@@ -65,7 +65,7 @@ BOOL s0271_MedalAcknowledge(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0272_MedalGetGuruActor(VM *vm, FieldScriptEnv *env) {
+BOOL s0272_MedalGetSpinTradeActor(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u16 *exists = ScriptReadVar(vm, env);

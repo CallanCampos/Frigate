@@ -7,10 +7,10 @@
 #include "battle/btl_faintrec.h"
 #include "battle/btl_handler_work.h"
 #include "battle/btl_monset.h"
+#include "battle/btl_move_rec.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_pospoke.h"
 #include "battle/btl_server.h"
-#include "battle/btl_wazarec.h"
 #include "struct_decls.h"
 
 // The start of every handler command's parameters
@@ -165,7 +165,7 @@ struct BtlServerFlow {
     u32 unk10;
     u32 unk14;
     u32 unk18;
-    BtlWazaRec wazaRec;
+    BtlMoveRec moveRec;
     BtlFaintRec faintRec;
     ArcTool *unk4A4;
     BattleMoveEffectState *moveEffect;

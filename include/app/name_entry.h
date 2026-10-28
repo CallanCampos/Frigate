@@ -11,7 +11,7 @@
 // The name entry, overlay 280
 
 // What the name entry is for. The mode is also the number of the message that asks for the name (the text bank of
-// namein.c)
+// name_input.c)
 enum {
     NAME_ENTRY_PLAYER,
     NAME_ENTRY_POKEMON,
@@ -61,7 +61,7 @@ typedef struct {
     u32 unk34;
 } NameEntryParam;
 
-// Overlay 12's namein_setup.c
+// Overlay 12's name_input_setup.c
 // The name starts as a copy of name, if given
 NameEntryParam *setupNameEntry(HeapID heapId, u32 mode, u32 a2, u32 a3, u32 maxLength, const StrBuf *name,
                                TrainerGameInfoSave *gameInfo);

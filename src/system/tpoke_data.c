@@ -28,7 +28,7 @@ struct TPokeData {
     u32 count;
 };
 
-static int GetFieldPokemonMMdlLUTIndex(TPokeData *data, u16 species, u16 sex, u16 form);
+static int GetFieldPokemonActorLUTIndex(TPokeData *data, u16 species, u16 sex, u16 form);
 static FieldActorConfig *GetIndexOfTPokeObjCode(TPokeData *data, u16 objCode);
 
 TPokeData *LoadTPokeData(HeapID heapId) {
@@ -49,13 +49,13 @@ void FreeTPokeData(TPokeData *data) {
 }
 
 u16 GetPokemonFieldOBJCODE(TPokeData *data, u16 species, u16 sex, u16 form) {
-    int index = GetFieldPokemonMMdlLUTIndex(data, species, sex, form);
+    int index = GetFieldPokemonActorLUTIndex(data, species, sex, form);
 
     return data->entries[index].objCode;
 }
 
 BOOL IsFieldPokemonSpriteHugeBillboard(GameData *unused, TPokeData *data, u16 species, u16 sex, u16 form) {
-    int index = GetFieldPokemonMMdlLUTIndex(data, species, sex, form);
+    int index = GetFieldPokemonActorLUTIndex(data, species, sex, form);
     FieldActorConfig *config = GetIndexOfTPokeObjCode(data, data->entries[index].objCode);
 
     if (config->billboardSize == 2) {
@@ -64,7 +64,7 @@ BOOL IsFieldPokemonSpriteHugeBillboard(GameData *unused, TPokeData *data, u16 sp
     return FALSE;
 }
 
-int GetFieldPokemonMMdlLUTIndex_(const TPokeData *data, u16 species, u16 sex, u16 form) {
+int GetFieldPokemonActorLUTIndex_(const TPokeData *data, u16 species, u16 sex, u16 form) {
     u32 i;
 
     for (i = 0; i < data->count; i++) {
@@ -76,10 +76,10 @@ int GetFieldPokemonMMdlLUTIndex_(const TPokeData *data, u16 species, u16 sex, u1
     return TPOKE_INDEX_NONE;
 }
 
-static int GetFieldPokemonMMdlLUTIndex(TPokeData *data, u16 species, u16 sex, u16 form) {
-    int index = GetFieldPokemonMMdlLUTIndex_(data, species, sex, form);
+static int GetFieldPokemonActorLUTIndex(TPokeData *data, u16 species, u16 sex, u16 form) {
+    int index = GetFieldPokemonActorLUTIndex_(data, species, sex, form);
 
-    // BUG: GetFieldPokemonMMdlLUTIndex_ returns TPOKE_INDEX_NONE, not a negative index, when no entry fits, so a
+    // BUG: GetFieldPokemonActorLUTIndex_ returns TPOKE_INDEX_NONE, not a negative index, when no entry fits, so a
     // Pokémon missing from the table reads entry 0xFFFF, past the end of the table, instead of entry 0
 #ifdef BUGFIX
     if (index == TPOKE_INDEX_NONE) {

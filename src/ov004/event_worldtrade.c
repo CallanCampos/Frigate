@@ -4,7 +4,7 @@
 #include "field/field_event.h"
 #include "gfl/sound.h"
 #include "gfl/std.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/save_control.h"
 #include "save/wifi_list.h"
 #include "system/game_comm.h"

@@ -45,7 +45,7 @@
 #include "field/player_state.h"
 #include "field/pleasure_boat.h"
 #include "field/resort_mapcreate.h"
-#include "field/scrcmd_ochiba.h"
+#include "field/scrcmd_leaves.h"
 #include "field/subscreen.h"
 #include "field/union_eff.h"
 #include "field/union_main.h"
@@ -53,7 +53,7 @@
 #include "field/zone.h"
 #include "field/zone_change.h"
 #include "gfl/arc.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/bmpwin.h"
 #include "gfl/calctool.h"
 #include "gfl/clact.h"
@@ -723,12 +723,12 @@ u16 Field_GetHeapID(Field *field) {
     return field->heapId;
 }
 
-BlActSys *Field_GetEffectBlAct(Field *field) {
-    return field->effectBlAct;
+BillboardActorSys *Field_GetEffectBillboardActor(Field *field) {
+    return field->effectBillboardActor;
 }
 
-BlActSys *Field_GetWildEffectBlAct(Field *field) {
-    return field->wildEffectBlAct;
+BillboardActorSys *Field_GetWildEffectBillboardActor(Field *field) {
+    return field->wildEffectBillboardActor;
 }
 
 FieldG3DMapper *Field_GetG3DMapper(Field *field) {
@@ -898,22 +898,22 @@ static inline G3DCamera *FieldG3D_CreateCamera(HeapID heapId) {
 }
 
 void FieldG3D_Init(Field *field) {
-    BlActScene *scene;
+    BillboardActorScene *scene;
 
-    field->actorBlAct = BlActSys_Create(0x40, 0x80, FldActSys_VRAMUploadFunc, field->heapId);
-    scene = BlActSys_GetScene(field->actorBlAct);
-    BlActScene_SetGeomOrigin(scene, 2);
-    BlActScene_SetTexcoordOffset(scene, 0, -0xa00);
-    field->effectBlAct = BlActSys_Create(0x3a, 0x50, FldActSys_VRAMUploadFunc, field->heapId);
-    field->wildEffectBlAct = BlActSys_Create(0x1e, 0x28, FldActSys_VRAMUploadFunc, field->heapId);
-    scene = BlActSys_GetScene(field->wildEffectBlAct);
+    field->actorBillboardActor = BillboardActorSys_Create(0x40, 0x80, FldActSys_VRAMUploadFunc, field->heapId);
+    scene = BillboardActorSys_GetScene(field->actorBillboardActor);
+    BillboardActorScene_SetGeomOrigin(scene, 2);
+    BillboardActorScene_SetTexcoordOffset(scene, 0, -0xa00);
+    field->effectBillboardActor = BillboardActorSys_Create(0x3a, 0x50, FldActSys_VRAMUploadFunc, field->heapId);
+    field->wildEffectBillboardActor = BillboardActorSys_Create(0x1e, 0x28, FldActSys_VRAMUploadFunc, field->heapId);
+    scene = BillboardActorSys_GetScene(field->wildEffectBillboardActor);
     {
         VecFx32 scale = { FX32_CONST(7), FX32_CONST(7), FX32_CONST(7) };
         u8 polyId;
 
-        BlActScene_SetScale(scene, &scale);
+        BillboardActorScene_SetScale(scene, &scale);
         polyId = 0;
-        BlActScene_SetBasePolyID(scene, &polyId);
+        BillboardActorScene_SetBasePolyID(scene, &polyId);
     }
     Field_LoadActorMatColorPreset(field);
     field->g3DObjSystem = FieldG3DObjSystem_Create(field->heapId, 0x40, 0x40);
@@ -926,9 +926,9 @@ void FieldG3D_Init(Field *field) {
 void FieldG3D_Update(Field *field) {
     BOOL loading;
 
-    BlActSys_UpdateActors(field->actorBlAct);
-    BlActSys_UpdateActors(field->effectBlAct);
-    BlActSys_UpdateActors(field->wildEffectBlAct);
+    BillboardActorSys_UpdateActors(field->actorBillboardActor);
+    BillboardActorSys_UpdateActors(field->effectBillboardActor);
+    BillboardActorSys_UpdateActors(field->wildEffectBillboardActor);
     FieldNoGridMapper_UpdateCamera(field->noGridMapper);
     FieldCameraArea_Update(field->sceneArea, &field->playerPos);
     FieldFogCtrl_Update(field->fogCtrl, field->heapId);
@@ -963,9 +963,9 @@ void FieldG3D_RenderPhase2(Field *field) {
 void FieldG3D_Free(Field *field) {
     GFL_G3DLightFree(field->g3dLights);
     GFL_G3DCameraFree(field->g3dCamera);
-    BlActSys_Free(field->actorBlAct);
-    BlActSys_Free(field->effectBlAct);
-    BlActSys_Free(field->wildEffectBlAct);
+    BillboardActorSys_Free(field->actorBillboardActor);
+    BillboardActorSys_Free(field->effectBillboardActor);
+    BillboardActorSys_Free(field->wildEffectBillboardActor);
     FieldG3DObjSystem_Free(field->g3DObjSystem);
 }
 
@@ -1013,7 +1013,7 @@ void Field_LoadActorMatColorPreset(Field *field) {
     FldActMatColorPreset *preset = FldActMatColorPreset_Create(heapId);
 
     FldActMatColorPreset_Load(preset, presetId);
-    FldActMatColorPreset_Apply(preset, BlActSys_GetScene(field->actorBlAct));
+    FldActMatColorPreset_Apply(preset, BillboardActorSys_GetScene(field->actorBillboardActor));
     FldActMatColorPreset_Free(preset);
 }
 
@@ -1024,9 +1024,9 @@ void Field_InitActorSystem(Field *field) {
     field->actorSystem = actorSystem;
     FldActSys_AttachField(actorSystem, field->heapId, gameData, field, field->g3DMapper, field->noGridMapper,
                           &field->colorPostFX);
-    FldActSys_InitBlAct(field->actorSystem, field->actorBlAct, 0x20);
-    FldActSys_LoadCachedBlact(field->actorSystem);
-    FldActSys_LoadStaticBlact(
+    FldActSys_InitBillboardActor(field->actorSystem, field->actorBillboardActor, 0x20);
+    FldActSys_LoadCachedBillboardActor(field->actorSystem);
+    FldActSys_LoadStaticBillboardActor(
         actorSystem,
         FieldPlayer_GetObjCodeByExState(getTrainerGender(GetGameDataPlayerInfo(gameData)), FLD_PLAYER_EXSTATE_NONE));
     FesGimmick_BindActorSystem(field->fesGimmick, actorSystem);
@@ -1347,8 +1347,8 @@ void FieldRenderPhase2_Fieldmap(Field *field) {
     NNS_G3dGeFlushBuffer();
     FieldEffects_Draw(field->fieldEffects);
     FieldG3DObjSystem_Draw(field->g3DObjSystem);
-    BlActSys_Draw(field->actorBlAct, field->g3dCamera, field->g3dLights);
-    BlActSys_Draw(field->wildEffectBlAct, field->g3dCamera, field->g3dLights);
+    BillboardActorSys_Draw(field->actorBillboardActor, field->g3dCamera, field->g3dLights);
+    BillboardActorSys_Draw(field->wildEffectBillboardActor, field->g3dCamera, field->g3dLights);
     if (field->unionEffect != NULL) {
         UnionEff_Draw(field->unionEffect);
     }
@@ -1357,7 +1357,7 @@ void FieldRenderPhase2_Fieldmap(Field *field) {
     NNS_G3dGlbSetProjectionMtx(&mtx);
     NNS_G3dGlbFlushP();
     NNS_G3dGeFlushBuffer();
-    BlActSys_Draw(field->effectBlAct, field->g3dCamera, field->g3dLights);
+    BillboardActorSys_Draw(field->effectBillboardActor, field->g3dCamera, field->g3dLights);
     NNS_G3dGlbSetProjectionMtx(&saved);
     NNS_G3dGlbFlushP();
     FieldAsyncProcManager_Draw(field->asyncProcManager);

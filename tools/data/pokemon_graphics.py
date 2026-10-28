@@ -171,7 +171,7 @@ def icon_file(root, index):
     return path, "char", {"size": (32, 64), "palette_bank": bank}
 
 
-# The footprints' shared files (zukan_info.c): the palette, then the animations and cells of the species up to
+# The footprints' shared files (pokedex_info.c): the palette, then the animations and cells of the species up to
 # Arceus, then those of the species from Victini
 FOOTPRINT_FILES = ("footprint_palette.pal", "footprint_animations_old.nanr", "footprint_cells_old.ncer",
                    "footprint_animations.nanr", "footprint_cells.ncer")

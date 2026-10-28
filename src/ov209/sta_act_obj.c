@@ -1,6 +1,6 @@
 #include "types.h"
 #include "app/musical/sta_act_obj.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/heap.h"
 #include "nitro/fx.h"
 
@@ -10,12 +10,12 @@ static void StaActObj_UpdateObj(StaActObjSys *sys, StaActObj *obj);
 
 static const BOOL STA_ACT_OBJ_SHOW = TRUE;
 
-StaActObjSys *StaActObj_InitSystem(HeapID heapId, BlActScene *blact) {
+StaActObjSys *StaActObj_InitSystem(HeapID heapId, BillboardActorScene *billboardActor) {
     u8 i;
     StaActObjSys *sys = GFL_HeapAllocate(heapId, sizeof(StaActObjSys), FALSE, "sta_act_obj.c", 79);
 
     sys->heapId = heapId;
-    sys->blact = blact;
+    sys->billboardActor = billboardActor;
     sys->scroll = 0;
     for (i = 0; i < 5; i++) {
         sys->objs[i].active = FALSE;
@@ -53,7 +53,7 @@ static void StaActObj_UpdateObj(StaActObjSys *sys, StaActObj *obj) {
         pos.x = (obj->pos.x - scroll) / 16;
         pos.y = (FX32_CONST(192) - obj->pos.y) / 16;
         pos.z = obj->pos.z;
-        BlActScene_SetActorPos(sys->blact, obj->actor, &pos);
+        BillboardActorScene_SetActorPos(sys->billboardActor, obj->actor, &pos);
         obj->update = FALSE;
     }
 }
@@ -84,14 +84,15 @@ StaActObj *StaActObj_AddObj(StaActObjSys *sys, u16 objId) {
     obj->pos.x = 0;
     obj->pos.y = 0;
     obj->pos.z = 0;
-    obj->actor = BlActScene_AddNewActor(sys->blact, obj->material, FX32_ONE, FX32_ONE, &obj->pos, 31, 0, 0);
-    BlActScene_SetActorHidden(sys->blact, obj->actor, &STA_ACT_OBJ_SHOW);
+    obj->actor =
+        BillboardActorScene_AddNewActor(sys->billboardActor, obj->material, FX32_ONE, FX32_ONE, &obj->pos, 31, 0, 0);
+    BillboardActorScene_SetActorHidden(sys->billboardActor, obj->actor, &STA_ACT_OBJ_SHOW);
     return obj;
 }
 
 void StaActObj_DelObj(StaActObjSys *sys, StaActObj *obj) {
-    BlActScene_ClearActorMaterial(sys->blact, obj->actor);
-    BlActScene_FreeMaterial(sys->blact, obj->material);
+    BillboardActorScene_ClearActorMaterial(sys->billboardActor, obj->actor);
+    BillboardActorScene_FreeMaterial(sys->billboardActor, obj->material);
     obj->active = FALSE;
 }
 
@@ -109,5 +110,5 @@ void StaActObj_GetPosition(StaActObjSys *sys, StaActObj *obj, VecFx32 *pos) {
 }
 
 void StaActObj_SetShowFlg(StaActObjSys *sys, StaActObj *obj, BOOL show) {
-    BlActScene_SetActorHidden(sys->blact, obj->actor, &show);
+    BillboardActorScene_SetActorHidden(sys->billboardActor, obj->actor, &show);
 }

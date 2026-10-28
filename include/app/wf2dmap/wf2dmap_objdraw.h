@@ -26,9 +26,9 @@ void WF2DMAP_OBJDrawWkUpdata(WF2DMAP_OBJDRAWWK *wk);
 // Whether WF2DMAP_OBJDrawWkUpdata does anything
 void WF2DMAP_OBJDrawWkUpdataFlagSet(WF2DMAP_OBJDRAWWK *wk, BOOL flag);
 // Plays the spinning animation
-void WF2DMAP_OBJDrawWkKuruAnimeStart(WF2DMAP_OBJDRAWWK *wk);
-void WF2DMAP_OBJDrawWkKuruAnimeMain(WF2DMAP_OBJDRAWWK *wk);
-void WF2DMAP_OBJDrawWkKuruAnimeEnd(WF2DMAP_OBJDRAWWK *wk);
+void WF2DMAP_OBJDrawWkSpinAnimeStart(WF2DMAP_OBJDRAWWK *wk);
+void WF2DMAP_OBJDrawWkSpinAnimeMain(WF2DMAP_OBJDRAWWK *wk);
+void WF2DMAP_OBJDrawWkSpinAnimeEnd(WF2DMAP_OBJDRAWWK *wk);
 void WF2DMAP_OBJDrawWkMatrixSet(WF2DMAP_OBJDRAWWK *wk, WF2DMAP_POS pos);
 BOOL WF2DMAP_OBJDrawWkDrawFlagGet(const WF2DMAP_OBJDRAWWK *wk);
 void WF2DMAP_OBJDrawWkDrawFlagSet(WF2DMAP_OBJDRAWWK *wk, BOOL flag);

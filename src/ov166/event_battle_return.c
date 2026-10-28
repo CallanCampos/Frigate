@@ -3,7 +3,7 @@
 #include "app/event_battle_return.h"
 #include "app/event_pdc_return.h"
 #include "app/name_entry.h"
-#include "app/zukan_toroku.h"
+#include "app/pokedex_registration.h"
 #include "battle/btl_result.h"
 #include "battle/btl_setup.h"
 #include "constants/abilities.h"
@@ -12,7 +12,7 @@
 #include "constants/pokemon.h"
 #include "constants/species.h"
 #include "constants/text_banks.h"
-#include "demo/shinka_demo.h"
+#include "demo/evolution_demo.h"
 #include "field/burmy_form.h"
 #include "field/player_state.h"
 #include "field/zone.h"
@@ -30,7 +30,7 @@
 #include "save/box.h"
 #include "save/event_work.h"
 #include "save/player_info.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/records.h"
 #include "save/save_control.h"
 #include "system/game_data.h"
@@ -59,11 +59,11 @@ typedef struct {
     StrBuf *name;
     // The caught Pokémon
     PartyPkm *pkm;
-    ZukanTorokuParam zukan;
+    PokedexRegistrationParam dex;
     // Where the Pokémon goes when the party is full
     StrBuf *boxMessage;
     u32 box;
-    ShinkaDemoParam *shinkaDemo;
+    EvolutionDemoParam *evolutionDemo;
     // The party slot evolveMask's lowest bit stands for
     u16 evolveSlot;
     // The party slots whose Pokémon leveled up in the battle, which may evolve
@@ -124,7 +124,7 @@ static BOOL EventBattleReturn_Init(GameProc *proc, u32 *state, void *param, void
     wk->pkm = NULL;
     wk->boxMessage = NULL;
     wk->box = 0;
-    wk->shinkaDemo = NULL;
+    wk->evolutionDemo = NULL;
     wk->heapId = HEAPID_BATTLE_RETURN;
     wk->procManager = CreateGameProcManager(wk->heapId);
     wk->musicDone = FALSE;
@@ -167,7 +167,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
     u32 evolveSlot;
     PartyPkm *pkm;
     u32 method;
-    ShinkaDemoParam *demo;
+    EvolutionDemoParam *demo;
 
     procRunning = GFL_ProcMgrUpdate(wk->procManager);
     if (procRunning == TRUE) {
@@ -229,18 +229,18 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
             }
             PokeDex_RegistPkm(pokedex, wk->pkm);
             addPkmToDex(pokedex, wk->pkm);
-            wk->zukan.pkm = wk->pkm;
-            wk->zukan.nationalDex = nationalDex;
-            wk->zukan.boxMessage = wk->boxMessage;
-            wk->zukan.boxes = boxes;
-            wk->zukan.box = wk->box;
-            wk->zukan.gameData = prm->gameData;
+            wk->dex.pkm = wk->pkm;
+            wk->dex.nationalDex = nationalDex;
+            wk->dex.boxMessage = wk->boxMessage;
+            wk->dex.boxes = boxes;
+            wk->dex.box = wk->box;
+            wk->dex.gameData = prm->gameData;
             if (firstCatch) {
-                wk->zukan.mode = 0;
+                wk->dex.mode = 0;
             } else {
-                wk->zukan.mode = 1;
+                wk->dex.mode = 1;
             }
-            QueueGameProc(wk->procManager, OVERLAY_ID(297), &ZUKAN_TOROKU_PROC_FUNCTIONS, &wk->zukan);
+            QueueGameProc(wk->procManager, OVERLAY_ID(297), &POKEDEX_REGISTRATION_PROC_FUNCTIONS, &wk->dex);
             (*state)++;
         } else {
             *state = 4;
@@ -250,7 +250,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
         if (procRunning != TRUE) {
             boxes = GameData_GetBoxSaveAccessor(prm->gameData);
             nickname = FALSE;
-            if (wk->zukan.nickname == TRUE) {
+            if (wk->dex.nickname == TRUE) {
                 nickname = TRUE;
             }
             if (nickname) {
@@ -321,7 +321,8 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
                 wk->evolveMask = wk->evolveMask >> 1;
                 wk->evolveSlot++;
                 if (species != 0) {
-                    demo = GFL_HeapAllocate(wk->heapId, sizeof(ShinkaDemoParam), FALSE, "event_battle_return.c", 465);
+                    demo =
+                        GFL_HeapAllocate(wk->heapId, sizeof(EvolutionDemoParam), FALSE, "event_battle_return.c", 465);
                     demo->gameData = prm->gameData;
                     demo->party = party;
                     demo->species = species;
@@ -329,8 +330,8 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
                     demo->method = method;
                     demo->unkC = 0;
                     demo->canCancel = TRUE;
-                    wk->shinkaDemo = demo;
-                    QueueGameProc(wk->procManager, OVERLAY_SHINKA_DEMO, &SHINKA_DEMO_PROC_FUNCTIONS, demo);
+                    wk->evolutionDemo = demo;
+                    QueueGameProc(wk->procManager, OVERLAY_EVOLUTION_DEMO, &EVOLUTION_DEMO_PROC_FUNCTIONS, demo);
                     *state = 5;
                     break;
                 }
@@ -341,8 +342,8 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
         break;
     case 5:
         if (procRunning != TRUE) {
-            GFL_HeapFree(wk->shinkaDemo);
-            wk->shinkaDemo = NULL;
+            GFL_HeapFree(wk->evolutionDemo);
+            wk->evolutionDemo = NULL;
             if (wk->evolveMask != 0) {
                 *state = 4;
             } else {

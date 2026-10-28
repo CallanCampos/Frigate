@@ -3,7 +3,7 @@
 // by the scanline hook (port/gfx/screens.c), the PNG screenshot (port/app/present.c), and the overlays' sections,
 // which a load sets back (port/hal/fs/ovsec.c, with ovsec_probe.c); and the game's own C where a host's 64-bit
 // pointers change what it computes: the field script's relative offsets (script_offsets.c, src/ov012/scrcmd_vm.c and
-// src/ov036/scrcmd_fldmmdl.c). Each scenario runs as the game's main() would, as the launcher of port_os_run, on the
+// src/ov036/scrcmd_field_actor.c). Each scenario runs as the game's main() would, as the launcher of port_os_run, on the
 // whole program's objects.
 //
 //   port_integrate_tests NAME | all

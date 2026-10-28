@@ -141,9 +141,9 @@ WorldTrade_WantLevelPrint_XY kind:function(thumb,size=0x50) addr:0x021d6fb8
 WorldTrade_PokeWantPrint kind:function(thumb,size=0xc6) addr:0x021d7008
 WorldTrade_MyPokeWantPrint kind:function(thumb,size=0xc6) addr:0x021d70d0
 WorldTrade_PokeInfoPrint kind:function(thumb,size=0x140) addr:0x021d7198
-WorldTrade_ZukanSortDataGet kind:function(thumb,size=0x24) addr:0x021d72d8
+WorldTrade_PokedexSortDataGet kind:function(thumb,size=0x24) addr:0x021d72d8
 WorldTrade_HeadwordRangeGet kind:function(thumb,size=0x34) addr:0x021d72fc
-WorldTrade_SinouZukanDataGet kind:function(thumb,size=0x68) addr:0x021d7330
+WorldTrade_SinnohPokedexDataGet kind:function(thumb,size=0x68) addr:0x021d7330
 WorldTrade_PostPokemonBaseDataMake kind:function(thumb,size=0x114) addr:0x021d7398
 Deposit_DepositPokemonDataMake kind:function(thumb,size=0x40) addr:0x021d74ac
 Deposit_PokeNameSortListMake kind:function(thumb,size=0xb4) addr:0x021d74ec
@@ -556,7 +556,7 @@ data_ov214_021e1e90 kind:data(any) addr:0x021e1ed0
 data_ov214_021e1eb0 kind:data(any) addr:0x021e1ef0
 sSearchLevelMinMaxTable kind:data(any) addr:0x021e1f10
 sLevelMinMaxTable kind:data(any) addr:0x021e1f68
-ZukanSortHiraTable kind:data(any) addr:0x021e1fc8
+PokedexSortInitialTable kind:data(any) addr:0x021e1fc8
 sCountryListTbl kind:data(any) addr:0x021e2034
 sExplainMsgTable kind:data(any) addr:0x021e2138
 sSexWinPos kind:data(any) addr:0x021e214c

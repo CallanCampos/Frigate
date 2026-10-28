@@ -1,6 +1,6 @@
 // The field script's relative offsets, which its commands read as signed 32-bit numbers and add to the script's
 // pointer: the jumps and calls of src/ov012/scrcmd_vm.c (s001E_VMJump, s0004_VMCall, s001F_VMJumpIf, s0020_VMCallIf)
-// and the movement that s0064_ActorCmdExec (src/ov036/scrcmd_fldmmdl.c) hands a field actor. Each offset counts from
+// and the movement that s0064_ActorCmdExec (src/ov036/scrcmd_field_actor.c) hands a field actor. Each offset counts from
 // the end of the command's arguments, and a script reaches what comes before the command with a negative one. On the
 // DS the 32-bit sum wraps; read as a u32 and added to a 64-bit pointer, such an offset moves the pointer 4 GiB forward
 // instead, which stopped Black 2 at the starter's nickname until the commands read it signed
@@ -9,14 +9,14 @@
 // the script's pointer goes and which action the actor gets.
 //
 // No ROM: s0064_ActorCmdExec's actor, its actor system, the GFL task manager and heap that the actor's action task
-// takes (src/ov036/fldmmdl_acmd.c) are made here with the game's own layouts (include/field/field_actor_internal.h,
+// takes (src/ov036/field_actor_acmd.c) are made here with the game's own layouts (include/field/field_actor_internal.h,
 // include/field/field_script.h). port/tests/integrate/test_integrate.c runs it as its script_offsets scenario.
 #include "types.h"
 #include "constants/field_script.h"
 #include "field/field_acmd.h"
 #include "field/field_actor_internal.h"
 #include "field/field_script.h"
-#include "field/scrcmd_fldmmdl.h"
+#include "field/scrcmd_field_actor.h"
 #include "gfl/heap.h"
 #include "gfl/tcb.h"
 #include "nitro/os.h"
@@ -28,7 +28,7 @@
 // is named after its offset; Black 2's build/b2_us/res/field/scripts/aspertia_city.bin has them so) from offset 0x500
 // on, at the offsets the script has them, each offset argument where its command reads it:
 // - Movement_0528, an animation of Bianca's in place: one action, 100, then the end. Action 100's commands
-//   (ACTOR_ACTION_COMMAND_TABLES[100], src/ov036/fldmmdl_movedata.c, run by src/ov036/fldmmdl_acmd.c) set her draw
+//   (ACTOR_ACTION_COMMAND_TABLES[100], src/ov036/field_actor_movedata.c, run by src/ov036/field_actor_acmd.c) set her draw
 //   status to 10 and wait for its animation to end, without moving her. The scene plays it twice: after "You're
 //   ex-act-ly like what I heard!", from before it, and after the answer to the nickname;
 // - the VMCall L_06C6 at 0x640, which the YES to the nickname takes, 128 bytes forward;
@@ -48,7 +48,7 @@
 #define BIANCA 2
 #define ANIMATION_ACTION 100
 
-// An actor's flag that its slot is in use (src/ov012/fldmmdl.c, NextActor)
+// An actor's flag that its slot is in use (src/ov012/field_actor.c, NextActor)
 #define ACTOR_FLAG_USED 0x1
 // The actor system's task priority, of which an action task takes two less (FieldAcmdTCB_Create)
 #define ACTOR_TASK_PRIORITY 2

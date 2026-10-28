@@ -4,7 +4,7 @@
 #include "constants/pokemon.h"
 #include "constants/species.h"
 #include "pml/poke_party.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "system/game_data.h"
 
 void TransformVsPokePartyBySeason(GameData *gameData, PokeParty *party, u8 season) {

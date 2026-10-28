@@ -81,7 +81,7 @@ BOOL s00C7_CallCut(VM *vm, FieldScriptEnv *env) {
 
     field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     actor = FieldPlayer_GetActor(Field_GetPlayer(field));
-    FldeffIaigiri_Start(actor, Field_GetFieldEffects(field));
+    FldeffCut_Start(actor, Field_GetFieldEffects(field));
     return FALSE;
 }
 

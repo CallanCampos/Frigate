@@ -63,7 +63,7 @@ GameEventReturnCode EventPerapRecord_Main(GameEvent *event, u32 *state, void *da
 
     switch (*state) {
     case 0:
-        EventPerapRecord_PauseMmdls(work);
+        EventPerapRecord_PauseActors(work);
         *state = 1;
         break;
     case 1:
@@ -186,7 +186,7 @@ GameEventReturnCode EventPerapRecord_Main(GameEvent *event, u32 *state, void *da
         *state = 14;
         break;
     case 14:
-        EventPerapRecord_ResumeMmdls(work);
+        EventPerapRecord_ResumeActors(work);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -196,11 +196,11 @@ void EventPerapRecord_OnRecorded(u32 result, u32 *done) {
     *done = TRUE;
 }
 
-void EventPerapRecord_PauseMmdls(ChatotEventWork *work) {
+void EventPerapRecord_PauseActors(ChatotEventWork *work) {
     DisableAllActorsMovement(Field_GetActorSystem(GSYS_GetField(work->gsys)));
 }
 
-void EventPerapRecord_ResumeMmdls(ChatotEventWork *work) {
+void EventPerapRecord_ResumeActors(ChatotEventWork *work) {
     EnableAllActorsMovement(Field_GetActorSystem(GSYS_GetField(work->gsys)));
 }
 

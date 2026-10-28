@@ -107,7 +107,7 @@ void UnionCommand_Set(UnionSystem *sys, u32 id, void *arg);
 BOOL UnionCommand_IsActive(UnionSystem *sys);
 
 // The procs of the activities that run in the Union Room, in overlays 70 and 216
-extern const GameProcFunctions OEKAKI_PROC_FUNCTIONS;
-extern const GameProcFunctions GURU2_PROC_FUNCTIONS;
+extern const GameProcFunctions DRAWING_PROC_FUNCTIONS;
+extern const GameProcFunctions SPIN_TRADE_PROC_FUNCTIONS;
 
 #endif // POKEBW2_FIELD_UNION_MAIN_H

@@ -97,6 +97,17 @@ that a comment explains). A local the code needs is fine even if the order of it
 **Don't:** expand a macro or an inline of the project or the SDK (`FX32_CONST`, `NELEMS`, `GX_RGB`, `FX_Mul`) by
 hand, or hand-copy a header's inline into a file, to change what the compiler does.
 
+**Does not apply when:** a `GFL_ASSERT` names something by a word that our names put in English. The game keeps the
+assert's expression as text, so the assert is written out as the macro expands, with the ROM's text and a comment that
+says so; the code is the macro's. The user chose this on 2026-10-28.
+
+```c
+    // GFL_ASSERT written out: the game prints Game Freak's name for PokedexSortInitialTable, ZukanSortHiraTable
+    if (!(select < NELEMS(PokedexSortInitialTable))) {
+        GFL_DebugAssertFail("", 0, "select < NELEMS(ZukanSortHiraTable)");
+    }
+```
+
 **Checked:** by review.
 
 ## 4. Indexing and pointers

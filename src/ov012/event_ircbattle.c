@@ -7,7 +7,7 @@
 #include "battle/btl_setup.h"
 #include "constants/pokemon.h"
 #include "constants/sound.h"
-#include "demo/shinka_demo.h"
+#include "demo/evolution_demo.h"
 #include "field/event_irc.h"
 #include "field/event_make.h"
 #include "field/field_event.h"
@@ -164,7 +164,7 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
     EventIRCWork *work = data;
     GameSystem *gsys = work->gsys;
     Field *field = GSYS_GetField(gsys);
-    ShinkaDemoParam *evolution;
+    EvolutionDemoParam *evolution;
 
     switch (*state) {
     case 0:
@@ -356,7 +356,7 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         }
         break;
     case 15:
-        evolution = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ShinkaDemoParam), FALSE, "event_ircbattle.c", 537);
+        evolution = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(EvolutionDemoParam), FALSE, "event_ircbattle.c", 537);
         evolution->gameData = work->gameData;
         evolution->party = work->trade.party;
         evolution->species = work->trade.evolveSpecies;
@@ -365,7 +365,7 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         evolution->unkC = 1;
         evolution->canCancel = FALSE;
         work->trade.evolution = evolution;
-        GSYS_QueueProc(gsys, OVERLAY_SHINKA_DEMO, &SHINKA_DEMO_PROC_FUNCTIONS, evolution);
+        GSYS_QueueProc(gsys, OVERLAY_EVOLUTION_DEMO, &EVOLUTION_DEMO_PROC_FUNCTIONS, evolution);
         (*state)++;
         break;
     case 16:

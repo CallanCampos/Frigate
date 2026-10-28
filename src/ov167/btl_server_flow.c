@@ -12,6 +12,7 @@
 #include "battle/btl_main.h"
 #include "battle/btl_monset.h"
 #include "battle/btl_move.h"
+#include "battle/btl_move_rec.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_pospoke.h"
 #include "battle/btl_server.h"
@@ -19,7 +20,6 @@
 #include "battle/btl_server_flow.h"
 #include "battle/btl_server_flow_sub.h"
 #include "battle/btl_tables.h"
-#include "battle/btl_wazarec.h"
 #include "battle/condition_effects.h"
 #include "battle/pos_handlers.h"
 #include "battle/side_handlers.h"
@@ -31,9 +31,9 @@
 #include "gfl/arc.h"
 #include "gfl/random.h"
 #include "gfl/std.h"
+#include "pml/move.h"
 #include "pml/personal.h"
 #include "pml/poke_party.h"
-#include "pml/waza.h"
 #include "system/comm_player_support.h"
 #include "system/game_beacon.h"
 
@@ -72,7 +72,7 @@ void BtlServerFlow_ResetSystem(BtlServerFlow *flow) {
 void BtlServerFlow_InitWork(BtlServerFlow *flow) {
     BattleEvent_Init();
     FieldStatusInit(0);
-    BtlWazaRec_Init(&flow->wazaRec);
+    BtlMoveRec_Init(&flow->moveRec);
     BtlFaintRec_Init(&flow->faintRec);
     BtlPosPoke_Init(&flow->posPoke, flow->mainModule, flow->pokeCon, BtlSetup_GetBattleStyle(flow->mainModule));
     MI_CpuFill8(flow->unk7A9, 0, sizeof(flow->unk7A9));
@@ -1668,7 +1668,7 @@ void ServerControl_Fight(BtlServerFlow *flow, BattleMon *mon, BattleAction *acti
         if (ServerControl_CheckPledgeCombo(flow, mon, actualMove, target)) {
             break;
         }
-        BtlWazaRec_Add(&flow->wazaRec, actualMove, flow->unk10, GetMonID(mon));
+        BtlMoveRec_Add(&flow->moveRec, actualMove, flow->unk10, GetMonID(mon));
         ServerControl_CallMoveEvent(flow, mon, flow->unk1AB0, 0x23);
         if (ServerControl_CheckMoveSteal(flow, mon, actualMove, flow->unk854, flow->unk4AC)) {
             ServerControl_StealMove(flow, mon, actualMove, flow->unk854);
@@ -2155,7 +2155,7 @@ BOOL ServerControl_ExecuteMove(BtlServerFlow *flow, BattleMon *mon, u16 move, Bt
             if (!flow->moveEffect->unk05_1) {
                 ServerControl_PutMoveAnimation(flow, move, flow->moveEffect, reserved);
             }
-            BtlWazaRec_MarkLastSucceeded(&flow->wazaRec);
+            BtlMoveRec_MarkLastSucceeded(&flow->moveRec);
             if (!IsFainted(mon) && getMoveFlag(move, 2)) {
                 scPut_SetContFlag(flow, mon, 0xc);
             }
@@ -7463,8 +7463,8 @@ u8 *BtlServerFlow_GetHandlerWork(BtlServerFlow *flow, u32 size) {
     return flow->unk1FF0;
 }
 
-BtlWazaRec *BtlServerFlow_GetWazaRec(BtlServerFlow *flow) {
-    return &flow->wazaRec;
+BtlMoveRec *BtlServerFlow_GetMoveRec(BtlServerFlow *flow) {
+    return &flow->moveRec;
 }
 
 BtlFaintRec *BtlServerFlow_GetFaintRec(BtlServerFlow *flow) {

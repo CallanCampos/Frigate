@@ -4,7 +4,7 @@
 #include "gfl/heap.h"
 #include "gfl/std.h"
 #include "gfl/str.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/save_control.h"
 #include "system/game_data.h"
 #include "system/game_system.h"

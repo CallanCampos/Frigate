@@ -245,7 +245,7 @@ void FieldPlayerRail_Delete(FieldPlayerNoGrid *nogrid) {
     GFL_HeapFree(nogrid);
 }
 
-void FieldPlayerRail_AttachMmdl(FieldPlayerNoGrid *nogrid, const RailPosition *pos) {
+void FieldPlayerRail_AttachActor(FieldPlayerNoGrid *nogrid, const RailPosition *pos) {
     if (GetActorMoveCode(nogrid->actor) != NOGRID_MOVE_CODE) {
         sPlayerTemplate.modelId = FldAct_GetObjCode(nogrid->actor);
         FldAct_Transplant(nogrid->actor, &sPlayerTemplate);

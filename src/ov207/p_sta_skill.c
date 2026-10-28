@@ -14,8 +14,8 @@
 #include "nitro/math.h"
 #include "p_status_local.h"
 #include "pml/hm_check.h"
+#include "pml/move.h"
 #include "pml/poke_party.h"
-#include "pml/waza.h"
 #include "system/app_menu_common.h"
 #include "system/hp_gauge.h"
 

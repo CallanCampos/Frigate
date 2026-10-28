@@ -26,7 +26,7 @@
 #include "gfl/touchpanel.h"
 #include "gfl/ui.h"
 #include "pml/personal.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "system/app_menu_common.h"
 #include "system/cursor_move.h"
 #include "system/game_data.h"

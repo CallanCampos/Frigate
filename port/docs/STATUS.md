@@ -32,12 +32,47 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: validate the expanded naming sync and preserve port adaptations
+
+- **Upstream:** proposed `0e2d7f0974a9104d274f00ecaa8167fbfac7dfa1`, ten commits beyond reviewed main's
+  `fd3b9e600d`: Hall of Fame, HM, Pokédex, evolution/trade, moves, name entry, Union Room and field actors/effects.
+  This remains a proposal for the existing draft sync PR, not a completed sync of main. No reference/rewrite
+  exception is used; no incoming workflow changes exist.
+- **Port:** `PORT_SHA`, on `codex/upstream-sync-c13587cf7872-3ea5609ea3e2`; real upstream merge with its
+  `Upstream-Commit` trailer and reviewed main `3ea5609ea3`. Pending feature/contributor PRs remain separate.
+- **ROM (T0):** fresh configure/Ninja, 9,607 steps, zero compiler warnings; both original hashes match: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+- **Host build/tests (T1/T2):** complete arm64 macOS RelWithDebInfo builds pass. Full CTest: B2 345 passed,
+  29 explicit skips of 374; W2 342 passed, 29 skips of 371; zero failures. Skips comprise 24 absent DS oracle
+  fixtures, absent party timing fixtures, unavailable Python Unicorn, two unsupported Apple function-sanitizer
+  negatives and the single-architecture universal check. Supplementary assembly-oracle runs use the existing
+  Unicorn environment; their results are recorded separately in PR verification. No test policy is weakened.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** existing native replay and applicable tests pass;
+  title timing passes both games and New Game timing passes B2. No new gameplay completion or full timing-parity
+  claim. Targeted MWCC preprocessing matches upstream for all four Hall of Fame C files and the Pokédex form C
+  file in both versions: ten of ten. Canonical exact-head and hosted PR checks remain merge gates.
+- **Tiers/trap stubs:** no new scan; this naming/organization sync does not complete native features. Previously
+  measured matching coverage remains separate from the unfinished CARD/DMA/AI timing and unsupported SDK paths.
+- **64-bit warnings:** both-version pointer guards pass: 365 sites in 229 keys (66 real, 123 harmless, 141 handled,
+  35 unreachable), 1,707 compiled inputs and zero missing; no increase.
+- **Work done:** retain full-width Hall of Fame handles/callbacks and the renamed Pokédex form callback; preserve
+  the ten `sizeof(HiddenEventData)` allocations. An independent audit checks all 32 incoming files carrying port
+  adaptations: all 156 previous added noncomment lines survive, 151 after path/whitespace normalization and five
+  verified callback renames. This additive-line audit is not a whole-sync token-equivalence claim. Imported decomp
+  configs equal upstream. Update the actual field-script test include and living source references for field-actor
+  renames; oracle changes only descriptive names, with identical logic, inputs, seeds, masks and goldens.
+- **Next:** finish feature/contributor review, incorporate reviewed main, and publish this bounded resolution to
+  the existing sync PR; rerun its exact-head local gates and require every hosted check before merging. Continue
+  general native CARD CPU service and original-DS timing comparison afterward.
+- **Blockers:** no human action blocks the sync resolution. Hosted/canonical validation remains due. Issue 45
+  remains open: Spanish gameplay and save/reload have no validating ROM dump or evidence here.
+
 ## 2026-10-28: prepare the Hall of Fame/HM naming sync without losing port changes
 
 - **Upstream:** proposed `29b9dcfef987d1bb850afd62f687d36447c27c4b`, two naming commits beyond `fd3b9e600d`.
   Reviewed main remains `b631907c33`, whose Compile, Standards and Frigate CI all pass. This is a local proposal,
   not a completed sync of main; no reference/rewrite exception is used and no incoming workflow changes exist.
-- **Port:** `PORT_SHA`, on `codex/upstream-sync-2026-10-28-hall-of-fame`; real upstream merge with its provenance
+- **Port:** `2cfb2f3330`, on `codex/upstream-sync-2026-10-28-hall-of-fame`; real upstream merge with its provenance
   trailer. The proposal is not pushed. Independent Windows/AI/Linux contributor work is being reviewed separately.
 - **ROM (T0):** fresh configure/Ninja, 10,651 steps, zero warnings; both original hashes match: B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.

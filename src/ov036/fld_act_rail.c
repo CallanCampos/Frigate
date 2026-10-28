@@ -1,9 +1,8 @@
 // The rail actors' jump along the rail, and the tables of the functions of their action commands, by the command's
-// state, which ACTOR_ACTION_COMMAND_TABLES_RAIL (fldmmdl_movedata.c) lists by command. The name is descriptive. The
-// size sort shows the file: its 8- and 12-byte tables and jump heights come before fldmmdl_rail.c's direction tables,
-// which share a section that would sit among the 8-byte tables in one file
-// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
-// Additional helper and table names are our descriptive guesses.
+// state, which ACTOR_ACTION_COMMAND_TABLES_RAIL (field_actor_movedata.c) lists by command. The name is descriptive. The
+// size sort shows the file: its 8- and 12-byte tables and jump heights come before field_actor_rail.c's direction
+// tables, which share a section that would sit among the 8-byte tables in one file Names from swan
+// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0). Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "constants/sound.h"
 #include "field/field_actor.h"

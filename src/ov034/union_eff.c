@@ -19,8 +19,8 @@
 enum {
     UNION_EFF_FOCUS_NSBMD = 0x14,
     UNION_EFF_FOCUS_NSBCA,
-    UNION_EFF_MARK_TOMO_NSBMD,
-    UNION_EFF_MARK_ASONDA_NSBMD,
+    UNION_EFF_MARK_FRIEND_NSBMD,
+    UNION_EFF_MARK_PLAYED_NSBMD,
 };
 
 #define FOCUS_SLOT_MAX 1
@@ -47,8 +47,8 @@ typedef struct {
 
 typedef struct {
     UnionEffSlot slot[MARK_SLOT_MAX];
-    G3DResource *res_nsbmd_tomo;
-    G3DResource *res_nsbmd_asonda;
+    G3DResource *res_nsbmd_friend;
+    G3DResource *res_nsbmd_played;
     u16 serial;
 } MarkMan;
 
@@ -70,8 +70,8 @@ static void UnionEff_DrawFocus(FocusMan *focus_man);
 static UnionEffSlot *UnionEff_GetFreeFocusSlot(FocusMan *focus_man);
 static void UnionEff_LoadMarks(MarkMan *mark_man, HeapID heapId);
 static void UnionEff_UnloadMarks(MarkMan *mark_man);
-static void UnionEff_StartMark(MarkMan *mark_man, FieldActor *actor, BOOL asonda);
-static void UnionEff_InitMarkSlot(MarkMan *mark_man, UnionEffSlot *slot, FieldActor *actor, u16 serial, BOOL asonda);
+static void UnionEff_StartMark(MarkMan *mark_man, FieldActor *actor, BOOL played);
+static void UnionEff_InitMarkSlot(MarkMan *mark_man, UnionEffSlot *slot, FieldActor *actor, u16 serial, BOOL played);
 static UnionEffSlot *UnionEff_GetFreeMarkSlot(MarkMan *mark_man);
 static void UnionEff_FreeMarkSlot(UnionEffSlot *slot);
 static void UnionEff_StepMarkSlot(UnionEffSlot *slot);
@@ -164,9 +164,9 @@ void UnionEff_AddFocus(UnionEffect *eff, FieldActor *actor) {
     }
 }
 
-void UnionEff_AddMark(UnionEffect *eff, FieldActor *actor, BOOL asonda) {
+void UnionEff_AddMark(UnionEffect *eff, FieldActor *actor, BOOL played) {
     if (eff != NULL) {
-        UnionEff_StartMark(&eff->mark, actor, asonda);
+        UnionEff_StartMark(&eff->mark, actor, played);
     }
 }
 
@@ -288,42 +288,48 @@ static void UnionEff_LoadMarks(MarkMan *mark_man, HeapID heapId) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(UNION_EFF_ARC_ID, heapId);
     BOOL ret;
 
-    mark_man->res_nsbmd_tomo = GFL_G3DSysReadArcToolResource(arc, UNION_EFF_MARK_TOMO_NSBMD);
-    mark_man->res_nsbmd_asonda = GFL_G3DSysReadArcToolResource(arc, UNION_EFF_MARK_ASONDA_NSBMD);
-    ret = GFL_G3DResUploadTexData(mark_man->res_nsbmd_tomo);
+    mark_man->res_nsbmd_friend = GFL_G3DSysReadArcToolResource(arc, UNION_EFF_MARK_FRIEND_NSBMD);
+    mark_man->res_nsbmd_played = GFL_G3DSysReadArcToolResource(arc, UNION_EFF_MARK_PLAYED_NSBMD);
+    ret = GFL_G3DResUploadTexData(mark_man->res_nsbmd_friend);
     GFL_ASSERT(ret);
-    ret = GFL_G3DResUploadTexData(mark_man->res_nsbmd_asonda);
+    ret = GFL_G3DResUploadTexData(mark_man->res_nsbmd_played);
     GFL_ASSERT(ret);
     GFL_ArcToolFree(arc);
 }
 
 static void UnionEff_UnloadMarks(MarkMan *mark_man) {
-    GFL_G3DResFreeTexData(mark_man->res_nsbmd_tomo);
-    GFL_G3DResFreeTexData(mark_man->res_nsbmd_asonda);
-    GFL_G3DResFree(mark_man->res_nsbmd_tomo);
-    GFL_G3DResFree(mark_man->res_nsbmd_asonda);
-    mark_man->res_nsbmd_tomo = NULL;
-    mark_man->res_nsbmd_asonda = NULL;
+    GFL_G3DResFreeTexData(mark_man->res_nsbmd_friend);
+    GFL_G3DResFreeTexData(mark_man->res_nsbmd_played);
+    GFL_G3DResFree(mark_man->res_nsbmd_friend);
+    GFL_G3DResFree(mark_man->res_nsbmd_played);
+    mark_man->res_nsbmd_friend = NULL;
+    mark_man->res_nsbmd_played = NULL;
 }
 
-static void UnionEff_StartMark(MarkMan *mark_man, FieldActor *actor, BOOL asonda) {
+static void UnionEff_StartMark(MarkMan *mark_man, FieldActor *actor, BOOL played) {
     UnionEffSlot *slot;
 
-    GFL_ASSERT(mark_man->res_nsbmd_tomo != NULL);
-    GFL_ASSERT(mark_man->res_nsbmd_asonda != NULL);
+    // GFL_ASSERT written out: the game prints Game Freak's name for res_nsbmd_friend, res_nsbmd_friend
+    if (!(mark_man->res_nsbmd_friend != NULL)) {
+        GFL_DebugAssertFail("", 0, "mark_man->res_nsbmd_tomo != NULL");
+    }
+    // GFL_ASSERT written out: the game prints Game Freak's name for res_nsbmd_played, res_nsbmd_asonda
+    if (!(mark_man->res_nsbmd_played != NULL)) {
+        GFL_DebugAssertFail("", 0, "mark_man->res_nsbmd_asonda != NULL");
+    }
     slot = UnionEff_GetFreeMarkSlot(mark_man);
-    UnionEff_InitMarkSlot(mark_man, slot, actor, mark_man->serial, asonda);
+    UnionEff_InitMarkSlot(mark_man, slot, actor, mark_man->serial, played);
     mark_man->serial++;
 }
 
-static void UnionEff_InitMarkSlot(MarkMan *mark_man, UnionEffSlot *slot, FieldActor *actor, u16 serial, BOOL asonda) {
+static void UnionEff_InitMarkSlot(MarkMan *mark_man, UnionEffSlot *slot, FieldActor *actor, u16 serial, BOOL played) {
     MI_CpuFill8(slot, 0, sizeof(UnionEffSlot));
     slot->actor = actor;
     slot->serial = serial;
-    if (asonda == FALSE) {
-        slot->model = GFL_G3DMdlCreate(mark_man->res_nsbmd_tomo, 0, mark_man->res_nsbmd_tomo);
+    if (played == FALSE) {
+        slot->model = GFL_G3DMdlCreate(mark_man->res_nsbmd_friend, 0, mark_man->res_nsbmd_friend);
     } else {
-        slot->model = GFL_G3DMdlCreate(mark_man->res_nsbmd_asonda, 0, mark_man->res_nsbmd_asonda);
+        slot->model = GFL_G3DMdlCreate(mark_man->res_nsbmd_played, 0, mark_man->res_nsbmd_played);
     }
     slot->g3dActor = GFL_G3DActorCreate(slot->model, NULL, 0);
 }

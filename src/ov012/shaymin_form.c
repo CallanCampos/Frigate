@@ -4,7 +4,7 @@
 #include "constants/species.h"
 #include "field/shaymin_form.h"
 #include "pml/poke_party.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "system/game_data.h"
 #include "system/rtc.h"
 

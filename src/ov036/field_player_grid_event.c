@@ -344,7 +344,7 @@ static void FieldSurfTCB_Callback(TCB *tcb, void *work) {
         height = 0;
         GetHeightFromMap(actor, &pos, &height);
         pos.y = height;
-        task = FldeffNamipoke_Start(Field_GetFieldEffects(surf->field), dir, &pos, actor, 0);
+        task = FldeffSurfPokemon_Start(Field_GetFieldEffects(surf->field), dir, &pos, actor, 0);
         FieldPlayer_SetRideEffect(surf->player, task);
         encounter = Field_GetEncountSystem(surf->field);
         gridPos[0] = HEIGHT_TO_GRID(pos.x);
@@ -375,7 +375,7 @@ static void FieldSurfTCB_Callback(TCB *tcb, void *work) {
             break;
         }
         FldAct_EndAcmd(actor);
-        FldeffNamipoke_SetFollowMode(FieldPlayer_GetRideEffect(surf->player), 1);
+        FldeffSurfPokemon_SetFollowMode(FieldPlayer_GetRideEffect(surf->player), 1);
         FieldPlayer_SetSpecialSeq(surf->player, 4);
         surf->state++;
         // fall through
@@ -460,7 +460,7 @@ static BOOL FieldPlayerGrid_JumpUpStart(WaterfallTCB *waterfall) {
     waterfall->stepY = FX32_CONST(6);
     waterfall->shake.y = FX32_ONE;
     task = FieldPlayer_GetRideEffect(waterfall->player);
-    FldeffNamipoke_SetFollowMode(task, 2);
+    FldeffSurfPokemon_SetFollowMode(task, 2);
     kind = 1;
     if ((u16)(waterfall->dir + 0xfffe) <= 1) {
         kind = 3;
@@ -468,7 +468,7 @@ static BOOL FieldPlayerGrid_JumpUpStart(WaterfallTCB *waterfall) {
     effects = Field_GetFieldEffects(waterfall->field);
     effectId = 8;
     FieldEffects_Load(effects, &effectId, 1);
-    waterfall->splash = FldeffNamipokeSplash_StartOnEffect(effects, kind, task);
+    waterfall->splash = FldeffSurfPokemonSplash_StartOnEffect(effects, kind, task);
     FieldCameraZoomTCB_Create(waterfall->field, 16, FX32_CONST(32));
     GFL_SndSEPlay(SEQ_SE_FLD_81);
     waterfall->state++;
@@ -497,7 +497,7 @@ static BOOL FieldPlayerGrid_JumpUpApproach(WaterfallTCB *waterfall) {
         if ((u16)(waterfall->dir + 0xfffe) <= 1) {
             kind = 2;
         }
-        waterfall->splash = FldeffNamipokeSplash_StartOnEffect(Field_GetFieldEffects(waterfall->field), kind, task);
+        waterfall->splash = FldeffSurfPokemonSplash_StartOnEffect(Field_GetFieldEffects(waterfall->field), kind, task);
     }
     Waterfall_SetShakeOffset(actor, &waterfall->shake);
     return FALSE;
@@ -573,8 +573,8 @@ static BOOL FieldPlayerGrid_JumpUpLand(WaterfallTCB *waterfall) {
     FldAct_SetHeightCalcDisabled(actor, FALSE);
     SetActorWPosAll(actor, &waterfall->dest, waterfall->dir);
     task = FieldPlayer_GetRideEffect(waterfall->player);
-    FldeffNamipoke_SetFollowMode(task, 1);
-    waterfall->splash = FldeffNamipokeSplash_StartOnEffect(Field_GetFieldEffects(waterfall->field), 0, task);
+    FldeffSurfPokemon_SetFollowMode(task, 1);
+    waterfall->splash = FldeffSurfPokemonSplash_StartOnEffect(Field_GetFieldEffects(waterfall->field), 0, task);
     GFL_SndSEPlay(SEQ_SE_FLD_83);
     waterfall->state++;
     return FALSE;
@@ -583,7 +583,7 @@ static BOOL FieldPlayerGrid_JumpUpLand(WaterfallTCB *waterfall) {
 static BOOL FieldPlayerGrid_JumpUpWaitEffect(WaterfallTCB *waterfall) {
     FieldEffects *effects;
 
-    if (waterfall->splash != NULL && FldeffNamipokeSplash_IsFinished(waterfall->splash) == TRUE) {
+    if (waterfall->splash != NULL && FldeffSurfPokemonSplash_IsFinished(waterfall->splash) == TRUE) {
         effects = Field_GetFieldEffects(waterfall->field);
         FieldEffects_DeleteObject(waterfall->splash);
         FieldEffects_FreeEffect(effects, 8);
@@ -625,8 +625,8 @@ static void FieldPlayerGrid_UpdateJumpDown(WaterfallTCB *waterfall) {
         waterfall->stepY = -0x6000;
         waterfall->shake.y = FX32_ONE;
         task = FieldPlayer_GetRideEffect(waterfall->player);
-        FldeffNamipoke_SetFollowMode(task, 2);
-        FldeffNamipoke_SetWakeEnabled(task, FALSE);
+        FldeffSurfPokemon_SetFollowMode(task, 2);
+        FldeffSurfPokemon_SetWakeEnabled(task, FALSE);
         kind = 1;
         if ((u16)(waterfall->dir + 0xfffe) <= 1) {
             kind = 3;
@@ -634,7 +634,7 @@ static void FieldPlayerGrid_UpdateJumpDown(WaterfallTCB *waterfall) {
         effects = Field_GetFieldEffects(waterfall->field);
         effectId = 8;
         FieldEffects_Load(effects, &effectId, 1);
-        waterfall->splash = FldeffNamipokeSplash_StartOnEffect(effects, kind, task);
+        waterfall->splash = FldeffSurfPokemonSplash_StartOnEffect(effects, kind, task);
         FieldCameraZoomTCB_Create(waterfall->field, 16, FX32_CONST(32));
         GFL_SndSEPlay(SEQ_SE_FLD_82);
         waterfall->state++;
@@ -656,7 +656,8 @@ static void FieldPlayerGrid_UpdateJumpDown(WaterfallTCB *waterfall) {
             if ((u16)(waterfall->dir + 0xfffe) <= 1) {
                 kind = 2;
             }
-            waterfall->splash = FldeffNamipokeSplash_StartOnEffect(Field_GetFieldEffects(waterfall->field), kind, task);
+            waterfall->splash =
+                FldeffSurfPokemonSplash_StartOnEffect(Field_GetFieldEffects(waterfall->field), kind, task);
         }
         Waterfall_SetShakeOffset(actor, &waterfall->shake);
         break;
@@ -671,8 +672,8 @@ static void FieldPlayerGrid_UpdateJumpDown(WaterfallTCB *waterfall) {
             FieldCameraZoomTCB_Create(waterfall->field, 16, -FX32_CONST(32));
             FieldEffects_DeleteObject(waterfall->splash);
             task = FieldPlayer_GetRideEffect(waterfall->player);
-            FldeffNamipoke_SetFollowMode(task, 1);
-            waterfall->splash = FldeffNamipokeSplash_StartOnEffect(Field_GetFieldEffects(waterfall->field), 0, task);
+            FldeffSurfPokemon_SetFollowMode(task, 1);
+            waterfall->splash = FldeffSurfPokemonSplash_StartOnEffect(Field_GetFieldEffects(waterfall->field), 0, task);
         }
         SetActorWPosValue(actor, &pos);
         break;
@@ -689,7 +690,7 @@ static void FieldPlayerGrid_UpdateJumpDown(WaterfallTCB *waterfall) {
             FieldEffects_DeleteObject(waterfall->splash);
             FieldEffects_FreeEffect(effects, 8);
             FieldPlayer_SetGridHopLanded(waterfall->player);
-            FldeffNamipoke_SetWakeEnabled(FieldPlayer_GetRideEffect(waterfall->player), TRUE);
+            FldeffSurfPokemon_SetWakeEnabled(FieldPlayer_GetRideEffect(waterfall->player), TRUE);
             waterfall->splash = NULL;
             waterfall->finished = TRUE;
             GFL_SndSEPlay(SEQ_SE_FLD_83);

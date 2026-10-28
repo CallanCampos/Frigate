@@ -3,7 +3,7 @@
 #include "constants/arc.h"
 #include "field/musical.h"
 #include "gfl/arc.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/g3d.h"
 #include "gfl/graphics.h"
 #include "gfl/heap.h"
@@ -26,14 +26,14 @@ const BOOL MUS_ITEM_DRAW_UNUSED_1 = TRUE;
 
 static const BOOL MUS_ITEM_DRAW_SHOW = TRUE;
 
-MusItemDrawSys *MusItemDraw_InitSystem(BlActScene *blact, u16 count, HeapID heapId) {
+MusItemDrawSys *MusItemDraw_InitSystem(BillboardActorScene *billboardActor, u16 count, HeapID heapId) {
     int i;
     MusItemDrawSys *sys = GFL_HeapAllocate(heapId, sizeof(MusItemDrawSys), FALSE, "mus_item_draw.c", 85);
 
     sys->items = GFL_HeapAllocate(heapId, sizeof(MusItemDraw) * count, FALSE, "mus_item_draw.c", 87);
     sys->heapId = heapId;
     sys->count = count;
-    sys->blact = blact;
+    sys->billboardActor = billboardActor;
     for (i = 0; i < sys->count; i++) {
         sys->items[i].active = FALSE;
         sys->items[i].update = FALSE;
@@ -89,12 +89,12 @@ void MusItemDraw_UpdateSystem(MusItemDrawSys *sys) {
             pos.x = (item->pos.x - dx) / 16;
             pos.y = (FX32_CONST(192) - (item->pos.y - dy)) / 16;
             pos.z = item->pos.z;
-            BlActScene_SetActorPos(sys->blact, item->actor, &pos);
+            BillboardActorScene_SetActorPos(sys->billboardActor, item->actor, &pos);
             MusItemDraw_GetFaceSize(item, &width, &height);
             scaleX = item->scaleX * width;
             scaleY = item->scaleY * height;
-            BlActScene_SetActorScale(sys->blact, item->actor, &scaleX, &scaleY);
-            BlActScene_SetActorRotation(sys->blact, item->actor, &item->rotation);
+            BillboardActorScene_SetActorScale(sys->billboardActor, item->actor, &scaleX, &scaleY);
+            BillboardActorScene_SetActorRotation(sys->billboardActor, item->actor, &item->rotation);
             sys->items[i].update = FALSE;
         }
     }
@@ -114,7 +114,7 @@ static void MusItemDraw_GetFaceSize(MusItemDraw *item, u8 *width, u8 *height) {
     u16 texWidth;
     u16 texHeight;
 
-    BlAct_GetTexDimensions(MusItemData_GetTexSize(item->data), &texWidth, &texHeight);
+    BillboardActor_GetTexDimensions(MusItemData_GetTexSize(item->data), &texWidth, &texHeight);
     *width = texWidth / 32;
     *height = texHeight / 32;
 }
@@ -172,7 +172,7 @@ MusItemDraw *MusItemDraw_AddItem(MusItemDrawSys *sys, u16 itemId, G3DResource *t
     size = MusItemData_GetTexSize(sys->items[index].data);
     MusItemDraw_GetFaceSize(&sys->items[index], &width, &height);
     sys->items[index].material =
-        BlActScene_AddMaterialNewTex(sys->blact, texResource, 0, size, width * 32, height * 32);
+        BillboardActorScene_AddMaterialNewTex(sys->billboardActor, texResource, 0, size, width * 32, height * 32);
     sys->items[index].ownMaterial = TRUE;
     MusItemDraw_InitActor(sys, index, pos, width, height);
     return &sys->items[index];
@@ -194,9 +194,9 @@ MusItemDraw *MusItemDraw_AddItemWithMaterial(MusItemDrawSys *sys, u16 itemId, u3
 }
 
 static MusItemDraw *MusItemDraw_InitActor(MusItemDrawSys *sys, u16 index, const VecFx32 *pos, s16 scaleX, s16 scaleY) {
-    sys->items[index].actor =
-        BlActScene_AddNewActor(sys->blact, sys->items[index].material, FX32_ONE, FX32_ONE, pos, 31, 0, 0);
-    BlActScene_SetActorHidden(sys->blact, sys->items[index].actor, &MUS_ITEM_DRAW_SHOW);
+    sys->items[index].actor = BillboardActorScene_AddNewActor(sys->billboardActor, sys->items[index].material, FX32_ONE,
+                                                              FX32_ONE, pos, 31, 0, 0);
+    BillboardActorScene_SetActorHidden(sys->billboardActor, sys->items[index].actor, &MUS_ITEM_DRAW_SHOW);
     sys->items[index].active = TRUE;
     sys->items[index].update = TRUE;
     sys->items[index].useOffset = TRUE;
@@ -211,9 +211,9 @@ static MusItemDraw *MusItemDraw_InitActor(MusItemDrawSys *sys, u16 index, const 
 }
 
 void MusItemDraw_DelItem(MusItemDrawSys *sys, MusItemDraw *item) {
-    BlActScene_ClearActorMaterial(sys->blact, item->actor);
+    BillboardActorScene_ClearActorMaterial(sys->billboardActor, item->actor);
     if (item->ownMaterial == TRUE) {
-        BlActScene_FreeMaterialVramIfTex(sys->blact, item->material);
+        BillboardActorScene_FreeMaterialVramIfTex(sys->billboardActor, item->material);
     }
     item->active = FALSE;
     item->update = FALSE;
@@ -223,9 +223,9 @@ void MusItemDraw_ChangeItem(MusItemDrawSys *sys, MusItemDraw *item, u16 itemId, 
     item->texFileId = MusItemDraw_GetTexFileId(itemId);
     item->data = MusItemData_GetItem(sys->itemData, itemId);
     item->shadow = FALSE;
-    BlActScene_SetActorMaterial(sys->blact, item->actor, &material);
+    BillboardActorScene_SetActorMaterial(sys->billboardActor, item->actor, &material);
     if (item->ownMaterial == TRUE) {
-        BlActScene_FreeMaterialVramIfTex(sys->blact, item->material);
+        BillboardActorScene_FreeMaterialVramIfTex(sys->billboardActor, item->material);
     }
     item->ownMaterial = FALSE;
     item->material = material;
@@ -238,8 +238,8 @@ void MusItemDraw_SetShadowPalette(MusItemDrawSys *sys, MusItemDraw *item, G3DRes
         u32 plttAddr;
         NNSGfdPlttKey plttKey;
 
-        BlActScene_GetMaterialPlttAddr(sys->blact, item->material, &plttAddr);
-        BlActScene_GetMaterialPlttKey(sys->blact, item->material, &plttKey);
+        BillboardActorScene_GetMaterialPlttAddr(sys->billboardActor, item->material, &plttAddr);
+        BillboardActorScene_GetMaterialPlttKey(sys->billboardActor, item->material, &plttKey);
         NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_PLTT, plttAddr, sys->shadowPalette,
                                            NNS_GfdGetPlttKeySize(plttKey));
         item->shadow = TRUE;
@@ -257,7 +257,7 @@ void MusItemDraw_CopyShadowPos(MusItemDrawSys *sys, MusItemDraw *item, MusItemDr
 }
 
 void MusItemDraw_SetVisible(MusItemDrawSys *sys, MusItemDraw *item, BOOL visible) {
-    BlActScene_SetActorHidden(sys->blact, item->actor, &visible);
+    BillboardActorScene_SetActorHidden(sys->billboardActor, item->actor, &visible);
     item->update = TRUE;
 }
 

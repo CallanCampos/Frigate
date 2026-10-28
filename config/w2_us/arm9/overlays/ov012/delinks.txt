@@ -357,7 +357,7 @@ src/ov012/oneshot_dr.c:
     .text       start:0x021659cc end:0x02165a2c
     .rodata     start:0x0216dc5c end:0x0216dc7c
 
-src/ov012/namein_setup.c:
+src/ov012/name_input_setup.c:
     complete
     .text       start:0x02165a2c end:0x02165b5c
     .data       start:0x0216e3e0 end:0x0216e3f0
@@ -372,7 +372,7 @@ src/ov012/event_bsubway.c:
     .text       start:0x02165ef8 end:0x021666a4
     .rodata     start:0x0216dc9c end:0x0216dca8
 
-src/ov012/fldmmdl.c:
+src/ov012/field_actor.c:
     complete
     .text       start:0x021666a4 end:0x02168360
     .data       start:0x0216e3f0 end:0x0216e60c
@@ -392,7 +392,7 @@ src/ov012/scrcmd_sp_poke.c:
     complete
     .text       start:0x02169c5c end:0x02169cbc
 
-src/ov012/waza_oshie.c:
+src/ov012/move_tutor.c:
     complete
     .text       start:0x02169cbc end:0x02169e58
     .data       start:0x0216e63c end:0x0216e64c

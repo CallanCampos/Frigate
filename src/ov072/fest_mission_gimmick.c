@@ -22,7 +22,7 @@ static BOOL FesMissionGimmick_IsRailPlaceBlocked(FesGimmick *gimmick, FesMission
 static void FesMissionGimmick_DeletePersonActor(FesMissionWork *work, int index);
 
 void FesMissionGimmick_LoadActorResource(FesGimmick *gimmick, FesMissionWork *work) {
-    FldActSys_LoadStaticBlact(gimmick->actors, FesMissionPeople_GetObjCode(work, gimmick->mission));
+    FldActSys_LoadStaticBillboardActor(gimmick->actors, FesMissionPeople_GetObjCode(work, gimmick->mission));
 }
 
 void FesMissionGimmick_RemoveBlockedPeople(FesGimmick *gimmick, FesMissionWork *work) {

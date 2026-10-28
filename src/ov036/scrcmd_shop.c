@@ -1052,7 +1052,7 @@ static void ShopUI_AppendOption(ShopUIWork *wk, u32 index, u8 mode, u32 item, Ms
         ListMenuCore_AppendStrBufOption(&wk->options[index], wk->message, index, wk->heapId);
     } else if (mode == SHOP_LIST_TMS) {
         WordSetNumber(wk->wordSet, 0, item - ITEM_TM01 + 1, 2, NUM_PAD_ZERO, 1);
-        loadMoveNameToStrbuf(wk->wordSet, 1, PML_ItemGetTMWazaID(item));
+        loadMoveNameToStrbuf(wk->wordSet, 1, PML_ItemGetTMMoveID(item));
         GFL_WordSetFormatStrbuf(wk->wordSet, wk->message, wk->moveLabelFormat);
         ListMenuCore_AppendStrBufOption(&wk->options[index], wk->message, index, wk->heapId);
     } else {
@@ -1617,7 +1617,7 @@ static void ShopUI_PrintItemBuyMessage(ShopUIWork *wk, u32 msgId, u16 item, u32 
 static void ShopUI_PrintTMBuyMessage(ShopUIWork *wk, u32 msgId, u16 item, u32 price) {
     ShopUI_DrawMessageFrame(wk->windows[6]);
     WordSetNumber(wk->wordSet, 0, item - ITEM_TM01 + 1, 2, NUM_PAD_ZERO, 1);
-    loadMoveNameToStrbuf(wk->wordSet, 1, PML_ItemGetTMWazaID(item));
+    loadMoveNameToStrbuf(wk->wordSet, 1, PML_ItemGetTMMoveID(item));
     WordSetNumber(wk->wordSet, 2, price, 5, NUM_PAD_NONE, 1);
     ShopUI_PrintMessageInFrame(wk, msgId);
 }

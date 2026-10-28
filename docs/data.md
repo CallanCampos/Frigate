@@ -344,7 +344,7 @@ fragmented. Those resources are preserved as separate source files and can be re
 `src/system/poke_icon.c` picks the bank, and the icons' cells and animations for each OBJ mapping are
 `shared/icon_{cells,animations}_{32k,64k,128k}`. `footprint.png` is a 16×32 character sheet and uses
 `res/pokemon/shared/footprint_palette.pal`, with the cells and animations of `shared/footprint_*_old` for the species
-up to Arceus and `shared/footprint_*` for the rest (`zukan_info.c`).
+up to Arceus and `shared/footprint_*` for the rest (`pokedex_info.c`).
 The older musical sprite archive has its own `musical/` subfolder. Files identical to the regular sprite are omitted
 there; the packer uses the regular file for those entries, so an edit of one shows in both. Sprite forms have
 `form_<n>/` folders under their species, numbered by the forms' `sprite_offset` (`GetPokemonDataIDBase`); the musical

@@ -60,7 +60,7 @@ src/ov036/resort_mapcreate.c:
     .text       start:0x021c898c end:0x021c8c6c
     .data       start:0x021d5784 end:0x021d5798
 
-src/ov036/scrcmd_ochiba.c:
+src/ov036/scrcmd_leaves.c:
     complete
     .text       start:0x021c97ec end:0x021c9eec
     .rodata     start:0x021d4954 end:0x021d4b44
@@ -127,7 +127,7 @@ src/ov036/fldeff_shadow.c:
     .rodata     start:0x021d0558 end:0x021d0578
     .data       start:0x021d5048 end:0x021d5058
 
-src/ov036/fldeff_kemuri.c:
+src/ov036/fldeff_dust.c:
     complete
     .text       start:0x021a3e20 end:0x021a4018
     .rodata     start:0x021d0578 end:0x021d058c
@@ -145,13 +145,13 @@ src/ov036/fldeff_encount.c:
     .rodata     start:0x021d0700 end:0x021d075c
     .data       start:0x021d50b4 end:0x021d511c
 
-src/ov036/fldeff_namipoke.c:
+src/ov036/fldeff_surf_pokemon.c:
     complete
     .text       start:0x021a43c4 end:0x021a50e4
     .rodata     start:0x021d0628 end:0x021d0700
     .data       start:0x021d50a0 end:0x021d50b4
 
-src/ov036/fldeff_iwakudaki.c:
+src/ov036/fldeff_rock_smash.c:
     complete
     .text       start:0x021a5644 end:0x021a5868
     .rodata     start:0x021d075c end:0x021d07ac
@@ -163,7 +163,7 @@ src/ov036/fldeff_fishing.c:
     .rodata     start:0x021d07ac end:0x021d0804
     .data       start:0x021d5140 end:0x021d5158
 
-src/ov036/fldeff_fes_kira.c:
+src/ov036/fldeff_fes_sparkle.c:
     complete
     .text       start:0x021a5a58 end:0x021a5d6c
     .rodata     start:0x021d0804 end:0x021d0854
@@ -235,7 +235,7 @@ src/ov036/scrcmd_encount.c:
     .rodata     start:0x021d0f8c end:0x021d0f98
     .data       start:0x021d5230 end:0x021d5244
 
-src/ov036/scrcmd_fldmmdl.c:
+src/ov036/scrcmd_field_actor.c:
     complete
     .text       start:0x021a9904 end:0x021aad84
     .rodata     start:0x021d0918 end:0x021d094c
@@ -310,7 +310,7 @@ src/ov036/field_nogrid_mapper.c:
     .text       start:0x021b3be4 end:0x021b3e88
     .data       start:0x021d52a8 end:0x021d52c0
 
-src/ov036/fldeff_gyoe.c:
+src/ov036/fldeff_emotion_bubble.c:
     complete
     .text       start:0x021b3e88 end:0x021b42b4
     .rodata     start:0x021d1038 end:0x021d10ac
@@ -390,19 +390,19 @@ src/ov036/field_menu_event.c:
     complete
     .text       start:0x0218b16c end:0x0218b238
 
-src/ov036/fldmmdl_acmd.c:
+src/ov036/field_actor_acmd.c:
     complete
     .text       start:0x0218ed58 end:0x02191268
     .rodata     start:0x021cace0 end:0x021cb8b0
     .data       start:0x021d4d74 end:0x021d4d90
 
-src/ov036/fldmmdl_blact.c:
+src/ov036/field_actor_billboard.c:
     complete
     .text       start:0x021936c0 end:0x021946f4
     .rodata     start:0x021cf30c end:0x021cf398
     .data       start:0x021d4d90 end:0x021d4da0
 
-src/ov036/fldmmdl_g3dobj.c:
+src/ov036/field_actor_g3dobj.c:
     complete
     .text       start:0x021946f4 end:0x021953b8
     .rodata     start:0x021cf398 end:0x021cf3a8
@@ -656,7 +656,7 @@ src/ov036/field_water_current.c:
     .text       start:0x021c24ec end:0x021c27c0
     .rodata     start:0x021d23a0 end:0x021d23c8
 
-src/ov036/fldeff_d06denki.c:
+src/ov036/fldeff_d06electric.c:
     complete
     .text       start:0x021c27c0 end:0x021c2cf4
     .rodata     start:0x021d23c8 end:0x021d24dc
@@ -667,7 +667,7 @@ src/ov036/land_data_patch.c:
     .text       start:0x021c2cf4 end:0x021c2e14
     .data       start:0x021d55e0 end:0x021d55f4
 
-src/ov036/fldeff_iaigiri.c:
+src/ov036/fldeff_cut.c:
     complete
     .text       start:0x021c2e14 end:0x021c31b8
     .rodata     start:0x021d24dc end:0x021d252c
@@ -731,7 +731,7 @@ src/ov036/scrcmd_hidden_hollow.c:
     .text       start:0x021c8d08 end:0x021c9480
     .rodata     start:0x021d4914 end:0x021d4928
 
-src/ov036/fldeff_ochiba.c:
+src/ov036/fldeff_leaves.c:
     complete
     .text       start:0x021c9480 end:0x021c97ec
     .rodata     start:0x021d4928 end:0x021d4954
@@ -741,26 +741,26 @@ src/ov036/enceff_data.c:
     complete
     .rodata     start:0x021d2620 end:0x021d2918
 
-src/ov036/fldmmdl_movecode.c:
+src/ov036/field_actor_movecode.c:
     complete
     .text       start:0x02191268 end:0x021925e4
     .rodata     start:0x021cb8b0 end:0x021cbde4
 
-src/ov036/fldmmdl_evtype.c:
+src/ov036/field_actor_evtype.c:
     complete
     .text       start:0x021925e4 end:0x02192a8c
     .rodata     start:0x021cbde4 end:0x021cbf20
 
-src/ov036/fldmmdl_movecode_pair.c:
+src/ov036/field_actor_movecode_pair.c:
     complete
     .text       start:0x02192a8c end:0x021936c0
     .rodata     start:0x021cbf20 end:0x021cc038
 
-src/ov036/fldmmdl_movedata.c:
+src/ov036/field_actor_movedata.c:
     complete
     .rodata     start:0x021cc038 end:0x021cd124
 
-src/ov036/fldmmdl_drawdata.c:
+src/ov036/field_actor_drawdata.c:
     complete
     .rodata     start:0x021cd124 end:0x021cf30c
 
@@ -785,12 +785,12 @@ src/ov036/scrcmd_poke_disp.c:
     .text       start:0x021c74d0 end:0x021c7b70
     .rodata     start:0x021d46b0 end:0x021d46b8
 
-src/ov036/fldmmdl_g3dobj_draw.c:
+src/ov036/field_actor_g3dobj_draw.c:
     complete
     .text       start:0x021974dc end:0x02197574
     .rodata     start:0x021cf9d4 end:0x021cf9ec
 
-src/ov036/fldmmdl_rail.c:
+src/ov036/field_actor_rail.c:
     complete
     .text       start:0x021955d0 end:0x02196248
     .rodata     start:0x021cf6d0 end:0x021cf7fc

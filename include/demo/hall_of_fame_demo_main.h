@@ -121,7 +121,7 @@ typedef struct {
 typedef struct {
     HallOfFameDemoParam *param;
     TCB *vblankTask;
-    // DDEMO_SCENE_*
+    // HALL_OF_FAME_DEMO_SCENE_*
     u32 scene;
     uptr seHandle;
     G3DManager *g3dMgr;

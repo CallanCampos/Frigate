@@ -6,7 +6,7 @@ every section.
 
 - Name a file after the original. Many functions pass their file's name to `GFL_HeapAllocate` or an assert, so the
   overlay embeds strings such as `"resort_npc.c"`, which sit in that file's `.data`. A name with a Japanese word or one
-  of Game Freak's private abbreviations is put in English, and the file's header gives the ROM's name: `zukan_toroku.c`
+  of Game Freak's private abbreviations is put in English, and the file's header gives the ROM's name: `pokedex_registration.c`
   is `pokedex_registration.c`, `fldmmdl_acmd.c` `field_actor_acmd.c` ([Names](#names) has the words). The string in
   the code stays the ROM's. A file whose name the ROM doesn't give gets a name for what it does, such as `gym_nacrene.c`; never an overlay number or a counter.
 - An original file is one entry in `delinks.txt`, covering its whole range in each section, even while only some of
@@ -160,7 +160,10 @@ Names that swan lacks are ours, and are recorded in `config/names.txt` by module
 
 Every name is English, swan's included: a Japanese word or one of Game Freak's private abbreviations is translated,
 and the header of a file whose swan names were translated says so. The user chose this on 2026-10-28. Well-known
-acronyms such as BGM, SE, HP, PP, TM, HM, NPC, BG and OBJ stay. The words so far:
+acronyms such as BGM, SE, HP, PP, TM, HM, NPC, BG and OBJ stay. A name the ROM spells out is in English too: `GFL_ASSERT`
+keeps its expression's text in the game, so an assert that names something by a translated word is written out with
+the ROM's text, as `worldtrade_deposit.c`'s for `PokedexSortInitialTable` is (docs/code-standards.md, rule 3). The words
+so far:
 
 | Word | English | | Word | English |
 |---|---|---|---|---|

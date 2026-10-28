@@ -9,7 +9,7 @@
 #include "constants/battle.h"
 #include "constants/types.h"
 #include "gfl/std.h"
-#include "pml/waza.h"
+#include "pml/move.h"
 
 #define NUM_SIDES 2
 #define NUM_SIDE_EFFECTS 14

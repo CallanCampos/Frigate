@@ -104,7 +104,7 @@ GameEventReturnCode WaterCurrent_SlideTaskMain(GameEvent *event, u32 *state, voi
         if (!IsTileWaterCurrent_(WaterCurrent_GetTileClass(work))) {
             *state = 2;
         } else {
-            FldeffNamipoke_SetWakeEnabled(FieldPlayer_GetRideEffect(work->player), FALSE);
+            FldeffSurfPokemon_SetWakeEnabled(FieldPlayer_GetRideEffect(work->player), FALSE);
             WaterCurrent_SlidePlayLoopSe(work);
             *state = 1;
         }
@@ -193,7 +193,7 @@ void WaterCurrent_SlideFinishBump(EventWaterCurrentMove *work) {
             FieldEffects_Load(effects, &effectId, 1);
         }
         FieldPlayer_GetWPos(work->player, &pos);
-        FldeffNamipokeSplash_StartAtPos(effects, 0, &pos);
+        FldeffSurfPokemonSplash_StartAtPos(effects, 0, &pos);
         WaterCurrent_SlidePlayBumpEffectSe(work);
         work->flowTile = NULL;
         work->flowing = FALSE;
@@ -209,7 +209,7 @@ void WaterCurrent_SlideSelectBumpEntry(EventWaterCurrentMove *work) {
 }
 
 void WaterCurrent_SlideShowSurfPokemon(EventWaterCurrentMove *work) {
-    FldeffNamipoke_SetWakeEnabled(FieldPlayer_GetRideEffect(work->player), TRUE);
+    FldeffSurfPokemon_SetWakeEnabled(FieldPlayer_GetRideEffect(work->player), TRUE);
     FieldPlayer_SetGridHopLanded(work->player);
 }
 

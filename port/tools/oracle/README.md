@@ -999,8 +999,8 @@ and variables, the mystery gifts and every other block are melonDS's:
   `0x7f7f` on the port against the DS's `0x7560` (Black 2) and `0xb793` (White 2). A change to the gift data would
   fail the trip. The catch saves, made without entering a Pokémon Center, hold the block as the start save has it.
 - 1 or 2 bytes of the field actors' block: the Pokémon Center's townsperson at (3,15) who turns at random (npc 9 of
-  `res/field/events/aspertia_city_pokemon_center.json`, movement code 13, `FldmmdlMovecode_MoveTurnRandom` in
-  `src/ov036/fldmmdl_movecode.c`), its seventh actor: his turn's timer (`0x1e412`, `RailWanderWork.timer` in the
+  `res/field/events/aspertia_city_pokemon_center.json`, movement code 13, `FieldActorMovecode_MoveTurnRandom` in
+  `src/ov036/field_actor_movecode.c`), its seventh actor: his turn's timer (`0x1e412`, `RailWanderWork.timer` in the
   movement code's work, 21 on the port and 28 on the DS in Black 2, 19 and 4 in White 2) and, in Black 2, his direction
   (`0x1e3ed`, left on the port and right on the DS). The timer counts down at each step of the field's actors, every
   other pass, and, run out, draws a new wait and direction from GFL's linear generator. The port reaches the Pokémon
@@ -1381,7 +1381,7 @@ failure to fix, never a known difference. By kind:
   the dialog on, the field's passes alternate between ending with NNS G3D's camera at the field's and at a 2D one, and
   the port reaches that step first, 232 counts before the DS in Black 2's catch and 144 in pc (`SAVE_CAMERA`); and the
   field's townspeople who walk or turn at random draw their waits and directions from GFL's linear generator
-  (`FldmmdlMovecode_GetRandomTableEntry` and `_GetRandomDirFromSet`, `src/ov036/fldmmdl_movecode.c`) when their timers,
+  (`FieldActorMovecode_GetRandomTableEntry` and `_GetRandomDirFromSet`, `src/ov036/field_actor_movecode.c`) when their timers,
   which wait while the field menu and the dialog show, run out, so from the port's dialog closing the DS makes each of
   the port's draws as many counts later as its dialog closes later, 192 and 168 in route19, 228 and 232 in catch
   (`SAVE_RANDOM`). In pc the draws come 126 counts later in both versions, a field pass less than the dialog's 128: the

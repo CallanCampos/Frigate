@@ -9,7 +9,7 @@
 #include "save/event_work.h"
 #include "save/medal_box.h"
 #include "save/misc_savedata.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/save_control.h"
 #include "system/game_data.h"
 

@@ -574,7 +574,7 @@ static GameEventReturnCode MistraltonTravelEvent_Run(GameEvent *event, u32 *stat
     switch (*state) {
     case 0:
         if (FldAct_CheckAcmdEnd(data->actor)) {
-            FldAct_SetAcmd(data->actor, ACMD_GYOE);
+            FldAct_SetAcmd(data->actor, ACMD_EMOTION_BUBBLE);
             GFL_SndSEPlay(SEQ_SE_GYM_H07);
             *state = 1;
         }
@@ -705,7 +705,7 @@ static GameEventReturnCode MistraltonBumpEvent_Run(GameEvent *event, u32 *state,
     switch (*state) {
     case 0:
         if (FldAct_CheckAcmdEnd(data->actor)) {
-            FldAct_SetAcmd(data->actor, ACMD_GYOE);
+            FldAct_SetAcmd(data->actor, ACMD_EMOTION_BUBBLE);
             GFL_SndSEPlay(SEQ_SE_GYM_H07);
             *state = 1;
         }
@@ -785,7 +785,7 @@ static GameEventReturnCode MistraltonCannonEvent_Run(GameEvent *event, u32 *stat
         break;
     case 1:
         if (FldAct_CheckAcmdEnd(data->actor)) {
-            FldAct_SetAcmd(data->actor, ACMD_GYOE);
+            FldAct_SetAcmd(data->actor, ACMD_EMOTION_BUBBLE);
             GFL_SndSEPlay(SEQ_SE_GYM_H07);
             *state = 2;
         }

@@ -44,6 +44,6 @@ void ShortcutMenu_RequestClose(ShortcutMenuApp *app);
 BOOL ShortcutMenu_IsWaitingInput(ShortcutMenuApp *app);
 u32 ShortcutMenu_GetResult(ShortcutMenuApp *app, u32 *item);
 // Puts the field back through a subprocess of overlay 0x118, then finishes
-GameEvent *ReturnToField_CreateNameInEvent(GameSystem *gsys, Field *field, NameEntryParam *param, BOOL transition);
+GameEvent *ReturnToField_CreateNameInputEvent(GameSystem *gsys, Field *field, NameEntryParam *param, BOOL transition);
 
 #endif // POKEBW2_FIELD_SHORTCUT_MENU_H

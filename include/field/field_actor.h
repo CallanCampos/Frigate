@@ -4,7 +4,7 @@
 #include "types.h"
 #include "constants/directions.h"
 #include "field/zone.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/heap.h"
 #include "nitro/fx.h"
 #include "struct_decls.h"
@@ -102,7 +102,7 @@ typedef struct {
     void (*unk10)(FieldActor *actor);
 } FieldActorMoveCode;
 
-// The saved positions of the strength boulders that were moved, in grid units, by the slots of fldmmdl.c's table of
+// The saved positions of the strength boulders that were moved, in grid units, by the slots of field_actor.c's table of
 // boulders. A slot without a saved position holds STRENGTH_ROCK_POS_NONE
 #define STRENGTH_ROCK_SLOT_COUNT 80
 #define STRENGTH_ROCK_POS_NONE 0x7fff
@@ -153,30 +153,30 @@ u16 FldAct_GetObjCode(FieldActor *actor);
 void FldAct_Transplant(FieldActor *actor, const ZoneNPC *npc);
 u16 GetActorMotionDir(FieldActor *actor);
 BOOL FldAct_CheckAcmdSet(FieldActor *actor);
-void RailActorAnim_GetBlactAnime(FieldActor *actor, u16 *a1, u16 *a2);
-void RailActorAnim_SetBlactAnime(FieldActor *actor, u16 a1, u16 a2);
+void RailActorAnim_GetBillboardActorAnime(FieldActor *actor, u16 *a1, u16 *a2);
+void RailActorAnim_SetBillboardActorAnime(FieldActor *actor, u16 a1, u16 a2);
 // Sets the frame of the model's animation for a time. FALSE if the actor has no model
 BOOL RailActorAnim_SyncFrameGroup(FieldActor *actor, u16 time);
-// Overlay 36's fldmmdl_acmd.c: whether the actor is free of its action command, and fldmmdl_movecode_pair.c's
+// Overlay 36's field_actor_acmd.c: whether the actor is free of its action command, and field_actor_movecode_pair.c's
 // setting of the field effect it hides in
 BOOL FieldAcmdTCB_CheckAnimePaused(FieldActor *actor);
-void FldmmdlMove_SetHideEffect(FieldActor *actor, FieldEffectTask *task);
-// Overlay 36's fldmmdl_blact.c: the freeing of the billboard actors' work, the flag that their load callback sets,
-// their billboard system, and the change of an actor's model to another object code
-void FldBlAct_Exit(MMSys *system);
-u8 FldBlAct_GetEntryHookFlag(FieldActor *actor);
-BlActSys *FieldBlAct_GetBlActSys(FieldBlAct *blact);
+void FieldActorMove_SetHideEffect(FieldActor *actor, FieldEffectTask *task);
+// Overlay 36's field_actor_billboard.c: the freeing of the billboard actors' work, the flag that their load callback
+// sets, their billboard system, and the change of an actor's model to another object code
+void FldBillboardActor_Exit(MMSys *system);
+u8 FldBillboardActor_GetEntryHookFlag(FieldActor *actor);
+BillboardActorSys *FieldBillboardActor_GetBillboardActorSys(FieldBillboardActor *billboardActor);
 void FldAct_SwapObjCode(FieldActor *actor, u16 newObjCode);
 // The creation of an actor's billboard actor into *index, and its deletion
-BOOL FldBlAct_AddActorMmdlOrReserve(FieldActor *actor, u16 *index);
-void FldBlAct_DeleteActorMmdl(FieldActor *actor, u32 index);
+BOOL FldBillboardActor_AddFieldActorOrReserve(FieldActor *actor, u16 *index);
+void FldBillboardActor_DeleteFieldActor(FieldActor *actor, u32 index);
 // The creation of a billboard actor of an object code at a position, into out[1] with the material's flags in out[0],
 // calling back once a material that has to be loaded first is there; its deletion; and the scale of an actor's
 // billboard
-BOOL FldBlAct_AddActorPosOrReserve(MMSys *system, const FieldActorConfig *config, u16 *out, VecFx32 *pos,
-                                   void (*callback)(u16 index, void *data), void *callbackData, u32 lights);
-void FldBlAct_DeleteActorPos(MMSys *system, u16 *out);
-void FldBlAct_GetActorSize(FieldActor *actor, u16 *scaleX, u16 *scaleY);
+BOOL FldBillboardActor_AddActorPosOrReserve(MMSys *system, const FieldActorConfig *config, u16 *out, VecFx32 *pos,
+                                            void (*callback)(u16 index, void *data), void *callbackData, u32 lights);
+void FldBillboardActor_DeleteActorPos(MMSys *system, u16 *out);
+void FldBillboardActor_GetActorSize(FieldActor *actor, u16 *scaleX, u16 *scaleY);
 // Overlay 36's field_rail_loader.c: sets a flag of the actor's rail billboard work
 void RailActorAnim_SetState(FieldActor *actor, BOOL value);
 // The script call of an actor's script; the animation and frame of the billboard actors of object codes 0xd3 and 0xd5,
@@ -184,15 +184,15 @@ void RailActorAnim_SetState(FieldActor *actor, BOOL value);
 // has run its animation, with the reset of that animation
 GameEvent *CreatePlayerXActorScriptCall(GameSystem *gsys, Field *field, u32 scriptId, FieldActor *player,
                                         FieldActor *actor, HeapID heapId);
-BOOL RailActorAnim_GetBlactAnimeTypeA(FieldActor *actor, u16 *anim, u16 *step);
-BOOL RailActorAnim_GetBlactAnimeTypeB(FieldActor *actor, u16 *anim, u16 *step);
-BOOL RailActorAnim_CheckBlactReady(FieldActor *actor);
-void RailActorAnim_ResetBlactAnime(FieldActor *actor);
+BOOL RailActorAnim_GetBillboardActorAnimeTypeA(FieldActor *actor, u16 *anim, u16 *step);
+BOOL RailActorAnim_GetBillboardActorAnimeTypeB(FieldActor *actor, u16 *anim, u16 *step);
+BOOL RailActorAnim_CheckBillboardActorReady(FieldActor *actor);
+void RailActorAnim_ResetBillboardActorAnime(FieldActor *actor);
 // The functions that run an action command: what to do on the first frame, each frame and at the end
 typedef BOOL (*ActorAcmdFunc)(FieldActor *actor);
 
-// The work of a jump along the rail, which fldmmdl_g3dobj.c's RailActorAcmd_InitJumpWithSe starts and fld_act_rail.c
-// updates
+// The work of a jump along the rail, which field_actor_g3dobj.c's RailActorAcmd_InitJumpWithSe starts and
+// fld_act_rail.c updates
 typedef struct {
     s32 speed;
     s32 progress;
@@ -204,7 +204,7 @@ typedef struct {
     s8 height;
 } ActorRailJumpWork;
 
-// Overlay 36's fldmmdl_g3dobj.c: the start, update and end functions of the action commands that the rail actors'
+// Overlay 36's field_actor_g3dobj.c: the start, update and end functions of the action commands that the rail actors'
 // tables in fld_act_rail.c name, and the jump along the rail that their start functions begin
 BOOL RailActor_AcSetAcmdEnd(FieldActor *actor);
 BOOL RailActor_AcNextState(FieldActor *actor);
@@ -256,8 +256,8 @@ BOOL RailActor_AcStayWalkD4F0(FieldActor *actor);
 BOOL RailActor_AcStayWalkL4F0(FieldActor *actor);
 BOOL RailActor_AcStayWalkR4F0(FieldActor *actor);
 void RailActorAcmd_InitJumpWithSe(FieldActor *actor, u16 dir, u32 speed, u32 timer, u16 frame, s16 height, u16 step);
-// Also fldmmdl_g3dobj.c's: the freeing of the actors' 3D system, their 3D object system, the creation and deletion of
-// an actor's 3D object, the tile under a rail position, and the direction an actor on the rails faces for a camera
+// Also field_actor_g3dobj.c's: the freeing of the actors' 3D system, their 3D object system, the creation and deletion
+// of an actor's 3D object, the tile under a rail position, and the direction an actor on the rails faces for a camera
 // angle
 void FieldActorG3DSystem_Delete(MMSys *system);
 FieldG3DObjSystem *FldAct_GetG3DObjSystem(FieldActor *actor);
@@ -272,9 +272,9 @@ void RailActor_GetDrawOffset(FieldActor *actor, VecFx16 *dest);
 void GetActorRailPos(FieldActor *actor, RailPosition *position);
 BOOL RailActor_GetFrontLocation(FieldActor *actor, RailPosition *position);
 BOOL GetActorRailPosForDir(FieldActor *actor, u16 dir, RailPosition *position);
-// Overlay 36's fldmmdl_rail.c: the actor's position as its rail unit holds it, the unit's step, the collision flags of
-// a step in a direction (1 off the rails, 2 a blocked tile, 4 another actor), the first actor on a rail position other
-// than exclude, and the change of the actor's grid position to the one a step ahead
+// Overlay 36's field_actor_rail.c: the actor's position as its rail unit holds it, the unit's step, the collision flags
+// of a step in a direction (1 off the rails, 2 a blocked tile, 4 another actor), the first actor on a rail position
+// other than exclude, and the change of the actor's grid position to the one a step ahead
 void RailActor_GetNowLocation(FieldActor *actor, RailPosition *position);
 void RailActor_UpdateRailWork(FieldActor *actor);
 void RailActor_SetMoveRequest(FieldActor *actor, u16 dir, u32 speed);
@@ -396,12 +396,12 @@ BOOL FldAct_CheckAcmdEnd(FieldActor *actor);
 FldActMatColorPreset *FldActMatColorPreset_Create(HeapID heapId);
 void FldActMatColorPreset_Free(FldActMatColorPreset *preset);
 void FldActMatColorPreset_Load(FldActMatColorPreset *preset, u32 presetId);
-void FldActMatColorPreset_Apply(FldActMatColorPreset *preset, BlActScene *scene);
+void FldActMatColorPreset_Apply(FldActMatColorPreset *preset, BillboardActorScene *scene);
 void FldActSys_AttachField(MMSys *system, HeapID heapId, GameData *gameData, Field *field, FieldG3DMapper *mapper,
                            NoGridMapper *noGridMapper, FieldColorPostFX *colorPostFx);
-void FldActSys_InitBlAct(MMSys *system, BlActSys *blAct, u32 count);
-void FldActSys_LoadCachedBlact(MMSys *system);
-void FldActSys_LoadStaticBlact(MMSys *system, u16 objCode);
+void FldActSys_InitBillboardActor(MMSys *system, BillboardActorSys *billboardActor, u32 count);
+void FldActSys_LoadCachedBillboardActor(MMSys *system);
+void FldActSys_LoadStaticBillboardActor(MMSys *system, u16 objCode);
 void FldActSys_Update(MMSys *system);
 void FldActSys_FinishAsyncMatLoad(MMSys *system);
 void FldActSys_FinishAsyncMatLoadSafe(MMSys *system);
@@ -469,12 +469,12 @@ u32 CheckMMSysFlag(MMSys *system, u32 flag);
 // Resets a strength boulder's saved position in a zone
 void ResetStrengthRockSaveDataPosition(MMSys *system, u16 zoneId, u16 uid);
 void FieldAcmdTCB_RunCmds(FieldActor *actor);
-// Overlay 36's fldmmdl_acmd.c: moves the actor's billboard to the actor's position
+// Overlay 36's field_actor_acmd.c: moves the actor's billboard to the actor's position
 void FieldAcmdSyncBillboardPos(FieldActor *actor);
-// Overlay 36's fldmmdl_evtype.c: runs the init function of the actor's event type, and whether both checks of the
+// Overlay 36's field_actor_evtype.c: runs the init function of the actor's event type, and whether both checks of the
 // type pass
-void FldmmdlMovecode_InitEventTypeProcThunk(FieldActor *actor);
-BOOL FldmmdlMovecode_UpdateEventTypeProc(FieldActor *actor);
+void FieldActorMovecode_InitEventTypeProcThunk(FieldActor *actor);
+BOOL FieldActorMovecode_UpdateEventTypeProc(FieldActor *actor);
 void SetActorInitedPositionRail(FieldActor *actor, const RailPosition *position);
 
 // What the terrain effects of an actor look at
@@ -552,7 +552,7 @@ void ActorTerrainEffect_Shadow(FieldActor *actor, ActorTerrainEffectParam *param
 void FldAct_StopAcmdWalkCodes(FieldActor *actor);
 BOOL GetActorInitPositionRail(FieldActor *actor, RailPosition *position);
 
-// Overlay 12's fldmmdl.c
+// Overlay 12's field_actor.c
 MMSys *FldActSys_Create(HeapID heapId, u32 capacity, StrengthRockSave *save);
 void FldActSys_Free(MMSys *system);
 // Updates until the materials have loaded
@@ -565,8 +565,8 @@ u16 FldActSys_GetTaskPriority(MMSys *system);
 HeapID FldActSys_GetFieldHeapID(MMSys *system);
 TCBManager *GetMMSysTCBMgr(MMSys *system);
 ArcTool *GetMMSysDataArcHandle(MMSys *system);
-void FldActSys_BindFieldBlAct(MMSys *system, FieldBlAct *fieldBlAct);
-FieldBlAct *FldActSys_GetFieldBlAct(MMSys *system);
+void FldActSys_BindFieldBillboardActor(MMSys *system, FieldBillboardActor *fieldBillboardActor);
+FieldBillboardActor *FldActSys_GetFieldBillboardActor(MMSys *system);
 void FldActSys_BindActorG3DSystem(MMSys *system, ActorG3DSystem *actorG3DSystem);
 ActorG3DSystem *FldActSys_GetActorG3DSystem(MMSys *system);
 NoGridMapper *FldActSys_GetNoGridMapper(MMSys *system);
@@ -589,9 +589,9 @@ void *FldAct_InitMoveSubProcWork(FieldActor *actor, u32 size);
 void *FldAct_GetMoveSubProcWork(FieldActor *actor);
 void *FldAct_InitMoveCmdWork(FieldActor *actor, u32 size);
 void *FldAct_GetMoveCmdWork(FieldActor *actor);
-void *FldAct_ResetBlActWork(FieldActor *actor, u32 size);
-void *FldAct_GetBlActWorkPtr(FieldActor *actor);
-u32 FldAct_GetBlActIdx(FieldActor *actor, u32 param);
+void *FldAct_ResetBillboardActorWork(FieldActor *actor, u32 size);
+void *FldAct_GetBillboardActorWorkPtr(FieldActor *actor);
+u32 FldAct_GetBillboardActorIdx(FieldActor *actor, u32 param);
 void SetNextActorAcmd(FieldActor *actor, u16 acmd);
 // The state of the actor's movement command
 void FldAct_SetAcmdState(FieldActor *actor, u16 state);
@@ -604,7 +604,7 @@ void SetActorWPosOffset(FieldActor *actor, const VecFx32 *offset);
 void FldAct_GetOuterDrawOffset(FieldActor *actor, VecFx32 *dest);
 void FldAct_SetOuterDrawOffset(FieldActor *actor, const VecFx32 *value);
 void FldAct_GetAttrDrawOffset(FieldActor *actor, VecFx32 *dest);
-FieldBlAct *FldAct_GetFieldBlAct(FieldActor *actor);
+FieldBillboardActor *FldAct_GetFieldBillboardActor(FieldActor *actor);
 // The model's position offset of the actor's config
 void CopyActorPosOffset(FieldActor *actor, VecFx32 *offset);
 void FldActSys_SetDrawInited(MMSys *system, BOOL flag);
@@ -657,7 +657,7 @@ u32 CountMovedStrengthRocks(MMSys *system);
 // Sets a ZoneNPC's position on a rail
 void ZoneNPC_SetRailPos(ZoneNPC *npc, u16 railIndex, u16 frontPos, u16 sidePos);
 
-// Overlay 36's functions that fldmmdl.c calls
+// Overlay 36's functions that field_actor.c calls
 void FieldAcmdTCB_DeleteDrawSys(MMSys *system);
 void FieldAcmdTCB_DrawIfInitialized(FieldActor *actor);
 void FldActSys_UpdateResourceLoader(MMSys *system);

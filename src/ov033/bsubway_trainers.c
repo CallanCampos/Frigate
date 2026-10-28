@@ -42,7 +42,7 @@ BtlSetup *BsubwayScr_CreateBtlSetup(BSubwayScrWork *bsw, GameSystem *gsys) {
     return result;
 }
 
-void *BsubwayScr_GetNameinEncounterWork(BSubwayScrWork *bsw) {
+void *BsubwayScr_GetNameInputEncounterWork(BSubwayScrWork *bsw) {
     return bsw->unk74C;
 }
 

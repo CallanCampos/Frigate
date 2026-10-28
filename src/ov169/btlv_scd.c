@@ -14,8 +14,8 @@
 #include "gfl/str.h"
 #include "gfl/touchpanel.h"
 #include "nitro/mi.h"
+#include "pml/move.h"
 #include "pml/poke_party.h"
-#include "pml/waza.h"
 #include "system/game_data.h"
 #include "system/printsys.h"
 

@@ -32,7 +32,7 @@ BOOL FieldPlayer_CheckMoveBusy(FieldPlayer *player);
 BOOL FieldPlayer_CheckRunningShoesFlag(FieldPlayer *player);
 void FieldPlayer_UpdateGridMovement(FieldPlayer *player, u32 pressedKeys, u32 heldKeys, u32 flags);
 void FieldPlayer_UpdateRailMovement(FieldPlayer *player, u32 pressedKeys, u32 heldKeys);
-void FieldPlayer_AttachNogridMmdl(FieldPlayer *player, const RailPosition *pos);
+void FieldPlayer_AttachNogridActor(FieldPlayer *player, const RailPosition *pos);
 void FieldPlayer_ResetNogrid(FieldPlayer *player);
 BOOL FieldPlayer_IsNogridForcedMove(FieldPlayer *player);
 RailUnit *FieldPlayer_GetNogridRailWork(FieldPlayer *player);

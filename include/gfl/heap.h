@@ -30,7 +30,7 @@ enum {
     HEAPID_POKELIST = 0x17,
     // Mystery Gift's (not from swan)
     HEAPID_MYSTERY = 0x1d,
-    HEAPID_NAMEIN = 0x1e,
+    HEAPID_NAME_INPUT = 0x1e,
     HEAPID_IRC_BATTLE_MENU = 0x1f,
     HEAPID_TRAINER_CARD = 0x26,
     HEAPID_PMS_INPUT_SYS = 0x29,
@@ -67,11 +67,11 @@ enum {
     HEAPID_MONOLITH = 0x61,
     HEAPID_GAMESYNC = 0x67,
     // The evolution demo's graphics, which it frees while another screen runs
-    HEAPID_SHINKA_DEMO_GRAPHIC = 0x68,
+    HEAPID_EVOLUTION_DEMO_GRAPHIC = 0x68,
     // Not from swan: the Pokédex's heap, overlay 302
-    HEAPID_ZUKAN = 0x69,
+    HEAPID_POKEDEX = 0x69,
     // Not from swan: the Pokédex registration's heap, overlay 297
-    HEAPID_ZUKAN_TOROKU = 0x6a,
+    HEAPID_POKEDEX_REGISTRATION = 0x6a,
     HEAPID_DEMO3D = 0x6c,
     // Not from swan: the Xtransceiver's heap, and the heap of its camera
     HEAPID_COMM_TVT = 0x6d,
@@ -86,7 +86,7 @@ enum {
     // Not from swan: the Unity Tower's floor select, overlay 311
     HEAPID_UN_SELECT = 0x7a,
     // Not from swan: the Pokédex opening's
-    HEAPID_ZUKAN_OPEN = 0x7e,
+    HEAPID_POKEDEX_OPEN = 0x7e,
     HEAPID_CDEMO = 0x7f,
     // Not from swan: the heap of the Battle Subway's records screen (overlay 141)
     HEAPID_BSUBWAY_RECORDS = 0x80,
@@ -108,8 +108,8 @@ enum {
     HEAPID_POKEMON_TRADE = 0x91,
     HEAPID_FIELD_WEATHER = 0x92,
     HEAPID_FIELD_PLACE_NAME = 0x93,
-    HEAPID_SHINKA_DEMO = 0x94,
-    HEAPID_ZUKAN_DETAIL = 0x95,
+    HEAPID_EVOLUTION_DEMO = 0x94,
+    HEAPID_POKEDEX_DETAIL = 0x95,
     HEAPID_FIELD_SCENEAREA = 0x96,
     HEAPID_BOX_SEARCH = 0x98,
     HEAPID_MEDAL_INFO = 0x99,

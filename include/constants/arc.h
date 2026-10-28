@@ -121,7 +121,7 @@
 #define ARCID_TPOKE 208
 // The Marine Tube board's graphics on the main screen (marine_tube_board.c). Our name, not swan's
 #define ARCID_MARINE_TUBE_BOARD 297
-// The Pokédex diplomas' graphics (chihou_zukan_award.c and zenkoku_zukan_award.c). Our name, not swan's
+// The Pokédex diplomas' graphics (regional_pokedex_award.c and national_pokedex_award.c). Our name, not swan's
 #define ARCID_ZUKAN_AWARD 199
 // The graphics of the Battle Subway's records screen (bsubway_records.c). Our name, not swan's
 #define ARCID_BSUBWAY_RECORDS 196
@@ -187,8 +187,8 @@
 #define ARCID_WIFI_NOTE 62                // wifi_note.c
 #define ARCID_FIELD_MENU 70               // field_menu.c, field_subscreen.c
 #define ARCID_PLIST 75                    // plist_sys.c, plist_battle.c, plist_menu.c
-#define ARCID_FIELD_PLACE_NAME 83         // field_place_name.c, namein.c
-#define ARCID_TOWNMAP_GRA 84              // townmap.c, townmap_grh.c, zukan_detail_map.c
+#define ARCID_FIELD_PLACE_NAME 83         // field_place_name.c, name_input.c
+#define ARCID_TOWNMAP_GRA 84              // townmap.c, townmap_grh.c, pokedex_detail_map.c
 #define ARCID_ITEMMENU 87                 // itemmenu.c, itemmenu_disp.c
 #define ARCID_BTLV_EFFVM_BG 94            // btlv_effvm.c
 #define ARCID_B_BAG 98                    // b_bag_anm.c, b_bag_main.c, b_bag_obj.c
@@ -199,8 +199,8 @@
 #define ARCID_POKEMONTRADE_DEMO 104       // pokemontrade_demo_common.c, pokemontrade_demo_down.c
 #define ARCID_POKEMONTRADE_2D 105         // pokemontrade_2d.c
 #define ARCID_MIC_TEST 107                // mictest.c
-#define ARCID_NAMEIN_GRAPHIC 119          // namein.c
-#define ARCID_WAZA_OSHIE 125              // waza_oshie_main.c
+#define ARCID_NAMEIN_GRAPHIC 119          // name_input.c
+#define ARCID_WAZA_OSHIE 125              // move_tutor_main.c
 #define ARCID_SHORTCUT_MENU 129           // shortcut_menu.c
 #define ARCID_LOCAL_TVT 132               // local_tvt_chara.c, local_tvt_util.c
 #define ARCID_WIFIBATTLEMATCH 134         // wifibattlematch_view.c
@@ -213,18 +213,18 @@
 #define ARCID_BEACON 171                  // beacon_view_setup.c, beacon_detail.c
 #define ARCID_ENTRANCE_CAMERA 177         // entrance_camera.c
 #define ARCID_COMM_BTL_DEMO 178           // comm_btl_demo.c
-#define ARCID_GURU2 180                   // guru2_main.c
-#define ARCID_GURU2_OBJ 181               // guru2_receipt.c, guru2_main.c
+#define ARCID_GURU2 180                   // spin_trade_main.c
+#define ARCID_GURU2_OBJ 181               // spin_trade_receipt.c, spin_trade_main.c
 #define ARCID_FLD_FACEUP 184              // fld_faceup.c
 #define ARCID_BTL_REC_SEL 185             // btl_rec_sel.c
-#define ARCID_OEKAKI 188                  // oekaki.c
+#define ARCID_OEKAKI 188                  // drawing.c
 #define ARCID_REPORT 193                  // report.c
 #define ARCID_GEONET 194                  // geonet.c
 #define ARCID_TIME_ICON 195               // time_icon.c
 #define ARCID_FIELD_SAVEANIME 197         // field_saveanime.c
 #define ARCID_PSEL 202                    // psel.c
-#define ARCID_DENDOU_PC 210         // hall_of_fame_pc_main.c
-#define ARCID_DENDOU_DEMO 213       // hall_of_fame_demo_main.c, hall_of_fame_demo_obj.c
+#define ARCID_DENDOU_PC 210               // hall_of_fame_pc_main.c
+#define ARCID_DENDOU_DEMO 213             // hall_of_fame_demo_main.c, hall_of_fame_demo_obj.c
 #define ARCID_MANUAL 218                  // manual_common.c
 #define ARCID_ASSERT_WINDOW_GRA 230       // net_err.c
 #define ARCID_BTLV_EFFVM_PAL_ANIM 231     // btlv_effvm.c

@@ -3,12 +3,12 @@
     .ctor       start:0x021a20c0 end:0x021a20c0 kind:rodata align:4
     .bss        start:0x021a20e0 end:0x021a20e0 kind:bss align:32
 
-src/ov304/zukan_area_list.c:
+src/ov304/pokedex_area_list.c:
     complete
     .text       start:0x0219fbc0 end:0x021a073c
     .rodata     start:0x021a1dac end:0x021a1e84
 
-src/ov304/zukan_area_list_view.c:
+src/ov304/pokedex_area_list_view.c:
     complete
     .text       start:0x021a073c end:0x021a1dac
     .rodata     start:0x021a1e84 end:0x021a20c0

@@ -141,7 +141,7 @@ static void ActorSave_LoadActor(FieldActor *actor, const FieldActorSaveEntry *en
     }
 }
 
-// Steps through the system's actors from *index, as fldmmdl.c's NextActor does
+// Steps through the system's actors from *index, as field_actor.c's NextActor does
 static BOOL ActorSave_IterateSaveActor(const MMSys *system, FieldActor **actor, u32 *index) {
     u32 limit = system->actorCapacity;
     FieldActor *candidate;

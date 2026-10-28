@@ -26,7 +26,7 @@
 #include "save/chatter.h"
 #include "save/event_work.h"
 #include "save/player_info.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "system/game_data.h"
 #include "system/game_system.h"
 
@@ -977,7 +977,7 @@ static void inheritTmMoves(EggParents *parents, EggData *egg, HeapID heapId) {
         int item;
 
         for (item = ITEM_TM01; item <= ITEM_LAST; item++) {
-            if (move == PML_ItemGetTMWazaID(item) && canPkmLearnTMItemNumber(heapId, egg->species, egg->form, item)) {
+            if (move == PML_ItemGetTMMoveID(item) && canPkmLearnTMItemNumber(heapId, egg->species, egg->form, item)) {
                 PushEggPkmMove(egg, move);
                 break;
             }

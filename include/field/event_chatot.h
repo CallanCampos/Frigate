@@ -44,8 +44,8 @@ struct ChatotEventWork {
 GameEvent *EventPerapRecord_Create(GameSystem *gsys, Field *field, u8 partyIndex);
 GameEventReturnCode EventPerapRecord_Main(GameEvent *event, u32 *state, void *data);
 void EventPerapRecord_OnRecorded(u32 result, u32 *done);
-void EventPerapRecord_PauseMmdls(ChatotEventWork *work);
-void EventPerapRecord_ResumeMmdls(ChatotEventWork *work);
+void EventPerapRecord_PauseActors(ChatotEventWork *work);
+void EventPerapRecord_ResumeActors(ChatotEventWork *work);
 void EventPerapRecord_CreatePokeIcon(ChatotEventWork *work);
 void EventPerapRecord_DeletePokeIcon(ChatotEventWork *work);
 u32 EventPerapRecord_HopPokeIcon(ChatotEventWork *work);

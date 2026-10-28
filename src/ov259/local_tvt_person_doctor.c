@@ -22,7 +22,7 @@
 #include "pml/personal.h"
 #include "pml/poke_party.h"
 #include "save/event_work.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/save_control.h"
 #include "system/game_data.h"
 

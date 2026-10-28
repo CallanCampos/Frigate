@@ -7,7 +7,7 @@
 #include "constants/text_banks.h"
 #include "constants/types.h"
 #include "gfl/heap.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "system/pms_word.h"
 #include "system/pmsi_param.h"
 

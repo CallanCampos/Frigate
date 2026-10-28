@@ -437,7 +437,7 @@ static void ActorMsgWin_CreateWindow(FieldScriptEnv *env, FieldMsgBG *msgBGSys, 
 
 // Moves the balloon with its actor. force recomputes the offset even when the actor hasn't moved
 static void ActorMsgWin_CalcAttachmentPos(FieldScriptEnv *env, BOOL force) {
-    MMSys *mmSys = GetScrEnvMMdlSys(env);
+    MMSys *mmSys = GetScrEnvActorSys(env);
     ScriptActorWork *actorWork = GetFieldScriptActorWk(env);
     FieldActor *actor = FindFieldActor(mmSys, actorWork->actorId);
     VecFx32 pos;
@@ -465,7 +465,7 @@ static void ActorMsgWin_CalcAttachmentPos(FieldScriptEnv *env, BOOL force) {
 static BOOL SetupActorMessageWindow(FieldScriptEnv *env, StrBuf *strbuf, u16 actorId, u16 pos, u32 frameType) {
     u16 winPos = pos;
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
-    MMSys *mmSys = GetScrEnvMMdlSys(env);
+    MMSys *mmSys = GetScrEnvActorSys(env);
     FieldActor *player = FindFieldActor(mmSys, ACTOR_UID_PLAYER);
     FieldActor *actor = FindFieldActor(mmSys, actorId);
     ScriptActorWork *actorWork;
@@ -619,7 +619,7 @@ BOOL s0087_TrainerSayMessage(VM *vm, FieldScriptEnv *env) {
         return TRUE;
     }
     TrainerMsg_Load(trainerId, msgType, strbuf, FieldScriptEnv_GetHeapID(env));
-    if (FindFieldActor(GetScrEnvMMdlSys(env), actorId) == NULL) {
+    if (FindFieldActor(GetScrEnvActorSys(env), actorId) == NULL) {
         actorId = ACTOR_UID_PLAYER;
     }
     actorWork = GetFieldScriptActorWk(env);
@@ -627,7 +627,7 @@ BOOL s0087_TrainerSayMessage(VM *vm, FieldScriptEnv *env) {
     MI_CpuFill8(actorWork, 0, sizeof(ScriptActorWork));
     actorWork->actorId = actorId;
     player = Field_GetPlayer(fieldWork->field);
-    mmSys = GetScrEnvMMdlSys(env);
+    mmSys = GetScrEnvActorSys(env);
     playerActor = FieldPlayer_GetActor(player);
     CopyActorWPos(FindFieldActor(mmSys, actorWork->actorId), &actorPos);
     winPos = ActorMsgWin_CalcWinPosAuto(playerActor, &actorPos);

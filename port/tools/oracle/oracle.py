@@ -340,8 +340,8 @@ SAVE_CAMERA = ("as SAVE_WRITES: from a step of the save's dialog on, the field's
                "every other pass of the port's ends with the 2D camera where the DS's ends with the field's; from "
                "there both alternate on the same counts")
 SAVE_RANDOM = ("the field's townspeople who walk or turn at random draw their waits and directions from GFL's linear "
-               "generator when their timers run out (FldmmdlMovecode_GetRandomTableEntry and "
-               "FldmmdlMovecode_GetRandomDirFromSet, src/ov036/fldmmdl_movecode.c), and their timers wait while the "
+               "generator when their timers run out (FieldActorMovecode_GetRandomTableEntry and "
+               "FieldActorMovecode_GetRandomDirFromSet, src/ov036/field_actor_movecode.c), and their timers wait while the "
                "field menu and the save's dialog show (DisableAllActorsMovement as the menu opens, "
                "src/ov012/event_field_menu.c), which on the DS closes later (SAVE_WRITES): from the port's first draw "
                "after its close, the DS makes each draw of the port's, the same number, later by as many counts (192 "
@@ -1413,8 +1413,8 @@ MYSTERY_KEY = ("the mystery gift block's key (MysteryGiftSaveData.key, include/s
                "port's 0x7f7f; the DS's 0x7560 in Black 2 and 0xb793 in White 2); the catch saves, made without "
                "entering a Pokemon Center, hold the block as the start save has it")
 TURN_TIMER = ("the Pokemon Center's townsperson at (3,15) who turns at random (npc 9 of "
-              "res/field/events/aspertia_city_pokemon_center.json, movement code 13, FldmmdlMovecode_MoveTurnRandom in "
-              "src/ov036/fldmmdl_movecode.c), the seventh actor of the field actors' block: his direction (+0xd, Black "
+              "res/field/events/aspertia_city_pokemon_center.json, movement code 13, FieldActorMovecode_MoveTurnRandom in "
+              "src/ov036/field_actor_movecode.c), the seventh actor of the field actors' block: his direction (+0xd, Black "
               "2's alone) and his turn's timer (+0x32, RailWanderWork.timer in the movement code's work). The timer "
               "counts down at each step of the field's actors, every other pass, and, run out, draws a new wait and "
               "direction from GFL's linear generator; past ADR 0023's cut the port's battle is its own, so it reaches "

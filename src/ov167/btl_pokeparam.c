@@ -14,9 +14,9 @@
 #include "gfl/heap.h"
 #include "gfl/std.h"
 #include "pml/item.h"
+#include "pml/move.h"
 #include "pml/personal.h"
 #include "pml/poke_party.h"
-#include "pml/waza.h"
 
 BattleMon *BattleMon_Create(PartyPkm *src, u8 monId, HeapID heapId) {
     BattleMon *mon;

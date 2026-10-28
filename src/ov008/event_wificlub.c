@@ -11,7 +11,7 @@
 #include "battle/btl_setup.h"
 #include "battle/regulation.h"
 #include "constants/sound.h"
-#include "demo/shinka_demo.h"
+#include "demo/evolution_demo.h"
 #include "field/event_wificlub.h"
 #include "field/field_event.h"
 #include "gfl/heap.h"
@@ -427,8 +427,8 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         }
         break;
     case 21: {
-        ShinkaDemoParam *evolution =
-            GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ShinkaDemoParam), FALSE, "event_wificlub.c", 582);
+        EvolutionDemoParam *evolution =
+            GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(EvolutionDemoParam), FALSE, "event_wificlub.c", 582);
 
         evolution->gameData = GSYS_GetGameData(wk->gsys);
         evolution->party = wk->trade.party;
@@ -438,7 +438,7 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         evolution->unkC = 1;
         evolution->canCancel = FALSE;
         wk->trade.evolution = evolution;
-        GSYS_QueueProcAsEvent(wk->event, OVERLAY_SHINKA_DEMO, &SHINKA_DEMO_PROC_FUNCTIONS, evolution);
+        GSYS_QueueProcAsEvent(wk->event, OVERLAY_EVOLUTION_DEMO, &EVOLUTION_DEMO_PROC_FUNCTIONS, evolution);
         *state = 22;
         break;
     }

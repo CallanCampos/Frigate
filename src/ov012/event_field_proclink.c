@@ -4,13 +4,13 @@
 #include "app/config_panel.h"
 #include "app/medalbox.h"
 #include "app/p_status.h"
+#include "app/pokedex.h"
 #include "app/pokelist.h"
 #include "app/townmap.h"
 #include "app/wifi_note.h"
 #include "app/xtransceiver.h"
-#include "app/zukan.h"
 #include "constants/pokemon.h"
-#include "demo/shinka_demo.h"
+#include "demo/evolution_demo.h"
 #include "field/app_call.h"
 #include "field/event_save.h"
 #include "field/field.h"
@@ -32,7 +32,7 @@
 #include "pml/mail.h"
 #include "pml/poke_party.h"
 #include "save/bag.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/records.h"
 #include "save/save_control.h"
 #include "system/game_data.h"
@@ -42,7 +42,7 @@
 // clang-format off
 const FieldProcLink FIELD_PROC_LINK_LIST[FIELD_APP_MAX] = {
     { OVERLAY_ID(165), &POKELIST_PROC_FUNCTIONS, FieldAppCall_CreatePokeListParam, FieldAppCall_GetPokeListResult, NULL, FieldProcLink_FreeParam },
-    { OVERLAY_ID(302), &ZUKAN_PROC_FUNCTIONS, FieldAppCall_CreateZukanParam, FieldAppCall_GetZukanResult, NULL, FieldProcLink_FreeParam },
+    { OVERLAY_ID(302), &POKEDEX_PROC_FUNCTIONS, FieldAppCall_CreatePokedexParam, FieldAppCall_GetPokedexResult, NULL, FieldProcLink_FreeParam },
     { OVERLAY_ID(142), &BAG_PROC_FUNCTIONS, FieldAppCall_CreateBagParam, FieldAppCall_GetBagResult, NULL, FieldProcLink_FreeParam },
     { OVERLAY_ID(186), &data_ov012_0216dd78, FieldAppCall_CreateTrainerCardParam, FieldAppCall_GetTrainerCardResult, NULL, FieldProcLink_FreeParam },
     { 0, NULL, NULL, NULL, FieldAppCall_CallSave, FieldProcLink_FreeParam },
@@ -52,7 +52,7 @@ const FieldProcLink FIELD_PROC_LINK_LIST[FIELD_APP_MAX] = {
     { OVERLAY_ID(144), &TOWNMAP_PROC_FUNCTIONS, FieldAppCall_CreateTownMapParam, FieldAppCall_GetTownMapResult, NULL, FieldProcLink_FreeParam },
     { OVERLAY_ID(204), &WIFI_NOTE_PROC_FUNCTIONS, FieldAppCall_CreateWifiNoteParam, FieldAppCall_GetWifiNoteResult, NULL, FieldProcLink_FreeParam },
     { OVERLAY_NONE, &MAILSYS_PROC_FUNCTIONS, FieldAppCall_CreateMailParam, FieldAppCall_GetMailResult, NULL, FieldAppCall_FreeMailParam },
-    { OVERLAY_ID(284), &SHINKA_DEMO_PROC_FUNCTIONS, script_evo, FieldAppCall_GetShinkaDemoResult, NULL, FieldProcLink_FreeParam },
+    { OVERLAY_ID(284), &EVOLUTION_DEMO_PROC_FUNCTIONS, script_evo, FieldAppCall_GetEvolutionDemoResult, NULL, FieldProcLink_FreeParam },
     { OVERLAY_ID(272), &BR_MAIN_PROC_FUNCTIONS, FieldAppCall_CreateBattleRecorderParam, FieldAppCall_GetBattleRecorderResult, NULL, FieldProcLink_FreeParam },
     { OVERLAY_ID(259), &XTRANSCEIVER_PROC_FUNCTIONS, FieldAppCall_CreateXtransceiverParam, FieldAppCall_GetXtransceiverResult, NULL, FieldProcLink_FreeParam },
     { OVERLAY_ID(145), &MEDALBOX_PROC_FUNCTIONS, FieldAppCall_CreateMedalBoxParam, FieldAppCall_GetMedalBoxResult, NULL, FieldProcLink_FreeParam },
@@ -356,7 +356,7 @@ void *FieldAppCall_CreatePokeListParam(FieldAppCallWork *work, s32 appParam, s32
                 param->index = work->partySlot;
             }
         }
-    } else if (prevAppId == FIELD_APP_SHINKA_DEMO) {
+    } else if (prevAppId == FIELD_APP_EVOLUTION_DEMO) {
         param->mode = 5;
         param->item = work->item;
     }
@@ -412,7 +412,7 @@ u32 FieldAppCall_GetPokeListResult(FieldAppCallWork *work, void *data) {
         return FIELD_APP_RESULT_NEXT;
     case 8:
     case 9:
-        work->nextAppId = FIELD_APP_SHINKA_DEMO;
+        work->nextAppId = FIELD_APP_EVOLUTION_DEMO;
         work->item = param->item;
         return FIELD_APP_RESULT_NEXT;
     case 11:
@@ -435,11 +435,12 @@ u32 FieldAppCall_GetPokeListResult(FieldAppCallWork *work, void *data) {
 }
 
 // The Pokédex
-void *FieldAppCall_CreateZukanParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
-    ZukanParam *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ZukanParam), FALSE, "event_field_proclink.c", 1295);
+void *FieldAppCall_CreatePokedexParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
+    PokedexParam *param =
+        GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(PokedexParam), FALSE, "event_field_proclink.c", 1295);
     FieldSound *sound;
 
-    MI_CpuFill8(param, 0, sizeof(ZukanParam));
+    MI_CpuFill8(param, 0, sizeof(PokedexParam));
     param->gameData = GSYS_GetGameData(work->input->gameSystem);
     param->pokedex = GameData_GetPokedex(param->gameData);
     param->playerInfo = GetGameDataPlayerInfo(param->gameData);
@@ -453,8 +454,8 @@ void *FieldAppCall_CreateZukanParam(FieldAppCallWork *work, s32 appParam, s32 pr
     return param;
 }
 
-u32 FieldAppCall_GetZukanResult(FieldAppCallWork *work, void *data) {
-    ZukanParam *param = data;
+u32 FieldAppCall_GetPokedexResult(FieldAppCallWork *work, void *data) {
+    PokedexParam *param = data;
     FieldSound *sound = GameData_GetFieldSoundSystem(param->gameData);
 
     FieldSnd_RestoreVolume(sound, GameSystem_GetISS(work->input->gameSystem));
@@ -914,7 +915,7 @@ void FieldAppCall_FreeMailParam(void *param) {
 // The evolution demo, for an item used from the bag or the party screen
 void *script_evo(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
     GameData *gameData = GSYS_GetGameData(work->input->gameSystem);
-    ShinkaDemoParam *param = NULL;
+    EvolutionDemoParam *param = NULL;
     const PokeListParam *partyParam = prevParam;
     PokeParty *party;
     PartyPkm *pkm;
@@ -936,7 +937,7 @@ void *script_evo(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void
             species = CheckEvolveSpecies(party, pkm, 0, playerState->zoneId, GameData_GetSeason(gameData), &method,
                                          HEAPID_GAMEEVENT);
         }
-        param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ShinkaDemoParam), FALSE, "event_field_proclink.c", 2281);
+        param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(EvolutionDemoParam), FALSE, "event_field_proclink.c", 2281);
         param->gameData = gameData;
         param->party = party;
         param->species = species;
@@ -948,7 +949,7 @@ void *script_evo(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void
     return param;
 }
 
-u32 FieldAppCall_GetShinkaDemoResult(FieldAppCallWork *work, void *param) {
+u32 FieldAppCall_GetEvolutionDemoResult(FieldAppCallWork *work, void *param) {
     GSYS_GetGameData(work->input->gameSystem);
     if (work->subMode == 3) {
         work->nextAppId = FIELD_APP_BAG;

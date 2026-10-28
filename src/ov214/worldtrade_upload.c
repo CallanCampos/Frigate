@@ -35,7 +35,7 @@
 #include "save/join_avenue.h"
 #include "save/medal_box.h"
 #include "save/player_info.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/records.h"
 #include "save/save_control.h"
 #include "save/wifi_list.h"

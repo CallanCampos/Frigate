@@ -301,7 +301,7 @@ static void PrintInfoMoves(Box2AppWork *app, Box2PokeInfo *info, u32 index) {
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_MOVE_NAMES, HEAPID_TAIL(HEAPID_BOX2_APP));
     if (info->egg == FALSE) {
         for (i = 0; i < 4; i++) {
-            PrintMsg(app, index, msgData, info->waza[i], 0, i * 16, app->font, BOX2_COLOR_NORMAL);
+            PrintMsg(app, index, msgData, info->moveId[i], 0, i * 16, app->font, BOX2_COLOR_NORMAL);
         }
     } else {
         PrintMsg(app, index, app->msgData, 106, 0, 0, app->font, BOX2_COLOR_NORMAL);

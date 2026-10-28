@@ -44,7 +44,7 @@ enum {
     SHORTCUT_CONFIG_PANEL,
     SHORTCUT_XTRANSCEIVER,
     SHORTCUT_MEDAL_BOX,
-    // The party list, and the Pokédex opened on its awards (ZUKAN_START_AWARDS) and on its Habitat List
+    // The party list, and the Pokédex opened on its awards (POKEDEX_START_AWARDS) and on its Habitat List
     SHORTCUT_POKELIST,
     SHORTCUT_POKEDEX_AWARDS,
     SHORTCUT_POKEDEX_HABITAT,

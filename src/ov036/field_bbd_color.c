@@ -5,7 +5,7 @@
 #include "field/field_actor.h"
 #include "field/field_map.h"
 #include "gfl/arc.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/heap.h"
 #include "nitro/gx.h"
 
@@ -49,7 +49,7 @@ void FldActMatColorPreset_Load(FldActMatColorPreset *preset, u32 presetId) {
     GFL_ArcToolRead(preset->arcTool, presetId, preset->normal);
 }
 
-void FldActMatColorPreset_Apply(FldActMatColorPreset *preset, BlActScene *scene) {
+void FldActMatColorPreset_Apply(FldActMatColorPreset *preset, BillboardActorScene *scene) {
     VecFx16 normal;
     GXRgb diffuse, ambient, specular, emissive;
 
@@ -57,15 +57,15 @@ void FldActMatColorPreset_Apply(FldActMatColorPreset *preset, BlActScene *scene)
     normal.y = preset->normal[1];
     normal.z = preset->normal[2];
     VEC_Fx16Normalize(&normal, &normal);
-    BlActScene_SetCustomNormal(scene, &normal);
+    BillboardActorScene_SetCustomNormal(scene, &normal);
     diffuse = GX_RGB(preset->diffuse[0], preset->diffuse[1], preset->diffuse[2]);
-    BlActScene_SetColDiffuse(scene, &diffuse);
+    BillboardActorScene_SetColDiffuse(scene, &diffuse);
     ambient = GX_RGB(preset->ambient[0], preset->ambient[1], preset->ambient[2]);
-    BlActScene_SetColAmbient(scene, &ambient);
+    BillboardActorScene_SetColAmbient(scene, &ambient);
     specular = GX_RGB(preset->specular[0], preset->specular[1], preset->specular[2]);
-    BlActScene_SetColSpecular(scene, &specular);
+    BillboardActorScene_SetColSpecular(scene, &specular);
     emissive = GX_RGB(preset->emissive[0], preset->emissive[1], preset->emissive[2]);
-    BlActScene_SetColEmissive(scene, &emissive);
+    BillboardActorScene_SetColEmissive(scene, &emissive);
 }
 
 static u16 DecideAbyssalRuinsDiveZoneByUndellaBayPos(u32 zoneId, u32 x, u32 z) {

@@ -18,7 +18,7 @@
 // name for this file: it is named after the older games' wifi_p2pmatchroom.c, and so are its functions
 
 // How long a friend takes to spin in and out, in frames
-#define WIFI_MCR_NPC_KURU_FRAMES 45
+#define WIFI_MCR_NPC_SPIN_FRAMES 45
 // The frames of a friend's jump, and how many of them it stands before jumping
 #define WIFI_MCR_NPC_JUMP_FRAMES 28
 #define WIFI_MCR_NPC_JUMP_WAIT 16
@@ -85,7 +85,7 @@ static void WifiMcr_NpcInMoveInit(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj);
 static void WifiMcr_NpcNormalMoveInit(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj);
 static void WifiMcr_NpcJumpMoveInit(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj);
 static void WifiMcr_DrawNone(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj);
-static void WifiMcr_DrawKuru(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj);
+static void WifiMcr_DrawSpin(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj);
 static void WifiMcr_DrawJump(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj);
 static BOOL WifiMcr_PlayerMove(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj);
 static BOOL WifiMcr_NpcInMove(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj);
@@ -322,12 +322,12 @@ void WIFI_MCR_DelPeopleReq(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj) {
     WF2DMAP_OBJWkDataGet(obj->obj, WF2DMAP_OBJPM_WAY);
 
     obj->move = WifiMcr_NpcOutMove;
-    obj->drawFunc = WifiMcr_DrawKuru;
+    obj->drawFunc = WifiMcr_DrawSpin;
     obj->moveCount = 0;
     obj->moveState = WIFI_MCR_MOVESTATE_NPC_OUT;
 
     WF2DMAP_OBJDrawWkUpdataFlagSet(obj->draw, FALSE);
-    WF2DMAP_OBJDrawWkKuruAnimeStart(obj->draw);
+    WF2DMAP_OBJDrawWkSpinAnimeStart(obj->draw);
     WifiMcr_ReqCmdSetObj(wk, WF2DMAP_OBJST_BUSY, obj);
 }
 
@@ -697,7 +697,7 @@ static void WifiMcr_ObjDrawNew(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj, BOOL hero) 
     // A friend spins in
     if (hero == FALSE) {
         WF2DMAP_OBJDrawWkUpdataFlagSet(obj->draw, FALSE);
-        WF2DMAP_OBJDrawWkKuruAnimeStart(obj->draw);
+        WF2DMAP_OBJDrawWkSpinAnimeStart(obj->draw);
         WF2DMAP_OBJDrawWkDrawFlagSet(obj->draw, FALSE);
     }
 }
@@ -739,8 +739,8 @@ static void WifiMcr_PlayerMoveInit(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj) {
 
 static void WifiMcr_NpcInMoveInit(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj) {
     obj->move = WifiMcr_NpcInMove;
-    obj->drawFunc = WifiMcr_DrawKuru;
-    obj->moveCount = WIFI_MCR_NPC_KURU_FRAMES;
+    obj->drawFunc = WifiMcr_DrawSpin;
+    obj->moveCount = WIFI_MCR_NPC_SPIN_FRAMES;
     obj->moveState = WIFI_MCR_MOVESTATE_NPC_IN;
 }
 
@@ -766,11 +766,11 @@ static void WifiMcr_DrawNone(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj) {
 }
 
 // Spinning, the character comes down from, or goes up to, 192 pixels above its square
-static void WifiMcr_DrawKuru(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj) {
+static void WifiMcr_DrawSpin(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj) {
     WF2DMAP_POS pos;
     WF2DMAP_POS shadowPos;
 
-    WF2DMAP_OBJDrawWkKuruAnimeMain(obj->draw);
+    WF2DMAP_OBJDrawWkSpinAnimeMain(obj->draw);
     if (WF2DMAP_OBJDrawWkDrawFlagGet(obj->draw) == FALSE) {
         WF2DMAP_OBJDrawWkDrawFlagSet(obj->draw, TRUE);
     }
@@ -858,7 +858,7 @@ static BOOL WifiMcr_NpcInMove(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj) {
         u32 playerId;
         u32 friendNo;
 
-        WF2DMAP_OBJDrawWkKuruAnimeEnd(obj->draw);
+        WF2DMAP_OBJDrawWkSpinAnimeEnd(obj->draw);
         WF2DMAP_OBJDrawWkUpdataFlagSet(obj->draw, TRUE);
 
         playerId = WF2DMAP_OBJWkDataGet(wk->player->obj, WF2DMAP_OBJPM_PLID);
@@ -874,7 +874,7 @@ static BOOL WifiMcr_NpcInMove(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj) {
 
 static BOOL WifiMcr_NpcOutMove(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj) {
     obj->moveCount++;
-    if (obj->moveCount > WIFI_MCR_NPC_KURU_FRAMES) {
+    if (obj->moveCount > WIFI_MCR_NPC_SPIN_FRAMES) {
         return TRUE;
     }
     return FALSE;
@@ -923,7 +923,7 @@ static void WifiMcr_ReqCmdSetObj(WIFI_MATCHROOM *wk, u32 cmd, const MCR_MOVEOBJ 
 
 // Whether the character is done spinning
 static BOOL WifiMcr_NpcMoveSetCheck(const MCR_MOVEOBJ *obj) {
-    if (obj->drawFunc != WifiMcr_DrawKuru) {
+    if (obj->drawFunc != WifiMcr_DrawSpin) {
         return TRUE;
     }
     return FALSE;

@@ -16,7 +16,7 @@
 #include "gfl/std.h"
 #include "gfl/str.h"
 #include "pml/poke_party.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "system/game_data.h"
 #include "system/game_event.h"
 #include "system/game_system.h"

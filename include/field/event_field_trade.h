@@ -4,7 +4,7 @@
 // Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 #include "types.h"
-#include "demo/shinka_demo.h"
+#include "demo/evolution_demo.h"
 #include "field/fld_trade.h"
 #include "struct_decls.h"
 #include "system/game_event.h"
@@ -23,7 +23,7 @@ typedef struct {
     PartyPkm *tradePkm;
     PlayerInfo *playerInfo;
     PlayerInfo *tradeTrainer;
-    ShinkaDemoParam *evolutionParam;
+    EvolutionDemoParam *evolutionParam;
 } EventFieldTradeWork;
 
 GameEvent *EventFieldTrade_Create(GameSystem *gsys, u8 offerIndex, u8 partyIndex);

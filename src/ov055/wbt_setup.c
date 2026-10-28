@@ -1,7 +1,7 @@
 #include "types.h"
 #include "constants/arc.h"
 #include "field/field_actor.h"
-#include "field/fldmmdl_drawdata.h"
+#include "field/field_actor_drawdata.h"
 #include "field/wbt.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"

@@ -2,7 +2,7 @@
 #include "types.h"
 #include "app/event_pdc_return.h"
 #include "app/name_entry.h"
-#include "app/zukan_toroku.h"
+#include "app/pokedex_registration.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/text_banks.h"
@@ -19,7 +19,7 @@
 #include "save/event_work.h"
 #include "save/join_avenue.h"
 #include "save/player_info.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/records.h"
 #include "save/save_control.h"
 #include "system/game_data.h"
@@ -33,7 +33,7 @@ typedef struct {
     NameEntryParam *nameEntry;
     // The player's name, then the nickname
     StrBuf *name;
-    ZukanTorokuParam zukan;
+    PokedexRegistrationParam dex;
     // Where the Pokémon goes when the party is full
     StrBuf *boxMessage;
     u32 box;
@@ -147,18 +147,18 @@ static BOOL EventPdcReturn_Main(GameProc *proc, u32 *state, void *param, void *w
             }
             PokeDex_RegistPkm(pokedex, prm->pkm);
             addPkmToDex(pokedex, prm->pkm);
-            wk->zukan.pkm = prm->pkm;
-            wk->zukan.nationalDex = nationalDex;
-            wk->zukan.boxMessage = wk->boxMessage;
-            wk->zukan.boxes = boxes;
-            wk->zukan.box = wk->box;
-            wk->zukan.gameData = prm->gameData;
+            wk->dex.pkm = prm->pkm;
+            wk->dex.nationalDex = nationalDex;
+            wk->dex.boxMessage = wk->boxMessage;
+            wk->dex.boxes = boxes;
+            wk->dex.box = wk->box;
+            wk->dex.gameData = prm->gameData;
             if (firstCatch) {
-                wk->zukan.mode = 0;
+                wk->dex.mode = 0;
             } else {
-                wk->zukan.mode = 1;
+                wk->dex.mode = 1;
             }
-            QueueGameProc(wk->procManager, OVERLAY_ID(297), &ZUKAN_TOROKU_PROC_FUNCTIONS, &wk->zukan);
+            QueueGameProc(wk->procManager, OVERLAY_ID(297), &POKEDEX_REGISTRATION_PROC_FUNCTIONS, &wk->dex);
             (*state)++;
         } else {
             if (prm->result == PDC_RESULT_SEEN) {
@@ -172,7 +172,7 @@ static BOOL EventPdcReturn_Main(GameProc *proc, u32 *state, void *param, void *w
         if (procRunning != TRUE) {
             boxes = GameData_GetBoxSaveAccessor(prm->gameData);
             nickname = FALSE;
-            if (wk->zukan.nickname == TRUE) {
+            if (wk->dex.nickname == TRUE) {
                 nickname = TRUE;
             }
             if (nickname) {
