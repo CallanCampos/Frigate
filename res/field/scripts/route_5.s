@@ -36,7 +36,7 @@ Script_22:
 
 Script_17:
     WorkSetConst 0x8025, 0
-    Cmd_02B2 0, 0x8025
+    MemoryLinkCheckFlag 0, 0x8025
     VMStackPush 0x8025
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -57,7 +57,7 @@ L_00C9:
     VMHalt
 
 L_00D7:
-    Cmd_02B2 0, EVENT_WORK_0x400f
+    MemoryLinkCheckFlag 0, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -68,7 +68,7 @@ L_00F4:
     VMReturn
 
 L_00F6:
-    Cmd_02B2 0, EVENT_WORK_0x400f
+    MemoryLinkCheckFlag 0, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -1189,13 +1189,13 @@ L_109A:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_11DA
-    Cmd_02B5 0, 1
+    WordSetMemoryLinkPlayerName 0, 1
     // "You remind me of [f000]Ā\u0001\u0001.\nThat makes me excited about[f000]븀\u0000\nthis Pokémon battle![f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, Route5_Text_RemindMakesExcitedAbout, 0, 0
     MsgWinCloseAll
     WorkSetConst 0x802a, 0
     WorkSetConst 0x802b, 0
-    Cmd_02B3 0, 0x802a
+    MemoryLinkGetVar 0, 0x802a
     WorkCmpConst 0x802a, 0
     VMJumpIf CMP_EQ, L_10E8
     VMJump L_10F4
@@ -1236,7 +1236,7 @@ L_1159:
     CallTrainerLose
 
 L_115B:
-    Cmd_02B5 0, 1
+    WordSetMemoryLinkPlayerName 0, 1
     ActorCmdExec 21, Movement_0DF8
     ActorCmdWait
     // "I talked with [f000]Ā\u0001\u0001 here before.[f000]븁\u0000\nWe all have our own brand of strength,\npeople and Pokémon both.[f000]븁\u0000\nThe strength to make our dreams\na reality, the strength to protect[f000]븀\u0000\nwhat we hold most dear...[f000]븀\u0000\nThat's what I said.[f000]븁\u0000"

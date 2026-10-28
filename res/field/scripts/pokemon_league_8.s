@@ -46,7 +46,7 @@ Script_3:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_009A
-    Plugin3_Cmd1000 4
+    PokemonLeagueCmd_DisableRailLines 4
     PokemonLeagueCmd_SetCamera 4
     VMJump L_00A6
 
@@ -269,7 +269,7 @@ L_038E:
 Script_5:
     ActorsPauseAll
     VMSleep 10
-    Plugin3_Cmd1005 0
+    PokemonLeagueCmd_PlayCaitlinModels34Or5 0
     SEPlay SEQ_SE_SW_CATTLEYA_01
     VMSleep 40
     WorkSetConst EVENT_WORK_0x4000, 1
@@ -279,17 +279,17 @@ Script_5:
 
 Script_6:
     ActorsPauseAll
-    Plugin3_Cmd1000 4
+    PokemonLeagueCmd_DisableRailLines 4
     PokemonLeagueCmd_SetCamera 4
     VMSleep 5
-    Plugin3_Cmd1005 1
+    PokemonLeagueCmd_PlayCaitlinModels34Or5 1
     VMSleep 40
-    Plugin3_Cmd1006
+    PokemonLeagueCmd_CallCaitlinModel1Event
     SEPlay SEQ_SE_SW_CATTLEYA_02
     VMSleep 30
-    Plugin3_Cmd1007
+    PokemonLeagueCmd_PlayCaitlinModel0
     VMSleep 30
-    Plugin3_Cmd1008 0, 15
+    PokemonLeagueCmd_DropCaitlinActor 0, 15
     VMSleep 60
     WorkSetConst EVENT_WORK_0x4001, 1
     FinishAllEvents

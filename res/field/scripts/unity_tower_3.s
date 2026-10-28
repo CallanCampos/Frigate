@@ -16,11 +16,11 @@
 
 Script_1:
     WorkSetConst 0x8021, 0
-    Cmd_01CE 0, EVENT_WORK_0x4020
-    Cmd_01CE 1, EVENT_WORK_0x4021
-    Cmd_01CE 2, EVENT_WORK_0x4022
-    Cmd_01CE 3, EVENT_WORK_0x4023
-    Cmd_01CE 4, EVENT_WORK_0x4024
+    UnityTowerGetTrainerClass 0, EVENT_WORK_0x4020
+    UnityTowerGetTrainerClass 1, EVENT_WORK_0x4021
+    UnityTowerGetTrainerClass 2, EVENT_WORK_0x4022
+    UnityTowerGetTrainerClass 3, EVENT_WORK_0x4023
+    UnityTowerGetTrainerClass 4, EVENT_WORK_0x4024
     FlagSet EVENT_FLAG_0x0260
     FlagSet EVENT_FLAG_0x0261
     FlagSet EVENT_FLAG_0x0262
@@ -268,7 +268,7 @@ L_037D:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_03B4
-    UnityTowerCmd_02D8 EVENT_WORK_0x4000
+    Scrcmd_MarkPartnerCandidate EVENT_WORK_0x4000
     UnityTowerInitVisitorMessage EVENT_WORK_0x4000, 1, 0x802a
     VMJump L_03BC
 

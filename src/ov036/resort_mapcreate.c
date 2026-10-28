@@ -8,7 +8,7 @@
 #include "system/resort_binary.h"
 #include "system/resort_layout.h"
 
-ResortMapCreateWork *func_ov036_021c8954(HeapID heapId) {
+ResortMapCreateWork *ResortMapCreate_Create(HeapID heapId) {
     ResortMapCreateWork *work;
 
     work = GFL_HeapAllocate(heapId, sizeof(ResortMapCreateWork), TRUE, "resort_mapcreate.c", 73);
@@ -17,26 +17,27 @@ ResortMapCreateWork *func_ov036_021c8954(HeapID heapId) {
     return work;
 }
 
-void func_ov036_021c897c(ResortMapCreateWork *work) {
+void ResortMapCreate_Free(ResortMapCreateWork *work) {
     GFL_HeapFree(work);
 }
 
-void func_ov036_021c8984(ResortMapCreateWork *work, u16 zoneId, JoinAvenueInfo *info, JoinAvenueOccupants *occupants) {
+void ResortMapCreate_Setup(ResortMapCreateWork *work, u16 zoneId, JoinAvenueInfo *info,
+                           JoinAvenueOccupants *occupants) {
     work->zoneId = zoneId;
     work->info = info;
     work->occupants = occupants;
 }
 
-u32 func_ov036_021c898c(ResortMapCreateWork *work, void *map, FieldPropSystem *propSystem, FieldChunk *fieldChunk,
-                        u32 propCount, u32 chunkIndex, HeapID heapId) {
+u32 ResortMapCreate_PatchChunk(ResortMapCreateWork *work, void *map, FieldPropSystem *propSystem,
+                               FieldChunk *fieldChunk, u32 propCount, u32 chunkIndex, HeapID heapId) {
     if (IsZoneJoinAvenue(work->zoneId)) {
-        return func_ov036_021c89cc(work, map, propSystem, fieldChunk, propCount, chunkIndex, heapId);
+        return ResortMapCreate_PatchShops(work, map, propSystem, fieldChunk, propCount, chunkIndex, heapId);
     }
     return propCount;
 }
 
-u32 func_ov036_021c89cc(ResortMapCreateWork *work, void *map, FieldPropSystem *propSystem, FieldChunk *fieldChunk,
-                        u32 propCount, u32 chunkIndex, HeapID heapId) {
+u32 ResortMapCreate_PatchShops(ResortMapCreateWork *work, void *map, FieldPropSystem *propSystem,
+                               FieldChunk *fieldChunk, u32 propCount, u32 chunkIndex, HeapID heapId) {
     ResortShopData *shops = ResortShopData_Load(HEAPID_TAIL(work->heapId));
     ResortBinary *table = ResortBinary_Load(3, 4, HEAPID_TAIL(work->heapId));
     s32 i;
@@ -91,7 +92,7 @@ u32 func_ov036_021c89cc(ResortMapCreateWork *work, void *map, FieldPropSystem *p
     return propCount;
 }
 
-void func_ov036_021c8b40(ResortMapCreateWork *work, EventData *eventData) {
+void ResortMapCreate_MoveShopEntities(ResortMapCreateWork *work, EventData *eventData) {
     ResortShopData *shops = ResortShopData_Load(HEAPID_TAIL(work->heapId));
     ResortBinary *table = ResortBinary_Load(3, 4, HEAPID_TAIL(work->heapId));
     s32 i;

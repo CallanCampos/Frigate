@@ -460,7 +460,7 @@ static void positionShakingSpot(EncountSystem *system, EffectEncountState *state
         for (x = area.minX; x <= area.maxX; x++) {
             u32 kind;
 
-            func_ov036_02185230(mapper, chunk, &pos, &terrain);
+            FieldG3DMapper_GetChunkHandleTerrain(mapper, chunk, &pos, &terrain);
             kind = MapTile_GetEncounterEffectKind(terrain.tileType);
             if (kindMask & sPhenomenonKindMasks[kind]) {
                 state->candidates.entries[state->candidates.count].kind = kind;
@@ -482,7 +482,7 @@ static void EffectEncount_PlaceRandomCandidate(EncountSystem *system, EffectEnco
     RareEncountSpot *spot = &encountState->rareSpot;
 
     candidate->y = (candidate->height >> 4) / FX32_ONE;
-    if (func_ov036_021b6758(Field_GetFesGimmick(system->field), candidate->x, candidate->z, candidate->height)) {
+    if (FesGimmick_IsSparkleOnTile(Field_GetFesGimmick(system->field), candidate->x, candidate->z, candidate->height)) {
         return;
     }
     if (IsPositionOccupiedByActorAny(system, candidate->x, candidate->y, candidate->z, FALSE)) {

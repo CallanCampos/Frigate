@@ -32,14 +32,14 @@ typedef struct {
     StrBuf *name;
 } PlaceNameTextParam;
 
-PlaceNameLetter *func_ov036_021b6824(HeapID heapId, u32 type, void *setup, ClActUnit *unit, ArcTool *arc,
-                                     u16 bgPriority, u16 palette, u16 chars, u16 cellAnims);
-void func_ov036_021b68bc(PlaceNameLetter *letter);
-void func_ov036_021b68d8(PlaceNameLetter *letter, void *setup);
-void func_ov036_021b68e8(PlaceNameLetter *letter);
-void func_ov036_021b6900(PlaceNameLetter *letter, s16 param0, u16 param1);
-void func_ov036_021b6910(PlaceNameLetter *letter, s16 param0, u16 param1);
-void func_ov036_021b6920(PlaceNameLetter *letter);
-BOOL PlaceName_GetMessageLength(PlaceNameLetter *letter);
+PlaceNameLetter *PlaceNameLetter_Create(HeapID heapId, u32 type, void *setup, ClActUnit *unit, ArcTool *arc,
+                                        u16 bgPriority, u16 palette, u16 chars, u16 cellAnims);
+void PlaceNameLetter_Delete(PlaceNameLetter *letter);
+void PlaceNameLetter_SetParam(PlaceNameLetter *letter, void *setup);
+void PlaceNameLetter_Update(PlaceNameLetter *letter);
+void PlaceNameLetter_SlideIn(PlaceNameLetter *letter, s16 param0, u16 param1);
+void PlaceNameLetter_SlideOut(PlaceNameLetter *letter, s16 param0, u16 param1);
+void PlaceNameLetter_Hide(PlaceNameLetter *letter);
+BOOL PlaceNameLetter_IsFinished(PlaceNameLetter *letter);
 
 #endif // POKEBW2_FIELD_PLACE_NAME_LETTER_H

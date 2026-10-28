@@ -44,17 +44,17 @@ FieldG3DMapper *FieldG3DMapper_Create(HeapID heapId, u16 season) {
     mapper->phase1MaxChunkCount = 0;
     mapper->terrainAnimator = NULL;
     mapper->propSystem = FieldPropSystem_Create(mapper->heapId, mapper, season);
-    mapper->wfbc = func_ov036_0218adac(heapId);
-    mapper->resortMap = func_ov036_021c8954(heapId);
+    mapper->wfbc = FieldWFBC_Create(heapId);
+    mapper->resortMap = ResortMapCreate_Create(heapId);
     mapper->heightEx = HeightEx_CreateTable(0x10, heapId);
     return mapper;
 }
 
 void FieldG3DMapper_Free(FieldG3DMapper *mapper) {
-    func_ov036_021ba670(mapper->heightEx);
+    HeightEx_FreeTable(mapper->heightEx);
     FieldG3DMapper_FreeMap(mapper);
-    func_ov036_021c897c(mapper->resortMap);
-    func_ov036_0218add0(mapper->wfbc);
+    ResortMapCreate_Free(mapper->resortMap);
+    FieldWFBC_Free(mapper->wfbc);
     if (mapper->propSystem != NULL) {
         FieldPropSystem_Free(mapper->propSystem);
         mapper->propSystem = NULL;
@@ -190,7 +190,7 @@ void FieldG3D_RenderFieldmap(FieldG3DMapper *mapper, G3DCamera *camera, u32 pass
     }
 }
 
-HeightExList *func_ov036_02184590(FieldG3DMapper *mapper) {
+HeightExList *FieldG3DMapper_GetHeightEx(FieldG3DMapper *mapper) {
     return mapper->heightEx;
 }
 
@@ -724,7 +724,8 @@ BOOL FieldG3DMapper_GetTerrain(FieldG3DMapper *mapper, const VecFx32 *position, 
     return TRUE;
 }
 
-BOOL func_ov036_02185230(FieldG3DMapper *mapper, u32 index, const VecFx32 *position, MapTerrainBuf *terrain) {
+BOOL FieldG3DMapper_GetChunkHandleTerrain(FieldG3DMapper *mapper, u32 index, const VecFx32 *position,
+                                          MapTerrainBuf *terrain) {
     MapTerrainSamplerOutput chunkTerrain;
 
     FieldChunk_GetTerrainBaseLayer(&chunkTerrain, mapper->chunkHandles[index].chunk, position, mapper->chunkSpan);
@@ -774,11 +775,11 @@ FieldPropSystem *FieldG3DMapper_GetBMSystem(FieldG3DMapper *mapper) {
     return mapper->propSystem;
 }
 
-void func_ov036_021852f4(FieldG3DMapper *mapper, CityState *city, BOOL isOther) {
-    func_ov036_0218ade0(mapper->wfbc, city, isOther, mapper->heapId);
+void FieldG3DMapper_SetupWfbc(FieldG3DMapper *mapper, CityState *city, BOOL isOther) {
+    FieldWFBC_Setup(mapper->wfbc, city, isOther, mapper->heapId);
 }
 
-ResortMapCreateWork *func_ov036_02185304(FieldG3DMapper *mapper) {
+ResortMapCreateWork *FieldG3DMapper_GetResortMap(FieldG3DMapper *mapper) {
     return mapper->resortMap;
 }
 

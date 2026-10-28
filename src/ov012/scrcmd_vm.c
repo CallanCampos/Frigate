@@ -572,9 +572,9 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s01DA_CallPhraseSelect,                           // 0x1da
     func_ov033_02177d78,                              // 0x1db
     s01DC_DreamWorldItems,                            // 0x1dc
-    func_ov036_021c3018,                              // 0x1dd
+    s01DD_BroadcastGameBeacon,                        // 0x1dd
     s01DE_PassPowerPopDepletedID,                     // 0x1de
-    func_ov036_021c315c,                              // 0x1df
+    s01DF_CallPassPowerFlash,                         // 0x1df
     s01E0_StadiumSetupActorsDouble,                   // 0x1e0
     s01E1_StadiumLoadTrainerTable,                    // 0x1e1
     s01E2_StadiumFreeTrainerTable,                    // 0x1e2
@@ -649,10 +649,10 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0227_RecordAdd,                                  // 0x227
     s0228_RecordGet,                                  // 0x228
     NULL,                                             // 0x229
-    func_ov036_021c784c,                              // 0x22a
+    s022A_HollowRivalGenMsgID,                        // 0x22a
     Scrcmd_StartSwapNpcEvent,                         // 0x22b
     NULL,                                             // 0x22c
-    func_ov036_021c2010,                              // 0x22d
+    s022D_PlayFieldEffectByTable,                     // 0x22d
     ScriptNative_SetMmdlZoneDeleteOff,                // 0x22e
     s022F_WordSetLoadPastTradePkmName,                // 0x22f
     s0230_MsgPlaceSignFont4,                          // 0x230
@@ -804,7 +804,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s02C2_RepelRearm,                                 // 0x2c2
     func_ov012_0216a7f4,                              // 0x2c3
     s02C4_HiddenHollowSetPeriod,                      // 0x2c4
-    func_ov036_021c783c,                              // 0x2c5
+    s02C5_JoinAvenueRecordActivity,                   // 0x2c5
     s02C6_JoinAvenueStoreStart,                       // 0x2c6
     s02C6_JoinAvenueStoreEnd,                         // 0x2c7, which swan's name numbers 0x2c6
     NULL,                                             // 0x2c8
@@ -816,16 +816,16 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     NULL,                                             // 0x2ce
     s02CF_PokeDexCheckHabitatList,                    // 0x2cf
     s02D0_PokeDexEnableHabitatList,                   // 0x2d0
-    func_ov036_021c9a40,                              // 0x2d1
+    s02D1_KeyInfoGetMyCityProgress,                   // 0x2d1
     s02D2_FieldOpenRestoreLCD,                        // 0x2d2
     s02D3_HollowRivalGetValue,                        // 0x2d3
     s02D4_ItemGetTMCount,                             // 0x2d4
-    func_ov036_021c9a7c,                              // 0x2d5
+    s02D5_WbtIsTrainerBeaten,                         // 0x2d5
     NULL,                                             // 0x2d6
     Scrcmd_GetWifiHistoryCountryCount,                // 0x2d7
     Scrcmd_MarkPartnerCandidate,                      // 0x2d8
     Scrcmd_IsPartnerCandidateMarked,                  // 0x2d9
-    func_ov036_021c9bec,                              // 0x2da
+    s02DA_UnityTowerSetRatingLevel,                   // 0x2da
     s02DB_UnityTowerSetFloor,                         // 0x2db
     s02DC_UnityTowerInitVisitorMessage,               // 0x2dc
     s02DD_UnityTowerGetVisitorCount,                  // 0x2dd

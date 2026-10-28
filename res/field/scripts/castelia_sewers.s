@@ -150,7 +150,7 @@ L_01F7:
 
 L_0241:
     FlagSet EVENT_FLAG_0x02f3
-    HollowRivalCmd_0262 1, 2
+    HollowRivalSetValue 1, 2
     VMJump L_0269
 
 L_0251:
@@ -214,7 +214,7 @@ L_02D7:
     VMStackPop 0x8001
     VMStackPop 0x8000
     FlagReset EVENT_FLAG_0x02f3
-    HollowRivalCmd_0262 1, 3
+    HollowRivalSetValue 1, 3
     ActorAdd 0
     ActorDelete 254
     VMJump L_0388
@@ -454,7 +454,7 @@ L_052B:
     FlagSet EVENT_FLAG_0x02f7
     FlagSet EVENT_FLAG_0x03ed
     FlagSet EVENT_FLAG_0x02f0
-    HollowRivalCmd_0262 1, 4
+    HollowRivalSetValue 1, 4
     MedalDiscover 58
     FinishAllEvents
     ActorsUnpauseAll

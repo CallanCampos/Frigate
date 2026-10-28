@@ -78,17 +78,17 @@ static GameEventReturnCode EventStrengthRockPush_Callback(GameEvent *event, u32 
 static void FieldSurfTCB_Callback(TCB *tcb, void *work);
 static void FieldWaterfallTCB_Callback(TCB *tcb, void *work);
 static void Waterfall_SetShakeOffset(FieldActor *actor, const VecFx32 *shake);
-static BOOL func_ov036_021bae8c(WaterfallTCB *waterfall);
+static BOOL FieldPlayerGrid_JumpUpStart(WaterfallTCB *waterfall);
 static BOOL FieldPlayerGrid_JumpUpApproach(WaterfallTCB *waterfall);
 static BOOL FieldPlayerGrid_JumpUpRise(WaterfallTCB *waterfall);
 static BOOL FieldPlayerGrid_JumpUpArc(WaterfallTCB *waterfall);
 static BOOL FieldPlayerGrid_JumpUpLand(WaterfallTCB *waterfall);
-static BOOL func_ov036_021bb1e4(WaterfallTCB *waterfall);
+static BOOL FieldPlayerGrid_JumpUpWaitEffect(WaterfallTCB *waterfall);
 static void FieldPlayerGrid_UpdateJumpDown(WaterfallTCB *waterfall);
 
 static BOOL (*const WATERFALL_UP_HANDLERS[6])(WaterfallTCB *) = {
-    func_ov036_021bae8c,       FieldPlayerGrid_JumpUpApproach, FieldPlayerGrid_JumpUpRise,
-    FieldPlayerGrid_JumpUpArc, FieldPlayerGrid_JumpUpLand,     func_ov036_021bb1e4,
+    FieldPlayerGrid_JumpUpStart, FieldPlayerGrid_JumpUpApproach, FieldPlayerGrid_JumpUpRise,
+    FieldPlayerGrid_JumpUpArc,   FieldPlayerGrid_JumpUpLand,     FieldPlayerGrid_JumpUpWaitEffect,
 };
 
 GameEvent *FieldPlayerGrid_CheckObjContactEvent(FieldPlayerGrid *grid, u32 pressedKeys, u32 heldKeys, u32 flags) {
@@ -433,7 +433,7 @@ static void Waterfall_SetShakeOffset(FieldActor *actor, const VecFx32 *shake) {
     FldAct_SetOuterDrawOffset(actor, &offset);
 }
 
-static BOOL func_ov036_021bae8c(WaterfallTCB *waterfall) {
+static BOOL FieldPlayerGrid_JumpUpStart(WaterfallTCB *waterfall) {
     FieldActor *actor = FieldPlayer_GetActor(waterfall->player);
     VecFx32 pos;
     VecFx32 posA;
@@ -580,7 +580,7 @@ static BOOL FieldPlayerGrid_JumpUpLand(WaterfallTCB *waterfall) {
     return FALSE;
 }
 
-static BOOL func_ov036_021bb1e4(WaterfallTCB *waterfall) {
+static BOOL FieldPlayerGrid_JumpUpWaitEffect(WaterfallTCB *waterfall) {
     FieldEffects *effects;
 
     if (waterfall->splash != NULL && FldeffNamipokeSplash_IsFinished(waterfall->splash) == TRUE) {

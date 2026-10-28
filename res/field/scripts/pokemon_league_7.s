@@ -44,7 +44,7 @@ Script_3:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0096
-    Plugin3_Cmd1000 3
+    PokemonLeagueCmd_DisableRailLines 3
     PokemonLeagueCmd_SetCamera 3
     VMJump L_00A2
 
@@ -279,10 +279,10 @@ L_03B1:
 Script_5:
     ActorsPauseAll
     VMSleep 5
-    Plugin3_Cmd1013
+    PokemonLeagueCmd_PlayMarshalModel0
     SEPlay SEQ_SE_SW_RENBU_01
     VMSleep 60
-    Plugin3_Cmd1014 0
+    PokemonLeagueCmd_PlayMarshalModel3Animation 0
     SEPlay SEQ_SE_SW_RENBU_02
     VMSleep 20
     WorkSetConst EVENT_WORK_0x4000, 1
@@ -292,19 +292,19 @@ Script_5:
 
 Script_6:
     ActorsPauseAll
-    Plugin3_Cmd1000 3
+    PokemonLeagueCmd_DisableRailLines 3
     PokemonLeagueCmd_SetCamera 3
     ActorCmdExec 255, Movement_043C
     ActorCmdWait
-    Plugin3_Cmd1014 1
+    PokemonLeagueCmd_PlayMarshalModel3Animation 1
     SEPlay SEQ_SE_SW_RENBU_03
     VMSleep 30
-    Plugin3_Cmd1016
+    PokemonLeagueCmd_CallMarshalPlatformEvent
     VMSleep 30
     ActorCmdExec 0, Movement_0444
     ActorCmdWait
     VMSleep 10
-    Plugin3_Cmd1015
+    PokemonLeagueCmd_PlayMarshalModel1
     SEPlay SEQ_SE_SW_RENBU_05
     VMSleep 5
     WorkSetConst EVENT_WORK_0x4001, 1

@@ -292,10 +292,10 @@ Script_22:
     ActorCmdExec 4, Movement_06BC
     ActorCmdWait
     WorkSetConst EVENT_WORK_0x40f0, 2
-    HollowRivalCmd_0262 0, 0
-    HollowRivalCmd_0262 1, 16
-    HollowRivalCmd_0262 2, 4
-    HollowRivalCmd_0262 4, 0
+    HollowRivalSetValue 0, 0
+    HollowRivalSetValue 1, 16
+    HollowRivalSetValue 2, 4
+    HollowRivalSetValue 4, 0
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -983,11 +983,11 @@ L_0F40:
     FlagSet EVENT_FLAG_0x0340
 
 L_0F99:
-    HollowRivalCmd_0262 0, 6
-    HollowRivalCmd_0262 1, 31
-    HollowRivalCmd_0262 2, 7
-    HollowRivalCmd_0262 3, 7
-    HollowRivalCmd_0262 4, 0
+    HollowRivalSetValue 0, 6
+    HollowRivalSetValue 1, 31
+    HollowRivalSetValue 2, 7
+    HollowRivalSetValue 3, 7
+    HollowRivalSetValue 4, 0
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

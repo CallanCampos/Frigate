@@ -63,7 +63,7 @@ Script_5:
     LastKeyWait
     InfoMsgClose_0039
     RecordAdd 43, 1
-    Cmd_02C5 11
+    JoinAvenueRecordActivity 11
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

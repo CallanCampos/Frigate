@@ -154,7 +154,7 @@ L_01F6:
     VMJumpIf CMP_STACK, L_023B
     // "In my view, you are a person with\ncommon sense!"
     ActorMsg MSGFILE_SCRIPT, VirbankCityPokemonCenter_Text_ViewPersonCommonSense, 8, 2, 0
-    UnityTowerCmd_02DA 0
+    UnityTowerSetRatingLevel 0
     VMJump L_0319
 
 L_023B:
@@ -168,7 +168,7 @@ L_023B:
     VMJumpIf CMP_STACK, L_0274
     // "I'd say you are quite active!"
     ActorMsg MSGFILE_SCRIPT, VirbankCityPokemonCenter_Text_IdSayQuiteActive, 8, 2, 0
-    UnityTowerCmd_02DA 1
+    UnityTowerSetRatingLevel 1
     VMJump L_0319
 
 L_0274:
@@ -182,7 +182,7 @@ L_0274:
     VMJumpIf CMP_STACK, L_02AD
     // "I'd say you are very curious!"
     ActorMsg MSGFILE_SCRIPT, VirbankCityPokemonCenter_Text_IdSayVeryCurious, 8, 2, 0
-    UnityTowerCmd_02DA 2
+    UnityTowerSetRatingLevel 2
     VMJump L_0319
 
 L_02AD:
@@ -196,7 +196,7 @@ L_02AD:
     VMJumpIf CMP_STACK, L_02E6
     // "I'd say you are quite composed!"
     ActorMsg MSGFILE_SCRIPT, VirbankCityPokemonCenter_Text_IdSayQuiteComposed, 8, 2, 0
-    UnityTowerCmd_02DA 4
+    UnityTowerSetRatingLevel 4
     VMJump L_0319
 
 L_02E6:
@@ -210,7 +210,7 @@ L_02E6:
     VMJumpIf CMP_STACK, L_0319
     // "I'd say you are quite relaxed!"
     ActorMsg MSGFILE_SCRIPT, VirbankCityPokemonCenter_Text_IdSayQuiteRelaxed, 8, 2, 0
-    UnityTowerCmd_02DA 3
+    UnityTowerSetRatingLevel 3
 
 L_0319:
     LastKeyWait

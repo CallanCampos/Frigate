@@ -16,7 +16,7 @@ Script_1:
     EvCameraReturn 60
     EvCameraWait
     FadeWait
-    Cmd_02B5 1, 0
+    WordSetMemoryLinkPlayerName 1, 0
     // "Leaving the Prop Case behind...\nHuh. Did [f000]Ā\u0001\u0000 do that[f000]븀\u0000\naccidentally or on purpose?[f000]븁\u0000\nWhatever the reason, there's no doubt\nthat [f000]Ā\u0001\u0000 had a great talent[f000]븀\u0000\nfor coordinating Pokémon Props![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, MusicalTheater3_Text_LeavingPropCaseBehind, 0, 0, 0
     MsgWinCloseAll

@@ -21,11 +21,11 @@ struct HeightExList {
 };
 
 GameEventReturnCode EventCommError_Run(GameEvent *event, u32 *state, void *data);
-BOOL func_ov036_021ba804(GameProc *proc, u32 *state, void *param, void *work);
-BOOL func_ov036_021ba808(GameProc *proc, u32 *state, void *param, void *work);
-BOOL func_ov036_021ba80c(GameProc *proc, u32 *state, void *param, void *work);
+BOOL CommErrorProc_Init(GameProc *proc, u32 *state, void *param, void *work);
+BOOL CommErrorProc_Main(GameProc *proc, u32 *state, void *param, void *work);
+BOOL CommErrorProc_Exit(GameProc *proc, u32 *state, void *param, void *work);
 
-const GameProcFunctions data_ov036_021d1760 = { func_ov036_021ba804, func_ov036_021ba808, func_ov036_021ba80c };
+const GameProcFunctions data_ov036_021d1760 = { CommErrorProc_Init, CommErrorProc_Main, CommErrorProc_Exit };
 GameEventReturnCode EventCommError_RunCommExit(GameEvent *event, u32 *state, void *data);
 
 HeightExList *HeightEx_CreateTable(u32 count, u8 heapId) {
@@ -54,7 +54,7 @@ void HeightEx_SetArea(u8 index, u32 x, u32 z, u32 width, u32 depth, u32 value, u
     }
 }
 
-void func_ov036_021ba670(HeightExList *list) {
+void HeightEx_FreeTable(HeightExList *list) {
     GFL_HeapFree(list->entries);
     GFL_HeapFree(list);
 }
@@ -78,7 +78,7 @@ u32 HeightEx_GetAreaAttr(u8 index, HeightExList *list) {
     return list->entries[index].flags;
 }
 
-void func_ov036_021ba6bc(u8 index, BOOL inUse, HeightExList *list) {
+void HeightEx_SetAreaInUse(u8 index, BOOL inUse, HeightExList *list) {
     list->entries[index].inUse = inUse;
 }
 
@@ -155,15 +155,15 @@ GameEventReturnCode EventCommError_RunCommExit(GameEvent *event, u32 *state, voi
     return FALSE;
 }
 
-BOOL func_ov036_021ba804(GameProc *proc, u32 *state, void *param, void *work) {
+BOOL CommErrorProc_Init(GameProc *proc, u32 *state, void *param, void *work) {
     return TRUE;
 }
 
-BOOL func_ov036_021ba808(GameProc *proc, u32 *state, void *param, void *work) {
+BOOL CommErrorProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
     return TRUE;
 }
 
-BOOL func_ov036_021ba80c(GameProc *proc, u32 *state, void *param, void *work) {
+BOOL CommErrorProc_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     GSYS_SetNetErrorPending(param, 0);
     return TRUE;
 }

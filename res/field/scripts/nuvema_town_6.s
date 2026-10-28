@@ -37,13 +37,13 @@ Script_2:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Cmd_02B4 0, EVENT_WORK_0x400f
+    MemoryLinkIsPlayerLinked 0, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 1
     VMStackCmp CMP_GE
     VMJumpIf CMP_STACK, L_00B4
     WordSetPlayerName 0
-    Cmd_02B5 0, 1
+    WordSetMemoryLinkPlayerName 0, 1
     // "Cheren's Mom: Oh my...\nYou resemble [f000]Ā\u0001\u0001 somehow...[f000]븁\u0000\nYour name's [f000]Ā\u0001\u0000, you say?\nWow! You have a Pokédex, too![f000]븁\u0000\nEveryone grows up like this\nnow, don't they?"
     ParentActorMsg MSGFILE_SCRIPT, NuvemaTown6_Text_CherensMomOhResemble, 0, 0
     LastKeyWait

@@ -28,32 +28,32 @@ typedef struct {
     u16 obj;
 } SplashTask;
 
-static void func_ov036_021be9c0(FieldEffectSplash *splash);
+static void FldeffSplash_LoadModel(FieldEffectSplash *splash);
 static void FldeffSplash_UnloadModel(FieldEffectSplash *splash);
 static void FldeffSplash_InitModelObj(FieldEffectTask *task, void *work);
-static void func_ov036_021beaac(FieldEffectTask *task, void *work);
+static void FldeffSplash_ExitModelObj(FieldEffectTask *task, void *work);
 static void FldeffSplash_UpdateModelObj(FieldEffectTask *task, void *work);
 static void FldeffSplash_DrawModelObj(FieldEffectTask *task, void *work);
 
 static const FieldEffectTaskVTable SPLASH_TASK_VTABLE = {
-    sizeof(SplashTask),          FldeffSplash_InitModelObj, func_ov036_021beaac,
+    sizeof(SplashTask),          FldeffSplash_InitModelObj, FldeffSplash_ExitModelObj,
     FldeffSplash_UpdateModelObj, FldeffSplash_DrawModelObj,
 };
 
-void *func_ov036_021be988(FieldEffects *effects, HeapID heapId) {
+void *FldeffSplash_CreateModelRes(FieldEffects *effects, HeapID heapId) {
     FieldEffectSplash *splash = GFL_HeapAllocate(heapId, sizeof(FieldEffectSplash), TRUE, "fldeff_splash.c", 91);
 
     splash->effects = effects;
-    func_ov036_021be9c0(splash);
+    FldeffSplash_LoadModel(splash);
     return splash;
 }
 
-void func_ov036_021be9ac(FieldEffects *effects, void *data) {
+void FldeffSplash_DeleteModelRes(FieldEffects *effects, void *data) {
     FldeffSplash_UnloadModel(data);
     GFL_HeapFree(data);
 }
 
-static void func_ov036_021be9c0(FieldEffectSplash *splash) {
+static void FldeffSplash_LoadModel(FieldEffectSplash *splash) {
     FieldG3DObjResRequest request;
     FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(splash->effects);
     ArcTool *arc = FieldEffects_GetArc(splash->effects);
@@ -74,7 +74,7 @@ static void FldeffSplash_UnloadModel(FieldEffectSplash *splash) {
     FieldG3DObjSystem_FreeResGroup(objSys, splash->resGroup);
 }
 
-void func_ov036_021bea3c(FieldEffects *effects, FieldActor *actor) {
+void FldeffSplash_AddModel(FieldEffects *effects, FieldActor *actor) {
     SplashTaskParams params;
 
     params.splash = FieldEffects_GetHandleData(effects, 16);
@@ -95,7 +95,7 @@ static void FldeffSplash_InitModelObj(FieldEffectTask *task, void *work) {
     splashTask->obj = splashTask->splash->obj;
 }
 
-static void func_ov036_021beaac(FieldEffectTask *task, void *work) {
+static void FldeffSplash_ExitModelObj(FieldEffectTask *task, void *work) {
 }
 
 static void FldeffSplash_UpdateModelObj(FieldEffectTask *task, void *work) {

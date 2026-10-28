@@ -139,8 +139,8 @@ L_022C:
     WorkAdd EVENT_WORK_0x40c2, 1
     FlagSet EVENT_FLAG_0x02fe
     FlagReset EVENT_FLAG_0x0300
-    HollowRivalCmd_0262 0, 3
-    HollowRivalCmd_0262 1, 18
+    HollowRivalSetValue 0, 3
+    HollowRivalSetValue 1, 18
     VMJump L_0271
 
 L_0250:

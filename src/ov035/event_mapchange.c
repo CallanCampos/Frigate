@@ -754,8 +754,8 @@ GameEventReturnCode EventMapChangeEscapeRope_Callback(GameEvent *event, u32 *sta
         (*state)++;
         break;
     case 4:
-        GameEvent_ChainNext(event,
-                            func_ov036_021b95ac(event, gsys, field, wk->seasonChanged, wk->prevSeason, wk->season));
+        GameEvent_ChainNext(event, EventQuicksandArrive_CreateSpinZoom(event, gsys, field, wk->seasonChanged,
+                                                                       wk->prevSeason, wk->season));
         (*state)++;
         break;
     case 5:
@@ -831,7 +831,7 @@ GameEventReturnCode EventMapChangeTeleport_Callback(GameEvent *event, u32 *state
         (*state)++;
         break;
     case 4:
-        GameEvent_ChainNext(event, func_ov036_021b9614(event, gsys, field));
+        GameEvent_ChainNext(event, EventQuicksandArrive_CreateSpinZoomSmoke(event, gsys, field));
         (*state)++;
         break;
     case 5:
@@ -993,7 +993,7 @@ GameEventReturnCode EventUnionRoomWarp_Callback(GameEvent *event, u32 *state, vo
         (*state)++;
         break;
     case 3:
-        GameEvent_ChainNext(event, func_ov036_021b9664(event, gsys, field));
+        GameEvent_ChainNext(event, EventQuicksandArrive_CreateMoveAnime(event, gsys, field));
         (*state)++;
         break;
     case 4:

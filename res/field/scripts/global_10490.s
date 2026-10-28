@@ -80,7 +80,7 @@ L_00B2:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0113
     RecordAdd 46, 1
-    AreaNPCCmd_021D 0x8011
+    EntreeForestRemovePkm 0x8011
     ActorDelete 0x8011
     CallWildBattleEnd
     MapChangeEntreeForest 9

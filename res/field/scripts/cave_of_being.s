@@ -164,7 +164,7 @@ Script_2:
     WorkSetConst EVENT_WORK_0x4118, 1
     FlagSet EVENT_FLAG_0x0394
     FlagSet EVENT_FLAG_0x0395
-    HollowRivalCmd_0262 0, 0
+    HollowRivalSetValue 0, 0
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

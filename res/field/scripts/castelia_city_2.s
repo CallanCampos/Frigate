@@ -269,7 +269,7 @@ Script_4:
     // "I've got some advice for you![f000]븁\u0000\nIf you want to become strong,\nbattle lots of Trainers[f000]븀\u0000\nand know your Pokémon well![f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, CasteliaCity2_Text_IveGotSomeAdvice, 0, 0
     MsgWinCloseAll
-    Cmd_0275 0, 7, 0
+    WordSetFunfestMission 0, 7, 0
     SEPlay SEQ_SE_FLD_133
     // "The Funfest Mission\n“[f000]ŀ\u0001\u0000\"[f000]븀\u0000\nhas been added to the Entralink!"
     SystemMsg CasteliaCity2_Text_FunfestMissionHasBeen, 0

@@ -119,7 +119,7 @@ Script_1:
 
 L_0172:
     ActorPairSet 0x8000, 0x8001, 0x8002, 0x8003, 0x8004
-    Cmd_022E 254
+    ScriptNative_SetMmdlZoneDeleteOff 254
     RTEndGlobal
     VMHalt
 

@@ -57,7 +57,7 @@ L_008E:
     VMCall L_02ED
     BGMPlay SEQ_BGM_E_INISHIE
     ActorCmdExec 0x8011, Movement_03B4
-    Plugin16_Cmd1005 251
+    Plugin16Cmd_StartChase 251
     DebugPrint 1
     ActorCmdExec 251, Movement_0418
     VMSleep 129
@@ -73,7 +73,7 @@ L_008E:
     DebugPrint 3
     ActorCmdExec 251, Movement_042C
     ActorCmdExec 0x8011, Movement_03C4
-    Plugin16_Cmd1006
+    Plugin16Cmd_WaitChase
     DebugPrint 4
     ActorCmdWait
     DebugPrint 5
@@ -92,7 +92,7 @@ L_008E:
     InfoMsgClose
 
 L_019B:
-    Plugin16_Cmd1007
+    Plugin16Cmd_DropActor
     EvCameraMoveTo 9688, 0, 0xed000, 0x58000, 0, 0x78000, 25
     EvCameraWait
     VMStackPush 0x8023
@@ -188,15 +188,15 @@ L_02EB:
     VMReturn
 
 L_02ED:
-    Cmd_020E 0, 5, 2, 7, 3, 8
-    Cmd_020F 0, 5, 2, 7
-    Cmd_0211 0
+    SpPokeJump 0, 5, 2, 7, 3, 8
+    SpPokeAppear 0, 5, 2, 7
+    SpPokeWaitFrame 0
     FadeEx 12, 0, 16, 2
     FadeExWait
     ActorNew 5, 7, 1, 251, 123, 0
     FadeEx 12, 16, 0, 2
     FadeExWait
-    Cmd_0210 0
+    SpPokeWaitAnimEnd 0
     VMReturn
 
 L_0335:
@@ -204,15 +204,15 @@ L_0335:
     EvCameraWait
     EvCameraRebind
     EvCameraEnd
-    Cmd_020F 1, 5, 3, 7
-    Cmd_0211 1
+    SpPokeAppear 1, 5, 3, 7
+    SpPokeWaitFrame 1
     FadeEx 12, 0, 16, 2
     FadeExWait
     ActorDelete 251
     FadeEx 12, 16, 0, 2
     FadeExWait
-    Cmd_0210 1
-    Cmd_020E 1, 5, 3, 7, 3, 8
+    SpPokeWaitAnimEnd 1
+    SpPokeJump 1, 5, 3, 7, 3, 8
     ActorCmdExec 255, Movement_0440
     ActorCmdWait
     VMReturn
@@ -386,7 +386,7 @@ L_0563:
     // "Thanks to you and Meloetta,\nmemories of my birthplace...[f000]븀\u0000\nmemories of when I was little...[f000]븀\u0000\nmemories of singing together after[f000]븀\u0000\nwe finished gathering Berries...[f000]븀\u0000\nAll these memories came flooding back.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, CasteliaCity22_Text_ThanksMeloettaMemoriesBirthplace, 4, 0, 0
     MsgWinCloseAll
-    Cmd_0275 0, 44, 0
+    WordSetFunfestMission 0, 44, 0
     SEPlay SEQ_SE_FLD_133
     // "The Funfest Mission\n“[f000]ŀ\u0001\u0000\"[f000]븀\u0000\nhas been added to the Entralink."
     SystemMsg CasteliaCity22_Text_FunfestMissionHasBeen, 0
@@ -455,7 +455,7 @@ L_0640:
     // "Thanks to you and Meloetta,\nmemories of my birthplace...[f000]븀\u0000\nmemories of when I was little...[f000]븀\u0000\nmemories of singing together after[f000]븀\u0000\nwe finished gathering Berries...[f000]븀\u0000\nAll these memories came flooding back.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, CasteliaCity22_Text_ThanksMeloettaMemoriesBirthplace, 4, 0, 0
     MsgWinCloseAll
-    Cmd_0275 0, 44, 0
+    WordSetFunfestMission 0, 44, 0
     SEPlay SEQ_SE_FLD_133
     // "The Funfest Mission\n“[f000]ŀ\u0001\u0000\"[f000]븀\u0000\nhas been added to the Entralink."
     SystemMsg CasteliaCity22_Text_FunfestMissionHasBeen, 0

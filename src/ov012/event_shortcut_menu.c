@@ -93,7 +93,7 @@ GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *sta
         *state = 2;
         break;
     case 2:
-        func_ov036_021bf1ac(work->app);
+        ShortcutMenu_Start(work->app);
         *state = 3;
         break;
     case 3:
@@ -514,7 +514,7 @@ void ShortcutMenu_Open(u32 arg0, ShortcutMenuWork *work) {
         }
         gameData = GSYS_GetGameData(work->gameSystem);
         listPos = GameData_GetShortcutMenuPos(gameData);
-        work->app = func_ov036_021bedd8(gameData, arg0, listPos, HEAPID_FIELD_PARTICLE, HEAPID_FIELDMAP);
+        work->app = ShortcutMenu_Create(gameData, arg0, listPos, HEAPID_FIELD_PARTICLE, HEAPID_FIELDMAP);
     }
 }
 

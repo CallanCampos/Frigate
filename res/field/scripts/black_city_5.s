@@ -265,7 +265,7 @@ L_03E3:
 
 Script_6:
     ActorsPauseAll
-    KeysCmd_02D1 0x8020
+    KeyInfoGetMyCityProgress 0x8020
     VMStackPush 0x8020
     VMStackPushConst 4
     VMStackCmp CMP_LE

@@ -134,6 +134,17 @@ def load_commands() -> tuple[dict[int, Command], dict[int, dict[int, Command]], 
                 int(cmd): Command(int(cmd), plugin_name(entry, f"Plugin{number}Ov{overlay}_Cmd{int(cmd)}"), entry)
                 for cmd, entry in commands.items()}
         zones[number] = plugin["zones"]
+    # A handler that serves two commands of a plugin would name both, so each takes its number
+    numbers = collections.defaultdict(set)
+    for variants in plugins.values():
+        for commands in variants.values():
+            for command in commands.values():
+                numbers[command.name].add(command.id)
+    for variants in plugins.values():
+        for commands in variants.values():
+            for command in commands.values():
+                if len(numbers[command.name]) > 1:
+                    command.name = f"{command.name}_{command.id}"
     return base, plugins, zones, table["global_scripts"]
 
 

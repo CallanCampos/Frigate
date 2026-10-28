@@ -60,10 +60,10 @@ void GrassTask_Start(FieldEffects *effects, FieldActor *actor, BOOL animate, int
 // whose footprint type is 2 in sand (1) and snow (3), and tracks in deep sand (4). Tracks turn with the actor
 void Footmark_SetMMdl(FieldActor *actor, FieldEffects *effects, u32 kind);
 void ReflectTask_SetMMdl(MMSys *system, FieldActor *actor, FieldEffects *effects, u32 kind);
-void func_ov036_021be828(FieldEffects *effects, FieldActor *actor, u32 arg2, u32 arg3);
-void func_ov036_021bea3c(FieldEffects *effects, FieldActor *actor);
-void func_ov036_021c289c(FieldActor *actor, FieldEffects *effects);
-void func_ov036_021c94e0(FieldEffects *effects, FieldActor *actor);
+void FldeffRipple_Start(FieldEffects *effects, FieldActor *actor, u32 arg2, u32 arg3);
+void FldeffSplash_AddModel(FieldEffects *effects, FieldActor *actor);
+void D06Denki_StartSpark(FieldActor *actor, FieldEffects *effects);
+void FldeffOchiba_Start(FieldEffects *effects, FieldActor *actor);
 
 // field_effect.c: the effects a map has loaded, by ID, and the tasks that play them
 enum {
@@ -162,22 +162,22 @@ void *Footmark_Init(FieldEffects *effects, HeapID heapId);
 void Footmark_Delete(FieldEffects *effects, void *data);
 void *FldeffReflect_Create(FieldEffects *effects, HeapID heapId);
 void FldeffReflect_Delete(FieldEffects *effects, void *data);
-void *func_ov036_021be790(FieldEffects *effects, HeapID heapId);
-void func_ov036_021be7c4(FieldEffects *effects, void *data);
+void *FldeffRipple_Create(FieldEffects *effects, HeapID heapId);
+void FldeffRipple_Delete(FieldEffects *effects, void *data);
 void *FldeffNamipokeSplash_Create(FieldEffects *effects, HeapID heapId);
 void FldeffNamipokeSplash_Delete(FieldEffects *effects, void *data);
 void *FldeffIwakudaki_Create(FieldEffects *effects, HeapID heapId);
 void FldeffIwakudaki_Delete(FieldEffects *effects, void *data);
 void *StoneTask_Create(FieldEffects *effects, HeapID heapId);
-void func_ov036_021c27ac(FieldEffects *effects, void *data);
+void D06Denki_Delete(FieldEffects *effects, void *data);
 void *FldeffIaigiri_Create(FieldEffects *effects, HeapID heapId);
-void func_ov036_021c2e00(FieldEffects *effects, void *data);
+void FldeffIaigiri_Delete(FieldEffects *effects, void *data);
 void *FldeffFishing_Create(FieldEffects *effects, HeapID heapId);
 void FldeffFishing_Delete(FieldEffects *effects, void *data);
 void *FieldEffect_BTrain_Create(FieldEffects *effects, HeapID heapId);
 void FieldEffect_BTrain_Free(FieldEffects *effects, void *data);
-void *func_ov036_021c66e8(FieldEffects *effects, HeapID heapId);
-void func_ov036_021c670c(FieldEffects *effects, void *data);
+void *Hide_CreateResources(FieldEffects *effects, HeapID heapId);
+void Hide_DeleteResources(FieldEffects *effects, void *data);
 // fldeff_hide.c: the object an actor hides in, of a kind (0 to 2); the start of its animation and sound; and whether
 // its animation has ended, which it has for a NULL task
 FieldEffectTask *HideTask_Start(FieldEffects *effects, FieldActor *actor, u32 kind);
@@ -186,11 +186,11 @@ u16 HideTask_IsFinished(FieldEffectTask *task);
 // The bubbles that rise from an actor in the water
 void FldeffBubble_Start(FieldActor *actor, FieldEffects *effects);
 void *FldeffBubble_CreateRes(FieldEffects *effects, HeapID heapId);
-void func_ov036_021c6990(FieldEffects *effects, void *data);
-void *func_ov036_021be988(FieldEffects *effects, HeapID heapId);
-void func_ov036_021be9ac(FieldEffects *effects, void *data);
-void *func_ov036_021c944c(FieldEffects *effects, HeapID heapId);
-void func_ov036_021c9470(FieldEffects *effects, void *data);
+void FldeffBubble_DeleteRes(FieldEffects *effects, void *data);
+void *FldeffSplash_CreateModelRes(FieldEffects *effects, HeapID heapId);
+void FldeffSplash_DeleteModelRes(FieldEffects *effects, void *data);
+void *FldeffOchiba_Create(FieldEffects *effects, HeapID heapId);
+void FldeffOchiba_Delete(FieldEffects *effects, void *data);
 void *FldeffFesKira_Create(FieldEffects *effects, HeapID heapId);
 void FldeffFesKira_Delete(FieldEffects *effects, void *data);
 void *EncountTask_CreateGrass(FieldEffects *effects, HeapID heapId);

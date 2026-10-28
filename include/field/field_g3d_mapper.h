@@ -129,7 +129,7 @@ BOOL FieldG3DMapper_Update(FieldG3DMapper *mapper);
 void FieldG3DMapper_CallAllLoaderUpdate(FieldG3DMapper *mapper);
 // pass is a FIELD_G3D_RENDER_PHASE_
 void FieldG3D_RenderFieldmap(FieldG3DMapper *mapper, G3DCamera *camera, u32 pass);
-HeightExList *func_ov036_02184590(FieldG3DMapper *mapper);
+HeightExList *FieldG3DMapper_GetHeightEx(FieldG3DMapper *mapper);
 void FieldG3DMapper_CreateMap(FieldG3DMapper *mapper, const FieldG3DMapperConfig *config,
                               FieldColorPostFX *colorPostFx);
 void FieldG3DMapper_FreeMap(FieldG3DMapper *mapper);
@@ -150,14 +150,15 @@ void ClearMapTerrainBuf(MapTerrainBuf *terrain);
 void ClearMapTerrainSamplerOutput(FieldG3DMapperTerrain *output);
 BOOL FieldG3DMapper_GetTerrainAll(FieldG3DMapper *mapper, const VecFx32 *position, FieldG3DMapperTerrain *output);
 BOOL FieldG3DMapper_GetTerrain(FieldG3DMapper *mapper, const VecFx32 *position, MapTerrainBuf *terrain);
-BOOL func_ov036_02185230(FieldG3DMapper *mapper, u32 index, const VecFx32 *position, MapTerrainBuf *terrain);
+BOOL FieldG3DMapper_GetChunkHandleTerrain(FieldG3DMapper *mapper, u32 index, const VecFx32 *position,
+                                          MapTerrainBuf *terrain);
 BOOL FieldG3DMapper_CheckChunkHandleTerrainReady(FieldG3DMapper *mapper, u32 index);
 BOOL FieldG3DMapper_IsPosOutOfBounds(FieldG3DMapper *mapper, const VecFx32 *position);
 void FieldG3DMapper_SetOriginOffset(FieldG3DMapper *mapper, const VecFx32 *position);
 void FieldG3DMapper_GetOriginOffset(FieldG3DMapper *mapper, VecFx32 *out);
 FieldPropSystem *FieldG3DMapper_GetBMSystem(FieldG3DMapper *mapper);
-void func_ov036_021852f4(FieldG3DMapper *mapper, CityState *city, BOOL isOther);
-ResortMapCreateWork *func_ov036_02185304(FieldG3DMapper *mapper);
+void FieldG3DMapper_SetupWfbc(FieldG3DMapper *mapper, CityState *city, BOOL isOther);
+ResortMapCreateWork *FieldG3DMapper_GetResortMap(FieldG3DMapper *mapper);
 FieldTerrainAnimator *FieldG3DMapper_CreateTerrainAnimator(u16 chunkCapacity, G3DResource *mapTextures,
                                                            const FieldTerrainAnmInfo *anmInfo, u32 heapId);
 BOOL FieldChunkContext_HasAnimator(FieldChunkContext *context);

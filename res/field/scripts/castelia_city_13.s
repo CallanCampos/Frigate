@@ -104,7 +104,7 @@ Script_1:
     VMJumpIf CMP_STACK, L_01FF
     VMCall L_4298
     FlagSet EVENT_FLAG_0x00cc
-    TrainerGameInfoCmd_020C
+    SurveyCmd_RaiseRank
     VMCall L_01B0
     VMCall L_0236
     VMJump L_0230
@@ -211,7 +211,7 @@ L_030E:
 
 L_034C:
     VMCall L_4401
-    TrainerGameInfoCmd_01FE
+    SurveyCmd_Clear
 
 L_0354:
     VMJump L_0360
@@ -233,7 +233,7 @@ L_0362:
 
 L_0387:
     SurveyGetCurrentQuestionID 0x8022
-    TrainerCardCmd_0202 0x8022, 0x8023
+    SurveyCmd_GetQuestionState 0x8022, 0x8023
     VMStackPush 0x8023
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -255,7 +255,7 @@ L_03B8:
 
 L_03E3:
     VMCall L_4401
-    TrainerGameInfoCmd_01FE
+    SurveyCmd_Clear
 
 L_03EB:
     VMReturn
@@ -311,7 +311,7 @@ L_0460:
     VMJumpIf CMP_STACK, L_0578
     WorkGet 0x8008, 0x8024
     VMCall L_463F
-    TrainerCardCmd_0202 0x8024, 0x8027
+    SurveyCmd_GetQuestionState 0x8024, 0x8027
     VMStackPush 0x8027
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -369,7 +369,7 @@ L_0584:
     VMReturn
 
 L_058C:
-    TrainerGameInfoCmd_020B 0x8028
+    SurveyCmd_GetRank 0x8028
     VMCall L_369C
     VMCall L_518D
     VMCall L_4447
@@ -386,7 +386,7 @@ L_058C:
     VMJump L_0627
 
 L_05DF:
-    TrainerGameInfoCmd_020B 0x8029
+    SurveyCmd_GetRank 0x8029
     VMStackPush 0x8028
     VMStackPush 0x8029
     VMStackCmp CMP_NE
@@ -432,21 +432,21 @@ L_0657:
 
 L_0679:
     VMCall L_1E49
-    TrainerGameInfoCmd_01FD 0x8024, 0x8009, 0x800a, 0x800b
+    SurveyCmd_Start 0x8024, 0x8009, 0x800a, 0x800b
     VMReturn
 
 L_068B:
     SurveyGetCurrentQuestionID 0x8040
     WorkGet 0x8008, 0x8040
     VMCall L_06C0
-    TrainerGameInfoCmd_01FE
+    SurveyCmd_Clear
     VMCall L_0C58
     WorkGet 0x8032, 0x8010
     VMStackPush 0x8032
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_06BE
-    TrainerGameInfoCmd_020C
+    SurveyCmd_RaiseRank
 
 L_06BE:
     VMReturn
@@ -900,7 +900,7 @@ L_0C50:
 L_0C58:
     VMCall L_0BFA
     WorkGet 0x8041, 0x8010
-    TrainerGameInfoCmd_020B 0x8040
+    SurveyCmd_GetRank 0x8040
     WorkCmpConst 0x8040, 1
     VMJumpIf CMP_EQ, L_0C7B
     VMJump L_0C87
@@ -4717,7 +4717,7 @@ L_41DA:
     VMReturn
 
 L_41E8:
-    TrainerGameInfoCmd_020B 0x8040
+    SurveyCmd_GetRank 0x8040
     WorkCmpConst 0x8040, 1
     VMJumpIf CMP_EQ, L_41FF
     VMJump L_420B
@@ -4825,7 +4825,7 @@ L_4327:
 
 L_433B:
     WorkGet 0x8040, 0x8008
-    TrainerGameInfoCmd_020B 0x8041
+    SurveyCmd_GetRank 0x8041
     WorkCmpConst 0x8040, 0
     VMJumpIf CMP_EQ, L_4358
     VMJump L_4376
@@ -4959,7 +4959,7 @@ L_44C3:
     VMReturn
 
 L_44D6:
-    TrainerGameInfoCmd_020B 0x8040
+    SurveyCmd_GetRank 0x8040
     WorkCmpConst 0x8040, 1
     VMJumpIf CMP_EQ, L_44ED
     VMJump L_44F9
@@ -5010,7 +5010,7 @@ L_4575:
     VMReturn
 
 L_4585:
-    TrainerGameInfoCmd_020B 0x8032
+    SurveyCmd_GetRank 0x8032
     WorkCmpConst 0x8032, 1
     VMJumpIf CMP_EQ, L_459C
     VMJump L_45A8
@@ -6373,7 +6373,7 @@ L_57C0:
 L_57CE:
     WorkGet 0x802e, 0x8008
     SurveyGetCurrentQuestionID 0x802b
-    TrainerCardCmd_0203 0x802d
+    SurveyCmd_GetCurrentRemaining 0x802d
     WorkCmpConst 0x802e, 2
     VMJumpIf CMP_EQ, L_57EF
     VMJump L_57FC
@@ -7287,7 +7287,7 @@ L_643C:
     WorkGet 0x8008, 0x802a
     WorkGet 0x8009, 0x802b
     VMCall L_74D5
-    Cmd_0209 0x802b, 0x8010
+    SurveyCmd_WriteOwnAnswer 0x802b, 0x8010
     VMStackPush 0x802a
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -7322,7 +7322,7 @@ L_64C5:
     WorkGet 0x8008, 0x802a
     WorkGet 0x8009, 0x802b
     VMCall L_7614
-    Cmd_0209 0x802b, 0x8010
+    SurveyCmd_WriteOwnAnswer 0x802b, 0x8010
     VMStackPush 0x802c
     VMStackPushConst 255
     VMStackCmp CMP_NE
@@ -7349,7 +7349,7 @@ L_6531:
     WorkGet 0x8008, 0x802a
     WorkGet 0x8009, 0x802b
     VMCall L_7753
-    Cmd_0209 0x802b, 0x8010
+    SurveyCmd_WriteOwnAnswer 0x802b, 0x8010
     WorkSetConst 0x8010, 1
     VMReturn
 
@@ -9029,7 +9029,7 @@ L_7BDE:
 
 Script_7:
     ActorsPauseAll
-    TrainerGameInfoCmd_020B 0x8010
+    SurveyCmd_GetRank 0x8010
     WorkCmpConst 0x8010, 1
     VMJumpIf CMP_EQ, L_7BFD
     VMJump L_7C09
@@ -9090,7 +9090,7 @@ L_7C8B:
 
 Script_8:
     ActorsPauseAll
-    TrainerGameInfoCmd_020B 0x8010
+    SurveyCmd_GetRank 0x8010
     WorkCmpConst 0x8010, 1
     VMJumpIf CMP_EQ, L_7CC3
     VMJump L_7CCF
@@ -9151,7 +9151,7 @@ L_7D51:
 
 Script_9:
     ActorsPauseAll
-    TrainerGameInfoCmd_020B 0x8010
+    SurveyCmd_GetRank 0x8010
     WorkCmpConst 0x8010, 2
     VMJumpIf CMP_EQ, L_7D89
     VMJump L_7D95
@@ -9203,7 +9203,7 @@ L_7DF8:
 
 Script_10:
     ActorsPauseAll
-    TrainerGameInfoCmd_020B 0x8010
+    SurveyCmd_GetRank 0x8010
     WorkCmpConst 0x8010, 2
     VMJumpIf CMP_EQ, L_7E30
     VMJump L_7E3C
@@ -9255,7 +9255,7 @@ L_7E9F:
 
 Script_11:
     ActorsPauseAll
-    TrainerGameInfoCmd_020B 0x8010
+    SurveyCmd_GetRank 0x8010
     WorkCmpConst 0x8010, 3
     VMJumpIf CMP_EQ, L_7ED7
     VMJump L_7EE3
@@ -9298,7 +9298,7 @@ L_7F27:
 
 Script_12:
     ActorsPauseAll
-    TrainerGameInfoCmd_020B 0x8010
+    SurveyCmd_GetRank 0x8010
     WorkCmpConst 0x8010, 4
     VMJumpIf CMP_EQ, L_7F5F
     VMJump L_7F6B
@@ -9332,7 +9332,7 @@ L_7F90:
 
 Script_13:
     ActorsPauseAll
-    TrainerGameInfoCmd_020B 0x8010
+    SurveyCmd_GetRank 0x8010
     WorkCmpConst 0x8010, 5
     VMJumpIf CMP_EQ, L_7FC8
     VMJump L_7FD4
@@ -9358,7 +9358,7 @@ L_7FDA:
 Script_14:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
-    Cmd_020A
+    SurveyCmd_ShowRankMessage
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -9397,7 +9397,7 @@ L_8064:
     VMHalt
 
 Script_15:
-    TrainerGameInfoCmd_020B 0x8010
+    SurveyCmd_GetRank 0x8010
     FlagSet EVENT_FLAG_0x027d
     FlagSet EVENT_FLAG_0x027e
     FlagSet EVENT_FLAG_0x027f

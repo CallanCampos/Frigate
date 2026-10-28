@@ -127,7 +127,7 @@ L_0148:
     WorkSetConst EVENT_WORK_0x40e3, 1
     FlagReset EVENT_FLAG_0x032a
     FlagSet EVENT_FLAG_0x03ea
-    HollowRivalCmd_0262 1, 27
+    HollowRivalSetValue 1, 27
     PlayerGetDir 0x8020
     ActorCmdExec 0, Movement_0434
     VMStackPush 0x8020
@@ -152,11 +152,11 @@ L_01FD:
 L_022C:
     ActorCmdWait
     ActorJumpToGPos 0, 16, 65532, 1
-    Cmd_02A2
+    HumilauGymPlayLeaderSplash
     ActorCmdExec 0, Movement_0454
     ActorCmdWait
     VMSleep 35
-    Cmd_02A3
+    HumilauGymPlayLeaderWaves
     VMSleep 80
     VMReturn
 
@@ -185,11 +185,11 @@ L_027D:
 L_02AC:
     ActorCmdWait
     ActorJumpToGPos 0, 16, 65532, 1
-    Cmd_02A2
+    HumilauGymPlayLeaderSplash
     ActorCmdExec 0, Movement_0454
     ActorCmdWait
     VMSleep 35
-    Cmd_02A3
+    HumilauGymPlayLeaderWaves
     VMSleep 80
     VMReturn
 

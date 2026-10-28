@@ -1812,13 +1812,13 @@
    ]
   },
   "201": {
-   "handler": "func_ov012_02155608",
+   "handler": "s00C9_ConfigToggleKanji",
    "overlay": 12,
    "args": [],
    "area": "TrainerData"
   },
   "202": {
-   "handler": "func_ov012_02155638",
+   "handler": "s00CA_ConfigGetKanji",
    "overlay": 12,
    "args": [
     "var"
@@ -1848,7 +1848,7 @@
    ]
   },
   "206": {
-   "handler": "func_ov012_0215569c",
+   "handler": "s00CE_TrainerCardGetStars",
    "overlay": 12,
    "args": [
     "var"
@@ -2018,14 +2018,14 @@
    "args": []
   },
   "228": {
-   "handler": "func_ov012_02155d00",
+   "handler": "s00E4_BoxUnlockWallpapers",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "229": {
-   "handler": "func_ov012_02155d30",
+   "handler": "FieldScriptEnv_CmdGetTrainerViewGroupAndMarkSeen",
    "overlay": 12,
    "args": [
     "var",
@@ -2034,7 +2034,7 @@
    "area": "TimeSig"
   },
   "230": {
-   "handler": "func_ov012_02155d80",
+   "handler": "s00E6_StartMenuIsItemUnlocked",
    "overlay": 12,
    "args": [
     "any",
@@ -2043,7 +2043,7 @@
    "area": "TrainerCard"
   },
   "231": {
-   "handler": "func_ov012_02155db4",
+   "handler": "s00E7_StartMenuUnlockItem",
    "overlay": 12,
    "args": [
     "any"
@@ -2051,7 +2051,7 @@
    "area": "TrainerCard"
   },
   "232": {
-   "handler": "func_ov012_02155dd4",
+   "handler": "s00E8_StartMenuIsItemSelected",
    "overlay": 12,
    "args": [
     "any",
@@ -2708,17 +2708,17 @@
    ]
   },
   "316": {
-   "handler": "func_ov012_02159c80",
+   "handler": "s013C_GameCommTryBoot",
    "overlay": 12,
    "args": []
   },
   "317": {
-   "handler": "func_ov012_02159c90",
+   "handler": "s013D_GameCommPause",
    "overlay": 12,
    "args": []
   },
   "318": {
-   "handler": "func_ov012_02159cd8",
+   "handler": "s013E_GameCommResume",
    "overlay": 12,
    "args": []
   },
@@ -2934,14 +2934,14 @@
    "args": []
   },
   "347": {
-   "handler": "func_ov036_021adc94",
+   "handler": "s015B_WifiListHasValidProfile",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "348": {
-   "handler": "func_ov036_021adcb4",
+   "handler": "s015C_WifiListCountFriends",
    "overlay": 36,
    "args": [
     "var"
@@ -2958,7 +2958,7 @@
    "args": []
   },
   "351": {
-   "handler": "func_ov012_02157a78",
+   "handler": "s015F_Nop",
    "overlay": 12,
    "args": []
   },
@@ -2983,7 +2983,7 @@
    "args": []
   },
   "355": {
-   "handler": "func_ov012_021580c4",
+   "handler": "s0163_MusicalCall",
    "overlay": 12,
    "args": [
     "any",
@@ -2995,7 +2995,7 @@
    ]
   },
   "356": {
-   "handler": "func_ov012_021581e4",
+   "handler": "s0164_MusicalCallDressUp",
    "overlay": 12,
    "args": [
     "any"
@@ -3003,7 +3003,7 @@
    "area": "Musical"
   },
   "357": {
-   "handler": "func_ov012_02158280",
+   "handler": "s0165_MusicalGetInfo",
    "overlay": 12,
    "args": [
     "u8",
@@ -3013,7 +3013,7 @@
    "area": "Musical"
   },
   "358": {
-   "handler": "func_ov012_02158550",
+   "handler": "s0166_MusicalGetAudienceGift",
    "overlay": 12,
    "args": [
     "any",
@@ -3023,7 +3023,7 @@
    "area": "Musical"
   },
   "359": {
-   "handler": "func_ov012_021588d4",
+   "handler": "s0167_MusicalComm",
    "overlay": 12,
    "args": [
     "any",
@@ -3036,7 +3036,7 @@
    ]
   },
   "360": {
-   "handler": "func_ov012_021585e0",
+   "handler": "s0168_MusicalAddProp",
    "overlay": 12,
    "args": [
     "any"
@@ -3044,7 +3044,7 @@
    "area": "Musical"
   },
   "361": {
-   "handler": "func_ov012_02158858",
+   "handler": "s0169_MusicalClearAudienceGift",
    "overlay": 12,
    "args": [
     "any"
@@ -3052,7 +3052,7 @@
    "area": "Musical"
   },
   "362": {
-   "handler": "func_ov012_0215887c",
+   "handler": "s016A_MusicalSelectPoke",
    "overlay": 12,
    "args": [
     "var",
@@ -3060,7 +3060,7 @@
    ]
   },
   "366": {
-   "handler": "func_ov012_02157814",
+   "handler": "s016E_CallMonolith",
    "overlay": 12,
    "args": [],
    "area": "HighLink",
@@ -3125,7 +3125,7 @@
    "args": []
   },
   "378": {
-   "handler": "func_ov104_021efb90",
+   "handler": "GimmickGateCmd_ViewBoard",
    "overlay": 104,
    "args": [
     "any"
@@ -3140,33 +3140,33 @@
    ]
   },
   "380": {
-   "handler": "func_ov036_021ab1a8",
+   "handler": "s017C_RollerCoasterCallSwitch",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "381": {
-   "handler": "func_ov036_021ab1e0",
+   "handler": "ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "390": {
-   "handler": "func_ov036_021aaf78",
+   "handler": "s0186_DriftveilGymPrepareFreight",
    "overlay": 36,
    "args": []
   },
   "391": {
-   "handler": "func_ov036_021aaf88",
+   "handler": "s0187_DriftveilLiftPlaceAtBottom",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "396": {
-   "handler": "func_ov036_021aae88",
+   "handler": "ScrcmdFieldGimmickPlateDoors_StartDoorEvent",
    "overlay": 36,
    "args": [
     "u16",
@@ -3174,35 +3174,35 @@
    ]
   },
   "397": {
-   "handler": "func_ov036_021aaec8",
+   "handler": "s018D_DriftveilGymCallFreight",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "398": {
-   "handler": "func_ov036_021aaf1c",
+   "handler": "s018E_DriftveilLiftCallMove",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "399": {
-   "handler": "func_ov036_021ab004",
+   "handler": "s018F_IcirrusGymCallSwitchAnim",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "400": {
-   "handler": "func_ov036_021ab03c",
+   "handler": "s0190_IcirrusGymCallFlipSwitch",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "401": {
-   "handler": "func_ov036_021ab074",
+   "handler": "s0191_IcirrusGymToggleMovementAtPlace",
    "overlay": 36,
    "args": [
     "u16"
@@ -3256,7 +3256,7 @@
    ]
   },
   "417": {
-   "handler": "func_ov012_02160a90",
+   "handler": "s01A1_PleasureBoatGetRoomInfo",
    "overlay": 12,
    "args": [
     "any",
@@ -3331,7 +3331,7 @@
    "args": []
   },
   "431": {
-   "handler": "func_ov036_021aea40",
+   "handler": "Regulation_RegisterAllowedSpecies",
    "overlay": 36,
    "args": [
     "any",
@@ -3339,7 +3339,7 @@
    ]
   },
   "432": {
-   "handler": "func_ov036_021aea8c",
+   "handler": "Regulation_CheckPartyRegulation",
    "overlay": 36,
    "args": [
     "any",
@@ -3352,14 +3352,14 @@
    "args": []
   },
   "434": {
-   "handler": "func_ov036_021ae4f4",
+   "handler": "ScrcmdProcFld_SpawnMovePokemonIfInactive",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "435": {
-   "handler": "func_ov012_02165950",
+   "handler": "FieldChunk_ScrCmdReadSaveByte",
    "overlay": 12,
    "args": [
     "any",
@@ -3462,21 +3462,21 @@
    "args": []
   },
   "460": {
-   "handler": "func_ov036_021afd9c",
+   "handler": "ElevatorTable_GetMysteryEntryCount",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "461": {
-   "handler": "func_ov036_021afcfc",
+   "handler": "ElevatorTable_RegisterBirthdayEntry",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "462": {
-   "handler": "func_ov012_02160cdc",
+   "handler": "s01CE_UnityTowerGetTrainerClass",
    "overlay": 12,
    "args": [
     "u16",
@@ -3602,7 +3602,7 @@
    ]
   },
   "476": {
-   "handler": "func_ov012_02158ff4",
+   "handler": "s01DC_DreamWorldItems",
    "overlay": 12,
    "args": [
     "any",
@@ -3611,7 +3611,7 @@
    "area": "DreamWorld"
   },
   "477": {
-   "handler": "func_ov036_021c3018",
+   "handler": "s01DD_BroadcastGameBeacon",
    "overlay": 36,
    "args": [
     "any",
@@ -3628,7 +3628,7 @@
    ]
   },
   "479": {
-   "handler": "func_ov036_021c315c",
+   "handler": "s01DF_CallPassPowerFlash",
    "overlay": 36,
    "args": []
   },
@@ -3705,7 +3705,7 @@
    ]
   },
   "490": {
-   "handler": "func_ov012_02164564",
+   "handler": "s01EA_TrialHouseSetTrainer",
    "overlay": 12,
    "args": [
     "any",
@@ -3727,7 +3727,7 @@
    "args": []
   },
   "493": {
-   "handler": "func_ov012_0216462c",
+   "handler": "s01ED_TrialHouseSetDownloadMode",
    "overlay": 12,
    "args": [
     "any"
@@ -3735,7 +3735,7 @@
    "area": "TrialHouse"
   },
   "494": {
-   "handler": "func_ov012_0216465c",
+   "handler": "s01EE_TrialHouseSetBattleTestRank",
    "overlay": 12,
    "args": [
     "any"
@@ -3750,7 +3750,7 @@
    ]
   },
   "496": {
-   "handler": "func_ov012_021646cc",
+   "handler": "s01F0_TrialHouseDownloadExamination",
    "overlay": 12,
    "args": [
     "var"
@@ -3766,7 +3766,7 @@
    ]
   },
   "498": {
-   "handler": "func_ov012_0216474c",
+   "handler": "s01F2_TrialHouseGetExaminationType",
    "overlay": 12,
    "args": [
     "var"
@@ -3781,7 +3781,7 @@
    ]
   },
   "500": {
-   "handler": "func_ov012_021647c4",
+   "handler": "s01F4_TrialHouseCallResults",
    "overlay": 12,
    "args": [
     "any",
@@ -3790,14 +3790,14 @@
    "area": "TrialHouse"
   },
   "501": {
-   "handler": "func_ov012_0216480c",
+   "handler": "s01F5_TrialHouseGetRecordMask",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "502": {
-   "handler": "func_ov033_021777dc",
+   "handler": "Scrcmd_CheckWifiListFlags",
    "overlay": 33,
    "args": [
     "any",
@@ -3807,7 +3807,7 @@
    ]
   },
   "503": {
-   "handler": "func_ov033_02177844",
+   "handler": "Scrcmd_WifiListOperation",
    "overlay": 33,
    "args": [
     "any",
@@ -3817,7 +3817,7 @@
    ]
   },
   "504": {
-   "handler": "func_ov033_02177908",
+   "handler": "Scrcmd_SetWifiFriendNameWord",
    "overlay": 33,
    "args": [
     "any",
@@ -3825,7 +3825,7 @@
    ]
   },
   "505": {
-   "handler": "func_ov036_021c730c",
+   "handler": "Scrcmd_CheckPmsWordPair",
    "overlay": 36,
    "args": [
     "any",
@@ -3862,7 +3862,7 @@
    ]
   },
   "509": {
-   "handler": "func_ov027_021704e0",
+   "handler": "SurveyCmd_Start",
    "overlay": 27,
    "args": [
     "any",
@@ -3873,7 +3873,7 @@
    "area": "TrainerGameInfo"
   },
   "510": {
-   "handler": "func_ov027_02170580",
+   "handler": "SurveyCmd_Clear",
    "overlay": 27,
    "args": [],
    "area": "TrainerGameInfo"
@@ -3903,7 +3903,7 @@
    ]
   },
   "514": {
-   "handler": "func_ov027_021706bc",
+   "handler": "SurveyCmd_GetQuestionState",
    "overlay": 27,
    "args": [
     "any",
@@ -3912,7 +3912,7 @@
    "area": "TrainerCard"
   },
   "515": {
-   "handler": "func_ov027_0217070c",
+   "handler": "SurveyCmd_GetCurrentRemaining",
    "overlay": 27,
    "args": [
     "var"
@@ -3941,7 +3941,7 @@
    ]
   },
   "519": {
-   "handler": "func_ov036_021a7c64",
+   "handler": "s0207_WordSetPasserbyCount",
    "overlay": 36,
    "args": [
     "u8"
@@ -3949,7 +3949,7 @@
    "area": "TrainerGameInfo"
   },
   "520": {
-   "handler": "func_ov036_021a7cb4",
+   "handler": "s0208_WordSetThankedCount",
    "overlay": 36,
    "args": [
     "u8"
@@ -3957,7 +3957,7 @@
    "area": "TrainerGameInfo"
   },
   "521": {
-   "handler": "func_ov027_02170650",
+   "handler": "SurveyCmd_WriteOwnAnswer",
    "overlay": 27,
    "args": [
     "any",
@@ -3965,12 +3965,12 @@
    ]
   },
   "522": {
-   "handler": "func_ov027_02170698",
+   "handler": "SurveyCmd_ShowRankMessage",
    "overlay": 27,
    "args": []
   },
   "523": {
-   "handler": "func_ov027_021703a8",
+   "handler": "SurveyCmd_GetRank",
    "overlay": 27,
    "args": [
     "var"
@@ -3978,7 +3978,7 @@
    "area": "TrainerGameInfo"
   },
   "524": {
-   "handler": "func_ov027_021703dc",
+   "handler": "SurveyCmd_RaiseRank",
    "overlay": 27,
    "args": [],
    "area": "TrainerGameInfo"
@@ -3994,7 +3994,7 @@
    ]
   },
   "526": {
-   "handler": "func_ov012_02165598",
+   "handler": "s020E_SpPokeJump",
    "overlay": 12,
    "args": [
     "any",
@@ -4006,7 +4006,7 @@
    ]
   },
   "527": {
-   "handler": "func_ov012_0216564c",
+   "handler": "s020F_SpPokeAppear",
    "overlay": 12,
    "args": [
     "any",
@@ -4016,21 +4016,21 @@
    ]
   },
   "528": {
-   "handler": "func_ov012_021656a8",
+   "handler": "s0210_SpPokeWaitAnimEnd",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "529": {
-   "handler": "func_ov012_021656e0",
+   "handler": "s0211_SpPokeWaitFrame",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "530": {
-   "handler": "func_ov012_02164838",
+   "handler": "s0212_ActorMoveToHeight",
    "overlay": 12,
    "args": [
     "any",
@@ -4039,7 +4039,7 @@
    ]
   },
   "531": {
-   "handler": "func_ov012_0216491c",
+   "handler": "s0213_ActorHoldPos",
    "overlay": 12,
    "args": [
     "any"
@@ -4056,7 +4056,7 @@
    ]
   },
   "533": {
-   "handler": "func_ov012_021658c8",
+   "handler": "s0215_SetSpecialTransferUsed",
    "overlay": 12,
    "args": [
     "any",
@@ -4064,7 +4064,7 @@
    ]
   },
   "534": {
-   "handler": "func_ov036_021c7698",
+   "handler": "Scrcmd_CheckBeaconTrainerKey",
    "overlay": 36,
    "args": [
     "any",
@@ -4119,7 +4119,7 @@
    ]
   },
   "541": {
-   "handler": "func_ov012_02164b94",
+   "handler": "s021D_EntreeForestRemovePkm",
    "overlay": 12,
    "args": [
     "any"
@@ -4189,7 +4189,7 @@
    ]
   },
   "550": {
-   "handler": "func_ov036_021c6220",
+   "handler": "CountTrainersEvent_StartCountOtherOtIdsTask",
    "overlay": 36,
    "args": [
     "var"
@@ -4212,7 +4212,7 @@
    ]
   },
   "554": {
-   "handler": "func_ov036_021c784c",
+   "handler": "s022A_HollowRivalGenMsgID",
    "overlay": 36,
    "args": [
     "any",
@@ -4221,7 +4221,7 @@
    "area": "HollowRival"
   },
   "555": {
-   "handler": "func_ov036_021c7ad0",
+   "handler": "Scrcmd_StartSwapNpcEvent",
    "overlay": 36,
    "args": [
     "any",
@@ -4229,14 +4229,14 @@
    ]
   },
   "557": {
-   "handler": "func_ov036_021c2010",
+   "handler": "s022D_PlayFieldEffectByTable",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "558": {
-   "handler": "func_ov036_021aa2cc",
+   "handler": "ScriptNative_SetMmdlZoneDeleteOff",
    "overlay": 36,
    "args": [
     "any"
@@ -4251,7 +4251,7 @@
    ]
   },
   "560": {
-   "handler": "func_ov036_021a9554",
+   "handler": "s0230_MsgPlaceSignFont4",
    "overlay": 36,
    "args": [
     "any",
@@ -4266,14 +4266,14 @@
    ]
   },
   "561": {
-   "handler": "func_ov036_021ae0cc",
+   "handler": "s0231_CallGameManual",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "562": {
-   "handler": "func_ov036_021af9dc",
+   "handler": "PokeParty_ControlLegendMon",
    "overlay": 36,
    "args": [
     "any",
@@ -4281,7 +4281,7 @@
    ]
   },
   "563": {
-   "handler": "func_ov036_021c9d24",
+   "handler": "Scrcmd_HasPlayerLanguage",
    "overlay": 36,
    "args": [
     "var"
@@ -4331,14 +4331,14 @@
    ]
   },
   "569": {
-   "handler": "func_ov036_021aa968",
+   "handler": "ScriptNative_CheckPlayerFormModel",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "570": {
-   "handler": "func_ov036_021a7340",
+   "handler": "ScriptWork_PlayPerapVoice",
    "overlay": 36,
    "args": [
     "any",
@@ -4351,12 +4351,12 @@
    "args": []
   },
   "572": {
-   "handler": "func_ov012_02169c2c",
+   "handler": "s023C_NuvemaGimmickPlay",
    "overlay": 12,
    "args": []
   },
   "573": {
-   "handler": "func_ov012_02169c40",
+   "handler": "s023D_NuvemaGimmickWaitAnim",
    "overlay": 12,
    "args": []
   },
@@ -4375,7 +4375,7 @@
    "args": []
   },
   "576": {
-   "handler": "func_ov036_021a6e74",
+   "handler": "ScriptWork_FadeBgmVolume",
    "overlay": 36,
    "args": [
     "any",
@@ -4383,7 +4383,7 @@
    ]
   },
   "577": {
-   "handler": "func_ov036_021a6ec4",
+   "handler": "ScriptWork_RestoreBgmVolume",
    "overlay": 36,
    "args": [
     "any"
@@ -4432,7 +4432,7 @@
    ]
   },
   "585": {
-   "handler": "func_ov012_02159f90",
+   "handler": "s0249_GetRandomDistinctSix",
    "overlay": 12,
    "args": [
     "var",
@@ -4444,7 +4444,7 @@
    ]
   },
   "586": {
-   "handler": "func_ov012_02159d10",
+   "handler": "s024A_FieldSubscreenIsEnabled",
    "overlay": 12,
    "args": [
     "var"
@@ -4461,7 +4461,7 @@
    "args": []
   },
   "589": {
-   "handler": "func_ov036_021ab208",
+   "handler": "s024D_RollerCoasterAmbienceStart",
    "overlay": 36,
    "args": []
   },
@@ -4531,12 +4531,12 @@
    ]
   },
   "603": {
-   "handler": "func_ov036_021aad44",
+   "handler": "s025B_GymElecReapplyProgress",
    "overlay": 36,
    "args": []
   },
   "604": {
-   "handler": "func_ov036_021aad58",
+   "handler": "s025C_GymElecSetFollower",
    "overlay": 36,
    "args": [
     "u16",
@@ -4545,21 +4545,21 @@
    ]
   },
   "605": {
-   "handler": "func_ov036_021aad90",
+   "handler": "s025D_GymElecSetProgress",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "607": {
-   "handler": "func_ov036_021aadc8",
+   "handler": "s025F_GymElecSetStage",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "610": {
-   "handler": "func_ov012_0216a6a4",
+   "handler": "s0262_HollowRivalSetValue",
    "overlay": 12,
    "args": [
     "u16",
@@ -4568,7 +4568,7 @@
    "area": "HollowRival"
   },
   "611": {
-   "handler": "func_ov012_0216a718",
+   "handler": "s0263_HollowRivalSetFlag",
    "overlay": 12,
    "args": [
     "u16"
@@ -4585,7 +4585,7 @@
    "area": "HollowRival"
   },
   "613": {
-   "handler": "func_ov036_021ae18c",
+   "handler": "s0265_CallXTransceiverSecret",
    "overlay": 36,
    "args": [
     "any"
@@ -4593,7 +4593,7 @@
    "area": "HollowRival"
   },
   "614": {
-   "handler": "func_ov012_0216a79c",
+   "handler": "s0266_HollowRivalGetCounter",
    "overlay": 12,
    "args": [
     "var"
@@ -4607,14 +4607,14 @@
    "area": "HollowRival"
   },
   "616": {
-   "handler": "func_ov036_021aae48",
+   "handler": "s0268_GymInsectPlayObject",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "617": {
-   "handler": "func_ov036_021aae74",
+   "handler": "s0269_GymInsectShowEffect",
    "overlay": 36,
    "args": []
   },
@@ -4671,7 +4671,7 @@
    "args": []
   },
   "629": {
-   "handler": "func_ov036_021a7e04",
+   "handler": "s0275_WordSetFunfestMission",
    "overlay": 36,
    "args": [
     "u8",
@@ -4795,14 +4795,14 @@
    "args": []
   },
   "654": {
-   "handler": "func_ov036_021aafa8",
+   "handler": "s028E_MistraltonGymFireCannon",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "655": {
-   "handler": "func_ov036_021ae300",
+   "handler": "s028F_CallRivalNameInput",
    "overlay": 36,
    "args": [
     "var"
@@ -4816,14 +4816,14 @@
    ]
   },
   "657": {
-   "handler": "func_ov036_021ab134",
+   "handler": "s0291_VirbankGymStopModelAnimations",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "658": {
-   "handler": "func_ov036_021ab158",
+   "handler": "s0292_VirbankGymSetActorFlag",
    "overlay": 36,
    "args": [
     "u16"
@@ -4865,7 +4865,7 @@
    ]
   },
   "664": {
-   "handler": "func_ov036_021a7d70",
+   "handler": "s0298_WordSetEmptyFileMessage",
    "overlay": 36,
    "args": [
     "u8",
@@ -4930,12 +4930,12 @@
    ]
   },
   "674": {
-   "handler": "func_ov036_021ab178",
+   "handler": "s02A2_HumilauGymPlayLeaderSplash",
    "overlay": 36,
    "args": []
   },
   "675": {
-   "handler": "func_ov036_021ab190",
+   "handler": "s02A3_HumilauGymPlayLeaderWaves",
    "overlay": 36,
    "args": []
   },
@@ -4945,31 +4945,31 @@
    "args": []
   },
   "677": {
-   "handler": "func_ov036_021ab094",
+   "handler": "s02A5_OpelucidGymCallMove",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "678": {
-   "handler": "func_ov036_021ab104",
+   "handler": "s02A6_OpelucidGymRefreshVars",
    "overlay": 36,
    "args": []
   },
   "679": {
-   "handler": "func_ov036_021ab0cc",
+   "handler": "s02A7_OpelucidGymCallButton",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "680": {
-   "handler": "func_ov036_021ab114",
+   "handler": "s02A8_OpelucidGymFreeHeap",
    "overlay": 36,
    "args": []
   },
   "681": {
-   "handler": "func_ov036_021ab124",
+   "handler": "s02A9_OpelucidGymCreateHeap",
    "overlay": 36,
    "args": []
   },
@@ -4979,7 +4979,7 @@
    "args": []
   },
   "686": {
-   "handler": "func_ov012_0216a82c",
+   "handler": "s02AE_GameGetMyCity",
    "overlay": 12,
    "args": [
     "var"
@@ -5000,7 +5000,7 @@
    ]
   },
   "689": {
-   "handler": "func_ov012_0216a894",
+   "handler": "s02B1_KeyInfoGetChamberKey",
    "overlay": 12,
    "args": [
     "var"
@@ -5008,7 +5008,7 @@
    "area": "Keys"
   },
   "690": {
-   "handler": "func_ov012_0216a950",
+   "handler": "s02B2_MemoryLinkCheckFlag",
    "overlay": 12,
    "args": [
     "any",
@@ -5016,7 +5016,7 @@
    ]
   },
   "691": {
-   "handler": "func_ov012_0216a994",
+   "handler": "s02B3_MemoryLinkGetVar",
    "overlay": 12,
    "args": [
     "any",
@@ -5024,7 +5024,7 @@
    ]
   },
   "692": {
-   "handler": "func_ov012_0216a9d8",
+   "handler": "s02B4_MemoryLinkIsPlayerLinked",
    "overlay": 12,
    "args": [
     "any",
@@ -5032,7 +5032,7 @@
    ]
   },
   "693": {
-   "handler": "func_ov012_0216aa1c",
+   "handler": "s02B5_WordSetMemoryLinkPlayerName",
    "overlay": 12,
    "args": [
     "any",
@@ -5040,7 +5040,7 @@
    ]
   },
   "694": {
-   "handler": "func_ov012_0216aabc",
+   "handler": "s02B6_MemoryLinkCheckMusical",
    "overlay": 12,
    "args": [
     "any",
@@ -5049,7 +5049,7 @@
    "area": "Musical"
   },
   "695": {
-   "handler": "func_ov012_0216ab30",
+   "handler": "s02B7_MemoryLinkAddMusicalProps",
    "overlay": 12,
    "args": [
     "var"
@@ -5132,12 +5132,12 @@
    "area": "HollowRival"
   },
   "708": {
-   "handler": "func_ov012_0216ac74",
+   "handler": "s02C4_HiddenHollowSetPeriod",
    "overlay": 12,
    "args": []
   },
   "709": {
-   "handler": "func_ov036_021c783c",
+   "handler": "s02C5_JoinAvenueRecordActivity",
    "overlay": 36,
    "args": [
     "u16"
@@ -5169,7 +5169,7 @@
    ]
   },
   "715": {
-   "handler": "func_ov012_0216acfc",
+   "handler": "s02CB_PokewoodGetLevel",
    "overlay": 12,
    "args": [
     "var"
@@ -5191,7 +5191,7 @@
    "args": []
   },
   "721": {
-   "handler": "func_ov036_021c9a40",
+   "handler": "s02D1_KeyInfoGetMyCityProgress",
    "overlay": 36,
    "args": [
     "var"
@@ -5204,7 +5204,7 @@
    "args": []
   },
   "723": {
-   "handler": "func_ov012_0216a6dc",
+   "handler": "s02D3_HollowRivalGetValue",
    "overlay": 12,
    "args": [
     "u16",
@@ -5220,7 +5220,7 @@
    ]
   },
   "725": {
-   "handler": "func_ov036_021c9a7c",
+   "handler": "s02D5_WbtIsTrainerBeaten",
    "overlay": 36,
    "args": [
     "any",
@@ -5228,7 +5228,7 @@
    ]
   },
   "727": {
-   "handler": "func_ov036_021c9ab0",
+   "handler": "Scrcmd_GetWifiHistoryCountryCount",
    "overlay": 36,
    "args": [
     "any",
@@ -5237,7 +5237,7 @@
    "area": "UnityTower"
   },
   "728": {
-   "handler": "func_ov036_021c9b38",
+   "handler": "Scrcmd_MarkPartnerCandidate",
    "overlay": 36,
    "args": [
     "any"
@@ -5245,7 +5245,7 @@
    "area": "UnityTower"
   },
   "729": {
-   "handler": "func_ov036_021c9b88",
+   "handler": "Scrcmd_IsPartnerCandidateMarked",
    "overlay": 36,
    "args": [
     "any",
@@ -5254,7 +5254,7 @@
    "area": "UnityTower"
   },
   "730": {
-   "handler": "func_ov036_021c9bec",
+   "handler": "s02DA_UnityTowerSetRatingLevel",
    "overlay": 36,
    "args": [
     "any"
@@ -5325,7 +5325,7 @@
    "args": []
   },
   "744": {
-   "handler": "func_ov036_021ab498",
+   "handler": "s02E8_CallFieldFadeOut",
    "overlay": 36,
    "args": [
     "any",
@@ -5333,7 +5333,7 @@
    ]
   },
   "745": {
-   "handler": "func_ov036_021ab50c",
+   "handler": "s02E9_CallFieldFadeIn",
    "overlay": 36,
    "args": [
     "any",
@@ -5353,7 +5353,7 @@
    ]
   },
   "749": {
-   "handler": "func_ov012_02155bec",
+   "handler": "s02ED_SetSoftResetBlocked",
    "overlay": 12,
    "args": [
     "any",
@@ -5376,7 +5376,7 @@
    ]
   },
   "753": {
-   "handler": "func_ov012_02155c30",
+   "handler": "s02F1_SetOneShotDRObtained",
    "overlay": 12,
    "args": [
     "any"
@@ -5384,7 +5384,7 @@
    "area": "TrainerCard"
   },
   "754": {
-   "handler": "func_ov012_02155c64",
+   "handler": "s02F2_IsOneShotDRObtained",
    "overlay": 12,
    "args": [
     "any",
@@ -5413,12 +5413,12 @@
    ],
    "commands": {
     "1000": {
-     "handler": "func_ov050_021e5838",
+     "handler": "BSubwayCmd_ClearWork",
      "overlay": 50,
      "args": []
     },
     "1001": {
-     "handler": "func_ov050_021e5800",
+     "handler": "BSubwayCmd_CreateWork",
      "overlay": 50,
      "args": [
       "u16",
@@ -5426,7 +5426,7 @@
      ]
     },
     "1002": {
-     "handler": "func_ov050_021e5854",
+     "handler": "BSubwayCmd_FreeWork",
      "overlay": 50,
      "args": []
     },
@@ -5514,7 +5514,7 @@
    ],
    "commands": {
     "1000": {
-     "handler": "func_ov052_021e5800",
+     "handler": "PokemonLeagueCmd_DisableRailLines",
      "overlay": 52,
      "args": [
       "any"
@@ -5528,14 +5528,14 @@
      ]
     },
     "1002": {
-     "handler": "func_ov052_021e58ac",
+     "handler": "PokemonLeagueCmd_PlayGrimsleyGroup",
      "overlay": 52,
      "args": [
       "u16"
      ]
     },
     "1003": {
-     "handler": "func_ov052_021e58cc",
+     "handler": "PokemonLeagueCmd_PlayGrimsleyModel0Animation",
      "overlay": 52,
      "args": [
       "u16"
@@ -5547,24 +5547,24 @@
      "args": []
     },
     "1005": {
-     "handler": "func_ov052_021e590c",
+     "handler": "PokemonLeagueCmd_PlayCaitlinModels34Or5",
      "overlay": 52,
      "args": [
       "u16"
      ]
     },
     "1006": {
-     "handler": "func_ov052_021e592c",
+     "handler": "PokemonLeagueCmd_CallCaitlinModel1Event",
      "overlay": 52,
      "args": []
     },
     "1007": {
-     "handler": "func_ov052_021e5954",
+     "handler": "PokemonLeagueCmd_PlayCaitlinModel0",
      "overlay": 52,
      "args": []
     },
     "1008": {
-     "handler": "func_ov052_021e5964",
+     "handler": "PokemonLeagueCmd_DropCaitlinActor",
      "overlay": 52,
      "args": [
       "u16",
@@ -5572,77 +5572,77 @@
      ]
     },
     "1009": {
-     "handler": "func_ov052_021e598c",
+     "handler": "PokemonLeagueCmd_CallShauntalModel8Event",
      "overlay": 52,
      "args": []
     },
     "1010": {
-     "handler": "func_ov052_021e59b4",
+     "handler": "PokemonLeagueCmd_PlayShauntalModel",
      "overlay": 52,
      "args": [
       "u16"
      ]
     },
     "1011": {
-     "handler": "func_ov052_021e59dc",
+     "handler": "PokemonLeagueCmd_CallShauntalRoomChangeEvent",
      "overlay": 52,
      "args": [
       "u16"
      ]
     },
     "1012": {
-     "handler": "func_ov052_021e5a14",
+     "handler": "PokemonLeagueCmd_CallShauntalModels6And9Event",
      "overlay": 52,
      "args": []
     },
     "1013": {
-     "handler": "func_ov052_021e5a3c",
+     "handler": "PokemonLeagueCmd_PlayMarshalModel0",
      "overlay": 52,
      "args": []
     },
     "1014": {
-     "handler": "func_ov052_021e5a4c",
+     "handler": "PokemonLeagueCmd_PlayMarshalModel3Animation",
      "overlay": 52,
      "args": [
       "u16"
      ]
     },
     "1015": {
-     "handler": "func_ov052_021e5a6c",
+     "handler": "PokemonLeagueCmd_PlayMarshalModel1",
      "overlay": 52,
      "args": []
     },
     "1016": {
-     "handler": "func_ov052_021e5a7c",
+     "handler": "PokemonLeagueCmd_CallMarshalPlatformEvent",
      "overlay": 52,
      "args": []
     },
     "1017": {
-     "handler": "func_ov052_021e5aa4",
+     "handler": "PokemonLeagueCmd_CallChampionChangeEvent",
      "overlay": 52,
      "args": []
     },
     "1018": {
-     "handler": "func_ov052_021e5acc",
+     "handler": "PokemonLeagueCmd_CallChampionOpenEvent",
      "overlay": 52,
      "args": []
     },
     "1019": {
-     "handler": "func_ov052_021e5af4",
+     "handler": "PokemonLeagueCmd_HideChampionActorShadow",
      "overlay": 52,
      "args": [
       "u16"
      ]
     },
     "1020": {
-     "handler": "func_ov052_021e5b14",
+     "handler": "PokemonLeagueCmd_ShowChampionActorShadow",
      "overlay": 52,
      "args": [
       "u16"
      ]
     },
     "1021": {
-     "handler": "func_ov052_021e5b34",
+     "handler": "PokemonLeagueCmd_SetChampionRoomOpen",
      "overlay": 52,
      "args": []
     }
@@ -5738,12 +5738,12 @@
      ]
     },
     "1005": {
-     "handler": "func_ov055_021e5960",
+     "handler": "WbtCmd_MakeMatch",
      "overlay": 55,
      "args": []
     },
     "1006": {
-     "handler": "func_ov056_021e7620",
+     "handler": "WbtCmd_IsTournamentAvailable",
      "overlay": 56,
      "args": [
       "any",
@@ -5751,7 +5751,7 @@
      ]
     },
     "1007": {
-     "handler": "func_ov056_021e7674",
+     "handler": "WbtCmd_WouldOpenTournament",
      "overlay": 56,
      "args": [
       "any",
@@ -5808,14 +5808,14 @@
      ]
     },
     "1015": {
-     "handler": "func_ov055_021e5a30",
+     "handler": "WbtCmd_SetCategory",
      "overlay": 55,
      "args": [
       "any"
      ]
     },
     "1016": {
-     "handler": "func_ov055_021e5a4c",
+     "handler": "WbtCmd_GetCategory",
      "overlay": 55,
      "args": [
       "var"
@@ -5843,7 +5843,7 @@
      ]
     },
     "1022": {
-     "handler": "func_ov056_021e7988",
+     "handler": "WbtCmd_GetSlot",
      "overlay": 56,
      "args": [
       "any",
@@ -5851,7 +5851,7 @@
      ]
     },
     "1023": {
-     "handler": "func_ov056_021e7894",
+     "handler": "WbtCmd_GetSlotTrainerObjCodes",
      "overlay": 56,
      "args": [
       "var",
@@ -5860,42 +5860,42 @@
      ]
     },
     "1024": {
-     "handler": "func_ov055_021e5ab8",
+     "handler": "WbtCmd_GetEntryCount",
      "overlay": 55,
      "args": [
       "var"
      ]
     },
     "1025": {
-     "handler": "func_ov056_021e79c0",
+     "handler": "WbtCmd_CountDownloads",
      "overlay": 56,
      "args": [
       "var"
      ]
     },
     "1026": {
-     "handler": "func_ov056_021e79f0",
+     "handler": "WbtCmd_SetDownloadSlot",
      "overlay": 56,
      "args": [
       "any"
      ]
     },
     "1027": {
-     "handler": "func_ov056_021e7a30",
+     "handler": "WbtCmd_GetDownloadSlot",
      "overlay": 56,
      "args": [
       "var"
      ]
     },
     "1028": {
-     "handler": "func_ov056_021e7808",
+     "handler": "WbtCmd_SetUseBattleBox",
      "overlay": 56,
      "args": [
       "any"
      ]
     },
     "1031": {
-     "handler": "func_ov056_021e7894",
+     "handler": "WbtCmd_GetSlotTrainerObjCodes",
      "overlay": 56,
      "args": [
       "var",
@@ -5911,7 +5911,7 @@
      ]
     },
     "1044": {
-     "handler": "func_ov055_021e5adc",
+     "handler": "WbtCmd_SetTournamentNameWord",
      "overlay": 55,
      "args": [
       "u8",
@@ -5919,28 +5919,28 @@
      ]
     },
     "1046": {
-     "handler": "func_ov056_021e7750",
+     "handler": "WbtCmd_CallEntryPartySelect",
      "overlay": 56,
      "args": [
       "var"
      ]
     },
     "1047": {
-     "handler": "func_ov055_021e5b38",
+     "handler": "WbtCmd_ShowTrainerList",
      "overlay": 55,
      "args": [
       "any"
      ]
     },
     "1048": {
-     "handler": "func_ov056_021e7a4c",
+     "handler": "WbtCmd_CallPokeSelect",
      "overlay": 56,
      "args": [
       "var"
      ]
     },
     "1049": {
-     "handler": "func_ov056_021e7a9c",
+     "handler": "WbtCmd_ShowDownloads",
      "overlay": 56,
      "args": [
       "var",
@@ -5948,7 +5948,7 @@
      ]
     },
     "1050": {
-     "handler": "func_ov056_021e7b00",
+     "handler": "WbtCmd_ShowWinRecord",
      "overlay": 56,
      "args": [
       "var"
@@ -5963,7 +5963,7 @@
      ]
     },
     "1057": {
-     "handler": "func_ov056_021e76f4",
+     "handler": "WbtCmd_GetRegulationId",
      "overlay": 56,
      "args": [
       "var"
@@ -5977,7 +5977,7 @@
      ]
     },
     "1059": {
-     "handler": "func_ov056_021e7710",
+     "handler": "WbtCmd_CheckEntryParties",
      "overlay": 56,
      "args": [
       "var"
@@ -6026,7 +6026,7 @@
      ]
     },
     "1005": {
-     "handler": "func_ov055_021e5960",
+     "handler": "WbtCmd_MakeMatch",
      "overlay": 55,
      "args": []
     },
@@ -6073,14 +6073,14 @@
      ]
     },
     "1015": {
-     "handler": "func_ov055_021e5a30",
+     "handler": "WbtCmd_SetCategory",
      "overlay": 55,
      "args": [
       "any"
      ]
     },
     "1016": {
-     "handler": "func_ov055_021e5a4c",
+     "handler": "WbtCmd_GetCategory",
      "overlay": 55,
      "args": [
       "var"
@@ -6101,48 +6101,48 @@
      ]
     },
     "1019": {
-     "handler": "func_ov057_021e7814",
+     "handler": "WbtCmd_GetRoundRemaining",
      "overlay": 57,
      "args": [
       "var"
      ]
     },
     "1023": {
-     "handler": "func_ov057_021e7894",
+     "handler": "WbtCmd_ResetPicks",
      "overlay": 57,
      "args": []
     },
     "1024": {
-     "handler": "func_ov055_021e5ab8",
+     "handler": "WbtCmd_GetEntryCount",
      "overlay": 55,
      "args": [
       "var"
      ]
     },
     "1029": {
-     "handler": "func_ov057_021e7850",
+     "handler": "WbtCmd_ShowPartyList",
      "overlay": 57,
      "args": []
     },
     "1030": {
-     "handler": "func_ov057_021e7878",
+     "handler": "WbtCmd_ClosePartyList",
      "overlay": 57,
      "args": []
     },
     "1031": {
-     "handler": "func_ov057_021e7894",
+     "handler": "WbtCmd_ResetPicks",
      "overlay": 57,
      "args": []
     },
     "1032": {
-     "handler": "func_ov057_021e78a4",
+     "handler": "WbtCmd_RandomPick",
      "overlay": 57,
      "args": [
       "any"
      ]
     },
     "1033": {
-     "handler": "func_ov057_021e78c8",
+     "handler": "WbtCmd_SetPick",
      "overlay": 57,
      "args": [
       "any",
@@ -6150,7 +6150,7 @@
      ]
     },
     "1034": {
-     "handler": "func_ov057_021e78fc",
+     "handler": "WbtCmd_WordSetPickSpecies",
      "overlay": 57,
      "args": [
       "u8",
@@ -6158,17 +6158,17 @@
      ]
     },
     "1035": {
-     "handler": "func_ov057_021e7948",
+     "handler": "WbtCmd_ListPartyPokemon",
      "overlay": 57,
      "args": []
     },
     "1036": {
-     "handler": "func_ov057_021e79e8",
+     "handler": "WbtCmd_Dummy",
      "overlay": 57,
      "args": []
     },
     "1037": {
-     "handler": "func_ov057_021e79ec",
+     "handler": "WbtCmd_SwapPickedPokemon",
      "overlay": 57,
      "args": []
     },
@@ -6178,14 +6178,14 @@
      "args": []
     },
     "1040": {
-     "handler": "func_ov057_021e760c",
+     "handler": "WbtCmd_GetOpponentObjCode",
      "overlay": 57,
      "args": [
       "var"
      ]
     },
     "1041": {
-     "handler": "func_ov057_021e7630",
+     "handler": "WbtCmd_ShowOpponentLine",
      "overlay": 57,
      "args": [
       "any",
@@ -6196,14 +6196,14 @@
      ]
     },
     "1042": {
-     "handler": "func_ov057_021e76a8",
+     "handler": "WbtCmd_CallBattle",
      "overlay": 57,
      "args": [
       "var"
      ]
     },
     "1043": {
-     "handler": "func_ov057_021e770c",
+     "handler": "WbtCmd_ShowOpponentLine7",
      "overlay": 57,
      "args": [
       "any"
@@ -6213,7 +6213,7 @@
      ]
     },
     "1044": {
-     "handler": "func_ov055_021e5adc",
+     "handler": "WbtCmd_SetTournamentNameWord",
      "overlay": 55,
      "args": [
       "u8",
@@ -6221,28 +6221,28 @@
      ]
     },
     "1045": {
-     "handler": "func_ov057_021e777c",
+     "handler": "WbtCmd_WordSetOpponentName",
      "overlay": 57,
      "args": [
       "u8"
      ]
     },
     "1047": {
-     "handler": "func_ov055_021e5b38",
+     "handler": "WbtCmd_ShowTrainerList",
      "overlay": 55,
      "args": [
       "any"
      ]
     },
     "1052": {
-     "handler": "func_ov057_021e7b20",
+     "handler": "WbtCmd_ShowPortraits",
      "overlay": 57,
      "args": [
       "any"
      ]
     },
     "1053": {
-     "handler": "func_ov057_021e7b60",
+     "handler": "WbtCmd_LoadPortraitScene",
      "overlay": 57,
      "args": [
       "any",
@@ -6250,12 +6250,12 @@
      ]
     },
     "1054": {
-     "handler": "func_ov057_021e7ba0",
+     "handler": "WbtCmd_PlayStadiumIntro",
      "overlay": 57,
      "args": []
     },
     "1055": {
-     "handler": "func_ov057_021e7bb4",
+     "handler": "WbtCmd_SwitchLights",
      "overlay": 57,
      "args": [
       "any",
@@ -6263,14 +6263,14 @@
      ]
     },
     "1056": {
-     "handler": "func_ov057_021e7bec",
+     "handler": "WbtCmd_PlayCrowd",
      "overlay": 57,
      "args": [
       "any"
      ]
     },
     "1060": {
-     "handler": "func_ov057_021e79fc",
+     "handler": "WbtCmd_SetNamePlates",
      "overlay": 57,
      "args": [
       "any"
@@ -6289,17 +6289,17 @@
    ],
    "commands": {
     "1000": {
-     "handler": "func_ov059_021e58c0",
+     "handler": "ResortCmd_StartTalk",
      "overlay": 59,
      "args": []
     },
     "1001": {
-     "handler": "func_ov059_021e591c",
+     "handler": "ResortCmd_EndTalk",
      "overlay": 59,
      "args": []
     },
     "1002": {
-     "handler": "func_ov059_021e5950",
+     "handler": "ResortCmd_GetValue",
      "overlay": 59,
      "args": [
       "any",
@@ -6307,7 +6307,7 @@
      ]
     },
     "1003": {
-     "handler": "func_ov059_021e5eb0",
+     "handler": "ResortCmd_GetScriptValue",
      "overlay": 59,
      "args": [
       "any",
@@ -6315,7 +6315,7 @@
      ]
     },
     "1004": {
-     "handler": "func_ov059_021e79a4",
+     "handler": "ResortCmd_ShowRecords",
      "overlay": 59,
      "args": [
       "any",
@@ -6326,7 +6326,7 @@
      ]
     },
     "1005": {
-     "handler": "func_ov059_021e5f38",
+     "handler": "ResortCmd_MakeData",
      "overlay": 59,
      "args": [
       "u16",
@@ -6334,14 +6334,14 @@
      ]
     },
     "1006": {
-     "handler": "func_ov059_021e7ad8",
+     "handler": "ResortCmd_RecreatePeople",
      "overlay": 59,
      "args": [
       "any"
      ]
     },
     "1007": {
-     "handler": "func_ov059_021e6014",
+     "handler": "ResortCmd_SetWord",
      "overlay": 59,
      "args": [
       "u16",
@@ -6351,7 +6351,7 @@
      ]
     },
     "1008": {
-     "handler": "func_ov059_021e60a4",
+     "handler": "ResortCmd_RemovePerson",
      "overlay": 59,
      "args": [
       "any",
@@ -6360,7 +6360,7 @@
      ]
     },
     "1009": {
-     "handler": "func_ov059_021e6778",
+     "handler": "ResortCmd_AddShopExperience",
      "overlay": 59,
      "args": [
       "any",
@@ -6370,7 +6370,7 @@
      ]
     },
     "1010": {
-     "handler": "func_ov059_021e67f8",
+     "handler": "ResortCmd_AddPopularity",
      "overlay": 59,
      "args": [
       "any",
@@ -6379,31 +6379,31 @@
      ]
     },
     "1011": {
-     "handler": "func_ov059_021e58c0",
+     "handler": "ResortCmd_StartTalk",
      "overlay": 59,
      "args": []
     },
     "1012": {
-     "handler": "func_ov059_021e619c",
+     "handler": "ResortCmd_SaveShopId",
      "overlay": 59,
      "args": []
     },
     "1013": {
-     "handler": "func_ov059_021e6868",
+     "handler": "ResortCmd_SetOccupantsLocked",
      "overlay": 59,
      "args": [
       "any"
      ]
     },
     "1014": {
-     "handler": "func_ov059_021e689c",
+     "handler": "ResortCmd_HideActors",
      "overlay": 59,
      "args": [
       "any"
      ]
     },
     "1015": {
-     "handler": "func_ov059_021e61d8",
+     "handler": "ResortCmd_RaffleShopItem",
      "overlay": 59,
      "args": [
       "any",
@@ -6412,7 +6412,7 @@
      ]
     },
     "1016": {
-     "handler": "func_ov059_021e62a8",
+     "handler": "ResortCmd_SetFriendship",
      "overlay": 59,
      "args": [
       "any",
@@ -6421,7 +6421,7 @@
      ]
     },
     "1017": {
-     "handler": "func_ov059_021e6318",
+     "handler": "ResortCmd_RaiseLevel",
      "overlay": 59,
      "args": [
       "any",
@@ -6430,7 +6430,7 @@
      ]
     },
     "1018": {
-     "handler": "func_ov059_021e63d4",
+     "handler": "ResortCmd_ChangeEffortValue",
      "overlay": 59,
      "args": [
       "any",
@@ -6440,7 +6440,7 @@
      ]
     },
     "1019": {
-     "handler": "func_ov059_021e64a0",
+     "handler": "ResortCmd_ShortenEggSteps",
      "overlay": 59,
      "args": [
       "any",
@@ -6449,12 +6449,12 @@
      ]
     },
     "1020": {
-     "handler": "func_ov059_021e65fc",
+     "handler": "ResortCmd_SetShopFlag",
      "overlay": 59,
      "args": []
     },
     "1021": {
-     "handler": "func_ov059_021e6630",
+     "handler": "ResortCmd_PayAndSetShopFlag",
      "overlay": 59,
      "args": [
       "any",
@@ -6463,7 +6463,7 @@
      "area": "TrainerCard"
     },
     "1022": {
-     "handler": "func_ov059_021e66d8",
+     "handler": "ResortCmd_GetPersonVisit",
      "overlay": 59,
      "args": [
       "any",
@@ -6474,7 +6474,7 @@
      ]
     },
     "1023": {
-     "handler": "func_ov059_021e6bd4",
+     "handler": "ResortCmd_NameEntry",
      "overlay": 59,
      "args": [
       "u16",
@@ -6482,7 +6482,7 @@
      ]
     },
     "1024": {
-     "handler": "func_ov059_021e6934",
+     "handler": "ResortCmd_Visit",
      "overlay": 59,
      "args": [
       "any",
@@ -6492,19 +6492,19 @@
      ]
     },
     "1025": {
-     "handler": "func_ov059_021e6b68",
+     "handler": "ResortCmd_CheckRank100Unlock",
      "overlay": 59,
      "args": [
       "var"
      ]
     },
     "1026": {
-     "handler": "func_ov059_021e6c10",
+     "handler": "ResortCmd_MarkRaffled",
      "overlay": 59,
      "args": []
     },
     "1027": {
-     "handler": "func_ov059_021e7a28",
+     "handler": "ResortCmd_AddRecordPerson",
      "overlay": 59,
      "args": [
       "any",
@@ -6512,7 +6512,7 @@
      ]
     },
     "1028": {
-     "handler": "func_ov059_021e77c4",
+     "handler": "ResortCmd_AddEntryOrRecord",
      "overlay": 59,
      "args": [
       "any",
@@ -6520,7 +6520,7 @@
      ]
     },
     "1029": {
-     "handler": "func_ov059_021e6c48",
+     "handler": "ResortCmd_GetNPCValue",
      "overlay": 59,
      "args": [
       "any",
@@ -6529,7 +6529,7 @@
      ]
     },
     "1030": {
-     "handler": "func_ov059_021e74cc",
+     "handler": "ResortCmd_SetOwnValue",
      "overlay": 59,
      "args": [
       "any",
@@ -6537,7 +6537,7 @@
      ]
     },
     "1031": {
-     "handler": "func_ov059_021e7608",
+     "handler": "ResortCmd_GetOwnValue",
      "overlay": 59,
      "args": [
       "any",
@@ -6545,7 +6545,7 @@
      ]
     },
     "1032": {
-     "handler": "func_ov059_021e6d50",
+     "handler": "ResortCmd_SetOccupantWords",
      "overlay": 59,
      "args": [
       "any",
@@ -6554,7 +6554,7 @@
      ]
     },
     "1033": {
-     "handler": "func_ov059_021e6f14",
+     "handler": "ResortCmd_SetNPCWord",
      "overlay": 59,
      "args": [
       "any",
@@ -6563,7 +6563,7 @@
      ]
     },
     "1034": {
-     "handler": "func_ov059_021e742c",
+     "handler": "ResortCmd_GetGoodsValue",
      "overlay": 59,
      "args": [
       "any",
@@ -6572,7 +6572,7 @@
      ]
     },
     "1035": {
-     "handler": "func_ov059_021e6fc8",
+     "handler": "ResortCmd_DescribeOccupant",
      "overlay": 59,
      "args": [
       "any",
@@ -6581,19 +6581,19 @@
      ]
     },
     "1036": {
-     "handler": "func_ov059_021e7c70",
+     "handler": "ResortCmd_ShowMedalInfo",
      "overlay": 59,
      "args": []
     },
     "1037": {
-     "handler": "func_ov059_021e7710",
+     "handler": "ResortCmd_StartSceneAnim",
      "overlay": 59,
      "args": [
       "any"
      ]
     },
     "1038": {
-     "handler": "func_ov059_021e7748",
+     "handler": "ResortCmd_IsSceneAnimDone",
      "overlay": 59,
      "args": [
       "any",
@@ -6601,7 +6601,7 @@
      ]
     },
     "1039": {
-     "handler": "func_ov059_021e778c",
+     "handler": "ResortCmd_EndSceneAnim",
      "overlay": 59,
      "args": [
       "any"
@@ -6611,7 +6611,7 @@
    "variants": {
     "60": {
      "1000": {
-      "handler": "func_ov060_021e58c0",
+      "handler": "ResortShopCmd_Open",
       "overlay": 60,
       "args": [
        "any",
@@ -6629,7 +6629,7 @@
       ]
      },
      "1011": {
-      "handler": "func_ov060_021e58c0",
+      "handler": "ResortShopCmd_Open",
       "overlay": 60,
       "args": [
        "any",
@@ -6669,12 +6669,12 @@
    ],
    "commands": {
     "1000": {
-     "handler": "func_ov061_021e5800",
+     "handler": "BlackTowerCmd_CreateWalls",
      "overlay": 61,
      "args": []
     },
     "1001": {
-     "handler": "func_ov061_021e5828",
+     "handler": "BlackTowerCmd_ChangeRoom",
      "overlay": 61,
      "args": [
       "any",
@@ -6683,12 +6683,12 @@
      ]
     },
     "1003": {
-     "handler": "func_ov061_021e5904",
+     "handler": "BlackTowerCmd_StartRun",
      "overlay": 61,
      "args": []
     },
     "1004": {
-     "handler": "func_ov061_021e594c",
+     "handler": "BlackTowerCmd_GetFloorInArea",
      "overlay": 61,
      "args": [
       "var"
@@ -6696,14 +6696,14 @@
      "area": "Keys"
     },
     "1005": {
-     "handler": "func_ov061_021e5888",
+     "handler": "BlackTowerCmd_ChangeFloor",
      "overlay": 61,
      "args": [
       "any"
      ]
     },
     "1006": {
-     "handler": "func_ov061_021e597c",
+     "handler": "BlackTowerCmd_GetArea",
      "overlay": 61,
      "args": [
       "var"
@@ -6711,7 +6711,7 @@
      "area": "Keys"
     },
     "1007": {
-     "handler": "func_ov061_021e59ac",
+     "handler": "BlackTowerCmd_CallBattleEvent",
      "overlay": 61,
      "args": []
     },
@@ -6723,7 +6723,7 @@
      ]
     },
     "1009": {
-     "handler": "func_ov061_021e5aa8",
+     "handler": "BlackTowerCmd_SetTrainerDefeated",
      "overlay": 61,
      "args": [
       "any",
@@ -6739,7 +6739,7 @@
      ]
     },
     "1011": {
-     "handler": "func_ov061_021e5af4",
+     "handler": "BlackTowerCmd_IsTrainerDefeated",
      "overlay": 61,
      "args": [
       "any",
@@ -6748,7 +6748,7 @@
      "area": "Keys"
     },
     "1012": {
-     "handler": "func_ov061_021e5b40",
+     "handler": "BlackTowerCmd_GetNpcScript",
      "overlay": 61,
      "args": [
       "var"
@@ -6763,7 +6763,7 @@
      ]
     },
     "1014": {
-     "handler": "func_ov061_021e5c5c",
+     "handler": "BlackTowerCmd_GetSpecialTrainerFlag",
      "overlay": 61,
      "args": [
       "any",
@@ -6772,7 +6772,7 @@
      "area": "Keys"
     },
     "1015": {
-     "handler": "func_ov061_021e5c04",
+     "handler": "BlackTowerCmd_SetSpecialTrainerFlag",
      "overlay": 61,
      "args": [
       "any",
@@ -6781,7 +6781,7 @@
      "area": "Keys"
     },
     "1016": {
-     "handler": "func_ov061_021e59ec",
+     "handler": "BlackTowerCmd_CallDoorEvent",
      "overlay": 61,
      "args": [
       "any",
@@ -6789,7 +6789,7 @@
      ]
     },
     "1017": {
-     "handler": "func_ov061_021e5cb8",
+     "handler": "BlackTowerCmd_GetGoalFloor",
      "overlay": 61,
      "args": [
       "var"
@@ -6797,7 +6797,7 @@
      "area": "Keys"
     },
     "1018": {
-     "handler": "func_ov061_021e5d58",
+     "handler": "BlackTowerCmd_GetTrainerClass",
      "overlay": 61,
      "args": [
       "any",
@@ -6805,7 +6805,7 @@
      ]
     },
     "1019": {
-     "handler": "func_ov061_021e58c4",
+     "handler": "BlackTowerCmd_SetProgress",
      "overlay": 61,
      "args": [
       "any"
@@ -6829,7 +6829,7 @@
      "area": "Keys"
     },
     "1022": {
-     "handler": "func_ov061_021e5e08",
+     "handler": "BlackTowerCmd_GetTrainerId",
      "overlay": 61,
      "args": [
       "any",
@@ -6838,14 +6838,14 @@
      "area": "Keys"
     },
     "1023": {
-     "handler": "func_ov061_021e5e60",
+     "handler": "BlackTowerCmd_GetVersion",
      "overlay": 61,
      "args": [
       "var"
      ]
     },
     "1024": {
-     "handler": "func_ov061_021e5e98",
+     "handler": "BlackTowerCmd_GetInfo",
      "overlay": 61,
      "args": [
       "any",
@@ -6855,12 +6855,12 @@
      "area": "Keys"
     },
     "1025": {
-     "handler": "func_ov061_021e5a38",
+     "handler": "BlackTowerCmd_CallMachineEvent",
      "overlay": 61,
      "args": []
     },
     "1026": {
-     "handler": "func_ov061_021e5fe4",
+     "handler": "BlackTowerCmd_IsTargetSlot",
      "overlay": 61,
      "args": [
       "any",
@@ -6869,7 +6869,7 @@
      "area": "Keys"
     },
     "1027": {
-     "handler": "func_ov061_021e603c",
+     "handler": "BlackTowerCmd_GetNpcScriptByResult",
      "overlay": 61,
      "args": [
       "any",
@@ -6878,26 +6878,26 @@
      "area": "Keys"
     },
     "1028": {
-     "handler": "func_ov061_021e5d0c",
+     "handler": "BlackTowerCmd_GetRoomNpcCount",
      "overlay": 61,
      "args": [
       "var"
      ]
     },
     "1029": {
-     "handler": "func_ov061_021e60a8",
+     "handler": "BlackTowerCmd_HasEarnedMoney",
      "overlay": 61,
      "args": [
       "var"
      ]
     },
     "1030": {
-     "handler": "func_ov061_021e5a64",
+     "handler": "BlackTowerCmd_CallLiftEvent",
      "overlay": 61,
      "args": []
     },
     "1031": {
-     "handler": "func_ov061_021e60f4",
+     "handler": "BlackTowerCmd_TakeEarnedMoney",
      "overlay": 61,
      "args": [
       "any"
@@ -6917,7 +6917,7 @@
    ],
    "commands": {
     "1000": {
-     "handler": "func_ov062_021e5914",
+     "handler": "PokewoodCmd_Film",
      "overlay": 62,
      "args": [
       "any",
@@ -6926,7 +6926,7 @@
      ]
     },
     "1001": {
-     "handler": "func_ov062_021e5a00",
+     "handler": "PokewoodCmd_WatchSlot",
      "overlay": 62,
      "args": [
       "any",
@@ -6934,14 +6934,14 @@
      ]
     },
     "1002": {
-     "handler": "func_ov062_021e5aa8",
+     "handler": "PokewoodCmd_PickMovie",
      "overlay": 62,
      "args": [
       "var"
      ]
     },
     "1003": {
-     "handler": "func_ov062_021e5b14",
+     "handler": "PokewoodCmd_OpenMenu",
      "overlay": 62,
      "args": [
       "any",
@@ -6949,14 +6949,14 @@
      ]
     },
     "1004": {
-     "handler": "func_ov062_021e5fb0",
+     "handler": "PokewoodCmd_SetSaveSlot",
      "overlay": 62,
      "args": [
       "any"
      ]
     },
     "1005": {
-     "handler": "func_ov062_021e5cbc",
+     "handler": "PokewoodCmd_SetMessageWord",
      "overlay": 62,
      "args": [
       "u8",
@@ -6996,7 +6996,7 @@
      ]
     },
     "1010": {
-     "handler": "func_ov062_021e5c7c",
+     "handler": "PokewoodCmd_GetDownloadedMovieResult",
      "overlay": 62,
      "args": [
       "any",
@@ -7014,21 +7014,21 @@
      "args": []
     },
     "1013": {
-     "handler": "func_ov062_021e597c",
+     "handler": "PokewoodCmd_SelectCast",
      "overlay": 62,
      "args": [
       "var"
      ]
     },
     "1014": {
-     "handler": "func_ov062_021e59cc",
+     "handler": "PokewoodCmd_SetUsePlayerCast",
      "overlay": 62,
      "args": [
       "any"
      ]
     },
     "1015": {
-     "handler": "func_ov062_021e5de4",
+     "handler": "PokewoodCmd_GetNewUnlockKind",
      "overlay": 62,
      "args": [
       "any",
@@ -7037,14 +7037,14 @@
      ]
     },
     "1016": {
-     "handler": "func_ov062_021e5e94",
+     "handler": "PokewoodCmd_TestAndSetLevelBit",
      "overlay": 62,
      "args": [
       "var"
      ]
     },
     "1017": {
-     "handler": "func_ov062_021e5ec8",
+     "handler": "PokewoodCmd_GetSlotFlag",
      "overlay": 62,
      "args": [
       "any",
@@ -7084,14 +7084,14 @@
      ]
     },
     "1022": {
-     "handler": "func_ov062_021e5ef8",
+     "handler": "PokewoodCmd_SetSlotFlag",
      "overlay": 62,
      "args": [
       "any"
      ]
     },
     "1023": {
-     "handler": "func_ov062_021e6040",
+     "handler": "PokewoodCmd_OpenRecordMonitor",
      "overlay": 62,
      "args": [
       "var"
@@ -7116,7 +7116,7 @@
      ]
     },
     "1026": {
-     "handler": "func_ov062_021e5a60",
+     "handler": "PokewoodCmd_WatchBlock",
      "overlay": 62,
      "args": []
     }
@@ -7162,14 +7162,14 @@
    ],
    "commands": {
     "1000": {
-     "handler": "func_ov064_021e5800",
+     "handler": "PlasmaFrigateCmd_PressSwitch",
      "overlay": 64,
      "args": [
       "u16"
      ]
     },
     "1001": {
-     "handler": "func_ov064_021e5838",
+     "handler": "PlasmaFrigateCmd_SetLightsState",
      "overlay": 64,
      "args": [
       "u16",
@@ -7177,14 +7177,14 @@
      ]
     },
     "1002": {
-     "handler": "func_ov064_021e586c",
+     "handler": "PlasmaFrigateCmd_PlayGroupASecond",
      "overlay": 64,
      "args": [
       "u16"
      ]
     },
     "1003": {
-     "handler": "func_ov064_021e588c",
+     "handler": "PlasmaFrigateCmd_PlayGroupBSecond",
      "overlay": 64,
      "args": [
       "u16"
@@ -7205,7 +7205,7 @@
      ]
     },
     "1006": {
-     "handler": "func_ov064_021e5910",
+     "handler": "PlasmaFrigateCmd_SetSwitchLightState",
      "overlay": 64,
      "args": [
       "u16",
@@ -7213,14 +7213,14 @@
      ]
     },
     "1007": {
-     "handler": "func_ov064_021e5944",
+     "handler": "PlasmaFrigateCmd_PlaySwitchAnim",
      "overlay": 64,
      "args": [
       "u16"
      ]
     },
     "1008": {
-     "handler": "func_ov064_021e5964",
+     "handler": "PlasmaFrigateCmd_PlaySwitchLightAnim",
      "overlay": 64,
      "args": [
       "u16"
@@ -7271,7 +7271,7 @@
      ]
     },
     "1005": {
-     "handler": "func_ov065_021e6508",
+     "handler": "PokemonCenterCmd_GetMatchState",
      "overlay": 65,
      "args": [
       "any",
@@ -7279,7 +7279,7 @@
      ]
     },
     "1006": {
-     "handler": "func_ov065_021e658c",
+     "handler": "PokemonCenterCmd_SetMatchInProgress",
      "overlay": 65,
      "args": []
     },
@@ -7289,7 +7289,7 @@
      "args": []
     },
     "1008": {
-     "handler": "func_ov065_021e65dc",
+     "handler": "PokemonCenterCmd_SetMatchState",
      "overlay": 65,
      "args": [
       "any",
@@ -7298,7 +7298,7 @@
      "area": "TrainerCard"
     },
     "1009": {
-     "handler": "func_ov065_021e6634",
+     "handler": "PokemonCenterCmd_AddBattlePoints",
      "overlay": 65,
      "args": [
       "any"
@@ -7319,40 +7319,40 @@
    ],
    "commands": {
     "1000": {
-     "handler": "func_ov066_021e597c",
+     "handler": "Plugin14Cmd_StartAspertiaSeasonAnimations",
      "overlay": 66,
      "args": []
     },
     "1001": {
-     "handler": "func_ov066_021e5800",
+     "handler": "Plugin14Cmd_ShowGC6Model",
      "overlay": 66,
      "args": [
       "u16"
      ]
     },
     "1002": {
-     "handler": "func_ov066_021e5820",
+     "handler": "Plugin14Cmd_PlayGC6Model",
      "overlay": 66,
      "args": [
       "u16"
      ]
     },
     "1003": {
-     "handler": "func_ov066_021e5840",
+     "handler": "Plugin14Cmd_StartActorHover",
      "overlay": 66,
      "args": [
       "u16"
      ]
     },
     "1004": {
-     "handler": "func_ov066_021e5860",
+     "handler": "Plugin14Cmd_PlayGC6Model23",
      "overlay": 66,
      "args": [
       "any"
      ]
     },
     "1005": {
-     "handler": "func_ov066_021e5888",
+     "handler": "Plugin14Cmd_HideGC6Model3",
      "overlay": 66,
      "args": []
     },
@@ -7366,12 +7366,12 @@
      ]
     },
     "1007": {
-     "handler": "func_ov066_021e5910",
+     "handler": "Plugin14Cmd_ResetLCDToBlack",
      "overlay": 66,
      "args": []
     },
     "1009": {
-     "handler": "func_ov066_021e598c",
+     "handler": "Plugin14Cmd_StartLeagueCenterAnimations",
      "overlay": 66,
      "args": []
     },
@@ -7383,17 +7383,17 @@
      ]
     },
     "1011": {
-     "handler": "func_ov066_021e5a1c",
+     "handler": "Plugin14Cmd_LoadAspertiaBG3Picture",
      "overlay": 66,
      "args": []
     },
     "1012": {
-     "handler": "func_ov066_021e5a2c",
+     "handler": "Plugin14Cmd_CallDT9ReleaseEvent",
      "overlay": 66,
      "args": []
     },
     "1013": {
-     "handler": "func_ov066_021e5a54",
+     "handler": "Plugin14Cmd_CallDT9ThrowEvent",
      "overlay": 66,
      "args": [
       "any",
@@ -7405,7 +7405,7 @@
      ]
     },
     "1014": {
-     "handler": "func_ov066_021e5b00",
+     "handler": "Plugin14Cmd_PlayDT9Thrown",
      "overlay": 66,
      "args": [
       "any",
@@ -7414,12 +7414,12 @@
      ]
     },
     "1015": {
-     "handler": "func_ov066_021e5b50",
+     "handler": "Plugin14Cmd_CallDT9WaitThrownDoneEvent",
      "overlay": 66,
      "args": []
     },
     "1016": {
-     "handler": "func_ov066_021e5b78",
+     "handler": "Plugin14Cmd_CallDT9WaitFifthFrameEvent",
      "overlay": 66,
      "args": []
     }
@@ -7436,7 +7436,7 @@
    ],
    "commands": {
     "1000": {
-     "handler": "func_ov067_021e5800",
+     "handler": "Plugin15Cmd_ShowSplash",
      "overlay": 67,
      "args": [
       "any",
@@ -7445,7 +7445,7 @@
      ]
     },
     "1001": {
-     "handler": "func_ov067_021e5840",
+     "handler": "Plugin15Cmd_JumpActorOut",
      "overlay": 67,
      "args": [
       "any",
@@ -7467,50 +7467,50 @@
    ],
    "commands": {
     "1000": {
-     "handler": "func_ov068_021e5800",
+     "handler": "Plugin16Cmd_ShowRuinsModel",
      "overlay": 68,
      "args": [
       "any"
      ]
     },
     "1001": {
-     "handler": "func_ov068_021e582c",
+     "handler": "Plugin16Cmd_SetRuinsAnimFrame",
      "overlay": 68,
      "args": [
       "any"
      ]
     },
     "1002": {
-     "handler": "func_ov068_021e5854",
+     "handler": "Plugin16Cmd_PlayRuinsAnim",
      "overlay": 68,
      "args": [
       "any"
      ]
     },
     "1003": {
-     "handler": "func_ov068_021e587c",
+     "handler": "Plugin16Cmd_CallFormEvent",
      "overlay": 68,
      "args": []
     },
     "1004": {
-     "handler": "func_ov068_021e58a4",
+     "handler": "Plugin16Cmd_HideActor2",
      "overlay": 68,
      "args": []
     },
     "1005": {
-     "handler": "func_ov068_021e58b4",
+     "handler": "Plugin16Cmd_StartChase",
      "overlay": 68,
      "args": [
       "any"
      ]
     },
     "1006": {
-     "handler": "func_ov068_021e58f8",
+     "handler": "Plugin16Cmd_WaitChase",
      "overlay": 68,
      "args": []
     },
     "1007": {
-     "handler": "func_ov068_021e5940",
+     "handler": "Plugin16Cmd_DropActor",
      "overlay": 68,
      "args": []
     }

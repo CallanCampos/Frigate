@@ -46,7 +46,7 @@ L_0064:
     FadeOutBlackQ
     FadeWait
     FieldClose
-    HighLinkCmd_016E
+    CallMonolith
     FieldOpen
     FadeInBlackQ
     FadeWait

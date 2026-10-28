@@ -895,9 +895,9 @@ static GameEvent *CheckPerStepEvents(FieldInteractWk *wk, Field *field, RailPosi
         }
         gimmick = Field_GetFesGimmick(field);
         if (railPos != NULL) {
-            event = func_ov036_021b672c(gimmick, railPos);
+            event = FesGimmick_CheckEventRail(gimmick, railPos);
         } else {
-            event = func_ov036_021b6700(gimmick, wk->pos);
+            event = FesGimmick_CheckEventGrid(gimmick, wk->pos);
         }
         if (event != NULL) {
             return event;

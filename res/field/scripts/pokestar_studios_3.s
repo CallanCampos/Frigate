@@ -154,7 +154,7 @@ L_0213:
 
 Script_8:
     ActorsPauseAll
-    Cmd_02CB EVENT_WORK_0x400f
+    PokewoodGetLevel EVENT_WORK_0x400f
     WordSetPlayerName 0
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 4
@@ -212,7 +212,7 @@ Script_4:
 Script_5:
     ActorsPauseAll
     WordSetPlayerName 0
-    Cmd_02CB EVENT_WORK_0x400f
+    PokewoodGetLevel EVENT_WORK_0x400f
     WorkSetConst 0x8022, 0
     WorkSetConst 0x8022, 7
     WorkAdd 0x8022, EVENT_WORK_0x400f
@@ -229,7 +229,7 @@ Script_5:
 Script_6:
     ActorsPauseAll
     WordSetPlayerName 0
-    Cmd_02CB EVENT_WORK_0x400f
+    PokewoodGetLevel EVENT_WORK_0x400f
     WorkSetConst 0x8023, 0
     WorkCmpConst EVENT_WORK_0x400f, 0
     VMJumpIf CMP_EQ, L_0314

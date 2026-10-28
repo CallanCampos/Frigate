@@ -201,7 +201,7 @@ L_02E3:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0372
     WorkSetConst 0x8025, 0
-    Cmd_024A 0x8025
+    FieldSubscreenIsEnabled 0x8025
     VMStackPush 0x8025
     VMStackPushConst 1
     VMStackCmp CMP_EQ

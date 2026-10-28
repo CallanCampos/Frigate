@@ -119,7 +119,7 @@ Script_7:
     FlagSet EVENT_FLAG_0x0370
     FlagSet EVENT_FLAG_0x0359
     WorkSetConst EVENT_WORK_0x4070, 2
-    HollowRivalCmd_0262 1, 33
+    HollowRivalSetValue 1, 33
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

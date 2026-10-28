@@ -34,17 +34,23 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 ## 2026-10-28: effective input recording and fresh-process replay
 
-- **Upstream:** reviewed main `85a0c74c067c`, through `35d735b52bb77338f3a138d321e562975ade556e`.
-  PR 52 merged normally after all 14 checks passed. The separate reviewed sync in PR 53 imports names through
-  `fd3b9e600da7`; its formatting follow-up passes local verification and awaits hosted checks. That pending
-  sync is not implicitly part of this feature's measured source.
+- **Upstream:** `fd3b9e600da72b208fa98c3486988d3d7ce16766`, reviewed main `afec4eed2b`. PR 53 merged
+  normally after owner approval and all 14 checks passed on `0b400ded7c`: both ROMs, full native suites and the
+  pointer guard. Its 31 naming commits preserve 163 symbols' addresses/sizes/modes; all 76 C/header files
+  normalize identically in upstream and adapted Frigate, and all 184 changed scripts preserve command bodies
+  and arguments. Two conflicts retain the port's wide callback types. Formatting is whitespace only; no workflow
+  change or reference exception. PR 52's cache change remains intact.
 - **Port:** `PORT_SHA` on `codex/input-recording`, with snapshot `1839aa2c61` and normal main integration at
   `5bc0b71fe6`, followed by writer fixes, the evidence checker and guides. Changes relative to reviewed main are
-  all in `port/`. Game C, source configurations, RNG algorithms and input assets stay unchanged.
+  all in `port/`. Game C, source configurations, RNG algorithms and input assets stay unchanged by recording.
+  The recorded experiments below ran on the explicit pre-sync source at `055c4910cd`/main `85a0c74c06`.
+  Normal integration of reviewed main `afec4eed2b` changes no recording runtime/test source; exact-head
+  publication checks verify the final combined tree separately.
 - **ROM (T0):** initial 10,587-step and final 18-step configure/Ninja runs pass both original hashes without
   warnings: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2
   `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. The supported local signed-wibo runtime override changes no
-  source; no tool or workaround binary is committed.
+  source; no tool or workaround binary is committed. Reviewed main integration also passes its 5,913-step
+  rebuild, both hashes and zero warnings.
 - **Host build (T1):** both ordinary RelWithDebInfo all-target builds pass on arm64 macOS. Both actual programs
   also build with Homebrew LLVM 23, fatal ASan/UBSan, recovery off and frame-time report-only off. The existing
   sanitizer ignorelist is unchanged. A Linux-only source definition exposes POSIX file APIs to strict C11;
@@ -53,6 +59,10 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   run metadata, strict seed exhaustion, actual ARM9 touch sampling, archive tables, pointer guard and real
   record/replay cases. The evidence checker's 16 ROM-free regressions reject missing/changed frames, state,
   clocks or seeds, corrupt saves and an unchanged copied fixture presented as a newly produced SAVE.
+  Full ordinary suites on `055c4910cd` pass: B2 326 passed/28 explicit skips of 354; W2 323/28 of 351,
+  zero failures. Fixture-dependent oracle tests remain separate from the recorded native experiments below.
+  Both latest-main all-target builds and 12 focused checks per game pass after integration, including the real
+  first-save/live recordings, pointer guard and actual touch path; zero skips. Exact-head full gates follow.
 - **Record/replay:** each game records the complete 34,600-frame Alder/Floccesy/Route 20 SAVE route from its
   SHA-checked catch fixture, then replays the new video-frame file in a fresh process from another fixture copy.
   All 34,600 frame/counter/screen records and 133,940 NNS/random-state payloads agree, without cuts or tolerances.

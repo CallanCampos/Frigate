@@ -98,14 +98,14 @@ void FesGimmick_BindPlayer(FesGimmick *fes, FieldEffects *effects, FieldPlayer *
     fes->sparkles = FldeffFesKira_Start(fes->effects);
 }
 
-void func_ov036_021b65d4(FesGimmick *fes) {
+void FesGimmick_DeleteSparkles(FesGimmick *fes) {
     if (fes->sparkles != NULL) {
         FieldEffects_DeleteObject(fes->sparkles);
         fes->sparkles = NULL;
     }
 }
 
-void func_ov036_021b65e8(FesGimmick *fes) {
+void FesGimmick_StartMission(FesGimmick *fes) {
     if (getStatusOfFesMission(fes->festival)) {
         MI_CpuFill8(&LinkFestival_GetMissionWork(fes->festival)->people, 0, sizeof(FesMissionWork));
         switch (fes->mission->header.kind) {
@@ -132,7 +132,7 @@ static void ClearFesEventFlags(FesGimmick *gimmick) {
     }
 }
 
-void func_ov036_021b6660(FesGimmick *fes) {
+void FesGimmick_OnZoneEnter(FesGimmick *fes) {
     if (getStatusOfFesMission(fes->festival)) {
         switch (fes->mission->header.kind) {
         case MISSION_SPARKLE:
@@ -145,7 +145,7 @@ void func_ov036_021b6660(FesGimmick *fes) {
     }
 }
 
-BOOL func_ov036_021b6690(FesGimmick *fes) {
+BOOL FesGimmick_EndMission(FesGimmick *fes) {
     FestMissionWork *work = LinkFestival_GetMissionWork(fes->festival);
 
     if (!getStatusOfFesMission(fes->festival)) {
@@ -173,7 +173,7 @@ BOOL FesGimmick_IsCurrent(FesGimmick *fes, u32 type) {
     return FALSE;
 }
 
-GameEvent *func_ov036_021b6700(FesGimmick *fes, const VecFx32 *position) {
+GameEvent *FesGimmick_CheckEventGrid(FesGimmick *fes, const VecFx32 *position) {
     if (!getStatusOfFesMission(fes->festival)) {
         return NULL;
     }
@@ -183,7 +183,7 @@ GameEvent *func_ov036_021b6700(FesGimmick *fes, const VecFx32 *position) {
     return NULL;
 }
 
-GameEvent *func_ov036_021b672c(FesGimmick *fes, const RailPosition *position) {
+GameEvent *FesGimmick_CheckEventRail(FesGimmick *fes, const RailPosition *position) {
     if (!getStatusOfFesMission(fes->festival)) {
         return NULL;
     }
@@ -193,7 +193,7 @@ GameEvent *func_ov036_021b672c(FesGimmick *fes, const RailPosition *position) {
     return NULL;
 }
 
-BOOL func_ov036_021b6758(FesGimmick *fes, u16 x, u16 z, fx32 height) {
+BOOL FesGimmick_IsSparkleOnTile(FesGimmick *fes, u16 x, u16 z, fx32 height) {
     if (!getStatusOfFesMission(fes->festival)) {
         return FALSE;
     }
@@ -213,14 +213,14 @@ void DeleteFunfestActor(FesGimmick *fes, u16 zoneId, u8 actorIndex) {
     }
 }
 
-u32 func_ov036_021b67bc(FesGimmick *fes) {
+u32 FesGimmick_IsOnSale(FesGimmick *fes) {
     if (FesGimmick_IsCurrent(fes, MISSION_PEOPLE)) {
         return FesMissionPeople_IsOnSale(fes->mission);
     }
     return 0;
 }
 
-void func_ov036_021b67d8(FesGimmick *gimmick, PokeParty *party) {
+void FesGimmick_BoostPartyLevels(FesGimmick *gimmick, PokeParty *party) {
     if (FesGimmick_IsCurrent(gimmick, MISSION_PEOPLE)) {
         FesMissionGimmick_BoostPartyLevels(gimmick, party);
     }

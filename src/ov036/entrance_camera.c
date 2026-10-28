@@ -66,8 +66,8 @@ static void EventWarpSequenceIn_ShowPlaceName(WarpInData *in);
 
 GameEvent *EventWarpSequence_CreateOut(WarpSequence *warp) {
     const GameEventCallback callbacks[] = {
-        EventWarpSequenceOut_RunPlain,  EventWarpSequenceOut_RunGroundAnime, func_ov036_021b74c8,
-        EventWarpSequenceOut_RunAppear, EventWarpSequenceOut_RunCamera,      func_ov036_021b7604,
+        EventWarpSequenceOut_RunPlain,  EventWarpSequenceOut_RunGroundAnime, EventWarpSequenceOut_RunObjectAnime,
+        EventWarpSequenceOut_RunAppear, EventWarpSequenceOut_RunCamera,      EventWarpSequenceOut_RunFadeSe,
     };
     int index;
     GameEvent *event;
@@ -172,7 +172,7 @@ static GameEventReturnCode EventWarpSequence_WalkTaskCallback(GameEvent *event, 
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *func_ov036_021b74a0(GameSystem *gsys, WarpSequence *warp) {
+GameEvent *EventWarpSequence_CreateWalkEvent(GameSystem *gsys, WarpSequence *warp) {
     GameEvent *event;
     WarpInData *data;
 
@@ -183,7 +183,7 @@ GameEvent *func_ov036_021b74a0(GameSystem *gsys, WarpSequence *warp) {
     return event;
 }
 
-GameEventReturnCode func_ov036_021b74c8(GameEvent *event, u32 *state, void *work) {
+GameEventReturnCode EventWarpSequenceOut_RunObjectAnime(GameEvent *event, u32 *state, void *work) {
     WarpOutData *out = work;
     WarpSequence *warp = out->warp;
 
@@ -263,7 +263,7 @@ GameEventReturnCode EventWarpSequenceOut_RunCamera(GameEvent *event, u32 *state,
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b7604(GameEvent *event, u32 *state, void *work) {
+GameEventReturnCode EventWarpSequenceOut_RunFadeSe(GameEvent *event, u32 *state, void *work) {
     WarpOutData *out = work;
     GameSystem *gsys = out->warp->gsys;
     Field *field = out->warp->field;

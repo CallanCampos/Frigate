@@ -18,7 +18,7 @@ Script_1:
     MsgWinCloseAll
     FadeOutBlackQ
     FadeWait
-    HollowRivalCmd_0265 0
+    CallXTransceiverSecret 0
     FadeInBlackQ
     FadeWait
     RTGetZoneID 0x8021
@@ -160,7 +160,7 @@ L_020C:
     DebugPrint 0x8021
 
 L_0210:
-    HollowRivalCmd_02D3 5, 0x8020
+    HollowRivalGetValue 5, 0x8020
     VMStackPush 0x8020
     VMStackPushConst 10
     VMStackCmp CMP_GE

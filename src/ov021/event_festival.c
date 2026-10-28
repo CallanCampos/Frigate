@@ -53,7 +53,7 @@ GameEventReturnCode EventFestival_Callback(GameEvent *event, u32 *state, void *d
     }
     case 1:
         if (work->mode == 1) {
-            func_ov036_021b6690(Field_GetFesGimmick(field));
+            FesGimmick_EndMission(Field_GetFesGimmick(field));
         }
         GameEvent_ChainNext(event, CreateFieldCloseEvent(gsys, field));
         (*state)++;

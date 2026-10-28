@@ -1,5 +1,5 @@
 // The actors of the other players in a field communication. Names from swan
-// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0); FieldCommActor_MoveInit and FieldCommActor_Move are ours.
 #include "types.h"
 #include "constants/obj_codes.h"
 #include "field/field_actor.h"
@@ -150,7 +150,7 @@ static FieldActor *FieldCommActor_Add(FldCommActSys *sys, u16 modelId, const u16
     return actor;
 }
 
-void func_ov036_0218b044(FieldActor *actor) {
+void FieldCommActor_MoveInit(FieldActor *actor) {
     ClearActorPositionBlock(actor, sizeof(FldCommActLink));
 }
 
@@ -160,7 +160,7 @@ void FieldCommActor_MoveDelete(FieldActor *actor) {
     link->entry->actorDeleted = 1;
 }
 
-void func_ov036_0218b060(FieldActor *actor) {
+void FieldCommActor_Move(FieldActor *actor) {
     FldCommActLink *link = GetNPCRailPosPtrAddr(actor);
     VecFx32 pos;
     u32 state;

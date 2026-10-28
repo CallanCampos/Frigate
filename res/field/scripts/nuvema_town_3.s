@@ -19,11 +19,11 @@
     WorkSetConst 0x8024, 0
 
 Script_1:
-    Cmd_02B2 3, 0x8020
-    Cmd_02B2 4, 0x8021
-    Cmd_02B2 5, 0x8022
-    Cmd_02B2 6, 0x8023
-    Cmd_02B2 7, 0x8024
+    MemoryLinkCheckFlag 3, 0x8020
+    MemoryLinkCheckFlag 4, 0x8021
+    MemoryLinkCheckFlag 5, 0x8022
+    MemoryLinkCheckFlag 6, 0x8023
+    MemoryLinkCheckFlag 7, 0x8024
     VMStackPush 0x8020
     VMStackPushConst 1
     VMStackCmp CMP_EQ
