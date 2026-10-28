@@ -1911,15 +1911,15 @@ static BOOL CheckNPCSpawnFlag(EventWork *eventWork, u16 flag) {
 
 u16 EvType_GetSightType(u16 type) {
     switch (type) {
-    case 4:
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-    case 11:
-    case 12:
-    case 13:
-        return 1;
+    case ACTOR_EVENT_TYPE_TRAINER_LOOK_AROUND:
+    case ACTOR_EVENT_TYPE_TRAINER_SPIN_COUNTERCLOCKWISE:
+    case ACTOR_EVENT_TYPE_TRAINER_SPIN_CLOCKWISE:
+    case ACTOR_EVENT_TYPE_TRAINER_WALK_SPIN_COUNTERCLOCKWISE:
+    case ACTOR_EVENT_TYPE_TRAINER_WALK_SPIN_CLOCKWISE:
+    case ACTOR_EVENT_TYPE_TRAINER_TURN_ON_B_PRESS:
+    case ACTOR_EVENT_TYPE_TRAINER_MOVE_ON_B_PRESS:
+    case ACTOR_EVENT_TYPE_TRAINER_DASH:
+        return TRAINER_SIGHT_FACING;
     }
     return type;
 }

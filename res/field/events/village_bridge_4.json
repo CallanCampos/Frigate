@@ -6,7 +6,7 @@
             "id": 0,
             "model": "OBJ_CODE_FISHERMAN",
             "movement": 16,
-            "type": 0,
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0318",
             "script": 1,
             "direction": "DIR_LEFT",

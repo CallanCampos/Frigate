@@ -6,7 +6,7 @@
             "id": 0,
             "model": "OBJ_CODE_BACKPACKER_M",
             "movement": 15,
-            "type": 1,
+            "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3390,
             "direction": "DIR_DOWN",

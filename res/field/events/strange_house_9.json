@@ -6,7 +6,7 @@
             "id": 0,
             "model": "OBJ_CODE_PSYCHIC_F",
             "movement": 3,
-            "type": 1,
+            "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3391,
             "direction": "DIR_UP",

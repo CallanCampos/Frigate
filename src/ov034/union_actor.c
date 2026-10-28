@@ -56,7 +56,7 @@ static const UnionActorOffset sUnionMemberOffsets[UNION_MEMBER_MAX] = {
 };
 
 static const ZoneNPC sUnionActorNpc = {
-    0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, { { 0, 0, 0 } },
+    0, 0, 2, ACTOR_EVENT_TYPE_NONE, 0, 0, 1, 0, 0, 0, 0, 0, 0, { { 0, 0, 0 } },
 };
 
 static const UnionActorOffset sUnionEntryPositions[UNION_BEACON_ENTRY_MAX] = {

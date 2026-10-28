@@ -340,15 +340,15 @@ FieldActor *FindPairedTrainerActor(FieldActor *actor) {
     u16 trainerId = GetNPCTrainerID(actor);
 
     switch (evType) {
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-    case 20:
+    case ACTOR_EVENT_TYPE_TRAINER:
+    case ACTOR_EVENT_TYPE_TRAINER_ALL_DIRS:
+    case ACTOR_EVENT_TYPE_3:
+    case ACTOR_EVENT_TYPE_TRAINER_LOOK_AROUND:
+    case ACTOR_EVENT_TYPE_TRAINER_SPIN_COUNTERCLOCKWISE:
+    case ACTOR_EVENT_TYPE_TRAINER_SPIN_CLOCKWISE:
+    case ACTOR_EVENT_TYPE_TRAINER_WALK_SPIN_COUNTERCLOCKWISE:
+    case ACTOR_EVENT_TYPE_TRAINER_WALK_SPIN_CLOCKWISE:
+    case ACTOR_EVENT_TYPE_SPIN_COUNTERCLOCKWISE:
         while (NextActor(mmSys, &other, &index) == TRUE) {
             if (actor != other && zoneId == GetActorZoneID(other) && trainerId == GetNPCTrainerID(other)) {
                 return other;

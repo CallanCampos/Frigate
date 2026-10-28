@@ -2,6 +2,7 @@
 #define POKEBW2_FIELD_FIELD_ACTOR_H
 
 #include "types.h"
+#include "constants/actor_event_types.h"
 #include "constants/directions.h"
 #include "field/zone.h"
 #include "gfl/billboard_actor.h"
@@ -596,6 +597,8 @@ NoGridMapper *FldActSys_GetNoGridMapper(MMSys *system);
 u16 FldActSys_GetCameraAngle(MMSys *system);
 u32 func_ov012_02166fc0(MMSys *system);
 void func_ov012_02166fc4(MMSys *system, u32 value);
+// The number of event types (constants/actor_event_types.h), by which field_actor_evtype.c's tables go
+#define ACTOR_EVENT_TYPE_MAX 21
 void SetActorEvType(FieldActor *actor, u16 evType);
 u16 GetActorEvType(FieldActor *actor);
 u16 GetActorSpawnFlag(FieldActor *actor);
@@ -663,9 +666,10 @@ const FieldActorResGroup *GetNPCMdlInfoG2DRscGroup(const FieldActorConfig *confi
 const FieldActorResGroup *GetNPCMdlInfoG3DRscGroup(const FieldActorConfig *config);
 // The object code that an object code stands for, through the work values of WKOBJCODE00 and on
 u16 ResolvePossibleWKOBJCODE(EventWork *eventWork, u16 objCode);
+// How a Trainer looks for the player: two of the event types, as EvType_GetSightType gives them
 enum {
-    TRAINER_SIGHT_FACING = 1,
-    TRAINER_SIGHT_ALL_DIRS = 2,
+    TRAINER_SIGHT_FACING = ACTOR_EVENT_TYPE_TRAINER,
+    TRAINER_SIGHT_ALL_DIRS = ACTOR_EVENT_TYPE_TRAINER_ALL_DIRS,
 };
 // How an actor of the event type looks for the player: the types that see only the way they face give
 // TRAINER_SIGHT_FACING, and the others their own type, of which TRAINER_SIGHT_ALL_DIRS looks every way

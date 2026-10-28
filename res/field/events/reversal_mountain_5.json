@@ -6,7 +6,7 @@
             "id": 0,
             "model": "OBJ_CODE_349",
             "movement": 15,
-            "type": 0,
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0384",
             "script": 3,
             "direction": "DIR_DOWN",

@@ -1027,7 +1027,8 @@ field, with swan's names and layouts (`include/field/zone.h`, `include/field/fie
 ```
 
 An event is at a `grid` position or, in a zone with rails, a `rail` one. A warp names the zone it leads to and the warp
-of that zone it arrives at, and an NPC the direction it faces (`DIR_*`). An NPC's spawn flag and a trigger's variable
+of that zone it arrives at, and an NPC the direction it faces (`DIR_*`) and its event type (`ACTOR_EVENT_TYPE_*` of
+`generated/actor_event_types.txt`, such as a Trainer that sees the way it faces). An NPC's spawn flag and a trigger's variable
 are written by name where the constant lists have one, and otherwise as their IDs in hex, as `"0x4176"`, as IDs are
 read; a file can write any ID that way. The init scripts are a map script table (see [Scripts](scripts.md)): a script by
 when it runs, or, for type 1, conditions on variables. A zone's header gives the number of its entities file (`entities`

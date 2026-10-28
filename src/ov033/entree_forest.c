@@ -43,7 +43,7 @@ static const EntreeForestActorAppearance sActorAppearances[8] = {
 
 // The actor of a Pokémon, before its ID, model, movement and position are set
 static const ZoneNPC sPokemonNPC = {
-    0, 0x1000, 0xf, 0, 0, 0x28fa, 1, 0, 0, 0, 0xffff, 0xffff, FALSE, { { 0, 0, 0 } },
+    0, 0x1000, 0xf, ACTOR_EVENT_TYPE_NONE, 0, 0x28fa, 1, 0, 0, 0, 0xffff, 0xffff, FALSE, { { 0, 0, 0 } },
 };
 
 static const u8 sPokemonPositions2[] = {

@@ -6,7 +6,7 @@
             "id": 0,
             "model": "OBJ_CODE_PKMN_RANGER_F",
             "movement": 14,
-            "type": 0,
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 1,
             "direction": "DIR_UP",

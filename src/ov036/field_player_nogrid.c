@@ -226,7 +226,9 @@ static const SlideFunc SLIDE_FUNCS[FORCED_MOVE_MAX] = {
 };
 
 // The player's actor on a rail, whose object code is filled in
-static ZoneNPC sPlayerTemplate = { 0xff, OBJ_CODE_HERO, NOGRID_MOVE_CODE, 0, 0, 0, 0, 0, 0, 0, 0xffff, 0xffff, TRUE };
+static ZoneNPC sPlayerTemplate = {
+    0xff, OBJ_CODE_HERO, NOGRID_MOVE_CODE, ACTOR_EVENT_TYPE_NONE, 0, 0, 0, 0, 0, 0, 0xffff, 0xffff, TRUE
+};
 
 FieldPlayerNoGrid *FieldPlayerRail_Create(FieldPlayerCore *core, HeapID heapId) {
     FieldPlayerNoGrid *nogrid = GFL_HeapAllocate(heapId, sizeof(FieldPlayerNoGrid), TRUE, "field_player_nogrid.c", 416);

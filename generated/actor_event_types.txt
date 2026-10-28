@@ -1,0 +1,33 @@
+# The actors' event types, which the zone events give each NPC (ZoneNPC.evType, swan's EvType) and which
+# field_actor_evtype.c's tables (swan's ACTOR_EVENTTYPE_FUNCS and the two after it) run by: whether the actor is a
+# Trainer that looks for the player (EvType_GetSightType) and how it turns or hurries as it moves. The ones that
+# nothing in the code tells apart are numbered. TRAINER: sees the way it faces. ALL_DIRS: sees every way. LOOK_AROUND:
+# after it comes back to its first square a number of times (its second parameter), looks to either side.
+# SPIN_COUNTERCLOCKWISE and SPIN_CLOCKWISE: then turns a full circle in place, up, left, down and right or up, right,
+# down and left. WALK_SPIN_*: turns that way a quarter at each step it walks instead of facing its way. TURN_ON_B_PRESS:
+# turns only when the player presses B beside it. MOVE_ON_B_PRESS: walks only when the player presses B beside it,
+# for its second parameter's frames. DASH: walks, and LOOK_AROUND_DASH and SPIN_*_DASH turn, faster while the player
+# holds B beside it. TURN_BACK_ON_SIGHT: turns back along its loop when it sees the player
+ACTOR_EVENT_TYPE_NONE = 0
+ACTOR_EVENT_TYPE_TRAINER
+ACTOR_EVENT_TYPE_TRAINER_ALL_DIRS
+# Only FindPairedTrainerActor tells it apart, as a Trainer that has a partner; it never sees the player
+ACTOR_EVENT_TYPE_3
+ACTOR_EVENT_TYPE_TRAINER_LOOK_AROUND
+ACTOR_EVENT_TYPE_TRAINER_SPIN_COUNTERCLOCKWISE
+ACTOR_EVENT_TYPE_TRAINER_SPIN_CLOCKWISE
+ACTOR_EVENT_TYPE_TRAINER_WALK_SPIN_COUNTERCLOCKWISE
+ACTOR_EVENT_TYPE_TRAINER_WALK_SPIN_CLOCKWISE
+# Nothing in the code tests it
+ACTOR_EVENT_TYPE_9
+ACTOR_EVENT_TYPE_TURN_BACK_ON_SIGHT
+ACTOR_EVENT_TYPE_TRAINER_TURN_ON_B_PRESS
+ACTOR_EVENT_TYPE_TRAINER_MOVE_ON_B_PRESS
+ACTOR_EVENT_TYPE_TRAINER_DASH
+ACTOR_EVENT_TYPE_LOOK_AROUND_DASH
+ACTOR_EVENT_TYPE_SPIN_COUNTERCLOCKWISE_DASH
+ACTOR_EVENT_TYPE_SPIN_CLOCKWISE_DASH
+ACTOR_EVENT_TYPE_WALK_SPIN_COUNTERCLOCKWISE_DASH
+ACTOR_EVENT_TYPE_WALK_SPIN_CLOCKWISE_DASH
+ACTOR_EVENT_TYPE_DASH
+ACTOR_EVENT_TYPE_SPIN_COUNTERCLOCKWISE

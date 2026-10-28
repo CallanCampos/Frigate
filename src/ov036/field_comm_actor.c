@@ -129,7 +129,7 @@ static void FieldCommActor_Reset(FldCommActEntry *entry) {
 
 // The entity that the actors are created from, with the model of each player filled in
 static const ZoneNPC FIELD_COMM_ACTOR_NPC = {
-    0xfc, 0, 0x44, 0, 0, 0x7d0, 0, 0, 0, 0, 4, 4, FALSE, { { 0, 0, 0 } },
+    0xfc, 0, 0x44, ACTOR_EVENT_TYPE_NONE, 0, 0x7d0, 0, 0, 0, 0, 4, 4, FALSE, { { 0, 0, 0 } },
 };
 
 static FieldActor *FieldCommActor_Add(FldCommActSys *sys, u16 modelId, const u16 *dir, const VecFx32 *pos,

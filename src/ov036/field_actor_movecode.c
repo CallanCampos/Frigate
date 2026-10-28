@@ -345,7 +345,7 @@ void FieldActorMovecode_InitTurnRandomSet10(FieldActor *actor) {
 
 void FieldActorMovecode_MoveTurnRandom(FieldActor *actor) {
     RailWanderWork *work = GetNPCRailPosPtrAddr(actor);
-    if (GetActorEvType(actor) == 0xb) {
+    if (GetActorEvType(actor) == ACTOR_EVENT_TYPE_TRAINER_TURN_ON_B_PRESS) {
         if (FldAct_IsNearPlayer(actor) == TRUE && FieldActorMovecode_IsBButtonPressed() == TRUE) {
             u16 faceDir = GetActorFaceDir(actor);
             u16 dir = FieldActorMovecode_GetNextDirInRotation(GetActorMoveCode(actor), faceDir);
@@ -637,7 +637,7 @@ static BOOL FieldActorMovecode_SpinStepWaitTurn(FieldActor *actor, RailTurnWork 
     if (!FieldAcmdTCB_Update(actor)) {
         return FALSE;
     }
-    if (GetActorEvType(actor) != 0xb) {
+    if (GetActorEvType(actor) != ACTOR_EVENT_TYPE_TRAINER_TURN_ON_B_PRESS) {
         work->count = 0;
     }
     work->state = 2;
@@ -645,7 +645,7 @@ static BOOL FieldActorMovecode_SpinStepWaitTurn(FieldActor *actor, RailTurnWork 
 }
 
 static BOOL FieldActorMovecode_SpinStepWaitInterval(FieldActor *actor, RailTurnWork *work) {
-    if (GetActorEvType(actor) == 0xb) {
+    if (GetActorEvType(actor) == ACTOR_EVENT_TYPE_TRAINER_TURN_ON_B_PRESS) {
         if (work->count != 0) {
             work->count = 0;
             return FALSE;
@@ -1078,7 +1078,7 @@ static void FieldActorMovecode_AdvanceRouteIndex(ActorPatrolWork *work) {
 }
 
 static BOOL FieldActorMovecode_RoutePatrolSwapStepLookForPlayer(FieldActor *actor, ActorPatrolWork *work) {
-    if (GetActorEvType(actor) == 10) {
+    if (GetActorEvType(actor) == ACTOR_EVENT_TYPE_TURN_BACK_ON_SIGHT) {
         u16 dir = GetActorFaceDir(actor);
 
         if (EventTrainerEyeSub_GetPlayerDistance(actor, dir, GetActorUserParam(actor, 0), NULL) != -1) {
@@ -1270,7 +1270,7 @@ static u32 FieldActorMovecode_GetSightDirToPlayer(FieldActor *actor) {
     u32 entry;
     u32 i;
 
-    if (evType != 1 && evType != 2) {
+    if (evType != ACTOR_EVENT_TYPE_TRAINER && evType != ACTOR_EVENT_TYPE_TRAINER_ALL_DIRS) {
         return DIR_NONE;
     }
     if (!FieldActorMovecode_IsPlayerWalking(actor)) {
@@ -1381,7 +1381,7 @@ static u32 FieldActorMovecode_GetDirTowardPlayerInSet(FieldActor *actor, u32 ind
 }
 
 static BOOL FieldActorMovecode_UpdateTriggerWait(FieldActor *actor, u8 *wait) {
-    if (GetActorEvType(actor) != 12) {
+    if (GetActorEvType(actor) != ACTOR_EVENT_TYPE_TRAINER_MOVE_ON_B_PRESS) {
         return TRUE;
     }
     if (*wait == 0) {
@@ -1402,7 +1402,9 @@ static BOOL FieldActorMovecode_UpdateTriggerWait(FieldActor *actor, u8 *wait) {
 static BOOL FieldActorMovecode_IsDashEventType(FieldActor *actor) {
     u16 evType = GetActorEvType(actor);
 
-    if (evType == 13 || evType == 15 || evType == 16 || evType == 17 || evType == 18 || evType == 19) {
+    if (evType == ACTOR_EVENT_TYPE_TRAINER_DASH || evType == ACTOR_EVENT_TYPE_SPIN_COUNTERCLOCKWISE_DASH ||
+        evType == ACTOR_EVENT_TYPE_SPIN_CLOCKWISE_DASH || evType == ACTOR_EVENT_TYPE_WALK_SPIN_COUNTERCLOCKWISE_DASH ||
+        evType == ACTOR_EVENT_TYPE_WALK_SPIN_CLOCKWISE_DASH || evType == ACTOR_EVENT_TYPE_DASH) {
         return TRUE;
     }
     return FALSE;
@@ -1411,7 +1413,10 @@ static BOOL FieldActorMovecode_IsDashEventType(FieldActor *actor) {
 static BOOL FieldActorMovecode_IsMirrorEventType(FieldActor *actor) {
     int evType = GetActorEvType(actor);
 
-    if (evType == 7 || evType == 8 || evType == 17 || evType == 18) {
+    if (evType == ACTOR_EVENT_TYPE_TRAINER_WALK_SPIN_COUNTERCLOCKWISE ||
+        evType == ACTOR_EVENT_TYPE_TRAINER_WALK_SPIN_CLOCKWISE ||
+        evType == ACTOR_EVENT_TYPE_WALK_SPIN_COUNTERCLOCKWISE_DASH ||
+        evType == ACTOR_EVENT_TYPE_WALK_SPIN_CLOCKWISE_DASH) {
         return TRUE;
     }
     return FALSE;
@@ -1420,7 +1425,8 @@ static BOOL FieldActorMovecode_IsMirrorEventType(FieldActor *actor) {
 static void FieldActorMovecode_InitMirrorSide(FieldActor *actor, ActorFaceMemory *face) {
     u16 evType = GetActorEvType(actor);
 
-    if (evType == 7 || evType == 17) {
+    if (evType == ACTOR_EVENT_TYPE_TRAINER_WALK_SPIN_COUNTERCLOCKWISE ||
+        evType == ACTOR_EVENT_TYPE_WALK_SPIN_COUNTERCLOCKWISE_DASH) {
         face->row = 0;
     } else {
         face->row = 1;
