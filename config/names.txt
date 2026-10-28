@@ -10933,6 +10933,7 @@ overlays/ov036 0x02199c08 WeatherTask_PlaySeDirect
 overlays/ov036 0x02199c30 WeatherTask_PlaySeWithVoice
 overlays/ov036 0x02199c5c WeatherTask_GetParticleWork
 overlays/ov036 0x02199c64 WeatherTask_GetParticleActor
+overlays/ov036 0x02199c6c WeatherTask_GetParticlePos
 overlays/ov036 0x02199c80 WeatherTask_SetParticlePosWrapped
 overlays/ov036 0x02199cf0 WeatherTask_SetParticlePos
 overlays/ov036 0x02199d04 WeatherTask_Reset

@@ -167,7 +167,7 @@ static void SandGrain_Move(WeatherObj *obj) {
     ClActorPos pos;
 
     WeatherTask_GetParticleActor(obj);
-    func_ov036_02199c6c(obj, &pos);
+    WeatherTask_GetParticlePos(obj, &pos);
     if (!grain->done) {
         pos.x += (s16)grain->speedX;
         pos.y += (s16)grain->speedY;

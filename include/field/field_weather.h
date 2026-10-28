@@ -104,7 +104,7 @@ void WeatherTask_PlaySeDirect(WeatherTask *task, u32 sound);
 void WeatherTask_PlaySeWithVoice(WeatherTask *task, u32 sound, u32 a2);
 void *WeatherTask_GetParticleWork(WeatherObj *obj);
 ClActor *WeatherTask_GetParticleActor(WeatherObj *obj);
-void func_ov036_02199c6c(WeatherObj *obj, ClActorPos *pos);
+void WeatherTask_GetParticlePos(WeatherObj *obj, ClActorPos *pos);
 void WeatherTask_SetParticlePosWrapped(WeatherObj *obj, const ClActorPos *pos);
 void WeatherTask_SetParticlePos(WeatherObj *obj, const ClActorPos *pos);
 

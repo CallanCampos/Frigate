@@ -603,7 +603,7 @@ ClActor *WeatherTask_GetParticleActor(WeatherObj *obj) {
     return WeatherTask_GetParticleActorPtr(obj);
 }
 
-void func_ov036_02199c6c(WeatherObj *obj, ClActorPos *pos) {
+void WeatherTask_GetParticlePos(WeatherObj *obj, ClActorPos *pos) {
     ClActor_GetSurfacePos(WeatherTask_GetParticleActorPtr(obj), pos, 0);
 }
 
