@@ -10798,6 +10798,9 @@ overlays/ov036 0x02197404 RailActor_GetCameraRelativeDir
 overlays/ov036 0x0219743c RailActor_UpdateVisibilityAndAnimation
 overlays/ov036 0x0219749c FldmmdlDraw_InitBlactId
 overlays/ov036 0x021974b4 FldmmdlDraw_DrawEffect
+overlays/ov036 0x02197510 FldmmdlDraw_DeleteEffect
+overlays/ov036 0x02197524 FldmmdlDraw_SuspendEffect
+overlays/ov036 0x0219752c FldmmdlDraw_WakeUpEffect
 overlays/ov036 0x021977a4 FieldFogCtrl_IsLoadRequest
 overlays/ov036 0x02197c00 FieldLight_Dummy
 overlays/ov036 0x021984e4 FieldSubscreen_ResetReturnSubscreen
