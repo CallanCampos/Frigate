@@ -334,7 +334,7 @@ static void RainDrop_Move(WeatherObj *obj) {
     ClActor *actor = WeatherTask_GetParticleActor(obj);
     ClActorPos pos;
 
-    func_ov036_02199c6c(obj, &pos);
+    WeatherTask_GetParticlePos(obj, &pos);
     switch (drop->state) {
     case 0:
         pos.x += (s16)drop->speedX;
@@ -530,7 +530,7 @@ static void ThunderDrop_Move(WeatherObj *obj) {
     ClActorPos pos;
 
     WeatherTask_GetParticleActor(obj);
-    func_ov036_02199c6c(obj, &pos);
+    WeatherTask_GetParticlePos(obj, &pos);
     switch (drop->state) {
     case 0:
         pos.x += (s16)drop->speedX;
@@ -754,7 +754,7 @@ static void GustSlant_Move(WeatherObj *obj, const GustWork *work, GustParticleDa
         data->baseX = windX;
         data->baseY = windY;
     }
-    func_ov036_02199c6c(obj, &pos);
+    WeatherTask_GetParticlePos(obj, &pos);
     data->x += data->speedX + windX;
     data->y += data->speedY + windY;
     pos.x = data->x / 8;
@@ -790,7 +790,7 @@ static void GustSlant_Init(WeatherObj *obj, const GustWork *work, GustParticleDa
 static void GustStreak_Move(WeatherObj *obj, const GustWork *work, GustParticleData *data, ClActor *actor) {
     ClActorPos pos;
 
-    func_ov036_02199c6c(obj, &pos);
+    WeatherTask_GetParticlePos(obj, &pos);
     data->x += data->speedX + work->windX;
     data->y += data->speedY + work->windY;
     pos.x = data->x / 8;
@@ -823,7 +823,7 @@ static void GustDriven_Move(WeatherObj *obj, const GustWork *work, GustParticleD
     ClActorPos pos;
     s16 windX;
 
-    func_ov036_02199c6c(obj, &pos);
+    WeatherTask_GetParticlePos(obj, &pos);
     windX = work->windX;
     if (windX != 0) {
         data->x += data->speedX + windX;

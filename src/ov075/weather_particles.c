@@ -327,7 +327,7 @@ static void Flake_Move(WeatherObj *obj) {
         WeatherTask_RemoveParticle(obj);
         return;
     }
-    func_ov036_02199c6c(obj, &pos);
+    WeatherTask_GetParticlePos(obj, &pos);
     pos.x += sFlakeSway[flake->swayIdx];
     if (flake->acc > flake->rate) {
         pos.y++;
@@ -657,7 +657,7 @@ static void FlutterFlake_Move(WeatherObj *obj) {
     ClActor *actor = WeatherTask_GetParticleActor(obj);
     ClActorPos pos;
 
-    func_ov036_02199c6c(obj, &pos);
+    WeatherTask_GetParticlePos(obj, &pos);
     switch (flake->phase) {
     case 0:
         if (++flake->frame > flake->lifetime) {
@@ -829,7 +829,7 @@ static void Speck_Move(WeatherObj *obj) {
     ClActorPos pos;
 
     WeatherTask_GetParticleActor(obj);
-    func_ov036_02199c6c(obj, &pos);
+    WeatherTask_GetParticlePos(obj, &pos);
     speck->frame++;
     if (speck->frame % speck->periodX == 0) {
         pos.x += (s16)speck->stepX;

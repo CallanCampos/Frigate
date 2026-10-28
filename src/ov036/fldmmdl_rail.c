@@ -248,10 +248,10 @@ static BOOL RailActor_CheckActorCollision(FieldActor *actor, const RailPosition 
 }
 
 FieldActor *FindActorByRailPos(MMSys *mmSys, const RailPosition *pos, BOOL checkInit) {
-    return func_ov036_0219584c(mmSys, pos, checkInit, NULL);
+    return FindActorByRailPosExcluding(mmSys, pos, checkInit, NULL);
 }
 
-FieldActor *func_ov036_0219584c(MMSys *mmSys, const RailPosition *pos, BOOL checkInit, FieldActor *exclude) {
+FieldActor *FindActorByRailPosExcluding(MMSys *mmSys, const RailPosition *pos, BOOL checkInit, FieldActor *exclude) {
     u32 index = 0;
     FieldRailSystem *railSystem;
     FieldActor *other;
@@ -355,95 +355,95 @@ void RailActor_StayInit(FieldActor *actor) {
     RailActor_InitWork(actor, 0xc);
 }
 
-void func_ov036_02195b28(FieldActor *actor) {
+void RailActor_StayMove(FieldActor *actor) {
     RailActor_SaveUnitPosition(RAIL_WORK(actor), actor);
 }
 
-void func_ov036_02195b38(FieldActor *actor) {
+void RailActor_StayDelete(FieldActor *actor) {
     RailActor_ReleaseUnit(RAIL_WORK(actor), actor);
 }
 
-void func_ov036_02195b48(FieldActor *actor) {
+void RailActor_Recover(FieldActor *actor) {
     RailActor_ReacquireUnit(RAIL_WORK(actor), actor);
 }
 
-void func_ov036_02195b58(FieldActor *actor) {
+void RailActor_WaitInitAll(FieldActor *actor) {
     RailActorWait_Init(actor, 0);
 }
 
-void func_ov036_02195b64(FieldActor *actor) {
+void RailActor_WaitInitUpLeft(FieldActor *actor) {
     RailActorWait_Init(actor, 1);
 }
 
-void func_ov036_02195b70(FieldActor *actor) {
+void RailActor_WaitInitUpRight(FieldActor *actor) {
     RailActorWait_Init(actor, 2);
 }
 
-void func_ov036_02195b7c(FieldActor *actor) {
+void RailActor_WaitInitDownLeft(FieldActor *actor) {
     RailActorWait_Init(actor, 3);
 }
 
-void func_ov036_02195b88(FieldActor *actor) {
+void RailActor_WaitInitDownRight(FieldActor *actor) {
     RailActorWait_Init(actor, 4);
 }
 
-void func_ov036_02195b94(FieldActor *actor) {
+void RailActor_WaitInitUpDownLeft(FieldActor *actor) {
     RailActorWait_Init(actor, 5);
 }
 
-void func_ov036_02195ba0(FieldActor *actor) {
+void RailActor_WaitInitUpDownRight(FieldActor *actor) {
     RailActorWait_Init(actor, 6);
 }
 
-void func_ov036_02195bac(FieldActor *actor) {
+void RailActor_WaitInitUpLeftRight(FieldActor *actor) {
     RailActorWait_Init(actor, 7);
 }
 
-void func_ov036_02195bb8(FieldActor *actor) {
+void RailActor_WaitInitDownLeftRight(FieldActor *actor) {
     RailActorWait_Init(actor, 8);
 }
 
-void func_ov036_02195bc4(FieldActor *actor) {
+void RailActor_WaitInitUpDown(FieldActor *actor) {
     RailActorWait_Init(actor, 9);
 }
 
-void func_ov036_02195bd0(FieldActor *actor) {
+void RailActor_WaitInitLeftRight(FieldActor *actor) {
     RailActorWait_Init(actor, 10);
 }
 
-void func_ov036_02195bdc(FieldActor *actor) {
+void RailActor_WaitMove(FieldActor *actor) {
     RailActorWait_Update(actor);
 }
 
-void func_ov036_02195be4(FieldActor *actor) {
+void RailActor_WaitDelete(FieldActor *actor) {
     RailActorWait_Free(actor);
 }
 
-void func_ov036_02195bec(FieldActor *actor) {
+void RailActor_WalkInitAll(FieldActor *actor) {
     RailActorWalk_Init(actor, 0);
 }
 
-void func_ov036_02195bf8(FieldActor *actor) {
+void RailActor_WalkInitUpDown(FieldActor *actor) {
     RailActorWalk_Init(actor, 9);
 }
 
-void func_ov036_02195c04(FieldActor *actor) {
+void RailActor_WalkMove(FieldActor *actor) {
     RailActorWalk_Update(actor);
 }
 
-void func_ov036_02195c0c(FieldActor *actor) {
+void RailActor_WalkDelete(FieldActor *actor) {
     RailActorWalk_Free(actor);
 }
 
-void func_ov036_02195c14(FieldActor *actor) {
+void RailActor_PatrolInit(FieldActor *actor) {
     RailActorPatrol_Init(actor);
 }
 
-void func_ov036_02195c1c(FieldActor *actor) {
+void RailActor_PatrolMove(FieldActor *actor) {
     RailActorPatrol_Update(actor);
 }
 
-void func_ov036_02195c24(FieldActor *actor) {
+void RailActor_PatrolDelete(FieldActor *actor) {
     RailActorPatrol_Free(actor);
 }
 

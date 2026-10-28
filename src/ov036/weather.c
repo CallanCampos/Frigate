@@ -70,7 +70,7 @@ static WeatherTransitionFunc WEATHER_TRANSITION_FUNCS[2] = {
     FieldWeather_UpdateCrossfade,
 };
 
-FieldWeather *func_ov036_02199004(FieldCamera *camera, FieldLight *light, FieldFog *fog, FieldFogCtrl *fogCtrl,
+FieldWeather *FieldWeather_Create(FieldCamera *camera, FieldLight *light, FieldFog *fog, FieldFogCtrl *fogCtrl,
                                   FieldSound *sound, u16 season, HeapID heapId) {
     FieldWeather *weather;
     ClActRenderer *renderer;
