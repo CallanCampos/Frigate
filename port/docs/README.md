@@ -93,3 +93,4 @@ The repository's landing page on GitHub is [../../.github/README.md](../../.gith
 documents are in [../../docs/](../../docs/): its [code organization](../../docs/code-organization.md),
 [source files](../../docs/source-files.md), [game data](../../docs/data.md) and [scripts](../../docs/scripts.md) are the
 ones Frigate's documents point to.
+| [adr/0026-native-archive-table-caches.md](adr/0026-native-archive-table-caches.md) | Native FAT/FNT cache representation, SDK seam, lifecycle and timing limits |

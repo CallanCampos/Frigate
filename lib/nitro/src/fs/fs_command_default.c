@@ -11,6 +11,9 @@
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/std.h"
+#ifdef PLATFORM_PC
+#include "port/hal/fs/port_fs_tables.h"
+#endif
 
 // Where the next bytes of the archive's tables are read from
 typedef struct FSiSyncReadParam {
@@ -47,8 +50,13 @@ static FSResult FSi_ReadTable(FSiSyncReadParam *reader, void *buffer, u32 length
     FSResult result;
 
     if (tables->load_mem != NULL) {
+#ifdef PLATFORM_PC
+        // Cached positions stay archive offsets; the host resolves them through the full native cache pointer.
+        result = FSi_HostReadArchiveTable(arc, buffer, reader->pos, length);
+#else
         MI_CpuCopy8((void *)reader->pos, buffer, length);
         result = FS_RESULT_SUCCESS;
+#endif
     } else {
         result = tables->read_func(arc, buffer, reader->pos, length);
         result = FSi_WaitForArchiveCompletion(arc->list, result);
