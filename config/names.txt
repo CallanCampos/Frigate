@@ -12211,6 +12211,8 @@ overlays/ov036 0x021c6f94 FieldSaveanime_DrawFrame
 overlays/ov036 0x021c6fec FieldSaveanime_AnimTask
 overlays/ov036 0x021c730c Scrcmd_CheckPmsWordPair
 overlays/ov036 0x021c7698 Scrcmd_CheckBeaconTrainerKey
+overlays/ov036 0x021c783c s02C5_JoinAvenueRecordActivity
+overlays/ov036 0x021c784c s022A_HollowRivalGenMsgID
 overlays/ov036 0x021c7ad0 Scrcmd_StartSwapNpcEvent
 overlays/ov036 0x021c9394 CreateMissionHiddenHollowPokemonActor
 overlays/ov036 0x021c93c0 ActivateHiddenHollowMission

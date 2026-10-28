@@ -3700,7 +3700,7 @@
     FieldCommand 708
     .endm
 
-    // func_ov036_021c783c
+    // s02C5_JoinAvenueRecordActivity
     .macro Cmd_02C5 a0
     FieldCommand 709
     .2byte \a0

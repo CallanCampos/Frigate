@@ -649,7 +649,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0227_RecordAdd,                                  // 0x227
     s0228_RecordGet,                                  // 0x228
     NULL,                                             // 0x229
-    func_ov036_021c784c,                              // 0x22a
+    s022A_HollowRivalGenMsgID,                        // 0x22a
     Scrcmd_StartSwapNpcEvent,                         // 0x22b
     NULL,                                             // 0x22c
     s022D_PlayFieldEffectByTable,                     // 0x22d
@@ -804,7 +804,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s02C2_RepelRearm,                                 // 0x2c2
     func_ov012_0216a7f4,                              // 0x2c3
     s02C4_HiddenHollowSetPeriod,                      // 0x2c4
-    func_ov036_021c783c,                              // 0x2c5
+    s02C5_JoinAvenueRecordActivity,                   // 0x2c5
     s02C6_JoinAvenueStoreStart,                       // 0x2c6
     s02C6_JoinAvenueStoreEnd,                         // 0x2c7, which swan's name numbers 0x2c6
     NULL,                                             // 0x2c8
