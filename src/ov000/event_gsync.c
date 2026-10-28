@@ -162,7 +162,7 @@ GameEventReturnCode EventGameSync_Callback(GameEvent *event, u32 *state, void *d
         wk->box.playerInfo = GetGameDataPlayerInfo(wk->box.gameData);
         wk->box.trainerData = getTrainerDataBlkAddress(GameData_GetSaveControl(wk->box.gameData));
         wk->box.unk20 = wk->sendableSpecies;
-        wk->box.unk1C = 0;
+        wk->box.isNationalDex = FALSE;
         wk->box.mode = BOX2_MODE_DREAM_WORLD;
         GSYS_QueueProcAsEvent(event, OVERLAY_BOX2, &BOX2_PROC_FUNCTIONS, &wk->box);
         (*state)++;

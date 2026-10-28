@@ -69,7 +69,7 @@ GameEvent *EventFieldSubprocessCall_CreateWithCallback(GameSystem *gsys, Field *
                                                        void (*callback)(void *work), void *work);
 // Events of overlay 36's other files that scripts start: a name input for the Pokémon, and another input with its
 // result
-GameEvent *EventPokeNameWordSetInput_Create(GameSystem *gsys, u16 a1, u16 a2, u16 *result, WordSet *wordSet);
+GameEvent *EventPokeNameWordSetInput_Create(GameSystem *gsys, u16 species, u16 form, u16 *result, WordSet *wordSet);
 // The nickname of the party's Pokémon in slot; transition is passed to the name entry's subprocess
 GameEvent *prepareForPokemonNameEntryData(GameSystem *gsys, u16 *result, int slot, BOOL transition);
 GameEvent *RivalNameEntry_Create(GameSystem *gsys, u16 *result);
