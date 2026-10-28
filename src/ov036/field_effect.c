@@ -64,45 +64,65 @@ static FieldEffectTaskStore *FieldEffectTCBStore_Create(HeapID heapId, TCBManage
 static void FieldEffects_DeleteObjectMgr(FieldEffectTaskStore *store);
 static void FieldEffects_DrawObjectMgr(FieldEffectTaskStore *store);
 static FieldEffectTask *FieldTerrainEffectTCB_Create(FieldEffectTaskStore *store, const FieldEffectTaskVTable *vtable,
-                                                     const VecFx32 *pos, u32 param1, void *param2, u32 priority);
+                                                     const VecFx32 *pos, u32 mode, void *params, u32 priority);
 static void FieldEffects_ObjectTask(TCB *tcb, void *data);
 static void FieldEffects_InitObject(FieldEffectTask *task);
 static void FieldEffects_DrawObject(FieldEffectTask *task);
 
-const u32 data_ov036_021d0388 = 21;
+const u32 STATIC_LOADED_FIELD_EFFECT_COUNT = 21;
 
 static const VecFx32 FIELD_EFFECT_SCALE = { FX32_CONST(8), FX32_CONST(8), FX32_CONST(8) };
 
 const u32 STATIC_LOADED_FIELD_EFFECT_IDS[21] = {
-    0, 1, 2, 3, 4, 5, 6, 7, 14, 15, 16, 12, 11, 17, 18, 19, 20, 21, 22, 23, 24,
+    FLDEFF_SHADOW,
+    FLDEFF_DUST,
+    FLDEFF_GRASS,
+    FLDEFF_SURF_POKEMON,
+    FLDEFF_EMOTION_BUBBLE,
+    FLDEFF_FOOTMARK,
+    FLDEFF_REFLECT,
+    FLDEFF_RIPPLE,
+    FLDEFF_HIDE,
+    FLDEFF_BUBBLE,
+    FLDEFF_SPLASH,
+    FLDEFF_FISHING,
+    FLDEFF_CUT,
+    FLDEFF_LEAVES,
+    FLDEFF_FES_SPARKLE,
+    FLDEFF_ENCOUNT_GRASS,
+    FLDEFF_ENCOUNT_REALLY_TALL_GRASS,
+    FLDEFF_ENCOUNT_DUST_CLOUD,
+    FLDEFF_ENCOUNT_WATER_0,
+    FLDEFF_ENCOUNT_WATER_1,
+    FLDEFF_ENCOUNT_FLYING_SHADOW,
 };
 
 static const FieldEffectVTable FIELD_EFFECT_VTABLES[FLDEFF_MAX + 1] = {
-    { 0, FieldEffect_Shadow_Create, FieldEffect_Shadow_Free },
-    { 1, playSmokeEffect, freeSmokeEffect },
-    { 2, loadGrassEffects, freeGrassEffects },
-    { 3, FldeffSurfPokemon_Create, FldeffSurfPokemon_Delete },
-    { 4, FldeffEmotionBubble_Create, FldeffEmotionBubble_Delete },
-    { 5, Footmark_Init, Footmark_Delete },
-    { 6, FldeffReflect_Create, FldeffReflect_Delete },
-    { 7, FldeffRipple_Create, FldeffRipple_Delete },
-    { 8, FldeffSurfPokemonSplash_Create, FldeffSurfPokemonSplash_Delete },
-    { 9, FldeffRockSmash_Create, FldeffRockSmash_Delete },
-    { 10, StoneTask_Create, D06Electric_Delete },
-    { 11, FldeffCut_Create, FldeffCut_Delete },
-    { 12, FldeffFishing_Create, FldeffFishing_Delete },
-    { 13, FieldEffect_BTrain_Create, FieldEffect_BTrain_Free },
-    { 14, Hide_CreateResources, Hide_DeleteResources },
-    { 15, FldeffBubble_CreateRes, FldeffBubble_DeleteRes },
-    { 16, FldeffSplash_CreateModelRes, FldeffSplash_DeleteModelRes },
-    { 17, FldeffLeaves_Create, FldeffLeaves_Delete },
-    { 18, FldeffFesSparkle_Create, FldeffFesSparkle_Delete },
-    { 19, EncountTask_CreateGrass, EncountTask_Delete },
-    { 20, EncountTask_CreateReallyTallGrass, EncountTask_Delete },
-    { 21, EncountTask_CreateDustCloud, EncountTask_Delete },
-    { 22, EncountTask_CreateWater0, EncountTask_Delete },
-    { 23, EncountTask_CreateWater1, EncountTask_Delete },
-    { 24, EncountTask_CreateFlyingShadow, EncountTask_Delete },
+    { FLDEFF_SHADOW, FieldEffect_Shadow_Create, FieldEffect_Shadow_Free },
+    { FLDEFF_DUST, playSmokeEffect, freeSmokeEffect },
+    { FLDEFF_GRASS, loadGrassEffects, freeGrassEffects },
+    { FLDEFF_SURF_POKEMON, FldeffSurfPokemon_Create, FldeffSurfPokemon_Delete },
+    { FLDEFF_EMOTION_BUBBLE, FldeffEmotionBubble_Create, FldeffEmotionBubble_Delete },
+    { FLDEFF_FOOTMARK, Footmark_Init, Footmark_Delete },
+    { FLDEFF_REFLECT, FldeffReflect_Create, FldeffReflect_Delete },
+    { FLDEFF_RIPPLE, FldeffRipple_Create, FldeffRipple_Delete },
+    { FLDEFF_SURF_POKEMON_SPLASH, FldeffSurfPokemonSplash_Create, FldeffSurfPokemonSplash_Delete },
+    { FLDEFF_ROCK_SMASH, FldeffRockSmash_Create, FldeffRockSmash_Delete },
+    { FLDEFF_D06_ELECTRIC, StoneTask_Create, D06Electric_Delete },
+    { FLDEFF_CUT, FldeffCut_Create, FldeffCut_Delete },
+    { FLDEFF_FISHING, FldeffFishing_Create, FldeffFishing_Delete },
+    { FLDEFF_BTRAIN, FieldEffect_BTrain_Create, FieldEffect_BTrain_Free },
+    { FLDEFF_HIDE, Hide_CreateResources, Hide_DeleteResources },
+    { FLDEFF_BUBBLE, FldeffBubble_CreateRes, FldeffBubble_DeleteRes },
+    { FLDEFF_SPLASH, FldeffSplash_CreateModelRes, FldeffSplash_DeleteModelRes },
+    { FLDEFF_LEAVES, FldeffLeaves_Create, FldeffLeaves_Delete },
+    { FLDEFF_FES_SPARKLE, FldeffFesSparkle_Create, FldeffFesSparkle_Delete },
+    { FLDEFF_ENCOUNT_GRASS, EncountTask_CreateGrass, EncountTask_Delete },
+    { FLDEFF_ENCOUNT_REALLY_TALL_GRASS, EncountTask_CreateReallyTallGrass, EncountTask_Delete },
+    { FLDEFF_ENCOUNT_DUST_CLOUD, EncountTask_CreateDustCloud, EncountTask_Delete },
+    { FLDEFF_ENCOUNT_WATER_0, EncountTask_CreateWater0, EncountTask_Delete },
+    { FLDEFF_ENCOUNT_WATER_1, EncountTask_CreateWater1, EncountTask_Delete },
+    { FLDEFF_ENCOUNT_FLYING_SHADOW, EncountTask_CreateFlyingShadow, EncountTask_Delete },
     { FLDEFF_NONE, NULL, NULL },
 };
 
@@ -258,8 +278,8 @@ void FieldEffects_TCBManagerInit(FieldEffects *effects, u32 count) {
 }
 
 FieldEffectTask *FieldEffects_TCBCreate(FieldEffects *effects, const FieldEffectTaskVTable *vtable, const VecFx32 *pos,
-                                        u32 param1, void *param2, u32 priority) {
-    return FieldTerrainEffectTCB_Create(effects->taskStore, vtable, pos, param1, param2, priority);
+                                        u32 mode, void *params, u32 priority) {
+    return FieldTerrainEffectTCB_Create(effects->taskStore, vtable, pos, mode, params, priority);
 }
 
 static void FieldEffects_ExitObjectSystem(FieldEffects *effects) {
@@ -317,7 +337,7 @@ static void FieldEffects_DrawObjectMgr(FieldEffectTaskStore *store) {
 }
 
 static FieldEffectTask *FieldTerrainEffectTCB_Create(FieldEffectTaskStore *store, const FieldEffectTaskVTable *vtable,
-                                                     const VecFx32 *pos, u32 param1, void *param2, u32 priority) {
+                                                     const VecFx32 *pos, u32 mode, void *params, u32 priority) {
     u32 i;
     FieldEffectTask *task = store->tasks;
 
@@ -327,8 +347,8 @@ static FieldEffectTask *FieldTerrainEffectTCB_Create(FieldEffectTaskStore *store
             MI_CpuFill8(task, 0, sizeof(FieldEffectTask));
             task->active = TRUE;
             task->vtable = *vtable;
-            task->param1 = param1;
-            task->param2 = param2;
+            task->mode = mode;
+            task->params = params;
             if (pos != NULL) {
                 task->pos = *pos;
             }
@@ -378,14 +398,14 @@ static void FieldEffects_DrawObject(FieldEffectTask *task) {
 
 u32 FieldEffects_GetObjectMode(FieldEffectTask *task) {
     if (task != NULL) {
-        return task->param1;
+        return task->mode;
     }
     return 0;
 }
 
 void *FieldEffects_GetObjectParam(FieldEffectTask *task) {
     if (task != NULL) {
-        return task->param2;
+        return task->params;
     }
     return NULL;
 }

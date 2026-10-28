@@ -5295,7 +5295,7 @@ TILE_CLASS_BATTLE_TERRAINS kind:data(any) addr:0x021d0358
 data_ov036_021d0325 kind:data(any) addr:0x021d0359
 FIELD_CAMERA_ARCIDS kind:data(any) addr:0x021d03a8
 FIELD_CAMERA_AREA_FUNCS kind:data(any) addr:0x021d03b0
-data_ov036_021d0388 kind:data(any) addr:0x021d03bc
+STATIC_LOADED_FIELD_EFFECT_COUNT kind:data(any) addr:0x021d03bc
 FIELD_EFFECT_SCALE kind:data(any) addr:0x021d03c0
 STATIC_LOADED_FIELD_EFFECT_IDS kind:data(any) addr:0x021d03cc
 FIELD_EFFECT_VTABLES kind:data(any) addr:0x021d0420

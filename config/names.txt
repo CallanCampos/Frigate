@@ -13037,6 +13037,7 @@ overlays/ov036 0x021d02c4 sPhenomenonStepChances
 overlays/ov036 0x021d02d2 sPhenomenonKindMasks
 overlays/ov036 0x021d02f0 sPhenomenonSearchOffsets
 overlays/ov036 0x021d0324 TILE_CLASS_BATTLE_TERRAINS
+overlays/ov036 0x021d0388 STATIC_LOADED_FIELD_EFFECT_COUNT
 overlays/ov036 0x021d038c FIELD_EFFECT_SCALE
 overlays/ov036 0x021d0524 SHADOW_SCALE
 overlays/ov036 0x021d0530 SHADOW_TASK_VTABLE

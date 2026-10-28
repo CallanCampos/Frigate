@@ -65,9 +65,36 @@ void FldeffSplash_AddModel(FieldEffects *effects, FieldActor *actor);
 void D06Electric_StartSpark(FieldActor *actor, FieldEffects *effects);
 void FldeffLeaves_Start(FieldEffects *effects, FieldActor *actor);
 
-// field_effect.c: the effects a map has loaded, by ID, and the tasks that play them
+// field_effect.c: the effects a map has loaded, by ID, and the tasks that play them. An ID is the effect's slot in
+// field_effect.c's table, named after the file whose load and free functions fill it
 enum {
-    FLDEFF_MAX = 25,
+    FLDEFF_SHADOW,
+    FLDEFF_DUST,
+    FLDEFF_GRASS,
+    FLDEFF_SURF_POKEMON,
+    FLDEFF_EMOTION_BUBBLE,
+    FLDEFF_FOOTMARK,
+    FLDEFF_REFLECT,
+    FLDEFF_RIPPLE,
+    FLDEFF_SURF_POKEMON_SPLASH,
+    FLDEFF_ROCK_SMASH,
+    FLDEFF_D06_ELECTRIC,
+    FLDEFF_CUT,
+    FLDEFF_FISHING,
+    FLDEFF_BTRAIN,
+    FLDEFF_HIDE,
+    FLDEFF_BUBBLE,
+    FLDEFF_SPLASH,
+    FLDEFF_LEAVES,
+    FLDEFF_FES_SPARKLE,
+    // fldeff_encount.c's phenomena, in the order of field_map.h's ENCOUNT_EFFECT_* that play them
+    FLDEFF_ENCOUNT_GRASS,
+    FLDEFF_ENCOUNT_REALLY_TALL_GRASS,
+    FLDEFF_ENCOUNT_DUST_CLOUD,
+    FLDEFF_ENCOUNT_WATER_0,
+    FLDEFF_ENCOUNT_WATER_1,
+    FLDEFF_ENCOUNT_FLYING_SHADOW,
+    FLDEFF_MAX,
     // The ID of an empty slot, and of the empty last entry of the effects' table
     FLDEFF_NONE = FLDEFF_MAX,
 };
@@ -88,8 +115,8 @@ typedef struct {
 
 struct FieldEffectTask {
     BOOL active;
-    u32 param1;
-    void *param2;
+    u32 mode;
+    void *params;
     VecFx32 pos;
     u8 work[0xa0];
     FieldEffectTaskVTable vtable;
@@ -115,7 +142,7 @@ void *FieldEffects_GetHandleData(FieldEffects *effects, u32 id);
 void FieldEffects_TCBManagerInit(FieldEffects *effects, u32 count);
 // Start a task, at pos if it isn't NULL
 FieldEffectTask *FieldEffects_TCBCreate(FieldEffects *effects, const FieldEffectTaskVTable *vtable, const VecFx32 *pos,
-                                        u32 param1, void *param2, u32 priority);
+                                        u32 mode, void *params, u32 priority);
 // End a task, update it, and its parameters, position and work
 void FieldEffects_DeleteObject(FieldEffectTask *task);
 void FieldEffects_UpdateObject(FieldEffectTask *task);
@@ -140,7 +167,7 @@ FieldEffectTask *FldeffSurfPokemonSplash_StartAtPos(FieldEffects *effects, u32 k
 BOOL FldeffSurfPokemonSplash_IsFinished(FieldEffectTask *task);
 // The effects that every map loads, and their count
 extern const u32 STATIC_LOADED_FIELD_EFFECT_IDS[21];
-extern const u32 data_ov036_021d0388;
+extern const u32 STATIC_LOADED_FIELD_EFFECT_COUNT;
 
 // Each effect's load and free functions, in their own files
 void *FieldEffect_Shadow_Create(FieldEffects *effects, HeapID heapId);
