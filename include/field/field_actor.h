@@ -50,6 +50,14 @@ typedef struct {
     u16 padding;
 } FieldActorConfig;
 
+// A config's billboardSize: the size of the actor's billboard in pixels, by field_actor_drawdata.c's
+// ACTOR_BILLBOARD_SIZES_INT
+enum {
+    ACTOR_BILLBOARD_SIZE_32,
+    ACTOR_BILLBOARD_SIZE_16,
+    ACTOR_BILLBOARD_SIZE_64,
+};
+
 // An actor's place on a rail, from swan's ActorPositionRail. unk0 is ACTOR_RAIL_POS_SET once the place is set
 typedef struct {
     u32 unk0;
@@ -140,6 +148,8 @@ void GetNPCMdlInfoForOBJCODE(const MMSys *actorSystem, u16 objCode, FieldActorCo
 void LoadMModelSystemInfoCache(MMSys *mmSys, s32 index);
 void SetActorFlag(FieldActor *actor, u32 flag);
 void ClearActorFlag(FieldActor *actor, u32 flag);
+// The movement flag that hides an actor's shadow, which the actor terrain effects set off a shadow tile
+#define ACTOR_MOVEMENT_FLAG_HIDE_SHADOW 0x8000
 void SetActorMovementFlag(FieldActor *actor, u32 flag);
 void ClearActorMovementFlag(FieldActor *actor, u32 flag);
 void FldAct_InvokeUpdateCallback(FieldActor *actor);
