@@ -6,12 +6,13 @@
 
 struct RivalEntry {
     u8 id;
-    u8 unk1;
+    // Whether the Pokémon is female
+    u8 female;
     u8 selected;
     u8 active;
-    // From overlay 26's table of the mission's people
-    u16 unk4;
-    u8 unk6;
+    // The Pokémon's species and form, from overlay 26's table of the mission's people
+    u16 species;
+    u8 form;
 };
 
 u8 getHollowNum(RivalDataSave *save);
