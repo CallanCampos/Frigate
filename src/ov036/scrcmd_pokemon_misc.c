@@ -568,7 +568,7 @@ BOOL s0225_ItemGetRandomOwnedTMMove(VM *vm, FieldScriptEnv *env) {
     if (count == 0) {
         move = 0;
     } else {
-        move = PML_ItemGetTMWazaID(BagSave_GetItemIndexHandle(bag, BAG_POCKET_TMS_HMS, index)->item);
+        move = PML_ItemGetTMMoveID(BagSave_GetItemIndexHandle(bag, BAG_POCKET_TMS_HMS, index)->item);
     }
     *result = move;
     return FALSE;

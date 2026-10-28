@@ -176,7 +176,7 @@ SINKS = {
     ("BagSave_AddItem", 1): "item", ("BagSave_SubItem", 1): "item", ("BagSave_CheckAmount", 1): "item",
     ("BagSave_CheckAvailItemSpace", 1): "item", ("BagSave_GetItemCountByID", 1): "item",
     ("BagSave_GetActualItemPocket", 1): "item", ("GetItemParam", 0): "item", ("loadItemNameToStrbuf", 2): "item",
-    ("loadItemsNameToStrbuf", 2): "item", ("loadItemTextNameToStrbuf", 2): "item", ("PML_ItemGetTMWazaID", 0): "item",
+    ("loadItemsNameToStrbuf", 2): "item", ("loadItemTextNameToStrbuf", 2): "item", ("PML_ItemGetTMMoveID", 0): "item",
     ("isMoveMachine", 0): "item",
     ("loadMoveNameToStrbuf", 2): "move",
     ("PokeDex_IsCaught", 1): "species", ("PokeDex_IsSeen", 1): "species",

@@ -200,7 +200,7 @@
 #define ARCID_POKEMONTRADE_2D 105         // pokemontrade_2d.c
 #define ARCID_MIC_TEST 107                // mictest.c
 #define ARCID_NAMEIN_GRAPHIC 119          // namein.c
-#define ARCID_WAZA_OSHIE 125              // waza_oshie_main.c
+#define ARCID_WAZA_OSHIE 125              // move_tutor_main.c
 #define ARCID_SHORTCUT_MENU 129           // shortcut_menu.c
 #define ARCID_LOCAL_TVT 132               // local_tvt_chara.c, local_tvt_util.c
 #define ARCID_WIFIBATTLEMATCH 134         // wifibattlematch_view.c

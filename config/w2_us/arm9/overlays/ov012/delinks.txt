@@ -392,7 +392,7 @@ src/ov012/scrcmd_sp_poke.c:
     complete
     .text       start:0x02169c5c end:0x02169cbc
 
-src/ov012/waza_oshie.c:
+src/ov012/move_tutor.c:
     complete
     .text       start:0x02169cbc end:0x02169e58
     .data       start:0x0216e63c end:0x0216e64c

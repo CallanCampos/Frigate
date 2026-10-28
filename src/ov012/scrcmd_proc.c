@@ -230,7 +230,7 @@ BOOL s01D6_MoveReminderCallMoveSelect(VM *vm, FieldScriptEnv *env) {
     work->resource = data;
     work->data = result;
     ScriptWork_CallEvent(scriptWork, EventFieldSubprocessTransition_CreateWithCallback(
-                                         gsys, field, OVERLAY_MOVE_REMINDER, &WazaOshieProcFunctions, data,
+                                         gsys, field, OVERLAY_MOVE_REMINDER, &MoveTutorProcFunctions, data,
                                          MoveReminder_ReadResult, work));
     return TRUE;
 }

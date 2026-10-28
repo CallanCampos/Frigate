@@ -1,5 +1,5 @@
-#ifndef POKEBW2_PML_WAZA_H
-#define POKEBW2_PML_WAZA_H
+#ifndef POKEBW2_PML_MOVE_H
+#define POKEBW2_PML_MOVE_H
 
 #include "types.h"
 #include "gfl/heap.h"
@@ -69,4 +69,4 @@ BOOL PML_MoveIsDataCachePresent(void);
 void PML_MoveInitDataCache(s32 count, HeapID heapId);
 void PML_MoveFreeDataCache(void);
 
-#endif // POKEBW2_PML_WAZA_H
+#endif // POKEBW2_PML_MOVE_H

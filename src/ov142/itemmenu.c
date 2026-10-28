@@ -1098,7 +1098,7 @@ static void ItemMenu_StateTMShowMove(ItemMenuWork *work) {
     if (GFL_SndPlayerIsActiveAny() != TRUE &&
         ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
         GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_ContainedTeachPokemon, work->strbuf);
-        loadMoveNameToStrbuf(work->wordSet, 0, PML_ItemGetTMWazaID(work->item));
+        loadMoveNameToStrbuf(work->wordSet, 0, PML_ItemGetTMMoveID(work->item));
         GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
         ItemMenuDisp_ShowMessage(work, TRUE);
         ItemMenu_SetState(work, ItemMenu_StateTMAskBootUp);

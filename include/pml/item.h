@@ -193,7 +193,7 @@ BOOL PML_ItemIsTMHM(u16 item);
 u32 PML_ItemGetMaxStorageCount(u16 item);
 BOOL PML_ItemIsTM(u16 item);
 // The move a TM or HM teaches, or 0
-u16 PML_ItemGetTMWazaID(u16 item);
+u16 PML_ItemGetTMMoveID(u16 item);
 BOOL PML_MoveIsHM(u16 move);
 // A TM's or HM's bit in a species' TM flags: TM01 to TM92, TM93 to TM95, then HM01 to HM06. 0xff for other items
 u8 PML_ItemGetTMBitMask(u16 item);

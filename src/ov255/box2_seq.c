@@ -5644,7 +5644,7 @@ static int Box2Seq_ReleaseCheck(Box2SysWork *syswk) {
 
 // Releasing: checks the moves the Pokémon takes away
 static int Box2Seq_ReleaseCheckMoves(Box2SysWork *syswk) {
-    Box2Main_PokeFreeWazaCheck(syswk);
+    Box2Main_PokeFreeMoveCheck(syswk);
     if (Box2PokeFree_Shrink(syswk->app->subWork) == FALSE) {
         if (((Box2PokeFreeWork *)syswk->app->subWork)->checkFlag != 0) {
             return Box2Seq_Goto(syswk, 104);

@@ -1,3 +1,4 @@
+// The ROM names this file waza_oshie.c.
 // The move reminder's parameters and the moves a Pokémon can remember. PokeParty_GetRememberableMoves and
 // doesPkmHaveLevelMoveToLearn are swan's names (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"

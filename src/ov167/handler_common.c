@@ -8,7 +8,7 @@
 #include "battle/handler_common.h"
 #include "constants/items.h"
 #include "constants/species.h"
-#include "pml/waza.h"
+#include "pml/move.h"
 
 // Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0) where it has them
 

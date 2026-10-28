@@ -285,7 +285,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `event_battle.c` | `0x021684bc`–`0x0216919c` | 26 | complete | string at `0x0216e5dc` |
 | `trcard_sys.c` | `0x0216919c`–`0x02169c1c` | 23 | complete | string at `0x0216e5ec` |
 | `scrcmd_sp_poke.c` | `0x02169c1c`–`0x02169c7c` | 4 | complete | descriptive |
-| `waza_oshie.c` | `0x02169c7c`–`0x02169e18` | 4 | complete | string at `0x0216e5fc` |
+| `move_tutor.c` | `0x02169c7c`–`0x02169e18` | 4 | complete | ROM's `waza_oshie.c`, string at `0x0216e5fc` |
 | `g3d_text_draw.c` | `0x02169e18`–`0x0216a190` | 7 | complete | descriptive |
 | `pass_power_check.c` | `0x0216a190`–`0x0216a23c` | 2 | complete | descriptive |
 | `pair_sys.c` | `0x0216a23c`–`0x0216a6a4` | 16 | complete | string at `0x0216e60c` |
@@ -1683,7 +1683,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `btl_tables.c` | `0x0689ca10`–`0x0689cc20` | 27 | complete | descriptive |
 | `btl_poke_select.c` | `0x0689cc20`–`0x0689ccc4` | 10 | complete | descriptive |
 | `btl_monset.c` | `0x0689ccc4`–`0x0689d178` | 38 | complete | descriptive |
-| `btl_wazarec.c` | `0x0689d178`–`0x0689d284` | 7 | complete | descriptive |
+| `btl_move_rec.c` | `0x0689d178`–`0x0689d284` | 7 | complete | descriptive |
 | `btl_faintrec.c` | `0x0689d284`–`0x0689d384` | 9 | complete | descriptive |
 | `btl_pospoke.c` | `0x0689d384`–`0x0689d790` | 44 | complete | descriptive |
 
@@ -2330,7 +2330,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `waza_oshie_main.c` | `0x021998c0`–`0x0219b9a8` | 84 | complete | descriptive |
+| `move_tutor_main.c` | `0x021998c0`–`0x0219b9a8` | 84 | complete | descriptive |
 
 ### Overlay 259
 

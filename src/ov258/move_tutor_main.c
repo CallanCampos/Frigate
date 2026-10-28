@@ -27,10 +27,10 @@
 #include "nitro/hw.h"
 #include "nitro/os.h"
 #include "nnsys/g2d.h"
+#include "pml/move.h"
 #include "pml/move_reminder.h"
 #include "pml/poke_graphic.h"
 #include "pml/poke_party.h"
-#include "pml/waza.h"
 #include "system/app_keycursor.h"
 #include "system/app_menu_common.h"
 #include "system/app_taskmenu.h"
@@ -50,7 +50,7 @@
 // the summary screen, which ends this screen's graphics and builds them again on return. The ROM has no name for this
 // file; "waza_oshie_main.c" is a guess from "waza_oshie.c", the file of overlay 12 that allocates its parameter
 
-#define HEAPID_WAZA_OSHIE 0x4f
+#define HEAPID_MOVE_TUTOR 0x4f
 
 #define RESOURCE_COUNT 9
 #define TYPE_ICON_COUNT 8
@@ -123,7 +123,7 @@ enum {
     SEQ_MOVE_CHOSEN,
 };
 
-// The messages, which index a row of sWazaOshieMessages
+// The messages, which index a row of sMoveTutorMessages
 enum {
     MSG_SELECT,
     MSG_LEARN,
@@ -140,7 +140,7 @@ enum {
     MESSAGE_COUNT,
 };
 
-// The questions, which index sWazaOshieYesNoFuncs
+// The questions, which index sMoveTutorYesNoFuncs
 enum {
     YES_NO_LEARN,
     YES_NO_QUIT,
@@ -155,7 +155,7 @@ enum {
     DECIDE_BUTTON,
 };
 
-// How WazaOshie_PrintText places the text in its window
+// How MoveTutor_PrintText places the text in its window
 enum {
     ALIGN_LEFT,
     ALIGN_RIGHT,
@@ -165,7 +165,7 @@ enum {
 typedef struct {
     u32 type;
     BOOL dirty;
-} WazaOshieTypeIcon;
+} MoveTutorTypeIcon;
 
 // What SEQ_DECIDE_WAIT waits for: an actor's animation or a button's flash, and the sequence that follows
 typedef struct {
@@ -173,7 +173,7 @@ typedef struct {
     u16 index;
     u16 seq;
     u16 type;
-} WazaOshieDecide;
+} MoveTutorDecide;
 
 typedef struct {
     MoveReminderProcessData *param;
@@ -197,7 +197,7 @@ typedef struct {
     ClActor *actors[ACTOR_COUNT];
     ArcTool *commonArc;
     // The type icons whose characters the next VBlank loads
-    WazaOshieTypeIcon typeIcons[TYPE_ICON_COUNT];
+    MoveTutorTypeIcon typeIcons[TYPE_ICON_COUNT];
     PStatusParam status;
     u8 unk1A8[8];
     u32 nextSeq;
@@ -212,7 +212,7 @@ typedef struct {
     CursorMove *cursor;
     u16 prevPos;
     u16 buttonsShown;
-    WazaOshieDecide decide;
+    MoveTutorDecide decide;
     AppTaskMenuRes *menuRes;
     AppTaskMenu *menu;
     AppTaskMenuItem buttonItems[2];
@@ -221,19 +221,19 @@ typedef struct {
     PrintQueue *printQueue;
     KeyCursor *keyCursor;
     AppTaskMenuWin *buttons[2];
-} WazaOshieWork;
+} MoveTutorWork;
 
 typedef struct {
     u32 msg;
     u32 type;
-} WazaOshieMenuItem;
+} MoveTutorMenuItem;
 
-typedef u32 (*WazaOshieYesNoFunc)(WazaOshieWork *work);
+typedef u32 (*MoveTutorYesNoFunc)(MoveTutorWork *work);
 
 typedef struct {
-    WazaOshieYesNoFunc yes;
-    WazaOshieYesNoFunc no;
-} WazaOshieYesNoFuncs;
+    MoveTutorYesNoFunc yes;
+    MoveTutorYesNoFunc no;
+} MoveTutorYesNoFuncs;
 
 typedef struct {
     u32 bg;
@@ -243,7 +243,7 @@ typedef struct {
     u32 height;
     u32 palette;
     u32 charOffset;
-} WazaOshieWindowData;
+} MoveTutorWindowData;
 
 typedef struct {
     s16 x;
@@ -260,106 +260,106 @@ typedef struct {
     u32 unk20;
     u32 bgPriority;
     u32 unk28;
-} WazaOshieActorData;
+} MoveTutorActorData;
 
-static BOOL WazaOshieProc_Init(GameProc *proc, u32 *state, void *param, void *work);
-static BOOL WazaOshieProc_Main(GameProc *proc, u32 *state, void *param, void *work);
-static BOOL WazaOshieProc_Exit(GameProc *proc, u32 *state, void *param, void *work);
-static void WazaOshie_InitMenu(WazaOshieWork *work);
-static void WazaOshie_FreeMenu(WazaOshieWork *work);
-static void WazaOshie_UpdateButtons(WazaOshieWork *work);
-static void WazaOshie_InitScreen(WazaOshieWork *work);
-static void WazaOshie_FreeScreen(WazaOshieWork *work);
-static void WazaOshie_VBlank(TCB *tcb, void *data);
-static void WazaOshie_SetVRAMBanks(void);
-static void WazaOshie_InitBG(void);
-static void WazaOshie_FreeBG(void);
-static void WazaOshie_LoadBG(WazaOshieWork *work, ArcTool *arc);
-static void WazaOshie_FreeScreenBuffer(WazaOshieWork *work);
-static void WazaOshie_InitWindows(WazaOshieWork *work);
-static void WazaOshie_FreeWindows(WazaOshieWork *work);
-static void WazaOshie_InitMsg(WazaOshieWork *work);
-static void WazaOshie_FreeMsg(WazaOshieWork *work);
-static u32 WazaOshie_SeqFadeWait(WazaOshieWork *work);
-static u32 WazaOshie_SeqSelect(WazaOshieWork *work);
-static u32 WazaOshie_SeqMessage(WazaOshieWork *work);
-static u32 WazaOshie_SeqYesNoInit(WazaOshieWork *work);
-static u32 WazaOshie_SeqYesNo(WazaOshieWork *work);
-static u32 WazaOshie_SeqSetMove(WazaOshieWork *work);
-static u32 WazaOshie_SeqForgot(WazaOshieWork *work);
-static u32 WazaOshie_SeqStatusResult(WazaOshieWork *work);
-static u32 WazaOshie_SeqFadeOut(WazaOshieWork *work);
-static void WazaOshie_DrawCursorMoveInfo(WazaOshieWork *work);
-static void WazaOshie_PrintText(WazaOshieWork *work, u32 window, Font *font, u16 color, u32 align, u8 y);
-static void WazaOshie_FormatNumber(WazaOshieWork *work, u32 msg, u32 number, u32 digits, u8 pad);
-static void WazaOshie_DrawText(WazaOshieWork *work);
-static u32 WazaOshie_CountMoves(WazaOshieWork *work);
-static void WazaOshie_DrawListRow(WazaOshieWork *work, u8 scroll, u8 row);
-static void WazaOshie_DrawList(WazaOshieWork *work);
-static void WazaOshie_InitList(WazaOshieWork *work);
-static void WazaOshie_FreeList(WazaOshieWork *work);
-static void WazaOshie_DrawMoveInfo(WazaOshieWork *work, u32 move);
-static void WazaOshie_FormatMessage(WazaOshieWork *work, u32 msg);
-static u16 WazaOshie_GetCursorMove(WazaOshieWork *work);
-static u16 WazaOshie_GetReplacedMove(WazaOshieWork *work);
-static void WazaOshie_PrintMessage(WazaOshieWork *work, u32 msg);
-static void WazaOshie_ClearMessage(WazaOshieWork *work);
-static BOOL WazaOshie_StreamCallback(u32 event);
-static u8 WazaOshie_CountKnownMoves(WazaOshieWork *work);
-static u32 WazaOshie_LearnYes(WazaOshieWork *work);
-static u32 WazaOshie_LearnNo(WazaOshieWork *work);
-static u32 WazaOshie_QuitYes(WazaOshieWork *work);
-static u32 WazaOshie_QuitNo(WazaOshieWork *work);
-static u32 WazaOshie_ReplaceYes(WazaOshieWork *work);
-static u32 WazaOshie_ReplaceNo(WazaOshieWork *work);
-static u32 WazaOshie_GiveUpYes(WazaOshieWork *work);
-static u32 WazaOshie_GiveUpNo(WazaOshieWork *work);
-static u32 WazaOshie_ForgetYes(WazaOshieWork *work);
-static u32 WazaOshie_ForgetNo(WazaOshieWork *work);
-static void WazaOshie_InitActorSys(WazaOshieWork *work);
-static void WazaOshie_FreeActors(WazaOshieWork *work);
-static void WazaOshie_LoadActorResources(WazaOshieWork *work, ArcTool *arc);
-static void WazaOshie_ReplaceChars(ArcTool *arc, u32 chars, u32 fileId, BOOL compressed, HeapID heapId);
-static void WazaOshie_SetKnownMoveType(WazaOshieWork *work, u16 move, u16 index);
-static void WazaOshie_LoadTypeIcons(WazaOshieWork *work);
-static void WazaOshie_UpdateListTypes(WazaOshieWork *work);
-static void WazaOshie_SetCategory(WazaOshieWork *work, u16 move);
-static void WazaOshie_InitActors(WazaOshieWork *work, ArcTool *arc);
-static void WazaOshie_SetCursorActor(WazaOshieWork *work, u8 pos, u32 unused);
-static u32 WazaOshie_SeqStatusFadeOut(WazaOshieWork *work);
-static u32 WazaOshie_SeqStatusCall(WazaOshieWork *work);
-static u32 WazaOshie_SeqStatusReturn(WazaOshieWork *work);
-static void WazaOshie_InitCursor(WazaOshieWork *work);
-static void WazaOshie_FreeCursor(WazaOshieWork *work);
-static void WazaOshie_CursorDummy(void *data, int pos, int prevPos);
-static void WazaOshie_CursorMove(void *data, int pos, int prevPos);
-static void WazaOshie_CursorTouch(void *data, int pos, int prevPos);
-static void WazaOshie_ShowButtons(WazaOshieWork *work, BOOL show);
-static BOOL WazaOshie_AreButtonsShown(WazaOshieWork *work);
-static void WazaOshie_UpdateArrowPositions(WazaOshieWork *work);
-static void WazaOshie_AnimateArrows(WazaOshieWork *work, int direction);
-static void WazaOshie_InitArrows(WazaOshieWork *work);
-static u32 WazaOshie_DecideActor(WazaOshieWork *work, u16 seq);
-static u32 WazaOshie_DecideTeach(WazaOshieWork *work, u16 seq);
-static u32 WazaOshie_DecideQuit(WazaOshieWork *work, u16 seq);
-static u32 WazaOshie_SeqDecideWait(WazaOshieWork *work);
-static u32 WazaOshie_SeqQuit(WazaOshieWork *work);
-static u32 WazaOshie_SeqMoveChosen(WazaOshieWork *work);
-static void WazaOshie_SetDimmed(BOOL dimmed);
+static BOOL MoveTutorProc_Init(GameProc *proc, u32 *state, void *param, void *work);
+static BOOL MoveTutorProc_Main(GameProc *proc, u32 *state, void *param, void *work);
+static BOOL MoveTutorProc_Exit(GameProc *proc, u32 *state, void *param, void *work);
+static void MoveTutor_InitMenu(MoveTutorWork *work);
+static void MoveTutor_FreeMenu(MoveTutorWork *work);
+static void MoveTutor_UpdateButtons(MoveTutorWork *work);
+static void MoveTutor_InitScreen(MoveTutorWork *work);
+static void MoveTutor_FreeScreen(MoveTutorWork *work);
+static void MoveTutor_VBlank(TCB *tcb, void *data);
+static void MoveTutor_SetVRAMBanks(void);
+static void MoveTutor_InitBG(void);
+static void MoveTutor_FreeBG(void);
+static void MoveTutor_LoadBG(MoveTutorWork *work, ArcTool *arc);
+static void MoveTutor_FreeScreenBuffer(MoveTutorWork *work);
+static void MoveTutor_InitWindows(MoveTutorWork *work);
+static void MoveTutor_FreeWindows(MoveTutorWork *work);
+static void MoveTutor_InitMsg(MoveTutorWork *work);
+static void MoveTutor_FreeMsg(MoveTutorWork *work);
+static u32 MoveTutor_SeqFadeWait(MoveTutorWork *work);
+static u32 MoveTutor_SeqSelect(MoveTutorWork *work);
+static u32 MoveTutor_SeqMessage(MoveTutorWork *work);
+static u32 MoveTutor_SeqYesNoInit(MoveTutorWork *work);
+static u32 MoveTutor_SeqYesNo(MoveTutorWork *work);
+static u32 MoveTutor_SeqSetMove(MoveTutorWork *work);
+static u32 MoveTutor_SeqForgot(MoveTutorWork *work);
+static u32 MoveTutor_SeqStatusResult(MoveTutorWork *work);
+static u32 MoveTutor_SeqFadeOut(MoveTutorWork *work);
+static void MoveTutor_DrawCursorMoveInfo(MoveTutorWork *work);
+static void MoveTutor_PrintText(MoveTutorWork *work, u32 window, Font *font, u16 color, u32 align, u8 y);
+static void MoveTutor_FormatNumber(MoveTutorWork *work, u32 msg, u32 number, u32 digits, u8 pad);
+static void MoveTutor_DrawText(MoveTutorWork *work);
+static u32 MoveTutor_CountMoves(MoveTutorWork *work);
+static void MoveTutor_DrawListRow(MoveTutorWork *work, u8 scroll, u8 row);
+static void MoveTutor_DrawList(MoveTutorWork *work);
+static void MoveTutor_InitList(MoveTutorWork *work);
+static void MoveTutor_FreeList(MoveTutorWork *work);
+static void MoveTutor_DrawMoveInfo(MoveTutorWork *work, u32 move);
+static void MoveTutor_FormatMessage(MoveTutorWork *work, u32 msg);
+static u16 MoveTutor_GetCursorMove(MoveTutorWork *work);
+static u16 MoveTutor_GetReplacedMove(MoveTutorWork *work);
+static void MoveTutor_PrintMessage(MoveTutorWork *work, u32 msg);
+static void MoveTutor_ClearMessage(MoveTutorWork *work);
+static BOOL MoveTutor_StreamCallback(u32 event);
+static u8 MoveTutor_CountKnownMoves(MoveTutorWork *work);
+static u32 MoveTutor_LearnYes(MoveTutorWork *work);
+static u32 MoveTutor_LearnNo(MoveTutorWork *work);
+static u32 MoveTutor_QuitYes(MoveTutorWork *work);
+static u32 MoveTutor_QuitNo(MoveTutorWork *work);
+static u32 MoveTutor_ReplaceYes(MoveTutorWork *work);
+static u32 MoveTutor_ReplaceNo(MoveTutorWork *work);
+static u32 MoveTutor_GiveUpYes(MoveTutorWork *work);
+static u32 MoveTutor_GiveUpNo(MoveTutorWork *work);
+static u32 MoveTutor_ForgetYes(MoveTutorWork *work);
+static u32 MoveTutor_ForgetNo(MoveTutorWork *work);
+static void MoveTutor_InitActorSys(MoveTutorWork *work);
+static void MoveTutor_FreeActors(MoveTutorWork *work);
+static void MoveTutor_LoadActorResources(MoveTutorWork *work, ArcTool *arc);
+static void MoveTutor_ReplaceChars(ArcTool *arc, u32 chars, u32 fileId, BOOL compressed, HeapID heapId);
+static void MoveTutor_SetKnownMoveType(MoveTutorWork *work, u16 move, u16 index);
+static void MoveTutor_LoadTypeIcons(MoveTutorWork *work);
+static void MoveTutor_UpdateListTypes(MoveTutorWork *work);
+static void MoveTutor_SetCategory(MoveTutorWork *work, u16 move);
+static void MoveTutor_InitActors(MoveTutorWork *work, ArcTool *arc);
+static void MoveTutor_SetCursorActor(MoveTutorWork *work, u8 pos, u32 unused);
+static u32 MoveTutor_SeqStatusFadeOut(MoveTutorWork *work);
+static u32 MoveTutor_SeqStatusCall(MoveTutorWork *work);
+static u32 MoveTutor_SeqStatusReturn(MoveTutorWork *work);
+static void MoveTutor_InitCursor(MoveTutorWork *work);
+static void MoveTutor_FreeCursor(MoveTutorWork *work);
+static void MoveTutor_CursorDummy(void *data, int pos, int prevPos);
+static void MoveTutor_CursorMove(void *data, int pos, int prevPos);
+static void MoveTutor_CursorTouch(void *data, int pos, int prevPos);
+static void MoveTutor_ShowButtons(MoveTutorWork *work, BOOL show);
+static BOOL MoveTutor_AreButtonsShown(MoveTutorWork *work);
+static void MoveTutor_UpdateArrowPositions(MoveTutorWork *work);
+static void MoveTutor_AnimateArrows(MoveTutorWork *work, int direction);
+static void MoveTutor_InitArrows(MoveTutorWork *work);
+static u32 MoveTutor_DecideActor(MoveTutorWork *work, u16 seq);
+static u32 MoveTutor_DecideTeach(MoveTutorWork *work, u16 seq);
+static u32 MoveTutor_DecideQuit(MoveTutorWork *work, u16 seq);
+static u32 MoveTutor_SeqDecideWait(MoveTutorWork *work);
+static u32 MoveTutor_SeqQuit(MoveTutorWork *work);
+static u32 MoveTutor_SeqMoveChosen(MoveTutorWork *work);
+static void MoveTutor_SetDimmed(BOOL dimmed);
 
 // BmpWin_ClearScreenNow with the screen copied at the next VBlank
-static inline void WazaOshie_ClearWindow(BmpWin *window) {
+static inline void MoveTutor_ClearWindow(BmpWin *window) {
     BmpWin_ClearScreen(window);
     GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(window));
 }
 
-const GameProcFunctions WazaOshieProcFunctions = { WazaOshieProc_Init, WazaOshieProc_Main, WazaOshieProc_Exit };
+const GameProcFunctions MoveTutorProcFunctions = { MoveTutorProc_Init, MoveTutorProc_Main, MoveTutorProc_Exit };
 
 // The tables are declared in the order that gives the ROM's .rodata, with those of the actors and the cursor ahead
 // of the functions that read them
 
 // clang-format off
-static const BGSysVRAMConfig sWazaOshieVRAMConfig = {
+static const BGSysVRAMConfig sMoveTutorVRAMConfig = {
     GX_VRAM_BG_128_B,
     GX_VRAM_BGEXTPLTT_NONE,
     GX_VRAM_SUB_BG_128_C,
@@ -376,18 +376,18 @@ static const BGSysVRAMConfig sWazaOshieVRAMConfig = {
 
 // clang-format on
 
-static const WazaOshieMenuItem sWazaOshieButtonItems[2] = {
+static const MoveTutorMenuItem sMoveTutorButtonItems[2] = {
     { ShinkaDemoBtlMain_Text_Teach, 0 },
     { ShinkaDemoBtlMain_Text_Quit, APP_TASKMENU_ITEM_RETURN },
 };
 
-static const WazaOshieMenuItem sWazaOshieYesNoItems[2] = {
+static const MoveTutorMenuItem sMoveTutorYesNoItems[2] = {
     { ShinkaDemoBtlMain_Text_Yes, 0 },
     { ShinkaDemoBtlMain_Text_No, 0 },
 };
 
 // clang-format off
-static const WazaOshieWindowData sWazaOshieWindows[WINDOW_COUNT] = {
+static const MoveTutorWindowData sMoveTutorMainWindows[WINDOW_COUNT] = {
     { 2, 0, 25, 1, 1, 0, 0 },      { 6, 0, 25, 1, 1, 0, 0 },       { 6, 8, 6, 6, 2, 15, 43 },
     { 6, 19, 6, 8, 2, 15, 55 },    { 6, 14, 6, 3, 2, 15, 71 },     { 6, 27, 6, 3, 2, 15, 77 },
     { 6, 1, 0, 30, 6, 15, 83 },    { 4, 2, 19, 27, 4, 14, 263 },   { 6, 1, 0, 30, 3, 15, 371 },
@@ -399,7 +399,7 @@ static const WazaOshieWindowData sWazaOshieWindows[WINDOW_COUNT] = {
 // clang-format on
 
 // The messages, by the parameter's mode
-static const u32 sWazaOshieMessages[2][MESSAGE_COUNT] = {
+static const u32 sMoveTutorMessages[2][MESSAGE_COUNT] = {
     {
         ShinkaDemoBtlMain_Text_Empty,
         ShinkaDemoBtlMain_Text_Empty_2,
@@ -429,125 +429,125 @@ static const u32 sWazaOshieMessages[2][MESSAGE_COUNT] = {
 };
 
 // clang-format off
-static const WazaOshieYesNoFuncs sWazaOshieYesNoFuncs[5] = {
-    { WazaOshie_LearnYes, WazaOshie_LearnNo },
-    { WazaOshie_QuitYes, WazaOshie_QuitNo },
-    { WazaOshie_ReplaceYes, WazaOshie_ReplaceNo },
-    { WazaOshie_GiveUpYes, WazaOshie_GiveUpNo },
-    { WazaOshie_ForgetYes, WazaOshie_ForgetNo },
+static const MoveTutorYesNoFuncs sMoveTutorYesNoFuncs[5] = {
+    { MoveTutor_LearnYes, MoveTutor_LearnNo },
+    { MoveTutor_QuitYes, MoveTutor_QuitNo },
+    { MoveTutor_ReplaceYes, MoveTutor_ReplaceNo },
+    { MoveTutor_GiveUpYes, MoveTutor_GiveUpNo },
+    { MoveTutor_ForgetYes, MoveTutor_ForgetNo },
 };
 
 // clang-format on
 
-static const ClActSysSetup sWazaOshieActorSysSetup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 9, 5, 6, 32, 16, 16 };
+static const ClActSysSetup sMoveTutorActorSysSetup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 9, 5, 6, 32, 16, 16 };
 
-static BOOL WazaOshieProc_Init(GameProc *proc, u32 *state, void *param, void *work) {
-    WazaOshieWork *wk;
+static BOOL MoveTutorProc_Init(GameProc *proc, u32 *state, void *param, void *work) {
+    MoveTutorWork *wk;
 
-    GFL_HeapCreateChild(HEAPID_USER, HEAPID_WAZA_OSHIE, 0x50000);
-    wk = GFL_ProcInitSubsystem(proc, sizeof(WazaOshieWork), HEAPID_WAZA_OSHIE);
-    MI_CpuFill8(wk, 0, sizeof(WazaOshieWork));
+    GFL_HeapCreateChild(HEAPID_USER, HEAPID_MOVE_TUTOR, 0x50000);
+    wk = GFL_ProcInitSubsystem(proc, sizeof(MoveTutorWork), HEAPID_MOVE_TUTOR);
+    MI_CpuFill8(wk, 0, sizeof(MoveTutorWork));
     wk->param = param;
-    wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_WAZA_OSHIE);
-    wk->tcbManager = GFL_TCBExMgrCreate(HEAPID_WAZA_OSHIE, HEAPID_WAZA_OSHIE, 32, 32);
-    WazaOshie_InitScreen(wk);
-    WazaOshie_SetCursorActor(wk, wk->param->cursorPos, 3);
+    wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_MOVE_TUTOR);
+    wk->tcbManager = GFL_TCBExMgrCreate(HEAPID_MOVE_TUTOR, HEAPID_MOVE_TUTOR, 32, 32);
+    MoveTutor_InitScreen(wk);
+    MoveTutor_SetCursorActor(wk, wk->param->cursorPos, 3);
     wk->nextSeq = SEQ_SELECT;
-    GFL_NetSetIconScreen(TRUE, HEAPID_WAZA_OSHIE);
+    GFL_NetSetIconScreen(TRUE, HEAPID_MOVE_TUTOR);
     return TRUE;
 }
 
-static BOOL WazaOshieProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
-    WazaOshieWork *wk = work;
+static BOOL MoveTutorProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
+    MoveTutorWork *wk = work;
 
     switch (*state) {
     case SEQ_FADE_WAIT:
-        *state = WazaOshie_SeqFadeWait(wk);
+        *state = MoveTutor_SeqFadeWait(wk);
         break;
     case SEQ_SELECT:
-        *state = WazaOshie_SeqSelect(wk);
+        *state = MoveTutor_SeqSelect(wk);
         break;
     case SEQ_MESSAGE:
-        *state = WazaOshie_SeqMessage(wk);
+        *state = MoveTutor_SeqMessage(wk);
         break;
     case SEQ_YES_NO_INIT:
-        *state = WazaOshie_SeqYesNoInit(wk);
+        *state = MoveTutor_SeqYesNoInit(wk);
         break;
     case SEQ_YES_NO:
-        *state = WazaOshie_SeqYesNo(wk);
+        *state = MoveTutor_SeqYesNo(wk);
         break;
     case SEQ_SET_MOVE:
-        *state = WazaOshie_SeqSetMove(wk);
+        *state = MoveTutor_SeqSetMove(wk);
         break;
     case SEQ_FORGOT:
-        *state = WazaOshie_SeqForgot(wk);
+        *state = MoveTutor_SeqForgot(wk);
         break;
     case SEQ_STATUS_RESULT:
-        *state = WazaOshie_SeqStatusResult(wk);
+        *state = MoveTutor_SeqStatusResult(wk);
         break;
     case SEQ_FADE_OUT:
-        *state = WazaOshie_SeqFadeOut(wk);
+        *state = MoveTutor_SeqFadeOut(wk);
         break;
     case SEQ_END:
         return TRUE;
     case SEQ_STATUS_FADE_OUT:
-        *state = WazaOshie_SeqStatusFadeOut(wk);
+        *state = MoveTutor_SeqStatusFadeOut(wk);
         break;
     case SEQ_STATUS_CALL:
-        *state = WazaOshie_SeqStatusCall(wk);
+        *state = MoveTutor_SeqStatusCall(wk);
         return FALSE;
     case SEQ_STATUS_RETURN:
-        *state = WazaOshie_SeqStatusReturn(wk);
+        *state = MoveTutor_SeqStatusReturn(wk);
         return FALSE;
     case SEQ_DECIDE_WAIT:
-        *state = WazaOshie_SeqDecideWait(wk);
+        *state = MoveTutor_SeqDecideWait(wk);
         break;
     case SEQ_QUIT:
-        *state = WazaOshie_SeqQuit(wk);
+        *state = MoveTutor_SeqQuit(wk);
         break;
     case SEQ_MOVE_CHOSEN:
-        *state = WazaOshie_SeqMoveChosen(wk);
+        *state = MoveTutor_SeqMoveChosen(wk);
         break;
     }
-    WazaOshie_UpdateButtons(wk);
+    MoveTutor_UpdateButtons(wk);
     ClActSys_Draw();
     GFL_TCBExMgrUpdate(wk->tcbManager);
     PrintQueue_Main(wk->printQueue);
     return FALSE;
 }
 
-static BOOL WazaOshieProc_Exit(GameProc *proc, u32 *state, void *param, void *work) {
-    WazaOshieWork *wk = work;
+static BOOL MoveTutorProc_Exit(GameProc *proc, u32 *state, void *param, void *work) {
+    MoveTutorWork *wk = work;
 
-    WazaOshie_FreeScreen(wk);
+    MoveTutor_FreeScreen(wk);
     GFL_TCBExMgrFree(wk->tcbManager);
     GFL_FontFree(wk->font);
     GFL_ProcReleaseSubsystem(proc);
-    GFL_HeapDelete(HEAPID_WAZA_OSHIE);
+    GFL_HeapDelete(HEAPID_MOVE_TUTOR);
     return TRUE;
 }
 
-static void WazaOshie_InitMenu(WazaOshieWork *work) {
+static void MoveTutor_InitMenu(MoveTutorWork *work) {
     int i;
 
-    work->printQueue = PrintQueue_CreateDefault(HEAPID_WAZA_OSHIE);
-    work->menuRes = AppTaskMenuRes_Create(4, 10, work->font, work->printQueue, HEAPID_WAZA_OSHIE);
+    work->printQueue = PrintQueue_CreateDefault(HEAPID_MOVE_TUTOR);
+    work->menuRes = AppTaskMenuRes_Create(4, 10, work->font, work->printQueue, HEAPID_MOVE_TUTOR);
     for (i = 0; i < 2; i++) {
-        work->buttonItems[i].str = GFL_MsgDataLoadStrbufNew(work->msgData, sWazaOshieButtonItems[i].msg);
+        work->buttonItems[i].str = GFL_MsgDataLoadStrbufNew(work->msgData, sMoveTutorButtonItems[i].msg);
         work->buttonItems[i].color = PRINT_COLOR(14, 15, 3);
-        work->buttonItems[i].type = sWazaOshieButtonItems[i].type;
+        work->buttonItems[i].type = sMoveTutorButtonItems[i].type;
     }
     for (i = 0; i < 2; i++) {
-        work->yesNoItems[i].str = GFL_MsgDataLoadStrbufNew(work->msgData, sWazaOshieYesNoItems[i].msg);
+        work->yesNoItems[i].str = GFL_MsgDataLoadStrbufNew(work->msgData, sMoveTutorYesNoItems[i].msg);
         work->yesNoItems[i].color = PRINT_COLOR(14, 15, 3);
-        work->yesNoItems[i].type = sWazaOshieYesNoItems[i].type;
+        work->yesNoItems[i].type = sMoveTutorYesNoItems[i].type;
     }
     work->buttons[BUTTON_TEACH] = NULL;
     work->buttons[BUTTON_QUIT] = NULL;
 }
 
-static void WazaOshie_FreeMenu(WazaOshieWork *work) {
-    WazaOshie_ShowButtons(work, FALSE);
+static void MoveTutor_FreeMenu(MoveTutorWork *work) {
+    MoveTutor_ShowButtons(work, FALSE);
     GFL_StrBufFree(work->buttonItems[0].str);
     GFL_StrBufFree(work->buttonItems[1].str);
     GFL_StrBufFree(work->yesNoItems[0].str);
@@ -556,65 +556,65 @@ static void WazaOshie_FreeMenu(WazaOshieWork *work) {
     PrintQueue_Free(work->printQueue);
 }
 
-static void WazaOshie_UpdateButtons(WazaOshieWork *work) {
+static void MoveTutor_UpdateButtons(MoveTutorWork *work) {
     if (work->buttons[BUTTON_TEACH] != NULL) {
         AppTaskMenuWin_Update(work->buttons[BUTTON_TEACH]);
         AppTaskMenuWin_Update(work->buttons[BUTTON_QUIT]);
     }
 }
 
-static void WazaOshie_InitScreen(WazaOshieWork *work) {
+static void MoveTutor_InitScreen(MoveTutorWork *work) {
     ArcTool *arc;
 
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
     GX_SetVisiblePlane(0);
     GXS_SetVisiblePlane(0);
-    arc = GFL_ArcSysCreateFileHandle(ARCID_WAZA_OSHIE, HEAPID_WAZA_OSHIE);
-    WazaOshie_SetVRAMBanks();
-    WazaOshie_InitBG();
-    WazaOshie_LoadBG(work, arc);
-    WazaOshie_InitActors(work, arc);
-    WazaOshie_InitMsg(work);
-    WazaOshie_InitWindows(work);
-    WazaOshie_InitList(work);
-    WazaOshie_DrawCursorMoveInfo(work);
-    WazaOshie_DrawText(work);
-    WazaOshie_InitCursor(work);
-    WazaOshie_InitArrows(work);
-    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 6, 1, HEAPID_WAZA_OSHIE);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_WAZA_OSHIE, HEAPID_MOVE_TUTOR);
+    MoveTutor_SetVRAMBanks();
+    MoveTutor_InitBG();
+    MoveTutor_LoadBG(work, arc);
+    MoveTutor_InitActors(work, arc);
+    MoveTutor_InitMsg(work);
+    MoveTutor_InitWindows(work);
+    MoveTutor_InitList(work);
+    MoveTutor_DrawCursorMoveInfo(work);
+    MoveTutor_DrawText(work);
+    MoveTutor_InitCursor(work);
+    MoveTutor_InitArrows(work);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 6, 1, HEAPID_MOVE_TUTOR);
     GFL_BGSysSetDisplayLayout(1);
-    work->vblankTcb = GFL_VBlankTCBAdd(WazaOshie_VBlank, work, 16);
+    work->vblankTcb = GFL_VBlankTCBAdd(MoveTutor_VBlank, work, 16);
     GFL_ArcToolFree(arc);
-    WazaOshie_InitMenu(work);
+    MoveTutor_InitMenu(work);
 }
 
-static void WazaOshie_FreeScreen(WazaOshieWork *work) {
-    WazaOshie_FreeMenu(work);
-    WazaOshie_FreeCursor(work);
-    WazaOshie_FreeList(work);
-    WazaOshie_FreeWindows(work);
-    WazaOshie_FreeScreenBuffer(work);
-    WazaOshie_FreeBG();
-    WazaOshie_FreeMsg(work);
-    WazaOshie_FreeActors(work);
+static void MoveTutor_FreeScreen(MoveTutorWork *work) {
+    MoveTutor_FreeMenu(work);
+    MoveTutor_FreeCursor(work);
+    MoveTutor_FreeList(work);
+    MoveTutor_FreeWindows(work);
+    MoveTutor_FreeScreenBuffer(work);
+    MoveTutor_FreeBG();
+    MoveTutor_FreeMsg(work);
+    MoveTutor_FreeActors(work);
     GFL_TCBRemove(work->vblankTcb);
 }
 
-static void WazaOshie_VBlank(TCB *tcb, void *data) {
-    WazaOshie_LoadTypeIcons(data);
+static void MoveTutor_VBlank(TCB *tcb, void *data) {
+    MoveTutor_LoadTypeIcons(data);
     GFL_BGSysUpdate();
     ClActSys_VBlank();
     OS_SetIrqCheckFlag(OS_IE_V_BLANK);
 }
 
-static void WazaOshie_SetVRAMBanks(void) {
-    GFL_BGSysSetVRAMBanks(&sWazaOshieVRAMConfig);
+static void MoveTutor_SetVRAMBanks(void) {
+    GFL_BGSysSetVRAMBanks(&sMoveTutorVRAMConfig);
 }
 
-static void WazaOshie_InitBG(void) {
-    GFL_BGSysCreate(HEAPID_WAZA_OSHIE);
-    BmpWin_InitAllocator(HEAPID_WAZA_OSHIE);
+static void MoveTutor_InitBG(void) {
+    GFL_BGSysCreate(HEAPID_MOVE_TUTOR);
+    BmpWin_InitAllocator(HEAPID_MOVE_TUTOR);
     {
         BGSysLCDConfig config = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_3D };
 
@@ -734,16 +734,16 @@ static void WazaOshie_InitBG(void) {
     GFL_BGSysSetBGEnabled(5, TRUE);
     GFL_BGSysSetBGEnabled(6, TRUE);
     GFL_BGSysSetBGEnabled(7, TRUE);
-    GFL_BGSysClearCharCore(2, 0x20, 0, HEAPID_WAZA_OSHIE);
-    GFL_BGSysClearCharCore(4, 0x20, 0, HEAPID_WAZA_OSHIE);
-    GFL_BGSysClearCharCore(5, 0x20, 0, HEAPID_WAZA_OSHIE);
-    GFL_BGSysClearCharCore(2, 0x20, 0, HEAPID_WAZA_OSHIE);
-    GFL_BGSysClearCharCore(4, 0x20, 0, HEAPID_WAZA_OSHIE);
+    GFL_BGSysClearCharCore(2, 0x20, 0, HEAPID_MOVE_TUTOR);
+    GFL_BGSysClearCharCore(4, 0x20, 0, HEAPID_MOVE_TUTOR);
+    GFL_BGSysClearCharCore(5, 0x20, 0, HEAPID_MOVE_TUTOR);
+    GFL_BGSysClearCharCore(2, 0x20, 0, HEAPID_MOVE_TUTOR);
+    GFL_BGSysClearCharCore(4, 0x20, 0, HEAPID_MOVE_TUTOR);
     G2_BlendNone();
     G2S_BlendNone();
 }
 
-static void WazaOshie_FreeBG(void) {
+static void MoveTutor_FreeBG(void) {
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ, FALSE);
     GFL_BGSysReleaseBG(5);
     GFL_BGSysReleaseBG(7);
@@ -755,38 +755,38 @@ static void WazaOshie_FreeBG(void) {
     GFL_BGSysFree();
 }
 
-static void WazaOshie_LoadBG(WazaOshieWork *work, ArcTool *arc) {
-    GFL_BGSysLoadArcNCGRStatic(arc, 1, 3, 0, 0, FALSE, HEAPID_WAZA_OSHIE);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, 4, 3, 0, 0x800, FALSE, HEAPID_WAZA_OSHIE);
-    GFL_G2DIOLoadArcNCLRDefault(arc, 0, 0, 0, 0, HEAPID_WAZA_OSHIE);
-    GFL_BGSysLoadArcNCGRStatic(arc, 1, 7, 0, 0, FALSE, HEAPID_WAZA_OSHIE);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, 2, 7, 0, 0x800, FALSE, HEAPID_WAZA_OSHIE);
-    GFL_G2DIOLoadArcNCLRDefault(arc, 0, 4, 0, 0, HEAPID_WAZA_OSHIE);
-    work->screenBuffer = GFL_G2DIOReadNSCRArc(arc, 3, FALSE, &work->screen, HEAPID_WAZA_OSHIE);
-    GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 4, 14 * 0x20, 0x20, HEAPID_WAZA_OSHIE);
-    GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 0, 15 * 0x20, 0x20, HEAPID_WAZA_OSHIE);
-    GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 4, 15 * 0x20, 0x20, HEAPID_WAZA_OSHIE);
-    LoadSysMsgBox(4, 1, 13, 0, HEAPID_WAZA_OSHIE);
+static void MoveTutor_LoadBG(MoveTutorWork *work, ArcTool *arc) {
+    GFL_BGSysLoadArcNCGRStatic(arc, 1, 3, 0, 0, FALSE, HEAPID_MOVE_TUTOR);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, 4, 3, 0, 0x800, FALSE, HEAPID_MOVE_TUTOR);
+    GFL_G2DIOLoadArcNCLRDefault(arc, 0, 0, 0, 0, HEAPID_MOVE_TUTOR);
+    GFL_BGSysLoadArcNCGRStatic(arc, 1, 7, 0, 0, FALSE, HEAPID_MOVE_TUTOR);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, 2, 7, 0, 0x800, FALSE, HEAPID_MOVE_TUTOR);
+    GFL_G2DIOLoadArcNCLRDefault(arc, 0, 4, 0, 0, HEAPID_MOVE_TUTOR);
+    work->screenBuffer = GFL_G2DIOReadNSCRArc(arc, 3, FALSE, &work->screen, HEAPID_MOVE_TUTOR);
+    GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 4, 14 * 0x20, 0x20, HEAPID_MOVE_TUTOR);
+    GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 0, 15 * 0x20, 0x20, HEAPID_MOVE_TUTOR);
+    GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 4, 15 * 0x20, 0x20, HEAPID_MOVE_TUTOR);
+    LoadSysMsgBox(4, 1, 13, 0, HEAPID_MOVE_TUTOR);
 }
 
-static void WazaOshie_FreeScreenBuffer(WazaOshieWork *work) {
+static void MoveTutor_FreeScreenBuffer(MoveTutorWork *work) {
     GFL_HeapFree(work->screenBuffer);
 }
 
-static void WazaOshie_InitWindows(WazaOshieWork *work) {
+static void MoveTutor_InitWindows(MoveTutorWork *work) {
     u32 i;
 
     for (i = 0; i < WINDOW_COUNT; i++) {
-        work->windows[i] = BmpWin_CreateDynamic(sWazaOshieWindows[i].bg, sWazaOshieWindows[i].x, sWazaOshieWindows[i].y,
-                                                sWazaOshieWindows[i].width, sWazaOshieWindows[i].height,
-                                                sWazaOshieWindows[i].palette, 1);
+        work->windows[i] = BmpWin_CreateDynamic(sMoveTutorMainWindows[i].bg, sMoveTutorMainWindows[i].x,
+                                                sMoveTutorMainWindows[i].y, sMoveTutorMainWindows[i].width,
+                                                sMoveTutorMainWindows[i].height, sMoveTutorMainWindows[i].palette, 1);
         GFL_BitmapFill(BmpWin_GetBitmap(work->windows[i]), 0);
     }
-    WazaOshie_ClearWindow(work->windows[WINDOW_TEACH]);
-    work->keyCursor = KeyCursor_Create(15, TRUE, TRUE, HEAPID_WAZA_OSHIE);
+    MoveTutor_ClearWindow(work->windows[WINDOW_TEACH]);
+    work->keyCursor = KeyCursor_Create(15, TRUE, TRUE, HEAPID_MOVE_TUTOR);
 }
 
-static void WazaOshie_FreeWindows(WazaOshieWork *work) {
+static void MoveTutor_FreeWindows(MoveTutorWork *work) {
     u32 i;
 
     KeyCursor_Free(work->keyCursor);
@@ -796,15 +796,15 @@ static void WazaOshie_FreeWindows(WazaOshieWork *work) {
     BmpWin_FreeAllocator();
 }
 
-static void WazaOshie_InitMsg(WazaOshieWork *work) {
-    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SHINKA_DEMO_BTL_MAIN, HEAPID_WAZA_OSHIE);
-    work->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_WAZA_OSHIE);
-    work->strbuf = GFL_StrBufCreate(0x100, HEAPID_WAZA_OSHIE);
+static void MoveTutor_InitMsg(MoveTutorWork *work) {
+    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SHINKA_DEMO_BTL_MAIN, HEAPID_MOVE_TUTOR);
+    work->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_MOVE_TUTOR);
+    work->strbuf = GFL_StrBufCreate(0x100, HEAPID_MOVE_TUTOR);
     work->ppLabel = GFL_MsgDataLoadStrbufNew(work->msgData, ShinkaDemoBtlMain_Text_Pp);
     work->ppFormat = GFL_MsgDataLoadStrbufNew(work->msgData, ShinkaDemoBtlMain_Text_Empty_12);
 }
 
-static void WazaOshie_FreeMsg(WazaOshieWork *work) {
+static void MoveTutor_FreeMsg(MoveTutorWork *work) {
     GFL_MsgDataFree(work->msgData);
     GFL_WordSetSystemFree(work->wordSet);
     GFL_StrBufFree(work->strbuf);
@@ -812,14 +812,14 @@ static void WazaOshie_FreeMsg(WazaOshieWork *work) {
     GFL_StrBufFree(work->ppFormat);
 }
 
-static u32 WazaOshie_SeqFadeWait(WazaOshieWork *work) {
+static u32 MoveTutor_SeqFadeWait(MoveTutorWork *work) {
     if (GFL_WipeIsFinished() == TRUE) {
         return work->nextSeq;
     }
     return SEQ_FADE_WAIT;
 }
 
-static u32 WazaOshie_SeqSelect(WazaOshieWork *work) {
+static u32 MoveTutor_SeqSelect(MoveTutorWork *work) {
     u32 pos;
 
     work->prevPos = CursorMove_GetPos(work->cursor);
@@ -832,7 +832,7 @@ static u32 WazaOshie_SeqSelect(WazaOshieWork *work) {
         if (!GFL_HIDIsTouchPressed()) {
             if (work->param->scroll + pos < work->moveCount) {
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
-                return WazaOshie_SeqMoveChosen(work);
+                return MoveTutor_SeqMoveChosen(work);
             }
         } else {
             if (work->param->scroll + pos < work->moveCount) {
@@ -843,28 +843,28 @@ static u32 WazaOshie_SeqSelect(WazaOshieWork *work) {
     case POS_RETURN:
     case POS_QUIT:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        if (WazaOshie_AreButtonsShown(work)) {
-            return WazaOshie_DecideQuit(work, SEQ_QUIT);
+        if (MoveTutor_AreButtonsShown(work)) {
+            return MoveTutor_DecideQuit(work, SEQ_QUIT);
         }
-        return WazaOshie_DecideActor(work, SEQ_QUIT);
+        return MoveTutor_DecideActor(work, SEQ_QUIT);
     case CURSOR_MOVE_CANCEL:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        WazaOshie_ShowButtons(work, FALSE);
-        return WazaOshie_DecideActor(work, SEQ_QUIT);
+        MoveTutor_ShowButtons(work, FALSE);
+        return MoveTutor_DecideActor(work, SEQ_QUIT);
     case POS_TEACH:
-        if (WazaOshie_AreButtonsShown(work)) {
+        if (MoveTutor_AreButtonsShown(work)) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-            return WazaOshie_DecideTeach(work, SEQ_MOVE_CHOSEN);
+            return MoveTutor_DecideTeach(work, SEQ_MOVE_CHOSEN);
         }
         break;
     case CURSOR_MOVE_EDGE_UP:
         if (work->param->scroll != 0) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             work->param->scroll--;
-            WazaOshie_DrawMoveInfo(work, WazaOshie_GetCursorMove(work));
-            WazaOshie_DrawList(work);
-            WazaOshie_UpdateArrowPositions(work);
-            WazaOshie_AnimateArrows(work, -1);
+            MoveTutor_DrawMoveInfo(work, MoveTutor_GetCursorMove(work));
+            MoveTutor_DrawList(work);
+            MoveTutor_UpdateArrowPositions(work);
+            MoveTutor_AnimateArrows(work, -1);
         }
         break;
     case CURSOR_MOVE_NONE:
@@ -875,7 +875,7 @@ static u32 WazaOshie_SeqSelect(WazaOshieWork *work) {
     return SEQ_SELECT;
 }
 
-static u32 WazaOshie_SeqMessage(WazaOshieWork *work) {
+static u32 MoveTutor_SeqMessage(MoveTutorWork *work) {
     u32 state = PrintStream_GetState(work->stream);
 
     KeyCursor_Update(work->keyCursor, work->stream, work->windows[WINDOW_MESSAGE]);
@@ -895,10 +895,10 @@ static u32 WazaOshie_SeqMessage(WazaOshieWork *work) {
     return SEQ_MESSAGE;
 }
 
-static u32 WazaOshie_SeqYesNoInit(WazaOshieWork *work) {
+static u32 MoveTutor_SeqYesNoInit(MoveTutorWork *work) {
     AppTaskMenuInit init;
 
-    init.heapId = HEAPID_WAZA_OSHIE;
+    init.heapId = HEAPID_MOVE_TUTOR;
     init.itemCount = 2;
     init.items = work->yesNoItems;
     init.posType = APP_TASKMENU_POS_TOP_LEFT;
@@ -907,20 +907,20 @@ static u32 WazaOshie_SeqYesNoInit(WazaOshieWork *work) {
     init.width = 10;
     init.height = 3;
     work->menu = AppTaskMenu_Create(&init, work->menuRes);
-    WazaOshie_SetDimmed(TRUE);
+    MoveTutor_SetDimmed(TRUE);
     return SEQ_YES_NO;
 }
 
-static u32 WazaOshie_SeqYesNo(WazaOshieWork *work) {
+static u32 MoveTutor_SeqYesNo(MoveTutorWork *work) {
     u32 seq = SEQ_YES_NO;
 
     if (AppTaskMenu_IsFlashFinished(work->menu)) {
         if (AppTaskMenu_GetCursorPos(work->menu) == 0) {
-            seq = sWazaOshieYesNoFuncs[work->yesNo].yes(work);
+            seq = sMoveTutorYesNoFuncs[work->yesNo].yes(work);
         } else {
-            seq = sWazaOshieYesNoFuncs[work->yesNo].no(work);
+            seq = sMoveTutorYesNoFuncs[work->yesNo].no(work);
         }
-        WazaOshie_SetDimmed(FALSE);
+        MoveTutor_SetDimmed(FALSE);
     }
     AppTaskMenu_Update(work->menu);
     if (seq != SEQ_YES_NO) {
@@ -929,52 +929,52 @@ static u32 WazaOshie_SeqYesNo(WazaOshieWork *work) {
     return seq;
 }
 
-static u32 WazaOshie_SeqSetMove(WazaOshieWork *work) {
-    PokeParty_SetParam(work->param->pkm, PKM_PARAM_MOVE1 + work->param->slot, WazaOshie_GetCursorMove(work));
+static u32 MoveTutor_SeqSetMove(MoveTutorWork *work) {
+    PokeParty_SetParam(work->param->pkm, PKM_PARAM_MOVE1 + work->param->slot, MoveTutor_GetCursorMove(work));
     PokeParty_SetParam(work->param->pkm, PKM_PARAM_MOVE1_PP_UP + work->param->slot, 0);
     PokeParty_SetParam(work->param->pkm, PKM_PARAM_MOVE1_PP + work->param->slot,
-                       PML_MoveGetMaxPP(WazaOshie_GetCursorMove(work), 0));
+                       PML_MoveGetMaxPP(MoveTutor_GetCursorMove(work), 0));
     work->param->status = MOVE_REMINDER_STATUS_LEARNED;
     return SEQ_FADE_OUT;
 }
 
-static u32 WazaOshie_SeqForgot(WazaOshieWork *work) {
-    WazaOshie_PrintMessage(work, MSG_FORGOT);
+static u32 MoveTutor_SeqForgot(MoveTutorWork *work) {
+    MoveTutor_PrintMessage(work, MSG_FORGOT);
     work->nextSeq = SEQ_SET_MOVE;
     return SEQ_MESSAGE;
 }
 
-static u32 WazaOshie_SeqStatusResult(WazaOshieWork *work) {
+static u32 MoveTutor_SeqStatusResult(MoveTutorWork *work) {
     if (work->param->slot < 4) {
-        WazaOshie_PrintMessage(work, MSG_FORGET_CONFIRM);
+        MoveTutor_PrintMessage(work, MSG_FORGET_CONFIRM);
         work->yesNo = YES_NO_FORGET;
     } else {
-        WazaOshie_PrintMessage(work, MSG_GIVE_UP);
+        MoveTutor_PrintMessage(work, MSG_GIVE_UP);
         work->yesNo = YES_NO_GIVE_UP;
     }
     work->nextSeq = SEQ_YES_NO_INIT;
     return SEQ_MESSAGE;
 }
 
-static u32 WazaOshie_SeqFadeOut(WazaOshieWork *work) {
-    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 6, 1, HEAPID_WAZA_OSHIE);
+static u32 MoveTutor_SeqFadeOut(MoveTutorWork *work) {
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 6, 1, HEAPID_MOVE_TUTOR);
     work->nextSeq = SEQ_END;
     return SEQ_FADE_WAIT;
 }
 
-static void WazaOshie_DrawCursorMoveInfo(WazaOshieWork *work) {
-    u32 move = WazaOshie_GetCursorMove(work);
+static void MoveTutor_DrawCursorMoveInfo(MoveTutorWork *work) {
+    u32 move = MoveTutor_GetCursorMove(work);
 
     if (move != MOVE_END) {
-        WazaOshie_DrawMoveInfo(work, move);
+        MoveTutor_DrawMoveInfo(work, move);
     } else {
-        WazaOshie_DrawMoveInfo(work, NO_MOVE);
+        MoveTutor_DrawMoveInfo(work, NO_MOVE);
     }
-    WazaOshie_UpdateListTypes(work);
+    MoveTutor_UpdateListTypes(work);
 }
 
 // Draws the work's string buffer into a window
-static void WazaOshie_PrintText(WazaOshieWork *work, u32 window, Font *font, u16 color, u32 align, u8 y) {
+static void MoveTutor_PrintText(MoveTutorWork *work, u32 window, Font *font, u16 color, u32 align, u8 y) {
     u8 x;
     u8 width;
     u8 windowWidth;
@@ -998,7 +998,7 @@ static void WazaOshie_PrintText(WazaOshieWork *work, u32 window, Font *font, u16
 }
 
 // Formats a message with a number into the work's string buffer
-static void WazaOshie_FormatNumber(WazaOshieWork *work, u32 msg, u32 number, u32 digits, u8 pad) {
+static void MoveTutor_FormatNumber(MoveTutorWork *work, u32 msg, u32 number, u32 digits, u8 pad) {
     StrBuf *str = GFL_MsgDataLoadStrbufNew(work->msgData, msg);
 
     WordSetNumber(work->wordSet, 0, number, digits, pad, TRUE);
@@ -1007,7 +1007,7 @@ static void WazaOshie_FormatNumber(WazaOshieWork *work, u32 msg, u32 number, u32
 }
 
 // Draws the labels, and on the top screen the Pokémon's name, level and moves
-static void WazaOshie_DrawText(WazaOshieWork *work) {
+static void MoveTutor_DrawText(MoveTutorWork *work) {
     StrBuf *str;
     MsgData *moveNames;
     BoxPkm *boxPkm;
@@ -1015,22 +1015,22 @@ static void WazaOshie_DrawText(WazaOshieWork *work) {
     u16 move;
 
     GFL_MsgDataLoadStrbuf(work->msgData, ShinkaDemoBtlMain_Text_Teach, work->strbuf);
-    WazaOshie_PrintText(work, WINDOW_TEACH, work->font, PRINT_COLOR(15, 2, 0), ALIGN_CENTER, 4);
+    MoveTutor_PrintText(work, WINDOW_TEACH, work->font, PRINT_COLOR(15, 2, 0), ALIGN_CENTER, 4);
     GFL_MsgDataLoadStrbuf(work->msgData, ShinkaDemoBtlMain_Text_Power, work->strbuf);
-    WazaOshie_PrintText(work, WINDOW_POWER_LABEL, work->font, PRINT_COLOR(1, 2, 0), ALIGN_LEFT, 0);
+    MoveTutor_PrintText(work, WINDOW_POWER_LABEL, work->font, PRINT_COLOR(1, 2, 0), ALIGN_LEFT, 0);
     BmpWin_Transfer(work->windows[WINDOW_POWER_LABEL]);
     GFL_MsgDataLoadStrbuf(work->msgData, ShinkaDemoBtlMain_Text_Accuracy, work->strbuf);
-    WazaOshie_PrintText(work, WINDOW_ACCURACY_LABEL, work->font, PRINT_COLOR(1, 2, 0), ALIGN_LEFT, 0);
+    MoveTutor_PrintText(work, WINDOW_ACCURACY_LABEL, work->font, PRINT_COLOR(1, 2, 0), ALIGN_LEFT, 0);
     BmpWin_Transfer(work->windows[WINDOW_ACCURACY_LABEL]);
 
-    str = GFL_StrBufCreate(0x100, HEAPID_WAZA_OSHIE);
+    str = GFL_StrBufCreate(0x100, HEAPID_MOVE_TUTOR);
     GFL_MsgDataLoadStrbuf(work->msgData, ShinkaDemoBtlMain_Text_LearnedMoves, str);
     loadPokemonNicknameToStrbuf(work->wordSet, 0, work->param->pkm);
     GFL_WordSetFormatStrbuf(work->wordSet, work->strbuf, str);
-    WazaOshie_PrintText(work, WINDOW_TITLE, work->font, PRINT_COLOR(15, 2, 0), ALIGN_LEFT, 4);
+    MoveTutor_PrintText(work, WINDOW_TITLE, work->font, PRINT_COLOR(15, 2, 0), ALIGN_LEFT, 4);
     BmpWin_Transfer(work->windows[WINDOW_TITLE]);
 
-    moveNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_MOVE_NAMES, HEAPID_WAZA_OSHIE);
+    moveNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_MOVE_NAMES, HEAPID_MOVE_TUTOR);
     boxPkm = PokeParty_ToBoxPkm(work->param->pkm);
     for (i = 0; i < 4; i++) {
         move = PML_PkmGetParam(boxPkm, PKM_PARAM_MOVE1 + i, NULL);
@@ -1038,9 +1038,9 @@ static void WazaOshie_DrawText(WazaOshieWork *work) {
             ClActor_SetVisible(work->actors[ACTOR_KNOWN_TYPE + i], FALSE);
         } else {
             ClActor_SetVisible(work->actors[ACTOR_KNOWN_TYPE + i], TRUE);
-            WazaOshie_SetKnownMoveType(work, move, i);
+            MoveTutor_SetKnownMoveType(work, move, i);
             GFL_MsgDataLoadStrbuf(moveNames, move, work->strbuf);
-            WazaOshie_PrintText(work, WINDOW_KNOWN_MOVES, work->font, PRINT_COLOR(15, 2, 0), ALIGN_LEFT, i * 32);
+            MoveTutor_PrintText(work, WINDOW_KNOWN_MOVES, work->font, PRINT_COLOR(15, 2, 0), ALIGN_LEFT, i * 32);
             GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(work->windows[WINDOW_KNOWN_MOVES]), 8, i * 32 + 16,
                                            work->ppLabel, work->font, PRINT_COLOR(1, 2, 0));
             BmpWin_Transfer(work->windows[WINDOW_KNOWN_MOVES]);
@@ -1063,14 +1063,14 @@ static void WazaOshie_DrawText(WazaOshieWork *work) {
     GFL_MsgDataLoadStrbuf(work->msgData, ShinkaDemoBtlMain_Text_Lv, str);
     WordSetNumber(work->wordSet, 0, PML_PkmGetParam(boxPkm, PKM_PARAM_LEVEL, NULL), 3, 1, TRUE);
     GFL_WordSetFormatStrbuf(work->wordSet, work->strbuf, str);
-    WazaOshie_PrintText(work, WINDOW_POKEMON, work->font, PRINT_COLOR(1, 2, 0), ALIGN_RIGHT, 16);
+    MoveTutor_PrintText(work, WINDOW_POKEMON, work->font, PRINT_COLOR(1, 2, 0), ALIGN_RIGHT, 16);
     BmpWin_Transfer(work->windows[WINDOW_POKEMON]);
 
     GFL_MsgDataFree(moveNames);
     GFL_StrBufFree(str);
 }
 
-static u32 WazaOshie_CountMoves(WazaOshieWork *work) {
+static u32 MoveTutor_CountMoves(MoveTutorWork *work) {
     u32 i;
 
     for (i = 0; i < 256; i++) {
@@ -1081,7 +1081,7 @@ static u32 WazaOshie_CountMoves(WazaOshieWork *work) {
     return i;
 }
 
-static void WazaOshie_DrawListRow(WazaOshieWork *work, u8 scroll, u8 row) {
+static void MoveTutor_DrawListRow(MoveTutorWork *work, u8 scroll, u8 row) {
     int y = row * 24;
     int index = scroll + row;
     u32 pp;
@@ -1104,47 +1104,47 @@ static void WazaOshie_DrawListRow(WazaOshieWork *work, u8 scroll, u8 row) {
     BmpWin_Transfer(work->windows[WINDOW_LIST]);
 }
 
-static void WazaOshie_DrawList(WazaOshieWork *work) {
+static void MoveTutor_DrawList(MoveTutorWork *work) {
     u32 i;
 
     GFL_BitmapFill(BmpWin_GetBitmap(work->windows[WINDOW_LIST]), 0);
     for (i = 0; i < LIST_ROWS; i++) {
-        WazaOshie_DrawListRow(work, work->param->scroll, i);
+        MoveTutor_DrawListRow(work, work->param->scroll, i);
     }
     BmpWin_Transfer(work->windows[WINDOW_LIST]);
     GFL_BGSysQueueScrLoad(7);
-    WazaOshie_UpdateListTypes(work);
+    MoveTutor_UpdateListTypes(work);
 }
 
-static void WazaOshie_InitList(WazaOshieWork *work) {
+static void MoveTutor_InitList(MoveTutorWork *work) {
     MsgData *moveNames;
     u32 i;
 
-    work->moveCount = WazaOshie_CountMoves(work);
-    work->moveList = ListMenuCore_CreateOptionList(work->moveCount, HEAPID_WAZA_OSHIE);
-    moveNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_MOVE_NAMES, HEAPID_WAZA_OSHIE);
+    work->moveCount = MoveTutor_CountMoves(work);
+    work->moveList = ListMenuCore_CreateOptionList(work->moveCount, HEAPID_MOVE_TUTOR);
+    moveNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_MOVE_NAMES, HEAPID_MOVE_TUTOR);
     for (i = 0; i < work->moveCount; i++) {
         if (work->param->moves[i] != MOVE_END) {
             ListMenuCore_AppendMsgOption(work->moveList, moveNames, work->param->moves[i], work->param->moves[i],
-                                         HEAPID_WAZA_OSHIE);
+                                         HEAPID_MOVE_TUTOR);
         } else {
             ListMenuCore_AppendMsgOption(work->moveList, work->msgData, ShinkaDemoBtlMain_Text_Empty_13, -2,
-                                         HEAPID_WAZA_OSHIE);
+                                         HEAPID_MOVE_TUTOR);
             break;
         }
     }
     GFL_MsgDataFree(moveNames);
     work->unk1BB = 0;
     work->unk1BC = work->param->cursorPos;
-    WazaOshie_DrawList(work);
+    MoveTutor_DrawList(work);
 }
 
-static void WazaOshie_FreeList(WazaOshieWork *work) {
+static void MoveTutor_FreeList(MoveTutorWork *work) {
     ListMenuCore_FreeOptionList(work->moveList);
 }
 
 // Draws a move's power, accuracy, description and category, or clears them for NO_MOVE
-static void WazaOshie_DrawMoveInfo(WazaOshieWork *work, u32 move) {
+static void MoveTutor_DrawMoveInfo(MoveTutorWork *work, u32 move) {
     u32 power;
     u32 accuracy;
     MsgData *descriptions;
@@ -1158,27 +1158,27 @@ static void WazaOshie_DrawMoveInfo(WazaOshieWork *work, u32 move) {
         if (power <= 1) {
             GFL_MsgDataLoadStrbuf(work->msgData, ShinkaDemoBtlMain_Text_Empty_14, work->strbuf);
         } else {
-            WazaOshie_FormatNumber(work, ShinkaDemoBtlMain_Text_Empty_10, power, 3, 0);
+            MoveTutor_FormatNumber(work, ShinkaDemoBtlMain_Text_Empty_10, power, 3, 0);
         }
-        WazaOshie_PrintText(work, WINDOW_POWER, work->font, PRINT_COLOR(1, 2, 0), ALIGN_RIGHT, 0);
+        MoveTutor_PrintText(work, WINDOW_POWER, work->font, PRINT_COLOR(1, 2, 0), ALIGN_RIGHT, 0);
         accuracy = PML_MoveGetParam(move, MOVE_PARAM_ACCURACY);
         if (accuracy == 0 || PML_MoveIsAlwaysHit(move)) {
             GFL_MsgDataLoadStrbuf(work->msgData, ShinkaDemoBtlMain_Text_Empty_14, work->strbuf);
         } else {
-            WazaOshie_FormatNumber(work, ShinkaDemoBtlMain_Text_Empty_11, accuracy, 3, 0);
+            MoveTutor_FormatNumber(work, ShinkaDemoBtlMain_Text_Empty_11, accuracy, 3, 0);
         }
-        WazaOshie_PrintText(work, WINDOW_ACCURACY, work->font, PRINT_COLOR(1, 2, 0), ALIGN_RIGHT, 0);
-        descriptions = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_13, HEAPID_WAZA_OSHIE);
+        MoveTutor_PrintText(work, WINDOW_ACCURACY, work->font, PRINT_COLOR(1, 2, 0), ALIGN_RIGHT, 0);
+        descriptions = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_13, HEAPID_MOVE_TUTOR);
         GFL_MsgDataLoadStrbuf(descriptions, move, work->strbuf);
-        WazaOshie_PrintText(work, WINDOW_DESCRIPTION, work->font, PRINT_COLOR(1, 2, 0), ALIGN_LEFT, 0);
+        MoveTutor_PrintText(work, WINDOW_DESCRIPTION, work->font, PRINT_COLOR(1, 2, 0), ALIGN_LEFT, 0);
         GFL_MsgDataFree(descriptions);
-        WazaOshie_SetCategory(work, move);
+        MoveTutor_SetCategory(work, move);
         ClActor_SetVisible(work->actors[ACTOR_CATEGORY], TRUE);
         BmpWin_Transfer(work->windows[WINDOW_POWER_LABEL]);
         BmpWin_Transfer(work->windows[WINDOW_ACCURACY_LABEL]);
     } else {
-        WazaOshie_ClearWindow(work->windows[WINDOW_POWER_LABEL]);
-        WazaOshie_ClearWindow(work->windows[WINDOW_ACCURACY_LABEL]);
+        MoveTutor_ClearWindow(work->windows[WINDOW_POWER_LABEL]);
+        MoveTutor_ClearWindow(work->windows[WINDOW_ACCURACY_LABEL]);
     }
     BmpWin_Transfer(work->windows[WINDOW_DESCRIPTION]);
     BmpWin_Transfer(work->windows[WINDOW_POWER]);
@@ -1186,7 +1186,7 @@ static void WazaOshie_DrawMoveInfo(WazaOshieWork *work, u32 move) {
 }
 
 // Formats one of the mode's messages into the work's string buffer
-static void WazaOshie_FormatMessage(WazaOshieWork *work, u32 msg) {
+static void MoveTutor_FormatMessage(MoveTutorWork *work, u32 msg) {
     StrBuf *str;
 
     switch (msg) {
@@ -1194,71 +1194,71 @@ static void WazaOshie_FormatMessage(WazaOshieWork *work, u32 msg) {
         loadPokemonNicknameToStrbuf(work->wordSet, 0, work->param->pkm);
         break;
     case MSG_LEARN:
-        loadMoveNameToStrbuf(work->wordSet, 1, WazaOshie_GetCursorMove(work));
+        loadMoveNameToStrbuf(work->wordSet, 1, MoveTutor_GetCursorMove(work));
         break;
     case MSG_QUIT:
         loadPokemonNicknameToStrbuf(work->wordSet, 0, work->param->pkm);
         break;
     case MSG_LEARNED:
         loadPokemonNicknameToStrbuf(work->wordSet, 0, work->param->pkm);
-        loadMoveNameToStrbuf(work->wordSet, 1, WazaOshie_GetCursorMove(work));
+        loadMoveNameToStrbuf(work->wordSet, 1, MoveTutor_GetCursorMove(work));
         break;
     case MSG_REPLACE:
         loadPokemonNicknameToStrbuf(work->wordSet, 0, work->param->pkm);
-        loadMoveNameToStrbuf(work->wordSet, 1, WazaOshie_GetCursorMove(work));
+        loadMoveNameToStrbuf(work->wordSet, 1, MoveTutor_GetCursorMove(work));
         break;
     case MSG_FORGET:
         loadPokemonNicknameToStrbuf(work->wordSet, 0, work->param->pkm);
-        loadMoveNameToStrbuf(work->wordSet, 1, WazaOshie_GetReplacedMove(work));
+        loadMoveNameToStrbuf(work->wordSet, 1, MoveTutor_GetReplacedMove(work));
         break;
     case MSG_FORGOT:
         loadPokemonNicknameToStrbuf(work->wordSet, 0, work->param->pkm);
-        loadMoveNameToStrbuf(work->wordSet, 1, WazaOshie_GetCursorMove(work));
+        loadMoveNameToStrbuf(work->wordSet, 1, MoveTutor_GetCursorMove(work));
         break;
     case MSG_GIVE_UP:
-        loadMoveNameToStrbuf(work->wordSet, 1, WazaOshie_GetCursorMove(work));
+        loadMoveNameToStrbuf(work->wordSet, 1, MoveTutor_GetCursorMove(work));
         break;
     case MSG_NOT_LEARNED:
         loadPokemonNicknameToStrbuf(work->wordSet, 0, work->param->pkm);
-        loadMoveNameToStrbuf(work->wordSet, 1, WazaOshie_GetCursorMove(work));
+        loadMoveNameToStrbuf(work->wordSet, 1, MoveTutor_GetCursorMove(work));
         break;
     case MSG_PAID:
         copyVarForText(work->wordSet, 2, work->param->playerInfo);
         break;
     case MSG_FORGET_CONFIRM:
-        loadMoveNameToStrbuf(work->wordSet, 0, WazaOshie_GetReplacedMove(work));
+        loadMoveNameToStrbuf(work->wordSet, 0, MoveTutor_GetReplacedMove(work));
         break;
     }
-    str = GFL_MsgDataLoadStrbufNew(work->msgData, sWazaOshieMessages[work->param->mode][msg]);
+    str = GFL_MsgDataLoadStrbufNew(work->msgData, sMoveTutorMessages[work->param->mode][msg]);
     GFL_WordSetFormatStrbuf(work->wordSet, work->strbuf, str);
     GFL_StrBufFree(str);
 }
 
-static u16 WazaOshie_GetCursorMove(WazaOshieWork *work) {
+static u16 MoveTutor_GetCursorMove(MoveTutorWork *work) {
     return work->param->moves[work->param->scroll + work->param->cursorPos];
 }
 
-static u16 WazaOshie_GetReplacedMove(WazaOshieWork *work) {
+static u16 MoveTutor_GetReplacedMove(MoveTutorWork *work) {
     return PokeParty_GetParam(work->param->pkm, PKM_PARAM_MOVE1 + work->param->slot, NULL);
 }
 
-static void WazaOshie_PrintMessage(WazaOshieWork *work, u32 msg) {
+static void MoveTutor_PrintMessage(MoveTutorWork *work, u32 msg) {
     GFL_BitmapFill(BmpWin_GetBitmap(work->windows[WINDOW_MESSAGE]), 15);
     BmpWin_DrawFrame(work->windows[WINDOW_MESSAGE], 0, 1, 13);
-    WazaOshie_FormatMessage(work, msg);
+    MoveTutor_FormatMessage(work, msg);
     work->stream = PrintStream_CreateWithCallback(work->windows[WINDOW_MESSAGE], 0, 0, work->strbuf, work->font,
-                                                  TextSpeed_GetCurrentWait(), work->tcbManager, 0, HEAPID_WAZA_OSHIE,
-                                                  0xffff, WazaOshie_StreamCallback);
+                                                  TextSpeed_GetCurrentWait(), work->tcbManager, 0, HEAPID_MOVE_TUTOR,
+                                                  0xffff, MoveTutor_StreamCallback);
     BmpWin_TransferNow(work->windows[WINDOW_MESSAGE]);
 }
 
-static void WazaOshie_ClearMessage(WazaOshieWork *work) {
+static void MoveTutor_ClearMessage(MoveTutorWork *work) {
     BmpWin_ClearFrame(work->windows[WINDOW_MESSAGE], 2);
-    WazaOshie_ClearWindow(work->windows[WINDOW_MESSAGE]);
+    MoveTutor_ClearWindow(work->windows[WINDOW_MESSAGE]);
 }
 
 // The messages' events: wait for the sounds, play the forgetting sound, and play the fanfare and wait for it
-static BOOL WazaOshie_StreamCallback(u32 event) {
+static BOOL MoveTutor_StreamCallback(u32 event) {
     switch (event) {
     case 1:
         return GFL_SndPlayerIsActiveAny();
@@ -1283,7 +1283,7 @@ static BOOL WazaOshie_StreamCallback(u32 event) {
     return FALSE;
 }
 
-static u8 WazaOshie_CountKnownMoves(WazaOshieWork *work) {
+static u8 MoveTutor_CountKnownMoves(MoveTutorWork *work) {
     u8 i;
 
     for (i = 0; i < 4; i++) {
@@ -1294,74 +1294,74 @@ static u8 WazaOshie_CountKnownMoves(WazaOshieWork *work) {
     return i;
 }
 
-static u32 WazaOshie_LearnYes(WazaOshieWork *work) {
-    WazaOshie_PrintMessage(work, MSG_LEARNED);
-    work->param->slot = WazaOshie_CountKnownMoves(work);
+static u32 MoveTutor_LearnYes(MoveTutorWork *work) {
+    MoveTutor_PrintMessage(work, MSG_LEARNED);
+    work->param->slot = MoveTutor_CountKnownMoves(work);
     work->nextSeq = SEQ_SET_MOVE;
     return SEQ_MESSAGE;
 }
 
-static u32 WazaOshie_LearnNo(WazaOshieWork *work) {
-    WazaOshie_ClearMessage(work);
+static u32 MoveTutor_LearnNo(MoveTutorWork *work) {
+    MoveTutor_ClearMessage(work);
     return SEQ_SELECT;
 }
 
-static u32 WazaOshie_QuitYes(WazaOshieWork *work) {
+static u32 MoveTutor_QuitYes(MoveTutorWork *work) {
     work->param->status = MOVE_REMINDER_STATUS_CANCELLED;
     return SEQ_FADE_OUT;
 }
 
-static u32 WazaOshie_QuitNo(WazaOshieWork *work) {
-    WazaOshie_ClearMessage(work);
+static u32 MoveTutor_QuitNo(MoveTutorWork *work) {
+    MoveTutor_ClearMessage(work);
     return SEQ_SELECT;
 }
 
-static u32 WazaOshie_ReplaceYes(WazaOshieWork *work) {
+static u32 MoveTutor_ReplaceYes(MoveTutorWork *work) {
     work->nextSeq = SEQ_STATUS_FADE_OUT;
     return SEQ_FADE_WAIT;
 }
 
-static u32 WazaOshie_ReplaceNo(WazaOshieWork *work) {
-    WazaOshie_PrintMessage(work, MSG_GIVE_UP);
+static u32 MoveTutor_ReplaceNo(MoveTutorWork *work) {
+    MoveTutor_PrintMessage(work, MSG_GIVE_UP);
     work->yesNo = YES_NO_GIVE_UP;
     work->nextSeq = SEQ_YES_NO_INIT;
     return SEQ_MESSAGE;
 }
 
-static u32 WazaOshie_GiveUpYes(WazaOshieWork *work) {
-    WazaOshie_PrintMessage(work, MSG_NOT_LEARNED);
+static u32 MoveTutor_GiveUpYes(MoveTutorWork *work) {
+    MoveTutor_PrintMessage(work, MSG_NOT_LEARNED);
     work->nextSeq = SEQ_FADE_OUT;
     work->param->status = MOVE_REMINDER_STATUS_CANCELLED;
     return SEQ_MESSAGE;
 }
 
-static u32 WazaOshie_GiveUpNo(WazaOshieWork *work) {
-    WazaOshie_PrintMessage(work, MSG_REPLACE);
+static u32 MoveTutor_GiveUpNo(MoveTutorWork *work) {
+    MoveTutor_PrintMessage(work, MSG_REPLACE);
     work->yesNo = YES_NO_REPLACE;
     work->nextSeq = SEQ_YES_NO_INIT;
     return SEQ_MESSAGE;
 }
 
-static u32 WazaOshie_ForgetYes(WazaOshieWork *work) {
-    WazaOshie_PrintMessage(work, MSG_FORGET);
+static u32 MoveTutor_ForgetYes(MoveTutorWork *work) {
+    MoveTutor_PrintMessage(work, MSG_FORGET);
     work->nextSeq = SEQ_FORGOT;
     return SEQ_MESSAGE;
 }
 
-static u32 WazaOshie_ForgetNo(WazaOshieWork *work) {
+static u32 MoveTutor_ForgetNo(MoveTutorWork *work) {
     work->nextSeq = SEQ_STATUS_FADE_OUT;
     return SEQ_FADE_WAIT;
 }
 
-static void WazaOshie_InitActorSys(WazaOshieWork *work) {
-    ClActSys_Create(&sWazaOshieActorSysSetup, &sWazaOshieVRAMConfig, HEAPID_WAZA_OSHIE);
-    work->unit = ClActUnit_Create(ACTOR_COUNT, 0, HEAPID_WAZA_OSHIE);
+static void MoveTutor_InitActorSys(MoveTutorWork *work) {
+    ClActSys_Create(&sMoveTutorActorSysSetup, &sMoveTutorVRAMConfig, HEAPID_MOVE_TUTOR);
+    work->unit = ClActUnit_Create(ACTOR_COUNT, 0, HEAPID_MOVE_TUTOR);
     ClActUnit_UseSystemRenderer(work->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
-static void WazaOshie_FreeActors(WazaOshieWork *work) {
+static void MoveTutor_FreeActors(MoveTutorWork *work) {
     u32 i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
@@ -1372,53 +1372,53 @@ static void WazaOshie_FreeActors(WazaOshieWork *work) {
     GFL_ArcToolFree(work->commonArc);
 }
 
-static void WazaOshie_LoadActorResources(WazaOshieWork *work, ArcTool *arc) {
+static void MoveTutor_LoadActorResources(MoveTutorWork *work, ArcTool *arc) {
     ArcTool *commonArc;
     ArcTool *pokeArc;
     BoxPkm *boxPkm;
     BOOL wasEncrypted;
     u32 i;
 
-    commonArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_WAZA_OSHIE);
+    commonArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_MOVE_TUTOR);
     work->chars[0] =
-        ClActSys_LoadChars(commonArc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_SUB, HEAPID_WAZA_OSHIE);
-    work->chars[1] = ClActSys_LoadChars(arc, 17, FALSE, CLACT_VRAM_SUB, HEAPID_WAZA_OSHIE);
-    work->chars[2] = ClActSys_LoadChars(arc, 26, FALSE, CLACT_VRAM_SUB, HEAPID_WAZA_OSHIE);
+        ClActSys_LoadChars(commonArc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_SUB, HEAPID_MOVE_TUTOR);
+    work->chars[1] = ClActSys_LoadChars(arc, 17, FALSE, CLACT_VRAM_SUB, HEAPID_MOVE_TUTOR);
+    work->chars[2] = ClActSys_LoadChars(arc, 26, FALSE, CLACT_VRAM_SUB, HEAPID_MOVE_TUTOR);
     for (i = 4; i < 8; i++) {
         work->chars[i] = ClActSys_LoadChars(commonArc, AppMenuCommon_GetTypeIconCharFile(0), FALSE, CLACT_VRAM_MAIN,
-                                            HEAPID_WAZA_OSHIE);
+                                            HEAPID_MOVE_TUTOR);
     }
-    work->chars[3] = ClActSys_LoadChars(arc, 23, FALSE, CLACT_VRAM_SUB, HEAPID_WAZA_OSHIE);
+    work->chars[3] = ClActSys_LoadChars(arc, 23, FALSE, CLACT_VRAM_SUB, HEAPID_MOVE_TUTOR);
     work->palettes[0] = ClActSys_LoadPlttRange(commonArc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_SUB, 0, 0,
-                                               4, HEAPID_WAZA_OSHIE);
-    work->palettes[1] = ClActSys_LoadPlttRange(arc, 5, CLACT_VRAM_SUB, 4 * 0x20, 0, 1, HEAPID_WAZA_OSHIE);
+                                               4, HEAPID_MOVE_TUTOR);
+    work->palettes[1] = ClActSys_LoadPlttRange(arc, 5, CLACT_VRAM_SUB, 4 * 0x20, 0, 1, HEAPID_MOVE_TUTOR);
     work->palettes[2] = ClActSys_LoadPlttRange(commonArc, AppMenuCommon_GetTypeIconPaletteFile(), CLACT_VRAM_SUB,
-                                               6 * 0x20, 0, 3, HEAPID_WAZA_OSHIE);
+                                               6 * 0x20, 0, 3, HEAPID_MOVE_TUTOR);
     work->palettes[3] =
-        ClActSys_LoadPltt(commonArc, AppMenuCommon_GetTypeIconPaletteFile(), CLACT_VRAM_MAIN, 0, HEAPID_WAZA_OSHIE);
+        ClActSys_LoadPltt(commonArc, AppMenuCommon_GetTypeIconPaletteFile(), CLACT_VRAM_MAIN, 0, HEAPID_MOVE_TUTOR);
     work->cellAnims[0] = ClActSys_LoadCellAnims(commonArc, AppMenuCommon_GetTouchBarCellFile(1),
-                                                AppMenuCommon_GetTouchBarAnimFile(1), HEAPID_WAZA_OSHIE);
-    work->cellAnims[1] = ClActSys_LoadCellAnims(arc, 7, 8, HEAPID_WAZA_OSHIE);
+                                                AppMenuCommon_GetTouchBarAnimFile(1), HEAPID_MOVE_TUTOR);
+    work->cellAnims[1] = ClActSys_LoadCellAnims(arc, 7, 8, HEAPID_MOVE_TUTOR);
     work->cellAnims[2] = ClActSys_LoadCellAnims(commonArc, AppMenuCommon_GetTypeIconCellFile(1),
-                                                AppMenuCommon_GetTypeIconAnimFile(1), HEAPID_WAZA_OSHIE);
-    work->cellAnims[3] = ClActSys_LoadCellAnims(arc, 24, 25, HEAPID_WAZA_OSHIE);
-    work->cellAnims[4] = ClActSys_LoadCellAnims(arc, 27, 28, HEAPID_WAZA_OSHIE);
+                                                AppMenuCommon_GetTypeIconAnimFile(1), HEAPID_MOVE_TUTOR);
+    work->cellAnims[3] = ClActSys_LoadCellAnims(arc, 24, 25, HEAPID_MOVE_TUTOR);
+    work->cellAnims[4] = ClActSys_LoadCellAnims(arc, 27, 28, HEAPID_MOVE_TUTOR);
     GFL_ArcToolFree(commonArc);
 
-    pokeArc = MakePokeGraArcHandle(HEAPID_WAZA_OSHIE);
+    pokeArc = MakePokeGraArcHandle(HEAPID_MOVE_TUTOR);
     boxPkm = PokeParty_GetBoxPkm(work->param->pkm);
     wasEncrypted = PML_PkmDecrypt(boxPkm);
     work->chars[8] =
-        PokeGra_LoadClActCharsByBoxData(pokeArc, boxPkm, POKEGRA_DIR_FRONT, CLACT_VRAM_MAIN, HEAPID_WAZA_OSHIE);
+        PokeGra_LoadClActCharsByBoxData(pokeArc, boxPkm, POKEGRA_DIR_FRONT, CLACT_VRAM_MAIN, HEAPID_MOVE_TUTOR);
     work->palettes[4] = PokeGra_LoadClActPaletteByBoxData(pokeArc, boxPkm, POKEGRA_DIR_FRONT, CLACT_VRAM_MAIN, 4 * 0x20,
-                                                          HEAPID_WAZA_OSHIE);
+                                                          HEAPID_MOVE_TUTOR);
     work->cellAnims[5] =
-        PokeGra_LoadClActCellAnimsByBoxData(boxPkm, POKEGRA_DIR_FRONT, 1, CLACT_VRAM_MAIN, HEAPID_WAZA_OSHIE);
+        PokeGra_LoadClActCellAnimsByBoxData(boxPkm, POKEGRA_DIR_FRONT, 1, CLACT_VRAM_MAIN, HEAPID_MOVE_TUTOR);
     PML_PkmReEncrypt(boxPkm, wasEncrypted);
     GFL_ArcToolFree(pokeArc);
 }
 
-static void WazaOshie_ReplaceChars(ArcTool *arc, u32 chars, u32 fileId, BOOL compressed, HeapID heapId) {
+static void MoveTutor_ReplaceChars(ArcTool *arc, u32 chars, u32 fileId, BOOL compressed, HeapID heapId) {
     NNSG2dCharacterData *character;
     void *buffer = GFL_G2DIOReadOBJNCGRArc(arc, fileId, compressed, &character, heapId);
 
@@ -1427,7 +1427,7 @@ static void WazaOshie_ReplaceChars(ArcTool *arc, u32 chars, u32 fileId, BOOL com
 }
 
 // Gives the icon of one of the Pokémon's moves its type, loaded at the next VBlank
-static void WazaOshie_SetKnownMoveType(WazaOshieWork *work, u16 move, u16 index) {
+static void MoveTutor_SetKnownMoveType(MoveTutorWork *work, u16 move, u16 index) {
     u32 type = PML_MoveGetParam(move, MOVE_PARAM_TYPE);
 
     work->typeIcons[index].type = type;
@@ -1435,21 +1435,21 @@ static void WazaOshie_SetKnownMoveType(WazaOshieWork *work, u16 move, u16 index)
     ClActor_SetPalette(work->actors[ACTOR_KNOWN_TYPE + index], AppMenuCommon_GetTypeIconPaletteIndex(type), 1);
 }
 
-static void WazaOshie_LoadTypeIcons(WazaOshieWork *work) {
+static void MoveTutor_LoadTypeIcons(MoveTutorWork *work) {
     int i;
 
     for (i = 0; i < TYPE_ICON_COUNT; i++) {
         if (work->typeIcons[i].dirty) {
-            WazaOshie_ReplaceChars(work->commonArc, work->chars[4 + i],
+            MoveTutor_ReplaceChars(work->commonArc, work->chars[4 + i],
                                    AppMenuCommon_GetTypeIconCharFile(work->typeIcons[i].type), FALSE,
-                                   HEAPID_WAZA_OSHIE);
+                                   HEAPID_MOVE_TUTOR);
             work->typeIcons[i].dirty = FALSE;
         }
     }
 }
 
 // Places the list's type icons and sets them to the types of the moves shown
-static void WazaOshie_UpdateListTypes(WazaOshieWork *work) {
+static void MoveTutor_UpdateListTypes(MoveTutorWork *work) {
     u32 i;
     ClActorPos pos;
     u32 type;
@@ -1468,11 +1468,11 @@ static void WazaOshie_UpdateListTypes(WazaOshieWork *work) {
     }
 }
 
-static void WazaOshie_SetCategory(WazaOshieWork *work, u16 move) {
+static void MoveTutor_SetCategory(MoveTutorWork *work, u16 move) {
     ClActor_SetSequence(work->actors[ACTOR_CATEGORY], PML_MoveGetParam(move, MOVE_PARAM_CATEGORY));
 }
 
-static const WazaOshieActorData sWazaOshieActors[ACTOR_COUNT] = {
+static const MoveTutorActorData sMoveTutorActors[ACTOR_COUNT] = {
     { 8, 168, 0, 2, 1, 2, CLACT_SURFACE_SUB, 0, 0, 0, 0, 2, 0 },
     { 40, 168, 0, 3, 1, 2, CLACT_SURFACE_SUB, 0, 0, 0, 0, 2, 0 },
     { 130, 84, 0, 0, 0, 3, CLACT_SURFACE_SUB, 1, 1, 1, 1, 2, 0 },
@@ -1489,22 +1489,22 @@ static const WazaOshieActorData sWazaOshieActors[ACTOR_COUNT] = {
     { 224, 168, 0, 1, 0, 0, CLACT_SURFACE_SUB, 0, 0, 0, 0, 2, 0 },
 };
 
-static void WazaOshie_InitActors(WazaOshieWork *work, ArcTool *arc) {
+static void MoveTutor_InitActors(MoveTutorWork *work, ArcTool *arc) {
     u32 i;
     ClActorSetup setup;
 
-    WazaOshie_InitActorSys(work);
-    WazaOshie_LoadActorResources(work, arc);
-    work->commonArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_WAZA_OSHIE);
+    MoveTutor_InitActorSys(work);
+    MoveTutor_LoadActorResources(work, arc);
+    work->commonArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_MOVE_TUTOR);
     for (i = 0; i < ACTOR_COUNT; i++) {
-        setup.x = sWazaOshieActors[i].x;
-        setup.y = sWazaOshieActors[i].y;
-        setup.sequence = sWazaOshieActors[i].sequence;
-        setup.priority = sWazaOshieActors[i].priority;
-        setup.bgPriority = sWazaOshieActors[i].bgPriority;
+        setup.x = sMoveTutorActors[i].x;
+        setup.y = sMoveTutorActors[i].y;
+        setup.sequence = sMoveTutorActors[i].sequence;
+        setup.priority = sMoveTutorActors[i].priority;
+        setup.bgPriority = sMoveTutorActors[i].bgPriority;
         work->actors[i] = ClActor_Create(
-            work->unit, work->chars[sWazaOshieActors[i].chars], work->palettes[sWazaOshieActors[i].palette],
-            work->cellAnims[sWazaOshieActors[i].cellAnims], &setup, sWazaOshieActors[i].surface, HEAPID_WAZA_OSHIE);
+            work->unit, work->chars[sMoveTutorActors[i].chars], work->palettes[sMoveTutorActors[i].palette],
+            work->cellAnims[sMoveTutorActors[i].cellAnims], &setup, sMoveTutorActors[i].surface, HEAPID_MOVE_TUTOR);
         ClActor_SetAutoAnim(work->actors[i], FALSE);
     }
     ClActor_SetAutoAnim(work->actors[ACTOR_RETURN], TRUE);
@@ -1514,7 +1514,7 @@ static void WazaOshie_InitActors(WazaOshieWork *work, ArcTool *arc) {
 }
 
 // Moves the cursor's actor to a row of the list, an arrow or the buttons, with the frame for each
-static void WazaOshie_SetCursorActor(WazaOshieWork *work, u8 pos, u32 unused) {
+static void MoveTutor_SetCursorActor(MoveTutorWork *work, u8 pos, u32 unused) {
     ClActorPos actorPos;
 
     if (pos < LIST_ROWS) {
@@ -1535,22 +1535,22 @@ static void WazaOshie_SetCursorActor(WazaOshieWork *work, u8 pos, u32 unused) {
     }
 }
 
-static u32 WazaOshie_SeqStatusFadeOut(WazaOshieWork *work) {
-    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 6, 1, HEAPID_WAZA_OSHIE);
+static u32 MoveTutor_SeqStatusFadeOut(MoveTutorWork *work) {
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 6, 1, HEAPID_MOVE_TUTOR);
     work->nextSeq = SEQ_STATUS_CALL;
     return SEQ_FADE_WAIT;
 }
 
 // Ends the screen's graphics and runs the summary screen to pick the move to forget
-static u32 WazaOshie_SeqStatusCall(WazaOshieWork *work) {
-    WazaOshie_FreeScreen(work);
+static u32 MoveTutor_SeqStatusCall(MoveTutorWork *work) {
+    MoveTutor_FreeScreen(work);
     work->status.party = work->param->pkm;
     work->status.trainerData = work->param->trainerData;
     work->status.gameData = GSYS_GetGameData(work->param->gsys);
     work->status.dataType = PSTATUS_DATA_PARTY_PKM;
     work->status.partyIndex = 0;
     work->status.partyCount = 1;
-    work->status.move = WazaOshie_GetCursorMove(work);
+    work->status.move = MoveTutor_GetCursorMove(work);
     work->status.mode = PSTATUS_MODE_FORGET_MOVE;
     work->status.page = PSTATUS_PAGE_INFO;
     work->status.isNationalDex = FALSE;
@@ -1558,10 +1558,10 @@ static u32 WazaOshie_SeqStatusCall(WazaOshieWork *work) {
     return SEQ_STATUS_RETURN;
 }
 
-static u32 WazaOshie_SeqStatusReturn(WazaOshieWork *work) {
-    WazaOshie_InitScreen(work);
-    WazaOshie_SetCursorActor(work, work->param->cursorPos, 3);
-    GFL_NetSetIconScreen(TRUE, HEAPID_WAZA_OSHIE);
+static u32 MoveTutor_SeqStatusReturn(MoveTutorWork *work) {
+    MoveTutor_InitScreen(work);
+    MoveTutor_SetCursorActor(work, work->param->cursorPos, 3);
+    GFL_NetSetIconScreen(TRUE, HEAPID_MOVE_TUTOR);
     if (work->status.result == PSTATUS_RESULT_FORGET) {
         work->param->slot = work->status.slot;
     } else {
@@ -1573,7 +1573,7 @@ static u32 WazaOshie_SeqStatusReturn(WazaOshieWork *work) {
 
 // The list's rows, the arrows, the return icon and the two buttons
 // clang-format off
-static const CursorMoveData sWazaOshieCursorData[] = {
+static const CursorMoveData sMoveTutorCursorData[] = {
     { 40, 52, 0, 0, 0, 1, 0, 0, { 69, 90, 21, 233 } },
     { 80, 60, 0, 0, 0, 2, 1, 1, { 93, 114, 21, 233 } },
     { 40, 84, 0, 0, 1, 3, 2, 2, { 117, 138, 21, 233 } },
@@ -1588,39 +1588,39 @@ static const CursorMoveData sWazaOshieCursorData[] = {
 
 // clang-format on
 
-static const CursorMoveCallbacks sWazaOshieCursorCallbacks = {
-    WazaOshie_CursorDummy,
-    WazaOshie_CursorDummy,
-    WazaOshie_CursorMove,
-    WazaOshie_CursorTouch,
+static const CursorMoveCallbacks sMoveTutorCursorCallbacks = {
+    MoveTutor_CursorDummy,
+    MoveTutor_CursorDummy,
+    MoveTutor_CursorMove,
+    MoveTutor_CursorTouch,
 };
 
-static void WazaOshie_InitCursor(WazaOshieWork *work) {
+static void MoveTutor_InitCursor(MoveTutorWork *work) {
     work->cursor =
-        CursorMove_Create(sWazaOshieCursorData, &sWazaOshieCursorCallbacks, work, TRUE, 0, HEAPID_WAZA_OSHIE);
+        CursorMove_Create(sMoveTutorCursorData, &sMoveTutorCursorCallbacks, work, TRUE, 0, HEAPID_MOVE_TUTOR);
     CursorMove_DisablePos(work->cursor, POS_QUIT);
-    WazaOshie_UpdateArrowPositions(work);
+    MoveTutor_UpdateArrowPositions(work);
 }
 
-static void WazaOshie_FreeCursor(WazaOshieWork *work) {
+static void MoveTutor_FreeCursor(MoveTutorWork *work) {
     CursorMove_Delete(work->cursor);
 }
 
-static void WazaOshie_CursorDummy(void *data, int pos, int prevPos) {
+static void MoveTutor_CursorDummy(void *data, int pos, int prevPos) {
 }
 
 // The cursor moved with the keys: onto a row, or past the list's ends, which scrolls it
-static void WazaOshie_CursorMove(void *data, int pos, int prevPos) {
-    WazaOshieWork *work = data;
+static void MoveTutor_CursorMove(void *data, int pos, int prevPos) {
+    MoveTutorWork *work = data;
 
-    WazaOshie_ShowButtons(work, FALSE);
+    MoveTutor_ShowButtons(work, FALSE);
     if (pos <= 3) {
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         work->param->cursorPos = pos;
         if (work->param->scroll + work->param->cursorPos < work->moveCount) {
-            WazaOshie_DrawMoveInfo(work, WazaOshie_GetCursorMove(work));
+            MoveTutor_DrawMoveInfo(work, MoveTutor_GetCursorMove(work));
         } else {
-            WazaOshie_DrawMoveInfo(work, NO_MOVE);
+            MoveTutor_DrawMoveInfo(work, NO_MOVE);
         }
     } else if (pos == POS_RETURN) {
         if (prevPos == 3 && work->param->scroll + LIST_ROWS < work->moveCount) {
@@ -1628,18 +1628,18 @@ static void WazaOshie_CursorMove(void *data, int pos, int prevPos) {
             pos = 3;
             CursorMove_SetPos(work->cursor, pos);
             work->param->scroll++;
-            WazaOshie_DrawList(work);
-            WazaOshie_DrawMoveInfo(work, WazaOshie_GetCursorMove(work));
-            WazaOshie_UpdateArrowPositions(work);
-            WazaOshie_AnimateArrows(work, 1);
+            MoveTutor_DrawList(work);
+            MoveTutor_DrawMoveInfo(work, MoveTutor_GetCursorMove(work));
+            MoveTutor_UpdateArrowPositions(work);
+            MoveTutor_AnimateArrows(work, 1);
         } else if (prevPos == 0) {
             if (work->param->scroll != 0) {
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
                 work->param->scroll--;
-                WazaOshie_DrawList(work);
-                WazaOshie_DrawMoveInfo(work, WazaOshie_GetCursorMove(work));
-                WazaOshie_UpdateArrowPositions(work);
-                WazaOshie_AnimateArrows(work, -1);
+                MoveTutor_DrawList(work);
+                MoveTutor_DrawMoveInfo(work, MoveTutor_GetCursorMove(work));
+                MoveTutor_UpdateArrowPositions(work);
+                MoveTutor_AnimateArrows(work, -1);
             }
             pos = 0;
             CursorMove_SetPos(work->cursor, pos);
@@ -1650,41 +1650,41 @@ static void WazaOshie_CursorMove(void *data, int pos, int prevPos) {
     } else {
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
     }
-    WazaOshie_SetCursorActor(work, pos, 3);
+    MoveTutor_SetCursorActor(work, pos, 3);
 }
 
 // A position was touched: a row, which shows the buttons, or an arrow, which scrolls the list
-static void WazaOshie_CursorTouch(void *data, int pos, int prevPos) {
-    WazaOshieWork *work = data;
+static void MoveTutor_CursorTouch(void *data, int pos, int prevPos) {
+    MoveTutorWork *work = data;
 
     if (pos <= 3) {
         work->param->cursorPos = pos;
         if (work->param->scroll + work->param->cursorPos < work->moveCount) {
-            WazaOshie_ShowButtons(work, TRUE);
-            WazaOshie_DrawMoveInfo(work, WazaOshie_GetCursorMove(work));
+            MoveTutor_ShowButtons(work, TRUE);
+            MoveTutor_DrawMoveInfo(work, MoveTutor_GetCursorMove(work));
         } else {
-            WazaOshie_ShowButtons(work, FALSE);
-            WazaOshie_DrawMoveInfo(work, NO_MOVE);
+            MoveTutor_ShowButtons(work, FALSE);
+            MoveTutor_DrawMoveInfo(work, NO_MOVE);
         }
     } else if (pos == POS_ARROW_DOWN) {
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         pos = work->param->cursorPos;
         work->param->scroll++;
-        WazaOshie_DrawMoveInfo(work, WazaOshie_GetCursorMove(work));
-        WazaOshie_DrawList(work);
-        WazaOshie_ShowButtons(work, FALSE);
-        WazaOshie_UpdateArrowPositions(work);
-        WazaOshie_AnimateArrows(work, 1);
+        MoveTutor_DrawMoveInfo(work, MoveTutor_GetCursorMove(work));
+        MoveTutor_DrawList(work);
+        MoveTutor_ShowButtons(work, FALSE);
+        MoveTutor_UpdateArrowPositions(work);
+        MoveTutor_AnimateArrows(work, 1);
         CursorMove_SetPos(work->cursor, pos);
     } else if (pos == POS_ARROW_UP) {
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         pos = work->param->cursorPos;
         work->param->scroll--;
-        WazaOshie_DrawMoveInfo(work, WazaOshie_GetCursorMove(work));
-        WazaOshie_DrawList(work);
-        WazaOshie_ShowButtons(work, FALSE);
-        WazaOshie_UpdateArrowPositions(work);
-        WazaOshie_AnimateArrows(work, -1);
+        MoveTutor_DrawMoveInfo(work, MoveTutor_GetCursorMove(work));
+        MoveTutor_DrawList(work);
+        MoveTutor_ShowButtons(work, FALSE);
+        MoveTutor_UpdateArrowPositions(work);
+        MoveTutor_AnimateArrows(work, -1);
         CursorMove_SetPos(work->cursor, pos);
     } else if (pos == POS_RETURN) {
         if (work->prevPos != POS_RETURN) {
@@ -1700,17 +1700,17 @@ static void WazaOshie_CursorTouch(void *data, int pos, int prevPos) {
             CursorMove_SetPos(work->cursor, pos);
         }
     }
-    WazaOshie_SetCursorActor(work, pos, 3);
+    MoveTutor_SetCursorActor(work, pos, 3);
 }
 
 // Shows or removes the Teach and Quit buttons
-static void WazaOshie_ShowButtons(WazaOshieWork *work, BOOL show) {
+static void MoveTutor_ShowButtons(MoveTutorWork *work, BOOL show) {
     if (show == TRUE) {
         if (work->buttons[BUTTON_TEACH] == NULL) {
             work->buttons[BUTTON_TEACH] =
-                AppTaskMenuWin_Create(work->menuRes, &work->buttonItems[BUTTON_TEACH], 13, 21, 9, HEAPID_WAZA_OSHIE);
+                AppTaskMenuWin_Create(work->menuRes, &work->buttonItems[BUTTON_TEACH], 13, 21, 9, HEAPID_MOVE_TUTOR);
             work->buttons[BUTTON_QUIT] =
-                AppTaskMenuWin_Create(work->menuRes, &work->buttonItems[BUTTON_QUIT], 22, 21, 9, HEAPID_WAZA_OSHIE);
+                AppTaskMenuWin_Create(work->menuRes, &work->buttonItems[BUTTON_QUIT], 22, 21, 9, HEAPID_MOVE_TUTOR);
             CursorMove_EnablePos(work->cursor, POS_QUIT);
             work->buttonsShown = TRUE;
         }
@@ -1727,7 +1727,7 @@ static void WazaOshie_ShowButtons(WazaOshieWork *work, BOOL show) {
     }
 }
 
-static BOOL WazaOshie_AreButtonsShown(WazaOshieWork *work) {
+static BOOL MoveTutor_AreButtonsShown(MoveTutorWork *work) {
     if (work->buttons[BUTTON_TEACH] != NULL) {
         return TRUE;
     }
@@ -1735,7 +1735,7 @@ static BOOL WazaOshie_AreButtonsShown(WazaOshieWork *work) {
 }
 
 // Lets the cursor onto the arrows that can scroll the list
-static void WazaOshie_UpdateArrowPositions(WazaOshieWork *work) {
+static void MoveTutor_UpdateArrowPositions(MoveTutorWork *work) {
     if (work->moveCount < LIST_ROWS) {
         CursorMove_DisablePos(work->cursor, POS_ARROW_DOWN);
         CursorMove_DisablePos(work->cursor, POS_ARROW_UP);
@@ -1754,7 +1754,7 @@ static void WazaOshie_UpdateArrowPositions(WazaOshieWork *work) {
 }
 
 // Plays the arrows' animations after the list scrolled down (direction above 0) or up
-static void WazaOshie_AnimateArrows(WazaOshieWork *work, int direction) {
+static void MoveTutor_AnimateArrows(MoveTutorWork *work, int direction) {
     ClActor_SetAnimTime(work->actors[ACTOR_ARROW_UP], 0);
     ClActor_SetAnimTime(work->actors[ACTOR_ARROW_DOWN], 0);
     if (direction > 0) {
@@ -1774,7 +1774,7 @@ static void WazaOshie_AnimateArrows(WazaOshieWork *work, int direction) {
     }
 }
 
-static void WazaOshie_InitArrows(WazaOshieWork *work) {
+static void MoveTutor_InitArrows(MoveTutorWork *work) {
     if (work->moveCount <= LIST_ROWS) {
         ClActor_SetSequence(work->actors[ACTOR_ARROW_UP], 17);
         ClActor_SetSequence(work->actors[ACTOR_ARROW_DOWN], 16);
@@ -1788,8 +1788,8 @@ static void WazaOshie_InitArrows(WazaOshieWork *work) {
 }
 
 // Start the animation of the return icon or the flash of a button, after which the process goes to seq
-static u32 WazaOshie_DecideActor(WazaOshieWork *work, u16 seq) {
-    WazaOshieDecide *decide = &work->decide;
+static u32 MoveTutor_DecideActor(MoveTutorWork *work, u16 seq) {
+    MoveTutorDecide *decide = &work->decide;
 
     decide->type = DECIDE_ACTOR;
     decide->index = ACTOR_RETURN;
@@ -1798,8 +1798,8 @@ static u32 WazaOshie_DecideActor(WazaOshieWork *work, u16 seq) {
     return SEQ_DECIDE_WAIT;
 }
 
-static u32 WazaOshie_DecideTeach(WazaOshieWork *work, u16 seq) {
-    WazaOshieDecide *decide = &work->decide;
+static u32 MoveTutor_DecideTeach(MoveTutorWork *work, u16 seq) {
+    MoveTutorDecide *decide = &work->decide;
 
     decide->type = DECIDE_BUTTON;
     decide->index = BUTTON_TEACH;
@@ -1808,8 +1808,8 @@ static u32 WazaOshie_DecideTeach(WazaOshieWork *work, u16 seq) {
     return SEQ_DECIDE_WAIT;
 }
 
-static u32 WazaOshie_DecideQuit(WazaOshieWork *work, u16 seq) {
-    WazaOshieDecide *decide = &work->decide;
+static u32 MoveTutor_DecideQuit(MoveTutorWork *work, u16 seq) {
+    MoveTutorDecide *decide = &work->decide;
 
     decide->type = DECIDE_BUTTON;
     decide->index = BUTTON_QUIT;
@@ -1818,8 +1818,8 @@ static u32 WazaOshie_DecideQuit(WazaOshieWork *work, u16 seq) {
     return SEQ_DECIDE_WAIT;
 }
 
-static u32 WazaOshie_SeqDecideWait(WazaOshieWork *work) {
-    WazaOshieDecide *decide = &work->decide;
+static u32 MoveTutor_SeqDecideWait(MoveTutorWork *work) {
+    MoveTutorDecide *decide = &work->decide;
 
     if (decide->type == DECIDE_ACTOR) {
         if (!ClActor_IsAnimActive(work->actors[decide->index])) {
@@ -1827,28 +1827,28 @@ static u32 WazaOshie_SeqDecideWait(WazaOshieWork *work) {
         }
     } else if (decide->type == DECIDE_BUTTON) {
         if (AppTaskMenuWin_IsFlashFinished(work->buttons[decide->index])) {
-            WazaOshie_ShowButtons(work, FALSE);
+            MoveTutor_ShowButtons(work, FALSE);
             return decide->seq;
         }
     }
     return SEQ_DECIDE_WAIT;
 }
 
-static u32 WazaOshie_SeqQuit(WazaOshieWork *work) {
-    WazaOshie_PrintMessage(work, MSG_QUIT);
+static u32 MoveTutor_SeqQuit(MoveTutorWork *work) {
+    MoveTutor_PrintMessage(work, MSG_QUIT);
     work->yesNo = YES_NO_QUIT;
     work->nextSeq = SEQ_YES_NO_INIT;
     return SEQ_MESSAGE;
 }
 
-static u32 WazaOshie_SeqMoveChosen(WazaOshieWork *work) {
+static u32 MoveTutor_SeqMoveChosen(MoveTutorWork *work) {
     u8 yesNo;
 
-    if (WazaOshie_CountKnownMoves(work) < 4) {
-        WazaOshie_PrintMessage(work, MSG_LEARN);
+    if (MoveTutor_CountKnownMoves(work) < 4) {
+        MoveTutor_PrintMessage(work, MSG_LEARN);
         yesNo = YES_NO_LEARN;
     } else {
-        WazaOshie_PrintMessage(work, MSG_REPLACE);
+        MoveTutor_PrintMessage(work, MSG_REPLACE);
         yesNo = YES_NO_REPLACE;
     }
     work->yesNo = yesNo;
@@ -1857,7 +1857,7 @@ static u32 WazaOshie_SeqMoveChosen(WazaOshieWork *work) {
 }
 
 // Darkens the touch screen behind the yes/no menu
-static void WazaOshie_SetDimmed(BOOL dimmed) {
+static void MoveTutor_SetDimmed(BOOL dimmed) {
     if (dimmed == TRUE) {
         G2x_SetBlendBrightness_(
             REG_DB_BLDCNT_ADDR,

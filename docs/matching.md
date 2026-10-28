@@ -2166,9 +2166,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A 0 loaded once from the literal pool, stored to one local's slot and copied from there to the others, is a local
   zeroed by a statement after the early returns, not at its declaration: DWC's `DWCi_CheckProfanityAsync`
   (`dwc_profanity.c`) matches with `total = 0;` just before its loop.
-- A compound assignment to a narrow field narrows its right side first: `work->checkFlag &= 0xff ^ (1 << waza);` on a
-  `u8` shifts the mask down to a byte before the `and`, while `work->checkFlag = work->checkFlag & (0xff ^ (1 << waza));`
-  ands the full mask, as the PC box's `Box2Main_PokeFreeWazaCheck` does.
+- A compound assignment to a narrow field narrows its right side first: `work->checkFlag &= 0xff ^ (1 << moveId);` on a
+  `u8` shifts the mask down to a byte before the `and`, while `work->checkFlag = work->checkFlag & (0xff ^ (1 << moveId));`
+  ands the full mask, as the PC box's `Box2Main_PokeFreeMoveCheck` does.
 - A call's result minus a constant, passed straight to another call, is copied to a scratch register while the
   constant is built in the argument register (`movs r2, #0xf; adds r3, r0, #0; lsls r2, r2, #0xc; subs r2, r3, r2`).
   With the difference in a local's initializer, `u32 heapSize = GetFieldmapZoneHeapSize(zone) - 0xf000;`, the
@@ -2508,7 +2508,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   callers' argument loads (`Upload_WifiHistoryDataSet`) or masks a `u8` passed on (`UnityTower_SetOwnRegion`); a plain `u8`
   used directly divides with `lsr`.
 - A result computed into the parameter's own callee-saved register comes from a compound assignment to the parameter
-  (`item -= ITEM_TM93 - TM_INDEX_TM93;` in `PML_ItemGetTMWazaID`); `item = item - X` or a new local computes into r0.
+  (`item -= ITEM_TM93 - TM_INDEX_TM93;` in `PML_ItemGetTMMoveID`); `item = item - X` or a new local computes into r0.
 
 - A parameter masked in place (`word &= 0x7ff`) with no narrowing after is wider than the callers' `u16`: pms_word.c's
   `PMSWord_GetMessage` takes a `u32`.
@@ -3325,7 +3325,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   lose the copy the original makes for `GetMove` when the element is first put in an `entry` local. A plain local
   passed by value keeps its stack copy only when the inline reads a field other than the one at offset 0, while an
   element, `Get(learnset[i])`, is copied for each call, and once more into the preheader of an inner loop that
-  passes it. Many copies of one element, as the eight of `waza_oshie.c`'s `PokeParty_GetRememberableMoves`, mean
+  passes it. Many copies of one element, as the eight of `move_tutor.c`'s `PokeParty_GetRememberableMoves`, mean
   every accessor took the element; that function also writes its two searches out, with
   `LearnsetEntry_GetMove(learnset[i])` compared inside each loop.
 - A loop entered with a `b` to its test and reloading its bound on each pass, where every plain comparison is

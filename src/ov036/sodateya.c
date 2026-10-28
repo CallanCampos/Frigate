@@ -977,7 +977,7 @@ static void inheritTmMoves(EggParents *parents, EggData *egg, HeapID heapId) {
         int item;
 
         for (item = ITEM_TM01; item <= ITEM_LAST; item++) {
-            if (move == PML_ItemGetTMWazaID(item) && canPkmLearnTMItemNumber(heapId, egg->species, egg->form, item)) {
+            if (move == PML_ItemGetTMMoveID(item) && canPkmLearnTMItemNumber(heapId, egg->species, egg->form, item)) {
                 PushEggPkmMove(egg, move);
                 break;
             }

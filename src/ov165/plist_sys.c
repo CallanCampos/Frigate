@@ -177,7 +177,7 @@ BOOL PokeList_Init(PokeListWork *wk) {
         wk->wasMode1A = FALSE;
     }
     if (wk->param->mode == 6 && wk->param->move == 0) {
-        wk->param->move = PML_ItemGetTMWazaID(wk->param->item);
+        wk->param->move = PML_ItemGetTMMoveID(wk->param->item);
     }
     PokeList_InitGraphics(wk);
     PokeList_LoadResources(wk);

@@ -1624,7 +1624,7 @@ src/system/poke_icon.c:
     .text       start:0x02020f6c end:0x020212ac
     .rodata     start:0x02090578 end:0x0209086c
 
-src/system/waza_tool.c:
+src/system/move_tool.c:
     complete
     .text       start:0x020212ac end:0x020219a0
     .data       start:0x0209a444 end:0x0209a450

@@ -4,7 +4,7 @@
 #include "constants/moves.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
-#include "pml/waza.h"
+#include "pml/move.h"
 
 // The moves' data, read from ARCID_WAZAINFO one move at a time, or kept in a cache of the moves asked for last while
 // a battle runs. The functions' names are swan's

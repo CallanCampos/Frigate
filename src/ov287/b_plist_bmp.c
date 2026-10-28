@@ -11,7 +11,7 @@
 #include "gfl/msg.h"
 #include "gfl/str.h"
 #include "pml/item.h"
-#include "pml/waza.h"
+#include "pml/move.h"
 #include "system/app_menu_common.h"
 #include "system/bmp_winframe.h"
 #include "system/gf_font.h"

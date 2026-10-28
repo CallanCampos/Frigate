@@ -88,7 +88,7 @@ BOOL s0050_WordSetTMMoveName(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
 
-    loadMoveNameToStrbuf(wordSet, index, PML_ItemGetTMWazaID(ScriptReadAny(vm, env)));
+    loadMoveNameToStrbuf(wordSet, index, PML_ItemGetTMMoveID(ScriptReadAny(vm, env)));
     return FALSE;
 }
 

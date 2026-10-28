@@ -10,10 +10,10 @@
 #include "battle/btl_item.h"
 #include "battle/btl_main.h"
 #include "battle/btl_move.h"
+#include "battle/btl_move_rec.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_server_flow.h"
 #include "battle/btl_tables.h"
-#include "battle/btl_wazarec.h"
 #include "battle/handler_common.h"
 #include "battle/side_handlers.h"
 #include "constants/battle.h"
@@ -21,8 +21,8 @@
 #include "constants/species.h"
 #include "gfl/std.h"
 #include "pml/item.h"
+#include "pml/move.h"
 #include "pml/poke_party.h"
-#include "pml/waza.h"
 
 // One move's handlers: the move and the function that returns its table
 typedef struct MoveEventAddEntry {
@@ -7602,19 +7602,19 @@ static const BattleEventHandlerEntry *EventAddEchoedVoice(u32 *priority) {
 }
 
 static void HandlerEchoedVoice(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
-    BtlWazaRec *wazaRec;
+    BtlMoveRec *moveRec;
     u16 move;
     int turn;
     u32 count;
     u16 power;
 
     if (BattleEventVar_GetValue(3) == monId) {
-        wazaRec = BtlServerFlow_GetWazaRec(flow);
+        moveRec = BtlServerFlow_GetMoveRec(flow);
         move = BattleEventItem_GetSubID(item);
         turn = GetTurnCounter(flow) - 1;
         count = 0;
         while (turn >= 0) {
-            if (!BtlWazaRec_IsUsed(wazaRec, move, turn--)) {
+            if (!BtlMoveRec_IsUsed(moveRec, move, turn--)) {
                 break;
             }
             count++;
@@ -8299,14 +8299,14 @@ static const BattleEventHandlerEntry *EventAddRound(u32 *priority) {
 }
 
 static void HandlerRound(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
-    BtlWazaRec *wazaRec;
+    BtlMoveRec *moveRec;
     u16 move;
     BattleHandlerInterruptParam *param;
 
     if (BattleEventVar_GetValue(2) == monId) {
-        wazaRec = BtlServerFlow_GetWazaRec(flow);
+        moveRec = BtlServerFlow_GetMoveRec(flow);
         move = BattleEventItem_GetSubID(item);
-        if (GetUsedMoveCount(wazaRec, move, GetTurnCounter(flow)) == 1) {
+        if (GetUsedMoveCount(moveRec, move, GetTurnCounter(flow)) == 1) {
             param = BattleHandler_PushWork(flow, 0x30, monId);
             param->moveId = move;
             BattleHandler_PopWork(flow, param);
@@ -8315,13 +8315,13 @@ static void HandlerRound(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s
 }
 
 static void HandlerRoundPower(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
-    BtlWazaRec *wazaRec;
+    BtlMoveRec *moveRec;
     u16 move;
 
     if (BattleEventVar_GetValue(3) == monId) {
-        wazaRec = BtlServerFlow_GetWazaRec(flow);
+        moveRec = BtlServerFlow_GetMoveRec(flow);
         move = BattleEventItem_GetSubID(item);
-        if (GetUsedMoveCount(wazaRec, move, GetTurnCounter(flow)) > 1) {
+        if (GetUsedMoveCount(moveRec, move, GetTurnCounter(flow)) > 1) {
             MultiplyBasePower(2);
         }
     }
@@ -8635,11 +8635,11 @@ static const BattleEventHandlerEntry *EventAddFusionFlare(u32 *priority) {
 }
 
 static void HandlerFusionFlare(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
-    BtlWazaRec *wazaRec;
+    BtlMoveRec *moveRec;
     u16 partner;
 
     if (BattleEventVar_GetValue(3) == monId) {
-        wazaRec = BtlServerFlow_GetWazaRec(flow);
+        moveRec = BtlServerFlow_GetMoveRec(flow);
         switch (BattleEventItem_GetSubID(item)) {
         case MOVE_FUSION_FLARE:
             partner = MOVE_FUSION_BOLT;
@@ -8651,7 +8651,7 @@ static void HandlerFusionFlare(BattleEventItem *item, BtlServerFlow *flow, u8 mo
             partner = MOVE_NONE;
             break;
         }
-        if (partner != MOVE_NONE && partner == BtlWazaRec_GetSucceededMove(wazaRec, GetTurnCounter(flow))) {
+        if (partner != MOVE_NONE && partner == BtlMoveRec_GetSucceededMove(moveRec, GetTurnCounter(flow))) {
             BattleEventVar_MulValue(0x31, 0x2000);
             SetMoveEffectIndex(flow, 1);
         }

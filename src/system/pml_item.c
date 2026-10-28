@@ -1051,7 +1051,7 @@ BOOL PML_ItemIsTM(u16 item) {
     return FALSE;
 }
 
-u16 PML_ItemGetTMWazaID(u16 item) {
+u16 PML_ItemGetTMMoveID(u16 item) {
     if (PML_ItemIsTMHM(item) == FALSE) {
         return MOVE_NONE;
     }

@@ -3,9 +3,9 @@
 #include "constants/species.h"
 #include "gfl/heap.h"
 #include "pml/item.h"
+#include "pml/move.h"
 #include "pml/personal.h"
 #include "pml/poke_party.h"
-#include "pml/waza.h"
 
 // What an item from the bag does to a Pokémon: whether it can be used, and using it. The ROM doesn't name this file;
 // the name is a guess, after the file that does this in HeartGold and SoulSilver

@@ -239,7 +239,7 @@ typedef struct {
     u8 rare : 1;
     // 1 while infected, 2 once cured
     u8 pokerus : 2;
-    u16 waza[4];
+    u16 moveId[4];
 } Box2PokeInfo;
 
 // The cursor's move to a position
@@ -395,7 +395,7 @@ BOOL Box2Main_IsSpeciesFlagged(Box2SysWork *syswk, u32 pos);
 BOOL Box2Main_PokeItemMoveCheck(Box2SysWork *syswk, u32 getPos, u32 putPos);
 void Box2Main_PokeFreeCreate(Box2SysWork *syswk);
 void Box2Main_PokeFreeExit(Box2SysWork *syswk);
-BOOL Box2Main_PokeFreeWazaCheck(Box2SysWork *syswk);
+BOOL Box2Main_PokeFreeMoveCheck(Box2SysWork *syswk);
 void Box2Main_UpdateChatter(Box2SysWork *syswk);
 u8 Box2Main_GetTrayScroll(Box2SysWork *syswk, s8 mv);
 // Shows a wallpaper, scrolling from the direction dir, a BOX2_TRAY_SCROLL_*

@@ -32,7 +32,7 @@
 #include "gfl/tcbl.h"
 #include "nitro/gx.h"
 #include "nitro/hw.h"
-#include "pml/waza.h"
+#include "pml/move.h"
 #include "system/gf_font.h"
 #include "text/system/btlv_core.h"
 
