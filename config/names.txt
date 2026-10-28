@@ -11231,11 +11231,13 @@ overlays/ov036 0x021a3ac8 FieldEffects_GetObjectParam
 overlays/ov036 0x021a3ad4 FieldEffects_GetObjectPos
 overlays/ov036 0x021a3ae8 FieldEffects_SetObjectPos
 overlays/ov036 0x021a3afc FieldEffects_GetObjectWork
+overlays/ov036 0x021a3b9c FldeffShadow_CreateSlot
 overlays/ov036 0x021a3bdc FldeffShadow_DeleteSlot
 overlays/ov036 0x021a3bf0 FldeffShadow_Start
 overlays/ov036 0x021a3c20 FldeffShadow_Init
 overlays/ov036 0x021a3cb4 FldeffShadow_Exit
 overlays/ov036 0x021a3cd4 FldeffShadow_Update
+overlays/ov036 0x021a3d28 FldeffShadow_Draw
 overlays/ov036 0x021a3e60 FldeffKemuri_FreeResource
 overlays/ov036 0x021a3e74 FldeffKemuri_Start
 overlays/ov036 0x021a3ec4 FldeffKemuri_StartFacing
