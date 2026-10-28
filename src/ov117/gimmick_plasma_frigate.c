@@ -933,7 +933,7 @@ static void GimmickPlasmaFrigate_ClearAreas(PlasmaFrigateWork *work) {
     int i;
 
     for (i = 0; i < count; i++) {
-        func_ov036_021ba6bc(i, 0, list);
+        HeightEx_SetAreaInUse(i, 0, list);
     }
 }
 
@@ -955,7 +955,7 @@ static void GimmickPlasmaFrigate_SetPanelArea(PlasmaFrigateWork *work, int panel
                 if (panel == 4 || panel == 12) {
                     first--;
                 }
-                func_ov036_021ba6bc(first, 0, list);
+                HeightEx_SetAreaInUse(first, 0, list);
                 HeightEx_SetArea(first, sAreasOff[first].x, sAreasOff[first].z, sAreasOff[first].width,
                                  sAreasOff[first].depth + 1, sAreaValues[0], AREA_FLAGS, list);
             }
@@ -971,13 +971,13 @@ static void GimmickPlasmaFrigate_SetPanelArea(PlasmaFrigateWork *work, int panel
         if (panel == 4 || panel == 12) {
             if (GimmickPlasmaFrigate_FindLinkedModel(work, model, &linkedModel) == FALSE) {
                 first = panel - 1;
-                func_ov036_021ba6bc(first, 0, list);
+                HeightEx_SetAreaInUse(first, 0, list);
                 HeightEx_SetArea(first, sAreasOff[first].x, sAreasOff[first].z, sAreasOff[first].width,
                                  sAreasOff[first].depth, sAreaValues[0], AREA_FLAGS, list);
             }
         }
     }
-    func_ov036_021ba6bc(panel, 0, list);
+    HeightEx_SetAreaInUse(panel, 0, list);
     HeightEx_SetArea(panel, area->x, area->z, area->width, area->depth, sAreaValues[mode], AREA_FLAGS, list);
 }
 

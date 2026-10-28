@@ -51,7 +51,7 @@ FieldG3DMapper *FieldG3DMapper_Create(HeapID heapId, u16 season) {
 }
 
 void FieldG3DMapper_Free(FieldG3DMapper *mapper) {
-    func_ov036_021ba670(mapper->heightEx);
+    HeightEx_FreeTable(mapper->heightEx);
     FieldG3DMapper_FreeMap(mapper);
     func_ov036_021c897c(mapper->resortMap);
     func_ov036_0218add0(mapper->wfbc);

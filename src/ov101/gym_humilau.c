@@ -1173,7 +1173,7 @@ static void GymHumilau_ClearAreas(HumilauGymWork *work) {
     int i;
 
     for (i = 0; i < count; i++) {
-        func_ov036_021ba6bc(i, FALSE, areas);
+        HeightEx_SetAreaInUse(i, FALSE, areas);
     }
     work->areaCount = 0;
     GymHumilau_ClearSlots(work);

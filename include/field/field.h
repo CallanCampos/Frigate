@@ -92,13 +92,13 @@ void Field_DeleteGimmickWorkBlock(Field *field, u32 id);
 // A list of areas of the map, which the list's entry index sets: a grid rectangle, a value and flags
 HeightExList *HeightEx_CreateTable(u32 count, u8 heapId);
 void HeightEx_SetArea(u8 index, u32 x, u32 z, u32 width, u32 depth, u32 value, u32 flags, HeightExList *list);
-void func_ov036_021ba670(HeightExList *list);
+void HeightEx_FreeTable(HeightExList *list);
 u32 HeightEx_GetAreaCount(HeightExList *list);
 BOOL HeightEx_IsPointInAreaAt(s32 x, s32 z, HeightExList *list, u8 index);
 u32 HeightEx_GetAreaHeight(u8 index, HeightExList *list);
 u32 HeightEx_GetAreaAttr(u8 index, HeightExList *list);
 // Sets whether the entry at index is in use, which HeightEx_SetArea checks before it fills one in
-void func_ov036_021ba6bc(u8 index, BOOL inUse, HeightExList *list);
+void HeightEx_SetAreaInUse(u8 index, BOOL inUse, HeightExList *list);
 // Overlay 36's field_fade.c: whether a grid position is in the rectangle of an entry of the list
 BOOL HeightEx_IsPointInArea(s32 x, s32 z, const HeightExEntry *entry);
 // The mapper's WFBC work
