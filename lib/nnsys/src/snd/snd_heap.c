@@ -87,10 +87,19 @@ void NNS_SndHeapClear(NNSSndHeapHandle heap) {
         }
         NNS_FndRemoveListObject(&heap->sectionList, section);
     }
+#ifdef PLATFORM_PC
+    // H8: disposal queues ARM7 invalidation, and its wait can advance audio still reading these owners.
+    // Complete that wait before the host frame heap poisons or reuses their memory.
+    if (doCallback) {
+        EraseSync();
+    }
+    NNS_FndFreeToFrmHeap(heap->handle, NNS_FND_FRMHEAP_FREE_ALL);
+#else
     NNS_FndFreeToFrmHeap(heap->handle, NNS_FND_FRMHEAP_FREE_ALL);
     if (doCallback) {
         EraseSync();
     }
+#endif
     NewSection(heap);
 }
 
@@ -141,10 +150,19 @@ void NNS_SndHeapLoadState(NNSSndHeapHandle heap, int level) {
         }
         NNS_FndRemoveListObject(&heap->sectionList, section);
     }
+#ifdef PLATFORM_PC
+    // H8: disposal queues ARM7 invalidation, and its wait can advance audio still reading these owners.
+    // Complete that wait before the host frame heap poisons or reuses their memory.
+    if (doCallback) {
+        EraseSync();
+    }
+    NNS_FndFreeByStateToFrmHeap(heap->handle, (u32)level);
+#else
     NNS_FndFreeByStateToFrmHeap(heap->handle, (u32)level);
     if (doCallback) {
         EraseSync();
     }
+#endif
     NNS_FndRecordStateForFrmHeap(heap->handle, heap->sectionList.numObjects);
     NewSection(heap);
 }

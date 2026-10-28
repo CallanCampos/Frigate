@@ -1,0 +1,20 @@
+pbwinput 1
+# Hugh's battle's save continued (oracle.py's SEQUENCES: center_continue; ROUND_TRIPS: hugh): the Pokemon Center save,
+# melonDS's (center_save_b2_us.pbwinput) or the port's own (oracle.py round-trip hugh), in a new run of each program.
+# The title's presses to the start menu, which shows the saved game (Aspertia City, badges 0, Pokedex 2, time 0:08), and
+# CONTINUE, through the black and the season's banner to the last frame before the Pokemon Center fades in. It stops
+# there: the field shows the townsperson by the counter who turns at random, whose direction and wait the two saves
+# hold differently, each program's battle having reached the Pokemon Center at another count (README.md, "Saves"). The
+# clock is pinned and the seed line is the random seed the DS builds at start-up (oracle.py seeds center_continue).
+# Counts are GFL's frame count (sVBlankCount). On game frames. Black 2.
+version b2_us
+clock pinned
+seed 0x5a0af77416c50a14  # GFL's, at start-up (oracle frame 20)
+1100 START  # START in the opening skips it to the title (count 1115 on both)
+1101 -
+3000 START  # START brings back the layers the title hid at count 2877
+3001 -
+3100 START  # START leaves for the start menu and its saved game, which shows from count 3249
+3101 -
+3400 A  # CONTINUE: the black, the season's banner, and the Pokemon Center (zone 435) loading behind it
+3401 -

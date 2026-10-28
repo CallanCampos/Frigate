@@ -90,10 +90,10 @@ static const Option sOptions[] = {
     { "run-screens", "LIST", 0,
       "the frames whose screens --run-dir also writes as frame_NNNNNN.png: N, A-B, A-B/STEP, all or none, "
       "comma-separated, as pbw-oracle's --screens (none by default)" },
-    { "run-dump", "[LABEL=][*]SYMBOL[+OFFSET]:SIZE[@LIST]", 1,
+    { "run-dump", "[LABEL=][*[*]]SYMBOL[+OFFSET]:SIZE[@LIST]", 1,
       "memory --run-dir also writes to memory.txt, as pbw-oracle's --dump: a global of the program by name (statics "
-      "aren't visible), * for where the pointer there points, at the frames of LIST (the last of --frames by "
-      "default)" },
+      "aren't visible), * for where the pointer there points, ** for where the pointer that one points at points, at "
+      "the frames of LIST (the last of --frames by default)" },
     { "sound-trace", "PATH", 0,
       "writes the sound driver's state after each run of its thread, as pbw-oracle's --sound-trace does the DS's "
       "(port/app/sound_trace.h)" },

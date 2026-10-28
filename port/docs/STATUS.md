@@ -81,6 +81,98 @@ Preparation record for the PR 44 review, not completed Spanish gameplay support.
   record.
 - **Blockers:** none upstream. Replays recorded on IRES would be its own; the US ones stay held to the US dump.
 
+## 2026-10-26: Phase 4 catch, save, quit and reload validated in both games
+
+Completed local validation of the recovered route, not a completed upstream sync or a release. The ready PR and its
+exact-head local/hosted checks are the publication record. ADR 0023 remains **proposed** for owner review.
+
+- **Upstream:** unchanged, `deb044db2d3d` from reviewed main `f786fed993` (PR 41); no pending upstream changes imported.
+- **Port:** `PORT_SHA`, on `codex/phase4-route`. Integration `91d0874aa9` retains reviewed main and the original
+  Phase 4 history as parents. Runtime fixes are `9a8d4f2a0c`; this entry and the final proof updates change records
+  only. Original `wt-p4` and `wt-p4b` HEADs, staged patches and working patches were rechecked unchanged; a separate
+  verified self-contained history bundle and binary patches preserve the unfinished work.
+- **ROM (T0):** `.venv/bin/python configure.py b2_us w2_us && ninja -j2`, with Homebrew LLVM first on `PATH`:
+  both SHA1s match, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`,
+  W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. All eight changed game/SDK files preprocess identically
+  to reviewed main in both versions: `check_mwcc_neutral.py --base f786fed993 --jobs 2`, 16/16.
+- **Host build (T1):** ordinary Apple-clang and strict Homebrew LLVM all-target builds pass in both versions on
+  arm64 macOS. Sanitizer recovery and frame-time report-only mode remain off.
+- **Tests (T2/T3):** `ctest --test-dir build/p4-<version> --output-on-failure --no-tests=error -j1 -LE oracle`:
+  B2 310 pass, three explicit skips of 313; W2 307 pass, three explicit skips of 310. Each includes five real
+  assembly-oracle cases (5/5, no skips), the pointer guard and short replay/hash regressions. The three skips are
+  the two negative C-function-sanitizer probes unsupported by Apple clang and the single-architecture build's
+  universal-slice check. Homebrew LLVM passes all four VM dispatch cases, including both negatives. The separate
+  strict core suites pass 295 with one universal-slice skip of 296/version (route/timing/oracle, pointer guard and
+  assembly oracle excluded there). Oracle helper unit tests pass 56/56.
+- **Timing (T3):** ordinary title/start-menu checks in both versions and B2 New Game pass the existing 8.36 ms
+  p95 budget. Separately, `ctest -R '^frame_times_party_menus$' -j1` passes in both versions (including the save
+  fixture, 2/2 each, zero skips). Report-only mode stays off; there are no load-related skips.
+- **Oracle (T4):** fresh saves and `oracle_hugh`, `oracle_route19`, `oracle_catch`, `oracle_catch_continue`,
+  `oracle_center_continue`, `oracle_pc`, `oracle_round_trip_catch`, `oracle_round_trip_hugh` all pass: 9/9 including
+  `oracle_saves` per version, zero skips. The final batches take 2,415.80 s B2 and 2,382.20 s W2. Runtime source
+  and binary hashes remain unchanged through both batches and the windowed tests. Hugh's comparison ends before
+  the CPU-time-dependent AI decision: 8,165 B2/8,157 W2 matched frames, then the completed native battle's save
+  and continuation. Catch compares 10,988 B2/10,481 W2 and PC 11,003 B2/10,926 W2 frames, with only the existing
+  documented tolerances and exclusions; this is not a claim of identical pixels on every pass.
+- **Sanitizers (T5):** six full strict ASan/UBSan native cases pass per game: Hugh 19,000 frames, its own-save
+  continuation 3,610, Route 19 15,400, catch/SAVE 11,600, its own-save continuation 4,700 and PC 11,600.
+  Each uses its named committed `pbwinput`, an isolated save directory and fatal sanitizer diagnostics. All reach
+  their final frame and exit zero without an ASan, UBSan or leak report. No recovery or broader suppression added.
+- **Saves (T6):** eight produced saves (Hugh, Route 19, catch and PC per version) have all 70 CRC blocks valid in
+  each copy and valid decrypted gift checksums. Hugh/catch have no undeclared decrypted differences against fresh
+  DS saves; existing narrowly traced byte declarations are unchanged. Both engines continue the same native catch
+  save; the native continuations match DS on 4,679 B2/4,671 W2 frames. The catch-save differences are 34 declared
+  bytes total across both copies (17/copy). Both own-save continuations leave the input save byte-identical.
+- **Playtest (T7):** both windowed, paced catch/SAVE runs exit, then a new process reloads that produced save and
+  opens the party. Screens inspected at battle, Gotcha, SAVE, CONTINUE and the party show Tepig and caught Lv4
+  Purrloin in both games. Produced SHA1s are B2 `7dccc2407c3c2093cd32a51353d50e69887133b5`,
+  W2 `3ab0a1aa07b16a677293a072bf7a8792efadd116`, identical to the T4 saves successfully continued by melonDS;
+  reload leaves them unchanged. These are local artifacts only; no saves, ROMs or captures are published.
+- **Tiers:** unchanged: 40,440 matching functions, 509 present/nonmatching, 68 missing (excluding 2,385 veneers);
+  code bytes a/b/c: B2 3,769,504/76,454/4,302; W2 3,769,592/76,454/4,302.
+- **Trap stubs:** unchanged, 25 functions and 20 data placeholders/build; none hit by these routes.
+- **64-bit warnings:** strict guard in both ordinary suites: 365 sites/229 keys, real 66, harmless 123, handled
+  141, unreachable 35; 1,701 compiled inputs, zero uncompiled. The classified baseline is unchanged.
+- **Work done:** recovered Phase 4 routes/coverage and dirty oracle fixes while preserving current-main fixes.
+  Added bounded SDK string/NODEMIX reads, typed encounter/tile callbacks, cut-in upload owners, safe sound-heap
+  invalidation and queued-start cancellation, and the PC zero-perimeter guard. Only the audited two VM command-table
+  calls gain a function-sanitizer exception; native/verifier callbacks stay checked. Actual SDK/driver regressions,
+  guides, findings and lessons document each fix ([game-changes.md](game-changes.md), R10/R12–R16/H7/H8).
+- **Next:** review ADR 0023 and the ready Phase 4 PR, then Phase 5's first story-progression route beyond this
+  coverage, retained as an oracle/sanitizer regression. Other PC apps, items/Battle Box and an independently
+  produced PC save's DS round trip remain additional coverage.
+- **Blockers:** no remaining source blocker for the Phase 4 exit route. Trainer AI's CPU-time divergence remains
+  explicitly bounded by the proposed ADR; whole-story progression and release readiness are not established.
+
+## 2026-10-26: Phase 4 recovered and hardened; final validation running
+
+Preparation checkpoint, not a completed milestone or upstream sync. Final results follow in a later entry.
+
+- **Upstream:** unchanged, `deb044db2d3d` from reviewed main `f786fed993` (PR 41).
+- **Port:** `9a8d4f2a0c`, `codex/phase4-route`, after integration `91d0874aa9`; original worktrees and their dirty
+  patches remain untouched and independently backed up in a verified self-contained Git bundle.
+- **ROM:** configure/Ninja passes both SHA1s (T0): B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`,
+  W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. All eight changed game/SDK files preprocess identically
+  to `f786fed993` in both versions (`check_mwcc_neutral.py --base f786fed993 --jobs 2`: 16/16).
+- **Host build:** both ordinary all-target builds and strict LLVM ASan/UBSan game builds pass on arm64 macOS.
+- **Tests:** T2 focused ordinary tests: 12 pass, two explicit Apple-clang function-check skips/version; upstream
+  LLVM runs all four VM cases. Audio selection: 24/24 across both ordinary versions and strict B2; 56 oracle
+  helper tests pass. T3/T4 final eight-route suites are running. T5 characterization passes Hugh, Route 19,
+  catch, produced-save continuations and PC after each applicable fix in both games; final single-binary batch
+  pending. T6 native saves change and reload unchanged; final oracle round trips pending. T7 final both-game
+  windowed runs pending. No interrupted or partly failing batch is counted as a full pass.
+- **Tiers:** unchanged: 40,440 matching functions, 509 present/nonmatching, 68 missing (excluding 2,385 veneers);
+  code bytes a/b/c: B2 3,769,504/76,454/4,302; W2 3,769,592/76,454/4,302.
+- **Trap stubs:** 25 functions, 20 data placeholders/build; none hit in native route characterization.
+- **64-bit warnings:** last strict guard: 365 sites/229 keys, real 66, harmless 123, handled 141, unreachable 35;
+  no uncompiled input. Final rerun pending.
+- **Work done:** integrated preserved Phase 4 history and dirty oracle fixes; retained current-main starter and
+  VM fixes. Fixed R10, H7, R12, H8, R14, R15 and R16; isolated R13's audited context-erasure exception to two VM
+  table calls, leaving native/verifier checks active. Added actual-SDK/driver regressions, guides and lessons.
+  The obsolete encounter experiment was not reapplied. ADR 0023 remains proposed for owner review.
+- **Next:** final T4/T5/T7, ordinary/timing checks, final record, ready PR and exact-head local verification.
+- **Blockers:** no known source blocker; validation is still required. Later PC apps and story routes remain.
+
 ## 2026-10-25: PR 33 reconciled with reviewed main; durable sync proposals and safe conflict notices
 
 This entry is a preparation snapshot. Final validation and merge results are recorded in
@@ -641,6 +733,269 @@ This entry is a preparation snapshot. Final validation and merge results are rec
   phase 4's route waits for, then that route.
 - **Blockers:** none for this change. A notice for the three stops, which push nothing, would need the sync App's
   Issues permission and a `permission-issues: write` line in `port-sync.yml`, both the owner's decision.
+
+## 2026-10-25: phase 4's coverage reviewed: the mystery gift block decrypted, continued saves held to the same save
+
+- **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it; this branch merges no upstream commit, and still
+  needs upstream's encounter effects' entries (`b962ecf040`), verified as the same local, uncommitted candidate.
+- **Port:** `PORT_SHA`, on the topic branch `port-phase4-coverage`, local and not published, after `4ca0b4fd39`, whose
+  entry's `PORT_SHA` it fills: the fixes of that branch's review. It lands as that entry says, after
+  `port-phase4-route`.
+- **ROM:** T0 passes on this commit's tree with the candidate: Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`,
+  White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a` (`python3 configure.py && ninja`, which recompiled
+  `src/ov036/fldmmdl_movecode.c`, touched and restored by the scratch trace, and matched both SHA1s).
+- **Host build:** T1 passes on macOS arm64, AppleClang 21.0.0, RelWithDebInfo with the oracle, both versions: this
+  commit changes no C and no CMake target, only `port/`'s Python, documents and comments; `build/port` and
+  `build/port-w2` configured again and rebuilt incrementally (`ninja -j4`) with the candidate, no warning. White 2's
+  program was built once with a scratch print in `FldmmdlMovecode_MoveTurnRandom` for the townsperson's trace, never
+  committed, and rebuilt from the restored file before any test below.
+- **Tests:** `ctest -j2` of the tests this commit touches, with the oracle and the cached oracle saves, on this
+  commit's tree but this file, with the candidate, both versions at once under load averages of 27 to 48 from other
+  sessions; every one passed: `oracle_compare` (56 unit tests, the new ones the mystery gift block's decryption, the
+  trips' declared bytes outside its encrypted contents and `compare_boots`' start-up count), `oracle_saves`,
+  `oracle_pc`, `oracle_center_continue`, `oracle_round_trip_catch`, `oracle_round_trip_hugh`, `game_script_vm` and
+  `game_ptrcasts`, in each version. T4 and T6:
+
+  | Test | Black 2 | White 2 |
+  | --- | --- | --- |
+  | `oracle_round_trip_hugh` | up to the cut 8,165 of 8,165, its state too; the saves 2,722 bytes of each copy apart as written, 19 decrypted, all declared; melonDS 5,671 frames the same on either save, up to count 3602; the port's continuation held to melonDS's on the port's save, 3,589 of 3,589, state at 2,474 frames, none apart | 8,157 of 8,157; 2,715 and 18 bytes; 5,606 frames; 3,581 of 3,581, 2,474 |
+  | `oracle_round_trip_catch` | the saves 17 bytes of each copy apart, written and decrypted; melonDS 6,900 of 6,900 frames the same on either save; the port's continuation held to melonDS's on the port's save, 4,679 of 4,679, state at 3,562 frames, none apart | 17 bytes; 6,900; 4,671 of 4,671, 3,562 |
+
+  `oracle_pc` and `oracle_center_continue` give the last entry's counts. The rest of the suite, which this commit
+  doesn't touch, passed in the last entry's full run. T5 and T7 not run (Next).
+- **Tiers:** unchanged: no game code changes.
+- **Trap stubs:** unchanged, 30 function stubs and 21 data placeholders per version.
+- **64-bit warnings:** unchanged: no C changes (the last entry's line).
+- **Work done:** the review of the last entry's three commits found the branch sound and nine problems; each is fixed,
+  but one taken as information:
+  - **The mystery gift block is compared by what it holds.** The hugh trip declared the whole block (2,712 bytes a
+    copy) because the Pokémon Center's deliveryman encrypts it again with a key from the VBlank count, so any change
+    to the gift data would have passed. `oracle.py` now decrypts each save's block with the key it keeps
+    (`mystery_gift_decrypted`, as `mgDecryptData` does), checks that its contents add up to its checksum, and compares
+    the saves so: the contents are the same in both versions, and only the key (`0x1d292`) and the block's CRC
+    (`0x1d296`) are declared, 19 bytes a copy in Black 2 and 18 in White 2 where 2,722 and 2,715 differ as written.
+    `oracle_compare` checks the decryption and that no trip declares the block's encrypted bytes.
+  - **The port's continuation is held to melonDS's run on the same save.** The round trips compared the port's run on
+    its own save with melonDS's on melonDS's save, which for hugh needed GFL's random state left out where the two
+    saves' townsperson draws apart (`continued_random`). They now compare it with melonDS's run on the port's save,
+    which `compare_boots` holds to melonDS's own up to `continued_last`, and `continued_random` is gone: no stretch of
+    state is declared for it.
+  - **`SAVE_RANDOM`'s 126 counts for the PC's save are traced.** The PC's dialog closes 128 counts later on the DS in
+    both versions, and the townsperson by the counter draws 126 later: the PC's log-off let him take up his wait a
+    field pass sooner on the DS in both versions (the DS's actor dumped from melonDS's memory, White 2's port from a
+    scratch trace), so the field menu stops him with one step less to go (25 against 26 in Black 2, 9 against 10 in
+    White 2). `PC_LOGOFF` said White 2's DS went on on the port's pass; it doesn't, but the lead shows only after the
+    save. `SAVE_WRITES`, `SAVE_CAMERA` and the README give each save's figures, the PC's 128 and 144 among them.
+  - **Cause texts corrected:** the play time's seconds (`CENTER_PLAY_SECONDS`: the DS's clock some 8 seconds ahead of
+    the port's at the same count in both versions; Black 2's saves on the same count, White 2's port saving 740 counts
+    later) and the townsperson's (the save isn't on the same count in White 2); `PC_WINDOW` (oracle frame 8795, 8730 in
+    White 2, is port frame 6403's picture, which the check of missing pictures names since it holds a frame to the
+    DS's own frames, and White 2's four fifth frames of six, a step further partway).
+  - **ADR 0023's third decision reworded before its review:** the port plays the oracle's presses where they still
+    reach its own course (Black 2's Hugh, whose scene ends at count 14,370, between melonDS's last two B presses and
+    50 counts before its X, measured from the port's running event), else presses of its own (White 2's).
+  - **Smaller:** `port/cmake/README.md`'s `oracle.cmake` row names phase 4's tests and the round trips; oracle.cmake's
+    comments, the glossary, the tests guide and the feature map say how the trips compare; `test_compare.py`'s blank
+    line is back and `compare_boots`' last count has its start-up case (a count past the last before the game sets it
+    up); three lessons.
+  - **Taken as information:** `ActorCmdExec`'s `s32` offset has no test of its own; the docs say `game_script_vm`
+    covers the four VM commands, and a test of it needs a field with an actor system, which the line's sum, the same
+    as the VM commands', doesn't justify.
+- **Next:** as the last entry gives it: the sync of upstream's `b962ecf040`, `port-phase4-route` published, then this
+  branch merged with it and published as its own pull request; T5 on phase 4's route and the PC (the gate's
+  `STD_GetStringLength` report), T7, the PC's other apps and a round trip of the PC's save.
+- **Blockers:** as the last entry gives them.
+
+## 2026-10-25: phase 4's PC and a trainer battle to its end, held to melonDS; the field script VM's jumps back
+
+- **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it; this branch merges no upstream commit. Like
+  `port-phase4-route`, which it continues, it needs upstream's encounter effects' entries (`b962ecf040`), which only
+  the next sync brings, and was verified with them as the same local, uncommitted candidate, never committed.
+- **Port:** `4ca0b4fd39`, on the topic branch `port-phase4-coverage`, local and not published, from `port-phase4-route`
+  at `0fcafe6757`: `5e838b5724` (the field script VM's jumps back, signed offsets), `14a6b68aa5` (Hugh's battle to its
+  end, held by its save) and this commit (the PC). It fills the last entry's `PORT_SHA`, `0fcafe6757`, and
+  game-changes.md's, `5e838b5724`. It lands after `port-phase4-route`: once that branch has merged `main` past the sync
+  and is published, this one merges it and follows as its own pull request.
+- **ROM:** T0 passes on this commit's tree with the candidate: Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White
+  2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a` (`python3 configure.py && ninja`, which recompiled
+  `src/ov012/scrcmd_vm.c` and `src/ov036/scrcmd_fldmmdl.c` for both versions, the two complete files the jumps' fix
+  changes, and matched both SHA1s). The candidate is inside `#ifdef PLATFORM_PC`, which MWCC never sees.
+- **Host build:** T1 passes on macOS arm64, AppleClang 21.0.0, RelWithDebInfo with the oracle, both versions
+  (`build/port`, `build/port-w2`), incrementally from `0fcafe6757`'s objects, with the candidate: no warning in the
+  changed C (`scrcmd_vm.c`, `scrcmd_fldmmdl.c`, `port/tests/game/test_script_vm.c`); clang-format (Homebrew 23.1.3) is
+  clean on them. `gen_stubs`: 30 function stubs and 21 data placeholders per version.
+- **Tests:** full `ctest -j2` with the oracle, the cached oracle saves and the clone's `build/port-venv` (Unicorn), on
+  this commit's tree but this file, with the encounter effects' candidate, both versions at once, under load averages of
+  5 to 11 on the machine's 8 cores from other sessions where sampled: Black 2, 316 passed and 1 skipped of 317
+  (2,526 s); White 2, 313 passed and 1 skipped of 314 (2,470 s); none failed. Skipped: `app_universal_slices`, which
+  only a distribution build has; `asm_oracle` ran and passed, and so did every timing gate. The candidate is the last
+  entry's, and without it the three tests it names stop at Bianca's wild encounter as it says; this branch's new tests
+  weren't run without it. T2: `game_script_vm` (new: the VM's jumps and calls, back and forward, on the whole program's
+  objects), `oracle_compare` (also the round trips' cut, port input, continued random state and last count,
+  `input_starts_with` and `compare_boots`' last count), `app_run_dir_plain` and `_sanitized`. T4 and T6, the new
+  sequences and the round trip, every port frame but the declared ones and the game's state at every frame it compares:
+
+  | Test | Black 2 | White 2 |
+  | --- | --- | --- |
+  | `oracle_pc` | 11,003 of 11,003 (4,941 exact); NNS G3D's state 10,369 of 10,369 frames, GFL's random state 9,912 of 9,912 | 10,926 of 10,926 (4,937); 10,369, 9,884 |
+  | `oracle_center_continue` | 3,589 of 3,589 (1,484); 2,474, 2,474 | 3,581 of 3,581 (1,486); 2,474, 2,474 |
+  | `oracle_round_trip_hugh` | up to the cut as `oracle_hugh`, 8,165 of 8,165, its state too; the saves 2,722 bytes of each copy apart, all declared; melonDS 5,671 frames the same on either save, up to count 3602; the port's own continued 3,589 of 3,589, its state as `center_continue`'s | 8,157 of 8,157; 2,715 bytes of each copy; 5,606 frames; 3,581 of 3,581 |
+
+  The oracle README's results give the frames left out of each, and the state's. `oracle_hugh`, `oracle_route19`,
+  `oracle_catch`, `oracle_catch_continue`, `oracle_round_trip_catch`, the exit route and the field sequences pass as the
+  last entry gives them. T5 and T7 not run (Next).
+- **Tiers:** unchanged: the jumps' fix retypes five locals of two complete files, which compile to the same code.
+- **Trap stubs:** 30 function stubs and 21 data placeholders per version (`build/port*/gen/stubs.c`), as the last
+  entry's; none on the new routes.
+- **64-bit warnings:** `check_ptrcasts: 361 sites in 225 keys (real 66, harmless 117, handled 141, unreachable 37), 1682
+  files, 0 not compiled` in both versions (`game_ptrcasts`), as the last entry's: the jumps' fix retypes integers, no
+  pointer cast.
+- **Work done:** phase 4's coverage (PLAN.md §7: the PC among the battles, menus and saves; ADR 0023's trainer battle
+  past the cut), in both versions, and a port defect the PC found.
+  - **The field script VM's jumps back (`5e838b5724`).** `VMCall`, `VMJump`, `VMJumpIf` and `VMCallIf`
+    (`src/ov012/scrcmd_vm.c`) and `ActorCmdExec`'s movement data (`src/ov036/scrcmd_fldmmdl.c`) read their offset as a
+    `u32`: a jump back, which the DS's 32-bit sum wraps, moved a 64-bit position 4 GiB on, and the port crashed in
+    `VM_Run` when the PC Box closed and the storage system's menu jumped back to show itself again. The offsets are
+    `s32` now, a neutral change with its row in game-changes.md, both files complete. `game_script_vm`
+    (`port/tests/game/test_script_vm.c`) runs the four jumps and calls on the whole program's objects: with the old
+    `u32` its five jumps back land 4 GiB on and it fails; with the fix it passes.
+  - **A trainer battle to its end (`14a6b68aa5`).** `oracle.py round-trip hugh` (`oracle_round_trip_hugh`) has the
+    port play Hugh's battle from melonDS's starter save with the DS's seeds, to the Pokémon Center's scene and SAVE
+    there. Up to ADR 0023's cut it is held frame by frame and by the game's state as the hugh sequence holds it, the
+    hugh sequence's input file checked to be the start of the one the port plays (`RoundTrip.cut`); past it the battle
+    is the port's own, which ends 560 counts later than the DS's in Black 2 and 704 in White 2, and the port's save is
+    held to melonDS's `center_save` byte by byte: 2,722 bytes of each copy apart in Black 2 and 2,715 in White 2, all
+    declared with their traced causes (the play time's seconds; the mystery gift block, which the Pokémon Center's
+    deliveryman reads and so encrypts again with a key from the VBlank count; the Pokémon Center's random-turning
+    townsperson's timer, and in Black 2 his direction; the CRCs). Tepig's data, the money, the bag and the flags are
+    melonDS's. melonDS continues both saves the same frame for frame up to the field's fade-in, and the port continues
+    its own as melonDS continues its, in a new sequence, `center_continue` (`RoundTrip.continued_last`, and
+    `continued_random` for the townsperson's draws as the field loads). White 2's port battle takes more turns, so the
+    port plays `hugh_port_w2_us.pbwinput`, melonDS's presses with its own past the cut (`RoundTrip.port_input`).
+  - **The PC (this commit).** The `pc` sequence goes on from the catch save back through the gate into Aspertia City
+    and the Pokémon Center, to its PC: Someone's PC, the Pokémon Storage System, and the PC Box's deposit (Purrloin
+    into Box 1), withdrawal (the box looked at, Purrloin taken back) and move (Tepig and Purrloin swapped in the
+    party), the PC switched off, and SAVE. Every port frame matches melonDS on the count, with the game's state, in
+    both versions but the declared differences, each traced: the DS's passes of 2 to 6 frames that redraw the PC's
+    windows (`PC_WINDOW`), two gate wipes' steps set while the beam draws (`WIPE_LINES`), the zoom into the Pokémon
+    Center (`CENTER_ZOOM`), the save's dialog and, after it, the Pokémon Center's globe and townsperson (`SAVE_GLOBE`),
+    and in Black 2 the townsperson's two turns after the PC switches off, 2 counts sooner on the DS, whose script goes
+    on a field pass sooner after the log-off sound ends in the same frame on both (`PC_LOGOFF`, traced with both
+    programs' sound traces, the DS's actor dumped from melonDS's memory and a scratch trace of the port's).
+  - **Records:** this entry, which fills the last entry's `PORT_SHA`; game-changes.md's row for the jumps (its
+    `PORT_SHA` filled here); the oracle README (the sequences, the results, the round trip and its bytes, the saves,
+    the known differences); oracle.cmake's and game.cmake's comments; the feature map's field, battles and new PC rows;
+    the tests and CMake guides; the glossary's round trip and cut; decomp-findings.md's AI row; the lessons.
+- **Next:** the sync of upstream's `b962ecf040`, then `port-phase4-route` merged with `main` and published, then this
+  branch merged with it and published as its own pull request. T5 (the sanitized build) on phase 4's route and the PC:
+  on the way to the PC it stops in the Aspertia gate, which route19 also passes, on a global-buffer-overflow report in
+  `STD_GetStringLength` (`lib/nitro/src/std/std_string.c:116`, NitroSDK's word-at-a-time string length), which reads
+  the last aligned word of an 11-byte string literal of `src/ov104/field_gimmick_gate.c` (the gate's electronic board,
+  `GimmickGate_AddDateMessage` → `G3DTextDraw_CreateResource`); a read that holds the terminator and never leaves its
+  word, a candidate for the sanitizer ignorelist with its report in sanitizers.md, not yet handled. T7 (a windowed
+  playtest of the catch, its save and the PC) is not run yet. The PC's other apps (the items, the Battle Box) and
+  the box's own menus have no route yet, and the PC's save isn't held as a save (a round trip from the catch save).
+- **Blockers:** upstream's `b962ecf040` reaching `main` by sync, before `port-phase4-route` and then this branch can be
+  published. Hugh's AI can't match melonDS past the first decision its CPU budget moves
+  ([ADR 0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md)).
+
+## 2026-10-24: phase 4's route held to melonDS: Hugh's battle, Route 19, a catch, its save and the round trip
+
+- **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it; this branch merges no upstream commit. The
+  route's battles need two of upstream's fixes: the semi-invulnerable table of `src/ov167/btl_pokeparam.c`, which `main`
+  has had since the sync of `629a53cccb`, and the encounter effects' entries of `src/ov036/enceff_data.c`, which
+  upstream merged at `b962ecf040` after it and which only the next sync brings. This branch was verified with those
+  entries as a local, uncommitted candidate (upstream's four entries under `PLATFORM_PC`), never committed.
+- **Port:** `0fcafe6757`, on the topic branch `port-phase4-route`, local and not published, from `main`'s PR 31
+  (`90e837daad`, merged at `949379c195`). It fills the last entry's `PORT_SHA`, `90e837daad`. The branch was first
+  written as four commits on `def88de18f`; after its review, the stand-alone three went to `main` through PR 31, and
+  this commit is the route's, its review's fixes folded in. It waits for the sync of upstream's `b962ecf040`; then it
+  merges `main` and is published as a pull request.
+- **ROM:** T0 as PR 31's entry gives it: this commit changes only `port/`, on PR 31's tree, which passes (Black 2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`). The candidate is
+  inside `#ifdef PLATFORM_PC`, which MWCC never sees.
+- **Host build:** T1 passes on macOS arm64, AppleClang 21.0.0, RelWithDebInfo with the oracle, both versions
+  (`build/port`, `build/port-w2`), incrementally, with the candidate: no warning in the changed files (`run_dir.c`,
+  `main.c`, `test_run_dir.c`, `gfl_use_host.c`, `gf_standard_host.c`); clang-format (Homebrew 23.1.3) is clean on them
+  and on `random_state.h`. `gen_stubs`: 30 function stubs and 21 data placeholders per version.
+- **Tests:** full `ctest -j2` with the oracle, the cached oracle saves and the clone's `build/port-venv` (Unicorn), on
+  this commit's tree but this file, with the encounter effects' candidate, both versions at once, under load averages of
+  14 to 101 on the machine's 8 cores from other sessions: Black 2, 311 passed and 1 skipped of 312 (6,583 s); White 2,
+  308 passed and 1 skipped of 309 (6,503 s); none failed. Skipped: `app_universal_slices`, which only a distribution
+  build has; `asm_oracle` ran and passed, and so did every timing gate. Without the candidate, `oracle_route19`,
+  `oracle_catch` and `oracle_round_trip_catch` stop at Bianca's wild encounter on GFL's overlay collision assert, as
+  decomp-findings.md's encounter row says, so the exact commit can't pass them until the sync. T2: `oracle_compare` (the
+  dumps' specs for each program, `known_random`, the round trips' declared bytes), `app_run_dir_plain` and `_sanitized`
+  (`**`). T4 and T6, the route, every port frame but the declared ones and the game's state at every frame it compares:
+
+  | Test | Black 2 | White 2 |
+  | --- | --- | --- |
+  | `oracle_hugh` | 8,165 of 8,165 (1,680 exact); NNS G3D's state 7,043 of 7,043 frames, GFL's random state 7,039 of 7,039 | 8,157 of 8,157 (1,682); 7,043, 7,039 |
+  | `oracle_route19` | 14,846 of 14,846 (6,951); 14,130, 13,336 | 14,345 of 14,345 (6,953); 14,122, 13,356 |
+  | `oracle_catch` | 10,988 of 10,988 (2,084); 10,323, 9,292 | 10,481 of 10,481 (2,007; the battle's 2,975 top screens left out); 9,561, 4,164 |
+  | `oracle_catch_continue` | 4,679 of 4,679 (1,967); 3,562, 3,562 | 4,671 of 4,671 (1,969); 3,562, 3,562 |
+  | `oracle_round_trip_catch` | saves 34 bytes apart, all declared; melonDS 6,900 of 6,900 frames the same on either save; the port's own continued 4,679 of 4,679, its state as `catch_continue`'s | the same 34 bytes; 6,900 of 6,900; 4,671 of 4,671 |
+
+  The oracle README's results give the frames left out of each, and the state's. The exit route and the field sequences
+  pass as PR 31's entry gives them. T5 and T7 not run (Next).
+- **Tiers:** unchanged: no game C changes.
+- **Trap stubs:** 30 function stubs and 21 data placeholders per version, as PR 31's entry; none on the route.
+- **64-bit warnings:** `check_ptrcasts: 361 sites in 225 keys (real 66, harmless 117, handled 141, unreachable 37), 1682
+  files, 0 not compiled` in both versions (`game_ptrcasts`), as PR 31's entry: the branch adds no game C.
+- **Work done:** phase 4's exit (PLAN.md §7: catch a Pokémon, save, quit, reload; a melonDS save continues in the port
+  and back) as oracle sequences held frame by frame on the game's count, in both versions, each from melonDS's save of
+  the piece before and with the DS's random seeds, cut where the DS's CPU time decides
+  ([ADR 0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md)); and the review's findings for the route.
+  - **The sequences.** `hugh`: from the starter save, CONTINUE at the lookout, Hugh's arrival and challenge, his trainer
+    battle with A every 16 frames, to his second turn's rolls (count 8193), where his AI picks another move by
+    construction. `route19`: from `center_save`, melonDS's save in the Pokémon Center after that battle, out into the
+    city, Mom's scene, the gate's gift, Bianca's capture demo, and SAVE beside the grass. `catch`: from `route19_save`,
+    a wild Purrloin (level 4, met at count 4929 in both versions) caught with a Poké Ball, the Pokédex entry, no
+    nickname, SAVE. `catch_continue`: that save continued in a new run, into the party with Tepig and Purrloin. The
+    saves `center_save`, `route19_save` (now from `center_save`, 17,800 frames) and `catch_save` are held to their
+    SHA-1s. `oracle.py round-trip catch` has the port make its own catch save from melonDS's Route 19 save; melonDS
+    continues both saves the same frame for frame, and the port continues its own as melonDS continues its.
+  - **The game's state, held as a test** (the review's fifth and sixth findings). Each sequence compares NNS G3D's state
+    and GFL's random state (`RANDOM_STATE`: the linear generator's state and the Mersenne Twister's first word and
+    index) with the DS's at every count from the title on, where they had none. The port reads GFL's statics through
+    the handles its host files now give them (`port/hal/gfl/random_state.h`), with `--run-dump`'s new `**` (`run_dir.c`,
+    with a `test_run_dir.c` case). A sequence declares, with their causes, the frames its state differs at:
+    `known_state` for all of it (the DS's long passes, `MID_PASS`; the save's dialog's camera, `SAVE_CAMERA`; White 2's
+    battle camera after Purrloin's cry, `CRY_BATTLE`) and the new `known_random` for GFL's random state alone, NNS G3D's
+    still compared there: Hugh's AI's two passes a turn (`AI_TIME`: Black 2's counts 7500-7501 and 7969-7970, White
+    2's 7496-7497 and 7969-7970), what made "GFL's state is the DS's count for count" and the AI's pass offset rest on
+    scratch traces before; the townspeople's draws after each save's dialog, the DS making each of the port's 192 to
+    232 counts later, as late as its dialog closes (`SAVE_RANDOM`); and White 2's battle from Purrloin's cry on
+    (`CRY_RANDOM`), where the battle's top screen is left out, so that its catch is held by its bottom screen, the
+    save's bytes, the continued runs and NNS G3D's state but for the battle's camera.
+  - **The round trip's saves** (the review's fifth finding). `RoundTrip` declares the bytes where the two catch saves
+    differ, each span with its cause (Purrloin's mail's sentence ids, the heap's leftovers; the play time's seconds;
+    the CRCs over them; both copies), and the trip fails on a byte that differs anywhere else; `test_compare.py` holds
+    the check. The continued runs compare the game's state too.
+  - **A trainer battle to its end on the port** (the sixth finding's last point): not yet a test.
+    `center_save`'s input files now give the DS's seeds, so the port plays Hugh's battle past the AI's cut: in Black 2
+    it plays it to its end, the Pokémon Center's scene and SAVE there, and its save differs from melonDS's only in the
+    play time, the mystery gift block (encrypted again with a key seeded by the VBlank count), a townsperson's random
+    turn and the CRCs, Tepig's data, the money and the bag melonDS's; in White 2 the same presses miss SAVE. The oracle
+    README says how to run it. A round trip for a trainer battle needs presses of its own after the battle (Next).
+  - **The review's other findings for the route:** this entry is the route's own, in the route's commit (the first);
+    its message names upstream's fixes by commit, not by a bare number (the second); the oracle README gave 4,633 frames
+    for Black 2's continued round trip (4,679), five saves made from saves (four) and 12 of White 2's frames for the
+    lookout's seam (12 in each version); the White 2 catch_continue input said 0:12 (0:13); decomp-findings.md's
+    encounter row gave the old Route 19 route's 28,600 frames as the route's (the eighth). The ADRs, the depth change's
+    claims and PR 31's records were the fixes' branch's.
+  - **Records:** this entry, which fills the last entry's `PORT_SHA`; the oracle README (the sequences, the results
+    with the state's column, the round trip, the saves, the known differences of the AI, the saves and the cry, the
+    dumps' `**`); the feature map's encounters, random numbers and replays rows; the platform layer's guide
+    (`random_state.h`); the tests guide; the glossary's random state; decomp-findings.md's AI and encounter rows; the
+    lessons; `oracle.cmake`'s comments; ADR 0023's third point, which now says that the port may need presses of its
+    own after a cut, as White 2's Hugh shows.
+- **Next:** the sync of upstream's `b962ecf040`; then merge `main` here, run the route's tests without the candidate,
+  and publish this branch as a pull request. T5 (the sanitized build) on the route's sequences and T7 (a windowed
+  playtest of the catch and its save), which phase 4's close needs, are not run yet. A round trip for Hugh's battle,
+  with presses of its own after the battle, would hold a trainer battle to its end on the port.
+- **Blockers:** upstream's `b962ecf040` (#496) reaching `main` by sync. Hugh's AI can't match melonDS past the first
+  decision its CPU budget moves ([ADR 0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md)).
 
 ## 2026-10-24: the follow-ups' hygiene: the metrics' compile step on upstream's probe, the records at the decomp's names
 

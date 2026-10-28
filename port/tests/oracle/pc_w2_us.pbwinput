@@ -1,0 +1,142 @@
+pbwinput 1
+# Phase 4's PC (oracle.py's SEQUENCES: pc), from the catch save, the game the route saved after catching a wild
+# Purrloin on Route 19 (catch_save_w2_us.pbwinput): CONTINUE in Route 19's grass, out of it and back through the
+# gate into Aspertia City, into the Pokemon Center and up to its PC, left of the counter (the tile at (4,11) is the
+# PC's, MapTile_IsPC, read facing up from (4,12)). The PC's menus (res/field/scripts/global_10090.s): Someone's PC,
+# the Pokemon Storage System, then each of its first three apps of the PC Box (overlay 255, src/ov255/box2_seq.c):
+# Deposit Pokemon, Purrloin from the party into Box 1; Withdraw Pokemon, Box 1 with Purrloin in it, and Purrloin back
+# into the party; Move Pokemon, the party opened from the box and Tepig moved onto Purrloin, which swaps them. Each app
+# ends with B and NO to "Continue Box operations?", back to the storage system's menu, which jumps back in the script to
+# show itself again. Then B out of both menus, the PC switched off, and the field menu's SAVE, whose dialog shows the
+# party in its new order (Aspertia City, Pokedex 3, time 0:15). The clock is pinned and the seed line is the random
+# seed the DS builds at start-up (oracle.py seeds pc): nothing here builds another. Positions are zone (x, z) tiles;
+# counts are GFL's frame count (sVBlankCount). On game frames.
+# White 2, with Black 2's presses but one: its catch save leaves the player a tile lower, so its LEFT in the gate is
+# shorter.
+version w2_us
+clock pinned
+seed 0x270fd5258c56ebe3  # GFL's, at start-up (oracle frame 20)
+1100 START  # START in the opening skips it to the title (count 1115 on both)
+1101 -
+3000 START  # START brings back the layers the title hid at count 2877
+3001 -
+3100 START  # START leaves for the start menu and its saved game, which shows from count 3249
+3101 -
+3400 A  # CONTINUE: Route 19 (zone 437), in the grass at (58,694), where the game was saved
+3401 -
+3800 LEFT  # out of the grass to (55,693)
+3856 -
+3900 DOWN  # down to (55,699), above the sign
+4000 -
+4010 LEFT  # (54,699)
+4028 -
+4040 DOWN  # down x = 54 into the gate (zone 438) at (6,1), and down to (6,7), where (6,8) stops the player
+4260 -
+4270 RIGHT  # (7,7), around it
+4288 -
+4300 DOWN  # down to (7,13)
+4400 -
+4410 LEFT  # (6,13)
+4420 -
+4440 DOWN  # through the gate's south door into Aspertia City (zone 427) at (54,711), down x = 54 to (54,740)
+5022 -
+5030 LEFT  # west along z = 740 to (48,740), below the Pokemon Center's door
+5126 -
+5140 UP  # into the Pokemon Center (zone 435) at (7,19), and up x = 7 to the counter, (7,12)
+5420 -
+5430 LEFT  # (4,12), below the PC
+5464 -
+5490 UP  # facing the PC
+5496 -
+5520 A  # "AAAAAAA booted up the PC."
+5524 -
+5800 A  # "Which PC should be accessed?"
+5804 -
+5860 A  # Someone's PC
+5864 -
+5920 A  # "The Pokemon Storage System was accessed."
+5924 -
+5980 A
+5984 -
+6040 A  # its menu: Deposit Pokemon, Withdraw Pokemon, Move Pokemon, Battle Box, Move items, No thanks!
+6044 -
+6100 A  # Deposit Pokemon: the PC Box opens on the party, Tepig and Purrloin, beside Box 1
+6104 -
+6400 RIGHT  # Purrloin
+6404 -
+6460 A  # "Purrloin is selected.": DEPOSIT, SUMMARY, MARKING, RELEASE, CANCEL
+6464 -
+6620 A  # DEPOSIT: "Place it in which Box?", Box 1
+6624 -
+6820 A  # Box 1: Purrloin deposited, Tepig alone in the party
+6824 -
+7050 B  # "Continue Box operations?"
+7054 -
+7100 DOWN  # NO
+7104 -
+7130 A  # back to the storage system's menu, which the script shows again with a jump back (L_047B)
+7134 -
+7300 DOWN  # Withdraw Pokemon
+7304 -
+7340 A  # Withdraw Pokemon: Box 1, Purrloin in its first place, the cursor on it
+7344 -
+7700 A  # "Purrloin is selected.": WITHDRAW, SUMMARY, MARKING, RELEASE, CANCEL
+7704 -
+7780 A  # WITHDRAW: Purrloin back in the party, Box 1 empty
+7784 -
+8000 B  # "Continue Box operations?"
+8004 -
+8050 DOWN  # NO
+8054 -
+8080 A  # back to the storage system's menu
+8084 -
+8300 DOWN  # Withdraw Pokemon
+8304 -
+8330 DOWN  # Move Pokemon
+8334 -
+8370 A  # Move Pokemon: Box 1, and the PARTY PKMN button below it
+8374 -
+8700 DOWN  # the cursor down Box 1's rows to PARTY PKMN
+8704 -
+8720 DOWN
+8724 -
+8740 DOWN
+8744 -
+8760 DOWN
+8764 -
+8780 DOWN
+8784 -
+8900 A  # PARTY PKMN: the party, the cursor on Tepig
+8904 -
+9000 A  # "Tepig is selected.": MOVE, SUMMARY, HELD ITEMS, MARKING, RELEASE, CANCEL
+9004 -
+9100 A  # MOVE: Tepig picked up
+9104 -
+9180 RIGHT  # over Purrloin
+9184 -
+9220 A  # put down there: Purrloin first in the party, Tepig second
+9224 -
+9320 B  # the party closed
+9324 -
+9400 B  # "Continue Box operations?"
+9404 -
+9620 DOWN  # NO
+9624 -
+9650 A  # back to the storage system's menu
+9654 -
+9800 B  # "Which PC should be accessed?"
+9804 -
+9900 B  # the PC switched off; the player free at (4,12)
+9904 -
+10050 X  # X: the field menu
+10056 -
+10110 DOWN  # the first key shows the cursor, on POKEMON
+10116 -
+10140 DOWN  # BAG
+10146 -
+10170 DOWN  # SAVE
+10176 -
+10200 A  # A: "Would you like to save the game?", the party in its new order
+10206 -
+10480 A  # YES: "AAAAAAA saved the game."
+10486 -

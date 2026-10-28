@@ -5,12 +5,16 @@
 // (src/ov167/btl_main.c) from the console's entropy, which on the DS is its CPU's timing and its stack's leftovers, so
 // a host builds another seed than any DS (port/docs/decomp-findings.md). The wrapper runs gf_standard.c's buildSeed,
 // then gives the context the seed random_seed.c says the game uses: the one an input file gives in its place, as the
-// DS built it, else the one built. gf_standard.c's other functions are its own.
+// DS built it, else the one built. gf_standard.c's other functions are its own. --run-dump reads the Mersenne Twister's
+// state through sGFLStd's handle (port/hal/gfl/random_state.h).
 #define buildSeed buildSeed_ds
 #include "src/gfl/gf_standard.c"
 #undef buildSeed
 
 #include "hal/gfl/random_seed.h"
+#include "hal/gfl/random_state.h"
+
+void *const port_gfl_std_tables = &sGFLStd;
 
 // The headers' prototype was renamed with the function
 void buildSeed(MATHRandContext32 *context);

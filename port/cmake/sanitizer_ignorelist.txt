@@ -25,3 +25,10 @@ fun:ApplyCurrentAnimResult_
 # function check for C, such as upstream clang 17 and later)
 [function]
 fun:runSaveBlkInitializers
+
+# R13: the field's ordinary/plugin command tables erase BOOL(VM *, FieldScriptEnv *) to BOOL(VM *, void *).
+# ISO C considers these function types incompatible; audited field, trainer-AI, battle-effect and Musical VM tables
+# all return BOOL/int and take two object pointers, identically passed by the supported host ABIs. Only the field
+# tables erase the context type. The host helper contains only that dispatch: native callbacks and the four-argument
+# verifier remain checked in VM_Run. No numeric-argument conversion is covered (R12 uses a correctly typed wrapper).
+fun:VM_CallCommand
