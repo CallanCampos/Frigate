@@ -161,7 +161,7 @@ void func_ov036_021be7c4(FieldEffects *effects, void *data);
 void *FldeffNamipokeSplash_Create(FieldEffects *effects, HeapID heapId);
 void FldeffNamipokeSplash_Delete(FieldEffects *effects, void *data);
 void *FldeffIwakudaki_Create(FieldEffects *effects, HeapID heapId);
-void func_ov036_021a5628(FieldEffects *effects, void *data);
+void FldeffIwakudaki_Delete(FieldEffects *effects, void *data);
 void *StoneTask_Create(FieldEffects *effects, HeapID heapId);
 void func_ov036_021c27ac(FieldEffects *effects, void *data);
 void *FldeffIaigiri_Create(FieldEffects *effects, HeapID heapId);

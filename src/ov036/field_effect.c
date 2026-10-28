@@ -87,7 +87,7 @@ static const FieldEffectVTable FIELD_EFFECT_VTABLES[FLDEFF_MAX + 1] = {
     { 6, func_ov036_021b496c, func_ov036_021b4990 },
     { 7, func_ov036_021be790, func_ov036_021be7c4 },
     { 8, FldeffNamipokeSplash_Create, FldeffNamipokeSplash_Delete },
-    { 9, FldeffIwakudaki_Create, func_ov036_021a5628 },
+    { 9, FldeffIwakudaki_Create, FldeffIwakudaki_Delete },
     { 10, StoneTask_Create, func_ov036_021c27ac },
     { 11, FldeffIaigiri_Create, func_ov036_021c2e00 },
     { 12, func_ov036_021a5828, func_ov036_021a584c },

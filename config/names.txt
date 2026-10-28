@@ -11304,6 +11304,7 @@ overlays/ov036 0x021a54fc EncountTask_Update
 overlays/ov036 0x021a5550 EncountTask_PlaySound
 overlays/ov036 0x021a55b8 EncountTask_Draw
 overlays/ov036 0x021a5604 FldeffIwakudaki_Create
+overlays/ov036 0x021a5628 FldeffIwakudaki_Delete
 overlays/ov036 0x021a563c FldeffIwakudaki_LoadResources
 overlays/ov036 0x021a5684 FldeffIwakudaki_FreeResources
 overlays/ov036 0x021a56b0 FldeffIwakudaki_UploadTexturesTask
@@ -11311,6 +11312,7 @@ overlays/ov036 0x021a56c8 FldeffIwakudaki_Start
 overlays/ov036 0x021a5734 FldeffIwakudaki_Init
 overlays/ov036 0x021a5798 FldeffIwakudaki_Exit
 overlays/ov036 0x021a57bc FldeffIwakudaki_Update
+overlays/ov036 0x021a57ec FldeffIwakudaki_Draw
 overlays/ov036 0x021a5860 FldeffFishing_LoadResources
 overlays/ov036 0x021a58b4 FldeffFishing_FreeResources
 overlays/ov036 0x021a5968 FldeffFishing_SetAnimeSpeed
