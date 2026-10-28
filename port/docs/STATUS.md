@@ -36,7 +36,7 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 - **Upstream:** reviewed Frigate main `43eaf0429a`, upstream `f71f5fe61d`. Pending sync PR 62 and the unfinished
   ROM reader remain separate; any later base integration requires renewed verification.
-- **Port:** `PORT_SHA`, native backup service, game-wrapper waiting and authentic save checkpoints;
+- **Port:** `43c07bce61`, native backup service, game-wrapper waiting and authentic save checkpoints;
   [ADR 0029](adr/0029-backup-write-service-wait.md) accepts this narrow policy.
 - **ROM (T0):** fresh signed configure and 18 Ninja steps after the native-only game-wrapper change pass both
   original US hashes with zero warnings: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`,
@@ -70,6 +70,7 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   Native `writeFlashWaitSuccess` waits through the genuine SDK while its finisher owns errors and lock release.
   Initial B2 diagnostics found six failures of 395 (361 pass/28 skips); the real busy loop, false 5600 completed-save
   assumption and CMake target-metadata fixture omission are corrected and full suites now pass. No failure was masked.
+  [Port lessons](lessons.md) record the real-caller and original-checkpoint validation rules.
 - **Next:** publish a separate topic PR, verify its exact head, then require all hosted checks and the configured
   owner-authored review exception before normal protected merge. Reverify if reviewed main changes.
 - **Blockers:** serial transport, other ARM7 work, the separate ROM-reader experiment and later story coverage
