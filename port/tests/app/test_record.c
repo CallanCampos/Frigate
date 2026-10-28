@@ -141,6 +141,60 @@ static void TestFaults(void) {
     pbw_input_free(&back);
     port_record_test_io(NULL);
 }
+// Probe this test directory's actual lookup rules rather than assuming macOS volumes are all case-insensitive.
+static void TestFilesystemAliases(const char *directory) {
+    char upper[4096], lower[4096];
+    FILE *probe, *alias;
+    const char *protectedPaths[1];
+    CHECK(snprintf(upper, sizeof(upper), "%s/CaseProbe", directory) < (int)sizeof(upper));
+    CHECK(snprintf(lower, sizeof(lower), "%s/caseprobe", directory) < (int)sizeof(lower));
+    remove(upper);
+    remove(lower);
+    probe = fopen(upper, "wb");
+    CHECK(probe != NULL && fputs("probe", probe) >= 0 && fclose(probe) == 0);
+    alias = fopen(lower, "rb");
+    int caseInsensitive = alias != NULL;
+    if (alias != NULL) {
+        fclose(alias);
+    }
+    remove(upper);
+    if (caseInsensitive) {
+        CHECK(snprintf(upper, sizeof(upper), "%s/IREO.sav", directory) < (int)sizeof(upper));
+        CHECK(snprintf(lower, sizeof(lower), "%s/ireo.sav", directory) < (int)sizeof(lower));
+        protectedPaths[0] = upper;
+        CHECK(!port_record_create(lower, protectedPaths, 1, NULL));
+        CHECK((probe = fopen(upper, "rb")) == NULL); // refusal removes only the newly created recording
+        CHECK((probe = fopen(lower, "rb")) == NULL);
+        CHECK(snprintf(upper, sizeof(upper), "%s/SAVE.sav", directory) < (int)sizeof(upper));
+        CHECK(snprintf(lower, sizeof(lower), "%s/save.sav.TMP", directory) < (int)sizeof(lower));
+        protectedPaths[0] = upper;
+        CHECK(!port_record_create(lower, protectedPaths, 1, NULL));
+        CHECK((probe = fopen(lower, "rb")) == NULL);
+        puts("record: actual case-insensitive future save and temporary aliases rejected");
+    }
+#ifndef _WIN32
+    // HFS/APFS can also normalize Unicode spellings. Other filesystems still execute every non-alias regression.
+    CHECK(snprintf(upper, sizeof(upper), "%s/caf\xc3\xa9", directory) < (int)sizeof(upper));
+    CHECK(snprintf(lower, sizeof(lower), "%s/cafe\xcc\x81", directory) < (int)sizeof(lower));
+    remove(upper);
+    remove(lower);
+    probe = fopen(upper, "wb");
+    CHECK(probe != NULL && fclose(probe) == 0);
+    alias = fopen(lower, "rb");
+    int normalizes = alias != NULL;
+    if (alias != NULL) {
+        fclose(alias);
+    }
+    remove(upper);
+    if (normalizes) {
+        protectedPaths[0] = upper;
+        CHECK(!port_record_create(lower, protectedPaths, 1, NULL));
+        CHECK((probe = fopen(upper, "rb")) == NULL);
+        puts("record: actual Unicode-normalized future alias rejected");
+    }
+#endif
+}
+
 int main(int argc, char **argv) {
     PbwInputState a = { PBW_INPUT_A, 0, 1, 100, 50 };
     PbwInput h, back;
@@ -211,6 +265,7 @@ int main(int argc, char **argv) {
     CHECK(!port_record_close());
     remove(sPath);
     TestFaults();
+    TestFilesystemAliases(argv[1]);
     sButtons = PBW_INPUT_X;
     sLid = 1;
     sTouch = 1;

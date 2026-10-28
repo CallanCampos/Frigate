@@ -53,6 +53,8 @@ records keep what was decided or found at the time, and are added to, not rewrit
 | [adr/0018](adr/0018-protected-main-and-sync-prs.md) | Protected main and reviewed upstream syncs |
 | [adr/0019](adr/0019-pointer-cast-guard-against-a-classified-baseline.md) | The pointer cast guard: the game's casts that cut an address, held to a classified baseline |
 | [adr/0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md) | Root heaps in the game's own memory get host memory |
+| [adr/0026-native-archive-table-caches.md](adr/0026-native-archive-table-caches.md) | Native FAT/FNT cache representation, SDK seam, lifecycle and timing limits |
+| [adr/0027-recorded-input-streams.md](adr/0027-recorded-input-streams.md) | Effective video input, explicit initial state, bounded seeds and committed recording prefixes |
 | [RESEARCH.md](RESEARCH.md) | The research of 2026-10-16 behind the plan, summarized |
 | [research/README.md](research/README.md) | The full research reports, with what each covers |
 | [research/decomp-progress.md](research/decomp-progress.md) | The decomp's C coverage per module, data and pointer coverage, pace, claims |
@@ -93,4 +95,3 @@ The repository's landing page on GitHub is [../../.github/README.md](../../.gith
 documents are in [../../docs/](../../docs/): its [code organization](../../docs/code-organization.md),
 [source files](../../docs/source-files.md), [game data](../../docs/data.md) and [scripts](../../docs/scripts.md) are the
 ones Frigate's documents point to.
-| [adr/0026-native-archive-table-caches.md](adr/0026-native-archive-table-caches.md) | Native FAT/FNT cache representation, SDK seam, lifecycle and timing limits |

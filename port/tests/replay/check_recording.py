@@ -109,7 +109,7 @@ def check_header(path: Path, version: str, info: dict) -> dict:
 
 
 def check_saves(first_path: Path, second_path: Path, require_save: bool,
-                reference: Path | None) -> dict[str, str]:
+                reference: Path | None, starting: Path | None = None) -> dict[str, str]:
     def images(directory: Path) -> dict[str, bytes]:
         files = {}
         for path in (directory / "saves").iterdir():
@@ -121,6 +121,8 @@ def check_saves(first_path: Path, second_path: Path, require_save: bool,
     first, second = images(first_path), images(second_path)
     if first.keys() != second.keys() or (require_save and not first):
         raise ValueError("record/replay produced different save files, or no required save")
+    if require_save and starting is not None and all(data == starting.read_bytes() for data in first.values()):
+        raise ValueError("the required SAVE did not change the starting image")
     result = {}
     for name, data in first.items():
         if data != second[name]:
@@ -147,7 +149,7 @@ def check(args: argparse.Namespace, work: Path, rom: Path) -> dict:
         raise ValueError("a live recording did not predeclare all 64 seeds")
     if args.input is not None and oracle.input_seeds(str(args.input)) != oracle.input_seeds(str(recording)):
         raise ValueError("recording changed the replay's explicit seed list")
-    result["saves_sha256"] = check_saves(first, second, args.require_save, args.reference_save)
+    result["saves_sha256"] = check_saves(first, second, args.require_save, args.reference_save, args.save)
     if args.fixed_time is not None and result["effective_time"] != args.fixed_time:
         raise ValueError("recording lost the explicit fixed-time override")
     if before != {str(path): digest(path) for path in immutable}:
@@ -167,7 +169,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--frames", type=int, default=5600)
     parser.add_argument("--fixed-time")
     parser.add_argument("--screens", default="none")
-    parser.add_argument("--require-save", action="store_true")
+    parser.add_argument("--require-save", action="store_true",
+                        help="require a produced save; with --save, require changed bytes from that starting image")
     parser.add_argument("--timeout", type=int, default=1200, help="seconds per process")
     parser.add_argument("--out", type=Path, help="new directory in which to preserve evidence; never overwrites")
     args = parser.parse_args(argv)

@@ -32,6 +32,71 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: effective input recording and fresh-process replay
+
+- **Upstream:** reviewed main `85a0c74c067c`, through `35d735b52bb77338f3a138d321e562975ade556e`.
+  PR 52 merged normally after all 14 checks passed. The separate reviewed sync in PR 53 imports names through
+  `fd3b9e600da7`; its formatting follow-up passes local verification and awaits hosted checks. That pending
+  sync is not implicitly part of this feature's measured source.
+- **Port:** `PORT_SHA` on `codex/input-recording`, with snapshot `1839aa2c61` and normal main integration at
+  `5bc0b71fe6`, followed by writer fixes, the evidence checker and guides. Changes relative to reviewed main are
+  all in `port/`. Game C, source configurations, RNG algorithms and input assets stay unchanged.
+- **ROM (T0):** initial 10,587-step and final 18-step configure/Ninja runs pass both original hashes without
+  warnings: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. The supported local signed-wibo runtime override changes no
+  source; no tool or workaround binary is committed.
+- **Host build (T1):** both ordinary RelWithDebInfo all-target builds pass on arm64 macOS. Both actual programs
+  also build with Homebrew LLVM 23, fatal ASan/UBSan, recovery off and frame-time report-only off. The existing
+  sanitizer ignorelist is unchanged. A Linux-only source definition exposes POSIX file APIs to strict C11;
+  all four tested Mac binaries remain byte-identical after that build-system change.
+- **Tests (T2/T3):** 15 focused checks pass without skips in each game: ordinary/sanitized writer and parser,
+  run metadata, strict seed exhaustion, actual ARM9 touch sampling, archive tables, pointer guard and real
+  record/replay cases. The evidence checker's 16 ROM-free regressions reject missing/changed frames, state,
+  clocks or seeds, corrupt saves and an unchanged copied fixture presented as a newly produced SAVE.
+- **Record/replay:** each game records the complete 34,600-frame Alder/Floccesy/Route 20 SAVE route from its
+  SHA-checked catch fixture, then replays the new video-frame file in a fresh process from another fixture copy.
+  All 34,600 frame/counter/screen records and 133,940 NNS/random-state payloads agree, without cuts or tolerances.
+  Original game-frame input, pinned RTC and every declared/used seed are preserved. Produced native images match
+  the prior Route 20 images exactly: B2 `902e95eaa5e9b402a1405033a4733e0d45cd9d61`, W2
+  `ae17781116ca7728ba8a9f23175e33cda8c5c6ea`. All 73 blocks in both banks, tables and footers validate
+  against SHA-checked DS references.
+- **Reload/clock:** each own save continues for 4,700 frames in a new recorded process, then replays again:
+  all frames and 14,340 state samples agree; save bytes stay unchanged. Both games also pass the video-frame
+  first-save route (5,600 frames, 17,940 samples, new valid identical save), live headless recording (1,800 frames,
+  2,740 samples, all 64 OS-source seeds declared), and an explicit running-clock override to
+  `2017-01-02 03:04:05` (5,600 frames, 17,940 samples and new valid identical save). The replay obtains the
+  effective clock from the recording alone. An unchanged image is allowed only for continuation tests that make
+  no claim of producing a new SAVE.
+- **Oracle (T4):** no fresh DS comparison or interchange is claimed here. Produced Route 20 images are identical
+  to those already proved by the previous milestone. Native determinism does not establish DS trainer-AI timing
+  fidelity. No new battle exclusion or comparison mask. Seed overrides are the explicit recording contract;
+  no hidden reseeding is introduced.
+- **Sanitizers (T5):** both strict programs pass separate 5,600-frame first-save and 1,800-frame live record/replay
+  cases: all frames, 17,940/2,740 state samples and produced save bytes agree. All eight native processes exit
+  zero without sanitizer diagnostics. These are separate from the longer ordinary story routes.
+- **Visual/performance play (T7):** eight captures inspected: SAVE prompt/final Route 20, then fresh-process
+  party/field, in both games. B2 has Tepig level 6 at 23/23 HP and Purrloin level 4 at 17/17; W2 has Tepig 24/24
+  and Purrloin 17/17. Headless captures, not a new windowed test or recording-overhead benchmark.
+- **Tiers:** no new scan for this port-only feature. Last source-unit scan: 41,017 tier (a), zero (b)/(c), plus
+  2,385 veneers/16,906 bytes. This is not a claim that every native/SDK subsystem works.
+- **Trap stubs:** unchanged at 25 functions plus `CARDi_NdmaInterface` data per game; none reached here.
+- **64-bit warnings:** both ordinary builds stay at 365 sites/229 keys: real 66, harmless 123, handled 141,
+  unreachable 35; 1,707 compiled inputs and zero missing. No baseline/suppression changes.
+- **Work done:** `--record` streams effective video input with separate preboot `initial` state, effective RTC
+  and bounded explicit seeds. Legacy initial input stays unchanged. Replay never hands off at its last change.
+  Exhaustion stops before the original fallback builder modifies state. Exclusive creation and actual file
+  identity protect future save/input/output aliases, including case/Unicode normalization. The actual Mac
+  case-alias reproduction now rejects with status 2 before startup and creates no file in either game. Failed
+  writes attempt rollback to the committed prefix. Guides/maps and [ADR 0027](adr/0027-recorded-input-streams.md)
+  explain limits. All 5,642 runtime/build/input source hashes stay fixed through the runs; the later Linux-only
+  declaration flag preserves all four Mac binaries exactly. No ROM/save/capture/diagnostic binary is committed.
+- **Next:** finish exact-head canonical/hosted checks and protected review/merge before closing issue 38.
+  Continue CARD wire/SDK timing with source-derived costs and unchanged game AI/scripts/shared RNG, then Phase 5
+  through Floccesy Ranch, Hugh's Town Map, the lost Lillipup and the first gym.
+- **Blockers:** no missing game C or owner approval blocks this work. Whole-game native support and trainer-AI
+  deadline fidelity remain unfinished; ADR 0023 stays proposed. Unlimited seeds and replay-to-live handoff are
+  separate designs. Issue 45 needs Spanish Black 2 gameplay/save evidence; the owner has no dump.
+
 ## 2026-10-28: native archive-table caches and measured trainer-AI work
 
 - **Upstream:** `35d735b52bb77338f3a138d321e562975ade556e`. PR 51 merged as `eb4873f7f1` after delegated
@@ -40,7 +105,7 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   addresses, sizes and modes in both versions. All 45 C/header files normalize to identical tokens in pure upstream
   and the actual adapted port; the assembler include changes comments only. No port/workflow change or reference
   exception. Existing pointer, VM and other native adaptations remain in place.
-- **Port:** `PORT_SHA`, on `codex/fs-table-cache`, from that reviewed main. The cache change is five code/test/build
+- **Port:** `5e23d1c7b4`, on `codex/fs-table-cache`, from that reviewed main. The cache change is five code/test/build
   files plus guides and records. Its sole out-of-port change is the guarded SDK cached-read seam in
   `lib/nitro/src/fs/fs_command_default.c`; no game algorithm is replaced.
 - **ROM (T0):** latest-base configure/Ninja completes 10,587 steps, zero warnings. Both original hashes match:

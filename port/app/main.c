@@ -81,8 +81,9 @@ static const Option sOptions[] = {
       "(or the format's default) sets the clock unless --fixed-time is given, and its clock line can pin the clock "
       "there for the whole run" },
     { "record", "FILE", 0,
-      "records effective buttons, lid and touch on video frames, with a fixed effective clock and bounded explicit "
-      "seeds; with --input, records playback without replay-to-live handoff" },
+      "records effective buttons, lid and touch on video frames with an explicit clock; live recording stops before "
+      "requesting more than 64 startup/battle random seeds (startup uses one); --input preserves its own declared "
+      "seed limit and records playback without replay-to-live handoff" },
     { "rom", "PATH", 0, "the player's ROM (port/hal/rom)" },
     { "save-dir", "PATH", 0, "where saves go (port/hal/card)" },
     { "fixed-time", "\"YYYY-MM-DD HH:MM:SS\"", 0,

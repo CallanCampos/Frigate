@@ -11,10 +11,12 @@
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
+// clang-format off
+#include <windows.h> // bcrypt.h requires Windows type declarations.
 #include <bcrypt.h>
+// clang-format on
 #include <direct.h>
 #include <io.h>
-#include <windows.h>
 #define PATH_SIZE 32768
 #define PATH_SEP '\\'
 #define PATH_COMPARE _stricmp
@@ -182,6 +184,81 @@ static int Canonical(const char *path, char *out, size_t size, unsigned depth) {
     return snprintf(out, size, "%s", resolved) < (int)size;
 }
 
+// Compare actual filesystem identity after exclusive creation: future leaves may alias by case or Unicode
+// normalization even when their canonical strings differed before the file existed. Never use Windows st_ino.
+static int SameFile(FILE *file, const char *path) {
+#ifdef _WIN32
+    BY_HANDLE_FILE_INFORMATION opened, other;
+    HANDLE current = (HANDLE)_get_osfhandle(_fileno(file));
+    HANDLE candidate;
+    int same;
+    if (current == INVALID_HANDLE_VALUE || !GetFileInformationByHandle(current, &opened)) {
+        return -1;
+    }
+    candidate = CreateFileA(path, 0, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING,
+                            FILE_FLAG_BACKUP_SEMANTICS, NULL);
+    if (candidate == INVALID_HANDLE_VALUE) {
+        DWORD error = GetLastError();
+        return error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND ? 0 : -1;
+    }
+    if (!GetFileInformationByHandle(candidate, &other)) {
+        CloseHandle(candidate);
+        return -1;
+    }
+    same = opened.dwVolumeSerialNumber == other.dwVolumeSerialNumber && opened.nFileIndexHigh == other.nFileIndexHigh &&
+           opened.nFileIndexLow == other.nFileIndexLow;
+    CloseHandle(candidate);
+    return same;
+#else
+    struct stat opened, other;
+    if (fstat(fileno(file), &opened) != 0) {
+        return -1;
+    }
+    if (stat(path, &other) != 0) {
+        return errno == ENOENT || errno == ENOTDIR ? 0 : -1;
+    }
+    return opened.st_dev == other.st_dev && opened.st_ino == other.st_ino;
+#endif
+}
+
+// Only unlink the path when it still names the file this module exclusively created.
+static void DiscardCreated(FILE *file, const char *path) {
+    int same = SameFile(file, path);
+    fclose(file);
+    if (same == 1) {
+        remove(path);
+    }
+}
+
+static int ProtectedAfterCreate(FILE *file, const char *const *paths, size_t count) {
+    char target[PATH_SIZE];
+    for (size_t i = 0; i < count; ++i) {
+        size_t n;
+        if (paths[i] == NULL) {
+            continue;
+        }
+        // A protected future path can now resolve to this new output through the filesystem's own rules.
+        if (SameFile(file, paths[i]) != 0) {
+            return 0;
+        }
+        if (!Canonical(paths[i], target, sizeof(target), 0)) {
+            return 0;
+        }
+        if (SameFile(file, target) != 0) {
+            return 0;
+        }
+        n = strlen(target);
+        if (n + 4 >= sizeof(target)) {
+            return 0;
+        }
+        memcpy(target + n, ".tmp", 5);
+        if (SameFile(file, target) != 0) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 int port_record_create(const char *path, const char *const *protectedPaths, size_t count, const char *runDir) {
     char output[PATH_SIZE], other[PATH_SIZE];
     if (sFile != NULL || !Canonical(path, output, sizeof(output), 0)) {
@@ -230,18 +307,16 @@ int port_record_create(const char *path, const char *const *protectedPaths, size
     if (sFile == NULL) {
         goto bad;
     }
-    if (setvbuf(sFile, NULL, _IONBF, 0) != 0) {
-        fclose(sFile);
+    if (!ProtectedAfterCreate(sFile, protectedPaths, count) || setvbuf(sFile, NULL, _IONBF, 0) != 0) {
+        DiscardCreated(sFile, path);
         sFile = NULL;
-        remove(path);
         goto bad;
     }
     snprintf(sPath, sizeof(sPath), "%s", path);
     if (!sExitRegistered) {
         if (atexit(ExitClose) != 0) {
-            fclose(sFile);
+            DiscardCreated(sFile, path);
             sFile = NULL;
-            remove(path);
             goto bad;
         }
         sExitRegistered = 1;

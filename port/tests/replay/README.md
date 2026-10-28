@@ -11,6 +11,8 @@ The parent [test map](../README.md) describes the established screen, same-save 
 
 The recording checker defaults to 5,600 frames. CTest supplies the existing first-save input, which formats New
 Game's save from a blank chip. Longer routes can pass `--input FILE --save START.sav --frames N --require-save`.
+With a starting image, `--require-save` also requires changed bytes, so an untouched copied fixture cannot pass as
+a newly produced save. Continuation-only checks can omit that flag and still compare/validate their images.
 `--reference-save FILE` fixes the block layout to an examined image; without it, CRC checks prove internal image
 integrity. These native comparisons do not establish DS interchange or trainer-AI timing fidelity.
 

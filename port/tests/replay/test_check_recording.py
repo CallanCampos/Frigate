@@ -126,6 +126,22 @@ class RecordingChecks(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "IREO.sav"):
             recording.check_saves(*self.paths, True, None)
 
+    def test_unchanged_valid_start_is_not_a_new_save(self):
+        fixture_spec = importlib.util.spec_from_file_location(
+            "saveimage_fixtures", HERE.parent / "oracle" / "test_saveimage.py")
+        fixture_module = importlib.util.module_from_spec(fixture_spec)
+        fixture_spec.loader.exec_module(fixture_module)
+        valid, _ = fixture_module.make_image()
+        self.assertEqual(recording.saveimage.validate_image(valid), [])
+        starting = self.root / "starting.sav"
+        starting.write_bytes(valid)
+        for path in self.paths:
+            (path / "saves" / "IREO.sav").write_bytes(valid)
+        with self.assertRaisesRegex(ValueError, "did not change the starting image"):
+            recording.check_saves(*self.paths, True, None, starting)
+        # Continuation tests may deliberately leave an existing save unchanged; they do not claim SAVE production.
+        self.assertEqual(len(recording.check_saves(*self.paths, False, None, starting)), 1)
+
     def test_unfinished_save_fails(self):
         (self.paths[0] / "saves" / "IREO.sav.tmp").write_bytes(b"unfinished")
         with self.assertRaisesRegex(ValueError, "unfinished save"):

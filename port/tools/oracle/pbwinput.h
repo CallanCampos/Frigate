@@ -11,7 +11,8 @@
 //   at the same moment of the game (port/docs/PLAN.md §6).
 // - Video frames: frame N ends with the N-th VBlank since power-on (on the port, since the game's main()).
 // Both programs apply a state at a VBlank, before the interrupt is taken, as pbw_input_frame_at_vblank says; the game
-// reads it at the start of its next pass (GCTX_HIDUpdate). The state of frame 1 also holds from power-on.
+// reads it at the start of its next pass (GCTX_HIDUpdate). Legacy files hold frame 1 from power-on; an explicit
+// initial header supplies a separate preboot state and holds until the first committed frame change.
 //
 // A file also sets the real-time clock: its "time" line is the time at power-on, and its "clock" line says whether the
 // clock runs from there (the default) or stays pinned there for the whole run on both programs (PbwInputClock), for a

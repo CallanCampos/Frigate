@@ -9,6 +9,11 @@ target_sources(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/app/present.c" "${C
     "${CMAKE_CURRENT_SOURCE_DIR}/tools/oracle/pbwinput.c")
 # The version an input file's "version" line must name
 target_compile_definitions(port_app PRIVATE "PORT_VERSION_NAME=\"${PORT_VERSION}\"")
+# The app is strict C11. glibc hides the recorder's POSIX file/realpath declarations unless features are requested
+# before its first system header; keep this on the source so the executable and focused test targets agree.
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set_property(SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/app/record.c" APPEND PROPERTY COMPILE_DEFINITIONS _GNU_SOURCE)
+endif()
 
 # --run-dump finds the game's globals by name (port_host_global_address, port/hal/host) without exporting them: dlsym on
 # macOS, the program's own symbol table on Linux and Windows
