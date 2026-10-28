@@ -11973,6 +11973,7 @@ overlays/ov036 0x021c1444 FieldWaitTask_Callback
 overlays/ov036 0x021c1c68 FieldFlash_RequestState
 overlays/ov036 0x021c1c6c FieldFlash_GetState
 overlays/ov036 0x021c1d14 FieldFlashAnimation_CmdInit
+overlays/ov036 0x021c1d30 FieldFlashAnimation_CmdExpand
 overlays/ov036 0x021c1d5c FieldFlashAnimation_ShowExpanded
 overlays/ov036 0x021c1d78 FieldFlashAnimation_HideMask
 overlays/ov036 0x021c2080 PleasureBoat_Create
