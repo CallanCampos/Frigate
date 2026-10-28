@@ -1,0 +1,277 @@
+pbwinput 1
+# The catch save, made on the oracle from the Route 19 save (route19_save_b2_us.pbwinput; oracle.py save catch_save),
+# and phase 4's route's third piece (oracle.py's SEQUENCES: catch), which both programs play from that save: CONTINUE
+# beside Route 19's grass, into the grass and up and down in it until a wild Pokemon appears, its battle, a Poke Ball
+# from the bag, the catch, and the field menu's SAVE. The clock is pinned, and the seed lines are the random seeds the
+# DS builds here (oracle.py seeds catch). Positions are zone (x, z) tiles; counts are GFL's frame count
+# (sVBlankCount). On game frames. Black 2.
+version b2_us
+clock pinned
+seed 0x5a0af77416c50a14  # GFL's, at start-up (oracle frame 20)
+seed 0x078adf42ff92a496  # the wild battle's (oracle frame 7042)
+1100 START  # START in the opening skips it to the title (count 1115 on both)
+1101 -
+3000 START  # START brings back the layers the title hid at count 2877
+3001 -
+3100 START  # START leaves for the start menu, which shows from count 3249
+3101 -
+3400 A  # CONTINUE: Route 19 (zone 437) at (56,696), beside the grass, facing it
+3401 -
+3900 RIGHT  # into the grass
+3940 -
+3960 UP  # up and down a tile at a time until a wild Pokemon appears
+4000 -
+4020 DOWN
+4060 -
+4080 UP
+4120 -
+4140 DOWN
+4180 -
+4200 UP
+4240 -
+4260 DOWN
+4300 -
+4320 UP
+4360 -
+4380 DOWN
+4420 -
+4440 UP
+4480 -
+4500 DOWN
+4540 -
+4560 UP
+4600 -
+4620 DOWN
+4660 -
+4680 UP
+4720 -
+4740 DOWN
+4780 -
+4800 UP
+4840 -
+4860 DOWN
+4900 -
+4920 UP
+4960 -
+4980 DOWN
+5020 -
+5040 UP
+5080 -
+5100 DOWN
+5140 -
+5160 UP
+5200 -
+5220 DOWN
+5260 -
+5280 UP
+5320 -
+5340 DOWN
+5380 -
+5400 UP
+5440 -
+5460 DOWN
+5500 -
+5520 UP
+5560 -
+5580 DOWN
+5620 -
+5640 UP
+5680 -
+5700 DOWN
+5740 -
+5760 UP
+5800 -
+5820 DOWN
+5860 -
+5880 UP
+5920 -
+6600 DOWN  # "What will Tepig do?": DOWN, LEFT to BAG
+6606 -
+6640 LEFT
+6646 -
+6700 A  # the bag
+6706 -
+6820 RIGHT  # POKE BALLS
+6826 -
+6860 A
+6866 -
+6960 A  # the Poke Ball
+6966 -
+7060 A  # USE: the throw
+7066 -
+8100 B  # B: the Pokedex's new data, then NO to a nickname, back to the field
+8104 -
+8116 B
+8120 -
+8132 B
+8136 -
+8148 B
+8152 -
+8164 B
+8168 -
+8180 B
+8184 -
+8196 B
+8200 -
+8212 B
+8216 -
+8228 B
+8232 -
+8244 B
+8248 -
+8260 B
+8264 -
+8276 B
+8280 -
+8292 B
+8296 -
+8308 B
+8312 -
+8324 B
+8328 -
+8340 B
+8344 -
+8356 B
+8360 -
+8372 B
+8376 -
+8388 B
+8392 -
+8404 B
+8408 -
+8420 B
+8424 -
+8436 B
+8440 -
+8452 B
+8456 -
+8468 B
+8472 -
+8484 B
+8488 -
+8500 B
+8504 -
+8516 B
+8520 -
+8532 B
+8536 -
+8548 B
+8552 -
+8564 B
+8568 -
+8580 B
+8584 -
+8596 B
+8600 -
+8612 B
+8616 -
+8628 B
+8632 -
+8644 B
+8648 -
+8660 B
+8664 -
+8676 B
+8680 -
+8692 B
+8696 -
+8708 B
+8712 -
+8724 B
+8728 -
+8740 B
+8744 -
+8756 B
+8760 -
+8772 B
+8776 -
+8788 B
+8792 -
+8804 B
+8808 -
+8820 B
+8824 -
+8836 B
+8840 -
+8852 B
+8856 -
+8868 B
+8872 -
+8884 B
+8888 -
+8900 B
+8904 -
+8916 B
+8920 -
+8932 B
+8936 -
+8948 B
+8952 -
+8964 B
+8968 -
+8980 B
+8984 -
+8996 B
+9000 -
+9012 B
+9016 -
+9028 B
+9032 -
+9044 B
+9048 -
+9060 B
+9064 -
+9076 B
+9080 -
+9092 B
+9096 -
+9108 B
+9112 -
+9124 B
+9128 -
+9140 B
+9144 -
+9156 B
+9160 -
+9172 B
+9176 -
+9188 B
+9192 -
+9204 B
+9208 -
+9220 B
+9224 -
+9236 B
+9240 -
+9252 B
+9256 -
+9268 B
+9272 -
+9284 B
+9288 -
+9300 B
+9304 -
+9316 B
+9320 -
+9332 B
+9336 -
+9348 B
+9352 -
+9364 B
+9368 -
+9380 B
+9384 -
+9396 B
+9400 -
+9500 X  # X: the field menu
+9506 -
+9560 DOWN  # the first key shows the cursor, on POKEMON
+9566 -
+9590 DOWN  # BAG
+9596 -
+9620 DOWN  # SAVE
+9626 -
+9650 A  # A: "Would you like to save the game?"
+9656 -
+9930 A  # YES: "AAAAAAA saved the game."
+9936 -

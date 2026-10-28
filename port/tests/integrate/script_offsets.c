@@ -116,8 +116,10 @@ static void TestJumpsAndCalls(void (*check)(int ok, const char *what)) {
     vm = VmAt(NICKNAME_CALL);
     s0004_VMCall(vm, NULL);
     check(vm->pc == At(NICKNAME_ROUTINE), "s0004_VMCall goes 128 bytes forward, to the nickname's routine");
-    VM_Return(vm);
+    check(vm->stackPos == 1 && sStack[0] == (uptr)At(NICKNAME_CALL + 4), "and pushes the exact return position");
+    s0005_VMReturn(vm, NULL);
     check(vm->pc == At(NICKNAME_CALL + 4), "and returns after its offset");
+    check(vm->stackPos == 0, "s0005_VMReturn consumes the return position");
 
     // The nickname's jump written as a conditional one: the condition's byte, then the offset
     At(NICKNAME_JUMP)[0] = CMP_EQ;
@@ -135,14 +137,18 @@ static void TestJumpsAndCalls(void (*check)(int ok, const char *what)) {
     VM_StackPush(vm, 0);
     s001F_VMJumpIf(vm, NULL);
     check(vm->pc == At(NICKNAME_LOOP), "and, testing the stack, goes back when the value popped isn't 1");
+    check(vm->stackPos == 0, "the conditional jump consumes the stack value");
 
     At(NICKNAME_JUMP)[0] = CMP_EQ;
     vm = VmAt(NICKNAME_JUMP);
     vm->cmpResult = CMP_EQ;
     s0020_VMCallIf(vm, NULL);
     check(vm->pc == At(NICKNAME_LOOP), "s0020_VMCallIf, its condition met, calls back to the nickname's loop");
-    VM_Return(vm);
+    check(vm->stackPos == 1 && sStack[0] == (uptr)At(NICKNAME_JUMP + 5),
+          "and pushes the conditional call's exact return position");
+    s0005_VMReturn(vm, NULL);
     check(vm->pc == At(NICKNAME_JUMP + 5), "and returns after its offset");
+    check(vm->stackPos == 0, "the conditional call's return consumes its position");
 }
 
 static void TestActorMovement(void (*check)(int ok, const char *what)) {

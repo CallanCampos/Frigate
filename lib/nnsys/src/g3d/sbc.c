@@ -834,7 +834,18 @@ void NNSi_G3dFuncSbc_NODEMIX(NNSG3dRS *rs, u32 opt) {
     sum.invN.m[2][2] += (weight * nrm->m[2][2]) >> FX32_SHIFT;
     // Loads the normal matrix as a 4x3 one, so the load reads three words past sum. Only the position matrix takes that
     // translation, and the next load replaces it
+#ifdef PLATFORM_PC
+    // The DS reads three discarded stack words here. Give the host a complete matrix instead: its translation is
+    // zero and the next position-only load replaces it, while the normal matrix keeps these nine weighted words.
+    {
+        MtxFx43 normal = { 0 };
+
+        MI_CpuCopy32(&sum.invN, &normal, sizeof(sum.invN));
+        G3_LoadMtx43(&normal);
+    }
+#else
     G3_LoadMtx43((const MtxFx43 *)&sum.invN);
+#endif
     reg_G3_MTX_MODE = GX_MTXMODE_POSITION;
     G3_LoadMtx43(&sum.invM);
     reg_G3_MTX_MODE = GX_MTXMODE_PROJECTION;

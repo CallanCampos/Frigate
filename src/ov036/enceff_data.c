@@ -10,17 +10,49 @@
 #include "field/encounter_effect_spread.h"
 #include "field/event_encounter_cutin.h"
 
+#ifdef PLATFORM_PC
+// The table's common signature has a u32 parameter. The model creators take a BOOL, and the ripple/grid creators
+// take no third argument; call their real prototypes through typed adapters instead of incompatible function casts.
+#define ENCEFF_BOOL_ADAPTER(name)                                                                                      \
+    static GameEvent *name##Host(GameSystem *gsys, Field *field, u32 param) {                                          \
+        return name(gsys, field, (BOOL)param);                                                                         \
+    }
+#define ENCEFF_TWO_ARG_ADAPTER(name)                                                                                   \
+    static GameEvent *name##Host(GameSystem *gsys, Field *field, u32 param) {                                          \
+        (void)param;                                                                                                   \
+        return name(gsys, field);                                                                                      \
+    }
+
+ENCEFF_BOOL_ADAPTER(EncEffModel_CreateModel7)
+ENCEFF_BOOL_ADAPTER(EncEffModel_CreateModel9)
+ENCEFF_BOOL_ADAPTER(EncEffModel_CreateModel5)
+ENCEFF_BOOL_ADAPTER(EncEffModel_CreateModel3)
+ENCEFF_BOOL_ADAPTER(EncEffModel_CreateModel1)
+ENCEFF_BOOL_ADAPTER(EncEffModel_CreateZoroark)
+ENCEFF_TWO_ARG_ADAPTER(EncEffRipple_CreateWhite)
+ENCEFF_TWO_ARG_ADAPTER(EncEffCells_Create)
+ENCEFF_TWO_ARG_ADAPTER(EncEffSpread_Create)
+ENCEFF_TWO_ARG_ADAPTER(EncEffColumns_Create)
+ENCEFF_TWO_ARG_ADAPTER(EncEffRipple_CreateBlack)
+
+#undef ENCEFF_BOOL_ADAPTER
+#undef ENCEFF_TWO_ARG_ADAPTER
+#define ENCEFF_CREATE(name) name##Host
+#else
+#define ENCEFF_CREATE(name) (EncEffCreateFunc) name
+#endif
+
 const EncEffInfo ENC_EFFECT_CONTROLLERS[ENCEFF_COUNT] = {
-    /* 0 */ { (EncEffCreateFunc)EncEffModel_CreateModel7, EncEffModel_Render, 149, 1, 0x13010 },
-    /* 1 */ { (EncEffCreateFunc)EncEffModel_CreateModel9, EncEffModel_Render, 149, 1, 0x131a4 },
-    /* 2 */ { (EncEffCreateFunc)EncEffRipple_CreateWhite, EncEffRipple_ClearAndDraw, 151, 1, 0x0 },
+    /* 0 */ { ENCEFF_CREATE(EncEffModel_CreateModel7), EncEffModel_Render, 149, 1, 0x13010 },
+    /* 1 */ { ENCEFF_CREATE(EncEffModel_CreateModel9), EncEffModel_Render, 149, 1, 0x131a4 },
+    /* 2 */ { ENCEFF_CREATE(EncEffRipple_CreateWhite), EncEffRipple_ClearAndDraw, 151, 1, 0x0 },
     /* 3 */ { EventEncountEffectCutin_Create25, NULL, 146, 0, 0x1e04 },
     /* 4 */ { EventEncountEffectCutin_Create26, NULL, 146, 1, 0x14bc8 },
-    /* 5 */ { (EncEffCreateFunc)EncEffModel_CreateModel5, EncEffModel_Render, 149, 1, 0x12fbc },
-    /* 6 */ { (EncEffCreateFunc)EncEffModel_CreateModel3, EncEffModel_Render, 149, 1, 0x13b20 },
-    /* 7 */ { (EncEffCreateFunc)EncEffCells_Create, EncEffGrid_ClearAndDraw, 152, 0, 0x0 },
-    /* 8 */ { (EncEffCreateFunc)EncEffSpread_Create, EncEffGrid_ClearAndDraw, 154, 1, 0x0 },
-    /* 9 */ { (EncEffCreateFunc)EncEffColumns_Create, EncEffGrid_ClearAndDraw, 153, 1, 0x0 },
+    /* 5 */ { ENCEFF_CREATE(EncEffModel_CreateModel5), EncEffModel_Render, 149, 1, 0x12fbc },
+    /* 6 */ { ENCEFF_CREATE(EncEffModel_CreateModel3), EncEffModel_Render, 149, 1, 0x13b20 },
+    /* 7 */ { ENCEFF_CREATE(EncEffCells_Create), EncEffGrid_ClearAndDraw, 152, 0, 0x0 },
+    /* 8 */ { ENCEFF_CREATE(EncEffSpread_Create), EncEffGrid_ClearAndDraw, 154, 1, 0x0 },
+    /* 9 */ { ENCEFF_CREATE(EncEffColumns_Create), EncEffGrid_ClearAndDraw, 153, 1, 0x0 },
     /* 10 */ { EventEncountEffectCutin_Create00, NULL, 146, 0, 0xe570 },
     /* 11 */ { EventEncountEffectCutin_Create01, NULL, 146, 0, 0xe570 },
     /* 12 */ { EventEncountEffectCutin_Create02, NULL, 146, 0, 0xe570 },
@@ -43,10 +75,12 @@ const EncEffInfo ENC_EFFECT_CONTROLLERS[ENCEFF_COUNT] = {
     /* 29 */ { EventEncountEffectCutin_Create19, NULL, 146, 0, 0xcf20 },
     /* 30 */ { EventEncountEffectCutin_Create20, NULL, 146, 0, 0xe570 },
     /* 31 */ { EventEncountEffectCutin_Create21, NULL, 146, 0, 0xe570 },
-    /* 32 */ { (EncEffCreateFunc)EncEffModel_CreateModel1, EncEffModel_Render, 149, 1, 0x132e8 },
+    /* 32 */ { ENCEFF_CREATE(EncEffModel_CreateModel1), EncEffModel_Render, 149, 1, 0x132e8 },
     /* 33 */ { EventEncountEffectCutin_Create22, NULL, 146, 1, 0x80e0 },
     /* 34 */ { EventEncountEffectCutin_Create23, NULL, 146, 1, 0x619c },
     /* 35 */ { EventEncountEffectCutin_Create24, NULL, 146, 1, 0xac88 },
-    /* 36 */ { (EncEffCreateFunc)EncEffModel_CreateZoroark, EncEffModel_Render, 149, 1, 0x12dc0 },
-    /* 37 */ { (EncEffCreateFunc)EncEffRipple_CreateBlack, EncEffRipple_ClearAndDraw, 151, 0, 0x0 },
+    /* 36 */ { ENCEFF_CREATE(EncEffModel_CreateZoroark), EncEffModel_Render, 149, 1, 0x12dc0 },
+    /* 37 */ { ENCEFF_CREATE(EncEffRipple_CreateBlack), EncEffRipple_ClearAndDraw, 151, 0, 0x0 },
 };
+
+#undef ENCEFF_CREATE

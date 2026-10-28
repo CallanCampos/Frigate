@@ -245,9 +245,21 @@ static const TileClassSFX TILE_CLASS_SFX_LAY0[] = {
     { NULL, 0, 0, 0, SEASON_ANY },
 };
 
+#ifdef PLATFORM_PC
+// TileClassSFX calls BOOL(u32), while the game's predicate takes u16. Keep the tile-class conversion without
+// calling through an incompatible function pointer on a host (R12, UBSan in the field's step sounds).
+static BOOL FieldPlayerGrid_IsReallyTallGrass(u32 tileClass) {
+    return MapTile_IsReallyTallGrass((u16)tileClass);
+}
+#endif
+
 // clang-format off
 static const TileClassSFX TILE_CLASS_SFX_LAY1[] = {
+#ifdef PLATFORM_PC
+    {FieldPlayerGrid_IsReallyTallGrass, SEQ_SE_FLD_08, 2, 4, SEASON_ANY},
+#else
     {(BOOL (*)(u32))MapTile_IsReallyTallGrass, SEQ_SE_FLD_08, 2, 4, SEASON_ANY},
+#endif
     {MapTile_IsSnow_, SEQ_SE_FLD_11, 2, 4, SEASON_ANY},
     {MapTile_IsSnowNoCycling, SEQ_SE_FLD_11, 2, 4, SEASON_ANY},
     {MapTile_IsSplashWater, SEQ_SE_FLD_13, 2, 4, SEASON_ANY},

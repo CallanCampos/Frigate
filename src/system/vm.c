@@ -51,6 +51,15 @@ void VM_Halt(VM *vm) {
     vm->pc = NULL;
 }
 
+#ifdef PLATFORM_PC
+// The field command tables erase FieldScriptEnv * to void *. Their BOOL return and two object-pointer arguments
+// share every supported host ABI, though the C function types differ (R13). Only this command-table call site has
+// a function-type-check exception; VM_Run's native callbacks and verifier keep their checks.
+static BOOL VM_CallCommand(VMCommand command, VM *vm, void *env) {
+    return command(vm, env);
+}
+#endif
+
 BOOL VM_Run(VM *vm) {
     u16 cmd;
 
@@ -81,7 +90,11 @@ BOOL VM_Run(VM *vm) {
                     vm->state = VM_STATE_STOPPED;
                     return FALSE;
                 }
+#ifdef PLATFORM_PC
+                if (VM_CallCommand(vm->param.extraCommands[cmd - vm->param.extraCommandStart], vm, vm->env) == TRUE) {
+#else
                 if (vm->param.extraCommands[cmd - vm->param.extraCommandStart](vm, vm->env) == TRUE) {
+#endif
                     break;
                 }
             } else {
@@ -89,7 +102,11 @@ BOOL VM_Run(VM *vm) {
                     vm->state = VM_STATE_STOPPED;
                     return FALSE;
                 }
+#ifdef PLATFORM_PC
+                if (VM_CallCommand(vm->param.commands[cmd], vm, vm->env) == TRUE) {
+#else
                 if (vm->param.commands[cmd](vm, vm->env) == TRUE) {
+#endif
                     break;
                 }
             }
