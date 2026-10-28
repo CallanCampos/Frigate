@@ -67,9 +67,9 @@ void GetPlayerGPosPlusDir(FieldPlayer *player, u16 dir, s16 *x, s16 *y, s16 *z);
 GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result, u16 useCurrent);
 // Check the party and the Battle Box against a regulation. Regulation_CreatePartyCheckTask returns the event that lets
 // the player choose between them, or NULL when neither can enter
-GameEvent *Regulation_CreatePartyCheckTask(GameSystem *gsys, u32 a1, Regulation *regulation, u16 *result,
+GameEvent *Regulation_CreatePartyCheckTask(GameSystem *gsys, u32 pickFromParty, Regulation *regulation, u16 *result,
                                            HeapID heapId);
-u32 Regulation_CheckTeams(GameSystem *gsys, u32 a1, Regulation *regulation, HeapID heapId);
+u32 Regulation_CheckTeams(GameSystem *gsys, u32 pickFromParty, Regulation *regulation, HeapID heapId);
 // The screen that picks the party or the Battle Box for a battle, whether it is done, and the choice
 PartySelectList *PartySelectList_Create(Field *field, PokeParty *party, PokeParty *battleBoxParty, u8 partyOk,
                                         u32 battleBoxOk, HeapID heapId);

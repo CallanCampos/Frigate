@@ -20,8 +20,13 @@
 #define REGULATION_SPECIES_COUNT 686
 #define REGULATION_LIST_MAX 32
 
-// The result when neither team can enter
-#define TEAM_SELECT_NONE 3
+// The team that enters, as PartySelectList_Delete returns its row: the party, the Battle Box, or neither when neither
+// can enter or the player cancels
+enum {
+    TEAM_SELECT_PARTY,
+    TEAM_SELECT_BATTLE_BOX,
+    TEAM_SELECT_NONE = 3,
+};
 
 typedef struct {
     GameSystem *gsys;
@@ -29,6 +34,7 @@ typedef struct {
     PartySelectList *select;
     PokeParty *party;
     PokeParty *battleBoxParty;
+    // Despite the names, set when the team fails the regulation, which PartySelectList greys out and refuses
     u8 partyOk;
     u8 battleBoxOk;
     u16 heapId;
@@ -37,7 +43,7 @@ typedef struct {
 
 static u16 Regulation_SetCaughtSpeciesWords(GameData *gameData, WordSet *wordSet, u16 regulationId, HeapID heapId);
 static u16 *Regulation_ListCaughtSpecies(Regulation *regulation, GameData *gameData, u16 *count, HeapID heapId);
-static BOOL TeamSelect_CheckTeams(GameSystem *gsys, u32 a1, Regulation *regulation, u32 *partyResult,
+static BOOL TeamSelect_CheckTeams(GameSystem *gsys, u32 pickFromParty, Regulation *regulation, u32 *partyResult,
                                   u32 *battleBoxResult, u16 *result, HeapID heapId);
 static GameEvent *TeamSelectEvent_Create(GameSystem *gsys, u32 partyResult, u32 battleBoxResult, u16 *result,
                                          HeapID heapId);
@@ -110,67 +116,69 @@ static u16 *Regulation_ListCaughtSpecies(Regulation *regulation, GameData *gameD
     return species;
 }
 
-GameEvent *Regulation_CreatePartyCheckTask(GameSystem *gsys, u32 a1, Regulation *regulation, u16 *result,
+GameEvent *Regulation_CreatePartyCheckTask(GameSystem *gsys, u32 pickFromParty, Regulation *regulation, u16 *result,
                                            HeapID heapId) {
     u32 partyResult;
     u32 battleBoxResult;
 
-    if (TeamSelect_CheckTeams(gsys, a1, regulation, &partyResult, &battleBoxResult, result, heapId) == TRUE) {
+    if (TeamSelect_CheckTeams(gsys, pickFromParty, regulation, &partyResult, &battleBoxResult, result, heapId) ==
+        TRUE) {
         return TeamSelectEvent_Create(gsys, partyResult, battleBoxResult, result, heapId);
     }
     return NULL;
 }
 
-// Check the party and the Battle Box against the regulation; whether the player has to pick between them
-static BOOL TeamSelect_CheckTeams(GameSystem *gsys, u32 a1, Regulation *regulation, u32 *partyResult,
+// Check the party and the Battle Box against the regulation, only whether a team can be picked from each when
+// pickFromParty is set; whether the player has to pick between them
+static BOOL TeamSelect_CheckTeams(GameSystem *gsys, u32 pickFromParty, Regulation *regulation, u32 *partyResult,
                                   u32 *battleBoxResult, u16 *result, HeapID heapId) {
-    u32 unk = 0;
+    u32 failFlags = 0;
     GameData *gameData = GSYS_GetGameData(gsys);
     PokeParty *party;
     BattleBoxSave *battleBox;
     PokeParty *battleBoxParty;
 
-    unk = 0;
+    failFlags = 0;
     party = GameData_GetParty(gameData);
     *result = TEAM_SELECT_NONE;
-    if (a1) {
+    if (pickFromParty) {
         *partyResult = PokeRegulation_CheckPartyCanEnter(regulation, party);
     } else {
-        *partyResult = PokeRegulation_CheckParty(regulation, party, &unk);
+        *partyResult = PokeRegulation_CheckParty(regulation, party, &failFlags);
     }
     battleBox = getBattleBox(GameData_GetSaveControl(gameData));
     if (BattleBoxSave_HasPkm(battleBox) == TRUE) {
-        unk = 0;
+        failFlags = 0;
         battleBoxParty = convertBoxedPokeSetToParty(battleBox, heapId);
-        if (a1) {
+        if (pickFromParty) {
             *battleBoxResult = PokeRegulation_CheckPartyCanEnter(regulation, battleBoxParty);
         } else {
-            *battleBoxResult = PokeRegulation_CheckParty(regulation, battleBoxParty, &unk);
+            *battleBoxResult = PokeRegulation_CheckParty(regulation, battleBoxParty, &failFlags);
         }
         if (battleBoxParty != NULL) {
             GFL_HeapFree(battleBoxParty);
         }
     } else {
-        if (*partyResult != 0) {
+        if (*partyResult != REGULATION_RESULT_OK) {
             *result = TEAM_SELECT_NONE;
         } else {
-            *result = 0;
+            *result = TEAM_SELECT_PARTY;
         }
         return FALSE;
     }
-    if (*partyResult != 0 && *battleBoxResult != 0) {
+    if (*partyResult != REGULATION_RESULT_OK && *battleBoxResult != REGULATION_RESULT_OK) {
         *result = TEAM_SELECT_NONE;
         return FALSE;
     }
     return TRUE;
 }
 
-u32 Regulation_CheckTeams(GameSystem *gsys, u32 a1, Regulation *regulation, HeapID heapId) {
+u32 Regulation_CheckTeams(GameSystem *gsys, u32 pickFromParty, Regulation *regulation, HeapID heapId) {
     u32 partyResult;
     u32 battleBoxResult;
     u16 result;
 
-    return TeamSelect_CheckTeams(gsys, a1, regulation, &partyResult, &battleBoxResult, &result, heapId);
+    return TeamSelect_CheckTeams(gsys, pickFromParty, regulation, &partyResult, &battleBoxResult, &result, heapId);
 }
 
 static GameEvent *TeamSelectEvent_Create(GameSystem *gsys, u32 partyResult, u32 battleBoxResult, u16 *result,
@@ -192,8 +200,8 @@ static GameEvent *TeamSelectEvent_Create(GameSystem *gsys, u32 partyResult, u32 
         select->heapId = heapId;
         select->party = party;
         select->battleBoxParty = battleBoxParty;
-        select->partyOk = partyResult != 0;
-        select->battleBoxOk = battleBoxResult != 0 ? TRUE : FALSE;
+        select->partyOk = partyResult != REGULATION_RESULT_OK;
+        select->battleBoxOk = battleBoxResult != REGULATION_RESULT_OK ? TRUE : FALSE;
     } else {
         return NULL;
     }
