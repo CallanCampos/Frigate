@@ -22,6 +22,8 @@ BOOL RivalSelect_RemoveHollowActorIfMission(FesGimmick *gimmick);
 BOOL RivalSelect_RemoveHollowActor(FesGimmick *gimmick);
 BOOL RivalSelect_IsSelectedAndActive(FesGimmick *gimmick, u32 id);
 void RivalSelect_SetActive(FesGimmick *gimmick, u32 id);
+// The index of the mission's entry for id among its 10, or RIVAL_ENTRY_NONE when none has it
+#define RIVAL_ENTRY_NONE 10
 u8 RivalSelect_FindEntryIndex(FesGimmick *gimmick, u32 id);
 
 #endif // POKEBW2_FIELD_RIVAL_SELECT_H
