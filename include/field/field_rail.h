@@ -66,14 +66,9 @@ struct RailLine {
 // A camera of the rails: the camera function to call, and its parameters
 struct RailCamera {
     u32 funcId;
-    s32 unk4;
-    s32 unk8;
-    s32 unkC;
-    s32 unk10;
-    s32 unk14;
-    s32 unk18;
-    s32 unk1C;
-    s32 unk20;
+    // The function's parameters, which each reads as its own: a pitch, yaw and zoom, an eye and a target, or an angle,
+    // a distance and the targets it moves between
+    s32 params[8];
 };
 
 // How a line bends: the function pair that converts between rail and world positions, and the center of its arc
