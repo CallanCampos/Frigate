@@ -11202,10 +11202,12 @@ overlays/ov036 0x021a24a4 EffectEncount_GetSearchArea
 overlays/ov036 0x021a26ec EffectEncount_PlaceRandomCandidate
 overlays/ov036 0x021a288c EffectEncount_CreateSpotEffect
 overlays/ov036 0x021a28c8 EffectEncount_FreeSpotEffect
+overlays/ov036 0x021a2bf4 MapTile_IsRippleWater
 overlays/ov036 0x021a2c04 MapTile_IsSplashWater
 overlays/ov036 0x021a2c58 MapTile_IsIce
 overlays/ov036 0x021a2c70 MapTile_IsSandD
 overlays/ov036 0x021a2c90 MapTile_IsAnySand
+overlays/ov036 0x021a2cd4 MapTile_IsFallenLeaves
 overlays/ov036 0x021a2ce0 MapTile_IsPuddle
 overlays/ov036 0x021a2cec MapTile_IsMud
 overlays/ov036 0x021a2d34 MapTile_IsGrassSingleB
