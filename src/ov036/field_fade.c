@@ -24,15 +24,15 @@
 typedef struct {
     GameSystem *gsys;
     Field *field;
-    u32 slow;
-    u32 waitDone;
+    u32 white;
+    u32 skipWait;
     u32 type;
     u32 stage;
 } FieldFadeWork;
 
 static void FieldFadeTCB_Callback(TCB *tcb, void *data);
 
-void FieldFadeTCB_Start(GameSystem *gsys, Field *field, u32 type, u32 slow, u32 waitDone) {
+void FieldFadeTCB_Start(GameSystem *gsys, Field *field, u32 type, u32 white, u32 skipWait) {
     FieldFadeWork *wk;
     TCBManager *mgr = Field_GetTCBMgr(field);
 
@@ -42,8 +42,8 @@ void FieldFadeTCB_Start(GameSystem *gsys, Field *field, u32 type, u32 slow, u32 
     wk->stage = 0;
     wk->gsys = gsys;
     wk->field = field;
-    wk->slow = slow;
-    wk->waitDone = waitDone;
+    wk->white = white;
+    wk->skipWait = skipWait;
     wk->type = type;
 }
 
@@ -57,12 +57,12 @@ static void FieldFadeTCB_Callback(TCB *tcb, void *data) {
         s32 end;
         u32 mode;
 
-        if (wk->type <= 1) {
+        if (wk->type <= FIELD_FADE_TYPE_OUT_QUICK) {
             speed = -1;
         } else {
             speed = 4;
         }
-        if (wk->type == 0 || wk->type == 2) {
+        if (wk->type == FIELD_FADE_TYPE_IN_QUICK || wk->type == FIELD_FADE_TYPE_IN) {
             u32 enabled;
 
             start = 16;
@@ -75,7 +75,7 @@ static void FieldFadeTCB_Callback(TCB *tcb, void *data) {
             start = 0;
             end = 16;
         }
-        if (wk->slow == 0) {
+        if (wk->white == FALSE) {
             mode = FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK;
         } else {
             mode = FADE_ENGINE_A_WHITE | FADE_ENGINE_B_WHITE;
@@ -87,7 +87,7 @@ static void FieldFadeTCB_Callback(TCB *tcb, void *data) {
     case 1: {
         BOOL done = FALSE;
 
-        if (wk->waitDone == 1) {
+        if (wk->skipWait == TRUE) {
             done = TRUE;
         }
         if (!GFL_FadeIsRunning()) {
@@ -608,14 +608,14 @@ GameEvent *EventDig_Create(GameEvent *parent, GameSystem *gsys, Field *field, BO
     return event;
 }
 
-GameEvent *EventTeleportEffect_Create(GameEvent *parent, GameSystem *gsys, Field *field, BOOL a3) {
+GameEvent *EventTeleportEffect_Create(GameEvent *parent, GameSystem *gsys, Field *field, BOOL teleport) {
     GameEvent *event = GameEvent_Create(gsys, parent, EventTeleportEffect_Callback, 0x7c);
     EffectEventWork *wk = GameEvent_GetData(event);
 
     wk->gsys = gsys;
     wk->field = field;
     wk->frame = 0;
-    wk->teleportFlag = a3;
+    wk->teleportFlag = teleport;
     return event;
 }
 

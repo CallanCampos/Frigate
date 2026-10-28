@@ -97,7 +97,7 @@ GameEvent *EventFieldSubprocessTransition_Create(GameSystem *gsys, Field *field,
 GameEvent *EventPlayerSpinDown_Create(GameEvent *event, GameSystem *gsys, Field *field);
 GameEvent *EventQuicksandArrive_Create(GameEvent *event, GameSystem *gsys, Field *field);
 GameEvent *EventQuicksandDrawIn_Create(GameEvent *event, GameSystem *gsys, Field *field, const VecFx32 *pos);
-GameEvent *EventTeleportEffect_Create(GameEvent *event, GameSystem *gsys, Field *field, BOOL a3);
+GameEvent *EventTeleportEffect_Create(GameEvent *event, GameSystem *gsys, Field *field, BOOL teleport);
 void PlaceName_OnZoneChange(PlaceName *placeName, s32 zoneId);
 void PlaceName_Cancel(PlaceName *placeName);
 void PlaceName_ShowForZone(PlaceName *placeName, u32 zoneId);

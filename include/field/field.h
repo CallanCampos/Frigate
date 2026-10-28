@@ -80,7 +80,15 @@ void FldeffBtrain_SetAnime(FieldEffectTask *task, u16 a1);
 void FldeffBtrain_SetHidden(FieldEffectTask *task, u16 a1);
 void FieldPlayer_SetWPos(FieldPlayer *player, const VecFx32 *pos);
 void FieldPlayer_SetDirection(FieldPlayer *player, u16 dir);
-void FieldFadeTCB_Start(GameSystem *gsys, Field *field, u32 a2, u32 a3, u32 a4);
+// field_fade.c's fade of the field's screens, by type: in or out, quickly or at the slower speed. white fades from or
+// to white rather than black, and skipWait lets the field go on without waiting for the fade
+enum {
+    FIELD_FADE_TYPE_IN_QUICK,
+    FIELD_FADE_TYPE_OUT_QUICK,
+    FIELD_FADE_TYPE_IN,
+    FIELD_FADE_TYPE_OUT,
+};
+void FieldFadeTCB_Start(GameSystem *gsys, Field *field, u32 type, u32 white, u32 skipWait);
 
 // The work of the zone's gimmick, such as a gym's puzzle, which the gimmick's overlay allocates at the zone's start
 void *Field_AllocGimmickWorkBlock(Field *field, u32 id, HeapID heapId, u32 size);
