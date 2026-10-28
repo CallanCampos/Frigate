@@ -153,7 +153,7 @@ void FldeffNamipoke_Delete(FieldEffects *effects, void *data);
 void *FldeffGyoe_Create(FieldEffects *effects, HeapID heapId);
 void FldeffGyoe_Delete(FieldEffects *effects, void *data);
 void *Footmark_Init(FieldEffects *effects, HeapID heapId);
-void func_ov036_021b46ec(FieldEffects *effects, void *data);
+void Footmark_Delete(FieldEffects *effects, void *data);
 void *func_ov036_021b496c(FieldEffects *effects, HeapID heapId);
 void func_ov036_021b4990(FieldEffects *effects, void *data);
 void *func_ov036_021be790(FieldEffects *effects, HeapID heapId);

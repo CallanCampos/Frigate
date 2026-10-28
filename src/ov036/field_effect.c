@@ -83,7 +83,7 @@ static const FieldEffectVTable FIELD_EFFECT_VTABLES[FLDEFF_MAX + 1] = {
     { 2, loadGrassEffects, freeGrassEffects },
     { 3, FldeffNamipoke_Create, FldeffNamipoke_Delete },
     { 4, FldeffGyoe_Create, FldeffGyoe_Delete },
-    { 5, Footmark_Init, func_ov036_021b46ec },
+    { 5, Footmark_Init, Footmark_Delete },
     { 6, func_ov036_021b496c, func_ov036_021b4990 },
     { 7, func_ov036_021be790, func_ov036_021be7c4 },
     { 8, FldeffNamipokeSplash_Create, FldeffNamipokeSplash_Delete },

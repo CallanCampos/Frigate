@@ -11579,6 +11579,7 @@ overlays/ov036 0x021b45cc UnionChat_AllocateLine
 overlays/ov036 0x021b4620 UnionChat_GetLine
 overlays/ov036 0x021b464c UnionChat_IsNewBeacon
 overlays/ov036 0x021b46b0 Footmark_Init
+overlays/ov036 0x021b46ec Footmark_Delete
 overlays/ov036 0x021b4700 Footmark_LoadTextures
 overlays/ov036 0x021b4758 Footmark_FreeTextures
 overlays/ov036 0x021b4778 Footmark_GetTexture
@@ -11586,6 +11587,7 @@ overlays/ov036 0x021b47c8 Footmark_SetMMdl
 overlays/ov036 0x021b4878 FootmarkTask_Init
 overlays/ov036 0x021b48e8 FootmarkTask_Delete
 overlays/ov036 0x021b4904 FootmarkTask_Update
+overlays/ov036 0x021b4968 FootmarkTask_Draw
 overlays/ov036 0x021b49ac ReflectTask_SetMMdl
 overlays/ov036 0x021b49f4 ReflectTask_Init
 overlays/ov036 0x021b4a30 ReflectTask_Free
