@@ -573,7 +573,7 @@ BOOL FieldAcmdTCB_Update(FieldActor *actor) {
 }
 
 static BOOL FldAct_ExecAcmd(FieldActor *actor, u32 acmd, u32 state) {
-    if (CheckActorFlag(actor, 0x2000)) {
+    if (CheckActorFlag(actor, ACTOR_FLAG_RAIL)) {
         return ACTOR_ACTION_COMMAND_TABLES_RAIL[acmd][state](actor);
     }
     return ACTOR_ACTION_COMMAND_TABLES[acmd][state](actor);
@@ -1238,13 +1238,13 @@ static BOOL FieldAcmdTCB_ClearHiddenFlag(FieldActor *actor) {
 }
 
 static BOOL FieldAcmdTCB_SetFaceDirLockFlag(FieldActor *actor) {
-    SetActorFlag(actor, 8);
+    SetActorFlag(actor, ACTOR_FLAG_FACE_DIR_LOCK);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_ClearFaceDirLockFlag(FieldActor *actor) {
-    ClearActorFlag(actor, 8);
+    ClearActorFlag(actor, ACTOR_FLAG_FACE_DIR_LOCK);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -1556,7 +1556,7 @@ static BOOL FieldAcmdTCB_HideOffInit(FieldActor *actor) {
 
     SetActorWPosOffset(actor, &offset);
     SetActorMovementFlag(actor, 0xa0);
-    ClearActorMovementFlag(actor, 0x8000);
+    ClearActorMovementFlag(actor, ACTOR_MOVEMENT_FLAG_HIDE_SHADOW);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }

@@ -400,9 +400,9 @@ void ActorTerrainEffect_AddShadow(FieldActor *actor, ActorTerrainEffectParam *pa
 void ActorTerrainEffect_UpdateShadowVisible(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (ActorTerrainEffect_IsShadowEnabled(actor, param) == TRUE) {
         if (ActorTerrainEffect_IsShadowTile(param) == FALSE) {
-            SetActorMovementFlag(actor, 0x8000);
+            SetActorMovementFlag(actor, ACTOR_MOVEMENT_FLAG_HIDE_SHADOW);
         } else {
-            ClearActorMovementFlag(actor, 0x8000);
+            ClearActorMovementFlag(actor, ACTOR_MOVEMENT_FLAG_HIDE_SHADOW);
         }
     }
 }
@@ -773,7 +773,7 @@ BOOL CheckRecalcActorY(FieldActor *actor) {
 
     CopyActorWPos(actor, &position);
     terrainPosition = position;
-    if (CheckActorFlag(actor, 0x2000)) {
+    if (CheckActorFlag(actor, ACTOR_FLAG_RAIL)) {
         return FALSE;
     }
     if (FldAct_IsHeightCalcDisabled(actor) == TRUE) {
@@ -947,7 +947,7 @@ u8 RotateDirByAngle(u32 direction, u16 angle) {
 }
 
 void SetRailActorFlag(FieldActor *actor) {
-    SetActorFlag(actor, 0x2000);
+    SetActorFlag(actor, ACTOR_FLAG_RAIL);
 }
 
 void InitRailActor(FieldActor *actor, const ZoneNPC *npc) {

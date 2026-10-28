@@ -1056,7 +1056,7 @@ static void FieldPlayerGrid_UpdateNormalCatwalkExit(FieldPlayerGrid *grid, Field
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_JUMP_1));
     FldAct_SetHeightCalcDisabled(actor, TRUE);
     FldAct_SetLandingDustDisabled(actor, TRUE);
-    SetActorMovementFlag(actor, 0x8000);
+    SetActorMovementFlag(actor, ACTOR_MOVEMENT_FLAG_HIDE_SHADOW);
     grid->state = GRID_STATE_CATWALK_EXIT;
 }
 
@@ -1077,7 +1077,7 @@ static void FieldPlayerGrid_UpdateNormalFall(FieldPlayerGrid *grid, FieldActor *
         pos.y -= FALL_SPEED;
         if (pos.y < height) {
             pos.y = height;
-            ClearActorMovementFlag(actor, 0x8000);
+            ClearActorMovementFlag(actor, ACTOR_MOVEMENT_FLAG_HIDE_SHADOW);
             grid->verticalMoveOnly = TRUE;
         }
         SetActorWPosValue(actor, &pos);

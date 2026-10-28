@@ -233,7 +233,7 @@ void FldeffBubble_DrawBubble(Bubble *bubble, G3DActor *actor) {
 u16 FldeffBubble_GetFacingVector(FieldActor *actor, VecFx16 *dir) {
     u16 faceDir = GetActorFaceDir(actor);
 
-    if (!CheckActorFlag(actor, 0x2000)) {
+    if (!CheckActorFlag(actor, ACTOR_FLAG_RAIL)) {
         dir->y = 0;
         dir->x = GetDirectionVectorCompX(faceDir);
         dir->z = GetDirectionVectorCompZ(faceDir);

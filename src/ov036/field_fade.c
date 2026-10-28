@@ -734,7 +734,7 @@ static GameEventReturnCode EventQuicksandDrawIn_Callback(GameEvent *event, u32 *
         FieldTaskManager *taskManager;
 
         GFL_SndSEPlay(SEQ_SE_FLD_147);
-        SetActorMovementFlag(actor, 0x8000);
+        SetActorMovementFlag(actor, ACTOR_MOVEMENT_FLAG_HIDE_SHADOW);
         move.x = 0;
         move.y = FX32_CONST(-30);
         move.z = 0;

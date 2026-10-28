@@ -206,7 +206,7 @@ GameEventReturnCode EventActorLinearMove_Callback(GameEvent *event, u32 *state, 
     switch (*state) {
     case 0:
         EnableActorMovement(work->actor);
-        SetActorMovementFlag(work->actor, 0x8000);
+        SetActorMovementFlag(work->actor, ACTOR_MOVEMENT_FLAG_HIDE_SHADOW);
         *state = 1;
         break;
     case 1:

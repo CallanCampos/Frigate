@@ -582,7 +582,7 @@ static void RailActor_SaveUnitPosition(ActorRailWork *rail, FieldActor *actor) {
 
 static void RailActor_ReleaseUnit(ActorRailWork *rail, FieldActor *actor) {
     FieldNoGridMapper_ReleaseUnit(FldActSys_GetNoGridMapper(GetActorMModelSystem(actor)), rail->unit);
-    ClearActorFlag(actor, 0x2000);
+    ClearActorFlag(actor, ACTOR_FLAG_RAIL);
 }
 
 static void RailActor_ReacquireUnit(ActorRailWork *rail, FieldActor *actor) {
