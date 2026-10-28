@@ -213,7 +213,7 @@ static void fillDataForHatchedEgg(BoxPkm *pkm, PlayerInfo *playerInfo, u32 place
 static void shuffleMovesUpWriteLastSlot(PartyPkm *pkm, u32 slot);
 static void setAbilityForForm(BoxPkm *pkm, u16 species, u16 oldSpecies);
 static void UpdateGenderOnMonsChange(BoxPkm *pkm, u16 species, u16 oldSpecies);
-static BOOL isKamiTrioTransformed(u16 species, u8 form);
+static BOOL isForcesOfNatureTransformed(u16 species, u8 form);
 static BOOL isKeldeoTransformed(u16 species, u8 form);
 static BOOL isNewFormTransformed(u16 species, u8 form);
 static u8 getPkmAbilSlotNumber(BoxPkm *pkm);
@@ -690,7 +690,7 @@ BOOL isKyuremTransformed(u16 species, u8 form) {
 }
 
 // Whether the species and form are Tornadus, Thundurus or Landorus in its Therian form
-static BOOL isKamiTrioTransformed(u16 species, u8 form) {
+static BOOL isForcesOfNatureTransformed(u16 species, u8 form) {
     if ((species == SPECIES_TORNADUS || species == SPECIES_THUNDURUS || species == SPECIES_LANDORUS) && form != 0) {
         return TRUE;
     }
@@ -708,7 +708,7 @@ static BOOL isNewFormTransformed(u16 species, u8 form) {
     if (isKyuremTransformed(species, form)) {
         return TRUE;
     }
-    if (isKamiTrioTransformed(species, form)) {
+    if (isForcesOfNatureTransformed(species, form)) {
         return TRUE;
     }
     if (isKeldeoTransformed(species, form)) {

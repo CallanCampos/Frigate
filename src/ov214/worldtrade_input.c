@@ -187,9 +187,9 @@ static void Input_SystemPrint(BGWinFrame *frm, MsgData *msgManager, BmpWin *win,
                               WorldTradePrint *print);
 static void Input_TouchPrint(BGWinFrame *frm, MsgData *msgManager, BmpWin *win, int msgNo, WorldTradePrint *print);
 static void Input_PagePrint(BGWinFrame *frm, WorldTradeNumFont *numFont, BmpWin *win, int page, int max);
-static int Input_PokeSeeCountSiin(WorldTradeInputWork *wk, int siin);
+static int Input_PokeSeeCountInitial(WorldTradeInputWork *wk, int initial);
 static BOOL Input_PokeSeeCountCategory(WorldTradeInputWork *wk, int select);
-static int Input_NationCountSiin(WorldTradeInputWork *wk, int siin);
+static int Input_NationCountInitial(WorldTradeInputWork *wk, int initial);
 static BOOL Input_NationCountCategory(WorldTradeInputWork *wk, int select);
 
 // Where the windows and the cursor's stops of each list are, in characters or pixels
@@ -1559,7 +1559,7 @@ static u32 Input_SeqHead2Init(WorldTradeInputWork *wk) {
     Input_SystemPrint(wk->bgWinFrm, wk->msgManager, wk->menuWin[0], wk->head1 + 0x74, 2, INPUT_COLOR_NORMAL,
                       &wk->print);
     for (i = 1; i <= sHeadwordRange[wk->head1].count; i++) {
-        if (Input_PokeSeeCountSiin(wk, sHeadOffset[wk->head1] + i - 1) > 0) {
+        if (Input_PokeSeeCountInitial(wk, sHeadOffset[wk->head1] + i - 1) > 0) {
             color = INPUT_COLOR_NORMAL;
             wk->seeCheck[sHeadOffset[wk->head1] + i - 1] = 1;
         } else {
@@ -1892,7 +1892,7 @@ static u32 Input_SeqNationHead2Init(WorldTradeInputWork *wk) {
     Input_SystemPrint(wk->bgWinFrm, wk->msgManager, wk->menuWin[0], wk->head1 + 0x74, 2, INPUT_COLOR_NORMAL,
                       &wk->print);
     for (i = 1; i < 4; i++) {
-        if (Input_NationCountSiin(wk, sHeadOffset[wk->head1] + i - 1) > 0) {
+        if (Input_NationCountInitial(wk, sHeadOffset[wk->head1] + i - 1) > 0) {
             color = INPUT_COLOR_NORMAL;
             wk->seeCheck[sHeadOffset[wk->head1] + i - 1] = 1;
         } else {
@@ -2183,14 +2183,14 @@ static void Input_PagePrint(BGWinFrame *frm, WorldTradeNumFont *numFont, BmpWin 
     BGWinFrame_WriteBmpWin(frm, 0, win);
 }
 
-static int Input_PokeSeeCountSiin(WorldTradeInputWork *wk, int siin) {
+static int Input_PokeSeeCountInitial(WorldTradeInputWork *wk, int initial) {
     int num;
     int start;
     int end;
     int count;
     u16 *sortList = WorldTrade_PokedexSortDataGet(HEAPID_WORLDTRADE, 0, &num);
 
-    WorldTrade_HeadwordRangeGet(siin, &start, &end);
+    WorldTrade_HeadwordRangeGet(initial, &start, &end);
     num = end - start;
     count = Input_PokeNameCountSeen(wk->sinnohTable, wk->dex, num, sortList, start, end);
     GFL_HeapFree(sortList);
@@ -2203,20 +2203,20 @@ static BOOL Input_PokeSeeCountCategory(WorldTradeInputWork *wk, int select) {
 
     if (sHeadwordRange[select].count > 0) {
         for (i = 0; i < sHeadwordRange[select].count; i++) {
-            if (Input_PokeSeeCountSiin(wk, start + i) > 0) {
+            if (Input_PokeSeeCountInitial(wk, start + i) > 0) {
                 return TRUE;
             }
         }
-    } else if (Input_PokeSeeCountSiin(wk, start) > 0) {
+    } else if (Input_PokeSeeCountInitial(wk, start) > 0) {
         return TRUE;
     }
     return FALSE;
 }
 
-static int Input_NationCountSiin(WorldTradeInputWork *wk, int siin) {
+static int Input_NationCountInitial(WorldTradeInputWork *wk, int initial) {
     int number;
 
-    return WorldTrade_NationSortListNumGet(siin, &number);
+    return WorldTrade_NationSortListNumGet(initial, &number);
 }
 
 static BOOL Input_NationCountCategory(WorldTradeInputWork *wk, int select) {
@@ -2225,11 +2225,11 @@ static BOOL Input_NationCountCategory(WorldTradeInputWork *wk, int select) {
 
     if (sHeadwordRange[select].count > 0) {
         for (i = 0; i < sHeadwordRange[select].count; i++) {
-            if (Input_NationCountSiin(wk, start + i) > 0) {
+            if (Input_NationCountInitial(wk, start + i) > 0) {
                 return TRUE;
             }
         }
-    } else if (Input_NationCountSiin(wk, start) > 0) {
+    } else if (Input_NationCountInitial(wk, start) > 0) {
         return TRUE;
     }
     return FALSE;

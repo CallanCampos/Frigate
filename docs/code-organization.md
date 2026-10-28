@@ -178,6 +178,10 @@ so far:
 | iaigiri | Cut | | iwakudaki | RockSmash |
 | kemuri | Dust | | kira | Sparkle |
 | namipoke, nami | SurfPokemon, Surf | | denki | Electric |
+| zkn, zknd | Pokedex, PokedexDetail | | dpc, ddemo | HallOfFamePC, HallOfFameDemo |
+| wazarec | MoveRec | | sodateya | DayCare |
+| asonda, tomo | Played, Friend | | siin (the initial's kana row) | Initial |
+| kami (the trio) | ForcesOfNature | | | |
 
 The constants generated from the game's data, such as `SEQ_BGM_KOUKAN` and the message IDs, keep their words for now.
 `tools/decomp/rename_symbol.py` renames a symbol in both versions, updates the source files and records the name:

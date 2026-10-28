@@ -1338,6 +1338,7 @@
 . 0x0201c1b4 MCSS_DrawSpindaSpots
 . 0x0201c290 MCSS_SetLoopAnimation
 . 0x0201c2a4 MCSS_RestartOnAnimationEnd
+. 0x0201ce18 isForcesOfNatureTransformed
 . 0x0201d268 PokeParty_LearnMoveTutor
 . 0x0201d270 PML_PkmLearnMoveTutor
 . 0x0201d2d0 PokeParty_SetMoveKeepPP
@@ -28176,9 +28177,9 @@ overlays/ov214 0x021daca0 Input_SeqLevelExit
 overlays/ov214 0x021dacd0 Input_SystemPrint
 overlays/ov214 0x021dad04 Input_TouchPrint
 overlays/ov214 0x021dad50 Input_PagePrint
-overlays/ov214 0x021dadb8 Input_PokeSeeCountSiin
+overlays/ov214 0x021dadb8 Input_PokeSeeCountInitial
 overlays/ov214 0x021dadfc Input_PokeSeeCountCategory
-overlays/ov214 0x021dae54 Input_NationCountSiin
+overlays/ov214 0x021dae54 Input_NationCountInitial
 overlays/ov214 0x021dae60 Input_NationCountCategory
 overlays/ov214 0x021daeb8 WorldTrade_MyPoke_Init
 overlays/ov214 0x021dafc0 WorldTrade_MyPoke_Main
