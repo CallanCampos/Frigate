@@ -115,7 +115,7 @@ BOOL s019D_PlayAlderFlyEffect(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov036_021c2010(VM *vm, FieldScriptEnv *env) {
+BOOL s022D_PlayFieldEffectByTable(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     void *g3dCi = Field_Get3DCi(GSYS_GetField(gsys));
     u16 scriptId = ScriptReadAny(vm, env);

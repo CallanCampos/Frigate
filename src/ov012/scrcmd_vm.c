@@ -652,7 +652,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     func_ov036_021c784c,                              // 0x22a
     Scrcmd_StartSwapNpcEvent,                         // 0x22b
     NULL,                                             // 0x22c
-    func_ov036_021c2010,                              // 0x22d
+    s022D_PlayFieldEffectByTable,                     // 0x22d
     ScriptNative_SetMmdlZoneDeleteOff,                // 0x22e
     s022F_WordSetLoadPastTradePkmName,                // 0x22f
     s0230_MsgPlaceSignFont4,                          // 0x230

@@ -11976,6 +11976,7 @@ overlays/ov036 0x021c1d14 FieldFlashAnimation_CmdInit
 overlays/ov036 0x021c1d30 FieldFlashAnimation_CmdExpand
 overlays/ov036 0x021c1d5c FieldFlashAnimation_ShowExpanded
 overlays/ov036 0x021c1d78 FieldFlashAnimation_HideMask
+overlays/ov036 0x021c2010 s022D_PlayFieldEffectByTable
 overlays/ov036 0x021c2080 PleasureBoat_Create
 overlays/ov036 0x021c20e0 PleasureBoat_AckEvent
 overlays/ov036 0x021c210c PleasureBoat_Update
