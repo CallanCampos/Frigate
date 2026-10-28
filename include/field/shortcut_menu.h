@@ -34,12 +34,12 @@ GameEvent *CallYButtonShortcutMenu(GameSystem *gsys, Field *field, u16 code);
 GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *state, void *data);
 GameEventReturnCode EventShortcutCallDirect_Callback(GameEvent *event, u32 *state, void *data);
 
-ShortcutMenuApp *func_ov036_021bedd8(GameData *gameData, u32 mode, ShortcutMenuPos *listPos, HeapID menuHeapId,
+ShortcutMenuApp *ShortcutMenu_Create(GameData *gameData, u32 mode, ShortcutMenuPos *listPos, HeapID menuHeapId,
                                      HeapID heapId);
 void ShortcutMenu_Delete(ShortcutMenuApp *app);
 u32 ShortcutMenu_RunPrint(ShortcutMenuApp *app);
 void ShortcutMenu_Main(ShortcutMenuApp *app);
-void func_ov036_021bf1ac(ShortcutMenuApp *app);
+void ShortcutMenu_Start(ShortcutMenuApp *app);
 void ShortcutMenu_RequestClose(ShortcutMenuApp *app);
 BOOL ShortcutMenu_IsWaitingInput(ShortcutMenuApp *app);
 u32 ShortcutMenu_GetResult(ShortcutMenuApp *app, u32 *item);

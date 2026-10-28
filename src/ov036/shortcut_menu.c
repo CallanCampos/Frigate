@@ -134,7 +134,7 @@ static void SetupMenu(ShortcutMenuList *menu, const ShortcutMenuPos *listPos, Ms
 static void FreeMenu(ShortcutMenuList *menu, ShortcutMenuPos *listPos);
 static GameEventReturnCode ReturnToField_Callback(GameEvent *event, u32 *state, void *data);
 
-ShortcutMenuApp *func_ov036_021bedd8(GameData *gameData, u32 mode, ShortcutMenuPos *listPos, HeapID menuHeapId,
+ShortcutMenuApp *ShortcutMenu_Create(GameData *gameData, u32 mode, ShortcutMenuPos *listPos, HeapID menuHeapId,
                                      HeapID heapId) {
     ClActorSetup setup;
     ShortcutMenuApp *work;
@@ -280,7 +280,7 @@ u32 ShortcutMenu_RunPrint(ShortcutMenuApp *work) {
     return PrintDone(&work->menu);
 }
 
-void func_ov036_021bf1ac(ShortcutMenuApp *work) {
+void ShortcutMenu_Start(ShortcutMenuApp *work) {
     if (work->state == STATE_CLOSED) {
         work->code = 0;
         work->item = 0xff;

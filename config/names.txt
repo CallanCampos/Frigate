@@ -11932,9 +11932,11 @@ overlays/ov036 0x021bea68 FldeffSplash_InitModelObj
 overlays/ov036 0x021beaac FldeffSplash_ExitModelObj
 overlays/ov036 0x021beab0 FldeffSplash_UpdateModelObj
 overlays/ov036 0x021beb38 FldeffSplash_DrawModelObj
+overlays/ov036 0x021bedd8 ShortcutMenu_Create
 overlays/ov036 0x021bf004 ShortcutMenu_Delete
 overlays/ov036 0x021bf088 ShortcutMenu_Main
 overlays/ov036 0x021bf198 ShortcutMenu_RunPrint
+overlays/ov036 0x021bf1ac ShortcutMenu_Start
 overlays/ov036 0x021bf1d0 ShortcutMenu_RequestClose
 overlays/ov036 0x021bf1e4 ShortcutMenu_IsWaitingInput
 overlays/ov036 0x021bf1f8 ShortcutMenu_GetResult
