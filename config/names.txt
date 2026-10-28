@@ -10092,6 +10092,8 @@ overlays/ov036 0x0218b370 TalkMsgWin_SetupPlainWindow
 overlays/ov036 0x0218b4b4 TalkMsgWin_Release
 overlays/ov036 0x0218b4c8 TalkMsgWin_Open
 overlays/ov036 0x0218b4d8 TalkMsgWin_Close
+overlays/ov036 0x0218b4e8 TalkMsgWin_IsWindowFree
+overlays/ov036 0x0218b4fc TalkMsgWin_IsWindowShown
 overlays/ov036 0x0218b50c TalkMsgWin_GetPrintStream
 overlays/ov036 0x0218b518 TalkMsgWin_GetBmpWin
 overlays/ov036 0x0218b524 TalkMsgWin_Reprint

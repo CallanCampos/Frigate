@@ -1205,7 +1205,7 @@ void MsgBGPrinter_DeleteTalkWin(ActorMsgWin *win) {
 }
 
 BOOL MsgBGPrinter_WaitTalkWinClose(ActorMsgWin *win) {
-    if (func_ov036_0218b4e8(win->talk, win->type)) {
+    if (TalkMsgWin_IsWindowFree(win->talk, win->type)) {
         MI_CpuFill8(win, 0, sizeof(ActorMsgWin));
         return TRUE;
     }
@@ -1235,7 +1235,7 @@ BOOL MsgBGPrinter_TalkWinMain(ActorMsgWin *actorWin) {
     PrintStream *stream;
     u32 state;
 
-    if (!func_ov036_0218b4fc(actorWin->talk, actorWin->type)) {
+    if (!TalkMsgWin_IsWindowShown(actorWin->talk, actorWin->type)) {
         return FALSE;
     }
     stream = TalkMsgWin_GetPrintStream(actorWin->talk, actorWin->type);
@@ -1543,7 +1543,7 @@ BOOL MsgBGPrinter_ExistsSubMsgWin(FieldMsgBG *sys) {
 }
 
 static BOOL MsgBGPrinter_SubMsgWinMain(NumberedMsgWin *win) {
-    if (!func_ov036_0218b4fc(win->talk, win->index)) {
+    if (!TalkMsgWin_IsWindowShown(win->talk, win->index)) {
         return FALSE;
     }
     GCTX_HIDGetPressedKeys();
