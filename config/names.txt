@@ -11000,6 +11000,7 @@ overlays/ov036 0x0219ad0c FieldPlayer_GetNogridRailWork
 overlays/ov036 0x0219ad24 FieldPlayer_GetNogridNextRailLocation
 overlays/ov036 0x0219ad30 FieldPlayer_GetNogridLocationByDir
 overlays/ov036 0x0219ad48 FieldPlayer_GetGrid
+overlays/ov036 0x0219afd8 FieldPlayerCore_GetMoveObserveStatus
 overlays/ov036 0x0219b014 FieldPlayerCore_SetFormSlotModel
 overlays/ov036 0x0219b04c FieldPlayerCore_WaitModelReady
 overlays/ov036 0x0219b088 FieldPlayerCore_CheckFormModel
