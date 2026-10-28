@@ -11128,6 +11128,7 @@ overlays/ov036 0x0219e2bc FieldPlayerRail_GetInputHoldDir
 overlays/ov036 0x0219e2d4 FieldPlayerRail_IsInputHoldKept
 overlays/ov036 0x0219e2dc FieldPlayerRail_HasConnectionAhead
 overlays/ov036 0x0219e3c8 FieldmapCtrlNoGrid_CreateWork
+overlays/ov036 0x0219e40c FieldmapCtrlNoGrid_FreeWork
 overlays/ov036 0x0219e414 FieldmapCtrlNoGrid_MovePlayer
 overlays/ov036 0x0219e434 FieldmapCtrlHybrid_ReplacePlayer
 overlays/ov036 0x0219e5cc FieldmapCtrlHybrid_UpdateGrid

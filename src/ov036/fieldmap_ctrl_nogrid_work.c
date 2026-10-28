@@ -24,7 +24,7 @@ static void FieldmapCtrlNoGrid_Free(Field *field);
 static void FieldmapCtrlNoGrid_Update(Field *field, VecFx32 *pos);
 static VecFx32 *FieldmapCtrlNoGrid_GetPos(Field *field);
 static FieldmapCtrlNoGrid *FieldmapCtrlNoGrid_CreateWork(Field *field, HeapID heapId);
-static void func_ov036_0219e40c(FieldmapCtrlNoGrid *controller);
+static void FieldmapCtrlNoGrid_FreeWork(FieldmapCtrlNoGrid *controller);
 static void FieldmapCtrlNoGrid_MovePlayer(FieldmapCtrlNoGrid *controller);
 
 const FieldmapCtrlVTable FIELDMAP_CTRL_NOGRID = {
@@ -51,7 +51,7 @@ static void FieldmapCtrlNoGrid_Create(Field *field, VecFx32 *pos, u16 dir) {
 }
 
 static void FieldmapCtrlNoGrid_Free(Field *field) {
-    func_ov036_0219e40c(Field_GetController(field));
+    FieldmapCtrlNoGrid_FreeWork(Field_GetController(field));
 }
 
 static void FieldmapCtrlNoGrid_Update(Field *field, VecFx32 *pos) {
@@ -74,7 +74,7 @@ static FieldmapCtrlNoGrid *FieldmapCtrlNoGrid_CreateWork(Field *field, HeapID he
     return controller;
 }
 
-static void func_ov036_0219e40c(FieldmapCtrlNoGrid *controller) {
+static void FieldmapCtrlNoGrid_FreeWork(FieldmapCtrlNoGrid *controller) {
     GFL_HeapFree(controller);
 }
 
