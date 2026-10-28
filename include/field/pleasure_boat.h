@@ -6,11 +6,13 @@
 
 // The Royal Unova's cruise (pleasure_boat.c, in overlay 36): its clock, and the people and Trainers aboard
 
+// What PleasureBoat_GetInfo counts: the Trainers aboard on each side, in the cabins with blue doors (overlay 89's
+// rooms 9 to 14) and in the others, all the Trainers, and those defeated
 enum {
     PLEASURE_BOAT_INFO_STARBOARD_PEOPLE,
     PLEASURE_BOAT_INFO_PORT_PEOPLE,
-    PLEASURE_BOAT_INFO_UNK_2,
-    PLEASURE_BOAT_INFO_UNK_3,
+    PLEASURE_BOAT_INFO_OTHER_DOOR_TRAINERS,
+    PLEASURE_BOAT_INFO_BLUE_DOOR_TRAINERS,
     PLEASURE_BOAT_INFO_TRAINERS,
     PLEASURE_BOAT_INFO_TRAINERS_DEFEATED,
 };
@@ -42,7 +44,7 @@ struct PleasureBoat {
     // The last period reached
     s32 period;
     PleasureBoatRoom rooms[PLEASURE_BOAT_ROOM_COUNT];
-    // The answers to PLEASURE_BOAT_INFO_STARBOARD_PEOPLE to PLEASURE_BOAT_INFO_UNK_3
+    // The answers to PLEASURE_BOAT_INFO_STARBOARD_PEOPLE to PLEASURE_BOAT_INFO_BLUE_DOOR_TRAINERS
     u8 infoCounts[4];
     // Set by PleasureBoat_StopClock
     u32 clockStopped;
