@@ -2,7 +2,7 @@
 // actors and Trainers, the numbered windows, and the loading and formatting of the script's messages. The ROM has no
 // name for the file; scrcmd_msg.c is descriptive. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
-// Additional helper and table names are our descriptive guesses.
+// Additional helper and table names, and command 0x230's, are our descriptive guesses.
 #include "types.h"
 #include "battle/trainer_data.h"
 #include "constants/arc.h"
@@ -191,7 +191,7 @@ BOOL s0036_InfoMsgClose(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov036_021a8844(FinishScriptSubEventsWork *work, u32 *state) {
+BOOL FieldScriptSubEventFinish_SystemMsg(FinishScriptSubEventsWork *work, u32 *state) {
     SystemMsgWin_Close(work->env);
     return TRUE;
 }
@@ -503,7 +503,8 @@ static BOOL ScriptNative_ActorMsgWinWait(VM *vm, void *env) {
     return MsgBGPrinter_TalkWinMain(msgWin) == TRUE;
 }
 
-BOOL func_ov036_021a8eb4(VM *vm, FieldScriptEnv *env, StrBuf *message, u16 actorId, u16 pos, u32 frameType) {
+BOOL CallFieldActorMessageDispStrBuf(VM *vm, FieldScriptEnv *env, StrBuf *message, u16 actorId, u16 pos,
+                                     u32 frameType) {
     if (SetupActorMessageWindow(env, message, actorId, pos, frameType) == TRUE) {
         VM_SetNativeCallback(vm, ScriptNative_ActorMsgWinWait);
         return TRUE;
@@ -590,7 +591,7 @@ BOOL s003E_ActorMsgClose(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov036_021a90fc(FinishScriptSubEventsWork *work, u32 *state) {
+BOOL FieldScriptSubEventFinish_ActorMsg(FinishScriptSubEventsWork *work, u32 *state) {
     ActorMsgWin_CloseImmediate(work->env);
     return TRUE;
 }
@@ -701,7 +702,7 @@ BOOL s0039_InfoMsgClose(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov036_021a9350(FinishScriptSubEventsWork *work, u32 *state) {
+BOOL FieldScriptSubEventFinish_InfoMsg(FinishScriptSubEventsWork *work, u32 *state) {
     InfoMsgWin_Close(work->env);
     return TRUE;
 }
@@ -749,7 +750,7 @@ static void NumberedMsgWins_CloseAll(FieldScriptEnv *env) {
     }
 }
 
-BOOL func_ov036_021a9478(FinishScriptSubEventsWork *work, u32 *state) {
+BOOL FieldScriptSubEventFinish_MultiMsg(FinishScriptSubEventsWork *work, u32 *state) {
     NumberedMsgWins_CloseAll(work->env);
     return TRUE;
 }
@@ -793,8 +794,8 @@ BOOL s0043_MsgPlaceSign(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-// A sign in another font
-BOOL func_ov036_021a9554(VM *vm, FieldScriptEnv *env) {
+// A sign in font 4, which only the Abyssal Ruins' scripts use
+BOOL s0230_MsgPlaceSignFont4(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
     u16 msgId = ScriptReadAny(vm, env);
@@ -817,7 +818,7 @@ BOOL s0044_MsgPlaceSignClose(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov036_021a95ec(FinishScriptSubEventsWork *work, u32 *state) {
+BOOL FieldScriptSubEventFinish_Sign(FinishScriptSubEventsWork *work, u32 *state) {
     SignMsgWin_Close(work->env);
     return TRUE;
 }
@@ -861,7 +862,7 @@ BOOL s0046_CheckerMsgClose(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov036_021a96ec(FinishScriptSubEventsWork *work, u32 *state) {
+BOOL FieldScriptSubEventFinish_CheckerMsg(FinishScriptSubEventsWork *work, u32 *state) {
     CheckerMsgWin_Close(work->env);
     return TRUE;
 }

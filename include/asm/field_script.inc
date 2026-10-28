@@ -3024,7 +3024,7 @@
     .2byte \a1
     .endm
 
-    // func_ov036_021a9554
+    // s0230_MsgPlaceSignFont4
     .macro Cmd_0230 a0, a1
     FieldCommand 560
     .2byte \a0

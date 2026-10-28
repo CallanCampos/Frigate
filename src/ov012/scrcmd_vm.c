@@ -85,21 +85,11 @@ static const u8 VM_CMP_LUT[][3] = {
 
 // What finishes each of the script's sub events when it ends, by the IDs of FieldScriptSubEvent_Register
 const FieldScriptSubEventFinishFunc FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS[SCRIPT_SUB_EVENT_MAX] = {
-    FieldScriptSubEventFinish_EvCamera,
-    func_ov036_021a8844,
-    func_ov036_021a90fc,
-    func_ov036_021a9350,
-    func_ov036_021a95ec,
-    func_ov036_021a9478,
-    func_ov036_021a96ec,
-    FieldScriptSubEventFinish_NDemo,
-    FieldScriptSubEventFinish_Subscreen,
-    ActorMsgWin_CleanupAutoMode,
-    FieldScriptSubEventFinish_MEPlayback,
-    GameCommPause_Finish,
-    ScriptWork_RestoreBgmVolumeEvent,
-    FieldScriptSubEventFinish_BGMPlayback,
-    NULL,
+    FieldScriptSubEventFinish_EvCamera,   FieldScriptSubEventFinish_SystemMsg,   FieldScriptSubEventFinish_ActorMsg,
+    FieldScriptSubEventFinish_InfoMsg,    FieldScriptSubEventFinish_Sign,        FieldScriptSubEventFinish_MultiMsg,
+    FieldScriptSubEventFinish_CheckerMsg, FieldScriptSubEventFinish_NDemo,       FieldScriptSubEventFinish_Subscreen,
+    ActorMsgWin_CleanupAutoMode,          FieldScriptSubEventFinish_MEPlayback,  GameCommPause_Finish,
+    ScriptWork_RestoreBgmVolumeEvent,     FieldScriptSubEventFinish_BGMPlayback, NULL,
 };
 
 // The field script commands, by their IDs. An ID with no command is NULL: EVCMD_PERM_TABLE allows it at no level, so
@@ -665,7 +655,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     func_ov036_021c2010,                              // 0x22d
     ScriptNative_SetMmdlZoneDeleteOff,                // 0x22e
     s022F_WordSetLoadPastTradePkmName,                // 0x22f
-    func_ov036_021a9554,                              // 0x230
+    s0230_MsgPlaceSignFont4,                          // 0x230
     func_ov036_021ae0cc,                              // 0x231
     PokeParty_ControlLegendMon,                       // 0x232
     Scrcmd_HasPlayerLanguage,                         // 0x233

@@ -2,7 +2,8 @@
 #define POKEBW2_FIELD_SCRCMD_MSG_H
 
 // Overlay 36's scrcmd_msg.c: the script commands of the message windows. Names from swan
-// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except our descriptive ones of command 0x230, the sub events'
+// finish functions and the helpers swan has no name for
 
 #include "types.h"
 #include "field/field_script.h"
@@ -32,7 +33,7 @@ void ActorMsgWin_GetBalloonOffset(const VecFx32 *pos, VecFx32 *offset, G3DCamera
 void ActorMsgWin_GetBalloonTailParams(u32 winPos, u32 *type, u32 *tail);
 u8 ActorMsgWin_CalcWinPosAuto(FieldActor *player, const VecFx32 *pos);
 // Show a message, and have the script wait for it
-BOOL func_ov036_021a8eb4(VM *vm, FieldScriptEnv *env, StrBuf *message, u16 actorId, u16 pos, u32 frameType);
+BOOL CallFieldActorMessageDispStrBuf(VM *vm, FieldScriptEnv *env, StrBuf *message, u16 actorId, u16 pos, u32 frameType);
 BOOL loadMsgBox(VM *vm, FieldScriptEnv *env, StrBuf *message, u32 frameType, u8 pos);
 
 BOOL s0034_SystemMsg(VM *vm, FieldScriptEnv *env);
@@ -55,7 +56,7 @@ BOOL s0039_InfoMsgClose(VM *vm, FieldScriptEnv *env);
 BOOL s003A_MultiMsg(VM *vm, FieldScriptEnv *env);
 BOOL s003B_MsgWinCloseNo(VM *vm, FieldScriptEnv *env);
 BOOL s0043_MsgPlaceSign(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021a9554(VM *vm, FieldScriptEnv *env);
+BOOL s0230_MsgPlaceSignFont4(VM *vm, FieldScriptEnv *env);
 BOOL s0044_MsgPlaceSignClose(VM *vm, FieldScriptEnv *env);
 BOOL s0045_CheckerMsg(VM *vm, FieldScriptEnv *env);
 BOOL s0046_CheckerMsgClose(VM *vm, FieldScriptEnv *env);
@@ -64,12 +65,12 @@ BOOL s004B_MsgWaitAdvance(VM *vm, FieldScriptEnv *env);
 BOOL s0033_MsgSetAutoscrolls(VM *vm, FieldScriptEnv *env);
 
 // Close the windows when the script's sub events are finished, in FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS
-BOOL func_ov036_021a8844(FinishScriptSubEventsWork *work, u32 *state);
-BOOL func_ov036_021a90fc(FinishScriptSubEventsWork *work, u32 *state);
-BOOL func_ov036_021a9350(FinishScriptSubEventsWork *work, u32 *state);
-BOOL func_ov036_021a9478(FinishScriptSubEventsWork *work, u32 *state);
-BOOL func_ov036_021a95ec(FinishScriptSubEventsWork *work, u32 *state);
-BOOL func_ov036_021a96ec(FinishScriptSubEventsWork *work, u32 *state);
+BOOL FieldScriptSubEventFinish_SystemMsg(FinishScriptSubEventsWork *work, u32 *state);
+BOOL FieldScriptSubEventFinish_ActorMsg(FinishScriptSubEventsWork *work, u32 *state);
+BOOL FieldScriptSubEventFinish_InfoMsg(FinishScriptSubEventsWork *work, u32 *state);
+BOOL FieldScriptSubEventFinish_MultiMsg(FinishScriptSubEventsWork *work, u32 *state);
+BOOL FieldScriptSubEventFinish_Sign(FinishScriptSubEventsWork *work, u32 *state);
+BOOL FieldScriptSubEventFinish_CheckerMsg(FinishScriptSubEventsWork *work, u32 *state);
 BOOL ActorMsgWin_CleanupAutoMode(FinishScriptSubEventsWork *work, u32 *state);
 
 #endif // POKEBW2_FIELD_SCRCMD_MSG_H
