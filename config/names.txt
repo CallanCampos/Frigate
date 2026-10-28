@@ -9875,11 +9875,14 @@ overlays/ov035 0x0217f53c sScoreboardPalette2
 overlays/ov035 0x0217f544 sScoreboardPalette3
 overlays/ov035 0x0217f5d4 sScoreboardPalettes
 overlays/ov036 0x0218051c Field_GetUnionEff
+overlays/ov036 0x02180630 FieldG2D_Prepare3DSurfaceDelayed
 overlays/ov036 0x02180f80 Field_GetCommKind
 overlays/ov036 0x02180fc0 Field_CheckCommExit
 overlays/ov036 0x02180fe4 Field_InitCommonWork
 overlays/ov036 0x02181324 Field_GetActorYOffset
 overlays/ov036 0x0218132c Field_CalcActorYOffset
+overlays/ov036 0x021813b8 IsZoneShadowsEnabled
+overlays/ov036 0x0218141c IsZoneFirstBlackTowerOrWhiteTreehollow
 overlays/ov036 0x02181ed8 StopXtransceiverRinging
 overlays/ov036 0x02182564 CheckPassPowerDepletedEvent
 overlays/ov036 0x0218258c CheckFunfestMissionEvent

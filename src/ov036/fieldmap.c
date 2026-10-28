@@ -223,7 +223,7 @@ Field *Field_Create(GameSystem *gsys, HeapID heapId) {
     if (AreaData_HasSeasons(areaId)) {
         season = GameSystem_GetSeason(gsys);
     } else if (AreaData_IsInfinityDungeon(areaId)) {
-        if (!func_ov036_0218141c(PlayerState_GetZoneID(GSYS_GetPlayerState(gsys)))) {
+        if (!IsZoneFirstBlackTowerOrWhiteTreehollow(PlayerState_GetZoneID(GSYS_GetPlayerState(gsys)))) {
             season = KeyDataSave_GetArea(getKeyDataBlkAddress(GameData_GetSaveControl(field->gameData)));
         }
     } else if (AreaData_IsJoinAvenue(areaId)) {
@@ -853,7 +853,7 @@ void FieldG2D_Prepare3DSurface(Field *field) {
     MsgBGPrinter_SetupBg(field->msgBGSys);
 }
 
-void func_ov036_02180630(Field *field) {
+void FieldG2D_Prepare3DSurfaceDelayed(Field *field) {
     MtxFx22 mtx;
 
     MAT2_SetScaleRot(&mtx, 0, FX32_ONE, FX32_ONE, MAT2_ROT_IDX);
@@ -1033,7 +1033,7 @@ void Field_InitActorSystem(Field *field) {
     FieldActorG3DSystem_Create(field->actorSystem, field->g3DObjSystem);
     FldActSys_InitDraw(field->actorSystem, FieldCamera_GetViewYawPtr(field->cameraSystem));
     FldActSys_WakeUpAllActors(field->actorSystem);
-    FldActSys_SetShadowsEnabled(actorSystem, func_ov036_021813b8(field->zoneId));
+    FldActSys_SetShadowsEnabled(actorSystem, IsZoneShadowsEnabled(field->zoneId));
 }
 
 void Field_SuspendActorSystem(Field *field) {
@@ -1484,7 +1484,7 @@ u32 GetObjectProjectionMatrixOffset(u16 zoneId) {
     return 0x136;
 }
 
-BOOL func_ov036_021813b8(u16 zoneId) {
+BOOL IsZoneShadowsEnabled(u16 zoneId) {
     if (zoneId == ZONE_NIMBASA_CITY_17) {
         return FALSE;
     }
@@ -1516,7 +1516,7 @@ BOOL IsZoneTwoPassLoad(u16 zoneId) {
     return FALSE;
 }
 
-BOOL func_ov036_0218141c(u16 zoneId) {
+BOOL IsZoneFirstBlackTowerOrWhiteTreehollow(u16 zoneId) {
     switch (zoneId) {
     case ZONE_WHITE_TREEHOLLOW:
     case ZONE_BLACK_TOWER:

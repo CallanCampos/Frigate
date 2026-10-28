@@ -486,7 +486,7 @@ GameEventReturnCode EventGameTransition_RunDefaultFadeIn(GameEvent *event, u32 *
         (*state)++;
         break;
     case 3:
-        func_ov036_02180630(work->field);
+        FieldG2D_Prepare3DSurfaceDelayed(work->field);
         (*state)++;
         break;
     case 4: {
