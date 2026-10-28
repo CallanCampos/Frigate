@@ -167,11 +167,11 @@ void FieldCommActor_Move(FieldActor *actor) {
     u32 state;
 
     CheckSetActorFaceDir(actor, FieldCommActor_ConvertDir(*link->dir));
-    state = 0;
+    state = DRAW_STATUS_STOP;
     CopyActorWPos(actor, &pos);
     if (pos.x != link->pos->x || pos.y != link->pos->y || pos.z != link->pos->z) {
         SetActorWPosAll(actor, link->pos, GetActorFaceDir(actor));
-        state = 3;
+        state = DRAW_STATUS_WALK_8F;
         if (link->entry->allowRun != 0) {
             u16 objCode = FldAct_GetObjCode(actor);
 
@@ -190,7 +190,7 @@ void FieldCommActor_Move(FieldActor *actor) {
                     dz = -dz;
                 }
                 if (dist + dz >= FX32_CONST(4)) {
-                    state = 10;
+                    state = DRAW_STATUS_ANIME_10;
                 }
             }
         }

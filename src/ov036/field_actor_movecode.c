@@ -295,7 +295,7 @@ static void FieldActorMovecode_InitTurnRandom(FieldActor *actor, u32 mask) {
     RailWanderWork *work = ClearActorPositionBlock(actor, sizeof(RailWanderWork));
     work->timer = FieldActorMovecode_GetRandomTableEntry(sTurnWaitTimes, -1);
     work->mask = mask;
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FldAct_ClearMoving(actor);
 }
 
@@ -423,7 +423,7 @@ static void FieldActorMovecode_InitWalkRandom(FieldActor *actor, u32 acmdBase, u
     work->mode = mode;
     work->acmdBase = acmdBase;
     work->mask = dirMask;
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FldAct_ClearMoving(actor);
 }
 
@@ -566,7 +566,7 @@ static BOOL FieldActorMovecode_IsDirInsideMoveRect(FieldActor *actor, u32 dir) {
 static void FieldActorMovecode_InitFixedDir(FieldActor *actor, u32 dir) {
     RailFaceWork *work = ClearActorPositionBlock(actor, sizeof(RailFaceWork));
     work->dir = dir;
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FldAct_ClearMoving(actor);
     SetActorInitialGPosToNowGPos(actor);
 }
@@ -602,7 +602,7 @@ void FieldActorMovecode_InitFixedDirRight(FieldActor *actor) {
 static void FieldActorMovecode_InitSpin(FieldActor *actor, u32 turn) {
     RailTurnWork *work = ClearActorPositionBlock(actor, sizeof(RailTurnWork));
     work->turn = turn;
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FldAct_ClearMoving(actor);
     SetActorInitialGPosToNowGPos(actor);
 }

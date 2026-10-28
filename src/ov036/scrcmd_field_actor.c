@@ -719,7 +719,7 @@ BOOL Scrcmd_FieldActor_ActorSetEyeToEye(VM *vm, FieldScriptEnv *env) {
 
     if (actor != NULL) {
         CheckSetActorFaceDir(actor, dir);
-        FldAct_SetDrawStatus(actor, 0);
+        FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     }
     return FALSE;
 }

@@ -156,7 +156,7 @@ void FieldActorMove_InitLookPlayer(FieldActor *actor) {
     ActorFollowWork *work = ClearActorPositionBlock(actor, 8);
 
     FieldActorMove_UpdatePlayerTracking(actor, work);
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FldAct_ClearMoving(actor);
     SetActorFlag8000(actor, 0);
 }
@@ -286,7 +286,7 @@ void FieldActorMove_InitLookFellow(FieldActor *actor) {
     ActorFollowWork *work = ClearActorPositionBlock(actor, 12);
 
     FieldActorMove_UpdateFellowTracking(actor, work);
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FldAct_ClearMoving(actor);
     work->active = 0;
 }
@@ -431,7 +431,7 @@ static void FieldActorMove_InitHide(FieldActor *actor, u32 kind) {
     ActorEffectWork *work = ClearActorPositionBlock(actor, 8);
 
     work->kind = kind;
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FldAct_ClearMoving(actor);
     SetActorMovementFlag(actor, ACTOR_MOVEMENT_FLAG_HIDE_SHADOW);
     VecFx32 offset = { 0, -32 * FX32_ONE, 0 };

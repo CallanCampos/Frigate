@@ -333,7 +333,7 @@ void FieldPlayerRail_EndBlockedWalk(FieldPlayerNoGrid *nogrid) {
 
         FldAct_FreeAcmd(actor);
         CheckSetActorFaceDir(actor, dir);
-        FldAct_SetDrawStatus(actor, 0);
+        FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
         FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_NONE);
     }
 }

@@ -380,7 +380,7 @@ static void RailActorAnim_DrawWalkAnime(FieldActor *actor) {
         VecFx32 pos;
 
         state = FldAct_GetDrawStatus(actor);
-        if (state >= 10) {
+        if (state >= DRAW_STATUS_ANIME_10) {
             u8 changed = FALSE;
             u8 dir = RailActor_GetCameraRelativeDir(actor);
 
@@ -415,7 +415,7 @@ static void RailActorAnim_DrawWalkAnimeB(FieldActor *actor) {
         u16 state = FldAct_GetDrawStatus(actor);
         VecFx32 pos;
 
-        if (state >= 10) {
+        if (state >= DRAW_STATUS_ANIME_10) {
             u8 dir = RailActor_GetCameraRelativeDir(actor);
 
             if (state != work->anim.state) {
@@ -885,7 +885,8 @@ static void RailActorAnim_DrawMultiPattern(FieldActor *actor) {
         if (entry == NULL) {
             return;
         }
-        if (state != work->anim.state || (entry->trackDir != 0 && state < 10 && dir != work->anim.dir)) {
+        if (state != work->anim.state ||
+            (entry->trackDir != 0 && state < DRAW_STATUS_ANIME_10 && dir != work->anim.dir)) {
             u8 anim = entry->anim;
 
             switch (entry->kind) {
@@ -1129,8 +1130,8 @@ static void RailActorAnim_Update(RailActorAnim *anim, FieldActor *actor, Billboa
         BillboardActorSys_SetActorAnim(sys, index, animId);
     } else if (state != anim->state) {
         changed = TRUE;
-        if (state == 0) {
-            if (anim->state == 0) {
+        if (state == DRAW_STATUS_STOP) {
+            if (anim->state == DRAW_STATUS_STOP) {
                 BillboardActorSys_SetActorAnim(sys, index, animId);
                 anim->state = state;
                 anim->pending = 0;
@@ -1150,7 +1151,7 @@ static void RailActorAnim_Update(RailActorAnim *anim, FieldActor *actor, Billboa
                 anim->pending = 0;
             }
         } else {
-            if (anim->state != 0) {
+            if (anim->state != DRAW_STATUS_STOP) {
                 anim->step = BillboardActorSys_GetActorStep(sys, index);
                 if (anim->step >= 2) {
                     anim->step = 0;

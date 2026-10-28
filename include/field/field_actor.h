@@ -402,6 +402,27 @@ FieldActor *FindPairedTrainerActor(FieldActor *actor);
 // Moves grid coordinates or a position by a distance in a direction
 void AdjusGridXZByDir(u32 dir, s16 *x, s16 *z, s16 distance);
 void ExpandVecInGridDir(u16 dir, VecFx32 *pos, fx32 distance);
+// An actor's draw status, which picks the animation of its model: a billboard actor shows animation status * 4 + its
+// direction, or status + 30 from DRAW_STATUS_ANIME_10 on for the models that have one animation for all directions. The
+// walking models stand still, and walk at the frames a tile that the names give; DRAW_STATUS_ANIME_10, 11 and 12 are
+// their runs at 4, 6 and 2 frames a tile. Other models give the numbered ones their own animations, which the action
+// commands that wait for an animation to end play
+enum {
+    DRAW_STATUS_STOP,
+    DRAW_STATUS_WALK_32F,
+    DRAW_STATUS_WALK_16F,
+    DRAW_STATUS_WALK_8F,
+    DRAW_STATUS_WALK_4F,
+    DRAW_STATUS_WALK_2F,
+    DRAW_STATUS_WALK_6F,
+    DRAW_STATUS_WALK_3F,
+    DRAW_STATUS_WALK_7F,
+    DRAW_STATUS_WALK_12F,
+    DRAW_STATUS_ANIME_10,
+    DRAW_STATUS_ANIME_11,
+    DRAW_STATUS_ANIME_12,
+    DRAW_STATUS_ANIME_13,
+};
 void FldAct_SetDrawStatus(FieldActor *actor, u32 value);
 void func_ov012_02167564(FieldActor *actor, u32 value);
 // Sets x and z to the center of a tile, leaving y

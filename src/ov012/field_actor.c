@@ -1732,7 +1732,7 @@ static void FldAct_CreateDraw(FieldActor *actor) {
         if (CheckActorMovementFlag(actor, 0x1000)) {
             CheckRecalcActorY(actor);
         }
-        FldAct_SetDrawStatus(actor, 0);
+        FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
         if (!FldAct_IsDrawCreated(actor)) {
             FldAct_LoadVTable(actor);
             FldAct_InvokeOnCreateCallback(actor);
