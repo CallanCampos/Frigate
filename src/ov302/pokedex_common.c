@@ -22,7 +22,7 @@
 
 // The heap of the Pokédex
 // The archive of the areas' files
-#define ARCID_ZUKAN_HABITAT 296
+#define ARCID_POKEDEX_HABITAT 296
 // The file of an area that the table does not name
 #define FILE_NONE 0x18
 // The flags that make an area's conditions true
@@ -217,7 +217,7 @@ u32 PokedexCommon_LoadHabitatSpecies(PokeDexSave *pokedex, PokedexHabitatSave *h
     zone = PokedexHabitatSave_GetZone(habitat);
     type = PokedexHabitatSave_GetType(habitat);
     season = PokedexHabitatSave_GetSeason(habitat);
-    arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_HABITAT, heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_HABITAT, heapId);
     areaFile = PokedexCommon_GetAreaFile(zone);
     if (areaFile < 0) {
         areaFile = 0;
@@ -241,7 +241,7 @@ void PokedexCommon_BuildHabitatList(PokedexHabitatSave *habitat, PokedexHabitatL
     PokedexHabitatConditions conditions;
     int habitatIndex;
     EventWork *eventWork = GameData_GetEventWork(param->gameData);
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_HABITAT, HEAPID_POKEDEX);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_HABITAT, HEAPID_POKEDEX);
     int index;
 
     PokedexCommon_GetConditions(&conditions, eventWork);
@@ -322,7 +322,7 @@ void PokedexCommon_BuildHabitatSummary(PokedexHabitatSave *habitat, PokedexHabit
     PokedexHabitatConditions conditions;
     PokeDexSave *pokedex;
     EventWork *eventWork = GameData_GetEventWork(param->gameData);
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_HABITAT, HEAPID_POKEDEX);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_HABITAT, HEAPID_POKEDEX);
     int habitatIndex;
     int index;
     int i;

@@ -144,13 +144,13 @@ void PokedexHabitatGraphic_VBlank(PokedexHabitatGraphic *graphic) {
     if (graphic->paletteRequested == TRUE) {
         switch (graphic->paletteType) {
         case 0:
-            GFL_G2DIOLoadNCLR(ARCID_ZUKAN_GRA, 49, PALTYPE_MAIN_BG, 0x120, 0x120, 0x60, HEAPID_POKEDEX_HABITAT);
+            GFL_G2DIOLoadNCLR(ARCID_POKEDEX_GRA, 49, PALTYPE_MAIN_BG, 0x120, 0x120, 0x60, HEAPID_POKEDEX_HABITAT);
             break;
         case 1:
-            GFL_G2DIOLoadNCLR(ARCID_ZUKAN_GRA, 50, PALTYPE_MAIN_BG, 0, 0x120, 0x60, HEAPID_POKEDEX_HABITAT);
+            GFL_G2DIOLoadNCLR(ARCID_POKEDEX_GRA, 50, PALTYPE_MAIN_BG, 0, 0x120, 0x60, HEAPID_POKEDEX_HABITAT);
             break;
         case 2:
-            GFL_G2DIOLoadNCLR(ARCID_ZUKAN_GRA, 50, PALTYPE_MAIN_BG, 0x60, 0x120, 0x60, HEAPID_POKEDEX_HABITAT);
+            GFL_G2DIOLoadNCLR(ARCID_POKEDEX_GRA, 50, PALTYPE_MAIN_BG, 0x60, 0x120, 0x60, HEAPID_POKEDEX_HABITAT);
             break;
         }
         PokedexHabitatGraphic_ReloadBlink(graphic, graphic->paletteType);
@@ -429,7 +429,7 @@ static void PokedexHabitatGraphic_InitClActSys(void) {
 }
 
 static void PokedexHabitatGraphic_LoadBG(void) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_HABITAT);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_HABITAT);
 
     GFL_G2DIOLoadArcNCLRDefault(arc, 49, PALTYPE_MAIN_BG, 0, 0, HEAPID_POKEDEX_HABITAT);
     GFL_G2DIOLoadArcNCLRDefault(arc, 51, PALTYPE_SUB_BG, 0, 0, HEAPID_POKEDEX_HABITAT);
@@ -463,7 +463,7 @@ static void PokedexHabitatGraphic_CreateActors(PokedexHabitatGraphic *graphic) {
 
     objSetup.vramType = CLACT_SURFACE_MAIN;
     objSetup.flags = 0;
-    objSetup.arcId = ARCID_ZUKAN_GRA;
+    objSetup.arcId = ARCID_POKEDEX_GRA;
     objSetup.paletteFile = 53;
     objSetup.charFile = 57;
     objSetup.cellFile = 63;
@@ -487,7 +487,7 @@ static void PokedexHabitatGraphic_CreateActors(PokedexHabitatGraphic *graphic) {
 
     areaSetup.vramType = CLACT_SURFACE_SUB;
     areaSetup.flags = 0;
-    areaSetup.arcId = ARCID_ZUKAN_GRA;
+    areaSetup.arcId = ARCID_POKEDEX_GRA;
     areaSetup.paletteFile = 5;
     areaSetup.charFile = 15;
     areaSetup.cellFile = 29;
@@ -701,7 +701,7 @@ static void PokedexHabitatGraphic_InitScroll(PokedexHabitatGraphic *graphic) {
 }
 
 static void PokedexHabitatGraphic_InitBlink(PokedexHabitatGraphic *graphic) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_HABITAT);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_HABITAT);
 
     graphic->blink[0] = BlinkPalAnm_Create(0xa0, 5, 2, HEAPID_POKEDEX_HABITAT);
     BlinkPalAnm_SetPalBufferArcTool(graphic->blink[0], arc, 49, 0x90, 0xa0);
@@ -998,13 +998,13 @@ static void PokedexHabitatGraphic_ReloadBlink(PokedexHabitatGraphic *graphic, u3
     graphic->blink[0] = BlinkPalAnm_Create(0xa0, 5, 2, HEAPID_POKEDEX_HABITAT);
     switch (type) {
     case 0:
-        BlinkPalAnm_SetPalBufferArc(graphic->blink[0], ARCID_ZUKAN_GRA, 49, 0x90, 0xa0);
+        BlinkPalAnm_SetPalBufferArc(graphic->blink[0], ARCID_POKEDEX_GRA, 49, 0x90, 0xa0);
         break;
     case 1:
-        BlinkPalAnm_SetPalBufferArc(graphic->blink[0], ARCID_ZUKAN_GRA, 50, 0, 0x10);
+        BlinkPalAnm_SetPalBufferArc(graphic->blink[0], ARCID_POKEDEX_GRA, 50, 0, 0x10);
         break;
     case 2:
-        BlinkPalAnm_SetPalBufferArc(graphic->blink[0], ARCID_ZUKAN_GRA, 50, 0x30, 0x40);
+        BlinkPalAnm_SetPalBufferArc(graphic->blink[0], ARCID_POKEDEX_GRA, 50, 0x30, 0x40);
         break;
     }
 }

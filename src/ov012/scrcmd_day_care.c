@@ -1,3 +1,4 @@
+// The ROM names this file scrcmd_sodateya.c.
 #include "types.h"
 #include "app/p_status.h"
 #include "app/pokelist.h"

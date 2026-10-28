@@ -10,7 +10,7 @@
 #include "gfl/str.h"
 #include "gfl/touchpanel.h"
 #include "system/printsys.h"
-#include "text/system/zknsearch_main.h"
+#include "text/system/pokedex_search_main.h"
 
 // The lists of the criteria of the Pokédex's search screen: the order, the initial, the type, the color and the shape.
 // The ROM doesn't name this file; pokedex_search_list.c is a guess after pokedex_search_main.c
@@ -167,7 +167,7 @@ static const FrameListSetup sPokedexSearchShapeSetup = {
 };
 
 void PokedexSearchList_InitOrder(PokedexSearchWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
     FrameListSetup setup = sPokedexSearchOrderSetup;
     u32 i;
 
@@ -181,12 +181,12 @@ void PokedexSearchList_InitOrder(PokedexSearchWork *wk) {
     GFL_ArcToolFree(arc);
     for (i = 0; i < ORDER_COUNT; i++) {
         FrameList_AddItem(wk->frameList, 0, i);
-        wk->itemNames[i] = GFL_MsgDataLoadStrbufNew(wk->msgData, ZknsearchMain_Text_Number + i);
+        wk->itemNames[i] = GFL_MsgDataLoadStrbufNew(wk->msgData, PokedexSearchMain_Text_Number + i);
     }
 }
 
 void PokedexSearchList_InitInitial(PokedexSearchWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
     FrameListSetup setup = sPokedexSearchInitialSetup;
     u32 i;
 
@@ -200,12 +200,12 @@ void PokedexSearchList_InitInitial(PokedexSearchWork *wk) {
     GFL_ArcToolFree(arc);
     for (i = 0; i < INITIAL_COUNT; i++) {
         FrameList_AddItem(wk->frameList, 0, i);
-        wk->itemNames[i] = GFL_MsgDataLoadStrbufNew(wk->msgData, ZknsearchMain_Text_A + i);
+        wk->itemNames[i] = GFL_MsgDataLoadStrbufNew(wk->msgData, PokedexSearchMain_Text_A + i);
     }
 }
 
 void PokedexSearchList_InitType(PokedexSearchWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
     FrameListSetup setup = sPokedexSearchTypeSetup;
     u32 i;
 
@@ -224,7 +224,7 @@ void PokedexSearchList_InitType(PokedexSearchWork *wk) {
 }
 
 void PokedexSearchList_InitColor(PokedexSearchWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
     FrameListSetup setup = sPokedexSearchColorSetup;
     u32 i;
 
@@ -236,14 +236,14 @@ void PokedexSearchList_InitColor(PokedexSearchWork *wk) {
     FrameList_LoadScreen(wk->frameList, arc, 99, FALSE, 0);
     FrameList_LoadCursorPalette(wk->frameList, arc, 75, 2, 3);
     GFL_ArcToolFree(arc);
-    for (i = ZknsearchMain_Text_Red; i <= ZknsearchMain_Text_Pink; i++) {
-        FrameList_AddItem(wk->frameList, 0, i - ZknsearchMain_Text_Red);
-        wk->itemNames[i - ZknsearchMain_Text_Red] = GFL_MsgDataLoadStrbufNew(wk->msgData, i);
+    for (i = PokedexSearchMain_Text_Red; i <= PokedexSearchMain_Text_Pink; i++) {
+        FrameList_AddItem(wk->frameList, 0, i - PokedexSearchMain_Text_Red);
+        wk->itemNames[i - PokedexSearchMain_Text_Red] = GFL_MsgDataLoadStrbufNew(wk->msgData, i);
     }
 }
 
 void PokedexSearchList_InitShape(PokedexSearchWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
     FrameListSetup setup = sPokedexSearchShapeSetup;
     u32 i;
 

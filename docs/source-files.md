@@ -227,7 +227,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `scrcmd_game_state.c` | `0x021555f8`–`0x02156174` | 55 | complete | descriptive |
 | `scrcmd_pokemon.c` | `0x02156174`–`0x021574a4` | 43 | complete | string at `0x0216e1f4` |
 | `scrcmd_proc.c` | `0x021574a4`–`0x02157c20` | 21 | complete | string at `0x0216e208` |
-| `scrcmd_sodateya.c` | `0x02157c20`–`0x021580c4` | 18 | complete | string at `0x0216e218` |
+| `scrcmd_day_care.c` | `0x02157c20`–`0x021580c4` | 18 | complete | ROM's `scrcmd_sodateya.c`, string at `0x0216e218` |
 | `scrcmd_musical.c` | `0x021580c4`–`0x021590ec` | 27 | complete | string at `0x0216e22c` |
 | `field_encount_st.c` | `0x021590ec`–`0x02159230` | 14 | complete | string at `0x0216e240` |
 | `hm_event.c` | `0x02159230`–`0x02159bc0` | 44 | complete | descriptive |
@@ -634,7 +634,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `field_player_grid_event.c` | `0x021ba81c`–`0x021bb590` | 23 | complete | string at `0x021d5404` |
 | `fld_particle.c` | `0x021bb590`–`0x021bb67c` | 8 | complete | string at `0x021d5420` |
 | `fld3d_ci.c` | `0x021bb67c`–`0x021bd2ac` | 54 | complete | string at `0x021d5430` |
-| `sodateya.c` | `0x021bd2ac`–`0x021be790` | 65 | complete | string at `0x021d54a4` |
+| `day_care.c` | `0x021bd2ac`–`0x021be790` | 65 | complete | ROM's `sodateya.c`, string at `0x021d54a4` |
 | `fldeff_ripple.c` | `0x021be790`–`0x021be988` | 9 | complete | string at `0x021d54b4` |
 | `fldeff_splash.c` | `0x021be988`–`0x021beb70` | 9 | complete | string at `0x021d54c4` |
 | `sound_obj.c` | `0x021beb70`–`0x021bedd8` | 9 | complete | string at `0x021d54d4` |

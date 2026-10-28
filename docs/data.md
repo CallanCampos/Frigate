@@ -1038,7 +1038,7 @@ events.
 ## 2D graphics
 
 The menus, apps and screens keep their 2D graphics in archives of Nitro resources, an archive each: the title screen's,
-the Pokédex's (`ARCID_ZUKAN_GRA`), the box's (`ARCID_BOX2`) and the others. Each is `res/graphics/<archive>/`, named
+the Pokédex's (`ARCID_POKEDEX_GRA`), the box's (`ARCID_BOX2`) and the others. Each is `res/graphics/<archive>/`, named
 after its `ARCID_*` constant in `include/constants/arc.h`, whose number gives the archive's file (`ARCID_TITLE`, 26, is
 `a/0/2/6`); `configure.py` packs a directory for each, 110 of them. An archive that swan doesn't name is named after
 the source file that loads it, or the prefix of an app's files where several load it (`ARCID_BTLV` for the

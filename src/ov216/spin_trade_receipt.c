@@ -282,7 +282,7 @@ BOOL SpinTradeReceipt_Init(GameProc *proc, u32 *state, void *param, void *work) 
         GX_SetVisiblePlane(0);
         GXS_SetVisiblePlane(0);
         GFL_HeapCreateChild(HEAPID_USER, HEAPID_SPIN_TRADE, 0x80000);
-        arc = GFL_ArcSysCreateFileHandle(ARCID_GURU2_OBJ, HEAPID_SPIN_TRADE);
+        arc = GFL_ArcSysCreateFileHandle(ARCID_SPIN_TRADE_OBJ, HEAPID_SPIN_TRADE);
         wk = GFL_ProcInitSubsystem(proc, sizeof(SpinTradeReceiptWork), HEAPID_SPIN_TRADE);
         MI_CpuFill8(wk, 0, sizeof(SpinTradeReceiptWork));
         g2p->g2r = wk;

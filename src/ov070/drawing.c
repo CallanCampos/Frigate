@@ -216,7 +216,7 @@ static BOOL Drawing_Init(GameProc *proc, u32 *state, void *param, void *work) {
         Drawing_InitBG();
         GFL_WipeSet(WIPE_MODE_BOTH, 9, 9, WIPE_COLOR_BLACK, 16, 1, HEAPID_DRAWING);
         wk->param = param;
-        arc = GFL_ArcSysCreateFileHandle(ARCID_OEKAKI, HEAPID_DRAWING);
+        arc = GFL_ArcSysCreateFileHandle(ARCID_DRAWING, HEAPID_DRAWING);
         Drawing_LoadGraphics(wk, arc);
         wk->vblankTcb = GFL_VBlankTCBAdd(Drawing_VBlank, wk, 0);
         Drawing_InitWork(wk);

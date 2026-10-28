@@ -46,7 +46,7 @@
 
 // The Pokémon icons, and the habitats, a file per species
 #define ARCID_POKEICON 7
-#define ARCID_ZUKAN_AREA 176
+#define ARCID_POKEDEX_AREA 176
 
 // The event flags that show the water and fishing habitats
 #define FLAG_HABITAT_WATER 0x987
@@ -485,7 +485,7 @@ static BOOL PokedexDetailMap_Init(PokedexDetailProcSys *sys, int *seq, void *par
     wk->active = TRUE;
     wk->townmap = TownMapData_Load(param->heapId);
     PokedexDetailMap_InitPlaceOrder(param, wk, common);
-    wk->habitatArc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_AREA, param->heapId);
+    wk->habitatArc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_AREA, param->heapId);
     wk->vblankTcb = GFL_VBlankTCBAdd(PokedexDetailMap_VBlank, wk, 1);
     wk->vblankRequest = VBLANK_NONE;
     PokedexDetailMap_CreatePrintQueues(param, wk, common);
@@ -915,13 +915,13 @@ static void PokedexDetailMap_CreateActors(PokedexDetailMapParam *param, PokedexD
     wk->mapCellAnims = ClActSys_LoadCellAnims(arc, 12, 19, param->heapId);
     GFL_ArcToolFree(arc);
 
-    arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, param->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, param->heapId);
     wk->seasonPalette = ClActSys_LoadPlttRange(arc, 6, CLACT_VRAM_MAIN, 0xa0, 0, 2, param->heapId);
     wk->seasonChars = ClActSys_LoadChars(arc, 16, FALSE, CLACT_VRAM_MAIN, param->heapId);
     wk->seasonCellAnims = ClActSys_LoadCellAnims(arc, 30, 47, param->heapId);
     GFL_ArcToolFree(arc);
 
-    arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, param->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, param->heapId);
     wk->areaPalette = ClActSys_LoadPlttRange(arc, 5, CLACT_VRAM_MAIN, 0xe0, 0, 1, param->heapId);
     wk->areaChars = ClActSys_LoadChars(arc, 15, FALSE, CLACT_VRAM_MAIN, param->heapId);
     wk->areaCellAnims = ClActSys_LoadCellAnims(arc, 29, 46, param->heapId);
@@ -1160,7 +1160,7 @@ static void PokedexDetailMap_FreeWindows(PokedexDetailMapParam *param, PokedexDe
 
 static void PokedexDetailMap_LoadPanelBG(PokedexDetailMapParam *param, PokedexDetailMapWork *wk,
                                          PokedexDetailCommon *common) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, param->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, param->heapId);
 
     GFL_G2DIOLoadArcNCLR(arc, 2, PALTYPE_SUB_BG, 0, 0, 8 * 0x20, param->heapId);
     wk->panelChars = GFL_BGSysLoadArcNCGRDynamic(arc, 12, PANEL_BG, 0, FALSE, param->heapId);

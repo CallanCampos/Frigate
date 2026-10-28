@@ -585,7 +585,7 @@ src/ov036/fld3d_ci.c:
     .rodata     start:0x021d1c80 end:0x021d20e4
     .data       start:0x021d5430 end:0x021d54a4
 
-src/ov036/sodateya.c:
+src/ov036/day_care.c:
     complete
     .text       start:0x021bd2ac end:0x021be790
     .rodata     start:0x021d20e4 end:0x021d220c

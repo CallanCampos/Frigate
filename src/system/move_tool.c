@@ -6,7 +6,7 @@
 #include "gfl/heap.h"
 #include "pml/move.h"
 
-// The moves' data, read from ARCID_WAZAINFO one move at a time, or kept in a cache of the moves asked for last while
+// The moves' data, read from ARCID_MOVE_INFO one move at a time, or kept in a cache of the moves asked for last while
 // a battle runs. The functions' names are swan's
 
 // The accuracy of a move that never misses, and the critical hit stage of one that always lands a critical hit
@@ -16,7 +16,7 @@
 #define MOVE_STAT_CHANGE_COUNT 3
 #define MOVE_MAX_PP_UPS 3
 
-// A move's file in ARCID_WAZAINFO
+// A move's file in ARCID_MOVE_INFO
 typedef struct {
     u8 type;
     u8 quality;
@@ -68,7 +68,7 @@ static inline MoveData *PML_MoveGetData(u16 move) {
         for (i = 0; i < sMoveDataCache->count; i++) {
             if (sMoveDataCache->moves[i] == MOVE_NONE) {
                 sMoveDataCache->moves[i] = move;
-                GFL_ArcSysRead(sMoveDataCache->data[i], ARCID_WAZAINFO, move);
+                GFL_ArcSysRead(sMoveDataCache->data[i], ARCID_MOVE_INFO, move);
                 break;
             }
             if (move == sMoveDataCache->moves[i]) {
@@ -78,11 +78,11 @@ static inline MoveData *PML_MoveGetData(u16 move) {
         if (i == sMoveDataCache->count) {
             i--;
             sMoveDataCache->moves[i] = move;
-            GFL_ArcSysRead(sMoveDataCache->data[i], ARCID_WAZAINFO, move);
+            GFL_ArcSysRead(sMoveDataCache->data[i], ARCID_MOVE_INFO, move);
         }
         return sMoveDataCache->data[i];
     }
-    GFL_ArcSysRead(&sMoveData, ARCID_WAZAINFO, move);
+    GFL_ArcSysRead(&sMoveData, ARCID_MOVE_INFO, move);
     return &sMoveData;
 }
 

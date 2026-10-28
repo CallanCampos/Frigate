@@ -306,7 +306,7 @@ static void NationalPokedexAward_VBlank(TCB *tcb, void *data) {
 }
 
 static void NationalPokedexAward_LoadGraphics(NationalPokedexAwardWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_AWARD, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_AWARD, wk->heapId);
 
     GFL_G2DIOLoadArcNCLRDefault(arc, 2, PALTYPE_MAIN_BG, 0, 0x1e0, wk->heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 5, BG_MAIN_DIPLOMA, 0, 0, FALSE, wk->heapId);
@@ -460,7 +460,7 @@ static void NationalPokedexAward_InitBackdrop(NationalPokedexAwardWork *wk) {
 }
 
 static void NationalPokedexAward_InitRibbon(NationalPokedexAwardWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_AWARD, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_AWARD, wk->heapId);
 
     wk->palette = ClActSys_LoadPlttRange(arc, 0, 0, 0, 0, 2, wk->heapId);
     wk->chars = ClActSys_LoadChars(arc, 3, FALSE, 0, wk->heapId);

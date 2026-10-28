@@ -206,7 +206,7 @@ static void PokedexListObj_LoadResources(PokedexListWork *wk) {
         wk->cellRes[i] = -1;
     }
 
-    arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_LIST | HEAPID_TAIL_BIT);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_LIST | HEAPID_TAIL_BIT);
     wk->charRes[CHAR_RES_LIST] = ClActSys_LoadChars(arc, 57, FALSE, CLACT_VRAM_MAIN, HEAPID_POKEDEX_LIST);
     wk->paletteRes[RES_LIST] = ClActSys_LoadPltt(arc, 53, CLACT_VRAM_MAIN, 0 * 0x20, HEAPID_POKEDEX_LIST);
     wk->cellRes[RES_LIST] = ClActSys_LoadCellAnims(arc, 63, 73, HEAPID_POKEDEX_LIST);
@@ -246,7 +246,7 @@ static void PokedexListObj_LoadResources(PokedexListWork *wk) {
 
 // The cursor's colors, in the palette of the list's actors
 static void PokedexListObj_InitBlinkAnm(PokedexListWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_LIST);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_LIST);
 
     wk->blinkAnm = BlinkPalAnm_Create(1 * 0x10, 0x10, BLINK_PALANM_OBJ_MAIN, HEAPID_POKEDEX_LIST);
     BlinkPalAnm_SetPalBufferArcTool(wk->blinkAnm, arc, 53, 1 * 0x10, 2 * 0x10);
@@ -391,7 +391,7 @@ void PokedexListObj_PutMon(PokedexListWork *wk, u16 species) {
         }
     }
     if (species == SPECIES_NONE) {
-        arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_LIST | HEAPID_TAIL_BIT);
+        arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_LIST | HEAPID_TAIL_BIT);
         wk->charRes[template.chars] = ClActSys_LoadChars(arc, 56, FALSE, CLACT_VRAM_MAIN, HEAPID_POKEDEX_LIST);
         wk->paletteRes[template.palette] =
             ClActSys_LoadPlttRange(arc, 52, CLACT_VRAM_MAIN, paletteOffset, 0, 1, HEAPID_POKEDEX_LIST);

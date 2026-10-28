@@ -359,7 +359,7 @@ PokedexDetailBackground *PokedexDetailBackground_Create(HeapID heapId, u32 page,
     } else {
         palType = PALTYPE_SUB_BG;
     }
-    arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, heapId);
     GFL_G2DIOLoadArcNCLR(arc, sBackgroundFiles[screen].nclr, palType, sBottomPalettes[screen][page] * 32,
                          bottomPalette * 32, 32, heapId);
     GFL_G2DIOLoadArcNCLR(arc, sBackgroundFiles[screen].nclr, palType, sTopPalettes[screen][page] * 32, topPalette * 32,

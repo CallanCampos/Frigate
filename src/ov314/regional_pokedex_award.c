@@ -292,7 +292,7 @@ static void RegionalPokedexAward_VBlank(TCB *tcb, void *data) {
 }
 
 static void RegionalPokedexAward_LoadGraphics(RegionalPokedexAwardWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_AWARD, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_AWARD, wk->heapId);
 
     GFL_G2DIOLoadArcNCLRDefault(arc, 1, PALTYPE_MAIN_BG, 0, 0x1e0, wk->heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 4, BG_MAIN_DIPLOMA, 0, 0, FALSE, wk->heapId);
@@ -424,7 +424,7 @@ static void RegionalPokedexAward_InitBackdrop(RegionalPokedexAwardWork *wk) {
 }
 
 static void RegionalPokedexAward_InitRibbon(RegionalPokedexAwardWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_AWARD, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_AWARD, wk->heapId);
 
     wk->palette = ClActSys_LoadPlttRange(arc, 0, 0, 0, 0, 2, wk->heapId);
     wk->chars = ClActSys_LoadChars(arc, 3, FALSE, 0, wk->heapId);

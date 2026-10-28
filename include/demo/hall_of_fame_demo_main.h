@@ -19,7 +19,7 @@
 
 // The Hall of Fame entry demo's work and its set-up, in hall_of_fame_demo_main.c (a guessed name). Our names
 
-// The members of ARCID_DENDOU_DEMO that the demo loads by number
+// The members of ARCID_HALL_OF_FAME_DEMO that the demo loads by number
 enum {
     NARC_HALL_OF_FAME_DEMO_BG_NCLR = 1,
     NARC_HALL_OF_FAME_DEMO_OBJ_NCLR = 3,

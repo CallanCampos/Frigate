@@ -282,7 +282,7 @@ static void PokedexOpen_FreeBG(void) {
 }
 
 static void PokedexOpen_LoadGraphics(PokedexOpenWork *work) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_TAIL(HEAPID_POKEDEX_OPEN));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_TAIL(HEAPID_POKEDEX_OPEN));
 
     if (getTrainerGender(work->param->playerInfo) == GENDER_MALE) {
         GFL_G2DIOLoadArcNCLRDefault(arc, 0x68, PALTYPE_MAIN_BG_EX, 0x4000, 0, HEAPID_POKEDEX_OPEN);

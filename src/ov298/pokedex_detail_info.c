@@ -579,7 +579,7 @@ static void PokedexDetailInfo_CreateButtons(PokedexDetailInfoParam *param, Poked
     PokedexDetailTouchbar *touchbar = PokedexDetailCommon_GetTouchbar(common);
     ClActUnit *unit = PokedexDetailGraphic_GetClActUnit(PokedexDetailCommon_GetGraphic(common));
     ClActSurface surface = CLACT_SURFACE_MAIN;
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, param->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, param->heapId);
     ClActorSetup setup;
     u8 i;
 
@@ -697,7 +697,7 @@ static void PokedexDetailInfo_GetPokemon(PokedexDetailInfoParam *param, PokedexD
 static void PokedexDetailInfo_InitGlow(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
                                        PokedexDetailCommon *common) {
     NNSG2dPaletteData *palette;
-    void *file = GFL_G2DIOReadNCLR(ARCID_ZUKAN_GRA, 3, &palette, param->heapId);
+    void *file = GFL_G2DIOReadNCLR(ARCID_POKEDEX_GRA, 3, &palette, param->heapId);
     u16 *data = palette->pRawData;
 
     MI_CpuCopy8(data + 16, wk->glowPalettes[0], 32);

@@ -126,7 +126,7 @@ src/ov012/scrcmd_proc.c:
     .text       start:0x021574e4 end:0x02157c60
     .data       start:0x0216e248 end:0x0216e258
 
-src/ov012/scrcmd_sodateya.c:
+src/ov012/scrcmd_day_care.c:
     complete
     .text       start:0x02157c60 end:0x02158104
     .data       start:0x0216e258 end:0x0216e26c

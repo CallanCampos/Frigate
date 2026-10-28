@@ -376,7 +376,7 @@ static BOOL PokedexDetailVoice_Main(PokedexDetailProcSys *sys, int *seq, void *p
         PokedexDetailVoice_PrintName(param, wk, common);
         PokedexDetailVoice_CreateTime(param, wk, common);
         PokedexDetailVoice_PrintTime(param, wk, common, 0, 0);
-        wk->bgChars = PokedexDetail_LoadBG(FALSE, param->heapId, 2, 1, 0, 5, ARCID_ZUKAN_GRA, 1, 11, 43, 0);
+        wk->bgChars = PokedexDetail_LoadBG(FALSE, param->heapId, 2, 1, 0, 5, ARCID_POKEDEX_GRA, 1, 11, 43, 0);
         wk->backgroundMain = PokedexDetailBackground_Create(param->heapId, 2, 0, 2, 3);
         wk->backgroundSub = PokedexDetailBackground_Create(param->heapId, 2, 4, 1, 2);
         PokedexDetailVoice_SetTimeDigits(param, wk, common, 0, 0);
@@ -604,7 +604,7 @@ static void PokedexDetailVoice_UpdateBGM(PokedexDetailVoiceParam *param, Pokedex
 
 static void PokedexDetailVoice_CreateActors(PokedexDetailVoiceParam *param, PokedexDetailVoiceWork *wk,
                                             PokedexDetailCommon *common) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, param->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, param->heapId);
     ClActorSetup setup;
     u8 i;
 

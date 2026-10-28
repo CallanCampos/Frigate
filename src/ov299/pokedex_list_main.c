@@ -320,7 +320,7 @@ void PokedexListMain_ExitBG(void) {
 void PokedexListMain_LoadGraphics(void) {
     ArcTool *arc;
 
-    arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_LIST);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_LIST);
     GFL_G2DIOLoadArcNCLRDefault(arc, 49, PALTYPE_MAIN_BG, 0, 0x80, HEAPID_POKEDEX_LIST);
     GFL_G2DIOLoadArcNCLRDefault(arc, 51, PALTYPE_SUB_BG, 0, 0xa0, HEAPID_POKEDEX_LIST);
     GFL_BGSysLoadArcNCGRStatic(arc, 60, 2, 0, 0, FALSE, HEAPID_POKEDEX_LIST);
@@ -452,7 +452,7 @@ BOOL PokedexListMain_UpdateFrameMove(PokedexListWork *wk) {
 }
 
 void PokedexListMain_InitList(PokedexListWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_LIST | HEAPID_TAIL_BIT);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_LIST | HEAPID_TAIL_BIT);
     u16 last = PokeDex_GetLastSpecies(wk->param->pokedex);
     FrameListSetup setup = sPokedexListSetup;
     u32 i;

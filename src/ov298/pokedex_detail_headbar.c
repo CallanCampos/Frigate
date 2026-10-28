@@ -148,10 +148,10 @@ static void PokedexDetailHeadbar_InitBG(PokedexDetailHeadbar *headbar) {
     headbar->window = BmpWin_CreateDynamic(HEADBAR_BG, 0, 0, 16, 1, 13, FALSE);
     GFL_BitmapFill(BmpWin_GetBitmap(headbar->window), 0);
     BmpWin_FlushChar(headbar->window);
-    headbar->bitmap = GFL_G2DIOLoadBitmap(ARCID_ZUKAN_GRA, 14, FALSE, headbar->heapId);
+    headbar->bitmap = GFL_G2DIOLoadBitmap(ARCID_POKEDEX_GRA, 14, FALSE, headbar->heapId);
     headbar->charSize = GFL_BitmapCalcPixelDataSize(headbar->bitmap);
     headbar->charPos = GFL_BGSysLoadCharDynamic(HEADBAR_BG, GFL_BitmapGetPixelData(headbar->bitmap), headbar->charSize);
-    loadBGScrToVramByNarcNoReserve(ARCID_ZUKAN_GRA, 38, HEADBAR_BG, 0, headbar->charPos, 0xc0, FALSE, headbar->heapId);
+    loadBGScrToVramByNarcNoReserve(ARCID_POKEDEX_GRA, 38, HEADBAR_BG, 0, headbar->charPos, 0xc0, FALSE, headbar->heapId);
     GFL_BGSysSetScrPaletteNo(HEADBAR_BG, 0, 0, 32, 24, 13);
     headbar->msgData =
         GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_SERVER_FLOW_TITLE, headbar->heapId);
@@ -166,7 +166,7 @@ static void PokedexDetailHeadbar_FreeBG(PokedexDetailHeadbar *headbar) {
 
 static void PokedexDetailHeadbar_PrintTitle(PokedexDetailHeadbar *headbar) {
     if (headbar->title >= 0 && headbar->title < POKEDEX_DETAIL_HEADBAR_TITLE_COUNT) {
-        ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, headbar->heapId);
+        ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, headbar->heapId);
         // The palette of each title's bar
         u32 palettes[POKEDEX_DETAIL_HEADBAR_TITLE_COUNT] = { 0, 2, 1, 3, 3 };
         GFLBitmap *bitmap;
@@ -174,7 +174,7 @@ static void PokedexDetailHeadbar_PrintTitle(PokedexDetailHeadbar *headbar) {
 
         GFL_G2DIOLoadArcNCLR(arc, 4, PALTYPE_SUB_BG, palettes[headbar->title] * 32, 13 * 32, 32, headbar->heapId);
         GFL_ArcToolFree(arc);
-        bitmap = GFL_G2DIOLoadBitmap(ARCID_ZUKAN_GRA, 14, FALSE, headbar->heapId);
+        bitmap = GFL_G2DIOLoadBitmap(ARCID_POKEDEX_GRA, 14, FALSE, headbar->heapId);
         GFL_BitmapCopy(bitmap, headbar->bitmap);
         GFL_BitmapFree(bitmap);
         strbuf = GFL_MsgDataLoadStrbufNew(headbar->msgData, BtlServerFlowTitle_Text_Info + headbar->title);

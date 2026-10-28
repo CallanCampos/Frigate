@@ -1,5 +1,5 @@
 // The day care: leaving and taking back Pokémon, their growth, and the egg that appears and what hatches from it.
-// Named after the ROM's "sodateya.c". Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// The ROM names it sodateya.c (the day care). Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
 #include "constants/arc.h"
 #include "constants/items.h"

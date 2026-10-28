@@ -183,7 +183,7 @@ static void PokedexSearchObj_LoadResources(PokedexSearchWork *wk) {
         wk->cellRes[i] = -1;
     }
 
-    arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
     wk->charRes[CHAR_RES_LIST] = ClActSys_LoadChars(arc, 80, FALSE, CLACT_VRAM_MAIN, HEAPID_POKEDEX_SEARCH);
     wk->paletteRes[CHAR_RES_LIST] = ClActSys_LoadPltt(arc, 77, CLACT_VRAM_MAIN, 0 * 0x20, HEAPID_POKEDEX_SEARCH);
     wk->cellRes[CELL_RES_LIST] = ClActSys_LoadCellAnims(arc, 86, 102, HEAPID_POKEDEX_SEARCH);

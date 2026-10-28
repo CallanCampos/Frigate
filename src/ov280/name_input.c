@@ -637,7 +637,7 @@ BOOL NameEntry_ProcMain(GameProc *proc, u32 *state, void *param, void *arg) {
 
 // Nothing is read from the first argument of the BG graphics' functions
 static void NameEntry_LoadBgGraphics(u32 *bgs, HeapID heapId) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_NAMEIN_GRAPHIC, heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_NAME_INPUT_GRAPHIC, heapId);
 
     GFL_G2DIOLoadArcNCLRDefault(arc, 2, 4, 0, 0, heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 1, 5, 0, 0, FALSE, heapId);
@@ -667,7 +667,7 @@ static void NameEntryObjs_Init(NameEntryObjs *objs, ClActUnit *unit, HeapID heap
     ClActorSetup setup;
     int i;
 
-    arc = GFL_ArcSysCreateFileHandle(ARCID_NAMEIN_GRAPHIC, heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_NAME_INPUT_GRAPHIC, heapId);
     objs->palette = ClActSys_LoadPltt(arc, 9, 0, 0, heapId);
     objs->cellAnims = ClActSys_LoadCellAnims(arc, 7, 6, heapId);
     objs->chars = ClActSys_LoadChars(arc, 8, FALSE, 0, heapId);
@@ -730,7 +730,7 @@ static void KeyHighlight_Init(KeyHighlight *highlight, u32 type, NameEntryObjs *
     for (i = 0; i < 2; i++) {
         highlight->actors[i] = NameEntryObjs_Get(objs, OBJ_HIGHLIGHT + i);
     }
-    file = GFL_G2DIOReadNCLR(ARCID_NAMEIN_GRAPHIC, 2, &palette, heapId);
+    file = GFL_G2DIOReadNCLR(ARCID_NAME_INPUT_GRAPHIC, 2, &palette, heapId);
     colors = palette->pRawData;
     for (i = 0; i < 16; i++) {
         highlight->baseColor[i] = colors[16 + i];
@@ -2072,8 +2072,8 @@ static void Keyboard_Init(Keyboard *kb, u32 type, Font *font, PrintQueue *queue,
     kb->type = type;
     kb->nextType = type;
     kb->keyboards = keyboards;
-    kb->screenData[0] = GFL_G2DIOReadNSCR(ARCID_NAMEIN_GRAPHIC, 10, FALSE, &kb->screens[0], heapId);
-    kb->screenData[1] = GFL_G2DIOReadNSCR(ARCID_NAMEIN_GRAPHIC, 5, FALSE, &kb->screens[1], heapId);
+    kb->screenData[0] = GFL_G2DIOReadNSCR(ARCID_NAME_INPUT_GRAPHIC, 10, FALSE, &kb->screens[0], heapId);
+    kb->screenData[1] = GFL_G2DIOReadNSCR(ARCID_NAME_INPUT_GRAPHIC, 5, FALSE, &kb->screens[1], heapId);
     if (type == KEYBOARD_TYPE_KANA) {
         GFL_BGSysBufferScrDefault(1, kb->screens[0]->rawData, 0x800);
         GFL_BGSysSetBGEnabled(2, FALSE);
@@ -2849,7 +2849,7 @@ static void NameEntryIcon_Init(NameEntryIcon *icon, u32 type, u32 species, u32 f
         break;
     case ICON_TYPE_BOX:
     case ICON_TYPE_KEY:
-        arcId = ARCID_NAMEIN_GRAPHIC;
+        arcId = ARCID_NAME_INPUT_GRAPHIC;
         paletteFile = 9;
         charsFile = 8;
         cellFile = 7;

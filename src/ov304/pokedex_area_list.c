@@ -23,7 +23,7 @@
 #include "system/game_data.h"
 #include "system/printsys.h"
 #include "system/wordset.h"
-#include "text/system/zukan_habitat.h"
+#include "text/system/pokedex_habitat.h"
 
 // The Pokédex's list of areas: its process and its states. The ROM doesn't name this file; pokedex_area_list.c is a
 // guess after what the screen lists
@@ -219,7 +219,7 @@ static PokedexAreaListWork *PokedexAreaList_CreateWork(GameProc *proc, PokedexHa
 
     MI_CpuFill8(wk, 0, sizeof(PokedexAreaListWork));
     wk->param = param;
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ZUKAN_HABITAT, HEAPID_POKEDEX_AREA_LIST);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_POKEDEX_HABITAT, HEAPID_POKEDEX_AREA_LIST);
     wk->habitatSave = SaveControl_GetPokedexHabitatSave(GameData_GetSaveControl(param->gameData));
     wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_POKEDEX_AREA_LIST);
     return wk;
@@ -613,7 +613,7 @@ static void PokedexAreaList_SetListResult(PokedexAreaListWork *wk, s32 result) {
 }
 
 static void PokedexAreaList_PrintHeading(PokedexAreaListWork *wk) {
-    StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, ZukanHabitat_Text_HabitatList);
+    StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, PokedexHabitat_Text_HabitatList);
 
     PokedexAreaListView_Print(POKEDEX_AREA_LIST_WIN_SUB, strbuf, &wk->view, 8, 4, 256, 16, PRINT_COLOR(14, 15, 0));
     GFL_StrBufFree(strbuf);
@@ -621,19 +621,19 @@ static void PokedexAreaList_PrintHeading(PokedexAreaListWork *wk) {
 
 // Prints the names of the buttons at the left: the habitats' at the bottom, and above it the Pokédex's lists
 static void PokedexAreaList_PrintModes(PokedexAreaListWork *wk) {
-    StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, ZukanHabitat_Text_Habitat);
+    StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, PokedexHabitat_Text_Habitat);
 
     PokedexAreaListView_Print(POKEDEX_AREA_LIST_WIN_MAIN, strbuf, &wk->view, 2, 149, 40, 16, PRINT_COLOR(15, 2, 1));
     GFL_StrBufFree(strbuf);
     if (wk->nationalObtained == TRUE) {
-        strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, ZukanHabitat_Text_Unova);
+        strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, PokedexHabitat_Text_Unova);
         PokedexAreaListView_Print(POKEDEX_AREA_LIST_WIN_MAIN, strbuf, &wk->view, 2, 103, 40, 16, PRINT_COLOR(15, 2, 1));
         GFL_StrBufFree(strbuf);
-        strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, ZukanHabitat_Text_National);
+        strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, PokedexHabitat_Text_National);
         PokedexAreaListView_Print(POKEDEX_AREA_LIST_WIN_MAIN, strbuf, &wk->view, 2, 126, 40, 16, PRINT_COLOR(15, 2, 1));
         GFL_StrBufFree(strbuf);
     } else {
-        strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, ZukanHabitat_Text_Unova);
+        strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, PokedexHabitat_Text_Unova);
         PokedexAreaListView_Print(POKEDEX_AREA_LIST_WIN_MAIN, strbuf, &wk->view, 2, 126, 40, 16, PRINT_COLOR(15, 2, 1));
         GFL_StrBufFree(strbuf);
         ClActor_SetVisible(PokedexAreaListView_GetActor(&wk->view, POKEDEX_AREA_LIST_OBJ_MODE_UPPER), FALSE);

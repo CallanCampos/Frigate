@@ -13,7 +13,8 @@ follows; [the docs](README.md#documentation) have the details.
 3. Pick something to work on. [Source files](docs/source-files.md) lists every overlay's original files and the
    [progress on ByteMatch](https://bytematch.dev/fuddlesworth/pokebw2) shows what is left. [Nonmatching functions](docs/nonmatching-functions.md) lists
    functions already in C that don't match yet, each with what was tried, if you like a puzzle. Before starting
-   overlay work, find its open `[Decomp] Overlay NNN` issue and read the comments. If nobody has claimed it, comment
+   overlay work, find its open `[Decomp] Overlay NNN` issue (for naming, its `[Names] Overlay NNN` issue, with
+   `tools/decomp/naming_report.py` and the `name-symbols` skill) and read the comments. If nobody has claimed it, comment
    that you are claiming it and what file or range you are starting with; then recheck for a concurrent claim.
    Treat a claim as active until its author releases it or the issue closes. Release yours if you leave the overlay
    unfinished. If someone already has it, choose another overlay or coordinate with them first. After each published
