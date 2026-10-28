@@ -32,6 +32,66 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-27: reviewed upstream sync and Phase 4 regression validation
+
+- **Upstream:** `5d5e9460693fc6681a75fe6d0a84d57516e44bc0`, 47 commits after reviewed `deb044db2d3d`.
+  Real upstream merge parents are retained. Reviewed PRs 42 (Phase 4), 40 (recording proposal) and 44 (experimental
+  Spanish loader) are integrated. This entry records local validation of the sync proposal; the protected PR records
+  the publication head, final CI, delegated owner review and merge. The owner authorized `--allow-references` for
+  this sync's incoming `f2b0f0c299`; future reference checks remain enabled.
+- **Port:** `PORT_SHA`, on `codex/upstream-sync-61ec4115fd52-f786fed9939d`, after upstream merge `510d66748e`
+  and reviewed-main merge `6f6554545d`. Merging actual reviewed main left the entire tested tree unchanged. Runtime
+  inputs (5,492 files) have SHA256 `cab35ccf3d4e7af4fbf06932ea1dbb9f392bcd19b8cc48d6148fa48160583367`.
+- **ROM (T0):** `.venv/bin/python configure.py b2_us w2_us && ninja`: both SHA1s match, B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  `check_mwcc_neutral.py --base 02cfabcc50 --jobs 2 src/gfl/arc_tool.c`: 2/2 pass. The final naming-only upstream
+  commit changes 51 names; normalizing those names and whitespace reproduces the previous three code/header files.
+- **Host build (T1), core tests (T2/T3/T6):** both arm64 macOS all-target builds pass. Preliminary ordinary core
+  runs (`ctest -LE 'timing|oracle'`) pass B2 312 and W2 310 tests, with three explicit capability skips each.
+  The actual-source archive-seek/default-length/assert checks and the exact-signature absent-ROM SDK checks pass
+  4/4; real assembly oracle tests pass 5/5 per game, with zero skips. Final publication runs the canonical full
+  both-version build/CTest gate again on the published head; its check is required before merge.
+- **Oracle (T4):** eight production Phase 4 comparison cases plus the fresh five-save fixture pass 9/9 per game,
+  zero skips: `oracle_saves`, `oracle_hugh`, `oracle_route19`, `oracle_catch`, `oracle_catch_continue`,
+  `oracle_center_continue`, `oracle_pc`, `oracle_round_trip_catch`, `oracle_round_trip_hugh`. Production CTest
+  commands use the unchanged pinned oracle with isolated fresh output/save paths. Native binaries remain unchanged
+  throughout. Existing declared frame/state exclusions, trainer-AI cut and tolerances remain unchanged. Each native
+  catch save continues in melonDS with 6,900/6,900 frames identical to the DS-save continuation (count and both
+  screens); both Hugh save round trips also pass. The strict native Hugh/catch saves are byte-identical to the
+  ones successfully continued by the DS oracle.
+- **Strict sanitizers (T5):** both `PORT_SANITIZE=ON` builds use Homebrew LLVM, recovery off. Six routes/game pass:
+  Hugh (19,000 frames), its produced-save continuation (3,610), Route 19 (15,400), catch/SAVE (11,600), its
+  produced-save continuation (4,700), and the PC route (11,600). All exit zero, reach the requested frame and emit
+  no ASan/UBSan/LSan report. Additional strict core suites pass 300 tests with one universal-slice skip/game.
+  All eight produced Hugh/Route19/catch/PC saves have 70 valid CRC blocks/copy and valid gift checksums; the Hugh
+  and catch saves have no undeclared decrypted differences from their fresh DS references. Own-save continuations
+  leave the produced saves byte-identical. Independently produced PC saves' DS interchange remains unproved.
+- **Frame timing:** production `frame_times_title` and `frame_times_party_menus` commands pass in both games,
+  plus B2 `frame_times_new_game`: 5/5 routes, eight scenes, three runs each, zero skips. Party checks use the fresh
+  verified starter saves. Worst scene p95 is 2.29 ms against the unchanged 8.36 ms budget; report-only is off.
+- **Playtest (T7):** both paced windowed catch/SAVE runs reach 11,600 frames, exit, then a new process reloads
+  the produced save and reaches 4,700 frames. Gotcha/party captures inspected in both games show Tepig Lv6 and the caught
+  Purrloin Lv4. Both saves have 70 valid CRC blocks/copy, valid gift checksums and no undeclared decrypted
+  differences from fresh DS references; reload leaves them unchanged. SHA1s: B2
+  `7dccc2407c3c2093cd32a51353d50e69887133b5`, W2 `3ab0a1aa07b16a677293a072bf7a8792efadd116`.
+  No ROMs, saves or captures are published.
+- **Tiers:** 40,949 matching tier (a), zero tier (b), 68 missing tier (c), excluding 2,385 veneers: +509/-509/0
+  from reviewed main. Code bytes a/b/c: B2 3,845,958/0/4,302; W2 3,846,046/0/4,302.
+- **Trap stubs:** 25 generated functions and one data placeholder (previously 25/20); none hit on these routes.
+  Absent-ROM GameSpy calls retain named, typed terminating HAL implementations; no fake encryption is provided.
+- **64-bit warnings:** both ordinary guards: 365 sites/229 keys, real 66, harmless 123, handled 141, unreachable 35;
+  1,703 compiled inputs, zero uncompiled. No baseline or sanitizer-budget relaxation.
+- **Work done:** preserved the host C implementation of `ArchiveMoveImageTop` while leaving MWCC's new DS assembly
+  untouched; added actual-source regressions, the newly referenced `gsCryptRSAEncryptBuffer` terminator and typed
+  tests. Reconciled reviewed main without losing local port changes, updated SDK IRQ ownership comments and module
+  guides ([game-changes.md](game-changes.md)). PR 40 remains a proposal; `--record` is not implemented. PR 44's
+  bounded parser/configuration tests pass 14/14, but IRES support remains experimental and Spanish White 2 refused.
+- **Next:** after protected publication/merge, Phase 5's first story-progression route beyond Phase 4, retained as an
+  oracle/sanitizer regression, or the explicitly scoped recording implementation in issue #38.
+- **Blockers:** no known Phase 4 source blocker. Spanish gameplay/save validation needs a Spanish dump (issue #45;
+  the owner has none). Trainer AI divergence remains bounded by proposed ADR 0023; whole-story,
+  JPEG/camera/network gameplay and release readiness are not established by this regression run.
+
 ## 2026-10-27: upstream sync prepared through `02cfabcc50`; native blockers fixed
 
 Preparation record for PR 43. Final base reconciliation, long route checks and publication follow; this is not a
@@ -41,7 +101,7 @@ completed sync on main.
   The original merge through `61ec4115fd52` and subsequent real merge `95806b27ac` retain the upstream parents.
   The owner explicitly authorized this sync's reference exception for incoming commit `f2b0f0c299` on 2026-10-27;
   no reference gate, App permission or branch rule is disabled.
-- **Port:** `PORT_SHA`, on `codex/upstream-sync-61ec4115fd52-f786fed9939d`, after reviewed-main merge `4316d79bb4`.
+- **Port:** `15424b0899`, on `codex/upstream-sync-61ec4115fd52-f786fed9939d`, after reviewed-main merge `4316d79bb4`.
   This local preparation is not yet pushed. Reviewed PRs 42 and 40 are merged; PR 44's experimental loader remains
   separate and must be reviewed/validated before main is merged into this proposal again.
 - **ROM (T0):** configure/Ninja, 10,691 steps, both original SHA1s match: B2
@@ -78,7 +138,7 @@ completed sync on main.
 Preparation record for the PR 44 review, not completed Spanish gameplay support.
 
 - **Upstream:** unchanged; this task imports no upstream commits.
-- **Port:** `PORT_SHA`, on `codex/review-spanish-rom`, preserving contributor head `6215e87d1f`.
+- **Port:** `b1893d1580`, on `codex/review-spanish-rom`, preserving contributor head `6215e87d1f`.
 - **ROM (T0):** not run in this focused review; maintainer exact-head validation remains required.
 - **Host build:** not run; only ROM-free parser/configuration tests run here.
 - **Tests:** `PYTHONDONTWRITEBYTECODE=1 python3 port/tests/rom/test_manifest.py`: 14 tests pass, including the actual
@@ -96,7 +156,7 @@ Preparation record for the PR 44 review, not completed Spanish gameplay support.
 ## 2026-10-27: a Spanish Black 2 ROM (IRES) by a manifest of its own, `PORT_ROM_LANGUAGE=es`
 
 - **Upstream:** `deb044db2d`, as `main` has it since PR 41; this branch merges no upstream commit.
-- **Port:** `PORT_SHA`, on `port/spanish-rom-manifest`: `f8e5aca53f` (libm linked by name on Linux, for a
+- **Port:** `6215e87d1f`, on `port/spanish-rom-manifest`: `f8e5aca53f` (libm linked by name on Linux, for a
   distribution's shared SDL3), `c548738245` (the Spanish ROM) and this entry's commit, which ignores the player's
   `nitrofs_manifest_languages.json` in `port/.gitignore`.
 - **ROM:** T0 not run: this clone has no `orig/`. The branch changes nothing outside `port/`; T0 is still due before
@@ -125,7 +185,7 @@ Preparation record for the PR 44 review, not completed Spanish gameplay support.
 ## 2026-10-27: recording-format proposal reviewed; implementation remains open
 
 - **Upstream:** unchanged, `deb044db2d3d`, from reviewed main `60da690df2` (PR 42).
-- **Port:** `PORT_SHA`, on `codex/review-record-format`, preserving PR 40's original documentation commit and merging
+- **Port:** `9ea2b86dc9`, on `codex/review-record-format`, preserving PR 40's original documentation commit and merging
   it with reviewed main. Phase 4 was reviewed and merged with all required checks green; its local evidence is below.
 - **ROM (T0):** both SHA1s match after configure/Ninja; no file outside `port/` changes. Pre-publication verification
   is repeated on this documentation head, and the exact PR head receives the required local check before merge.
