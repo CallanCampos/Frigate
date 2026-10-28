@@ -136,15 +136,15 @@ static BOOL FldmmdlMovecode_SwingStepRotateDir(FieldActor *actor, RailTurnWork *
 static BOOL FldmmdlMovecode_BackForthStepFaceDir(FieldActor *actor, RailPaceWork *work);
 static BOOL FldmmdlMovecode_BackForthStepWalk(FieldActor *actor, RailPaceWork *work);
 static BOOL FldmmdlMovecode_BackForthStepWaitWalk(FieldActor *actor, RailPaceWork *work);
-static void func_ov036_02191bc8(FieldActor *actor, u32 steps, u32 turns, u32 speed);
+static void FldmmdlMovecode_InitRoutePatrol(FieldActor *actor, u32 steps, u32 turns, u32 speed);
 static BOOL FldmmdlMovecode_RoutePatrolStepWalk(FieldActor *actor, ActorRoundWork *work);
-static BOOL func_ov036_02191e78(FieldActor *actor, ActorRoundWork *work);
-static void func_ov036_02191ea8(FieldActor *actor, u32 limit, u32 axis, u32 dirTable);
+static BOOL FldmmdlMovecode_RoutePatrolStepWaitWalk(FieldActor *actor, ActorRoundWork *work);
+static void FldmmdlMovecode_InitRoutePatrolSwap(FieldActor *actor, u32 limit, u32 axis, u32 dirTable);
 static void FldmmdlMovecode_AdvanceRouteIndex(ActorPatrolWork *work);
 static BOOL FldmmdlMovecode_RoutePatrolSwapStepLookForPlayer(FieldActor *actor, ActorPatrolWork *work);
 static BOOL FldmmdlMovecode_RoutePatrolSwapStepSwapMoveCode(FieldActor *actor, ActorPatrolWork *work);
 static BOOL FldmmdlMovecode_RoutePatrolSwapStepWalk(FieldActor *actor, ActorPatrolWork *work);
-static BOOL func_ov036_021921c0(FieldActor *actor, ActorPatrolWork *work);
+static BOOL FldmmdlMovecode_RoutePatrolSwapStepWaitWalk(FieldActor *actor, ActorPatrolWork *work);
 static BOOL FldmmdlMovecode_IsBButtonHeld(void);
 static BOOL FldmmdlMovecode_IsPlayerWalking(FieldActor *actor);
 static BOOL FldmmdlMovecode_IsBButtonPressed(void);
@@ -167,7 +167,7 @@ static void FldmmdlMovecode_EndMirrorTurn(FieldActor *actor, ActorFaceMemory *fa
 // FldmmdlMovecode_SwingStepRotateDir for the same reason
 static BOOL (*const data_ov036_021cb87c[])(FieldActor *actor,
                                            ActorRoundWork *work) = { FldmmdlMovecode_RoutePatrolStepWalk,
-                                                                     func_ov036_02191e78 };
+                                                                     FldmmdlMovecode_RoutePatrolStepWaitWalk };
 
 static const s32 data_ov036_021cb9f0[] = { DIR_LEFT, DIR_UP, DIR_DOWN, DIR_RIGHT };
 
@@ -221,7 +221,7 @@ static const s32 data_ov036_021cb910[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT
 
 static BOOL (*const data_ov036_021cb8f0[])(FieldActor *actor, ActorPatrolWork *work) = {
     FldmmdlMovecode_RoutePatrolSwapStepLookForPlayer, FldmmdlMovecode_RoutePatrolSwapStepSwapMoveCode,
-    FldmmdlMovecode_RoutePatrolSwapStepWalk, func_ov036_021921c0
+    FldmmdlMovecode_RoutePatrolSwapStepWalk, FldmmdlMovecode_RoutePatrolSwapStepWaitWalk
 };
 
 static const s32 data_ov036_021cb9e0[] = { DIR_DOWN, DIR_UP, DIR_RIGHT, DIR_LEFT };
@@ -299,47 +299,47 @@ static void FldmmdlMovecode_InitTurnRandom(FieldActor *actor, u32 mask) {
     FldAct_ClearMoving(actor);
 }
 
-void func_ov036_0219125c(FieldActor *actor) {
+void FldmmdlMovecode_InitTurnRandomSet0(FieldActor *actor) {
     FldmmdlMovecode_InitTurnRandom(actor, 0);
 }
 
-void func_ov036_02191268(FieldActor *actor) {
+void FldmmdlMovecode_InitTurnRandomSet1(FieldActor *actor) {
     FldmmdlMovecode_InitTurnRandom(actor, 1);
 }
 
-void func_ov036_02191274(FieldActor *actor) {
+void FldmmdlMovecode_InitTurnRandomSet2(FieldActor *actor) {
     FldmmdlMovecode_InitTurnRandom(actor, 2);
 }
 
-void func_ov036_02191280(FieldActor *actor) {
+void FldmmdlMovecode_InitTurnRandomSet3(FieldActor *actor) {
     FldmmdlMovecode_InitTurnRandom(actor, 3);
 }
 
-void func_ov036_0219128c(FieldActor *actor) {
+void FldmmdlMovecode_InitTurnRandomSet4(FieldActor *actor) {
     FldmmdlMovecode_InitTurnRandom(actor, 4);
 }
 
-void func_ov036_02191298(FieldActor *actor) {
+void FldmmdlMovecode_InitTurnRandomSet5(FieldActor *actor) {
     FldmmdlMovecode_InitTurnRandom(actor, 5);
 }
 
-void func_ov036_021912a4(FieldActor *actor) {
+void FldmmdlMovecode_InitTurnRandomSet6(FieldActor *actor) {
     FldmmdlMovecode_InitTurnRandom(actor, 6);
 }
 
-void func_ov036_021912b0(FieldActor *actor) {
+void FldmmdlMovecode_InitTurnRandomSet7(FieldActor *actor) {
     FldmmdlMovecode_InitTurnRandom(actor, 7);
 }
 
-void func_ov036_021912bc(FieldActor *actor) {
+void FldmmdlMovecode_InitTurnRandomSet8(FieldActor *actor) {
     FldmmdlMovecode_InitTurnRandom(actor, 8);
 }
 
-void func_ov036_021912c8(FieldActor *actor) {
+void FldmmdlMovecode_InitTurnRandomSet9(FieldActor *actor) {
     FldmmdlMovecode_InitTurnRandom(actor, 9);
 }
 
-void func_ov036_021912d4(FieldActor *actor) {
+void FldmmdlMovecode_InitTurnRandomSet10(FieldActor *actor) {
     FldmmdlMovecode_InitTurnRandom(actor, 10);
 }
 
@@ -583,19 +583,19 @@ void FldmmdlMovecode_MoveFixedDir(FieldActor *actor) {
     }
 }
 
-void func_ov036_02191704(FieldActor *actor) {
+void FldmmdlMovecode_InitFixedDirUp(FieldActor *actor) {
     FldmmdlMovecode_InitFixedDir(actor, DIR_UP);
 }
 
-void func_ov036_02191710(FieldActor *actor) {
+void FldmmdlMovecode_InitFixedDirDown(FieldActor *actor) {
     FldmmdlMovecode_InitFixedDir(actor, DIR_DOWN);
 }
 
-void func_ov036_0219171c(FieldActor *actor) {
+void FldmmdlMovecode_InitFixedDirLeft(FieldActor *actor) {
     FldmmdlMovecode_InitFixedDir(actor, DIR_LEFT);
 }
 
-void func_ov036_02191728(FieldActor *actor) {
+void FldmmdlMovecode_InitFixedDirRight(FieldActor *actor) {
     FldmmdlMovecode_InitFixedDir(actor, DIR_RIGHT);
 }
 
@@ -607,15 +607,15 @@ static void FldmmdlMovecode_InitSpin(FieldActor *actor, u32 turn) {
     SetActorInitialGPosToNowGPos(actor);
 }
 
-void func_ov036_02191758(FieldActor *actor) {
+void FldmmdlMovecode_InitSpinClockwise(FieldActor *actor) {
     FldmmdlMovecode_InitSpin(actor, 2);
 }
 
-void func_ov036_02191764(FieldActor *actor) {
+void FldmmdlMovecode_InitSpinCounterClockwise(FieldActor *actor) {
     FldmmdlMovecode_InitSpin(actor, 3);
 }
 
-void func_ov036_02191770(FieldActor *actor) {
+void FldmmdlMovecode_MoveSpin(FieldActor *actor) {
     RailTurnWork *work = GetNPCRailPosPtrAddr(actor);
     while (data_ov036_021cb960[work->state](actor, work) == TRUE) {
     }
@@ -695,11 +695,11 @@ static BOOL FldmmdlMovecode_SpinStepRotateDir(FieldActor *actor, RailTurnWork *w
     return TRUE;
 }
 
-void func_ov036_021918e0(FieldActor *actor) {
+void FldmmdlMovecode_InitSwing(FieldActor *actor) {
     FldmmdlMovecode_InitSpin(actor, 3);
 }
 
-void func_ov036_021918ec(FieldActor *actor) {
+void FldmmdlMovecode_MoveSwing(FieldActor *actor) {
     RailTurnWork *work = GetNPCRailPosPtrAddr(actor);
     while (data_ov036_021cb930[work->state](actor, work) == TRUE) {
     }
@@ -788,7 +788,7 @@ void FldmmdlMovecode_InitBackForth(FieldActor *actor) {
     }
 }
 
-void func_ov036_02191a2c(FieldActor *actor) {
+void FldmmdlMovecode_MoveBackForth(FieldActor *actor) {
     RailPaceWork *work = GetNPCRailPosPtrAddr(actor);
     while (data_ov036_021cb8d8[work->state](actor, work) == TRUE) {
     }
@@ -865,7 +865,7 @@ static BOOL FldmmdlMovecode_BackForthStepWaitWalk(FieldActor *actor, RailPaceWor
     return FALSE;
 }
 
-static void func_ov036_02191bc8(FieldActor *actor, u32 steps, u32 turns, u32 speed) {
+static void FldmmdlMovecode_InitRoutePatrol(FieldActor *actor, u32 steps, u32 turns, u32 speed) {
     RailStepWork *work = ClearActorPositionBlock(actor, sizeof(RailStepWork));
     work->steps = steps;
     work->turns = turns;
@@ -875,71 +875,71 @@ static void func_ov036_02191bc8(FieldActor *actor, u32 steps, u32 turns, u32 spe
     }
 }
 
-void func_ov036_02191bf8(FieldActor *actor) {
-    func_ov036_02191bc8(actor, 2, 0, 14);
+void FldmmdlMovecode_InitRoutePatrolSet14(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrol(actor, 2, 0, 14);
 }
 
-void func_ov036_02191c08(FieldActor *actor) {
-    func_ov036_02191bc8(actor, 2, 0, 15);
+void FldmmdlMovecode_InitRoutePatrolSet15(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrol(actor, 2, 0, 15);
 }
 
-void func_ov036_02191c18(FieldActor *actor) {
-    func_ov036_02191bc8(actor, 2, 1, 16);
+void FldmmdlMovecode_InitRoutePatrolSet16(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrol(actor, 2, 1, 16);
 }
 
-void func_ov036_02191c28(FieldActor *actor) {
-    func_ov036_02191bc8(actor, 2, 1, 17);
+void FldmmdlMovecode_InitRoutePatrolSet17(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrol(actor, 2, 1, 17);
 }
 
-void func_ov036_02191c38(FieldActor *actor) {
-    func_ov036_02191bc8(actor, 2, 0, 18);
+void FldmmdlMovecode_InitRoutePatrolSet18(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrol(actor, 2, 0, 18);
 }
 
-void func_ov036_02191c48(FieldActor *actor) {
-    func_ov036_02191bc8(actor, 2, 0, 19);
+void FldmmdlMovecode_InitRoutePatrolSet19(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrol(actor, 2, 0, 19);
 }
 
-void func_ov036_02191c58(FieldActor *actor) {
-    func_ov036_02191bc8(actor, 2, 1, 20);
+void FldmmdlMovecode_InitRoutePatrolSet20(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrol(actor, 2, 1, 20);
 }
 
-void func_ov036_02191c68(FieldActor *actor) {
-    func_ov036_02191bc8(actor, 2, 1, 21);
+void FldmmdlMovecode_InitRoutePatrolSet21(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrol(actor, 2, 1, 21);
 }
 
-void func_ov036_02191c78(FieldActor *actor) {
-    func_ov036_02191bc8(actor, 2, 1, 22);
+void FldmmdlMovecode_InitRoutePatrolSet22(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrol(actor, 2, 1, 22);
 }
 
-void func_ov036_02191c88(FieldActor *actor) {
-    func_ov036_02191bc8(actor, 2, 1, 23);
+void FldmmdlMovecode_InitRoutePatrolSet23(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrol(actor, 2, 1, 23);
 }
 
-void func_ov036_02191c98(FieldActor *actor) {
-    func_ov036_02191bc8(actor, 2, 0, 24);
+void FldmmdlMovecode_InitRoutePatrolSet24(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrol(actor, 2, 0, 24);
 }
 
-void func_ov036_02191ca8(FieldActor *actor) {
-    func_ov036_02191bc8(actor, 2, 0, 25);
+void FldmmdlMovecode_InitRoutePatrolSet25(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrol(actor, 2, 0, 25);
 }
 
-void func_ov036_02191cb8(FieldActor *actor) {
-    func_ov036_02191bc8(actor, 2, 1, 26);
+void FldmmdlMovecode_InitRoutePatrolSet26(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrol(actor, 2, 1, 26);
 }
 
-void func_ov036_02191cc8(FieldActor *actor) {
-    func_ov036_02191bc8(actor, 2, 1, 27);
+void FldmmdlMovecode_InitRoutePatrolSet27(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrol(actor, 2, 1, 27);
 }
 
-void func_ov036_02191cd8(FieldActor *actor) {
-    func_ov036_02191bc8(actor, 2, 0, 28);
+void FldmmdlMovecode_InitRoutePatrolSet28(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrol(actor, 2, 0, 28);
 }
 
-void func_ov036_02191ce8(FieldActor *actor) {
-    func_ov036_02191bc8(actor, 2, 0, 29);
+void FldmmdlMovecode_InitRoutePatrolSet29(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrol(actor, 2, 0, 29);
 }
 
-void func_ov036_02191cf8(FieldActor *actor) {
+void FldmmdlMovecode_MoveRoutePatrol(FieldActor *actor) {
     ActorRoundWork *work = GetNPCRailPosPtrAddr(actor);
 
     while (data_ov036_021cb87c[work->state](actor, work) == TRUE) {
@@ -1008,7 +1008,7 @@ static BOOL FldmmdlMovecode_RoutePatrolStepWalk(FieldActor *actor, ActorRoundWor
     return TRUE;
 }
 
-static BOOL func_ov036_02191e78(FieldActor *actor, ActorRoundWork *work) {
+static BOOL FldmmdlMovecode_RoutePatrolStepWaitWalk(FieldActor *actor, ActorRoundWork *work) {
     if (FieldAcmdTCB_Update(actor) == TRUE) {
         FldAct_ClearMoving(actor);
         if (FldmmdlMovecode_IsMirrorEventType(actor) == TRUE) {
@@ -1019,7 +1019,7 @@ static BOOL func_ov036_02191e78(FieldActor *actor, ActorRoundWork *work) {
     return FALSE;
 }
 
-static void func_ov036_02191ea8(FieldActor *actor, u32 limit, u32 axis, u32 dirTable) {
+static void FldmmdlMovecode_InitRoutePatrolSwap(FieldActor *actor, u32 limit, u32 axis, u32 dirTable) {
     ActorRoundWork *work = ClearActorPositionBlock(actor, 12);
 
     work->limit = limit;
@@ -1030,39 +1030,39 @@ static void func_ov036_02191ea8(FieldActor *actor, u32 limit, u32 axis, u32 dirT
     }
 }
 
-void func_ov036_02191ed8(FieldActor *actor) {
-    func_ov036_02191ea8(actor, 2, 1, 0x1e);
+void FldmmdlMovecode_InitRoutePatrolSwapSet30(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrolSwap(actor, 2, 1, 0x1e);
 }
 
-void func_ov036_02191ee8(FieldActor *actor) {
-    func_ov036_02191ea8(actor, 2, 1, 0x1f);
+void FldmmdlMovecode_InitRoutePatrolSwapSet31(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrolSwap(actor, 2, 1, 0x1f);
 }
 
-void func_ov036_02191ef8(FieldActor *actor) {
-    func_ov036_02191ea8(actor, 2, 0, 0x20);
+void FldmmdlMovecode_InitRoutePatrolSwapSet32(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrolSwap(actor, 2, 0, 0x20);
 }
 
-void func_ov036_02191f08(FieldActor *actor) {
-    func_ov036_02191ea8(actor, 2, 0, 0x21);
+void FldmmdlMovecode_InitRoutePatrolSwapSet33(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrolSwap(actor, 2, 0, 0x21);
 }
 
-void func_ov036_02191f18(FieldActor *actor) {
-    func_ov036_02191ea8(actor, 2, 1, 0x22);
+void FldmmdlMovecode_InitRoutePatrolSwapSet34(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrolSwap(actor, 2, 1, 0x22);
 }
 
-void func_ov036_02191f28(FieldActor *actor) {
-    func_ov036_02191ea8(actor, 2, 1, 0x23);
+void FldmmdlMovecode_InitRoutePatrolSwapSet35(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrolSwap(actor, 2, 1, 0x23);
 }
 
-void func_ov036_02191f38(FieldActor *actor) {
-    func_ov036_02191ea8(actor, 2, 0, 0x24);
+void FldmmdlMovecode_InitRoutePatrolSwapSet36(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrolSwap(actor, 2, 0, 0x24);
 }
 
-void func_ov036_02191f48(FieldActor *actor) {
-    func_ov036_02191ea8(actor, 2, 0, 0x25);
+void FldmmdlMovecode_InitRoutePatrolSwapSet37(FieldActor *actor) {
+    FldmmdlMovecode_InitRoutePatrolSwap(actor, 2, 0, 0x25);
 }
 
-void func_ov036_02191f58(FieldActor *actor) {
+void FldmmdlMovecode_MoveRoutePatrolSwap(FieldActor *actor) {
     ActorPatrolWork *work = GetNPCRailPosPtrAddr(actor);
 
     while (data_ov036_021cb8f0[work->state](actor, work) == TRUE) {
@@ -1183,7 +1183,7 @@ static BOOL FldmmdlMovecode_RoutePatrolSwapStepWalk(FieldActor *actor, ActorPatr
     return TRUE;
 }
 
-static BOOL func_ov036_021921c0(FieldActor *actor, ActorPatrolWork *work) {
+static BOOL FldmmdlMovecode_RoutePatrolSwapStepWaitWalk(FieldActor *actor, ActorPatrolWork *work) {
     if (FieldAcmdTCB_Update(actor) == TRUE) {
         FldAct_ClearMoving(actor);
         if (FldmmdlMovecode_IsMirrorEventType(actor) == TRUE) {
