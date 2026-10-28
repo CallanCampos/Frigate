@@ -12014,8 +12014,11 @@ overlays/ov036 0x021c2734 WaterCurrent_SlidePlayBumpEffectSe
 overlays/ov036 0x021c2750 WaterCurrent_SlidePlayLoopSe
 overlays/ov036 0x021c277c WaterCurrent_SlideStopLoopSe
 overlays/ov036 0x021c2788 StoneTask_Create
+overlays/ov036 0x021c27ac D06Denki_Delete
 overlays/ov036 0x021c27c0 D06Denki_LoadResources
 overlays/ov036 0x021c2858 D06Denki_FreeResources
+overlays/ov036 0x021c289c D06Denki_StartSpark
+overlays/ov036 0x021c28fc SparkTask_Exit
 overlays/ov036 0x021c2900 SparkTask_Update
 overlays/ov036 0x021c2910 SparkTask_Draw
 overlays/ov036 0x021c2984 StoneTask_StartFollow

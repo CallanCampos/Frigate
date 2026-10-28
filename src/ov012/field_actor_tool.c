@@ -470,7 +470,7 @@ void ActorTerrainEffect_UpdateReflection(FieldActor *actor, ActorTerrainEffectPa
 
 void ActorTerrainEffect_ElectricField(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (MapTile_IsElectricField(param->tileClass) == TRUE) {
-        func_ov036_021c289c(actor, param->effects);
+        D06Denki_StartSpark(actor, param->effects);
     }
 }
 

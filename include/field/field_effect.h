@@ -62,7 +62,7 @@ void Footmark_SetMMdl(FieldActor *actor, FieldEffects *effects, u32 kind);
 void ReflectTask_SetMMdl(MMSys *system, FieldActor *actor, FieldEffects *effects, u32 kind);
 void FldeffRipple_Start(FieldEffects *effects, FieldActor *actor, u32 arg2, u32 arg3);
 void FldeffSplash_AddModel(FieldEffects *effects, FieldActor *actor);
-void func_ov036_021c289c(FieldActor *actor, FieldEffects *effects);
+void D06Denki_StartSpark(FieldActor *actor, FieldEffects *effects);
 void func_ov036_021c94e0(FieldEffects *effects, FieldActor *actor);
 
 // field_effect.c: the effects a map has loaded, by ID, and the tasks that play them
@@ -163,7 +163,7 @@ void FldeffNamipokeSplash_Delete(FieldEffects *effects, void *data);
 void *FldeffIwakudaki_Create(FieldEffects *effects, HeapID heapId);
 void FldeffIwakudaki_Delete(FieldEffects *effects, void *data);
 void *StoneTask_Create(FieldEffects *effects, HeapID heapId);
-void func_ov036_021c27ac(FieldEffects *effects, void *data);
+void D06Denki_Delete(FieldEffects *effects, void *data);
 void *FldeffIaigiri_Create(FieldEffects *effects, HeapID heapId);
 void func_ov036_021c2e00(FieldEffects *effects, void *data);
 void *FldeffFishing_Create(FieldEffects *effects, HeapID heapId);
