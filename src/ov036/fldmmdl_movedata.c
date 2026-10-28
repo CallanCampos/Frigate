@@ -269,7 +269,7 @@ static const FieldActorMoveCode data_ov036_021cc27c = { 0x42, FldmmdlMove_InitWa
                                                         FldmmdlMove_MoveWallWalk, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc3e4 = { 0x44, func_ov036_0218b044, func_ov036_0218b060,
+static const FieldActorMoveCode data_ov036_021cc3e4 = { 0x44, FieldCommActor_MoveInit, FieldCommActor_Move,
                                                         FieldCommActor_MoveDelete, MoveCodeNone_Return };
 
 static const FieldActorMoveCode data_ov036_021cc290 = { 0x45, RailActor_StayInit, RailActor_StayMove,

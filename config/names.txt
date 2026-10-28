@@ -10078,7 +10078,9 @@ overlays/ov036 0x0218adfc FieldWFBC_LoadResources
 overlays/ov036 0x0218ae00 FieldWFBC_FreeResources
 overlays/ov036 0x0218ae04 FieldWFBC_Clear
 overlays/ov036 0x0218ae10 FieldWFBC_SetCityState
+overlays/ov036 0x0218b044 FieldCommActor_MoveInit
 overlays/ov036 0x0218b050 FieldCommActor_MoveDelete
+overlays/ov036 0x0218b060 FieldCommActor_Move
 overlays/ov036 0x0218b110 FieldCommActor_SetMoveWork
 overlays/ov036 0x0218b128 FieldCommActor_ConvertDir
 overlays/ov036 0x0218b1f8 TalkMsgWinSys_Create
