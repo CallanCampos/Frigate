@@ -704,7 +704,8 @@ static GameEventReturnCode EventPokewood_RunFilm(GameEvent *event, u32 *state, v
         (*state)++;
         break;
     case 8:
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, field, 0, 0, 1, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         (*state)++;
         break;
     case 9: {
@@ -878,7 +879,8 @@ static GameEventReturnCode EventPokewood_RunCastSelect(GameEvent *event, u32 *st
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, wk->field, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceOutTransitionDefault(gsys, wk->field, FIELD_TRANSITION_FADE_BLACK, 0));
         (*state)++;
         break;
     case 1:
@@ -894,7 +896,8 @@ static GameEventReturnCode EventPokewood_RunCastSelect(GameEvent *event, u32 *st
         (*state)++;
         break;
     case 4:
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, wk->field, 0, 0, 1, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceInTransition(gsys, wk->field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         (*state)++;
         break;
     case 5:

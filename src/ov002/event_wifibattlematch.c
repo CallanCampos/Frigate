@@ -40,7 +40,8 @@ GameEventReturnCode EventWifiBattleMatch_Callback(GameEvent *event, u32 *state, 
         break;
     case 1:
         if (wk->useTransitions) {
-            GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, wk->field, 0, 0));
+            GameEvent_ChainNext(
+                event, CallFieldMapEntranceOutTransitionDefault(gsys, wk->field, FIELD_TRANSITION_FADE_BLACK, 0));
         }
         (*state)++;
         break;
@@ -79,7 +80,8 @@ GameEventReturnCode EventWifiBattleMatch_Callback(GameEvent *event, u32 *state, 
         break;
     case 7:
         if (wk->useTransitions) {
-            GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, wk->field, 0, 0, 1, 0, 0));
+            GameEvent_ChainNext(
+                event, CallFieldMapEntranceInTransition(gsys, wk->field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         }
         (*state)++;
         break;

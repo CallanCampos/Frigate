@@ -109,7 +109,8 @@ GameEventReturnCode EventFly_Callback(GameEvent *event, u32 *state, void *data) 
         EnableAllActorsMovement(Field_GetActorSystem(field));
         SetActorHidden(FieldPlayer_GetActor(Field_GetPlayer(field)), TRUE);
         FieldCameraAnm_EVCameraEnd(camera);
-        GameEvent_ChainNext(event, EventGameTransition_CreateFadeOutEvent(work->gsys, field, 0, 0));
+        GameEvent_ChainNext(event,
+                            EventGameTransition_CreateFadeOutEvent(work->gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
         (*state)++;
         break;
     case 4:

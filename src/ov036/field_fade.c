@@ -205,7 +205,8 @@ static GameEventReturnCode EventQuicksandArrive_Callback(GameEvent *event, u32 *
             actor = FieldPlayer_GetActor(Field_GetPlayer(wk->field));
             SetActorWPosOffset(actor, &offset);
             FldAct_SetAcmd(actor, 1);
-            GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(wk->gsys, wk->field, 0, 1, 1, 0, 0));
+            GameEvent_ChainNext(
+                event, CallFieldMapEntranceInTransition(wk->gsys, wk->field, FIELD_TRANSITION_FADE_BLACK, 1, 1, 0, 0));
             actor = FieldPlayer_GetActor(Field_GetPlayer(wk->field));
             task = FieldActorFallTask_Create(wk->field, actor, 0x28, 0xfa);
             FieldTaskManager_AddTask(Field_GetTaskManager(wk->field), task, 0);
@@ -310,7 +311,7 @@ static GameEvent *EventQuicksandArrive_CreateFadeIn(SpinEventWork *wk) {
         return EventGameTransition_CreateSeasonFadeInEventWithCallback(gsys, field, wk->warpA, wk->warpB,
                                                                        EventQuicksandArrive_OnScoreboardEnd, wk);
     }
-    return CallFieldMapEntranceInTransition(gsys, field, 1, 1, 1, 0, 0);
+    return CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_WHITE, 1, 1, 0, 0);
 }
 
 static void EventQuicksandArrive_OnScoreboardEnd(void *data) {
@@ -403,7 +404,7 @@ static GameEvent *EventQuicksandArrive_CreateFadeInAlt(SpinEventWork *wk) {
         return EventGameTransition_CreateSeasonFadeInEventWithCallback(gsys, field, wk->warpA, wk->warpB,
                                                                        EventQuicksandArrive_OnScoreboardEndAlt, wk);
     }
-    return CallFieldMapEntranceInTransition(gsys, field, 1, 1, 1, 0, 0);
+    return CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_WHITE, 1, 1, 0, 0);
 }
 
 static void EventQuicksandArrive_OnScoreboardEndAlt(void *data) {
@@ -450,7 +451,8 @@ static GameEventReturnCode EventQuicksandArrive_RunSpinZoomSmoke(GameEvent *even
         break;
     }
     case 3:
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, field, 0, 1, 1, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 1, 1, 0, 0));
         (*state)++;
         break;
     case 4:
@@ -485,7 +487,8 @@ static GameEventReturnCode EventPlayerSpinDown_Callback(GameEvent *event, u32 *s
             offset.z = 0;
             SetActorWPosOffset(actor, &offset);
         }
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(wk->gsys, field, 0, 1, 1, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceInTransition(wk->gsys, field, FIELD_TRANSITION_FADE_BLACK, 1, 1, 0, 0));
         {
             VecFx32 move;
             FieldTask *spin;
@@ -533,7 +536,8 @@ static GameEventReturnCode EventQuicksandArrive_RunMoveAnime(GameEvent *event, u
         wk->transformType = FieldCamera_GetTransformType(camera);
         FieldCamera_ChangeTransformType(camera, 0);
         FldAct_SetAcmd(actor, 0x44);
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(wk->gsys, wk->field, 0, 1, 1, 0, 0));
+        GameEvent_ChainNext(
+            event, CallFieldMapEntranceInTransition(wk->gsys, wk->field, FIELD_TRANSITION_FADE_BLACK, 1, 1, 0, 0));
         (*state)++;
         break;
     case 1:
@@ -842,9 +846,9 @@ static GameEvent *EventEscapeRope_CreateExitTransition(EffectEventWork *wk) {
     Field *field = wk->field;
 
     if (wk->seasonChanged) {
-        return CallFieldMapEntranceOutTransitionDefault(gsys, field, 0, 0);
+        return CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0);
     }
-    return CallFieldMapEntranceOutTransitionDefault(gsys, field, 1, 0);
+    return CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_WHITE, 0);
 }
 
 static GameEventReturnCode EventDig_Callback(GameEvent *event, u32 *state, void *data) {
@@ -916,9 +920,9 @@ static GameEvent *EventDig_CreateExitTransition(EffectEventWork *wk) {
     Field *field = wk->field;
 
     if (wk->seasonChanged) {
-        return CallFieldMapEntranceOutTransitionDefault(gsys, field, 0, 0);
+        return CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0);
     }
-    return CallFieldMapEntranceOutTransitionDefault(gsys, field, 1, 0);
+    return CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_WHITE, 0);
 }
 
 static GameEventReturnCode EventTeleportEffect_Callback(GameEvent *event, u32 *state, void *data) {

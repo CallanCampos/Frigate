@@ -336,7 +336,7 @@ static GameEventReturnCode GymInsect_RideEvent(GameEvent *event, u32 *state, voi
         break;
     case 2:
         if (ride->entry->script != 0 && ride->frame == 20) {
-            FieldFadeTCB_Start(wk->gsys, wk->field, 3, 0, 0);
+            FieldFadeTCB_Start(wk->gsys, wk->field, FIELD_FADE_TYPE_OUT, 0, 0);
         }
         if (GymInsect_StepRide(wk, ride)) {
             GymInsect_EndRide(wk, ride);
@@ -390,7 +390,7 @@ static GameEventReturnCode GymInsect_RideEventZone488(GameEvent *event, u32 *sta
         FieldCamera_DisableDelay(wk->camera);
         FieldCamera_CalcTransform(wk->camera, 0);
         FieldCamera_EnableDelay(wk->camera);
-        FieldFadeTCB_Start(wk->gsys, wk->field, 0, 0, 0);
+        FieldFadeTCB_Start(wk->gsys, wk->field, FIELD_FADE_TYPE_IN_QUICK, 0, 0);
         (*state)++;
         break;
     case 2:

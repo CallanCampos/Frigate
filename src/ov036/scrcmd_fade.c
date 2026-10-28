@@ -84,7 +84,8 @@ BOOL s01AA_CallSeasonBanner(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(gsys);
     u32 season = GameData_GetSeason(gameData);
 
-    ScriptWork_CallEvent(work, CallFieldMapEntranceInTransition(gsys, field, 3, 0, 0, season, season));
+    ScriptWork_CallEvent(work,
+                         CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_SEASON, 0, 0, season, season));
     return FALSE;
 }
 
@@ -92,7 +93,7 @@ BOOL s01A8_FadeInBlackQ_(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    FieldFadeTCB_Start(gsys, GSYS_GetField(gsys), 0, 0, 0);
+    FieldFadeTCB_Start(gsys, GSYS_GetField(gsys), FIELD_FADE_TYPE_IN_QUICK, 0, 0);
     return FALSE;
 }
 
@@ -100,7 +101,7 @@ BOOL s01A3_FadeInBlackQ(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    FieldFadeTCB_Start(gsys, GSYS_GetField(gsys), 0, 0, 0);
+    FieldFadeTCB_Start(gsys, GSYS_GetField(gsys), FIELD_FADE_TYPE_IN_QUICK, 0, 0);
     return FALSE;
 }
 
@@ -108,7 +109,7 @@ BOOL s01A4_FadeOutBlackQ(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    FieldFadeTCB_Start(gsys, GSYS_GetField(gsys), 1, 0, 0);
+    FieldFadeTCB_Start(gsys, GSYS_GetField(gsys), FIELD_FADE_TYPE_OUT_QUICK, 0, 0);
     return FALSE;
 }
 
@@ -116,7 +117,7 @@ BOOL s01A5_FadeInWhiteQ(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    FieldFadeTCB_Start(gsys, GSYS_GetField(gsys), 0, 1, 0);
+    FieldFadeTCB_Start(gsys, GSYS_GetField(gsys), FIELD_FADE_TYPE_IN_QUICK, 1, 0);
     return FALSE;
 }
 
@@ -124,7 +125,7 @@ BOOL s01A6_FadeOutWhiteQ(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    FieldFadeTCB_Start(gsys, GSYS_GetField(gsys), 1, 1, 0);
+    FieldFadeTCB_Start(gsys, GSYS_GetField(gsys), FIELD_FADE_TYPE_OUT_QUICK, 1, 0);
     return FALSE;
 }
 
@@ -132,7 +133,7 @@ BOOL s01AB_FadeInBlack(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    FieldFadeTCB_Start(gsys, GSYS_GetField(gsys), 2, 0, 0);
+    FieldFadeTCB_Start(gsys, GSYS_GetField(gsys), FIELD_FADE_TYPE_IN, 0, 0);
     return FALSE;
 }
 
@@ -140,7 +141,7 @@ BOOL s01AC_FadeOutBlack(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    FieldFadeTCB_Start(gsys, GSYS_GetField(gsys), 3, 0, 0);
+    FieldFadeTCB_Start(gsys, GSYS_GetField(gsys), FIELD_FADE_TYPE_OUT, 0, 0);
     return FALSE;
 }
 
@@ -148,7 +149,7 @@ BOOL s01AD_FadeInWhite(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    FieldFadeTCB_Start(gsys, GSYS_GetField(gsys), 2, 1, 0);
+    FieldFadeTCB_Start(gsys, GSYS_GetField(gsys), FIELD_FADE_TYPE_IN, 1, 0);
     return FALSE;
 }
 
@@ -156,7 +157,7 @@ BOOL s01AE_FadeOutWhite(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    FieldFadeTCB_Start(gsys, GSYS_GetField(gsys), 3, 1, 0);
+    FieldFadeTCB_Start(gsys, GSYS_GetField(gsys), FIELD_FADE_TYPE_OUT, 1, 0);
     return FALSE;
 }
 

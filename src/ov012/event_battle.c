@@ -174,7 +174,8 @@ static GameEventReturnCode EventWildBattleCall_Callback(GameEvent *event, u32 *s
             CommPlayerSupport_Init(GameData_GetCommPlayerSupport(gameData));
             GameEvent_Replace(event, EventBattleLose_Create(gsys));
         } else {
-            GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, GSYS_GetField(gsys), 0, 0, 1, 0, 0));
+            GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, GSYS_GetField(gsys),
+                                                                        FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         }
         (*state)++;
         break;
@@ -500,7 +501,8 @@ static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state
         break;
     case 10:
         if (wk->unk14 == FALSE) {
-            GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, field, 0, 0, 1, 0, 0));
+            GameEvent_ChainNext(event,
+                                CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         }
         (*state)++;
         break;

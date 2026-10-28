@@ -548,8 +548,8 @@ static void EntranceEffect_ChainArrivalTransition(GameEvent *event, EntranceEffe
     GameEvent *transition;
 
     if (warp->seasonChanged) {
-        transition =
-            CallFieldMapEntranceInTransition(warp->gsys, warp->field, 3, 0, 0, warp->startSeason, warp->endSeason);
+        transition = CallFieldMapEntranceInTransition(warp->gsys, warp->field, FIELD_TRANSITION_SEASON, 0, 0,
+                                                      warp->startSeason, warp->endSeason);
     } else {
         transition = CallFieldMapEntranceInTransition(warp->gsys, warp->field, warp->inTransition, 0, 1, 0, 0);
     }
@@ -561,7 +561,7 @@ static void EntranceEffect_ChainDepartureTransition(GameEvent *event, EntranceEf
     GameEvent *transition;
 
     if (warp->seasonChanged) {
-        transition = CallFieldMapEntranceOutTransitionDefault(warp->gsys, warp->field, 0, 0);
+        transition = CallFieldMapEntranceOutTransitionDefault(warp->gsys, warp->field, FIELD_TRANSITION_FADE_BLACK, 0);
     } else {
         transition = CallFieldMapEntranceOutTransitionDefault(warp->gsys, warp->field, warp->outTransition, 0);
     }
@@ -575,7 +575,7 @@ static BOOL EntranceEffect_ShouldPlayStairsSound(EntranceEffectWork *work) {
     if (EntranceEffect_HasDoor(work)) {
         return FALSE;
     }
-    if (warp->outTransition != 2) {
+    if (warp->outTransition != FIELD_TRANSITION_BUILDING) {
         return TRUE;
     }
     return FALSE;

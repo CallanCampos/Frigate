@@ -57,7 +57,8 @@ static GameEventReturnCode EventWbtPokeSelect_Callback(GameEvent *event, u32 *st
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, work->field, 0, 0));
+        GameEvent_ChainNext(
+            event, CallFieldMapEntranceOutTransitionDefault(gsys, work->field, FIELD_TRANSITION_FADE_BLACK, 0));
         (*state)++;
         break;
     case 1:
@@ -73,7 +74,8 @@ static GameEventReturnCode EventWbtPokeSelect_Callback(GameEvent *event, u32 *st
         (*state)++;
         break;
     case 4:
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, work->field, 0, 0, 1, 0, 0));
+        GameEvent_ChainNext(
+            event, CallFieldMapEntranceInTransition(gsys, work->field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         (*state)++;
         break;
     case 5:

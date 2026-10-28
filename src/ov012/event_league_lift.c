@@ -85,7 +85,8 @@ static GameEventReturnCode EventLeagueLiftWarp_Callback(GameEvent *event, u32 *s
         }
         break;
     case 4:
-        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, field, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
         (*state)++;
         break;
     case 5:
@@ -173,7 +174,8 @@ static GameEventReturnCode EventLeagueLiftArrival_Callback(GameEvent *event, u32
     case 2:
         GimmickLeagueLift_PlayLiftAnim(data->field);
         GimmickLeagueLift_PlayArrivalModel(data->field);
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(data->gsys, data->field, 0, 0, 1, 0, 0));
+        GameEvent_ChainNext(
+            event, CallFieldMapEntranceInTransition(data->gsys, data->field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         (*state)++;
         break;
     case 3:

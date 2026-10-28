@@ -184,7 +184,8 @@ GameEventReturnCode EventDayCarePokeSelect_Callback(GameEvent *event, u32 *state
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, work->field, 0, 0));
+        GameEvent_ChainNext(
+            event, CallFieldMapEntranceOutTransitionDefault(gsys, work->field, FIELD_TRANSITION_FADE_BLACK, 0));
         *state = 1;
         break;
     case 1:
@@ -201,7 +202,8 @@ GameEventReturnCode EventDayCarePokeSelect_Callback(GameEvent *event, u32 *state
         *state = 4;
         break;
     case 4:
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, work->field, 0, 0, 1, 0, 0));
+        GameEvent_ChainNext(
+            event, CallFieldMapEntranceInTransition(gsys, work->field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         *state = 5;
         break;
     case 5:
