@@ -25,7 +25,7 @@ L_004E:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_028C
-    ListMenu_AnchorTopRight 31, 5, 0x8024, 1, 32800
+    ListMenuAnchorTopRight 31, 5, 0x8024, 1, 32800
     ListMenuAdd 6, 65535, 1
     ListMenuAdd 7, 65535, 2
     ListMenuAdd 8, 65535, 3
@@ -113,7 +113,7 @@ L_01A1:
     WordSetItemName 0, 0x8021
     // "A [f000]ĉ\u0001\u0000 dropped down![f000]븁\u0000"
     SystemMsg Global10400_Text_DroppedDown, 2
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8000
     VMStackPush 0x8001
     WorkSet 0x8000, 0x8021
@@ -138,7 +138,7 @@ L_01A1:
     WordSetItemName 0, 0x8021
     // "Bonus! Another [f000]ĉ\u0001\u0000\ndropped down.[f000]븁\u0000"
     SystemMsg Global10400_Text_BonusAnotherDroppedDown, 2
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8000
     VMStackPush 0x8001
     WorkSet 0x8000, 0x8021
@@ -167,7 +167,7 @@ L_028C:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_02A3
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
 
 L_02A3:
     MoneyWinClose

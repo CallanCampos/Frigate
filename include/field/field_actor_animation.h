@@ -31,10 +31,10 @@ BOOL FieldActorAnmProc_IsPlaying(FieldActorAnmProc *proc);
 void FieldActorAnmProc_Update(FieldAsyncProc *asyncProc, Field *field, void *data);
 void FieldActorAnmProc_Draw(FieldAsyncProc *asyncProc, Field *field, void *data);
 void FieldActorAnmProc_CommitTransform(G3DCurve *curve, FieldActor *actor, VecFx32 *pos);
-BOOL s0157_ActorAnimationInit(VM *vm, FieldScriptEnv *env);
-BOOL s0158_ActorAnimationFree(VM *vm, FieldScriptEnv *env);
-BOOL s0159_ActorAnimationPlay(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_FieldActorAnimation_ActorAnimationInit(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_FieldActorAnimation_ActorAnimationFree(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_FieldActorAnimation_ActorAnimationPlay(VM *vm, FieldScriptEnv *env);
 GameEventReturnCode EventActorAnmProcWait_Callback(GameEvent *event, u32 *state, void *data);
-BOOL s015A_ActorAnimationWait(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_FieldActorAnimation_ActorAnimationWait(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_FIELD_ACTOR_ANIMATION_H

@@ -133,7 +133,7 @@ L_01A2:
     WorkSetConst 0x8021, 0
     // "[f000]Ā\u0001\u0000 received the\nJet Badge from Skyla.[f000]븁\u0000"
     SystemMsg MistraltonCityGym_Text_ReceivedJetBadgeFrom, 0
-    InfoMsgClose
+    SystemMsgClose
     // "Wow, hot stuff![f000]븁\u0000\nWith that many Gym Badges,\nPokémon up to Lv. 70 will obey you.[f000]븁\u0000\nAlso, I want you to have this TM\nso that you'll always remember[f000]븀\u0000\nthis Pokémon battle.[f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, MistraltonCityGym_Text_WowHotStuffMany, 0, 0
     ActorMsgClose
@@ -311,7 +311,7 @@ L_0415:
 
 L_0420:
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

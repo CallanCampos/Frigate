@@ -16,12 +16,12 @@ Script_1:
     WordSetPassPowerName 2, 0x8020
     // "[f000]Ā\u0001\u0000 used the Pass Power\n“[f000]Ĝ\u0001\u0002!\"[f000]븁\u0000"
     SystemMsg Global10435_Text_UsedPassPower, 2
-    InfoMsgClose
+    SystemMsgClose
     CallPassPowerFlash
     WorkAdd 0x8021, 8
     SystemMsg 0x8021, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8022, 0
     WorkSetConst 0x8021, 0
     WorkSetConst 0x8020, 0
@@ -50,7 +50,7 @@ L_007E:
 
 L_00B4:
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8025, 0
     WorkSetConst 0x8024, 0
     WorkSetConst 0x8023, 0

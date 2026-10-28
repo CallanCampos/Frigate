@@ -37,7 +37,7 @@
 // The script plugin of the Join Avenue (plugin 8), commands from 1000. Its command table is in overlay 58, so that
 // the shops' overlay 60 can take this overlay's place
 
-// The page of records that ResortCmd_ShowRecords shows, while the script waits
+// The page of records that Scrcmd_Resort_ShowRecords shows, while the script waits
 typedef struct {
     MoneyWin *window;
     s16 page;
@@ -56,7 +56,7 @@ static u16 ResortCmd_GetActorUID(FieldScriptEnv *env);
 static ResortNPC *ResortCmd_GetNPC(Field *field);
 static int ResortCmd_ApplyEffortChange(int value, int others, int change);
 
-BOOL ResortCmd_StartTalk(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_StartTalk(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ResortPerson *person = ResortSys_GetScriptPerson(env, ResortCmd_GetPeople(GSYS_GetField(gsys)));
 
@@ -68,7 +68,7 @@ BOOL ResortCmd_StartTalk(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_EndTalk(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_EndTalk(VM *vm, FieldScriptEnv *env) {
     ResortPerson *person =
         ResortSys_GetScriptPerson(env, ResortCmd_GetPeople(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
 
@@ -80,7 +80,7 @@ BOOL ResortCmd_EndTalk(VM *vm, FieldScriptEnv *env) {
 }
 
 // Sets a variable to one of 65 things about the avenue and the person the script is about
-BOOL ResortCmd_GetValue(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_GetValue(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
     u32 which = ScriptReadAny(vm, env);
@@ -351,7 +351,7 @@ BOOL ResortCmd_GetValue(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_GetScriptValue(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_GetScriptValue(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
@@ -372,7 +372,7 @@ BOOL ResortCmd_GetScriptValue(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_MakeData(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_MakeData(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     u16 mode = VM_Read16(vm);
     u16 *var = ScriptReadVar(vm, env);
@@ -414,7 +414,7 @@ BOOL ResortCmd_MakeData(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_SetWord(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_SetWord(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
@@ -431,7 +431,7 @@ BOOL ResortCmd_SetWord(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_RemovePerson(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_RemovePerson(VM *vm, FieldScriptEnv *env) {
     Field *field;
     ResortSys *sys;
     ResortPeople *people;
@@ -486,7 +486,7 @@ BOOL ResortCmd_RemovePerson(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_SaveShopId(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_SaveShopId(VM *vm, FieldScriptEnv *env) {
     ResortPerson *person;
     u16 value;
 
@@ -497,7 +497,7 @@ BOOL ResortCmd_SaveShopId(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_RaffleShopItem(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_RaffleShopItem(VM *vm, FieldScriptEnv *env) {
     Field *field;
     ResortSys *sys;
     void *shops;
@@ -535,7 +535,7 @@ BOOL ResortCmd_RaffleShopItem(VM *vm, FieldScriptEnv *env) {
 }
 
 // Sets a Pokémon's friendship
-BOOL ResortCmd_SetFriendship(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_SetFriendship(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     u16 slot;
     u16 value;
@@ -559,7 +559,7 @@ BOOL ResortCmd_SetFriendship(VM *vm, FieldScriptEnv *env) {
 }
 
 // Raises a Pokémon's level, up to 100
-BOOL ResortCmd_RaiseLevel(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_RaiseLevel(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     u16 slot;
     s16 levels;
@@ -595,7 +595,7 @@ BOOL ResortCmd_RaiseLevel(VM *vm, FieldScriptEnv *env) {
 }
 
 // Raises or, for stats from 6, lowers one of a Pokémon's effort values
-BOOL ResortCmd_ChangeEffortValue(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_ChangeEffortValue(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     u16 slot;
     u16 stat;
@@ -638,7 +638,7 @@ BOOL ResortCmd_ChangeEffortValue(VM *vm, FieldScriptEnv *env) {
 }
 
 // Shortens the steps an egg of the party needs to hatch, by the shop's rate
-BOOL ResortCmd_ShortenEggSteps(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_ShortenEggSteps(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
     ResortSys *sys;
@@ -701,7 +701,7 @@ BOOL ResortCmd_ShortenEggSteps(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_SetShopFlag(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_SetShopFlag(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     JoinAvenueShop_SetFlag(JoinAvenuePerson_GetShop(ResortPerson_GetJoinAvenuePerson(ResortSys_GetScriptPerson(
                                env, ResortCmd_GetPeople(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)))))),
@@ -710,7 +710,7 @@ BOOL ResortCmd_SetShopFlag(VM *vm, FieldScriptEnv *env) {
 }
 
 // Takes ten times the amount from the player's money, and sets a flag of the person
-BOOL ResortCmd_PayAndSetShopFlag(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_PayAndSetShopFlag(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
@@ -734,7 +734,7 @@ BOOL ResortCmd_PayAndSetShopFlag(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_GetPersonVisit(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_GetPersonVisit(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
     ResortPerson *person;
@@ -764,7 +764,7 @@ BOOL ResortCmd_GetPersonVisit(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_AddShopExperience(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_AddShopExperience(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
     ResortSys *sys;
@@ -789,7 +789,7 @@ BOOL ResortCmd_AddShopExperience(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_AddPopularity(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_AddPopularity(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     GameData *gameData;
     Field *field;
@@ -810,7 +810,7 @@ BOOL ResortCmd_AddPopularity(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_SetOccupantsLocked(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_SetOccupantsLocked(VM *vm, FieldScriptEnv *env) {
     JoinAvenueOccupants *occupants;
 
     FieldScriptEnv_GetScriptWork(env);
@@ -819,7 +819,7 @@ BOOL ResortCmd_SetOccupantsLocked(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_HideActors(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_HideActors(VM *vm, FieldScriptEnv *env) {
     Field *field;
     ResortPeople *people;
     void *unk;
@@ -851,7 +851,7 @@ BOOL ResortCmd_HideActors(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_Visit(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_Visit(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
     ResortSys *sys;
@@ -961,7 +961,7 @@ BOOL ResortCmd_Visit(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_CheckRank100Unlock(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_CheckRank100Unlock(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     GameData *gameData;
     ResortSys *sys;
@@ -986,7 +986,7 @@ BOOL ResortCmd_CheckRank100Unlock(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_NameEntry(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_NameEntry(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 a0 = VM_Read16(vm);
@@ -996,7 +996,7 @@ BOOL ResortCmd_NameEntry(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL ResortCmd_MarkRaffled(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_MarkRaffled(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
 
     FieldScriptEnv_GetScriptWork(env);
@@ -1007,7 +1007,7 @@ BOOL ResortCmd_MarkRaffled(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_GetNPCValue(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_GetNPCValue(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     void *unk;
     u16 id;
@@ -1079,7 +1079,7 @@ BOOL ResortCmd_GetNPCValue(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_SetOccupantWords(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_SetOccupantWords(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameSystem *gsys;
     Field *field;
@@ -1156,7 +1156,7 @@ BOOL ResortCmd_SetOccupantWords(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_SetNPCWord(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_SetNPCWord(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field;
@@ -1187,7 +1187,7 @@ BOOL ResortCmd_SetNPCWord(VM *vm, FieldScriptEnv *env) {
 
 // Puts things about one of the avenue's people in the script's WordSet, and sets a variable to the message that
 // tells them
-BOOL ResortCmd_DescribeOccupant(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_DescribeOccupant(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameSystem *gsys;
     Field *field;
@@ -1394,7 +1394,7 @@ BOOL ResortCmd_DescribeOccupant(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_GetGoodsValue(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_GetGoodsValue(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
     void *shops;
@@ -1427,7 +1427,7 @@ BOOL ResortCmd_GetGoodsValue(VM *vm, FieldScriptEnv *env) {
 }
 
 // Sets a field of the player's own entry or the avenue's info
-BOOL ResortCmd_SetOwnValue(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_SetOwnValue(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
@@ -1494,7 +1494,7 @@ BOOL ResortCmd_SetOwnValue(VM *vm, FieldScriptEnv *env) {
 }
 
 // Sets a variable to a field of the player's own entry or the avenue's info
-BOOL ResortCmd_GetOwnValue(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_GetOwnValue(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     GameData *gameData;
     Field *field;
@@ -1564,7 +1564,7 @@ BOOL ResortCmd_GetOwnValue(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_StartSceneAnim(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_StartSceneAnim(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
 
@@ -1576,7 +1576,7 @@ BOOL ResortCmd_StartSceneAnim(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_IsSceneAnimDone(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_IsSceneAnimDone(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
     u16 a1;
@@ -1592,7 +1592,7 @@ BOOL ResortCmd_IsSceneAnimDone(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_EndSceneAnim(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_EndSceneAnim(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
 
@@ -1604,7 +1604,7 @@ BOOL ResortCmd_EndSceneAnim(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_AddEntryOrRecord(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_AddEntryOrRecord(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     GameData *gameData;
     Field *field;
@@ -1691,7 +1691,7 @@ static BOOL ResortCmd_UpdateRecords(VM *vm, void *data) {
 }
 
 // Shows the avenue's records, from the page, and sets a variable to the page it closes on
-BOOL ResortCmd_ShowRecords(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_ShowRecords(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field;
@@ -1716,7 +1716,7 @@ BOOL ResortCmd_ShowRecords(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL ResortCmd_AddRecordPerson(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_AddRecordPerson(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
     ResortSys *sys;
@@ -1751,7 +1751,7 @@ BOOL ResortCmd_AddRecordPerson(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ResortCmd_RecreatePeople(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Resort_RecreatePeople(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
     void *unk30;

@@ -444,7 +444,7 @@ L_06EC:
     VMReturn
 
 L_06F2:
-    PokewoodCmd_GetDownloadedMovieResult EVENT_WORK_0x4002, 0x8010
+    GetDownloadedMovieResult EVENT_WORK_0x4002, 0x8010
     WorkCmpConst 0x8010, 0
     VMJumpIf CMP_EQ, L_070B
     VMJump L_071D

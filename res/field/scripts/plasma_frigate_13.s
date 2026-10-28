@@ -87,44 +87,44 @@ L_0128:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0147
-    PlasmaFrigateCmd_SetLightsState 0, 0
+    SetLightsState 0, 0
     VMJump L_014D
 
 L_0147:
-    PlasmaFrigateCmd_SetLightsState 0, 1
+    SetLightsState 0, 1
 
 L_014D:
     VMStackPush EVENT_WORK_0x40f6
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_016C
-    PlasmaFrigateCmd_SetLightsState 1, 0
+    SetLightsState 1, 0
     VMJump L_0172
 
 L_016C:
-    PlasmaFrigateCmd_SetLightsState 1, 1
+    SetLightsState 1, 1
 
 L_0172:
     VMStackPush EVENT_WORK_0x40f7
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0191
-    PlasmaFrigateCmd_SetLightsState 2, 0
+    SetLightsState 2, 0
     VMJump L_0197
 
 L_0191:
-    PlasmaFrigateCmd_SetLightsState 2, 1
+    SetLightsState 2, 1
 
 L_0197:
     VMStackPush EVENT_WORK_0x40f8
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_01B6
-    PlasmaFrigateCmd_SetLightsState 3, 0
+    SetLightsState 3, 0
     VMJump L_01BC
 
 L_01B6:
-    PlasmaFrigateCmd_SetLightsState 3, 1
+    SetLightsState 3, 1
 
 L_01BC:
     VMReturn
@@ -483,8 +483,8 @@ L_0612:
 L_0614:
     MsgWinCloseAll
     SEWait
-    PlasmaFrigateCmd_PlayGroupBSecond 0
-    PlasmaFrigateCmd_PlayGroupASecond 0
+    PlayGroupBSecond 0
+    PlayGroupASecond 0
     VMStackPush EVENT_WORK_0x40f5
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -542,8 +542,8 @@ L_06CE:
 L_06D0:
     MsgWinCloseAll
     SEWait
-    PlasmaFrigateCmd_PlayGroupBSecond 1
-    PlasmaFrigateCmd_PlayGroupASecond 1
+    PlayGroupBSecond 1
+    PlayGroupASecond 1
     VMStackPush EVENT_WORK_0x40f5
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -601,8 +601,8 @@ L_078A:
 L_078C:
     MsgWinCloseAll
     SEWait
-    PlasmaFrigateCmd_PlayGroupBSecond 2
-    PlasmaFrigateCmd_PlayGroupASecond 2
+    PlayGroupBSecond 2
+    PlayGroupASecond 2
     VMStackPush EVENT_WORK_0x40f5
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -660,8 +660,8 @@ L_0846:
 L_0848:
     MsgWinCloseAll
     SEWait
-    PlasmaFrigateCmd_PlayGroupBSecond 3
-    PlasmaFrigateCmd_PlayGroupASecond 3
+    PlayGroupBSecond 3
+    PlayGroupASecond 3
     VMStackPush EVENT_WORK_0x40f5
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -694,7 +694,7 @@ Script_7:
     WorkSetConst EVENT_WORK_0x4001, 0
     WorkSetConst EVENT_WORK_0x4002, 0
     WorkSetConst EVENT_WORK_0x4003, 0
-    PlasmaFrigateCmd_PressSwitch 0
+    PressSwitch 0
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -705,7 +705,7 @@ Script_8:
     WorkSetConst EVENT_WORK_0x4000, 0
     WorkSetConst EVENT_WORK_0x4002, 0
     WorkSetConst EVENT_WORK_0x4003, 0
-    PlasmaFrigateCmd_PressSwitch 1
+    PressSwitch 1
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -716,7 +716,7 @@ Script_9:
     WorkSetConst EVENT_WORK_0x4000, 0
     WorkSetConst EVENT_WORK_0x4001, 0
     WorkSetConst EVENT_WORK_0x4003, 0
-    PlasmaFrigateCmd_PressSwitch 2
+    PressSwitch 2
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -727,7 +727,7 @@ Script_10:
     WorkSetConst EVENT_WORK_0x4000, 0
     WorkSetConst EVENT_WORK_0x4001, 0
     WorkSetConst EVENT_WORK_0x4002, 0
-    PlasmaFrigateCmd_PressSwitch 3
+    PressSwitch 3
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

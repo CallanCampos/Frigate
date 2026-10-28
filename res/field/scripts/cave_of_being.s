@@ -54,7 +54,7 @@ Script_2:
     // "A mysterious presence can be felt!"
     SystemMsg CaveOfBeing_Text_MysteriousPresenceCanFelt, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     FlagReset EVENT_FLAG_0x0394
     ActorCmdExec 0, Movement_0348
     ActorCmdExec 255, Movement_0358
@@ -124,7 +124,7 @@ Script_2:
     ActorDelete 2
     // "Uxie went flying off somewhere...[f000]븁\u0000"
     SystemMsg CaveOfBeing_Text_UxieWentFlyingOff, 2
-    InfoMsgClose
+    SystemMsgClose
     VMSleep 8
     ActorCmdExec 3, Movement_03A0
     ActorCmdWait
@@ -135,7 +135,7 @@ Script_2:
     ActorDelete 3
     // "Mesprit went flying off somewhere...[f000]븁\u0000"
     SystemMsg CaveOfBeing_Text_MespritWentFlyingOff, 2
-    InfoMsgClose
+    SystemMsgClose
     VMSleep 8
     ActorCmdExec 1, Movement_03A8
     ActorCmdWait
@@ -146,7 +146,7 @@ Script_2:
     ActorDelete 1
     // "Azelf went flying off somewhere...[f000]븁\u0000"
     SystemMsg CaveOfBeing_Text_AzelfWentFlyingOff, 2
-    InfoMsgClose
+    SystemMsgClose
     VMSleep 16
     ActorCmdExec 255, Movement_0350
     ActorCmdWait

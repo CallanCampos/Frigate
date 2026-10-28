@@ -11,7 +11,7 @@ Script_1:
     // "                                                                                                         "
     SystemMsg NuvemaTown5_Text_Empty, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

@@ -77,7 +77,7 @@ L_00FB:
     SystemMsg Global2200_Text_ReceivedEggFromDay, 0
     MEWait
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     // "You take good care of it."
     ActorMsg MSGFILE_SCRIPT, Global2200_Text_TakeGoodCare, 0x8011, 2, 0
     LastKeyWait
@@ -242,7 +242,7 @@ L_035C:
     ActorMsg MSGFILE_SCRIPT, Global2200_Text_ImDayCareLady_2, 0x8011, 2, 0
 
 L_0368:
-    ListMenu_AnchorTopRight 31, 5, 0, 1, 32813
+    ListMenuAnchorTopRight 31, 5, 0, 1, 32813
     VMStackPush 0x8027
     VMStackPush 0x8028
     VMStackCmp CMP_LT
@@ -460,7 +460,7 @@ L_0669:
     WorkSetConst 0x803a, 0
     WorkSetConst 0x803b, 0
     WorkSetConst 0x803c, 0
-    ListMenu_AnchorTopRight 31, 5, 0, 1, 32820
+    ListMenuAnchorTopRight 31, 5, 0, 1, 32820
     WorkSetConst 0x803c, 0
 
 L_06AE:
@@ -576,7 +576,7 @@ L_083B:
     WordSetPlayerName 1
     // "[f000]Ā\u0001\u0001 took [f000]ā\u0001\u0000 back\nfrom the Day-Care Lady.[f000]븁\u0000"
     SystemMsg Global2200_Text_TookBackFromDay, 2
-    InfoMsgClose
+    SystemMsgClose
     DayCareWithdraw 0x8034
     WorkSetConst 0x8023, 2
     WorkSetConst 0x803c, 0

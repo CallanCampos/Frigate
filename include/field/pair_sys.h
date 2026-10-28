@@ -31,9 +31,9 @@ void updateFollowerModel(GameData *gameData);
 u16 GetNowFollowerAllyTrID(GameData *gameData);
 
 // The follower's script commands
-BOOL s0250_ActorPairSet(VM *vm, FieldScriptEnv *env);
-BOOL s0251_ActorPairEnd(VM *vm, FieldScriptEnv *env);
-BOOL s0252_ActorPairGetTrID(VM *vm, FieldScriptEnv *env);
-BOOL s0253_ActorPairSetMoveEnable(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_PairSys_ActorPairSet(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_PairSys_ActorPairEnd(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_PairSys_ActorPairGetTrID(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_PairSys_ActorPairSetMoveEnable(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_PAIR_SYS_H

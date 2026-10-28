@@ -21,7 +21,7 @@ Script_2:
     // "Click![f000]븁\u0000\nThe sound reverberates."
     InfoMsg Global10470_Text_ClickSoundReverberates, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FlagReset EVENT_FLAG_0x00d7
     FlagReset EVENT_FLAG_0x00d6
     WorkSetConst EVENT_WORK_0x4094, 0
@@ -40,7 +40,7 @@ Script_3:
     // "A dull sound came from far away."
     InfoMsg Global10470_Text_DullSoundCameFrom, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -53,7 +53,7 @@ Script_4:
     // "A dull sound echoed."
     InfoMsg Global10470_Text_DullSoundEchoed, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -66,7 +66,7 @@ Script_5:
     // "The dull sound is close!"
     InfoMsg Global10470_Text_DullSoundClose, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -76,7 +76,7 @@ Script_6:
     // "It's a torrent of water!"
     InfoMsg Global10470_Text_ItsTorrentWater, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     SEPlay SEQ_SE_FLD_156
     EvCameraShake 10, 0, 3, 20, 1, 0, 1, 5
     SEWait
@@ -105,7 +105,7 @@ Script_7:
     // "The wall moved, and you can proceed now!"
     InfoMsg Global10470_Text_WallMovedCanProceed, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FlagSet EVENT_FLAG_0x00d7
     WorkSetConst EVENT_WORK_0x4095, 1
 
@@ -129,7 +129,7 @@ Script_8:
     // "The wall moved, and you can proceed now!"
     InfoMsg Global10470_Text_WallMovedCanProceed, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FlagSet EVENT_FLAG_0x00d6
     WorkSetConst EVENT_WORK_0x4096, 1
 

@@ -100,7 +100,7 @@ L_0148:
     WorkSetConst 0x8024, 0
     // "[f000]Ā\u0001\u0000 received the Wave Badge\nfrom Marlon![f000]븁\u0000"
     SystemMsg HumilauCityGym_Text_ReceivedWaveBadgeFrom, 0
-    InfoMsgClose
+    SystemMsgClose
     // "That's the Wave Badge,\nthe Unova region's new[f000]븀\u0000\nGym Badge! Pretty sweet, right?[f000]븁\u0000\nNow you got all eight Badges,\nso you can be tight with any Pokémon![f000]븁\u0000\nOh yeah, got a TM for you, too![f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, HumilauCityGym_Text_ThatsWaveBadgeUnova, 0, 0
     ActorMsgClose

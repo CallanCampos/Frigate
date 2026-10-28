@@ -95,775 +95,775 @@ const FieldScriptSubEventFinishFunc FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS[SCRIPT_S
 // The field script commands, by their IDs. An ID with no command is NULL: EVCMD_PERM_TABLE allows it at no level, so
 // FieldScript_OpcodeGuard stops the script before the VM would call it
 const FieldScriptCommand EVCMD_TABLE[] = {
-    s0000_VMNop,                                      // 0x000
-    s0001_VMNop2,                                     // 0x001
-    s0002_VMHalt,                                     // 0x002
-    s0003_VMSleep,                                    // 0x003
-    s0004_VMCall,                                     // 0x004
-    s0005_VMReturn,                                   // 0x005
-    s0006_DebugPrint,                                 // 0x006
-    s0007_DebugStack,                                 // 0x007
-    s0008_VMStackPushConst,                           // 0x008
-    s0009_VMStackPush,                                // 0x009
-    s000A_VMStackPop,                                 // 0x00a
-    s000B_VMStackDiscard,                             // 0x00b
-    s000C_VMStackAdd,                                 // 0x00c
-    s000D_VMStackSub,                                 // 0x00d
-    s000E_VMStackMul,                                 // 0x00e
-    s000F_VMStackDiv,                                 // 0x00f
-    s0010_VMStackPushFlag,                            // 0x010
-    s0011_VMStackCmp,                                 // 0x011
-    s0012_WorkAnd,                                    // 0x012
-    s0013_WorkOr,                                     // 0x013
-    s0014_VMRegSet8,                                  // 0x014
-    s0015_VMRegSet32,                                 // 0x015
-    s0016_VMRegMov,                                   // 0x016
-    s0017_VMRegCmp8,                                  // 0x017
-    s0018_VMRegCmpConst8,                             // 0x018
-    s0019_WorkCmpConst,                               // 0x019
-    s001A_WorkCmpWork,                                // 0x01a
-    s001B_RTCallGlobalAsync,                          // 0x01b
-    s001C_RTCallGlobal,                               // 0x01c
-    s001D_RTEndGlobal,                                // 0x01d
-    s001E_VMJump,                                     // 0x01e
-    s001F_VMJumpIf,                                   // 0x01f
-    s0020_VMCallIf,                                   // 0x020
-    s0021_RTReserveScript,                            // 0x021
-    s0022_FieldGetContinueFlag,                       // 0x022
-    s0023_FlagSet,                                    // 0x023
-    s0024_FlagReset,                                  // 0x024
-    s0025_FlagGet,                                    // 0x025
-    s0026_WorkAdd,                                    // 0x026
-    s0027_WorkSub,                                    // 0x027
-    s0028_WorkSetConst,                               // 0x028
-    s0029_WorkGet,                                    // 0x029
-    s002A_WorkSet,                                    // 0x02a
-    s002B_WorkMul,                                    // 0x02b
-    s002C_WorkDiv,                                    // 0x02c
-    s002D_WorkMod,                                    // 0x02d
-    s002E_ActorsPauseAll,                             // 0x02e
-    s002F_ActorsUnpauseAll,                           // 0x02f
-    s0030_FinishAllEvents,                            // 0x030
-    s0031_ABKeyWait,                                  // 0x031
-    s0032_LastKeyWait,                                // 0x032
-    s0033_MsgSetAutoscrolls,                          // 0x033
-    s0034_SystemMsg,                                  // 0x034
-    s0035_SystemMsgAsync,                             // 0x035
-    s0036_InfoMsgClose,                               // 0x036
-    s0037_MsgSetLoadingSpinner,                       // 0x037
-    s0038_InfoMsg,                                    // 0x038
-    s0039_InfoMsgClose,                               // 0x039
-    s003A_MultiMsg,                                   // 0x03a
-    s003B_MsgWinCloseNo,                              // 0x03b
-    s003C_ActorMsg,                                   // 0x03c
-    s003D_ParentActorMsg,                             // 0x03d
-    s003E_ActorMsgClose,                              // 0x03e
-    s003F_MsgWinCloseAll,                             // 0x03f
-    s0040_MoneyWinDisp,                               // 0x040
-    s0041_MoneyWinClose,                              // 0x041
-    s0042_MoneyWinUpdate,                             // 0x042
-    s0043_MsgPlaceSign,                               // 0x043
-    s0044_MsgPlaceSignClose,                          // 0x044
-    s0045_CheckerMsg,                                 // 0x045
-    s0046_CheckerMsgClose,                            // 0x046
-    s0047_YesNoWin,                                   // 0x047
-    s0048_ActorMsgGendered,                           // 0x048
-    s0049_ActorMsgVersioned,                          // 0x049
-    s004A_ScreamMsg,                                  // 0x04a
-    s004B_MsgWaitAdvance,                             // 0x04b
-    s004C_WordSetPlayerName,                          // 0x04c
-    s004D_WordSetItemName,                            // 0x04d
-    s004E_WordSetItemNameEx,                          // 0x04e
-    s004F_WordSetItemNameWithArticle,                 // 0x04f
-    s0050_WordSetTMMoveName,                          // 0x050
-    s0051_WordSetMoveName,                            // 0x051
-    s0052_WordSetItemPocketName,                      // 0x052
-    s0053_WordSetPartyPokeSpecies,                    // 0x053
-    s0054_WordSetPartyPokeName,                       // 0x054
-    s0055_WordSetDaycarePokeSpecies,                  // 0x055
-    s0056_WordSetPokeTypeName,                        // 0x056
-    s0057_WordSetPokeSpecies,                         // 0x057
-    s0058_WordSetPokeSpeciesWithArticle,              // 0x058
-    s0059_WordSetPlaceName,                           // 0x059
-    s005A_WordSetTrendName,                           // 0x05a
-    s005B_WordSetDaycarePokeName,                     // 0x05b
-    s005C_WordSetNumber,                              // 0x05c
-    s005D_WordSetMusicalInfo,                         // 0x05d
-    s005E_WordSetCountry,                             // 0x05e
-    s005F_WordSetHobbyName,                           // 0x05f
-    s0060_WordSetPassPowerName,                       // 0x060
-    s0061_WordSetTrainerClassName,                    // 0x061
-    s0062_WordSetTrainerClassNameWithArticle,         // 0x062
-    s0063_WordSetSurveyAnswer,                        // 0x063
-    s0064_ActorCmdExec,                               // 0x064
-    s0065_ActorCmdWait,                               // 0x065
-    s0066_ActorGetMoveCode,                           // 0x066
-    s0067_ActorGetGPos,                               // 0x067
-    s0068_PlayerGetGPos,                              // 0x068
-    s0069_ActorNew,                                   // 0x069
-    s006A_ActorGetSpawnFlag,                          // 0x06a
-    s006B_ActorAdd,                                   // 0x06b
-    s006C_ActorDelete,                                // 0x06c
-    s006D_ActorSetGPos,                               // 0x06d
-    s006E_PlayerGetDir,                               // 0x06e
-    s006F_PlayerGetActorInFront,                      // 0x06f
-    s0070_ActorFindByGPos,                            // 0x070
-    s0071_PlayerGetRailPos,                           // 0x071
-    s0072_ActorGetRailPos,                            // 0x072
-    s0073_ActorSetMoveCode,                           // 0x073
-    s0074_ActorSetEyeToEye,                           // 0x074
-    s0075_PlayerSetSpecialSequence,                   // 0x075
-    s0076_PlayerMoveToYAsync,                         // 0x076
-    s0077_PlayerTurnByTrigger,                        // 0x077
-    s0078_PlayerGetExState,                           // 0x078
-    s0079_ActorGetUserParam,                          // 0x079
-    s007A_ActorPlayRailSlipdown,                      // 0x07a
-    s007B_ActorJumpToGPos,                            // 0x07b
-    s007C_PlayerSetRailPos,                           // 0x07c
-    s007D_ActorSetRailPos,                            // 0x07d
-    s007E_ActorPlayTeleportSeq,                       // 0x07e
-    s007F_TrainerEyeGetTrainerID,                     // 0x07f
-    s0080_TrainerEyeEventInit,                        // 0x080
-    s0081_TrainerEyeEventStart,                       // 0x081
-    s0082_TrainerGetActorID,                          // 0x082
-    s0083_TrainerGetBattleType,                       // 0x083
-    s0084_ActorGetTrainerID,                          // 0x084
-    s0085_CallTrainerBattle,                          // 0x085
-    s0085_CallTrainerMultiBattle,                     // 0x086, which swan's name numbers 0x085
-    s0087_TrainerSayMessage,                          // 0x087
-    s0088_TrainerGetMessageTypes,                     // 0x088
-    NULL,                                             // 0x089
-    s008A_TrainerGetBattleType,                       // 0x08a
-    s008B_TrainerBGMPlayPush,                         // 0x08b
-    s008C_CallTrainerLose,                            // 0x08c
-    s008D_TrainerBattleIsVictory,                     // 0x08d
-    s008E_CallTrainerBattleEnd,                       // 0x08e
-    s008F_TrainerClassBGMPlayPush,                    // 0x08f
-    s0090_TrainerBGMPlay,                             // 0x090
-    NULL,                                             // 0x091
-    s0092_TrainerGetFieldAction,                      // 0x092
-    s0093_TrainerGetPrizeItem,                        // 0x093
-    s0094_CallTradedPokemonBattle,                    // 0x094
-    s0095_TrainerFlagSet,                             // 0x095
-    s0096_TrainerFlagReset,                           // 0x096
-    s0097_TrainerFlagGet,                             // 0x097
-    s0098_BGMPlay,                                    // 0x098
-    NULL,                                             // 0x099
-    NULL,                                             // 0x09a
-    s009B_BGMIsPlaying,                               // 0x09b
-    NULL,                                             // 0x09c
-    NULL,                                             // 0x09d
-    s009E_BGMChangeMap,                               // 0x09e
-    s009F_BGMPlayPush,                                // 0x09f
-    s00A0_BGMWait,                                    // 0x0a0
-    s00A1_BGMPush,                                    // 0x0a1
-    s00A2_BGMPop,                                     // 0x0a2
-    s00A3_ISSSwitchEnable,                            // 0x0a3
-    s00A4_ISSSwitchDisable,                           // 0x0a4
-    s00A5_ISSSwitchQuery,                             // 0x0a5
-    s00A6_SEPlay,                                     // 0x0a6
-    s00A7_SEStop,                                     // 0x0a7
-    s00A8_SEWait,                                     // 0x0a8
-    s00A9_MEPlay,                                     // 0x0a9
-    s00AA_MEWait,                                     // 0x0aa
-    s00AB_PVPlay,                                     // 0x0ab
-    s00AC_PVWait,                                     // 0x0ac
-    s00AD_ListMenuInitCommon,                         // 0x0ad
-    s00AE_ListMenu_AnchorTopLeft,                     // 0x0ae
-    s00AF_ListMenuAdd,                                // 0x0af
-    s00B0_ListMenuShow,                               // 0x0b0
-    s00B1_ListMenuShow2,                              // 0x0b1
-    s00B2_ListMenu_AnchorTopRight,                    // 0x0b2
-    s00B3_FadeEx,                                     // 0x0b3
-    s00B4_FadeExWait,                                 // 0x0b4
-    s00B5_ItemAdd,                                    // 0x0b5
-    s00B6_ItemSub,                                    // 0x0b6
-    s00B7_ItemCheckSpace,                             // 0x0b7
-    s00B8_ItemCheckAmount,                            // 0x0b8
-    s00B9_ItemGetCount,                               // 0x0b9
-    s00BA_ItemIsTMHM,                                 // 0x0ba
-    s00BB_ItemGetPocket,                              // 0x0bb
-    s00BC_PhenomenonGetItemID,                        // 0x0bc
-    s00BD_ItemGetClass,                               // 0x0bd
-    s00BE_MapChangeFake,                              // 0x0be
-    s00BF_MapChangeWarpPad,                           // 0x0bf
-    s00C0_MapChangeWarpRail,                          // 0x0c0
-    s00C1_MapChangeQuicksand,                         // 0x0c1
-    s00C2_MapChangeWarp,                              // 0x0c2
-    s00C3_MapChangeUnionRoom,                         // 0x0c3
-    s00C4_MapChangeCore,                              // 0x0c4
-    s00C5_CallSurf,                                   // 0x0c5
-    s00C6_CallWaterfall,                              // 0x0c6
-    s00C7_CallCut,                                    // 0x0c7
-    s00C8_CallDiving,                                 // 0x0c8
-    s00C9_ConfigToggleKanji,                          // 0x0c9
-    s00CA_ConfigGetKanji,                             // 0x0ca
-    s00CB_Random,                                     // 0x0cb
-    s00CC_RTGetTextFile,                              // 0x0cc
-    s00CD_RTCGetDayPart,                              // 0x0cd
-    s00CE_TrainerCardGetStars,                        // 0x0ce
-    s00CF_RTCGetWeekDay,                              // 0x0cf
-    s00D0_RTCGetDate,                                 // 0x0d0
-    s00D1_RTCGetTime,                                 // 0x0d1
-    s00D2_RTCGetSeason,                               // 0x0d2
-    s00D3_RTGetZoneID,                                // 0x0d3
-    s00D4_TrainerCardGetBirthDate,                    // 0x0d4
-    s00D5_TrainerCardHasBadge,                        // 0x0d5
-    s00D6_TrainerCardAddBadge,                        // 0x0d6
-    s00D7_TrainerCardGetBadgeCount,                   // 0x0d7
-    s00D8_MapReplaceIsEventSet,                       // 0x0d8
-    s00D9_FieldSetTeleportZone,                       // 0x0d9
-    s00DA_MapReplaceSetEvent,                         // 0x0da
-    s00DB_FieldSetNextZoneHere,                       // 0x0db
-    s00DC_FieldSetNextZone,                           // 0x0dc
-    s00DD_PokeDexGetCount,                            // 0x0dd
-    s00DE_PokeDexRegist,                              // 0x0de
-    s00DF_PokeDexIsRegist,                            // 0x0df
-    s00E0_GameGetVersion,                             // 0x0e0
-    s00E1_TrainerCardGetSex,                          // 0x0e1
-    s00E2_SaveDataCheckRequired,                      // 0x0e2
-    s00E3_GiveRunningShoes,                           // 0x0e3
-    s00E4_BoxUnlockWallpapers,                        // 0x0e4
-    FieldScriptEnv_CmdGetTrainerViewGroupAndMarkSeen, // 0x0e5
-    s00E6_StartMenuIsItemUnlocked,                    // 0x0e6
-    s00E7_StartMenuUnlockItem,                        // 0x0e7
-    s00E8_StartMenuIsItemSelected,                    // 0x0e8
-    NULL,                                             // 0x0e9
-    s00EA_HOFCheckIntegrity,                          // 0x0ea
-    s00EB_DayCareCheckSpawnFlag,                      // 0x0eb
-    s00EC_DayCareBreed,                               // 0x0ec
-    s00ED_DayCareResetSeed,                           // 0x0ed
-    s00EE_DayCareGetPkmCount,                         // 0x0ee
-    s00EF_DayCareCalcEggSpawnChance,                  // 0x0ef
-    s00F0_DayCareDeposit,                             // 0x0f0
-    s00F1_DayCareWithdraw,                            // 0x0f1
-    s00F2_DayCareGetSpecies,                          // 0x0f2
-    s00F3_DayCareGetForme,                            // 0x0f3
-    s00F4_DayCareCalcNewLevel,                        // 0x0f4
-    s00F5_DayCareCalcLevelGain,                       // 0x0f5
-    s00F6_DayCareCalcWithdrawCost,                    // 0x0f6
-    s00F7_DayCareCallPokeSelect,                      // 0x0f7
-    s00F8_DayCareGetSex,                              // 0x0f8
-    s00F9_MoneyAdd,                                   // 0x0f9
-    s00FA_MoneySub,                                   // 0x0fa
-    s00FB_MoneyCheck,                                 // 0x0fb
-    s00FC_PokePartyGetHappiness,                      // 0x0fc
-    s00FD_PokePartyAdjustHappiness,                   // 0x0fd
-    s00FE_PokePartyGetSpecies,                        // 0x0fe
-    s00FF_PokePartyGetForme,                          // 0x0ff
-    s0100_PokePartyCheckPokerus,                      // 0x100
-    s0101_PokePartyIsFullHP,                          // 0x101
-    s0102_PokePartyIsEgg,                             // 0x102
-    s0103_PokePartyGetCount,                          // 0x103
-    s0104_PokePartyRecoverAll,                        // 0x104
-    s0105_CallPokeNameInput,                          // 0x105
-    s0106_CallEggHatch,                               // 0x106
-    s0107_CallPokeSelect,                             // 0x107
-    s0108_PokePartyGetMoveCount,                      // 0x108
-    s0109_CallPokeMoveReplace,                        // 0x109
-    s010A_PokePartyGetMove,                           // 0x10a
-    s010B_PokePartyLearnMove,                         // 0x10b
-    s010C_PokePartyAdd,                               // 0x10c
-    s010D_PokePartyGetMemberByType,                   // 0x10d
-    s010E_PokePartyAddEx,                             // 0x10e
-    s010F_PokePartyAddEgg,                            // 0x10f
-    s0110_PokePartyGetParam,                          // 0x110
-    s0111_PokePartySetIV,                             // 0x111
-    s0112_PokePartyGetEVTotal,                        // 0x112
-    s0113_PokePartyIsOriginGame,                      // 0x113
-    s0114_PokePartyGetCountBySpecies,                 // 0x114
-    s0115_PokePartyHasMove,                           // 0x115
-    s0116_PokePartyHasMoveAny,                        // 0x116
-    s0117_PokePartySetForme,                          // 0x117
-    s0118_PokePartyFindBySpecies,                     // 0x118
-    s0119_PokePartyIsFromWhiteForest,                 // 0x119
-    s011A_PokePartyGetMetDate,                        // 0x11a
-    s011B_PokePartyGetTypes,                          // 0x11b
-    s011C_PokePartyChangeRotomForme,                  // 0x11c
-    s011D_TrainerCardSetFavePokemon,                  // 0x11d
-    s011E_TrainerCardSaveGymVictoryParty,             // 0x11e
-    s011F_WordSetGymVictoryParty,                     // 0x11f
-    s0120_FieldTradeSavePokemon,                      // 0x120
-    s0121_BoxGetCount,                                // 0x121
-    s0122_BoxAdd,                                     // 0x122
-    s0123_BoxAddEx,                                   // 0x123
-    s0124_BMHndAnmPlay,                               // 0x124
-    s0125_BMPlayHOFMachineSeq,                        // 0x125
-    s0126_BMChangeMdlID,                              // 0x126
-    s0127_BMCreateHandleByGPos,                       // 0x127
-    s0128_BMReleaseHandle,                            // 0x128
-    s0129_BMHndAudioVisualAnmPlay,                    // 0x129
-    s012A_BMHndAnmWait,                               // 0x12a
-    s012B_BMAnmPlayInv,                               // 0x12b
-    s012C_BMHndAnmPause,                              // 0x12c
-    s012D_BMSetVisible,                               // 0x12d
-    s012E_BMAnmPlayLoop,                              // 0x12e
-    s012F_PokecenPlayHealingSequence,                 // 0x12f
-    s0130_PokecenPCOpen,                              // 0x130
-    s0131_PokecenPCIdle,                              // 0x131
-    s0132_PokecenPCClose,                             // 0x132
-    NULL,                                             // 0x133
-    s0134_CasteliaRushInit,                           // 0x134
-    NULL,                                             // 0x135
-    s0136_FieldSetWeather,                            // 0x136
-    s0137_SaveDataWrite,                              // 0x137
-    s0138_SaveDataGetStatus,                          // 0x138
-    s0139_GameCommDisconnect,                         // 0x139
-    s013A_GameCommGetStatus,                          // 0x13a
-    s013B_GameCommCheckDSiWiFi,                       // 0x13b
-    s013C_GameCommTryBoot,                            // 0x13c
-    s013D_GameCommPause,                              // 0x13d
-    s013E_GameCommResume,                             // 0x13e
-    s013F_EvCameraInit,                               // 0x13f
-    s0140_EvCameraEnd,                                // 0x140
-    s0141_EvCameraUnbind,                             // 0x141
-    s0142_EvCameraRebind,                             // 0x142
-    s0143_EvCameraMoveTo,                             // 0x143
-    s0144_EvCameraReturn,                             // 0x144
-    s0145_EvCameraWait,                               // 0x145
-    s0146_EvCameraMoveToCommon,                       // 0x146
-    s0147_EvCameraMoveToDefault,                      // 0x147
-    s0148_EvCameraShake,                              // 0x148
-    s0149_CallFriendlyShopBuy,                        // 0x149
-    s014A_FieldOpen,                                  // 0x14a
-    s014B_FieldClose,                                 // 0x14b
-    s014C_RTFreeUserHeap,                             // 0x14c
-    s014D_CallRecordSystem,                           // 0x14d
-    s014E_CallBag,                                    // 0x14e
-    s014F_CallPC,                                     // 0x14f
-    s0150_CallMailbox,                                // 0x150
-    s0151_CallPokedexDiploma,                         // 0x151
-    s0152_CallGeonet,                                 // 0x152
-    s0153_callPoke3Select,                            // 0x153
-    s0154_Call3DDemo,                                 // 0x154
-    s0155_CallXTransceiver,                           // 0x155
-    s0156_CallGameClear,                              // 0x156
-    s0157_ActorAnimationInit,                         // 0x157
-    s0158_ActorAnimationFree,                         // 0x158
-    s0159_ActorAnimationPlay,                         // 0x159
-    s015A_ActorAnimationWait,                         // 0x15a
-    s015B_WifiListHasValidProfile,                    // 0x15b
-    s015C_WifiListCountFriends,                       // 0x15c
-    s015D_NetConnectWiFiClub,                         // 0x15d
-    s015E_NetConnectGTS,                              // 0x15e
-    s015F_Nop,                                        // 0x15f
-    s0160_NetConnectWiFiBattle,                       // 0x160
-    s0161_NetConnectBattleVideo,                      // 0x161
-    s0162_NetConnectGTSNegotiation,                   // 0x162
-    s0163_MusicalCall,                                // 0x163
-    s0164_MusicalCallDressUp,                         // 0x164
-    s0165_MusicalGetInfo,                             // 0x165
-    s0166_MusicalGetAudienceGift,                     // 0x166
-    s0167_MusicalComm,                                // 0x167
-    s0168_MusicalAddProp,                             // 0x168
-    s0169_MusicalClearAudienceGift,                   // 0x169
-    s016A_MusicalSelectPoke,                          // 0x16a
-    NULL,                                             // 0x16b
-    NULL,                                             // 0x16c
-    NULL,                                             // 0x16d
-    s016E_CallMonolith,                               // 0x16e
-    NULL,                                             // 0x16f
-    func_ov033_021772f4,                              // 0x170
-    NULL,                                             // 0x171
-    func_ov033_021772c8,                              // 0x172
-    NULL,                                             // 0x173
-    s0174_CallWildBattle,                             // 0x174
-    s0175_CallWildBattleEnd,                          // 0x175
-    s0176_CallWildLose,                               // 0x176
-    s0177_WildBattleIsVictory,                        // 0x177
-    s0178_WildBattleGetResult,                        // 0x178
-    s0179_CallCaptureDemo,                            // 0x179
-    GimmickGateCmd_ViewBoard,                         // 0x17a
-    func_ov012_02157bdc,                              // 0x17b
-    s017C_RollerCoasterCallSwitch,                    // 0x17c
-    s017D_RollerCoasterSetCarIntroSeen,               // 0x17d
-    NULL,                                             // 0x17e
-    NULL,                                             // 0x17f
-    NULL,                                             // 0x180
-    NULL,                                             // 0x181
-    NULL,                                             // 0x182
-    NULL,                                             // 0x183
-    NULL,                                             // 0x184
-    NULL,                                             // 0x185
-    s0186_DriftveilGymPrepareFreight,                 // 0x186
-    s0187_DriftveilLiftPlaceAtBottom,                 // 0x187
-    NULL,                                             // 0x188
-    NULL,                                             // 0x189
-    NULL,                                             // 0x18a
-    NULL,                                             // 0x18b
-    s018C_DriftveilGymCallElevator,                   // 0x18c
-    s018D_DriftveilGymCallFreight,                    // 0x18d
-    s018E_DriftveilLiftCallMove,                      // 0x18e
-    s018F_IcirrusGymCallSwitchAnim,                   // 0x18f
-    s0190_IcirrusGymCallFlipSwitch,                   // 0x190
-    s0191_IcirrusGymToggleMovementAtPlace,            // 0x191
-    NULL,                                             // 0x192
-    NULL,                                             // 0x193
-    NULL,                                             // 0x194
-    NULL,                                             // 0x195
-    NULL,                                             // 0x196
-    s0197_CGearPowerOn,                               // 0x197
-    s0198_FieldSubscreenChange,                       // 0x198
-    s0199_FieldSubscreenReturn,                       // 0x199
-    s019A_CGearControlWarning,                        // 0x19a
-    s019B_PlayFieldEffect,                            // 0x19b
-    s019C_PlayHMCutInEffect,                          // 0x19c
-    s019D_PlayAlderFlyEffect,                         // 0x19d
-    NULL,                                             // 0x19e
-    NULL,                                             // 0x19f
-    NULL,                                             // 0x1a0
-    s01A1_PleasureBoatGetRoomInfo,                    // 0x1a1
-    s01A2_CallRoyalUnovaView,                         // 0x1a2
-    s01A3_FadeInBlackQ,                               // 0x1a3
-    s01A4_FadeOutBlackQ,                              // 0x1a4
-    s01A5_FadeInWhiteQ,                               // 0x1a5
-    s01A6_FadeOutWhiteQ,                              // 0x1a6
-    s01A7_FadeWait,                                   // 0x1a7
-    s01A8_FadeInBlackQ_,                              // 0x1a8
-    NULL,                                             // 0x1a9
-    s01AA_CallSeasonBanner,                           // 0x1aa
-    s01AB_FadeInBlack,                                // 0x1ab
-    s01AC_FadeOutBlack,                               // 0x1ac
-    s01AD_FadeInWhite,                                // 0x1ad
-    s01AE_FadeOutWhite,                               // 0x1ae
-    Regulation_RegisterAllowedSpecies,                // 0x1af
-    Regulation_CheckPartyRegulation,                  // 0x1b0
-    s01B1_CallLeagueLiftWarp,                         // 0x1b1
-    ScrcmdProcFld_SpawnMovePokemonIfInactive,         // 0x1b2
-    FieldChunk_ScrCmdReadSaveByte,                    // 0x1b3
-    s01B4_FieldTradeStart,                            // 0x1b4
-    s01B5_FieldTradeCheck,                            // 0x1b5
-    NULL,                                             // 0x1b6
-    NULL,                                             // 0x1b7
-    NULL,                                             // 0x1b8
-    NULL,                                             // 0x1b9
-    NULL,                                             // 0x1ba
-    NULL,                                             // 0x1bb
-    NULL,                                             // 0x1bc
-    NULL,                                             // 0x1bd
-    NULL,                                             // 0x1be
-    NULL,                                             // 0x1bf
-    NULL,                                             // 0x1c0
-    s01C1_ElevatorSetTablePtr,                        // 0x1c1
-    s01C2_ElevatorBuildListMenu,                      // 0x1c2
-    s01C2_ElevatorChangeMap,                          // 0x1c3, which swan's name numbers 0x1c2
-    s01C4_PokeDexIsComplete,                          // 0x1c4
-    s01C5_PokeDexGetEvaluationParams,                 // 0x1c5
-    s01C6_PokeDexGiveNational,                        // 0x1c6
-    s01C7_PokeDexHaveNational,                        // 0x1c7
-    s01C8_PokeDexEnable,                              // 0x1c8
-    s01C9_NDemoStart,                                 // 0x1c9
-    s01CA_NDemoEnd,                                   // 0x1ca
-    s01CB_NDemoReadyTalkMotion,                       // 0x1cb
-    ElevatorTable_GetMysteryEntryCount,               // 0x1cc
-    ElevatorTable_RegisterBirthdayEntry,              // 0x1cd
-    s01CE_UnityTowerGetTrainerClass,                  // 0x1ce
-    s01CF_UnityTowerGetStateParam,                    // 0x1cf
-    s01D0_UnityTowerCallFloorSelect,                  // 0x1d0
-    s01D1_MoveTutorCheckParty,                        // 0x1d1
-    s01D2_MoveTutorCheckPkm,                          // 0x1d2
-    s01D3_MoveTutorGetMoveID,                         // 0x1d3
-    s01D4_MoveTutorCallPokeSelect,                    // 0x1d4
-    s01D5_MoveReminderCheckPkm,                       // 0x1d5
-    s01D6_MoveReminderCallMoveSelect,                 // 0x1d6
-    s01D7_ObjInitPointGPos,                           // 0x1d7
-    s01D8_ObjInitWarpGPos,                            // 0x1d8
-    s01D9_ObjInitNPCGPos,                             // 0x1d9
-    s01DA_CallPhraseSelect,                           // 0x1da
-    func_ov033_02177d78,                              // 0x1db
-    s01DC_DreamWorldItems,                            // 0x1dc
-    s01DD_BroadcastGameBeacon,                        // 0x1dd
-    s01DE_PassPowerPopDepletedID,                     // 0x1de
-    s01DF_CallPassPowerFlash,                         // 0x1df
-    s01E0_StadiumSetupActorsDouble,                   // 0x1e0
-    s01E1_StadiumLoadTrainerTable,                    // 0x1e1
-    s01E2_StadiumFreeTrainerTable,                    // 0x1e2
-    s01E3_StadiumSetupActorSingle,                    // 0x1e3
-    s01E0_StadiumSetupActorsTriple,                   // 0x1e4, which swan's name numbers 0x1e0
-    s01E5_StadiumResetTrainerFlags,                   // 0x1e5
-    s01E6_TrialHouseWorkInit,                         // 0x1e6
-    s01E7_TrialHouseWorkDelete,                       // 0x1e7
-    s01E8_TrialHousePrepareParty,                     // 0x1e8
-    s01E9_TrialHouseCallTeamSelect,                   // 0x1e9
-    s01EA_TrialHouseSetTrainer,                       // 0x1ea
-    s01EB_TrialHouseMsgDisp,                          // 0x1eb
-    s01EC_TrialHouseStartBattle,                      // 0x1ec
-    s01ED_TrialHouseSetDownloadMode,                  // 0x1ed
-    s01EE_TrialHouseSetBattleTestRank,                // 0x1ee
-    s01EF_TrialHouseGetBattleTestRank,                // 0x1ef
-    s01F0_TrialHouseDownloadExamination,              // 0x1f0
-    s01F1_TrialHouseCalcPointsStars,                  // 0x1f1
-    s01F2_TrialHouseGetExaminationType,               // 0x1f2
-    s01F3_TrialHouseSaveData,                         // 0x1f3
-    s01F4_TrialHouseCallResults,                      // 0x1f4
-    s01F5_TrialHouseGetRecordMask,                    // 0x1f5
-    Scrcmd_CheckWifiListFlags,                        // 0x1f6
-    Scrcmd_WifiListOperation,                         // 0x1f7
-    Scrcmd_SetWifiFriendNameWord,                     // 0x1f8
-    s01F9_CheckPmsWordPair,                           // 0x1f9
-    s01FA_PepQuizGenerate,                            // 0x1fa
-    s01FB_ItemCollectorCheckGroup,                    // 0x1fb
-    s01FC_ItemCollectorGetPrice,                      // 0x1fc
-    SurveyCmd_Start,                                  // 0x1fd
-    SurveyCmd_Clear,                                  // 0x1fe
-    s01FF_SurveyGetCurrentQuestionID,                 // 0x1ff
-    s0200_SurveyGetCurrentAnswerIDs,                  // 0x200
-    s0201_SurveyGetPopularOptionMsgID,                // 0x201
-    SurveyCmd_GetQuestionState,                       // 0x202
-    SurveyCmd_GetCurrentRemaining,                    // 0x203
-    s0204_SurveyGetTime,                              // 0x204
-    s0205_CallGreetingPhraseInput,                    // 0x205
-    s0206_CallThanksPhraseInput,                      // 0x206
-    s0207_WordSetPasserbyCount,                       // 0x207
-    s0208_WordSetThankedCount,                        // 0x208
-    SurveyCmd_WriteOwnAnswer,                         // 0x209
-    SurveyCmd_ShowRankMessage,                        // 0x20a
-    SurveyCmd_GetRank,                                // 0x20b
-    SurveyCmd_RaiseRank,                              // 0x20c
-    s020D_PokePartyFindEx,                            // 0x20d
-    s020E_SpPokeJump,                                 // 0x20e
-    s020F_SpPokeAppear,                               // 0x20f
-    s0210_SpPokeWaitAnimEnd,                          // 0x210
-    s0211_SpPokeWaitFrame,                            // 0x211
-    s0212_ActorMoveToHeight,                          // 0x212
-    s0213_ActorHoldPos,                               // 0x213
-    s0214_CallPokemonPreview,                         // 0x214
-    s0215_SetSpecialTransferUsed,                     // 0x215
-    s0216_CheckBeaconTrainerKey,                      // 0x216
-    s0217_MapChangeEntreeForest,                      // 0x217
-    func_ov012_02164c68,                              // 0x218
-    func_ov012_02164bcc,                              // 0x219
-    s021A_WordSetLoadEntreeForestPkmName,             // 0x21a
-    s021B_EntreeForestSpawnAllPkm,                    // 0x21b
-    s021C_EntreeForestStartBattle,                    // 0x21c
-    s021D_EntreeForestRemovePkm,                      // 0x21d
-    s021E_FishingChallengeGetRandomPkm,               // 0x21e
-    func_ov012_02156104,                              // 0x21f
-    func_ov012_02156128,                              // 0x220
-    s0221_AnvilleTrainGetModelID,                     // 0x221
-    s0222_AnvilleTrainGetDailyIndex,                  // 0x222
-    s0223_PokePartyGetHiddenPowerType,                // 0x223
-    s0224_PokePartyGetIV,                             // 0x224
-    s0225_ItemGetRandomOwnedTMMove,                   // 0x225
-    CountTrainersEvent_StartCountOtherOtIdsTask,      // 0x226
-    s0227_RecordAdd,                                  // 0x227
-    s0228_RecordGet,                                  // 0x228
-    NULL,                                             // 0x229
-    s022A_TVGenProgramMsgID,                          // 0x22a
-    s022B_StartSwapNpcEvent,                          // 0x22b
-    NULL,                                             // 0x22c
-    s022D_PlayFieldEffectByTable,                     // 0x22d
-    ScriptNative_SetActorZoneDeleteOff,               // 0x22e
-    s022F_WordSetLoadPastTradePkmName,                // 0x22f
-    s0230_MsgPlaceSignFont4,                          // 0x230
-    s0231_CallGameManual,                             // 0x231
-    PokeParty_ControlLegendMon,                       // 0x232
-    s0233_HasPlayerLanguage,                          // 0x233
-    s0234_ActorFallDownToXZ,                          // 0x234
-    s0235_BGMPlayEx,                                  // 0x235
-    s0236_WordSetLoadItemCollectorPrice,              // 0x236
-    s0237_ItemCollectorSell,                          // 0x237
-    s0238_BGMChangeMapEx,                             // 0x238
-    ScriptNative_CheckPlayerFormModel,                // 0x239
-    ScriptWork_PlayPerapVoice,                        // 0x23a
-    func_ov012_02169c1c,                              // 0x23b
-    s023C_NuvemaGimmickPlay,                          // 0x23c
-    s023D_NuvemaGimmickWaitAnim,                      // 0x23d
-    s023E_DayCareGetSexForNamePrint,                  // 0x23e
-    s023F_CallPlaceNameDisp,                          // 0x23f
-    ScriptWork_FadeBgmVolume,                         // 0x240
-    ScriptWork_RestoreBgmVolume,                      // 0x241
-    NULL,                                             // 0x242
-    NULL,                                             // 0x243
-    NULL,                                             // 0x244
-    s0245_BGMFadeOut,                                 // 0x245
-    s0246_BGMFadeOutAll,                              // 0x246
-    s0247_MapChangeRail,                              // 0x247
-    s0248_PlayerMoveToYAsync_,                        // 0x248
-    s0249_GetRandomDistinctSix,                       // 0x249
-    s024A_FieldSubscreenIsEnabled,                    // 0x24a
-    s024B_FieldSubscreenDisable,                      // 0x24b
-    s024C_BGMAmbienceResume,                          // 0x24c
-    s024D_RollerCoasterAmbienceStart,                 // 0x24d
-    s024E_PokePartyIsFullPP,                          // 0x24e
-    s024F_ActorWalkRoute,                             // 0x24f
-    s0250_ActorPairSet,                               // 0x250
-    s0251_ActorPairEnd,                               // 0x251
-    s0252_ActorPairGetTrID,                           // 0x252
-    s0253_ActorPairSetMoveEnable,                     // 0x253
-    NULL,                                             // 0x254
-    NULL,                                             // 0x255
-    NULL,                                             // 0x256
-    NULL,                                             // 0x257
-    NULL,                                             // 0x258
-    NULL,                                             // 0x259
-    func_ov012_02157b7c,                              // 0x25a
-    s025B_GymElecReapplyProgress,                     // 0x25b
-    s025C_GymElecSetFollower,                         // 0x25c
-    s025D_GymElecSetProgress,                         // 0x25d
-    NULL,                                             // 0x25e
-    s025F_GymElecSetStage,                            // 0x25f
-    NULL,                                             // 0x260
-    NULL,                                             // 0x261
-    s0262_HollowRivalSetValue,                        // 0x262
-    s0263_HollowRivalSetFlag,                         // 0x263
-    func_ov012_0216a748,                              // 0x264
-    s0265_CallXTransceiverSecret,                     // 0x265
-    s0266_HollowRivalGetCounter,                      // 0x266
-    func_ov012_0216a7cc,                              // 0x267
-    s0268_GymInsectPlayObject,                        // 0x268
-    s0269_GymInsectShowEffect,                        // 0x269
-    NULL,                                             // 0x26a
-    NULL,                                             // 0x26b
-    s026C_WordSetMedalName,                           // 0x26c
-    s026D_WordSetMedalRank,                           // 0x26d
-    s026E_MedalGetCount,                              // 0x26e
-    NULL,                                             // 0x26f
-    NULL,                                             // 0x270
-    s0271_MedalAcknowledge,                           // 0x271
-    s0272_MedalGetSpinTradeActor,                     // 0x272
-    s0273_MedalGive,                                  // 0x273
-    s0274_FunfestMissionStart,                        // 0x274
-    s0275_WordSetFunfestMission,                      // 0x275
-    s0276_FunfestMissionBroadcast,                    // 0x276
-    s0277_FunfestActorDelete,                         // 0x277
-    s0278_FunfestDispSalesmanMessage,                 // 0x278
-    s0279_FunfestBGMReturn,                           // 0x279
-    s027A_FunfestGetGenericInfo,                      // 0x27a
-    s027B_FunfestGetItemExchangeInfo,                 // 0x27b
-    s027C_FunfestGetItemSaleInfo,                     // 0x27c
-    s027D_FunfestGetPokemonQuizInfo,                  // 0x27d
-    s027E_FunfestGetPokemonQuizSpecies,               // 0x27e
-    s027F_FunfestGetPokemonQuizBogusSpecies,          // 0x27f
-    NULL,                                             // 0x280
-    NULL,                                             // 0x281
-    NULL,                                             // 0x282
-    NULL,                                             // 0x283
-    s0284_CallPlaceSelect,                            // 0x284
-    s0285_CallWordSetPokeNameInput,                   // 0x285
-    NULL,                                             // 0x286
-    NULL,                                             // 0x287
-    NULL,                                             // 0x288
-    NULL,                                             // 0x289
-    s028A_MapChangeFlyWarp,                           // 0x28a
-    s028B_CallEntralinkWarpOut,                       // 0x28b
-    NULL,                                             // 0x28c
-    NULL,                                             // 0x28d
-    s028E_MistraltonGymFireCannon,                    // 0x28e
-    s028F_CallRivalNameInput,                         // 0x28f
-    s0290_WordSetLoadRivalName,                       // 0x290
-    s0291_VirbankGymStopModelAnimations,              // 0x291
-    s0292_VirbankGymSetActorFlag,                     // 0x292
-    s0293_HiddenHollowCallWarpIn,                     // 0x293
-    s0294_HiddenHollowGetParam,                       // 0x294
-    s0295_HiddenHollowReset,                          // 0x295
-    s0296_HiddenHollowCallWarpOut,                    // 0x296
-    s0297_CallWildBattleEx,                           // 0x297
-    s0298_WordSetEmptyFileMessage,                    // 0x298
-    s0299_WordSetLoadAbility,                         // 0x299
-    s029A_WordSetLoadNature,                          // 0x29a
-    s029B_WordSetLoadJoinAvenueName,                  // 0x29b
-    NULL,                                             // 0x29c
-    NULL,                                             // 0x29d
-    s029E_MedalGetFieldEffectID,                      // 0x29e
-    s029F_MedalDiscover,                              // 0x29f
-    s02A0_MedalIsObtained,                            // 0x2a0
-    s02A1_MedalGetMostCompleteCategory,               // 0x2a1
-    s02A2_HumilauGymPlayLeaderSplash,                 // 0x2a2
-    s02A3_HumilauGymPlayLeaderWaves,                  // 0x2a3
-    func_ov012_02157bb4,                              // 0x2a4
-    s02A5_OpelucidGymCallMove,                        // 0x2a5
-    s02A6_OpelucidGymRefreshVars,                     // 0x2a6
-    s02A7_OpelucidGymCallButton,                      // 0x2a7
-    s02A8_OpelucidGymFreeHeap,                        // 0x2a8
-    s02A9_OpelucidGymCreateHeap,                      // 0x2a9
-    NULL,                                             // 0x2aa
-    NULL,                                             // 0x2ab
-    s02AC_CallLeafPileStuck,                          // 0x2ac
-    NULL,                                             // 0x2ad
-    s02AE_GameGetMyCity,                              // 0x2ae
-    s02AF_GameGetDifficulty,                          // 0x2af
-    s02B0_CallUnovaLinkKeyUnlock,                     // 0x2b0
-    s02B1_KeyInfoGetChamberKey,                       // 0x2b1
-    s02B2_MemoryLinkCheckFlag,                        // 0x2b2
-    s02B3_MemoryLinkGetVar,                           // 0x2b3
-    s02B4_MemoryLinkIsPlayerLinked,                   // 0x2b4
-    s02B5_WordSetMemoryLinkPlayerName,                // 0x2b5
-    s02B6_MemoryLinkCheckMusical,                     // 0x2b6
-    s02B7_MemoryLinkAddMusicalProps,                  // 0x2b7
-    s02B8_PedometerStart,                             // 0x2b8
-    s02B9_PedometerEnd,                               // 0x2b9
-    s02BA_PedometerGet,                               // 0x2ba
-    s02BB_Gym0601FanAmbienceStart,                    // 0x2bb
-    s02BC_TVCheckCommercial,                          // 0x2bc
-    s02BD_TVGenCommercialMsgID,                       // 0x2bd
-    s02BE_ActorMoveLinear,                            // 0x2be
-    NULL,                                             // 0x2bf
-    s02C0_FieldTradeGetSpecies,                       // 0x2c0
-    NULL,                                             // 0x2c1
-    s02C2_RepelRearm,                                 // 0x2c2
-    func_ov012_0216a7f4,                              // 0x2c3
-    s02C4_HiddenHollowSetPeriod,                      // 0x2c4
-    s02C5_JoinAvenueRecordActivity,                   // 0x2c5
-    s02C6_JoinAvenueStoreStart,                       // 0x2c6
-    s02C6_JoinAvenueStoreEnd,                         // 0x2c7, which swan's name numbers 0x2c6
-    NULL,                                             // 0x2c8
-    NULL,                                             // 0x2c9
-    s02CA_CallHappyPhraseInput,                       // 0x2ca
-    s02CB_PokewoodGetLevel,                           // 0x2cb
-    NULL,                                             // 0x2cc
-    NULL,                                             // 0x2cd
-    NULL,                                             // 0x2ce
-    s02CF_PokeDexCheckHabitatList,                    // 0x2cf
-    s02D0_PokeDexEnableHabitatList,                   // 0x2d0
-    s02D1_KeyInfoGetMyCityProgress,                   // 0x2d1
-    s02D2_FieldOpenRestoreLCD,                        // 0x2d2
-    s02D3_HollowRivalGetValue,                        // 0x2d3
-    s02D4_ItemGetTMCount,                             // 0x2d4
-    s02D5_WbtIsTrainerBeaten,                         // 0x2d5
-    NULL,                                             // 0x2d6
-    s02D7_GetWifiHistoryCountryCount,                 // 0x2d7
-    s02D8_MarkPartnerCandidate,                       // 0x2d8
-    s02D9_IsPartnerCandidateMarked,                   // 0x2d9
-    s02DA_UnityTowerSetRatingLevel,                   // 0x2da
-    s02DB_UnityTowerSetFloor,                         // 0x2db
-    s02DC_UnityTowerInitVisitorMessage,               // 0x2dc
-    s02DD_UnityTowerGetVisitorCount,                  // 0x2dd
-    s02DE_UnityTowerSetHobby,                         // 0x2de
-    s02DF_UnityTowerGetHobby,                         // 0x2df
-    NULL,                                             // 0x2e0
-    s02E1_MedalDiscoverInitial,                       // 0x2e1
-    NULL,                                             // 0x2e2
-    s02E3_LensFlareRequest,                           // 0x2e3
-    NULL,                                             // 0x2e4
-    s02E5_HiddenHollowSet,                            // 0x2e5
-    s02E6_HiddenHollowCreateEvents,                   // 0x2e6
-    NULL,                                             // 0x2e7
-    s02E8_CallFieldFadeOut,                           // 0x2e8
-    s02E9_CallFieldFadeIn,                            // 0x2e9
-    s02EA_PokePartyAddNPoke,                          // 0x2ea
-    NULL,                                             // 0x2eb
-    NULL,                                             // 0x2ec
-    s02ED_SetSoftResetBlocked,                        // 0x2ed
-    s02EE_MusicalIsPropOwned,                         // 0x2ee
-    s02EF_MusicalGetOwnedPropCount,                   // 0x2ef
-    NULL,                                             // 0x2f0
-    s02F1_SetOneShotDRObtained,                       // 0x2f1
-    s02F2_IsOneShotDRObtained,                        // 0x2f2
+    Scrcmd_Vm_VMNop,                                    // 0x000
+    Scrcmd_Vm_VMNop2,                                   // 0x001
+    Scrcmd_Vm_VMHalt,                                   // 0x002
+    Scrcmd_Vm_VMSleep,                                  // 0x003
+    Scrcmd_Vm_VMCall,                                   // 0x004
+    Scrcmd_Vm_VMReturn,                                 // 0x005
+    Scrcmd_Vm_DebugPrint,                               // 0x006
+    Scrcmd_Vm_DebugStack,                               // 0x007
+    Scrcmd_Vm_VMStackPushConst,                         // 0x008
+    Scrcmd_Vm_VMStackPush,                              // 0x009
+    Scrcmd_Vm_VMStackPop,                               // 0x00a
+    Scrcmd_Vm_VMStackDiscard,                           // 0x00b
+    Scrcmd_Vm_VMStackAdd,                               // 0x00c
+    Scrcmd_Vm_VMStackSub,                               // 0x00d
+    Scrcmd_Vm_VMStackMul,                               // 0x00e
+    Scrcmd_Vm_VMStackDiv,                               // 0x00f
+    Scrcmd_Vm_VMStackPushFlag,                          // 0x010
+    Scrcmd_Vm_VMStackCmp,                               // 0x011
+    Scrcmd_Vm_WorkAnd,                                  // 0x012
+    Scrcmd_Vm_WorkOr,                                   // 0x013
+    Scrcmd_Vm_VMRegSet8,                                // 0x014
+    Scrcmd_Vm_VMRegSet32,                               // 0x015
+    Scrcmd_Vm_VMRegMov,                                 // 0x016
+    Scrcmd_Vm_VMRegCmp8,                                // 0x017
+    Scrcmd_Vm_VMRegCmpConst8,                           // 0x018
+    Scrcmd_Vm_WorkCmpConst,                             // 0x019
+    Scrcmd_Vm_WorkCmpWork,                              // 0x01a
+    Scrcmd_Vm_RTCallGlobalAsync,                        // 0x01b
+    Scrcmd_Vm_RTCallGlobal,                             // 0x01c
+    Scrcmd_Vm_RTEndGlobal,                              // 0x01d
+    Scrcmd_Vm_VMJump,                                   // 0x01e
+    Scrcmd_Vm_VMJumpIf,                                 // 0x01f
+    Scrcmd_Vm_VMCallIf,                                 // 0x020
+    Scrcmd_Vm_RTReserveScript,                          // 0x021
+    Scrcmd_Vm_FieldGetContinueFlag,                     // 0x022
+    Scrcmd_Vm_FlagSet,                                  // 0x023
+    Scrcmd_Vm_FlagReset,                                // 0x024
+    Scrcmd_Vm_FlagGet,                                  // 0x025
+    Scrcmd_Vm_WorkAdd,                                  // 0x026
+    Scrcmd_Vm_WorkSub,                                  // 0x027
+    Scrcmd_Vm_WorkSetConst,                             // 0x028
+    Scrcmd_Vm_WorkGet,                                  // 0x029
+    Scrcmd_Vm_WorkSet,                                  // 0x02a
+    Scrcmd_Vm_WorkMul,                                  // 0x02b
+    Scrcmd_Vm_WorkDiv,                                  // 0x02c
+    Scrcmd_Vm_WorkMod,                                  // 0x02d
+    Scrcmd_Vm_ActorsPauseAll,                           // 0x02e
+    Scrcmd_Vm_ActorsUnpauseAll,                         // 0x02f
+    Scrcmd_Vm_FinishAllEvents,                          // 0x030
+    Scrcmd_Vm_ABKeyWait,                                // 0x031
+    Scrcmd_Vm_LastKeyWait,                              // 0x032
+    Scrcmd_Msg_MsgSetAutoscrolls,                       // 0x033
+    Scrcmd_Msg_SystemMsg,                               // 0x034
+    Scrcmd_Msg_SystemMsgAsync,                          // 0x035
+    Scrcmd_Msg_SystemMsgClose,                          // 0x036
+    Scrcmd_Msg_MsgSetLoadingSpinner,                    // 0x037
+    Scrcmd_Msg_InfoMsg,                                 // 0x038
+    Scrcmd_Msg_InfoMsgClose,                            // 0x039
+    Scrcmd_Msg_MultiMsg,                                // 0x03a
+    Scrcmd_Msg_MsgWinCloseNo,                           // 0x03b
+    Scrcmd_Msg_ActorMsg,                                // 0x03c
+    Scrcmd_Msg_ParentActorMsg,                          // 0x03d
+    Scrcmd_Msg_ActorMsgClose,                           // 0x03e
+    Scrcmd_Msg_MsgWinCloseAll,                          // 0x03f
+    Scrcmd_Msg_MoneyWinDisp,                            // 0x040
+    Scrcmd_Msg_MoneyWinClose,                           // 0x041
+    Scrcmd_Msg_MoneyWinUpdate,                          // 0x042
+    Scrcmd_Msg_MsgPlaceSign,                            // 0x043
+    Scrcmd_Msg_MsgPlaceSignClose,                       // 0x044
+    Scrcmd_Msg_CheckerMsg,                              // 0x045
+    Scrcmd_Msg_CheckerMsgClose,                         // 0x046
+    Scrcmd_Menu_YesNoWin,                               // 0x047
+    Scrcmd_Msg_ActorMsgGendered,                        // 0x048
+    Scrcmd_Msg_ActorMsgVersioned,                       // 0x049
+    Scrcmd_Msg_ScreamMsg,                               // 0x04a
+    Scrcmd_Msg_MsgWaitAdvance,                          // 0x04b
+    Scrcmd_Word_WordSetPlayerName,                      // 0x04c
+    Scrcmd_Word_WordSetItemName,                        // 0x04d
+    Scrcmd_Word_WordSetItemNameEx,                      // 0x04e
+    Scrcmd_Word_WordSetItemNameWithArticle,             // 0x04f
+    Scrcmd_Word_WordSetTMMoveName,                      // 0x050
+    Scrcmd_Word_WordSetMoveName,                        // 0x051
+    Scrcmd_Word_WordSetItemPocketName,                  // 0x052
+    Scrcmd_Word_WordSetPartyPokeSpecies,                // 0x053
+    Scrcmd_Word_WordSetPartyPokeName,                   // 0x054
+    Scrcmd_Word_WordSetDaycarePokeSpecies,              // 0x055
+    Scrcmd_Word_WordSetPokeTypeName,                    // 0x056
+    Scrcmd_Word_WordSetPokeSpecies,                     // 0x057
+    Scrcmd_Word_WordSetPokeSpeciesWithArticle,          // 0x058
+    Scrcmd_Word_WordSetPlaceName,                       // 0x059
+    Scrcmd_Word_WordSetTrendName,                       // 0x05a
+    Scrcmd_Word_WordSetDaycarePokeName,                 // 0x05b
+    Scrcmd_Word_WordSetNumber,                          // 0x05c
+    Scrcmd_Musical_WordSetMusicalInfo,                  // 0x05d
+    Scrcmd_Word_WordSetCountry,                         // 0x05e
+    Scrcmd_Word_WordSetHobbyName,                       // 0x05f
+    Scrcmd_Word_WordSetPassPowerName,                   // 0x060
+    Scrcmd_Word_WordSetTrainerClassName,                // 0x061
+    Scrcmd_Word_WordSetTrainerClassNameWithArticle,     // 0x062
+    Scrcmd_Word_WordSetSurveyAnswer,                    // 0x063
+    Scrcmd_FieldActor_ActorCmdExec,                     // 0x064
+    Scrcmd_FieldActor_ActorCmdWait,                     // 0x065
+    Scrcmd_FieldActor_ActorGetMoveCode,                 // 0x066
+    Scrcmd_FieldActor_ActorGetGPos,                     // 0x067
+    Scrcmd_FieldActor_PlayerGetGPos,                    // 0x068
+    Scrcmd_FieldActor_ActorNew,                         // 0x069
+    Scrcmd_FieldActor_ActorGetSpawnFlag,                // 0x06a
+    Scrcmd_FieldActor_ActorAdd,                         // 0x06b
+    Scrcmd_FieldActor_ActorDelete,                      // 0x06c
+    Scrcmd_FieldActor_ActorSetGPos,                     // 0x06d
+    Scrcmd_FieldActor_PlayerGetDir,                     // 0x06e
+    Scrcmd_FieldActor_PlayerGetActorInFront,            // 0x06f
+    Scrcmd_FieldActor_ActorFindByGPos,                  // 0x070
+    Scrcmd_FieldActor_PlayerGetRailPos,                 // 0x071
+    Scrcmd_FieldActor_ActorGetRailPos,                  // 0x072
+    Scrcmd_FieldActor_ActorSetMoveCode,                 // 0x073
+    Scrcmd_FieldActor_ActorSetEyeToEye,                 // 0x074
+    Scrcmd_FieldActor_PlayerSetSpecialSequence,         // 0x075
+    Scrcmd_FieldActor_PlayerMoveToYAsync,               // 0x076
+    Scrcmd_FieldActor_PlayerTurnByTrigger,              // 0x077
+    Scrcmd_FieldActor_PlayerGetExState,                 // 0x078
+    Scrcmd_FieldActor_ActorGetUserParam,                // 0x079
+    Scrcmd_FieldActor_ActorPlayRailSlipdown,            // 0x07a
+    Scrcmd_FieldActor_ActorJumpToGPos,                  // 0x07b
+    Scrcmd_FieldActor_PlayerSetRailPos,                 // 0x07c
+    Scrcmd_FieldActor_ActorSetRailPos,                  // 0x07d
+    Scrcmd_FieldActor_ActorPlayTeleportSeq,             // 0x07e
+    Scrcmd_Trainer_TrainerEyeGetTrainerID,              // 0x07f
+    Scrcmd_Trainer_TrainerEyeEventInit,                 // 0x080
+    Scrcmd_Trainer_TrainerEyeEventStart,                // 0x081
+    Scrcmd_Trainer_TrainerGetActorID,                   // 0x082
+    Scrcmd_Trainer_TrainerEyeGetBattleType,             // 0x083
+    Scrcmd_Trainer_ActorGetTrainerID,                   // 0x084
+    Scrcmd_Trainer_CallTrainerBattle,                   // 0x085
+    Scrcmd_Trainer_CallTrainerMultiBattle,              // 0x086, which swan's name numbers 0x085
+    Scrcmd_Msg_TrainerSayMessage,                       // 0x087
+    Scrcmd_Trainer_TrainerGetMessageTypes,              // 0x088
+    NULL,                                               // 0x089
+    Scrcmd_Trainer_TrainerGetBattleType,                // 0x08a
+    Scrcmd_Trainer_TrainerBGMPlayPush,                  // 0x08b
+    Scrcmd_GameState_CallTrainerLose,                   // 0x08c
+    Scrcmd_GameState_TrainerBattleIsVictory,            // 0x08d
+    Scrcmd_Trainer_CallTrainerBattleEnd,                // 0x08e
+    Scrcmd_Trainer_TrainerClassBGMPlayPush,             // 0x08f
+    Scrcmd_Trainer_TrainerBGMPlay,                      // 0x090
+    NULL,                                               // 0x091
+    Scrcmd_Trainer_TrainerGetFieldAction,               // 0x092
+    Scrcmd_Trainer_TrainerGetPrizeItem,                 // 0x093
+    Scrcmd_Trainer_CallTradedPokemonBattle,             // 0x094
+    Scrcmd_GameState_TrainerFlagSet,                    // 0x095
+    Scrcmd_GameState_TrainerFlagReset,                  // 0x096
+    Scrcmd_GameState_TrainerFlagGet,                    // 0x097
+    Scrcmd_Sound_BGMPlay,                               // 0x098
+    NULL,                                               // 0x099
+    NULL,                                               // 0x09a
+    Scrcmd_Sound_BGMIsPlaying,                          // 0x09b
+    NULL,                                               // 0x09c
+    NULL,                                               // 0x09d
+    Scrcmd_Sound_BGMChangeMap,                          // 0x09e
+    Scrcmd_Sound_BGMPlayPush,                           // 0x09f
+    Scrcmd_Sound_BGMWait,                               // 0x0a0
+    Scrcmd_Sound_BGMPush,                               // 0x0a1
+    Scrcmd_Sound_BGMPop,                                // 0x0a2
+    Scrcmd_Sound_ISSSwitchEnable,                       // 0x0a3
+    Scrcmd_Sound_ISSSwitchDisable,                      // 0x0a4
+    Scrcmd_Sound_ISSSwitchQuery,                        // 0x0a5
+    Scrcmd_Sound_SEPlay,                                // 0x0a6
+    Scrcmd_Sound_SEStop,                                // 0x0a7
+    Scrcmd_Sound_SEWait,                                // 0x0a8
+    Scrcmd_Sound_MEPlay,                                // 0x0a9
+    Scrcmd_Sound_MEWait,                                // 0x0aa
+    Scrcmd_Sound_PVPlay,                                // 0x0ab
+    Scrcmd_Sound_PVWait,                                // 0x0ac
+    Scrcmd_Menu_ListMenuInitCommon,                     // 0x0ad
+    Scrcmd_Menu_ListMenuAnchorTopLeft,                  // 0x0ae
+    Scrcmd_Menu_ListMenuAdd,                            // 0x0af
+    Scrcmd_Menu_ListMenuShow,                           // 0x0b0
+    Scrcmd_Menu_ListMenuShow2,                          // 0x0b1
+    Scrcmd_Menu_ListMenuAnchorTopRight,                 // 0x0b2
+    Scrcmd_Fade_FadeEx,                                 // 0x0b3
+    Scrcmd_Fade_FadeExWait,                             // 0x0b4
+    Scrcmd_Item_ItemAdd,                                // 0x0b5
+    Scrcmd_Item_ItemSub,                                // 0x0b6
+    Scrcmd_Item_ItemCheckSpace,                         // 0x0b7
+    Scrcmd_Item_ItemCheckAmount,                        // 0x0b8
+    Scrcmd_Item_ItemGetCount,                           // 0x0b9
+    Scrcmd_Item_ItemIsTMHM,                             // 0x0ba
+    Scrcmd_Item_ItemGetPocket,                          // 0x0bb
+    Scrcmd_Encount_PhenomenonGetItemID,                 // 0x0bc
+    Scrcmd_Item_ItemGetClass,                           // 0x0bd
+    Scrcmd_Mapchange_MapChangeFake,                     // 0x0be
+    Scrcmd_Mapchange_MapChangeWarpPad,                  // 0x0bf
+    Scrcmd_Mapchange_MapChangeWarpRail,                 // 0x0c0
+    Scrcmd_Mapchange_MapChangeQuicksand,                // 0x0c1
+    Scrcmd_Mapchange_MapChangeWarp,                     // 0x0c2
+    Scrcmd_Mapchange_MapChangeUnionRoom,                // 0x0c3
+    Scrcmd_Mapchange_MapChangeCore,                     // 0x0c4
+    Scrcmd_FieldMove_CallSurf,                          // 0x0c5
+    Scrcmd_FieldMove_CallWaterfall,                     // 0x0c6
+    Scrcmd_FieldMove_CallCut,                           // 0x0c7
+    Scrcmd_FieldMove_CallDiving,                        // 0x0c8
+    Scrcmd_GameState_ConfigToggleKanji,                 // 0x0c9
+    Scrcmd_GameState_ConfigGetKanji,                    // 0x0ca
+    Scrcmd_GameState_Random,                            // 0x0cb
+    Scrcmd_GameState_RTGetTextFile,                     // 0x0cc
+    Scrcmd_GameState_RTCGetDayPart,                     // 0x0cd
+    Scrcmd_GameState_TrainerCardGetStars,               // 0x0ce
+    Scrcmd_GameState_RTCGetWeekDay,                     // 0x0cf
+    Scrcmd_GameState_RTCGetDate,                        // 0x0d0
+    Scrcmd_GameState_RTCGetTime,                        // 0x0d1
+    Scrcmd_GameState_RTCGetSeason,                      // 0x0d2
+    Scrcmd_GameState_RTGetZoneID,                       // 0x0d3
+    Scrcmd_GameState_TrainerCardGetBirthDate,           // 0x0d4
+    Scrcmd_GameState_TrainerCardHasBadge,               // 0x0d5
+    Scrcmd_GameState_TrainerCardAddBadge,               // 0x0d6
+    Scrcmd_GameState_TrainerCardGetBadgeCount,          // 0x0d7
+    Scrcmd_GameState_MapReplaceIsEventSet,              // 0x0d8
+    Scrcmd_GameState_FieldSetTeleportZone,              // 0x0d9
+    Scrcmd_GameState_MapReplaceSetEvent,                // 0x0da
+    Scrcmd_GameState_FieldSetNextZoneHere,              // 0x0db
+    Scrcmd_GameState_FieldSetNextZone,                  // 0x0dc
+    Scrcmd_GameState_PokeDexGetCount,                   // 0x0dd
+    Scrcmd_GameState_PokeDexRegist,                     // 0x0de
+    Scrcmd_GameState_PokeDexIsRegist,                   // 0x0df
+    Scrcmd_GameState_GameGetVersion,                    // 0x0e0
+    Scrcmd_GameState_TrainerCardGetSex,                 // 0x0e1
+    Scrcmd_GameState_SaveDataCheckRequired,             // 0x0e2
+    Scrcmd_GameState_GiveRunningShoes,                  // 0x0e3
+    Scrcmd_GameState_BoxUnlockWallpapers,               // 0x0e4
+    Scrcmd_GameState_GetTrainerViewGroupAndMarkSeen,    // 0x0e5
+    Scrcmd_GameState_StartMenuIsItemUnlocked,           // 0x0e6
+    Scrcmd_GameState_StartMenuUnlockItem,               // 0x0e7
+    Scrcmd_GameState_StartMenuIsItemSelected,           // 0x0e8
+    NULL,                                               // 0x0e9
+    Scrcmd_GameState_HOFCheckIntegrity,                 // 0x0ea
+    Scrcmd_DayCare_DayCareCheckSpawnFlag,               // 0x0eb
+    Scrcmd_DayCare_DayCareBreed,                        // 0x0ec
+    Scrcmd_DayCare_DayCareResetSeed,                    // 0x0ed
+    Scrcmd_DayCare_DayCareGetPkmCount,                  // 0x0ee
+    Scrcmd_DayCare_DayCareCalcEggSpawnChance,           // 0x0ef
+    Scrcmd_DayCare_DayCareDeposit,                      // 0x0f0
+    Scrcmd_DayCare_DayCareWithdraw,                     // 0x0f1
+    Scrcmd_DayCare_DayCareGetSpecies,                   // 0x0f2
+    Scrcmd_DayCare_DayCareGetForme,                     // 0x0f3
+    Scrcmd_DayCare_DayCareCalcNewLevel,                 // 0x0f4
+    Scrcmd_DayCare_DayCareCalcLevelGain,                // 0x0f5
+    Scrcmd_DayCare_DayCareCalcWithdrawCost,             // 0x0f6
+    Scrcmd_DayCare_DayCareCallPokeSelect,               // 0x0f7
+    Scrcmd_DayCare_DayCareGetSex,                       // 0x0f8
+    Scrcmd_Pokemon_MoneyAdd,                            // 0x0f9
+    Scrcmd_Pokemon_MoneySub,                            // 0x0fa
+    Scrcmd_Pokemon_MoneyCheck,                          // 0x0fb
+    Scrcmd_Pokemon_PokePartyGetHappiness,               // 0x0fc
+    Scrcmd_Pokemon_PokePartyAdjustHappiness,            // 0x0fd
+    Scrcmd_Pokemon_PokePartyGetSpecies,                 // 0x0fe
+    Scrcmd_Pokemon_PokePartyGetForme,                   // 0x0ff
+    Scrcmd_PokemonMisc_PokePartyCheckPokerus,           // 0x100
+    Scrcmd_Pokemon_PokePartyIsFullHP,                   // 0x101
+    Scrcmd_Pokemon_PokePartyIsEgg,                      // 0x102
+    Scrcmd_Pokemon_PokePartyGetCount,                   // 0x103
+    Scrcmd_Pokemon_PokePartyRecoverAll,                 // 0x104
+    Scrcmd_PokemonMisc_CallPokeNameInput,               // 0x105
+    Scrcmd_PokemonMisc_CallEggHatch,                    // 0x106
+    Scrcmd_PokemonMisc_CallPokeSelect,                  // 0x107
+    Scrcmd_Pokemon_PokePartyGetMoveCount,               // 0x108
+    Scrcmd_PokemonMisc_CallPokeMoveReplace,             // 0x109
+    Scrcmd_Pokemon_PokePartyGetMove,                    // 0x10a
+    Scrcmd_Pokemon_PokePartyLearnMove,                  // 0x10b
+    Scrcmd_Pokemon_PokePartyAdd,                        // 0x10c
+    Scrcmd_Pokemon_PokePartyGetMemberByType,            // 0x10d
+    Scrcmd_Pokemon_PokePartyAddEx,                      // 0x10e
+    Scrcmd_Pokemon_PokePartyAddEgg,                     // 0x10f
+    Scrcmd_Pokemon_PokePartyGetParam,                   // 0x110
+    Scrcmd_Pokemon_PokePartySetIV,                      // 0x111
+    Scrcmd_Pokemon_PokePartyGetEVTotal,                 // 0x112
+    Scrcmd_Pokemon_PokePartyIsOriginGame,               // 0x113
+    Scrcmd_Pokemon_PokePartyGetCountBySpecies,          // 0x114
+    Scrcmd_Pokemon_PokePartyHasMove,                    // 0x115
+    Scrcmd_Pokemon_PokePartyHasMoveAny,                 // 0x116
+    Scrcmd_Pokemon_PokePartySetForme,                   // 0x117
+    Scrcmd_Pokemon_PokePartyFindBySpecies,              // 0x118
+    Scrcmd_Pokemon_PokePartyIsFromWhiteForest,          // 0x119
+    Scrcmd_Pokemon_PokePartyGetMetDate,                 // 0x11a
+    Scrcmd_Pokemon_PokePartyGetTypes,                   // 0x11b
+    Scrcmd_Pokemon_PokePartyChangeRotomForme,           // 0x11c
+    Scrcmd_PokemonMisc_TrainerCardSetFavePokemon,       // 0x11d
+    Scrcmd_PokemonMisc_TrainerCardSaveGymVictoryParty,  // 0x11e
+    Scrcmd_PokemonMisc_WordSetGymVictoryParty,          // 0x11f
+    Scrcmd_PokemonMisc_FieldTradeSavePokemon,           // 0x120
+    Scrcmd_Pokemon_BoxGetCount,                         // 0x121
+    Scrcmd_Pokemon_BoxAdd,                              // 0x122
+    Scrcmd_Pokemon_BoxAddEx,                            // 0x123
+    Scrcmd_Buildmodel_BMHndAnmPlay,                     // 0x124
+    Scrcmd_Buildmodel_BMPlayHOFMachineSeq,              // 0x125
+    Scrcmd_Buildmodel_BMChangeMdlID,                    // 0x126
+    Scrcmd_Buildmodel_BMCreateHandleByGPos,             // 0x127
+    Scrcmd_Buildmodel_BMReleaseHandle,                  // 0x128
+    Scrcmd_Buildmodel_BMHndAudioVisualAnmPlay,          // 0x129
+    Scrcmd_Buildmodel_BMHndAnmWait,                     // 0x12a
+    Scrcmd_Buildmodel_BMAnmPlayInv,                     // 0x12b
+    Scrcmd_Buildmodel_BMHndAnmPause,                    // 0x12c
+    Scrcmd_Buildmodel_BMSetVisible,                     // 0x12d
+    Scrcmd_Buildmodel_BMAnmPlayLoop,                    // 0x12e
+    Scrcmd_Buildmodel_PokecenPlayHealingSequence,       // 0x12f
+    Scrcmd_Buildmodel_PokecenPCOpen,                    // 0x130
+    Scrcmd_Buildmodel_PokecenPCIdle,                    // 0x131
+    Scrcmd_Buildmodel_PokecenPCClose,                   // 0x132
+    NULL,                                               // 0x133
+    Scrcmd_Misc_CasteliaRushInit,                       // 0x134
+    NULL,                                               // 0x135
+    Scrcmd_Weather_FieldSetWeather,                     // 0x136
+    Scrcmd_Save_SaveDataWrite,                          // 0x137
+    Scrcmd_GameState_SaveDataGetStatus,                 // 0x138
+    Scrcmd_Network_GameCommDisconnect,                  // 0x139
+    Scrcmd_Net_GameCommGetStatus,                       // 0x13a
+    Scrcmd_Network_GameCommCheckDSiWiFi,                // 0x13b
+    Scrcmd_Network_GameCommTryBoot,                     // 0x13c
+    Scrcmd_Network_GameCommPause,                       // 0x13d
+    Scrcmd_Network_GameCommResume,                      // 0x13e
+    Scrcmd_Camera_EvCameraInit,                         // 0x13f
+    Scrcmd_Camera_EvCameraEnd,                          // 0x140
+    Scrcmd_Camera_EvCameraUnbind,                       // 0x141
+    Scrcmd_Camera_EvCameraRebind,                       // 0x142
+    Scrcmd_Camera_EvCameraMoveTo,                       // 0x143
+    Scrcmd_Camera_EvCameraReturn,                       // 0x144
+    Scrcmd_Camera_EvCameraWait,                         // 0x145
+    Scrcmd_Camera_EvCameraMoveToCommon,                 // 0x146
+    Scrcmd_Camera_EvCameraMoveToDefault,                // 0x147
+    Scrcmd_Camera_EvCameraShake,                        // 0x148
+    Scrcmd_Shop_CallFriendlyShopBuy,                    // 0x149
+    Scrcmd_Proc_FieldOpen,                              // 0x14a
+    Scrcmd_Proc_FieldClose,                             // 0x14b
+    Scrcmd_Proc_RTFreeUserHeap,                         // 0x14c
+    Scrcmd_ProcFld_CallRecordSystem,                    // 0x14d
+    Scrcmd_Proc_CallBag,                                // 0x14e
+    Scrcmd_ProcFld_CallPC,                              // 0x14f
+    Scrcmd_Proc_CallMailbox,                            // 0x150
+    Scrcmd_Proc_CallPokedexDiploma,                     // 0x151
+    Scrcmd_ProcFld_CallGeonet,                          // 0x152
+    Scrcmd_Proc_callPoke3Select,                        // 0x153
+    Scrcmd_Proc_Call3DDemo,                             // 0x154
+    Scrcmd_ProcFld_CallXTransceiver,                    // 0x155
+    Scrcmd_ProcFld_CallGameClear,                       // 0x156
+    Scrcmd_FieldActorAnimation_ActorAnimationInit,      // 0x157
+    Scrcmd_FieldActorAnimation_ActorAnimationFree,      // 0x158
+    Scrcmd_FieldActorAnimation_ActorAnimationPlay,      // 0x159
+    Scrcmd_FieldActorAnimation_ActorAnimationWait,      // 0x15a
+    Scrcmd_Net_WifiListHasValidProfile,                 // 0x15b
+    Scrcmd_Net_WifiListCountFriends,                    // 0x15c
+    Scrcmd_Net_NetConnectWiFiClub,                      // 0x15d
+    Scrcmd_Net_NetConnectGTS,                           // 0x15e
+    Scrcmd_Proc_Nop,                                    // 0x15f
+    Scrcmd_Proc_NetConnectWiFiBattle,                   // 0x160
+    Scrcmd_Proc_NetConnectBattleVideo,                  // 0x161
+    Scrcmd_Net_NetConnectGTSNegotiation,                // 0x162
+    Scrcmd_Musical_MusicalCall,                         // 0x163
+    Scrcmd_Musical_MusicalCallDressUp,                  // 0x164
+    Scrcmd_Musical_MusicalGetInfo,                      // 0x165
+    Scrcmd_Musical_MusicalGetAudienceGift,              // 0x166
+    Scrcmd_Musical_MusicalComm,                         // 0x167
+    Scrcmd_Musical_MusicalAddProp,                      // 0x168
+    Scrcmd_Musical_MusicalClearAudienceGift,            // 0x169
+    Scrcmd_Musical_MusicalSelectPoke,                   // 0x16a
+    NULL,                                               // 0x16b
+    NULL,                                               // 0x16c
+    NULL,                                               // 0x16d
+    Scrcmd_Proc_CallMonolith,                           // 0x16e
+    NULL,                                               // 0x16f
+    func_ov033_021772f4,                                // 0x170
+    NULL,                                               // 0x171
+    func_ov033_021772c8,                                // 0x172
+    NULL,                                               // 0x173
+    Scrcmd_Encount_CallWildBattle,                      // 0x174
+    Scrcmd_Encount_CallWildBattleEnd,                   // 0x175
+    Scrcmd_GameState_CallWildLose,                      // 0x176
+    Scrcmd_GameState_WildBattleIsVictory,               // 0x177
+    Scrcmd_GameState_WildBattleGetResult,               // 0x178
+    Scrcmd_Encount_CallCaptureDemo,                     // 0x179
+    Scrcmd_FieldGimmickGate_GimmickGateViewBoard,       // 0x17a
+    func_ov012_02157bdc,                                // 0x17b
+    Scrcmd_Gym_RollerCoasterCallSwitch,                 // 0x17c
+    Scrcmd_Gym_RollerCoasterSetCarIntroSeen,            // 0x17d
+    NULL,                                               // 0x17e
+    NULL,                                               // 0x17f
+    NULL,                                               // 0x180
+    NULL,                                               // 0x181
+    NULL,                                               // 0x182
+    NULL,                                               // 0x183
+    NULL,                                               // 0x184
+    NULL,                                               // 0x185
+    Scrcmd_Gym_DriftveilGymPrepareFreight,              // 0x186
+    Scrcmd_Gym_DriftveilLiftPlaceAtBottom,              // 0x187
+    NULL,                                               // 0x188
+    NULL,                                               // 0x189
+    NULL,                                               // 0x18a
+    NULL,                                               // 0x18b
+    Scrcmd_Gym_DriftveilGymCallElevator,                // 0x18c
+    Scrcmd_Gym_DriftveilGymCallFreight,                 // 0x18d
+    Scrcmd_Gym_DriftveilLiftCallMove,                   // 0x18e
+    Scrcmd_Gym_IcirrusGymCallSwitchAnim,                // 0x18f
+    Scrcmd_Gym_IcirrusGymCallFlipSwitch,                // 0x190
+    Scrcmd_Gym_IcirrusGymToggleMovementAtPlace,         // 0x191
+    NULL,                                               // 0x192
+    NULL,                                               // 0x193
+    NULL,                                               // 0x194
+    NULL,                                               // 0x195
+    NULL,                                               // 0x196
+    Scrcmd_ProcFld_CGearPowerOn,                        // 0x197
+    Scrcmd_Field_FieldSubscreenChange,                  // 0x198
+    Scrcmd_Field_FieldSubscreenReturn,                  // 0x199
+    Scrcmd_PokeDisp_CGearControlWarning,                // 0x19a
+    Scrcmd_FldWipe3dobj_PlayFieldEffect,                // 0x19b
+    Scrcmd_FldWipe3dobj_PlayHMCutInEffect,              // 0x19c
+    Scrcmd_FldWipe3dobj_PlayAlderFlyEffect,             // 0x19d
+    NULL,                                               // 0x19e
+    NULL,                                               // 0x19f
+    NULL,                                               // 0x1a0
+    Scrcmd_RoyalUnova_PleasureBoatGetRoomInfo,          // 0x1a1
+    Scrcmd_RoyalUnova_CallRoyalUnovaView,               // 0x1a2
+    Scrcmd_Fade_FadeInBlackQ,                           // 0x1a3
+    Scrcmd_Fade_FadeOutBlackQ,                          // 0x1a4
+    Scrcmd_Fade_FadeInWhiteQ,                           // 0x1a5
+    Scrcmd_Fade_FadeOutWhiteQ,                          // 0x1a6
+    Scrcmd_Fade_FadeWait,                               // 0x1a7
+    Scrcmd_Fade_FadeInBlackQ_01A8,                      // 0x1a8
+    NULL,                                               // 0x1a9
+    Scrcmd_Fade_CallSeasonBanner,                       // 0x1aa
+    Scrcmd_Fade_FadeInBlack,                            // 0x1ab
+    Scrcmd_Fade_FadeOutBlack,                           // 0x1ac
+    Scrcmd_Fade_FadeInWhite,                            // 0x1ad
+    Scrcmd_Fade_FadeOutWhite,                           // 0x1ae
+    Scrcmd_FldBattle_RegisterAllowedSpecies,            // 0x1af
+    Scrcmd_FldBattle_CheckPartyRegulation,              // 0x1b0
+    Scrcmd_FldeffCut_CallLeagueLiftWarp,                // 0x1b1
+    Scrcmd_Encount_SpawnMovePokemonIfInactive,          // 0x1b2
+    Scrcmd_SpPokeGimmick_ReadSaveByte,                  // 0x1b3
+    Scrcmd_PokemonMisc_FieldTradeStart,                 // 0x1b4
+    Scrcmd_PokemonMisc_FieldTradeCheck,                 // 0x1b5
+    NULL,                                               // 0x1b6
+    NULL,                                               // 0x1b7
+    NULL,                                               // 0x1b8
+    NULL,                                               // 0x1b9
+    NULL,                                               // 0x1ba
+    NULL,                                               // 0x1bb
+    NULL,                                               // 0x1bc
+    NULL,                                               // 0x1bd
+    NULL,                                               // 0x1be
+    NULL,                                               // 0x1bf
+    NULL,                                               // 0x1c0
+    Scrcmd_Misc_ElevatorSetTablePtr,                    // 0x1c1
+    Scrcmd_Misc_ElevatorBuildListMenu,                  // 0x1c2
+    Scrcmd_Misc_ElevatorChangeMap,                      // 0x1c3, which swan's name numbers 0x1c2
+    Scrcmd_PokemonMisc_PokeDexIsComplete,               // 0x1c4
+    Scrcmd_PokemonMisc_PokeDexGetEvaluationParams,      // 0x1c5
+    Scrcmd_GameState_PokeDexGiveNational,               // 0x1c6
+    Scrcmd_GameState_PokeDexHaveNational,               // 0x1c7
+    Scrcmd_GameState_PokeDexEnable,                     // 0x1c8
+    Scrcmd_Ndemo_NDemoStart,                            // 0x1c9
+    Scrcmd_Ndemo_NDemoEnd,                              // 0x1ca
+    Scrcmd_Ndemo_NDemoReadyTalkMotion,                  // 0x1cb
+    Scrcmd_Misc_ElevatorGetMysteryEntryCount,           // 0x1cc
+    Scrcmd_Misc_ElevatorRegisterBirthdayEntry,          // 0x1cd
+    Scrcmd_UnityTower_UnityTowerGetTrainerClass,        // 0x1ce
+    Scrcmd_UnityTower_UnityTowerGetStateParam,          // 0x1cf
+    Scrcmd_UnityTower_UnityTowerCallFloorSelect,        // 0x1d0
+    Scrcmd_PokemonMisc_MoveTutorCheckParty,             // 0x1d1
+    Scrcmd_PokemonMisc_MoveTutorCheckPkm,               // 0x1d2
+    Scrcmd_PokemonMisc_MoveTutorGetMoveID,              // 0x1d3
+    Scrcmd_PokemonMisc_MoveTutorCallPokeSelect,         // 0x1d4
+    Scrcmd_Pokemon_MoveReminderCheckPkm,                // 0x1d5
+    Scrcmd_Proc_MoveReminderCallMoveSelect,             // 0x1d6
+    Scrcmd_GameState_ObjInitPointGPos,                  // 0x1d7
+    Scrcmd_GameState_ObjInitWarpGPos,                   // 0x1d8
+    Scrcmd_GameState_ObjInitNPCGPos,                    // 0x1d9
+    Scrcmd_PhraseSelect_CallPhraseSelect,               // 0x1da
+    func_ov033_02177d78,                                // 0x1db
+    Scrcmd_Musical_DreamWorldItems,                     // 0x1dc
+    Scrcmd_FldeffCut_BroadcastGameBeacon,               // 0x1dd
+    Scrcmd_FldeffCut_PassPowerPopDepletedID,            // 0x1de
+    Scrcmd_FldeffCut_CallPassPowerFlash,                // 0x1df
+    Scrcmd_Stadium_StadiumSetupActorsDouble,            // 0x1e0
+    Scrcmd_Stadium_StadiumLoadTrainerTable,             // 0x1e1
+    Scrcmd_Stadium_StadiumFreeTrainerTable,             // 0x1e2
+    Scrcmd_Stadium_StadiumSetupActorSingle,             // 0x1e3
+    Scrcmd_Stadium_StadiumSetupActorsTriple,            // 0x1e4, which swan's name numbers 0x1e0
+    Scrcmd_Stadium_StadiumResetTrainerFlags,            // 0x1e5
+    Scrcmd_TrialHouse_TrialHouseWorkInit,               // 0x1e6
+    Scrcmd_TrialHouse_TrialHouseWorkDelete,             // 0x1e7
+    Scrcmd_TrialHouse_TrialHousePrepareParty,           // 0x1e8
+    Scrcmd_TrialHouse_TrialHouseCallTeamSelect,         // 0x1e9
+    Scrcmd_TrialHouse_TrialHouseSetTrainer,             // 0x1ea
+    Scrcmd_TrialHouse_TrialHouseMsgDisp,                // 0x1eb
+    Scrcmd_TrialHouse_TrialHouseStartBattle,            // 0x1ec
+    Scrcmd_TrialHouse_TrialHouseSetDownloadMode,        // 0x1ed
+    Scrcmd_TrialHouse_TrialHouseSetBattleTestRank,      // 0x1ee
+    Scrcmd_TrialHouse_TrialHouseGetBattleTestRank,      // 0x1ef
+    Scrcmd_TrialHouse_TrialHouseDownloadExamination,    // 0x1f0
+    Scrcmd_TrialHouse_TrialHouseCalcPointsStars,        // 0x1f1
+    Scrcmd_TrialHouse_TrialHouseGetExaminationType,     // 0x1f2
+    Scrcmd_TrialHouse_TrialHouseSaveData,               // 0x1f3
+    Scrcmd_TrialHouse_TrialHouseCallResults,            // 0x1f4
+    Scrcmd_TrialHouse_TrialHouseGetRecordMask,          // 0x1f5
+    Scrcmd_PhraseInput_CheckWifiListFlags,              // 0x1f6
+    Scrcmd_PhraseInput_WifiListOperation,               // 0x1f7
+    Scrcmd_PhraseInput_SetWifiFriendNameWord,           // 0x1f8
+    Scrcmd_Field_CheckPmsWordPair,                      // 0x1f9
+    Scrcmd_PepQuiz_PepQuizGenerate,                     // 0x1fa
+    Scrcmd_Misc_ItemCollectorCheckGroup,                // 0x1fb
+    Scrcmd_Misc_ItemCollectorGetPrice,                  // 0x1fc
+    Scrcmd_Survey_SurveyStart,                          // 0x1fd
+    Scrcmd_Survey_SurveyClear,                          // 0x1fe
+    Scrcmd_Survey_SurveyGetCurrentQuestionID,           // 0x1ff
+    Scrcmd_Survey_SurveyGetCurrentAnswerIDs,            // 0x200
+    Scrcmd_Survey_SurveyGetPopularOptionMsgID,          // 0x201
+    Scrcmd_Survey_SurveyGetQuestionState,               // 0x202
+    Scrcmd_Survey_SurveyGetCurrentRemaining,            // 0x203
+    Scrcmd_Survey_SurveyGetTime,                        // 0x204
+    Scrcmd_ProcFld_CallGreetingPhraseInput,             // 0x205
+    Scrcmd_ProcFld_CallThanksPhraseInput,               // 0x206
+    Scrcmd_Word_WordSetPasserbyCount,                   // 0x207
+    Scrcmd_Word_WordSetThankedCount,                    // 0x208
+    Scrcmd_Survey_SurveyWriteOwnAnswer,                 // 0x209
+    Scrcmd_Survey_SurveyShowRankMessage,                // 0x20a
+    Scrcmd_Survey_SurveyGetRank,                        // 0x20b
+    Scrcmd_Survey_SurveyRaiseRank,                      // 0x20c
+    Scrcmd_SpPokeGimmick_PokePartyFindEx,               // 0x20d
+    Scrcmd_SpPokeGimmick_SpPokeJump,                    // 0x20e
+    Scrcmd_SpPokeGimmick_SpPokeAppear,                  // 0x20f
+    Scrcmd_SpPokeGimmick_SpPokeWaitAnimEnd,             // 0x210
+    Scrcmd_SpPokeGimmick_SpPokeWaitFrame,               // 0x211
+    Scrcmd_ActorMove_ActorMoveToHeight,                 // 0x212
+    Scrcmd_ActorMove_ActorHoldPos,                      // 0x213
+    Scrcmd_PokeDisp_CallPokemonPreview,                 // 0x214
+    Scrcmd_SpPokeGimmick_SetSpecialTransferUsed,        // 0x215
+    Scrcmd_PokeDisp_IsOneShotDRObtained,                // 0x216
+    Scrcmd_EntreeForest_MapChangeEntreeForest,          // 0x217
+    func_ov012_02164c68,                                // 0x218
+    func_ov012_02164bcc,                                // 0x219
+    Scrcmd_EntreeForest_WordSetLoadEntreeForestPkmName, // 0x21a
+    Scrcmd_EntreeForest_EntreeForestSpawnAllPkm,        // 0x21b
+    Scrcmd_EntreeForest_EntreeForestStartBattle,        // 0x21c
+    Scrcmd_EntreeForest_EntreeForestRemovePkm,          // 0x21d
+    Scrcmd_Encount_FishingChallengeGetRandomPkm,        // 0x21e
+    func_ov012_02156104,                                // 0x21f
+    func_ov012_02156128,                                // 0x220
+    Scrcmd_Misc_AnvilleTrainGetModelID,                 // 0x221
+    Scrcmd_Misc_AnvilleTrainGetDailyIndex,              // 0x222
+    Scrcmd_PokemonMisc_PokePartyGetHiddenPowerType,     // 0x223
+    Scrcmd_PokemonMisc_PokePartyGetIV,                  // 0x224
+    Scrcmd_PokemonMisc_ItemGetRandomOwnedTMMove,        // 0x225
+    Scrcmd_Enceff_StartCountOtherOtIdsTask,             // 0x226
+    Scrcmd_PokeDisp_RecordAdd,                          // 0x227
+    Scrcmd_PokeDisp_RecordGet,                          // 0x228
+    NULL,                                               // 0x229
+    Scrcmd_PokeDisp_TVGenProgramMsgID,                  // 0x22a
+    Scrcmd_PokeDisp_StartSwapNpcEvent,                  // 0x22b
+    NULL,                                               // 0x22c
+    Scrcmd_FldWipe3dobj_FieldEffect,                    // 0x22d
+    Scrcmd_FieldActor_SetActorZoneDeleteOff,            // 0x22e
+    Scrcmd_PokemonMisc_WordSetLoadPastTradePkmName,     // 0x22f
+    Scrcmd_Msg_MsgPlaceSignFont4,                       // 0x230
+    Scrcmd_ProcFld_CallGameManual,                      // 0x231
+    Scrcmd_PokemonMisc_ControlLegendMon,                // 0x232
+    Scrcmd_Leaves_UnityTowerGetVisitorCountry,          // 0x233
+    Scrcmd_FieldActor_ActorFallDownToXZ,                // 0x234
+    Scrcmd_Sound_BGMPlayEx,                             // 0x235
+    Scrcmd_Misc_WordSetLoadItemCollectorPrice,          // 0x236
+    Scrcmd_Misc_ItemCollectorSell,                      // 0x237
+    Scrcmd_Sound_BGMChangeMapEx,                        // 0x238
+    Scrcmd_FieldActor_CheckPlayerFormModel,             // 0x239
+    Scrcmd_Sound_PokeVoicePlay,                         // 0x23a
+    func_ov012_02169c1c,                                // 0x23b
+    Scrcmd_SpPoke_NuvemaGimmickPlay,                    // 0x23c
+    Scrcmd_SpPoke_NuvemaGimmickWaitAnim,                // 0x23d
+    Scrcmd_DayCare_DayCareGetSexForNamePrint,           // 0x23e
+    Scrcmd_PlaceName_CallPlaceNameDisp,                 // 0x23f
+    Scrcmd_Sound_FadeBgmVolume,                         // 0x240
+    Scrcmd_Sound_RestoreBgmVolume,                      // 0x241
+    NULL,                                               // 0x242
+    NULL,                                               // 0x243
+    NULL,                                               // 0x244
+    Scrcmd_Sound_BGMFadeOut,                            // 0x245
+    Scrcmd_Sound_BGMFadeOutAll,                         // 0x246
+    Scrcmd_Mapchange_MapChangeRail,                     // 0x247
+    Scrcmd_FieldActor_PlayerMoveToYAsync_0248,          // 0x248
+    Scrcmd_Stadium_GetRandomDistinctSix,                // 0x249
+    Scrcmd_Network_FieldSubscreenIsEnabled,             // 0x24a
+    Scrcmd_Network_FieldSubscreenDisable,               // 0x24b
+    Scrcmd_Sound_BGMAmbienceResume,                     // 0x24c
+    Scrcmd_Gym_RollerCoasterAmbienceStart,              // 0x24d
+    Scrcmd_Pokemon_PokePartyIsFullPP,                   // 0x24e
+    Scrcmd_FieldActor_ActorWalkRoute,                   // 0x24f
+    Scrcmd_PairSys_ActorPairSet,                        // 0x250
+    Scrcmd_PairSys_ActorPairEnd,                        // 0x251
+    Scrcmd_PairSys_ActorPairGetTrID,                    // 0x252
+    Scrcmd_PairSys_ActorPairSetMoveEnable,              // 0x253
+    NULL,                                               // 0x254
+    NULL,                                               // 0x255
+    NULL,                                               // 0x256
+    NULL,                                               // 0x257
+    NULL,                                               // 0x258
+    NULL,                                               // 0x259
+    func_ov012_02157b7c,                                // 0x25a
+    Scrcmd_Gym_GymElecReapplyProgress,                  // 0x25b
+    Scrcmd_Gym_GymElecSetFollower,                      // 0x25c
+    Scrcmd_Gym_GymElecSetProgress,                      // 0x25d
+    NULL,                                               // 0x25e
+    Scrcmd_Gym_GymElecSetStage,                         // 0x25f
+    NULL,                                               // 0x260
+    NULL,                                               // 0x261
+    Scrcmd_HollowRival_HollowRivalSetValue,             // 0x262
+    Scrcmd_HollowRival_HollowRivalSetFlag,              // 0x263
+    func_ov012_0216a748,                                // 0x264
+    Scrcmd_ProcFld_CallXTransceiverSecret,              // 0x265
+    Scrcmd_HollowRival_HollowRivalGetCounter,           // 0x266
+    func_ov012_0216a7cc,                                // 0x267
+    Scrcmd_Gym_GymInsectPlayObject,                     // 0x268
+    Scrcmd_Gym_GymInsectShowEffect,                     // 0x269
+    NULL,                                               // 0x26a
+    NULL,                                               // 0x26b
+    Scrcmd_Word_WordSetMedalName,                       // 0x26c
+    Scrcmd_Word_WordSetMedalRank,                       // 0x26d
+    Scrcmd_Medal_MedalGetCount,                         // 0x26e
+    NULL,                                               // 0x26f
+    NULL,                                               // 0x270
+    Scrcmd_Medal_MedalAcknowledge,                      // 0x271
+    Scrcmd_Medal_MedalGetSpinTradeActor,                // 0x272
+    Scrcmd_Medal_MedalGive,                             // 0x273
+    Scrcmd_Funfest_FunfestMissionStart,                 // 0x274
+    Scrcmd_Word_WordSetFunfestMission,                  // 0x275
+    Scrcmd_Funfest_FunfestMissionBroadcast,             // 0x276
+    Scrcmd_Funfest_FunfestActorDelete,                  // 0x277
+    Scrcmd_Msg_FunfestDispSalesmanMessage,              // 0x278
+    Scrcmd_Funfest_FunfestBGMReturn,                    // 0x279
+    Scrcmd_Funfest_FunfestGetGenericInfo,               // 0x27a
+    Scrcmd_Funfest_FunfestGetItemExchangeInfo,          // 0x27b
+    Scrcmd_Funfest_FunfestGetItemSaleInfo,              // 0x27c
+    Scrcmd_Funfest_FunfestGetPokemonQuizInfo,           // 0x27d
+    Scrcmd_Funfest_FunfestGetPokemonQuizSpecies,        // 0x27e
+    Scrcmd_Funfest_FunfestGetPokemonQuizBogusSpecies,   // 0x27f
+    NULL,                                               // 0x280
+    NULL,                                               // 0x281
+    NULL,                                               // 0x282
+    NULL,                                               // 0x283
+    Scrcmd_ProcFld_CallPlaceSelect,                     // 0x284
+    Scrcmd_ProcFld_CallWordSetPokeNameInput,            // 0x285
+    NULL,                                               // 0x286
+    NULL,                                               // 0x287
+    NULL,                                               // 0x288
+    NULL,                                               // 0x289
+    Scrcmd_Mapchange_MapChangeFlyWarp,                  // 0x28a
+    Scrcmd_Funfest_CallEntralinkWarpOut,                // 0x28b
+    NULL,                                               // 0x28c
+    NULL,                                               // 0x28d
+    Scrcmd_Gym_MistraltonGymFireCannon,                 // 0x28e
+    Scrcmd_ProcFld_CallRivalNameInput,                  // 0x28f
+    Scrcmd_Word_WordSetLoadRivalName,                   // 0x290
+    Scrcmd_Gym_VirbankGymStopModelAnimations,           // 0x291
+    Scrcmd_Gym_VirbankGymSetActorFlag,                  // 0x292
+    Scrcmd_HiddenHollow_HiddenHollowCallWarpIn,         // 0x293
+    Scrcmd_HiddenHollow_HiddenHollowGetParam,           // 0x294
+    Scrcmd_HiddenHollow_HiddenHollowReset,              // 0x295
+    Scrcmd_HiddenHollow_HiddenHollowCallWarpOut,        // 0x296
+    Scrcmd_Encount_CallWildBattleEx,                    // 0x297
+    Scrcmd_Word_WordSetEmptyFileMessage,                // 0x298
+    Scrcmd_Word_WordSetLoadAbility,                     // 0x299
+    Scrcmd_Word_WordSetLoadNature,                      // 0x29a
+    Scrcmd_Word_WordSetLoadJoinAvenueName,              // 0x29b
+    NULL,                                               // 0x29c
+    NULL,                                               // 0x29d
+    Scrcmd_Medal_MedalGetFieldEffectID,                 // 0x29e
+    Scrcmd_Medal_MedalDiscover,                         // 0x29f
+    Scrcmd_Medal_MedalIsObtained,                       // 0x2a0
+    Scrcmd_Medal_MedalGetMostCompleteCategory,          // 0x2a1
+    Scrcmd_Gym_HumilauGymPlayLeaderSplash,              // 0x2a2
+    Scrcmd_Gym_HumilauGymPlayLeaderWaves,               // 0x2a3
+    func_ov012_02157bb4,                                // 0x2a4
+    Scrcmd_Gym_OpelucidGymCallMove,                     // 0x2a5
+    Scrcmd_Gym_OpelucidGymRefreshVars,                  // 0x2a6
+    Scrcmd_Gym_OpelucidGymCallButton,                   // 0x2a7
+    Scrcmd_Gym_OpelucidGymFreeHeap,                     // 0x2a8
+    Scrcmd_Gym_OpelucidGymCreateHeap,                   // 0x2a9
+    NULL,                                               // 0x2aa
+    NULL,                                               // 0x2ab
+    Scrcmd_FldeffLeaves_CallLeafPileStuck,              // 0x2ac
+    NULL,                                               // 0x2ad
+    Scrcmd_Keysystem_GameGetMyCity,                     // 0x2ae
+    Scrcmd_Keysystem_GameGetDifficulty,                 // 0x2af
+    Scrcmd_Keysystem_CallUnovaLinkKeyUnlock,            // 0x2b0
+    Scrcmd_Keysystem_KeyInfoGetChamberKey,              // 0x2b1
+    Scrcmd_DownloadData_MemoryLinkCheckFlag,            // 0x2b2
+    Scrcmd_DownloadData_MemoryLinkGetVar,               // 0x2b3
+    Scrcmd_DownloadData_MemoryLinkIsPlayerLinked,       // 0x2b4
+    Scrcmd_DownloadData_WordSetMemoryLinkPlayerName,    // 0x2b5
+    Scrcmd_DownloadData_MemoryLinkCheckMusical,         // 0x2b6
+    Scrcmd_DownloadData_MemoryLinkAddMusicalProps,      // 0x2b7
+    Scrcmd_Pedometer_PedometerStart,                    // 0x2b8
+    Scrcmd_Pedometer_PedometerEnd,                      // 0x2b9
+    Scrcmd_Pedometer_PedometerGet,                      // 0x2ba
+    Scrcmd_Gym_Gym0601FanAmbienceStart,                 // 0x2bb
+    Scrcmd_PokeDisp_TVCheckCommercial,                  // 0x2bc
+    Scrcmd_PokeDisp_TVGenCommercialMsgID,               // 0x2bd
+    Scrcmd_FieldActor_ActorMoveLinear,                  // 0x2be
+    NULL,                                               // 0x2bf
+    Scrcmd_PokemonMisc_FieldTradeGetSpecies,            // 0x2c0
+    NULL,                                               // 0x2c1
+    Scrcmd_Encount_RepelRearm,                          // 0x2c2
+    func_ov012_0216a7f4,                                // 0x2c3
+    Scrcmd_HiddenHollow_HiddenHollowSetPeriod,          // 0x2c4
+    Scrcmd_PokeDisp_JoinAvenueRecordActivity,           // 0x2c5
+    Scrcmd_JoinAvenueStore_JoinAvenueStoreStart,        // 0x2c6
+    Scrcmd_JoinAvenueStore_JoinAvenueStoreEnd,          // 0x2c7, which swan's name numbers 0x2c6
+    NULL,                                               // 0x2c8
+    NULL,                                               // 0x2c9
+    Scrcmd_ProcFld_CallHappyPhraseInput,                // 0x2ca
+    Scrcmd_JoinAvenueStore_PokewoodGetLevel,            // 0x2cb
+    NULL,                                               // 0x2cc
+    NULL,                                               // 0x2cd
+    NULL,                                               // 0x2ce
+    Scrcmd_Leaves_PokeDexCheckHabitatList,              // 0x2cf
+    Scrcmd_GameState_PokeDexEnableHabitatList,          // 0x2d0
+    Scrcmd_Leaves_KeyInfoGetMyCityProgress,             // 0x2d1
+    Scrcmd_GameState_FieldOpenRestoreLCD,               // 0x2d2
+    Scrcmd_HollowRival_HollowRivalGetValue,             // 0x2d3
+    Scrcmd_Item_ItemGetTMCount,                         // 0x2d4
+    Scrcmd_Leaves_WbtIsTrainerBeaten,                   // 0x2d5
+    NULL,                                               // 0x2d6
+    Scrcmd_Leaves_GetWifiHistoryCountryCount,           // 0x2d7
+    Scrcmd_Leaves_MarkPartnerCandidate,                 // 0x2d8
+    Scrcmd_Leaves_UnityTowerGetVisitorParam,            // 0x2d9
+    Scrcmd_Leaves_UnityTowerSetRatingLevel,             // 0x2da
+    Scrcmd_Leaves_UnityTowerSetFloor,                   // 0x2db
+    Scrcmd_Leaves_UnityTowerInitVisitorMessage,         // 0x2dc
+    Scrcmd_Leaves_UnityTowerGetVisitorCount,            // 0x2dd
+    Scrcmd_Leaves_UnityTowerSetHobby,                   // 0x2de
+    Scrcmd_Leaves_UnityTowerGetHobby,                   // 0x2df
+    NULL,                                               // 0x2e0
+    Scrcmd_Medal_MedalDiscoverInitial,                  // 0x2e1
+    NULL,                                               // 0x2e2
+    Scrcmd_JoinAvenueStore_LensFlareRequest,            // 0x2e3
+    NULL,                                               // 0x2e4
+    Scrcmd_HiddenHollow_HiddenHollowSet,                // 0x2e5
+    Scrcmd_HiddenHollow_HiddenHollowCreateEvents,       // 0x2e6
+    NULL,                                               // 0x2e7
+    Scrcmd_Fade_CallFieldFadeOut,                       // 0x2e8
+    Scrcmd_Fade_CallFieldFadeIn,                        // 0x2e9
+    Scrcmd_Pokemon_PokePartyAddNPoke,                   // 0x2ea
+    NULL,                                               // 0x2eb
+    NULL,                                               // 0x2ec
+    Scrcmd_GameState_SetSoftResetBlocked,               // 0x2ed
+    Scrcmd_Musical_MusicalIsPropOwned,                  // 0x2ee
+    Scrcmd_Musical_MusicalGetOwnedPropCount,            // 0x2ef
+    NULL,                                               // 0x2f0
+    Scrcmd_GameState_SetOneShotDRObtained,              // 0x2f1
+    Scrcmd_GameState_IsOneShotDRObtained_02F2,          // 0x2f2
 };
 
 // MWCC lays the file's data out by size, so the count comes first in the ROM, ahead of the tables
 const u32 EVCMD_MAX = NELEMS(EVCMD_TABLE);
 
-BOOL s0000_VMNop(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMNop(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0001_VMNop2(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMNop2(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0002_VMHalt(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMHalt(VM *vm, FieldScriptEnv *env) {
     VM_Halt(vm);
     return TRUE;
 }
@@ -872,37 +872,37 @@ BOOL swapToScrcmdEnvirDecPauseCtr(VM *vm, void *env) {
     return FieldScriptEnv_UpdateWaitCounter(env);
 }
 
-BOOL s0003_VMSleep(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMSleep(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_SetWaitCounter(env, VM_Read16(vm));
     VM_SetNativeCallback(vm, swapToScrcmdEnvirDecPauseCtr);
     return TRUE;
 }
 
-BOOL s0004_VMCall(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMCall(VM *vm, FieldScriptEnv *env) {
     s32 offset = VM_Read32(vm);
 
     VM_Call(vm, vm->pc + offset);
     return FALSE;
 }
 
-BOOL s0005_VMReturn(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMReturn(VM *vm, FieldScriptEnv *env) {
     VM_Return(vm);
     return FALSE;
 }
 
-BOOL s0006_DebugPrint(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_DebugPrint(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetGameData(env);
     ScriptReadAny(vm, env);
     return FALSE;
 }
 
-BOOL s0007_DebugStack(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_DebugStack(VM *vm, FieldScriptEnv *env) {
     VM_StackPop(vm);
     ScriptReadAny(vm, env);
     return FALSE;
 }
 
-BOOL s0014_VMRegSet8(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMRegSet8(VM *vm, FieldScriptEnv *env) {
     u8 index = VM_Read8(vm);
     u8 value = VM_Read8(vm);
 
@@ -910,7 +910,7 @@ BOOL s0014_VMRegSet8(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0015_VMRegSet32(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMRegSet32(VM *vm, FieldScriptEnv *env) {
     u8 index = VM_Read8(vm);
     u32 value = VM_Read32(vm);
 
@@ -918,7 +918,7 @@ BOOL s0015_VMRegSet32(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0016_VMRegMov(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMRegMov(VM *vm, FieldScriptEnv *env) {
     u8 dst = VM_Read8(vm);
     u8 src = VM_Read8(vm);
 
@@ -936,7 +936,7 @@ u8 VMCmp(u32 left, u32 right) {
     return 2;
 }
 
-BOOL s0017_VMRegCmp8(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMRegCmp8(VM *vm, FieldScriptEnv *env) {
     u8 left = vm->work[VM_Read8(vm)];
     u8 right = vm->work[VM_Read8(vm)];
 
@@ -944,7 +944,7 @@ BOOL s0017_VMRegCmp8(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0018_VMRegCmpConst8(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMRegCmpConst8(VM *vm, FieldScriptEnv *env) {
     u8 left = vm->work[VM_Read8(vm)];
     u8 right = VM_Read8(vm);
 
@@ -952,7 +952,7 @@ BOOL s0018_VMRegCmpConst8(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0019_WorkCmpConst(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_WorkCmpConst(VM *vm, FieldScriptEnv *env) {
     u16 left = *ScriptReadVar(vm, env);
     u16 right = VM_Read16(vm);
 
@@ -960,7 +960,7 @@ BOOL s0019_WorkCmpConst(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s001A_WorkCmpWork(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_WorkCmpWork(VM *vm, FieldScriptEnv *env) {
     u16 *left = ScriptReadVar(vm, env);
     u16 *right = ScriptReadVar(vm, env);
 
@@ -968,29 +968,29 @@ BOOL s001A_WorkCmpWork(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0008_VMStackPushConst(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMStackPushConst(VM *vm, FieldScriptEnv *env) {
     VM_StackPush(vm, VM_Read16(vm));
     return FALSE;
 }
 
-BOOL s0009_VMStackPush(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMStackPush(VM *vm, FieldScriptEnv *env) {
     VM_StackPush(vm, ScriptReadAny(vm, env));
     return FALSE;
 }
 
-BOOL s000A_VMStackPop(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMStackPop(VM *vm, FieldScriptEnv *env) {
     u32 value = VM_StackPop(vm);
 
     *ScriptReadVar(vm, env) = value;
     return FALSE;
 }
 
-BOOL s000B_VMStackDiscard(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMStackDiscard(VM *vm, FieldScriptEnv *env) {
     VM_StackPop(vm);
     return FALSE;
 }
 
-BOOL s000C_VMStackAdd(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMStackAdd(VM *vm, FieldScriptEnv *env) {
     u32 right = VM_StackPop(vm);
     u32 left = VM_StackPop(vm);
 
@@ -998,7 +998,7 @@ BOOL s000C_VMStackAdd(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s000D_VMStackSub(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMStackSub(VM *vm, FieldScriptEnv *env) {
     u32 right = VM_StackPop(vm);
     u32 left = VM_StackPop(vm);
 
@@ -1006,7 +1006,7 @@ BOOL s000D_VMStackSub(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s000E_VMStackMul(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMStackMul(VM *vm, FieldScriptEnv *env) {
     u32 right = VM_StackPop(vm);
     u32 left = VM_StackPop(vm);
 
@@ -1014,7 +1014,7 @@ BOOL s000E_VMStackMul(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s000F_VMStackDiv(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMStackDiv(VM *vm, FieldScriptEnv *env) {
     u32 right = VM_StackPop(vm);
     u32 left = VM_StackPop(vm);
 
@@ -1022,7 +1022,7 @@ BOOL s000F_VMStackDiv(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0010_VMStackPushFlag(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMStackPushFlag(VM *vm, FieldScriptEnv *env) {
     EventWork *eventWork = GameData_GetEventWork(FieldScriptEnv_GetGameData(env));
     u16 flag = ScriptReadAny(vm, env);
 
@@ -1030,7 +1030,7 @@ BOOL s0010_VMStackPushFlag(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0011_VMStackCmp(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMStackCmp(VM *vm, FieldScriptEnv *env) {
     u32 right = VM_StackPop(vm);
     u32 left = VM_StackPop(vm);
     u16 comparison = VM_Read16(vm);
@@ -1069,7 +1069,7 @@ BOOL s0011_VMStackCmp(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s001B_RTCallGlobalAsync(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_RTCallGlobalAsync(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     u16 scriptId;
     u16 zoneId;
@@ -1096,7 +1096,7 @@ BOOL ScriptNative_WaitFinishSubScript(VM *vm, void *data) {
     return FALSE;
 }
 
-BOOL s001C_RTCallGlobal(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_RTCallGlobal(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     ScriptWork *work;
     u16 scriptId;
@@ -1120,20 +1120,20 @@ BOOL s001C_RTCallGlobal(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s001D_RTEndGlobal(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_RTEndGlobal(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     VM_Halt(vm);
     return TRUE;
 }
 
-BOOL s001E_VMJump(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMJump(VM *vm, FieldScriptEnv *env) {
     s32 offset = VM_Read32(vm);
 
     VM_Jump(vm, vm->pc + offset);
     return FALSE;
 }
 
-BOOL s001F_VMJumpIf(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMJumpIf(VM *vm, FieldScriptEnv *env) {
     u8 condition = VM_Read8(vm);
     s32 offset = VM_Read32(vm);
 
@@ -1147,7 +1147,7 @@ BOOL s001F_VMJumpIf(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0020_VMCallIf(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_VMCallIf(VM *vm, FieldScriptEnv *env) {
     u8 condition = VM_Read8(vm);
     s32 offset = VM_Read32(vm);
 
@@ -1157,7 +1157,7 @@ BOOL s0020_VMCallIf(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0021_RTReserveScript(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_RTReserveScript(VM *vm, FieldScriptEnv *env) {
     u16 scriptId = VM_Read16(vm);
     FieldStatus *status = GameData_GetFieldStatus(FieldScriptEnv_GetGameData(env));
 
@@ -1165,7 +1165,7 @@ BOOL s0021_RTReserveScript(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0022_FieldGetContinueFlag(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_FieldGetContinueFlag(VM *vm, FieldScriptEnv *env) {
     u16 *value = ScriptReadVar(vm, env);
     FieldStatus *status = GameData_GetFieldStatus(FieldScriptEnv_GetGameData(env));
 
@@ -1173,7 +1173,7 @@ BOOL s0022_FieldGetContinueFlag(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0023_FlagSet(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_FlagSet(VM *vm, FieldScriptEnv *env) {
     EventWork *eventWork = GameData_GetEventWork(FieldScriptEnv_GetGameData(env));
     u16 flag = ScriptReadAny(vm, env);
 
@@ -1181,7 +1181,7 @@ BOOL s0023_FlagSet(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0024_FlagReset(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_FlagReset(VM *vm, FieldScriptEnv *env) {
     EventWork *eventWork = GameData_GetEventWork(FieldScriptEnv_GetGameData(env));
     u16 flag = ScriptReadAny(vm, env);
 
@@ -1189,7 +1189,7 @@ BOOL s0024_FlagReset(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0025_FlagGet(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_FlagGet(VM *vm, FieldScriptEnv *env) {
     EventWork *eventWork = GameData_GetEventWork(FieldScriptEnv_GetGameData(env));
     u16 flag = ScriptReadAny(vm, env);
     u16 *value = ScriptReadVar(vm, env);
@@ -1198,7 +1198,7 @@ BOOL s0025_FlagGet(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0026_WorkAdd(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_WorkAdd(VM *vm, FieldScriptEnv *env) {
     u16 *value = ScriptReadVar(vm, env);
     u16 operand = ScriptReadAny(vm, env);
 
@@ -1206,7 +1206,7 @@ BOOL s0026_WorkAdd(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0027_WorkSub(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_WorkSub(VM *vm, FieldScriptEnv *env) {
     u16 *value = ScriptReadVar(vm, env);
     u16 operand = ScriptReadAny(vm, env);
 
@@ -1214,7 +1214,7 @@ BOOL s0027_WorkSub(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s002B_WorkMul(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_WorkMul(VM *vm, FieldScriptEnv *env) {
     u16 *value = ScriptReadVar(vm, env);
     u16 operand = ScriptReadAny(vm, env);
 
@@ -1222,7 +1222,7 @@ BOOL s002B_WorkMul(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s002C_WorkDiv(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_WorkDiv(VM *vm, FieldScriptEnv *env) {
     u16 *value = ScriptReadVar(vm, env);
     u16 operand = ScriptReadAny(vm, env);
 
@@ -1230,7 +1230,7 @@ BOOL s002C_WorkDiv(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s002D_WorkMod(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_WorkMod(VM *vm, FieldScriptEnv *env) {
     u16 *value = ScriptReadVar(vm, env);
     u16 operand = ScriptReadAny(vm, env);
 
@@ -1238,7 +1238,7 @@ BOOL s002D_WorkMod(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0012_WorkAnd(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_WorkAnd(VM *vm, FieldScriptEnv *env) {
     u16 *value = ScriptReadVar(vm, env);
     u16 operand = ScriptReadAny(vm, env);
 
@@ -1246,7 +1246,7 @@ BOOL s0012_WorkAnd(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0013_WorkOr(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_WorkOr(VM *vm, FieldScriptEnv *env) {
     u16 *value = ScriptReadVar(vm, env);
     u16 operand = ScriptReadAny(vm, env);
 
@@ -1254,14 +1254,14 @@ BOOL s0013_WorkOr(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0028_WorkSetConst(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_WorkSetConst(VM *vm, FieldScriptEnv *env) {
     u16 *value = ScriptReadVar(vm, env);
 
     *value = VM_Read16(vm);
     return FALSE;
 }
 
-BOOL s0029_WorkGet(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_WorkGet(VM *vm, FieldScriptEnv *env) {
     u16 *dst = ScriptReadVar(vm, env);
     u16 *src = ScriptReadVar(vm, env);
 
@@ -1269,18 +1269,18 @@ BOOL s0029_WorkGet(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s002A_WorkSet(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_WorkSet(VM *vm, FieldScriptEnv *env) {
     u16 *value = ScriptReadVar(vm, env);
 
     *value = ScriptReadAny(vm, env);
     return FALSE;
 }
 
-BOOL s002E_ActorsPauseAll(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_ActorsPauseAll(VM *vm, FieldScriptEnv *env) {
     return PauseEventMModels(vm, env);
 }
 
-BOOL s002F_ActorsUnpauseAll(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_ActorsUnpauseAll(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
@@ -1294,7 +1294,7 @@ BOOL s002F_ActorsUnpauseAll(VM *vm, FieldScriptEnv *env) {
     return wait;
 }
 
-BOOL s0030_FinishAllEvents(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_FinishAllEvents(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameEvent *event;
 
@@ -1311,7 +1311,7 @@ BOOL testAB(VM *vm, void *env) {
     return (GCTX_HIDGetPressedKeys() & 3) != 0;
 }
 
-BOOL s0031_ABKeyWait(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_ABKeyWait(VM *vm, FieldScriptEnv *env) {
     VM_SetNativeCallback(vm, testAB);
     return TRUE;
 }
@@ -1320,7 +1320,7 @@ BOOL ScriptNative_LastKeyWait(VM *vm, void *env) {
     return (GCTX_HIDGetPressedKeys() & 0xf3) != 0;
 }
 
-BOOL s0032_LastKeyWait(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Vm_LastKeyWait(VM *vm, FieldScriptEnv *env) {
     VM_SetNativeCallback(vm, ScriptNative_LastKeyWait);
     return TRUE;
 }

@@ -173,7 +173,7 @@ L_01E7:
     // "[f000]Ā\u0001\u0000 pressed the switch.[f000]븁\u0000\nThe roller coaster's path\nhas been changed!"
     SystemMsg NimbasaCity17_Text_PressedSwitchRollerCoasters, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 Script_6:

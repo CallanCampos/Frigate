@@ -33,7 +33,7 @@ static void WbtStadium_LoadPartySpeciesName(FieldScriptEnv *env, PokeParty *part
     setPartyPokemonSpeciesNameToStrbuf(wordSet, index, PokeParty_GetPkm(party, slot));
 }
 
-BOOL WbtCmd_GetOpponentObjCode(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_GetOpponentObjCode(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = WbtCmd_GetSystem(env);
     u16 *var = ScriptReadVar(vm, env);
 
@@ -41,7 +41,7 @@ BOOL WbtCmd_GetOpponentObjCode(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL WbtCmd_ShowOpponentLine(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_ShowOpponentLine(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     WbtSystem *sys = WbtCmd_GetSystem(env);
     u16 message = ScriptReadAny(vm, env);
@@ -56,7 +56,7 @@ BOOL WbtCmd_ShowOpponentLine(VM *vm, FieldScriptEnv *env) {
     return CallFieldActorMessageDispStrBuf(vm, env, strbuf, value, 0, 0);
 }
 
-BOOL WbtCmd_CallBattle(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_CallBattle(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
@@ -69,7 +69,7 @@ BOOL WbtCmd_CallBattle(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL WbtCmd_ShowOpponentLine7(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_ShowOpponentLine7(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     StrBuf *strbuf = ScriptWork_GetMainStrBuf(work);
     u16 value = ScriptReadAny(vm, env);
@@ -84,7 +84,7 @@ BOOL WbtCmd_ShowOpponentLine7(VM *vm, FieldScriptEnv *env) {
 }
 
 // Puts the opponent's name in a word of the script's WordSet
-BOOL WbtCmd_WordSetOpponentName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_WordSetOpponentName(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     WbtSystem *sys = WbtCmd_GetSystem(env);
@@ -98,7 +98,7 @@ BOOL WbtCmd_WordSetOpponentName(VM *vm, FieldScriptEnv *env) {
 }
 
 // Makes the opponent's party
-BOOL WbtCmd_MakeOpponentParty(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_MakeOpponentParty(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     WbtSystem *sys = WbtCmd_GetSystem(env);
     WbtEntrant *opponent = WbtBattle_GetOpponent(sys);
@@ -115,7 +115,7 @@ BOOL WbtCmd_MakeOpponentParty(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL WbtCmd_GetRoundRemaining(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_GetRoundRemaining(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = WbtCmd_GetSystem(env);
     u16 round = WbtSystem_GetRound(sys);
     u16 *var = ScriptReadVar(vm, env);
@@ -128,7 +128,7 @@ BOOL WbtCmd_GetRoundRemaining(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL WbtCmd_ShowPartyList(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_ShowPartyList(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = WbtCmd_GetSystem(env);
     WbtPartyList *work = WbtBattle_CreatePartyList(env, sys);
 
@@ -137,7 +137,7 @@ BOOL WbtCmd_ShowPartyList(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL WbtCmd_ClosePartyList(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_ClosePartyList(VM *vm, FieldScriptEnv *env) {
     WbtPartyList *work = WbtSystem_GetPartyList(WbtCmd_GetSystem(env));
 
     WbtBattle_ClosePartyList(work);
@@ -145,19 +145,19 @@ BOOL WbtCmd_ClosePartyList(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL WbtCmd_ResetPicks(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_ResetPicks(VM *vm, FieldScriptEnv *env) {
     WbtBattle_ResetPicks(WbtCmd_GetSystem(env));
     return FALSE;
 }
 
-BOOL WbtCmd_RandomPick(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_RandomPick(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = WbtCmd_GetSystem(env);
 
     WbtBattle_RandomPick(sys, ScriptReadAny(vm, env));
     return FALSE;
 }
 
-BOOL WbtCmd_SetPick(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_SetPick(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = WbtCmd_GetSystem(env);
     u16 index = ScriptReadAny(vm, env);
 
@@ -166,7 +166,7 @@ BOOL WbtCmd_SetPick(VM *vm, FieldScriptEnv *env) {
 }
 
 // Puts the species of one of the Pokémon that WbtBattle_GetPick picks in a word of the script's WordSet
-BOOL WbtCmd_WordSetPickSpecies(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_WordSetPickSpecies(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = WbtCmd_GetSystem(env);
     u8 index = VM_Read8(vm);
     u16 which = ScriptReadAny(vm, env);
@@ -183,7 +183,7 @@ BOOL WbtCmd_WordSetPickSpecies(VM *vm, FieldScriptEnv *env) {
 }
 
 // Adds each Pokémon of the party to the list menu
-BOOL WbtCmd_ListPartyPokemon(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_ListPartyPokemon(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = WbtCmd_GetSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     StrBuf *strbuf = ScriptWork_GetMainStrBuf(work);
@@ -209,16 +209,16 @@ BOOL WbtCmd_ListPartyPokemon(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL WbtCmd_Dummy(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_Dummy(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL WbtCmd_SwapPickedPokemon(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_SwapPickedPokemon(VM *vm, FieldScriptEnv *env) {
     WbtBattle_SwapPickedPokemon(WbtCmd_GetSystem(env));
     return FALSE;
 }
 
-BOOL WbtCmd_SetNamePlates(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_SetNamePlates(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     GameData *gameData;
     HeapID heapId;
@@ -285,7 +285,7 @@ BOOL WbtCmd_SetNamePlates(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL WbtCmd_ShowPortraits(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_ShowPortraits(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field;
     u8 value;
@@ -299,7 +299,7 @@ BOOL WbtCmd_ShowPortraits(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL WbtCmd_LoadPortraitScene(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_LoadPortraitScene(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     u8 a1 = ScriptReadAny(vm, env);
     u8 a2 = ScriptReadAny(vm, env);
@@ -311,12 +311,12 @@ BOOL WbtCmd_LoadPortraitScene(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL WbtCmd_PlayStadiumIntro(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_PlayStadiumIntro(VM *vm, FieldScriptEnv *env) {
     WbtStadiumGimmick_PlayIntro(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
     return FALSE;
 }
 
-BOOL WbtCmd_SwitchLights(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_SwitchLights(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     u8 a1 = ScriptReadAny(vm, env);
     u8 a2 = ScriptReadAny(vm, env);
@@ -325,7 +325,7 @@ BOOL WbtCmd_SwitchLights(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL WbtCmd_PlayCrowd(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WbtStadium_PlayCrowd(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     u8 value = ScriptReadAny(vm, env);
 

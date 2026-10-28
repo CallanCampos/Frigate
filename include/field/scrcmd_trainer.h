@@ -8,22 +8,22 @@
 #include "struct_decls.h"
 #include "system/vm.h"
 
-BOOL s0080_TrainerEyeEventInit(VM *vm, FieldScriptEnv *env);
-BOOL s0081_TrainerEyeEventStart(VM *vm, FieldScriptEnv *env);
-BOOL s0083_TrainerGetBattleType(VM *vm, FieldScriptEnv *env);
-BOOL s007F_TrainerEyeGetTrainerID(VM *vm, FieldScriptEnv *env);
-BOOL s0082_TrainerGetActorID(VM *vm, FieldScriptEnv *env);
-BOOL s0084_ActorGetTrainerID(VM *vm, FieldScriptEnv *env);
-BOOL s0085_CallTrainerBattle(VM *vm, FieldScriptEnv *env);
-BOOL s0085_CallTrainerMultiBattle(VM *vm, FieldScriptEnv *env);
-BOOL s0088_TrainerGetMessageTypes(VM *vm, FieldScriptEnv *env);
-BOOL s008A_TrainerGetBattleType(VM *vm, FieldScriptEnv *env);
-BOOL s008B_TrainerBGMPlayPush(VM *vm, FieldScriptEnv *env);
-BOOL s008F_TrainerClassBGMPlayPush(VM *vm, FieldScriptEnv *env);
-BOOL s0090_TrainerBGMPlay(VM *vm, FieldScriptEnv *env);
-BOOL s008E_CallTrainerBattleEnd(VM *vm, FieldScriptEnv *env);
-BOOL s0092_TrainerGetFieldAction(VM *vm, FieldScriptEnv *env);
-BOOL s0093_TrainerGetPrizeItem(VM *vm, FieldScriptEnv *env);
-BOOL s0094_CallTradedPokemonBattle(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Trainer_TrainerEyeEventInit(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Trainer_TrainerEyeEventStart(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Trainer_TrainerEyeGetBattleType(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Trainer_TrainerEyeGetTrainerID(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Trainer_TrainerGetActorID(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Trainer_ActorGetTrainerID(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Trainer_CallTrainerBattle(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Trainer_CallTrainerMultiBattle(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Trainer_TrainerGetMessageTypes(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Trainer_TrainerGetBattleType(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Trainer_TrainerBGMPlayPush(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Trainer_TrainerClassBGMPlayPush(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Trainer_TrainerBGMPlay(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Trainer_CallTrainerBattleEnd(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Trainer_TrainerGetFieldAction(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Trainer_TrainerGetPrizeItem(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Trainer_CallTradedPokemonBattle(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_TRAINER_H

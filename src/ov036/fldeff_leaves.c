@@ -168,7 +168,7 @@ static void FldeffLeaves_Draw(FieldEffectTask *task, void *work) {
     FieldG3DObjSystem_DrawObj(leavesTask->objSys, leavesTask->objIdx);
 }
 
-BOOL s02AC_CallLeafPileStuck(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FldeffLeaves_CallLeafPileStuck(VM *vm, FieldScriptEnv *env) {
     ScriptWork *scriptWork = FieldScriptEnv_GetScriptWork(env);
 
     ScriptWork_CallEvent(scriptWork, EventLeafPileStuck_Create(NULL, FieldScriptEnv_GetGameSystem(env)));

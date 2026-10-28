@@ -57,7 +57,7 @@ L_00A8:
     ParentActorMsg MSGFILE_SCRIPT, Global10325_Text_OhWonderfulThenLet, 0, 0
     // "...[f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, Global10325_Text_Empty, 0, 0
-    CountTrainersEvent_StartCountOtherOtIdsTask 0x8021
+    StartCountOtherOtIdsTask 0x8021
     WordSetNumber 0, 0x8021, 2
     VMStackPush 0x8021
     VMStackPushConst 0

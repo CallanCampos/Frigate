@@ -231,7 +231,7 @@ L_02D7:
 
 L_02DC:
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

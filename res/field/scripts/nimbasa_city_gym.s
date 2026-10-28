@@ -266,7 +266,7 @@ L_03DF:
     WordSetPlayerName 0
     // "[f000]Ā\u0001\u0000 received the\nBolt Badge from Elesa![f000]븁\u0000"
     SystemMsg NimbasaCityGym_Text_ReceivedBoltBadgeFrom, 2
-    InfoMsgClose
+    SystemMsgClose
     // "If you have four Badges, including this\nBolt Badge, Pokémon up to Lv. 50,[f000]븀\u0000\nincluding traded Pokémon, will obey you.[f000]븁\u0000\nAlso, here's this move I like.\nFeel free to use it, um, if you want to.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, NimbasaCityGym_Text_IfHaveFourBadges, 4, 2, 0
     ActorMsgClose

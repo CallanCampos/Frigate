@@ -68,7 +68,7 @@ void EncSys_Free(EncountSystem *system) {
     GFL_HeapFree(system);
 }
 
-BOOL EncSys_IsActive(EncountSystem *system, u32 a1) {
+BOOL EncSys_IsActive(EncountSystem *system, u32 unused) {
     if (system == NULL || system->encData == NULL || !system->encData->fishingEnable) {
         return FALSE;
     }

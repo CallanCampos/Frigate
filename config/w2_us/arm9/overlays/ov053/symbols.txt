@@ -1,5 +1,5 @@
-PalParkCmd_CallMbParent kind:function(thumb,size=0x68) addr:0x021e5840
-PalParkCmd_GetInfo kind:function(thumb,size=0x3a) addr:0x021e58a8
+Scrcmd_Palpark_CallMbParent kind:function(thumb,size=0x68) addr:0x021e5840
+Scrcmd_Palpark_GetInfo kind:function(thumb,size=0x3a) addr:0x021e58a8
 PAL_PARK_SCRIPT_COMMANDS kind:data(any) addr:0x021e58e4 ambiguous
 data_ov053_021e58c0 kind:data(any) addr:0x021e5900
 data_ov053_021e58c1 kind:data(any) addr:0x021e5901 ambiguous

@@ -42,7 +42,7 @@ BOOL FieldScriptSubEventFinish_EvCamera(FinishScriptSubEventsWork *work, u32 *st
     return TRUE;
 }
 
-BOOL s013F_EvCameraInit(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Camera_EvCameraInit(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
     FieldCamera *camera = Field_GetCameraSystem(field);
@@ -62,24 +62,24 @@ BOOL s013F_EvCameraInit(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0140_EvCameraEnd(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Camera_EvCameraEnd(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
 
     CloseEventCamera(field, Field_GetCameraSystem(field));
     return FALSE;
 }
 
-BOOL s0141_EvCameraUnbind(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Camera_EvCameraUnbind(VM *vm, FieldScriptEnv *env) {
     FieldCamera_ClearBind(Field_GetCameraSystem(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
     return FALSE;
 }
 
-BOOL s0142_EvCameraRebind(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Camera_EvCameraRebind(VM *vm, FieldScriptEnv *env) {
     FieldCamera_ResetBind(Field_GetCameraSystem(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
     return FALSE;
 }
 
-BOOL s0143_EvCameraMoveTo(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Camera_EvCameraMoveTo(VM *vm, FieldScriptEnv *env) {
     FieldEvCameraAnimationSetup setup;
     FieldCamera *camera = Field_GetCameraSystem(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
 
@@ -99,7 +99,7 @@ BOOL s0143_EvCameraMoveTo(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0146_EvCameraMoveToCommon(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Camera_EvCameraMoveToCommon(VM *vm, FieldScriptEnv *env) {
     FieldEvCameraAnimationSetup setup;
     EvCameraMoveData data;
     FieldCamera *camera = Field_GetCameraSystem(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
@@ -116,7 +116,7 @@ BOOL s0146_EvCameraMoveToCommon(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0144_EvCameraReturn(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Camera_EvCameraReturn(VM *vm, FieldScriptEnv *env) {
     FieldEvCameraAnimationFlags flags;
     FieldCamera *camera = Field_GetCameraSystem(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
     u16 frames = VM_Read16(vm);
@@ -131,14 +131,14 @@ BOOL s0144_EvCameraReturn(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0147_EvCameraMoveToDefault(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Camera_EvCameraMoveToDefault(VM *vm, FieldScriptEnv *env) {
     FieldCamera *camera = Field_GetCameraSystem(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
 
     FieldCameraAnm_SetLoadDefaultsAnimation(camera, VM_Read16(vm));
     return FALSE;
 }
 
-BOOL s0145_EvCameraWait(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Camera_EvCameraWait(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
     ScriptWork_CallEvent(work,
@@ -146,7 +146,7 @@ BOOL s0145_EvCameraWait(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0148_EvCameraShake(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Camera_EvCameraShake(VM *vm, FieldScriptEnv *env) {
     FieldCameraShakeSetup shake;
     u16 amplitudeX = ScriptReadAny(vm, env);
     u16 amplitudeY = ScriptReadAny(vm, env);

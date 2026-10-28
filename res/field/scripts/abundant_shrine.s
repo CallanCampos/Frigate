@@ -298,7 +298,7 @@ Script_4:
     // "It's a small, weathered shrine."
     InfoMsg AbundantShrine_Text_ItsSmallWeatheredShrine, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

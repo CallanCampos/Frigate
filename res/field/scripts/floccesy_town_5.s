@@ -38,7 +38,7 @@ Script_1:
     VMSleep 50
     // "Sensei!\nYou called?[f000]븁\u0000"
     ScreamMsg FloccesyTown5_Text_SenseiCalled, 0
-    InfoMsgClose_0039
+    InfoMsgClose
     ActorCmdExec 0, Movement_0360
     VMSleep 10
     ActorCmdExec 1, Movement_0360

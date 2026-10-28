@@ -57,7 +57,7 @@ L_00DF:
 
 L_00E9:
     MoneyWinDisp 31, 1
-    ListMenu_AnchorTopRight 31, 5, 0, 1, 32808
+    ListMenuAnchorTopRight 31, 5, 0, 1, 32808
     ListMenuAdd 39, 65535, 0
     ListMenuAdd 40, 65535, 1
     ListMenuShow

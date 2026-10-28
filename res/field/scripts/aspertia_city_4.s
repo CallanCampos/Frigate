@@ -170,7 +170,7 @@ Script_4:
     // "It's a map of the Unova region."
     InfoMsg AspertiaCity4_Text_ItsMapUnovaRegion, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

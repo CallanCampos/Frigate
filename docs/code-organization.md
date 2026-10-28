@@ -158,6 +158,9 @@ ds-pokemon-hacking community, revision `4324f73` (2025-07-03). `tools/decomp/imp
 
 Names that swan lacks are ours, and are recorded in `config/names.txt` by module and Black 2 address.
 
+A script command's handler is `Scrcmd_<Group>_<Name>`, swan's `sNNNN_` handlers included (`docs/scripts.md`). The user
+chose this on 2026-10-29.
+
 Every name is English, swan's included: a Japanese word or one of Game Freak's private abbreviations is translated,
 and the header of a file whose swan names were translated says so. The user chose this on 2026-10-28. Well-known
 acronyms such as BGM, SE, HP, PP, TM, HM, NPC, BG and OBJ stay. A name the ROM spells out is in English too: `GFL_ASSERT`

@@ -26,7 +26,7 @@ L_003E:
     VMJumpIf CMP_STACK, L_0139
     // "What do you want to read about?"
     SystemMsg StriatonCity9_Text_WhatWantReadAbout, 2
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32803
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32803
     ListMenuAdd 51, 65535, 0
     ListMenuAdd 52, 65535, 1
     ListMenuAdd 53, 65535, 2
@@ -85,7 +85,7 @@ L_0133:
     VMJump L_003E
 
 L_0139:
-    InfoMsgClose
+    SystemMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -150,7 +150,7 @@ L_01D7:
     MsgWaitAdvance
     // "First, I'd like some advice about items.[f000]븁\u0000\nI want to use Trick or Switcheroo\nto give an item to a Pokémon that[f000]븀\u0000\nhas the Levitate Ability so I can[f000]븀\u0000\nhit it with Ground-type moves![f000]븁\u0000\nAfter considering which item to give,\nI thought the Iron Ball might work.[f000]븀\u0000\nI'm not sure, though...[f000]븁\u0000\nWhat do you think?\nIs the Iron Ball a good idea?"
     ActorMsg MSGFILE_SCRIPT, StriatonCity9_Text_FirstIdLikeSome, 0, 2, 0
-    ListMenu_AnchorTopRight 31, 5, 0, 1, 32800
+    ListMenuAnchorTopRight 31, 5, 0, 1, 32800
     ListMenuAdd 4, 65535, 0
     ListMenuAdd 5, 65535, 1
     ListMenuAdd 6, 65535, 2
@@ -196,7 +196,7 @@ L_02BF:
     VMJumpIf CMP_STACK, L_03A4
     // "I'd like to get your advice on moves.[f000]븁\u0000\nIf I use a certain move on a Pokémon\nwith the Levitate Ability, and then[f000]븀\u0000\nuse a Ground-type move on it,[f000]븀\u0000\nI think that could work.[f000]븁\u0000\nWhich move should I choose:\nSmack Down, Gravity, or Gastro Acid?"
     ActorMsg MSGFILE_SCRIPT, StriatonCity9_Text_IdLikeGetAdvice, 0, 2, 0
-    ListMenu_AnchorTopRight 31, 5, 0, 1, 32800
+    ListMenuAnchorTopRight 31, 5, 0, 1, 32800
     ListMenuAdd 10, 65535, 0
     ListMenuAdd 11, 65535, 1
     ListMenuAdd 12, 65535, 2
@@ -250,7 +250,7 @@ L_03A4:
     VMJumpIf CMP_STACK, L_0495
     // "Finally, I'd like a little advice\nabout Abilities.[f000]븁\u0000\nApparently, some Abilities will let you\nhit Pokémon that have Levitate[f000]븀\u0000\nwith Ground-type moves![f000]븁\u0000\nBut...\nI'm not sure which one to use![f000]븁\u0000\nMold Breaker, Teravolt, and Turboblaze\nall seem like good choices...[f000]븁\u0000\nI'm close, but I can't decide.[f000]븁\u0000\nHey! Please decide for me!"
     ActorMsg MSGFILE_SCRIPT, StriatonCity9_Text_FinallyIdLikeLittle, 0, 2, 0
-    ListMenu_AnchorTopRight 31, 5, 0, 1, 32800
+    ListMenuAnchorTopRight 31, 5, 0, 1, 32800
     ListMenuAdd 17, 65535, 0
     ListMenuAdd 18, 65535, 1
     ListMenuAdd 19, 65535, 2
@@ -453,7 +453,7 @@ Script_6:
     VMJumpIf CMP_STACK, L_084E
     // "So here is the question:[f000]븁\u0000\nWhich of the following Berries\ncures confusion?"
     ActorMsg MSGFILE_SCRIPT, StriatonCity9_Text_HereQuestionWhichFollowing, 4, 2, 0
-    ListMenu_AnchorTopRight 31, 5, 0, 1, 32800
+    ListMenuAnchorTopRight 31, 5, 0, 1, 32800
     ListMenuAdd 32, 65535, 0
     ListMenuAdd 33, 65535, 1
     ListMenuAdd 34, 65535, 2
@@ -502,7 +502,7 @@ L_0749:
     VMJumpIf CMP_STACK, L_0848
     // "OK! The move Swagger raises the target's\nAttack, but it also causes which[f000]븀\u0000\nstatus condition?"
     ActorMsg MSGFILE_SCRIPT, StriatonCity9_Text_OkMoveSwaggerRaises, 4, 2, 0
-    ListMenu_AnchorTopRight 31, 5, 0, 1, 32800
+    ListMenuAnchorTopRight 31, 5, 0, 1, 32800
     ListMenuAdd 37, 65535, 0
     ListMenuAdd 38, 65535, 1
     ListMenuAdd 39, 65535, 2

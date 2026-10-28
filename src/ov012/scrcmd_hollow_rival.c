@@ -9,7 +9,7 @@
 
 #define HOLLOW_COUNT 15
 
-BOOL s0262_HollowRivalSetValue(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_HollowRival_HollowRivalSetValue(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     u16 index = VM_Read16(vm);
     u16 value = VM_Read16(vm);
@@ -18,7 +18,7 @@ BOOL s0262_HollowRivalSetValue(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s02D3_HollowRivalGetValue(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_HollowRival_HollowRivalGetValue(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     u16 index = VM_Read16(vm);
     u16 *result = ScriptReadVar(vm, env);
@@ -27,7 +27,7 @@ BOOL s02D3_HollowRivalGetValue(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0263_HollowRivalSetFlag(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_HollowRival_HollowRivalSetFlag(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     u16 index = VM_Read16(vm);
 
@@ -54,7 +54,7 @@ BOOL func_ov012_0216a748(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0266_HollowRivalGetCounter(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_HollowRival_HollowRivalGetCounter(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     u16 *result = ScriptReadVar(vm, env);
 

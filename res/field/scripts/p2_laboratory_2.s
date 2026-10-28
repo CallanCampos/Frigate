@@ -49,7 +49,7 @@ Script_4:
     // "Battle the Scientist?"
     SystemMsg P2Laboratory2_Text_BattleScientist, 0
     YesNoWin 0x8010
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_020E
     FinishAllEvents
     ActorsUnpauseAll
@@ -241,7 +241,7 @@ Script_2:
     LastKeyWait
 
 L_0398:
-    InfoMsgClose
+    SystemMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

@@ -106,7 +106,7 @@ Script_3:
     // "It looks like you can climb down here![f000]븁\u0000\nWill you return to the lower floor?"
     SystemMsg AbyssalRuins8_Text_LooksLikeCanClimb, 2
     YesNoWin 0x8010
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ

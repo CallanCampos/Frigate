@@ -455,14 +455,14 @@ L_065F:
     // "Latios flew off into\nthe distant sky..."
     SystemMsg Dreamyard_Text_LatiosFlewOffInto, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_0690
 
 L_0686:
     // "Latias flew off into\nthe distant sky..."
     SystemMsg Dreamyard_Text_LatiasFlewOffInto, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
 
 L_0690:
     VMJump L_0696

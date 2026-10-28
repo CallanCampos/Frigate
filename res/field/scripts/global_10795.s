@@ -29,7 +29,7 @@ L_0058:
     // "Look!\nYou've found a narrow path![f000]븁\u0000\nWill you follow it?"
     SystemMsg Global10795_Text_LookYouveFoundNarrow, 2
     YesNoWin 0x8010
-    InfoMsgClose
+    SystemMsgClose
     SEWait
     VMStackPush 0x8010
     VMStackPushConst 0

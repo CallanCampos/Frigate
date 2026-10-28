@@ -45,7 +45,7 @@ L_006F:
     // "It's a challenge rock."
     InfoMsg PinwheelForest_Text_ItsChallengeRock, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
 
 L_0078:
     FinishAllEvents
@@ -92,7 +92,7 @@ L_00AE:
     WordSetPartyPokeName 0, 0x8022
     // "[f000]Ă\u0001\u0000 tried to smash the\nchallenge rock.[f000]븁\u0000\nA piece of the rock broke away![f000]븁\u0000"
     InfoMsg PinwheelForest_Text_TriedSmashChallengeRock, 2
-    InfoMsgClose_0039
+    InfoMsgClose
     VMStackPush 0x8000
     VMStackPush 0x8001
     WorkSet 0x8000, 90
@@ -106,7 +106,7 @@ L_00AE:
     VMJump L_0176
 
 L_0168:
-    InfoMsgClose_0039
+    InfoMsgClose
     WorkSetConst 0x8022, 6
     WorkSetConst 0x8025, 1
 
@@ -133,7 +133,7 @@ L_0194:
     // "It's a challenge rock."
     InfoMsg PinwheelForest_Text_ItsChallengeRock, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
 
 L_01B0:
     VMReturn

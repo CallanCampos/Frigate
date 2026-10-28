@@ -42,7 +42,7 @@ L_0051:
     // "Tornadus and Thundurus have been\nregistered in the Pokédex."
     SystemMsg Route73_Text_TornadusThundurusHaveBeen, 0
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     // "The Pokémon who quieted the others\nis known as Landorus.[f000]븁\u0000\nFeast yer eyes![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Route73_Text_PokemonWhoQuietedOthers, 1, 0, 0
     MsgWinCloseAll
@@ -51,7 +51,7 @@ L_0051:
     // "Landorus has been registered\nin the Pokédex."
     SystemMsg Route73_Text_LandorusHasBeenRegistered, 0
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     FlagSet EVENT_FLAG_0x01e5
 
 L_00D5:

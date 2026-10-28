@@ -122,7 +122,7 @@ L_018A:
 
 L_0196:
     MoneyWinDisp 31, 1
-    ListMenu_AnchorTopRight 31, 5, 0, 1, 32804
+    ListMenuAnchorTopRight 31, 5, 0, 1, 32804
     ListMenuAdd 10, 65535, 0
     ListMenuAdd 11, 65535, 1
     ListMenuAdd 12, 65535, 2
@@ -571,7 +571,7 @@ L_095F:
 
 L_096B:
     MoneyWinDisp 31, 1
-    ListMenu_AnchorTopRight 31, 5, 0, 1, 32804
+    ListMenuAnchorTopRight 31, 5, 0, 1, 32804
     ListMenuAdd 10, 65535, 0
     ListMenuAdd 11, 65535, 1
     ListMenuAdd 12, 65535, 2

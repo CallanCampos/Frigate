@@ -8,7 +8,7 @@
 #include "struct_decls.h"
 #include "system/vm.h"
 
-BOOL s0212_ActorMoveToHeight(VM *vm, FieldScriptEnv *env);
-BOOL s0213_ActorHoldPos(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_ActorMove_ActorMoveToHeight(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_ActorMove_ActorHoldPos(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_ACTOR_MOVE_H

@@ -92,7 +92,7 @@ L_0124:
     ScreamMsg Route11_Text_Kikwaaaa, 1
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     WorkSetConst EVENT_WORK_0x40da, 1
     FinishAllEvents
     ActorsUnpauseAll
@@ -107,7 +107,7 @@ Script_4:
     ScreamMsg Route11_Text_Kikwaaaa, 1
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     VMCall L_017A
     FinishAllEvents
     ActorsUnpauseAll
@@ -174,7 +174,7 @@ L_0241:
     // "Virizion ran off\ndown the road and vanished..."
     SystemMsg Route11_Text_VirizionRanOffDown, 0
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
 
 L_025E:
     VMReturn

@@ -89,7 +89,7 @@ Script_1:
     WordSetPlayerName 0
     // "[f000]Ā\u0001\u0000 received\nthe [f000][ff00]\u0001\u0002[f000]ĵ\u0001\u0001[f000][ff00]\u0001\u0000 Medal![f000]븁\u0000"
     SystemMsg MedalOffice_Text_ReceivedMedal, 2
-    InfoMsgClose
+    SystemMsgClose
     WordSetPlayerName 0
     // "The Medal Rally is far from over![f000]븁\u0000\nKeep up the good work,\nand receive many more Medals![f000]븁\u0000\nSee you!"
     ActorMsg MSGFILE_SCRIPT, MedalOffice_Text_MedalRallyFarFrom, 4, 2, 0
@@ -168,7 +168,7 @@ Script_2:
     WordSetPlayerName 0
     // "[f000]Ā\u0001\u0000 received\nthe [f000][ff00]\u0001\u0002[f000]ĵ\u0001\u0001[f000][ff00]\u0001\u0000 Medal![f000]븁\u0000"
     SystemMsg MedalOffice_Text_ReceivedMedal, 2
-    InfoMsgClose
+    SystemMsgClose
     MultiMsg 37, 9, 8, 1
     VMSleep 10
     MultiMsg 38, 3, 3, 2
@@ -337,7 +337,7 @@ L_053C:
     VMJumpIf CMP_STACK, L_065D
     // "Hi! Is there anything\nyou want to ask me?"
     ActorMsg MSGFILE_SCRIPT, MedalOffice_Text_HiThereAnythingWant, 0, 4, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32804
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32804
     ListMenuAdd 23, 65535, 0
     ListMenuAdd 24, 65535, 1
     ListMenuAdd 25, 65535, 2
@@ -458,7 +458,7 @@ Script_6:
     // "Welcome to the Medal Office."
     InfoMsg MedalOffice_Text_WelcomeMedalOffice, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -476,7 +476,7 @@ Script_7:
     // "It's a graph showing the results\nof the Medal Rally.[f000]븁\u0000\n...[f000]븁\u0000\n[f000]Ā\u0001\u0000\nMedals received: [f000]Ȃ\u0001\u0001.[f000]븀\u0000\n[f000]Ķ\u0001\u0002 Rank[f000]븁\u0000\n..."
     InfoMsg MedalOffice_Text_ItsGraphShowingResults, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     WorkSetConst 0x8027, 0
     WorkSetConst 0x8026, 0
     FinishAllEvents
@@ -489,7 +489,7 @@ Script_8:
     // "Many types of Medals\nare on the wall."
     InfoMsg MedalOffice_Text_ManyTypesMedalsWall, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

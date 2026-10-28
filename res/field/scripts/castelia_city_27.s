@@ -28,7 +28,7 @@ L_004B:
     VMJumpIf CMP_STACK, L_0230
     // "Which Badge do you want to know about?"
     ActorMsg MSGFILE_SCRIPT, CasteliaCity27_Text_WhichBadgeWantKnow, 1, 4, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32800
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32800
     ListMenuAdd 11, 65535, 0
     ListMenuAdd 12, 65535, 1
     ListMenuAdd 13, 65535, 2

@@ -289,7 +289,7 @@ L_0428:
     SystemMsg FloccesyTown_Text_SPokedexUpgraded, 0
     SEWait
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     PokeDexEnableHabitatList
     // "With the Habitat List, you can check\nwhich Pokémon are in the area![f000]븁\u0000\nIt's a mode in the Pokédex![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, FloccesyTown_Text_HabitatListCanCheck, 251, 0, 0

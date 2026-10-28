@@ -8,6 +8,6 @@
 #include "struct_decls.h"
 #include "system/vm.h"
 
-BOOL s0137_SaveDataWrite(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Save_SaveDataWrite(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_SAVE_H

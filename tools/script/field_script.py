@@ -72,15 +72,11 @@ ENDS = {"VMHalt", "VMReturn", "VMJump", "RTEndGlobal"}
 
 
 # Names for commands that swan does not name, where the function the handler calls tells what it does
+# A script command's handler, Scrcmd_<Group>_<Name>: <Group> is its scrcmd_<group>.c file
+HANDLER_PREFIX = re.compile(r"^Scrcmd_[A-Za-z0-9]+_")
+
 COMMAND_NAMES = {
     0x172: "IsFestMissionAvailable",      # isFesMissionAvailable
-    0x216: "IsOneShotDRObtained",         # isOneShotDRObtained
-    0x2F1: "SetOneShotDRObtained",        # setOneShotDRObtained
-    0x2F2: "IsOneShotDRObtained",         # isOneShotDRObtained
-    0x233: "UnityTowerGetVisitorCountry",  # UnityTowerVisitor_GetCountry
-    0x2D9: "UnityTowerGetVisitorParam",   # UnityTower_GetVisitorParam
-    0x23A: "PokeVoicePlay",               # starts the event of EventPokeVoicePlay_Callback
-    0x22D: "FieldEffect",                 # EventFieldEffect_Create
 }
 
 
@@ -110,19 +106,18 @@ def load_commands() -> tuple[dict[int, Command], dict[int, dict[int, Command]], 
     base = {}
     for cmd, entry in sorted(table["commands"].items(), key=lambda x: int(x[0])):
         cmd = int(cmd)
-        name = re.sub(r"^s[0-9A-F]{4}_", "", entry["handler"])
-        if cmd in COMMAND_NAMES:
-            name = COMMAND_NAMES[cmd]
-        elif name.startswith("func_"):
-            name = f"{entry.get('area', '')}Cmd_{cmd:04X}"
+        # A handler is Scrcmd_<Group>_<Name>, and the command is its <Name>
+        name = HANDLER_PREFIX.sub("", entry["handler"])
+        if name.startswith("func_"):
+            name = COMMAND_NAMES.get(cmd, f"{entry.get('area', '')}Cmd_{cmd:04X}")
         names[name] += 1
         if names[name] > 1:
             name = f"{name}_{cmd:04X}"
         base[cmd] = Command(cmd, name, entry)
     # Each plugin's commands, by the overlay swapped in ("" for none). A command is named after its handler once the
-    # handler has a name; plugins that share a handler share the command
+    # handler has a name, as a base command is; plugins that share a handler share the command
     def plugin_name(entry: dict, fallback: str) -> str:
-        return fallback if entry["handler"].startswith("func_") else entry["handler"]
+        return fallback if entry["handler"].startswith("func_") else HANDLER_PREFIX.sub("", entry["handler"])
 
     plugins, zones = {}, {}
     for number, plugin in table["plugins"].items():
@@ -134,6 +129,19 @@ def load_commands() -> tuple[dict[int, Command], dict[int, dict[int, Command]], 
                 int(cmd): Command(int(cmd), plugin_name(entry, f"Plugin{number}Ov{overlay}_Cmd{int(cmd)}"), entry)
                 for cmd, entry in commands.items()}
         zones[number] = plugin["zones"]
+    # A name that another command already has takes the handler's group too (Resort_StartTalk)
+    handlers_of = collections.defaultdict(set)
+    for variants in plugins.values():
+        for commands in variants.values():
+            for command in commands.values():
+                handlers_of[command.name].add(command.handler)
+    base_names = {command.name for command in base.values()}
+    for variants in plugins.values():
+        for commands in variants.values():
+            for command in commands.values():
+                group = re.match(r"Scrcmd_([A-Za-z0-9]+)_", command.handler)
+                if group and (command.name in base_names or len(handlers_of[command.name]) > 1):
+                    command.name = f"{group.group(1)}_{command.name}"
     # A handler that serves two commands of a plugin would name both, so each takes its number
     numbers = collections.defaultdict(set)
     for variants in plugins.values():

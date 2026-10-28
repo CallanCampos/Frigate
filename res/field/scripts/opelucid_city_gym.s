@@ -375,7 +375,7 @@ L_04BF:
     InfoMsg OpelucidCityGym_Text_HowLikeTheseDragon, 2
     VMCall L_05A6
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     VMStackPush 0x8021
     VMStackPushConst 25
     VMStackCmp CMP_NE
@@ -511,7 +511,7 @@ L_06B7:
     WordSetPlayerName 0
     // "[f000]Ā\u0001\u0000 received the Legend Badge\nfrom Drayden![f000]븁\u0000"
     SystemMsg OpelucidCityGym_Text_ReceivedLegendBadgeFrom, 0
-    InfoMsgClose
+    SystemMsgClose
     // "Well, now. You've obtained seven of\nthe Gym Badges in Unova.[f000]븁\u0000\nThat means Pokémon up to Lv. 80,\nincluding those received in trades,[f000]븀\u0000\nwill follow your commands obediently.[f000]븁\u0000\nI also want you to have this.\nIt's a TM I'm particularly fond of.[f000]븁\u0000\nIt's called Dragon Tail.[f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, OpelucidCityGym_Text_WellNowYouveObtained, 0, 0
     ActorMsgClose
@@ -586,7 +586,7 @@ L_07B1:
 
 L_07B6:
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

@@ -11,7 +11,7 @@ Script_1:
     // "[f000]ă\u0001\u0000 checked the PC screen.[f000]븁\u0000\nAdventure Rule No. 1\nThe X Button opens the menu![f000]븁\u0000\nAdventure Rule No. 2\nRecord your progress with SAVE.[f000]븁\u0000\nThere is nothing else on here..."
     SystemMsg NuvemaTown7_Text_CheckedPcScreenAdventure, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

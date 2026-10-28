@@ -8,11 +8,11 @@
 #include "struct_decls.h"
 #include "system/vm.h"
 
-BOOL s02B2_MemoryLinkCheckFlag(VM *vm, FieldScriptEnv *env);
-BOOL s02B3_MemoryLinkGetVar(VM *vm, FieldScriptEnv *env);
-BOOL s02B4_MemoryLinkIsPlayerLinked(VM *vm, FieldScriptEnv *env);
-BOOL s02B5_WordSetMemoryLinkPlayerName(VM *vm, FieldScriptEnv *env);
-BOOL s02B6_MemoryLinkCheckMusical(VM *vm, FieldScriptEnv *env);
-BOOL s02B7_MemoryLinkAddMusicalProps(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_DownloadData_MemoryLinkCheckFlag(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_DownloadData_MemoryLinkGetVar(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_DownloadData_MemoryLinkIsPlayerLinked(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_DownloadData_WordSetMemoryLinkPlayerName(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_DownloadData_MemoryLinkCheckMusical(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_DownloadData_MemoryLinkAddMusicalProps(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_DOWNLOAD_DATA_H

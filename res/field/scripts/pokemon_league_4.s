@@ -32,12 +32,12 @@ L_006B:
     SEPlay SEQ_SE_SW_ENDING_02
     SEPlay SEQ_SE_SW_ENDING_03
     FadeExWait
-    Plugin14Cmd_StartLeagueCenterAnimations
+    StartLeagueCenterAnimations
     VMSleep 90
     EvCameraMoveTo 5080, 0, 0xdd000, 0x1f8000, 0x3192ef, 0x78000, 120
-    Plugin14Cmd_FadeOutSeq 2406
-    Plugin14Cmd_FadeOutSeq 2407
-    Plugin14Cmd_FadeOutSeq 2408
+    FadeOutSeq 2406
+    FadeOutSeq 2407
+    FadeOutSeq 2408
     EvCameraWait
     ActorCmdExec 255, Movement_0294
     ActorCmdWait

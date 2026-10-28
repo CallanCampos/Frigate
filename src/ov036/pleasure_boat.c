@@ -104,10 +104,10 @@ u32 PleasureBoat_GetInfo(PleasureBoat *boat, u32 info) {
     case PLEASURE_BOAT_INFO_PORT_PEOPLE:
         value = boat->infoCounts[1];
         break;
-    case PLEASURE_BOAT_INFO_UNK_2:
+    case PLEASURE_BOAT_INFO_OTHER_DOOR_TRAINERS:
         value = boat->infoCounts[2];
         break;
-    case PLEASURE_BOAT_INFO_UNK_3:
+    case PLEASURE_BOAT_INFO_BLUE_DOOR_TRAINERS:
         value = boat->infoCounts[3];
         break;
     case PLEASURE_BOAT_INFO_TRAINERS:

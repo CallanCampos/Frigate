@@ -213,7 +213,7 @@ L_02E8:
     PVPlay 644, 0
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     VMJump L_0371
 
 L_0360:
@@ -222,7 +222,7 @@ L_0360:
     PVPlay 643, 0
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
 
 L_0371:
     ActorCmdExec 0, Movement_0A90
@@ -374,7 +374,7 @@ Script_6:
     ScreamMsg NsCastle5_Text_Shaaaaaak, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     VMJump L_0577
 
 L_0566:
@@ -383,7 +383,7 @@ L_0566:
     ScreamMsg NsCastle5_Text_Baaaaaaaahn, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
 
 L_0577:
     FinishAllEvents
@@ -411,7 +411,7 @@ L_057D:
     ScreamMsg NsCastle5_Text_Bazzazzazzash, 1
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     CallTrainerBattle TRAINER_N, 0, 0
     VMJump L_05FD
 
@@ -421,7 +421,7 @@ L_05E4:
     ScreamMsg NsCastle5_Text_Preeeeaah, 1
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     CallTrainerBattle TRAINER_N_2, 0, 0
 
 L_05FD:

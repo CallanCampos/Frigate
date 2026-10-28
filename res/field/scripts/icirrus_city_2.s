@@ -314,7 +314,7 @@ Script_3:
     // "Former Icirrus City\nPokémon Gym"
     InfoMsg IcirrusCity2_Text_FormerIcirrusCityPokemon, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

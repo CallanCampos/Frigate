@@ -240,7 +240,7 @@ L_02A1:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_03E8
-    InfoMsgClose
+    SystemMsgClose
     ActorCmdExec 251, Movement_0E00
     VMSleep 8
     ActorCmdExec 255, Movement_0E08
@@ -254,7 +254,7 @@ L_02A1:
     VMJump L_03EA
 
 L_03E8:
-    InfoMsgClose
+    SystemMsgClose
 
 L_03EA:
     HiddenHollowSet 1, 0, 0, 0

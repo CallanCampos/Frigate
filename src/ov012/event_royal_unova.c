@@ -85,7 +85,7 @@ static void PleasureBoat_SetClock(PleasureBoat *boat, u32 clock) {
     }
 }
 
-BOOL s01A1_PleasureBoatGetRoomInfo(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_RoyalUnova_PleasureBoatGetRoomInfo(VM *vm, FieldScriptEnv *env) {
     PleasureBoat **boat;
     u16 room;
     u16 kind;
@@ -125,7 +125,7 @@ BOOL s01A1_PleasureBoatGetRoomInfo(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01A2_CallRoyalUnovaView(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_RoyalUnova_CallRoyalUnovaView(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     PleasureBoat **boat = GameData_GetPleasureBoatPtr(GSYS_GetGameData(gsys));

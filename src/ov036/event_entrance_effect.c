@@ -158,7 +158,7 @@ static void EntranceEffect_SetArrivalSteps(EntranceEffectWork *work) {
             work->steps[9] = ARRIVAL_STEP_END;
             break;
         }
-    } else if (CityState_IsSlotIndexOutOfRange(warp->transitionType)) {
+    } else if (IsEntranceCameraTransition(warp->transitionType)) {
         work->steps[0] = ARRIVAL_STEP_START;
         work->steps[1] = ARRIVAL_STEP_TRANSITION;
         work->steps[2] = ARRIVAL_STEP_2;
@@ -304,7 +304,7 @@ GameEvent *EntranceEffect_CreateB(WarpSequence *warp) {
     EntranceEffect_GetFrontPosition(warp->field, &work->pos);
     EntranceEffect_CreateDoorHandle(work);
     EntranceEffect_SetDepartureSteps(work);
-    if (CityState_IsSlotIndexOutOfRange(warp->departureTransitionType)) {
+    if (IsEntranceCameraTransition(warp->departureTransitionType)) {
         work->continueDirect = TRUE;
     } else {
         work->continueDirect = FALSE;

@@ -12,7 +12,7 @@ Script_1:
     ScreamMsg RelicCastle23_Text_Vraahhbrbrbr, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     VMStackPushFlag EVENT_FLAG_0x0194
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -59,7 +59,7 @@ L_00B4:
     // "Volcarona quietly flew away..."
     SystemMsg RelicCastle23_Text_VolcaronaQuietlyFlewAway, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_00C4
 
 L_00C4:

@@ -11,7 +11,7 @@ Script_1:
     // "It's impossible to tell\nwhen this portrait was painted..."
     InfoMsg StrangeHouse_Text_ItsImpossibleTellWhen, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -22,7 +22,7 @@ Script_2:
     // "If you look at it closely, you can see\nit's covered in scratches."
     InfoMsg StrangeHouse_Text_IfLookCloselyCan, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

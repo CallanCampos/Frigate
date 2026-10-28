@@ -37,6 +37,6 @@ void GimmickGate_Update(Field *field);
 u32 GimmickGate_GetDirection(Field *field);
 
 // Script command 0x17a: plays a sound and runs the news board's event for as long as the script says
-BOOL GimmickGateCmd_ViewBoard(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_FieldGimmickGate_GimmickGateViewBoard(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_FIELD_GIMMICK_GATE_H

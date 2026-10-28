@@ -119,14 +119,14 @@ L_0143:
     ActorCmdWait
     // "Kyurem!\nGlaciate![f000]븁\u0000"
     ScreamMsg GiantChasm6_Text_KyuremGlaciate, 1
-    InfoMsgClose_0039
+    InfoMsgClose
     PVPlay 646, 0
     // "Haahraa!"
     ScreamMsg GiantChasm6_Text_Haahraa, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
-    Plugin14Cmd_PlayGC6Model 0
+    InfoMsgClose
+    PlayGC6Model 0
     VMSleep 300
     EvCameraMoveTo 9688, 0, 0xed000, 0xf8000, 0, 0x13d000, 40
     VMSleep 200
@@ -149,8 +149,8 @@ L_025D:
 
 L_0262:
     VMSleep 60
-    InfoMsgClose_0039
-    Plugin14Cmd_ShowGC6Model 1
+    InfoMsgClose
+    ShowGC6Model 1
     CallFieldFadeIn 2, 0
     VMStackPush 0x8020
     VMStackPushConst 23
@@ -163,7 +163,7 @@ L_028F:
     PlayFieldEffect 108
 
 L_0293:
-    Plugin14Cmd_PlayGC6Model 1
+    PlayGC6Model 1
     VMSleep 50
     EvCameraMoveTo 9688, 0, 0xed000, 0xf8000, 0, 0x108000, 20
     EvCameraWait
@@ -173,7 +173,7 @@ L_0293:
     BGMPlay SEQ_BGM_EV_GIANTHOLE_01
     FlagSet EVENT_FLAG_0x09fc
     BGMAmbienceResume
-    Plugin14Cmd_PlayGC6Model23 1
+    PlayGC6Model23 1
     VMSleep 100
     FadeOutBlack
     FadeWait
@@ -192,14 +192,14 @@ L_0293:
     VMStackPushConst 23
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0348
-    Plugin14Cmd_ShiftActor 3, 0, 9
+    ShiftActor 3, 0, 9
     VMJump L_0350
 
 L_0348:
-    Plugin14Cmd_ShiftActor 3, 0, 9
+    ShiftActor 3, 0, 9
 
 L_0350:
-    Plugin14Cmd_ShiftActor 4, 4, 0
+    ShiftActor 4, 4, 0
     FadeInBlackQ
     FadeWait
     FlagSet EVENT_FLAG_0x09fb
@@ -218,7 +218,7 @@ L_0350:
     ScreamMsg GiantChasm6_Text_Bazzazzazzash, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     VMJump L_03B3
 
 L_03A2:
@@ -227,7 +227,7 @@ L_03A2:
     ScreamMsg GiantChasm6_Text_Preeeeaah, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
 
 L_03B3:
     // "Ghetsis: Excellent!\nThat was a moving expression[f000]븀\u0000\nof your determination![f000]븁\u0000\nSo the education I provided\nto make you king wasn't[f000]븀\u0000\na complete waste, then![f000]븁\u0000"
@@ -306,7 +306,7 @@ L_04C5:
     ActorSetGPos 0, 17, 0, 16, 1
     ActorSetGPos 2, 15, 0, 16, 1
     ActorSetGPos 4, 17, 0, 19, 2
-    Plugin14Cmd_ShiftActor 4, 65532, 0
+    ShiftActor 4, 65532, 0
     VMStackPush 0x8020
     VMStackPushConst 23
     VMStackCmp CMP_EQ
@@ -318,8 +318,8 @@ L_0536:
     ActorNew 15, 18, 1, 251, 144, 0
 
 L_0544:
-    Plugin14Cmd_ShiftActor 251, 0, 8
-    Plugin14Cmd_StartActorHover 251
+    ShiftActor 251, 0, 8
+    StartActorHover 251
     FadeInBlackQ
     BGMPop 0, 60
     FadeWait
@@ -446,13 +446,13 @@ L_0710:
 L_071B:
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     PVPlay 646, 0
     // "Haaahraaan!"
     ScreamMsg GiantChasm6_Text_Haaahraaan_2, 5
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     VMStackPush 0x8020
     VMStackPushConst 23
     VMStackCmp CMP_EQ
@@ -467,7 +467,7 @@ L_0750:
 
 L_0755:
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     CallFieldFadeIn 1, 0
     ActorCmdExec 255, Movement_1190
     ActorCmdWait
@@ -725,11 +725,11 @@ L_0AE3:
     ActorDelete 3
     ActorSetGPos 255, 17, 0, 18, 2
     FadeEx 3, 16, 0, 4
-    Plugin14Cmd_PlayGC6Model23 0
+    PlayGC6Model23 0
     VMSleep 10
     FadeExWait
     VMSleep 160
-    Plugin14Cmd_HideGC6Model3
+    HideGC6Model3
     FlagReset EVENT_FLAG_0x09fb
     FlagReset EVENT_FLAG_0x0407
     ActorAdd 11
@@ -892,7 +892,7 @@ L_0D29:
     PVPlay 646, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     CallWildBattleEx 646, 55, 2, 0x8024
     VMJump L_0DCA
 
@@ -904,7 +904,7 @@ L_0DA5:
     PVPlay 646, 1
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     CallWildBattleEx 646, 55, 1, 0x8024
 
 L_0DCA:
@@ -935,7 +935,7 @@ L_0DCA:
     ActorSetGPos 0, 17, 0, 16, 2
     ActorCmdExec 4, Movement_1158
     ActorCmdWait
-    Plugin14Cmd_ResetLCDToBlack
+    ResetLCDToBlack
     VMJump L_0E87
 
 L_0E58:
@@ -1028,7 +1028,7 @@ Script_9:
     ScreamMsg GiantChasm6_Text_Haaahraaan_3, 1
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     CallWildBattle 646, 70, 1
     WildBattleIsVictory 0x8010
     VMStackPush 0x8010
@@ -1080,7 +1080,7 @@ L_0FFC:
     // "Kyurem vanished into the darkness\nof the cave..."
     SystemMsg GiantChasm6_Text_KyuremVanishedIntoDarkness, 0
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_100C
 
 L_100C:

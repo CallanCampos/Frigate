@@ -81,7 +81,7 @@ static GameEvent *ScrcmdMsgwin_CreateYesNoEvent(GameSystem *gsys, FieldScriptEnv
     return event;
 }
 
-BOOL s0047_YesNoWin(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Menu_YesNoWin(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
@@ -126,7 +126,7 @@ static GameEvent *CreateListMenuCallEvent(GameSystem *gsys, FieldScriptEnv *env,
     return event;
 }
 
-BOOL s00AD_ListMenuInitCommon(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Menu_ListMenuInitCommon(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u8 x = VM_Read8(vm);
@@ -139,7 +139,7 @@ BOOL s00AD_ListMenuInitCommon(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s00AE_ListMenu_AnchorTopLeft(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Menu_ListMenuAnchorTopLeft(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u8 x = VM_Read8(vm);
@@ -153,7 +153,7 @@ BOOL s00AE_ListMenu_AnchorTopLeft(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s00B2_ListMenu_AnchorTopRight(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Menu_ListMenuAnchorTopRight(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u8 x = VM_Read8(vm);
@@ -167,7 +167,7 @@ BOOL s00B2_ListMenu_AnchorTopRight(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s00AF_ListMenuAdd(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Menu_ListMenuAdd(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 messageId = VM_Read16(vm);
     u16 descriptionId = VM_Read16(vm);
@@ -178,14 +178,14 @@ BOOL s00AF_ListMenuAdd(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00B0_ListMenuShow(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Menu_ListMenuShow(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
     ScriptWork_CallEvent(work, CreateListMenuCallEvent(FieldScriptEnv_GetGameSystem(env), env, FALSE));
     return TRUE;
 }
 
-BOOL s00B1_ListMenuShow2(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Menu_ListMenuShow2(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
     ScriptWork_CallEvent(work, CreateListMenuCallEvent(FieldScriptEnv_GetGameSystem(env), env, FALSE));

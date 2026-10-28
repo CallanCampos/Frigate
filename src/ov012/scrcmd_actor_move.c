@@ -27,7 +27,7 @@ typedef struct {
 static GameEventReturnCode EventActorMoveHeight_Callback(GameEvent *event, u32 *state, void *work);
 static GameEventReturnCode EventActorHold_Callback(GameEvent *event, u32 *state, void *work);
 
-BOOL s0212_ActorMoveToHeight(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_ActorMove_ActorMoveToHeight(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameSystem *gsys;
     u16 actorId;
@@ -71,7 +71,7 @@ static GameEventReturnCode EventActorMoveHeight_Callback(GameEvent *event, u32 *
     return GAMEEVENT_CONTINUE;
 }
 
-BOOL s0213_ActorHoldPos(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_ActorMove_ActorHoldPos(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameSystem *gsys;
     u16 actorId;

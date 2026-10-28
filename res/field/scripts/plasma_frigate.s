@@ -1101,7 +1101,7 @@ Script_24:
     // "Zzz...\nZzz...[f000]븁\u0000\nLooks like he's asleep."
     InfoMsg PlasmaFrigate_Text_ZzzZzzLooksLike, 1
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

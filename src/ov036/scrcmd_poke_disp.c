@@ -2,8 +2,9 @@
 // camera's shake. The ROM has no name for the file; scrcmd_poke_disp.c is descriptive, after its first command. It
 // is a file of its own because overlay 36's .rodata has its 8-byte actor setup after the 62-byte answer list of
 // scrcmd_pep_quiz.c, which one file's size sort can't give. Names from swan
-// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except s0216_CheckBeaconTrainerKey, s022A_TVGenProgramMsgID,
-// s022B_StartSwapNpcEvent and s02C5_JoinAvenueRecordActivity, which are ours
+// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except Scrcmd_PokeDisp_IsOneShotDRObtained,
+// Scrcmd_PokeDisp_TVGenProgramMsgID, Scrcmd_PokeDisp_StartSwapNpcEvent and Scrcmd_PokeDisp_JoinAvenueRecordActivity,
+// which are ours
 #include "types.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
@@ -54,8 +55,8 @@ enum {
     POKE_DISP_STATE_END,
 };
 
-// The TV programs whose messages s022A_TVGenProgramMsgID picks: Interview Unova, or Pokémon Idol Chat for the rest of
-// its rolls; Moves for Living; and the Personality Assessment and Horoscope
+// The TV programs whose messages Scrcmd_PokeDisp_TVGenProgramMsgID picks: Interview Unova, or Pokémon Idol Chat for the
+// rest of its rolls; Moves for Living; and the Personality Assessment and Horoscope
 enum {
     TV_PROGRAM_INTERVIEW,
     TV_PROGRAM_MOVES_FOR_LIVING,
@@ -76,7 +77,7 @@ static void EventFieldPokeDisp_UpdateClAct(EventFieldPokeDisp *data);
 static GameEventReturnCode EventFieldPokeDisp_Callback(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode EventEvCameraShake_Callback(GameEvent *event, u32 *state, void *data);
 
-BOOL s0214_CallPokemonPreview(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokeDisp_CallPokemonPreview(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 species;
     u16 form;
@@ -165,7 +166,7 @@ static GameEventReturnCode EventFieldPokeDisp_Callback(GameEvent *event, u32 *st
     return GAMEEVENT_CONTINUE;
 }
 
-BOOL s0216_CheckBeaconTrainerKey(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokeDisp_IsOneShotDRObtained(VM *vm, FieldScriptEnv *env) {
     u16 flag = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
@@ -175,7 +176,7 @@ BOOL s0216_CheckBeaconTrainerKey(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s019A_CGearControlWarning(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokeDisp_CGearControlWarning(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     HeapID heapId = Field_GetHeapID(fieldWork->field);
     FieldMsgBG *msgBGSys = Field_GetMsgBGSys(fieldWork->field);
@@ -205,7 +206,7 @@ BOOL s019A_CGearControlWarning(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0227_RecordAdd(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokeDisp_RecordAdd(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 id = ScriptReadAny(vm, env);
     u16 value = ScriptReadAny(vm, env);
@@ -214,7 +215,7 @@ BOOL s0227_RecordAdd(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0228_RecordGet(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokeDisp_RecordGet(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 id = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
@@ -223,12 +224,12 @@ BOOL s0228_RecordGet(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s02C5_JoinAvenueRecordActivity(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokeDisp_JoinAvenueRecordActivity(VM *vm, FieldScriptEnv *env) {
     JoinAvenue_RecordActivity(VM_Read16(vm));
     return FALSE;
 }
 
-BOOL s022A_TVGenProgramMsgID(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokeDisp_TVGenProgramMsgID(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
@@ -311,7 +312,7 @@ BOOL s022A_TVGenProgramMsgID(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s02BC_TVCheckCommercial(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokeDisp_TVCheckCommercial(VM *vm, FieldScriptEnv *env) {
     BOOL show = FALSE;
     u16 rare = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
@@ -332,7 +333,7 @@ BOOL s02BC_TVCheckCommercial(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s02BD_TVGenCommercialMsgID(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokeDisp_TVGenCommercialMsgID(VM *vm, FieldScriptEnv *env) {
     u16 *result;
 
     FieldScriptEnv_GetScriptWork(env);
@@ -375,7 +376,7 @@ static GameEventReturnCode EventEvCameraShake_Callback(GameEvent *event, u32 *st
     return GAMEEVENT_CONTINUE;
 }
 
-BOOL s022B_StartSwapNpcEvent(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokeDisp_StartSwapNpcEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 actorId;

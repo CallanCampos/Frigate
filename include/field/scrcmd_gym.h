@@ -7,33 +7,33 @@
 #include "struct_decls.h"
 #include "system/vm.h"
 
-BOOL s025B_GymElecReapplyProgress(VM *vm, FieldScriptEnv *env);
-BOOL s025C_GymElecSetFollower(VM *vm, FieldScriptEnv *env);
-BOOL s025D_GymElecSetProgress(VM *vm, FieldScriptEnv *env);
-BOOL s025F_GymElecSetStage(VM *vm, FieldScriptEnv *env);
-BOOL s0268_GymInsectPlayObject(VM *vm, FieldScriptEnv *env);
-BOOL s0269_GymInsectShowEffect(VM *vm, FieldScriptEnv *env);
-BOOL s018C_DriftveilGymCallElevator(VM *vm, FieldScriptEnv *env);
-BOOL s018D_DriftveilGymCallFreight(VM *vm, FieldScriptEnv *env);
-BOOL s018E_DriftveilLiftCallMove(VM *vm, FieldScriptEnv *env);
-BOOL s0186_DriftveilGymPrepareFreight(VM *vm, FieldScriptEnv *env);
-BOOL s0187_DriftveilLiftPlaceAtBottom(VM *vm, FieldScriptEnv *env);
-BOOL s028E_MistraltonGymFireCannon(VM *vm, FieldScriptEnv *env);
-BOOL s02BB_Gym0601FanAmbienceStart(VM *vm, FieldScriptEnv *env);
-BOOL s018F_IcirrusGymCallSwitchAnim(VM *vm, FieldScriptEnv *env);
-BOOL s0190_IcirrusGymCallFlipSwitch(VM *vm, FieldScriptEnv *env);
-BOOL s0191_IcirrusGymToggleMovementAtPlace(VM *vm, FieldScriptEnv *env);
-BOOL s02A5_OpelucidGymCallMove(VM *vm, FieldScriptEnv *env);
-BOOL s02A7_OpelucidGymCallButton(VM *vm, FieldScriptEnv *env);
-BOOL s02A6_OpelucidGymRefreshVars(VM *vm, FieldScriptEnv *env);
-BOOL s02A8_OpelucidGymFreeHeap(VM *vm, FieldScriptEnv *env);
-BOOL s02A9_OpelucidGymCreateHeap(VM *vm, FieldScriptEnv *env);
-BOOL s0291_VirbankGymStopModelAnimations(VM *vm, FieldScriptEnv *env);
-BOOL s0292_VirbankGymSetActorFlag(VM *vm, FieldScriptEnv *env);
-BOOL s02A2_HumilauGymPlayLeaderSplash(VM *vm, FieldScriptEnv *env);
-BOOL s02A3_HumilauGymPlayLeaderWaves(VM *vm, FieldScriptEnv *env);
-BOOL s017C_RollerCoasterCallSwitch(VM *vm, FieldScriptEnv *env);
-BOOL s017D_RollerCoasterSetCarIntroSeen(VM *vm, FieldScriptEnv *env);
-BOOL s024D_RollerCoasterAmbienceStart(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_GymElecReapplyProgress(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_GymElecSetFollower(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_GymElecSetProgress(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_GymElecSetStage(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_GymInsectPlayObject(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_GymInsectShowEffect(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_DriftveilGymCallElevator(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_DriftveilGymCallFreight(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_DriftveilLiftCallMove(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_DriftveilGymPrepareFreight(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_DriftveilLiftPlaceAtBottom(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_MistraltonGymFireCannon(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_Gym0601FanAmbienceStart(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_IcirrusGymCallSwitchAnim(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_IcirrusGymCallFlipSwitch(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_IcirrusGymToggleMovementAtPlace(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_OpelucidGymCallMove(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_OpelucidGymCallButton(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_OpelucidGymRefreshVars(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_OpelucidGymFreeHeap(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_OpelucidGymCreateHeap(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_VirbankGymStopModelAnimations(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_VirbankGymSetActorFlag(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_HumilauGymPlayLeaderSplash(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_HumilauGymPlayLeaderWaves(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_RollerCoasterCallSwitch(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_RollerCoasterSetCarIntroSeen(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Gym_RollerCoasterAmbienceStart(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_GYM_H

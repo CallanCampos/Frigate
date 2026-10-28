@@ -40,7 +40,8 @@ struct FieldPlayerCore {
     u32 specialSeq;
     FieldEffectTask *terrainEffectTCB;
     u16 modelReadyFrames;
-    u16 unk2E;
+    // How many times the special sequence has changed the player's object code, which nothing reads
+    u16 objCodeChanges;
     s16 seqStep;
     u16 seqDone;
 };
@@ -503,7 +504,7 @@ void FieldPlayerCore_SetSpecialSeq(FieldPlayerCore *core, u32 seq) {
     core->seqStep = 0;
     core->seqDone = 0;
     core->modelReadyFrames = 0;
-    core->unk2E = 0;
+    core->objCodeChanges = 0;
 }
 
 BOOL FieldPlayerCore_StepFormChange(FieldPlayerCore *core) {
@@ -548,7 +549,7 @@ static BOOL FieldPlayerCore_ChangeToFormSlot(FieldPlayerCore *core, u32 forme) {
 
 static BOOL FieldPlayerCore_FinishFormSlotChange(FieldPlayerCore *core, u32 forme) {
     if (FieldPlayerCore_CheckDrawProcReady(core) == TRUE) {
-        core->unk2E++;
+        core->objCodeChanges++;
         FieldPlayerCore_ChangeObjCode(core, FieldPlayer_GetObjCodeByForme(FieldPlayerCore_GetSex(core), forme));
         core->seqDone = 1;
         return TRUE;
@@ -633,7 +634,7 @@ static BOOL FieldPlayerCore_FormStepRestoreModelDone(FieldPlayerCore *core) {
     if (FieldPlayerCore_CheckDrawProcReady(core) == TRUE) {
         u32 exState;
 
-        core->unk2E++;
+        core->objCodeChanges++;
         exState = FieldPlayerCore_GetExState(core);
         FieldPlayerCore_ChangeObjCode(core, FieldPlayer_GetObjCodeByExState(FieldPlayerCore_GetSex(core), exState));
         core->seqDone = 1;

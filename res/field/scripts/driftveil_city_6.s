@@ -370,7 +370,7 @@ L_0598:
     SystemMsg DriftveilCity6_Text_ReceivedZorua, 0
     MEWait
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8021
     VMStackPushConst 6
     VMStackCmp CMP_EQ

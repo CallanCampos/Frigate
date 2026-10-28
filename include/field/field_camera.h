@@ -258,7 +258,7 @@ enum {
 
 // Shakes the camera; the task ends when the shake does
 FieldTask *FieldCameraShakeTask_Create(Field *field, const FieldCameraShakeSetup *setup);
-// The event of s0148_EvCameraShake and the League's lift, which runs the task with no delay
+// The event of Scrcmd_Camera_EvCameraShake and the League's lift, which runs the task with no delay
 GameEvent *EventEvCameraShake_Create(GameSystem *gsys, FieldCameraShakeSetup *setup);
 FieldCamera *FieldCamera_Create(u32 cameraIndex, u32 transformType, G3DCamera *g3dCamera, const VecFx32 *target,
                                 HeapID heapId);

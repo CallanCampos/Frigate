@@ -31,7 +31,7 @@ L_003C:
     VMJumpIf CMP_STACK, L_0136
     // "Which topic would you\nlike me to explain?"
     InfoMsg UnionRoom_Text_WhichTopicWouldLike, 2
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32801
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32801
     ListMenuAdd 41, 65535, 4
     ListMenuAdd 36, 65535, 0
     ListMenuAdd 37, 65535, 1

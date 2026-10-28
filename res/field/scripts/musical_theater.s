@@ -558,7 +558,7 @@ Script_18:
     // "[f000]Ā\u0001\u0000 received\na set of Props![f000]븁\u0000"
     SystemMsg MusicalTheater_Text_ReceivedSetProps, 0
     MEWait
-    InfoMsgClose
+    SystemMsgClose
     // "Mmm, that takes me back!"
     ActorMsg MSGFILE_SCRIPT, MusicalTheater_Text_MmmTakesBack, 11, 0, 0
     MsgWaitAdvance

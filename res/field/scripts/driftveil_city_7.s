@@ -41,7 +41,7 @@ Script_2:
     MoneyWinDisp 31, 1
     // "Welcome! This is straight from the farm![f000]븁\u0000\nMoomoo Milk--one bottle for $500.\nWould you like some for your trip?"
     ActorMsg MSGFILE_SCRIPT, DriftveilCity7_Text_WelcomeStraightFromFarm, 1, 4, 0
-    ListMenu_AnchorTopRight 31, 5, 0, 1, 32801
+    ListMenuAnchorTopRight 31, 5, 0, 1, 32801
     ListMenuAdd 8, 65535, 0
     ListMenuAdd 9, 65535, 1
     ListMenuAdd 10, 65535, 2

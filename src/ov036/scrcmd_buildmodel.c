@@ -25,7 +25,7 @@ static FieldPropSystem *GetScrEnvBMSystem(FieldScriptEnv *env);
 static FieldChunkPropHolder *FieldPropSystem_FindPropAtGPos(FieldPropSystem *system, u32 propId, u16 x, u16 z);
 static BOOL ScriptNative_BMHndAnmWait(VM *vm, void *env);
 
-BOOL s0125_BMPlayHOFMachineSeq(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Buildmodel_BMPlayHOFMachineSeq(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
@@ -33,7 +33,7 @@ BOOL s0125_BMPlayHOFMachineSeq(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s012F_PokecenPlayHealingSequence(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Buildmodel_PokecenPlayHealingSequence(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 ballCount = ScriptReadAny(vm, env);
@@ -43,7 +43,7 @@ BOOL s012F_PokecenPlayHealingSequence(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0130_PokecenPCOpen(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Buildmodel_PokecenPCOpen(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     Field *field = GSYS_GetField(gsys);
@@ -52,7 +52,7 @@ BOOL s0130_PokecenPCOpen(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0131_PokecenPCIdle(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Buildmodel_PokecenPCIdle(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     Field *field = GSYS_GetField(gsys);
@@ -61,7 +61,7 @@ BOOL s0131_PokecenPCIdle(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0132_PokecenPCClose(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Buildmodel_PokecenPCClose(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     Field *field = GSYS_GetField(gsys);
@@ -84,7 +84,7 @@ static FieldChunkPropHolder *FieldPropSystem_FindPropAtGPos(FieldPropSystem *sys
     return FieldPropSystem_FindPropAtPos(system, propId, &pos);
 }
 
-BOOL s012B_BMAnmPlayInv(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Buildmodel_BMAnmPlayInv(VM *vm, FieldScriptEnv *env) {
     u16 propId = ScriptReadAny(vm, env);
     u16 x = ScriptReadAny(vm, env);
     u16 z = ScriptReadAny(vm, env);
@@ -98,7 +98,7 @@ BOOL s012B_BMAnmPlayInv(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s012E_BMAnmPlayLoop(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Buildmodel_BMAnmPlayLoop(VM *vm, FieldScriptEnv *env) {
     u16 propId = ScriptReadAny(vm, env);
     u16 x = ScriptReadAny(vm, env);
     u16 z = ScriptReadAny(vm, env);
@@ -111,7 +111,7 @@ BOOL s012E_BMAnmPlayLoop(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s012D_BMSetVisible(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Buildmodel_BMSetVisible(VM *vm, FieldScriptEnv *env) {
     u16 propId = ScriptReadAny(vm, env);
     u16 x = ScriptReadAny(vm, env);
     u16 z = ScriptReadAny(vm, env);
@@ -124,7 +124,7 @@ BOOL s012D_BMSetVisible(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0126_BMChangeMdlID(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Buildmodel_BMChangeMdlID(VM *vm, FieldScriptEnv *env) {
     u16 propId = ScriptReadAny(vm, env);
     u16 x = ScriptReadAny(vm, env);
     u16 z = ScriptReadAny(vm, env);
@@ -138,7 +138,7 @@ BOOL s0126_BMChangeMdlID(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0127_BMCreateHandleByGPos(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Buildmodel_BMCreateHandleByGPos(VM *vm, FieldScriptEnv *env) {
     VecFx32 pos;
     u16 *result = ScriptReadVar(vm, env);
     u16 propId = ScriptReadAny(vm, env);
@@ -154,7 +154,7 @@ BOOL s0127_BMCreateHandleByGPos(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0128_BMReleaseHandle(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Buildmodel_BMReleaseHandle(VM *vm, FieldScriptEnv *env) {
     u16 id = ScriptReadAny(vm, env);
     FieldPropHandle *handle = FieldPropSystem_FindHandleByID(GetScrEnvBMSystem(env), id);
 
@@ -165,7 +165,7 @@ BOOL s0128_BMReleaseHandle(VM *vm, FieldScriptEnv *env) {
 }
 
 // Play the handle's animation and its sound
-BOOL s0129_BMHndAudioVisualAnmPlay(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Buildmodel_BMHndAudioVisualAnmPlay(VM *vm, FieldScriptEnv *env) {
     u16 soundId;
     u16 id = ScriptReadAny(vm, env);
     u16 animation = ScriptReadAny(vm, env);
@@ -180,7 +180,7 @@ BOOL s0129_BMHndAudioVisualAnmPlay(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0124_BMHndAnmPlay(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Buildmodel_BMHndAnmPlay(VM *vm, FieldScriptEnv *env) {
     u16 id = ScriptReadAny(vm, env);
     u16 animation = ScriptReadAny(vm, env);
     FieldPropHandle *handle = FieldPropSystem_FindHandleByID(GetScrEnvBMSystem(env), id);
@@ -191,7 +191,7 @@ BOOL s0124_BMHndAnmPlay(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s012C_BMHndAnmPause(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Buildmodel_BMHndAnmPause(VM *vm, FieldScriptEnv *env) {
     u16 id = ScriptReadAny(vm, env);
     FieldPropHandle *handle = FieldPropSystem_FindHandleByID(GetScrEnvBMSystem(env), id);
 
@@ -201,7 +201,7 @@ BOOL s012C_BMHndAnmPause(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s012A_BMHndAnmWait(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Buildmodel_BMHndAnmWait(VM *vm, FieldScriptEnv *env) {
     g_ScrBMAnmWaitHandleID = ScriptReadAny(vm, env);
     VM_SetNativeCallback(vm, ScriptNative_BMHndAnmWait);
     return TRUE;

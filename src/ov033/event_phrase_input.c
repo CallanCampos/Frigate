@@ -137,7 +137,7 @@ void EventPhraseInput_StoreResult(struct EventPhraseInputData *data, NameEntryPa
     }
 }
 
-BOOL Scrcmd_CheckWifiListFlags(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PhraseInput_CheckWifiListFlags(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameSystem *gsys;
     GameData *gameData;
@@ -163,7 +163,7 @@ BOOL Scrcmd_CheckWifiListFlags(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL Scrcmd_WifiListOperation(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PhraseInput_WifiListOperation(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameSystem *gsys;
     GameData *gameData;
@@ -218,7 +218,7 @@ BOOL Scrcmd_WifiListOperation(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL Scrcmd_SetWifiFriendNameWord(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PhraseInput_SetWifiFriendNameWord(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameSystem *gsys;
     GameData *gameData;
