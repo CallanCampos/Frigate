@@ -3825,7 +3825,7 @@
    ]
   },
   "505": {
-   "handler": "Scrcmd_CheckPmsWordPair",
+   "handler": "s01F9_CheckPmsWordPair",
    "overlay": 36,
    "args": [
     "any",

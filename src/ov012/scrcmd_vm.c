@@ -600,7 +600,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     Scrcmd_CheckWifiListFlags,                        // 0x1f6
     Scrcmd_WifiListOperation,                         // 0x1f7
     Scrcmd_SetWifiFriendNameWord,                     // 0x1f8
-    Scrcmd_CheckPmsWordPair,                          // 0x1f9
+    s01F9_CheckPmsWordPair,                           // 0x1f9
     s01FA_PepQuizGenerate,                            // 0x1fa
     s01FB_ItemCollectorCheckGroup,                    // 0x1fb
     s01FC_ItemCollectorGetPrice,                      // 0x1fc

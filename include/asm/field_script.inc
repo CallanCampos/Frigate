@@ -2663,7 +2663,7 @@
     .2byte \a1
     .endm
 
-    .macro Scrcmd_CheckPmsWordPair a0, a1, a2, a3
+    .macro CheckPmsWordPair a0, a1, a2, a3
     FieldCommand 505
     .2byte \a0
     .2byte \a1

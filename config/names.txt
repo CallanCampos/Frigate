@@ -12339,7 +12339,7 @@ overlays/ov036 0x021c6f64 FieldSaveanime_ShowWindow
 overlays/ov036 0x021c6f7c FieldSaveanime_HideWindow
 overlays/ov036 0x021c6f94 FieldSaveanime_DrawFrame
 overlays/ov036 0x021c6fec FieldSaveanime_AnimTask
-overlays/ov036 0x021c730c Scrcmd_CheckPmsWordPair
+overlays/ov036 0x021c730c s01F9_CheckPmsWordPair
 overlays/ov036 0x021c7698 Scrcmd_CheckBeaconTrainerKey
 overlays/ov036 0x021c783c s02C5_JoinAvenueRecordActivity
 overlays/ov036 0x021c784c s022A_HollowRivalGenMsgID
