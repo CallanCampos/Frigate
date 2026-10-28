@@ -173,8 +173,8 @@ void FldBlAct_DeleteActorMmdl(FieldActor *actor, u32 index);
 // The creation of a billboard actor of an object code at a position, into out[1] with the material's flags in out[0],
 // calling back once a material that has to be loaded first is there; its deletion; and the scale of an actor's
 // billboard
-BOOL func_ov036_02193b14(MMSys *system, const FieldActorConfig *config, u16 *out, VecFx32 *pos,
-                         void (*callback)(u16 index, void *data), void *callbackData, u32 lights);
+BOOL FldBlAct_AddActorPosOrReserve(MMSys *system, const FieldActorConfig *config, u16 *out, VecFx32 *pos,
+                                   void (*callback)(u16 index, void *data), void *callbackData, u32 lights);
 void FldBlAct_DeleteActorPos(MMSys *system, u16 *out);
 void FldBlAct_GetActorSize(FieldActor *actor, u16 *scaleX, u16 *scaleY);
 // Overlay 36's field_rail_loader.c: sets a flag of the actor's rail billboard work

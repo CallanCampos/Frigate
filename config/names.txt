@@ -10574,6 +10574,7 @@ overlays/ov036 0x0219396c FldActSys_AddBlActWithPalette
 overlays/ov036 0x021939a0 FldAct_InitBlActWithPalette
 overlays/ov036 0x02193a00 FldBlAct_AddActorMmdlOrReserve
 overlays/ov036 0x02193ac0 FldBlAct_DeleteActorMmdl
+overlays/ov036 0x02193b14 FldBlAct_AddActorPosOrReserve
 overlays/ov036 0x02193b7c FldBlAct_DeleteActorPos
 overlays/ov036 0x02193bc0 FieldBlAct_ActorCallback
 overlays/ov036 0x02193bd0 FldBlAct_GetActorSize
