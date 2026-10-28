@@ -51,10 +51,10 @@ def code_only(text: str) -> str:
     return LEX.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)) if m.group(1) or m.group(2) else m.group(0), text)
 
 
-def file_ranges() -> list[tuple[int, int, str]]:
-    """(start, end, source file) of every section of every registered file."""
+def file_ranges(delinks: Path) -> list[tuple[int, int, str]]:
+    """(start, end, source file) of every section of every file that a module's delinks.txt registers."""
     ranges = []
-    for delinks in CONFIG.rglob("delinks.txt"):
+    if delinks.exists():
         current = None
         for line in delinks.read_text().splitlines():
             if line and not line[0].isspace() and line.endswith(":"):
@@ -69,10 +69,11 @@ def file_ranges() -> list[tuple[int, int, str]]:
 def address_names() -> dict[str, collections.Counter]:
     """Address-named functions and data by source file (the module name where no file holds them)."""
     import bisect
-    ranges = file_ranges()
-    starts = [r[0] for r in ranges]
     counts = collections.defaultdict(collections.Counter)
     for symbols in CONFIG.rglob("symbols.txt"):
+        # Overlays share addresses: a module's symbols are placed by its own delinks.txt only
+        ranges = file_ranges(symbols.parent / "delinks.txt")
+        starts = [r[0] for r in ranges]
         module = symbols.parent.name if symbols.parent.parent.name == "overlays" else "main"
         for line in symbols.read_text().splitlines():
             name, _, rest = line.partition(" ")
