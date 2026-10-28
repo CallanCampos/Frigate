@@ -3,6 +3,17 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-28: keep full save integrity checks affordable
+
+- The full save-image suite timed out at 120 seconds on an Intel CI runner while every other job passed. Keep its
+  corruption, second-bank, checksum-table and footer checks, and fix the expensive primitive before increasing the
+  test budget. The per-bit Python CRC loop has the same non-reflected 0x1021 update as `binascii.crc_hqx`, including
+  its supplied state and no final XOR; the public wrapper still starts at 0xffff.
+- Verify incremental discovery as well as whole-block CRCs. All 16,777,216 state/byte transitions matched the old
+  implementation, every empty update retained its state, and both validators accepted identical layouts and all
+  banks/blocks/tables/footers in 12 immutable DS images. The same 18-test local command dropped from 12.47 to 0.57
+  seconds; the existing CI timeout remains 120 seconds. That measurement is local, not a promised runner duration.
+
 ## 2026-10-28: invalidate physical tokens and close equal-cycle events
 
 - Resetting a native DMA generation to zero permits an ABA bug: an old token 1 can authorize a new token 1's output.

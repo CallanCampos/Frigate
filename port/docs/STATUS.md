@@ -32,6 +32,47 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: keep complete save validation fast on CI
+
+- **Upstream:** `fd3b9e600da72b208fa98c3486988d3d7ce16766`; reviewed main `70085bfae7`.
+  PR 55's foundation head `3c6928e219` passed its exact-head local gates: B2 346 passed/28 explicit skips of 374;
+  W2 343/28 of 371, zero failures, status 57467175440. Its macOS 15 Intel job then timed out after 120.14 seconds
+  in `oracle_save_image`; every other hosted job passed. The merge remains gated on the corrected head's checks.
+- **Port:** `PORT_SHA`, a follow-up on `codex/card-physical-foundation`. This changes the oracle's Python CRC
+  implementation and incremental CRC tests. No native C/header/build configuration, game data or workflow change.
+- **ROM (T0):** fresh configure/Ninja passes both original hashes with zero warnings: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  The supported private signed runtime retains original pin validation; no tool binary is included.
+- **Host build (T1):** the frozen native foundation builds from the preceding entry remain unchanged by this
+  Python-only follow-up. Required canonical builds and complete suites verify the new PR head separately.
+- **Tests (T2/T6):** all 18 save-image corruption/integration tests pass. Empty updates and every split of the
+  independent `123456789` check vector verify stateful CRC updates as well as the full-message result. A local
+  exhaustive comparison checks all 16,777,216 combinations of 65,536 valid CRC states and 256 input bytes against
+  the previous bitwise implementation, with zero differences; empty updates preserve every state. Equal transitions
+  preserve every longer input/chunking by induction. Both validators discover identical layouts and accept all
+  12 SHA-checked DS fixtures: 24 complete banks, each with all 73 blocks, padded table and footer. Inputs are immutable.
+  Four dependent CTests pass: save-image, oracle comparison, recording checker and manifest tool.
+- **Performance:** the same local 18-test command drops from 12.47 to 0.57 seconds including process startup.
+  CI keeps its 120-second test limit. Every corruption, second-bank, checksum-table and footer assertion remains;
+  no test or validation stage is disabled. This is a local measurement, not a guaranteed runner speedup.
+- **Replay/oracle/sanitizers/play (T3/T4/T5/T7):** no new gameplay or native sanitizer claim for this helper-only
+  change. The source-specific foundation results above remain labeled with `3c6928e219`; the corrected head still
+  requires all canonical and hosted gates. No input, golden, comparison mask, seed or performance budget changes.
+- **Tiers/trap stubs:** no new scan; previous 41,017 tier (a), zero (b)/(c), plus 2,385 veneers/16,906 bytes, and
+  25 function traps plus `CARDi_NdmaInterface` data remain. Native feature completeness is still separate.
+- **64-bit warnings:** no native source change; previous exact-head guard remains 365 sites/229 keys, real 66,
+  harmless 123, handled 141, unreachable 35, with 1,707 compiled inputs/zero missing. Rechecked by the new-head gate.
+- **Work done:** use standard-library `binascii.crc_hqx` for the same non-reflected polynomial 0x1021 update, with
+  supplied state and no final XOR. The outer CRC still starts at 0xffff. Four-byte discovery updates and whole-block
+  validation keep their contracts; their expensive per-bit Python loop is removed. Known-vector, incremental,
+  exhaustive-transition and real-image evidence protect the exact algorithm while making CI validation affordable.
+- **Next:** publish the corrected PR head and complete protected review/local/hosted gates. Continue the separately
+  verified AI jump-table sequencing defect and original SDK timing work before claiming faithful Terrell combat,
+  then proceed to Ranch/Hugh/Herdier. No AI clock constant or new battle exclusion is introduced here.
+- **Blockers:** no human action blocks this correction. The prior Intel timeout is actionable and remains recorded;
+  the new CI result is pending. Production CARD/DMA integration, AI fidelity and later native features remain
+  unfinished. Issue 45 still requires Spanish gameplay/save evidence; the owner has no dump.
+
 ## 2026-10-28: independent cartridge wire and physical DMA foundation
 
 - **Upstream:** `fd3b9e600da72b208fa98c3486988d3d7ce16766`, still contained after a fresh fetch.
@@ -39,7 +80,7 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   review. Its exact-head canonical local gates passed B2 326/28 explicit skips of 354 and W2 323/28 of 351;
   status 57460557946 records success. Issue 38 closed automatically. The merged main's Compile, Standards and
   Frigate CI runs also pass; no protection or workflow policy change.
-- **Port:** `PORT_SHA`, on `codex/card-physical-foundation`. All changes are in `port/`. This is the independent
+- **Port:** `3c6928e219`, on `codex/card-physical-foundation`. All changes are in `port/`. This is the independent
   clock/controller foundation. Production `hal/card/card_rom.c` and `replaced.txt` are byte-identical to reviewed
   main; no CPU-reader adapter, new product flag or production DMA selection is included.
 - **ROM (T0):** `build/python-signed-wibo configure.py b2_us w2_us`, then `ninja -j2`, passes with zero warnings;
