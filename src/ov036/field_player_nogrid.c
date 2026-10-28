@@ -159,9 +159,9 @@ static void FieldPlayerRail_ClearForcedMove(FieldPlayerNoGrid *nogrid);
 static void FieldPlayerRail_SetForcedMoveEnded(FieldPlayerNoGrid *nogrid);
 static void FieldPlayerRail_ClearForcedMoveEnded(FieldPlayerNoGrid *nogrid);
 static void FieldPlayerRail_ClearPending(FieldPlayerNoGrid *nogrid);
-static void func_ov036_0219ddb4(FieldPlayerNoGrid *nogrid);
+static void FieldPlayerRail_SetSpinA(FieldPlayerNoGrid *nogrid);
 static void FieldPlayerRail_ClearSpinA(FieldPlayerNoGrid *nogrid);
-static void func_ov036_0219ddcc(FieldPlayerNoGrid *nogrid);
+static void FieldPlayerRail_SetSpinB(FieldPlayerNoGrid *nogrid);
 static void FieldPlayerRail_ClearSpinB(FieldPlayerNoGrid *nogrid);
 static void FieldPlayerRail_SetFaceRight(FieldPlayerNoGrid *nogrid);
 static void FieldPlayerRail_ClearFaceRight(FieldPlayerNoGrid *nogrid);
@@ -171,8 +171,8 @@ static u32 FieldPlayerRail_GetForcedMoveKind(FieldPlayerNoGrid *nogrid);
 static u16 FieldPlayerRail_RunForcedMove(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2);
 static void FieldPlayerRail_EndForcedMove(FieldPlayerNoGrid *nogrid);
 static u16 FieldPlayerRail_ForcedSlide(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2);
-static u16 func_ov036_0219dfe4(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2);
-static u16 func_ov036_0219e048(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2);
+static u16 FieldPlayerRail_ForcedSlideSpinA(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2);
+static u16 FieldPlayerRail_ForcedSlideSpinB(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2);
 static u16 FieldPlayerRail_ForcedSlideWarnDir2(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2);
 static u16 FieldPlayerRail_ForcedSlideWarnDir3(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2);
 static u16 FieldPlayerRail_ForcedSlideFaceRight(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2);
@@ -199,8 +199,8 @@ static const u8 SPIN_FACE_DIRS[2][4] = {
 static const SlideFunc SLIDE_FUNCS[8] = {
     NULL,
     FieldPlayerRail_ForcedSlide,
-    func_ov036_0219dfe4,
-    func_ov036_0219e048,
+    FieldPlayerRail_ForcedSlideSpinA,
+    FieldPlayerRail_ForcedSlideSpinB,
     FieldPlayerRail_ForcedSlideWarnDir2,
     FieldPlayerRail_ForcedSlideWarnDir3,
     FieldPlayerRail_ForcedSlideFaceRight,
@@ -956,7 +956,7 @@ static void FieldPlayerRail_ClearPending(FieldPlayerNoGrid *nogrid) {
     FieldPlayerRail_ClearFlags(nogrid, NOGRID_FLAG_4);
 }
 
-static void func_ov036_0219ddb4(FieldPlayerNoGrid *nogrid) {
+static void FieldPlayerRail_SetSpinA(FieldPlayerNoGrid *nogrid) {
     FieldPlayerRail_SetFlags(nogrid, NOGRID_FLAG_SLIDE_A);
 }
 
@@ -964,7 +964,7 @@ static void FieldPlayerRail_ClearSpinA(FieldPlayerNoGrid *nogrid) {
     FieldPlayerRail_ClearFlags(nogrid, NOGRID_FLAG_SLIDE_A);
 }
 
-static void func_ov036_0219ddcc(FieldPlayerNoGrid *nogrid) {
+static void FieldPlayerRail_SetSpinB(FieldPlayerNoGrid *nogrid) {
     FieldPlayerRail_SetFlags(nogrid, NOGRID_FLAG_SLIDE_B);
 }
 
@@ -1078,7 +1078,7 @@ static u16 FieldPlayerRail_ForcedSlide(FieldPlayerNoGrid *nogrid, u16 dir, u32 a
     return motionDir;
 }
 
-static u16 func_ov036_0219dfe4(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
+static u16 FieldPlayerRail_ForcedSlideSpinA(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
     FieldActor *actor = nogrid->actor;
     u16 motionDir = GetActorMotionDir(actor);
 
@@ -1087,7 +1087,7 @@ static u16 func_ov036_0219dfe4(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
         return dir;
     }
     FieldPlayerRail_SetForcedMove(nogrid);
-    func_ov036_0219ddb4(nogrid);
+    FieldPlayerRail_SetSpinA(nogrid);
     FieldPlayerRail_ClearSpinB(nogrid);
     FldAct_SetAcmd(actor, GetAcmdForDir(motionDir, ACMD_WALK_4F));
     SetActorFlag(actor, 0x18);
@@ -1096,7 +1096,7 @@ static u16 func_ov036_0219dfe4(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
     return motionDir;
 }
 
-static u16 func_ov036_0219e048(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
+static u16 FieldPlayerRail_ForcedSlideSpinB(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
     FieldActor *actor = nogrid->actor;
     u16 motionDir = GetActorMotionDir(actor);
 
@@ -1105,7 +1105,7 @@ static u16 func_ov036_0219e048(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
         return dir;
     }
     FieldPlayerRail_SetForcedMove(nogrid);
-    func_ov036_0219ddcc(nogrid);
+    FieldPlayerRail_SetSpinB(nogrid);
     FieldPlayerRail_ClearSpinA(nogrid);
     FldAct_SetAcmd(actor, GetAcmdForDir(motionDir, ACMD_WALK_4F));
     SetActorFlag(actor, 0x18);

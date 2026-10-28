@@ -11098,7 +11098,9 @@ overlays/ov036 0x0219dd84 FieldPlayerRail_ClearForcedMove
 overlays/ov036 0x0219dd90 FieldPlayerRail_SetForcedMoveEnded
 overlays/ov036 0x0219dd9c FieldPlayerRail_ClearForcedMoveEnded
 overlays/ov036 0x0219dda8 FieldPlayerRail_ClearPending
+overlays/ov036 0x0219ddb4 FieldPlayerRail_SetSpinA
 overlays/ov036 0x0219ddc0 FieldPlayerRail_ClearSpinA
+overlays/ov036 0x0219ddcc FieldPlayerRail_SetSpinB
 overlays/ov036 0x0219ddd8 FieldPlayerRail_ClearSpinB
 overlays/ov036 0x0219dde4 FieldPlayerRail_SetFaceRight
 overlays/ov036 0x0219ddf0 FieldPlayerRail_ClearFaceRight
@@ -11108,6 +11110,8 @@ overlays/ov036 0x0219de14 FieldPlayerRail_GetForcedMoveKind
 overlays/ov036 0x0219de9c FieldPlayerRail_RunForcedMove
 overlays/ov036 0x0219dee0 FieldPlayerRail_EndForcedMove
 overlays/ov036 0x0219df78 FieldPlayerRail_ForcedSlide
+overlays/ov036 0x0219dfe4 FieldPlayerRail_ForcedSlideSpinA
+overlays/ov036 0x0219e048 FieldPlayerRail_ForcedSlideSpinB
 overlays/ov036 0x0219e0ac FieldPlayerRail_ForcedSlideWarnDir2
 overlays/ov036 0x0219e0d4 FieldPlayerRail_ForcedSlideWarnDir3
 overlays/ov036 0x0219e0fc FieldPlayerRail_ForcedSlideFaceRight
