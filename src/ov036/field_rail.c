@@ -473,7 +473,7 @@ u8 RailUnit_IsMovePending(RailUnit *unit) {
 }
 
 static BOOL RailUnit_HasStepped(RailUnit *unit) {
-    return unit->unk34;
+    return unit->stepped;
 }
 
 void RailUnit_GetStepVector(RailUnit *unit, VecFx16 *dir) {
@@ -534,7 +534,7 @@ void RailUnit_UpdateMove(RailUnit *unit) {
         return;
     }
     resultDir = RAIL_DIR_NONE;
-    unit->unk34 = 0;
+    unit->stepped = FALSE;
     if (unit->movePending == 0) {
         return;
     }
@@ -548,7 +548,7 @@ void RailUnit_UpdateMove(RailUnit *unit) {
     if (resultDir != RAIL_DIR_NONE) {
         unit->direction = resultDir;
         unit->lastMoveSpeedIndex = unit->pendingSpeedIndex;
-        unit->unk34 = 1;
+        unit->stepped = TRUE;
         RailUnit_GetSpotPos(unit, &unit->calcPos);
     }
     if (onLine != unit->onLine) {
@@ -720,7 +720,7 @@ BOOL FieldRailSystem_IsPosNear(const VecFx32 *a, const VecFx32 *b, fx32 dist) {
     return FALSE;
 }
 
-void SetWkToActorRailPos(const RailUnit *unit, u16 *a1, u16 *a2, u16 *a3) {
+void SetWkToActorRailPos(const RailUnit *unit, u16 *lineIndex, u16 *front, u16 *side) {
     s32 width = GetLerpedLineWidthByLineYPos(unit->component.line, 0, unit->length, unit->handle);
     s32 endWidth = GetLerpedLineWidthByLineYPos(unit->component.line, unit->length, unit->length, unit->handle);
     s32 index;
@@ -735,20 +735,20 @@ void SetWkToActorRailPos(const RailUnit *unit, u16 *a1, u16 *a2, u16 *a3) {
             index = i;
         }
     }
-    *a1 = index;
-    *a2 = unit->front / 16;
-    *a3 = unit->side / 16 + width / 16;
+    *lineIndex = index;
+    *front = unit->front / 16;
+    *side = unit->side / 16 + width / 16;
 }
 
-void RailUnit_SetLineLocation(RailUnit *unit, u16 a1, u16 a2, u16 a3) {
+void RailUnit_SetLineLocation(RailUnit *unit, u16 lineIndex, u16 front, u16 side) {
     RailPosition pos;
 
     RailUnit_GetRailPos(unit, &pos);
-    pos.componentId = a1;
+    pos.componentId = lineIndex;
     pos.posSide = 0;
-    pos.posFront = a2;
+    pos.posFront = front;
     RailUnit_SetRailPos(unit, &pos);
-    pos.posSide = a3 - unit->width / 16;
+    pos.posSide = side - unit->width / 16;
     RailUnit_GetSpotPos(unit, &unit->calcPos);
     unit->railPos = pos;
     unit->prevRailPos = pos;

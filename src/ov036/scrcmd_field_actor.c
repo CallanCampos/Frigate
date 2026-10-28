@@ -972,22 +972,22 @@ BOOL s02BE_ActorMoveLinear(VM *vm, FieldScriptEnv *env) {
 
 BOOL s0071_PlayerGetRailPos(VM *vm, FieldScriptEnv *env) {
     FieldActor *actor = FindScrEnvPlayerActor(env);
-    u16 *a = ScriptReadVar(vm, env);
-    u16 *b = ScriptReadVar(vm, env);
-    u16 *c = ScriptReadVar(vm, env);
+    u16 *lineIndex = ScriptReadVar(vm, env);
+    u16 *front = ScriptReadVar(vm, env);
+    u16 *side = ScriptReadVar(vm, env);
 
-    SetWkToActorRailPos(FldAct_GetRailUnit(actor), a, b, c);
+    SetWkToActorRailPos(FldAct_GetRailUnit(actor), lineIndex, front, side);
     return FALSE;
 }
 
 BOOL s0072_ActorGetRailPos(VM *vm, FieldScriptEnv *env) {
     MMSys *mmSys = GetScrEnvActorSys(env);
     FieldActor *actor = FindFieldActor(mmSys, ScriptReadAny(vm, env));
-    u16 *a = ScriptReadVar(vm, env);
-    u16 *b = ScriptReadVar(vm, env);
-    u16 *c = ScriptReadVar(vm, env);
+    u16 *lineIndex = ScriptReadVar(vm, env);
+    u16 *front = ScriptReadVar(vm, env);
+    u16 *side = ScriptReadVar(vm, env);
 
-    SetWkToActorRailPos(FldAct_GetRailUnit(actor), a, b, c);
+    SetWkToActorRailPos(FldAct_GetRailUnit(actor), lineIndex, front, side);
     return FALSE;
 }
 
@@ -1005,12 +1005,12 @@ BOOL s007A_ActorPlayRailSlipdown(VM *vm, FieldScriptEnv *env) {
 BOOL s007C_PlayerSetRailPos(VM *vm, FieldScriptEnv *env) {
     RailPosition railPos;
     FieldActor *actor = FindScrEnvPlayerActor(env);
-    u16 a = ScriptReadAny(vm, env);
-    u16 b = ScriptReadAny(vm, env);
-    u16 c = ScriptReadAny(vm, env);
+    u16 lineIndex = ScriptReadAny(vm, env);
+    u16 front = ScriptReadAny(vm, env);
+    u16 side = ScriptReadAny(vm, env);
     RailUnit *unit = FldAct_GetRailUnit(actor);
 
-    RailUnit_SetLineLocation(unit, a, b, c);
+    RailUnit_SetLineLocation(unit, lineIndex, front, side);
     RailUnit_GetRailPos(unit, &railPos);
     SetActorInitedPositionRail(actor, &railPos);
     return FALSE;
@@ -1020,12 +1020,12 @@ BOOL s007D_ActorSetRailPos(VM *vm, FieldScriptEnv *env) {
     RailPosition railPos;
     MMSys *mmSys = GetScrEnvActorSys(env);
     FieldActor *actor = FindFieldActor(mmSys, ScriptReadAny(vm, env));
-    u16 a = ScriptReadAny(vm, env);
-    u16 b = ScriptReadAny(vm, env);
-    u16 c = ScriptReadAny(vm, env);
+    u16 lineIndex = ScriptReadAny(vm, env);
+    u16 front = ScriptReadAny(vm, env);
+    u16 side = ScriptReadAny(vm, env);
     RailUnit *unit = FldAct_GetRailUnit(actor);
 
-    RailUnit_SetLineLocation(unit, a, b, c);
+    RailUnit_SetLineLocation(unit, lineIndex, front, side);
     RailUnit_GetRailPos(unit, &railPos);
     SetActorInitedPositionRail(actor, &railPos);
     return FALSE;
