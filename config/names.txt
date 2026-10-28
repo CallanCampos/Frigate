@@ -13169,6 +13169,11 @@ overlays/ov036 0x021d1ba4 FLD3DCI_SOUND_KEYS_18
 overlays/ov036 0x021d1bd4 FLD3DCI_SOUND_KEYS_22
 overlays/ov036 0x021d1c0c FLD3DCI_SOUND_KEYS_03
 overlays/ov036 0x021d1c44 FLD3DCI_FADE_KEYS_06
+overlays/ov036 0x021d1cd0 FLD3DCI_SOUND_KEYS_06
+overlays/ov036 0x021d1d10 FLD3DCI_SOUND_KEYS_33
+overlays/ov036 0x021d1d80 FLD3DCI_SOUND_KEYS_34
+overlays/ov036 0x021d1df0 FLD3DCI_FADE_KEYS
+overlays/ov036 0x021d1e80 FLD3DCI_SOUND_KEYS
 overlays/ov036 0x021d20e4 sOpenSlotMoveParams
 overlays/ov036 0x021d20f4 sExistingMoveParams
 overlays/ov036 0x021d2104 sTmMoveParams

@@ -101,7 +101,17 @@ GameEvent *EventTeleportEffect_Create(GameEvent *event, GameSystem *gsys, Field 
 void PlaceName_OnZoneChange(PlaceName *placeName, s32 zoneId);
 void PlaceName_Cancel(PlaceName *placeName);
 void PlaceName_ShowForZone(PlaceName *placeName, u32 zoneId);
-// The field effect of an ID, such as flying off and landing, or NULL
+// The field effect of an ID, such as flying off and landing, or NULL. An ID is the effect's file in archive 0x76; the
+// ones the code names are the Pokémon sprite of a field move, the player's flight off and landing, by the player's
+// sex, and Alder's flight
+enum {
+    FLD3DCI_POKE_SPRITE = 3,
+    FLD3DCI_FLY_OUT_MALE = 11,
+    FLD3DCI_FLY_IN_MALE = 12,
+    FLD3DCI_ALDER_FLY = 30,
+    FLD3DCI_FLY_OUT_FEMALE = 31,
+    FLD3DCI_FLY_IN_FEMALE = 32,
+};
 GameEvent *EventFieldEffect_Create(GameSystem *gsys, Fld3DCi *ci, u8 effectId);
 // The fade out of the field before flying
 GameEvent *EventGameTransition_CreateFadeOutEvent(GameSystem *gsys, Field *field, u32 type, u32 skipWait);

@@ -5495,11 +5495,11 @@ data_ov036_021d1c98 kind:data(any) addr:0x021d1ccc
 data_ov036_021d1ca4 kind:data(any) addr:0x021d1cd8
 data_ov036_021d1cb0 kind:data(any) addr:0x021d1ce4
 data_ov036_021d1cc0 kind:data(any) addr:0x021d1cf4
-data_ov036_021d1cd0 kind:data(any) addr:0x021d1d04
-data_ov036_021d1d10 kind:data(any) addr:0x021d1d44
-data_ov036_021d1d80 kind:data(any) addr:0x021d1db4
-FLD3DCI_FADE_ANIMATIONS kind:data(any) addr:0x021d1e24
-data_ov036_021d1e80 kind:data(any) addr:0x021d1eb4
+FLD3DCI_SOUND_KEYS_06 kind:data(any) addr:0x021d1d04
+FLD3DCI_SOUND_KEYS_33 kind:data(any) addr:0x021d1d44
+FLD3DCI_SOUND_KEYS_34 kind:data(any) addr:0x021d1db4
+FLD3DCI_FADE_KEYS kind:data(any) addr:0x021d1e24
+FLD3DCI_SOUND_KEYS kind:data(any) addr:0x021d1eb4
 FIELD_EFFECT_HEAP_SIZES kind:data(any) addr:0x021d1f44
 sOpenSlotMoveParams kind:data(any) addr:0x021d2118
 sExistingMoveParams kind:data(any) addr:0x021d2128
