@@ -247,13 +247,13 @@ BOOL s01DF_CallPassPowerFlash(VM *vm, FieldScriptEnv *env);
 BOOL s02AC_CallLeafPileStuck(VM *vm, FieldScriptEnv *env);
 
 BOOL s02CF_PokeDexCheckHabitatList(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021c9a40(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021c9a7c(VM *vm, FieldScriptEnv *env);
+BOOL s02D1_KeyInfoGetMyCityProgress(VM *vm, FieldScriptEnv *env);
+BOOL s02D5_WbtIsTrainerBeaten(VM *vm, FieldScriptEnv *env);
 BOOL Scrcmd_GetWifiHistoryCountryCount(VM *vm, FieldScriptEnv *env);
 BOOL s02DD_UnityTowerGetVisitorCount(VM *vm, FieldScriptEnv *env);
 BOOL Scrcmd_MarkPartnerCandidate(VM *vm, FieldScriptEnv *env);
 BOOL Scrcmd_IsPartnerCandidateMarked(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021c9bec(VM *vm, FieldScriptEnv *env);
+BOOL s02DA_UnityTowerSetRatingLevel(VM *vm, FieldScriptEnv *env);
 BOOL s02DE_UnityTowerSetHobby(VM *vm, FieldScriptEnv *env);
 BOOL s02DF_UnityTowerGetHobby(VM *vm, FieldScriptEnv *env);
 BOOL s02DB_UnityTowerSetFloor(VM *vm, FieldScriptEnv *env);

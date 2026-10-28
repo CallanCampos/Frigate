@@ -12232,10 +12232,16 @@ overlays/ov036 0x021c955c FldeffOchiba_Init
 overlays/ov036 0x021c95a4 FldeffOchiba_Exit
 overlays/ov036 0x021c95b0 FldeffOchiba_Update
 overlays/ov036 0x021c95cc FldeffOchiba_Draw
+overlays/ov036 0x021c97b8 OchibaEffect_Start
+overlays/ov036 0x021c9870 OchibaEffect_UpdateTCB
 overlays/ov036 0x021c98a4 GetPWTTournamentInfo
+overlays/ov036 0x021c98f4 GetPWTSeason
+overlays/ov036 0x021c9a40 s02D1_KeyInfoGetMyCityProgress
+overlays/ov036 0x021c9a7c s02D5_WbtIsTrainerBeaten
 overlays/ov036 0x021c9ab0 Scrcmd_GetWifiHistoryCountryCount
 overlays/ov036 0x021c9b38 Scrcmd_MarkPartnerCandidate
 overlays/ov036 0x021c9b88 Scrcmd_IsPartnerCandidateMarked
+overlays/ov036 0x021c9bec s02DA_UnityTowerSetRatingLevel
 overlays/ov036 0x021c9d24 Scrcmd_HasPlayerLanguage
 overlays/ov036 0x021c9ec4 sResolvedControllerTypes
 overlays/ov036 0x021c9f20 FIELD_CLACT_SETUP

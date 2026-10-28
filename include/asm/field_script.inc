@@ -3757,7 +3757,7 @@
     .2byte \a0
     .endm
 
-    // func_ov036_021c9a7c
+    // s02D5_WbtIsTrainerBeaten
     .macro Cmd_02D5 a0, a1
     FieldCommand 725
     .2byte \a0

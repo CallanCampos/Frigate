@@ -81,7 +81,7 @@ const HabitatListHeader HABITAT_LIST_HEADERS[57] = {
 
 // clang-format on
 
-void func_ov036_021c97b8(OchibaEffectArgs *args) {
+void OchibaEffect_Start(OchibaEffectArgs *args) {
     TCBManager *tcbManager = Field_GetTCBMgr(args->field);
     OchibaEffectWork *work = GFL_HeapAllocate(HEAPID_TAIL(Field_GetHeapID(args->field)), sizeof(OchibaEffectWork), TRUE,
                                               "scrcmd_ochiba.c", 0x134);
@@ -102,10 +102,10 @@ void func_ov036_021c97b8(OchibaEffectArgs *args) {
     work->resGroup = FieldG3DObjSystem_AddResGroup(sys, &request, FALSE);
     work->obj = FieldG3DObjSystem_AddObj(sys, work->resGroup, 0, &position);
     GFL_SndSEPlay(SEQ_SE_OCHIBA_01);
-    GFL_TCBMgrAddTask(tcbManager, func_ov036_021c9870, work, 0);
+    GFL_TCBMgrAddTask(tcbManager, OchibaEffect_UpdateTCB, work, 0);
 }
 
-void func_ov036_021c9870(TCB *tcb, void *data) {
+void OchibaEffect_UpdateTCB(TCB *tcb, void *data) {
     OchibaEffectWork *work = data;
 
     if (FieldG3DObjSystem_StepObjAnm(work->sys, work->obj, FX32_ONE) != TRUE) {
@@ -133,7 +133,7 @@ void LoadPWTTournamentTypeText(HeapID heapId, u32 tournament, StrBuf *strbuf) {
     }
 }
 
-u8 func_ov036_021c98f4(const WbtSystem *wbt) {
+u8 GetPWTSeason(const WbtSystem *wbt) {
     return wbt->unk1E;
 }
 
@@ -196,7 +196,7 @@ BOOL CheckHabitatList(const HabitatList *list, PokeDexSave *pokedex, u8 time, u3
     return TRUE;
 }
 
-BOOL func_ov036_021c9a40(VM *vm, FieldScriptEnv *env) {
+BOOL s02D1_KeyInfoGetMyCityProgress(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     SaveControl *save = GameData_GetSaveControl(gameData);
     u16 *result = ScriptReadVar(vm, env);
@@ -206,7 +206,7 @@ BOOL func_ov036_021c9a40(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov036_021c9a7c(VM *vm, FieldScriptEnv *env) {
+BOOL s02D5_WbtIsTrainerBeaten(VM *vm, FieldScriptEnv *env) {
     WbtSave *block = GameData_GetWbtSave(FieldScriptEnv_GetGameData(env));
     u16 index = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
@@ -283,7 +283,7 @@ BOOL Scrcmd_IsPartnerCandidateMarked(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov036_021c9bec(VM *vm, FieldScriptEnv *env) {
+BOOL s02DA_UnityTowerSetRatingLevel(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     u8 index;
 

@@ -232,7 +232,7 @@ Field *Field_Create(GameSystem *gsys, HeapID heapId) {
         WbtSystem **wbt = GameData_GetWbtSystemPtr(field->gameData);
 
         if (wbt != NULL && *wbt != NULL) {
-            season = func_ov036_021c98f4(*wbt);
+            season = GetPWTSeason(*wbt);
         }
     }
     field->areaData = AreaData_Create(heapId, areaId, season);

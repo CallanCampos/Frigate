@@ -198,7 +198,7 @@ static GameEventReturnCode EventLeafPileStuck_Callback(GameEvent *event, u32 *st
         *state = 2;
         break;
     case 2:
-        func_ov036_021c97b8(&work->args);
+        OchibaEffect_Start(&work->args);
         *state = 3;
     case 3:
         work->y -= work->speed;

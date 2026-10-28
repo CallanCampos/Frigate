@@ -816,16 +816,16 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     NULL,                                             // 0x2ce
     s02CF_PokeDexCheckHabitatList,                    // 0x2cf
     s02D0_PokeDexEnableHabitatList,                   // 0x2d0
-    func_ov036_021c9a40,                              // 0x2d1
+    s02D1_KeyInfoGetMyCityProgress,                   // 0x2d1
     s02D2_FieldOpenRestoreLCD,                        // 0x2d2
     s02D3_HollowRivalGetValue,                        // 0x2d3
     s02D4_ItemGetTMCount,                             // 0x2d4
-    func_ov036_021c9a7c,                              // 0x2d5
+    s02D5_WbtIsTrainerBeaten,                         // 0x2d5
     NULL,                                             // 0x2d6
     Scrcmd_GetWifiHistoryCountryCount,                // 0x2d7
     Scrcmd_MarkPartnerCandidate,                      // 0x2d8
     Scrcmd_IsPartnerCandidateMarked,                  // 0x2d9
-    func_ov036_021c9bec,                              // 0x2da
+    s02DA_UnityTowerSetRatingLevel,                   // 0x2da
     s02DB_UnityTowerSetFloor,                         // 0x2db
     s02DC_UnityTowerInitVisitorMessage,               // 0x2dc
     s02DD_UnityTowerGetVisitorCount,                  // 0x2dd
