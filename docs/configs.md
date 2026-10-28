@@ -378,16 +378,15 @@ addresses, such as `0x02020100`. The words that point at no symbol (`--all`) are
 
 ## Remaining generated ranges
 
-The generated gap objects still contain 196 data bytes and a 32-byte ITCM prefix after recovering the touchscreen
-rectangle, the HTTP root's trailing member and the sprite parameter cache. These ranges are not all missing C
-objects. Addresses below are Black 2 / White 2; sizes and contents agree between versions.
+The generated gap objects still contain 168 zero data bytes and a 32-byte ITCM prefix after recovering the
+touchscreen rectangle, the HTTP root's trailing member, the sprite parameter cache and the three nonzero graphics
+prefixes (the renderer core's all-ones words, the software sprite draw's unit pair and the character canvas's
+all-ones words). The ranges that remain are zero-filled alignment and startup blocks, not missing C objects.
+Addresses below are Black 2 / White 2; sizes and contents agree between versions.
 
 | Module / section | Start | Bytes | Evidence |
 | --- | --- | ---: | --- |
 | Main `.data` | `0x0209b258` / `0x0209b298` | 8 | Two zero words before the renderer's state; original ownership remains unproven. |
-| Main `.rodata` | `0x020942d4` / `0x02094300` | 8 | Two `FX32_ONE` words before the software sprite tables. |
-| Main `.rodata` | `0x02094364` / `0x02094390` | 8 | All ones before the renderer core's identity matrix. |
-| Main `.rodata` | `0x02094384` / `0x020943b0` | 12 | All ones before the character canvas's function tables. |
 | Main `.data` | `0x0209d728` / `0x0209d768` | 24 | Zero alignment tail after `SDK_OVERLAY_DIGEST_END`, to the next 32-byte boundary. |
 | Overlay 081 `.data` | `0x021eac90` / `0x021eacd0` | 16 | Zero tail after the file-name string, to the module's 32-byte end boundary. |
 | DTCM `.bss` | `0x02fe00a8` / `0x02fe00a8` | 24 | Alignment tail after the recovered eight-byte IRQ thread queue. |
@@ -396,13 +395,8 @@ objects. Addresses below are Black 2 / White 2; sizes and contents agree between
 | Autoload 2 `.data` | `0x02400000` / `0x02400000` | 32 | Entire initialized block is zero; no source object is identified. |
 | Autoload 3 `.data` | `0x06898000` / `0x06898000` | 32 | Entire initialized block is zero; no source object is identified. |
 
-The nonzero graphics ranges need complete object-layout evidence. Two live `const s16 posZ = -1` locals in
-`g2d_RendererCore.c` emit four bytes altogether, not its eight-byte prefix, while preserving all 19 functions.
-`g2d_CharCanvas.c`'s two live `const u32 fullbits` locals emit eight bytes while preserving all 18 functions, but
-also move the unused 2D table relative to the other data. Three such mask locals give the twelve bytes without the
-original table layout; function-level IPA retains a static table but places the constants at the end instead.
-These scratch variants are not retained. Matching a value or a function is insufficient to claim the surrounding
-data, and the zero-filled startup and alignment ranges must not be replaced with arbitrary C filler arrays.
+Matching a value or a function is insufficient to claim the surrounding data, and the zero-filled startup and
+alignment ranges must not be replaced with arbitrary C filler arrays.
 
 ## Known gaps
 

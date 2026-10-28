@@ -19,6 +19,8 @@
 # introduce shared XML field names before the remote login. All five reconstructed routines match the SDK object;
 # the game keeps only their shared strings, so the two public entry points are stripped with their private helpers.
 "lib/dwc/src/auth/AuthService.c" = ["wsLoginProfile", "wsLoginUnique"]
+# The 2D OBJ canvas init that the original link dropped: its functions table is the only reader of nothing else
+"lib/nnsys/src/g2d/g2d_CharCanvas.c" = ["NNS_G2dCharCanvasInitForOBJ2DRect"]
 # The wipe handlers the game's table doesn't use, whose function-local statics are the rest of the file's .rodata
 # and .data
 "src/system/wipe_sub.c" = [

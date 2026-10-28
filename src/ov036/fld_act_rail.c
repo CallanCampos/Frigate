@@ -119,56 +119,64 @@ static BOOL func_ov036_0219556c(FieldActor *actor) {
 
 // The turns, done in their first frame, have only a start and an end function. The moves along the rail, the steps
 // in place and the jumps follow, in an order that the size sort lays out as the ROM does
-const ActorAcmdFunc data_ov036_021cf394[] = { func_ov036_02194ef8, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf384[] = { func_ov036_02194f28, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf38c[] = { func_ov036_02194f34, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf37c[] = { func_ov036_02194f40, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf374[] = { func_ov036_02194f4c, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf588[] = { func_ov036_02194ff4, RailActor_AcWalk1, RailActor_AcWalkEnd };
-const ActorAcmdFunc data_ov036_021cf57c[] = { func_ov036_02195004, RailActor_AcWalk1, RailActor_AcWalkEnd };
-const ActorAcmdFunc data_ov036_021cf570[] = { func_ov036_02195014, RailActor_AcWalk1, RailActor_AcWalkEnd };
-const ActorAcmdFunc data_ov036_021cf564[] = { func_ov036_02195024, RailActor_AcWalk1, RailActor_AcWalkEnd };
-const ActorAcmdFunc data_ov036_021cf558[] = { func_ov036_02195034, RailActor_AcWalk1, RailActor_AcWalkEnd };
-const ActorAcmdFunc data_ov036_021cf54c[] = { func_ov036_02195044, RailActor_AcWalk1, RailActor_AcWalkEnd };
-const ActorAcmdFunc data_ov036_021cf540[] = { func_ov036_02195054, RailActor_AcWalk1, RailActor_AcWalkEnd };
-const ActorAcmdFunc data_ov036_021cf534[] = { func_ov036_02195064, RailActor_AcWalk1, RailActor_AcWalkEnd };
-const ActorAcmdFunc data_ov036_021cf528[] = { func_ov036_02195074, RailActor_AcWalk1, RailActor_AcWalkEnd };
-const ActorAcmdFunc data_ov036_021cf51c[] = { func_ov036_02195084, RailActor_AcWalk1, RailActor_AcWalkEnd };
-const ActorAcmdFunc data_ov036_021cf510[] = { func_ov036_02195094, RailActor_AcWalk1, RailActor_AcWalkEnd };
-const ActorAcmdFunc data_ov036_021cf504[] = { func_ov036_021950a4, RailActor_AcWalk1, RailActor_AcWalkEnd };
-const ActorAcmdFunc data_ov036_021cf4f8[] = { func_ov036_021950b4, RailActor_AcWalk1, RailActor_AcWalkEnd };
-const ActorAcmdFunc data_ov036_021cf4c8[] = { func_ov036_021950c4, RailActor_AcWalk1, RailActor_AcWalkEnd };
-const ActorAcmdFunc data_ov036_021cf4d4[] = { func_ov036_021950d4, RailActor_AcWalk1, RailActor_AcWalkEnd };
-const ActorAcmdFunc data_ov036_021cf4ec[] = { func_ov036_021950e4, RailActor_AcWalk1, RailActor_AcWalkEnd };
+const ActorAcmdFunc data_ov036_021cf394[] = { RailActor_AcNextState, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf384[] = { RailActor_AcFaceU, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf38c[] = { RailActor_AcFaceD, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf37c[] = { RailActor_AcFaceL, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf374[] = { RailActor_AcFaceR, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf588[] = { RailActor_AcWalkU16F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
+const ActorAcmdFunc data_ov036_021cf57c[] = { RailActor_AcWalkD16F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
+const ActorAcmdFunc data_ov036_021cf570[] = { RailActor_AcWalkL16F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
+const ActorAcmdFunc data_ov036_021cf564[] = { RailActor_AcWalkR16F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
+const ActorAcmdFunc data_ov036_021cf558[] = { RailActor_AcWalkU8F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
+const ActorAcmdFunc data_ov036_021cf54c[] = { RailActor_AcWalkD8F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
+const ActorAcmdFunc data_ov036_021cf540[] = { RailActor_AcWalkL8F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
+const ActorAcmdFunc data_ov036_021cf534[] = { RailActor_AcWalkR8F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
+const ActorAcmdFunc data_ov036_021cf528[] = { RailActor_AcWalkU4F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
+const ActorAcmdFunc data_ov036_021cf51c[] = { RailActor_AcWalkD4F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
+const ActorAcmdFunc data_ov036_021cf510[] = { RailActor_AcWalkL4F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
+const ActorAcmdFunc data_ov036_021cf504[] = { RailActor_AcWalkR4F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
+const ActorAcmdFunc data_ov036_021cf4f8[] = { RailActor_AcWalkU2F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
+const ActorAcmdFunc data_ov036_021cf4c8[] = { RailActor_AcWalkD2F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
+const ActorAcmdFunc data_ov036_021cf4d4[] = { RailActor_AcWalkL2F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
+const ActorAcmdFunc data_ov036_021cf4ec[] = { RailActor_AcWalkR2F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
 const ActorAcmdFunc data_ov036_021cf594[] = { RailActor_AcDashU4F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
 const ActorAcmdFunc data_ov036_021cf4bc[] = { RailActor_AcDashD4F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
 const ActorAcmdFunc data_ov036_021cf4b0[] = { RailActor_AcDashL4F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
 const ActorAcmdFunc data_ov036_021cf4a4[] = { RailActor_AcDashR4F0, RailActor_AcWalk1, RailActor_AcWalkEnd };
-const ActorAcmdFunc data_ov036_021cf3b4[] = { func_ov036_0219519c, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf5d0[] = { func_ov036_021951ac, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf480[] = { func_ov036_021951bc, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf474[] = { func_ov036_021951cc, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf468[] = { func_ov036_021951dc, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf45c[] = { func_ov036_021951ec, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf450[] = { func_ov036_021951fc, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf444[] = { func_ov036_0219520c, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf438[] = { func_ov036_0219521c, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf414[] = { func_ov036_0219522c, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf420[] = { func_ov036_0219523c, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf4e0[] = { func_ov036_0219524c, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf5a0[] = { func_ov036_0219529c, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf3fc[] = { func_ov036_021952ac, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf39c[] = { func_ov036_021952bc, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf48c[] = { func_ov036_021952cc, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf3d8[] = { func_ov036_0219525c, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf3c0[] = { func_ov036_0219526c, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf3cc[] = { func_ov036_0219527c, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf42c[] = { func_ov036_0219528c, RailActor_AcStayWalk1, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf5ac[] = { func_ov036_02195480, RailJump_Update, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf498[] = { func_ov036_021954a0, RailJump_Update, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf3e4[] = { func_ov036_021954c4, RailJump_Update, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf408[] = { func_ov036_021954e8, RailJump_Update, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf5b8[] = { func_ov036_02195508, RailJump_Update, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf3a8[] = { func_ov036_02195528, RailJump_Update, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf5c4[] = { func_ov036_0219554c, RailJump_Update, func_ov036_02194ee8 };
-const ActorAcmdFunc data_ov036_021cf3f0[] = { func_ov036_0219556c, RailJump_Update, func_ov036_02194ee8 };
+const ActorAcmdFunc data_ov036_021cf3b4[] = { RailActor_AcStayWalkU32F0, RailActor_AcStayWalk1,
+                                              RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf5d0[] = { RailActor_AcStayWalkD32F0, RailActor_AcStayWalk1,
+                                              RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf480[] = { RailActor_AcStayWalkL32F0, RailActor_AcStayWalk1,
+                                              RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf474[] = { RailActor_AcStayWalkR32F0, RailActor_AcStayWalk1,
+                                              RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf468[] = { RailActor_AcStayWalkU16F0, RailActor_AcStayWalk1,
+                                              RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf45c[] = { RailActor_AcStayWalkD16F0, RailActor_AcStayWalk1,
+                                              RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf450[] = { RailActor_AcStayWalkL16F0, RailActor_AcStayWalk1,
+                                              RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf444[] = { RailActor_AcStayWalkR16F0, RailActor_AcStayWalk1,
+                                              RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf438[] = { RailActor_AcStayWalkU8F0, RailActor_AcStayWalk1, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf414[] = { RailActor_AcStayWalkD8F0, RailActor_AcStayWalk1, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf420[] = { RailActor_AcStayWalkL8F0, RailActor_AcStayWalk1, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf4e0[] = { RailActor_AcStayWalkR8F0, RailActor_AcStayWalk1, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf5a0[] = { RailActor_AcStayWalkU4F0, RailActor_AcStayWalk1, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf3fc[] = { RailActor_AcStayWalkD4F0, RailActor_AcStayWalk1, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf39c[] = { RailActor_AcStayWalkL4F0, RailActor_AcStayWalk1, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf48c[] = { RailActor_AcStayWalkR4F0, RailActor_AcStayWalk1, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf3d8[] = { RailActor_AcStayWalkU2F0, RailActor_AcStayWalk1, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf3c0[] = { RailActor_AcStayWalkD2F0, RailActor_AcStayWalk1, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf3cc[] = { RailActor_AcStayWalkL2F0, RailActor_AcStayWalk1, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf42c[] = { RailActor_AcStayWalkR2F0, RailActor_AcStayWalk1, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf5ac[] = { func_ov036_02195480, RailJump_Update, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf498[] = { func_ov036_021954a0, RailJump_Update, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf3e4[] = { func_ov036_021954c4, RailJump_Update, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf408[] = { func_ov036_021954e8, RailJump_Update, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf5b8[] = { func_ov036_02195508, RailJump_Update, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf3a8[] = { func_ov036_02195528, RailJump_Update, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf5c4[] = { func_ov036_0219554c, RailJump_Update, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf3f0[] = { func_ov036_0219556c, RailJump_Update, RailActor_AcSetAcmdEnd };

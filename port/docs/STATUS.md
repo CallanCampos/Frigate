@@ -32,6 +32,61 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-27: bounded five-commit graphics/field follow-up through `dae88ff545`
+
+This records the follow-up to merged PR 43, not a repeat of its deep Phase 4 validation. The protected PR and its
+exact-head checks record publication, delegated owner review and merge.
+
+- **Upstream:** `dae88ff545a89b530ebb6701164264969829c853`, five commits after PR 43's frozen
+  `5d5e9460693fc6681a75fe6d0a84d57516e44bc0`, 52 commits after `deb044db2d3d`. This is a separate bounded proposal
+  (PR 46), retaining the real upstream merge parent and `Upstream-Commit` provenance. No incoming reference exception,
+  workflow change, App-scope change or branch-rule change is introduced by this batch.
+- **Port:** `PORT_SHA`, on `codex/upstream-sync-dae88ff545a8-a4bbdc245f51`, initially proposed as `e3179a4820` from
+  reviewed main `a4bbdc245f51` (merged PR 43). No new port adaptation is needed. Existing archive host C, typed
+  absent-ROM terminators, native pointer types and other guards remain in place.
+- **ROM (T0):** configure/Ninja completes 1,883 incremental steps; both original SHA1s match: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. Canonical publication rechecks both hashes on this proposal
+  before recording its local status.
+- **Host build (T1):** both ordinary arm64 macOS all-target builds and strict Homebrew LLVM builds pass
+  in both games.
+- **Tests (T2/T3):** `ctest --test-dir build/p4-san-<version> -R
+  '^(nnsys_|g3d_|gfx_|integrate_archive|hal_gscrypt)' --output-on-failure --no-tests=error` passes 35/35 per game,
+  zero skips, with ASan/UBSan recovery off. The canonical exact-head both-version build/CTest gate remains
+  required before merge; final pass/skip counts and the strict SDK-focused results belong in PR 46's check.
+- **Short visual replay:** both games exit zero at 8,500 frames using the committed `party_menus_<version>.pbwinput`
+  with SHA-checked starter saves. Programs stay unchanged and the isolated input saves stay byte-identical.
+  Party, summary, Pokédex, trainer card and bag captures are inspected in both games.
+- **Oracle, sanitizers and saves (T4/T5/T6/T7):** this follow-up does not rerun the full Phase 4 oracle and six-case
+  strict gameplay batches solely for equivalent constants and naming changes. PR 43's complete T4/T5/T6/T7 evidence
+  remains evidence for its tested upstream `5d5e946069` head. New build, SDK, core and short-replay results above
+  establish this proposal's narrower checks; they do not relabel the earlier 18 oracle results or save round trips
+  as new runs. Any required canonical route checks are recorded separately on this proposal's exact head.
+- **Tiers:** fresh `progress.py --root . --version <version> --out <local-output>` scans: both games
+  40,949 tier (a), zero (b), 68 (c), excluding 2,385 veneers; function counts/code bytes are unchanged from PR 43.
+  Code bytes a/b/c: B2 3,845,958/0/4,302, W2 3,846,046/0/4,302. Recovered tier-(a) data increases 28 bytes/game
+  to 1,824,004; remaining generated data gaps total 552 bytes/game. The added DS-dead-stripped initializer
+  leaves ROM-linked function coverage unchanged.
+- **Trap stubs:** 25 generated functions and one data placeholder in each ordinary build, unchanged. Explicit
+  absent-ROM typed HAL terminators remain separate. The new SDK initializer references existing functions and tables, adding no unknown symbol.
+- **64-bit warnings:** strict `game_ptrcasts` passes; report: 365 sites/229 keys, real 66, harmless 123,
+  handled 141, unreachable 35, 1,703 compiled inputs, zero uncompiled. The classified baseline remains unchanged,
+  with no increased real truncations or broader suppression.
+- **Work done:** upstream's field actor header, `fldmmdl_g3dobj.c` and `fld_act_rail.c` are identical after replacing
+  the 44 symbol names and ignoring whitespace. Callback signatures, table order and values are unchanged; no stale
+  port reference to the former names remains. `g2d_RendererCore.c` names the same `s16 -1` depth and `u32 0xffffffff`
+  invalid-handle constants. `g2d_OamSoftwareSpriteDraw.c` adds two unused `FX32_ONE` objects. `g2d_CharCanvas.c`
+  reorders definitions without changing vtable contents, names equivalent unsigned 32-bit all-one masks, and adds
+  the header-declared `NNS_G2dCharCanvasInitForOBJ2DRect`, dropped by the DS link and uncalled by the game. That
+  initializer selects the existing table with its 32/16 line-width parameter; native pointer fields/layouts stay
+  unchanged. The remaining commit documents which generated graphics ranges these constants close.
+- **Next:** complete the exact-head gates and protected review/merge, then Phase 5's next story-progression route
+  or the separately scoped recorder implementation (issue #38). `--record` remains a proposal, not an implemented
+  option. Spanish gameplay/save validation still needs a Spanish dump (issue #45); IRES loading is experimental and
+  Spanish White 2 is refused.
+- **Blockers:** no known source blocker for this batch. Proposed ADR 0023 still bounds trainer-AI comparison.
+  Whole-story, JPEG/camera/network gameplay, Spanish compatibility and independent PC-save DS interchange remain
+  outside this batch's coverage.
+
 ## 2026-10-27: reviewed upstream sync and Phase 4 regression validation
 
 - **Upstream:** `5d5e9460693fc6681a75fe6d0a84d57516e44bc0`, 47 commits after reviewed `deb044db2d3d`.
@@ -39,7 +94,7 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   Spanish loader) are integrated. This entry records local validation of the sync proposal; the protected PR records
   the publication head, final CI, delegated owner review and merge. The owner authorized `--allow-references` for
   this sync's incoming `f2b0f0c299`; future reference checks remain enabled.
-- **Port:** `PORT_SHA`, on `codex/upstream-sync-61ec4115fd52-f786fed9939d`, after upstream merge `510d66748e`
+- **Port:** `eba2133ecc`, on `codex/upstream-sync-61ec4115fd52-f786fed9939d`, after upstream merge `510d66748e`
   and reviewed-main merge `6f6554545d`. Merging actual reviewed main left the entire tested tree unchanged. Runtime
   inputs (5,492 files) have SHA256 `cab35ccf3d4e7af4fbf06932ea1dbb9f392bcd19b8cc48d6148fa48160583367`.
 - **ROM (T0):** `.venv/bin/python configure.py b2_us w2_us && ninja`: both SHA1s match, B2

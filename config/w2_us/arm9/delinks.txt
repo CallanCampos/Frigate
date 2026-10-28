@@ -916,14 +916,14 @@ lib/nnsys/src/g2d/g2d_CellTransferManager.c:
 lib/nnsys/src/g2d/g2d_OamSoftwareSpriteDraw.c:
     complete
     .text       start:0x02062e40 end:0x02063194
-    .rodata     start:0x02094308 end:0x02094390
+    .rodata     start:0x02094300 end:0x02094390
     .data       start:0x0209b2c0 end:0x0209b2c4
     .bss        start:0x02143a2c end:0x02143a48
 
 lib/nnsys/src/g2d/g2d_RendererCore.c:
     complete
     .text       start:0x02063194 end:0x02063b5c
-    .rodata     start:0x02094398 end:0x020943b0
+    .rodata     start:0x02094390 end:0x020943b0
     .bss        start:0x02143a48 end:0x02143a4c
 
 lib/nnsys/src/g2d/g2d_PaletteTable.c:
@@ -943,7 +943,7 @@ lib/nnsys/src/g2d/g2d_Font.c:
 lib/nnsys/src/g2d/g2d_CharCanvas.c:
     complete
     .text       start:0x02063d50 end:0x02064adc
-    .rodata     start:0x020943bc end:0x02094440
+    .rodata     start:0x020943b0 end:0x02094440
 
 lib/nnsys/src/g2d/g2d_TextCanvas.c:
     complete
