@@ -12,7 +12,7 @@
     ScriptEntriesEnd
 
 Script_5:
-    WbtCmd_IsCreated 0x8010
+    IsCreated 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -25,7 +25,7 @@ L_003D:
     VMHalt
 
 L_0045:
-    WbtCmd_GetCategory 0x8010
+    GetCategory 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -59,7 +59,7 @@ L_00A9:
     VMReturn
 
 L_00BE:
-    WbtCmd_GetSlotTrainerObjCodes_1023 EVENT_WORK_0x4020, EVENT_WORK_0x4021, EVENT_WORK_0x4022
+    GetSlotTrainerObjCodes_1023 EVENT_WORK_0x4020, EVENT_WORK_0x4021, EVENT_WORK_0x4022
     VMStackPush EVENT_WORK_0x4020
     VMStackPushConst 0
     VMStackCmp CMP_NE
@@ -94,7 +94,7 @@ L_0119:
     VMReturn
 
 L_012E:
-    WbtCmd_GetTournament 0x8010
+    GetTournament 0x8010
     VMStackPush 0x8010
     VMStackPushConst 11
     VMStackCmp CMP_NE
@@ -102,7 +102,7 @@ L_012E:
     VMReturn
 
 L_0147:
-    WbtCmd_GetRound 0x8010
+    GetRound 0x8010
     VMStackPush 0x8010
     VMStackPushConst 5
     VMStackCmp CMP_EQ
@@ -127,8 +127,8 @@ Script_1:
     VMJump L_01A3
 
 L_0197:
-    WbtCmd_Create
-    WbtCmd_SetCategory 1
+    Wbt_Create
+    SetCategory 1
     VMCall L_01EC
 
 L_01A3:
@@ -144,8 +144,8 @@ Script_3:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_01D6
-    WbtCmd_Create
-    WbtCmd_SetCategory 2
+    Wbt_Create
+    SetCategory 2
     VMCall L_01EC
     VMJump L_01E6
 
@@ -171,7 +171,7 @@ L_01EC:
     WorkSetConst 0x8027, 0
     WorkSetConst 0x8028, 0
     WorkSetConst 0x8029, 0
-    WbtCmd_SetRound 0
+    SetRound 0
     // "Welcome to the\nPokémon World Tournament![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_WelcomePokemonWorldTournament, 0x8011, 4, 0
     WorkSetConst 0x8020, 1
@@ -220,7 +220,7 @@ L_02CE:
 
 L_02E1:
     VMCall L_05D6
-    WbtCmd_SetTournament 0x8023
+    SetTournament 0x8023
     WorkGet 0x8021, 0x8023
     WorkCmpConst 0x8021, 0
     VMJumpIf CMP_EQ, L_0304
@@ -236,7 +236,7 @@ L_0310:
     VMJump L_0333
 
 L_0323:
-    WbtCmd_SetStyle 0
+    SetStyle 0
     WorkSetConst 0x8020, 7
     VMJump L_0377
 
@@ -271,7 +271,7 @@ L_037D:
 
 L_0390:
     WorkSetConst 0x8023, 17
-    WbtCmd_SetType 17
+    SetType 17
     VMCall L_0DED
     VMStackPush 0x8023
     VMStackPushConst 17
@@ -281,7 +281,7 @@ L_0390:
     VMJump L_03C9
 
 L_03BF:
-    WbtCmd_SetType 0x8023
+    SetType 0x8023
     WorkSetConst 0x8020, 6
 
 L_03C9:
@@ -295,7 +295,7 @@ L_03CF:
 L_03E2:
     WorkSetConst 0x8022, 0
     VMCall L_0EAF
-    WbtCmd_SetDownloadSlot 0x8022
+    SetDownloadSlot 0x8022
     VMStackPush 0x8028
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -330,12 +330,12 @@ L_044F:
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_0484
     WorkGet 0x8025, 0x8023
-    WbtCmd_SetStyle 0x8025
+    SetStyle 0x8025
     WorkSetConst 0x8020, 7
     VMJump L_04AD
 
 L_0484:
-    WbtCmd_GetTournament 0x8021
+    GetTournament 0x8021
     VMStackPush 0x8021
     VMStackPushConst 2
     VMStackCmp CMP_EQ
@@ -371,8 +371,8 @@ L_04F1:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0528
-    WbtCmd_MakeMatch
-    WbtCmd_SetRound 1
+    MakeMatch
+    SetRound 1
     VMCall L_0A17
     WorkSetConst 0x8020, 8
     VMJump L_052E
@@ -398,14 +398,14 @@ L_0540:
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_WeHopeSeeAgain, 0x8011, 4, 0
     LastKeyWait
     MsgWinCloseAll
-    WbtCmd_Free
+    Wbt_Free
     VMJump L_056B
 
 L_056B:
     VMReturn
 
 L_056D:
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32803
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32803
     ListMenuAdd 2, 65535, 0
     ListMenuAdd 3, 65535, 1
     ListMenuAdd 4, 65535, 2
@@ -436,7 +436,7 @@ L_05D4:
 L_05D6:
     // "Which tournament\nwill you participate in?"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_WhichTournamentWillParticipate, 0x8011, 4, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32803
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32803
     VMCall L_0616
     ListMenuAdd 38, 65535, 0
     ListMenuShow
@@ -450,7 +450,7 @@ L_0614:
     VMReturn
 
 L_0616:
-    WbtCmd_IsTournamentAvailable 11, 0x8010
+    IsTournamentAvailable 11, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -458,7 +458,7 @@ L_0616:
     ListMenuAdd 26, 65535, 11
 
 L_0637:
-    WbtCmd_IsTournamentAvailable 4, 0x8010
+    IsTournamentAvailable 4, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -466,7 +466,7 @@ L_0637:
     ListMenuAdd 26, 65535, 4
 
 L_0658:
-    WbtCmd_IsTournamentAvailable 5, 0x8010
+    IsTournamentAvailable 5, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -474,7 +474,7 @@ L_0658:
     ListMenuAdd 27, 65535, 5
 
 L_0679:
-    WbtCmd_IsTournamentAvailable 6, 0x8010
+    IsTournamentAvailable 6, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -482,7 +482,7 @@ L_0679:
     ListMenuAdd 28, 65535, 6
 
 L_069A:
-    WbtCmd_IsTournamentAvailable 7, 0x8010
+    IsTournamentAvailable 7, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -490,7 +490,7 @@ L_069A:
     ListMenuAdd 29, 65535, 7
 
 L_06BB:
-    WbtCmd_IsTournamentAvailable 8, 0x8010
+    IsTournamentAvailable 8, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -498,7 +498,7 @@ L_06BB:
     ListMenuAdd 30, 65535, 8
 
 L_06DC:
-    WbtCmd_IsTournamentAvailable 9, 0x8010
+    IsTournamentAvailable 9, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -506,7 +506,7 @@ L_06DC:
     ListMenuAdd 31, 65535, 9
 
 L_06FD:
-    WbtCmd_IsTournamentAvailable 10, 0x8010
+    IsTournamentAvailable 10, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -514,7 +514,7 @@ L_06FD:
     ListMenuAdd 32, 65535, 10
 
 L_071E:
-    WbtCmd_IsTournamentAvailable 1, 0x8010
+    IsTournamentAvailable 1, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -522,7 +522,7 @@ L_071E:
     ListMenuAdd 23, 65535, 1
 
 L_073F:
-    WbtCmd_IsTournamentAvailable 13, 0x8010
+    IsTournamentAvailable 13, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -530,7 +530,7 @@ L_073F:
     ListMenuAdd 35, 65535, 13
 
 L_0760:
-    WbtCmd_IsTournamentAvailable 15, 0x8010
+    IsTournamentAvailable 15, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -538,7 +538,7 @@ L_0760:
     ListMenuAdd 36, 65535, 15
 
 L_0781:
-    WbtCmd_IsTournamentAvailable 2, 0x8010
+    IsTournamentAvailable 2, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -546,7 +546,7 @@ L_0781:
     ListMenuAdd 24, 65535, 2
 
 L_07A2:
-    WbtCmd_IsTournamentAvailable 12, 0x8010
+    IsTournamentAvailable 12, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -554,7 +554,7 @@ L_07A2:
     ListMenuAdd 33, 65535, 12
 
 L_07C3:
-    WbtCmd_IsTournamentAvailable 14, 0x8010
+    IsTournamentAvailable 14, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -562,7 +562,7 @@ L_07C3:
     ListMenuAdd 34, 65535, 14
 
 L_07E4:
-    WbtCmd_IsTournamentAvailable 3, 0x8010
+    IsTournamentAvailable 3, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -575,7 +575,7 @@ L_0805:
 L_0807:
     // "Which battle format\nwill you choose?"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_WhichBattleFormatWill, 0x8011, 4, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32803
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32803
     ListMenuAdd 44, 65535, 0
     ListMenuAdd 45, 65535, 1
     ListMenuAdd 46, 65535, 2
@@ -592,7 +592,7 @@ L_085F:
     VMReturn
 
 L_0861:
-    WbtCmd_GetTournament 0x8021
+    GetTournament 0x8021
     VMStackPush 0x8021
     VMStackPushConst 12
     VMStackCmp CMP_EQ
@@ -612,8 +612,8 @@ L_0890:
     MsgWinCloseAll
 
 L_08A5:
-    WbtCmd_CallEntryPartySelect 0x8010
-    WbtCmd_SetUseBattleBox 0x8010
+    CallEntryPartySelect 0x8010
+    SetUseBattleBox 0x8010
     DebugPrint 0x8010
     VMStackPush 0x8010
     VMStackPushConst 2
@@ -658,7 +658,7 @@ L_093E:
 
 L_0952:
     SystemMsg 0x8010, 2
-    WbtCmd_GetRegulationId 0x8026
+    GetRegulationId 0x8026
     VMStackPush 0x8000
     WorkSet 0x8000, 0x8026
     RTCallGlobal 10261
@@ -672,7 +672,7 @@ L_0970:
     VMReturn
 
 L_0978:
-    WbtCmd_GetTournament 0x8021
+    GetTournament 0x8021
     VMStackPush 0x8021
     VMStackPushConst 12
     VMStackCmp CMP_EQ
@@ -683,7 +683,7 @@ L_0978:
     VMJumpIf CMP_STACK, L_09E6
     // "A randomized draw will determine your\nPokémon team. The excitement builds!"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_RandomizedDrawWillDetermine, 0x8011, 4, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 0, 32784
+    ListMenuAnchorTopRight 31, 1, 0, 0, 32784
     ListMenuAdd 109, 65535, 0
     ListMenuAdd 110, 65535, 1
     ListMenuAdd 111, 65535, 2
@@ -691,7 +691,7 @@ L_0978:
     // "The moment of truth!\nWhich Pokémon will you receive?[f000]븁\u0000\nCounting down...[f000]븁\u0000\n... ...\n... ...[f000]븁\u0000\nTa-da! Here they are![f000]븁\u0000\nThese are the Pokémon\navailable for rental![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_MomentTruthWhichPokemon, 0x8011, 4, 0
     MsgWinCloseAll
-    WbtCmd_MakeRentalParty 0x8010
+    MakeRentalParty 0x8010
     VMJump L_09F4
 
 L_09E6:
@@ -701,7 +701,7 @@ L_09E6:
 
 L_09F4:
     PokePartyRecoverAll
-    WbtCmd_CallPokeSelect 0x8010
+    WbtEntrance_CallPokeSelect 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -714,7 +714,7 @@ L_0A0F:
 
 L_0A17:
     FunfestBGMReturn
-    WbtCmd_WouldOpenTournament 6, 0x8010
+    WouldOpenTournament 6, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -723,7 +723,7 @@ L_0A17:
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_VictoryUnovaLeadersTournament, 0x8011, 4, 0
 
 L_0A3E:
-    WbtCmd_WouldOpenTournament 10, 0x8010
+    WouldOpenTournament 10, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -732,7 +732,7 @@ L_0A3E:
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_HaveAnnouncementMakeWin, 0x8011, 4, 0
 
 L_0A63:
-    WbtCmd_WouldOpenTournament 1, 0x8010
+    WouldOpenTournament 1, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -741,7 +741,7 @@ L_0A63:
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_OneMoreWinWorld, 0x8011, 4, 0
 
 L_0A88:
-    WbtCmd_WouldOpenTournament 13, 0x8010
+    WouldOpenTournament 13, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -750,7 +750,7 @@ L_0A88:
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_WhenWinAllRegional, 0x8011, 4, 0
 
 L_0AAD:
-    WbtCmd_WouldOpenTournament 15, 0x8010
+    WouldOpenTournament 15, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -762,7 +762,7 @@ L_0AD2:
     // "Done!\nYour registration is complete.[f000]븀\u0000\nRight this way, please.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_DoneRegistrationCompleteRight, 0x8011, 4, 0
     MsgWinCloseAll
-    WbtCmd_GetCategory 0x8010
+    GetCategory 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -806,7 +806,7 @@ Movement_0B60:
 L_0B68:
     // "Which tournament do you\nwant to know about?"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_WhichTournamentWantKnow, 0x8011, 4, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32803
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32803
     ListMenuAdd 37, 65535, 100
     VMCall L_0616
     ListMenuAdd 38, 65535, 0
@@ -979,7 +979,7 @@ L_0DEB:
 L_0DED:
     // "Which type of tournament\nwill you participate in?"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_WhichTypeTournamentWill, 0x8011, 4, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32803
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32803
     ListMenuAdd 83, 65535, 0
     ListMenuAdd 84, 65535, 9
     ListMenuAdd 85, 65535, 10
@@ -1009,7 +1009,7 @@ L_0EAD:
     VMReturn
 
 L_0EAF:
-    WbtCmd_CountDownloads 0x8028
+    CountDownloads 0x8028
     VMStackPush 0x8028
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -1020,14 +1020,14 @@ L_0EAF:
 
 L_0ED8:
     MsgWinCloseAll
-    WbtCmd_ShowDownloads 0x8010, 0x8022
+    ShowDownloads 0x8010, 0x8022
 
 L_0EE0:
     VMReturn
 
 Script_4:
     ActorsPauseAll
-    WbtCmd_GetCategory 0x8010
+    GetCategory 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1051,7 +1051,7 @@ L_0F1B:
     ActorCmdWait
 
 L_0F48:
-    WbtCmd_GetRound 0x8010
+    GetRound 0x8010
     WorkCmpConst 0x8010, 2
     VMJumpIf CMP_EQ, L_0F5F
     VMJump L_0F77
@@ -1090,13 +1090,13 @@ L_0FCD:
     VMJump L_1009
 
 L_0FE0:
-    WbtCmd_GetTournament 0x8021
-    WbtCmd_SetTournamentNameWord 0, 0x8021
+    GetTournament 0x8021
+    SetTournamentNameWord 0, 0x8021
     // "Congratulations on winning the\n[f000]Ļ\u0001\u0000![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_CongratulationsWinning, 0x8011, 4, 0
     VMCall L_1068
     VMCall L_115E
-    WbtCmd_RecordWin
+    RecordWin
     VMJump L_1009
 
 L_1009:
@@ -1104,7 +1104,7 @@ L_1009:
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_WeHopeSeeAgain, 0x8011, 4, 0
     LastKeyWait
     MsgWinCloseAll
-    WbtCmd_Free
+    Wbt_Free
     VMStackPush 0x8021
     VMStackPushConst 11
     VMStackCmp CMP_EQ
@@ -1137,7 +1137,7 @@ Movement_105C:
     MoveEnd
 
 L_1068:
-    WbtCmd_AwardBattlePoints 0x8010
+    AwardBattlePoints 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_NE
@@ -1223,7 +1223,7 @@ L_1173:
     WorkSetConst 0x802a, 0
     WorkSetConst 0x802b, 0
     WorkSetConst 0x802c, 0
-    WbtCmd_GetType 0x802a
+    GetType 0x802a
     WorkSetConst 0x802b, 0
     WorkSetConst 0x802c, 1
 
@@ -1236,7 +1236,7 @@ L_11A8:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_122A
-    WbtCmd_GetWinCount 2, 0x802b, 0x8010
+    GetWinCount 2, 0x802b, 0x8010
     VMStackPush 0x802b
     VMStackPush 0x802a
     VMStackCmp CMP_EQ
@@ -1274,7 +1274,7 @@ L_1241:
     WorkSetConst 0x802a, 0
 
 L_1253:
-    WbtCmd_GetWinCount 0x8021, 17, 0x8010
+    GetWinCount 0x8021, 17, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -1391,7 +1391,7 @@ L_13D5:
     VMJump L_13DF
 
 L_13DF:
-    WbtCmd_WouldOpenTournament 6, 0x8010
+    WouldOpenTournament 6, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1404,51 +1404,51 @@ L_13DF:
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_WowCanNowParticipate, 0x8011, 4, 0
 
 L_1414:
-    WbtCmd_WouldOpenTournament 10, 0x8010
+    WouldOpenTournament 10, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_1442
     MedalDiscover 141
-    WbtCmd_SetTournamentNameWord 0, 10
+    SetTournamentNameWord 0, 10
     // "You can now participate in the\n[f000]Ļ\u0001\u0000![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_CanNowParticipate, 0x8011, 4, 0
 
 L_1442:
-    WbtCmd_WouldOpenTournament 13, 0x8010
+    WouldOpenTournament 13, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_1470
     MedalDiscover 143
-    WbtCmd_SetTournamentNameWord 0, 13
+    SetTournamentNameWord 0, 13
     // "You can now participate in the\n[f000]Ļ\u0001\u0000![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_CanNowParticipate, 0x8011, 4, 0
 
 L_1470:
-    WbtCmd_WouldOpenTournament 15, 0x8010
+    WouldOpenTournament 15, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_149E
     MedalDiscover 144
-    WbtCmd_SetTournamentNameWord 0, 15
+    SetTournamentNameWord 0, 15
     // "You can now participate in the\n[f000]Ļ\u0001\u0000![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_CanNowParticipate, 0x8011, 4, 0
 
 L_149E:
-    WbtCmd_WouldOpenTournament 2, 0x8010
+    WouldOpenTournament 2, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_14CC
     MedalDiscover 145
-    WbtCmd_SetTournamentNameWord 0, 2
+    SetTournamentNameWord 0, 2
     // "You can now participate in the\n[f000]Ļ\u0001\u0000![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_CanNowParticipate, 0x8011, 4, 0
 
 L_14CC:
-    WbtCmd_IsTournamentAvailable 1, 0x8010
+    IsTournamentAvailable 1, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -1457,19 +1457,19 @@ L_14CC:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_1550
-    WbtCmd_WouldOpenTournament 1, 0x8010
+    WouldOpenTournament 1, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_1529
     MedalDiscover 142
-    WbtCmd_SetTournamentNameWord 0, 1
+    SetTournamentNameWord 0, 1
     // "You can now participate in the\n[f000]Ļ\u0001\u0000![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_CanNowParticipate, 0x8011, 4, 0
     VMJump L_1550
 
 L_1529:
-    WbtCmd_GetWinCount 10, 17, 0x8010
+    GetWinCount 10, 17, 0x8010
     WorkSetConst 0x8029, 9
     WorkSub 0x8029, 0x8010
     WordSetNumber 0, 0x8029, 2
@@ -1493,7 +1493,7 @@ L_156A:
     VMJumpIf CMP_STACK, L_1645
     // ""
     SystemMsg Global10655_Text_Empty, 2
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32814
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32814
     ListMenuAdd 100, 103, 100
     ListMenuAdd 101, 104, 101
     ListMenuAdd 102, 105, 102
@@ -1538,7 +1538,7 @@ L_1631:
     VMJump L_163F
 
 L_1637:
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x802d, 1
 
 L_163F:
@@ -1552,8 +1552,8 @@ L_1645:
 L_164B:
     // "Tournament Records\nwere accessed.[f000]븁\u0000"
     SystemMsg Global10655_Text_TournamentRecordsWereAccessed, 2
-    InfoMsgClose
-    WbtCmd_ShowWinRecord 0x8010
+    SystemMsgClose
+    ShowWinRecord 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1566,8 +1566,8 @@ L_1670:
 L_1672:
     // "The Tournament Download System\nwas accessed.[f000]븁\u0000"
     SystemMsg Global10655_Text_TournamentDownloadSystemAccessed, 2
-    InfoMsgClose
-    WbtCmd_Download 0, 0x8010
+    SystemMsgClose
+    Download 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ

@@ -66,7 +66,7 @@ L_00E5:
     EvCameraMoveTo 9688, 0, 0xed000, 0x108000, 0, 0xa8000, 30
     EvCameraWait
     VMSleep 8
-    Plugin14Cmd_CallDT9ReleaseEvent
+    CallDT9ReleaseEvent
     BGMPlayEx 1002, 6
     FlagReset EVENT_FLAG_0x029b
     WorkSetConst EVENT_WORK_0x411b, 2
@@ -118,7 +118,7 @@ L_01B2:
     EvCameraMoveTo 9688, 0, 0xed000, 0x108000, 0, 0xa8000, 30
     EvCameraWait
     VMSleep 8
-    Plugin14Cmd_CallDT9ReleaseEvent
+    CallDT9ReleaseEvent
     BGMPlayEx 1002, 6
     FlagReset EVENT_FLAG_0x029b
     WorkSetConst EVENT_WORK_0x411b, 2
@@ -238,7 +238,7 @@ L_033E:
     ScreamMsg DragonspiralTower9_Text_Bazzazzazzash, 0
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     CallWildBattle 644, 70, 0x8024
     VMJump L_03A1
 
@@ -248,7 +248,7 @@ L_0388:
     ScreamMsg DragonspiralTower9_Text_Preeeeaah, 0
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     CallWildBattle 643, 70, 0x8024
 
 L_03A1:
@@ -298,14 +298,14 @@ L_041F:
     // "Zekrom went flying off somewhere..."
     SystemMsg DragonspiralTower9_Text_ZekromWentFlyingOff, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_0450
 
 L_0446:
     // "Reshiram went flying off somewhere..."
     SystemMsg DragonspiralTower9_Text_ReshiramWentFlyingOff, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
 
 L_0450:
     VMJump L_0456

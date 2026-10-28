@@ -34,7 +34,7 @@
 #include "system/vm.h"
 #include "system/wordset.h"
 
-// What s0224_PokePartyGetIV gives: the IVs' total, the highest, or one of them
+// What Scrcmd_PokemonMisc_PokePartyGetIV gives: the IVs' total, the highest, or one of them
 enum {
     IV_QUERY_TOTAL,
     IV_QUERY_HIGHEST,
@@ -78,7 +78,7 @@ enum {
     MOVE_TUTOR_CHECK_KNOWN,
 };
 
-// What s0223_PokePartyGetHiddenPowerType gives for a Pokémon that can't learn Hidden Power
+// What Scrcmd_PokemonMisc_PokePartyGetHiddenPowerType gives for a Pokémon that can't learn Hidden Power
 #define HIDDEN_POWER_TYPE_NONE 0xffff
 
 // Whether the Pokémon can be traded for the offer: it can, it is an egg, it is another species or sex, or it can't
@@ -91,8 +91,8 @@ enum {
     FIELD_TRADE_CHECK_UNTRADEABLE,
 };
 
-// What PokeParty_ControlLegendMon does: check whether the party has the legendary Pokémon, move it to the front, or
-// swap a party Pokémon with it from the box first
+// What Scrcmd_PokemonMisc_ControlLegendMon does: check whether the party has the legendary Pokémon, move it to the
+// front, or swap a party Pokémon with it from the box first
 enum {
     LEGEND_MON_CHECK_PARTY,
     LEGEND_MON_MOVE_TO_FRONT,
@@ -104,7 +104,7 @@ static u32 PML_PkmGetHapinessMax(u32 unused);
 static BOOL PokeParty_CheckTutorMoveCompat(PartyPkm *pkm, u32 tutor);
 static u32 CheckPartyAllMoveTutor(VM *vm, FieldScriptEnv *env, u32 tutor, u8 *learnable, BOOL needMaxHappiness);
 
-BOOL s0107_CallPokeSelect(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_CallPokeSelect(VM *vm, FieldScriptEnv *env) {
     PokeSelectArgs args;
     u16 flag = VM_Read16(vm);
     u16 *picked = ScriptReadVar(vm, env);
@@ -129,7 +129,7 @@ BOOL s0107_CallPokeSelect(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s011D_TrainerCardSetFavePokemon(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_TrainerCardSetFavePokemon(VM *vm, FieldScriptEnv *env) {
     PartyPkm *pkm;
     u32 index = ScriptReadAny(vm, env);
 
@@ -145,7 +145,7 @@ BOOL s011D_TrainerCardSetFavePokemon(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s011E_TrainerCardSaveGymVictoryParty(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_TrainerCardSaveGymVictoryParty(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     PokeParty *party = GameData_GetParty(gameData);
     u16 gym = ScriptReadAny(vm, env);
@@ -167,7 +167,7 @@ BOOL s011E_TrainerCardSaveGymVictoryParty(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s011F_WordSetGymVictoryParty(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_WordSetGymVictoryParty(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u16 gym = ScriptReadAny(vm, env);
@@ -189,7 +189,7 @@ BOOL s011F_WordSetGymVictoryParty(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0224_PokePartyGetIV(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_PokePartyGetIV(VM *vm, FieldScriptEnv *env) {
     PartyPkm *pkm;
     u32 index = ScriptReadAny(vm, env);
     u32 type = ScriptReadAny(vm, env);
@@ -246,7 +246,7 @@ BOOL s0224_PokePartyGetIV(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01C5_PokeDexGetEvaluationParams(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_PokeDexGetEvaluationParams(VM *vm, FieldScriptEnv *env) {
     u16 mode = ScriptReadAny(vm, env);
     u16 *message = ScriptReadVar(vm, env);
     u16 *count = ScriptReadVar(vm, env);
@@ -258,7 +258,7 @@ BOOL s01C5_PokeDexGetEvaluationParams(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01C4_PokeDexIsComplete(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_PokeDexIsComplete(VM *vm, FieldScriptEnv *env) {
     PokeDexSave *pokedex = GameData_GetPokedex(FieldScriptEnv_GetGameData(env));
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     u16 *result = ScriptReadVar(vm, env);
@@ -374,7 +374,7 @@ static u32 CheckPartyAllMoveTutor(VM *vm, FieldScriptEnv *env, u32 tutor, u8 *le
     return MOVE_TUTOR_CHECK_OK;
 }
 
-BOOL s01D1_MoveTutorCheckParty(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_MoveTutorCheckParty(VM *vm, FieldScriptEnv *env) {
     u8 learnable;
     u16 tutor = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
@@ -383,7 +383,7 @@ BOOL s01D1_MoveTutorCheckParty(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01D3_MoveTutorGetMoveID(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_MoveTutorGetMoveID(VM *vm, FieldScriptEnv *env) {
     PartyPkm *pkm;
     u16 tutor = ScriptReadAny(vm, env);
     u16 index = ScriptReadAny(vm, env);
@@ -397,7 +397,7 @@ BOOL s01D3_MoveTutorGetMoveID(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01D2_MoveTutorCheckPkm(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_MoveTutorCheckPkm(VM *vm, FieldScriptEnv *env) {
     PartyPkm *pkm;
     u32 tutor = ScriptReadAny(vm, env);
     u32 index = ScriptReadAny(vm, env);
@@ -419,7 +419,7 @@ BOOL s01D2_MoveTutorCheckPkm(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01D4_MoveTutorCallPokeSelect(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_MoveTutorCallPokeSelect(VM *vm, FieldScriptEnv *env) {
     u8 learnable;
     MoveTutorPokeSelectArgs args;
     u16 tutor = ScriptReadAny(vm, env);
@@ -455,7 +455,7 @@ BOOL s01D4_MoveTutorCallPokeSelect(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0100_PokePartyCheckPokerus(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_PokePartyCheckPokerus(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     PokeParty *party;
     u32 count;
@@ -474,7 +474,7 @@ BOOL s0100_PokePartyCheckPokerus(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0223_PokePartyGetHiddenPowerType(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_PokePartyGetHiddenPowerType(VM *vm, FieldScriptEnv *env) {
     PartyPkm *pkm;
     u16 *result = ScriptReadVar(vm, env);
     u32 index = ScriptReadAny(vm, env);
@@ -490,7 +490,7 @@ BOOL s0223_PokePartyGetHiddenPowerType(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0105_CallPokeNameInput(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_CallPokeNameInput(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 *result = ScriptReadVar(vm, env);
@@ -500,7 +500,7 @@ BOOL s0105_CallPokeNameInput(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0109_CallPokeMoveReplace(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_CallPokeMoveReplace(VM *vm, FieldScriptEnv *env) {
     PokeMoveReplaceArgs args;
     u16 *forgot = ScriptReadVar(vm, env);
     u16 *slot = ScriptReadVar(vm, env);
@@ -521,7 +521,7 @@ BOOL s0109_CallPokeMoveReplace(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0106_CallEggHatch(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_CallEggHatch(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -551,7 +551,7 @@ BOOL s0106_CallEggHatch(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01B5_FieldTradeCheck(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_FieldTradeCheck(VM *vm, FieldScriptEnv *env) {
     PartyPkm *pkm;
     FieldTradeInput *input;
     GameSystem *gsys;
@@ -598,7 +598,7 @@ BOOL s01B5_FieldTradeCheck(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01B4_FieldTradeStart(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_FieldTradeStart(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u32 offerIndex = ScriptReadAny(vm, env);
@@ -608,7 +608,7 @@ BOOL s01B4_FieldTradeStart(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s02C0_FieldTradeGetSpecies(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_FieldTradeGetSpecies(VM *vm, FieldScriptEnv *env) {
     FieldTradeInput *input;
     GameSystem *gsys;
     HeapID heapId;
@@ -625,7 +625,7 @@ BOOL s02C0_FieldTradeGetSpecies(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0225_ItemGetRandomOwnedTMMove(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_ItemGetRandomOwnedTMMove(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     BagSave *bag = GameData_GetBag(FieldScriptEnv_GetGameData(env));
     s32 count = BagSave_GetPocketItemCount(bag, BAG_POCKET_TMS_HMS);
@@ -641,7 +641,7 @@ BOOL s0225_ItemGetRandomOwnedTMMove(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0120_FieldTradeSavePokemon(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_FieldTradeSavePokemon(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     TradedPokemonSave *block;
     PokeParty *party;
@@ -658,7 +658,7 @@ BOOL s0120_FieldTradeSavePokemon(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s022F_WordSetLoadPastTradePkmName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_WordSetLoadPastTradePkmName(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     TradedPokemonSave *block = GetTradedPokemonBlock(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     u32 tradeIndex = ScriptReadAny(vm, env);
@@ -678,7 +678,7 @@ BOOL s022F_WordSetLoadPastTradePkmName(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL PokeParty_ControlLegendMon(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonMisc_ControlLegendMon(VM *vm, FieldScriptEnv *env) {
     u16 kind = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);

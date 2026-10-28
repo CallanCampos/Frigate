@@ -101,7 +101,7 @@ Script_4:
     // "The Pokémon won't move.\nIt might be protecting something..."
     SystemMsg VictoryRoad22_Text_PokemonWontMoveMight, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

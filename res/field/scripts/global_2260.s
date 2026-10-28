@@ -291,7 +291,7 @@ L_0444:
     // "[f000]Ā\u0001\u0000 handed over one\nHeart Scale in exchange."
     SystemMsg Global2260_Text_HandedOverOneHeart, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8033, 0
     ItemSub ITEM_HEART_SCALE, 1, 0x8033
     WorkSetConst 0x8033, 0

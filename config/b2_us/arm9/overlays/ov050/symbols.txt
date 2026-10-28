@@ -1,7 +1,7 @@
-BSubwayCmd_CreateWork kind:function(thumb,size=0x38) addr:0x021e5800
-BSubwayCmd_ClearWork kind:function(thumb,size=0x1c) addr:0x021e5838
-BSubwayCmd_FreeWork kind:function(thumb,size=0x2a) addr:0x021e5854
-BSubwayCmd_Tool kind:function(thumb,size=0x1128) addr:0x021e5880
+Scrcmd_Bsubway_CreateWork kind:function(thumb,size=0x38) addr:0x021e5800
+Scrcmd_Bsubway_ClearWork kind:function(thumb,size=0x1c) addr:0x021e5838
+Scrcmd_Bsubway_FreeWork kind:function(thumb,size=0x2a) addr:0x021e5854
+Scrcmd_Bsubway_Tool kind:function(thumb,size=0x1128) addr:0x021e5880
 .L_021e5e2a kind:label(thumb) addr:0x021e5e2a local
 .L_021e62d2 kind:label(thumb) addr:0x021e62d2
 .L_021e62d4 kind:label(thumb) addr:0x021e62d4

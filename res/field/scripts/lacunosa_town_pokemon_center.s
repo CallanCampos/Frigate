@@ -125,7 +125,7 @@ L_016A:
     WorkSetConst 0x8022, 0
     // "Which Badge's story\nwould you like to hear?"
     ActorMsg MSGFILE_SCRIPT, LacunosaTownPokemonCenter_Text_WhichBadgesStoryWould, 0x8011, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32802
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32802
     TrainerCardHasBadge 0x8010, 0
     VMStackPush 0x8010
     VMStackPushConst 1

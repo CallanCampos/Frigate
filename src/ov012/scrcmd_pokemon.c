@@ -62,7 +62,7 @@ BOOL CheckPokeMoveLearned_NonEgg(PartyPkm *pkm, u16 move) {
     return FALSE;
 }
 
-BOOL s011B_PokePartyGetTypes(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyGetTypes(VM *vm, FieldScriptEnv *env) {
     u16 *type1 = ScriptReadVar(vm, env);
     u16 *type2 = ScriptReadVar(vm, env);
     u16 index = ScriptReadAny(vm, env);
@@ -78,12 +78,12 @@ BOOL s011B_PokePartyGetTypes(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0104_PokePartyRecoverAll(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyRecoverAll(VM *vm, FieldScriptEnv *env) {
     PokeParty_RecoverAll(GameData_GetParty(FieldScriptEnv_GetGameData(env)));
     return FALSE;
 }
 
-BOOL s0112_PokePartyGetEVTotal(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyGetEVTotal(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 index = ScriptReadAny(vm, env);
     PartyPkm *pkm;
@@ -101,7 +101,7 @@ BOOL s0112_PokePartyGetEVTotal(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0101_PokePartyIsFullHP(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyIsFullHP(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 index = ScriptReadAny(vm, env);
     PartyPkm *pkm;
@@ -117,7 +117,7 @@ BOOL s0101_PokePartyIsFullHP(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s024E_PokePartyIsFullPP(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyIsFullPP(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 index = ScriptReadAny(vm, env);
     PartyPkm *pkm;
@@ -150,7 +150,7 @@ BOOL s024E_PokePartyIsFullPP(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0102_PokePartyIsEgg(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyIsEgg(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 index = ScriptReadAny(vm, env);
     PartyPkm *pkm;
@@ -166,7 +166,7 @@ BOOL s0102_PokePartyIsEgg(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00FC_PokePartyGetHappiness(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyGetHappiness(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 index = ScriptReadAny(vm, env);
     PartyPkm *pkm;
@@ -180,7 +180,7 @@ BOOL s00FC_PokePartyGetHappiness(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00FD_PokePartyAdjustHappiness(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyAdjustHappiness(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
     u16 delta = ScriptReadAny(vm, env);
     u16 mode = VM_Read16(vm);
@@ -221,7 +221,7 @@ BOOL s00FD_PokePartyAdjustHappiness(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00FE_PokePartyGetSpecies(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyGetSpecies(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 index = ScriptReadAny(vm, env);
 
@@ -233,14 +233,14 @@ BOOL s00FE_PokePartyGetSpecies(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00FF_PokePartyGetForme(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyGetForme(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 index = ScriptReadAny(vm, env);
     *result = GetScrPokeStat(env, index, PKM_PARAM_FORM);
     return FALSE;
 }
 
-BOOL s010D_PokePartyGetMemberByType(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyGetMemberByType(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 kind = ScriptReadAny(vm, env);
     PokeParty *party = GameData_GetParty(FieldScriptEnv_GetGameData(env));
@@ -261,7 +261,7 @@ BOOL s010D_PokePartyGetMemberByType(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0103_PokePartyGetCount(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyGetCount(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 kind = ScriptReadAny(vm, env);
     PokeParty *party = GameData_GetParty(FieldScriptEnv_GetGameData(env));
@@ -300,7 +300,7 @@ BOOL s0103_PokePartyGetCount(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0114_PokePartyGetCountBySpecies(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyGetCountBySpecies(VM *vm, FieldScriptEnv *env) {
     u16 species = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
     PokeParty *party = GameData_GetParty(FieldScriptEnv_GetGameData(env));
@@ -325,7 +325,7 @@ BOOL s0114_PokePartyGetCountBySpecies(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0121_BoxGetCount(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_BoxGetCount(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 kind = ScriptReadAny(vm, env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
@@ -360,7 +360,7 @@ BOOL s0121_BoxGetCount(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0118_PokePartyFindBySpecies(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyFindBySpecies(VM *vm, FieldScriptEnv *env) {
     u16 species = ScriptReadAny(vm, env);
     u16 *found = ScriptReadVar(vm, env);
     u16 *indexOut = ScriptReadVar(vm, env);
@@ -390,7 +390,7 @@ BOOL s0118_PokePartyFindBySpecies(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0115_PokePartyHasMove(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyHasMove(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 move = ScriptReadAny(vm, env);
     u16 index = ScriptReadAny(vm, env);
@@ -405,7 +405,7 @@ BOOL s0115_PokePartyHasMove(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0116_PokePartyHasMoveAny(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyHasMoveAny(VM *vm, FieldScriptEnv *env) {
     PokeParty *party = GameData_GetParty(FieldScriptEnv_GetGameData(env));
     u16 *result = ScriptReadVar(vm, env);
     u16 move = ScriptReadAny(vm, env);
@@ -423,7 +423,7 @@ BOOL s0116_PokePartyHasMoveAny(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s010C_PokePartyAdd(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyAdd(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     HeapID heapId;
     u16 *result;
@@ -455,7 +455,7 @@ BOOL s010C_PokePartyAdd(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s010E_PokePartyAddEx(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyAddEx(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     HeapID heapId;
     u16 *result;
@@ -507,7 +507,7 @@ BOOL s010E_PokePartyAddEx(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s02EA_PokePartyAddNPoke(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyAddNPoke(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     HeapID heapId;
     PokeParty *party;
@@ -550,7 +550,7 @@ BOOL s02EA_PokePartyAddNPoke(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0108_PokePartyGetMoveCount(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyGetMoveCount(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 index = ScriptReadAny(vm, env);
     PartyPkm *pkm;
@@ -568,7 +568,7 @@ BOOL s0108_PokePartyGetMoveCount(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s010A_PokePartyGetMove(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyGetMove(VM *vm, FieldScriptEnv *env) {
     PartyPkm *pkm;
     u16 slot;
     u16 index;
@@ -586,7 +586,7 @@ BOOL s010A_PokePartyGetMove(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s010B_PokePartyLearnMove(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyLearnMove(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
     u16 slot = ScriptReadAny(vm, env);
     u16 move = ScriptReadAny(vm, env);
@@ -628,7 +628,7 @@ BOOL s010B_PokePartyLearnMove(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0113_PokePartyIsOriginGame(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyIsOriginGame(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 index = ScriptReadAny(vm, env);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(FieldScriptEnv_GetGameData(env));
@@ -677,7 +677,7 @@ BOOL s0113_PokePartyIsOriginGame(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0117_PokePartySetForme(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartySetForme(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
     u16 forme = ScriptReadAny(vm, env);
     FieldScriptEnv_GetScriptWork(env);
@@ -688,7 +688,7 @@ BOOL s0117_PokePartySetForme(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s011C_PokePartyChangeRotomForme(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyChangeRotomForme(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
     u16 forme = ScriptReadAny(vm, env);
     u16 slot = ScriptReadAny(vm, env);
@@ -700,7 +700,7 @@ BOOL s011C_PokePartyChangeRotomForme(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01D5_MoveReminderCheckPkm(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_MoveReminderCheckPkm(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 index = ScriptReadAny(vm, env);
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
@@ -713,10 +713,10 @@ BOOL s01D5_MoveReminderCheckPkm(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-// The place s0119_PokePartyIsFromWhiteForest checks the egg location against, by the index the script gives
+// The place Scrcmd_Pokemon_PokePartyIsFromWhiteForest checks the egg location against, by the index the script gives
 static const u16 wf_location[1] = { PLACE_WHITE_FOREST };
 
-BOOL s0119_PokePartyIsFromWhiteForest(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyIsFromWhiteForest(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 index = ScriptReadAny(vm, env);
     u16 city = ScriptReadAny(vm, env);
@@ -729,7 +729,7 @@ BOOL s0119_PokePartyIsFromWhiteForest(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s011A_PokePartyGetMetDate(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyGetMetDate(VM *vm, FieldScriptEnv *env) {
     u16 *year = ScriptReadVar(vm, env);
     u16 *month = ScriptReadVar(vm, env);
     u16 *day = ScriptReadVar(vm, env);
@@ -748,7 +748,7 @@ BOOL s011A_PokePartyGetMetDate(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-// The IVs that s0111_PokePartySetIV may set, each with its highest value
+// The IVs that Scrcmd_Pokemon_PokePartySetIV may set, each with its highest value
 typedef struct {
     u16 param;
     u16 max;
@@ -759,7 +759,7 @@ static const ScrPokeIVLimit iv_set[6] = {
     { PKM_PARAM_IV_SPEED, 31 }, { PKM_PARAM_IV_SP_ATTACK, 31 }, { PKM_PARAM_IV_SP_DEFENSE, 31 },
 };
 
-BOOL s0111_PokePartySetIV(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartySetIV(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
     u16 param = ScriptReadAny(vm, env);
     u16 value = ScriptReadAny(vm, env);
@@ -780,7 +780,7 @@ BOOL s0111_PokePartySetIV(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-// The parameters s0110_PokePartyGetParam may read
+// The parameters Scrcmd_Pokemon_PokePartyGetParam may read
 static const u8 stats_list[20] = {
     PKM_PARAM_SPECIES,   PKM_PARAM_ITEM,      PKM_PARAM_ABILITY,    PKM_PARAM_REGION,       PKM_PARAM_FATEFUL_ENCOUNTER,
     PKM_PARAM_SEX,       PKM_PARAM_FORM,      PKM_PARAM_NATURE,     PKM_PARAM_IS_NICKNAMED, PKM_PARAM_ORIGIN_GAME,
@@ -788,7 +788,7 @@ static const u8 stats_list[20] = {
     PKM_PARAM_SPEED,     PKM_PARAM_SP_ATTACK, PKM_PARAM_SP_DEFENSE, PKM_PARAM_N_POKEMON,    PKM_PARAM_HP,
 };
 
-BOOL s0110_PokePartyGetParam(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyGetParam(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 index = ScriptReadAny(vm, env);
     u16 param = ScriptReadAny(vm, env);
@@ -804,7 +804,7 @@ BOOL s0110_PokePartyGetParam(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0122_BoxAdd(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_BoxAdd(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     HeapID heapId;
     u16 *result;
@@ -835,7 +835,7 @@ BOOL s0122_BoxAdd(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0123_BoxAddEx(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_BoxAddEx(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     HeapID heapId;
     u16 *result;
@@ -882,7 +882,7 @@ BOOL s0123_BoxAddEx(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s010F_PokePartyAddEgg(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_PokePartyAddEgg(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     HeapID heapId;
     PokeParty *party;
@@ -994,7 +994,7 @@ BOOL addPkmToParty(GameData *gameData, BoxPkmCreateParams *params) {
     return TRUE;
 }
 
-BOOL s00F9_MoneyAdd(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_MoneyAdd(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     GameData_GetPlayerState(gameData);
     u32 amount = ScriptReadAny(vm, env);
@@ -1003,7 +1003,7 @@ BOOL s00F9_MoneyAdd(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00FA_MoneySub(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_MoneySub(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     GameData_GetPlayerState(gameData);
     u32 amount = ScriptReadAny(vm, env);
@@ -1012,7 +1012,7 @@ BOOL s00FA_MoneySub(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00FB_MoneyCheck(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pokemon_MoneyCheck(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u32 amount = ScriptReadAny(vm, env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);

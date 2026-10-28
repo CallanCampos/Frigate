@@ -15,7 +15,7 @@ Script_1:
     ActorsPauseAll
     // "The one radiating such a\ntremendous presence before you[f000]븀\u0000\nis none other than Terrakion![f000]븁\u0000"
     InfoMsg Route22_Text_OneRadiatingSuchTremendous, 1
-    InfoMsgClose_0039
+    InfoMsgClose
     ActorCmdExec 255, Movement_0550
     ActorCmdWait
     PlayerGetDir 0x8020
@@ -279,7 +279,7 @@ Script_2:
     ScreamMsg Route22_Text_Gurooooohhh, 1
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     VMStackPushFlag EVENT_FLAG_0x0149
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -338,7 +338,7 @@ L_0529:
     // "Terrakion ran away past\nthe end of the route..."
     SystemMsg Route22_Text_TerrakionRanAwayPast, 2
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
 
 L_0546:
     FlagSet EVENT_FLAG_0x0149

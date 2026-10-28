@@ -59,7 +59,7 @@ Script_4:
     ActorSetEyeToEye
     // "Hi, hi!\nLet's play Pokémon rock-paper-scissors![f000]븁\u0000\nI'm really good at it!\nI've beaten all of my friends![f000]븀\u0000\nAre you ready?[f000]븁\u0000\nHere we go!"
     ParentActorMsg MSGFILE_SCRIPT, StriatonCity7_Text_HiHiLetsPlay, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 0, 32784
+    ListMenuAnchorTopRight 31, 1, 0, 0, 32784
     ListMenuAdd 4, 65535, 0
     ListMenuAdd 5, 65535, 1
     ListMenuAdd 6, 65535, 2

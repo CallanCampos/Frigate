@@ -33,7 +33,7 @@ Script_2:
     // "There are markings on the wall\nwhere the portrait was hung..."
     InfoMsg StrangeHouse6_Text_ThereMarkingsWallWhere, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -44,7 +44,7 @@ Script_3:
     // "Could there be another painting\nbehind the scratches?"
     InfoMsg StrangeHouse6_Text_CouldThereAnotherPainting, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

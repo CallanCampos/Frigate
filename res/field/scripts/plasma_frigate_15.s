@@ -43,7 +43,7 @@ Script_3:
     VMJumpIf CMP_STACK, L_009C
     // "[f000]Ā\u0001\u0000 hopped into bed and\nfell asleep...[f000]븁\u0000"
     SystemMsg PlasmaFrigate15_Text_HoppedIntoBedFell, 0
-    InfoMsgClose
+    SystemMsgClose
     FadeEx 3, 0, 16, 2
     FadeExWait
     PokePartyRecoverAll
@@ -56,7 +56,7 @@ Script_3:
     LastKeyWait
 
 L_009C:
-    InfoMsgClose
+    SystemMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

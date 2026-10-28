@@ -44,8 +44,8 @@ Script_3:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0096
-    PokemonLeagueCmd_DisableRailLines 1
-    PokemonLeagueCmd_SetCamera 1
+    DisableRailLines 1
+    SetCamera 1
     VMJump L_00A2
 
 L_0096:
@@ -310,17 +310,17 @@ L_0426:
 
 Script_5:
     ActorsPauseAll
-    PokemonLeagueCmd_CallShauntalModel8Event
+    CallShauntalModel8Event
     VMSleep 31
-    PokemonLeagueCmd_PlayShauntalModel 0
+    PlayShauntalModel 0
     VMSleep 35
-    PokemonLeagueCmd_PlayShauntalModel 1
+    PlayShauntalModel 1
     VMSleep 7
-    PokemonLeagueCmd_PlayShauntalModel 2
+    PlayShauntalModel 2
     VMSleep 7
-    PokemonLeagueCmd_PlayShauntalModel 3
+    PlayShauntalModel 3
     VMSleep 7
-    PokemonLeagueCmd_PlayShauntalModel 4
+    PlayShauntalModel 4
     WorkSetConst EVENT_WORK_0x4000, 1
     FinishAllEvents
     ActorsUnpauseAll
@@ -328,10 +328,10 @@ Script_5:
 
 Script_6:
     ActorsPauseAll
-    PokemonLeagueCmd_DisableRailLines 1
-    PokemonLeagueCmd_SetCamera 1
-    PokemonLeagueCmd_CallShauntalRoomChangeEvent 37
-    PokemonLeagueCmd_CallShauntalModels6And9Event
+    DisableRailLines 1
+    SetCamera 1
+    CallShauntalRoomChangeEvent 37
+    CallShauntalModels6And9Event
     WorkSetConst EVENT_WORK_0x4001, 1
     FinishAllEvents
     ActorsUnpauseAll

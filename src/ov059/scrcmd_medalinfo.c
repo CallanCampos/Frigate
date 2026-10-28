@@ -16,7 +16,7 @@
 static void ResortCmd_FreeMedalInfo(void *arg);
 static ResortPerson *ResortCmd_GetMedalPerson(Field *field, FieldScriptEnv *env);
 
-BOOL ResortCmd_ShowMedalInfo(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Medalinfo_ShowMedalInfo(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
     Field *field = GSYS_GetField(gsys);

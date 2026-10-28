@@ -176,7 +176,7 @@ L_0228:
     WorkSetConst 0x8022, 0
     // "[f000]Ā\u0001\u0000 received the\nInsect Badge from Burgh.[f000]븁\u0000"
     SystemMsg CasteliaCityGym2_Text_ReceivedInsectBadgeFrom, 0
-    InfoMsgClose
+    SystemMsgClose
     // "Ooh! The Insect Badge suits you even\nbetter than I thought it would![f000]븁\u0000\nIf you have three Badges,\nPokémon up to Lv. 40 will obey you,[f000]븀\u0000\nincluding traded Pokémon.[f000]븁\u0000\nAnd, uh, you know what,\nI'll also give you this.[f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, CasteliaCityGym2_Text_OohInsectBadgeSuits, 0, 0
     ActorMsgClose

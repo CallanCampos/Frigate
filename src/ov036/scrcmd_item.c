@@ -12,7 +12,7 @@
 
 static u16 isMoveMachine(u16 item);
 
-BOOL s00B5_ItemAdd(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Item_ItemAdd(VM *vm, FieldScriptEnv *env) {
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     BagSave *bag = GameData_GetBag(FieldScriptEnv_GetGameData(env));
     u16 item = ScriptReadAny(vm, env);
@@ -23,7 +23,7 @@ BOOL s00B5_ItemAdd(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00B6_ItemSub(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Item_ItemSub(VM *vm, FieldScriptEnv *env) {
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     BagSave *bag = GameData_GetBag(FieldScriptEnv_GetGameData(env));
     u16 item = ScriptReadAny(vm, env);
@@ -34,7 +34,7 @@ BOOL s00B6_ItemSub(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00B7_ItemCheckSpace(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Item_ItemCheckSpace(VM *vm, FieldScriptEnv *env) {
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     BagSave *bag = GameData_GetBag(FieldScriptEnv_GetGameData(env));
     u16 item = ScriptReadAny(vm, env);
@@ -45,7 +45,7 @@ BOOL s00B7_ItemCheckSpace(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00B8_ItemCheckAmount(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Item_ItemCheckAmount(VM *vm, FieldScriptEnv *env) {
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     BagSave *bag = GameData_GetBag(FieldScriptEnv_GetGameData(env));
     u16 item = ScriptReadAny(vm, env);
@@ -56,7 +56,7 @@ BOOL s00B8_ItemCheckAmount(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00B9_ItemGetCount(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Item_ItemGetCount(VM *vm, FieldScriptEnv *env) {
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     BagSave *bag = GameData_GetBag(FieldScriptEnv_GetGameData(env));
     u16 item = ScriptReadAny(vm, env);
@@ -66,7 +66,7 @@ BOOL s00B9_ItemGetCount(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00BA_ItemIsTMHM(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Item_ItemIsTMHM(VM *vm, FieldScriptEnv *env) {
     u16 item = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
@@ -74,7 +74,7 @@ BOOL s00BA_ItemIsTMHM(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00BB_ItemGetPocket(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Item_ItemGetPocket(VM *vm, FieldScriptEnv *env) {
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     u16 item = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
@@ -83,7 +83,7 @@ BOOL s00BB_ItemGetPocket(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00BD_ItemGetClass(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Item_ItemGetClass(VM *vm, FieldScriptEnv *env) {
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     u16 item = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
@@ -93,7 +93,7 @@ BOOL s00BD_ItemGetClass(VM *vm, FieldScriptEnv *env) {
 }
 
 // How many of the TMs the player has
-BOOL s02D4_ItemGetTMCount(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Item_ItemGetTMCount(VM *vm, FieldScriptEnv *env) {
     u16 count;
     u16 item;
     BagSave *bag = GameData_GetBag(FieldScriptEnv_GetGameData(env));

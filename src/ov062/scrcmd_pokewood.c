@@ -83,7 +83,7 @@ static PokewoodSystem *Pokewood_GetSystem(FieldScriptEnv *env) {
     return *GameData_GetPokewoodSystemPtr(FieldScriptEnv_GetGameData(env));
 }
 
-static BOOL PokewoodCmd_Create(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_Create(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     PokewoodSave *save = PokewoodSave_Get(gameData);
     PokewoodSystem **sys = GameData_GetPokewoodSystemPtr(gameData);
@@ -95,7 +95,7 @@ static BOOL PokewoodCmd_Create(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL PokewoodCmd_Free(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_Free(VM *vm, FieldScriptEnv *env) {
     PokewoodSystem **sys = GameData_GetPokewoodSystemPtr(FieldScriptEnv_GetGameData(env));
 
     PokewoodSystem_Free(*sys);
@@ -103,7 +103,7 @@ static BOOL PokewoodCmd_Free(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL PokewoodCmd_Film(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_Film(VM *vm, FieldScriptEnv *env) {
     PokewoodSystem *sys = Pokewood_GetSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -117,7 +117,7 @@ static BOOL PokewoodCmd_Film(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static BOOL PokewoodCmd_SelectCast(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_SelectCast(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = ScriptWork_GetGameSystem(work);
     u16 *var = ScriptReadVar(vm, env);
@@ -129,7 +129,7 @@ static BOOL PokewoodCmd_SelectCast(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static BOOL PokewoodCmd_SetUsePlayerCast(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_SetUsePlayerCast(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     PokewoodSystem *sys = Pokewood_GetSystem(env);
@@ -138,7 +138,7 @@ static BOOL PokewoodCmd_SetUsePlayerCast(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static BOOL PokewoodCmd_WatchSlot(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_WatchSlot(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
@@ -152,7 +152,7 @@ static BOOL PokewoodCmd_WatchSlot(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static BOOL PokewoodCmd_WatchBlock(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_WatchBlock(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
@@ -164,7 +164,7 @@ static BOOL PokewoodCmd_WatchBlock(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static BOOL PokewoodCmd_PickMovie(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_PickMovie(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
@@ -180,7 +180,7 @@ static BOOL PokewoodCmd_PickMovie(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static BOOL PokewoodCmd_OpenMenu(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_OpenMenu(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
@@ -243,7 +243,7 @@ static u32 Pokewood_GetDownloadedMovieField(FieldScriptEnv *env, u32 slot, u32 f
     return value;
 }
 
-static BOOL PokewoodCmd_CheckDownloadedMovie(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_CheckDownloadedMovie(VM *vm, FieldScriptEnv *env) {
     u16 slot = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
 
@@ -251,7 +251,7 @@ static BOOL PokewoodCmd_CheckDownloadedMovie(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL PokewoodCmd_GetDownloadedMovieResult(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_GetDownloadedMovieResult(VM *vm, FieldScriptEnv *env) {
     u16 slot = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
 
@@ -270,7 +270,7 @@ static BOOL PokewoodCmd_GetDownloadedMovieResult(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL PokewoodCmd_SetMessageWord(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_SetMessageWord(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     u8 index = VM_Read8(vm);
@@ -288,7 +288,7 @@ static BOOL PokewoodCmd_SetMessageWord(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL PokewoodCmd_GetMovieFlag(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_GetMovieFlag(VM *vm, FieldScriptEnv *env) {
     PokewoodSave *save = Pokewood_GetSave(env);
     u16 list = ScriptReadAny(vm, env);
     u16 movie = ScriptReadAny(vm, env);
@@ -298,7 +298,7 @@ static BOOL PokewoodCmd_GetMovieFlag(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL PokewoodCmd_SetMovieFlag(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_SetMovieFlag(VM *vm, FieldScriptEnv *env) {
     PokewoodSave *save = Pokewood_GetSave(env);
     u16 list = ScriptReadAny(vm, env);
     u16 movie = ScriptReadAny(vm, env);
@@ -307,7 +307,7 @@ static BOOL PokewoodCmd_SetMovieFlag(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL PokewoodCmd_CountMovieFlags(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_CountMovieFlags(VM *vm, FieldScriptEnv *env) {
     PokewoodSave *save = Pokewood_GetSave(env);
     u16 list = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
@@ -316,14 +316,14 @@ static BOOL PokewoodCmd_CountMovieFlags(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL PokewoodCmd_CountDownloadedMovies(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_CountDownloadedMovies(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
 
     *var = Pokewood_CountDownloadedMovies(env);
     return FALSE;
 }
 
-static BOOL PokewoodCmd_GetNewUnlockKind(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_GetNewUnlockKind(VM *vm, FieldScriptEnv *env) {
     PokewoodSave *save = Pokewood_GetSave(env);
     u16 movie = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
@@ -364,7 +364,7 @@ static BOOL PokewoodCmd_GetNewUnlockKind(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL PokewoodCmd_TestAndSetLevelBit(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_TestAndSetLevelBit(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
     PokewoodSave *save = Pokewood_GetSave(env);
     u32 level = PokewoodSave_GetLevelOfPoints(PokewoodSave_GetLevelPoints(save));
@@ -374,7 +374,7 @@ static BOOL PokewoodCmd_TestAndSetLevelBit(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL PokewoodCmd_GetSlotFlag(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_GetSlotFlag(VM *vm, FieldScriptEnv *env) {
     PokewoodSave *save = Pokewood_GetSave(env);
     u16 slot = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
@@ -383,7 +383,7 @@ static BOOL PokewoodCmd_GetSlotFlag(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL PokewoodCmd_SetSlotFlag(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_SetSlotFlag(VM *vm, FieldScriptEnv *env) {
     PokewoodSave *save = Pokewood_GetSave(env);
 
     func_020111a8(save, ScriptReadAny(vm, env), 1);
@@ -410,7 +410,7 @@ static BOOL func_ov062_021e5f50(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL PokewoodCmd_SetSaveSlot(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_SetSaveSlot(VM *vm, FieldScriptEnv *env) {
     PokewoodSave *save = Pokewood_GetSave(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -441,7 +441,7 @@ static BOOL func_ov062_021e6010(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL PokewoodCmd_OpenRecordMonitor(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Pokewood_OpenRecordMonitor(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
@@ -489,32 +489,32 @@ static BOOL func_ov062_021e60a8(VM *vm, FieldScriptEnv *env) {
 }
 
 const FieldScriptCommand POKEWOOD_SCRIPT_COMMANDS[] = {
-    PokewoodCmd_Film,
-    PokewoodCmd_WatchSlot,
-    PokewoodCmd_PickMovie,
-    PokewoodCmd_OpenMenu,
-    PokewoodCmd_SetSaveSlot,
-    PokewoodCmd_SetMessageWord,
-    PokewoodCmd_GetMovieFlag,
-    PokewoodCmd_SetMovieFlag,
-    PokewoodCmd_CountDownloadedMovies,
-    PokewoodCmd_CheckDownloadedMovie,
-    PokewoodCmd_GetDownloadedMovieResult,
-    PokewoodCmd_Create,
-    PokewoodCmd_Free,
-    PokewoodCmd_SelectCast,
-    PokewoodCmd_SetUsePlayerCast,
-    PokewoodCmd_GetNewUnlockKind,
-    PokewoodCmd_TestAndSetLevelBit,
-    PokewoodCmd_GetSlotFlag,
+    Scrcmd_Pokewood_Film,
+    Scrcmd_Pokewood_WatchSlot,
+    Scrcmd_Pokewood_PickMovie,
+    Scrcmd_Pokewood_OpenMenu,
+    Scrcmd_Pokewood_SetSaveSlot,
+    Scrcmd_Pokewood_SetMessageWord,
+    Scrcmd_Pokewood_GetMovieFlag,
+    Scrcmd_Pokewood_SetMovieFlag,
+    Scrcmd_Pokewood_CountDownloadedMovies,
+    Scrcmd_Pokewood_CheckDownloadedMovie,
+    Scrcmd_Pokewood_GetDownloadedMovieResult,
+    Scrcmd_Pokewood_Create,
+    Scrcmd_Pokewood_Free,
+    Scrcmd_Pokewood_SelectCast,
+    Scrcmd_Pokewood_SetUsePlayerCast,
+    Scrcmd_Pokewood_GetNewUnlockKind,
+    Scrcmd_Pokewood_TestAndSetLevelBit,
+    Scrcmd_Pokewood_GetSlotFlag,
     func_ov062_021e5f1c,
     func_ov062_021e5f50,
     func_ov062_021e5fec,
     func_ov062_021e6010,
-    PokewoodCmd_SetSlotFlag,
-    PokewoodCmd_OpenRecordMonitor,
+    Scrcmd_Pokewood_SetSlotFlag,
+    Scrcmd_Pokewood_OpenRecordMonitor,
     func_ov062_021e60a8,
-    PokewoodCmd_CountMovieFlags,
-    PokewoodCmd_WatchBlock,
+    Scrcmd_Pokewood_CountMovieFlags,
+    Scrcmd_Pokewood_WatchBlock,
     (FieldScriptCommand)0xFFFFFFFF,
 };

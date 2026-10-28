@@ -21,7 +21,7 @@ Script_1:
     // "Title “White and Black Dragons\""
     InfoMsg CasteliaCity14_Text_TitleWhiteBlackDragons, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -32,7 +32,7 @@ Script_2:
     // "Title “Sin and Money Stack Up\""
     InfoMsg CasteliaCity14_Text_TitleSinMoneyStack, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -43,7 +43,7 @@ Script_3:
     // "Title “Ugly Truth\""
     InfoMsg CasteliaCity14_Text_TitleUglyTruth, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -54,7 +54,7 @@ Script_4:
     // "Title “Vanished Hero\""
     InfoMsg CasteliaCity14_Text_TitleVanishedHero, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -65,7 +65,7 @@ Script_5:
     // "Title “Eternal Ideals\""
     InfoMsg CasteliaCity14_Text_TitleEternalIdeals, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -76,7 +76,7 @@ Script_6:
     // "Title “Two Beings--A Meeting\nThat Must Occur\""
     InfoMsg CasteliaCity14_Text_TitleTwoBeingsMeeting, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -142,7 +142,7 @@ L_017C:
     // "Oh! You have that type!\nI'm inspired![f000]븁\u0000\nThank you! As a token of my gratitude,\nwhich one would you like?"
     ActorMsg MSGFILE_SCRIPT, CasteliaCity14_Text_OhHaveTypeIm, 1, 2, 0
     WorkSetConst 0x8025, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 0, 32805
+    ListMenuAnchorTopRight 31, 1, 0, 0, 32805
     ListMenuAdd 11, 65535, 0
     ListMenuAdd 12, 65535, 1
     ListMenuAdd 13, 65535, 2
@@ -313,7 +313,7 @@ Script_10:
     // "Title “The Recipient\""
     InfoMsg CasteliaCity14_Text_TitleRecipient, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -324,7 +324,7 @@ Script_11:
     // "Title “The Moving Pokémon\""
     InfoMsg CasteliaCity14_Text_TitleMovingPokemon, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -335,7 +335,7 @@ Script_12:
     // "Title “A Gift\""
     InfoMsg CasteliaCity14_Text_TitleGift, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

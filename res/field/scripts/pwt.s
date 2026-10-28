@@ -128,7 +128,7 @@ L_01B8:
     ActorCmdWait
     // "Whaddya think?\nGreat buildin', huh?[f000]븁\u0000\nHere's where the Pokémon World\nTournament takes place![f000]븀\u0000\nAin't she purty?[f000]븁\u0000\nFollow me, tads![f000]븁\u0000"
     InfoMsg Pwt_Text_WhaddyaThinkGreatBuildin, 2
-    InfoMsgClose_0039
+    InfoMsgClose
     EvCameraMoveToDefault 40
     EvCameraWait
     EvCameraRebind

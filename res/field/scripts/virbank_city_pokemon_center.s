@@ -84,7 +84,7 @@ Script_5:
     ActorSetEyeToEye
     // "Hi! I have some questions for you![f000]븁\u0000\nIf you want to play, where do\nyou prefer: outside or at home?"
     ActorMsg MSGFILE_SCRIPT, VirbankCityPokemonCenter_Text_HiHaveSomeQuestions, 8, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 0, 32784
+    ListMenuAnchorTopRight 31, 1, 0, 0, 32784
     ListMenuAdd 11, 65535, 1
     ListMenuAdd 12, 65535, 2
     ListMenuAdd 13, 65535, 3
@@ -114,7 +114,7 @@ L_0157:
 L_0170:
     // "I see! I see![f000]븁\u0000\nThen, which one are you interested in:\nthe thing everybody knows[f000]븀\u0000\nor the thing nobody knows?"
     ActorMsg MSGFILE_SCRIPT, VirbankCityPokemonCenter_Text_SeeSeeThenWhich, 8, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 0, 32784
+    ListMenuAnchorTopRight 31, 1, 0, 0, 32784
     ListMenuAdd 14, 65535, 1
     ListMenuAdd 15, 65535, 2
     ListMenuAdd 13, 65535, 3

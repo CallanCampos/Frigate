@@ -1,6 +1,6 @@
 // Script commands of the special Pokémon: overlay 129's events for them (sp_poke_gimmick.c), finding one given at an
-// event in the party, and the roaming Pokémon. The name is a guess after overlay 129's file. s020D_PokePartyFindEx is
-// swan's name (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// event in the party, and the roaming Pokémon. The name is a guess after overlay 129's file.
+// Scrcmd_SpPokeGimmick_PokePartyFindEx is swan's name (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
@@ -28,7 +28,7 @@
 static BOOL FindSpecialTransferPkm(PokeParty *party, u16 species, u16 move, u8 form, u32 kind, u16 *slot,
                                    PlayerInfo *playerInfo);
 
-BOOL s020E_SpPokeJump(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_SpPokeGimmick_SpPokeJump(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
@@ -63,7 +63,7 @@ BOOL s020E_SpPokeJump(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s020F_SpPokeAppear(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_SpPokeGimmick_SpPokeAppear(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 a1 = ScriptReadAny(vm, env);
     u16 x = ScriptReadAny(vm, env);
@@ -78,7 +78,7 @@ BOOL s020F_SpPokeAppear(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0210_SpPokeWaitAnimEnd(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_SpPokeGimmick_SpPokeWaitAnimEnd(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameEvent *event = SpPokeEvent_CreateWaitAnimEnd(gsys, ScriptReadAny(vm, env));
@@ -90,7 +90,7 @@ BOOL s0210_SpPokeWaitAnimEnd(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0211_SpPokeWaitFrame(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_SpPokeGimmick_SpPokeWaitFrame(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameEvent *event = SpPokeEvent_CreateWaitFrame(gsys, ScriptReadAny(vm, env));
@@ -102,7 +102,7 @@ BOOL s0211_SpPokeWaitFrame(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s020D_PokePartyFindEx(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_SpPokeGimmick_PokePartyFindEx(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     PokeParty *party = GameData_GetParty(gameData);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
@@ -194,7 +194,7 @@ static BOOL FindSpecialTransferPkm(PokeParty *party, u16 species, u16 move, u8 f
     return found;
 }
 
-BOOL s0215_SetSpecialTransferUsed(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_SpPokeGimmick_SetSpecialTransferUsed(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     PokeParty *party = GameData_GetParty(gameData);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
@@ -223,7 +223,7 @@ BOOL s0215_SetSpecialTransferUsed(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL FieldChunk_ScrCmdReadSaveByte(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_SpPokeGimmick_ReadSaveByte(VM *vm, FieldScriptEnv *env) {
     EncountSave *encountSave = SaveControl_GetEncountSave(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     u8 index = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);

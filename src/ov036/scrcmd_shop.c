@@ -572,7 +572,7 @@ static const ShopWindowSetup *sMartWindows[] = {
     &sWindowTitle, &sWindowMoney, &sWindowList, &sWindowInBag, &sWindowAmount, &sWindowInfo, &sWindowMessage,
 };
 
-BOOL s0149_CallFriendlyShopBuy(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Shop_CallFriendlyShopBuy(VM *vm, FieldScriptEnv *env) {
     u16 shopId = ScriptReadAny(vm, env);
     GameSystem *gsys;
     GameData *gameData;

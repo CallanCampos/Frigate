@@ -350,7 +350,7 @@ Script_1:
     // "The surface is covered with moss.\nTouching it feels good somehow."
     InfoMsg PinwheelForest2_Text_SurfaceCoveredMossTouching, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

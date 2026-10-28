@@ -40,7 +40,7 @@ L_003E:
     // "[f000]ā\u0001\u0000 is\nmoving around energetically!"
     SystemMsg Global10490_Text_MovingAroundEnergetically, 0
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 L_0069:
@@ -69,7 +69,7 @@ L_00B2:
     // "Would you like to add\nthe Pokémon to your party?"
     SystemMsg Global10490_Text_WouldLikeAddPokemon, 2
     YesNoWin 0x8010
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -106,7 +106,7 @@ L_011F:
     // "Would you like [f000]ā\u0001\u0000\nto move to the Forest Clearing?"
     SystemMsg Global10490_Text_WouldLikeMoveForest, 2
     YesNoWin 0x8010
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -120,7 +120,7 @@ L_011F:
     // "There's no more room in the Forest\nClearing, so [f000]ā\u0001\u0000 could not move!"
     SystemMsg Global10490_Text_TheresNoMoreRoom_2, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
     VMJump L_01A2
 
@@ -128,7 +128,7 @@ L_018E:
     VMCall L_0214
     // "[f000]ā\u0001\u0000 moved to\nthe Forest Clearing![f000]븁\u0000"
     SystemMsg Global10490_Text_MovedForestClearing, 0
-    InfoMsgClose
+    SystemMsgClose
     MapChangeEntreeForest 9
     VMReturn
 
@@ -140,7 +140,7 @@ L_01A8:
     // "Would you like [f000]ā\u0001\u0000\nto move to the Deepest Clearing?"
     SystemMsg Global10490_Text_WouldLikeMoveDeepest, 2
     YesNoWin 0x8010
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -154,7 +154,7 @@ L_01A8:
     // "There's no more room in the Deepest\nClearing, so [f000]ā\u0001\u0000 could not move!"
     SystemMsg Global10490_Text_TheresNoMoreRoom, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
     VMJump L_0212
 
@@ -162,7 +162,7 @@ L_01FE:
     VMCall L_0214
     // "[f000]ā\u0001\u0000 moved to\nthe Deepest Clearing![f000]븁\u0000"
     SystemMsg Global10490_Text_MovedDeepestClearing, 0
-    InfoMsgClose
+    SystemMsgClose
     MapChangeEntreeForest 9
     VMReturn
 

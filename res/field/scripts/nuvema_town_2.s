@@ -150,7 +150,7 @@ L_021C:
 Script_2:
     ActorsPauseAll
     ActorSetGPos 0, 6, 0, 7, 1
-    FadeInBlackQ_
+    FadeInBlackQ_01A8
     FadeWait
     WordSetPlayerName 0
     // "                                                                        "

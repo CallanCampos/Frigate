@@ -242,7 +242,7 @@ Script_18:
 Script_19:
     ActorsPauseAll
     WorkSetConst 0x8022, 0
-    AbyssalRuinsCmd_GetStepCounter 0x8022
+    GetStepCounter 0x8022
     VMStackPush EVENT_WORK_0x4094
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -297,7 +297,7 @@ L_0370:
     // "The wall moved, and you can proceed now!"
     SystemMsg AbyssalRuins5_Text_WallMovedCanProceed, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst EVENT_WORK_0x4094, 1
     VMJump L_03DB
 
@@ -331,7 +331,7 @@ Script_20:
     // "It looks like you can climb up here![f000]븁\u0000\nWill you proceed to the upper floor?"
     SystemMsg AbyssalRuins5_Text_LooksLikeCanClimb, 2
     YesNoWin 0x8010
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ

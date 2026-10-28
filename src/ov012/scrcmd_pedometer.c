@@ -8,19 +8,19 @@
 #include "system/game_system.h"
 #include "system/vm.h"
 
-BOOL s02B8_PedometerStart(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pedometer_PedometerStart(VM *vm, FieldScriptEnv *env) {
     PlayerSave_BeginStepCounter(
         SaveControl_GetPlayerSave(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)))));
     return FALSE;
 }
 
-BOOL s02B9_PedometerEnd(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pedometer_PedometerEnd(VM *vm, FieldScriptEnv *env) {
     PlayerSave_EndStepCounter(
         SaveControl_GetPlayerSave(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)))));
     return FALSE;
 }
 
-BOOL s02BA_PedometerGet(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Pedometer_PedometerGet(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     u16 *result = ScriptReadVar(vm, env);
 

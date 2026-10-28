@@ -212,7 +212,7 @@ L_02DF:
     WordSetItemNameEx 0, 0x8008, 2, 0
     // "Too bad! There is no more room for\n[f000]ĉ\u0001\u0000![f000]븁\u0000"
     SystemMsg Global7000_Text_TooBadThereNo, 0
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 Script_5:
@@ -225,14 +225,14 @@ L_02FB:
     // "Too bad! There is no more room for\n[f000]ĉ\u0001\u0000!"
     SystemMsg Global7000_Text_TooBadThereNo_2, 0
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 L_030F:
     WorkSetConst 0x8022, 0
     VMCall L_04C9
     VMSleep 4
-    ScriptNative_CheckPlayerFormModel 0x8022
+    CheckPlayerFormModel 0x8022
     VMStackPush 0x8022
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -351,7 +351,7 @@ L_0489:
     // "[f000]Ā\u0001\u0000 put the [f000]ĉ\u0001\u0001 in the\n[f000][ff00]\u0001\u0002[f000]Ē\u0001\u0002[f000][ff00]\u0001\u0000 Case."
     SystemMsg Global7000_Text_PutCase_2, 0
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 L_04A5:
@@ -360,7 +360,7 @@ L_04A5:
     WordSetItemPocketName 2, 0x8008
     // "[f000]Ā\u0001\u0000 put the [f000]ĉ\u0001\u0001 in the\n[f000][ff00]\u0001\u0002[f000]Ē\u0001\u0002[f000][ff00]\u0001\u0000 Case.[f000]븁\u0000"
     SystemMsg Global7000_Text_PutCase, 0
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 Script_9:
@@ -476,7 +476,7 @@ Script_13:
     // "Too bad! The Bag is full!\n[f000]Ā\u0001\u0000 gave up the hidden item."
     SystemMsg Global7000_Text_TooBadBagFull, 0
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_066C
 
 L_063B:
@@ -493,7 +493,7 @@ L_063B:
     LastKeyWait
 
 L_066C:
-    InfoMsgClose
+    SystemMsgClose
     WorkGet 0x8010, 0x8023
     WorkSetConst 0x8023, 0
     FinishAllEvents
@@ -520,7 +520,7 @@ Script_16:
 L_06CB:
     MEPlay SEQ_ME_ITEM
     VMSleep 4
-    ScriptNative_CheckPlayerFormModel 0x8028
+    CheckPlayerFormModel 0x8028
     VMStackPush 0x8028
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -546,7 +546,7 @@ L_0725:
 
 L_072D:
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8028, 0
     WorkSetConst 0x8027, 0
     WorkSetConst 0x8026, 0

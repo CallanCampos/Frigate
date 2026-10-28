@@ -24,7 +24,7 @@ BOOL ScriptNative_SurfTCBWait(VM *vm, void *env) {
     return FALSE;
 }
 
-BOOL s00C5_CallSurf(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldMove_CallSurf(VM *vm, FieldScriptEnv *env) {
     VecFx32 position;
     Field *field;
     FieldPlayer *player;
@@ -58,7 +58,7 @@ BOOL ScriptNative_WaterfallTCBWait(VM *vm, void *env) {
     return FALSE;
 }
 
-BOOL s00C6_CallWaterfall(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldMove_CallWaterfall(VM *vm, FieldScriptEnv *env) {
     FieldPlayer *player;
     HeapID heapId;
     u32 direction;
@@ -75,7 +75,7 @@ BOOL s00C6_CallWaterfall(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s00C7_CallCut(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldMove_CallCut(VM *vm, FieldScriptEnv *env) {
     Field *field;
     FieldActor *actor;
 
@@ -85,7 +85,7 @@ BOOL s00C7_CallCut(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00C8_CallDiving(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldMove_CallDiving(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);

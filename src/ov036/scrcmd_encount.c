@@ -34,7 +34,7 @@ static const u16 CHALLENGE_FISHING_ZONES[FISHING_CHALLENGE_ZONE_COUNT] = {
     ZONE_VILLAGE_BRIDGE, ZONE_ROUTE_1, ZONE_ROUTE_3, ZONE_WELLSPRING_CAVE, ZONE_ROUTE_13, ZONE_ROUTE_17,
 };
 
-BOOL s0174_CallWildBattle(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Encount_CallWildBattle(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 species = ScriptReadAny(vm, env);
     u16 level = ScriptReadAny(vm, env);
@@ -48,7 +48,7 @@ BOOL s0174_CallWildBattle(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0297_CallWildBattleEx(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Encount_CallWildBattleEx(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 species = ScriptReadAny(vm, env);
     u16 level = ScriptReadAny(vm, env);
@@ -63,7 +63,7 @@ BOOL s0297_CallWildBattleEx(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0175_CallWildBattleEnd(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Encount_CallWildBattleEnd(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -72,7 +72,7 @@ BOOL s0175_CallWildBattleEnd(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0179_CallCaptureDemo(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Encount_CallCaptureDemo(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -80,7 +80,7 @@ BOOL s0179_CallCaptureDemo(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s00BC_PhenomenonGetItemID(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Encount_PhenomenonGetItemID(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     u16 *result = ScriptReadVar(vm, env);
 
@@ -88,7 +88,7 @@ BOOL s00BC_PhenomenonGetItemID(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ScrcmdProcFld_SpawnMovePokemonIfInactive(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Encount_SpawnMovePokemonIfInactive(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     EncountSave *save = SaveControl_GetEncountSave(GameData_GetSaveControl(gameData));
     u8 slot = ScriptReadAny(vm, env);
@@ -113,7 +113,7 @@ static u16 LoadEventEncountPokemonToBuffer(u16 *list, u16 count, u16 species) {
 }
 
 // A random one of the Pokémon that can be fished in the fishing challenge's zones this season
-BOOL s021E_FishingChallengeGetRandomPkm(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Encount_FishingChallengeGetRandomPkm(VM *vm, FieldScriptEnv *env) {
     EncData encData;
     u8 season;
     u16 i;
@@ -149,7 +149,7 @@ BOOL s021E_FishingChallengeGetRandomPkm(VM *vm, FieldScriptEnv *env) {
 }
 
 // Use another of the Repel just used up, if the player has one
-BOOL s02C2_RepelRearm(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Encount_RepelRearm(VM *vm, FieldScriptEnv *env) {
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     EncountSave *save = SaveControl_GetEncountSave(GameData_GetSaveControl(gameData));

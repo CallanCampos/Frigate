@@ -80,7 +80,7 @@ L_0119:
     // "DS Wireless Communications will\nbe launched."
     SystemMsg Global10290_Text_DsWirelessCommunicationsWill, 0
     YesNoWin 0x8010
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -193,10 +193,10 @@ L_0276:
     ActorMsgClose
     VMCall L_0460
     WorkSetConst EVENT_WORK_0x408d, 1
-    PalParkCmd_CallMbParent
+    CallMbParent
     WorkSetConst EVENT_WORK_0x408d, 0
     VMCall L_04CA
-    PalParkCmd_GetInfo 0, 0x8024
+    Palpark_GetInfo 0, 0x8024
     VMStackPush 0x8024
     VMStackPushConst 3
     VMStackCmp CMP_EQ

@@ -28,26 +28,26 @@ Script_1:
     VMStackPushConst 1
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_008F
-    WbtCmd_GetTournament 0x8010
+    GetTournament 0x8010
     BroadcastGameBeacon 11, 0x8010, 0
     VMCall L_0139
     VMJump L_0131
 
 L_008F:
-    WbtCmd_GetTournament 0x8010
+    GetTournament 0x8010
     BroadcastGameBeacon 10, 0x8010, 1
     VMCall L_053D
     VMStackPush 0x8027
     VMStackPushConst 1
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_00CC
-    WbtCmd_GetTournament 0x8010
+    GetTournament 0x8010
     BroadcastGameBeacon 11, 0x8010, 1
     VMCall L_0139
     VMJump L_0131
 
 L_00CC:
-    WbtCmd_GetTournament 0x8010
+    GetTournament 0x8010
     BroadcastGameBeacon 10, 0x8010, 2
     VMCall L_07E0
     VMStackPush 0x8027
@@ -56,15 +56,15 @@ L_00CC:
     VMJumpIf CMP_STACK, L_010F
     WorkSetConst 0x8027, 0
     VMCall L_0B14
-    WbtCmd_GetTournament 0x8010
+    GetTournament 0x8010
     BroadcastGameBeacon 11, 0x8010, 2
     VMJump L_012B
 
 L_010F:
     WorkSetConst 0x8027, 1
     VMCall L_0B14
-    WbtCmd_SetRound 5
-    WbtCmd_GetTournament 0x8010
+    SetRound 5
+    GetTournament 0x8010
     BroadcastGameBeacon 10, 0x8010, 3
 
 L_012B:
@@ -80,7 +80,7 @@ L_0139:
     BGMChangeMap
     SEStop
     RTReserveScript 10658
-    WbtCmd_GetCategory 0x8010
+    GetCategory 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -100,12 +100,12 @@ L_0185:
 
 Script_2:
     ActorsPauseAll
-    WbtCmd_Create
-    WbtCmd_SetTournament 4
-    WbtCmd_SetStyle 0
-    WbtCmd_SetRound 2
-    WbtCmd_MakeMatch
-    WbtCmd_GetOpponentObjCode EVENT_WORK_0x4020
+    Wbt_Create
+    SetTournament 4
+    SetStyle 0
+    SetRound 2
+    MakeMatch
+    GetOpponentObjCode EVENT_WORK_0x4020
     ActorNew 21, 15, 3, 251, 162, 0
     EvCameraInit
     EvCameraUnbind
@@ -121,12 +121,12 @@ Script_2:
 
 Script_3:
     ActorsPauseAll
-    WbtCmd_Create
-    WbtCmd_SetTournament 4
-    WbtCmd_SetStyle 0
-    WbtCmd_SetRound 3
-    WbtCmd_MakeMatch
-    WbtCmd_GetOpponentObjCode EVENT_WORK_0x4020
+    Wbt_Create
+    SetTournament 4
+    SetStyle 0
+    SetRound 3
+    MakeMatch
+    GetOpponentObjCode EVENT_WORK_0x4020
     ActorNew 21, 15, 3, 251, 162, 0
     VMCall L_07E0
     VMStackPush 0x8027
@@ -151,20 +151,20 @@ L_0240:
 
 L_0256:
     SEPlay SEQ_SE_SW_WBT_07
-    WbtCmd_ShowTrainerList 0
-    WbtCmd_SetRound 2
-    WbtCmd_GetTournament 0x8029
+    ShowTrainerList 0
+    SetRound 2
+    GetTournament 0x8029
     VMStackPush 0x8029
     VMStackPushConst 11
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0315
-    WbtCmd_GetOpponentObjCode EVENT_WORK_0x4020
+    GetOpponentObjCode EVENT_WORK_0x4020
     ActorNew 3, 15, 3, 251, 162, 0
     ActorSetGPos 255, 42, 0, 15, 2
     ActorCmdExec 251, Movement_0AD4
     ActorCmdExec 255, Movement_0AD4
     ActorCmdWait
-    WbtCmd_ShowPortraits 3
+    ShowPortraits 3
     EvCameraInit
     EvCameraUnbind
     EvCameraMoveTo 3544, 0, 0xed000, 0x2ac000, 0x2001f, 0x108000, 1
@@ -175,7 +175,7 @@ L_0256:
     WordSetPlayerName 1
     // "The Driftveil Tournament\nstarts now![f000]븁\u0000\nFirst-timer [f000]Ā\u0001\u0001 enters![f000]븁\u0000"
     InfoMsg Global10665_Text_DriftveilTournamentStartsNow, 1
-    InfoMsgClose_0039
+    InfoMsgClose
     ActorCmdExec 255, Movement_0ADC
     ActorCmdWait
     ActorCmdExec 255, Movement_0AE4
@@ -186,7 +186,7 @@ L_0256:
     VMJump L_037F
 
 L_0315:
-    WbtCmd_GetOpponentObjCode EVENT_WORK_0x4020
+    GetOpponentObjCode EVENT_WORK_0x4020
     ActorNew 3, 15, 3, 251, 162, 0
     ActorCmdExec 251, Movement_0AD4
     ActorCmdWait
@@ -194,7 +194,7 @@ L_0315:
     EvCameraUnbind
     EvCameraMoveTo 2008, 0, 0xfd000, 0x172000, 0x4a5bf, 0xe7000, 1
     EvCameraWait
-    WbtCmd_ShowPortraits 3
+    ShowPortraits 3
     FadeInBlack
     EvCameraMoveTo 2008, 0, 0xfd000, 0x172000, 0x2001f, 0xe7000, 48
     ActorCmdExec 255, Movement_0A84
@@ -210,7 +210,7 @@ L_037F:
     VMSleep 60
     FadeEx 3, 16, 0, 2
     FadeExWait
-    WbtCmd_ShowOpponentLine7 1
+    ShowOpponentLine7 1
     MsgWinCloseAll
     ActorCmdExec 251, Movement_0ADC
     ActorCmdWait
@@ -219,13 +219,13 @@ L_037F:
     VMSleep 20
     FadeEx 3, 0, 16, 2
     FadeExWait
-    WbtCmd_SetNamePlates 0
+    SetNamePlates 0
     VMSleep 50
     FadeEx 3, 16, 0, 2
     FadeExWait
     ActorCmdWait
     EvCameraWait
-    WbtCmd_MakeOpponentParty
+    MakeOpponentParty
     VMStackPush 0x8029
     VMStackPushConst 14
     VMStackCmp CMP_EQ
@@ -237,32 +237,32 @@ L_037F:
     VMCall L_0BDD
 
 L_0436:
-    WbtCmd_WordSetOpponentName 0
+    WordSetOpponentName 0
     WordSetPlayerName 1
     // "The first round!\n[f000]Ā\u0001\u0000 vs. [f000]Ā\u0001\u0001.[f000]븁\u0000"
     InfoMsg Global10665_Text_FirstRoundVs, 1
-    InfoMsgClose_0039
+    InfoMsgClose
     SEPlay SEQ_SE_SW_WBT_16
-    WbtCmd_ShowPortraits 0
+    ShowPortraits 0
     VMSleep 29
     SEPlay SEQ_SE_SW_WBT_21
     VMSleep 31
     SEPlay SEQ_SE_SW_WBT_22
     VMSleep 30
-    WbtCmd_ShowOpponentLine 0, 251
+    ShowOpponentLine 0, 251
     ActorMsgClose
     SEStop
     ActorCmdExec 255, Movement_0B08
     ActorCmdExec 251, Movement_0AFC
     ActorCmdWait
-    WbtCmd_CallBattle 0x8027
+    CallBattle 0x8027
     SEPlay SEQ_SE_SW_WBT_07
-    WbtCmd_ShowPortraits 3
+    ShowPortraits 3
     EvCameraInit
     EvCameraUnbind
     EvCameraMoveTo 2008, 0, 0xfd000, 0x172000, 0x2001f, 0xe7000, 1
     EvCameraWait
-    FadeInBlackQ_
+    FadeInBlackQ_01A8
     FadeWait
     VMStackPush 0x8027
     VMStackPushConst 1
@@ -283,8 +283,8 @@ L_0436:
     VMCall L_0DA8
 
 L_04F1:
-    InfoMsgClose_0039
-    WbtCmd_ShowOpponentLine 5, 251
+    InfoMsgClose
+    ShowOpponentLine 5, 251
     ActorMsgClose
     ActorCmdExec 251, Movement_0A9C
     ActorCmdWait
@@ -294,12 +294,12 @@ L_04F1:
     VMJump L_0539
 
 L_0519:
-    WbtCmd_WordSetOpponentName 0
+    WordSetOpponentName 0
     SEPlay SEQ_SE_SW_WBT_02
     // "The winner of the first round is...\n[f000]Ā\u0001\u0000![f000]븁\u0000"
     ScreamMsg Global10665_Text_WinnerFirstRound, 1
-    InfoMsgClose_0039
-    WbtCmd_ShowOpponentLine 6, 251
+    InfoMsgClose
+    ShowOpponentLine 6, 251
     ActorMsgClose
     ActorCmdExec 255, Movement_0AF4
     ActorCmdWait
@@ -311,15 +311,15 @@ L_0539:
 L_053D:
     // "Let's check out\nthe other matches![f000]븁\u0000\nTurn your attention to\nthe giant screen![f000]븁\u0000"
     InfoMsg Global10665_Text_LetsCheckOutOther, 1
-    InfoMsgClose_0039
+    InfoMsgClose
     FadeOutBlack
     SEPlay SEQ_SE_SW_WBT_20
     EvCameraMoveTo 3554, 0, 0xecf4c, 0x170000, 0x2a01f, 0x56000, 18
     FadeWait
     EvCameraWait
-    WbtCmd_ShowTrainerList 1
-    WbtCmd_SetRound 3
-    WbtCmd_GetOpponentObjCode EVENT_WORK_0x4020
+    ShowTrainerList 1
+    SetRound 3
+    GetOpponentObjCode EVENT_WORK_0x4020
     ActorNew 3, 15, 3, 251, 162, 0
     ActorSetGPos 255, 31, 0, 15, 2
     ActorCmdExec 251, Movement_0AD4
@@ -328,7 +328,7 @@ L_053D:
     EvCameraUnbind
     EvCameraMoveTo 2008, 0, 0xfd000, 0x172000, 0x4a5bf, 0xe7000, 1
     EvCameraWait
-    WbtCmd_ShowPortraits 3
+    ShowPortraits 3
     FadeInBlack
     SEPlay SEQ_SE_SW_WBT_02
     EvCameraMoveTo 2008, 0, 0xfd000, 0x172000, 0x2001f, 0xe7000, 30
@@ -345,7 +345,7 @@ L_053D:
     VMSleep 60
     FadeEx 3, 16, 0, 2
     FadeExWait
-    WbtCmd_ShowOpponentLine7 1
+    ShowOpponentLine7 1
     MsgWinCloseAll
     ActorCmdExec 251, Movement_0ADC
     ActorCmdWait
@@ -355,7 +355,7 @@ L_053D:
     VMSleep 20
     FadeEx 3, 0, 16, 2
     FadeExWait
-    WbtCmd_SetNamePlates 0
+    SetNamePlates 0
     VMSleep 50
     FadeEx 3, 16, 0, 2
     FadeExWait
@@ -363,7 +363,7 @@ L_053D:
     VMCall L_0E8B
     ActorCmdWait
     EvCameraWait
-    WbtCmd_MakeOpponentParty
+    MakeOpponentParty
     VMStackPush 0x8029
     VMStackPushConst 14
     VMStackCmp CMP_EQ
@@ -375,33 +375,33 @@ L_053D:
     VMCall L_0BDD
 
 L_06BB:
-    WbtCmd_WordSetOpponentName 0
+    WordSetOpponentName 0
     WordSetPlayerName 1
     VMSleep 30
     // "The second round!\n[f000]Ā\u0001\u0000 vs. [f000]Ā\u0001\u0001.[f000]븁\u0000"
     InfoMsg Global10665_Text_SecondRoundVs, 1
-    InfoMsgClose_0039
+    InfoMsgClose
     SEPlay SEQ_SE_SW_WBT_16
-    WbtCmd_ShowPortraits 0
+    ShowPortraits 0
     VMSleep 29
     SEPlay SEQ_SE_SW_WBT_21
     VMSleep 31
     SEPlay SEQ_SE_SW_WBT_22
     VMSleep 30
-    WbtCmd_ShowOpponentLine 1, 251
+    ShowOpponentLine 1, 251
     ActorMsgClose
     SEStop
     ActorCmdExec 255, Movement_0B08
     ActorCmdExec 251, Movement_0AFC
     ActorCmdWait
-    WbtCmd_CallBattle 0x8027
+    CallBattle 0x8027
     SEPlay SEQ_SE_SW_WBT_07
-    WbtCmd_ShowPortraits 3
+    ShowPortraits 3
     EvCameraInit
     EvCameraUnbind
     EvCameraMoveTo 2008, 0, 0xfd000, 0x172000, 0x2001f, 0xe7000, 1
     EvCameraWait
-    FadeInBlackQ_
+    FadeInBlackQ_01A8
     FadeWait
     SEPlay SEQ_SE_SW_WBT_02
     VMStackPush 0x8027
@@ -423,11 +423,11 @@ L_06BB:
     VMCall L_0DA8
 
 L_077E:
-    InfoMsgClose_0039
+    InfoMsgClose
     SEPlay SEQ_SE_SW_WBT_17
-    WbtCmd_PlayCrowd 2
+    PlayCrowd 2
     VMSleep 60
-    WbtCmd_ShowOpponentLine 5, 251
+    ShowOpponentLine 5, 251
     ActorMsgClose
     ActorCmdExec 251, Movement_0AC4
     ActorCmdWait
@@ -437,15 +437,15 @@ L_077E:
     VMJump L_07DE
 
 L_07B2:
-    WbtCmd_WordSetOpponentName 0
+    WordSetOpponentName 0
     SEPlay SEQ_SE_SW_WBT_02
     // "The winner of the second round is...\n[f000]Ā\u0001\u0000![f000]븁\u0000"
     ScreamMsg Global10665_Text_WinnerSecondRound, 1
-    InfoMsgClose_0039
+    InfoMsgClose
     SEPlay SEQ_SE_SW_WBT_17
-    WbtCmd_PlayCrowd 2
+    PlayCrowd 2
     VMSleep 60
-    WbtCmd_ShowOpponentLine 6, 251
+    ShowOpponentLine 6, 251
     ActorMsgClose
     ActorCmdExec 255, Movement_0AF4
     ActorCmdWait
@@ -456,22 +456,22 @@ L_07DE:
 L_07E0:
     // "Let's check out the other match\non the giant screen![f000]븁\u0000"
     InfoMsg Global10665_Text_LetsCheckOutOther_2, 1
-    InfoMsgClose_0039
+    InfoMsgClose
     FadeOutBlack
     SEPlay SEQ_SE_SW_WBT_20
     EvCameraMoveTo 3554, 0, 0xecf4c, 0x170000, 0x2a01f, 0x56000, 18
     FadeWait
     EvCameraWait
-    WbtCmd_ShowTrainerList 2
-    WbtCmd_SetRound 4
-    WbtCmd_GetOpponentObjCode EVENT_WORK_0x4020
+    ShowTrainerList 2
+    SetRound 4
+    GetOpponentObjCode EVENT_WORK_0x4020
     ActorNew 3, 15, 3, 251, 162, 0
     ActorSetGPos 255, 42, 0, 15, 2
     ActorCmdExec 251, Movement_0AD4
     ActorCmdExec 255, Movement_0AD4
     ActorCmdWait
-    WbtCmd_ShowPortraits 3
-    WbtCmd_SwitchLights 0, 1
+    ShowPortraits 3
+    SwitchLights 0, 1
     EvCameraInit
     EvCameraUnbind
     EvCameraMoveTo 3544, 0, 0xed000, 0x2ac000, 0x2001f, 0x108000, 1
@@ -485,10 +485,10 @@ L_07E0:
     SEPlay SEQ_SE_SW_WBT_07
     ActorCmdExec 255, Movement_0ADC
     ActorCmdWait
-    WbtCmd_SwitchLights 1, 1
+    SwitchLights 1, 1
     BGMChangeMap
     VMCall L_17EE
-    WbtCmd_LoadPortraitScene 0x802a, 1
+    LoadPortraitScene 0x802a, 1
     VMStackPush 0x8029
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -503,29 +503,29 @@ L_08B6:
     ActorCmdWait
     EvCameraWait
     SEPlay SEQ_SE_SW_WBT_18
-    WbtCmd_PlayCrowd 1
+    PlayCrowd 1
     VMSleep 60
-    WbtCmd_GetTournament 0x8010
-    WbtCmd_SetTournamentNameWord 0, 0x8010
+    GetTournament 0x8010
+    SetTournamentNameWord 0, 0x8010
     // "[f000]Ļ\u0001\u0000!\nThe final round![f000]븀\u0000\nThe opponent is entering the arena![f000]븁\u0000"
     InfoMsg Global10665_Text_FinalRoundOpponentEntering, 1
-    InfoMsgClose_0039
+    InfoMsgClose
     EvCameraMoveTo 3544, 0, 0xed000, 0x33000, 0x2001f, 0x108000, 60
     FadeEx 3, 0, 16, 2
     FadeExWait
-    WbtCmd_SetNamePlates 0
+    SetNamePlates 0
     VMSleep 60
-    WbtCmd_SwitchLights 0, 0
+    SwitchLights 0, 0
     SEStop
     FadeEx 3, 16, 0, 2
     FadeExWait
-    WbtCmd_ShowOpponentLine7 1
+    ShowOpponentLine7 1
     MsgWinCloseAll
     ActorCmdExec 251, Movement_0ADC
     ActorCmdWait
-    WbtCmd_SwitchLights 1, 0
+    SwitchLights 1, 0
     VMCall L_17EE
-    WbtCmd_LoadPortraitScene 0x802a, 0
+    LoadPortraitScene 0x802a, 0
     VMStackPush 0x8029
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -540,9 +540,9 @@ L_0979:
     ActorCmdWait
     EvCameraWait
     SEPlay SEQ_SE_SW_WBT_18
-    WbtCmd_PlayCrowd 0
+    PlayCrowd 0
     VMSleep 60
-    WbtCmd_MakeOpponentParty
+    MakeOpponentParty
     VMStackPush 0x8029
     VMStackPushConst 14
     VMStackCmp CMP_EQ
@@ -554,31 +554,31 @@ L_0979:
     VMCall L_0BDD
 
 L_09DE:
-    WbtCmd_WordSetOpponentName 0
+    WordSetOpponentName 0
     WordSetPlayerName 1
     // "The final round!\n[f000]Ā\u0001\u0000 vs. [f000]Ā\u0001\u0001.[f000]븁\u0000"
     InfoMsg Global10665_Text_FinalRoundVs, 1
-    InfoMsgClose_0039
+    InfoMsgClose
     SEPlay SEQ_SE_SW_WBT_16
-    WbtCmd_ShowPortraits 0
+    ShowPortraits 0
     VMSleep 29
     SEPlay SEQ_SE_SW_WBT_21
     VMSleep 31
     SEPlay SEQ_SE_SW_WBT_22
     VMSleep 30
-    WbtCmd_ShowOpponentLine 2, 251
+    ShowOpponentLine 2, 251
     ActorMsgClose
     SEStop
     ActorCmdExec 255, Movement_0B08
     ActorCmdExec 251, Movement_0AFC
     ActorCmdWait
     SEPlay SEQ_SE_SW_WBT_19
-    WbtCmd_PlayCrowd 3
+    PlayCrowd 3
     VMSleep 30
     SEWait
-    WbtCmd_CallBattle 0x8027
+    CallBattle 0x8027
     BGMFadeOutAll 1
-    WbtCmd_ShowPortraits 3
+    ShowPortraits 3
     EvCameraInit
     EvCameraUnbind
     EvCameraMoveTo 2008, 0, 0xfd000, 0x172000, 0x2001f, 0xe7000, 1
@@ -587,14 +587,14 @@ L_09DE:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0A78
-    WbtCmd_SetNamePlates 1
+    SetNamePlates 1
     VMJump L_0A7C
 
 L_0A78:
-    WbtCmd_SetNamePlates 2
+    SetNamePlates 2
 
 L_0A7C:
-    FadeInBlackQ_
+    FadeInBlackQ_01A8
     FadeWait
     VMReturn
     .balign 4, 0
@@ -668,7 +668,7 @@ Movement_0B08:
 L_0B14:
     // "The winner is...[f000]븁\u0000"
     InfoMsg Global10665_Text_Winner, 1
-    InfoMsgClose_0039
+    InfoMsgClose
     VMSleep 30
     VMStackPush 0x8027
     VMStackPushConst 1
@@ -678,7 +678,7 @@ L_0B14:
     VMJump L_0B3E
 
 L_0B3B:
-    WbtCmd_WordSetOpponentName 0
+    WordSetOpponentName 0
 
 L_0B3E:
     SEPlay SEQ_SE_SW_WBT_15
@@ -686,14 +686,14 @@ L_0B3E:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0B5F
-    WbtCmd_ShowPortraits 1
+    ShowPortraits 1
     VMJump L_0B63
 
 L_0B5F:
-    WbtCmd_ShowPortraits 2
+    ShowPortraits 2
 
 L_0B63:
-    WbtCmd_PlayStadiumIntro
+    PlayStadiumIntro
     VMSleep 80
     SEPlay SEQ_SE_SW_WBT_07
     SEPlay SEQ_SE_SW_WBT_03
@@ -702,24 +702,24 @@ L_0B63:
     BGMPlay SEQ_BGM_WBT_FANFARE
     VMSleep 120
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     VMStackPush 0x8027
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0BA1
-    WbtCmd_ShowOpponentLine 5, 251
+    ShowOpponentLine 5, 251
     VMJump L_0BA7
 
 L_0BA1:
-    WbtCmd_ShowOpponentLine 6, 251
+    ShowOpponentLine 6, 251
 
 L_0BA7:
     ActorMsgClose
-    WbtCmd_GetTournament 0x8010
-    WbtCmd_SetTournamentNameWord 0, 0x8010
+    GetTournament 0x8010
+    SetTournamentNameWord 0, 0x8010
     // "This concludes the\n[f000]Ļ\u0001\u0000![f000]븀\u0000\nSee you in the next tournament![f000]븁\u0000"
     InfoMsg Global10665_Text_ConcludesSeeNextTournament, 1
-    InfoMsgClose_0039
+    InfoMsgClose
     VMSleep 60
     VMReturn
     WorkSetConst 0x802d, 0
@@ -729,7 +729,7 @@ L_0BA7:
     WorkSetConst 0x8031, 0
 
 L_0BDD:
-    WbtCmd_ResetPicks_1031
+    ResetPicks_1031
     // "How strong are your Pokémon\nwhen they face your own party?[f000]븁\u0000\nLet's mix them![f000]븁\u0000"
     ScreamMsg Global10665_Text_HowStrongPokemonWhen, 1
     SEPlay SEQ_SE_SW_WBT_01
@@ -738,7 +738,7 @@ L_0BDD:
     WorkSetConst 0x8030, 0
     WorkSetConst 0x8031, 2
     VMCall L_0C3C
-    WbtCmd_GetStyle 0x8010
+    GetStyle 0x8010
     VMStackPush 0x8010
     VMStackPushConst 2
     VMStackCmp CMP_EQ
@@ -753,13 +753,13 @@ L_0BDD:
     VMCall L_0C3C
 
 L_0C38:
-    WbtCmd_SwapPickedPokemon
+    SwapPickedPokemon
     VMReturn
 
 L_0C3C:
-    WbtCmd_RandomPick 0x8030
-    WbtCmd_WordSetOpponentName 0
-    WbtCmd_WordSetPickSpecies 1, 0x8030
+    RandomPick 0x8030
+    WordSetOpponentName 0
+    WordSetPickSpecies 1, 0x8030
     // "[f000]Ā\u0001\u0000 chose\n[f000]ā\u0001\u0001.[f000]븁\u0000"
     SystemMsg Global10665_Text_Chose, 1
     WorkSetConst 0x802d, 1
@@ -769,22 +769,22 @@ L_0C54:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0CE9
-    WbtCmd_ShowPartyList
+    ShowPartyList
     // "Select one Pokémon\nfrom the opponent's party."
     SystemMsg Global10665_Text_SelectOnePokemonFrom, 1
-    ListMenu_AnchorTopRight 31, 7, 0, 0, 32815
-    WbtCmd_ListPartyPokemon
+    ListMenuAnchorTopRight 31, 7, 0, 0, 32815
+    ListPartyPokemon
     ListMenuShow
-    WbtCmd_ClosePartyList
-    WbtCmd_GetEntryCount 0x802e
+    ClosePartyList
+    GetEntryCount 0x802e
     DebugPrint 0x802f
     DebugPrint 0x802e
     VMStackPush 0x802f
     VMStackPush 0x802e
     VMStackCmp CMP_LT
     VMJumpIf CMP_STACK, L_0CDD
-    WbtCmd_SetPick 0x8031, 0x802f
-    WbtCmd_WordSetPickSpecies 0, 0x8031
+    SetPick 0x8031, 0x802f
+    WordSetPickSpecies 0, 0x8031
     // "Are you OK with [f000]ā\u0001\u0000?"
     SystemMsg Global10665_Text_Ok, 1
     YesNoWin 0x8010
@@ -796,7 +796,7 @@ L_0C54:
     VMJump L_0CD7
 
 L_0CD1:
-    WbtCmd_SetPick 0x8031, 0x802e
+    SetPick 0x8031, 0x802e
 
 L_0CD7:
     VMJump L_0CE3
@@ -809,16 +809,16 @@ L_0CE3:
     VMJump L_0C54
 
 L_0CE9:
-    InfoMsgClose
+    SystemMsgClose
     // "Let's mix them![f000]븁\u0000"
     ScreamMsg Global10665_Text_LetsMixThem, 1
     MsgWinCloseAll
     ActorCmdExec 251, Movement_0D80
     ActorCmdExec 255, Movement_0D78
     ActorCmdWait
-    WbtCmd_WordSetPickSpecies 0, 0x8030
+    WordSetPickSpecies 0, 0x8030
     MultiMsg 56, 3, 3, 1
-    WbtCmd_WordSetPickSpecies 0, 0x8031
+    WordSetPickSpecies 0, 0x8031
     MultiMsg 56, 19, 16, 2
     VMSleep 60
     MsgWinCloseNo 1
@@ -827,12 +827,12 @@ L_0CE9:
     ActorCmdExec 255, Movement_0D88
     ActorCmdWait
     WordSetPlayerName 0
-    WbtCmd_WordSetPickSpecies 1, 0x8030
-    WbtCmd_WordSetOpponentName 2
-    WbtCmd_WordSetPickSpecies 3, 0x8031
+    WordSetPickSpecies 1, 0x8030
+    WordSetOpponentName 2
+    WordSetPickSpecies 3, 0x8031
     // "[f000]ā\u0001\u0001 from [f000]Ā\u0001\u0000's party\nand [f000]ā\u0001\u0003 from [f000]Ā\u0001\u0002's party[f000]븀\u0000\nhave been swapped.[f000]븁\u0000"
     SystemMsg Global10665_Text_FromSPartyFrom, 1
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
     .byte 0x28
     .byte 0x00
@@ -885,7 +885,7 @@ Movement_0D98:
     MoveEnd
 
 L_0DA8:
-    WbtCmd_GetRoundRemaining 0x8010
+    GetRoundRemaining 0x8010
     VMStackPush 0x8010
     VMStackPushConst 255
     VMStackCmp CMP_EQ
@@ -913,7 +913,7 @@ L_0DFB:
     VMReturn
 
 L_0DFD:
-    WbtCmd_GetWinCount 0, 17, 0x8020
+    GetWinCount 0, 17, 0x8020
     DebugPrint 0x8020
     VMStackPush 0x8020
     VMStackPushConst 30
@@ -994,7 +994,7 @@ L_0F20:
     VMJump L_0F3C
 
 L_0F33:
-    WbtCmd_WordSetOpponentName 0
+    WordSetOpponentName 0
     VMJump L_0F3C
 
 L_0F3C:
@@ -1025,7 +1025,7 @@ L_0F93:
     VMJump L_0FAF
 
 L_0FA6:
-    WbtCmd_WordSetOpponentName 0
+    WordSetOpponentName 0
     VMJump L_0FAF
 
 L_0FAF:
@@ -1182,7 +1182,7 @@ L_11F8:
 
 L_11FA:
     WorkSetConst 0x8023, 99
-    WbtCmd_WordSetOpponentName 0
+    WordSetOpponentName 0
     Random 0x8021, 100
     VMStackPush 0x8023
     VMStackPush 0x8021
@@ -1500,7 +1500,7 @@ L_16CF:
 
 L_16D1:
     WordSetPlayerName 0
-    WbtCmd_GetWinCount 0, 17, 0x8020
+    GetWinCount 0, 17, 0x8020
     VMStackPush 0x8020
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -1582,11 +1582,11 @@ L_17CC:
     VMJump L_17EA
 
 L_17EA:
-    InfoMsgClose_0039
+    InfoMsgClose
     VMReturn
 
 L_17EE:
-    WbtCmd_GetTournament 0x8029
+    GetTournament 0x8029
     WorkCmpConst 0x8029, 1
     VMJumpIf CMP_EQ, L_1805
     VMJump L_1815
@@ -1602,7 +1602,7 @@ L_1815:
     VMJump L_1A45
 
 L_1828:
-    WbtCmd_GetType 0x802b
+    GetType 0x802b
     SEPlay SEQ_SE_SW_WBT_04
     WorkCmpConst 0x802b, 0
     VMJumpIf CMP_EQ, L_1843

@@ -51,7 +51,7 @@ Script_4:
     // "Rock Peak Chamber"
     InfoMsg RockPeakChamber_Text_RockPeakChamber, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -62,7 +62,7 @@ Script_5:
     // "It protects this place\nwith the power of rock."
     InfoMsg RockPeakChamber_Text_ProtectsPlacePowerRock, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -72,7 +72,7 @@ Script_6:
     SEPlay SEQ_SE_MESSAGE
     // "The Pokémon statue that exudes the\npower of rock started moving![f000]븁\u0000"
     SystemMsg RockPeakChamber_Text_PokemonStatueExudesPower, 2
-    InfoMsgClose
+    SystemMsgClose
     PlayerGetDir 0x8010
     WorkCmpConst 0x8010, 0
     VMJumpIf CMP_EQ, L_00BF
@@ -116,7 +116,7 @@ L_0130:
     ScreamMsg RockPeakChamber_Text_ZazaZariZa, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     CallWildBattle 377, 65, 1
     WildBattleIsVictory 0x8010
     VMStackPush 0x8010
@@ -143,7 +143,7 @@ L_0198:
     // "Regirock disappeared deep\ninto the ruins..."
     SystemMsg RockPeakChamber_Text_RegirockDisappearedDeepInto, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_01EA
 
 L_01A8:

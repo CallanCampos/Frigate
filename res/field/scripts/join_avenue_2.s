@@ -17,7 +17,7 @@ Script_1:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0056
-    ResortCmd_CheckRank100Unlock 0x8020
+    CheckRank100Unlock 0x8020
     VMStackPush 0x8020
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -29,15 +29,15 @@ L_0056:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0106
-    ResortCmd_GetOwnValue 20, 0x8020
+    GetOwnValue 20, 0x8020
     DebugPrint 0x8020
     WorkCmpConst 0x8020, 1
     VMJumpIf CMP_EQ, L_0086
     VMJump L_00A4
 
 L_0086:
-    ResortCmd_AddEntryOrRecord 3, 6
-    ResortCmd_AddRecordPerson 2, 0x8022
+    AddEntryOrRecord 3, 6
+    AddRecordPerson 2, 0x8022
     ActorSetGPos 0x8022, 6, 0, 4, 1
     VMJump L_0100
 
@@ -47,8 +47,8 @@ L_00A4:
     VMJump L_00D5
 
 L_00B7:
-    ResortCmd_AddEntryOrRecord 3, 7
-    ResortCmd_AddRecordPerson 3, 0x8022
+    AddEntryOrRecord 3, 7
+    AddRecordPerson 3, 0x8022
     ActorSetGPos 0x8022, 6, 0, 4, 1
     VMJump L_0100
 
@@ -79,10 +79,10 @@ L_0118:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_014F
     WorkSetConst 0x8024, 0
-    ResortCmd_AddRecordPerson 0, 0x8024
-    ResortCmd_AddRecordPerson 1, 0x8024
-    ResortCmd_AddRecordPerson 2, 0x8024
-    ResortCmd_AddRecordPerson 3, 0x8024
+    AddRecordPerson 0, 0x8024
+    AddRecordPerson 1, 0x8024
+    AddRecordPerson 2, 0x8024
+    AddRecordPerson 3, 0x8024
     WorkSetConst EVENT_WORK_0x413a, 0
 
 L_014F:
@@ -102,18 +102,18 @@ L_0171:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_03DA
-    ResortCmd_SetWord 4, 255, 0, 0
-    ResortCmd_SetWord 8, 255, 0, 1
+    SetWord 4, 255, 0, 0
+    SetWord 8, 255, 0, 1
     // "[f000]ĺ\u0001\u0000!\nDo you have any questions?"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_HaveAnyQuestions, 0, 0, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32806
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32806
     ListMenuAdd 22, 65535, 0
     ListMenuAdd 23, 65535, 1
     ListMenuAdd 24, 65535, 2
     ListMenuAdd 25, 65535, 3
     ListMenuAdd 26, 65535, 4
     ListMenuAdd 27, 65535, 5
-    ResortCmd_GetValue 1, 0x8020
+    GetValue 1, 0x8020
     VMStackPush 0x8020
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -157,7 +157,7 @@ L_027B:
     VMJump L_02CB
 
 L_028E:
-    ResortCmd_GetValue 1, 0x8020
+    GetValue 1, 0x8020
     VMStackPush 0x8020
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -268,10 +268,10 @@ L_0402:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0655
-    ResortCmd_GetOwnValue 25, 0x8020
+    GetOwnValue 25, 0x8020
     // "Is there anything you'd like to know\nabout shops?"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_ThereAnythingYoudLike, 0, 0, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32808
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32808
     ListMenuAdd 31, 65535, 0
     ListMenuAdd 33, 65535, 2
     ListMenuAdd 39, 65535, 8
@@ -301,7 +301,7 @@ L_04AE:
     VMJump L_0502
 
 L_04C1:
-    ResortCmd_SetWord 8, 255, 0, 0
+    SetWord 8, 255, 0, 0
     VMStackPush 0x8020
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -419,7 +419,7 @@ L_0655:
 
 Script_3:
     ActorsPauseAll
-    ResortCmd_GetOwnValue 20, 0x8020
+    GetOwnValue 20, 0x8020
     WorkCmpConst 0x8020, 1
     VMJumpIf CMP_EQ, L_067E
     VMJump L_068A
@@ -499,7 +499,7 @@ L_0763:
 
 L_076F:
     VMCall L_0BB9
-    ResortCmd_SetWord 4, 255, 0, 0
+    SetWord 4, 255, 0, 0
     // "[f000]Ā\u0001\u0000,\nI see you are putting in a lot of effort![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_SeePuttingLotEffort, 1, 0, 0
     // "I have a present for you today.\nI've recruited a new assistant for you.[f000]븁\u0000"
@@ -507,8 +507,8 @@ L_076F:
     ActorMsgClose
     ActorFindByGPos 0x8022, 0x8020, 6, 0, 4
     VMCall L_0C48
-    ResortCmd_SetWord 0, 3, 2, 0
-    ResortCmd_SetWord 6, 3, 2, 1
+    SetWord 0, 3, 2, 0
+    SetWord 6, 3, 2, 1
     // "[f000]ķ\u0001\u0001\nI'm [f000]Ā\u0001\u0000![f000]븁\u0000\nWhen it comes to reorganizing things,\nleave it to me![f000]븁\u0000\nPC Boxes and Record Rankings!\nChanging the roles of assistants![f000]븀\u0000\nChanging the order of shops![f000]븀\u0000\nPlease talk to me when you[f000]븀\u0000\nwant to reorganize things.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_ImWhenComesReorganizing, 0x8022, 0, 0
     ActorMsgClose
@@ -517,13 +517,13 @@ L_076F:
     // "Keep up the good work![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_KeepUpGoodWork, 1, 0, 0
     ActorMsgClose
-    ResortCmd_SetOwnValue 21, 1
+    SetOwnValue 21, 1
     VMCall L_0BCB
     VMReturn
 
 L_07F3:
     VMCall L_0BB9
-    ResortCmd_SetWord 4, 255, 0, 0
+    SetWord 4, 255, 0, 0
     // "[f000]Ā\u0001\u0000,\nI see you are putting in a lot of effort![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_SeePuttingLotEffort_2, 1, 0, 0
     // "I have a present for you today.\nI've recruited a new assistant for you.[f000]븁\u0000"
@@ -531,8 +531,8 @@ L_07F3:
     ActorMsgClose
     ActorFindByGPos 0x8022, 0x8020, 6, 0, 4
     VMCall L_0C48
-    ResortCmd_SetWord 0, 3, 3, 0
-    ResortCmd_SetWord 6, 3, 3, 1
+    SetWord 0, 3, 3, 0
+    SetWord 6, 3, 3, 1
     // "[f000]ķ\u0001\u0001\nI'm [f000]Ā\u0001\u0000![f000]븁\u0000\nPlease talk to me when you want to rest\nyour tired Pokémon.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_ImPleaseTalkWhen, 0x8022, 0, 0
     ActorMsgClose
@@ -541,22 +541,22 @@ L_07F3:
     // "Keep up the good work![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_KeepUpGoodWork_2, 1, 0, 0
     ActorMsgClose
-    ResortCmd_SetOwnValue 21, 2
+    SetOwnValue 21, 2
     VMCall L_0BCB
     VMReturn
 
 L_0877:
     VMCall L_0BB9
-    ResortCmd_SetWord 4, 255, 0, 0
-    ResortCmd_SetWord 4, 255, 0, 1
+    SetWord 4, 255, 0, 0
+    SetWord 4, 255, 0, 1
     // "[f000]Ā\u0001\u0000,\nI see you are putting in a lot of effort![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_SeePuttingLotEffort_3, 1, 0, 0
     // "Today, I want to say how grateful I am.[f000]븁\u0000\nThank you for doing so much to\ndevelop this avenue![f000]븁\u0000\nYou're a truly deserving “[f000]ĺ\u0001\u0001\"!\nI'd say you've made the avenue your own![f000]븁\u0000\nBecause of that, you have earned\nthe privilege of renaming the avenue.[f000]븁\u0000\nPlease consider a new name for Join\nAvenue that describes its character.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_TodayWantSayHow, 1, 0, 0
     ActorMsgClose
-    ResortCmd_NameEntry 0, 0
-    ResortCmd_SetWord 4, 255, 0, 1
-    ResortCmd_SetWord 8, 255, 0, 2
+    NameEntry 0, 0
+    SetWord 4, 255, 0, 1
+    SetWord 8, 255, 0, 2
     // "Wonderful![f000]븁\u0000\n[f000]ĺ\u0001\u0001,\n[f000]Ĺ\u0001\u0002 belongs to you now![f000]븀\u0000\nI'll leave everything to you.[f000]븁\u0000\nContinue developing the avenue\nso visitors will be even more delighted.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_WonderfulBelongsNowIll, 1, 0, 0
     ActorMsgClose
@@ -565,10 +565,10 @@ L_0877:
     EvCameraMoveTo 9688, 0, 0xed000, 0xe9000, 0, 0x58000, 60
     EvCameraWait
     ActorFindByGPos 0x8022, 0x8020, 13, 0, 5
-    ResortCmd_GetValue 35, 0x8020
-    ResortCmd_GetValue 37, 0x8023
-    ResortCmd_SetWord 0, 3, 0x8023, 0
-    ResortCmd_SetWord 6, 3, 0x8023, 1
+    GetValue 35, 0x8020
+    GetValue 37, 0x8023
+    SetWord 0, 3, 0x8023, 0
+    SetWord 6, 3, 0x8023, 1
     ActorCmdExec 255, Movement_0C84
     ActorCmdExec 0x8022, Movement_0C74
     ActorCmdWait
@@ -595,14 +595,14 @@ L_0960:
     // "Keep up the good work![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_KeepUpGoodWork_3, 1, 0, 0
     ActorMsgClose
-    ResortCmd_SetOwnValue 21, 3
+    SetOwnValue 21, 3
     MedalGive 194
     VMCall L_0BCB
     VMReturn
 
 L_0996:
     VMCall L_0BB9
-    ResortCmd_SetWord 4, 255, 0, 0
+    SetWord 4, 255, 0, 0
     // "[f000]Ā\u0001\u0000,\nI see you are putting in a lot of effort![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_SeePuttingLotEffort_4, 1, 0, 0
     // "Today, I have a present for you.[f000]븁\u0000\nNow you can change the avenue's\nneon arch as you wish.[f000]븁\u0000\nIt will give a fresh look to the avenue.\nWon't it delight our visitors even more?![f000]븁\u0000"
@@ -613,10 +613,10 @@ L_0996:
     EvCameraMoveTo 9688, 0, 0xed000, 0xb6000, 0, 0xa4000, 60
     EvCameraWait
     ActorFindByGPos 0x8022, 0x8020, 11, 0, 11
-    ResortCmd_GetValue 36, 0x8020
-    ResortCmd_GetValue 38, 0x8023
-    ResortCmd_SetWord 0, 3, 0x8023, 0
-    ResortCmd_SetWord 6, 3, 0x8023, 1
+    GetValue 36, 0x8020
+    GetValue 38, 0x8023
+    SetWord 0, 3, 0x8023, 0
+    SetWord 6, 3, 0x8023, 1
     ActorCmdExec 255, Movement_0C8C
     ActorCmdExec 0x8022, Movement_0C7C
     ActorCmdWait
@@ -643,13 +643,13 @@ L_0A4D:
     // "Keep up the good work![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_KeepUpGoodWork_4, 1, 0, 0
     ActorMsgClose
-    ResortCmd_SetOwnValue 21, 4
+    SetOwnValue 21, 4
     VMCall L_0BCB
     VMReturn
 
 L_0A7F:
     VMCall L_0BB9
-    ResortCmd_SetWord 4, 255, 0, 0
+    SetWord 4, 255, 0, 0
     // "[f000]Ā\u0001\u0000,\nI see you are putting in a lot of effort![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_SeePuttingLotEffort_5, 1, 0, 0
     // "I have a piece of advice for you today.[f000]븁\u0000\nYou'd want an assistant that suits\nyour preferences, wouldn't you?[f000]븁\u0000\nWhy don't you choose one of the visitors?\nIt's quite easy.[f000]븁\u0000\nTalk to a person and choose “Recruit.\"[f000]븁\u0000\nThe higher the current avenue rank is\ncompared to the person's ideals,[f000]븀\u0000\nthe better chance you'll have of[f000]븀\u0000\nrecruiting him or her successfully.[f000]븁\u0000\nPlease bring even more delight\nto our visitors![f000]븁\u0000"
@@ -657,13 +657,13 @@ L_0A7F:
     // "Keep up the good work![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_KeepUpGoodWork_5, 1, 0, 0
     ActorMsgClose
-    ResortCmd_SetOwnValue 21, 5
+    SetOwnValue 21, 5
     VMCall L_0BCB
     VMReturn
 
 L_0AC3:
     VMCall L_0BB9
-    ResortCmd_SetWord 4, 255, 0, 0
+    SetWord 4, 255, 0, 0
     // "[f000]Ā\u0001\u0000,\nI see you are putting in a lot of effort![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_SeePuttingLotEffort_6, 1, 0, 0
     // "Today, I have a big present for you![f000]븁\u0000\nTo commemorate your entering the\nHall of Fame, shops have been renovated.[f000]븁\u0000\nYou'll notice new services and items,\nso you might want to check those out.[f000]븁\u0000\nWhat's more...\nHave you heard of Pokémon Eggs?[f000]븁\u0000\nYou'll now be able to build what they call\na “Nursery,\" which enables Eggs to[f000]븀\u0000\nbe hatched more quickly than normal.[f000]븁\u0000\nFind a visitor who wants to build a\nNursery, and give it a try![f000]븁\u0000"
@@ -671,18 +671,18 @@ L_0AC3:
     // "I have nothing more to\npoint out to you![f000]븁\u0000\nJust keep up the good work![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_HaveNothingMorePoint, 1, 0, 0
     ActorMsgClose
-    ResortCmd_SetOwnValue 21, 6
+    SetOwnValue 21, 6
     VMCall L_0BCB
     VMReturn
 
 L_0B07:
     VMCall L_0BB9
-    ResortCmd_SetWord 4, 255, 0, 0
+    SetWord 4, 255, 0, 0
     // "[f000]Ā\u0001\u0000,\nI see you are putting in a lot of effort![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_SeePuttingLotEffort_7, 1, 0, 0
     // "Today, I have a surprise for you.[f000]븁\u0000\nEverybody here is celebrating the\ngreat effort you've been putting in.[f000]븁\u0000\nWhat are you waiting for? Don't be shy!\nGo and greet everyone![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_TodayHaveSurpriseEverybody, 1, 0, 0
-    ResortCmd_SetOwnValue 21, 7
+    SetOwnValue 21, 7
     ActorMsgClose
     WorkSetConst EVENT_WORK_0x413a, 1
     FlagSet EVENT_FLAG_0x09f1
@@ -691,13 +691,13 @@ L_0B07:
 
 L_0B4D:
     VMCall L_0BB9
-    ResortCmd_SetWord 4, 255, 0, 0
+    SetWord 4, 255, 0, 0
     // "[f000]Ā\u0001\u0000,\nI see you are putting in a lot of effort![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_SeePuttingLotEffort_8, 1, 0, 0
     // "I have a present for you to recognize\nall your continuous effort.[f000]븁\u0000\nIt's just a little something.\nPlease, take it.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_HavePresentRecognizeAll, 1, 0, 0
     ActorMsgClose
-    ResortCmd_GetValue 61, 0x8020
+    GetValue 61, 0x8020
     VMStackPush 0x8000
     VMStackPush 0x8001
     WorkSet 0x8000, 0x8020
@@ -708,7 +708,7 @@ L_0B4D:
     // "I have nothing more to\npoint out to you![f000]븁\u0000\nJust keep up the good work![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue2_Text_HaveNothingMorePoint_2, 1, 0, 0
     ActorMsgClose
-    ResortCmd_SetOwnValue 21, 8
+    SetOwnValue 21, 8
     VMCall L_0BCB
     VMReturn
 

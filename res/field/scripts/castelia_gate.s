@@ -43,7 +43,7 @@ Script_6:
 
 Script_1:
     ActorsPauseAll
-    GimmickGateCmd_ViewBoard 36
+    GimmickGateViewBoard 36
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

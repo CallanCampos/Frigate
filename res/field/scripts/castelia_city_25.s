@@ -25,7 +25,7 @@ Script_2:
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
     WorkSetConst 0x8020, 0
-    ElevatorTable_GetMysteryEntryCount 0x8020
+    ElevatorGetMysteryEntryCount 0x8020
     VMStackPush 0x8020
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -44,7 +44,7 @@ L_006B:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_00CB
-    ElevatorTable_RegisterBirthdayEntry 0
+    ElevatorRegisterBirthdayEntry 0
     VMStackPush 0x8020
     VMStackPushConst 1
     VMStackCmp CMP_EQ

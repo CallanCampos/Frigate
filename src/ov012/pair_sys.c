@@ -168,7 +168,7 @@ static void ClearFollowNpcData(FieldFollowWk *wk) {
     wk->trainerId = 0;
 }
 
-BOOL s0250_ActorPairSet(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PairSys_ActorPairSet(VM *vm, FieldScriptEnv *env) {
     u16 actorId = ScriptReadAny(vm, env);
     u16 index = ScriptReadAny(vm, env);
     u16 isPersistent = ScriptReadAny(vm, env);
@@ -193,7 +193,7 @@ BOOL s0250_ActorPairSet(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0251_ActorPairEnd(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PairSys_ActorPairEnd(VM *vm, FieldScriptEnv *env) {
     u16 scrId = ScriptReadAny(vm, env);
     u16 moveCode = ScriptReadAny(vm, env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
@@ -212,7 +212,7 @@ BOOL s0251_ActorPairEnd(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0252_ActorPairGetTrID(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PairSys_ActorPairGetTrID(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
 
@@ -221,7 +221,7 @@ BOOL s0252_ActorPairGetTrID(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0253_ActorPairSetMoveEnable(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PairSys_ActorPairSetMoveEnable(VM *vm, FieldScriptEnv *env) {
     u8 enable = VM_Read8(vm);
     FieldActor *actor = FindFieldActor(GameData_GetMMSys(FieldScriptEnv_GetGameData(env)), FOLLOWER_ACTOR_ID);
 

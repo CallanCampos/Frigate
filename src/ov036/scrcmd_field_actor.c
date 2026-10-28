@@ -76,7 +76,7 @@ typedef struct {
     u16 count;
 } WalkRouteAcmd;
 
-// The route that s024F_ActorWalkRoute has an actor walk: to the tile (x, z), first along axis
+// The route that Scrcmd_FieldActor_ActorWalkRoute has an actor walk: to the tile (x, z), first along axis
 typedef struct {
     FieldScriptEnv *env;
     Field *field;
@@ -114,7 +114,7 @@ static FieldActor *FindScriptActor(FieldScriptEnv *env, u16 id) {
     return actor;
 }
 
-BOOL s0064_ActorCmdExec(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorCmdExec(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     u16 id = ScriptReadAny(vm, env);
     u32 offset = VM_Read32(vm);
@@ -429,7 +429,7 @@ static u16 CreateRouteActionQueue(WalkRouteAcmd *acmd, FieldActor *actor, WalkRo
     return index;
 }
 
-BOOL s024F_ActorWalkRoute(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorWalkRoute(VM *vm, FieldScriptEnv *env) {
     WalkRoute route;
     u16 id = ScriptReadAny(vm, env);
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
@@ -460,12 +460,12 @@ static BOOL ScriptNative_AcmdWait(VM *vm, void *data) {
     return FALSE;
 }
 
-BOOL s0065_ActorCmdWait(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorCmdWait(VM *vm, FieldScriptEnv *env) {
     VM_SetNativeCallback(vm, ScriptNative_AcmdWait);
     return TRUE;
 }
 
-BOOL s0066_ActorGetMoveCode(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorGetMoveCode(VM *vm, FieldScriptEnv *env) {
     MMSys *mmSys = GetScrEnvActorSys(env);
     u16 *result = ScriptReadVar(vm, env);
 
@@ -474,7 +474,7 @@ BOOL s0066_ActorGetMoveCode(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0073_ActorSetMoveCode(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorSetMoveCode(VM *vm, FieldScriptEnv *env) {
     MMSys *mmSys = GetScrEnvActorSys(env);
     u16 id = ScriptReadAny(vm, env);
     u16 moveCode = ScriptReadAny(vm, env);
@@ -483,7 +483,7 @@ BOOL s0073_ActorSetMoveCode(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0067_ActorGetGPos(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorGetGPos(VM *vm, FieldScriptEnv *env) {
     MMSys *mmSys = GetScrEnvActorSys(env);
     FieldActor *actor = FindFieldActor(mmSys, ScriptReadAny(vm, env));
     u16 *x = ScriptReadVar(vm, env);
@@ -494,7 +494,7 @@ BOOL s0067_ActorGetGPos(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0068_PlayerGetGPos(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_PlayerGetGPos(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     FieldActor *actor = FieldPlayer_GetActor(Field_GetPlayer(fieldWork->field));
     u16 *x = ScriptReadVar(vm, env);
@@ -505,7 +505,7 @@ BOOL s0068_PlayerGetGPos(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s006E_PlayerGetDir(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_PlayerGetDir(VM *vm, FieldScriptEnv *env) {
     FieldActor *actor = FindScrEnvPlayerActor(env);
     u16 *result = ScriptReadVar(vm, env);
 
@@ -513,7 +513,7 @@ BOOL s006E_PlayerGetDir(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0069_ActorNew(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorNew(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     u16 x = ScriptReadAny(vm, env);
     u16 z = ScriptReadAny(vm, env);
@@ -533,7 +533,7 @@ BOOL s0069_ActorNew(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s006C_ActorDelete(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorDelete(VM *vm, FieldScriptEnv *env) {
     MMSys *mmSys = GetScrEnvActorSys(env);
     FieldActor *actor = FindFieldActor(mmSys, ScriptReadAny(vm, env));
 
@@ -543,7 +543,7 @@ BOOL s006C_ActorDelete(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s006B_ActorAdd(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorAdd(VM *vm, FieldScriptEnv *env) {
     MMSys *mmSys = GetScrEnvActorSys(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     EventData *eventData = GameData_GetEventData(gameData);
@@ -562,7 +562,7 @@ BOOL s006B_ActorAdd(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s006D_ActorSetGPos(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorSetGPos(VM *vm, FieldScriptEnv *env) {
     u16 id = ScriptReadAny(vm, env);
     s16 x = ScriptReadAny(vm, env);
     s16 y = ScriptReadAny(vm, env);
@@ -576,7 +576,7 @@ BOOL s006D_ActorSetGPos(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s006A_ActorGetSpawnFlag(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorGetSpawnFlag(VM *vm, FieldScriptEnv *env) {
     u16 id = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
     FieldActor *actor = FindFieldActor(GetScrEnvActorSys(env), id);
@@ -587,7 +587,7 @@ BOOL s006A_ActorGetSpawnFlag(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0079_ActorGetUserParam(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorGetUserParam(VM *vm, FieldScriptEnv *env) {
     u16 id = ScriptReadAny(vm, env);
     u16 index = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
@@ -599,7 +599,7 @@ BOOL s0079_ActorGetUserParam(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ScriptNative_SetActorZoneDeleteOff(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_SetActorZoneDeleteOff(VM *vm, FieldScriptEnv *env) {
     u16 id = ScriptReadAny(vm, env);
     FieldActor *actor = FindFieldActor(GetScrEnvActorSys(env), id);
 
@@ -712,7 +712,7 @@ void EnableAllActorsMovementScr(FieldScriptEnv *env) {
     EnableAllActorsMovement(GetScrEnvActorSys(env));
 }
 
-BOOL s0074_ActorSetEyeToEye(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorSetEyeToEye(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 dir = GetInverseDirection(GetActorFaceDir(FindScrEnvPlayerActor(env)));
     FieldActor *actor = ScriptWork_GetParentActor(work);
@@ -724,7 +724,7 @@ BOOL s0074_ActorSetEyeToEye(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0070_ActorFindByGPos(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorFindByGPos(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     Field *field = fieldWork->field;
     u16 *uid = ScriptReadVar(vm, env);
@@ -743,7 +743,7 @@ BOOL s0070_ActorFindByGPos(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s006F_PlayerGetActorInFront(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_PlayerGetActorInFront(VM *vm, FieldScriptEnv *env) {
     FieldPlayer *player = Field_GetPlayer(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
     u16 *uid = ScriptReadVar(vm, env);
     u16 *found = ScriptReadVar(vm, env);
@@ -768,7 +768,7 @@ static BOOL ScriptNative_WaitPlayerSpecialSequence(VM *vm, void *data) {
     return FALSE;
 }
 
-BOOL s0075_PlayerSetSpecialSequence(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_PlayerSetSpecialSequence(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     u16 seq = VM_Read16(vm);
     FieldPlayer *player = Field_GetPlayer(fieldWork->field);
@@ -781,7 +781,7 @@ BOOL s0075_PlayerSetSpecialSequence(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0076_PlayerMoveToYAsync(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_PlayerMoveToYAsync(VM *vm, FieldScriptEnv *env) {
     VecFx32 pos;
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     Field *field = fieldWork->field;
@@ -806,7 +806,7 @@ BOOL s0076_PlayerMoveToYAsync(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0248_PlayerMoveToYAsync_(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_PlayerMoveToYAsync_0248(VM *vm, FieldScriptEnv *env) {
     VecFx32 pos;
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     Field *field = fieldWork->field;
@@ -836,7 +836,7 @@ static FieldActor *FindScrEnvPlayerActor(FieldScriptEnv *env) {
 }
 
 // Turns the player to face the trigger the player stands on
-BOOL s0077_PlayerTurnByTrigger(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_PlayerTurnByTrigger(VM *vm, FieldScriptEnv *env) {
     int i;
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
@@ -888,7 +888,7 @@ BOOL s0077_PlayerTurnByTrigger(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0078_PlayerGetExState(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_PlayerGetExState(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     FieldPlayer *player = Field_GetPlayer(fieldWork->field);
     u16 *result = ScriptReadVar(vm, env);
@@ -913,7 +913,7 @@ BOOL s0078_PlayerGetExState(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s007B_ActorJumpToGPos(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorJumpToGPos(VM *vm, FieldScriptEnv *env) {
     VecFx32 start;
     VecFx32 end;
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
@@ -933,7 +933,7 @@ BOOL s007B_ActorJumpToGPos(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL ScriptNative_CheckPlayerFormModel(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_CheckPlayerFormModel(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     FieldPlayer *player = Field_GetPlayer(fieldWork->field);
     u16 *result = ScriptReadVar(vm, env);
@@ -942,7 +942,7 @@ BOOL ScriptNative_CheckPlayerFormModel(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s02BE_ActorMoveLinear(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorMoveLinear(VM *vm, FieldScriptEnv *env) {
     VecFx32 start;
     VecFx32 end;
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
@@ -970,7 +970,7 @@ BOOL s02BE_ActorMoveLinear(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0071_PlayerGetRailPos(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_PlayerGetRailPos(VM *vm, FieldScriptEnv *env) {
     FieldActor *actor = FindScrEnvPlayerActor(env);
     u16 *lineIndex = ScriptReadVar(vm, env);
     u16 *front = ScriptReadVar(vm, env);
@@ -980,7 +980,7 @@ BOOL s0071_PlayerGetRailPos(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0072_ActorGetRailPos(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorGetRailPos(VM *vm, FieldScriptEnv *env) {
     MMSys *mmSys = GetScrEnvActorSys(env);
     FieldActor *actor = FindFieldActor(mmSys, ScriptReadAny(vm, env));
     u16 *lineIndex = ScriptReadVar(vm, env);
@@ -991,7 +991,7 @@ BOOL s0072_ActorGetRailPos(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s007A_ActorPlayRailSlipdown(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorPlayRailSlipdown(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     MMSys *mmSys = GetScrEnvActorSys(env);
@@ -1002,7 +1002,7 @@ BOOL s007A_ActorPlayRailSlipdown(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s007C_PlayerSetRailPos(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_PlayerSetRailPos(VM *vm, FieldScriptEnv *env) {
     RailPosition railPos;
     FieldActor *actor = FindScrEnvPlayerActor(env);
     u16 lineIndex = ScriptReadAny(vm, env);
@@ -1016,7 +1016,7 @@ BOOL s007C_PlayerSetRailPos(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s007D_ActorSetRailPos(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorSetRailPos(VM *vm, FieldScriptEnv *env) {
     RailPosition railPos;
     MMSys *mmSys = GetScrEnvActorSys(env);
     FieldActor *actor = FindFieldActor(mmSys, ScriptReadAny(vm, env));
@@ -1031,7 +1031,7 @@ BOOL s007D_ActorSetRailPos(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s007E_ActorPlayTeleportSeq(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorPlayTeleportSeq(VM *vm, FieldScriptEnv *env) {
     VecFx32 offset;
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 id = ScriptReadAny(vm, env);
@@ -1051,7 +1051,7 @@ BOOL s007E_ActorPlayTeleportSeq(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0234_ActorFallDownToXZ(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldActor_ActorFallDownToXZ(VM *vm, FieldScriptEnv *env) {
     VecFx32 pos;
     fx32 height;
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);

@@ -185,7 +185,7 @@ L_025D:
     SystemMsg MarvelousBridge_Text_WouldLikeGiveNickname, 2
     WorkSetConst 0x8028, 0
     YesNoWin 0x8028
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8028
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -339,7 +339,7 @@ Script_4:
     InfoMsg MarvelousBridge_Text_Lunaaan, 1
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     ActorCmdExec 255, Movement_05D4
     PlayerGetGPos 0x8021, 0x8022
     ActorAdd 2
@@ -373,7 +373,7 @@ Script_5:
     ScreamMsg MarvelousBridge_Text_Lunaaan, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     CallWildBattle 488, 68, 1
     WildBattleIsVictory 0x8010
     VMStackPush 0x8010
@@ -417,7 +417,7 @@ L_059F:
     // "Cresselia disappeared somewhere..."
     SystemMsg MarvelousBridge_Text_CresseliaDisappearedSomewhere, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
 
 L_05BC:
     FinishAllEvents

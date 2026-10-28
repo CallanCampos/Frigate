@@ -24,7 +24,7 @@ Script_1:
 Script_2:
     WorkSetConst 0x8021, 0
     VMCall L_0250
-    ResortCmd_GetOwnValue 20, 0x8021
+    GetOwnValue 20, 0x8021
     VMStackPush 0x8021
     VMStackPushConst 0
     VMStackCmp CMP_NE
@@ -116,16 +116,16 @@ L_01C3:
     VMJumpIf CMP_STACK, L_023A
     WorkSetConst 0x8022, 0
     ActorSetGPos 255, 15, 0, 70, 0
-    ResortCmd_AddRecordPerson 0, 0x8022
+    AddRecordPerson 0, 0x8022
     ActorSetGPos 0x8022, 14, 0, 71, 0
-    ResortCmd_AddRecordPerson 1, 0x8022
+    AddRecordPerson 1, 0x8022
     ActorSetGPos 0x8022, 16, 0, 71, 0
-    ResortCmd_AddRecordPerson 2, 0x8022
+    AddRecordPerson 2, 0x8022
     ActorSetGPos 0x8022, 13, 0, 72, 0
-    ResortCmd_AddRecordPerson 3, 0x8022
+    AddRecordPerson 3, 0x8022
     ActorSetGPos 0x8022, 17, 0, 72, 0
-    ResortCmd_SetOwnValue 23, 1
-    ResortCmd_StartSceneAnim 1
+    SetOwnValue 23, 1
+    StartSceneAnim 1
 
 L_023A:
     WorkSetConst 0x8022, 0
@@ -203,17 +203,17 @@ L_034F:
     MsgWinCloseAll
     // "[f000][ff00]\u0001\u0002[f000]봂\u0000Warning![f000][ff00]\u0001\u0000[f000]븁\u0000\nThe words you are about to enter\nmay be sent to other players.[f000]븁\u0000\nPlease consider them carefully\nbefore you register them.[f000]븁\u0000"
     SystemMsg JoinAvenue_Text_WarningWordsAboutEnter, 2
-    InfoMsgClose
-    ResortCmd_NameEntry 2, 0
+    SystemMsgClose
+    NameEntry 2, 0
     // "That's a great line![f000]븁\u0000\nThen what would you say when\nsomething truly moves your heart?[f000]븁\u0000\nYou want to choose something universal,\na phrase that anyone will understand,[f000]븀\u0000\nyou know?[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue_Text_ThatsGreatLineThen, 0, 0, 0
     MsgWinCloseAll
     // "[f000][ff00]\u0001\u0002[f000]봂\u0000Warning![f000][ff00]\u0001\u0000[f000]븁\u0000\nThe words you are about to enter\nmay be sent to other players.[f000]븁\u0000\nPlease consider them carefully\nbefore you register them.[f000]븁\u0000"
     SystemMsg JoinAvenue_Text_WarningWordsAboutEnter, 2
-    InfoMsgClose
-    ResortCmd_NameEntry 3, 0
-    ResortCmd_SetWord 19, 255, 0, 0
-    ResortCmd_SetWord 20, 255, 0, 1
+    SystemMsgClose
+    NameEntry 3, 0
+    SetWord 19, 255, 0, 0
+    SetWord 20, 255, 0, 1
     // "[f000]ķ\u0001\u0000\n[f000]ķ\u0001\u0001[f000]븁\u0000\nI knew it!\nYou are the one![f000]븁\u0000\nWho else could be so well suited\nto managing the avenue?[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue_Text_KnewOneWhoElse, 0, 0, 0
     MsgWinCloseAll
@@ -256,8 +256,8 @@ L_034F:
     // "Pleased to meet you![f000]븁\u0000\nHow should we address you?[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue_Text_PleasedMeetHowShould, 1, 0, 0
     MsgWinCloseAll
-    ResortCmd_NameEntry 1, 0
-    ResortCmd_SetWord 4, 255, 0, 0
+    NameEntry 1, 0
+    SetWord 4, 255, 0, 0
     // "[f000]ĺ\u0001\u0000![f000]븁\u0000\nNow that you are the one to manage\nthe development of the avenue,[f000]븀\u0000\nplease turn it into a wonderful[f000]븀\u0000\nattraction where many people visit.[f000]븁\u0000\nI'll explain how to develop the avenue,\nso please talk to me when you are ready."
     ActorMsg MSGFILE_SCRIPT, JoinAvenue_Text_NowOneManageDevelopment, 1, 0, 0
     LastKeyWait
@@ -327,7 +327,7 @@ Script_4:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    ResortCmd_SetWord 4, 255, 0, 0
+    SetWord 4, 255, 0, 0
     WorkCmpConst EVENT_WORK_0x4110, 0
     VMJumpIf CMP_EQ, L_0545
     VMJump L_055B
@@ -349,7 +349,7 @@ L_056E:
     ActorMsg MSGFILE_SCRIPT, JoinAvenue_Text_MakeMoreAttractiveYoull, 1, 0, 0
     LastKeyWait
     ActorMsgClose
-    ResortCmd_AddEntryOrRecord 1, 0
+    AddEntryOrRecord 1, 0
     WorkSetConst EVENT_WORK_0x4110, 2
     VMJump L_0640
 
@@ -375,7 +375,7 @@ L_05CC:
     ActorMsg MSGFILE_SCRIPT, JoinAvenue_Text_CongratulationsYouveJustMade, 1, 0, 0
     LastKeyWait
     ActorMsgClose
-    ResortCmd_AddEntryOrRecord 1, 1
+    AddEntryOrRecord 1, 1
     WorkSetConst EVENT_WORK_0x4110, 4
     VMJump L_0640
 
@@ -428,7 +428,7 @@ Script_5:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    ResortCmd_SetWord 4, 255, 0, 0
+    SetWord 4, 255, 0, 0
     WorkCmpConst EVENT_WORK_0x4110, 0
     VMJumpIf CMP_EQ, L_0691
     VMJump L_06A3
@@ -500,7 +500,7 @@ Script_6:
     ActorCmdExec 1, Movement_04B4
     ActorCmdExec 2, Movement_04B4
     ActorCmdWait
-    ResortCmd_SetWord 4, 255, 0, 0
+    SetWord 4, 255, 0, 0
     // "Congratulations![f000]븁\u0000\nYou've just recommended the shop, and\nthat made the popularity of[f000]븀\u0000\nthe avenue go up![f000]븁\u0000\nRaise the popularities of shops and the\navenue to make it famous![f000]븁\u0000\nA good tip for bringing more customers\nis to use the communication features.[f000]븁\u0000\nYou should turn on the C-Gear to attract\nlots of passersby.[f000]븁\u0000\nYou should also try communication\nfacilities, such as the Union Room[f000]븀\u0000\nand the Global Terminal.[f000]븁\u0000\n[f000]ĺ\u0001\u0000,\nwe'll be serving as your assistants[f000]븀\u0000\nin the room over here.[f000]븁\u0000\nPlease come visit us.[f000]븁\u0000\nIf you'll excuse us...[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue_Text_CongratulationsYouveJustRecommended, 1, 0, 0
     MsgWinCloseAll
@@ -513,18 +513,18 @@ Script_6:
     SEPlay SEQ_SE_KAIDAN
     ActorDelete 1
     SEWait
-    ResortCmd_AddEntryOrRecord 3, 4
-    ResortCmd_AddEntryOrRecord 3, 5
+    AddEntryOrRecord 3, 4
+    AddEntryOrRecord 3, 5
     WorkSetConst EVENT_WORK_0x4110, 6
-    ResortCmd_SetOwnValue 18, 0
+    SetOwnValue 18, 0
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
 
 Script_8:
     ActorsPauseAll
-    ResortCmd_SetWord 8, 255, 0, 0
-    ResortCmd_SetWord 4, 255, 0, 1
+    SetWord 8, 255, 0, 0
+    SetWord 4, 255, 0, 1
     FunfestMissionBroadcast 17, 0
     SEPlay SEQ_SE_MESSAGE
     // "[f000]Ĺ\u0001\u0000\n[f000]ĺ\u0001\u0001's office[f000]븁\u0000"
@@ -536,7 +536,7 @@ Script_8:
 
 Script_9:
     ActorsPauseAll
-    ResortCmd_SetWord 8, 255, 0, 0
+    SetWord 8, 255, 0, 0
     FunfestMissionBroadcast 17, 0
     SEPlay SEQ_SE_MESSAGE
     // "[f000]Ĺ\u0001\u0000[f000]븁\u0000\nAn avenue that grows as you deepen\nexchanges with other people.[f000]븁\u0000"
@@ -548,7 +548,7 @@ Script_9:
 
 Script_10:
     ActorsPauseAll
-    ResortCmd_SetWord 8, 255, 0, 0
+    SetWord 8, 255, 0, 0
     FunfestMissionBroadcast 17, 0
     SEPlay SEQ_SE_MESSAGE
     // "[f000]Ĺ\u0001\u0000[f000]븁\u0000\nAn avenue that grows as you deepen\nexchanges with other people.[f000]븁\u0000"
@@ -579,7 +579,7 @@ L_08B8:
     VMStackPushConst 8
     VMStackCmp CMP_LT
     VMJumpIf CMP_STACK, L_0A6B
-    ResortCmd_SetOwnValue 24, 1
+    SetOwnValue 24, 1
     ActorCmdExec 255, Movement_0D20
     ActorCmdExec 0x8025, Movement_0D20
     ActorCmdExec 0x8026, Movement_0D20
@@ -588,7 +588,7 @@ L_08B8:
     ActorCmdWait
     WorkGet 0x802c, 0x802a
     WorkAdd 0x802c, 25
-    ResortCmd_GetValue 0x802c, 0x8029
+    GetValue 0x802c, 0x8029
     VMStackPush 0x8029
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -627,21 +627,21 @@ L_09B9:
     ActorCmdWait
     WorkGet 0x802c, 0x802a
     WorkAdd 0x802c, 44
-    ResortCmd_GetValue 0x802c, 0x802b
-    ResortCmd_SetOwnValue 24, 0
-    ResortCmd_SetWord 0, 0, 0x802a, 0
-    ResortCmd_SetWord 6, 0, 0x802a, 1
-    ResortCmd_SetWord 18, 0, 0x802a, 2
-    ResortCmd_SetWord 4, 255, 0, 3
+    GetValue 0x802c, 0x802b
+    SetOwnValue 24, 0
+    SetWord 0, 0, 0x802a, 0
+    SetWord 6, 0, 0x802a, 1
+    SetWord 18, 0, 0x802a, 2
+    SetWord 4, 255, 0, 3
     // "[f000]Ā\u0001\u0000: [f000]ķ\u0001\u0001\n[f000]ķ\u0001\u0002[f000]븀\u0000\n[f000]ĺ\u0001\u0003! Hurrah![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, JoinAvenue_Text_Hurrah_2, 0x802b, 2, 0
     ActorMsgClose
-    ResortCmd_SetWord 0, 0, 0x802a, 0
-    ResortCmd_SetWord 21, 0, 0x802a, 1
-    ResortCmd_SetWord 22, 0, 0x802a, 2
-    ResortCmd_SetWord 23, 0, 0x802a, 3
-    ResortCmd_SetWord 1, 0, 0x802a, 4
-    ResortCmd_SetWord 10, 0, 0x802a, 5
+    SetWord 0, 0, 0x802a, 0
+    SetWord 21, 0, 0x802a, 1
+    SetWord 22, 0, 0x802a, 2
+    SetWord 23, 0, 0x802a, 3
+    SetWord 1, 0, 0x802a, 4
+    SetWord 10, 0, 0x802a, 5
     // "[f000]Ā\u0001\u0000\nMet on [f000]ȁ\u0001\u0002/[f000]ȁ\u0001\u0003/20[f000]ȁ\u0001\u0001[f000]븁\u0000"
     SystemMsg JoinAvenue_Text_Met20, 2
     SEPlay SEQ_SE_SW_JA_01
@@ -650,14 +650,14 @@ L_09B9:
     SystemMsg JoinAvenue_Text_Rank, 2
     SEWait
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
 
 L_0A5F:
     WorkAdd 0x802a, 1
     VMJump L_08B8
 
 L_0A6B:
-    ResortCmd_SetOwnValue 24, 1
+    SetOwnValue 24, 1
     ActorCmdExec 255, Movement_0D28
     ActorCmdExec 0x8025, Movement_0D28
     ActorCmdExec 0x8026, Movement_0D28
@@ -666,7 +666,7 @@ L_0A6B:
     ActorCmdWait
     FadeEx 3, 0, 16, 2
     FadeExWait
-    ResortCmd_EndSceneAnim 1
+    EndSceneAnim 1
     ActorSetGPos 255, 15, 0, 40, 1
     ActorSetGPos 0x8025, 14, 0, 39, 1
     ActorSetGPos 0x8026, 16, 0, 39, 1
@@ -676,10 +676,10 @@ L_0A6B:
     EvCameraUnbind
     EvCameraMoveTo 64037, 0, 0xe1000, 0xf8000, 0x24000, 0x247000, 1
     EvCameraWait
-    ResortCmd_StartSceneAnim 0
+    StartSceneAnim 0
     FadeEx 3, 16, 0, 2
     FadeExWait
-    ResortCmd_SetOwnValue 24, 0
+    SetOwnValue 24, 0
     WorkSetConst 0x802a, 0
 
 L_0B21:
@@ -729,25 +729,25 @@ L_0BB0:
     WorkGet 0x802c, 0x802a
     WorkAdd 0x802c, 1
     WordSetNumber 4, 0x802c, 1
-    ResortCmd_SetWord 0, 3, 0x802a, 0
-    ResortCmd_SetWord 21, 3, 0x802a, 1
-    ResortCmd_SetWord 22, 3, 0x802a, 2
-    ResortCmd_SetWord 23, 3, 0x802a, 3
+    SetWord 0, 3, 0x802a, 0
+    SetWord 21, 3, 0x802a, 1
+    SetWord 22, 3, 0x802a, 2
+    SetWord 23, 3, 0x802a, 3
     SEPlay SEQ_SE_SW_JA_01
     SEPlay SEQ_SE_SW_JA_02
     // "Assistant [f000]Ȁ\u0001\u0004: [f000]Ā\u0001\u0000\nMet on [f000]ȁ\u0001\u0002/[f000]ȁ\u0001\u0003/20[f000]ȁ\u0001\u0001"
     SystemMsg JoinAvenue_Text_AssistantMet20, 1
     SEWait
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     WorkAdd 0x802a, 1
     VMJump L_0B21
 
 L_0C19:
     VMSleep 10
-    ResortCmd_SetWord 8, 255, 0, 0
-    ResortCmd_SetWord 11, 255, 0, 1
-    ResortCmd_SetWord 4, 255, 0, 2
+    SetWord 8, 255, 0, 0
+    SetWord 11, 255, 0, 1
+    SetWord 4, 255, 0, 2
     SEPlay SEQ_SE_SW_JA_01
     SEPlay SEQ_SE_SW_JA_02
     // "[f000]ĺ\u0001\u0002's [f000]Ĺ\u0001\u0000\nRank [f000]Ȃ\u0001\u0001"
@@ -758,14 +758,14 @@ L_0C19:
     WordSetNumber 0, 0x8029, 7
     RecordGet 128, 0x8029
     WordSetNumber 1, 0x8029, 7
-    ResortCmd_SetWord 12, 255, 0, 2
+    SetWord 12, 255, 0, 2
     // "People recommended: [f000]Ȇ\u0001\u0000\nPeople invited: [f000]Ȇ\u0001\u0001[f000]븁\u0000\nPopularity of the avenue:\n“[f000]ł\u0001\u0002\"[f000]븁\u0000"
     SystemMsg JoinAvenue_Text_PeopleRecommendedPeopleInvited, 1
-    ResortCmd_SetWord 8, 255, 0, 0
-    ResortCmd_GetValue 63, 0x8029
+    SetWord 8, 255, 0, 0
+    GetValue 63, 0x8029
     WorkAdd 0x8029, 36
     SystemMsg 0x8029, 1
-    InfoMsgClose
+    SystemMsgClose
     SEPlay SEQ_SE_MSCL_09
     FadeOutWhite
     FadeWait
@@ -774,11 +774,11 @@ L_0C19:
     EvCameraWait
     EvCameraRebind
     EvCameraEnd
-    ResortCmd_EndSceneAnim 0
-    ResortCmd_RemovePerson 1, 3, 0
-    ResortCmd_RemovePerson 1, 3, 1
-    ResortCmd_RemovePerson 1, 3, 2
-    ResortCmd_RemovePerson 1, 3, 3
+    EndSceneAnim 0
+    RemovePerson 1, 3, 0
+    RemovePerson 1, 3, 1
+    RemovePerson 1, 3, 2
+    RemovePerson 1, 3, 3
     WorkSetConst EVENT_WORK_0x413a, 2
     FlagReset EVENT_FLAG_0x09f1
     MapChangeCore ZONE_JOIN_AVENUE_2, 8, 0, 8, 1

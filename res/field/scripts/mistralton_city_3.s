@@ -507,7 +507,7 @@ L_0731:
 L_0737:
     // "“Deliver a lot of cargo quickly!\"\nThis is Mistralton Cargo Service.[f000]븁\u0000\nWhere would you like to fly?"
     ActorMsg MSGFILE_SCRIPT, MistraltonCity3_Text_DeliverLotCargoQuickly, 6, 2, 0
-    ListMenu_AnchorTopRight 31, 5, 0, 1, 32801
+    ListMenuAnchorTopRight 31, 5, 0, 1, 32801
     ListMenuAdd 17, 65535, 0
     ListMenuAdd 18, 65535, 1
     ListMenuAdd 19, 65535, 2

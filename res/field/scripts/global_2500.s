@@ -17,7 +17,7 @@ Script_1:
     // "It's lined with Pokémon picture books."
     InfoMsg Global2500_Text_ItsLinedPokemonPicture, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -28,7 +28,7 @@ Script_2:
     // "Are these books for Pokémon\nto read?"
     InfoMsg Global2500_Text_TheseBooksPokemonRead, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -39,7 +39,7 @@ Script_3:
     // "It's chock full of Pokémon books and\nphoto collections."
     InfoMsg Global2500_Text_ItsChockFullPokemon, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -50,7 +50,7 @@ Script_4:
     // "There are lots of Pokémon magazines![f000]븁\u0000\n“Pokémon Pal\"\n“Pokémon Handbook\"[f000]븀\u0000\n“Adorable Pokémon\""
     InfoMsg Global2500_Text_ThereLotsPokemonMagazines, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -61,7 +61,7 @@ Script_5:
     // "The trash can is empty."
     InfoMsg Global2500_Text_TrashCanEmpty, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     RecordAdd 43, 1
     JoinAvenueRecordActivity 11
     FinishAllEvents
@@ -74,7 +74,7 @@ Script_6:
     // "The shelves are jammed with vibrant\nPokémon goods."
     InfoMsg Global2500_Text_ShelvesJammedVibrantPokemon, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -85,7 +85,7 @@ Script_7:
     // "It looks like a cabinet full of\nPokémon goods."
     InfoMsg Global2500_Text_LooksLikeCabinetFull, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -96,7 +96,7 @@ Script_8:
     // "Goods are arranged on the shelves in a\nvery orderly fashion."
     InfoMsg Global2500_Text_GoodsArrangedShelvesVery, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

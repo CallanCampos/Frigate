@@ -114,7 +114,7 @@ static GameEvent *EventSaveData_Create(GameSystem *gsys, u16 *result) {
     return event;
 }
 
-BOOL s0137_SaveDataWrite(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Save_SaveDataWrite(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     FieldScriptEnv_GetGameData(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);

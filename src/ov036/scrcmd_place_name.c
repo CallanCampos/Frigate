@@ -8,7 +8,7 @@
 #include "system/game_system.h"
 #include "system/vm.h"
 
-BOOL s023F_CallPlaceNameDisp(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PlaceName_CallPlaceNameDisp(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     PlaceName *placeName = Field_GetPlaceName(field);
 

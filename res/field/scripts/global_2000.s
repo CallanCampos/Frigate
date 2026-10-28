@@ -21,7 +21,7 @@ Script_2:
     WorkSetConst 0x8020, 0
     WorkSetConst 0x8021, 0
     WorkSetConst 0x8022, 0
-    FadeInBlackQ_
+    FadeInBlackQ_01A8
     FadeWait
     PlayerSetSpecialSequence 64
     ActorCmdExec 255, Movement_0120
@@ -172,7 +172,7 @@ L_01DC:
     WorkSetConst 0x8025, 1
 
 L_0247:
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8025
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -187,7 +187,7 @@ L_0247:
     VMJumpIf CMP_STACK, L_028A
     // "There is already a saved game file.\nIt is impossible to save.[f000]븁\u0000\nPlease refer to the Instruction\nBooklet for details.[f000]븁\u0000\nPress Up + SELECT + B Button on\nthe title screen if you want to erase[f000]븀\u0000\nthe current saved game file.[f000]븁\u0000"
     SystemMsg Global10520_Text_ThereAlreadySavedGame_2, 2
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8025, 0
 
 L_028A:
@@ -219,7 +219,7 @@ L_02DB:
     MsgSetLoadingSpinner 0
     SaveDataWrite 0x8029
     SEStop
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8029
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -229,14 +229,14 @@ L_02DB:
     // "[f000]Ā\u0001\u0000 saved the game."
     SystemMsg Global10520_Text_SavedGame, 2
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8000, 0
     VMJump L_0329
 
 L_031B:
     // "Save error.[f000]븁\u0000"
     SystemMsg Global10520_Text_SaveError, 2
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8000, 1
 
 L_0329:
@@ -282,14 +282,14 @@ L_038D:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_03C7
     WorkSetConst 0x8000, 1
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 L_03C7:
     // "Ending communication.\nPlease wait."
     SystemMsg Global10520_Text_EndingCommunicationPleaseWait, 2
     GameCommDisconnect 0x8000
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_03DD
 
 L_03D9:
@@ -301,7 +301,7 @@ L_03DD:
 Script_6:
     // "Wireless communications are turned OFF.\nTurn wireless communications ON[f000]븀\u0000\nin the System Settings.[f000]븀\u0000\nError code: 50699[f000]븁\u0000"
     SystemMsg Global10520_Text_WirelessCommunicationsTurnedOff, 2
-    InfoMsgClose
+    SystemMsgClose
     RTEndGlobal
 
 Script_7:
@@ -313,7 +313,7 @@ Script_7:
     WordSetItemName 1, 0x8001
     SystemMsg 0x802a, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x802a, 0
     FinishAllEvents
     ActorsUnpauseAll

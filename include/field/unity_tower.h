@@ -132,8 +132,8 @@ u32 Scrcmd_GetPartnerGreetingMessage(WordSet *wordSet, GameSystem *gsys, UnityTo
 void LoadUnityTowerVisitorWordSet(WordSet *wordSet, GameData *gameData, u32 index);
 
 // Overlay 12's scrcmd_unity_tower.c
-BOOL s01CE_UnityTowerGetTrainerClass(VM *vm, FieldScriptEnv *env);
-BOOL s01CF_UnityTowerGetStateParam(VM *vm, FieldScriptEnv *env);
-BOOL s01D0_UnityTowerCallFloorSelect(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_UnityTower_UnityTowerGetTrainerClass(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_UnityTower_UnityTowerGetStateParam(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_UnityTower_UnityTowerCallFloorSelect(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_UNITY_TOWER_H

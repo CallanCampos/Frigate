@@ -69,7 +69,7 @@ u32 PleasureBoat_GetPassengerExtra(PleasureBoat *boat, u32 room, u32 index);
 BOOL PleasureBoat_GetPassengerOccupied(PleasureBoat *boat, u32 room);
 
 // Overlay 12's event_royal_unova.c
-BOOL s01A1_PleasureBoatGetRoomInfo(VM *vm, FieldScriptEnv *env);
-BOOL s01A2_CallRoyalUnovaView(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_RoyalUnova_PleasureBoatGetRoomInfo(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_RoyalUnova_CallRoyalUnovaView(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_PLEASURE_BOAT_H

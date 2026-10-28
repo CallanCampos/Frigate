@@ -213,7 +213,7 @@ L_0324:
     VMJump L_0347
 
 L_033B:
-    SurveyCmd_WriteOwnAnswer 0, 1
+    SurveyWriteOwnAnswer 0, 1
     VMJump L_0366
 
 L_0347:
@@ -222,7 +222,7 @@ L_0347:
     VMJump L_0366
 
 L_035A:
-    SurveyCmd_WriteOwnAnswer 0, 2
+    SurveyWriteOwnAnswer 0, 2
     VMJump L_0366
 
 L_0366:
@@ -232,7 +232,7 @@ L_0366:
     VMJump L_0389
 
 L_037D:
-    SurveyCmd_WriteOwnAnswer 1, 1
+    SurveyWriteOwnAnswer 1, 1
     VMJump L_03A8
 
 L_0389:
@@ -241,11 +241,11 @@ L_0389:
     VMJump L_03A8
 
 L_039C:
-    SurveyCmd_WriteOwnAnswer 1, 2
+    SurveyWriteOwnAnswer 1, 2
     VMJump L_03A8
 
 L_03A8:
-    SurveyCmd_WriteOwnAnswer 29, 1
+    SurveyWriteOwnAnswer 29, 1
     VMReturn
 
 Script_3:

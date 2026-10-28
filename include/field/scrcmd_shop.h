@@ -8,6 +8,6 @@
 #include "struct_decls.h"
 #include "system/vm.h"
 
-BOOL s0149_CallFriendlyShopBuy(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Shop_CallFriendlyShopBuy(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_SHOP_H

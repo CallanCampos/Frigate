@@ -54,7 +54,7 @@ Script_3:
     // "There's some graffiti\non the other side of the signboard...[f000]븁\u0000\nNothing ventured, nothing gained.\nMedals await the adventurous!"
     InfoMsg Route2_Text_TheresSomeGraffitiOther, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     MedalGive 18
     VMJump L_00C7
 

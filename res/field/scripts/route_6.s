@@ -134,7 +134,7 @@ Script_5:
     ScreamMsg Route6_Text_Kawbraa, 1
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     PlayerGetDir 0x8020
     VMStackPush 0x8020
     VMStackPushConst 0

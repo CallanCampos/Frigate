@@ -9,13 +9,13 @@
 
 // The script plugin of the Royal Unova (plugin 2), commands from 1000
 
-// What PleasureBoatCmd_SetTrainerInfo sets
+// What Scrcmd_PleasureBoat_SetTrainerInfo sets
 enum {
     PLEASURE_BOAT_TRAINER_INFO_DEFEATED = 8,
 };
 
 // Sets up the cruise, if it isn't already, with the state of a flag
-static BOOL PleasureBoatCmd_Create(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PleasureBoat_Create(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(Field_GetGameSystem(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
     EventWork *eventWork = GameData_GetEventWork(gameData);
     PleasureBoat **boat = GameData_GetPleasureBoatPtr(gameData);
@@ -27,14 +27,14 @@ static BOOL PleasureBoatCmd_Create(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL PleasureBoatCmd_Free(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PleasureBoat_Free(VM *vm, FieldScriptEnv *env) {
     PleasureBoat_Free(GameData_GetPleasureBoatPtr(
         GSYS_GetGameData(Field_GetGameSystem(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))))));
     return FALSE;
 }
 
 // Sets a variable to PLEASURE_BOAT_INFO_*
-static BOOL PleasureBoatCmd_GetInfo(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PleasureBoat_GetInfo(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     PleasureBoat **boat = GameData_GetPleasureBoatPtr(
         GSYS_GetGameData(Field_GetGameSystem(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)))));
@@ -45,7 +45,7 @@ static BOOL PleasureBoatCmd_GetInfo(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL PleasureBoatCmd_AdvanceClock(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PleasureBoat_AdvanceClock(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     PleasureBoat **boat = GameData_GetPleasureBoatPtr(
         GSYS_GetGameData(Field_GetGameSystem(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)))));
@@ -57,7 +57,7 @@ static BOOL PleasureBoatCmd_AdvanceClock(VM *vm, FieldScriptEnv *env) {
 }
 
 // Sets something about a Trainer aboard, of which only PLEASURE_BOAT_TRAINER_INFO_DEFEATED does anything
-static BOOL PleasureBoatCmd_SetTrainerInfo(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PleasureBoat_SetTrainerInfo(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     PleasureBoat **boat = GameData_GetPleasureBoatPtr(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     u16 trainer = ScriptReadAny(vm, env);
@@ -82,14 +82,14 @@ static BOOL PleasureBoatCmd_SetTrainerInfo(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL PleasureBoatCmd_StopClock(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PleasureBoat_StopClock(VM *vm, FieldScriptEnv *env) {
     PleasureBoat_StopClock(*GameData_GetPleasureBoatPtr(
         GSYS_GetGameData(Field_GetGameSystem(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))))));
     return FALSE;
 }
 
 const FieldScriptCommand PLEASURE_BOAT_SCRIPT_COMMANDS[] = {
-    PleasureBoatCmd_Create,         PleasureBoatCmd_Free,           PleasureBoatCmd_GetInfo,
-    PleasureBoatCmd_AdvanceClock,   PleasureBoatCmd_SetTrainerInfo, PleasureBoatCmd_StopClock,
+    Scrcmd_PleasureBoat_Create,       Scrcmd_PleasureBoat_Free,           Scrcmd_PleasureBoat_GetInfo,
+    Scrcmd_PleasureBoat_AdvanceClock, Scrcmd_PleasureBoat_SetTrainerInfo, Scrcmd_PleasureBoat_StopClock,
     (FieldScriptCommand)0xFFFFFFFF,
 };

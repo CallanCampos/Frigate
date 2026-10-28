@@ -6,16 +6,16 @@
 // MWCC lays out by size within a file, so it is in a file of its own, linked before the commands.
 
 const FieldScriptCommand POKEMON_CENTER_SCRIPT_COMMANDS[] = {
-    PokemonCenterCmd_Medal,
-    PokemonCenterCmd_FindEarnedMedal,
+    Scrcmd_PokemonCenter_Medal,
+    Scrcmd_PokemonCenter_FindEarnedMedal,
     NULL,
     NULL,
     NULL,
-    PokemonCenterCmd_GetMatchState,
-    PokemonCenterCmd_SetMatchInProgress,
-    PokemonCenterCmd_ClearMatchInProgress,
-    PokemonCenterCmd_SetMatchState,
-    PokemonCenterCmd_AddBattlePoints,
+    Scrcmd_PokemonCenter_GetMatchState,
+    Scrcmd_PokemonCenter_SetMatchInProgress,
+    Scrcmd_PokemonCenter_ClearMatchInProgress,
+    Scrcmd_PokemonCenter_SetMatchState,
+    Scrcmd_PokemonCenter_AddBattlePoints,
     NULL,
     NULL,
     NULL,

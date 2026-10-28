@@ -1,7 +1,7 @@
-PokemonCenterCmd_Medal kind:function(thumb,size=0x70) addr:0x021e5840
+Scrcmd_PokemonCenter_Medal kind:function(thumb,size=0x70) addr:0x021e5840
 PokemonCenter_DiscoverInitialMedals kind:function(thumb,size=0x50) addr:0x021e58b0
 PokemonCenter_FindEarnedMedal kind:function(thumb,size=0x30) addr:0x021e5900
-PokemonCenterCmd_FindEarnedMedal kind:function(thumb,size=0x30) addr:0x021e5930
+Scrcmd_PokemonCenter_FindEarnedMedal kind:function(thumb,size=0x30) addr:0x021e5930
 PokemonCenter_AcknowledgeMedal kind:function(thumb,size=0x54) addr:0x021e5960
 PokemonCenter_CheckMedals kind:function(thumb,size=0x228) addr:0x021e59b4
 PokemonCenter_CheckSpecialMedal kind:function(thumb,size=0x34) addr:0x021e5bdc
@@ -59,11 +59,11 @@ PokemonCenter_CheckMemoryLinkEvents kind:function(thumb,size=0x58) addr:0x021e64
 PokemonCenter_CheckDailyExp kind:function(thumb,size=0x36) addr:0x021e64a8
 PokemonCenter_CheckDailyCatches kind:function(thumb,size=0x36) addr:0x021e64e0
 PokemonCenter_CountSetFlags kind:function(thumb,size=0x2e) addr:0x021e6518
-PokemonCenterCmd_GetMatchState kind:function(thumb,size=0x84) addr:0x021e6548
-PokemonCenterCmd_SetMatchInProgress kind:function(thumb,size=0x2c) addr:0x021e65cc
-PokemonCenterCmd_ClearMatchInProgress kind:function(thumb,size=0x24) addr:0x021e65f8
-PokemonCenterCmd_SetMatchState kind:function(thumb,size=0x58) addr:0x021e661c
-PokemonCenterCmd_AddBattlePoints kind:function(thumb,size=0x50) addr:0x021e6674
+Scrcmd_PokemonCenter_GetMatchState kind:function(thumb,size=0x84) addr:0x021e6548
+Scrcmd_PokemonCenter_SetMatchInProgress kind:function(thumb,size=0x2c) addr:0x021e65cc
+Scrcmd_PokemonCenter_ClearMatchInProgress kind:function(thumb,size=0x24) addr:0x021e65f8
+Scrcmd_PokemonCenter_SetMatchState kind:function(thumb,size=0x58) addr:0x021e661c
+Scrcmd_PokemonCenter_AddBattlePoints kind:function(thumb,size=0x50) addr:0x021e6674
 POKEMON_CENTER_SCRIPT_COMMANDS kind:data(any) addr:0x021e66c4
 data_ov065_021e66bc kind:data(any) addr:0x021e66fc
 data_ov065_021e66c8 kind:data(any) addr:0x021e6708

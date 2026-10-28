@@ -24,7 +24,7 @@ L_0048:
     // "[f000]ć\u0001\u0000 can't be used if you have\nsomeone with you."
     SystemMsg Global10000_Text_CantUsedIfHave, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 Movement_0054:
@@ -65,7 +65,7 @@ L_00C2:
     // "It's a big boulder, but a Pokémon\nmay be able to push it aside.[f000]븁\u0000\nWould you like to use Strength?"
     SystemMsg Global10000_Text_ItsBigBoulderBut, 2
     YesNoWin 0x8010
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -81,14 +81,14 @@ L_00ED:
     // "Strength made it possible to move\nboulders around."
     SystemMsg Global10000_Text_StrengthMadePossibleMove, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 L_00F9:
     // "It's a big boulder, but a Pokémon\nmay be able to push it aside."
     SystemMsg Global10000_Text_ItsBigBoulderBut_2, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 L_0105:
@@ -99,14 +99,14 @@ L_0105:
     WordSetPartyPokeName 0, 0x8021
     // "[f000]Ă\u0001\u0000 used Strength![f000]븁\u0000"
     SystemMsg Global10000_Text_UsedStrength, 2
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_005C
     PlayHMCutInEffect 0x8021
     VMCall L_006C
     // "[f000]Ă\u0001\u0000's Strength made it\npossible to move boulders around!"
     SystemMsg Global10000_Text_SStrengthMadePossible, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8021, 0
     VMReturn
 
@@ -126,14 +126,14 @@ L_0173:
     WordSetPartyPokeName 0, 0x8000
     // "[f000]Ă\u0001\u0000 used Strength![f000]븁\u0000"
     SystemMsg Global10000_Text_UsedStrength, 2
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_005C
     PlayHMCutInEffect 0x8000
     VMCall L_006C
     // "[f000]Ă\u0001\u0000's Strength made it\npossible to move boulders around!"
     SystemMsg Global10000_Text_SStrengthMadePossible, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
 
 L_01A6:
     FinishAllEvents
@@ -164,7 +164,7 @@ L_01FB:
     // "The water is a deep blue...\nWould you like to surf on it?"
     SystemMsg Global10000_Text_WaterDeepBlueWould, 2
     YesNoWin 0x8010
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -180,7 +180,7 @@ L_0226:
     // "Surf can't be used if you have\nsomeone with you."
     SystemMsg Global10000_Text_SurfCantUsedIf, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 L_0232:
@@ -189,7 +189,7 @@ L_0232:
     WordSetPartyPokeName 0, 0x8010
     // "[f000]Ă\u0001\u0000 used Surf![f000]븁\u0000"
     SystemMsg Global10000_Text_UsedSurf, 2
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_005C
     PlayHMCutInEffect 0x8008
     PlayerSetSpecialSequence 1
@@ -202,7 +202,7 @@ Script_4:
     WordSetPartyPokeName 0, 0x8000
     // "[f000]Ă\u0001\u0000 used Surf![f000]븁\u0000"
     SystemMsg Global10000_Text_UsedSurf, 2
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_005C
     PlayHMCutInEffect 0x8000
     VMCall L_006C
@@ -235,7 +235,7 @@ L_02BF:
     VMJump L_02EA
 
 L_02E8:
-    InfoMsgClose
+    SystemMsgClose
 
 L_02EA:
     FinishAllEvents
@@ -246,7 +246,7 @@ L_02F0:
     // "This tree looks like it can be\ncut down!"
     SystemMsg Global10000_Text_TreeLooksLikeCan_2, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 L_02FC:
@@ -255,7 +255,7 @@ L_02FC:
     WordSetPartyPokeName 0, 0x8010
     // "[f000]Ă\u0001\u0000 used Cut![f000]븁\u0000"
     SystemMsg Global10000_Text_UsedCut, 2
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_005C
     PlayHMCutInEffect 0x8008
     VMCall L_006C
@@ -273,7 +273,7 @@ Script_6:
     WordSetPartyPokeName 0, 0x8000
     // "[f000]Ă\u0001\u0000 used Cut![f000]븁\u0000"
     SystemMsg Global10000_Text_UsedCut, 2
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_005C
     PlayHMCutInEffect 0x8000
     VMCall L_006C
@@ -321,7 +321,7 @@ L_0400:
     // "It's a large waterfall.\nWould you like to use Waterfall?"
     SystemMsg Global10000_Text_ItsLargeWaterfallWould, 2
     YesNoWin 0x8010
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -337,7 +337,7 @@ L_042B:
     // "A wall of water is crashing down with\na mighty roar."
     SystemMsg Global10000_Text_WallWaterCrashingDown, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 L_0437:
@@ -346,7 +346,7 @@ L_0437:
     WordSetPartyPokeName 0, 0x8024
     // "[f000]Ă\u0001\u0000 used Waterfall![f000]븁\u0000"
     SystemMsg Global10000_Text_UsedWaterfall, 2
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_005C
     PlayHMCutInEffect 0x8024
     VMCall L_006C
@@ -360,7 +360,7 @@ Script_8:
     WordSetPartyPokeName 0, 0x8000
     // "[f000]Ă\u0001\u0000 used Waterfall![f000]븁\u0000"
     SystemMsg Global10000_Text_UsedWaterfall, 2
-    InfoMsgClose
+    SystemMsgClose
     PlayHMCutInEffect 0x8000
     CallWaterfall 0x8000
     BroadcastGameBeacon 1, 127, 0
@@ -380,7 +380,7 @@ Script_9:
     WordSetPartyPokeName 0, 0x8000
     // "[f000]Ă\u0001\u0000 used Flash![f000]븁\u0000"
     SystemMsg Global10000_Text_UsedFlash, 2
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_005C
     PlayHMCutInEffect 0x8000
     VMCall L_006C
@@ -393,7 +393,7 @@ Script_10:
     WordSetPartyPokeName 0, 0x8000
     // "[f000]Ă\u0001\u0000 used Teleport![f000]븁\u0000"
     SystemMsg Global10000_Text_UsedTeleport, 2
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_005C
     PlayHMCutInEffect 0x8000
     VMCall L_006C
@@ -406,7 +406,7 @@ Script_11:
     WordSetPartyPokeName 0, 0x8000
     // "[f000]Ă\u0001\u0000 used Dig![f000]븁\u0000"
     SystemMsg Global10000_Text_UsedDig, 2
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_005C
     PlayHMCutInEffect 0x8000
     VMCall L_006C
@@ -424,7 +424,7 @@ Script_12:
     // "It's a deep part of the sea, but a\nPokémon may be able to dive down."
     SystemMsg Global10000_Text_ItsDeepPartSea, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_0599
 
 L_053F:
@@ -440,7 +440,7 @@ L_0563:
     // "It's a deep part of the sea.\nWould you like to use Dive?"
     SystemMsg Global10000_Text_ItsDeepPartSea_2, 2
     YesNoWin 0x8010
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -458,7 +458,7 @@ L_0599:
 L_059F:
     // "[f000]Ă\u0001\u0000 used Dive![f000]븁\u0000"
     SystemMsg Global10000_Text_UsedDive, 2
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_005C
     PlayHMCutInEffect 0x8008
     VMCall L_006C
@@ -485,7 +485,7 @@ Script_14:
     WordSetPartyPokeName 0, 0x8000
     // "[f000]Ă\u0001\u0000 used Flash![f000]븁\u0000"
     SystemMsg Global10000_Text_UsedFlash, 2
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_005C
     PlayHMCutInEffect 0x8000
     VMCall L_006C
@@ -505,7 +505,7 @@ Script_15:
     WordSetPartyPokeName 0, 0x8000
     // "[f000]Ă\u0001\u0000 used Strength![f000]븁\u0000"
     SystemMsg Global10000_Text_UsedStrength, 2
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_005C
     PlayHMCutInEffect 0x8000
     VMCall L_006C

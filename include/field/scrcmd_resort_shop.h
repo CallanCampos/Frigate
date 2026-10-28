@@ -5,6 +5,6 @@
 #include "struct_decls.h"
 
 // The script command of the Join Avenue's shops, overlay 60
-BOOL ResortShopCmd_Open(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_ResortShop_Open(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_RESORT_SHOP_H

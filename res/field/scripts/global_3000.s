@@ -862,7 +862,7 @@ L_0D59:
 L_0D5F:
     WorkSetConst 0x8025, 0
     WorkSetConst 0x8026, 0
-    TrainerGetBattleType_008A 0x8020, 0x8025
+    TrainerGetBattleType 0x8020, 0x8025
     PokePartyGetCount 0x8026, 2
     VMStackPush 0x8025
     VMStackPushConst 1
@@ -1099,7 +1099,7 @@ Movement_1088:
 
 Script_817:
     ActorsPauseAll
-    TrainerGetBattleType 0x8010
+    TrainerEyeGetBattleType 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ

@@ -273,7 +273,7 @@ L_0434:
     WorkSetConst 0x8024, 0
     // "[f000]Ā\u0001\u0000 received the\nBasic Badge from Cheren![f000]븁\u0000"
     SystemMsg AspertiaCityGym_Text_ReceivedBasicBadgeFrom, 0
-    InfoMsgClose
+    SystemMsgClose
     // "Here is your first Gym Badge,\nthe Basic Badge![f000]븀\u0000\nThis is an important milestone![f000]븁\u0000\nWith this Badge, Pokémon up to Lv. 20\nwill obey you, including traded Pokémon.[f000]븁\u0000\nAnd I want you to take this![f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, AspertiaCityGym_Text_HereFirstGymBadge, 0, 0
     ActorMsgClose

@@ -8,7 +8,7 @@ tools/script/field_commands.json names each command's handler. A handler still n
 looked up at that address in config/b2_us/arm9's symbols.txt and takes the name it has there; a handler that
 rename_symbol.py renamed after the manifest last changed takes its new name the same way, through HEAD's manifest.
 Then include/asm/field_script.inc is generated again, and the macros whose names changed are renamed in the scripts
-of res/**/*.s, matched command by command (the base commands by number, a plugin's by plugin, overlay and number).
+of res/**/*.s, matched command by command, the old names by HEAD's field_script.py and the new by the working tree's (the base commands by number, a plugin's by plugin, overlay and number).
 The build checks the scripts: they must assemble to the same bytes.
 """
 import argparse
@@ -58,14 +58,21 @@ def handler_addresses(old_manifest: dict, by_address: dict) -> dict[str, tuple[s
 
 
 def config_names() -> dict[str, tuple[str, int]]:
-    """Each name HEAD's config/names.txt gave, at its module and address, to follow a handler renamed since."""
-    text = subprocess.run(["git", "show", "HEAD:config/names.txt"], capture_output=True, text=True, cwd=ROOT).stdout
+    """Each function name of HEAD's symbols.txt, at its module and address, to follow a handler renamed since,
+    swan's names included."""
+    files = subprocess.run(["git", "ls-tree", "-r", "--name-only", "HEAD", "config/b2_us/arm9"], capture_output=True,
+                           text=True, cwd=ROOT).stdout.split()
     out = {}
-    for line in text.splitlines():
-        parts = line.split()
-        if len(parts) == 3 and not line.startswith("#"):
-            module = "main" if parts[0] == "." else parts[0].split("/")[-1]
-            out[parts[2]] = (module, int(parts[1], 16))
+    for path in files:
+        if not path.endswith("/symbols.txt"):
+            continue
+        parent = Path(path).parent
+        module = parent.name if parent.parent.name == "overlays" else "main"
+        text = subprocess.run(["git", "show", f"HEAD:{path}"], capture_output=True, text=True, cwd=ROOT).stdout
+        for line in text.splitlines():
+            m = re.match(r"(\S+) kind:function\S* addr:0x([0-9a-f]+)", line)
+            if m:
+                out.setdefault(m.group(1), (module, int(m.group(2), 16)))
     return out
 
 
@@ -83,10 +90,26 @@ def handlers(manifest) -> set[str]:
     return out
 
 
-def macro_names(table: Path) -> dict:
+def head_generator(tmp: Path):
+    """HEAD's field_script.py, which made the macros the scripts use now: the old names come from it, in case the
+    working tree's names its commands differently."""
+    import importlib.util
+    source = subprocess.run(["git", "show", "HEAD:tools/script/field_script.py"], capture_output=True, text=True,
+                            cwd=ROOT).stdout
+    if not source:
+        return field_script
+    path = tmp / "field_script_head.py"
+    path.write_text(source)
+    spec = importlib.util.spec_from_file_location("field_script_head", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def macro_names(table: Path, generator=field_script) -> dict:
     """Each command's macro name, by ("base", number) or (plugin, overlay, number)."""
-    field_script.TABLE = table
-    base, plugins, _, _ = field_script.load_commands()
+    generator.TABLE = table
+    base, plugins, _, _ = generator.load_commands()
     out = {("base", number): command.name for number, command in base.items()}
     for plugin, variants in plugins.items():
         for overlay, commands in variants.items():
@@ -115,7 +138,7 @@ def main():
         old_table, new_table = Path(tmp) / "old.json", Path(tmp) / "new.json"
         old_table.write_text(raw)
         new_table.write_text(new_raw)
-        old, new = macro_names(old_table), macro_names(new_table)
+        old, new = macro_names(old_table, head_generator(Path(tmp))), macro_names(new_table)
     field_script.TABLE = MANIFEST
     mapping = {}
     for key, name in old.items():

@@ -1,5 +1,5 @@
 // Script commands of the Key System: the game's difficulty and the Unova Link's key unlocking. The name is the file's
-// own; s02AF_GameGetDifficulty and s02B0_CallUnovaLinkKeyUnlock are swan's names
+// own; Scrcmd_Keysystem_GameGetDifficulty and Scrcmd_Keysystem_CallUnovaLinkKeyUnlock are swan's names
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
 #include "app/unova_link.h"
@@ -16,7 +16,7 @@
 
 static void FreeUnovaLinkKeyParam(void *param);
 
-BOOL s02AE_GameGetMyCity(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Keysystem_GameGetMyCity(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     u16 *result;
 
@@ -27,7 +27,7 @@ BOOL s02AE_GameGetMyCity(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s02AF_GameGetDifficulty(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Keysystem_GameGetDifficulty(VM *vm, FieldScriptEnv *env) {
     KeyInfoSave *keyInfo;
     u16 *result;
 
@@ -38,7 +38,7 @@ BOOL s02AF_GameGetDifficulty(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s02B1_KeyInfoGetChamberKey(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Keysystem_KeyInfoGetChamberKey(VM *vm, FieldScriptEnv *env) {
     KeyInfoSave *keyInfo;
     u16 *result;
 
@@ -53,7 +53,7 @@ static void FreeUnovaLinkKeyParam(void *param) {
     GFL_HeapFree(param);
 }
 
-BOOL s02B0_CallUnovaLinkKeyUnlock(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Keysystem_CallUnovaLinkKeyUnlock(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);

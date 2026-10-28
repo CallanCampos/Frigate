@@ -8,11 +8,11 @@
 #include "struct_decls.h"
 #include "system/vm.h"
 
-BOOL s013A_GameCommGetStatus(VM *vm, FieldScriptEnv *env);
-BOOL s015B_WifiListHasValidProfile(VM *vm, FieldScriptEnv *env);
-BOOL s015C_WifiListCountFriends(VM *vm, FieldScriptEnv *env);
-BOOL s015D_NetConnectWiFiClub(VM *vm, FieldScriptEnv *env);
-BOOL s015E_NetConnectGTS(VM *vm, FieldScriptEnv *env);
-BOOL s0162_NetConnectGTSNegotiation(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Net_GameCommGetStatus(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Net_WifiListHasValidProfile(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Net_WifiListCountFriends(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Net_NetConnectWiFiClub(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Net_NetConnectGTS(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Net_NetConnectGTSNegotiation(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_NET_H

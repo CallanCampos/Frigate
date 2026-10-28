@@ -25,11 +25,11 @@ L_004D:
 
 L_005F:
     SystemMsg 0x8024, 2
-    Regulation_RegisterAllowedSpecies 0x8022, 0x8023
+    RegisterAllowedSpecies 0x8022, 0x8023
     WorkSetConst 0x8024, 13
     WorkAdd 0x8024, 0x8023
     SystemMsg 0x8024, 2
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8024, 0
     WorkSetConst 0x8023, 0
     WorkSetConst 0x8022, 0
@@ -42,11 +42,11 @@ Script_2:
     WorkSetConst 0x8026, 0
     WorkSetConst 0x8027, 0
     WorkGet 0x8025, 0x8000
-    Regulation_RegisterAllowedSpecies 0x8025, 0x8026
+    RegisterAllowedSpecies 0x8025, 0x8026
     WorkSetConst 0x8027, 13
     WorkAdd 0x8027, 0x8026
     SystemMsg 0x8027, 2
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8027, 0
     WorkSetConst 0x8026, 0
     WorkSetConst 0x8025, 0

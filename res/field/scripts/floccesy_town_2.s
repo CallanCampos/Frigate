@@ -726,13 +726,13 @@ L_0AE8:
     SystemMsg FloccesyTown2_Text_Received, 0
     MEWait
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     // "Would you like to give a\nnickname to this [f000]ā\u0001\u0001?"
     SystemMsg FloccesyTown2_Text_WouldLikeGiveNickname, 0
     WorkSetConst 0x802a, 0
     WorkSetConst 0x802b, 0
     YesNoWin 0x802a
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x802a
     VMStackPushConst 0
     VMStackCmp CMP_EQ

@@ -31,7 +31,7 @@ Script_1:
     // "It's a statue of a Pokémon.\nIt exudes tremendous power..."
     SystemMsg TwistMountain8_Text_ItsStatuePokemonExudes, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_0085
 
 L_007F:
@@ -46,13 +46,13 @@ L_008B:
     // "It's a statue of a Pokémon.\nIt exudes tremendous power...[f000]븁\u0000\n..."
     SystemMsg TwistMountain8_Text_ItsStatuePokemonExudes_2, 2
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     PVPlay 486, 0
     // "...Zut zutt!"
     ScreamMsg TwistMountain8_Text_ZutZutt, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     CallWildBattle 486, 68, 1
     WildBattleIsVictory 0x8010
     VMStackPush 0x8010
@@ -88,7 +88,7 @@ L_0118:
     // "Regigigas disappeared\nsomewhere into the passage..."
     SystemMsg TwistMountain8_Text_RegigigasDisappearedSomewhereInto, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_0128
 
 L_0128:
@@ -101,7 +101,7 @@ Script_2:
     // "[f000]Ā\u0001\u0000 read the\nengraved writing...[f000]븁\u0000\n“A body of rock.\nTo summon the king,[f000]븀\u0000\nsuch a thing must be obtained...\""
     InfoMsg TwistMountain8_Text_ReadEngravedWritingBody, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -113,7 +113,7 @@ Script_3:
     // "[f000]Ā\u0001\u0000 read the\nengraved writing...[f000]븁\u0000\n“A body of ice.\nTo summon the king,[f000]븀\u0000\nsuch a thing must be obtained...\""
     InfoMsg TwistMountain8_Text_ReadEngravedWritingBody_2, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -125,7 +125,7 @@ Script_4:
     // "[f000]Ā\u0001\u0000 read the\nengraved writing...[f000]븁\u0000\n“A body of steel.\nTo summon the king,[f000]븀\u0000\nsuch a thing must be obtained...\""
     InfoMsg TwistMountain8_Text_ReadEngravedWritingBody_3, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

@@ -1,4 +1,4 @@
-ResortShopCmd_Open kind:function(thumb,size=0x3cc) addr:0x021e58c0
+Scrcmd_ResortShop_Open kind:function(thumb,size=0x3cc) addr:0x021e58c0
 ResortShop_Run kind:function(thumb,size=0xa6) addr:0x021e5c8c
 ResortShop_Init kind:function(thumb,size=0x2a) addr:0x021e5d34
 ResortShop_LoadPriceStrings kind:function(thumb,size=0x24) addr:0x021e5d60

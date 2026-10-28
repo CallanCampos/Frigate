@@ -71,7 +71,7 @@ BOOL ScriptNative_MusicalCommBootWait(VM *vm, void *arg);
 BOOL ScriptNative_MusicalCommEndWait(VM *vm, void *arg);
 BOOL ScriptNative_MusicalPokesRecvWait(VM *vm, void *arg);
 
-BOOL s0163_MusicalCall(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Musical_MusicalCall(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
@@ -115,7 +115,7 @@ BOOL s0163_MusicalCall(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0164_MusicalCallDressUp(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Musical_MusicalCallDressUp(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
@@ -140,7 +140,7 @@ BOOL s0164_MusicalCallDressUp(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0165_MusicalGetInfo(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Musical_MusicalGetInfo(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     u32 mostIndex;
     u32 fewestIndex;
@@ -339,7 +339,7 @@ BOOL s0165_MusicalGetInfo(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0166_MusicalGetAudienceGift(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Musical_MusicalGetAudienceGift(VM *vm, FieldScriptEnv *env) {
     u16 arg = ScriptReadAny(vm, env);
     u8 kind = VM_Read8(vm);
     u16 *result = ScriptReadVar(vm, env);
@@ -382,14 +382,14 @@ BOOL s0166_MusicalGetAudienceGift(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0168_MusicalAddProp(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Musical_MusicalAddProp(VM *vm, FieldScriptEnv *env) {
     u16 prop = ScriptReadAny(vm, env);
 
     MusicalSave_AddProp(getMusicalInfoBlkAddress(FieldScriptEnv_GetGameData(env)), prop);
     return FALSE;
 }
 
-BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Musical_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
@@ -503,14 +503,14 @@ BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0169_MusicalClearAudienceGift(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Musical_MusicalClearAudienceGift(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
 
     MusicalSave_GetAudienceGift(getMusicalInfoBlkAddress(FieldScriptEnv_GetGameData(env)), index)->hasProp = 0;
     return FALSE;
 }
 
-BOOL s016A_MusicalSelectPoke(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Musical_MusicalSelectPoke(VM *vm, FieldScriptEnv *env) {
     u16 *a0 = ScriptReadVar(vm, env);
     u16 *a1 = ScriptReadVar(vm, env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
@@ -525,7 +525,7 @@ BOOL s016A_MusicalSelectPoke(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0167_MusicalComm(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Musical_MusicalComm(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
@@ -664,7 +664,7 @@ BOOL s0167_MusicalComm(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s02EE_MusicalIsPropOwned(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Musical_MusicalIsPropOwned(VM *vm, FieldScriptEnv *env) {
     u16 prop = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
@@ -673,7 +673,7 @@ BOOL s02EE_MusicalIsPropOwned(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s02EF_MusicalGetOwnedPropCount(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Musical_MusicalGetOwnedPropCount(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     MusicalSave *save = getMusicalInfoBlkAddress(gameData);
@@ -960,7 +960,7 @@ BOOL ScriptNative_MusicalPokesRecvWait(VM *vm, void *arg) {
 }
 
 // The items sent from the Dream World
-BOOL s01DC_DreamWorldItems(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Musical_DreamWorldItems(VM *vm, FieldScriptEnv *env) {
     u16 kind = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
     HeapID heapId = FieldScriptEnv_GetHeapID(env);

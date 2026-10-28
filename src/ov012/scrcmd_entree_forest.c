@@ -71,7 +71,7 @@ static void GetEntreeForestArrivalPos(const VecFx32 *pos, u32 dir, VecFx32 *dest
 static GameEvent *EventEntreeForestWarp_CreateToAnother(GameSystem *gsys, u32 dir, u32 area);
 static GameEventReturnCode EventEntreeForestWarp_Callback(GameEvent *event, u32 *state, void *work);
 
-BOOL s021C_EntreeForestStartBattle(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_EntreeForest_EntreeForestStartBattle(VM *vm, FieldScriptEnv *env) {
     u16 actorId = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
     FieldActor *actor;
@@ -90,7 +90,7 @@ BOOL s021C_EntreeForestStartBattle(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s021B_EntreeForestSpawnAllPkm(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_EntreeForest_EntreeForestSpawnAllPkm(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
     u32 actorIdBase;
@@ -103,7 +103,7 @@ BOOL s021B_EntreeForestSpawnAllPkm(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s021D_EntreeForestRemovePkm(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_EntreeForest_EntreeForestRemovePkm(VM *vm, FieldScriptEnv *env) {
     u16 actorId = ScriptReadAny(vm, env);
     AreaNPCSave *npcData = getAreaNPCData(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     FieldActor *actor = FieldScriptEnv_FindActor(env, actorId);
@@ -128,7 +128,7 @@ BOOL func_ov012_02164bcc(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s021A_WordSetLoadEntreeForestPkmName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_EntreeForest_WordSetLoadEntreeForestPkmName(VM *vm, FieldScriptEnv *env) {
     u16 actorId = ScriptReadAny(vm, env);
     u16 index = ScriptReadAny(vm, env);
     FieldActor *actor;
@@ -175,7 +175,7 @@ BOOL func_ov012_02164c68(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0217_MapChangeEntreeForest(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_EntreeForest_MapChangeEntreeForest(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);

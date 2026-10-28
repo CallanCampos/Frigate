@@ -1,3 +1,3 @@
-AbyssalRuinsCmd_StartUnderwaterEffect kind:function(thumb,size=0x30) addr:0x021e5800
-AbyssalRuinsCmd_GetStepCounter kind:function(thumb,size=0x36) addr:0x021e5830
+Scrcmd_AbyssalRuins_StartUnderwaterEffect kind:function(thumb,size=0x30) addr:0x021e5800
+Scrcmd_AbyssalRuins_GetStepCounter kind:function(thumb,size=0x36) addr:0x021e5830
 ABYSSAL_RUINS_SCRIPT_COMMANDS kind:data(any) addr:0x021e5868 ambiguous

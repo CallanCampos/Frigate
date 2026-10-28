@@ -743,7 +743,7 @@ L_09DC:
     WorkSetConst 0x8029, 0
 
 L_0A2D:
-    InfoMsgClose
+    SystemMsgClose
     PokePartyLearnMove 0x8020, 0x8010, 0x8021
     VMReturn
 
@@ -803,7 +803,7 @@ L_0AF7:
     MsgWaitAdvance
 
 L_0AF9:
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8028, 1
     VMReturn
 
@@ -825,7 +825,7 @@ L_0B0B:
     VMReturn
 
 L_0B3A:
-    InfoMsgClose
+    SystemMsgClose
     CallPokeMoveReplace 0x8010, 0x8025, 0x8020, 0x8021
     VMStackPush 0x8010
     VMStackPushConst 0
@@ -886,7 +886,7 @@ L_0BCD:
     WorkSetConst 0x802a, 0
 
 L_0C1E:
-    InfoMsgClose
+    SystemMsgClose
     PokePartyLearnMove 0x8020, 0x8025, 0x8021
     WorkSetConst 0x8028, 1
     VMReturn

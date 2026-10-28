@@ -28,7 +28,7 @@ L_003C:
     VMJumpIf CMP_STACK, L_01C7
     // "Hey! Want to know anything\nabout Pokéstar Studios?"
     ActorMsg MSGFILE_SCRIPT, PokestarStudios3_Text_HeyWantKnowAnything, 3, 4, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32800
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32800
     ListMenuAdd 23, 65535, 0
     ListMenuAdd 24, 65535, 1
     ListMenuAdd 29, 65535, 2

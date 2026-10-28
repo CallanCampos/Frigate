@@ -312,7 +312,7 @@ L_046C:
     // "Construction Truck Quiz!\nFor short: TruQ![f000]븁\u0000\nNow, here's the question![f000]븁\u0000\nWhich place is famous for\nan old rusty crane truck?"
     ActorMsg MSGFILE_SCRIPT, TwistMountain5_Text_ConstructionTruckQuizShort, 7, 2, 0
     MsgWaitAdvance
-    ListMenu_AnchorTopRight 31, 5, 0, 1, 32801
+    ListMenuAnchorTopRight 31, 5, 0, 1, 32801
     ListMenuAdd 8, 65535, 0
     ListMenuAdd 9, 65535, 1
     ListMenuAdd 10, 65535, 2
@@ -344,7 +344,7 @@ L_04EE:
     // "Construction Truck Quiz!\nFor short: TruQ![f000]븁\u0000\nNow, here's the question![f000]븁\u0000\nThe trucks that run on Route 4\ncome in three different colors:[f000]븀\u0000\nred, blue, and...what?"
     ActorMsg MSGFILE_SCRIPT, TwistMountain5_Text_ConstructionTruckQuizShort_2, 7, 2, 0
     MsgWaitAdvance
-    ListMenu_AnchorTopRight 31, 5, 0, 1, 32801
+    ListMenuAnchorTopRight 31, 5, 0, 1, 32801
     ListMenuAdd 13, 65535, 0
     ListMenuAdd 14, 65535, 1
     ListMenuAdd 15, 65535, 2
@@ -376,7 +376,7 @@ L_0570:
     // "Construction Truck Quiz!\nFor short: TruQ![f000]븁\u0000\nNow, here's the question![f000]븁\u0000\nWhich question is this?"
     ActorMsg MSGFILE_SCRIPT, TwistMountain5_Text_ConstructionTruckQuizShort_3, 7, 2, 0
     MsgWaitAdvance
-    ListMenu_AnchorTopRight 31, 5, 0, 1, 32801
+    ListMenuAnchorTopRight 31, 5, 0, 1, 32801
     ListMenuAdd 18, 65535, 0
     ListMenuAdd 19, 65535, 1
     ListMenuAdd 20, 65535, 2
@@ -408,7 +408,7 @@ L_05F2:
     // "Construction Truck Quiz!\nFor short: TruQ![f000]븁\u0000\nNow, here's the question![f000]븁\u0000\nWhich Gym has a yellow drill car?"
     ActorMsg MSGFILE_SCRIPT, TwistMountain5_Text_ConstructionTruckQuizShort_4, 7, 2, 0
     MsgWaitAdvance
-    ListMenu_AnchorTopRight 31, 5, 0, 1, 32801
+    ListMenuAnchorTopRight 31, 5, 0, 1, 32801
     ListMenuAdd 23, 65535, 0
     ListMenuAdd 24, 65535, 1
     ListMenuAdd 25, 65535, 2
@@ -440,7 +440,7 @@ L_0674:
     // "Construction Truck Quiz!\nFor short: TruQ![f000]븁\u0000\nNow, here's the question![f000]븁\u0000\nHow many bulldozers\nare there in Twist Mountain?"
     ActorMsg MSGFILE_SCRIPT, TwistMountain5_Text_ConstructionTruckQuizShort_5, 7, 2, 0
     MsgWaitAdvance
-    ListMenu_AnchorTopRight 31, 5, 0, 1, 32801
+    ListMenuAnchorTopRight 31, 5, 0, 1, 32801
     ListMenuAdd 28, 65535, 0
     ListMenuAdd 29, 65535, 1
     ListMenuAdd 30, 65535, 2

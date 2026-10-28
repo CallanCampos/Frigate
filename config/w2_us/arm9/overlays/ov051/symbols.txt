@@ -1,7 +1,7 @@
-PleasureBoatCmd_Create kind:function(thumb,size=0x48) addr:0x021e5840
-PleasureBoatCmd_Free kind:function(thumb,size=0x20) addr:0x021e5888
-PleasureBoatCmd_GetInfo kind:function(thumb,size=0x44) addr:0x021e58a8
-PleasureBoatCmd_AdvanceClock kind:function(thumb,size=0x40) addr:0x021e58ec
-PleasureBoatCmd_SetTrainerInfo kind:function(thumb,size=0x72) addr:0x021e592c
-PleasureBoatCmd_StopClock kind:function(thumb,size=0x22) addr:0x021e59a0
+Scrcmd_PleasureBoat_Create kind:function(thumb,size=0x48) addr:0x021e5840
+Scrcmd_PleasureBoat_Free kind:function(thumb,size=0x20) addr:0x021e5888
+Scrcmd_PleasureBoat_GetInfo kind:function(thumb,size=0x44) addr:0x021e58a8
+Scrcmd_PleasureBoat_AdvanceClock kind:function(thumb,size=0x40) addr:0x021e58ec
+Scrcmd_PleasureBoat_SetTrainerInfo kind:function(thumb,size=0x72) addr:0x021e592c
+Scrcmd_PleasureBoat_StopClock kind:function(thumb,size=0x22) addr:0x021e59a0
 PLEASURE_BOAT_SCRIPT_COMMANDS kind:data(any) addr:0x021e59c4

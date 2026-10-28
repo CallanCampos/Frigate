@@ -9,12 +9,12 @@
 #include "system/vm.h"
 #include "system/zone_weather.h"
 
-// The script command that sets the field's weather (a descriptive name). s0136_FieldSetWeather is swan's name
+// The script command that sets the field's weather (a descriptive name). Scrcmd_Weather_FieldSetWeather is swan's name
 
 // The zone's own weather
 #define WEATHER_OF_ZONE 0xffff
 
-BOOL s0136_FieldSetWeather(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Weather_FieldSetWeather(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     GameData *gameData;
     Field *field;
