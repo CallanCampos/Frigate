@@ -78,11 +78,20 @@ GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result,
 GameEvent *Regulation_CreatePartyCheckTask(GameSystem *gsys, u32 pickFromParty, Regulation *regulation, u16 *result,
                                            HeapID heapId);
 u32 Regulation_CheckTeams(GameSystem *gsys, u32 pickFromParty, Regulation *regulation, HeapID heapId);
-// The screen that picks the party or the Battle Box for a battle, whether it is done, and the choice
-PartySelectList *PartySelectList_Create(Field *field, PokeParty *party, PokeParty *battleBoxParty, u8 partyOk,
-                                        u32 battleBoxOk, HeapID heapId);
+// PartySelectList_Delete's result, the row the player picked
+enum {
+    PARTY_SELECT_PARTY,
+    PARTY_SELECT_BATTLE_BOX,
+    PARTY_SELECT_CANCEL,
+};
+
+// The screen that picks the party or the Battle Box for a battle, whether it is done, and the choice. partyIneligible
+// and battleBoxIneligible are set for a team that fails the regulation, and PartySelectList_Delete sets *ineligible
+// when the team picked is one
+PartySelectList *PartySelectList_Create(Field *field, PokeParty *party, PokeParty *battleBoxParty, u8 partyIneligible,
+                                        u32 battleBoxIneligible, HeapID heapId);
 BOOL PartySelectList_Main(PartySelectList *select);
-int PartySelectList_Delete(PartySelectList *select, u32 *a1);
+int PartySelectList_Delete(PartySelectList *select, u32 *ineligible);
 FieldEffectTask *FldeffBtrain_Start(FieldEffects *effects, u32 a1, const VecFx32 *pos);
 void FldeffBtrain_SetAnime(FieldEffectTask *task, u16 a1);
 void FldeffBtrain_SetHidden(FieldEffectTask *task, u16 a1);

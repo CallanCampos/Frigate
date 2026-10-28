@@ -20,12 +20,13 @@
 #define REGULATION_SPECIES_COUNT 686
 #define REGULATION_LIST_MAX 32
 
-// The team that enters, as PartySelectList_Delete returns its row: the party, the Battle Box, or neither when neither
-// can enter or the player cancels
+// The team that enters, as PartySelectList_Delete returns its row: the party, the Battle Box, cancel, or neither when
+// neither can enter or the team picked fails the regulation
 enum {
     TEAM_SELECT_PARTY,
     TEAM_SELECT_BATTLE_BOX,
-    TEAM_SELECT_NONE = 3,
+    TEAM_SELECT_CANCEL,
+    TEAM_SELECT_NONE,
 };
 
 typedef struct {
@@ -34,9 +35,9 @@ typedef struct {
     PartySelectList *select;
     PokeParty *party;
     PokeParty *battleBoxParty;
-    // Despite the names, set when the team fails the regulation, which PartySelectList greys out and refuses
-    u8 partyOk;
-    u8 battleBoxOk;
+    // Set when the team fails the regulation, which PartySelectList refuses
+    u8 partyIneligible;
+    u8 battleBoxIneligible;
     u16 heapId;
     u16 *result;
 } TeamSelectEvent;
@@ -200,8 +201,8 @@ static GameEvent *TeamSelectEvent_Create(GameSystem *gsys, u32 partyResult, u32 
         select->heapId = heapId;
         select->party = party;
         select->battleBoxParty = battleBoxParty;
-        select->partyOk = partyResult != REGULATION_RESULT_OK;
-        select->battleBoxOk = battleBoxResult != REGULATION_RESULT_OK ? TRUE : FALSE;
+        select->partyIneligible = partyResult != REGULATION_RESULT_OK;
+        select->battleBoxIneligible = battleBoxResult != REGULATION_RESULT_OK ? TRUE : FALSE;
     } else {
         return NULL;
     }
@@ -210,18 +211,18 @@ static GameEvent *TeamSelectEvent_Create(GameSystem *gsys, u32 partyResult, u32 
 
 static GameEventReturnCode TeamSelectEvent_Callback(GameEvent *event, u32 *state, void *data) {
     TeamSelectEvent *select = data;
-    u32 cancelled;
+    u32 ineligible;
 
     switch (*state) {
     case 0:
-        select->select = PartySelectList_Create(select->field, select->party, select->battleBoxParty, select->partyOk,
-                                                select->battleBoxOk, select->heapId);
+        select->select = PartySelectList_Create(select->field, select->party, select->battleBoxParty,
+                                                select->partyIneligible, select->battleBoxIneligible, select->heapId);
         (*state)++;
         break;
     case 1:
         if (PartySelectList_Main(select->select)) {
-            *select->result = PartySelectList_Delete(select->select, &cancelled);
-            if (cancelled == TRUE) {
+            *select->result = PartySelectList_Delete(select->select, &ineligible);
+            if (ineligible == TRUE) {
                 *select->result = TEAM_SELECT_NONE;
             }
             GFL_HeapFree(select->battleBoxParty);
