@@ -569,7 +569,7 @@ BOOL FieldG3DMapper_UpdateChunkLoad(FieldG3DMapper *mapper, FieldChunkLocator *l
                 if (!FieldChunkLocator_IsActive(&mapper->chunkHandles[j].locator) && !placed) {
                     datId = mapper->chunkDatIds[FieldChunkLocator_GetChunkID(&locators[i])];
                     FieldChunkLocator_GetPos(&locators[i], &newPos);
-                    if (datId != 0xffffffff) {
+                    if (datId != FIELD_CHUNK_DAT_NONE) {
                         FieldChunk_ChangeDatID(mapper->chunkHandles[j].chunk, datId);
                         FieldChunk_SetWorldPos(mapper->chunkHandles[j].chunk, &newPos);
                         FieldChunk_SetActive(mapper->chunkHandles[j].chunk, TRUE);
@@ -786,13 +786,13 @@ ResortMapCreateWork *FieldG3DMapper_GetResortMap(FieldG3DMapper *mapper) {
 FieldTerrainAnimator *FieldG3DMapper_CreateTerrainAnimator(u16 chunkCapacity, G3DResource *mapTextures,
                                                            const FieldTerrainAnmInfo *anmInfo, u32 heapId) {
     GND_ANIME_WK.chunkCapacity = chunkCapacity;
-    if (anmInfo->srtAnimeId == 0xffffffff) {
+    if (anmInfo->srtAnimeId == FIELD_TERRAIN_ANM_NONE) {
         GND_ANIME_WK.hasSRT = FALSE;
     } else {
         GND_ANIME_WK.hasSRT = TRUE;
         GND_ANIME_WK.idSRT = anmInfo->srtAnimeId;
     }
-    if (anmInfo->patAnimeId == 0xffffffff) {
+    if (anmInfo->patAnimeId == FIELD_TERRAIN_ANM_NONE) {
         GND_ANIME_WK.hasPat = FALSE;
     } else {
         GND_ANIME_WK.hasPat = TRUE;
