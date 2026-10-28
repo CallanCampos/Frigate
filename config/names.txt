@@ -11888,10 +11888,12 @@ overlays/ov036 0x021ba804 CommErrorProc_Init
 overlays/ov036 0x021ba808 CommErrorProc_Main
 overlays/ov036 0x021ba80c CommErrorProc_Exit
 overlays/ov036 0x021bae58 Waterfall_SetShakeOffset
+overlays/ov036 0x021bae8c FieldPlayerGrid_JumpUpStart
 overlays/ov036 0x021bafe0 FieldPlayerGrid_JumpUpApproach
 overlays/ov036 0x021bb06c FieldPlayerGrid_JumpUpRise
 overlays/ov036 0x021bb0f0 FieldPlayerGrid_JumpUpArc
 overlays/ov036 0x021bb190 FieldPlayerGrid_JumpUpLand
+overlays/ov036 0x021bb1e4 FieldPlayerGrid_JumpUpWaitEffect
 overlays/ov036 0x021bb220 FieldPlayerGrid_UpdateJumpDown
 overlays/ov036 0x021bb590 FieldParticle_Create
 overlays/ov036 0x021bb5d0 FieldParticle_CreateSystem
