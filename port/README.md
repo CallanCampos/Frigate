@@ -157,6 +157,7 @@ asm oracle, each spike, the artwork) lists its files there.
 | `include/` | What the decomp's C needs to compile for a host: `port_host.h`, force-included into every decomp file of the host build; `wchar.h`, the DS's 16-bit wide strings in place of the C library's; and `port_wcm.h`, the Wi-Fi workspace's host size | [include/README.md](include/README.md) |
 | `cmake/` | The host build's fragments, one per module, with its tests, and the build's options | [cmake/README.md](cmake/README.md) |
 | `tests/` | Unit, integration, replay and oracle tests, one directory per module | [tests/README.md](tests/README.md) |
+| `tests/fs/` | Actual SDK archive-table cache lifecycle tests with synthetic storage | [tests/fs/README.md](tests/fs/README.md) |
 | `tools/` | The build's generators, the upstream sync, the pointer cast guard, the macOS packaging, the melonDS oracle, the measurement scripts | [tools/README.md](tools/README.md) |
 | `assets/` | Files that aren't code and never game data: Frigate's logo and app icons | [assets/README.md](assets/README.md) |
 | `spikes/` | Phase 0's experiments, frozen; the live code took their answers | [spikes/README.md](spikes/README.md) |

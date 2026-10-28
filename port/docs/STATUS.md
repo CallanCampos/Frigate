@@ -32,6 +32,79 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: native archive-table caches and measured trainer-AI work
+
+- **Upstream:** `35d735b52bb77338f3a138d321e562975ade556e`. PR 51 merged as `eb4873f7f1` after delegated
+  owner approval and all 14 checks passed on exact head `2ca9c4a9a1`: both original ROM hashes and full native
+  suites (B2 317 passed/28 optional skips of 345; W2 314/28 of 342). The 22 naming commits preserve 148 functions'
+  addresses, sizes and modes in both versions. All 45 C/header files normalize to identical tokens in pure upstream
+  and the actual adapted port; the assembler include changes comments only. No port/workflow change or reference
+  exception. Existing pointer, VM and other native adaptations remain in place.
+- **Port:** `PORT_SHA`, on `codex/fs-table-cache`, from that reviewed main. The cache change is five code/test/build
+  files plus guides and records. Its sole out-of-port change is the guarded SDK cached-read seam in
+  `lib/nitro/src/fs/fs_command_default.c`; no game algorithm is replaced.
+- **ROM (T0):** latest-base configure/Ninja completes 10,587 steps, zero warnings. Both original hashes match:
+  B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  `.venv/bin/python port/tools/check_mwcc_neutral.py --base HEAD --jobs 2
+  lib/nitro/src/fs/fs_command_default.c` also passes 2/2 actual MWCC token comparisons against reviewed `eb4873f7f1`.
+  The local runtime uses a private ad-hoc-signed copy of the pinned wibo code with identical executable sections;
+  configure's original download/checksum validation remains intact. No OS policy or shared executable is changed.
+- **Host build (T1):** both ordinary RelWithDebInfo all-target builds and both fatal Homebrew LLVM23 ASan/UBSan
+  program builds pass on arm64 macOS, including incremental builds after the reviewed main update. Recovery and
+  frame-time report-only overrides are off. The published PR's exact-head canonical verifier and hosted matrix
+  remain required separately before merge.
+- **Tests (T2/T3):** the real SDK archive/file/default-command `fs_archive_tables` passes plain and strict ASan/UBSan,
+  without a ROM. It checks native pointers, actual cache snapshots/storage traffic, independent archives, payload
+  reads, unaligned allocations, zero/adjacent tables, reload/query/unload contracts, failed reads and malformed
+  ranges. On the measured `c6e457f969` parent plus this unchanged cache patch, complete non-timing suites pass:
+  B2 315 passed/28 explicit skips of 343; W2 313/28 of 341. Missing optional ASM environment was then supplied
+  locally and actual ASM suites pass 5/5 each, zero skips. After updating to reviewed `eb4873f7f1`, both all-target
+  builds and `fs_archive_tables`, `game_ptrcasts`, `replay_starter_save` pass 3/3 per game, zero skips. Earlier
+  full-suite results remain labeled with their actual parent; no missing test is relabeled as passed.
+- **Oracle/traffic evidence (T4):** two private Black 2 observers of the pinned melonDS 1.1 model preserve all 10,750 control frame records and
+  RNG snapshots. Native observers preserve all 8,500 control records and 34,000 NNS/RNG payloads. With the cache,
+  all 23 ARC/VM spans retain the same data reads, and the complete 18 ordered CARD source/length requests match
+  the bounded DS trace. The first damage opcode now makes ten data reads and zero global FAT/FNT reads, removing
+  the former two FAT and 58 FNT requests. This does not establish equal cycles, DMA behavior or AI scheduling.
+  No fresh whole-story DS comparison is claimed here; PR 50 records those comparisons on its tested source.
+- **Strict gameplay and saves (T5/T6):** both latest-base strict programs complete all 34,600 frames from the
+  SHA-checked catch fixture through Alder/Floccesy to Route 20 SAVE, then continue their own save in a new process
+  for all 4,700 frames, exit zero and produce no sanitizer diagnostics. Resulting native saves remain exactly B2
+  `902e95eaa5e9b402a1405033a4733e0d45cd9d61` and W2 `ae17781116ca7728ba8a9f23175e33cda8c5c6ea`.
+  Both copies' full 73 block CRCs, padded table and footer validate against the SHA-checked DS references. Party,
+  story and location therefore retain the previously proved checkpoint. Continuations leave their input images
+  byte-identical; source/input/binary hashes stay fixed throughout. These exact save images already passed DS
+  interchange in PR 50; this task does not claim a fresh DS interchange run.
+- **Visual/performance play (T7):** SAVE prompts, fresh-process party and final Route 20 captures were inspected in
+  both games. On the measured `c6e457f969` parent plus this patch, all five defined real performance gates pass
+  with report-only off, zero gate skips: B2 title/new game/party, W2 title/party. Worst p95 is 2.29 ms against the
+  8.36 ms budget. Party reruns use SHA-verified existing starter fixtures and exclude only automatic fixture setup;
+  the initial unavailable-fixture skip remains recorded separately. These are headless native replays, not a new
+  windowed playtest or a new Route 20 performance benchmark.
+- **Tiers:** fresh both-version `progress.py --root . --version <version> --out <local-directory>` scans remain
+  41,017 tier (a), zero (b), zero (c), plus 2,385 veneers (16,906 bytes). Code bytes a/b/c: B2 3,850,260/0/0;
+  W2 3,850,348/0/0. Tier-(a) data 1,824,388 bytes and unowned data 168 per game. Original assembly exceptions and
+  native HAL coverage remain separate from this source-unit measure.
+- **Trap stubs:** unchanged at 25 functions plus `CARDi_NdmaInterface` data per game: 15 networking/HTTP/crypto SDK
+  functions and ten DS boot/DSi/BIOS functions. No trap is reached in these regressions.
+- **64-bit warnings:** both latest builds retain 365 sites/229 keys: real 66, harmless 123, handled 141, unreachable
+  35. The new actual-source test adds compile inputs: 1,707 compiled, zero uncompiled. No baseline or suppression
+  change; real sites do not increase.
+- **Work done:** honor the SDK's caller-owned FAT/FNT cache using its full native `load_mem` pointer and original
+  archive-offset positions. A bounded typed resolver replaces the SDK's cached pointer cast only on PC; the real
+  unload retains original-pointer return and offset restoration. New module guides, feature/test maps and
+  [ADR 0026](adr/0026-native-archive-table-caches.md) document representation and lifecycle. Measured melonDS-model script loads
+  take 32,938–33,089 bus cycles; ideal card-wire time (21,700) and observed CARD API spans (27,597–27,825) are each
+  below the 32,000-cycle deadline. Remaining SDK/FS/copy/poll/IRQ work matters; it is not all proven CPU time.
+- **Next:** use the now-correct request stream to model and validate actual CARD page/ID/cache/clock behavior and
+  missing SDK work time, keeping original AI/scripts/shared RNG. Verify complete trainer battles before promising
+  AI parity. Continue Phase 5 from Route 20 through Floccesy Ranch, Hugh's Town Map and the lost Lillipup, then the
+  first gym, with native save/reload and oracle checkpoints.
+- **Blockers:** no missing game C blocks those tasks. AI deadline fidelity remains unresolved; this cache patch
+  adds no elapsed time and no artificial choice delay. Later story, optional/native networking, distribution,
+  controllers and the future mod platform remain unfinished. Issue 38's recorder is unimplemented; issue 45 needs
+  Spanish Black 2 gameplay/save evidence, and the owner has no such dump. ADR 0023 remains proposed.
+
 ## 2026-10-28: Alder, Floccesy and Route 20 save/reload in both games
 
 - **Upstream:** `0f7a44e4315bde2140da62518dfad80819127a6e`. PR 49 merged as `21221ad250` after delegated
@@ -41,7 +114,7 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   their 74 function names are normalized, both in pure upstream and in Frigate's adapted tree. No conflict,
   workflow change or reference exception; documented port guards remain. Newer upstream commits are separate
   reviewed sync work, not implicitly part of this feature.
-- **Port:** `PORT_SHA`, on `codex/phase5-floccesy`, from reviewed main `21221ad250`. No game C or HAL change.
+- **Port:** `bab5e37884`, on `codex/phase5-floccesy`, from reviewed main `21221ad250`. No game C or HAL change.
 - **ROM (T0):** `PATH=/opt/homebrew/opt/llvm/bin:$PATH .venv/bin/python configure.py b2_us w2_us`, then `ninja`
   passes all 351 incremental steps; both original SHA1s match: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`,
   W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. Publication rechecks these hashes.
