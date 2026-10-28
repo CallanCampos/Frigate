@@ -146,7 +146,7 @@ static void FldeffFesSparkle_FreeResources(FieldEffectFesSparkle *effect) {
 FieldEffectTask *FldeffFesSparkle_Start(FieldEffects *effects) {
     FesSparkleTaskParams params;
     Field *field = FieldEffects_GetField(effects);
-    FieldEffectFesSparkle *effect = FieldEffects_GetHandleData(effects, 18);
+    FieldEffectFesSparkle *effect = FieldEffects_GetHandleData(effects, FLDEFF_FES_SPARKLE);
 
     if (effect == NULL) {
         return NULL;
