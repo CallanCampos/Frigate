@@ -1,5 +1,5 @@
-// The Pokémon a field actor surfs on and its wake, and the splashes around it: field effects 3 and 8. The name is the
-// ROM's own, from GFL_HeapAllocate's file argument ("namipoke" is the surfing Pokémon). Function names from swan
+// The Pokémon a field actor surfs on and its wake, and the splashes around it: field effects 3 and 8. The ROM names it
+// fldeff_namipoke.c, by GFL_HeapAllocate's file argument ("namipoke" is the surfing Pokémon). Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
 #include "field/field_actor.h"
@@ -27,17 +27,17 @@ typedef struct {
     u16 wakeResGroup;
     u16 pokeObj;
     u16 wakeObj;
-} FieldEffectNamipoke;
+} FieldEffectSurfPokemon;
 
 // What the Pokémon's task starts from
 typedef struct {
-    FieldEffectNamipoke *namipoke;
+    FieldEffectSurfPokemon *surfPokemon;
     FieldActor *actor;
     u16 uid;
     u16 zoneId;
     u16 dir;
     VecFx32 pos;
-} NamipokeTaskParams;
+} SurfPokemonTaskParams;
 
 typedef struct {
     u16 hidden;
@@ -48,7 +48,7 @@ typedef struct {
     u16 objIdx;
     VecFx32 scale;
     VecFx32 offset;
-} NamipokeWake;
+} SurfPokemonWake;
 
 typedef struct {
     u32 unk0;
@@ -61,9 +61,9 @@ typedef struct {
     fx32 bob;
     fx32 bobSpeed;
     u16 objIdx;
-    NamipokeTaskParams params;
-    NamipokeWake wake;
-} NamipokeTask;
+    SurfPokemonTaskParams params;
+    SurfPokemonWake wake;
+} SurfPokemonTask;
 
 // Field effect 8: the splashes, a resource group of each kind
 typedef struct {
@@ -73,12 +73,12 @@ typedef struct {
     u16 resGroup3;
     u16 resGroup2;
     u16 resGroup4;
-} FieldEffectNamipokeSplash;
+} FieldEffectSurfPokemonSplash;
 
 // What a splash's task starts from
 typedef struct {
     BOOL endWithAnim;
-    FieldEffectNamipokeSplash *splash;
+    FieldEffectSurfPokemonSplash *splash;
     u32 kind;
     // The task of the Pokémon the splash follows, or NULL
     FieldEffectTask *parent;
@@ -91,140 +91,141 @@ typedef struct {
     SplashTaskParams params;
 } SplashTask;
 
-static void FldeffNamipoke_LoadResources(FieldEffectNamipoke *namipoke);
-static void FldeffNamipoke_FreeResources(FieldEffectNamipoke *namipoke);
-static fx32 FldeffNamipoke_GetWakeScale(fx32 distance);
-static fx32 FldeffNamipoke_GetWakeLength(const VecFx32 *actorPos, const VecFx32 *wakePos, u16 dir);
-static void FldeffNamipoke_Init(FieldEffectTask *task, void *work);
-static void FldeffNamipoke_Exit(FieldEffectTask *task, void *work);
-static void FldeffNamipoke_PlaceObjects(FieldEffectTask *task, NamipokeTask *namiTask);
-static void FldeffNamipoke_UpdateGrid(FieldEffectTask *task, void *work);
-static void FldeffNamipoke_DrawGrid(FieldEffectTask *task, void *work);
-static void FldeffNamipoke_UpdateRail(FieldEffectTask *task, void *work);
-static void FldeffNamipoke_DrawRail(FieldEffectTask *task, void *work);
-static void FldeffNamipokeSplash_LoadResources(FieldEffectNamipokeSplash *splash);
-static void FldeffNamipokeSplash_FreeResources(FieldEffectNamipokeSplash *splash);
-static void FldeffNamipokeSplash_Init(FieldEffectTask *task, void *work);
-static void FldeffNamipokeSplash_Exit(FieldEffectTask *task, void *work);
-static void FldeffNamipokeSplash_Update(FieldEffectTask *task, void *work);
-static void FldeffNamipokeSplash_Draw(FieldEffectTask *task, void *work);
+static void FldeffSurfPokemon_LoadResources(FieldEffectSurfPokemon *surfPokemon);
+static void FldeffSurfPokemon_FreeResources(FieldEffectSurfPokemon *surfPokemon);
+static fx32 FldeffSurfPokemon_GetWakeScale(fx32 distance);
+static fx32 FldeffSurfPokemon_GetWakeLength(const VecFx32 *actorPos, const VecFx32 *wakePos, u16 dir);
+static void FldeffSurfPokemon_Init(FieldEffectTask *task, void *work);
+static void FldeffSurfPokemon_Exit(FieldEffectTask *task, void *work);
+static void FldeffSurfPokemon_PlaceObjects(FieldEffectTask *task, SurfPokemonTask *surfTask);
+static void FldeffSurfPokemon_UpdateGrid(FieldEffectTask *task, void *work);
+static void FldeffSurfPokemon_DrawGrid(FieldEffectTask *task, void *work);
+static void FldeffSurfPokemon_UpdateRail(FieldEffectTask *task, void *work);
+static void FldeffSurfPokemon_DrawRail(FieldEffectTask *task, void *work);
+static void FldeffSurfPokemonSplash_LoadResources(FieldEffectSurfPokemonSplash *splash);
+static void FldeffSurfPokemonSplash_FreeResources(FieldEffectSurfPokemonSplash *splash);
+static void FldeffSurfPokemonSplash_Init(FieldEffectTask *task, void *work);
+static void FldeffSurfPokemonSplash_Exit(FieldEffectTask *task, void *work);
+static void FldeffSurfPokemonSplash_Update(FieldEffectTask *task, void *work);
+static void FldeffSurfPokemonSplash_Draw(FieldEffectTask *task, void *work);
 
 // clang-format off
 static const FieldEffectTaskVTable SPLASH_TASK_VTABLE = {
     sizeof(SplashTask),
-    FldeffNamipokeSplash_Init,
-    FldeffNamipokeSplash_Exit,
-    FldeffNamipokeSplash_Update,
-    FldeffNamipokeSplash_Draw,
+    FldeffSurfPokemonSplash_Init,
+    FldeffSurfPokemonSplash_Exit,
+    FldeffSurfPokemonSplash_Update,
+    FldeffSurfPokemonSplash_Draw,
 };
 
 // clang-format on
 
 // The Pokémon of an actor on the grid
 // clang-format off
-static const FieldEffectTaskVTable NAMIPOKE_TASK_VTABLE = {
-    sizeof(NamipokeTask),
-    FldeffNamipoke_Init,
-    FldeffNamipoke_Exit,
-    FldeffNamipoke_UpdateGrid,
-    FldeffNamipoke_DrawGrid,
+static const FieldEffectTaskVTable SURF_POKEMON_TASK_VTABLE = {
+    sizeof(SurfPokemonTask),
+    FldeffSurfPokemon_Init,
+    FldeffSurfPokemon_Exit,
+    FldeffSurfPokemon_UpdateGrid,
+    FldeffSurfPokemon_DrawGrid,
 };
 
 // clang-format on
 
 // The Pokémon of an actor on a rail
 // clang-format off
-static const FieldEffectTaskVTable NAMIPOKE_RAIL_TASK_VTABLE = {
-    sizeof(NamipokeTask),
-    FldeffNamipoke_Init,
-    FldeffNamipoke_Exit,
-    FldeffNamipoke_UpdateRail,
-    FldeffNamipoke_DrawRail,
+static const FieldEffectTaskVTable SURF_POKEMON_RAIL_TASK_VTABLE = {
+    sizeof(SurfPokemonTask),
+    FldeffSurfPokemon_Init,
+    FldeffSurfPokemon_Exit,
+    FldeffSurfPokemon_UpdateRail,
+    FldeffSurfPokemon_DrawRail,
 };
 
 // clang-format on
 
-void *FldeffNamipoke_Create(FieldEffects *effects, HeapID heapId) {
-    FieldEffectNamipoke *namipoke =
-        GFL_HeapAllocate(heapId, sizeof(FieldEffectNamipoke), TRUE, "fldeff_namipoke.c", 172);
+void *FldeffSurfPokemon_Create(FieldEffects *effects, HeapID heapId) {
+    FieldEffectSurfPokemon *surfPokemon =
+        GFL_HeapAllocate(heapId, sizeof(FieldEffectSurfPokemon), TRUE, "fldeff_namipoke.c", 172);
 
-    namipoke->effects = effects;
-    FldeffNamipoke_LoadResources(namipoke);
-    return namipoke;
+    surfPokemon->effects = effects;
+    FldeffSurfPokemon_LoadResources(surfPokemon);
+    return surfPokemon;
 }
 
-void FldeffNamipoke_Delete(FieldEffects *effects, void *data) {
-    FldeffNamipoke_FreeResources(data);
+void FldeffSurfPokemon_Delete(FieldEffects *effects, void *data) {
+    FldeffSurfPokemon_FreeResources(data);
     GFL_HeapFree(data);
 }
 
-static void FldeffNamipoke_LoadResources(FieldEffectNamipoke *namipoke) {
+static void FldeffSurfPokemon_LoadResources(FieldEffectSurfPokemon *surfPokemon) {
     FieldG3DObjResRequest request;
-    FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(namipoke->effects);
-    ArcTool *arc = FieldEffects_GetArc(namipoke->effects);
+    FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(surfPokemon->effects);
+    ArcTool *arc = FieldEffects_GetArc(surfPokemon->effects);
 
     FieldG3DObjResRequest_Clear(&request);
     FieldG3DObjResRequest_SetModel(&request, arc, 49);
-    namipoke->pokeResGroup = FieldG3DObjSystem_AddResGroup(objSys, &request, FALSE);
-    namipoke->pokeObj = FieldG3DObjSystem_AddObj(objSys, namipoke->pokeResGroup, 0, NULL);
-    FieldG3DObjSystem_SetObjectManualDraw(objSys, namipoke->pokeObj, TRUE);
+    surfPokemon->pokeResGroup = FieldG3DObjSystem_AddResGroup(objSys, &request, FALSE);
+    surfPokemon->pokeObj = FieldG3DObjSystem_AddObj(objSys, surfPokemon->pokeResGroup, 0, NULL);
+    FieldG3DObjSystem_SetObjectManualDraw(objSys, surfPokemon->pokeObj, TRUE);
 
     FieldG3DObjResRequest_Clear(&request);
     FieldG3DObjResRequest_SetModel(&request, arc, 54);
     FieldG3DObjResRequest_SetAnmArc(&request, arc);
     FieldG3DObjResRequest_AddAnm(&request, 111);
     FieldG3DObjResRequest_AddAnm(&request, 140);
-    namipoke->wakeResGroup = FieldG3DObjSystem_AddResGroup(objSys, &request, FALSE);
-    namipoke->wakeObj = FieldG3DObjSystem_AddObj(objSys, namipoke->wakeResGroup, 0, NULL);
-    FieldG3DObjSystem_SetObjectManualDraw(objSys, namipoke->wakeObj, TRUE);
+    surfPokemon->wakeResGroup = FieldG3DObjSystem_AddResGroup(objSys, &request, FALSE);
+    surfPokemon->wakeObj = FieldG3DObjSystem_AddObj(objSys, surfPokemon->wakeResGroup, 0, NULL);
+    FieldG3DObjSystem_SetObjectManualDraw(objSys, surfPokemon->wakeObj, TRUE);
 }
 
-static void FldeffNamipoke_FreeResources(FieldEffectNamipoke *namipoke) {
-    FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(namipoke->effects);
+static void FldeffSurfPokemon_FreeResources(FieldEffectSurfPokemon *surfPokemon) {
+    FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(surfPokemon->effects);
 
-    FieldG3DObjSystem_FreeObj(objSys, namipoke->pokeObj);
-    FieldG3DObjSystem_FreeObj(objSys, namipoke->wakeObj);
-    FieldG3DObjSystem_FreeResGroup(objSys, namipoke->pokeResGroup);
-    FieldG3DObjSystem_FreeResGroup(objSys, namipoke->wakeResGroup);
+    FieldG3DObjSystem_FreeObj(objSys, surfPokemon->pokeObj);
+    FieldG3DObjSystem_FreeObj(objSys, surfPokemon->wakeObj);
+    FieldG3DObjSystem_FreeResGroup(objSys, surfPokemon->pokeResGroup);
+    FieldG3DObjSystem_FreeResGroup(objSys, surfPokemon->wakeResGroup);
 }
 
-FieldEffectTask *FldeffNamipoke_Start(FieldEffects *effects, u16 dir, const VecFx32 *pos, FieldActor *actor, u32 mode) {
-    NamipokeTaskParams params;
+FieldEffectTask *FldeffSurfPokemon_Start(FieldEffects *effects, u16 dir, const VecFx32 *pos, FieldActor *actor,
+                                         u32 mode) {
+    SurfPokemonTaskParams params;
 
-    params.namipoke = FieldEffects_GetHandleData(effects, 3);
+    params.surfPokemon = FieldEffects_GetHandleData(effects, 3);
     params.actor = actor;
     params.uid = GetActorUID(actor);
     params.zoneId = GetActorZoneID(actor);
     params.dir = dir;
     params.pos = *pos;
     if (CheckActorFlag(actor, 0x2000)) {
-        return FieldEffects_TCBCreate(effects, &NAMIPOKE_RAIL_TASK_VTABLE, &params.pos, mode, &params, 0);
+        return FieldEffects_TCBCreate(effects, &SURF_POKEMON_RAIL_TASK_VTABLE, &params.pos, mode, &params, 0);
     }
-    return FieldEffects_TCBCreate(effects, &NAMIPOKE_TASK_VTABLE, &params.pos, mode, &params, 0);
+    return FieldEffects_TCBCreate(effects, &SURF_POKEMON_TASK_VTABLE, &params.pos, mode, &params, 0);
 }
 
-void FldeffNamipoke_SetFollowMode(FieldEffectTask *task, u8 mode) {
+void FldeffSurfPokemon_SetFollowMode(FieldEffectTask *task, u8 mode) {
     if (task != NULL) {
-        NamipokeTask *namiTask = FieldEffects_GetObjectWork(task);
+        SurfPokemonTask *surfTask = FieldEffects_GetObjectWork(task);
 
-        namiTask->mode = mode;
+        surfTask->mode = mode;
     }
 }
 
-void FldeffNamipoke_SetWakeEnabled(FieldEffectTask *task, BOOL showWake) {
+void FldeffSurfPokemon_SetWakeEnabled(FieldEffectTask *task, BOOL showWake) {
     if (task != NULL) {
-        NamipokeTask *namiTask = FieldEffects_GetObjectWork(task);
+        SurfPokemonTask *surfTask = FieldEffects_GetObjectWork(task);
 
         if (showWake == TRUE) {
-            namiTask->hideWake = FALSE;
+            surfTask->hideWake = FALSE;
         } else {
-            namiTask->hideWake = TRUE;
+            surfTask->hideWake = TRUE;
         }
     }
 }
 
 // The wake's scale for its distance behind the Pokémon
-static fx32 FldeffNamipoke_GetWakeScale(fx32 distance) {
+static fx32 FldeffSurfPokemon_GetWakeScale(fx32 distance) {
     if (distance > WAKE_MAX_DISTANCE) {
         distance = WAKE_MAX_DISTANCE;
     }
@@ -232,7 +233,7 @@ static fx32 FldeffNamipoke_GetWakeScale(fx32 distance) {
 }
 
 // How far the wake is behind the actor, along the direction it faces
-static fx32 FldeffNamipoke_GetWakeLength(const VecFx32 *actorPos, const VecFx32 *wakePos, u16 dir) {
+static fx32 FldeffSurfPokemon_GetWakeLength(const VecFx32 *actorPos, const VecFx32 *wakePos, u16 dir) {
     fx32 distance = 0;
 
     switch (dir) {
@@ -252,22 +253,22 @@ static fx32 FldeffNamipoke_GetWakeLength(const VecFx32 *actorPos, const VecFx32 
     return distance;
 }
 
-static void FldeffNamipoke_Init(FieldEffectTask *task, void *work) {
-    NamipokeTask *namiTask = work;
-    NamipokeTaskParams *params = FieldEffects_GetObjectParam(task);
-    NamipokeWake *wake;
+static void FldeffSurfPokemon_Init(FieldEffectTask *task, void *work) {
+    SurfPokemonTask *surfTask = work;
+    SurfPokemonTaskParams *params = FieldEffects_GetObjectParam(task);
+    SurfPokemonWake *wake;
 
-    namiTask->params = *params;
+    surfTask->params = *params;
     FieldEffects_SetObjectPos(task, &params->pos);
-    namiTask->dir = params->dir;
+    surfTask->dir = params->dir;
     // The game fetches the 3D object system here and doesn't use it
-    FieldEffects_GetFieldMapData(namiTask->params.namipoke->effects);
-    namiTask->objIdx = namiTask->params.namipoke->pokeObj;
-    namiTask->mode = FieldEffects_GetObjectMode(task);
-    namiTask->bob = FX32_ONE;
-    namiTask->bobSpeed = FX32_CONST(0.25);
-    wake = &namiTask->wake;
-    wake->objIdx = namiTask->params.namipoke->wakeObj;
+    FieldEffects_GetFieldMapData(surfTask->params.surfPokemon->effects);
+    surfTask->objIdx = surfTask->params.surfPokemon->pokeObj;
+    surfTask->mode = FieldEffects_GetObjectMode(task);
+    surfTask->bob = FX32_ONE;
+    surfTask->bobSpeed = FX32_CONST(0.25);
+    wake = &surfTask->wake;
+    wake->objIdx = surfTask->params.surfPokemon->wakeObj;
     wake->hidden = TRUE;
     wake->dir = WAKE_DIR_NONE;
     wake->scale.x = FX32_ONE;
@@ -276,25 +277,25 @@ static void FldeffNamipoke_Init(FieldEffectTask *task, void *work) {
     FieldEffects_UpdateObject(task);
 }
 
-static void FldeffNamipoke_Exit(FieldEffectTask *task, void *work) {
+static void FldeffSurfPokemon_Exit(FieldEffectTask *task, void *work) {
 }
 
 // Turn the Pokémon and its wake on the grid to the direction it faces, and put them where the task is
-static void FldeffNamipoke_PlaceObjects(FieldEffectTask *task, NamipokeTask *namiTask) {
+static void FldeffSurfPokemon_PlaceObjects(FieldEffectTask *task, SurfPokemonTask *surfTask) {
     u16 pokeRotations[4][3] = {
         { 0, 0x8000, 0 },
         { 0, 0, 0 },
         { 0, 0xc000, 0 },
         { 0, 0x4000, 0 },
     };
-    u16 *rotation = pokeRotations[namiTask->dir];
-    FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(namiTask->params.namipoke->effects);
-    SRTMatrix *transform = FieldG3DObjSystem_GetObjTransform(objSys, namiTask->objIdx);
+    u16 *rotation = pokeRotations[surfTask->dir];
+    FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(surfTask->params.surfPokemon->effects);
+    SRTMatrix *transform = FieldG3DObjSystem_GetObjTransform(objSys, surfTask->objIdx);
 
     MAT3_RotationEulerZYX(rotation[0], rotation[1], rotation[2], &transform->rotation);
     FieldEffects_GetObjectPos(task, &transform->translation);
-    if (namiTask->wake.hidden == FALSE) {
-        NamipokeWake *wake = &namiTask->wake;
+    if (surfTask->wake.hidden == FALSE) {
+        SurfPokemonWake *wake = &surfTask->wake;
         VecFx32 wakeOffsets[4] = {
             { 0, FX32_CONST(-4), FX32_CONST(14) },
             { 0, FX32_CONST(-4), FX32_CONST(-14) },
@@ -307,9 +308,9 @@ static void FldeffNamipoke_PlaceObjects(FieldEffectTask *task, NamipokeTask *nam
             { 0, 0x4000, 0 },
             { 0, 0xc000, 0 },
         };
-        VecFx32 *offset = &wakeOffsets[namiTask->dir];
+        VecFx32 *offset = &wakeOffsets[surfTask->dir];
 
-        rotation = wakeRotations[namiTask->dir];
+        rotation = wakeRotations[surfTask->dir];
         transform = FieldG3DObjSystem_GetObjTransform(objSys, wake->objIdx);
         MAT3_RotationEulerZYX(rotation[0], rotation[1], rotation[2], &transform->rotation);
         FieldEffects_GetObjectPos(task, &transform->translation);
@@ -319,69 +320,69 @@ static void FldeffNamipoke_PlaceObjects(FieldEffectTask *task, NamipokeTask *nam
         transform->scale = wake->scale;
         FieldG3DObjSystem_SetObjectHidden(objSys, wake->objIdx, FALSE);
     } else {
-        FieldG3DObjSystem_SetObjectHidden(objSys, namiTask->wake.objIdx, TRUE);
+        FieldG3DObjSystem_SetObjectHidden(objSys, surfTask->wake.objIdx, TRUE);
     }
 }
 
 // On the grid: bob under the actor, and trail the wake behind it
-static void FldeffNamipoke_UpdateGrid(FieldEffectTask *task, void *work) {
+static void FldeffSurfPokemon_UpdateGrid(FieldEffectTask *task, void *work) {
     VecFx32 offset = { 0, 0, 0 };
     VecFx32 pos;
     VecFx32 actorPos;
-    NamipokeTask *namiTask = work;
+    SurfPokemonTask *surfTask = work;
     u16 objCode;
 
-    if (namiTask->mode == 0) {
-        FldeffNamipoke_PlaceObjects(task, namiTask);
+    if (surfTask->mode == 0) {
+        FldeffSurfPokemon_PlaceObjects(task, surfTask);
         return;
     }
-    namiTask->dir = GetActorFaceDir(namiTask->params.actor);
-    if (namiTask->mode == 1) {
-        namiTask->bob += namiTask->bobSpeed;
-        if (namiTask->bob >= FX32_CONST(4)) {
-            namiTask->bob = FX32_CONST(4);
-            namiTask->bobSpeed = -namiTask->bobSpeed;
-        } else if (namiTask->bob <= FX32_ONE) {
-            namiTask->bob = FX32_ONE;
-            namiTask->bobSpeed = -namiTask->bobSpeed;
+    surfTask->dir = GetActorFaceDir(surfTask->params.actor);
+    if (surfTask->mode == 1) {
+        surfTask->bob += surfTask->bobSpeed;
+        if (surfTask->bob >= FX32_CONST(4)) {
+            surfTask->bob = FX32_CONST(4);
+            surfTask->bobSpeed = -surfTask->bobSpeed;
+        } else if (surfTask->bob <= FX32_ONE) {
+            surfTask->bob = FX32_ONE;
+            surfTask->bobSpeed = -surfTask->bobSpeed;
         }
         offset.x = 0;
-        offset.y = namiTask->bob + FX32_ONE;
+        offset.y = surfTask->bob + FX32_ONE;
         offset.z = FX32_CONST(5);
         // Object codes 160 and 161 sit higher on the Pokémon
-        objCode = FldAct_GetObjCode(namiTask->params.actor);
+        objCode = FldAct_GetObjCode(surfTask->params.actor);
         if (objCode == 160 || objCode == 161) {
-            offset.y = namiTask->bob + FX32_CONST(8);
+            offset.y = surfTask->bob + FX32_CONST(8);
         }
-        FldAct_SetOuterDrawOffset(namiTask->params.actor, &offset);
-    } else if (namiTask->mode == 2) {
-        FldAct_GetOuterDrawOffset(namiTask->params.actor, &offset);
+        FldAct_SetOuterDrawOffset(surfTask->params.actor, &offset);
+    } else if (surfTask->mode == 2) {
+        FldAct_GetOuterDrawOffset(surfTask->params.actor, &offset);
     }
-    CopyActorPosAllAdd(namiTask->params.actor, &pos);
+    CopyActorPosAllAdd(surfTask->params.actor, &pos);
     pos.x -= offset.x;
     pos.y -= offset.y;
     pos.z -= offset.z;
-    if (namiTask->mode != 2) {
-        pos.y += namiTask->bob - FX32_ONE;
+    if (surfTask->mode != 2) {
+        pos.y += surfTask->bob - FX32_ONE;
     }
     FieldEffects_SetObjectPos(task, &pos);
-    if (namiTask->mode == 2 || namiTask->hideWake == TRUE) {
-        NamipokeWake *wake = &namiTask->wake;
+    if (surfTask->mode == 2 || surfTask->hideWake == TRUE) {
+        SurfPokemonWake *wake = &surfTask->wake;
 
         wake->dir = WAKE_DIR_NONE;
-        if (namiTask->hideWake == TRUE) {
+        if (surfTask->hideWake == TRUE) {
             wake->hidden = TRUE;
         }
     } else {
-        NamipokeWake *wake = &namiTask->wake;
+        SurfPokemonWake *wake = &surfTask->wake;
         fx32 distance;
         fx32 scale;
 
-        FieldG3DObjSystem_StepObjAnmLoop(FieldEffects_GetFieldMapData(namiTask->params.namipoke->effects), wake->objIdx,
-                                         FX32_ONE);
-        CopyActorWPos(namiTask->params.actor, &actorPos);
-        if (namiTask->dir != wake->dir) {
-            wake->dir = namiTask->dir;
+        FieldG3DObjSystem_StepObjAnmLoop(FieldEffects_GetFieldMapData(surfTask->params.surfPokemon->effects),
+                                         wake->objIdx, FX32_ONE);
+        CopyActorWPos(surfTask->params.actor, &actorPos);
+        if (surfTask->dir != wake->dir) {
+            wake->dir = surfTask->dir;
             wake->pos = actorPos;
         } else if (actorPos.x == wake->actorPos.x && actorPos.y == wake->actorPos.y && actorPos.z == wake->actorPos.z) {
             // The actor stopped: the wake catches up
@@ -412,7 +413,7 @@ static void FldeffNamipoke_UpdateGrid(FieldEffectTask *task, void *work) {
                 break;
             }
         }
-        distance = FldeffNamipoke_GetWakeLength(&actorPos, &wake->pos, wake->dir);
+        distance = FldeffSurfPokemon_GetWakeLength(&actorPos, &wake->pos, wake->dir);
         if (distance >= WAKE_MAX_DISTANCE) {
             switch (wake->dir) {
             case DIR_UP:
@@ -429,7 +430,7 @@ static void FldeffNamipoke_UpdateGrid(FieldEffectTask *task, void *work) {
                 break;
             }
         }
-        scale = FldeffNamipoke_GetWakeScale(distance);
+        scale = FldeffSurfPokemon_GetWakeScale(distance);
         if (scale < WAKE_MIN_SCALE) {
             wake->hidden = TRUE;
         } else {
@@ -440,73 +441,73 @@ static void FldeffNamipoke_UpdateGrid(FieldEffectTask *task, void *work) {
         }
         wake->actorPos = actorPos;
     }
-    FldeffNamipoke_PlaceObjects(task, namiTask);
+    FldeffSurfPokemon_PlaceObjects(task, surfTask);
 }
 
-static void FldeffNamipoke_DrawGrid(FieldEffectTask *task, void *work) {
-    NamipokeTask *namiTask = work;
-    FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(namiTask->params.namipoke->effects);
+static void FldeffSurfPokemon_DrawGrid(FieldEffectTask *task, void *work) {
+    SurfPokemonTask *surfTask = work;
+    FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(surfTask->params.surfPokemon->effects);
 
-    FieldG3DObjSystem_DrawObj(objSys, namiTask->objIdx);
-    FieldG3DObjSystem_DrawObj(objSys, namiTask->wake.objIdx);
+    FieldG3DObjSystem_DrawObj(objSys, surfTask->objIdx);
+    FieldG3DObjSystem_DrawObj(objSys, surfTask->wake.objIdx);
 }
 
 // On a rail: the same along the rail's directions
-static void FldeffNamipoke_UpdateRail(FieldEffectTask *task, void *work) {
+static void FldeffSurfPokemon_UpdateRail(FieldEffectTask *task, void *work) {
     VecFx32 offset = { 0, 0, 0 };
     VecFx32 pos;
     VecFx32 actorPos;
     VecFx16 up;
     VecFx16 forward;
-    NamipokeTask *namiTask = work;
+    SurfPokemonTask *surfTask = work;
 
-    if (namiTask->mode == 0) {
+    if (surfTask->mode == 0) {
         return;
     }
-    namiTask->dir = GetActorFaceDir(namiTask->params.actor);
-    RailActor_GetDrawOffsetByDir(namiTask->params.actor, DIR_UP, &up);
-    RailActor_GetDrawOffsetByDir(namiTask->params.actor, namiTask->dir, &forward);
+    surfTask->dir = GetActorFaceDir(surfTask->params.actor);
+    RailActor_GetDrawOffsetByDir(surfTask->params.actor, DIR_UP, &up);
+    RailActor_GetDrawOffsetByDir(surfTask->params.actor, surfTask->dir, &forward);
     up.y = 0;
     VEC_Fx16Normalize(&up, &up);
     forward.y = 0;
     VEC_Fx16Normalize(&forward, &forward);
-    if (namiTask->mode == 1) {
-        namiTask->bob += namiTask->bobSpeed;
-        if (namiTask->bob >= FX32_CONST(4)) {
-            namiTask->bob = FX32_CONST(4);
-            namiTask->bobSpeed = -namiTask->bobSpeed;
-        } else if (namiTask->bob <= FX32_ONE) {
-            namiTask->bob = FX32_ONE;
-            namiTask->bobSpeed = -namiTask->bobSpeed;
+    if (surfTask->mode == 1) {
+        surfTask->bob += surfTask->bobSpeed;
+        if (surfTask->bob >= FX32_CONST(4)) {
+            surfTask->bob = FX32_CONST(4);
+            surfTask->bobSpeed = -surfTask->bobSpeed;
+        } else if (surfTask->bob <= FX32_ONE) {
+            surfTask->bob = FX32_ONE;
+            surfTask->bobSpeed = -surfTask->bobSpeed;
         }
         offset.x = FX_Mul(-up.x, FX32_CONST(7));
-        offset.y = namiTask->bob + FX32_CONST(5);
+        offset.y = surfTask->bob + FX32_CONST(5);
         offset.z = FX_Mul(-up.z, FX32_CONST(7));
-        FldAct_SetOuterDrawOffset(namiTask->params.actor, &offset);
+        FldAct_SetOuterDrawOffset(surfTask->params.actor, &offset);
     }
-    CopyActorPosAllAdd(namiTask->params.actor, &pos);
+    CopyActorPosAllAdd(surfTask->params.actor, &pos);
     pos.x -= offset.x;
     pos.y -= offset.y;
     pos.z -= offset.z;
-    pos.y += namiTask->bob - FX32_ONE;
+    pos.y += surfTask->bob - FX32_ONE;
     FieldEffects_SetObjectPos(task, &pos);
-    if (namiTask->mode == 2 || namiTask->hideWake == TRUE) {
-        NamipokeWake *wake = &namiTask->wake;
+    if (surfTask->mode == 2 || surfTask->hideWake == TRUE) {
+        SurfPokemonWake *wake = &surfTask->wake;
 
         wake->dir = WAKE_DIR_NONE;
-        if (namiTask->hideWake == TRUE) {
+        if (surfTask->hideWake == TRUE) {
             wake->hidden = TRUE;
         }
     } else {
-        NamipokeWake *wake = &namiTask->wake;
+        SurfPokemonWake *wake = &surfTask->wake;
         fx32 distance;
         fx32 scale;
 
-        FieldG3DObjSystem_StepObjAnmLoop(FieldEffects_GetFieldMapData(namiTask->params.namipoke->effects), wake->objIdx,
-                                         FX32_ONE);
-        CopyActorWPos(namiTask->params.actor, &actorPos);
-        if (namiTask->dir != wake->dir) {
-            wake->dir = namiTask->dir;
+        FieldG3DObjSystem_StepObjAnmLoop(FieldEffects_GetFieldMapData(surfTask->params.surfPokemon->effects),
+                                         wake->objIdx, FX32_ONE);
+        CopyActorWPos(surfTask->params.actor, &actorPos);
+        if (surfTask->dir != wake->dir) {
+            wake->dir = surfTask->dir;
             wake->pos = actorPos;
         } else if (actorPos.x == wake->actorPos.x && actorPos.y == wake->actorPos.y && actorPos.z == wake->actorPos.z) {
             // The actor stopped: the wake catches up
@@ -537,7 +538,7 @@ static void FldeffNamipoke_UpdateRail(FieldEffectTask *task, void *work) {
             wake->pos.x = actorPos.x - FX_Mul(forward.x, WAKE_MAX_DISTANCE);
             wake->pos.z = actorPos.z - FX_Mul(forward.z, WAKE_MAX_DISTANCE);
         }
-        scale = FldeffNamipoke_GetWakeScale(distance);
+        scale = FldeffSurfPokemon_GetWakeScale(distance);
         if (scale <= WAKE_MIN_SCALE) {
             wake->hidden = TRUE;
         } else {
@@ -550,7 +551,7 @@ static void FldeffNamipoke_UpdateRail(FieldEffectTask *task, void *work) {
     }
 }
 
-static void FldeffNamipoke_DrawRail(FieldEffectTask *task, void *work) {
+static void FldeffSurfPokemon_DrawRail(FieldEffectTask *task, void *work) {
     VecFx32 forward;
     VecFx32 back;
     MtxFx33 pokeRotation;
@@ -558,10 +559,10 @@ static void FldeffNamipoke_DrawRail(FieldEffectTask *task, void *work) {
     VecFx16 dir;
     FieldG3DObjSystem *objSys;
     SRTMatrix *transform;
-    NamipokeTask *namiTask = work;
-    NamipokeWake *wake = &namiTask->wake;
+    SurfPokemonTask *surfTask = work;
+    SurfPokemonWake *wake = &surfTask->wake;
 
-    RailActor_GetDrawOffsetByDir(namiTask->params.actor, namiTask->dir, &dir);
+    RailActor_GetDrawOffsetByDir(surfTask->params.actor, surfTask->dir, &dir);
     forward.x = dir.x;
     forward.y = 0;
     forward.z = dir.z;
@@ -570,11 +571,11 @@ static void FldeffNamipoke_DrawRail(FieldEffectTask *task, void *work) {
     back.z = -dir.z;
     MAT3_RotationDir(&forward, &pokeRotation);
     MAT3_RotationDir(&back, &wakeRotation);
-    objSys = FieldEffects_GetFieldMapData(namiTask->params.namipoke->effects);
-    transform = FieldG3DObjSystem_GetObjTransform(objSys, namiTask->objIdx);
+    objSys = FieldEffects_GetFieldMapData(surfTask->params.surfPokemon->effects);
+    transform = FieldG3DObjSystem_GetObjTransform(objSys, surfTask->objIdx);
     transform->rotation = pokeRotation;
     FieldEffects_GetObjectPos(task, &transform->translation);
-    if (namiTask->wake.hidden == FALSE) {
+    if (surfTask->wake.hidden == FALSE) {
         FieldG3DObjSystem_SetObjectHidden(objSys, wake->objIdx, FALSE);
         transform = FieldG3DObjSystem_GetObjTransform(objSys, wake->objIdx);
         transform->rotation = wakeRotation;
@@ -586,25 +587,25 @@ static void FldeffNamipoke_DrawRail(FieldEffectTask *task, void *work) {
     } else {
         FieldG3DObjSystem_SetObjectHidden(objSys, wake->objIdx, TRUE);
     }
-    FieldG3DObjSystem_DrawObj(objSys, namiTask->objIdx);
+    FieldG3DObjSystem_DrawObj(objSys, surfTask->objIdx);
     FieldG3DObjSystem_DrawObj(objSys, wake->objIdx);
 }
 
-void *FldeffNamipokeSplash_Create(FieldEffects *effects, HeapID heapId) {
-    FieldEffectNamipokeSplash *splash =
-        GFL_HeapAllocate(heapId, sizeof(FieldEffectNamipokeSplash), TRUE, "fldeff_namipoke.c", 975);
+void *FldeffSurfPokemonSplash_Create(FieldEffects *effects, HeapID heapId) {
+    FieldEffectSurfPokemonSplash *splash =
+        GFL_HeapAllocate(heapId, sizeof(FieldEffectSurfPokemonSplash), TRUE, "fldeff_namipoke.c", 975);
 
     splash->effects = effects;
-    FldeffNamipokeSplash_LoadResources(splash);
+    FldeffSurfPokemonSplash_LoadResources(splash);
     return splash;
 }
 
-void FldeffNamipokeSplash_Delete(FieldEffects *effects, void *data) {
-    FldeffNamipokeSplash_FreeResources(data);
+void FldeffSurfPokemonSplash_Delete(FieldEffects *effects, void *data) {
+    FldeffSurfPokemonSplash_FreeResources(data);
     GFL_HeapFree(data);
 }
 
-static void FldeffNamipokeSplash_LoadResources(FieldEffectNamipokeSplash *splash) {
+static void FldeffSurfPokemonSplash_LoadResources(FieldEffectSurfPokemonSplash *splash) {
     FieldG3DObjResRequest request;
     FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(splash->effects);
     ArcTool *arc = FieldEffects_GetArc(splash->effects);
@@ -645,7 +646,7 @@ static void FldeffNamipokeSplash_LoadResources(FieldEffectNamipokeSplash *splash
     splash->resGroup4 = FieldG3DObjSystem_AddResGroup(objSys, &request, FALSE);
 }
 
-static void FldeffNamipokeSplash_FreeResources(FieldEffectNamipokeSplash *splash) {
+static void FldeffSurfPokemonSplash_FreeResources(FieldEffectSurfPokemonSplash *splash) {
     FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(splash->effects);
 
     FieldG3DObjSystem_FreeResGroup(objSys, splash->resGroup0);
@@ -655,7 +656,7 @@ static void FldeffNamipokeSplash_FreeResources(FieldEffectNamipokeSplash *splash
     FieldG3DObjSystem_FreeResGroup(objSys, splash->resGroup4);
 }
 
-FieldEffectTask *FldeffNamipokeSplash_StartOnEffect(FieldEffects *effects, u32 kind, FieldEffectTask *parent) {
+FieldEffectTask *FldeffSurfPokemonSplash_StartOnEffect(FieldEffects *effects, u32 kind, FieldEffectTask *parent) {
     SplashTaskParams params;
 
     params.splash = FieldEffects_GetHandleData(effects, 8);
@@ -665,7 +666,7 @@ FieldEffectTask *FldeffNamipokeSplash_StartOnEffect(FieldEffects *effects, u32 k
     return FieldEffects_TCBCreate(effects, &SPLASH_TASK_VTABLE, NULL, 0, &params, 1);
 }
 
-FieldEffectTask *FldeffNamipokeSplash_StartAtPos(FieldEffects *effects, u32 kind, const VecFx32 *pos) {
+FieldEffectTask *FldeffSurfPokemonSplash_StartAtPos(FieldEffects *effects, u32 kind, const VecFx32 *pos) {
     SplashTaskParams params;
 
     params.splash = FieldEffects_GetHandleData(effects, 8);
@@ -675,7 +676,7 @@ FieldEffectTask *FldeffNamipokeSplash_StartAtPos(FieldEffects *effects, u32 kind
     return FieldEffects_TCBCreate(effects, &SPLASH_TASK_VTABLE, pos, 0, &params, 1);
 }
 
-BOOL FldeffNamipokeSplash_IsFinished(FieldEffectTask *task) {
+BOOL FldeffSurfPokemonSplash_IsFinished(FieldEffectTask *task) {
     if (task != NULL) {
         SplashTask *splashTask = FieldEffects_GetObjectWork(task);
 
@@ -684,7 +685,7 @@ BOOL FldeffNamipokeSplash_IsFinished(FieldEffectTask *task) {
     return TRUE;
 }
 
-static void FldeffNamipokeSplash_Init(FieldEffectTask *task, void *work) {
+static void FldeffSurfPokemonSplash_Init(FieldEffectTask *task, void *work) {
     SplashTask *splashTask = work;
     SplashTaskParams *params = FieldEffects_GetObjectParam(task);
     FieldG3DObjSystem *objSys;
@@ -723,14 +724,14 @@ static void FldeffNamipokeSplash_Init(FieldEffectTask *task, void *work) {
     }
 }
 
-static void FldeffNamipokeSplash_Exit(FieldEffectTask *task, void *work) {
+static void FldeffSurfPokemonSplash_Exit(FieldEffectTask *task, void *work) {
     SplashTask *splashTask = work;
 
     FieldG3DObjSystem_FreeObj(FieldEffects_GetFieldMapData(splashTask->params.splash->effects), splashTask->objIdx);
 }
 
 // Play the animation, once for kind 0 and over and over for the others, and follow the Pokémon
-static void FldeffNamipokeSplash_Update(FieldEffectTask *task, void *work) {
+static void FldeffSurfPokemonSplash_Update(FieldEffectTask *task, void *work) {
     VecFx32 pos;
     SplashTask *splashTask = work;
     FieldG3DObjSystem *objSys;
@@ -756,7 +757,7 @@ static void FldeffNamipokeSplash_Update(FieldEffectTask *task, void *work) {
     }
 }
 
-static void FldeffNamipokeSplash_Draw(FieldEffectTask *task, void *work) {
+static void FldeffSurfPokemonSplash_Draw(FieldEffectTask *task, void *work) {
     SplashTask *splashTask = work;
     SRTMatrix *transform = FieldG3DObjSystem_GetObjTransform(
         FieldEffects_GetFieldMapData(splashTask->params.splash->effects), splashTask->objIdx);

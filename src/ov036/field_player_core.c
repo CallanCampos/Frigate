@@ -614,7 +614,7 @@ static BOOL FieldPlayerCore_ExStateChangeFunc_SURF(FieldPlayerCore *core) {
         u16 dir = GetActorFaceDir(actor);
 
         CopyActorWPos(actor, &pos);
-        FieldPlayerCore_SetRideEffect(core, FldeffNamipoke_Start(effects, dir, &pos, actor, 1));
+        FieldPlayerCore_SetRideEffect(core, FldeffSurfPokemon_Start(effects, dir, &pos, actor, 1));
     }
     core->seqDone = 1;
     return FALSE;
@@ -708,11 +708,11 @@ static BOOL FieldPlayerCore_ExStateChangeFunc_DIVE(FieldPlayerCore *core) {
         u16 dir = GetActorFaceDir(actor);
 
         CopyActorWPos(actor, &pos);
-        FieldPlayerCore_SetRideEffect(core, FldeffNamipoke_Start(fieldEffects, dir, &pos, actor, 1));
+        FieldPlayerCore_SetRideEffect(core, FldeffSurfPokemon_Start(fieldEffects, dir, &pos, actor, 1));
     }
     FldeffBubble_Start(core->actor, effects);
     if (core->terrainEffectTCB != NULL) {
-        FldeffNamipoke_SetWakeEnabled(core->terrainEffectTCB, FALSE);
+        FldeffSurfPokemon_SetWakeEnabled(core->terrainEffectTCB, FALSE);
     }
     core->seqDone = 1;
     return FALSE;

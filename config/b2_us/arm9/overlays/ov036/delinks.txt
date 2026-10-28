@@ -60,7 +60,7 @@ src/ov036/resort_mapcreate.c:
     .text       start:0x021c8954 end:0x021c8c34
     .data       start:0x021d5744 end:0x021d5758
 
-src/ov036/scrcmd_ochiba.c:
+src/ov036/scrcmd_leaves.c:
     complete
     .text       start:0x021c97b8 end:0x021c9eb8
     .rodata     start:0x021d4920 end:0x021d4b10
@@ -127,7 +127,7 @@ src/ov036/fldeff_shadow.c:
     .rodata     start:0x021d0524 end:0x021d0544
     .data       start:0x021d5008 end:0x021d5018
 
-src/ov036/fldeff_kemuri.c:
+src/ov036/fldeff_dust.c:
     complete
     .text       start:0x021a3de0 end:0x021a3fd8
     .rodata     start:0x021d0544 end:0x021d0558
@@ -145,13 +145,13 @@ src/ov036/fldeff_encount.c:
     .rodata     start:0x021d06cc end:0x021d0728
     .data       start:0x021d5074 end:0x021d50dc
 
-src/ov036/fldeff_namipoke.c:
+src/ov036/fldeff_surf_pokemon.c:
     complete
     .text       start:0x021a4384 end:0x021a50a4
     .rodata     start:0x021d05f4 end:0x021d06cc
     .data       start:0x021d5060 end:0x021d5074
 
-src/ov036/fldeff_iwakudaki.c:
+src/ov036/fldeff_rock_smash.c:
     complete
     .text       start:0x021a5604 end:0x021a5828
     .rodata     start:0x021d0728 end:0x021d0778
@@ -163,7 +163,7 @@ src/ov036/fldeff_fishing.c:
     .rodata     start:0x021d0778 end:0x021d07d0
     .data       start:0x021d5100 end:0x021d5118
 
-src/ov036/fldeff_fes_kira.c:
+src/ov036/fldeff_fes_sparkle.c:
     complete
     .text       start:0x021a5a18 end:0x021a5d2c
     .rodata     start:0x021d07d0 end:0x021d0820
@@ -310,7 +310,7 @@ src/ov036/field_nogrid_mapper.c:
     .text       start:0x021b3bac end:0x021b3e50
     .data       start:0x021d5268 end:0x021d5280
 
-src/ov036/fldeff_gyoe.c:
+src/ov036/fldeff_emotion_bubble.c:
     complete
     .text       start:0x021b3e50 end:0x021b427c
     .rodata     start:0x021d1004 end:0x021d1078
@@ -656,7 +656,7 @@ src/ov036/field_water_current.c:
     .text       start:0x021c24b4 end:0x021c2788
     .rodata     start:0x021d236c end:0x021d2394
 
-src/ov036/fldeff_d06denki.c:
+src/ov036/fldeff_d06electric.c:
     complete
     .text       start:0x021c2788 end:0x021c2cbc
     .rodata     start:0x021d2394 end:0x021d24a8
@@ -667,7 +667,7 @@ src/ov036/land_data_patch.c:
     .text       start:0x021c2cbc end:0x021c2ddc
     .data       start:0x021d55a0 end:0x021d55b4
 
-src/ov036/fldeff_iaigiri.c:
+src/ov036/fldeff_cut.c:
     complete
     .text       start:0x021c2ddc end:0x021c3180
     .rodata     start:0x021d24a8 end:0x021d24f8
@@ -731,7 +731,7 @@ src/ov036/scrcmd_hidden_hollow.c:
     .text       start:0x021c8cd0 end:0x021c944c
     .rodata     start:0x021d48e0 end:0x021d48f4
 
-src/ov036/fldeff_ochiba.c:
+src/ov036/fldeff_leaves.c:
     complete
     .text       start:0x021c944c end:0x021c97b8
     .rodata     start:0x021d48f4 end:0x021d4920

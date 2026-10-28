@@ -419,7 +419,7 @@ static void func_ov036_02194dec(FieldActor *actor, u32 tile, u32 origYTile, cons
 }
 
 static void RailActor_MapAttrLandingDustProc(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
-    FldeffKemuri_StartFacing(actor, FldAct_GetFieldEffects(actor));
+    FldeffDust_StartFacing(actor, FldAct_GetFieldEffects(actor));
 }
 
 static void RailActor_StartReflection(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {

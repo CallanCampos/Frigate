@@ -86,7 +86,7 @@ BOOL s00C1_MapChangeQuicksand(VM *vm, FieldScriptEnv *env) {
     event = GSYS_GetNowEvent(gsys);
     GameEvent_ChainNext(event, EventMapChangeQuicksand_Create(gsys, field, &effectPos, zoneId, &pos));
     actor = FieldPlayer_GetActor(Field_GetPlayer(field));
-    FldeffGyoe_StartHeld(Field_GetFieldEffects(field), actor, 0, 1);
+    FldeffEmotionBubble_StartHeld(Field_GetFieldEffects(field), actor, 0, 1);
     return TRUE;
 }
 

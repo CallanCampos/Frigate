@@ -1,5 +1,5 @@
-// The rock that breaks into pieces when Rock Smash is used on it. The name is the ROM's own, from GFL_HeapAllocate's
-// file argument ("iwakudaki" is Rock Smash). Function names from swan
+// The rock that breaks into pieces when Rock Smash is used on it. The ROM names it fldeff_iwakudaki.c, by
+// GFL_HeapAllocate's file argument ("iwakudaki" is Rock Smash). Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
 #include "field/field_actor.h"
@@ -33,54 +33,54 @@ typedef struct {
     G3DModel *mdl;
 } RockSmashTask;
 
-static void FldeffIwakudaki_LoadResources(FieldEffectRockSmash *effect);
-static void FldeffIwakudaki_FreeResources(FieldEffectRockSmash *effect);
-static void FldeffIwakudaki_UploadTexturesTask(TCB *tcb, void *data);
-static void FldeffIwakudaki_Init(FieldEffectTask *task, void *work);
-static void FldeffIwakudaki_Exit(FieldEffectTask *task, void *work);
-static void FldeffIwakudaki_Update(FieldEffectTask *task, void *work);
-static void FldeffIwakudaki_Draw(FieldEffectTask *task, void *work);
+static void FldeffRockSmash_LoadResources(FieldEffectRockSmash *effect);
+static void FldeffRockSmash_FreeResources(FieldEffectRockSmash *effect);
+static void FldeffRockSmash_UploadTexturesTask(TCB *tcb, void *data);
+static void FldeffRockSmash_Init(FieldEffectTask *task, void *work);
+static void FldeffRockSmash_Exit(FieldEffectTask *task, void *work);
+static void FldeffRockSmash_Update(FieldEffectTask *task, void *work);
+static void FldeffRockSmash_Draw(FieldEffectTask *task, void *work);
 
 // clang-format off
 static const FieldEffectTaskVTable ROCK_SMASH_TASK_VTABLE = {
     sizeof(RockSmashTask),
-    FldeffIwakudaki_Init,
-    FldeffIwakudaki_Exit,
-    FldeffIwakudaki_Update,
-    FldeffIwakudaki_Draw,
+    FldeffRockSmash_Init,
+    FldeffRockSmash_Exit,
+    FldeffRockSmash_Update,
+    FldeffRockSmash_Draw,
 };
 
 // clang-format on
 
 static u32 ROCK_SMASH_ANM_IDS[ROCK_SMASH_ANM_COUNT] = { 117, 105, 155, 136 };
 
-void *FldeffIwakudaki_Create(FieldEffects *effects, HeapID heapId) {
+void *FldeffRockSmash_Create(FieldEffects *effects, HeapID heapId) {
     FieldEffectRockSmash *effect =
         GFL_HeapAllocate(heapId, sizeof(FieldEffectRockSmash), TRUE, "fldeff_iwakudaki.c", 103);
 
     effect->effects = effects;
-    FldeffIwakudaki_LoadResources(effect);
+    FldeffRockSmash_LoadResources(effect);
     return effect;
 }
 
-void FldeffIwakudaki_Delete(FieldEffects *effects, void *data) {
-    FldeffIwakudaki_FreeResources(data);
+void FldeffRockSmash_Delete(FieldEffects *effects, void *data) {
+    FldeffRockSmash_FreeResources(data);
     GFL_HeapFree(data);
 }
 
-static void FldeffIwakudaki_LoadResources(FieldEffectRockSmash *effect) {
+static void FldeffRockSmash_LoadResources(FieldEffectRockSmash *effect) {
     int i;
     ArcTool *arc = FieldEffects_GetArc(effect->effects);
 
     effect->mdlRes = GFL_G3DSysReadArcToolResource(arc, 77);
     GFL_G3DResSetupTexData(effect->mdlRes);
-    effect->uploadTcb = GFL_VBlankTCBAdd(FldeffIwakudaki_UploadTexturesTask, effect, 0);
+    effect->uploadTcb = GFL_VBlankTCBAdd(FldeffRockSmash_UploadTexturesTask, effect, 0);
     for (i = 0; i < ROCK_SMASH_ANM_COUNT; i++) {
         effect->anmRes[i] = GFL_G3DSysReadArcToolResource(arc, ROCK_SMASH_ANM_IDS[i]);
     }
 }
 
-static void FldeffIwakudaki_FreeResources(FieldEffectRockSmash *effect) {
+static void FldeffRockSmash_FreeResources(FieldEffectRockSmash *effect) {
     int i;
 
     for (i = 0; i < ROCK_SMASH_ANM_COUNT; i++) {
@@ -92,7 +92,7 @@ static void FldeffIwakudaki_FreeResources(FieldEffectRockSmash *effect) {
 }
 
 // Upload the model's textures in the first VBlank
-static void FldeffIwakudaki_UploadTexturesTask(TCB *tcb, void *data) {
+static void FldeffRockSmash_UploadTexturesTask(TCB *tcb, void *data) {
     FieldEffectRockSmash *effect = data;
 
     if (!effect->uploaded) {
@@ -102,7 +102,7 @@ static void FldeffIwakudaki_UploadTexturesTask(TCB *tcb, void *data) {
 }
 
 // Break the rock in front of the actor, loading the effect first if the map hasn't
-void FldeffIwakudaki_Start(FieldActor *actor, FieldEffects *effects) {
+void FldeffRockSmash_Start(FieldActor *actor, FieldEffects *effects) {
     VecFx32 pos;
     RockSmashTaskParams params;
     u32 id;
@@ -119,7 +119,7 @@ void FldeffIwakudaki_Start(FieldActor *actor, FieldEffects *effects) {
     FieldEffects_TCBCreate(effects, &ROCK_SMASH_TASK_VTABLE, NULL, 0, &params, 0);
 }
 
-static void FldeffIwakudaki_Init(FieldEffectTask *task, void *work) {
+static void FldeffRockSmash_Init(FieldEffectTask *task, void *work) {
     int i;
     RockSmashTask *rockTask = work;
     RockSmashTaskParams *params = FieldEffects_GetObjectParam(task);
@@ -136,7 +136,7 @@ static void FldeffIwakudaki_Init(FieldEffectTask *task, void *work) {
     }
 }
 
-static void FldeffIwakudaki_Exit(FieldEffectTask *task, void *work) {
+static void FldeffRockSmash_Exit(FieldEffectTask *task, void *work) {
     int i;
     RockSmashTask *rockTask = work;
 
@@ -148,7 +148,7 @@ static void FldeffIwakudaki_Exit(FieldEffectTask *task, void *work) {
 }
 
 // End once every animation has
-static void FldeffIwakudaki_Update(FieldEffectTask *task, void *work) {
+static void FldeffRockSmash_Update(FieldEffectTask *task, void *work) {
     int i;
     RockSmashTask *rockTask = work;
     BOOL done = TRUE;
@@ -163,7 +163,7 @@ static void FldeffIwakudaki_Update(FieldEffectTask *task, void *work) {
     }
 }
 
-static void FldeffIwakudaki_Draw(FieldEffectTask *task, void *work) {
+static void FldeffRockSmash_Draw(FieldEffectTask *task, void *work) {
     SRTMatrix srt = { { 0, 0, 0 }, { FX32_ONE, FX32_ONE, FX32_ONE } };
     RockSmashTask *rockTask = work;
 

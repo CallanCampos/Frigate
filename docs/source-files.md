@@ -582,13 +582,13 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `fld_scenearea_loader.c` | `0x021a30f8`–`0x021a3664` | 20 | complete | string at `0x021d4fe0` |
 | `field_effect.c` | `0x021a3664`–`0x021a3b34` | 38 | complete | string at `0x021d4ff8` |
 | `fldeff_shadow.c` | `0x021a3b34`–`0x021a3de0` | 9 | complete | string at `0x021d5008` |
-| `fldeff_kemuri.c` | `0x021a3de0`–`0x021a3fd8` | 10 | complete | string at `0x021d5018` |
+| `fldeff_dust.c` | `0x021a3de0`–`0x021a3fd8` | 10 | complete | ROM's `fldeff_kemuri.c`, string at `0x021d5018` |
 | `fldeff_grass.c` | `0x021a3fd8`–`0x021a4384` | 10 | complete | string at `0x021d5050` |
-| `fldeff_namipoke.c` | `0x021a4384`–`0x021a50a4` | 27 | complete | string at `0x021d5060` |
+| `fldeff_surf_pokemon.c` | `0x021a4384`–`0x021a50a4` | 27 | complete | ROM's `fldeff_namipoke.c`, string at `0x021d5060` |
 | `fldeff_encount.c` | `0x021a50a4`–`0x021a5604` | 22 | complete | string at `0x021d50c8` |
-| `fldeff_iwakudaki.c` | `0x021a5604`–`0x021a5828` | 10 | complete | string at `0x021d50ec` |
+| `fldeff_rock_smash.c` | `0x021a5604`–`0x021a5828` | 10 | complete | ROM's `fldeff_iwakudaki.c`, string at `0x021d50ec` |
 | `fldeff_fishing.c` | `0x021a5828`–`0x021a5a18` | 10 | complete | string at `0x021d5104` |
-| `fldeff_fes_kira.c` | `0x021a5a18`–`0x021a5d2c` | 18 | complete | string at `0x021d5124` |
+| `fldeff_fes_sparkle.c` | `0x021a5a18`–`0x021a5d2c` | 18 | complete | ROM's `fldeff_fes_kira.c`, string at `0x021d5124` |
 | `event_trainer_eye.c` | `0x021a5d2c`–`0x021a6668` | 39 | complete | string at `0x021d5138` |
 | `scrcmd_trainer.c` | `0x021a6668`–`0x021a6b80` | 18 | complete | descriptive |
 | `scrcmd_save.c` | `0x021a6b80`–`0x021a6d14` | 3 | complete | descriptive |
@@ -616,7 +616,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `field_rail_func.c` | `0x021b2404`–`0x021b3a3c` | 30 | complete | descriptive |
 | `rail_attr.c` | `0x021b3a3c`–`0x021b3bac` | 13 | complete | string at `0x021d525c` |
 | `field_nogrid_mapper.c` | `0x021b3bac`–`0x021b3e50` | 18 | complete | string at `0x021d5268` |
-| `fldeff_gyoe.c` | `0x021b3e50`–`0x021b427c` | 15 | complete | string at `0x021d5280` |
+| `fldeff_emotion_bubble.c` | `0x021b3e50`–`0x021b427c` | 15 | complete | ROM's `fldeff_gyoe.c`, string at `0x021d5280` |
 | `fieldmap_func.c` | `0x021b427c`–`0x021b445c` | 9 | complete | string at `0x021d5290` |
 | `union_mine_pms.c` | `0x021b445c`–`0x021b46b0` | 4 | complete | descriptive |
 | `fldeff_footmark.c` | `0x021b46b0`–`0x021b496c` | 10 | complete | string at `0x021d5324` |
@@ -650,9 +650,9 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `pleasure_boat.c` | `0x021c2080`–`0x021c229c` | 12 | complete | string at `0x021d557c` |
 | `field_slope_slip.c` | `0x021c229c`–`0x021c24b4` | 14 | complete | descriptive |
 | `field_water_current.c` | `0x021c24b4`–`0x021c2788` | 18 | complete | descriptive |
-| `fldeff_d06denki.c` | `0x021c2788`–`0x021c2cbc` | 23 | complete | string at `0x021d558c` |
+| `fldeff_d06electric.c` | `0x021c2788`–`0x021c2cbc` | 23 | complete | ROM's `fldeff_d06denki.c`, string at `0x021d558c` |
 | `land_data_patch.c` | `0x021c2cbc`–`0x021c2ddc` | 6 | complete | string at `0x021d55a0` |
-| `fldeff_iaigiri.c` | `0x021c2ddc`–`0x021c3180` | 13 | complete | string at `0x021d55c0` |
+| `fldeff_cut.c` | `0x021c2ddc`–`0x021c3180` | 13 | complete | ROM's `fldeff_iaigiri.c`, string at `0x021d55c0` |
 | `party_select_list.c` | `0x021c3180`–`0x021c3c34` | 30 | complete | string at `0x021d55f8` |
 | `field_bbd_color.c` | `0x021c3c34`–`0x021c3d9c` | 6 | complete | string at `0x021d5620` |
 | `comm_entry_menu.c` | `0x021c3d9c`–`0x021c5d7c` | 75 | complete | string at `0x021d5634` |
@@ -673,8 +673,8 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `resort_mapcreate.c` | `0x021c8954`–`0x021c8c34` | 6 | complete | string at `0x021d5744` |
 | `hidden_hollow_generate.c` | `0x021c8c34`–`0x021c8cd0` | 1 | complete | descriptive |
 | `scrcmd_hidden_hollow.c` | `0x021c8cd0`–`0x021c944c` | 18 | complete | descriptive |
-| `fldeff_ochiba.c` | `0x021c944c`–`0x021c97b8` | 12 | complete | string at `0x021d5758` |
-| `scrcmd_ochiba.c` | `0x021c97b8`–`0x021c9eb8` | 22 | complete | string at `0x021d5768` |
+| `fldeff_leaves.c` | `0x021c944c`–`0x021c97b8` | 12 | complete | ROM's `fldeff_ochiba.c`, string at `0x021d5758` |
+| `scrcmd_leaves.c` | `0x021c97b8`–`0x021c9eb8` | 22 | complete | ROM's `scrcmd_ochiba.c`, string at `0x021d5768` |
 
 ### Overlay 50
 

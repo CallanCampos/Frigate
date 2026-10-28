@@ -1,7 +1,7 @@
-#ifndef POKEBW2_FIELD_SCRCMD_OCHIBA_H
-#define POKEBW2_FIELD_SCRCMD_OCHIBA_H
+#ifndef POKEBW2_FIELD_SCRCMD_LEAVES_H
+#define POKEBW2_FIELD_SCRCMD_LEAVES_H
 
-// Overlay 36's scrcmd_ochiba.c: the fallen leaves effect, the Habitat List checks and the Unity Tower commands
+// Overlay 36's scrcmd_leaves.c: the fallen leaves effect, the Habitat List checks and the Unity Tower commands
 
 #include "types.h"
 #include "gfl/tcb.h"
@@ -12,13 +12,13 @@
 typedef struct {
     Field *field;
     FieldPlayer *player;
-} OchibaEffectArgs;
+} LeavesEffectArgs;
 
 typedef struct {
     struct FieldG3DObjSystem *sys;
     u16 resGroup;
     u16 obj;
-} OchibaEffectWork;
+} LeavesEffectWork;
 
 // A Pokémon of a Habitat List page, and where it appears in each part of the day
 typedef struct {
@@ -44,9 +44,9 @@ typedef struct {
 
 extern const HabitatListHeader HABITAT_LIST_HEADERS[57];
 
-void OchibaEffect_Start(OchibaEffectArgs *args);
-void OchibaEffect_UpdateTCB(TCB *tcb, void *data);
+void LeavesEffect_Start(LeavesEffectArgs *args);
+void LeavesEffect_UpdateTCB(TCB *tcb, void *data);
 u8 GetPWTSeason(const WbtSystem *wbt);
 BOOL CheckHabitatList(const HabitatList *list, PokeDexSave *pokedex, u8 time, u32 caught);
 
-#endif // POKEBW2_FIELD_SCRCMD_OCHIBA_H
+#endif // POKEBW2_FIELD_SCRCMD_LEAVES_H

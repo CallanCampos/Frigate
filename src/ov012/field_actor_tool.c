@@ -340,7 +340,7 @@ void ActorTerrainEffect_Footmark(FieldActor *actor, ActorTerrainEffectParam *par
 
 void ActorTerrainEffect_FallenLeaves(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (MapTile_IsFallenLeaves(param->tileClassOrigY) == TRUE) {
-        FldeffOchiba_Start(param->effects, actor);
+        FldeffLeaves_Start(param->effects, actor);
     }
 }
 
@@ -409,7 +409,7 @@ void ActorTerrainEffect_UpdateShadowVisible(FieldActor *actor, ActorTerrainEffec
 
 void ActorTerrainEffect_LandingDust(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (!(param->tileFlags & 2) && FldAct_IsLandingDustDisabled(actor) == FALSE) {
-        FldeffKemuri_Start(actor, param->effects);
+        FldeffDust_Start(actor, param->effects);
     }
 }
 
@@ -470,7 +470,7 @@ void ActorTerrainEffect_UpdateReflection(FieldActor *actor, ActorTerrainEffectPa
 
 void ActorTerrainEffect_ElectricField(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (MapTile_IsElectricField(param->tileClass) == TRUE) {
-        D06Denki_StartSpark(actor, param->effects);
+        D06Electric_StartSpark(actor, param->effects);
     }
 }
 

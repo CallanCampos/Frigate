@@ -455,7 +455,7 @@ static GameEventReturnCode EventQuicksandArrive_RunSpinZoomSmoke(GameEvent *even
         break;
     case 4:
         if (FieldTaskManager_IsIdle(taskManager)) {
-            FldeffKemuri_Start(FieldPlayer_GetActor(Field_GetPlayer(field)), Field_GetFieldEffects(field));
+            FldeffDust_Start(FieldPlayer_GetActor(Field_GetPlayer(field)), Field_GetFieldEffects(field));
             (*state)++;
         }
         break;
@@ -509,7 +509,7 @@ static GameEventReturnCode EventPlayerSpinDown_Callback(GameEvent *event, u32 *s
         }
         break;
     case 2:
-        FldeffKemuri_Start(FieldPlayer_GetActor(Field_GetPlayer(field)), Field_GetFieldEffects(wk->field));
+        FldeffDust_Start(FieldPlayer_GetActor(Field_GetPlayer(field)), Field_GetFieldEffects(wk->field));
         GFL_SndSEPlay(SEQ_SE_FLD_10);
         (*state)++;
         break;
@@ -718,7 +718,7 @@ static GameEventReturnCode EventQuicksandDrawIn_Callback(GameEvent *event, u32 *
             FldAct_SetAcmd(actor, 0x27);
         }
         if (wk->frame++ % 10 == 0) {
-            FldeffKemuri_Start(actor, effects);
+            FldeffDust_Start(actor, effects);
         }
         if (FieldTaskManager_IsIdle(Field_GetTaskManager(wk->field))) {
             *state = 4;

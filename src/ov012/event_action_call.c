@@ -177,7 +177,7 @@ GameEventReturnCode EventActorJump_Callback(GameEvent *event, u32 *state, void *
             position.z = work->start.z + work->displacement.z;
             SetActorWPosAll(work->actor, &position, GetActorFaceDir(work->actor));
             GFL_SndSEPlay(0x67b);
-            FldeffKemuri_Start(work->actor, work->effects);
+            FldeffDust_Start(work->actor, work->effects);
         }
         break;
     }

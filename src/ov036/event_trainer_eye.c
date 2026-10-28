@@ -381,13 +381,13 @@ static BOOL EventTrainerEyeSub_WaitTurnTrainer(EventTrainerEyeWork *work) {
 
 // The exclamation mark over the Trainer
 static BOOL EventTrainerEyeSub_StartTerrainEffect(EventTrainerEyeWork *work) {
-    work->emote = FldeffGyoe_SetMMdl(Field_GetFieldEffects(work->field), work->data.actor, 0, 0);
+    work->emote = FldeffEmotionBubble_SetMMdl(Field_GetFieldEffects(work->field), work->data.actor, 0, 0);
     work->seq = TRAINER_EYE_SEQ_WAIT_TERRAIN_EFFECT;
     return FALSE;
 }
 
 static BOOL EventTrainerEyeSub_WaitTerrainEffect(EventTrainerEyeWork *work) {
-    if (FldeffGyoe_IsFinished(work->emote) == TRUE) {
+    if (FldeffEmotionBubble_IsFinished(work->emote) == TRUE) {
         FieldEffects_DeleteObject(work->emote);
         work->seq = TRAINER_EYE_SEQ_WAIT_30F;
     }

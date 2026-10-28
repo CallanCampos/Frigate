@@ -220,7 +220,7 @@ static void RailSlipdown_Task(TCB *tcb, void *data) {
                     work->start.z + FX_Mul(work->dir.z, dist));
             // Dust every other frame
             if (work->frame % 2 == 0) {
-                FldeffKemuri_Start(work->actor, work->effects);
+                FldeffDust_Start(work->actor, work->effects);
             }
         }
         if (work->player != NULL) {

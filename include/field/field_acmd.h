@@ -27,8 +27,8 @@ enum {
     ACMD_STAY_WALK_2F = 0x28,
     ACMD_JUMP_1 = 0x34,
     ACMD_JUMP_2 = 0x38,
-    // The "!" bubble over the actor (fldeff_gyoe.c's kind 0) with its sound; one command, for no direction
-    ACMD_GYOE = 0x4b,
+    // The "!" bubble over the actor (fldeff_emotion_bubble.c's kind 0) with its sound; one command, for no direction
+    ACMD_EMOTION_BUBBLE = 0x4b,
     ACMD_WALK_UPHILL_4F = 0x4c,
     ACMD_DASH = 0x58,
     ACMD_BIKE_DEEP_SAND = 0x9b,

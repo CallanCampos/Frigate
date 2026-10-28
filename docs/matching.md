@@ -323,7 +323,7 @@ Same instructions, registers swapped.
   position in a `u16` local, which a `u32` local moved to the lowest slot.
 - A constant built from another follows the store order: with `bob = FX32_ONE;` written before
   `bobSpeed = FX32_CONST(0.25);`, MWCC builds 0x1000 and gets 0x400 from it with `lsrs #2`; in the other order it
-  builds 0x400 and shifts it left. `fldeff_namipoke.c`'s surfing Pokémon sets its bobbing so.
+  builds 0x400 and shifts it left. `fldeff_surf_pokemon.c`'s surfing Pokémon sets its bobbing so.
 - A call's result passed straight to a narrower parameter is copied to the argument register and narrowed there (`adds
   r1, r0, #0; lsls r1, r1, #0x18; lsrs r1, r1, #0x18`). Narrowed in `r0` and shifted into the argument register (`lsls
   r0, r0, #0x18; lsrs r1, r0, #0x18`), it went through a `u8` or `u16` local first, as `u8 targetId =
@@ -1657,7 +1657,7 @@ Same instructions, scheduled in another order.
   and divided at each call, `GFL_BitmapCreate(width / 8, height / 8, ...)`; `u32` locals holding the quotients load
   it first.
 - A global's address that the original loads early, into a saved register before unrelated calls, and copies from
-  later was taken into a pointer local where it is loaded: `fldeff_gyoe.c`'s draw loads `&NNS_G3dGlb.projMtx` before
+  later was taken into a pointer local where it is loaded: `fldeff_emotion_bubble.c`'s draw loads `&NNS_G3dGlb.projMtx` before
   the float calls of its depth offset only as `const MtxFx44 *proj = NNS_G3dGlbGetProjectionMtx();` declared first
   and `saved = *proj;` after the offset. `saved = NNS_G3dGlb.projMtx;`, with or without the offset in a local first,
   loads the address after the calls into another register. A static table's address that MWCC gathers into a saved
@@ -2229,7 +2229,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `UpdateWeatherToDefault` keeps `int nowWeather = (u16)GetNowWeather(gameData);` for its `== 6 || == 7` test.
 - On a `u16`, `x == A || x == A + 1` compiles to `adds x, #(u16)-A` (the negated constant from the literal pool,
   `0xff60` for 0xa0), `lsl/lsr #16; cmp #1; bhi`. `(u16)(x - A) <= 1` gives `subs` instead, and `x >= A && x <= A + 1`
-  two compares. `fldeff_namipoke.c` tests the actor's object code so.
+  two compares. `fldeff_surf_pokemon.c` tests the actor's object code so.
 - A callee that narrows its result in its body (`lsl #24; lsr #24`) can still return `u32`, with the value in a `u8`
   local: the caller narrowing the result again shows it, as `event_mapchange.c` does for `season.c`'s
   `Season_GetRealTime`.
@@ -4209,7 +4209,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   emit", above).
 - The linker starts each `.rodata` section on a 4-byte boundary, whatever the section's own alignment, so a 6-byte
   `u16` table followed by a `u8` initializer leaves 2 bytes of padding between them, as at the start of
-  `btl_server_flow.c`'s `.rodata`. `scrcmd_ochiba.c`'s 150-byte and 342-byte tables, both 2-aligned, end where only
+  `btl_server_flow.c`'s `.rodata`. `scrcmd_leaves.c`'s 150-byte and 342-byte tables, both 2-aligned, end where only
   this layout puts them.
 - The list that is heapsorted holds the file's `.data` tables as well as its `.rodata` objects, so a `.data` table's
   declaration reorders `.rodata` objects of the same size, and `rodata_order.py` predicts the layout only when it is

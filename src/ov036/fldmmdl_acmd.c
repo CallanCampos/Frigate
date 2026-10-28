@@ -1265,15 +1265,15 @@ static void FieldAcmdTCB_MarkWaitInit(FieldActor *actor, u32 kind, u32 unused, B
     AcmdEffectWork *work = FldAct_InitMoveCmdWork(actor, 8);
 
     work->kind = kind;
-    work->task =
-        FldeffGyoe_SetMMdl(Field_GetFieldEffects(GetMMSysField(GetActorMModelSystem(actor))), actor, kind, playSE);
+    work->task = FldeffEmotionBubble_SetMMdl(Field_GetFieldEffects(GetMMSysField(GetActorMModelSystem(actor))), actor,
+                                             kind, playSE);
     FieldActor_NextAcmdState(actor);
 }
 
 static BOOL FieldAcmdTCB_MarkWait(FieldActor *actor) {
     AcmdEffectWork *work = FldAct_GetMoveCmdWork(actor);
 
-    if (FldeffGyoe_IsFinished(work->task) == TRUE) {
+    if (FldeffEmotionBubble_IsFinished(work->task) == TRUE) {
         FieldEffects_DeleteObject(work->task);
         FieldActor_NextAcmdState(actor);
         return TRUE;

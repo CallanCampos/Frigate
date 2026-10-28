@@ -45,7 +45,7 @@
 #include "field/player_state.h"
 #include "field/pleasure_boat.h"
 #include "field/resort_mapcreate.h"
-#include "field/scrcmd_ochiba.h"
+#include "field/scrcmd_leaves.h"
 #include "field/subscreen.h"
 #include "field/union_eff.h"
 #include "field/union_main.h"

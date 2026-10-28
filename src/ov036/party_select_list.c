@@ -29,7 +29,7 @@
 
 struct PartySelectList {
     Field *field;
-    PokeParty *temoti;
+    PokeParty *playerParty;
     PokeParty *bbox;
     HeapID heapId;
     int partyOk;
@@ -108,16 +108,17 @@ static const ListMenuRequest sPartySelectRequest = {
     .height = 6,
 };
 
-PartySelectList *PartySelectList_Create(Field *field, PokeParty *temoti, PokeParty *bbox, u8 partyOk, u32 bboxOk,
+PartySelectList *PartySelectList_Create(Field *field, PokeParty *playerParty, PokeParty *bbox, u8 partyOk, u32 bboxOk,
                                         HeapID heapId) {
     PartySelectList *psl;
 
-    // clang-format off
-    GFL_ASSERT(temoti != NULL && bbox != NULL);
-    // clang-format on
+    // GFL_ASSERT written out: the game prints Game Freak's name for playerParty, temoti
+    if (!(playerParty != NULL && bbox != NULL)) {
+        GFL_DebugAssertFail("", 0, "temoti != NULL && bbox != NULL");
+    }
     psl = GFL_HeapAllocate(heapId, sizeof(PartySelectList), TRUE, "party_select_list.c", 211);
     psl->field = field;
-    psl->temoti = temoti;
+    psl->playerParty = playerParty;
     psl->bbox = bbox;
     psl->heapId = heapId;
     psl->partyOk = partyOk;
@@ -211,10 +212,10 @@ static void PartySelectList_LoadIconResources(PartySelectList *psl) {
 
     psl->iconPalette = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 192, psl->heapId);
     psl->iconCells = ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), psl->heapId);
-    count = PokeParty_GetPkmCount(psl->temoti);
+    count = PokeParty_GetPkmCount(psl->playerParty);
     for (i = 0; i < count; i++) {
         psl->partyChars[i] = ClActSys_LoadChars(
-            arc, PokeIcon_GetFileOfPkm(PokeParty_GetBoxPkm(PokeParty_GetPkm(psl->temoti, i))), 0, 0, psl->heapId);
+            arc, PokeIcon_GetFileOfPkm(PokeParty_GetBoxPkm(PokeParty_GetPkm(psl->playerParty, i))), 0, 0, psl->heapId);
     }
     if (psl->bbox != NULL) {
         count = PokeParty_GetPkmCount(psl->bbox);
@@ -236,7 +237,7 @@ static void PartySelectList_FreeIconResources(PartySelectList *psl) {
             ClActSys_FreeChars(psl->bboxChars[i]);
         }
     }
-    count = PokeParty_GetPkmCount(psl->temoti);
+    count = PokeParty_GetPkmCount(psl->playerParty);
     for (i = 0; i < count; i++) {
         ClActSys_FreeChars(psl->partyChars[i]);
     }
@@ -246,7 +247,7 @@ static void PartySelectList_FreeIconResources(PartySelectList *psl) {
 
 static void PartySelectList_CreateIcons(PartySelectList *psl) {
     ClActorSetup setup = { 0, 32, 0, 21, 0 };
-    int count = PokeParty_GetPkmCount(psl->temoti);
+    int count = PokeParty_GetPkmCount(psl->playerParty);
     int bboxCount;
     u32 species;
     u32 form;
@@ -263,7 +264,7 @@ static void PartySelectList_CreateIcons(PartySelectList *psl) {
         setup.x = i * 40 + 24;
         psl->partyIcons[i] =
             ClActor_Create(psl->unit, psl->partyChars[i], psl->iconPalette, psl->iconCells, &setup, 0, psl->heapId);
-        pkm = PokeParty_GetPkm(psl->temoti, i);
+        pkm = PokeParty_GetPkm(psl->playerParty, i);
         species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
         form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
         if (PokeParty_GetParam(pkm, PKM_PARAM_LEGAL_SPECIES, NULL) == SPECIES_EGG) {
@@ -304,7 +305,7 @@ static void PartySelectList_CreateIcons(PartySelectList *psl) {
 }
 
 static void PartySelectList_DeleteIcons(PartySelectList *psl) {
-    int count = PokeParty_GetPkmCount(psl->temoti);
+    int count = PokeParty_GetPkmCount(psl->playerParty);
     int i;
 
     for (i = 0; i < count; i++) {
@@ -363,11 +364,11 @@ static void PartySelectList_FreeItemResources(PartySelectList *psl) {
 
 static void PartySelectList_CreateItemIcons(PartySelectList *psl) {
     ClActorSetup setup = { 0, 40, 0, 20, 0 };
-    int count = PokeParty_GetPkmCount(psl->temoti);
+    int count = PokeParty_GetPkmCount(psl->playerParty);
     int i;
 
     for (i = 0; i < count; i++) {
-        u32 item = PokeParty_GetParam(PokeParty_GetPkm(psl->temoti, i), PKM_PARAM_ITEM, NULL);
+        u32 item = PokeParty_GetParam(PokeParty_GetPkm(psl->playerParty, i), PKM_PARAM_ITEM, NULL);
 
         if (item != ITEM_NONE) {
             if (PML_ItemIsMail(item) == TRUE) {
@@ -402,7 +403,7 @@ static void PartySelectList_CreateItemIcons(PartySelectList *psl) {
 }
 
 static void PartySelectList_DeleteItemIcons(PartySelectList *psl) {
-    int count = PokeParty_GetPkmCount(psl->temoti);
+    int count = PokeParty_GetPkmCount(psl->playerParty);
     int i;
 
     for (i = 0; i < count; i++) {
@@ -580,7 +581,7 @@ static void PartySelectList_ShowPreview(PartySelectList *psl, u32 mode) {
     PokeParty *party;
 
     if (mode == 0) {
-        party = psl->temoti;
+        party = psl->playerParty;
     } else {
         party = psl->bbox;
     }

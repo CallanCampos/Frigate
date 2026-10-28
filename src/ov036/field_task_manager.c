@@ -672,7 +672,7 @@ static BOOL FieldActorFallTask_Callback(void *work) {
         FieldActorFallTask_CalcFallPos(&pos, data->frame, data->duration, data->height);
         SetActorWPosOffset(actor, &pos);
         if (data->duration <= data->frame) {
-            FldeffKemuri_Start(actor, Field_GetFieldEffects(data->field));
+            FldeffDust_Start(actor, Field_GetFieldEffects(data->field));
             GFL_SndSEPlay(SEQ_SE_FLD_17);
             return TRUE;
         }
@@ -936,7 +936,7 @@ static BOOL FieldActorEffectTask_Callback(void *work) {
 
     if (data->state == 0) {
         if (data->frame % data->interval == 0) {
-            FldeffIwakudaki_Start(data->actor, data->effects);
+            FldeffRockSmash_Start(data->actor, data->effects);
         }
         if (data->duration <= data->frame++) {
             return TRUE;

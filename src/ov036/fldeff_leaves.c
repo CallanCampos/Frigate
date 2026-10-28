@@ -1,5 +1,5 @@
-// The fallen leaves an actor kicks up, and the player sinking into a pile of leaves. The name is the ROM's own, from
-// GFL_HeapAllocate's file argument ("ochiba" is fallen leaves). Function names from swan
+// The fallen leaves an actor kicks up, and the player sinking into a pile of leaves. The ROM names it fldeff_ochiba.c,
+// by GFL_HeapAllocate's file argument ("ochiba" is fallen leaves). Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except the FldeffOchiba_ functions, which are ours
 #include "types.h"
 #include "field/field.h"
@@ -8,7 +8,7 @@
 #include "field/field_g3dobj.h"
 #include "field/field_player.h"
 #include "field/field_script.h"
-#include "field/scrcmd_ochiba.h"
+#include "field/scrcmd_leaves.h"
 #include "gfl/calctool.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
@@ -20,25 +20,25 @@
 typedef struct {
     FieldEffects *effects;
     u16 resGroup;
-} FieldEffectOchiba;
+} FieldEffectLeaves;
 
 // What a leaf effect starts from
 typedef struct {
-    FieldEffectOchiba *effect;
+    FieldEffectLeaves *effect;
     FieldActor *actor;
     u16 dir;
     VecFx32 pos;
-} OchibaTaskParams;
+} LeavesTaskParams;
 
 typedef struct {
-    FieldEffectOchiba *effect;
+    FieldEffectLeaves *effect;
     FieldG3DObjSystem *objSys;
     u16 objIdx;
     u16 dir;
-} OchibaTask;
+} LeavesTask;
 
 typedef struct {
-    OchibaEffectArgs args;
+    LeavesEffectArgs args;
     u32 unk8;
     u32 unkC;
     u16 frames;
@@ -47,33 +47,33 @@ typedef struct {
     fx32 speed;
 } LeafPileStuckWork;
 
-static void FldeffOchiba_LoadResource(FieldEffectOchiba *effect);
-static void FldeffOchiba_FreeResource(FieldEffectOchiba *effect);
-static void FldeffOchiba_Init(FieldEffectTask *task, void *work);
-static void FldeffOchiba_Exit(FieldEffectTask *task, void *work);
-static void FldeffOchiba_Update(FieldEffectTask *task, void *work);
-static void FldeffOchiba_Draw(FieldEffectTask *task, void *work);
+static void FldeffLeaves_LoadResource(FieldEffectLeaves *effect);
+static void FldeffLeaves_FreeResource(FieldEffectLeaves *effect);
+static void FldeffLeaves_Init(FieldEffectTask *task, void *work);
+static void FldeffLeaves_Exit(FieldEffectTask *task, void *work);
+static void FldeffLeaves_Update(FieldEffectTask *task, void *work);
+static void FldeffLeaves_Draw(FieldEffectTask *task, void *work);
 static GameEvent *EventLeafPileStuck_Create(GameEvent *parent, GameSystem *gsys);
 static GameEventReturnCode EventLeafPileStuck_Callback(GameEvent *event, u32 *state, void *data);
 
-static const FieldEffectTaskVTable OCHIBA_TASK_VTABLE = {
-    sizeof(OchibaTask), FldeffOchiba_Init, FldeffOchiba_Exit, FldeffOchiba_Update, FldeffOchiba_Draw,
+static const FieldEffectTaskVTable LEAVES_TASK_VTABLE = {
+    sizeof(LeavesTask), FldeffLeaves_Init, FldeffLeaves_Exit, FldeffLeaves_Update, FldeffLeaves_Draw,
 };
 
-void *FldeffOchiba_Create(FieldEffects *effects, HeapID heapId) {
-    FieldEffectOchiba *effect = GFL_HeapAllocate(heapId, sizeof(FieldEffectOchiba), TRUE, "fldeff_ochiba.c", 109);
+void *FldeffLeaves_Create(FieldEffects *effects, HeapID heapId) {
+    FieldEffectLeaves *effect = GFL_HeapAllocate(heapId, sizeof(FieldEffectLeaves), TRUE, "fldeff_ochiba.c", 109);
 
     effect->effects = effects;
-    FldeffOchiba_LoadResource(effect);
+    FldeffLeaves_LoadResource(effect);
     return effect;
 }
 
-void FldeffOchiba_Delete(FieldEffects *effects, void *data) {
-    FldeffOchiba_FreeResource(data);
+void FldeffLeaves_Delete(FieldEffects *effects, void *data) {
+    FldeffLeaves_FreeResource(data);
     GFL_HeapFree(data);
 }
 
-static void FldeffOchiba_LoadResource(FieldEffectOchiba *effect) {
+static void FldeffLeaves_LoadResource(FieldEffectLeaves *effect) {
     FieldG3DObjResRequest request;
     FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(effect->effects);
     ArcTool *arc = FieldEffects_GetArc(effect->effects);
@@ -85,14 +85,14 @@ static void FldeffOchiba_LoadResource(FieldEffectOchiba *effect) {
     effect->resGroup = FieldG3DObjSystem_AddResGroup(objSys, &request, FALSE);
 }
 
-static void FldeffOchiba_FreeResource(FieldEffectOchiba *effect) {
+static void FldeffLeaves_FreeResource(FieldEffectLeaves *effect) {
     FieldG3DObjSystem_FreeResGroup(FieldEffects_GetFieldMapData(effect->effects), effect->resGroup);
 }
 
 // Leaves under the actor, which face the way it does
-void FldeffOchiba_Start(FieldEffects *effects, FieldActor *actor) {
+void FldeffLeaves_Start(FieldEffects *effects, FieldActor *actor) {
     VecFx32 pos;
-    OchibaTaskParams params;
+    LeavesTaskParams params;
     fx32 height;
     s16 gx = GetGPosX(actor);
     s16 gz = GetGPosZ(actor);
@@ -108,48 +108,48 @@ void FldeffOchiba_Start(FieldEffects *effects, FieldActor *actor) {
     params.actor = actor;
     params.pos = pos;
     params.dir = dir;
-    FieldEffects_TCBCreate(effects, &OCHIBA_TASK_VTABLE, &params.pos, 0, &params, 0);
+    FieldEffects_TCBCreate(effects, &LEAVES_TASK_VTABLE, &params.pos, 0, &params, 0);
 }
 
-static void FldeffOchiba_Init(FieldEffectTask *task, void *work) {
-    OchibaTask *ochibaTask = work;
-    OchibaTaskParams *params = FieldEffects_GetObjectParam(task);
-    FieldEffectOchiba *effect = params->effect;
+static void FldeffLeaves_Init(FieldEffectTask *task, void *work) {
+    LeavesTask *leavesTask = work;
+    LeavesTaskParams *params = FieldEffects_GetObjectParam(task);
+    FieldEffectLeaves *effect = params->effect;
     FieldG3DObjSystem *objSys;
 
-    ochibaTask->effect = effect;
+    leavesTask->effect = effect;
     objSys = FieldEffects_GetFieldMapData(effect->effects);
-    ochibaTask->dir = params->dir;
-    ochibaTask->objSys = objSys;
+    leavesTask->dir = params->dir;
+    leavesTask->objSys = objSys;
     FieldEffects_SetObjectPos(task, &params->pos);
-    ochibaTask->objIdx = FieldG3DObjSystem_AddObj(objSys, ochibaTask->effect->resGroup, 0, &params->pos);
-    FieldG3DObjSystem_SetObjectManualDraw(objSys, ochibaTask->objIdx, TRUE);
+    leavesTask->objIdx = FieldG3DObjSystem_AddObj(objSys, leavesTask->effect->resGroup, 0, &params->pos);
+    FieldG3DObjSystem_SetObjectManualDraw(objSys, leavesTask->objIdx, TRUE);
 }
 
-static void FldeffOchiba_Exit(FieldEffectTask *task, void *work) {
-    OchibaTask *ochibaTask = work;
+static void FldeffLeaves_Exit(FieldEffectTask *task, void *work) {
+    LeavesTask *leavesTask = work;
 
-    FieldG3DObjSystem_FreeObj(ochibaTask->objSys, ochibaTask->objIdx);
+    FieldG3DObjSystem_FreeObj(leavesTask->objSys, leavesTask->objIdx);
 }
 
 // End when the animation does
-static void FldeffOchiba_Update(FieldEffectTask *task, void *work) {
-    OchibaTask *ochibaTask = work;
+static void FldeffLeaves_Update(FieldEffectTask *task, void *work) {
+    LeavesTask *leavesTask = work;
 
-    if (!FieldG3DObjSystem_StepObjAnm(ochibaTask->objSys, ochibaTask->objIdx, FX32_ONE)) {
+    if (!FieldG3DObjSystem_StepObjAnm(leavesTask->objSys, leavesTask->objIdx, FX32_ONE)) {
         FieldEffects_DeleteObject(task);
     }
 }
 
-static void FldeffOchiba_Draw(FieldEffectTask *task, void *work) {
-    OchibaTask *ochibaTask = work;
+static void FldeffLeaves_Draw(FieldEffectTask *task, void *work) {
+    LeavesTask *leavesTask = work;
     u16 rotations[4][3] = { { 0, 0xc000, 0 }, { 0, 0x4000, 0 }, { 0, 0, 0 }, { 0, 0x8000, 0 } };
-    u16 *rot = rotations[ochibaTask->dir];
-    SRTMatrix *srt = FieldG3DObjSystem_GetObjTransform(ochibaTask->objSys, ochibaTask->objIdx);
+    u16 *rot = rotations[leavesTask->dir];
+    SRTMatrix *srt = FieldG3DObjSystem_GetObjTransform(leavesTask->objSys, leavesTask->objIdx);
 
     MAT3_RotationEulerZYX(rot[0], rot[1], rot[2], &srt->rotation);
     FieldEffects_GetObjectPos(task, &srt->translation);
-    FieldG3DObjSystem_DrawObj(ochibaTask->objSys, ochibaTask->objIdx);
+    FieldG3DObjSystem_DrawObj(leavesTask->objSys, leavesTask->objIdx);
 }
 
 BOOL s02AC_CallLeafPileStuck(VM *vm, FieldScriptEnv *env) {
@@ -198,7 +198,7 @@ static GameEventReturnCode EventLeafPileStuck_Callback(GameEvent *event, u32 *st
         *state = 2;
         break;
     case 2:
-        OchibaEffect_Start(&work->args);
+        LeavesEffect_Start(&work->args);
         *state = 3;
     case 3:
         work->y -= work->speed;

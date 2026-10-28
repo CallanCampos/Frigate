@@ -1,7 +1,6 @@
-// The electric effects of Chargestone Cave (d06denki): the sparks over a stone and the glow of a stone's mark. The name
-// is the ROM's own, from GFL_HeapAllocate's file argument.
-// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
-// Additional helper and table names are our descriptive guesses.
+// The electric effects of Chargestone Cave (d06denki): the sparks over a stone and the glow of a stone's mark. The ROM
+// names it fldeff_d06denki.c, by GFL_HeapAllocate's file argument. Names from swan
+// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0). Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "constants/sound.h"
 #include "field/field_actor.h"
@@ -11,26 +10,26 @@
 #include "gfl/sound.h"
 #include "nitro/fx.h"
 
-#define D06DENKI_MDL_COUNT 4
-#define D06DENKI_ANM_COUNT 5
+#define D06ELECTRIC_MDL_COUNT 4
+#define D06ELECTRIC_ANM_COUNT 5
 
 typedef struct {
     FieldEffects *effects;
-    G3DResource *mdlRes[D06DENKI_MDL_COUNT];
-    G3DResource *anmRes[D06DENKI_ANM_COUNT];
+    G3DResource *mdlRes[D06ELECTRIC_MDL_COUNT];
+    G3DResource *anmRes[D06ELECTRIC_ANM_COUNT];
     G3DAnimation *anm;
     G3DModel *mdl;
     G3DActor *actor;
-} FieldEffectD06Denki;
+} FieldEffectD06Electric;
 
 // What the sparks over a stone start from
 typedef struct {
-    FieldEffectD06Denki *effect;
+    FieldEffectD06Electric *effect;
     VecFx32 pos;
 } SparkTaskParams;
 
 typedef struct {
-    FieldEffectD06Denki *effect;
+    FieldEffectD06Electric *effect;
     fx32 frame;
     // Set once the sparks' animation has ended
     BOOL done;
@@ -38,13 +37,13 @@ typedef struct {
 
 // What a stone's effect starts from
 typedef struct {
-    FieldEffectD06Denki *effect;
+    FieldEffectD06Electric *effect;
     VecFx32 pos;
     FieldActor *actor;
 } StoneTaskParams;
 
 typedef struct {
-    FieldEffectD06Denki *effect;
+    FieldEffectD06Electric *effect;
     VecFx32 pos;
     FieldActor *actor;
     u8 paused;
@@ -59,7 +58,7 @@ typedef struct {
 } StoneTask;
 
 typedef struct {
-    FieldEffectD06Denki *effect;
+    FieldEffectD06Electric *effect;
     VecFx32 pos;
     u8 lit;
     G3DActor *actor;
@@ -67,8 +66,8 @@ typedef struct {
     G3DModel *mdl;
 } MarkTask;
 
-static void D06Denki_LoadResources(FieldEffectD06Denki *effect);
-static void D06Denki_FreeResources(FieldEffectD06Denki *effect);
+static void D06Electric_LoadResources(FieldEffectD06Electric *effect);
+static void D06Electric_FreeResources(FieldEffectD06Electric *effect);
 void FieldTerrainEffectElec_Init(FieldEffectTask *task, void *work);
 static void SparkTask_Exit(FieldEffectTask *task, void *work);
 static void SparkTask_Update(FieldEffectTask *task, void *work);
@@ -83,29 +82,30 @@ static void MarkTask_Update(FieldEffectTask *task, void *work);
 static void MarkTask_Draw(FieldEffectTask *task, void *work);
 
 void *StoneTask_Create(FieldEffects *effects, HeapID heapId) {
-    FieldEffectD06Denki *effect = GFL_HeapAllocate(heapId, sizeof(FieldEffectD06Denki), TRUE, "fldeff_d06denki.c", 169);
+    FieldEffectD06Electric *effect =
+        GFL_HeapAllocate(heapId, sizeof(FieldEffectD06Electric), TRUE, "fldeff_d06denki.c", 169);
 
     effect->effects = effects;
-    D06Denki_LoadResources(effect);
+    D06Electric_LoadResources(effect);
     return effect;
 }
 
-void D06Denki_Delete(FieldEffects *effects, void *data) {
-    D06Denki_FreeResources(data);
+void D06Electric_Delete(FieldEffects *effects, void *data) {
+    D06Electric_FreeResources(data);
     GFL_HeapFree(data);
 }
 
-static void D06Denki_LoadResources(FieldEffectD06Denki *effect) {
-    u32 mdlIds[D06DENKI_MDL_COUNT] = { 80, 78, 79, 81 };
-    u32 anmIds[D06DENKI_ANM_COUNT] = { 106, 124, 125, 126, 127 };
+static void D06Electric_LoadResources(FieldEffectD06Electric *effect) {
+    u32 mdlIds[D06ELECTRIC_MDL_COUNT] = { 80, 78, 79, 81 };
+    u32 anmIds[D06ELECTRIC_ANM_COUNT] = { 106, 124, 125, 126, 127 };
     u32 i;
     ArcTool *arc = FieldEffects_GetArc(effect->effects);
 
-    for (i = 0; i < D06DENKI_MDL_COUNT; i++) {
+    for (i = 0; i < D06ELECTRIC_MDL_COUNT; i++) {
         effect->mdlRes[i] = GFL_G3DSysReadArcToolResource(arc, mdlIds[i]);
         GFL_G3DResUploadTexData(effect->mdlRes[i]);
     }
-    for (i = 0; i < D06DENKI_ANM_COUNT; i++) {
+    for (i = 0; i < D06ELECTRIC_ANM_COUNT; i++) {
         effect->anmRes[i] = GFL_G3DSysReadArcToolResource(arc, anmIds[i]);
     }
     effect->mdl = GFL_G3DMdlCreate(effect->mdlRes[0], 0, effect->mdlRes[0]);
@@ -114,17 +114,17 @@ static void D06Denki_LoadResources(FieldEffectD06Denki *effect) {
     GFL_G3DActorBindAnm(effect->actor, 0);
 }
 
-static void D06Denki_FreeResources(FieldEffectD06Denki *effect) {
+static void D06Electric_FreeResources(FieldEffectD06Electric *effect) {
     u32 i;
 
     GFL_G3DAnmFree(effect->anm);
     GFL_G3DActorFree(effect->actor);
     GFL_G3DMdlFree(effect->mdl);
-    for (i = 0; i < D06DENKI_MDL_COUNT; i++) {
+    for (i = 0; i < D06ELECTRIC_MDL_COUNT; i++) {
         GFL_G3DResFreeTexData(effect->mdlRes[i]);
         GFL_G3DResFree(effect->mdlRes[i]);
     }
-    for (i = 0; i < D06DENKI_ANM_COUNT; i++) {
+    for (i = 0; i < D06ELECTRIC_ANM_COUNT; i++) {
         GFL_G3DResFree(effect->anmRes[i]);
     }
 }
@@ -141,7 +141,7 @@ static const FieldEffectTaskVTable MARK_TASK_VTABLE = {
     sizeof(MarkTask), MarkTask_Init, MarkTask_Delete, MarkTask_Update, MarkTask_Draw,
 };
 
-void D06Denki_StartSpark(FieldActor *actor, FieldEffects *effects) {
+void D06Electric_StartSpark(FieldActor *actor, FieldEffects *effects) {
     VecFx32 pos;
     SparkTaskParams params;
 

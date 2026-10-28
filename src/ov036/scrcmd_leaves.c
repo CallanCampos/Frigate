@@ -1,3 +1,4 @@
+// The ROM names this file scrcmd_ochiba.c.
 // GetPWTTournamentInfo and PWT_TOURNAMENT_INFO are our descriptive names for the tournament metadata.
 
 #include "types.h"
@@ -14,7 +15,7 @@
 #include "field/field_pokemon_form.h"
 #include "field/field_script.h"
 #include "field/medal.h"
-#include "field/scrcmd_ochiba.h"
+#include "field/scrcmd_leaves.h"
 #include "field/unity_tower.h"
 #include "field/wbt.h"
 #include "gfl/arc.h"
@@ -81,9 +82,9 @@ const HabitatListHeader HABITAT_LIST_HEADERS[57] = {
 
 // clang-format on
 
-void OchibaEffect_Start(OchibaEffectArgs *args) {
+void LeavesEffect_Start(LeavesEffectArgs *args) {
     TCBManager *tcbManager = Field_GetTCBMgr(args->field);
-    OchibaEffectWork *work = GFL_HeapAllocate(HEAPID_TAIL(Field_GetHeapID(args->field)), sizeof(OchibaEffectWork), TRUE,
+    LeavesEffectWork *work = GFL_HeapAllocate(HEAPID_TAIL(Field_GetHeapID(args->field)), sizeof(LeavesEffectWork), TRUE,
                                               "scrcmd_ochiba.c", 0x134);
     void *effects = Field_GetFieldEffects(args->field);
     VecFx32 position;
@@ -102,11 +103,11 @@ void OchibaEffect_Start(OchibaEffectArgs *args) {
     work->resGroup = FieldG3DObjSystem_AddResGroup(sys, &request, FALSE);
     work->obj = FieldG3DObjSystem_AddObj(sys, work->resGroup, 0, &position);
     GFL_SndSEPlay(SEQ_SE_OCHIBA_01);
-    GFL_TCBMgrAddTask(tcbManager, OchibaEffect_UpdateTCB, work, 0);
+    GFL_TCBMgrAddTask(tcbManager, LeavesEffect_UpdateTCB, work, 0);
 }
 
-void OchibaEffect_UpdateTCB(TCB *tcb, void *data) {
-    OchibaEffectWork *work = data;
+void LeavesEffect_UpdateTCB(TCB *tcb, void *data) {
+    LeavesEffectWork *work = data;
 
     if (FieldG3DObjSystem_StepObjAnm(work->sys, work->obj, FX32_ONE) != TRUE) {
         FieldG3DObjSystem_FreeObj(work->sys, work->obj);
