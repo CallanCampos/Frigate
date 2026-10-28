@@ -4236,7 +4236,7 @@
    ]
   },
   "558": {
-   "handler": "ScriptNative_SetMmdlZoneDeleteOff",
+   "handler": "ScriptNative_SetActorZoneDeleteOff",
    "overlay": 36,
    "args": [
     "any"

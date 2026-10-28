@@ -4,14 +4,14 @@
 // Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 #include "types.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/heap.h"
 #include "gfl/tcb.h"
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
-BlActSys *Field_GetEffectBlAct(Field *field);
-BlActSys *Field_GetWildEffectBlAct(Field *field);
+BillboardActorSys *Field_GetEffectBillboardActor(Field *field);
+BillboardActorSys *Field_GetWildEffectBillboardActor(Field *field);
 // The saving icon, and showing, hiding and freeing it
 FieldSaveAnime *FieldSaveanime_Create(HeapID heapId, Field *field);
 void FieldSaveanime_Start(FieldSaveAnime *effect);
@@ -21,7 +21,7 @@ void FieldSaveanime_Delete(FieldSaveAnime *effect);
 // fldeff_emotion_bubble.c: an emotion bubble over an actor's head, by kind: "!", "?", a music note and "...", which has
 // no sound. playSE plays the bubble's sound. The first function's bubble stays when it is done, until its owner ends
 // it, and the second's ends itself. Then whether a bubble is done, which a NULL one is
-FieldEffectTask *FldeffEmotionBubble_SetMMdl(FieldEffects *effects, FieldActor *actor, u32 kind, BOOL playSE);
+FieldEffectTask *FldeffEmotionBubble_SetActor(FieldEffects *effects, FieldActor *actor, u32 kind, BOOL playSE);
 FieldEffectTask *FldeffEmotionBubble_StartHeld(FieldEffects *effects, FieldActor *actor, u32 kind, BOOL playSE);
 BOOL FldeffEmotionBubble_IsFinished(FieldEffectTask *task);
 // Chargestone Cave's stones (field_gimmick_d06.c): the effect over a stone at pos for actor, and the one at a mark
@@ -58,8 +58,8 @@ void FldeffDust_StartFacing(FieldActor *actor, FieldEffects *effects);
 void GrassTask_Start(FieldEffects *effects, FieldActor *actor, BOOL animate, int kind);
 // fldeff_footmark.c: the marks an actor leaves, by kind: footprints in sand (0) and snow (2), the tracks of actors
 // whose footprint type is 2 in sand (1) and snow (3), and tracks in deep sand (4). Tracks turn with the actor
-void Footmark_SetMMdl(FieldActor *actor, FieldEffects *effects, u32 kind);
-void ReflectTask_SetMMdl(MMSys *system, FieldActor *actor, FieldEffects *effects, u32 kind);
+void Footmark_SetActor(FieldActor *actor, FieldEffects *effects, u32 kind);
+void ReflectTask_SetActor(MMSys *system, FieldActor *actor, FieldEffects *effects, u32 kind);
 void FldeffRipple_Start(FieldEffects *effects, FieldActor *actor, u32 arg2, u32 arg3);
 void FldeffSplash_AddModel(FieldEffects *effects, FieldActor *actor);
 void D06Electric_StartSpark(FieldActor *actor, FieldEffects *effects);

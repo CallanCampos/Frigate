@@ -1,12 +1,12 @@
 #ifndef POKEBW2_APP_MUSICAL_MUS_ITEM_DRAW_H
 #define POKEBW2_APP_MUSICAL_MUS_ITEM_DRAW_H
 
-// Overlay 209's mus_item_draw.c: draws the props the musical's Pokémon wear, each a billboard actor of a BlAct scene.
-// The dressing room (overlay 208) and the stage share it
+// Overlay 209's mus_item_draw.c: draws the props the musical's Pokémon wear, each a billboard actor of a BillboardActor
+// scene. The dressing room (overlay 208) and the stage share it
 
 #include "types.h"
 #include "field/musical.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/heap.h"
 #include "nitro/fx.h"
 #include "struct_decls.h"
@@ -34,7 +34,7 @@ typedef struct {
 
 struct MusItemDrawSys {
     HeapID heapId;
-    BlActScene *blact;
+    BillboardActorScene *billboardActor;
     MusItemDraw *items;
     // Overlay 210's table of the props
     MusItemData *itemData;
@@ -42,7 +42,7 @@ struct MusItemDrawSys {
     GXRgb shadowPalette[16];
 };
 
-MusItemDrawSys *MusItemDraw_InitSystem(BlActScene *blact, u16 count, HeapID heapId);
+MusItemDrawSys *MusItemDraw_InitSystem(BillboardActorScene *billboardActor, u16 count, HeapID heapId);
 void MusItemDraw_TermSystem(MusItemDrawSys *sys);
 void MusItemDraw_UpdateSystem(MusItemDrawSys *sys);
 void MusItemDraw_DrawSystem(MusItemDrawSys *sys);

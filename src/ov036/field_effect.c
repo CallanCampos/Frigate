@@ -6,7 +6,7 @@
 #include "field/field_effect.h"
 #include "field/field_map.h"
 #include "gfl/arc.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/g3d.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
@@ -109,7 +109,7 @@ static const FieldEffectVTable FIELD_EFFECT_VTABLES[FLDEFF_MAX + 1] = {
 FieldEffects *FieldEffects_Create(Field *field, int count, HeapID heapId) {
     VecFx32 scale;
     u8 polyId;
-    BlActScene *scene;
+    BillboardActorScene *scene;
     FieldEffects *effects = GFL_HeapAllocate(heapId, sizeof(FieldEffects), TRUE, "field_effect.c", 128);
 
     effects->count = count;
@@ -119,12 +119,12 @@ FieldEffects *FieldEffects_Create(Field *field, int count, HeapID heapId) {
     effects->season = GameSystem_GetSeason(Field_GetGameSystem(field));
     effects->isExterior = AreaData_IsExterior(Field_GetAreaData(field));
     FieldEffects_InitEffectBuffer(effects);
-    scene = BlActSys_GetScene(Field_GetEffectBlAct(effects->field));
-    BlActScene_SetGeomOrigin(scene, 0);
+    scene = BillboardActorSys_GetScene(Field_GetEffectBillboardActor(effects->field));
+    BillboardActorScene_SetGeomOrigin(scene, 0);
     scale = FIELD_EFFECT_SCALE;
-    BlActScene_SetScale(scene, &scale);
+    BillboardActorScene_SetScale(scene, &scale);
     polyId = 0;
-    BlActScene_SetBasePolyID(scene, &polyId);
+    BillboardActorScene_SetBasePolyID(scene, &polyId);
     return effects;
 }
 

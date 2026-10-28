@@ -8,7 +8,7 @@
 #include "field/field_camera.h"
 #include "field/field_effect.h"
 #include "field/field_map.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/g3d.h"
 #include "gfl/heap.h"
 #include "nitro/fx.h"
@@ -22,7 +22,7 @@ typedef struct {
     u32 type;
     FieldActor *actor;
     MMSys *mmSys;
-    BlActSys *blActSys;
+    BillboardActorSys *billboardActorSys;
 } ReflectTaskParams;
 
 typedef struct {
@@ -34,8 +34,8 @@ typedef struct {
     u8 created;
     u8 initialized;
     ReflectTaskParams params;
-    // The material's flags and the reflection's billboard actor, as FldBlAct_AddActorPosOrReserve gives them
-    u16 blAct[2];
+    // The material's flags and the reflection's billboard actor, as FldBillboardActor_AddActorPosOrReserve gives them
+    u16 billboardActor[2];
     FieldActorIdentity identity;
 } ReflectTask;
 
@@ -45,7 +45,7 @@ static void ReflectTask_Init(FieldEffectTask *task, void *data);
 static void ReflectTask_Free(FieldEffectTask *task, void *data);
 static void ReflectTask_Update(FieldEffectTask *task, void *data);
 static void ReflectTask_Draw(FieldEffectTask *task, void *data);
-static void ReflectTask_UpdateBillboard(u16 blActIdx, void *data);
+static void ReflectTask_UpdateBillboard(u16 billboardActorIdx, void *data);
 static s32 ReflectTask_GetScaleYOffset(u32 zoneId);
 static fx32 ReflectTask_GetZoneHeightOffset(u32 zoneId, u32 billboardSize);
 static void ReflectTask_AdjustJoinAvenueHeight(FieldCamera *camera, u32 zoneId, u32 billboardSize, VecFx32 *pos);
@@ -77,14 +77,14 @@ static void FldeffReflect_InitResource(FieldEffectReflect *effect) {
 static void FldeffReflect_DeleteResource(FieldEffectReflect *effect) {
 }
 
-void ReflectTask_SetMMdl(MMSys *mmSys, FieldActor *actor, FieldEffects *effects, u32 type) {
+void ReflectTask_SetActor(MMSys *mmSys, FieldActor *actor, FieldEffects *effects, u32 type) {
     ReflectTaskParams params;
 
     FieldEffects_GetField(effects);
     params.type = type;
     params.actor = actor;
     params.mmSys = mmSys;
-    params.blActSys = FieldBlAct_GetBlActSys(FldActSys_GetFieldBlAct(mmSys));
+    params.billboardActorSys = FieldBillboardActor_GetBillboardActorSys(FldActSys_GetFieldBillboardActor(mmSys));
     params.effect = FieldEffects_GetHandleData(effects, 6);
     FieldEffects_TCBCreate(effects, &REFLECT_TASK_VTABLE, NULL, 0, &params, 0);
 }
@@ -108,13 +108,13 @@ static void ReflectTask_Free(FieldEffectTask *task, void *data) {
 
     if (work->created) {
         work->created = FALSE;
-        FldBlAct_DeleteActorPos(work->params.mmSys, work->blAct);
+        FldBillboardActor_DeleteActorPos(work->params.mmSys, work->billboardActor);
     }
 }
 
 static void ReflectTask_Update(FieldEffectTask *task, void *data) {
     ReflectTask *work = data;
-    u32 blActIdx;
+    u32 billboardActorIdx;
     u16 x;
     u16 y;
 
@@ -122,23 +122,24 @@ static void ReflectTask_Update(FieldEffectTask *task, void *data) {
         FieldEffects_DeleteObject(task);
         return;
     }
-    blActIdx = FldAct_GetBlActIdx(work->params.actor, 0);
+    billboardActorIdx = FldAct_GetBillboardActorIdx(work->params.actor, 0);
     if (!work->created) {
-        if (blActIdx == 0xffff) {
+        if (billboardActorIdx == 0xffff) {
             return;
         }
         {
             // Created at the origin; ReflectTask_UpdateBillboard places it below the actor
             VecFx32 pos = { 0, 0, 0 };
 
-            FldBlAct_AddActorPosOrReserve(work->params.mmSys, GetActorMdlInfo(work->params.actor), work->blAct, &pos,
-                                          ReflectTask_UpdateBillboard, work, func_ov012_02166fc0(work->params.mmSys));
+            FldBillboardActor_AddActorPosOrReserve(work->params.mmSys, GetActorMdlInfo(work->params.actor),
+                                                   work->billboardActor, &pos, ReflectTask_UpdateBillboard, work,
+                                                   func_ov012_02166fc0(work->params.mmSys));
         }
         work->created = TRUE;
     }
-    if (work->blAct[1] != 0xffff) {
+    if (work->billboardActor[1] != 0xffff) {
         if (!work->initialized) {
-            FldBlAct_GetActorSize(work->params.actor, &x, &y);
+            FldBillboardActor_GetActorSize(work->params.actor, &x, &y);
             work->base = x;
             work->scaleY = y;
             work->swing = x;
@@ -160,16 +161,17 @@ static void ReflectTask_Update(FieldEffectTask *task, void *data) {
 static void ReflectTask_Draw(FieldEffectTask *task, void *data) {
     ReflectTask *work = data;
 
-    if (FldAct_CheckIdentity(work->params.actor, &work->identity) == 1 && work->created && work->blAct[1] != 0xffff) {
-        ReflectTask_UpdateBillboard(work->blAct[1], work);
+    if (FldAct_CheckIdentity(work->params.actor, &work->identity) == 1 && work->created &&
+        work->billboardActor[1] != 0xffff) {
+        ReflectTask_UpdateBillboard(work->billboardActor[1], work);
     }
 }
 
-static void ReflectTask_UpdateBillboard(u16 blActIdx, void *data) {
+static void ReflectTask_UpdateBillboard(u16 billboardActorIdx, void *data) {
     ReflectTask *work = data;
-    BlActSys *sys = work->params.blActSys;
-    BlActScene *scene = BlActSys_GetScene(sys);
-    u32 actorIdx = FldAct_GetBlActIdx(work->params.actor, 0);
+    BillboardActorSys *sys = work->params.billboardActorSys;
+    BillboardActorScene *scene = BillboardActorSys_GetScene(sys);
+    u32 actorIdx = FldAct_GetBillboardActorIdx(work->params.actor, 0);
     u32 zoneId;
     u16 visible;
     FieldActor *actor;
@@ -184,16 +186,16 @@ static void ReflectTask_UpdateBillboard(u16 blActIdx, void *data) {
     BOOL flip;
     s16 rot[4];
 
-    if (blActIdx == 0xffff) {
+    if (billboardActorIdx == 0xffff) {
         return;
     }
     zoneId = Field_GetPlayerStateZoneID(FieldEffects_GetField(work->params.effect->effects));
-    visible = BlActSys_IsActorVisible(sys, actorIdx);
+    visible = BillboardActorSys_IsActorVisible(sys, actorIdx);
     if (visible && func_ov012_0216754c(work->params.actor)) {
         visible = 0;
     }
-    BlActSys_SetActorVisible(sys, blActIdx, visible);
-    BlActSys_SetActorAnimating(sys, blActIdx, 0);
+    BillboardActorSys_SetActorVisible(sys, billboardActorIdx, visible);
+    BillboardActorSys_SetActorAnimating(sys, billboardActorIdx, 0);
     actor = work->params.actor;
     config = GetActorMdlInfo(actor);
     CopyActorWPos(actor, &pos);
@@ -228,23 +230,23 @@ static void ReflectTask_UpdateBillboard(u16 blActIdx, void *data) {
         pos.x += (pos.x / FX32_ONE - target.x / FX32_ONE) * 0x12a;
     }
     ReflectTask_AdjustJoinAvenueDepth(camera, zoneId, &target, &pos);
-    BlActScene_SetActorPos(scene, blActIdx, &pos);
+    BillboardActorScene_SetActorPos(scene, billboardActorIdx, &pos);
     flip = TRUE;
-    self = BlActSys_GetSceneActor(sys, actorIdx);
-    other = BlActSys_GetSceneActor(sys, blActIdx);
+    self = BillboardActorSys_GetSceneActor(sys, actorIdx);
+    other = BillboardActorSys_GetSceneActor(sys, billboardActorIdx);
     rot[3] = work->swing;
     rot[2] = work->scaleY;
     rot[2] += (s16)ReflectTask_GetScaleYOffset(zoneId);
     rot[1] = 0;
     rot[0] = 0;
-    BlActScene_GetActorMaterial(scene, self, (u16 *)&rot[1]);
-    BlActScene_SetActorMaterial(scene, other, (u16 *)&rot[1]);
-    BlActScene_GetActorFace(scene, self, (u16 *)&rot[0]);
-    BlActScene_SetActorFace(scene, other, (u16 *)&rot[0]);
-    BlActScene_SetActorScale(scene, other, &rot[3], &rot[2]);
-    BlActScene_SetActorFlipT(scene, other, &flip);
-    flip = BlActScene_GetActorFlipS(scene, self);
-    BlActScene_SetActorFlipS(scene, other, &flip);
+    BillboardActorScene_GetActorMaterial(scene, self, (u16 *)&rot[1]);
+    BillboardActorScene_SetActorMaterial(scene, other, (u16 *)&rot[1]);
+    BillboardActorScene_GetActorFace(scene, self, (u16 *)&rot[0]);
+    BillboardActorScene_SetActorFace(scene, other, (u16 *)&rot[0]);
+    BillboardActorScene_SetActorScale(scene, other, &rot[3], &rot[2]);
+    BillboardActorScene_SetActorFlipT(scene, other, &flip);
+    flip = BillboardActorScene_GetActorFlipS(scene, self);
+    BillboardActorScene_SetActorFlipS(scene, other, &flip);
 }
 
 static s32 ReflectTask_GetScaleYOffset(u32 zoneId) {

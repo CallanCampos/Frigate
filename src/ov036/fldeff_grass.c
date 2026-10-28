@@ -6,7 +6,7 @@
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_effect.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/g3d.h"
 #include "gfl/heap.h"
 #include "nitro/fx.h"
@@ -15,7 +15,7 @@
 
 typedef struct {
     FieldEffects *effects;
-    BlActSys *blact;
+    BillboardActorSys *billboardActor;
     u16 matIndices[GRASS_KIND_COUNT];
 } FieldEffectGrass;
 
@@ -63,18 +63,18 @@ static const FieldEffectTaskVTable GRASS_TASK_VTABLE = {
 
 // clang-format on
 
-static const BlActAnimStep GRASS_ANIM_SHAKE[] = {
-    { 0, 0, 0, 3 }, { 1, 0, 0, 3 }, { 2, 0, 0, 3 }, { 3, 0, 0, 4 }, { BLACT_ANIM_CMD_END, 0, 0, 0 },
+static const BillboardActorAnimStep GRASS_ANIM_SHAKE[] = {
+    { 0, 0, 0, 3 }, { 1, 0, 0, 3 }, { 2, 0, 0, 3 }, { 3, 0, 0, 4 }, { BILLBOARD_ACTOR_ANIM_CMD_END, 0, 0, 0 },
 };
 
-static const BlActAnimStep GRASS_ANIM_SHAKE_LONG[] = {
+static const BillboardActorAnimStep GRASS_ANIM_SHAKE_LONG[] = {
     { 0, 0, 0, 2 },
     { 1, 0, 0, 2 },
     { 0, 0, 0, 2 },
     { 1, 0, 0, 2 },
     { 0, 0, 0, 2 },
     { 1, 0, 0, 2 },
-    { BLACT_ANIM_CMD_END, 0, 0, 0 },
+    { BILLBOARD_ACTOR_ANIM_CMD_END, 0, 0, 0 },
 };
 
 // Each kind's texture in each season
@@ -92,11 +92,11 @@ static const u16 GRASS_TEXTURES[GRASS_KIND_COUNT][4] = {
 
 // clang-format on
 
-static const BlActAnimStep *GRASS_ANIMS[] = { GRASS_ANIM_SHAKE };
+static const BillboardActorAnimStep *GRASS_ANIMS[] = { GRASS_ANIM_SHAKE };
 
-static const BlActAnimStep *GRASS_ANIMS_LONG[] = { GRASS_ANIM_SHAKE_LONG };
+static const BillboardActorAnimStep *GRASS_ANIMS_LONG[] = { GRASS_ANIM_SHAKE_LONG };
 
-static const BlActAnimStep **GRASS_KIND_ANIMS[GRASS_KIND_COUNT] = {
+static const BillboardActorAnimStep **GRASS_KIND_ANIMS[GRASS_KIND_COUNT] = {
     GRASS_ANIMS, GRASS_ANIMS, GRASS_ANIMS_LONG, GRASS_ANIMS_LONG, GRASS_ANIMS, GRASS_ANIMS, GRASS_ANIMS, GRASS_ANIMS,
 };
 
@@ -104,7 +104,7 @@ void *loadGrassEffects(FieldEffects *effects, HeapID heapId) {
     FieldEffectGrass *grass = GFL_HeapAllocate(heapId, sizeof(FieldEffectGrass), TRUE, "fldeff_grass.c", 108);
 
     grass->effects = effects;
-    grass->blact = Field_GetWildEffectBlAct(FieldEffects_GetField(effects));
+    grass->billboardActor = Field_GetWildEffectBillboardActor(FieldEffects_GetField(effects));
     Grass_LoadTextures(grass);
     return grass;
 }
@@ -116,7 +116,7 @@ void freeGrassEffects(FieldEffects *effects, void *data) {
 
 static void Grass_LoadTextures(FieldEffectGrass *grass) {
     int i;
-    BlActMatRequest request;
+    BillboardActorMatRequest request;
     ArcTool *arc = FieldEffects_GetArc(grass->effects);
     Field_GetGameSystem(FieldEffects_GetField(grass->effects));
     u32 season = FieldEffects_GetSeason(grass->effects);
@@ -125,11 +125,11 @@ static void Grass_LoadTextures(FieldEffectGrass *grass) {
     request.size = 36;
     request.faceWidth = 32;
     request.faceHeight = 32;
-    request.mode = BLACT_LOAD_TRIM;
+    request.mode = BILLBOARD_ACTOR_LOAD_TRIM;
     for (i = 0; i < GRASS_KIND_COUNT; i++) {
         request.texResource = GFL_G3DSysReadArcToolResource(arc, GRASS_TEXTURES[i][season]);
         FieldEffects_ApplyLuminanceTable(grass->effects, request.texResource);
-        grass->matIndices[i] = BlActSys_ExecMatLoadRequests(grass->blact, &request, 1);
+        grass->matIndices[i] = BillboardActorSys_ExecMatLoadRequests(grass->billboardActor, &request, 1);
     }
 }
 
@@ -137,7 +137,7 @@ static void Grass_FreeTextures(FieldEffectGrass *grass) {
     int i;
 
     for (i = 0; i < GRASS_KIND_COUNT; i++) {
-        BlActSys_FreeMaterials(grass->blact, grass->matIndices[i], 1);
+        BillboardActorSys_FreeMaterials(grass->billboardActor, grass->matIndices[i], 1);
     }
 }
 
@@ -174,9 +174,9 @@ void GrassTask_Start(FieldEffects *effects, FieldActor *actor, BOOL animate, int
 static void GrassTask_Init(FieldEffectTask *task, void *work) {
     GrassTask *grassTask = work;
     GrassTaskParams *params = FieldEffects_GetObjectParam(task);
-    BlActActorRequest request;
+    BillboardActorRequest request;
     u16 kind;
-    BlActSys *blact;
+    BillboardActorSys *billboardActor;
     u16 actorIndex;
 
     grassTask->params = *params;
@@ -192,16 +192,16 @@ static void GrassTask_Init(FieldEffectTask *task, void *work) {
     request.pos = params->pos;
     request.callback = NULL;
     request.callbackData = grassTask;
-    blact = grassTask->params.grass->blact;
-    grassTask->actorIndex = BlActSys_ExecActorRequests(blact, 0, &request, 1, 0);
+    billboardActor = grassTask->params.grass->billboardActor;
+    grassTask->actorIndex = BillboardActorSys_ExecActorRequests(billboardActor, 0, &request, 1, 0);
     if (grassTask->actorIndex == 0xffff) {
         FieldEffects_DeleteObject(task);
         return;
     }
-    BlActSys_SetActorAnims(blact, grassTask->actorIndex, GRASS_KIND_ANIMS[kind], 1);
+    BillboardActorSys_SetActorAnims(billboardActor, grassTask->actorIndex, GRASS_KIND_ANIMS[kind], 1);
     actorIndex = grassTask->actorIndex;
-    BlActSys_SetActorAnim(blact, actorIndex, 0);
-    BlActSys_SetActorAnimating(blact, actorIndex, TRUE);
+    BillboardActorSys_SetActorAnim(billboardActor, actorIndex, 0);
+    BillboardActorSys_SetActorAnimating(billboardActor, actorIndex, TRUE);
     if (FieldEffects_GetObjectMode(task) == FALSE) {
         grassTask->state = 1;
     }
@@ -210,17 +210,17 @@ static void GrassTask_Init(FieldEffectTask *task, void *work) {
 
 static void GrassTask_Delete(FieldEffectTask *task, void *work) {
     GrassTask *grassTask = work;
-    BlActSys *blact = grassTask->params.grass->blact;
+    BillboardActorSys *billboardActor = grassTask->params.grass->billboardActor;
 
     if (grassTask->actorIndex != 0xffff) {
-        BlActSys_DeleteActors(blact, grassTask->actorIndex, 1);
+        BillboardActorSys_DeleteActors(billboardActor, grassTask->actorIndex, 1);
     }
 }
 
 static void GrassTask_Update(FieldEffectTask *task, void *work) {
     u16 cmd;
     GrassTask *grassTask = work;
-    BlActSys *blact = grassTask->params.grass->blact;
+    BillboardActorSys *billboardActor = grassTask->params.grass->billboardActor;
 
     switch (grassTask->state) {
     case 0:
@@ -234,7 +234,7 @@ static void GrassTask_Update(FieldEffectTask *task, void *work) {
                 return;
             }
         }
-        if (BlActSys_GetActorLastCmd(blact, grassTask->actorIndex, &cmd)) {
+        if (BillboardActorSys_GetActorLastCmd(billboardActor, grassTask->actorIndex, &cmd)) {
             grassTask->state++;
         }
         break;
@@ -244,7 +244,7 @@ static void GrassTask_Update(FieldEffectTask *task, void *work) {
             FieldEffects_DeleteObject(task);
             return;
         }
-        BlActSys_SetActorStep(blact, grassTask->actorIndex, GRASS_REST_STEPS[grassTask->params.kind]);
+        BillboardActorSys_SetActorStep(billboardActor, grassTask->actorIndex, GRASS_REST_STEPS[grassTask->params.kind]);
         grassTask->state++;
         break;
     case 2:

@@ -418,6 +418,6 @@ void *ScriptWork_CreateVarCopy(ScriptWork *work);
 void ScriptWork_RestoreVarCopy(ScriptWork *work, void *copy);
 u16 *ScriptWork_GetLocalWork(ScriptWork *work, u16 id);
 WordSet *ScriptWork_GetWordSet(ScriptWork *work);
-MMSys *GetScrEnvMMdlSys(FieldScriptEnv *env);
+MMSys *GetScrEnvActorSys(FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_FIELD_SCRIPT_H

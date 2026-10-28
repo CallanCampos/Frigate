@@ -1,6 +1,6 @@
-// The field actors' action commands (fldmmdl_acmd.c, after the file name that its allocation passes): the task that
-// runs a list of them, and the start, update and end functions of each command with the tables of them that
-// fldmmdl_movedata.c lists. Names such as FieldAcmdTCB_Create, GetAcmdForDir and the ACMD_ tables are swan's
+// The field actors' action commands (the ROM's fldmmdl_acmd.c, by the file name that its allocation passes): the task
+// that runs a list of them, and the start, update and end functions of each command with the tables of them that
+// field_actor_movedata.c lists. Names such as FieldAcmdTCB_Create, GetAcmdForDir and the ACMD_ tables are swan's
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0). The code was first written by mariano54 on their
 // parallel-decomp branch
 
@@ -12,8 +12,8 @@
 #include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_actor_internal.h"
+#include "field/field_actor_movecode_pair.h"
 #include "field/field_effect.h"
-#include "field/fldmmdl_movecode_pair.h"
 #include "gfl/heap.h"
 #include "gfl/sound.h"
 #include "gfl/tcb.h"
@@ -383,8 +383,8 @@ static const s32 data_ov036_021cb608[];
 static const fx32 *data_ov036_021d4d34[];
 
 void FieldAcmdTCB_DeleteDrawSys(MMSys *system) {
-    if (FldActSys_GetFieldBlAct(system) != NULL) {
-        FldBlAct_Exit(system);
+    if (FldActSys_GetFieldBillboardActor(system) != NULL) {
+        FldBillboardActor_Exit(system);
     }
     if (FldActSys_GetActorG3DSystem(system) != NULL) {
         FieldActorG3DSystem_Delete(system);
@@ -427,14 +427,14 @@ void CopyActorPosAllAdd(FieldActor *actor, VecFx32 *dest) {
 
 void FieldAcmdSyncBillboardPos(FieldActor *actor) {
     VecFx32 pos;
-    u32 idx = FldAct_GetBlActIdx(actor, 0);
+    u32 idx = FldAct_GetBillboardActorIdx(actor, 0);
 
     if (idx != 0xffff) {
-        BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+        BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
 
         CopyActorPosAllAdd(actor, &pos);
         pos.y += Field_GetActorYOffset(GetMMSysField(GetActorMModelSystem(actor)));
-        BlActScene_SetActorPos(BlActSys_GetScene(sys), idx, &pos);
+        BillboardActorScene_SetActorPos(BillboardActorSys_GetScene(sys), idx, &pos);
     }
 }
 
@@ -1265,8 +1265,8 @@ static void FieldAcmdTCB_MarkWaitInit(FieldActor *actor, u32 kind, u32 unused, B
     AcmdEffectWork *work = FldAct_InitMoveCmdWork(actor, 8);
 
     work->kind = kind;
-    work->task = FldeffEmotionBubble_SetMMdl(Field_GetFieldEffects(GetMMSysField(GetActorMModelSystem(actor))), actor,
-                                             kind, playSE);
+    work->task = FldeffEmotionBubble_SetActor(Field_GetFieldEffects(GetMMSysField(GetActorMModelSystem(actor))), actor,
+                                              kind, playSE);
     FieldActor_NextAcmdState(actor);
 }
 
@@ -1514,10 +1514,11 @@ static BOOL FieldAcmdTCB_AnimeWaitEndStop(FieldActor *actor) {
     u32 index;
 
     FldAct_GetMoveCmdWork(actor);
-    index = FldAct_GetBlActIdx(actor, 0);
+    index = FldAct_GetBillboardActorIdx(actor, 0);
     if (index != 0xffff) {
-        if (BlActSys_GetActorLastCmd(FieldBlAct_GetBlActSys(FldActSys_GetFieldBlAct(GetActorMModelSystem(actor))),
-                                     (u16)index, &cmd) == TRUE) {
+        if (BillboardActorSys_GetActorLastCmd(
+                FieldBillboardActor_GetBillboardActorSys(FldActSys_GetFieldBillboardActor(GetActorMModelSystem(actor))),
+                (u16)index, &cmd) == TRUE) {
             FldAct_SetDrawStatus(actor, 0);
             FieldActor_NextAcmdState(actor);
             return TRUE;
@@ -1531,10 +1532,11 @@ static BOOL FieldAcmdTCB_AnimeWaitEnd(FieldActor *actor) {
     u32 index;
 
     FldAct_GetMoveCmdWork(actor);
-    index = FldAct_GetBlActIdx(actor, 0);
+    index = FldAct_GetBillboardActorIdx(actor, 0);
     if (index != 0xffff) {
-        if (BlActSys_GetActorLastCmd(FieldBlAct_GetBlActSys(FldActSys_GetFieldBlAct(GetActorMModelSystem(actor))),
-                                     (u16)index, &cmd) == TRUE) {
+        if (BillboardActorSys_GetActorLastCmd(
+                FieldBillboardActor_GetBillboardActorSys(FldActSys_GetFieldBillboardActor(GetActorMModelSystem(actor))),
+                (u16)index, &cmd) == TRUE) {
             FieldActor_NextAcmdState(actor);
             return TRUE;
         }
@@ -1546,7 +1548,7 @@ static BOOL FieldAcmdTCB_HideOffInit(FieldActor *actor) {
     FieldEffectTask *task;
 
     FldAct_InitMoveCmdWork(actor, 4);
-    task = FldmmdlMove_GetHideEffect(actor);
+    task = FieldActorMove_GetHideEffect(actor);
     if (task != NULL) {
         HideTask_RequestEnd(task);
     }
@@ -1566,11 +1568,11 @@ static BOOL FieldAcmdTCB_HideOffMove(FieldActor *actor) {
 
     offset.y = data_ov036_021d4d34[0][*work];
     SetActorWPosOffset(actor, &offset);
-    task = FldmmdlMove_GetHideEffect(actor);
+    task = FieldActorMove_GetHideEffect(actor);
     if (task != NULL) {
         if (HideTask_IsFinished(task) == TRUE) {
             FieldEffects_DeleteObject(task);
-            FldmmdlMove_SetHideEffect(actor, 0);
+            FieldActorMove_SetHideEffect(actor, 0);
         }
     }
     *work += 2;
@@ -1580,7 +1582,7 @@ static BOOL FieldAcmdTCB_HideOffMove(FieldActor *actor) {
     offset.y = 0;
     SetActorWPosOffset(actor, &offset);
     SetActorMovementFlag(actor, 0x540);
-    FldmmdlMove_SetHideNoEffect(actor);
+    FieldActorMove_SetHideNoEffect(actor);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -2149,7 +2151,7 @@ static BOOL FieldAcmdTCB_FlyUpMove(FieldActor *actor) {
     LiftWork *work = FldAct_GetMoveCmdWork(actor);
     u16 anim;
     u16 step;
-    if (RailActorAnim_GetBlactAnimeTypeA(actor, &anim, &step) != TRUE) {
+    if (RailActorAnim_GetBillboardActorAnimeTypeA(actor, &anim, &step) != TRUE) {
         return FALSE;
     }
     work->time++;
@@ -2201,11 +2203,13 @@ static BOOL FieldAcmdTCB_AnimeWaitEndFaceDownInit(FieldActor *actor) {
 }
 
 static BOOL FieldAcmdTCB_AnimeWaitEndFaceDown(FieldActor *actor) {
-    BlActSys *blAct = FieldBlAct_GetBlActSys(FldActSys_GetFieldBlAct(GetActorMModelSystem(actor)));
-    u32 blActIdx;
+    BillboardActorSys *billboardActor =
+        FieldBillboardActor_GetBillboardActorSys(FldActSys_GetFieldBillboardActor(GetActorMModelSystem(actor)));
+    u32 billboardActorIdx;
     u16 cmd;
-    blActIdx = FldAct_GetBlActIdx(actor, 0);
-    if (blActIdx != 0xffff && !BlActSys_GetActorLastCmd(blAct, (u16)blActIdx, &cmd)) {
+    billboardActorIdx = FldAct_GetBillboardActorIdx(actor, 0);
+    if (billboardActorIdx != 0xffff &&
+        !BillboardActorSys_GetActorLastCmd(billboardActor, (u16)billboardActorIdx, &cmd)) {
         return FALSE;
     }
     CheckSetActorFaceDir(actor, DIR_DOWN);
@@ -2236,7 +2240,7 @@ static BOOL FieldAcmdTCB_FlyReadyMove(FieldActor *actor) {
     ShiftWork *work = FldAct_GetMoveCmdWork(actor);
     u16 anim;
     u16 step;
-    if (RailActorAnim_GetBlactAnimeTypeB(actor, &anim, &step) != TRUE) {
+    if (RailActorAnim_GetBillboardActorAnimeTypeB(actor, &anim, &step) != TRUE) {
         return FALSE;
     }
     work->time++;
@@ -2279,20 +2283,20 @@ static BOOL FieldAcmdTCB_DrawReadyWaitInit11(FieldActor *actor) {
 
 static BOOL FieldAcmdTCB_DrawReadyWaitInit12(FieldActor *actor) {
     FldAct_SetDrawStatus(actor, 12);
-    RailActorAnim_ResetBlactAnime(actor);
+    RailActorAnim_ResetBillboardActorAnime(actor);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL FieldAcmdTCB_DrawReadyWaitInit13(FieldActor *actor) {
     FldAct_SetDrawStatus(actor, 13);
-    RailActorAnim_ResetBlactAnime(actor);
+    RailActorAnim_ResetBillboardActorAnime(actor);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL FieldAcmdTCB_DrawReadyWaitStop(FieldActor *actor) {
-    if (RailActorAnim_CheckBlactReady(actor) == TRUE) {
+    if (RailActorAnim_CheckBillboardActorReady(actor) == TRUE) {
         FldAct_SetDrawStatus(actor, 0);
         FieldActor_NextAcmdState(actor);
         return TRUE;
@@ -2301,7 +2305,7 @@ static BOOL FieldAcmdTCB_DrawReadyWaitStop(FieldActor *actor) {
 }
 
 static BOOL FieldAcmdTCB_DrawReadyWait(FieldActor *actor) {
-    if (RailActorAnim_CheckBlactReady(actor) == TRUE) {
+    if (RailActorAnim_CheckBillboardActorReady(actor) == TRUE) {
         FieldActor_NextAcmdState(actor);
         return TRUE;
     }

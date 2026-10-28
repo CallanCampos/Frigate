@@ -7,7 +7,7 @@
 #include "field/field_palace.h"
 #include "field/field_scene_area.h"
 #include "field/zone.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 
 // The gimmick work of Field_AllocGimmickWorkBlock, password 0xffffffff for none
 typedef struct {
@@ -51,9 +51,9 @@ struct Field {
     G3DCamera *g3dCamera;
     G3DLight *g3dLights;
     TCB *asyncActorMatLoadTCB;
-    BlActSys *actorBlAct;
-    BlActSys *effectBlAct;
-    BlActSys *wildEffectBlAct;
+    BillboardActorSys *actorBillboardActor;
+    BillboardActorSys *effectBillboardActor;
+    BillboardActorSys *wildEffectBillboardActor;
     FieldAsyncProcManager *asyncProcManager;
     // 1 when the map is loaded, 2 when closing
     u32 routineState;

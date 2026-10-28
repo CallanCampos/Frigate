@@ -8,7 +8,7 @@
 #include "constants/sound.h"
 #include "constants/species.h"
 #include "field/musical.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/heap.h"
 #include "gfl/random.h"
 #include "gfl/sound.h"
@@ -50,7 +50,7 @@ static const u32 STA_ACT_POKE_ITEM_SE[] = {
 };
 
 StaActPokeSys *StaActPoke_InitSystem(HeapID heapId, StaActing *stage, MusPokeDrawSys *pokeDraw,
-                                     MusItemDrawSys *itemDraw, BlActScene *blact) {
+                                     MusItemDrawSys *itemDraw, BillboardActorScene *billboardActor) {
     u8 i;
     StaActPokeSys *sys = GFL_HeapAllocate(heapId, sizeof(StaActPokeSys), FALSE, "sta_act_poke.c", 147);
 
@@ -59,13 +59,14 @@ StaActPokeSys *StaActPoke_InitSystem(HeapID heapId, StaActing *stage, MusPokeDra
     sys->pokeDraw = pokeDraw;
     sys->itemDraw = itemDraw;
     sys->scroll = 0;
-    sys->blact = blact;
+    sys->billboardActor = billboardActor;
     sys->effectCount = 0;
     for (i = 0; i < 4; i++) {
         sys->pokes[i].active = FALSE;
         sys->pokes[i].update = FALSE;
     }
-    sys->shadowMaterial = BlActScene_AddMaterialArcTex(sys->blact, ARCID_MUSICAL, 29, 3, 0x33, 64, 64);
+    sys->shadowMaterial =
+        BillboardActorScene_AddMaterialArcTex(sys->billboardActor, ARCID_MUSICAL, 29, 3, 0x33, 64, 64);
     return sys;
 }
 
@@ -77,7 +78,7 @@ void StaActPoke_TermSystem(StaActPokeSys *sys) {
             StaActPoke_DeletePoke(sys, &sys->pokes[i]);
         }
     }
-    BlActScene_FreeMaterial(sys->blact, sys->shadowMaterial);
+    BillboardActorScene_FreeMaterial(sys->billboardActor, sys->shadowMaterial);
     GFL_HeapFree(sys);
 }
 
@@ -221,7 +222,7 @@ static void StaActPoke_UpdateItems(StaActPokeSys *sys, StaActPoke *poke) {
     pos.x = poke->pos.x / 16;
     pos.y = (FX32_CONST(192) - poke->pos.y) / 16;
     pos.z = 50;
-    BlActScene_SetActorPos(sys->blact, poke->shadowActor, &pos);
+    BillboardActorScene_SetActorPos(sys->billboardActor, poke->shadowActor, &pos);
 }
 
 void StaActPoke_DrawSystem(StaActPokeSys *sys) {
@@ -313,9 +314,10 @@ StaActPoke *StaActPoke_CreatePoke(StaActPokeSys *sys, MusicalPoke *musPoke) {
             poke->items[i] = NULL;
         }
     }
-    poke->shadowActor = BlActScene_AddNewActor(sys->blact, sys->shadowMaterial, 0x400, 0x300, &poke->pos, 30, 0, 0);
+    poke->shadowActor =
+        BillboardActorScene_AddNewActor(sys->billboardActor, sys->shadowMaterial, 0x400, 0x300, &poke->pos, 30, 0, 0);
     show = TRUE;
-    BlActScene_SetActorHidden(sys->blact, poke->shadowActor, &show);
+    BillboardActorScene_SetActorHidden(sys->billboardActor, poke->shadowActor, &show);
     poke->blinkTimer = GFL_RandomLC(150) / 2;
     poke->animating = TRUE;
     return poke;
@@ -324,7 +326,7 @@ StaActPoke *StaActPoke_CreatePoke(StaActPokeSys *sys, MusicalPoke *musPoke) {
 void StaActPoke_DeletePoke(StaActPokeSys *sys, StaActPoke *poke) {
     u8 i;
 
-    BlActScene_ClearActorMaterial(sys->blact, poke->shadowActor);
+    BillboardActorScene_ClearActorMaterial(sys->billboardActor, poke->shadowActor);
     for (i = 0; i < 9; i++) {
         if (poke->items[i] != NULL) {
             MusItemDraw_DelItem(sys->itemDraw, poke->items[i]);
@@ -644,7 +646,7 @@ void StaActPoke_SetShowFlg(StaActPokeSys *sys, StaActPoke *poke, const BOOL show
             MusItemDraw_SetVisible(sys->itemDraw, poke->items[i], show);
         }
     }
-    BlActScene_SetActorHidden(sys->blact, poke->shadowActor, &show);
+    BillboardActorScene_SetActorHidden(sys->billboardActor, poke->shadowActor, &show);
 }
 
 BOOL StaActPoke_GetShowFlg(StaActPokeSys *sys, StaActPoke *poke) {

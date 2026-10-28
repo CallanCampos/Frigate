@@ -279,7 +279,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `name_input_setup.c` | `0x021659ec`–`0x02165b1c` | 7 | complete | ROM's `namein_setup.c`, string at `0x0216e3a0` |
 | `event_league_lift.c` | `0x02165b1c`–`0x02165eb8` | 7 | complete | descriptive |
 | `event_bsubway.c` | `0x02165eb8`–`0x02166664` | 17 | complete | descriptive |
-| `fldmmdl.c` | `0x02166664`–`0x02168320` | 270 | complete | string at `0x0216e5c0` |
+| `field_actor.c` | `0x02166664`–`0x02168320` | 270 | complete | ROM's `fldmmdl.c`, string at `0x0216e5c0` |
 | `fest_mission_field.c` | `0x02168320`–`0x02168468` | 5 | complete | descriptive |
 | `burmy_form.c` | `0x02168468`–`0x021684bc` | 1 | complete | descriptive |
 | `event_battle.c` | `0x021684bc`–`0x0216919c` | 26 | complete | string at `0x0216e5dc` |
@@ -546,17 +546,17 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `field_menu_event.c` | `0x0218b12c`–`0x0218b1f8` | 2 | complete | descriptive |
 | `talkmsgwin.c` | `0x0218b1f8`–`0x0218d0e8` | 54 | complete | string at `0x021d4c24` |
 | `ircbattlemenu.c` | `0x0218d0e8`–`0x0218ed18` | 65 | complete | string at `0x021d4d24` |
-| `fldmmdl_acmd.c` | `0x0218ed18`–`0x02191228` | 247 | complete | string at `0x021d4d40` |
-| `fldmmdl_movecode.c` | `0x02191228`–`0x021925a4` | 98 | complete | descriptive |
-| `fldmmdl_evtype.c` | `0x021925a4`–`0x02192a4c` | 17 | complete | descriptive |
-| `fldmmdl_movecode_pair.c` | `0x02192a4c`–`0x02193680` | 68 | complete | descriptive |
-| `fldmmdl_blact.c` | `0x02193680`–`0x021946b4` | 58 | complete | string at `0x021d4d50` |
-| `fldmmdl_g3dobj.c` | `0x021946b4`–`0x02195378` | 91 | complete | string at `0x021d4d60` |
+| `field_actor_acmd.c` | `0x0218ed18`–`0x02191228` | 247 | complete | ROM's `fldmmdl_acmd.c`, string at `0x021d4d40` |
+| `field_actor_movecode.c` | `0x02191228`–`0x021925a4` | 98 | complete | descriptive |
+| `field_actor_evtype.c` | `0x021925a4`–`0x02192a4c` | 17 | complete | descriptive |
+| `field_actor_movecode_pair.c` | `0x02192a4c`–`0x02193680` | 68 | complete | descriptive |
+| `field_actor_billboard.c` | `0x02193680`–`0x021946b4` | 58 | complete | ROM's `fldmmdl_blact.c`, string at `0x021d4d50` |
+| `field_actor_g3dobj.c` | `0x021946b4`–`0x02195378` | 91 | complete | ROM's `fldmmdl_g3dobj.c`, string at `0x021d4d60` |
 | `fld_act_rail.c` | `0x02195378`–`0x02195590` | 9 | complete | descriptive |
-| `fldmmdl_rail.c` | `0x02195590`–`0x02196208` | 64 | complete | descriptive |
+| `field_actor_rail.c` | `0x02195590`–`0x02196208` | 64 | complete | descriptive |
 | `rail_data_handle.c` | `0x02196208`–`0x02196238` | 1 | complete | descriptive |
 | `field_rail_loader.c` | `0x02196238`–`0x0219749c` | 57 | complete | string at `0x021d4de8` |
-| `fldmmdl_g3dobj_draw.c` | `0x0219749c`–`0x02197534` | 5 | complete | descriptive |
+| `field_actor_g3dobj_draw.c` | `0x0219749c`–`0x02197534` | 5 | complete | descriptive |
 | `field_fog.c` | `0x02197534`–`0x02197710` | 22 | complete | string at `0x021d4dfc` |
 | `field_zonefog.c` | `0x02197710`–`0x02197820` | 11 | complete | string at `0x021d4e08` |
 | `field_light.c` | `0x02197820`–`0x02198198` | 31 | complete | string at `0x021d4e18` |
@@ -598,7 +598,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `scrcmd_mapchange.c` | `0x021a7eb8`–`0x021a82bc` | 9 | complete | descriptive |
 | `scrcmd_menu.c` | `0x021a82bc`–`0x021a861c` | 11 | complete | descriptive |
 | `scrcmd_msg.c` | `0x021a861c`–`0x021a98c4` | 65 | complete | descriptive |
-| `scrcmd_fldmmdl.c` | `0x021a98c4`–`0x021aad44` | 50 | complete | string at `0x021d514c` |
+| `scrcmd_field_actor.c` | `0x021a98c4`–`0x021aad44` | 50 | complete | ROM's `scrcmd_fldmmdl.c`, string at `0x021d514c` |
 | `scrcmd_gym.c` | `0x021aad44`–`0x021ab218` | 28 | complete | descriptive |
 | `scrcmd_fade.c` | `0x021ab218`–`0x021ab73c` | 18 | complete | descriptive |
 | `scrcmd_buildmodel.c` | `0x021ab73c`–`0x021abb48` | 18 | complete | descriptive |

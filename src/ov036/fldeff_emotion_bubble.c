@@ -125,7 +125,7 @@ static void FldeffEmotionBubble_DeleteResource(FieldEffectEmotionBubble *emotion
     }
 }
 
-FieldEffectTask *FldeffEmotionBubble_SetMMdl(FieldEffects *effects, FieldActor *actor, u32 kind, BOOL playSE) {
+FieldEffectTask *FldeffEmotionBubble_SetActor(FieldEffects *effects, FieldActor *actor, u32 kind, BOOL playSE) {
     EmotionBubbleTaskParams params;
 
     params.kind = kind;

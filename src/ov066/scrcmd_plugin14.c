@@ -62,7 +62,7 @@ static BOOL Plugin14Cmd_ShiftActor(VM *vm, FieldScriptEnv *env) {
     u32 actorId = ScriptReadAny(vm, env);
     s16 dx = ScriptReadAny(vm, env);
     s16 dz = ScriptReadAny(vm, env);
-    FieldActor *actor = FindFieldActor(GetScrEnvMMdlSys(env), actorId);
+    FieldActor *actor = FindFieldActor(GetScrEnvActorSys(env), actorId);
 
     if (actor == NULL) {
         return FALSE;

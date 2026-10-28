@@ -11,7 +11,7 @@
 
 FieldPlayerNoGrid *FieldPlayerRail_Create(FieldPlayerCore *core, HeapID heapId);
 void FieldPlayerRail_Delete(FieldPlayerNoGrid *nogrid);
-void FieldPlayerRail_AttachMmdl(FieldPlayerNoGrid *nogrid, const RailPosition *pos);
+void FieldPlayerRail_AttachActor(FieldPlayerNoGrid *nogrid, const RailPosition *pos);
 void FieldPlayerRail_ClearRailWork(FieldPlayerNoGrid *nogrid);
 void FieldPlayerRail_UpdateMovement(FieldPlayerNoGrid *nogrid, u32 pressedKeys, u32 heldKeys);
 BOOL FieldPlayerRail_IsBlocked(FieldPlayerNoGrid *nogrid);

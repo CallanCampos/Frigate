@@ -77,7 +77,7 @@ GameData *FieldScriptEnv_GetGameData(FieldScriptEnv *env) {
     return env->subwork->gameData;
 }
 
-MMSys *GetScrEnvMMdlSys(FieldScriptEnv *env) {
+MMSys *GetScrEnvActorSys(FieldScriptEnv *env) {
     return env->subwork->mmSys;
 }
 

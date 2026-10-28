@@ -7,7 +7,7 @@
 #include "field/field_player_core.h"
 #include "field/field_sound.h"
 #include "field/player_state.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
 #include "nitro/fx.h"
@@ -313,7 +313,7 @@ void FieldPlayerCore_SetFormSlotModel(FieldPlayerCore *core, u32 forme) {
 }
 
 BOOL FieldPlayerCore_WaitModelReady(FieldPlayerCore *core) {
-    if (FldAct_GetBlActIdx(FieldPlayerCore_GetActor(core), 0) != BLACT_NONE) {
+    if (FldAct_GetBillboardActorIdx(FieldPlayerCore_GetActor(core), 0) != BILLBOARD_ACTOR_NONE) {
         if (core->unk2C == 1) {
             return TRUE;
         }
@@ -334,15 +334,17 @@ u32 FieldPlayerCore_CheckFormModel(FieldPlayerCore *core) {
 }
 
 BOOL FieldPlayerCore_CheckAnimePaused(FieldPlayerCore *core) {
-    BlActSys *blActSys = FieldBlAct_GetBlActSys(FldActSys_GetFieldBlAct(GetActorMModelSystem(core->actor)));
+    BillboardActorSys *billboardActorSys =
+        FieldBillboardActor_GetBillboardActorSys(FldActSys_GetFieldBillboardActor(GetActorMModelSystem(core->actor)));
     u32 idx;
     u16 cmd;
 
-    if (FieldAcmdTCB_CheckAnimePaused(core->actor) == TRUE && FldBlAct_GetEntryHookFlag(core->actor) == TRUE) {
+    if (FieldAcmdTCB_CheckAnimePaused(core->actor) == TRUE && FldBillboardActor_GetEntryHookFlag(core->actor) == TRUE) {
         return TRUE;
     }
-    idx = FldAct_GetBlActIdx(core->actor, 0);
-    if (idx != BLACT_NONE && BlActSys_GetActorLastCmd(blActSys, idx, &cmd) && cmd == BLACT_ANIM_CMD_END) {
+    idx = FldAct_GetBillboardActorIdx(core->actor, 0);
+    if (idx != BILLBOARD_ACTOR_NONE && BillboardActorSys_GetActorLastCmd(billboardActorSys, idx, &cmd) &&
+        cmd == BILLBOARD_ACTOR_ANIM_CMD_END) {
         return TRUE;
     }
     return FALSE;
@@ -410,9 +412,9 @@ static BOOL FieldPlayerCore_IsBaseFormeObjCode(FieldPlayerCore *core) {
 }
 
 static BOOL FieldPlayerCore_CheckDrawProcReady(FieldPlayerCore *core) {
-    u16 idx = FldAct_GetBlActIdx(core->actor, 0);
+    u16 idx = FldAct_GetBillboardActorIdx(core->actor, 0);
 
-    if (idx != BLACT_NONE) {
+    if (idx != BILLBOARD_ACTOR_NONE) {
         return TRUE;
     }
     return FALSE;

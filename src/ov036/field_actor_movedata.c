@@ -2,8 +2,8 @@
 // commands' by command, for the actors on the grid (ACTOR_ACTION_COMMAND_TABLES) and on the rails
 // (ACTOR_ACTION_COMMAND_TABLES_RAIL), and the rows of the commands that differ only by direction (ACMD_DIR_LUT). The
 // table names are swan's (https://github.com/ds-pokemon-hacking/swan, GPL-3.0). The ROM gives this file no name, so
-// fldmmdl_movedata.c is a guess. It holds only data, whose .rodata (0x021cc004-0x021cd0f0 in Black 2) is one run
-// sorted by size after fldmmdl_movecode_pair.c's, laid out as the original's only in this order of definitions. The
+// field_actor_movedata.c is a guess. It holds only data, whose .rodata (0x021cc004-0x021cd0f0 in Black 2) is one run
+// sorted by size after field_actor_movecode_pair.c's, laid out as the original's only in this order of definitions. The
 // tables were first written by mariano54 on their parallel-decomp branch
 
 #include "types.h"
@@ -11,10 +11,10 @@
 #include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_actor_internal.h"
+#include "field/field_actor_movecode.h"
+#include "field/field_actor_movecode_pair.h"
 #include "field/field_comm_actor.h"
 #include "field/fld_act_rail.h"
-#include "field/fldmmdl_movecode.h"
-#include "field/fldmmdl_movecode_pair.h"
 
 // The functions of each move code, by move code, except that 0x2d and 0x2e follow 0xd, 0x31 follows 0x13 and 0x43
 // follows 0x5, the codes whose functions come just before theirs
@@ -24,249 +24,263 @@ static const FieldActorMoveCode data_ov036_021cc59c = { 0, MoveCodeNone_Init, Mo
 static const FieldActorMoveCode data_ov036_021cc5b0 = { 0x1, MoveCodeNone_Init, MoveCodeNone_Move, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc420 = { 0x2, FldmmdlMovecode_InitTurnRandomSet0,
-                                                        FldmmdlMovecode_MoveTurnRandom, func_ov036_021913dc,
+static const FieldActorMoveCode data_ov036_021cc420 = { 0x2, FieldActorMovecode_InitTurnRandomSet0,
+                                                        FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc8e4 = { 0x3, FldmmdlMovecode_InitWalkRandomSet11,
-                                                        FldmmdlMovecode_MoveWalkRandom, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc8e4 = { 0x3, FieldActorMovecode_InitWalkRandomSet11,
+                                                        FieldActorMovecode_MoveWalkRandom, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc8d0 = { 0x3, FldmmdlMovecode_InitWalkRandomSet12,
-                                                        FldmmdlMovecode_MoveWalkRandom, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc8d0 = { 0x3, FieldActorMovecode_InitWalkRandomSet12,
+                                                        FieldActorMovecode_MoveWalkRandom, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc3f8 = { 0x3, FldmmdlMovecode_InitWalkRandomSet13,
-                                                        FldmmdlMovecode_MoveWalkRandom, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc3f8 = { 0x3, FieldActorMovecode_InitWalkRandomSet13,
+                                                        FieldActorMovecode_MoveWalkRandom, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc268 = { 0x3, FldmmdlMovecode_InitWalkRandomSet13Bump,
-                                                        FldmmdlMovecode_MoveWalkRandom, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc268 = { 0x3, FieldActorMovecode_InitWalkRandomSet13Bump,
+                                                        FieldActorMovecode_MoveWalkRandom, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc894 = { 0x3, FldmmdlMovecode_InitTurnRandomSet1,
-                                                        FldmmdlMovecode_MoveTurnRandom, func_ov036_021913dc,
+static const FieldActorMoveCode data_ov036_021cc894 = { 0x3, FieldActorMovecode_InitTurnRandomSet1,
+                                                        FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc880 = { 0x3, FldmmdlMovecode_InitTurnRandomSet2,
-                                                        FldmmdlMovecode_MoveTurnRandom, func_ov036_021913dc,
+static const FieldActorMoveCode data_ov036_021cc880 = { 0x3, FieldActorMovecode_InitTurnRandomSet2,
+                                                        FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc86c = { 0x3, FldmmdlMovecode_InitTurnRandomSet3,
-                                                        FldmmdlMovecode_MoveTurnRandom, func_ov036_021913dc,
+static const FieldActorMoveCode data_ov036_021cc86c = { 0x3, FieldActorMovecode_InitTurnRandomSet3,
+                                                        FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc3d0 = { 0x3, FldmmdlMovecode_InitTurnRandomSet4,
-                                                        FldmmdlMovecode_MoveTurnRandom, func_ov036_021913dc,
+static const FieldActorMoveCode data_ov036_021cc3d0 = { 0x3, FieldActorMovecode_InitTurnRandomSet4,
+                                                        FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc844 = { 0x3, FldmmdlMovecode_InitTurnRandomSet5,
-                                                        FldmmdlMovecode_MoveTurnRandom, func_ov036_021913dc,
+static const FieldActorMoveCode data_ov036_021cc844 = { 0x3, FieldActorMovecode_InitTurnRandomSet5,
+                                                        FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc830 = { 0x3, FldmmdlMovecode_InitTurnRandomSet6,
-                                                        FldmmdlMovecode_MoveTurnRandom, func_ov036_021913dc,
+static const FieldActorMoveCode data_ov036_021cc830 = { 0x3, FieldActorMovecode_InitTurnRandomSet6,
+                                                        FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc2a4 = { 0x3, FldmmdlMovecode_InitTurnRandomSet7,
-                                                        FldmmdlMovecode_MoveTurnRandom, func_ov036_021913dc,
+static const FieldActorMoveCode data_ov036_021cc2a4 = { 0x3, FieldActorMovecode_InitTurnRandomSet7,
+                                                        FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc2b8 = { 0x3, FldmmdlMovecode_InitTurnRandomSet8,
-                                                        FldmmdlMovecode_MoveTurnRandom, func_ov036_021913dc,
+static const FieldActorMoveCode data_ov036_021cc2b8 = { 0x3, FieldActorMovecode_InitTurnRandomSet8,
+                                                        FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc7f4 = { 0x3, FldmmdlMovecode_InitTurnRandomSet9,
-                                                        FldmmdlMovecode_MoveTurnRandom, func_ov036_021913dc,
+static const FieldActorMoveCode data_ov036_021cc7f4 = { 0x3, FieldActorMovecode_InitTurnRandomSet9,
+                                                        FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc7e0 = { 0x3, FldmmdlMovecode_InitTurnRandomSet10,
-                                                        FldmmdlMovecode_MoveTurnRandom, func_ov036_021913dc,
+static const FieldActorMoveCode data_ov036_021cc7e0 = { 0x3, FieldActorMovecode_InitTurnRandomSet10,
+                                                        FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc7cc = { 0x3, FldmmdlMovecode_InitFixedDirUp,
-                                                        FldmmdlMovecode_MoveFixedDir, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc7cc = { 0x3, FieldActorMovecode_InitFixedDirUp,
+                                                        FieldActorMovecode_MoveFixedDir, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc380 = { 0x3, FldmmdlMovecode_InitFixedDirDown,
-                                                        FldmmdlMovecode_MoveFixedDir, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc380 = { 0x3, FieldActorMovecode_InitFixedDirDown,
+                                                        FieldActorMovecode_MoveFixedDir, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc7a4 = { 0x3, FldmmdlMovecode_InitFixedDirLeft,
-                                                        FldmmdlMovecode_MoveFixedDir, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc7a4 = { 0x3, FieldActorMovecode_InitFixedDirLeft,
+                                                        FieldActorMovecode_MoveFixedDir, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc790 = { 0x3, FldmmdlMovecode_InitFixedDirRight,
-                                                        FldmmdlMovecode_MoveFixedDir, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc790 = { 0x3, FieldActorMovecode_InitFixedDirRight,
+                                                        FieldActorMovecode_MoveFixedDir, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc358 = { 0x3, FldmmdlMovecode_InitSpinClockwise,
-                                                        FldmmdlMovecode_MoveSpin, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc358 = { 0x3, FieldActorMovecode_InitSpinClockwise,
+                                                        FieldActorMovecode_MoveSpin, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc2f4 = { 0x3, FldmmdlMovecode_InitSpinCounterClockwise,
-                                                        FldmmdlMovecode_MoveSpin, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc2f4 = { 0x3, FieldActorMovecode_InitSpinCounterClockwise,
+                                                        FieldActorMovecode_MoveSpin, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc754 = { 0x3, FldmmdlMovecode_InitSwing, FldmmdlMovecode_MoveSwing,
+static const FieldActorMoveCode data_ov036_021cc754 = { 0x3, FieldActorMovecode_InitSwing, FieldActorMovecode_MoveSwing,
                                                         MoveCodeNone_Delete, MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc740 = { 0x3, FldmmdlMovecode_InitBackForth,
-                                                        FldmmdlMovecode_MoveBackForth, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc740 = { 0x3, FieldActorMovecode_InitBackForth,
+                                                        FieldActorMovecode_MoveBackForth, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc72c = { 0x3, FldmmdlMovecode_InitRoutePatrolSet14,
-                                                        FldmmdlMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc72c = { 0x3, FieldActorMovecode_InitRoutePatrolSet14,
+                                                        FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc330 = { 0x3, FldmmdlMovecode_InitRoutePatrolSet15,
-                                                        FldmmdlMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc330 = { 0x3, FieldActorMovecode_InitRoutePatrolSet15,
+                                                        FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc704 = { 0x3, FldmmdlMovecode_InitRoutePatrolSet16,
-                                                        FldmmdlMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc704 = { 0x3, FieldActorMovecode_InitRoutePatrolSet16,
+                                                        FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc3a8 = { 0x3, FldmmdlMovecode_InitRoutePatrolSet17,
-                                                        FldmmdlMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc3a8 = { 0x3, FieldActorMovecode_InitRoutePatrolSet17,
+                                                        FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc45c = { 0x3, FldmmdlMovecode_InitRoutePatrolSet18,
-                                                        FldmmdlMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc45c = { 0x3, FieldActorMovecode_InitRoutePatrolSet18,
+                                                        FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc470 = { 0x3, FldmmdlMovecode_InitRoutePatrolSet19,
-                                                        FldmmdlMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc470 = { 0x3, FieldActorMovecode_InitRoutePatrolSet19,
+                                                        FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc6b4 = { 0x3, FldmmdlMovecode_InitRoutePatrolSet20,
-                                                        FldmmdlMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc6b4 = { 0x3, FieldActorMovecode_InitRoutePatrolSet20,
+                                                        FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc6a0 = { 0x3, FldmmdlMovecode_InitRoutePatrolSet21,
-                                                        FldmmdlMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc6a0 = { 0x3, FieldActorMovecode_InitRoutePatrolSet21,
+                                                        FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc68c = { 0x3, FldmmdlMovecode_InitRoutePatrolSet22,
-                                                        FldmmdlMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc68c = { 0x3, FieldActorMovecode_InitRoutePatrolSet22,
+                                                        FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc4ac = { 0x3, FldmmdlMovecode_InitRoutePatrolSet23,
-                                                        FldmmdlMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc4ac = { 0x3, FieldActorMovecode_InitRoutePatrolSet23,
+                                                        FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc664 = { 0x3, FldmmdlMovecode_InitRoutePatrolSet24,
-                                                        FldmmdlMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc664 = { 0x3, FieldActorMovecode_InitRoutePatrolSet24,
+                                                        FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc650 = { 0x3, FldmmdlMovecode_InitRoutePatrolSet25,
-                                                        FldmmdlMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc650 = { 0x3, FieldActorMovecode_InitRoutePatrolSet25,
+                                                        FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc4e8 = { 0x3, FldmmdlMovecode_InitRoutePatrolSet26,
-                                                        FldmmdlMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc4e8 = { 0x3, FieldActorMovecode_InitRoutePatrolSet26,
+                                                        FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc4fc = { 0x3, FldmmdlMovecode_InitRoutePatrolSet27,
-                                                        FldmmdlMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc4fc = { 0x3, FieldActorMovecode_InitRoutePatrolSet27,
+                                                        FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc614 = { 0x3, FldmmdlMovecode_InitRoutePatrolSet28,
-                                                        FldmmdlMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc614 = { 0x3, FieldActorMovecode_InitRoutePatrolSet28,
+                                                        FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc600 = { 0x3, FldmmdlMovecode_InitRoutePatrolSet29,
-                                                        FldmmdlMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc600 = { 0x3, FieldActorMovecode_InitRoutePatrolSet29,
+                                                        FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc5ec = { 0x3, FldmmdlMovecode_InitRoutePatrolSwapSet30,
-                                                        FldmmdlMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc5ec = { 0x3, FieldActorMovecode_InitRoutePatrolSwapSet30,
+                                                        FieldActorMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc538 = { 0x3, FldmmdlMovecode_InitRoutePatrolSwapSet31,
-                                                        FldmmdlMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc538 = { 0x3, FieldActorMovecode_InitRoutePatrolSwapSet31,
+                                                        FieldActorMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc5c4 = { 0x3, FldmmdlMovecode_InitRoutePatrolSwapSet32,
-                                                        FldmmdlMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc5c4 = { 0x3, FieldActorMovecode_InitRoutePatrolSwapSet32,
+                                                        FieldActorMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc560 = { 0x3, FldmmdlMovecode_InitRoutePatrolSwapSet33,
-                                                        FldmmdlMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc560 = { 0x3, FieldActorMovecode_InitRoutePatrolSwapSet33,
+                                                        FieldActorMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc574 = { 0x3, FldmmdlMovecode_InitRoutePatrolSwapSet34,
-                                                        FldmmdlMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc574 = { 0x3, FieldActorMovecode_InitRoutePatrolSwapSet34,
+                                                        FieldActorMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc588 = { 0x3, FldmmdlMovecode_InitRoutePatrolSwapSet35,
-                                                        FldmmdlMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc588 = { 0x3, FieldActorMovecode_InitRoutePatrolSwapSet35,
+                                                        FieldActorMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc5d8 = { 0x3, FldmmdlMovecode_InitRoutePatrolSwapSet36,
-                                                        FldmmdlMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc5d8 = { 0x3, FieldActorMovecode_InitRoutePatrolSwapSet36,
+                                                        FieldActorMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc628 = { 0x3, FldmmdlMovecode_InitRoutePatrolSwapSet37,
-                                                        FldmmdlMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc628 = { 0x3, FieldActorMovecode_InitRoutePatrolSwapSet37,
+                                                        FieldActorMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc63c = { 0x3, FldmmdlMove_InitLookPlayer, FldmmdlMove_MoveLookPlayer,
-                                                        FldmmdlMove_DeleteLookPlayer, MoveCodeNone_Return };
-
-static const FieldActorMoveCode data_ov036_021cc678 = { 0x3, FldmmdlMove_InitLookFellow, FldmmdlMove_MoveLookFellow,
-                                                        FldmmdlMove_DeleteLookFellow, FldmmdlMove_ClearFellowTracking };
-
-static const FieldActorMoveCode data_ov036_021cc6c8 = { 0x33, FldmmdlMove_InitHideKind0Code33, FldmmdlMove_MoveHide,
-                                                        FldmmdlMove_DeleteHide, FldmmdlMove_RecoverHide };
-
-static const FieldActorMoveCode data_ov036_021cc6dc = { 0x34, FldmmdlMove_InitHideKind1Code34, FldmmdlMove_MoveHide,
-                                                        FldmmdlMove_DeleteHide, FldmmdlMove_RecoverHide };
-
-static const FieldActorMoveCode data_ov036_021cc6f0 = { 0x35, FldmmdlMove_InitHideKind1Code35, FldmmdlMove_MoveHide,
-                                                        FldmmdlMove_DeleteHide, FldmmdlMove_RecoverHide };
-
-static const FieldActorMoveCode data_ov036_021cc718 = { 0x36, FldmmdlMove_InitHideKind0Code36, FldmmdlMove_MoveHide,
-                                                        FldmmdlMove_DeleteHide, FldmmdlMove_RecoverHide };
-
-static const FieldActorMoveCode data_ov036_021cc768 = { 0x37, FldmmdlMove_InitFaceDirSet0, FldmmdlMove_MoveFaceDir,
-                                                        MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode data_ov036_021cc77c = { 0x38, FldmmdlMove_InitFaceDirSet1, FldmmdlMove_MoveFaceDir,
-                                                        MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode data_ov036_021cc7b8 = { 0x39, FldmmdlMove_InitFaceDirSet2, FldmmdlMove_MoveFaceDir,
-                                                        MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode data_ov036_021cc808 = { 0x3a, FldmmdlMove_InitFaceDirSet3, FldmmdlMove_MoveFaceDir,
-                                                        MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode data_ov036_021cc81c = { 0x3b, FldmmdlMove_InitFaceDirFlagSet0, FldmmdlMove_MoveFaceDir,
-                                                        MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode data_ov036_021cc858 = { 0x3c, FldmmdlMove_InitFaceDirFlagSet1, FldmmdlMove_MoveFaceDir,
-                                                        MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode data_ov036_021cc8a8 = { 0x3d, FldmmdlMove_InitFaceDirFlagSet2, FldmmdlMove_MoveFaceDir,
-                                                        MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode data_ov036_021cc8bc = { 0x3e, FldmmdlMove_InitFaceDirFlagSet3, FldmmdlMove_MoveFaceDir,
-                                                        MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode data_ov036_021cc434 = { 0x3f, FldmmdlMove_InitWallWalkLeftHand,
-                                                        FldmmdlMove_MoveWallWalk, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc63c = { 0x3, FieldActorMove_InitLookPlayer,
+                                                        FieldActorMove_MoveLookPlayer, FieldActorMove_DeleteLookPlayer,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc254 = { 0x40, FldmmdlMove_InitWallWalkRightHand,
-                                                        FldmmdlMove_MoveWallWalk, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc678 = { 0x3, FieldActorMove_InitLookFellow,
+                                                        FieldActorMove_MoveLookFellow, FieldActorMove_DeleteLookFellow,
+                                                        FieldActorMove_ClearFellowTracking };
+
+static const FieldActorMoveCode data_ov036_021cc6c8 = { 0x33, FieldActorMove_InitHideKind0Code33,
+                                                        FieldActorMove_MoveHide, FieldActorMove_DeleteHide,
+                                                        FieldActorMove_RecoverHide };
+
+static const FieldActorMoveCode data_ov036_021cc6dc = { 0x34, FieldActorMove_InitHideKind1Code34,
+                                                        FieldActorMove_MoveHide, FieldActorMove_DeleteHide,
+                                                        FieldActorMove_RecoverHide };
+
+static const FieldActorMoveCode data_ov036_021cc6f0 = { 0x35, FieldActorMove_InitHideKind1Code35,
+                                                        FieldActorMove_MoveHide, FieldActorMove_DeleteHide,
+                                                        FieldActorMove_RecoverHide };
+
+static const FieldActorMoveCode data_ov036_021cc718 = { 0x36, FieldActorMove_InitHideKind0Code36,
+                                                        FieldActorMove_MoveHide, FieldActorMove_DeleteHide,
+                                                        FieldActorMove_RecoverHide };
+
+static const FieldActorMoveCode data_ov036_021cc768 = { 0x37, FieldActorMove_InitFaceDirSet0,
+                                                        FieldActorMove_MoveFaceDir, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc40c = { 0x41, FldmmdlMove_InitWallWalkLeftHandReversing,
-                                                        FldmmdlMove_MoveWallWalk, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc77c = { 0x38, FieldActorMove_InitFaceDirSet1,
+                                                        FieldActorMove_MoveFaceDir, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc27c = { 0x42, FldmmdlMove_InitWallWalkRightHandReversing,
-                                                        FldmmdlMove_MoveWallWalk, MoveCodeNone_Delete,
+static const FieldActorMoveCode data_ov036_021cc7b8 = { 0x39, FieldActorMove_InitFaceDirSet2,
+                                                        FieldActorMove_MoveFaceDir, MoveCodeNone_Delete,
+                                                        MoveCodeNone_Return };
+
+static const FieldActorMoveCode data_ov036_021cc808 = { 0x3a, FieldActorMove_InitFaceDirSet3,
+                                                        FieldActorMove_MoveFaceDir, MoveCodeNone_Delete,
+                                                        MoveCodeNone_Return };
+
+static const FieldActorMoveCode data_ov036_021cc81c = { 0x3b, FieldActorMove_InitFaceDirFlagSet0,
+                                                        FieldActorMove_MoveFaceDir, MoveCodeNone_Delete,
+                                                        MoveCodeNone_Return };
+
+static const FieldActorMoveCode data_ov036_021cc858 = { 0x3c, FieldActorMove_InitFaceDirFlagSet1,
+                                                        FieldActorMove_MoveFaceDir, MoveCodeNone_Delete,
+                                                        MoveCodeNone_Return };
+
+static const FieldActorMoveCode data_ov036_021cc8a8 = { 0x3d, FieldActorMove_InitFaceDirFlagSet2,
+                                                        FieldActorMove_MoveFaceDir, MoveCodeNone_Delete,
+                                                        MoveCodeNone_Return };
+
+static const FieldActorMoveCode data_ov036_021cc8bc = { 0x3e, FieldActorMove_InitFaceDirFlagSet3,
+                                                        FieldActorMove_MoveFaceDir, MoveCodeNone_Delete,
+                                                        MoveCodeNone_Return };
+
+static const FieldActorMoveCode data_ov036_021cc434 = { 0x3f, FieldActorMove_InitWallWalkLeftHand,
+                                                        FieldActorMove_MoveWallWalk, MoveCodeNone_Delete,
+                                                        MoveCodeNone_Return };
+
+static const FieldActorMoveCode data_ov036_021cc254 = { 0x40, FieldActorMove_InitWallWalkRightHand,
+                                                        FieldActorMove_MoveWallWalk, MoveCodeNone_Delete,
+                                                        MoveCodeNone_Return };
+
+static const FieldActorMoveCode data_ov036_021cc40c = { 0x41, FieldActorMove_InitWallWalkLeftHandReversing,
+                                                        FieldActorMove_MoveWallWalk, MoveCodeNone_Delete,
+                                                        MoveCodeNone_Return };
+
+static const FieldActorMoveCode data_ov036_021cc27c = { 0x42, FieldActorMove_InitWallWalkRightHandReversing,
+                                                        FieldActorMove_MoveWallWalk, MoveCodeNone_Delete,
                                                         MoveCodeNone_Return };
 
 static const FieldActorMoveCode data_ov036_021cc3e4 = { 0x44, FieldCommActor_MoveInit, FieldCommActor_Move,
@@ -320,8 +334,9 @@ static const FieldActorMoveCode data_ov036_021cc510 = { 0x53, RailActor_WalkInit
 static const FieldActorMoveCode data_ov036_021cc524 = { 0x54, RailActor_PatrolInit, RailActor_PatrolMove,
                                                         RailActor_PatrolDelete, RailActor_Recover };
 
-static const FieldActorMoveCode data_ov036_021cc54c = { 0x55, FldmmdlMove_InitHideKind2Code55, FldmmdlMove_MoveHide,
-                                                        FldmmdlMove_DeleteHide, FldmmdlMove_RecoverHide };
+static const FieldActorMoveCode data_ov036_021cc54c = { 0x55, FieldActorMove_InitHideKind2Code55,
+                                                        FieldActorMove_MoveHide, FieldActorMove_DeleteHide,
+                                                        FieldActorMove_RecoverHide };
 
 const FieldActorMoveCode *const ACTOR_MOVE_CODE_FUNCTION_TABLES[] = {
     &data_ov036_021cc59c, &data_ov036_021cc5b0, &data_ov036_021cc420, &data_ov036_021cc8e4,
@@ -390,8 +405,8 @@ const ActorAcmdFunc *const ACTOR_ACTION_COMMAND_TABLES[] = {
     data_ov036_021cb1c0, data_ov036_021cacb4, data_ov036_021caf74,
 };
 
-// The rail actors' functions of the action commands: fld_act_rail.c's, fldmmdl_acmd.c's for the commands that work the
-// same on the rails, and data_ov036_021cf394, which only moves on to the next state, for the others
+// The rail actors' functions of the action commands: fld_act_rail.c's, field_actor_acmd.c's for the commands that work
+// the same on the rails, and data_ov036_021cf394, which only moves on to the next state, for the others
 const ActorAcmdFunc *const ACTOR_ACTION_COMMAND_TABLES_RAIL[] = {
     data_ov036_021cf384,
     data_ov036_021cf38c,

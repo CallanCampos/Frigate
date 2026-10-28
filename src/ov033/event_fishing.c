@@ -256,7 +256,7 @@ void func_ov033_021795e8(FishingEventWork *work) {
 
     effects = Field_GetFieldEffects(work->field);
     FldAct_SetDrawStatus(work->actor, 2);
-    work->effect2C = FldeffEmotionBubble_SetMMdl(effects, work->actor, 0, 1);
+    work->effect2C = FldeffEmotionBubble_SetActor(effects, work->actor, 0, 1);
     FldeffFishing_SetAnimeSpeed(work->effect30, 1);
 }
 

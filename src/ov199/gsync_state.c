@@ -970,7 +970,7 @@ static void GSync_AddForestPokemon(GSyncWork *wk, DreamWorldSave *dreamWorld, in
         if (forestSlot > 8) {
             forestSlot = 0;
         }
-        if (GetFieldPokemonMMdlLUTIndex_(data, species, sex, modelForm) != 0xffff) {
+        if (GetFieldPokemonActorLUTIndex_(data, species, sex, modelForm) != 0xffff) {
             SymbolSave_AddPokemon(getAreaNPCData(wk->save), species, unk2, sex, modelForm, forestSlot, size);
         }
         FreeTPokeData(data);

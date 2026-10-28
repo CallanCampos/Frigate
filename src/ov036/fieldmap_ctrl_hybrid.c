@@ -82,7 +82,7 @@ void FieldmapCtrlHybrid_Create(Field *field, VecFx32 *pos, u16 dir) {
     isRail = PlayerState_IsRail(playerState);
     controller->activeType = 2;
     actor = FieldPlayer_GetActor(controller->player);
-    RailActorAnim_GetBlactAnime(actor, &a5, &a6);
+    RailActorAnim_GetBillboardActorAnime(actor, &a5, &a6);
     if (isRail == FALSE) {
         FieldPlayer_InitGrid(controller->player, heapId);
         FieldPlayer_CreateNogrid(controller->player, heapId);
@@ -180,7 +180,7 @@ void FieldmapCtrlHybrid_SwitchToNogrid(Field *field, FieldmapCtrlHybrid *control
     u16 a6;
     u16 a5;
 
-    RailActorAnim_GetBlactAnime(actor, &a5, &a6);
+    RailActorAnim_GetBillboardActorAnime(actor, &a5, &a6);
     FieldPlayer_UpdateGridMovement(controller->player, 0, 0, 0);
     if (!keyDir) {
         dir = GetActorFaceDir(actor);
@@ -196,7 +196,7 @@ void FieldmapCtrlHybrid_SwitchToGrid(Field *field, FieldmapCtrlHybrid *controlle
     u16 a6;
     u16 a5;
 
-    RailActorAnim_GetBlactAnime(actor, &a5, &a6);
+    RailActorAnim_GetBillboardActorAnime(actor, &a5, &a6);
     FieldPlayer_UpdateRailMovement(controller->player, 0, 0);
     if (!keyDir) {
         dir = GetActorFaceDir(actor);
@@ -275,12 +275,12 @@ void FieldmapCtrlHybrid_SetMode(Field *field, FieldmapCtrlHybrid *controller, u3
         FieldCamera_ResetBind(camera);
         FieldCamera_LoadDefaults(camera);
     } else {
-        FieldPlayer_AttachNogridMmdl(controller->player, pos);
+        FieldPlayer_AttachNogridActor(controller->player, pos);
         FieldNoGridMapper_SetCameraParent(mapper, FieldPlayer_GetNogridRailWork(controller->player));
         FieldCamera_EnableDelay(camera);
     }
     CheckSetActorFaceDir(actor, dir);
     SetActorMotionDir(actor, dir);
-    RailActorAnim_SetBlactAnime(actor, a5, a6);
+    RailActorAnim_SetBillboardActorAnime(actor, a5, a6);
     controller->activeType = type;
 }

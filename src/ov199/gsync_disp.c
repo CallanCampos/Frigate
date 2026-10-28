@@ -791,7 +791,7 @@ void GSyncDisp_SetFloatPokemon(GSyncDisp *disp, int index, int species, int form
     TPokeData *data = LoadTPokeData(disp->heapId);
 
     if (species != SPECIES_NONE && species <= SPECIES_GENESECT) {
-        if (GetFieldPokemonMMdlLUTIndex_(data, species, sex, form) != 0xffff) {
+        if (GetFieldPokemonActorLUTIndex_(data, species, sex, form) != 0xffff) {
             disp->floats[index].id = species;
             disp->floats[index].form = form;
             if (sex > 2) {

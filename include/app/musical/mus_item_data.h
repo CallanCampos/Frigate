@@ -10,7 +10,7 @@
 
 // A prop's entry in the table, 12 bytes
 typedef struct MusicalItemData {
-    // The BlAct size of its texture
+    // The BillboardActor size of its texture
     u32 texSize;
     // Its offset from where it is worn
     s8 offsetX;
@@ -35,7 +35,7 @@ void MusItemData_Free(MusItemData *items);
 MusicalItemData *MusItemData_GetItem(MusItemData *items, u16 itemId);
 // The prop's offset from where it is worn, x then y
 void MusItemData_GetOffset(MusicalItemData *item, s32 *offset);
-// The BlAct size of its texture
+// The BillboardActor size of its texture
 u32 MusItemData_GetTexSize(MusicalItemData *item);
 // Whether the prop can be worn at a position, by its flags
 BOOL MusItemData_CanEquipAtPos(MusicalItemData *item, s32 pos);

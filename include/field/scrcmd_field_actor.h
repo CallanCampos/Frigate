@@ -1,9 +1,9 @@
-#ifndef POKEBW2_FIELD_SCRCMD_FLDMMDL_H
-#define POKEBW2_FIELD_SCRCMD_FLDMMDL_H
+#ifndef POKEBW2_FIELD_SCRCMD_FIELD_ACTOR_H
+#define POKEBW2_FIELD_SCRCMD_FIELD_ACTOR_H
 
-// Overlay 36's scrcmd_fldmmdl.c: the script commands of field actors. PauseEventMModels and EnableAllActorsMovementScr,
-// which overlay 12 calls, are in field/field_script.h. Names from swan (https://github.com/ds-pokemon-hacking/swan,
-// GPL-3.0)
+// Overlay 36's scrcmd_field_actor.c: the script commands of field actors. PauseEventMModels and
+// EnableAllActorsMovementScr, which overlay 12 calls, are in field/field_script.h. Names from swan
+// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 #include "types.h"
 #include "struct_decls.h"
@@ -23,7 +23,7 @@ BOOL s006B_ActorAdd(VM *vm, FieldScriptEnv *env);
 BOOL s006D_ActorSetGPos(VM *vm, FieldScriptEnv *env);
 BOOL s006A_ActorGetSpawnFlag(VM *vm, FieldScriptEnv *env);
 BOOL s0079_ActorGetUserParam(VM *vm, FieldScriptEnv *env);
-BOOL ScriptNative_SetMmdlZoneDeleteOff(VM *vm, FieldScriptEnv *env);
+BOOL ScriptNative_SetActorZoneDeleteOff(VM *vm, FieldScriptEnv *env);
 BOOL s0074_ActorSetEyeToEye(VM *vm, FieldScriptEnv *env);
 BOOL s0070_ActorFindByGPos(VM *vm, FieldScriptEnv *env);
 BOOL s006F_PlayerGetActorInFront(VM *vm, FieldScriptEnv *env);
@@ -46,4 +46,4 @@ BOOL s0234_ActorFallDownToXZ(VM *vm, FieldScriptEnv *env);
 // The actors the script waits on to stop, among the common symbols at the end of the .bss
 extern u8 g_ScrEventActorFlags;
 
-#endif // POKEBW2_FIELD_SCRCMD_FLDMMDL_H
+#endif // POKEBW2_FIELD_SCRCMD_FIELD_ACTOR_H

@@ -6,7 +6,7 @@
 #include "field/field_actor.h"
 #include "field/field_effect.h"
 #include "field/zone.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/g3d.h"
 #include "gfl/heap.h"
 #include "nitro/fx.h"
@@ -14,8 +14,8 @@
 typedef struct {
     FieldEffects *effects;
     VecFx32 scale;
-    BlActSys *blact;
-    BlActScene *scene;
+    BillboardActorSys *billboardActor;
+    BillboardActorScene *scene;
     u32 matIndex;
     FieldColorPostFX *postFx;
 } FieldEffectShadow;
@@ -61,8 +61,8 @@ void *FieldEffect_Shadow_Create(FieldEffects *effects, HeapID heapId) {
     shadow->effects = effects;
     shadow->scale = SHADOW_SCALE;
     field = FieldEffects_GetField(effects);
-    shadow->blact = Field_GetEffectBlAct(field);
-    shadow->scene = BlActSys_GetScene(shadow->blact);
+    shadow->billboardActor = Field_GetEffectBillboardActor(field);
+    shadow->scene = BillboardActorSys_GetScene(shadow->billboardActor);
     shadow->postFx = Field_GetColorPostFX(field);
     FldeffShadow_CreateSlot(shadow);
     return shadow;
@@ -74,7 +74,7 @@ void FieldEffect_Shadow_Free(FieldEffects *effects, void *data) {
 }
 
 static void FldeffShadow_CreateSlot(FieldEffectShadow *shadow) {
-    BlActMatRequest request;
+    BillboardActorMatRequest request;
     G3DResource *texture = GFL_G3DSysReadArcToolResource(FieldEffects_GetArc(shadow->effects), 47);
 
     FieldColorPostFX_Apply(shadow->postFx, texture);
@@ -83,12 +83,12 @@ static void FldeffShadow_CreateSlot(FieldEffectShadow *shadow) {
     request.size = 17;
     request.faceWidth = 16;
     request.faceHeight = 16;
-    request.mode = BLACT_LOAD_TRIM;
-    shadow->matIndex = BlActSys_ExecMatLoadRequests(shadow->blact, &request, 1);
+    request.mode = BILLBOARD_ACTOR_LOAD_TRIM;
+    shadow->matIndex = BillboardActorSys_ExecMatLoadRequests(shadow->billboardActor, &request, 1);
 }
 
 static void FldeffShadow_DeleteSlot(FieldEffectShadow *shadow) {
-    BlActSys_FreeMaterials(shadow->blact, shadow->matIndex, 1);
+    BillboardActorSys_FreeMaterials(shadow->billboardActor, shadow->matIndex, 1);
 }
 
 // Give the actor a shadow
@@ -103,7 +103,7 @@ void FldeffShadow_Start(FieldActor *actor, FieldEffects *effects) {
 static void FldeffShadow_Init(FieldEffectTask *task, void *work) {
     ShadowTask *shadowTask = work;
     const ShadowTaskParams *params = FieldEffects_GetObjectParam(task);
-    BlActActorRequest request;
+    BillboardActorRequest request;
     u8 polygonId;
 
     shadowTask->shadow = params->shadow;
@@ -118,14 +118,14 @@ static void FldeffShadow_Init(FieldEffectTask *task, void *work) {
     request.pos = (VecFx32){ 0, 0, 0 };
     request.callback = NULL;
     request.callbackData = shadowTask;
-    shadowTask->actorIndex =
-        BlActSys_ExecActorRequests(shadowTask->shadow->blact, shadowTask->shadow->matIndex, &request, 1, 3);
+    shadowTask->actorIndex = BillboardActorSys_ExecActorRequests(shadowTask->shadow->billboardActor,
+                                                                 shadowTask->shadow->matIndex, &request, 1, 3);
     if (shadowTask->actorIndex == 0xffff) {
         FieldEffects_DeleteObject(task);
         return;
     }
     polygonId = 2;
-    BlActScene_SetActorPolygonId(shadowTask->shadow->scene, shadowTask->actorIndex, &polygonId);
+    BillboardActorScene_SetActorPolygonId(shadowTask->shadow->scene, shadowTask->actorIndex, &polygonId);
     FieldEffects_UpdateObject(task);
 }
 
@@ -133,7 +133,7 @@ static void FldeffShadow_Exit(FieldEffectTask *task, void *work) {
     ShadowTask *shadowTask = work;
 
     if (shadowTask->actorIndex != 0xffff) {
-        BlActSys_DeleteActors(shadowTask->shadow->blact, (u16)shadowTask->actorIndex, 1);
+        BillboardActorSys_DeleteActors(shadowTask->shadow->billboardActor, (u16)shadowTask->actorIndex, 1);
     }
 }
 
@@ -184,12 +184,12 @@ static void FldeffShadow_Draw(FieldEffectTask *task, void *work) {
             }
             VEC_Add(&pos, &offset, &pos);
         }
-        BlActScene_SetActorHidden(shadowTask->shadow->scene, actorIndex, &visible);
+        BillboardActorScene_SetActorHidden(shadowTask->shadow->scene, actorIndex, &visible);
         pos.y += FX32_ONE;
-        BlActScene_SetActorPos(shadowTask->shadow->scene, actorIndex, &pos);
+        BillboardActorScene_SetActorPos(shadowTask->shadow->scene, actorIndex, &pos);
     } else {
         BOOL hidden = FALSE;
 
-        BlActScene_SetActorHidden(shadowTask->shadow->scene, actorIndex, &hidden);
+        BillboardActorScene_SetActorHidden(shadowTask->shadow->scene, actorIndex, &hidden);
     }
 }

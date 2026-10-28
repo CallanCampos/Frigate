@@ -12,8 +12,9 @@
 #include "nitro/os.h"
 #include "save/event_work.h"
 
-// The field actors (fldmmdl.c, after the file name that its allocations pass): the system that holds them, their
-// creation from a zone's entities, their state, and the saved positions of the strength boulders
+// The field actors (the ROM's fldmmdl.c, by the file name that its allocations pass): the system that holds them, their
+// creation from a zone's entities, their state, and the saved positions of the strength boulders. swan's names here are
+// in English: its MMDL is FieldActor and its BlAct BillboardActor
 
 // The grid coordinate of a world coordinate
 #define POS_TO_GRID(pos) ((s16)(((pos) >> 4) / FX32_ONE))
@@ -45,7 +46,7 @@ typedef struct {
 
 static void FldActSys_FreeFieldResources(MMSys *system);
 static FieldActor *CreateNewActorByEntity(MMSys *system, const ZoneNPC *npc, s32 zoneId, EventWork *eventWork);
-static void LoadZoneNPCParamsToMMDL(FieldActor *actor, const ZoneNPC *npc);
+static void LoadZoneNPCParamsToActor(FieldActor *actor, const ZoneNPC *npc);
 static void SetupNPCPositionBasic(FieldActor *actor, const ZoneNPC *npc);
 static void LoadActorParamsByZoneNPC(FieldActor *actor, const ZoneNPC *npc, EventWork *eventWork, MMSys *system);
 static void SetupActorOnRailIfRail(FieldActor *actor, const ZoneNPC *npc, u32 unused);
@@ -63,7 +64,7 @@ static void FldActSys_SetFlag(MMSys *system, u32 flag);
 static void ClearMMSysFlag(MMSys *system, u32 flag);
 static void IncrementMMSysActorCount(MMSys *system);
 static void FldActSys_DecrementActorCount(MMSys *system);
-static void SetMMDLActorUID(FieldActor *actor, u16 uid);
+static void SetFieldActorUID(FieldActor *actor, u16 uid);
 static void SetActorZoneID(FieldActor *actor, u16 zoneId);
 static void FldAct_SetObjCode(FieldActor *actor, u16 objCode);
 static void SetActorMoveCode(FieldActor *actor, u16 moveCode);
@@ -236,7 +237,7 @@ void FldActSys_Update(MMSys *system) {
 }
 
 void FldActSys_FinishAsyncMatLoadSafe(MMSys *system) {
-    if (system->fieldBlAct != NULL) {
+    if (system->fieldBillboardActor != NULL) {
         FldActSys_FinishAsyncMatLoad(system);
     }
 }
@@ -365,8 +366,8 @@ void FldActSys_DeleteAllActors(MMSys *mmSys) {
     }
 }
 
-static void LoadZoneNPCParamsToMMDL(FieldActor *actor, const ZoneNPC *npc) {
-    SetMMDLActorUID(actor, npc->uid);
+static void LoadZoneNPCParamsToActor(FieldActor *actor, const ZoneNPC *npc) {
+    SetFieldActorUID(actor, npc->uid);
     SetActorMoveCode(actor, npc->moveCode);
     SetActorEvType(actor, npc->evType);
     SetActorSpawnFlag(actor, npc->spawnFlag);
@@ -392,7 +393,7 @@ static void LoadActorParamsByZoneNPC(FieldActor *actor, const ZoneNPC *npc, Even
     u16 objCode;
     const FieldActorConfig *config;
 
-    LoadZoneNPCParamsToMMDL(actor, npc);
+    LoadZoneNPCParamsToActor(actor, npc);
     objCode = GetWKOBJCODENPCOBJCODE(eventWork, npc->modelId);
     FldAct_SetObjCode(actor, objCode);
     LoadInfoForNewActorModelID(system, objCode, actor);
@@ -652,12 +653,12 @@ ArcTool *GetMMSysDataArcHandle(MMSys *system) {
     return system->dataArc;
 }
 
-void FldActSys_BindFieldBlAct(MMSys *system, FieldBlAct *fieldBlAct) {
-    system->fieldBlAct = fieldBlAct;
+void FldActSys_BindFieldBillboardActor(MMSys *system, FieldBillboardActor *fieldBillboardActor) {
+    system->fieldBillboardActor = fieldBillboardActor;
 }
 
-FieldBlAct *FldActSys_GetFieldBlAct(MMSys *system) {
-    return system->fieldBlAct;
+FieldBillboardActor *FldActSys_GetFieldBillboardActor(MMSys *system) {
+    return system->fieldBillboardActor;
 }
 
 void FldActSys_BindActorG3DSystem(MMSys *system, ActorG3DSystem *actorG3DSystem) {
@@ -723,7 +724,7 @@ BOOL CheckActorMovementFlag(FieldActor *actor, u32 flag) {
     return actor->movementFlags & flag;
 }
 
-static void SetMMDLActorUID(FieldActor *actor, u16 uid) {
+static void SetFieldActorUID(FieldActor *actor, u16 uid) {
     actor->uid = uid;
 }
 
@@ -911,15 +912,15 @@ void *FldAct_GetMoveCmdWork(FieldActor *actor) {
     return actor->unkB4;
 }
 
-void *FldAct_ResetBlActWork(FieldActor *actor, u32 size) {
-    void *work = FldAct_GetBlActWorkPtr(actor);
+void *FldAct_ResetBillboardActorWork(FieldActor *actor, u32 size) {
+    void *work = FldAct_GetBillboardActorWorkPtr(actor);
 
     MI_CpuFill8(work, 0, size);
     return work;
 }
 
-void *FldAct_GetBlActWorkPtr(FieldActor *actor) {
-    return actor->blActWork;
+void *FldAct_GetBillboardActorWorkPtr(FieldActor *actor) {
+    return actor->billboardActorWork;
 }
 
 void FldAct_CallMoveInitProc(FieldActor *actor) {
@@ -964,9 +965,9 @@ static void FldAct_InvokeWakeUpCallback(FieldActor *actor) {
     }
 }
 
-u32 FldAct_GetBlActIdx(FieldActor *actor, u32 param) {
-    if (actor->sceneNodeVTable->getBlActIdx != NULL) {
-        return actor->sceneNodeVTable->getBlActIdx(actor, param);
+u32 FldAct_GetBillboardActorIdx(FieldActor *actor, u32 param) {
+    if (actor->sceneNodeVTable->getBillboardActorIdx != NULL) {
+        return actor->sceneNodeVTable->getBillboardActorIdx(actor, param);
     }
     return 0;
 }
@@ -1139,8 +1140,8 @@ void FldAct_SetAttrDrawOffset(FieldActor *actor, const VecFx32 *offset) {
     actor->unk68 = *offset;
 }
 
-FieldBlAct *FldAct_GetFieldBlAct(FieldActor *actor) {
-    return FldActSys_GetFieldBlAct(GetActorMModelSystem(actor));
+FieldBillboardActor *FldAct_GetFieldBillboardActor(FieldActor *actor) {
+    return FldActSys_GetFieldBillboardActor(GetActorMModelSystem(actor));
 }
 
 u8 GetActorCollWidth(FieldActor *actor) {
@@ -1708,7 +1709,7 @@ void FldAct_Transplant(FieldActor *actor, const ZoneNPC *npc) {
     if (actor->moveCodeVTable->unkC != NULL) {
         actor->moveCodeVTable->unkC(actor);
     }
-    LoadZoneNPCParamsToMMDL(actor, npc);
+    LoadZoneNPCParamsToActor(actor, npc);
     SetupNPCPositionBasic(actor, npc);
     UpdateActorMoveCodeExecutor(actor);
     FldAct_InitMoveProc(system, actor);
@@ -1749,7 +1750,7 @@ static void FldAct_ClearEffectFlags(FieldActor *actor) {
 }
 
 void ChangeActorUID(FieldActor *actor, u16 uid) {
-    SetMMDLActorUID(actor, uid);
+    SetFieldActorUID(actor, uid);
     FldAct_SetMoveStart(actor);
     FldAct_ClearEffectFlags(actor);
 }

@@ -235,7 +235,7 @@ src/ov036/scrcmd_encount.c:
     .rodata     start:0x021d0f8c end:0x021d0f98
     .data       start:0x021d5230 end:0x021d5244
 
-src/ov036/scrcmd_fldmmdl.c:
+src/ov036/scrcmd_field_actor.c:
     complete
     .text       start:0x021a9904 end:0x021aad84
     .rodata     start:0x021d0918 end:0x021d094c
@@ -390,19 +390,19 @@ src/ov036/field_menu_event.c:
     complete
     .text       start:0x0218b16c end:0x0218b238
 
-src/ov036/fldmmdl_acmd.c:
+src/ov036/field_actor_acmd.c:
     complete
     .text       start:0x0218ed58 end:0x02191268
     .rodata     start:0x021cace0 end:0x021cb8b0
     .data       start:0x021d4d74 end:0x021d4d90
 
-src/ov036/fldmmdl_blact.c:
+src/ov036/field_actor_billboard.c:
     complete
     .text       start:0x021936c0 end:0x021946f4
     .rodata     start:0x021cf30c end:0x021cf398
     .data       start:0x021d4d90 end:0x021d4da0
 
-src/ov036/fldmmdl_g3dobj.c:
+src/ov036/field_actor_g3dobj.c:
     complete
     .text       start:0x021946f4 end:0x021953b8
     .rodata     start:0x021cf398 end:0x021cf3a8
@@ -741,26 +741,26 @@ src/ov036/enceff_data.c:
     complete
     .rodata     start:0x021d2620 end:0x021d2918
 
-src/ov036/fldmmdl_movecode.c:
+src/ov036/field_actor_movecode.c:
     complete
     .text       start:0x02191268 end:0x021925e4
     .rodata     start:0x021cb8b0 end:0x021cbde4
 
-src/ov036/fldmmdl_evtype.c:
+src/ov036/field_actor_evtype.c:
     complete
     .text       start:0x021925e4 end:0x02192a8c
     .rodata     start:0x021cbde4 end:0x021cbf20
 
-src/ov036/fldmmdl_movecode_pair.c:
+src/ov036/field_actor_movecode_pair.c:
     complete
     .text       start:0x02192a8c end:0x021936c0
     .rodata     start:0x021cbf20 end:0x021cc038
 
-src/ov036/fldmmdl_movedata.c:
+src/ov036/field_actor_movedata.c:
     complete
     .rodata     start:0x021cc038 end:0x021cd124
 
-src/ov036/fldmmdl_drawdata.c:
+src/ov036/field_actor_drawdata.c:
     complete
     .rodata     start:0x021cd124 end:0x021cf30c
 
@@ -785,12 +785,12 @@ src/ov036/scrcmd_poke_disp.c:
     .text       start:0x021c74d0 end:0x021c7b70
     .rodata     start:0x021d46b0 end:0x021d46b8
 
-src/ov036/fldmmdl_g3dobj_draw.c:
+src/ov036/field_actor_g3dobj_draw.c:
     complete
     .text       start:0x021974dc end:0x02197574
     .rodata     start:0x021cf9d4 end:0x021cf9ec
 
-src/ov036/fldmmdl_rail.c:
+src/ov036/field_actor_rail.c:
     complete
     .text       start:0x021955d0 end:0x02196248
     .rodata     start:0x021cf6d0 end:0x021cf7fc

@@ -1,6 +1,6 @@
 // The move codes by which actors look around, wander in a rectangle or by a mask of directions, turn, pace back and
-// forth and walk around a square: the functions that fldmmdl_movedata.c's tables list for each, and the steps they
-// run. The ROM gives this file no name, so fldmmdl_movecode.c is a guess. It follows fldmmdl_acmd.c, and its
+// forth and walk around a square: the functions that field_actor_movedata.c's tables list for each, and the steps they
+// run. The ROM gives this file no name, so field_actor_movecode.c is a guess. It follows field_actor_acmd.c, and its
 // .rodata, sorted by size on its own, starts at 0x021cb87c (Black 2). The code was first written by mariano54 on
 // their parallel-decomp branch
 
@@ -9,7 +9,7 @@
 #include "field/event_trainer_eye.h"
 #include "field/field_actor.h"
 #include "field/field_actor_internal.h"
-#include "field/fldmmdl_movecode.h"
+#include "field/field_actor_movecode.h"
 #include "gfl/key.h"
 #include "gfl/random.h"
 
@@ -118,56 +118,56 @@ typedef struct {
     const s32 *dirs;
 } ActorDirTableEntry;
 
-static void FldmmdlMovecode_InitTurnRandom(FieldActor *actor, u32 mask);
-static u16 FldmmdlMovecode_GetNextDirInRotation(u16 moveCode, u16 faceDir);
-static void FldmmdlMovecode_InitWalkRandom(FieldActor *actor, u32 acmdBase, u32 dirMask, u32 mode);
-static void FldmmdlMovecode_GetMoveRect(FieldActor *actor, WalkRect *rect);
-static BOOL FldmmdlMovecode_IsDirInsideMoveRect(FieldActor *actor, u32 dir);
-static void FldmmdlMovecode_InitFixedDir(FieldActor *actor, u32 dir);
-static void FldmmdlMovecode_InitSpin(FieldActor *actor, u32 turn);
-static BOOL FldmmdlMovecode_SpinStepTurn(FieldActor *actor, RailTurnWork *work);
-static BOOL FldmmdlMovecode_SpinStepWaitTurn(FieldActor *actor, RailTurnWork *work);
-static BOOL FldmmdlMovecode_SpinStepWaitInterval(FieldActor *actor, RailTurnWork *work);
-static BOOL FldmmdlMovecode_SpinStepRotateDir(FieldActor *actor, RailTurnWork *work);
-static BOOL FldmmdlMovecode_SwingStepTurn(FieldActor *actor, RailTurnWork *work);
-static BOOL FldmmdlMovecode_SwingStepWaitTurn(FieldActor *actor, RailTurnWork *work);
-static BOOL FldmmdlMovecode_SwingStepWaitInterval(FieldActor *actor, RailTurnWork *work);
-static BOOL FldmmdlMovecode_SwingStepRotateDir(FieldActor *actor, RailTurnWork *work);
-static BOOL FldmmdlMovecode_BackForthStepFaceDir(FieldActor *actor, RailPaceWork *work);
-static BOOL FldmmdlMovecode_BackForthStepWalk(FieldActor *actor, RailPaceWork *work);
-static BOOL FldmmdlMovecode_BackForthStepWaitWalk(FieldActor *actor, RailPaceWork *work);
-static void FldmmdlMovecode_InitRoutePatrol(FieldActor *actor, u32 steps, u32 turns, u32 speed);
-static BOOL FldmmdlMovecode_RoutePatrolStepWalk(FieldActor *actor, ActorRoundWork *work);
-static BOOL FldmmdlMovecode_RoutePatrolStepWaitWalk(FieldActor *actor, ActorRoundWork *work);
-static void FldmmdlMovecode_InitRoutePatrolSwap(FieldActor *actor, u32 limit, u32 axis, u32 dirTable);
-static void FldmmdlMovecode_AdvanceRouteIndex(ActorPatrolWork *work);
-static BOOL FldmmdlMovecode_RoutePatrolSwapStepLookForPlayer(FieldActor *actor, ActorPatrolWork *work);
-static BOOL FldmmdlMovecode_RoutePatrolSwapStepSwapMoveCode(FieldActor *actor, ActorPatrolWork *work);
-static BOOL FldmmdlMovecode_RoutePatrolSwapStepWalk(FieldActor *actor, ActorPatrolWork *work);
-static BOOL FldmmdlMovecode_RoutePatrolSwapStepWaitWalk(FieldActor *actor, ActorPatrolWork *work);
-static BOOL FldmmdlMovecode_IsBButtonHeld(void);
-static BOOL FldmmdlMovecode_IsPlayerWalking(FieldActor *actor);
-static BOOL FldmmdlMovecode_IsBButtonPressed(void);
-static u32 FldmmdlMovecode_FindTableEnd(const s32 *list, u32 end);
-static s32 FldmmdlMovecode_GetRandomTableEntry(const s32 *list, u32 end);
-static s32 FldmmdlMovecode_GetRandomDirFromSet(u32 index, u32 end);
-static const s32 *FldmmdlMovecode_GetDirSet(u32 index);
-static u32 FldmmdlMovecode_GetSightDirToPlayer(FieldActor *actor);
-static u32 FldmmdlMovecode_GetDirTowardPlayerInSet(FieldActor *actor, u32 index, u32 end);
-static BOOL FldmmdlMovecode_UpdateTriggerWait(FieldActor *actor, u8 *wait);
-static BOOL FldmmdlMovecode_IsDashEventType(FieldActor *actor);
-static BOOL FldmmdlMovecode_IsMirrorEventType(FieldActor *actor);
-static void FldmmdlMovecode_InitMirrorSide(FieldActor *actor, ActorFaceMemory *face);
-static void FldmmdlMovecode_StartMirrorTurn(FieldActor *actor, ActorFaceMemory *face);
-static void FldmmdlMovecode_EndMirrorTurn(FieldActor *actor, ActorFaceMemory *face);
+static void FieldActorMovecode_InitTurnRandom(FieldActor *actor, u32 mask);
+static u16 FieldActorMovecode_GetNextDirInRotation(u16 moveCode, u16 faceDir);
+static void FieldActorMovecode_InitWalkRandom(FieldActor *actor, u32 acmdBase, u32 dirMask, u32 mode);
+static void FieldActorMovecode_GetMoveRect(FieldActor *actor, WalkRect *rect);
+static BOOL FieldActorMovecode_IsDirInsideMoveRect(FieldActor *actor, u32 dir);
+static void FieldActorMovecode_InitFixedDir(FieldActor *actor, u32 dir);
+static void FieldActorMovecode_InitSpin(FieldActor *actor, u32 turn);
+static BOOL FieldActorMovecode_SpinStepTurn(FieldActor *actor, RailTurnWork *work);
+static BOOL FieldActorMovecode_SpinStepWaitTurn(FieldActor *actor, RailTurnWork *work);
+static BOOL FieldActorMovecode_SpinStepWaitInterval(FieldActor *actor, RailTurnWork *work);
+static BOOL FieldActorMovecode_SpinStepRotateDir(FieldActor *actor, RailTurnWork *work);
+static BOOL FieldActorMovecode_SwingStepTurn(FieldActor *actor, RailTurnWork *work);
+static BOOL FieldActorMovecode_SwingStepWaitTurn(FieldActor *actor, RailTurnWork *work);
+static BOOL FieldActorMovecode_SwingStepWaitInterval(FieldActor *actor, RailTurnWork *work);
+static BOOL FieldActorMovecode_SwingStepRotateDir(FieldActor *actor, RailTurnWork *work);
+static BOOL FieldActorMovecode_BackForthStepFaceDir(FieldActor *actor, RailPaceWork *work);
+static BOOL FieldActorMovecode_BackForthStepWalk(FieldActor *actor, RailPaceWork *work);
+static BOOL FieldActorMovecode_BackForthStepWaitWalk(FieldActor *actor, RailPaceWork *work);
+static void FieldActorMovecode_InitRoutePatrol(FieldActor *actor, u32 steps, u32 turns, u32 speed);
+static BOOL FieldActorMovecode_RoutePatrolStepWalk(FieldActor *actor, ActorRoundWork *work);
+static BOOL FieldActorMovecode_RoutePatrolStepWaitWalk(FieldActor *actor, ActorRoundWork *work);
+static void FieldActorMovecode_InitRoutePatrolSwap(FieldActor *actor, u32 limit, u32 axis, u32 dirTable);
+static void FieldActorMovecode_AdvanceRouteIndex(ActorPatrolWork *work);
+static BOOL FieldActorMovecode_RoutePatrolSwapStepLookForPlayer(FieldActor *actor, ActorPatrolWork *work);
+static BOOL FieldActorMovecode_RoutePatrolSwapStepSwapMoveCode(FieldActor *actor, ActorPatrolWork *work);
+static BOOL FieldActorMovecode_RoutePatrolSwapStepWalk(FieldActor *actor, ActorPatrolWork *work);
+static BOOL FieldActorMovecode_RoutePatrolSwapStepWaitWalk(FieldActor *actor, ActorPatrolWork *work);
+static BOOL FieldActorMovecode_IsBButtonHeld(void);
+static BOOL FieldActorMovecode_IsPlayerWalking(FieldActor *actor);
+static BOOL FieldActorMovecode_IsBButtonPressed(void);
+static u32 FieldActorMovecode_FindTableEnd(const s32 *list, u32 end);
+static s32 FieldActorMovecode_GetRandomTableEntry(const s32 *list, u32 end);
+static s32 FieldActorMovecode_GetRandomDirFromSet(u32 index, u32 end);
+static const s32 *FieldActorMovecode_GetDirSet(u32 index);
+static u32 FieldActorMovecode_GetSightDirToPlayer(FieldActor *actor);
+static u32 FieldActorMovecode_GetDirTowardPlayerInSet(FieldActor *actor, u32 index, u32 end);
+static BOOL FieldActorMovecode_UpdateTriggerWait(FieldActor *actor, u8 *wait);
+static BOOL FieldActorMovecode_IsDashEventType(FieldActor *actor);
+static BOOL FieldActorMovecode_IsMirrorEventType(FieldActor *actor);
+static void FieldActorMovecode_InitMirrorSide(FieldActor *actor, ActorFaceMemory *face);
+static void FieldActorMovecode_StartMirrorTurn(FieldActor *actor, ActorFaceMemory *face);
+static void FieldActorMovecode_EndMirrorTurn(FieldActor *actor, ActorFaceMemory *face);
 
 // The tables are declared in this order because MWCC lays out objects of the same size by where each was declared:
 // it is one that gives the ROM's .rodata (found with tools/decomp/rodata_order.py's model), not the original's, which
 // is unknown. data_ov036_021cb8d8, data_ov036_021cbb64 and data_ov036_021cbc70 follow
-// FldmmdlMovecode_SwingStepRotateDir for the same reason
+// FieldActorMovecode_SwingStepRotateDir for the same reason
 static BOOL (*const data_ov036_021cb87c[])(FieldActor *actor,
-                                           ActorRoundWork *work) = { FldmmdlMovecode_RoutePatrolStepWalk,
-                                                                     FldmmdlMovecode_RoutePatrolStepWaitWalk };
+                                           ActorRoundWork *work) = { FieldActorMovecode_RoutePatrolStepWalk,
+                                                                     FieldActorMovecode_RoutePatrolStepWaitWalk };
 
 static const s32 data_ov036_021cb9f0[] = { DIR_LEFT, DIR_UP, DIR_DOWN, DIR_RIGHT };
 
@@ -220,8 +220,8 @@ static const s32 data_ov036_021cba10[] = { DIR_RIGHT, DIR_UP, DIR_DOWN, DIR_LEFT
 static const s32 data_ov036_021cb910[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT };
 
 static BOOL (*const data_ov036_021cb8f0[])(FieldActor *actor, ActorPatrolWork *work) = {
-    FldmmdlMovecode_RoutePatrolSwapStepLookForPlayer, FldmmdlMovecode_RoutePatrolSwapStepSwapMoveCode,
-    FldmmdlMovecode_RoutePatrolSwapStepWalk, FldmmdlMovecode_RoutePatrolSwapStepWaitWalk
+    FieldActorMovecode_RoutePatrolSwapStepLookForPlayer, FieldActorMovecode_RoutePatrolSwapStepSwapMoveCode,
+    FieldActorMovecode_RoutePatrolSwapStepWalk, FieldActorMovecode_RoutePatrolSwapStepWaitWalk
 };
 
 static const s32 data_ov036_021cb9e0[] = { DIR_DOWN, DIR_UP, DIR_RIGHT, DIR_LEFT };
@@ -236,10 +236,10 @@ static const s32 data_ov036_021cb940[] = { DIR_LEFT, DIR_RIGHT, DIR_DOWN, DIR_UP
 static const s32 data_ov036_021cb9a0[] = { DIR_LEFT, DIR_RIGHT, DIR_DOWN, DIR_UP };
 
 static BOOL (*const data_ov036_021cb960[])(FieldActor *actor, RailTurnWork *work) = {
-    FldmmdlMovecode_SpinStepTurn,
-    FldmmdlMovecode_SpinStepWaitTurn,
-    FldmmdlMovecode_SpinStepWaitInterval,
-    FldmmdlMovecode_SpinStepRotateDir,
+    FieldActorMovecode_SpinStepTurn,
+    FieldActorMovecode_SpinStepWaitTurn,
+    FieldActorMovecode_SpinStepWaitInterval,
+    FieldActorMovecode_SpinStepRotateDir,
 };
 
 static const s32 data_ov036_021cb970[] = { DIR_DOWN, DIR_LEFT, DIR_UP, DIR_RIGHT };
@@ -261,10 +261,10 @@ static const s32 data_ov036_021cbae0[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT
 static const s32 data_ov036_021cb900[] = { DIR_LEFT, DIR_RIGHT, DIR_UP, DIR_DOWN };
 
 static BOOL (*const data_ov036_021cb930[])(FieldActor *actor, RailTurnWork *work) = {
-    FldmmdlMovecode_SwingStepTurn,
-    FldmmdlMovecode_SwingStepWaitTurn,
-    FldmmdlMovecode_SwingStepWaitInterval,
-    FldmmdlMovecode_SwingStepRotateDir,
+    FieldActorMovecode_SwingStepTurn,
+    FieldActorMovecode_SwingStepWaitTurn,
+    FieldActorMovecode_SwingStepWaitInterval,
+    FieldActorMovecode_SwingStepRotateDir,
 };
 
 // The directions that each move code turns between, in turn, after the move code and ended by DIR_NONE. A move code
@@ -291,77 +291,77 @@ static const s32 data_ov036_021cbb30[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT
 
 static const s32 data_ov036_021cbad0[] = { DIR_DOWN, DIR_RIGHT, DIR_UP, DIR_LEFT };
 
-static void FldmmdlMovecode_InitTurnRandom(FieldActor *actor, u32 mask) {
+static void FieldActorMovecode_InitTurnRandom(FieldActor *actor, u32 mask) {
     RailWanderWork *work = ClearActorPositionBlock(actor, sizeof(RailWanderWork));
-    work->timer = FldmmdlMovecode_GetRandomTableEntry(data_ov036_021cbb1c, -1);
+    work->timer = FieldActorMovecode_GetRandomTableEntry(data_ov036_021cbb1c, -1);
     work->mask = mask;
     FldAct_SetDrawStatus(actor, 0);
     FldAct_ClearMoving(actor);
 }
 
-void FldmmdlMovecode_InitTurnRandomSet0(FieldActor *actor) {
-    FldmmdlMovecode_InitTurnRandom(actor, 0);
+void FieldActorMovecode_InitTurnRandomSet0(FieldActor *actor) {
+    FieldActorMovecode_InitTurnRandom(actor, 0);
 }
 
-void FldmmdlMovecode_InitTurnRandomSet1(FieldActor *actor) {
-    FldmmdlMovecode_InitTurnRandom(actor, 1);
+void FieldActorMovecode_InitTurnRandomSet1(FieldActor *actor) {
+    FieldActorMovecode_InitTurnRandom(actor, 1);
 }
 
-void FldmmdlMovecode_InitTurnRandomSet2(FieldActor *actor) {
-    FldmmdlMovecode_InitTurnRandom(actor, 2);
+void FieldActorMovecode_InitTurnRandomSet2(FieldActor *actor) {
+    FieldActorMovecode_InitTurnRandom(actor, 2);
 }
 
-void FldmmdlMovecode_InitTurnRandomSet3(FieldActor *actor) {
-    FldmmdlMovecode_InitTurnRandom(actor, 3);
+void FieldActorMovecode_InitTurnRandomSet3(FieldActor *actor) {
+    FieldActorMovecode_InitTurnRandom(actor, 3);
 }
 
-void FldmmdlMovecode_InitTurnRandomSet4(FieldActor *actor) {
-    FldmmdlMovecode_InitTurnRandom(actor, 4);
+void FieldActorMovecode_InitTurnRandomSet4(FieldActor *actor) {
+    FieldActorMovecode_InitTurnRandom(actor, 4);
 }
 
-void FldmmdlMovecode_InitTurnRandomSet5(FieldActor *actor) {
-    FldmmdlMovecode_InitTurnRandom(actor, 5);
+void FieldActorMovecode_InitTurnRandomSet5(FieldActor *actor) {
+    FieldActorMovecode_InitTurnRandom(actor, 5);
 }
 
-void FldmmdlMovecode_InitTurnRandomSet6(FieldActor *actor) {
-    FldmmdlMovecode_InitTurnRandom(actor, 6);
+void FieldActorMovecode_InitTurnRandomSet6(FieldActor *actor) {
+    FieldActorMovecode_InitTurnRandom(actor, 6);
 }
 
-void FldmmdlMovecode_InitTurnRandomSet7(FieldActor *actor) {
-    FldmmdlMovecode_InitTurnRandom(actor, 7);
+void FieldActorMovecode_InitTurnRandomSet7(FieldActor *actor) {
+    FieldActorMovecode_InitTurnRandom(actor, 7);
 }
 
-void FldmmdlMovecode_InitTurnRandomSet8(FieldActor *actor) {
-    FldmmdlMovecode_InitTurnRandom(actor, 8);
+void FieldActorMovecode_InitTurnRandomSet8(FieldActor *actor) {
+    FieldActorMovecode_InitTurnRandom(actor, 8);
 }
 
-void FldmmdlMovecode_InitTurnRandomSet9(FieldActor *actor) {
-    FldmmdlMovecode_InitTurnRandom(actor, 9);
+void FieldActorMovecode_InitTurnRandomSet9(FieldActor *actor) {
+    FieldActorMovecode_InitTurnRandom(actor, 9);
 }
 
-void FldmmdlMovecode_InitTurnRandomSet10(FieldActor *actor) {
-    FldmmdlMovecode_InitTurnRandom(actor, 10);
+void FieldActorMovecode_InitTurnRandomSet10(FieldActor *actor) {
+    FieldActorMovecode_InitTurnRandom(actor, 10);
 }
 
-void FldmmdlMovecode_MoveTurnRandom(FieldActor *actor) {
+void FieldActorMovecode_MoveTurnRandom(FieldActor *actor) {
     RailWanderWork *work = GetNPCRailPosPtrAddr(actor);
     if (GetActorEvType(actor) == 0xb) {
-        if (FldAct_IsNearPlayer(actor) == TRUE && FldmmdlMovecode_IsBButtonPressed() == TRUE) {
+        if (FldAct_IsNearPlayer(actor) == TRUE && FieldActorMovecode_IsBButtonPressed() == TRUE) {
             u16 faceDir = GetActorFaceDir(actor);
-            u16 dir = FldmmdlMovecode_GetNextDirInRotation(GetActorMoveCode(actor), faceDir);
+            u16 dir = FieldActorMovecode_GetNextDirInRotation(GetActorMoveCode(actor), faceDir);
             if (dir != DIR_NONE) {
                 CheckSetActorFaceDir(actor, dir);
             }
         }
     } else {
-        u32 dir = FldmmdlMovecode_GetDirTowardPlayerInSet(actor, work->mask, DIR_NONE);
+        u32 dir = FieldActorMovecode_GetDirTowardPlayerInSet(actor, work->mask, DIR_NONE);
         if (dir != DIR_NONE) {
             CheckSetActorFaceDir(actor, dir);
         } else if (work->pause == 0) {
             work->timer--;
             if (work->timer <= 0) {
-                work->timer = FldmmdlMovecode_GetRandomTableEntry(data_ov036_021cbb1c, -1);
-                dir = FldmmdlMovecode_GetRandomDirFromSet(work->mask, DIR_NONE);
+                work->timer = FieldActorMovecode_GetRandomTableEntry(data_ov036_021cbb1c, -1);
+                dir = FieldActorMovecode_GetRandomDirFromSet(work->mask, DIR_NONE);
                 CheckSetActorFaceDir(actor, dir);
             }
         }
@@ -369,7 +369,7 @@ void FldmmdlMovecode_MoveTurnRandom(FieldActor *actor) {
     SetActorInitialGPosToNowGPos(actor);
 }
 
-static u16 FldmmdlMovecode_GetNextDirInRotation(u16 moveCode, u16 faceDir) {
+static u16 FieldActorMovecode_GetNextDirInRotation(u16 moveCode, u16 faceDir) {
     s32 i = 0;
     do {
         if (moveCode == data_ov036_021cbbec[i][0]) {
@@ -402,23 +402,23 @@ static u16 FldmmdlMovecode_GetNextDirInRotation(u16 moveCode, u16 faceDir) {
 void func_ov036_021913dc(FieldActor *actor) {
 }
 
-void FldmmdlMovecode_InitWalkRandomSet11(FieldActor *actor) {
-    FldmmdlMovecode_InitWalkRandom(actor, 12, 11, 0);
+void FieldActorMovecode_InitWalkRandomSet11(FieldActor *actor) {
+    FieldActorMovecode_InitWalkRandom(actor, 12, 11, 0);
 }
 
-void FldmmdlMovecode_InitWalkRandomSet12(FieldActor *actor) {
-    FldmmdlMovecode_InitWalkRandom(actor, 12, 12, 0);
+void FieldActorMovecode_InitWalkRandomSet12(FieldActor *actor) {
+    FieldActorMovecode_InitWalkRandom(actor, 12, 12, 0);
 }
 
-void FldmmdlMovecode_InitWalkRandomSet13(FieldActor *actor) {
-    FldmmdlMovecode_InitWalkRandom(actor, 12, 13, 0);
+void FieldActorMovecode_InitWalkRandomSet13(FieldActor *actor) {
+    FieldActorMovecode_InitWalkRandom(actor, 12, 13, 0);
 }
 
-void FldmmdlMovecode_InitWalkRandomSet13Bump(FieldActor *actor) {
-    FldmmdlMovecode_InitWalkRandom(actor, 12, 13, 2);
+void FieldActorMovecode_InitWalkRandomSet13Bump(FieldActor *actor) {
+    FieldActorMovecode_InitWalkRandom(actor, 12, 13, 2);
 }
 
-static void FldmmdlMovecode_InitWalkRandom(FieldActor *actor, u32 acmdBase, u32 dirMask, u32 mode) {
+static void FieldActorMovecode_InitWalkRandom(FieldActor *actor, u32 acmdBase, u32 dirMask, u32 mode) {
     RailWalkWork *work = ClearActorPositionBlock(actor, sizeof(RailWalkWork));
     work->mode = mode;
     work->acmdBase = acmdBase;
@@ -427,7 +427,7 @@ static void FldmmdlMovecode_InitWalkRandom(FieldActor *actor, u32 acmdBase, u32 
     FldAct_ClearMoving(actor);
 }
 
-void FldmmdlMovecode_MoveWalkRandom(FieldActor *actor) {
+void FieldActorMovecode_MoveWalkRandom(FieldActor *actor) {
     RailWalkWork *work = GetNPCRailPosPtrAddr(actor);
     u32 dir;
     u32 collision;
@@ -445,7 +445,7 @@ void FldmmdlMovecode_MoveWalkRandom(FieldActor *actor) {
         if (!FieldAcmdTCB_Update(actor)) {
             break;
         }
-        work->timer = FldmmdlMovecode_GetRandomTableEntry(data_ov036_021cbb1c, -1);
+        work->timer = FieldActorMovecode_GetRandomTableEntry(data_ov036_021cbb1c, -1);
         work->state++;
     case 2:
         work->timer--;
@@ -454,9 +454,9 @@ void FldmmdlMovecode_MoveWalkRandom(FieldActor *actor) {
         }
         work->state++;
     case 3:
-        dir = FldmmdlMovecode_GetRandomDirFromSet(work->mask, DIR_NONE);
+        dir = FieldActorMovecode_GetRandomDirFromSet(work->mask, DIR_NONE);
         ChangeActorDirection(actor, dir);
-        if (work->mode == 1 && FldmmdlMovecode_IsDirInsideMoveRect(actor, dir) == 0) {
+        if (work->mode == 1 && FieldActorMovecode_IsDirInsideMoveRect(actor, dir) == 0) {
             work->state = 0;
             return;
         }
@@ -487,7 +487,7 @@ void FldmmdlMovecode_MoveWalkRandom(FieldActor *actor) {
     }
 }
 
-static void FldmmdlMovecode_GetMoveRect(FieldActor *actor, WalkRect *rect) {
+static void FieldActorMovecode_GetMoveRect(FieldActor *actor, WalkRect *rect) {
     s32 z;
     s32 x = GetActorDefaultGPosX(actor);
     s32 w;
@@ -547,11 +547,11 @@ static void FldmmdlMovecode_GetMoveRect(FieldActor *actor, WalkRect *rect) {
     }
 }
 
-static BOOL FldmmdlMovecode_IsDirInsideMoveRect(FieldActor *actor, u32 dir) {
+static BOOL FieldActorMovecode_IsDirInsideMoveRect(FieldActor *actor, u32 dir) {
     WalkRect rect;
     s32 x;
     s32 z;
-    FldmmdlMovecode_GetMoveRect(actor, &rect);
+    FieldActorMovecode_GetMoveRect(actor, &rect);
     x = GetGPosX(actor) + GetDirectionVectorCompX(dir);
     z = GetGPosZ(actor) + GetDirectionVectorCompZ(dir);
     if (rect.minX > x || rect.maxX < x) {
@@ -563,7 +563,7 @@ static BOOL FldmmdlMovecode_IsDirInsideMoveRect(FieldActor *actor, u32 dir) {
     return TRUE;
 }
 
-static void FldmmdlMovecode_InitFixedDir(FieldActor *actor, u32 dir) {
+static void FieldActorMovecode_InitFixedDir(FieldActor *actor, u32 dir) {
     RailFaceWork *work = ClearActorPositionBlock(actor, sizeof(RailFaceWork));
     work->dir = dir;
     FldAct_SetDrawStatus(actor, 0);
@@ -571,7 +571,7 @@ static void FldmmdlMovecode_InitFixedDir(FieldActor *actor, u32 dir) {
     SetActorInitialGPosToNowGPos(actor);
 }
 
-void FldmmdlMovecode_MoveFixedDir(FieldActor *actor) {
+void FieldActorMovecode_MoveFixedDir(FieldActor *actor) {
     RailFaceWork *work = GetNPCRailPosPtrAddr(actor);
     switch (work->state) {
     case 0:
@@ -583,23 +583,23 @@ void FldmmdlMovecode_MoveFixedDir(FieldActor *actor) {
     }
 }
 
-void FldmmdlMovecode_InitFixedDirUp(FieldActor *actor) {
-    FldmmdlMovecode_InitFixedDir(actor, DIR_UP);
+void FieldActorMovecode_InitFixedDirUp(FieldActor *actor) {
+    FieldActorMovecode_InitFixedDir(actor, DIR_UP);
 }
 
-void FldmmdlMovecode_InitFixedDirDown(FieldActor *actor) {
-    FldmmdlMovecode_InitFixedDir(actor, DIR_DOWN);
+void FieldActorMovecode_InitFixedDirDown(FieldActor *actor) {
+    FieldActorMovecode_InitFixedDir(actor, DIR_DOWN);
 }
 
-void FldmmdlMovecode_InitFixedDirLeft(FieldActor *actor) {
-    FldmmdlMovecode_InitFixedDir(actor, DIR_LEFT);
+void FieldActorMovecode_InitFixedDirLeft(FieldActor *actor) {
+    FieldActorMovecode_InitFixedDir(actor, DIR_LEFT);
 }
 
-void FldmmdlMovecode_InitFixedDirRight(FieldActor *actor) {
-    FldmmdlMovecode_InitFixedDir(actor, DIR_RIGHT);
+void FieldActorMovecode_InitFixedDirRight(FieldActor *actor) {
+    FieldActorMovecode_InitFixedDir(actor, DIR_RIGHT);
 }
 
-static void FldmmdlMovecode_InitSpin(FieldActor *actor, u32 turn) {
+static void FieldActorMovecode_InitSpin(FieldActor *actor, u32 turn) {
     RailTurnWork *work = ClearActorPositionBlock(actor, sizeof(RailTurnWork));
     work->turn = turn;
     FldAct_SetDrawStatus(actor, 0);
@@ -607,23 +607,23 @@ static void FldmmdlMovecode_InitSpin(FieldActor *actor, u32 turn) {
     SetActorInitialGPosToNowGPos(actor);
 }
 
-void FldmmdlMovecode_InitSpinClockwise(FieldActor *actor) {
-    FldmmdlMovecode_InitSpin(actor, 2);
+void FieldActorMovecode_InitSpinClockwise(FieldActor *actor) {
+    FieldActorMovecode_InitSpin(actor, 2);
 }
 
-void FldmmdlMovecode_InitSpinCounterClockwise(FieldActor *actor) {
-    FldmmdlMovecode_InitSpin(actor, 3);
+void FieldActorMovecode_InitSpinCounterClockwise(FieldActor *actor) {
+    FieldActorMovecode_InitSpin(actor, 3);
 }
 
-void FldmmdlMovecode_MoveSpin(FieldActor *actor) {
+void FieldActorMovecode_MoveSpin(FieldActor *actor) {
     RailTurnWork *work = GetNPCRailPosPtrAddr(actor);
     while (data_ov036_021cb960[work->state](actor, work) == TRUE) {
     }
 }
 
-static BOOL FldmmdlMovecode_SpinStepTurn(FieldActor *actor, RailTurnWork *work) {
+static BOOL FieldActorMovecode_SpinStepTurn(FieldActor *actor, RailTurnWork *work) {
     u32 acmd;
-    u32 dir = FldmmdlMovecode_GetDirTowardPlayerInSet(actor, 0x26, DIR_NONE);
+    u32 dir = FieldActorMovecode_GetDirTowardPlayerInSet(actor, 0x26, DIR_NONE);
     if (dir == DIR_NONE) {
         dir = GetActorFaceDir(actor);
     }
@@ -633,7 +633,7 @@ static BOOL FldmmdlMovecode_SpinStepTurn(FieldActor *actor, RailTurnWork *work) 
     return TRUE;
 }
 
-static BOOL FldmmdlMovecode_SpinStepWaitTurn(FieldActor *actor, RailTurnWork *work) {
+static BOOL FieldActorMovecode_SpinStepWaitTurn(FieldActor *actor, RailTurnWork *work) {
     if (!FieldAcmdTCB_Update(actor)) {
         return FALSE;
     }
@@ -644,7 +644,7 @@ static BOOL FldmmdlMovecode_SpinStepWaitTurn(FieldActor *actor, RailTurnWork *wo
     return TRUE;
 }
 
-static BOOL FldmmdlMovecode_SpinStepWaitInterval(FieldActor *actor, RailTurnWork *work) {
+static BOOL FieldActorMovecode_SpinStepWaitInterval(FieldActor *actor, RailTurnWork *work) {
     if (GetActorEvType(actor) == 0xb) {
         if (work->count != 0) {
             work->count = 0;
@@ -653,12 +653,12 @@ static BOOL FldmmdlMovecode_SpinStepWaitInterval(FieldActor *actor, RailTurnWork
         if (!FldAct_IsNearPlayer(actor)) {
             return FALSE;
         }
-        if (!FldmmdlMovecode_IsBButtonPressed()) {
+        if (!FieldActorMovecode_IsBButtonPressed()) {
             return FALSE;
         }
         work->count++;
     } else {
-        if (work->count != 0 && FldmmdlMovecode_GetDirTowardPlayerInSet(actor, 0x26, DIR_NONE) != DIR_NONE) {
+        if (work->count != 0 && FieldActorMovecode_GetDirTowardPlayerInSet(actor, 0x26, DIR_NONE) != DIR_NONE) {
             work->state = 0;
             return TRUE;
         }
@@ -671,7 +671,7 @@ static BOOL FldmmdlMovecode_SpinStepWaitInterval(FieldActor *actor, RailTurnWork
     return TRUE;
 }
 
-static BOOL FldmmdlMovecode_SpinStepRotateDir(FieldActor *actor, RailTurnWork *work) {
+static BOOL FieldActorMovecode_SpinStepRotateDir(FieldActor *actor, RailTurnWork *work) {
     u32 clockwise[5] = { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT, DIR_NONE };
     u32 counter[5] = { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_NONE };
     u32 *dirs = clockwise;
@@ -695,17 +695,17 @@ static BOOL FldmmdlMovecode_SpinStepRotateDir(FieldActor *actor, RailTurnWork *w
     return TRUE;
 }
 
-void FldmmdlMovecode_InitSwing(FieldActor *actor) {
-    FldmmdlMovecode_InitSpin(actor, 3);
+void FieldActorMovecode_InitSwing(FieldActor *actor) {
+    FieldActorMovecode_InitSpin(actor, 3);
 }
 
-void FldmmdlMovecode_MoveSwing(FieldActor *actor) {
+void FieldActorMovecode_MoveSwing(FieldActor *actor) {
     RailTurnWork *work = GetNPCRailPosPtrAddr(actor);
     while (data_ov036_021cb930[work->state](actor, work) == TRUE) {
     }
 }
 
-static BOOL FldmmdlMovecode_SwingStepTurn(FieldActor *actor, RailTurnWork *work) {
+static BOOL FieldActorMovecode_SwingStepTurn(FieldActor *actor, RailTurnWork *work) {
     u32 dir = GetActorFaceDir(actor);
     u32 acmd = GetAcmdForDir(dir, 0);
     FldAct_SetLocalAcmd(actor, acmd);
@@ -713,7 +713,7 @@ static BOOL FldmmdlMovecode_SwingStepTurn(FieldActor *actor, RailTurnWork *work)
     return TRUE;
 }
 
-static BOOL FldmmdlMovecode_SwingStepWaitTurn(FieldActor *actor, RailTurnWork *work) {
+static BOOL FieldActorMovecode_SwingStepWaitTurn(FieldActor *actor, RailTurnWork *work) {
     if (!FieldAcmdTCB_Update(actor)) {
         return FALSE;
     }
@@ -722,7 +722,7 @@ static BOOL FldmmdlMovecode_SwingStepWaitTurn(FieldActor *actor, RailTurnWork *w
     return TRUE;
 }
 
-static BOOL FldmmdlMovecode_SwingStepWaitInterval(FieldActor *actor, RailTurnWork *work) {
+static BOOL FieldActorMovecode_SwingStepWaitInterval(FieldActor *actor, RailTurnWork *work) {
     work->count++;
     if (work->count < 0x18) {
         return FALSE;
@@ -731,7 +731,7 @@ static BOOL FldmmdlMovecode_SwingStepWaitInterval(FieldActor *actor, RailTurnWor
     return TRUE;
 }
 
-static BOOL FldmmdlMovecode_SwingStepRotateDir(FieldActor *actor, RailTurnWork *work) {
+static BOOL FieldActorMovecode_SwingStepRotateDir(FieldActor *actor, RailTurnWork *work) {
     u32 clockwise[5] = { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT, DIR_NONE };
     u32 counter[5] = { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_NONE };
     u32 *dirs = clockwise;
@@ -759,9 +759,9 @@ static BOOL FldmmdlMovecode_SwingStepRotateDir(FieldActor *actor, RailTurnWork *
 }
 
 static BOOL (*const data_ov036_021cb8d8[])(FieldActor *actor, RailPaceWork *work) = {
-    FldmmdlMovecode_BackForthStepFaceDir,
-    FldmmdlMovecode_BackForthStepWalk,
-    FldmmdlMovecode_BackForthStepWaitWalk,
+    FieldActorMovecode_BackForthStepFaceDir,
+    FieldActorMovecode_BackForthStepWalk,
+    FieldActorMovecode_BackForthStepWaitWalk,
 };
 
 static const u32 data_ov036_021cbb64[] = {
@@ -781,37 +781,37 @@ static const ActorDirTableEntry data_ov036_021cbc70[] = {
     { 36, data_ov036_021cb980 }, { 37, data_ov036_021cbaa0 }, { 38, data_ov036_021cbaf4 }, { 0x27, NULL },
 };
 
-void FldmmdlMovecode_InitBackForth(FieldActor *actor) {
+void FieldActorMovecode_InitBackForth(FieldActor *actor) {
     RailPaceWork *work = ClearActorPositionBlock(actor, sizeof(RailPaceWork));
-    if (FldmmdlMovecode_IsMirrorEventType(actor) == TRUE) {
-        FldmmdlMovecode_InitMirrorSide(actor, &work->face);
+    if (FieldActorMovecode_IsMirrorEventType(actor) == TRUE) {
+        FieldActorMovecode_InitMirrorSide(actor, &work->face);
     }
 }
 
-void FldmmdlMovecode_MoveBackForth(FieldActor *actor) {
+void FieldActorMovecode_MoveBackForth(FieldActor *actor) {
     RailPaceWork *work = GetNPCRailPosPtrAddr(actor);
     while (data_ov036_021cb8d8[work->state](actor, work) == TRUE) {
     }
 }
 
-static BOOL FldmmdlMovecode_BackForthStepFaceDir(FieldActor *actor, RailPaceWork *work) {
+static BOOL FieldActorMovecode_BackForthStepFaceDir(FieldActor *actor, RailPaceWork *work) {
     u32 dir = GetDefaultActorDir(actor);
     if (work->flip == 1) {
         dir = GetInverseDirection((u16)dir);
     }
     SetActorMotionDir(actor, dir);
-    if (FldmmdlMovecode_IsMirrorEventType(actor) == 0) {
+    if (FieldActorMovecode_IsMirrorEventType(actor) == 0) {
         CheckSetActorFaceDir(actor, dir);
     }
     work->state = 1;
     return TRUE;
 }
 
-static BOOL FldmmdlMovecode_BackForthStepWalk(FieldActor *actor, RailPaceWork *work) {
+static BOOL FieldActorMovecode_BackForthStepWalk(FieldActor *actor, RailPaceWork *work) {
     u32 collision;
     u32 dir;
     u32 acmdBase;
-    if (FldmmdlMovecode_UpdateTriggerWait(actor, &work->wait) == 0) {
+    if (FieldActorMovecode_UpdateTriggerWait(actor, &work->wait) == 0) {
         return FALSE;
     }
     if (work->flip != 0) {
@@ -822,7 +822,7 @@ static BOOL FldmmdlMovecode_BackForthStepWalk(FieldActor *actor, RailPaceWork *w
         if (defaultX == x && defaultZ == z) {
             dir = GetInverseDirection(GetActorMotionDir(actor));
             SetActorMotionDir(actor, dir);
-            if (FldmmdlMovecode_IsMirrorEventType(actor) == 0) {
+            if (FieldActorMovecode_IsMirrorEventType(actor) == 0) {
                 CheckSetActorFaceDir(actor, dir);
             }
             work->flip = 0;
@@ -836,8 +836,8 @@ static BOOL FldmmdlMovecode_BackForthStepWalk(FieldActor *actor, RailPaceWork *w
         collision = ActorRouteCollCheckOneTileInDir(actor, dir);
     }
     acmdBase = 12;
-    if (FldmmdlMovecode_IsDashEventType(actor) != 0) {
-        if (FldmmdlMovecode_IsBButtonHeld() == TRUE && FldAct_IsNearPlayer(actor) == TRUE) {
+    if (FieldActorMovecode_IsDashEventType(actor) != 0) {
+        if (FieldActorMovecode_IsBButtonHeld() == TRUE && FldAct_IsNearPlayer(actor) == TRUE) {
             acmdBase = 16;
         }
     }
@@ -846,112 +846,112 @@ static BOOL FldmmdlMovecode_BackForthStepWalk(FieldActor *actor, RailPaceWork *w
     }
     u32 acmd = GetAcmdForDir(dir, acmdBase);
     FldAct_SetLocalAcmd(actor, acmd);
-    if (FldmmdlMovecode_IsMirrorEventType(actor) == TRUE) {
-        FldmmdlMovecode_StartMirrorTurn(actor, &work->face);
+    if (FieldActorMovecode_IsMirrorEventType(actor) == TRUE) {
+        FieldActorMovecode_StartMirrorTurn(actor, &work->face);
     }
     FldAct_SetMoving(actor);
     work->state = 2;
     return TRUE;
 }
 
-static BOOL FldmmdlMovecode_BackForthStepWaitWalk(FieldActor *actor, RailPaceWork *work) {
+static BOOL FieldActorMovecode_BackForthStepWaitWalk(FieldActor *actor, RailPaceWork *work) {
     if (FieldAcmdTCB_Update(actor) == TRUE) {
         FldAct_ClearMoving(actor);
-        if (FldmmdlMovecode_IsMirrorEventType(actor) == TRUE) {
-            FldmmdlMovecode_EndMirrorTurn(actor, &work->face);
+        if (FieldActorMovecode_IsMirrorEventType(actor) == TRUE) {
+            FieldActorMovecode_EndMirrorTurn(actor, &work->face);
         }
         work->state = 0;
     }
     return FALSE;
 }
 
-static void FldmmdlMovecode_InitRoutePatrol(FieldActor *actor, u32 steps, u32 turns, u32 speed) {
+static void FieldActorMovecode_InitRoutePatrol(FieldActor *actor, u32 steps, u32 turns, u32 speed) {
     RailStepWork *work = ClearActorPositionBlock(actor, sizeof(RailStepWork));
     work->steps = steps;
     work->turns = turns;
     work->speed = speed;
-    if (FldmmdlMovecode_IsMirrorEventType(actor) == TRUE) {
-        FldmmdlMovecode_InitMirrorSide(actor, &work->face);
+    if (FieldActorMovecode_IsMirrorEventType(actor) == TRUE) {
+        FieldActorMovecode_InitMirrorSide(actor, &work->face);
     }
 }
 
-void FldmmdlMovecode_InitRoutePatrolSet14(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrol(actor, 2, 0, 14);
+void FieldActorMovecode_InitRoutePatrolSet14(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrol(actor, 2, 0, 14);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSet15(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrol(actor, 2, 0, 15);
+void FieldActorMovecode_InitRoutePatrolSet15(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrol(actor, 2, 0, 15);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSet16(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrol(actor, 2, 1, 16);
+void FieldActorMovecode_InitRoutePatrolSet16(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrol(actor, 2, 1, 16);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSet17(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrol(actor, 2, 1, 17);
+void FieldActorMovecode_InitRoutePatrolSet17(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrol(actor, 2, 1, 17);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSet18(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrol(actor, 2, 0, 18);
+void FieldActorMovecode_InitRoutePatrolSet18(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrol(actor, 2, 0, 18);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSet19(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrol(actor, 2, 0, 19);
+void FieldActorMovecode_InitRoutePatrolSet19(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrol(actor, 2, 0, 19);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSet20(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrol(actor, 2, 1, 20);
+void FieldActorMovecode_InitRoutePatrolSet20(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrol(actor, 2, 1, 20);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSet21(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrol(actor, 2, 1, 21);
+void FieldActorMovecode_InitRoutePatrolSet21(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrol(actor, 2, 1, 21);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSet22(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrol(actor, 2, 1, 22);
+void FieldActorMovecode_InitRoutePatrolSet22(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrol(actor, 2, 1, 22);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSet23(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrol(actor, 2, 1, 23);
+void FieldActorMovecode_InitRoutePatrolSet23(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrol(actor, 2, 1, 23);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSet24(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrol(actor, 2, 0, 24);
+void FieldActorMovecode_InitRoutePatrolSet24(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrol(actor, 2, 0, 24);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSet25(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrol(actor, 2, 0, 25);
+void FieldActorMovecode_InitRoutePatrolSet25(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrol(actor, 2, 0, 25);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSet26(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrol(actor, 2, 1, 26);
+void FieldActorMovecode_InitRoutePatrolSet26(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrol(actor, 2, 1, 26);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSet27(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrol(actor, 2, 1, 27);
+void FieldActorMovecode_InitRoutePatrolSet27(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrol(actor, 2, 1, 27);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSet28(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrol(actor, 2, 0, 28);
+void FieldActorMovecode_InitRoutePatrolSet28(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrol(actor, 2, 0, 28);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSet29(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrol(actor, 2, 0, 29);
+void FieldActorMovecode_InitRoutePatrolSet29(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrol(actor, 2, 0, 29);
 }
 
-void FldmmdlMovecode_MoveRoutePatrol(FieldActor *actor) {
+void FieldActorMovecode_MoveRoutePatrol(FieldActor *actor) {
     ActorRoundWork *work = GetNPCRailPosPtrAddr(actor);
 
     while (data_ov036_021cb87c[work->state](actor, work) == TRUE) {
     }
 }
 
-static BOOL FldmmdlMovecode_RoutePatrolStepWalk(FieldActor *actor, ActorRoundWork *work) {
+static BOOL FieldActorMovecode_RoutePatrolStepWalk(FieldActor *actor, ActorRoundWork *work) {
     s32 blocked;
     const s32 *dirs;
     s32 dir;
 
-    if (!FldmmdlMovecode_UpdateTriggerWait(actor, &work->wait)) {
+    if (!FieldActorMovecode_UpdateTriggerWait(actor, &work->wait)) {
         return FALSE;
     }
     if (work->dirIdx == work->limit) {
@@ -973,10 +973,10 @@ static BOOL FldmmdlMovecode_RoutePatrolStepWalk(FieldActor *actor, ActorRoundWor
             work->dirIdx = 0;
         }
     }
-    dirs = FldmmdlMovecode_GetDirSet(work->dirTable);
+    dirs = FieldActorMovecode_GetDirSet(work->dirTable);
     dir = dirs[work->dirIdx];
     SetActorMotionDir(actor, dir);
-    if (FldmmdlMovecode_IsMirrorEventType(actor) == FALSE) {
+    if (FieldActorMovecode_IsMirrorEventType(actor) == FALSE) {
         CheckSetActorFaceDir(actor, dir);
     }
     blocked = ActorRouteCollCheckOneTileInDir(actor, dir);
@@ -984,15 +984,15 @@ static BOOL FldmmdlMovecode_RoutePatrolStepWalk(FieldActor *actor, ActorRoundWor
         work->dirIdx++;
         dir = dirs[work->dirIdx];
         SetActorMotionDir(actor, dir);
-        if (FldmmdlMovecode_IsMirrorEventType(actor) == FALSE) {
+        if (FieldActorMovecode_IsMirrorEventType(actor) == FALSE) {
             CheckSetActorFaceDir(actor, dir);
         }
         blocked = ActorRouteCollCheckOneTileInDir(actor, dir);
     }
     u32 speed = 12;
 
-    if (FldmmdlMovecode_IsDashEventType(actor)) {
-        if (FldmmdlMovecode_IsBButtonHeld() == TRUE && FldAct_IsNearPlayer(actor) == TRUE) {
+    if (FieldActorMovecode_IsDashEventType(actor)) {
+        if (FieldActorMovecode_IsBButtonHeld() == TRUE && FldAct_IsNearPlayer(actor) == TRUE) {
             speed = 16;
         }
     }
@@ -1000,76 +1000,76 @@ static BOOL FldmmdlMovecode_RoutePatrolStepWalk(FieldActor *actor, ActorRoundWor
         speed = 32;
     }
     StartDirAcmd(actor, dir, speed);
-    if (FldmmdlMovecode_IsMirrorEventType(actor) == TRUE) {
-        FldmmdlMovecode_StartMirrorTurn(actor, &work->face);
+    if (FieldActorMovecode_IsMirrorEventType(actor) == TRUE) {
+        FieldActorMovecode_StartMirrorTurn(actor, &work->face);
     }
     FldAct_SetMoving(actor);
     work->state = 1;
     return TRUE;
 }
 
-static BOOL FldmmdlMovecode_RoutePatrolStepWaitWalk(FieldActor *actor, ActorRoundWork *work) {
+static BOOL FieldActorMovecode_RoutePatrolStepWaitWalk(FieldActor *actor, ActorRoundWork *work) {
     if (FieldAcmdTCB_Update(actor) == TRUE) {
         FldAct_ClearMoving(actor);
-        if (FldmmdlMovecode_IsMirrorEventType(actor) == TRUE) {
-            FldmmdlMovecode_EndMirrorTurn(actor, &work->face);
+        if (FieldActorMovecode_IsMirrorEventType(actor) == TRUE) {
+            FieldActorMovecode_EndMirrorTurn(actor, &work->face);
         }
         work->state = 0;
     }
     return FALSE;
 }
 
-static void FldmmdlMovecode_InitRoutePatrolSwap(FieldActor *actor, u32 limit, u32 axis, u32 dirTable) {
+static void FieldActorMovecode_InitRoutePatrolSwap(FieldActor *actor, u32 limit, u32 axis, u32 dirTable) {
     ActorRoundWork *work = ClearActorPositionBlock(actor, 12);
 
     work->limit = limit;
     work->axis = axis;
     work->dirTable = dirTable;
-    if (FldmmdlMovecode_IsMirrorEventType(actor) == TRUE) {
-        FldmmdlMovecode_InitMirrorSide(actor, &work->face);
+    if (FieldActorMovecode_IsMirrorEventType(actor) == TRUE) {
+        FieldActorMovecode_InitMirrorSide(actor, &work->face);
     }
 }
 
-void FldmmdlMovecode_InitRoutePatrolSwapSet30(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrolSwap(actor, 2, 1, 0x1e);
+void FieldActorMovecode_InitRoutePatrolSwapSet30(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrolSwap(actor, 2, 1, 0x1e);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSwapSet31(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrolSwap(actor, 2, 1, 0x1f);
+void FieldActorMovecode_InitRoutePatrolSwapSet31(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrolSwap(actor, 2, 1, 0x1f);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSwapSet32(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrolSwap(actor, 2, 0, 0x20);
+void FieldActorMovecode_InitRoutePatrolSwapSet32(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrolSwap(actor, 2, 0, 0x20);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSwapSet33(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrolSwap(actor, 2, 0, 0x21);
+void FieldActorMovecode_InitRoutePatrolSwapSet33(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrolSwap(actor, 2, 0, 0x21);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSwapSet34(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrolSwap(actor, 2, 1, 0x22);
+void FieldActorMovecode_InitRoutePatrolSwapSet34(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrolSwap(actor, 2, 1, 0x22);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSwapSet35(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrolSwap(actor, 2, 1, 0x23);
+void FieldActorMovecode_InitRoutePatrolSwapSet35(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrolSwap(actor, 2, 1, 0x23);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSwapSet36(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrolSwap(actor, 2, 0, 0x24);
+void FieldActorMovecode_InitRoutePatrolSwapSet36(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrolSwap(actor, 2, 0, 0x24);
 }
 
-void FldmmdlMovecode_InitRoutePatrolSwapSet37(FieldActor *actor) {
-    FldmmdlMovecode_InitRoutePatrolSwap(actor, 2, 0, 0x25);
+void FieldActorMovecode_InitRoutePatrolSwapSet37(FieldActor *actor) {
+    FieldActorMovecode_InitRoutePatrolSwap(actor, 2, 0, 0x25);
 }
 
-void FldmmdlMovecode_MoveRoutePatrolSwap(FieldActor *actor) {
+void FieldActorMovecode_MoveRoutePatrolSwap(FieldActor *actor) {
     ActorPatrolWork *work = GetNPCRailPosPtrAddr(actor);
 
     while (data_ov036_021cb8f0[work->state](actor, work) == TRUE) {
     }
 }
 
-static void FldmmdlMovecode_AdvanceRouteIndex(ActorPatrolWork *work) {
+static void FieldActorMovecode_AdvanceRouteIndex(ActorPatrolWork *work) {
     if (work->reverse == TRUE) {
         work->dirIdx--;
         if (work->dirIdx < 0) {
@@ -1080,7 +1080,7 @@ static void FldmmdlMovecode_AdvanceRouteIndex(ActorPatrolWork *work) {
     }
 }
 
-static BOOL FldmmdlMovecode_RoutePatrolSwapStepLookForPlayer(FieldActor *actor, ActorPatrolWork *work) {
+static BOOL FieldActorMovecode_RoutePatrolSwapStepLookForPlayer(FieldActor *actor, ActorPatrolWork *work) {
     if (GetActorEvType(actor) == 10) {
         u16 dir = GetActorFaceDir(actor);
 
@@ -1095,7 +1095,7 @@ static BOOL FldmmdlMovecode_RoutePatrolSwapStepLookForPlayer(FieldActor *actor, 
     return TRUE;
 }
 
-static BOOL FldmmdlMovecode_RoutePatrolSwapStepSwapMoveCode(FieldActor *actor, ActorPatrolWork *work) {
+static BOOL FieldActorMovecode_RoutePatrolSwapStepSwapMoveCode(FieldActor *actor, ActorPatrolWork *work) {
     if (FieldAcmdTCB_Update(actor) == TRUE) {
         u16 other = 0xff;
         u16 moveCode = GetActorMoveCode(actor);
@@ -1121,21 +1121,21 @@ static BOOL FldmmdlMovecode_RoutePatrolSwapStepSwapMoveCode(FieldActor *actor, A
     return FALSE;
 }
 
-static BOOL FldmmdlMovecode_RoutePatrolSwapStepWalk(FieldActor *actor, ActorPatrolWork *work) {
+static BOOL FieldActorMovecode_RoutePatrolSwapStepWalk(FieldActor *actor, ActorPatrolWork *work) {
     s32 blocked;
     const s32 *dirs;
     s32 dir;
 
-    if (!FldmmdlMovecode_UpdateTriggerWait(actor, &work->wait)) {
+    if (!FieldActorMovecode_UpdateTriggerWait(actor, &work->wait)) {
         return FALSE;
     }
     if (work->dirIdx == work->limit) {
         if (work->axis == 0) {
             if (GetActorDefaultGPosX(actor) == GetGPosX(actor)) {
-                FldmmdlMovecode_AdvanceRouteIndex(work);
+                FieldActorMovecode_AdvanceRouteIndex(work);
             }
         } else if (GetActorDefaultGPosZ(actor) == GetGPosZ(actor)) {
-            FldmmdlMovecode_AdvanceRouteIndex(work);
+            FieldActorMovecode_AdvanceRouteIndex(work);
         }
     }
     if (work->dirIdx == 3) {
@@ -1148,26 +1148,26 @@ static BOOL FldmmdlMovecode_RoutePatrolSwapStepWalk(FieldActor *actor, ActorPatr
             work->dirIdx = 0;
         }
     }
-    dirs = FldmmdlMovecode_GetDirSet(work->dirTable);
+    dirs = FieldActorMovecode_GetDirSet(work->dirTable);
     dir = dirs[work->dirIdx];
     SetActorMotionDir(actor, dir);
-    if (FldmmdlMovecode_IsMirrorEventType(actor) == FALSE) {
+    if (FieldActorMovecode_IsMirrorEventType(actor) == FALSE) {
         CheckSetActorFaceDir(actor, dir);
     }
     blocked = ActorRouteCollCheckOneTileInDir(actor, dir);
     if (blocked & 1) {
-        FldmmdlMovecode_AdvanceRouteIndex(work);
+        FieldActorMovecode_AdvanceRouteIndex(work);
         dir = dirs[work->dirIdx];
         SetActorMotionDir(actor, dir);
-        if (FldmmdlMovecode_IsMirrorEventType(actor) == FALSE) {
+        if (FieldActorMovecode_IsMirrorEventType(actor) == FALSE) {
             CheckSetActorFaceDir(actor, dir);
         }
         blocked = ActorRouteCollCheckOneTileInDir(actor, dir);
     }
     u32 speed = 12;
 
-    if (FldmmdlMovecode_IsDashEventType(actor)) {
-        if (FldmmdlMovecode_IsBButtonHeld() == TRUE && FldAct_IsNearPlayer(actor) == TRUE) {
+    if (FieldActorMovecode_IsDashEventType(actor)) {
+        if (FieldActorMovecode_IsBButtonHeld() == TRUE && FldAct_IsNearPlayer(actor) == TRUE) {
             speed = 16;
         }
     }
@@ -1175,33 +1175,33 @@ static BOOL FldmmdlMovecode_RoutePatrolSwapStepWalk(FieldActor *actor, ActorPatr
         speed = 32;
     }
     StartDirAcmd(actor, dir, speed);
-    if (FldmmdlMovecode_IsMirrorEventType(actor) == TRUE) {
-        FldmmdlMovecode_StartMirrorTurn(actor, &work->face);
+    if (FieldActorMovecode_IsMirrorEventType(actor) == TRUE) {
+        FieldActorMovecode_StartMirrorTurn(actor, &work->face);
     }
     FldAct_SetMoving(actor);
     work->state = 3;
     return TRUE;
 }
 
-static BOOL FldmmdlMovecode_RoutePatrolSwapStepWaitWalk(FieldActor *actor, ActorPatrolWork *work) {
+static BOOL FieldActorMovecode_RoutePatrolSwapStepWaitWalk(FieldActor *actor, ActorPatrolWork *work) {
     if (FieldAcmdTCB_Update(actor) == TRUE) {
         FldAct_ClearMoving(actor);
-        if (FldmmdlMovecode_IsMirrorEventType(actor) == TRUE) {
-            FldmmdlMovecode_EndMirrorTurn(actor, &work->face);
+        if (FieldActorMovecode_IsMirrorEventType(actor) == TRUE) {
+            FieldActorMovecode_EndMirrorTurn(actor, &work->face);
         }
         work->state = 0;
     }
     return FALSE;
 }
 
-static BOOL FldmmdlMovecode_IsBButtonHeld(void) {
+static BOOL FieldActorMovecode_IsBButtonHeld(void) {
     if (GCTX_HIDGetHeldKeys() & PAD_BUTTON_B) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL FldmmdlMovecode_IsPlayerWalking(FieldActor *actor) {
+static BOOL FieldActorMovecode_IsPlayerWalking(FieldActor *actor) {
     FieldActor *player = FindPlayerFieldActor(GetActorMModelSystem(actor));
 
     if (player != NULL) {
@@ -1220,14 +1220,14 @@ static BOOL FldmmdlMovecode_IsPlayerWalking(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL FldmmdlMovecode_IsBButtonPressed(void) {
+static BOOL FieldActorMovecode_IsBButtonPressed(void) {
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
         return TRUE;
     }
     return FALSE;
 }
 
-static u32 FldmmdlMovecode_FindTableEnd(const s32 *list, u32 end) {
+static u32 FieldActorMovecode_FindTableEnd(const s32 *list, u32 end) {
     u32 count = 0;
 
     while (end != list[count]) {
@@ -1236,17 +1236,17 @@ static u32 FldmmdlMovecode_FindTableEnd(const s32 *list, u32 end) {
     return count;
 }
 
-static s32 FldmmdlMovecode_GetRandomTableEntry(const s32 *list, u32 end) {
-    return list[GFL_RandomLC(FldmmdlMovecode_FindTableEnd(list, end))];
+static s32 FieldActorMovecode_GetRandomTableEntry(const s32 *list, u32 end) {
+    return list[GFL_RandomLC(FieldActorMovecode_FindTableEnd(list, end))];
 }
 
-static s32 FldmmdlMovecode_GetRandomDirFromSet(u32 index, u32 end) {
-    const s32 *list = FldmmdlMovecode_GetDirSet(index);
+static s32 FieldActorMovecode_GetRandomDirFromSet(u32 index, u32 end) {
+    const s32 *list = FieldActorMovecode_GetDirSet(index);
 
-    return list[GFL_RandomLC(FldmmdlMovecode_FindTableEnd(list, end))];
+    return list[GFL_RandomLC(FieldActorMovecode_FindTableEnd(list, end))];
 }
 
-static const s32 *FldmmdlMovecode_GetDirSet(u32 index) {
+static const s32 *FieldActorMovecode_GetDirSet(u32 index) {
     const ActorDirTableEntry *entry = data_ov036_021cbc70;
 
     for (; entry->key != 0x27; entry++) {
@@ -1257,7 +1257,7 @@ static const s32 *FldmmdlMovecode_GetDirSet(u32 index) {
     return NULL;
 }
 
-static u32 FldmmdlMovecode_GetSightDirToPlayer(FieldActor *actor) {
+static u32 FieldActorMovecode_GetSightDirToPlayer(FieldActor *actor) {
     FieldActor *player;
     s32 range;
     s32 playerX;
@@ -1276,7 +1276,7 @@ static u32 FldmmdlMovecode_GetSightDirToPlayer(FieldActor *actor) {
     if (evType != 1 && evType != 2) {
         return DIR_NONE;
     }
-    if (!FldmmdlMovecode_IsPlayerWalking(actor)) {
+    if (!FieldActorMovecode_IsPlayerWalking(actor)) {
         return DIR_NONE;
     }
     i = 0;
@@ -1310,9 +1310,9 @@ static u32 FldmmdlMovecode_GetSightDirToPlayer(FieldActor *actor) {
     return DIR_NONE;
 }
 
-static u32 FldmmdlMovecode_GetDirTowardPlayerInSet(FieldActor *actor, u32 index, u32 end) {
-    const s32 *dirs = FldmmdlMovecode_GetDirSet(index);
-    s32 count = FldmmdlMovecode_FindTableEnd(dirs, end);
+static u32 FieldActorMovecode_GetDirTowardPlayerInSet(FieldActor *actor, u32 index, u32 end) {
+    const s32 *dirs = FieldActorMovecode_GetDirSet(index);
+    s32 count = FieldActorMovecode_FindTableEnd(dirs, end);
     FieldActor *player;
     s32 actorX;
     s32 actorZ;
@@ -1326,7 +1326,7 @@ static u32 FldmmdlMovecode_GetDirTowardPlayerInSet(FieldActor *actor, u32 index,
     if (count == 1) {
         return DIR_NONE;
     }
-    dir = FldmmdlMovecode_GetSightDirToPlayer(actor);
+    dir = FieldActorMovecode_GetSightDirToPlayer(actor);
     if (dir == DIR_NONE) {
         return dir;
     }
@@ -1383,7 +1383,7 @@ static u32 FldmmdlMovecode_GetDirTowardPlayerInSet(FieldActor *actor, u32 index,
     return DIR_NONE;
 }
 
-static BOOL FldmmdlMovecode_UpdateTriggerWait(FieldActor *actor, u8 *wait) {
+static BOOL FieldActorMovecode_UpdateTriggerWait(FieldActor *actor, u8 *wait) {
     if (GetActorEvType(actor) != 12) {
         return TRUE;
     }
@@ -1391,7 +1391,7 @@ static BOOL FldmmdlMovecode_UpdateTriggerWait(FieldActor *actor, u8 *wait) {
         if (!FldAct_IsNearPlayer(actor)) {
             return FALSE;
         }
-        if (!FldmmdlMovecode_IsBButtonPressed()) {
+        if (!FieldActorMovecode_IsBButtonPressed()) {
             return FALSE;
         }
         *wait = GetActorUserParam(actor, 1);
@@ -1402,7 +1402,7 @@ static BOOL FldmmdlMovecode_UpdateTriggerWait(FieldActor *actor, u8 *wait) {
     return TRUE;
 }
 
-static BOOL FldmmdlMovecode_IsDashEventType(FieldActor *actor) {
+static BOOL FieldActorMovecode_IsDashEventType(FieldActor *actor) {
     u16 evType = GetActorEvType(actor);
 
     if (evType == 13 || evType == 15 || evType == 16 || evType == 17 || evType == 18 || evType == 19) {
@@ -1411,7 +1411,7 @@ static BOOL FldmmdlMovecode_IsDashEventType(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL FldmmdlMovecode_IsMirrorEventType(FieldActor *actor) {
+static BOOL FieldActorMovecode_IsMirrorEventType(FieldActor *actor) {
     int evType = GetActorEvType(actor);
 
     if (evType == 7 || evType == 8 || evType == 17 || evType == 18) {
@@ -1420,7 +1420,7 @@ static BOOL FldmmdlMovecode_IsMirrorEventType(FieldActor *actor) {
     return FALSE;
 }
 
-static void FldmmdlMovecode_InitMirrorSide(FieldActor *actor, ActorFaceMemory *face) {
+static void FieldActorMovecode_InitMirrorSide(FieldActor *actor, ActorFaceMemory *face) {
     u16 evType = GetActorEvType(actor);
 
     if (evType == 7 || evType == 17) {
@@ -1430,7 +1430,7 @@ static void FldmmdlMovecode_InitMirrorSide(FieldActor *actor, ActorFaceMemory *f
     }
 }
 
-static void FldmmdlMovecode_StartMirrorTurn(FieldActor *actor, ActorFaceMemory *face) {
+static void FieldActorMovecode_StartMirrorTurn(FieldActor *actor, ActorFaceMemory *face) {
     u16 dir = GetActorFaceDir(actor);
     s32 i;
     s32 nextDir;
@@ -1452,7 +1452,7 @@ static void FldmmdlMovecode_StartMirrorTurn(FieldActor *actor, ActorFaceMemory *
     SetActorFlag(actor, 8);
 }
 
-static void FldmmdlMovecode_EndMirrorTurn(FieldActor *actor, ActorFaceMemory *face) {
+static void FieldActorMovecode_EndMirrorTurn(FieldActor *actor, ActorFaceMemory *face) {
     if (face->hadFlag8 == 0) {
         ClearActorFlag(actor, 8);
     }

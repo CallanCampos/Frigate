@@ -5,8 +5,8 @@
 #include "field/field_actor.h"
 
 // Overlay 36's fld_act_rail.c: the functions of the rail actors' action commands, by the command's state, which
-// fldmmdl_movedata.c's ACTOR_ACTION_COMMAND_TABLES_RAIL lists by command. The first five, the turns, are done in their
-// first frame and have only a start and an end function
+// field_actor_movedata.c's ACTOR_ACTION_COMMAND_TABLES_RAIL lists by command. The first five, the turns, are done in
+// their first frame and have only a start and an end function
 extern const ActorAcmdFunc data_ov036_021cf374[];
 extern const ActorAcmdFunc data_ov036_021cf37c[];
 extern const ActorAcmdFunc data_ov036_021cf384[];

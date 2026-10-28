@@ -529,8 +529,8 @@ void FieldPlayer_UpdateRailMovement(FieldPlayer *player, u32 pressedKeys, u32 he
     FieldPlayerRail_UpdateMovement(player->nogrid, pressedKeys, heldKeys);
 }
 
-void FieldPlayer_AttachNogridMmdl(FieldPlayer *player, const RailPosition *pos) {
-    FieldPlayerRail_AttachMmdl(player->nogrid, pos);
+void FieldPlayer_AttachNogridActor(FieldPlayer *player, const RailPosition *pos) {
+    FieldPlayerRail_AttachActor(player->nogrid, pos);
 }
 
 void FieldPlayer_ResetNogrid(FieldPlayer *player) {

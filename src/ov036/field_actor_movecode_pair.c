@@ -1,8 +1,8 @@
 // The move codes that follow another actor or the player, hide an actor under a field effect, turn it with the player
-// and walk it along a wall: the functions that fldmmdl_movedata.c's tables list for each, and the steps they run. The
-// ROM gives this file no name, so fldmmdl_movecode_pair.c is a guess after the first of them (FindPairedTrainerActor is
-// swan's). Its .text starts at 0x02192a4c and its .rodata, sorted by size on its own, at 0x021cbeec (Black 2). The code
-// was first written by mariano54 on their parallel-decomp branch
+// and walk it along a wall: the functions that field_actor_movedata.c's tables list for each, and the steps they run.
+// The ROM gives this file no name, so field_actor_movecode_pair.c is a guess after the first of them
+// (FindPairedTrainerActor is swan's). Its .text starts at 0x02192a4c and its .rodata, sorted by size on its own, at
+// 0x021cbeec (Black 2). The code was first written by mariano54 on their parallel-decomp branch
 
 #include "types.h"
 #include "constants/directions.h"
@@ -10,9 +10,9 @@
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_actor_internal.h"
+#include "field/field_actor_movecode_pair.h"
 #include "field/field_effect.h"
 #include "field/field_map.h"
-#include "field/fldmmdl_movecode_pair.h"
 #include "nitro/fx.h"
 
 // A position in fx32 and the grid square that holds it
@@ -53,62 +53,63 @@ typedef struct {
     s32 variant;
 } ActorWallWalkWork;
 
-static BOOL FldmmdlMove_LookPlayerWaitPlayerStep(FieldActor *actor, ActorFollowWork *work);
-static BOOL FldmmdlMove_LookPlayerWaitStep(FieldActor *actor, ActorFollowWork *work);
-static BOOL FldmmdlMove_UpdatePlayerTracking(FieldActor *actor, ActorFollowWork *work);
-static void FldmmdlMove_StartPlayerTracking(FieldActor *actor, ActorFollowWork *work);
-static BOOL FldmmdlMove_HasPlayerMoved(FieldActor *actor, ActorFollowWork *work);
-static void FldmmdlMove_SavePlayerGridPos(FieldActor *actor, ActorFollowWork *work);
-static u32 FldmmdlMove_GetPlayerCopyAcmd(FieldActor *actor);
-static BOOL FldmmdlMove_StepToPlayerInitGrid(FieldActor *actor);
-static BOOL FldmmdlMove_LookFellowTurn(FieldActor *actor, ActorFollowWork *work);
-static BOOL FldmmdlMove_LookFellowWaitTurn(FieldActor *actor, ActorFollowWork *work);
-static BOOL FldmmdlMove_UpdateFellowTracking(FieldActor *actor, ActorFollowWork *work);
-static void FldmmdlMove_StartFellowTracking(FieldActor *actor, ActorFollowWork *work, FieldActor *other);
-static BOOL FldmmdlMove_CanTurnToFellow(FieldActor *actor, ActorFollowWork *work);
-static BOOL FldmmdlMove_TurnToFellow(FieldActor *actor, ActorFollowWork *work);
-static void FldmmdlMove_InitHide(FieldActor *actor, u32 variant);
+static BOOL FieldActorMove_LookPlayerWaitPlayerStep(FieldActor *actor, ActorFollowWork *work);
+static BOOL FieldActorMove_LookPlayerWaitStep(FieldActor *actor, ActorFollowWork *work);
+static BOOL FieldActorMove_UpdatePlayerTracking(FieldActor *actor, ActorFollowWork *work);
+static void FieldActorMove_StartPlayerTracking(FieldActor *actor, ActorFollowWork *work);
+static BOOL FieldActorMove_HasPlayerMoved(FieldActor *actor, ActorFollowWork *work);
+static void FieldActorMove_SavePlayerGridPos(FieldActor *actor, ActorFollowWork *work);
+static u32 FieldActorMove_GetPlayerCopyAcmd(FieldActor *actor);
+static BOOL FieldActorMove_StepToPlayerInitGrid(FieldActor *actor);
+static BOOL FieldActorMove_LookFellowTurn(FieldActor *actor, ActorFollowWork *work);
+static BOOL FieldActorMove_LookFellowWaitTurn(FieldActor *actor, ActorFollowWork *work);
+static BOOL FieldActorMove_UpdateFellowTracking(FieldActor *actor, ActorFollowWork *work);
+static void FieldActorMove_StartFellowTracking(FieldActor *actor, ActorFollowWork *work, FieldActor *other);
+static BOOL FieldActorMove_CanTurnToFellow(FieldActor *actor, ActorFollowWork *work);
+static BOOL FieldActorMove_TurnToFellow(FieldActor *actor, ActorFollowWork *work);
+static void FieldActorMove_InitHide(FieldActor *actor, u32 variant);
 static FieldEffectTask *FldeffHide_Create(FieldActor *actor, u32 kind);
-static BOOL FldmmdlMove_HideCreateEffect(FieldActor *actor, ActorEffectWork *work);
-static BOOL FldmmdlMove_HideKeepEffect(FieldActor *actor, ActorEffectWork *work);
-static void FldmmdlMove_InitFaceDir(FieldActor *actor, u32 unused, u32 flag);
-static BOOL FldmmdlMove_FaceDirTurnSelf(FieldActor *actor, ActorTurnWork *work);
-static BOOL FldmmdlMove_FaceDirWaitTurn(FieldActor *actor, ActorTurnWork *work);
-static BOOL FldmmdlMove_FaceDirResolvePlayerDir(FieldActor *actor, ActorTurnWork *work);
-static BOOL FldmmdlMove_FaceDirTurnPlayerDir(FieldActor *actor, ActorTurnWork *work);
-static BOOL FldmmdlMove_FaceDirWaitPlayerTurn(FieldActor *actor, ActorTurnWork *work);
-static void FldmmdlMove_InitWallWalk(FieldActor *actor, s32 mode, s32 variant);
-static BOOL FldmmdlMove_WallWalkStart(FieldActor *actor, ActorWallWalkWork *work);
-static BOOL FldmmdlMove_WallWalkStep(FieldActor *actor, ActorWallWalkWork *work);
-static BOOL FldmmdlMove_WallWalkWaitStep(FieldActor *actor, ActorWallWalkWork *work);
-static BOOL FldmmdlMove_IsWallAtOffsetA(FieldActor *actor, const VecFx32 *pos, u32 dir, u32 variant);
-static BOOL FldmmdlMove_IsWallAtOffsetB(FieldActor *actor, const VecFx32 *pos, u32 dir, u32 variant);
-static BOOL FldmmdlMove_IsWallNearA(FieldActor *actor, u32 dir, u32 variant);
-static BOOL FldmmdlMove_IsWallNearB(FieldActor *actor, u32 dir, u32 variant);
-static u32 FldmmdlMove_GetWallWalkDir(FieldActor *actor, u32 dir, u32 variant);
-static u32 FldmmdlMove_HitCheckWallWalkDir(FieldActor *actor, u32 *dir, u32 variant);
-static BOOL FldmmdlMove_WallWalkStepOnce(FieldActor *actor, ActorWallWalkWork *work, u32 speed);
+static BOOL FieldActorMove_HideCreateEffect(FieldActor *actor, ActorEffectWork *work);
+static BOOL FieldActorMove_HideKeepEffect(FieldActor *actor, ActorEffectWork *work);
+static void FieldActorMove_InitFaceDir(FieldActor *actor, u32 unused, u32 flag);
+static BOOL FieldActorMove_FaceDirTurnSelf(FieldActor *actor, ActorTurnWork *work);
+static BOOL FieldActorMove_FaceDirWaitTurn(FieldActor *actor, ActorTurnWork *work);
+static BOOL FieldActorMove_FaceDirResolvePlayerDir(FieldActor *actor, ActorTurnWork *work);
+static BOOL FieldActorMove_FaceDirTurnPlayerDir(FieldActor *actor, ActorTurnWork *work);
+static BOOL FieldActorMove_FaceDirWaitPlayerTurn(FieldActor *actor, ActorTurnWork *work);
+static void FieldActorMove_InitWallWalk(FieldActor *actor, s32 mode, s32 variant);
+static BOOL FieldActorMove_WallWalkStart(FieldActor *actor, ActorWallWalkWork *work);
+static BOOL FieldActorMove_WallWalkStep(FieldActor *actor, ActorWallWalkWork *work);
+static BOOL FieldActorMove_WallWalkWaitStep(FieldActor *actor, ActorWallWalkWork *work);
+static BOOL FieldActorMove_IsWallAtOffsetA(FieldActor *actor, const VecFx32 *pos, u32 dir, u32 variant);
+static BOOL FieldActorMove_IsWallAtOffsetB(FieldActor *actor, const VecFx32 *pos, u32 dir, u32 variant);
+static BOOL FieldActorMove_IsWallNearA(FieldActor *actor, u32 dir, u32 variant);
+static BOOL FieldActorMove_IsWallNearB(FieldActor *actor, u32 dir, u32 variant);
+static u32 FieldActorMove_GetWallWalkDir(FieldActor *actor, u32 dir, u32 variant);
+static u32 FieldActorMove_HitCheckWallWalkDir(FieldActor *actor, u32 *dir, u32 variant);
+static BOOL FieldActorMove_WallWalkStepOnce(FieldActor *actor, ActorWallWalkWork *work, u32 speed);
 
 // The tables are declared in this order because MWCC lays out objects of the same size by where each was declared:
 // it is one that gives the ROM's .rodata (found with tools/decomp/rodata_order.py's model)
 static BOOL (*const data_ov036_021cbeec[])(FieldActor *actor,
-                                           ActorFollowWork *work) = { FldmmdlMove_LookPlayerWaitPlayerStep,
-                                                                      FldmmdlMove_LookPlayerWaitStep };
+                                           ActorFollowWork *work) = { FieldActorMove_LookPlayerWaitPlayerStep,
+                                                                      FieldActorMove_LookPlayerWaitStep };
 
-static BOOL (*const data_ov036_021cbef4[])(FieldActor *actor, ActorEffectWork *work) = { FldmmdlMove_HideCreateEffect,
-                                                                                         FldmmdlMove_HideKeepEffect };
+static BOOL (*const data_ov036_021cbef4[])(FieldActor *actor,
+                                           ActorEffectWork *work) = { FieldActorMove_HideCreateEffect,
+                                                                      FieldActorMove_HideKeepEffect };
 
 static BOOL (*const data_ov036_021cbf18[])(FieldActor *actor, ActorTurnWork *work) = {
-    FldmmdlMove_FaceDirTurnSelf, FldmmdlMove_FaceDirWaitTurn, FldmmdlMove_FaceDirResolvePlayerDir,
-    FldmmdlMove_FaceDirTurnPlayerDir, FldmmdlMove_FaceDirWaitPlayerTurn
+    FieldActorMove_FaceDirTurnSelf, FieldActorMove_FaceDirWaitTurn, FieldActorMove_FaceDirResolvePlayerDir,
+    FieldActorMove_FaceDirTurnPlayerDir, FieldActorMove_FaceDirWaitPlayerTurn
 };
 
 static BOOL (*const data_ov036_021cbf04[])(FieldActor *actor,
-                                           ActorFollowWork *work) = { FldmmdlMove_LookFellowTurn,
-                                                                      FldmmdlMove_LookFellowWaitTurn };
+                                           ActorFollowWork *work) = { FieldActorMove_LookFellowTurn,
+                                                                      FieldActorMove_LookFellowWaitTurn };
 
 static BOOL (*const data_ov036_021cbf0c[])(FieldActor *actor, ActorWallWalkWork *work) = {
-    FldmmdlMove_WallWalkStart, FldmmdlMove_WallWalkStep, FldmmdlMove_WallWalkWaitStep
+    FieldActorMove_WallWalkStart, FieldActorMove_WallWalkStep, FieldActorMove_WallWalkWaitStep
 };
 
 static const s32 data_ov036_021cbfac[][2] = { { 0x1, 0x1 }, { -0x1, -0x1 }, { 0x1, -0x1 }, { -0x1, 0x1 } };
@@ -129,36 +130,36 @@ static const s32 data_ov036_021cbf6c[][2] = {
     { DIR_LEFT, DIR_RIGHT }, { DIR_RIGHT, DIR_LEFT }, { DIR_DOWN, DIR_UP }, { DIR_UP, DIR_DOWN }
 };
 
-void FldmmdlMove_InitLookPlayer(FieldActor *actor) {
+void FieldActorMove_InitLookPlayer(FieldActor *actor) {
     ActorFollowWork *work = ClearActorPositionBlock(actor, 8);
 
-    FldmmdlMove_UpdatePlayerTracking(actor, work);
+    FieldActorMove_UpdatePlayerTracking(actor, work);
     FldAct_SetDrawStatus(actor, 0);
     FldAct_ClearMoving(actor);
     SetActorFlag8000(actor, 0);
 }
 
-void FldmmdlMove_MoveLookPlayer(FieldActor *actor) {
+void FieldActorMove_MoveLookPlayer(FieldActor *actor) {
     ActorFollowWork *work = GetNPCRailPosPtrAddr(actor);
 
-    if (FldmmdlMove_UpdatePlayerTracking(actor, work)) {
+    if (FieldActorMove_UpdatePlayerTracking(actor, work)) {
         while (data_ov036_021cbeec[work->state](actor, work) == TRUE) {
         }
     }
 }
 
-void FldmmdlMove_DeleteLookPlayer(FieldActor *actor) {
+void FieldActorMove_DeleteLookPlayer(FieldActor *actor) {
 }
 
-static BOOL FldmmdlMove_LookPlayerWaitPlayerStep(FieldActor *actor, ActorFollowWork *work) {
+static BOOL FieldActorMove_LookPlayerWaitPlayerStep(FieldActor *actor, ActorFollowWork *work) {
     FldAct_ClearMoving(actor);
     FldAct_ClearMoveEnd(actor);
     if (IsActorHidden(actor)) {
         return FALSE;
     }
-    if (FldmmdlMove_HasPlayerMoved(actor, work) == TRUE) {
-        FldmmdlMove_SavePlayerGridPos(actor, work);
-        if (FldmmdlMove_StepToPlayerInitGrid(actor) == TRUE) {
+    if (FieldActorMove_HasPlayerMoved(actor, work) == TRUE) {
+        FieldActorMove_SavePlayerGridPos(actor, work);
+        if (FieldActorMove_StepToPlayerInitGrid(actor) == TRUE) {
             FldAct_SetMoving(actor);
             work->state++;
             return TRUE;
@@ -167,7 +168,7 @@ static BOOL FldmmdlMove_LookPlayerWaitPlayerStep(FieldActor *actor, ActorFollowW
     return FALSE;
 }
 
-static BOOL FldmmdlMove_LookPlayerWaitStep(FieldActor *actor, ActorFollowWork *work) {
+static BOOL FieldActorMove_LookPlayerWaitStep(FieldActor *actor, ActorFollowWork *work) {
     if (FieldAcmdTCB_Update(actor) == TRUE) {
         FldAct_ClearMoving(actor);
         work->state = 0;
@@ -175,18 +176,18 @@ static BOOL FldmmdlMove_LookPlayerWaitStep(FieldActor *actor, ActorFollowWork *w
     return FALSE;
 }
 
-static BOOL FldmmdlMove_UpdatePlayerTracking(FieldActor *actor, ActorFollowWork *work) {
+static BOOL FieldActorMove_UpdatePlayerTracking(FieldActor *actor, ActorFollowWork *work) {
     if (FindPlayerFieldActor(GetActorMModelSystem(actor)) == NULL) {
         work->active = 0;
         return FALSE;
     }
     if (work->active == 0) {
-        FldmmdlMove_StartPlayerTracking(actor, work);
+        FieldActorMove_StartPlayerTracking(actor, work);
     }
     return TRUE;
 }
 
-static void FldmmdlMove_StartPlayerTracking(FieldActor *actor, ActorFollowWork *work) {
+static void FieldActorMove_StartPlayerTracking(FieldActor *actor, ActorFollowWork *work) {
     FieldActor *player = FindPlayerFieldActor(GetActorMModelSystem(actor));
 
     work->active = 1;
@@ -195,7 +196,7 @@ static void FldmmdlMove_StartPlayerTracking(FieldActor *actor, ActorFollowWork *
     work->unk6 = 0xff;
 }
 
-static BOOL FldmmdlMove_HasPlayerMoved(FieldActor *actor, ActorFollowWork *work) {
+static BOOL FieldActorMove_HasPlayerMoved(FieldActor *actor, ActorFollowWork *work) {
     FieldActor *player = FindPlayerFieldActor(GetActorMModelSystem(actor));
 
     if (player != NULL) {
@@ -209,14 +210,14 @@ static BOOL FldmmdlMove_HasPlayerMoved(FieldActor *actor, ActorFollowWork *work)
     return FALSE;
 }
 
-static void FldmmdlMove_SavePlayerGridPos(FieldActor *actor, ActorFollowWork *work) {
+static void FieldActorMove_SavePlayerGridPos(FieldActor *actor, ActorFollowWork *work) {
     FieldActor *player = FindPlayerFieldActor(GetActorMModelSystem(actor));
 
     work->x = GetGPosX(player);
     work->z = GetGPosZ(player);
 }
 
-static u32 FldmmdlMove_GetPlayerCopyAcmd(FieldActor *actor) {
+static u32 FieldActorMove_GetPlayerCopyAcmd(FieldActor *actor) {
     u16 acmd = FldAct_GetAcmd(FindPlayerFieldActor(GetActorMModelSystem(actor)));
 
     switch (acmd) {
@@ -240,7 +241,7 @@ static u32 FldmmdlMove_GetPlayerCopyAcmd(FieldActor *actor) {
     return acmd;
 }
 
-static BOOL FldmmdlMove_StepToPlayerInitGrid(FieldActor *actor) {
+static BOOL FieldActorMove_StepToPlayerInitGrid(FieldActor *actor) {
     FieldActor *player = FindPlayerFieldActor(GetActorMModelSystem(actor));
     s32 x = GetGPosX(actor);
     s32 z = GetGPosZ(actor);
@@ -249,7 +250,7 @@ static BOOL FldmmdlMove_StepToPlayerInitGrid(FieldActor *actor) {
     u32 acmd;
 
     if (x != playerInitX || z != playerInitZ) {
-        acmd = FldmmdlMove_GetPlayerCopyAcmd(actor);
+        acmd = FieldActorMove_GetPlayerCopyAcmd(actor);
         if (acmd == 0xff) {
             return FALSE;
         }
@@ -259,38 +260,38 @@ static BOOL FldmmdlMove_StepToPlayerInitGrid(FieldActor *actor) {
     return FALSE;
 }
 
-void FldmmdlMove_InitLookFellow(FieldActor *actor) {
+void FieldActorMove_InitLookFellow(FieldActor *actor) {
     ActorFollowWork *work = ClearActorPositionBlock(actor, 12);
 
-    FldmmdlMove_UpdateFellowTracking(actor, work);
+    FieldActorMove_UpdateFellowTracking(actor, work);
     FldAct_SetDrawStatus(actor, 0);
     FldAct_ClearMoving(actor);
     work->active = 0;
 }
 
-void FldmmdlMove_MoveLookFellow(FieldActor *actor) {
+void FieldActorMove_MoveLookFellow(FieldActor *actor) {
     ActorFollowWork *work = GetNPCRailPosPtrAddr(actor);
 
-    if (FldmmdlMove_UpdateFellowTracking(actor, work)) {
+    if (FieldActorMove_UpdateFellowTracking(actor, work)) {
         while (data_ov036_021cbf04[work->state](actor, work) == TRUE) {
         }
     }
 }
 
-void FldmmdlMove_DeleteLookFellow(FieldActor *actor) {
+void FieldActorMove_DeleteLookFellow(FieldActor *actor) {
 }
 
-void FldmmdlMove_ClearFellowTracking(FieldActor *actor) {
+void FieldActorMove_ClearFellowTracking(FieldActor *actor) {
     ActorFollowWork *work = GetNPCRailPosPtrAddr(actor);
 
     work->active = 0;
 }
 
-static BOOL FldmmdlMove_LookFellowTurn(FieldActor *actor, ActorFollowWork *work) {
+static BOOL FieldActorMove_LookFellowTurn(FieldActor *actor, ActorFollowWork *work) {
     FldAct_ClearMoving(actor);
     FldAct_ClearMoveEnd(actor);
-    if (FldmmdlMove_CanTurnToFellow(actor, work) == TRUE) {
-        if (FldmmdlMove_TurnToFellow(actor, work) == TRUE) {
+    if (FieldActorMove_CanTurnToFellow(actor, work) == TRUE) {
+        if (FieldActorMove_TurnToFellow(actor, work) == TRUE) {
             FldAct_SetMoving(actor);
             work->state++;
             return TRUE;
@@ -299,7 +300,7 @@ static BOOL FldmmdlMove_LookFellowTurn(FieldActor *actor, ActorFollowWork *work)
     return FALSE;
 }
 
-static BOOL FldmmdlMove_LookFellowWaitTurn(FieldActor *actor, ActorFollowWork *work) {
+static BOOL FieldActorMove_LookFellowWaitTurn(FieldActor *actor, ActorFollowWork *work) {
     if (!FieldAcmdTCB_Update(actor)) {
         return FALSE;
     }
@@ -336,7 +337,7 @@ FieldActor *FindPairedTrainerActor(FieldActor *actor) {
     return NULL;
 }
 
-static BOOL FldmmdlMove_UpdateFellowTracking(FieldActor *actor, ActorFollowWork *work) {
+static BOOL FieldActorMove_UpdateFellowTracking(FieldActor *actor, ActorFollowWork *work) {
     u16 zoneId;
     u16 trainerId;
     u32 index;
@@ -350,7 +351,7 @@ static BOOL FldmmdlMove_UpdateFellowTracking(FieldActor *actor, ActorFollowWork 
     while (NextActor(mmSys, &other, &index) == TRUE) {
         if (actor != other && zoneId == GetActorZoneID(other) && trainerId == GetNPCTrainerID(other)) {
             if (work->active == 0) {
-                FldmmdlMove_StartFellowTracking(actor, work, other);
+                FieldActorMove_StartFellowTracking(actor, work, other);
             }
             return TRUE;
         }
@@ -359,7 +360,7 @@ static BOOL FldmmdlMove_UpdateFellowTracking(FieldActor *actor, ActorFollowWork 
     return FALSE;
 }
 
-static void FldmmdlMove_StartFellowTracking(FieldActor *actor, ActorFollowWork *work, FieldActor *other) {
+static void FieldActorMove_StartFellowTracking(FieldActor *actor, ActorFollowWork *work, FieldActor *other) {
     work->active = 1;
     work->x = GetGPosX(other);
     work->z = GetGPosZ(other);
@@ -367,7 +368,7 @@ static void FldmmdlMove_StartFellowTracking(FieldActor *actor, ActorFollowWork *
     work->target = other;
 }
 
-static BOOL FldmmdlMove_CanTurnToFellow(FieldActor *actor, ActorFollowWork *work) {
+static BOOL FieldActorMove_CanTurnToFellow(FieldActor *actor, ActorFollowWork *work) {
     FieldActor *target = work->target;
     s32 x = GetGPosX(actor);
     s32 z = GetGPosZ(actor);
@@ -382,7 +383,7 @@ static BOOL FldmmdlMove_CanTurnToFellow(FieldActor *actor, ActorFollowWork *work
     return FALSE;
 }
 
-static BOOL FldmmdlMove_TurnToFellow(FieldActor *actor, ActorFollowWork *work) {
+static BOOL FieldActorMove_TurnToFellow(FieldActor *actor, ActorFollowWork *work) {
     s32 x = GetGPosX(actor);
     s32 z = GetGPosZ(actor);
     s32 targetX = GetGPosX(work->target);
@@ -404,7 +405,7 @@ static BOOL FldmmdlMove_TurnToFellow(FieldActor *actor, ActorFollowWork *work) {
     return FALSE;
 }
 
-static void FldmmdlMove_InitHide(FieldActor *actor, u32 variant) {
+static void FieldActorMove_InitHide(FieldActor *actor, u32 variant) {
     ActorBobWork *work = ClearActorPositionBlock(actor, 8);
 
     work->variant = variant;
@@ -416,46 +417,46 @@ static void FldmmdlMove_InitHide(FieldActor *actor, u32 variant) {
     SetActorWPosOffset(actor, &offset);
 }
 
-void FldmmdlMove_InitHideKind0Code33(FieldActor *actor) {
-    FldmmdlMove_InitHide(actor, 0);
+void FieldActorMove_InitHideKind0Code33(FieldActor *actor) {
+    FieldActorMove_InitHide(actor, 0);
 }
 
-void FldmmdlMove_InitHideKind1Code34(FieldActor *actor) {
-    FldmmdlMove_InitHide(actor, 1);
+void FieldActorMove_InitHideKind1Code34(FieldActor *actor) {
+    FieldActorMove_InitHide(actor, 1);
 }
 
-void FldmmdlMove_InitHideKind1Code35(FieldActor *actor) {
-    FldmmdlMove_InitHide(actor, 1);
+void FieldActorMove_InitHideKind1Code35(FieldActor *actor) {
+    FieldActorMove_InitHide(actor, 1);
 }
 
-void FldmmdlMove_InitHideKind0Code36(FieldActor *actor) {
-    FldmmdlMove_InitHide(actor, 0);
+void FieldActorMove_InitHideKind0Code36(FieldActor *actor) {
+    FieldActorMove_InitHide(actor, 0);
 }
 
-void FldmmdlMove_InitHideKind2Code55(FieldActor *actor) {
-    FldmmdlMove_InitHide(actor, 2);
+void FieldActorMove_InitHideKind2Code55(FieldActor *actor) {
+    FieldActorMove_InitHide(actor, 2);
 }
 
-void FldmmdlMove_MoveHide(FieldActor *actor) {
+void FieldActorMove_MoveHide(FieldActor *actor) {
     ActorEffectWork *work = GetNPCRailPosPtrAddr(actor);
 
     while (data_ov036_021cbef4[work->state](actor, work) == TRUE) {
     }
 }
 
-void FldmmdlMove_DeleteHide(FieldActor *actor) {
-    FieldEffectTask *task = FldmmdlMove_GetHideEffect(actor);
+void FieldActorMove_DeleteHide(FieldActor *actor) {
+    FieldEffectTask *task = FieldActorMove_GetHideEffect(actor);
 
     if (task != NULL) {
         FieldEffects_DeleteObject(task);
     }
 }
 
-void FldmmdlMove_RecoverHide(FieldActor *actor) {
+void FieldActorMove_RecoverHide(FieldActor *actor) {
     ActorEffectWork *work = GetNPCRailPosPtrAddr(actor);
 
     work->state = 0;
-    FldmmdlMove_SetHideEffect(actor, NULL);
+    FieldActorMove_SetHideEffect(actor, NULL);
     if (work->hasEffect == 0) {
         VecFx32 offset = { 0, -32 * FX32_ONE, 0 };
 
@@ -468,9 +469,9 @@ static FieldEffectTask *FldeffHide_Create(FieldActor *actor, u32 kind) {
     return HideTask_Start(Field_GetFieldEffects(GetMMSysField(GetActorMModelSystem(actor))), actor, kind);
 }
 
-static BOOL FldmmdlMove_HideCreateEffect(FieldActor *actor, ActorEffectWork *work) {
+static BOOL FieldActorMove_HideCreateEffect(FieldActor *actor, ActorEffectWork *work) {
     if (work->hasEffect == 0) {
-        FldmmdlMove_SetHideEffect(actor, FldeffHide_Create(actor, work->kind));
+        FieldActorMove_SetHideEffect(actor, FldeffHide_Create(actor, work->kind));
     }
     FldAct_ClearMoving(actor);
     FldAct_ClearMoveEnd(actor);
@@ -478,11 +479,11 @@ static BOOL FldmmdlMove_HideCreateEffect(FieldActor *actor, ActorEffectWork *wor
     return FALSE;
 }
 
-static BOOL FldmmdlMove_HideKeepEffect(FieldActor *actor, ActorEffectWork *work) {
+static BOOL FieldActorMove_HideKeepEffect(FieldActor *actor, ActorEffectWork *work) {
     if (work->hasEffect == 0) {
-        if (FldmmdlMove_GetHideEffect(actor) == NULL) {
+        if (FieldActorMove_GetHideEffect(actor) == NULL) {
             if (FldAct_IsDrawReady(actor) == TRUE) {
-                FldmmdlMove_SetHideEffect(actor, FldeffHide_Create(actor, work->kind));
+                FieldActorMove_SetHideEffect(actor, FldeffHide_Create(actor, work->kind));
             }
         }
         SetActorMovementFlag(actor, 0x8000);
@@ -490,25 +491,25 @@ static BOOL FldmmdlMove_HideKeepEffect(FieldActor *actor, ActorEffectWork *work)
     return FALSE;
 }
 
-void FldmmdlMove_SetHideEffect(FieldActor *actor, FieldEffectTask *task) {
+void FieldActorMove_SetHideEffect(FieldActor *actor, FieldEffectTask *task) {
     ActorEffectWork *work = GetNPCRailPosPtrAddr(actor);
 
     work->task = task;
 }
 
-FieldEffectTask *FldmmdlMove_GetHideEffect(FieldActor *actor) {
+FieldEffectTask *FieldActorMove_GetHideEffect(FieldActor *actor) {
     ActorEffectWork *work = GetNPCRailPosPtrAddr(actor);
 
     return work->task;
 }
 
-void FldmmdlMove_SetHideNoEffect(FieldActor *actor) {
+void FieldActorMove_SetHideNoEffect(FieldActor *actor) {
     ActorEffectWork *work = GetNPCRailPosPtrAddr(actor);
 
     work->hasEffect = 1;
 }
 
-static void FldmmdlMove_InitFaceDir(FieldActor *actor, u32 unused, u32 flag) {
+static void FieldActorMove_InitFaceDir(FieldActor *actor, u32 unused, u32 flag) {
     ActorTurnWork *work = ClearActorPositionBlock(actor, 4);
 
     work->dir = DIR_NONE;
@@ -516,46 +517,46 @@ static void FldmmdlMove_InitFaceDir(FieldActor *actor, u32 unused, u32 flag) {
     CheckSetActorFaceDir(actor, DIR_UP);
 }
 
-void FldmmdlMove_InitFaceDirSet0(FieldActor *actor) {
-    FldmmdlMove_InitFaceDir(actor, 0, 0);
+void FieldActorMove_InitFaceDirSet0(FieldActor *actor) {
+    FieldActorMove_InitFaceDir(actor, 0, 0);
 }
 
-void FldmmdlMove_InitFaceDirSet1(FieldActor *actor) {
-    FldmmdlMove_InitFaceDir(actor, 1, 0);
+void FieldActorMove_InitFaceDirSet1(FieldActor *actor) {
+    FieldActorMove_InitFaceDir(actor, 1, 0);
 }
 
-void FldmmdlMove_InitFaceDirSet2(FieldActor *actor) {
-    FldmmdlMove_InitFaceDir(actor, 2, 0);
+void FieldActorMove_InitFaceDirSet2(FieldActor *actor) {
+    FieldActorMove_InitFaceDir(actor, 2, 0);
 }
 
-void FldmmdlMove_InitFaceDirSet3(FieldActor *actor) {
-    FldmmdlMove_InitFaceDir(actor, 3, 0);
+void FieldActorMove_InitFaceDirSet3(FieldActor *actor) {
+    FieldActorMove_InitFaceDir(actor, 3, 0);
 }
 
-void FldmmdlMove_InitFaceDirFlagSet0(FieldActor *actor) {
-    FldmmdlMove_InitFaceDir(actor, 0, 1);
+void FieldActorMove_InitFaceDirFlagSet0(FieldActor *actor) {
+    FieldActorMove_InitFaceDir(actor, 0, 1);
 }
 
-void FldmmdlMove_InitFaceDirFlagSet1(FieldActor *actor) {
-    FldmmdlMove_InitFaceDir(actor, 1, 1);
+void FieldActorMove_InitFaceDirFlagSet1(FieldActor *actor) {
+    FieldActorMove_InitFaceDir(actor, 1, 1);
 }
 
-void FldmmdlMove_InitFaceDirFlagSet2(FieldActor *actor) {
-    FldmmdlMove_InitFaceDir(actor, 2, 1);
+void FieldActorMove_InitFaceDirFlagSet2(FieldActor *actor) {
+    FieldActorMove_InitFaceDir(actor, 2, 1);
 }
 
-void FldmmdlMove_InitFaceDirFlagSet3(FieldActor *actor) {
-    FldmmdlMove_InitFaceDir(actor, 3, 1);
+void FieldActorMove_InitFaceDirFlagSet3(FieldActor *actor) {
+    FieldActorMove_InitFaceDir(actor, 3, 1);
 }
 
-void FldmmdlMove_MoveFaceDir(FieldActor *actor) {
+void FieldActorMove_MoveFaceDir(FieldActor *actor) {
     ActorTurnWork *work = GetNPCRailPosPtrAddr(actor);
 
     while (data_ov036_021cbf18[work->state](actor, work) == TRUE) {
     }
 }
 
-static BOOL FldmmdlMove_FaceDirTurnSelf(FieldActor *actor, ActorTurnWork *work) {
+static BOOL FieldActorMove_FaceDirTurnSelf(FieldActor *actor, ActorTurnWork *work) {
     u32 dir = GetActorFaceDir(actor);
 
     StartDirAcmd(actor, dir, 0);
@@ -565,7 +566,7 @@ static BOOL FldmmdlMove_FaceDirTurnSelf(FieldActor *actor, ActorTurnWork *work) 
     return TRUE;
 }
 
-static BOOL FldmmdlMove_FaceDirWaitTurn(FieldActor *actor, ActorTurnWork *work) {
+static BOOL FieldActorMove_FaceDirWaitTurn(FieldActor *actor, ActorTurnWork *work) {
     if (FieldAcmdTCB_Update(actor) == TRUE) {
         work->state = 2;
         return TRUE;
@@ -573,7 +574,7 @@ static BOOL FldmmdlMove_FaceDirWaitTurn(FieldActor *actor, ActorTurnWork *work) 
     return FALSE;
 }
 
-static BOOL FldmmdlMove_FaceDirResolvePlayerDir(FieldActor *actor, ActorTurnWork *work) {
+static BOOL FieldActorMove_FaceDirResolvePlayerDir(FieldActor *actor, ActorTurnWork *work) {
     if (work->dir == DIR_NONE) {
         FieldActor *player = FindPlayerFieldActor(GetActorMModelSystem(actor));
 
@@ -587,7 +588,7 @@ static BOOL FldmmdlMove_FaceDirResolvePlayerDir(FieldActor *actor, ActorTurnWork
     return TRUE;
 }
 
-static BOOL FldmmdlMove_FaceDirTurnPlayerDir(FieldActor *actor, ActorTurnWork *work) {
+static BOOL FieldActorMove_FaceDirTurnPlayerDir(FieldActor *actor, ActorTurnWork *work) {
     u32 acmd = GetAcmdForDir(GetActorMotionDir(FindPlayerFieldActor(GetActorMModelSystem(actor))), 0);
 
     FldAct_SetLocalAcmd(actor, acmd);
@@ -595,7 +596,7 @@ static BOOL FldmmdlMove_FaceDirTurnPlayerDir(FieldActor *actor, ActorTurnWork *w
     return TRUE;
 }
 
-static BOOL FldmmdlMove_FaceDirWaitPlayerTurn(FieldActor *actor, ActorTurnWork *work) {
+static BOOL FieldActorMove_FaceDirWaitPlayerTurn(FieldActor *actor, ActorTurnWork *work) {
     if (!FieldAcmdTCB_Update(actor)) {
         return FALSE;
     }
@@ -605,49 +606,49 @@ static BOOL FldmmdlMove_FaceDirWaitPlayerTurn(FieldActor *actor, ActorTurnWork *
     return FALSE;
 }
 
-static void FldmmdlMove_InitWallWalk(FieldActor *actor, s32 mode, s32 variant) {
+static void FieldActorMove_InitWallWalk(FieldActor *actor, s32 mode, s32 variant) {
     ActorWallWalkWork *work = ClearActorPositionBlock(actor, 12);
 
     work->mode = mode;
     work->variant = variant;
 }
 
-void FldmmdlMove_InitWallWalkLeftHand(FieldActor *actor) {
-    FldmmdlMove_InitWallWalk(actor, 0, 0);
+void FieldActorMove_InitWallWalkLeftHand(FieldActor *actor) {
+    FieldActorMove_InitWallWalk(actor, 0, 0);
 }
 
-void FldmmdlMove_InitWallWalkRightHand(FieldActor *actor) {
-    FldmmdlMove_InitWallWalk(actor, 1, 1);
+void FieldActorMove_InitWallWalkRightHand(FieldActor *actor) {
+    FieldActorMove_InitWallWalk(actor, 1, 1);
 }
 
-void FldmmdlMove_InitWallWalkLeftHandReversing(FieldActor *actor) {
-    FldmmdlMove_InitWallWalk(actor, 2, 0);
+void FieldActorMove_InitWallWalkLeftHandReversing(FieldActor *actor) {
+    FieldActorMove_InitWallWalk(actor, 2, 0);
 }
 
-void FldmmdlMove_InitWallWalkRightHandReversing(FieldActor *actor) {
-    FldmmdlMove_InitWallWalk(actor, 2, 1);
+void FieldActorMove_InitWallWalkRightHandReversing(FieldActor *actor) {
+    FieldActorMove_InitWallWalk(actor, 2, 1);
 }
 
-void FldmmdlMove_MoveWallWalk(FieldActor *actor) {
+void FieldActorMove_MoveWallWalk(FieldActor *actor) {
     ActorWallWalkWork *work = GetNPCRailPosPtrAddr(actor);
 
     while (data_ov036_021cbf0c[work->state](actor, work) == TRUE) {
     }
 }
 
-static BOOL FldmmdlMove_WallWalkStart(FieldActor *actor, ActorWallWalkWork *work) {
+static BOOL FieldActorMove_WallWalkStart(FieldActor *actor, ActorWallWalkWork *work) {
     FldAct_ClearMoving(actor);
     work->state++;
     return TRUE;
 }
 
-static BOOL FldmmdlMove_WallWalkStep(FieldActor *actor, ActorWallWalkWork *work) {
-    FldmmdlMove_WallWalkStepOnce(actor, work, 12);
+static BOOL FieldActorMove_WallWalkStep(FieldActor *actor, ActorWallWalkWork *work) {
+    FieldActorMove_WallWalkStepOnce(actor, work, 12);
     work->state++;
     return TRUE;
 }
 
-static BOOL FldmmdlMove_WallWalkWaitStep(FieldActor *actor, ActorWallWalkWork *work) {
+static BOOL FieldActorMove_WallWalkWaitStep(FieldActor *actor, ActorWallWalkWork *work) {
     if (FieldAcmdTCB_Update(actor) == TRUE) {
         FldAct_ClearMoving(actor);
         work->state = 0;
@@ -655,7 +656,7 @@ static BOOL FldmmdlMove_WallWalkWaitStep(FieldActor *actor, ActorWallWalkWork *w
     return FALSE;
 }
 
-static BOOL FldmmdlMove_IsWallAtOffsetA(FieldActor *actor, const VecFx32 *pos, u32 dir, u32 variant) {
+static BOOL FieldActorMove_IsWallAtOffsetA(FieldActor *actor, const VecFx32 *pos, u32 dir, u32 variant) {
     u32 tileType;
     BOOL blocked = FALSE;
     VecFx32 target = *pos;
@@ -674,7 +675,7 @@ static BOOL FldmmdlMove_IsWallAtOffsetA(FieldActor *actor, const VecFx32 *pos, u
     return blocked;
 }
 
-static BOOL FldmmdlMove_IsWallAtOffsetB(FieldActor *actor, const VecFx32 *pos, u32 dir, u32 variant) {
+static BOOL FieldActorMove_IsWallAtOffsetB(FieldActor *actor, const VecFx32 *pos, u32 dir, u32 variant) {
     u32 tileType;
     BOOL blocked = FALSE;
     VecFx32 target = *pos;
@@ -693,23 +694,23 @@ static BOOL FldmmdlMove_IsWallAtOffsetB(FieldActor *actor, const VecFx32 *pos, u
     return blocked;
 }
 
-static BOOL FldmmdlMove_IsWallNearA(FieldActor *actor, u32 dir, u32 variant) {
+static BOOL FieldActorMove_IsWallNearA(FieldActor *actor, u32 dir, u32 variant) {
     VecFx32 pos;
 
     CopyActorWPos(actor, &pos);
-    return FldmmdlMove_IsWallAtOffsetA(actor, &pos, dir, variant);
+    return FieldActorMove_IsWallAtOffsetA(actor, &pos, dir, variant);
 }
 
-static BOOL FldmmdlMove_IsWallNearB(FieldActor *actor, u32 dir, u32 variant) {
+static BOOL FieldActorMove_IsWallNearB(FieldActor *actor, u32 dir, u32 variant) {
     VecFx32 pos;
 
     CopyActorWPos(actor, &pos);
-    return FldmmdlMove_IsWallAtOffsetB(actor, &pos, dir, variant);
+    return FieldActorMove_IsWallAtOffsetB(actor, &pos, dir, variant);
 }
 
-static u32 FldmmdlMove_GetWallWalkDir(FieldActor *actor, u32 dir, u32 variant) {
-    if (!FldmmdlMove_IsWallNearA(actor, dir, variant)) {
-        if (!FldmmdlMove_IsWallNearB(actor, dir, variant)) {
+static u32 FieldActorMove_GetWallWalkDir(FieldActor *actor, u32 dir, u32 variant) {
+    if (!FieldActorMove_IsWallNearA(actor, dir, variant)) {
+        if (!FieldActorMove_IsWallNearB(actor, dir, variant)) {
             return DIR_NONE;
         }
         dir = data_ov036_021cbf6c[dir][variant];
@@ -717,19 +718,19 @@ static u32 FldmmdlMove_GetWallWalkDir(FieldActor *actor, u32 dir, u32 variant) {
     return dir;
 }
 
-static u32 FldmmdlMove_HitCheckWallWalkDir(FieldActor *actor, u32 *dir, u32 variant) {
-    *dir = FldmmdlMove_GetWallWalkDir(actor, *dir, variant);
+static u32 FieldActorMove_HitCheckWallWalkDir(FieldActor *actor, u32 *dir, u32 variant) {
+    *dir = FieldActorMove_GetWallWalkDir(actor, *dir, variant);
     if (*dir != DIR_NONE) {
         return ActorRouteCollCheckOneTileInDir(actor, *dir);
     }
     return 0;
 }
 
-static BOOL FldmmdlMove_WallWalkStepOnce(FieldActor *actor, ActorWallWalkWork *work, u32 speed) {
+static BOOL FieldActorMove_WallWalkStepOnce(FieldActor *actor, ActorWallWalkWork *work, u32 speed) {
     u32 acmd;
     u32 variant = work->variant;
     u32 dir = GetActorMotionDir(actor);
-    u32 result = FldmmdlMove_HitCheckWallWalkDir(actor, &dir, variant);
+    u32 result = FieldActorMove_HitCheckWallWalkDir(actor, &dir, variant);
 
     if (dir == DIR_NONE) {
         dir = GetActorMotionDir(actor);
@@ -747,7 +748,7 @@ static BOOL FldmmdlMove_WallWalkStepOnce(FieldActor *actor, ActorWallWalkWork *w
         dir = GetInverseDirection(GetActorMotionDir(actor));
         variant = data_ov036_021cbefc[variant];
         work->variant = variant;
-        result = FldmmdlMove_HitCheckWallWalkDir(actor, &dir, variant);
+        result = FieldActorMove_HitCheckWallWalkDir(actor, &dir, variant);
         if (dir == DIR_NONE) {
             dir = GetActorMotionDir(actor);
             acmd = GetAcmdForDir(dir, 0x1c);
@@ -763,7 +764,7 @@ static BOOL FldmmdlMove_WallWalkStepOnce(FieldActor *actor, ActorWallWalkWork *w
     }
     if (result & 2) {
         dir = data_ov036_021cbfcc[dir][variant];
-        result = FldmmdlMove_HitCheckWallWalkDir(actor, &dir, variant);
+        result = FieldActorMove_HitCheckWallWalkDir(actor, &dir, variant);
         if (dir == DIR_NONE) {
             dir = GetActorMotionDir(actor);
             acmd = GetAcmdForDir(dir, 0x1c);

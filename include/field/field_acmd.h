@@ -46,7 +46,7 @@ extern const u32 ACMD_QUEUE_WALK_S_8F[2];
 extern const u32 ACMD_QUEUE_WALK_W_8F[2];
 extern const u32 ACMD_QUEUE_WALK_E_8F[2];
 
-// The functions of each action command, by the command's state, which fldmmdl_movedata.c's
+// The functions of each action command, by the command's state, which field_actor_movedata.c's
 // ACTOR_ACTION_COMMAND_TABLES lists by command
 extern const ActorAcmdFunc data_ov036_021cacac[];
 extern const ActorAcmdFunc data_ov036_021cacb4[];

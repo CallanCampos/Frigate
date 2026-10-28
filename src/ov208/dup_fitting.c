@@ -11,7 +11,7 @@
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/bmp.h"
 #include "gfl/bmpwin.h"
 #include "gfl/clact.h"
@@ -141,7 +141,7 @@ struct DupFittingWork {
     MusPokeDraw *poke;
     MusItemDrawSys *itemSys;
     G3DCamera *camera;
-    BlActScene *blact;
+    BillboardActorScene *billboardActor;
     ClActor *sparkles[8];
     ClActor *okMark;
     ClActor *touchEffect;
@@ -321,7 +321,7 @@ void DupFitting_Free(DupFittingWork *work) {
     MusPokeDraw_DelPoke(work->pokeSys, work->poke);
     MusPokeDraw_TermSystem(work->pokeSys);
     GFL_TCBRemove(work->vblankTcb);
-    BlActScene_Delete(work->blact);
+    BillboardActorScene_Delete(work->billboardActor);
     GFL_G3DCameraFree(work->camera);
     GFL_G3DSysFree();
     GFL_BGSysReleaseBG(0);
@@ -437,7 +437,7 @@ u32 DupFitting_Main(DupFittingWork *work) {
     GFL_G3DSysReset();
     GFL_G3DSysMtxViewFlush();
     MusPokeDraw_DrawSystem(work->pokeSys);
-    BlActScene_Draw(work->blact, work->camera, NULL);
+    BillboardActorScene_Draw(work->billboardActor, work->camera, NULL);
     GFL_G3DSysReqSwapBuffers();
     work->bgScrollFrame++;
     if (work->bgScrollFrame > 1) {
@@ -558,14 +558,15 @@ static void DupFitting_VBlank(TCB *tcb, void *data) {
             u16 material;
 
             work->shadowItemId = entry->itemId;
-            BlActScene_GetMaterialPlttKey(work->blact, work->shadowMaterial, &plttKey);
-            BlActScene_GetMaterialTexKey(work->blact, entry->material, &texKey);
-            BlActScene_SetMaterialTexKey(work->blact, work->shadowMaterial, texKey);
+            BillboardActorScene_GetMaterialPlttKey(work->billboardActor, work->shadowMaterial, &plttKey);
+            BillboardActorScene_GetMaterialTexKey(work->billboardActor, entry->material, &texKey);
+            BillboardActorScene_SetMaterialTexKey(work->billboardActor, work->shadowMaterial, texKey);
             size = MusItemData_GetTexSize(MusItemData_GetItem(items, work->shadowItemId));
-            BlAct_GetTexDimensions(size, &width, &height);
-            material = BlActScene_AddMaterialExistTex(work->blact, texKey, plttKey, 0, size, width, height);
+            BillboardActor_GetTexDimensions(size, &width, &height);
+            material =
+                BillboardActorScene_AddMaterialExistTex(work->billboardActor, texKey, plttKey, 0, size, width, height);
             MusItemDraw_ChangeItem(work->itemSys, work->shadowDraw, work->shadowItemId, material);
-            BlActScene_FreeMaterialVramIfTex(work->blact, work->shadowMaterial);
+            BillboardActorScene_FreeMaterialVramIfTex(work->billboardActor, work->shadowMaterial);
             work->shadowMaterial = material;
         }
     }
@@ -753,9 +754,10 @@ static void DupFitting_InitGraphics(DupFittingWork *work) {
     work->clactUnit = ClActUnit_Create(24, 0, work->heapId);
     ClActUnit_UseSystemRenderer(work->clactUnit);
     {
-        BlActSceneSetup blactSetup = { 0x200, 0xa0, { FX32_ONE, FX32_ONE, 0 }, 0, 0, 0, 0, 0x3f, BLACT_ORIGIN_CENTER };
+        BillboardActorSceneSetup billboardActorSetup = { 0x200, 0xa0, { FX32_ONE, FX32_ONE, 0 },    0, 0, 0,
+                                                         0,     0x3f, BILLBOARD_ACTOR_ORIGIN_CENTER };
 
-        work->blact = BlActScene_Create(&blactSetup, work->heapId);
+        work->billboardActor = BillboardActorScene_Create(&billboardActorSetup, work->heapId);
     }
 }
 
@@ -867,7 +869,7 @@ static void DupFitting_InitItems(DupFittingWork *work) {
         work->entries[work->entryCount].isNew = TRUE;
 #endif
     }
-    work->itemSys = MusItemDraw_InitSystem(work->blact, 0x98, work->heapId);
+    work->itemSys = MusItemDraw_InitSystem(work->billboardActor, 0x98, work->heapId);
     items = MusItemDraw_GetItemData(work->itemSys);
     for (n = 0; n < work->entryCount; n++) {
         G3DResource *res;
@@ -890,9 +892,9 @@ static void DupFitting_InitItems(DupFittingWork *work) {
         plttSize = NNS_GfdGetPlttKeySize(plttKey);
         dimPlttKey = NNS_GfdAllocPlttVram(plttSize, FALSE, 0);
         size = MusItemData_GetTexSize(MusItemData_GetItem(items, work->entries[n].itemId));
-        BlAct_GetTexDimensions(size, &width, &height);
+        BillboardActor_GetTexDimensions(size, &width, &height);
         work->entries[n].material =
-            BlActScene_AddMaterialExistTex(work->blact, texKey, plttKey, 0, size, width, height);
+            BillboardActorScene_AddMaterialExistTex(work->billboardActor, texKey, plttKey, 0, size, width, height);
         palette = GFL_G3DResGetTexPaletteData(res);
         for (j = 0; j < plttSize / 2; j++) {
             u16 color = palette[j];
@@ -911,7 +913,7 @@ static void DupFitting_InitItems(DupFittingWork *work) {
         DC_FlushRange(file, file->fileSize);
         NNS_G3dPlttLoad(tex, TRUE);
         work->entries[n].dimMaterial =
-            BlActScene_AddMaterialExistTex(work->blact, texKey, dimPlttKey, 0, size, width, height);
+            BillboardActorScene_AddMaterialExistTex(work->billboardActor, texKey, dimPlttKey, 0, size, width, height);
         MusItemDraw_FreeTexResource(res);
     }
     DupFitting_SortEntries(work, DUP_FITTING_CATEGORY_ORIGINAL, 0);
@@ -935,11 +937,12 @@ static void DupFitting_InitItems(DupFittingWork *work) {
 
         work->shadowItemId = 0;
         size = MusItemData_GetTexSize(MusItemData_GetItem(items, work->shadowItemId));
-        BlAct_GetTexDimensions(size, &width, &height);
+        BillboardActor_GetTexDimensions(size, &width, &height);
         res = MusItemDraw_LoadTexResource(work->shadowItemId);
         GFL_G3DResUploadTexData(res);
-        work->shadowMaterial = BlActScene_AddMaterialExistTex(work->blact, GFL_G3DResGetTexVRAMHandle(res),
-                                                              GFL_G3DResGetPltVRAMHandle(res), 0, size, width, height);
+        work->shadowMaterial =
+            BillboardActorScene_AddMaterialExistTex(work->billboardActor, GFL_G3DResGetTexVRAMHandle(res),
+                                                    GFL_G3DResGetPltVRAMHandle(res), 0, size, width, height);
         work->shadowDraw =
             MusItemDraw_AddItemWithMaterial(work->itemSys, work->shadowItemId, work->shadowMaterial, &pos);
         MusItemDraw_SetVisible(work->itemSys, work->shadowDraw, FALSE);
@@ -947,13 +950,15 @@ static void DupFitting_InitItems(DupFittingWork *work) {
         MusItemDraw_SetShadowPalette(work->itemSys, work->shadowDraw, res);
         MusItemDraw_FreeTexResource(res);
     }
-    work->badgeMaterial = BlActScene_AddMaterialArcTex(work->blact, ARCID_MUSICAL_SHOT, 25, 2, 0x22, 32, 32);
+    work->badgeMaterial =
+        BillboardActorScene_AddMaterialArcTex(work->billboardActor, ARCID_MUSICAL_SHOT, 25, 2, 0x22, 32, 32);
     for (i = 0; i < DUP_FITTING_RING_PROPS; i++) {
         VecFx32 pos = { 0, 0, 0 };
-        u32 actor = BlActScene_AddNewActor(work->blact, work->badgeMaterial, FX32_ONE, FX32_ONE, &pos, 31, 0, 0);
+        u32 actor = BillboardActorScene_AddNewActor(work->billboardActor, work->badgeMaterial, FX32_ONE, FX32_ONE, &pos,
+                                                    31, 0, 0);
 
         work->badgeActors[i] = actor;
-        BlActScene_SetActorHidden(work->blact, actor, &hidden);
+        BillboardActorScene_SetActorHidden(work->billboardActor, actor, &hidden);
     }
     work->badgeFrame = 0;
     {
@@ -1025,14 +1030,14 @@ static void DupFitting_FreeItems(DupFittingWork *work) {
         DupFittingItemNode_Delete(node, work->itemSys);
     }
     for (i = 0; i < DUP_FITTING_RING_PROPS; i++) {
-        BlActScene_ClearActorMaterial(work->blact, work->badgeActors[i]);
+        BillboardActorScene_ClearActorMaterial(work->billboardActor, work->badgeActors[i]);
     }
-    BlActScene_FreeMaterial(work->blact, work->badgeMaterial);
+    BillboardActorScene_FreeMaterial(work->billboardActor, work->badgeMaterial);
     MusItemDraw_DelItem(work->itemSys, work->shadowDraw);
-    BlActScene_FreeMaterial(work->blact, work->shadowMaterial);
+    BillboardActorScene_FreeMaterial(work->billboardActor, work->shadowMaterial);
     for (i = 0; i < work->entryCount; i++) {
-        BlActScene_FreeMaterial(work->blact, work->entries[i].material);
-        BlActScene_FreeMaterial(work->blact, work->entries[i].dimMaterial);
+        BillboardActorScene_FreeMaterial(work->billboardActor, work->entries[i].material);
+        BillboardActorScene_FreeMaterial(work->billboardActor, work->entries[i].dimMaterial);
     }
     DupFittingItemList_Free(work->carouselList);
     DupFittingItemList_Free(work->stageList);
@@ -1168,11 +1173,11 @@ static DupFittingItemNode *DupFitting_UpdateCarousel(DupFittingWork *work, u16 a
             badgePos.x = vec.x / 16;
             badgePos.y = (192 * FX32_ONE - (vec.y + 0x8000)) / 16;
             badgePos.z = vec.z + 192 * FX32_ONE / 512;
-            BlActScene_SetActorPos(work->blact, work->badgeActors[i], &badgePos);
-            BlActScene_SetActorScale(work->blact, work->badgeActors[i], &scale, &scale);
-            BlActScene_SetActorHidden(work->blact, work->badgeActors[i], &shown);
+            BillboardActorScene_SetActorPos(work->billboardActor, work->badgeActors[i], &badgePos);
+            BillboardActorScene_SetActorScale(work->billboardActor, work->badgeActors[i], &scale, &scale);
+            BillboardActorScene_SetActorHidden(work->billboardActor, work->badgeActors[i], &shown);
         } else {
-            BlActScene_SetActorHidden(work->blact, work->badgeActors[i], &hidden);
+            BillboardActorScene_SetActorHidden(work->billboardActor, work->badgeActors[i], &hidden);
         }
     }
     return DupFittingItemList_GetHead(work->carouselList);

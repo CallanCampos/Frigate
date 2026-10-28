@@ -14,7 +14,7 @@
 #include "gfl/sound.h"
 #include "nitro/fx.h"
 
-// The 3D models of the field actors (fldmmdl_g3dobj.c, after the file name that its allocation passes): which
+// The 3D models of the field actors (the ROM's fldmmdl_g3dobj.c, by the file name that its allocation passes): which
 // resource group holds the model of each object code, and the actors' per-frame tile checks and animation commands
 
 // A resource group and the object code whose model it holds
@@ -398,7 +398,7 @@ static void RailActor_MapAttrFootMarkProc1(FieldActor *actor, u32 tile, u32 orig
         if (info->footprintType == 2) {
             kind = 1;
         }
-        Footmark_SetMMdl(actor, effects, kind);
+        Footmark_SetActor(actor, effects, kind);
     }
 }
 
@@ -440,7 +440,7 @@ static void RailActor_StartReflection(FieldActor *actor, u32 tile, u32 origYTile
                 MMSys *system = GetActorMModelSystem(actor);
 
                 FldAct_SetReflectingFlag(actor, TRUE);
-                ReflectTask_SetMMdl(system, actor, effects, 1);
+                ReflectTask_SetActor(system, actor, effects, 1);
             }
         }
     }

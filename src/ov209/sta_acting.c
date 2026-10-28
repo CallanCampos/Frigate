@@ -18,7 +18,7 @@
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/bmp.h"
 #include "gfl/bmpwin.h"
 #include "gfl/clact.h"
@@ -113,7 +113,7 @@ struct StaActing {
     StaActLight *lights[4];
     StaActButton *button;
     G3DCamera *camera;
-    BlActScene *blact;
+    BillboardActorScene *billboardActor;
     StaActScriptSys *scriptSys;
     u32 *script;
     StaActAudience *audience;
@@ -426,7 +426,7 @@ void StaActing_Term(StaActing *stage) {
     MusPokeDraw_TermSystem(stage->pokeDraw);
     MusItemDraw_TermSystem(stage->itemDraw);
     ClActSys_Delete();
-    BlActScene_Delete(stage->blact);
+    BillboardActorScene_Delete(stage->billboardActor);
     GFL_G3DCameraFree(stage->camera);
     GFL_G3DSysFree();
     GFL_BGSysReleaseBG(0);
@@ -525,7 +525,7 @@ BOOL StaActing_Main(StaActing *stage) {
     MusPokeDraw_DrawSystem(stage->pokeDraw);
     StaActPoke_UpdateSystem_Item(stage->pokeSys);
     StaActBg_DrawSystem(stage->bg);
-    BlActScene_Draw(stage->blact, stage->camera, NULL);
+    BillboardActorScene_Draw(stage->billboardActor, stage->camera, NULL);
     StaActEffect_DrawSystem(stage->effectSys);
     StaActing_DrawDebug(stage);
     GFL_G3DSysReqSwapBuffers();
@@ -577,11 +577,11 @@ static void StaActing_InitGraphics(StaActing *stage) {
     G3X_AlphaBlend(TRUE);
     GFL_G3DSysSetSwapBufferParams(0, 0);
     {
-        BlActSceneSetup setup = { 128, 128, { FX32_ONE, FX32_ONE, FX32_ONE }, 0, 0, 0, 0, 63, 0 };
+        BillboardActorSceneSetup setup = { 128, 128, { FX32_ONE, FX32_ONE, FX32_ONE }, 0, 0, 0, 0, 63, 0 };
         VecFx32 scale = { FX32_CONST(4), FX32_CONST(4), FX32_ONE };
 
-        stage->blact = BlActScene_Create(&setup, stage->heapId);
-        BlActScene_SetScale(stage->blact, &scale);
+        stage->billboardActor = BillboardActorScene_Create(&setup, stage->heapId);
+        BillboardActorScene_SetScale(stage->billboardActor, &scale);
     }
     ClActSys_Create(&data_02093f08, &STA_ACTING_VRAM_CONFIG, stage->heapId);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
@@ -644,8 +644,9 @@ static void StaActing_InitPoke(StaActing *stage) {
 
     stage->pokeDraw = MusPokeDraw_InitSystem(stage->heapId);
     MusPokeDraw_SetTexBase(stage->pokeDraw, 0x20000);
-    stage->itemDraw = MusItemDraw_InitSystem(stage->blact, 36, stage->heapId);
-    stage->pokeSys = StaActPoke_InitSystem(stage->heapId, stage, stage->pokeDraw, stage->itemDraw, stage->blact);
+    stage->itemDraw = MusItemDraw_InitSystem(stage->billboardActor, 36, stage->heapId);
+    stage->pokeSys =
+        StaActPoke_InitSystem(stage->heapId, stage, stage->pokeDraw, stage->itemDraw, stage->billboardActor);
     for (i = 0; i < 4; i++) {
         stage->pokes[i] = NULL;
     }
@@ -663,7 +664,7 @@ static void StaActing_InitObj(StaActing *stage) {
     for (i = 0; i < 5; i++) {
         stage->objs[i] = NULL;
     }
-    stage->objSys = StaActObj_InitSystem(stage->heapId, stage->blact);
+    stage->objSys = StaActObj_InitSystem(stage->heapId, stage->billboardActor);
 }
 
 static void StaActing_InitEffect(StaActing *stage) {

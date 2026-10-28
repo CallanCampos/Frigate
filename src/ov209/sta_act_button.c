@@ -172,7 +172,7 @@ static void StaActButton_InitGraphic(StaActButton *sys) {
     ClActor_SetAutoAnim(sys->effect, TRUE);
 }
 
-// Copies the prop's texture, of the BlAct size `size`, into the characters of the prop's cell
+// Copies the prop's texture, of the BillboardActor size `size`, into the characters of the prop's cell
 static void StaActButton_LoadItemTexture(StaActButton *sys, u8 index, u16 itemId, u32 size) {
     void *file;
     NNSG3dResTex *tex;

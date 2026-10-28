@@ -556,7 +556,7 @@ Same instructions, registers swapped.
   first in `ClearArea1D`), and a `const u8` local for a `u8` field picks other registers than an `int`
   (`DrawGlyph1D`'s glyph width).
 - An inline's enum-typed parameter changes how MWCC orders and allocates the inlined expression when the argument
-  is an integer: `billboard.c`'s `BlActScene_Draw` packs its polygon attributes in the original's order (alpha,
+  is an integer: `billboard.c`'s `BillboardActorScene_Draw` packs its polygon attributes in the original's order (alpha,
   then the polygon ID, then the light mask, `const | lights`) only with `G3_PolygonAttr` taking `int light`, as
   NitroSDK declares it, not `GXLightMask light`; casts or enum locals at the call don't help. Check the SDK's
   prototype of an inline before the call site. It goes the other way as well: NitroSDK's `MIi_DMACallback`
@@ -1699,13 +1699,13 @@ Same instructions, scheduled in another order.
 - A load through a `const` pointer is also reused across stores, as the World Tournament's `wbt_setup.c` reads an
   entrant's bit fields from one load, but it is not hoisted out of a loop: `wbt_party.c`'s filter check reads each
   list's count again in every iteration because its filter is `const`, where a plain pointer's count is loaded once
-  before the loop. Overlay 169's `BtlMonSet_GetTotalDamage` and `BtlMonSet_GetHpDamage` match the same way with
-  `const BtlMonSet *set`, and `PokeSelect_Init` loads `cmd->count` above its store of 0 only with `cmd` `const`.
-  The pointer can be a parameter or a local: `field_rail.c`'s line searches `func_ov036_021b21b0` and
-  `RailDisabledLines_ContainsLine` match with `const RailDataHandle *data`, and `fldmmdl_blact.c`'s
-  `FieldBlAct_IsAsyncLoadPending` with `const AsyncLoader *loader = blact->loader;` (its own field read through a
-  plain pointer). In `SetWkToActorRailPos` neither a `const` local nor a `const` parameter of a `static inline`
-  helper stops the hoist, so the count there is held some other way.
+  before the loop. Overlay 169's `BtlMonSet_GetTotalDamage` and `BtlMonSet_GetHpDamage` match the same way with `const
+  BtlMonSet *set`, and `PokeSelect_Init` loads `cmd->count` above its store of 0 only with `cmd` `const`. The pointer
+  can be a parameter or a local: `field_rail.c`'s line searches `func_ov036_021b21b0` and
+  `RailDisabledLines_ContainsLine` match with `const RailDataHandle *data`, and `field_actor_billboard.c`'s
+  `FieldBillboardActor_IsAsyncLoadPending` with `const AsyncLoader *loader = billboardActor->loader;` (its own field
+  read through a plain pointer). In `SetWkToActorRailPos` neither a `const` local nor a `const` parameter of a `static
+  inline` helper stops the hoist, so the count there is held some other way.
 - A field load scheduled ahead of a store it doesn't depend on, where MWCC keeps the written order, can come from an
   inline helper's argument: arguments are evaluated before the body's stores. The PC box's sequences set the picked
   position with `u8 pos = func_0202ba60(...); Box2Seq_SetGetPos(syswk, pos, syswk->tray);`, which loads `tray` before
@@ -2408,7 +2408,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   NitroSDK's `VEC_Set(&u->pos, pos->x, pos->y, pos->z)`, as `iss_3ds_sys.c`'s `ISS3DSoundSys_SetListenerCore` writes it.
   More exactly: each field's load followed by its store is three assignments, `v.x = p->x; v.y = p->y; ...`; the loads
   of z, y and x first and then the three stores is `VEC_Set`, and branches that each end in a `VEC_Set` into the same
-  vector share one store tail (`scrcmd_fldmmdl.c`).
+  vector share one store tail (`scrcmd_field_actor.c`).
 - Two locals initialized to 0 in their declarations share one zero register, so a later `offset += 4` compiles as
   `adds r5, r4, #4` from the counter's zero: `iss_switch_set.c`'s `ISSSwitchSet_LoadArcDataCore` declares `int i = 0;
   u32 offset = 0;`, where `offset = 4` shares the `movs #4` of another argument instead.
@@ -2779,7 +2779,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   comparison, and `if (isLeague) { return FALSE; } return TRUE;`.
 - A range check that adds the 16-bit negated constant (`adds r0, #0xc004`, narrowing, `cmp r0, #3`, `bhi`) is an
   `||` chain of `==` tests of consecutive constants; a written `(u16)(x - C) <= n` subtracts instead.
-  `billboard_act.c`'s `BlActSys_GetActorLastCmd` tests the last animation command this way, and `pml_item.c`'s
+  `billboard_act.c`'s `BillboardActorSys_GetActorLastCmd` tests the last animation command this way, and `pml_item.c`'s
   `PML_ItemIsNotSpecialMonsball` its nine balls, with `0xfe14` from the literal pool and `cmp #8; bls`, where
   `item < ITEM_FAST_BALL || item > ITEM_PARK_BALL` builds the constant with `movs`/`lsls` and compares twice. Even a
   written `(u16)(x + 0xfffe) <= 1`, which gives the same adds, can allocate the function's registers differently:
@@ -3472,7 +3472,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `b_plist_main.c`'s `BPlistMain_InitPageCursor` does, and writing `case 0:` last moves its block to the end of the
   switch (`BPlistMain_CanSwitch`).
 - `*result = N; break;` in every case makes later cases branch to an earlier case's `b`, a branch to a branch. A local
-  set in each case and stored once after the switch gives direct branches: `scrcmd_fldmmdl.c`'s `s0078`.
+  set in each case and stored once after the switch gives direct branches: `scrcmd_field_actor.c`'s `s0078`.
 - Switch cases are laid out in source order, not by value, so the layout shows the order the cases were written in.
 - A jump table that takes `-1` in with the other cases (`adds r0, #1; cmp r0, #6; bhi`) switches on a signed value.
   On a `u32`, `case -1:` is `0xffffffff` and is compared on its own before the table. `un_select.c`'s

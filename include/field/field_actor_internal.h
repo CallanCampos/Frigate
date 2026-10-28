@@ -19,13 +19,13 @@ typedef struct {
     void (*onDelete)(FieldActor *actor);
     void (*suspend)(FieldActor *actor);
     void (*wakeUp)(FieldActor *actor);
-    u32 (*getBlActIdx)(FieldActor *actor, u32 param);
+    u32 (*getBillboardActorIdx)(FieldActor *actor, u32 param);
 } FieldActorSceneNodeVTable;
 
-// Overlay 36's tables of the move codes' functions, by move code (fldmmdl_movedata.c's), and of the scene nodes'
-// functions, by sceneNodeType (fldmmdl_drawdata.c's)
+// Overlay 36's tables of the move codes' functions, by move code (field_actor_movedata.c's), and of the scene nodes'
+// functions, by sceneNodeType (field_actor_drawdata.c's)
 extern const FieldActorMoveCode *const ACTOR_MOVE_CODE_FUNCTION_TABLES[];
-// Overlay 36's fldmmdl_movedata.c: the tables of the action commands' functions, by command, for the actors on the
+// Overlay 36's field_actor_movedata.c: the tables of the action commands' functions, by command, for the actors on the
 // grid and on the rails, and the rows of commands that differ only by direction, by direction
 extern const ActorAcmdFunc *const ACTOR_ACTION_COMMAND_TABLES[];
 extern const ActorAcmdFunc *const ACTOR_ACTION_COMMAND_TABLES_RAIL[];
@@ -49,7 +49,7 @@ extern const FieldActorSceneNodeVTable data_ov036_021cf910;
 extern const FieldActorSceneNodeVTable data_ov036_021cf928;
 extern const FieldActorSceneNodeVTable data_ov036_021cf940;
 extern const FieldActorSceneNodeVTable data_ov036_021cf958;
-// Overlay 36's fldmmdl_g3dobj_draw.c: the functions of the actors drawn as a 3D model
+// Overlay 36's field_actor_g3dobj_draw.c: the functions of the actors drawn as a 3D model
 extern const FieldActorSceneNodeVTable data_ov036_021cf9a0;
 
 // A position on the grid
@@ -108,7 +108,7 @@ struct FieldActor {
     u32 unkA0;
     u8 unkA4[0x10];
     u8 unkB4[0x10];
-    u8 blActWork[0x20];
+    u8 billboardActorWork[0x20];
     FieldActorConfig config;
 };
 
@@ -126,7 +126,7 @@ struct MMSys {
     FieldActor *actorHeap;
     void *tcbMgrHeap;
     TCBManager *tcbMgr;
-    FieldBlAct *fieldBlAct;
+    FieldBillboardActor *fieldBillboardActor;
     ActorG3DSystem *actorG3DSystem;
     StrengthRockSave *mmodelSave;
     GameData *gameData;

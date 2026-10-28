@@ -1,7 +1,7 @@
 // The actors' event types: the init function and the two checks of each type, which swan's ACTOR_EVENTTYPE_FUNCS
 // and the two tables after it hold, with the trainers that turn in place as they watch. The ROM gives this file no
-// name, so fldmmdl_evtype.c is a guess after the event types. Its .text starts at 0x021925a4 and its .rodata, sorted
-// by size on its own, at 0x021cbdb0 (Black 2). The code was first written by mariano54 on their parallel-decomp
+// name, so field_actor_evtype.c is a guess after the event types. Its .text starts at 0x021925a4 and its .rodata,
+// sorted by size on its own, at 0x021cbdb0 (Black 2). The code was first written by mariano54 on their parallel-decomp
 // branch
 
 #include "types.h"
@@ -28,36 +28,36 @@ typedef BOOL (*ActorEvTypeFunc)(FieldActor *actor);
 typedef void (*ActorEvTypeInitFunc)(FieldActor *actor);
 
 static void ExecActorEvTypeFunction(FieldActor *actor);
-static BOOL FldmmdlMovecode_CheckByEventType(FieldActor *actor);
-static BOOL FldmmdlMovecode_UpdateByEventType(FieldActor *actor);
-static BOOL FldmmdlMovecode_HasLeftOldGrid(FieldActor *actor);
-static BOOL FldmmdlMovecode_IsAtOldGrid(FieldActor *actor);
-static void FldmmdlMove_InitEvTypeNone(FieldActor *actor);
-static BOOL FldmmdlMove_CheckEvTypeNone(FieldActor *actor);
-static BOOL FldmmdlMove_UpdateEvTypeNone(FieldActor *actor);
-static void FldmmdlMove_InitWalkRepeatLookAround(FieldActor *actor);
-static BOOL FldmmdlMove_CheckWalkRepeatLookAround(FieldActor *actor);
-static BOOL FldmmdlMove_TurnLookAround(FieldActor *actor);
-static void FldmmdlMove_InitWalkRepeatSpin(FieldActor *actor);
-static BOOL FldmmdlMove_CheckWalkRepeatSpin(FieldActor *actor);
-static BOOL FldmmdlMove_TurnSpin(FieldActor *actor);
-static BOOL FldmmdlMove_IsButtonBHeld(void);
+static BOOL FieldActorMovecode_CheckByEventType(FieldActor *actor);
+static BOOL FieldActorMovecode_UpdateByEventType(FieldActor *actor);
+static BOOL FieldActorMovecode_HasLeftOldGrid(FieldActor *actor);
+static BOOL FieldActorMovecode_IsAtOldGrid(FieldActor *actor);
+static void FieldActorMove_InitEvTypeNone(FieldActor *actor);
+static BOOL FieldActorMove_CheckEvTypeNone(FieldActor *actor);
+static BOOL FieldActorMove_UpdateEvTypeNone(FieldActor *actor);
+static void FieldActorMove_InitWalkRepeatLookAround(FieldActor *actor);
+static BOOL FieldActorMove_CheckWalkRepeatLookAround(FieldActor *actor);
+static BOOL FieldActorMove_TurnLookAround(FieldActor *actor);
+static void FieldActorMove_InitWalkRepeatSpin(FieldActor *actor);
+static BOOL FieldActorMove_CheckWalkRepeatSpin(FieldActor *actor);
+static BOOL FieldActorMove_TurnSpin(FieldActor *actor);
+static BOOL FieldActorMove_IsButtonBHeld(void);
 
 // The tables by event type, defined after the functions: there, MWCC's size sort lays the two 16-byte local
-// initializers of FldmmdlMove_TurnLookAround out in the ROM's order
+// initializers of FieldActorMove_TurnLookAround out in the ROM's order
 static const ActorEvTypeInitFunc ACTOR_EVENTTYPE_FUNCS[21];
 static const ActorEvTypeFunc data_ov036_021cbe44[21];
 static const ActorEvTypeFunc data_ov036_021cbe98[21];
 
-void FldmmdlMovecode_InitEventTypeProcThunk(FieldActor *actor) {
+void FieldActorMovecode_InitEventTypeProcThunk(FieldActor *actor) {
     ExecActorEvTypeFunction(actor);
 }
 
-BOOL FldmmdlMovecode_UpdateEventTypeProc(FieldActor *actor) {
-    if (!FldmmdlMovecode_CheckByEventType(actor)) {
+BOOL FieldActorMovecode_UpdateEventTypeProc(FieldActor *actor) {
+    if (!FieldActorMovecode_CheckByEventType(actor)) {
         return FALSE;
     }
-    if (FldmmdlMovecode_UpdateByEventType(actor)) {
+    if (FieldActorMovecode_UpdateByEventType(actor)) {
         return TRUE;
     }
     return FALSE;
@@ -67,15 +67,15 @@ static void ExecActorEvTypeFunction(FieldActor *actor) {
     ACTOR_EVENTTYPE_FUNCS[GetActorEvType(actor)](actor);
 }
 
-static BOOL FldmmdlMovecode_CheckByEventType(FieldActor *actor) {
+static BOOL FieldActorMovecode_CheckByEventType(FieldActor *actor) {
     return data_ov036_021cbe44[GetActorEvType(actor)](actor);
 }
 
-static BOOL FldmmdlMovecode_UpdateByEventType(FieldActor *actor) {
+static BOOL FieldActorMovecode_UpdateByEventType(FieldActor *actor) {
     return data_ov036_021cbe98[GetActorEvType(actor)](actor);
 }
 
-static BOOL FldmmdlMovecode_HasLeftOldGrid(FieldActor *actor) {
+static BOOL FieldActorMovecode_HasLeftOldGrid(FieldActor *actor) {
     if (GetGPosX(actor) != FldAct_GetInitGPosX(actor)) {
         return TRUE;
     }
@@ -85,7 +85,7 @@ static BOOL FldmmdlMovecode_HasLeftOldGrid(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL FldmmdlMovecode_IsAtOldGrid(FieldActor *actor) {
+static BOOL FieldActorMovecode_IsAtOldGrid(FieldActor *actor) {
     if (GetGPosX(actor) != FldAct_GetInitGPosX(actor)) {
         return FALSE;
     }
@@ -95,34 +95,34 @@ static BOOL FldmmdlMovecode_IsAtOldGrid(FieldActor *actor) {
     return FALSE;
 }
 
-static void FldmmdlMove_InitEvTypeNone(FieldActor *actor) {
+static void FieldActorMove_InitEvTypeNone(FieldActor *actor) {
 }
 
-static BOOL FldmmdlMove_CheckEvTypeNone(FieldActor *actor) {
+static BOOL FieldActorMove_CheckEvTypeNone(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL FldmmdlMove_UpdateEvTypeNone(FieldActor *actor) {
+static BOOL FieldActorMove_UpdateEvTypeNone(FieldActor *actor) {
     return FALSE;
 }
 
-static void FldmmdlMove_InitWalkRepeatLookAround(FieldActor *actor) {
+static void FieldActorMove_InitWalkRepeatLookAround(FieldActor *actor) {
     ActorSpinWork *work = FldAct_InitMoveSubProcWork(actor, 9);
 
     work->limit = GetActorUserParam(actor, 1);
 }
 
-static BOOL FldmmdlMove_CheckWalkRepeatLookAround(FieldActor *actor) {
+static BOOL FieldActorMove_CheckWalkRepeatLookAround(FieldActor *actor) {
     ActorSpinWork *work = FldAct_GetMoveSubProcWork(actor);
 
     switch (work->state) {
     case 0:
-        if (FldmmdlMovecode_HasLeftOldGrid(actor) == TRUE) {
+        if (FieldActorMovecode_HasLeftOldGrid(actor) == TRUE) {
             work->state++;
         }
         break;
     case 1:
-        if (!FldmmdlMovecode_IsAtOldGrid(actor)) {
+        if (!FieldActorMovecode_IsAtOldGrid(actor)) {
             break;
         }
         work->count++;
@@ -144,7 +144,7 @@ static BOOL FldmmdlMove_CheckWalkRepeatLookAround(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL FldmmdlMove_TurnLookAround(FieldActor *actor) {
+static BOOL FieldActorMove_TurnLookAround(FieldActor *actor) {
     ActorSpinWork *work = FldAct_GetMoveSubProcWork(actor);
     s32 wait;
 
@@ -170,7 +170,8 @@ static BOOL FldmmdlMove_TurnLookAround(FieldActor *actor) {
         work->phase++;
     case 3:
         wait = 8;
-        if (GetActorEvType(actor) == 14 && FldmmdlMove_IsButtonBHeld() == TRUE && FldAct_IsNearPlayer(actor) == TRUE) {
+        if (GetActorEvType(actor) == 14 && FieldActorMove_IsButtonBHeld() == TRUE &&
+            FldAct_IsNearPlayer(actor) == TRUE) {
             wait = 4;
         }
         work->wait++;
@@ -192,7 +193,7 @@ static BOOL FldmmdlMove_TurnLookAround(FieldActor *actor) {
     return FALSE;
 }
 
-static void FldmmdlMove_InitWalkRepeatSpin(FieldActor *actor) {
+static void FieldActorMove_InitWalkRepeatSpin(FieldActor *actor) {
     ActorSpinWork *work = FldAct_InitMoveSubProcWork(actor, 9);
     u32 variant = 1;
     u16 evType;
@@ -205,17 +206,17 @@ static void FldmmdlMove_InitWalkRepeatSpin(FieldActor *actor) {
     work->variant = variant;
 }
 
-static BOOL FldmmdlMove_CheckWalkRepeatSpin(FieldActor *actor) {
+static BOOL FieldActorMove_CheckWalkRepeatSpin(FieldActor *actor) {
     ActorSpinWork *work = FldAct_GetMoveSubProcWork(actor);
 
     switch (work->state) {
     case 0:
-        if (FldmmdlMovecode_HasLeftOldGrid(actor) == TRUE) {
+        if (FieldActorMovecode_HasLeftOldGrid(actor) == TRUE) {
             work->state++;
         }
         break;
     case 1:
-        if (!FldmmdlMovecode_IsAtOldGrid(actor)) {
+        if (!FieldActorMovecode_IsAtOldGrid(actor)) {
             break;
         }
         work->count++;
@@ -237,7 +238,7 @@ static BOOL FldmmdlMove_CheckWalkRepeatSpin(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL FldmmdlMove_TurnSpin(FieldActor *actor) {
+static BOOL FieldActorMove_TurnSpin(FieldActor *actor) {
     s32 dirs[2][4] = { { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT }, { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT } };
     ActorSpinWork *work = FldAct_GetMoveSubProcWork(actor);
     s32 wait;
@@ -268,7 +269,7 @@ static BOOL FldmmdlMove_TurnSpin(FieldActor *actor) {
         {
             u16 evType = GetActorEvType(actor);
 
-            if ((evType == 15 || evType == 16) && FldmmdlMove_IsButtonBHeld() == TRUE &&
+            if ((evType == 15 || evType == 16) && FieldActorMove_IsButtonBHeld() == TRUE &&
                 FldAct_IsNearPlayer(actor) == TRUE) {
                 wait = 4;
             }
@@ -292,7 +293,7 @@ static BOOL FldmmdlMove_TurnSpin(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL FldmmdlMove_IsButtonBHeld(void) {
+static BOOL FieldActorMove_IsButtonBHeld(void) {
     if (GCTX_HIDGetHeldKeys() & PAD_BUTTON_B) {
         return TRUE;
     }
@@ -300,31 +301,35 @@ static BOOL FldmmdlMove_IsButtonBHeld(void) {
 }
 
 static const ActorEvTypeInitFunc ACTOR_EVENTTYPE_FUNCS[] = {
-    FldmmdlMove_InitEvTypeNone,     FldmmdlMove_InitEvTypeNone,           FldmmdlMove_InitEvTypeNone,
-    FldmmdlMove_InitEvTypeNone,     FldmmdlMove_InitWalkRepeatLookAround, FldmmdlMove_InitWalkRepeatSpin,
-    FldmmdlMove_InitWalkRepeatSpin, FldmmdlMove_InitEvTypeNone,           FldmmdlMove_InitEvTypeNone,
-    FldmmdlMove_InitEvTypeNone,     FldmmdlMove_InitEvTypeNone,           FldmmdlMove_InitEvTypeNone,
-    FldmmdlMove_InitEvTypeNone,     FldmmdlMove_InitEvTypeNone,           FldmmdlMove_InitWalkRepeatLookAround,
-    FldmmdlMove_InitWalkRepeatSpin, FldmmdlMove_InitWalkRepeatSpin,       FldmmdlMove_InitEvTypeNone,
-    FldmmdlMove_InitEvTypeNone,     FldmmdlMove_InitEvTypeNone,           FldmmdlMove_InitWalkRepeatSpin
+    FieldActorMove_InitEvTypeNone,     FieldActorMove_InitEvTypeNone,           FieldActorMove_InitEvTypeNone,
+    FieldActorMove_InitEvTypeNone,     FieldActorMove_InitWalkRepeatLookAround, FieldActorMove_InitWalkRepeatSpin,
+    FieldActorMove_InitWalkRepeatSpin, FieldActorMove_InitEvTypeNone,           FieldActorMove_InitEvTypeNone,
+    FieldActorMove_InitEvTypeNone,     FieldActorMove_InitEvTypeNone,           FieldActorMove_InitEvTypeNone,
+    FieldActorMove_InitEvTypeNone,     FieldActorMove_InitEvTypeNone,           FieldActorMove_InitWalkRepeatLookAround,
+    FieldActorMove_InitWalkRepeatSpin, FieldActorMove_InitWalkRepeatSpin,       FieldActorMove_InitEvTypeNone,
+    FieldActorMove_InitEvTypeNone,     FieldActorMove_InitEvTypeNone,           FieldActorMove_InitWalkRepeatSpin
 };
 
 static const ActorEvTypeFunc data_ov036_021cbe44[] = {
-    FldmmdlMove_CheckEvTypeNone,     FldmmdlMove_CheckEvTypeNone,           FldmmdlMove_CheckEvTypeNone,
-    FldmmdlMove_CheckEvTypeNone,     FldmmdlMove_CheckWalkRepeatLookAround, FldmmdlMove_CheckWalkRepeatSpin,
-    FldmmdlMove_CheckWalkRepeatSpin, FldmmdlMove_CheckEvTypeNone,           FldmmdlMove_CheckEvTypeNone,
-    FldmmdlMove_CheckEvTypeNone,     FldmmdlMove_CheckEvTypeNone,           FldmmdlMove_CheckEvTypeNone,
-    FldmmdlMove_CheckEvTypeNone,     FldmmdlMove_CheckEvTypeNone,           FldmmdlMove_CheckWalkRepeatLookAround,
-    FldmmdlMove_CheckWalkRepeatSpin, FldmmdlMove_CheckWalkRepeatSpin,       FldmmdlMove_CheckEvTypeNone,
-    FldmmdlMove_CheckEvTypeNone,     FldmmdlMove_CheckEvTypeNone,           FldmmdlMove_CheckWalkRepeatSpin
+    FieldActorMove_CheckEvTypeNone,           FieldActorMove_CheckEvTypeNone,
+    FieldActorMove_CheckEvTypeNone,           FieldActorMove_CheckEvTypeNone,
+    FieldActorMove_CheckWalkRepeatLookAround, FieldActorMove_CheckWalkRepeatSpin,
+    FieldActorMove_CheckWalkRepeatSpin,       FieldActorMove_CheckEvTypeNone,
+    FieldActorMove_CheckEvTypeNone,           FieldActorMove_CheckEvTypeNone,
+    FieldActorMove_CheckEvTypeNone,           FieldActorMove_CheckEvTypeNone,
+    FieldActorMove_CheckEvTypeNone,           FieldActorMove_CheckEvTypeNone,
+    FieldActorMove_CheckWalkRepeatLookAround, FieldActorMove_CheckWalkRepeatSpin,
+    FieldActorMove_CheckWalkRepeatSpin,       FieldActorMove_CheckEvTypeNone,
+    FieldActorMove_CheckEvTypeNone,           FieldActorMove_CheckEvTypeNone,
+    FieldActorMove_CheckWalkRepeatSpin
 };
 
 static const ActorEvTypeFunc data_ov036_021cbe98[] = {
-    FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_UpdateEvTypeNone,
-    FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_TurnLookAround,   FldmmdlMove_TurnSpin,
-    FldmmdlMove_TurnSpin,         FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_UpdateEvTypeNone,
-    FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_UpdateEvTypeNone,
-    FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_TurnLookAround,
-    FldmmdlMove_TurnSpin,         FldmmdlMove_TurnSpin,         FldmmdlMove_UpdateEvTypeNone,
-    FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_TurnSpin
+    FieldActorMove_UpdateEvTypeNone, FieldActorMove_UpdateEvTypeNone, FieldActorMove_UpdateEvTypeNone,
+    FieldActorMove_UpdateEvTypeNone, FieldActorMove_TurnLookAround,   FieldActorMove_TurnSpin,
+    FieldActorMove_TurnSpin,         FieldActorMove_UpdateEvTypeNone, FieldActorMove_UpdateEvTypeNone,
+    FieldActorMove_UpdateEvTypeNone, FieldActorMove_UpdateEvTypeNone, FieldActorMove_UpdateEvTypeNone,
+    FieldActorMove_UpdateEvTypeNone, FieldActorMove_UpdateEvTypeNone, FieldActorMove_TurnLookAround,
+    FieldActorMove_TurnSpin,         FieldActorMove_TurnSpin,         FieldActorMove_UpdateEvTypeNone,
+    FieldActorMove_UpdateEvTypeNone, FieldActorMove_UpdateEvTypeNone, FieldActorMove_TurnSpin
 };
