@@ -81,13 +81,37 @@ Preparation record for the PR 44 review, not completed Spanish gameplay support.
   record.
 - **Blockers:** none upstream. Replays recorded on IRES would be its own; the US ones stay held to the US dump.
 
+## 2026-10-27: recording-format proposal reviewed; implementation remains open
+
+- **Upstream:** unchanged, `deb044db2d3d`, from reviewed main `60da690df2` (PR 42).
+- **Port:** `PORT_SHA`, on `codex/review-record-format`, preserving PR 40's original documentation commit and merging
+  it with reviewed main. Phase 4 was reviewed and merged with all required checks green; its local evidence is below.
+- **ROM (T0):** both SHA1s match after configure/Ninja; no file outside `port/` changes. Pre-publication verification
+  is repeated on this documentation head, and the exact PR head receives the required local check before merge.
+- **Host build (T1):** no runtime/build source change from reviewed main. Fresh canonical both-version builds/tests
+  are required by `sync_upstream.sh --verify-pr 40`; the PR checks record the final result.
+- **Tests (T2/T3/T6):** documentation reviewed against actual replay, RTC, GFL seed and touch-sampling paths. This
+  proposal adds no recording code or tests and claims no implemented recording feature. Existing native suites run
+  in exact-head verification; the completed Phase 4 T4/T5/T7 results below still describe the unchanged runtime.
+- **Tiers:** unchanged: 40,440 matching, 509 present/nonmatching and 68 missing functions (2,385 veneers excluded);
+  code bytes a/b/c B2 3,769,504/76,454/4,302, W2 3,769,592/76,454/4,302.
+- **Trap stubs:** unchanged, 25 functions and 20 data placeholders/build; no game code changes.
+- **64-bit warnings:** unchanged from reviewed main: 365 sites/229 keys, real 66, harmless 123, handled 141,
+  unreachable 35. The exact-head verifier repeats the guard; no baseline change.
+- **Work done:** corrected PR 40's proposal to preserve per-VBlank touches with video-frame recording, preserve the
+  effective clock/override and input-domain conversion, and stop before unrecorded seed fallback. Added explicit
+  acceptance tests and retained contributor attribution. A format proposal does not resolve issue #38.
+- **Next:** finish the remaining PR reviews/upstream sync, then implement issue #38 under this bounded contract or
+  continue Phase 5 story coverage as prioritized by the owner.
+- **Blockers:** recording is not implemented. Spanish gameplay validation and remaining sync checks are separate work.
+
 ## 2026-10-26: Phase 4 catch, save, quit and reload validated in both games
 
 Completed local validation of the recovered route, not a completed upstream sync or a release. The ready PR and its
 exact-head local/hosted checks are the publication record. ADR 0023 remains **proposed** for owner review.
 
 - **Upstream:** unchanged, `deb044db2d3d` from reviewed main `f786fed993` (PR 41); no pending upstream changes imported.
-- **Port:** `PORT_SHA`, on `codex/phase4-route`. Integration `91d0874aa9` retains reviewed main and the original
+- **Port:** `ed26ff887f`, on `codex/phase4-route`. Integration `91d0874aa9` retains reviewed main and the original
   Phase 4 history as parents. Runtime fixes are `9a8d4f2a0c`; this entry and the final proof updates change records
   only. Original `wt-p4` and `wt-p4b` HEADs, staged patches and working patches were rechecked unchanged; a separate
   verified self-contained history bundle and binary patches preserve the unfinished work.
