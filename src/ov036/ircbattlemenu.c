@@ -596,7 +596,7 @@ static void IrcMenu_StartExit(IrcMenuWork *wk) {
 }
 
 // Called by the touched button's actor once its animation ends
-static void func_ov036_0218d938(u32 param, fx32 frame) {
+static void IrcMenu_OnMainButtonAnimEnd(u32 param, fx32 frame) {
     IrcMenuWork *wk = (IrcMenuWork *)param;
 
     if (wk->mode == 12) {
@@ -614,16 +614,16 @@ static void func_ov036_0218d938(u32 param, fx32 frame) {
     IrcMenu_SetStateAtLine(wk, IrcMenu_ShowPlayerCountMenu, 928);
 }
 
-static void func_ov036_0218d9a4(IrcMenuWork *wk) {
+static void IrcMenu_WaitMainButtonAnim(IrcMenuWork *wk) {
 }
 
-static void func_ov036_0218d9a8(IrcMenuWork *wk) {
+static void IrcMenu_PressMainButton(IrcMenuWork *wk) {
     ClActorCallback callback;
     int index = wk->selected;
 
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)wk;
-    callback.func = func_ov036_0218d938;
+    callback.func = IrcMenu_OnMainButtonAnimEnd;
     if (index == 5) {
         index = 0;
     } else if (index == 6) {
@@ -634,10 +634,10 @@ static void func_ov036_0218d9a8(IrcMenuWork *wk) {
     ClActor_SetAutoAnim(wk->actors[index], TRUE);
     ClActor_SetAnimCallback(wk->actors[index], &callback);
     ClActor_RestartAnim(wk->actors[index]);
-    IrcMenu_SetStateAtLine(wk, func_ov036_0218d9a4, 968);
+    IrcMenu_SetStateAtLine(wk, IrcMenu_WaitMainButtonAnim, 968);
 }
 
-static void func_ov036_0218da0c(IrcMenuWork *wk) {
+static void IrcMenu_WaitMessageTouch(IrcMenuWork *wk) {
     if (IrcMenu_UpdateMessage(wk) && GFL_HIDIsTouchPressed()) {
         IrcMenu_FreeMessageWindow(wk);
         IrcMenu_SetStateAtLine(wk, IrcMenu_MainUpdate, 980);
@@ -652,7 +652,7 @@ static BOOL IrcMenu_MainTouch(u32 button, IrcMenuWork *wk) {
     case 0:
     case 5:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
-        IrcMenu_SetStateAtLine(wk, func_ov036_0218d9a8, 999);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_PressMainButton, 999);
         wk->mode = 1;
         result = TRUE;
         break;
@@ -661,31 +661,31 @@ static BOOL IrcMenu_MainTouch(u32 button, IrcMenuWork *wk) {
         if (howManyPartyPokesAreNotEggs(GameData_GetParty(wk->gameData)) < 2) {
             GFL_MsgDataLoadStrbuf(wk->msgData, Startmenu2_Text_NeedLeastTwoPokemon, wk->strBuf);
             IrcMenu_PrintMessage(wk, FALSE);
-            IrcMenu_SetStateAtLine(wk, func_ov036_0218da0c, 1011);
+            IrcMenu_SetStateAtLine(wk, IrcMenu_WaitMessageTouch, 1011);
         } else {
             GFL_SndSEPlay(SEQ_SE_SYS_69);
             wk->mode = 6;
-            IrcMenu_SetStateAtLine(wk, func_ov036_0218d9a8, 1017);
+            IrcMenu_SetStateAtLine(wk, IrcMenu_PressMainButton, 1017);
             result = TRUE;
         }
         break;
     case 2:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
         wk->mode = 8;
-        IrcMenu_SetStateAtLine(wk, func_ov036_0218d9a8, 1023);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_PressMainButton, 1023);
         result = TRUE;
         break;
     case 3:
     case 7:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
         wk->mode = 7;
-        IrcMenu_SetStateAtLine(wk, func_ov036_0218d9a8, 1030);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_PressMainButton, 1030);
         result = TRUE;
         break;
     case 4:
         GFL_SndSEPlay(SEQ_SE_SYS_70);
         wk->mode = 12;
-        IrcMenu_SetStateAtLine(wk, func_ov036_0218d9a8, 1037);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_PressMainButton, 1037);
         break;
     }
     return result;
@@ -708,7 +708,7 @@ static void IrcMenu_ShowPlayerCountMenu(IrcMenuWork *wk) {
     IrcMenu_SetStateAtLine(wk, IrcMenu_SubmenuUpdate, 1083);
 }
 
-static void func_ov036_0218db94(u32 param, fx32 frame) {
+static void IrcMenu_OnPlayerCountButtonAnimEnd(u32 param, fx32 frame) {
     IrcMenuWork *wk = (IrcMenuWork *)param;
 
     if (wk->mode == 5) {
@@ -722,10 +722,10 @@ static void func_ov036_0218db94(u32 param, fx32 frame) {
     }
 }
 
-static void func_ov036_0218dbec(IrcMenuWork *wk) {
+static void IrcMenu_WaitPlayerCountButtonAnim(IrcMenuWork *wk) {
 }
 
-static void func_ov036_0218dbf0(IrcMenuWork *wk) {
+static void IrcMenu_PressPlayerCountButton(IrcMenuWork *wk) {
     ClActorCallback callback;
     int index = 0;
 
@@ -734,32 +734,32 @@ static void func_ov036_0218dbf0(IrcMenuWork *wk) {
     }
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)wk;
-    callback.func = func_ov036_0218db94;
+    callback.func = IrcMenu_OnPlayerCountButtonAnimEnd;
     ClActor_SetAutoAnim(wk->actors[index], TRUE);
     ClActor_SetAnimCallback(wk->actors[index], &callback);
     ClActor_RestartAnim(wk->actors[index]);
-    IrcMenu_SetStateAtLine(wk, func_ov036_0218dbec, 1146);
+    IrcMenu_SetStateAtLine(wk, IrcMenu_WaitPlayerCountButtonAnim, 1146);
 }
 
-static void func_ov036_0218dc44(u32 param, fx32 frame) {
+static void IrcMenu_OnPlayerCountBackAnimEnd(u32 param, fx32 frame) {
     IrcMenuWork *wk = (IrcMenuWork *)param;
 
     IrcMenu_SetStateAtLine(wk, IrcMenu_ShowMainMenu, 1155);
 }
 
-static void func_ov036_0218dc58(IrcMenuWork *wk) {
+static void IrcMenu_WaitPlayerCountBackAnim(IrcMenuWork *wk) {
 }
 
-static void func_ov036_0218dc5c(IrcMenuWork *wk) {
+static void IrcMenu_PressPlayerCountBack(IrcMenuWork *wk) {
     ClActorCallback callback;
 
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)wk;
-    callback.func = func_ov036_0218dc44;
+    callback.func = IrcMenu_OnPlayerCountBackAnimEnd;
     ClActor_SetAutoAnim(wk->actors[wk->selected], TRUE);
     ClActor_SetAnimCallback(wk->actors[wk->selected], &callback);
     ClActor_RestartAnim(wk->actors[wk->selected]);
-    IrcMenu_SetStateAtLine(wk, func_ov036_0218dc58, 1179);
+    IrcMenu_SetStateAtLine(wk, IrcMenu_WaitPlayerCountBackAnim, 1179);
 }
 
 static BOOL IrcMenu_PlayerCountTouch(u32 button, IrcMenuWork *wk) {
@@ -769,17 +769,17 @@ static BOOL IrcMenu_PlayerCountTouch(u32 button, IrcMenuWork *wk) {
     switch (button) {
     case 0:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
-        IrcMenu_SetStateAtLine(wk, func_ov036_0218dbf0, 1196);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_PressPlayerCountButton, 1196);
         break;
     case 1:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
         wk->mode = 5;
-        IrcMenu_SetStateAtLine(wk, func_ov036_0218dbf0, 1202);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_PressPlayerCountButton, 1202);
         break;
     case 2:
         GFL_SndSEPlay(SEQ_SE_SYS_70);
         wk->mode = 12;
-        IrcMenu_SetStateAtLine(wk, func_ov036_0218dc5c, 1208);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_PressPlayerCountBack, 1208);
         break;
     }
     return result;
@@ -797,7 +797,7 @@ static void IrcMenu_ShowBattleTypeMenu(IrcMenuWork *wk) {
     IrcMenu_SetStateAtLine(wk, IrcMenu_SubmenuUpdate, 1237);
 }
 
-static void func_ov036_0218dda0(u32 param, fx32 frame) {
+static void IrcMenu_OnBattleBoxButtonAnimEnd(u32 param, fx32 frame) {
     IrcMenuWork *wk = (IrcMenuWork *)param;
 
     if (wk->choice == 2) {
@@ -812,21 +812,21 @@ static void func_ov036_0218dda0(u32 param, fx32 frame) {
     }
 }
 
-static void func_ov036_0218dde8(IrcMenuWork *wk) {
+static void IrcMenu_WaitBattleBoxButtonAnim(IrcMenuWork *wk) {
 }
 
-static void func_ov036_0218ddec(IrcMenuWork *wk) {
+static void IrcMenu_PressBattleBoxButton(IrcMenuWork *wk) {
     u8 indices[3] = { 1, 0, 2 };
     ClActorCallback callback;
     int index = indices[wk->choice];
 
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)wk;
-    callback.func = func_ov036_0218dda0;
+    callback.func = IrcMenu_OnBattleBoxButtonAnimEnd;
     ClActor_SetAutoAnim(wk->actors[index], TRUE);
     ClActor_SetAnimCallback(wk->actors[index], &callback);
     ClActor_RestartAnim(wk->actors[index]);
-    IrcMenu_SetStateAtLine(wk, func_ov036_0218dde8, 1293);
+    IrcMenu_SetStateAtLine(wk, IrcMenu_WaitBattleBoxButtonAnim, 1293);
 }
 
 static void IrcMenu_BattleBoxUpdate(IrcMenuWork *wk) {
@@ -841,19 +841,19 @@ static BOOL IrcMenu_BattleBoxTouch(u32 button, IrcMenuWork *wk) {
     case 1:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
         wk->choice = 0;
-        IrcMenu_SetStateAtLine(wk, func_ov036_0218ddec, 1325);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_PressBattleBoxButton, 1325);
         result = TRUE;
         break;
     case 0:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
         wk->choice = 1;
         result = TRUE;
-        IrcMenu_SetStateAtLine(wk, func_ov036_0218ddec, 1331);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_PressBattleBoxButton, 1331);
         break;
     case 2:
         GFL_SndSEPlay(SEQ_SE_SYS_70);
         wk->choice = 2;
-        IrcMenu_SetStateAtLine(wk, func_ov036_0218ddec, 1337);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_PressBattleBoxButton, 1337);
         break;
     }
     return result;
@@ -870,7 +870,7 @@ static void IrcMenu_ShowBattleBoxMenu(IrcMenuWork *wk) {
     IrcMenu_SetStateAtLine(wk, IrcMenu_BattleBoxUpdate, 1366);
 }
 
-static void func_ov036_0218df3c(u32 param, fx32 frame) {
+static void IrcMenu_OnBattleTypeButtonAnimEnd(u32 param, fx32 frame) {
     IrcMenuWork *wk = (IrcMenuWork *)param;
 
     if (wk->mode == 12) {
@@ -882,10 +882,10 @@ static void func_ov036_0218df3c(u32 param, fx32 frame) {
     }
 }
 
-static void func_ov036_0218df94(IrcMenuWork *wk) {
+static void IrcMenu_WaitBattleTypeButtonAnim(IrcMenuWork *wk) {
 }
 
-static void func_ov036_0218df98(IrcMenuWork *wk) {
+static void IrcMenu_PressBattleTypeButton(IrcMenuWork *wk) {
     ClActorCallback callback;
     int index;
 
@@ -908,11 +908,11 @@ static void func_ov036_0218df98(IrcMenuWork *wk) {
     }
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)wk;
-    callback.func = func_ov036_0218df3c;
+    callback.func = IrcMenu_OnBattleTypeButtonAnimEnd;
     ClActor_SetAutoAnim(wk->actors[index], TRUE);
     ClActor_SetAnimCallback(wk->actors[index], &callback);
     ClActor_RestartAnim(wk->actors[index]);
-    IrcMenu_SetStateAtLine(wk, func_ov036_0218df94, 1432);
+    IrcMenu_SetStateAtLine(wk, IrcMenu_WaitBattleTypeButtonAnim, 1432);
 }
 
 static BOOL IrcMenu_BattleTypeTouch(u32 button, IrcMenuWork *wk) {
@@ -924,30 +924,30 @@ static BOOL IrcMenu_BattleTypeTouch(u32 button, IrcMenuWork *wk) {
         GFL_SndSEPlay(SEQ_SE_SYS_69);
         result = TRUE;
         wk->mode = 1;
-        IrcMenu_SetStateAtLine(wk, func_ov036_0218df98, 1466);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_PressBattleTypeButton, 1466);
         break;
     case 1:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
         wk->mode = 2;
-        IrcMenu_SetStateAtLine(wk, func_ov036_0218df98, 1472);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_PressBattleTypeButton, 1472);
         result = TRUE;
         break;
     case 2:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
         wk->mode = 3;
-        IrcMenu_SetStateAtLine(wk, func_ov036_0218df98, 1478);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_PressBattleTypeButton, 1478);
         result = TRUE;
         break;
     case 3:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
         wk->mode = 4;
-        IrcMenu_SetStateAtLine(wk, func_ov036_0218df98, 1484);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_PressBattleTypeButton, 1484);
         result = TRUE;
         break;
     case 4:
         GFL_SndSEPlay(SEQ_SE_SYS_70);
         wk->mode = 12;
-        IrcMenu_SetStateAtLine(wk, func_ov036_0218df98, 1490);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_PressBattleTypeButton, 1490);
         break;
     }
     return result;
