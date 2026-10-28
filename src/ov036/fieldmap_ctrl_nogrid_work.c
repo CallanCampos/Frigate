@@ -28,11 +28,13 @@ static void FieldmapCtrlNoGrid_FreeWork(FieldmapCtrlNoGrid *controller);
 static void FieldmapCtrlNoGrid_MovePlayer(FieldmapCtrlNoGrid *controller);
 
 const FieldmapCtrlVTable FIELDMAP_CTRL_NOGRID = {
-    1, FieldmapCtrlNoGrid_Create, FieldmapCtrlNoGrid_Update, FieldmapCtrlNoGrid_Free, FieldmapCtrlNoGrid_GetPos,
+    FIELDMAP_CTRL_TYPE_NOGRID, FieldmapCtrlNoGrid_Create, FieldmapCtrlNoGrid_Update,
+    FieldmapCtrlNoGrid_Free,   FieldmapCtrlNoGrid_GetPos,
 };
 
 const FieldmapCtrlVTable FIELDMAP_CTRL_HYBRID = {
-    2, FieldmapCtrlHybrid_Create, FieldmapCtrlHybrid_Update, FieldmapCtrlHybrid_Free, FieldmapCtrlHybrid_GetPos,
+    FIELDMAP_CTRL_TYPE_HYBRID, FieldmapCtrlHybrid_Create, FieldmapCtrlHybrid_Update,
+    FieldmapCtrlHybrid_Free,   FieldmapCtrlHybrid_GetPos,
 };
 
 static void FieldmapCtrlNoGrid_Create(Field *field, VecFx32 *pos, u16 dir) {

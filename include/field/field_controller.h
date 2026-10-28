@@ -7,6 +7,13 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
+// The kinds of controller, a FieldmapCtrlVTable's typeId
+enum {
+    FIELDMAP_CTRL_TYPE_GRID,
+    FIELDMAP_CTRL_TYPE_NOGRID,
+    FIELDMAP_CTRL_TYPE_HYBRID,
+};
+
 // What a kind of map's controller does: its type, making, updating and freeing it, and where its player is
 struct FieldmapCtrlVTable {
     u32 typeId;

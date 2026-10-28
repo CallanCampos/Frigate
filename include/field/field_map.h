@@ -91,6 +91,8 @@ void ProcessMapMatrix(MapMatrix *matrix, const MapMatrixFileHeader *data, u32 ma
 void FreeMapMatrix(MapMatrix *matrix);
 u16 GetZoneIDAtMatrixXZ(MapMatrix *matrix, s32 x, s32 z);
 u16 GetZoneIDAtMatrixXZWorld(MapMatrix *matrix, s32 x, s32 z);
+// What a matrix's chunk without a zone has
+#define MATRIX_ZONE_NONE 0xffff
 u16 GetMapMatrixWidth(MapMatrix *matrix);
 u16 GetMapMatrixHeight(MapMatrix *matrix);
 u32 GetMapMatrixChunkIDCount(MapMatrix *matrix);
