@@ -8,6 +8,9 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
+// The number of zones, one past the last, which code also uses for no zone
+#define ZONE_MAX 615
+
 struct RailPosition {
     u16 componentId;
     u8 componentIsLine;

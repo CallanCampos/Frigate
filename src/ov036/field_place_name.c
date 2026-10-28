@@ -64,9 +64,6 @@ enum {
 // The place names the message bank has: a zone's past them shows none
 #define PLACE_NAME_COUNT 154
 
-// The zone that the banner starts from, one past the last, before the save's is loaded
-#define PLACE_NAME_ZONE_NONE 615
-
 // The place name banner of the field
 struct PlaceName {
     GameSystem *gsys;
@@ -832,8 +829,9 @@ void PlaceName_InitWork(PlaceName *wk, GameSystem *gsys) {
     wk->charPos = -1;
     wk->forced = 0;
     wk->requested = 0;
-    wk->prevZoneId = PLACE_NAME_ZONE_NONE;
-    wk->reqZoneId = PLACE_NAME_ZONE_NONE;
+    // The banner starts from no zone, before the save's is loaded
+    wk->prevZoneId = ZONE_MAX;
+    wk->reqZoneId = ZONE_MAX;
 }
 
 void PlaceName_FreeWork(PlaceName *wk) {
