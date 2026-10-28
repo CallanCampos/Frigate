@@ -303,6 +303,14 @@ BOOL IsZonesWithRailsArrayHasZoneID(u16 zoneId);
 BOOL IsZoneLEQ76(u16 zoneId);
 // The zone's place name for a game of the given version
 u16 GetZoneLocationNameIdx(u16 zoneId, u32 version);
+// When the field shows the zone's place name on entering it: never, always, only when the game continues from the
+// save there, or except then
+enum {
+    PLACE_NAME_DISP_NEVER,
+    PLACE_NAME_DISP_ALWAYS,
+    PLACE_NAME_DISP_ON_CONTINUE,
+    PLACE_NAME_DISP_NOT_ON_CONTINUE,
+};
 u32 GetZoneLocNameDispType(u16 zoneId);
 u32 GetZoneEasyChallengeModeLevelAdjust(u16 zoneId);
 u16 GetZoneNameIcon(u16 zoneId);
