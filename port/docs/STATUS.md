@@ -32,10 +32,42 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: preserve ELF dump globals while isolating the game's socket names
+
+- **Upstream:** reviewed main `3ea5609ea3` contains `fd3b9e600d`; the separate `29b9dcfef9` naming proposal remains
+  local. This merges reviewed main into the contributor's Linux visibility proposal, retaining the Windows fix.
+- **Port:** `PORT_SHA`, maintainer follow-up to PR 58 head `948b7efa0f`. Game/HAL ownership is unchanged except the
+  ELF global-name resolver; the original Linux-only visibility policy remains. No source outside `port/` changes.
+- **ROM (T0):** fresh configure/Ninja passes both original hashes with zero warnings: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+- **Host build/tests (T1/T2):** the actual Mac host test target builds and `host_global_symbols` passes. Eight real
+  Linux resolver probes pass: GNU ld/LLD, default/hidden visibility, ordinary/fatal ASan+UBSan. The same tracked
+  fixture checks exact global/weak-alias addresses, unique hidden-local lookup, ordinary-local rejection and
+  ambiguous hidden-local rejection. Four shared-library socket probes pass hidden ordinary/fatal builds under
+  both linkers; all four default-visibility negatives fail as expected. The executable's own typed pointer still
+  reaches its sentinel; the DSO opens/closes a real unconnected local AF_UNIX socket. No ROM, server or external
+  network is used. Both targets inherit the production visibility/sanitizer environment in Linux CMake CI.
+- **Replay/oracle/sanitizers/play (T3/T4/T5/T7):** no new gameplay, screenshot or Spanish compatibility claim. The
+  contributor's window/copyright-screen observation remains limited to the described desktop. ROM-free probes
+  preserve the actual resolver and loader contract, not full game outcomes. Exact-head canonical/hosted gates remain.
+- **Performance (T6):** no budget changes; symbol resolution occurs when dump specifications are added, not per
+  frame. Full-name scanning rejects ambiguity without introducing an every-frame lookup.
+- **Tiers/trap stubs/64-bit warnings:** no new scan or cast change; fresh canonical verification must recheck the
+  existing tier/stub/complete-compilation measures. No completed native feature or whole-game claim is introduced.
+- **Work done:** reproduced the original socket interposition and a remaining linker-specific dump regression.
+  GNU ld keeps hidden globals GLOBAL HIDDEN; LLD makes them LOCAL HIDDEN, which the old resolver rejected. Accept
+  only hidden local entries in addition to legacy global/weak symbols; ordinary statics remain private and distinct
+  same-name addresses return NULL. Guides/maps and ROM-free tests cover both the window namespace and actual dump
+  API. No exported-symbol workaround, arbitrary-local lookup, ignored linker error or sanitizer exclusion is added.
+- **Next:** publish this follow-up to the contributor PR, run exact-head canonical and hosted gates, then approve
+  and merge normally. Complete the reviewed AI repair and upstream proposal, then resume general CARD CPU timing.
+- **Blockers:** no human action blocks verification. Hosted final-head tests and full native gates remain due.
+  Issue 45 stays open: showing the Spanish copyright screen does not verify gameplay or save/quit/reload.
+
 ## 2026-10-28: the window on Linux, with the game's symbols hidden from a shared SDL3
 
 - **Upstream:** `fd3b9e600d`, as reviewed main `b631907c33` has it; this branch merges no upstream commit.
-- **Port:** `PORT_SHA`, on `port/linux-hidden-game-symbols`, from `b631907c33`.
+- **Port:** `948b7efa0f`, on `port/linux-hidden-game-symbols`, from `b631907c33`.
 - **ROM:** T0 not run: this clone has no `orig/`. The branch changes only `port/CMakeLists.txt` and this file, so
   MWCC's build is untouched; T0 is still due before merge.
 - **Host build:** Linux (Ubuntu 26.04, clang 21.1.8, the distribution's shared SDL3 3.4.2), RelWithDebInfo,
@@ -51,7 +83,8 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 - **Work done:** on Linux, an executable exports a definition that a shared library refers to, and it wins over the
   C library's. GameSpy defines the BSD socket calls for the DS (`lib/dwc/src/gscommon/gsPlatformSocket.c`), so
   libwayland-client and libX11, loaded by a distribution's shared SDL3, called GameSpy's `socket` and `connect`, found
-  no display, and SDL fell through every video driver: no window on any Linux desktop, the US build too. CI runs
+  no display, and SDL fell through the available video drivers in the observed shared SDL3 Wayland/X11 setup,
+  including the US build. CI runs
   headless and didn't see it. `port_decomp_env` compiles
   the decomp with `-fvisibility=hidden` on Linux: the game's calls bind as before, inside the program. No game change.
 - **Next:** this branch published as a pull request to `main`, T0 and the owner's review. Issue 45's Spanish

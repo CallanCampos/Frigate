@@ -130,6 +130,10 @@ build/port/frigate-black2 --rom /c/Games/black2.nds                      # your 
   game's next save rather than followed; the VRAM banks are copied between their views rather than mapped into them by
   pages (the same pictures, more copying); the ROM is read into memory rather than mapped; the program loads MSYS2's
   `SDL3.dll`, so run it from the CLANG64 shell, or with `C:\msys64\clang64\bin` on `PATH`.
+- **Struct layout:** MinGW's clang lays out structs as MSVC does by default, which ignores the DS's 4-byte alignment
+  of 64-bit values (`PORT_DS_ALIGN_64`, `include/types.h`) and moves the save's fields after one. Everything that
+  includes the decomp's headers is built with `-mno-ms-bitfields`, as [CMakeLists.txt](CMakeLists.txt) sets for
+  Windows, and [include/port_host.h](include/port_host.h) stops a build that lays a `u64` out otherwise.
 - **Names that aren't ASCII:** every program of the build carries a manifest that makes UTF-8 its code page (Windows
   10 1903 or later, [app/windows/utf8.manifest](app/windows/utf8.manifest)), so a ROM, a save folder or a run directory
   named with accents works as on macOS and Linux.

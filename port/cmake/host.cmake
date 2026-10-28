@@ -9,6 +9,7 @@
 enable_testing()
 add_executable(port_host_tests
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/host/test_host.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/host/elf_symbol_peer.c"
     $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> ${port_gfx_objects} "${PORT_GEN}/stubs.c")
 target_link_libraries(port_host_tests PRIVATE port_decomp_env SDL3::SDL3)
 target_include_directories(port_host_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/..")
@@ -103,10 +104,21 @@ add_test(NAME host_watchdog_off COMMAND port_host_tests watchdog_off)
 set_tests_properties(host_watchdog_off PROPERTIES TIMEOUT 60
     PASS_REGULAR_EXPRESSION "watchdog_off: ok" FAIL_REGULAR_EXPRESSION "went off")
 
-foreach(scenario IN ITEMS static_data files)
+foreach(scenario IN ITEMS static_data global_symbols files)
     add_test(NAME host_${scenario} COMMAND port_host_tests ${scenario})
     set_tests_properties(host_${scenario} PROPERTIES TIMEOUT 60)
 endforeach()
 # An argument that isn't ASCII, as a path given on the command line may be: "Pokémon"
 add_test(NAME host_utf8_argument COMMAND port_host_tests utf8_argument "Pokémon")
 set_tests_properties(host_utf8_argument PROPERTIES TIMEOUT 60)
+
+# A real ELF DSO must not bind its socket import to the executable's GameSpy-like definition. Both targets inherit
+# the actual visibility/sanitizer policy; removal of hidden visibility makes this ROM-free test fail.
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_library(port_host_socket_peer SHARED tests/host/socket_peer.c)
+    target_link_libraries(port_host_socket_peer PRIVATE port_decomp_env)
+    add_executable(port_host_socket_tests tests/host/socket_namespace.c)
+    target_link_libraries(port_host_socket_tests PRIVATE port_decomp_env port_host_socket_peer)
+    add_test(NAME host_socket_namespace COMMAND port_host_socket_tests)
+    set_tests_properties(host_socket_namespace PROPERTIES TIMEOUT 30)
+endif()

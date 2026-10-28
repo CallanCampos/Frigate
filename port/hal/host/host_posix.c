@@ -320,6 +320,8 @@ static int MapProgram(void) {
 void *port_host_global_address(const char *name) {
     const ElfW(Shdr) * sections;
     ElfW(Addr) base = 0;
+    ElfW(Addr) found = 0;
+    int haveFound = 0;
 
     if (!MapProgram()) {
         return NULL;
@@ -345,12 +347,23 @@ void *port_host_global_address(const char *name) {
             const ElfW(Sym) *symbol = &symbols[j];
 
             if (symbol->st_shndx == SHN_UNDEF || symbol->st_name >= strtab->sh_size ||
-                ELF64_ST_BIND(symbol->st_info) == STB_LOCAL || strcmp(names + symbol->st_name, name) != 0) {
+                (ELF64_ST_BIND(symbol->st_info) == STB_LOCAL && ELF64_ST_VISIBILITY(symbol->st_other) != STV_HIDDEN) ||
+                strcmp(names + symbol->st_name, name) != 0) {
                 continue;
             }
-            dl_iterate_phdr(TakeFirst, &base);
-            return (void *)(base + symbol->st_value);
+            // LLD localizes hidden globals, while GNU ld can leave them GLOBAL HIDDEN. Ordinary C statics stay
+            // invisible. A deliberate hidden local is indistinguishable here, so differing same-name addresses
+            // fail closed instead of selecting an arbitrary translation unit's object.
+            if (haveFound && found != symbol->st_value) {
+                return NULL;
+            }
+            found = symbol->st_value;
+            haveFound = 1;
         }
+    }
+    if (haveFound) {
+        dl_iterate_phdr(TakeFirst, &base);
+        return (void *)(base + found);
     }
     return NULL;
 }

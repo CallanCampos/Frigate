@@ -11,6 +11,7 @@
 // stand on. The scenarios that end the process run one a process. None needs a ROM.
 //
 //   port_host_tests NAME [ARGUMENT]
+#include "global_symbols.h"
 #include "hal/host/host.h"
 #include "hal/os/fiber.h"
 #include "hal/trap.h"
@@ -388,6 +389,7 @@ static const Test sTests[] = {
     { "watchdog_kicked", TestWatchdogKicked },
     { "watchdog_off", TestWatchdogOff },
     { "static_data", TestStaticData },
+    { "global_symbols", TestGlobalSymbols },
     { "files", TestFiles },
     { "utf8_argument", TestUtf8Argument },
 };
