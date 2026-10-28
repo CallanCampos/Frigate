@@ -281,9 +281,9 @@ Script_4:
     SEPlay SEQ_SE_FLD_61
     SEWait
     VMCall L_04C2
-    ScrcmdFieldGimmickPlateDoors_StartDoorEvent 0, 0
+    DriftveilGymCallElevator 0, 0
     VMCall L_058C
-    ScrcmdFieldGimmickPlateDoors_StartDoorEvent 0, 1
+    DriftveilGymCallElevator 0, 1
     VMCall L_0656
     SEWait
     FinishAllEvents
@@ -297,9 +297,9 @@ Script_5:
     SEPlay SEQ_SE_FLD_61
     SEWait
     VMCall L_04C2
-    ScrcmdFieldGimmickPlateDoors_StartDoorEvent 1, 0
+    DriftveilGymCallElevator 1, 0
     VMCall L_058C
-    ScrcmdFieldGimmickPlateDoors_StartDoorEvent 1, 1
+    DriftveilGymCallElevator 1, 1
     VMCall L_0656
     SEWait
     FinishAllEvents
@@ -313,9 +313,9 @@ Script_6:
     SEPlay SEQ_SE_FLD_61
     SEWait
     VMCall L_04C2
-    ScrcmdFieldGimmickPlateDoors_StartDoorEvent 2, 0
+    DriftveilGymCallElevator 2, 0
     VMCall L_058C
-    ScrcmdFieldGimmickPlateDoors_StartDoorEvent 2, 1
+    DriftveilGymCallElevator 2, 1
     VMCall L_0656
     SEWait
     FinishAllEvents
@@ -329,9 +329,9 @@ Script_7:
     SEPlay SEQ_SE_FLD_61
     SEWait
     VMCall L_04C2
-    ScrcmdFieldGimmickPlateDoors_StartDoorEvent 3, 0
+    DriftveilGymCallElevator 3, 0
     VMCall L_058C
-    ScrcmdFieldGimmickPlateDoors_StartDoorEvent 3, 1
+    DriftveilGymCallElevator 3, 1
     VMCall L_0656
     SEWait
     FinishAllEvents

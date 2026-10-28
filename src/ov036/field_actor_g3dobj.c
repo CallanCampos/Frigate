@@ -290,8 +290,8 @@ static void RailActor_ProcMoveEnd(FieldActor *actor) {
 }
 
 static BOOL RailActor_CacheTerrain(FieldActor *actor) {
-    u32 origYTile = -1;
-    u32 tile = -1;
+    u32 origYTile = TILE_TYPE_NONE;
+    u32 tile = TILE_TYPE_NONE;
 
     if (!FldAct_IsMapAttrDisabled(actor)) {
         NoGridMapper *mapper = FldActSys_GetNoGridMapper(GetActorMModelSystem(actor));
@@ -305,7 +305,7 @@ static BOOL RailActor_CacheTerrain(FieldActor *actor) {
     }
     SetCachedOrigYTileUnderActor(actor, origYTile);
     SetCachedTileUnderActor(actor, tile);
-    if (tile == -1) {
+    if (tile == TILE_TYPE_NONE) {
         SetActorMovementFlag(actor, 0x800);
         return FALSE;
     }
@@ -385,13 +385,13 @@ static void RailActor_MapAttrGrassProc0(FieldActor *actor, u32 tile, u32 origYTi
 }
 
 static void RailActor_MapAttrGrassProc12(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
-    if (tile != -1 && (GetTileFlags(tile) & 0x20)) {
+    if (tile != TILE_TYPE_NONE && (GetTileFlags(tile) & 0x20)) {
         GrassTask_Start(FldAct_GetFieldEffects(actor), actor, TRUE, 0);
     }
 }
 
 static void RailActor_MapAttrFootMarkProc1(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
-    if (origYTile != -1 && (GetTileFlags(origYTile) & 0x8)) {
+    if (origYTile != TILE_TYPE_NONE && (GetTileFlags(origYTile) & 0x8)) {
         FieldEffects *effects = FldAct_GetFieldEffects(actor);
         u32 kind = 0;
 
@@ -424,9 +424,9 @@ static void RailActor_MapAttrLandingDustProc(FieldActor *actor, u32 tile, u32 or
 
 static void RailActor_StartReflection(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
     if (info->enableReflections != 0 && !FldAct_CheckReflectingFlag(actor)) {
-        u32 reflectTile = -1;
+        u32 reflectTile = TILE_TYPE_NONE;
 
-        if (tile != -1) {
+        if (tile != TILE_TYPE_NONE) {
             if (GetTileFlags(tile) & 0x40) {
                 reflectTile = tile;
             } else {
@@ -435,7 +435,7 @@ static void RailActor_StartReflection(FieldActor *actor, u32 tile, u32 origYTile
                     reflectTile = tile;
                 }
             }
-            if (reflectTile != -1) {
+            if (reflectTile != TILE_TYPE_NONE) {
                 FieldEffects *effects = FldAct_GetFieldEffects(actor);
                 MMSys *system = GetActorMModelSystem(actor);
 
@@ -451,7 +451,7 @@ static void RailActor_ClearReflectionIfOffTile(FieldActor *actor, u32 tile, u32 
     if (info->enableReflections != 0 && FldAct_CheckReflectingFlag(actor)) {
         u32 reflectTile = FldAct_GetTileTypeInDir(actor, 1);
 
-        if (reflectTile == -1) {
+        if (reflectTile == TILE_TYPE_NONE) {
             FldAct_SetReflectingFlag(actor, FALSE);
             return;
         }

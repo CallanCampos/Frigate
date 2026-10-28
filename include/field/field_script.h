@@ -140,6 +140,11 @@ void FreeFieldScriptEnv(FieldScriptEnv *env);
 u32 FieldScriptEnv_IsReducedFeatureLevel(FieldScriptEnv *env);
 u32 FieldScriptEnv_GetFeatureLevel(FieldScriptEnv *env);
 void FieldScriptEnv_RemoveAcmdTasks(FieldScriptEnv *env);
+// InitListMenu's align: x is the list's left edge, or its right edge
+enum {
+    LIST_MENU_ANCHOR_TOP_LEFT,
+    LIST_MENU_ANCHOR_TOP_RIGHT,
+};
 void InitListMenu(FieldScriptEnv *env, u16 x, u16 y, u16 cursor, u16 flags, u32 align, u16 *result, WordSet *wordSet,
                   MsgData *msgData);
 void AddItemToListMenu(FieldScriptEnv *env, u32 messageId, u32 descriptionId, u32 value, StrBuf *expanded,
@@ -249,16 +254,16 @@ BOOL s02AC_CallLeafPileStuck(VM *vm, FieldScriptEnv *env);
 BOOL s02CF_PokeDexCheckHabitatList(VM *vm, FieldScriptEnv *env);
 BOOL s02D1_KeyInfoGetMyCityProgress(VM *vm, FieldScriptEnv *env);
 BOOL s02D5_WbtIsTrainerBeaten(VM *vm, FieldScriptEnv *env);
-BOOL Scrcmd_GetWifiHistoryCountryCount(VM *vm, FieldScriptEnv *env);
+BOOL s02D7_GetWifiHistoryCountryCount(VM *vm, FieldScriptEnv *env);
 BOOL s02DD_UnityTowerGetVisitorCount(VM *vm, FieldScriptEnv *env);
-BOOL Scrcmd_MarkPartnerCandidate(VM *vm, FieldScriptEnv *env);
-BOOL Scrcmd_IsPartnerCandidateMarked(VM *vm, FieldScriptEnv *env);
+BOOL s02D8_MarkPartnerCandidate(VM *vm, FieldScriptEnv *env);
+BOOL s02D9_IsPartnerCandidateMarked(VM *vm, FieldScriptEnv *env);
 BOOL s02DA_UnityTowerSetRatingLevel(VM *vm, FieldScriptEnv *env);
 BOOL s02DE_UnityTowerSetHobby(VM *vm, FieldScriptEnv *env);
 BOOL s02DF_UnityTowerGetHobby(VM *vm, FieldScriptEnv *env);
 BOOL s02DB_UnityTowerSetFloor(VM *vm, FieldScriptEnv *env);
 BOOL s02DC_UnityTowerInitVisitorMessage(VM *vm, FieldScriptEnv *env);
-BOOL Scrcmd_HasPlayerLanguage(VM *vm, FieldScriptEnv *env);
+BOOL s0233_HasPlayerLanguage(VM *vm, FieldScriptEnv *env);
 BOOL s024B_FieldSubscreenDisable(VM *vm, FieldScriptEnv *env);
 BOOL s00EB_DayCareCheckSpawnFlag(VM *vm, FieldScriptEnv *env);
 BOOL s00EC_DayCareBreed(VM *vm, FieldScriptEnv *env);

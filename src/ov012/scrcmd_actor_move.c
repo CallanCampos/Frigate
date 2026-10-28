@@ -10,9 +10,6 @@
 #include "system/game_system.h"
 #include "system/vm.h"
 
-// The actor's movement flag that keeps its movement codes from moving it
-#define ACTOR_MOVEMENT_FLAG_HELD 0x8000
-
 typedef struct {
     fx32 distance;
     u16 frames;
@@ -53,7 +50,7 @@ BOOL s0212_ActorMoveToHeight(VM *vm, FieldScriptEnv *env) {
     actor = FindFieldActor(Field_GetActorSystem(GSYS_GetField(gsys)), actorId);
     CopyActorWPos(actor, &data->pos);
     data->actor = actor;
-    SetActorMovementFlag(actor, ACTOR_MOVEMENT_FLAG_HELD);
+    SetActorMovementFlag(actor, ACTOR_MOVEMENT_FLAG_HIDE_SHADOW);
     // The height is in half tiles
     data->distance = height * (8 * FX32_ONE) - data->pos.y;
     ScriptWork_CallEvent(work, event);

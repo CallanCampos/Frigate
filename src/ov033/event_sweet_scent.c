@@ -86,7 +86,7 @@ GameEventReturnCode EventSweetScent_Callback(GameEvent *event, u32 *state, void 
         *state = 6;
         break;
     case 6:
-        next = EventWildBattleCall_CreateRandom(Field_GetEncountSystem(work->field), 2);
+        next = EventWildBattleCall_CreateRandom(Field_GetEncountSystem(work->field), ENCOUNT_MODE_SWEET_SCENT);
         if (next == NULL) {
             *state = 7;
             break;

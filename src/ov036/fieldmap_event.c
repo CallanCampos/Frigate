@@ -312,7 +312,7 @@ static GameEvent *FieldEventProvider_Grid_CheckForEvent(GameSystem *gsys, Field 
         u32 contactFlags = 0;
 
         if (EventWork_FlagGet(GameData_GetEventWork(wk.gameData), EVENT_FLAG_0x0964) == TRUE) {
-            contactFlags |= 1;
+            contactFlags |= OBJ_CONTACT_STRENGTH;
         }
         event = FieldPlayer_CheckObjContactEvent(wk.player, wk.pressed, wk.held, contactFlags);
         if (event != NULL) {
@@ -1317,7 +1317,7 @@ static GameEvent *CheckCallRandomEncounter(FieldInteractWk *wk, GameSystem *gsys
     EncountSystem *encounter = Field_GetEncountSystem(field);
 
     if (wk->walking) {
-        return EventWildBattleCall_CreateRandom(encounter, 0);
+        return EventWildBattleCall_CreateRandom(encounter, ENCOUNT_MODE_NORMAL);
     }
     return NULL;
 }
@@ -1384,7 +1384,7 @@ static GameEventReturnCode EventSurfExit_Callback(GameEvent *event, u32 *state, 
     case SURF_EXIT_JUMP: {
         u16 acmd;
 
-        FldeffSurfPokemon_SetFollowMode(FieldPlayer_GetRideEffect(player), 0);
+        FldeffSurfPokemon_SetFollowMode(FieldPlayer_GetRideEffect(player), SURF_POKEMON_FOLLOW_NONE);
         FieldPlayer_SetSpecialSeq(player, 1);
         FieldPlayer_FinishFormChange(player);
         acmd = GetAcmdForDir(work->dir, ACMD_JUMP_1);

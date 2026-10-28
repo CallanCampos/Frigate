@@ -59,7 +59,8 @@ void LandDataPatch_OverwriteAttr(LandDataPatch *patch, LandPatchGrid *src, u32 s
     }
 }
 
-u32 LoadLandDataPatchBuildings(LandDataPatch *patch, FieldPropSystem *a1, FieldChunk *a2, u32 count, u32 x, u32 y) {
+u32 LoadLandDataPatchBuildings(LandDataPatch *patch, FieldPropSystem *propSystem, FieldChunk *chunk, u32 count, u32 x,
+                               u32 y) {
     LandPatchBuildings *buildings = GetLandDataPatchBMDataPtr(patch);
     FieldPropSourceInfo *infos = buildings->infos;
     u32 i;
@@ -70,7 +71,7 @@ u32 LoadLandDataPatchBuildings(LandDataPatch *patch, FieldPropSystem *a1, FieldC
         MI_CpuCopy8(&infos[i], &info, sizeof(FieldPropSourceInfo));
         info.x += x << 16;
         info.z -= y << 16;
-        FieldPropSystem_InstantiateFromInfo(a1, a2, &info, count + i);
+        FieldPropSystem_InstantiateFromInfo(propSystem, chunk, &info, count + i);
     }
     return count + buildings->count;
 }

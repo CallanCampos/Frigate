@@ -3147,7 +3147,7 @@
    ]
   },
   "381": {
-   "handler": "ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript",
+   "handler": "s017D_RollerCoasterSetCarIntroSeen",
    "overlay": 36,
    "args": [
     "u16"
@@ -3166,7 +3166,7 @@
    ]
   },
   "396": {
-   "handler": "ScrcmdFieldGimmickPlateDoors_StartDoorEvent",
+   "handler": "s018C_DriftveilGymCallElevator",
    "overlay": 36,
    "args": [
     "u16",
@@ -3825,7 +3825,7 @@
    ]
   },
   "505": {
-   "handler": "Scrcmd_CheckPmsWordPair",
+   "handler": "s01F9_CheckPmsWordPair",
    "overlay": 36,
    "args": [
     "any",
@@ -4064,7 +4064,7 @@
    ]
   },
   "534": {
-   "handler": "Scrcmd_CheckBeaconTrainerKey",
+   "handler": "s0216_CheckBeaconTrainerKey",
    "overlay": 36,
    "args": [
     "any",
@@ -4212,7 +4212,7 @@
    ]
   },
   "554": {
-   "handler": "s022A_HollowRivalGenMsgID",
+   "handler": "s022A_TVGenProgramMsgID",
    "overlay": 36,
    "args": [
     "any",
@@ -4221,7 +4221,7 @@
    "area": "HollowRival"
   },
   "555": {
-   "handler": "Scrcmd_StartSwapNpcEvent",
+   "handler": "s022B_StartSwapNpcEvent",
    "overlay": 36,
    "args": [
     "any",
@@ -4281,7 +4281,7 @@
    ]
   },
   "563": {
-   "handler": "Scrcmd_HasPlayerLanguage",
+   "handler": "s0233_HasPlayerLanguage",
    "overlay": 36,
    "args": [
     "var"
@@ -5228,7 +5228,7 @@
    ]
   },
   "727": {
-   "handler": "Scrcmd_GetWifiHistoryCountryCount",
+   "handler": "s02D7_GetWifiHistoryCountryCount",
    "overlay": 36,
    "args": [
     "any",
@@ -5237,7 +5237,7 @@
    "area": "UnityTower"
   },
   "728": {
-   "handler": "Scrcmd_MarkPartnerCandidate",
+   "handler": "s02D8_MarkPartnerCandidate",
    "overlay": 36,
    "args": [
     "any"
@@ -5245,7 +5245,7 @@
    "area": "UnityTower"
   },
   "729": {
-   "handler": "Scrcmd_IsPartnerCandidateMarked",
+   "handler": "s02D9_IsPartnerCandidateMarked",
    "overlay": 36,
    "args": [
     "any",

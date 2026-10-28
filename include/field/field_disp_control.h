@@ -5,7 +5,22 @@
 #include "gfl/heap.h"
 #include "struct_decls.h"
 
+// A request of each screen's blending, which FieldDispControl_Update makes once, by its proc
+enum {
+    FIELD_DISP_REQUEST_NONE,
+    FIELD_DISP_REQUEST_RESET_BRIGHTNESS,
+    FIELD_DISP_REQUEST_SET_ALPHA,
+    FIELD_DISP_REQUEST_SET_BRIGHTNESS,
+    FIELD_DISP_REQUEST_SET_ALL,
+    FIELD_DISP_REQUEST_ADJUST_ALPHA,
+    FIELD_DISP_REQUEST_ADJUST_BRIGHTNESS,
+};
+
+// A background whose shown state no request changes
+#define FIELD_DISP_BG_UNCHANGED 0xff
+
 struct FieldDispControl {
+    // A FIELD_DISP_REQUEST_ value
     u16 requestA;
     u16 requestB;
     u32 alphaA;
@@ -17,7 +32,8 @@ struct FieldDispControl {
     u32 betaB;
     u32 planeMaskB;
     u32 complementB;
-    u32 unk28;
+    u32 allB;
+    // TRUE, FALSE or FIELD_DISP_BG_UNCHANGED
     u8 bgEnabled[8];
     u8 brightnessRequest[2];
     s8 brightnessValue[2];

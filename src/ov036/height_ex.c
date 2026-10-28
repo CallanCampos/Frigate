@@ -25,7 +25,7 @@ BOOL CommErrorProc_Init(GameProc *proc, u32 *state, void *param, void *work);
 BOOL CommErrorProc_Main(GameProc *proc, u32 *state, void *param, void *work);
 BOOL CommErrorProc_Exit(GameProc *proc, u32 *state, void *param, void *work);
 
-const GameProcFunctions data_ov036_021d1760 = { CommErrorProc_Init, CommErrorProc_Main, CommErrorProc_Exit };
+const GameProcFunctions COMM_ERROR_PROC_FUNCTIONS = { CommErrorProc_Init, CommErrorProc_Main, CommErrorProc_Exit };
 GameEventReturnCode EventCommError_RunCommExit(GameEvent *event, u32 *state, void *data);
 
 HeightExList *HeightEx_CreateTable(u32 count, u8 heapId) {
@@ -86,29 +86,36 @@ GameEvent *EventCommError_Create(GameSystem *gsys, Field *field) {
     return GameEvent_Create(gsys, NULL, EventCommError_Run, 0);
 }
 
+// The steps of the comm error event: stop the actors and show the error or leave the comm, then wait for the field
+enum {
+    COMM_ERROR_STATE_START,
+    COMM_ERROR_STATE_WAIT_FIELD,
+};
+
 GameEventReturnCode EventCommError_Run(GameEvent *event, u32 *state, void *data) {
     GameSystem *gsys = GameEvent_GetGameSystem(event);
     Field *field = GSYS_GetField(gsys);
     GameEvent *next;
 
     switch (*state) {
-    case 0:
+    case COMM_ERROR_STATE_START:
         DisableAllActorsMovement(Field_GetActorSystem(field));
         if (GameCommSys_GetLastCommNo(GSYS_GetGameCommSystem(gsys)) == GAME_COMM_NO_INTRUDE) {
             if (GameData_IsForceSeasonSync(GSYS_GetGameData(gsys)) == TRUE) {
                 GFL_NetErrMarkShown();
-                next = EventFieldSubprocessTransition_Create(gsys, field, OVERLAY_ID(36), &data_ov036_021d1760, gsys);
+                next = EventFieldSubprocessTransition_Create(gsys, field, OVERLAY_ID(36), &COMM_ERROR_PROC_FUNCTIONS,
+                                                             gsys);
             } else {
                 next = GameEvent_Create(gsys, NULL, EventCommError_RunCommExit, 0);
             }
         } else {
             GFL_NetErrMarkShown();
-            next = EventFieldSubprocessTransition_Create(gsys, field, OVERLAY_ID(36), &data_ov036_021d1760, gsys);
+            next = EventFieldSubprocessTransition_Create(gsys, field, OVERLAY_ID(36), &COMM_ERROR_PROC_FUNCTIONS, gsys);
         }
         GameEvent_ChainNext(event, next);
         (*state)++;
         break;
-    case 1:
+    case COMM_ERROR_STATE_WAIT_FIELD:
         if (field != NULL && Field_CheckMapLoadFinished(field) == TRUE) {
             EnableAllActorsMovement(Field_GetActorSystem(field));
             return TRUE;
@@ -118,33 +125,41 @@ GameEventReturnCode EventCommError_Run(GameEvent *event, u32 *state, void *data)
     return FALSE;
 }
 
+// The steps of leaving the comm after an error: end the network, wait for it, boot the game comm again and wait for it
+enum {
+    COMM_EXIT_STATE_EXIT_NET,
+    COMM_EXIT_STATE_WAIT_NET_END,
+    COMM_EXIT_STATE_BOOT_COMM,
+    COMM_EXIT_STATE_WAIT_BOOT,
+};
+
 GameEventReturnCode EventCommError_RunCommExit(GameEvent *event, u32 *state, void *data) {
     GameSystem *gsys = GameEvent_GetGameSystem(event);
     GameCommSys *comm = GSYS_GetGameCommSystem(gsys);
     void *work;
 
     switch (*state) {
-    case 0:
+    case COMM_EXIT_STATE_EXIT_NET:
         if (GFL_NetIsInitialized()) {
             GFL_NetExit(NULL);
         }
         (*state)++;
         break;
-    case 1:
+    case COMM_EXIT_STATE_WAIT_NET_END:
         if (GFL_NetIsEnded() == TRUE) {
             GFL_NetErrClear();
             GSYS_SetNetErrorPending(gsys, 0);
             (*state)++;
         }
         break;
-    case 2:
+    case COMM_EXIT_STATE_BOOT_COMM:
         if (GSYS_TryBootGameComm(gsys) == TRUE) {
             (*state)++;
         } else {
             return TRUE;
         }
         break;
-    case 3:
+    case COMM_EXIT_STATE_WAIT_BOOT:
         work = GameCommSys_GetWork(comm);
         if (work != NULL && GameCommSys_BootCheck(comm)) {
             GameBeaconSearch_StartType35Wait(work);

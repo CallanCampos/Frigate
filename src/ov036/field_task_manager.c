@@ -3,6 +3,7 @@
 #include "types.h"
 #include "constants/sound.h"
 #include "field/field.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_animation_curve.h"
 #include "field/field_camera.h"
@@ -18,6 +19,21 @@
 #define CAMERA_ANGLE_PITCH 1
 #define ACTOR_MOVE_FORWARD 0
 #define ACTOR_MOVE_BACKWARD 1
+
+// The steps of the tasks that move over frames: take where they start from, then move each frame until they end
+enum {
+    TASK_STATE_START,
+    TASK_STATE_UPDATE,
+};
+
+// The steps of the camera shake: end the camera's delay, wait for it to stop and free the camera from its bind, shake
+// it, and end
+enum {
+    SHAKE_STATE_END_DELAY,
+    SHAKE_STATE_WAIT_DELAY,
+    SHAKE_STATE_SHAKE,
+    SHAKE_STATE_END,
+};
 
 struct FieldTaskManager {
     u8 count;
@@ -264,7 +280,8 @@ static void FieldTaskManager_RunTask(FieldTaskManager *mgr, u8 index) {
 
 static void FieldTaskManager_UpdateParentControlTransfer(FieldTaskManager *mgr, u8 index) {
     if (mgr->tasks[index] != NULL && mgr->parents[index] != NULL) {
-        if (FieldTask_GetState(mgr->tasks[index]) == 0 && FieldTask_GetState(mgr->parents[index]) == 2) {
+        if (FieldTask_GetState(mgr->tasks[index]) == FIELD_TASK_STATE_WAIT &&
+            FieldTask_GetState(mgr->parents[index]) == FIELD_TASK_STATE_END) {
             FieldTask_SetStarted(mgr->tasks[index]);
         }
     }
@@ -283,7 +300,7 @@ FieldTask *FieldCameraMoveTaskZoom_Create(Field *field, u16 duration, fx32 zoom)
         FieldTask_Create(Field_GetHeapID(field), sizeof(FieldCameraZoomTask), FieldCameraMoveTaskZoom_Calc);
     FieldCameraZoomTask *data = FieldTask_GetData(task);
 
-    data->state = 0;
+    data->state = TASK_STATE_START;
     data->field = field;
     data->frame = 0;
     data->duration = duration;
@@ -296,11 +313,11 @@ static BOOL FieldCameraMoveTaskZoom_Calc(void *taskData) {
     FieldCamera *camera = Field_GetCameraSystem(data->field);
 
     switch (data->state) {
-    case 0:
+    case TASK_STATE_START:
         data->start = FieldCamera_CoordsGetZoom(camera);
         data->state++;
         break;
-    case 1: {
+    case TASK_STATE_UPDATE: {
         u32 type;
         f32 ratio;
         f32 start;
@@ -332,7 +349,7 @@ FieldTask *FieldCameraMoveTaskYaw_Callback(Field *field, u32 duration, u16 yaw) 
 
     data->field = field;
     data->camera = Field_GetCameraSystem(field);
-    data->state = 0;
+    data->state = TASK_STATE_START;
     data->axis = CAMERA_ANGLE_YAW;
     data->frame = 0;
     data->duration = duration;
@@ -347,7 +364,7 @@ FieldTask *FieldCameraMoveTaskPitch_Callback(Field *field, u32 duration, u16 pit
 
     data->field = field;
     data->camera = Field_GetCameraSystem(field);
-    data->state = 0;
+    data->state = TASK_STATE_START;
     data->axis = CAMERA_ANGLE_PITCH;
     data->frame = 0;
     data->duration = duration;
@@ -410,11 +427,11 @@ static BOOL FieldCameraMoveTaskAngle_Callback(void *work) {
     FieldCameraAngleTask *data = work;
 
     switch (data->state) {
-    case 0:
+    case TASK_STATE_START:
         FieldCameraMoveTaskAngle_CalcStartValues(data);
         data->state++;
         break;
-    case 1:
+    case TASK_STATE_UPDATE:
         FieldCameraMoveTaskAngle_Calc(data);
         if (data->duration <= data->frame) {
             return TRUE;
@@ -485,7 +502,7 @@ FieldTask *FieldActorSpinTask_CreatePlayerDeaccel(Field *field, u32 duration, u3
 // The animation command that turns the actor to the direction it has after elapsed of duration frames of a spin of
 // the given number of turns, steady
 static u16 FieldActorSpinTask_CalcSpinDirAcmd(f32 elapsed, f32 duration, f32 turns) {
-    u16 acmds[4] = { 1, 3, 0, 2 };
+    u16 acmds[4] = { ACMD_FACE + DIR_DOWN, ACMD_FACE + DIR_RIGHT, ACMD_FACE + DIR_UP, ACMD_FACE + DIR_LEFT };
     f32 rate = 4.0f * turns / duration;
 
     return acmds[(s32)(rate * elapsed) % 4];
@@ -493,7 +510,7 @@ static u16 FieldActorSpinTask_CalcSpinDirAcmd(f32 elapsed, f32 duration, f32 tur
 
 // The same, speeding up
 static u16 FieldActorSpinTask_CalcSpinDirAcmdQuad(f32 elapsed, f32 duration, f32 turns) {
-    u16 acmds[4] = { 1, 3, 0, 2 };
+    u16 acmds[4] = { ACMD_FACE + DIR_DOWN, ACMD_FACE + DIR_RIGHT, ACMD_FACE + DIR_UP, ACMD_FACE + DIR_LEFT };
 
     f32 rate = 4.0f * turns / (duration * duration);
 
@@ -502,7 +519,7 @@ static u16 FieldActorSpinTask_CalcSpinDirAcmdQuad(f32 elapsed, f32 duration, f32
 
 // The same, slowing down
 static u16 FieldActorSpinTask_CalcSpinDirAcmdSqrt(f32 elapsed, f32 duration, f32 turns) {
-    u16 acmds[4] = { 1, 3, 0, 2 };
+    u16 acmds[4] = { ACMD_FACE + DIR_DOWN, ACMD_FACE + DIR_RIGHT, ACMD_FACE + DIR_UP, ACMD_FACE + DIR_LEFT };
     f32 distance = 4.0f * turns;
     f32 rate = distance * distance / duration;
     f32 value = FieldAnimationCurve_Sqrt(rate, elapsed);
@@ -519,18 +536,18 @@ static BOOL FieldActorSpinTask_Callback(void *work) {
     data->frame++;
     if (data->duration < data->frame) {
         switch (data->dir) {
-        case 0:
+        case DIR_UP:
         default:
-            acmd = 0;
+            acmd = ACMD_FACE + DIR_UP;
             break;
-        case 1:
-            acmd = 1;
+        case DIR_DOWN:
+            acmd = ACMD_FACE + DIR_DOWN;
             break;
-        case 2:
-            acmd = 2;
+        case DIR_LEFT:
+            acmd = ACMD_FACE + DIR_LEFT;
             break;
-        case 3:
-            acmd = 3;
+        case DIR_RIGHT:
+            acmd = ACMD_FACE + DIR_RIGHT;
             break;
         }
         FldAct_SetAcmd(actor, acmd);
@@ -548,18 +565,18 @@ static BOOL FieldActorSpinTask_CallbackAccel(void *work) {
     data->frame++;
     if (data->duration < data->frame) {
         switch (data->dir) {
-        case 0:
+        case DIR_UP:
         default:
-            acmd = 0;
+            acmd = ACMD_FACE + DIR_UP;
             break;
-        case 1:
-            acmd = 1;
+        case DIR_DOWN:
+            acmd = ACMD_FACE + DIR_DOWN;
             break;
-        case 2:
-            acmd = 2;
+        case DIR_LEFT:
+            acmd = ACMD_FACE + DIR_LEFT;
             break;
-        case 3:
-            acmd = 3;
+        case DIR_RIGHT:
+            acmd = ACMD_FACE + DIR_RIGHT;
             break;
         }
         FldAct_SetAcmd(actor, acmd);
@@ -586,7 +603,7 @@ FieldTask *FieldPlayerMoveTask_Create(Field *field, u32 duration, VecFx32 *pos) 
         FieldTask_Create(Field_GetHeapID(field), sizeof(FieldPlayerMoveTask), FieldPlayerMoveTask_Callback);
     FieldPlayerMoveTask *data = FieldTask_GetData(task);
 
-    data->state = 0;
+    data->state = TASK_STATE_START;
     data->field = field;
     data->frame = 0;
     data->duration = duration;
@@ -600,11 +617,11 @@ static BOOL FieldPlayerMoveTask_Callback(void *work) {
     FieldActor *actor = FieldPlayer_GetActor(player);
 
     switch (data->state) {
-    case 0:
+    case TASK_STATE_START:
         FieldPlayer_GetWPos(player, &data->start);
         data->state++;
         break;
-    case 1: {
+    case TASK_STATE_UPDATE: {
         s32 duration = data->duration;
         s32 frame = data->frame + 1;
         fx32 ratio;
@@ -636,7 +653,7 @@ FieldTask *FieldActorFallTask_Create(Field *field, FieldActor *actor, u32 durati
     FieldTask *task = FieldTask_Create(Field_GetHeapID(field), sizeof(FieldActorFallTask), FieldActorFallTask_Callback);
     FieldActorFallTask *data = FieldTask_GetData(task);
 
-    data->state = 0;
+    data->state = TASK_STATE_START;
     data->field = field;
     data->frame = 0;
     data->duration = duration;
@@ -661,13 +678,13 @@ static BOOL FieldActorFallTask_Callback(void *work) {
     VecFx32 pos;
 
     switch (data->state) {
-    case 0:
+    case TASK_STATE_START:
         FieldActorFallTask_CalcFallPos(&pos, data->frame, data->duration, data->height);
         SetActorWPosOffset(actor, &pos);
         GFL_SndSEPlay(SEQ_SE_FLD_16);
         data->state++;
         break;
-    case 1:
+    case TASK_STATE_UPDATE:
         data->frame++;
         FieldActorFallTask_CalcFallPos(&pos, data->frame, data->duration, data->height);
         SetActorWPosOffset(actor, &pos);
@@ -822,7 +839,7 @@ FieldTask *FieldCameraMoveTaskTargetOffs_Create(Field *field, u32 duration, cons
                                        FieldCameraTargetMoveTaskTargetOffs_Callback);
     FieldCameraTargetOffsTask *data = FieldTask_GetData(task);
 
-    data->state = 0;
+    data->state = TASK_STATE_START;
     data->field = field;
     data->frame = 0;
     data->duration = duration;
@@ -835,11 +852,11 @@ static BOOL FieldCameraTargetMoveTaskTargetOffs_Callback(void *work) {
     FieldCamera *camera = Field_GetCameraSystem(data->field);
 
     switch (data->state) {
-    case 0:
+    case TASK_STATE_START:
         FieldCamera_CoordsGetTargetOffset(camera, &data->start);
         data->state++;
         break;
-    case 1: {
+    case TASK_STATE_UPDATE: {
         s32 duration = data->duration;
         s32 frame = data->frame + 1;
         fx32 ratio;
@@ -870,7 +887,7 @@ FieldTask *FieldCameraMoveTaskTarget_Create(Field *field, u16 duration, const Ve
     Field_GetCameraSystem(field);
     task = FieldTask_Create(heapId, sizeof(FieldCameraTargetTask), FieldCameraMoveTaskTarget_Callback);
     data = FieldTask_GetData(task);
-    data->state = 0;
+    data->state = TASK_STATE_START;
     data->field = field;
     data->frame = 0;
     data->duration = duration;
@@ -885,12 +902,12 @@ static BOOL FieldCameraMoveTaskTarget_Callback(void *work) {
     FieldCamera *camera = Field_GetCameraSystem(data->field);
 
     switch (data->state) {
-    case 0:
+    case TASK_STATE_START:
         data->transformType = FieldCamera_GetTransformType(camera);
         FieldCamera_ChangeTransformType(camera, 0);
         data->state++;
         break;
-    case 1: {
+    case TASK_STATE_UPDATE: {
         f32 progress;
         fx32 ratio;
         VecFx32 pos;
@@ -953,7 +970,7 @@ FieldTask *FieldCameraShakeTask_Create(Field *field, const FieldCameraShakeSetup
     data->field = field;
     data->camera = Field_GetCameraSystem(field);
     data->setup = *setup;
-    data->state = 0;
+    data->state = SHAKE_STATE_END_DELAY;
     return task;
 }
 
@@ -968,11 +985,11 @@ static BOOL FieldCameraShakeTask_Callback(void *work) {
         return finished;
     }
     switch (data->state) {
-    case 0:
+    case SHAKE_STATE_END_DELAY:
         FieldCamera_FinishDelay(camera);
         data->state++;
         break;
-    case 1:
+    case SHAKE_STATE_WAIT_DELAY:
         if (FieldCamera_IsDelayActive(data->camera)) {
             break;
         }
@@ -980,17 +997,17 @@ static BOOL FieldCameraShakeTask_Callback(void *work) {
         data->bind = FieldCamera_GetBind(camera);
         FieldCamera_ClearBind(camera);
         data->state++;
-    case 2: {
+    case SHAKE_STATE_SHAKE: {
         u16 angle;
 
-        setup->unk18++;
-        angle = (setup->unk18 << 16) / setup->period;
-        if (setup->unkA != 0 && setup->unk10 - setup->steps >= setup->unkA) {
-            setup->unkC++;
-            if (setup->unkC >= setup->unkE) {
-                setup->unkC = 0;
-                setup->amplitudeY -= setup->unk8;
-                setup->amplitudeX -= setup->unk6;
+        setup->frame++;
+        angle = (setup->frame << 16) / setup->period;
+        if (setup->decayStart != 0 && setup->totalSteps - setup->steps >= setup->decayStart) {
+            setup->decayTimer++;
+            if (setup->decayTimer >= setup->decayInterval) {
+                setup->decayTimer = 0;
+                setup->amplitudeY -= setup->decayY;
+                setup->amplitudeX -= setup->decayX;
                 if (setup->amplitudeY <= 0) {
                     setup->amplitudeY = 1;
                 }
@@ -999,12 +1016,12 @@ static BOOL FieldCameraShakeTask_Callback(void *work) {
                 }
             }
         }
-        if (setup->unk18 >= setup->period) {
+        if (setup->frame >= setup->period) {
             setup->steps--;
-            setup->unk18 = 0;
+            setup->frame = 0;
         }
         if (setup->steps == 0) {
-            setup->unk18 = 0;
+            setup->frame = 0;
             finished = TRUE;
         }
         if (finished) {
@@ -1029,16 +1046,16 @@ static BOOL FieldCameraShakeTask_Callback(void *work) {
             eyeOffset.y = offsetY;
             eyeOffset.z = 0;
             mode = setup->mode;
-            if (mode <= 1) {
+            if (mode <= CAMERA_SHAKE_TARGET) {
                 FieldCamera_CoordsSetTarget(camera, &target);
             }
-            if (mode == 0 || mode == 2) {
+            if (mode == CAMERA_SHAKE_BOTH || mode == CAMERA_SHAKE_EYE) {
                 FieldCamera_CoordsSetEyeOffset(camera, &eyeOffset);
             }
         }
         break;
     }
-    case 3:
+    case SHAKE_STATE_END:
         return TRUE;
     }
     return FALSE;

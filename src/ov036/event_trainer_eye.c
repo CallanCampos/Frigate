@@ -2,9 +2,11 @@
 // name is the ROM's own, from GFL_HeapAllocate's file argument. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
+#include "constants/battle.h"
 #include "field/encounter.h"
 #include "field/event_trainer_eye.h"
 #include "field/field.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_comm_actor.h"
 #include "field/field_effect.h"
@@ -19,10 +21,9 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
-// The script of a Trainer's battle, and of the Trainer whose actor uses the special script
+// The script of a Trainer's battle, and of the Trainer whose actor uses SCRID_SPECIAL_TRAINER
 #define SCRID_TRAINER_CLASH 0xee8
 #define SCRID_SPECIAL_TRAINER_CLASH 0x29f8
-#define SCRID_SPECIAL_TRAINER 0x29f9
 
 enum {
     TRAINER_EYE_SEQ_START_MOVE,
@@ -143,43 +144,43 @@ GameEvent *EventTrainerEye_CheckAll(Field *field) {
     if (EventTrainerEye_FindClashActor(field, NULL, &data) == TRUE) {
         battleCount = FieldEventProvider_CountAlivePartyMembers(Field_GetGameSystem(field));
         if (EventTrainerEye_UsesSpecialScript(data.actor) == TRUE) {
-            battleType = 0;
+            battleType = BTL_STYLE_SINGLE;
         } else {
             battleType = getBattleType(data.trainerId);
         }
-        if (battleType == 0) {
+        if (battleType == BTL_STYLE_SINGLE) {
             if (battleCount >= 1 && GetNowFollowerAllyTrID(gameData) != 0 &&
                 EventTrainerEye_FindClashActor(field, data.actor, &partner) == TRUE) {
                 event = CreateTrainerClashEvent(field, data.actor);
-                data.kind = 3;
+                data.kind = TRAINER_CLASH_WITH_PARTNER;
                 SetupTrainerClashSlot(event, 0, &data);
-                partner.kind = 3;
+                partner.kind = TRAINER_CLASH_WITH_PARTNER;
                 SetupTrainerClashSlot(event, 1, &partner);
             } else if (battleCount < 2 || EventTrainerEye_FindClashActor(field, data.actor, &partner) == FALSE) {
                 event = CreateTrainerClashEvent(field, data.actor);
-                data.kind = 0;
+                data.kind = TRAINER_CLASH_SINGLE;
                 SetupTrainerClashSlot(event, 0, &data);
             } else {
                 event = CreateTrainerClashEvent(field, data.actor);
-                data.kind = 2;
+                data.kind = TRAINER_CLASH_TWO_TRAINERS;
                 SetupTrainerClashSlot(event, 0, &data);
-                partner.kind = 2;
+                partner.kind = TRAINER_CLASH_TWO_TRAINERS;
                 SetupTrainerClashSlot(event, 1, &partner);
             }
-        } else if (battleType == 1) {
+        } else if (battleType == BTL_STYLE_DOUBLE) {
             if (battleCount >= 2) {
                 InitFieldScriptTrainerSetup(&partner, EventTrainerEye_FindPairedTrainer(data.actor, data.trainerId),
                                             data.range, data.dir);
                 event = CreateTrainerClashEvent(field, data.actor);
-                data.kind = 1;
+                data.kind = TRAINER_CLASH_DOUBLE_PAIR;
                 SetupTrainerClashSlot(event, 0, &data);
-                partner.kind = 1;
+                partner.kind = TRAINER_CLASH_DOUBLE_PAIR;
                 SetupTrainerClashSlot(event, 1, &partner);
             }
-        } else if (battleType == 2 || battleType == 3) {
+        } else if (battleType == BTL_STYLE_TRIPLE || battleType == BTL_STYLE_ROTATION) {
             if (battleCount >= 3) {
                 event = CreateTrainerClashEvent(field, data.actor);
-                data.kind = 0;
+                data.kind = TRAINER_CLASH_SINGLE;
                 SetupTrainerClashSlot(event, 0, &data);
             }
         }
@@ -191,7 +192,7 @@ int EventTrainerEyeSub_GetPlayerDistance(FieldActor *actor, u16 dir, int range, 
     GridPos pos;
     GridPos playerPos;
     int dist;
-    FieldActor *player = FindFieldActor(GetActorMModelSystem(actor), 0xff);
+    FieldActor *player = FindFieldActor(GetActorMModelSystem(actor), ACTOR_UID_PLAYER);
 
     if (player == NULL) {
         return -1;
@@ -241,12 +242,12 @@ static int EventTrainerEye_CheckActorClash(EncountSystem *encounter, FieldActor 
     u16 dir;
     u16 eyeType = EventTrainerEye_GetSightType(actor);
 
-    if (eyeType == 1 || eyeType == 2) {
-        dir = 0;
+    if (eyeType == TRAINER_SIGHT_FACING || eyeType == TRAINER_SIGHT_ALL_DIRS) {
+        dir = DIR_UP;
         range = GetActorUserParam(actor, 0);
         FldAct_GetGPos(actor, &pos);
         FldAct_GetGPos(player, &playerPos);
-        if (eyeType == 1) {
+        if (eyeType == TRAINER_SIGHT_FACING) {
             faceDir = GetActorFaceDir(actor);
             dist = EventTrainerEye_CalcLineOfSight(faceDir, range, &pos, &playerPos);
             if (dist != -1 && !EventTrainerEye_CheckPathObstacle(actor, faceDir, dist, encounter)) {
@@ -365,7 +366,7 @@ static BOOL EventTrainerEyeSub_DecideJumpOut(EventTrainerEyeWork *work) {
 
 static BOOL EventTrainerEyeSub_TurnTrainer(EventTrainerEyeWork *work) {
     if (IsAllActorAcmdFinished(work->data.actor) == TRUE) {
-        FldAct_SetAcmd(work->data.actor, GetAcmdForDir(work->data.dir, 0));
+        FldAct_SetAcmd(work->data.actor, GetAcmdForDir(work->data.dir, ACMD_FACE));
         work->seq = TRAINER_EYE_SEQ_WAIT_TURN_TRAINER;
     }
     return FALSE;
@@ -426,7 +427,7 @@ static BOOL EventTrainerEyeSub_DecideWalkOrStop(EventTrainerEyeWork *work) {
 
 static BOOL EventTrainerEyeSub_WalkOneStepToPlayer(EventTrainerEyeWork *work) {
     if (IsAllActorAcmdFinished(work->data.actor) == TRUE) {
-        FldAct_SetAcmd(work->data.actor, GetAcmdForDir(work->data.dir, 12));
+        FldAct_SetAcmd(work->data.actor, GetAcmdForDir(work->data.dir, ACMD_WALK_8F));
         work->seq = TRAINER_EYE_SEQ_DECREMENT_CLASH_DIST;
     }
     return FALSE;
@@ -456,9 +457,9 @@ static BOOL EventTrainerEyeSub_TurnPlayer(EventTrainerEyeWork *work) {
     s16 playerZ = GetGPosZ(player);
     u16 dir = GetDirFromPosToPos(playerX, playerZ, GetGPosX(work->data.actor), GetGPosZ(work->data.actor));
 
-    if (dir != GetActorFaceDir(player) && (!work->isPair || work->data.kind == 2)) {
+    if (dir != GetActorFaceDir(player) && (!work->isPair || work->data.kind == TRAINER_CLASH_TWO_TRAINERS)) {
         if (IsAllActorAcmdFinished(player) == TRUE) {
-            FldAct_SetAcmd(player, GetAcmdForDir(dir, 0));
+            FldAct_SetAcmd(player, GetAcmdForDir(dir, ACMD_FACE));
             work->seq = TRAINER_EYE_SEQ_WAIT_TURN_PLAYER;
         }
     } else {
@@ -517,7 +518,7 @@ static GameEventReturnCode EventTrainerEye_Callback(GameEvent *event, u32 *state
     return GAMEEVENT_CONTINUE;
 }
 
-// How the actor looks for the player: 1 the way it faces, 2 every way
+// How the actor looks for the player: TRAINER_SIGHT_FACING or TRAINER_SIGHT_ALL_DIRS for a Trainer
 static u16 EventTrainerEye_GetSightType(FieldActor *actor) {
     return EvType_GetSightType(GetActorEvType(actor));
 }
@@ -537,7 +538,7 @@ static BOOL EventTrainerEye_CheckPathObstacle(FieldActor *actor, u16 dir, int ra
         pos.x += dx;
         pos.z += dz;
         for (; i < range - 1; i++) {
-            if (ActorRouteCollCheck(actor, pos.x, pos.y, pos.z, dir) & ~1) {
+            if (ActorRouteCollCheck(actor, pos.x, pos.y, pos.z, dir) & ~ACTOR_COLL_WALK_AREA) {
                 return TRUE;
             }
             if (encounter != NULL && EncountState_CheckSpecialEncountPos(encounter, &pos.x)) {
@@ -546,7 +547,7 @@ static BOOL EventTrainerEye_CheckPathObstacle(FieldActor *actor, u16 dir, int ra
             pos.x += dx;
             pos.z += dz;
         }
-        if ((ActorRouteCollCheck(actor, pos.x, pos.y, pos.z, dir) & ~1) != 4) {
+        if ((ActorRouteCollCheck(actor, pos.x, pos.y, pos.z, dir) & ~ACTOR_COLL_WALK_AREA) != ACTOR_COLL_ACTOR) {
             return TRUE;
         }
         if (encounter != NULL && EncountState_CheckSpecialEncountPos(encounter, &pos.x)) {
@@ -600,7 +601,8 @@ static FieldActor *EventTrainerEye_FindPairedTrainer(FieldActor *trainer, u16 tr
     while (NextActor(actorSys, &actor, &index) == TRUE) {
         if (actor != trainer) {
             eyeType = EventTrainerEye_GetSightType(actor);
-            if ((eyeType == 1 || eyeType == 2) && trainerId == GetNPCTrainerID(actor)) {
+            if ((eyeType == TRAINER_SIGHT_FACING || eyeType == TRAINER_SIGHT_ALL_DIRS) &&
+                trainerId == GetNPCTrainerID(actor)) {
                 return actor;
             }
         }

@@ -44,11 +44,11 @@ void FesMissionHollow_Setup(FesGimmick *gimmick) {
         RivalEntry *entry = &entries[i];
 
         entries[i].id = hollows[i];
-        entry->unk1 = 0;
+        entry->female = FALSE;
         entry->selected = 1;
         entry->active = 0;
-        entry->unk4 = FesMissionHollow_GetPersonObjCode(gimmick);
-        entry->unk6 = FesMissionHollow_GetPersonUnk2(gimmick);
+        entry->species = FesMissionHollow_GetPersonObjCode(gimmick);
+        entry->form = FesMissionHollow_GetPersonUnk2(gimmick);
     }
     FesMissionHollow_Shuffle(hollows, 20, &rand);
     for (i = 0; i < 10; i++) {
@@ -56,7 +56,7 @@ void FesMissionHollow_Setup(FesGimmick *gimmick) {
     }
     FesMissionHollow_Shuffle(hollows, 10, &rand);
     for (i = 0; i < 2; i++) {
-        entries[hollows[i]].unk1 = 1;
+        entries[hollows[i]].female = TRUE;
     }
 }
 

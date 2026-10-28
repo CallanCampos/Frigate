@@ -681,8 +681,8 @@ static GameEventReturnCode InfinityDungeonRoomChange_Event(GameEvent *event, u32
             if (InfinityDungeonRoomChange_UsesFade(roomChange)) {
                 GFL_FadeSet(3, 0, 16, 4);
             } else {
-                GameEvent_ChainNext(
-                    event, CallFieldMapEntranceOutTransitionDefault(roomChange->gsys, roomChange->field, 0, 0));
+                GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(roomChange->gsys, roomChange->field,
+                                                                                    FIELD_TRANSITION_FADE_BLACK, 0));
             }
         }
         (*state)++;
@@ -725,8 +725,8 @@ static GameEventReturnCode InfinityDungeonRoomChange_Event(GameEvent *event, u32
                 FieldG3D_RestoreSurface(roomChange->field);
                 GFL_FadeSet(3, 16, 0, 4);
             } else {
-                GameEvent_ChainNext(
-                    event, CallFieldMapEntranceInTransition(roomChange->gsys, roomChange->field, 0, 0, 1, 0, 0));
+                GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(roomChange->gsys, roomChange->field,
+                                                                            FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
             }
         } else {
             FieldG3D_RestoreSurface(roomChange->field);

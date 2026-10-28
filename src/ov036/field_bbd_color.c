@@ -4,6 +4,7 @@
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_map.h"
+#include "field/zone.h"
 #include "gfl/arc.h"
 #include "gfl/billboard_actor.h"
 #include "gfl/heap.h"
@@ -68,6 +69,7 @@ void FldActMatColorPreset_Apply(FldActMatColorPreset *preset, BillboardActorScen
     BillboardActorScene_SetColEmissive(scene, &emissive);
 }
 
+// The Abyssal Ruins zone of the dive spot at x, z in zoneId, or ZONE_MAX off the dive spots
 static u16 DecideAbyssalRuinsDiveZoneByUndellaBayPos(u32 zoneId, u32 x, u32 z) {
     u32 i;
     const u16 *warp = UNDELLA_BAY_DIVE_WARPS[0];
@@ -77,7 +79,7 @@ static u16 DecideAbyssalRuinsDiveZoneByUndellaBayPos(u32 zoneId, u32 x, u32 z) {
             return warp[3];
         }
     }
-    return 0x267;
+    return ZONE_MAX;
 }
 
 u16 GetAbyssalRuinsDiveZoneID(Field *field, u16 *zoneId) {
@@ -87,7 +89,7 @@ u16 GetAbyssalRuinsDiveZoneID(Field *field, u16 *zoneId) {
     u16 z = GetGPosZ(actor);
 
     *zoneId = DecideAbyssalRuinsDiveZoneByUndellaBayPos(playerZoneId, x, z);
-    if (*zoneId != 0x267) {
+    if (*zoneId != ZONE_MAX) {
         return TRUE;
     }
     *zoneId = playerZoneId;

@@ -700,7 +700,7 @@ static void FMissionView_DrawMission(FMissionView *view) {
     BeaconViewWin_Print(&view->wins[FMISSION_VIEW_WIN_MISSION].win, view->message, (u8)x, 4, 13, PRINT_COLOR(1, 2, 13),
                         NULL, view->printNow);
     WordSetNumber(view->wordSet, 0, view->config->info.count, 4, 1, TRUE);
-    FMissionView_LoadMessage(view, view->config->info.unk10_6);
+    FMissionView_LoadMessage(view, view->config->info.targetKind);
     BeaconViewWin_Print(&view->wins[FMISSION_VIEW_WIN_GOAL].win, view->message, 0, 0, 13, PRINT_COLOR(1, 2, 13), NULL,
                         view->printNow);
 }

@@ -32,7 +32,8 @@ GameEventReturnCode EventCommTvt_Callback(GameEvent *event, u32 *state, void *da
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, field, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
         (*state)++;
         break;
     case 1:
@@ -78,7 +79,8 @@ GameEventReturnCode EventCommTvt_Callback(GameEvent *event, u32 *state, void *da
         (*state)++;
         break;
     case 8:
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, field, 0, 0, 1, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         (*state)++;
         break;
     case 9:

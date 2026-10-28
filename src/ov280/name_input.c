@@ -3159,18 +3159,18 @@ static void NameEntry_CheckChanged(NameEntryWork *work) {
     StrBuf *preset;
     int i;
 
-    work->param->unk1C = FALSE;
+    work->param->canceled = FALSE;
     previous = GFL_StrBufClone(work->param->name, HEAPID_NAME_INPUT);
     NameBox_GetString(&work->box, work->param->name);
     if (work->param->mode == NAME_ENTRY_GAME_SYNC_ID) {
         NameEntry_UpperCaseName(work->param->name);
     }
     if (GFL_StrBufCmp(previous, work->param->name)) {
-        work->param->unk1C = TRUE;
+        work->param->canceled = TRUE;
     }
     if (!NameBox_HasVisibleChar(&work->box)) {
         GFL_StrBufCopy(work->param->name, previous);
-        work->param->unk1C = TRUE;
+        work->param->canceled = TRUE;
     }
     GFL_StrBufFree(previous);
 
@@ -3197,9 +3197,9 @@ static void NameEntry_CheckChanged(NameEntryWork *work) {
     }
     if (GFL_StrBufGetCharCount(work->param->name) == 0 && work->param->mode != NAME_ENTRY_PLAYER &&
         work->param->mode != NAME_ENTRY_RIVAL) {
-        work->param->unk1C = TRUE;
+        work->param->canceled = TRUE;
     }
-    if (work->param->mode == NAME_ENTRY_POKEMON && work->param->unk1C == FALSE) {
+    if (work->param->mode == NAME_ENTRY_POKEMON && work->param->canceled == FALSE) {
         JoinAvenue_RecordActivity(12);
     }
 }

@@ -50,6 +50,14 @@ typedef struct {
     u16 padding;
 } FieldActorConfig;
 
+// A config's billboardSize: the size of the actor's billboard in pixels, by field_actor_drawdata.c's
+// ACTOR_BILLBOARD_SIZES_INT
+enum {
+    ACTOR_BILLBOARD_SIZE_32,
+    ACTOR_BILLBOARD_SIZE_16,
+    ACTOR_BILLBOARD_SIZE_64,
+};
+
 // An actor's place on a rail, from swan's ActorPositionRail. unk0 is ACTOR_RAIL_POS_SET once the place is set
 typedef struct {
     u32 unk0;
@@ -138,8 +146,14 @@ void SetZoneNPCMdlID(EventData *eventData, u16 npcId, u16 objCode);
 void SetZoneNPCSCRID(EventData *eventData, u16 npcId, u16 scriptId);
 void GetNPCMdlInfoForOBJCODE(const MMSys *actorSystem, u16 objCode, FieldActorConfig *config);
 void LoadMModelSystemInfoCache(MMSys *mmSys, s32 index);
+// The flag that keeps an actor's face direction, which CheckSetActorFaceDir leaves alone while it is set
+#define ACTOR_FLAG_FACE_DIR_LOCK 0x8
+// The flag of an actor that moves on rails, which SetRailActorFlag sets
+#define ACTOR_FLAG_RAIL 0x2000
 void SetActorFlag(FieldActor *actor, u32 flag);
 void ClearActorFlag(FieldActor *actor, u32 flag);
+// The movement flag that hides an actor's shadow, which the actor terrain effects set off a shadow tile
+#define ACTOR_MOVEMENT_FLAG_HIDE_SHADOW 0x8000
 void SetActorMovementFlag(FieldActor *actor, u32 flag);
 void ClearActorMovementFlag(FieldActor *actor, u32 flag);
 void FldAct_InvokeUpdateCallback(FieldActor *actor);
@@ -495,7 +509,14 @@ typedef struct {
 void FldAct_InitMoveProcGrid(FieldActor *actor);
 void FldAct_UpdateMoveProcGrid(FieldActor *actor);
 void ActorTerrainEffect_ApplyAll(FieldActor *actor);
-// The collision flags at a grid position, with the world position's y
+// The collision flags at a grid position, with the world position's y: the position is outside the actor's walk area,
+// the way there is blocked, another actor stands there, its height is too far from y or the map has none there, and
+// it is out of the map's bounds
+#define ACTOR_COLL_WALK_AREA 0x1
+#define ACTOR_COLL_BLOCKED 0x2
+#define ACTOR_COLL_ACTOR 0x4
+#define ACTOR_COLL_HEIGHT 0x8
+#define ACTOR_COLL_OUT_OF_BOUNDS 0x10
 u32 ActorRouteCollCheckCore(FieldActor *actor, const VecFx32 *position, s16 x, s16 y, s16 z, u16 dir);
 u32 ActorRouteCollCheck(FieldActor *actor, s16 x, s16 y, s16 z, u16 dir);
 BOOL CheckActorNewPosOtherActorCollision(const FieldActor *actor, s16 x, s16 y, s16 z);
@@ -642,7 +663,12 @@ const FieldActorResGroup *GetNPCMdlInfoG2DRscGroup(const FieldActorConfig *confi
 const FieldActorResGroup *GetNPCMdlInfoG3DRscGroup(const FieldActorConfig *config);
 // The object code that an object code stands for, through the work values of WKOBJCODE00 and on
 u16 ResolvePossibleWKOBJCODE(EventWork *eventWork, u16 objCode);
-// How an actor of the event type looks for the player: the types that see only the way they face give 1
+enum {
+    TRAINER_SIGHT_FACING = 1,
+    TRAINER_SIGHT_ALL_DIRS = 2,
+};
+// How an actor of the event type looks for the player: the types that see only the way they face give
+// TRAINER_SIGHT_FACING, and the others their own type, of which TRAINER_SIGHT_ALL_DIRS looks every way
 u16 EvType_GetSightType(u16 type);
 void MoveCodeNone_Init(FieldActor *actor);
 void MoveCodeNone_Move(FieldActor *actor);

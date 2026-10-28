@@ -140,7 +140,7 @@ L_01EE:
     WorkSetConst 0x8026, 0
     WorkSetConst 0x8027, 0
     RecordAdd 23, 1
-    HollowRivalGenMsgID 0x8021, 0x8026
+    TVGenProgramMsgID 0x8021, 0x8026
     SystemMsg 0x8026, 2
     LastKeyWait
     TVCheckCommercial 0x8022, 0x8027

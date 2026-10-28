@@ -21,7 +21,8 @@ enum {
 typedef struct {
     // Which of the kind's people the room has
     u32 index;
-    u32 unk4;
+    // The Trainer's ID, or 0 for anyone else
+    u32 trainerId;
     // The object code of the person
     u32 objCode;
     // 0 for a Trainer, 1 for a person and 2 for a pair of them
@@ -32,7 +33,8 @@ typedef struct {
 } PleasureBoatRoom;
 
 struct PleasureBoat {
-    u32 unk0;
+    // Set when a period ends, until PleasureBoat_AckEvent plays its sound and counts it
+    u32 periodEnded;
     // The clock, which counts periods of 1350
     s16 clock;
     // How many Trainers are aboard, by the day of the week
@@ -42,11 +44,12 @@ struct PleasureBoat {
     PleasureBoatRoom rooms[PLEASURE_BOAT_ROOM_COUNT];
     // The answers to PLEASURE_BOAT_INFO_STARBOARD_PEOPLE to PLEASURE_BOAT_INFO_UNK_3
     u8 infoCounts[4];
-    u32 unk1B4;
+    // Set by PleasureBoat_StopClock
+    u32 clockStopped;
 };
 
-// Sets up a cruise, with overlay 89
-PleasureBoat *PleasureBoat_Create(BOOL a0);
+// Sets up a cruise, with overlay 89, and with the second table of Trainers when altTrainers is set
+PleasureBoat *PleasureBoat_Create(BOOL altTrainers);
 // Frees the cruise and clears the pointer
 void PleasureBoat_Free(PleasureBoat **boat);
 // Returns PLEASURE_BOAT_INFO_*

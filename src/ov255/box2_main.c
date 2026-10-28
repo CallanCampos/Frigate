@@ -1353,7 +1353,7 @@ static BOOL Box2Main_PokeMoveCheck(Box2SysWork *syswk, u32 getPos, u32 putPos) {
     }
 
     if (syswk->param->mode == 4) {
-        if (syswk->param->unk14 == 1) {
+        if (syswk->param->battleBoxLocked == 1) {
             syswk->app->moveErr = BOX2_MOVE_ERR_BATTLE_BOX_LOCKED;
             return FALSE;
         }
@@ -2676,8 +2676,8 @@ int Box2Main_PokeStatusCall(Box2SysWork *syswk) {
     param->page = PSTATUS_PAGE_INFO;
     param->gameData = syswk->param->gameData;
     param->trainerData = syswk->param->trainerData;
-    param->isNationalDex = syswk->param->unk1C;
-    if (syswk->param->unk14 == 1) {
+    param->isNationalDex = syswk->param->isNationalDex;
+    if (syswk->param->battleBoxLocked == 1) {
         param->mode = PSTATUS_MODE_LOCK_MARKINGS;
     } else {
         param->mode = PSTATUS_MODE_NORMAL;
@@ -2733,10 +2733,10 @@ int Box2Main_NameInputCall(Box2SysWork *syswk) {
 int Box2Main_NameInputExit(Box2SysWork *syswk) {
     Box2NameInputWork *work = syswk->subProcWork;
 
-    if (work->param->unk1C == 0) {
+    if (work->param->canceled == 0) {
         getBoxNameFromStrbuf(syswk->param->boxes, syswk->tray, work->param->name);
     }
-    syswk->subRet = work->param->unk1C;
+    syswk->subRet = work->param->canceled;
     NameEntryParam_Free(work->param);
     GFL_StrBufFree(work->name);
     GFL_HeapFree(syswk->subProcWork);
@@ -2816,7 +2816,7 @@ BOOL Box2Main_VFuncPokeMoveTouchParty(Box2SysWork *syswk) {
             if (Box2Frame_IsPartyAtLeft(syswk->app->bgWinFrame) == TRUE) {
                 pos = PartyPokePutAreaCheck(syswk->app->tpx, syswk->app->tpy, sPartyPokeAreaRight);
             }
-            if (syswk->param->mode == 4 && syswk->param->unk14 == 1) {
+            if (syswk->param->mode == 4 && syswk->param->battleBoxLocked == 1) {
                 pos = BOX2_GET_NONE;
                 syswk->app->moveErr = BOX2_MOVE_ERR_BATTLE_BOX_LOCKED;
             }
@@ -4811,7 +4811,7 @@ BOOL Box2Main_VFuncRangeMoveTouch(Box2SysWork *syswk) {
             if (pos == BOX2_GET_NONE) {
                 pos = TrayPokePutAreaCheck(syswk->app->tpx, syswk->app->tpy);
             }
-            if (syswk->param->mode == 4 && syswk->param->unk14 == 1) {
+            if (syswk->param->mode == 4 && syswk->param->battleBoxLocked == 1) {
                 pos = BOX2_GET_NONE;
                 syswk->app->moveErr = BOX2_MOVE_ERR_BATTLE_BOX_LOCKED;
             }

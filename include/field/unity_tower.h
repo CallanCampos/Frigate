@@ -122,6 +122,8 @@ u8 UnityTowerVisitor_GetCountry(PlayerInfo *playerInfo);
 u32 UnityTowerSurvey_RegisterTrade(UnityTowerSurveySave *save, UnityTowerVisitor *visitor);
 void Scrcmd_FillPartnerCandidates(GameSystem *gsys, s32 floor, u32 value);
 void Scrcmd_CollectPartnersByLanguage(UnityTowerSurveySave *save, UnityTowerFloor *output, s32 floor, u32 value);
+// The survey's index of the floor's candidate, or UNITY_TOWER_HISTORY_INDEX_NONE when there is none
+#define UNITY_TOWER_HISTORY_INDEX_NONE 0xff
 u32 Scrcmd_GetPartnerCandidateHistoryIndex(UnityTowerFloor *output, u32 index);
 u32 Scrcmd_CalcPartnerGreetingIndex(u32 gender, u32 id, u32 province, u32 a3, u32 hasProvince);
 void UnityTowerSave_Init(UnityTowerFloor *save);

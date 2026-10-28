@@ -19,8 +19,16 @@ void FieldSaveanime_Stop(FieldSaveAnime *effect);
 void FieldSaveanime_Delete(FieldSaveAnime *effect);
 
 // fldeff_emotion_bubble.c: an emotion bubble over an actor's head, by kind: "!", "?", a music note and "...", which has
-// no sound. playSE plays the bubble's sound. The first function's bubble stays when it is done, until its owner ends
-// it, and the second's ends itself. Then whether a bubble is done, which a NULL one is
+// no sound
+enum {
+    EMOTION_BUBBLE_EXCLAMATION,
+    EMOTION_BUBBLE_QUESTION,
+    EMOTION_BUBBLE_NOTE,
+    EMOTION_BUBBLE_ELLIPSIS,
+    EMOTION_BUBBLE_KIND_COUNT,
+};
+// playSE plays the bubble's sound. The first function's bubble stays when it is done, until its owner ends it, and
+// the second's ends itself. Then whether a bubble is done, which a NULL one is
 FieldEffectTask *FldeffEmotionBubble_SetActor(FieldEffects *effects, FieldActor *actor, u32 kind, BOOL playSE);
 FieldEffectTask *FldeffEmotionBubble_StartHeld(FieldEffects *effects, FieldActor *actor, u32 kind, BOOL playSE);
 BOOL FldeffEmotionBubble_IsFinished(FieldEffectTask *task);
@@ -56,18 +64,60 @@ void FldeffDust_Start(FieldActor *actor, FieldEffects *effects);
 // The dust in front of an actor
 void FldeffDust_StartFacing(FieldActor *actor, FieldEffects *effects);
 void GrassTask_Start(FieldEffects *effects, FieldActor *actor, BOOL animate, int kind);
-// fldeff_footmark.c: the marks an actor leaves, by kind: footprints in sand (0) and snow (2), the tracks of actors
-// whose footprint type is 2 in sand (1) and snow (3), and tracks in deep sand (4). Tracks turn with the actor
+// fldeff_footmark.c: the marks an actor leaves, by kind: footprints in sand and snow, the tracks of actors whose
+// footprint type is 2 in sand and snow, and tracks in deep sand. Tracks turn with the actor. The actor's map
+// attributes pass FOOTMARK_KIND_MAX for no mark
+enum {
+    FOOTMARK_KIND_SAND,
+    FOOTMARK_KIND_SAND_TRACKS,
+    FOOTMARK_KIND_SNOW,
+    FOOTMARK_KIND_SNOW_TRACKS,
+    FOOTMARK_KIND_DEEP_SAND_TRACKS,
+    FOOTMARK_KIND_MAX,
+};
 void Footmark_SetActor(FieldActor *actor, FieldEffects *effects, u32 kind);
+// fldeff_reflect.c: an actor's reflection, by kind: in water, whose width swings, and in a mirror floor or ice, which
+// stays still
+enum {
+    REFLECT_KIND_WATER = 1,
+    REFLECT_KIND_MIRROR,
+};
 void ReflectTask_SetActor(MMSys *system, FieldActor *actor, FieldEffects *effects, u32 kind);
-void FldeffRipple_Start(FieldEffects *effects, FieldActor *actor, u32 arg2, u32 arg3);
+void FldeffRipple_Start(FieldEffects *effects, FieldActor *actor, u32 big, u32 atInit);
 void FldeffSplash_AddModel(FieldEffects *effects, FieldActor *actor);
 void D06Electric_StartSpark(FieldActor *actor, FieldEffects *effects);
 void FldeffLeaves_Start(FieldEffects *effects, FieldActor *actor);
 
-// field_effect.c: the effects a map has loaded, by ID, and the tasks that play them
+// field_effect.c: the effects a map has loaded, by ID, and the tasks that play them. An ID is the effect's slot in
+// field_effect.c's table, named after the file whose load and free functions fill it
 enum {
-    FLDEFF_MAX = 25,
+    FLDEFF_SHADOW,
+    FLDEFF_DUST,
+    FLDEFF_GRASS,
+    FLDEFF_SURF_POKEMON,
+    FLDEFF_EMOTION_BUBBLE,
+    FLDEFF_FOOTMARK,
+    FLDEFF_REFLECT,
+    FLDEFF_RIPPLE,
+    FLDEFF_SURF_POKEMON_SPLASH,
+    FLDEFF_ROCK_SMASH,
+    FLDEFF_D06_ELECTRIC,
+    FLDEFF_CUT,
+    FLDEFF_FISHING,
+    FLDEFF_BTRAIN,
+    FLDEFF_HIDE,
+    FLDEFF_BUBBLE,
+    FLDEFF_SPLASH,
+    FLDEFF_LEAVES,
+    FLDEFF_FES_SPARKLE,
+    // fldeff_encount.c's phenomena, in the order of field_map.h's ENCOUNT_EFFECT_* that play them
+    FLDEFF_ENCOUNT_GRASS,
+    FLDEFF_ENCOUNT_REALLY_TALL_GRASS,
+    FLDEFF_ENCOUNT_DUST_CLOUD,
+    FLDEFF_ENCOUNT_WATER_0,
+    FLDEFF_ENCOUNT_WATER_1,
+    FLDEFF_ENCOUNT_FLYING_SHADOW,
+    FLDEFF_MAX,
     // The ID of an empty slot, and of the empty last entry of the effects' table
     FLDEFF_NONE = FLDEFF_MAX,
 };
@@ -88,8 +138,8 @@ typedef struct {
 
 struct FieldEffectTask {
     BOOL active;
-    u32 param1;
-    void *param2;
+    u32 mode;
+    void *params;
     VecFx32 pos;
 #ifdef PLATFORM_PC
     // The tasks' work holds pointers, which a host aligns to 8 bytes; after param2 and pos it would start 4 bytes past
@@ -121,7 +171,7 @@ void *FieldEffects_GetHandleData(FieldEffects *effects, u32 id);
 void FieldEffects_TCBManagerInit(FieldEffects *effects, u32 count);
 // Start a task, at pos if it isn't NULL
 FieldEffectTask *FieldEffects_TCBCreate(FieldEffects *effects, const FieldEffectTaskVTable *vtable, const VecFx32 *pos,
-                                        u32 param1, void *param2, u32 priority);
+                                        u32 mode, void *params, u32 priority);
 // End a task, update it, and its parameters, position and work
 void FieldEffects_DeleteObject(FieldEffectTask *task);
 void FieldEffects_UpdateObject(FieldEffectTask *task);
@@ -133,8 +183,16 @@ void *FieldEffects_GetObjectWork(FieldEffectTask *task);
 void FieldEffects_SetLuminanceTable(FieldEffects *effects, const u8 *table);
 void FieldEffects_ApplyLuminanceTable(FieldEffects *effects, G3DResource *resource);
 
-// fldeff_surf_pokemon.c: the Pokémon an actor surfs on, facing dir at pos, and how it follows the actor (0: it doesn't,
-// 1: it bobs under the actor, 2: the actor's offset is left alone), which can change; and whether its wake shows
+// fldeff_surf_pokemon.c: the Pokémon an actor surfs on, facing dir at pos, and how it follows the actor, which can
+// change; and whether its wake shows
+enum {
+    // It stays where it is
+    SURF_POKEMON_FOLLOW_NONE,
+    // It bobs under the actor, which it lifts by its draw offset
+    SURF_POKEMON_FOLLOW_BOB,
+    // It follows the actor and leaves the actor's draw offset alone, without its wake
+    SURF_POKEMON_FOLLOW_KEEP_OFFSET,
+};
 FieldEffectTask *FldeffSurfPokemon_Start(FieldEffects *effects, u16 dir, const VecFx32 *pos, FieldActor *actor,
                                          u32 mode);
 void FldeffSurfPokemon_SetFollowMode(FieldEffectTask *task, u8 mode);
@@ -146,7 +204,7 @@ FieldEffectTask *FldeffSurfPokemonSplash_StartAtPos(FieldEffects *effects, u32 k
 BOOL FldeffSurfPokemonSplash_IsFinished(FieldEffectTask *task);
 // The effects that every map loads, and their count
 extern const u32 STATIC_LOADED_FIELD_EFFECT_IDS[21];
-extern const u32 data_ov036_021d0388;
+extern const u32 STATIC_LOADED_FIELD_EFFECT_COUNT;
 
 // Each effect's load and free functions, in their own files
 void *FieldEffect_Shadow_Create(FieldEffects *effects, HeapID heapId);

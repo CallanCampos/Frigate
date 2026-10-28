@@ -55,7 +55,7 @@ void FldeffBubble_Start(FieldActor *actor, FieldEffects *effects) {
     BubbleTaskParams params;
     VecFx32 pos;
 
-    params.effect = FieldEffects_GetHandleData(effects, 15);
+    params.effect = FieldEffects_GetHandleData(effects, FLDEFF_BUBBLE);
     params.actor = actor;
     CopyActorWPos(actor, &pos);
     FieldEffects_TCBCreate(effects, &BUBBLE_TASK_VTABLE, &pos, 0, &params, 0);
@@ -233,7 +233,7 @@ void FldeffBubble_DrawBubble(Bubble *bubble, G3DActor *actor) {
 u16 FldeffBubble_GetFacingVector(FieldActor *actor, VecFx16 *dir) {
     u16 faceDir = GetActorFaceDir(actor);
 
-    if (!CheckActorFlag(actor, 0x2000)) {
+    if (!CheckActorFlag(actor, ACTOR_FLAG_RAIL)) {
         dir->y = 0;
         dir->x = GetDirectionVectorCompX(faceDir);
         dir->z = GetDirectionVectorCompZ(faceDir);

@@ -689,11 +689,11 @@ static u32 FieldEncount_GenPID(const EncountManager *manager, PersonalData *pers
         }
     }
     if (param->shinyLock == WILD_SHINY_NEVER) {
-        shiny = 0;
+        shiny = PID_RARE_NEVER;
     } else if (param->shinyLock == WILD_SHINY_FORCED) {
-        shiny = 1;
+        shiny = PID_RARE_ALWAYS;
     } else {
-        shiny = 2;
+        shiny = PID_RARE_RANDOM;
     }
     pid = PML_GenPID(manager->trainerId, param->species, param->form, sex, 2, shiny);
     if (param->shinyLock != WILD_SHINY_NEVER && param->shinyLock != WILD_SHINY_FORCED) {

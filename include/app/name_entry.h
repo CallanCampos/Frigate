@@ -46,8 +46,8 @@ typedef struct {
     BoxSaveAccessor *unk10;
     u32 unk14;
     u32 maxLength;
-    // 1 when the name is to be left as it was
-    u32 unk1C;
+    // Set when the name is to be left as it was, unchanged or empty (NameEntryParam_IsCanceled)
+    u32 canceled;
     // The name, which starts as a default
     StrBuf *name;
     // The save data that the new game creates in the background

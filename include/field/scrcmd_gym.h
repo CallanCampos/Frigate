@@ -13,7 +13,7 @@ BOOL s025D_GymElecSetProgress(VM *vm, FieldScriptEnv *env);
 BOOL s025F_GymElecSetStage(VM *vm, FieldScriptEnv *env);
 BOOL s0268_GymInsectPlayObject(VM *vm, FieldScriptEnv *env);
 BOOL s0269_GymInsectShowEffect(VM *vm, FieldScriptEnv *env);
-BOOL ScrcmdFieldGimmickPlateDoors_StartDoorEvent(VM *vm, FieldScriptEnv *env);
+BOOL s018C_DriftveilGymCallElevator(VM *vm, FieldScriptEnv *env);
 BOOL s018D_DriftveilGymCallFreight(VM *vm, FieldScriptEnv *env);
 BOOL s018E_DriftveilLiftCallMove(VM *vm, FieldScriptEnv *env);
 BOOL s0186_DriftveilGymPrepareFreight(VM *vm, FieldScriptEnv *env);
@@ -33,7 +33,7 @@ BOOL s0292_VirbankGymSetActorFlag(VM *vm, FieldScriptEnv *env);
 BOOL s02A2_HumilauGymPlayLeaderSplash(VM *vm, FieldScriptEnv *env);
 BOOL s02A3_HumilauGymPlayLeaderWaves(VM *vm, FieldScriptEnv *env);
 BOOL s017C_RollerCoasterCallSwitch(VM *vm, FieldScriptEnv *env);
-BOOL ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript(VM *vm, FieldScriptEnv *env);
+BOOL s017D_RollerCoasterSetCarIntroSeen(VM *vm, FieldScriptEnv *env);
 BOOL s024D_RollerCoasterAmbienceStart(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_GYM_H

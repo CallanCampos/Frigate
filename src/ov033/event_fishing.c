@@ -216,7 +216,7 @@ GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, voi
     case 10:
         RecordAddOne(work->records, 8);
         JoinAvenue_RecordActivity(13);
-        battleMode = work->isPhenomenon == 1 ? 1 : 4;
+        battleMode = work->isPhenomenon == 1 ? ENCOUNT_MODE_EFFECT : ENCOUNT_MODE_FISHING;
         next = EventWildBattleCall_Create(work->gsys, work->field, work->battleSetup, 0, battleMode);
         GameEvent_Replace(event, next);
         return GAMEEVENT_CONTINUE;

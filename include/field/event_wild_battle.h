@@ -10,6 +10,9 @@ enum {
     ENCOUNT_MODE_NORMAL,
     ENCOUNT_MODE_EFFECT,
     ENCOUNT_MODE_SWEET_SCENT,
+    // The fishing event's mode for a bite off a calm spot, which takes the water's effect and BGM; a bite off a
+    // rippling spot is ENCOUNT_MODE_EFFECT
+    ENCOUNT_MODE_FISHING = 4,
 };
 
 GameEvent *EventWildBattleCall_CreateRandom(EncountSystem *encountSystem, u32 mode);

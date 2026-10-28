@@ -358,7 +358,7 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
         field->fieldEffects = FieldEffects_Create(field, 0x19, field->heapId);
         FieldEffects_TCBManagerInit(field->fieldEffects, 0x5e);
         FieldEffects_SetLuminanceTable(field->fieldEffects, FieldPalaceSys_GetLuminanceTable(field->palaceSys));
-        FieldEffects_Load(field->fieldEffects, STATIC_LOADED_FIELD_EFFECT_IDS, data_ov036_021d0388);
+        FieldEffects_Load(field->fieldEffects, STATIC_LOADED_FIELD_EFFECT_IDS, STATIC_LOADED_FIELD_EFFECT_COUNT);
         if (GetZoneIsUnionRoom(field->zoneId) == TRUE || IsZone150Or151(field->zoneId) == TRUE) {
             field->unionEffect = UnionEff_Create(field->heapId);
         }
@@ -1498,7 +1498,7 @@ fx32 Field_CalcActorYOffset(Field *field) {
 
 u32 GetZoneFogIndexAll(Field *field, u16 zoneId) {
     if (zoneId == ZONE_OPELUCID_CITY && !GameData_IsMapReplaceEventSet(field->gameData, 0)) {
-        return 0xfffffff;
+        return ZONE_FOG_NONE;
     }
     return GetZoneFogIndex(zoneId);
 }

@@ -66,14 +66,9 @@ struct RailLine {
 // A camera of the rails: the camera function to call, and its parameters
 struct RailCamera {
     u32 funcId;
-    s32 unk4;
-    s32 unk8;
-    s32 unkC;
-    s32 unk10;
-    s32 unk14;
-    s32 unk18;
-    s32 unk1C;
-    s32 unk20;
+    // The function's parameters, which each reads as its own: a pitch, yaw and zoom, an eye and a target, or an angle,
+    // a distance and the targets it moves between
+    s32 params[8];
 };
 
 // How a line bends: the function pair that converts between rail and world positions, and the center of its arc
@@ -144,7 +139,8 @@ struct RailUnit {
     u16 pendingSpeedIndex;
     u8 direction;          // Placement/accepted move direction, distinct from dir in the stored rail position
     u8 lastMoveSpeedIndex; // Accepted request speed index; placement initializes it to 1
-    u8 unk34;
+    // Set by the frame whose pending move went along the rail
+    u8 stepped;
     VecFx32 calcPos;
     VecFx32 prevCalcPos;
     VecFx32 nextVec;
@@ -271,9 +267,10 @@ RailCamera *GetRailCameraByPoint(RailUnit *unit, RailPoint *point);
 s32 FieldRailSystem_RoundToGrid(s32 value);
 // Whether two positions are within dist of each other across and half a tile up or down
 BOOL FieldRailSystem_IsPosNear(const VecFx32 *a, const VecFx32 *b, fx32 dist);
-// Writes the unit's rail position to three script variables, or sets it from three values
-void SetWkToActorRailPos(const RailUnit *unit, u16 *a1, u16 *a2, u16 *a3);
-void RailUnit_SetLineLocation(RailUnit *unit, u16 a1, u16 a2, u16 a3);
+// Writes the unit's rail position to three script variables, or sets it from three values: the line, the steps along
+// it and the steps across it from its edge
+void SetWkToActorRailPos(const RailUnit *unit, u16 *lineIndex, u16 *front, u16 *side);
+void RailUnit_SetLineLocation(RailUnit *unit, u16 lineIndex, u16 front, u16 side);
 // field_rail_func.c: the curves' conversions between rail and world positions
 void RailMath_RailToWorldNoCurve(RailUnit *unit, VecFx32 *out);
 void RailMath_RailToWorldSlerpXZ(RailUnit *unit, VecFx32 *out);

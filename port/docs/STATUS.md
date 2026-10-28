@@ -32,11 +32,40 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: validate the frozen 79-commit field naming sync
+
+- **Upstream:** frozen `fada8baae349`, 79 commits after `f71f5fe61d`; PR 62 remains a proposal until protected merge.
+  Reviewed Frigate base is `43eaf0429a`. No later upstream commits or experimental reader/service features enter.
+- **Port:** `PORT_SHA`, real two-parent upstream merge with the complete Upstream-Commit trailer.
+- **ROM (T0):** fresh signed-runtime configure/Ninja passes both original US hashes with zero compiler warnings:
+  B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  No manual decomp-config changes; complete compiled files and final ROMs supply the neutrality proof.
+- **Host build/tests (T1/T2):** fresh arm64 macOS RelWithDebInfo all-target builds pass. Complete suites finish
+  B2 357 passed/28 explicit skips of 385 and W2 354/28 of 382, zero failures. Both actual assembly oracles pass
+  five of five cases without skips. Candidate source hashes remain fixed throughout both suites.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** registered replay, save, reference-hash and
+  timing checks pass within those suites; no new whole-game or general timing-parity claim. Existing inputs,
+  seeds, goldens, masks, performance budgets and fatal sanitizer policy remain unchanged.
+- **Tiers/trap stubs:** no fresh progress scan or game implementation claim. The separate unfinished ROM reader
+  and backup WRITE service remain outside this proposal.
+- **64-bit warnings:** the pointer guard passes: 365 sites/229 keys (real 66, harmless 123, handled 141,
+  unreachable 35), all 1,711 files compiled, zero missing. No baseline edit.
+- **Work done:** resolve exactly three C conflicts: upstream name-entry enums plus native-width Join Avenue
+  values, the renamed Teleport argument plus native-size work, and the new bitmap-conversion states alongside
+  the existing host VBlank upload-buffer owner. Preserve automatic merges of all other pointer/sizeof adaptations.
+  All 206 other incoming paths match Git's automatic merge; 209 incoming paths total, no path renames or workflows.
+  Pinned clang-format 23.1.1 passes all 198 changed original C/headers; strict style, style fixtures, symbol-name
+  dry run and nonmatching-row validation pass. No cross-repository reference override is used.
+- **Next:** publish the resolved head as a fast-forward of the existing App draft, then exact-head owner local
+  verification, explicit source approval and all required hosted checks before normal protected merge of PR 62.
+- **Blockers:** published-head and hosted gates remain required; no human approval blocks this work. Faithful
+  native timing and later story coverage remain unfinished. Spanish issue 45 still lacks a locally available dump.
+
 ## 2026-10-28: integrate the reviewed controller into the bounded field sync
 
 - **Upstream:** frozen `f71f5fe61d`, still the same 36 commits in PR 60. Reviewed main is now `ad54a31b4f`,
   the normal PR 61 merge after all 14 checks passed. No later upstream commits or experimental SDK reader enter.
-- **Port:** `PORT_SHA`, a real merge of that reviewed main into companion `1b76a05ca0` on the App's original
+- **Port:** `0d11d8e74e`, a real merge of that reviewed main into companion `1b76a05ca0` on the App's original
   two-parent proposal. The separately preserved private 25-commit merge remains outside this graph.
 - **ROM (T0):** fresh combined-tree signed-runtime configure/Ninja passes both original US hashes, zero warnings:
   B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.

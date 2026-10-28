@@ -30,17 +30,29 @@ static const FieldAmbientSound FIELD_AMBIENT_SOUNDS[] = {
     { SEQ_SE_GYM_H02, TRUE },  { SEQ_SE_SW_CATTLEYA_03, TRUE },
 };
 
+// The steps of a subscreen change: request it once the subscreen is ready, then wait until it is ready again
+enum {
+    SUBSCREEN_CHANGE_STATE_REQUEST,
+    SUBSCREEN_CHANGE_STATE_WAIT,
+};
+
+// The word pairs that s01F9_CheckPmsWordPair checks a sentence's two words against, named by their words
+enum {
+    PMS_WORD_PAIR_EVERYONE_HAPPY = 1,
+    PMS_WORD_PAIR_SIMPLE_CONNECTION,
+};
+
 static GameEventReturnCode EventFieldSubscreenChange_Callback(GameEvent *event, u32 *state, void *data) {
     EventFieldSubscreenChange *change = data;
 
     switch (*state) {
-    case 0:
+    case SUBSCREEN_CHANGE_STATE_REQUEST:
         if (FieldSubscreen_IsReady(change->subscreen)) {
             FieldSubscreen_ReqChange(change->subscreen, change->mode);
             (*state)++;
         }
         break;
-    case 1:
+    case SUBSCREEN_CHANGE_STATE_WAIT:
         if (FieldSubscreen_IsReady(change->subscreen)) {
             return GAMEEVENT_DONE;
         }
@@ -84,14 +96,14 @@ BOOL FieldScriptSubEventFinish_Subscreen(FinishScriptSubEventsWork *work, u32 *s
     FieldSubscreen *subscreen = Field_GetSubscreen(fieldWork->field);
 
     switch (*state) {
-    case 0:
+    case SUBSCREEN_CHANGE_STATE_REQUEST:
         if (FieldSubscreen_IsReady(subscreen)) {
             FieldSubscreen_ReqChange(subscreen, FLD_SUBSCREEN_ID_DEFAULT);
             FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_SUBSCREEN);
             (*state)++;
         }
         break;
-    case 1:
+    case SUBSCREEN_CHANGE_STATE_WAIT:
         if (FieldSubscreen_IsReady(subscreen)) {
             return TRUE;
         }
@@ -100,7 +112,7 @@ BOOL FieldScriptSubEventFinish_Subscreen(FinishScriptSubEventsWork *work, u32 *s
     return FALSE;
 }
 
-BOOL Scrcmd_CheckPmsWordPair(VM *vm, FieldScriptEnv *env) {
+BOOL s01F9_CheckPmsWordPair(VM *vm, FieldScriptEnv *env) {
     u16 kind = ScriptReadAny(vm, env);
     u16 word1 = ScriptReadAny(vm, env);
     u16 word2 = ScriptReadAny(vm, env);
@@ -109,11 +121,11 @@ BOOL Scrcmd_CheckPmsWordPair(VM *vm, FieldScriptEnv *env) {
     u16 second;
 
     switch (kind) {
-    case 1:
+    case PMS_WORD_PAIR_EVERYONE_HAPPY:
         first = PMS_WORD_PEOPLE_EVERYONE;
         second = PMS_WORD_FEELINGS_HAPPY;
         break;
-    case 2:
+    case PMS_WORD_PAIR_SIMPLE_CONNECTION:
         first = PMS_WORD_FEELINGS_SIMPLE;
         second = PMS_WORD_CONNECTION_CONNECTION;
         break;

@@ -2,6 +2,7 @@
 // Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "constants/arc.h"
+#include "constants/places.h"
 #include "constants/text_banks.h"
 #include "constants/version.h"
 #include "field/field.h"
@@ -27,6 +28,41 @@
 #include "system/game_system.h"
 #include "system/printsys.h"
 #include "system/version.h"
+
+// The banner's modes: waiting for a request, loading the name and the window, sliding the letters in, showing them,
+// and sliding them out
+enum {
+    PLACE_NAME_MODE_IDLE,
+    PLACE_NAME_MODE_PREPARE,
+    PLACE_NAME_MODE_FADE_IN,
+    PLACE_NAME_MODE_FADE_IN_WAIT,
+    PLACE_NAME_MODE_LETTERS_LAUNCH,
+    PLACE_NAME_MODE_LETTERS_LAND,
+    PLACE_NAME_MODE_FADE_OUT,
+};
+
+// The steps of PLACE_NAME_MODE_PREPARE, a frame each: the name, a frame's wait, the window's screen, palette, chars
+// and screen, its BG and window planes, then the letters, which it waits for
+enum {
+    PLACE_NAME_PREPARE_LOAD_MESSAGE,
+    PLACE_NAME_PREPARE_WAIT,
+    PLACE_NAME_PREPARE_CLEAR_SCREEN,
+    PLACE_NAME_PREPARE_PALETTE,
+    PLACE_NAME_PREPARE_CHARS,
+    PLACE_NAME_PREPARE_SCREEN,
+    PLACE_NAME_PREPARE_WINDOW,
+    PLACE_NAME_PREPARE_LETTERS,
+    PLACE_NAME_PREPARE_WAIT_LETTERS,
+};
+
+// The steps of the modes that start something and then wait for it
+enum {
+    PLACE_NAME_STEP_START,
+    PLACE_NAME_STEP_WAIT,
+};
+
+// The place names the message bank has: a zone's past them shows none
+#define PLACE_NAME_COUNT 154
 
 // The place name banner of the field
 struct PlaceName {
@@ -149,7 +185,7 @@ void PlaceName_SaveZoneToSave(PlaceName *wk);
 u16 PlaceName_GetReqZoneID(PlaceName *wk);
 void SetPlaceNameDispZone(PlaceName *wk, u16 zoneId);
 StrBuf *PlaceName_GetName(PlaceName *wk);
-BOOL CheckPopupPlaceNameDispAuto(u16 zoneId, BOOL a1);
+BOOL CheckPopupPlaceNameDispAuto(u16 zoneId, BOOL continued);
 
 static const ClActSurfaceSetup sPlaceNameSurfaceSetup = { 0, 0, 256, 192, 0, 1 };
 
@@ -189,7 +225,7 @@ PlaceName *FieldPlaceName_Create(GameSystem *gsys, HeapID heapId, FieldMsgBG *ms
         PlaceName_LoadScreenFile(wk, 2);
     }
     PlaceName_AllocBgChars(wk);
-    PlaceName_SetState(wk, 0);
+    PlaceName_SetState(wk, PLACE_NAME_MODE_IDLE);
     return wk;
 }
 
@@ -215,25 +251,25 @@ void FieldPlaceName_Free(PlaceName *wk) {
 void PlaceName_Main(PlaceName *wk) {
     PlaceName_IncrementTimer(wk);
     switch (PlaceName_GetMode(wk)) {
-    case 0:
+    case PLACE_NAME_MODE_IDLE:
         PlaceName_StateIdle(wk);
         break;
-    case 1:
+    case PLACE_NAME_MODE_PREPARE:
         PlaceName_StatePrepare(wk);
         break;
-    case 2:
+    case PLACE_NAME_MODE_FADE_IN:
         PlaceName_StateFadeIn(wk);
         break;
-    case 3:
+    case PLACE_NAME_MODE_FADE_IN_WAIT:
         PlaceName_StateFadeInWait(wk);
         break;
-    case 4:
+    case PLACE_NAME_MODE_LETTERS_LAUNCH:
         PlaceName_StateLettersLaunch(wk);
         break;
-    case 5:
+    case PLACE_NAME_MODE_LETTERS_LAND:
         PlaceName_StateLettersLand(wk);
         break;
-    case 6:
+    case PLACE_NAME_MODE_FADE_OUT:
         PlaceName_StateFadeOut(wk);
         break;
     }
@@ -242,25 +278,25 @@ void PlaceName_Main(PlaceName *wk) {
 
 void PlaceName_Draw(PlaceName *wk) {
     switch (PlaceName_GetMode(wk)) {
-    case 0:
+    case PLACE_NAME_MODE_IDLE:
         PlaceName_DrawIdle(wk);
         break;
-    case 1:
+    case PLACE_NAME_MODE_PREPARE:
         PlaceName_DrawPrepare(wk);
         break;
-    case 2:
+    case PLACE_NAME_MODE_FADE_IN:
         __endColorBlending(wk);
         break;
-    case 3:
+    case PLACE_NAME_MODE_FADE_IN_WAIT:
         PlaceName_DrawFadeInWait(wk);
         break;
-    case 4:
+    case PLACE_NAME_MODE_LETTERS_LAUNCH:
         PlaceName_DrawLettersLaunch(wk);
         break;
-    case 5:
+    case PLACE_NAME_MODE_LETTERS_LAND:
         PlaceName_DrawLettersLand(wk);
         break;
-    case 6:
+    case PLACE_NAME_MODE_FADE_OUT:
         _endColorBlending(wk);
         break;
     }
@@ -298,7 +334,7 @@ void BeginForcePlaceNameDisp(PlaceName *wk, s32 zoneId) {
 }
 
 void PlaceName_Cancel(PlaceName *wk) {
-    PlaceName_SetState(wk, 0);
+    PlaceName_SetState(wk, PLACE_NAME_MODE_IDLE);
     PlaceName_ClearZoneChangeRequest(wk);
     PlaceName_ClearForceShowRequest(wk);
 }
@@ -461,16 +497,16 @@ void PlaceName_CreateLetters(PlaceName *wk) {
     text.printQueue = wk->printQueue;
     heapId = FieldPlaceName_GetHeapID(wk);
     arc = FieldPlaceName_GetArc(wk);
-    wk->objects[0] =
-        PlaceNameLetter_Create(heapId, 0, &text, wk->clactUnit, arc, 0, wk->palettes[0], wk->chars, wk->cellAnims);
+    wk->objects[0] = PlaceNameLetter_Create(heapId, PLACE_NAME_LETTER_TEXT, &text, wk->clactUnit, arc, 0,
+                                            wk->palettes[0], wk->chars, wk->cellAnims);
     MI_CpuFill8(&frame, 0, sizeof(frame));
     frame.palette = wk->palettes[1];
     frame.chars = wk->chars;
     frame.cellAnims = wk->cellAnims;
     heapId = FieldPlaceName_GetHeapID(wk);
     arc = FieldPlaceName_GetArc(wk);
-    wk->objects[1] =
-        PlaceNameLetter_Create(heapId, 1, &frame, wk->clactUnit, arc, 0, wk->palettes[0], wk->chars, wk->cellAnims);
+    wk->objects[1] = PlaceNameLetter_Create(heapId, PLACE_NAME_LETTER_FRAME, &frame, wk->clactUnit, arc, 0,
+                                            wk->palettes[0], wk->chars, wk->cellAnims);
 }
 
 void PlaceName_FreeLetters(PlaceName *wk) {
@@ -585,10 +621,10 @@ BOOL IsLocNameIdxChanged(PlaceName *wk) {
 void PlaceName_LoadMessage(PlaceName *wk) {
     u16 zoneId = PlaceName_GetReqZoneID(wk);
     u16 nameId = ZoneData_GetPlaceNameID(zoneId);
-    if (nameId >= 0x9a) {
-        nameId = 0;
+    if (nameId >= PLACE_NAME_COUNT) {
+        nameId = PLACE_NONE;
     }
-    if (nameId == 0) {
+    if (nameId == PLACE_NONE) {
         PlaceName_Cancel(wk);
         return;
     }
@@ -608,7 +644,7 @@ void PlaceName_SetState(PlaceName *wk, u32 mode) {
     PlaceName_SetMode(wk, mode);
     PlaceName_ResetTimer(wk);
     PlaceName_ResetState(wk);
-    if (mode == 0) {
+    if (mode == PLACE_NAME_MODE_IDLE) {
         PlaceName_HideLetters(wk);
         GX_SetVisibleWnd(GX_WNDMASK_NONE);
     }
@@ -618,21 +654,21 @@ void PlaceName_Interrupt(PlaceName *wk) {
     u32 mode;
     s32 timer;
     switch (wk->mode) {
-    case 0:
-    case 6:
+    case PLACE_NAME_MODE_IDLE:
+    case PLACE_NAME_MODE_FADE_OUT:
         return;
-    case 3:
-    case 4:
-    case 5:
-        mode = 5;
+    case PLACE_NAME_MODE_FADE_IN_WAIT:
+    case PLACE_NAME_MODE_LETTERS_LAUNCH:
+    case PLACE_NAME_MODE_LETTERS_LAND:
+        mode = PLACE_NAME_MODE_LETTERS_LAND;
         timer = 0;
         break;
-    case 2:
-        mode = 5;
+    case PLACE_NAME_MODE_FADE_IN:
+        mode = PLACE_NAME_MODE_LETTERS_LAND;
         timer = 12.0f * (1.0f - wk->timer / 10.0f);
         break;
-    case 1:
-        mode = 0;
+    case PLACE_NAME_MODE_PREPARE:
+        mode = PLACE_NAME_MODE_IDLE;
         timer = 0;
         break;
     }
@@ -652,36 +688,36 @@ void PlaceName_StateIdle(PlaceName *wk) {
         PlaceName_ClearZoneChangeRequest(wk);
     }
     if (start) {
-        PlaceName_SetState(wk, 1);
+        PlaceName_SetState(wk, PLACE_NAME_MODE_PREPARE);
     }
 }
 
 void PlaceName_StatePrepare(PlaceName *wk) {
     switch (PlaceName_GetState(wk)) {
-    case 0:
+    case PLACE_NAME_PREPARE_LOAD_MESSAGE:
         PlaceName_LoadMessage(wk);
         PlaceName_NextState(wk);
         break;
-    case 1:
+    case PLACE_NAME_PREPARE_WAIT:
         PlaceName_NextState(wk);
         break;
-    case 2:
+    case PLACE_NAME_PREPARE_CLEAR_SCREEN:
         GFL_BGSysClearScr(3);
         PlaceName_NextState(wk);
         break;
-    case 3:
+    case PLACE_NAME_PREPARE_PALETTE:
         PlaceName_TransferPalette(wk);
         PlaceName_NextState(wk);
         break;
-    case 4:
+    case PLACE_NAME_PREPARE_CHARS:
         PlaceName_TransferChars(wk);
         PlaceName_NextState(wk);
         break;
-    case 5:
+    case PLACE_NAME_PREPARE_SCREEN:
         PlaceName_TransferScreen(wk);
         PlaceName_NextState(wk);
         break;
-    case 6:
+    case PLACE_NAME_PREPARE_WINDOW:
         GFL_BGSysSetBGPriority(3, 1);
         GFL_BGSysSetBGEnabled(3, 0);
         endColorBlending(wk);
@@ -693,13 +729,13 @@ void PlaceName_StatePrepare(PlaceName *wk) {
                               TRUE);
         PlaceName_NextState(wk);
         break;
-    case 7:
+    case PLACE_NAME_PREPARE_LETTERS:
         PlaceName_SetupLetters(wk);
         PlaceName_NextState(wk);
         break;
-    case 8:
+    case PLACE_NAME_PREPARE_WAIT_LETTERS:
         if (PlaceName_IsAllSpawned(wk)) {
-            PlaceName_SetState(wk, 2);
+            PlaceName_SetState(wk, PLACE_NAME_MODE_FADE_IN);
         }
         break;
     }
@@ -707,15 +743,15 @@ void PlaceName_StatePrepare(PlaceName *wk) {
 
 void PlaceName_StateFadeIn(PlaceName *wk) {
     switch (PlaceName_GetState(wk)) {
-    case 0:
+    case PLACE_NAME_STEP_START:
         __endColorBlending(wk);
         GFL_BGSysSetBGEnabled(3, 1);
         PlaceName_SlideInLetters(wk);
         PlaceName_NextState(wk);
         break;
-    case 1:
+    case PLACE_NAME_STEP_WAIT:
         if (wk->timer > 10 && PlaceName_IsAllSpawned(wk)) {
-            PlaceName_SetState(wk, 3);
+            PlaceName_SetState(wk, PLACE_NAME_MODE_FADE_IN_WAIT);
         }
         break;
     }
@@ -723,30 +759,30 @@ void PlaceName_StateFadeIn(PlaceName *wk) {
 
 void PlaceName_StateFadeInWait(PlaceName *wk) {
     if (wk->timer > 30) {
-        PlaceName_SetState(wk, 4);
+        PlaceName_SetState(wk, PLACE_NAME_MODE_LETTERS_LAUNCH);
     }
 }
 
 void PlaceName_StateLettersLaunch(PlaceName *wk) {
     switch (PlaceName_GetState(wk)) {
-    case 0:
+    case PLACE_NAME_STEP_START:
         PlaceName_NextState(wk);
         break;
-    case 1:
-        PlaceName_SetState(wk, 5);
+    case PLACE_NAME_STEP_WAIT:
+        PlaceName_SetState(wk, PLACE_NAME_MODE_LETTERS_LAND);
         break;
     }
 }
 
 void PlaceName_StateLettersLand(PlaceName *wk) {
     switch (PlaceName_GetState(wk)) {
-    case 0:
+    case PLACE_NAME_STEP_START:
         PlaceName_SlideOutLetters(wk);
         PlaceName_NextState(wk);
         break;
-    case 1:
+    case PLACE_NAME_STEP_WAIT:
         if (wk->timer > 12 && PlaceName_IsAllSpawned(wk)) {
-            PlaceName_SetState(wk, 6);
+            PlaceName_SetState(wk, PLACE_NAME_MODE_FADE_OUT);
         }
         break;
     }
@@ -754,7 +790,7 @@ void PlaceName_StateLettersLand(PlaceName *wk) {
 
 void PlaceName_StateFadeOut(PlaceName *wk) {
     if (wk->timer > 5) {
-        PlaceName_SetState(wk, 0);
+        PlaceName_SetState(wk, PLACE_NAME_MODE_IDLE);
         PlaceName_HideLetters(wk);
     }
 }
@@ -793,8 +829,9 @@ void PlaceName_InitWork(PlaceName *wk, GameSystem *gsys) {
     wk->charPos = -1;
     wk->forced = 0;
     wk->requested = 0;
-    wk->prevZoneId = 0x267;
-    wk->reqZoneId = 0x267;
+    // The banner starts from no zone, before the save's is loaded
+    wk->prevZoneId = ZONE_MAX;
+    wk->reqZoneId = ZONE_MAX;
 }
 
 void PlaceName_FreeWork(PlaceName *wk) {
@@ -906,16 +943,16 @@ StrBuf *PlaceName_GetName(PlaceName *wk) {
     return wk->name;
 }
 
-BOOL CheckPopupPlaceNameDispAuto(u16 zoneId, BOOL a1) {
+BOOL CheckPopupPlaceNameDispAuto(u16 zoneId, BOOL continued) {
     switch (GetZoneLocNameDispType(zoneId)) {
-    case 0:
+    case PLACE_NAME_DISP_NEVER:
         return FALSE;
-    case 1:
+    case PLACE_NAME_DISP_ALWAYS:
         return TRUE;
-    case 2:
-        return a1;
-    case 3:
-        if (a1) {
+    case PLACE_NAME_DISP_ON_CONTINUE:
+        return continued;
+    case PLACE_NAME_DISP_NOT_ON_CONTINUE:
+        if (continued) {
             return FALSE;
         }
         return TRUE;

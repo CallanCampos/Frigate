@@ -5,6 +5,7 @@
 #include "field/field_gimmick_gate.h"
 #include "field/field_task.h"
 #include "field/gimmick_obj_elboard.h"
+#include "field/zone.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
@@ -371,7 +372,8 @@ BOOL GimmickGateBoardEntry_Load(GimmickGateBoardEntry *entry, u32 arcId, u32 fil
 }
 
 BOOL GimmickGateBoardEntry_MatchesZone(GimmickGateBoardEntry *entry, u16 zone) {
-    if (entry->zones[0] == 0x267 && entry->zones[1] == 0x267 && entry->zones[2] == 0x267 && entry->zones[3] == 0x267) {
+    if (entry->zones[0] == ZONE_MAX && entry->zones[1] == ZONE_MAX && entry->zones[2] == ZONE_MAX &&
+        entry->zones[3] == ZONE_MAX) {
         return TRUE;
     }
     if (entry->zones[0] == zone || entry->zones[1] == zone || entry->zones[2] == zone || entry->zones[3] == zone) {
