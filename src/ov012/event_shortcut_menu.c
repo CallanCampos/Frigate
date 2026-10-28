@@ -89,7 +89,7 @@ GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *sta
         *state = 1;
         break;
     case 1:
-        ShortcutMenu_Open(0, work);
+        ShortcutMenu_Open(SHORTCUT_MENU_START_CLOSED, work);
         *state = 2;
         break;
     case 2:
@@ -155,7 +155,7 @@ GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *sta
         }
         break;
     case 8:
-        ShortcutMenu_Open(1, work);
+        ShortcutMenu_Open(SHORTCUT_MENU_START_OPEN, work);
         *state = 4;
         break;
     case 9:
@@ -561,7 +561,7 @@ BOOL ShortcutMenu_CanRetry(FieldAppCallInput *input, void *arg) {
         } else if (input->eventType == 1 || input->eventType == 3 || input->eventType == 2 || input->eventType == 5) {
             work->state = 2;
         } else {
-            ShortcutMenu_Open(1, work);
+            ShortcutMenu_Open(SHORTCUT_MENU_START_OPEN, work);
             work->state = 1;
         }
         break;
