@@ -22,6 +22,7 @@
 // the switch to a thread whose saved I bit is clear), when the clock passes an event inside a modelled busy loop
 // (OS_GetTick, OS_SpinWaitSysCycles, SVC_WaitByLoop) and at port_os_poll_irq. Everything is a function of the
 // program's own actions, so a run is deterministic.
+#include "hal/card/port_card_hardware.h"
 #include "hal/hw/hw.h"
 #include "hal/os/fiber.h"
 #include "hal/os/frame_time.h"
@@ -96,10 +97,11 @@ typedef enum Request {
 } Request;
 
 typedef enum EventKind {
-    EVENT_LINE,   // the start of a line: VCOUNT, the VBlank at line 192, the V-count match, the scanline hook
-    EVENT_HBLANK, // the HBlank interrupt's request
-    EVENT_TIMER,  // a timer that interrupts wraps
-    EVENT_TIMED,  // a module's timed work (port_os_set_timed_work)
+    EVENT_LINE,          // the start of a line: VCOUNT, the VBlank at line 192, the V-count match, the scanline hook
+    EVENT_HBLANK,        // the HBlank interrupt's request
+    EVENT_TIMER,         // a timer that interrupts wraps
+    EVENT_TIMED,         // a module's timed work (port_os_set_timed_work)
+    EVENT_CARD_HARDWARE, // closed physical READY/COMMIT state, never generic host/SDK callbacks
 } EventKind;
 
 // A module's timed work and its moment, UINT64_MAX while it has none
@@ -136,8 +138,9 @@ static u32 sLauncherStackSize = 8 * 1024 * 1024;
 static u32 sThreadStackSize = 256 * 1024;
 
 // The CPU and the interrupt controller's IF (IE and IME are the I/O registers themselves)
-static u32 sCpsrMask; // the CPSR's I and F bits of the code that runs
-static BOOL sInIrq;   // the processor is in IRQ mode: a handler, or the thread-switch tail after it
+static u32 sCpsrMask;            // the CPSR's I and F bits of the code that runs
+static BOOL sDeviceWaitHostWork; // reject recursive waits from device work run inside an IRQ wait
+static BOOL sInIrq;              // the processor is in IRQ mode: a handler, or the thread-switch tail after it
 static u32 sIF;
 
 // The virtual clock
@@ -387,11 +390,11 @@ static void QueueWork(int item) {
 }
 
 // Runs the scanline hook for each line and the frame hooks for each frame that came, in order. Only the dispatcher
-// calls it, on the host's stack and outside handlers, so that platform code never runs on a game stack or inside the
-// game's critical sections
+// calls it on the host stack. The new absolute-device wait may explicitly publish host work during an IRQ,
+// with nested IRQ delivery masked; all older callers remain outside handlers. No callback may invoke the SDK.
 static void RunHostWork(void) {
-    if (port_fiber_current() != NULL || sInIrq) {
-        Fatal("the host's work would run on a fiber's stack or in a handler");
+    if (port_fiber_current() != NULL || (sInIrq && !sDeviceWaitHostWork)) {
+        Fatal("the host's work would run on a fiber's stack or outside the guarded IRQ device wait");
     }
     while (sWorkCount > 0 && !sStop) {
         int item = sWork[sWorkHead];
@@ -496,6 +499,12 @@ static u64 NextEvent(EventKind *kind, int *timerNo) {
             *timerNo = i;
         }
     }
+    // New physical events follow the existing events on equal cycles; their old relative ordering is unchanged.
+    u64 device = port_card_hardware_deadline();
+    if (device < when) {
+        when = device < sCycles ? sCycles : device;
+        *kind = EVENT_CARD_HARDWARE;
+    }
     return when;
 }
 
@@ -535,6 +544,9 @@ static void RaiseEvent(EventKind kind, u64 when, int timerNo) {
         RequestIF(OS_IE_TIMER0 << timerNo);
         sTimers[timerNo].nextWrap += TimerPeriod(&sTimers[timerNo]);
         break;
+    case EVENT_CARD_HARDWARE:
+        port_card_hardware_event(sCycles);
+        break;
     case EVENT_TIMED:
         // Its moment is spent; the work sets the next
         sTimedWork[timerNo].when = UINT64_MAX;
@@ -551,7 +563,7 @@ static BOOL PendingIrq(void) {
 
 // Whether the code that runs could take an interrupt now: a fiber, not a handler, with the I bit clear and IME on
 static BOOL CanTakeIrq(void) {
-    return sRunning != NULL && !sInIrq && !(sCpsrMask & CPSR_IRQ_DISABLE) && ReadIME();
+    return sRunning != NULL && !sInIrq && !port_card_hardware_stalled() && !(sCpsrMask & CPSR_IRQ_DISABLE) && ReadIME();
 }
 
 // Takes a pending interrupt now, if this is a fiber with interrupts enabled. This is where the DS would take the IRQ
@@ -564,6 +576,35 @@ static void PollIrq(void) {
 
 void port_osi_poll_irq(void) {
     PollIrq();
+}
+
+// A CARD DMA unit stalls ARM9 execution, including an IRQ's CPU work, but never stops physical timers/devices.
+// Drain only closed hardware events and latch IF; generic host work and IRQ delivery wait until the bus releases CPU.
+// Each physical interval is counted once here; callers choose own-work extension versus absolute elapsed waiting.
+static u64 DrainCardStall(void) {
+    u64 stalled = 0;
+    // Close all physical transitions due now before any CPU/IRQ/host-work boundary. NextEvent still raises older
+    // equal-cycle timer/line/timed events in their existing order, but they cannot resume ARM9 ahead of READY.
+    for (;;) {
+        u64 device = port_card_hardware_deadline();
+        if (!port_card_hardware_stalled() && (device == UINT64_MAX || device > sCycles)) {
+            break;
+        }
+        EventKind kind;
+        int timerNo;
+        u64 when = NextEvent(&kind, &timerNo);
+        u64 before = sCycles;
+        BOOL wasStalled = port_card_hardware_stalled();
+        if (when == UINT64_MAX) {
+            Fatal("CARD DMA stall without a completion event");
+        }
+        RaiseEvent(kind, when, timerNo);
+        if (wasStalled) {
+            stalled += sCycles - before;
+        }
+    }
+    sStats.deviceStallCycles += stalled;
+    return stalled;
 }
 
 // Runs the clock for cycles of the running code's own work, as a busy loop would: each event on the way is raised
@@ -579,6 +620,11 @@ static void Spin(u64 cycles) {
 
     while ((when = NextEvent(&kind, &timerNo)) <= target) {
         RaiseEvent(kind, when, timerNo);
+        u64 stalled = DrainCardStall();
+        if (UINT64_MAX - target < stalled) {
+            Fatal("CPU work deadline overflow after CARD DMA stall");
+        }
+        target += stalled;
         if (sWorkCount != 0 && sRunning != NULL) {
             Yield(REQUEST_HOST);
         }
@@ -590,6 +636,54 @@ static void Spin(u64 cycles) {
         }
     }
     AdvanceClock(target);
+}
+
+// Physical device time is absolute: work by an IRQ or another thread spends the wait, rather than extending it.
+// Keep Spin's own-work accounting separate; use the same event ordering and host-stack dispatch as other waits.
+int port_os_wait_until(uint64_t deadline) {
+    EventKind kind;
+    int timerNo;
+    u64 when;
+
+    if ((sRunning == NULL && !sInIrq) || sDeviceWaitHostWork || sStop) {
+        return 0;
+    }
+    if (sInIrq && sWorkCount != 0) {
+        sDeviceWaitHostWork = TRUE;
+        RunHostWork();
+        sDeviceWaitHostWork = FALSE;
+        if (sStop) {
+            return 0;
+        }
+    }
+    while (sCycles <= deadline) {
+        when = NextEvent(&kind, &timerNo);
+        if (when > deadline) {
+            break;
+        }
+        RaiseEvent(kind, when, timerNo);
+        (void)DrainCardStall(); // The absolute target never moves, even if CPU unavailability passes it.
+        if (sWorkCount != 0) {
+            if (sInIrq) {
+                // IRQ handlers already run on the dispatcher stack. Publish physical device state there, with
+                // nested IRQ delivery still masked; callbacks cannot recursively wait or invoke the SDK.
+                sDeviceWaitHostWork = TRUE;
+                RunHostWork();
+                sDeviceWaitHostWork = FALSE;
+                if (sStop) {
+                    return 0;
+                }
+            } else {
+                Yield(REQUEST_HOST);
+            }
+        }
+        PollIrq();
+    }
+    if (sCycles < deadline) {
+        AdvanceClock(deadline);
+    }
+    PollIrq();
+    return 1;
 }
 
 void port_osi_spin(u64 cycles) {
@@ -659,7 +753,7 @@ void OS_IrqHandler(void) {
         u32 bit;
         OSIrqFunction handler;
 
-        if (!ReadIME() || pending == 0 || (interrupted->cpsrMask & CPSR_IRQ_DISABLE)) {
+        if (!ReadIME() || pending == 0 || port_card_hardware_stalled() || (interrupted->cpsrMask & CPSR_IRQ_DISABLE)) {
             break;
         }
         bit = pending & (~pending + 1);
@@ -692,6 +786,7 @@ static void Halt(void) {
             return;
         }
         RaiseEvent(kind, when, timerNo);
+        (void)DrainCardStall();
         RunHostWork();
         if (sStop) {
             return;
@@ -805,8 +900,10 @@ PortOsResult port_os_run(void (*boot)(void)) {
     sStop = FALSE;
     memset(&sStats, 0, sizeof(sStats));
     sInIrq = FALSE;
+    sDeviceWaitHostWork = FALSE;
     sIF = 0;
     sCycles = 0;
+    port_card_hardware_reset();
     sNextLine = CYCLES_PER_LINE;
     sNextHBlank = HBLANK_CYCLE;
     sFrame = 0;
@@ -848,6 +945,8 @@ PortOsResult port_os_run(void (*boot)(void)) {
     sLauncher->cpsrMask = 0;
     sLauncher->stackSize = sLauncherStackSize;
     result = Dispatcher(sLauncher);
+    // Retire experimental physical requests before their native output buffers/fibers can disappear.
+    port_card_hardware_reset();
 
     // Every fiber that is left, suspended or done, goes
     for (i = 0; i < MAX_CONTEXTS; i++) {

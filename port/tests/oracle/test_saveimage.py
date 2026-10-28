@@ -72,7 +72,15 @@ class SaveImageTests(unittest.TestCase):
         self.assertTrue(any(text in problem for problem in problems), problems)
 
     def test_known_crc_vector(self):
+        self.assertEqual(saveimage.crc16_ccitt(b""), 0xffff)
         self.assertEqual(saveimage.crc16_ccitt(b"123456789"), 0x29b1)
+        self.assertEqual(saveimage._crc16_update(0x29b1, b""), 0x29b1)
+        # CRC-16/CCITT-FALSE's known check value must hold across every split, including empty updates.
+        # Discovery carries this state between chunks; resetting it would pass the whole-message vector above.
+        for split in range(10):
+            with self.subTest(split=split):
+                first = saveimage._crc16_update(0xffff, b"123456789"[:split])
+                self.assertEqual(saveimage._crc16_update(first, b"123456789"[split:]), 0x29b1)
 
     def test_full_valid_image_and_reference(self):
         self.assertEqual(saveimage.validate_image(self.valid), [])

@@ -255,3 +255,30 @@ add_test(NAME rom_manifest_tool
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/rom/test_manifest.py")
 set_tests_properties(rom_manifest_tool PROPERTIES TIMEOUT 60)
+
+# Standalone wire controller only: synthetic immutable bytes, no SDK objects, ROM or scheduler integration.
+add_executable(port_card_bus_tests tests/card/test_card_bus.c hal/card/port_card_bus.c)
+target_include_directories(port_card_bus_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+set_target_properties(port_card_bus_tests PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED YES C_EXTENSIONS NO)
+add_test(NAME card_bus COMMAND port_card_bus_tests)
+set_tests_properties(card_bus PROPERTIES TIMEOUT 30 LABELS "unit")
+
+# Experimental typed physical CARD events, not selected by production CARD reads. The genuine SDK OS scheduler and
+# native core service synthetic READY/COMMIT words through masks, old IRQ Spin, Halt and stop/reset.
+add_executable(port_card_hardware_tests tests/card/test_card_hardware.c
+    $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> ${port_gfx_objects} "${PORT_GEN}/stubs.c")
+target_link_libraries(port_card_hardware_tests PRIVATE port_decomp_env SDL3::SDL3)
+target_include_directories(port_card_hardware_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${REPO_ROOT}")
+if(port_os_stack_probes)
+    target_compile_options(port_card_hardware_tests PRIVATE ${port_os_stack_probes})
+endif()
+foreach(scenario pacing absolute own_work masked timer_stall equal_cycle irq_spin halt bounds cancel inactive reset)
+    add_test(NAME card_hardware_${scenario} COMMAND port_card_hardware_tests ${scenario})
+    set_tests_properties(card_hardware_${scenario} PROPERTIES TIMEOUT 60)
+endforeach()
+
+add_test(NAME card_hardware_generic_conflict COMMAND "${PORT_PYTHON}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/check_exit.py" --status 71
+    --expect "generic operation conflicts with experimental CARD DMA channel ownership"
+    -- $<TARGET_FILE:port_card_hardware_tests> generic_conflict)
+set_tests_properties(card_hardware_generic_conflict PROPERTIES TIMEOUT 60)
