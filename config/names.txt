@@ -12153,6 +12153,8 @@ overlays/ov036 0x021c5cc4 CommEntryMenu_RecvCancel
 overlays/ov036 0x021c5cd0 CommEntryMenu_SendCancel
 overlays/ov036 0x021c5cfc CommEntryMenu_RecvMemberList
 overlays/ov036 0x021c5d1c CommEntryMenu_SendMemberList
+overlays/ov036 0x021c5ea0 EncEff_LoadCaptureGridSubOvls
+overlays/ov036 0x021c5ebc EncEff_LoadCaptureSubOvl
 overlays/ov036 0x021c6220 CountTrainersEvent_StartCountOtherOtIdsTask
 overlays/ov036 0x021c6288 CountTrainersEvent_Callback
 overlays/ov036 0x021c6328 CountTrainersEvent_ScanParty

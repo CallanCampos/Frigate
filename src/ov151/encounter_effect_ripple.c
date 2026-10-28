@@ -25,7 +25,7 @@ static GameEvent *EncEffRipple_InitBlack(GameSystem *gsys);
 GameEvent *EncEffRipple_CreateWhite(GameSystem *gsys, Field *field) {
     VecFx32 pos = { 0, 0, FX32_CONST(33) };
 
-    func_ov036_021c5ebc(Field_GetEncEff(field));
+    EncEff_LoadCaptureSubOvl(Field_GetEncEff(field));
     return EncEffCapture_CreateFlashEvent(gsys, &pos, EncEffRipple_InitWhite,
                                           (void (*)(EncEffGrid *))EncEffRipple_Draw);
 }
@@ -33,7 +33,7 @@ GameEvent *EncEffRipple_CreateWhite(GameSystem *gsys, Field *field) {
 GameEvent *EncEffRipple_CreateBlack(GameSystem *gsys, Field *field) {
     VecFx32 pos = { 0, 0, FX32_CONST(33) };
 
-    func_ov036_021c5ebc(Field_GetEncEff(field));
+    EncEff_LoadCaptureSubOvl(Field_GetEncEff(field));
     return EncEffCapture_CreateEvent(gsys, &pos, EncEffRipple_InitBlack, (void (*)(EncEffGrid *))EncEffRipple_Draw);
 }
 

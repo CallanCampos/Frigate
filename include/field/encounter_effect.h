@@ -66,9 +66,9 @@ typedef struct {
 // Every encounter effect, by its ID, which EncEff_StartEvent runs
 extern const EncEffInfo ENC_EFFECT_CONTROLLERS[ENCEFF_COUNT];
 
-void func_ov036_021c5ea0(EncEff *effect);
+void EncEff_LoadCaptureGridSubOvls(EncEff *effect);
 // Loads overlay 148 alone, for the effects that draw the captured screen themselves
-void func_ov036_021c5ebc(EncEff *effect);
+void EncEff_LoadCaptureSubOvl(EncEff *effect);
 void *EncEff_AllocWorkArea(EncEff *effect, u32 size, HeapID heapId);
 void *EncEff_GetWorkArea(EncEff *effect);
 void *EncEff_GetEventData(EncEff *effect);
