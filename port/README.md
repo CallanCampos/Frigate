@@ -19,11 +19,12 @@ into the field: a new game goes through the intro into Aspertia City, where the 
 and goes into a house and out again (phase 3's exit, met on 2026-10-24), CONTINUE goes into the field too, and the field
 menu opens the party list and a Pokémon's summary, the Pokédex, the bag and the trainer card. Tests compare these paths
 frame by frame with melonDS and check the sound driver, music and cries. Phase 4's integrated route adds Hugh's
-battle, Bianca's capture demo, a wild catch, PC deposit/withdraw/swap and save continuations. The imported branch
-records both-version results; the integrated route now passes all eight fresh oracle cases and strict native replays
-in each version, including catch/save/new-process reload. Hugh's CPU-time-dependent
-AI decision is an explicit comparison cut, followed by save-state and same-save continuation checks rather than a
-claim of an identical battle. Both upstream encounter fixes are already included.
+battle, Bianca's capture demo, a wild catch, PC deposit/withdraw/swap and save continuations, verified in both games
+including catch/save/new-process reload. Phase 5's first story checkpoint follows Alder through Route 19 and
+Floccesy Town to a Route 20 save, with DS comparisons, strict sanitizer runs and fresh-process save interchange.
+Floccesy Ranch and later story remain next. Hugh's CPU-time-dependent AI decision still uses an explicit comparison
+cut followed by save and continuation checks; trainer-AI fidelity remains unresolved. Both upstream encounter fixes
+are already included.
 [docs/STATUS.md](docs/STATUS.md) records the checks and remaining work.
 
 ## Contributing

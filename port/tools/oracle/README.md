@@ -1,8 +1,8 @@
 # The melonDS oracle
 
-Phase 4 route counts below record the imported route/coverage branches' runs. The reconciled integration
-retains their checks; final ROM, native and oracle validation of this integration is pending in
-[../../docs/STATUS.md](../../docs/STATUS.md).
+Current integration validation and the next story checkpoint are recorded in
+[../../docs/STATUS.md](../../docs/STATUS.md). Historical result tables below preserve each route's measurements
+when it was introduced.
 
 The reference the port is held against ([PLAN.md §6](../../docs/PLAN.md#6-verification), test level T4): the player's
 ROM running on [melonDS](https://melonds.kuribo64.net)'s emulation core, headless and deterministic, with an input
@@ -27,6 +27,7 @@ at build time, pinned to a release, and never committed.
 | `pbwinput.c`, `pbwinput.h` | the input file reader and writer and the game-frame clock, plain C11, which the port can compile as it is |
 | `oracle.py` | runs the oracle and the port with the repository's defaults; makes the saves the tests start from on the oracle, each from the save before it ([Saves](#saves)); the comparison sequences, the field menu's and its apps' among them, and the sound's comparison; the ctest check |
 | `compare.py` | compares two runs: screens, memory, alignment |
+| `saveimage.py` | verifies both main save copies' 73 block CRCs, the padded CRC table and its footer before any clock/CRC exceptions; native block extents come from the examined DS image |
 | `sound.py` | compares two runs' sound: the sound driver's state run by run, what the ARM9 sees of it frame by frame, and the sound by segment ([Sound](#sound)) |
 | `sndtrace.h` | the sound trace's format, plain C11, which the port's sound driver (`port/hal/snd7/snd7.c`), its `--sound-trace` (`port/app/sound_trace.c`) and the sound driver's tests include |
 | `seeds.py` | the random seeds the DS built in an oracle run, read from the memory it dumps ([Random seeds](#random-seeds)) |
@@ -616,8 +617,8 @@ differed in 14,330 at the first frame, 1,823 at the fourth, and passed the toler
 start from a save, which leaves other bytes after the copyright screen's file on the port than on the DS
 ([below](#known-differences-from-the-hardware)), so they don't hold those frames close.
 
-Each is two ctest tests, but the ten that start from a save (continue, continue_starter, field_menus, party_menus,
-the five of phase 4's route and pc), whose saves only the oracle can make, have only the first:
+Each is two ctest tests, but sequences that start from a save (continue, continue_starter, field_menus, party_menus,
+phase 4's route, pc, floccesy and floccesy_continue), whose saves only the oracle can make, have only the first:
 
 - `oracle_<name>` (`oracle.py sequence NAME --port BIN`), with the oracle built: runs both programs and compares every
   port frame but the known differences ([below](#known-differences-from-the-hardware)): where the game counts passes,
@@ -723,6 +724,55 @@ apps, which have no 3D, is exact but the deposit screen's as the cursor moves to
 state matches at every frame it compares: NNS G3D's but in the DS's long
 passes and the save's dialog, GFL's random state but after the save and, in Black 2, at the townsperson's two turns
 after the PC switches off.
+
+### Floccesy and Route 20
+
+Phase 5's first story checkpoint starts from the examined `catch_save`, plays Alder's Route 19 introduction and
+both Floccesy Town conversations, follows the road into Route 20, and saves. Its source is the actual game C and
+`res/field/scripts/route_19.s` / `floccesy_town.s`. The event rectangles in `res/field/events` trigger the scenes.
+White 2 encounters Patrat and Purrloin on this path and escapes with RUN touches at `(128,160)`. Its three seeds
+are the startup seed and the two battle seeds captured from the DS playing those inputs. Black 2 reaches the road
+earlier and waits there before the common SAVE at count 32,000.
+
+| Check | Input and scope |
+| --- | --- |
+| `oracle_floccesy` / `sequence floccesy` | `floccesy_save_<version>.pbwinput`, from `catch_save`: every native frame through 31,900, with screens, NNS G3D and GFL random state, before SAVE |
+| `oracle_floccesy_save` / `save floccesy_save` | The same input on the DS to 40,000 video frames; a fixture that extends `oracle_saves`' cache when requested |
+| `oracle_floccesy_continue` / `sequence floccesy_continue` | `floccesy_continue_<version>.pbwinput`: a fresh process, CONTINUE into Route 20, the party, then back to the field; 4,700 native / 6,900 DS frames |
+| `oracle_round_trip_floccesy` / `round-trip floccesy` | The native route through SAVE to 34,600 frames, every save byte compared with the DS fixture, both saves continued on the DS, and a new native process continuing its own save |
+
+Run the story comparison and round trip together: the sequence verifies the producing story; the round trip verifies
+the write and continuations. SAVE's asynchronous progress pictures are covered by content and reload checks. This
+route uses the full continuation and no trainer-AI cut. The only save differences allowed are the play-time seconds
+at `0x19427` and the trainer/table/footer CRCs over them, in each copy. Party data, position, story flags and decrypted
+gifts remain checked. The checkpoint has 73 valid block CRCs in both copies, zone 446 at grid `(130,661)`, and event
+work `40a3=2` and `40a5=2`.
+
+Save integrity is enforced before the byte comparison or DS boot. `saveimage.py` checks all 73 blocks in each
+copy, including the final Funfest, Pokéstar Studios and Dream Radar blocks (70–72), and the 148-byte CRC table
+including its padding. The footer's size, magic and CRC must also be valid. A good bank cannot hide a broken other
+bank through the game's fallback. The earlier replay helper stopped after 70 blocks; old 70-row content references
+remain readable, while their integrity checks and new reference output cover all 73. Synthetic regressions include
+one bad masked trainer CRC, the final three blocks, bad table/footer/padding, malformed lengths and forged footer
+locations. The real round-trip command is tested to reject an invalid bank before decryption or boot.
+
+The examined DS fixtures are `07d26e593786080b3a50f4d2afecd276bfed50b8` (Black 2) and
+`26ef0ed2e6cae38298b5543580e64172556e52dc` (White 2). Only hashes and inputs are committed.
+
+The nine top-screen presentation frames per game are individually traced below: the initial InfoMsg window and two
+four-step text scrolls. The bottom screen remains compared. State exclusions are the first snapshots of precisely
+identified multi-frame DS passes; every excluded value matches a later DS frame at the same counter. These preserve
+the existing pixel tolerances. Fresh-process save round trips and strict ASan/UBSan gameplay runs are recorded in
+[STATUS.md](../../docs/STATUS.md).
+
+```sh
+python3 port/tools/oracle/oracle.py sequence floccesy --port build/port-oracle/frigate-black2 \
+    --version b2_us --save-cache build/port-oracle/oracle-saves
+python3 port/tools/oracle/oracle.py round-trip floccesy --port build/port-oracle/frigate-black2 \
+    --version b2_us --save-cache build/port-oracle/oracle-saves
+```
+
+Use `--version w2_us` with the White 2 binary for the other game. Both need the oracle built and the user's ROM.
 
 ## Saves
 
@@ -1254,6 +1304,17 @@ failure to fix, never a known difference. By kind:
   4969-4972 and 9305-9308), in both versions, each DS frame's balloon equal to the port's frame before pixel for pixel
   and the port's to the DS's frame after; where the DS's pass takes two frames (White 2, count 4963), its second shows
   the step on time, which only the port's frame of that count shows (oracle frame 7060).
+- **Route 19's first InfoMsg and Alder's text scrolls.** Floccesy's top-only exclusions are Black 2 frame 4530
+  and White 2 frame 17230 for the initial `InfoMsg` window (`FIELD_WINDOW_OPEN`), and Black 2 frames 4983–4986 /
+  5063–5066 and White 2 frames 17987–17990 / 18067–18070 for the four-pixel scrolls (`BALLOON_SCROLL`). The latter
+  follow `PrintStream_Task`'s bitmap copy/fill and `BmpWin_FlushChar`; the native text interior equals the same-counter
+  DS interior shifted upward four pixels, exactly, and the next DS picture matches the native one. The InfoMsg
+  follows `s0038_InfoMsg` → `MsgBGPrinter_CreatePlainWin` → `TalkMsgWin_AddFrameWindow` → char/map flushes and direct
+  `GX_LoadBGnChar/Scr` copies. A fresh Black 2 trace dumps the whole main BG VRAM (`0x06000000:0x80000`), main palette
+  and OAM at DS frames 6588 and 6589: all are identical at frame end, although the window appears on the LCD only
+  in 6589. Its rectangle equals native frame 4530 exactly. The same source path and adjacent-frame rectangle match
+  identify White 2's case. These are after-scanout presentation differences, separate from the multi-frame-pass state
+  snapshots; bottom screens and all game state remain compared on these nine frames.
 - **Memory the game reads past a heap block.** The copyright screen loads 0x8000 bytes of a smaller file's
   characters, so the tiles past them are whatever the heap held after the file's block
   ([../../docs/sanitizers.md](../../docs/sanitizers.md), H1), and the title's bottom screen shows them as a band over

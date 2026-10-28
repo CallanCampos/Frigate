@@ -1466,6 +1466,44 @@ class OracleScriptTests(unittest.TestCase):
             self.assertEqual(len(labels), len(set(labels)), name)
             self.assertTrue(all(dump.oracle and dump.port and dump.size > 0 for dump in sequence.state), name)
 
+    def test_floccesy_checks_the_story_before_saving(self):
+        # A save/reload check alone cannot replace the frame comparison of the story that produced the save.
+        sequence = oracle.SEQUENCES["floccesy"]
+        trip = oracle.ROUND_TRIPS["floccesy"]
+        self.assertEqual(sequence.save, oracle.SAVES[trip.maker].start)
+        self.assertEqual(sequence.state, oracle.STATE + oracle.RANDOM_STATE)
+        self.assertIn(sequence.port_frames, compare.parse_frames(sequence.state_frames))
+        self.assertFalse(sequence.stop_from)
+        self.assertFalse(trip.cut)
+        self.assertFalse(trip.port_input)
+        self.assertEqual(trip.continued_last, 0)
+        for version in ("b2_us", "w2_us"):
+            def lines(name):
+                return oracle.input_lines(os.path.join(oracle.REPO_ROOT,
+                    oracle.SEQUENCE_INPUT.format(name=name, version=version)))
+
+            events = [line.split() for line in lines(trip.maker) if line.split()[0].isdigit()]
+            save_menu = min(int(words[0]) for words in events if "X" in words[1].split("+"))
+            self.assertLess(max(int(words[0]) for words in events if int(words[0]) < save_menu),
+                            sequence.port_frames)
+            self.assertLess(sequence.port_frames, save_menu)
+            self.assertLessEqual(max(int(words[0]) for words in events), trip.port_frames)
+            # Continuation exclusions were verified with these same boot/party/return controls.
+            self.assertEqual(lines(trip.continued), lines("catch_continue"))
+
+    def test_floccesy_save_keeps_party_location_flags_and_gifts(self):
+        # Neither native party data nor story/position/gift differences can hide behind clock/CRC exceptions.
+        original = bytes(oracle.BACKUP_SIZE)
+        protected = {copy + offset for copy in (0, oracle.SECOND_COPY)
+                     for offset in (0x18e08, 0x19580, oracle.MYSTERY_GIFT_BLOCK, 0x1ff00 + 0xa5 * 2)}
+        changed = bytearray(original)
+        for offset in protected:
+            changed[offset] = 1
+        for version in ("b2_us", "w2_us"):
+            self.assertEqual(oracle.undeclared_differences(original, bytes(changed),
+                             oracle.ROUND_TRIPS["floccesy"].known[version]),
+                             [(offset, offset) for offset in sorted(protected)])
+
     def test_save_differences(self):
         # The spans where two saves differ, bytes 8 or less apart joined
         a = bytes(64)

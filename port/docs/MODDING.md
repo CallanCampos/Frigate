@@ -7,21 +7,21 @@ has is the game's whole source, compiled into the program, so a change to the ga
 
 Two limits shape everything below:
 
-- **Frigate plays the game as far as Route 19: a trainer battle, a wild Pokémon caught, a save that continues.** The
-  field engine's C is in, and the host gives the field's heap the room its larger structs need
-  ([ADR 0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md)), so CONTINUE and New Game go into the
-  field and the house, and the field menu opens its apps. Beyond the house, phase 4's route plays from a save with a
-  starter Pokémon: Hugh's battle on Route 19, Bianca's capture demo, a wild Purrloin caught and the game saved, and that
-  save continued in a new run, on Frigate and on melonDS, each piece held to melonDS from melonDS's save of the piece
-  before. Hugh's AI thinks for as many passes as the DS's CPU takes, which a host doesn't reproduce, so his battle parts
-  from melonDS's at his second move ([decomp-findings.md](decomp-findings.md)). The PC route also deposits, withdraws and swaps Pokémon, then saves. These are the imported Phase 4 branch's
-  results; final validation of this integration is pending. Both encounter fixes are already on current main,
-  with no experimental guard. The story past Route 19 is phase 5's.
-  See [STATUS.md](STATUS.md).
-- **Frigate reads the game's data from the player's ROM, and checks it.** The program accepts only a dump of the
+- **Verified story and save coverage reaches Route 20 in both games.** Phase 4 covers Hugh's battle, Bianca's
+  capture demo, a wild Pokémon caught, the party and PC, SAVE and fresh-process continuation, including save
+  interchange with melonDS. Phase 5 now follows the real field scripts through Alder's Route 19 introduction and
+  both Floccesy Town scenes to a Route 20 save. The same route runs under ASan/UBSan with recovery off; its expected
+  story flags, position, party and other save contents agree with the DS except the traced play-time/CRC bytes.
+  [STATUS.md](STATUS.md) records exact validation, and [the oracle guide](../tools/oracle/README.md#floccesy-and-route-20)
+  explains the checks. Trainer AI's CPU-deadline difference remains unresolved ([proposed ADR 0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md)).
+  Floccesy Ranch and later story, optional features and multiplayer still need verification or implementation under
+  [PLAN.md](PLAN.md). Source coverage and remaining native SDK traps are separate measures.
+- **Frigate reads the game's data from the player's ROM, and checks it.** By default it accepts a US dump of the
   version it was built for, by its SHA-1 or by every NitroFS file's ([../hal/rom/port_rom.h](../hal/rom/port_rom.h)),
   so a patched ROM is refused. Changing data files (text, species, trainers, maps) needs the layered file system of
   the mod platform, which isn't built yet. Data that the game keeps in its code (tables in C) changes with the C.
+  The opt-in Spanish Black 2 manifest loader remains experimental; actual Spanish gameplay/save validation needs
+  a dump and is tracked in issue 45 ([proposed ADR 0025](adr/0025-a-spanish-rom-by-a-manifest-of-its-own.md)).
 
 ## Where the game lives
 

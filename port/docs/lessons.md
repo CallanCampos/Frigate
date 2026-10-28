@@ -3,6 +3,19 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-28: a recoverable save is not a fully validated save
+
+- The DS can load the good copy when the other copy's CRC is corrupt. Comparing allowed clock/CRC differences and
+  booting the save therefore cannot establish that both copies are valid. Validate every block and the padded CRC
+  table/footer before masking any bytes, using the trusted DS image's extents for native data.
+- Count blocks from `SAVEDATA_INIT` / `SAVE_BLOCK_MAX`: there are 73, not the old replay helper's 70. The final
+  Funfest, Pokéstar Studios and Dream Radar blocks need coverage too. A synthetic one-bank CRC error that used to
+  fit the permitted-byte set now fails before decryption or boot; all six current DS/native/strict checkpoint
+  images pass the complete check.
+- A one-frame UI difference is not automatically a multi-frame-pass state snapshot. Alder's text scrolls have an
+  exact four-pixel bitmap shift, while the first InfoMsg window is already in end-of-frame VRAM before the LCD shows
+  it. Trace the pixels, source and memory separately; retain bottom-screen and game-state checks on those frames.
+
 ## 2026-10-28: migrated source ranges are not missing game C
 
 - Main objects can own `.ltdmain` and DTCM ranges whose symbols live in other modules. Resolve the documented

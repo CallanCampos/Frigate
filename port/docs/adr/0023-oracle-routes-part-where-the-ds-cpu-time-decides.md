@@ -13,6 +13,9 @@ melonDS's save made after it. -->
   proposed until the developer reviews it; the change that records that review sets the status line to accepted.
 - **Note (2026-10-25):** the third decision's wording follows the round trips before review: the port plays the
   oracle's presses where they still meet its course (Black 2's Hugh), not only where its course takes the same passes.
+- **Note (2026-10-28):** the [current source audit](../decomp-findings.md) qualifies the budget and identifies
+  missing native work/I/O time. A measured timing model remains possible; this proposal is temporary test coverage,
+  not evidence that faithful trainer AI is impossible. Its status remains proposed.
 
 ## Context
 
