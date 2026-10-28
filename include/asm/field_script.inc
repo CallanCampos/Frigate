@@ -2016,13 +2016,13 @@
     FieldCommand 346
     .endm
 
-    // func_ov036_021adc94
+    // s015B_WifiListHasValidProfile
     .macro Cmd_015B a0
     FieldCommand 347
     .2byte \a0
     .endm
 
-    // func_ov036_021adcb4
+    // s015C_WifiListCountFriends
     .macro Cmd_015C a0
     FieldCommand 348
     .2byte \a0

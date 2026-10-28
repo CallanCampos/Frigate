@@ -1,6 +1,7 @@
 // The script commands of the network: the game communication's status, the Wi-Fi friend list's state, and starting
 // the Wi-Fi Club, the GTS and GTS negotiations from their overlays. The ROM has no name for the file; scrcmd_net.c
-// is descriptive. Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// is descriptive. Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except our
+// descriptive ones of commands 0x15B and 0x15C.
 #include "types.h"
 #include "field/event_gtsnego.h"
 #include "field/event_wificlub.h"
@@ -23,14 +24,14 @@ BOOL s013A_GameCommGetStatus(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov036_021adc94(VM *vm, FieldScriptEnv *env) {
+BOOL s015B_WifiListHasValidProfile(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
 
     *result = WifiList_HasValidProfile(GameData_GetWifiList(FieldScriptEnv_GetGameData(env)));
     return FALSE;
 }
 
-BOOL func_ov036_021adcb4(VM *vm, FieldScriptEnv *env) {
+BOOL s015C_WifiListCountFriends(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
 
     *result = WifiList_CountFriends(GameData_GetWifiList(FieldScriptEnv_GetGameData(env)));

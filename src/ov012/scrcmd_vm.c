@@ -442,8 +442,8 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0158_ActorAnimationFree,                         // 0x158
     s0159_ActorAnimationPlay,                         // 0x159
     s015A_ActorAnimationWait,                         // 0x15a
-    func_ov036_021adc94,                              // 0x15b
-    func_ov036_021adcb4,                              // 0x15c
+    s015B_WifiListHasValidProfile,                    // 0x15b
+    s015C_WifiListCountFriends,                       // 0x15c
     s015D_NetConnectWiFiClub,                         // 0x15d
     s015E_NetConnectGTS,                              // 0x15e
     s015F_Nop,                                        // 0x15f

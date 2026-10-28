@@ -11439,6 +11439,8 @@ overlays/ov036 0x021ad864 ShopUI_PrintMessageInFrame
 overlays/ov036 0x021ad8e8 ShopUI_PrintItemBuyMessage
 overlays/ov036 0x021ad954 ShopUI_PrintTMBuyMessage
 overlays/ov036 0x021adbd4 ShopUI_ClearListScreen
+overlays/ov036 0x021adc94 s015B_WifiListHasValidProfile
+overlays/ov036 0x021adcb4 s015C_WifiListCountFriends
 overlays/ov036 0x021add94 ScrcmdProcFld_FinishOv170Event
 overlays/ov036 0x021ae4f4 ScrcmdProcFld_SpawnMovePokemonIfInactive
 overlays/ov036 0x021aea40 Regulation_RegisterAllowedSpecies
