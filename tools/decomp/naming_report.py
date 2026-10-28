@@ -9,7 +9,8 @@ A module is an overlay (ov036), ARM9 main's game code (main, src/gfl and src/sys
 each source file it counts, in Black 2:
 
 - funcs: functions that symbols.txt still names by address (func_...), placed in the file by delinks.txt;
-- data: data and bss objects named by address (data_..., bss_...);
+- data: data and bss objects named by address (data_..., bss_...), but not the compiler's unnamed string literals
+  and initializers, which the last build's map shows;
 - unk: identifiers that name something by an offset instead of a meaning (unk_2E4, unk1C, Btlv_GetUnk2E4);
 - params: placeholder parameters and locals (a0, a1, param1, arg2, var3);
 - cases: case labels that are bare numbers, to check against a value set;
@@ -66,9 +67,24 @@ def file_ranges(delinks: Path) -> list[tuple[int, int, str]]:
     return sorted(ranges)
 
 
+def anonymous_objects() -> set[tuple[str, int]]:
+    """(object stem, address) of the compiler's unnamed objects, string literals and local initializers (@1234), from
+    the last build's map: C has no name for them, so their address names are not work left."""
+    path = ROOT / "build" / "b2_us" / "arm9.o.xMAP"
+    out = set()
+    if path.exists():
+        for line in path.read_text(errors="replace").splitlines():
+            m = re.match(r"\s+([0-9A-F]{8}) [0-9A-F]{8} \.\w+\s+@\d+\t\((\w+)\.o\)", line)
+            if m:
+                out.add((m.group(2), int(m.group(1), 16)))
+    return out
+
+
 def address_names() -> dict[str, collections.Counter]:
-    """Address-named functions and data by source file (the module name where no file holds them)."""
+    """Address-named functions and data by source file (the module name where no file holds them), leaving out the
+    compiler's unnamed objects."""
     import bisect
+    anonymous = anonymous_objects()
     counts = collections.defaultdict(collections.Counter)
     for symbols in CONFIG.rglob("symbols.txt"):
         # Overlays share addresses: a module's symbols are placed by its own delinks.txt only
@@ -84,6 +100,8 @@ def address_names() -> dict[str, collections.Counter]:
             addr = int(m.group(1), 16)
             i = bisect.bisect_right(starts, addr) - 1
             owner = ranges[i][2] if i >= 0 and ranges[i][0] <= addr < ranges[i][1] else module
+            if kind == "data" and (Path(owner).stem, addr) in anonymous:
+                continue
             counts[owner][kind] += 1
     return counts
 
