@@ -3,6 +3,22 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-28: measure card work before assigning an AI delay
+
+- A typed API which returns the right bytes can still have the wrong request stream. The native archive wrapper
+  reserved cache memory but did not load it. Controlled traces found 58 global FNT and two FAT reads beyond the
+  DS's ten data reads in Hugh's first damage calculation. Use the SDK's actual cache lifecycle and existing native
+  `load_mem` pointer before modeling physical transfers.
+- A script load exceeds the 500-tick budget in the pinned melonDS model, but its ideal wire time (21,700 bus cycles) and observed
+  CARD API spans (27,597–27,825) are each below 32,000 cycles; the whole load takes 32,938–33,089. Remaining
+  SDK/FS/copy/poll/IRQ work must not be mislabeled pure CPU time or hidden behind a Hugh-specific constant.
+  Private DS observers preserve all 10,750 control frame rows and RNG dumps; native observers preserve all 8,500
+  frame rows and 34,000 state snapshots. These are measurements, not a production timing fix.
+- On this Mac an unsigned `wibo` launch entered kernel wait while a private ad-hoc-signed copy ran. Preserve the
+  pinned unsigned download, record both hashes and identical executable code sections, and use configure's
+  supported `--wine` runtime option. Keep its original checksum validation intact. No OS policy change is needed;
+  copying/signing is a local workaround, not proof of the kernel's root cause.
+
 ## 2026-10-28: a recoverable save is not a fully validated save
 
 - The DS can load the good copy when the other copy's CRC is corrupt. Comparing allowed clock/CRC differences and

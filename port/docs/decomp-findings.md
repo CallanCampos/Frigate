@@ -17,6 +17,24 @@ indices. Correct CARD latency is the smallest candidate if I/O accounts for the 
 work-cost model needs its own decision and validation. A fixed delay before the final choice cannot preserve
 intermediate `CompareToRandom` draws. No timing fix or new full-battle parity is claimed; ADR 0023 remains proposed.
 
+**Controlled timing follow-up, 2026-10-28:** these are pinned melonDS 1.1-model observations, not retail-card
+hardware measurements. Four Black 2 AI script loads take 32,938–33,089 bus cycles on the
+DS model, just beyond 500 ticks (32,000 cycles). Each issues two CPU card reads (an eight-byte NARC table entry and a
+208-byte script), two page commands and four ID commands. Ideal wire time is 21,700 cycles; observed CARD API
+spans total 27,597–27,825, so CARD delay alone is not the entire deadline deficit. The residual includes SDK/FS,
+copying, polling and possible IRQ/preemption work. The first damage opcode spans ten data requests on the DS;
+native uncached file-table lookup adds 58 global FNT and two FAT requests. The native archive cache correction
+([ADR 0026](adr/0026-native-archive-table-caches.md)) addresses that traffic mismatch without adding elapsed time.
+
+Private instruction observers match all 10,750 DS control frame records and RNG snapshots; typed native API
+wrappers match all 8,500 native control records and 34,000 state snapshots. Native script loads and all 19 VM calls
+consume zero virtual cycles; each original `GetTick` advances 64. DS observers use bounds-checked memory and verified
+overlay fingerprints; native wrappers observe the actual VM/TrAI objects and MT through native pointers. Added
+timer reads are forbidden. The DS core's raw frontend frame-number field is unreliable
+and excluded from the analysis; game counters, normalized bus cycles and actual oracle frame records establish the
+boundaries. Only four observed loop branches have the real SUSPENDED flag. These measurements establish neither
+whole-game timing parity nor a generic CPU-cost model. No fixed choice delay or new battle-frame mask is introduced.
+
 | Where | What | How the port handles it | Found |
 | --- | --- | --- | --- |
 | `src/ov170/tr_ai.c` (`TrAI_RunScripts`, `TRAI_TIME_LIMIT`; complete) | The trainers' AI scores its moves by running its scripts for at most 500 ticks of `OS_GetTick` a pass, about a millisecond, and goes on where it stopped at the next pass. The DS's CPU takes time for the scripts' interpreter and the data they load, so how many passes the AI thinks is the DS's speed. Meanwhile the battle's view draws two numbers a pass from GFL's Mersenne Twister (`BtlvMcss_Main`'s blinks, `src/ov168/btlv_mcss.c`), and the AI picks among its best moves with the twister's next one (`TrAI_ChooseMove`), so its pick depends on the passes it took. On the port each `OS_GetTick` moves the virtual clock a tick, so the AI runs 500 of those checks a pass and thinks in one. Traced first by the twister's callers on both programs (a scratch log of `GFL_RandomMT`'s callers in the port and an instrumented scratch build of melonDS, Black 2, 2026-10-24): at each of Hugh's turns his AI's setup draws in the same pass on both, the port's AI picks at the next pass and the DS's two passes later. The `hugh` sequence now holds it as GFL's random state, with the DS's seeds, in both versions (`oracle_hugh`): the linear generator's state and the twister's first word and index are the DS's at every count of the title, CONTINUE, the field and the battle but two passes at each turn, where the port's twister index is one ahead (Black 2's counts 7500-7501 and 7969-7970, White 2's 7496-7497 and 7969-7970), and the DS's again from its pick on. Oshawott's first pick is the same by chance; its second is another, and from that turn's rolls on (count 8193) the battle differs | nothing: no host has the DS's time. On the port a trainer battle plays as a DS could play it, from the DS's seeds too, but not as melonDS plays it once the AI thinks for more than a pass there ([oracle README](../tools/oracle/README.md#known-differences-from-the-hardware)). An oracle sequence stops before the AI's first decision the DS's time moves, and the route goes on from melonDS's save made after the battle ([ADR 0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md)). Past the cut the port's battle is its own and is held by what the CPU's time doesn't decide: `oracle_round_trip_hugh` plays Hugh's battle to its end on the port, which takes 560 counts more than the DS's in Black 2 and 704 in White 2, and holds its save in the Pokémon Center to melonDS's byte by byte but the bytes it declares (2026-10-25) | 2026-10-24, phase 4's route |
