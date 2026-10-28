@@ -136,8 +136,8 @@ GameEvent *EventQuicksandArrive_Create(GameEvent *parent, GameSystem *gsys, Fiel
     return event;
 }
 
-GameEvent *EventQuicksandArrive_CreateSpinZoom(GameEvent *parent, GameSystem *gsys, Field *field, BOOL seasonChanged, u32 prevSeason,
-                               u32 nextSeason) {
+GameEvent *EventQuicksandArrive_CreateSpinZoom(GameEvent *parent, GameSystem *gsys, Field *field, BOOL seasonChanged,
+                                               u32 prevSeason, u32 nextSeason) {
     GameEvent *event = GameEvent_Create(gsys, parent, EventQuicksandArrive_RunSpinZoom, sizeof(SpinEventWork));
     SpinEventWork *wk = GameEvent_GetData(event);
 
