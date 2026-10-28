@@ -485,7 +485,7 @@ static void FldAct_SetupMoveCode(MMSys *system, FieldActor *actor) {
 }
 
 static void FldAct_InitMoveProc(MMSys *system, FieldActor *actor) {
-    if (!CheckActorFlag(actor, 0x2000)) {
+    if (!CheckActorFlag(actor, ACTOR_FLAG_RAIL)) {
         FldAct_InitMoveProcGrid(actor);
     } else {
         RailActor_InitMove(actor);
@@ -493,7 +493,7 @@ static void FldAct_InitMoveProc(MMSys *system, FieldActor *actor) {
 }
 
 static void FldAct_UpdateMoveProc(FieldActor *actor) {
-    if (!CheckActorFlag(actor, 0x2000)) {
+    if (!CheckActorFlag(actor, ACTOR_FLAG_RAIL)) {
         FldAct_UpdateMoveProcGrid(actor);
     } else {
         RailActor_UpdateMove(actor);
@@ -797,7 +797,7 @@ void SetActorFaceDir(FieldActor *actor, u16 dir) {
 }
 
 void CheckSetActorFaceDir(FieldActor *actor, u16 dir) {
-    if (!CheckActorFlag(actor, 8)) {
+    if (!CheckActorFlag(actor, ACTOR_FLAG_FACE_DIR_LOCK)) {
         actor->lastFaceDir = actor->faceDir;
         actor->faceDir = dir;
     }

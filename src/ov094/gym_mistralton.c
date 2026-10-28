@@ -610,7 +610,7 @@ static GameEventReturnCode MistraltonTravelEvent_Run(GameEvent *event, u32 *stat
                 shake.amplitudeY = 2;
                 shake.period = 3;
                 shake.steps = 4;
-                shake.unk18 = 0;
+                shake.frame = 0;
                 shake.delay = distance * 3 - 6;
                 shake.mode = 1;
                 task = FieldCameraShakeTask_Create(data->field, &shake);
@@ -966,7 +966,7 @@ static GameEventReturnCode MistraltonTriggerEvent_Run(GameEvent *event, u32 *sta
             shake.amplitudeY = 2;
             shake.period = 3;
             shake.steps = 4;
-            shake.unk18 = 0;
+            shake.frame = 0;
             shake.delay = 0x18;
             shake.mode = 1;
             task = FieldCameraShakeTask_Create(data->field, &shake);

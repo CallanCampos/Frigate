@@ -21,7 +21,7 @@ FieldDispControl *FieldDispControl_Create(HeapID heapId) {
     FieldDispControl *control;
 
     control = GFL_HeapAllocate(heapId, sizeof(FieldDispControl), TRUE, "fld_vreq.c", 128);
-    MI_CpuFill8(control->bgEnabled, 0xff, sizeof(control->bgEnabled));
+    MI_CpuFill8(control->bgEnabled, FIELD_DISP_BG_UNCHANGED, sizeof(control->bgEnabled));
     return control;
 }
 
@@ -36,19 +36,19 @@ void FieldDispControl_Update(FieldDispControl *control) {
     proc = FIELD_DISP_CONTROL_PROCS[control->requestA];
     if (proc != NULL) {
         proc(&control->alphaA, 1);
-        control->requestA = 0;
+        control->requestA = FIELD_DISP_REQUEST_NONE;
     }
 
     proc = FIELD_DISP_CONTROL_PROCS[control->requestB];
     if (proc != NULL) {
         proc(&control->alphaB, 0);
-        control->requestB = 0;
+        control->requestB = FIELD_DISP_REQUEST_NONE;
     }
 
     for (i = 0; i < 8; i++) {
-        if (control->bgEnabled[i] != 0xff) {
+        if (control->bgEnabled[i] != FIELD_DISP_BG_UNCHANGED) {
             GFL_BGSysSetBGEnabled(i, control->bgEnabled[i]);
-            control->bgEnabled[i] = 0xff;
+            control->bgEnabled[i] = FIELD_DISP_BG_UNCHANGED;
         }
     }
 
@@ -67,7 +67,7 @@ void FieldDispControl_ReqSetBGEnabled(FieldDispControl *control, u32 bgId, BOOL 
 }
 
 void FieldDispControl_ReqSetAlphaA(FieldDispControl *control, u32 alpha, u32 beta, u32 planeMask, u32 complement) {
-    control->requestA = 2;
+    control->requestA = FIELD_DISP_REQUEST_SET_ALPHA;
     control->alphaA = alpha;
     control->betaA = beta;
     control->planeMaskA = planeMask;
@@ -76,7 +76,7 @@ void FieldDispControl_ReqSetAlphaA(FieldDispControl *control, u32 alpha, u32 bet
 
 void FieldDispControl_ReqSetAllA(FieldDispControl *control, u32 alpha, u32 beta, u32 planeMask, u32 complement,
                                  u32 all) {
-    control->requestA = 4;
+    control->requestA = FIELD_DISP_REQUEST_SET_ALL;
     control->alphaA = alpha;
     control->betaA = beta;
     control->planeMaskA = planeMask;
@@ -85,13 +85,13 @@ void FieldDispControl_ReqSetAllA(FieldDispControl *control, u32 alpha, u32 beta,
 }
 
 void FieldDispControl_ReqAdjustAlphaA(FieldDispControl *control, u32 alpha, u32 complement) {
-    control->requestA = 5;
+    control->requestA = FIELD_DISP_REQUEST_ADJUST_ALPHA;
     control->alphaA = alpha;
     control->betaA = complement;
 }
 
 void FieldDispControl_ReqSetAlphaB(FieldDispControl *control, u32 alpha, u32 beta, u32 planeMask, u32 complement) {
-    control->requestB = 2;
+    control->requestB = FIELD_DISP_REQUEST_SET_ALPHA;
     control->alphaB = alpha;
     control->betaB = beta;
     control->planeMaskB = planeMask;

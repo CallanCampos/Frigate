@@ -40,7 +40,6 @@
 #define PLACE_OWN_GATE PLACE_WHITE_GATE
 #endif
 
-#define ZONE_FOG_NONE 0x0fffffff
 #define ZONE_LIGHT_NONE 0x0fffffff
 
 typedef struct {

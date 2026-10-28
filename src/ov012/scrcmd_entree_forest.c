@@ -401,7 +401,8 @@ static GameEventReturnCode EventEntreeForestWarp_Callback(GameEvent *event, u32 
         if (data->playSound) {
             GFL_SndSEPlay(SEQ_SE_WARP);
         }
-        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, field, 9, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_WIPE_FACING, 0));
         (*state)++;
         break;
     case 2:
@@ -412,7 +413,8 @@ static GameEventReturnCode EventEntreeForestWarp_Callback(GameEvent *event, u32 
         break;
     case 3:
         if (FldActSys_IsAsyncLoadPending(Field_GetActorSystem(GSYS_GetField(gsys))) != TRUE) {
-            GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, field, 9, 0, 0, 0, 0));
+            GameEvent_ChainNext(
+                event, CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_WIPE_FACING, 0, 0, 0, 0));
             (*state)++;
         }
         break;

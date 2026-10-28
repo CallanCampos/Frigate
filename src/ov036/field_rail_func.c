@@ -370,9 +370,9 @@ void RailCameraFuncSetStaticPYR(FieldRailSystem *rail) {
 
     FieldRailSystem_GetCameraParentPos(rail, &eye);
     FieldCamera_SetTransformType(FieldRailSystem_GetFieldCamera(rail), 2);
-    eye.x += cam->unk4;
-    eye.y += cam->unk8;
-    eye.z += cam->unkC;
+    eye.x += cam->params[0];
+    eye.y += cam->params[1];
+    eye.z += cam->params[2];
     FieldCamera_CoordsSetEye(FieldRailSystem_GetFieldCamera(rail), &eye);
     FieldCamera_ResetBind(FieldRailSystem_GetFieldCamera(rail));
 }
@@ -387,9 +387,9 @@ void RailCameraFuncSetStaticPYDist(FieldRailSystem *rail) {
     FieldCamera_SetTransformType(camera, 0);
     FieldCamera_ResetBind(FieldRailSystem_GetFieldCamera(rail));
     FieldRailSystem_GetCameraParentPos(rail, &pos);
-    pitch = cam->unk4;
-    zoom = cam->unkC;
-    FieldCamera_CoordsSetYaw(camera, cam->unk8);
+    pitch = cam->params[0];
+    zoom = cam->params[2];
+    FieldCamera_CoordsSetYaw(camera, cam->params[1]);
     FieldCamera_CoordsSetPitch(camera, pitch);
     FieldCamera_CoordsSetZoom(camera, zoom);
 }
@@ -429,12 +429,12 @@ void FieldRailCamera_BlendAngles(FieldRailSystem *rail) {
     length = GetCurrentLineLength(unit);
     posV = GetCurrentLinePosV(unit);
     t = FX_Div(posV << 12, length << 12);
-    pitch0 = (u16)c0->unk4;
-    yaw0 = (u16)c0->unk8;
-    zoom0 = c0->unkC;
-    yaw1 = (u16)c1->unk8;
-    zoom1 = c1->unkC;
-    diff = (u16)c1->unk4 - pitch0;
+    pitch0 = (u16)c0->params[0];
+    yaw0 = (u16)c0->params[1];
+    zoom0 = c0->params[2];
+    yaw1 = (u16)c1->params[1];
+    zoom1 = c1->params[2];
+    diff = (u16)c1->params[0] - pitch0;
     if (diff >= 0x8000) {
         diff -= 0x10000;
     } else if (diff <= -0x8000) {
@@ -486,12 +486,12 @@ void FieldRailCamera_FixedEyeTarget(FieldRailSystem *rail) {
 
     FieldCamera_SetTransformType(camera, 2);
     FieldCamera_ClearBind(FieldRailSystem_GetFieldCamera(rail));
-    eye.x = cam->unk4;
-    eye.y = cam->unk8;
-    eye.z = cam->unkC;
-    target.x = cam->unk10;
-    target.y = cam->unk14;
-    target.z = cam->unk18;
+    eye.x = cam->params[0];
+    eye.y = cam->params[1];
+    eye.z = cam->params[2];
+    target.x = cam->params[3];
+    target.y = cam->params[4];
+    target.z = cam->params[5];
     FieldCamera_CoordsSetEye(camera, &eye);
     FieldCamera_CoordsSetTarget(camera, &target);
 }
@@ -514,18 +514,18 @@ void FieldRailCamera_BlendEyeTarget(FieldRailSystem *rail) {
     posV = GetCurrentLinePosV(unit);
     posV *= 0x1000;
     length *= 0x1000;
-    eye.x = FX_Div(FX_Mul(c1->unk4 - c0->unk4, posV), length);
-    eye.y = FX_Div(FX_Mul(c1->unk8 - c0->unk8, posV), length);
-    eye.z = FX_Div(FX_Mul(c1->unkC - c0->unkC, posV), length);
-    target.x = FX_Div(FX_Mul(c1->unk10 - c0->unk10, posV), length);
-    target.y = FX_Div(FX_Mul(c1->unk14 - c0->unk14, posV), length);
-    target.z = FX_Div(FX_Mul(c1->unk18 - c0->unk18, posV), length);
-    eye.x += c0->unk4;
-    eye.y += c0->unk8;
-    eye.z += c0->unkC;
-    target.x += c0->unk10;
-    target.y += c0->unk14;
-    target.z += c0->unk18;
+    eye.x = FX_Div(FX_Mul(c1->params[0] - c0->params[0], posV), length);
+    eye.y = FX_Div(FX_Mul(c1->params[1] - c0->params[1], posV), length);
+    eye.z = FX_Div(FX_Mul(c1->params[2] - c0->params[2], posV), length);
+    target.x = FX_Div(FX_Mul(c1->params[3] - c0->params[3], posV), length);
+    target.y = FX_Div(FX_Mul(c1->params[4] - c0->params[4], posV), length);
+    target.z = FX_Div(FX_Mul(c1->params[5] - c0->params[5], posV), length);
+    eye.x += c0->params[0];
+    eye.y += c0->params[1];
+    eye.z += c0->params[2];
+    target.x += c0->params[3];
+    target.y += c0->params[4];
+    target.z += c0->params[5];
     FieldCamera_CoordsSetEye(camera, &eye);
     FieldCamera_CoordsSetTarget(camera, &target);
 }
@@ -557,21 +557,21 @@ void FieldRailCamera_BlendOrbit(FieldRailSystem *rail) {
         length = 1;
         posV = 0;
     }
-    pitchStep = posV * (c1->unk4 - c0->unk4) / length;
-    angle = c0->unk4 + pitchStep;
-    distStep = FX_Div(FX_Mul(c1->unk8 - c0->unk8, posV << 12), length << 12);
-    dist = c0->unk8 + distStep;
-    target.x = c0->unkC;
-    target.y = c0->unk10;
-    target.z = c0->unk14;
+    pitchStep = posV * (c1->params[0] - c0->params[0]) / length;
+    angle = c0->params[0] + pitchStep;
+    distStep = FX_Div(FX_Mul(c1->params[1] - c0->params[1], posV << 12), length << 12);
+    dist = c0->params[1] + distStep;
+    target.x = c0->params[2];
+    target.y = c0->params[3];
+    target.z = c0->params[4];
     FieldRailCamera_SetOrbit(rail, angle, dist, &target);
 }
 
 void FieldRailCamera_Orbit(FieldRailSystem *rail) {
     RailCamera *cam = GetRailCameraByCamHandler(FieldRailSystem_GetCameraParentUnit(rail));
-    u16 angle = cam->unk4;
-    s32 dist = cam->unk8;
-    VecFx32 target = { cam->unkC, cam->unk10, cam->unk14 };
+    u16 angle = cam->params[0];
+    s32 dist = cam->params[1];
+    VecFx32 target = { cam->params[2], cam->params[3], cam->params[4] };
 
     FieldRailCamera_SetOrbit(rail, angle, dist, &target);
 }
@@ -618,11 +618,11 @@ void FieldRailCamera_OrbitMovingPoint(FieldRailSystem *rail) {
     length = GetCurrentLineLength(unit);
     posV = GetCurrentLinePosV(unit);
     cam = GetRailCameraByCamHandler(unit);
-    angle = cam->unk4;
-    dist = cam->unk8;
-    target.x = cam->unkC + FX_Div(FX_Mul(cam->unk18 - cam->unkC, posV * 0x1000), length * 0x1000);
-    target.y = cam->unk10 + FX_Div(FX_Mul(cam->unk1C - cam->unk10, posV * 0x1000), length * 0x1000);
-    target.z = cam->unk14 + FX_Div(FX_Mul(cam->unk20 - cam->unk14, posV * 0x1000), length * 0x1000);
+    angle = cam->params[0];
+    dist = cam->params[1];
+    target.x = cam->params[2] + FX_Div(FX_Mul(cam->params[5] - cam->params[2], posV * 0x1000), length * 0x1000);
+    target.y = cam->params[3] + FX_Div(FX_Mul(cam->params[6] - cam->params[3], posV * 0x1000), length * 0x1000);
+    target.z = cam->params[4] + FX_Div(FX_Mul(cam->params[7] - cam->params[4], posV * 0x1000), length * 0x1000);
     FieldRailCamera_SetOrbit(rail, angle, dist, &target);
 }
 
@@ -637,14 +637,14 @@ void FieldRailCamera_YawFromPoint(FieldRailSystem *rail) {
     FieldCamera_ResetBind(FieldRailSystem_GetFieldCamera(rail));
     FieldRailSystem_GetCameraParentPos(rail, &pos);
     pos.y = 0;
-    base.x = cam->unkC;
+    base.x = cam->params[2];
     base.y = 0;
-    base.z = cam->unk10;
+    base.z = cam->params[3];
     VEC_Subtract(&pos, &base, &pos);
     VEC_Normalize(&pos, &pos);
     yaw = FX_Atan2Idx(pos.x, pos.z);
-    FieldCamera_CoordsSetPitch(camera, cam->unk4);
-    FieldCamera_CoordsSetZoom(camera, cam->unk8);
+    FieldCamera_CoordsSetPitch(camera, cam->params[0]);
+    FieldCamera_CoordsSetZoom(camera, cam->params[1]);
     FieldCamera_CoordsSetYaw(camera, yaw);
 }
 
@@ -659,9 +659,9 @@ void FieldRailCamera_FollowHeading(FieldRailSystem *rail) {
     FieldCamera_ResetBind(FieldRailSystem_GetFieldCamera(rail));
     RailUnit_GetStepVector(unit, &dir);
     yaw = FX_Atan2Idx(-dir.x, -dir.z);
-    FieldCamera_CoordsSetPitch(camera, cam->unk8);
-    FieldCamera_CoordsSetZoom(camera, cam->unkC);
-    FieldCamera_CoordsSetYaw(camera, yaw + cam->unk4);
+    FieldCamera_CoordsSetPitch(camera, cam->params[1]);
+    FieldCamera_CoordsSetZoom(camera, cam->params[2]);
+    FieldCamera_CoordsSetYaw(camera, yaw + cam->params[0]);
 }
 
 void FieldRailCamera_FollowHeadingSlope(FieldRailSystem *rail) {
@@ -681,9 +681,9 @@ void FieldRailCamera_FollowHeadingSlope(FieldRailSystem *rail) {
     flat.z = dir.z;
     flat.y = 0;
     pitch = FX_Atan2Idx(-dir.y, VEC_Fx16Mag(&flat));
-    FieldCamera_CoordsSetPitch(camera, pitch + cam->unk8);
-    FieldCamera_CoordsSetZoom(camera, cam->unkC);
-    FieldCamera_CoordsSetYaw(camera, yaw + cam->unk4);
+    FieldCamera_CoordsSetPitch(camera, pitch + cam->params[1]);
+    FieldCamera_CoordsSetZoom(camera, cam->params[2]);
+    FieldCamera_CoordsSetYaw(camera, yaw + cam->params[0]);
 }
 
 void FieldRailCamera_FollowHeadingAtCentre(FieldRailSystem *rail) {
@@ -698,9 +698,9 @@ void FieldRailCamera_FollowHeadingAtCentre(FieldRailSystem *rail) {
     FieldCamera_ClearBind(FieldRailSystem_GetFieldCamera(rail));
     RailUnit_GetStepVector(unit, &dir);
     yaw = FX_Atan2Idx(-dir.x, -dir.z);
-    FieldCamera_CoordsSetPitch(camera, cam->unk8);
-    FieldCamera_CoordsSetZoom(camera, cam->unkC);
-    FieldCamera_CoordsSetYaw(camera, yaw + cam->unk4);
+    FieldCamera_CoordsSetPitch(camera, cam->params[1]);
+    FieldCamera_CoordsSetZoom(camera, cam->params[2]);
+    FieldCamera_CoordsSetYaw(camera, yaw + cam->params[0]);
     RailUnit_GetCentrePos(unit, &target);
     FieldCamera_CoordsSetTarget(FieldRailSystem_GetFieldCamera(rail), &target);
 }
@@ -737,14 +737,14 @@ void FieldRailCamera_FixedAngleShift(FieldRailSystem *rail) {
     FieldCamera_SetTransformType(camera, 0);
     FieldCamera_ResetBind(FieldRailSystem_GetFieldCamera(rail));
     FieldRailSystem_GetCameraParentPos(rail, &pos);
-    pitch = cam->unk4;
-    zoom = cam->unkC;
-    FieldCamera_CoordsSetYaw(camera, cam->unk8);
+    pitch = cam->params[0];
+    zoom = cam->params[2];
+    FieldCamera_CoordsSetYaw(camera, cam->params[1]);
     FieldCamera_CoordsSetPitch(camera, pitch);
     FieldCamera_CoordsSetZoom(camera, zoom);
-    offset.x = cam->unk10;
-    offset.y = cam->unk14;
-    offset.z = cam->unk18;
+    offset.x = cam->params[3];
+    offset.y = cam->params[4];
+    offset.z = cam->params[5];
     FieldCamera_CoordsSetTargetOffset(camera, &offset);
 }
 
@@ -784,12 +784,12 @@ void FieldRailCamera_BlendAnglesShift(FieldRailSystem *rail) {
     length = GetCurrentLineLength(unit);
     posV = GetCurrentLinePosV(unit);
     t = FX_Div(posV << 12, length << 12);
-    pitch0 = (u16)c0->unk4;
-    yaw0 = (u16)c0->unk8;
-    zoom0 = c0->unkC;
-    yaw1 = (u16)c1->unk8;
-    zoom1 = c1->unkC;
-    diff = (u16)c1->unk4 - pitch0;
+    pitch0 = (u16)c0->params[0];
+    yaw0 = (u16)c0->params[1];
+    zoom0 = c0->params[2];
+    yaw1 = (u16)c1->params[1];
+    zoom1 = c1->params[2];
+    diff = (u16)c1->params[0] - pitch0;
     if (diff >= 0x8000) {
         diff -= 0x10000;
     } else if (diff <= -0x8000) {
@@ -810,9 +810,9 @@ void FieldRailCamera_BlendAnglesShift(FieldRailSystem *rail) {
         FieldCamera_CoordsSetPitch(camera, pitch);
     }
     FieldCamera_CoordsSetZoom(camera, zoom0 + FX_Mul(zoom1 - zoom0, t));
-    offset.x = c0->unk10 + FX_Mul(c1->unk10 - c0->unk10, t);
-    offset.y = c0->unk14 + FX_Mul(c1->unk14 - c0->unk14, t);
-    offset.z = c0->unk18 + FX_Mul(c1->unk18 - c0->unk18, t);
+    offset.x = c0->params[3] + FX_Mul(c1->params[3] - c0->params[3], t);
+    offset.y = c0->params[4] + FX_Mul(c1->params[4] - c0->params[4], t);
+    offset.z = c0->params[5] + FX_Mul(c1->params[5] - c0->params[5], t);
     FieldCamera_CoordsSetTargetOffset(camera, &offset);
 }
 
@@ -886,7 +886,7 @@ static void FieldRailCamera_ApplyPoint(FieldRailSystem *rail, RailUnit *unit, Ra
     FieldCamera_SetTransformType(camera, 0);
     FieldCamera_ClearBind(camera);
     FieldCamera_CoordsSetTarget(camera, &target);
-    FieldCamera_CoordsSetPitch(camera, cam->unk4);
-    FieldCamera_CoordsSetYaw(camera, cam->unk8);
-    FieldCamera_CoordsSetZoom(camera, cam->unkC);
+    FieldCamera_CoordsSetPitch(camera, cam->params[0]);
+    FieldCamera_CoordsSetYaw(camera, cam->params[1]);
+    FieldCamera_CoordsSetZoom(camera, cam->params[2]);
 }

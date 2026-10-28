@@ -64,23 +64,48 @@ void FieldPlayer_GetGPos(FieldPlayer *player, s16 *x, s16 *y, s16 *z);
 u32 TrainerCard_CountStars(GameData *gameData);
 // The grid position in front of the player, facing dir
 void GetPlayerGPosPlusDir(FieldPlayer *player, u16 dir, s16 *x, s16 *y, s16 *z);
+// What a Join Avenue name entry names: the avenue, its title, and the player's favorite phrase and phrase when
+// impressed, which the passerbys say
+enum {
+    JOIN_AVENUE_ENTRY_NAME,
+    JOIN_AVENUE_ENTRY_TITLE,
+    JOIN_AVENUE_ENTRY_PHRASE,
+    JOIN_AVENUE_ENTRY_IMPRESSED,
+};
 GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result, u16 useCurrent);
 // Check the party and the Battle Box against a regulation. Regulation_CreatePartyCheckTask returns the event that lets
 // the player choose between them, or NULL when neither can enter
-GameEvent *Regulation_CreatePartyCheckTask(GameSystem *gsys, u32 a1, Regulation *regulation, u16 *result,
+GameEvent *Regulation_CreatePartyCheckTask(GameSystem *gsys, u32 pickFromParty, Regulation *regulation, u16 *result,
                                            HeapID heapId);
-u32 Regulation_CheckTeams(GameSystem *gsys, u32 a1, Regulation *regulation, HeapID heapId);
-// The screen that picks the party or the Battle Box for a battle, whether it is done, and the choice
-PartySelectList *PartySelectList_Create(Field *field, PokeParty *party, PokeParty *battleBoxParty, u8 partyOk,
-                                        u32 battleBoxOk, HeapID heapId);
+u32 Regulation_CheckTeams(GameSystem *gsys, u32 pickFromParty, Regulation *regulation, HeapID heapId);
+// PartySelectList_Delete's result, the row the player picked
+enum {
+    PARTY_SELECT_PARTY,
+    PARTY_SELECT_BATTLE_BOX,
+    PARTY_SELECT_CANCEL,
+};
+
+// The screen that picks the party or the Battle Box for a battle, whether it is done, and the choice. partyIneligible
+// and battleBoxIneligible are set for a team that fails the regulation, and PartySelectList_Delete sets *ineligible
+// when the team picked is one
+PartySelectList *PartySelectList_Create(Field *field, PokeParty *party, PokeParty *battleBoxParty, u8 partyIneligible,
+                                        u32 battleBoxIneligible, HeapID heapId);
 BOOL PartySelectList_Main(PartySelectList *select);
-int PartySelectList_Delete(PartySelectList *select, u32 *a1);
-FieldEffectTask *FldeffBtrain_Start(FieldEffects *effects, u32 a1, const VecFx32 *pos);
-void FldeffBtrain_SetAnime(FieldEffectTask *task, u16 a1);
-void FldeffBtrain_SetHidden(FieldEffectTask *task, u16 a1);
+int PartySelectList_Delete(PartySelectList *select, u32 *ineligible);
+FieldEffectTask *FldeffBtrain_Start(FieldEffects *effects, u32 trainIdx, const VecFx32 *pos);
+void FldeffBtrain_SetAnime(FieldEffectTask *task, u16 anmIdx);
+void FldeffBtrain_SetHidden(FieldEffectTask *task, u16 hidden);
 void FieldPlayer_SetWPos(FieldPlayer *player, const VecFx32 *pos);
 void FieldPlayer_SetDirection(FieldPlayer *player, u16 dir);
-void FieldFadeTCB_Start(GameSystem *gsys, Field *field, u32 a2, u32 a3, u32 a4);
+// field_fade.c's fade of the field's screens, by type: in or out, quickly or at the slower speed. white fades from or
+// to white rather than black, and skipWait lets the field go on without waiting for the fade
+enum {
+    FIELD_FADE_TYPE_IN_QUICK,
+    FIELD_FADE_TYPE_OUT_QUICK,
+    FIELD_FADE_TYPE_IN,
+    FIELD_FADE_TYPE_OUT,
+};
+void FieldFadeTCB_Start(GameSystem *gsys, Field *field, u32 type, u32 white, u32 skipWait);
 
 // The work of the zone's gimmick, such as a gym's puzzle, which the gimmick's overlay allocates at the zone's start
 void *Field_AllocGimmickWorkBlock(Field *field, u32 id, HeapID heapId, u32 size);
@@ -159,6 +184,9 @@ void FieldRenderPhase2_EncountEffect(Field *field);
 FieldDispControl *FieldG2D_GetDispControl(Field *field);
 FieldEffects *Field_GetFieldEffects(Field *field);
 FieldG3DObjSystem *Field_GetG3DObjSys(Field *field);
+// No fog, which GetZoneFogIndex and GetZoneFogIndexAll return for a zone without one
+#define ZONE_FOG_NONE 0x0fffffff
+
 u32 GetZoneFogIndex(u16 zoneId);
 u32 ZoneData_GetObjectProjectionMatrixType(u16 zoneId);
 u32 GetObjectProjectionMatrixOffset(u16 zoneId);

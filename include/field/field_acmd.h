@@ -33,8 +33,11 @@ enum {
     ACMD_JUMP_2 = 0x38,
     // The "!" bubble over the actor (fldeff_emotion_bubble.c's kind 0) with its sound; one command, for no direction
     ACMD_EMOTION_BUBBLE = 0x4b,
+    // The walks that take 6 and 12 frames a tile, uphill from ACMD_WALK_4F and ACMD_WALK_8F
     ACMD_WALK_UPHILL_4F = 0x4c,
+    ACMD_WALK_3F = 0x50,
     ACMD_DASH = 0x58,
+    ACMD_WALK_7F = 0x60,
     ACMD_BIKE_DEEP_SAND = 0x9b,
     ACMD_DASH_UPHILL = 0xa3,
     ACMD_WALK_UPHILL_8F = 0xa7,

@@ -247,7 +247,8 @@ GameEventReturnCode EventFieldFirst_Callback(GameEvent *event, u32 *state, void 
         (*state)++;
         break;
     case 4:
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, GSYS_GetField(gsys), 0, 0, 1, 0, 0));
+        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, GSYS_GetField(gsys),
+                                                                    FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         (*state)++;
         break;
     case 5:
@@ -346,8 +347,8 @@ GameEventReturnCode EventFieldContinue_Callback(GameEvent *event, u32 *state, vo
             EventScriptCall_Start(event, 0x83b, NULL, 0, HEAPID_FIELDMAP);
         } else {
             u8 season = GameData_GetSeason(gameData);
-            GameEvent_ChainNext(event,
-                                CallFieldMapEntranceInTransition(gsys, GSYS_GetField(gsys), 3, 0, 0, season, season));
+            GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, GSYS_GetField(gsys),
+                                                                        FIELD_TRANSITION_SEASON, 0, 0, season, season));
         }
         (*state)++;
         break;
@@ -426,7 +427,7 @@ void EventMapChange_SetupWarpSequenceOut(EventMapChange *wk, GameEvent *parent) 
     warp->gsys = wk->gsys;
     warp->gameData = wk->gameData;
     warp->field = wk->field;
-    warp->unk10 = wk->unk2C;
+    warp->departureTransitionType = wk->unk2C;
     warp->parent = parent;
     warp->zoneId = wk->zoneId;
     warp->spawn = wk->spawn;
@@ -436,7 +437,7 @@ void EventMapChange_SetupWarpSequenceOut(EventMapChange *wk, GameEvent *parent) 
     warp->startSeason = Season_GetNext(wk->prevSeason);
     warp->endSeason = wk->season;
     warp->zoneBGMChanged = 0;
-    warp->unk4C = 0;
+    warp->bgmFadedOut = 0;
 }
 
 void EventMapChange_SetupWarpSequenceIn(EventMapChange *wk, GameEvent *parent) {
@@ -445,7 +446,7 @@ void EventMapChange_SetupWarpSequenceIn(EventMapChange *wk, GameEvent *parent) {
     warp->gsys = wk->gsys;
     warp->gameData = wk->gameData;
     warp->field = wk->field;
-    warp->unk10 = wk->unk2C;
+    warp->departureTransitionType = wk->unk2C;
     warp->parent = parent;
     warp->zoneId = wk->zoneId;
     warp->spawn = wk->spawn;
@@ -662,7 +663,8 @@ GameEventReturnCode EventMapChangeFakeWarp_Callback(GameEvent *event, u32 *state
         break;
     case 1:
         if (wk->unk40 && wk->seasonChanged) {
-            GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, field, 0, 0));
+            GameEvent_ChainNext(event,
+                                CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
         } else {
             GameEvent_ChainNext(event,
                                 CallFieldMapEntranceOutTransitionDefault(
@@ -676,8 +678,8 @@ GameEventReturnCode EventMapChangeFakeWarp_Callback(GameEvent *event, u32 *state
         break;
     case 3:
         if (wk->unk40 && wk->seasonChanged) {
-            GameEvent_ChainNext(event,
-                                CallFieldMapEntranceInTransition(gsys, field, 3, 0, 0, wk->prevSeason, wk->season));
+            GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_SEASON, 0, 0,
+                                                                        wk->prevSeason, wk->season));
         } else {
             GameEvent_ChainNext(
                 event, CallFieldMapEntranceInTransition(
@@ -849,7 +851,8 @@ GameEventReturnCode EventMapChangeDiveOut_Callback(GameEvent *event, u32 *state,
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, field, 1, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_WHITE, 0));
         (*state)++;
         break;
     case 1:
@@ -863,7 +866,8 @@ GameEventReturnCode EventMapChangeDiveOut_Callback(GameEvent *event, u32 *state,
         (*state)++;
         break;
     case 3:
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, field, 1, 0, 1, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_WHITE, 0, 1, 0, 0));
         (*state)++;
         break;
     case 4:
@@ -884,7 +888,8 @@ GameEventReturnCode EventMapChangeDiveIn_Callback(GameEvent *event, u32 *state, 
         (*state)++;
         break;
     case 1:
-        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, field, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
         (*state)++;
         break;
     case 2: {
@@ -897,7 +902,8 @@ GameEventReturnCode EventMapChangeDiveIn_Callback(GameEvent *event, u32 *state, 
         break;
     }
     case 3:
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, field, 0, 0, 1, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         (*state)++;
         break;
     case 4:
@@ -1643,7 +1649,8 @@ GameEventReturnCode EventEntralinkWarp_Callback(GameEvent *event, u32 *state, vo
         PlaceName_Cancel(Field_GetPlaceName(field));
         if (wk->festMissionStatus != 0) {
             GFL_SndSEPlay(SEQ_SE_FLD_131);
-            GameEvent_ChainNext(event, CallFieldMapEntranceOutTransition(gsys, field, 1, 0, 4));
+            GameEvent_ChainNext(event,
+                                CallFieldMapEntranceOutTransition(gsys, field, FIELD_TRANSITION_FADE_WHITE, 0, 4));
         } else {
             GFL_SndSEPlay(SEQ_SE_FLD_131);
             EncEff_StartEvent(Field_GetEncEff(field), event, 0x25);
@@ -1664,9 +1671,11 @@ GameEventReturnCode EventEntralinkWarp_Callback(GameEvent *event, u32 *state, vo
     }
     case 2:
         if (wk->festMissionStatus != 0) {
-            GameEvent_ChainNext(event, EventGameTransition_CreateFadeInEventWithBgRestore(gsys, field, 1, 0, 2));
+            GameEvent_ChainNext(event, EventGameTransition_CreateFadeInEventWithBgRestore(
+                                           gsys, field, FIELD_TRANSITION_FADE_WHITE, 0, 2));
         } else {
-            GameEvent_ChainNext(event, EventGameTransition_CreateFadeInEventWithBgRestore(gsys, field, 0, 0, 2));
+            GameEvent_ChainNext(event, EventGameTransition_CreateFadeInEventWithBgRestore(
+                                           gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 2));
         }
         (*state)++;
         break;

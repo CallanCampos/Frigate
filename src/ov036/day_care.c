@@ -723,28 +723,28 @@ static void abilDecision(EggParents *parents, EggData *egg, HeapID heapId, EggRa
     u32 roll = EggRandom_Next(rnd, 100);
 
     switch (slot) {
-    case 0:
+    case ABILITY_SLOT_1:
     default:
         if (roll < 80) {
-            egg->abilitySlot = 0;
+            egg->abilitySlot = ABILITY_SLOT_1;
         } else {
-            egg->abilitySlot = 1;
+            egg->abilitySlot = ABILITY_SLOT_2;
         }
         break;
-    case 1:
+    case ABILITY_SLOT_2:
         if (roll < 20) {
-            egg->abilitySlot = 0;
+            egg->abilitySlot = ABILITY_SLOT_1;
         } else {
-            egg->abilitySlot = 1;
+            egg->abilitySlot = ABILITY_SLOT_2;
         }
         break;
-    case 2:
+    case ABILITY_SLOT_HIDDEN:
         if (roll < 20) {
-            egg->abilitySlot = 0;
+            egg->abilitySlot = ABILITY_SLOT_1;
         } else if (roll < 40) {
-            egg->abilitySlot = 1;
+            egg->abilitySlot = ABILITY_SLOT_2;
         } else {
-            egg->abilitySlot = 2;
+            egg->abilitySlot = ABILITY_SLOT_HIDDEN;
         }
         break;
     }
@@ -756,9 +756,9 @@ static void dittoAbilFix(EggParents *parents, EggData *egg, EggRandom *rnd) {
 
     if (species1 == SPECIES_DITTO || species2 == SPECIES_DITTO) {
         if (EggRandom_Next(rnd, 2) == 0) {
-            egg->abilitySlot = 0;
+            egg->abilitySlot = ABILITY_SLOT_1;
         } else {
-            egg->abilitySlot = 1;
+            egg->abilitySlot = ABILITY_SLOT_2;
         }
     }
 }
@@ -858,12 +858,12 @@ static void getEggIDSet(PlayerInfo *info, EggData *egg) {
 static void rerollEggPID(EggParents *parents, EggData *egg) {
     u32 ability;
 
-    if (egg->abilitySlot == 0 || egg->abilitySlot != 1) {
+    if (egg->abilitySlot == ABILITY_SLOT_1 || egg->abilitySlot != ABILITY_SLOT_2) {
         ability = 0;
     } else {
         ability = 1;
     }
-    egg->pid = PML_GenPID(egg->trainerId, egg->species, egg->form, 2, ability, 2);
+    egg->pid = PML_GenPID(egg->trainerId, egg->species, egg->form, GENDER_UNKNOWN, ability, PID_RARE_RANDOM);
 }
 
 static void shinyBreedHandler(EggParents *parents, EggData *egg, BOOL hasShinyCharm) {
@@ -1027,7 +1027,7 @@ static void createEggPkm(PartyPkm *pkm, const EggData *egg, PlayerInfo *info, u3
     PokeParty_SetParam(pkm, PKM_PARAM_FORM, egg->form);
     PokeParty_SetParam(pkm, PKM_PARAM_NATURE, egg->nature);
     PokeParty_SetParam(pkm, PKM_PARAM_HAPPINESS, egg->happiness);
-    if (egg->abilitySlot == 2) {
+    if (egg->abilitySlot == ABILITY_SLOT_HIDDEN) {
         PokeParty_SetHiddenAbil(pkm, egg->species, egg->form);
     }
     for (i = 0; i < 6; i++) {

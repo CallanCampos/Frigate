@@ -13,8 +13,15 @@
 #define G3DOBJ_ANM_MAX 8
 #define G3DOBJ_ANM_ALL 8
 
-// The resources of a model with its textures and animations; state is 1 once the textures are in VRAM and 2 while
-// they wait to be put there
+// The state of a resource group's textures, none in VRAM, in VRAM, or waiting to be put there, and of an object, free,
+// set up, or waiting for its group's textures before it is
+enum {
+    G3DOBJ_STATE_NONE,
+    G3DOBJ_STATE_READY,
+    G3DOBJ_STATE_PENDING,
+};
+
+// The resources of a model with its textures and animations, with a G3DOBJ_STATE_ value
 typedef struct {
     G3DResource *model;
     G3DResource *texture;
@@ -28,8 +35,10 @@ typedef struct {
     u32 state : 2;
     u32 bboxCull : 1;
     u32 hidden : 1;
-    u32 flag4 : 1;
-    u32 flag5 : 1;
+    // Set when the object is drawn by FieldG3DObjSystem_DrawObj rather than with the others
+    u32 manualDraw : 1;
+    // Set by the object's user once a frame's animation is stepped, and cleared when the frame is drawn
+    u32 redraw : 1;
     u16 resGroup;
     u16 modelIndex;
     SRTMatrix transform;
@@ -76,7 +85,7 @@ void FieldG3DObjSystem_Free(FieldG3DObjSystem *system) {
     system->ready = FALSE;
     obj = system->objs;
     for (i = 0; i < system->objCount; i++, obj++) {
-        if (obj->state == 1 && obj->actor != NULL) {
+        if (obj->state == G3DOBJ_STATE_READY && obj->actor != NULL) {
             FieldG3DObj_Free(obj, &system->resGroups[obj->resGroup]);
         }
     }
@@ -100,14 +109,14 @@ void FieldG3DObjSystem_SetupResources(FieldG3DObjSystem *system) {
         obj = system->objs;
         group = system->resGroups;
         for (i = 0; i < system->resGroupCount; i++) {
-            if (group->state == 2) {
+            if (group->state == G3DOBJ_STATE_PENDING) {
                 FieldG3DObjResGroup_SetupTextures(group);
             }
             group++;
         }
         groups = system->resGroups;
         for (j = 0; j < system->objCount; j++) {
-            if (obj->state == 2) {
+            if (obj->state == G3DOBJ_STATE_PENDING) {
                 FieldG3DObj_Setup(obj, &groups[obj->resGroup], obj->resGroup, obj->modelIndex, system->heapId, NULL,
                                   FALSE);
             }
@@ -121,15 +130,15 @@ void FieldG3DObjSystem_Draw(FieldG3DObjSystem *system) {
     FieldG3DObj *obj = system->objs;
 
     for (i = 0; i < system->objCount; i++) {
-        if (obj->state == 1) {
-            if (!obj->flag4 && !obj->hidden) {
+        if (obj->state == G3DOBJ_STATE_READY) {
+            if (!obj->manualDraw && !obj->hidden) {
                 if (obj->bboxCull == 1) {
                     GFL_G3DSysDrawObjBBoxCull(obj->actor, &obj->transform);
                 } else {
                     GFL_G3DSysDrawObj(obj->actor, &obj->transform);
                 }
             }
-            obj->flag5 = 0;
+            obj->redraw = 0;
         }
         obj++;
     }
@@ -166,13 +175,13 @@ u16 FieldG3DObjSystem_AddObj(FieldG3DObjSystem *system, u16 resGroup, u16 modelI
     FieldG3DObj *obj = system->objs;
 
     for (i = 0; i < system->objCount; i++, obj++) {
-        if (obj->state == 0 && obj->actor == NULL) {
+        if (obj->state == G3DOBJ_STATE_NONE && obj->actor == NULL) {
             FieldG3DObjResGroup *group = &system->resGroups[resGroup];
 
-            if (group->state == 2) {
+            if (group->state == G3DOBJ_STATE_PENDING) {
                 obj->resGroup = resGroup;
                 obj->modelIndex = modelIndex;
-                obj->state = 2;
+                obj->state = G3DOBJ_STATE_PENDING;
                 obj->bboxCull = 1;
                 obj->transform.scale.x = FX32_ONE;
                 obj->transform.scale.y = FX32_ONE;
@@ -194,7 +203,7 @@ void FieldG3DObjSystem_FreeObj(FieldG3DObjSystem *system, u16 objIndex) {
     FieldG3DObj *obj = &system->objs[objIndex];
 
     system->ready = FALSE;
-    if (obj->state == 1) {
+    if (obj->state == G3DOBJ_STATE_READY) {
         FieldG3DObj_Free(obj, &system->resGroups[obj->resGroup]);
     }
     system->ready = TRUE;
@@ -218,14 +227,14 @@ BOOL FieldG3DObjSystem_StepObjAnm(FieldG3DObjSystem *system, u16 objIndex, fx32 
     int i;
     int count;
 
-    if (obj->state == 1) {
+    if (obj->state == G3DOBJ_STATE_READY) {
         count = system->resGroups[obj->resGroup].animationCount;
         for (i = 0; i < count; i++) {
             if (GFL_G3DActorStepAnmFrame(obj->actor, i, speed)) {
                 playing = TRUE;
             }
         }
-    } else if (obj->state == 2) {
+    } else if (obj->state == G3DOBJ_STATE_PENDING) {
         playing = TRUE;
     }
     return playing;
@@ -237,14 +246,14 @@ BOOL FieldG3DObjSystem_StepObjAnmLoop(FieldG3DObjSystem *system, u16 objIndex, f
     int i;
     int count;
 
-    if (obj->state == 1) {
+    if (obj->state == G3DOBJ_STATE_READY) {
         count = system->resGroups[obj->resGroup].animationCount;
         for (i = 0; i < count; i++) {
             if (GFL_G3DActorStepAnmFrameLoop(obj->actor, i, speed)) {
                 playing = TRUE;
             }
         }
-    } else if (obj->state == 2) {
+    } else if (obj->state == G3DOBJ_STATE_PENDING) {
         playing = TRUE;
     }
     return playing;
@@ -255,7 +264,7 @@ void FieldG3DObjSystem_SetAnmFrame(FieldG3DObjSystem *system, u16 objIndex, int 
     int count;
     int i;
 
-    if (obj->state == 1) {
+    if (obj->state == G3DOBJ_STATE_READY) {
         count = system->resGroups[obj->resGroup].animationCount;
         if (anmIndex == G3DOBJ_ANM_ALL) {
             for (i = 0; i < count; i++) {
@@ -271,7 +280,7 @@ fx32 FieldG3DObjSystem_GetAnmFrame(FieldG3DObjSystem *system, u16 objIndex, u32 
     fx32 frame = 0;
     FieldG3DObj *obj = &system->objs[objIndex];
 
-    if (obj->state == 1) {
+    if (obj->state == G3DOBJ_STATE_READY) {
         if (!GFL_G3DActorGetAnmFrame(obj->actor, anmIndex, &frame)) {
             frame = 0;
         }
@@ -280,13 +289,13 @@ fx32 FieldG3DObjSystem_GetAnmFrame(FieldG3DObjSystem *system, u16 objIndex, u32 
 }
 
 void FieldG3DObjSystem_SetObjectManualDraw(FieldG3DObjSystem *system, u16 objIndex, BOOL value) {
-    system->objs[objIndex].flag4 = value;
+    system->objs[objIndex].manualDraw = value;
 }
 
 void FieldG3DObjSystem_DrawObj(FieldG3DObjSystem *system, u16 objIndex) {
     FieldG3DObj *obj = &system->objs[objIndex];
 
-    if (obj->state == 1 && !obj->hidden) {
+    if (obj->state == G3DOBJ_STATE_READY && !obj->hidden) {
         if (obj->bboxCull == 1) {
             GFL_G3DSysDrawObjBBoxCull(obj->actor, &obj->transform);
         } else {
@@ -296,21 +305,21 @@ void FieldG3DObjSystem_DrawObj(FieldG3DObjSystem *system, u16 objIndex) {
 }
 
 void FieldG3DObjSystem_SetObjectRedrawFlag(FieldG3DObjSystem *system, u16 objIndex, BOOL value) {
-    system->objs[objIndex].flag5 = value;
+    system->objs[objIndex].redraw = value;
 }
 
 u32 FieldG3DObjSystem_GetObjectRedrawFlag(FieldG3DObjSystem *system, u16 objIndex) {
-    return system->objs[objIndex].flag5;
+    return system->objs[objIndex].redraw;
 }
 
 void FieldG3DObjResGroup_SetupTextures(FieldG3DObjResGroup *group) {
-    group->state = 0;
+    group->state = G3DOBJ_STATE_NONE;
     if (group->texture != NULL) {
         GFL_G3DResUploadTexData(group->texture);
     } else {
         GFL_G3DResUploadTexData(group->model);
     }
-    group->state = 1;
+    group->state = G3DOBJ_STATE_READY;
 }
 
 void FieldG3DObjResGroup_LoadResources(FieldG3DObjResGroup *group, u16 heapId, FieldG3DObjResRequest *request,
@@ -338,7 +347,7 @@ void FieldG3DObjResGroup_LoadResources(FieldG3DObjResGroup *group, u16 heapId, F
         if (setupTextures == TRUE) {
             FieldG3DObjResGroup_SetupTextures(group);
         } else {
-            group->state = 2;
+            group->state = G3DOBJ_STATE_PENDING;
         }
     }
     if (request->anmCount != 0) {
@@ -354,8 +363,8 @@ void FieldG3DObjResGroup_Free(FieldG3DObjResGroup *group) {
     int i;
     u8 state = group->state;
 
-    group->state = 0;
-    if (state == 1) {
+    group->state = G3DOBJ_STATE_NONE;
+    if (state == G3DOBJ_STATE_READY) {
         if (group->texture != NULL) {
             GFL_G3DResFreeTexData(group->texture);
         } else if (group->model != NULL) {
@@ -374,7 +383,7 @@ void FieldG3DObjResGroup_Free(FieldG3DObjResGroup *group) {
         }
     }
     MI_CpuFill(group, 0, sizeof(FieldG3DObjResGroup));
-    group->state = 1;
+    group->state = G3DOBJ_STATE_READY;
 }
 
 void FieldG3DObj_Setup(FieldG3DObj *obj, FieldG3DObjResGroup *group, u16 resGroup, u16 modelIndex, u16 heapId,
@@ -385,7 +394,7 @@ void FieldG3DObj_Setup(FieldG3DObj *obj, FieldG3DObjResGroup *group, u16 resGrou
 
     obj->resGroup = resGroup;
     obj->modelIndex = modelIndex;
-    if (group->state == 1) {
+    if (group->state == G3DOBJ_STATE_READY) {
         texture = group->model;
         if (group->texture != NULL) {
             texture = group->texture;
@@ -414,7 +423,7 @@ void FieldG3DObj_Setup(FieldG3DObj *obj, FieldG3DObjResGroup *group, u16 resGrou
         obj->transform.scale.z = FX32_ONE;
         MTX_Identity33_(&obj->transform.rotation);
     }
-    obj->state = 1;
+    obj->state = G3DOBJ_STATE_READY;
 }
 
 void FieldG3DObj_Free(FieldG3DObj *obj, FieldG3DObjResGroup *group) {

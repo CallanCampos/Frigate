@@ -222,7 +222,7 @@ GameEvent *EventWildBattleCall_CreateStatic(EncountSystem *system, u16 species, 
     if (species == SPECIES_KYUREM) {
         setup->fieldSituation.env.bgType = 0x14;
     }
-    return EventWildBattleCall_Create(system->gsys, system->field, setup, 1, 0);
+    return EventWildBattleCall_Create(system->gsys, system->field, setup, 1, ENCOUNT_MODE_NORMAL);
 }
 
 BtlSetup *BtlSetup_CreateFishing(EncountSystem *system, BOOL rare) {

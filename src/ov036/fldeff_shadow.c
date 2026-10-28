@@ -95,7 +95,7 @@ static void FldeffShadow_DeleteSlot(FieldEffectShadow *shadow) {
 void FldeffShadow_Start(FieldActor *actor, FieldEffects *effects) {
     ShadowTaskParams params;
 
-    params.shadow = FieldEffects_GetHandleData(effects, 0);
+    params.shadow = FieldEffects_GetHandleData(effects, FLDEFF_SHADOW);
     params.actor = actor;
     FieldEffects_TCBCreate(effects, &SHADOW_TASK_VTABLE, NULL, 0, &params, 0);
 }
@@ -120,7 +120,7 @@ static void FldeffShadow_Init(FieldEffectTask *task, void *work) {
     request.callbackData = shadowTask;
     shadowTask->actorIndex = BillboardActorSys_ExecActorRequests(shadowTask->shadow->billboardActor,
                                                                  shadowTask->shadow->matIndex, &request, 1, 3);
-    if (shadowTask->actorIndex == 0xffff) {
+    if (shadowTask->actorIndex == BILLBOARD_ACTOR_NONE) {
         FieldEffects_DeleteObject(task);
         return;
     }
@@ -132,12 +132,12 @@ static void FldeffShadow_Init(FieldEffectTask *task, void *work) {
 static void FldeffShadow_Exit(FieldEffectTask *task, void *work) {
     ShadowTask *shadowTask = work;
 
-    if (shadowTask->actorIndex != 0xffff) {
+    if (shadowTask->actorIndex != BILLBOARD_ACTOR_NONE) {
         BillboardActorSys_DeleteActors(shadowTask->shadow->billboardActor, (u16)shadowTask->actorIndex, 1);
     }
 }
 
-// End with the actor; hide while the actor is hidden or flagged so
+// End with the actor; hide while the actor is hidden or its shadow is
 static void FldeffShadow_Update(FieldEffectTask *task, void *work) {
     ShadowTask *shadowTask = work;
 
@@ -149,7 +149,8 @@ static void FldeffShadow_Update(FieldEffectTask *task, void *work) {
         FieldEffects_DeleteObject(task);
         return;
     }
-    if (IsActorHidden(shadowTask->actor) == TRUE || CheckActorMovementFlag(shadowTask->actor, 0x8000)) {
+    if (IsActorHidden(shadowTask->actor) == TRUE ||
+        CheckActorMovementFlag(shadowTask->actor, ACTOR_MOVEMENT_FLAG_HIDE_SHADOW)) {
         shadowTask->hidden = TRUE;
     } else {
         shadowTask->hidden = FALSE;
@@ -179,7 +180,7 @@ static void FldeffShadow_Draw(FieldEffectTask *task, void *work) {
                 offset.y = 0;
                 offset.z = 0;
             }
-            if (config->billboardSize == 0) {
+            if (config->billboardSize == ACTOR_BILLBOARD_SIZE_32) {
                 offset.y = FX32_CONST(-0.5);
             }
             VEC_Add(&pos, &offset, &pos);

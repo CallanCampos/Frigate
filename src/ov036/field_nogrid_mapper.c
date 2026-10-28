@@ -22,11 +22,15 @@ struct NoGridMapper {
 };
 
 // A map's file in ARCID_RAIL_DATA
+// A header's railFileId or cameraId when the map has no rails or no camera areas
+#define NOGRID_RAIL_NONE 0xffff
+#define NOGRID_CAMERA_NONE 0xffff
+
 typedef struct {
     // The rail data in ARCID_RAIL_HEADERS, whose second half holds the rails' tile attributes in the same order, or
-    // 0xffff
+    // NOGRID_RAIL_NONE
     u16 railFileId;
-    // The camera areas, or 0xffff
+    // The camera areas, or NOGRID_CAMERA_NONE
     u16 cameraId;
 } NoGridMapperHeader;
 
@@ -63,14 +67,14 @@ void FieldNoGridMapper_SetCameraAreaEnabled(NoGridMapper *mapper, BOOL enabled) 
 
 static void FieldNoGridMapper_Load(NoGridMapper *mapper, const NoGridMapperHeader *header, u32 heapId) {
     FieldNoGridMapper_Reset(mapper);
-    if (header->railFileId != 0xffff) {
+    if (header->railFileId != NOGRID_RAIL_NONE) {
         u32 fileCount = GFL_ArcSysGetDataMax(ARCID_RAIL_HEADERS);
 
         FieldRailLoader_LoadFile(mapper->railLoader, header->railFileId, heapId);
         FieldRailSystem_Load(mapper->railSystem, FieldRailLoader_GetRailData(mapper->railLoader));
         FieldRailTilemap_Load(mapper->tilemap, header->railFileId + fileCount / 2, heapId);
     }
-    if (header->cameraId != 0xffff) {
+    if (header->cameraId != NOGRID_CAMERA_NONE) {
         LoadCameraDataToSceneAreaLoader(mapper->sceneAreaLoader, 0, header->cameraId, heapId);
         BuildSceneArea(mapper->sceneArea, GetFldSceneAreaLoaderCameraData(mapper->sceneAreaLoader),
                        GetFldSceneAreaLoaderCamCount(mapper->sceneAreaLoader),

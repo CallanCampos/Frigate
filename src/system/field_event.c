@@ -192,7 +192,8 @@ static GameEventReturnCode EventFieldSubprocessTransition_Callback(GameEvent *ev
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, wk->field, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceOutTransitionDefault(gsys, wk->field, FIELD_TRANSITION_FADE_BLACK, 0));
         (*state)++;
         break;
     case 1:
@@ -201,7 +202,8 @@ static GameEventReturnCode EventFieldSubprocessTransition_Callback(GameEvent *ev
         (*state)++;
         break;
     case 2:
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, wk->field, 0, 0, 1, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceInTransition(gsys, wk->field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         (*state)++;
         break;
     case 3:

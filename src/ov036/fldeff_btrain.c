@@ -103,7 +103,7 @@ static void FldeffBtrain_FreeResources(FieldEffectBTrain *effect) {
 FieldEffectTask *FldeffBtrain_Start(FieldEffects *effects, u32 trainIdx, const VecFx32 *pos) {
     BTrainTaskParams params;
 
-    params.effect = FieldEffects_GetHandleData(effects, 13);
+    params.effect = FieldEffects_GetHandleData(effects, FLDEFF_BTRAIN);
     params.trainIdx = trainIdx;
     FldeffBtrain_LoadResources(params.effect, trainIdx);
     return FieldEffects_TCBCreate(effects, &BTRAIN_TASK_VTABLE, pos, 0, &params, 0);

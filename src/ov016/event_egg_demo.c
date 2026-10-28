@@ -38,7 +38,8 @@ GameEventReturnCode EventEggDemo_Callback(GameEvent *event, u32 *state, void *da
         *state = 2;
         break;
     case 2:
-        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, field, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
         *state = 3;
         break;
     case 3:
@@ -54,7 +55,8 @@ GameEventReturnCode EventEggDemo_Callback(GameEvent *event, u32 *state, void *da
         *state = 6;
         break;
     case 6:
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, field, 0, 0, 1, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         GameBeacon_BroadcastEggHatched((u16)PokeParty_GetParam(work->pkm, PKM_PARAM_SPECIES, NULL));
         *state = 7;
         break;

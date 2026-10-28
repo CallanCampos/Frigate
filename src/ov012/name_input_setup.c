@@ -75,7 +75,7 @@ void NameEntryParam_GetName(NameEntryParam *param, StrBuf *dest) {
 }
 
 BOOL NameEntryParam_IsCanceled(NameEntryParam *param) {
-    return param->unk1C;
+    return param->canceled;
 }
 
 BOOL NameEntryParam_CompareName(NameEntryParam *param, const StrBuf *str) {

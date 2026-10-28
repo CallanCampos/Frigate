@@ -135,7 +135,7 @@ void LoadPWTTournamentTypeText(HeapID heapId, u32 tournament, StrBuf *strbuf) {
 }
 
 u8 GetPWTSeason(const WbtSystem *wbt) {
-    return wbt->unk1E;
+    return wbt->season;
 }
 
 BOOL s02CF_PokeDexCheckHabitatList(VM *vm, FieldScriptEnv *env) {
@@ -216,7 +216,7 @@ BOOL s02D5_WbtIsTrainerBeaten(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL Scrcmd_GetWifiHistoryCountryCount(VM *vm, FieldScriptEnv *env) {
+BOOL s02D7_GetWifiHistoryCountryCount(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     u16 index;
     u16 *result;
@@ -245,7 +245,7 @@ BOOL s02DD_UnityTowerGetVisitorCount(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL Scrcmd_MarkPartnerCandidate(VM *vm, FieldScriptEnv *env) {
+BOOL s02D8_MarkPartnerCandidate(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     UnityTowerFloor *unityTower;
     u8 visitor;
@@ -256,13 +256,14 @@ BOOL Scrcmd_MarkPartnerCandidate(VM *vm, FieldScriptEnv *env) {
     unityTower = GameData_GetUnityTowerSave(gameData);
     visitor = ScriptReadAny(vm, env);
     index = Scrcmd_GetPartnerCandidateHistoryIndex(unityTower, visitor);
-    if (index != 0xff) {
-        UnityTower_SetVisitorParam(getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(gameData)), index, 5, 1);
+    if (index != UNITY_TOWER_HISTORY_INDEX_NONE) {
+        UnityTower_SetVisitorParam(getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(gameData)), index,
+                                   UNITY_TOWER_VISITOR_PARAM_SCRIPT_FLAG, TRUE);
     }
     return FALSE;
 }
 
-BOOL Scrcmd_IsPartnerCandidateMarked(VM *vm, FieldScriptEnv *env) {
+BOOL s02D9_IsPartnerCandidateMarked(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     UnityTowerFloor *unityTower;
     u16 visitor;
@@ -276,7 +277,7 @@ BOOL Scrcmd_IsPartnerCandidateMarked(VM *vm, FieldScriptEnv *env) {
     result = ScriptReadVar(vm, env);
     *result = FALSE;
     index = Scrcmd_GetPartnerCandidateHistoryIndex(unityTower, visitor);
-    if (index != 0xff &&
+    if (index != UNITY_TOWER_HISTORY_INDEX_NONE &&
         (u8)UnityTower_GetVisitorParam(getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(gameData)), index,
                                        UNITY_TOWER_VISITOR_PARAM_SCRIPT_FLAG)) {
         *result = TRUE;
@@ -355,7 +356,7 @@ BOOL s02DC_UnityTowerInitVisitorMessage(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL Scrcmd_HasPlayerLanguage(VM *vm, FieldScriptEnv *env) {
+BOOL s0233_HasPlayerLanguage(VM *vm, FieldScriptEnv *env) {
     u16 *result;
     GameSystem *gsys;
 

@@ -257,7 +257,7 @@ u32 FieldPlayer_GetTileTypeInDirEx(FieldPlayer *player, u16 direction, fx32 *hei
             *height = terrain.height;
             return terrain.tileType;
         }
-        return 0xffffffff;
+        return TILE_TYPE_NONE;
     } else {
         FieldActor *actor = FieldPlayer_GetActor(player);
         NoGridMapper *mapper = Field_GetNoGridMapper(player->field);
@@ -266,7 +266,7 @@ u32 FieldPlayer_GetTileTypeInDirEx(FieldPlayer *player, u16 direction, fx32 *hei
         if (direction == PLAYER_DIR_NONE) {
             GetActorRailPos(actor, &railPos);
         } else if (!GetActorRailPosForDir(actor, direction, &railPos)) {
-            return -1;
+            return TILE_TYPE_NONE;
         }
         FieldRailSystem_GetLocationPos(rail, &railPos, &pos);
         *height = pos.y;

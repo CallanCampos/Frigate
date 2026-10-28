@@ -1,7 +1,8 @@
-// The Pokémon a field actor surfs on and its wake, and the splashes around it: field effects 3 and 8. The ROM names it
-// fldeff_namipoke.c, by GFL_HeapAllocate's file argument ("namipoke" is the surfing Pokémon). Function names from swan
-// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// The Pokémon a field actor surfs on and its wake, and the splashes around it: FLDEFF_SURF_POKEMON and
+// FLDEFF_SURF_POKEMON_SPLASH. The ROM names it fldeff_namipoke.c, by GFL_HeapAllocate's file argument ("namipoke" is
+// the surfing Pokémon). Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
+#include "constants/obj_codes.h"
 #include "field/field_actor.h"
 #include "field/field_effect.h"
 #include "field/field_g3dobj.h"
@@ -15,12 +16,9 @@
 #define WAKE_MAX_DISTANCE FX32_CONST(64)
 #define WAKE_MIN_SCALE 40
 
-// The direction the wake has while it is hidden
-#define WAKE_DIR_NONE 9
-
 #define SPLASH_KIND_COUNT 5
 
-// Field effect 3: the Pokémon and its wake, which every task shares
+// FLDEFF_SURF_POKEMON: the Pokémon and its wake, which every task shares
 typedef struct {
     FieldEffects *effects;
     u16 pokeResGroup;
@@ -65,7 +63,7 @@ typedef struct {
     SurfPokemonWake wake;
 } SurfPokemonTask;
 
-// Field effect 8: the splashes, a resource group of each kind
+// FLDEFF_SURF_POKEMON_SPLASH: the splashes, a resource group of each kind
 typedef struct {
     FieldEffects *effects;
     u16 resGroup0;
@@ -192,13 +190,13 @@ FieldEffectTask *FldeffSurfPokemon_Start(FieldEffects *effects, u16 dir, const V
                                          u32 mode) {
     SurfPokemonTaskParams params;
 
-    params.surfPokemon = FieldEffects_GetHandleData(effects, 3);
+    params.surfPokemon = FieldEffects_GetHandleData(effects, FLDEFF_SURF_POKEMON);
     params.actor = actor;
     params.uid = GetActorUID(actor);
     params.zoneId = GetActorZoneID(actor);
     params.dir = dir;
     params.pos = *pos;
-    if (CheckActorFlag(actor, 0x2000)) {
+    if (CheckActorFlag(actor, ACTOR_FLAG_RAIL)) {
         return FieldEffects_TCBCreate(effects, &SURF_POKEMON_RAIL_TASK_VTABLE, &params.pos, mode, &params, 0);
     }
     return FieldEffects_TCBCreate(effects, &SURF_POKEMON_TASK_VTABLE, &params.pos, mode, &params, 0);
@@ -270,7 +268,7 @@ static void FldeffSurfPokemon_Init(FieldEffectTask *task, void *work) {
     wake = &surfTask->wake;
     wake->objIdx = surfTask->params.surfPokemon->wakeObj;
     wake->hidden = TRUE;
-    wake->dir = WAKE_DIR_NONE;
+    wake->dir = DIR_NONE;
     wake->scale.x = FX32_ONE;
     wake->scale.y = FX32_ONE;
     wake->scale.z = FX32_ONE;
@@ -332,12 +330,12 @@ static void FldeffSurfPokemon_UpdateGrid(FieldEffectTask *task, void *work) {
     SurfPokemonTask *surfTask = work;
     u16 objCode;
 
-    if (surfTask->mode == 0) {
+    if (surfTask->mode == SURF_POKEMON_FOLLOW_NONE) {
         FldeffSurfPokemon_PlaceObjects(task, surfTask);
         return;
     }
     surfTask->dir = GetActorFaceDir(surfTask->params.actor);
-    if (surfTask->mode == 1) {
+    if (surfTask->mode == SURF_POKEMON_FOLLOW_BOB) {
         surfTask->bob += surfTask->bobSpeed;
         if (surfTask->bob >= FX32_CONST(4)) {
             surfTask->bob = FX32_CONST(4);
@@ -349,27 +347,27 @@ static void FldeffSurfPokemon_UpdateGrid(FieldEffectTask *task, void *work) {
         offset.x = 0;
         offset.y = surfTask->bob + FX32_ONE;
         offset.z = FX32_CONST(5);
-        // Object codes 160 and 161 sit higher on the Pokémon
+        // These object codes sit higher on the Pokémon
         objCode = FldAct_GetObjCode(surfTask->params.actor);
-        if (objCode == 160 || objCode == 161) {
+        if (objCode == OBJ_CODE_160 || objCode == OBJ_CODE_161) {
             offset.y = surfTask->bob + FX32_CONST(8);
         }
         FldAct_SetOuterDrawOffset(surfTask->params.actor, &offset);
-    } else if (surfTask->mode == 2) {
+    } else if (surfTask->mode == SURF_POKEMON_FOLLOW_KEEP_OFFSET) {
         FldAct_GetOuterDrawOffset(surfTask->params.actor, &offset);
     }
     CopyActorPosAllAdd(surfTask->params.actor, &pos);
     pos.x -= offset.x;
     pos.y -= offset.y;
     pos.z -= offset.z;
-    if (surfTask->mode != 2) {
+    if (surfTask->mode != SURF_POKEMON_FOLLOW_KEEP_OFFSET) {
         pos.y += surfTask->bob - FX32_ONE;
     }
     FieldEffects_SetObjectPos(task, &pos);
-    if (surfTask->mode == 2 || surfTask->hideWake == TRUE) {
+    if (surfTask->mode == SURF_POKEMON_FOLLOW_KEEP_OFFSET || surfTask->hideWake == TRUE) {
         SurfPokemonWake *wake = &surfTask->wake;
 
-        wake->dir = WAKE_DIR_NONE;
+        wake->dir = DIR_NONE;
         if (surfTask->hideWake == TRUE) {
             wake->hidden = TRUE;
         }
@@ -461,7 +459,7 @@ static void FldeffSurfPokemon_UpdateRail(FieldEffectTask *task, void *work) {
     VecFx16 forward;
     SurfPokemonTask *surfTask = work;
 
-    if (surfTask->mode == 0) {
+    if (surfTask->mode == SURF_POKEMON_FOLLOW_NONE) {
         return;
     }
     surfTask->dir = GetActorFaceDir(surfTask->params.actor);
@@ -471,7 +469,7 @@ static void FldeffSurfPokemon_UpdateRail(FieldEffectTask *task, void *work) {
     VEC_Fx16Normalize(&up, &up);
     forward.y = 0;
     VEC_Fx16Normalize(&forward, &forward);
-    if (surfTask->mode == 1) {
+    if (surfTask->mode == SURF_POKEMON_FOLLOW_BOB) {
         surfTask->bob += surfTask->bobSpeed;
         if (surfTask->bob >= FX32_CONST(4)) {
             surfTask->bob = FX32_CONST(4);
@@ -491,10 +489,10 @@ static void FldeffSurfPokemon_UpdateRail(FieldEffectTask *task, void *work) {
     pos.z -= offset.z;
     pos.y += surfTask->bob - FX32_ONE;
     FieldEffects_SetObjectPos(task, &pos);
-    if (surfTask->mode == 2 || surfTask->hideWake == TRUE) {
+    if (surfTask->mode == SURF_POKEMON_FOLLOW_KEEP_OFFSET || surfTask->hideWake == TRUE) {
         SurfPokemonWake *wake = &surfTask->wake;
 
-        wake->dir = WAKE_DIR_NONE;
+        wake->dir = DIR_NONE;
         if (surfTask->hideWake == TRUE) {
             wake->hidden = TRUE;
         }
@@ -659,7 +657,7 @@ static void FldeffSurfPokemonSplash_FreeResources(FieldEffectSurfPokemonSplash *
 FieldEffectTask *FldeffSurfPokemonSplash_StartOnEffect(FieldEffects *effects, u32 kind, FieldEffectTask *parent) {
     SplashTaskParams params;
 
-    params.splash = FieldEffects_GetHandleData(effects, 8);
+    params.splash = FieldEffects_GetHandleData(effects, FLDEFF_SURF_POKEMON_SPLASH);
     params.kind = kind;
     params.parent = parent;
     params.endWithAnim = FALSE;
@@ -669,7 +667,7 @@ FieldEffectTask *FldeffSurfPokemonSplash_StartOnEffect(FieldEffects *effects, u3
 FieldEffectTask *FldeffSurfPokemonSplash_StartAtPos(FieldEffects *effects, u32 kind, const VecFx32 *pos) {
     SplashTaskParams params;
 
-    params.splash = FieldEffects_GetHandleData(effects, 8);
+    params.splash = FieldEffects_GetHandleData(effects, FLDEFF_SURF_POKEMON_SPLASH);
     params.kind = kind;
     params.parent = NULL;
     params.endWithAnim = TRUE;

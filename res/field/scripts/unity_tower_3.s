@@ -268,7 +268,7 @@ L_037D:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_03B4
-    Scrcmd_MarkPartnerCandidate EVENT_WORK_0x4000
+    MarkPartnerCandidate EVENT_WORK_0x4000
     UnityTowerInitVisitorMessage EVENT_WORK_0x4000, 1, 0x802a
     VMJump L_03BC
 

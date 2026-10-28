@@ -32,6 +32,32 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: integrate reviewed field updates with the backup service
+
+- **Upstream:** reviewed main `2a3782a6fb` includes frozen `fada8baae349`; PR 62 passed all 14 checks and normal
+  owner-approved protected merge. Later upstream proposals remain separate.
+- **Port:** `PORT_SHA`, real merge of that reviewed main into PR 63's `ae53551488` feature head.
+- **ROM (T0):** fresh signed-runtime configure/Ninja (8,569 steps) and both original US SHA1s pass with zero
+  compiler warnings: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`,
+  W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. No manual config changes.
+- **Host build/tests (T1/T2):** fresh arm64 macOS RelWithDebInfo all-target builds and full native suites pass:
+  B2 370 passed/28 explicit skips of 398, W2 367/28 of 395, zero failures. Actual assembly oracles pass 5/5 in
+  both games without skips. All 232 combined source/record hashes stay unchanged throughout these runs.
+- **Replay/oracle/sanitizers/performance/save/play (T3/T4/T5/T6/T7):** all registered ordinary replay, reference,
+  save and timing checks pass. Additional fresh LLVM 23.1.3 whole-app ASan/UBSan builds with recovery disabled
+  pass `replay_new_game_house`, `replay_starter_save`, `replay_same_save` and `replay_same_save_complete` in each
+  game (5/5 including cleanup); all 232 hashes remain fixed. Existing inputs, seeds, checkpoints, reference hashes,
+  masks, budgets and sanitizer policy remain unchanged. This does not establish later-story or windowed-play parity.
+- **Tiers/trap stubs:** no fresh scan or production SDK-reader activation.
+- **64-bit warnings:** combined guard passes, 365 sites/229 keys (real 66, harmless 123, handled 141,
+  unreachable 35); all 1,711 files compiled, zero missing. No baseline change.
+- **Work done:** reconcile only the STATUS insertion, preserving both parents' records. All 22 other feature paths
+  retain their reviewed bytes before the ADR index's status is corrected to match accepted ADR 0029.
+- **Next:** repeated post-commit T0, normal topic update, exact published-head local verification and hosted checks
+  before protected merge. The existing owner-authored review exception covers only review.
+- **Blockers:** published-head gates remain required; no human input blocks US port work. Broader timing and
+  later story coverage remain unfinished; Spanish issue 45 still lacks a locally available dump.
+
 ## 2026-10-28: preserve the backup WRITE initial service wait
 
 - **Upstream:** reviewed Frigate main `43eaf0429a`, upstream `f71f5fe61d`. Pending sync PR 62 and the unfinished
@@ -75,6 +101,35 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   owner-authored review exception before normal protected merge. Reverify if reviewed main changes.
 - **Blockers:** serial transport, other ARM7 work, the separate ROM-reader experiment and later story coverage
   remain unfinished. ADR 0023 remains proposed. Spanish issue 45 still lacks a locally available dump.
+
+## 2026-10-28: validate the frozen 79-commit field naming sync
+
+- **Upstream:** frozen `fada8baae349`, 79 commits after `f71f5fe61d`; PR 62 remains a proposal until protected merge.
+  Reviewed Frigate base is `43eaf0429a`. No later upstream commits or experimental reader/service features enter.
+- **Port:** `59b9fc8351`, real two-parent upstream merge with the complete Upstream-Commit trailer.
+- **ROM (T0):** fresh signed-runtime configure/Ninja passes both original US hashes with zero compiler warnings:
+  B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  No manual decomp-config changes; complete compiled files and final ROMs supply the neutrality proof.
+- **Host build/tests (T1/T2):** fresh arm64 macOS RelWithDebInfo all-target builds pass. Complete suites finish
+  B2 357 passed/28 explicit skips of 385 and W2 354/28 of 382, zero failures. Both actual assembly oracles pass
+  five of five cases without skips. Candidate source hashes remain fixed throughout both suites.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** registered replay, save, reference-hash and
+  timing checks pass within those suites; no new whole-game or general timing-parity claim. Existing inputs,
+  seeds, goldens, masks, performance budgets and fatal sanitizer policy remain unchanged.
+- **Tiers/trap stubs:** no fresh progress scan or game implementation claim. The separate unfinished ROM reader
+  and backup WRITE service remain outside this proposal.
+- **64-bit warnings:** the pointer guard passes: 365 sites/229 keys (real 66, harmless 123, handled 141,
+  unreachable 35), all 1,711 files compiled, zero missing. No baseline edit.
+- **Work done:** resolve exactly three C conflicts: upstream name-entry enums plus native-width Join Avenue
+  values, the renamed Teleport argument plus native-size work, and the new bitmap-conversion states alongside
+  the existing host VBlank upload-buffer owner. Preserve automatic merges of all other pointer/sizeof adaptations.
+  All 206 other incoming paths match Git's automatic merge; 209 incoming paths total, no path renames or workflows.
+  Pinned clang-format 23.1.1 passes all 198 changed original C/headers; strict style, style fixtures, symbol-name
+  dry run and nonmatching-row validation pass. No cross-repository reference override is used.
+- **Next:** publish the resolved head as a fast-forward of the existing App draft, then exact-head owner local
+  verification, explicit source approval and all required hosted checks before normal protected merge of PR 62.
+- **Blockers:** published-head and hosted gates remain required; no human approval blocks this work. Faithful
+  native timing and later story coverage remain unfinished. Spanish issue 45 still lacks a locally available dump.
 
 ## 2026-10-28: integrate the reviewed controller into the bounded field sync
 

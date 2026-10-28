@@ -27,7 +27,7 @@ struct FieldFlash {
     FieldFlashG3D *g3d;
     FieldFlashAnimation animation;
     u16 state;
-    u16 nextState;
+    u16 request;
 };
 
 void FieldFlashAnimation_Init(FieldFlashAnimation *animation);
@@ -57,8 +57,8 @@ FieldFlash *FieldFlash_Create(HeapID heapId) {
 
     flash = GFL_HeapAllocate(heapId, sizeof(FieldFlash), TRUE, "field_flash.c", 0x7a);
     flash->g3d = FieldFlashG3D_Create(heapId);
-    flash->state = 0;
-    flash->nextState = 4;
+    flash->state = FIELD_FLASH_STATE_OFF;
+    flash->request = FIELD_FLASH_REQUEST_NONE;
     FieldFlashAnimation_Init(&flash->animation);
     return flash;
 }
@@ -73,13 +73,13 @@ void FieldFlash_Free(FieldFlash *flash) {
 
 void FieldFlash_Update(FieldFlash *flash) {
     if (flash) {
-        if (flash->nextState != 4) {
-            FIELD_FLASH_FUNCTIONS[flash->nextState](flash);
-            flash->nextState = 4;
+        if (flash->request != FIELD_FLASH_REQUEST_NONE) {
+            FIELD_FLASH_FUNCTIONS[flash->request](flash);
+            flash->request = FIELD_FLASH_REQUEST_NONE;
         }
-        if (flash->state == 2) {
+        if (flash->state == FIELD_FLASH_STATE_WIDENING) {
             if (FieldFlashAnimation_Update(&flash->animation)) {
-                flash->state = 3;
+                flash->state = FIELD_FLASH_STATE_LIT;
             }
         }
     }
@@ -93,8 +93,8 @@ void FieldFlash_Draw(FieldFlash *flash) {
     }
 }
 
-void FieldFlash_RequestState(FieldFlash *flash, u32 nextState) {
-    flash->nextState = nextState;
+void FieldFlash_RequestState(FieldFlash *flash, u32 request) {
+    flash->request = request;
 }
 
 u16 FieldFlash_GetState(FieldFlash *flash) {
@@ -149,24 +149,24 @@ void FieldFlashAnimation_SetAlpha(FieldFlashAnimation *animation, u32 alpha) {
 }
 
 void FieldFlashAnimation_CmdInit(FieldFlash *flash) {
-    flash->state = 1;
+    flash->state = FIELD_FLASH_STATE_DARK;
     FieldFlashAnimation_SetScale(&flash->animation, 0x3000);
     FieldFlashAnimation_SetAlpha(&flash->animation, 0x1f);
 }
 
 void FieldFlashAnimation_CmdExpand(FieldFlash *flash) {
-    flash->state = 2;
+    flash->state = FIELD_FLASH_STATE_WIDENING;
     FieldFlashAnimation_Set(&flash->animation, 0x3000, 0xaa00, 0x1f, 0x1f, 0xf);
     GFL_SndSEPlay(SEQ_SE_FLD_127);
 }
 
 void FieldFlashAnimation_ShowExpanded(FieldFlash *flash) {
-    flash->state = 3;
+    flash->state = FIELD_FLASH_STATE_LIT;
     FieldFlashAnimation_SetScale(&flash->animation, 0xaa00);
     FieldFlashAnimation_SetAlpha(&flash->animation, 0x1f);
 }
 
 void FieldFlashAnimation_HideMask(FieldFlash *flash) {
-    flash->state = 0;
+    flash->state = FIELD_FLASH_STATE_OFF;
     FieldFlashAnimation_SetScale(&flash->animation, 0);
 }

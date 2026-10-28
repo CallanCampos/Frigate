@@ -16,7 +16,7 @@ static void FieldTask_ExecCallback(FieldTask *task);
 FieldTask *FieldTask_Create(HeapID heapId, u32 dataSize, FieldTaskCallback callback) {
     FieldTask *task = GFL_HeapAllocate(heapId, sizeof(FieldTask), FALSE, "field_task.c", 59);
 
-    task->state = 0;
+    task->state = FIELD_TASK_STATE_WAIT;
     task->data = GFL_HeapAllocate(heapId, dataSize, TRUE, "field_task.c", 61);
     task->callback = callback;
     return task;
@@ -40,7 +40,7 @@ void *FieldTask_GetData(FieldTask *task) {
 }
 
 BOOL FieldTask_CheckStateReqEnd(FieldTask *task) {
-    if (task->state == 2) {
+    if (task->state == FIELD_TASK_STATE_END) {
         return TRUE;
     }
     return FALSE;
@@ -55,15 +55,15 @@ FieldTaskCallback FieldTask_GetCallback(FieldTask *task) {
 }
 
 static void FieldTask_SetStartedCore(FieldTask *task) {
-    task->state = 1;
+    task->state = FIELD_TASK_STATE_RUNNING;
 }
 
 static void FieldTask_ReqEnd(FieldTask *task) {
-    task->state = 2;
+    task->state = FIELD_TASK_STATE_END;
 }
 
 static void FieldTask_ExecCallback(FieldTask *task) {
-    if (task->state == 1 && task->callback(task->data) == TRUE) {
+    if (task->state == FIELD_TASK_STATE_RUNNING && task->callback(task->data) == TRUE) {
         FieldTask_ReqEnd(task);
     }
 }

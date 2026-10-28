@@ -165,22 +165,6 @@ typedef struct {
 
 typedef struct FieldCameraAnimationController FieldCameraAnimationController;
 
-// How the event camera shakes
-typedef struct {
-    u16 unk00;
-    u16 unk02;
-    u8 unk04;
-    u16 unk06;
-    u16 unk08;
-    u16 unk0A;
-    u16 unk0C;
-    u16 unk0E;
-    u8 unk10;
-    u32 unk14;
-    u32 unk18;
-    u32 unk1C;
-} FieldEvCameraShake;
-
 void FieldCamera_GetAnimationCoords(FieldCamera *camera, FieldCameraCoords *coords);
 FieldCameraAnimationController *Field_CreateCameraAnimationController(Field *field);
 void FieldCameraAnimationController_FreeAnimation(FieldCameraAnimationController *controller);
@@ -192,7 +176,6 @@ void FieldCameraAnimationController_StartAnimation(FieldCameraAnimationControlle
 // camera at the animation's start
 void FieldCameraAnimationController_FinishCamera(FieldCameraAnimationController *controller);
 void FieldCameraAnimationController_CommitSrcCoords(FieldCameraAnimationController *controller);
-GameEvent *EventEvCameraShake_Create(GameSystem *gsys, FieldEvCameraShake *shake);
 void FieldCamera_CalcTransform(FieldCamera *camera, u16 heldKeys);
 G3DCamera *FieldCamera_GetG3DCamera(FieldCamera *camera);
 void FieldCamera_CoordsGetEyeOffset(FieldCamera *camera, VecFx32 *offset);
@@ -242,29 +225,41 @@ void FieldCameraAnm_SetReturnAnimation(FieldCamera *camera, const FieldEvCameraA
 void FieldCameraAnm_SetLoadDefaultsAnimation(FieldCamera *camera, u16 frames);
 BOOL FieldCamera_IsAnimating(FieldCamera *camera);
 void FieldCameraAnm_EVCameraEnd(FieldCamera *camera);
-// How the camera shakes: the size of the shake along the screen's axes, how many times it weakens, and how many
-// frames each step lasts. Our layout, from the task's code
+// How the camera shakes: the size of the shake along the screen's axes, how many swings are left of totalSteps, and
+// how many frames each swing lasts. From the swing decayStart on, the size weakens by decayX and decayY every
+// decayInterval frames. Our layout, from the task's code
 typedef struct {
     s16 amplitudeX;
     s16 amplitudeY;
     u8 steps;
     u8 pad5;
-    s16 unk6;
-    s16 unk8;
-    u16 unkA;
-    u16 unkC;
-    u16 unkE;
-    u8 unk10;
+    s16 decayX;
+    s16 decayY;
+    u16 decayStart;
+    // The frames since the size last weakened
+    u16 decayTimer;
+    u16 decayInterval;
+    u8 totalSteps;
     u8 pad11[3];
     u32 period;
-    u32 unk18;
+    // The frame of the swing
+    u32 frame;
     s16 delay;
+    // A CAMERA_SHAKE_ value
     u8 mode;
     u8 pad1F;
 } FieldCameraShakeSetup;
+// What the shake moves: the camera's target and its eye offset, the target only, or the eye offset only
+enum {
+    CAMERA_SHAKE_BOTH,
+    CAMERA_SHAKE_TARGET,
+    CAMERA_SHAKE_EYE,
+};
 
 // Shakes the camera; the task ends when the shake does
 FieldTask *FieldCameraShakeTask_Create(Field *field, const FieldCameraShakeSetup *setup);
+// The event of s0148_EvCameraShake and the League's lift, which runs the task with no delay
+GameEvent *EventEvCameraShake_Create(GameSystem *gsys, FieldCameraShakeSetup *setup);
 FieldCamera *FieldCamera_Create(u32 cameraIndex, u32 transformType, G3DCamera *g3dCamera, const VecFx32 *target,
                                 HeapID heapId);
 void FieldCamera_Free(FieldCamera *camera);

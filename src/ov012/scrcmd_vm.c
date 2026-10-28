@@ -476,7 +476,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     GimmickGateCmd_ViewBoard,                         // 0x17a
     func_ov012_02157bdc,                              // 0x17b
     s017C_RollerCoasterCallSwitch,                    // 0x17c
-    ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript, // 0x17d
+    s017D_RollerCoasterSetCarIntroSeen,               // 0x17d
     NULL,                                             // 0x17e
     NULL,                                             // 0x17f
     NULL,                                             // 0x180
@@ -491,7 +491,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     NULL,                                             // 0x189
     NULL,                                             // 0x18a
     NULL,                                             // 0x18b
-    ScrcmdFieldGimmickPlateDoors_StartDoorEvent,      // 0x18c
+    s018C_DriftveilGymCallElevator,                   // 0x18c
     s018D_DriftveilGymCallFreight,                    // 0x18d
     s018E_DriftveilLiftCallMove,                      // 0x18e
     s018F_IcirrusGymCallSwitchAnim,                   // 0x18f
@@ -600,7 +600,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     Scrcmd_CheckWifiListFlags,                        // 0x1f6
     Scrcmd_WifiListOperation,                         // 0x1f7
     Scrcmd_SetWifiFriendNameWord,                     // 0x1f8
-    Scrcmd_CheckPmsWordPair,                          // 0x1f9
+    s01F9_CheckPmsWordPair,                           // 0x1f9
     s01FA_PepQuizGenerate,                            // 0x1fa
     s01FB_ItemCollectorCheckGroup,                    // 0x1fb
     s01FC_ItemCollectorGetPrice,                      // 0x1fc
@@ -629,7 +629,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0213_ActorHoldPos,                               // 0x213
     s0214_CallPokemonPreview,                         // 0x214
     s0215_SetSpecialTransferUsed,                     // 0x215
-    Scrcmd_CheckBeaconTrainerKey,                     // 0x216
+    s0216_CheckBeaconTrainerKey,                      // 0x216
     s0217_MapChangeEntreeForest,                      // 0x217
     func_ov012_02164c68,                              // 0x218
     func_ov012_02164bcc,                              // 0x219
@@ -649,8 +649,8 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0227_RecordAdd,                                  // 0x227
     s0228_RecordGet,                                  // 0x228
     NULL,                                             // 0x229
-    s022A_HollowRivalGenMsgID,                        // 0x22a
-    Scrcmd_StartSwapNpcEvent,                         // 0x22b
+    s022A_TVGenProgramMsgID,                          // 0x22a
+    s022B_StartSwapNpcEvent,                          // 0x22b
     NULL,                                             // 0x22c
     s022D_PlayFieldEffectByTable,                     // 0x22d
     ScriptNative_SetActorZoneDeleteOff,               // 0x22e
@@ -658,7 +658,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0230_MsgPlaceSignFont4,                          // 0x230
     s0231_CallGameManual,                             // 0x231
     PokeParty_ControlLegendMon,                       // 0x232
-    Scrcmd_HasPlayerLanguage,                         // 0x233
+    s0233_HasPlayerLanguage,                          // 0x233
     s0234_ActorFallDownToXZ,                          // 0x234
     s0235_BGMPlayEx,                                  // 0x235
     s0236_WordSetLoadItemCollectorPrice,              // 0x236
@@ -822,9 +822,9 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s02D4_ItemGetTMCount,                             // 0x2d4
     s02D5_WbtIsTrainerBeaten,                         // 0x2d5
     NULL,                                             // 0x2d6
-    Scrcmd_GetWifiHistoryCountryCount,                // 0x2d7
-    Scrcmd_MarkPartnerCandidate,                      // 0x2d8
-    Scrcmd_IsPartnerCandidateMarked,                  // 0x2d9
+    s02D7_GetWifiHistoryCountryCount,                 // 0x2d7
+    s02D8_MarkPartnerCandidate,                       // 0x2d8
+    s02D9_IsPartnerCandidateMarked,                   // 0x2d9
     s02DA_UnityTowerSetRatingLevel,                   // 0x2da
     s02DB_UnityTowerSetFloor,                         // 0x2db
     s02DC_UnityTowerInitVisitorMessage,               // 0x2dc

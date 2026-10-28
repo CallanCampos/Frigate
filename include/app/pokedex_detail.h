@@ -415,12 +415,9 @@ void PokedexDetailInfo_InitParam(PokedexDetailInfoParam *param, HeapID heapId);
 
 typedef struct {
     HeapID heapId;
-    // The zone of the place picked on the map for the habitat list, or POKEDEX_DETAIL_MAP_NO_PLACE
+    // The zone of the place picked on the map for the habitat list, or ZONE_MAX
     u16 place;
 } PokedexDetailMapParam;
-
-// One past the last zone
-#define POKEDEX_DETAIL_MAP_NO_PLACE 615
 
 extern const PokedexDetailProcFuncs POKEDEX_DETAIL_MAP_PROC_FUNCS;
 

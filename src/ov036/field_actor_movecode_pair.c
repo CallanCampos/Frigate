@@ -433,7 +433,7 @@ static void FieldActorMove_InitHide(FieldActor *actor, u32 kind) {
     work->kind = kind;
     FldAct_SetDrawStatus(actor, 0);
     FldAct_ClearMoving(actor);
-    SetActorMovementFlag(actor, 0x8000);
+    SetActorMovementFlag(actor, ACTOR_MOVEMENT_FLAG_HIDE_SHADOW);
     VecFx32 offset = { 0, -32 * FX32_ONE, 0 };
 
     SetActorWPosOffset(actor, &offset);
@@ -483,7 +483,7 @@ void FieldActorMove_RecoverHide(FieldActor *actor) {
         VecFx32 offset = { 0, -32 * FX32_ONE, 0 };
 
         SetActorWPosOffset(actor, &offset);
-        SetActorMovementFlag(actor, 0x8000);
+        SetActorMovementFlag(actor, ACTOR_MOVEMENT_FLAG_HIDE_SHADOW);
     }
 }
 
@@ -508,7 +508,7 @@ static BOOL FieldActorMove_HideKeepEffect(FieldActor *actor, ActorEffectWork *wo
                 FieldActorMove_SetHideEffect(actor, FldeffHide_Create(actor, work->kind));
             }
         }
-        SetActorMovementFlag(actor, 0x8000);
+        SetActorMovementFlag(actor, ACTOR_MOVEMENT_FLAG_HIDE_SHADOW);
     }
     return FALSE;
 }

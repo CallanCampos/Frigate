@@ -2157,7 +2157,7 @@
     .2byte \a0
     .endm
 
-    .macro ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript a0
+    .macro RollerCoasterSetCarIntroSeen a0
     FieldCommand 381
     .2byte \a0
     .endm
@@ -2171,7 +2171,7 @@
     .2byte \a0
     .endm
 
-    .macro ScrcmdFieldGimmickPlateDoors_StartDoorEvent a0, a1
+    .macro DriftveilGymCallElevator a0, a1
     FieldCommand 396
     .2byte \a0
     .2byte \a1
@@ -2663,7 +2663,7 @@
     .2byte \a1
     .endm
 
-    .macro Scrcmd_CheckPmsWordPair a0, a1, a2, a3
+    .macro CheckPmsWordPair a0, a1, a2, a3
     FieldCommand 505
     .2byte \a0
     .2byte \a1
@@ -2948,13 +2948,13 @@
     .2byte \a1
     .endm
 
-    .macro HollowRivalGenMsgID a0, a1
+    .macro TVGenProgramMsgID a0, a1
     FieldCommand 554
     .2byte \a0
     .2byte \a1
     .endm
 
-    .macro Scrcmd_StartSwapNpcEvent a0, a1
+    .macro StartSwapNpcEvent a0, a1
     FieldCommand 555
     .2byte \a0
     .2byte \a1
@@ -3677,13 +3677,13 @@
     .2byte \a1
     .endm
 
-    .macro Scrcmd_GetWifiHistoryCountryCount a0, a1
+    .macro GetWifiHistoryCountryCount a0, a1
     FieldCommand 727
     .2byte \a0
     .2byte \a1
     .endm
 
-    .macro Scrcmd_MarkPartnerCandidate a0
+    .macro MarkPartnerCandidate a0
     FieldCommand 728
     .2byte \a0
     .endm

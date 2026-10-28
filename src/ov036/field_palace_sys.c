@@ -12,6 +12,12 @@
 #include "system/game_data.h"
 #include "system/game_system.h"
 
+// No luminance file, for an area owner of a version class other than 1 and 2
+#define LUMINANCE_FILE_NONE 0xffff
+
+// A luminance entry's area or season that matches any
+#define PALACE_LUMINANCE_ANY 0xff
+
 // The zones of the Entralink's worlds, and the flag that each needs
 static const struct {
     u16 zoneId;
@@ -78,7 +84,7 @@ void FieldPalaceSys_InitPostFX(FieldPalaceSys *sys, u16 zoneId, HeapID heapId) {
         gameData = GSYS_GetGameData(sys->gsys);
         flag = FieldPalaceSys_CheckEventFlag(gameData, zoneId);
         state = Intrude_GetAreaOwnerVersionClass(commSys, gameData);
-        fileId = 0xffff;
+        fileId = LUMINANCE_FILE_NONE;
         if (state == 2) {
             if (flag == TRUE) {
                 fileId = 1;
@@ -92,13 +98,13 @@ void FieldPalaceSys_InitPostFX(FieldPalaceSys *sys, u16 zoneId, HeapID heapId) {
                 fileId = 2;
             }
         }
-        if (fileId != 0xffff) {
+        if (fileId != LUMINANCE_FILE_NONE) {
             FieldPalaceSys_LoadLuminanceTable(sys, fileId, zoneId, getSeasonFromPlayerData(commSys), heapId);
         }
     }
 }
 
-// An entry of a luminance file: the table for an area and season, where 0xff matches any
+// An entry of a luminance file: the table for an area and season, where PALACE_LUMINANCE_ANY matches any
 typedef struct {
     u8 area;
     u8 season;
@@ -115,8 +121,8 @@ void FieldPalaceSys_LoadLuminanceTable(FieldPalaceSys *sys, u32 fileId, u16 zone
     PalaceLuminanceEntry *entries = GFL_ArcToolReadHeapNewLZGetLen(arc, fileId, FALSE, HEAPID_TAIL(heapId), &size);
 
     for (i = 1; i < size / sizeof(PalaceLuminanceEntry); i++) {
-        if ((entries[i].area == area || entries[i].area == 0xff) &&
-            (entries[i].season == season || entries[i].season == 0xff)) {
+        if ((entries[i].area == area || entries[i].area == PALACE_LUMINANCE_ANY) &&
+            (entries[i].season == season || entries[i].season == PALACE_LUMINANCE_ANY)) {
             found = TRUE;
             break;
         }

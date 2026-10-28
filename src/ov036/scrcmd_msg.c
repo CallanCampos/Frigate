@@ -9,6 +9,7 @@
 #include "constants/field_script.h"
 #include "constants/script_text_banks.h"
 #include "constants/sound.h"
+#include "field/event_trainer_eye.h"
 #include "field/festival.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -612,7 +613,7 @@ BOOL s0087_TrainerSayMessage(VM *vm, FieldScriptEnv *env) {
     u8 winPos;
     u16 type;
 
-    if (scriptId == 0x29f9) {
+    if (scriptId == SCRID_SPECIAL_TRAINER) {
         trainerId += 0x500;
     }
     if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_ACTOR_MSG)) {

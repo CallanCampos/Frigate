@@ -1,6 +1,7 @@
 // place_name_letter.c: the two animated letters of a place name sign: the zone's icon and name text that slide in
 // and out on the field. The name is the ROM's own, from GFL_HeapAllocate's file argument
 #include "types.h"
+#include "constants/version.h"
 #include "field/place_name_letter.h"
 #include "field/zone.h"
 #include "gfl/arc_util.h"
@@ -25,6 +26,40 @@ typedef struct {
     LetterUpdateFn update;
 } PlaceNameLetterOps;
 
+// What a part is doing: nothing, sliding in, sliding out, hiding, or taking what it was set up with
+enum {
+    PLACE_NAME_LETTER_STATE_NONE,
+    PLACE_NAME_LETTER_STATE_SLIDE_IN,
+    PLACE_NAME_LETTER_STATE_SLIDE_OUT,
+    PLACE_NAME_LETTER_STATE_HIDE,
+    PLACE_NAME_LETTER_STATE_SET,
+    PLACE_NAME_LETTER_STATE_COUNT,
+};
+
+// The steps of a slide: start it, move until it ends, and be done
+enum {
+    PLACE_NAME_LETTER_SLIDE_START,
+    PLACE_NAME_LETTER_SLIDE_MOVE,
+    PLACE_NAME_LETTER_SLIDE_DONE,
+};
+
+// The steps of printing the name: clear the bitmap, print, send it once it is printed, a frame's wait, load the
+// zone's icon, and be done
+enum {
+    PLACE_NAME_TEXT_PRINT_CLEAR,
+    PLACE_NAME_TEXT_PRINT_NAME,
+    PLACE_NAME_TEXT_PRINT_TRANSFER,
+    PLACE_NAME_TEXT_PRINT_WAIT,
+    PLACE_NAME_TEXT_PRINT_ICON,
+    PLACE_NAME_TEXT_PRINT_DONE,
+};
+
+// An animation moves its part along its path, then swings it
+enum {
+    PLACE_NAME_ANIM_STAGE_MOVE,
+    PLACE_NAME_ANIM_STAGE_SWING,
+};
+
 struct PlaceNameLetter {
     s32 step;
     u32 bgPriority;
@@ -36,8 +71,9 @@ struct PlaceNameLetter {
     s32 changed;
     const PlaceNameLetterOps *ops;
     void *work;
-    u16 param0;
-    u16 param1;
+    // The frame the slide starts from and the frames it takes
+    u16 startFrame;
+    u16 frames;
 };
 
 typedef struct {
@@ -117,7 +153,7 @@ typedef struct {
     u16 iconId;
     ClActorPos pos;
     PrintQueue *queue;
-} LetterA;
+} PlaceNameTextWork;
 
 typedef struct {
     u32 iconId;
@@ -125,7 +161,7 @@ typedef struct {
     Mover mover;
     ClActor *actor;
     ClActorPos pos;
-} LetterB;
+} PlaceNameFrameWork;
 
 static const ClActorPos PLACE_NAME_LETTER_POSITIONS[5] = {
     { 0x10, 8 }, { 0x80, 0x60 }, { 0x1e, 3 }, { 0xe2, 0xbc }, { 0x80, 0x60 }
@@ -142,8 +178,9 @@ static u32 PlaceNameFrame_Update(PlaceNameLetter *letter, void *work);
 static void PlaceNameLetter_SetState(PlaceNameLetter *letter, s32 state);
 
 static const PlaceNameLetterOps PLACE_NAME_LETTER_OPS[2] = {
-    { sizeof(LetterA), PlaceNameText_Init, PlaceNameText_Exit, PlaceNameText_SetParam, PlaceNameText_Update },
-    { sizeof(LetterB), PlaceNameFrame_Init, PlaceNameFrame_Exit, PlaceNameFrame_SetSeason, PlaceNameFrame_Update },
+    { sizeof(PlaceNameTextWork), PlaceNameText_Init, PlaceNameText_Exit, PlaceNameText_SetParam, PlaceNameText_Update },
+    { sizeof(PlaceNameFrameWork), PlaceNameFrame_Init, PlaceNameFrame_Exit, PlaceNameFrame_SetSeason,
+      PlaceNameFrame_Update },
 };
 
 // How each part slides out, and how it slides in and swings; the code fills in the start and the timing. They are
@@ -197,20 +234,20 @@ void PlaceNameLetter_Update(PlaceNameLetter *letter) {
     }
 }
 
-void PlaceNameLetter_SlideIn(PlaceNameLetter *letter, s16 param0, u16 param1) {
-    letter->param0 = param0;
-    letter->param1 = param1;
-    PlaceNameLetter_SetState(letter, 1);
+void PlaceNameLetter_SlideIn(PlaceNameLetter *letter, s16 startFrame, u16 frames) {
+    letter->startFrame = startFrame;
+    letter->frames = frames;
+    PlaceNameLetter_SetState(letter, PLACE_NAME_LETTER_STATE_SLIDE_IN);
 }
 
-void PlaceNameLetter_SlideOut(PlaceNameLetter *letter, s16 param0, u16 param1) {
-    letter->param0 = param0;
-    letter->param1 = param1;
-    PlaceNameLetter_SetState(letter, 2);
+void PlaceNameLetter_SlideOut(PlaceNameLetter *letter, s16 startFrame, u16 frames) {
+    letter->startFrame = startFrame;
+    letter->frames = frames;
+    PlaceNameLetter_SetState(letter, PLACE_NAME_LETTER_STATE_SLIDE_OUT);
 }
 
 void PlaceNameLetter_Hide(PlaceNameLetter *letter) {
-    PlaceNameLetter_SetState(letter, 3);
+    PlaceNameLetter_SetState(letter, PLACE_NAME_LETTER_STATE_HIDE);
 }
 
 static void PlaceNameLetter_SetState(PlaceNameLetter *letter, s32 state) {
@@ -229,7 +266,7 @@ BOOL PlaceNameLetter_IsFinished(PlaceNameLetter *letter) {
 }
 
 static void PlaceNameText_Init(PlaceNameLetter *letter, void *work, const void *arg) {
-    LetterA *wk = work;
+    PlaceNameTextWork *wk = work;
     const PlaceNameTextSetup *setup = arg;
     BmpOamActorSetup oamSetup;
 
@@ -260,7 +297,7 @@ static void PlaceNameText_Init(PlaceNameLetter *letter, void *work, const void *
 }
 
 static void PlaceNameText_Exit(PlaceNameLetter *letter, void *work) {
-    LetterA *wk = work;
+    PlaceNameTextWork *wk = work;
 
     if (wk->actor != NULL) {
         ClActor_Delete(wk->actor);
@@ -280,52 +317,52 @@ static void PlaceNameText_Exit(PlaceNameLetter *letter, void *work) {
 }
 
 static void PlaceNameText_SetParam(PlaceNameLetter *letter, void *work, const void *arg) {
-    LetterA *wk = work;
+    PlaceNameTextWork *wk = work;
     const PlaceNameTextParam *text = arg;
 
     wk->text = *text;
-    PlaceNameLetter_SetState(letter, 4);
+    PlaceNameLetter_SetState(letter, PLACE_NAME_LETTER_STATE_SET);
 }
 
-static u32 PlaceNameText_Print(PlaceNameLetter *letter, LetterA *wk, s32 *step);
-static u32 PlaceNameText_SlideIn(PlaceNameLetter *letter, LetterA *wk, s32 *step);
-static u32 PlaceNameText_SlideOut(PlaceNameLetter *letter, LetterA *wk, s32 *step);
-static u32 PlaceNameText_Hide(PlaceNameLetter *letter, LetterA *wk, s32 *step);
+static u32 PlaceNameText_Print(PlaceNameLetter *letter, PlaceNameTextWork *wk, s32 *step);
+static u32 PlaceNameText_SlideIn(PlaceNameLetter *letter, PlaceNameTextWork *wk, s32 *step);
+static u32 PlaceNameText_SlideOut(PlaceNameLetter *letter, PlaceNameTextWork *wk, s32 *step);
+static u32 PlaceNameText_Hide(PlaceNameLetter *letter, PlaceNameTextWork *wk, s32 *step);
 
 static u32 PlaceNameText_Update(PlaceNameLetter *letter, void *work) {
-    u32 (*handlers[5])(PlaceNameLetter *, LetterA *, s32 *) = {
+    u32 (*handlers[PLACE_NAME_LETTER_STATE_COUNT])(PlaceNameLetter *, PlaceNameTextWork *, s32 *) = {
         NULL, PlaceNameText_SlideIn, PlaceNameText_SlideOut, PlaceNameText_Hide, PlaceNameText_Print,
     };
 
     return handlers[letter->state](letter, work, &letter->step);
 }
 
-static u32 PlaceNameText_Print(PlaceNameLetter *letter, LetterA *wk, s32 *step) {
+static u32 PlaceNameText_Print(PlaceNameLetter *letter, PlaceNameTextWork *wk, s32 *step) {
     switch (*step) {
-    case 0:
+    case PLACE_NAME_TEXT_PRINT_CLEAR:
         wk->iconId = GetZoneNameIcon(wk->text.zoneId);
         GFL_BitmapFill(wk->bitmap, 0);
         (*step)++;
         break;
-    case 1: {
+    case PLACE_NAME_TEXT_PRINT_NAME: {
         u16 color = 0x440;
-        if (getGameVersion() == 0x16) {
+        if (getGameVersion() == VERSION_WHITE2) {
             color = 0x3c40;
         }
         PrintQueue_PrintColor(wk->queue, wk->bitmap, 0, 0, wk->text.name, wk->text.font, color);
         (*step)++;
         break;
     }
-    case 2:
+    case PLACE_NAME_TEXT_PRINT_TRANSFER:
         if (!PrintQueue_IsBitmapPending(wk->queue, wk->bitmap)) {
             BmpOam_ActorBmpTrans(wk->oamActor);
             (*step)++;
         }
         break;
-    case 3:
+    case PLACE_NAME_TEXT_PRINT_WAIT:
         (*step)++;
         break;
-    case 4: {
+    case PLACE_NAME_TEXT_PRINT_ICON: {
         NNSG2dCharacterData *character;
         void *file = GFL_G2DIOReadOBJNCGRArc(letter->arc, wk->iconId + 2, FALSE, &character, letter->heapId);
         ClActSys_ReplaceCharData(wk->chars, character);
@@ -333,7 +370,7 @@ static u32 PlaceNameText_Print(PlaceNameLetter *letter, LetterA *wk, s32 *step) 
         (*step)++;
         break;
     }
-    case 5:
+    case PLACE_NAME_TEXT_PRINT_DONE:
         return FALSE;
     }
     return TRUE;
@@ -347,22 +384,23 @@ static void PlaceNameMover_Init(Mover *mover, const MoveSpec *spec);
 static void PlaceNameMover_Update(Mover *mover);
 static BOOL PlaceNameMover_IsDone(Mover *mover);
 static void PlaceNameMover_GetPos(Mover *mover, ClActorPos *pos);
-static void PlaceNameText_SetPos(PlaceNameLetter *letter, LetterA *wk, const ClActorPos *pos);
-static void PlaceNameFrame_SetPos(PlaceNameLetter *letter, LetterB *wk, const ClActorPos *pos);
+static void PlaceNameText_SetPos(PlaceNameLetter *letter, PlaceNameTextWork *wk, const ClActorPos *pos);
+static void PlaceNameFrame_SetPos(PlaceNameLetter *letter, PlaceNameFrameWork *wk, const ClActorPos *pos);
 
-static u32 PlaceNameText_SlideIn(PlaceNameLetter *letter, LetterA *wk, s32 *step) {
+static u32 PlaceNameText_SlideIn(PlaceNameLetter *letter, PlaceNameTextWork *wk, s32 *step) {
     // The slide in as a plain move, on the path of PLACE_NAME_LETTER_TEXT_ANIM_IN's. Nothing reads it, so which
     // function held it is a guess, one that gives the original's .rodata
     static const MoveSpec sMoveIn = { { { 0, -0x20 }, { 0, 0 } }, 0, 0 };
 
     switch (*step) {
-    case 0: {
+    case PLACE_NAME_LETTER_SLIDE_START: {
         AnimSpec spec = PLACE_NAME_LETTER_TEXT_ANIM_IN;
 
-        spec.moveStart = letter->param0;
-        spec.moveFrames = (s16)(letter->param1 * 0.6f);
-        spec.swingStart = letter->param0 >= spec.moveFrames ? letter->param0 - spec.moveFrames : letter->param0;
-        spec.swingFrames = (s16)(letter->param1 * 0.4f);
+        spec.moveStart = letter->startFrame;
+        spec.moveFrames = (s16)(letter->frames * 0.6f);
+        spec.swingStart =
+            letter->startFrame >= spec.moveFrames ? letter->startFrame - spec.moveFrames : letter->startFrame;
+        spec.swingFrames = (s16)(letter->frames * 0.4f);
         PlaceNameAnim_Init(&wk->anim, &spec);
         BmpOam_ActorSetDrawEnable(wk->oamActor, TRUE);
         ClActor_SetVisible(letter->actor, TRUE);
@@ -370,13 +408,13 @@ static u32 PlaceNameText_SlideIn(PlaceNameLetter *letter, LetterA *wk, s32 *step
         (*step)++;
         break;
     }
-    case 1:
+    case PLACE_NAME_LETTER_SLIDE_MOVE:
         PlaceNameAnim_Update(&wk->anim);
         if (PlaceNameAnim_IsDone(&wk->anim)) {
             (*step)++;
         }
         break;
-    case 2:
+    case PLACE_NAME_LETTER_SLIDE_DONE:
         return FALSE;
     }
     PlaceNameAnim_GetPos(&wk->anim, &wk->pos);
@@ -384,20 +422,20 @@ static u32 PlaceNameText_SlideIn(PlaceNameLetter *letter, LetterA *wk, s32 *step
     return TRUE;
 }
 
-static u32 PlaceNameText_SlideOut(PlaceNameLetter *letter, LetterA *wk, s32 *step) {
+static u32 PlaceNameText_SlideOut(PlaceNameLetter *letter, PlaceNameTextWork *wk, s32 *step) {
     switch (*step) {
-    case 0: {
+    case PLACE_NAME_LETTER_SLIDE_START: {
         MoveSpec spec = PLACE_NAME_LETTER_TEXT_MOVE_OUT;
 
         spec.path.start.x = wk->pos.x;
         spec.path.start.y = wk->pos.y;
-        spec.startFrame = letter->param0;
-        spec.frames = letter->param1;
+        spec.startFrame = letter->startFrame;
+        spec.frames = letter->frames;
         PlaceNameMover_Init(&wk->mover, &spec);
         (*step)++;
         break;
     }
-    case 1:
+    case PLACE_NAME_LETTER_SLIDE_MOVE:
         PlaceNameMover_Update(&wk->mover);
         if (PlaceNameMover_IsDone(&wk->mover)) {
             ClActor_SetVisible(letter->actor, FALSE);
@@ -406,7 +444,7 @@ static u32 PlaceNameText_SlideOut(PlaceNameLetter *letter, LetterA *wk, s32 *ste
             (*step)++;
         }
         break;
-    case 2:
+    case PLACE_NAME_LETTER_SLIDE_DONE:
         return FALSE;
     }
     PlaceNameMover_GetPos(&wk->mover, &wk->pos);
@@ -414,14 +452,14 @@ static u32 PlaceNameText_SlideOut(PlaceNameLetter *letter, LetterA *wk, s32 *ste
     return TRUE;
 }
 
-static u32 PlaceNameText_Hide(PlaceNameLetter *letter, LetterA *wk, s32 *step) {
+static u32 PlaceNameText_Hide(PlaceNameLetter *letter, PlaceNameTextWork *wk, s32 *step) {
     ClActor_SetVisible(letter->actor, FALSE);
     ClActor_SetVisible(wk->actor, FALSE);
     BmpOam_ActorSetDrawEnable(wk->oamActor, FALSE);
     return FALSE;
 }
 
-static void PlaceNameText_SetPos(PlaceNameLetter *letter, LetterA *wk, const ClActorPos *pos) {
+static void PlaceNameText_SetPos(PlaceNameLetter *letter, PlaceNameTextWork *wk, const ClActorPos *pos) {
     ClActorPos letterPos;
     ClActorPos oamPos;
     ClActorPos actorPos;
@@ -440,7 +478,7 @@ static void PlaceNameText_SetPos(PlaceNameLetter *letter, LetterA *wk, const ClA
 }
 
 static void PlaceNameFrame_Init(PlaceNameLetter *letter, void *work, const void *arg) {
-    LetterB *wk = work;
+    PlaceNameFrameWork *wk = work;
     const PlaceNameFrameSetup *frame = arg;
 
     ClActor_SetSequence(letter->actor, 1);
@@ -455,7 +493,7 @@ static void PlaceNameFrame_Init(PlaceNameLetter *letter, void *work, const void 
 }
 
 static void PlaceNameFrame_Exit(PlaceNameLetter *letter, void *work) {
-    LetterB *wk = work;
+    PlaceNameFrameWork *wk = work;
 
     if (wk->actor != NULL) {
         ClActor_Delete(wk->actor);
@@ -464,56 +502,57 @@ static void PlaceNameFrame_Exit(PlaceNameLetter *letter, void *work) {
 }
 
 static void PlaceNameFrame_SetSeason(PlaceNameLetter *letter, void *work, const void *arg) {
-    LetterB *wk = work;
+    PlaceNameFrameWork *wk = work;
     const u32 *season = arg;
 
     wk->iconId = *season;
-    PlaceNameLetter_SetState(letter, 4);
+    PlaceNameLetter_SetState(letter, PLACE_NAME_LETTER_STATE_SET);
 }
 
-static u32 PlaceNameFrame_SetIcon(PlaceNameLetter *letter, LetterB *wk, s32 *step);
-static u32 PlaceNameFrame_SlideIn(PlaceNameLetter *letter, LetterB *wk, s32 *step);
-static u32 PlaceNameFrame_SlideOut(PlaceNameLetter *letter, LetterB *wk, s32 *step);
-static u32 PlaceNameFrame_Hide(PlaceNameLetter *letter, LetterB *wk, s32 *step);
+static u32 PlaceNameFrame_SetIcon(PlaceNameLetter *letter, PlaceNameFrameWork *wk, s32 *step);
+static u32 PlaceNameFrame_SlideIn(PlaceNameLetter *letter, PlaceNameFrameWork *wk, s32 *step);
+static u32 PlaceNameFrame_SlideOut(PlaceNameLetter *letter, PlaceNameFrameWork *wk, s32 *step);
+static u32 PlaceNameFrame_Hide(PlaceNameLetter *letter, PlaceNameFrameWork *wk, s32 *step);
 
 static u32 PlaceNameFrame_Update(PlaceNameLetter *letter, void *work) {
-    u32 (*handlers[5])(PlaceNameLetter *, LetterB *, s32 *) = {
+    u32 (*handlers[PLACE_NAME_LETTER_STATE_COUNT])(PlaceNameLetter *, PlaceNameFrameWork *, s32 *) = {
         NULL, PlaceNameFrame_SlideIn, PlaceNameFrame_SlideOut, PlaceNameFrame_Hide, PlaceNameFrame_SetIcon,
     };
 
     return handlers[letter->state](letter, work, &letter->step);
 }
 
-static u32 PlaceNameFrame_SetIcon(PlaceNameLetter *letter, LetterB *wk, s32 *step) {
+static u32 PlaceNameFrame_SetIcon(PlaceNameLetter *letter, PlaceNameFrameWork *wk, s32 *step) {
     ClActor_SetSequence(wk->actor, (u16)(wk->iconId + 2));
     return FALSE;
 }
 
-static u32 PlaceNameFrame_SlideIn(PlaceNameLetter *letter, LetterB *wk, s32 *step) {
+static u32 PlaceNameFrame_SlideIn(PlaceNameLetter *letter, PlaceNameFrameWork *wk, s32 *step) {
     // The slide in as a plain move, on the path of PLACE_NAME_LETTER_FRAME_ANIM_IN's. Nothing reads it either
     static const MoveSpec sMoveIn = { { { 0, 0x20 }, { 0, 0 } }, 0, 0 };
 
     switch (*step) {
-    case 0: {
+    case PLACE_NAME_LETTER_SLIDE_START: {
         AnimSpec spec = PLACE_NAME_LETTER_FRAME_ANIM_IN;
 
-        spec.moveStart = letter->param0;
-        spec.moveFrames = (s16)(letter->param1 * 0.6f);
-        spec.swingStart = letter->param0 >= spec.moveFrames ? letter->param0 - spec.moveFrames : letter->param0;
-        spec.swingFrames = (s16)(letter->param1 * 0.4f);
+        spec.moveStart = letter->startFrame;
+        spec.moveFrames = (s16)(letter->frames * 0.6f);
+        spec.swingStart =
+            letter->startFrame >= spec.moveFrames ? letter->startFrame - spec.moveFrames : letter->startFrame;
+        spec.swingFrames = (s16)(letter->frames * 0.4f);
         PlaceNameAnim_Init(&wk->anim, &spec);
         ClActor_SetVisible(letter->actor, TRUE);
         ClActor_SetVisible(wk->actor, TRUE);
         (*step)++;
         break;
     }
-    case 1:
+    case PLACE_NAME_LETTER_SLIDE_MOVE:
         PlaceNameAnim_Update(&wk->anim);
         if (PlaceNameAnim_IsDone(&wk->anim)) {
             (*step)++;
         }
         break;
-    case 2:
+    case PLACE_NAME_LETTER_SLIDE_DONE:
         return FALSE;
     }
     PlaceNameAnim_GetPos(&wk->anim, &wk->pos);
@@ -521,20 +560,20 @@ static u32 PlaceNameFrame_SlideIn(PlaceNameLetter *letter, LetterB *wk, s32 *ste
     return TRUE;
 }
 
-static u32 PlaceNameFrame_SlideOut(PlaceNameLetter *letter, LetterB *wk, s32 *step) {
+static u32 PlaceNameFrame_SlideOut(PlaceNameLetter *letter, PlaceNameFrameWork *wk, s32 *step) {
     switch (*step) {
-    case 0: {
+    case PLACE_NAME_LETTER_SLIDE_START: {
         MoveSpec spec = PLACE_NAME_LETTER_FRAME_MOVE_OUT;
 
         spec.path.start.x = wk->pos.x;
         spec.path.start.y = wk->pos.y;
-        spec.startFrame = letter->param0;
-        spec.frames = letter->param1;
+        spec.startFrame = letter->startFrame;
+        spec.frames = letter->frames;
         PlaceNameMover_Init(&wk->mover, &spec);
         (*step)++;
         break;
     }
-    case 1:
+    case PLACE_NAME_LETTER_SLIDE_MOVE:
         PlaceNameMover_Update(&wk->mover);
         if (PlaceNameMover_IsDone(&wk->mover)) {
             ClActor_SetVisible(letter->actor, FALSE);
@@ -542,7 +581,7 @@ static u32 PlaceNameFrame_SlideOut(PlaceNameLetter *letter, LetterB *wk, s32 *st
             (*step)++;
         }
         break;
-    case 2:
+    case PLACE_NAME_LETTER_SLIDE_DONE:
         return FALSE;
     }
     PlaceNameMover_GetPos(&wk->mover, &wk->pos);
@@ -550,13 +589,13 @@ static u32 PlaceNameFrame_SlideOut(PlaceNameLetter *letter, LetterB *wk, s32 *st
     return TRUE;
 }
 
-static u32 PlaceNameFrame_Hide(PlaceNameLetter *letter, LetterB *wk, s32 *step) {
+static u32 PlaceNameFrame_Hide(PlaceNameLetter *letter, PlaceNameFrameWork *wk, s32 *step) {
     ClActor_SetVisible(letter->actor, FALSE);
     ClActor_SetVisible(wk->actor, FALSE);
     return FALSE;
 }
 
-static void PlaceNameFrame_SetPos(PlaceNameLetter *letter, LetterB *wk, const ClActorPos *pos) {
+static void PlaceNameFrame_SetPos(PlaceNameLetter *letter, PlaceNameFrameWork *wk, const ClActorPos *pos) {
     ClActorPos letterPos;
     ClActorPos actorPos;
 
@@ -664,7 +703,7 @@ static void PlaceNameAnim_Init(Anim *anim, const AnimSpec *spec) {
 
 static void PlaceNameAnim_Update(Anim *anim) {
     switch (anim->stage) {
-    case 0:
+    case PLACE_NAME_ANIM_STAGE_MOVE:
         PlaceNameMover_Update(&anim->mover);
         if (PlaceNameMover_IsDone(&anim->mover)) {
             SwingSpec swing;
@@ -683,7 +722,7 @@ static void PlaceNameAnim_Update(Anim *anim) {
             anim->stage++;
         }
         break;
-    case 1:
+    case PLACE_NAME_ANIM_STAGE_SWING:
         PlaceNameSwing_Update(&anim->swing);
         if (PlaceNameSwing_IsDone(&anim->swing)) {
             anim->stage++;
@@ -701,10 +740,10 @@ static BOOL PlaceNameAnim_IsDone(Anim *anim) {
 
 static void PlaceNameAnim_GetPos(Anim *anim, ClActorPos *pos) {
     switch (anim->stage) {
-    case 0:
+    case PLACE_NAME_ANIM_STAGE_MOVE:
         PlaceNameMover_GetPos(&anim->mover, pos);
         break;
-    case 1:
+    case PLACE_NAME_ANIM_STAGE_SWING:
     default:
         PlaceNameSwing_GetPos(&anim->swing, pos);
         break;

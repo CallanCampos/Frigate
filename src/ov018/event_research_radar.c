@@ -23,7 +23,8 @@ GameEventReturnCode EventResearchRadar_Callback(GameEvent *event, u32 *state, vo
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, field, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
         *state = 1;
         break;
     case 1:
@@ -39,7 +40,8 @@ GameEventReturnCode EventResearchRadar_Callback(GameEvent *event, u32 *state, vo
         *state = 4;
         break;
     case 4:
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, field, 0, 0, 1, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         *state = 5;
         break;
     case 5:

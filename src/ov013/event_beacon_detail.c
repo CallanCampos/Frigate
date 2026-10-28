@@ -28,7 +28,8 @@ GameEventReturnCode EventBeaconDetail_Callback(GameEvent *event, u32 *state, voi
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, field, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
         (*state)++;
         break;
     case 1:
@@ -61,7 +62,8 @@ GameEventReturnCode EventBeaconDetail_Callback(GameEvent *event, u32 *state, voi
         if (work->param.unk0A) {
             FieldSubscreen_ChangeImm(Field_GetSubscreen(field), 0);
         }
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, field, 0, 0, 1, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         (*state)++;
         break;
     case 7:

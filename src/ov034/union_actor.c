@@ -513,13 +513,13 @@ static BOOL UnionOneself_ActorTalk(UnionSystem *unisys, UnionActorSlot *slot, Fi
         break;
     case 1:
         if (FldAct_EndAcmd(actor) == TRUE) {
-            SetActorFlag(actor, 8);
+            SetActorFlag(actor, ACTOR_FLAG_FACE_DIR_LOCK);
             (*seq)++;
         }
         break;
     case 2:
         if (situ->mycomm.unk44 != UnionOneself_GetActorId(slot->entry, slot)) {
-            ClearActorFlag(actor, 8);
+            ClearActorFlag(actor, ACTOR_FLAG_FACE_DIR_LOCK);
             return TRUE;
         }
         break;

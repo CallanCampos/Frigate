@@ -198,7 +198,7 @@ static BOOL UnionCommand_Trade(GameSystem *gsys, UnionSystem *unisys, Field *fie
 
     switch (*step) {
     case 0:
-        *next = CallFieldMapEntranceOutTransitionDefault(gsys, field, 0, 0);
+        *next = CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0);
         (*step)++;
         break;
     case 1:
@@ -248,7 +248,7 @@ static BOOL UnionCommand_Trade(GameSystem *gsys, UnionSystem *unisys, Field *fie
         *step = 7;
         break;
     case 7:
-        *next = CallFieldMapEntranceInTransition(gsys, field, 0, 0, 1, 0, 0);
+        *next = CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0);
         *step = 8;
         break;
     default:
@@ -273,7 +273,7 @@ static BOOL UnionCommand_App(GameSystem *gsys, UnionSystem *unisys, Field *field
     }
     switch (*step) {
     case 0:
-        chain = CallFieldMapEntranceOutTransitionDefault(gsys, field, 0, 0);
+        chain = CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0);
         GameEvent_ChainNext(event, chain);
         (*step)++;
         break;
@@ -401,7 +401,7 @@ static BOOL UnionCommand_App(GameSystem *gsys, UnionSystem *unisys, Field *field
         (*step)++;
         break;
     case 18:
-        chain = CallFieldMapEntranceInTransition(gsys, field, 0, 0, 1, 0, 0);
+        chain = CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0);
         GameEvent_ChainNext(event, chain);
         (*step)++;
         break;
@@ -482,7 +482,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
     }
     switch (*step) {
     case 0:
-        chain = CallFieldMapEntranceOutTransitionDefault(gsys, field, 0, 0);
+        chain = CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0);
         GameEvent_ChainNext(event, chain);
         (*step)++;
         break;
@@ -635,7 +635,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
         (*step)++;
         break;
     case 15:
-        chain = CallFieldMapEntranceInTransition(gsys, field, 0, 0, 1, 0, 0);
+        chain = CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0);
         GameEvent_ChainNext(event, chain);
         (*step)++;
         break;

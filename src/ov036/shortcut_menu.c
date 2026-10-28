@@ -46,6 +46,12 @@ enum {
     STATE_SCROLL_OUT,
 };
 
+// What the list's buttons do: pick a shortcut, or move the one picked to where the cursor goes
+enum {
+    LIST_MODE_SELECT,
+    LIST_MODE_REORDER,
+};
+
 // The list of the shortcuts, which SetupMenu makes and FreeMenu clears
 typedef struct {
     ListMenuOption *options;
@@ -57,6 +63,7 @@ typedef struct {
     u16 listTop;
     u16 cursorRow;
     ShortcutSave *shortcut;
+    // A LIST_MODE_ value, which Select toggles
     u32 mode;
     ClActor *actors[ACTORS];
     HeapID heapId;
@@ -184,12 +191,12 @@ ShortcutMenuApp *ShortcutMenu_Create(GameData *gameData, u32 mode, ShortcutMenuP
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_OBJ, 12, 4);
 
     switch (mode) {
-    case 0:
+    case SHORTCUT_MENU_START_CLOSED:
         GFL_BGSysMoveBG(BG, BG_MOVE_SET_Y, -0xc0);
         GFL_BGSysSetBGEnabled(BG, FALSE);
         work->state = STATE_CLOSED;
         break;
-    case 1:
+    case SHORTCUT_MENU_START_OPEN:
         GFL_BGSysMoveBG(BG, BG_MOVE_SET_Y, 0);
         GFL_BGSysSetBGEnabled(BG, TRUE);
         work->state = STATE_INPUT;
@@ -346,12 +353,12 @@ static void OnCursorUp(ShortcutMenuList *menu, u16 value, u32 count, u32 *handle
 
         FreeList(menu, NULL, NULL);
         CreateList(menu, (count - 1) - (maxShown - 1), maxShown - 1, menu->heapId);
-        if (menu->mode == 1) {
+        if (menu->mode == LIST_MODE_REORDER) {
             menu->scrollDir = 1;
         }
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         *handled = TRUE;
-    } else if (menu->scrollDir == 1 && menu->mode == 1) {
+    } else if (menu->scrollDir == 1 && menu->mode == LIST_MODE_REORDER) {
         u16 cursorRow;
         u16 y;
 
@@ -366,7 +373,7 @@ static void OnCursorUp(ShortcutMenuList *menu, u16 value, u32 count, u32 *handle
 
 static void OnCursorDown(ShortcutMenuList *menu, u16 value, u32 count, u32 *handled) {
     if (value == count - 1) {
-        if (menu->mode == 1) {
+        if (menu->mode == LIST_MODE_REORDER) {
             u16 cursorRow;
             u16 y;
 
@@ -418,15 +425,15 @@ static void ReadInput(ShortcutMenuList *menu) {
             BmpMenuList_GetCursorIndex(menu->list, &buttonIndex);
             result = BmpMenuList_GetOptionValue(menu->list, buttonIndex);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        } else if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) && menu->mode == 1) {
+        } else if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) && menu->mode == LIST_MODE_REORDER) {
             BmpMenuList_GetCursorIndex(menu->list, &selectIndex);
             result = BmpMenuList_GetOptionValue(menu->list, selectIndex);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
         }
     }
-    if (menu->mode == 0) {
+    if (menu->mode == LIST_MODE_SELECT) {
         menu->input = result;
-    } else if (menu->mode == 1) {
+    } else if (menu->mode == LIST_MODE_REORDER) {
         if (result == BMPMENULIST_CANCEL) {
             toggle = TRUE;
         } else if (result != BMPMENULIST_NULL) {
@@ -445,14 +452,14 @@ static void ReadInput(ShortcutMenuList *menu) {
             toggle = TRUE;
         }
     }
-    if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) && menu->mode == 0 &&
+    if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) && menu->mode == LIST_MODE_SELECT &&
         (u32)BmpMenuList_GetParam(menu->list, BMPMENULIST_PARAM_COUNT) > 1) {
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         toggle = TRUE;
     }
     if (toggle) {
         menu->mode ^= 1;
-        if (menu->mode == 0) {
+        if (menu->mode == LIST_MODE_SELECT) {
             int i;
 
             menu->scrollDir = 0;
@@ -460,7 +467,7 @@ static void ReadInput(ShortcutMenuList *menu) {
                 ClActor_SetVisible(menu->actors[i], FALSE);
             }
             RedrawHighlight(menu->list, FALSE, FALSE);
-        } else if (menu->mode == 1) {
+        } else if (menu->mode == LIST_MODE_REORDER) {
             BmpMenuList_GetPos(menu->list, &menu->listTop, &menu->cursorRow);
             menu->showActors = TRUE;
         }
@@ -506,12 +513,12 @@ static void RedrawHighlight(BmpMenuList *list, u8 unused1, u8 unused2) {
     u16 cursorY = BmpMenuList_GetCursorY(list) >> 3;
     u32 rowHeight = (u32)BmpMenuList_GetParam(list, BMPMENULIST_PARAM_ROW_HEIGHT) >> 3;
 
-    if (menu->mode == 0) {
+    if (menu->mode == LIST_MODE_SELECT) {
         GFL_BGSysSetScrPaletteNo(BG, 1, 0xc, 0x1e, 0xc, 0xb);
         GFL_BGSysSetScrPaletteNo(BG, 1, cursorY + 0xc, 0x1e, rowHeight, 0xc);
         GFL_BGSysSetScrPaletteNo(BG, 0, 0xb, 0x20, 1, 0xa);
         GFL_BGSysQueueScrLoad(BG);
-    } else if (menu->mode == 1) {
+    } else if (menu->mode == LIST_MODE_REORDER) {
         u16 listTop;
         u16 cursorRow;
         u32 listY;
@@ -634,11 +641,17 @@ GameEvent *ReturnToField_CreateNameInputEvent(GameSystem *gsys, Field *field, Na
     return event;
 }
 
+// The steps of the event that leaves the menu for the name entry: call it, and end
+enum {
+    RETURN_STATE_CALL,
+    RETURN_STATE_END,
+};
+
 static GameEventReturnCode ReturnToField_Callback(GameEvent *event, u32 *state, void *data) {
     ShortcutMenuReturn *ret = data;
 
     switch (*state) {
-    case 0:
+    case RETURN_STATE_CALL:
         if (ret->transition) {
             GameEvent_ChainNext(event, EventFieldSubprocessTransition_Create(ret->gsys, ret->field, OVERLAY_ID(280),
                                                                              &NAME_ENTRY_PROC_FUNCTIONS, ret->param));
@@ -648,7 +661,7 @@ static GameEventReturnCode ReturnToField_Callback(GameEvent *event, u32 *state, 
         }
         (*state)++;
         break;
-    case 1:
+    case RETURN_STATE_END:
         return TRUE;
     }
     return FALSE;

@@ -122,7 +122,8 @@ static GameEventReturnCode EventBSubwayPokeSelect_Callback(GameEvent *event, u32
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, data->field, 0, 0));
+        GameEvent_ChainNext(
+            event, CallFieldMapEntranceOutTransitionDefault(gsys, data->field, FIELD_TRANSITION_FADE_BLACK, 0));
         (*state)++;
         break;
     case 1:
@@ -138,7 +139,8 @@ static GameEventReturnCode EventBSubwayPokeSelect_Callback(GameEvent *event, u32
         (*state)++;
         break;
     case 4:
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, data->field, 0, 0, 1, 0, 0));
+        GameEvent_ChainNext(
+            event, CallFieldMapEntranceInTransition(gsys, data->field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         MI_CpuCopy8(data->partyParam.picked, data->picked, sizeof(data->partyParam.picked));
         *data->choice = data->partyParam.index;
         *data->result = data->partyParam.result;
@@ -457,7 +459,8 @@ static GameEventReturnCode EventBSubwayCommBattle_Callback(GameEvent *event, u32
         (*state)++;
         break;
     case 8:
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, field, 0, 0, 1, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         (*state)++;
         break;
     case 9:

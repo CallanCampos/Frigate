@@ -9,14 +9,14 @@
 #include "struct_decls.h"
 
 BOOL s0214_CallPokemonPreview(VM *vm, FieldScriptEnv *env);
-BOOL Scrcmd_CheckBeaconTrainerKey(VM *vm, FieldScriptEnv *env);
+BOOL s0216_CheckBeaconTrainerKey(VM *vm, FieldScriptEnv *env);
 BOOL s019A_CGearControlWarning(VM *vm, FieldScriptEnv *env);
 BOOL s0227_RecordAdd(VM *vm, FieldScriptEnv *env);
 BOOL s0228_RecordGet(VM *vm, FieldScriptEnv *env);
 BOOL s02C5_JoinAvenueRecordActivity(VM *vm, FieldScriptEnv *env);
-BOOL s022A_HollowRivalGenMsgID(VM *vm, FieldScriptEnv *env);
+BOOL s022A_TVGenProgramMsgID(VM *vm, FieldScriptEnv *env);
 BOOL s02BC_TVCheckCommercial(VM *vm, FieldScriptEnv *env);
 BOOL s02BD_TVGenCommercialMsgID(VM *vm, FieldScriptEnv *env);
-BOOL Scrcmd_StartSwapNpcEvent(VM *vm, FieldScriptEnv *env);
+BOOL s022B_StartSwapNpcEvent(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_POKE_DISP_H

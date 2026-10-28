@@ -146,7 +146,7 @@ void D06Electric_StartSpark(FieldActor *actor, FieldEffects *effects) {
     SparkTaskParams params;
 
     CopyActorWPos(actor, &pos);
-    params.effect = FieldEffects_GetHandleData(effects, 10);
+    params.effect = FieldEffects_GetHandleData(effects, FLDEFF_D06_ELECTRIC);
     params.pos = pos;
     FieldEffects_TCBCreate(effects, &SPARK_TASK_VTABLE, NULL, 0, &params, 0);
 }
@@ -194,7 +194,7 @@ static void SparkTask_Draw(FieldEffectTask *task, void *work) {
 FieldEffectTask *StoneTask_StartFollow(FieldEffects *effects, const VecFx32 *pos, FieldActor *actor) {
     StoneTaskParams params;
 
-    params.effect = FieldEffects_GetHandleData(effects, 10);
+    params.effect = FieldEffects_GetHandleData(effects, FLDEFF_D06_ELECTRIC);
     params.pos = *pos;
     params.actor = actor;
     return FieldEffects_TCBCreate(effects, &STONE_TASK_VTABLE, NULL, 0, &params, 0);
@@ -291,7 +291,7 @@ static void StoneTask_Draw(FieldEffectTask *task, void *work) {
 FieldEffectTask *StoneTask_StartPulse(FieldEffects *effects, const VecFx32 *pos) {
     SparkTaskParams params;
 
-    params.effect = FieldEffects_GetHandleData(effects, 10);
+    params.effect = FieldEffects_GetHandleData(effects, FLDEFF_D06_ELECTRIC);
     params.pos = *pos;
     return FieldEffects_TCBCreate(effects, &MARK_TASK_VTABLE, NULL, 0, &params, 0);
 }
