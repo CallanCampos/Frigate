@@ -5,8 +5,10 @@ file's `.text`, `.rodata`, `.data` and `.bss` are each one contiguous range, and
 every section.
 
 - Name a file after the original. Many functions pass their file's name to `GFL_HeapAllocate` or an assert, so the
-  overlay embeds strings such as `"resort_npc.c"`, which sit in that file's `.data`. A file whose name the ROM doesn't
-  give gets a name for what it does, such as `gym_nacrene.c`; never an overlay number or a counter.
+  overlay embeds strings such as `"resort_npc.c"`, which sit in that file's `.data`. A name with a Japanese word or one
+  of Game Freak's private abbreviations is put in English, and the file's header gives the ROM's name: `zukan_toroku.c`
+  is `pokedex_registration.c`, `fldmmdl_acmd.c` `field_actor_acmd.c` ([Names](#names) has the words). The string in
+  the code stays the ROM's. A file whose name the ROM doesn't give gets a name for what it does, such as `gym_nacrene.c`; never an overlay number or a counter.
 - An original file is one entry in `delinks.txt`, covering its whole range in each section, even while only some of
   its functions are written. The entry stays without `complete` until every function matches, and the original code
   is linked until then, as with `src/ov059/scrcmd_resort.c`. Never split a file into several entries to link the
@@ -155,6 +157,26 @@ ds-pokemon-hacking community, revision `4324f73` (2025-07-03). `tools/decomp/imp
 ```
 
 Names that swan lacks are ours, and are recorded in `config/names.txt` by module and Black 2 address.
+
+Every name is English, swan's included: a Japanese word or one of Game Freak's private abbreviations is translated,
+and the header of a file whose swan names were translated says so. The user chose this on 2026-10-28. Well-known
+acronyms such as BGM, SE, HP, PP, TM, HM, NPC, BG and OBJ stay. The words so far:
+
+| Word | English | | Word | English |
+|---|---|---|---|---|
+| zukan | Pokedex | | dendou | HallOfFame |
+| zenkoku, chihou | National, Regional | | hiden | HM |
+| toroku | Registration | | koukan | Trade |
+| shinka | Evolution | | guru2 | SpinTrade |
+| waza, oshie | Move, Tutor | | oekaki | Drawing |
+| namein | NameInput | | kuru | Spin |
+| fldmmdl, mmdl | FieldActor, Actor | | blact | BillboardActor |
+| gyoe | EmotionBubble | | ochiba | Leaves |
+| iaigiri | Cut | | iwakudaki | RockSmash |
+| kemuri | Dust | | kira | Sparkle |
+| namipoke, nami | SurfPokemon, Surf | | denki | Electric |
+
+The constants generated from the game's data, such as `SEQ_BGM_KOUKAN` and the message IDs, keep their words for now.
 `tools/decomp/rename_symbol.py` renames a symbol in both versions, updates the source files and records the name:
 
 ```sh

@@ -64,7 +64,7 @@ src/ov033/event_fishing.c:
     complete
     .text       start:0x021791c0 end:0x02179664
 
-src/ov033/event_dendou_machine.c:
+src/ov033/event_hall_of_fame_machine.c:
     complete
     .text       start:0x02179664 end:0x02179868
     .rodata     start:0x0217c490 end:0x0217c4d8

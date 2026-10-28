@@ -37,9 +37,9 @@ The caller applies your fixes without re-deriving them, so a confident wrong cla
   `text/system/<bank>.h`, never line numbers), archive IDs and `narc_<archive>.txt` constants.
 - **Constants**: items, moves, species, zones, flags, variables, trainers and sounds are lists in `generated/`
   turned into headers by the build; a number where a constant exists is a finding.
-- **Files**: one source file per original file, named from the ROM's string or descriptively (the guess said in the
+- **Files**: one source file per original file, named in English from the ROM's string (the ROM's name in the header) or descriptively (the guess said in the
   header), functions in address order; a file's own data defined in it from the ROM's bytes, never `extern`.
-- **Names**: swan's first and marked; ours via `rename_symbol.py`; statics' symbols renamed to their C names; `unk_`
+- **Names**: English, no Japanese words or Game Freak abbreviations (`docs/code-organization.md`, Names); swan's first, translated the same way, and marked; ours via `rename_symbol.py`; statics' symbols renamed to their C names; `unk_`
   only where nothing shows a meaning.
 
 ## Known bad shapes to check for

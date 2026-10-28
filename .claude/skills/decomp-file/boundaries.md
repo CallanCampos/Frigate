@@ -37,7 +37,8 @@ Pipe the output through `head` or `grep`; for a big overlay, use the `boundary-s
 
 ## Naming
 
-- From the ROM's string when there is one. Otherwise name it for what it does (`gimmick_nacrene.c`), never with an
+- From the ROM's string when there is one, in English, with the ROM's name in the header (see
+  `docs/code-organization.md`, Names). Otherwise name it for what it does (`gimmick_nacrene.c`), never with an
   overlay number or a counter. Say a guessed name is guessed in the header comment and in the commit message.
 - Follow the names of the overlay's own files: overlay 12's script plugin table and the files `docs/scripts.md` lists
   (`scrcmd_*.c`, `event_*.c`, `wbt_*.c`).

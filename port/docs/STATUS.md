@@ -32,13 +32,43 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: prepare the Hall of Fame/HM naming sync without losing port changes
+
+- **Upstream:** proposed `29b9dcfef987d1bb850afd62f687d36447c27c4b`, two naming commits beyond `fd3b9e600d`.
+  Reviewed main remains `b631907c33`, whose Compile, Standards and Frigate CI all pass. This is a local proposal,
+  not a completed sync of main; no reference/rewrite exception is used and no incoming workflow changes exist.
+- **Port:** `PORT_SHA`, on `codex/upstream-sync-2026-10-28-hall-of-fame`; real upstream merge with its provenance
+  trailer. The proposal is not pushed. Independent Windows/AI/Linux contributor work is being reviewed separately.
+- **ROM (T0):** fresh configure/Ninja, 10,651 steps, zero warnings; both original hashes match: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+- **Host build/tests (T1/T2):** not run for this proposal yet. Targeted MWCC preprocessing matches upstream for all
+  four renamed Hall of Fame demo C files in both versions: eight of eight, including the widened owning header.
+  An independent source-preservation proof checks all 89 incoming old/new paths: all other imported blobs match
+  upstream exactly, and all other ported source remains identical to reviewed main. Four incoming files retain
+  precisely their documented adaptations. A separate read-only review found no actionable issue.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** no new runtime claim. Full integrated native builds,
+  suites, pointer guard, required hosted checks and exact-head verification remain due before protected merging.
+  Inputs, seeds, goldens, masks, budgets and sanitizer policy remain unchanged.
+- **Tiers/trap stubs:** no new scan; this imports names and organization, not a native-feature completion. Existing
+  tier/stub measurements and the unfinished CARD/DMA/AI timing limits remain separate from matching ROM coverage.
+- **64-bit warnings:** not rescanned yet; recheck the prior 365 sites/66 real and complete compilation after renames.
+- **Work done:** resolve two conflict owners using upstream's renamed structure: remove `ddemo_main.h` and preserve
+  `seHandle` as `uptr` in `hall_of_fame_demo_main.h`; keep the renamed callback declaration/definition and registration
+  parameter full-width in `hall_of_fame_demo_main.c`. The ten HM event `sizeof(HiddenEventData)` allocations and nine
+  existing mail-pointer casts survive. Config imports equal upstream; no decomp config is manually edited. The game
+  change ledger follows the three renamed port-adaptation paths. Original handoff work, saves and backups stay intact.
+- **Next:** finish the reviewed feature/contributor PRs, integrate their reviewed main into this proposal, then run
+  complete native/canonical checks and publish one bounded sync PR. Check for an existing bot proposal before push.
+- **Blockers:** no human action blocks this local resolution. Native/hosted validation and the reviewed-base update
+  remain unfinished. Issue 45 stays open until Spanish gameplay and save/reload evidence exists.
+
 ## 2026-10-28: keep complete save validation fast on CI
 
 - **Upstream:** `fd3b9e600da72b208fa98c3486988d3d7ce16766`; reviewed main `70085bfae7`.
   PR 55's foundation head `3c6928e219` passed its exact-head local gates: B2 346 passed/28 explicit skips of 374;
   W2 343/28 of 371, zero failures, status 57467175440. Its macOS 15 Intel job then timed out after 120.14 seconds
   in `oracle_save_image`; every other hosted job passed. The merge remains gated on the corrected head's checks.
-- **Port:** `PORT_SHA`, a follow-up on `codex/card-physical-foundation`. This changes the oracle's Python CRC
+- **Port:** `ca9555921c`, a follow-up on `codex/card-physical-foundation`. This changes the oracle's Python CRC
   implementation and incremental CRC tests. No native C/header/build configuration, game data or workflow change.
 - **ROM (T0):** fresh configure/Ninja passes both original hashes with zero warnings: B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.

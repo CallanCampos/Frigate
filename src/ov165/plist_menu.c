@@ -130,7 +130,7 @@ static void PokeListMenu_SetItems(PokeListWork *wk, PokeListMenu *menu, const u3
             u8 slot;
 
             for (slot = 0; slot < 4; slot++) {
-                if (PokeList_GetHidenResult(wk->pkm, slot) != 0) {
+                if (PokeList_GetHMResult(wk->pkm, slot) != 0) {
                     menu->items[menu->count] = POKELIST_MENU_MOVE1 + slot;
                     menu->count++;
                 }

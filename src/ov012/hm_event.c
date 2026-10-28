@@ -1,7 +1,7 @@
 // The hidden moves' events (a descriptive name). CalcPlayerActionPossibilities is placed here as a guess: it fills the
 // PlayerActionPossibilities that this file's checks take and is the only caller of HiddenArea_ContainsUnlessFlag, but a
 // file of its own between field_encount_st.c and this one would give the same ROM. Names from swan
-// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), in English: swan's Hiden (the HMs) is HM
 #include "types.h"
 #include "constants/obj_codes.h"
 #include "field/event_chatot.h"
@@ -32,7 +32,7 @@ static const HiddenArea ABYSSAL_RUINS_STRENGTH_ROCK_RADIUS = { 40, 26, 1, 2 };
 
 // Four zero bytes that nothing reads, ahead of the Abyssal Ruins areas. Their type and form are a guess: as a
 // function-local static, or as two u16s, they give the same ROM
-const u32 HIDEN_EVENT_UNUSED = 0;
+const u32 HM_EVENT_UNUSED = 0;
 
 void CalcPlayerActionPossibilities(Field *field, PlayerActionPossibilities *action) {
     FieldPlayer *player;
@@ -112,7 +112,7 @@ void CalcPlayerActionPossibilities(Field *field, PlayerActionPossibilities *acti
 }
 
 // The events of each hidden move, by its kind, and the same in the Abyssal Ruins, where Strength and Flash differ
-const HiddenEventSpec HIDEN_EVENTS_NORMAL[11] = {
+const HiddenEventSpec HM_EVENTS_NORMAL[11] = {
     { EventCutCall_Create, EventCutCall_Check },
     { EventSurfCall_Create, EventSurfCall_Check },
     { EventWaterfallCall_Create, EventWaterfallCall_Check },
@@ -126,7 +126,7 @@ const HiddenEventSpec HIDEN_EVENTS_NORMAL[11] = {
     { EventDivingCall_Create, EventDivingCall_Check },
 };
 
-const HiddenEventSpec HIDEN_EVENTS_RUINS[11] = {
+const HiddenEventSpec HM_EVENTS_RUINS[11] = {
     { EventCutCall_Create, EventCutCall_Check },
     { EventSurfCall_Create, EventSurfCall_Check },
     { EventWaterfallCall_Create, EventWaterfallCall_Check },
@@ -140,8 +140,8 @@ const HiddenEventSpec HIDEN_EVENTS_RUINS[11] = {
     { EventDivingCall_Create, EventDivingCall_Check },
 };
 
-u32 CheckAllowHidenEvent(u32 kind, PlayerActionPossibilities *context) {
-    HiddenCheckFunc check = GetHidenEventCheckFunc(context, kind);
+u32 CheckAllowHMEvent(u32 kind, PlayerActionPossibilities *context) {
+    HiddenCheckFunc check = GetHMEventCheckFunc(context, kind);
     if (check == NULL) {
         return TRUE;
     }
@@ -154,21 +154,21 @@ void HiddenEventArgs_Set(HiddenEventArgs *args, u16 partySlot, u16 kind, u32 val
     args->value = value;
 }
 
-GameEvent *CreateHidenEvent(u32 kind, HiddenEventArgs *args, PlayerActionPossibilities *context) {
-    HiddenCtorFunc ctor = GetHidenEventCtorFunc(context, kind);
+GameEvent *CreateHMEvent(u32 kind, HiddenEventArgs *args, PlayerActionPossibilities *context) {
+    HiddenCtorFunc ctor = GetHMEventCtorFunc(context, kind);
     if (ctor == NULL) {
         return NULL;
     }
     return ctor(args, context);
 }
 
-BOOL HidenEvent_CheckPairFlag(PlayerActionPossibilities *context) {
+BOOL HMEvent_CheckPairFlag(PlayerActionPossibilities *context) {
     return GameData_CheckPairFlag(GSYS_GetGameData(context->gsys));
 }
 
 u32 EventCutCall_Check(PlayerActionPossibilities *context) {
     u32 result = FALSE;
-    if (HidenEvent_CheckContextFlag(context, 0) == 0) {
+    if (HMEvent_CheckContextFlag(context, 0) == 0) {
         result = TRUE;
     }
     return result;
@@ -204,8 +204,8 @@ u32 EventSurfCall_Check(PlayerActionPossibilities *context) {
     if (state == 3) {
         return 1;
     }
-    if (HidenEvent_CheckContextFlag(context, 1) != 0) {
-        if (HidenEvent_CheckPairFlag(context) != 0) {
+    if (HMEvent_CheckContextFlag(context, 1) != 0) {
+        if (HMEvent_CheckPairFlag(context) != 0) {
             return 3;
         }
         return 0;
@@ -236,8 +236,8 @@ GameEventReturnCode EventSurfCall_Callback(GameEvent *event, u32 *state, void *d
 }
 
 u32 EventWaterfallCall_Check(PlayerActionPossibilities *context) {
-    if (HidenEvent_CheckContextFlag(context, 2) != 0) {
-        if (HidenEvent_CheckPairFlag(context) != 0) {
+    if (HMEvent_CheckContextFlag(context, 2) != 0) {
+        if (HMEvent_CheckPairFlag(context) != 0) {
             return 3;
         }
         return 0;
@@ -268,7 +268,7 @@ GameEventReturnCode EventWaterfallCall_Callback(GameEvent *event, u32 *state, vo
 }
 
 u32 EventStrengthCall_Check(PlayerActionPossibilities *context) {
-    switch (HidenEvent_CheckContextFlag(context, 3)) {
+    switch (HMEvent_CheckContextFlag(context, 3)) {
     default:
         return FALSE;
     case 0:
@@ -299,7 +299,7 @@ GameEventReturnCode EventStrengthCall_Callback(GameEvent *event, u32 *state, voi
 }
 
 u32 EventSweetScentCall_Check(PlayerActionPossibilities *context) {
-    switch (HidenEvent_CheckContextFlag(context, 8)) {
+    switch (HMEvent_CheckContextFlag(context, 8)) {
     default:
         return FALSE;
     case 0:
@@ -317,8 +317,8 @@ GameEvent *EventFly_Create(HiddenEventArgs *args, PlayerActionPossibilities *con
 }
 
 u32 EventFly_Check(PlayerActionPossibilities *context) {
-    if (HidenEvent_CheckContextFlag(context, 4) != 0) {
-        if (HidenEvent_CheckPairFlag(context) != 0) {
+    if (HMEvent_CheckContextFlag(context, 4) != 0) {
+        if (HMEvent_CheckPairFlag(context) != 0) {
             return 3;
         }
         return 0;
@@ -327,7 +327,7 @@ u32 EventFly_Check(PlayerActionPossibilities *context) {
 }
 
 u32 EventFlash_Check(PlayerActionPossibilities *context) {
-    switch (HidenEvent_CheckContextFlag(context, 5)) {
+    switch (HMEvent_CheckContextFlag(context, 5)) {
     default:
         return FALSE;
     case 0:
@@ -392,8 +392,8 @@ GameEventReturnCode EventFlash_Callback(GameEvent *event, u32 *state, void *data
 }
 
 u32 EventDigCall_Check(PlayerActionPossibilities *context) {
-    if (HidenEvent_CheckContextFlag(context, 7) != 0) {
-        if (HidenEvent_CheckPairFlag(context) != 0)
+    if (HMEvent_CheckContextFlag(context, 7) != 0) {
+        if (HMEvent_CheckPairFlag(context) != 0)
             return 3;
         return 0;
     }
@@ -430,8 +430,8 @@ GameEventReturnCode EventDigCall_Callback(GameEvent *event, u32 *state, void *da
 }
 
 u32 EventTeleportCall_Check(PlayerActionPossibilities *context) {
-    if (HidenEvent_CheckContextFlag(context, 6) != 0) {
-        if (HidenEvent_CheckPairFlag(context) != 0)
+    if (HMEvent_CheckContextFlag(context, 6) != 0) {
+        if (HMEvent_CheckPairFlag(context) != 0)
             return 3;
         return 0;
     }
@@ -468,8 +468,8 @@ GameEventReturnCode EventTeleportCall_Callback(GameEvent *event, u32 *state, voi
 }
 
 u32 EventDivingCall_Check(PlayerActionPossibilities *context) {
-    if (HidenEvent_CheckContextFlag(context, 10) != 0) {
-        if (HidenEvent_CheckPairFlag(context) != 0)
+    if (HMEvent_CheckContextFlag(context, 10) != 0) {
+        if (HMEvent_CheckPairFlag(context) != 0)
             return 3;
         return 0;
     }
@@ -498,7 +498,7 @@ GameEventReturnCode EventDivingCall_Callback(GameEvent *event, u32 *state, void 
 }
 
 u32 EventChatterCall_Check(PlayerActionPossibilities *context) {
-    switch (HidenEvent_CheckContextFlag(context, 9)) {
+    switch (HMEvent_CheckContextFlag(context, 9)) {
     default:
         return FALSE;
     case 0:
@@ -573,24 +573,24 @@ GameEvent *EventRuinsFlash_Create(HiddenEventArgs *param, PlayerActionPossibilit
     return event;
 }
 
-HiddenCheckFunc GetHidenEventCheckFunc(PlayerActionPossibilities *context, u32 kind) {
+HiddenCheckFunc GetHMEventCheckFunc(PlayerActionPossibilities *context, u32 kind) {
     if ((s32)kind >= 11) {
         return NULL;
     }
     if (IsZoneAbyssalRuinsInside(context->zoneId)) {
-        return HIDEN_EVENTS_RUINS[kind].check;
+        return HM_EVENTS_RUINS[kind].check;
     }
-    return HIDEN_EVENTS_NORMAL[kind].check;
+    return HM_EVENTS_NORMAL[kind].check;
 }
 
-HiddenCtorFunc GetHidenEventCtorFunc(PlayerActionPossibilities *context, u32 kind) {
+HiddenCtorFunc GetHMEventCtorFunc(PlayerActionPossibilities *context, u32 kind) {
     if ((s32)kind >= 11) {
         return NULL;
     }
     if (IsZoneAbyssalRuinsInside(context->zoneId)) {
-        return HIDEN_EVENTS_RUINS[kind].create;
+        return HM_EVENTS_RUINS[kind].create;
     }
-    return HIDEN_EVENTS_NORMAL[kind].create;
+    return HM_EVENTS_NORMAL[kind].create;
 }
 
 void HiddenEventData_Init(HiddenEventData *data, HiddenEventArgs *param, PlayerActionPossibilities *context) {
@@ -600,7 +600,7 @@ void HiddenEventData_Init(HiddenEventData *data, HiddenEventArgs *param, PlayerA
     data->gsys = context->gsys;
 }
 
-u32 HidenEvent_CheckContextFlag(PlayerActionPossibilities *context, u32 value) {
+u32 HMEvent_CheckContextFlag(PlayerActionPossibilities *context, u32 value) {
     u16 flags = context->flags;
     u32 mask = 1 << value;
     return (flags & mask) ? TRUE : FALSE;

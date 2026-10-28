@@ -14,14 +14,17 @@ a rule here changes, change it there too.
   does, and an incremental build hides those in files it didn't rebuild. Black 2 is primary. White 2 shares the source (`BLACK2`/`WHITE2` defines) and gets its configs through the version map, so
   change configs only with the scripts, which update both versions and record what they did:
   `add_source_file.py`, `mark_complete.py`, `rename_symbol.py`, `config_fixes.py`.
-- **One source file per original file**, named after the ROM's embedded string, or descriptively, with the guess said
-  in the header and the commit; never an overlay number. Functions go in address order, and in reverse for SPL,
+- **One source file per original file**, named in English after the ROM's embedded string (`zukan_toroku.c` is
+  `pokedex_registration.c`, with the ROM's name in the header), or descriptively, with the guess said in the header and
+  the commit; never an overlay number. Functions go in address order, and in reverse for SPL,
   whose `1.2/base` compiler emits them reversed. `src/` is code built with the game's compiler: `src/ovNNN/` for overlays,
   `src/gfl` and `src/system` for main, by link order. Libraries built apart, with their own compiler, go in
   `lib/<name>/{include,src}` with a `library.toml`: `lib/spl`, `lib/dsprot`, `lib/nitro` (RC4 so far) and
   `lib/nnsys` (FND and GFD so far).
   `docs/code-organization.md` has the rest.
-- **Names:** swan's first, marked as swan's in the header. Our own go through `rename_symbol.py`, which records them
+- **Names:** in English, never a Japanese word or one of Game Freak's private abbreviations (`zukan` is `Pokedex`,
+  `fldmmdl` `FieldActor`, `blact` `BillboardActor`); well-known acronyms such as BGM, SE, HP, TM and NPC stay. The user
+  chose this on 2026-10-28. swan's first, translated the same way, marked as swan's in the header. Our own go through `rename_symbol.py`, which records them
   in `config/names.txt`. Types swan doesn't name are named after their owner. Rename a static's symbol to its C name.
   Library code in `lib/` (NitroSDK, NitroSystem, TwlSDK, DWC) uses the SDK's own names where the code shows them, even
   over swan's; the header notes swan's name where it differs. The user chose this.

@@ -1,71 +1,71 @@
 #include "types.h"
-#include "app/dpc_main.h"
-#include "app/dpc_obj.h"
-#include "app/dpc_ui.h"
+#include "app/hall_of_fame_pc_main.h"
+#include "app/hall_of_fame_pc_obj.h"
+#include "app/hall_of_fame_pc_ui.h"
 #include "gfl/key.h"
 #include "gfl/touchpanel.h"
 
 // The Hall of Fame PC's input: the buttons, the keys and the Pokémon touched on the ring. The ROM doesn't name this
 // file; the name is a guess, after box2_ui.c
 
-static u32 DpcUi_HitPokemon(DendouPCWork *wk);
+static u32 HallOfFamePCUi_HitPokemon(HallOfFamePCWork *wk);
 
-// The buttons, in the order of DPCUI_*
-static const TouchRect sDpcUiTouchRects[] = {
+// The buttons, in the order of HALL_OF_FAME_PC_UI_*
+static const TouchRect sHallOfFamePCUiTouchRects[] = {
     { 168, 191, 8, 31 },    { 168, 191, 88, 111 },       { 168, 191, 200, 223 },
     { 168, 191, 232, 255 }, { TOUCH_RECT_END, 0, 0, 0 },
 };
 
-u32 DpcUi_PageMain(DendouPCWork *wk) {
-    u32 ret = GFL_HIDGetTouchPressedRect(sDpcUiTouchRects);
+u32 HallOfFamePCUi_PageMain(HallOfFamePCWork *wk) {
+    u32 ret = GFL_HIDGetTouchPressedRect(sHallOfFamePCUiTouchRects);
 
     if (ret == TOUCH_RECT_NONE) {
-        ret = DpcUi_HitPokemon(wk);
-        if (ret == DPCUI_NONE) {
+        ret = HallOfFamePCUi_HitPokemon(wk);
+        if (ret == HALL_OF_FAME_PC_UI_NONE) {
             if (GCTX_HIDGetTypedKeys() & (PAD_KEY_LEFT | PAD_BUTTON_L)) {
-                return DPCUI_LEFT;
+                return HALL_OF_FAME_PC_UI_LEFT;
             }
             if (GCTX_HIDGetTypedKeys() & (PAD_KEY_RIGHT | PAD_BUTTON_R)) {
-                return DPCUI_RIGHT;
+                return HALL_OF_FAME_PC_UI_RIGHT;
             }
             if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
-                return DPCUI_DECIDE;
+                return HALL_OF_FAME_PC_UI_DECIDE;
             }
             if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-                return DPCUI_RETURN;
+                return HALL_OF_FAME_PC_UI_RETURN;
             }
             if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-                return DPCUI_CLOSE;
+                return HALL_OF_FAME_PC_UI_CLOSE;
             }
-            return DPCUI_NONE;
+            return HALL_OF_FAME_PC_UI_NONE;
         }
     }
     return ret;
 }
 
-u32 DpcUi_PokeMain(DendouPCWork *wk) {
-    u32 ret = GFL_HIDGetTouchPressedRect(sDpcUiTouchRects);
+u32 HallOfFamePCUi_PokeMain(HallOfFamePCWork *wk) {
+    u32 ret = GFL_HIDGetTouchPressedRect(sHallOfFamePCUiTouchRects);
 
-    if (ret != DPCUI_RETURN) {
-        ret = DpcUi_HitPokemon(wk);
-        if (ret == DPCUI_NONE) {
+    if (ret != HALL_OF_FAME_PC_UI_RETURN) {
+        ret = HallOfFamePCUi_HitPokemon(wk);
+        if (ret == HALL_OF_FAME_PC_UI_NONE) {
             if (GCTX_HIDGetTypedKeys() & (PAD_KEY_LEFT | PAD_BUTTON_L)) {
-                return DPCUI_LEFT;
+                return HALL_OF_FAME_PC_UI_LEFT;
             }
             if (GCTX_HIDGetTypedKeys() & (PAD_KEY_RIGHT | PAD_BUTTON_R)) {
-                return DPCUI_RIGHT;
+                return HALL_OF_FAME_PC_UI_RIGHT;
             }
             if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-                return DPCUI_RETURN;
+                return HALL_OF_FAME_PC_UI_RETURN;
             }
-            return DPCUI_NONE;
+            return HALL_OF_FAME_PC_UI_NONE;
         }
     }
     return ret;
 }
 
-// The Pokémon touched this frame as a DPCUI_POKE, the one in front where several overlap
-static u32 DpcUi_HitPokemon(DendouPCWork *wk) {
+// The Pokémon touched this frame as a HALL_OF_FAME_PC_UI_POKE, the one in front where several overlap
+static u32 HallOfFamePCUi_HitPokemon(HallOfFamePCWork *wk) {
     u32 tpX, tpY;
     u32 i;
     s16 base;
@@ -75,16 +75,16 @@ static u32 DpcUi_HitPokemon(DendouPCWork *wk) {
     s16 left, right, top, bottom;
 
     if (GFL_HIDGetTouchPressedPoint(&tpX, &tpY) == FALSE) {
-        return DPCUI_NONE;
+        return HALL_OF_FAME_PC_UI_NONE;
     }
 
-    base = DpcObj_GetPokeBase(wk);
+    base = HallOfFamePCObj_GetPokeBase(wk);
     hit = -1;
     for (i = base; i < base + HALL_OF_FAME_TEAM_SIZE; i++) {
         if (wk->actors[i] == NULL) {
             continue;
         }
-        DpcObj_GetPos(wk, i, &x, &y);
+        HallOfFamePCObj_GetPos(wk, i, &x, &y);
         left = x - 48;
         right = x + 48;
         top = y - 48;
@@ -113,7 +113,7 @@ static u32 DpcUi_HitPokemon(DendouPCWork *wk) {
     }
 
     if (hit != -1) {
-        return DPCUI_POKE + hit % HALL_OF_FAME_TEAM_SIZE;
+        return HALL_OF_FAME_PC_UI_POKE + hit % HALL_OF_FAME_TEAM_SIZE;
     }
-    return DPCUI_NONE;
+    return HALL_OF_FAME_PC_UI_NONE;
 }

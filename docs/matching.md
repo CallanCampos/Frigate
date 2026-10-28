@@ -2088,8 +2088,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   into the table's literal address; `p[i + k]` adds the constant to the index first. Some twenty functions match only
   as pointer sums, so the original wrote them so: `btl_server_cmd.c`'s readers of the command queue
   (`*(que->buffer + que->readPtr + 1)`), the SSP JPEG decoder's EXIF readers, `field_ground_anime.c`,
-  `rtc_cache.c`'s `*(sDaysBeforeMonth + date->month - 1)`, `plist_sys.c`'s `*(sHidenMoves + hiden - 11)` (the
-  literal is `sHidenMoves - 22`), `strbuf.c`, `startmenu.c` and others. A local `u8 *p = data + pos` read as `p[0]`,
+  `rtc_cache.c`'s `*(sDaysBeforeMonth + date->month - 1)`, `plist_sys.c`'s `*(sHMMoves + hm - 11)` (the
+  literal is `sHMMoves - 22`), `strbuf.c`, `startmenu.c` and others. A local `u8 *p = data + pos` read as `p[0]`,
   `p[1]` doesn't give it either.
 - Parentheses that group a pointer sum count too: a macro that writes its second half at `(u8 *)(p) + 2` makes the
   whole of `p` one subexpression, computed before the value, where `p + 2` written flat is computed after it. NitroWiFi's
@@ -3583,7 +3583,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   control word 0x27f (53-bit precision); wibo 1.2.0 leaves Linux's 0x37f (64-bit). A range whose density is exactly
   0.4 (two cases 4 apart, four cases in a span of 10) passes under 53-bit and fails under 64-bit, so wibo 1.2.0 made
   another tree than the ROM's compiler did, and no source changes that. With mwccarm run at 0x27f these match
-  unchanged: `ItemMenuDisp_IsFieldMoveTM` and `PokeList_GetHidenResult` (cases 15 and 19), overlay 36's `SetupEncountFlagsByPartyPokeAbil`
+  unchanged: `ItemMenuDisp_IsFieldMoveTM` and `PokeList_GetHMResult` (cases 15 and 19), overlay 36's `SetupEncountFlagsByPartyPokeAbil`
   (42 and 46), `Demo3DCapture_End` and `Demo3DCapture_VBlank` (2 and 6; `Demo3DCapture_Begin` goes from 93 to 24
   bytes), and `box_search.c`'s `BoxSearch_PrintInfo` (cases 0, 3, 9, 15, 21, 24, 27, 30). A full build of every file
   for both versions at 0x27f still gives both ROMs, so nothing that matches today depends on 64-bit. The pinned wibo
