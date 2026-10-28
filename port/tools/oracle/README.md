@@ -282,49 +282,57 @@ seed 0xea56a175a2fffc8a       # optional, repeated: the random seeds the DS buil
   to 191.
 - Columns are separated by spaces or tabs; lines may end with CR LF. Anything else is an error that names the line.
 
-### Recordings
+### Recordings (proposed; not implemented)
 
-`--record FILE` isn't in the program yet: this is its format, for review before its code. The port writes the run's
-input as an input file that `--input FILE` replays to the same frames, given the same ROM, the same starting save (the
-save directory's contents) and a compatible build. It writes the input the game reads, not the window's events: the
-buttons and lid held and the touch state as the program's frame hook leaves them for the game (`port_input.h`,
-`tp_host.h`), at each VBlank.
+`--record FILE` is not an available option yet. This is the contract for the implementation tracked in issue #38.
+A recording targets reproducible native input on a compatible build, with the same ROM and starting save directory.
+It does not promise that a CPU-time-dependent trainer battle follows the DS's course (ADR 0023), or that unrelated
+builds reproduce the same game behavior.
 
 ```
 pbwinput 1
 # Recorded by Frigate: frigate-black2 <commit>, ROM <the dump's SHA-1>
 version b2_us
-frames game
-time 2026-10-25 14:03:27      # the clock at power-on, captured once
+frames video
+time 2026-10-25 14:03:27      # the effective RTC at power-on
 clock running
-seed 0x...                    # 64 lines, declared before the game starts
+seed 0x...                    # bounded seed list, before the first frame
 # FRAME BUTTONS [TOUCH]
 ...
 ```
 
-- **The clock.** `time` is `--fixed-time`'s, or the host's local time when the program starts, and the run's clock
-  starts there and runs with the virtual clock, as `--fixed-time` makes it (`port/hal/rtc/rtc7.c`). Without
-  `--record` the clock reads the host's time at each request, which no file can replay; while recording it follows the
-  frames the game plays, behind the wall clock while the program is paused or slower than the DS, ahead while it runs
-  faster.
-- **The seeds.** A file's `seed` lines come before its first frame and number 64 at most, and a battle's seed is built
-  when the battle starts, after many frames have been written. So the recorder declares the run's seeds up front: it
-  draws 64 from the host's random source, writes them, and gives them to the game as a replay's are given
-  (`port/hal/gfl/random_seed.h`), so the recorded run and its replay take the same seeds in the same order, GFL's at
-  start-up and one per battle. After 63 battles the game builds its own, which on a host depend only on the clock and
-  the input ([Random seeds](#random-seeds)). `run.txt` lists the seeds a run used and whether each was given.
-- **The frames** are game frames, by `pbw_input_frame_at_vblank`: the state goes with the frame whose pass reads it
-  next, which is the frame a replay applies it at. Several VBlanks share a frame when a pass takes longer than a frame.
-  For the buttons and the lid the last of them wins, since the game reads them once, at the start of its pass. The
-  touch is sampled at every VBlank while the game samples automatically (`port/hal/tp/tp7.c`), so a pen down at any
-  VBlank of a frame is written as down for the frame, at its last position, and its release in the next frame: a tap
-  can last a frame longer in the replay, never vanish. A frame's line is written, and the file flushed, when the frame
-  number moves on, and only when the state changed; a run that crashes leaves a file that ends at the last complete
-  frame.
-- **With `--input FILE`** the recording is of what the file plays, with the file's `time`, `clock` and `seed` lines
-  instead of new ones, so that it replays the same. Handing the controls to the window when the file ends is for later.
-- A file that can't be created is a bad option (status 2) before the game starts; a write that fails during the run
-  stops it with status 1, as `--run-dir`'s do.
+- **Effective input, on video frames.** At the VBlank hook, capture the held buttons, lid and pen state after window
+  input/replay application, at the same boundary playback uses before ARM7 touch sampling. Write the corresponding
+  monotonically increasing video-frame number. Several VBlanks can share one game frame; they remain distinct in
+  this file. In particular, a pen down for one VBlank and released for the next must remain two samples. Do not
+  coalesce a game frame's touches into an invented held touch: the game's latest-sample read can observe a release.
+  Emit state changes only, flush each complete line, and retain the initial input state needed before the first read.
+  A killed process leaves a parseable prefix of complete samples; clean exit flushes any remaining complete sample.
+- **Effective clock.** Capture the RTC actually selected for the recorded run, including an explicit `--fixed-time`
+  override. Live recording captures the host's local time once, then makes the RTC follow virtual time, as
+  `--fixed-time` already does. It can fall behind wall time while paused or slow, and advance faster during fast play.
+  Record `clock running` or `clock pinned` from the effective mode, not a discarded input-file default. Ordinary
+  non-recorded live play keeps its existing host-clock behavior.
+- **Bounded seeds.** For live recording, draw 64 seeds from the host's random source before starting the game, write
+  them and supply them through `port_random_seed_give`. For recording a replay, preserve its explicitly declared
+  seed list; reject a replay with no declared seeds before starting (option error, status 2). Before any request past
+  the declared list (the 65th for a live recording), flush the readable prefix and stop with status 1 and a diagnostic,
+  before an unrecorded fallback seed reaches the game. Count seed requests, not battles: startup also consumes one.
+  The present `buildSeed` fallback combines timing and other entropy, so no cross-machine guarantee is made for it.
+  `run.txt` must identify the supplied seeds; an unlimited recording needs a separately reviewed format/seed design.
+- **With `--input FILE`.** Record the effective states after playback, normalized into `frames video` even when the
+  input uses `frames game`. Preserve the explicit seeds and the effective RTC/mode described above. Both input frame
+  domains and RTC overrides need round-trip tests; copying header text alone does not establish equivalent playback.
+  Replay-to-live handoff is a later change, not part of this proposal.
+- **Errors.** A destination that cannot be created is an option error (status 2) before game startup. A write/flush
+  error or seed exhaustion stops the run with status 1 and a diagnostic; never silently continue an incomplete
+  recording. Do not overwrite the input file or a save file when selecting the output destination.
+
+Acceptance tests for the later implementation: both-version seeded record/replay routes compare frame/state and save
+hashes; one-VBlank touch transitions in a two-VBlank game pass preserve what the actual touch API returns; game/video
+input domains and effective RTC overrides round-trip; initial/unchanged/lid states, seed-list rejection/exhaustion,
+clean exit, crash prefixes, unwritable paths and mid-run write failures have focused regressions. Those tests and the
+option itself are not added by this documentation change. Issue #38 remains open until they are implemented and pass.
 
 ## Run directories
 
