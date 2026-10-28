@@ -26,6 +26,7 @@ res/
   town_map/
   sound/{sequences,banks,wave_archives,streams}/
   graphics/<archive>/       the menus', apps' and screens' 2D graphics, an archive each
+  demo/<archive>/           the demos and cutscenes: the movies' frames, an archive each
   text/{system,script}/
 generated/                  the constant lists: species.txt, items.txt, obj_codes.txt, sound.txt and the others
 ```
@@ -1070,3 +1071,15 @@ has a PCMP section. A new member is the next number's file: a PNG becomes a size
 palette has more than 16 colors and 4bpp otherwise, a `.pal` a palette, and the rest go in as they are.
 `tools/data/graphics_archive.py dump ARCID_TITLE` writes an archive's directory again from both versions' files,
 replacing it and any edits.
+
+The same packer takes archives of other subjects, each in the directory for what it holds (`ARCHIVE_ROOTS`):
+`res/graphics/` for the menus and apps, `res/demo/` for the demos and cutscenes, `res/field/gimmicks/` and
+`res/field/effects/`, `res/particles/` and `res/fonts/`; `dump ARCID_X res/demo` writes one there. A name, like its
+`ARCID_*`, is in one of them only.
+
+A movie's frames are direct color bitmaps, 15-bit color with bit 15 set where the pixel shows, as
+`cdemo_control.c` plays the Game Freak logo (`res/demo/cdemo_gflogo/`) and the opening (`res/demo/cdemo_openingsw/`):
+an archive whose `archive.json` has `"direct_color": [256, 256]` keeps each 256 by 256 frame as an RGBA PNG, each
+color's five bits widened to eight and alpha 255 where the pixel shows, 0 where it doesn't. Edit a frame as any
+image: the packer keeps each channel's top five bits and shows the pixels whose alpha is 128 or more. `dump ARCID_X
+res/demo --direct-color 256x256` writes such an archive.

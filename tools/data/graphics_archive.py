@@ -2,11 +2,15 @@
 """Dump and pack the 2D graphics archives: the screens, windows, icons and sprites of the game's menus and apps.
 
     graphics_archive.py dump ARCID_TITLE            # writes res/graphics/title/ from both versions' archives
+    graphics_archive.py dump ARCID_X res/demo       # or under another of the archive roots (ARCHIVE_ROOTS)
+    graphics_archive.py dump ARCID_X res/demo --direct-color 256x256    # members that are 256x256 bitmaps as PNGs
     graphics_archive.py pack res/graphics/title black2 OUT
 
-Each archive is a directory of res/graphics/ named after its ARCID_* constant in include/constants/arc.h, whose
-number gives its file (ARCID_TITLE, 26, is a/0/2/6). It holds the archive's members in order, each a file named after
-its number in the archive, or after its constant where generated/narc_<archive>.txt names it, as narc_intro.txt does:
+Each archive is a directory named after its ARCID_* constant in include/constants/arc.h, whose number gives its file
+(ARCID_TITLE, 26, is a/0/2/6), in the root for what it holds (ARCHIVE_ROOTS: res/graphics/ for the menus and apps,
+res/demo/, res/field/gimmicks/ and effects/, res/particles/ and res/fonts/). It holds the archive's members in order,
+each a file named after its number in the archive, or after its constant where generated/narc_<archive>.txt names it, as
+narc_intro.txt does:
 
 - a character resource (NCGR) is an indexed PNG, `03.png`, 4bpp or 8bpp as the resource is. Its pixels are the palette
   indices the game draws, so edit it in indexed mode and keep the palette's order: the packer reads the indices, not
@@ -38,10 +42,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from tools.data.narc import read_narc, write_narc  # noqa: E402
-from tools.data.nitro_2d import (compress_literals, decompress, palette_colors, palette_resource,  # noqa: E402
-                                 read_indexed_png, read_palette, write_indexed_png, write_palette)
+from tools.data.nitro_2d import (bitmap_png, build_bitmap, compress_literals, decompress, palette_colors,  # noqa: E402
+                                 palette_resource, read_indexed_png, read_palette, write_indexed_png, write_palette)
 
 GRAPHICS = ROOT / "res" / "graphics"
+# The directories that hold archive directories, by what the archives are: the menus' and apps' 2D graphics, the
+# demos and cutscenes, the field's gimmicks and effects, the particles and the fonts
+ARCHIVE_ROOTS = [GRAPHICS, ROOT / "res" / "demo", ROOT / "res" / "field" / "gimmicks", ROOT / "res" / "field" / "effects",
+                 ROOT / "res" / "particles", ROOT / "res" / "fonts"]
 VERSIONS = {"black2": "b2_us", "white2": "w2_us"}
 EXTENSIONS = {b"RGCN": ".png", b"RLCN": ".pal", b"RCSN": ".nscr", b"RECN": ".ncer", b"RNAN": ".nanr",
               b"RCMN": ".nmcr", b"RAMN": ".nmar", b"BMD0": ".nsbmd", b"BCA0": ".nsbca", b"BTA0": ".nsbta",
@@ -64,8 +72,21 @@ def archive_path(number: int) -> str:
     return f"a/{digits[0]}/{digits[1]}/{digits[2]}"
 
 
+def archive_directories() -> list[Path]:
+    """Every archive directory under ARCHIVE_ROOTS; a name, and so an ARCID_, may be in one root only."""
+    found = {}
+    for root in ARCHIVE_ROOTS:
+        if root.is_dir():
+            for directory in sorted(root.iterdir()):
+                if directory.is_dir():
+                    if directory.name in found:
+                        raise GraphicsError(f"{directory} and {found[directory.name]} both name ARCID_{directory.name.upper()}")
+                    found[directory.name] = directory
+    return sorted(found.values())
+
+
 def directory_archive(directory: Path) -> str:
-    """Returns the archive file of a directory of res/graphics/, from its ARCID_* constant."""
+    """Returns the archive file of an archive directory, from its ARCID_* constant."""
     name = "ARCID_" + directory.name.upper()
     ids = archive_ids()
     if name not in ids:
@@ -256,8 +277,11 @@ def preview_colors(members: list[bytes], index: int, bits: int) -> list:
     return bank + [(0, 0, 0)] * (16 - len(bank))
 
 
-def member_file(name: str, data: bytes, members: list[bytes], index: int) -> tuple[str, bytes]:
+def member_file(name: str, data: bytes, members: list[bytes], index: int,
+                direct_color: tuple[int, int] | None = None) -> tuple[str, bytes]:
     extension = EXTENSIONS.get(data[:4], ".bin")
+    if direct_color and extension == ".bin" and len(data) == direct_color[0] * direct_color[1] * 2:
+        return name + ".png", bitmap_png(data, *direct_color)
     if extension == ".png":
         _, _, bits, _, _ = characters(data)
         return name + ".png", character_png(data, preview_colors(members, index, bits))
@@ -266,11 +290,18 @@ def member_file(name: str, data: bytes, members: list[bytes], index: int) -> tup
     return name + extension, data
 
 
-def dump(arcid: str):
+def dump(arcid: str, root: Path = GRAPHICS, direct_color: tuple[int, int] | None = None):
     ids = archive_ids()
     if arcid not in ids:
         raise SystemExit(f"no {arcid} in include/constants/arc.h")
-    directory = GRAPHICS / arcid.removeprefix("ARCID_").lower()
+    root = (ROOT / root).resolve() if not root.is_absolute() else root
+    if root not in ARCHIVE_ROOTS:
+        raise SystemExit(f"{root} is not one of the archive roots: {', '.join(str(r.relative_to(ROOT)) for r in ARCHIVE_ROOTS)}")
+    name = arcid.removeprefix("ARCID_").lower()
+    for other in archive_directories():
+        if other.name == name and other.parent != root:
+            raise SystemExit(f"{other} already holds {arcid}")
+    directory = root / name
     path = archive_path(ids[arcid])
     games = {game: [unpack(blob) for blob in read_narc((ROOT / "extract" / folder / "files" / path).read_bytes())]
              for game, folder in VERSIONS.items()}
@@ -290,13 +321,16 @@ def dump(arcid: str):
         targets = {"": black} if black == white else {"black2/": black, "white2/": white}
         for sub, (data, _) in targets.items():
             members = [content for content, _ in games["black2" if sub != "white2/" else "white2"]]
-            file_name, content = member_file(name, data, members, index)
+            file_name, content = member_file(name, data, members, index, direct_color)
             (directory / sub).mkdir(exist_ok=True)
             (directory / sub / file_name).write_bytes(content)
             if black[1]:
                 compressed[file_name] = black[1]
+    settings = {"direct_color": list(direct_color)} if direct_color else {}
     if compressed:
-        (directory / "archive.json").write_text(json.dumps({"compressed": compressed}, indent=4) + "\n")
+        settings["compressed"] = compressed
+    if settings:
+        (directory / "archive.json").write_text(json.dumps(settings, indent=4) + "\n")
     print(f"wrote {directory.relative_to(ROOT)} from {path}")
 
 
@@ -329,7 +363,9 @@ def member_files(directory: Path, game: str) -> list[tuple[str, Path]]:
     return [numbered[number] for number in range(len(numbered))]
 
 
-def build_member(path: Path, original: bytes | None) -> bytes:
+def build_member(path: Path, original: bytes | None, direct_color: list[int] | None = None) -> bytes:
+    if path.suffix == ".png" and direct_color and not (original and original[:4] == b"RGCN"):
+        return build_bitmap(path, *direct_color)
     if path.suffix == ".png":
         return build_characters(path, original if original and original[:4] == b"RGCN" else None)
     if path.suffix == ".pal":
@@ -352,7 +388,7 @@ def pack(directory: Path, game: str, output: Path):
     for index, (stem, file) in enumerate(members):
         original = originals[index] if index < len(originals) else None
         content, kind = unpack(original) if original is not None else (None, None)
-        built = build_member(file, content)
+        built = build_member(file, content, settings.get("direct_color"))
         if original is not None and built == content and kind == compressed.get(file.name):
             result.append(original)
         else:
@@ -363,8 +399,14 @@ def pack(directory: Path, game: str, output: Path):
 
 def main():
     try:
-        if len(sys.argv) == 3 and sys.argv[1] == "dump":
-            dump(sys.argv[2])
+        if len(sys.argv) >= 3 and sys.argv[1] == "dump":
+            args = sys.argv[2:]
+            direct_color = None
+            if "--direct-color" in args:
+                at = args.index("--direct-color")
+                direct_color = tuple(int(n) for n in args[at + 1].split("x"))
+                del args[at:at + 2]
+            dump(args[0], *(Path(a) for a in args[1:]), direct_color=direct_color)
         elif len(sys.argv) == 5 and sys.argv[1] == "pack":
             pack(Path(sys.argv[2]), sys.argv[3], Path(sys.argv[4]))
         else:

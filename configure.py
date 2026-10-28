@@ -26,7 +26,7 @@ ROOT = Path(__file__).parent.resolve()
 sys.path.insert(0, str(ROOT))
 from tools.build.deadstrip import load_manifest as load_deadstrip  # noqa: E402
 from tools.data.gen_constants import ordered_files  # noqa: E402
-from tools.data.graphics_archive import GRAPHICS, directory_archive  # noqa: E402
+from tools.data.graphics_archive import archive_directories, directory_archive  # noqa: E402
 from tools.text.pms_words import CATEGORIES as PMS_WORD_CATEGORIES  # noqa: E402
 
 VERSIONS = {
@@ -330,9 +330,10 @@ DATA_PACKS = [
     # The zones' events, in the order of res/field/events/order.json
     ("tools/data/event_data.py", "res/field/events", ["a/1/2/6"], False),
 ]
-# The 2D graphics archives, each a directory of res/graphics/ named after its ARCID_* constant, which gives its file
-DATA_PACKS += [("tools/data/graphics_archive.py", f"res/graphics/{directory.name}", [directory_archive(directory)], True)
-               for directory in sorted(GRAPHICS.iterdir()) if directory.is_dir()]
+# The archives of Nitro resources and data, each a directory named after its ARCID_* constant, which gives its file, in
+# the root for what it holds (graphics_archive.ARCHIVE_ROOTS)
+DATA_PACKS += [("tools/data/graphics_archive.py", str(directory.relative_to(ROOT)), [directory_archive(directory)], True)
+               for directory in archive_directories()]
 # What every packer reads besides its data: the scripts, and the move tutors' tables, which name the species data's
 # tutor bits (tools/data/species_data.py). A packer also depends on the modules of tools/ that it imports
 # (script_imports).

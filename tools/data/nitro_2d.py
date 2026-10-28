@@ -331,3 +331,93 @@ def read_indexed_png(path):
             pixels.extend(unpacked[:width])
         previous = row
     return width, height, bytes(pixels), colors
+
+
+def unfilter_png(raw, width, height, pixel_bytes, label):
+    """Returns a non-interlaced PNG's rows without their filters, as one run of bytes."""
+    stride = width * pixel_bytes
+    out = bytearray()
+    previous = bytearray(stride)
+    cursor = 0
+    for _ in range(height):
+        filter_type = raw[cursor]
+        row = bytearray(raw[cursor + 1:cursor + 1 + stride])
+        cursor += 1 + stride
+        for x in range(stride):
+            left = row[x - pixel_bytes] if x >= pixel_bytes else 0
+            above = previous[x]
+            upper_left = previous[x - pixel_bytes] if x >= pixel_bytes else 0
+            if filter_type == 1:
+                row[x] = (row[x] + left) & 255
+            elif filter_type == 2:
+                row[x] = (row[x] + above) & 255
+            elif filter_type == 3:
+                row[x] = (row[x] + (left + above) // 2) & 255
+            elif filter_type == 4:
+                prediction = left + above - upper_left
+                distances = (abs(prediction - left), abs(prediction - above), abs(prediction - upper_left))
+                row[x] = (row[x] + (left, above, upper_left)[distances.index(min(distances))]) & 255
+            elif filter_type != 0:
+                raise ValueError(f"{label}: unsupported PNG filter")
+        out.extend(row)
+        previous = row
+    return bytes(out)
+
+
+def write_rgba_png(width, height, pixels):
+    if len(pixels) != width * height * 4:
+        raise ValueError("invalid RGBA image")
+    raw = b"".join(b"\0" + pixels[y * width * 4:(y + 1) * width * 4] for y in range(height))
+    return (b"\x89PNG\r\n\x1a\n" + png_chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0))
+            + png_chunk(b"IDAT", zlib.compress(raw, 9)) + png_chunk(b"IEND", b""))
+
+
+def read_rgba_png(path):
+    """Returns an 8-bit RGB or RGBA PNG's width, height and its pixels as RGBA."""
+    data = path.read_bytes()
+    if not data.startswith(b"\x89PNG\r\n\x1a\n"):
+        raise ValueError(f"{path}: expected PNG")
+    cursor, image = 8, bytearray()
+    width = height = color = None
+    while cursor < len(data):
+        size = struct.unpack_from(">I", data, cursor)[0]
+        kind = data[cursor + 4:cursor + 8]
+        payload = data[cursor + 8:cursor + 8 + size]
+        if zlib.crc32(kind + payload) != struct.unpack_from(">I", data, cursor + 8 + size)[0]:
+            raise ValueError(f"{path}: PNG CRC mismatch")
+        cursor += 12 + size
+        if kind == b"IHDR":
+            width, height, depth, color, comp, filt, interlace = struct.unpack(">IIBBBBB", payload)
+            if color not in (2, 6) or depth != 8 or comp or filt or interlace:
+                raise ValueError(f"{path}: expected a noninterlaced 8-bit RGB or RGBA PNG")
+        elif kind == b"IDAT":
+            image.extend(payload)
+        elif kind == b"IEND":
+            break
+    rows = unfilter_png(zlib.decompress(image), width, height, 4 if color == 6 else 3, path)
+    if color == 2:
+        rows = b"".join(rows[i:i + 3] + b"\xff" for i in range(0, len(rows), 3))
+    return width, height, rows
+
+
+def bitmap_png(data, width, height):
+    """A direct color bitmap (RGB555, bit 15 set where the pixel shows) as an RGBA PNG: each channel's five bits
+    widened to eight, and alpha 255 where the pixel shows and 0 where it doesn't, keeping its color."""
+    if len(data) != width * height * 2:
+        raise ValueError(f"a {width}x{height} direct color bitmap is {width * height * 2} bytes, not {len(data)}")
+    pixels = bytearray()
+    for (value,) in struct.iter_unpack("<H", data):
+        for shift in (0, 5, 10):
+            channel = value >> shift & 31
+            pixels.append(channel << 3 | channel >> 2)
+        pixels.append(255 if value & 0x8000 else 0)
+    return write_rgba_png(width, height, bytes(pixels))
+
+
+def build_bitmap(path, width, height):
+    """An RGBA PNG as a direct color bitmap: each channel's top five bits, and bit 15 where alpha is at least 128."""
+    png_width, png_height, pixels = read_rgba_png(path)
+    if (png_width, png_height) != (width, height):
+        raise ValueError(f"{path}: a frame is {width}x{height}, not {png_width}x{png_height}")
+    return b"".join(struct.pack("<H", pixels[i] >> 3 | (pixels[i + 1] >> 3) << 5 | (pixels[i + 2] >> 3) << 10
+                                | (0x8000 if pixels[i + 3] >= 128 else 0)) for i in range(0, len(pixels), 4))
