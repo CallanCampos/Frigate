@@ -12214,6 +12214,12 @@ overlays/ov036 0x021c7698 Scrcmd_CheckBeaconTrainerKey
 overlays/ov036 0x021c783c s02C5_JoinAvenueRecordActivity
 overlays/ov036 0x021c784c s022A_HollowRivalGenMsgID
 overlays/ov036 0x021c7ad0 Scrcmd_StartSwapNpcEvent
+overlays/ov036 0x021c8954 ResortMapCreate_Create
+overlays/ov036 0x021c897c ResortMapCreate_Free
+overlays/ov036 0x021c8984 ResortMapCreate_Setup
+overlays/ov036 0x021c898c ResortMapCreate_PatchChunk
+overlays/ov036 0x021c89cc ResortMapCreate_PatchShops
+overlays/ov036 0x021c8b40 ResortMapCreate_MoveShopEntities
 overlays/ov036 0x021c9394 CreateMissionHiddenHollowPokemonActor
 overlays/ov036 0x021c93c0 ActivateHiddenHollowMission
 overlays/ov036 0x021c9440 GetHiddenHollowMissionLevel

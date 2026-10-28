@@ -1221,8 +1221,8 @@ void Field_LoadJoinAvenue(GameData *gameData, Field *field, u32 zoneId) {
     JoinAvenueOccupants *occupants = getAddressOfBeginningOfOccupants(joinAvenue);
 
     if (IsZoneJoinAvenue(zoneId)) {
-        func_ov036_021c8984(resortMap, zoneId, info, occupants);
-        func_ov036_021c8b40(resortMap, GameData_GetEventData(gameData));
+        ResortMapCreate_Setup(resortMap, zoneId, info, occupants);
+        ResortMapCreate_MoveShopEntities(resortMap, GameData_GetEventData(gameData));
     }
 }
 

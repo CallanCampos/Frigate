@@ -45,7 +45,7 @@ FieldG3DMapper *FieldG3DMapper_Create(HeapID heapId, u16 season) {
     mapper->terrainAnimator = NULL;
     mapper->propSystem = FieldPropSystem_Create(mapper->heapId, mapper, season);
     mapper->wfbc = func_ov036_0218adac(heapId);
-    mapper->resortMap = func_ov036_021c8954(heapId);
+    mapper->resortMap = ResortMapCreate_Create(heapId);
     mapper->heightEx = HeightEx_CreateTable(0x10, heapId);
     return mapper;
 }
@@ -53,7 +53,7 @@ FieldG3DMapper *FieldG3DMapper_Create(HeapID heapId, u16 season) {
 void FieldG3DMapper_Free(FieldG3DMapper *mapper) {
     HeightEx_FreeTable(mapper->heightEx);
     FieldG3DMapper_FreeMap(mapper);
-    func_ov036_021c897c(mapper->resortMap);
+    ResortMapCreate_Free(mapper->resortMap);
     func_ov036_0218add0(mapper->wfbc);
     if (mapper->propSystem != NULL) {
         FieldPropSystem_Free(mapper->propSystem);
