@@ -923,7 +923,7 @@ lib/nnsys/src/g2d/g2d_OamSoftwareSpriteDraw.c:
 lib/nnsys/src/g2d/g2d_RendererCore.c:
     complete
     .text       start:0x02063194 end:0x02063b5c
-    .rodata     start:0x02094398 end:0x020943b0
+    .rodata     start:0x02094390 end:0x020943b0
     .bss        start:0x02143a48 end:0x02143a4c
 
 lib/nnsys/src/g2d/g2d_PaletteTable.c:
