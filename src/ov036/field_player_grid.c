@@ -86,7 +86,6 @@ enum {
 #define CATWALK_BALANCE_TIME 60
 
 #define KEY_B 0x2
-#define MOVE_FLAG_CAN_RUN 0x1
 
 struct FieldPlayerGrid {
     u32 state;

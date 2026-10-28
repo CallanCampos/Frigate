@@ -30,6 +30,9 @@ void FieldPlayer_CreateNogrid(FieldPlayer *player, HeapID heapId);
 u16 FieldPlayer_GetMoveDirByKey(FieldPlayer *player, u32 heldKeys);
 BOOL FieldPlayer_CheckMoveBusy(FieldPlayer *player);
 BOOL FieldPlayer_CheckRunningShoesFlag(FieldPlayer *player);
+// The flags of FieldPlayer_UpdateGridMovement: the player has the running shoes, and runs with B held
+#define MOVE_FLAG_CAN_RUN 0x1
+
 void FieldPlayer_UpdateGridMovement(FieldPlayer *player, u32 pressedKeys, u32 heldKeys, u32 flags);
 void FieldPlayer_UpdateRailMovement(FieldPlayer *player, u32 pressedKeys, u32 heldKeys);
 void FieldPlayer_AttachNogridActor(FieldPlayer *player, const RailPosition *pos);
