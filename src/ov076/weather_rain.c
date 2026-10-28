@@ -998,7 +998,7 @@ static void Gust_PlayRumble(WeatherTask *task, GustWork *work, u32 arg) {
             if (!GFL_SndPlayerIsActive(GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_99))) {
                 u32 delay = GFL_RandomLC(27) + 100;
 
-                WeatherTask_PlaySeWithVoice(task, SEQ_SE_FLD_98, delay);
+                WeatherTask_PlaySeWithVolume(task, SEQ_SE_FLD_98, delay);
                 Gust_ResetRumble(work);
             } else {
                 work->rumbleCounter = work->rumbleLimit - 10;

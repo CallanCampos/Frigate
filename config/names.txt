@@ -11060,7 +11060,7 @@ overlays/ov036 0x02199b90 WeatherTask_ShiftParticles
 overlays/ov036 0x02199be8 WeatherTask_PlaySe
 overlays/ov036 0x02199bf8 WeatherTask_StopSe
 overlays/ov036 0x02199c08 WeatherTask_PlaySeDirect
-overlays/ov036 0x02199c30 WeatherTask_PlaySeWithVoice
+overlays/ov036 0x02199c30 WeatherTask_PlaySeWithVolume
 overlays/ov036 0x02199c5c WeatherTask_GetParticleWork
 overlays/ov036 0x02199c64 WeatherTask_GetParticleActor
 overlays/ov036 0x02199c6c WeatherTask_GetParticlePos

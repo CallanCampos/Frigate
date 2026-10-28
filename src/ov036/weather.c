@@ -181,7 +181,8 @@ void SetWeatherInit(FieldWeather *weather, u16 weatherId, HeapID heapId) {
     FieldWeather_UnloadOverlay(weather);
     weather->state = WEATHER_STATE_IDLE;
     FieldWeather_LoadOverlay(weather, WEATHER_OVERLAYS[weatherId].overlayId);
-    WeatherTask_Start(weather->tasks[0], WEATHER_OVERLAYS[weatherId].data, 0, 0, 1, 1, heapId);
+    WeatherTask_Start(weather->tasks[0], WEATHER_OVERLAYS[weatherId].data, FALSE, FALSE, WEATHER_MODE_ALONE, TRUE,
+                      heapId);
     weather->current = weatherId;
     weather->next = WEATHER_NONE;
 }
@@ -238,7 +239,7 @@ static BOOL FieldWeather_StartTransition(FieldWeather *weather, u32 weatherId) {
 static void FieldWeather_UpdateSequential(FieldWeather *weather, HeapID heapId) {
     switch (weather->state) {
     case WEATHER_STATE_START:
-        WeatherTask_RequestEnd(weather->tasks[0], 1, 1);
+        WeatherTask_RequestEnd(weather->tasks[0], TRUE, WEATHER_MODE_ALONE);
         weather->state = WEATHER_STATE_WAIT_END;
         break;
     case WEATHER_STATE_WAIT_END:
@@ -252,7 +253,8 @@ static void FieldWeather_UpdateSequential(FieldWeather *weather, HeapID heapId) 
         weather->state = WEATHER_STATE_START_NEXT;
         break;
     case WEATHER_STATE_START_NEXT:
-        WeatherTask_Start(weather->tasks[0], WEATHER_OVERLAYS[weather->next].data, 1, 1, 1, weather->fadeIn, heapId);
+        WeatherTask_Start(weather->tasks[0], WEATHER_OVERLAYS[weather->next].data, TRUE, TRUE, WEATHER_MODE_ALONE,
+                          weather->fadeIn, heapId);
         weather->current = weather->next;
         weather->fadeIn = TRUE;
         weather->next = WEATHER_NONE;
@@ -268,8 +270,9 @@ static void FieldWeather_UpdateCrossfade(FieldWeather *weather, HeapID heapId) {
     case WEATHER_STATE_IDLE:
         break;
     case WEATHER_STATE_START:
-        WeatherTask_Start(weather->tasks[1], WEATHER_OVERLAYS[weather->next].data, 1, 1, 2, weather->fadeIn, heapId);
-        WeatherTask_RequestEnd(weather->tasks[0], 1, 2);
+        WeatherTask_Start(weather->tasks[1], WEATHER_OVERLAYS[weather->next].data, TRUE, TRUE, WEATHER_MODE_CROSSFADE,
+                          weather->fadeIn, heapId);
+        WeatherTask_RequestEnd(weather->tasks[0], TRUE, WEATHER_MODE_CROSSFADE);
         weather->state = WEATHER_STATE_WAIT_END;
         break;
     case WEATHER_STATE_WAIT_END:
