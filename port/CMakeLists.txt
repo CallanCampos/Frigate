@@ -272,6 +272,15 @@ target_compile_options(port_decomp_env INTERFACE
     # decomp does it where the original did, so that part of the group stays a warning
     -Werror=implicit-function-declaration -Werror=int-conversion -Werror=incompatible-pointer-types
     -Wno-error=incompatible-pointer-types-discards-qualifiers)
+# Windows: MinGW's clang lays out structs as MSVC does unless told otherwise (-mms-bitfields, its default there), and
+# that layout ignores the lower alignment PORT_DS_ALIGN_64 gives the 64-bit typedefs (include/types.h): a u64 after a
+# u32 goes to offset 8, not the DS's 4, so a save block holding one moves its fields and its footer (the day care's egg
+# seed, block 0x32). Every file that includes the decomp's headers takes GCC's layout instead, as on macOS and Linux,
+# and port/include/port_host.h stops a build without it. The Windows structs the platform layer uses (CONTEXT, the PE
+# image's headers, WIN32_FIND_DATAA, SRWLOCK) have no bitfields, so they come out the same in both layouts
+if(WIN32)
+    target_compile_options(port_decomp_env INTERFACE -mno-ms-bitfields)
+endif()
 # The decomp's C calls the C library's math (sqrt, which clang turns into sqrtf where its argument and result are
 # float), which glibc keeps in libm. The pinned SDL3 brings it on its link line, a distribution's shared SDL3 doesn't,
 # so on Linux it is linked by name; macOS's and MSYS2's C libraries have it already
