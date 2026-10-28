@@ -9,7 +9,7 @@ The player supplies the ROM/save; no cartridge data is stored here.
 | [backup.c](backup.c), [card_backup_host.c](card_backup_host.c), [card_backup_calls.h](card_backup_calls.h) | Backup-image service and native pointer transport. |
 | [card_spi.c](card_spi.c), [card_spi.h](card_spi.h) | Cartridge infrared/SPI model. |
 | [port_card_bus.c](port_card_bus.c), [port_card_bus.h](port_card_bus.h) | Independent caller-owned NTR read/ID wire engine; `card_bus`. |
-| [port_card_hardware.c](port_card_hardware.c), [port_card_hardware.h](port_card_hardware.h) | Test-activated physical READY/COMMIT events and bounded native-mainRAM DMA service; `card_hardware_*`. |
+| [port_card_hardware.c](port_card_hardware.c), [port_card_hardware.h](port_card_hardware.h) | One test-activated CPU/DMA owner, CPU latch-consume API, physical READY/COMMIT events and bounded native-mainRAM DMA; `card_hardware_*`. |
 
 ## Physical foundation, not production timing
 
@@ -52,3 +52,23 @@ overlap and exhausted payload bounds cannot gain writes. Stopped/reset tokens ca
 across reset and exhaustion stays fail-closed. Reset/cancel and OS run teardown discard pending events before their
 buffers disappear. Actual MI Stop/StopAll cancel this experimental channel. Generic reuse fails visibly rather
 than stealing it; production MIi_CardDmaCopy32 remains deliberately unsupported. No new production feature flag.
+
+## Shared CPU latch boundary
+
+`port_card_hardware_configure` accepts an immutable backend only while the controller and DMA are idle. A CPU command
+uses the actual OS clock and receives a monotonic generation token. DMA cannot arm during that command, and a CPU
+command cannot start while DMA owns a destination. Both use the same physical bus; no second cartridge is created.
+
+`port_card_hardware_read_cpu` returns the old latch before READY. Consuming READY schedules the next word from the
+actual consumption time; an unread word holds indefinitely. Final consumption clears BUSY and publishes CARD_DATA
+IF immediately, before the caller's separate destination store. The API neither advances a CPU-work estimate nor
+delivers an IRQ handler. Absolute waits and the OS's existing interrupt boundaries retain those responsibilities.
+
+Cancel/reset invalidate old tokens, including across reinitialization. A stale read/cancel cannot consume or stop a
+later command. Backend failure at READY cancels the command, retains `PORT_CARD_BUS_IO` in `state.result`, invalidates
+its token and raises no completion IF. A subsequent token read returns BUSY; inspect the retained result for the
+cause. Invalid output or deadline overflow does not silently consume a ready word: correct the call or cancel it.
+
+These are controller tests, not an activated SDK CPU reader. `card_rom.c` still supplies the existing production
+fallback. Cache/page/ID/task integration, original polling/store/copy work, DMA selection and authentic gameplay
+timing validation remain separate. No device minimum or observed scene duration is presented as a generic CPU cost.

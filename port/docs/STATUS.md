@@ -32,11 +32,38 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: integrate the reviewed controller into the bounded field sync
+
+- **Upstream:** frozen `f71f5fe61d`, still the same 36 commits in PR 60. Reviewed main is now `ad54a31b4f`,
+  the normal PR 61 merge after all 14 checks passed. No later upstream commits or experimental SDK reader enter.
+- **Port:** `PORT_SHA`, a real merge of that reviewed main into companion `1b76a05ca0` on the App's original
+  two-parent proposal. The separately preserved private 25-commit merge remains outside this graph.
+- **ROM (T0):** fresh combined-tree signed-runtime configure/Ninja passes both original US hashes, zero warnings:
+  B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  The exact companion `1b76a05ca0` independently passes as well; no parent result substitutes for this run.
+- **Host build/tests (T1/T2):** combined-tree arm64 macOS RelWithDebInfo all-target builds pass. Complete suites
+  finish B2 357 passed/28 explicit skips of 385, W2 354/28 of 382, zero failures. Both actual five-case assembly
+  oracles run without skips. Source hashes stay fixed throughout verification; published exact-head gates remain due.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** no new gameplay or general timing-parity claim.
+  Existing inputs, seeds, reference hashes, masks, performance budgets and fatal sanitizer policy remain fixed.
+- **Tiers/trap stubs:** no fresh scan or production SDK activation. Naming and controller tests do not complete
+  native gameplay; the unfinished reader remains preserved in its separate worktree.
+- **64-bit warnings:** both combined-tree guards pass; the required report is 365 sites/229 keys (real 66,
+  harmless 123, handled 141, unreachable 35), all 1,711 inputs compiled and zero missing. No baseline change.
+- **Work done:** resolve only the STATUS insertion by retaining both records and all historical sections. The
+  imported controller, DMA, fixture, CMake and guide changes retain their reviewed source; original game/SDK/config
+  files remain the frozen sync's. SYNC.md retains the documented existing manual-dispatch fallback. The first
+  hosted Intel runner for PR 61 lost communication; retrying failed jobs at the same head passed, without a bypass.
+- **Next:** fast-forward the existing sync topic, then exact-head owner local
+  verification, source approval and all required hosted checks before a normal protected merge of PR 60.
+- **Blockers:** final published-head canonical and hosted gates remain required; no human approval blocks this work.
+  Faithful native timing and later story coverage remain unfinished. Spanish issue 45 lacks gameplay/save evidence.
+
 ## 2026-10-28: validate the frozen 36-commit field naming proposal
 
 - **Upstream:** `f71f5fe61d`, 36 commits after reviewed `b7ce134e0c`. The App's bounded PR 60 proposal is
   `6d33e29061`, based on reviewed Frigate main `42eade465e`; no later upstream commits are imported.
-- **Port:** `PORT_SHA`, a documentation companion directly on the App's original two-parent upstream merge.
+- **Port:** `1b76a05ca0`, a documentation companion directly on the App's original two-parent upstream merge.
   The separately validated private 25-commit proposal remains preserved; its duplicate merge is not imported.
   Main is not yet synchronized by this proposal, and no experimental CARD SDK reader is included.
 - **ROM (T0):** fresh signed-runtime configure/Ninja completes 1,455 steps with zero warnings; both original hashes
@@ -70,6 +97,31 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   patterns match no incoming commit. One message contains the compiler-local name `@6131`; the helper does not check mentions.
   ADR 0023 remains proposed; this sync claims no AI deadline or whole-game parity. Spanish issue 45 still needs
   genuine gameplay/save evidence.
+
+## 2026-10-28: integrate the reviewed shared-controller interface with current main
+
+- **Upstream:** `b7ce134e0c`, in reviewed main `42eade465e`. PR 59 merged normally after exact-head owner
+  approval, both ROM hashes, complete native suites and all 14 checks. Newer upstream commits are reviewed separately.
+- **Port:** `c8b824ff10`, combining that main with the tested shared-controller interface `9edcfa856b`.
+  Production `card_rom.c` remains byte-identical to main; the experimental SDK reader is separate and unpublished.
+- **ROM (T0):** both parents pass the original US hashes with zero ROM compiler warnings. This integrated head
+  requires fresh configure/Ninja and both hashes before publication; parent results are not transferred.
+- **Host build/tests (T1/T2):** support parent: B2 353 passes/28 explicit skips of 381, W2 350/28 of 378.
+  Main's exact sync head: B2 351/28 of 379, W2 348/28 of 376. Both have zero failures. The support's 20 wire and
+  physical-controller cases pass ordinary and fatal LLVM ASan/UBSan configurations per game. Repeat full gates here.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** the unchanged production reader passes the
+  parents' existing replay gates. No input, seed, reference, mask, timing-budget or sanitizer-policy change.
+  Shared ownership tests do not establish SDK integration, general CPU timing or complete gameplay fidelity.
+- **Tiers/trap stubs:** no new scan; no new game source or production SDK implementation is supplied.
+- **64-bit warnings:** current main passes 365 sites/229 keys, real 66, all 1,711 inputs compiled. Repeat the guard
+  on the integrated head; no source narrowing or source-list override is introduced.
+- **Work done:** retain every historical STATUS section from both parents and their complete test/guide changes.
+  Only the STATUS insertion conflicts; production sources merge cleanly. A second independent read-only review
+  finds no actionable controller defect and confirms the production reader is unchanged.
+- **Next:** publish this support change after its integrated gates, then approve and merge through the protected
+  workflow. Continue the separate SDK reader's intro regression and longer battle/save validation.
+- **Blockers:** no human action blocks this support change. Full integrated verification is still required;
+  native timing/rendering and later story coverage remain incomplete. Spanish issue 45 lacks a gameplay/save dump.
 
 ## 2026-10-28: integrate reviewed trainer-AI sequencing into the final sync proposal
 
@@ -215,6 +267,42 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   the bounded upstream sync and continue the original-DS CARD CPU service investigation.
 - **Blockers:** no human action blocks this integration. Required checks and remaining native timing/features are
   unfinished; showing the Spanish copyright screen does not establish gameplay/save compatibility.
+## 2026-10-28: share physical CARD ownership with a bounded CPU latch interface
+
+- **Upstream:** `fd3b9e600d`, contained in reviewed main `71eabc1eb0`; the separate naming-sync proposal is not
+  imported into this feature. PR 58 merged normally after all 14 checks, owner approval and exact-head verification.
+- **Port:** `9edcfa856b`, on `codex/card-cpu-controller`. The production `card_rom.c` reader and SDK selection remain
+  unchanged. This extends the independent physical foundation of ADR 0028; it does not activate gameplay timing.
+- **ROM (T0):** fresh configure/Ninja passes both original hashes with zero warnings: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+- **Host build/tests (T1/T2):** complete arm64 macOS RelWithDebInfo builds and suites pass: B2 353 passed/28 explicit
+  fixture/platform-dependent skips of 381; W2 350/28 of 378; zero failures. All 20 wire/physical cases pass per game
+  in ordinary and LLVM 23 fatal ASan/UBSan builds, recovery OFF. The actual Ninja compile/link flags instrument the
+  standalone wire test as well as the shared controller. An initially unbuilt standalone sanitizer test executable
+  was built and the complete focused suite rerun; its prior Not Run result is not counted as a pass.
+- **Replay/oracle/play (T3/T4/T7):** applicable existing replays, including both exact New Game house checks, pass
+  with the production reader unchanged. Private original-DS CPU observers preserve all 11,000 frames and 56,086
+  semantic payloads per game. Both first AI loads use 19 pages/four IDs and retain an extra final old-control poll on
+  all 19 pages. Observed B2 238,780/W2 241,502 system-cycle totals include wire waiting/IRQ/SDK work, not CPU constants.
+- **Sanitizers/performance (T5/T6):** no suppression, mask, seed, input, golden or budget changes. Tests cover CPU
+  held/early reads and all 128 page words; IF before final store and deferred delivery; CPU/DMA exclusion; stale token
+  and cancel/reset ABA; zero-data completion; READ/ID backend error and recovery; actual IRQ-handler ID service with
+  pending timer IF and no nested IRQ. CPU consumption adds no invented own-work or DMA-stall cost.
+- **Tiers/trap stubs:** no new tier scan; this changes no game source or completed native feature. Existing matching
+  coverage and unsupported SDK paths remain separate from this controller-boundary proof.
+- **64-bit warnings:** both complete-suite pointer guards pass; no new game cast or source-list change. The prior
+  baseline remains 365 sites/229 keys, real 66, with all 1,707 inputs compiled.
+- **Work done:** one bus now accepts generation-scoped CPU commands; idle-only backend configuration cannot steal
+  active ownership. READY belongs to CPU or DMA explicitly. CPU read consumes the latch, schedules the next physical
+  deadline and publishes final IF before the caller stores data. Reset/cancel never reuse epochs; backend IO failure
+  cancels, invalidates the token and preserves its result. An independent read-only review found no actionable API
+  bug; its two requested error/IRQ coverage gaps are exercised. Guides, feature map and ADR note describe the scope.
+- **Next:** integrate reviewed main and publish this support change through protected review. Adapt the original SDK
+  CPU page/cache/task algorithm to this shared controller only after resolving the preserved runtime prototype's
+  New Game regression and validating genuine AI choices. Continue Ranch/Hugh/Herdier afterward.
+- **Blockers:** no human action blocks this support change. The archived timing prototype still misses the authentic
+  name-confirmation golden with the same genuine seed; passive source-state comparison remains in progress. No
+  gameplay timing activation or AI parity is claimed. Spanish issue 45 still lacks gameplay/save evidence.
 
 ## 2026-10-28: combine the contributor's LLD follow-up with namespace regression coverage
 

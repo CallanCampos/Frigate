@@ -2,6 +2,7 @@
 // Bounds/native provenance are explicit. Per-unit 9 normalized cycles is the pinned IO32->mainRAM model class;
 // no general CPU-work, unknown-destination timing or ordinary DMA IRQ is supplied by this module.
 #include "hal/dma/card_dma.h"
+#include "hal/card/port_card_hardware.h"
 #include "hal/os/port_os.h"
 #include <stdint.h>
 #include <string.h>
@@ -10,8 +11,9 @@ static PortCardDmaState sState;
 static uint8_t *sDest;
 
 bool port_card_dma_arm_main(unsigned channel, void *dest, size_t bytes) {
-    if (channel > 3 || sState.armed || sState.servicing || dest == NULL || bytes == 0 || (bytes & 3) != 0 ||
-        ((uintptr_t)dest & 31) != 0 || !port_os_main_arena_holds(dest, bytes) || sState.generation == UINT64_MAX) {
+    if (channel > 3 || sState.armed || sState.servicing || port_card_hardware_state().owner == PORT_CARD_OWNER_CPU ||
+        dest == NULL || bytes == 0 || (bytes & 3) != 0 || ((uintptr_t)dest & 31) != 0 ||
+        !port_os_main_arena_holds(dest, bytes) || sState.generation == UINT64_MAX) {
         return false;
     }
     ++sState.generation;
