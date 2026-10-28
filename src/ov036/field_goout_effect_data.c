@@ -5,24 +5,24 @@
 #include "gfl/heap.h"
 #include "system/aeabi.h"
 
-// The lens flares of each effect set, ended by 8
+// The lens flares of each effect set, ended by LENS_FLARE_NONE
 // clang-format off
 static const u16 LENS_FLARE_IDS[10][4] = {
-    { 8, 8, 8, 8 },
-    { 0, 8, 8, 8 },
-    { 1, 8, 8, 8 },
-    { 2, 8, 8, 8 },
-    { 3, 8, 8, 8 },
-    { 4, 8, 8, 8 },
-    { 5, 8, 8, 8 },
-    { 6, 8, 8, 8 },
-    { 7, 8, 8, 8 },
+    { LENS_FLARE_NONE, LENS_FLARE_NONE, LENS_FLARE_NONE, LENS_FLARE_NONE },
+    { 0, LENS_FLARE_NONE, LENS_FLARE_NONE, LENS_FLARE_NONE },
+    { 1, LENS_FLARE_NONE, LENS_FLARE_NONE, LENS_FLARE_NONE },
+    { 2, LENS_FLARE_NONE, LENS_FLARE_NONE, LENS_FLARE_NONE },
+    { 3, LENS_FLARE_NONE, LENS_FLARE_NONE, LENS_FLARE_NONE },
+    { 4, LENS_FLARE_NONE, LENS_FLARE_NONE, LENS_FLARE_NONE },
+    { 5, LENS_FLARE_NONE, LENS_FLARE_NONE, LENS_FLARE_NONE },
+    { 6, LENS_FLARE_NONE, LENS_FLARE_NONE, LENS_FLARE_NONE },
+    { 7, LENS_FLARE_NONE, LENS_FLARE_NONE, LENS_FLARE_NONE },
     { 0, 1, 2, 3 },
 };
 
 // clang-format on
 
-// The resources of each effect set
+// The resources of each lens flare: its model, then its animations
 // clang-format off
 static const u16 LENS_FLARE_RESOURCE_IDS[8][6] = {
     { 0x22, 0x20, 0x21, 0x23, 0x24, 0x0 },
@@ -69,7 +69,7 @@ u8 FieldLensFlareData_GetEffectSetSize(FieldLensFlareData *data, u32 effectSet) 
     int index;
 
     for (index = 0; index < 4; index++) {
-        if (FieldLensFlareData_GetLensFlareID(data, effectSet, index) == 8) {
+        if (FieldLensFlareData_GetLensFlareID(data, effectSet, index) == LENS_FLARE_NONE) {
             break;
         }
     }
