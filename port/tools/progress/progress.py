@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Port-readiness progress of the pokebw2 decompilation: which code and data exist as C.
+"""ROM source coverage of the pokebw2 decompilation: which source units own code and data.
 
 Usage:
     python3 progress.py --root <repo> [--version b2_us] [--rev <git rev>] --out <dir>
@@ -8,16 +8,17 @@ With --rev, the configs and sources are read from that git revision (git show / 
 so the same measurement can be taken on historic commits.
 
 Tiers, per function (from symbols.txt) and per data byte (from the delinks section ranges):
-    a   in a source file marked `complete` (matching C, linked from C)
+    a   in a source file marked `complete` (ROM-linked source, which can include assembly)
     b   defined in the C of an incomplete file (C present, not linked; may or may not match)
-    c   no C: c_gap (in no delinks entry), c_nosrc (entry whose source file does not exist), c_partial (an incomplete
-        file's range, but the function is not defined in its C)
-Writes <out>/functions.tsv, <out>/files.tsv, <out>/summary.json.
+    c   unowned or no C: c_gap (in no unambiguous delinks range), c_nosrc (entry whose source file does not exist),
+        c_partial (an incomplete file's range, but the function is not defined in its C)
+Writes <out>/functions.tsv, <out>/files.tsv, <out>/data.json and <out>/modules.json.
 
 It reads config/<version>/arm9's symbols.txt and delinks.txt, every module's (ARM9 main, the ITCM, the DTCM, the
 autoloads, the LTD autoload, the overlays), the C of src/ and lib/ (cparse.py) and the ROM's bytes for veneers
-(rombytes.py). The tiers say how much of the game the host build compiles from C and how much it stubs
-(port/tools/gen_stubs.py); STATUS.md's Tiers line is its headline (port/docs/research/decomp-progress.md).
+(rombytes.py). Native symbol availability is measured separately by port/tools/gen_stubs.py: SDK/HAL files can be
+excluded from the host even when their ROM source is complete. STATUS.md's Tiers line records source coverage;
+its Trap stubs line and actual gameplay tests record native support (port/docs/research/decomp-progress.md).
 """
 import argparse
 import bisect
@@ -31,7 +32,6 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cparse  # noqa: E402
-from rombytes import RomBytes, is_veneer  # noqa: E402
 
 CODE_SECTIONS = {".text", ".ltdmain", ".init"}
 DATA_SECTIONS = {".rodata", ".data", ".bss", ".ctor", ".init", ".sbss", ".sdata"}
@@ -131,6 +131,61 @@ def parse_delinks(text):
     return sections, files
 
 
+# dsd's explicit migrated sections (docs/configs.md): only ARM9 main may contribute these ranges to another
+# module. Equal addresses alone never transfer ownership: overlays routinely share their load addresses.
+MIGRATED_SECTIONS = {
+    ".ltdmain": ("ltd_autoload_0", ".ltdmain"),
+    ".ltdmain.bss": ("ltd_autoload_0", ".bss"),
+    ".dtcm": ("dtcm", ".bss"),
+    ".dtcm.data": ("dtcm", ".data"),
+    ".dtcm.bss": ("dtcm", ".bss"),
+}
+
+
+def resolve_owners(modules):
+    """Disjoint ownership in each destination module/section, from explicit delinks ranges only.
+
+    A migrated range must fit wholly in its named destination section. Overlapping claims remain unowned on
+    their intersection, including a local claim overlapping a migrated one; neither declaration order nor a
+    function name may decide which file owns those bytes. The same resolver serves function and data accounting.
+    """
+    candidates = {mod: defaultdict(list) for mod in modules}
+    for mod, info in modules.items():
+        for file in info["files"]:
+            for section, (start, end) in file["sections"].items():
+                target, target_section = mod, section
+                if mod == "main" and section in MIGRATED_SECTIONS:
+                    target, target_section = MIGRATED_SECTIONS[section]
+                bounds = modules.get(target, {}).get("sections", {}).get(target_section)
+                if bounds and bounds["start"] <= start < end <= bounds["end"]:
+                    candidates[target][target_section].append((start, end, file))
+    result = {mod: {} for mod in modules}
+    for mod, sections in candidates.items():
+        for section, claims in sections.items():
+            points = sorted({point for start, end, _ in claims for point in (start, end)})
+            spans = []
+            for start, end in zip(points, points[1:]):
+                matches = [file for a, b, file in claims if a <= start and end <= b]
+                if len(matches) != 1:
+                    continue
+                file = matches[0]
+                if spans and spans[-1][1] == start and spans[-1][2] is file:
+                    spans[-1] = (spans[-1][0], end, file)
+                else:
+                    spans.append((start, end, file))
+            result[mod][section] = spans
+    return result
+
+
+def range_owner(owners, section, addr, size=1):
+    """A function belongs to one unambiguous span only when its entire range fits."""
+    spans = owners.get(section, [])
+    k = bisect.bisect_right([span[0] for span in spans], addr) - 1
+    if k >= 0 and spans[k][0] <= addr and addr + max(size, 1) <= spans[k][1]:
+        return spans[k][2]
+    return None
+
+
 SYM_RE = re.compile(r"^(\S+) kind:(\w+)(\(([^)]*\)?)\))? addr:0x([0-9a-f]+)(.*)$")
 
 
@@ -186,7 +241,18 @@ def main():
                     default="docs/nonmatching-functions.md")
     args = ap.parse_args()
     src = Source(args.root, args.rev)
-    rb = RomBytes(args.root, args.version)
+    rb = None
+
+    def veneer(module, addr, size, mode):
+        # Large functions cannot be veneers. Synthetic ownership reports therefore need neither ROMs nor PyYAML.
+        if size > 0x10:
+            return False
+        nonlocal rb
+        from rombytes import RomBytes, is_veneer
+        if rb is None:
+            rb = RomBytes(args.root, args.version)
+        return is_veneer(rb, module, addr, size, mode)
+
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
 
@@ -211,28 +277,27 @@ def main():
     reloc_rows = []
     module_meta = {}
 
+    # Read all modules first: some main objects explicitly own ranges in the LTD autoload or DTCM.
+    modules = {}
     for drel in src.glob_configs(args.version):
         mod = module_name(drel, args.version)
-        mdir = str(Path(drel).parent)
         sections, files = parse_delinks(src.read(drel))
+        modules[mod] = {"sections": sections, "files": files, "directory": str(Path(drel).parent)}
+    all_owners = resolve_owners(modules)
+
+    for mod, module in modules.items():
+        sections = module["sections"]
+        mdir = module["directory"]
+        owners = all_owners[mod]
+        # Keep local entries, and report migrated pieces in their actual destination module as well.
+        files = list(module["files"])
+        for spans in owners.values():
+            for _, _, file in spans:
+                if not any(file is existing for existing in files):
+                    files.append(file)
         funcs, datas = parse_symbols(src.read(f"{mdir}/symbols.txt") or "")
         relocs = parse_relocs(src.read(f"{mdir}/relocs.txt") or "")
-        module_meta[mod] = {s: v["end"] - v["start"] for s, v in sections.items()}
-
-        # owner lookup per section: sorted list of (start, end, file)
-        owners = defaultdict(list)
-        for f in files:
-            for sec, (a, b) in f["sections"].items():
-                owners[sec].append((a, b, f))
-        for sec in owners:
-            owners[sec].sort(key=lambda x: x[0])
-
-        def owner(sec, addr):
-            lst = owners.get(sec, [])
-            k = bisect.bisect_right([x[0] for x in lst], addr) - 1
-            if k >= 0 and lst[k][0] <= addr < lst[k][1]:
-                return lst[k][2]
-            return None
+        module_meta[mod] = {section: value["end"] - value["start"] for section, value in sections.items()}
 
         def section_of(addr):
             for s, v in sections.items():
@@ -265,10 +330,10 @@ def main():
         placed = []
         for fn in funcs:
             sec = section_of(fn["addr"]) or "?"
-            f = owner(sec, fn["addr"])
+            f = range_owner(owners, sec, fn["addr"], fn["size"])
             info0 = c_info(f["path"]) if f is not None else None
             in_c = bool(info0) and fn["name"] in info0[0]
-            ven = (not in_c) and is_veneer(rb, mod, fn["addr"], fn["size"], fn["mode"])
+            ven = (not in_c) and veneer(mod, fn["addr"], fn["size"], fn["mode"])
             placed.append((fn, sec, f, ven))
         # pass 2: for incomplete files with C, align C definitions (source order) with symbols (address order), since
         # statics often have a C name while the config keeps func_ovNNN_xxxxxxxx
@@ -438,8 +503,10 @@ def main():
                 "cat": category_of(f["path"]), "funcs": st["n"], "func_bytes": st["bytes"], "funcs_in_c": st["inC"],
                 "func_bytes_in_c": st["inC_bytes"], "asm_funcs": st["asm"],
                 "c_defs": len(info[0]) if info else 0,
-                "text": sum(b - a for s, (a, b) in f["sections"].items() if s in CODE_SECTIONS),
-                "data": sum(b - a for s, (a, b) in f["sections"].items() if s not in CODE_SECTIONS),
+                "text": sum(b - a for section, spans in owners.items() if section in CODE_SECTIONS
+                            for a, b, file in spans if file is f),
+                "data": sum(b - a for section, spans in owners.items() if section not in CODE_SECTIONS
+                            for a, b, file in spans if file is f),
             })
 
     with open(out / "functions.tsv", "w") as fh:

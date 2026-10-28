@@ -32,6 +32,52 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: corrected source ownership and reviewed field movement sync
+
+- **Upstream:** `ee0a7531a022ea6515e640e0d36dc8dfc537b81b`, two naming commits after `dae88ff545`.
+  PR 47 merged as `96d846a593` after delegated owner review, both ROM hashes, both native suites and all hosted
+  checks passed on exact head `8c75102430`. Its 38 function renames and one private structure rename normalize to
+  otherwise identical C tokens in all four affected source/header files. No port conflict or workflow change.
+- **Port:** `PORT_SHA`, on `codex/progress-section-ownership`, from that reviewed main. No game or HAL code changes.
+- **ROM (T0):** configure/Ninja completes all 2,853 steps; both original SHA1s match: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+- **Host build (T1):** both fresh canonical arm64 macOS RelWithDebInfo all-target builds pass, with sanitizer
+  recovery and frame-time report-only overrides off. The protected PR's exact-head local verification records
+  the full both-version suite results before merge.
+- **Tests (T2/T3):** the new `progress_ownership` exercises the production resolver and complete CLI against
+  synthetic configs and C: 11 tests pass, zero skips, without a ROM or compiler. It checks LTD/DTCM migrations,
+  module/overlay isolation, ambiguous intersections, whole-function bounds, incomplete owners and destination-only
+  function/data totals. CTest registration passes in both game builds. Full canonical suites include this test and
+  remain required on the published PR head. No new runtime behavior is introduced.
+- **Oracle, sanitizers and saves (T4/T5/T6/T7):** no new full oracle route or native save round trip is claimed by
+  this reporting fix. Merged Phase 4 validation remains its own evidence. Floccesy/Route 20 route calibration is
+  local unfinished work; it must pass fresh DS comparisons, save CRC/content checks and new-process continuations
+  in both games before becoming a regression test.
+- **Tiers:** fresh both-version scans correct the earlier false gap: 41,017 tier (a), zero (b), zero (c), plus
+  2,385 veneers (16,906 bytes). Code bytes a/b/c: B2 3,850,260/0/0; W2 3,850,348/0/0. All 68 previously reported
+  missing functions already had source: main-file `.ltdmain` ownership was not carried into the LTD module.
+  Explicit DTCM ownership also recovers 136 data bytes; LTD recovers 248, bringing tier-(a) data to 1,824,388 and
+  unowned data to 168 bytes per game. This is a measurement correction, not newly decompiled or newly supported code.
+  Complete source units can contain original assembly; native support remains a separate measure.
+- **Trap stubs:** unchanged: 25 functions and one data placeholder per game. Fifteen functions are excluded
+  networking/HTTP/crypto SDK entries, ten are DS boot/DSi/BIOS entries; the data placeholder is the hardware-specific
+  `CARDi_NdmaInterface`. Typed absent-ROM terminators are separate. No next field/story blocker was found among
+  these symbols, but this does not establish whole-game coverage.
+- **64-bit warnings:** the current classified baseline is 365 sites/229 keys: real 66, harmless 123, handled 141,
+  unreachable 35, with 1,703 compiled inputs and zero uncompiled; the guard passes. No baseline or suppression changes.
+- **Work done:** source ownership follows documented main-object section migrations into named destination
+  sections. Overlapping claims and out-of-bounds ranges remain unowned; equal overlay addresses never transfer
+  ownership. Function extents must fit wholly, and mixed-file data is counted only in its destination. Guides and
+  the architecture map now distinguish ROM source coverage, native HAL traps and verified gameplay.
+- **Next:** Phase 5's story criterion: extend the SHA-pinned catch save through Alder's Route 19 introduction and
+  both Floccesy scenes to a Route 20 save, then quit/reload and verify DS interchange in both games. Continue to
+  Floccesy Ranch and the first gym after that checkpoint. Later story, all optional features, distribution,
+  controllers and cross-platform play remain unverified criteria of the plan.
+- **Blockers:** no missing game C blocks that next route. The trainer-AI CPU-deadline difference remains unresolved
+  (proposed ADR 0023); no new tolerance or save mask is introduced. Native SDK/network support, the 66 real pointer
+  sites and 168 unowned data bytes remain separate audit work. Issue 38's recorder is unimplemented; issue 45's
+  Spanish gameplay/save validation needs a Spanish Black 2 dump, which the owner does not have.
+
 ## 2026-10-27: bounded five-commit graphics/field follow-up through `dae88ff545`
 
 This records the follow-up to merged PR 43, not a repeat of its deep Phase 4 validation. The protected PR and its
@@ -41,7 +87,7 @@ exact-head checks record publication, delegated owner review and merge.
   `5d5e9460693fc6681a75fe6d0a84d57516e44bc0`, 52 commits after `deb044db2d3d`. This is a separate bounded proposal
   (PR 46), retaining the real upstream merge parent and `Upstream-Commit` provenance. No incoming reference exception,
   workflow change, App-scope change or branch-rule change is introduced by this batch.
-- **Port:** `PORT_SHA`, on `codex/upstream-sync-dae88ff545a8-a4bbdc245f51`, initially proposed as `e3179a4820` from
+- **Port:** `c897819d3d`, on `codex/upstream-sync-dae88ff545a8-a4bbdc245f51`, initially proposed as `e3179a4820` from
   reviewed main `a4bbdc245f51` (merged PR 43). No new port adaptation is needed. Existing archive host C, typed
   absent-ROM terminators, native pointer types and other guards remain in place.
 - **ROM (T0):** configure/Ninja completes 1,883 incremental steps; both original SHA1s match: B2

@@ -3,6 +3,15 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-28: migrated source ranges are not missing game C
+
+- Main objects can own `.ltdmain` and DTCM ranges whose symbols live in other modules. Resolve the documented
+  section migrations before measuring coverage; looking only in a symbol's local delinks falsely reported 68
+  missing functions that already had C. Equal overlay addresses are not ownership evidence, and overlapping or
+  out-of-bounds claims must remain unowned. Test both function extents and destination-only data accounting.
+- Complete ROM source coverage does not prove native feature support. Keep the generated native traps, excluded
+  SDK/HAL files, pointer audit and actual gameplay/oracle coverage as separate measurements.
+
 ## 2026-10-26: owners, queued starts and complete packets
 
 - A stopped audio voice can restart when its pending register writes run. Invalidation must cancel its queued
