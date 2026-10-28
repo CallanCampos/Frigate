@@ -2717,9 +2717,9 @@ int Box2Main_BagExit(Box2SysWork *syswk) {
     return 0;
 }
 
-int Box2Main_NameInCall(Box2SysWork *syswk) {
+int Box2Main_NameInputCall(Box2SysWork *syswk) {
     TrainerGameInfoSave *gameInfo = getTrainerGameInfoAddress(GameData_GetSaveControl(syswk->param->gameData));
-    Box2NameInWork *work = GFL_HeapAllocate(HEAPID_BOX2, sizeof(Box2NameInWork), TRUE, "box2_main.c", 4659);
+    Box2NameInputWork *work = GFL_HeapAllocate(HEAPID_BOX2, sizeof(Box2NameInputWork), TRUE, "box2_main.c", 4659);
 
     work->name = GFL_StrBufCreate(20, HEAPID_BOX2);
     loadBoxNameToStrbuf(syswk->param->boxes, syswk->tray, work->name);
@@ -2730,8 +2730,8 @@ int Box2Main_NameInCall(Box2SysWork *syswk) {
     return 0;
 }
 
-int Box2Main_NameInExit(Box2SysWork *syswk) {
-    Box2NameInWork *work = syswk->subProcWork;
+int Box2Main_NameInputExit(Box2SysWork *syswk) {
+    Box2NameInputWork *work = syswk->subProcWork;
 
     if (work->param->unk1C == 0) {
         getBoxNameFromStrbuf(syswk->param->boxes, syswk->tray, work->param->name);

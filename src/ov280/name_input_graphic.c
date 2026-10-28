@@ -1,5 +1,5 @@
 #include "types.h"
-#include "app/namein_graphic.h"
+#include "app/name_input_graphic.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmpwin.h"
 #include "gfl/clact.h"
@@ -18,15 +18,15 @@
 
 typedef struct {
     u32 unk0;
-} NameinGraphicBG;
+} NameInputGraphicBG;
 
 typedef struct {
     ClActUnit *unit;
-} NameinGraphicClAct;
+} NameInputGraphicClAct;
 
-struct NameinGraphic {
-    NameinGraphicBG bg;
-    NameinGraphicClAct clact;
+struct NameInputGraphic {
+    NameInputGraphicBG bg;
+    NameInputGraphicClAct clact;
     u32 unk8;
     TCB *vblankTask;
 };
@@ -36,18 +36,18 @@ typedef struct {
     BGSetup setup;
     u32 mode;
     u32 enabled;
-} NameinGraphicBGSetup;
+} NameInputGraphicBGSetup;
 
-static void NameinGraphic_VBlank(TCB *tcb, void *data);
-static void NameinGraphic_BGInit(NameinGraphicBG *bg, HeapID heapId);
-static void NameinGraphic_BGExit(NameinGraphicBG *bg);
-static void NameinGraphic_BGMain(NameinGraphicBG *bg);
-static void NameinGraphic_BGVBlank(NameinGraphicBG *bg);
-static void NameinGraphic_ClActInit(NameinGraphicClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId);
-static void NameinGraphic_ClActExit(NameinGraphicClAct *clact);
-static void NameinGraphic_ClActMain(NameinGraphicClAct *clact);
-static void NameinGraphic_ClActVBlank(NameinGraphicClAct *clact);
-static ClActUnit *NameinGraphic_ClActGetUnit(NameinGraphicClAct *clact);
+static void NameInputGraphic_VBlank(TCB *tcb, void *data);
+static void NameInputGraphic_BGInit(NameInputGraphicBG *bg, HeapID heapId);
+static void NameInputGraphic_BGExit(NameInputGraphicBG *bg);
+static void NameInputGraphic_BGMain(NameInputGraphicBG *bg);
+static void NameInputGraphic_BGVBlank(NameInputGraphicBG *bg);
+static void NameInputGraphic_ClActInit(NameInputGraphicClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId);
+static void NameInputGraphic_ClActExit(NameInputGraphicClAct *clact);
+static void NameInputGraphic_ClActMain(NameInputGraphicClAct *clact);
+static void NameInputGraphic_ClActVBlank(NameInputGraphicClAct *clact);
+static ClActUnit *NameInputGraphic_ClActGetUnit(NameInputGraphicClAct *clact);
 
 static const BGSysLCDConfig sLCDConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_2D };
 
@@ -63,7 +63,7 @@ static const BGSysVRAMConfig sVRAMConfig = {
 // clang-format on
 
 // clang-format off
-static const NameinGraphicBGSetup sBGSetups[BG_COUNT] = {
+static const NameInputGraphicBGSetup sBGSetups[BG_COUNT] = {
     { 0,
       { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x0000), GX_BG_CHARBASE(0x04000), 0x8000,
         GX_BG_EXTPLTT_01, 3, GX_BG_AREAOVER_XLU, FALSE },
@@ -100,10 +100,10 @@ static const NameinGraphicBGSetup sBGSetups[BG_COUNT] = {
 
 // clang-format on
 
-NameinGraphic *NameinGraphic_Create(u32 layout, HeapID heapId) {
-    NameinGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(NameinGraphic), FALSE, "namein_graphic.c", 443);
+NameInputGraphic *NameInputGraphic_Create(u32 layout, HeapID heapId) {
+    NameInputGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(NameInputGraphic), FALSE, "namein_graphic.c", 443);
 
-    MI_CpuFill8(graphic, 0, sizeof(NameinGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(NameInputGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -115,45 +115,45 @@ NameinGraphic *NameinGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
     GFL_TextRndInitColorIndexLUT();
-    NameinGraphic_BGInit(&graphic->bg, heapId);
-    NameinGraphic_ClActInit(&graphic->clact, &sVRAMConfig, heapId);
-    graphic->vblankTask = GFL_VBlankTCBAdd(NameinGraphic_VBlank, graphic, 0);
+    NameInputGraphic_BGInit(&graphic->bg, heapId);
+    NameInputGraphic_ClActInit(&graphic->clact, &sVRAMConfig, heapId);
+    graphic->vblankTask = GFL_VBlankTCBAdd(NameInputGraphic_VBlank, graphic, 0);
     return graphic;
 }
 
-void NameinGraphic_Delete(NameinGraphic *graphic) {
+void NameInputGraphic_Delete(NameInputGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
-    NameinGraphic_ClActExit(&graphic->clact);
-    NameinGraphic_BGExit(&graphic->bg);
+    NameInputGraphic_ClActExit(&graphic->clact);
+    NameInputGraphic_BGExit(&graphic->bg);
     GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    MI_CpuFill8(graphic, 0, sizeof(NameinGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(NameInputGraphic));
     GFL_HeapFree(graphic);
 }
 
-void NameinGraphic_Main(NameinGraphic *graphic) {
-    NameinGraphic_ClActMain(&graphic->clact);
-    NameinGraphic_BGMain(&graphic->bg);
+void NameInputGraphic_Main(NameInputGraphic *graphic) {
+    NameInputGraphic_ClActMain(&graphic->clact);
+    NameInputGraphic_BGMain(&graphic->bg);
 }
 
-ClActUnit *NameinGraphic_GetClActUnit(NameinGraphic *graphic) {
-    return NameinGraphic_ClActGetUnit(&graphic->clact);
+ClActUnit *NameInputGraphic_GetClActUnit(NameInputGraphic *graphic) {
+    return NameInputGraphic_ClActGetUnit(&graphic->clact);
 }
 
-static void NameinGraphic_VBlank(TCB *tcb, void *data) {
-    NameinGraphic *graphic = data;
+static void NameInputGraphic_VBlank(TCB *tcb, void *data) {
+    NameInputGraphic *graphic = data;
 
-    NameinGraphic_BGVBlank(&graphic->bg);
-    NameinGraphic_ClActVBlank(&graphic->clact);
+    NameInputGraphic_BGVBlank(&graphic->bg);
+    NameInputGraphic_ClActVBlank(&graphic->clact);
 }
 
-static void NameinGraphic_BGInit(NameinGraphicBG *bg, HeapID heapId) {
+static void NameInputGraphic_BGInit(NameInputGraphicBG *bg, HeapID heapId) {
     u32 i;
 
-    MI_CpuFill8(bg, 0, sizeof(NameinGraphicBG));
+    MI_CpuFill8(bg, 0, sizeof(NameInputGraphicBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sLCDConfig);
@@ -164,7 +164,7 @@ static void NameinGraphic_BGInit(NameinGraphicBG *bg, HeapID heapId) {
     }
 }
 
-static void NameinGraphic_BGExit(NameinGraphicBG *bg) {
+static void NameInputGraphic_BGExit(NameInputGraphicBG *bg) {
     u32 i;
 
     for (i = 0; i < NELEMS(sBGSetups); i++) {
@@ -172,18 +172,18 @@ static void NameinGraphic_BGExit(NameinGraphicBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    MI_CpuFill8(bg, 0, sizeof(NameinGraphicBG));
+    MI_CpuFill8(bg, 0, sizeof(NameInputGraphicBG));
 }
 
-static void NameinGraphic_BGMain(NameinGraphicBG *bg) {
+static void NameInputGraphic_BGMain(NameInputGraphicBG *bg) {
 }
 
-static void NameinGraphic_BGVBlank(NameinGraphicBG *bg) {
+static void NameInputGraphic_BGVBlank(NameInputGraphicBG *bg) {
     GFL_BGSysUpdate();
 }
 
-static void NameinGraphic_ClActInit(NameinGraphicClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    MI_CpuFill8(clact, 0, sizeof(NameinGraphicClAct));
+static void NameInputGraphic_ClActInit(NameInputGraphicClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
+    MI_CpuFill8(clact, 0, sizeof(NameInputGraphicClAct));
     ClActSys_Create(&sClActSysSetup, vramConfig, heapId);
     clact->unit = ClActUnit_Create(128, 0, heapId);
     ClActUnit_UseSystemRenderer(clact->unit);
@@ -191,20 +191,20 @@ static void NameinGraphic_ClActInit(NameinGraphicClAct *clact, const BGSysVRAMCo
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
-static void NameinGraphic_ClActExit(NameinGraphicClAct *clact) {
+static void NameInputGraphic_ClActExit(NameInputGraphicClAct *clact) {
     ClActUnit_Delete(clact->unit);
     ClActSys_Delete();
-    MI_CpuFill8(clact, 0, sizeof(NameinGraphicClAct));
+    MI_CpuFill8(clact, 0, sizeof(NameInputGraphicClAct));
 }
 
-static void NameinGraphic_ClActMain(NameinGraphicClAct *clact) {
+static void NameInputGraphic_ClActMain(NameInputGraphicClAct *clact) {
     ClActSys_Draw();
 }
 
-static void NameinGraphic_ClActVBlank(NameinGraphicClAct *clact) {
+static void NameInputGraphic_ClActVBlank(NameInputGraphicClAct *clact) {
     ClActSys_VBlank();
 }
 
-static ClActUnit *NameinGraphic_ClActGetUnit(NameinGraphicClAct *clact) {
+static ClActUnit *NameInputGraphic_ClActGetUnit(NameInputGraphicClAct *clact) {
     return clact->unit;
 }

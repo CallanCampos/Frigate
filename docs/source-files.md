@@ -276,7 +276,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `survey.c` | `0x021652cc`–`0x02165598` | 14 | complete | descriptive |
 | `scrcmd_sp_poke_gimmick.c` | `0x02165598`–`0x0216598c` | 8 | complete | descriptive |
 | `oneshot_dr.c` | `0x0216598c`–`0x021659ec` | 2 | complete | descriptive |
-| `namein_setup.c` | `0x021659ec`–`0x02165b1c` | 7 | complete | string at `0x0216e3a0` |
+| `name_input_setup.c` | `0x021659ec`–`0x02165b1c` | 7 | complete | ROM's `namein_setup.c`, string at `0x0216e3a0` |
 | `event_league_lift.c` | `0x02165b1c`–`0x02165eb8` | 7 | complete | descriptive |
 | `event_bsubway.c` | `0x02165eb8`–`0x02166664` | 17 | complete | descriptive |
 | `fldmmdl.c` | `0x02166664`–`0x02168320` | 270 | complete | string at `0x0216e5c0` |
@@ -2531,9 +2531,9 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `namein.c` | `0x021d96e0`–`0x021dd28c` | 111 | complete | descriptive |
-| `namein_graphic.c` | `0x021dd28c`–`0x021dd4c8` | 14 | complete | string at `0x021ddb84` |
-| `namein_data.c` | `0x021dd4c8`–`0x021dd8e4` | 23 | complete | string at `0x021ddb98` |
+| `name_input.c` | `0x021d96e0`–`0x021dd28c` | 111 | complete | descriptive |
+| `name_input_graphic.c` | `0x021dd28c`–`0x021dd4c8` | 14 | complete | ROM's `namein_graphic.c`, string at `0x021ddb84` |
+| `name_input_data.c` | `0x021dd4c8`–`0x021dd8e4` | 23 | complete | ROM's `namein_data.c`, string at `0x021ddb98` |
 
 ### Overlay 281
 

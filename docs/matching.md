@@ -2572,7 +2572,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   values; MWCC doesn't fold `x >= left && x <= right` into it (`AppTaskMenuWin_IsTouched`).
 - Two range tests joined by a bitwise `&` each build a 0/1 (`cmp; bhs; movs rN, #1; b; movs rN, #0`) and combine them
   with `ands`, and the second test runs even when the first fails. `&&` instead zeroes one result register up front
-  and branches past the second test. Game Freak's touch hit tests are written this way: `namein.c`'s
+  and branches past the second test. Game Freak's touch hit tests are written this way: `name_input.c`'s
   `NameEntry_PointInRect` returns `(touch->x - rect->left <= rect->right - rect->left) & (touch->y - rect->top <=
   rect->bottom - rect->top)`.
 - A test of `x == 1 || x == 2` repeated after a call subtracts again at each test on a `u32`, and on an `int` is
@@ -4257,7 +4257,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   section comes before small initializers; check the object's section order, not only its symbol table.
 - A global nothing refers to that the ROM has after the shared section, where ours sorts it first, needs an object
   of its size or less in the shared section that the sort puts first, and the globals' declaration order decides
-  that tie: overlay 280's `namein.c` declares `NAME_ENTRY_SOUND_COUNT` after the other exports, below the tables,
+  that tie: overlay 280's `name_input.c` declares `NAME_ENTRY_SOUND_COUNT` after the other exports, below the tables,
   and its eight leading words are `const` locals of the functions that use them: `NameBox_Update`'s left and top
   edge of the name, `Keyboard_Init`'s first key of the cursor, and `Keyboard_UpdateSlide`'s frame count and three
   BGs. When the function-local statics are all one size, though, the layout fixes only their order in MWCC's list,

@@ -188,7 +188,7 @@ typedef struct {
 typedef struct {
     NameEntryParam *param;
     StrBuf *name;
-} Box2NameInWork;
+} Box2NameInputWork;
 
 // Releasing a Pokémon
 typedef struct {
@@ -415,8 +415,8 @@ int Box2Main_PokeStatusCall(Box2SysWork *syswk);
 int Box2Main_PokeStatusExit(Box2SysWork *syswk);
 int Box2Main_BagCall(Box2SysWork *syswk);
 int Box2Main_BagExit(Box2SysWork *syswk);
-int Box2Main_NameInCall(Box2SysWork *syswk);
-int Box2Main_NameInExit(Box2SysWork *syswk);
+int Box2Main_NameInputCall(Box2SysWork *syswk);
+int Box2Main_NameInputExit(Box2SysWork *syswk);
 int Box2Main_BoxSearchCall(Box2SysWork *syswk);
 int Box2Main_BoxSearchExit(Box2SysWork *syswk);
 BOOL Box2Main_VFuncPokeMoveTouchParty(Box2SysWork *syswk);

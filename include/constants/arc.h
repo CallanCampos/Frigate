@@ -187,7 +187,7 @@
 #define ARCID_WIFI_NOTE 62                // wifi_note.c
 #define ARCID_FIELD_MENU 70               // field_menu.c, field_subscreen.c
 #define ARCID_PLIST 75                    // plist_sys.c, plist_battle.c, plist_menu.c
-#define ARCID_FIELD_PLACE_NAME 83         // field_place_name.c, namein.c
+#define ARCID_FIELD_PLACE_NAME 83         // field_place_name.c, name_input.c
 #define ARCID_TOWNMAP_GRA 84              // townmap.c, townmap_grh.c, pokedex_detail_map.c
 #define ARCID_ITEMMENU 87                 // itemmenu.c, itemmenu_disp.c
 #define ARCID_BTLV_EFFVM_BG 94            // btlv_effvm.c
@@ -199,7 +199,7 @@
 #define ARCID_POKEMONTRADE_DEMO 104       // pokemontrade_demo_common.c, pokemontrade_demo_down.c
 #define ARCID_POKEMONTRADE_2D 105         // pokemontrade_2d.c
 #define ARCID_MIC_TEST 107                // mictest.c
-#define ARCID_NAMEIN_GRAPHIC 119          // namein.c
+#define ARCID_NAMEIN_GRAPHIC 119          // name_input.c
 #define ARCID_WAZA_OSHIE 125              // move_tutor_main.c
 #define ARCID_SHORTCUT_MENU 129           // shortcut_menu.c
 #define ARCID_LOCAL_TVT 132               // local_tvt_chara.c, local_tvt_util.c

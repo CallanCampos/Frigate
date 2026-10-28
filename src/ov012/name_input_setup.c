@@ -1,3 +1,4 @@
+// The ROM names this file namein_setup.c.
 // The parameters of the name entry (overlay 280). The name is the file's own; setupNameEntry, setupPokemonNameEntry
 // and pokemonNameEntry are swan's names (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"

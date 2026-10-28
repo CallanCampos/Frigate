@@ -1,7 +1,7 @@
 #include "types.h"
 #include "app/name_entry.h"
-#include "app/namein_data.h"
-#include "app/namein_graphic.h"
+#include "app/name_input_data.h"
+#include "app/name_input_graphic.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/sound.h"
@@ -49,8 +49,9 @@
 #include "text/system/ability_handlers_btl_main.h"
 
 // The name entry screen: a name field along the top, a keyboard of keys that the keys or the touch screen pick, and the
-// icon of whatever is being named. Overlay 280, with the graphics of namein_graphic.c and the tables of namein_data.c.
-// The ROM gives this file no name; "namein" follows its siblings. The names are ours
+// icon of whatever is being named. Overlay 280, with the graphics of name_input_graphic.c and the tables of
+// name_input_data.c. The ROM gives this file no name; it follows its siblings, the ROM's namein_data.c and
+// namein_graphic.c. The names are ours
 
 // How many cell actors the screen has: the name field's, the key highlight's and the selectors'
 #define OBJ_COUNT 24
@@ -236,12 +237,12 @@ typedef struct NameBox {
     StrBuf *buf;
     BmpWin *window;
     ClActor *slots[NAME_SLOT_COUNT];
-    NameinWordTable *words[NAMEIN_WORD_TABLE_MAX];
-    NameinConvTable *conv;
+    NameInputWordTable *words[NAME_INPUT_WORD_TABLE_MAX];
+    NameInputConvTable *conv;
 } NameBox;
 
 typedef struct KeyLayout {
-    NameinKeyboard *keyboard;
+    NameInputKeyboard *keyboard;
     u8 memory[13];
     BOOL (*getRect)(const KeyPos *pos, KeyRect *rect);
     void (*move)(KeyPos *pos, const KeyPos *delta, u8 *memory);
@@ -285,7 +286,7 @@ typedef struct Keyboard {
     BOOL hasUpperLayer;
     void *screenData[2];
     NNSG2dScreenData *screens[2];
-    NameinKeyboardSet *keyboards;
+    NameInputKeyboardSet *keyboards;
     BOOL locked;
 } Keyboard;
 
@@ -345,12 +346,12 @@ struct NameEntryTask {
 };
 
 struct NameEntryWork {
-    NameinGraphic *graphic;
+    NameInputGraphic *graphic;
     NameEntryObjs objs;
     u32 bgs;
     NameBox box;
     Keyboard keyboard;
-    NameinKeyboardSet *keyboards;
+    NameInputKeyboardSet *keyboards;
     NameEntryMessage message;
     NameEntryTalk talk;
     NameEntryIcon icon;
@@ -404,8 +405,9 @@ static BOOL NameBox_ComposeAll(NameBox *box, int set);
 static BOOL NameBox_HasVisibleChar(const NameBox *box);
 static BOOL NameBox_IsValidGameSyncId(NameBox *box);
 static BOOL NameEntry_IsGameSyncIdChar(u16 c);
-static void KeyLayout_Init(KeyLayout *layout, u32 type, u32 index, const NameinKeyboardSet *keyboards, HeapID heapId);
-static void KeyLayout_SetKeyboard(KeyLayout *layout, u32 index, const NameinKeyboardSet *keyboards);
+static void KeyLayout_Init(KeyLayout *layout, u32 type, u32 index, const NameInputKeyboardSet *keyboards,
+                           HeapID heapId);
+static void KeyLayout_SetKeyboard(KeyLayout *layout, u32 index, const NameInputKeyboardSet *keyboards);
 static void KeyLayout_Clear(KeyLayout *layout);
 static int KeyLayout_GetChar(KeyLayout *layout, const KeyPos *pos, u16 *c);
 static BOOL KeyLayout_FindAtTouch(const KeyLayout *layout, const TouchPos *touch, KeyPos *found);
@@ -421,7 +423,7 @@ static void KanaLayout_Move(KeyPos *pos, const KeyPos *delta, u8 *memory);
 static int AlphaLayout_GetKindDefault(const KeyPos *pos, KeyPos *cell);
 static int AlphaLayout_GetKind(const KeyPos *pos, KeyPos *cell);
 static int KanaLayout_GetKind(const KeyPos *pos, KeyPos *cell);
-static void Keyboard_Init(Keyboard *kb, u32 type, Font *font, PrintQueue *queue, NameinKeyboardSet *keyboards,
+static void Keyboard_Init(Keyboard *kb, u32 type, Font *font, PrintQueue *queue, NameInputKeyboardSet *keyboards,
                           NameEntryObjs *objs, HeapID heapId);
 static void Keyboard_Free(Keyboard *kb);
 static void Keyboard_Update(Keyboard *kb, NameBox *box);
@@ -533,8 +535,8 @@ BOOL NameEntry_ProcInit(GameProc *proc, u32 *state, void *arg, void *unused) {
         }
     }
 
-    GFL_HeapCreateChild(HEAPID_USER, HEAPID_NAMEIN, 0x70000);
-    work = GFL_ProcInitSubsystem(proc, sizeof(NameEntryWork), HEAPID_NAMEIN);
+    GFL_HeapCreateChild(HEAPID_USER, HEAPID_NAME_INPUT, 0x70000);
+    work = GFL_ProcInitSubsystem(proc, sizeof(NameEntryWork), HEAPID_NAME_INPUT);
     MI_CpuFill8(work, 0, sizeof(NameEntryWork));
     work->param = param;
     if (param->mode == NAME_ENTRY_PASSERBY_MESSAGE || param->mode == NAME_ENTRY_TRAINER_MESSAGE) {
@@ -543,39 +545,41 @@ BOOL NameEntry_ProcInit(GameProc *proc, u32 *state, void *arg, void *unused) {
         work->usesPresetNames = FALSE;
     }
 
-    work->font = GFL_FontCreate(ARCID_FONT, 0, 1, FALSE, HEAPID_NAMEIN);
-    work->queue = PrintQueue_Create(0x1000, HEAPID_NAMEIN);
-    work->msgData = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_BTL_MAIN, HEAPID_NAMEIN);
-    work->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_NAMEIN);
-    work->graphic = NameinGraphic_Create(0, HEAPID_NAMEIN);
-    work->bmpOam = BmpOam_Init(HEAPID_NAMEIN, NameinGraphic_GetClActUnit(work->graphic));
-    NameEntry_LoadBgGraphics(&work->bgs, HEAPID_NAMEIN);
-    unit = NameinGraphic_GetClActUnit(work->graphic);
-    NameEntryObjs_Init(&work->objs, unit, HEAPID_NAMEIN);
+    work->font = GFL_FontCreate(ARCID_FONT, 0, 1, FALSE, HEAPID_NAME_INPUT);
+    work->queue = PrintQueue_Create(0x1000, HEAPID_NAME_INPUT);
+    work->msgData =
+        GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_BTL_MAIN, HEAPID_NAME_INPUT);
+    work->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_NAME_INPUT);
+    work->graphic = NameInputGraphic_Create(0, HEAPID_NAME_INPUT);
+    work->bmpOam = BmpOam_Init(HEAPID_NAME_INPUT, NameInputGraphic_GetClActUnit(work->graphic));
+    NameEntry_LoadBgGraphics(&work->bgs, HEAPID_NAME_INPUT);
+    unit = NameInputGraphic_GetClActUnit(work->graphic);
+    NameEntryObjs_Init(&work->objs, unit, HEAPID_NAME_INPUT);
     species = param->gender;
     NameEntryIcon_Init(&work->icon, NameEntry_GetIconType(param->mode, species), species, param->unk6, unit, work->font,
-                       work->queue, work->msgData, work->bmpOam, HEAPID_NAMEIN);
-    work->keyboards = NameinData_LoadKeyboards(HEAPID_NAMEIN);
-    work->name = GFL_StrBufClone(param->name, HEAPID_NAMEIN);
+                       work->queue, work->msgData, work->bmpOam, HEAPID_NAME_INPUT);
+    work->keyboards = NameInputData_LoadKeyboards(HEAPID_NAME_INPUT);
+    work->name = GFL_StrBufClone(param->name, HEAPID_NAME_INPUT);
     if (GFL_StrBufGetCharCount(work->name) != 0) {
         if (GFL_StrBufGetCharCount(work->name) > param->maxLength ||
-            !NameinData_IsNameValid(GFL_StrBufGetStringPtr(work->name), HEAPID_NAMEIN)) {
+            !NameInputData_IsNameValid(GFL_StrBufGetStringPtr(work->name), HEAPID_NAME_INPUT)) {
             GFL_StrBufClear(work->name);
         }
     }
     NameEntryTask_Init(&work->task, work, NameEntryTask_WaitDraw);
-    NameBox_Init(&work->box, work->name, param->maxLength, work->font, work->queue, &work->objs, HEAPID_NAMEIN);
-    Keyboard_Init(&work->keyboard, keyboardType, work->font, work->queue, work->keyboards, &work->objs, HEAPID_NAMEIN);
+    NameBox_Init(&work->box, work->name, param->maxLength, work->font, work->queue, &work->objs, HEAPID_NAME_INPUT);
+    Keyboard_Init(&work->keyboard, keyboardType, work->font, work->queue, work->keyboards, &work->objs,
+                  HEAPID_NAME_INPUT);
     if (param->mode == NAME_ENTRY_GAME_SYNC_ID) {
         Keyboard_SetLocked(&work->keyboard, TRUE);
     }
-    NameEntryMessage_Init(&work->message, work->font, work->msgData, work->queue, work->wordSet, HEAPID_NAMEIN);
-    NameEntryTalk_Init(&work->talk, HEAPID_NAMEIN);
-    work->profWord = ProfWord_LoadLists(HEAPID_NAMEIN);
+    NameEntryMessage_Init(&work->message, work->font, work->msgData, work->queue, work->wordSet, HEAPID_NAME_INPUT);
+    NameEntryTalk_Init(&work->talk, HEAPID_NAME_INPUT);
+    work->profWord = ProfWord_LoadLists(HEAPID_NAME_INPUT);
     NameEntryObjs_ShowSelectors(&work->objs, work->usesPresetNames);
     if (param->mode == NAME_ENTRY_POKEMON) {
         if (param->pkm == NULL) {
-            NameEntryMessage_PrintSpecies(&work->message, param->mode, param->gender, param->unk6, HEAPID_NAMEIN);
+            NameEntryMessage_PrintSpecies(&work->message, param->mode, param->gender, param->unk6, HEAPID_NAME_INPUT);
         } else {
             NameEntryMessage_PrintPokemon(&work->message, param->mode, param->pkm);
         }
@@ -583,7 +587,7 @@ BOOL NameEntry_ProcInit(GameProc *proc, u32 *state, void *arg, void *unused) {
         NameEntryMessage_Print(&work->message, param->mode);
     }
     if (GFL_NetIsInitialized()) {
-        GFL_NetSetIconScreen(TRUE, HEAPID_NAMEIN);
+        GFL_NetSetIconScreen(TRUE, HEAPID_NAME_INPUT);
     }
     if (work->param->saveTask != NULL) {
         SaveControlIntr_Resume(work->param->saveTask);
@@ -599,21 +603,21 @@ BOOL NameEntry_ProcExit(GameProc *proc, u32 *state, void *param, void *arg) {
     NameEntryMessage_Free(&work->message);
     Keyboard_Free(&work->keyboard);
     GFL_StrBufFree(work->name);
-    NameinData_FreeKeyboards(work->keyboards);
+    NameInputData_FreeKeyboards(work->keyboards);
     NameBox_Free(&work->box);
     NameEntryTask_Clear(&work->task);
     NameEntryIcon_Free(&work->icon);
     NameEntryObjs_Free(&work->objs);
     NameEntry_FreeBgGraphics(&work->bgs);
     BmpOam_Exit(work->bmpOam);
-    NameinGraphic_Delete(work->graphic);
+    NameInputGraphic_Delete(work->graphic);
     GFL_WordSetSystemFree(work->wordSet);
     GFL_MsgDataFree(work->msgData);
     PrintQueue_Clear(work->queue);
     PrintQueue_Free(work->queue);
     GFL_FontFree(work->font);
     GFL_ProcReleaseSubsystem(proc);
-    GFL_HeapDelete(HEAPID_NAMEIN);
+    GFL_HeapDelete(HEAPID_NAME_INPUT);
     GFL_OvlUnload(OVERLAY_PROF_WORD);
     return TRUE;
 }
@@ -622,7 +626,7 @@ BOOL NameEntry_ProcMain(GameProc *proc, u32 *state, void *param, void *arg) {
     NameEntryWork *work = arg;
 
     NameEntryTask_Run(&work->task);
-    NameinGraphic_Main(work->graphic);
+    NameInputGraphic_Main(work->graphic);
     PrintQueue_Main(work->queue);
     NameEntryIcon_UpdateLabel(&work->icon);
     if (NameEntryTask_IsDone(&work->task)) {
@@ -900,10 +904,10 @@ static void NameBox_Init(NameBox *box, StrBuf *name, u8 maxLength, Font *font, P
     box->printWindow = box->window;
     box->printing = FALSE;
     box->buf = GFL_StrBufCreate(14, heapId);
-    for (i = 0; i < NAMEIN_WORD_TABLE_MAX; i++) {
-        box->words[i] = NameinData_LoadWordTable(i, heapId);
+    for (i = 0; i < NAME_INPUT_WORD_TABLE_MAX; i++) {
+        box->words[i] = NameInputData_LoadWordTable(i, heapId);
     }
-    box->conv = NameinData_LoadConvTable(heapId);
+    box->conv = NameInputData_LoadConvTable(heapId);
     for (i = 0; i < NAME_SLOT_COUNT; i++) {
         box->slots[i] = NameEntryObjs_Get(objs, i);
     }
@@ -943,9 +947,9 @@ static void NameBox_Init(NameBox *box, StrBuf *name, u8 maxLength, Font *font, P
 static void NameBox_Free(NameBox *box) {
     int i;
 
-    NameinData_FreeConvTable(box->conv);
-    for (i = 0; i < NAMEIN_WORD_TABLE_MAX; i++) {
-        NameinData_FreeWordTable(box->words[i]);
+    NameInputData_FreeConvTable(box->conv);
+    for (i = 0; i < NAME_INPUT_WORD_TABLE_MAX; i++) {
+        NameInputData_FreeWordTable(box->words[i]);
     }
     GFL_StrBufFree(box->buf);
     BmpWin_Free(box->window);
@@ -1063,7 +1067,7 @@ static BOOL NameBox_AddComposeChar(NameBox *box, u16 c, int set) {
 
 // Turns the last character into its other spelling
 static BOOL NameBox_Compose(NameBox *box, int which) {
-    const NameinWordTable *table;
+    const NameInputWordTable *table;
     u16 index;
     u16 added[4];
     u16 removed[4];
@@ -1072,20 +1076,20 @@ static BOOL NameBox_Compose(NameBox *box, int which) {
     int i;
 
     switch (which) {
-    case NAMEIN_WORD_TABLE_DAKUTEN:
-        table = box->words[NAMEIN_WORD_TABLE_DAKUTEN];
+    case NAME_INPUT_WORD_TABLE_DAKUTEN:
+        table = box->words[NAME_INPUT_WORD_TABLE_DAKUTEN];
         break;
-    case NAMEIN_WORD_TABLE_HANDAKUTEN:
-        table = box->words[NAMEIN_WORD_TABLE_HANDAKUTEN];
+    case NAME_INPUT_WORD_TABLE_HANDAKUTEN:
+        table = box->words[NAME_INPUT_WORD_TABLE_HANDAKUTEN];
         break;
     default:
         return FALSE;
     }
     if (box->length != 0) {
-        index = NameinWordTable_Find(table, &box->text[box->length - 1]);
+        index = NameInputWordTable_Find(table, &box->text[box->length - 1]);
         if (index != 0xffff) {
-            if (NameinWordTable_GetForm1(table, index, added, 4, &addCount)) {
-                NameinWordTable_GetForm0(table, index, removed, 4, &removeCount);
+            if (NameInputWordTable_GetForm1(table, index, added, 4, &addCount)) {
+                NameInputWordTable_GetForm0(table, index, removed, 4, &removeCount);
                 for (i = 0; i < removeCount; i++) {
                     NameBox_DeleteChar(box);
                 }
@@ -1103,7 +1107,7 @@ static BOOL NameBox_CycleLast(NameBox *box) {
     u16 next;
 
     if (box->length != 0) {
-        if (NameinConvTable_GetNext(box->conv, &box->text[box->length - 1], &next)) {
+        if (NameInputConvTable_GetNext(box->conv, &box->text[box->length - 1], &next)) {
             NameBox_DeleteChar(box);
             NameBox_AddChar(box, next);
             return TRUE;
@@ -1186,7 +1190,7 @@ static u16 NameBox_GetComposeLength(NameBox *box) {
 // Looks the composed characters up in the third word table and, when a character has an entry, commits the ones before
 // it and replaces it with the spelling that the entry gives for the set
 static BOOL NameBox_ComposeAll(NameBox *box, int set) {
-    BOOL (*lookup)(const NameinWordTable *table, u32 index, u16 *dest, u32 n, u8 *len);
+    BOOL (*lookup)(const NameInputWordTable *table, u32 index, u16 *dest, u32 n, u8 *len);
     u8 count;
     u16 chars[4];
     u16 index;
@@ -1194,12 +1198,12 @@ static BOOL NameBox_ComposeAll(NameBox *box, int set) {
     int j;
 
     if (set) {
-        lookup = NameinWordTable_GetForm2;
+        lookup = NameInputWordTable_GetForm2;
     } else {
-        lookup = NameinWordTable_GetForm1;
+        lookup = NameInputWordTable_GetForm1;
     }
     for (i = 0; i < box->pendingLength; i++) {
-        index = NameinWordTable_Find(box->words[NAMEIN_WORD_TABLE_COMPOSE], &box->pending[i]);
+        index = NameInputWordTable_Find(box->words[NAME_INPUT_WORD_TABLE_COMPOSE], &box->pending[i]);
         if (index != 0xffff) {
             for (j = 0; j < i; j++) {
                 NameBox_AddChar(box, box->pending[j]);
@@ -1207,15 +1211,15 @@ static BOOL NameBox_ComposeAll(NameBox *box, int set) {
             for (j = 0; j < i; j++) {
                 NameBox_DeleteChar(box);
             }
-            if (lookup(box->words[NAMEIN_WORD_TABLE_COMPOSE], index, chars, 4, &count)) {
+            if (lookup(box->words[NAME_INPUT_WORD_TABLE_COMPOSE], index, chars, 4, &count)) {
                 for (i = 0; i < count; i++) {
                     NameBox_AddChar(box, chars[i]);
                 }
-                NameinWordTable_GetForm0(box->words[NAMEIN_WORD_TABLE_COMPOSE], index, chars, 4, &count);
+                NameInputWordTable_GetForm0(box->words[NAME_INPUT_WORD_TABLE_COMPOSE], index, chars, 4, &count);
                 for (i = 0; i < count; i++) {
                     NameBox_DeleteChar(box);
                 }
-                NameinWordTable_GetForm3(box->words[NAMEIN_WORD_TABLE_COMPOSE], index, chars, 4, &count);
+                NameInputWordTable_GetForm3(box->words[NAME_INPUT_WORD_TABLE_COMPOSE], index, chars, 4, &count);
                 for (i = 0; i < count; i++) {
                     box->pending[box->pendingLength] = chars[i];
                     box->pendingLength++;
@@ -1275,11 +1279,12 @@ static BOOL NameEntry_IsGameSyncIdChar(u16 c) {
     return FALSE;
 }
 
-static void KeyLayout_Init(KeyLayout *layout, u32 type, u32 index, const NameinKeyboardSet *keyboards, HeapID heapId) {
+static void KeyLayout_Init(KeyLayout *layout, u32 type, u32 index, const NameInputKeyboardSet *keyboards,
+                           HeapID heapId) {
     int i;
 
     MI_CpuFill8(layout, 0, sizeof(KeyLayout));
-    layout->keyboard = NameinData_GetKeyboard(keyboards, index);
+    layout->keyboard = NameInputData_GetKeyboard(keyboards, index);
     switch (type) {
     case KEYBOARD_TYPE_KANA:
         layout->width = 11;
@@ -1303,8 +1308,8 @@ static void KeyLayout_Init(KeyLayout *layout, u32 type, u32 index, const NameinK
     }
 }
 
-static void KeyLayout_SetKeyboard(KeyLayout *layout, u32 index, const NameinKeyboardSet *keyboards) {
-    layout->keyboard = NameinData_GetKeyboard(keyboards, index);
+static void KeyLayout_SetKeyboard(KeyLayout *layout, u32 index, const NameInputKeyboardSet *keyboards) {
+    layout->keyboard = NameInputData_GetKeyboard(keyboards, index);
 }
 
 static void KeyLayout_Clear(KeyLayout *layout) {
@@ -1318,7 +1323,7 @@ static int KeyLayout_GetChar(KeyLayout *layout, const KeyPos *pos, u16 *c) {
 
     if (kind == KEY_KIND_CHAR || kind == KEY_KIND_DAKUTEN || kind == KEY_KIND_HANDAKUTEN) {
         if (c != NULL) {
-            *c = NameinKeyboard_GetChar(layout->keyboard, cell.x, cell.y);
+            *c = NameInputKeyboard_GetChar(layout->keyboard, cell.x, cell.y);
         }
     } else if (kind == KEY_KIND_SPACE) {
         if (c != NULL) {
@@ -1368,8 +1373,8 @@ static void KeyLayout_PrintKeys(KeyLayout *layout, KeyPrint *print, PrintQueue *
     u16 y;
     int kind;
 
-    for (pos.y = 0; pos.y < NameinKeyboard_GetHeight(layout->keyboard); pos.y++) {
-        for (pos.x = 0; pos.x < NameinKeyboard_GetWidth(layout->keyboard); pos.x++) {
+    for (pos.y = 0; pos.y < NameInputKeyboard_GetHeight(layout->keyboard); pos.y++) {
+        for (pos.x = 0; pos.x < NameInputKeyboard_GetWidth(layout->keyboard); pos.x++) {
             if (KeyLayout_GetRect(layout, &pos, &rect)) {
                 kind = KeyLayout_GetChar(layout, &pos, &c);
                 if (kind == KEY_KIND_CHAR || kind == KEY_KIND_DAKUTEN || kind == KEY_KIND_HANDAKUTEN) {
@@ -2050,7 +2055,7 @@ static int KanaLayout_GetKind(const KeyPos *pos, KeyPos *cell) {
     return kind;
 }
 
-static void Keyboard_Init(Keyboard *kb, u32 type, Font *font, PrintQueue *queue, NameinKeyboardSet *keyboards,
+static void Keyboard_Init(Keyboard *kb, u32 type, Font *font, PrintQueue *queue, NameInputKeyboardSet *keyboards,
                           NameEntryObjs *objs, HeapID heapId) {
     // The cursor starts on the top left key
     const int startX = 0;
@@ -3155,7 +3160,7 @@ static void NameEntry_CheckChanged(NameEntryWork *work) {
     int i;
 
     work->param->unk1C = FALSE;
-    previous = GFL_StrBufClone(work->param->name, HEAPID_NAMEIN);
+    previous = GFL_StrBufClone(work->param->name, HEAPID_NAME_INPUT);
     NameBox_GetString(&work->box, work->param->name);
     if (work->param->mode == NAME_ENTRY_GAME_SYNC_ID) {
         NameEntry_UpperCaseName(work->param->name);
@@ -3170,7 +3175,7 @@ static void NameEntry_CheckChanged(NameEntryWork *work) {
     GFL_StrBufFree(previous);
 
     if (work->usesPresetNames == TRUE && work->presetNameFilled) {
-        preset = GFL_StrBufCreate(9, HEAPID_NAMEIN);
+        preset = GFL_StrBufCreate(9, HEAPID_NAME_INPUT);
         for (i = PRESET_NAME_GREETING; i <= PRESET_NAME_CGEAR; i++) {
             switch (i) {
             case PRESET_NAME_GREETING:
@@ -3374,7 +3379,7 @@ static void NameEntryTask_Input(NameEntryTask *task, u32 *state, NameEntryWork *
             if (work->param->mode == NAME_ENTRY_POKEMON) {
                 if (work->param->pkm == NULL) {
                     NameEntryMessage_PrintSpecies(&work->message, work->param->mode, work->param->gender,
-                                                  work->param->unk6, HEAPID_NAMEIN);
+                                                  work->param->unk6, HEAPID_NAME_INPUT);
                 } else {
                     NameEntryMessage_PrintPokemon(&work->message, work->param->mode, work->param->pkm);
                 }
@@ -3402,7 +3407,7 @@ static void NameEntryTask_Input(NameEntryTask *task, u32 *state, NameEntryWork *
         break;
     case KEY_RESULT_DAKUTEN:
         success = TRUE;
-        if (!NameBox_Compose(&work->box, NAMEIN_WORD_TABLE_DAKUTEN)) {
+        if (!NameBox_Compose(&work->box, NAME_INPUT_WORD_TABLE_DAKUTEN)) {
             success = FALSE;
         }
         if (success) {
@@ -3413,7 +3418,7 @@ static void NameEntryTask_Input(NameEntryTask *task, u32 *state, NameEntryWork *
         break;
     case KEY_RESULT_HANDAKUTEN:
         success = TRUE;
-        if (!NameBox_Compose(&work->box, NAMEIN_WORD_TABLE_HANDAKUTEN)) {
+        if (!NameBox_Compose(&work->box, NAME_INPUT_WORD_TABLE_HANDAKUTEN)) {
             success = FALSE;
         }
         if (success) {
@@ -3460,11 +3465,12 @@ static void NameEntryTask_Input(NameEntryTask *task, u32 *state, NameEntryWork *
                 work->messagePending = TRUE;
                 break;
             }
-            if (!(work->param->unk2C & 2) && ProfWord_Check(work->profWord, work->box.text, HEAPID_NAMEIN)) {
+            if (!(work->param->unk2C & 2) && ProfWord_Check(work->profWord, work->box.text, HEAPID_NAME_INPUT)) {
                 GFL_SndSEPlay(SEQ_SE_BEEP);
                 break;
             }
-            if (!(work->param->unk2C & 1) && ProfWord_HasManyDigits(work->box.text, work->box.length, HEAPID_NAMEIN)) {
+            if (!(work->param->unk2C & 1) &&
+                ProfWord_HasManyDigits(work->box.text, work->box.length, HEAPID_NAME_INPUT)) {
                 GFL_SndSEPlay(SEQ_SE_BEEP);
                 NameEntryMessage_Print(&work->message, AbilityHandlersBtlMain_Text_NumbersMayContainOnly);
                 work->messagePending = TRUE;
@@ -3473,7 +3479,7 @@ static void NameEntryTask_Input(NameEntryTask *task, u32 *state, NameEntryWork *
             GFL_SndSEPlay(SEQ_SE_DECIDE2);
             NameEntry_CheckChanged(work);
             if (work->param->mode == NAME_ENTRY_POKEMON && work->param->unkC != NULL) {
-                NameEntryTalk_Start(&work->talk, &work->message, work->param, HEAPID_NAMEIN);
+                NameEntryTalk_Start(&work->talk, &work->message, work->param, HEAPID_NAME_INPUT);
                 NameEntryTask_SetFunc(task, NameEntryTask_Talk);
             } else {
                 NameEntryTask_SetFunc(task, NameEntryTask_FadeOut);
@@ -3485,7 +3491,7 @@ static void NameEntryTask_Input(NameEntryTask *task, u32 *state, NameEntryWork *
         break;
     case KEY_RESULT_NONE:
         if (NameEntryIcon_WasTouched(&work->icon)) {
-            name = NameEntry_GetPresetName(work, work->param->mode, HEAPID_NAMEIN);
+            name = NameEntry_GetPresetName(work, work->param->mode, HEAPID_NAME_INPUT);
             NameBox_Clear(&work->box);
             if (name != NULL) {
                 NameBox_SetString(&work->box, GFL_StrBufGetStringPtr(name));
@@ -3496,7 +3502,7 @@ static void NameEntryTask_Input(NameEntryTask *task, u32 *state, NameEntryWork *
         if (work->usesPresetNames == TRUE) {
             which = NameEntryObjs_UpdateSelectors(&work->objs);
             if (which != PRESET_NAME_MAX) {
-                name = NameEntry_LoadPresetName(work->param, which, HEAPID_NAMEIN);
+                name = NameEntry_LoadPresetName(work->param, which, HEAPID_NAME_INPUT);
                 NameBox_Clear(&work->box);
                 if (name != NULL) {
                     work->presetNameFilled = TRUE;

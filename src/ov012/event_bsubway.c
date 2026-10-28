@@ -480,7 +480,7 @@ static GameEvent *EventBSubwayCommBattle_Create(GameSystem *gsys, Field *field, 
 }
 
 static GameEvent *EventBSubwayCommBattle_CreateFromScrWork(BSubwayScrWork *bsw, GameSystem *gsys, Field *field) {
-    return EventBSubwayCommBattle_Create(gsys, field, bsw->btlSetup, BsubwayScr_GetNameinEncounterWork(bsw));
+    return EventBSubwayCommBattle_Create(gsys, field, bsw->btlSetup, BsubwayScr_GetNameInputEncounterWork(bsw));
 }
 
 static GameEventReturnCode EventBSubwayLeaderMsg_Callback(GameEvent *event, u32 *state, void *work) {

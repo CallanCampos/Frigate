@@ -30,7 +30,7 @@ enum {
     HEAPID_POKELIST = 0x17,
     // Mystery Gift's (not from swan)
     HEAPID_MYSTERY = 0x1d,
-    HEAPID_NAMEIN = 0x1e,
+    HEAPID_NAME_INPUT = 0x1e,
     HEAPID_IRC_BATTLE_MENU = 0x1f,
     HEAPID_TRAINER_CARD = 0x26,
     HEAPID_PMS_INPUT_SYS = 0x29,

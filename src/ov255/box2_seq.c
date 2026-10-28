@@ -144,7 +144,7 @@ static int Box2Seq_CallPokeStatus(Box2SysWork *syswk);
 static int Box2Seq_TakeItem(Box2SysWork *syswk);
 static int Box2Seq_CallBoxSearch(Box2SysWork *syswk);
 static int Box2Seq_SummaryReturn(Box2SysWork *syswk);
-static int Box2Seq_NameInReturn(Box2SysWork *syswk);
+static int Box2Seq_NameInputReturn(Box2SysWork *syswk);
 static int Box2Seq_BagReturn(Box2SysWork *syswk);
 static int Box2Seq_BoxSearchReturn(Box2SysWork *syswk);
 static int Box2Seq_GivenItemMsg(Box2SysWork *syswk);
@@ -166,8 +166,8 @@ static int Box2Seq_BoxJumpReturn(Box2SysWork *syswk);
 static int Box2Seq_WallpaperMenuOpen(Box2SysWork *syswk);
 static int Box2Seq_WallpaperMenuMain(Box2SysWork *syswk);
 static int Box2Seq_WallpaperChange(Box2SysWork *syswk);
-static int Box2Seq_CallNameIn(Box2SysWork *syswk);
-static int Box2Seq_NameInOpen(Box2SysWork *syswk);
+static int Box2Seq_CallNameInput(Box2SysWork *syswk);
+static int Box2Seq_NameInputOpen(Box2SysWork *syswk);
 static int Box2Seq_YesTakeItem(Box2SysWork *syswk);
 static int Box2Seq_YesRelease(Box2SysWork *syswk);
 static int Box2Seq_NoRelease(Box2SysWork *syswk);
@@ -236,7 +236,7 @@ static void PutPartyLeft(Box2SysWork *syswk);
 static void PutPartyRight(Box2SysWork *syswk);
 static void ToggleMark(Box2SysWork *syswk, u32 mark);
 static int Box2Seq_PickWallpaper(Box2SysWork *syswk, u32 pos);
-static void DimActorsForNameIn(Box2SysWork *syswk);
+static void DimActorsForNameInput(Box2SysWork *syswk);
 static void CancelRange(Box2SysWork *syswk);
 static void SortRangeEnds(Box2SysWork *syswk);
 
@@ -264,7 +264,7 @@ static const Box2MenuItem sMenu71f0[] = { { 81, 0 }, { 74, 0 }, { 75, 0 }, { 76,
 static const Box2SubProc sSubProcs[] = {
     { Box2Main_PokeStatusCall, Box2Main_PokeStatusExit, 92 },
     { Box2Main_BagCall, Box2Main_BagExit, 94 },
-    { Box2Main_NameInCall, Box2Main_NameInExit, 93 },
+    { Box2Main_NameInputCall, Box2Main_NameInputExit, 93 },
     { Box2Main_BoxSearchCall, Box2Main_BoxSearchExit, 95 },
 };
 
@@ -301,14 +301,14 @@ static const Box2SeqFunc sMainSeq[] = {
     Box2Seq_ItemPartyReturn, Box2Seq_DreamWorldMain, Box2Seq_DreamWorldMenuOpened,
     Box2Seq_DreamWorldPick, Box2Seq_DreamWorldMenuClose, Box2Seq_CallPokeStatus,
     Box2Seq_TakeItem, Box2Seq_CallBoxSearch, Box2Seq_SummaryReturn,
-    Box2Seq_NameInReturn, Box2Seq_BagReturn, Box2Seq_BoxSearchReturn,
+    Box2Seq_NameInputReturn, Box2Seq_BagReturn, Box2Seq_BoxSearchReturn,
     Box2Seq_GivenItemMsg, Box2Seq_MarkingOpen, Box2Seq_MarkingMain,
     Box2Seq_MarkingClose, Box2Seq_ReleaseStart, Box2Seq_ReleaseCheck,
     Box2Seq_ReleaseCheckMoves, Box2Seq_ReleaseDo, Box2Seq_ReleaseMoveLocked,
     Box2Seq_BoxMenuOpen, Box2Seq_BoxMenuMain, Box2Seq_BoxMenuClose,
     Box2Seq_BoxJumpOpen, Box2Seq_BoxJumpMain, Box2Seq_BoxJumpClose,
     Box2Seq_BoxJumpReturn, Box2Seq_WallpaperMenuOpen, Box2Seq_WallpaperMenuMain,
-    Box2Seq_WallpaperChange, Box2Seq_CallNameIn, Box2Seq_NameInOpen,
+    Box2Seq_WallpaperChange, Box2Seq_CallNameInput, Box2Seq_NameInputOpen,
 };
 
 // clang-format on
@@ -5371,7 +5371,7 @@ static int Box2Seq_SummaryReturn(Box2SysWork *syswk) {
 }
 
 // Back from the bag: puts the cursor on the box list and fades in
-static int Box2Seq_NameInReturn(Box2SysWork *syswk) {
+static int Box2Seq_NameInputReturn(Box2SysWork *syswk) {
     Box2Main_PokeInfoOff(syswk);
     switch (syswk->param->mode) {
     case 1:
@@ -6172,16 +6172,16 @@ static int Box2Seq_WallpaperChange(Box2SysWork *syswk) {
     return 114;
 }
 
-static int Box2Seq_CallNameIn(Box2SysWork *syswk) {
+static int Box2Seq_CallNameInput(Box2SysWork *syswk) {
     return Box2Seq_WipeOutCallSubProc(syswk, 2);
 }
 
 // Opens the box's name entry
-static int Box2Seq_NameInOpen(Box2SysWork *syswk) {
+static int Box2Seq_NameInputOpen(Box2SysWork *syswk) {
     Box2Obj_SetVisible(syswk->app, BOX2_ACTOR_CURSOR, FALSE);
     Box2Obj_SetToolButtons(syswk, 9, 0);
     Box2Bmp_PrintContinue(syswk, 24);
-    DimActorsForNameIn(syswk);
+    DimActorsForNameInput(syswk);
     return Box2Seq_OpenYesNo(syswk, 4);
 }
 
@@ -7497,7 +7497,7 @@ static int Box2Seq_PickWallpaper(Box2SysWork *syswk, u32 pos) {
 }
 
 // Dims the actors behind the box's name entry
-static void DimActorsForNameIn(Box2SysWork *syswk) {
+static void DimActorsForNameInput(Box2SysWork *syswk) {
     switch (syswk->param->mode) {
     case 0:
         Box2Obj_SetIconsBlend(syswk, 2, 1);
