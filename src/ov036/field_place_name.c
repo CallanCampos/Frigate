@@ -462,7 +462,7 @@ void PlaceName_CreateLetters(PlaceName *wk) {
     heapId = FieldPlaceName_GetHeapID(wk);
     arc = FieldPlaceName_GetArc(wk);
     wk->objects[0] =
-        func_ov036_021b6824(heapId, 0, &text, wk->clactUnit, arc, 0, wk->palettes[0], wk->chars, wk->cellAnims);
+        PlaceNameLetter_Create(heapId, 0, &text, wk->clactUnit, arc, 0, wk->palettes[0], wk->chars, wk->cellAnims);
     MI_CpuFill8(&frame, 0, sizeof(frame));
     frame.palette = wk->palettes[1];
     frame.chars = wk->chars;
@@ -470,14 +470,14 @@ void PlaceName_CreateLetters(PlaceName *wk) {
     heapId = FieldPlaceName_GetHeapID(wk);
     arc = FieldPlaceName_GetArc(wk);
     wk->objects[1] =
-        func_ov036_021b6824(heapId, 1, &frame, wk->clactUnit, arc, 0, wk->palettes[0], wk->chars, wk->cellAnims);
+        PlaceNameLetter_Create(heapId, 1, &frame, wk->clactUnit, arc, 0, wk->palettes[0], wk->chars, wk->cellAnims);
 }
 
 void PlaceName_FreeLetters(PlaceName *wk) {
     int i;
     for (i = 0; i < 2; i++) {
         if (wk->objects[i] != NULL) {
-            func_ov036_021b68bc(wk->objects[i]);
+            PlaceNameLetter_Delete(wk->objects[i]);
             wk->objects[i] = NULL;
         }
     }
@@ -491,16 +491,16 @@ void PlaceName_SetupLetters(PlaceName *wk) {
     text.font = PlaceName_GetFont(wk);
     text.zoneId = wk->shownZoneId;
     text.name = PlaceName_GetName(wk);
-    func_ov036_021b68d8(wk->objects[0], &text);
+    PlaceNameLetter_SetParam(wk->objects[0], &text);
     MI_CpuFill8(&season, 0, sizeof(season));
     season = wk->season;
-    func_ov036_021b68d8(wk->objects[1], &season);
+    PlaceNameLetter_SetParam(wk->objects[1], &season);
 }
 
 void PlaceName_HideLetters(PlaceName *wk) {
     int i;
     for (i = 0; i < 2; i++) {
-        func_ov036_021b6920(wk->objects[i]);
+        PlaceNameLetter_Hide(wk->objects[i]);
     }
     GFL_BGSysSetBGEnabled(3, 0);
 }
@@ -508,7 +508,7 @@ void PlaceName_HideLetters(PlaceName *wk) {
 void PlaceName_UpdateLetters(PlaceName *wk) {
     int i;
     for (i = 0; i < 2; i++) {
-        func_ov036_021b68e8(wk->objects[i]);
+        PlaceNameLetter_Update(wk->objects[i]);
     }
 }
 
@@ -516,7 +516,7 @@ BOOL PlaceName_IsAllSpawned(PlaceName *wk) {
     BOOL done = TRUE;
     int i;
     for (i = 0; i < 2; i++) {
-        if (!PlaceName_GetMessageLength(wk->objects[i])) {
+        if (!PlaceNameLetter_IsFinished(wk->objects[i])) {
             done = FALSE;
             break;
         }
@@ -527,14 +527,14 @@ BOOL PlaceName_IsAllSpawned(PlaceName *wk) {
 void PlaceName_SlideInLetters(PlaceName *wk) {
     int i;
     for (i = 0; i < 2; i++) {
-        func_ov036_021b6900(wk->objects[i], wk->timer, 10);
+        PlaceNameLetter_SlideIn(wk->objects[i], wk->timer, 10);
     }
 }
 
 void PlaceName_SlideOutLetters(PlaceName *wk) {
     int i;
     for (i = 0; i < 2; i++) {
-        func_ov036_021b6910(wk->objects[i], 0, 12);
+        PlaceNameLetter_SlideOut(wk->objects[i], 0, 12);
     }
 }
 
