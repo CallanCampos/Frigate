@@ -19,8 +19,16 @@ void FieldSaveanime_Stop(FieldSaveAnime *effect);
 void FieldSaveanime_Delete(FieldSaveAnime *effect);
 
 // fldeff_emotion_bubble.c: an emotion bubble over an actor's head, by kind: "!", "?", a music note and "...", which has
-// no sound. playSE plays the bubble's sound. The first function's bubble stays when it is done, until its owner ends
-// it, and the second's ends itself. Then whether a bubble is done, which a NULL one is
+// no sound
+enum {
+    EMOTION_BUBBLE_EXCLAMATION,
+    EMOTION_BUBBLE_QUESTION,
+    EMOTION_BUBBLE_NOTE,
+    EMOTION_BUBBLE_ELLIPSIS,
+    EMOTION_BUBBLE_KIND_COUNT,
+};
+// playSE plays the bubble's sound. The first function's bubble stays when it is done, until its owner ends it, and
+// the second's ends itself. Then whether a bubble is done, which a NULL one is
 FieldEffectTask *FldeffEmotionBubble_SetActor(FieldEffects *effects, FieldActor *actor, u32 kind, BOOL playSE);
 FieldEffectTask *FldeffEmotionBubble_StartHeld(FieldEffects *effects, FieldActor *actor, u32 kind, BOOL playSE);
 BOOL FldeffEmotionBubble_IsFinished(FieldEffectTask *task);

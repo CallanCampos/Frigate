@@ -13,8 +13,11 @@
 #include "nitro/mi.h"
 #include "nnsys/g3d.h"
 
+// A bubble hops up and comes back down, then stays for its wait, and is done
 enum {
-    EMOTION_BUBBLE_KIND_COUNT = 4,
+    EMOTION_BUBBLE_STATE_HOP,
+    EMOTION_BUBBLE_STATE_WAIT,
+    EMOTION_BUBBLE_STATE_DONE,
 };
 
 typedef struct {
@@ -130,7 +133,7 @@ FieldEffectTask *FldeffEmotionBubble_SetActor(FieldEffects *effects, FieldActor 
 
     params.kind = kind;
     params.playSE = playSE;
-    params.emotionBubble = FieldEffects_GetHandleData(effects, 4);
+    params.emotionBubble = FieldEffects_GetHandleData(effects, FLDEFF_EMOTION_BUBBLE);
     params.actor = actor;
     FldAct_GetIdentity(actor, &params.identity);
     params.field = FieldEffects_GetField(effects);
@@ -145,7 +148,7 @@ FieldEffectTask *FldeffEmotionBubble_StartHeld(FieldEffects *effects, FieldActor
 
     params.kind = kind;
     params.playSE = playSE;
-    params.emotionBubble = FieldEffects_GetHandleData(effects, 4);
+    params.emotionBubble = FieldEffects_GetHandleData(effects, FLDEFF_EMOTION_BUBBLE);
     params.actor = actor;
     FldAct_GetIdentity(actor, &params.identity);
     params.field = FieldEffects_GetField(effects);
@@ -232,16 +235,16 @@ static void FldeffEmotionBubble_PlaySe(u32 kind) {
     u32 se = 0;
 
     switch (kind) {
-    case 0:
+    case EMOTION_BUBBLE_EXCLAMATION:
         se = SEQ_SE_FLD_07;
         break;
-    case 1:
+    case EMOTION_BUBBLE_QUESTION:
         se = SEQ_SE_SYS_62;
         break;
-    case 2:
+    case EMOTION_BUBBLE_NOTE:
         se = SEQ_SE_SYS_63;
         break;
-    case 3:
+    case EMOTION_BUBBLE_ELLIPSIS:
         return;
     }
     GFL_SndSEPlay(se);
@@ -270,7 +273,7 @@ static void FldeffEmotionBubble_StepAnimation(EmotionBubbleTask *emotionBubbleTa
     G3DCamera *camera;
 
     switch (emotionBubbleTask->state) {
-    case 0:
+    case EMOTION_BUBBLE_STATE_HOP:
         emotionBubbleTask->height += emotionBubbleTask->speed;
         if (emotionBubbleTask->height != 0) {
             emotionBubbleTask->speed -= FX32_CONST(2);
@@ -279,7 +282,7 @@ static void FldeffEmotionBubble_StepAnimation(EmotionBubbleTask *emotionBubbleTa
             emotionBubbleTask->state++;
         }
         break;
-    case 1:
+    case EMOTION_BUBBLE_STATE_WAIT:
         emotionBubbleTask->timer++;
         if (emotionBubbleTask->timer >= 30) {
             emotionBubbleTask->state++;
