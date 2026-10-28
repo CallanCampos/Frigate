@@ -31,6 +31,8 @@ enum {
 
 // The chunk ID of a locator that places no chunk
 #define FIELD_CHUNK_ID_NONE 0xffffffff
+// The map file of a chunk that the map matrix leaves empty, in a mapper's chunkDatIds
+#define FIELD_CHUNK_DAT_NONE 0xffffffff
 
 // The terrain layers that FieldG3DMapperTerrain holds
 #define FIELD_G3D_MAPPER_LAYER_MAX 16

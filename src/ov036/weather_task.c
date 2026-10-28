@@ -27,7 +27,14 @@ typedef struct {
     ArcTool *arc;
 } WeatherRes;
 
-// The weather's sound: state 1 plays it, state 2 waits for the BGM to finish loading
+// WeatherSound's state: no sound, the sound playing, or waiting for the BGM to finish loading to play it
+enum {
+    WEATHER_SOUND_NONE,
+    WEATHER_SOUND_PLAYING,
+    WEATHER_SOUND_WAIT_LOAD,
+};
+
+// The weather's sound
 typedef struct {
     u16 state;
     u16 se;
@@ -72,7 +79,7 @@ struct WeatherTask {
     const WeatherData *data;
     u8 mode : 4;
     u8 fade : 4;
-    u8 unk25;
+    u8 stagedLoad;
     u8 state;
     u8 loaded;
     WeatherRes res;
@@ -89,8 +96,28 @@ struct WeatherTask {
     u32 fogColor;
 };
 
+// WeatherTask's state: load the weather's resources at once or over three frames, run its data's functions (funcs[0]
+// to funcs[6]: init, fade in or start without one, the weather, fade out, the end of the fade and exit) and free
+// what it loaded
+enum {
+    WEATHER_TASK_NONE,
+    WEATHER_TASK_LOAD_ALL,
+    WEATHER_TASK_LOAD_RESOURCES,
+    WEATHER_TASK_INIT_BILLBOARDS,
+    WEATHER_TASK_ALLOC_PARTICLES,
+    WEATHER_TASK_INIT,
+    WEATHER_TASK_FADE_IN,
+    WEATHER_TASK_START,
+    WEATHER_TASK_MAIN,
+    WEATHER_TASK_FADE_OUT,
+    WEATHER_TASK_FADE_OUT_END,
+    WEATHER_TASK_EXIT,
+    WEATHER_TASK_FREE,
+    WEATHER_TASK_STATE_MAX,
+};
+
 static const ClActorSetup WEATHER_OBJ_SETUP = { 0, 0, 0, 0x40, 3 };
-static const u8 WEATHER_STATE_KINDS[13] = { 0, 1, 1, 1, 1, 2, 2, 1, 3, 4, 4, 5, 5 };
+static const u8 WEATHER_STATE_KINDS[WEATHER_TASK_STATE_MAX] = { 0, 1, 1, 1, 1, 2, 2, 1, 3, 4, 4, 5, 5 };
 
 static BOOL WeatherTask_HasFogChange(WeatherTask *task);
 static void WeatherTask_ApplyFogChange(WeatherTask *task);
@@ -163,119 +190,119 @@ void WeatherTask_Update(WeatherTask *task, HeapID heapId) {
         WeatherTask_ClearFogChange(task);
     }
     switch (task->state) {
-    case 1:
+    case WEATHER_TASK_LOAD_ALL:
         WeatherTask_LoadResources(task, heapId);
         WeatherTask_InitBillboards(task, heapId);
         WeatherTask_AllocParticles(task, heapId);
         WeatherTask_MarkStarted(task);
-        task->state = 5;
+        task->state = WEATHER_TASK_INIT;
         break;
-    case 2:
+    case WEATHER_TASK_LOAD_RESOURCES:
         WeatherTask_LoadResources(task, heapId);
-        task->state = 3;
+        task->state = WEATHER_TASK_INIT_BILLBOARDS;
         break;
-    case 3:
+    case WEATHER_TASK_INIT_BILLBOARDS:
         WeatherTask_InitBillboards(task, heapId);
-        task->state = 4;
+        task->state = WEATHER_TASK_ALLOC_PARTICLES;
         break;
-    case 4:
+    case WEATHER_TASK_ALLOC_PARTICLES:
         WeatherTask_AllocParticles(task, heapId);
-        task->state = 5;
+        task->state = WEATHER_TASK_INIT;
         break;
-    case 5:
+    case WEATHER_TASK_INIT:
         if (WeatherTask_CallStageFunc(task, task->data->funcs[0], heapId)) {
             if (task->fade != 0) {
-                task->state = 6;
+                task->state = WEATHER_TASK_FADE_IN;
             } else {
-                task->state = 7;
+                task->state = WEATHER_TASK_START;
             }
         }
         WeatherTask_ResumeSound(&task->sound, task->fieldSound);
         WeatherTask_MarkStarted(task);
         break;
-    case 6:
+    case WEATHER_TASK_FADE_IN:
         if (WeatherTask_CallStageFunc(task, task->data->funcs[1], heapId)) {
-            task->state = 8;
+            task->state = WEATHER_TASK_MAIN;
         }
         WeatherTask_UpdateParticles(task);
         WeatherTask_ResumeSound(&task->sound, task->fieldSound);
         break;
-    case 7:
+    case WEATHER_TASK_START:
         if (WeatherTask_CallStageFunc(task, task->data->funcs[2], heapId)) {
-            task->state = 8;
+            task->state = WEATHER_TASK_MAIN;
         }
         WeatherTask_ResumeSound(&task->sound, task->fieldSound);
         break;
-    case 8:
+    case WEATHER_TASK_MAIN:
         WeatherTask_CallStageFunc(task, task->data->funcs[3], heapId);
         WeatherTask_UpdateParticles(task);
         WeatherTask_ResumeSound(&task->sound, task->fieldSound);
         break;
-    case 9:
+    case WEATHER_TASK_FADE_OUT:
         if (WeatherTask_CallStageFunc(task, task->data->funcs[4], heapId)) {
-            task->state = 10;
+            task->state = WEATHER_TASK_FADE_OUT_END;
         }
         WeatherTask_UpdateParticles(task);
         WeatherTask_ResumeSound(&task->sound, task->fieldSound);
         break;
-    case 10:
+    case WEATHER_TASK_FADE_OUT_END:
         if (WeatherTask_CallStageFunc(task, task->data->funcs[5], heapId)) {
-            task->state = 11;
+            task->state = WEATHER_TASK_EXIT;
         }
         WeatherTask_UpdateParticles(task);
         WeatherTask_ResumeSound(&task->sound, task->fieldSound);
         break;
-    case 11:
+    case WEATHER_TASK_EXIT:
         if (WeatherTask_IsStarted(task)) {
             WeatherTask_CallStageFunc(task, task->data->funcs[6], heapId);
         }
-        task->state = 12;
+        task->state = WEATHER_TASK_FREE;
         break;
-    case 12:
+    case WEATHER_TASK_FREE:
         WeatherTask_FreeParticles(task);
         WeatherTask_FreeBillboards(task);
         WeatherTask_UnloadResources(task);
         WeatherTask_Reset(task);
-        task->state = 0;
+        task->state = WEATHER_TASK_NONE;
         break;
     }
 }
 
-void WeatherTask_Start(WeatherTask *task, const WeatherData *data, u8 unk25, u32 fade, u32 mode, u32 ambience,
+void WeatherTask_Start(WeatherTask *task, const WeatherData *data, u8 stagedLoad, u32 fade, u32 mode, u32 ambience,
                        HeapID heapId) {
     task->data = data;
     task->mode = mode;
     task->fade = fade;
-    task->unk25 = unk25;
-    if (task->unk25 == 0) {
-        task->state = 1;
-    } else if (task->unk25 == 1) {
-        task->state = 2;
+    task->stagedLoad = stagedLoad;
+    if (!task->stagedLoad) {
+        task->state = WEATHER_TASK_LOAD_ALL;
+    } else if (task->stagedLoad == TRUE) {
+        task->state = WEATHER_TASK_LOAD_RESOURCES;
     }
     WeatherTask_SetSoundUseSoundSys(&task->sound, ambience);
 }
 
 void WeatherTask_RequestEnd(WeatherTask *task, u32 fade, u32 mode) {
     u8 kind = WeatherTask_GetStagePhase(task);
-    if (task->state != 0 && (u32)(kind - 4) > 1) {
+    if (task->state != WEATHER_TASK_NONE && (u32)(kind - 4) > 1) {
         task->fade = fade;
         task->mode = mode;
-        if (task->state <= 5) {
-            task->state = 11;
+        if (task->state <= WEATHER_TASK_INIT) {
+            task->state = WEATHER_TASK_EXIT;
         } else if (task->fade != 0) {
-            task->state = 9;
+            task->state = WEATHER_TASK_FADE_OUT;
         } else {
-            task->state = 11;
+            task->state = WEATHER_TASK_EXIT;
         }
     }
 }
 
 void WeatherTask_ForceEnd(WeatherTask *task) {
-    if (task->state != 0) {
-        if (task->state <= 11) {
+    if (task->state != WEATHER_TASK_NONE) {
+        if (task->state <= WEATHER_TASK_EXIT) {
             WeatherTask_CallStageFunc(task, task->data->funcs[6], 0);
         }
-        if (task->state <= 12) {
+        if (task->state <= WEATHER_TASK_FREE) {
             WeatherTask_FreeParticles(task);
             WeatherTask_FreeBillboards(task);
             WeatherTask_UnloadResources(task);
@@ -284,22 +311,22 @@ void WeatherTask_ForceEnd(WeatherTask *task) {
     }
 }
 
-void WeatherTask_FadeLight(WeatherTask *task, u32 a1, u32 a2) {
-    FieldLight_ChangeData(task->light, a1, a2, 0x3c);
+void WeatherTask_FadeLight(WeatherTask *task, u32 arcId, u32 fileId) {
+    FieldLight_ChangeData(task->light, arcId, fileId, 0x3c);
 }
 
-void WeatherTask_SetLight(WeatherTask *task, u32 a1, u32 a2) {
-    FieldLight_ChangeData(task->light, a1, a2, 1);
+void WeatherTask_SetLight(WeatherTask *task, u32 arcId, u32 fileId) {
+    FieldLight_ChangeData(task->light, arcId, fileId, 1);
 }
 
-void WeatherTask_ResetLight(WeatherTask *task, u32 a1) {
-    if (a1 == 1) {
+void WeatherTask_ResetLight(WeatherTask *task, u32 mode) {
+    if (mode == WEATHER_MODE_ALONE) {
         FieldLight_ChangeDataDefault(task->light);
     }
 }
 
-void WeatherTask_FlashLight(WeatherTask *task, u16 a1, u32 a2, u32 a3) {
-    FieldLight_StartFlash(task->light, a1, a2, a3);
+void WeatherTask_FlashLight(WeatherTask *task, u16 color, u32 frames, u32 returnFrames) {
+    FieldLight_StartFlash(task->light, color, frames, returnFrames);
 }
 
 BOOL WeatherTask_IsLightFlashing(WeatherTask *task) {
@@ -310,12 +337,12 @@ u32 WeatherTask_GetCameraSettingId(WeatherTask *task) {
     return FieldCamera_GetDefaultsIndex(task->camera);
 }
 
-void WeatherTask_SetLightColor(WeatherTask *task, u16 a1, u16 a2) {
-    FieldLight_StartFlashOneWay(task->light, a1, a2);
+void WeatherTask_SetLightColor(WeatherTask *task, u16 color, u16 frames) {
+    FieldLight_StartFlashOneWay(task->light, color, frames);
 }
 
-void WeatherTask_SetBillboardVisible(WeatherTask *task, u32 a1, u32 index) {
-    Field3DBG_SetBillboardVisible(task->bgs[index], a1);
+void WeatherTask_SetBillboardVisible(WeatherTask *task, u32 enabled, u32 index) {
+    Field3DBG_SetBillboardVisible(task->bgs[index], enabled);
 }
 
 void WeatherTask_SetBillboardScaleX(WeatherTask *task, int value, u32 index) {
@@ -360,13 +387,15 @@ void WeatherTask_RemoveParticle(WeatherObj *obj) {
     }
 }
 
-void WeatherTask_SetupSpawner(WeatherTask *task, u32 a1, u32 a2, u32 a3, int a4, int a5, int a6, int a7,
-                              WeatherSpawnFunc spawn) {
-    WeatherTask_InitSpawner(&task->timer, task, a2, a1, a3, a4, a5, a6, a7, spawn);
+void WeatherTask_SetupSpawner(WeatherTask *task, u32 value, u32 interval, u32 valueTarget, int intervalTarget,
+                              int intervalStep, int stepsMax, int valueStep, WeatherSpawnFunc spawn) {
+    WeatherTask_InitSpawner(&task->timer, task, interval, value, valueTarget, intervalTarget, intervalStep, stepsMax,
+                            valueStep, spawn);
 }
 
-void WeatherTask_RetargetSpawner(WeatherTask *task, u32 a1, u32 a2, u32 a3, int a4) {
-    WeatherTask_SetSpawnerTarget(&task->timer, a1, a2, a3, a4);
+void WeatherTask_RetargetSpawner(WeatherTask *task, u32 valueTarget, u32 intervalTarget, u32 intervalStep,
+                                 int valueStep) {
+    WeatherTask_SetSpawnerTarget(&task->timer, valueTarget, intervalTarget, intervalStep, valueStep);
 }
 
 BOOL WeatherTask_StepSpawner(WeatherTask *task, HeapID heapId) {
@@ -377,7 +406,8 @@ BOOL WeatherTask_StepSpawnTimer(WeatherTask *task, HeapID heapId) {
     return WeatherTask_TickSpawnTimer(&task->timer, heapId);
 }
 
-void WeatherTask_PrewarmParticles(WeatherTask *task, WeatherSpawnFunc spawn, int count, int a3, int a4, HeapID heapId) {
+void WeatherTask_PrewarmParticles(WeatherTask *task, WeatherSpawnFunc spawn, int count, int rateInterval, int rateStep,
+                                  HeapID heapId) {
     int j;
     int i;
     WeatherObj *obj;
@@ -398,8 +428,8 @@ void WeatherTask_PrewarmParticles(WeatherTask *task, WeatherSpawnFunc spawn, int
             }
             obj = next;
             next = obj->next;
-            if (i >= a3 && i % a3 == 0) {
-                rate += a4;
+            if (i >= rateInterval && i % rateInterval == 0) {
+                rate += rateStep;
             }
             if (obj == task->objHead) {
                 break;
@@ -408,43 +438,43 @@ void WeatherTask_PrewarmParticles(WeatherTask *task, WeatherSpawnFunc spawn, int
     }
 }
 
-void WeatherTask_InitFog(WeatherTask *task, u32 a1, u32 a2, u32 a3) {
-    if (a3 == 1) {
+void WeatherTask_InitFog(WeatherTask *task, u32 depthShift, u32 offset, u32 mode) {
+    if (mode == WEATHER_MODE_ALONE) {
         FieldFog_SetAlphaMode(task->fog, 0);
         FieldFog_SetAlpha(task->fog, 0x1f);
-        FieldFog_SetDepthShift(task->fog, a1);
-        FieldFog_SetOffset(task->fog, a2);
+        FieldFog_SetDepthShift(task->fog, depthShift);
+        FieldFog_SetOffset(task->fog, offset);
         FieldFog_SetDefaultTable(task->fog);
         FieldFog_SetEnabled(task->fog, TRUE);
     }
 }
 
-void WeatherTask_DisableFog(WeatherTask *task, u32 a1) {
-    if (a1 == 1) {
+void WeatherTask_DisableFog(WeatherTask *task, u32 mode) {
+    if (mode == WEATHER_MODE_ALONE) {
         FieldFog_SetEnabled(task->fog, FALSE);
     }
 }
 
-void WeatherTask_ChangeFog(WeatherTask *task, u32 a1, u32 a2, int a3, u32 a4) {
+void WeatherTask_ChangeFog(WeatherTask *task, u32 depthShift, u32 color, int duration, u32 mode) {
     int half;
-    if (a4 == 1) {
-        FieldFog_Animate(task->fog, a2, a1, a3);
+    if (mode == WEATHER_MODE_ALONE) {
+        FieldFog_Animate(task->fog, color, depthShift, duration);
         return;
     }
-    if (a4 == 2) {
-        if (a1 == FieldFog_GetDepthShift(task->fog)) {
-            FieldFog_Animate(task->fog, a2, a1, a3);
+    if (mode == WEATHER_MODE_CROSSFADE) {
+        if (depthShift == FieldFog_GetDepthShift(task->fog)) {
+            FieldFog_Animate(task->fog, color, depthShift, duration);
             return;
         }
-        half = a3 / 2;
+        half = duration / 2;
         FieldFog_Animate(task->fog, 0x7fdf, FieldFog_GetDepthShift(task->fog), half);
-        WeatherTask_QueueFogChange(task, a1, a2, half);
+        WeatherTask_QueueFogChange(task, depthShift, color, half);
     }
 }
 
-void WeatherTask_ChangeFogOffset(WeatherTask *task, u32 a1, u32 a2, u32 a3) {
-    if (a3 == 1) {
-        FieldFog_Animate(task->fog, a1, FieldFog_GetDepthShift(task->fog), a2);
+void WeatherTask_ChangeFogOffset(WeatherTask *task, u32 color, u32 duration, u32 mode) {
+    if (mode == WEATHER_MODE_ALONE) {
+        FieldFog_Animate(task->fog, color, FieldFog_GetDepthShift(task->fog), duration);
     }
 }
 
@@ -567,8 +597,8 @@ void WeatherTask_ShiftParticles(WeatherTask *task, int x, int y) {
     }
 }
 
-void WeatherTask_PlaySe(WeatherTask *task, u32 a1) {
-    WeatherTask_PlaySound(&task->sound, task->fieldSound, a1);
+void WeatherTask_PlaySe(WeatherTask *task, u32 se) {
+    WeatherTask_PlaySound(&task->sound, task->fieldSound, se);
 }
 
 void WeatherTask_StopSe(WeatherTask *task) {
@@ -585,12 +615,12 @@ void WeatherTask_PlaySeDirect(WeatherTask *task, u32 sound) {
     }
 }
 
-void WeatherTask_PlaySeWithVoice(WeatherTask *task, u32 sound, u32 a2) {
+void WeatherTask_PlaySeWithVolume(WeatherTask *task, u32 sound, u32 volume) {
     if (!GFL_SndIsLoadThreadRunning()) {
         if (task->sound.ambience != 0) {
-            FieldSnd_PlayAmbienceEx(task->fieldSound, sound, a2);
+            FieldSnd_PlayAmbienceEx(task->fieldSound, sound, volume);
         } else {
-            GFL_SndSEPlayEx(sound, a2);
+            GFL_SndSEPlayEx(sound, volume);
         }
     }
 }
@@ -945,7 +975,7 @@ static void WeatherTask_SetSoundUseSoundSys(WeatherSound *sound, u32 ambience) {
 static void WeatherTask_PlaySound(WeatherSound *sound, FieldSound *fieldSound, u32 se) {
     WeatherTask_StopSound(sound, fieldSound);
     if (!GFL_SndIsLoadThreadRunning()) {
-        sound->state = 1;
+        sound->state = WEATHER_SOUND_PLAYING;
         sound->se = se;
         if (sound->ambience != 0) {
             FieldSnd_PlayAmbience(fieldSound, sound->se);
@@ -953,14 +983,14 @@ static void WeatherTask_PlaySound(WeatherSound *sound, FieldSound *fieldSound, u
             GFL_SndSEPlay(sound->se);
         }
     } else {
-        sound->state = 2;
+        sound->state = WEATHER_SOUND_WAIT_LOAD;
         sound->se = se;
     }
 }
 
 static void WeatherTask_StopSound(WeatherSound *sound, FieldSound *fieldSound) {
-    if (sound->state == 1) {
-        sound->state = 0;
+    if (sound->state == WEATHER_SOUND_PLAYING) {
+        sound->state = WEATHER_SOUND_NONE;
         if (sound->ambience != 0) {
             FieldSnd_StopAmbience(fieldSound, sound->se);
         } else {
@@ -970,8 +1000,8 @@ static void WeatherTask_StopSound(WeatherSound *sound, FieldSound *fieldSound) {
 }
 
 static void WeatherTask_ResumeSound(WeatherSound *sound, FieldSound *fieldSound) {
-    if (sound->state == 2 && !GFL_SndIsLoadThreadRunning()) {
-        sound->state = 1;
+    if (sound->state == WEATHER_SOUND_WAIT_LOAD && !GFL_SndIsLoadThreadRunning()) {
+        sound->state = WEATHER_SOUND_PLAYING;
         if (sound->ambience != 0) {
             FieldSnd_PlayAmbience(fieldSound, sound->se);
         } else {

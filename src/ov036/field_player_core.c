@@ -39,7 +39,7 @@ struct FieldPlayerCore {
     u16 keyDirV;
     u32 specialSeq;
     FieldEffectTask *terrainEffectTCB;
-    u16 unk2C;
+    u16 modelReadyFrames;
     u16 unk2E;
     s16 seqStep;
     u16 seqDone;
@@ -77,38 +77,34 @@ static BOOL FieldPlayerCore_FormStepSlot8Done(FieldPlayerCore *core);
 static const ExStateChangeFunc PLAYER_EXSTATE_CHANGE_VTABLE_DIVE[] = { FieldPlayerCore_ExStateChangeFunc_DIVE };
 static const ExStateChangeFunc PLAYER_EXSTATE_CHANGE_VTABLE_NONE[] = { FieldPlayerCore_ExStateChangeFunc_NONE };
 static const ExStateChangeFunc PLAYER_EXSTATE_CHANGE_VTABLE_SURF[] = { FieldPlayerCore_ExStateChangeFunc_SURF };
-static const ExStateChangeFunc data_ov036_021cfc8c[] = { FieldPlayerCore_FormStepSlot9,
-                                                         FieldPlayerCore_FormStepSlot9Done };
+static const ExStateChangeFunc PLAYER_EXSTATE_CHANGE_VTABLE_SLOT9[] = { FieldPlayerCore_FormStepSlot9,
+                                                                        FieldPlayerCore_FormStepSlot9Done };
 static const ExStateChangeFunc PLAYER_EXSTATE_CHANGE_VTABLE_CYCLING[] = {
     FieldPlayerCore_ExStateChangeFunc_CYCLING,
     FieldPlayerCore_FormStepCycleDone,
 };
-static const ExStateChangeFunc data_ov036_021cfc7c[] = { FieldPlayerCore_FormStepSlot4,
-                                                         FieldPlayerCore_FormStepSlot4Done };
-static const ExStateChangeFunc data_ov036_021cfc74[] = { FieldPlayerCore_FormStepSlot6,
-                                                         FieldPlayerCore_FormStepSlot6Done };
-static const ExStateChangeFunc data_ov036_021cfc84[] = { FieldPlayerCore_FormStepRestoreModel,
-                                                         FieldPlayerCore_FormStepRestoreModelDone };
-static const ExStateChangeFunc data_ov036_021cfc9c[] = { FieldPlayerCore_FormStepSlot8,
-                                                         FieldPlayerCore_FormStepSlot8Done };
-static const ExStateChangeFunc data_ov036_021cfc6c[] = { FieldPlayerCore_FormStepSlot5,
-                                                         FieldPlayerCore_FormStepSlot5Done };
+static const ExStateChangeFunc PLAYER_EXSTATE_CHANGE_VTABLE_SLOT4[] = { FieldPlayerCore_FormStepSlot4,
+                                                                        FieldPlayerCore_FormStepSlot4Done };
+static const ExStateChangeFunc PLAYER_EXSTATE_CHANGE_VTABLE_SLOT6[] = { FieldPlayerCore_FormStepSlot6,
+                                                                        FieldPlayerCore_FormStepSlot6Done };
+static const ExStateChangeFunc PLAYER_EXSTATE_CHANGE_VTABLE_RESTORE_MODEL[] = {
+    FieldPlayerCore_FormStepRestoreModel, FieldPlayerCore_FormStepRestoreModelDone
+};
+static const ExStateChangeFunc PLAYER_EXSTATE_CHANGE_VTABLE_SLOT8[] = { FieldPlayerCore_FormStepSlot8,
+                                                                        FieldPlayerCore_FormStepSlot8Done };
+static const ExStateChangeFunc PLAYER_EXSTATE_CHANGE_VTABLE_SLOT5[] = { FieldPlayerCore_FormStepSlot5,
+                                                                        FieldPlayerCore_FormStepSlot5Done };
 
 static const ZoneNPC PLAYER_NPC_TEMPLATE = {
     PLAYER_ACTOR_ID, OBJ_CODE_HERO, 0, 0, 0, 0, 0, 0, 0, 0, 0xffff, 0xffff, FALSE,
 };
 
 static const ExStateChangeFunc *const PLAYER_EXSTATE_CHANGE_VTABLES[] = {
-    PLAYER_EXSTATE_CHANGE_VTABLE_NONE,
-    PLAYER_EXSTATE_CHANGE_VTABLE_CYCLING,
-    PLAYER_EXSTATE_CHANGE_VTABLE_SURF,
-    data_ov036_021cfc84,
-    data_ov036_021cfc7c,
-    data_ov036_021cfc6c,
-    data_ov036_021cfc74,
-    data_ov036_021cfc8c,
-    PLAYER_EXSTATE_CHANGE_VTABLE_DIVE,
-    data_ov036_021cfc9c,
+    PLAYER_EXSTATE_CHANGE_VTABLE_NONE,  PLAYER_EXSTATE_CHANGE_VTABLE_CYCLING,
+    PLAYER_EXSTATE_CHANGE_VTABLE_SURF,  PLAYER_EXSTATE_CHANGE_VTABLE_RESTORE_MODEL,
+    PLAYER_EXSTATE_CHANGE_VTABLE_SLOT4, PLAYER_EXSTATE_CHANGE_VTABLE_SLOT5,
+    PLAYER_EXSTATE_CHANGE_VTABLE_SLOT6, PLAYER_EXSTATE_CHANGE_VTABLE_SLOT9,
+    PLAYER_EXSTATE_CHANGE_VTABLE_DIVE,  PLAYER_EXSTATE_CHANGE_VTABLE_SLOT8,
 };
 
 FieldPlayerCore *FieldPlayerCore_Create(PlayerState *state, Field *field, const VecFx32 *pos, u32 sex, HeapID heapId) {
@@ -167,21 +163,21 @@ void FieldPlayerCore_UpdateActionStatusObserver(FieldPlayerCore *core) {
     u32 prevObserve;
 
     prevObserve = core->observeStatus;
-    core->observeStatus = 0;
+    core->observeStatus = PLAYER_OBSERVE_NONE;
     moveStatus = core->moveStatus;
     if (!IsAllActorAcmdFinished(actor)) {
         switch (moveStatus) {
-        case 0:
+        case PLAYER_MOVE_STATUS_NONE:
             return;
-        case 1:
-            if (prevObserve == 0 || prevObserve == 3) {
-                core->observeStatus = 1;
+        case PLAYER_MOVE_STATUS_MOVE:
+            if (prevObserve == PLAYER_OBSERVE_NONE || prevObserve == PLAYER_OBSERVE_END) {
+                core->observeStatus = PLAYER_OBSERVE_START;
                 return;
             }
-            core->observeStatus = 2;
+            core->observeStatus = PLAYER_OBSERVE_MOVING;
             return;
-        case 2:
-            core->observeStatus = 2;
+        case PLAYER_MOVE_STATUS_TURN:
+            core->observeStatus = PLAYER_OBSERVE_MOVING;
             return;
         default:
             return;
@@ -189,27 +185,27 @@ void FieldPlayerCore_UpdateActionStatusObserver(FieldPlayerCore *core) {
     }
     if (FldAct_CheckAcmdEnd(actor) == TRUE) {
         switch (moveStatus) {
-        case 0:
+        case PLAYER_MOVE_STATUS_NONE:
             return;
-        case 1:
-            if (prevObserve == 0) {
+        case PLAYER_MOVE_STATUS_MOVE:
+            if (prevObserve == PLAYER_OBSERVE_NONE) {
                 return;
             }
-            if (prevObserve == 3) {
-                core->observeStatus = 0;
+            if (prevObserve == PLAYER_OBSERVE_END) {
+                core->observeStatus = PLAYER_OBSERVE_NONE;
                 return;
             }
-            core->observeStatus = 3;
+            core->observeStatus = PLAYER_OBSERVE_END;
             return;
-        case 2:
-            if (prevObserve == 0) {
+        case PLAYER_MOVE_STATUS_TURN:
+            if (prevObserve == PLAYER_OBSERVE_NONE) {
                 return;
             }
-            if (prevObserve == 3) {
-                core->observeStatus = 0;
+            if (prevObserve == PLAYER_OBSERVE_END) {
+                core->observeStatus = PLAYER_OBSERVE_NONE;
                 return;
             }
-            core->observeStatus = 3;
+            core->observeStatus = PLAYER_OBSERVE_END;
             return;
         default:
             return;
@@ -309,15 +305,15 @@ void FieldPlayerCore_SetFormSlotModel(FieldPlayerCore *core, u32 forme) {
     if (objCode != FldAct_GetObjCode(actor)) {
         FieldPlayerCore_ChangeObjCode(core, objCode);
     }
-    core->unk2C = 0;
+    core->modelReadyFrames = 0;
 }
 
 BOOL FieldPlayerCore_WaitModelReady(FieldPlayerCore *core) {
     if (FldAct_GetBillboardActorIdx(FieldPlayerCore_GetActor(core), 0) != BILLBOARD_ACTOR_NONE) {
-        if (core->unk2C == 1) {
+        if (core->modelReadyFrames == 1) {
             return TRUE;
         }
-        core->unk2C++;
+        core->modelReadyFrames++;
     }
     return FALSE;
 }
@@ -327,7 +323,7 @@ u32 FieldPlayerCore_DeriveExState(FieldPlayerCore *core) {
 }
 
 u32 FieldPlayerCore_CheckFormModel(FieldPlayerCore *core) {
-    if (FieldPlayer_GetExStateByObjCode(FldAct_GetObjCode(FieldPlayerCore_GetActor(core))) == 10) {
+    if (FieldPlayer_GetExStateByObjCode(FldAct_GetObjCode(FieldPlayerCore_GetActor(core))) == PLAYER_FORM_COUNT) {
         return FALSE;
     }
     return TRUE;
@@ -506,7 +502,7 @@ void FieldPlayerCore_SetSpecialSeq(FieldPlayerCore *core, u32 seq) {
     core->specialSeq = seq;
     core->seqStep = 0;
     core->seqDone = 0;
-    core->unk2C = 0;
+    core->modelReadyFrames = 0;
     core->unk2E = 0;
 }
 

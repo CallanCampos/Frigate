@@ -435,7 +435,7 @@ void EventMapChange_SetupWarpSequenceOut(EventMapChange *wk, GameEvent *parent) 
     warp->seasonChanged = (wk->unk40 && wk->seasonChanged) ? TRUE : FALSE;
     warp->startSeason = Season_GetNext(wk->prevSeason);
     warp->endSeason = wk->season;
-    warp->unk48 = 0;
+    warp->zoneBGMChanged = 0;
     warp->unk4C = 0;
 }
 

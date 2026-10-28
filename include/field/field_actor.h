@@ -200,7 +200,7 @@ typedef struct {
     u16 phase;
     s8 dir;
     s8 timer;
-    s8 unkE;
+    s8 drawStatus;
     s8 height;
 } ActorRailJumpWork;
 
@@ -255,7 +255,8 @@ BOOL RailActor_AcStayWalkU4F0(FieldActor *actor);
 BOOL RailActor_AcStayWalkD4F0(FieldActor *actor);
 BOOL RailActor_AcStayWalkL4F0(FieldActor *actor);
 BOOL RailActor_AcStayWalkR4F0(FieldActor *actor);
-void RailActorAcmd_InitJumpWithSe(FieldActor *actor, u16 dir, u32 speed, u32 timer, u16 frame, s16 height, u16 step);
+void RailActorAcmd_InitJumpWithSe(FieldActor *actor, u16 dir, u32 speed, u32 timer, u16 drawStatus, s16 height,
+                                  u16 step);
 // Also field_actor_g3dobj.c's: the freeing of the actors' 3D system, their 3D object system, the creation and deletion
 // of an actor's 3D object, the tile under a rail position, and the direction an actor on the rails faces for a camera
 // angle

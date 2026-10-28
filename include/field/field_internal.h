@@ -9,7 +9,8 @@
 #include "field/zone.h"
 #include "gfl/billboard_actor.h"
 
-// The gimmick work of Field_AllocGimmickWorkBlock, password 0xffffffff for none
+// The gimmick work of Field_AllocGimmickWorkBlock, password FIELD_GIMMICK_PASSWORD_NONE for none
+#define FIELD_GIMMICK_PASSWORD_NONE 0xffffffff
 typedef struct {
     u32 password;
     void *work;

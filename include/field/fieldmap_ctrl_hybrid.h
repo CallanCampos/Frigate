@@ -13,7 +13,7 @@ typedef struct {
     u32 activeType;
     FieldPlayer *player;
     // On a rail, what FieldPlayer_IsNogridForcedMove last returned: then the player keeps moving its way
-    u32 unk08;
+    u32 forcedMove;
 } FieldmapCtrlHybrid;
 
 u32 FieldmapCtrlHybrid_GetActiveTypeID(FieldmapCtrlHybrid *controller);

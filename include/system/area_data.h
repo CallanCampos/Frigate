@@ -36,6 +36,8 @@ u32 AreaData_GetPatAnmID(AreaData *areaData);
 BOOL AreaData_IsExterior(AreaData *areaData);
 u8 AreaData_GetLightsID(AreaData *areaData);
 u8 AreaData_GetEdgeColorTableID(AreaData *areaData);
+// The edge color table of an area without edge marking
+#define AREA_EDGE_COLOR_TABLE_NONE 0xff
 u8 AreaData_GetActorMatColorID(AreaData *areaData);
 BOOL AreaData_HasSeasons(u16 areaId);
 // Areas whose record is picked by something other than the season

@@ -22,7 +22,7 @@ typedef struct {
     s16 y;
     s16 z;
     fx32 height;
-    // The kind of tile, as MapTile_GetEncounterEffectKind gives it
+    // The phenomenon, an ENCOUNT_EFFECT_ value that MapTile_GetEncounterEffectKind gives
     u8 kind;
     u8 active : 4;
     u8 suspended : 2;
@@ -61,6 +61,9 @@ typedef struct {
     u8 minLevel;
     u8 maxLevel;
 } WildEncSlot;
+
+// A slot's form that picks one of the species' forms at random
+#define WILD_ENC_FORM_RANDOM 0x1f
 
 // A zone's wild encounters for a season, 0xe8 bytes of archive 0x7f
 struct EncData {
@@ -106,7 +109,8 @@ BOOL EncountSystem_CancelPhenomenonIfActorHit(EncountSystem *system);
 GameEvent *CreateRandomPhenomenonEvent(EncountSystem *system);
 // The distance to the phenomenon, along the axis it is farther on, and whether there is one
 BOOL EffectEncount_GetSpotDistance(EncountSystem *system, u16 *distance);
-void EffectEncount_SetEffectFlag(EncountSystem *system, u32 a1);
+// Hides or shows the phenomenon's effect
+void EffectEncount_SetEffectHidden(EncountSystem *system, u32 hidden);
 // The item the phenomenon gave
 u16 EffectEncount_GetItemId(EncountSystem *system);
 // The wild encounters of field_encount.c
@@ -114,6 +118,15 @@ EncountSystem *EncSys_Create(Field *field);
 void EncSys_Free(EncountSystem *system);
 BOOL EncSys_IsActive(EncountSystem *system, u32 a1);
 void EncSys_Update(EncountSystem *system, BOOL moved, BOOL turned);
+// The flags of a static encounter that make its Pokémon: shiny, without its held item, with its hidden ability, never
+// shiny, male or female. The others change the battle
+#define STATIC_ENC_FLAG_SHINY 0x2
+#define STATIC_ENC_FLAG_NO_ITEM 0x4
+#define STATIC_ENC_FLAG_HIDDEN_ABILITY 0x8
+#define STATIC_ENC_FLAG_NOT_SHINY 0x10
+#define STATIC_ENC_FLAG_MALE 0x20
+#define STATIC_ENC_FLAG_FEMALE 0x40
+
 GameEvent *EventWildBattleCall_CreateStatic(EncountSystem *system, u16 species, u8 level, u8 form, u16 flags);
 u32 ConvFieldWeatherToBtl(Field *field);
 void EffectEncount_ConsumeSpot(EncountSystem *system);

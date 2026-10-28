@@ -5,11 +5,13 @@
 #include "types.h"
 #include "constants/items.h"
 #include "constants/zones.h"
+#include "field/enc_pokeset.h"
 #include "field/encounter.h"
 #include "field/event_wild_battle.h"
 #include "field/festival.h"
 #include "field/field.h"
 #include "field/field_actor.h"
+#include "field/field_controller.h"
 #include "field/field_effect.h"
 #include "field/field_g3d_mapper.h"
 #include "field/field_map.h"
@@ -23,6 +25,14 @@
 #include "save/save_control.h"
 #include "save/trainer_card.h"
 #include "system/game_data.h"
+
+// The phenomena that the zone's encounter tables allow: of land, with shaking grass, and of water, with rare surfing
+// or fishing
+#define PHENOMENON_MASK_LAND 0x1
+#define PHENOMENON_MASK_WATER 0x2
+
+// The script that gives the item of a dust cloud or a flying Pokémon's shadow
+#define SCRID_PHENOMENON_ITEM 0x2795
 
 // A tile around the player where a phenomenon could appear
 typedef struct {
@@ -91,8 +101,13 @@ static const u8 sPhenomenonStepChances[3][2] = { { 20, 10 }, { 20, 10 }, { 5, 15
 // The shards a dust cloud gives in the zones of DUST_CLOUD_SHARD_ZONES
 static const u16 DUST_CLOUD_ITEMS_SHARDS[4] = { ITEM_RED_SHARD, ITEM_BLUE_SHARD, ITEM_YELLOW_SHARD, ITEM_GREEN_SHARD };
 
-// Encounter-table availability flags for each terrain phenomenon kind
-static const u8 sPhenomenonKindMasks[10] = { 1, 1, 1, 1, 1, 2, 2, 1, 0, 0 };
+// Whether each phenomenon is one of land or water, which UpdatePhenomenon picks by the zone's encounter tables
+static const u8 sPhenomenonKindMasks[10] = {
+    [ENCOUNT_EFFECT_GRASS] = PHENOMENON_MASK_LAND,      [ENCOUNT_EFFECT_GRASS_B] = PHENOMENON_MASK_LAND,
+    [ENCOUNT_EFFECT_GRASS_C] = PHENOMENON_MASK_LAND,    [ENCOUNT_EFFECT_REALLY_TALL_GRASS] = PHENOMENON_MASK_LAND,
+    [ENCOUNT_EFFECT_DUST_CLOUD] = PHENOMENON_MASK_LAND, [ENCOUNT_EFFECT_WATER_0] = PHENOMENON_MASK_WATER,
+    [ENCOUNT_EFFECT_WATER_1] = PHENOMENON_MASK_WATER,   [ENCOUNT_EFFECT_FLYING_SHADOW] = PHENOMENON_MASK_LAND,
+};
 
 // The rarer items of a dust cloud
 static const u16 DUST_CLOUD_ITEMS_NORMAL[10] = { ITEM_SUN_STONE,   ITEM_MOON_STONE, ITEM_FIRE_STONE,  ITEM_THUNDERSTONE,
@@ -174,21 +189,21 @@ void UpdatePhenomenon(EncountSystem *system) {
     {
         u16 matrixZoneId = GetZoneIDAtMatrixXZWorld(matrix, pos.x, pos.z);
 
-        if (zoneId == 0xffff || matrixZoneId == 0xffff || zoneId != matrixZoneId) {
+        if (zoneId == MATRIX_ZONE_NONE || matrixZoneId == MATRIX_ZONE_NONE || zoneId != matrixZoneId) {
             return;
         }
     }
     if (!isBadgeObtained(getTrainerCardDataBlkAddress(system->gameData), 0)) {
         return;
     }
-    if (Field_GetResolvedControllerTypeID(system->field) != 0) {
+    if (Field_GetResolvedControllerTypeID(system->field) != FIELDMAP_CTRL_TYPE_GRID) {
         return;
     }
-    if (system->encData->userData[2]) {
-        kindMask |= 1;
+    if (system->encData->userData[ENCTYPE_GRASS_SHAKING]) {
+        kindMask |= PHENOMENON_MASK_LAND;
     }
-    if (system->encData->userData[4] || system->encData->userData[6]) {
-        kindMask |= 2;
+    if (system->encData->userData[ENCTYPE_SURF_RARE] || system->encData->userData[ENCTYPE_FISHING_RARE]) {
+        kindMask |= PHENOMENON_MASK_WATER;
     }
     if (kindMask == 0) {
         return;
@@ -248,9 +263,9 @@ GameEvent *CreateRandomPhenomenonEvent(EncountSystem *system) {
         return NULL;
     }
     roll = GFL_RandomLCAlt(1000);
-    if (spot->kind == 7) {
+    if (spot->kind == ENCOUNT_EFFECT_FLYING_SHADOW) {
         if (roll < 200) {
-            event = EventWildBattleCall_CreateRandom(system, 1);
+            event = EventWildBattleCall_CreateRandom(system, ENCOUNT_MODE_EFFECT);
         } else {
             u16 itemId = GetRandomWingItemID();
 
@@ -258,9 +273,9 @@ GameEvent *CreateRandomPhenomenonEvent(EncountSystem *system) {
             GameBeacon_BroadcastMission(0x19, itemId);
             gaveItem = TRUE;
         }
-    } else if (spot->kind == 4) {
+    } else if (spot->kind == ENCOUNT_EFFECT_DUST_CLOUD) {
         if (roll < 400) {
-            event = EventWildBattleCall_CreateRandom(system, 1);
+            event = EventWildBattleCall_CreateRandom(system, ENCOUNT_MODE_EFFECT);
         } else {
             u16 itemId = EffectEncount_GenDustCloudItem(spot->zoneId);
 
@@ -269,7 +284,7 @@ GameEvent *CreateRandomPhenomenonEvent(EncountSystem *system) {
             gaveItem = TRUE;
         }
     } else {
-        event = EventWildBattleCall_CreateRandom(system, 1);
+        event = EventWildBattleCall_CreateRandom(system, ENCOUNT_MODE_EFFECT);
     }
     if (event == NULL) {
         EncountSystem_CancelPhenomenonCore(system, state);
@@ -280,8 +295,8 @@ GameEvent *CreateRandomPhenomenonEvent(EncountSystem *system) {
     } else {
         FieldPlayer *player;
 
-        if (spot->kind == 5 || spot->kind == 6) {
-            EffectEncount_SetEffectFlag(system, 1);
+        if (spot->kind == ENCOUNT_EFFECT_WATER_0 || spot->kind == ENCOUNT_EFFECT_WATER_1) {
+            EffectEncount_SetEffectHidden(system, TRUE);
         }
         spot->triggered = 1;
         player = Field_GetPlayer(system->field);
@@ -330,21 +345,21 @@ void EffectEncount_ConsumeSpot(EncountSystem *system) {
     }
 }
 
-void EffectEncount_SetEffectPaused(EncountSystem *system, u32 a1) {
+void EffectEncount_SetEffectPaused(EncountSystem *system, u32 paused) {
     EncountState *encountState = GameData_GetEncountState(system->gameData);
     EffectEncountState *state = system->effectEncountState;
 
     if (encountState->rareSpot.active && state->effect != NULL) {
-        EncountTask_SetPaused(state->effect, a1);
+        EncountTask_SetPaused(state->effect, paused);
     }
 }
 
-void EffectEncount_SetEffectFlag(EncountSystem *system, u32 a1) {
+void EffectEncount_SetEffectHidden(EncountSystem *system, u32 hidden) {
     EncountState *encountState = GameData_GetEncountState(system->gameData);
     EffectEncountState *state = system->effectEncountState;
 
     if (encountState->rareSpot.active && state->effect != NULL) {
-        EncountTask_SetDrawHidden(state->effect, a1);
+        EncountTask_SetDrawHidden(state->effect, hidden);
     }
 }
 
@@ -595,5 +610,5 @@ static u16 GetRandomWingItemID(void) {
 
 static GameEvent *CallGivePhenomenonItem(EncountSystem *system, u16 itemId) {
     system->effectEncountState->itemId = itemId;
-    return EventScriptCall_Create(system->gsys, 0x2795, NULL, Field_GetHeapID(system->field));
+    return EventScriptCall_Create(system->gsys, SCRID_PHENOMENON_ITEM, NULL, Field_GetHeapID(system->field));
 }

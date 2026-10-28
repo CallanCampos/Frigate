@@ -9,9 +9,12 @@ static BOOL MapTile_IsNormalTallGrassSingleBtl(u32 tileClass);
 static BOOL MapTile_IsTallGrassSingleBtl(u32 tileClass);
 static BOOL MapTile_IsSandD(u32 tileClass);
 
+// The tile class of a tile that isn't one
+#define TILE_CLASS_NONE 0xff
+
 // The battle terrain of each tile class
 // clang-format off
-static const u8 data_ov036_021d0324[40][2] = {
+static const u8 TILE_CLASS_BATTLE_TERRAINS[40][2] = {
     {0x00, 4},  {0x02, 2},  {0x03, 1}, {0x04, 5},  {0x05, 5},  {0x06, 5},  {0x07, 5}, {0x08, 5},
     {0x09, 5},  {0x0a, 10}, {0x0b, 8}, {0x0c, 8},  {0x0e, 7},  {0x0f, 7},  {0x10, 13}, {0x11, 4},
     {0x13, 4},  {0x14, 11}, {0x15, 11}, {0x16, 14}, {0x17, 12}, {0x18, 13}, {0x19, 8}, {0x1b, 4},
@@ -27,7 +30,7 @@ u32 GetTileTypeAtPos(FieldG3DMapper *mapper, const VecFx32 *position) {
     if (FieldG3DMapper_GetTerrain(mapper, position, &terrain) == TRUE) {
         return terrain.tileType;
     }
-    return 0xffffffff;
+    return TILE_TYPE_NONE;
 }
 
 u16 GetTileClass(u32 tileType) {
@@ -41,7 +44,7 @@ u32 GetTileFlags(u32 tileType) {
 BOOL MapTile_IsValid(u32 tileType) {
     u16 tileClass = GetTileClass(tileType);
 
-    if (tileType == 0xffffffff || tileClass == 0xff) {
+    if (tileType == TILE_TYPE_NONE || tileClass == TILE_CLASS_NONE) {
         return FALSE;
     }
     return TRUE;
@@ -50,7 +53,7 @@ BOOL MapTile_IsValid(u32 tileType) {
 BOOL MapTile_BlocksCollision(u32 tileType) {
     u32 flags = GetTileFlags(tileType);
 
-    if (!MapTile_IsValid(tileType) || (flags & 1)) {
+    if (!MapTile_IsValid(tileType) || (flags & TILE_FLAG_COLLISION)) {
         return TRUE;
     }
     return FALSE;
@@ -496,38 +499,38 @@ u32 MapTile_GetEncounterEffectKind(u32 tileType) {
     u16 flags = tileType >> 16;
 
     if (tileClass == 0x20) {
-        return 7;
+        return ENCOUNT_EFFECT_FLYING_SHADOW;
     }
-    if (!(flags & 4)) {
-        return 8;
+    if (!(flags & TILE_FLAG_ENCOUNT)) {
+        return ENCOUNT_EFFECT_NONE;
     }
     switch (tileClass) {
     case 4:
-        return 0;
+        return ENCOUNT_EFFECT_GRASS;
     case 5:
-        return 1;
+        return ENCOUNT_EFFECT_GRASS_B;
     case 0x21:
-        return 2;
+        return ENCOUNT_EFFECT_GRASS_C;
     case 8:
-        return 3;
+        return ENCOUNT_EFFECT_REALLY_TALL_GRASS;
     case 10:
-        return 4;
+        return ENCOUNT_EFFECT_DUST_CLOUD;
     case 0x3d:
-        return 5;
+        return ENCOUNT_EFFECT_WATER_0;
     case 0x3f:
     case 0x43:
-        return 6;
+        return ENCOUNT_EFFECT_WATER_1;
     default:
-        return 8;
+        return ENCOUNT_EFFECT_NONE;
     }
 }
 
 u32 GetTileEncountType(u32 tileClass) {
     u32 i;
 
-    for (i = 0; i < 40; i++) {
-        if (tileClass == data_ov036_021d0324[i][0]) {
-            return data_ov036_021d0324[i][1];
+    for (i = 0; i < NELEMS(TILE_CLASS_BATTLE_TERRAINS); i++) {
+        if (tileClass == TILE_CLASS_BATTLE_TERRAINS[i][0]) {
+            return TILE_CLASS_BATTLE_TERRAINS[i][1];
         }
     }
     return 0;
@@ -541,7 +544,7 @@ BOOL CheckSurfBeginTiles(u32 tileType, u32 frontTileType) {
     if (MapTile_BlocksCollision(tileType)) {
         return FALSE;
     }
-    if (((flags & 2) && !MapTile_BlocksCollision(frontTileType)) || MapTile_IsSurfEdge(tileClass)) {
+    if (((flags & TILE_FLAG_WATER) && !MapTile_BlocksCollision(frontTileType)) || MapTile_IsSurfEdge(tileClass)) {
         return TRUE;
     }
     return FALSE;

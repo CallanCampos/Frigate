@@ -91,6 +91,8 @@ void ProcessMapMatrix(MapMatrix *matrix, const MapMatrixFileHeader *data, u32 ma
 void FreeMapMatrix(MapMatrix *matrix);
 u16 GetZoneIDAtMatrixXZ(MapMatrix *matrix, s32 x, s32 z);
 u16 GetZoneIDAtMatrixXZWorld(MapMatrix *matrix, s32 x, s32 z);
+// What a matrix's chunk without a zone has
+#define MATRIX_ZONE_NONE 0xffff
 u16 GetMapMatrixWidth(MapMatrix *matrix);
 u16 GetMapMatrixHeight(MapMatrix *matrix);
 u32 GetMapMatrixChunkIDCount(MapMatrix *matrix);
@@ -110,7 +112,17 @@ void GameData_SetEventMapReplace(GameData *gameData, u16 uid, BOOL set);
 BOOL GameData_IsMapReplaceEventSet(GameData *gameData, u16 uid);
 void MapReplace_LoadVariables(MapReplaceVariables *variables, GameSystem *gsys);
 void MapMatrix_Patch(MapMatrix *matrix, GameSystem *gsys, HeapID heapId);
+// What GetTileTypeAtPos returns where there is no terrain
+#define TILE_TYPE_NONE 0xffffffff
+
 u32 GetTileTypeAtPos(FieldG3DMapper *mapper, const VecFx32 *position);
+// The tile flags that GetTileFlags returns: the one that MapTile_BlocksCollision tests, the one of water, which the
+// player can't jump onto from the water and which gives battles their water music, and the one of the tiles where
+// wild Pokémon appear
+#define TILE_FLAG_COLLISION 0x1
+#define TILE_FLAG_WATER 0x2
+#define TILE_FLAG_ENCOUNT 0x4
+
 u32 GetTileFlags(u32 tileType);
 u16 GetAbyssalRuinsDiveZoneID(Field *field, u16 *zoneId);
 u16 GetTileClass(u32 tileType);
@@ -179,6 +191,21 @@ BOOL MapTile_IsElectricRock(u32 tileClass);
 BOOL MapTile_IsCatwalkBody_(u32 tileClass);
 BOOL MapTile_IsCatwalkEntryPoint(u32 tileClass);
 BOOL MapTile_IsHiddenGrottoEntranceGrass(u32 tileClass);
+// The phenomena that MapTile_GetEncounterEffectKind finds on a tile, by the effects that fldeff_encount.c makes for
+// them: three kinds of grass, which share one effect, really tall grass, a dust cloud, two kinds of water and a flying
+// Pokémon's shadow, or none
+enum {
+    ENCOUNT_EFFECT_GRASS,
+    ENCOUNT_EFFECT_GRASS_B,
+    ENCOUNT_EFFECT_GRASS_C,
+    ENCOUNT_EFFECT_REALLY_TALL_GRASS,
+    ENCOUNT_EFFECT_DUST_CLOUD,
+    ENCOUNT_EFFECT_WATER_0,
+    ENCOUNT_EFFECT_WATER_1,
+    ENCOUNT_EFFECT_FLYING_SHADOW,
+    ENCOUNT_EFFECT_NONE,
+};
+
 u32 MapTile_GetEncounterEffectKind(u32 tileType);
 BOOL CheckSurfBeginTiles(u32 tileType, u32 frontTileType);
 

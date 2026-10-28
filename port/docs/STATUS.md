@@ -32,11 +32,77 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: integrate the reviewed controller into the bounded field sync
+
+- **Upstream:** frozen `f71f5fe61d`, still the same 36 commits in PR 60. Reviewed main is now `ad54a31b4f`,
+  the normal PR 61 merge after all 14 checks passed. No later upstream commits or experimental SDK reader enter.
+- **Port:** `PORT_SHA`, a real merge of that reviewed main into companion `1b76a05ca0` on the App's original
+  two-parent proposal. The separately preserved private 25-commit merge remains outside this graph.
+- **ROM (T0):** fresh combined-tree signed-runtime configure/Ninja passes both original US hashes, zero warnings:
+  B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  The exact companion `1b76a05ca0` independently passes as well; no parent result substitutes for this run.
+- **Host build/tests (T1/T2):** combined-tree arm64 macOS RelWithDebInfo all-target builds pass. Complete suites
+  finish B2 357 passed/28 explicit skips of 385, W2 354/28 of 382, zero failures. Both actual five-case assembly
+  oracles run without skips. Source hashes stay fixed throughout verification; published exact-head gates remain due.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** no new gameplay or general timing-parity claim.
+  Existing inputs, seeds, reference hashes, masks, performance budgets and fatal sanitizer policy remain fixed.
+- **Tiers/trap stubs:** no fresh scan or production SDK activation. Naming and controller tests do not complete
+  native gameplay; the unfinished reader remains preserved in its separate worktree.
+- **64-bit warnings:** both combined-tree guards pass; the required report is 365 sites/229 keys (real 66,
+  harmless 123, handled 141, unreachable 35), all 1,711 inputs compiled and zero missing. No baseline change.
+- **Work done:** resolve only the STATUS insertion by retaining both records and all historical sections. The
+  imported controller, DMA, fixture, CMake and guide changes retain their reviewed source; original game/SDK/config
+  files remain the frozen sync's. SYNC.md retains the documented existing manual-dispatch fallback. The first
+  hosted Intel runner for PR 61 lost communication; retrying failed jobs at the same head passed, without a bypass.
+- **Next:** fast-forward the existing sync topic, then exact-head owner local
+  verification, source approval and all required hosted checks before a normal protected merge of PR 60.
+- **Blockers:** final published-head canonical and hosted gates remain required; no human approval blocks this work.
+  Faithful native timing and later story coverage remain unfinished. Spanish issue 45 lacks gameplay/save evidence.
+
+## 2026-10-28: validate the frozen 36-commit field naming proposal
+
+- **Upstream:** `f71f5fe61d`, 36 commits after reviewed `b7ce134e0c`. The App's bounded PR 60 proposal is
+  `6d33e29061`, based on reviewed Frigate main `42eade465e`; no later upstream commits are imported.
+- **Port:** `1b76a05ca0`, a documentation companion directly on the App's original two-parent upstream merge.
+  The separately validated private 25-commit proposal remains preserved; its duplicate merge is not imported.
+  Main is not yet synchronized by this proposal, and no experimental CARD SDK reader is included.
+- **ROM (T0):** fresh signed-runtime configure/Ninja completes 1,455 steps with zero warnings; both original hashes
+  match: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  The complete compiled objects and ROMs supply the actual neutrality proof; no redundant compiler sweep was added.
+- **Host build/tests (T1/T2):** new arm64 macOS RelWithDebInfo all-target builds pass. Full CTest suites pass B2
+  351/28 explicit skips of 379 and W2 348/28 of 376, zero failures. The actual assembly oracle runs five of five
+  cases per game, zero skips, through the existing `build/port-venv` interpreter with Unicorn 2.1.4.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** applicable ordinary replay/save/recording checks,
+  both title timing gates and B2's additional New Game timing gate pass. Party-menu timing lacks its save fixture
+  and explicitly skips. Oracle-dependent DS comparisons skip with `PORT_BUILD_ORACLE=OFF`. No fresh full DS-route,
+  full-app fatal sanitizer, windowed-play or timing-parity proof is claimed. Existing inputs, seeds, reference
+  images, masks, sanitizer settings and performance budgets are unchanged.
+- **Tiers/trap stubs:** no fresh tier scan or stub removal; naming is not new native functionality. The naming-report
+  tool now excludes compiler-generated anonymous objects using the last B2 map; that metric is not matching or
+  gameplay coverage.
+- **64-bit warnings:** both required guards pass: 365 sites/229 keys (real 66, harmless 123, handled 141,
+  unreachable 35), all 1,711 inputs compiled and zero missing. No baseline or classification change.
+- **Work done:** review the field/actor/rail/camera/infrared-menu/weather/player/encounter names, constants and table
+  formatting. The proposal changes 79 upstream paths; all 202 existing game/SDK adaptations retain exactly their
+  prior added and removed lines. Seven adapted incoming owners retain their host safety/native-width work:
+  `event_mapchange.c`, `enc_pokeset.c`, `field_buildmodel.c`, `field_camera.c`, `field_fade.c`,
+  `field_player_grid.c` and `ircbattlemenu.c`. No manual game/configuration repair was needed. There are 332
+  same-address symbol renames and no old-symbol references in `port/`. Strict style and pinned 23.1.1 formatting
+  pass all 73 changed C/headers. SYNC.md explains best-effort schedules and the existing manual dispatch path,
+  preserving one bounded proposal without guessing why a particular scheduled event was absent.
+- **Next:** independent review and protected exact-head publication/verification for PR 60; retain this frozen
+  upstream target. Continue faithful native CARD investigation and authentic Ranch progression separately.
+- **Blockers:** hosted checks and owner local-verification status for the final published head are still pending.
+  No workflow changes or reference-guard override is needed: the actual cross-repository and closing-keyword
+  patterns match no incoming commit. One message contains the compiler-local name `@6131`; the helper does not check mentions.
+  ADR 0023 remains proposed; this sync claims no AI deadline or whole-game parity. Spanish issue 45 still needs
+  genuine gameplay/save evidence.
+
 ## 2026-10-28: integrate the reviewed shared-controller interface with current main
 
 - **Upstream:** `b7ce134e0c`, in reviewed main `42eade465e`. PR 59 merged normally after exact-head owner
   approval, both ROM hashes, complete native suites and all 14 checks. Newer upstream commits are reviewed separately.
-- **Port:** `PORT_SHA`, combining that main with the tested shared-controller interface `9edcfa856b`.
+- **Port:** `c8b824ff10`, combining that main with the tested shared-controller interface `9edcfa856b`.
   Production `card_rom.c` remains byte-identical to main; the experimental SDK reader is separate and unpublished.
 - **ROM (T0):** both parents pass the original US hashes with zero ROM compiler warnings. This integrated head
   requires fresh configure/Ninja and both hashes before publication; parent results are not transferred.

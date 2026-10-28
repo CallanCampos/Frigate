@@ -45,6 +45,8 @@
 // The slots of the items, x + y * 2 for the cursor's column and row, and the return button at the bottom
 #define FIELD_MENU_SLOT_BOTTOM 6
 #define FIELD_MENU_SLOT_COUNT 7
+// The cursor's row at the return button
+#define FIELD_MENU_ROW_BOTTOM 3
 
 // The moves of FIELD_MENU_CURSOR_MOVES from the return button up to the second or the third row, keeping the column
 #define FIELD_MENU_MOVE_TO_ROW_1 0xfe
@@ -402,7 +404,7 @@ void FieldMenu_Update(FieldMenu *menu) {
         }
         break;
     case FIELD_MENU_STATE_DECIDE:
-        if (menu->cancel == TRUE || menu->cursorY == 3) {
+        if (menu->cancel == TRUE || menu->cursorY == FIELD_MENU_ROW_BOTTOM) {
             menu->state = FIELD_MENU_STATE_SCROLL_OUT;
             GFL_SndSEPlay(SEQ_SE_CLOSE1);
             GFL_BGSysSetBGEnabled(4, FALSE);

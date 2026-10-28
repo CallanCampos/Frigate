@@ -317,7 +317,7 @@ static void EventWarpSequenceOut_ChangeToZoneBGM(WarpOutData *out) {
     GameData *gameData = warp->gameData;
 
     FieldSnd_SetZoneBGM(GameData_GetFieldSoundSystem(gameData), gameData, warp->spawn.zoneId, warp->endSeason);
-    warp->unk48 = 1;
+    warp->zoneBGMChanged = 1;
 }
 
 static void EventWarpSequenceOut_FadeOutBGM(WarpOutData *out, GameEvent *event) {
@@ -391,7 +391,7 @@ GameEventReturnCode EventWarpSequenceIn_RunPlain(GameEvent *event, u32 *state, v
 
     switch (*state) {
     case 0:
-        if (warp->unk48 != 0) {
+        if (warp->zoneBGMChanged != 0) {
             EventWarpSequenceIn_FadeInBGM(in);
         }
         EventWarpSequenceIn_PlayTransition(in, event);
@@ -432,7 +432,7 @@ GameEventReturnCode EventWarpSequenceIn_RunObjectAnime(GameEvent *event, u32 *st
         (*state)++;
         break;
     case 1:
-        if (warp->unk48 != 0) {
+        if (warp->zoneBGMChanged != 0) {
             EventWarpSequenceIn_FadeInBGM(in);
         } else if (warp->unk4C != 0) {
             EventWarpSequenceIn_ChainBGMFadeIn(in, event);
@@ -492,7 +492,7 @@ GameEventReturnCode EventWarpSequenceIn_RunFadeSe(GameEvent *event, u32 *state, 
 
     switch (*state) {
     case 0:
-        if (warp->unk48 != 0) {
+        if (warp->zoneBGMChanged != 0) {
             EventWarpSequenceIn_FadeInBGM(in);
         }
         (*state)++;
@@ -650,8 +650,8 @@ void EntranceCamera_ConfigureDefaultDeparture(EntranceCamera *camera) {
         break;
     }
     if (camera->hasDepartureAnimation) {
-        animation->unk4C = FALSE;
-        animation->unk48 = FALSE;
+        animation->disableBoundary = FALSE;
+        animation->releaseBind = FALSE;
         if (EntranceCamera_AimsAtEntrance(camera)) {
             EntranceEffect_GetEntryPos(camera->field, &pos);
         } else {
@@ -719,8 +719,8 @@ void EntranceCamera_ConfigureDefaultArrival(EntranceCamera *camera) {
         break;
     }
     if (camera->hasArrivalAnimation) {
-        animation->unk4C = FALSE;
-        animation->unk48 = FALSE;
+        animation->disableBoundary = FALSE;
+        animation->releaseBind = FALSE;
         if (EntranceCamera_AimsAtEntrance(camera)) {
             EntranceEffect_GetEntryPos(camera->field, &pos);
         } else {
@@ -776,8 +776,8 @@ void EntranceCamera_ConfigureFileDeparture(EntranceCamera *camera) {
     player = Field_GetPlayer(camera->field);
     FieldPlayer_GetFaceDir(player);
     EntranceCamera_ReadFile(&file, EntranceCamera_GetTransitionType(camera));
-    animation->unk4C = file.unk4C;
-    animation->unk48 = file.unk48;
+    animation->disableBoundary = file.disableBoundary;
+    animation->releaseBind = file.releaseBind;
     camera->hasDepartureAnimation = file.hasDepartureAnimation;
     camera->hasArrivalAnimation = file.hasArrivalAnimation;
     if (camera->hasDepartureAnimation) {
@@ -814,8 +814,8 @@ void EntranceCamera_ConfigureFileArrival(EntranceCamera *camera) {
     player = Field_GetPlayer(camera->field);
     FieldPlayer_GetFaceDir(player);
     EntranceCamera_ReadFile(&file, EntranceCamera_GetTransitionType(camera));
-    animation->unk4C = file.unk4C;
-    animation->unk48 = file.unk48;
+    animation->disableBoundary = file.disableBoundary;
+    animation->releaseBind = file.releaseBind;
     camera->hasDepartureAnimation = file.hasDepartureAnimation;
     camera->hasArrivalAnimation = file.hasArrivalAnimation;
     if (camera->hasArrivalAnimation) {
@@ -824,7 +824,7 @@ void EntranceCamera_ConfigureFileArrival(EntranceCamera *camera) {
         } else {
             FieldPlayer_GetWPos(player, &pos);
         }
-        if (animation->unk48 && EntranceCamera_AimsAtEntrance(camera)) {
+        if (animation->releaseBind && EntranceCamera_AimsAtEntrance(camera)) {
             FieldCamera_ChangeRefPos(fieldCamera, &pos);
         }
         FieldCameraAnimationController_PrepareCamera(camera->controller);
