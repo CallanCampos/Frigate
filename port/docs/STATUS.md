@@ -32,6 +32,26 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-27: Spanish manifest review fixes, experimental scope only
+
+Preparation record for the PR 44 review, not completed Spanish gameplay support.
+
+- **Upstream:** unchanged; this task imports no upstream commits.
+- **Port:** `PORT_SHA`, on `codex/review-spanish-rom`, preserving contributor head `6215e87d1f`.
+- **ROM (T0):** not run in this focused review; maintainer exact-head validation remains required.
+- **Host build:** not run; only ROM-free parser/configuration tests run here.
+- **Tests:** `PYTHONDONTWRITEBYTECODE=1 python3 port/tests/rom/test_manifest.py`: 14 tests pass, including the actual
+  CMake manifest fragment with no game compilation. Synthetic checks cover malformed tables/CRC/IDs/paths, schema,
+  B2-es-only scope and atomic output failures. Spanish T4/T5/T6/T7 remain unrun; no dump is available to this review.
+- **Tiers, trap stubs and 64-bit warnings:** unchanged by this tooling/documentation review; not remeasured.
+- **Work done:** bounded structural validation before generating exact-ROM hashes, configure schema checks, atomic
+  manifest replacement, synthetic regressions and explicit experimental IRES-only scope. US build inputs remain
+  unchanged; the probe confirms identical generated US output with or without an invalid Spanish side manifest.
+- **Next:** full US regression/exact-head gates, contributor diagnosis of the four Spanish replay failures, then
+  isolated Spanish New Game/field/save-CRC/own-save-reload evidence. Review proposed ADR 0025.
+- **Blockers:** no local Spanish dump; same archive/member counts and self-generated hashes establish neither
+  authenticity nor asset/gameplay compatibility. Spanish White 2 is refused.
+
 ## 2026-10-27: a Spanish Black 2 ROM (IRES) by a manifest of its own, `PORT_ROM_LANGUAGE=es`
 
 - **Upstream:** `deb044db2d`, as `main` has it since PR 41; this branch merges no upstream commit.

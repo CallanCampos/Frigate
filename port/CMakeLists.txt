@@ -107,8 +107,8 @@ else()
     message(FATAL_ERROR "PORT_VERSION must be b2_us or w2_us, not ${PORT_VERSION}")
 endif()
 
-# The language of the ROM the program plays: us, the dump the decomp builds, or es, a Spanish dump of the same version
-# (IRES for Black 2), whose files the US code reads instead, by the manifest that
+# The ROM data the program plays: us, the dump the decomp builds, or experimental Spanish Black 2
+# (IRES only), whose files the US code reads instead, by the manifest that
 # port/tools/research/assets/rom_manifest.py writes from that dump (port/cmake/rom.cmake). The game's code stays the
 # decomp's US C, with English game logic where it has any (port/docs/research/es-rom-support.md, section 4)
 set(PORT_ROM_LANGUAGE "us" CACHE STRING "The language of the ROM to play: us (the decomp's) or es (Spanish)")
@@ -116,7 +116,11 @@ set_property(CACHE PORT_ROM_LANGUAGE PROPERTY STRINGS us es)
 if(PORT_ROM_LANGUAGE STREQUAL "us")
     set(PORT_ROM_REGION "US")
 elseif(PORT_ROM_LANGUAGE STREQUAL "es")
-    set(PORT_ROM_REGION "Spain")
+    if(NOT PORT_VERSION STREQUAL "b2_us")
+        message(FATAL_ERROR "PORT_ROM_LANGUAGE=es is experimental and supports only Black 2 (b2_us/IRES)")
+    endif()
+    message(WARNING "Experimental IRES data loader: Spanish gameplay/save compatibility is not established")
+    set(PORT_ROM_REGION "Spain, experimental")
 else()
     message(FATAL_ERROR "PORT_ROM_LANGUAGE must be us or es, not ${PORT_ROM_LANGUAGE}")
 endif()

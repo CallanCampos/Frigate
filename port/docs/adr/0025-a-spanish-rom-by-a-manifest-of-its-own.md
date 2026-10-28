@@ -20,19 +20,23 @@ Frigate plays the ROM the decomp builds: `port_rom_check` refuses any game code 
   initial and 8 messages added at the end of one script bank;
 - its overlay table has the same 344 overlays, consistently moved by main's 64 bytes.
 
-So the US code can read its data. The code stays the decomp's US C, with the English logic that §4 of the report lists.
+These measurements suggest a data-loader experiment; equal archive/message counts do not establish compatible
+layouts, correct text semantics or safe gameplay. The code stays the decomp's US C, with the English logic that §4
+of the report lists. Only 1,800 boot frames were reported; Spanish New Game, field and save compatibility are unverified.
 
 ## Decision
 
 A configure option, `PORT_ROM_LANGUAGE` (`us`, the default, or `es`), picks the ROM the program accepts. For `es`,
-[rom.cmake](../../cmake/rom.cmake) builds the ROM manifest from the `b2_es` (or `w2_es`) entry of
+[rom.cmake](../../cmake/rom.cmake) builds the ROM manifest from the `b2_es` entry of
 `port/tools/research/assets/nitrofs_manifest_languages.json`. That entry holds the game code, the whole dump's SHA-1,
 the overlay table's size and SHA-1, and every file's size and SHA-1. It is written from the player's own dump by
 [rom_manifest.py](../../tools/research/assets/rom_manifest.py), which reads the ROM's tables in place, hashes only.
 
-Configure stops if the entry is missing, if its game code isn't the version's, or if its overlay table doesn't have
-`config/<version>`'s count of overlays. The program then accepts exactly that dump, or one whose files match it, with
-the title "Pokémon Black 2 (Spain)". It keeps its saves apart (`IRES.sav`). Nothing in the game's code changes. The US
+The option is explicitly experimental and requires `b2_us`/`IRES`; Spanish White 2 is refused. The generator
+requires a valid header CRC and bounded FNT/FAT/overlay structures, valid IDs and safe unique paths before writing
+an entry atomically. Configure validates that schema, exact game code and overlay count; old entries must be regenerated.
+The program then accepts exactly that dump, or one whose files match it, with the title
+"Pokémon Black 2 (Spain, experimental)". It keeps its saves apart (`IRES.sav`). Nothing in the game's code changes. The US
 build is unchanged: the same manifest, only messages reworded ("the decomp's" stays for it).
 
 ## Alternatives
@@ -42,18 +46,22 @@ build is unchanged: the same manifest, only messages reworded ("the decomp's" st
 - **A Spanish manifest committed for everyone.** No clean IRES dump has a published hash to trust. The dump this was
   first made from is a "(Fix)" one of unknown changes. So the entry is written from each player's dump and isn't a
   shared input.
-- **Skipping the check for other languages.** That would accept any dump, damaged ones too, against
-  [port_rom.h](../../hal/rom/port_rom.h)'s promise that what the program reads is what the manifest has.
+- **Skipping the check for other languages.** A generated manifest instead pins later runs to the user's selected
+  bytes and rejects malformed structures at generation. It cannot establish authenticity or detect all damaged or
+  incompatible assets in that original dump; a self-generated SHA-1 is not an independent reference.
 
 ## Consequences
 
-- The game runs with Spanish text, fonts and graphics, but with the US code's English logic:
+- The experimental loader reads Spanish text, fonts and graphics with the US code's English logic:
   - Pokémon say English (`region`, `GAME_LANGUAGE`);
   - DS Download Play asks for `_eng.srl`;
   - Easy Chat's word tables by initial are English;
   - the article and plural loaders in `wordset.c` are English.
   Fixing those is the report's option C: a language define for the host build only, one reviewed change each, with
   its row in [game-changes.md](../game-changes.md).
+- Gameplay support is not established. The four contributor replay failures must be checked for final frame, exit
+  status and state before attributing them only to translated pixels. Same counts of archive members are not a
+  compatibility proof. Use isolated save directories; Spanish cartridge-save interoperability is not verified.
 - The replay, frame-hash and oracle tests are US-only. An `es` build has its own build directory and runs the unit
   tests that need a ROM against the Spanish dump.
 - Revisit when upstream builds another region, or when a known clean IRES dump gives a hash to commit.

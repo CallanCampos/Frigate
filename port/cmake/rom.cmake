@@ -64,9 +64,10 @@ if(PORT_ROM_LANGUAGE STREQUAL "us")
         message(FATAL_ERROR "port/cmake/rom.cmake has no overlay table hash for the ROM ${port_rom_sha1}")
     endif()
 else()
-    # b2_es: the version's two letters and the language
-    string(SUBSTRING "${PORT_VERSION}" 0 2 port_rom_version_letters)
-    set(port_rom_manifest_version "${port_rom_version_letters}_${PORT_ROM_LANGUAGE}")
+    if(NOT PORT_ROM_LANGUAGE STREQUAL "es" OR NOT PORT_VERSION STREQUAL "b2_us")
+        message(FATAL_ERROR "experimental es requires b2_us; Spanish White 2 is not validated")
+    endif()
+    set(port_rom_manifest_version "b2_es")
     set(port_rom_manifest_sources
         "port/tools/research/assets/nitrofs_manifest_languages.json's ${port_rom_manifest_version}")
     string(CONCAT port_rom_language_help "write it from your ROM with: "
@@ -75,7 +76,15 @@ else()
         message(FATAL_ERROR "PORT_ROM_LANGUAGE ${PORT_ROM_LANGUAGE} needs ${port_rom_language_json}; "
             "${port_rom_language_help}")
     endif()
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${port_rom_language_json}")
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${port_rom_language_json}"
+        "${REPO_ROOT}/port/tools/research/assets/rom_manifest.py")
+    # Validate schema and safe C-string paths before embedding a player's manifest in generated C.
+    execute_process(COMMAND "${PORT_PYTHON}" "${REPO_ROOT}/port/tools/research/assets/rom_manifest.py"
+        --validate-manifest "${port_rom_language_json}" --overlay-count "${port_rom_overlay_count}"
+        RESULT_VARIABLE port_rom_validation ERROR_VARIABLE port_rom_validation_error)
+    if(NOT port_rom_validation EQUAL 0)
+        message(FATAL_ERROR "Invalid experimental IRES manifest: ${port_rom_validation_error}")
+    endif()
     file(READ "${port_rom_language_json}" port_rom_json)
     string(JSON port_rom_entry ERROR_VARIABLE port_rom_entry_error
         GET "${port_rom_json}" "${port_rom_manifest_version}")
@@ -85,12 +94,8 @@ else()
     string(JSON port_rom_files GET "${port_rom_entry}" files)
     string(JSON port_rom_game_code GET "${port_rom_entry}" gamecode)
     string(JSON port_rom_sha1 GET "${port_rom_entry}" rom_sha1)
-    # The game code's first three letters are the version's (IRE Black 2, IRD White 2), whose code the program has
-    string(SUBSTRING "${port_rom_game_code}" 0 3 port_rom_game_letters)
-    if(NOT (port_rom_game_letters STREQUAL "IRE" AND PORT_VERSION STREQUAL "b2_us")
-            AND NOT (port_rom_game_letters STREQUAL "IRD" AND PORT_VERSION STREQUAL "w2_us"))
-        message(FATAL_ERROR
-            "the ${port_rom_manifest_version} ROM's game code ${port_rom_game_code} isn't ${PORT_VERSION}'s")
+    if(NOT port_rom_game_code STREQUAL "IRES" OR NOT PORT_VERSION STREQUAL "b2_us")
+        message(FATAL_ERROR "experimental es requires b2_us and an IRES manifest")
     endif()
     string(JSON port_rom_language_table_size GET "${port_rom_entry}" overlay_table size)
     string(JSON port_rom_overlay_table_sha1 GET "${port_rom_entry}" overlay_table sha1)
@@ -244,3 +249,9 @@ add_test(NAME rom_game_backup_cut_pointer COMMAND port_rom_tests backup_cut_poin
 set_tests_properties(rom_game_backup_cut_pointer PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 120
     PASS_REGULAR_EXPRESSION "cut to 32 bits, through CARDi_RequestStreamCommand|skipped"
     FAIL_REGULAR_EXPRESSION "went on")
+
+# Synthetic ROM tables only: no Nintendo data or game execution. Also checks the configure-time manifest schema.
+add_test(NAME rom_manifest_tool
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/rom/test_manifest.py")
+set_tests_properties(rom_manifest_tool PROPERTIES TIMEOUT 60)

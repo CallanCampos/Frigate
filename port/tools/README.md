@@ -16,7 +16,7 @@ build time; their output goes into the build directory, never into the repositor
 | [gen_overlay_sections.py](gen_overlay_sections.py) | Per-overlay sections for overlay code's writable statics, from `delinks.txt`; the check of a Mach-O link's section count, slice by slice for a universal program, with the link format of each slice's architecture and macOS | Overlays reloading as on the DS |
 | [gen_window_icon.c](gen_window_icon.c) | The window's icon on Linux and Windows: the version's 32 px window icon, drawn pixel by pixel, and its icon master scaled to 64 px ([../assets/branding](../assets/branding/README.md)), as bitmaps in C, built and run for the machine that builds | None: the program's look |
 | [research/assets/nitrofs_manifest.json](research/assets/) | Not a generator but build input: the size and SHA-1 of every NitroFS file of both ROMs, which [../cmake/rom.cmake](../cmake/rom.cmake) turns into the ROM manifest that checks a trimmed dump. `research/assets/manifest.py` wrote it | The ROM's check |
-| [research/assets/rom_manifest.py](research/assets/rom_manifest.py) | Writes, from the player's ROM of another language, the entry of `research/assets/nitrofs_manifest_languages.json` that [../cmake/rom.cmake](../cmake/rom.cmake) makes the ROM manifest with `PORT_ROM_LANGUAGE=es` | The ROM's check |
+| [research/assets/rom_manifest.py](research/assets/rom_manifest.py) | Validates an experimental Spanish Black 2 (`IRES`) dump's structural bounds/CRC and atomically writes the entry of `research/assets/nitrofs_manifest_languages.json` that [../cmake/rom.cmake](../cmake/rom.cmake) makes the ROM manifest with `PORT_ROM_LANGUAGE=es` | The ROM's check |
 
 ## Checking, syncing, packaging
 

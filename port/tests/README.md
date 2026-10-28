@@ -92,3 +92,13 @@ The HAL's [hal/test_gbucket.c](hal/test_gbucket.c) calls the actual GameSpy buck
 [hal/check_gbucket.py](hal/check_gbucket.py) checks each subprocess for exit 70, its function name and "not in ROM".
 This covers the three absent SDK functions, including `FreeBucketSet(NULL)`, without treating a successful return
 or another failure as a passing trap test.
+
+### Experimental Spanish manifest validation
+
+`rom_manifest_tool` runs [rom/test_manifest.py](rom/test_manifest.py) against fabricated header/FNT/FAT/overlay
+bytes and the actual [rom_manifest.py](../tools/research/assets/rom_manifest.py). It covers CRC/table bounds, IDs,
+cycles, duplicate/unsafe paths, image sizes, schema rejection, atomic output preservation, and the actual
+[rom.cmake](../cmake/rom.cmake) generator in a target-registration-free probe. The probe validates US output
+stability, missing/invalid Spanish manifests and rejection of Spanish White 2. It compiles no game and needs no ROM.
+It establishes parser/configuration behavior, not Spanish asset or gameplay compatibility. Run directly with
+`PYTHONDONTWRITEBYTECODE=1 python3 port/tests/rom/test_manifest.py`.

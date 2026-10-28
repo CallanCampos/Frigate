@@ -10,7 +10,7 @@ script read the bytes), **read** (from the decomp's code or configs) or **inferr
 The ROM measured was `PNeg2_espa_fix_0.nds`: 512 MiB, SHA-1 `1942ea58fb78f8d85e1a28db82dc0b846e0f4e0a`, header CRC
 valid (0x46C8). Its secure area is decrypted (`ffdeffe7…`), as in most dumps, so the secure-area CRC doesn't match.
 The "(Fix)" in its name suggests an anti-piracy patch. Without a reference hash there is no telling what it changed,
-but such patches touch ARM9 or overlay code, which Frigate never runs. The SHA-1 isn't indexed on the web, so it may
+and without comparing a known clean dump we cannot assume the changes affect only code rather than assets. The SHA-1 isn't indexed on the web, so it may
 not be a clean No-Intro dump. This report calls the US reference "US": the decomp's `b2_us`, SHA-1 `e51e6dfb…`.
 
 ## 1. Header and modules (measured)
@@ -104,8 +104,8 @@ Sample: species names are the same (Bulbasaur…); items "Ultraball", "Superball
 ## 4. The game's code against Spanish data (read)
 
 Frigate runs the decomp's C compiled for the host, never the ROM's code, so different overlays don't matter in
-themselves. What matters is whether the US C behaves correctly on Spanish data. The data layouts are the same (same
-archives, member counts, record sizes and message counts, §2–3), so loading works. These are the places where the US
+themselves. What matters is whether the US C behaves correctly on Spanish data. Matching archive/member counts and some record sizes (§2–3) are useful screening evidence, but do not prove all
+data layouts or semantics compatible. Only experimental loading is established by the reported 1,800-frame smoke run. These are the places where the US
 code is English:
 
 | Where | What the US code does | Effect with Spanish data |
@@ -208,8 +208,7 @@ regions.
 ## Resumen en español
 
 La ROM española (IRES) es casi la misma que la US. Los dos ficheros de código son una recompilación pequeña: el ARM9
-tiene 64 bytes menos, 333 overlays se cargan 0x40 más abajo y solo 4 cambian de tamaño. Los datos son compatibles con
-el código US: hay los mismos 318 ficheros (salvo dos `.srl` que acaban en `_spa`), 252 son idénticos (216 de 270 MiB)
+tiene 64 bytes menos, 333 overlays se cargan 0x40 más abajo y solo 4 cambian de tamaño. Los datos parecen candidatos para una prueba experimental con el código US, pero su compatibilidad no está demostrada: hay los mismos 318 ficheros (salvo dos `.srl` que acaban en `_spa`), 252 son idénticos (216 de 270 MiB)
 y todos los NARC distintos tienen el mismo número de miembros. Los textos tienen los mismos 495 + 676 ficheros con el
 mismo número de mensajes. Las excepciones son las listas del Chat Fácil por inicial y 8 mensajes añadidos al final de
 `global_10735`. En objetos solo cambia el orden alfabético y en los intercambios solo el idioma.
@@ -227,3 +226,16 @@ compilación de idioma (opción C), con su ADR. La opción B, una versión `b2_e
 exacto, pero es trabajo largo de decompilación que las reglas del port no permiten en este clon. Primer paso concreto:
 un script que genere el manifiesto leyendo la ROM directamente y una opción `PORT_ROM_LANGUAGE=es`. Conviene comprobar
 antes si el volcado "(Fix)" está limpio.
+
+
+## Review limits (2026-10-27)
+
+The first implementation is an **experimental IRES-only data loader**, not supported Spanish gameplay. Spanish
+White 2 is refused. Its manifest generator now checks header CRC, bounded tables, directory/file IDs and overlay
+image ranges; configure checks its schema. These checks do not authenticate the source dump or prove assets
+compatible with US logic. The original measured dump is unavailable to the reviewer. Its four failed US replay
+checks remain undiagnosed here; translated frame hashes alone cannot excuse a crash or missing final frame.
+
+Next evidence needs the contributor's own dump: isolated New Game/field runs, final frames and exit status, save
+block CRCs and a new-process own-save reload, followed by Spanish-specific state/visual checks. Preserve original
+saves and keep the existing US regression suite unchanged. The synthetic loader tests need no commercial data.
