@@ -402,7 +402,55 @@ static void TestFormatAndRoundTrip(const char *program) {
     CHECK(strstr(error, "can't open") != NULL);
 }
 
+static void TestInitialAndCommittedTails(void) {
+    static const char header[] = "pbwinput 1\ninitial B+LID 10,20\nframes video\nseed 0x1\n";
+    static const char row[] = "12 A+LID 128,96\n";
+    PbwInput input, back;
+    char error[256], text[512];
+    CHECK(Parse(&input, header, error, sizeof(error)));
+    CHECK(input.hasInitial && input.count == 0);
+    CHECK(pbw_input_initial_state(&input).buttons == PBW_INPUT_B);
+    CHECK(pbw_input_state(&input, 500).touching && pbw_input_state(&input, 500).lidClosed);
+    FILE *file = tmpfile();
+    CHECK(file != NULL && pbw_input_write(&input, file));
+    rewind(file);
+    size_t n = fread(text, 1, sizeof(text) - 1, file);
+    text[n] = '\0';
+    fclose(file);
+    CHECK(strstr(text, "clock running\n") != NULL);
+    CHECK(Parse(&back, text, error, sizeof(error)) && back.hasInitial);
+    CHECK(SameState(pbw_input_state(&back, 1), input.initial));
+    pbw_input_free(&back);
+    pbw_input_free(&input);
+    for (size_t cut = 0; cut < sizeof(row) - 1; ++cut) {
+        snprintf(text, sizeof(text), "%s%.*s", header, (int)cut, row);
+        CHECK(Parse(&input, text, error, sizeof(error)));
+        CHECK(input.count == 0 && pbw_input_state(&input, 12).buttons == PBW_INPUT_B);
+        pbw_input_free(&input);
+    }
+    snprintf(text, sizeof(text), "%s%s", header, row);
+    CHECK(Parse(&input, text, error, sizeof(error)) && input.count == 1 &&
+          pbw_input_state(&input, 12).buttons == PBW_INPUT_A);
+    pbw_input_free(&input);
+    static const char *bad[] = { "pbwinput 1\ninitial A -\ninitial B -\n",
+                                 "pbwinput 1\n1 A\ninitial B -\n",
+                                 "pbwinput 1\ninitial A -",
+                                 "pbwinput 1\ninitial A -\ntime 2012-10-07 12:00:00",
+                                 "pbwinput 1\ninitial A -\nseed 0x1",
+                                 "pbwinput 1\ninitial A -\n13 BAD -\n",
+                                 "pbwinput 1\ninitial A -\n13 BAD 128,96\n",
+                                 "pbwinput 1\ninitial A -\n13x BAD",
+                                 "pbwinput 1\ninitial A -\n100000001 A -" };
+    for (size_t i = 0; i < sizeof(bad) / sizeof(bad[0]); ++i) {
+        CHECK(!Parse(&input, bad[i], error, sizeof(error)));
+    }
+    CHECK(Parse(&input, "pbwinput 1\n1 A -", error, sizeof(error))); // legacy EOF still commits a full row
+    CHECK(!input.hasInitial && pbw_input_initial_state(&input).buttons == PBW_INPUT_A);
+    pbw_input_free(&input);
+}
+
 int main(int argc, char **argv) {
+    TestInitialAndCommittedTails();
     TestValidFile();
     TestStatesBeforeTheFirstChange();
     TestErrors();

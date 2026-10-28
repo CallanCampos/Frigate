@@ -27,7 +27,7 @@ A bug fix, a refactor or anything one comment explains needs no ADR.
   that those branches don't collide when they merge: 0019 for the pointer-cast guard against a classified baseline,
   0020 for one program for both versions (D6) and 0021 for root heaps in host memory, which was written first. A
   branch whose ADR took another number before the reservation renumbers it when it merges. The next free number is
-  0027.
+  0028.
 - An accepted ADR isn't rewritten. Only its status line changes: to "superseded by NNNN" when a later ADR replaces
   it, to "accepted; amended by NNNN" when a later ADR changes part of it, or to "accepted; superseded: retired when
   ..." when what it decided is removed with no later decision in its place, with a dated note that says what went.
@@ -92,6 +92,7 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0024](0024-a-conflicting-sync-proposes-a-draft-of-upstreams-head.md) | A conflicting sync proposes a draft of upstream's head | D1, §4.1, §8 | accepted |
 | [0025](0025-a-spanish-rom-by-a-manifest-of-its-own.md) | A Spanish ROM by a manifest of its own, read by the US code | §1, §4.5 | proposed |
 | [0026](0026-native-archive-table-caches.md) | Keep archive offsets and resolve cached tables through the native pointer | §4.5, §4.8, §6 | accepted |
+| [0027](0027-recorded-input-streams.md) | Record effective video input with explicit initial state, clock and bounded seeds | §4.5, §6 | accepted |
 
 ## Decisions waiting for an ADR
 

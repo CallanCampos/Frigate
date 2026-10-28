@@ -74,7 +74,8 @@ ctest --test-dir build/port -j4 --output-on-failure                      # test
 - **The program's options** are in `frigate-black2 --help`, which says what each does and what each exit status means,
   from `sOptions` in [app/main.c](app/main.c): `--headless` runs without a window or pacing, `--frames N` stops after N
   frames, `--screenshot PATH` writes both screens at the end, `--save-dir PATH` keeps the saves elsewhere,
-  `--input FILE` plays a replay, `--frame-times FILE` writes how long each frame took on this machine, and
+  `--input FILE` plays a replay, `--record FILE` records effective input to a fresh file
+  ([recording limits](tools/oracle/README.md#recordings)), `--frame-times FILE` writes frame times, and
   `--render-threads N` draws the 3D frame on N threads (the machine's performance cores by default; the frames are the
   same whatever N).
 - **The tests** that need your ROM skip without it ([tests/README.md](tests/README.md)). In an optimized build the

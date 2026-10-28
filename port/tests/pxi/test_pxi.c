@@ -7,7 +7,11 @@
 //
 // One scenario a process, since the libraries start once (PM_Init and the like do nothing the second time).
 // PORT_PXI_VERBOSE prints each scenario's log.
+#include "app/record.h"
+#include "app/replay.h"
+#include "hal/gfl/gfl_frame.h"
 #include "hal/host/host.h"
+#include "hal/input/port_input.h"
 #include "hal/nvram/nvram_settings.h"
 #include "hal/os/port_os.h"
 #include "hal/pxi/arm7.h"
@@ -495,6 +499,76 @@ static void TestTpAutoSampling(void) {
     index = TP_GetLatestIndexInAuto();
     WaitFrames(2);
     CHECK(TP_GetLatestIndexInAuto() == index);
+}
+
+// Two video samples in one unchanged game pass must preserve a pen release through the real ARM9 latest-sample API.
+static void TestRecordedTouch(void) {
+    static TPData samples[9];
+    TPCalibrateParam calibrate;
+    TPData raw, point;
+    PbwInput header;
+    PbwInputState state;
+    u32 gameFrame;
+    Boot();
+    TP_Init();
+    TP_GetUserInfo(&calibrate);
+    TP_SetCalibrateParam(&calibrate);
+    gameFrame = port_gfl_frame_count();
+    remove(PORT_RECORD_TOUCH_FILE);
+    pbw_input_init(&header);
+    snprintf(header.version, sizeof(header.version), "%s", PORT_VERSION_NAME);
+    header.frames = PBW_INPUT_VIDEO_FRAMES;
+    header.hasInitial = 1;
+    header.seedCount = 1;
+    header.seeds[0] = 1;
+    port_input_set(PORT_INPUT_B, 0);
+    port_tp_set_touch(1, 10, 20);
+    header.initial = port_record_input();
+    CHECK(port_record_create(PORT_RECORD_TOUCH_FILE, NULL, 0, NULL));
+    CHECK(port_record_start(&header));
+    TP_RequestAutoSamplingStartAsync(0, 4, samples, NELEMS(samples));
+    TP_WaitBusy(TP_REQUEST_COMMAND_FLAG_AUTO_ON);
+    port_input_set(PORT_INPUT_A, 0);
+    port_tp_set_touch(1, 128, 96);
+    state = port_record_input();
+    CHECK(port_record_frame(1, &state));
+    WaitFrames(1);
+    TP_GetLatestRawPointInAuto(&raw);
+    TP_GetCalibratedPoint(&point, &raw);
+    CHECK(point.touch && point.x == 128 && point.y == 96);
+    port_tp_set_touch(0, 0, 0);
+    state = port_record_input();
+    CHECK(port_record_frame(2, &state));
+    WaitFrames(1);
+    TP_GetLatestRawPointInAuto(&raw);
+    CHECK(!raw.touch);
+    CHECK(port_gfl_frame_count() == gameFrame);
+    CHECK(port_record_close());
+    TP_RequestAutoSamplingStopAsync();
+    TP_WaitBusy(TP_REQUEST_COMMAND_FLAG_AUTO_OFF);
+    CHECK(port_replay_open(PORT_RECORD_TOUCH_FILE));
+    port_replay_start();
+    CHECK(port_input_held() == PORT_INPUT_B); // actual preboot read differs from VBlank1
+    TP_RequestSamplingAsync();
+    CHECK(TP_WaitRawResult(&raw) == 0);
+    TP_GetCalibratedPoint(&point, &raw);
+    CHECK(point.touch && point.x == 10 && point.y == 20);
+    TP_RequestAutoSamplingStartAsync(0, 4, samples, NELEMS(samples));
+    TP_WaitBusy(TP_REQUEST_COMMAND_FLAG_AUTO_ON);
+    port_replay_vblank(1);
+    WaitFrames(1);
+    TP_GetLatestRawPointInAuto(&raw);
+    TP_GetCalibratedPoint(&point, &raw);
+    CHECK(point.touch && point.x == 128 && point.y == 96 && port_input_held() == PORT_INPUT_A);
+    port_replay_vblank(2);
+    WaitFrames(1);
+    TP_GetLatestRawPointInAuto(&raw);
+    CHECK(!raw.touch);
+    CHECK(port_gfl_frame_count() == gameFrame);
+    TP_RequestAutoSamplingStopAsync();
+    TP_WaitBusy(TP_REQUEST_COMMAND_FLAG_AUTO_OFF);
+    port_replay_close();
+    remove(PORT_RECORD_TOUCH_FILE);
 }
 
 // The firmware's user settings and the NVRAM
@@ -1075,6 +1149,7 @@ static const Test sTests[] = {
     { "tp_sampling", TestTpSampling },
     { "tp_calibration", TestTpCalibration },
     { "tp_auto_sampling", TestTpAutoSampling },
+    { "tp_recorded_release", TestRecordedTouch },
     { "nvram_user_info", TestNvramUserInfo },
     { "nvram_read", TestNvramRead },
     { "nvram_write", TestNvramWrite },

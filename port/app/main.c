@@ -16,6 +16,7 @@
 
 #include "app/message_log.h"
 #include "app/present.h"
+#include "app/record.h"
 #include "app/replay.h"
 #include "app/run_dir.h"
 #include "app/sound_trace.h"
@@ -23,6 +24,7 @@
 #include "gfx/ge/ge_hal.h"
 #include "gfx/screens.h"
 #include "gfx/workers.h"
+#include "hal/card/port_card.h"
 #include "hal/gfl/gfl_frame.h"
 #include "hal/gfl/random_seed.h"
 #include "hal/host/host.h"
@@ -78,6 +80,10 @@ static const Option sOptions[] = {
       "plays the buttons, lid and touch of an input file instead of the window's (port/app/replay.h); its time line "
       "(or the format's default) sets the clock unless --fixed-time is given, and its clock line can pin the clock "
       "there for the whole run" },
+    { "record", "FILE", 0,
+      "records effective buttons, lid and touch on video frames with an explicit clock; live recording stops before "
+      "requesting more than 64 startup/battle random seeds (startup uses one); --input preserves its own declared "
+      "seed limit and records playback without replay-to-live handoff" },
     { "rom", "PATH", 0, "the player's ROM (port/hal/rom)" },
     { "save-dir", "PATH", 0, "where saves go (port/hal/card)" },
     { "fixed-time", "\"YYYY-MM-DD HH:MM:SS\"", 0,
@@ -129,7 +135,8 @@ static const ExitStatus sExitStatuses[] = {
     { 0, "the run ended normally" },
     { 1, "it can't go on or didn't do what it was asked, each cause with a \"port:\" line: the window didn't open, a "
          "write to the run directory failed during the run (a frame's row in frames.tsv, a screen's PNG file or "
-         "memory.txt, which stops the run at once), a write to the sound trace or of --frame-times' file failed, a "
+         "memory.txt, which stops the run at once), a write to the recording, exhausted recording seeds, a write to "
+         "the sound trace or of --frame-times' file failed, a "
          "module ran out of host memory (an arena, the geometry engine or its command log, the files over memory) or "
          "found a build that can't work (no overlay sections, an archive or a file over memory read through an "
          "address cut to 32 bits)" },
@@ -158,6 +165,15 @@ static unsigned long sFrames;
 static const char *sScreenshotPath;
 static int sScreenshotWritten;
 static int sRunDirFailed;
+static int sRecordFailed;
+static char sEffectiveTime[20];
+
+// Exhaustion is called from buildSeed: returning to the game would expose an unrecorded fallback seed.
+static void RecordSeedExhausted(void) {
+    port_record_close();
+    port_run_dir_close(1);
+    exit(1);
+}
 static int sWindowOpen;
 // Pacing: the host time of the first paced frame, and the frames since
 static Uint64 sPaceStartNs;
@@ -374,10 +390,14 @@ static int OpenRunDir(const char *dir, const char *inputPath) {
 
     info.program = program != NULL ? program + 1 : sArgv[0];
     info.rom = rom != NULL ? rom : port_rom_default_path();
-    info.time = time != NULL ? time : inputPath != NULL ? port_replay_time() : "host";
+    info.time = sEffectiveTime[0] != '\0' ? sEffectiveTime
+                : time != NULL            ? time
+                : inputPath != NULL       ? port_replay_time()
+                                          : "host";
     info.input = inputPath;
     info.inputFrames = port_replay_frames();
     info.frames = (uint32_t)sFrameLimit;
+    info.clock = port_replay_clock_pinned() ? "pinned" : "running";
     return port_run_dir_open(dir, port_app_option("run-screens"), port_present_screenshot, &info);
 }
 
@@ -422,6 +442,13 @@ static void AppFrame(void) {
     port_frame_time_end(PORT_FRAME_TIME_PRESENT, begin);
     // The game clock, and a replay's input in place of what the window took
     port_replay_vblank((uint32_t)sFrames);
+    if (port_record_active()) {
+        PbwInputState input = port_record_input();
+        if (!port_record_frame(sFrames, &input)) {
+            sRecordFailed = 1;
+            port_os_stop();
+        }
+    }
     if (port_run_dir_active()) {
         RunDirFrame();
     }
@@ -453,8 +480,10 @@ int main(int argc, char **argv) {
     const char *soundTrace;
     const char *frameTimes;
     const char *inputPath;
-    const uint64_t *seeds;
-    size_t seedCount;
+    const char *recordPath;
+    uint64_t recordSeeds[PBW_INPUT_MAX_SEEDS];
+    const uint64_t *seeds = NULL;
+    size_t seedCount = 0;
     const char *runDir;
     PortOsResult result;
     int status = 0;
@@ -513,7 +542,26 @@ int main(int argc, char **argv) {
         Usage();
         return EXIT_BAD_OPTIONS;
     }
+    recordPath = port_app_option("record");
+    inputPath = port_app_option("input");
+    runDir = port_app_option("run-dir");
     frameTimes = port_app_option("frame-times");
+    if (recordPath != NULL) {
+        const char *protectedPaths[] = { inputPath,
+                                         port_card_save_path(),
+                                         sScreenshotPath,
+                                         audioDump,
+                                         soundTrace,
+                                         frameTimes,
+                                         port_app_option("rom") != NULL ? port_app_option("rom")
+                                                                        : port_rom_default_path() };
+        if ((uint64_t)frames > PBW_INPUT_MAX_FRAME ||
+            !port_record_create(recordPath, protectedPaths, sizeof(protectedPaths) / sizeof(protectedPaths[0]),
+                                runDir)) {
+            fprintf(stderr, "port: --record: needs a new safe file and at most %u frames\n", PBW_INPUT_MAX_FRAME);
+            return EXIT_BAD_OPTIONS;
+        }
+    }
     if (frameTimes != NULL && (*frameTimes == '\0' || !port_frame_time_open(frameTimes))) {
         fprintf(stderr, "port: --frame-times needs a file it can write\n");
         Usage();
@@ -541,6 +589,42 @@ int main(int argc, char **argv) {
         // layer takes (port/app/replay.c checks it)
         seedCount = port_replay_seeds(&seeds);
         port_random_seed_give(seeds, seedCount);
+    }
+    if (recordPath != NULL) {
+        const char *fixed = port_app_option("fixed-time");
+        if (inputPath != NULL && seedCount == 0) {
+            fprintf(stderr, "port: --record with --input requires explicit seed lines\n");
+            return EXIT_BAD_OPTIONS;
+        }
+        if (fixed != NULL || inputPath != NULL) {
+            PortRtcTime now;
+            if (!port_rtc_set_fixed_time(fixed != NULL ? fixed : port_replay_time())) {
+                fprintf(stderr, "port: --record: effective time is invalid\n");
+                return EXIT_BAD_OPTIONS;
+            }
+            port_rtc_now(&now);
+            snprintf(sEffectiveTime, sizeof(sEffectiveTime), "%04d-%02d-%02d %02d:%02d:%02d", now.year, now.month,
+                     now.day, now.hour, now.minute, now.second);
+        } else {
+            PortRtcTime now;
+            port_rtc_now(&now);
+            snprintf(sEffectiveTime, sizeof(sEffectiveTime), "%04d-%02d-%02d %02d:%02d:%02d", now.year, now.month,
+                     now.day, now.hour, now.minute, now.second);
+            port_rtc_set_pinned(0);
+        }
+        if (!port_rtc_set_fixed_time(sEffectiveTime)) {
+            fprintf(stderr, "port: --record: effective time is invalid\n");
+            return EXIT_BAD_OPTIONS;
+        }
+        if (inputPath == NULL) {
+            seedCount = PBW_INPUT_MAX_SEEDS;
+            if (!port_record_random_seeds(recordSeeds, seedCount)) {
+                fprintf(stderr, "port: --record: cannot obtain host random seeds\n");
+                return EXIT_BAD_OPTIONS;
+            }
+            seeds = recordSeeds;
+            port_random_seed_give(seeds, seedCount);
+        }
     }
     runDir = port_app_option("run-dir");
     if ((runDir != NULL && *runDir == '\0') ||
@@ -608,6 +692,23 @@ int main(int argc, char **argv) {
     // The ROM before the game, so that its check (and the message when there is none) comes first; the CARD library
     // would open it at CARD_Init otherwise
     port_rom_boot();
+    if (recordPath != NULL) {
+        PbwInput header;
+        pbw_input_init(&header);
+        snprintf(header.version, sizeof(header.version), "%s", PORT_VERSION_NAME);
+        snprintf(header.time, sizeof(header.time), "%s", sEffectiveTime);
+        header.frames = PBW_INPUT_VIDEO_FRAMES;
+        header.clock = port_replay_clock_pinned() ? PBW_INPUT_CLOCK_PINNED : PBW_INPUT_CLOCK_RUNNING;
+        header.seedCount = seedCount;
+        memcpy(header.seeds, seeds, seedCount * sizeof(*seeds));
+        header.hasInitial = 1;
+        header.initial = port_record_input();
+        if (!port_record_start(&header)) {
+            port_run_dir_close(1);
+            return 1;
+        }
+        port_random_seed_on_exhaustion(RecordSeedExhausted);
+    }
     port_frame_time_start();
     result = port_os_run(NitroMain);
     switch (result) {
@@ -633,6 +734,10 @@ int main(int argc, char **argv) {
     }
     // --frame-times' file, written now that the run is over
     if (!port_frame_time_close()) {
+        status = 1;
+    }
+    port_random_seed_on_exhaustion(NULL);
+    if (!port_record_close() || sRecordFailed) {
         status = 1;
     }
     port_run_dir_close(status);

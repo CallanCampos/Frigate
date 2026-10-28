@@ -23,6 +23,9 @@ enable_testing()
 add_executable(port_pxi_tests
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/pxi/test_pxi.c"
     $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> ${port_gfx_objects} "${PORT_GEN}/stubs.c")
+target_sources(port_pxi_tests PRIVATE app/record.c app/replay.c tools/oracle/pbwinput.c)
+target_compile_definitions(port_pxi_tests PRIVATE "PORT_VERSION_NAME=\"${PORT_VERSION}\""
+    "PORT_RECORD_TOUCH_FILE=\"${CMAKE_CURRENT_BINARY_DIR}/record-touch.pbwinput\"")
 target_link_libraries(port_pxi_tests PRIVATE port_decomp_env SDL3::SDL3)
 target_include_directories(port_pxi_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/..")
 target_compile_options(port_pxi_tests PRIVATE -std=gnu11 -Wall -Wextra -Wno-unused-parameter)
@@ -33,7 +36,7 @@ endif()
 set(port_pxi_scenarios
     bus_ready_tags bus_unknown_tag bus_reply_when_enabled bus_pointer
     pm_battery_backlight pm_amp pm_sleep pm_power_off
-    tp_sampling tp_calibration tp_auto_sampling
+    tp_sampling tp_calibration tp_auto_sampling tp_recorded_release
     nvram_user_info nvram_read nvram_write
     rtc_fixed_time rtc_runs_with_clock rtc_pinned rtc_async rtc_host_time
     reset_command ctrdg_empty mic_silence

@@ -4,9 +4,17 @@
 // after the last, and every one is recorded with whether it was given, as the run directory's run.txt reports them.
 // More seeds than an input file can hold are refused. It prints each failure and returns nonzero if there was one.
 #include "hal/gfl/random_seed.h"
+#include <setjmp.h>
 #include <stdio.h>
+#include <string.h>
 
 static int sFailed;
+static jmp_buf sEscape;
+static void Exhausted(void) {
+    longjmp(sEscape, 1);
+}
+static void ReturningHandler(void) {
+}
 
 #define CHECK(condition)                                                                                               \
     do {                                                                                                               \
@@ -16,7 +24,18 @@ static int sFailed;
         }                                                                                                              \
     } while (0)
 
-int main(void) {
+int main(int argc, char **argv) {
+    if (argc > 1) {
+        uint64_t supplied[64] = { 0 };
+        size_t count = strcmp(argv[1], "strict64") == 0 ? 64 : 2;
+        CHECK(port_random_seed_give(supplied, count));
+        port_random_seed_on_exhaustion(ReturningHandler);
+        for (size_t i = 0; i < count; i++) {
+            CHECK(port_random_seed_take(0xdeadbeef) == 0);
+        }
+        port_random_seed_take(0xdeadbeef);
+        return 99; // A returning handler must still never deliver fallback to its caller.
+    }
     // The first is the seed Black 2 builds at start-up on melonDS, from power-on with the default clock
     static const uint64_t given[] = { 0xea56a175a2fffc8aull, 0x0000000100000001ull };
     uint64_t tooMany[PORT_RANDOM_SEED_MAX_GIVEN + 1] = { 0 };
@@ -51,6 +70,15 @@ int main(void) {
           seed == PORT_RANDOM_SEED_MAX_KEPT - 1 && !fromFile);
     CHECK(!port_random_seed_at(PORT_RANDOM_SEED_MAX_KEPT, &seed, &fromFile));
 
+    port_random_seed_on_exhaustion(Exhausted);
+    size_t before = port_random_seed_count();
+    if (setjmp(sEscape) == 0) {
+        port_random_seed_take(0xdeadbeef);
+        CHECK(0); // Exhaustion must leave before a fallback value is returned or recorded.
+    }
+    CHECK(port_random_seed_count() == before);
+    port_random_seed_on_exhaustion(NULL);
+    CHECK(port_random_seed_take(42) == 42);
     if (sFailed) {
         return 1;
     }

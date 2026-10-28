@@ -26,6 +26,12 @@ int port_random_seed_give(const uint64_t *seeds, size_t count);
 // The seed the game uses now, where buildSeed made `built`: the next given seed while any is left, else `built`
 uint64_t port_random_seed_take(uint64_t built);
 
+// Recording-only fail-closed policy: call before an unsupplied seed could reach the game. Handler must not return;
+// returning handlers still terminate with status 1. NULL restores ordinary fallback behavior.
+void port_random_seed_on_exhaustion(void (*handler)(void));
+// Check before buildSeed touches the game context; take checks again for other callers.
+void port_random_seed_check(void);
+
 // How many seeds the game has built so far
 size_t port_random_seed_count(void);
 

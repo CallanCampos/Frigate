@@ -318,6 +318,26 @@ int pbw_input_parse(PbwInput *input, const char *text, size_t length, char *erro
             SetError(error, errorSize, line, "a NUL byte");
             goto fail;
         }
+        // New explicit-initial streams commit rows with a newline. Ignore only an unterminated numeric FRAME
+        // tail; never recover headers or malformed newline-terminated records.
+        if (input->hasInitial && newline == NULL) {
+            size_t first = 0;
+            while (first < lineLength && (start[first] == ' ' || start[first] == '\t'))
+                first++;
+            size_t digit = first;
+            uint64_t framePrefix = 0;
+            while (digit < lineLength && start[digit] >= '0' && start[digit] <= '9' &&
+                   framePrefix <= PBW_INPUT_MAX_FRAME) {
+                framePrefix = framePrefix * 10 + (unsigned)(start[digit++] - '0');
+            }
+            if (digit > first && framePrefix > 0 && framePrefix <= PBW_INPUT_MAX_FRAME &&
+                (digit == lineLength || start[digit] == ' ' || start[digit] == '\t'))
+                break;
+            if (first < lineLength) {
+                SetError(error, errorSize, line, "unterminated header in explicit-initial stream");
+                goto fail;
+            }
+        }
         count = Tokenize(start, lineLength, tokens);
         if (count < 0) {
             SetError(error, errorSize, line, "a word longer than %d characters", MAX_TOKEN - 1);
@@ -386,6 +406,16 @@ int pbw_input_parse(PbwInput *input, const char *text, size_t length, char *erro
             }
             input->clock = strcmp(tokens[1], "pinned") == 0 ? PBW_INPUT_CLOCK_PINNED : PBW_INPUT_CLOCK_RUNNING;
             sawClock = 1;
+        } else if (strcmp(tokens[0], "initial") == 0) {
+            if (lastFrame != 0 || input->hasInitial || newline == NULL || count != 3) {
+                SetError(error, errorSize, line, "one complete initial BUTTONS TOUCH header before frames");
+                goto fail;
+            }
+            if (!ParseButtons(tokens[1], &input->initial, error, errorSize, line) ||
+                !ParseTouch(tokens[2], &input->initial, error, errorSize, line)) {
+                goto fail;
+            }
+            input->hasInitial = 1;
         } else if (strcmp(tokens[0], "seed") == 0) {
             if (input->count != 0) {
                 SetError(error, errorSize, line, "\"seed\" lines come before the first frame");
@@ -405,6 +435,11 @@ int pbw_input_parse(PbwInput *input, const char *text, size_t length, char *erro
             PbwInputState state = { 0 };
             uint32_t frame;
 
+            // Explicit-initial files commit frame rows with a newline. A killed stream may leave only a numeric
+            // frame/touch/lid fragment at EOF; headers and newline-terminated malformed rows still fail normally.
+            if (input->hasInitial && newline == NULL && tokens[0][0] >= '0' && tokens[0][0] <= '9') {
+                break;
+            }
             if (!ParseNumber(tokens[0], PBW_INPUT_MAX_FRAME, &frame) || frame == 0) {
                 SetError(error, errorSize, line, "\"%s\" is neither a directive nor a frame from 1 to %u", tokens[0],
                          PBW_INPUT_MAX_FRAME);
@@ -491,6 +526,8 @@ PbwInputState pbw_input_state(const PbwInput *input, uint32_t frame) {
     size_t low = 0;
     size_t high = input->count;
 
+    if (input->hasInitial)
+        none = input->initial;
     // The first change after frame; the one before it holds
     while (low < high) {
         size_t middle = low + (high - low) / 2;
@@ -584,11 +621,18 @@ int pbw_input_format_state(const PbwInputState *state, char *out, size_t size) {
     return written >= 0 && (size_t)written < size - used;
 }
 
-int pbw_input_write(const PbwInput *input, FILE *file) {
+int pbw_input_write_header(const PbwInput *input, FILE *file) {
     size_t i;
 
     if (fprintf(file, "pbwinput 1\n") < 0) {
         return 0;
+    }
+    if (input->hasInitial) {
+        char columns[96];
+        if (!pbw_input_format_state(&input->initial, columns, sizeof(columns)) ||
+            fprintf(file, "initial %s\n", columns) < 0) {
+            return 0;
+        }
     }
     if (input->time[0] != '\0' && fprintf(file, "time %s\n", input->time) < 0) {
         return 0;
@@ -600,7 +644,8 @@ int pbw_input_write(const PbwInput *input, FILE *file) {
         return 0;
     }
     // A running clock is the default, which a file written before the line existed has too
-    if (input->clock == PBW_INPUT_CLOCK_PINNED && fprintf(file, "clock pinned\n") < 0) {
+    if ((input->clock == PBW_INPUT_CLOCK_PINNED || input->hasInitial) &&
+        fprintf(file, "clock %s\n", input->clock == PBW_INPUT_CLOCK_PINNED ? "pinned" : "running") < 0) {
         return 0;
     }
     for (i = 0; i < input->seedCount; i++) {
@@ -608,13 +653,26 @@ int pbw_input_write(const PbwInput *input, FILE *file) {
             return 0;
         }
     }
-    for (i = 0; i < input->count; i++) {
-        char columns[96];
+    return !ferror(file);
+}
 
-        if (!pbw_input_format_state(&input->changes[i].state, columns, sizeof(columns)) ||
-            fprintf(file, "%u %s\n", input->changes[i].frame, columns) < 0) {
+int pbw_input_write_change(FILE *file, uint32_t frame, const PbwInputState *state) {
+    char columns[96];
+    return frame != 0 && frame <= PBW_INPUT_MAX_FRAME && pbw_input_format_state(state, columns, sizeof(columns)) &&
+           fprintf(file, "%u %s\n", frame, columns) >= 0;
+}
+
+int pbw_input_write(const PbwInput *input, FILE *file) {
+    size_t i;
+    if (!pbw_input_write_header(input, file))
+        return 0;
+    for (i = 0; i < input->count; i++) {
+        if (!pbw_input_write_change(file, input->changes[i].frame, &input->changes[i].state))
             return 0;
-        }
     }
     return fflush(file) == 0;
+}
+
+PbwInputState pbw_input_initial_state(const PbwInput *input) {
+    return input->hasInitial ? input->initial : pbw_input_state(input, 1);
 }

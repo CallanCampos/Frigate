@@ -46,6 +46,7 @@ typedef struct PortRunDirInfo {
     const char *input;       // the input file
     const char *inputFrames; // "game" or "video"
     uint32_t frames;         // the frames asked for (--frames), 0 for no limit
+    const char *clock;       // effective running/pinned mode
 } PortRunDirInfo;
 
 // Creates dir (one level) when it doesn't exist and opens frames.tsv there; the PNG files of the frames of screens

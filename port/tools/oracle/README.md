@@ -131,7 +131,8 @@ from the game's `main()`. **Frame N ends with the N-th VBlank** (the start of li
 - **Input** is applied at a VBlank too, so it is what the game's main loop reads after it (`GCTX_HIDUpdate` is the first
   thing the loop does), and an input file's frames are **game frames** unless it says otherwise ([below](#input-files)):
   at each VBlank the oracle applies the state of the game frame whose pass reads the keys next, from GFL's frame count
-  (`frames.tsv`'s `game_frame`). The state of frame 1 also holds from power-on.
+  (`frames.tsv`'s `game_frame`). Legacy files also hold frame 1 from power-on; an explicit `initial` header supplies
+  a separate preboot state.
 
 ### Aligning the oracle with the port
 
@@ -238,9 +239,17 @@ seed 0xea56a175a2fffc8a       # optional, repeated: the random seeds the DS buil
 ```
 
 - The first line that isn't blank or a comment is `pbwinput 1`, the format's version.
-- `time`, `version`, `frames` and `clock` come before the first frame line, once each, and so do the `seed` lines.
+- `time`, `version`, `frames`, `clock` and optional `initial` come before the first frame line, once each;
+  `seed` lines also precede the first frame.
   `time` is `YYYY-MM-DD HH:MM:SS` from 2000 to 2099; the oracle's `--time` overrides it. `version` is checked against
   the ROM's game code (`IREO` for `b2_us`, `IRDO` for `w2_us`).
+- `initial BUTTONS TOUCH` supplies the state before the first VBlank, and holds until the first explicit frame row.
+  Unlike frame rows, both columns are required (`initial - -` is released input). Without it, legacy playback still
+  applies frame 1 at power-on. New readers accept old files unchanged; older readers without this extension cannot
+  read recordings that use it. Both native playback and the test-only oracle use the same initial-state getter.
+  In a file with `initial`, **frame rows commit only with a newline**: an unterminated final numeric frame row is
+  discarded as an uncommitted crash tail. This also applies to manually edited files using `initial`. Headers must
+  be complete; malformed newline-terminated rows remain errors. Legacy EOF-without-newline behavior is unchanged.
 - `clock` says whether the real-time clock runs on from `time`: **`running`**, the default, as a console's does, or
   **`pinned`**, at `time` for the whole run. A running clock moves with each program's video frames, and the DS takes
   more of them than the port to reach the same count (its movies, its loads), so a screen that shows the clock, such as
@@ -250,7 +259,8 @@ seed 0xea56a175a2fffc8a       # optional, repeated: the random seeds the DS buil
   melonDS's clock chip timer, which counts the seconds on, and the port's clock stays at its fixed time
   (`port/hal/rtc/rtc7.c`); the game never uses the chip's interrupts, which the timer also raises. Only the date and
   time stop: the play time counts the CPU's ticks (`src/system/playtime_ctrl.c`), and goes on as before.
-- `seed` lines give the **random seeds the DS built**, in the order it built them, each a 64-bit number in
+- `seed` lines supply explicit random seeds in request order: oracle fixtures use **seeds the DS built**, and live
+  recordings use host-OS seeds. Each is a 64-bit number in
   hexadecimal (`0x` and 1 to 16 digits), up to 64 of them. The game builds a seed from the console's entropy at
   start-up, for GFL's random numbers, which the field draws from (a townsperson's walk, a wild Pokémon), and at each
   battle's start, for the battle's (its damage rolls, critical hits, a Poké Ball's shakes): `buildSeed` in
@@ -258,8 +268,8 @@ seed 0xea56a175a2fffc8a       # optional, repeated: the random seeds the DS buil
   engine's status as the call finds them, and 20 bytes of whatever the DS's stack held. A host can't have any of
   those as the DS has them (its CPU takes no time, and its stack holds other things), so the port builds other seeds,
   and every random outcome differs from the DS's (port/docs/decomp-findings.md). The port's game takes the file's
-  seeds in place of the ones it builds, the n-th line for the n-th seed, and builds its own after the last
-  (port/hal/gfl/random_seed.h); its run directory's `run.txt` lists the seeds it used. melonDS builds the DS's own, so
+  seeds in place of the ones it builds, the n-th line for the n-th seed, and normally builds its own after the last
+  (port/hal/gfl/random_seed.h); recording instead stops before an unsupplied seed can reach the game. Its run directory's `run.txt` lists the seeds it used. melonDS builds the DS's own, so
   the oracle reads the lines only as part of the file. With the DS's seeds the two programs draw the same random
   numbers, and a battle or a wild encounter plays as the DS plays it. A file's seeds belong to its start: a DS that
   starts from another save, or reaches a battle by other presses, builds other seeds. [Random seeds](#random-seeds)
@@ -268,7 +278,7 @@ seed 0xea56a175a2fffc8a       # optional, repeated: the random seeds the DS buil
   gives both programs the same input at the same moment of the game ([PLAN.md §6](../../docs/PLAN.md#6-verification)):
   the DS drops frames under load and its start-up takes 241 frames, and the port does neither. Game frame N is the pass
   after GFL's frame count (`sVBlankCount`) has gone up N times since power-on: the pass during which the count is N,
-  until a soft reset restarts the count (the steps go on counting). The first pass, game frame 0, has frame 1's state,
+  until a soft reset restarts the count (the steps go on counting). The first pass, game frame 0, has frame 1's state unless `initial` supplies a separate preboot state,
   as everything before it does. A video frame the console sleeps through counts as one game frame, so that a later line
   can open the lid. **`video`** counts VBlanks since power-on (on the port, since `main()`), for the boot itself or a
   test of timing. `pbwinput.h`'s `pbw_input_frame_at_vblank` and `pbw_input_frame_asleep` say which frame's state a
@@ -276,64 +286,61 @@ seed 0xea56a175a2fffc8a       # optional, repeated: the random seeds the DS buil
   In a run, `frames.tsv`'s `game_frame` is the number to write for a state the game reads right after that frame's
   picture.
 - A frame line gives the **whole state from that frame on**, until the next frame line: not a change of state. Frames
-  count from 1 and increase strictly. Before the first frame line nothing is held, the lid is open and the pen is up.
+  count from 1 and increase strictly. Before the first frame line, explicit `initial` holds when present; otherwise
+  nothing is held, the lid is open and the pen is up.
 - BUTTONS is `-` for none, or names joined by `+`, in any case: `A B SELECT START RIGHT LEFT UP DOWN R L X Y DEBUG`,
   and `LID` for the lid closed. The bits are NitroSDK's `PAD_*` values, as `port_input.h`'s `PORT_INPUT_*`.
 - TOUCH is `-` (the pen up, as when the column is left out) or `X,Y`, a bottom-screen pixel: X from 0 to 255, Y from 0
   to 191.
 - Columns are separated by spaces or tabs; lines may end with CR LF. Anything else is an error that names the line.
 
-### Recordings (proposed; not implemented)
+### Recordings
 
-`--record FILE` is not an available option yet. This is the contract for the implementation tracked in issue #38.
-A recording targets reproducible native input on a compatible build, with the same ROM and starting save directory.
-It does not promise that a CPU-time-dependent trainer battle follows the DS's course (ADR 0023), or that unrelated
-builds reproduce the same game behavior.
+Use `--record FILE` to capture effective native input, or `--input INPUT --record FILE` to normalize a replay into
+video-frame input. Supply the same compatible build, ROM and starting save directory when playing the result with
+`--input FILE`; the recorder does not copy a starting save. It does not promise the DS's CPU-dependent trainer-AI
+course (ADR 0023), equality across unrelated builds, or replay-to-live handoff.
 
 ```
 pbwinput 1
-# Recorded by Frigate: frigate-black2 <commit>, ROM <the dump's SHA-1>
+initial - -
+time 2026-10-25 14:03:27
 version b2_us
 frames video
-time 2026-10-25 14:03:27      # the effective RTC at power-on
 clock running
-seed 0x...                    # bounded seed list, before the first frame
+seed 0x...                    # all declared seeds precede frame rows
 # FRAME BUTTONS [TOUCH]
 ...
 ```
 
-- **Effective input, on video frames.** At the VBlank hook, capture the held buttons, lid and pen state after window
-  input/replay application, at the same boundary playback uses before ARM7 touch sampling. Write the corresponding
-  monotonically increasing video-frame number. Several VBlanks can share one game frame; they remain distinct in
-  this file. In particular, a pen down for one VBlank and released for the next must remain two samples. Do not
-  coalesce a game frame's touches into an invented held touch: the game's latest-sample read can observe a release.
-  Emit state changes only, flush each complete line, and retain the initial input state needed before the first read.
-  A killed process leaves a parseable prefix of complete samples; clean exit flushes any remaining complete sample.
-- **Effective clock.** Capture the RTC actually selected for the recorded run, including an explicit `--fixed-time`
-  override. Live recording captures the host's local time once, then makes the RTC follow virtual time, as
-  `--fixed-time` already does. It can fall behind wall time while paused or slow, and advance faster during fast play.
-  Record `clock running` or `clock pinned` from the effective mode, not a discarded input-file default. Ordinary
-  non-recorded live play keeps its existing host-clock behavior.
-- **Bounded seeds.** For live recording, draw 64 seeds from the host's random source before starting the game, write
-  them and supply them through `port_random_seed_give`. For recording a replay, preserve its explicitly declared
-  seed list; reject a replay with no declared seeds before starting (option error, status 2). Before any request past
-  the declared list (the 65th for a live recording), flush the readable prefix and stop with status 1 and a diagnostic,
-  before an unrecorded fallback seed reaches the game. Count seed requests, not battles: startup also consumes one.
-  The present `buildSeed` fallback combines timing and other entropy, so no cross-machine guarantee is made for it.
-  `run.txt` must identify the supplied seeds; an unlimited recording needs a separately reviewed format/seed design.
-- **With `--input FILE`.** Record the effective states after playback, normalized into `frames video` even when the
-  input uses `frames game`. Preserve the explicit seeds and the effective RTC/mode described above. Both input frame
-  domains and RTC overrides need round-trip tests; copying header text alone does not establish equivalent playback.
-  Replay-to-live handoff is a later change, not part of this proposal.
-- **Errors.** A destination that cannot be created is an option error (status 2) before game startup. A write/flush
-  error or seed exhaustion stops the run with status 1 and a diagnostic; never silently continue an incomplete
-  recording. Do not overwrite the input file or a save file when selecting the output destination.
+- **Effective input and initial state.** The recorder samples buttons, lid and touch after window/replay application
+  at the VBlank boundary, before ARM7 touch sampling. Each changed state uses the increasing video-frame number,
+  even if several video frames share one game pass. A pen release remains distinct from the preceding touch.
+  The `initial` header separately preserves the preboot state; a different VBlank-1 state is written as frame 1.
+- **Effective clock.** Explicit `--fixed-time` takes precedence over an input file's time/default. Live recording
+  captures host local time once, then runs from it on the virtual clock. Input running/pinned mode is preserved,
+  including with a time override. Both the recording and `run.txt` identify the effective clock. Ordinary live play
+  without `--record` keeps its host-driven clock.
+- **Bounded explicit seeds.** Live recording obtains 64 seeds from the host OS before startup, flushes them into the
+  header and supplies them to the game. With `--input`, its explicit list is preserved; an empty list is rejected
+  before startup (status 2). A request beyond the list (65th for live capture) stops with status 1 before the original
+  fallback builder touches the game context. Count seed requests, not battles: startup consumes one too. No seed is
+  silently added and no fallback is recorded after the event. An unlimited format needs a separate design.
+- **Complete prefixes and errors.** Output is streamed with bounded session state, flushing every complete change.
+  Detected write/flush failure attempts rollback to the last committed offset and stops with status 1 even if rollback
+  succeeds; close errors also fail. With `initial`, an interrupted final numeric frame row without a newline is
+  ignored by playback, retaining complete samples. Killing the process during its header is not claimed recoverable.
+  A session beyond frame 100,000,000 stops before wrap. Existing output files, input/save/temporary-save aliases and
+  output paths inside `--run-dir` are refused before startup (status 2); use a fresh file.
+- **No handoff.** With `--input`, recording observes playback, including its held final state. The last change is not
+  an end-of-session marker. Window input does not take over when it is reached.
 
-Acceptance tests for the later implementation: both-version seeded record/replay routes compare frame/state and save
-hashes; one-VBlank touch transitions in a two-VBlank game pass preserve what the actual touch API returns; game/video
-input domains and effective RTC overrides round-trip; initial/unchanged/lid states, seed-list rejection/exhaustion,
-clean exit, crash prefixes, unwritable paths and mid-run write failures have focused regressions. Those tests and the
-option itself are not added by this documentation change. Issue #38 remains open until they are implemented and pass.
+The focused units cover initial/header-only playback, every numeric/touch/lid tail truncation, errors, actual SDK
+latest-touch sampling across repeated game passes, seed exhaustion and file lifecycle. The actual-game acceptance
+harness is [tests/replay/check_recording.py](../../tests/replay/check_recording.py): it compares record/replay frame
+records, every required RNG/NNS payload, supplied-seed accounting and saved images in isolated directories. See
+[its guide](../../tests/replay/README.md) for longer story/save runs and [ADR 0027](../../docs/adr/0027-recorded-input-streams.md)
+for the format and failure boundaries. Results belong in STATUS/PR evidence, not an implied whole-game guarantee.
 
 ## Run directories
 

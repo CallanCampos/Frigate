@@ -29,7 +29,7 @@ const char *port_replay_frames(void);
 // (port/hal/gfl/random_seed.h): how many, and where they are; 0 without a file or without the lines
 size_t port_replay_seeds(const uint64_t **seeds);
 
-// Gives the game frame 1's state, which holds from power-on; before the game starts
+// Gives the explicit initial header state before game startup; legacy files use frame 1 at power-on.
 void port_replay_start(void);
 // At each VBlank, before the interrupt is taken (a frame hook), with or without a file: moves the game clock on and,
 // with a file, gives the game the state of the frame whose pass reads the keys next. videoFrame is the VBlank's number

@@ -77,7 +77,7 @@ static void Apply(const PbwInputState *state) {
 }
 
 void port_replay_start(void) {
-    PbwInputState state = pbw_input_state(&sInput, 1);
+    PbwInputState state = pbw_input_initial_state(&sInput);
 
     Apply(&state);
 }

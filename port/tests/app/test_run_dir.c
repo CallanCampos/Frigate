@@ -211,6 +211,7 @@ static void TestRun(void) {
                                      "frames: 4\n"
                                      "completed: -\n"
                                      "time: 2012-10-07 12:00:00\n"
+                                     "clock: running\n"
                                      "input: -\n"
                                      "input_frames: -\n"
                                      "counter: sVBlankCount\n"
@@ -221,12 +222,13 @@ static void TestRun(void) {
                                       "frames: 4\n"
                                       "completed: 4\n"
                                       "time: 2012-10-07 12:00:00\n"
+                                      "clock: running\n"
                                       "input: -\n"
                                       "input_frames: -\n"
                                       "counter: sVBlankCount\n"
                                       "status: 0\n"
                                       "seeds: 0\n";
-    const PortRunDirInfo info = { "frigate-black2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 4 };
+    const PortRunDirInfo info = { "frigate-black2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 4, "running" };
     const PortRunDirFrame frames[] = { { 1, 1, 0, 1 }, { 2, 2, 1, 2 }, { 3, 3, 1, 2 }, { 4, 4, 2, 3 } };
     char expected[sizeof(tsvHead) + sizeof(rows)];
     char wanted[600];
@@ -341,8 +343,8 @@ static int DumpRejected(const char *spec, const char *message) {
 }
 
 static void TestDumps(void) {
-    const PortRunDirInfo info = { "frigate-black2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 4 };
-    const PortRunDirInfo unlimited = { "frigate-black2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 0 };
+    const PortRunDirInfo info = { "frigate-black2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 4, "running" };
+    const PortRunDirInfo unlimited = { "frigate-black2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 0, "running" };
     char error[256];
     char expected[600];
     char *text;
