@@ -38,17 +38,17 @@ typedef struct {
     HiddenCheckFunc check;
 } HiddenEventSpec;
 
-extern const HiddenEventSpec HIDEN_EVENTS_NORMAL[11];
-extern const HiddenEventSpec HIDEN_EVENTS_RUINS[11];
+extern const HiddenEventSpec HM_EVENTS_NORMAL[11];
+extern const HiddenEventSpec HM_EVENTS_RUINS[11];
 
 void CalcPlayerActionPossibilities(Field *field, PlayerActionPossibilities *action);
-HiddenCheckFunc GetHidenEventCheckFunc(PlayerActionPossibilities *context, u32 kind);
-HiddenCtorFunc GetHidenEventCtorFunc(PlayerActionPossibilities *context, u32 kind);
-u32 CheckAllowHidenEvent(u32 kind, PlayerActionPossibilities *context);
+HiddenCheckFunc GetHMEventCheckFunc(PlayerActionPossibilities *context, u32 kind);
+HiddenCtorFunc GetHMEventCtorFunc(PlayerActionPossibilities *context, u32 kind);
+u32 CheckAllowHMEvent(u32 kind, PlayerActionPossibilities *context);
 void HiddenEventArgs_Set(HiddenEventArgs *args, u16 partySlot, u16 kind, u32 value);
-GameEvent *CreateHidenEvent(u32 kind, HiddenEventArgs *args, PlayerActionPossibilities *context);
-BOOL HidenEvent_CheckPairFlag(PlayerActionPossibilities *context);
-u32 HidenEvent_CheckContextFlag(PlayerActionPossibilities *context, u32 value);
+GameEvent *CreateHMEvent(u32 kind, HiddenEventArgs *args, PlayerActionPossibilities *context);
+BOOL HMEvent_CheckPairFlag(PlayerActionPossibilities *context);
+u32 HMEvent_CheckContextFlag(PlayerActionPossibilities *context, u32 value);
 BOOL HiddenArea_ContainsUnlessFlag(const HiddenArea *area, u16 x, u16 z, u16 flag, Field *field);
 void HiddenEventData_Init(HiddenEventData *data, HiddenEventArgs *param, PlayerActionPossibilities *context);
 u32 EventCutCall_Check(PlayerActionPossibilities *context);

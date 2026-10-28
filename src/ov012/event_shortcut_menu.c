@@ -212,7 +212,7 @@ GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *sta
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         CalcPlayerActionPossibilities(work->field, &possibilities);
         HiddenEventArgs_Set(&args, work->input->partySlot, work->input->eventId, work->input->eventValue);
-        next = CreateHidenEvent(work->input->eventId, &args, &possibilities);
+        next = CreateHMEvent(work->input->eventId, &args, &possibilities);
         if (next != NULL) {
             GameEvent_ChainNext(event, next);
         }
@@ -318,7 +318,7 @@ GameEventReturnCode EventShortcutCallDirect_Callback(GameEvent *event, u32 *stat
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         CalcPlayerActionPossibilities(work->field, &possibilities);
         HiddenEventArgs_Set(&args, work->input->partySlot, work->input->eventId, work->input->eventValue);
-        next = CreateHidenEvent(work->input->eventId, &args, &possibilities);
+        next = CreateHMEvent(work->input->eventId, &args, &possibilities);
         if (next != NULL) {
             GameEvent_ChainNext(event, next);
         }

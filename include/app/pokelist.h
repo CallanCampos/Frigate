@@ -224,7 +224,7 @@ void PokeList_Init3D(PokeListWork *wk);
 void PokeList_ReleaseBG0(PokeListWork *wk);
 void PokeList_Exit3D(PokeListWork *wk);
 void PokeList_ShowMessage(PokeListWork *wk, u32 msgId, BOOL waitInput, void (*doneFunc)(PokeListWork *wk));
-u32 PokeList_GetHidenResult(PartyPkm *pkm, u8 slot);
+u32 PokeList_GetHMResult(PartyPkm *pkm, u8 slot);
 BOOL PokeList_IsBattle(PokeListWork *wk);
 u32 PokeList_CheckLearnMove(PokeListWork *wk, PartyPkm *pkm, u8 pos);
 BOOL PokeList_CanEvolveWithItem(PokeListWork *wk, PartyPkm *pkm, u16 item);

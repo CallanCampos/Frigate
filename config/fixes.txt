@@ -996,7 +996,7 @@ overlays/ov012 0x02158c68 overlay_id 210
 overlays/ov012 0x02158c70 reloc_module overlay(211)
 overlays/ov012 0x02158c82 reloc_module overlay(211)
 overlays/ov012 0x02159230 section_end src/ov012/field_encount_st.c:.text
-overlays/ov012 0x02159230 section_start src/ov012/hiden_event.c:.text
+overlays/ov012 0x02159230 section_start src/ov012/hm_event.c:.text
 overlays/ov012 0x0215970c reloc_module overlay(36)
 overlays/ov012 0x0215a44c overlay_id 265
 overlays/ov012 0x0215a454 overlay_id 266
@@ -1256,7 +1256,7 @@ overlays/ov012 0x0216ca04 add_section src/ov012/scrcmd_pokemon.c:.rodata:0x30
 overlays/ov012 0x0216ca1c remove_symbol
 overlays/ov012 0x0216ca34 add_section src/ov012/field_encount_st.c:.rodata:0x40
 overlays/ov012 0x0216ca34 add_data sRoamingZoneGroups
-overlays/ov012 0x0216ca74 section_start src/ov012/hiden_event.c:.rodata
+overlays/ov012 0x0216ca74 section_start src/ov012/hm_event.c:.rodata
 overlays/ov012 0x0216ca74 add_data data_ov012_0216ca74
 overlays/ov012 0x0216cb74 add_section src/ov012/event_field_menu.c:.rodata:0x24
 overlays/ov012 0x0216cb98 add_section src/ov012/event_field_proclink.c:.rodata:0x168

@@ -1,5 +1,5 @@
 #include "types.h"
-#include "app/dpc_main.h"
+#include "app/hall_of_fame_pc_main.h"
 #include "constants/arc.h"
 #include "constants/text_banks.h"
 #include "gfl/arc.h"
@@ -25,24 +25,24 @@
 // The Hall of Fame PC's set-up: the display, the palette fade of the Pokémon, the text and the teams. The ROM doesn't
 // name this file; the name is a guess, after box2_main.c
 
-static void DpcMain_VBlank(TCB *tcb, void *data);
+static void HallOfFamePCMain_VBlank(TCB *tcb, void *data);
 
-static const BGSysVRAMConfig sDpcMainVramBanks = {
+static const BGSysVRAMConfig sHallOfFamePCMainVramBanks = {
     GX_VRAM_BG_128_A,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
     GX_VRAM_OBJ_128_B, GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_128_D,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
     GX_VRAM_TEX_NONE,  GX_VRAM_TEXPLTT_NONE,    GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_128K,
 };
 
-void DpcMain_InitVBlank(DendouPCWork *wk) {
-    wk->vblankTask = GFL_VBlankTCBAdd(DpcMain_VBlank, wk, 0);
+void HallOfFamePCMain_InitVBlank(HallOfFamePCWork *wk) {
+    wk->vblankTask = GFL_VBlankTCBAdd(HallOfFamePCMain_VBlank, wk, 0);
 }
 
-void DpcMain_ExitVBlank(DendouPCWork *wk) {
+void HallOfFamePCMain_ExitVBlank(HallOfFamePCWork *wk) {
     GFL_TCBRemove(wk->vblankTask);
 }
 
-static void DpcMain_VBlank(TCB *tcb, void *data) {
-    DendouPCWork *wk = data;
+static void HallOfFamePCMain_VBlank(TCB *tcb, void *data) {
+    HallOfFamePCWork *wk = data;
 
     GFL_BGSysUpdate();
     ClActSys_VBlank();
@@ -50,17 +50,17 @@ static void DpcMain_VBlank(TCB *tcb, void *data) {
     OS_SetIrqCheckFlag(OS_IE_V_BLANK);
 }
 
-void DpcMain_InitVram(void) {
+void HallOfFamePCMain_InitVram(void) {
     GFL_BGSysInitVRAM(GX_VRAM_NONE);
-    GFL_BGSysSetVRAMBanks(&sDpcMainVramBanks);
+    GFL_BGSysSetVRAMBanks(&sHallOfFamePCMainVramBanks);
 }
 
-const BGSysVRAMConfig *DpcMain_GetVramBanks(void) {
-    return &sDpcMainVramBanks;
+const BGSysVRAMConfig *HallOfFamePCMain_GetVramBanks(void) {
+    return &sHallOfFamePCMainVramBanks;
 }
 
-void DpcMain_InitBg(void) {
-    GFL_BGSysCreate(HEAPID_DENDOU_PC);
+void HallOfFamePCMain_InitBg(void) {
+    GFL_BGSysCreate(HEAPID_HALL_OF_FAME_PC);
 
     {
         BGSysLCDConfig config = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_2D };
@@ -183,7 +183,7 @@ void DpcMain_InitBg(void) {
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1, TRUE);
 }
 
-void DpcMain_ExitBg(void) {
+void HallOfFamePCMain_ExitBg(void) {
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3, FALSE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1, FALSE);
     GFL_BGSysReleaseBG(5);
@@ -195,37 +195,37 @@ void DpcMain_ExitBg(void) {
     GFL_BGSysFree();
 }
 
-void DpcMain_LoadBgGraphic(void) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_DENDOU_PC, HEAPID_TAIL(HEAPID_DENDOU_PC));
+void HallOfFamePCMain_LoadBgGraphic(void) {
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_DENDOU_PC, HEAPID_TAIL(HEAPID_HALL_OF_FAME_PC));
 
-    GFL_G2DIOLoadArcNCLRDefault(arc, 1, PALTYPE_MAIN_BG, 0, 0x80, HEAPID_DENDOU_PC);
-    GFL_G2DIOLoadArcNCLRDefault(arc, 6, PALTYPE_SUB_BG, 0, 0x40, HEAPID_DENDOU_PC);
-    GFL_BGSysLoadArcNCGRStatic(arc, 0, 0, 0, 0, TRUE, HEAPID_DENDOU_PC);
-    GFL_BGSysLoadArcNCGRStatic(arc, 5, 4, 0, 0, TRUE, HEAPID_DENDOU_PC);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, 2, 0, 0, 0, TRUE, HEAPID_DENDOU_PC);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, 3, 1, 0, 0, TRUE, HEAPID_DENDOU_PC);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, 4, 2, 0, 0, TRUE, HEAPID_DENDOU_PC);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, 7, 4, 0, 0, TRUE, HEAPID_DENDOU_PC);
+    GFL_G2DIOLoadArcNCLRDefault(arc, 1, PALTYPE_MAIN_BG, 0, 0x80, HEAPID_HALL_OF_FAME_PC);
+    GFL_G2DIOLoadArcNCLRDefault(arc, 6, PALTYPE_SUB_BG, 0, 0x40, HEAPID_HALL_OF_FAME_PC);
+    GFL_BGSysLoadArcNCGRStatic(arc, 0, 0, 0, 0, TRUE, HEAPID_HALL_OF_FAME_PC);
+    GFL_BGSysLoadArcNCGRStatic(arc, 5, 4, 0, 0, TRUE, HEAPID_HALL_OF_FAME_PC);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, 2, 0, 0, 0, TRUE, HEAPID_HALL_OF_FAME_PC);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, 3, 1, 0, 0, TRUE, HEAPID_HALL_OF_FAME_PC);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, 4, 2, 0, 0, TRUE, HEAPID_HALL_OF_FAME_PC);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, 7, 4, 0, 0, TRUE, HEAPID_HALL_OF_FAME_PC);
     GFL_ArcToolFree(arc);
 
     // The title's window takes the bottom rows of the background's screen
     GFL_BGSysLoadScrAreaAll(3, (u16 *)GFL_BGSysIsScrHeapExists(0) + 21 * 32, 0, 21, 32, 3);
 
-    GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, PALTYPE_MAIN_BG, 15 * 0x20, 0x20, HEAPID_DENDOU_PC);
-    GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, PALTYPE_SUB_BG, 15 * 0x20, 0x20, HEAPID_DENDOU_PC);
+    GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, PALTYPE_MAIN_BG, 15 * 0x20, 0x20, HEAPID_HALL_OF_FAME_PC);
+    GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, PALTYPE_SUB_BG, 15 * 0x20, 0x20, HEAPID_HALL_OF_FAME_PC);
 }
 
-void DpcMain_InitPaletteFade(DendouPCWork *wk) {
-    wk->palFade = PaletteFade_Create(HEAPID_DENDOU_PC);
-    PaletteFade_AllocBuffer(wk->palFade, PALFADE_BUFFER_MAIN_OBJ, 0x200, HEAPID_DENDOU_PC);
+void HallOfFamePCMain_InitPaletteFade(HallOfFamePCWork *wk) {
+    wk->palFade = PaletteFade_Create(HEAPID_HALL_OF_FAME_PC);
+    PaletteFade_AllocBuffer(wk->palFade, PALFADE_BUFFER_MAIN_OBJ, 0x200, HEAPID_HALL_OF_FAME_PC);
 }
 
-void DpcMain_ExitPaletteFade(DendouPCWork *wk) {
+void HallOfFamePCMain_ExitPaletteFade(HallOfFamePCWork *wk) {
     PaletteFade_FreeBuffer(wk->palFade, PALFADE_BUFFER_MAIN_OBJ);
     PaletteFade_Free(wk->palFade);
 }
 
-void DpcMain_BlendPokePalettes(DendouPCWork *wk) {
+void HallOfFamePCMain_BlendPokePalettes(HallOfFamePCWork *wk) {
     u32 i;
 
     // Both sets of actors, of which one is shown
@@ -236,7 +236,7 @@ void DpcMain_BlendPokePalettes(DendouPCWork *wk) {
     PaletteFade_SetTransferAll(wk->palFade, TRUE);
 }
 
-BOOL DpcMain_IsPaletteFading(DendouPCWork *wk) {
+BOOL HallOfFamePCMain_IsPaletteFading(HallOfFamePCWork *wk) {
     if (PaletteFade_GetActiveMask(wk->palFade) != 0) {
         return TRUE;
     }
@@ -244,21 +244,21 @@ BOOL DpcMain_IsPaletteFading(DendouPCWork *wk) {
     return FALSE;
 }
 
-void DpcMain_SetBlend(void) {
+void HallOfFamePCMain_SetBlend(void) {
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2,
                        GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_OBJ, 16, 8);
 }
 
-void DpcMain_InitMsg(DendouPCWork *wk) {
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_POKEPARAM_3, HEAPID_DENDOU_PC);
-    wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_DENDOU_PC);
-    wk->smallFont = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, HEAPID_DENDOU_PC);
-    wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_DENDOU_PC);
-    wk->printQueue = PrintQueue_CreateDefault(HEAPID_DENDOU_PC);
-    wk->expandBuf = GFL_StrBufCreate(0x400, HEAPID_DENDOU_PC);
+void HallOfFamePCMain_InitMsg(HallOfFamePCWork *wk) {
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_POKEPARAM_3, HEAPID_HALL_OF_FAME_PC);
+    wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_HALL_OF_FAME_PC);
+    wk->smallFont = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, HEAPID_HALL_OF_FAME_PC);
+    wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_HALL_OF_FAME_PC);
+    wk->printQueue = PrintQueue_CreateDefault(HEAPID_HALL_OF_FAME_PC);
+    wk->expandBuf = GFL_StrBufCreate(0x400, HEAPID_HALL_OF_FAME_PC);
 }
 
-void DpcMain_ExitMsg(DendouPCWork *wk) {
+void HallOfFamePCMain_ExitMsg(HallOfFamePCWork *wk) {
     GFL_StrBufFree(wk->expandBuf);
     PrintQueue_Free(wk->printQueue);
     GFL_WordSetSystemFree(wk->wordSet);
@@ -268,23 +268,23 @@ void DpcMain_ExitMsg(DendouPCWork *wk) {
 }
 
 // The buffers that the save's functions copy the Pokémon's names into
-static inline void DpcMain_CreateTeamStrings(DendouPCWork *wk) {
+static inline void HallOfFamePCMain_CreateTeamStrings(HallOfFamePCWork *wk) {
     u16 i, j;
 
     for (i = 0; i < HALL_OF_FAME_TEAMS; i++) {
         for (j = 0; j < HALL_OF_FAME_TEAM_SIZE; j++) {
-            wk->teams[i].pokemon[j].nickname = GFL_StrBufCreate(0x20, HEAPID_DENDOU_PC);
-            wk->teams[i].pokemon[j].trainerName = GFL_StrBufCreate(0x20, HEAPID_DENDOU_PC);
+            wk->teams[i].pokemon[j].nickname = GFL_StrBufCreate(0x20, HEAPID_HALL_OF_FAME_PC);
+            wk->teams[i].pokemon[j].trainerName = GFL_StrBufCreate(0x20, HEAPID_HALL_OF_FAME_PC);
         }
     }
 }
 
-void DpcMain_LoadTeams(DendouPCWork *wk) {
+void HallOfFamePCMain_LoadTeams(HallOfFamePCWork *wk) {
     u16 i, j;
 
-    DpcMain_CreateTeamStrings(wk);
+    HallOfFamePCMain_CreateTeamStrings(wk);
 
-    if (wk->param->mode == DENDOU_PC_MODE_FIRST_CLEAR) {
+    if (wk->param->mode == HALL_OF_FAME_PC_MODE_FIRST_CLEAR) {
         HallOfFameTeam *team = GameData_GetHallOfFameTeam(wk->param->gameData);
 
         wk->teams[0].count = HallOfFameTeam_GetPokemonCount(team);
@@ -296,7 +296,7 @@ void DpcMain_LoadTeams(DendouPCWork *wk) {
     } else {
         SaveControl *save = GameData_GetSaveControl(wk->param->gameData);
 
-        if (SaveControl_OpenExtraBlock(save, SAVE_EXTRA_ID_HALL_OF_FAME, HEAPID_DENDOU_PC) == 1) {
+        if (SaveControl_OpenExtraBlock(save, SAVE_EXTRA_ID_HALL_OF_FAME, HEAPID_HALL_OF_FAME_PC) == 1) {
             HallOfFameSave *hallOfFame = getAddressOfExtraSaveBlk(save, SAVE_EXTRA_ID_HALL_OF_FAME, 0);
 
             if (hallOfFame != NULL) {
@@ -317,7 +317,7 @@ void DpcMain_LoadTeams(DendouPCWork *wk) {
     }
 }
 
-void DpcMain_FreeTeams(DendouPCWork *wk) {
+void HallOfFamePCMain_FreeTeams(HallOfFamePCWork *wk) {
     u16 i, j;
 
     for (i = 0; i < HALL_OF_FAME_TEAMS; i++) {

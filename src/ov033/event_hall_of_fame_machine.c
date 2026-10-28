@@ -1,5 +1,8 @@
+// The Hall of Fame machine's event: the balls of the team going onto the machine and its animations (a descriptive
+// name). Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), in English: swan's EventDendouMachine
+// is EventHallOfFameMachine
 #include "types.h"
-#include "field/event_dendou_machine.h"
+#include "field/event_hall_of_fame_machine.h"
 #include "field/field.h"
 #include "field/field_g3d_mapper.h"
 #include "field/field_map.h"
@@ -27,22 +30,22 @@ static const VecFx32 sBallPositions[6] = {
 
 // clang-format on
 
-GameEvent *EventDendouMachine_Create(GameSystem *gsys, GameEvent *parent) {
+GameEvent *EventHallOfFameMachine_Create(GameSystem *gsys, GameEvent *parent) {
     GameEvent *event;
 
-    event = GameEvent_Create(gsys, parent, EventDendouMachine_Callback, sizeof(EventDendouMachineData));
-    EventDendouMachine_Init(GameEvent_GetData(event), gsys);
+    event = GameEvent_Create(gsys, parent, EventHallOfFameMachine_Callback, sizeof(EventHallOfFameMachineData));
+    EventHallOfFameMachine_Init(GameEvent_GetData(event), gsys);
     return event;
 }
 
-GameEventReturnCode EventDendouMachine_Callback(GameEvent *event, u32 *state, void *data) {
-    EventDendouMachineData *work;
+GameEventReturnCode EventHallOfFameMachine_Callback(GameEvent *event, u32 *state, void *data) {
+    EventHallOfFameMachineData *work;
 
     work = data;
     switch (*state) {
     case 0:
         if (work->frameCounter % 20 == 0) {
-            EventDendouMachine_SpawnMonsBall(work);
+            EventHallOfFameMachine_SpawnMonsBall(work);
             if (work->ballCount <= work->spawnedCount) {
                 (*state)++;
                 work->frameCounter = 0;
@@ -51,25 +54,25 @@ GameEventReturnCode EventDendouMachine_Callback(GameEvent *event, u32 *state, vo
         break;
     case 1:
         if (work->frameCounter > 10) {
-            EventDendouMachine_StartAnimations(work);
+            EventHallOfFameMachine_StartAnimations(work);
             (*state)++;
             work->frameCounter = 0;
         }
         break;
     case 2:
-        if (EventDendouMachine_IsAnimationDone(work)) {
+        if (EventHallOfFameMachine_IsAnimationDone(work)) {
             (*state)++;
         }
         break;
     case 3:
-        EventDendouMachine_End(work);
+        EventHallOfFameMachine_End(work);
         return GAMEEVENT_DONE;
     }
     work->frameCounter++;
     return GAMEEVENT_CONTINUE;
 }
 
-void EventDendouMachine_Init(EventDendouMachineData *work, GameSystem *gsys) {
+void EventHallOfFameMachine_Init(EventHallOfFameMachineData *work, GameSystem *gsys) {
     u32 count;
     VecFx32 playerPosition;
     FieldPropAreaBounds bounds;
@@ -106,13 +109,13 @@ void EventDendouMachine_Init(EventDendouMachineData *work, GameSystem *gsys) {
     }
 }
 
-void EventDendouMachine_End(EventDendouMachineData *work) {
+void EventHallOfFameMachine_End(EventHallOfFameMachineData *work) {
     if (work->centerProp != NULL) {
         FieldPropHandle_Free(work->centerHandle);
     }
 }
 
-void EventDendouMachine_SpawnMonsBall(EventDendouMachineData *work) {
+void EventHallOfFameMachine_SpawnMonsBall(EventHallOfFameMachineData *work) {
     SRTMatrix transform;
     u8 index;
 
@@ -127,7 +130,7 @@ void EventDendouMachine_SpawnMonsBall(EventDendouMachineData *work) {
     }
 }
 
-void EventDendouMachine_StartAnimations(EventDendouMachineData *work) {
+void EventHallOfFameMachine_StartAnimations(EventHallOfFameMachineData *work) {
     s32 i;
 
     for (i = 0; i < work->spawnedCount; i++) {
@@ -138,7 +141,7 @@ void EventDendouMachine_StartAnimations(EventDendouMachineData *work) {
     }
 }
 
-BOOL EventDendouMachine_IsAnimationDone(EventDendouMachineData *work) {
+BOOL EventHallOfFameMachine_IsAnimationDone(EventHallOfFameMachineData *work) {
     if (work->centerProp != NULL) {
         return FieldPropHandle_IsAnmFinished(work->centerHandle);
     }

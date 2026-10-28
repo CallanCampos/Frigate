@@ -322,7 +322,7 @@ typedef struct EventActorJumpWork EventActorJumpWork;
 typedef struct EventCommTvt EventCommTvt;
 typedef struct EventData EventData;
 typedef struct EncData EncData;
-typedef struct EventDendouMachineData EventDendouMachineData;
+typedef struct EventHallOfFameMachineData EventHallOfFameMachineData;
 typedef struct EventMedalInfoBeacon EventMedalInfoBeacon;
 typedef struct EventBeaconDetail EventBeaconDetail;
 typedef struct EventEggDemo EventEggDemo;

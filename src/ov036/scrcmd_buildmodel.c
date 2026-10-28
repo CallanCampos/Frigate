@@ -3,7 +3,7 @@
 // scrcmd_buildmodel.c is descriptive, after field_buildmodel.c. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
-#include "field/event_dendou_machine.h"
+#include "field/event_hall_of_fame_machine.h"
 #include "field/event_pokemon_center.h"
 #include "field/field.h"
 #include "field/field_g3d_mapper.h"
@@ -29,7 +29,7 @@ BOOL s0125_BMPlayHOFMachineSeq(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
-    ScriptWork_CallEvent(work, EventDendouMachine_Create(gsys, ScriptWork_GetEvent(work)));
+    ScriptWork_CallEvent(work, EventHallOfFameMachine_Create(gsys, ScriptWork_GetEvent(work)));
     return TRUE;
 }
 

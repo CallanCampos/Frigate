@@ -223,8 +223,8 @@
 #define ARCID_TIME_ICON 195               // time_icon.c
 #define ARCID_FIELD_SAVEANIME 197         // field_saveanime.c
 #define ARCID_PSEL 202                    // psel.c
-#define ARCID_DENDOU_PC 210               // dpc_main.c
-#define ARCID_DENDOU_DEMO 213             // ddemo_main.c, ddemo_obj.c
+#define ARCID_DENDOU_PC 210         // hall_of_fame_pc_main.c
+#define ARCID_DENDOU_DEMO 213       // hall_of_fame_demo_main.c, hall_of_fame_demo_obj.c
 #define ARCID_MANUAL 218                  // manual_common.c
 #define ARCID_ASSERT_WINDOW_GRA 230       // net_err.c
 #define ARCID_BTLV_EFFVM_PAL_ANIM 231     // btlv_effvm.c

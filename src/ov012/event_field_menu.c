@@ -122,7 +122,7 @@ GameEventReturnCode EventFieldMenu_Callback(GameEvent *event, u32 *state, void *
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         CalcPlayerActionPossibilities(GSYS_GetField(work->gameSystem), &action);
         HiddenEventArgs_Set(&args, work->appCall.partySlot, work->appCall.eventId, work->appCall.eventValue);
-        next = CreateHidenEvent(work->appCall.eventId, &args, &action);
+        next = CreateHMEvent(work->appCall.eventId, &args, &action);
         if (next == NULL) {
             return GAMEEVENT_DONE;
         }

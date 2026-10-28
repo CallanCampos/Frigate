@@ -230,7 +230,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `scrcmd_sodateya.c` | `0x02157c20`–`0x021580c4` | 18 | complete | string at `0x0216e218` |
 | `scrcmd_musical.c` | `0x021580c4`–`0x021590ec` | 27 | complete | string at `0x0216e22c` |
 | `field_encount_st.c` | `0x021590ec`–`0x02159230` | 14 | complete | string at `0x0216e240` |
-| `hiden_event.c` | `0x02159230`–`0x02159bc0` | 44 | complete | descriptive |
+| `hm_event.c` | `0x02159230`–`0x02159bc0` | 44 | complete | descriptive |
 | `scrcmd_network.c` | `0x02159bc0`–`0x02159d54` | 9 | complete | string at `0x0216e254` |
 | `scrcmd_stadium.c` | `0x02159d54`–`0x0215a0b0` | 9 | complete | descriptive |
 | `event_battle_lose.c` | `0x0215a0b0`–`0x0215a19c` | 2 | complete | descriptive |
@@ -488,7 +488,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `event_fly.c` | `0x02178908`–`0x02178ca8` | 3 | complete | descriptive |
 | `event_chatot.c` | `0x02178ca8`–`0x021791c0` | 10 | complete | descriptive |
 | `event_fishing.c` | `0x021791c0`–`0x02179664` | 9 | complete | descriptive |
-| `event_dendou_machine.c` | `0x02179664`–`0x02179868` | 8 | complete | descriptive |
+| `event_hall_of_fame_machine.c` | `0x02179664`–`0x02179868` | 8 | complete | descriptive |
 | `event_pc.c` | `0x02179868`–`0x02179b54` | 8 | complete | descriptive |
 | `event_pokemon_center.c` | `0x02179b54`–`0x02179dd4` | 9 | complete | descriptive |
 | `event_game_manual.c` | `0x02179dd4`–`0x02179e98` | 3 | complete | string at `0x0217c610` |
@@ -2291,12 +2291,12 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `dendou_pc.c` | `0x021bb700`–`0x021bb758` | 3 | complete | descriptive |
-| `dpc_main.c` | `0x021bb758`–`0x021bbd10` | 17 | complete | descriptive |
-| `dpc_seq.c` | `0x021bbd10`–`0x021bc714` | 21 | complete | descriptive |
-| `dpc_bmp.c` | `0x021bc714`–`0x021bce88` | 8 | complete | descriptive |
-| `dpc_obj.c` | `0x021bce88`–`0x021bd748` | 25 | complete | descriptive |
-| `dpc_ui.c` | `0x021bd748`–`0x021bd8e4` | 3 | complete | descriptive |
+| `hall_of_fame_pc.c` | `0x021bb700`–`0x021bb758` | 3 | complete | descriptive |
+| `hall_of_fame_pc_main.c` | `0x021bb758`–`0x021bbd10` | 17 | complete | descriptive |
+| `hall_of_fame_pc_seq.c` | `0x021bbd10`–`0x021bc714` | 21 | complete | descriptive |
+| `hall_of_fame_pc_bmp.c` | `0x021bc714`–`0x021bce88` | 8 | complete | descriptive |
+| `hall_of_fame_pc_obj.c` | `0x021bce88`–`0x021bd748` | 25 | complete | descriptive |
+| `hall_of_fame_pc_ui.c` | `0x021bd748`–`0x021bd8e4` | 3 | complete | descriptive |
 
 ### Overlay 257
 
@@ -2424,10 +2424,10 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `dendou_demo.c` | `0x021998c0`–`0x0219991c` | 3 | complete | descriptive |
-| `ddemo_main.c` | `0x0219991c`–`0x0219a1d4` | 44 | complete | descriptive |
-| `ddemo_seq.c` | `0x0219a1d4`–`0x0219aadc` | 17 | complete | descriptive |
-| `ddemo_obj.c` | `0x0219aadc`–`0x0219b7d0` | 35 | complete | descriptive |
+| `hall_of_fame_demo.c` | `0x021998c0`–`0x0219991c` | 3 | complete | descriptive |
+| `hall_of_fame_demo_main.c` | `0x0219991c`–`0x0219a1d4` | 44 | complete | descriptive |
+| `hall_of_fame_demo_seq.c` | `0x0219a1d4`–`0x0219aadc` | 17 | complete | descriptive |
+| `hall_of_fame_demo_obj.c` | `0x0219aadc`–`0x0219b7d0` | 35 | complete | descriptive |
 
 ### Overlay 266
 

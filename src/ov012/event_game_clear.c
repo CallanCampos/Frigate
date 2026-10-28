@@ -72,7 +72,7 @@ GameEventReturnCode EventGameClear_Callback(GameEvent *event, u32 *state, void *
         EventGameClear_NextState(work, state);
         break;
     case 5:
-        GSYS_QueueProc(gsys, OVERLAY_ID(265), &DENDOU_DEMO_PROC_FUNCTIONS, &work->ov265Param);
+        GSYS_QueueProc(gsys, OVERLAY_ID(265), &HALL_OF_FAME_DEMO_PROC_FUNCTIONS, &work->ov265Param);
         EventGameClear_NextState(work, state);
         break;
     case 6:
