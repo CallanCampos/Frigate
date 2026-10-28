@@ -467,7 +467,7 @@ u32 CheckMMSysFlag(MMSys *system, u32 flag);
 void ResetStrengthRockSaveDataPosition(MMSys *system, u16 zoneId, u16 uid);
 void FieldAcmdTCB_RunCmds(FieldActor *actor);
 // Overlay 36's fldmmdl_acmd.c: moves the actor's billboard to the actor's position
-void func_ov036_0218ee08(FieldActor *actor);
+void FieldAcmdSyncBillboardPos(FieldActor *actor);
 // Overlay 36's fldmmdl_evtype.c: runs the init function of the actor's event type, and whether both checks of the
 // type pass
 void FldmmdlMovecode_InitEventTypeProcThunk(FieldActor *actor);
