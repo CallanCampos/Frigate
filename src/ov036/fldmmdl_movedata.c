@@ -272,53 +272,53 @@ static const FieldActorMoveCode data_ov036_021cc27c = { 0x42, FldmmdlMove_InitWa
 static const FieldActorMoveCode data_ov036_021cc3e4 = { 0x44, func_ov036_0218b044, func_ov036_0218b060,
                                                         FieldCommActor_MoveDelete, MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc290 = { 0x45, RailActor_StayInit, func_ov036_02195b28,
-                                                        func_ov036_02195b38, func_ov036_02195b48 };
+static const FieldActorMoveCode data_ov036_021cc290 = { 0x45, RailActor_StayInit, RailActor_StayMove,
+                                                        RailActor_StayDelete, RailActor_Recover };
 
-static const FieldActorMoveCode data_ov036_021cc3bc = { 0x46, func_ov036_02195b58, func_ov036_02195bdc,
-                                                        func_ov036_02195be4, func_ov036_02195b48 };
+static const FieldActorMoveCode data_ov036_021cc3bc = { 0x46, RailActor_WaitInitAll, RailActor_WaitMove,
+                                                        RailActor_WaitDelete, RailActor_Recover };
 
-static const FieldActorMoveCode data_ov036_021cc2cc = { 0x47, func_ov036_02195b64, func_ov036_02195bdc,
-                                                        func_ov036_02195be4, func_ov036_02195b48 };
+static const FieldActorMoveCode data_ov036_021cc2cc = { 0x47, RailActor_WaitInitUpLeft, RailActor_WaitMove,
+                                                        RailActor_WaitDelete, RailActor_Recover };
 
-static const FieldActorMoveCode data_ov036_021cc394 = { 0x48, func_ov036_02195b70, func_ov036_02195bdc,
-                                                        func_ov036_02195be4, func_ov036_02195b48 };
+static const FieldActorMoveCode data_ov036_021cc394 = { 0x48, RailActor_WaitInitUpRight, RailActor_WaitMove,
+                                                        RailActor_WaitDelete, RailActor_Recover };
 
-static const FieldActorMoveCode data_ov036_021cc2e0 = { 0x49, func_ov036_02195b7c, func_ov036_02195bdc,
-                                                        func_ov036_02195be4, func_ov036_02195b48 };
+static const FieldActorMoveCode data_ov036_021cc2e0 = { 0x49, RailActor_WaitInitDownLeft, RailActor_WaitMove,
+                                                        RailActor_WaitDelete, RailActor_Recover };
 
-static const FieldActorMoveCode data_ov036_021cc36c = { 0x4a, func_ov036_02195b88, func_ov036_02195bdc,
-                                                        func_ov036_02195be4, func_ov036_02195b48 };
+static const FieldActorMoveCode data_ov036_021cc36c = { 0x4a, RailActor_WaitInitDownRight, RailActor_WaitMove,
+                                                        RailActor_WaitDelete, RailActor_Recover };
 
-static const FieldActorMoveCode data_ov036_021cc308 = { 0x4b, func_ov036_02195b94, func_ov036_02195bdc,
-                                                        func_ov036_02195be4, func_ov036_02195b48 };
+static const FieldActorMoveCode data_ov036_021cc308 = { 0x4b, RailActor_WaitInitUpDownLeft, RailActor_WaitMove,
+                                                        RailActor_WaitDelete, RailActor_Recover };
 
-static const FieldActorMoveCode data_ov036_021cc31c = { 0x4c, func_ov036_02195ba0, func_ov036_02195bdc,
-                                                        func_ov036_02195be4, func_ov036_02195b48 };
+static const FieldActorMoveCode data_ov036_021cc31c = { 0x4c, RailActor_WaitInitUpDownRight, RailActor_WaitMove,
+                                                        RailActor_WaitDelete, RailActor_Recover };
 
-static const FieldActorMoveCode data_ov036_021cc344 = { 0x4d, func_ov036_02195bac, func_ov036_02195bdc,
-                                                        func_ov036_02195be4, func_ov036_02195b48 };
+static const FieldActorMoveCode data_ov036_021cc344 = { 0x4d, RailActor_WaitInitUpLeftRight, RailActor_WaitMove,
+                                                        RailActor_WaitDelete, RailActor_Recover };
 
-static const FieldActorMoveCode data_ov036_021cc448 = { 0x4e, func_ov036_02195bb8, func_ov036_02195bdc,
-                                                        func_ov036_02195be4, func_ov036_02195b48 };
+static const FieldActorMoveCode data_ov036_021cc448 = { 0x4e, RailActor_WaitInitDownLeftRight, RailActor_WaitMove,
+                                                        RailActor_WaitDelete, RailActor_Recover };
 
-static const FieldActorMoveCode data_ov036_021cc484 = { 0x4f, func_ov036_02195bc4, func_ov036_02195bdc,
-                                                        func_ov036_02195be4, func_ov036_02195b48 };
+static const FieldActorMoveCode data_ov036_021cc484 = { 0x4f, RailActor_WaitInitUpDown, RailActor_WaitMove,
+                                                        RailActor_WaitDelete, RailActor_Recover };
 
-static const FieldActorMoveCode data_ov036_021cc498 = { 0x50, func_ov036_02195bd0, func_ov036_02195bdc,
-                                                        func_ov036_02195be4, func_ov036_02195b48 };
+static const FieldActorMoveCode data_ov036_021cc498 = { 0x50, RailActor_WaitInitLeftRight, RailActor_WaitMove,
+                                                        RailActor_WaitDelete, RailActor_Recover };
 
-static const FieldActorMoveCode data_ov036_021cc4c0 = { 0x51, func_ov036_02195bec, func_ov036_02195c04,
-                                                        func_ov036_02195c0c, func_ov036_02195b48 };
+static const FieldActorMoveCode data_ov036_021cc4c0 = { 0x51, RailActor_WalkInitAll, RailActor_WalkMove,
+                                                        RailActor_WalkDelete, RailActor_Recover };
 
-static const FieldActorMoveCode data_ov036_021cc4d4 = { 0x52, func_ov036_02195bf8, func_ov036_02195c04,
-                                                        func_ov036_02195c0c, func_ov036_02195b48 };
+static const FieldActorMoveCode data_ov036_021cc4d4 = { 0x52, RailActor_WalkInitUpDown, RailActor_WalkMove,
+                                                        RailActor_WalkDelete, RailActor_Recover };
 
-static const FieldActorMoveCode data_ov036_021cc510 = { 0x53, func_ov036_02195bf8, func_ov036_02195c04,
-                                                        func_ov036_02195c0c, func_ov036_02195b48 };
+static const FieldActorMoveCode data_ov036_021cc510 = { 0x53, RailActor_WalkInitUpDown, RailActor_WalkMove,
+                                                        RailActor_WalkDelete, RailActor_Recover };
 
-static const FieldActorMoveCode data_ov036_021cc524 = { 0x54, func_ov036_02195c14, func_ov036_02195c1c,
-                                                        func_ov036_02195c24, func_ov036_02195b48 };
+static const FieldActorMoveCode data_ov036_021cc524 = { 0x54, RailActor_PatrolInit, RailActor_PatrolMove,
+                                                        RailActor_PatrolDelete, RailActor_Recover };
 
 static const FieldActorMoveCode data_ov036_021cc54c = { 0x55, FldmmdlMove_InitHideKind2Code55, FldmmdlMove_MoveHide,
                                                         FldmmdlMove_DeleteHide, FldmmdlMove_RecoverHide };
