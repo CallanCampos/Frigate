@@ -943,7 +943,7 @@ lib/nnsys/src/g2d/g2d_Font.c:
 lib/nnsys/src/g2d/g2d_CharCanvas.c:
     complete
     .text       start:0x02063d24 end:0x02064ab0
-    .rodata     start:0x02094390 end:0x02094414
+    .rodata     start:0x02094384 end:0x02094414
 
 lib/nnsys/src/g2d/g2d_TextCanvas.c:
     complete
