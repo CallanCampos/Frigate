@@ -140,6 +140,11 @@ void FreeFieldScriptEnv(FieldScriptEnv *env);
 u32 FieldScriptEnv_IsReducedFeatureLevel(FieldScriptEnv *env);
 u32 FieldScriptEnv_GetFeatureLevel(FieldScriptEnv *env);
 void FieldScriptEnv_RemoveAcmdTasks(FieldScriptEnv *env);
+// InitListMenu's align: x is the list's left edge, or its right edge
+enum {
+    LIST_MENU_ANCHOR_TOP_LEFT,
+    LIST_MENU_ANCHOR_TOP_RIGHT,
+};
 void InitListMenu(FieldScriptEnv *env, u16 x, u16 y, u16 cursor, u16 flags, u32 align, u16 *result, WordSet *wordSet,
                   MsgData *msgData);
 void AddItemToListMenu(FieldScriptEnv *env, u32 messageId, u32 descriptionId, u32 value, StrBuf *expanded,
