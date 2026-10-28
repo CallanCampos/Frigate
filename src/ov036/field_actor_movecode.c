@@ -7,6 +7,7 @@
 #include "types.h"
 #include "constants/directions.h"
 #include "field/event_trainer_eye.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_actor_internal.h"
 #include "field/field_actor_movecode.h"
@@ -30,6 +31,14 @@ typedef struct {
     s16 timer;
     u32 mask;
 } RailWanderWork;
+
+// The modes of the random walk: walk wherever nothing is in the way, only inside the move code's rectangle (which no
+// move code uses), or into every collision but the first kind
+enum {
+    WALK_RANDOM_MODE_ANY,
+    WALK_RANDOM_MODE_IN_RECT,
+    WALK_RANDOM_MODE_BUMP,
+};
 
 // The work of a rail actor that walks along the directions of a mask
 typedef struct {
@@ -411,19 +420,19 @@ void func_ov036_021913dc(FieldActor *actor) {
 }
 
 void FieldActorMovecode_InitWalkRandomSet11(FieldActor *actor) {
-    FieldActorMovecode_InitWalkRandom(actor, 12, 11, 0);
+    FieldActorMovecode_InitWalkRandom(actor, ACMD_WALK_8F, 11, WALK_RANDOM_MODE_ANY);
 }
 
 void FieldActorMovecode_InitWalkRandomSet12(FieldActor *actor) {
-    FieldActorMovecode_InitWalkRandom(actor, 12, 12, 0);
+    FieldActorMovecode_InitWalkRandom(actor, ACMD_WALK_8F, 12, WALK_RANDOM_MODE_ANY);
 }
 
 void FieldActorMovecode_InitWalkRandomSet13(FieldActor *actor) {
-    FieldActorMovecode_InitWalkRandom(actor, 12, 13, 0);
+    FieldActorMovecode_InitWalkRandom(actor, ACMD_WALK_8F, 13, WALK_RANDOM_MODE_ANY);
 }
 
 void FieldActorMovecode_InitWalkRandomSet13Bump(FieldActor *actor) {
-    FieldActorMovecode_InitWalkRandom(actor, 12, 13, 2);
+    FieldActorMovecode_InitWalkRandom(actor, ACMD_WALK_8F, 13, WALK_RANDOM_MODE_BUMP);
 }
 
 static void FieldActorMovecode_InitWalkRandom(FieldActor *actor, u32 acmdBase, u32 dirMask, u32 mode) {
@@ -435,48 +444,58 @@ static void FieldActorMovecode_InitWalkRandom(FieldActor *actor, u32 acmdBase, u
     FldAct_ClearMoving(actor);
 }
 
+// The steps of the random walk: face the way the actor faces, wait a random time, pick a direction of its set and walk
+// one tile if it can, and wait for the walk
+enum {
+    WALK_RANDOM_FACE,
+    WALK_RANDOM_WAIT_FACE,
+    WALK_RANDOM_WAIT,
+    WALK_RANDOM_WALK,
+    WALK_RANDOM_WAIT_WALK,
+};
+
 void FieldActorMovecode_MoveWalkRandom(FieldActor *actor) {
     RailWalkWork *work = GetNPCRailPosPtrAddr(actor);
     u32 dir;
     u32 collision;
     u32 acmd;
     switch (work->state) {
-    case 0:
+    case WALK_RANDOM_FACE:
         FldAct_ClearMoving(actor);
         FldAct_ClearMoveEnd(actor);
         dir = GetActorFaceDir(actor);
-        acmd = GetAcmdForDir(dir, 0);
+        acmd = GetAcmdForDir(dir, ACMD_FACE);
         FldAct_SetLocalAcmd(actor, acmd);
         work->state++;
         break;
-    case 1:
+    case WALK_RANDOM_WAIT_FACE:
         if (!FieldAcmdTCB_Update(actor)) {
             break;
         }
         work->timer = FieldActorMovecode_GetRandomTableEntry(sTurnWaitTimes, -1);
         work->state++;
-    case 2:
+    case WALK_RANDOM_WAIT:
         work->timer--;
         if (work->timer != 0) {
             break;
         }
         work->state++;
-    case 3:
+    case WALK_RANDOM_WALK:
         dir = FieldActorMovecode_GetRandomDirFromSet(work->mask, DIR_NONE);
         ChangeActorDirection(actor, dir);
-        if (work->mode == 1 && FieldActorMovecode_IsDirInsideMoveRect(actor, dir) == 0) {
-            work->state = 0;
+        if (work->mode == WALK_RANDOM_MODE_IN_RECT && FieldActorMovecode_IsDirInsideMoveRect(actor, dir) == 0) {
+            work->state = WALK_RANDOM_FACE;
             return;
         }
         collision = ActorRouteCollCheckOneTileInDir(actor, dir);
         if (collision != 0) {
-            if (work->mode == 2) {
+            if (work->mode == WALK_RANDOM_MODE_BUMP) {
                 if (collision & 1) {
-                    work->state = 0;
+                    work->state = WALK_RANDOM_FACE;
                     return;
                 }
             } else {
-                work->state = 0;
+                work->state = WALK_RANDOM_FACE;
                 return;
             }
         }
@@ -484,10 +503,10 @@ void FieldActorMovecode_MoveWalkRandom(FieldActor *actor) {
         FldAct_SetLocalAcmd(actor, acmd);
         FldAct_SetMoving(actor);
         work->state++;
-    case 4:
+    case WALK_RANDOM_WAIT_WALK:
         if (FieldAcmdTCB_Update(actor)) {
             FldAct_ClearMoving(actor);
-            work->state = 0;
+            work->state = WALK_RANDOM_FACE;
         }
         break;
     default:
@@ -579,14 +598,20 @@ static void FieldActorMovecode_InitFixedDir(FieldActor *actor, u32 dir) {
     SetActorInitialGPosToNowGPos(actor);
 }
 
+// The steps of the codes that face one way: face it once, then stay
+enum {
+    FIXED_DIR_FACE,
+    FIXED_DIR_STAY,
+};
+
 void FieldActorMovecode_MoveFixedDir(FieldActor *actor) {
     RailFaceWork *work = GetNPCRailPosPtrAddr(actor);
     switch (work->state) {
-    case 0:
+    case FIXED_DIR_FACE:
         CheckSetActorFaceDir(actor, work->dir);
         work->state++;
         break;
-    case 1:
+    case FIXED_DIR_STAY:
         break;
     }
 }
@@ -635,7 +660,7 @@ static BOOL FieldActorMovecode_SpinStepTurn(FieldActor *actor, RailTurnWork *wor
     if (dir == DIR_NONE) {
         dir = GetActorFaceDir(actor);
     }
-    acmd = GetAcmdForDir(dir, 0);
+    acmd = GetAcmdForDir(dir, ACMD_FACE);
     FldAct_SetLocalAcmd(actor, acmd);
     work->state = 1;
     return TRUE;
@@ -715,7 +740,7 @@ void FieldActorMovecode_MoveSwing(FieldActor *actor) {
 
 static BOOL FieldActorMovecode_SwingStepTurn(FieldActor *actor, RailTurnWork *work) {
     u32 dir = GetActorFaceDir(actor);
-    u32 acmd = GetAcmdForDir(dir, 0);
+    u32 acmd = GetAcmdForDir(dir, ACMD_FACE);
     FldAct_SetLocalAcmd(actor, acmd);
     work->state = 1;
     return TRUE;
@@ -853,14 +878,14 @@ static BOOL FieldActorMovecode_BackForthStepWalk(FieldActor *actor, RailPaceWork
         dir = GetInverseDirection((u16)dir);
         collision = ActorRouteCollCheckOneTileInDir(actor, dir);
     }
-    acmdBase = 12;
+    acmdBase = ACMD_WALK_8F;
     if (FieldActorMovecode_IsDashEventType(actor) != 0) {
         if (FieldActorMovecode_IsBButtonHeld() == TRUE && FldAct_IsNearPlayer(actor) == TRUE) {
-            acmdBase = 16;
+            acmdBase = ACMD_WALK_4F;
         }
     }
     if (collision != 0) {
-        acmdBase = 32;
+        acmdBase = ACMD_STAY_WALK_8F;
     }
     u32 acmd = GetAcmdForDir(dir, acmdBase);
     FldAct_SetLocalAcmd(actor, acmd);
@@ -1224,14 +1249,14 @@ static BOOL FieldActorMovecode_IsPlayerWalking(FieldActor *actor) {
 
     if (player != NULL) {
         switch (FldAct_GetAcmd(player)) {
-        case 0x58:
-        case 0x59:
-        case 0x5a:
-        case 0x5b:
-        case 0xa3:
-        case 0xa4:
-        case 0xa5:
-        case 0xa6:
+        case ACMD_DASH + DIR_UP:
+        case ACMD_DASH + DIR_DOWN:
+        case ACMD_DASH + DIR_LEFT:
+        case ACMD_DASH + DIR_RIGHT:
+        case ACMD_DASH_UPHILL + DIR_UP:
+        case ACMD_DASH_UPHILL + DIR_DOWN:
+        case ACMD_DASH_UPHILL + DIR_LEFT:
+        case ACMD_DASH_UPHILL + DIR_RIGHT:
             return TRUE;
         }
     }
