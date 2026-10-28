@@ -49,7 +49,7 @@ static GameEventReturnCode EventFieldMenuReturn_Callback(GameEvent *event, u32 *
     MMSys *actorSystem;
 
     switch (work->seq) {
-    case 0:
+    case MENU_RETURN_CHANGE_SCREEN:
         if (FieldSubscreen_IsReady(Field_GetSubscreen(work->field)) == TRUE) {
             actorSystem = Field_GetActorSystem(work->field);
             gameData = GSYS_GetGameData(GameEvent_GetGameSystem(event));
@@ -59,13 +59,13 @@ static GameEventReturnCode EventFieldMenuReturn_Callback(GameEvent *event, u32 *
             work->seq++;
         }
         break;
-    case 1:
+    case MENU_RETURN_SAVE_SCREEN:
         if (FieldSubscreen_IsReady(Field_GetSubscreen(work->field)) == TRUE) {
             GameData_SetLastSubscreen(GSYS_GetGameData(GameEvent_GetGameSystem(event)), work->screenId);
             work->seq++;
         }
         break;
-    case 2:
+    case MENU_RETURN_END:
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         return GAMEEVENT_DONE;
     }
