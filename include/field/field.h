@@ -64,6 +64,14 @@ void FieldPlayer_GetGPos(FieldPlayer *player, s16 *x, s16 *y, s16 *z);
 u32 TrainerCard_CountStars(GameData *gameData);
 // The grid position in front of the player, facing dir
 void GetPlayerGPosPlusDir(FieldPlayer *player, u16 dir, s16 *x, s16 *y, s16 *z);
+// What a Join Avenue name entry names: the avenue, its title, and the player's favorite phrase and phrase when
+// impressed, which the passerbys say
+enum {
+    JOIN_AVENUE_ENTRY_NAME,
+    JOIN_AVENUE_ENTRY_TITLE,
+    JOIN_AVENUE_ENTRY_PHRASE,
+    JOIN_AVENUE_ENTRY_IMPRESSED,
+};
 GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result, u16 useCurrent);
 // Check the party and the Battle Box against a regulation. Regulation_CreatePartyCheckTask returns the event that lets
 // the player choose between them, or NULL when neither can enter

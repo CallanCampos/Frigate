@@ -2733,10 +2733,10 @@ int Box2Main_NameInputCall(Box2SysWork *syswk) {
 int Box2Main_NameInputExit(Box2SysWork *syswk) {
     Box2NameInputWork *work = syswk->subProcWork;
 
-    if (work->param->unk1C == 0) {
+    if (work->param->canceled == 0) {
         getBoxNameFromStrbuf(syswk->param->boxes, syswk->tray, work->param->name);
     }
-    syswk->subRet = work->param->unk1C;
+    syswk->subRet = work->param->canceled;
     NameEntryParam_Free(work->param);
     GFL_StrBufFree(work->name);
     GFL_HeapFree(syswk->subProcWork);

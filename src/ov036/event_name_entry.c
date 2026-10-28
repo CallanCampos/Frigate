@@ -61,6 +61,15 @@ typedef struct {
     WordSet *wordSet;
 } EventPokeNameWordSetInput;
 
+// The records' entry that counts the Pokémon nicknamed
+#define RECORD_NICKNAMES 30
+
+// The steps of each event: call the name entry, then keep what it returns
+enum {
+    NAME_ENTRY_STATE_CALL,
+    NAME_ENTRY_STATE_RESULT,
+};
+
 static GameEventReturnCode PokeNameEntry_Callback(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode RivalNameEntry_Callback(GameEvent *event, u32 *state, void *data);
@@ -100,22 +109,22 @@ static GameEventReturnCode PokeNameEntry_Callback(GameEvent *event, u32 *state, 
     EventPokeNameEntry *work = data;
 
     switch (*state) {
-    case 0:
+    case NAME_ENTRY_STATE_CALL:
         GameEvent_ChainNext(
             event, ReturnToField_CreateNameInputEvent(work->gsys, work->field, work->nameEntry, work->transition));
         (*state)++;
         break;
-    case 1:
-        if (work->nameEntry->unk1C != 1) {
+    case NAME_ENTRY_STATE_RESULT:
+        if (work->nameEntry->canceled != TRUE) {
             if (GFL_StrBufCmp(work->nameEntry->name, work->name) == 0) {
                 PokeParty_SetParam(work->pkm, PKM_PARAM_NICKNAME, (u32)work->nameEntry->name);
             } else {
-                work->nameEntry->unk1C = 1;
+                work->nameEntry->canceled = TRUE;
             }
         }
-        *work->result = (work->nameEntry->unk1C != 1);
-        if (*work->result == 1) {
-            RecordAddOne(GameData_GetRecords(GSYS_GetGameData(work->gsys)), 0x1e);
+        *work->result = (work->nameEntry->canceled != TRUE);
+        if (*work->result == TRUE) {
+            RecordAddOne(GameData_GetRecords(GSYS_GetGameData(work->gsys)), RECORD_NICKNAMES);
         }
         GFL_StrBufFree(work->name);
         NameEntryParam_Free(work->nameEntry);
@@ -148,23 +157,23 @@ GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result,
     name = GFL_StrBufCreate(64, HEAPID_TAIL(HEAPID_GAMEEVENT));
 
     switch (target) {
-    case 0:
+    case JOIN_AVENUE_ENTRY_NAME:
     default:
         mode = NAME_ENTRY_AVENUE_NAME;
         maxLength = 10;
         JoinAvenue_GetParam(info, JOIN_AVE_INFO_NAME, buffer);
         break;
-    case 1:
+    case JOIN_AVENUE_ENTRY_TITLE:
         mode = NAME_ENTRY_AVENUE_TITLE;
         maxLength = 10;
         JoinAvenue_GetParam(info, JOIN_AVE_INFO_TITLE, buffer);
         break;
-    case 2:
+    case JOIN_AVENUE_ENTRY_PHRASE:
         mode = NAME_ENTRY_FAVORITE_PHRASE;
         maxLength = 8;
         joinAveTextHandler(person, JOIN_AVE_PARAM_MESSAGE1, buffer);
         break;
-    case 3:
+    case JOIN_AVENUE_ENTRY_IMPRESSED:
         mode = NAME_ENTRY_IMPRESSED;
         maxLength = 8;
         joinAveTextHandler(person, JOIN_AVE_PARAM_MESSAGE2, buffer);
@@ -196,12 +205,12 @@ static GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *s
     u16 name[22];
 
     switch (*state) {
-    case 0:
+    case NAME_ENTRY_STATE_CALL:
         GameEvent_ChainNext(event, ReturnToField_CreateNameInputEvent(work->gsys, work->field, work->nameEntry, TRUE));
         (*state)++;
         break;
-    case 1:
-        if (work->nameEntry->unk1C != 1) {
+    case NAME_ENTRY_STATE_RESULT:
+        if (work->nameEntry->canceled != TRUE) {
             JoinAvenueSave *save = SaveControl_GetJoinAvenue(GameData_GetSaveControl(GSYS_GetGameData(work->gsys)));
             JoinAvenueOccupants *occupants = getAddressOfBeginningOfOccupants(save);
             JoinAvenueInfo *info = JoinAvenue_GetInfo(save);
@@ -209,20 +218,20 @@ static GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *s
             const u16 *str = GFL_StrBufGetStringPtr(work->nameEntry->name);
 
             switch (work->target) {
-            case 0:
+            case JOIN_AVENUE_ENTRY_NAME:
                 JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_NAME, (u32)str);
                 break;
-            case 1:
+            case JOIN_AVENUE_ENTRY_TITLE:
                 JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_TITLE, (u32)str);
                 break;
-            case 2:
+            case JOIN_AVENUE_ENTRY_PHRASE:
                 JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_MESSAGE1, (u32)str);
                 break;
-            case 3:
+            case JOIN_AVENUE_ENTRY_IMPRESSED:
                 JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_MESSAGE2, (u32)str);
                 break;
             }
-        } else if (work->target == 0) {
+        } else if (work->target == JOIN_AVENUE_ENTRY_NAME) {
             JoinAvenueSave *save = SaveControl_GetJoinAvenue(GameData_GetSaveControl(GSYS_GetGameData(work->gsys)));
             JoinAvenueInfo *info;
             MsgData *msgData;
@@ -235,7 +244,7 @@ static GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *s
             JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_NAME, (u32)name);
         }
         if (work->result != NULL) {
-            *work->result = (work->nameEntry->unk1C != 1);
+            *work->result = (work->nameEntry->canceled != TRUE);
         }
         NameEntryParam_Free(work->nameEntry);
         return TRUE;
@@ -261,18 +270,18 @@ static GameEventReturnCode RivalNameEntry_Callback(GameEvent *event, u32 *state,
     EventRivalNameEntry *work = data;
 
     switch (*state) {
-    case 0:
+    case NAME_ENTRY_STATE_CALL:
         GameEvent_ChainNext(event, ReturnToField_CreateNameInputEvent(work->gsys, work->field, work->nameEntry, TRUE));
         (*state)++;
         break;
-    case 1:
-        if (work->nameEntry->unk1C != 1) {
+    case NAME_ENTRY_STATE_RESULT:
+        if (work->nameEntry->canceled != TRUE) {
             SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(work->gsys));
 
             copyRivalNameIntoHollowBlock(getHollow_RivalData(save), GFL_StrBufGetStringPtr(work->nameEntry->name));
         }
         if (work->result != NULL) {
-            *work->result = (work->nameEntry->unk1C != 1);
+            *work->result = (work->nameEntry->canceled != TRUE);
         }
         NameEntryParam_Free(work->nameEntry);
         return TRUE;
@@ -302,23 +311,23 @@ static GameEventReturnCode EventPokeNameWordSetInput_Callback(GameEvent *event, 
     StrBuf *speciesName;
 
     switch (*state) {
-    case 0:
+    case NAME_ENTRY_STATE_CALL:
         GameEvent_ChainNext(event, ReturnToField_CreateNameInputEvent(work->gsys, work->field, work->nameEntry, TRUE));
         (*state)++;
         break;
-    case 1:
+    case NAME_ENTRY_STATE_RESULT:
         speciesName = GFL_StrBufCreate(32, HEAPID_GAMEEVENT);
         GFL_MsgDataLoadStrbuf(g_PMLSpeciesNamesResident, work->species, speciesName);
-        if (work->nameEntry->unk1C != 1) {
-            if (GFL_StrBufCmpIgnoreAccents(work->nameEntry->name, speciesName) == 1) {
-                *work->result = 1;
+        if (work->nameEntry->canceled != TRUE) {
+            if (GFL_StrBufCmpIgnoreAccents(work->nameEntry->name, speciesName) == TRUE) {
+                *work->result = POKE_NAME_INPUT_SPECIES;
                 GFL_WordSetSetStrbuf(work->wordSet, work->form, speciesName, 0, 1, 2);
             } else {
-                *work->result = 2;
+                *work->result = POKE_NAME_INPUT_NICKNAME;
                 GFL_WordSetSetStrbuf(work->wordSet, work->form, work->nameEntry->name, 0, 1, 2);
             }
         } else {
-            *work->result = 0;
+            *work->result = POKE_NAME_INPUT_CANCELED;
         }
         GFL_StrBufFree(speciesName);
         NameEntryParam_Free(work->nameEntry);

@@ -2689,7 +2689,7 @@ static BOOL WifiNoteCodeIn_Main(WifiNoteCodeIn *codeIn, WifiNoteWork *wk, WifiNo
     }
     case CODE_IN_SEQ_NEW_NAME:
         if (!GFL_ProcMgrUpdate(codeIn->procManager)) {
-            if (codeIn->nameParam->unk1C == 0) {
+            if (codeIn->nameParam->canceled == 0) {
                 QueueGameProc(codeIn->procManager, OVERLAY_CODEIN, &CODEIN_PROC_FUNCTIONS, codeIn->codeParam);
                 data->seq = CODE_IN_SEQ_NEW_CODE;
             } else {
@@ -2725,7 +2725,7 @@ static BOOL WifiNoteCodeIn_Main(WifiNoteCodeIn *codeIn, WifiNoteWork *wk, WifiNo
         if (!GFL_ProcMgrUpdate(codeIn->procManager)) {
             FreeGameProcManager(codeIn->procManager);
             data->touch = GCTX_HIDIsUsingTouch();
-            if (codeIn->nameParam->unk1C == 0) {
+            if (codeIn->nameParam->canceled == 0) {
                 WifiNoteData_SetNext(data, WIFI_NOTE_MODE_FRIEND_LIST, FRIEND_LIST_SEQ_NAME_RETURN);
                 WifiNoteData_SetEntered(data, codeIn->nameParam->name, NULL);
                 data->seq = CODE_IN_SEQ_NAME_END;
