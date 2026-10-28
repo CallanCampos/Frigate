@@ -1186,7 +1186,7 @@ static PartyPkm *CygnusData_CreatePokemon(const CygnusData *data, u32 index, Hea
         u16 species = data->entries[index].id;
         u8 form = data->entries[index].form;
         u32 id = getIDAsUInt(GetGameDataPlayerInfo(data->gameData));
-        u32 pid = PML_GenPID(id, species, form, sex, 2, 0);
+        u32 pid = PML_GenPID(id, species, form, sex, 2, PID_RARE_NEVER);
         int badges = getBadgeCount(getTrainerCardDataBlkAddress(data->gameData));
         u8 level = sLevelsByBadges[MATH_CLAMP(badges, 0, NELEMS(sLevelsByBadges) - 1)];
         PartyPkm *pkm = PokeParty_NewTempPkm(species, level, id, heapId);

@@ -79,7 +79,8 @@ void EventFieldTrade_CreatePkm(GameData *gameData, HeapID heapId, PartyPkm *pkm,
     if (sexMode == 0xff) {
         sexMode = 2;
     }
-    pid = PML_GenPID(offer->trainerId, (u16)offer->species, (u16)offer->form, sexMode, offer->abilitySlot, 0);
+    pid = PML_GenPID(offer->trainerId, (u16)offer->species, (u16)offer->form, sexMode, offer->abilitySlot,
+                     PID_RARE_NEVER);
     PokeParty_CreatePkm(pkm, (u16)offer->species, (u16)offer->level, offer->trainerId, PKM_IVS_RANDOM, pid);
     PokeParty_SetParam(pkm, PKM_PARAM_FORM, offer->form);
     EventFieldTrade_DebugLogPkm(pkm);
@@ -106,7 +107,7 @@ void EventFieldTrade_CreatePkm(GameData *gameData, HeapID heapId, PartyPkm *pkm,
     if (offer->ivs[5] != 0xff) {
         PokeParty_SetParam(pkm, PKM_PARAM_IV_SP_DEFENSE, offer->ivs[5]);
     }
-    if (offer->abilitySlot == 2) {
+    if (offer->abilitySlot == ABILITY_SLOT_HIDDEN) {
         PokeParty_SetHiddenAbil(pkm, offer->species, offer->form);
     }
     if (offer->nature != 0xff) {

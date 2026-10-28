@@ -321,7 +321,7 @@ u32 BtlInst_MakeRomPokemon(BSubwayPokemon *pkm, u32 arcId, u16 file, u32 id, u32
     pkm->id = id;
     personality = pid;
     if (personality == 0) {
-        personality = PML_GenPID(id, data.species, data.form, 2, 2, 0);
+        personality = PML_GenPID(id, data.species, data.form, 2, 2, PID_RARE_NEVER);
         pkm->personality = personality;
     } else {
         pkm->personality = personality;
