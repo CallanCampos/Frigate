@@ -1286,7 +1286,7 @@ src/system/cgear_picture_save.c:
     complete
     .text       start:0x0200ce50 end:0x0200ce8c
 
-src/system/pokedex.c:
+src/system/pokedex_savedata.c:
     complete
     .text       start:0x0200ce8c end:0x0200dcec
     .rodata     start:0x0208f80c end:0x0208f974
@@ -1391,7 +1391,7 @@ src/system/memory_link_savedata.c:
     .text       start:0x020108cc end:0x02010ca0
     .rodata     start:0x0208fa60 end:0x0208fac0
 
-src/system/zukan_habitat_savedata.c:
+src/system/pokedex_habitat_savedata.c:
     complete
     .text       start:0x02010ca0 end:0x02010dc0
 

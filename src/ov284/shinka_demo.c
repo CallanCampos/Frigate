@@ -37,7 +37,7 @@
 #include "pml/poke_party.h"
 #include "pml/species_names.h"
 #include "save/bag.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/records.h"
 #include "save/save_control.h"
 #include "system/app_keycursor.h"

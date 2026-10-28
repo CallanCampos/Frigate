@@ -8,7 +8,7 @@
 #include "gfl/proc.h"
 #include "gfl/std.h"
 #include "pml/poke_party.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "system/game_data.h"
 
 // guru2.c, which the ROM names: the proc of the Union Room's Spin Trade. It runs the receipt screen, where the group

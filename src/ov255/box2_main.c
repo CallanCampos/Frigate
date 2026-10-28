@@ -40,7 +40,7 @@
 #include "save/box.h"
 #include "save/chatter.h"
 #include "save/dream_world.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/save_control.h"
 #include "system/app_menu_common.h"
 #include "system/app_taskmenu.h"

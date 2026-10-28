@@ -51,7 +51,7 @@
 enum {
     GSYNC_DOWNLOAD_CGEAR,
     GSYNC_DOWNLOAD_MUSICAL,
-    GSYNC_DOWNLOAD_ZUKAN,
+    GSYNC_DOWNLOAD_POKEDEX,
 };
 
 // The requests Game Sync makes of the server, by their URLs in overlay 189's table
@@ -69,7 +69,7 @@ enum {
 
 // The sizes of the downloaded skins, before their CRC
 #define GSYNC_CGEAR_SKIN_SIZE 0x2600
-#define GSYNC_ZUKAN_SKIN_SIZE 0x6200
+#define GSYNC_POKEDEX_SKIN_SIZE 0x6200
 #define GSYNC_MUSICAL_SIZE_MAX 0x17bf0
 
 typedef struct GSyncWork GSyncWork;
@@ -107,7 +107,7 @@ typedef struct {
     u8 unk56;
     u8 musical;
     u8 cgear;
-    u8 zukan;
+    u8 dex;
     u8 unk5A;
     u8 unk5B;
     u16 items[20];
@@ -145,7 +145,7 @@ struct GSyncWork {
     MusicalDistWork *musical;
     void *dreamWorldCopy;
     GSyncResult *result;
-    void *zukanSkin;
+    void *pokedexSkin;
     void *cgearSkin;
     void *unk44;
     int boxTray;
@@ -164,7 +164,7 @@ struct GSyncWork {
     u8 unk84[0x20];
     u8 getMusical;
     u8 getCGear;
-    u8 getZukan;
+    u8 getPokedex;
     u8 downloadKind;
     u8 downloadFlags;
     u8 hasItems;
@@ -204,9 +204,9 @@ static void GSync_StateCleanupDownload(GSyncWork *wk);
 static void GSync_StateCGearSaved(GSyncWork *wk);
 static void GSync_StateWaitCGearSave(GSyncWork *wk);
 static void GSync_StateCGearDownloaded(GSyncWork *wk);
-static void GSync_StateZukanSaved(GSyncWork *wk);
-static void GSync_StateWaitZukanSave(GSyncWork *wk);
-static void GSync_StateZukanDownloaded(GSyncWork *wk);
+static void GSync_StatePokedexSaved(GSyncWork *wk);
+static void GSync_StateWaitPokedexSave(GSyncWork *wk);
+static void GSync_StatePokedexDownloaded(GSyncWork *wk);
 static void GSync_StateWaitMusicalImport(GSyncWork *wk);
 static void GSync_MusicalDownloaded(GSyncWork *wk, int size);
 static void GSync_StateWaitDownloadCleanup(GSyncWork *wk);
@@ -668,40 +668,40 @@ static void GSync_StateCGearDownloaded(GSyncWork *wk) {
     GSync_ChangeState(wk, GSync_StateWaitCGearSave, 882);
 }
 
-static void GSync_StateZukanSaved(GSyncWork *wk) {
-    wk->getZukan = FALSE;
-    GFL_HeapFree(wk->zukanSkin);
+static void GSync_StatePokedexSaved(GSyncWork *wk) {
+    wk->getPokedex = FALSE;
+    GFL_HeapFree(wk->pokedexSkin);
     wk->busy = FALSE;
-    wk->zukanSkin = NULL;
+    wk->pokedexSkin = NULL;
     GSync_ChangeState(wk, GSync_StateCleanupDownload, 893);
 }
 
-static void GSync_StateWaitZukanSave(GSyncWork *wk) {
+static void GSync_StateWaitPokedexSave(GSyncWork *wk) {
     SaveControl *save = GameData_GetSaveControl(wk->gameData);
 
     if (GameData_UpdateSaveBlock(wk->gameData, 7) == 2) {
         freeIntermediateSaveExtraBlksAfterLoad2(save, 7);
-        GSync_ChangeState(wk, GSync_StateZukanSaved, 903);
+        GSync_ChangeState(wk, GSync_StatePokedexSaved, 903);
     }
 }
 
-static void GSync_StateZukanDownloaded(GSyncWork *wk) {
+static void GSync_StatePokedexDownloaded(GSyncWork *wk) {
     SaveControl *save = GameData_GetSaveControl(wk->gameData);
     u8 *buffer = GSyncDownload_GetBuffer(wk->download);
-    u16 crc = getCRC16(buffer, GSYNC_ZUKAN_SKIN_SIZE);
+    u16 crc = getCRC16(buffer, GSYNC_POKEDEX_SKIN_SIZE);
 
-    if (crc != *(u16 *)(buffer + GSYNC_ZUKAN_SKIN_SIZE)) {
+    if (crc != *(u16 *)(buffer + GSYNC_POKEDEX_SKIN_SIZE)) {
         wk->error = GSYNC_ERROR_DOWNLOAD;
         GSync_ChangeState(wk, GSync_StateError, 917);
         return;
     }
     wk->busy = TRUE;
-    wk->zukanSkin = GFL_HeapAllocate(wk->heapId, 0x6800, FALSE, "gsync_state.c", 922);
-    SaveControl_LoadExtraBlock(save, 7, wk->heapId, wk->zukanSkin, 0x6800);
-    MI_CpuCopy8(buffer, wk->zukanSkin, GSYNC_ZUKAN_SKIN_SIZE);
-    PokedexSkinSave_SetValid(wk->zukanSkin, TRUE);
+    wk->pokedexSkin = GFL_HeapAllocate(wk->heapId, 0x6800, FALSE, "gsync_state.c", 922);
+    SaveControl_LoadExtraBlock(save, 7, wk->heapId, wk->pokedexSkin, 0x6800);
+    MI_CpuCopy8(buffer, wk->pokedexSkin, GSYNC_POKEDEX_SKIN_SIZE);
+    PokedexSkinSave_SetValid(wk->pokedexSkin, TRUE);
     GameData_StartSaveBlock(wk->gameData, 7);
-    GSync_ChangeState(wk, GSync_StateWaitZukanSave, 928);
+    GSync_ChangeState(wk, GSync_StateWaitPokedexSave, 928);
 }
 
 static void GSync_StateWaitMusicalImport(GSyncWork *wk) {
@@ -762,8 +762,8 @@ static void GSync_StateDownloaded(GSyncWork *wk) {
     case GSYNC_DOWNLOAD_MUSICAL:
         GSync_MusicalDownloaded(wk, GSyncDownload_GetFileSize(wk->download) - 2);
         break;
-    case GSYNC_DOWNLOAD_ZUKAN:
-        GSync_ChangeState(wk, GSync_StateZukanDownloaded, 1010);
+    case GSYNC_DOWNLOAD_POKEDEX:
+        GSync_ChangeState(wk, GSync_StatePokedexDownloaded, 1010);
         break;
     }
 }
@@ -839,8 +839,8 @@ static void GSync_StateSetAttr(GSyncWork *wk) {
             wk->error = GSYNC_ERROR_DOWNLOAD;
             GSync_ChangeState(wk, GSync_StateError, 1113);
             return;
-        case GSYNC_DOWNLOAD_ZUKAN:
-            if (GSyncDownload_SetAttr(wk->download, "ZUKAN_E", wk->getZukan)) {
+        case GSYNC_DOWNLOAD_POKEDEX:
+            if (GSyncDownload_SetAttr(wk->download, "ZUKAN_E", wk->getPokedex)) {
                 GSync_ChangeState(wk, GSync_StateGetFileList, 1118);
                 return;
             }
@@ -859,7 +859,7 @@ static void GSync_StateStartDownload(GSyncWork *wk) {
     case GSYNC_DOWNLOAD_MUSICAL:
         wk->download = GSyncDownload_Create(wk->heapId, 0x20000);
         break;
-    case GSYNC_DOWNLOAD_ZUKAN:
+    case GSYNC_DOWNLOAD_POKEDEX:
         wk->download = GSyncDownload_Create(wk->heapId, PokedexSkinSave_GetSize() + 4);
         break;
     }
@@ -879,8 +879,8 @@ static void GSync_StateNextDownload(GSyncWork *wk) {
     } else if (wk->getMusical) {
         wk->downloadKind = GSYNC_DOWNLOAD_MUSICAL;
         GSync_ChangeState(wk, GSync_StateStartDownload, 1167);
-    } else if (wk->getZukan) {
-        wk->downloadKind = GSYNC_DOWNLOAD_ZUKAN;
+    } else if (wk->getPokedex) {
+        wk->downloadKind = GSYNC_DOWNLOAD_POKEDEX;
         GSync_ChangeState(wk, GSync_StateStartDownload, 1172);
     } else {
         GSync_ChangeState(wk, GSync_StateReceive, 1175);
@@ -1013,7 +1013,7 @@ static void GSync_ReadResult(GSyncWork *wk, DreamWorldSave *dreamWorld, GSyncRes
         wk->resultId = result->id;
         wk->getMusical = result->musical;
         wk->getCGear = result->cgear;
-        wk->getZukan = result->zukan;
+        wk->getPokedex = result->dex;
         wk->levels = result->levels;
         if (wk->getCGear) {
             wk->downloadFlags |= 1;
@@ -1021,7 +1021,7 @@ static void GSync_ReadResult(GSyncWork *wk, DreamWorldSave *dreamWorld, GSyncRes
         if (wk->getMusical) {
             wk->downloadFlags |= 2;
         }
-        if (wk->getZukan) {
+        if (wk->getPokedex) {
             wk->downloadFlags |= 4;
         }
         for (i = 0; i < 10; i++) {
@@ -1865,8 +1865,8 @@ static BOOL GSync_ProcExit(GameProc *proc, u32 *state, void *param, void *work) 
     if (wk->musical != NULL) {
         GFL_HeapFree(wk->musical);
     }
-    if (wk->zukanSkin != NULL) {
-        GFL_HeapFree(wk->zukanSkin);
+    if (wk->pokedexSkin != NULL) {
+        GFL_HeapFree(wk->pokedexSkin);
     }
     if (wk->cgearSkin != NULL) {
         GFL_HeapFree(wk->cgearSkin);

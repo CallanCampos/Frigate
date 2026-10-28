@@ -15,7 +15,7 @@
 #include "pml/met_data.h"
 #include "pml/poke_party.h"
 #include "save/player_info.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "struct_decls.h"
 #include "system/game_data.h"
 #include "system/game_event.h"

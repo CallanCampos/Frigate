@@ -118,7 +118,7 @@ tools that show the differences.
 - A blend's clamps written into their own narrow locals, `u8 r = MATH_CLAMP(glowR + dr, 0, 31);`, and through one
   wide temporary assigned before each (`value = glowR + dr; r = value > 31 ? 31 : value < 0 ? 0 : value;`) compile
   to different registers and order around them. `plist_sys.c`'s `PokeList_UpdateGlow` matches only the first way,
-  with six `u8` channel locals as the other RGB555 blends write them (`zukan_info.c`) and `s8` differences (`int`
+  with six `u8` channel locals as the other RGB555 blends write them (`pokedex_info.c`) and `s8` differences (`int`
   ones are 12 bytes short); with the shared `s32 value`, every spelling of the rest kept the glow and base colors in
   swapped registers or came out 4 bytes larger. Its `fx32 ratio`, declared after the two `u8` loop counters, then
   takes `r4`, as in the original (10 bytes off when declared first). The `u16` locals for the two colors and
@@ -469,8 +469,8 @@ Same instructions, registers swapped.
   also why overlay 12's readers only matched through pointer locals; with it `FestSparklePlace_PickPlaces` and
   `FesMissionPeople_PickPlaces` copy their entities as the original does.
 - A scalar declared before a local array with an initializer is allocated ahead of the initializer's copy and the
-  parameters' copies; declared after it, it takes the register right after the counter. `zukan_area_list.c`'s
-  `ZukanAreaList_GetMarkKind` has `u8 next;` and its enum counter `i` ahead of `u32 kinds[3] = { ... }`, which puts
+  parameters' copies; declared after it, it takes the register right after the counter. `pokedex_area_list.c`'s
+  `PokedexAreaList_GetMarkKind` has `u8 next;` and its enum counter `i` ahead of `u32 kinds[3] = { ... }`, which puts
   `next` in `r3` and the loop's temporary in `r1`. The counter is initialized from `next` (`for (i = next; ...)`), and
   the test before the first pass, which an enum counter keeps, is on `next`'s register.
 - A subtraction feeding a multiply, computed into its second operand's register and then copied to `r0`
@@ -480,7 +480,7 @@ Same instructions, registers swapped.
 - A `u16` built from a call's result and then updated in place, `entry = BmpWin_GetCharPos(win); entry |= 15 << 12;`,
   stays in the call's `r0` through its narrowing, and the loop counter's zero takes `r1`; the single expression
   `entry = BmpWin_GetCharPos(win) | (15 << 12);` moves it to `r1` and the zero to `r0`
-  (`chihou_zukan_award.c`'s `ChihouZukanAward_InitBackdrop`). A shift written in place,
+  (`regional_pokedex_award.c`'s `RegionalPokedexAward_InitBackdrop`). A shift written in place,
   `sample = nibble - 8; sample <<= 4;`, likewise keeps the `s8` value and its shift in one register, where
   `perapvoice.c`'s `PerapVoice_Decode` shifts into a new one (`lsl r5, r5, #0x1c; asr r7, r5, #0x18`). There the
   shift is an expression: an inline returning `sample << 4` from its own `s8 sample = nibble - 8;`. The same inline
@@ -628,7 +628,7 @@ Same instructions, registers swapped.
 - Constants hoisted into saved registers across a run of `f(g(x, N), FALSE)` calls (`movs r1, #0; movs r4, #0` at the
   first call, `adds r1, r4, #0` at the last ones) come from the inner call's result passing through one local that
   every statement reassigns: `actor = GetActor(...); ClActor_SetVisible(actor, FALSE);`, as the habitat list's
-  `ZukanHabitat_HideListButtons` has it. Written nested, every constant stays a literal (4 bytes short there);
+  `PokedexHabitat_HideListButtons` has it. Written nested, every constant stays a literal (4 bytes short there);
   constant locals, inline helpers and loops did not reproduce it.
 - A register argument or a loop counter that takes its 0 from another variable's stack slot
   (`ldr r1, [sp, #0x20]` for `MI_CpuFill8`'s 0, and for `i = 0`) where the original has `movs r1, #0`: an earlier
@@ -1269,7 +1269,7 @@ Same code, other `sp` offsets or frame size.
   stays where it is written.
 - A loop counter shared by two loops is split, and its spilled piece takes the lowest slot whatever the declaration
   order, so a declaration sweep finds nothing until each loop has a counter of its own:
-  `ZukanCommon_BuildHabitatSummary` matched once its counting loop got its own `i`, with `pokedex` declared first
+  `PokedexCommon_BuildHabitatSummary` matched once its counting loop got its own `i`, with `pokedex` declared first
   and assigned last.
 - **MWCC allocates registers and stack slots before it merges identical tails.** A call written at the end of both
   branches of an `if`/`else` compiles to the same bytes as one copy after it, but it counts twice for the allocator
@@ -1734,7 +1734,7 @@ Same instructions, scheduled in another order.
   `Oekaki_PrintMessage(...)` in both arms of its End button case. The store to `[sp]` is hoisted above the call
   either way, built in `r1` when the statement follows the call and in `r0` when it precedes it.
 - A field of a local struct that a call fills is loaded before the next call only when the source reads it there: the
-  Pokédex forms page copies `targetX = target.x;` between `ZukanDetailForm_GetSpritePosF32(..., &target)` and
+  Pokédex forms page copies `targetX = target.x;` between `PokedexDetailForm_GetSpritePosF32(..., &target)` and
   `MCSS_GetPosition`.
 - A call nested in another call's arguments is made after the other arguments' addresses are computed. When the
   original makes the inner call first, its result was put in a local: the summary screen's ribbon list writes
@@ -1841,21 +1841,21 @@ Same instructions, scheduled in another order.
   registers unchanged: `ThAward_InitText` measures its points text into a `pointsWidth` of its own, which lets the
   width's reload move above the stack argument's store, where reusing `kindWidth` kept it below. In the same
   function two address locals set in one branch are spilled in statement order (`record` before `name`).
-- A pointer reused by later blocks of the same shape changes their registers: `zenkoku_zukan_award.c`'s
-  `ZenkokuZukanAward_InitText` prints its three blocks through three `StrBuf *` locals (`strbuf`, `certifies`,
+- A pointer reused by later blocks of the same shape changes their registers: `national_pokedex_award.c`'s
+  `NationalPokedexAward_InitText` prints its three blocks through three `StrBuf *` locals (`strbuf`, `certifies`,
   `staff`), declared together ahead of `wordSet`. One `strbuf` for
   all three stays in `r4`, the width takes `r6`, and the print colour is then shared across the last two prints
   where the original builds it again for each.
 - A member array's offset added to the struct pointer before the index is shifted
   (`adds r2, r6, r1; lsls r1, r4, #2; ldr r1, [r2, r1]`) comes from a pointer local that is initialized and then
-  stepped: `u32 *state = area->states; state += type;` in `ZukanHabitat_GetTypeAward`. A pointer that is only
+  stepped: `u32 *state = area->states; state += type;` in `PokedexHabitat_GetTypeAward`. A pointer that is only
   initialized (`&area->states[type]`), a nested struct, an inline accessor and other index types all fold back to
   `(area + type * 4) + 0x354`. The stepped pointer also keeps a loaded index in its own register and shifts it into
   another (`ldr r0, [r4, #0x40]` ... `lsl r1, r0, #0x4`), where every other spelling, index locals and inlines
   included, shifts it in place and lets the load move above the parameter's copy: `resonance_resort_data.c`'s
   `JoinAvenuePerson_AddVisitorData` writes `JoinAvenueData *data = person->data; data += visitor->dataIndex;` inside
   its `if`, and the pointer initialized before the `if` left 12 bytes off.
-  In a loop the stepped pointer keeps the member's address one value, hoisted ahead of the loop. For `pokedex.c`'s
+  In a loop the stepped pointer keeps the member's address one value, hoisted ahead of the loop. For `pokedex_savedata.c`'s
   `addToDex`, which still doesn't match (its row), a variant that clears each kind's bit through
   `u8 *list = pokedex->shown; list += i * POKEDEX_SPECIES_BYTES;` adds the row to `pokedex + 0x1ac` before indexing by
   the byte (`add r2, r1, r2; ldrb r5, [r2, r0]`) as the original does, while every spelling in one expression
@@ -2113,7 +2113,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `const void *`; the other BSSID stays a `const u8 *`. Two `const u8 *`, the NitroSDK's pointer-sum form of the
   compare included, give 0x178 against 0x188, and a `const u8 *bssid` local gives the same addressing but turns the
   inline's `&&` chain into predicated `cmpeq`s. The parameter's type is the lever here, and the inline's comment says
-  so. A `ClearBit(void *bits, u16 index)` tried for `pokedex.c`'s `addToDex` keeps `pokedex->shownForms + 0xb` whole
+  so. A `ClearBit(void *bits, u16 index)` tried for `pokedex_savedata.c`'s `addToDex` keeps `pokedex->shownForms + 0xb` whole
   the same way, where a `u8 *` parameter regroups it around the byte index.
 
 - `field += value` on an `s16` field with an `int` value narrows the value first and shares the narrowed copy between
@@ -2281,8 +2281,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   constant in `r4`, ahead of the parameters.
   A constant narrowed at a call (`movs r3, #0x11` then `lsls`/`asrs` to `s16`) is an enum local too, and where it
   is assigned decides where it is built: set at the top, before the first call, and live across calls while every
-  saved register is taken, it is rebuilt at its one use inside the argument setup. `zukan_detail_form.c`'s
-  `ZukanDetailForm_PrintEntry` declares `EntryLine colorY = ENTRY_LINE_BOTTOM;` (17) and passes it to the color's
+  saved register is taken, it is rebuilt at its one use inside the argument setup. `pokedex_detail_form.c`'s
+  `PokedexDetailForm_PrintEntry` declares `EntryLine colorY = ENTRY_LINE_BOTTOM;` (17) and passes it to the color's
   print; set in the color's block, the 17 is built before `x`'s arithmetic (9 bytes), and an `int` or a field
   folds the narrowing away.
   A constant offset added to a pointer in a call's argument is an enum local in the same way, assigned where the
@@ -2650,7 +2650,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (Scheduling section; a candidate for a shared inline in `gfl/std.h`.)
 - In `if ((u8)f() != engine->criteria->color)` MWCC loads `engine->criteria` before the call and keeps it in a saved
   register. Where the original loads the pointer after the call, the call's result was in a local first: the Pokédex
-  search's `ZukanSearchEngine_Step` has `u8 color = PML_PersonalGetParam(...);` and `u8 shape = ...GetShape(...);`
+  search's `PokedexSearchEngine_Step` has `u8 color = PML_PersonalGetParam(...);` and `u8 shape = ...GetShape(...);`
   before their comparisons (8 bytes larger without them).
 - `u32` and `s32` are the SDK's `unsigned long` and `long` (`include/types.h`), and MWCC treats them differently from
   `unsigned int` and `int` in an index: with a `long` index it keeps `i * size` and folds the constant of `a[i + k]` or
@@ -3086,9 +3086,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   expression `(screen->extra & 0xf) << 12` sits in the inner loop's body.
 - A flag built as `bne; movs #0; b; movs #1; str [sp]` is an enum-typed local set with a ternary; every plain 0/1
   spelling folds to the mirrored `beq` layout. Which of a function's two flags is the enum can differ between
-  siblings: in the Pokédex entry's `ZukanInfo_InitTypeIcons` the enum (`ClActDrawType`, our name) feeds the resource
-  loaders and a `u32` zero-plus-`if` flag feeds `ClActor_Create`, and in `ZukanInfo_ShowTypesInGameLanguage`,
-  `ZukanInfo_ShowTypesInLanguage` and `ZukanInfo_LoadFootprint` it is the other way round. All four were 4 bytes
+  siblings: in the Pokédex entry's `PokedexInfo_InitTypeIcons` the enum (`ClActDrawType`, our name) feeds the resource
+  loaders and a `u32` zero-plus-`if` flag feeds `ClActor_Create`, and in `PokedexInfo_ShowTypesInGameLanguage`,
+  `PokedexInfo_ShowTypesInLanguage` and `PokedexInfo_LoadFootprint` it is the other way round. All four were 4 bytes
   long or 29 bytes off before.
 - A dead second conditional branch on the same flags is a redundant test in the source: the live competition's
   `LiveBattleMatchFlow_StepLink` has `wk->readySent = (field12 != 0 || (field12 == 0 && !known));` (4 bytes short
@@ -3311,7 +3311,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   test can skip it. Passed to an inline, it is reused only for an `int` or `u32` variable given to parameters of that
   type: an `int bit` given to `int` parameters is reused, a `u16`, `u32`, `s16` or `long` one given to `int`
   parameters is computed again, and so is a `u16` or `s16` given to parameters of its own type.
-  `pokedex.c`'s `addToDex` builds its byte and flag once before its kinds loop and uses
+  `pokedex_savedata.c`'s `addToDex` builds its byte and flag once before its kinds loop and uses
   them again in the six sets after it, so in the original they are locals. In the same loop the mask passed to an
   inline, `flag ^ 0xff`, is hoisted ahead of the loop's base address whatever the order of the inline's parameters,
   and the base comes after every other hoisted value (flag, mask, byte) in every statement order, unless a statement
@@ -4400,7 +4400,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A helper's local initializer joins the size sort where the helper is defined, and a `static inline` defined after
   its caller is still inlined, so where a helper sits moves equal-size initializers without touching code. In a
   frame, the caller's own locals take the highest slots in declaration order, then each inlined call's locals follow
-  in call order, with the locals inside one helper ascending. The Pokédex cover's `ZukanOpen_InitBG` sets up its five
+  in call order, with the locals inside one helper ascending. The Pokédex cover's `PokedexOpen_InitBG` sets up its five
   BGs through five one-BG inlines, three defined before it and two after, which gives both the ROM's falling stack
   slots and the order of its two equal-size initializers. Which helpers sit after the caller is a fit; a table the
   original link dead-stripped would explain the ROM as well.

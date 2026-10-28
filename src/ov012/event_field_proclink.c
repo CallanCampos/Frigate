@@ -4,11 +4,11 @@
 #include "app/config_panel.h"
 #include "app/medalbox.h"
 #include "app/p_status.h"
+#include "app/pokedex.h"
 #include "app/pokelist.h"
 #include "app/townmap.h"
 #include "app/wifi_note.h"
 #include "app/xtransceiver.h"
-#include "app/zukan.h"
 #include "constants/pokemon.h"
 #include "demo/shinka_demo.h"
 #include "field/app_call.h"
@@ -32,7 +32,7 @@
 #include "pml/mail.h"
 #include "pml/poke_party.h"
 #include "save/bag.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/records.h"
 #include "save/save_control.h"
 #include "system/game_data.h"
@@ -42,7 +42,7 @@
 // clang-format off
 const FieldProcLink FIELD_PROC_LINK_LIST[FIELD_APP_MAX] = {
     { OVERLAY_ID(165), &POKELIST_PROC_FUNCTIONS, FieldAppCall_CreatePokeListParam, FieldAppCall_GetPokeListResult, NULL, FieldProcLink_FreeParam },
-    { OVERLAY_ID(302), &ZUKAN_PROC_FUNCTIONS, FieldAppCall_CreateZukanParam, FieldAppCall_GetZukanResult, NULL, FieldProcLink_FreeParam },
+    { OVERLAY_ID(302), &POKEDEX_PROC_FUNCTIONS, FieldAppCall_CreatePokedexParam, FieldAppCall_GetPokedexResult, NULL, FieldProcLink_FreeParam },
     { OVERLAY_ID(142), &BAG_PROC_FUNCTIONS, FieldAppCall_CreateBagParam, FieldAppCall_GetBagResult, NULL, FieldProcLink_FreeParam },
     { OVERLAY_ID(186), &data_ov012_0216dd78, FieldAppCall_CreateTrainerCardParam, FieldAppCall_GetTrainerCardResult, NULL, FieldProcLink_FreeParam },
     { 0, NULL, NULL, NULL, FieldAppCall_CallSave, FieldProcLink_FreeParam },
@@ -435,11 +435,12 @@ u32 FieldAppCall_GetPokeListResult(FieldAppCallWork *work, void *data) {
 }
 
 // The Pokédex
-void *FieldAppCall_CreateZukanParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
-    ZukanParam *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ZukanParam), FALSE, "event_field_proclink.c", 1295);
+void *FieldAppCall_CreatePokedexParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
+    PokedexParam *param =
+        GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(PokedexParam), FALSE, "event_field_proclink.c", 1295);
     FieldSound *sound;
 
-    MI_CpuFill8(param, 0, sizeof(ZukanParam));
+    MI_CpuFill8(param, 0, sizeof(PokedexParam));
     param->gameData = GSYS_GetGameData(work->input->gameSystem);
     param->pokedex = GameData_GetPokedex(param->gameData);
     param->playerInfo = GetGameDataPlayerInfo(param->gameData);
@@ -453,8 +454,8 @@ void *FieldAppCall_CreateZukanParam(FieldAppCallWork *work, s32 appParam, s32 pr
     return param;
 }
 
-u32 FieldAppCall_GetZukanResult(FieldAppCallWork *work, void *data) {
-    ZukanParam *param = data;
+u32 FieldAppCall_GetPokedexResult(FieldAppCallWork *work, void *data) {
+    PokedexParam *param = data;
     FieldSound *sound = GameData_GetFieldSoundSystem(param->gameData);
 
     FieldSnd_RestoreVolume(sound, GameSystem_GetISS(work->input->gameSystem));

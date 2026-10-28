@@ -14,7 +14,7 @@ a rule here changes, change it there too.
   does, and an incremental build hides those in files it didn't rebuild. Black 2 is primary. White 2 shares the source (`BLACK2`/`WHITE2` defines) and gets its configs through the version map, so
   change configs only with the scripts, which update both versions and record what they did:
   `add_source_file.py`, `mark_complete.py`, `rename_symbol.py`, `config_fixes.py`.
-- **One source file per original file**, named in English after the ROM's embedded string (`zukan_toroku.c` is
+- **One source file per original file**, named in English after the ROM's embedded string (`pokedex_registration.c` is
   `pokedex_registration.c`, with the ROM's name in the header), or descriptively, with the guess said in the header and
   the commit; never an overlay number. Functions go in address order, and in reverse for SPL,
   whose `1.2/base` compiler emits them reversed. `src/` is code built with the game's compiler: `src/ovNNN/` for overlays,

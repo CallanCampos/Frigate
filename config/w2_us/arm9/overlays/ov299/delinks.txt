@@ -3,32 +3,32 @@
     .ctor       start:0x021a2a34 end:0x021a2a34 kind:rodata align:4
     .bss        start:0x021a2a40 end:0x021a2a40 kind:bss align:32
 
-src/ov299/zukanlist.c:
+src/ov299/pokedex_list.c:
     complete
     .text       start:0x0219fc00 end:0x0219fc54
     .rodata     start:0x021a2608 end:0x021a2614
 
-src/ov299/zknlist_main.c:
+src/ov299/pokedex_list_main.c:
     complete
     .text       start:0x0219fc54 end:0x021a061c
     .rodata     start:0x021a2614 end:0x021a27e0
 
-src/ov299/zknlist_seq.c:
+src/ov299/pokedex_list_seq.c:
     complete
     .text       start:0x021a061c end:0x021a0f00
     .rodata     start:0x021a27e0 end:0x021a2804
 
-src/ov299/zknlist_bmp.c:
+src/ov299/pokedex_list_bmp.c:
     complete
     .text       start:0x021a0f00 end:0x021a1430
     .rodata     start:0x021a2804 end:0x021a2828
 
-src/ov299/zknlist_obj.c:
+src/ov299/pokedex_list_obj.c:
     complete
     .text       start:0x021a1430 end:0x021a23e4
     .rodata     start:0x021a2828 end:0x021a29ac
 
-src/ov299/zknlist_ui.c:
+src/ov299/pokedex_list_ui.c:
     complete
     .text       start:0x021a23e4 end:0x021a2608
     .rodata     start:0x021a29ac end:0x021a2a34

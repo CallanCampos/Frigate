@@ -2658,7 +2658,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_info.c` | `0x0219d6e0`–`0x0219fa7c` | 61 | complete | string at `0x0219fba0` |
+| `pokedex_info.c` | `0x0219d6e0`–`0x0219fa7c` | 61 | complete | ROM's `zukan_info.c`, string at `0x0219fba0` |
 
 ### Overlay 297
 
@@ -2666,9 +2666,9 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_toroku.c` | `0x021f4260`–`0x021f4638` | 6 | complete | descriptive |
-| `zukan_toroku_graphic.c` | `0x021f4638`–`0x021f487c` | 16 | complete | string at `0x021f4fa0` |
-| `zukan_nickname.c` | `0x021f487c`–`0x021f4e38` | 9 | complete | string at `0x021f4fb8` |
+| `pokedex_registration.c` | `0x021f4260`–`0x021f4638` | 6 | complete | descriptive |
+| `pokedex_registration_graphic.c` | `0x021f4638`–`0x021f487c` | 16 | complete | ROM's `zukan_toroku_graphic.c`, string at `0x021f4fa0` |
+| `pokedex_nickname.c` | `0x021f487c`–`0x021f4e38` | 9 | complete | ROM's `zukan_nickname.c`, string at `0x021f4fb8` |
 
 ### Overlay 298
 
@@ -2676,17 +2676,17 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_detail_procsys.c` | `0x0219fbc0`–`0x0219fcdc` | 7 | complete | string at `0x021acde0` |
-| `zukan_detail_common.c` | `0x0219fcdc`–`0x021a03e8` | 39 | complete | string at `0x021acdf8` |
-| `zukan_detail.c` | `0x021a03e8`–`0x021a0700` | 5 | complete | string at `0x021ace10` |
-| `zukan_detail_graphic.c` | `0x021a0700`–`0x021a0ae0` | 23 | complete | string at `0x021ace20` |
-| `zknd_tbar.c` | `0x021a0ae0`–`0x021a1268` | 39 | complete | string at `0x021ace38` |
-| `zukan_detail_touchbar.c` | `0x021a1268`–`0x021a21f0` | 44 | complete | string at `0x021ace44` |
-| `zukan_detail_headbar.c` | `0x021a21f0`–`0x021a24e0` | 13 | complete | string at `0x021ace5c` |
-| `zukan_detail_info.c` | `0x021a24e0`–`0x021a328c` | 20 | complete | descriptive |
-| `zukan_detail_map.c` | `0x021a328c`–`0x021a63d4` | 76 | complete | descriptive |
-| `zukan_detail_voice.c` | `0x021a63d4`–`0x021a79e0` | 39 | complete | string at `0x021ace88` |
-| `zukan_detail_form.c` | `0x021a79e0`–`0x021abf74` | 75 | complete | string at `0x021acec4` |
+| `pokedex_detail_procsys.c` | `0x0219fbc0`–`0x0219fcdc` | 7 | complete | ROM's `zukan_detail_procsys.c`, string at `0x021acde0` |
+| `pokedex_detail_common.c` | `0x0219fcdc`–`0x021a03e8` | 39 | complete | ROM's `zukan_detail_common.c`, string at `0x021acdf8` |
+| `pokedex_detail.c` | `0x021a03e8`–`0x021a0700` | 5 | complete | ROM's `zukan_detail.c`, string at `0x021ace10` |
+| `pokedex_detail_graphic.c` | `0x021a0700`–`0x021a0ae0` | 23 | complete | ROM's `zukan_detail_graphic.c`, string at `0x021ace20` |
+| `pokedex_detail_tbar.c` | `0x021a0ae0`–`0x021a1268` | 39 | complete | ROM's `zknd_tbar.c`, string at `0x021ace38` |
+| `pokedex_detail_touchbar.c` | `0x021a1268`–`0x021a21f0` | 44 | complete | ROM's `zukan_detail_touchbar.c`, string at `0x021ace44` |
+| `pokedex_detail_headbar.c` | `0x021a21f0`–`0x021a24e0` | 13 | complete | ROM's `zukan_detail_headbar.c`, string at `0x021ace5c` |
+| `pokedex_detail_info.c` | `0x021a24e0`–`0x021a328c` | 20 | complete | descriptive |
+| `pokedex_detail_map.c` | `0x021a328c`–`0x021a63d4` | 76 | complete | descriptive |
+| `pokedex_detail_voice.c` | `0x021a63d4`–`0x021a79e0` | 39 | complete | ROM's `zukan_detail_voice.c`, string at `0x021ace88` |
+| `pokedex_detail_form.c` | `0x021a79e0`–`0x021abf74` | 75 | complete | ROM's `zukan_detail_form.c`, string at `0x021acec4` |
 
 ### Overlay 299
 
@@ -2694,12 +2694,12 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukanlist.c` | `0x0219fbc0`–`0x0219fc14` | 3 | complete | descriptive |
-| `zknlist_main.c` | `0x0219fc14`–`0x021a05dc` | 29 | complete | descriptive |
-| `zknlist_seq.c` | `0x021a05dc`–`0x021a0ec0` | 16 | complete | descriptive |
-| `zknlist_bmp.c` | `0x021a0ec0`–`0x021a13f0` | 12 | complete | descriptive |
-| `zknlist_obj.c` | `0x021a13f0`–`0x021a23a4` | 33 | complete | descriptive |
-| `zknlist_ui.c` | `0x021a23a4`–`0x021a25c8` | 1 | complete | descriptive |
+| `pokedex_list.c` | `0x0219fbc0`–`0x0219fc14` | 3 | complete | descriptive |
+| `pokedex_list_main.c` | `0x0219fc14`–`0x021a05dc` | 29 | complete | descriptive |
+| `pokedex_list_seq.c` | `0x021a05dc`–`0x021a0ec0` | 16 | complete | descriptive |
+| `pokedex_list_bmp.c` | `0x021a0ec0`–`0x021a13f0` | 12 | complete | descriptive |
+| `pokedex_list_obj.c` | `0x021a13f0`–`0x021a23a4` | 33 | complete | descriptive |
+| `pokedex_list_ui.c` | `0x021a23a4`–`0x021a25c8` | 1 | complete | descriptive |
 
 ### Overlay 300
 
@@ -2707,13 +2707,13 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukansearch.c` | `0x0219fbc0`–`0x0219fc14` | 3 | complete | descriptive |
-| `zknsearch_main.c` | `0x0219fc14`–`0x021a08d0` | 46 | complete | string at `0x021a4800` |
-| `zknsearch_seq.c` | `0x021a08d0`–`0x021a1ce8` | 41 | complete | descriptive |
-| `zknsearch_bmp.c` | `0x021a1ce8`–`0x021a26ac` | 25 | complete | descriptive |
-| `zknsearch_obj.c` | `0x021a26ac`–`0x021a382c` | 42 | complete | descriptive |
-| `zknsearch_ui.c` | `0x021a382c`–`0x021a3bb4` | 12 | complete | descriptive |
-| `zknsearch_list.c` | `0x021a3bb4`–`0x021a4094` | 21 | complete | descriptive |
+| `pokedex_search.c` | `0x0219fbc0`–`0x0219fc14` | 3 | complete | descriptive |
+| `pokedex_search_main.c` | `0x0219fc14`–`0x021a08d0` | 46 | complete | ROM's `zknsearch_main.c`, string at `0x021a4800` |
+| `pokedex_search_seq.c` | `0x021a08d0`–`0x021a1ce8` | 41 | complete | descriptive |
+| `pokedex_search_bmp.c` | `0x021a1ce8`–`0x021a26ac` | 25 | complete | descriptive |
+| `pokedex_search_obj.c` | `0x021a26ac`–`0x021a382c` | 42 | complete | descriptive |
+| `pokedex_search_ui.c` | `0x021a382c`–`0x021a3bb4` | 12 | complete | descriptive |
+| `pokedex_search_list.c` | `0x021a3bb4`–`0x021a4094` | 21 | complete | descriptive |
 
 ### Overlay 301
 
@@ -2721,7 +2721,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_open.c` | `0x0219fbc0`–`0x021a023c` | 19 | complete | descriptive |
+| `pokedex_open.c` | `0x0219fbc0`–`0x021a023c` | 19 | complete | descriptive |
 
 ### Overlay 302
 
@@ -2729,9 +2729,9 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan.c` | `0x021acee0`–`0x021ad624` | 19 | complete | string at `0x021ae5a0` |
-| `zukan_common.c` | `0x021ad624`–`0x021adecc` | 20 | complete | string at `0x021ae5a8` |
-| `zukan_search_engine.c` | `0x021adecc`–`0x021ae3dc` | 7 | complete | string at `0x021ae5b8` |
+| `pokedex.c` | `0x021acee0`–`0x021ad624` | 19 | complete | ROM's `zukan.c`, string at `0x021ae5a0` |
+| `pokedex_common.c` | `0x021ad624`–`0x021adecc` | 20 | complete | ROM's `zukan_common.c`, string at `0x021ae5a8` |
+| `pokedex_search_engine.c` | `0x021adecc`–`0x021ae3dc` | 7 | complete | ROM's `zukan_search_engine.c`, string at `0x021ae5b8` |
 
 ### Overlay 303
 
@@ -2739,8 +2739,8 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_habitat.c` | `0x0219fbc0`–`0x021a1a80` | 56 | complete | descriptive |
-| `zukan_habitat_graphic.c` | `0x021a1a80`–`0x021a32d8` | 58 | complete | descriptive |
+| `pokedex_habitat.c` | `0x0219fbc0`–`0x021a1a80` | 56 | complete | descriptive |
+| `pokedex_habitat_graphic.c` | `0x021a1a80`–`0x021a32d8` | 58 | complete | descriptive |
 
 ### Overlay 304
 
@@ -2748,8 +2748,8 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_area_list.c` | `0x0219fbc0`–`0x021a073c` | 34 | complete | descriptive |
-| `zukan_area_list_view.c` | `0x021a073c`–`0x021a1dac` | 58 | complete | descriptive |
+| `pokedex_area_list.c` | `0x0219fbc0`–`0x021a073c` | 34 | complete | descriptive |
+| `pokedex_area_list_view.c` | `0x021a073c`–`0x021a1dac` | 58 | complete | descriptive |
 
 ### Overlay 305
 
@@ -2852,8 +2852,8 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `chihou_zukan_award.c` | `0x0219ce80`–`0x0219d6a4` | 16 | complete | string at `0x0219db80` |
-| `chihou_zukan_award_graphic.c` | `0x0219d6a4`–`0x0219da10` | 17 | complete | string at `0x0219db98` |
+| `regional_pokedex_award.c` | `0x0219ce80`–`0x0219d6a4` | 16 | complete | ROM's `chihou_zukan_award.c`, string at `0x0219db80` |
+| `regional_pokedex_award_graphic.c` | `0x0219d6a4`–`0x0219da10` | 17 | complete | ROM's `chihou_zukan_award_graphic.c`, string at `0x0219db98` |
 
 ### Overlay 315
 
@@ -2861,8 +2861,8 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zenkoku_zukan_award.c` | `0x0219ce80`–`0x0219d73c` | 16 | complete | string at `0x0219dc40` |
-| `zenkoku_zukan_award_graphic.c` | `0x0219d73c`–`0x0219daa8` | 17 | complete | string at `0x0219dc58` |
+| `national_pokedex_award.c` | `0x0219ce80`–`0x0219d73c` | 16 | complete | ROM's `zenkoku_zukan_award.c`, string at `0x0219dc40` |
+| `national_pokedex_award_graphic.c` | `0x0219d73c`–`0x0219daa8` | 17 | complete | ROM's `zenkoku_zukan_award_graphic.c`, string at `0x0219dc58` |
 
 ### Overlay 316
 

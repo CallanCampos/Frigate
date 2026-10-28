@@ -24,7 +24,7 @@
 #include "pml/item.h"
 #include "pml/poke_party.h"
 #include "save/bag.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/save_control.h"
 #include "save/traded_pokemon.h"
 #include "save/trainer_game_info.h"

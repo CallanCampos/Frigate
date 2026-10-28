@@ -19,7 +19,7 @@
 #include "pml/species_names.h"
 #include "save/box.h"
 #include "save/player_info.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/save_control.h"
 #include "system/game_data.h"
 #include "system/game_system.h"

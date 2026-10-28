@@ -5,7 +5,7 @@
 
 #include "types.h"
 #include "gfl/tcb.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "struct_decls.h"
 
 // Where the fallen leaves effect plays

@@ -4,69 +4,69 @@
     .data       start:0x021acde0 end:0x021acee0 kind:data align:32
     .bss        start:0x021acee0 end:0x021acee0 kind:bss align:32
 
-src/ov298/zukan_detail_procsys.c:
+src/ov298/pokedex_detail_procsys.c:
     complete
     .text       start:0x0219fbc0 end:0x0219fcdc
     .data       start:0x021acde0 end:0x021acdf8
 
-src/ov298/zukan_detail_common.c:
+src/ov298/pokedex_detail_common.c:
     complete
     .text       start:0x0219fcdc end:0x021a03e8
     .rodata     start:0x021abf74 end:0x021abf9c
     .data       start:0x021acdf8 end:0x021ace10
 
-src/ov298/zukan_detail.c:
+src/ov298/pokedex_detail.c:
     complete
     .text       start:0x021a03e8 end:0x021a0700
     .rodata     start:0x021abf9c end:0x021abfa8
     .data       start:0x021ace10 end:0x021ace20
 
-src/ov298/zukan_detail_graphic.c:
+src/ov298/pokedex_detail_graphic.c:
     complete
     .text       start:0x021a0700 end:0x021a0ae0
     .rodata     start:0x021abfa8 end:0x021ac1a8
     .data       start:0x021ace20 end:0x021ace38
 
-src/ov298/zknd_tbar.c:
+src/ov298/pokedex_detail_tbar.c:
     complete
     .text       start:0x021a0ae0 end:0x021a1268
     .rodata     start:0x021ac1a8 end:0x021ac218
     .data       start:0x021ace38 end:0x021ace44
 
-src/ov298/zukan_detail_touchbar.c:
+src/ov298/pokedex_detail_touchbar.c:
     complete
     .text       start:0x021a1268 end:0x021a21f0
     .rodata     start:0x021ac218 end:0x021ac3c0
     .data       start:0x021ace44 end:0x021ace5c
 
-src/ov298/zukan_detail_headbar.c:
+src/ov298/pokedex_detail_headbar.c:
     complete
     .text       start:0x021a21f0 end:0x021a24e0
     .rodata     start:0x021ac3c0 end:0x021ac3d4
     .data       start:0x021ace5c end:0x021ace74
 
-src/ov298/zukan_detail_info.c:
+src/ov298/pokedex_detail_info.c:
     complete
     .text       start:0x021a24e0 end:0x021a328c
     .rodata     start:0x021ac3d4 end:0x021ac420
 
-src/ov298/zukan_detail_map.c:
+src/ov298/pokedex_detail_map.c:
     complete
     .text       start:0x021a328c end:0x021a63d4
     .rodata     start:0x021ac420 end:0x021ac748
     .data       start:0x021ace74 end:0x021ace88
 
-src/ov298/zukan_detail_voice.c:
+src/ov298/pokedex_detail_voice.c:
     complete
     .text       start:0x021a63d4 end:0x021a79e0
     .rodata     start:0x021ac748 end:0x021ac7f0
     .data       start:0x021ace88 end:0x021acea0
 
-src/ov298/zukan_detail_form_data.c:
+src/ov298/pokedex_detail_form_data.c:
     complete
     .rodata     start:0x021ac7f0 end:0x021ac858
 
-src/ov298/zukan_detail_form.c:
+src/ov298/pokedex_detail_form.c:
     complete
     .text       start:0x021a79e0 end:0x021abf74
     .rodata     start:0x021ac858 end:0x021acdd8

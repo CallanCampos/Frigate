@@ -21,7 +21,7 @@
 #include "pml/personal.h"
 #include "pml/poke_party.h"
 #include "save/player_info.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "system/bmp_menulist.h"
 #include "system/bmp_winframe.h"
 #include "system/str_tool.h"
@@ -111,7 +111,7 @@ static u16 Deposit_GetSexBaseColor(int sex);
 static u16 Deposit_GetSexColor(int sex, u16 color);
 static void Deposit_DepositPokemonDataMake(Dpw_Tr_Data *dtd, WorldTradeWork *wk);
 static int Deposit_PokeNameSortListMake(ListMenuOption **menulist, MsgData *monsNameManager, MsgData *msgManager,
-                                        u16 *table, u8 *sinou, int num, int select, PokeDexSave *zukan);
+                                        u16 *table, u8 *sinnoh, int num, int select, PokeDexSave *dex);
 static u32 Deposit_BmpListMain(BmpMenuList *list, u16 *posBackup);
 
 static int (*sDepositSubSeqTable[])(WorldTradeWork *wk) = {
@@ -197,8 +197,8 @@ int WorldTrade_Deposit_Init(WorldTradeWork *wk, int seq) {
     header.msgManager = wk->msgManager;
     header.monsNameManager = wk->monsNameManager;
     header.countryNameManager = wk->countryNameManager;
-    header.zukan = wk->param->pokedex;
-    header.sinouTable = wk->dw->sinouTable;
+    header.dex = wk->param->pokedex;
+    header.sinnohTable = wk->dw->sinnohTable;
     header.config = wk->param->config;
     wk->inputWork = WorldTrade_Input_Init(&header, 2, 0);
 
@@ -420,13 +420,13 @@ static void Deposit_InitWork(WorldTradeWork *wk) {
     wk->talkString = GFL_StrBufCreate(180, HEAPID_WORLDTRADE);
     wk->dw = GFL_HeapAllocate(HEAPID_WORLDTRADE, sizeof(WorldTradeDepositWork), FALSE, "worldtrade_deposit.c", 692);
     MIi_CpuClearFast(0, wk->dw, sizeof(WorldTradeDepositWork));
-    wk->dw->nameSortTable = WorldTrade_ZukanSortDataGet(HEAPID_WORLDTRADE, 0, &wk->dw->nameSortNum);
-    wk->dw->sinouTable = WorldTrade_SinouZukanDataGet(HEAPID_WORLDTRADE);
+    wk->dw->nameSortTable = WorldTrade_PokedexSortDataGet(HEAPID_WORLDTRADE, 0, &wk->dw->nameSortNum);
+    wk->dw->sinnohTable = WorldTrade_SinnohPokedexDataGet(HEAPID_WORLDTRADE);
     WorldTrade_SelectListPosInit(&wk->selectListPos);
 }
 
 static void Deposit_FreeWork(WorldTradeWork *wk) {
-    GFL_HeapFree(wk->dw->sinouTable);
+    GFL_HeapFree(wk->dw->sinnohTable);
     GFL_HeapFree(wk->dw->nameSortTable);
     GFL_HeapFree(wk->dw);
     GFL_StrBufFree(wk->talkString);
@@ -886,7 +886,7 @@ void WorldTrade_PokeInfoPrint(MsgData *msgManager, WordSet *wordSet, BmpWin **wi
     GFL_StrBufFree(title);
 }
 
-u16 *WorldTrade_ZukanSortDataGet(int heapId, int idx, int *num) {
+u16 *WorldTrade_PokedexSortDataGet(int heapId, int idx, int *num) {
     u32 size;
     u16 *data = GFL_ArcSysReadHeapNewLZGetLen(97, 5, FALSE, heapId, &size);
 
@@ -908,7 +908,7 @@ void WorldTrade_HeadwordRangeGet(int select, int *start, int *end) {
     *end = ZukanSortHiraTable[select + 1];
 }
 
-u8 *WorldTrade_SinouZukanDataGet(int heapId) {
+u8 *WorldTrade_SinnohPokedexDataGet(int heapId) {
     u32 i = 0;
     u8 *table = GFL_HeapAllocate(HEAPID_WORLDTRADE, MONSNO_TABLE_SIZE, FALSE, "worldtrade_deposit.c", 1942);
     u32 size;
@@ -969,20 +969,20 @@ static void Deposit_DepositPokemonDataMake(Dpw_Tr_Data *dtd, WorldTradeWork *wk)
 }
 
 static int Deposit_PokeNameSortListMake(ListMenuOption **menulist, MsgData *monsNameManager, MsgData *msgManager,
-                                        u16 *table, u8 *sinou, int num, int select, PokeDexSave *zukan) {
+                                        u16 *table, u8 *sinnoh, int num, int select, PokeDexSave *dex) {
     int count = 0;
     int start = sNameHeadTable[select];
     int max = sNameHeadTable[select + 1] - start;
     int i;
 
     for (i = 0; i < max; i++) {
-        if (PokeDex_IsSeen(zukan, table[start + i])) {
+        if (PokeDex_IsSeen(dex, table[start + i])) {
             count++;
         }
     }
     *menulist = ListMenuCore_CreateOptionList(count + 1, HEAPID_WORLDTRADE);
     for (i = 0; i < max; i++) {
-        if (PokeDex_IsSeen(zukan, table[start + i])) {
+        if (PokeDex_IsSeen(dex, table[start + i])) {
             ListMenuCore_AppendMsgOption(*menulist, monsNameManager, table[start + i], table[start + i],
                                          HEAPID_WORLDTRADE);
         }
@@ -993,15 +993,15 @@ static int Deposit_PokeNameSortListMake(ListMenuOption **menulist, MsgData *mons
 
 BmpMenuList *WorldTrade_PokeNameListMake(WorldTradeWork *wk, ListMenuOption **menulist, BmpWin *win,
                                          MsgData *msgManager, MsgData *monsNameManager, WorldTradeDepositWork *dw,
-                                         PokeDexSave *zukan) {
+                                         PokeDexSave *dex) {
     BmpMenuListHeader header;
     int head;
     int num;
 
     GFL_BitmapFill(BmpWin_GetBitmap(win), 15);
     head = dw->headwordListPos + dw->headwordPos;
-    num = Deposit_PokeNameSortListMake(menulist, monsNameManager, msgManager, dw->nameSortTable, dw->sinouTable,
-                                       dw->nameSortNum, head, zukan);
+    num = Deposit_PokeNameSortListMake(menulist, monsNameManager, msgManager, dw->nameSortTable, dw->sinnohTable,
+                                       dw->nameSortNum, head, dex);
     header = sPokeNameListHeader;
     header.count = num;
     header.options = *menulist;

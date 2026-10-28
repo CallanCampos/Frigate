@@ -121,7 +121,7 @@
 #define ARCID_TPOKE 208
 // The Marine Tube board's graphics on the main screen (marine_tube_board.c). Our name, not swan's
 #define ARCID_MARINE_TUBE_BOARD 297
-// The Pokédex diplomas' graphics (chihou_zukan_award.c and zenkoku_zukan_award.c). Our name, not swan's
+// The Pokédex diplomas' graphics (regional_pokedex_award.c and national_pokedex_award.c). Our name, not swan's
 #define ARCID_ZUKAN_AWARD 199
 // The graphics of the Battle Subway's records screen (bsubway_records.c). Our name, not swan's
 #define ARCID_BSUBWAY_RECORDS 196
@@ -188,7 +188,7 @@
 #define ARCID_FIELD_MENU 70               // field_menu.c, field_subscreen.c
 #define ARCID_PLIST 75                    // plist_sys.c, plist_battle.c, plist_menu.c
 #define ARCID_FIELD_PLACE_NAME 83         // field_place_name.c, namein.c
-#define ARCID_TOWNMAP_GRA 84              // townmap.c, townmap_grh.c, zukan_detail_map.c
+#define ARCID_TOWNMAP_GRA 84              // townmap.c, townmap_grh.c, pokedex_detail_map.c
 #define ARCID_ITEMMENU 87                 // itemmenu.c, itemmenu_disp.c
 #define ARCID_BTLV_EFFVM_BG 94            // btlv_effvm.c
 #define ARCID_B_BAG 98                    // b_bag_anm.c, b_bag_main.c, b_bag_obj.c
@@ -223,8 +223,8 @@
 #define ARCID_TIME_ICON 195               // time_icon.c
 #define ARCID_FIELD_SAVEANIME 197         // field_saveanime.c
 #define ARCID_PSEL 202                    // psel.c
-#define ARCID_DENDOU_PC 210         // hall_of_fame_pc_main.c
-#define ARCID_DENDOU_DEMO 213       // hall_of_fame_demo_main.c, hall_of_fame_demo_obj.c
+#define ARCID_DENDOU_PC 210               // hall_of_fame_pc_main.c
+#define ARCID_DENDOU_DEMO 213             // hall_of_fame_demo_main.c, hall_of_fame_demo_obj.c
 #define ARCID_MANUAL 218                  // manual_common.c
 #define ARCID_ASSERT_WINDOW_GRA 230       // net_err.c
 #define ARCID_BTLV_EFFVM_PAL_ANIM 231     // btlv_effvm.c

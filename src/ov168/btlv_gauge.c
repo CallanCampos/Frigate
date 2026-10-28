@@ -27,7 +27,7 @@
 #include "nitro/math.h"
 #include "pml/personal.h"
 #include "pml/poke_party.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "system/app_menu_common.h"
 #include "system/gf_font.h"
 #include "system/hp_gauge.h"

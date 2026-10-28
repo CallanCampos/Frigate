@@ -18,7 +18,7 @@
 #include "pml/waza.h"
 #include "save/bag.h"
 #include "save/musical_savedata.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/save_control.h"
 #include "save/shortcut.h"
 #include "system/rtc.h"

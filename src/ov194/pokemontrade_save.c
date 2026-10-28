@@ -31,7 +31,7 @@
 #include "save/chatter.h"
 #include "save/medal_box.h"
 #include "save/player_info.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/records.h"
 #include "save/save_control.h"
 #include "save/wifi_list.h"
@@ -58,7 +58,7 @@ static void PoketradeSave_SendTradeSummary(PokemonTradeWork *wk);
 static void *func_ov194_021bef14(GameData *gameData, HeapID heapId);
 static void PoketradeSave_RestoreSaveControl(GameData *gameData, void *copy);
 static void *func_ov194_021bef7c(GameData *gameData, HeapID heapId);
-static void PoketradeSave_RestoreZukan(GameData *gameData, void *copy);
+static void PoketradeSave_RestorePokedex(GameData *gameData, void *copy);
 static void *func_ov194_021befdc(GameData *gameData, HeapID heapId);
 static void PoketradeSave_RestoreBlock1F(GameData *gameData, void *copy);
 static void PoketradeSave_FreeBackups(void *work);
@@ -284,7 +284,7 @@ static void *func_ov194_021bef7c(GameData *gameData, HeapID heapId) {
     return copy;
 }
 
-static void PoketradeSave_RestoreZukan(GameData *gameData, void *copy) {
+static void PoketradeSave_RestorePokedex(GameData *gameData, void *copy) {
     MI_CpuCopy8(copy, GameData_GetPokedex(gameData), getSizeofPokedexData());
     GFL_HeapFree(copy);
 }
@@ -350,7 +350,7 @@ static void PoketradeSave_RestoreBackups(PokemonTradeWork *wk) {
         PoketradeSave_RestoreSaveControl(wk->gameData, wk->backup.survey);
     }
     if (wk->backup.pokedex != NULL) {
-        PoketradeSave_RestoreZukan(wk->gameData, wk->backup.pokedex);
+        PoketradeSave_RestorePokedex(wk->gameData, wk->backup.pokedex);
     }
     if (wk->backup.playersMet != NULL) {
         PoketradeSave_RestoreBlock1F(wk->gameData, wk->backup.playersMet);

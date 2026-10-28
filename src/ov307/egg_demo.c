@@ -30,7 +30,7 @@
 #include "gfl/ui.h"
 #include "nitro/hw.h"
 #include "pml/poke_party.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/records.h"
 #include "save/save_control.h"
 #include "system/bmp_menu.h"

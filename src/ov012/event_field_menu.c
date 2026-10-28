@@ -169,7 +169,7 @@ GameEventReturnCode EventFieldMenu_Callback(GameEvent *event, u32 *state, void *
 static const s32 sFieldMenuAppIds[9] = {
     -1,
     FIELD_APP_POKELIST,
-    FIELD_APP_ZUKAN,
+    FIELD_APP_POKEDEX,
     FIELD_APP_BAG,
     FIELD_APP_TRAINER_CARD,
     FIELD_APP_SAVE,

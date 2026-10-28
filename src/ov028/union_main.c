@@ -33,7 +33,7 @@
 #include "pml/poke_party.h"
 #include "save/join_avenue.h"
 #include "save/player_info.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/save_control.h"
 #include "save/wifi_list.h"
 #include "system/game_comm.h"

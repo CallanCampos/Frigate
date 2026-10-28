@@ -220,8 +220,8 @@ int WorldTrade_Search_Init(WorldTradeWork *wk, int seq) {
     header.msgManager = wk->msgManager;
     header.monsNameManager = wk->monsNameManager;
     header.countryNameManager = wk->countryNameManager;
-    header.zukan = wk->param->pokedex;
-    header.sinouTable = wk->dw->sinouTable;
+    header.dex = wk->param->pokedex;
+    header.sinnohTable = wk->dw->sinnohTable;
     wk->inputWork = WorldTrade_Input_Init(&header, 2, INPUT_SITUATION_SEARCH);
 
     Search_WantLabelPrint(&wk->infoWin[0], wk->countryWin, wk->msgManager, &wk->print);
@@ -517,12 +517,12 @@ static void Search_InitWork(WorldTradeWork *wk) {
     wk->titleString = GFL_MsgDataLoadStrbufNew(wk->msgManager, 0x30);
     wk->dw = GFL_HeapAllocate(HEAPID_WORLDTRADE, sizeof(WorldTradeDepositWork), FALSE, "worldtrade_search.c", 849);
     MIi_CpuClearFast(0, wk->dw, sizeof(WorldTradeDepositWork));
-    wk->dw->sinouTable = WorldTrade_SinouZukanDataGet(HEAPID_WORLDTRADE);
+    wk->dw->sinnohTable = WorldTrade_SinnohPokedexDataGet(HEAPID_WORLDTRADE);
     WorldTrade_SelectListPosInit(&wk->selectListPos);
 }
 
 static void Search_FreeWork(WorldTradeWork *wk) {
-    GFL_HeapFree(wk->dw->sinouTable);
+    GFL_HeapFree(wk->dw->sinnohTable);
     GFL_HeapFree(wk->dw);
     GFL_StrBufFree(wk->talkString);
     GFL_StrBufFree(wk->titleString);

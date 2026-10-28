@@ -126,7 +126,7 @@ typedef struct UnionEffect UnionEffect;
 typedef struct WbtPartyList WbtPartyList;
 typedef struct WbtSave WbtSave;
 typedef struct WihDwcWork WihDwcWork;
-typedef struct ZukanHabitatSave ZukanHabitatSave;
+typedef struct PokedexHabitatSave PokedexHabitatSave;
 typedef union BattleAction BattleAction;
 typedef struct BattleBoxSave BattleBoxSave;
 typedef struct BattleCondition BattleCondition;

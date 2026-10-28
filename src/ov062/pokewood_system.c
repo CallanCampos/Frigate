@@ -7,7 +7,7 @@
 #include "gfl/std.h"
 #include "pml/poke_party.h"
 #include "save/medal_box.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/pokewood.h"
 #include "save/records.h"
 #include "save/save_control.h"

@@ -33,7 +33,7 @@
 #include "gfl/str.h"
 #include "pml/poke_party.h"
 #include "save/bsubway_save.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/save_control.h"
 #include "system/game_data.h"
 #include "system/game_event.h"

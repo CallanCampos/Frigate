@@ -26,7 +26,7 @@
 #include "save/chatter.h"
 #include "save/event_work.h"
 #include "save/player_info.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "system/game_data.h"
 #include "system/game_system.h"
 

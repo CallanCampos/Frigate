@@ -25,7 +25,7 @@
 #include "save/high_link.h"
 #include "save/mystery_gift.h"
 #include "save/player_info.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/save_control.h"
 #include "save/trainer_card.h"
 #include "struct_decls.h"

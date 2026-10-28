@@ -39,7 +39,7 @@
 #include "nitro/os.h"
 #include "pml/poke_party.h"
 #include "save/encounter.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/records.h"
 #include "save/save_control.h"
 #include "save/traded_pokemon.h"

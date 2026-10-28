@@ -27,7 +27,7 @@
 #include "nitro/rtc.h"
 #include "pml/poke_party.h"
 #include "save/medal_box.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/save_control.h"
 #include "save/wbt_save.h"
 #include "system/game_data.h"
