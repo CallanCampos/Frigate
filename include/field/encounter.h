@@ -116,7 +116,7 @@ u16 EffectEncount_GetItemId(EncountSystem *system);
 // The wild encounters of field_encount.c
 EncountSystem *EncSys_Create(Field *field);
 void EncSys_Free(EncountSystem *system);
-BOOL EncSys_IsActive(EncountSystem *system, u32 a1);
+BOOL EncSys_IsActive(EncountSystem *system, u32 unused);
 void EncSys_Update(EncountSystem *system, BOOL moved, BOOL turned);
 // The flags of a static encounter that make its Pokémon: shiny, without its held item, with its hidden ability, never
 // shiny, male or female. The others change the battle
