@@ -721,7 +721,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     NULL,                                             // 0x26f
     NULL,                                             // 0x270
     s0271_MedalAcknowledge,                           // 0x271
-    s0272_MedalGetGuruActor,                          // 0x272
+    s0272_MedalGetSpinTradeActor,                     // 0x272
     s0273_MedalGive,                                  // 0x273
     s0274_FunfestMissionStart,                        // 0x274
     s0275_WordSetFunfestMission,                      // 0x275

@@ -355,11 +355,11 @@ static BOOL UnionCommand_App(GameSystem *gsys, UnionSystem *unisys, Field *field
         if (self->activity == 3) {
             param = subproc->arg;
             param->app = unisys->alloc.uniapp;
-            GSYS_QueueProc(gsys, OVERLAY_ID(70), &OEKAKI_PROC_FUNCTIONS, param);
+            GSYS_QueueProc(gsys, OVERLAY_ID(70), &DRAWING_PROC_FUNCTIONS, param);
         } else {
             param = subproc->arg;
             param->app = unisys->alloc.uniapp;
-            GSYS_QueueProc(gsys, OVERLAY_ID(216), &GURU2_PROC_FUNCTIONS, param);
+            GSYS_QueueProc(gsys, OVERLAY_ID(216), &SPIN_TRADE_PROC_FUNCTIONS, param);
         }
         (*step)++;
         break;

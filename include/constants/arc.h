@@ -213,11 +213,11 @@
 #define ARCID_BEACON 171                  // beacon_view_setup.c, beacon_detail.c
 #define ARCID_ENTRANCE_CAMERA 177         // entrance_camera.c
 #define ARCID_COMM_BTL_DEMO 178           // comm_btl_demo.c
-#define ARCID_GURU2 180                   // guru2_main.c
-#define ARCID_GURU2_OBJ 181               // guru2_receipt.c, guru2_main.c
+#define ARCID_GURU2 180                   // spin_trade_main.c
+#define ARCID_GURU2_OBJ 181               // spin_trade_receipt.c, spin_trade_main.c
 #define ARCID_FLD_FACEUP 184              // fld_faceup.c
 #define ARCID_BTL_REC_SEL 185             // btl_rec_sel.c
-#define ARCID_OEKAKI 188                  // oekaki.c
+#define ARCID_OEKAKI 188                  // drawing.c
 #define ARCID_REPORT 193                  // report.c
 #define ARCID_GEONET 194                  // geonet.c
 #define ARCID_TIME_ICON 195               // time_icon.c

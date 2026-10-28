@@ -673,10 +673,10 @@ Same instructions, registers swapped.
   integer locals, inline wrappers and `const` did not change it. The callee keeps `int` parameters: with enum
   parameters the locals are propagated again.
 - A store of 0 is not always emitted where it is written: MWCC can sink it below later stores, and only the place
-  where the zero is built shows where the statement was. In the Spin Trade's `Guru2Receipt_UpdatePalAnim`
-  (`anim->counter = 0;` before `anim->index++;`) and `Guru2Main_InitDisc` (`disc->angle = 0;` before
+  where the zero is built shows where the statement was. In the Spin Trade's `SpinTradeReceipt_UpdatePalAnim`
+  (`anim->counter = 0;` before `anim->index++;`) and `SpinTradeMain_InitDisc` (`disc->angle = 0;` before
   `disc->angleOffset = ...`) moving the zero store up fixed a register swap. A `static const` table's read is reused
-  across a call, but a read through a pointer to its row is loaded again: `Guru2MainSeq_Bonus` reads the clamp's
+  across a call, but a read through a pointer to its row is loaded again: `SpinTradeMainSeq_Bonus` reads the clamp's
   first Berry through `const u32 *range = sBonusItems[count];`. The tell is a function that matches when the table is
   made non-`const` although it sits in `.rodata`.
 - A copy's size computed by a call and held in a local before the `MI_CpuCopy8` or `MI_CpuFill8` is scheduled
@@ -1730,8 +1730,8 @@ Same instructions, scheduled in another order.
   written after that call: overlay 185's `CountupGreetings` stores `n`'s zero before calling
   `PMSWord_GetWordNumByGmmId` only with `n = 0;` after `first` and `last` are computed. Written before the call, it is
   stored after the call's result and built in `r0`; the next function, `CountupPokemon`, sets it right after its call.
-- The same holds for a flag: `oekaki.c`'s `Oekaki_UpdateTouch` sets `endPressed = TRUE;` after
-  `Oekaki_PrintMessage(...)` in both arms of its End button case. The store to `[sp]` is hoisted above the call
+- The same holds for a flag: `drawing.c`'s `Drawing_UpdateTouch` sets `endPressed = TRUE;` after
+  `Drawing_PrintMessage(...)` in both arms of its End button case. The store to `[sp]` is hoisted above the call
   either way, built in `r1` when the statement follows the call and in `r0` when it precedes it.
 - A field of a local struct that a call fills is loaded before the next call only when the source reads it there: the
   Pokédex forms page copies `targetX = target.x;` between `PokedexDetailForm_GetSpritePosF32(..., &target)` and
@@ -2589,7 +2589,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `oam->x` with `ClAct_WrapOamX(oam->x)` for both its left and its right edge (and `oam->y` likewise), where one local
   wrapped once was 56 bytes short.
 - `FX32_ONE` is an `int` constant in `nitro/fx.h` but a `long` in the SDK. Where a product of it is passed on,
-  the type shows: `oekaki.c`'s `Oekaki_CreateActors` matches only with the sub surface's Y as `256 * 0x1000L`.
+  the type shows: `drawing.c`'s `Drawing_CreateActors` matches only with the sub surface's Y as `256 * 0x1000L`.
 - Two identical expressions are merged into one spilled value, even across calls and loops. Where the original
   computes the value twice, the two sites differ in type: `pleasure_boat_rooms.c`'s `PleasureBoat_SetUpRooms` draws
   `NELEMS(sPeople) - (trainerCount + 2)` people, which is unsigned through `sizeof`, and later loops to the signed
@@ -4310,7 +4310,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   not in it), and a tentative `.bss` definition counts at the end of the file. With that, `rodata_order.py`'s model
   predicts `pkwd_briefing.c` (117 objects), `c_gear_sw.c` and `comm_btl_demo.c` exactly; without it no declaration
   order of their tables gives the ROM's layout. A lone table ahead of the sorted run still means another file in
-  front (`oekaki_comm.c`). A global initialized to zero (`int x = 0;`) goes to `.bss` too but counts where it is
+  front (`drawing_comm.c`). A global initialized to zero (`int x = 0;`) goes to `.bss` too but counts where it is
   defined: one before `wifibattlematch_net_fields.c`'s tables moves their strings as a `const` scalar there does.
   Several tentative definitions enter the list in the reverse of their declarations: `vct_audio.c`'s fifteen `.bss`
   statics (eleven scalars, built with `-ipa file`) come out as the model predicts only when they are given to

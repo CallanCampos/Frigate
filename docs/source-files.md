@@ -841,8 +841,8 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `oekaki_comm.c` | `0x0217cfc0`–`0x0217d34c` | 12 | complete | descriptive |
-| `oekaki.c` | `0x0217d34c`–`0x0217f84c` | 89 | complete | string at `0x0217fd38` |
+| `drawing_comm.c` | `0x0217cfc0`–`0x0217d34c` | 12 | complete | descriptive |
+| `drawing.c` | `0x0217d34c`–`0x0217f84c` | 89 | complete | ROM's `oekaki.c`, string at `0x0217fd38` |
 
 ### Overlay 71
 
@@ -2256,10 +2256,10 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `guru2.c` | `0x021bb700`–`0x021bb984` | 13 | complete | string at `0x021c1100` |
-| `guru2_comm.c` | `0x021bb984`–`0x021bbc98` | 25 | complete | string at `0x021c1108` |
-| `guru2_receipt.c` | `0x021bbc98`–`0x021bd6a0` | 69 | complete | descriptive |
-| `guru2_main.c` | `0x021bd6a0`–`0x021c08d0` | 185 | complete | string at `0x021c1158` |
+| `spin_trade.c` | `0x021bb700`–`0x021bb984` | 13 | complete | ROM's `guru2.c`, string at `0x021c1100` |
+| `spin_trade_comm.c` | `0x021bb984`–`0x021bbc98` | 25 | complete | ROM's `guru2_comm.c`, string at `0x021c1108` |
+| `spin_trade_receipt.c` | `0x021bbc98`–`0x021bd6a0` | 69 | complete | descriptive |
+| `spin_trade_main.c` | `0x021bd6a0`–`0x021c08d0` | 185 | complete | ROM's `guru2_main.c`, string at `0x021c1158` |
 
 ### Overlay 253
 

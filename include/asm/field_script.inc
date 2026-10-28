@@ -3263,7 +3263,7 @@
     .2byte \a1
     .endm
 
-    .macro MedalGetGuruActor a0, a1
+    .macro MedalGetSpinTradeActor a0, a1
     FieldCommand 626
     .2byte \a0
     .2byte \a1
