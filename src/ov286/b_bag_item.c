@@ -1,5 +1,6 @@
 #include "battle/b_bag_item.h"
 #include "battle/b_bag_main.h"
+#include "constants/arc.h"
 #include "constants/items.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
@@ -48,7 +49,7 @@ void BBagItem_MakePocketLists(BBagWork *work) {
     u8 pocket;
     u8 bits;
 
-    pockets = GFL_ArcSysReadHeapNew(228, 0, work->param->heapId);
+    pockets = GFL_ArcSysReadHeapNew(ARCID_B_BAG_ITEM, 0, work->param->heapId);
     for (i = 0; i < 3; i++) {
         for (j = 0;; j++) {
             slot = BagSave_GetItemIndexHandle(work->param->bag, data_ov286_021f6e88[i], j);

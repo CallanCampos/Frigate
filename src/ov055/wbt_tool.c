@@ -53,7 +53,7 @@ void WbtTool_LoadTrainerClassName(HeapID heapId, u32 message, StrBuf *strbuf) {
 }
 
 WbtTrainers *WbtTrainers_Load(HeapID heapId) {
-    ArcTool *handle = GFL_ArcSysCreateFileHandle(247, HEAPID_TAIL(heapId));
+    ArcTool *handle = GFL_ArcSysCreateFileHandle(ARCID_WBT_TOOL, HEAPID_TAIL(heapId));
     u32 size = GFL_ArcToolGetDataLength(handle, 0);
     WbtTrainers *trainers = GFL_HeapAllocate(heapId, size + 4, TRUE, "wbt_tool.c", 126);
 

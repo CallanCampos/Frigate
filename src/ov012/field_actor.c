@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/obj_codes.h"
 #include "field/field_actor.h"
 #include "field/field_actor_internal.h"
@@ -1808,7 +1809,7 @@ static void FldActSys_FreeConfigArc(MMSys *system) {
 }
 
 void LoadMModelSystemInfoCache(MMSys *mmSys, s32 index) {
-    GFL_ArcSysRead(mmSys->actorConfigCache, 0x39, index);
+    GFL_ArcSysRead(mmSys->actorConfigCache, ARCID_FIELD_ACTOR_CONFIG, index);
 }
 
 void GetMMSysMdlInfoCacheEntry(MMSys *system, u32 index, FieldActorConfig *config) {

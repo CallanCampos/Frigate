@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field_map.h"
 #include "field/intrude_work.h"
 #include "field/zone.h"
@@ -31,7 +32,7 @@ MapReplace *MapReplace_Create(HeapID heapId, GameSystem *gsys) {
     MapReplace *replace = GFL_HeapAllocate(heapId, sizeof(MapReplace), TRUE, "map_replace.c", 0x77);
 
     replace->heapId = heapId;
-    replace->arc = GFL_ArcSysCreateFileHandle(10, heapId);
+    replace->arc = GFL_ArcSysCreateFileHandle(ARCID_MAP_REPLACE, heapId);
     replace->entryCount = (u16)GFL_ArcToolGetDataLength(replace->arc, 0) / sizeof(MapReplaceEntry);
     MapReplace_LoadVariables(&replace->variables, gsys);
     return replace;

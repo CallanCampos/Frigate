@@ -33,13 +33,14 @@
 #include "system/vm.h"
 
 struct BtlvEffvm {
-    u32 flipSides : 1;         // bit 0   swaps the sides of the positions; nothing in the file sets it
-    u32 cameraReset : 1;       // bit 1   the camera returns to its default with the effect's end
-    u32 seDelayed : 1;         // bit 2   a delayed sound effect waits (BtlvEffvm_PlaySEAt)
-    u32 seSliding : 1;         // bit 3   a sound player's parameter moves (BtlvEffvm_SlideSE)
-    u32 bgMoved : 1;           // bit 4   BG 3 was loaded; the end restores its priority and offset
-    u32 alphaBlend : 1;        // bit 5   the blend was changed; the end restores it
-    u32 isEffect : 1;          // bit 6   the script is an effect's, from archive 66, rather than a move's, from 65
+    u32 flipSides : 1;   // bit 0   swaps the sides of the positions; nothing in the file sets it
+    u32 cameraReset : 1; // bit 1   the camera returns to its default with the effect's end
+    u32 seDelayed : 1;   // bit 2   a delayed sound effect waits (BtlvEffvm_PlaySEAt)
+    u32 seSliding : 1;   // bit 3   a sound player's parameter moves (BtlvEffvm_SlideSE)
+    u32 bgMoved : 1;     // bit 4   BG 3 was loaded; the end restores its priority and offset
+    u32 alphaBlend : 1;  // bit 5   the blend was changed; the end restores it
+    u32 isEffect
+        : 1; // bit 6   the script is an effect's, from ARCID_BTLV_EFFVM_EFFECT_SCRIPTS, rather than a move's, from 65
     u32 paused : 1;            // bit 7   until BtlvEffvm_Resume
     u32 windowTask : 1;        // bit 8   BtlvEffect_QueueCommands' window task runs
     u32 bgmLowered : 1;        // bit 9
@@ -580,7 +581,7 @@ void BtlvEffvm_Start(VM *vm, u32 attacker, u32 defender, u16 move, BtlvEffvmPara
         BtlvEffect_SetPokemonCheck(0);
     }
     if (wk->move < BTLV_EFFECT_FIRST) {
-        wk->script = GFL_ArcSysReadHeapNew(65, move, HEAPID_TAIL(wk->heapId));
+        wk->script = GFL_ArcSysReadHeapNew(ARCID_BTLV_EFFVM_MOVE_SCRIPTS, move, HEAPID_TAIL(wk->heapId));
         if (wk->move != 144 && wk->move != 119 && wk->move != 267) {
             BtlvEffect_SetGaugeDrawEnableBySide(0, 2);
         }
@@ -590,7 +591,8 @@ void BtlvEffvm_Start(VM *vm, u32 attacker, u32 defender, u16 move, BtlvEffvmPara
         wk->isEffect = FALSE;
         BtlvEffvm_StartBgmFade(wk, 0x7f000, 0x6b000, 20);
     } else {
-        wk->script = GFL_ArcSysReadHeapNew(66, move - BTLV_EFFECT_FIRST, HEAPID_TAIL(wk->heapId));
+        wk->script =
+            GFL_ArcSysReadHeapNew(ARCID_BTLV_EFFVM_EFFECT_SCRIPTS, move - BTLV_EFFECT_FIRST, HEAPID_TAIL(wk->heapId));
         wk->isEffect = TRUE;
         if (move >= 0x256 && !(reg_G2_BLDALPHA & 0x1f)) {
             GFL_BGSysSetBGEnabled(1, FALSE);
@@ -620,14 +622,14 @@ void BtlvEffvm_Start(VM *vm, u32 attacker, u32 defender, u16 move, BtlvEffvmPara
     if (wk->move == 0x27e && visible) {
         wk->savedScript = wk->script;
         wk->savedOffset = offset;
-        wk->script = GFL_ArcSysReadHeapNew(66, 51, HEAPID_TAIL(wk->heapId));
+        wk->script = GFL_ArcSysReadHeapNew(ARCID_BTLV_EFFVM_EFFECT_SCRIPTS, 51, HEAPID_TAIL(wk->heapId));
         wk->isEffect = TRUE;
         wk->substituteRestore = TRUE;
         offset = 4;
     } else if (!wk->isEffect && wk->move != 144 && !wk->substituteRestore && visible) {
         wk->savedScript = wk->script;
         wk->savedOffset = offset;
-        wk->script = GFL_ArcSysReadHeapNew(66, 51, HEAPID_TAIL(wk->heapId));
+        wk->script = GFL_ArcSysReadHeapNew(ARCID_BTLV_EFFVM_EFFECT_SCRIPTS, 51, HEAPID_TAIL(wk->heapId));
         wk->isEffect = TRUE;
         offset = 4;
     }
@@ -2542,7 +2544,8 @@ static BOOL BtlvEffvm_CmdCall(VM *vm, void *env) {
         wk->defender = defender;
     }
     wk->value = 0;
-    wk->script = GFL_ArcSysReadHeapNew(66, effect - BTLV_EFFECT_FIRST, HEAPID_TAIL(wk->heapId));
+    wk->script =
+        GFL_ArcSysReadHeapNew(ARCID_BTLV_EFFVM_EFFECT_SCRIPTS, effect - BTLV_EFFECT_FIRST, HEAPID_TAIL(wk->heapId));
     VM_Call(vm, (u8 *)wk->script + ((u32 *)wk->script)[1]);
     wk->callDepth++;
     return wk->ret;
@@ -2585,9 +2588,10 @@ static BOOL BtlvEffvm_CmdChangeScript(VM *vm, void *env) {
 
     GFL_HeapFree(wk->script);
     if (effect < BTLV_EFFECT_FIRST) {
-        wk->script = GFL_ArcSysReadHeapNew(65, effect, HEAPID_TAIL(wk->heapId));
+        wk->script = GFL_ArcSysReadHeapNew(ARCID_BTLV_EFFVM_MOVE_SCRIPTS, effect, HEAPID_TAIL(wk->heapId));
     } else {
-        wk->script = GFL_ArcSysReadHeapNew(66, effect - BTLV_EFFECT_FIRST, HEAPID_TAIL(wk->heapId));
+        wk->script =
+            GFL_ArcSysReadHeapNew(ARCID_BTLV_EFFVM_EFFECT_SCRIPTS, effect - BTLV_EFFECT_FIRST, HEAPID_TAIL(wk->heapId));
     }
     script = wk->script;
     wk->value = 0;
@@ -2691,7 +2695,7 @@ static BOOL BtlvEffvm_CmdEnd(VM *vm, void *env) {
     if (wk->substituteRestore == TRUE && wk->move == 0x291) {
         GFL_HeapFree(wk->script);
         wk->move = 52;
-        wk->script = GFL_ArcSysReadHeapNew(66, wk->move, HEAPID_TAIL(wk->heapId));
+        wk->script = GFL_ArcSysReadHeapNew(ARCID_BTLV_EFFVM_EFFECT_SCRIPTS, wk->move, HEAPID_TAIL(wk->heapId));
         wk->isEffect = TRUE;
         wk->value = 0;
         wk->substituteRestore = FALSE;
@@ -2705,7 +2709,7 @@ static BOOL BtlvEffvm_CmdEnd(VM *vm, void *env) {
         }
         GFL_HeapFree(wk->script);
         wk->move = 52;
-        wk->script = GFL_ArcSysReadHeapNew(66, wk->move, HEAPID_TAIL(wk->heapId));
+        wk->script = GFL_ArcSysReadHeapNew(ARCID_BTLV_EFFVM_EFFECT_SCRIPTS, wk->move, HEAPID_TAIL(wk->heapId));
         wk->isEffect = TRUE;
         wk->value = 0;
         wk->substituteRestore = FALSE;

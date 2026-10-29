@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field_lens_flare.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -41,7 +42,7 @@ FieldLensFlareData *FieldLensFlareData_Create(HeapID heapId) {
     FieldLensFlareData *data;
 
     data = GFL_HeapAllocate(heapId, sizeof(FieldLensFlareData), TRUE, "field_goout_effect_data.c", 57);
-    data->entries = GFL_ArcSysReadHeapNewLZGetLen(0xf1, 0, 0, heapId, &data->byteCount);
+    data->entries = GFL_ArcSysReadHeapNewLZGetLen(ARCID_FIELD_GOOUT_EFFECT_DATA, 0, 0, heapId, &data->byteCount);
     return data;
 }
 

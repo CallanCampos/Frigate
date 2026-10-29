@@ -47,9 +47,9 @@
 #include "system/wordset.h"
 #include "text/system/0368.h"
 
-// The field effects of the 3D scenes of archive 0x76 (fld3d_ci.c, after the file name that its allocations pass): the
-// Pokemon's sprite of a field move, the battle cut-ins and Alder's flight, with their particles, sounds and screen
-// fades. Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0); the layouts are ours
+// The field effects of the 3D scenes of ARCID_FLD3D_CI_FILE (fld3d_ci.c, after the file name that its allocations
+// pass): the Pokemon's sprite of a field move, the battle cut-ins and Alder's flight, with their particles, sounds and
+// screen fades. Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0); the layouts are ours
 
 typedef struct {
     u32 flags;
@@ -86,7 +86,7 @@ typedef struct {
     u32 fogEnabled;
 } Fld3DCiScene;
 
-// An effect's file in archive 0x76
+// An effect's file in ARCID_FLD3D_CI_FILE
 typedef struct {
     u32 particle;
     u16 particleDelay[2];
@@ -132,7 +132,7 @@ typedef struct {
     u8 index;
 } BitmapConvParam;
 
-// An entry of an effect's bitmap file in archive 0x10c: the names of a texture and a palette of the effect's
+// An entry of an effect's bitmap file in ARCID_FLD3D_CI_BITMAP: the names of a texture and a palette of the effect's
 // model, and the graphics to put in them
 typedef struct {
     char texName[0x14];
@@ -453,7 +453,7 @@ GameEvent *EventFieldEffect_CreateBattleCutin(GameSystem *gsys, Fld3DCi *ci, u32
     data = GameEvent_GetData(event);
     Fld3DCi_InitEventData(ci, data);
     data->scene.param = param;
-    GFL_ArcSysReadRange(header, 0x10c, cutin->cutin, 0, 4);
+    GFL_ArcSysReadRange(header, ARCID_FLD3D_CI_BITMAP, cutin->cutin, 0, 4);
     if (header[1] != 0 || header[0] != 0) {
         ci->callback = EventFieldEffectCutinSub_Callback;
     } else {
@@ -762,7 +762,7 @@ static void EventFieldEffect_LoadGraphics(GameEvent *event, Fld3DCi *ci, Fld3DCi
     Fld3DCi_LoadG3DSceneTemplate(scene, effectId, ci->heapId);
     Fld3DCi_LoadG3DScene(ci, &scene->setup);
     if (scene->particle != 0xffff) {
-        particleRes = FieldParticle_LoadResource(ci->particleSystem, 0x74, scene->particle);
+        particleRes = FieldParticle_LoadResource(ci->particleSystem, ARCID_FLD3D_CI_RESOURCES, scene->particle);
         FieldParticle_SetResource(ci->particleSystem, particleRes, TRUE, NULL);
     } else {
         particleRes = NULL;
@@ -803,7 +803,7 @@ static void EventFieldEffect_LoadGraphics(GameEvent *event, Fld3DCi *ci, Fld3DCi
     if (scene->animation2Count != 0) {
         ci->actor2Enabled = 1;
     }
-    GFL_ArcSysReadRange(header, 0x10c, effectId, 0, 4);
+    GFL_ArcSysReadRange(header, ARCID_FLD3D_CI_BITMAP, effectId, 0, 4);
     if (header[0] != 0) {
         GameEvent_ChainNext(
             event, GameEvent_Create(GameEvent_GetGameSystem(event), event, EventFld3DCiBitmapConv_Callback, 0));
@@ -845,7 +845,7 @@ static void Fld3DCi_LoadG3DSceneTemplate(Fld3DCiScene *scene, u32 fileId, HeapID
     u8 i;
     u8 j;
 
-    GFL_ArcSysRead(&file, 0x76, fileId);
+    GFL_ArcSysRead(&file, ARCID_FLD3D_CI_FILE, fileId);
     actorCount = 0;
     for (i = 0; i < 2; i++) {
         if (file.models[i] != 0xffff) {
@@ -903,7 +903,7 @@ static void Fld3DCi_LoadG3DSceneTemplate(Fld3DCiScene *scene, u32 fileId, HeapID
     i = 0;
     for (j = 0; j < 8; j++) {
         if (ids[j] != 0xffff) {
-            scene->resources[i].arcId = 0x74;
+            scene->resources[i].arcId = ARCID_FLD3D_CI_RESOURCES;
             scene->resources[i].fileId = ids[j];
             scene->resources[i].type = 0;
             i++;
@@ -1369,7 +1369,8 @@ static GameEventReturnCode EventFld3DCiBitmapConv_Callback(GameEvent *event, u32
 
     switch (*state) {
     case BITMAP_CONV_STATE_LOAD:
-        param->entries = GFL_ArcSysReadHeapNewRange(0x10c, param->file, ci->heapId, 4, param->count * 0x30);
+        param->entries =
+            GFL_ArcSysReadHeapNewRange(ARCID_FLD3D_CI_BITMAP, param->file, ci->heapId, 4, param->count * 0x30);
         param->index = 0;
         (*state)++;
     case BITMAP_CONV_STATE_CONVERT:

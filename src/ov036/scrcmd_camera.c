@@ -2,6 +2,7 @@
 // returning it, waiting for it and shaking it. The ROM has no name for the file; scrcmd_camera.c is descriptive.
 // Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_camera.h"
 #include "field/field_nogrid_mapper.h"
@@ -106,7 +107,7 @@ BOOL Scrcmd_Camera_EvCameraMoveToCommon(VM *vm, FieldScriptEnv *env) {
     u16 dataId = VM_Read16(vm);
     u16 frames = VM_Read16(vm);
 
-    GFL_ArcSysRead(&data, 161, dataId);
+    GFL_ArcSysRead(&data, ARCID_SCRCMD_CAMERA, dataId);
     setup.targetCoords.pitch = data.pitch;
     setup.targetCoords.yaw = data.yaw;
     setup.targetCoords.distance = data.distance;

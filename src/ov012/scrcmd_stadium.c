@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/event_data.h"
 #include "field/field_actor.h"
 #include "field/field_script.h"
@@ -15,7 +16,7 @@
 
 BOOL Scrcmd_Stadium_StadiumLoadTrainerTable(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    StadiumTrainerEntry *trainers = GFL_ArcSysReadHeapNewLZ(0xce, 0, 0, HEAPID_TAIL(4));
+    StadiumTrainerEntry *trainers = GFL_ArcSysReadHeapNewLZ(ARCID_SCRCMD_STADIUM, 0, 0, HEAPID_TAIL(4));
     ScriptWork_SetStadiumTrainers(work, trainers);
     return FALSE;
 }

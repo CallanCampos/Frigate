@@ -38,7 +38,7 @@ static void FieldCameraAreaCalc_RECT_LookatTargetOffs(FieldSceneArea *area, cons
 static void FieldCameraAreaCalc_RECT_FOV(FieldSceneArea *area, const CameraArea *cameraArea, const VecFx32 *pos);
 
 // The camera areas of the field maps, and of the other maps
-static const u32 FIELD_CAMERA_ARCIDS[2] = { 79, ARCID_FIELD_CAMERA_MAP_PARAM };
+static const u32 FIELD_CAMERA_ARCIDS[2] = { ARCID_FIELD_SCENE_AREA, ARCID_FIELD_CAMERA_MAP_PARAM };
 
 static CameraAreaCollCheck CAM_COLL_CHECK_FUNCS[2] = {
     FieldCameraArea_CIRCLE_CheckColl,
