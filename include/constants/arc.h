@@ -176,6 +176,7 @@
 // The 2D graphics archives that the code loads by number, named after the source files that load them, or the
 // app's prefix where several do (docs/data.md, 2D graphics). Our names, not swan's
 #define ARCID_MAP_REPLACE 10                       // map_replace.c
+#define ARCID_BTLV_EFFVM_PARTICLES 6               // btlv_effvm.c, intro_particle.c
 #define ARCID_BTLV 11                              // btlv_scu.c, btlv_stage.c, pkwd_briefing.c
 #define ARCID_ERROR_WINDOW_GRA 22                  // net_err.c, error_window_screen.c, wfc_user_info_warning.c
 #define ARCID_CONFIG_PANEL 27                      // config_panel.c

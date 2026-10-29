@@ -1135,7 +1135,7 @@ static BOOL BtlvEffvm_CmdParticleLoad(VM *vm, void *env) {
 
     if (BtlvEffvm_FindOrAddParticleId(wk, fileId, &index) == TRUE) {
         work = GFL_HeapAllocate(HEAPID_TAIL(wk->heapId), 0x4800, FALSE, "btlv_effvm.c", 1912);
-        resource = Particle_ReadResource(6, fileId, HEAPID_TAIL(wk->heapId));
+        resource = Particle_ReadResource(ARCID_BTLV_EFFVM_PARTICLES, fileId, HEAPID_TAIL(wk->heapId));
         if (work != NULL && resource != NULL) {
             wk->particles[index] = Particle_CreateSystemEx(work, 0x4800, FALSE, 5, 6, 54, HEAPID_TAIL(wk->heapId));
             if (wk->particles[index] != NULL) {
