@@ -28,7 +28,7 @@ Script_4:
     // "Reshiram has been registered\nin the Pokédex."
     SystemMsg PlasmaFrigate22_Text_ReshiramHasBeenRegistered, 0
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     // "And this is the legendary Electric-type\nPokémon Zekrom.[f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, PlasmaFrigate22_Text_LegendaryElectricTypePokemon, 0, 0
     ActorMsgClose
@@ -37,7 +37,7 @@ Script_4:
     // "Zekrom has been registered\nin the Pokédex."
     SystemMsg PlasmaFrigate22_Text_ZekromHasBeenRegistered, 0
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     // "I yearned for them since I was a child.\nWhen I saw them two years ago,[f000]븀\u0000\nI was so moved that I cried!"
     ParentActorMsg MSGFILE_SCRIPT, PlasmaFrigate22_Text_YearnedThemSinceChild, 0, 0
     LastKeyWait
@@ -140,7 +140,7 @@ Script_7:
     // "Warning! Warning!\nIntruders in the vessel![f000]븀\u0000\nEveryone, please respond."
     InfoMsg PlasmaFrigate22_Text_WarningWarningIntrudersVessel, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     WorkSetConst EVENT_WORK_0x4149, 2
     FinishAllEvents
     ActorsUnpauseAll

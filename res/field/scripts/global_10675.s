@@ -13,7 +13,7 @@ Script_1:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    WbtCmd_GetSlot 0, 0x8010
+    GetSlot 0, 0x8010
     VMCall L_0060
     FinishAllEvents
     ActorsUnpauseAll
@@ -23,7 +23,7 @@ Script_2:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    WbtCmd_GetSlot 1, 0x8010
+    GetSlot 1, 0x8010
     VMCall L_0060
     FinishAllEvents
     ActorsUnpauseAll
@@ -33,7 +33,7 @@ Script_3:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    WbtCmd_GetSlot 2, 0x8010
+    GetSlot 2, 0x8010
     VMCall L_0060
     FinishAllEvents
     ActorsUnpauseAll
@@ -52,7 +52,7 @@ Script_4:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    WbtCmd_GetWinCount 4, 17, 0x8010
+    GetWinCount 4, 17, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -74,7 +74,7 @@ L_00BF:
 L_00C5:
     // "I know a lot about strong Trainers.[f000]븁\u0000\nHey! Which region's Trainers\ndo you want to know about?"
     ParentActorMsg MSGFILE_SCRIPT, Global10675_Text_KnowLotAboutStrong, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32802
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32802
     VMCall L_11DE
     VMStackPush 0x8021
     VMStackPushConst 0
@@ -178,7 +178,7 @@ L_0238:
     VMJumpIf CMP_STACK, L_0670
     // "Which Trainer do you want to\nknow about?"
     ParentActorMsg MSGFILE_SCRIPT, Global10675_Text_WhichTrainerWantKnow, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32802
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32802
     WbtIsTrainerBeaten 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
@@ -469,7 +469,7 @@ L_0678:
     VMJumpIf CMP_STACK, L_095C
     // "Which Trainer do you want to\nknow about?"
     ParentActorMsg MSGFILE_SCRIPT, Global10675_Text_WhichTrainerWantKnow, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32802
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32802
     WbtIsTrainerBeaten 20, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
@@ -670,7 +670,7 @@ L_0964:
     VMJumpIf CMP_STACK, L_0C04
     // "Which Trainer do you want to\nknow about?"
     ParentActorMsg MSGFILE_SCRIPT, Global10675_Text_WhichTrainerWantKnow, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32802
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32802
     WbtIsTrainerBeaten 27, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
@@ -853,7 +853,7 @@ L_0C0C:
     VMJumpIf CMP_STACK, L_0F34
     // "Which Trainer do you want to\nknow about?"
     ParentActorMsg MSGFILE_SCRIPT, Global10675_Text_WhichTrainerWantKnow, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32802
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32802
     WbtIsTrainerBeaten 36, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
@@ -1072,7 +1072,7 @@ L_0F3C:
     VMJumpIf CMP_STACK, L_11DC
     // "Which Trainer do you want to\nknow about?"
     ParentActorMsg MSGFILE_SCRIPT, Global10675_Text_WhichTrainerWantKnow, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32802
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32802
     WbtIsTrainerBeaten 45, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1

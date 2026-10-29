@@ -10,7 +10,7 @@
 #include "save/save_control.h"
 #include "system/game_data.h"
 
-BOOL s01FA_PepQuizGenerate(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PepQuiz_PepQuizGenerate(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u16 hard = ScriptReadAny(vm, env);
     u16 *question = ScriptReadVar(vm, env);

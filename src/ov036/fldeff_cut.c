@@ -1,7 +1,7 @@
 // The slash that Cut leaves, and the script commands of the League's lift, the beacons and the Pass Powers that share
 // its range. The ROM names it fldeff_iaigiri.c, by GFL_HeapAllocate's file argument; the commands' names are from swan
-// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except s01DD_BroadcastGameBeacon and s01DF_CallPassPowerFlash,
-// which are ours
+// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except Scrcmd_FldeffCut_BroadcastGameBeacon and
+// Scrcmd_FldeffCut_CallPassPowerFlash, which are ours
 #include "types.h"
 #include "field/event_league_lift.h"
 #include "field/field_actor.h"
@@ -20,7 +20,7 @@
 
 #define CUT_ANM_COUNT 3
 
-// What s01DD_BroadcastGameBeacon broadcasts, each by its GameBeacon_Broadcast function
+// What Scrcmd_FldeffCut_BroadcastGameBeacon broadcasts, each by its GameBeacon_Broadcast function
 enum {
     BEACON_COMMAND_FOUND_ITEM,
     BEACON_COMMAND_FIELD_MOVE,
@@ -184,7 +184,7 @@ static void FldeffCut_Draw(FieldEffectTask *task, void *data) {
     GFL_G3DSysDrawObjBBoxCull(work->actor, &mtx);
 }
 
-BOOL s01B1_CallLeagueLiftWarp(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FldeffCut_CallLeagueLiftWarp(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -192,7 +192,7 @@ BOOL s01B1_CallLeagueLiftWarp(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s01DD_BroadcastGameBeacon(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FldeffCut_BroadcastGameBeacon(VM *vm, FieldScriptEnv *env) {
     u16 command = ScriptReadAny(vm, env);
     u16 value = ScriptReadAny(vm, env);
     u16 extra = ScriptReadAny(vm, env);
@@ -254,7 +254,7 @@ BOOL s01DD_BroadcastGameBeacon(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01DE_PassPowerPopDepletedID(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FldeffCut_PassPowerPopDepletedID(VM *vm, FieldScriptEnv *env) {
     u16 *depletedId = ScriptReadVar(vm, env);
     u16 *remains = ScriptReadVar(vm, env);
 
@@ -271,7 +271,7 @@ BOOL s01DE_PassPowerPopDepletedID(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01DF_CallPassPowerFlash(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FldeffCut_CallPassPowerFlash(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
     ScriptWork_CallEvent(work, EventPassPowerFlash_Create(FieldScriptEnv_GetGameSystem(env)));

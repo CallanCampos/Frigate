@@ -53,11 +53,11 @@ L_008E:
     WordSetPartyPokeName 0, 0x8022
     // "[f000]Ă\u0001\u0000 popped out of\nthe Poké Ball![f000]븁\u0000"
     InfoMsg CasteliaCity22_Text_PoppedOutPokeBall, 2
-    InfoMsgClose_0039
+    InfoMsgClose
     VMCall L_02ED
     BGMPlay SEQ_BGM_E_INISHIE
     ActorCmdExec 0x8011, Movement_03B4
-    Plugin16Cmd_StartChase 251
+    StartChase 251
     DebugPrint 1
     ActorCmdExec 251, Movement_0418
     VMSleep 129
@@ -73,7 +73,7 @@ L_008E:
     DebugPrint 3
     ActorCmdExec 251, Movement_042C
     ActorCmdExec 0x8011, Movement_03C4
-    Plugin16Cmd_WaitChase
+    WaitChase
     DebugPrint 4
     ActorCmdWait
     DebugPrint 5
@@ -89,10 +89,10 @@ L_008E:
     WordSetPartyPokeName 0, 0x8022
     // "[f000]Ă\u0001\u0000 remembered the\nRelic Song it had forgotten![f000]븁\u0000"
     SystemMsg CasteliaCity22_Text_RememberedRelicSongHad, 2
-    InfoMsgClose
+    SystemMsgClose
 
 L_019B:
-    Plugin16Cmd_DropActor
+    DropActor
     EvCameraMoveTo 9688, 0, 0xed000, 0x58000, 0, 0x78000, 25
     EvCameraWait
     VMStackPush 0x8023

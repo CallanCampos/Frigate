@@ -35,7 +35,7 @@ BOOL ScriptNative_WaitGameCommDisconnect(VM *vm, void *arg) {
     return FALSE;
 }
 
-BOOL s0139_GameCommDisconnect(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Network_GameCommDisconnect(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     void **slot;
     u16 *result;
@@ -52,13 +52,13 @@ BOOL s0139_GameCommDisconnect(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s013B_GameCommCheckDSiWiFi(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Network_GameCommCheckDSiWiFi(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     *result = isWirelessEnabled();
     return FALSE;
 }
 
-BOOL s013C_GameCommTryBoot(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Network_GameCommTryBoot(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
 
     gsys = FieldScriptEnv_GetGameSystem(env);
@@ -66,7 +66,7 @@ BOOL s013C_GameCommTryBoot(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s013D_GameCommPause(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Network_GameCommPause(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     GameCommSys *commSys;
 
@@ -88,7 +88,7 @@ BOOL s013D_GameCommPause(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s013E_GameCommResume(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Network_GameCommResume(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
 
     gsys = FieldScriptEnv_GetGameSystem(env);
@@ -107,7 +107,7 @@ BOOL GameCommPause_Finish(FinishScriptSubEventsWork *work, u32 *state) {
     return TRUE;
 }
 
-BOOL s024A_FieldSubscreenIsEnabled(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Network_FieldSubscreenIsEnabled(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     u16 *value;
 
@@ -117,7 +117,7 @@ BOOL s024A_FieldSubscreenIsEnabled(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s024B_FieldSubscreenDisable(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Network_FieldSubscreenDisable(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GSYS_SetCGearOn(gsys, 0);
     GameData_SetCGearPowerRequest(GSYS_GetGameData(gsys), 0);

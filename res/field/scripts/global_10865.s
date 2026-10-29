@@ -187,9 +187,9 @@ L_02CC:
     FadeOutBlackQ
     FadeWait
     BMReleaseHandle 0x8025
-    PokewoodCmd_Create
-    PokewoodCmd_WatchBlock
-    PokewoodCmd_Free
+    Pokewood_Create
+    WatchBlock
+    Pokewood_Free
     PlayerGetGPos 0x8027, 0x8028
     BMCreateHandleByGPos 0x8025, 1, 0x8027, 0x8028
     BMHndAudioVisualAnmPlay 0x8025, 1
@@ -249,7 +249,7 @@ Script_1:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    PokewoodCmd_Create
+    Pokewood_Create
     WorkSetConst 0x8020, 2
 
 L_043C:
@@ -314,7 +314,7 @@ L_050A:
     VMJump L_043C
 
 L_0510:
-    PokewoodCmd_Free
+    Pokewood_Free
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -329,7 +329,7 @@ L_051E:
     VMJumpIf CMP_STACK, L_05F1
     // "Welcome to Pokéstar Studios.\nHow may I help you?"
     ActorMsg MSGFILE_SCRIPT, Global10865_Text_WelcomePokestarStudiosHow, 0x8011, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32801
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32801
     ListMenuAdd 0, 65535, 0
     ListMenuAdd 1, 65535, 1
     ListMenuAdd 2, 65535, 2
@@ -339,7 +339,7 @@ L_051E:
     VMJump L_05BA
 
 L_0573:
-    PokewoodCmd_CountDownloadedMovies 0x8024
+    CountDownloadedMovies 0x8024
     VMStackPush 0x8024
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -381,7 +381,7 @@ L_05F3:
     // "Please select the movie\nyou'd like to watch.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10865_Text_PleaseSelectMovieYoud, 0x8011, 2, 0
     MsgWinCloseAll
-    PokewoodCmd_OpenMenu 0, 0x8023
+    OpenMenu 0, 0x8023
     DebugPrint 0x8023
     VMStackPush 0x8023
     VMStackPushConst 8
@@ -413,8 +413,8 @@ L_0632:
     FadeOutBlackQ
     FadeWait
     BMReleaseHandle 0x8025
-    PokewoodCmd_WatchSlot 0x8023, 0x8026
-    PokewoodCmd_GetSlotFlag 0x8023, 0x8010
+    WatchSlot 0x8023, 0x8026
+    GetSlotFlag 0x8023, 0x8010
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -572,8 +572,8 @@ L_0887:
     VMReturn
 
 L_08D1:
-    PokewoodCmd_GetSlotFlag 0x8023, 0x8010
-    PokewoodCmd_SetSlotFlag 0x8023
+    GetSlotFlag 0x8023, 0x8010
+    SetSlotFlag 0x8023
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -643,7 +643,7 @@ L_09BA:
 
 L_09D4:
     WordSetPlayerName 0
-    PokewoodCmd_GetDownloadedMovieResult EVENT_WORK_0x4001, 0x8010
+    GetDownloadedMovieResult EVENT_WORK_0x4001, 0x8010
     WorkCmpConst 0x8010, 1
     VMJumpIf CMP_EQ, L_09F0
     VMJump L_0A02
@@ -749,20 +749,20 @@ Movement_0B18:
 Script_2:
     ActorsPauseAll
     WorkSetConst 0x8029, 0
-    PokewoodCmd_CountMovieFlags 5, 0x8029
+    CountMovieFlags 5, 0x8029
     VMStackPush 0x8029
     VMStackPushConst 0
     VMStackCmp CMP_GT
     VMJumpIf CMP_STACK, L_0B53
     SEPlay SEQ_SE_MESSAGE
-    PokewoodCmd_OpenRecordMonitor 0x8010
+    OpenRecordMonitor 0x8010
     VMJump L_0B5D
 
 L_0B53:
     // "This monitor is currently being tested."
     SystemMsg Global10865_Text_MonitorCurrentlyBeingTested, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
 
 L_0B5D:
     WorkSetConst 0x8029, 0

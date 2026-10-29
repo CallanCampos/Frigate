@@ -18,8 +18,8 @@
 // The script of Mr. Medal, whose actor and NPC the medal commands look for
 #define SCRID_MR_MEDAL 0x298e
 
-// What s026E_MedalGetCount counts: the medals of a status, the medals the next rank needs, the medals that can be
-// hinted, the medals not yet obtained, or the rank itself
+// What Scrcmd_Medal_MedalGetCount counts: the medals of a status, the medals the next rank needs, the medals that can
+// be hinted, the medals not yet obtained, or the rank itself
 enum {
     MEDAL_GET_COUNT_STATUS_1,
     MEDAL_GET_COUNT_DISCOVERED,
@@ -31,7 +31,7 @@ enum {
     MEDAL_GET_COUNT_RANK,
 };
 
-BOOL s026E_MedalGetCount(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Medal_MedalGetCount(VM *vm, FieldScriptEnv *env) {
     MedalBox *box = SaveControl_GetMedalBox(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     u8 mode = VM_Read8(vm);
     u16 *result = ScriptReadVar(vm, env);
@@ -65,7 +65,7 @@ BOOL s026E_MedalGetCount(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0271_MedalAcknowledge(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Medal_MedalAcknowledge(VM *vm, FieldScriptEnv *env) {
     MedalBox *box = SaveControl_GetMedalBox(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     u16 medal = ScriptReadAny(vm, env);
     u16 acknowledge = ScriptReadAny(vm, env);
@@ -81,7 +81,7 @@ BOOL s0271_MedalAcknowledge(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0272_MedalGetSpinTradeActor(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Medal_MedalGetSpinTradeActor(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u16 *exists = ScriptReadVar(vm, env);
@@ -96,7 +96,7 @@ BOOL s0272_MedalGetSpinTradeActor(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0273_MedalGive(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Medal_MedalGive(VM *vm, FieldScriptEnv *env) {
     MedalBox *box = SaveControl_GetMedalBox(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     u16 medal = ScriptReadAny(vm, env);
 
@@ -106,7 +106,7 @@ BOOL s0273_MedalGive(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s029F_MedalDiscover(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Medal_MedalDiscover(VM *vm, FieldScriptEnv *env) {
     MedalBox *box = SaveControl_GetMedalBox(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     u16 medal = ScriptReadAny(vm, env);
 
@@ -116,7 +116,7 @@ BOOL s029F_MedalDiscover(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s029E_MedalGetFieldEffectID(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Medal_MedalGetFieldEffectID(VM *vm, FieldScriptEnv *env) {
     MedalData data;
     u16 medal;
     u16 *result;
@@ -159,7 +159,7 @@ u32 GetHintableMedalCount(FieldScriptEnv *env) {
     return count;
 }
 
-BOOL s02A0_MedalIsObtained(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Medal_MedalIsObtained(VM *vm, FieldScriptEnv *env) {
     MedalBox *box = SaveControl_GetMedalBox(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     u16 *result = ScriptReadVar(vm, env);
 
@@ -171,7 +171,7 @@ BOOL s02A0_MedalIsObtained(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s02A1_MedalGetMostCompleteCategory(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Medal_MedalGetMostCompleteCategory(VM *vm, FieldScriptEnv *env) {
     s32 j;
     fx32 best = 0;
     fx32 obtained[5] = { 0 };
@@ -246,7 +246,7 @@ u32 GetMrMedalActorUID(GameData *gameData) {
     return -1;
 }
 
-BOOL s02E1_MedalDiscoverInitial(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Medal_MedalDiscoverInitial(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     SaveControl *save;
     MedalBox *box;

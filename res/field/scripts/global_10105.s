@@ -201,7 +201,7 @@ L_02B5:
     WorkSetConst 0x8026, 0
     WorkSetConst 0x8027, 0
     WorkSetConst 0x8028, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32806
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32806
     ItemCheckAmount ITEM_PROP_CASE, 1, 0x8027
     ItemCheckAmount ITEM_VS_RECORDER, 1, 0x8028
     VMStackPush 0x8028
@@ -376,7 +376,7 @@ L_055B:
 
 L_056F:
     WorkSetConst 0x802f, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32815
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32815
     ListMenuAdd 54, 65535, 1
     ListMenuAdd 55, 65535, 4
     ListMenuAdd 56, 65535, 254
@@ -410,7 +410,7 @@ L_05E9:
     VMJumpIf CMP_STACK, L_06DB
     // "Would you like to know more details?"
     ActorMsg MSGFILE_SCRIPT, Global10105_Text_WouldLikeKnowMore, 0x8011, 4, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32816
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32816
     ListMenuAdd 59, 65535, 0
     ListMenuAdd 60, 65535, 1
     ListMenuAdd 61, 65535, 2
@@ -472,12 +472,12 @@ L_06DB:
 L_06F5:
     WorkSetConst 0x8033, 0
     WorkSetConst 0x8034, 0
-    PokemonCenterCmd_GetMatchState 0, 0x8033
+    GetMatchState 0, 0x8033
     VMStackPush 0x8033
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0753
-    PokemonCenterCmd_GetMatchState 2, 0x8033
+    GetMatchState 2, 0x8033
     VMStackPush 0x8033
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -489,7 +489,7 @@ L_06F5:
     VMJump L_0753
 
 L_074D:
-    PokemonCenterCmd_SetMatchState 5, 0x8033
+    SetMatchState 5, 0x8033
 
 L_0753:
     VMCall L_0026
@@ -503,7 +503,7 @@ L_0753:
 L_0774:
     // "Which Battle would you like\nto choose?"
     ActorMsg MSGFILE_SCRIPT, Global10105_Text_WhichBattleWouldLike, 0x8011, 4, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32819
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32819
     ListMenuAdd 67, 65535, 0
     ListMenuAdd 68, 65535, 1
     ListMenuAdd 69, 65535, 2
@@ -533,7 +533,7 @@ L_07FC:
     WorkSetConst 0x8036, 73
     WorkAdd 0x8036, 0x8029
     ActorMsg MSGFILE_SCRIPT, 0x8036, 0x8011, 4, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32821
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32821
     ListMenuAdd 78, 65535, 0
     ListMenuAdd 79, 65535, 1
     ListMenuAdd 80, 65535, 2
@@ -569,7 +569,7 @@ L_08AD:
     WorkSetConst 0x8038, 0
     WorkSetConst 0x8039, 0
     ActorMsgClose
-    Regulation_CheckPartyRegulation 0x802a, 0x8037
+    CheckPartyRegulation 0x802a, 0x8037
     VMStackPush 0x8037
     VMStackPushConst 2
     VMStackCmp CMP_EQ
@@ -592,8 +592,8 @@ L_08E8:
 
 L_0915:
     WorkGet 0x802b, 0x8037
-    PokemonCenterCmd_SetMatchInProgress
-    PokemonCenterCmd_SetMatchState 4, 1
+    SetMatchInProgress
+    SetMatchState 4, 1
     RTGetZoneID 0x8039
     FieldSetNextZone 0x8039, 1, 10, 65535, 1
     FlagSet EVENT_FLAG_CONTINUE_SCRIPT
@@ -618,10 +618,10 @@ L_0915:
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_09B0
     WorkSetConst 0x8020, 255
-    PokemonCenterCmd_ClearMatchInProgress
+    ClearMatchInProgress
     FlagReset EVENT_FLAG_CONTINUE_SCRIPT
     WorkSetConst EVENT_WORK_CONTINUE_SCRIPT, 0
-    PokemonCenterCmd_SetMatchState 4, 0
+    SetMatchState 4, 0
     SetSoftResetBlocked 1, 0
     VMReturn
 
@@ -635,10 +635,10 @@ L_09B0:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_09FB
     WorkSetConst 0x8020, 255
-    PokemonCenterCmd_ClearMatchInProgress
+    ClearMatchInProgress
     FlagReset EVENT_FLAG_CONTINUE_SCRIPT
     WorkSetConst EVENT_WORK_CONTINUE_SCRIPT, 0
-    PokemonCenterCmd_SetMatchState 4, 0
+    SetMatchState 4, 0
     SetSoftResetBlocked 1, 0
     VMReturn
     VMJump L_0A2E
@@ -649,10 +649,10 @@ L_09FB:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0A2E
     WorkSetConst 0x8020, 252
-    PokemonCenterCmd_ClearMatchInProgress
+    ClearMatchInProgress
     FlagReset EVENT_FLAG_CONTINUE_SCRIPT
     WorkSetConst EVENT_WORK_CONTINUE_SCRIPT, 0
-    PokemonCenterCmd_SetMatchState 4, 0
+    SetMatchState 4, 0
     SetSoftResetBlocked 1, 0
     VMReturn
 
@@ -776,7 +776,7 @@ L_0BE9:
     WorkSetConst 0x803d, 0
     // "Would you like to make a Global Trade?"
     ActorMsg MSGFILE_SCRIPT, Global10105_Text_WouldLikeMakeGlobal, 0x8011, 4, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32829
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32829
     ListMenuAdd 17, 65535, 1
     ListMenuAdd 18, 65535, 2
     ListMenuAdd 19, 65535, 3
@@ -890,7 +890,7 @@ L_0DA1:
     WorkSetConst 0x8041, 0
     // "Would you like to make a GTS trade?"
     ActorMsg MSGFILE_SCRIPT, Global10105_Text_WouldLikeMakeGts, 0x8011, 4, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32833
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32833
     ListMenuAdd 22, 65535, 2
     ListMenuAdd 23, 65535, 1
     ListMenuAdd 24, 65535, 254
@@ -923,7 +923,7 @@ L_0E21:
     VMJumpIf CMP_STACK, L_0EB9
     // "Should I describe things in\ngreater detail?"
     ActorMsg MSGFILE_SCRIPT, Global10105_Text_ShouldDescribeThingsGreater, 0x8011, 4, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32834
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32834
     ListMenuAdd 29, 65535, 0
     ListMenuAdd 30, 65535, 1
     ListMenuAdd 31, 65535, 2
@@ -1146,7 +1146,7 @@ L_1189:
 
 L_119D:
     WorkSetConst 0x804a, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32842
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32842
     ListMenuAdd 33, 65535, 2
     ListMenuAdd 34, 65535, 1
     ListMenuAdd 35, 65535, 254
@@ -1179,7 +1179,7 @@ L_1211:
     VMJumpIf CMP_STACK, L_12A9
     // "Should I describe things in\ngreater detail?"
     ActorMsg MSGFILE_SCRIPT, Global10105_Text_ShouldDescribeThingsGreater_2, 0x8011, 4, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32843
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32843
     ListMenuAdd 40, 65535, 0
     ListMenuAdd 41, 65535, 1
     ListMenuAdd 42, 65535, 2
@@ -1302,7 +1302,7 @@ L_13F6:
     VMJumpIf CMP_STACK, L_149A
     // "Would you like to view or upload\nMusical Photos?"
     ActorMsg MSGFILE_SCRIPT, Global10105_Text_WouldLikeViewUpload_2, 0x8011, 4, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32847
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32847
     ListMenuAdd 50, 65535, 0
     ListMenuAdd 51, 65535, 1
     ListMenuAdd 52, 65535, 2
@@ -1349,7 +1349,7 @@ L_14BA:
     VMJumpIf CMP_STACK, L_155E
     // "Would you like to view or upload\nBattle Videos?"
     ActorMsg MSGFILE_SCRIPT, Global10105_Text_WouldLikeViewUpload, 0x8011, 4, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32849
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32849
     ListMenuAdd 45, 65535, 0
     ListMenuAdd 46, 65535, 1
     ListMenuAdd 47, 65535, 2

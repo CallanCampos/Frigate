@@ -383,7 +383,7 @@ Script_11:
 
 Data_02E4:
     VMNop2
-    InfoMsgClose
+    SystemMsgClose
     DebugStack 0
     VMNop
     VMReturn
@@ -525,11 +525,11 @@ L_03E6:
     VMCall L_045C
     // "Which floor would you like to go to?"
     SystemMsg Global10405_Text_WhichFloorWouldLike, 2
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32784
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32784
     ElevatorBuildListMenu
     ListMenuAdd 0, 65535, 255
     ListMenuShow
-    InfoMsgClose
+    SystemMsgClose
     DebugPrint 0x8010
     VMStackPush 0x8010
     VMStackPushConst 255

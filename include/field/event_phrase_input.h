@@ -26,8 +26,8 @@ GameEvent *EventPhraseInput_Create(GameSystem *gsys, Field *field, GameEvent *pa
 GameEventReturnCode EventPhraseInput_Callback(GameEvent *event, u32 *state, void *data);
 void EventPhraseInput_StoreResult(struct EventPhraseInputData *data, NameEntryParam *nameEntryParams);
 // Script commands
-BOOL Scrcmd_CheckWifiListFlags(VM *vm, FieldScriptEnv *env);
-BOOL Scrcmd_WifiListOperation(VM *vm, FieldScriptEnv *env);
-BOOL Scrcmd_SetWifiFriendNameWord(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_PhraseInput_CheckWifiListFlags(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_PhraseInput_WifiListOperation(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_PhraseInput_SetWifiFriendNameWord(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_EVENT_PHRASE_INPUT_H

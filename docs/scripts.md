@@ -76,15 +76,17 @@ L_015C:
     VMReturn
 ```
 
-Commands are named after their handlers, without the number of swan's names, such as `s0024_FlagReset` for `FlagReset`
-and `s0207_WordSetPasserbyCount` for `WordSetPasserbyCount`. A few that are still address-named are named after the
-function they call, such as `IsFestMissionAvailable`. Those whose calls only tell the save data they use get its area,
-such as `HighLinkCmd_0170`, and the rest are `Cmd_NNNN`.
+A command's handler is `Scrcmd_<Group>_<Name>`, where `<Group>` is its file, `scrcmd_<group>.c` (or the file's name
+without `event_` for the few outside those), and the command is `<Name>`: `Scrcmd_Vm_FlagReset` is `FlagReset`, and
+`Scrcmd_Msg_InfoMsgClose` `InfoMsgClose`. swan's handlers (`s0024_FlagReset`) take this form too. A few handlers that
+are still address-named are named after the function they call, such as `IsFestMissionAvailable`. Those whose calls only
+tell the save data they use get its area, such as `HighLinkCmd_0170`, and the rest are `Cmd_NNNN`.
 
-Commands from ID 1000 up come from the script plugin, overlays that the zone loads. They take their handler's name once
-it has one, such as `BadgeGateCmd_PlayCheck`, and are `PluginN_CmdNNNN` until then. A handler that serves commands of
-two numbers names each with its number, such as `WbtCmd_ResetPicks_1023` and `WbtCmd_ResetPicks_1031`. Overlay 12's
-`SCRIPT_PLUGIN_TABLE` lists the plugins:
+Commands from ID 1000 up come from the script plugin, overlays that the zone loads. They take their handler's `<Name>`
+once it has one, as the base commands do (`Scrcmd_BadgeGate_PlayCheck` is `PlayCheck`), with the group in front where
+another command has the name already (`BlackTower_GetInfo`, beside other plugins' `GetInfo`), and are `PluginN_CmdNNNN`
+until then. A handler that serves commands of two numbers names each with its number, such as `ResetPicks_1023` and
+`ResetPicks_1031`. Overlay 12's `SCRIPT_PLUGIN_TABLE` lists the plugins:
 
 | Plugin | Overlays | For | Files named in the overlays |
 |---|---|---|---|

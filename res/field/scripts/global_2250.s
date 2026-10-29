@@ -8,7 +8,7 @@ Script_1:
     WorkSetConst 0x8020, 0
     // "Oh?[f000]븁\u0000"
     SystemMsg Global2250_Text_Oh, 2
-    InfoMsgClose
+    SystemMsgClose
     CallEggHatch 0x8020
     RecordAdd 9, 1
     JoinAvenueRecordActivity 8

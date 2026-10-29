@@ -50,7 +50,7 @@ L_00BE:
 L_00C4:
     // "Which Rotom will you allow\nto enter a motor?[f000]븁\u0000"
     SystemMsg Global10315_Text_WhichRotomWillAllow, 2
-    InfoMsgClose
+    SystemMsgClose
     CallPokeSelect 0, 0x8010, 0x8021, 0
     VMStackPush 0x8010
     VMStackPushConst 1
@@ -85,7 +85,7 @@ L_012C:
 L_0132:
     SystemMsg 0x8022, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 L_013E:
@@ -93,7 +93,7 @@ L_013E:
     MEPlay SEQ_ME_LVUP
     MEWait
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 L_0150:
@@ -142,7 +142,7 @@ L_01EF:
     VMJumpIf CMP_STACK, L_02FF
     // "Which appliance's motor will you\nallow [f000]Ă\u0001\u0000 to enter?"
     SystemMsg Global10315_Text_WhichAppliancesMotorWill, 2
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32813
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32813
     ListMenuAdd 7, 65535, 1
     ListMenuAdd 8, 65535, 2
     ListMenuAdd 10, 65535, 3
@@ -399,7 +399,7 @@ L_05A3:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0698
-    InfoMsgClose
+    SystemMsgClose
     CallPokeMoveReplace 0x8010, 0x8023, 0x8021, 0x8024
     VMStackPush 0x8010
     VMStackPushConst 0
@@ -410,7 +410,7 @@ L_05A3:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0623
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8010, 0
     WorkSetConst 0x8032, 1
 
@@ -438,7 +438,7 @@ L_066B:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0692
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8010, 0
     WorkSetConst 0x8032, 1
 
@@ -451,7 +451,7 @@ L_0698:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_06BF
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8010, 0
     WorkSetConst 0x8032, 1
 

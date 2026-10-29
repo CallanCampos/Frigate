@@ -153,7 +153,7 @@ L_01C4:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0372
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32804
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32804
     ListMenuAdd 13, 65535, 1
     ListMenuAdd 14, 65535, 2
     ListMenuAdd 15, 65535, 3
@@ -263,7 +263,7 @@ L_0372:
 Script_7:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
-    BSubwayCmd_Tool 43, 0, 0, 32784
+    Tool 43, 0, 0, 32784
     DebugPrint 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
@@ -276,7 +276,7 @@ Script_7:
     VMJump L_03B5
 
 L_03AB:
-    BSubwayCmd_Tool 111, 0, 0, 32784
+    Tool 111, 0, 0, 32784
 
 L_03B5:
     FinishAllEvents

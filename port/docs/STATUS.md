@@ -32,11 +32,36 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: integrate the reviewed VM and terrain sync with native backup
+
+- **Upstream:** reviewed main `a5f21a0da0` includes frozen `cdbe99de1c73`; PR 64 passed both full native suites,
+  original ROM hashes, actual assembly oracles and all 14 checks before owner approval and protected merge.
+- **Port:** `PORT_SHA`, real merge of that reviewed main into PR 63's `5fef55cc70` feature head.
+- **ROM (T0):** fresh signed-runtime configure/Ninja (8,353 steps) and both original US SHA1s pass with zero
+  compiler warnings: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`,
+  W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. No manual upstream config changes.
+- **Host build/tests (T1/T2):** fresh arm64 macOS RelWithDebInfo all-target builds pass in both games. Each selected
+  unit/static suite passes 338 tests with three explicit optional skips of 341, zero failures; actual game backup
+  integration passes. All 466 combined source/record hashes remain fixed throughout.
+- **Replay/oracle/sanitizers/performance/save/play (T3/T4/T5/T6/T7):** short start/new-game and two-run partial/complete
+  save routes pass, B2 6/6 and W2 4/4 including fixture cleanup, with no skips. Exact published-head full native/assembly/oracle
+  verification remains mandatory. Inputs, seeds, references, masks, budgets and sanitizer policy are unchanged.
+  No new whole-app fatal-sanitizer, later-story or windowed-play claim follows from these pre-push gates.
+- **Tiers/trap stubs:** no fresh progress scan or experimental SDK-reader activation.
+- **64-bit warnings:** guard passes, 365 sites/229 keys (real 66, harmless 123, handled 141, unreachable 35);
+  all 1,711 files compiled, zero missing. No baseline edit.
+- **Work done:** only the STATUS insertion conflicts; retain both parents' complete history and their prior results.
+  Reviewed upstream handler/terrain names combine with the native backup wait and unchanged actual game wrapper.
+- **Next:** commit and repeated T0, normal topic push, then exact published-head full local
+  verification and all hosted checks before protected merge under the existing owner-authored review-only exception.
+- **Blockers:** those gates remain required. No human input blocks US work; Spanish issue 45 still lacks a local dump.
+  Transport/CPU timing, the separate SDK-reader prototype and later story coverage remain unfinished.
+
 ## 2026-10-28: integrate reviewed field updates with the backup service
 
 - **Upstream:** reviewed main `2a3782a6fb` includes frozen `fada8baae349`; PR 62 passed all 14 checks and normal
   owner-approved protected merge. Later upstream proposals remain separate.
-- **Port:** `PORT_SHA`, real merge of that reviewed main into PR 63's `ae53551488` feature head.
+- **Port:** `5fef55cc70`, real merge of that reviewed main into PR 63's `ae53551488` feature head.
 - **ROM (T0):** fresh signed-runtime configure/Ninja (8,569 steps) and both original US SHA1s pass with zero
   compiler warnings: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`,
   W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. No manual config changes.
@@ -101,6 +126,36 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   owner-authored review exception before normal protected merge. Reverify if reviewed main changes.
 - **Blockers:** serial transport, other ARM7 work, the separate ROM-reader experiment and later story coverage
   remain unfinished. ADR 0023 remains proposed. Spanish issue 45 still lacks a locally available dump.
+
+## 2026-10-28: validate the frozen script-handler and terrain naming sync
+
+- **Upstream:** frozen `cdbe99de1c73`, nine commits after `fada8baae349`; PR 64 remains a proposal until protected
+  merge. Reviewed Frigate base is `2a3782a6fb`. Later tips and PR 63's backup-service feature remain separate.
+- **Port:** `f158d060ca`, real two-parent upstream merge with canonical subject and complete Upstream-Commit trailer.
+- **ROM (T0):** fresh signed-runtime configure/Ninja passes both original US hashes with zero compiler warnings:
+  B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  All source/config/tool changes outside the VM conflict are automatic imports, not manual decomp setup changes.
+- **Host build/tests (T1/T2):** fresh arm64 macOS RelWithDebInfo all-target builds pass. Full suites finish
+  B2 357 passed/28 explicit skips of 385 and W2 354/28 of 382, zero failures. Both actual assembly oracles run
+  five of five without skips; all 446 candidate source/record hashes remain fixed throughout verification.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** registered replay, reference-hash, timing and
+  save checks pass in those suites, including the actual renamed script-offset fixture. No new whole-app fatal
+  sanitizer, windowed-play or general timing-parity claim. Inputs, seeds, goldens, masks and budgets stay fixed.
+- **Tiers/trap stubs:** no fresh scan, trap removal or experimental reader/service activation.
+- **64-bit warnings:** required guard passes: 365 sites/229 keys (real 66, harmless 123, handled 141,
+  unreachable 35), all 1,711 files compiled, zero missing. No baseline change.
+- **Work done:** preserve all four signed VM relative offsets under incoming Scrcmd handler names; update six
+  actual fixture names and living documentation, retaining assertions and historical records. All other 438
+  incoming blobs match the automatic merge. Same-address handler maps, constant/macro and script normalization
+  show the bounded naming changes; actual compiled ROM/native results supply validation beyond normalization.
+  Pinned clang-format 23.1.1 passes all 170 changed original C/headers plus the fixture; strict style, style
+  fixtures, symbol-name dry run and nonmatching-row checks pass. The production macro generator reproduces the
+  entire committed include byte-for-byte. No workflow/toolchain/delink changes or reference/rewrite overrides.
+- **Next:** publish the resolved exact head as a normal fast-forward of the App draft, then owner local
+  verification, explicit source approval and all required hosted checks before normal protected merge of PR 64.
+  Reverify after any reviewed-main update; no merge from an outdated base.
+- **Blockers:** published-head and hosted checks remain required. Native timing, later story coverage and
+  proposed ADR 0023 remain unfinished. Spanish issue 45 still lacks a locally available dump.
 
 ## 2026-10-28: validate the frozen 79-commit field naming sync
 

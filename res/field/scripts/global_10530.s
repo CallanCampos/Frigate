@@ -97,13 +97,13 @@ L_0155:
     WorkSetConst 0x8025, 0
     // "Which channel will you watch?"
     SystemMsg Global10530_Text_WhichChannelWillWatch, 2
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32805
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32805
     ListMenuAdd 189, 65535, 1
     ListMenuAdd 190, 65535, 2
     ListMenuAdd 191, 65535, 3
     ListMenuAdd 192, 65535, 255
     ListMenuShow
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8025
     VMStackPushConst 65534
     VMStackCmp CMP_EQ
@@ -133,7 +133,7 @@ L_01E4:
     WorkSetConst 0x8020, 255
 
 L_01EA:
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 L_01EE:
@@ -154,7 +154,7 @@ L_01EE:
     LastKeyWait
 
 L_0239:
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8027, 0
     WorkSetConst 0x8026, 0
     VMReturn

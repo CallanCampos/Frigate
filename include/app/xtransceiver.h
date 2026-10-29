@@ -22,7 +22,8 @@ enum {
 // The Xtransceiver's parameters
 struct LocalTvtParam {
     u32 mode;
-    u32 unk04;
+    // Whether the background takes the palette of the other sex's player (LocalTvtBG_Create)
+    u32 swapPalette;
     // The script of LOCAL_TVT_MODE_SCRIPT
     u16 scriptId;
     GameData *gameData;

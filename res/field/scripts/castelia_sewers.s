@@ -394,7 +394,7 @@ L_052B:
     MsgWinCloseAll
     // "???: You there![f000]븁\u0000"
     InfoMsg CasteliaSewers_Text_There, 1
-    InfoMsgClose_0039
+    InfoMsgClose
     ActorCmdExec 255, Movement_0920
     VMSleep 4
     ActorCmdExec 20, Movement_0920

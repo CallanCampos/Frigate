@@ -21,7 +21,7 @@
 
 static void RecordNimbasaStadiumBattle(FieldScriptEnv *env);
 
-BOOL s0080_TrainerEyeEventInit(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Trainer_TrainerEyeEventInit(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
     u16 index = ScriptReadAny(vm, env);
@@ -36,7 +36,7 @@ BOOL s0080_TrainerEyeEventInit(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0081_TrainerEyeEventStart(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Trainer_TrainerEyeEventStart(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     TrainerClashSlot *slot0 = ScriptWork_GetTrainerState(work, 0);
     TrainerClashSlot *slot1 = ScriptWork_GetTrainerState(work, 1);
@@ -45,7 +45,7 @@ BOOL s0081_TrainerEyeEventStart(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0083_TrainerGetBattleType(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Trainer_TrainerEyeGetBattleType(VM *vm, FieldScriptEnv *env) {
     TrainerClashSlot *slot = ScriptWork_GetTrainerState(FieldScriptEnv_GetScriptWork(env), 0);
     u16 *result = ScriptReadVar(vm, env);
 
@@ -53,7 +53,7 @@ BOOL s0083_TrainerGetBattleType(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s007F_TrainerEyeGetTrainerID(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Trainer_TrainerEyeGetTrainerID(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 index = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
@@ -68,7 +68,7 @@ BOOL s007F_TrainerEyeGetTrainerID(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0082_TrainerGetActorID(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Trainer_TrainerGetActorID(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 index = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
@@ -83,7 +83,7 @@ BOOL s0082_TrainerGetActorID(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0084_ActorGetTrainerID(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Trainer_ActorGetTrainerID(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     ScriptWork_GetFieldWork(work);
     u16 scrId = ScriptWork_GetSCRID(work);
@@ -93,7 +93,7 @@ BOOL s0084_ActorGetTrainerID(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0085_CallTrainerBattle(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Trainer_CallTrainerBattle(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     ScriptWork_GetSCRID(work);
     u16 trainer1 = ScriptReadAny(vm, env);
@@ -114,7 +114,7 @@ BOOL s0085_CallTrainerBattle(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0085_CallTrainerMultiBattle(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Trainer_CallTrainerMultiBattle(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     ScriptWork_GetSCRID(work);
     u16 partner = ScriptReadAny(vm, env);
@@ -131,7 +131,7 @@ BOOL s0085_CallTrainerMultiBattle(VM *vm, FieldScriptEnv *env) {
 }
 
 // The messages of the Trainer's script: before, after and on defeat, for a single Trainer or either of a pair
-BOOL s0088_TrainerGetMessageTypes(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Trainer_TrainerGetMessageTypes(VM *vm, FieldScriptEnv *env) {
     u16 beforeMsg;
     u16 defeatMsg;
     u16 afterMsg;
@@ -160,7 +160,7 @@ BOOL s0088_TrainerGetMessageTypes(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s008A_TrainerGetBattleType(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Trainer_TrainerGetBattleType(VM *vm, FieldScriptEnv *env) {
     u16 trainerId = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
@@ -168,7 +168,7 @@ BOOL s008A_TrainerGetBattleType(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s008B_TrainerBGMPlayPush(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Trainer_TrainerBGMPlayPush(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     FieldScriptEnv_GetGameData(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
@@ -180,7 +180,7 @@ BOOL s008B_TrainerBGMPlayPush(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s008F_TrainerClassBGMPlayPush(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Trainer_TrainerClassBGMPlayPush(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     FieldScriptEnv_GetGameData(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
@@ -190,7 +190,7 @@ BOOL s008F_TrainerClassBGMPlayPush(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0090_TrainerBGMPlay(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Trainer_TrainerBGMPlay(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     FieldScriptEnv_GetGameData(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
@@ -201,7 +201,7 @@ BOOL s0090_TrainerBGMPlay(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s008E_CallTrainerBattleEnd(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Trainer_CallTrainerBattleEnd(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -211,7 +211,7 @@ BOOL s008E_CallTrainerBattleEnd(VM *vm, FieldScriptEnv *env) {
 }
 
 // Whether the Trainer's battle needs healing first (1), or gives an item (2)
-BOOL s0092_TrainerGetFieldAction(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Trainer_TrainerGetFieldAction(VM *vm, FieldScriptEnv *env) {
     u16 action;
     u16 trainerId = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
@@ -227,7 +227,7 @@ BOOL s0092_TrainerGetFieldAction(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0093_TrainerGetPrizeItem(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Trainer_TrainerGetPrizeItem(VM *vm, FieldScriptEnv *env) {
     u16 trainerId = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
@@ -235,7 +235,7 @@ BOOL s0093_TrainerGetPrizeItem(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0094_CallTradedPokemonBattle(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Trainer_CallTradedPokemonBattle(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     ScriptWork_GetSCRID(work);
     u16 trainer1 = ScriptReadAny(vm, env);

@@ -51,7 +51,7 @@ Script_4:
     // "Iceberg Chamber"
     InfoMsg IcebergChamber_Text_IcebergChamber, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -62,7 +62,7 @@ Script_5:
     // "It protects this place\nwith the power of ice."
     InfoMsg IcebergChamber_Text_ProtectsPlacePowerIce, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -72,7 +72,7 @@ Script_6:
     SEPlay SEQ_SE_MESSAGE
     // "The Pokémon statue that exudes the\npower of ice started moving![f000]븁\u0000"
     SystemMsg IcebergChamber_Text_PokemonStatueExudesPower, 2
-    InfoMsgClose
+    SystemMsgClose
     PlayerGetDir 0x8010
     WorkCmpConst 0x8010, 0
     VMJumpIf CMP_EQ, L_00BF
@@ -116,7 +116,7 @@ L_0130:
     ScreamMsg IcebergChamber_Text_Jakiih, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     CallWildBattle 378, 65, 1
     WildBattleIsVictory 0x8010
     VMStackPush 0x8010
@@ -143,7 +143,7 @@ L_0198:
     // "Regice disappeared deep\ninto the ruins..."
     SystemMsg IcebergChamber_Text_RegiceDisappearedDeepInto, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_01C5
 
 L_01A8:

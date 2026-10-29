@@ -45,7 +45,7 @@ L_00A0:
 L_00A6:
     // "Which Deoxys would you like to\nbring closer to the meteor?[f000]븁\u0000"
     SystemMsg Global10270_Text_WhichDeoxysWouldLike, 2
-    InfoMsgClose
+    SystemMsgClose
     CallPokeSelect 0, 0x8010, 0x8020, 0
     VMStackPush 0x8010
     VMStackPushConst 1
@@ -57,7 +57,7 @@ L_00D1:
     VMJump L_00D9
 
 L_00D7:
-    InfoMsgClose
+    SystemMsgClose
 
 L_00D9:
     FinishAllEvents
@@ -145,12 +145,12 @@ L_020D:
     SystemMsg 0x8025, 2
     PVWait
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 L_021B:
     SystemMsg 0x8021, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
     .balign 4, 0

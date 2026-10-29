@@ -1087,7 +1087,7 @@ void GimmickGate_GetRoamerZones(GimmickGateWork *work, GimmickGateZoneList *list
     }
 }
 
-BOOL GimmickGateCmd_ViewBoard(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FieldGimmickGate_GimmickGateViewBoard(VM *vm, FieldScriptEnv *env) {
     ScriptWork *scriptWork;
     GameSystem *gsys;
     Field *field;

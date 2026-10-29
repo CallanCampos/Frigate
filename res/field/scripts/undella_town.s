@@ -251,7 +251,7 @@ Script_4:
     InfoMsg UndellaTown_Text_WaitUp, 2
     ActorCmdExec 255, Movement_0B14
     ActorCmdWait
-    InfoMsgClose_0039
+    InfoMsgClose
     WorkAdd 0x8022, 2
     ActorWalkRoute 251, 0x8021, 0x8022, 1, 8, 0
     ActorCmdWait
@@ -773,7 +773,7 @@ L_0A84:
     // "[f000]Ā\u0001\u0000 is now able to read\nthe Abyssal Ruins script!"
     SystemMsg UndellaTown_Text_NowAbleReadAbyssal, 2
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     // "Just to make sure you know,\nyou reach the Abyssal Ruins[f000]븀\u0000\nby using Dive in Undella Bay.[f000]븁\u0000\nAnd you must write down the\nciphers you find in the[f000]븀\u0000\nAbyssal Ruins by yourself."
     ActorMsg MSGFILE_SCRIPT, UndellaTown_Text_JustMakeSureKnow, 7, 0, 0
     LastKeyWait

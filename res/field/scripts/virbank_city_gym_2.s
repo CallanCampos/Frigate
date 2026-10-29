@@ -228,7 +228,7 @@ L_030E:
     WorkSetConst 0x8025, 0
     // "[f000]Ā\u0001\u0000 received the\nToxic Badge from Roxie![f000]븁\u0000"
     SystemMsg VirbankCityGym2_Text_ReceivedToxicBadgeFrom, 0
-    InfoMsgClose
+    SystemMsgClose
     // "Two Badges![f000]븁\u0000\nNow Pokémon up to Lv. 30,\neven Pokémon you got in trades,[f000]븀\u0000\nwill realize how good you are[f000]븀\u0000\nand won't ignore your commands![f000]븁\u0000\nAlso, here!\nUse this TM![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, VirbankCityGym2_Text_TwoBadgesNowPokemon, 4, 0, 0
     ActorMsgClose

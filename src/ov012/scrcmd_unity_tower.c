@@ -104,7 +104,7 @@ static GameEventReturnCode EventUnityTowerFloorSelect_Callback(GameEvent *event,
     return GAMEEVENT_CONTINUE;
 }
 
-BOOL s01CE_UnityTowerGetTrainerClass(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_UnityTower_UnityTowerGetTrainerClass(VM *vm, FieldScriptEnv *env) {
     const UnityTowerFloor *state;
     u8 index;
     u16 *result;
@@ -117,7 +117,7 @@ BOOL s01CE_UnityTowerGetTrainerClass(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01CF_UnityTowerGetStateParam(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_UnityTower_UnityTowerGetStateParam(VM *vm, FieldScriptEnv *env) {
     const UnityTowerFloor *state;
     u16 param;
     u16 *result;
@@ -130,7 +130,7 @@ BOOL s01CF_UnityTowerGetStateParam(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01D0_UnityTowerCallFloorSelect(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_UnityTower_UnityTowerCallFloorSelect(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 floor;

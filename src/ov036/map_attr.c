@@ -9,20 +9,49 @@ static BOOL MapTile_IsNormalTallGrassSingleBtl(u32 tileClass);
 static BOOL MapTile_IsTallGrassSingleBtl(u32 tileClass);
 static BOOL MapTile_IsSandD(u32 tileClass);
 
-// The tile class of a tile that isn't one
-#define TILE_CLASS_NONE 0xff
-
 // The battle terrain of each tile class
-// clang-format off
 static const u8 TILE_CLASS_BATTLE_TERRAINS[40][2] = {
-    {0x00, 4},  {0x02, 2},  {0x03, 1}, {0x04, 5},  {0x05, 5},  {0x06, 5},  {0x07, 5}, {0x08, 5},
-    {0x09, 5},  {0x0a, 10}, {0x0b, 8}, {0x0c, 8},  {0x0e, 7},  {0x0f, 7},  {0x10, 13}, {0x11, 4},
-    {0x13, 4},  {0x14, 11}, {0x15, 11}, {0x16, 14}, {0x17, 12}, {0x18, 13}, {0x19, 8}, {0x1b, 4},
-    {0x1c, 9},  {0x1e, 3},  {0x1f, 0}, {0x20, 4},  {0x21, 5},  {0x22, 5},  {0x23, 8}, {0x25, 17},
-    {0x26, 4},  {0x30, 10}, {0x3d, 6}, {0x3f, 6},  {0x43, 6},  {0x7c, 8},  {0xa1, 1}, {0xbe, 1},
+    { TILE_CLASS_NORMAL, 4 },
+    { TILE_CLASS_PUDDLE, 2 },
+    { TILE_CLASS_03, 1 },
+    { TILE_CLASS_GRASS, 5 },
+    { TILE_CLASS_GRASS_B, 5 },
+    { TILE_CLASS_GRASS_DOUBLE, 5 },
+    { TILE_CLASS_GRASS_DOUBLE_B, 5 },
+    { TILE_CLASS_REALLY_TALL_GRASS, 5 },
+    { TILE_CLASS_REALLY_TALL_GRASS_DOUBLE, 5 },
+    { TILE_CLASS_CAVE, 10 },
+    { TILE_CLASS_SAND, 8 },
+    { TILE_CLASS_DEEP_SAND, 8 },
+    { TILE_CLASS_SNOW, 7 },
+    { TILE_CLASS_SNOW_NO_CYCLING, 7 },
+    { TILE_CLASS_MIRROR_ICE, 13 },
+    { TILE_CLASS_11, 4 },
+    { TILE_CLASS_13, 4 },
+    { TILE_CLASS_RIPPLE_WATER, 11 },
+    { TILE_CLASS_RIPPLE_WATER_15, 11 },
+    { TILE_CLASS_16, 14 },
+    { TILE_CLASS_SPLASH_WATER, 12 },
+    { TILE_CLASS_ICE, 13 },
+    { TILE_CLASS_SAND_19, 8 },
+    { TILE_CLASS_MIRROR_FLOOR, 4 },
+    { TILE_CLASS_SWAMP, 9 },
+    { TILE_CLASS_MUD, 3 },
+    { TILE_CLASS_1F, 0 },
+    { TILE_CLASS_BRIDGE, 4 },
+    { TILE_CLASS_GRASS_C, 5 },
+    { TILE_CLASS_GRASS_DOUBLE_C, 5 },
+    { TILE_CLASS_SAND_23, 8 },
+    { TILE_CLASS_FALLEN_LEAVES, 17 },
+    { TILE_CLASS_26, 4 },
+    { TILE_CLASS_ELECTRIC_FIELD, 10 },
+    { TILE_CLASS_WATER_3D, 6 },
+    { TILE_CLASS_WATER, 6 },
+    { TILE_CLASS_WATER_43, 6 },
+    { TILE_CLASS_QUICKSAND, 8 },
+    { TILE_CLASS_SLIP_DOWN_EDGE_A1, 1 },
+    { TILE_CLASS_CATWALK, 1 },
 };
-
-// clang-format on
 
 u32 GetTileTypeAtPos(FieldG3DMapper *mapper, const VecFx32 *position) {
     MapTerrainBuf terrain;
@@ -60,168 +89,169 @@ BOOL MapTile_BlocksCollision(u32 tileType) {
 }
 
 BOOL MapTile_IsReallyTallGrass(u16 tileClass) {
-    if (tileClass == 8 || tileClass == 9) {
+    if (tileClass == TILE_CLASS_REALLY_TALL_GRASS || tileClass == TILE_CLASS_REALLY_TALL_GRASS_DOUBLE) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsLedgeU(u32 tileClass) {
-    if (tileClass == 0x74) {
+    if (tileClass == TILE_CLASS_LEDGE_UP) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsLedgeD(u32 tileClass) {
-    if (tileClass == 0x75) {
+    if (tileClass == TILE_CLASS_LEDGE_DOWN) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsLedgeL(u32 tileClass) {
-    if (tileClass == 0x73) {
+    if (tileClass == TILE_CLASS_LEDGE_LEFT) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsLedgeR(u32 tileClass) {
-    if (tileClass == 0x72) {
+    if (tileClass == TILE_CLASS_LEDGE_RIGHT) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsQuicksand(u32 tileClass) {
-    if (tileClass == 0x7c) {
+    if (tileClass == TILE_CLASS_QUICKSAND) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsReceptionCounter(u32 tileClass) {
-    if (tileClass == 0xd4) {
+    if (tileClass == TILE_CLASS_RECEPTION_COUNTER) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsPC(u32 tileClass) {
-    if (tileClass == 0xd6) {
+    if (tileClass == TILE_CLASS_PC) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsUnused0xD7(u32 tileClass) {
-    if (tileClass == 0xd7) {
+    if (tileClass == TILE_CLASS_UNUSED_D7) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsTV(u32 tileClass) {
-    if (tileClass == 0xd8) {
+    if (tileClass == TILE_CLASS_TV) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsVendingMachine(u32 tileClass) {
-    if (tileClass == 0xe2) {
+    if (tileClass == TILE_CLASS_VENDING_MACHINE) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsBookcaseA(u32 tileClass) {
-    if (tileClass == 0xd9) {
+    if (tileClass == TILE_CLASS_BOOKCASE_A) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsBookcaseB(u32 tileClass) {
-    if (tileClass == 0xda) {
+    if (tileClass == TILE_CLASS_BOOKCASE_B) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsBookcaseC(u32 tileClass) {
-    if (tileClass == 0xdb) {
+    if (tileClass == TILE_CLASS_BOOKCASE_C) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsBookcaseD(u32 tileClass) {
-    if (tileClass == 0xdc) {
+    if (tileClass == TILE_CLASS_BOOKCASE_D) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsTrashCanA(u32 tileClass) {
-    if (tileClass == 0xdd) {
+    if (tileClass == TILE_CLASS_TRASH_CAN_A) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsTrashCanB(u32 tileClass) {
-    if (tileClass == 0xde) {
+    if (tileClass == TILE_CLASS_TRASH_CAN_B) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsAssortmentA(u32 tileClass) {
-    if (tileClass == 0xdf) {
+    if (tileClass == TILE_CLASS_ASSORTMENT_A) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsAssortmentB(u32 tileClass) {
-    if (tileClass == 0xe0) {
+    if (tileClass == TILE_CLASS_ASSORTMENT_B) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsAssortmentC(u32 tileClass) {
-    if (tileClass == 0xe1) {
+    if (tileClass == TILE_CLASS_ASSORTMENT_C) {
         return TRUE;
     }
     return FALSE;
 }
 
 static BOOL MapTile_IsNormalTallGrassSingleBtl(u32 tileClass) {
-    if (tileClass == 4 || tileClass == 0x21 || tileClass == 5) {
+    if (tileClass == TILE_CLASS_GRASS || tileClass == TILE_CLASS_GRASS_C || tileClass == TILE_CLASS_GRASS_B) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsNormalTallGrassDoubleBtl(u32 tileClass) {
-    if (tileClass == 6 || tileClass == 0x22 || tileClass == 7) {
+    if (tileClass == TILE_CLASS_GRASS_DOUBLE || tileClass == TILE_CLASS_GRASS_DOUBLE_C ||
+        tileClass == TILE_CLASS_GRASS_DOUBLE_B) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsReallyTallGrassSingleBtl(u32 tileClass) {
-    if (tileClass == 0x8) {
+    if (tileClass == TILE_CLASS_REALLY_TALL_GRASS) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsReallyTallGrassDoubleBtl(u32 tileClass) {
-    if (tileClass == 0x9) {
+    if (tileClass == TILE_CLASS_REALLY_TALL_GRASS_DOUBLE) {
         return TRUE;
     }
     return FALSE;
@@ -251,14 +281,14 @@ BOOL MapTile_IsTallGrass(u32 tileClass) {
 }
 
 BOOL MapTile_IsStrengthHole(u32 tileClass) {
-    if (tileClass == 0x1d) {
+    if (tileClass == TILE_CLASS_STRENGTH_HOLE) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsSurfEdge(u32 tileClass) {
-    if (tileClass == 0x41 || tileClass == 0x44) {
+    if (tileClass == TILE_CLASS_SURF_EDGE || tileClass == TILE_CLASS_SURF_EDGE_44) {
         return TRUE;
     }
     return FALSE;
@@ -266,36 +296,36 @@ BOOL MapTile_IsSurfEdge(u32 tileClass) {
 
 BOOL MapTile_IsRippleWater(u32 tileClass) {
     switch (tileClass) {
-    case 0x14:
-    case 0x15:
+    case TILE_CLASS_RIPPLE_WATER:
+    case TILE_CLASS_RIPPLE_WATER_15:
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsSplashWater(u32 tileClass) {
-    if (tileClass == 0x17) {
+    if (tileClass == TILE_CLASS_SPLASH_WATER) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL IsTileWaterfall(u32 tileClass) {
-    if (tileClass == 0x40) {
+    if (tileClass == TILE_CLASS_WATERFALL) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsSnow_(u32 tileClass) {
-    if (tileClass == 0xe) {
+    if (tileClass == TILE_CLASS_SNOW) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsSnowNoCycling(u32 tileClass) {
-    if (tileClass == 0xf) {
+    if (tileClass == TILE_CLASS_SNOW_NO_CYCLING) {
         return TRUE;
     }
     return FALSE;
@@ -309,35 +339,35 @@ BOOL MapTile_IsSnow(u32 tileClass) {
 }
 
 BOOL IsTileSlidingIce(u32 tileClass) {
-    if (tileClass == 0x18 || tileClass == 0x10) {
+    if (tileClass == TILE_CLASS_ICE || tileClass == TILE_CLASS_MIRROR_ICE) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsIce(u32 tileClass) {
-    if (tileClass == 0x10) {
+    if (tileClass == TILE_CLASS_MIRROR_ICE) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsSwamp(u32 tileClass) {
-    if (tileClass == 0x1c) {
+    if (tileClass == TILE_CLASS_SWAMP) {
         return TRUE;
     }
     return FALSE;
 }
 
 static BOOL MapTile_IsSandD(u32 tileClass) {
-    if (tileClass == 0x19) {
+    if (tileClass == TILE_CLASS_SAND_19) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL IsTileSand(u32 tileClass) {
-    if (tileClass == 0xc || tileClass == 0xb || tileClass == 0x23) {
+    if (tileClass == TILE_CLASS_DEEP_SAND || tileClass == TILE_CLASS_SAND || tileClass == TILE_CLASS_SAND_23) {
         return TRUE;
     }
     return FALSE;
@@ -351,112 +381,117 @@ BOOL MapTile_IsAnySand(u32 tileClass) {
 }
 
 BOOL IsTileSurfWater(u16 tileClass) {
-    if (tileClass == 0x3d || tileClass == 0x3e || tileClass == 0x3f || tileClass == 0x42 || tileClass == 0x43) {
+    if (tileClass == TILE_CLASS_WATER_3D || tileClass == TILE_CLASS_WATER_3E || tileClass == TILE_CLASS_WATER ||
+        tileClass == TILE_CLASS_WATER_42 || tileClass == TILE_CLASS_WATER_43) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsFallenLeaves(u32 tileClass) {
-    if (tileClass == 0x25) {
+    if (tileClass == TILE_CLASS_FALLEN_LEAVES) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsPuddle(u32 tileClass) {
-    if (tileClass == 0x2) {
+    if (tileClass == TILE_CLASS_PUDDLE) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsMud(u32 tileClass) {
-    if (tileClass == 0x1e) {
+    if (tileClass == TILE_CLASS_MUD) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsElectricField(u32 tileClass) {
-    if (tileClass == 0x30) {
+    if (tileClass == TILE_CLASS_ELECTRIC_FIELD) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsElectricRock(u32 tileClass) {
-    if (tileClass == 0x32) {
+    if (tileClass == TILE_CLASS_ELECTRIC_ROCK) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsCatwalkBody_(u32 tileClass) {
-    if (tileClass == 0xbe) {
+    if (tileClass == TILE_CLASS_CATWALK) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsCatwalkEntryPoint(u32 tileClass) {
-    if (tileClass == 0xbf) {
+    if (tileClass == TILE_CLASS_CATWALK_ENTRY) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsDeepSand(u32 tileClass) {
-    if (tileClass == 0xc) {
+    if (tileClass == TILE_CLASS_DEEP_SAND) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsGrassSingleB(u32 tileClass) {
-    if (tileClass == 0x5) {
+    if (tileClass == TILE_CLASS_GRASS_B) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsGrassDoubleB(u32 tileClass) {
-    if (tileClass == 0x7) {
+    if (tileClass == TILE_CLASS_GRASS_DOUBLE_B) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsMirrorFloor(u32 tileClass) {
-    if (tileClass == 0x1b) {
+    if (tileClass == TILE_CLASS_MIRROR_FLOOR) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL TileExitBlockCheck_Up(u16 tileClass) {
-    if (tileClass == 0x53 || tileClass == 0x55 || tileClass == 0x56) {
+    if (tileClass == TILE_CLASS_BLOCK_UP || tileClass == TILE_CLASS_BLOCK_UP_RIGHT ||
+        tileClass == TILE_CLASS_BLOCK_UP_LEFT) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL TileExitBlockCheck_Down(u16 tileClass) {
-    if (tileClass == 0x54 || tileClass == 0x57 || tileClass == 0x58) {
+    if (tileClass == TILE_CLASS_BLOCK_DOWN || tileClass == TILE_CLASS_BLOCK_DOWN_RIGHT ||
+        tileClass == TILE_CLASS_BLOCK_DOWN_LEFT) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL TileExitBlockCheck_Left(u16 tileClass) {
-    if (tileClass == 0x52 || tileClass == 0x56 || tileClass == 0x58) {
+    if (tileClass == TILE_CLASS_BLOCK_LEFT || tileClass == TILE_CLASS_BLOCK_UP_LEFT ||
+        tileClass == TILE_CLASS_BLOCK_DOWN_LEFT) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL TileExitBlockCheck_Right(u16 tileClass) {
-    if (tileClass == 0x51 || tileClass == 0x55 || tileClass == 0x57) {
+    if (tileClass == TILE_CLASS_BLOCK_RIGHT || tileClass == TILE_CLASS_BLOCK_UP_RIGHT ||
+        tileClass == TILE_CLASS_BLOCK_DOWN_RIGHT) {
         return TRUE;
     }
     return FALSE;
@@ -472,21 +507,21 @@ BOOL MapTile_IsBlocksCycling(u16 tileClass) {
 }
 
 BOOL MapTile_IsGrassSingleC(u32 tileClass) {
-    if (tileClass == 0x21) {
+    if (tileClass == TILE_CLASS_GRASS_C) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsGrassDoubleC(u32 tileClass) {
-    if (tileClass == 0x22) {
+    if (tileClass == TILE_CLASS_GRASS_DOUBLE_C) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsHiddenGrottoEntranceGrass(u32 tileClass) {
-    if (tileClass == 0x24) {
+    if (tileClass == TILE_CLASS_HIDDEN_GROTTO_GRASS) {
         return TRUE;
     }
     return FALSE;
@@ -498,27 +533,27 @@ u32 MapTile_GetEncounterEffectKind(u32 tileType) {
     u16 tileClass = tileType;
     u16 flags = tileType >> 16;
 
-    if (tileClass == 0x20) {
+    if (tileClass == TILE_CLASS_BRIDGE) {
         return ENCOUNT_EFFECT_FLYING_SHADOW;
     }
     if (!(flags & TILE_FLAG_ENCOUNT)) {
         return ENCOUNT_EFFECT_NONE;
     }
     switch (tileClass) {
-    case 4:
+    case TILE_CLASS_GRASS:
         return ENCOUNT_EFFECT_GRASS;
-    case 5:
+    case TILE_CLASS_GRASS_B:
         return ENCOUNT_EFFECT_GRASS_B;
-    case 0x21:
+    case TILE_CLASS_GRASS_C:
         return ENCOUNT_EFFECT_GRASS_C;
-    case 8:
+    case TILE_CLASS_REALLY_TALL_GRASS:
         return ENCOUNT_EFFECT_REALLY_TALL_GRASS;
-    case 10:
+    case TILE_CLASS_CAVE:
         return ENCOUNT_EFFECT_DUST_CLOUD;
-    case 0x3d:
+    case TILE_CLASS_WATER_3D:
         return ENCOUNT_EFFECT_WATER_0;
-    case 0x3f:
-    case 0x43:
+    case TILE_CLASS_WATER:
+    case TILE_CLASS_WATER_43:
         return ENCOUNT_EFFECT_WATER_1;
     default:
         return ENCOUNT_EFFECT_NONE;

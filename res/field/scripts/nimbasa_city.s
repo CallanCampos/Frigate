@@ -672,7 +672,7 @@ L_08A4:
     // "[f000]Ā\u0001\u0001 fully healed\n[f000]Ā\u0001\u0000's Pokémon!"
     SystemMsg NimbasaCity_Text_FullyHealedSPokemon, 0
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     // "[f000]Ā\u0001\u0001: Listen up!\nYou fill up that Pokédex.[f000]븁\u0000\nKeep getting stronger and stronger,\nand back me up![f000]븁\u0000\nI'll be counting on you from\nhere on out, too![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, NimbasaCity_Text_ListenUpFillUp, 3, 0, 0
     MsgWinCloseAll

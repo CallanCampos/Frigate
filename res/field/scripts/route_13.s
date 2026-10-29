@@ -68,7 +68,7 @@ L_00CB:
     ScreamMsg Route13_Text_Kawbraa, 1
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     EvCameraMoveToDefault 32
     EvCameraWait
     EvCameraRebind
@@ -87,7 +87,7 @@ Script_5:
     ScreamMsg Route13_Text_Kawbraa, 1
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     VMStackPushFlag EVENT_FLAG_0x012e
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -147,7 +147,7 @@ L_01CC:
     // "Cobalion ran away\nbeyond the road..."
     SystemMsg Route13_Text_CobalionRanAwayBeyond, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
 
 L_01E9:
     FinishAllEvents

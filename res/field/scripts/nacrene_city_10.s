@@ -333,7 +333,7 @@ L_045B:
     // "[f000]Ā\u0001\u0000\nhanded over the Grubby Hanky!"
     SystemMsg NacreneCity10_Text_HandedOverGrubbyHanky, 0
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     SEWait
     WorkSetConst 0x8021, 0
     ItemSub ITEM_GRUBBY_HANKY, 1, 0x8021

@@ -33,7 +33,7 @@ Script_2:
     // "The portrait has fallen..."
     InfoMsg StrangeHouse3_Text_PortraitHasFallen, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -44,7 +44,7 @@ Script_3:
     // "No one saw it change, but now\nthe picture is hanging upside down..."
     InfoMsg StrangeHouse3_Text_NoOneSawChange, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

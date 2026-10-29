@@ -31,7 +31,7 @@ L_005F:
     VMJumpIf CMP_STACK, L_0226
     // "Which PC should be accessed?"
     SystemMsg Global10090_Text_WhichPcShouldAccessed, 2
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32804
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32804
     VMStackPush 0x8025
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -62,7 +62,7 @@ L_00EB:
     ListMenuAdd 7, 65535, 7
     ListMenuAdd 8, 65535, 8
     ListMenuShow2
-    InfoMsgClose
+    SystemMsgClose
     VMSleep 3
     WorkCmpConst 0x8024, 2
     VMJumpIf CMP_EQ, L_0116
@@ -209,7 +209,7 @@ L_02F4:
     VMJumpIf CMP_STACK, L_0481
     // ""
     SystemMsg Global10090_Text_Empty_9, 2
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32808
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32808
     ListMenuAdd 15, 21, 15
     ListMenuAdd 16, 22, 16
     ListMenuAdd 17, 23, 17
@@ -217,7 +217,7 @@ L_02F4:
     ListMenuAdd 18, 24, 18
     ListMenuAdd 19, 25, 19
     ListMenuShow2
-    InfoMsgClose
+    SystemMsgClose
     WorkCmpConst 0x8028, 19
     VMJumpIf CMP_EQ, L_035D
     VMJump L_0365
@@ -328,7 +328,7 @@ L_04A1:
     WordSetPlayerName 0
     // "Accessed [f000]Ā\u0001\u0000's PC.[f000]븁\u0000"
     SystemMsg Global10090_Text_AccessedSPc, 2
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x802c, 0
 
 L_04C8:
@@ -338,11 +338,11 @@ L_04C8:
     VMJumpIf CMP_STACK, L_059E
     // ""
     SystemMsg Global10090_Text_Empty_9, 2
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32813
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32813
     ListMenuAdd 28, 30, 28
     ListMenuAdd 29, 31, 29
     ListMenuShow2
-    InfoMsgClose
+    SystemMsgClose
     WorkCmpConst 0x802d, 29
     VMJumpIf CMP_EQ, L_0511
     VMJump L_0519
@@ -412,7 +412,7 @@ L_05C2:
     SEPlay SEQ_SE_PC_LOGIN
     // "Accessed the Record System![f000]븁\u0000"
     SystemMsg Global10090_Text_AccessedRecordSystem, 2
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8023
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -431,7 +431,7 @@ L_0612:
 L_0618:
     // "Your Hall of Fame data is corrupted.[f000]븁\u0000\nIt will be fixed if you enter the\nHall of Fame again.[f000]븁\u0000"
     SystemMsg Global10090_Text_HallFameDataCorrupted, 2
-    InfoMsgClose
+    SystemMsgClose
 
 L_0620:
     WorkSetConst 0x8030, 0
@@ -442,7 +442,7 @@ L_062E:
     SEPlay SEQ_SE_PC_LOGIN
     // "Accessed the Help System.[f000]븁\u0000"
     SystemMsg Global10090_Text_AccessedHelpSystem, 2
-    InfoMsgClose
+    SystemMsgClose
     CallGameManual 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0

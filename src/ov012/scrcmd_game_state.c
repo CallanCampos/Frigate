@@ -32,7 +32,7 @@
 #include "system/union_view.h"
 #include "system/vm.h"
 
-BOOL s00E0_GameGetVersion(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_GameGetVersion(VM *vm, FieldScriptEnv *env) {
     u16 *value = ScriptReadVar(vm, env);
 #if defined(BLACK2)
     *value = 23;
@@ -42,7 +42,7 @@ BOOL s00E0_GameGetVersion(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00C9_ConfigToggleKanji(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_ConfigToggleKanji(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     SaveControl *save;
     Config *trainerData;
@@ -61,7 +61,7 @@ BOOL s00C9_ConfigToggleKanji(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00CA_ConfigGetKanji(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_ConfigGetKanji(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     SaveControl *save;
     Config *trainerData;
@@ -75,20 +75,20 @@ BOOL s00CA_ConfigGetKanji(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00CB_Random(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_Random(VM *vm, FieldScriptEnv *env) {
     u16 *value = ScriptReadVar(vm, env);
     u16 range = ScriptReadAny(vm, env);
     *value = GFL_RandomLC(range);
     return FALSE;
 }
 
-BOOL s00CC_RTGetTextFile(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_RTGetTextFile(VM *vm, FieldScriptEnv *env) {
     u16 *value = ScriptReadVar(vm, env);
     *value = GetFieldScriptMsgFileNo(env);
     return FALSE;
 }
 
-BOOL s00CE_TrainerCardGetStars(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_TrainerCardGetStars(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     u16 *value;
 
@@ -98,21 +98,21 @@ BOOL s00CE_TrainerCardGetStars(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00CD_RTCGetDayPart(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_RTCGetDayPart(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u16 *value = ScriptReadVar(vm, env);
     *value = GameData_GetDayPeriod(gameData);
     return FALSE;
 }
 
-BOOL s00CF_RTCGetWeekDay(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_RTCGetWeekDay(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u16 *value = ScriptReadVar(vm, env);
     *value = getCurrentDayOfWeek(gameData);
     return FALSE;
 }
 
-BOOL s00D0_RTCGetDate(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_RTCGetDate(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u16 *month = ScriptReadVar(vm, env);
     u16 *day = ScriptReadVar(vm, env);
@@ -121,7 +121,7 @@ BOOL s00D0_RTCGetDate(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00D1_RTCGetTime(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_RTCGetTime(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u16 *hour = ScriptReadVar(vm, env);
     u16 *minute = ScriptReadVar(vm, env);
@@ -130,14 +130,14 @@ BOOL s00D1_RTCGetTime(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00D2_RTCGetSeason(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_RTCGetSeason(VM *vm, FieldScriptEnv *env) {
     u16 *value = ScriptReadVar(vm, env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     *value = GameData_GetSeason(gameData);
     return FALSE;
 }
 
-BOOL s00D4_TrainerCardGetBirthDate(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_TrainerCardGetBirthDate(VM *vm, FieldScriptEnv *env) {
     u16 *month;
     u16 *day;
     OSOwnerInfoEx info;
@@ -150,7 +150,7 @@ BOOL s00D4_TrainerCardGetBirthDate(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00E1_TrainerCardGetSex(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_TrainerCardGetSex(VM *vm, FieldScriptEnv *env) {
     u16 *value;
     GameData *gameData;
     PlayerState *state;
@@ -162,7 +162,7 @@ BOOL s00E1_TrainerCardGetSex(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00D5_TrainerCardHasBadge(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_TrainerCardHasBadge(VM *vm, FieldScriptEnv *env) {
     u16 *value;
     u16 badgeId;
     GameData *gameData;
@@ -176,7 +176,7 @@ BOOL s00D5_TrainerCardHasBadge(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00D6_TrainerCardAddBadge(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_TrainerCardAddBadge(VM *vm, FieldScriptEnv *env) {
     u16 badgeId;
     GameData *gameData;
     TrainerCardSave *card;
@@ -193,7 +193,7 @@ BOOL s00D6_TrainerCardAddBadge(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00D7_TrainerCardGetBadgeCount(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_TrainerCardGetBadgeCount(VM *vm, FieldScriptEnv *env) {
     u16 *value;
     GameData *gameData;
     TrainerCardSave *card;
@@ -205,7 +205,7 @@ BOOL s00D7_TrainerCardGetBadgeCount(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0138_SaveDataGetStatus(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_SaveDataGetStatus(VM *vm, FieldScriptEnv *env) {
     SaveControl *save = GameData_GetSaveControl(FieldScriptEnv_GetGameData(env));
     u16 *present = ScriptReadVar(vm, env);
     u16 *status = ScriptReadVar(vm, env);
@@ -224,13 +224,13 @@ BOOL s0138_SaveDataGetStatus(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00D3_RTGetZoneID(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_RTGetZoneID(VM *vm, FieldScriptEnv *env) {
     u16 *value = ScriptReadVar(vm, env);
     *value = GetScriptEnvZoneID(env);
     return FALSE;
 }
 
-BOOL s00D9_FieldSetTeleportZone(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_FieldSetTeleportZone(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u16 zone = ScriptReadAny(vm, env);
     if (RangeCheckTeleportZone(zone) == TRUE) {
@@ -239,7 +239,7 @@ BOOL s00D9_FieldSetTeleportZone(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00DB_FieldSetNextZoneHere(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_FieldSetNextZoneHere(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     PlayerState *playerState = GameData_GetPlayerState(gameData);
     VecFx32 *pos = PlayerState_GetWPos(playerState);
@@ -252,7 +252,7 @@ BOOL s00DB_FieldSetNextZoneHere(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00DC_FieldSetNextZone(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_FieldSetNextZone(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u16 zone = ScriptReadAny(vm, env);
     u16 direction = ScriptReadAny(vm, env);
@@ -266,7 +266,7 @@ BOOL s00DC_FieldSetNextZone(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00DA_MapReplaceSetEvent(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_MapReplaceSetEvent(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u16 uid = ScriptReadAny(vm, env);
@@ -288,7 +288,7 @@ BOOL s00DA_MapReplaceSetEvent(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00D8_MapReplaceIsEventSet(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_MapReplaceIsEventSet(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u16 uid = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
@@ -296,7 +296,7 @@ BOOL s00D8_MapReplaceIsEventSet(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00DE_PokeDexRegist(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_PokeDexRegist(VM *vm, FieldScriptEnv *env) {
     PokeDexSave *pokedex = GameData_GetPokedex(FieldScriptEnv_GetGameData(env));
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     u16 kind = ScriptReadAny(vm, env);
@@ -315,7 +315,7 @@ BOOL s00DE_PokeDexRegist(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00DF_PokeDexIsRegist(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_PokeDexIsRegist(VM *vm, FieldScriptEnv *env) {
     PokeDexSave *pokedex = GameData_GetPokedex(FieldScriptEnv_GetGameData(env));
     u16 kind = ScriptReadAny(vm, env);
     u16 species = ScriptReadAny(vm, env);
@@ -335,7 +335,7 @@ BOOL s00DF_PokeDexIsRegist(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00DD_PokeDexGetCount(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_PokeDexGetCount(VM *vm, FieldScriptEnv *env) {
     PokeDexSave *pokedex = GameData_GetPokedex(FieldScriptEnv_GetGameData(env));
     u16 kind = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
@@ -354,36 +354,36 @@ BOOL s00DD_PokeDexGetCount(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01C6_PokeDexGiveNational(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_PokeDexGiveNational(VM *vm, FieldScriptEnv *env) {
     PokeDexSave *pokedex = GameData_GetPokedex(FieldScriptEnv_GetGameData(env));
     PokeDex_EnableHabitatList(pokedex);
     PokeDex_SetNationalObtained(pokedex);
     return FALSE;
 }
 
-BOOL s01C7_PokeDexHaveNational(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_PokeDexHaveNational(VM *vm, FieldScriptEnv *env) {
     u16 *value = ScriptReadVar(vm, env);
     PokeDexSave *pokedex = GameData_GetPokedex(FieldScriptEnv_GetGameData(env));
     *value = PokeDex_IsNationalObtained(pokedex);
     return FALSE;
 }
 
-BOOL s01C8_PokeDexEnable(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_PokeDexEnable(VM *vm, FieldScriptEnv *env) {
     PokeDexSave *pokedex = GameData_GetPokedex(FieldScriptEnv_GetGameData(env));
     givePlayerPokedex(pokedex);
     return FALSE;
 }
 
-BOOL s02D0_PokeDexEnableHabitatList(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_PokeDexEnableHabitatList(VM *vm, FieldScriptEnv *env) {
     PokeDexSave *pokedex = GameData_GetPokedex(FieldScriptEnv_GetGameData(env));
     PokeDex_EnableHabitatList(pokedex);
     return FALSE;
 }
 
-// The system UI flags that s02ED_SetSoftResetBlocked sets and clears
+// The system UI flags that Scrcmd_GameState_SetSoftResetBlocked sets and clears
 static const u32 sSystemUIFlags[1] = { 0x40 };
 
-BOOL s02ED_SetSoftResetBlocked(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_SetSoftResetBlocked(VM *vm, FieldScriptEnv *env) {
     u16 mode = ScriptReadAny(vm, env);
     u16 index = ScriptReadAny(vm, env);
 
@@ -398,7 +398,7 @@ BOOL s02ED_SetSoftResetBlocked(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s02F1_SetOneShotDRObtained(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_SetOneShotDRObtained(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
     TrainerCardSave *card = getTrainerCardDataBlkAddress(gameData);
@@ -407,7 +407,7 @@ BOOL s02F1_SetOneShotDRObtained(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s02F2_IsOneShotDRObtained(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_IsOneShotDRObtained_02F2(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
     TrainerCardSave *card = getTrainerCardDataBlkAddress(gameData);
@@ -418,7 +418,7 @@ BOOL s02F2_IsOneShotDRObtained(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00E2_SaveDataCheckRequired(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_SaveDataCheckRequired(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
     SaveControl *save = GameData_GetSaveControl(gameData);
@@ -436,13 +436,13 @@ BOOL s00E2_SaveDataCheckRequired(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00E3_GiveRunningShoes(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_GiveRunningShoes(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     EventWork_FlagSet(GameData_GetEventWork(gameData), 0x963);
     return FALSE;
 }
 
-BOOL s00E4_BoxUnlockWallpapers(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_BoxUnlockWallpapers(VM *vm, FieldScriptEnv *env) {
     u16 flags = ScriptReadAny(vm, env);
     BoxSaveAccessor *box = GameData_GetBoxSaveAccessor(FieldScriptEnv_GetGameData(env));
 
@@ -452,7 +452,7 @@ BOOL s00E4_BoxUnlockWallpapers(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL FieldScriptEnv_CmdGetTrainerViewGroupAndMarkSeen(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_GetTrainerViewGroupAndMarkSeen(VM *vm, FieldScriptEnv *env) {
     u16 *flag = ScriptReadVar(vm, env);
     u16 *value = ScriptReadVar(vm, env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
@@ -465,7 +465,7 @@ BOOL FieldScriptEnv_CmdGetTrainerViewGroupAndMarkSeen(VM *vm, FieldScriptEnv *en
     return FALSE;
 }
 
-BOOL s00E6_StartMenuIsItemUnlocked(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_StartMenuIsItemUnlocked(VM *vm, FieldScriptEnv *env) {
     u16 item = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
@@ -476,14 +476,14 @@ BOOL s00E6_StartMenuIsItemUnlocked(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00E7_StartMenuUnlockItem(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_StartMenuUnlockItem(VM *vm, FieldScriptEnv *env) {
     u16 item = ScriptReadAny(vm, env);
 
     TrainerGameInfo_AddStartMenuItemFlags(getTrainerCardDataBlkAddress(FieldScriptEnv_GetGameData(env)), item, 1);
     return FALSE;
 }
 
-BOOL s00E8_StartMenuIsItemSelected(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_StartMenuIsItemSelected(VM *vm, FieldScriptEnv *env) {
     u16 item = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
@@ -496,7 +496,7 @@ BOOL s00E8_StartMenuIsItemSelected(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00EA_HOFCheckIntegrity(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_HOFCheckIntegrity(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     EventWork *eventWork = GameData_GetEventWork(gameData);
     u16 *result = ScriptReadVar(vm, env);
@@ -527,7 +527,7 @@ BOOL s00EA_HOFCheckIntegrity(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01D7_ObjInitPointGPos(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_ObjInitPointGPos(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
     s16 x = ScriptReadAny(vm, env);
     s16 z = ScriptReadAny(vm, env);
@@ -537,7 +537,7 @@ BOOL s01D7_ObjInitPointGPos(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01D8_ObjInitWarpGPos(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_ObjInitWarpGPos(VM *vm, FieldScriptEnv *env) {
     u16 warpId = ScriptReadAny(vm, env);
     s16 x = ScriptReadAny(vm, env);
     s16 y = ScriptReadAny(vm, env);
@@ -547,7 +547,7 @@ BOOL s01D8_ObjInitWarpGPos(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01D9_ObjInitNPCGPos(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_ObjInitNPCGPos(VM *vm, FieldScriptEnv *env) {
     u16 npcId = ScriptReadAny(vm, env);
     u16 direction = ScriptReadAny(vm, env);
     s16 x = ScriptReadAny(vm, env);
@@ -558,21 +558,21 @@ BOOL s01D9_ObjInitNPCGPos(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0095_TrainerFlagSet(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_TrainerFlagSet(VM *vm, FieldScriptEnv *env) {
     EventWork *eventWork = GameData_GetEventWork(FieldScriptEnv_GetGameData(env));
     u16 trainerId = ScriptReadAny(vm, env);
     setTrainerBattleFlag(eventWork, trainerId);
     return FALSE;
 }
 
-BOOL s0096_TrainerFlagReset(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_TrainerFlagReset(VM *vm, FieldScriptEnv *env) {
     EventWork *eventWork = GameData_GetEventWork(FieldScriptEnv_GetGameData(env));
     u16 trainerId = ScriptReadAny(vm, env);
     clearTrainerBattleFlag(eventWork, trainerId);
     return FALSE;
 }
 
-BOOL s0097_TrainerFlagGet(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_TrainerFlagGet(VM *vm, FieldScriptEnv *env) {
     EventWork *eventWork = GameData_GetEventWork(FieldScriptEnv_GetGameData(env));
     u16 trainerId = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
@@ -580,7 +580,7 @@ BOOL s0097_TrainerFlagGet(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s008C_CallTrainerLose(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_CallTrainerLose(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     ScriptWork_SetPostEvent(work, EventBattleLose_Create(gsys));
@@ -588,7 +588,7 @@ BOOL s008C_CallTrainerLose(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s008D_TrainerBattleIsVictory(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_TrainerBattleIsVictory(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u32 battleResult = GameData_GetLastBtlResult(gameData);
@@ -600,7 +600,7 @@ BOOL s008D_TrainerBattleIsVictory(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0176_CallWildLose(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_CallWildLose(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     ScriptWork_SetPostEvent(work, EventBattleLose_Create(gsys));
@@ -608,7 +608,7 @@ BOOL s0176_CallWildLose(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0177_WildBattleIsVictory(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_WildBattleIsVictory(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u32 battleResult = GameData_GetLastBtlResult(gameData);
@@ -620,7 +620,7 @@ BOOL s0177_WildBattleIsVictory(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0178_WildBattleGetResult(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_WildBattleGetResult(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u32 battleResult = GameData_GetLastBtlResult(gameData);
     u16 *result = ScriptReadVar(vm, env);
@@ -646,7 +646,7 @@ BOOL func_ov012_02156128(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s02D2_FieldOpenRestoreLCD(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_FieldOpenRestoreLCD(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     ScriptWork_CallEvent(work, EventFieldOpenRestoreLCD_Create(gsys));

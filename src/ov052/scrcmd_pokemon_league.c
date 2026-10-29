@@ -16,7 +16,7 @@
 static void PokemonLeague_DisableRailLines(Field *field, u16 a1);
 static u32 PokemonLeague_GetRoomCamera(u16 room);
 
-static BOOL PokemonLeagueCmd_DisableRailLines(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_DisableRailLines(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     u16 room = ScriptReadAny(vm, env);
@@ -26,7 +26,7 @@ static BOOL PokemonLeagueCmd_DisableRailLines(VM *vm, FieldScriptEnv *env) {
 }
 
 // Sets the camera of an Elite Four's room
-static BOOL PokemonLeagueCmd_SetCamera(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_SetCamera(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     u16 room = ScriptReadAny(vm, env);
     FieldCamera *camera = Field_GetCameraSystem(field);
@@ -52,7 +52,7 @@ static u32 PokemonLeague_GetRoomCamera(u16 room) {
 }
 
 // Grimsley's room
-static BOOL PokemonLeagueCmd_PlayGrimsleyGroup(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_PlayGrimsleyGroup(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     GimmickGrimsley_PlayGroup(gsys, VM_Read16(vm));
@@ -60,21 +60,21 @@ static BOOL PokemonLeagueCmd_PlayGrimsleyGroup(VM *vm, FieldScriptEnv *env) {
 }
 
 // Grimsley's room
-static BOOL PokemonLeagueCmd_PlayGrimsleyModel0Animation(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_PlayGrimsleyModel0Animation(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     GimmickGrimsley_PlayModel0Animation(gsys, VM_Read16(vm));
     return FALSE;
 }
 
-static BOOL PokemonLeagueCmd_PlayCaitlinAmbience(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_PlayCaitlinAmbience(VM *vm, FieldScriptEnv *env) {
     FieldSnd_PlayAmbience(GameData_GetFieldSoundSystem(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))),
                           SEQ_SE_SW_CATTLEYA_03);
     return FALSE;
 }
 
 // Caitlin's room
-static BOOL PokemonLeagueCmd_PlayCaitlinModels34Or5(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_PlayCaitlinModels34Or5(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     GimmickCaitlin_PlayModels34Or5(gsys, VM_Read16(vm));
@@ -82,7 +82,7 @@ static BOOL PokemonLeagueCmd_PlayCaitlinModels34Or5(VM *vm, FieldScriptEnv *env)
 }
 
 // Caitlin's room
-static BOOL PokemonLeagueCmd_CallCaitlinModel1Event(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_CallCaitlinModel1Event(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameEvent *event = GimmickCaitlin_CreateModel1Event(FieldScriptEnv_GetGameSystem(env));
 
@@ -94,13 +94,13 @@ static BOOL PokemonLeagueCmd_CallCaitlinModel1Event(VM *vm, FieldScriptEnv *env)
 }
 
 // Caitlin's room
-static BOOL PokemonLeagueCmd_PlayCaitlinModel0(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_PlayCaitlinModel0(VM *vm, FieldScriptEnv *env) {
     GimmickCaitlin_CallPlayModel0(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
 // Caitlin's room
-static BOOL PokemonLeagueCmd_DropCaitlinActor(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_DropCaitlinActor(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 actorId = VM_Read16(vm);
 
@@ -109,7 +109,7 @@ static BOOL PokemonLeagueCmd_DropCaitlinActor(VM *vm, FieldScriptEnv *env) {
 }
 
 // Shauntal's room
-static BOOL PokemonLeagueCmd_CallShauntalModel8Event(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_CallShauntalModel8Event(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameEvent *event = GimmickShauntal_CallModel8Event(FieldScriptEnv_GetGameSystem(env));
 
@@ -121,7 +121,7 @@ static BOOL PokemonLeagueCmd_CallShauntalModel8Event(VM *vm, FieldScriptEnv *env
 }
 
 // Shauntal's room
-static BOOL PokemonLeagueCmd_PlayShauntalModel(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_PlayShauntalModel(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -130,7 +130,7 @@ static BOOL PokemonLeagueCmd_PlayShauntalModel(VM *vm, FieldScriptEnv *env) {
 }
 
 // Shauntal's room
-static BOOL PokemonLeagueCmd_CallShauntalRoomChangeEvent(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_CallShauntalRoomChangeEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameEvent *event = GimmickShauntal_CallRoomChangeEvent(gsys, VM_Read16(vm));
@@ -143,7 +143,7 @@ static BOOL PokemonLeagueCmd_CallShauntalRoomChangeEvent(VM *vm, FieldScriptEnv 
 }
 
 // Shauntal's room
-static BOOL PokemonLeagueCmd_CallShauntalModels6And9Event(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_CallShauntalModels6And9Event(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameEvent *event = GimmickShauntal_CallModels6And9Event(FieldScriptEnv_GetGameSystem(env));
 
@@ -155,13 +155,13 @@ static BOOL PokemonLeagueCmd_CallShauntalModels6And9Event(VM *vm, FieldScriptEnv
 }
 
 // Marshal's room
-static BOOL PokemonLeagueCmd_PlayMarshalModel0(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_PlayMarshalModel0(VM *vm, FieldScriptEnv *env) {
     MarshalRoom_PlayModel0Anims(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
 // Marshal's room
-static BOOL PokemonLeagueCmd_PlayMarshalModel3Animation(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_PlayMarshalModel3Animation(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     MarshalRoom_PlayModel3Anim(gsys, VM_Read16(vm));
@@ -169,13 +169,13 @@ static BOOL PokemonLeagueCmd_PlayMarshalModel3Animation(VM *vm, FieldScriptEnv *
 }
 
 // Marshal's room
-static BOOL PokemonLeagueCmd_PlayMarshalModel1(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_PlayMarshalModel1(VM *vm, FieldScriptEnv *env) {
     MarshalRoom_PlayModel1Anims(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
 // Marshal's room
-static BOOL PokemonLeagueCmd_CallMarshalPlatformEvent(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_CallMarshalPlatformEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameEvent *event = MarshalRoom_LowerPlatform(FieldScriptEnv_GetGameSystem(env));
 
@@ -187,7 +187,7 @@ static BOOL PokemonLeagueCmd_CallMarshalPlatformEvent(VM *vm, FieldScriptEnv *en
 }
 
 // The Champion's room
-static BOOL PokemonLeagueCmd_CallChampionChangeEvent(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_CallChampionChangeEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameEvent *event = GimmickChampion_CallChangeEvent(FieldScriptEnv_GetGameSystem(env));
 
@@ -199,7 +199,7 @@ static BOOL PokemonLeagueCmd_CallChampionChangeEvent(VM *vm, FieldScriptEnv *env
 }
 
 // The Champion's room
-static BOOL PokemonLeagueCmd_CallChampionOpenEvent(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_CallChampionOpenEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameEvent *event = GimmickChampion_CallOpenEvent(FieldScriptEnv_GetGameSystem(env));
 
@@ -211,7 +211,7 @@ static BOOL PokemonLeagueCmd_CallChampionOpenEvent(VM *vm, FieldScriptEnv *env) 
 }
 
 // The Champion's room
-static BOOL PokemonLeagueCmd_HideChampionActorShadow(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_HideChampionActorShadow(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     GimmickChampion_HideActorShadow(gsys, VM_Read16(vm));
@@ -219,7 +219,7 @@ static BOOL PokemonLeagueCmd_HideChampionActorShadow(VM *vm, FieldScriptEnv *env
 }
 
 // The Champion's room
-static BOOL PokemonLeagueCmd_ShowChampionActorShadow(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_ShowChampionActorShadow(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     GimmickChampion_ShowActorShadow(gsys, VM_Read16(vm));
@@ -227,33 +227,33 @@ static BOOL PokemonLeagueCmd_ShowChampionActorShadow(VM *vm, FieldScriptEnv *env
 }
 
 // The Champion's room
-static BOOL PokemonLeagueCmd_SetChampionRoomOpen(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PokemonLeague_SetChampionRoomOpen(VM *vm, FieldScriptEnv *env) {
     GimmickChampion_CallSetOpen(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
 const FieldScriptCommand POKEMON_LEAGUE_SCRIPT_COMMANDS[] = {
-    PokemonLeagueCmd_DisableRailLines,
-    PokemonLeagueCmd_SetCamera,
-    PokemonLeagueCmd_PlayGrimsleyGroup,
-    PokemonLeagueCmd_PlayGrimsleyModel0Animation,
-    PokemonLeagueCmd_PlayCaitlinAmbience,
-    PokemonLeagueCmd_PlayCaitlinModels34Or5,
-    PokemonLeagueCmd_CallCaitlinModel1Event,
-    PokemonLeagueCmd_PlayCaitlinModel0,
-    PokemonLeagueCmd_DropCaitlinActor,
-    PokemonLeagueCmd_CallShauntalModel8Event,
-    PokemonLeagueCmd_PlayShauntalModel,
-    PokemonLeagueCmd_CallShauntalRoomChangeEvent,
-    PokemonLeagueCmd_CallShauntalModels6And9Event,
-    PokemonLeagueCmd_PlayMarshalModel0,
-    PokemonLeagueCmd_PlayMarshalModel3Animation,
-    PokemonLeagueCmd_PlayMarshalModel1,
-    PokemonLeagueCmd_CallMarshalPlatformEvent,
-    PokemonLeagueCmd_CallChampionChangeEvent,
-    PokemonLeagueCmd_CallChampionOpenEvent,
-    PokemonLeagueCmd_HideChampionActorShadow,
-    PokemonLeagueCmd_ShowChampionActorShadow,
-    PokemonLeagueCmd_SetChampionRoomOpen,
+    Scrcmd_PokemonLeague_DisableRailLines,
+    Scrcmd_PokemonLeague_SetCamera,
+    Scrcmd_PokemonLeague_PlayGrimsleyGroup,
+    Scrcmd_PokemonLeague_PlayGrimsleyModel0Animation,
+    Scrcmd_PokemonLeague_PlayCaitlinAmbience,
+    Scrcmd_PokemonLeague_PlayCaitlinModels34Or5,
+    Scrcmd_PokemonLeague_CallCaitlinModel1Event,
+    Scrcmd_PokemonLeague_PlayCaitlinModel0,
+    Scrcmd_PokemonLeague_DropCaitlinActor,
+    Scrcmd_PokemonLeague_CallShauntalModel8Event,
+    Scrcmd_PokemonLeague_PlayShauntalModel,
+    Scrcmd_PokemonLeague_CallShauntalRoomChangeEvent,
+    Scrcmd_PokemonLeague_CallShauntalModels6And9Event,
+    Scrcmd_PokemonLeague_PlayMarshalModel0,
+    Scrcmd_PokemonLeague_PlayMarshalModel3Animation,
+    Scrcmd_PokemonLeague_PlayMarshalModel1,
+    Scrcmd_PokemonLeague_CallMarshalPlatformEvent,
+    Scrcmd_PokemonLeague_CallChampionChangeEvent,
+    Scrcmd_PokemonLeague_CallChampionOpenEvent,
+    Scrcmd_PokemonLeague_HideChampionActorShadow,
+    Scrcmd_PokemonLeague_ShowChampionActorShadow,
+    Scrcmd_PokemonLeague_SetChampionRoomOpen,
     (FieldScriptCommand)0xFFFFFFFF,
 };

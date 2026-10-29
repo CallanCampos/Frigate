@@ -68,8 +68,8 @@ Script_1:
     SEWait
     // "Thank you for sailing with us.[f000]븁\u0000\nThis cruise ship will arrive\nin Castelia City shortly.[f000]븁\u0000"
     SystemMsg RoyalUnova_Text_ThankSailingUsCruise, 2
-    InfoMsgClose
-    PleasureBoatCmd_StopClock
+    SystemMsgClose
+    StopClock
     FadeOutBlack
     FadeWait
     VMCall L_083D
@@ -86,8 +86,8 @@ Script_2:
     ActorSetEyeToEye
     WorkSetConst 0x8020, 0
     WorkSetConst 0x8021, 0
-    PleasureBoatCmd_GetInfo 4, 0x8020
-    PleasureBoatCmd_GetInfo 5, 0x8021
+    PleasureBoat_GetInfo 4, 0x8020
+    PleasureBoat_GetInfo 5, 0x8021
     WordSetNumber 3, 0x8020, 1
     WordSetNumber 4, 0x8021, 1
     VMStackPush 0x8020
@@ -120,7 +120,7 @@ L_01DA:
     // "Certainly. Just a moment, please.[f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, RoyalUnova_Text_CertainlyJustMomentPlease, 0, 0
     ActorMsgClose
-    PleasureBoatCmd_StopClock
+    StopClock
     FadeOutBlack
     FadeWait
     VMCall L_083D
@@ -162,8 +162,8 @@ L_025C:
     VMJumpIf CMP_STACK, L_02FB
     WorkSetConst 0x8022, 0
     WorkSetConst 0x8023, 0
-    PleasureBoatCmd_GetInfo 0, 0x8022
-    PleasureBoatCmd_GetInfo 1, 0x8023
+    PleasureBoat_GetInfo 0, 0x8022
+    PleasureBoat_GetInfo 1, 0x8023
     WordSetNumber 0, 0x8022, 1
     WordSetNumber 1, 0x8023, 1
     VMStackPush 0x8022
@@ -234,7 +234,7 @@ Script_5:
 Script_6:
     ActorsPauseAll
     WorkSetConst 0x8024, 0
-    PleasureBoatCmd_GetInfo 3, 0x8024
+    PleasureBoat_GetInfo 3, 0x8024
     VMStackPush 0x8024
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -515,11 +515,11 @@ L_0691:
     CallTrainerLose
 
 L_0693:
-    PleasureBoatCmd_SetTrainerInfo EVENT_WORK_0x4000, 8, 0, 1
+    SetTrainerInfo EVENT_WORK_0x4000, 8, 0, 1
     WorkSetConst 0x8029, 0
     WorkSetConst 0x802a, 0
-    PleasureBoatCmd_GetInfo 4, 0x8029
-    PleasureBoatCmd_GetInfo 5, 0x802a
+    PleasureBoat_GetInfo 4, 0x8029
+    PleasureBoat_GetInfo 5, 0x802a
     VMStackPush 0x8029
     VMStackPush 0x802a
     VMStackCmp CMP_LE
@@ -527,7 +527,7 @@ L_0693:
     // "Won against every Trainer on the ship!"
     SystemMsg RoyalUnova_Text_WonAgainstEveryTrainer, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
 
 L_06D2:
     VMJump L_06FC
@@ -553,7 +553,7 @@ L_06FE:
     ParentActorMsg MSGFILE_SCRIPT, 0x802b, 0, 0
     LastKeyWait
     ActorMsgClose
-    PleasureBoatCmd_AdvanceClock 10, 1
+    AdvanceClock 10, 1
     VMReturn
 
 L_072E:
@@ -571,7 +571,7 @@ L_072E:
     ParentActorMsg MSGFILE_SCRIPT, 0x802c, 0, 0
     LastKeyWait
     ActorMsgClose
-    PleasureBoatCmd_AdvanceClock 45, 0
+    AdvanceClock 45, 0
     VMReturn
 
 Script_28:
@@ -595,8 +595,8 @@ Script_28:
     SEWait
     // "Thank you for sailing with us.[f000]븁\u0000\nThis cruise ship will arrive\nin Castelia City shortly.[f000]븁\u0000"
     SystemMsg RoyalUnova_Text_ThankSailingUsCruise, 2
-    InfoMsgClose
-    PleasureBoatCmd_StopClock
+    SystemMsgClose
+    StopClock
     FadeOutBlack
     FadeWait
     VMCall L_083D
@@ -614,8 +614,8 @@ Movement_07D4:
 Script_29:
     ActorsPauseAll
     WorkSetConst 0x802d, 0
-    PleasureBoatCmd_Create EVENT_FLAG_0x0960
-    PleasureBoatCmd_GetInfo 4, 0x802d
+    PleasureBoat_Create EVENT_FLAG_0x0960
+    PleasureBoat_GetInfo 4, 0x802d
     ActorCmdExec 0, Movement_0884
     ActorCmdExec 255, Movement_08AC
     ActorCmdWait
@@ -641,8 +641,8 @@ Script_29:
 L_083D:
     WorkSetConst 0x802e, 0
     WorkSetConst 0x802f, 0
-    PleasureBoatCmd_GetInfo 4, 0x802e
-    PleasureBoatCmd_GetInfo 5, 0x802f
+    PleasureBoat_GetInfo 4, 0x802e
+    PleasureBoat_GetInfo 5, 0x802f
     VMStackPush 0x802e
     VMStackPush 0x802f
     VMStackCmp CMP_LE
@@ -650,7 +650,7 @@ L_083D:
     WorkSetConst EVENT_WORK_0x417b, 2
 
 L_086E:
-    PleasureBoatCmd_Free
+    PleasureBoat_Free
     RTReserveScript 1
     MapChangeCore ZONE_CASTELIA_CITY_11, 19, 0, 16, 2
     VMReturn

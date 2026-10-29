@@ -97,7 +97,7 @@ L_013B:
 
 L_0140:
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

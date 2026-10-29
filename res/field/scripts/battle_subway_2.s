@@ -17,22 +17,22 @@
     WorkSetConst 0x8023, 0
 
 Script_1:
-    BSubwayCmd_Tool 21, 0, 0, 32803
+    Tool 21, 0, 0, 32803
     ActorSetGPos 0, 17, 0, 14, 3
     ActorSetGPos 1, 76, 0, 14, 2
     VMStackPush EVENT_WORK_0x4179
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_008B
-    BSubwayCmd_Tool 18, 0x8023, 1, 0
+    Tool 18, 0x8023, 1, 0
     ActorSetGPos 255, 75, 0, 12, 1
-    BSubwayCmd_Tool 329, 0, 0, 0
+    Tool 329, 0, 0, 0
 
 L_008B:
     VMHalt
 
 Script_2:
-    BSubwayCmd_Tool 21, 0, 0, 32803
+    Tool 21, 0, 0, 32803
     FieldGetContinueFlag 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
@@ -42,7 +42,7 @@ Script_2:
     VMStackPushConst 0
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_00F0
-    BSubwayCmd_CreateWork 1, 0x8023
+    CreateWork 1, 0x8023
     VMStackPush 0x8023
     VMStackPushConst 3
     VMStackCmp CMP_EQ
@@ -54,12 +54,12 @@ Script_2:
     WorkSetConst EVENT_WORK_0x4179, 3
 
 L_00F0:
-    BSubwayCmd_Tool 18, 0x8023, 1, 0
+    Tool 18, 0x8023, 1, 0
     VMStackPush EVENT_WORK_0x4179
     VMStackPushConst 2
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0117
-    BSubwayCmd_Tool 20, 1, 0, 0
+    Tool 20, 1, 0, 0
 
 L_0117:
     VMHalt
@@ -74,7 +74,7 @@ Script_3:
     VMJumpIf CMP_STACK, L_01AB
     // "What would you like to do?"
     ActorMsg MSGFILE_SCRIPT, BattleSubway2_Text_WhatWouldLike, 0x8011, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32784
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32784
     ListMenuAdd 16, 65535, 0
     ListMenuAdd 17, 65535, 1
     ListMenuAdd 18, 65535, 2
@@ -112,7 +112,7 @@ L_01B1:
     VMHalt
 
 L_01B7:
-    BSubwayCmd_Tool 21, 0, 0, 32803
+    Tool 21, 0, 0, 32803
     WorkCmpConst 0x8023, 0
     VMJumpIf CMP_EQ, L_01D4
     VMJump L_01E0
@@ -215,7 +215,7 @@ L_02F0:
     VMReturn
 
 L_031F:
-    BSubwayCmd_Tool 310, 0, 0, 32803
+    Tool 310, 0, 0, 32803
     VMStackPush 0x8023
     VMStackPushConst 2
     VMStackCmp CMP_EQ
@@ -243,8 +243,8 @@ L_031F:
 L_0391:
     WorkSetConst EVENT_WORK_0x4176, 4
     WorkSetConst EVENT_WORK_0x4178, 1
-    BSubwayCmd_Tool 322, 0, 0, 0
-    BSubwayCmd_Tool 316, 0, 0, 0
+    Tool 322, 0, 0, 0
+    Tool 316, 0, 0, 0
     // "Saving...\nDon't turn off the power."
     SystemMsg BattleSubway2_Text_SavingDontTurnOff, 2
     SaveDataWrite 0x8010
@@ -266,18 +266,18 @@ Movement_03EC:
 L_03F4:
     FadeEx 3, 0, 16, 2
     FadeExWait
-    BSubwayCmd_Tool 35, 0, 3, 0
+    Tool 35, 0, 3, 0
     ActorSetGPos 255, 18, 0, 14, 3
     ActorSetGPos 2, 19, 0, 14, 2
-    BSubwayCmd_Tool 36, 2, 0, 0
+    Tool 36, 2, 0, 0
     FadeEx 3, 16, 0, 2
     VMReturn
 
 L_0438:
     // "Communicating. Please stand by..."
     SystemMsg BattleSubway2_Text_CommunicatingPleaseStandBy, 2
-    BSubwayCmd_Tool 319, 0, 0, 0
-    BSubwayCmd_Tool 402, 100, 0, 32802
+    Tool 319, 0, 0, 0
+    Tool 402, 100, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -289,8 +289,8 @@ L_0438:
 
 L_0475:
     WorkSetConst EVENT_WORK_0x4000, 0
-    BSubwayCmd_Tool 405, 2, EVENT_WORK_0x4000, 0
-    BSubwayCmd_Tool 415, 0, 0, 32802
+    Tool 405, 2, EVENT_WORK_0x4000, 0
+    Tool 415, 0, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -301,9 +301,9 @@ L_0475:
     VMReturn
 
 L_04B2:
-    BSubwayCmd_Tool 406, 2, 0, 16384
+    Tool 406, 2, 0, 16384
     MsgWinCloseAll
-    BSubwayCmd_Tool 415, 0, 0, 32802
+    Tool 415, 0, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -338,8 +338,8 @@ L_0510:
 L_052E:
     WorkSetConst 0x8025, 0
     WorkSetConst 0x8026, 0
-    BSubwayCmd_Tool 319, 0, 0, 0
-    BSubwayCmd_Tool 402, 105, 0, 32802
+    Tool 319, 0, 0, 0
+    Tool 402, 105, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -354,31 +354,31 @@ L_056F:
     VMSleep 30
     // "Awaiting your friend's response..."
     SystemMsg BattleSubway2_Text_AwaitingFriendsResponse, 2
-    BSubwayCmd_Tool 402, 106, 0, 32802
+    Tool 402, 106, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_05B0
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_16F4
     VMCall L_0A7C
     VMReturn
 
 L_05B0:
-    BSubwayCmd_Tool 405, 5, 0x8025, 0
-    BSubwayCmd_Tool 415, 0, 0, 32802
+    Tool 405, 5, 0x8025, 0
+    Tool 415, 0, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_05E7
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_16F4
     VMCall L_0A7C
     VMReturn
 
 L_05E7:
-    BSubwayCmd_Tool 406, 5, 0, 32806
-    BSubwayCmd_Tool 415, 0, 0, 32802
+    Tool 406, 5, 0, 32806
+    Tool 415, 0, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -397,8 +397,8 @@ L_061E:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_OR
     VMJumpIf CMP_STACK, L_06A5
-    InfoMsgClose
-    BSubwayCmd_Tool 402, 107, 0, 32802
+    SystemMsgClose
+    Tool 402, 107, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -426,36 +426,36 @@ L_069F:
     VMReturn
 
 L_06A5:
-    BSubwayCmd_Tool 402, 108, 0, 32802
+    Tool 402, 108, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_06D2
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_16F4
     VMCall L_0A7C
     VMReturn
 
 L_06D2:
-    InfoMsgClose
+    SystemMsgClose
     WorkGet 0x8008, 0x8011
     RTCallGlobal 10346
     WorkGet 0x8025, 0x8010
     // "Awaiting your friend's response..."
     SystemMsg BattleSubway2_Text_AwaitingFriendsResponse, 2
-    BSubwayCmd_Tool 402, 109, 0, 32802
+    Tool 402, 109, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0717
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_16F4
     VMCall L_0A7C
     VMReturn
 
 L_0717:
-    BSubwayCmd_Tool 405, 6, 0x8025, 0
-    BSubwayCmd_Tool 415, 0, 0, 32802
+    Tool 405, 6, 0x8025, 0
+    Tool 415, 0, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -466,8 +466,8 @@ L_0717:
     VMReturn
 
 L_074E:
-    BSubwayCmd_Tool 406, 6, 0, 32806
-    BSubwayCmd_Tool 415, 0, 0, 32802
+    Tool 406, 6, 0, 32806
+    Tool 415, 0, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -486,8 +486,8 @@ L_0785:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_OR
     VMJumpIf CMP_STACK, L_080C
-    InfoMsgClose
-    BSubwayCmd_Tool 402, 110, 0, 32802
+    SystemMsgClose
+    Tool 402, 110, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -515,20 +515,20 @@ L_0806:
     VMReturn
 
 L_080C:
-    BSubwayCmd_Tool 319, 0, 0, 0
-    BSubwayCmd_Tool 402, 111, 0, 32802
+    Tool 319, 0, 0, 0
+    Tool 402, 111, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0843
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_16F4
     VMCall L_0A7C
     VMReturn
 
 L_0843:
-    BSubwayCmd_Tool 405, 0, 0, 0
-    BSubwayCmd_Tool 415, 0, 0, 32802
+    Tool 405, 0, 0, 0
+    Tool 415, 0, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -539,8 +539,8 @@ L_0843:
     VMReturn
 
 L_087A:
-    BSubwayCmd_Tool 406, 0, 0, 32806
-    BSubwayCmd_Tool 415, 0, 0, 32802
+    Tool 406, 0, 0, 32806
+    Tool 415, 0, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -555,13 +555,13 @@ L_08B1:
     VMStackPushConst 0
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_091F
-    InfoMsgClose
+    SystemMsgClose
     WorkGet 0x8008, 0x8011
     WorkGet 0x8009, 0x8026
     RTCallGlobal 10348
     // "Awaiting your friend's response..."
     SystemMsgAsync BattleSubway2_Text_AwaitingFriendsResponse, 2
-    BSubwayCmd_Tool 402, 112, 0, 32802
+    Tool 402, 112, 0, 32802
     VMSleep 15
     MsgWinCloseAll
     VMStackPush 0x8022
@@ -580,12 +580,12 @@ L_090D:
     VMReturn
 
 L_091F:
-    BSubwayCmd_Tool 402, 113, 0, 32802
+    Tool 402, 113, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_094C
-    InfoMsgClose
+    SystemMsgClose
     VMCall L_16F4
     VMCall L_0A7C
     VMReturn
@@ -595,10 +595,10 @@ L_094C:
     SystemMsg BattleSubway2_Text_SavingDontTurnOff, 2
     WorkSetConst EVENT_WORK_0x4176, 4
     WorkSetConst EVENT_WORK_0x4178, 1
-    BSubwayCmd_Tool 21, 0, 0, 32803
-    BSubwayCmd_Tool 322, 0, 0, 0
-    BSubwayCmd_Tool 319, 0, 0, 0
-    BSubwayCmd_Tool 402, 102, 0, 32802
+    Tool 21, 0, 0, 32803
+    Tool 322, 0, 0, 0
+    Tool 319, 0, 0, 0
+    Tool 402, 102, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -609,20 +609,20 @@ L_094C:
     VMReturn
 
 L_09A9:
-    BSubwayCmd_Tool 407, 0, 0, 32801
+    Tool 407, 0, 0, 32801
     VMStackPush 0x8021
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_09E0
-    BSubwayCmd_Tool 316, 0, 0, 0
-    BSubwayCmd_Tool 405, 1, 0, 32801
+    Tool 316, 0, 0, 0
+    Tool 405, 1, 0, 32801
     VMJump L_09EA
 
 L_09E0:
-    BSubwayCmd_Tool 406, 1, 0, 16384
+    Tool 406, 1, 0, 16384
 
 L_09EA:
-    BSubwayCmd_Tool 415, 0, 0, 32802
+    Tool 415, 0, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -635,7 +635,7 @@ L_09EA:
 L_0A17:
     SaveDataWrite 0x8010
     MsgWinCloseAll
-    BSubwayCmd_Tool 402, 103, 0, 32802
+    Tool 402, 103, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -680,7 +680,7 @@ L_0AC9:
     // "Well then, we'll return to Nimbasa City.[f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, BattleSubway2_Text_WellThenWellReturn, 0, 0
     MsgWinCloseAll
-    BSubwayCmd_Tool 331, 0, 0, 32807
+    Tool 331, 0, 0, 32807
     VMStackPush 0x8027
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -700,8 +700,8 @@ L_0AF8:
 L_0B20:
     // "Awaiting your friend's response..."
     SystemMsg BattleSubway2_Text_AwaitingFriendsResponse, 2
-    BSubwayCmd_Tool 319, 0, 0, 0
-    BSubwayCmd_Tool 402, 100, 0, 32802
+    Tool 319, 0, 0, 0
+    Tool 402, 100, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -712,8 +712,8 @@ L_0B20:
 
 L_0B5B:
     WorkSetConst EVENT_WORK_0x4000, 1
-    BSubwayCmd_Tool 405, 2, EVENT_WORK_0x4000, 0
-    BSubwayCmd_Tool 406, 2, 0, 16384
+    Tool 405, 2, EVENT_WORK_0x4000, 0
+    Tool 406, 2, 0, 16384
     VMCall L_1718
     MsgWinCloseAll
 
@@ -724,8 +724,8 @@ Script_4:
     ActorsPauseAll
     WorkSetConst 0x8028, 0
     WorkSetConst 0x8029, 0
-    BSubwayCmd_Tool 21, 0, 0, 32803
-    BSubwayCmd_Tool 6, 0x8023, 0, 32809
+    Tool 21, 0, 0, 32803
+    Tool 6, 0x8023, 0, 32809
     TrainerCardGetSex 0x8028
     VMStackPush 0x8028
     VMStackPushConst 1
@@ -779,18 +779,18 @@ L_0C3A:
 
 Script_5:
     ActorsPauseAll
-    BSubwayCmd_Tool 21, 0, 0, 32803
+    Tool 21, 0, 0, 32803
     VMStackPush 0x8023
     VMStackPushConst 4
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0C95
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    BSubwayCmd_Tool 37, 0x8011, 0, 0
+    Tool 37, 0x8011, 0, 0
     VMJump L_0CDC
 
 L_0C95:
-    BSubwayCmd_Tool 39, 0x8011, 0, 32784
+    Tool 39, 0x8011, 0, 32784
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -799,7 +799,7 @@ L_0C95:
     VMJump L_0CDC
 
 L_0CBE:
-    BSubwayCmd_Tool 26, 0x8011, 0, 32800
+    Tool 26, 0x8011, 0, 32800
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
     ParentActorMsg MSGFILE_SCRIPT, 0x8020, 0, 0
@@ -817,9 +817,9 @@ L_0CE2:
     WorkSetConst 0x802c, 0
     WorkSetConst 0x802d, 0
     WorkGet 0x802d, 0x8011
-    BSubwayCmd_Tool 40, 0x802d, 0, 32810
-    BSubwayCmd_Tool 41, 0x802d, 0, 32811
-    BSubwayCmd_Tool 42, 0x802d, 0, 32812
+    Tool 40, 0x802d, 0, 32810
+    Tool 41, 0x802d, 0, 32811
+    Tool 42, 0x802d, 0, 32812
     VMStackPush 0x8000
     VMStackPush 0x8001
     VMStackPush 0x8002
@@ -856,8 +856,8 @@ Script_6:
     WorkSetConst 0x8031, 0
     WorkSetConst 0x8031, 0
     WorkSetConst 0x802e, 1
-    BSubwayCmd_Tool 310, 0, 0, 32803
-    BSubwayCmd_Tool 312, 0, 0, 32815
+    Tool 310, 0, 0, 32803
+    Tool 312, 0, 0, 32815
     WorkSetConst EVENT_WORK_0x4179, 2
     WorkCmpConst 0x8023, 0
     VMJumpIf CMP_EQ, L_0DEF
@@ -909,7 +909,7 @@ L_0E72:
     VMJump L_0EAE
 
 L_0E85:
-    BSubwayCmd_Tool 358, 0, 0, 32784
+    Tool 358, 0, 0, 32784
     VMStackPush 0x8010
     VMStackPushConst 21
     VMStackCmp CMP_GE
@@ -930,12 +930,12 @@ L_0EC1:
 
 L_0ECD:
     VMCall L_13CB
-    BSubwayCmd_Tool 5, 0, 0, 0
+    Tool 5, 0, 0, 0
     VMStackPush 0x802f
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_1113
-    BSubwayCmd_Tool 326, 0, 0, 32784
+    Tool 326, 0, 0, 32784
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -943,7 +943,7 @@ L_0ECD:
     // "Congratulations![f000]븁\u0000\nYou had a seven-win streak and\nbrilliantly beat the Subway Boss![f000]븁\u0000\nTo commemorate this,\nI present you with these Battle Points.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, BattleSubway2_Text_CongratulationsHadSevenWin, 0x802e, 2, 0
     MsgWinCloseAll
-    BSubwayCmd_Tool 313, 0, 0, 32816
+    Tool 313, 0, 0, 32816
     WordSetPlayerName 0
     WordSetNumber 1, 0x8030, 2
     // "[f000]Ā\u0001\u0000 received [f000]ȁ\u0001\u0001 BP!"
@@ -951,8 +951,8 @@ L_0ECD:
     MEPlay SEQ_ME_BPGET
     MEWait
     MsgWaitAdvance
-    InfoMsgClose
-    BSubwayCmd_Tool 14, 0x8023, 0, 32784
+    SystemMsgClose
+    Tool 14, 0x8023, 0, 32784
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -963,7 +963,7 @@ L_0ECD:
     MEWait
     MsgWaitAdvance
     MsgWinCloseAll
-    BSubwayCmd_Tool 15, 0x8023, 0, 0
+    Tool 15, 0x8023, 0, 0
     BroadcastGameBeacon 8, 0, 0
     WorkCmpConst 0x8023, 5
     VMJumpIf CMP_EQ, L_0F97
@@ -1007,7 +1007,7 @@ L_0FFE:
     // "Congratulations![f000]븁\u0000\nYou had a seven-win streak and\nbrilliantly beat the Subway Boss![f000]븁\u0000\nTo commemorate this,\nI present you with these Battle Points.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, BattleSubway2_Text_CongratulationsHadSevenWin, 0x802e, 2, 0
     MsgWinCloseAll
-    BSubwayCmd_Tool 313, 0, 0, 32816
+    Tool 313, 0, 0, 32816
     WordSetPlayerName 0
     WordSetNumber 1, 0x8030, 2
     // "[f000]Ā\u0001\u0000 received [f000]ȁ\u0001\u0001 BP!"
@@ -1015,13 +1015,13 @@ L_0FFE:
     MEPlay SEQ_ME_BPGET
     MEWait
     MsgWaitAdvance
-    InfoMsgClose
-    BSubwayCmd_Tool 358, 0, 0, 32784
+    SystemMsgClose
+    Tool 358, 0, 0, 32784
     VMStackPush 0x8010
     VMStackPushConst 21
     VMStackCmp CMP_GE
     VMJumpIf CMP_STACK, L_110D
-    BSubwayCmd_Tool 14, 0x8023, 0, 32784
+    Tool 14, 0x8023, 0, 32784
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -1068,7 +1068,7 @@ L_10EF:
 
 L_1101:
     MsgWinCloseAll
-    BSubwayCmd_Tool 15, 0x8023, 0, 0
+    Tool 15, 0x8023, 0, 0
 
 L_110D:
     VMJump L_11AA
@@ -1077,7 +1077,7 @@ L_1113:
     // "Congratulations! You've successfully\nreached a seven-win streak![f000]븁\u0000\nSince you've won seven in a row,\nI present you with these Battle Points![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, BattleSubway2_Text_CongratulationsYouveSuccessfullyReached, 0x802e, 2, 0
     MsgWinCloseAll
-    BSubwayCmd_Tool 313, 0, 0, 32816
+    Tool 313, 0, 0, 32816
     WordSetPlayerName 0
     WordSetNumber 1, 0x8030, 2
     // "[f000]Ā\u0001\u0000 received [f000]ȁ\u0001\u0001 BP!"
@@ -1085,17 +1085,17 @@ L_1113:
     MEPlay SEQ_ME_BPGET
     MEWait
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8023
     VMStackPushConst 3
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_11AA
-    BSubwayCmd_Tool 358, 0, 0, 32784
+    Tool 358, 0, 0, 32784
     VMStackPush 0x8010
     VMStackPushConst 21
     VMStackCmp CMP_GE
     VMJumpIf CMP_STACK, L_11AA
-    BSubwayCmd_Tool 14, 0x8023, 0, 32784
+    Tool 14, 0x8023, 0, 32784
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -1103,24 +1103,24 @@ L_1113:
     // "And, [f000]Ā\u0001\u0000, now you have earned\nthe right to challenge[f000]븀\u0000\nthe Super Multi Train![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, BattleSubway2_Text_NowHaveEarnedRight_3, 0x802e, 2, 0
     MsgWinCloseAll
-    BSubwayCmd_Tool 15, 0x8023, 0, 0
+    Tool 15, 0x8023, 0, 0
 
 L_11AA:
     VMStackPush 0x8023
     VMStackPushConst 4
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_1252
-    BSubwayCmd_Tool 109, 0, 0, 32801
+    Tool 109, 0, 0, 32801
     VMStackPush 0x8021
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_1252
-    BSubwayCmd_Tool 28, 0, 0, 32801
+    Tool 28, 0, 0, 32801
     VMStackPush 0x8021
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_1217
-    BSubwayCmd_Tool 27, 0, 0, 32801
+    Tool 27, 0, 0, 32801
     WordSetPlayerName 0
     WordSetNumber 1, 0x8021, 2
     // "[f000]Ā\u0001\u0000, you have been promoted\nto Rank [f000]ȁ\u0001\u0001![f000]븁\u0000"
@@ -1139,14 +1139,14 @@ L_1217:
     VMJump L_1252
 
 L_1248:
-    BSubwayCmd_Tool 100, 1, 0, 0
+    Tool 100, 1, 0, 0
 
 L_1252:
     VMStackPush EVENT_WORK_0x4179
     VMStackPushConst 3
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_126F
-    BSubwayCmd_Tool 349, 0, 0, 0
+    Tool 349, 0, 0, 0
 
 L_126F:
     VMStackPush EVENT_WORK_0x4165
@@ -1156,7 +1156,7 @@ L_126F:
     WorkAdd EVENT_WORK_0x4165, 1
 
 L_1288:
-    BSubwayCmd_Tool 321, 0, 0, 0
+    Tool 321, 0, 0, 0
     VMStackPush 0x8031
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1171,7 +1171,7 @@ L_12B5:
     // "Saving your record data...\nDon't turn off the power."
     SystemMsg BattleSubway2_Text_SavingRecordDataDont, 2
     SaveDataWrite 0x8010
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush EVENT_WORK_0x4179
     VMStackPushConst 2
     VMStackCmp CMP_EQ
@@ -1233,7 +1233,7 @@ L_138D:
 L_139F:
     LastKeyWait
     MsgWinCloseAll
-    BSubwayCmd_Tool 333, 0, 0, 0
+    Tool 333, 0, 0, 0
     WorkSetConst 0x8031, 0
     WorkSetConst 0x8030, 0
     WorkSetConst 0x802f, 0
@@ -1244,7 +1244,7 @@ L_139F:
 
 L_13CB:
     WorkSetConst 0x8032, 0
-    BSubwayCmd_Tool 310, 0, 0, 32803
+    Tool 310, 0, 0, 32803
     VMStackPush 0x8023
     VMStackPushConst 2
     VMStackCmp CMP_EQ
@@ -1260,23 +1260,23 @@ L_140A:
     WorkSetConst 0x8032, 0
 
 L_1410:
-    BSubwayCmd_Tool 13, 255, 1, 0
-    BSubwayCmd_Tool 23, 255, 0, 0
+    Tool 13, 255, 1, 0
+    Tool 23, 255, 0, 0
     VMStackPush 0x8032
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_147D
-    BSubwayCmd_Tool 31, 0, 0, 16416
+    Tool 31, 0, 0, 16416
     FlagReset EVENT_FLAG_0x025c
     ActorAdd 2
-    BSubwayCmd_Tool 23, 2, 0, 0
-    BSubwayCmd_Tool 13, 2, 1, 0
-    BSubwayCmd_Tool 36, 2, 0, 0
-    BSubwayCmd_Tool 35, 2, 1, 0
+    Tool 23, 2, 0, 0
+    Tool 13, 2, 1, 0
+    Tool 36, 2, 0, 0
+    Tool 35, 2, 1, 0
     ActorSetGPos 2, 75, 0, 12, 1
 
 L_147D:
-    BSubwayCmd_Tool 19, 2, 0, 0
+    Tool 19, 2, 0, 0
     FadeInBlackQ
     FadeWait
     VMSleep 10
@@ -1292,12 +1292,12 @@ L_147D:
 
 L_14BE:
     ActorCmdWait
-    BSubwayCmd_Tool 24, 255, 0, 0
+    Tool 24, 255, 0, 0
     VMStackPush 0x8032
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_14E7
-    BSubwayCmd_Tool 24, 2, 0, 0
+    Tool 24, 2, 0, 0
 
 L_14E7:
     VMStackPush EVENT_WORK_0x4179
@@ -1305,14 +1305,14 @@ L_14E7:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_153E
     VMSleep 30
-    BSubwayCmd_Tool 19, 0, 0, 0
+    Tool 19, 0, 0, 0
     SEPlay SEQ_SE_BDEMO_01
     VMSleep 20
     SEPlay SEQ_SE_BDEMO_04
     VMSleep 30
     FadeEx 3, 0, 16, 2
     FadeExWait
-    BSubwayCmd_Tool 20, 1, 0, 0
+    Tool 20, 1, 0, 0
     VMSleep 30
     FadeEx 3, 16, 0, 2
     FadeExWait
@@ -1343,8 +1343,8 @@ L_157C:
     WorkSetConst 0x8033, 0
     FadeEx 3, 0, 16, 2
     FadeExWait
-    BSubwayCmd_Tool 35, 0, 3, 0
-    BSubwayCmd_Tool 310, 0, 0, 32803
+    Tool 35, 0, 3, 0
+    Tool 310, 0, 0, 32803
     VMStackPush 0x8023
     VMStackPushConst 2
     VMStackCmp CMP_EQ
@@ -1361,14 +1361,14 @@ L_15D1:
 
 L_15D7:
     ActorSetGPos 255, 18, 0, 14, 2
-    BSubwayCmd_Tool 23, 255, 0, 0
+    Tool 23, 255, 0, 0
     VMStackPush 0x8033
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_1620
     ActorSetGPos 2, 19, 0, 14, 2
-    BSubwayCmd_Tool 23, 2, 0, 0
-    BSubwayCmd_Tool 36, 2, 0, 0
+    Tool 23, 2, 0, 0
+    Tool 36, 2, 0, 0
 
 L_1620:
     FadeEx 3, 16, 0, 2
@@ -1376,8 +1376,8 @@ L_1620:
     VMStackPushConst 2
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_1661
-    BSubwayCmd_Tool 19, 2, 1, 0
-    BSubwayCmd_Tool 20, 0, 0, 0
+    Tool 19, 2, 1, 0
+    Tool 20, 0, 0, 0
     SEPlay SEQ_SE_BDEMO_03
     VMSleep 70
     SEPlay SEQ_SE_BDEMO_01
@@ -1394,7 +1394,7 @@ L_1661:
 
 L_1686:
     ActorCmdWait
-    BSubwayCmd_Tool 19, 3, 1, 0
+    Tool 19, 3, 1, 0
     SEPlay SEQ_SE_BDEMO_01
     VMSleep 30
     SEPlay SEQ_SE_BDEMO_02
@@ -1421,44 +1421,44 @@ Movement_16C4:
     MoveEnd
 
 L_16DC:
-    BSubwayCmd_Tool 401, 0, 0, 0
+    Tool 401, 0, 0, 0
     GameCommTryBoot
-    BSubwayCmd_Tool 330, 0, 0, 0
+    Tool 330, 0, 0, 0
     VMReturn
 
 L_16F4:
-    BSubwayCmd_Tool 413, 0, 0, 0
+    Tool 413, 0, 0, 0
     VMCall L_16DC
     VMReturn
-    BSubwayCmd_Tool 414, 0, 0, 0
+    Tool 414, 0, 0, 0
     VMCall L_16DC
     VMReturn
 
 L_1718:
-    BSubwayCmd_Tool 402, 104, 0, 32802
+    Tool 402, 104, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_173F
-    BSubwayCmd_Tool 413, 0, 0, 0
+    Tool 413, 0, 0, 0
 
 L_173F:
     VMCall L_16DC
     VMReturn
-    BSubwayCmd_Tool 402, 104, 0, 32802
+    Tool 402, 104, 0, 32802
     VMStackPush 0x8022
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_176E
-    BSubwayCmd_Tool 414, 0, 0, 0
+    Tool 414, 0, 0, 0
 
 L_176E:
     VMCall L_16DC
     VMReturn
 
 L_1776:
-    BSubwayCmd_Tool 202, 99, 0, 0
-    BSubwayCmd_Tool 21, 0, 0, 32803
+    Tool 202, 99, 0, 0
+    Tool 21, 0, 0, 32803
     WorkCmpConst 0x8023, 0
     VMJumpIf CMP_EQ, L_179D
     VMJump L_17AF
@@ -1543,7 +1543,7 @@ L_18D7:
     MapChangeCore ZONE_GEAR_STATION_2, 11, 0, 15, 3
 
 L_18E3:
-    BSubwayCmd_Tool 202, 100, 0, 0
+    Tool 202, 100, 0, 0
     VMReturn
 
 Script_7:

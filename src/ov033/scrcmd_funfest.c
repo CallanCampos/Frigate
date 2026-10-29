@@ -17,7 +17,7 @@
 #include "system/game_system.h"
 #include "system/vm.h"
 
-BOOL s0279_FunfestBGMReturn(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Funfest_FunfestBGMReturn(VM *vm, FieldScriptEnv *env) {
     ScriptWork *scriptWork = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     FesGimmick *gimmick = Field_GetFesGimmick(GSYS_GetField(gsys));
@@ -35,7 +35,7 @@ BOOL s0279_FunfestBGMReturn(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0276_FunfestMissionBroadcast(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Funfest_FunfestMissionBroadcast(VM *vm, FieldScriptEnv *env) {
     u8 type;
     u16 value;
 
@@ -47,7 +47,7 @@ BOOL s0276_FunfestMissionBroadcast(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0277_FunfestActorDelete(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Funfest_FunfestActorDelete(VM *vm, FieldScriptEnv *env) {
     ScriptWork *scriptWork = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
@@ -62,7 +62,7 @@ BOOL s0277_FunfestActorDelete(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s027A_FunfestGetGenericInfo(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Funfest_FunfestGetGenericInfo(VM *vm, FieldScriptEnv *env) {
     ScriptWork *scriptWork = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     FesGimmick *gimmick = Field_GetFesGimmick(GSYS_GetField(gsys));
@@ -77,7 +77,7 @@ BOOL s027A_FunfestGetGenericInfo(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s027B_FunfestGetItemExchangeInfo(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Funfest_FunfestGetItemExchangeInfo(VM *vm, FieldScriptEnv *env) {
     ScriptWork *scriptWork = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     FesGimmick *gimmick = Field_GetFesGimmick(GSYS_GetField(gsys));
@@ -94,7 +94,7 @@ BOOL s027B_FunfestGetItemExchangeInfo(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s027C_FunfestGetItemSaleInfo(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Funfest_FunfestGetItemSaleInfo(VM *vm, FieldScriptEnv *env) {
     ScriptWork *scriptWork = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     FesGimmick *gimmick = Field_GetFesGimmick(GSYS_GetField(gsys));
@@ -110,7 +110,7 @@ BOOL s027C_FunfestGetItemSaleInfo(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s027D_FunfestGetPokemonQuizInfo(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Funfest_FunfestGetPokemonQuizInfo(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     FesGimmick *gimmick;
     u16 *out0;
@@ -133,7 +133,7 @@ BOOL s027D_FunfestGetPokemonQuizInfo(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s027E_FunfestGetPokemonQuizSpecies(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Funfest_FunfestGetPokemonQuizSpecies(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     FesGimmick *gimmick;
     u16 index;
@@ -153,7 +153,7 @@ BOOL s027E_FunfestGetPokemonQuizSpecies(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s027F_FunfestGetPokemonQuizBogusSpecies(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Funfest_FunfestGetPokemonQuizBogusSpecies(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     FesGimmick *gimmick;
     u16 index;
@@ -201,7 +201,7 @@ BOOL func_ov033_021772f4(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0274_FunfestMissionStart(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Funfest_FunfestMissionStart(VM *vm, FieldScriptEnv *env) {
     ScriptWork *scriptWork = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -209,7 +209,7 @@ BOOL s0274_FunfestMissionStart(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s028B_CallEntralinkWarpOut(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Funfest_CallEntralinkWarpOut(VM *vm, FieldScriptEnv *env) {
     ScriptWork *scriptWork = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 

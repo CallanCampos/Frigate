@@ -48,7 +48,7 @@ Script_1:
     MsgWinCloseAll
     // "???: Hey there!\nWhat's everyone all gathered up for?[f000]븁\u0000"
     InfoMsg NacreneCity11_Text_HeyThereWhatsEveryone, 1
-    InfoMsgClose_0039
+    InfoMsgClose
     ActorCmdExec 2, Movement_02C8
     ActorCmdWait
     ActorCmdExec 1, Movement_0310

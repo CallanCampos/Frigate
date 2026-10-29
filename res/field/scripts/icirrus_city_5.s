@@ -69,7 +69,7 @@ L_00BA:
     // "He's lost in the music..."
     SystemMsg IcirrusCity5_Text_HesLostMusic, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
 
 L_00C8:
     FinishAllEvents

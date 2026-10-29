@@ -133,7 +133,7 @@ L_01E3:
     WorkSetConst 0x8025, 0
     // "You've just started walking.\nPlease walk more![f000]븁\u0000\n...Whaaat?[f000]븁\u0000\nYou're not going to say\nyou will quit in the middle of[f000]븀\u0000\nwalking my cute Mienfoo, are you?[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, HumilauCity6_Text_YouveJustStartedWalking, 1, 4, 0
-    ListMenu_AnchorTopRight 31, 5, 0, 1, 32805
+    ListMenuAnchorTopRight 31, 5, 0, 1, 32805
     ListMenuAdd 6, 65535, 0
     ListMenuAdd 7, 65535, 1
     ListMenuShow
@@ -624,7 +624,7 @@ L_08DF:
     ScreamMsg HumilauCity6_Text_Hey, 2
     SEWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     ActorCmdExec 255, Movement_0A60
     ActorCmdWait
     // "What are you doing?[f000]븁\u0000\nIn front of my very eyes,\nyou disrupt Mienfoo's walk...[f000]븁\u0000\nOn top of that, you got engrossed\nin watching TV.[f000]븀\u0000\nWhat nerve![f000]븁\u0000\nStop taking a break, and walk\nmy Mienfoo![f000]븁\u0000"
@@ -659,7 +659,7 @@ L_0949:
     ScreamMsg HumilauCity6_Text_Hey, 2
     SEWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     ActorWalkRoute 1, 7, 5, 1, 4, 1
     ActorCmdExec 255, Movement_0A68
     ActorCmdWait
@@ -685,7 +685,7 @@ Script_5:
     ScreamMsg HumilauCity6_Text_Hey, 2
     SEWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     ActorWalkRoute 1, 5, 6, 1, 4, 1
     ActorCmdExec 255, Movement_0A58
     ActorCmdWait

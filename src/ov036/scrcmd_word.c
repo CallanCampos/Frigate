@@ -28,7 +28,7 @@ static BOOL loadAllItemText(VM *vm, FieldScriptEnv *env, WordSetLoadFunc load);
 static BOOL loadAllPkmNameText(VM *vm, FieldScriptEnv *env, WordSetLoadFunc load);
 static BOOL WordSet_LoadTrainerClassFromScript(VM *vm, FieldScriptEnv *env, WordSetLoadByteFunc load);
 
-BOOL s004C_WordSetPlayerName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetPlayerName(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     ScriptWork_GetFieldWork(work);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(FieldScriptEnv_GetGameData(env));
@@ -39,7 +39,7 @@ BOOL s004C_WordSetPlayerName(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0290_WordSetLoadRivalName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetLoadRivalName(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     ScriptWork_GetFieldWork(work);
     RivalDataSave *rival = getHollow_RivalData(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
@@ -58,16 +58,16 @@ static BOOL loadAllItemText(VM *vm, FieldScriptEnv *env, WordSetLoadFunc load) {
     return FALSE;
 }
 
-BOOL s004D_WordSetItemName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetItemName(VM *vm, FieldScriptEnv *env) {
     return loadAllItemText(vm, env, loadItemNameToStrbuf);
 }
 
-BOOL s004F_WordSetItemNameWithArticle(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetItemNameWithArticle(VM *vm, FieldScriptEnv *env) {
     return loadAllItemText(vm, env, loadItemTextNameToStrbuf);
 }
 
 // The item's name, plural when there are more than one, or with its article
-BOOL s004E_WordSetItemNameEx(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetItemNameEx(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
     u16 item = ScriptReadAny(vm, env);
@@ -84,7 +84,7 @@ BOOL s004E_WordSetItemNameEx(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0050_WordSetTMMoveName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetTMMoveName(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
 
@@ -92,7 +92,7 @@ BOOL s0050_WordSetTMMoveName(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0051_WordSetMoveName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetMoveName(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
 
@@ -100,7 +100,7 @@ BOOL s0051_WordSetMoveName(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0056_WordSetPokeTypeName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetPokeTypeName(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
 
@@ -116,15 +116,15 @@ static BOOL loadAllPkmNameText(VM *vm, FieldScriptEnv *env, WordSetLoadFunc load
     return FALSE;
 }
 
-BOOL s0057_WordSetPokeSpecies(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetPokeSpecies(VM *vm, FieldScriptEnv *env) {
     return loadAllPkmNameText(vm, env, WordSet_LoadSpeciesName);
 }
 
-BOOL s0058_WordSetPokeSpeciesWithArticle(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetPokeSpeciesWithArticle(VM *vm, FieldScriptEnv *env) {
     return loadAllPkmNameText(vm, env, loadPokemonTextNameToStrbuf);
 }
 
-BOOL s0052_WordSetItemPocketName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetItemPocketName(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
     u16 item = ScriptReadAny(vm, env);
@@ -135,7 +135,7 @@ BOOL s0052_WordSetItemPocketName(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0053_WordSetPartyPokeSpecies(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetPartyPokeSpecies(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
@@ -146,7 +146,7 @@ BOOL s0053_WordSetPartyPokeSpecies(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0054_WordSetPartyPokeName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetPartyPokeName(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
@@ -157,7 +157,7 @@ BOOL s0054_WordSetPartyPokeName(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0055_WordSetDaycarePokeSpecies(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetDaycarePokeSpecies(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
     u16 slot = ScriptReadAny(vm, env);
@@ -167,7 +167,7 @@ BOOL s0055_WordSetDaycarePokeSpecies(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s005B_WordSetDaycarePokeName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetDaycarePokeName(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
     u16 slot = ScriptReadAny(vm, env);
@@ -177,7 +177,7 @@ BOOL s005B_WordSetDaycarePokeName(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s005C_WordSetNumber(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetNumber(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
     u16 number = ScriptReadAny(vm, env);
@@ -187,7 +187,7 @@ BOOL s005C_WordSetNumber(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0059_WordSetPlaceName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetPlaceName(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
 
@@ -195,7 +195,7 @@ BOOL s0059_WordSetPlaceName(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s005A_WordSetTrendName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetTrendName(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
 
@@ -203,7 +203,7 @@ BOOL s005A_WordSetTrendName(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s005E_WordSetCountry(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetCountry(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
 
@@ -211,7 +211,7 @@ BOOL s005E_WordSetCountry(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s005F_WordSetHobbyName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetHobbyName(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
 
@@ -219,7 +219,7 @@ BOOL s005F_WordSetHobbyName(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0063_WordSetSurveyAnswer(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetSurveyAnswer(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
     u16 answer = ScriptReadAny(vm, env);
@@ -228,7 +228,7 @@ BOOL s0063_WordSetSurveyAnswer(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0060_WordSetPassPowerName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetPassPowerName(VM *vm, FieldScriptEnv *env) {
     u8 index = VM_Read8(vm);
     u16 passPower = ScriptReadAny(vm, env);
 
@@ -244,15 +244,15 @@ static BOOL WordSet_LoadTrainerClassFromScript(VM *vm, FieldScriptEnv *env, Word
     return FALSE;
 }
 
-BOOL s0061_WordSetTrainerClassName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetTrainerClassName(VM *vm, FieldScriptEnv *env) {
     return WordSet_LoadTrainerClassFromScript(vm, env, loadTrainerTypeText);
 }
 
-BOOL s0062_WordSetTrainerClassNameWithArticle(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetTrainerClassNameWithArticle(VM *vm, FieldScriptEnv *env) {
     return WordSet_LoadTrainerClassFromScript(vm, env, loadTrainerTypeWithArticleToStrbuf);
 }
 
-BOOL s0207_WordSetPasserbyCount(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetPasserbyCount(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     TrainerGameInfoSave *info = getTrainerGameInfoAddress(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     WordSet *wordSet = ScriptWork_GetWordSet(work);
@@ -262,7 +262,7 @@ BOOL s0207_WordSetPasserbyCount(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0208_WordSetThankedCount(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetThankedCount(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     TrainerGameInfoSave *info = getTrainerGameInfoAddress(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     WordSet *wordSet = ScriptWork_GetWordSet(work);
@@ -272,7 +272,7 @@ BOOL s0208_WordSetThankedCount(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s026C_WordSetMedalName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetMedalName(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
     u16 medal = ScriptReadAny(vm, env);
@@ -281,7 +281,7 @@ BOOL s026C_WordSetMedalName(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s026D_WordSetMedalRank(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetMedalRank(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
 
@@ -293,7 +293,7 @@ BOOL s026D_WordSetMedalRank(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0298_WordSetEmptyFileMessage(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetEmptyFileMessage(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
     u16 messageId = ScriptReadAny(vm, env);
@@ -302,7 +302,7 @@ BOOL s0298_WordSetEmptyFileMessage(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0299_WordSetLoadAbility(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetLoadAbility(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
 
@@ -310,7 +310,7 @@ BOOL s0299_WordSetLoadAbility(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s029A_WordSetLoadNature(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetLoadNature(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
 
@@ -318,7 +318,7 @@ BOOL s029A_WordSetLoadNature(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0275_WordSetFunfestMission(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetFunfestMission(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
     u16 value = ScriptReadAny(vm, env);
@@ -328,7 +328,7 @@ BOOL s0275_WordSetFunfestMission(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s029B_WordSetLoadJoinAvenueName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Word_WordSetLoadJoinAvenueName(VM *vm, FieldScriptEnv *env) {
     u16 name[22];
     StrBuf *strBuf;
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));

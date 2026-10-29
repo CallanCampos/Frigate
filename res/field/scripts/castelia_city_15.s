@@ -21,7 +21,7 @@ Script_1:
     // "This is Battle Company.\nResearch and Development of Items!"
     InfoMsg CasteliaCity15_Text_BattleCompanyResearchDevelopment, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -31,7 +31,7 @@ Script_2:
     // "Burgh's signature is scrawled in the\ncorner of the painting."
     InfoMsg CasteliaCity15_Text_BurghsSignatureScrawledCorner, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -77,7 +77,7 @@ L_00C7:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_02E3
-    ListMenu_AnchorTopRight 31, 5, 0, 1, 32803
+    ListMenuAnchorTopRight 31, 5, 0, 1, 32803
     ListMenuAdd 11, 65535, 0
     ListMenuAdd 12, 65535, 1
     ListMenuAdd 13, 65535, 2

@@ -40,7 +40,7 @@ typedef struct {
 static GameEvent *PlasmaFrigate_CreatePasswordEvent(GameSystem *gsys, u16 *result);
 static u8 PlasmaFrigate_GetPasswordIndex(PlayerInfo *playerInfo);
 
-static BOOL PlasmaFrigateCmd_PressSwitch(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PlasmaFrigate_PressSwitch(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameEvent *event = GimmickPlasmaFrigate_CallSwitchEvent(gsys, VM_Read16(vm));
@@ -52,7 +52,7 @@ static BOOL PlasmaFrigateCmd_PressSwitch(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static BOOL PlasmaFrigateCmd_SetLightsState(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PlasmaFrigate_SetLightsState(VM *vm, FieldScriptEnv *env) {
     u16 a;
     GameSystem *gsys;
 
@@ -62,14 +62,14 @@ static BOOL PlasmaFrigateCmd_SetLightsState(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL PlasmaFrigateCmd_PlayGroupASecond(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PlasmaFrigate_PlayGroupASecond(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     GimmickPlasmaFrigate_CallPlayGroupASecond(gsys, VM_Read16(vm));
     return FALSE;
 }
 
-static BOOL PlasmaFrigateCmd_PlayGroupBSecond(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PlasmaFrigate_PlayGroupBSecond(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     GimmickPlasmaFrigate_CallPlayGroupBSecond(gsys, VM_Read16(vm));
@@ -77,7 +77,7 @@ static BOOL PlasmaFrigateCmd_PlayGroupBSecond(VM *vm, FieldScriptEnv *env) {
 }
 
 // Lets the player enter a password, and sets a variable to whether it is the player's
-static BOOL PlasmaFrigateCmd_EnterPassword(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PlasmaFrigate_EnterPassword(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameEvent *event = PlasmaFrigate_CreatePasswordEvent(gsys, ScriptReadVar(vm, env));
@@ -90,7 +90,7 @@ static BOOL PlasmaFrigateCmd_EnterPassword(VM *vm, FieldScriptEnv *env) {
 }
 
 // Sets a variable to which of the passwords is the player's
-static BOOL PlasmaFrigateCmd_GetPasswordIndex(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PlasmaFrigate_GetPasswordIndex(VM *vm, FieldScriptEnv *env) {
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     u16 *var = ScriptReadVar(vm, env);
 
@@ -98,7 +98,7 @@ static BOOL PlasmaFrigateCmd_GetPasswordIndex(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL PlasmaFrigateCmd_SetSwitchLightState(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PlasmaFrigate_SetSwitchLightState(VM *vm, FieldScriptEnv *env) {
     u16 a;
     GameSystem *gsys;
 
@@ -108,14 +108,14 @@ static BOOL PlasmaFrigateCmd_SetSwitchLightState(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL PlasmaFrigateCmd_PlaySwitchAnim(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PlasmaFrigate_PlaySwitchAnim(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     PlasmaFrigateLights_PlaySwitchAnim(gsys, VM_Read16(vm));
     return FALSE;
 }
 
-static BOOL PlasmaFrigateCmd_PlaySwitchLightAnim(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_PlasmaFrigate_PlaySwitchLightAnim(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     PlasmaFrigateLights_PlayLightAnim(gsys, VM_Read16(vm));
@@ -189,8 +189,9 @@ static u8 PlasmaFrigate_GetPasswordIndex(PlayerInfo *playerInfo) {
 }
 
 const FieldScriptCommand PLASMA_FRIGATE_SCRIPT_COMMANDS[] = {
-    PlasmaFrigateCmd_PressSwitch,         PlasmaFrigateCmd_SetLightsState, PlasmaFrigateCmd_PlayGroupASecond,
-    PlasmaFrigateCmd_PlayGroupBSecond,    PlasmaFrigateCmd_EnterPassword,  PlasmaFrigateCmd_GetPasswordIndex,
-    PlasmaFrigateCmd_SetSwitchLightState, PlasmaFrigateCmd_PlaySwitchAnim, PlasmaFrigateCmd_PlaySwitchLightAnim,
-    (FieldScriptCommand)0xFFFFFFFF,
+    Scrcmd_PlasmaFrigate_PressSwitch,         Scrcmd_PlasmaFrigate_SetLightsState,
+    Scrcmd_PlasmaFrigate_PlayGroupASecond,    Scrcmd_PlasmaFrigate_PlayGroupBSecond,
+    Scrcmd_PlasmaFrigate_EnterPassword,       Scrcmd_PlasmaFrigate_GetPasswordIndex,
+    Scrcmd_PlasmaFrigate_SetSwitchLightState, Scrcmd_PlasmaFrigate_PlaySwitchAnim,
+    Scrcmd_PlasmaFrigate_PlaySwitchLightAnim, (FieldScriptCommand)0xFFFFFFFF,
 };

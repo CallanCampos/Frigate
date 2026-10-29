@@ -73,7 +73,7 @@ static void ScrcmdProcFld_FinishOv170Event(void *data) {
     GFL_HeapFree(work->param);
 }
 
-BOOL s014F_CallPC(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_ProcFld_CallPC(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
@@ -110,7 +110,7 @@ BOOL s014F_CallPC(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0205_CallGreetingPhraseInput(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_ProcFld_CallGreetingPhraseInput(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
@@ -119,7 +119,7 @@ BOOL s0205_CallGreetingPhraseInput(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0206_CallThanksPhraseInput(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_ProcFld_CallThanksPhraseInput(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
@@ -128,7 +128,7 @@ BOOL s0206_CallThanksPhraseInput(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s02CA_CallHappyPhraseInput(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_ProcFld_CallHappyPhraseInput(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
@@ -139,7 +139,7 @@ BOOL s02CA_CallHappyPhraseInput(VM *vm, FieldScriptEnv *env) {
 }
 
 // The game clear sequence takes over once the script ends
-BOOL s0156_CallGameClear(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_ProcFld_CallGameClear(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -149,7 +149,7 @@ BOOL s0156_CallGameClear(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0197_CGearPowerOn(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_ProcFld_CGearPowerOn(VM *vm, FieldScriptEnv *env) {
     CGearSettings *cgear = CGearSettings_GetFromSave(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     u16 bootComm = ScriptReadAny(vm, env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
@@ -160,7 +160,7 @@ BOOL s0197_CGearPowerOn(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0152_CallGeonet(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_ProcFld_CallGeonet(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     Field *field = GSYS_GetField(gsys);
@@ -170,7 +170,7 @@ BOOL s0152_CallGeonet(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s014D_CallRecordSystem(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_ProcFld_CallRecordSystem(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 mode;
@@ -194,7 +194,7 @@ BOOL s014D_CallRecordSystem(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0231_CallGameManual(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_ProcFld_CallGameManual(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
@@ -202,16 +202,16 @@ BOOL s0231_CallGameManual(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0155_CallXTransceiver(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_ProcFld_CallXTransceiver(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
     u16 scriptId = ScriptReadAny(vm, env);
-    u16 a2 = VM_Read16(vm);
+    u16 swapPalette = VM_Read16(vm);
     LocalTvtParam *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(LocalTvtParam), TRUE, "scrcmd_proc_fld.c", 401);
 
     param->mode = LOCAL_TVT_MODE_SCRIPT;
-    param->unk04 = a2;
+    param->swapPalette = swapPalette;
     param->scriptId = scriptId;
     param->gameData = FieldScriptEnv_GetGameData(env);
     param->gsys = gsys;
@@ -221,18 +221,18 @@ BOOL s0155_CallXTransceiver(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0265_CallXTransceiverSecret(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_ProcFld_CallXTransceiverSecret(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
-    u16 a1;
+    u16 swapPalette;
     LocalTvtParam *param;
 
     getHollow_RivalBlk(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
-    a1 = ScriptReadAny(vm, env);
+    swapPalette = ScriptReadAny(vm, env);
     param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(LocalTvtParam), TRUE, "scrcmd_proc_fld.c", 437);
     param->mode = LOCAL_TVT_MODE_CALL_SECRET;
-    param->unk04 = a1;
+    param->swapPalette = swapPalette;
     param->gameData = FieldScriptEnv_GetGameData(env);
     param->gsys = gsys;
     ScriptWork_CallEvent(work, EventFieldSubprocessCall_CreateWithCallback(gsys, field, OVERLAY_XTRANSCEIVER,
@@ -254,7 +254,7 @@ static void ScrcmdProcFld_FinishPlaceSelect(void *data) {
 }
 
 // Pick a place on the town map
-BOOL s0284_CallPlaceSelect(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_ProcFld_CallPlaceSelect(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
@@ -279,7 +279,7 @@ BOOL s0284_CallPlaceSelect(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s028F_CallRivalNameInput(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_ProcFld_CallRivalNameInput(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -287,7 +287,7 @@ BOOL s028F_CallRivalNameInput(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0285_CallWordSetPokeNameInput(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_ProcFld_CallWordSetPokeNameInput(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     WordSet *wordSet = ScriptWork_GetWordSet(work);

@@ -81,7 +81,7 @@ L_00E6:
     SystemMsg Global10480_Text_TurnedOverReceived, 2
     SEWait
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8024, 0
     ItemSub 0x8020, 1, 0x8024
     MoneyWinClose
@@ -190,7 +190,7 @@ L_0274:
     SystemMsg Global10480_Text_TurnedOverReceived_2, 2
     SEWait
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8029, 0
     ItemSub 0x8025, 1, 0x8029
     MoneyWinClose
@@ -274,7 +274,7 @@ L_0375:
     SystemMsg Global10480_Text_TurnedOverReceived_3, 2
     SEWait
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x802e, 0
     ItemSub 0x802a, 1, 0x802e
     MoneyWinClose
@@ -374,7 +374,7 @@ L_051E:
     SystemMsg Global10480_Text_TurnedOverReceived_3, 2
     SEWait
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8033, 0
     ItemSub 0x802f, 1, 0x8033
     MoneyWinClose
@@ -481,7 +481,7 @@ L_06A8:
     SystemMsg Global10480_Text_TurnedOverReceived_4, 2
     SEWait
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8038, 0
     ItemSub 0x8034, 1, 0x8038
     MoneyWinClose
@@ -590,7 +590,7 @@ L_0836:
     SystemMsg Global10480_Text_TurnedOverReceived_5, 2
     SEWait
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x803d, 0
     ItemSub 0x8039, 1, 0x803d
     MoneyWinClose

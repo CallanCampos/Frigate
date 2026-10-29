@@ -42,7 +42,7 @@ Script_4:
 L_0064:
     // "Checked your Entree.[f000]븁\u0000"
     SystemMsg Entralink_Text_CheckedEntree, 2
-    InfoMsgClose
+    SystemMsgClose
     FadeOutBlackQ
     FadeWait
     FieldClose
@@ -289,7 +289,7 @@ L_0392:
     VMJumpIf CMP_STACK, L_042A
     // "Is there anything you'd like to know\nabout the Entralink?"
     ActorMsg MSGFILE_SCRIPT, Entralink_Text_ThereAnythingYoudLike_2, 0, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32802
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32802
     ListMenuAdd 27, 65535, 0
     ListMenuAdd 28, 65535, 1
     ListMenuAdd 29, 65535, 10
@@ -340,7 +340,7 @@ L_0458:
     VMJumpIf CMP_STACK, L_04F0
     // "Is there anything you'd like to know\nabout participants?"
     ActorMsg MSGFILE_SCRIPT, Entralink_Text_ThereAnythingYoudLike_4, 1, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32804
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32804
     ListMenuAdd 43, 65535, 0
     ListMenuAdd 44, 65535, 1
     ListMenuAdd 45, 65535, 10
@@ -395,7 +395,7 @@ L_0526:
     VMJumpIf CMP_STACK, L_05BE
     // "Is there anything you'd like to know\nabout the Entree?"
     ActorMsg MSGFILE_SCRIPT, Entralink_Text_ThereAnythingYoudLike_3, 2, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32806
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32806
     ListMenuAdd 36, 65535, 0
     ListMenuAdd 37, 65535, 1
     ListMenuAdd 38, 65535, 10
@@ -452,7 +452,7 @@ L_0600:
     VMJumpIf CMP_STACK, L_0698
     // "Is there anything you'd like to know\nabout the Entree Forest?"
     ActorMsg MSGFILE_SCRIPT, Entralink_Text_ThereAnythingYoudLike, 5, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32808
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32808
     ListMenuAdd 7, 65535, 0
     ListMenuAdd 8, 65535, 1
     ListMenuAdd 9, 65535, 10
@@ -510,7 +510,7 @@ Script_14:
     // "You can go back to your\nown world from here.[f000]븁\u0000\nDo you want to go back?"
     SystemMsg Entralink_Text_CanGoBackOwn, 2
     YesNoWin 0x8010
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ

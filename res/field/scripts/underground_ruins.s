@@ -38,7 +38,7 @@ L_004F:
     VMJump L_006C
 
 L_0062:
-    Plugin16Cmd_ShowRuinsModel 3
+    ShowRuinsModel 3
     VMJump L_00C7
 
 L_006C:
@@ -47,7 +47,7 @@ L_006C:
     VMJump L_0089
 
 L_007F:
-    Plugin16Cmd_ShowRuinsModel 0
+    ShowRuinsModel 0
     VMJump L_00C7
 
 L_0089:
@@ -56,7 +56,7 @@ L_0089:
     VMJump L_00A6
 
 L_009C:
-    Plugin16Cmd_ShowRuinsModel 1
+    ShowRuinsModel 1
     VMJump L_00C7
 
 L_00A6:
@@ -65,11 +65,11 @@ L_00A6:
     VMJump L_00C3
 
 L_00B9:
-    Plugin16Cmd_ShowRuinsModel 2
+    ShowRuinsModel 2
     VMJump L_00C7
 
 L_00C3:
-    Plugin16Cmd_ShowRuinsModel 3
+    ShowRuinsModel 3
 
 L_00C7:
     VMReturn
@@ -120,8 +120,8 @@ L_0161:
     EvCameraUnbind
     EvCameraMoveTo 5720, 0, 0xed000, 0xf8000, 0, 0x15000, 40
     EvCameraWait
-    Plugin16Cmd_SetRuinsAnimFrame 0
-    Plugin16Cmd_PlayRuinsAnim 1
+    SetRuinsAnimFrame 0
+    PlayRuinsAnim 1
     SEPlay SEQ_SE_SW_RELIC_02
     VMSleep 30
     ActorCmdExec 255, Movement_0290
@@ -263,7 +263,7 @@ L_036A:
 
 Script_5:
     ActorsPauseAll
-    Plugin16Cmd_SetRuinsAnimFrame 1
+    SetRuinsAnimFrame 1
     EvCameraInit
     EvCameraUnbind
     EvCameraMoveTo 5720, 0, 0xed000, 0xf8000, 0, 0x15000, 1
@@ -271,7 +271,7 @@ Script_5:
     FadeInBlack
     ActorCmdExec 255, Movement_03CC
     VMSleep 20
-    Plugin16Cmd_PlayRuinsAnim 0
+    PlayRuinsAnim 0
     SEPlay SEQ_SE_SW_RELIC_03
     ActorCmdWait
     FadeWait
@@ -312,12 +312,12 @@ Script_6:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0475
-    InfoMsgClose_0039
+    InfoMsgClose
     SEPlay SEQ_SE_SW_RELIC_01
     EvCameraShake 6, 0, 3, 10, 1, 0, 1, 3
     FadeEx 3, 0, 16, 4
     FadeExWait
-    Plugin16Cmd_ShowRuinsModel 0
+    ShowRuinsModel 0
     VMSleep 60
     FadeEx 3, 16, 0, 4
     FadeExWait
@@ -334,7 +334,7 @@ L_047A:
     LastKeyWait
 
 L_047C:
-    InfoMsgClose_0039
+    InfoMsgClose
 
 L_047E:
     FinishAllEvents

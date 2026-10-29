@@ -90,7 +90,7 @@ L_0120:
     // "I mimicked one of your party Pokémon.\nWhich Pokémon was it?"
     ActorMsg MSGFILE_SCRIPT, Route415_Text_MimickedOnePartyPokemon, 0, 2, 0
     MsgWaitAdvance
-    ListMenu_AnchorTopRight 31, 1, 0, 0, 32809
+    ListMenuAnchorTopRight 31, 1, 0, 0, 32809
     PokePartyGetCount 0x8020, 0
 
 L_0161:

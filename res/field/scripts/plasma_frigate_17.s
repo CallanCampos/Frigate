@@ -11,7 +11,7 @@ Script_1:
     // "Warning! Warning!\nIntruders in the vessel![f000]븀\u0000\nEveryone, please respond."
     InfoMsg PlasmaFrigate17_Text_WarningWarningIntrudersVessel, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     WorkSetConst EVENT_WORK_0x4149, 2
     FinishAllEvents
     ActorsUnpauseAll

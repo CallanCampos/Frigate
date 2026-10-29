@@ -13,7 +13,7 @@
 #include "system/game_system.h"
 #include "system/wordset.h"
 
-BOOL s02B2_MemoryLinkCheckFlag(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DownloadData_MemoryLinkCheckFlag(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     MemoryLinkSave *data =
         SaveControl_GetMemoryLink(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
@@ -24,7 +24,7 @@ BOOL s02B2_MemoryLinkCheckFlag(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s02B3_MemoryLinkGetVar(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DownloadData_MemoryLinkGetVar(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     MemoryLinkSave *data =
         SaveControl_GetMemoryLink(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
@@ -35,7 +35,7 @@ BOOL s02B3_MemoryLinkGetVar(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s02B4_MemoryLinkIsPlayerLinked(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DownloadData_MemoryLinkIsPlayerLinked(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     MemoryLinkSave *data =
         SaveControl_GetMemoryLink(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
@@ -47,7 +47,7 @@ BOOL s02B4_MemoryLinkIsPlayerLinked(VM *vm, FieldScriptEnv *env) {
 }
 
 // Puts the name of the entry in the buffer
-BOOL s02B5_WordSetMemoryLinkPlayerName(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DownloadData_WordSetMemoryLinkPlayerName(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     MemoryLinkSave *data =
         SaveControl_GetMemoryLink(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
@@ -66,7 +66,7 @@ BOOL s02B5_WordSetMemoryLinkPlayerName(VM *vm, FieldScriptEnv *env) {
 }
 
 // Mode 0: whether the downloaded props were added. Mode 1: whether the musical's program is at least the downloaded one
-BOOL s02B6_MemoryLinkCheckMusical(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DownloadData_MemoryLinkCheckMusical(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     MusicalSave *musical = getAddressOfMusicalDataInfo(save);
@@ -93,7 +93,7 @@ BOOL s02B6_MemoryLinkCheckMusical(VM *vm, FieldScriptEnv *env) {
 }
 
 // Adds the downloaded props the musical doesn't have, and sets the result when it added any
-BOOL s02B7_MemoryLinkAddMusicalProps(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DownloadData_MemoryLinkAddMusicalProps(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     MemoryLinkSave *data = SaveControl_GetMemoryLink(save);

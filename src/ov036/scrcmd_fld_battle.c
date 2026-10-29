@@ -51,7 +51,7 @@ static GameEvent *TeamSelectEvent_Create(GameSystem *gsys, u32 partyResult, u32 
 static GameEventReturnCode TeamSelectEvent_Callback(GameEvent *event, u32 *state, void *data);
 
 // Set the words to the species of the regulation that the player has caught; their count
-BOOL Regulation_RegisterAllowedSpecies(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FldBattle_RegisterAllowedSpecies(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
@@ -63,7 +63,7 @@ BOOL Regulation_RegisterAllowedSpecies(VM *vm, FieldScriptEnv *env) {
 }
 
 // Let the player pick the team for a battle under the regulation
-BOOL Regulation_CheckPartyRegulation(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_FldBattle_CheckPartyRegulation(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 regulationId = ScriptReadAny(vm, env);

@@ -86,7 +86,7 @@ L_00DD:
     ScreamMsg PlasmaFrigate5_Text_Haaahraa, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     EvCameraMoveToDefault 32
     EvCameraWait
     EvCameraRebind

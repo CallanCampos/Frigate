@@ -11,7 +11,7 @@ Script_1:
     // "It's a rock covered with ice.\nTouching it could make you freeze."
     InfoMsg TwistMountain6_Text_ItsRockCoveredIce, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

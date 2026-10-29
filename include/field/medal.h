@@ -23,14 +23,14 @@ u32 CountMedalsByStatus(FieldScriptEnv *env, u32 status);
 u32 GetHintableMedalCount(FieldScriptEnv *env);
 
 // The medals' script commands
-BOOL s026E_MedalGetCount(VM *vm, FieldScriptEnv *env);
-BOOL s0271_MedalAcknowledge(VM *vm, FieldScriptEnv *env);
-BOOL s0272_MedalGetSpinTradeActor(VM *vm, FieldScriptEnv *env);
-BOOL s0273_MedalGive(VM *vm, FieldScriptEnv *env);
-BOOL s029F_MedalDiscover(VM *vm, FieldScriptEnv *env);
-BOOL s029E_MedalGetFieldEffectID(VM *vm, FieldScriptEnv *env);
-BOOL s02A0_MedalIsObtained(VM *vm, FieldScriptEnv *env);
-BOOL s02A1_MedalGetMostCompleteCategory(VM *vm, FieldScriptEnv *env);
-BOOL s02E1_MedalDiscoverInitial(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Medal_MedalGetCount(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Medal_MedalAcknowledge(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Medal_MedalGetSpinTradeActor(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Medal_MedalGive(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Medal_MedalDiscover(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Medal_MedalGetFieldEffectID(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Medal_MedalIsObtained(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Medal_MedalGetMostCompleteCategory(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Medal_MedalDiscoverInitial(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_MEDAL_H

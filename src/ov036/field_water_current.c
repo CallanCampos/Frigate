@@ -53,17 +53,17 @@ void WaterCurrent_SlidePlayBumpSe(EventWaterCurrentMove *work);
 void WaterCurrent_SlidePlayBumpEffectSe(EventWaterCurrentMove *work);
 
 static const WaterCurrentTileAcmd WATER_CURRENT_FLOW_TILES[4] = {
-    { 0x72, 0x78 },
-    { 0x73, 0x77 },
-    { 0x74, 0x75 },
-    { 0x75, 0x76 },
+    { TILE_CLASS_LEDGE_RIGHT, 0x78 },
+    { TILE_CLASS_LEDGE_LEFT, 0x77 },
+    { TILE_CLASS_LEDGE_UP, 0x75 },
+    { TILE_CLASS_LEDGE_DOWN, 0x76 },
 };
 
 static const WaterCurrentTile WATER_CURRENT_TILES[4] = {
-    { 0x95, ACMD_WALK_3F + DIR_LEFT, DIR_LEFT },
-    { 0x94, ACMD_WALK_3F + DIR_RIGHT, DIR_RIGHT },
-    { 0x96, ACMD_WALK_3F + DIR_UP, DIR_UP },
-    { 0x97, ACMD_WALK_3F + DIR_DOWN, DIR_DOWN },
+    { TILE_CLASS_WATER_CURRENT_LEFT, ACMD_WALK_3F + DIR_LEFT, DIR_LEFT },
+    { TILE_CLASS_WATER_CURRENT_RIGHT, ACMD_WALK_3F + DIR_RIGHT, DIR_RIGHT },
+    { TILE_CLASS_WATER_CURRENT_UP, ACMD_WALK_3F + DIR_UP, DIR_UP },
+    { TILE_CLASS_WATER_CURRENT_DOWN, ACMD_WALK_3F + DIR_DOWN, DIR_DOWN },
 };
 
 const WaterCurrentTile *GetWaterCurrentTileConfig(u32 tileClass) {

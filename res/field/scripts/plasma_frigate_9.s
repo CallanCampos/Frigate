@@ -20,7 +20,7 @@ Script_1:
     // "Reshiram has been registered\nin the Pokédex."
     SystemMsg PlasmaFrigate9_Text_ReshiramHasBeenRegistered, 0
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     // "And the other legendary\nPokémon, Zekrom.[f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, PlasmaFrigate9_Text_OtherLegendaryPokemonZekrom, 0, 0
     ActorMsgClose
@@ -29,7 +29,7 @@ Script_1:
     // "Zekrom has been registered\nin the Pokédex."
     SystemMsg PlasmaFrigate9_Text_ZekromHasBeenRegistered, 0
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     // "If you have these Pokémon,\nit's so easy to control[f000]븀\u0000\nthe Unova region, right?"
     ParentActorMsg MSGFILE_SCRIPT, PlasmaFrigate9_Text_IfHaveThesePokemon, 0, 0
     LastKeyWait

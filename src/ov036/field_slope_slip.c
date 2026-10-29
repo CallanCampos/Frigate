@@ -39,10 +39,10 @@ enum {
 };
 
 static const SlopeSlipTileConfig SLOPE_SLIP_TILES[4] = {
-    { 0x77, ACMD_WALK_8F + DIR_LEFT, DIR_LEFT, 2 },
-    { 0x76, ACMD_WALK_8F + DIR_RIGHT, DIR_RIGHT, 2 },
-    { 0x78, ACMD_WALK_8F + DIR_UP, DIR_UP, 2 },
-    { 0x79, ACMD_WALK_8F + DIR_DOWN, DIR_DOWN, 2 },
+    { TILE_CLASS_SLOPE_SLIP_LEFT, ACMD_WALK_8F + DIR_LEFT, DIR_LEFT, 2 },
+    { TILE_CLASS_SLOPE_SLIP_RIGHT, ACMD_WALK_8F + DIR_RIGHT, DIR_RIGHT, 2 },
+    { TILE_CLASS_SLOPE_SLIP_UP, ACMD_WALK_8F + DIR_UP, DIR_UP, 2 },
+    { TILE_CLASS_SLOPE_SLIP_DOWN, ACMD_WALK_8F + DIR_DOWN, DIR_DOWN, 2 },
 };
 
 const SlopeSlipTileConfig *GetSlopeSlipTileConfig(u32 tileClass);

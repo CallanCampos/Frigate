@@ -348,7 +348,7 @@ L_0517:
     // "Trade [f000]ā\u0001\u0002 for [f000]ā\u0001\u0001?[f000]븁\u0000"
     SystemMsg Global10510_Text_Trade, 2
     YesNoWin 0x8010
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -361,7 +361,7 @@ L_0597:
 L_059D:
     // "That Pokémon can't be traded.[f000]븁\u0000"
     SystemMsg Global10510_Text_PokemonCantTraded, 2
-    InfoMsgClose
+    SystemMsgClose
 
 L_05A5:
     VMJump L_05B1
@@ -736,7 +736,7 @@ L_0BC5:
     VMJump L_0BD1
 
 L_0BD1:
-    InfoMsgClose
+    SystemMsgClose
     SEWait
     WorkCmpConst 0x803d, 0
     VMJumpIf CMP_EQ, L_0BE8
@@ -782,7 +782,7 @@ L_0C59:
 L_0C65:
     SEPlay SEQ_SE_SW_LC_NO
     SEWait
-    InfoMsgClose
+    SystemMsgClose
     // "Can I ask you one more thing?[f000]븁\u0000\nI called you on the Xtransceiver\ntoo often, and Ma...[f000]븀\u0000\nI mean one of my coworkers...[f000]븀\u0000\ngot really mad at me...[f000]븁\u0000\nSo, [f000]Ā\u0001\u0000,\ncould you call me?[f000]븁\u0000\n...[f000]븁\u0000\nWhat? Really? Thanks...[f000]븁\u0000\n[f000]Ā\u0001\u0000, you're really nice.[f000]븁\u0000\nHee hee...[f000]븁\u0000\nI'm usually at work, and sometimes\nI have trouble picking up a signal...[f000]븁\u0000\nBut I'd like it if you check your\nXtransceiver often and give me a call...[f000]븁\u0000\nAh ha ha![f000]븁\u0000\nWell, I'll be heading home!\nGood-bye, [f000]Ā\u0001\u0000![f000]븁\u0000"
     // "Can I ask you one more thing?[f000]븁\u0000\nI called you on the Xtransceiver\ntoo often, and Ma...[f000]븀\u0000\nI mean one of my coworkers...[f000]븀\u0000\ngot really mad at me...[f000]븁\u0000\nSo, [f000]Ā\u0001\u0000,\ncould you call me?[f000]븁\u0000\n...[f000]븁\u0000\nWhat? Really? Thanks...[f000]븁\u0000\n[f000]Ā\u0001\u0000, you're really nice.[f000]븁\u0000\nI'm usually at work, and sometimes\nI have trouble picking up a signal...[f000]븁\u0000\nBut I'd like it if you check your\nXtransceiver often, and give me a call...[f000]븁\u0000\nAh ha ha![f000]븁\u0000\nWell, I'll be heading home!\nGood-bye, [f000]Ā\u0001\u0000![f000]븁\u0000"
     ActorMsgGendered 1024, Global10510_Text_CanAskOneMore, Global10510_Text_CanAskOneMore_2, 0x8011, 0, 0

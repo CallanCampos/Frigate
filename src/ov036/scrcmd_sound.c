@@ -38,7 +38,7 @@ static inline u32 playChatterVoice(u32 species, u32 form) {
     return PokeVoice_Play(species, form, 64, 0, 0, 0, 0, &chatterInfo);
 }
 
-BOOL s0098_BGMPlay(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_BGMPlay(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
@@ -48,7 +48,7 @@ BOOL s0098_BGMPlay(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0235_BGMPlayEx(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_BGMPlayEx(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 bgm = VM_Read16(vm);
@@ -60,7 +60,7 @@ BOOL s0235_BGMPlayEx(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0246_BGMFadeOutAll(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_BGMFadeOutAll(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
@@ -70,7 +70,7 @@ BOOL s0246_BGMFadeOutAll(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0245_BGMFadeOut(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_BGMFadeOut(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
@@ -79,7 +79,7 @@ BOOL s0245_BGMFadeOut(VM *vm, FieldScriptEnv *env) {
 }
 
 // The BGM it reads is unused: the result is whether any BGM is playing
-BOOL s009B_BGMIsPlaying(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_BGMIsPlaying(VM *vm, FieldScriptEnv *env) {
     VM_Read16(vm);
     u16 *result = ScriptReadVar(vm, env);
 
@@ -97,13 +97,13 @@ static BOOL isSequenceNotPlaying(VM *vm, void *env) {
     return FALSE;
 }
 
-BOOL s00A0_BGMWait(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_BGMWait(VM *vm, FieldScriptEnv *env) {
     VM_SetNativeCallback(vm, isSequenceNotPlaying);
     return TRUE;
 }
 
 // Fades the BGM players' volume
-BOOL ScriptWork_FadeBgmVolume(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_FadeBgmVolume(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
     GSYS_GetField(gsys);
@@ -118,7 +118,7 @@ BOOL ScriptWork_FadeBgmVolume(VM *vm, FieldScriptEnv *env) {
 }
 
 // Fades the BGM players' volume back to full
-BOOL ScriptWork_RestoreBgmVolume(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_RestoreBgmVolume(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
     GSYS_GetField(gsys);
@@ -130,7 +130,7 @@ BOOL ScriptWork_RestoreBgmVolume(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-// Finishes ScriptWork_FadeBgmVolume's sub event: the volume goes back to full at once
+// Finishes Scrcmd_Sound_FadeBgmVolume's sub event: the volume goes back to full at once
 BOOL ScriptWork_RestoreBgmVolumeEvent(FinishScriptSubEventsWork *work, u32 *state) {
     FieldSound *fieldSound = GameData_GetFieldSoundSystem(GSYS_GetGameData(work->gsys));
 
@@ -145,7 +145,7 @@ BOOL ScriptWork_RestoreBgmVolumeEvent(FinishScriptSubEventsWork *work, u32 *stat
     return FALSE;
 }
 
-BOOL s009E_BGMChangeMap(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_BGMChangeMap(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
     Field *field = GSYS_GetField(gsys);
@@ -160,7 +160,7 @@ BOOL s009E_BGMChangeMap(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0238_BGMChangeMapEx(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_BGMChangeMapEx(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
     Field *field = GSYS_GetField(gsys);
@@ -176,7 +176,7 @@ BOOL s0238_BGMChangeMapEx(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s009F_BGMPlayPush(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_BGMPlayPush(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GSYS_GetGameData(gsys);
     GSYS_GetField(gsys);
@@ -187,7 +187,7 @@ BOOL s009F_BGMPlayPush(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s00A1_BGMPush(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_BGMPush(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
@@ -196,7 +196,7 @@ BOOL s00A1_BGMPush(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s00A2_BGMPop(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_BGMPop(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 fadeOutFrames = ScriptReadAny(vm, env);
@@ -207,7 +207,7 @@ BOOL s00A2_BGMPop(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-// Finishes s00A1_BGMPush's sub event: the pushed BGM comes back
+// Finishes Scrcmd_Sound_BGMPush's sub event: the pushed BGM comes back
 BOOL FieldScriptSubEventFinish_MEPlayback(FinishScriptSubEventsWork *work, u32 *state) {
     ScriptWork *scriptWork = work->scriptWork;
     ScriptWork_GetFieldWork(scriptWork);
@@ -223,7 +223,7 @@ BOOL FieldScriptSubEventFinish_MEPlayback(FinishScriptSubEventsWork *work, u32 *
     return FALSE;
 }
 
-BOOL s024C_BGMAmbienceResume(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_BGMAmbienceResume(VM *vm, FieldScriptEnv *env) {
     FieldSnd_ResumeAmbience(GameData_GetFieldSoundSystem(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))),
                             FIELD_SND_AMBIENCE_STOP_SCRIPT_BGM);
     FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_BGM_PLAY);
@@ -283,7 +283,7 @@ static void ScriptWork_SEStop(ScriptWork *work) {
     *mask = 0;
 }
 
-BOOL s00A6_SEPlay(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_SEPlay(VM *vm, FieldScriptEnv *env) {
     u16 se = ScriptReadAny(vm, env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
@@ -293,7 +293,7 @@ BOOL s00A6_SEPlay(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00A7_SEStop(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_SEStop(VM *vm, FieldScriptEnv *env) {
     ScriptWork_SEStop(FieldScriptEnv_GetScriptWork(env));
     return FALSE;
 }
@@ -305,12 +305,12 @@ static BOOL ScriptNative_SEWait(VM *vm, void *env) {
     return FALSE;
 }
 
-BOOL s00A8_SEWait(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_SEWait(VM *vm, FieldScriptEnv *env) {
     VM_SetNativeCallback(vm, ScriptNative_SEWait);
     return TRUE;
 }
 
-BOOL s00A9_MEPlay(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_MEPlay(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
@@ -331,12 +331,12 @@ static BOOL ScriptNative_MEWait(VM *vm, void *env) {
     return FALSE;
 }
 
-BOOL s00AA_MEWait(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_MEWait(VM *vm, FieldScriptEnv *env) {
     VM_SetNativeCallback(vm, ScriptNative_MEWait);
     return TRUE;
 }
 
-BOOL s00AB_PVPlay(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_PVPlay(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 species = ScriptReadAny(vm, env);
@@ -352,7 +352,7 @@ BOOL s00AB_PVPlay(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL ScriptWork_PlayPerapVoice(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_PokeVoicePlay(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 species = ScriptReadAny(vm, env);
@@ -375,26 +375,26 @@ static BOOL ScriptNative_VoiceWait(VM *vm, void *env) {
     return FALSE;
 }
 
-BOOL s00AC_PVWait(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_PVWait(VM *vm, FieldScriptEnv *env) {
     VM_SetNativeCallback(vm, ScriptNative_VoiceWait);
     return TRUE;
 }
 
-BOOL s00A3_ISSSwitchEnable(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_ISSSwitchEnable(VM *vm, FieldScriptEnv *env) {
     ISSSwitchSys *switchSys = ISS_GetSwitchSys(GameSystem_GetISS(FieldScriptEnv_GetGameSystem(env)));
 
     ISSSwitchSys_ReqSwitchFadeIn(switchSys, ScriptReadAny(vm, env));
     return FALSE;
 }
 
-BOOL s00A4_ISSSwitchDisable(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_ISSSwitchDisable(VM *vm, FieldScriptEnv *env) {
     ISSSwitchSys *switchSys = ISS_GetSwitchSys(GameSystem_GetISS(FieldScriptEnv_GetGameSystem(env)));
 
     ISSSwitchSys_ReqSwitchFadeOut(switchSys, ScriptReadAny(vm, env));
     return FALSE;
 }
 
-BOOL s00A5_ISSSwitchQuery(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Sound_ISSSwitchQuery(VM *vm, FieldScriptEnv *env) {
     ISSSwitchSys *switchSys = ISS_GetSwitchSys(GameSystem_GetISS(FieldScriptEnv_GetGameSystem(env)));
     u16 *result = ScriptReadVar(vm, env);
 
@@ -402,7 +402,7 @@ BOOL s00A5_ISSSwitchQuery(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-// Plays the cry once no other sound blocks it, and keeps its handle for s00AC_PVWait
+// Plays the cry once no other sound blocks it, and keeps its handle for Scrcmd_Sound_PVWait
 static GameEventReturnCode EventPokeVoicePlay_Callback(GameEvent *event, u32 *state, void *data) {
     PokeVoiceEvent *voice = data;
     u32 handle;

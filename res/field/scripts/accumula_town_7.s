@@ -291,7 +291,7 @@ Script_4:
     WorkSetConst 0x8020, 0
     Random 0x8020, 100
     WorkSetConst 0x8021, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 0, 32801
+    ListMenuAnchorTopRight 31, 1, 0, 0, 32801
     ListMenuAdd 26, 65535, 0
     ListMenuAdd 27, 65535, 1
     ListMenuAdd 28, 65535, 2

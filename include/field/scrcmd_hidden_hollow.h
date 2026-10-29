@@ -7,11 +7,11 @@
 #include "types.h"
 #include "struct_decls.h"
 
-BOOL s0294_HiddenHollowGetParam(VM *vm, FieldScriptEnv *env);
-BOOL s0295_HiddenHollowReset(VM *vm, FieldScriptEnv *env);
-BOOL s0293_HiddenHollowCallWarpIn(VM *vm, FieldScriptEnv *env);
-BOOL s0296_HiddenHollowCallWarpOut(VM *vm, FieldScriptEnv *env);
-BOOL s02E5_HiddenHollowSet(VM *vm, FieldScriptEnv *env);
-BOOL s02E6_HiddenHollowCreateEvents(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_HiddenHollow_HiddenHollowGetParam(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_HiddenHollow_HiddenHollowReset(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_HiddenHollow_HiddenHollowCallWarpIn(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_HiddenHollow_HiddenHollowCallWarpOut(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_HiddenHollow_HiddenHollowSet(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_HiddenHollow_HiddenHollowCreateEvents(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_HIDDEN_HOLLOW_H

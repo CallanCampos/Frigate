@@ -51,7 +51,7 @@ Script_4:
     // "Iron Chamber"
     InfoMsg IronChamber_Text_IronChamber, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -62,7 +62,7 @@ Script_5:
     // "It protects this place\nwith the power of steel."
     InfoMsg IronChamber_Text_ProtectsPlacePowerSteel, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -72,7 +72,7 @@ Script_6:
     SEPlay SEQ_SE_MESSAGE
     // "The Pokémon statue that exudes the\npower of steel started moving![f000]븁\u0000"
     SystemMsg IronChamber_Text_PokemonStatueExudesPower, 2
-    InfoMsgClose
+    SystemMsgClose
     PlayerGetDir 0x8010
     WorkCmpConst 0x8010, 0
     VMJumpIf CMP_EQ, L_00BF
@@ -116,7 +116,7 @@ L_0130:
     ScreamMsg IronChamber_Text_JiJiZeJi, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     CallWildBattle 379, 65, 1
     WildBattleIsVictory 0x8010
     VMStackPush 0x8010
@@ -143,7 +143,7 @@ L_0198:
     // "Registeel disappeared deep\ninto the ruins..."
     SystemMsg IronChamber_Text_RegisteelDisappearedDeepInto, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_01C5
 
 L_01A8:

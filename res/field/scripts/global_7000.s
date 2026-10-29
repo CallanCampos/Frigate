@@ -4013,7 +4013,7 @@ Script_401:
     WorkGet 0x8009, 0x800d
     RTCallGlobal 2808
     ItemCheckSpace 0x8008, 0x8009, 0x8020
-    ScriptNative_CheckPlayerFormModel 0x8021
+    CheckPlayerFormModel 0x8021
     VMStackPush 0x8020
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -4059,7 +4059,7 @@ L_2FA8:
 
 L_2FB6:
     WorkSetConst 0x8022, 0
-    ScriptNative_CheckPlayerFormModel 0x8022
+    CheckPlayerFormModel 0x8022
     ItemAdd 0x8008, 0x8009, 0x8010
     BroadcastGameBeacon 0, 0x8008, 0
     MEWait
@@ -4079,7 +4079,7 @@ L_2FEB:
     SystemMsg Global7000_Text_PutCase_2, 2
     LastKeyWait
     WorkSetConst 0x8010, 1
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8022, 0
     VMReturn
     .balign 4, 0
@@ -4110,7 +4110,7 @@ L_3048:
     // "Too bad! There is no more room for\n[f000]ĉ\u0001\u0000!"
     SystemMsg Global7000_Text_TooBadThereNo_2, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8010, 0
     VMReturn
     .balign 4, 0

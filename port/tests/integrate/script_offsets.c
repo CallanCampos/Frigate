@@ -1,16 +1,17 @@
 // The field script's relative offsets, which its commands read as signed 32-bit numbers and add to the script's
-// pointer: the jumps and calls of src/ov012/scrcmd_vm.c (s001E_VMJump, s0004_VMCall, s001F_VMJumpIf, s0020_VMCallIf)
-// and the movement that s0064_ActorCmdExec (src/ov036/scrcmd_field_actor.c) hands a field actor. Each offset counts from
-// the end of the command's arguments, and a script reaches what comes before the command with a negative one. On the
-// DS the 32-bit sum wraps; read as a u32 and added to a 64-bit pointer, such an offset moves the pointer 4 GiB forward
-// instead, which stopped Black 2 at the starter's nickname until the commands read it signed
-// (port/docs/game-changes.md, the row of these files). Each command runs here alone, as VM_Run (src/system/vm.c) calls
-// it once it has read the command's ID, over the bytes the starter scene's commands read, and the scenario checks where
-// the script's pointer goes and which action the actor gets.
+// pointer: the jumps and calls of src/ov012/scrcmd_vm.c (Scrcmd_Vm_VMJump, Scrcmd_Vm_VMCall, Scrcmd_Vm_VMJumpIf,
+// Scrcmd_Vm_VMCallIf) and the movement that Scrcmd_FieldActor_ActorCmdExec (src/ov036/scrcmd_field_actor.c) hands a
+// field actor. Each offset counts from the end of the command's arguments, and a script reaches what comes before the
+// command with a negative one. On the DS the 32-bit sum wraps; read as a u32 and added to a 64-bit pointer, such an
+// offset moves the pointer 4 GiB forward instead, which stopped Black 2 at the starter's nickname until the commands
+// read it signed (port/docs/game-changes.md, the row of these files). Each command runs here alone, as VM_Run
+// (src/system/vm.c) calls it once it has read the command's ID, over the bytes the starter scene's commands read, and
+// the scenario checks where the script's pointer goes and which action the actor gets.
 //
-// No ROM: s0064_ActorCmdExec's actor, its actor system, the GFL task manager and heap that the actor's action task
-// takes (src/ov036/field_actor_acmd.c) are made here with the game's own layouts (include/field/field_actor_internal.h,
-// include/field/field_script.h). port/tests/integrate/test_integrate.c runs it as its script_offsets scenario.
+// No ROM: Scrcmd_FieldActor_ActorCmdExec's actor, its actor system, the GFL task manager and heap that the actor's
+// action task takes (src/ov036/field_actor_acmd.c) are made here with the game's own layouts
+// (include/field/field_actor_internal.h, include/field/field_script.h). port/tests/integrate/test_integrate.c runs it
+// as its script_offsets scenario.
 #include "types.h"
 #include "constants/field_script.h"
 #include "field/field_acmd.h"
@@ -28,8 +29,8 @@
 // is named after its offset; Black 2's build/b2_us/res/field/scripts/aspertia_city.bin has them so) from offset 0x500
 // on, at the offsets the script has them, each offset argument where its command reads it:
 // - Movement_0528, an animation of Bianca's in place: one action, 100, then the end. Action 100's commands
-//   (ACTOR_ACTION_COMMAND_TABLES[100], src/ov036/field_actor_movedata.c, run by src/ov036/field_actor_acmd.c) set her draw
-//   status to 10 and wait for its animation to end, without moving her. The scene plays it twice: after "You're
+//   (ACTOR_ACTION_COMMAND_TABLES[100], src/ov036/field_actor_movedata.c, run by src/ov036/field_actor_acmd.c) set her
+//   draw status to 10 and wait for its animation to end, without moving her. The scene plays it twice: after "You're
 //   ex-act-ly like what I heard!", from before it, and after the answer to the nickname;
 // - the VMCall L_06C6 at 0x640, which the YES to the nickname takes, 128 bytes forward;
 // - the ActorCmdExec 2, Movement_0528 at 0x65a, after L_0658's MsgWinCloseAll, which both answers reach, 314 bytes
@@ -109,44 +110,44 @@ static void TestJumpsAndCalls(void (*check)(int ok, const char *what)) {
 
     WriteOffset(NICKNAME_JUMP, NICKNAME_LOOP);
     vm = VmAt(NICKNAME_JUMP);
-    s001E_VMJump(vm, NULL);
-    check(vm->pc == At(NICKNAME_LOOP), "s001E_VMJump goes 134 bytes back, to the nickname's loop");
+    Scrcmd_Vm_VMJump(vm, NULL);
+    check(vm->pc == At(NICKNAME_LOOP), "Scrcmd_Vm_VMJump goes 134 bytes back, to the nickname's loop");
 
     WriteOffset(NICKNAME_CALL, NICKNAME_ROUTINE);
     vm = VmAt(NICKNAME_CALL);
-    s0004_VMCall(vm, NULL);
-    check(vm->pc == At(NICKNAME_ROUTINE), "s0004_VMCall goes 128 bytes forward, to the nickname's routine");
+    Scrcmd_Vm_VMCall(vm, NULL);
+    check(vm->pc == At(NICKNAME_ROUTINE), "Scrcmd_Vm_VMCall goes 128 bytes forward, to the nickname's routine");
     check(vm->stackPos == 1 && sStack[0] == (uptr)At(NICKNAME_CALL + 4), "and pushes the exact return position");
-    s0005_VMReturn(vm, NULL);
+    Scrcmd_Vm_VMReturn(vm, NULL);
     check(vm->pc == At(NICKNAME_CALL + 4), "and returns after its offset");
-    check(vm->stackPos == 0, "s0005_VMReturn consumes the return position");
+    check(vm->stackPos == 0, "Scrcmd_Vm_VMReturn consumes the return position");
 
     // The nickname's jump written as a conditional one: the condition's byte, then the offset
     At(NICKNAME_JUMP)[0] = CMP_EQ;
     WriteOffset(NICKNAME_JUMP + 1, NICKNAME_LOOP);
     vm = VmAt(NICKNAME_JUMP);
     vm->cmpResult = CMP_EQ;
-    s001F_VMJumpIf(vm, NULL);
-    check(vm->pc == At(NICKNAME_LOOP), "s001F_VMJumpIf, its condition met, goes back to the nickname's loop");
+    Scrcmd_Vm_VMJumpIf(vm, NULL);
+    check(vm->pc == At(NICKNAME_LOOP), "Scrcmd_Vm_VMJumpIf, its condition met, goes back to the nickname's loop");
     vm = VmAt(NICKNAME_JUMP);
     vm->cmpResult = CMP_LT;
-    s001F_VMJumpIf(vm, NULL);
+    Scrcmd_Vm_VMJumpIf(vm, NULL);
     check(vm->pc == At(NICKNAME_JUMP + 5), "and, not met, goes on after its offset");
     At(NICKNAME_JUMP)[0] = CMP_STACK;
     vm = VmAt(NICKNAME_JUMP);
     VM_StackPush(vm, 0);
-    s001F_VMJumpIf(vm, NULL);
+    Scrcmd_Vm_VMJumpIf(vm, NULL);
     check(vm->pc == At(NICKNAME_LOOP), "and, testing the stack, goes back when the value popped isn't 1");
     check(vm->stackPos == 0, "the conditional jump consumes the stack value");
 
     At(NICKNAME_JUMP)[0] = CMP_EQ;
     vm = VmAt(NICKNAME_JUMP);
     vm->cmpResult = CMP_EQ;
-    s0020_VMCallIf(vm, NULL);
-    check(vm->pc == At(NICKNAME_LOOP), "s0020_VMCallIf, its condition met, calls back to the nickname's loop");
+    Scrcmd_Vm_VMCallIf(vm, NULL);
+    check(vm->pc == At(NICKNAME_LOOP), "Scrcmd_Vm_VMCallIf, its condition met, calls back to the nickname's loop");
     check(vm->stackPos == 1 && sStack[0] == (uptr)At(NICKNAME_JUMP + 5),
           "and pushes the conditional call's exact return position");
-    s0005_VMReturn(vm, NULL);
+    Scrcmd_Vm_VMReturn(vm, NULL);
     check(vm->pc == At(NICKNAME_JUMP + 5), "and returns after its offset");
     check(vm->stackPos == 0, "the conditional call's return consumes its position");
 }
@@ -185,8 +186,8 @@ static void TestActorMovement(void (*check)(int ok, const char *what)) {
     Write16(BIANCA_ANIMATION, BIANCA);
     WriteOffset(BIANCA_ANIMATION + 2, MOVEMENT);
     vm = VmAt(BIANCA_ANIMATION);
-    s0064_ActorCmdExec(vm, &env);
-    check(vm->pc == At(BIANCA_ANIMATION + 6), "s0064_ActorCmdExec goes on after its actor and offset");
+    Scrcmd_FieldActor_ActorCmdExec(vm, &env);
+    check(vm->pc == At(BIANCA_ANIMATION + 6), "Scrcmd_FieldActor_ActorCmdExec goes on after its actor and offset");
     check(subwork.acmdTasks[0] != NULL, "and gives the actor an action task");
     // The task's first pass commits the movement's first action to the actor (FieldAcmdTCB_CommitAcmd): the movement
     // the command found, 314 bytes back. Read 4 GiB forward, it would fault here

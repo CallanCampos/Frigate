@@ -8,7 +8,7 @@
 #include "struct_decls.h"
 #include "system/vm.h"
 
-// A floor of an elevator: its name, and where it goes. A script's table of them follows s01C1_ElevatorSetTablePtr
+// A floor of an elevator: its name, and where it goes. A script's table of them follows Scrcmd_Misc_ElevatorSetTablePtr
 struct ElevatorFloor {
     u16 messageId;
     u16 zoneId;
@@ -17,17 +17,17 @@ struct ElevatorFloor {
     u16 z;
 };
 
-BOOL s0134_CasteliaRushInit(VM *vm, FieldScriptEnv *env);
-BOOL ElevatorTable_RegisterBirthdayEntry(VM *vm, FieldScriptEnv *env);
-BOOL ElevatorTable_GetMysteryEntryCount(VM *vm, FieldScriptEnv *env);
-BOOL s01C1_ElevatorSetTablePtr(VM *vm, FieldScriptEnv *env);
-BOOL s01C2_ElevatorBuildListMenu(VM *vm, FieldScriptEnv *env);
-BOOL s01C2_ElevatorChangeMap(VM *vm, FieldScriptEnv *env);
-BOOL s01FC_ItemCollectorGetPrice(VM *vm, FieldScriptEnv *env);
-BOOL s01FB_ItemCollectorCheckGroup(VM *vm, FieldScriptEnv *env);
-BOOL s0236_WordSetLoadItemCollectorPrice(VM *vm, FieldScriptEnv *env);
-BOOL s0237_ItemCollectorSell(VM *vm, FieldScriptEnv *env);
-BOOL s0221_AnvilleTrainGetModelID(VM *vm, FieldScriptEnv *env);
-BOOL s0222_AnvilleTrainGetDailyIndex(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Misc_CasteliaRushInit(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Misc_ElevatorRegisterBirthdayEntry(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Misc_ElevatorGetMysteryEntryCount(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Misc_ElevatorSetTablePtr(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Misc_ElevatorBuildListMenu(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Misc_ElevatorChangeMap(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Misc_ItemCollectorGetPrice(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Misc_ItemCollectorCheckGroup(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Misc_WordSetLoadItemCollectorPrice(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Misc_ItemCollectorSell(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Misc_AnvilleTrainGetModelID(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Misc_AnvilleTrainGetDailyIndex(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_MISC_H

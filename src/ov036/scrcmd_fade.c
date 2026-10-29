@@ -53,7 +53,7 @@ static BOOL letBrightnessFinishAdjusting(VM *vm, void *env);
 static BOOL ScriptNative_WaitFieldFade(VM *vm, void *env);
 static GameEventReturnCode FieldFadeEvent_Callback(GameEvent *event, u32 *state, void *data);
 
-BOOL s00B3_FadeEx(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Fade_FadeEx(VM *vm, FieldScriptEnv *env) {
     u16 mode = VM_Read16(vm);
     u16 start = VM_Read16(vm);
     u16 end = VM_Read16(vm);
@@ -77,7 +77,7 @@ static BOOL ScriptNative_WaitFieldFade(VM *vm, void *env) {
     return TRUE;
 }
 
-BOOL s01AA_CallSeasonBanner(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Fade_CallSeasonBanner(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
@@ -89,7 +89,7 @@ BOOL s01AA_CallSeasonBanner(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01A8_FadeInBlackQ_(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Fade_FadeInBlackQ_01A8(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -97,7 +97,7 @@ BOOL s01A8_FadeInBlackQ_(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01A3_FadeInBlackQ(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Fade_FadeInBlackQ(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -105,7 +105,7 @@ BOOL s01A3_FadeInBlackQ(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01A4_FadeOutBlackQ(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Fade_FadeOutBlackQ(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -113,7 +113,7 @@ BOOL s01A4_FadeOutBlackQ(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01A5_FadeInWhiteQ(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Fade_FadeInWhiteQ(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -121,7 +121,7 @@ BOOL s01A5_FadeInWhiteQ(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01A6_FadeOutWhiteQ(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Fade_FadeOutWhiteQ(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -129,7 +129,7 @@ BOOL s01A6_FadeOutWhiteQ(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01AB_FadeInBlack(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Fade_FadeInBlack(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -137,7 +137,7 @@ BOOL s01AB_FadeInBlack(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01AC_FadeOutBlack(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Fade_FadeOutBlack(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -145,7 +145,7 @@ BOOL s01AC_FadeOutBlack(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01AD_FadeInWhite(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Fade_FadeInWhite(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -153,7 +153,7 @@ BOOL s01AD_FadeInWhite(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01AE_FadeOutWhite(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Fade_FadeOutWhite(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -161,18 +161,18 @@ BOOL s01AE_FadeOutWhite(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00B4_FadeExWait(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Fade_FadeExWait(VM *vm, FieldScriptEnv *env) {
     VM_SetNativeCallback(vm, letBrightnessFinishAdjusting);
     return TRUE;
 }
 
-BOOL s01A7_FadeWait(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Fade_FadeWait(VM *vm, FieldScriptEnv *env) {
     VM_SetNativeCallback(vm, ScriptNative_WaitFieldFade);
     return TRUE;
 }
 
 // Fades out to black when black is 1, otherwise white
-BOOL s02E8_CallFieldFadeOut(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Fade_CallFieldFadeOut(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     Field *field = GSYS_GetField(gsys);
@@ -198,7 +198,7 @@ BOOL s02E8_CallFieldFadeOut(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s02E9_CallFieldFadeIn(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Fade_CallFieldFadeIn(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     Field *field = GSYS_GetField(gsys);

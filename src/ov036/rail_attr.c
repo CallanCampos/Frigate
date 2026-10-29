@@ -75,56 +75,56 @@ u32 FieldRailTilemap_GetTileAtPos(RailAttr *attr, const RailPosition *pos) {
 }
 
 BOOL FieldRailTilemap_IsSignBoard(u16 tileClass) {
-    if (tileClass == 0xa0 || tileClass == 0xa1) {
+    if (tileClass == TILE_CLASS_SLIP_DOWN_EDGE || tileClass == TILE_CLASS_SLIP_DOWN_EDGE_A1) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL FieldRailTilemap_IsJumpStart(u32 tileClass) {
-    if (tileClass == 0xa3 || tileClass == 0x28) {
+    if (tileClass == TILE_CLASS_GRID_RAIL_SWITCH || tileClass == TILE_CLASS_GRID_RAIL_SWITCH_28) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL FieldRailTilemap_IsForceMoveUp(u32 tileClass) {
-    if (tileClass == 0xa5) {
+    if (tileClass == TILE_CLASS_FORCE_MOVE_UP) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL FieldRailTilemap_IsForceMoveDown(u32 tileClass) {
-    if (tileClass == 0xa4) {
+    if (tileClass == TILE_CLASS_FORCE_MOVE_DOWN) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL FieldRailTilemap_IsForceMoveLeft(u32 tileClass) {
-    if (tileClass == 0xa7) {
+    if (tileClass == TILE_CLASS_FORCE_MOVE_LEFT) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL FieldRailTilemap_IsForceMoveRight(u32 tileClass) {
-    if (tileClass == 0xa6) {
+    if (tileClass == TILE_CLASS_FORCE_MOVE_RIGHT) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL FieldRailTilemap_IsForceMoveStop(u32 tileClass) {
-    if (tileClass == 0xa8) {
+    if (tileClass == TILE_CLASS_FORCE_MOVE_STOP) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL FieldRailTilemap_IsSlipDown(u32 tileClass) {
-    if (tileClass == 0xb0) {
+    if (tileClass == TILE_CLASS_SLIP_DOWN) {
         return TRUE;
     }
     return FALSE;
