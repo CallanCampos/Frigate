@@ -249,10 +249,20 @@ elif [ "$push" = 0 ]; then
 fi
 workflow_changes=""
 summary_ready=0
+verification_pending=0
 
 # Prints the fields of a port/docs/STATUS.md entry that a sync knows; the session fills in the others
 summary() {
     local status=$?
+    if [ "$verification_pending" = 1 ]; then
+        # Only this invocation's pinned head is affected. An EXIT trap preserves the build/signal exit status even
+        # if this best-effort API request fails; never replace a failed verification with success.
+        if ! gh api --method POST "repos/$PORT_REPO/statuses/$verified_head" -f state=failure \
+            -f 'context=Frigate local verification' \
+            -f "description=Local verification stopped (exit $status); rerun on this head"; then
+            printf 'sync_upstream: could not record failed local verification; the GitHub status may remain pending\n' >&2
+        fi
+    fi
     [ "$summary_ready" = 1 ] || return 0
     local outcome="done" upstream_now pr=""
     case "$status" in
@@ -416,6 +426,9 @@ verified_head=$(git rev-parse HEAD)
 if [ -n "$verify_pr" ]; then
     pr_head=$(gh pr view "$verify_pr" --repo "$PORT_REPO" --json headRefOid --jq .headRefOid)
     [ "$pr_head" = "$verified_head" ] || die 1 "check out the exact PR head before verification"
+    verification_pending=1
+    trap 'exit 130' INT
+    trap 'exit 143' TERM
     gh api --method POST "repos/$PORT_REPO/statuses/$verified_head" -f state=pending \
         -f 'context=Frigate local verification' -f 'description=Local ROM and host verification running'
 else
@@ -574,6 +587,7 @@ if [ -n "$verify_pr" ]; then
     gh api --method POST "repos/$PORT_REPO/statuses/$verified_head" -f state=success \
         -f 'context=Frigate local verification' \
         -f 'description=Both ROM SHA1s and host build/tests verified locally'
+    verification_pending=0
     rm -f "$publish_helper"
     exit 0
 fi

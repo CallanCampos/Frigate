@@ -37,7 +37,8 @@ jobs:
         id: sync-token
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         with:
-          app-id: ${{ vars.FRIGATE_SYNC_APP_ID }}
+          # This pinned action accepts the same identifier through either input; retain the configured App ID.
+          client-id: ${{ vars.FRIGATE_SYNC_APP_ID }}
           private-key: ${{ secrets.FRIGATE_SYNC_APP_PRIVATE_KEY }}
           owner: CallanCampos
           repositories: Frigate
