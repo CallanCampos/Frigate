@@ -9,8 +9,11 @@ The parent [test map](../README.md) describes the established screen, same-save 
 | [check_recording.py](check_recording.py) | Run `--record` with isolated saves, replay the resulting video-frame input in a new process, and compare every frame/counter/screen hash, NNS/random-state payload, effective clock and used seed. Compare save bytes exactly and validate both main-save copies, all 73 blocks, tables and footers. | `replay_recording`; returns 66 without the matching ROM. |
 | [test_check_recording.py](test_check_recording.py) | Feed actual run-directory parsers synthetic mismatches; prove missing frames/state, bad seeds/clocks and equally corrupt saves fail. Different native addresses do not hide different payloads. | `replay_recording_tool`, ROM-free. |
 
-The recording checker defaults to 5,600 frames. CTest supplies the existing first-save input, which formats New
-Game's save from a blank chip. Longer routes can pass `--input FILE --save START.sav --frames N --require-save`.
+The recording checker defaults to 5,600 frames for callers choosing their own endpoint. CTest explicitly uses
+7,800 frames with the existing first-save input: both original DS versions have complete valid main-save copies
+then, while at 5,600 both still have unfinished images. `replay_same_save` retains that early checkpoint with
+first-bank identity/egg bytes and second-bank FF ranges; `replay_same_save_complete` runs twice to 7,800 and checks
+both banks' identity/egg bytes plus all 73 blocks, checksum tables and footers (`--require-valid-image FILE`). Longer routes can pass `--input FILE --save START.sav --frames N --require-save`.
 With a starting image, `--require-save` also requires changed bytes, so an untouched copied fixture cannot pass as
 a newly produced save. Continuation-only checks can omit that flag and still compare/validate their images.
 `--reference-save FILE` fixes the block layout to an examined image; without it, CRC checks prove internal image

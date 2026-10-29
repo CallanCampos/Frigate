@@ -42,6 +42,8 @@
 // initialization calls it (CARDi_InitRom), after the PXI bus has started; calling it again registers the services
 // again, as after a reset of the bus. Without a PXI bus in the build it says so and registers nothing
 void port_card_boot(void);
+// Retire only a pending service reply on bus reset/path change; already-written flash bytes are not rolled back.
+void port_card_backup_reset(void);
 
 // Writes the backup image to its file now if the game changed it since the last write
 void port_card_flush(void);

@@ -195,7 +195,7 @@ add_executable(port_card_backup_tests
 target_link_libraries(port_card_backup_tests PRIVATE port_decomp_env)
 target_include_directories(port_card_backup_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_options(port_card_backup_tests PRIVATE ${port_rom_test_options})
-foreach(test init identify flash unreachable save_file write_failure round_trip other_saves linked_save save_path)
+foreach(test deferred_reply init identify flash unreachable save_file write_failure round_trip other_saves linked_save save_path)
     add_test(NAME card_backup_${test} COMMAND port_card_backup_tests ${test})
     set_tests_properties(card_backup_${test} PROPERTIES TIMEOUT 60)
 endforeach()
@@ -283,3 +283,27 @@ add_test(NAME card_hardware_generic_conflict COMMAND "${PORT_PYTHON}"
     --expect "generic operation conflicts with experimental CARD DMA channel ownership"
     -- $<TARGET_FILE:port_card_hardware_tests> generic_conflict)
 set_tests_properties(card_hardware_generic_conflict PROPERTIES TIMEOUT 60)
+
+# ROM-free backup service fixture: only CARDi_InitRom is replaced, not SDK task/PXI/OS behavior.
+add_library(port_backup_rom_fixture OBJECT hal/card/card_rom.c)
+target_link_libraries(port_backup_rom_fixture PRIVATE port_decomp_env)
+target_include_directories(port_backup_rom_fixture PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_compile_definitions(port_backup_rom_fixture PRIVATE CARDi_InitRom=port_backup_unused_rom_init)
+add_executable(port_backup_service_tests tests/card/test_backup_service.c
+    $<TARGET_OBJECTS:pokebw2_game>
+    "$<FILTER:$<TARGET_OBJECTS:port_hal>,EXCLUDE,card_rom[.]c[.](o|obj)$>"
+    $<TARGET_OBJECTS:port_backup_rom_fixture> ${port_gfx_objects} "${PORT_GEN}/stubs.c")
+target_link_libraries(port_backup_service_tests PRIVATE port_decomp_env SDL3::SDL3)
+target_include_directories(port_backup_service_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${REPO_ROOT}")
+if(port_os_stack_probes)
+    target_compile_options(port_backup_service_tests PRIVATE ${port_os_stack_probes})
+endif()
+foreach(scenario stream sync cancel stop bus_reset path_reset invalid game_wrapper game_error)
+    add_test(NAME card_backup_service_${scenario} COMMAND port_backup_service_tests ${scenario})
+    set_tests_properties(card_backup_service_${scenario} PROPERTIES TIMEOUT 60)
+endforeach()
+# Check both the persistence diagnostic and status 0; PASS_REGULAR_EXPRESSION alone would ignore a failed assertion.
+add_test(NAME card_backup_service_io_error COMMAND "${PORT_PYTHON}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/check_exit.py" --status 0 --expect "port: card: can't write"
+    -- $<TARGET_FILE:port_backup_service_tests> io_error)
+set_tests_properties(card_backup_service_io_error PROPERTIES TIMEOUT 60)

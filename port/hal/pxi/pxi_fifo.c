@@ -10,6 +10,7 @@
 //     FIFO's registers themselves are never read or written.
 // PXIi_HandlerRecvFifoNotEmpty and the table of the tags each processor is ready for (OSSystemWork's
 // pxiHandleChecker, which PXI_IsCallbackReady reads) are the DS's.
+#include "hal/card/port_card.h"
 #include "hal/os/port_os.h"
 #include "hal/pxi/arm7.h"
 #include "hal/pxi/pxi_bus.h"
@@ -90,6 +91,8 @@ u32 port_pxi_pending(void) {
 
 void port_pxi_reset(void) {
     int i;
+
+    port_card_backup_reset();
 
     for (i = 0; i < PXI_MAX_FIFO_TAG; i++) {
         FifoRecvCallbackTable[i] = NULL;
