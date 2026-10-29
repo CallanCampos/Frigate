@@ -208,6 +208,7 @@
 #define ARCID_POKEMONTRADE_DEMO 104                // pokemontrade_demo_common.c, pokemontrade_demo_down.c
 #define ARCID_POKEMONTRADE_2D 105                  // pokemontrade_2d.c
 #define ARCID_MIC_TEST 107                         // mictest.c
+#define ARCID_GYM_ELEC 108                         // gym_elec.c
 #define ARCID_FLD3D_CI_RESOURCES 116               // fld3d_ci.c
 #define ARCID_FLD3D_CI_FILE 118                    // fld3d_ci.c
 #define ARCID_NAME_INPUT_GRAPHIC 119               // name_input.c
@@ -216,6 +217,7 @@
 #define ARCID_FIELD_GIMMICK_GATE 131               // field_gimmick_gate.c
 #define ARCID_LOCAL_TVT 132                        // local_tvt_chara.c, local_tvt_util.c
 #define ARCID_WIFIBATTLEMATCH 134                  // wifibattlematch_view.c
+#define ARCID_GYM_INSECT 135                       // gym_insect.c
 #define ARCID_BR_RES 137                           // br_res.c
 #define ARCID_GYM_DRIFTVEIL 138                    // gym_driftveil.c
 #define ARCID_MB_PARENT_SYS 142                    // mb_parent_sys.c
@@ -243,10 +245,13 @@
 #define ARCID_GEONET 194                           // geonet.c
 #define ARCID_TIME_ICON 195                        // time_icon.c
 #define ARCID_FIELD_SAVEANIME 197                  // field_saveanime.c
+#define ARCID_FIELD_ACTOR_ANIMATION 200            // field_actor_animation.c
 #define ARCID_PSEL 202                             // psel.c
 #define ARCID_GIMMICK_FUNFEST_LEVELS_BODY 204      // gimmick_funfest_levels.c
+#define ARCID_ITEM_COLLECTOR 205                   // scrcmd_misc.c
 #define ARCID_SCRCMD_STADIUM 206                   // scrcmd_stadium.c
 #define ARCID_GIMMICK_FUNFEST_LEVELS_PARTS 207     // gimmick_funfest_levels.c
+#define ARCID_CAMERA_SOUND 209                     // camera_system.c
 #define ARCID_HALL_OF_FAME_PC 210                  // hall_of_fame_pc_main.c
 #define ARCID_HALL_OF_FAME_DEMO 213                // hall_of_fame_demo_main.c, hall_of_fame_demo_obj.c
 #define ARCID_GIMMICK_PASSING_VEHICLES 217         // gimmick_passing_vehicles.c
@@ -259,23 +264,28 @@
 #define ARCID_BTLV_EFFVM_PAL_ANIM 231              // btlv_effvm.c
 #define ARCID_FIELD_GOOUT_EFFECT 232               // field_goout_effect.c
 #define ARCID_CTVT_GAME 233                        // ctvt_game.c
+#define ARCID_LOCAL_TVT_SCRIPT 234                 // local_tvt_scriptmode.c
 #define ARCID_MEDALBOX 236                         // medalbox.c
 #define ARCID_MEDAL_INFO_VIEWER 237                // medal_info_viewer.c
 #define ARCID_MEDAL 238                            // medalbox.c, medal_info_viewer.c
+#define ARCID_LOCAL_TVT_CALL_DATA 240              // local_tvt_calldata.c
 #define ARCID_FIELD_GOOUT_EFFECT_DATA 241          // field_goout_effect_data.c
 #define ARCID_CTVT_GAME_CAM 242                    // ctvt_game_cam.c, ctvt_game.c
 #define ARCID_FIELD_FMISSION_INFO 243              // field_fmission_info.c
 #define ARCID_WBT_TOOL 247                         // wbt_tool.c
 #define ARCID_FMISSION_VIEW 259                    // fmission_view_setup.c
+#define ARCID_INFINITY_DUNGEON 260                 // infinity_dungeon_gimmick.c
 #define ARCID_WBT_STADIUM_GIMMICK_MODELS 263       // wbt_stadium_gimmick.c
 #define ARCID_GYM_VIRBANK 264                      // gym_virbank.c
 #define ARCID_FLD3D_CI 267                         // fld3d_ci.c
 #define ARCID_FLD3D_CI_BITMAP 268                  // fld3d_ci.c
 #define ARCID_FMISSION_APP 270                     // fmission_app.c, fmission_app_draw.c
+#define ARCID_SCRCMD_HIDDEN_HOLLOW 273             // scrcmd_hidden_hollow.c
 #define ARCID_GIMMICK_LEAGUE_GRIMSLEY 278          // gimmick_league_grimsley.c
 #define ARCID_GIMMICK_LEAGUE_CAITLIN 279           // gimmick_league_caitlin.c
 #define ARCID_GIMMICK_LEAGUE_SHAUNTAL 280          // gimmick_league_shauntal.c
 #define ARCID_GIMMICK_LEAGUE_MARSHAL 281           // gimmick_league_marshal.c
+#define ARCID_GIMMICK_BADGE_GATE 284               // gimmick_badge_gate.c
 #define ARCID_GPOWER_APP 285                       // gpower_app.c
 #define ARCID_GIMMICK_PLASMA_FRIGATE 286           // gimmick_plasma_frigate.c, gimmick_plasma_frigate_lights.c
 #define ARCID_GIMMICK_PLASMA_FRIGATE_DECK 288      // gimmick_plasma_frigate_deck.c

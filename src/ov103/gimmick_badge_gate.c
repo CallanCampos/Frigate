@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/badge_gate.h"
 #include "field/field.h"
 #include "field/field_camera.h"
@@ -76,9 +77,6 @@ typedef struct {
     fx32 amplitudeY;
 } BadgeGateCameraShake;
 
-// The archive of the gimmick's models and animations
-#define ARC_BADGE_GATE 284
-
 static const G3DSceneAnimationSetup sScene2Animations7[] = { { 15, 0 } };
 static const G3DSceneAnimationSetup sScene2Animations0[] = { { 1, 0 } };
 static const G3DSceneAnimationSetup sScene2Animations6[] = { { 13, 0 } };
@@ -95,9 +93,9 @@ static const G3DSceneAnimationSetup sScene2Animations4[] = { { 9, 0 } };
 static const G3DSceneAnimationSetup sScene2Animations1[] = { { 3, 0 } };
 
 static const G3DSceneResourceSetup sScene1Resources[] = {
-    { ARC_BADGE_GATE, 1, 0 },  { ARC_BADGE_GATE, 4, 0 },  { ARC_BADGE_GATE, 7, 0 },
-    { ARC_BADGE_GATE, 10, 0 }, { ARC_BADGE_GATE, 13, 0 }, { ARC_BADGE_GATE, 16, 0 },
-    { ARC_BADGE_GATE, 19, 0 }, { ARC_BADGE_GATE, 22, 0 }, { ARC_BADGE_GATE, 25, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 1, 0 },  { ARCID_GIMMICK_BADGE_GATE, 4, 0 },  { ARCID_GIMMICK_BADGE_GATE, 7, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 10, 0 }, { ARCID_GIMMICK_BADGE_GATE, 13, 0 }, { ARCID_GIMMICK_BADGE_GATE, 16, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 19, 0 }, { ARCID_GIMMICK_BADGE_GATE, 22, 0 }, { ARCID_GIMMICK_BADGE_GATE, 25, 0 },
 };
 
 static const G3DSceneAnimationSetup sScene0Animations3[] = { { 10, 0 }, { 11, 0 } };
@@ -110,12 +108,14 @@ static const G3DSceneActorSetup sScene3Actors[] = {
 };
 
 static const G3DSceneResourceSetup sScene0Resources[] = {
-    { ARC_BADGE_GATE, 0, 0 },  { ARC_BADGE_GATE, 27, 0 }, { ARC_BADGE_GATE, 29, 0 }, { ARC_BADGE_GATE, 3, 0 },
-    { ARC_BADGE_GATE, 27, 0 }, { ARC_BADGE_GATE, 29, 0 }, { ARC_BADGE_GATE, 6, 0 },  { ARC_BADGE_GATE, 27, 0 },
-    { ARC_BADGE_GATE, 29, 0 }, { ARC_BADGE_GATE, 9, 0 },  { ARC_BADGE_GATE, 27, 0 }, { ARC_BADGE_GATE, 29, 0 },
-    { ARC_BADGE_GATE, 12, 0 }, { ARC_BADGE_GATE, 27, 0 }, { ARC_BADGE_GATE, 29, 0 }, { ARC_BADGE_GATE, 15, 0 },
-    { ARC_BADGE_GATE, 27, 0 }, { ARC_BADGE_GATE, 29, 0 }, { ARC_BADGE_GATE, 18, 0 }, { ARC_BADGE_GATE, 27, 0 },
-    { ARC_BADGE_GATE, 29, 0 }, { ARC_BADGE_GATE, 21, 0 }, { ARC_BADGE_GATE, 27, 0 }, { ARC_BADGE_GATE, 29, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 0, 0 },  { ARCID_GIMMICK_BADGE_GATE, 27, 0 }, { ARCID_GIMMICK_BADGE_GATE, 29, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 3, 0 },  { ARCID_GIMMICK_BADGE_GATE, 27, 0 }, { ARCID_GIMMICK_BADGE_GATE, 29, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 6, 0 },  { ARCID_GIMMICK_BADGE_GATE, 27, 0 }, { ARCID_GIMMICK_BADGE_GATE, 29, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 9, 0 },  { ARCID_GIMMICK_BADGE_GATE, 27, 0 }, { ARCID_GIMMICK_BADGE_GATE, 29, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 12, 0 }, { ARCID_GIMMICK_BADGE_GATE, 27, 0 }, { ARCID_GIMMICK_BADGE_GATE, 29, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 15, 0 }, { ARCID_GIMMICK_BADGE_GATE, 27, 0 }, { ARCID_GIMMICK_BADGE_GATE, 29, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 18, 0 }, { ARCID_GIMMICK_BADGE_GATE, 27, 0 }, { ARCID_GIMMICK_BADGE_GATE, 29, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 21, 0 }, { ARCID_GIMMICK_BADGE_GATE, 27, 0 }, { ARCID_GIMMICK_BADGE_GATE, 29, 0 },
 };
 
 static const G3DSceneActorSetup sScene0Actors[] = {
@@ -136,18 +136,19 @@ static const G3DSceneActorSetup sScene1Actors[] = {
 };
 
 static const G3DSceneResourceSetup sScene2Resources[] = {
-    { ARC_BADGE_GATE, 2, 0 },  { ARC_BADGE_GATE, 31, 0 }, { ARC_BADGE_GATE, 5, 0 },  { ARC_BADGE_GATE, 31, 0 },
-    { ARC_BADGE_GATE, 8, 0 },  { ARC_BADGE_GATE, 31, 0 }, { ARC_BADGE_GATE, 11, 0 }, { ARC_BADGE_GATE, 31, 0 },
-    { ARC_BADGE_GATE, 14, 0 }, { ARC_BADGE_GATE, 31, 0 }, { ARC_BADGE_GATE, 17, 0 }, { ARC_BADGE_GATE, 31, 0 },
-    { ARC_BADGE_GATE, 20, 0 }, { ARC_BADGE_GATE, 31, 0 }, { ARC_BADGE_GATE, 23, 0 }, { ARC_BADGE_GATE, 31, 0 },
-    { ARC_BADGE_GATE, 26, 0 }, { ARC_BADGE_GATE, 32, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 2, 0 },  { ARCID_GIMMICK_BADGE_GATE, 31, 0 }, { ARCID_GIMMICK_BADGE_GATE, 5, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 31, 0 }, { ARCID_GIMMICK_BADGE_GATE, 8, 0 },  { ARCID_GIMMICK_BADGE_GATE, 31, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 11, 0 }, { ARCID_GIMMICK_BADGE_GATE, 31, 0 }, { ARCID_GIMMICK_BADGE_GATE, 14, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 31, 0 }, { ARCID_GIMMICK_BADGE_GATE, 17, 0 }, { ARCID_GIMMICK_BADGE_GATE, 31, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 20, 0 }, { ARCID_GIMMICK_BADGE_GATE, 31, 0 }, { ARCID_GIMMICK_BADGE_GATE, 23, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 31, 0 }, { ARCID_GIMMICK_BADGE_GATE, 26, 0 }, { ARCID_GIMMICK_BADGE_GATE, 32, 0 },
 };
 
 static const G3DSceneResourceSetup sScene3Resources[] = {
-    { ARC_BADGE_GATE, 24, 0 },
-    { ARC_BADGE_GATE, 28, 0 },
-    { ARC_BADGE_GATE, 30, 0 },
-    { ARC_BADGE_GATE, 32, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 24, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 28, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 30, 0 },
+    { ARCID_GIMMICK_BADGE_GATE, 32, 0 },
 };
 
 static const G3DSceneActorSetup sScene2Actors[] = {

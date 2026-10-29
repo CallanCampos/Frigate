@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_actor_animation.h"
@@ -84,7 +85,8 @@ void FieldActorAnmProc_Free(FieldActorAnmProc *proc) {
 }
 
 void FieldActorAnmProc_Play(FieldActorAnmProc *proc, u16 animation) {
-    proc->curve = GFL_G3DCurveCreateToLoadBuffer(proc->heapId, 0xc8, animation, 0xa, proc->unk4, sizeof(proc->unk4));
+    proc->curve = GFL_G3DCurveCreateToLoadBuffer(proc->heapId, ARCID_FIELD_ACTOR_ANIMATION, animation, 0xa, proc->unk4,
+                                                 sizeof(proc->unk4));
     proc->finished = TRUE;
     proc->animation = animation;
     FieldActorAnmProc_CommitTransform(proc->curve, proc->actor, &proc->pos);

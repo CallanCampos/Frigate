@@ -3,6 +3,7 @@
 // holds is hidden_hollow_generate.c, before it. Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 // Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/directions.h"
 #include "constants/flags.h"
 #include "constants/obj_codes.h"
@@ -27,8 +28,6 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 #include "system/tpoke_data.h"
-
-#define SLOT_ARC 0x111
 
 // Which of a grotto file's two sets of Pokémon the version reads
 #ifdef BLACK2
@@ -142,7 +141,7 @@ BOOL Scrcmd_HiddenHollow_HiddenHollowGetParam(VM *vm, FieldScriptEnv *env) {
     switch (param) {
     case HIDDEN_HOLLOW_PARAM_SPECIES:
         if (!mission) {
-            GFL_ArcSysRead(&file, SLOT_ARC, hollow);
+            GFL_ArcSysRead(&file, ARCID_SCRCMD_HIDDEN_HOLLOW, hollow);
             *result = getSlotFilePtr(&file, slot)->species[group];
         } else {
             *result = entry->species;
@@ -153,7 +152,7 @@ BOOL Scrcmd_HiddenHollow_HiddenHollowGetParam(VM *vm, FieldScriptEnv *env) {
             HollowSlot *slotData;
             u8 min;
 
-            GFL_ArcSysRead(&file, SLOT_ARC, hollow);
+            GFL_ArcSysRead(&file, ARCID_SCRCMD_HIDDEN_HOLLOW, hollow);
             slotData = getSlotFilePtr(&file, slot);
             min = slotData->minLevel[group];
             *result = min + GFL_RandomLC((u8)(slotData->maxLevel[group] - min));
@@ -163,7 +162,7 @@ BOOL Scrcmd_HiddenHollow_HiddenHollowGetParam(VM *vm, FieldScriptEnv *env) {
         break;
     case HIDDEN_HOLLOW_PARAM_FORM:
         if (!mission) {
-            GFL_ArcSysRead(&file, SLOT_ARC, hollow);
+            GFL_ArcSysRead(&file, ARCID_SCRCMD_HIDDEN_HOLLOW, hollow);
             *result = getSlotFilePtr(&file, slot)->form[group];
         } else {
             *result = entry->form;
@@ -174,7 +173,7 @@ BOOL Scrcmd_HiddenHollow_HiddenHollowGetParam(VM *vm, FieldScriptEnv *env) {
             u32 gender = getHollowGender(rival, hollow);
             BOOL female = FALSE;
 
-            GFL_ArcSysRead(&file, SLOT_ARC, hollow);
+            GFL_ArcSysRead(&file, ARCID_SCRCMD_HIDDEN_HOLLOW, hollow);
             if (gender < getSlotFilePtr(&file, slot)->femaleBelow[group]) {
                 female = TRUE;
             }
@@ -184,11 +183,11 @@ BOOL Scrcmd_HiddenHollow_HiddenHollowGetParam(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case HIDDEN_HOLLOW_PARAM_ITEM:
-        GFL_ArcSysRead(&file, SLOT_ARC, hollow);
+        GFL_ArcSysRead(&file, ARCID_SCRCMD_HIDDEN_HOLLOW, hollow);
         *result = file.items[(u8)(slot - 3)][group];
         break;
     case HIDDEN_HOLLOW_PARAM_HIDDEN_ITEM:
-        GFL_ArcSysRead(&file, SLOT_ARC, hollow);
+        GFL_ArcSysRead(&file, ARCID_SCRCMD_HIDDEN_HOLLOW, hollow);
         *result = file.hiddenItems[(u8)(slot - 7)][group];
         break;
     case HIDDEN_HOLLOW_PARAM_HAS_HIDDEN_ITEM:
@@ -330,7 +329,7 @@ static void CreateGenericHiddenHollowPokemonActor(HollowEventWork *work) {
     HollowSlot *slotData;
     u16 female = FALSE;
 
-    GFL_ArcSysRead(&file, SLOT_ARC, work->hollow);
+    GFL_ArcSysRead(&file, ARCID_SCRCMD_HIDDEN_HOLLOW, work->hollow);
     slotData = getSlotFilePtr(&file, slot);
     if (gender < slotData->femaleBelow[group]) {
         female = TRUE;

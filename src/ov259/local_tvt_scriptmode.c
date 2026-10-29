@@ -24,9 +24,6 @@
 // "local_tvt_scriptmode.c". A script names the faces and their zones, then has commands that let a face talk, wait
 // or play a sound
 
-// The archive of the scripts
-#define ARC_LOCAL_TVT_SCRIPT 234
-
 // The steps of LocalTvtScriptMode_Main
 enum {
     SCRIPT_SEQ_WAIT_FACES,
@@ -123,7 +120,7 @@ LocalTvtScriptMode *LocalTvtScriptMode_Create(HeapID heapId, GameSystem *gsys, G
     mode->heapId = heapId;
     mode->chara = chara;
     LocalTvtScriptMode_InitGraphic(mode);
-    mode->arc = GFL_ArcSysCreateFileHandle(ARC_LOCAL_TVT_SCRIPT, mode->heapId);
+    mode->arc = GFL_ArcSysCreateFileHandle(ARCID_LOCAL_TVT_SCRIPT, mode->heapId);
     LocalTvtScriptMode_LoadScript(mode);
     // Each script has a bank of its own
     mode->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_LOCAL_TVT_TALK + scriptId, mode->heapId);

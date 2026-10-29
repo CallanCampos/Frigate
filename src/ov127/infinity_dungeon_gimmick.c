@@ -1,5 +1,6 @@
 #include "field/infinity_dungeon_gimmick.h"
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/version.h"
 #include "constants/zones.h"
@@ -40,9 +41,6 @@ enum {
     OBJECT_MACHINE_B,
     OBJECT_LIFT,
 };
-
-// The archive of the models
-#define ARC_INFINITY_DUNGEON 0x104
 
 // The kind of a door event that opens the door, where any other closes it
 #define DOOR_OPEN 1
@@ -136,17 +134,17 @@ static const G3DSceneActorSetup sBlackActors[4] = {
 
 // clang-format off
 static const G3DSceneResourceSetup sBlackResources[9] = {
-    { ARC_INFINITY_DUNGEON, 0, 0, 0 }, { ARC_INFINITY_DUNGEON, 1, 0, 0 },  { ARC_INFINITY_DUNGEON, 2, 0, 0 },
-    { ARC_INFINITY_DUNGEON, 3, 0, 0 }, { ARC_INFINITY_DUNGEON, 4, 0, 0 },  { ARC_INFINITY_DUNGEON, 5, 0, 0 },
-    { ARC_INFINITY_DUNGEON, 12, 0, 0 }, { ARC_INFINITY_DUNGEON, 13, 0, 0 }, { 0, 0, 0, 0 },
+    { ARCID_INFINITY_DUNGEON, 0, 0, 0 }, { ARCID_INFINITY_DUNGEON, 1, 0, 0 },  { ARCID_INFINITY_DUNGEON, 2, 0, 0 },
+    { ARCID_INFINITY_DUNGEON, 3, 0, 0 }, { ARCID_INFINITY_DUNGEON, 4, 0, 0 },  { ARCID_INFINITY_DUNGEON, 5, 0, 0 },
+    { ARCID_INFINITY_DUNGEON, 12, 0, 0 }, { ARCID_INFINITY_DUNGEON, 13, 0, 0 }, { 0, 0, 0, 0 },
 };
 
 // clang-format on
 
 static const G3DSceneResourceSetup sWhiteResources[9] = {
-    { ARC_INFINITY_DUNGEON, 6, 0, 0 },  { ARC_INFINITY_DUNGEON, 7, 0, 0 },  { ARC_INFINITY_DUNGEON, 8, 0, 0 },
-    { ARC_INFINITY_DUNGEON, 9, 0, 0 },  { ARC_INFINITY_DUNGEON, 10, 0, 0 }, { ARC_INFINITY_DUNGEON, 11, 0, 0 },
-    { ARC_INFINITY_DUNGEON, 14, 0, 0 }, { ARC_INFINITY_DUNGEON, 15, 0, 0 }, { ARC_INFINITY_DUNGEON, 16, 0, 0 },
+    { ARCID_INFINITY_DUNGEON, 6, 0, 0 },  { ARCID_INFINITY_DUNGEON, 7, 0, 0 },  { ARCID_INFINITY_DUNGEON, 8, 0, 0 },
+    { ARCID_INFINITY_DUNGEON, 9, 0, 0 },  { ARCID_INFINITY_DUNGEON, 10, 0, 0 }, { ARCID_INFINITY_DUNGEON, 11, 0, 0 },
+    { ARCID_INFINITY_DUNGEON, 14, 0, 0 }, { ARCID_INFINITY_DUNGEON, 15, 0, 0 }, { ARCID_INFINITY_DUNGEON, 16, 0, 0 },
 };
 
 // The props of a room's walls, for its north, south, east and west passages. In the ROM they lie after the placements,

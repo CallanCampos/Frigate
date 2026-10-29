@@ -1,5 +1,6 @@
 #include "app/comm_tvt/camera_system.h"
 #include "types.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
 #include "gfl/net.h"
@@ -17,8 +18,6 @@
 // The NDMA channel that receives the frames
 #define CAMERA_NDMA_NO 1
 
-// The sounds in the archive
-#define ARC_CAMERA_SOUND 209
 enum {
     CAMERA_SOUND_SHUTTER,
     CAMERA_SOUND_VIDEO_START,
@@ -247,9 +246,9 @@ static void CameraSystem_LoadSound(CameraSystem *sys, BOOL start) {
     u16 file = start == TRUE ? CAMERA_SOUND_VIDEO_START : CAMERA_SOUND_VIDEO_END;
 
     CameraSystem_FreeSound(sys);
-    sys->soundSize = GFL_ArcSysGetDataLength(ARC_CAMERA_SOUND, file);
+    sys->soundSize = GFL_ArcSysGetDataLength(ARCID_CAMERA_SOUND, file);
     sys->soundData = allocConfigDSSoftwareFeature(sys->heapId, sys->soundSize, "camera_system.c", 359);
-    GFL_ArcSysRead(sys->soundData, ARC_CAMERA_SOUND, file);
+    GFL_ArcSysRead(sys->soundData, ARCID_CAMERA_SOUND, file);
     DC_FlushRange(sys->soundData, sys->soundSize);
 }
 
@@ -262,9 +261,9 @@ static void CameraSystem_FreeSound(CameraSystem *sys) {
 
 static void CameraSystem_LoadShutterSound(CameraSystem *sys) {
     CameraSystem_FreeSound(sys);
-    sys->soundSize = GFL_ArcSysGetDataLength(ARC_CAMERA_SOUND, CAMERA_SOUND_SHUTTER);
+    sys->soundSize = GFL_ArcSysGetDataLength(ARCID_CAMERA_SOUND, CAMERA_SOUND_SHUTTER);
     sys->soundData = allocConfigDSSoftwareFeature(sys->heapId, sys->soundSize, "camera_system.c", 381);
-    GFL_ArcSysRead(sys->soundData, ARC_CAMERA_SOUND, CAMERA_SOUND_SHUTTER);
+    GFL_ArcSysRead(sys->soundData, ARCID_CAMERA_SOUND, CAMERA_SOUND_SHUTTER);
     DC_FlushRange(sys->soundData, sys->soundSize);
 }
 

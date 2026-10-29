@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -29,9 +30,6 @@
 #define GIMMICK_STATE_ID 6
 
 #define ZONE_488 488
-
-// The archive of the rides' curves and the gym's models
-#define ARC_GYM_INSECT 135
 
 #define FLAG_OBJECT_0 0x109
 
@@ -139,8 +137,8 @@ static const u8 sObjectPositions[OBJECT_COUNT][3] = { { 8, 0, 4 }, { 25, 20, 15 
 static const G3DSceneAnimationSetup sObjectAnimations[] = { { 1, 0 }, { 2, 0 }, { 3, 0 } };
 
 static const G3DSceneResourceSetup sResources[] = {
-    { ARC_GYM_INSECT, 8, 0 },  { ARC_GYM_INSECT, 9, 0 },  { ARC_GYM_INSECT, 10, 0 }, { ARC_GYM_INSECT, 11, 0 },
-    { ARC_GYM_INSECT, 12, 0 }, { ARC_GYM_INSECT, 13, 0 }, { ARC_GYM_INSECT, 14, 0 },
+    { ARCID_GYM_INSECT, 8, 0 },  { ARCID_GYM_INSECT, 9, 0 },  { ARCID_GYM_INSECT, 10, 0 }, { ARCID_GYM_INSECT, 11, 0 },
+    { ARCID_GYM_INSECT, 12, 0 }, { ARCID_GYM_INSECT, 13, 0 }, { ARCID_GYM_INSECT, 14, 0 },
 };
 
 static const G3DSceneActorSetup sActors[] = {
@@ -432,7 +430,7 @@ static s16 GymInsect_GetRideSpeedParam(RideWork *ride) {
 }
 
 static void GymInsect_StartRide(GymInsectWork *wk, RideWork *ride) {
-    ride->curve = GFL_G3DCurveLoadFileAll(wk->tailHeapId, ARC_GYM_INSECT, ride->entry->curveFile);
+    ride->curve = GFL_G3DCurveLoadFileAll(wk->tailHeapId, ARCID_GYM_INSECT, ride->entry->curveFile);
     ride->frameCount = GFL_G3DCurveGetFrameCount(ride->curve);
     if (ride->entry->reverse) {
         ride->step = -1;
