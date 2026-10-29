@@ -519,7 +519,11 @@ class ShellVerificationTests(GitFixture):
         for name in ('sync_upstream.sh', 'upstream_sync.py'):
             self.write('port/tools/' + name, (MODULE.parent / name).read_text())
         self.write('.gitignore', 'orig/\nbuild/\n*.sha1\n')
-        self.write('configure.py', 'import os, sys\nsys.exit(int(os.environ.get("CONFIGURE_FAIL", "0")))\n')
+        self.write('configure.py', '''import os, signal, sys
+if os.environ.get('CONFIGURE_SIGNAL'):
+    os.kill(os.getppid(), getattr(signal, os.environ['CONFIGURE_SIGNAL']))
+sys.exit(int(os.environ.get('CONFIGURE_FAIL', '0')))
+''')
         self.write('port/CMakeLists.txt', '# fixture\n')
         self.git('add', '.')
         self.git('commit', '-m', 'Verification fixtures')
@@ -533,7 +537,7 @@ class ShellVerificationTests(GitFixture):
         self.addCleanup(lambda: __import__('shutil').rmtree(bins))
         for name in ('ninja', 'cmake', 'ctest', 'sha1sum'):
             target = bins / name
-            target.write_text('#!/bin/sh\nexit 0\n')
+            target.write_text('#!/bin/sh\nexit "${' + name.upper() + '_FAIL:-0}"\n')
             target.chmod(0o755)
         target = bins / 'gh'
         target.write_text('''#!/bin/sh
@@ -546,7 +550,10 @@ case "$1 $2" in
     fi
     touch "$GH_COUNT"
     ;;
-  "api --method") printf '%s\n' "$*" >> "$GH_LOG" ;;
+  "api --method")
+    printf '%s\n' "$*" >> "$GH_LOG"
+    case "$*" in *state=failure*) exit "${GH_FAILURE_POST_FAIL:-0}" ;; esac
+    ;;
 esac
 ''')
         target.chmod(0o755)
@@ -558,14 +565,65 @@ esac
         return subprocess.run(['bash', 'port/tools/sync_upstream.sh', '--verify-pr', '123'],
                               cwd=self.root, env=environment, text=True, capture_output=True)
 
-    def test_shell_build_failure_leaves_pending(self):
+    def test_shell_build_failure_records_failure(self):
         bins, environment = self.fixture()
         environment['CONFIGURE_FAIL'] = '1'
         result = self.verify(environment)
         self.assertNotEqual(result.returncode, 0)
         log = (bins / 'log').read_text()
         self.assertIn('state=pending', log)
+        self.assertIn('state=failure', log)
         self.assertNotIn('state=success', log)
+
+    def test_shell_host_test_failure_records_failure(self):
+        bins, environment = self.fixture()
+        environment['CTEST_FAIL'] = '7'
+        result = self.verify(environment)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn('host tests failed', result.stderr)
+        log = (bins / 'log').read_text()
+        self.assertIn('state=pending', log)
+        self.assertIn('state=failure', log)
+        self.assertNotIn('state=success', log)
+
+    def test_shell_failure_status_upload_preserves_original_failure(self):
+        bins, environment = self.fixture()
+        environment.update(CONFIGURE_FAIL='1', GH_FAILURE_POST_FAIL='77')
+        result = self.verify(environment)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn('status may remain pending', result.stderr)
+        self.assertNotIn('state=success', (bins / 'log').read_text())
+
+    def test_shell_interrupt_records_failure(self):
+        bins, environment = self.fixture()
+        environment['CONFIGURE_SIGNAL'] = 'SIGINT'
+        result = self.verify(environment)
+        self.assertEqual(result.returncode, 130, result.stdout + result.stderr)
+        log = (bins / 'log').read_text()
+        self.assertIn('state=failure', log)
+        self.assertIn('exit 130', log)
+        self.assertNotIn('state=success', log)
+
+    def test_shell_termination_records_failure(self):
+        bins, environment = self.fixture()
+        environment['CONFIGURE_SIGNAL'] = 'SIGTERM'
+        result = self.verify(environment)
+        self.assertEqual(result.returncode, 143, result.stdout + result.stderr)
+        log = (bins / 'log').read_text()
+        self.assertIn('state=failure', log)
+        self.assertIn('exit 143', log)
+        self.assertNotIn('state=success', log)
+
+    def test_shell_success_is_not_overwritten_by_exit_trap(self):
+        bins, environment = self.fixture()
+        result = self.verify(environment)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        log = (bins / 'log').read_text()
+        self.assertIn('state=pending', log)
+        self.assertIn('state=success', log)
+        self.assertNotIn('state=failure', log)
+        self.assertEqual(len(log.splitlines()), 2)
+        self.assertIn('state=success', log.splitlines()[-1])
 
     def test_shell_remote_head_change_refuses_success(self):
         bins, environment = self.fixture()
@@ -573,7 +631,12 @@ esac
         result = self.verify(environment)
         self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn('PR head changed', result.stderr)
-        self.assertNotIn('state=success', (bins / 'log').read_text())
+        log = (bins / 'log').read_text()
+        self.assertIn('state=failure', log)
+        self.assertNotIn('state=success', log)
+        target = 'repos/CallanCampos/Frigate/statuses/' + self.git('rev-parse', 'HEAD')
+        self.assertEqual(len(log.splitlines()), 2)
+        self.assertTrue(all(target in line for line in log.splitlines()))
 
     def test_shell_untracked_source_refused(self):
         bins, environment = self.fixture()

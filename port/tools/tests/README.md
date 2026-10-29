@@ -19,3 +19,7 @@ and conflict filenames containing blank lines, backticks and terminal controls. 
 
 Mixed resource/C diff fixtures also verify that non-UTF-8 resource bytes cannot crash the inherited style checker,
 while newly added C violations still fail strict checking.
+
+Shell-verifier controls cover build/test failures, caught interrupts/termination, a changed PR head, unsuccessful
+failure-status uploads and successful completion. They require failed runs to stay failed while reporting the
+result on the pinned commit; only completed validation may leave a successful local-verification status.
