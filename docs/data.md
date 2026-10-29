@@ -1067,7 +1067,7 @@ events.
 The menus, apps and screens keep their 2D graphics in archives of Nitro resources, an archive each: the title screen's,
 the Pokédex's (`ARCID_POKEDEX_GRA`), the box's (`ARCID_BOX2`) and the others. Each is `res/graphics/<archive>/`, named
 after its `ARCID_*` constant in `include/constants/arc.h`, whose number gives the archive's file (`ARCID_TITLE`, 26, is
-`a/0/2/6`); `configure.py` packs a directory for each, 110 of them. An archive that swan doesn't name is named after
+`a/0/2/6`); `configure.py` packs a directory for each, 111 of them. An archive that swan doesn't name is named after
 the source file that loads it, or the prefix of an app's files where several load it (`ARCID_BTLV` for the
 `btlv_*.c` files), in the block at the end of `arc.h` with its loaders. Twelve archives with graphics, `a/0/0/0`,
 `a/0/0/1`, `a/0/3/5`, `a/0/4/3`, `a/0/5/4`, `a/0/5/5`, `a/0/6/4`, `a/0/6/7`, `a/1/2/1`, `a/1/4/0`, `a/1/4/1` and
@@ -1154,9 +1154,14 @@ added or a range extended. A changed pixel, width or advance, a new glyph and a 
 reads them, and all five fonts pack byte for byte in both versions. A font that the converter doesn't read, or wouldn't
 build again byte for byte, stays its `.nftr` file, as `dump` says.
 
-A movie's frames are direct color bitmaps, 15-bit color with bit 15 set where the pixel shows, as
-`cdemo_control.c` plays the Game Freak logo (`res/demo/cdemo_gflogo/`) and the opening (`res/demo/cdemo_openingsw/`):
-an archive whose `archive.json` has `"direct_color": [256, 256]` keeps each 256 by 256 frame as an RGBA PNG, each
-color's five bits widened to eight and alpha 255 where the pixel shows, 0 where it doesn't. Edit a frame as any
-image: the packer keeps each channel's top five bits and shows the pixels whose alpha is 128 or more. `dump ARCID_X
-res/demo --direct-color 256x256` writes such an archive.
+A movie is an animated PNG, `movie.png`, as `cdemo_control.c` plays the Game Freak logo (`res/demo/cdemo_gflogo/`) and
+the opening (`res/demo/cdemo_openingsw/`, a movie in each version's directory): its frames are the archive's first
+members, direct color bitmaps, 15-bit color with bit 15 set where the pixel shows, which the PNG keeps as RGBA, each
+color's five bits widened to eight and alpha 255 where the pixel shows, 0 where it doesn't. It plays at the game's 15
+frames a second in a browser or an image viewer, and an APNG editor, or `ffmpeg`, edits it; the packer composes the
+frames as a viewer shows them, keeps each channel's top five bits and shows the pixels whose alpha is 128 or more, so an
+unchanged frame packs as the game's own and an edited one changes only its member. `archive.json`'s `"movie"` gives the
+frames' size (256 by 256, of which the game shows the top 192 rows), how many the archive had and their compression; the
+members after them are numbered files from there (`626.bin`). The game plays as many frames as `cdemo_control.c`'s
+`CDEMO_MOVIES` says, so a movie with more or fewer needs its count changed there too. `dump ARCID_X res/demo --movie
+256x256` writes such an archive.
