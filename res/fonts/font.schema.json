@@ -1,0 +1,59 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A font: res/fonts/<archive>/<font>/font.json",
+    "description": "A font of ARCID_FONT (a/0/2/3), in Nitro's font format, which gf_font.c reads: its metrics, its character maps and its glyphs, whose pixels are the cells of glyphs.png beside it. tools/data/nitro_font.py builds the font from them for tools/data/graphics_archive.py, computing the blocks' offsets and sizes, the maps' contents and the widths block.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "fontType", "lineFeed", "alterCharIndex", "defaultLeft", "defaultGlyphWidth", "defaultCharWidth", "encoding",
+                  "cellWidth", "cellHeight", "baseline", "maxCharWidth", "bpp", "flags", "maps", "glyphs" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "fontType": { "$ref": "#/$defs/u8", "description": "The font information's (FINF) type of font: 0 for a glyph font" },
+        "lineFeed": { "$ref": "#/$defs/u8", "description": "The height of a line, which the game gives as every glyph's height (GFL_FontGetCharHeight)" },
+        "alterCharIndex": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "The glyph for a character the font doesn't have, in the format; the game draws '?' instead" },
+        "defaultLeft": { "$ref": "#/$defs/u8", "description": "The format's default left offset" },
+        "defaultGlyphWidth": { "$ref": "#/$defs/u8", "description": "The format's default glyph width" },
+        "defaultCharWidth": { "$ref": "#/$defs/u8", "description": "The default advance, which a font loaded with fixed widths gives every glyph (GFL_FontGetCharWidthFixed), and the widths block gives a glyph it doesn't hold" },
+        "encoding": { "enum": [ "UTF-8", "UTF-16", "Shift-JIS", "CP1252" ], "description": "The characters' encoding" },
+        "cellWidth": { "$ref": "#/$defs/u8", "description": "The glyph cells' width in pixels, a cell of glyphs.png" },
+        "cellHeight": { "$ref": "#/$defs/u8", "description": "The glyph cells' height in pixels" },
+        "baseline": { "type": "integer", "minimum": -128, "maximum": 127, "description": "The baseline, from the cell's top" },
+        "maxCharWidth": { "$ref": "#/$defs/u8", "description": "The widest advance, as the format records it; the game doesn't read it" },
+        "bpp": { "enum": [ 1, 2, 4 ], "description": "Bits a pixel; the game draws 2" },
+        "flags": { "$ref": "#/$defs/u8", "description": "The glyphs' flags (rotation), 0 in the game's fonts" },
+        "classPadding": {
+            "type": "array", "items": { "$ref": "#/$defs/u8" }, "maxItems": 3,
+            "description": "The bytes after the last glyph's class in the widths block, up to its hash table, where they aren't zeros: as the game's fonts have them"
+        },
+        "maps": {
+            "type": "array", "minItems": 1,
+            "description": "The character maps (CMAP), in the order the game searches them; each takes the glyphs of its range's characters that no earlier map's range holds",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "method", "first", "last" ],
+                "properties": {
+                    "method": { "enum": [ "direct", "table", "scan" ], "description": "direct: the range's characters are its first's glyph and those after it; table: a glyph for each character of the range; scan: pairs of a character and its glyph, in order" },
+                    "first": { "$ref": "#/$defs/code", "description": "The range's first character" },
+                    "last": { "$ref": "#/$defs/code", "description": "The range's last character" }
+                }
+            }
+        },
+        "glyphs": {
+            "type": "array",
+            "description": "The glyphs, in the order of glyphs.png's cells; each starts its cell with its left offset, width and advance, as GFL_FontGlyphCopy reads them",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "left", "width", "advance" ],
+                "properties": {
+                    "char": { "type": "string", "description": "The character the glyph draws" },
+                    "code": { "$ref": "#/$defs/code", "description": "Its code, where the character doesn't print; the character must be the code's where both are given" },
+                    "left": { "$ref": "#/$defs/u8", "description": "Where the glyph's pixels start, from the pen" },
+                    "width": { "$ref": "#/$defs/u8", "description": "The width of the glyph's pixels" },
+                    "advance": { "$ref": "#/$defs/u8", "description": "How far the pen moves after the glyph (GFL_FontGetCharWidth)" }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "u8": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "code": { "type": "string", "pattern": "^U\\+[0-9A-F]{4}$" }
+    }
+}
