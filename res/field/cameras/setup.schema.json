@@ -1,0 +1,30 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A field camera setup: res/field/cameras/setups/<n>.json",
+    "description": "Camera setup n of ARCID_FIELD_CAMERA_DEFAULT (a/0/5/9), which a zone names by its \"camera\" and FieldCamera_CoordsLoadDefaults applies. tools/data/field_camera_data.py packs them in order.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "distance", "pitch", "yaw", "fov", "z_near", "z_far", "buffer_mode", "bind", "target", "unkC", "unk10" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "distance": { "type": "integer", "minimum": -524288, "maximum": 524287, "description": "The camera's distance from its target, in whole units" },
+        "pitch": { "$ref": "#/$defs/angle" },
+        "yaw": { "$ref": "#/$defs/angle" },
+        "fov": { "$ref": "#/$defs/angle", "description": "Half the field of view of a perspective camera, in 65536ths of a turn" },
+        "z_near": { "$ref": "#/$defs/fx32", "description": "The near clipping plane" },
+        "z_far": { "$ref": "#/$defs/fx32", "description": "The far clipping plane" },
+        "buffer_mode": { "enum": [ "z", "w" ], "description": "The depth buffer's mode, GX_BUFFERMODE_Z or GX_BUFFERMODE_W" },
+        "bind": { "type": "boolean", "description": "Whether the camera follows what it is bound to (the player), at target from it, or looks at target" },
+        "target": {
+            "type": "object", "additionalProperties": false, "required": [ "x", "y", "z" ],
+            "description": "With bind, the target's offset from what the camera follows; without, the target",
+            "properties": { "x": { "$ref": "#/$defs/fx32" }, "y": { "$ref": "#/$defs/fx32" }, "z": { "$ref": "#/$defs/fx32" } }
+        },
+        "unkC": { "type": "integer", "minimum": 0, "maximum": 4294967295, "description": "Not read by the code" },
+        "unk10": { "type": "integer", "minimum": 0, "maximum": 255, "description": "Not read by the code" }
+    },
+    "$defs": {
+        "angle": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "An angle in 65536ths of a turn" },
+        "fx32": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647, "description": "In 4096ths of a unit, as the game's fixed-point numbers" }
+    }
+}

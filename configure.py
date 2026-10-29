@@ -311,6 +311,8 @@ DATA_PACKS = [
     ("tools/data/map_texture_data.py", "res/field/props/interior/textures", ["a/1/7/5"], True),
     ("tools/data/area_data.py", "res/field/areas", ["a/0/1/3"], False),  # Areas, a file of records rather than an archive
     ("tools/data/light_data.py", "res/lighting", ["a/0/6/0", "a/0/6/1"], False),  # Field and battle lighting
+    # The field camera's setups, the zones' camera boundaries and the entrance cameras
+    ("tools/data/field_camera_data.py", "res/field/cameras", ["a/0/5/9", "a/1/0/9", "a/1/7/7"], False),
     # The town map's places, whose texts are messages of town_map.txt
     ("tools/data/town_map_data.py", "res/town_map", ["a/0/8/5"], True, ["res/text/system/town_map.txt"]),
     # The battle facilities' trainers and Pokémon; the Battle Subway's are also the Trial House's

@@ -1,0 +1,22 @@
+{
+    "$schema": "../entrance.schema.json",
+    "pitch": 60407,
+    "yaw": 0,
+    "distance": 128,
+    "use_target": false,
+    "target": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+    },
+    "offset": {
+        "x": 0,
+        "y": 120,
+        "z": -34
+    },
+    "frames": 0,
+    "departure_animation": true,
+    "arrival_animation": false,
+    "release_bind": true,
+    "disable_boundary": true
+}
