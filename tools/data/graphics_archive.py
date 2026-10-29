@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Dump and pack the archives of Nitro resources: the screens, windows, icons and sprites of the game's menus and apps,
-the 3D models of its demos, gimmicks and effects, and its fonts.
+the 3D models of its demos, gimmicks and effects, its fonts and its particle effects.
 
     graphics_archive.py dump ARCID_TITLE            # writes res/graphics/title/ from both versions' archives
     graphics_archive.py dump ARCID_X res/demo       # or under another of the archive roots (ARCHIVE_ROOTS)
@@ -36,6 +36,13 @@ narc_intro.txt does:
   methods, and each glyph's character, left offset, width and advance. The packer computes the rest; a new glyph is an
   entry at the end of the glyphs and the next cell, which the map whose range holds its character takes. A font that
   nitro_font.py doesn't read, or wouldn't build again byte for byte, stays its .nftr file, as dump says.
+- a particle resource (SPA) is a directory named as the member is, `000/`, which nitro_particles.py dumps and builds:
+  particles.json (res/particles/particles.schema.json), the emitters' fields under lib/spl's names, each with the
+  animation, child and behavior blocks it has, and the textures' formats, and a PNG of each texture, texture00.png and
+  on, as its format shows it. An unchanged texture packs as the game's bytes, an edited one encoded again in its
+  format and palette; the packer computes the counts, sizes, offsets and flags of the blocks there are, so emitters may
+  be added and removed. A resource that nitro_particles.py doesn't read, or wouldn't build again byte for byte, stays
+  its .spa file, as dump says.
 - a movie's frames, which the archive starts with, are one animated PNG, movie.png, of RGBA frames: direct color
   bitmaps (RGB555, bit 15 set where a pixel shows) with each channel's five bits widened to eight and alpha 255 where
   a pixel shows, 0 where it doesn't. archive.json's "movie" gives the frames' size, how many the archive had and their
@@ -44,7 +51,7 @@ narc_intro.txt does:
   bits, and it shows where alpha is at least 128.
 - anything else is the member itself, decompressed, named by its kind: `.nscr` (screens), `.ncer` (cells), `.nanr`
   (cell animations), `.nmcr`/`.nmar` (multi-cells), `.nsbca`/`.nsbta`/`.nsbma`/`.nsbtp`/`.nsbva` (3D animations),
-  `.nftr` (fonts), or `.bin`.
+  `.nftr` (fonts), `.spa` (particle resources), or `.bin`.
 
 archive.json, where there is one, lists the members the game stores LZ-compressed, `{"compressed": {"03.nscr": "lz10"}}`;
 the packer compresses them again, an edited one as a valid stream of literals that is an eighth larger than its data.
@@ -77,6 +84,7 @@ from tools.data.nitro_2d import (bitmap_pixels, compress_literals, decompress, p
                                  palette_resource, pixels_bitmap, read_indexed_png, read_palette, read_rgba_apng,
                                  write_indexed_png, write_palette, write_rgba_apng)
 from tools.data.nitro_font import FontError, build_font_directory, export_font  # noqa: E402
+from tools.data.nitro_particles import ParticleError, build_directory as build_particles, export_particles  # noqa: E402
 from field_prop_model_data import edit_model, glb_fields  # noqa: E402
 from map_model_data import (canonical_texture_name, dictionary_offsets, model_name, pairing_entries, u32,  # noqa: E402
                             write_glb)
@@ -93,7 +101,8 @@ ARCHIVE_ROOTS = [GRAPHICS, ROOT / "res" / "demo", ROOT / "res" / "field" / "gimm
 VERSIONS = {"black2": "b2_us", "white2": "w2_us"}
 EXTENSIONS = {b"RGCN": ".png", b"RLCN": ".pal", b"RCSN": ".nscr", b"RECN": ".ncer", b"RNAN": ".nanr",
               b"RCMN": ".nmcr", b"RAMN": ".nmar", b"BMD0": ".nsbmd", b"BCA0": ".nsbca", b"BTA0": ".nsbta",
-              b"BMA0": ".nsbma", b"BTP0": ".nsbtp", b"BTX0": ".nsbtx", b"BVA0": ".nsbva", b"RTFN": ".nftr"}
+              b"BMA0": ".nsbma", b"BTP0": ".nsbtp", b"BTX0": ".nsbtx", b"BVA0": ".nsbva", b"RTFN": ".nftr",
+              b" APS": ".spa"}
 LZ = {0x10: "lz10", 0x11: "lz11"}
 
 
@@ -136,7 +145,8 @@ def directory_archive(directory: Path) -> str:
 
 KIND_EXTENSIONS = {"NCGR": ".png", "NCLR": ".pal", "NSCR": ".nscr", "NCER": ".ncer", "NANR": ".nanr", "NMCR": ".nmcr",
                    "NMAR": ".nmar", "BIN": ".bin", "NSBMD": ".nsbmd", "NSBCA": ".nsbca", "NSBTA": ".nsbta",
-                   "NSBMA": ".nsbma", "NSBTP": ".nsbtp", "NSBTX": ".nsbtx", "NSBVA": ".nsbva", "NFTR": ".nftr"}
+                   "NSBMA": ".nsbma", "NSBTP": ".nsbtp", "NSBTX": ".nsbtx", "NSBVA": ".nsbva", "NFTR": ".nftr",
+                   "SPA": ".spa"}
 
 
 def member_names(directory: Path) -> dict[int, str]:
@@ -566,10 +576,11 @@ def dump(arcid: str, root: Path = GRAPHICS, movie: tuple[int, int] | None = None
             members = [content for content, _ in games["black2" if sub != "white2/" else "white2"]]
             (directory / sub).mkdir(exist_ok=True)
             file_name, converted = name, False
-            if data[:4] in (b"BMD0", b"BTX0", b"RTFN"):
+            if data[:4] in (b"BMD0", b"BTX0", b"RTFN", b" APS"):
                 problem = export_model(directory / sub / name, data, apicula) if data[:4] == b"BMD0" else \
                     export_textures(directory / sub / name, data) if data[:4] == b"BTX0" else \
-                    export_font(directory / sub / name, data)
+                    export_font(directory / sub / name, data) if data[:4] == b"RTFN" else \
+                    export_particles(directory / sub / name, data)
                 converted = problem is None
                 if problem is not None:
                     print(f"{path}: member {index} stays a Nitro file: {problem}")
@@ -590,7 +601,8 @@ def dump(arcid: str, root: Path = GRAPHICS, movie: tuple[int, int] | None = None
 def member_files(directory: Path, game: str, first: int = 0) -> list[tuple[str, Path]]:
     """Returns an archive's members, (name, file), in order: numbered files, or named ones at their constants'
     numbers, each from the version's directory where it has one, from first, the number after a movie's frames. A
-    member's file is a directory where it is a model, a texture set or a font, named without an extension."""
+    member's file is a directory where it is a model, a texture set, a font or a particle resource, named without an
+    extension."""
     files = {}
     for folder in (directory, directory / game):
         for path in folder.iterdir() if folder.is_dir() else []:
@@ -599,7 +611,7 @@ def member_files(directory: Path, game: str, first: int = 0) -> list[tuple[str, 
                 files[path.name] = path
     names = {name: number for number, name in member_names(directory).items()}
     names |= {name.split(".")[0]: number for name, number in names.copy().items()
-              if name.endswith((".nsbmd", ".nsbtx", ".nftr"))}
+              if name.endswith((".nsbmd", ".nsbtx", ".nftr", ".spa"))}
     numbered = {}
     for file_name, path in files.items():
         stem = file_name.split(".")[0]
@@ -623,12 +635,14 @@ def build_member(path: Path, original: bytes | None) -> bytes:
     if path.is_dir():
         if (path / "font.json").exists():
             return build_font_directory(path)
+        if (path / "particles.json").exists():
+            return build_particles(path, original if original is not None and original[:4] == b" APS" else None)
         if original is not None and original[:4] == b"BMD0":
             return build_model(path, original)
         if original is not None and original[:4] == b"BTX0":
             return pack_textures(original, path, str(path))
-        raise GraphicsError(f"{path}: a directory, which only the game's models and texture sets and fonts are; add a "
-                            "new model or texture set as its .nsbmd or .nsbtx file")
+        raise GraphicsError(f"{path}: a directory, which only the game's models, texture sets, fonts and particle "
+                            "resources are; add a new model or texture set as its .nsbmd or .nsbtx file")
     if path.suffix == ".png":
         return build_characters(path, original if original and original[:4] == b"RGCN" else None)
     if path.suffix == ".pal":
@@ -688,7 +702,7 @@ def main():
             pack(Path(sys.argv[2]), sys.argv[3], Path(sys.argv[4]))
         else:
             raise SystemExit(__doc__)
-    except (GraphicsError, DataError, FontError, ValueError) as error:
+    except (GraphicsError, DataError, FontError, ParticleError, ValueError) as error:
         raise SystemExit(f"error: {error}") from None
 
 

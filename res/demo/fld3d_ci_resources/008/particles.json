@@ -1,0 +1,72 @@
+{
+    "$schema": "../../../particles/particles.schema.json",
+    "emitters": [
+        {
+            "emissionType": "circle_border",
+            "drawType": "billboard",
+            "emissionAxis": "z",
+            "hasRotation": true,
+            "randomInitAngle": false,
+            "autoTerminate": true,
+            "followEmitter": false,
+            "polygonRotAxis": "y",
+            "polygonReferencePlane": "xy",
+            "randomLoopOffset": false,
+            "drawChildrenFirst": false,
+            "hideParent": false,
+            "relativeToBasePos": false,
+            "fixedPolygonID": false,
+            "childFixedPolygonID": false,
+            "emitterBasePos": { "x": 0, "y": -3350, "z": -914 },
+            "emissionCount": 12288,
+            "radius": 0,
+            "length": 0,
+            "axis": { "x": 0, "y": 4096, "z": 0 },
+            "color": { "red": 31, "green": 31, "blue": 31 },
+            "initVelPositionAmplifier": 1218,
+            "initVelAxisAmplifier": 327,
+            "baseScale": 4096,
+            "aspectRatio": 4096,
+            "startDelay": 0,
+            "minRotation": 0,
+            "maxRotation": 2000,
+            "initAngle": 0,
+            "emitterLifeTime": 4,
+            "particleLifeTime": 32,
+            "scaleVariance": 51,
+            "lifeTimeVariance": 0,
+            "velocityVariance": 0,
+            "emissionInterval": 1,
+            "baseAlpha": 31,
+            "airResistance": 120,
+            "texture": "texture00",
+            "loopTime": 1,
+            "dirStretch": 0,
+            "textureRepeatShiftS": 0,
+            "textureRepeatShiftT": 0,
+            "scaleAnimDir": "xy",
+            "dirFromPosition": false,
+            "flipTextureS": false,
+            "flipTextureT": false,
+            "polygonX": 0,
+            "polygonY": 0,
+            "unused": { "unk4c": 917600 },
+            "scaleAnim": {
+                "start": 487,
+                "mid": 3411,
+                "end": 0,
+                "in": 50,
+                "out": 85,
+                "loop": false,
+                "unused": { "unk8": 15934, "padding": 56 }
+            },
+            "alphaAnim": { "start": 0, "mid": 31, "end": 0, "randomRange": 0, "loop": false, "in": 0, "out": 128 },
+            "gravityBehavior": {
+                "magnitude": { "x": 0, "y": -24, "z": 0 }
+            }
+        }
+    ],
+    "textures": [
+        { "name": "texture00", "format": "a3i5", "repeat": "none", "flip": "none", "palColor0": true }
+    ]
+}

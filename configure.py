@@ -348,7 +348,8 @@ DATA_PACK_TOOLS = ["tools/data/datajson.py", "tools/text/text_ids.py", "tools/da
 # The C files a packer reads its tables from, besides scrcmd_shop.c
 DATA_PACK_SOURCES = {"tools/data/pokemon_graphics.py": ["src/system/poke_icon.c"],
                      "tools/data/pokemon_cries.py": ["src/system/poke_icon.c"],
-                     "tools/data/graphics_archive.py": ["res/fonts/font.schema.json"]}
+                     "tools/data/graphics_archive.py": ["res/fonts/font.schema.json",
+                                                        "res/particles/particles.schema.json"]}
 
 
 def script_imports(script: str) -> list[str]:

@@ -1087,10 +1087,12 @@ after their constant where `generated/narc_<archive>.txt` names them (`professor
   GLB's images show. A texture set (BTX0) is a directory of those PNGs alone. See below.
 - a font (NFTR) is a directory named as the member is (`00/`): `glyphs.png`, a sheet of its glyphs, and `font.json`,
   its metrics, character maps and glyphs' widths. See below.
+- a particle resource (SPA) is a directory named as the member is (`000/`): `particles.json`, its emitters' fields,
+  and a PNG of each texture. See below.
 - the rest are the members themselves, decompressed: screens (`.nscr`), which place the tiles, cells (`.ncer`), cell
   animations (`.nanr`), multi-cells (`.nmcr`, `.nmar`), 3D animations (`.nsbca`, `.nsbta`, `.nsbma`, `.nsbtp`,
-  `.nsbva`), as the field props keep theirs, a font that the converter doesn't take (`.nftr`), and other data
-  (`.bin`). Tools such as NitroPaint edit them.
+  `.nsbva`), as the field props keep theirs, a font or a particle resource that the converter doesn't take (`.nftr`,
+  `.spa`), and other data (`.bin`). Tools such as NitroPaint edit them.
 
 `archive.json` lists the members that the game stores LZ-compressed (`{"compressed": {"05.png": "lz10"}}`), which the
 packer compresses again: an edited one as a valid stream of literals, an eighth larger than its data. A member that
@@ -1106,7 +1108,9 @@ The same packer takes archives of other subjects, each in the directory for what
 `res/graphics/` for the menus and apps, `res/demo/` for the demos and cutscenes, `res/field/gimmicks/` and
 `res/field/effects/`, `res/particles/` and `res/fonts/`; `dump ARCID_X res/demo` writes one there. A name, like its
 `ARCID_*`, is in one of them only. `res/fonts/font/` is `ARCID_FONT` (`a/0/2/3`): the game's five fonts, `00/` to
-`04/`, and three palettes, the same in both versions.
+`04/`, and three palettes, the same in both versions. `res/particles/btlv_effvm_particles/` is
+`ARCID_BTLV_EFFVM_PARTICLES` (`a/0/0/6`), the particle effects of the battle's moves, which `btlv_effvm.c` loads, and of
+the intro, which `intro_particle.c` does: 739 resources, `000/` to `738/`, the same in both versions.
 
 A model's GLB and PNGs are edited and packed as the field props' are (see "Map model sources"), with the same
 converters. `dump` has [Apicula](https://github.com/scurest/apicula) convert each model, from `PATH` or `--apicula
@@ -1153,6 +1157,32 @@ cells where the sheet is full; every font ends in a `scan` map of every characte
 added or a range extended. A changed pixel, width or advance, a new glyph and a new map pack and read back as the game
 reads them, and all five fonts pack byte for byte in both versions. A font that the converter doesn't read, or wouldn't
 build again byte for byte, stays its `.nftr` file, as `dump` says.
+
+A particle resource is converted by `tools/data/nitro_particles.py`, which `dump` and `pack` call, from the format as
+NitroSystem's particle library reads it (`SPLManager_LoadResources` in `lib/spl/`). `particles.json`, which
+`res/particles/particles.schema.json` describes, has the emitters in order, which the game creates by their index
+(`SPLManager_CreateEmitter`), and the textures. An emitter has its header's fields (`SPLResourceHeader`) under
+`lib/spl`'s names, then the blocks that follow it where it has them, under the names of `SPLResource`'s pointers:
+`scaleAnim`, `colorAnim`, `alphaAnim`, `textureAnim`, `childResource` and the behaviors (`gravityBehavior` to
+`convergenceBehavior`); the packer sets the header's flags of the blocks from the blocks there are. Fixed-point fields
+are the integers the game keeps, in 4096ths, angles in 65536ths of a turn, and the animations run over a particle's
+life from 0 to 255, as the schema says for each; colors are `{red, green, blue}`, 0 to 31 each, the enumerations names
+(`"emissionType": "circle_border"`), and textures are named. A block's `unused` keeps the fields and bits that the
+library never reads but that the game's files don't leave zero (most emitters have some), so that they pack byte for
+byte. Each texture is a PNG named after it (`texture00.png`, in the resource's order), RGBA as its format shows it:
+A3I5 and A5I3, a palette's index and an alpha a pixel, are the formats of all but 23 of the resources' 2,843
+textures, and 4 and 16 colors the rest, which `map_texture_data.py` decodes as a field texture's; direct color is
+decoded too, and a texture
+of another format (4x4 compressed, which none is) is its data as it is (`texture00.bin`). An unchanged texture packs as
+the game's bytes, and an edited one is encoded again in its format and palette, which grows to the colors the PNG
+needs, up to its format's; its size is the PNG's, a power of two from 8 to 1024. The packer computes the rest: the
+counts, sizes and offsets, a texture animation's count, and the textures' headers but for their format, repeat, flip,
+color 0 and sharing. An emitter is added by adding its object to `emitters`, and the code creates it by its index; a
+changed field, an edited pixel, and an emitter added or removed pack and read back as the game reads them
+(`tools/data/test_nitro_particles.py`). Besides the 739 of `a/0/0/6`, 40 resources of ten archives of
+`res/graphics/` are directories too (`plist/`, `hall_of_fame_demo/` and others), and all of them pack byte for byte in
+both versions. A resource that the converter doesn't read, or wouldn't build again byte for byte, stays its `.spa`
+file, as `dump` says.
 
 A movie is an animated PNG, `movie.png`, as `cdemo_control.c` plays the Game Freak logo (`res/demo/cdemo_gflogo/`) and
 the opening (`res/demo/cdemo_openingsw/`, a movie in each version's directory): its frames are the archive's first

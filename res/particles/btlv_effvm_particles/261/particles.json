@@ -1,0 +1,77 @@
+{
+    "$schema": "../../particles.schema.json",
+    "emitters": [
+        {
+            "emissionType": "circle_border",
+            "drawType": "billboard",
+            "emissionAxis": "y",
+            "hasRotation": true,
+            "randomInitAngle": true,
+            "autoTerminate": true,
+            "followEmitter": false,
+            "polygonRotAxis": "y",
+            "polygonReferencePlane": "xy",
+            "randomLoopOffset": false,
+            "drawChildrenFirst": true,
+            "hideParent": false,
+            "relativeToBasePos": false,
+            "fixedPolygonID": false,
+            "childFixedPolygonID": false,
+            "emitterBasePos": { "x": 0, "y": 305, "z": 0 },
+            "emissionCount": 4096,
+            "radius": 5482,
+            "length": 0,
+            "axis": { "x": 0, "y": 4096, "z": 0 },
+            "color": { "red": 22, "green": 20, "blue": 1 },
+            "initVelPositionAmplifier": 914,
+            "initVelAxisAmplifier": 1751,
+            "baseScale": 614,
+            "aspectRatio": 4096,
+            "startDelay": 10,
+            "minRotation": 1339,
+            "maxRotation": 2558,
+            "initAngle": 0,
+            "emitterLifeTime": 50,
+            "particleLifeTime": 16,
+            "scaleVariance": 82,
+            "lifeTimeVariance": 20,
+            "velocityVariance": 0,
+            "emissionInterval": 1,
+            "baseAlpha": 31,
+            "airResistance": 101,
+            "texture": "texture00",
+            "loopTime": 1,
+            "dirStretch": 0,
+            "textureRepeatShiftS": 0,
+            "textureRepeatShiftT": 0,
+            "scaleAnimDir": "xy",
+            "dirFromPosition": false,
+            "flipTextureS": false,
+            "flipTextureT": false,
+            "polygonX": 0,
+            "polygonY": 0,
+            "colorAnim": {
+                "start": { "red": 15, "green": 17, "blue": 1 },
+                "end": { "red": 31, "green": 28, "blue": 13 },
+                "in": 60,
+                "peak": 128,
+                "out": 255,
+                "randomStart": true,
+                "loop": false,
+                "interpolate": true
+            },
+            "alphaAnim": { "start": 31, "mid": 31, "end": 9, "randomRange": 0, "loop": false, "in": 128, "out": 128 },
+            "gravityBehavior": {
+                "magnitude": { "x": 0, "y": -305, "z": 0 }
+            },
+            "randomBehavior": {
+                "magnitude": { "x": 122, "y": 122, "z": 122 },
+                "applyInterval": 1
+            },
+            "collisionPlaneBehavior": { "y": 0, "elasticity": 2457, "type": "bounce" }
+        }
+    ],
+    "textures": [
+        { "name": "texture00", "format": "a3i5", "repeat": "none", "flip": "none", "palColor0": true }
+    ]
+}
