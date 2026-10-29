@@ -16,8 +16,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_DEPOT_AGENT",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10333,
             "direction": "DIR_LEFT",
@@ -35,8 +35,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_WORK_00",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0265",
             "script": 2000,
             "direction": "DIR_DOWN",
@@ -54,8 +54,8 @@
         {
             "id": 2,
             "model": "OBJ_CODE_75",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 5,
             "direction": "DIR_DOWN",
@@ -73,8 +73,8 @@
         {
             "id": 3,
             "model": "OBJ_CODE_76",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 6,
             "direction": "DIR_DOWN",

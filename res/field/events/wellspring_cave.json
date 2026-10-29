@@ -146,8 +146,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_110",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0565",
             "script": 7281,
             "direction": "DIR_DOWN",
@@ -165,8 +165,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_110",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0569",
             "script": 7285,
             "direction": "DIR_DOWN",
@@ -184,8 +184,8 @@
         {
             "id": 2,
             "model": "OBJ_CODE_HIKER",
-            "movement": 14,
-            "type": 1,
+            "movement": "MOVE_CODE_FACE_UP",
+            "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3674,
             "direction": "DIR_UP",
@@ -203,8 +203,8 @@
         {
             "id": 3,
             "model": "OBJ_CODE_BATTLE_GIRL",
-            "movement": 20,
-            "type": 1,
+            "movement": "MOVE_CODE_WALK_BACK_AND_FORTH",
+            "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3675,
             "direction": "DIR_DOWN",

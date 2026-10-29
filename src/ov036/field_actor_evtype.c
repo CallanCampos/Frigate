@@ -62,9 +62,9 @@ static BOOL FieldActorMove_IsButtonBHeld(void);
 
 // The tables by event type, defined after the functions: there, MWCC's size sort lays the two 16-byte local
 // initializers of FieldActorMove_TurnLookAround out in the ROM's order
-static const ActorEvTypeInitFunc ACTOR_EVENTTYPE_FUNCS[21];
-static const ActorEvTypeFunc ACTOR_EVENTTYPE_CHECK_FUNCS[21];
-static const ActorEvTypeFunc ACTOR_EVENTTYPE_UPDATE_FUNCS[21];
+static const ActorEvTypeInitFunc ACTOR_EVENTTYPE_FUNCS[ACTOR_EVENT_TYPE_MAX];
+static const ActorEvTypeFunc ACTOR_EVENTTYPE_CHECK_FUNCS[ACTOR_EVENT_TYPE_MAX];
+static const ActorEvTypeFunc ACTOR_EVENTTYPE_UPDATE_FUNCS[ACTOR_EVENT_TYPE_MAX];
 
 void FieldActorMovecode_InitEventTypeProcThunk(FieldActor *actor) {
     ExecActorEvTypeFunction(actor);
@@ -187,7 +187,7 @@ static BOOL FieldActorMove_TurnLookAround(FieldActor *actor) {
         work->phase++;
     case SPIN_PHASE_WAIT:
         wait = 8;
-        if (GetActorEvType(actor) == 14 && FieldActorMove_IsButtonBHeld() == TRUE &&
+        if (GetActorEvType(actor) == ACTOR_EVENT_TYPE_LOOK_AROUND_DASH && FieldActorMove_IsButtonBHeld() == TRUE &&
             FldAct_IsNearPlayer(actor) == TRUE) {
             wait = 4;
         }
@@ -217,7 +217,8 @@ static void FieldActorMove_InitWalkRepeatSpin(FieldActor *actor) {
 
     work->limit = GetActorUserParam(actor, 1);
     evType = GetActorEvType(actor);
-    if (evType == 5 || evType == 20 || evType == 15) {
+    if (evType == ACTOR_EVENT_TYPE_TRAINER_SPIN_COUNTERCLOCKWISE || evType == ACTOR_EVENT_TYPE_SPIN_COUNTERCLOCKWISE ||
+        evType == ACTOR_EVENT_TYPE_SPIN_COUNTERCLOCKWISE_DASH) {
         variant = 0;
     }
     work->variant = variant;
@@ -286,8 +287,9 @@ static BOOL FieldActorMove_TurnSpin(FieldActor *actor) {
         {
             u16 evType = GetActorEvType(actor);
 
-            if ((evType == 15 || evType == 16) && FieldActorMove_IsButtonBHeld() == TRUE &&
-                FldAct_IsNearPlayer(actor) == TRUE) {
+            if ((evType == ACTOR_EVENT_TYPE_SPIN_COUNTERCLOCKWISE_DASH ||
+                 evType == ACTOR_EVENT_TYPE_SPIN_CLOCKWISE_DASH) &&
+                FieldActorMove_IsButtonBHeld() == TRUE && FldAct_IsNearPlayer(actor) == TRUE) {
                 wait = 4;
             }
         }

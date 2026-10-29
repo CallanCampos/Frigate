@@ -46,8 +46,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_110",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0468",
             "script": 7028,
             "direction": "DIR_DOWN",
@@ -65,8 +65,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_VETERAN_M",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 1,
             "direction": "DIR_DOWN",

@@ -5,8 +5,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_MODEL_BIGROCK2",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10000,
             "direction": "DIR_DOWN",

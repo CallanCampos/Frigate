@@ -47,7 +47,8 @@ static void (*sUpdateFuncs[2])(Field *field, FieldmapCtrlHybrid *controller) = {
 };
 
 // The player's actor on the grid, whose object code is filled in
-static ZoneNPC sGridPlayer = { 0xff, OBJ_CODE_HERO, 0, 0, 0, 0, 0, 0, 0, 0, 0xffff, 0xffff, FALSE };
+static ZoneNPC sGridPlayer = { 0xff,   OBJ_CODE_HERO, MOVE_CODE_NONE, ACTOR_EVENT_TYPE_NONE, 0, 0, 0, 0, 0, 0,
+                               0xffff, 0xffff,        FALSE };
 
 u32 FieldmapCtrlHybrid_GetActiveTypeID(FieldmapCtrlHybrid *controller) {
     return controller->activeType;

@@ -5,8 +5,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_F",
-            "movement": 13,
-            "type": 1,
+            "movement": "MOVE_CODE_TURN_RANDOM_DOWN_LEFT_RIGHT",
+            "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": "EVENT_FLAG_0x03d0",
             "script": 3437,
             "direction": "DIR_UP",

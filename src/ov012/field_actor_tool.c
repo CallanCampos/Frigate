@@ -73,7 +73,7 @@ BOOL FldAct_CanRunMoveProc(FieldActor *actor) {
         if (CheckActorMovementFlag(actor, 0x1800) == 0) {
             return TRUE;
         }
-        if (GetActorMoveCode(actor) == 0x32) {
+        if (GetActorMoveCode(actor) == MOVE_CODE_FOLLOW_PAIRED_TRAINER) {
             return TRUE;
         }
         flags = GetActorMovementFlags(actor);
@@ -862,7 +862,8 @@ BOOL FldAct_IsNearPlayer(FieldActor *actor) {
 void FldAct_StopAcmdWalkCodes(FieldActor *actor) {
     u16 moveCode = GetActorMoveCode(actor);
 
-    if (moveCode == 0x33 || moveCode == 0x34 || moveCode == 0x35 || moveCode == 0x36 || moveCode == 0x55) {
+    if (moveCode == MOVE_CODE_HIDE_33 || moveCode == MOVE_CODE_HIDE_34 || moveCode == MOVE_CODE_HIDE_35 ||
+        moveCode == MOVE_CODE_HIDE_36 || moveCode == MOVE_CODE_HIDE_LEAVES) {
         FldAct_CallMoveProc(actor);
     }
 }

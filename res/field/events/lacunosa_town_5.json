@@ -5,8 +5,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_PARASOL_LADY",
-            "movement": 3,
-            "type": 0,
+            "movement": "MOVE_CODE_WALK_RANDOM",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0312",
             "script": 2,
             "direction": "DIR_DOWN",
@@ -24,8 +24,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_110",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04d9",
             "script": 7141,
             "direction": "DIR_DOWN",
@@ -43,8 +43,8 @@
         {
             "id": 2,
             "model": "OBJ_CODE_CLERK_M_67",
-            "movement": 13,
-            "type": 0,
+            "movement": "MOVE_CODE_TURN_RANDOM_DOWN_LEFT_RIGHT",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0312",
             "script": 3,
             "direction": "DIR_DOWN",

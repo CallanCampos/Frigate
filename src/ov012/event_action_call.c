@@ -103,7 +103,7 @@ FieldActor *EventActionCall_FindActor(MMSys *mmSys, u16 actorId) {
     FieldActor *actor;
 
     if (actorId == 0xf2) {
-        actor = FindActorByMoveCode(mmSys, 0x30);
+        actor = FindActorByMoveCode(mmSys, MOVE_CODE_FOLLOW_PLAYER);
     } else if (actorId != 0xf1) {
         actor = FindFieldActor(mmSys, actorId);
     }

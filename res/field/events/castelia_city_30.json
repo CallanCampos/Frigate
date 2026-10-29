@@ -46,8 +46,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_SCIENTIST_F_46",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 4,
             "direction": "DIR_LEFT",
@@ -65,8 +65,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_SCHOOL_KID_F",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 5,
             "direction": "DIR_RIGHT",
@@ -84,8 +84,8 @@
         {
             "id": 2,
             "model": "OBJ_CODE_CLERK_F",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 1,
             "direction": "DIR_UP",

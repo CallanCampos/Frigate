@@ -3,6 +3,15 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-28: decode mixed resource diffs without weakening C checks
+
+- A NUL-free opaque resource can appear as text in Git's diff even when its bytes are not UTF-8. The opening archive's
+  `626.bin` exposed this in Standards before C checking began. Preserve undecodable diff bytes with `surrogateescape`;
+  leave the checked paths, hunk line selection and every style rule intact.
+- Keep both regression controls: a mixed resource/clean-C diff must pass, and a mixed resource/new-C-violation diff
+  must still fail with its expected diagnostic. The old checker fails both controls; original rule fixtures and the
+  actual imported diff also pass after the portability fix. A formatter pass alone does not cover the whole pipeline.
+
 ## 2026-10-28: validate asynchronous saves through the game and original checkpoints
 
 - A genuine SDK request fixture can pass while the game's wrapper spins forever on a callback-owned flag.

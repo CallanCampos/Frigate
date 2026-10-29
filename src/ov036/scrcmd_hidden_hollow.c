@@ -346,9 +346,9 @@ static void CreateHiddenHollowPokemonActor(MMSys *actors, u16 species, u16 sex, 
         TPokeData *data = LoadTPokeData(HEAPID_FIELDMAP);
         u16 objCode = GetPokemonFieldOBJCODE(data, species, sex, form);
         FreeTPokeData(data);
-        actor = CreateNewActorByParam(actors, 0xf, 0xc, 1, 0xe0, objCode, 0, ZONE_HIDDEN_GROTTO);
+        actor = CreateNewActorByParam(actors, 0xf, 0xc, 1, 0xe0, objCode, MOVE_CODE_NONE, ZONE_HIDDEN_GROTTO);
     } else {
-        actor = CreateNewActorByParam(actors, 0xf, 0xc, 1, 0xe0, OBJ_CODE_110, 0, ZONE_HIDDEN_GROTTO);
+        actor = CreateNewActorByParam(actors, 0xf, 0xc, 1, 0xe0, OBJ_CODE_110, MOVE_CODE_NONE, ZONE_HIDDEN_GROTTO);
     }
     SetActorSCRID(actor, 1);
     if (moves == TRUE) {
@@ -364,7 +364,8 @@ static BOOL isFoongusAmoongus(u16 species) {
 }
 
 static void CreateHiddenHollowItemActor(MMSys *actors) {
-    FieldActor *actor = CreateNewActorByParam(actors, 0xf, 0xc, 1, 0xe0, OBJ_CODE_110, 0, ZONE_HIDDEN_GROTTO);
+    FieldActor *actor =
+        CreateNewActorByParam(actors, 0xf, 0xc, 1, 0xe0, OBJ_CODE_110, MOVE_CODE_NONE, ZONE_HIDDEN_GROTTO);
 
     SetActorSCRID(actor, 2);
 }

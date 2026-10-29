@@ -130,16 +130,22 @@ BOOL Scrcmd_Sound_RestoreBgmVolume(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
+// The steps of the sound's sub event finishers: bring the sound back, then end
+enum {
+    SOUND_FINISH_START,
+    SOUND_FINISH_END,
+};
+
 // Finishes Scrcmd_Sound_FadeBgmVolume's sub event: the volume goes back to full at once
 BOOL ScriptWork_RestoreBgmVolumeEvent(FinishScriptSubEventsWork *work, u32 *state) {
     FieldSound *fieldSound = GameData_GetFieldSoundSystem(GSYS_GetGameData(work->gsys));
 
     switch (*state) {
-    case 0:
+    case SOUND_FINISH_START:
         FieldSnd_SetPlayerVolumeFade(fieldSound, SND_VOLUME_MAX, 0);
         (*state)++;
         break;
-    case 1:
+    case SOUND_FINISH_END:
         return TRUE;
     }
     return FALSE;
@@ -213,11 +219,11 @@ BOOL FieldScriptSubEventFinish_MEPlayback(FinishScriptSubEventsWork *work, u32 *
     ScriptWork_GetFieldWork(scriptWork);
 
     switch (*state) {
-    case 0:
+    case SOUND_FINISH_START:
         ScriptWork_CallEvent(scriptWork, EventPushBGMFinish_Create(work->gsys, 0, 0));
         (*state)++;
         break;
-    case 1:
+    case SOUND_FINISH_END:
         return TRUE;
     }
     return FALSE;

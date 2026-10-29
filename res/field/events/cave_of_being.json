@@ -5,8 +5,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_105",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0395",
             "script": 3,
             "direction": "DIR_UP",
@@ -24,8 +24,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_POKEMON_AZELF",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0394",
             "script": 2000,
             "direction": "DIR_LEFT",
@@ -43,8 +43,8 @@
         {
             "id": 2,
             "model": "OBJ_CODE_POKEMON_UXIE",
-            "movement": 15,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_DOWN",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0394",
             "script": 2000,
             "direction": "DIR_DOWN",
@@ -62,8 +62,8 @@
         {
             "id": 3,
             "model": "OBJ_CODE_POKEMON_MESPRIT",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0394",
             "script": 2000,
             "direction": "DIR_RIGHT",

@@ -5,8 +5,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_SOCIALITE",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 1,
             "direction": "DIR_LEFT",
@@ -24,8 +24,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_RICH_BOY",
-            "movement": 3,
-            "type": 0,
+            "movement": "MOVE_CODE_WALK_RANDOM",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2,
             "direction": "DIR_DOWN",
@@ -43,8 +43,8 @@
         {
             "id": 2,
             "model": "OBJ_CODE_LADY",
-            "movement": 7,
-            "type": 0,
+            "movement": "MOVE_CODE_TURN_RANDOM_UP_RIGHT",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 3,
             "direction": "DIR_RIGHT",

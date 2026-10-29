@@ -2,7 +2,9 @@
 #define POKEBW2_FIELD_FIELD_ACTOR_H
 
 #include "types.h"
+#include "constants/actor_event_types.h"
 #include "constants/directions.h"
+#include "constants/move_codes.h"
 #include "field/zone.h"
 #include "gfl/billboard_actor.h"
 #include "gfl/heap.h"
@@ -401,6 +403,27 @@ FieldActor *FindPairedTrainerActor(FieldActor *actor);
 // Moves grid coordinates or a position by a distance in a direction
 void AdjusGridXZByDir(u32 dir, s16 *x, s16 *z, s16 distance);
 void ExpandVecInGridDir(u16 dir, VecFx32 *pos, fx32 distance);
+// An actor's draw status, which picks the animation of its model: a billboard actor shows animation status * 4 + its
+// direction, or status + 30 from DRAW_STATUS_ANIME_10 on for the models that have one animation for all directions. The
+// walking models stand still, and walk at the frames a tile that the names give; DRAW_STATUS_ANIME_10, 11 and 12 are
+// their runs at 4, 6 and 2 frames a tile. Other models give the numbered ones their own animations, which the action
+// commands that wait for an animation to end play
+enum {
+    DRAW_STATUS_STOP,
+    DRAW_STATUS_WALK_32F,
+    DRAW_STATUS_WALK_16F,
+    DRAW_STATUS_WALK_8F,
+    DRAW_STATUS_WALK_4F,
+    DRAW_STATUS_WALK_2F,
+    DRAW_STATUS_WALK_6F,
+    DRAW_STATUS_WALK_3F,
+    DRAW_STATUS_WALK_7F,
+    DRAW_STATUS_WALK_12F,
+    DRAW_STATUS_ANIME_10,
+    DRAW_STATUS_ANIME_11,
+    DRAW_STATUS_ANIME_12,
+    DRAW_STATUS_ANIME_13,
+};
 void FldAct_SetDrawStatus(FieldActor *actor, u32 value);
 void func_ov012_02167564(FieldActor *actor, u32 value);
 // Sets x and z to the center of a tile, leaving y
@@ -596,6 +619,8 @@ NoGridMapper *FldActSys_GetNoGridMapper(MMSys *system);
 u16 FldActSys_GetCameraAngle(MMSys *system);
 u32 func_ov012_02166fc0(MMSys *system);
 void func_ov012_02166fc4(MMSys *system, u32 value);
+// The number of event types (constants/actor_event_types.h), by which field_actor_evtype.c's tables go
+#define ACTOR_EVENT_TYPE_MAX 21
 void SetActorEvType(FieldActor *actor, u16 evType);
 u16 GetActorEvType(FieldActor *actor);
 u16 GetActorSpawnFlag(FieldActor *actor);
@@ -663,9 +688,10 @@ const FieldActorResGroup *GetNPCMdlInfoG2DRscGroup(const FieldActorConfig *confi
 const FieldActorResGroup *GetNPCMdlInfoG3DRscGroup(const FieldActorConfig *config);
 // The object code that an object code stands for, through the work values of WKOBJCODE00 and on
 u16 ResolvePossibleWKOBJCODE(EventWork *eventWork, u16 objCode);
+// How a Trainer looks for the player: two of the event types, as EvType_GetSightType gives them
 enum {
-    TRAINER_SIGHT_FACING = 1,
-    TRAINER_SIGHT_ALL_DIRS = 2,
+    TRAINER_SIGHT_FACING = ACTOR_EVENT_TYPE_TRAINER,
+    TRAINER_SIGHT_ALL_DIRS = ACTOR_EVENT_TYPE_TRAINER_ALL_DIRS,
 };
 // How an actor of the event type looks for the player: the types that see only the way they face give
 // TRAINER_SIGHT_FACING, and the others their own type, of which TRAINER_SIGHT_ALL_DIRS looks every way

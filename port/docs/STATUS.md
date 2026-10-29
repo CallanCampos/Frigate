@@ -32,11 +32,42 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: validate actor names and reconstructed movie resources
+
+- **Upstream:** frozen `9496bc869b87`, 14 commits after `cdbe99de1c73`; PR 65 remains a proposal until protected
+  merge. Reviewed main `e90c158810` includes the owner-reviewed backup service from PR 63, whose 14 checks pass.
+- **Port:** `PORT_SHA`, real integration of that reviewed main with the App's `e151a070c9` upstream merge.
+- **ROM (T0):** the original App tree's 10,664-step rebuild passes both original US SHA1s with zero warnings;
+  combined-tree configure/Ninja and both hashes also pass with zero warnings: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  No manual decomp config or resource changes.
+- **Host build/tests (T1/T2):** fresh arm64 macOS RelWithDebInfo all-target builds pass in both games. Each selected
+  unit/static suite passes 338 tests with three explicit optional skips of 341; actual game backup integration passes.
+  Short replay/save routes pass B2 6/6 and W2 4/4 including cleanup, without skips. All 1,944 source/record hashes
+  remain fixed throughout verification; pinned formatting, strict style, copies, names and row checks also pass.
+- **Replay/oracle/sanitizers/performance/save/play (T3/T4/T5/T6/T7):** exact published-head full canonical verification
+  remains mandatory; no parent result substitutes. Retain all inputs, seeds, reference hashes, checkpoints, masks,
+  budgets and sanitizer policy. No new whole-app fatal-sanitizer, later-story or windowed-play claim.
+- **Tiers/trap stubs:** no new progress scan or experimental SDK-reader activation.
+- **64-bit warnings:** guard passes, 365 sites/229 keys (real 66, harmless 123, handled 141, unreachable 35);
+  all 1,711 files compiled, zero missing. No baseline edit.
+- **Work done:** the 1,938 incoming paths merge automatically. All five touched files' existing port-adaptation edit
+  lines stay exact, and the other 197 adapted source blobs match reviewed pre-backup main. The actual backup wait,
+  game wrapper and source tests arrive from reviewed main. Resource support reconstructs the opening/logo archives.
+  Standards failed because non-UTF-8 bytes in a textual resource diff crashed the inherited host checker; explicit
+  byte-preserving decoding fixes that portability issue without changing rules or checked paths. Mixed resource/C
+  fixtures, original style fixtures and strict checking pass; the original checker fails both negative controls.
+  [Game changes](game-changes.md) records the host-only neutral fix; no original game C is manually changed.
+- **Next:** commit and repeated T0, normal topic update, then exact published-head full
+  local verification, all hosted checks and owner approval before normal protected merge.
+- **Blockers:** those gates remain required. Serial/CPU timing, the separate SDK-reader prototype and later-story
+  coverage remain unfinished. Spanish issue 45 still lacks a local dump; no human input blocks US work.
+
 ## 2026-10-28: integrate the reviewed VM and terrain sync with native backup
 
 - **Upstream:** reviewed main `a5f21a0da0` includes frozen `cdbe99de1c73`; PR 64 passed both full native suites,
   original ROM hashes, actual assembly oracles and all 14 checks before owner approval and protected merge.
-- **Port:** `PORT_SHA`, real merge of that reviewed main into PR 63's `5fef55cc70` feature head.
+- **Port:** `4d2d424719`, real merge of that reviewed main into PR 63's `5fef55cc70` feature head.
 - **ROM (T0):** fresh signed-runtime configure/Ninja (8,353 steps) and both original US SHA1s pass with zero
   compiler warnings: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`,
   W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. No manual upstream config changes.

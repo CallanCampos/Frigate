@@ -1356,7 +1356,7 @@ void FieldPlayerGrid_ForceBrake(FieldPlayerGrid *grid) {
 
         FldAct_FreeAcmd(actor);
         CheckSetActorFaceDir(actor, dir);
-        FldAct_SetDrawStatus(actor, 0);
+        FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
         FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_NONE);
     }
 }
@@ -1374,7 +1374,7 @@ BOOL FieldPlayerGrid_StopTurnOrBlocked(FieldPlayerGrid *grid) {
 
         FldAct_FreeAcmd(actor);
         CheckSetActorFaceDir(actor, dir);
-        FldAct_SetDrawStatus(actor, 0);
+        FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
         FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_NONE);
         break;
     }

@@ -97,7 +97,7 @@ static const ExStateChangeFunc PLAYER_EXSTATE_CHANGE_VTABLE_SLOT5[] = { FieldPla
                                                                         FieldPlayerCore_FormStepSlot5Done };
 
 static const ZoneNPC PLAYER_NPC_TEMPLATE = {
-    PLAYER_ACTOR_ID, OBJ_CODE_HERO, 0, 0, 0, 0, 0, 0, 0, 0, 0xffff, 0xffff, FALSE,
+    PLAYER_ACTOR_ID, OBJ_CODE_HERO, MOVE_CODE_NONE, ACTOR_EVENT_TYPE_NONE, 0, 0, 0, 0, 0, 0, 0xffff, 0xffff, FALSE,
 };
 
 static const ExStateChangeFunc *const PLAYER_EXSTATE_CHANGE_VTABLES[] = {

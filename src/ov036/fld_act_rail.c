@@ -78,49 +78,49 @@ static BOOL RailJump_Update(FieldActor *actor) {
     }
     SetActorMovementFlag(actor, 0x540);
     SetActorInitialGPosToNowGPos(actor);
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FieldActor_NextAcmdState(actor);
     GFL_SndSEPlay(SEQ_SE_FLD_10);
     return TRUE;
 }
 
 static BOOL RailActor_AcJumpU1G8F0(FieldActor *actor) {
-    RailActorAcmd_InitJumpWithSe(actor, DIR_UP, 0x2000, 8, 3, RAIL_JUMP_HIGH, 0x200);
+    RailActorAcmd_InitJumpWithSe(actor, DIR_UP, 0x2000, 8, DRAW_STATUS_WALK_8F, RAIL_JUMP_HIGH, 0x200);
     return TRUE;
 }
 
 static BOOL RailActor_AcJumpD1G8F0(FieldActor *actor) {
-    RailActorAcmd_InitJumpWithSe(actor, DIR_DOWN, 0x2000, 8, 3, RAIL_JUMP_HIGH, 0x200);
+    RailActorAcmd_InitJumpWithSe(actor, DIR_DOWN, 0x2000, 8, DRAW_STATUS_WALK_8F, RAIL_JUMP_HIGH, 0x200);
     return TRUE;
 }
 
 static BOOL RailActor_AcJumpL1G8F0(FieldActor *actor) {
-    RailActorAcmd_InitJumpWithSe(actor, DIR_LEFT, 0x2000, 8, 3, RAIL_JUMP_HIGH, 0x200);
+    RailActorAcmd_InitJumpWithSe(actor, DIR_LEFT, 0x2000, 8, DRAW_STATUS_WALK_8F, RAIL_JUMP_HIGH, 0x200);
     return TRUE;
 }
 
 static BOOL RailActor_AcJumpR1G8F0(FieldActor *actor) {
-    RailActorAcmd_InitJumpWithSe(actor, DIR_RIGHT, 0x2000, 8, 3, RAIL_JUMP_HIGH, 0x200);
+    RailActorAcmd_InitJumpWithSe(actor, DIR_RIGHT, 0x2000, 8, DRAW_STATUS_WALK_8F, RAIL_JUMP_HIGH, 0x200);
     return TRUE;
 }
 
 static BOOL RailActor_AcJumpU2G16F0(FieldActor *actor) {
-    RailActorAcmd_InitJumpWithSe(actor, DIR_UP, 0x2000, 0x10, 3, RAIL_JUMP_HIGH, 0x100);
+    RailActorAcmd_InitJumpWithSe(actor, DIR_UP, 0x2000, 0x10, DRAW_STATUS_WALK_8F, RAIL_JUMP_HIGH, 0x100);
     return TRUE;
 }
 
 static BOOL RailActor_AcJumpD2G16F0(FieldActor *actor) {
-    RailActorAcmd_InitJumpWithSe(actor, DIR_DOWN, 0x2000, 0x10, 3, RAIL_JUMP_HIGH, 0x100);
+    RailActorAcmd_InitJumpWithSe(actor, DIR_DOWN, 0x2000, 0x10, DRAW_STATUS_WALK_8F, RAIL_JUMP_HIGH, 0x100);
     return TRUE;
 }
 
 static BOOL RailActor_AcJumpL2G16F0(FieldActor *actor) {
-    RailActorAcmd_InitJumpWithSe(actor, DIR_LEFT, 0x2000, 0x10, 3, RAIL_JUMP_HIGH, 0x100);
+    RailActorAcmd_InitJumpWithSe(actor, DIR_LEFT, 0x2000, 0x10, DRAW_STATUS_WALK_8F, RAIL_JUMP_HIGH, 0x100);
     return TRUE;
 }
 
 static BOOL RailActor_AcJumpR2G16F0(FieldActor *actor) {
-    RailActorAcmd_InitJumpWithSe(actor, DIR_RIGHT, 0x2000, 0x10, 3, RAIL_JUMP_HIGH, 0x100);
+    RailActorAcmd_InitJumpWithSe(actor, DIR_RIGHT, 0x2000, 0x10, DRAW_STATUS_WALK_8F, RAIL_JUMP_HIGH, 0x100);
     return TRUE;
 }
 

@@ -16,8 +16,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_SCIENTIST_M_52",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0290",
             "script": 1,
             "direction": "DIR_UP",
@@ -35,8 +35,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_110",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x05c5",
             "script": 7377,
             "direction": "DIR_DOWN",

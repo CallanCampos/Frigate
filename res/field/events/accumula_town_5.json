@@ -5,8 +5,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_307",
-            "movement": 16,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_LEFT",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 4,
             "direction": "DIR_LEFT",
@@ -24,8 +24,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_21",
-            "movement": 14,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_UP",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2,
             "direction": "DIR_UP",
@@ -43,8 +43,8 @@
         {
             "id": 2,
             "model": "OBJ_CODE_14",
-            "movement": 17,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_RIGHT",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 3,
             "direction": "DIR_RIGHT",
@@ -62,8 +62,8 @@
         {
             "id": 3,
             "model": "OBJ_CODE_18",
-            "movement": 17,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_RIGHT",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 1,
             "direction": "DIR_RIGHT",

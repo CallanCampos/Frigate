@@ -156,7 +156,7 @@ void FieldActorMove_InitLookPlayer(FieldActor *actor) {
     ActorFollowWork *work = ClearActorPositionBlock(actor, 8);
 
     FieldActorMove_UpdatePlayerTracking(actor, work);
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FldAct_ClearMoving(actor);
     SetActorFlag8000(actor, 0);
 }
@@ -286,7 +286,7 @@ void FieldActorMove_InitLookFellow(FieldActor *actor) {
     ActorFollowWork *work = ClearActorPositionBlock(actor, 12);
 
     FieldActorMove_UpdateFellowTracking(actor, work);
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FldAct_ClearMoving(actor);
     work->active = 0;
 }
@@ -340,15 +340,15 @@ FieldActor *FindPairedTrainerActor(FieldActor *actor) {
     u16 trainerId = GetNPCTrainerID(actor);
 
     switch (evType) {
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-    case 20:
+    case ACTOR_EVENT_TYPE_TRAINER:
+    case ACTOR_EVENT_TYPE_TRAINER_ALL_DIRS:
+    case ACTOR_EVENT_TYPE_3:
+    case ACTOR_EVENT_TYPE_TRAINER_LOOK_AROUND:
+    case ACTOR_EVENT_TYPE_TRAINER_SPIN_COUNTERCLOCKWISE:
+    case ACTOR_EVENT_TYPE_TRAINER_SPIN_CLOCKWISE:
+    case ACTOR_EVENT_TYPE_TRAINER_WALK_SPIN_COUNTERCLOCKWISE:
+    case ACTOR_EVENT_TYPE_TRAINER_WALK_SPIN_CLOCKWISE:
+    case ACTOR_EVENT_TYPE_SPIN_COUNTERCLOCKWISE:
         while (NextActor(mmSys, &other, &index) == TRUE) {
             if (actor != other && zoneId == GetActorZoneID(other) && trainerId == GetNPCTrainerID(other)) {
                 return other;
@@ -431,7 +431,7 @@ static void FieldActorMove_InitHide(FieldActor *actor, u32 kind) {
     ActorEffectWork *work = ClearActorPositionBlock(actor, 8);
 
     work->kind = kind;
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FldAct_ClearMoving(actor);
     SetActorMovementFlag(actor, ACTOR_MOVEMENT_FLAG_HIDE_SHADOW);
     VecFx32 offset = { 0, -32 * FX32_ONE, 0 };

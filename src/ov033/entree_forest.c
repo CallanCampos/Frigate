@@ -29,21 +29,22 @@ static const u8 sPokemonPositions1[] = {
 // The move code and the area of a Pokémon's actor, by EntreeForestPokemon.actorType
 // clang-format off
 static const EntreeForestActorAppearance sActorAppearances[8] = {
-    { 2, 0, 0 },
-    { 3, 1, 1 },
-    { 3, 2, 2 },
-    { 4, 0, 2 },
-    { 5, 2, 0 },
-    { 3, 2, 0 },
-    { 0x13, 0, 0 },
-    { 0x12, 0, 0 },
+    { MOVE_CODE_TURN_RANDOM, 0, 0 },
+    { MOVE_CODE_WALK_RANDOM, 1, 1 },
+    { MOVE_CODE_WALK_RANDOM, 2, 2 },
+    { MOVE_CODE_WALK_RANDOM_UP_DOWN, 0, 2 },
+    { MOVE_CODE_WALK_RANDOM_LEFT_RIGHT, 2, 0 },
+    { MOVE_CODE_WALK_RANDOM, 2, 0 },
+    { MOVE_CODE_SPIN_CLOCKWISE, 0, 0 },
+    { MOVE_CODE_SPIN_COUNTERCLOCKWISE, 0, 0 },
 };
 
 // clang-format on
 
 // The actor of a Pokémon, before its ID, model, movement and position are set
 static const ZoneNPC sPokemonNPC = {
-    0, 0x1000, 0xf, 0, 0, 0x28fa, 1, 0, 0, 0, 0xffff, 0xffff, FALSE, { { 0, 0, 0 } },
+    0,      0x1000, MOVE_CODE_FACE_DOWN, ACTOR_EVENT_TYPE_NONE, 0, 0x28fa, 1, 0, 0, 0, 0xffff,
+    0xffff, FALSE,  { { 0, 0, 0 } },
 };
 
 static const u8 sPokemonPositions2[] = {

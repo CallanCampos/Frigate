@@ -5,8 +5,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_VETERAN_M",
-            "movement": 15,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_DOWN",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 1,
             "direction": "DIR_DOWN",

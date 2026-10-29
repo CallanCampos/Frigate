@@ -5,8 +5,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_304",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0353",
             "script": 2000,
             "direction": "DIR_UP",
@@ -24,8 +24,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_WORK_00",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10746,
             "direction": "DIR_DOWN",

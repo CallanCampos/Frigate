@@ -5,8 +5,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
-            "movement": 4,
-            "type": 1,
+            "movement": "MOVE_CODE_WALK_RANDOM_UP_DOWN",
+            "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": "EVENT_FLAG_0x03d0",
             "script": 3429,
             "direction": "DIR_DOWN",
@@ -24,8 +24,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
-            "movement": 4,
-            "type": 1,
+            "movement": "MOVE_CODE_WALK_RANDOM_UP_DOWN",
+            "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": "EVENT_FLAG_0x03d0",
             "script": 3428,
             "direction": "DIR_DOWN",

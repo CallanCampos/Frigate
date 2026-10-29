@@ -524,7 +524,7 @@ void FldActSys_WakeUpAllActors(MMSys *system) {
         if (!CheckActorFlag(actor, 2)) {
             FldAct_InitMoveProc(system, actor);
         }
-        if (moveCode != 0x55 && CheckActorMovementFlag(actor, 1)) {
+        if (moveCode != MOVE_CODE_HIDE_LEAVES && CheckActorMovementFlag(actor, 1)) {
             FldAct_CallMoveReturnProc(actor);
             ClearActorMovementFlag(actor, 1);
         }
@@ -536,7 +536,7 @@ void FldActSys_WakeUpAllActors(MMSys *system) {
             ClearActorMovementFlag(actor, 4);
         }
         FldAct_ClearEffectFlags(actor);
-        if (moveCode == 0x55 && CheckActorMovementFlag(actor, 1)) {
+        if (moveCode == MOVE_CODE_HIDE_LEAVES && CheckActorMovementFlag(actor, 1)) {
             FldAct_CallMoveReturnProc(actor);
             ClearActorMovementFlag(actor, 1);
         }
@@ -1657,7 +1657,7 @@ static void FldAct_AddTask(FieldActor *actor, MMSys *system) {
     u16 priority = FldActSys_GetTaskPriority(system);
     u16 moveCode = GetActorMoveCode(actor);
 
-    if (moveCode == 0x30 || moveCode == 0x32) {
+    if (moveCode == MOVE_CODE_FOLLOW_PLAYER || moveCode == MOVE_CODE_FOLLOW_PAIRED_TRAINER) {
         priorityOffset = 1;
     } else if (GetActorUID(actor) == ACTOR_UID_PLAYER) {
         priorityOffset--;
@@ -1732,7 +1732,7 @@ static void FldAct_CreateDraw(FieldActor *actor) {
         if (CheckActorMovementFlag(actor, 0x1000)) {
             CheckRecalcActorY(actor);
         }
-        FldAct_SetDrawStatus(actor, 0);
+        FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
         if (!FldAct_IsDrawCreated(actor)) {
             FldAct_LoadVTable(actor);
             FldAct_InvokeOnCreateCallback(actor);
@@ -1911,15 +1911,15 @@ static BOOL CheckNPCSpawnFlag(EventWork *eventWork, u16 flag) {
 
 u16 EvType_GetSightType(u16 type) {
     switch (type) {
-    case 4:
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-    case 11:
-    case 12:
-    case 13:
-        return 1;
+    case ACTOR_EVENT_TYPE_TRAINER_LOOK_AROUND:
+    case ACTOR_EVENT_TYPE_TRAINER_SPIN_COUNTERCLOCKWISE:
+    case ACTOR_EVENT_TYPE_TRAINER_SPIN_CLOCKWISE:
+    case ACTOR_EVENT_TYPE_TRAINER_WALK_SPIN_COUNTERCLOCKWISE:
+    case ACTOR_EVENT_TYPE_TRAINER_WALK_SPIN_CLOCKWISE:
+    case ACTOR_EVENT_TYPE_TRAINER_TURN_ON_B_PRESS:
+    case ACTOR_EVENT_TYPE_TRAINER_MOVE_ON_B_PRESS:
+    case ACTOR_EVENT_TYPE_TRAINER_DASH:
+        return TRAINER_SIGHT_FACING;
     }
     return type;
 }

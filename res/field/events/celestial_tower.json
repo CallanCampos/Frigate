@@ -26,8 +26,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_POKEMON_MESPRIT",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0397",
             "script": 4,
             "direction": "DIR_UP",

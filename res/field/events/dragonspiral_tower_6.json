@@ -146,8 +146,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_110",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0500",
             "script": 7180,
             "direction": "DIR_DOWN",
@@ -165,8 +165,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_110",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x05c8",
             "script": 7380,
             "direction": "DIR_DOWN",
@@ -184,8 +184,8 @@
         {
             "id": 2,
             "model": "OBJ_CODE_110",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x05c9",
             "script": 7381,
             "direction": "DIR_DOWN",

@@ -4,8 +4,10 @@
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 // Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/directions.h"
 #include "constants/sound.h"
 #include "field/field.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_camera.h"
 #include "field/field_effect.h"
@@ -30,6 +32,12 @@ typedef struct {
     u32 stage;
 } FieldFadeWork;
 
+// The stages of the field's fade task: start the fade, then wait for it unless the caller skips the wait
+enum {
+    FIELD_FADE_STAGE_START,
+    FIELD_FADE_STAGE_WAIT,
+};
+
 static void FieldFadeTCB_Callback(TCB *tcb, void *data);
 
 void FieldFadeTCB_Start(GameSystem *gsys, Field *field, u32 type, u32 white, u32 skipWait) {
@@ -39,7 +47,7 @@ void FieldFadeTCB_Start(GameSystem *gsys, Field *field, u32 type, u32 white, u32
     wk = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(FieldFadeWork), TRUE, "field_fade.c", 56);
     GFL_TCBMgrAddTask(mgr, FieldFadeTCB_Callback, wk, 0);
     Field_SetFadeFlag(field, TRUE);
-    wk->stage = 0;
+    wk->stage = FIELD_FADE_STAGE_START;
     wk->gsys = gsys;
     wk->field = field;
     wk->white = white;
@@ -51,7 +59,7 @@ static void FieldFadeTCB_Callback(TCB *tcb, void *data) {
     FieldFadeWork *wk = data;
 
     switch (wk->stage) {
-    case 0: {
+    case FIELD_FADE_STAGE_START: {
         s32 speed;
         s32 start;
         s32 end;
@@ -84,7 +92,7 @@ static void FieldFadeTCB_Callback(TCB *tcb, void *data) {
         wk->stage++;
         break;
     }
-    case 1: {
+    case FIELD_FADE_STAGE_WAIT: {
         BOOL done = FALSE;
 
         if (wk->skipWait == TRUE) {
@@ -189,12 +197,21 @@ GameEvent *EventQuicksandArrive_CreateMoveAnime(GameEvent *parent, GameSystem *g
     return event;
 }
 
+// The steps of the quicksand arrival's fall, its move animation and Dig's rising spin: switch the camera's transform
+// and start the player's animation, wait for it, restore the camera's transform, end
+enum {
+    PLAYER_ANIME_START,
+    PLAYER_ANIME_WAIT,
+    PLAYER_ANIME_RESTORE_CAMERA,
+    PLAYER_ANIME_END,
+};
+
 static GameEventReturnCode EventQuicksandArrive_Callback(GameEvent *event, u32 *state, void *data) {
     FallEventWork *wk = data;
     FieldCamera *camera = Field_GetCameraSystem(wk->field);
 
     switch (*state) {
-    case 0:
+    case PLAYER_ANIME_START:
         wk->transformType = FieldCamera_GetTransformType(camera);
         FieldCamera_ChangeTransformType(camera, 0);
         {
@@ -204,7 +221,7 @@ static GameEventReturnCode EventQuicksandArrive_Callback(GameEvent *event, u32 *
 
             actor = FieldPlayer_GetActor(Field_GetPlayer(wk->field));
             SetActorWPosOffset(actor, &offset);
-            FldAct_SetAcmd(actor, 1);
+            FldAct_SetAcmd(actor, ACMD_FACE + DIR_DOWN);
             GameEvent_ChainNext(
                 event, CallFieldMapEntranceInTransition(wk->gsys, wk->field, FIELD_TRANSITION_FADE_BLACK, 1, 1, 0, 0));
             actor = FieldPlayer_GetActor(Field_GetPlayer(wk->field));
@@ -213,16 +230,16 @@ static GameEventReturnCode EventQuicksandArrive_Callback(GameEvent *event, u32 *
         }
         (*state)++;
         break;
-    case 1:
+    case PLAYER_ANIME_WAIT:
         if (FieldTaskManager_IsIdle(Field_GetTaskManager(wk->field))) {
             (*state)++;
         }
         break;
-    case 2:
+    case PLAYER_ANIME_RESTORE_CAMERA:
         FieldCamera_ChangeTransformType(camera, wk->transformType);
         (*state)++;
         break;
-    case 3:
+    case PLAYER_ANIME_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -233,6 +250,18 @@ static void EventQuicksandArrive_StartZoomOut(SpinEventWork *wk);
 static GameEvent *EventQuicksandArrive_CreateFadeIn(SpinEventWork *wk);
 static void EventQuicksandArrive_EndZoomOut(SpinEventWork *wk);
 
+// The steps of the quicksand arrival's spins: finish the camera's delay and wait for it, start the player's spin and
+// the camera's zoom out (the season banner's callback starts them when the season changes), chain the fade in, wait
+// for the tasks, end the zoom
+enum {
+    SPIN_ZOOM_FINISH_DELAY,
+    SPIN_ZOOM_WAIT_DELAY,
+    SPIN_ZOOM_START,
+    SPIN_ZOOM_FADE_IN,
+    SPIN_ZOOM_WAIT,
+    SPIN_ZOOM_END,
+};
+
 static GameEventReturnCode EventQuicksandArrive_RunSpinZoom(GameEvent *event, u32 *state, void *data) {
     SpinEventWork *wk = data;
     Field *field = wk->field;
@@ -240,32 +269,32 @@ static GameEventReturnCode EventQuicksandArrive_RunSpinZoom(GameEvent *event, u3
     FieldTaskManager *taskManager = Field_GetTaskManager(field);
 
     switch (*state) {
-    case 0:
+    case SPIN_ZOOM_FINISH_DELAY:
         FieldCamera_FinishDelay(camera);
         (*state)++;
         break;
-    case 1:
+    case SPIN_ZOOM_WAIT_DELAY:
         if (!FieldCamera_IsDelayActive(camera)) {
             (*state)++;
         }
         break;
-    case 2:
+    case SPIN_ZOOM_START:
         if (wk->hasWarp == 0) {
             EventQuicksandArrive_StartPlayerSpin(wk);
             EventQuicksandArrive_StartZoomOut(wk);
         }
         (*state)++;
         break;
-    case 3:
+    case SPIN_ZOOM_FADE_IN:
         GameEvent_ChainNext(event, EventQuicksandArrive_CreateFadeIn(wk));
         (*state)++;
         break;
-    case 4:
+    case SPIN_ZOOM_WAIT:
         if (FieldTaskManager_IsIdle(taskManager)) {
             (*state)++;
         }
         break;
-    case 5:
+    case SPIN_ZOOM_END:
         EventQuicksandArrive_EndZoomOut(wk);
         return GAMEEVENT_DONE;
     }
@@ -333,32 +362,32 @@ static GameEventReturnCode EventQuicksandArrive_RunSpinZoomAlt(GameEvent *event,
     FieldTaskManager *taskManager = Field_GetTaskManager(field);
 
     switch (*state) {
-    case 0:
+    case SPIN_ZOOM_FINISH_DELAY:
         FieldCamera_FinishDelay(camera);
         (*state)++;
         break;
-    case 1:
+    case SPIN_ZOOM_WAIT_DELAY:
         if (!FieldCamera_IsDelayActive(camera)) {
             (*state)++;
         }
         break;
-    case 2:
+    case SPIN_ZOOM_START:
         if (wk->hasWarp == 0) {
             EventQuicksandArrive_StartPlayerSpinAlt(wk);
             EventQuicksandArrive_StartZoomOutAlt(wk);
         }
         (*state)++;
         break;
-    case 3:
+    case SPIN_ZOOM_FADE_IN:
         GameEvent_ChainNext(event, EventQuicksandArrive_CreateFadeInAlt(wk));
         (*state)++;
         break;
-    case 4:
+    case SPIN_ZOOM_WAIT:
         if (FieldTaskManager_IsIdle(taskManager)) {
             (*state)++;
         }
         break;
-    case 5:
+    case SPIN_ZOOM_END:
         EventQuicksandArrive_EndZoomOutAlt(wk);
         return GAMEEVENT_DONE;
     }
@@ -422,16 +451,16 @@ static GameEventReturnCode EventQuicksandArrive_RunSpinZoomSmoke(GameEvent *even
     FieldTaskManager *taskManager = Field_GetTaskManager(field);
 
     switch (*state) {
-    case 0:
+    case SPIN_ZOOM_FINISH_DELAY:
         FieldCamera_FinishDelay(camera);
         (*state)++;
         break;
-    case 1:
+    case SPIN_ZOOM_WAIT_DELAY:
         if (!FieldCamera_IsDelayActive(camera)) {
             (*state)++;
         }
         break;
-    case 2: {
+    case SPIN_ZOOM_START: {
         FieldCameraAnimationController *controller;
 
         FieldTaskManager_AddTask(taskManager, FieldActorSpinTask_CreatePlayerDeaccel(field, 0x3c, 8, 1), 0);
@@ -450,18 +479,18 @@ static GameEventReturnCode EventQuicksandArrive_RunSpinZoomSmoke(GameEvent *even
         (*state)++;
         break;
     }
-    case 3:
+    case SPIN_ZOOM_FADE_IN:
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 1, 1, 0, 0));
         (*state)++;
         break;
-    case 4:
+    case SPIN_ZOOM_WAIT:
         if (FieldTaskManager_IsIdle(taskManager)) {
             FldeffDust_Start(FieldPlayer_GetActor(Field_GetPlayer(field)), Field_GetFieldEffects(field));
             (*state)++;
         }
         break;
-    case 5:
+    case SPIN_ZOOM_END:
         FieldCameraAnimationController_FinishCamera(wk->controller);
         FieldCameraAnimationController_FreeAnimation(wk->controller);
         return GAMEEVENT_DONE;
@@ -469,13 +498,23 @@ static GameEventReturnCode EventQuicksandArrive_RunSpinZoomSmoke(GameEvent *even
     return GAMEEVENT_CONTINUE;
 }
 
+// The steps of the player's spin down: start the spin and the drop, wait for them, land with dust and a sound, restore
+// the camera's transform, end
+enum {
+    SPIN_DOWN_START,
+    SPIN_DOWN_WAIT,
+    SPIN_DOWN_LAND,
+    SPIN_DOWN_RESTORE_CAMERA,
+    SPIN_DOWN_END,
+};
+
 static GameEventReturnCode EventPlayerSpinDown_Callback(GameEvent *event, u32 *state, void *data) {
     FallEventWork *wk = data;
     Field *field = wk->field;
     FieldCamera *camera = Field_GetCameraSystem(field);
 
     switch (*state) {
-    case 0:
+    case SPIN_DOWN_START:
         wk->transformType = FieldCamera_GetTransformType(camera);
         FieldCamera_ChangeTransformType(camera, 0);
         {
@@ -506,21 +545,21 @@ static GameEventReturnCode EventPlayerSpinDown_Callback(GameEvent *event, u32 *s
         }
         (*state)++;
         break;
-    case 1:
+    case SPIN_DOWN_WAIT:
         if (FieldTaskManager_IsIdle(Field_GetTaskManager(field))) {
             (*state)++;
         }
         break;
-    case 2:
+    case SPIN_DOWN_LAND:
         FldeffDust_Start(FieldPlayer_GetActor(Field_GetPlayer(field)), Field_GetFieldEffects(wk->field));
         GFL_SndSEPlay(SEQ_SE_FLD_10);
         (*state)++;
         break;
-    case 3:
+    case SPIN_DOWN_RESTORE_CAMERA:
         FieldCamera_ChangeTransformType(camera, wk->transformType);
         (*state)++;
         break;
-    case 4:
+    case SPIN_DOWN_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -532,7 +571,7 @@ static GameEventReturnCode EventQuicksandArrive_RunMoveAnime(GameEvent *event, u
     FieldActor *actor = FieldPlayer_GetActor(Field_GetPlayer(wk->field));
 
     switch (*state) {
-    case 0:
+    case PLAYER_ANIME_START:
         wk->transformType = FieldCamera_GetTransformType(camera);
         FieldCamera_ChangeTransformType(camera, 0);
         FldAct_SetAcmd(actor, 0x44);
@@ -540,17 +579,17 @@ static GameEventReturnCode EventQuicksandArrive_RunMoveAnime(GameEvent *event, u
             event, CallFieldMapEntranceInTransition(wk->gsys, wk->field, FIELD_TRANSITION_FADE_BLACK, 1, 1, 0, 0));
         (*state)++;
         break;
-    case 1:
+    case PLAYER_ANIME_WAIT:
         if (FldAct_CheckAcmdEnd(actor) == 1) {
             FldAct_EndAcmd(actor);
             (*state)++;
         }
         break;
-    case 2:
+    case PLAYER_ANIME_RESTORE_CAMERA:
         FieldCamera_ChangeTransformType(camera, wk->transformType);
         (*state)++;
         break;
-    case 3:
+    case PLAYER_ANIME_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -633,6 +672,18 @@ GameEvent *EventDig_CreateRisingSpin(GameEvent *parent, GameSystem *gsys, Field 
     return event;
 }
 
+// The steps of the quicksand's draw in: switch the camera's transform, find the quicksand's prop and play its
+// animation, pull the player to the center if they are not on it, sink, wait for the sinking tasks, end
+enum {
+    QUICKSAND_DRAW_IN_START,
+    QUICKSAND_DRAW_IN_FIND_PROP,
+    QUICKSAND_DRAW_IN_CHECK_DISTANCE,
+    QUICKSAND_DRAW_IN_PULL,
+    QUICKSAND_DRAW_IN_SINK,
+    QUICKSAND_DRAW_IN_WAIT,
+    QUICKSAND_DRAW_IN_END,
+};
+
 static GameEventReturnCode EventQuicksandDrawIn_Callback(GameEvent *event, u32 *state, void *data) {
     EffectEventWork *wk = data;
     FieldPlayer *player = Field_GetPlayer(wk->field);
@@ -641,12 +692,12 @@ static GameEventReturnCode EventQuicksandDrawIn_Callback(GameEvent *event, u32 *
     FieldCamera *camera = Field_GetCameraSystem(wk->field);
 
     switch (*state) {
-    case 0:
+    case QUICKSAND_DRAW_IN_START:
         wk->transformType = FieldCamera_GetTransformType(camera);
         FieldCamera_ChangeTransformType(camera, 0);
-        *state = 1;
+        *state = QUICKSAND_DRAW_IN_FIND_PROP;
         break;
-    case 1: {
+    case QUICKSAND_DRAW_IN_FIND_PROP: {
         FieldPropSystem *propSystem;
         FieldPropAreaBounds bounds;
         FieldChunkPropHolder **props;
@@ -666,10 +717,10 @@ static GameEventReturnCode EventQuicksandDrawIn_Callback(GameEvent *event, u32 *
             wk->propHandle = NULL;
         }
         GFL_HeapFree(props);
-        *state = 2;
+        *state = QUICKSAND_DRAW_IN_CHECK_DISTANCE;
         break;
     }
-    case 2: {
+    case QUICKSAND_DRAW_IN_CHECK_DISTANCE: {
         VecFx32 playerPos;
         s32 dx;
         s32 dz;
@@ -695,14 +746,14 @@ static GameEventReturnCode EventQuicksandDrawIn_Callback(GameEvent *event, u32 *
             FieldTask *task = FieldPlayerMoveTask_Create(wk->field, duration, &wk->pos);
 
             FieldTaskManager_AddTask(Field_GetTaskManager(wk->field), task, 0);
-            *state = 3;
+            *state = QUICKSAND_DRAW_IN_PULL;
         } else {
-            *state = 4;
+            *state = QUICKSAND_DRAW_IN_SINK;
         }
         wk->frame = 0;
         break;
     }
-    case 3: {
+    case QUICKSAND_DRAW_IN_PULL: {
         u32 keys;
 
         if (wk->propHandle != NULL && FieldPropHandle_IsAnmIdle(wk->propHandle, 0)) {
@@ -710,26 +761,26 @@ static GameEventReturnCode EventQuicksandDrawIn_Callback(GameEvent *event, u32 *
         }
         keys = GCTX_HIDGetHeldKeys();
         if (keys & PAD_KEY_UP) {
-            FldAct_SetAcmd(actor, 0x24);
+            FldAct_SetAcmd(actor, ACMD_STAY_WALK_4F + DIR_UP);
         }
         if (keys & PAD_KEY_DOWN) {
-            FldAct_SetAcmd(actor, 0x25);
+            FldAct_SetAcmd(actor, ACMD_STAY_WALK_4F + DIR_DOWN);
         }
         if (keys & PAD_KEY_LEFT) {
-            FldAct_SetAcmd(actor, 0x26);
+            FldAct_SetAcmd(actor, ACMD_STAY_WALK_4F + DIR_LEFT);
         }
         if (keys & PAD_KEY_RIGHT) {
-            FldAct_SetAcmd(actor, 0x27);
+            FldAct_SetAcmd(actor, ACMD_STAY_WALK_4F + DIR_RIGHT);
         }
         if (wk->frame++ % 10 == 0) {
             FldeffDust_Start(actor, effects);
         }
         if (FieldTaskManager_IsIdle(Field_GetTaskManager(wk->field))) {
-            *state = 4;
+            *state = QUICKSAND_DRAW_IN_SINK;
         }
         break;
     }
-    case 4: {
+    case QUICKSAND_DRAW_IN_SINK: {
         VecFx32 move;
         FieldTask *moveTask;
         FieldTask *spin;
@@ -752,15 +803,15 @@ static GameEventReturnCode EventQuicksandDrawIn_Callback(GameEvent *event, u32 *
         FieldTaskManager_AddTask(taskManager, zoom, 0);
         FieldTaskManager_AddTask(taskManager, fade, zoom);
         wk->frame = 0;
-        *state = 5;
+        *state = QUICKSAND_DRAW_IN_WAIT;
         break;
     }
-    case 5:
+    case QUICKSAND_DRAW_IN_WAIT:
         if (FieldTaskManager_IsIdle(Field_GetTaskManager(wk->field))) {
-            *state = 6;
+            *state = QUICKSAND_DRAW_IN_END;
         }
         break;
-    case 6:
+    case QUICKSAND_DRAW_IN_END:
         GFL_SndPlayerStop(GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_15));
         FieldCamera_ChangeTransformType(camera, wk->transformType);
         if (wk->propHandle != NULL) {
@@ -780,29 +831,38 @@ static void EventDig_StartCameraAnimation(EffectEventWork *wk);
 static void EventDig_FreeCameraAnimation(EffectEventWork *wk);
 static GameEvent *EventDig_CreateExitTransition(EffectEventWork *wk);
 
+// The steps of an Escape Rope and of Dig: start the spin and the camera, chain the exit after 36 frames (until then
+// fall into the wait), wait for the tasks, end
+enum {
+    ESCAPE_START,
+    ESCAPE_CHAIN_EXIT,
+    ESCAPE_WAIT,
+    ESCAPE_END,
+};
+
 static GameEventReturnCode EventEscapeRope_Callback(GameEvent *event, u32 *state, void *data) {
     EffectEventWork *wk = data;
     FieldTaskManager *taskManager = Field_GetTaskManager(wk->field);
 
     switch (*state) {
-    case 0:
+    case ESCAPE_START:
         EventEscapeRope_StartSpinTasks(wk);
         EventEscapeRope_StartCameraAnimation(wk);
         (*state)++;
         break;
-    case 1:
+    case ESCAPE_CHAIN_EXIT:
         if (wk->timer++ > 0x23) {
             GameEvent_ChainNext(event, EventEscapeRope_CreateExitTransition(wk));
             (*state)++;
             break;
         }
-    case 2:
+    case ESCAPE_WAIT:
         if (FieldTaskManager_IsIdle(taskManager)) {
             GFL_SndSEPlay(SEQ_SE_KAIDAN);
             (*state)++;
         }
         break;
-    case 3:
+    case ESCAPE_END:
         EventEscapeRope_FreeCameraAnimation(wk);
         return GAMEEVENT_DONE;
     }
@@ -856,25 +916,25 @@ static GameEventReturnCode EventDig_Callback(GameEvent *event, u32 *state, void 
     FieldTaskManager *taskManager = Field_GetTaskManager(wk->field);
 
     switch (*state) {
-    case 0:
+    case ESCAPE_START:
         EventDig_StartEffectTasks(wk);
         EventDig_StartCameraAnimation(wk);
         GFL_SndSEPlay(SEQ_SE_FLD_80);
         (*state)++;
         break;
-    case 1:
+    case ESCAPE_CHAIN_EXIT:
         if (wk->timer++ > 0x23) {
             GameEvent_ChainNext(event, EventDig_CreateExitTransition(wk));
             (*state)++;
             break;
         }
-    case 2:
+    case ESCAPE_WAIT:
         if (FieldTaskManager_IsIdle(taskManager)) {
             GFL_SndSEPlay(SEQ_SE_KAIDAN);
             (*state)++;
         }
         break;
-    case 3:
+    case ESCAPE_END:
         EventDig_FreeCameraAnimation(wk);
         return GAMEEVENT_DONE;
     }
@@ -925,6 +985,13 @@ static GameEvent *EventDig_CreateExitTransition(EffectEventWork *wk) {
     return CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_WHITE, 0);
 }
 
+// The steps of Teleport's effect: start the spin, the fade and the camera, wait for them, end
+enum {
+    TELEPORT_START,
+    TELEPORT_WAIT,
+    TELEPORT_END,
+};
+
 static GameEventReturnCode EventTeleportEffect_Callback(GameEvent *event, u32 *state, void *data) {
     EffectEventWork *wk = data;
     Field *field = wk->field;
@@ -935,7 +1002,7 @@ static GameEventReturnCode EventTeleportEffect_Callback(GameEvent *event, u32 *s
     camera = Field_GetCameraSystem(wk->field);
     taskManager = Field_GetTaskManager(field);
     switch (*state) {
-    case 0: {
+    case TELEPORT_START: {
         FieldTask *accel = FieldActorSpinTask_CreatePlayerAccel(field, 0x14, 3);
         FieldTask *spin = FieldActorSpinTask_CreatePlayer(field, 0x14, 5);
         FieldTask *wait = FieldWaitTask_Create(field, 0x1e);
@@ -966,12 +1033,12 @@ static GameEventReturnCode EventTeleportEffect_Callback(GameEvent *event, u32 *s
         (*state)++;
         break;
     }
-    case 1:
+    case TELEPORT_WAIT:
         if (FieldTaskManager_IsIdle(taskManager)) {
             (*state)++;
         }
         break;
-    case 2:
+    case TELEPORT_END:
         FieldCameraAnimationController_FinishCamera(wk->controller);
         FieldCameraAnimationController_FreeAnimation(wk->controller);
         return GAMEEVENT_DONE;
@@ -987,7 +1054,7 @@ static GameEventReturnCode EventDig_RunRisingSpin(GameEvent *event, u32 *state, 
     Field_GetPlayer(field);
     camera = Field_GetCameraSystem(field);
     switch (*state) {
-    case 0: {
+    case PLAYER_ANIME_START: {
         VecFx32 move;
         FieldTask *spin;
         FieldTask *fade;
@@ -1010,16 +1077,16 @@ static GameEventReturnCode EventDig_RunRisingSpin(GameEvent *event, u32 *state, 
         (*state)++;
         break;
     }
-    case 1:
+    case PLAYER_ANIME_WAIT:
         if (FieldTaskManager_IsIdle(Field_GetTaskManager(field)) && !GFL_FadeIsRunning()) {
             (*state)++;
         }
         break;
-    case 2:
+    case PLAYER_ANIME_RESTORE_CAMERA:
         FieldCamera_ChangeTransformType(camera, wk->transformType);
         (*state)++;
         break;
-    case 3:
+    case PLAYER_ANIME_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;

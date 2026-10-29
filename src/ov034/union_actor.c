@@ -56,7 +56,7 @@ static const UnionActorOffset sUnionMemberOffsets[UNION_MEMBER_MAX] = {
 };
 
 static const ZoneNPC sUnionActorNpc = {
-    0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, { { 0, 0, 0 } },
+    0, 0, MOVE_CODE_TURN_RANDOM, ACTOR_EVENT_TYPE_NONE, 0, 0, 1, 0, 0, 0, 0, 0, 0, { { 0, 0, 0 } },
 };
 
 static const UnionActorOffset sUnionEntryPositions[UNION_BEACON_ENTRY_MAX] = {
@@ -88,7 +88,7 @@ static FieldActor *UnionOneself_CreateActor(UnionSystem *unisys, GameData *gameD
     npc.uid = id;
     npc.modelId = UnionView_GetTrainerType(look);
     if (member != 0) {
-        npc.moveCode = 0xf;
+        npc.moveCode = MOVE_CODE_FACE_DOWN;
     }
     ZoneNPC_SetGridPos(&npc, sUnionEntryPositions[entryIndex].x + sUnionMemberOffsets[member].x,
                        sUnionEntryPositions[entryIndex].z + sUnionMemberOffsets[member].z, 0);
@@ -423,14 +423,14 @@ static BOOL UnionOneself_ActorIdle(UnionSystem *unisys, UnionActorSlot *slot, Fi
     } else if (slot->member == 0 && entry->beacon.memberCount > 1) {
         FieldActor *actor = UnionOneself_FindActor(unisys, slot->entry, slot);
 
-        if (GetActorMoveCode(actor) == 2) {
-            ChangeActorMoveCodeSeq(actor, 0xf);
+        if (GetActorMoveCode(actor) == MOVE_CODE_TURN_RANDOM) {
+            ChangeActorMoveCodeSeq(actor, MOVE_CODE_FACE_DOWN);
         }
     } else if (slot->member == 0 && entry->beacon.memberCount <= 1) {
         FieldActor *actor = UnionOneself_FindActor(unisys, slot->entry, slot);
 
-        if (GetActorMoveCode(actor) == 0xf) {
-            ChangeActorMoveCodeSeq(actor, 2);
+        if (GetActorMoveCode(actor) == MOVE_CODE_FACE_DOWN) {
+            ChangeActorMoveCodeSeq(actor, MOVE_CODE_TURN_RANDOM);
         }
     }
     return FALSE;

@@ -76,8 +76,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_110",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x045d",
             "script": 7017,
             "direction": "DIR_DOWN",
@@ -95,8 +95,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_110",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x045f",
             "script": 7019,
             "direction": "DIR_DOWN",
@@ -114,8 +114,8 @@
         {
             "id": 2,
             "model": "OBJ_CODE_ROUGHNECK",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2,
             "direction": "DIR_DOWN",

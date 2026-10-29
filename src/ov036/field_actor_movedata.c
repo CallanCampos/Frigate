@@ -16,317 +16,486 @@
 #include "field/field_comm_actor.h"
 #include "field/fld_act_rail.h"
 
-// The functions of each move code, by move code, except that 0x2d and 0x2e follow 0xd, 0x31 follows 0x13 and 0x43
-// follows 0x5, the codes whose functions come just before theirs
-static const FieldActorMoveCode sMoveCode00 = { 0, MoveCodeNone_Init, MoveCodeNone_Move, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode01 = { 0x1, MoveCodeNone_Init, MoveCodeNone_Move, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode02 = { 0x2, FieldActorMovecode_InitTurnRandomSet0,
-                                                FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode03 = { 0x3, FieldActorMovecode_InitWalkRandomSet11,
-                                                FieldActorMovecode_MoveWalkRandom, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode04 = { 0x3, FieldActorMovecode_InitWalkRandomSet12,
-                                                FieldActorMovecode_MoveWalkRandom, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode05 = { 0x3, FieldActorMovecode_InitWalkRandomSet13,
-                                                FieldActorMovecode_MoveWalkRandom, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode42 = { 0x3, FieldActorMovecode_InitWalkRandomSet13Bump,
-                                                FieldActorMovecode_MoveWalkRandom, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode06 = { 0x3, FieldActorMovecode_InitTurnRandomSet1,
-                                                FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode07 = { 0x3, FieldActorMovecode_InitTurnRandomSet2,
-                                                FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode08 = { 0x3, FieldActorMovecode_InitTurnRandomSet3,
-                                                FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode09 = { 0x3, FieldActorMovecode_InitTurnRandomSet4,
-                                                FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode0A = { 0x3, FieldActorMovecode_InitTurnRandomSet5,
-                                                FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode0B = { 0x3, FieldActorMovecode_InitTurnRandomSet6,
-                                                FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode0C = { 0x3, FieldActorMovecode_InitTurnRandomSet7,
-                                                FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode0D = { 0x3, FieldActorMovecode_InitTurnRandomSet8,
-                                                FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode2D = { 0x3, FieldActorMovecode_InitTurnRandomSet9,
-                                                FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode2E = { 0x3, FieldActorMovecode_InitTurnRandomSet10,
-                                                FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode0E = { 0x3, FieldActorMovecode_InitFixedDirUp, FieldActorMovecode_MoveFixedDir,
-                                                MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode0F = { 0x3, FieldActorMovecode_InitFixedDirDown,
-                                                FieldActorMovecode_MoveFixedDir, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode10 = { 0x3, FieldActorMovecode_InitFixedDirLeft,
-                                                FieldActorMovecode_MoveFixedDir, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode11 = { 0x3, FieldActorMovecode_InitFixedDirRight,
-                                                FieldActorMovecode_MoveFixedDir, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode12 = { 0x3, FieldActorMovecode_InitSpinClockwise, FieldActorMovecode_MoveSpin,
-                                                MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode13 = { 0x3, FieldActorMovecode_InitSpinCounterClockwise,
-                                                FieldActorMovecode_MoveSpin, MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode30 = { 0x3, FieldActorMovecode_InitSwing, FieldActorMovecode_MoveSwing,
-                                                MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode14 = { 0x3, FieldActorMovecode_InitBackForth, FieldActorMovecode_MoveBackForth,
-                                                MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode15 = { 0x3, FieldActorMovecode_InitRoutePatrolSet14,
-                                                FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode16 = { 0x3, FieldActorMovecode_InitRoutePatrolSet15,
-                                                FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode17 = { 0x3, FieldActorMovecode_InitRoutePatrolSet16,
-                                                FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode18 = { 0x3, FieldActorMovecode_InitRoutePatrolSet17,
-                                                FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode19 = { 0x3, FieldActorMovecode_InitRoutePatrolSet18,
-                                                FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode1A = { 0x3, FieldActorMovecode_InitRoutePatrolSet19,
-                                                FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode1B = { 0x3, FieldActorMovecode_InitRoutePatrolSet20,
-                                                FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode1C = { 0x3, FieldActorMovecode_InitRoutePatrolSet21,
-                                                FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode1D = { 0x3, FieldActorMovecode_InitRoutePatrolSet22,
-                                                FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode1E = { 0x3, FieldActorMovecode_InitRoutePatrolSet23,
-                                                FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode1F = { 0x3, FieldActorMovecode_InitRoutePatrolSet24,
-                                                FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode20 = { 0x3, FieldActorMovecode_InitRoutePatrolSet25,
-                                                FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode21 = { 0x3, FieldActorMovecode_InitRoutePatrolSet26,
-                                                FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode22 = { 0x3, FieldActorMovecode_InitRoutePatrolSet27,
-                                                FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode23 = { 0x3, FieldActorMovecode_InitRoutePatrolSet28,
-                                                FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode24 = { 0x3, FieldActorMovecode_InitRoutePatrolSet29,
-                                                FieldActorMovecode_MoveRoutePatrol, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode25 = { 0x3, FieldActorMovecode_InitRoutePatrolSwapSet30,
-                                                FieldActorMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode26 = { 0x3, FieldActorMovecode_InitRoutePatrolSwapSet31,
-                                                FieldActorMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode27 = { 0x3, FieldActorMovecode_InitRoutePatrolSwapSet32,
-                                                FieldActorMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode28 = { 0x3, FieldActorMovecode_InitRoutePatrolSwapSet33,
-                                                FieldActorMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode29 = { 0x3, FieldActorMovecode_InitRoutePatrolSwapSet34,
-                                                FieldActorMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode2A = { 0x3, FieldActorMovecode_InitRoutePatrolSwapSet35,
-                                                FieldActorMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode2B = { 0x3, FieldActorMovecode_InitRoutePatrolSwapSet36,
-                                                FieldActorMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode2C = { 0x3, FieldActorMovecode_InitRoutePatrolSwapSet37,
-                                                FieldActorMovecode_MoveRoutePatrolSwap, MoveCodeNone_Delete,
-                                                MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode2F = { 0x3, FieldActorMove_InitLookPlayer, FieldActorMove_MoveLookPlayer,
-                                                FieldActorMove_DeleteLookPlayer, MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode31 = { 0x3, FieldActorMove_InitLookFellow, FieldActorMove_MoveLookFellow,
-                                                FieldActorMove_DeleteLookFellow, FieldActorMove_ClearFellowTracking };
-
-static const FieldActorMoveCode sMoveCode32 = { 0x33, FieldActorMove_InitHideKind0Code33, FieldActorMove_MoveHide,
-                                                FieldActorMove_DeleteHide, FieldActorMove_RecoverHide };
-
-static const FieldActorMoveCode sMoveCode33 = { 0x34, FieldActorMove_InitHideKind1Code34, FieldActorMove_MoveHide,
-                                                FieldActorMove_DeleteHide, FieldActorMove_RecoverHide };
-
-static const FieldActorMoveCode sMoveCode34 = { 0x35, FieldActorMove_InitHideKind1Code35, FieldActorMove_MoveHide,
-                                                FieldActorMove_DeleteHide, FieldActorMove_RecoverHide };
-
-static const FieldActorMoveCode sMoveCode35 = { 0x36, FieldActorMove_InitHideKind0Code36, FieldActorMove_MoveHide,
-                                                FieldActorMove_DeleteHide, FieldActorMove_RecoverHide };
-
-static const FieldActorMoveCode sMoveCode36 = { 0x37, FieldActorMove_InitFaceDirSet0, FieldActorMove_MoveFaceDir,
-                                                MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode37 = { 0x38, FieldActorMove_InitFaceDirSet1, FieldActorMove_MoveFaceDir,
-                                                MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode38 = { 0x39, FieldActorMove_InitFaceDirSet2, FieldActorMove_MoveFaceDir,
-                                                MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode39 = { 0x3a, FieldActorMove_InitFaceDirSet3, FieldActorMove_MoveFaceDir,
-                                                MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode3A = { 0x3b, FieldActorMove_InitFaceDirFlagSet0, FieldActorMove_MoveFaceDir,
-                                                MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode3B = { 0x3c, FieldActorMove_InitFaceDirFlagSet1, FieldActorMove_MoveFaceDir,
-                                                MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode3C = { 0x3d, FieldActorMove_InitFaceDirFlagSet2, FieldActorMove_MoveFaceDir,
-                                                MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode3D = { 0x3e, FieldActorMove_InitFaceDirFlagSet3, FieldActorMove_MoveFaceDir,
-                                                MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode3E = { 0x3f, FieldActorMove_InitWallWalkLeftHand, FieldActorMove_MoveWallWalk,
-                                                MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode3F = { 0x40, FieldActorMove_InitWallWalkRightHand, FieldActorMove_MoveWallWalk,
-                                                MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode40 = { 0x41, FieldActorMove_InitWallWalkLeftHandReversing,
-                                                FieldActorMove_MoveWallWalk, MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode41 = { 0x42, FieldActorMove_InitWallWalkRightHandReversing,
-                                                FieldActorMove_MoveWallWalk, MoveCodeNone_Delete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode43 = { 0x44, FieldCommActor_MoveInit, FieldCommActor_Move,
-                                                FieldCommActor_MoveDelete, MoveCodeNone_Return };
-
-static const FieldActorMoveCode sMoveCode44 = { 0x45, RailActor_StayInit, RailActor_StayMove, RailActor_StayDelete,
-                                                RailActor_Recover };
-
-static const FieldActorMoveCode sMoveCode45 = { 0x46, RailActor_WaitInitAll, RailActor_WaitMove, RailActor_WaitDelete,
-                                                RailActor_Recover };
-
-static const FieldActorMoveCode sMoveCode46 = { 0x47, RailActor_WaitInitUpLeft, RailActor_WaitMove,
-                                                RailActor_WaitDelete, RailActor_Recover };
-
-static const FieldActorMoveCode sMoveCode47 = { 0x48, RailActor_WaitInitUpRight, RailActor_WaitMove,
-                                                RailActor_WaitDelete, RailActor_Recover };
-
-static const FieldActorMoveCode sMoveCode48 = { 0x49, RailActor_WaitInitDownLeft, RailActor_WaitMove,
-                                                RailActor_WaitDelete, RailActor_Recover };
-
-static const FieldActorMoveCode sMoveCode49 = { 0x4a, RailActor_WaitInitDownRight, RailActor_WaitMove,
-                                                RailActor_WaitDelete, RailActor_Recover };
-
-static const FieldActorMoveCode sMoveCode4A = { 0x4b, RailActor_WaitInitUpDownLeft, RailActor_WaitMove,
-                                                RailActor_WaitDelete, RailActor_Recover };
-
-static const FieldActorMoveCode sMoveCode4B = { 0x4c, RailActor_WaitInitUpDownRight, RailActor_WaitMove,
-                                                RailActor_WaitDelete, RailActor_Recover };
-
-static const FieldActorMoveCode sMoveCode4C = { 0x4d, RailActor_WaitInitUpLeftRight, RailActor_WaitMove,
-                                                RailActor_WaitDelete, RailActor_Recover };
-
-static const FieldActorMoveCode sMoveCode4D = { 0x4e, RailActor_WaitInitDownLeftRight, RailActor_WaitMove,
-                                                RailActor_WaitDelete, RailActor_Recover };
-
-static const FieldActorMoveCode sMoveCode4E = { 0x4f, RailActor_WaitInitUpDown, RailActor_WaitMove,
-                                                RailActor_WaitDelete, RailActor_Recover };
-
-static const FieldActorMoveCode sMoveCode4F = { 0x50, RailActor_WaitInitLeftRight, RailActor_WaitMove,
-                                                RailActor_WaitDelete, RailActor_Recover };
-
-static const FieldActorMoveCode sMoveCode50 = { 0x51, RailActor_WalkInitAll, RailActor_WalkMove, RailActor_WalkDelete,
-                                                RailActor_Recover };
-
-static const FieldActorMoveCode sMoveCode51 = { 0x52, RailActor_WalkInitUpDown, RailActor_WalkMove,
-                                                RailActor_WalkDelete, RailActor_Recover };
-
-static const FieldActorMoveCode sMoveCode52 = { 0x53, RailActor_WalkInitUpDown, RailActor_WalkMove,
-                                                RailActor_WalkDelete, RailActor_Recover };
-
-static const FieldActorMoveCode sMoveCode53 = { 0x54, RailActor_PatrolInit, RailActor_PatrolMove,
-                                                RailActor_PatrolDelete, RailActor_Recover };
-
-static const FieldActorMoveCode sMoveCode54 = { 0x55, FieldActorMove_InitHideKind2Code55, FieldActorMove_MoveHide,
-                                                FieldActorMove_DeleteHide, FieldActorMove_RecoverHide };
-
-const FieldActorMoveCode *const ACTOR_MOVE_CODE_FUNCTION_TABLES[] = {
-    &sMoveCode00, &sMoveCode01, &sMoveCode02, &sMoveCode03, &sMoveCode04, &sMoveCode05, &sMoveCode06, &sMoveCode07,
-    &sMoveCode08, &sMoveCode09, &sMoveCode0A, &sMoveCode0B, &sMoveCode0C, &sMoveCode0D, &sMoveCode0E, &sMoveCode0F,
-    &sMoveCode10, &sMoveCode11, &sMoveCode12, &sMoveCode13, &sMoveCode14, &sMoveCode15, &sMoveCode16, &sMoveCode17,
-    &sMoveCode18, &sMoveCode19, &sMoveCode1A, &sMoveCode1B, &sMoveCode1C, &sMoveCode1D, &sMoveCode1E, &sMoveCode1F,
-    &sMoveCode20, &sMoveCode21, &sMoveCode22, &sMoveCode23, &sMoveCode24, &sMoveCode25, &sMoveCode26, &sMoveCode27,
-    &sMoveCode28, &sMoveCode29, &sMoveCode2A, &sMoveCode2B, &sMoveCode2C, &sMoveCode2D, &sMoveCode2E, NULL,
-    &sMoveCode2F, &sMoveCode30, &sMoveCode31, &sMoveCode32, &sMoveCode33, &sMoveCode34, &sMoveCode35, &sMoveCode36,
-    &sMoveCode37, &sMoveCode38, &sMoveCode39, &sMoveCode3A, &sMoveCode3B, &sMoveCode3C, &sMoveCode3D, &sMoveCode3E,
-    &sMoveCode3F, &sMoveCode40, &sMoveCode41, &sMoveCode42, &sMoveCode43, &sMoveCode44, &sMoveCode45, &sMoveCode46,
-    &sMoveCode47, &sMoveCode48, &sMoveCode49, &sMoveCode4A, &sMoveCode4B, &sMoveCode4C, &sMoveCode4D, &sMoveCode4E,
-    &sMoveCode4F, &sMoveCode50, &sMoveCode51, &sMoveCode52, &sMoveCode53, &sMoveCode54,
+// The functions of each move code (constants/move_codes.h), by move code, except that MOVE_CODE_TURN_RANDOM_UP_DOWN
+// and MOVE_CODE_TURN_RANDOM_LEFT_RIGHT follow MOVE_CODE_TURN_RANDOM_DOWN_LEFT_RIGHT, MOVE_CODE_SWING follows
+// MOVE_CODE_SPIN_CLOCKWISE and MOVE_CODE_WALK_RANDOM_LEFT_RIGHT_BUMP follows MOVE_CODE_WALK_RANDOM_LEFT_RIGHT, the
+// codes whose functions come just before theirs. The records from MOVE_CODE_WALK_RANDOM to
+// MOVE_CODE_FOLLOW_PAIRED_TRAINER, and MOVE_CODE_WALK_RANDOM_LEFT_RIGHT_BUMP's, all give MOVE_CODE_WALK_RANDOM as their
+// code
+static const FieldActorMoveCode sMoveCodeNone = { MOVE_CODE_NONE, MoveCodeNone_Init, MoveCodeNone_Move,
+                                                  MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCode1 = { MOVE_CODE_1, MoveCodeNone_Init, MoveCodeNone_Move, MoveCodeNone_Delete,
+                                               MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeTurnRandom = { MOVE_CODE_TURN_RANDOM, FieldActorMovecode_InitTurnRandomSet0,
+                                                        FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
+                                                        MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeWalkRandom = { MOVE_CODE_WALK_RANDOM, FieldActorMovecode_InitWalkRandomSet11,
+                                                        FieldActorMovecode_MoveWalkRandom, MoveCodeNone_Delete,
+                                                        MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeWalkRandomUpDown = { MOVE_CODE_WALK_RANDOM,
+                                                              FieldActorMovecode_InitWalkRandomSet12,
+                                                              FieldActorMovecode_MoveWalkRandom, MoveCodeNone_Delete,
+                                                              MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeWalkRandomLeftRight = { MOVE_CODE_WALK_RANDOM,
+                                                                 FieldActorMovecode_InitWalkRandomSet13,
+                                                                 FieldActorMovecode_MoveWalkRandom, MoveCodeNone_Delete,
+                                                                 MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeWalkRandomLeftRightBump = { MOVE_CODE_WALK_RANDOM,
+                                                                     FieldActorMovecode_InitWalkRandomSet13Bump,
+                                                                     FieldActorMovecode_MoveWalkRandom,
+                                                                     MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeTurnRandomUpLeft = { MOVE_CODE_WALK_RANDOM,
+                                                              FieldActorMovecode_InitTurnRandomSet1,
+                                                              FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
+                                                              MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeTurnRandomUpRight = { MOVE_CODE_WALK_RANDOM,
+                                                               FieldActorMovecode_InitTurnRandomSet2,
+                                                               FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
+                                                               MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeTurnRandomDownLeft = { MOVE_CODE_WALK_RANDOM,
+                                                                FieldActorMovecode_InitTurnRandomSet3,
+                                                                FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
+                                                                MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeTurnRandomDownRight = { MOVE_CODE_WALK_RANDOM,
+                                                                 FieldActorMovecode_InitTurnRandomSet4,
+                                                                 FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
+                                                                 MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeTurnRandomUpDownLeft = { MOVE_CODE_WALK_RANDOM,
+                                                                  FieldActorMovecode_InitTurnRandomSet5,
+                                                                  FieldActorMovecode_MoveTurnRandom,
+                                                                  func_ov036_021913dc, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeTurnRandomUpDownRight = { MOVE_CODE_WALK_RANDOM,
+                                                                   FieldActorMovecode_InitTurnRandomSet6,
+                                                                   FieldActorMovecode_MoveTurnRandom,
+                                                                   func_ov036_021913dc, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeTurnRandomUpLeftRight = { MOVE_CODE_WALK_RANDOM,
+                                                                   FieldActorMovecode_InitTurnRandomSet7,
+                                                                   FieldActorMovecode_MoveTurnRandom,
+                                                                   func_ov036_021913dc, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeTurnRandomDownLeftRight = { MOVE_CODE_WALK_RANDOM,
+                                                                     FieldActorMovecode_InitTurnRandomSet8,
+                                                                     FieldActorMovecode_MoveTurnRandom,
+                                                                     func_ov036_021913dc, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeTurnRandomUpDown = { MOVE_CODE_WALK_RANDOM,
+                                                              FieldActorMovecode_InitTurnRandomSet9,
+                                                              FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
+                                                              MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeTurnRandomLeftRight = { MOVE_CODE_WALK_RANDOM,
+                                                                 FieldActorMovecode_InitTurnRandomSet10,
+                                                                 FieldActorMovecode_MoveTurnRandom, func_ov036_021913dc,
+                                                                 MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeFaceUp = { MOVE_CODE_WALK_RANDOM, FieldActorMovecode_InitFixedDirUp,
+                                                    FieldActorMovecode_MoveFixedDir, MoveCodeNone_Delete,
+                                                    MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeFaceDown = { MOVE_CODE_WALK_RANDOM, FieldActorMovecode_InitFixedDirDown,
+                                                      FieldActorMovecode_MoveFixedDir, MoveCodeNone_Delete,
+                                                      MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeFaceLeft = { MOVE_CODE_WALK_RANDOM, FieldActorMovecode_InitFixedDirLeft,
+                                                      FieldActorMovecode_MoveFixedDir, MoveCodeNone_Delete,
+                                                      MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeFaceRight = { MOVE_CODE_WALK_RANDOM, FieldActorMovecode_InitFixedDirRight,
+                                                       FieldActorMovecode_MoveFixedDir, MoveCodeNone_Delete,
+                                                       MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeSpinCounterclockwise = { MOVE_CODE_WALK_RANDOM,
+                                                                  FieldActorMovecode_InitSpinLeft,
+                                                                  FieldActorMovecode_MoveSpin, MoveCodeNone_Delete,
+                                                                  MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeSpinClockwise = { MOVE_CODE_WALK_RANDOM, FieldActorMovecode_InitSpinRight,
+                                                           FieldActorMovecode_MoveSpin, MoveCodeNone_Delete,
+                                                           MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeSwing = { MOVE_CODE_WALK_RANDOM, FieldActorMovecode_InitSwing,
+                                                   FieldActorMovecode_MoveSwing, MoveCodeNone_Delete,
+                                                   MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeWalkBackAndForth = { MOVE_CODE_WALK_RANDOM, FieldActorMovecode_InitBackForth,
+                                                              FieldActorMovecode_MoveBackForth, MoveCodeNone_Delete,
+                                                              MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeRouteUpRightLeftDown = { MOVE_CODE_WALK_RANDOM,
+                                                                  FieldActorMovecode_InitRoutePatrolSet14,
+                                                                  FieldActorMovecode_MoveRoutePatrol,
+                                                                  MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeRouteRightLeftDownUp = { MOVE_CODE_WALK_RANDOM,
+                                                                  FieldActorMovecode_InitRoutePatrolSet15,
+                                                                  FieldActorMovecode_MoveRoutePatrol,
+                                                                  MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeRouteDownUpRightLeft = { MOVE_CODE_WALK_RANDOM,
+                                                                  FieldActorMovecode_InitRoutePatrolSet16,
+                                                                  FieldActorMovecode_MoveRoutePatrol,
+                                                                  MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeRouteLeftDownUpRight = { MOVE_CODE_WALK_RANDOM,
+                                                                  FieldActorMovecode_InitRoutePatrolSet17,
+                                                                  FieldActorMovecode_MoveRoutePatrol,
+                                                                  MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeRouteLeftRightDownUp = { MOVE_CODE_WALK_RANDOM,
+                                                                  FieldActorMovecode_InitRoutePatrolSet18,
+                                                                  FieldActorMovecode_MoveRoutePatrol,
+                                                                  MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeRouteLeftRightDownUp2 = { MOVE_CODE_WALK_RANDOM,
+                                                                   FieldActorMovecode_InitRoutePatrolSet19,
+                                                                   FieldActorMovecode_MoveRoutePatrol,
+                                                                   MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeRouteDownUpLeftRight = { MOVE_CODE_WALK_RANDOM,
+                                                                  FieldActorMovecode_InitRoutePatrolSet20,
+                                                                  FieldActorMovecode_MoveRoutePatrol,
+                                                                  MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeRouteRightDownUpLeft = { MOVE_CODE_WALK_RANDOM,
+                                                                  FieldActorMovecode_InitRoutePatrolSet21,
+                                                                  FieldActorMovecode_MoveRoutePatrol,
+                                                                  MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeRouteLeftUpDownRight = { MOVE_CODE_WALK_RANDOM,
+                                                                  FieldActorMovecode_InitRoutePatrolSet22,
+                                                                  FieldActorMovecode_MoveRoutePatrol,
+                                                                  MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeRouteUpDownRightLeft = { MOVE_CODE_WALK_RANDOM,
+                                                                  FieldActorMovecode_InitRoutePatrolSet23,
+                                                                  FieldActorMovecode_MoveRoutePatrol,
+                                                                  MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeRouteRightLeftUpDown = { MOVE_CODE_WALK_RANDOM,
+                                                                  FieldActorMovecode_InitRoutePatrolSet24,
+                                                                  FieldActorMovecode_MoveRoutePatrol,
+                                                                  MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeRouteDownRightLeftUp = { MOVE_CODE_WALK_RANDOM,
+                                                                  FieldActorMovecode_InitRoutePatrolSet25,
+                                                                  FieldActorMovecode_MoveRoutePatrol,
+                                                                  MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeRouteRightUpDownLeft = { MOVE_CODE_WALK_RANDOM,
+                                                                  FieldActorMovecode_InitRoutePatrolSet26,
+                                                                  FieldActorMovecode_MoveRoutePatrol,
+                                                                  MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeRouteUpDownLeftRight = { MOVE_CODE_WALK_RANDOM,
+                                                                  FieldActorMovecode_InitRoutePatrolSet27,
+                                                                  FieldActorMovecode_MoveRoutePatrol,
+                                                                  MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeRouteLeftRightUpDown = { MOVE_CODE_WALK_RANDOM,
+                                                                  FieldActorMovecode_InitRoutePatrolSet28,
+                                                                  FieldActorMovecode_MoveRoutePatrol,
+                                                                  MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeRouteDownLeftRightUp = { MOVE_CODE_WALK_RANDOM,
+                                                                  FieldActorMovecode_InitRoutePatrolSet29,
+                                                                  FieldActorMovecode_MoveRoutePatrol,
+                                                                  MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeLoopUpLeftDownRight = { MOVE_CODE_WALK_RANDOM,
+                                                                 FieldActorMovecode_InitRoutePatrolSwapSet30,
+                                                                 FieldActorMovecode_MoveRoutePatrolSwap,
+                                                                 MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeLoopDownRightUpLeft = { MOVE_CODE_WALK_RANDOM,
+                                                                 FieldActorMovecode_InitRoutePatrolSwapSet31,
+                                                                 FieldActorMovecode_MoveRoutePatrolSwap,
+                                                                 MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeLoopLeftDownRightUp = { MOVE_CODE_WALK_RANDOM,
+                                                                 FieldActorMovecode_InitRoutePatrolSwapSet32,
+                                                                 FieldActorMovecode_MoveRoutePatrolSwap,
+                                                                 MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeLoopRightUpLeftDown = { MOVE_CODE_WALK_RANDOM,
+                                                                 FieldActorMovecode_InitRoutePatrolSwapSet33,
+                                                                 FieldActorMovecode_MoveRoutePatrolSwap,
+                                                                 MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeLoopUpRightDownLeft = { MOVE_CODE_WALK_RANDOM,
+                                                                 FieldActorMovecode_InitRoutePatrolSwapSet34,
+                                                                 FieldActorMovecode_MoveRoutePatrolSwap,
+                                                                 MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeLoopDownLeftUpRight = { MOVE_CODE_WALK_RANDOM,
+                                                                 FieldActorMovecode_InitRoutePatrolSwapSet35,
+                                                                 FieldActorMovecode_MoveRoutePatrolSwap,
+                                                                 MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeLoopLeftUpRightDown = { MOVE_CODE_WALK_RANDOM,
+                                                                 FieldActorMovecode_InitRoutePatrolSwapSet36,
+                                                                 FieldActorMovecode_MoveRoutePatrolSwap,
+                                                                 MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeLoopRightDownLeftUp = { MOVE_CODE_WALK_RANDOM,
+                                                                 FieldActorMovecode_InitRoutePatrolSwapSet37,
+                                                                 FieldActorMovecode_MoveRoutePatrolSwap,
+                                                                 MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeFollowPlayer = { MOVE_CODE_WALK_RANDOM, FieldActorMove_InitLookPlayer,
+                                                          FieldActorMove_MoveLookPlayer,
+                                                          FieldActorMove_DeleteLookPlayer, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeFollowPairedTrainer = { MOVE_CODE_WALK_RANDOM, FieldActorMove_InitLookFellow,
+                                                                 FieldActorMove_MoveLookFellow,
+                                                                 FieldActorMove_DeleteLookFellow,
+                                                                 FieldActorMove_ClearFellowTracking };
+
+static const FieldActorMoveCode sMoveCodeHide33 = { MOVE_CODE_HIDE_33, FieldActorMove_InitHideKind0Code33,
+                                                    FieldActorMove_MoveHide, FieldActorMove_DeleteHide,
+                                                    FieldActorMove_RecoverHide };
+
+static const FieldActorMoveCode sMoveCodeHide34 = { MOVE_CODE_HIDE_34, FieldActorMove_InitHideKind1Code34,
+                                                    FieldActorMove_MoveHide, FieldActorMove_DeleteHide,
+                                                    FieldActorMove_RecoverHide };
+
+static const FieldActorMoveCode sMoveCodeHide35 = { MOVE_CODE_HIDE_35, FieldActorMove_InitHideKind1Code35,
+                                                    FieldActorMove_MoveHide, FieldActorMove_DeleteHide,
+                                                    FieldActorMove_RecoverHide };
+
+static const FieldActorMoveCode sMoveCodeHide36 = { MOVE_CODE_HIDE_36, FieldActorMove_InitHideKind0Code36,
+                                                    FieldActorMove_MoveHide, FieldActorMove_DeleteHide,
+                                                    FieldActorMove_RecoverHide };
+
+static const FieldActorMoveCode sMoveCodeTurnWithPlayer0 = { MOVE_CODE_TURN_WITH_PLAYER_0,
+                                                             FieldActorMove_InitFaceDirSet0, FieldActorMove_MoveFaceDir,
+                                                             MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeTurnWithPlayer1 = { MOVE_CODE_TURN_WITH_PLAYER_1,
+                                                             FieldActorMove_InitFaceDirSet1, FieldActorMove_MoveFaceDir,
+                                                             MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeTurnWithPlayer2 = { MOVE_CODE_TURN_WITH_PLAYER_2,
+                                                             FieldActorMove_InitFaceDirSet2, FieldActorMove_MoveFaceDir,
+                                                             MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeTurnWithPlayer3 = { MOVE_CODE_TURN_WITH_PLAYER_3,
+                                                             FieldActorMove_InitFaceDirSet3, FieldActorMove_MoveFaceDir,
+                                                             MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeTurnWithPlayerFlag0 = { MOVE_CODE_TURN_WITH_PLAYER_FLAG_0,
+                                                                 FieldActorMove_InitFaceDirFlagSet0,
+                                                                 FieldActorMove_MoveFaceDir, MoveCodeNone_Delete,
+                                                                 MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeTurnWithPlayerFlag1 = { MOVE_CODE_TURN_WITH_PLAYER_FLAG_1,
+                                                                 FieldActorMove_InitFaceDirFlagSet1,
+                                                                 FieldActorMove_MoveFaceDir, MoveCodeNone_Delete,
+                                                                 MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeTurnWithPlayerFlag2 = { MOVE_CODE_TURN_WITH_PLAYER_FLAG_2,
+                                                                 FieldActorMove_InitFaceDirFlagSet2,
+                                                                 FieldActorMove_MoveFaceDir, MoveCodeNone_Delete,
+                                                                 MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeTurnWithPlayerFlag3 = { MOVE_CODE_TURN_WITH_PLAYER_FLAG_3,
+                                                                 FieldActorMove_InitFaceDirFlagSet3,
+                                                                 FieldActorMove_MoveFaceDir, MoveCodeNone_Delete,
+                                                                 MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeWallWalkLeftHand = { MOVE_CODE_WALL_WALK_LEFT_HAND,
+                                                              FieldActorMove_InitWallWalkLeftHand,
+                                                              FieldActorMove_MoveWallWalk, MoveCodeNone_Delete,
+                                                              MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeWallWalkRightHand = { MOVE_CODE_WALL_WALK_RIGHT_HAND,
+                                                               FieldActorMove_InitWallWalkRightHand,
+                                                               FieldActorMove_MoveWallWalk, MoveCodeNone_Delete,
+                                                               MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeWallWalkLeftHandReversing = { MOVE_CODE_WALL_WALK_LEFT_HAND_REVERSING,
+                                                                       FieldActorMove_InitWallWalkLeftHandReversing,
+                                                                       FieldActorMove_MoveWallWalk, MoveCodeNone_Delete,
+                                                                       MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeWallWalkRightHandReversing = { MOVE_CODE_WALL_WALK_RIGHT_HAND_REVERSING,
+                                                                        FieldActorMove_InitWallWalkRightHandReversing,
+                                                                        FieldActorMove_MoveWallWalk,
+                                                                        MoveCodeNone_Delete, MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeCommActor = { MOVE_CODE_COMM_ACTOR, FieldCommActor_MoveInit,
+                                                       FieldCommActor_Move, FieldCommActor_MoveDelete,
+                                                       MoveCodeNone_Return };
+
+static const FieldActorMoveCode sMoveCodeRailStay = { MOVE_CODE_RAIL_STAY, RailActor_StayInit, RailActor_StayMove,
+                                                      RailActor_StayDelete, RailActor_Recover };
+
+static const FieldActorMoveCode sMoveCodeRailTurnRandom = { MOVE_CODE_RAIL_TURN_RANDOM, RailActor_WaitInitAll,
+                                                            RailActor_WaitMove, RailActor_WaitDelete,
+                                                            RailActor_Recover };
+
+static const FieldActorMoveCode sMoveCodeRailTurnRandomUpLeft = { MOVE_CODE_RAIL_TURN_RANDOM_UP_LEFT,
+                                                                  RailActor_WaitInitUpLeft, RailActor_WaitMove,
+                                                                  RailActor_WaitDelete, RailActor_Recover };
+
+static const FieldActorMoveCode sMoveCodeRailTurnRandomUpRight = { MOVE_CODE_RAIL_TURN_RANDOM_UP_RIGHT,
+                                                                   RailActor_WaitInitUpRight, RailActor_WaitMove,
+                                                                   RailActor_WaitDelete, RailActor_Recover };
+
+static const FieldActorMoveCode sMoveCodeRailTurnRandomDownLeft = { MOVE_CODE_RAIL_TURN_RANDOM_DOWN_LEFT,
+                                                                    RailActor_WaitInitDownLeft, RailActor_WaitMove,
+                                                                    RailActor_WaitDelete, RailActor_Recover };
+
+static const FieldActorMoveCode sMoveCodeRailTurnRandomDownRight = { MOVE_CODE_RAIL_TURN_RANDOM_DOWN_RIGHT,
+                                                                     RailActor_WaitInitDownRight, RailActor_WaitMove,
+                                                                     RailActor_WaitDelete, RailActor_Recover };
+
+static const FieldActorMoveCode sMoveCodeRailTurnRandomUpDownLeft = { MOVE_CODE_RAIL_TURN_RANDOM_UP_DOWN_LEFT,
+                                                                      RailActor_WaitInitUpDownLeft, RailActor_WaitMove,
+                                                                      RailActor_WaitDelete, RailActor_Recover };
+
+static const FieldActorMoveCode sMoveCodeRailTurnRandomUpDownRight = { MOVE_CODE_RAIL_TURN_RANDOM_UP_DOWN_RIGHT,
+                                                                       RailActor_WaitInitUpDownRight,
+                                                                       RailActor_WaitMove, RailActor_WaitDelete,
+                                                                       RailActor_Recover };
+
+static const FieldActorMoveCode sMoveCodeRailTurnRandomUpLeftRight = { MOVE_CODE_RAIL_TURN_RANDOM_UP_LEFT_RIGHT,
+                                                                       RailActor_WaitInitUpLeftRight,
+                                                                       RailActor_WaitMove, RailActor_WaitDelete,
+                                                                       RailActor_Recover };
+
+static const FieldActorMoveCode sMoveCodeRailTurnRandomDownLeftRight = { MOVE_CODE_RAIL_TURN_RANDOM_DOWN_LEFT_RIGHT,
+                                                                         RailActor_WaitInitDownLeftRight,
+                                                                         RailActor_WaitMove, RailActor_WaitDelete,
+                                                                         RailActor_Recover };
+
+static const FieldActorMoveCode sMoveCodeRailTurnRandomUpDown = { MOVE_CODE_RAIL_TURN_RANDOM_UP_DOWN,
+                                                                  RailActor_WaitInitUpDown, RailActor_WaitMove,
+                                                                  RailActor_WaitDelete, RailActor_Recover };
+
+static const FieldActorMoveCode sMoveCodeRailTurnRandomLeftRight = { MOVE_CODE_RAIL_TURN_RANDOM_LEFT_RIGHT,
+                                                                     RailActor_WaitInitLeftRight, RailActor_WaitMove,
+                                                                     RailActor_WaitDelete, RailActor_Recover };
+
+static const FieldActorMoveCode sMoveCodeRailWalkRandom = { MOVE_CODE_RAIL_WALK_RANDOM, RailActor_WalkInitAll,
+                                                            RailActor_WalkMove, RailActor_WalkDelete,
+                                                            RailActor_Recover };
+
+static const FieldActorMoveCode sMoveCodeRailWalkRandomUpDown = { MOVE_CODE_RAIL_WALK_RANDOM_UP_DOWN,
+                                                                  RailActor_WalkInitUpDown, RailActor_WalkMove,
+                                                                  RailActor_WalkDelete, RailActor_Recover };
+
+static const FieldActorMoveCode sMoveCodeRailWalkRandomUpDown2 = { MOVE_CODE_RAIL_WALK_RANDOM_UP_DOWN_2,
+                                                                   RailActor_WalkInitUpDown, RailActor_WalkMove,
+                                                                   RailActor_WalkDelete, RailActor_Recover };
+
+static const FieldActorMoveCode sMoveCodeRailPatrol = { MOVE_CODE_RAIL_PATROL, RailActor_PatrolInit,
+                                                        RailActor_PatrolMove, RailActor_PatrolDelete,
+                                                        RailActor_Recover };
+
+static const FieldActorMoveCode sMoveCodeHideLeaves = { MOVE_CODE_HIDE_LEAVES, FieldActorMove_InitHideKind2Code55,
+                                                        FieldActorMove_MoveHide, FieldActorMove_DeleteHide,
+                                                        FieldActorMove_RecoverHide };
+
+const FieldActorMoveCode *const ACTOR_MOVE_CODE_FUNCTION_TABLES[MOVE_CODE_MAX] = {
+    &sMoveCodeNone,
+    &sMoveCode1,
+    &sMoveCodeTurnRandom,
+    &sMoveCodeWalkRandom,
+    &sMoveCodeWalkRandomUpDown,
+    &sMoveCodeWalkRandomLeftRight,
+    &sMoveCodeTurnRandomUpLeft,
+    &sMoveCodeTurnRandomUpRight,
+    &sMoveCodeTurnRandomDownLeft,
+    &sMoveCodeTurnRandomDownRight,
+    &sMoveCodeTurnRandomUpDownLeft,
+    &sMoveCodeTurnRandomUpDownRight,
+    &sMoveCodeTurnRandomUpLeftRight,
+    &sMoveCodeTurnRandomDownLeftRight,
+    &sMoveCodeFaceUp,
+    &sMoveCodeFaceDown,
+    &sMoveCodeFaceLeft,
+    &sMoveCodeFaceRight,
+    &sMoveCodeSpinCounterclockwise,
+    &sMoveCodeSpinClockwise,
+    &sMoveCodeWalkBackAndForth,
+    &sMoveCodeRouteUpRightLeftDown,
+    &sMoveCodeRouteRightLeftDownUp,
+    &sMoveCodeRouteDownUpRightLeft,
+    &sMoveCodeRouteLeftDownUpRight,
+    &sMoveCodeRouteLeftRightDownUp,
+    &sMoveCodeRouteLeftRightDownUp2,
+    &sMoveCodeRouteDownUpLeftRight,
+    &sMoveCodeRouteRightDownUpLeft,
+    &sMoveCodeRouteLeftUpDownRight,
+    &sMoveCodeRouteUpDownRightLeft,
+    &sMoveCodeRouteRightLeftUpDown,
+    &sMoveCodeRouteDownRightLeftUp,
+    &sMoveCodeRouteRightUpDownLeft,
+    &sMoveCodeRouteUpDownLeftRight,
+    &sMoveCodeRouteLeftRightUpDown,
+    &sMoveCodeRouteDownLeftRightUp,
+    &sMoveCodeLoopUpLeftDownRight,
+    &sMoveCodeLoopDownRightUpLeft,
+    &sMoveCodeLoopLeftDownRightUp,
+    &sMoveCodeLoopRightUpLeftDown,
+    &sMoveCodeLoopUpRightDownLeft,
+    &sMoveCodeLoopDownLeftUpRight,
+    &sMoveCodeLoopLeftUpRightDown,
+    &sMoveCodeLoopRightDownLeftUp,
+    &sMoveCodeTurnRandomUpDown,
+    &sMoveCodeTurnRandomLeftRight,
+    NULL,
+    &sMoveCodeFollowPlayer,
+    &sMoveCodeSwing,
+    &sMoveCodeFollowPairedTrainer,
+    &sMoveCodeHide33,
+    &sMoveCodeHide34,
+    &sMoveCodeHide35,
+    &sMoveCodeHide36,
+    &sMoveCodeTurnWithPlayer0,
+    &sMoveCodeTurnWithPlayer1,
+    &sMoveCodeTurnWithPlayer2,
+    &sMoveCodeTurnWithPlayer3,
+    &sMoveCodeTurnWithPlayerFlag0,
+    &sMoveCodeTurnWithPlayerFlag1,
+    &sMoveCodeTurnWithPlayerFlag2,
+    &sMoveCodeTurnWithPlayerFlag3,
+    &sMoveCodeWallWalkLeftHand,
+    &sMoveCodeWallWalkRightHand,
+    &sMoveCodeWallWalkLeftHandReversing,
+    &sMoveCodeWallWalkRightHandReversing,
+    &sMoveCodeWalkRandomLeftRightBump,
+    &sMoveCodeCommActor,
+    &sMoveCodeRailStay,
+    &sMoveCodeRailTurnRandom,
+    &sMoveCodeRailTurnRandomUpLeft,
+    &sMoveCodeRailTurnRandomUpRight,
+    &sMoveCodeRailTurnRandomDownLeft,
+    &sMoveCodeRailTurnRandomDownRight,
+    &sMoveCodeRailTurnRandomUpDownLeft,
+    &sMoveCodeRailTurnRandomUpDownRight,
+    &sMoveCodeRailTurnRandomUpLeftRight,
+    &sMoveCodeRailTurnRandomDownLeftRight,
+    &sMoveCodeRailTurnRandomUpDown,
+    &sMoveCodeRailTurnRandomLeftRight,
+    &sMoveCodeRailWalkRandom,
+    &sMoveCodeRailWalkRandomUpDown,
+    &sMoveCodeRailWalkRandomUpDown2,
+    &sMoveCodeRailPatrol,
+    &sMoveCodeHideLeaves,
 };
 
 const ActorAcmdFunc *const ACTOR_ACTION_COMMAND_TABLES[] = {

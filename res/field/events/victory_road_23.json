@@ -66,8 +66,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_VETERAN_M",
-            "movement": 14,
-            "type": 1,
+            "movement": "MOVE_CODE_FACE_UP",
+            "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3612,
             "direction": "DIR_UP",
@@ -85,8 +85,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_110",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x058e",
             "script": 7322,
             "direction": "DIR_DOWN",

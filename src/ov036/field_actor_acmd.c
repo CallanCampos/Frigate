@@ -586,7 +586,7 @@ static BOOL FieldAcmdTCB_SetAcmdEnd(FieldActor *actor) {
 
 static void FieldAcmdTCB_FaceInit(FieldActor *actor, u32 dir) {
     CheckSetActorFaceDir(actor, dir);
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     SetActorInitialGPosToNowGPos(actor);
     FieldActor_NextAcmdState(actor);
 }
@@ -636,168 +636,168 @@ static BOOL FieldAcmdTCB_WalkMove(FieldActor *actor) {
     }
     SetActorMovementFlag(actor, 0x440);
     SetActorInitialGPosToNowGPos(actor);
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL FieldAcmdTCB_WalkUp32F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x800, 32, 1);
+    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x800, 32, DRAW_STATUS_WALK_32F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkDown32F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x800, 32, 1);
+    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x800, 32, DRAW_STATUS_WALK_32F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkLeft32F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x800, 32, 1);
+    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x800, 32, DRAW_STATUS_WALK_32F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkRight32F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x800, 32, 1);
+    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x800, 32, DRAW_STATUS_WALK_32F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkUp16F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x1000, 16, 2);
+    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x1000, 16, DRAW_STATUS_WALK_16F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkDown16F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x1000, 16, 2);
+    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x1000, 16, DRAW_STATUS_WALK_16F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkLeft16F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x1000, 16, 2);
+    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x1000, 16, DRAW_STATUS_WALK_16F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkRight16F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x1000, 16, 2);
+    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x1000, 16, DRAW_STATUS_WALK_16F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkUp8F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x2000, 8, 3);
+    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x2000, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkDown8F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x2000, 8, 3);
+    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x2000, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkLeft8F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x2000, 8, 3);
+    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x2000, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkRight8F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x2000, 8, 3);
+    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x2000, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkUp4F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x4000, 4, 4);
+    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x4000, 4, DRAW_STATUS_WALK_4F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkDown4F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x4000, 4, 4);
+    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x4000, 4, DRAW_STATUS_WALK_4F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkLeft4F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x4000, 4, 4);
+    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x4000, 4, DRAW_STATUS_WALK_4F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkRight4F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x4000, 4, 4);
+    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x4000, 4, DRAW_STATUS_WALK_4F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkUp2F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x8000, 2, 5);
+    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x8000, 2, DRAW_STATUS_WALK_2F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkDown2F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x8000, 2, 5);
+    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x8000, 2, DRAW_STATUS_WALK_2F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkLeft2F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x8000, 2, 5);
+    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x8000, 2, DRAW_STATUS_WALK_2F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkRight2F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x8000, 2, 5);
+    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x8000, 2, DRAW_STATUS_WALK_2F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkUp1F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x10000, 1, 0);
+    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x10000, 1, DRAW_STATUS_STOP);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkDown1F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x10000, 1, 0);
+    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x10000, 1, DRAW_STATUS_STOP);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkLeft1F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x10000, 1, 0);
+    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x10000, 1, DRAW_STATUS_STOP);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkRight1F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x10000, 1, 0);
+    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x10000, 1, DRAW_STATUS_STOP);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashUp4F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x4000, 4, 10);
+    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x4000, 4, DRAW_STATUS_ANIME_10);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashDown4F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x4000, 4, 10);
+    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x4000, 4, DRAW_STATUS_ANIME_10);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashLeft4F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x4000, 4, 10);
+    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x4000, 4, DRAW_STATUS_ANIME_10);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashRight4F(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x4000, 4, 10);
+    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x4000, 4, DRAW_STATUS_ANIME_10);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkUp16FFastAnime(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x1000, 16, 5);
+    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x1000, 16, DRAW_STATUS_WALK_2F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkDown16FFastAnime(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x1000, 16, 5);
+    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x1000, 16, DRAW_STATUS_WALK_2F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkLeft16FFastAnime(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x1000, 16, 5);
+    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x1000, 16, DRAW_STATUS_WALK_2F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkRight16FFastAnime(FieldActor *actor) {
-    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x1000, 16, 5);
+    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x1000, 16, DRAW_STATUS_WALK_2F);
     return TRUE;
 }
 
@@ -820,108 +820,108 @@ static BOOL FieldAcmdTCB_StayWalkMove(FieldActor *actor) {
         return FALSE;
     }
     SetActorMovementFlag(actor, 0x400);
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkUp32F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 32, 1);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 32, DRAW_STATUS_WALK_32F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkDown32F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 32, 1);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 32, DRAW_STATUS_WALK_32F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkLeft32F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 32, 1);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 32, DRAW_STATUS_WALK_32F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkRight32F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 32, 1);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 32, DRAW_STATUS_WALK_32F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkUp16F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 16, 2);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 16, DRAW_STATUS_WALK_16F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkDown16F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 16, 2);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 16, DRAW_STATUS_WALK_16F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkLeft16F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 16, 2);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 16, DRAW_STATUS_WALK_16F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkRight16F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 16, 2);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 16, DRAW_STATUS_WALK_16F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkUp8F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 8, 3);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkDown8F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 8, 3);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkLeft8F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 8, 3);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkRight8F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 8, 3);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkUp4F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 4, 4);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 4, DRAW_STATUS_WALK_4F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkDown4F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 4, 4);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 4, DRAW_STATUS_WALK_4F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkLeft4F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 4, 4);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 4, DRAW_STATUS_WALK_4F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkRight4F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 4, 4);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 4, DRAW_STATUS_WALK_4F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkUp2F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 2, 5);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 2, DRAW_STATUS_WALK_2F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkDown2F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 2, 5);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 2, DRAW_STATUS_WALK_2F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkLeft2F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 2, 5);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 2, DRAW_STATUS_WALK_2F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkRight2F(FieldActor *actor) {
-    FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 2, 5);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 2, DRAW_STATUS_WALK_2F);
     return TRUE;
 }
 
@@ -993,129 +993,129 @@ static BOOL FieldAcmdTCB_JumpMove(FieldActor *actor) {
     SetActorWPosOffset(actor, &zero);
     SetActorMovementFlag(actor, 0x540);
     SetActorInitialGPosToNowGPos(actor);
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FieldActor_NextAcmdState(actor);
     GFL_SndSEPlay(SEQ_SE_FLD_10);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayJumpUp16F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_UP, 0x0, 16, 2, 1, 0x100);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_UP, 0x0, 16, DRAW_STATUS_WALK_16F, 1, 0x100);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayJumpDown16F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_DOWN, 0x0, 16, 2, 1, 0x100);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_DOWN, 0x0, 16, DRAW_STATUS_WALK_16F, 1, 0x100);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayJumpLeft16F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x0, 16, 2, 1, 0x100);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x0, 16, DRAW_STATUS_WALK_16F, 1, 0x100);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayJumpRight16F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x0, 16, 2, 1, 0x100);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x0, 16, DRAW_STATUS_WALK_16F, 1, 0x100);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayJumpUp8F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_UP, 0x0, 8, 3, 1, 0x200);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_UP, 0x0, 8, DRAW_STATUS_WALK_8F, 1, 0x200);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayJumpDown8F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_DOWN, 0x0, 8, 3, 1, 0x200);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_DOWN, 0x0, 8, DRAW_STATUS_WALK_8F, 1, 0x200);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayJumpLeft8F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x0, 8, 3, 1, 0x200);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x0, 8, DRAW_STATUS_WALK_8F, 1, 0x200);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayJumpRight8F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x0, 8, 3, 1, 0x200);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x0, 8, DRAW_STATUS_WALK_8F, 1, 0x200);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_JumpUp1G8F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_UP, 0x2000, 8, 3, 0, 0x200);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_UP, 0x2000, 8, DRAW_STATUS_WALK_8F, 0, 0x200);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_JumpDown1G8F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_DOWN, 0x2000, 8, 3, 0, 0x200);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_DOWN, 0x2000, 8, DRAW_STATUS_WALK_8F, 0, 0x200);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_JumpLeft1G8F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x2000, 8, 3, 0, 0x200);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x2000, 8, DRAW_STATUS_WALK_8F, 0, 0x200);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_JumpRight1G8F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x2000, 8, 3, 0, 0x200);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x2000, 8, DRAW_STATUS_WALK_8F, 0, 0x200);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_JumpUp2G16F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_UP, 0x2000, 16, 3, 0, 0x100);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_UP, 0x2000, 16, DRAW_STATUS_WALK_8F, 0, 0x100);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_JumpDown2G16F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_DOWN, 0x2000, 16, 3, 0, 0x100);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_DOWN, 0x2000, 16, DRAW_STATUS_WALK_8F, 0, 0x100);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_JumpLeft2G16F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x2000, 16, 3, 0, 0x100);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x2000, 16, DRAW_STATUS_WALK_8F, 0, 0x100);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_JumpRight2G16F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x2000, 16, 3, 0, 0x100);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x2000, 16, DRAW_STATUS_WALK_8F, 0, 0x100);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_JumpLeft1G16F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x1000, 16, 2, 0, 0xf0);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x1000, 16, DRAW_STATUS_WALK_16F, 0, 0xf0);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_JumpRight1G16F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x1000, 16, 2, 0, 0xf0);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x1000, 16, DRAW_STATUS_WALK_16F, 0, 0xf0);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_JumpLeft3G12F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x4000, 12, 3, 0, 0x140);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x4000, 12, DRAW_STATUS_WALK_8F, 0, 0x140);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_JumpRight3G12F(FieldActor *actor) {
-    FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x4000, 12, 3, 0, 0x140);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x4000, 12, DRAW_STATUS_WALK_8F, 0, 0x140);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_JumpUp3G24FNoSe(FieldActor *actor) {
-    FieldAcmdTCB_JumpInit(actor, DIR_UP, 0x2000, 24, 3, 0, 0xa0, 0);
+    FieldAcmdTCB_JumpInit(actor, DIR_UP, 0x2000, 24, DRAW_STATUS_WALK_8F, 0, 0xa0, 0);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_JumpDown3G24FNoSe(FieldActor *actor) {
-    FieldAcmdTCB_JumpInit(actor, DIR_DOWN, 0x2000, 24, 3, 0, 0xa0, 0);
+    FieldAcmdTCB_JumpInit(actor, DIR_DOWN, 0x2000, 24, DRAW_STATUS_WALK_8F, 0, 0xa0, 0);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_JumpLeft3G24FNoSe(FieldActor *actor) {
-    FieldAcmdTCB_JumpInit(actor, DIR_LEFT, 0x2000, 24, 3, 0, 0xa0, 0);
+    FieldAcmdTCB_JumpInit(actor, DIR_LEFT, 0x2000, 24, DRAW_STATUS_WALK_8F, 0, 0xa0, 0);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_JumpRight3G24FNoSe(FieldActor *actor) {
-    FieldAcmdTCB_JumpInit(actor, DIR_RIGHT, 0x2000, 24, 3, 0, 0xa0, 0);
+    FieldAcmdTCB_JumpInit(actor, DIR_RIGHT, 0x2000, 24, DRAW_STATUS_WALK_8F, 0, 0xa0, 0);
     return TRUE;
 }
 
@@ -1176,7 +1176,7 @@ static BOOL FieldAcmdTCB_RiseInit(FieldActor *actor) {
     AcmdPosSpeedWork *work = FldAct_InitMoveCmdWork(actor, 8);
 
     work->speed = 8 << 13;
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -1202,7 +1202,7 @@ static BOOL FieldAcmdTCB_FallInit(FieldActor *actor) {
     work->pos = 5 << 18;
     work->speed = -0x10000;
     GFL_SndSEPlay(SEQ_SE_FLD_05);
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -1345,48 +1345,48 @@ static BOOL FieldAcmdTCB_WalkTableMove(FieldActor *actor, const s32 *distances) 
     }
     SetActorMovementFlag(actor, 0x440);
     SetActorInitialGPosToNowGPos(actor);
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkUp6F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_UP, 6, 6);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_UP, 6, DRAW_STATUS_WALK_6F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkDown6F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_DOWN, 6, 6);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_DOWN, 6, DRAW_STATUS_WALK_6F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkLeft6F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_LEFT, 6, 6);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_LEFT, 6, DRAW_STATUS_WALK_6F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkRight6F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_RIGHT, 6, 6);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_RIGHT, 6, DRAW_STATUS_WALK_6F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashUp6F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_UP, 6, 11);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_UP, 6, DRAW_STATUS_ANIME_11);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashDown6F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_DOWN, 6, 11);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_DOWN, 6, DRAW_STATUS_ANIME_11);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashLeft6F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_LEFT, 6, 11);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_LEFT, 6, DRAW_STATUS_ANIME_11);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashRight6F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_RIGHT, 6, 11);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_RIGHT, 6, DRAW_STATUS_ANIME_11);
     return TRUE;
 }
 
@@ -1398,22 +1398,22 @@ static BOOL FieldAcmdTCB_Walk6FMove(FieldActor *actor) {
 }
 
 static BOOL FieldAcmdTCB_WalkUp3F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_UP, 3, 7);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_UP, 3, DRAW_STATUS_WALK_3F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkDown3F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_DOWN, 3, 7);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_DOWN, 3, DRAW_STATUS_WALK_3F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkLeft3F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_LEFT, 3, 7);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_LEFT, 3, DRAW_STATUS_WALK_3F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkRight3F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_RIGHT, 3, 7);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_RIGHT, 3, DRAW_STATUS_WALK_3F);
     return TRUE;
 }
 
@@ -1425,22 +1425,22 @@ static BOOL FieldAcmdTCB_Walk3FMove(FieldActor *actor) {
 }
 
 static BOOL FieldAcmdTCB_WalkUp7F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_UP, 7, 8);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_UP, 7, DRAW_STATUS_WALK_7F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkDown7F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_DOWN, 7, 8);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_DOWN, 7, DRAW_STATUS_WALK_7F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkLeft7F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_LEFT, 7, 8);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_LEFT, 7, DRAW_STATUS_WALK_7F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkRight7F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_RIGHT, 7, 8);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_RIGHT, 7, DRAW_STATUS_WALK_7F);
     return TRUE;
 }
 
@@ -1452,22 +1452,22 @@ static BOOL FieldAcmdTCB_Walk7FMove(FieldActor *actor) {
 }
 
 static BOOL FieldAcmdTCB_WalkUp12F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_UP, 12, 9);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_UP, 12, DRAW_STATUS_WALK_12F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkDown12F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_DOWN, 12, 9);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_DOWN, 12, DRAW_STATUS_WALK_12F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkLeft12F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_LEFT, 12, 9);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_LEFT, 12, DRAW_STATUS_WALK_12F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_WalkRight12F(FieldActor *actor) {
-    FieldAcmdTCB_WalkTableInit(actor, DIR_RIGHT, 12, 9);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_RIGHT, 12, DRAW_STATUS_WALK_12F);
     return TRUE;
 }
 
@@ -1480,21 +1480,21 @@ static BOOL FieldAcmdTCB_Walk12FMove(FieldActor *actor) {
 
 static BOOL FieldAcmdTCB_AnimeWaitEndInit10(FieldActor *actor) {
     FldAct_InitMoveCmdWork(actor, 4);
-    FldAct_SetDrawStatus(actor, 10);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_ANIME_10);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL FieldAcmdTCB_AnimeWaitEndInit11(FieldActor *actor) {
     FldAct_InitMoveCmdWork(actor, 4);
-    FldAct_SetDrawStatus(actor, 11);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_ANIME_11);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL FieldAcmdTCB_AnimeWaitEndInit12(FieldActor *actor) {
     FldAct_InitMoveCmdWork(actor, 4);
-    FldAct_SetDrawStatus(actor, 12);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_ANIME_12);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
@@ -1519,7 +1519,7 @@ static BOOL FieldAcmdTCB_AnimeWaitEndStop(FieldActor *actor) {
         if (BillboardActorSys_GetActorLastCmd(
                 FieldBillboardActor_GetBillboardActorSys(FldActSys_GetFieldBillboardActor(GetActorMModelSystem(actor))),
                 (u16)index, &cmd) == TRUE) {
-            FldAct_SetDrawStatus(actor, 0);
+            FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
             FieldActor_NextAcmdState(actor);
             return TRUE;
         }
@@ -1605,26 +1605,26 @@ static BOOL FieldAcmdTCB_StayMove(FieldActor *actor) {
 }
 
 static BOOL FieldAcmdTCB_StayWalk32F40F(FieldActor *actor) {
-    FieldAcmdTCB_StayInit(actor, 1, 40);
+    FieldAcmdTCB_StayInit(actor, DRAW_STATUS_WALK_32F, 40);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL FieldAcmdTCB_StayWalk16F41F(FieldActor *actor) {
-    FieldAcmdTCB_StayInit(actor, 2, 41);
+    FieldAcmdTCB_StayInit(actor, DRAW_STATUS_WALK_16F, 41);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL FieldAcmdTCB_StayIdle8F(FieldActor *actor) {
-    FieldAcmdTCB_StayInit(actor, 0, 8);
+    FieldAcmdTCB_StayInit(actor, DRAW_STATUS_STOP, 8);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL FieldAcmdTCB_StayWalkBobInit(FieldActor *actor) {
     FldAct_InitMoveCmdWork(actor, 4);
-    FldAct_SetDrawStatus(actor, 1);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_WALK_32F);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -1690,7 +1690,7 @@ static BOOL FieldAcmdTCB_StepMove(FieldActor *actor) {
     }
     SetActorMovementFlag(actor, 0x440);
     SetActorInitialGPosToNowGPos(actor);
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -1698,210 +1698,210 @@ static BOOL FieldAcmdTCB_StepMove(FieldActor *actor) {
 static BOOL FieldAcmdTCB_StepUpFaceLeft8F(FieldActor *actor) {
     VecFx32 delta = { 0, FX32_CONST(2), 0 };
 
-    FieldAcmdTCB_StepInit(actor, &delta, DIR_LEFT, DIR_UP, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_LEFT, DIR_UP, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StepDownFaceRight8F(FieldActor *actor) {
     VecFx32 delta = { 0, FX32_CONST(-2), 0 };
 
-    FieldAcmdTCB_StepInit(actor, &delta, DIR_RIGHT, DIR_DOWN, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_RIGHT, DIR_DOWN, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StepLeftFaceDown8F(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(2) };
 
-    FieldAcmdTCB_StepInit(actor, &delta, DIR_DOWN, DIR_LEFT, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_DOWN, DIR_LEFT, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StepRightFaceUp8F(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(-2) };
 
-    FieldAcmdTCB_StepInit(actor, &delta, DIR_UP, DIR_RIGHT, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_UP, DIR_RIGHT, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StepUpFaceRight8F(FieldActor *actor) {
     VecFx32 delta = { 0, FX32_CONST(2), 0 };
 
-    FieldAcmdTCB_StepInit(actor, &delta, DIR_RIGHT, DIR_UP, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_RIGHT, DIR_UP, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StepDownFaceLeft8F(FieldActor *actor) {
     VecFx32 delta = { 0, FX32_CONST(-2), 0 };
 
-    FieldAcmdTCB_StepInit(actor, &delta, DIR_LEFT, DIR_DOWN, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_LEFT, DIR_DOWN, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StepLeftFaceUp8F(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(-2) };
 
-    FieldAcmdTCB_StepInit(actor, &delta, DIR_UP, DIR_LEFT, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_UP, DIR_LEFT, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL func_ov036_021904f4(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(2) };
 
-    FieldAcmdTCB_StepInit(actor, &delta, DIR_DOWN, DIR_LEFT, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_DOWN, DIR_LEFT, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StepUpFaceDown8F(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(2) };
 
-    FieldAcmdTCB_StepInit(actor, &delta, DIR_DOWN, DIR_UP, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_DOWN, DIR_UP, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StepDownFaceUp8F(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(-2) };
 
-    FieldAcmdTCB_StepInit(actor, &delta, DIR_UP, DIR_DOWN, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_UP, DIR_DOWN, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StepLeftFaceRight8F(FieldActor *actor) {
     VecFx32 delta = { FX32_CONST(-2), 0, 0 };
 
-    FieldAcmdTCB_StepInit(actor, &delta, DIR_RIGHT, DIR_LEFT, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_RIGHT, DIR_LEFT, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StepRightFaceLeft8F(FieldActor *actor) {
     VecFx32 delta = { FX32_CONST(2), 0, 0 };
 
-    FieldAcmdTCB_StepInit(actor, &delta, DIR_LEFT, DIR_RIGHT, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_LEFT, DIR_RIGHT, 8, DRAW_STATUS_WALK_8F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StepUpFaceDown4F(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(4) };
 
-    FieldAcmdTCB_StepInit(actor, &delta, DIR_DOWN, DIR_UP, 4, 4);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_DOWN, DIR_UP, 4, DRAW_STATUS_WALK_4F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StepDownFaceUp4F(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(-4) };
 
-    FieldAcmdTCB_StepInit(actor, &delta, DIR_UP, DIR_DOWN, 4, 4);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_UP, DIR_DOWN, 4, DRAW_STATUS_WALK_4F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StepLeftFaceRight4F(FieldActor *actor) {
     VecFx32 delta = { FX32_CONST(-4), 0, 0 };
 
-    FieldAcmdTCB_StepInit(actor, &delta, DIR_RIGHT, DIR_LEFT, 4, 4);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_RIGHT, DIR_LEFT, 4, DRAW_STATUS_WALK_4F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StepRightFaceLeft4F(FieldActor *actor) {
     VecFx32 delta = { FX32_CONST(4), 0, 0 };
 
-    FieldAcmdTCB_StepInit(actor, &delta, DIR_LEFT, DIR_RIGHT, 4, 4);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_LEFT, DIR_RIGHT, 4, DRAW_STATUS_WALK_4F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StepUpFaceDown2F(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(8) };
 
-    FieldAcmdTCB_StepInit(actor, &delta, DIR_DOWN, DIR_UP, 2, 5);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_DOWN, DIR_UP, 2, DRAW_STATUS_WALK_2F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StepDownFaceUp2F(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(-8) };
 
-    FieldAcmdTCB_StepInit(actor, &delta, DIR_UP, DIR_DOWN, 2, 5);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_UP, DIR_DOWN, 2, DRAW_STATUS_WALK_2F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StepLeftFaceRight2F(FieldActor *actor) {
     VecFx32 step = { -0x8000, 0, 0 };
-    FieldAcmdTCB_StepInit(actor, &step, DIR_RIGHT, DIR_LEFT, 2, 5);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_RIGHT, DIR_LEFT, 2, DRAW_STATUS_WALK_2F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StepRightFaceLeft2F(FieldActor *actor) {
     VecFx32 step = { 0x8000, 0, 0 };
-    FieldAcmdTCB_StepInit(actor, &step, DIR_LEFT, DIR_RIGHT, 2, 5);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_LEFT, DIR_RIGHT, 2, DRAW_STATUS_WALK_2F);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashStepUpFaceLeft4F(FieldActor *actor) {
     VecFx32 step = { 0, 0x4000, 0 };
-    FieldAcmdTCB_StepInit(actor, &step, DIR_LEFT, DIR_UP, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_LEFT, DIR_UP, 4, DRAW_STATUS_ANIME_10);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashStepDownFaceRight4F(FieldActor *actor) {
     VecFx32 step = { 0, -0x4000, 0 };
-    FieldAcmdTCB_StepInit(actor, &step, DIR_RIGHT, DIR_DOWN, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_RIGHT, DIR_DOWN, 4, DRAW_STATUS_ANIME_10);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashStepLeftFaceDown4F(FieldActor *actor) {
     VecFx32 step = { 0, 0, 0x4000 };
-    FieldAcmdTCB_StepInit(actor, &step, DIR_DOWN, DIR_LEFT, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_DOWN, DIR_LEFT, 4, DRAW_STATUS_ANIME_10);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashStepRightFaceUp4F(FieldActor *actor) {
     VecFx32 step = { 0, 0, -0x4000 };
-    FieldAcmdTCB_StepInit(actor, &step, DIR_UP, DIR_RIGHT, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_UP, DIR_RIGHT, 4, DRAW_STATUS_ANIME_10);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashStepUpFaceRight4F(FieldActor *actor) {
     VecFx32 step = { 0, 0x4000, 0 };
-    FieldAcmdTCB_StepInit(actor, &step, DIR_RIGHT, DIR_UP, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_RIGHT, DIR_UP, 4, DRAW_STATUS_ANIME_10);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashStepDownFaceLeft4F(FieldActor *actor) {
     VecFx32 step = { 0, -0x4000, 0 };
-    FieldAcmdTCB_StepInit(actor, &step, DIR_LEFT, DIR_DOWN, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_LEFT, DIR_DOWN, 4, DRAW_STATUS_ANIME_10);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashStepLeftFaceUp4F(FieldActor *actor) {
     VecFx32 step = { 0, 0, -0x4000 };
-    FieldAcmdTCB_StepInit(actor, &step, DIR_UP, DIR_LEFT, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_UP, DIR_LEFT, 4, DRAW_STATUS_ANIME_10);
     return TRUE;
 }
 
 static BOOL func_ov036_021908e4(FieldActor *actor) {
     VecFx32 step = { 0, 0, 0x4000 };
-    FieldAcmdTCB_StepInit(actor, &step, DIR_DOWN, DIR_LEFT, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_DOWN, DIR_LEFT, 4, DRAW_STATUS_ANIME_10);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashStepUpFaceDown4F(FieldActor *actor) {
     VecFx32 step = { 0, 0, 0x4000 };
-    FieldAcmdTCB_StepInit(actor, &step, DIR_DOWN, DIR_UP, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_DOWN, DIR_UP, 4, DRAW_STATUS_ANIME_10);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashStepDownFaceUp4F(FieldActor *actor) {
     VecFx32 step = { 0, 0, -0x4000 };
-    FieldAcmdTCB_StepInit(actor, &step, DIR_UP, DIR_DOWN, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_UP, DIR_DOWN, 4, DRAW_STATUS_ANIME_10);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashStepLeftFaceRight4F(FieldActor *actor) {
     VecFx32 step = { -0x4000, 0, 0 };
-    FieldAcmdTCB_StepInit(actor, &step, DIR_RIGHT, DIR_LEFT, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_RIGHT, DIR_LEFT, 4, DRAW_STATUS_ANIME_10);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashStepRightFaceLeft4F(FieldActor *actor) {
     VecFx32 step = { 0x4000, 0, 0 };
-    FieldAcmdTCB_StepInit(actor, &step, DIR_LEFT, DIR_RIGHT, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_LEFT, DIR_RIGHT, 4, DRAW_STATUS_ANIME_10);
     return TRUE;
 }
 
@@ -2025,74 +2025,74 @@ static BOOL FieldAcmdTCB_HopMove(FieldActor *actor) {
     SetActorWPosOffset(actor, &zero);
     SetActorMovementFlag(actor, 0x540);
     SetActorInitialGPosToNowGPos(actor);
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_HopUpFaceLeft8F(FieldActor *actor) {
-    FieldAcmdTCB_HopInit(actor, 0x2000, DIR_LEFT, DIR_UP, 8, 3, 1, 1, 0);
+    FieldAcmdTCB_HopInit(actor, 0x2000, DIR_LEFT, DIR_UP, 8, DRAW_STATUS_WALK_8F, 1, 1, 0);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_HopDownFaceRight8F(FieldActor *actor) {
-    FieldAcmdTCB_HopInit(actor, -0x2000, DIR_RIGHT, DIR_DOWN, 8, 3, 1, 1, 0);
+    FieldAcmdTCB_HopInit(actor, -0x2000, DIR_RIGHT, DIR_DOWN, 8, DRAW_STATUS_WALK_8F, 1, 1, 0);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_HopLeftFaceDown8F(FieldActor *actor) {
-    FieldAcmdTCB_HopInit(actor, 0x2000, DIR_DOWN, DIR_LEFT, 8, 3, 2, 1, 0);
+    FieldAcmdTCB_HopInit(actor, 0x2000, DIR_DOWN, DIR_LEFT, 8, DRAW_STATUS_WALK_8F, 2, 1, 0);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_HopRightFaceUp8F(FieldActor *actor) {
-    FieldAcmdTCB_HopInit(actor, -0x2000, DIR_UP, DIR_RIGHT, 8, 3, 2, 1, 0);
+    FieldAcmdTCB_HopInit(actor, -0x2000, DIR_UP, DIR_RIGHT, 8, DRAW_STATUS_WALK_8F, 2, 1, 0);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_HopUpFaceRight8F(FieldActor *actor) {
-    FieldAcmdTCB_HopInit(actor, 0x2000, DIR_RIGHT, DIR_UP, 8, 3, 1, 1, 0);
+    FieldAcmdTCB_HopInit(actor, 0x2000, DIR_RIGHT, DIR_UP, 8, DRAW_STATUS_WALK_8F, 1, 1, 0);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_HopDownFaceLeft8F(FieldActor *actor) {
-    FieldAcmdTCB_HopInit(actor, -0x2000, DIR_LEFT, DIR_DOWN, 8, 3, 1, 1, 0);
+    FieldAcmdTCB_HopInit(actor, -0x2000, DIR_LEFT, DIR_DOWN, 8, DRAW_STATUS_WALK_8F, 1, 1, 0);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_HopLeftFaceUp8F(FieldActor *actor) {
-    FieldAcmdTCB_HopInit(actor, -0x2000, DIR_UP, DIR_LEFT, 8, 3, 2, 1, 0);
+    FieldAcmdTCB_HopInit(actor, -0x2000, DIR_UP, DIR_LEFT, 8, DRAW_STATUS_WALK_8F, 2, 1, 0);
     return TRUE;
 }
 
 static BOOL func_ov036_02190d60(FieldActor *actor) {
-    FieldAcmdTCB_HopInit(actor, 0x2000, DIR_DOWN, DIR_LEFT, 8, 3, 2, 1, 0);
+    FieldAcmdTCB_HopInit(actor, 0x2000, DIR_DOWN, DIR_LEFT, 8, DRAW_STATUS_WALK_8F, 2, 1, 0);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_HopUpFaceDown8F(FieldActor *actor) {
-    FieldAcmdTCB_HopInit(actor, 0x2000, DIR_DOWN, DIR_UP, 8, 3, 2, 1, 0);
+    FieldAcmdTCB_HopInit(actor, 0x2000, DIR_DOWN, DIR_UP, 8, DRAW_STATUS_WALK_8F, 2, 1, 0);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_HopDownFaceUp8F(FieldActor *actor) {
-    FieldAcmdTCB_HopInit(actor, -0x2000, DIR_UP, DIR_DOWN, 8, 3, 2, 1, 0);
+    FieldAcmdTCB_HopInit(actor, -0x2000, DIR_UP, DIR_DOWN, 8, DRAW_STATUS_WALK_8F, 2, 1, 0);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_HopLeftFaceRight8F(FieldActor *actor) {
-    FieldAcmdTCB_HopInit(actor, -0x2000, DIR_RIGHT, DIR_LEFT, 8, 3, 0, 1, 0);
+    FieldAcmdTCB_HopInit(actor, -0x2000, DIR_RIGHT, DIR_LEFT, 8, DRAW_STATUS_WALK_8F, 0, 1, 0);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_HopRightFaceLeft8F(FieldActor *actor) {
-    FieldAcmdTCB_HopInit(actor, 0x2000, DIR_LEFT, DIR_RIGHT, 8, 3, 0, 1, 0);
+    FieldAcmdTCB_HopInit(actor, 0x2000, DIR_LEFT, DIR_RIGHT, 8, DRAW_STATUS_WALK_8F, 0, 1, 0);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_StayWalk22FInit(FieldActor *actor) {
     FldAct_InitMoveCmdWork(actor, 4);
-    FldAct_SetDrawStatus(actor, 1);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_WALK_32F);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
@@ -2107,14 +2107,14 @@ static BOOL FieldAcmdTCB_StayWalk22FMove(FieldActor *actor) {
 }
 
 static BOOL FieldAcmdTCB_SetAnime10(FieldActor *actor) {
-    FldAct_SetDrawStatus(actor, 10);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_ANIME_10);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DashLeft2F(FieldActor *actor) {
     WalkFramesWork *work = FldAct_InitMoveCmdWork(actor, sizeof(WalkFramesWork));
-    work->anim = 12;
+    work->anim = DRAW_STATUS_ANIME_12;
     work->frames = 2;
     work->dir = 2;
     work->distance = 0x8000;
@@ -2142,7 +2142,7 @@ static BOOL FieldAcmdTCB_FlyUpInit(FieldActor *actor) {
     work->speed = 0x2000;
     work->time = 0;
     work->lastFrame = 0;
-    FldAct_SetDrawStatus(actor, 11);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_ANIME_11);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -2185,19 +2185,19 @@ static BOOL FieldAcmdTCB_FlyUpMove(FieldActor *actor) {
     if (work->height / 0x8000 < 16) {
         return FALSE;
     }
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
 static BOOL func_ov036_0219100c(FieldActor *actor) {
-    FldAct_SetDrawStatus(actor, 10);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_ANIME_10);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_AnimeWaitEndFaceDownInit(FieldActor *actor) {
-    FldAct_SetDrawStatus(actor, 11);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_ANIME_11);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
@@ -2213,7 +2213,7 @@ static BOOL FieldAcmdTCB_AnimeWaitEndFaceDown(FieldActor *actor) {
         return FALSE;
     }
     CheckSetActorFaceDir(actor, DIR_DOWN);
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -2231,7 +2231,7 @@ static BOOL FieldAcmdTCB_FlyReadyInit(FieldActor *actor) {
     work->time = 0;
     work->lastFrame = 0;
     SetActorWPosOffset(actor, &offset);
-    FldAct_SetDrawStatus(actor, 10);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_ANIME_10);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -2264,32 +2264,32 @@ static BOOL FieldAcmdTCB_FlyReadyMove(FieldActor *actor) {
 }
 
 static BOOL func_ov036_02191174(FieldActor *actor) {
-    FldAct_SetDrawStatus(actor, 10);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_ANIME_10);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
 static BOOL FieldAcmdTCB_DrawReadyWaitInit10(FieldActor *actor) {
-    FldAct_SetDrawStatus(actor, 10);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_ANIME_10);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL FieldAcmdTCB_DrawReadyWaitInit11(FieldActor *actor) {
-    FldAct_SetDrawStatus(actor, 11);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_ANIME_11);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL FieldAcmdTCB_DrawReadyWaitInit12(FieldActor *actor) {
-    FldAct_SetDrawStatus(actor, 12);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_ANIME_12);
     RailActorAnim_ResetBillboardActorAnime(actor);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL FieldAcmdTCB_DrawReadyWaitInit13(FieldActor *actor) {
-    FldAct_SetDrawStatus(actor, 13);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_ANIME_13);
     RailActorAnim_ResetBillboardActorAnime(actor);
     FieldActor_NextAcmdState(actor);
     return FALSE;
@@ -2297,7 +2297,7 @@ static BOOL FieldAcmdTCB_DrawReadyWaitInit13(FieldActor *actor) {
 
 static BOOL FieldAcmdTCB_DrawReadyWaitStop(FieldActor *actor) {
     if (RailActorAnim_CheckBillboardActorReady(actor) == TRUE) {
-        FldAct_SetDrawStatus(actor, 0);
+        FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
         FieldActor_NextAcmdState(actor);
         return TRUE;
     }

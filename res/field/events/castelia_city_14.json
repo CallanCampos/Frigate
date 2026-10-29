@@ -146,8 +146,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_SOCIALITE",
-            "movement": 3,
-            "type": 0,
+            "movement": "MOVE_CODE_WALK_RANDOM",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 9,
             "direction": "DIR_RIGHT",
@@ -165,8 +165,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_CLERK_M_67",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 7,
             "direction": "DIR_DOWN",
@@ -184,8 +184,8 @@
         {
             "id": 2,
             "model": "OBJ_CODE_83",
-            "movement": 15,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_DOWN",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 8,
             "direction": "DIR_DOWN",

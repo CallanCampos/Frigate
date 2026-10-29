@@ -156,8 +156,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_MODEL_BIGROCK2",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10000,
             "direction": "DIR_DOWN",
@@ -175,8 +175,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_110",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0534",
             "script": 7232,
             "direction": "DIR_DOWN",
@@ -194,8 +194,8 @@
         {
             "id": 2,
             "model": "OBJ_CODE_110",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0538",
             "script": 7236,
             "direction": "DIR_DOWN",

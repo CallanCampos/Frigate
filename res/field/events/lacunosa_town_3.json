@@ -5,8 +5,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_29",
-            "movement": 15,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_DOWN",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x030f",
             "script": 4,
             "direction": "DIR_DOWN",
@@ -24,8 +24,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_105",
-            "movement": 14,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_UP",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x030d",
             "script": 2000,
             "direction": "DIR_UP",
@@ -43,8 +43,8 @@
         {
             "id": 2,
             "model": "OBJ_CODE_249",
-            "movement": 14,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_UP",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x030e",
             "script": 2000,
             "direction": "DIR_UP",
@@ -62,8 +62,8 @@
         {
             "id": 3,
             "model": "OBJ_CODE_BLACK_BELT",
-            "movement": 17,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_RIGHT",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0312",
             "script": 5,
             "direction": "DIR_RIGHT",

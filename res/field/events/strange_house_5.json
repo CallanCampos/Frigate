@@ -5,8 +5,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_110",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0383",
             "script": 1,
             "direction": "DIR_DOWN",

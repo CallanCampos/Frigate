@@ -7,11 +7,15 @@
 #include "types.h"
 #include "constants/directions.h"
 #include "field/event_trainer_eye.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_actor_internal.h"
 #include "field/field_actor_movecode.h"
 #include "gfl/key.h"
 #include "gfl/random.h"
+
+// Ends the tables of move codes, and stands for no move code where one is looked for in them
+#define MOVE_CODE_LIST_END 0xff
 
 // The facing a walking code keeps for actors that turn and then restore it: the facing before, a row of
 // sMirrorTurnOrders and whether movement flag 8 was set
@@ -27,6 +31,14 @@ typedef struct {
     s16 timer;
     u32 mask;
 } RailWanderWork;
+
+// The modes of the random walk: walk wherever nothing is in the way, only inside the move code's rectangle (which no
+// move code uses), or into every collision but the first kind
+enum {
+    WALK_RANDOM_MODE_ANY,
+    WALK_RANDOM_MODE_IN_RECT,
+    WALK_RANDOM_MODE_BUMP,
+};
 
 // The work of a rail actor that walks along the directions of a mask
 typedef struct {
@@ -51,8 +63,8 @@ typedef struct {
     u32 state;
 } RailFaceWork;
 
-// The work of an actor that turns around a rotation of directions: turn is 2 for a clockwise one, state picks the
-// function of the table that runs
+// The work of an actor that turns around a rotation of directions: turn is the way it turns, DIR_LEFT or DIR_RIGHT,
+// state picks the function of the table that runs
 typedef struct {
     s8 turn;
     u8 pad1;
@@ -267,24 +279,29 @@ static BOOL (*const sSwingSteps[])(FieldActor *actor, RailTurnWork *work) = {
     FieldActorMovecode_SwingStepRotateDir,
 };
 
-// The directions that each move code turns between, in turn, after the move code and ended by DIR_NONE. A move code
-// of 0xff ends the table
+// The directions that each move code turns between, in turn, after the move code and ended by DIR_NONE, for the event
+// type that turns when the player presses B; the first two give the random walks' codes with their directions.
+// MOVE_CODE_LIST_END ends the table
 static const u16 sMoveCodeTurnDirs[][6] = {
-    { 4, DIR_UP, DIR_DOWN, DIR_NONE },
-    { 5, DIR_LEFT, DIR_RIGHT, DIR_NONE },
-    { 6, DIR_UP, DIR_LEFT, DIR_NONE },
-    { 7, DIR_UP, DIR_RIGHT, DIR_NONE },
-    { 8, DIR_DOWN, DIR_LEFT, DIR_NONE },
-    { 9, DIR_DOWN, DIR_RIGHT, DIR_NONE },
-    { 10, DIR_UP, DIR_DOWN, DIR_LEFT, DIR_NONE },
-    { 11, DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_NONE },
-    { 12, DIR_UP, DIR_RIGHT, DIR_LEFT, DIR_NONE },
-    { 13, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE },
-    { 0xff },
+    { MOVE_CODE_WALK_RANDOM_UP_DOWN, DIR_UP, DIR_DOWN, DIR_NONE },
+    { MOVE_CODE_WALK_RANDOM_LEFT_RIGHT, DIR_LEFT, DIR_RIGHT, DIR_NONE },
+    { MOVE_CODE_TURN_RANDOM_UP_LEFT, DIR_UP, DIR_LEFT, DIR_NONE },
+    { MOVE_CODE_TURN_RANDOM_UP_RIGHT, DIR_UP, DIR_RIGHT, DIR_NONE },
+    { MOVE_CODE_TURN_RANDOM_DOWN_LEFT, DIR_DOWN, DIR_LEFT, DIR_NONE },
+    { MOVE_CODE_TURN_RANDOM_DOWN_RIGHT, DIR_DOWN, DIR_RIGHT, DIR_NONE },
+    { MOVE_CODE_TURN_RANDOM_UP_DOWN_LEFT, DIR_UP, DIR_DOWN, DIR_LEFT, DIR_NONE },
+    { MOVE_CODE_TURN_RANDOM_UP_DOWN_RIGHT, DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_NONE },
+    { MOVE_CODE_TURN_RANDOM_UP_LEFT_RIGHT, DIR_UP, DIR_RIGHT, DIR_LEFT, DIR_NONE },
+    { MOVE_CODE_TURN_RANDOM_DOWN_LEFT_RIGHT, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE },
+    { MOVE_CODE_LIST_END },
 };
 
 static const ActorMoveCodePair sPatrolSwapMoveCodes[] = {
-    { 0x25, 0x2b }, { 0x26, 0x2c }, { 0x27, 0x2a }, { 0x28, 0x29 }, { 0xff, 0xff },
+    { MOVE_CODE_LOOP_UP_LEFT_DOWN_RIGHT, MOVE_CODE_LOOP_LEFT_UP_RIGHT_DOWN },
+    { MOVE_CODE_LOOP_DOWN_RIGHT_UP_LEFT, MOVE_CODE_LOOP_RIGHT_DOWN_LEFT_UP },
+    { MOVE_CODE_LOOP_LEFT_DOWN_RIGHT_UP, MOVE_CODE_LOOP_DOWN_LEFT_UP_RIGHT },
+    { MOVE_CODE_LOOP_RIGHT_UP_LEFT_DOWN, MOVE_CODE_LOOP_UP_RIGHT_DOWN_LEFT },
+    { MOVE_CODE_LIST_END, MOVE_CODE_LIST_END },
 };
 
 static const s32 sDirSet0[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE };
@@ -295,7 +312,7 @@ static void FieldActorMovecode_InitTurnRandom(FieldActor *actor, u32 mask) {
     RailWanderWork *work = ClearActorPositionBlock(actor, sizeof(RailWanderWork));
     work->timer = FieldActorMovecode_GetRandomTableEntry(sTurnWaitTimes, -1);
     work->mask = mask;
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FldAct_ClearMoving(actor);
 }
 
@@ -345,7 +362,7 @@ void FieldActorMovecode_InitTurnRandomSet10(FieldActor *actor) {
 
 void FieldActorMovecode_MoveTurnRandom(FieldActor *actor) {
     RailWanderWork *work = GetNPCRailPosPtrAddr(actor);
-    if (GetActorEvType(actor) == 0xb) {
+    if (GetActorEvType(actor) == ACTOR_EVENT_TYPE_TRAINER_TURN_ON_B_PRESS) {
         if (FldAct_IsNearPlayer(actor) == TRUE && FieldActorMovecode_IsBButtonPressed() == TRUE) {
             u16 faceDir = GetActorFaceDir(actor);
             u16 dir = FieldActorMovecode_GetNextDirInRotation(GetActorMoveCode(actor), faceDir);
@@ -395,7 +412,7 @@ static u16 FieldActorMovecode_GetNextDirInRotation(u16 moveCode, u16 faceDir) {
             return DIR_NONE;
         }
         i++;
-    } while (sMoveCodeTurnDirs[i][0] != 0xff);
+    } while (sMoveCodeTurnDirs[i][0] != MOVE_CODE_LIST_END);
     return DIR_NONE;
 }
 
@@ -403,19 +420,19 @@ void func_ov036_021913dc(FieldActor *actor) {
 }
 
 void FieldActorMovecode_InitWalkRandomSet11(FieldActor *actor) {
-    FieldActorMovecode_InitWalkRandom(actor, 12, 11, 0);
+    FieldActorMovecode_InitWalkRandom(actor, ACMD_WALK_8F, 11, WALK_RANDOM_MODE_ANY);
 }
 
 void FieldActorMovecode_InitWalkRandomSet12(FieldActor *actor) {
-    FieldActorMovecode_InitWalkRandom(actor, 12, 12, 0);
+    FieldActorMovecode_InitWalkRandom(actor, ACMD_WALK_8F, 12, WALK_RANDOM_MODE_ANY);
 }
 
 void FieldActorMovecode_InitWalkRandomSet13(FieldActor *actor) {
-    FieldActorMovecode_InitWalkRandom(actor, 12, 13, 0);
+    FieldActorMovecode_InitWalkRandom(actor, ACMD_WALK_8F, 13, WALK_RANDOM_MODE_ANY);
 }
 
 void FieldActorMovecode_InitWalkRandomSet13Bump(FieldActor *actor) {
-    FieldActorMovecode_InitWalkRandom(actor, 12, 13, 2);
+    FieldActorMovecode_InitWalkRandom(actor, ACMD_WALK_8F, 13, WALK_RANDOM_MODE_BUMP);
 }
 
 static void FieldActorMovecode_InitWalkRandom(FieldActor *actor, u32 acmdBase, u32 dirMask, u32 mode) {
@@ -423,9 +440,19 @@ static void FieldActorMovecode_InitWalkRandom(FieldActor *actor, u32 acmdBase, u
     work->mode = mode;
     work->acmdBase = acmdBase;
     work->mask = dirMask;
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FldAct_ClearMoving(actor);
 }
+
+// The steps of the random walk: face the way the actor faces, wait a random time, pick a direction of its set and walk
+// one tile if it can, and wait for the walk
+enum {
+    WALK_RANDOM_FACE,
+    WALK_RANDOM_WAIT_FACE,
+    WALK_RANDOM_WAIT,
+    WALK_RANDOM_WALK,
+    WALK_RANDOM_WAIT_WALK,
+};
 
 void FieldActorMovecode_MoveWalkRandom(FieldActor *actor) {
     RailWalkWork *work = GetNPCRailPosPtrAddr(actor);
@@ -433,42 +460,42 @@ void FieldActorMovecode_MoveWalkRandom(FieldActor *actor) {
     u32 collision;
     u32 acmd;
     switch (work->state) {
-    case 0:
+    case WALK_RANDOM_FACE:
         FldAct_ClearMoving(actor);
         FldAct_ClearMoveEnd(actor);
         dir = GetActorFaceDir(actor);
-        acmd = GetAcmdForDir(dir, 0);
+        acmd = GetAcmdForDir(dir, ACMD_FACE);
         FldAct_SetLocalAcmd(actor, acmd);
         work->state++;
         break;
-    case 1:
+    case WALK_RANDOM_WAIT_FACE:
         if (!FieldAcmdTCB_Update(actor)) {
             break;
         }
         work->timer = FieldActorMovecode_GetRandomTableEntry(sTurnWaitTimes, -1);
         work->state++;
-    case 2:
+    case WALK_RANDOM_WAIT:
         work->timer--;
         if (work->timer != 0) {
             break;
         }
         work->state++;
-    case 3:
+    case WALK_RANDOM_WALK:
         dir = FieldActorMovecode_GetRandomDirFromSet(work->mask, DIR_NONE);
         ChangeActorDirection(actor, dir);
-        if (work->mode == 1 && FieldActorMovecode_IsDirInsideMoveRect(actor, dir) == 0) {
-            work->state = 0;
+        if (work->mode == WALK_RANDOM_MODE_IN_RECT && FieldActorMovecode_IsDirInsideMoveRect(actor, dir) == 0) {
+            work->state = WALK_RANDOM_FACE;
             return;
         }
         collision = ActorRouteCollCheckOneTileInDir(actor, dir);
         if (collision != 0) {
-            if (work->mode == 2) {
+            if (work->mode == WALK_RANDOM_MODE_BUMP) {
                 if (collision & 1) {
-                    work->state = 0;
+                    work->state = WALK_RANDOM_FACE;
                     return;
                 }
             } else {
-                work->state = 0;
+                work->state = WALK_RANDOM_FACE;
                 return;
             }
         }
@@ -476,10 +503,10 @@ void FieldActorMovecode_MoveWalkRandom(FieldActor *actor) {
         FldAct_SetLocalAcmd(actor, acmd);
         FldAct_SetMoving(actor);
         work->state++;
-    case 4:
+    case WALK_RANDOM_WAIT_WALK:
         if (FieldAcmdTCB_Update(actor)) {
             FldAct_ClearMoving(actor);
-            work->state = 0;
+            work->state = WALK_RANDOM_FACE;
         }
         break;
     default:
@@ -496,49 +523,49 @@ static void FieldActorMovecode_GetMoveRect(FieldActor *actor, WalkRect *rect) {
     w = GetActorWalkAreaW(actor);
     h = GetActorWalkAreaH(actor);
     switch (GetActorMoveCode(actor)) {
-    case 6:
+    case MOVE_CODE_TURN_RANDOM_UP_LEFT:
         rect->minX = x - w;
         rect->maxX = x;
         rect->minZ = z - h;
         rect->maxZ = z;
         break;
-    case 7:
+    case MOVE_CODE_TURN_RANDOM_UP_RIGHT:
         rect->minX = x;
         rect->maxX = x + w;
         rect->minZ = z - h;
         rect->maxZ = z;
         break;
-    case 8:
+    case MOVE_CODE_TURN_RANDOM_DOWN_LEFT:
         rect->minX = x - w;
         rect->maxX = x;
         rect->minZ = z;
         rect->maxZ = z + h;
         break;
-    case 9:
+    case MOVE_CODE_TURN_RANDOM_DOWN_RIGHT:
         rect->maxX = x + w;
         rect->minX = x;
         rect->minZ = z;
         rect->maxZ = z + h;
         break;
-    case 10:
+    case MOVE_CODE_TURN_RANDOM_UP_DOWN_LEFT:
         rect->minX = x - w;
         rect->maxX = x;
         rect->minZ = z - h;
         rect->maxZ = z + h;
         break;
-    case 11:
+    case MOVE_CODE_TURN_RANDOM_UP_DOWN_RIGHT:
         rect->maxX = x + w;
         rect->minX = x;
         rect->minZ = z - h;
         rect->maxZ = z + h;
         break;
-    case 12:
+    case MOVE_CODE_TURN_RANDOM_UP_LEFT_RIGHT:
         rect->minX = x - w;
         rect->maxX = x + w;
         rect->minZ = z - h;
         rect->maxZ = z;
         break;
-    case 13:
+    case MOVE_CODE_TURN_RANDOM_DOWN_LEFT_RIGHT:
         rect->minX = x - w;
         rect->maxX = x + w;
         rect->minZ = z;
@@ -566,19 +593,25 @@ static BOOL FieldActorMovecode_IsDirInsideMoveRect(FieldActor *actor, u32 dir) {
 static void FieldActorMovecode_InitFixedDir(FieldActor *actor, u32 dir) {
     RailFaceWork *work = ClearActorPositionBlock(actor, sizeof(RailFaceWork));
     work->dir = dir;
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FldAct_ClearMoving(actor);
     SetActorInitialGPosToNowGPos(actor);
 }
 
+// The steps of the codes that face one way: face it once, then stay
+enum {
+    FIXED_DIR_FACE,
+    FIXED_DIR_STAY,
+};
+
 void FieldActorMovecode_MoveFixedDir(FieldActor *actor) {
     RailFaceWork *work = GetNPCRailPosPtrAddr(actor);
     switch (work->state) {
-    case 0:
+    case FIXED_DIR_FACE:
         CheckSetActorFaceDir(actor, work->dir);
         work->state++;
         break;
-    case 1:
+    case FIXED_DIR_STAY:
         break;
     }
 }
@@ -602,17 +635,17 @@ void FieldActorMovecode_InitFixedDirRight(FieldActor *actor) {
 static void FieldActorMovecode_InitSpin(FieldActor *actor, u32 turn) {
     RailTurnWork *work = ClearActorPositionBlock(actor, sizeof(RailTurnWork));
     work->turn = turn;
-    FldAct_SetDrawStatus(actor, 0);
+    FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
     FldAct_ClearMoving(actor);
     SetActorInitialGPosToNowGPos(actor);
 }
 
-void FieldActorMovecode_InitSpinClockwise(FieldActor *actor) {
-    FieldActorMovecode_InitSpin(actor, 2);
+void FieldActorMovecode_InitSpinLeft(FieldActor *actor) {
+    FieldActorMovecode_InitSpin(actor, DIR_LEFT);
 }
 
-void FieldActorMovecode_InitSpinCounterClockwise(FieldActor *actor) {
-    FieldActorMovecode_InitSpin(actor, 3);
+void FieldActorMovecode_InitSpinRight(FieldActor *actor) {
+    FieldActorMovecode_InitSpin(actor, DIR_RIGHT);
 }
 
 void FieldActorMovecode_MoveSpin(FieldActor *actor) {
@@ -627,7 +660,7 @@ static BOOL FieldActorMovecode_SpinStepTurn(FieldActor *actor, RailTurnWork *wor
     if (dir == DIR_NONE) {
         dir = GetActorFaceDir(actor);
     }
-    acmd = GetAcmdForDir(dir, 0);
+    acmd = GetAcmdForDir(dir, ACMD_FACE);
     FldAct_SetLocalAcmd(actor, acmd);
     work->state = 1;
     return TRUE;
@@ -637,7 +670,7 @@ static BOOL FieldActorMovecode_SpinStepWaitTurn(FieldActor *actor, RailTurnWork 
     if (!FieldAcmdTCB_Update(actor)) {
         return FALSE;
     }
-    if (GetActorEvType(actor) != 0xb) {
+    if (GetActorEvType(actor) != ACTOR_EVENT_TYPE_TRAINER_TURN_ON_B_PRESS) {
         work->count = 0;
     }
     work->state = 2;
@@ -645,7 +678,7 @@ static BOOL FieldActorMovecode_SpinStepWaitTurn(FieldActor *actor, RailTurnWork 
 }
 
 static BOOL FieldActorMovecode_SpinStepWaitInterval(FieldActor *actor, RailTurnWork *work) {
-    if (GetActorEvType(actor) == 0xb) {
+    if (GetActorEvType(actor) == ACTOR_EVENT_TYPE_TRAINER_TURN_ON_B_PRESS) {
         if (work->count != 0) {
             work->count = 0;
             return FALSE;
@@ -672,13 +705,13 @@ static BOOL FieldActorMovecode_SpinStepWaitInterval(FieldActor *actor, RailTurnW
 }
 
 static BOOL FieldActorMovecode_SpinStepRotateDir(FieldActor *actor, RailTurnWork *work) {
-    u32 clockwise[5] = { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT, DIR_NONE };
-    u32 counter[5] = { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_NONE };
-    u32 *dirs = clockwise;
+    u32 counterclockwise[5] = { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT, DIR_NONE };
+    u32 clockwise[5] = { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_NONE };
+    u32 *dirs = counterclockwise;
     u32 face;
     s32 i;
-    if (work->turn != 2) {
-        dirs = counter;
+    if (work->turn != DIR_LEFT) {
+        dirs = clockwise;
     }
     face = GetActorFaceDir(actor);
     for (i = 0; dirs[i] != DIR_NONE; i++) {
@@ -696,7 +729,7 @@ static BOOL FieldActorMovecode_SpinStepRotateDir(FieldActor *actor, RailTurnWork
 }
 
 void FieldActorMovecode_InitSwing(FieldActor *actor) {
-    FieldActorMovecode_InitSpin(actor, 3);
+    FieldActorMovecode_InitSpin(actor, DIR_RIGHT);
 }
 
 void FieldActorMovecode_MoveSwing(FieldActor *actor) {
@@ -707,7 +740,7 @@ void FieldActorMovecode_MoveSwing(FieldActor *actor) {
 
 static BOOL FieldActorMovecode_SwingStepTurn(FieldActor *actor, RailTurnWork *work) {
     u32 dir = GetActorFaceDir(actor);
-    u32 acmd = GetAcmdForDir(dir, 0);
+    u32 acmd = GetAcmdForDir(dir, ACMD_FACE);
     FldAct_SetLocalAcmd(actor, acmd);
     work->state = 1;
     return TRUE;
@@ -732,13 +765,13 @@ static BOOL FieldActorMovecode_SwingStepWaitInterval(FieldActor *actor, RailTurn
 }
 
 static BOOL FieldActorMovecode_SwingStepRotateDir(FieldActor *actor, RailTurnWork *work) {
-    u32 clockwise[5] = { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT, DIR_NONE };
-    u32 counter[5] = { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_NONE };
-    u32 *dirs = clockwise;
+    u32 counterclockwise[5] = { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT, DIR_NONE };
+    u32 clockwise[5] = { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_NONE };
+    u32 *dirs = counterclockwise;
     u32 face;
     s32 i;
-    if (work->turn != 2) {
-        dirs = counter;
+    if (work->turn != DIR_LEFT) {
+        dirs = clockwise;
     }
     face = GetActorFaceDir(actor);
     for (i = 0; dirs[i] != DIR_NONE; i++) {
@@ -765,7 +798,20 @@ static BOOL (*const sBackForthSteps[])(FieldActor *actor, RailPaceWork *work) = 
 };
 
 static const u32 sPlayerSightMoveCodes[] = {
-    0x2, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0x2d, 0x2e, 0x12, 0x13, 0xff,
+    MOVE_CODE_TURN_RANDOM,
+    MOVE_CODE_TURN_RANDOM_UP_LEFT,
+    MOVE_CODE_TURN_RANDOM_UP_RIGHT,
+    MOVE_CODE_TURN_RANDOM_DOWN_LEFT,
+    MOVE_CODE_TURN_RANDOM_DOWN_RIGHT,
+    MOVE_CODE_TURN_RANDOM_UP_DOWN_LEFT,
+    MOVE_CODE_TURN_RANDOM_UP_DOWN_RIGHT,
+    MOVE_CODE_TURN_RANDOM_UP_LEFT_RIGHT,
+    MOVE_CODE_TURN_RANDOM_DOWN_LEFT_RIGHT,
+    MOVE_CODE_TURN_RANDOM_UP_DOWN,
+    MOVE_CODE_TURN_RANDOM_LEFT_RIGHT,
+    MOVE_CODE_SPIN_COUNTERCLOCKWISE,
+    MOVE_CODE_SPIN_CLOCKWISE,
+    MOVE_CODE_LIST_END,
 };
 
 static const ActorDirTableEntry sDirSets[] = {
@@ -832,14 +878,14 @@ static BOOL FieldActorMovecode_BackForthStepWalk(FieldActor *actor, RailPaceWork
         dir = GetInverseDirection((u16)dir);
         collision = ActorRouteCollCheckOneTileInDir(actor, dir);
     }
-    acmdBase = 12;
+    acmdBase = ACMD_WALK_8F;
     if (FieldActorMovecode_IsDashEventType(actor) != 0) {
         if (FieldActorMovecode_IsBButtonHeld() == TRUE && FldAct_IsNearPlayer(actor) == TRUE) {
-            acmdBase = 16;
+            acmdBase = ACMD_WALK_4F;
         }
     }
     if (collision != 0) {
-        acmdBase = 32;
+        acmdBase = ACMD_STAY_WALK_8F;
     }
     u32 acmd = GetAcmdForDir(dir, acmdBase);
     FldAct_SetLocalAcmd(actor, acmd);
@@ -1078,7 +1124,7 @@ static void FieldActorMovecode_AdvanceRouteIndex(ActorPatrolWork *work) {
 }
 
 static BOOL FieldActorMovecode_RoutePatrolSwapStepLookForPlayer(FieldActor *actor, ActorPatrolWork *work) {
-    if (GetActorEvType(actor) == 10) {
+    if (GetActorEvType(actor) == ACTOR_EVENT_TYPE_TURN_BACK_ON_SIGHT) {
         u16 dir = GetActorFaceDir(actor);
 
         if (EventTrainerEyeSub_GetPlayerDistance(actor, dir, GetActorUserParam(actor, 0), NULL) != -1) {
@@ -1094,17 +1140,17 @@ static BOOL FieldActorMovecode_RoutePatrolSwapStepLookForPlayer(FieldActor *acto
 
 static BOOL FieldActorMovecode_RoutePatrolSwapStepSwapMoveCode(FieldActor *actor, ActorPatrolWork *work) {
     if (FieldAcmdTCB_Update(actor) == TRUE) {
-        u16 other = 0xff;
+        u16 other = MOVE_CODE_LIST_END;
         u16 moveCode = GetActorMoveCode(actor);
         const ActorMoveCodePair *pair;
 
-        for (pair = sPatrolSwapMoveCodes; pair->first != 0xff; pair++) {
+        for (pair = sPatrolSwapMoveCodes; pair->first != MOVE_CODE_LIST_END; pair++) {
             if (pair->first == moveCode) {
                 other = pair->second;
             } else if (pair->second == moveCode) {
                 other = pair->first;
             }
-            if (other != 0xff) {
+            if (other != MOVE_CODE_LIST_END) {
                 s32 dirIdx = 4 - (work->dirIdx + 1);
 
                 ChangeActorMoveCodeSeq(actor, other);
@@ -1203,14 +1249,14 @@ static BOOL FieldActorMovecode_IsPlayerWalking(FieldActor *actor) {
 
     if (player != NULL) {
         switch (FldAct_GetAcmd(player)) {
-        case 0x58:
-        case 0x59:
-        case 0x5a:
-        case 0x5b:
-        case 0xa3:
-        case 0xa4:
-        case 0xa5:
-        case 0xa6:
+        case ACMD_DASH + DIR_UP:
+        case ACMD_DASH + DIR_DOWN:
+        case ACMD_DASH + DIR_LEFT:
+        case ACMD_DASH + DIR_RIGHT:
+        case ACMD_DASH_UPHILL + DIR_UP:
+        case ACMD_DASH_UPHILL + DIR_DOWN:
+        case ACMD_DASH_UPHILL + DIR_LEFT:
+        case ACMD_DASH_UPHILL + DIR_RIGHT:
             return TRUE;
         }
     }
@@ -1270,7 +1316,7 @@ static u32 FieldActorMovecode_GetSightDirToPlayer(FieldActor *actor) {
     u32 entry;
     u32 i;
 
-    if (evType != 1 && evType != 2) {
+    if (evType != ACTOR_EVENT_TYPE_TRAINER && evType != ACTOR_EVENT_TYPE_TRAINER_ALL_DIRS) {
         return DIR_NONE;
     }
     if (!FieldActorMovecode_IsPlayerWalking(actor)) {
@@ -1281,7 +1327,7 @@ static u32 FieldActorMovecode_GetSightDirToPlayer(FieldActor *actor) {
     do {
         entry = sPlayerSightMoveCodes[i];
         i++;
-    } while (entry != moveCode && entry != 0xff);
+    } while (entry != moveCode && entry != MOVE_CODE_LIST_END);
     if (moveCode != entry) {
         return DIR_NONE;
     }
@@ -1381,7 +1427,7 @@ static u32 FieldActorMovecode_GetDirTowardPlayerInSet(FieldActor *actor, u32 ind
 }
 
 static BOOL FieldActorMovecode_UpdateTriggerWait(FieldActor *actor, u8 *wait) {
-    if (GetActorEvType(actor) != 12) {
+    if (GetActorEvType(actor) != ACTOR_EVENT_TYPE_TRAINER_MOVE_ON_B_PRESS) {
         return TRUE;
     }
     if (*wait == 0) {
@@ -1402,7 +1448,9 @@ static BOOL FieldActorMovecode_UpdateTriggerWait(FieldActor *actor, u8 *wait) {
 static BOOL FieldActorMovecode_IsDashEventType(FieldActor *actor) {
     u16 evType = GetActorEvType(actor);
 
-    if (evType == 13 || evType == 15 || evType == 16 || evType == 17 || evType == 18 || evType == 19) {
+    if (evType == ACTOR_EVENT_TYPE_TRAINER_DASH || evType == ACTOR_EVENT_TYPE_SPIN_COUNTERCLOCKWISE_DASH ||
+        evType == ACTOR_EVENT_TYPE_SPIN_CLOCKWISE_DASH || evType == ACTOR_EVENT_TYPE_WALK_SPIN_COUNTERCLOCKWISE_DASH ||
+        evType == ACTOR_EVENT_TYPE_WALK_SPIN_CLOCKWISE_DASH || evType == ACTOR_EVENT_TYPE_DASH) {
         return TRUE;
     }
     return FALSE;
@@ -1411,7 +1459,10 @@ static BOOL FieldActorMovecode_IsDashEventType(FieldActor *actor) {
 static BOOL FieldActorMovecode_IsMirrorEventType(FieldActor *actor) {
     int evType = GetActorEvType(actor);
 
-    if (evType == 7 || evType == 8 || evType == 17 || evType == 18) {
+    if (evType == ACTOR_EVENT_TYPE_TRAINER_WALK_SPIN_COUNTERCLOCKWISE ||
+        evType == ACTOR_EVENT_TYPE_TRAINER_WALK_SPIN_CLOCKWISE ||
+        evType == ACTOR_EVENT_TYPE_WALK_SPIN_COUNTERCLOCKWISE_DASH ||
+        evType == ACTOR_EVENT_TYPE_WALK_SPIN_CLOCKWISE_DASH) {
         return TRUE;
     }
     return FALSE;
@@ -1420,7 +1471,8 @@ static BOOL FieldActorMovecode_IsMirrorEventType(FieldActor *actor) {
 static void FieldActorMovecode_InitMirrorSide(FieldActor *actor, ActorFaceMemory *face) {
     u16 evType = GetActorEvType(actor);
 
-    if (evType == 7 || evType == 17) {
+    if (evType == ACTOR_EVENT_TYPE_TRAINER_WALK_SPIN_COUNTERCLOCKWISE ||
+        evType == ACTOR_EVENT_TYPE_WALK_SPIN_COUNTERCLOCKWISE_DASH) {
         face->row = 0;
     } else {
         face->row = 1;
