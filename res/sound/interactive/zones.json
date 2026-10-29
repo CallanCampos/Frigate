@@ -1,0 +1,191 @@
+{
+    "$schema": "interactive_sound.schema.json",
+    "zones": [
+        {
+            "zone": "ZONE_VICTORY_ROAD_2",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 9, 10 ],
+            "tracks_out": [ 7, 8, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_3",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 9 ],
+            "tracks_out": [ 7, 8, 10, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_4",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 9 ],
+            "tracks_out": [ 7, 8, 10, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_5",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 9 ],
+            "tracks_out": [ 7, 8, 10, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_6",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 9 ],
+            "tracks_out": [ 7, 8, 10, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_7",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 9 ],
+            "tracks_out": [ 7, 8, 10, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_8",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 9 ],
+            "tracks_out": [ 7, 8, 10, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_9",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 9 ],
+            "tracks_out": [ 7, 8, 10, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_10",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 9 ],
+            "tracks_out": [ 7, 8, 10, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_11",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 9 ],
+            "tracks_out": [ 7, 8, 10, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_12",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 9 ],
+            "tracks_out": [ 7, 8, 10, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_13",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 9 ],
+            "tracks_out": [ 7, 8, 10, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_14",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 9 ],
+            "tracks_out": [ 7, 8, 10, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_15",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 9 ],
+            "tracks_out": [ 7, 8, 10, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_16",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 9 ],
+            "tracks_out": [ 7, 8, 10, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_TRIAL_CHAMBER",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 9 ],
+            "tracks_out": [ 7, 8, 10, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_SKYARROW_BRIDGE",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15 ],
+            "tracks_out": [ 6, 7, 8, 9 ],
+            "fade_frames": 0
+        },
+        {
+            "zone": "ZONE_ROUTE_10_2",
+            "tracks_in": [ 10 ],
+            "tracks_out": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_ROUTE_10_3",
+            "tracks_in": [ 9, 10 ],
+            "tracks_out": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_ROUTE_10_4",
+            "tracks_in": [ 4, 9, 10 ],
+            "tracks_out": [ 0, 1, 2, 3, 5, 6, 7, 8, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_ROUTE_10_5",
+            "tracks_in": [ 4, 6, 9, 10 ],
+            "tracks_out": [ 0, 1, 2, 3, 5, 7, 8, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_ROUTE_10_6",
+            "tracks_in": [ 2, 4, 6, 9, 10 ],
+            "tracks_out": [ 0, 1, 3, 5, 7, 8, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_ROUTE_10_7",
+            "tracks_in": [ 2, 4, 5, 6, 9, 10 ],
+            "tracks_out": [ 0, 1, 3, 7, 8, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_ROUTE_10_8",
+            "tracks_in": [ 2, 3, 4, 5, 6, 9, 10 ],
+            "tracks_out": [ 0, 1, 7, 8, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_ROUTE_10_9",
+            "tracks_in": [ 1, 2, 3, 4, 5, 6, 9, 10 ],
+            "tracks_out": [ 0, 7, 8, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_ROUTE_10_10",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 9, 10 ],
+            "tracks_out": [ 7, 8, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_UNDELLA_TOWN",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ],
+            "tracks_out": [ 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_BRIDGE_GATE_GATE_8",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "tracks_out": [ 10, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_UNDELLA_TOWN_2",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "tracks_out": [ 10, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_UNDELLA_TOWN_3",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "tracks_out": [ 10, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        },
+        {
+            "zone": "ZONE_UNDELLA_TOWN_4",
+            "tracks_in": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "tracks_out": [ 10, 11, 12, 13, 14, 15 ],
+            "fade_frames": 60
+        }
+    ]
+}

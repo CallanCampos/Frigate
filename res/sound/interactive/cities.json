@@ -1,0 +1,237 @@
+{
+    "$schema": "interactive_sound.schema.json",
+    "cities": [
+        {
+            "zone": "ZONE_NACRENE_CITY",
+            "center": {
+                "x": 629,
+                "y": 0,
+                "z": 582
+            },
+            "keys": [
+                {
+                    "volume": 0,
+                    "range": {
+                        "x": 15,
+                        "y": 104,
+                        "z": 15
+                    }
+                },
+                {
+                    "volume": 10,
+                    "range": {
+                        "x": 12,
+                        "y": 103,
+                        "z": 12
+                    }
+                },
+                {
+                    "volume": 40,
+                    "range": {
+                        "x": 8,
+                        "y": 102,
+                        "z": 8
+                    }
+                },
+                {
+                    "volume": 80,
+                    "range": {
+                        "x": 5,
+                        "y": 101,
+                        "z": 5
+                    }
+                },
+                {
+                    "volume": 127,
+                    "range": {
+                        "x": 3,
+                        "y": 100,
+                        "z": 3
+                    }
+                },
+                {
+                    "volume": 127,
+                    "range": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "zone": "ZONE_ICIRRUS_CITY",
+            "center": {
+                "x": 176,
+                "y": 0,
+                "z": 187
+            },
+            "keys": [
+                {
+                    "volume": 0,
+                    "range": {
+                        "x": 15,
+                        "y": 104,
+                        "z": 15
+                    }
+                },
+                {
+                    "volume": 25,
+                    "range": {
+                        "x": 12,
+                        "y": 103,
+                        "z": 12
+                    }
+                },
+                {
+                    "volume": 50,
+                    "range": {
+                        "x": 8,
+                        "y": 102,
+                        "z": 8
+                    }
+                },
+                {
+                    "volume": 95,
+                    "range": {
+                        "x": 5,
+                        "y": 101,
+                        "z": 5
+                    }
+                },
+                {
+                    "volume": 127,
+                    "range": {
+                        "x": 3,
+                        "y": 100,
+                        "z": 3
+                    }
+                },
+                {
+                    "volume": 127,
+                    "range": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "zone": "ZONE_OPELUCID_CITY",
+            "center": {
+                "x": 420,
+                "y": -1,
+                "z": 172
+            },
+            "keys": [
+                {
+                    "volume": 0,
+                    "range": {
+                        "x": 15,
+                        "y": 104,
+                        "z": 15
+                    }
+                },
+                {
+                    "volume": 10,
+                    "range": {
+                        "x": 12,
+                        "y": 103,
+                        "z": 12
+                    }
+                },
+                {
+                    "volume": 40,
+                    "range": {
+                        "x": 8,
+                        "y": 102,
+                        "z": 8
+                    }
+                },
+                {
+                    "volume": 80,
+                    "range": {
+                        "x": 5,
+                        "y": 101,
+                        "z": 5
+                    }
+                },
+                {
+                    "volume": 127,
+                    "range": {
+                        "x": 3,
+                        "y": 100,
+                        "z": 3
+                    }
+                },
+                {
+                    "volume": 127,
+                    "range": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "zone": "ZONE_ANVILLE_TOWN",
+            "center": {
+                "x": 20,
+                "y": 5,
+                "z": 38
+            },
+            "keys": [
+                {
+                    "volume": 0,
+                    "range": {
+                        "x": 15,
+                        "y": 104,
+                        "z": 15
+                    }
+                },
+                {
+                    "volume": 10,
+                    "range": {
+                        "x": 12,
+                        "y": 103,
+                        "z": 12
+                    }
+                },
+                {
+                    "volume": 40,
+                    "range": {
+                        "x": 8,
+                        "y": 102,
+                        "z": 8
+                    }
+                },
+                {
+                    "volume": 80,
+                    "range": {
+                        "x": 5,
+                        "y": 101,
+                        "z": 5
+                    }
+                },
+                {
+                    "volume": 127,
+                    "range": {
+                        "x": 3,
+                        "y": 100,
+                        "z": 3
+                    }
+                },
+                {
+                    "volume": 127,
+                    "range": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        }
+    ]
+}

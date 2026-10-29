@@ -25,7 +25,7 @@ res/
     gimmicks/<archive>/  effects/<archive>/   the gyms' and other gimmicks' models, the field effects' animations
   lighting/{field,battle}/
   town_map/
-  sound/{sequences,banks,wave_archives,streams}/
+  sound/{sequences,banks,wave_archives,streams,interactive}/
   graphics/<archive>/       the menus', apps' and screens' graphics and models, an archive each
   demo/<archive>/           the demos and cutscenes: the movies' frames and the 3D demos' models, an archive each
   text/{system,script}/
@@ -396,6 +396,15 @@ a copy of one to start from; a new player, group or stream player needs its cons
 files of the sequences, banks, wave archives and streams, each kind in its list's order, so the sources pack it byte
 for byte, and stops with the file's name and line where a source is wrong. `.venv/bin/python
 tools/data/sound_data.py dump extract/b2_us/files res/sound` writes them again.
+
+The interactive sound system's tables, which change the field's music by where the player is, are
+`res/sound/interactive/`, a JSON file per archive with its entries in order, which
+`tools/data/interactive_sound_data.py` packs: `cities.json`, the towns whose music grows louder toward their center
+(`ARCID_ISS_CITY`); `dungeons.json`, a dungeon's pitch and tempo in each season; `zones.json`, the tracks that a zone
+fades in and out; `switches.json`, a BGM's nine switches of tracks and the zones they apply in; and `3d_sound.json`, the
+BGMs whose tracks play from places on the map. Zones and BGM are their `ZONE_*` and `SEQ_*` constants, and tracks are
+lists of track numbers, 0 to 15. `interactive_sound.schema.json` describes the fields, and both versions have the same
+tables.
 
 ### Sequences
 
@@ -1062,8 +1071,8 @@ after its `ARCID_*` constant in `include/constants/arc.h`, whose number gives th
 the source file that loads it, or the prefix of an app's files where several load it (`ARCID_BTLV` for the
 `btlv_*.c` files), in the block at the end of `arc.h` with its loaders. Twelve archives with graphics, `a/0/0/0`,
 `a/0/0/1`, `a/0/3/5`, `a/0/4/3`, `a/0/5/4`, `a/0/5/5`, `a/0/6/4`, `a/0/6/7`, `a/1/2/1`, `a/1/4/0`, `a/1/4/1` and
-`a/2/4/6`, have no loader found yet, so no name, and stay as the ROM has them until code that loads them is; the font's
-archive is the font's. The members are files in the archive's order, named after their number in it, or
+`a/2/4/6`, have no loader found yet, so no name, and stay as the ROM has them until code that loads them is; the fonts'
+archive is `res/fonts/font/`. The members are files in the archive's order, named after their number in it, or
 after their constant where `generated/narc_<archive>.txt` names them (`professor.png` for `NARC_INTRO_PROFESSOR_NCGR`):
 
 - a character resource (NCGR), the tiles of a screen or the characters of a sprite, is an indexed PNG (`05.png`), 4bpp
@@ -1076,9 +1085,12 @@ after their constant where `generated/narc_<archive>.txt` names them (`professor
 - a 3D model (BMD0) is a directory named as the member is (`05/`), as a field prop's model is: `model.glb`, its
   `data.json` and, where the model embeds its textures (a TEX0 block), a PNG of each texture, named after it, which the
   GLB's images show. A texture set (BTX0) is a directory of those PNGs alone. See below.
+- a font (NFTR) is a directory named as the member is (`00/`): `glyphs.png`, a sheet of its glyphs, and `font.json`,
+  its metrics, character maps and glyphs' widths. See below.
 - the rest are the members themselves, decompressed: screens (`.nscr`), which place the tiles, cells (`.ncer`), cell
   animations (`.nanr`), multi-cells (`.nmcr`, `.nmar`), 3D animations (`.nsbca`, `.nsbta`, `.nsbma`, `.nsbtp`,
-  `.nsbva`), as the field props keep theirs, and other data (`.bin`). Tools such as NitroPaint edit them.
+  `.nsbva`), as the field props keep theirs, a font that the converter doesn't take (`.nftr`), and other data
+  (`.bin`). Tools such as NitroPaint edit them.
 
 `archive.json` lists the members that the game stores LZ-compressed (`{"compressed": {"05.png": "lz10"}}`), which the
 packer compresses again: an edited one as a valid stream of literals, an eighth larger than its data. A member that
@@ -1093,7 +1105,8 @@ replacing it and any edits.
 The same packer takes archives of other subjects, each in the directory for what it holds (`ARCHIVE_ROOTS`):
 `res/graphics/` for the menus and apps, `res/demo/` for the demos and cutscenes, `res/field/gimmicks/` and
 `res/field/effects/`, `res/particles/` and `res/fonts/`; `dump ARCID_X res/demo` writes one there. A name, like its
-`ARCID_*`, is in one of them only.
+`ARCID_*`, is in one of them only. `res/fonts/font/` is `ARCID_FONT` (`a/0/2/3`): the game's five fonts, `00/` to
+`04/`, and three palettes, the same in both versions.
 
 A model's GLB and PNGs are edited and packed as the field props' are (see "Map model sources"), with the same
 converters. `dump` has [Apicula](https://github.com/scurest/apicula) convert each model, from `PATH` or `--apicula
@@ -1119,6 +1132,27 @@ four demo models pack with their triangles encoded again, and the packer refuses
 vertices: 17 have parts that their node transforms scale to nothing until an animation shows them (`hoeru_1`) or to a
 hundredth (the eight `city_plasma_come`), whose positions Blender doesn't export exactly, eight have blended skin
 weights, and three have shapes that set matrices as they draw.
+
+A font is converted by `tools/data/nitro_font.py`, which `dump` and `pack` call, from the format as `gf_font.c` reads
+it. `glyphs.png` has every glyph in the font's order, a cell each, left to right in rows of 32 (16 for a
+font of 256 glyphs or fewer), with a magenta guide line around each cell. Its pixels are the glyphs' values, 2 bits
+each: 0 is clear, and the game draws 1 in the letter color, 2 in the shadow's and 3 in the background's
+(`GFL_TextRndUpdateColorIndexLUT`), so edit it in indexed mode; its colors are only a preview. The packer reads the
+cells and not the guide lines. `font.json`, which `res/fonts/font.schema.json` describes, has the font information
+(`lineFeed`, the default widths, `encoding` and the rest of FINF) and the glyph cells' size (`cellWidth`, `cellHeight`,
+`baseline`, `maxCharWidth`, `bpp`), under `gf_font.c`'s names; the character maps, in the order the game searches them,
+each a range of characters and its method (`direct`, `table` or `scan`); and a line for each glyph, its character
+(with its code, `"code": "U+3000"`, where the character doesn't print) and its `left` offset, `width` and `advance`,
+which the game keeps at the start of the glyph's cell (`GFL_FontGlyphCopy`). The packer computes the rest: the blocks'
+offsets and sizes, each map's contents from the glyphs whose characters its range holds and no earlier range does, and
+the widths block. That block is Game Freak's, not the format's per-glyph table: the three commonest advances, a 2-bit
+class for each glyph, and a hash table of the other advances, with buckets where glyphs share a hash
+(`GFL_FontGetCharWidthDynamic`). Two fonts keep the bytes that pad their classes, which aren't zeros, as
+`classPadding`. To add a character, add its glyph at the end of `glyphs` and draw it in the next cell, adding a row of
+cells where the sheet is full; every font ends in a `scan` map of every character, which takes it, or a map can be
+added or a range extended. A changed pixel, width or advance, a new glyph and a new map pack and read back as the game
+reads them, and all five fonts pack byte for byte in both versions. A font that the converter doesn't read, or wouldn't
+build again byte for byte, stays its `.nftr` file, as `dump` says.
 
 A movie's frames are direct color bitmaps, 15-bit color with bit 15 set where the pixel shows, as
 `cdemo_control.c` plays the Game Freak logo (`res/demo/cdemo_gflogo/`) and the opening (`res/demo/cdemo_openingsw/`):

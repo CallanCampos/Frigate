@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Dump and pack the archives of Nitro resources: the screens, windows, icons and sprites of the game's menus and apps,
-and the 3D models of its demos, gimmicks and effects.
+the 3D models of its demos, gimmicks and effects, and its fonts.
 
     graphics_archive.py dump ARCID_TITLE            # writes res/graphics/title/ from both versions' archives
     graphics_archive.py dump ARCID_X res/demo       # or under another of the archive roots (ARCHIVE_ROOTS)
@@ -30,9 +30,15 @@ narc_intro.txt does:
   that map_texture_data.py doesn't decode, one without a mesh, or one whose materials pair a texture with another
   palette than map_texture_data.py gives it. A new model is added as its .nsbmd file.
 - a texture set (BTX0) is a directory of its textures' PNGs, `07/`, packed as a field texture set's are.
+- a font (NFTR) is a directory named as the member is, `00/`, which nitro_font.py dumps and builds: glyphs.png, the
+  glyphs in the font's order, a cell each, whose pixels are the glyphs' values (0 clear, then the letter, its shadow
+  and the background), and font.json (res/fonts/font.schema.json), the font's metrics, its character maps' ranges and
+  methods, and each glyph's character, left offset, width and advance. The packer computes the rest; a new glyph is an
+  entry at the end of the glyphs and the next cell, which the map whose range holds its character takes. A font that
+  nitro_font.py doesn't read, or wouldn't build again byte for byte, stays its .nftr file, as dump says.
 - anything else is the member itself, decompressed, named by its kind: `.nscr` (screens), `.ncer` (cells), `.nanr`
-  (cell animations), `.nmcr`/`.nmar` (multi-cells), `.nsbca`/`.nsbta`/`.nsbma`/`.nsbtp`/`.nsbva` (3D animations), or
-  `.bin`.
+  (cell animations), `.nmcr`/`.nmar` (multi-cells), `.nsbca`/`.nsbta`/`.nsbma`/`.nsbtp`/`.nsbva` (3D animations),
+  `.nftr` (fonts), or `.bin`.
 
 archive.json, where there is one, lists the members the game stores LZ-compressed, `{"compressed": {"03.nscr": "lz10"}}`;
 the packer compresses them again, an edited one as a valid stream of literals that is an eighth larger than its data.
@@ -63,6 +69,7 @@ from tools.data.datajson import DataError, load, write  # noqa: E402
 from tools.data.narc import read_narc, write_narc  # noqa: E402
 from tools.data.nitro_2d import (bitmap_png, build_bitmap, compress_literals, decompress, palette_colors,  # noqa: E402
                                  palette_resource, read_indexed_png, read_palette, write_indexed_png, write_palette)
+from tools.data.nitro_font import FontError, build_font_directory, export_font  # noqa: E402
 from field_prop_model_data import edit_model, glb_fields  # noqa: E402
 from map_model_data import (canonical_texture_name, dictionary_offsets, model_name, pairing_entries, u32,  # noqa: E402
                             write_glb)
@@ -76,7 +83,7 @@ ARCHIVE_ROOTS = [GRAPHICS, ROOT / "res" / "demo", ROOT / "res" / "field" / "gimm
 VERSIONS = {"black2": "b2_us", "white2": "w2_us"}
 EXTENSIONS = {b"RGCN": ".png", b"RLCN": ".pal", b"RCSN": ".nscr", b"RECN": ".ncer", b"RNAN": ".nanr",
               b"RCMN": ".nmcr", b"RAMN": ".nmar", b"BMD0": ".nsbmd", b"BCA0": ".nsbca", b"BTA0": ".nsbta",
-              b"BMA0": ".nsbma", b"BTP0": ".nsbtp", b"BTX0": ".nsbtx", b"BVA0": ".nsbva"}
+              b"BMA0": ".nsbma", b"BTP0": ".nsbtp", b"BTX0": ".nsbtx", b"BVA0": ".nsbva", b"RTFN": ".nftr"}
 LZ = {0x10: "lz10", 0x11: "lz11"}
 
 
@@ -119,7 +126,7 @@ def directory_archive(directory: Path) -> str:
 
 KIND_EXTENSIONS = {"NCGR": ".png", "NCLR": ".pal", "NSCR": ".nscr", "NCER": ".ncer", "NANR": ".nanr", "NMCR": ".nmcr",
                    "NMAR": ".nmar", "BIN": ".bin", "NSBMD": ".nsbmd", "NSBCA": ".nsbca", "NSBTA": ".nsbta",
-                   "NSBMA": ".nsbma", "NSBTP": ".nsbtp", "NSBTX": ".nsbtx", "NSBVA": ".nsbva"}
+                   "NSBMA": ".nsbma", "NSBTP": ".nsbtp", "NSBTX": ".nsbtx", "NSBVA": ".nsbva", "NFTR": ".nftr"}
 
 
 def member_names(directory: Path) -> dict[int, str]:
@@ -529,9 +536,10 @@ def dump(arcid: str, root: Path = GRAPHICS, direct_color: tuple[int, int] | None
             members = [content for content, _ in games["black2" if sub != "white2/" else "white2"]]
             (directory / sub).mkdir(exist_ok=True)
             file_name, converted = name, False
-            if data[:4] in (b"BMD0", b"BTX0"):
+            if data[:4] in (b"BMD0", b"BTX0", b"RTFN"):
                 problem = export_model(directory / sub / name, data, apicula) if data[:4] == b"BMD0" else \
-                    export_textures(directory / sub / name, data)
+                    export_textures(directory / sub / name, data) if data[:4] == b"BTX0" else \
+                    export_font(directory / sub / name, data)
                 converted = problem is None
                 if problem is not None:
                     print(f"{path}: member {index} stays a Nitro file: {problem}")
@@ -552,8 +560,8 @@ def dump(arcid: str, root: Path = GRAPHICS, direct_color: tuple[int, int] | None
 
 def member_files(directory: Path, game: str) -> list[tuple[str, Path]]:
     """Returns an archive's members, (name, file), in order: numbered files, or named ones at their constants'
-    numbers, each from the version's directory where it has one. A member's file is a directory where it is a model
-    or a texture set, named without an extension."""
+    numbers, each from the version's directory where it has one. A member's file is a directory where it is a model,
+    a texture set or a font, named without an extension."""
     files = {}
     for folder in (directory, directory / game):
         for path in folder.iterdir() if folder.is_dir() else []:
@@ -562,7 +570,7 @@ def member_files(directory: Path, game: str) -> list[tuple[str, Path]]:
                 files[path.name] = path
     names = {name: number for number, name in member_names(directory).items()}
     names |= {name.split(".")[0]: number for name, number in names.copy().items()
-              if name.endswith((".nsbmd", ".nsbtx"))}
+              if name.endswith((".nsbmd", ".nsbtx", ".nftr"))}
     numbered = {}
     for file_name, path in files.items():
         stem = file_name.split(".")[0]
@@ -583,12 +591,14 @@ def member_files(directory: Path, game: str) -> list[tuple[str, Path]]:
 
 def build_member(path: Path, original: bytes | None, direct_color: list[int] | None = None) -> bytes:
     if path.is_dir():
+        if (path / "font.json").exists():
+            return build_font_directory(path)
         if original is not None and original[:4] == b"BMD0":
             return build_model(path, original)
         if original is not None and original[:4] == b"BTX0":
             return pack_textures(original, path, str(path))
-        raise GraphicsError(f"{path}: a directory, which only the game's models and texture sets are; add a new one "
-                            "as its .nsbmd or .nsbtx file")
+        raise GraphicsError(f"{path}: a directory, which only the game's models and texture sets and fonts are; add a "
+                            "new model or texture set as its .nsbmd or .nsbtx file")
     if path.suffix == ".png" and direct_color and not (original and original[:4] == b"RGCN"):
         return build_bitmap(path, *direct_color)
     if path.suffix == ".png":
@@ -641,7 +651,7 @@ def main():
             pack(Path(sys.argv[2]), sys.argv[3], Path(sys.argv[4]))
         else:
             raise SystemExit(__doc__)
-    except (GraphicsError, DataError, ValueError) as error:
+    except (GraphicsError, DataError, FontError, ValueError) as error:
         raise SystemExit(f"error: {error}") from None
 
 

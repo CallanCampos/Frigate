@@ -313,6 +313,9 @@ DATA_PACKS = [
     ("tools/data/light_data.py", "res/lighting", ["a/0/6/0", "a/0/6/1"], False),  # Field and battle lighting
     # The field camera's setups, the zones' camera boundaries and the entrance cameras
     ("tools/data/field_camera_data.py", "res/field/cameras", ["a/0/5/9", "a/1/0/9", "a/1/7/7"], False),
+    # The interactive sound system's towns, dungeons, zones, BGM switches and 3D sound
+    ("tools/data/interactive_sound_data.py", "res/sound/interactive",
+     ["a/1/3/3", "a/1/4/6", "a/1/3/6", "a/1/4/7", "a/1/8/2"], False),
     # The town map's places, whose texts are messages of town_map.txt
     ("tools/data/town_map_data.py", "res/town_map", ["a/0/8/5"], True, ["res/text/system/town_map.txt"]),
     # The battle facilities' trainers and Pokémon; the Battle Subway's are also the Trial House's
@@ -344,7 +347,8 @@ DATA_PACK_TOOLS = ["tools/data/datajson.py", "tools/text/text_ids.py", "tools/da
                    "src/ov036/scrcmd_shop.c", "tools/data/facility_data.py", "tools/data/make_constants.py"]
 # The C files a packer reads its tables from, besides scrcmd_shop.c
 DATA_PACK_SOURCES = {"tools/data/pokemon_graphics.py": ["src/system/poke_icon.c"],
-                     "tools/data/pokemon_cries.py": ["src/system/poke_icon.c"]}
+                     "tools/data/pokemon_cries.py": ["src/system/poke_icon.c"],
+                     "tools/data/graphics_archive.py": ["res/fonts/font.schema.json"]}
 
 
 def script_imports(script: str) -> list[str]:
