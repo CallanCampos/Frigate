@@ -291,8 +291,8 @@ void InfinityDungeonRoomChange_CreateTrainers(InfinityDungeonRoomChange *roomCha
 
 static void InfinityDungeonRoomChange_CreateTrainerActor(const InfinityDungeonRoomChange *roomChange,
                                                          const InfinityDungeonPos *pos) {
-    FieldActor *actor = CreateNewActorByParam(roomChange->actorSystem, pos->x, pos->z, DIR_UP, 0xd1, 0xb9, 0,
-                                              roomChange->destination.zoneId);
+    FieldActor *actor = CreateNewActorByParam(roomChange->actorSystem, pos->x, pos->z, DIR_UP, 0xd1, 0xb9,
+                                              MOVE_CODE_NONE, roomChange->destination.zoneId);
     SetActorSCRID(actor, 2000);
 }
 

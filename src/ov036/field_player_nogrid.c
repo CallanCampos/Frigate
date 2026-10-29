@@ -62,8 +62,6 @@ enum {
     FORCED_MOVE_MAX,
 };
 
-#define NOGRID_MOVE_CODE 0x45 // Guessed name: the player rail movement callback set.
-
 typedef struct {
     u8 active;
     u8 kind;
@@ -226,7 +224,9 @@ static const SlideFunc SLIDE_FUNCS[FORCED_MOVE_MAX] = {
 };
 
 // The player's actor on a rail, whose object code is filled in
-static ZoneNPC sPlayerTemplate = { 0xff, OBJ_CODE_HERO, NOGRID_MOVE_CODE, 0, 0, 0, 0, 0, 0, 0, 0xffff, 0xffff, TRUE };
+static ZoneNPC sPlayerTemplate = {
+    0xff, OBJ_CODE_HERO, MOVE_CODE_RAIL_STAY, ACTOR_EVENT_TYPE_NONE, 0, 0, 0, 0, 0, 0, 0xffff, 0xffff, TRUE
+};
 
 FieldPlayerNoGrid *FieldPlayerRail_Create(FieldPlayerCore *core, HeapID heapId) {
     FieldPlayerNoGrid *nogrid = GFL_HeapAllocate(heapId, sizeof(FieldPlayerNoGrid), TRUE, "field_player_nogrid.c", 416);
@@ -234,7 +234,7 @@ FieldPlayerNoGrid *FieldPlayerRail_Create(FieldPlayerCore *core, HeapID heapId) 
     nogrid->core = core;
     nogrid->field = FieldPlayerCore_GetField(core);
     nogrid->actor = FieldPlayerCore_GetActor(nogrid->core);
-    if (GetActorMoveCode(nogrid->actor) != NOGRID_MOVE_CODE) {
+    if (GetActorMoveCode(nogrid->actor) != MOVE_CODE_RAIL_STAY) {
         sPlayerTemplate.modelId = FldAct_GetObjCode(nogrid->actor);
         FldAct_Transplant(nogrid->actor, &sPlayerTemplate);
     }
@@ -264,7 +264,7 @@ void FieldPlayerRail_Delete(FieldPlayerNoGrid *nogrid) {
 }
 
 void FieldPlayerRail_AttachActor(FieldPlayerNoGrid *nogrid, const RailPosition *pos) {
-    if (GetActorMoveCode(nogrid->actor) != NOGRID_MOVE_CODE) {
+    if (GetActorMoveCode(nogrid->actor) != MOVE_CODE_RAIL_STAY) {
         sPlayerTemplate.modelId = FldAct_GetObjCode(nogrid->actor);
         FldAct_Transplant(nogrid->actor, &sPlayerTemplate);
     }
@@ -331,7 +331,7 @@ void FieldPlayerRail_EndBlockedWalk(FieldPlayerNoGrid *nogrid) {
 
         FldAct_FreeAcmd(actor);
         CheckSetActorFaceDir(actor, dir);
-        FldAct_SetDrawStatus(actor, 0);
+        FldAct_SetDrawStatus(actor, DRAW_STATUS_STOP);
         FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_NONE);
     }
 }
@@ -340,14 +340,14 @@ static u32 FieldPlayerRail_CheckAction(FieldPlayerNoGrid *nogrid, u32 dir, u32 p
     u32 command;
 
     switch (FieldPlayerCore_GetExState(nogrid->core)) {
-    case 0:
+    case FLD_PLAYER_EXSTATE_NONE:
         command = FieldPlayerRail_CheckActionWalk(nogrid, pressedKeys, heldKeys, dir, force);
         break;
-    case 1:
+    case FLD_PLAYER_EXSTATE_CYCLING:
         command = FieldPlayerRail_CheckActionSlow(nogrid, pressedKeys, heldKeys, dir, force);
         break;
-    case 2:
-    case 3:
+    case FLD_PLAYER_EXSTATE_SURF:
+    case FLD_PLAYER_EXSTATE_DIVE:
         command = FieldPlayerRail_CheckActionRail(nogrid, pressedKeys, heldKeys, dir, force);
         break;
     }
@@ -357,14 +357,14 @@ static u32 FieldPlayerRail_CheckAction(FieldPlayerNoGrid *nogrid, u32 dir, u32 p
 static void FieldPlayerRail_StartAction(FieldPlayerNoGrid *nogrid, u32 command, u32 dir, u32 pressedKeys, u32 heldKeys,
                                         BOOL force) {
     switch (FieldPlayerCore_GetExState(nogrid->core)) {
-    case 0:
+    case FLD_PLAYER_EXSTATE_NONE:
         FieldPlayerRail_StartActionWalk(nogrid, command, pressedKeys, heldKeys, dir, force);
         break;
-    case 1:
+    case FLD_PLAYER_EXSTATE_CYCLING:
         FieldPlayerRail_StartActionSlow(nogrid, command, pressedKeys, heldKeys, dir, force);
         break;
-    case 2:
-    case 3:
+    case FLD_PLAYER_EXSTATE_SURF:
+    case FLD_PLAYER_EXSTATE_DIVE:
         FieldPlayerRail_StartActionRail(nogrid, command, pressedKeys, heldKeys, dir, force);
         break;
     }

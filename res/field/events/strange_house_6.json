@@ -46,8 +46,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_LASS",
-            "movement": 14,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_UP",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0382",
             "script": 2000,
             "direction": "DIR_UP",

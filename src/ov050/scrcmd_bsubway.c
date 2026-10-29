@@ -1157,7 +1157,7 @@ static void BSubway_PlacePassengers(BSubwayScrWork *bsw, GameData *gameData, MMS
                 } else {
                     objCode = sTable7040[index];
                 }
-                actor = CreateNewActorByParam(mmSys, pos->x, pos->z, i % 4, id, objCode, 2, zoneId);
+                actor = CreateNewActorByParam(mmSys, pos->x, pos->z, i % 4, id, objCode, MOVE_CODE_TURN_RANDOM, zoneId);
                 SetActorUserParam(actor, count - 1, 0);
                 SetActorSCRID(actor, 5);
                 i++;
@@ -1185,7 +1185,8 @@ static void BSubway_PlacePassengers(BSubwayScrWork *bsw, GameData *gameData, MMS
         }
         while (entry->objCode != 0xffff) {
             if (sStages[entry->stage - 1] == stage) {
-                actor = CreateNewActorByParam(mmSys, entry->x, entry->z, i % 4, id, entry->objCode, 2, zoneId);
+                actor = CreateNewActorByParam(mmSys, entry->x, entry->z, i % 4, id, entry->objCode,
+                                              MOVE_CODE_TURN_RANDOM, zoneId);
                 SetActorUserParam(actor, i, 0);
                 SetActorUserParam(actor, entry->unkA, 1);
                 SetActorSCRID(actor, 5);

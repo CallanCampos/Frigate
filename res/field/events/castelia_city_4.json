@@ -16,8 +16,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_CLERK_M_67",
-            "movement": 3,
-            "type": 0,
+            "movement": "MOVE_CODE_WALK_RANDOM",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 4,
             "direction": "DIR_LEFT",
@@ -35,8 +35,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_ACE_TRAINER_F",
-            "movement": 3,
-            "type": 0,
+            "movement": "MOVE_CODE_WALK_RANDOM",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 5,
             "direction": "DIR_LEFT",

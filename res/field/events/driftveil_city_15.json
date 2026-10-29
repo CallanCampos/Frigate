@@ -26,8 +26,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_VETERAN_F",
-            "movement": 15,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_DOWN",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 1,
             "direction": "DIR_DOWN",
@@ -45,8 +45,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_314",
-            "movement": 20,
-            "type": 0,
+            "movement": "MOVE_CODE_WALK_BACK_AND_FORTH",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2,
             "direction": "DIR_RIGHT",
@@ -64,8 +64,8 @@
         {
             "id": 2,
             "model": "OBJ_CODE_BACKERS_F",
-            "movement": 14,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_UP",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 3,
             "direction": "DIR_UP",
@@ -83,8 +83,8 @@
         {
             "id": 3,
             "model": "OBJ_CODE_YOUNGSTER",
-            "movement": 16,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_LEFT",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 4,
             "direction": "DIR_LEFT",

@@ -5,8 +5,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_SCIENTIST_M_52",
-            "movement": 14,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_UP",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 3,
             "direction": "DIR_UP",
@@ -24,8 +24,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_VETERAN_F",
-            "movement": 15,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_DOWN",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 1,
             "direction": "DIR_DOWN",
@@ -43,8 +43,8 @@
         {
             "id": 2,
             "model": "OBJ_CODE_315",
-            "movement": 15,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_DOWN",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2,
             "direction": "DIR_DOWN",

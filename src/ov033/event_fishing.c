@@ -26,6 +26,14 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
+// The fishing form's own animations, the draw statuses after DRAW_STATUS_STOP that the fishing gives the player: the
+// line reeled in with nothing on it, a bite, and a hooked Pokémon that the battle starts with
+enum {
+    FISHING_ANIME_REEL_IN_EMPTY = 1,
+    FISHING_ANIME_BITE,
+    FISHING_ANIME_HOOKED,
+};
+
 BOOL CreateSurfPos(GameData *context, Field *field, VecFx32 *position) {
     VecFx32 targetPosition;
     MapTerrainBuf terrain;
@@ -138,7 +146,7 @@ GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, voi
         ++*state;
     case 1:
         if (FieldPlayer_StepFormChange(work->player) == 1) {
-            FldAct_SetDrawStatus(work->actor, 0);
+            FldAct_SetDrawStatus(work->actor, DRAW_STATUS_STOP);
             func_ov012_02167564(work->actor, work->flag5B);
             GFL_SndSEPlay(0x684);
             ++*state;
@@ -170,7 +178,7 @@ GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, voi
             func_ov033_02179614(work);
             if (result == 1) {
                 func_ov033_02179650(work);
-                FldAct_SetDrawStatus(work->actor, 3);
+                FldAct_SetDrawStatus(work->actor, FISHING_ANIME_HOOKED);
                 party = BtlSetup_GetParty(work->battleSetup, 1);
                 pkm = PokeParty_GetPkm(party, 0);
                 species = PokeParty_GetParam(pkm, 5, NULL);
@@ -200,7 +208,7 @@ GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, voi
             }
             BtlSetup_Free(work->battleSetup);
         }
-        FldAct_SetDrawStatus(work->actor, 1);
+        FldAct_SetDrawStatus(work->actor, FISHING_ANIME_REEL_IN_EMPTY);
         EventScriptCall_Start(event, 0x2792 + *state, NULL, 0, 0x15);
         *state = 8;
         break;
@@ -255,7 +263,7 @@ void func_ov033_021795e8(FishingEventWork *work) {
     void *effects;
 
     effects = Field_GetFieldEffects(work->field);
-    FldAct_SetDrawStatus(work->actor, 2);
+    FldAct_SetDrawStatus(work->actor, FISHING_ANIME_BITE);
     work->effect2C = FldeffEmotionBubble_SetActor(effects, work->actor, 0, 1);
     FldeffFishing_SetAnimeSpeed(work->effect30, 1);
 }

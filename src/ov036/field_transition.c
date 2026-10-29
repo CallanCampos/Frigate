@@ -393,15 +393,21 @@ GameEvent *EventGameTransition_StartFadeInByFacing(GameSystem *gsys, Field *fiel
     }
 }
 
+// The steps of the fades: start the fade, then wait for it unless the caller skips the wait
+enum {
+    TRANSITION_FADE_START,
+    TRANSITION_FADE_WAIT,
+};
+
 GameEventReturnCode EventGameTransition_RunFadeOut(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     switch (*state) {
-    case 0:
+    case TRANSITION_FADE_START:
         GFL_FadeSet(work->fadeMode, 0, 16, work->fadeSlowness);
         FieldLensFlare_Cancel(Field_GetLensFlare(work->field));
         (*state)++;
         break;
-    case 1:
+    case TRANSITION_FADE_WAIT:
         if (work->skipWait == 1) {
             return GAMEEVENT_DONE;
         }
@@ -416,7 +422,7 @@ GameEventReturnCode EventGameTransition_RunFadeOut(GameEvent *event, u32 *state,
 GameEventReturnCode EventGameTransition_RunFadeIn(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     switch (*state) {
-    case 0:
+    case TRANSITION_FADE_START:
         if (work->keepLCD != 0) {
             FieldG3D_SetLCDConfigKeepBGs(work->field);
             EventGameTransition_ResetBgAffine(work->field);
@@ -425,7 +431,7 @@ GameEventReturnCode EventGameTransition_RunFadeIn(GameEvent *event, u32 *state, 
         FieldLensFlare_GreenlightStart(Field_GetLensFlare(work->field));
         (*state)++;
         break;
-    case 1:
+    case TRANSITION_FADE_WAIT:
         if (work->skipWait == 1) {
             return GAMEEVENT_DONE;
         }
@@ -459,10 +465,25 @@ GameEventReturnCode setupScreenForEnterBuilding(GameEvent *event, u32 *state, vo
     return GAMEEVENT_CONTINUE;
 }
 
+// The steps of the building fade-in: start the fade and the blend over the captured screen, blend it away and clear
+// its VRAM, restore the BGs and the 3D surface, load the message windows' palettes, system frame and list frame, then
+// an empty step that falls into the end
+enum {
+    BUILDING_FADE_IN_START,
+    BUILDING_FADE_IN_BLEND,
+    BUILDING_FADE_IN_LCD_CONFIG,
+    BUILDING_FADE_IN_3D_SURFACE,
+    BUILDING_FADE_IN_PALETTES,
+    BUILDING_FADE_IN_SYSTEM_FRAME,
+    BUILDING_FADE_IN_LIST_FRAME,
+    BUILDING_FADE_IN_EMPTY,
+    BUILDING_FADE_IN_END,
+};
+
 GameEventReturnCode EventGameTransition_RunDefaultFadeIn(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     switch (*state) {
-    case 0:
+    case BUILDING_FADE_IN_START:
         Field_SetEffectRunningFlag(work->field, TRUE);
         work->alpha = 16;
         GFL_BGSysSetBGPriority(2, 0);
@@ -473,7 +494,7 @@ GameEventReturnCode EventGameTransition_RunDefaultFadeIn(GameEvent *event, u32 *
         FieldLensFlare_Cancel(Field_GetLensFlare(work->field));
         (*state)++;
         break;
-    case 1:
+    case BUILDING_FADE_IN_BLEND:
         if (work->alpha != 0) {
             u32 alpha = --work->alpha;
             G2_ChangeBlendAlpha(alpha, 16 - alpha);
@@ -487,15 +508,15 @@ GameEventReturnCode EventGameTransition_RunDefaultFadeIn(GameEvent *event, u32 *
         resetBuildingEnterVBlankCallback();
         (*state)++;
         break;
-    case 2:
+    case BUILDING_FADE_IN_LCD_CONFIG:
         FieldG3D_SetLCDConfigKeepBGs(work->field);
         (*state)++;
         break;
-    case 3:
+    case BUILDING_FADE_IN_3D_SURFACE:
         FieldG2D_Prepare3DSurfaceDelayed(work->field);
         (*state)++;
         break;
-    case 4: {
+    case BUILDING_FADE_IN_PALETTES: {
         FieldMsgBG *msgBGSys = Field_GetMsgBGSys(work->field);
         if (!MsgBGPrinter_IsSetupDone(msgBGSys)) {
             break;
@@ -504,34 +525,40 @@ GameEventReturnCode EventGameTransition_RunDefaultFadeIn(GameEvent *event, u32 *
         (*state)++;
         break;
     }
-    case 5:
+    case BUILDING_FADE_IN_SYSTEM_FRAME:
         MsgBGPrinter_LoadWindowGraphicsStep(Field_GetMsgBGSys(work->field), MSGBG_LOAD_SYSTEM_FRAME);
         (*state)++;
         break;
-    case 6:
+    case BUILDING_FADE_IN_LIST_FRAME:
         MsgBGPrinter_LoadWindowGraphicsStep(Field_GetMsgBGSys(work->field), MSGBG_LOAD_LIST_FRAME);
         (*state)++;
         break;
-    case 7:
+    case BUILDING_FADE_IN_EMPTY:
         (*state)++;
-    case 8:
+    case BUILDING_FADE_IN_END:
         Field_SetEffectRunningFlag(work->field, FALSE);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
+// The steps of the season banner's events: chain the banner, then end
+enum {
+    TRANSITION_SEASON_BANNER_START,
+    TRANSITION_SEASON_BANNER_END,
+};
+
 GameEventReturnCode EventGameTransition_SeasonBanner_Callback(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     GameSystem *gsys = work->gsys;
     Field *field = work->field;
     switch (*state) {
-    case 0:
+    case TRANSITION_SEASON_BANNER_START:
         GameEvent_ChainNext(event,
                             EventSeasonBanner_CreateFieldTransition(gsys, field, work->startSeason, work->endSeason));
         (*state)++;
         break;
-    case 1:
+    case TRANSITION_SEASON_BANNER_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -542,37 +569,45 @@ GameEventReturnCode EventGameTransition_RunSeasonFadeInWithCallback(GameEvent *e
     GameSystem *gsys = work->gsys;
     Field *field = work->field;
     switch (*state) {
-    case 0:
+    case TRANSITION_SEASON_BANNER_START:
         GameEvent_ChainNext(event,
                             EventSeasonBanner_CreateFieldTransitionEx(gsys, field, work->startSeason, work->endSeason,
                                                                       work->callback, work->callbackArg));
         (*state)++;
         break;
-    case 1:
+    case TRANSITION_SEASON_BANNER_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
+// The steps of the wipes: start the fade (after restoring the BGs for a wipe in), start the wipe, wait for it, end
+enum {
+    TRANSITION_WIPE_FADE,
+    TRANSITION_WIPE_START,
+    TRANSITION_WIPE_WAIT,
+    TRANSITION_WIPE_END,
+};
+
 GameEventReturnCode EventGameTransition_RunWipeOut(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
-    case 0:
+    case TRANSITION_WIPE_FADE:
         GFL_FadeSet(work->fadeMode, 0, 16, -1);
         FieldLensFlare_Cancel(Field_GetLensFlare(work->field));
         (*state)++;
         break;
-    case 1:
+    case TRANSITION_WIPE_START:
         GFL_WipeSet(WIPE_MODE_MAIN, 8, 8, WIPE_COLOR_BLACK, 6, 1, Field_GetHeapID(field));
         (*state)++;
         break;
-    case 2:
+    case TRANSITION_WIPE_WAIT:
         if (GFL_WipeIsFinished()) {
             (*state)++;
         }
         break;
-    case 3:
+    case TRANSITION_WIPE_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -582,21 +617,21 @@ GameEventReturnCode EventGameTransition_RunWipeOutUp(GameEvent *event, u32 *stat
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
-    case 0:
+    case TRANSITION_WIPE_FADE:
         GFL_FadeSet(work->fadeMode, 0, 16, -1);
         FieldLensFlare_Cancel(Field_GetLensFlare(work->field));
         (*state)++;
         break;
-    case 1:
+    case TRANSITION_WIPE_START:
         GFL_WipeSet(WIPE_MODE_MAIN, 2, 2, WIPE_COLOR_BLACK, 6, 1, Field_GetHeapID(field));
         (*state)++;
         break;
-    case 2:
+    case TRANSITION_WIPE_WAIT:
         if (GFL_WipeIsFinished()) {
             (*state)++;
         }
         break;
-    case 3:
+    case TRANSITION_WIPE_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -606,21 +641,21 @@ GameEventReturnCode EventGameTransition_RunWipeOutDown(GameEvent *event, u32 *st
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
-    case 0:
+    case TRANSITION_WIPE_FADE:
         GFL_FadeSet(work->fadeMode, 0, 16, -1);
         FieldLensFlare_Cancel(Field_GetLensFlare(work->field));
         (*state)++;
         break;
-    case 1:
+    case TRANSITION_WIPE_START:
         GFL_WipeSet(WIPE_MODE_MAIN, 4, 4, WIPE_COLOR_BLACK, 6, 1, Field_GetHeapID(field));
         (*state)++;
         break;
-    case 2:
+    case TRANSITION_WIPE_WAIT:
         if (GFL_WipeIsFinished()) {
             (*state)++;
         }
         break;
-    case 3:
+    case TRANSITION_WIPE_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -630,21 +665,21 @@ GameEventReturnCode EventGameTransition_RunWipeOutLeft(GameEvent *event, u32 *st
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
-    case 0:
+    case TRANSITION_WIPE_FADE:
         GFL_FadeSet(work->fadeMode, 0, 16, -1);
         FieldLensFlare_Cancel(Field_GetLensFlare(work->field));
         (*state)++;
         break;
-    case 1:
+    case TRANSITION_WIPE_START:
         GFL_WipeSet(WIPE_MODE_MAIN, 10, 10, WIPE_COLOR_BLACK, 6, 1, Field_GetHeapID(field));
         (*state)++;
         break;
-    case 2:
+    case TRANSITION_WIPE_WAIT:
         if (GFL_WipeIsFinished()) {
             (*state)++;
         }
         break;
-    case 3:
+    case TRANSITION_WIPE_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -654,21 +689,21 @@ GameEventReturnCode EventGameTransition_RunWipeOutRight(GameEvent *event, u32 *s
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
-    case 0:
+    case TRANSITION_WIPE_FADE:
         GFL_FadeSet(work->fadeMode, 0, 16, -1);
         FieldLensFlare_Cancel(Field_GetLensFlare(work->field));
         (*state)++;
         break;
-    case 1:
+    case TRANSITION_WIPE_START:
         GFL_WipeSet(WIPE_MODE_MAIN, 6, 6, WIPE_COLOR_BLACK, 6, 1, Field_GetHeapID(field));
         (*state)++;
         break;
-    case 2:
+    case TRANSITION_WIPE_WAIT:
         if (GFL_WipeIsFinished()) {
             (*state)++;
         }
         break;
-    case 3:
+    case TRANSITION_WIPE_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -678,23 +713,23 @@ GameEventReturnCode EventGameTransition_RunWipeInUp(GameEvent *event, u32 *state
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
-    case 0:
+    case TRANSITION_WIPE_FADE:
         FieldG3D_SetLCDConfigKeepBGs(field);
         EventGameTransition_ResetBgAffine(work->field);
         GFL_FadeSet(work->fadeMode, 16, 0, -1);
         FieldLensFlare_GreenlightStart(Field_GetLensFlare(work->field));
         (*state)++;
         break;
-    case 1:
+    case TRANSITION_WIPE_START:
         GFL_WipeSet(WIPE_MODE_MAIN, 3, 3, WIPE_COLOR_BLACK, 6, 1, Field_GetHeapID(field));
         (*state)++;
         break;
-    case 2:
+    case TRANSITION_WIPE_WAIT:
         if (GFL_WipeIsFinished()) {
             (*state)++;
         }
         break;
-    case 3:
+    case TRANSITION_WIPE_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -704,23 +739,23 @@ GameEventReturnCode EventGameTransition_RunWipeInDown(GameEvent *event, u32 *sta
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
-    case 0:
+    case TRANSITION_WIPE_FADE:
         FieldG3D_SetLCDConfigKeepBGs(field);
         EventGameTransition_ResetBgAffine(work->field);
         GFL_FadeSet(work->fadeMode, 16, 0, -1);
         FieldLensFlare_GreenlightStart(Field_GetLensFlare(work->field));
         (*state)++;
         break;
-    case 1:
+    case TRANSITION_WIPE_START:
         GFL_WipeSet(WIPE_MODE_MAIN, 5, 5, WIPE_COLOR_BLACK, 6, 1, Field_GetHeapID(field));
         (*state)++;
         break;
-    case 2:
+    case TRANSITION_WIPE_WAIT:
         if (GFL_WipeIsFinished()) {
             (*state)++;
         }
         break;
-    case 3:
+    case TRANSITION_WIPE_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -730,23 +765,23 @@ GameEventReturnCode EventGameTransition_RunWipeInLeft(GameEvent *event, u32 *sta
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
-    case 0:
+    case TRANSITION_WIPE_FADE:
         FieldG3D_SetLCDConfigKeepBGs(field);
         EventGameTransition_ResetBgAffine(work->field);
         GFL_FadeSet(work->fadeMode, 16, 0, -1);
         FieldLensFlare_GreenlightStart(Field_GetLensFlare(work->field));
         (*state)++;
         break;
-    case 1:
+    case TRANSITION_WIPE_START:
         GFL_WipeSet(WIPE_MODE_MAIN, 7, 7, WIPE_COLOR_BLACK, 6, 1, Field_GetHeapID(field));
         (*state)++;
         break;
-    case 2:
+    case TRANSITION_WIPE_WAIT:
         if (GFL_WipeIsFinished()) {
             (*state)++;
         }
         break;
-    case 3:
+    case TRANSITION_WIPE_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -756,23 +791,23 @@ GameEventReturnCode EventGameTransition_RunWipeInRight(GameEvent *event, u32 *st
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
-    case 0:
+    case TRANSITION_WIPE_FADE:
         FieldG3D_SetLCDConfigKeepBGs(field);
         EventGameTransition_ResetBgAffine(work->field);
         GFL_FadeSet(work->fadeMode, 16, 0, -1);
         FieldLensFlare_GreenlightStart(Field_GetLensFlare(work->field));
         (*state)++;
         break;
-    case 1:
+    case TRANSITION_WIPE_START:
         GFL_WipeSet(WIPE_MODE_MAIN, 11, 11, WIPE_COLOR_BLACK, 6, 1, Field_GetHeapID(field));
         (*state)++;
         break;
-    case 2:
+    case TRANSITION_WIPE_WAIT:
         if (GFL_WipeIsFinished()) {
             (*state)++;
         }
         break;
-    case 3:
+    case TRANSITION_WIPE_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -781,14 +816,14 @@ GameEventReturnCode EventGameTransition_RunWipeInRight(GameEvent *event, u32 *st
 GameEventReturnCode EventGameTransition_RunFadeInWithBgRestore(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     switch (*state) {
-    case 0:
+    case TRANSITION_FADE_START:
         GFL_FadeSet(work->fadeMode, 16, 0, work->fadeSlowness);
         FieldLensFlare_Cancel(Field_GetLensFlare(work->field));
         FieldG3D_SetLCDConfigKeepBGs(work->field);
         EventGameTransition_ResetBgAffine(work->field);
         (*state)++;
         break;
-    case 1:
+    case TRANSITION_FADE_WAIT:
         if (work->skipWait == 1) {
             return GAMEEVENT_DONE;
         }

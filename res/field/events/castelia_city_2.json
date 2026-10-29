@@ -136,8 +136,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_250",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02f4",
             "script": 2000,
             "direction": "DIR_DOWN",
@@ -155,8 +155,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_ARTIST",
-            "movement": 3,
-            "type": 0,
+            "movement": "MOVE_CODE_WALK_RANDOM",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 4,
             "direction": "DIR_LEFT",

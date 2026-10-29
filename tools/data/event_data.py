@@ -108,7 +108,9 @@ def events_json(data: bytes) -> dict:
     for _ in range(counts[1]):
         (uid, model, movement, kind, flag, script, direction, param0, param1, param2, width, height, is_rail,
          union) = NPC.unpack_from(data, pos)
-        events["npcs"].append({"id": uid, "model": name("OBJ_CODE_", model), "movement": movement, "type": kind,
+        events["npcs"].append({"id": uid, "model": name("OBJ_CODE_", model),
+                               "movement": name("MOVE_CODE_", movement),
+                               "type": name("ACTOR_EVENT_TYPE_", kind),
                                "flag": id_name("EVENT_FLAG_", flag), "script": script,
                                "direction": name("DIR_", direction),
                                "params": [param0, param1, param2], "area": {"width": width, "height": height},
@@ -187,9 +189,10 @@ def events_bytes(events: dict, where: str) -> bytes:
         records += BG.pack(event["script"], event["condition"], event["direction"], is_rail, union)
     for npc in events["npcs"]:
         is_rail, union = position_bytes(npc, NPC_POSITION, 8, where)
-        records += NPC.pack(npc["id"], value(npc["model"], where), npc["movement"], npc["type"], value(npc["flag"], where),
-                            npc["script"], value(npc["direction"], where), *npc["params"], npc["area"]["width"],
-                            npc["area"]["height"], is_rail, union)
+        records += NPC.pack(npc["id"], value(npc["model"], where), value(npc["movement"], where),
+                            value(npc["type"], where), value(npc["flag"], where), npc["script"],
+                            value(npc["direction"], where), *npc["params"], npc["area"]["width"], npc["area"]["height"],
+                            is_rail, union)
     for warp in events["warps"]:
         is_rail, union = position_bytes(warp, WARP_POSITION, 12, where)
         records += WARP.pack(value(warp["zone"], where), warp["warp"], warp["unk4"], warp["transition"], is_rail, union)

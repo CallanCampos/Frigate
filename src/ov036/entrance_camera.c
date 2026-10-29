@@ -18,6 +18,7 @@
 #include "field/field_player.h"
 #include "field/field_sound.h"
 #include "field/pair_sys.h"
+#include "field/player_state.h"
 #include "field/zone.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
@@ -118,12 +119,18 @@ GameEvent *EventWarpSequence_CreateOut(WarpSequence *warp) {
     return event;
 }
 
+// The steps of the warp events that start the transition or chain one event, and end once it is done
+enum {
+    WARP_STEP_START,
+    WARP_STEP_END,
+};
+
 GameEventReturnCode EventWarpSequenceOut_RunPlain(GameEvent *event, u32 *state, void *work) {
     WarpOutData *out = work;
     WarpSequence *warp = out->warp;
 
     switch (*state) {
-    case 0:
+    case WARP_STEP_START:
         EventWarpSequenceOut_ChangeToZoneBGM(out);
         if (warp->outTransition != FIELD_TRANSITION_BUILDING) {
             GFL_SndSEPlay(SEQ_SE_KAIDAN);
@@ -131,7 +138,7 @@ GameEventReturnCode EventWarpSequenceOut_RunPlain(GameEvent *event, u32 *state, 
         EventWarpSequenceOut_PlayTransition(out, event);
         (*state)++;
         break;
-    case 1:
+    case WARP_STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -142,11 +149,11 @@ GameEventReturnCode EventWarpSequenceOut_RunGroundAnime(GameEvent *event, u32 *s
     WarpSequence *warp = out->warp;
 
     switch (*state) {
-    case 0:
+    case WARP_STEP_START:
         GameEvent_ChainNext(event, EntranceEffect_CreateB(warp));
         (*state)++;
         break;
-    case 1:
+    case WARP_STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -195,12 +202,19 @@ GameEvent *EventWarpSequence_CreateWalkEvent(GameSystem *gsys, WarpSequence *war
     return event;
 }
 
+// The steps of the walk out: start the walk of one tile, play the transition once it is over, and end
+enum {
+    WARP_OUT_WALK_START,
+    WARP_OUT_WALK_WAIT,
+    WARP_OUT_WALK_END,
+};
+
 GameEventReturnCode EventWarpSequenceOut_RunObjectAnime(GameEvent *event, u32 *state, void *work) {
     WarpOutData *out = work;
     WarpSequence *warp = out->warp;
 
     switch (*state) {
-    case 0:
+    case WARP_OUT_WALK_START:
         if (EventWarpSequenceOut_ShouldKeepBGM(out)) {
             EventWarpSequenceOut_FadeOutBGM(out, event);
         } else {
@@ -209,7 +223,7 @@ GameEventReturnCode EventWarpSequenceOut_RunObjectAnime(GameEvent *event, u32 *s
         EventWarpSequence_StartWalkTask(warp);
         (*state)++;
         break;
-    case 1:
+    case WARP_OUT_WALK_WAIT:
         if (EventWarpSequence_UpdateTCB(warp)) {
             if (warp->outTransition != FIELD_TRANSITION_BUILDING) {
                 GFL_SndSEPlay(SEQ_SE_KAIDAN);
@@ -218,7 +232,7 @@ GameEventReturnCode EventWarpSequenceOut_RunObjectAnime(GameEvent *event, u32 *s
             (*state)++;
         }
         break;
-    case 2:
+    case WARP_OUT_WALK_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -230,15 +244,24 @@ GameEventReturnCode EventWarpSequenceOut_RunAppear(GameEvent *event, u32 *state,
     Field *field = out->warp->field;
 
     switch (*state) {
-    case 0:
+    case WARP_STEP_START:
         GameEvent_ChainNext(event, EventDig_CreateRisingSpin(NULL, gsys, field));
         (*state)++;
         break;
-    case 1:
+    case WARP_STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
+
+// The steps of the camera's exit: finish the camera's delay if it has one, wait for it, play the entrance effect, and
+// end
+enum {
+    WARP_OUT_CAMERA_CHECK_DELAY,
+    WARP_OUT_CAMERA_WAIT_DELAY,
+    WARP_OUT_CAMERA_EFFECT,
+    WARP_OUT_CAMERA_END,
+};
 
 GameEventReturnCode EventWarpSequenceOut_RunCamera(GameEvent *event, u32 *state, void *work) {
     WarpOutData *out = work;
@@ -246,30 +269,30 @@ GameEventReturnCode EventWarpSequenceOut_RunCamera(GameEvent *event, u32 *state,
     FieldCamera *camera = Field_GetCameraSystem(warp->field);
 
     switch (*state) {
-    case 0:
+    case WARP_OUT_CAMERA_CHECK_DELAY:
         if (FieldCamera_SupportsDelay(camera) && FieldCamera_IsDelayActive(camera)) {
             FieldCamera_FinishDelay(camera);
-            *state = 1;
+            *state = WARP_OUT_CAMERA_WAIT_DELAY;
         } else {
-            *state = 2;
+            *state = WARP_OUT_CAMERA_EFFECT;
         }
         return GAMEEVENT_CONTINUE_DIRECT;
-    case 1:
+    case WARP_OUT_CAMERA_WAIT_DELAY:
         if (!FieldCamera_SupportsDelay(camera)) {
-            *state = 2;
+            *state = WARP_OUT_CAMERA_EFFECT;
             return GAMEEVENT_CONTINUE_DIRECT;
         }
         if (!FieldCamera_IsDelayActive(camera)) {
             FieldCamera_ClearBind(camera);
-            *state = 2;
+            *state = WARP_OUT_CAMERA_EFFECT;
             return GAMEEVENT_CONTINUE_DIRECT;
         }
         break;
-    case 2:
+    case WARP_OUT_CAMERA_EFFECT:
         GameEvent_ChainNext(event, EntranceEffect_CreateB(warp));
-        *state = 3;
+        *state = WARP_OUT_CAMERA_END;
         return GAMEEVENT_CONTINUE_DIRECT;
-    case 3:
+    case WARP_OUT_CAMERA_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -281,13 +304,13 @@ GameEventReturnCode EventWarpSequenceOut_RunFadeSe(GameEvent *event, u32 *state,
     Field *field = out->warp->field;
 
     switch (*state) {
-    case 0:
+    case WARP_STEP_START:
         EventWarpSequenceOut_ChangeToZoneBGM(out);
         GFL_SndSEPlay(SEQ_SE_FLD_102);
         GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_BUILDING, 0));
         (*state)++;
         break;
-    case 1:
+    case WARP_STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -303,7 +326,8 @@ static BOOL EventWarpSequenceOut_ShouldKeepBGM(WarpOutData *out) {
     if (GameData_IsZoneBGMOverriden(gameData, (u16)warp->spawn.zoneId)) {
         return FALSE;
     }
-    if (EventWarpSequenceOut_GetPlayerExState(out) == 1 && GameData_GetNowBGM(gameData) == SEQ_BGM_BICYCLE) {
+    if (EventWarpSequenceOut_GetPlayerExState(out) == FLD_PLAYER_EXSTATE_CYCLING &&
+        GameData_GetNowBGM(gameData) == SEQ_BGM_BICYCLE) {
         return FALSE;
     }
     return TRUE;
@@ -403,14 +427,14 @@ GameEventReturnCode EventWarpSequenceIn_RunPlain(GameEvent *event, u32 *state, v
     WarpSequence *warp = in->warp;
 
     switch (*state) {
-    case 0:
+    case WARP_STEP_START:
         if (warp->zoneBGMChanged != 0) {
             EventWarpSequenceIn_FadeInBGM(in);
         }
         EventWarpSequenceIn_PlayTransition(in, event);
         (*state)++;
         break;
-    case 1:
+    case WARP_STEP_END:
         EventWarpSequenceIn_ShowPlaceName(in);
         return GAMEEVENT_DONE;
     }
@@ -422,16 +446,24 @@ GameEventReturnCode EventWarpSequenceIn_RunGroundAnime(GameEvent *event, u32 *st
     WarpSequence *warp = in->warp;
 
     switch (*state) {
-    case 0:
+    case WARP_STEP_START:
         GameEvent_ChainNext(event, EntranceEffect_CreateA(warp));
         (*state)++;
         break;
-    case 1:
+    case WARP_STEP_END:
         EventWarpSequenceIn_ShowPlaceName(in);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
+
+// The steps of the walk in: play the transition, fade the BGM in, walk one tile and end
+enum {
+    WARP_IN_WALK_TRANSITION,
+    WARP_IN_WALK_BGM,
+    WARP_IN_WALK_STEP,
+    WARP_IN_WALK_END,
+};
 
 GameEventReturnCode EventWarpSequenceIn_RunObjectAnime(GameEvent *event, u32 *state, void *work) {
     WarpInData *in = work;
@@ -440,11 +472,11 @@ GameEventReturnCode EventWarpSequenceIn_RunObjectAnime(GameEvent *event, u32 *st
     Field *field = warp->field;
 
     switch (*state) {
-    case 0:
+    case WARP_IN_WALK_TRANSITION:
         EventWarpSequenceIn_PlayTransition(in, event);
         (*state)++;
         break;
-    case 1:
+    case WARP_IN_WALK_BGM:
         if (warp->zoneBGMChanged != 0) {
             EventWarpSequenceIn_FadeInBGM(in);
         } else if (warp->bgmFadedOut != 0) {
@@ -452,11 +484,11 @@ GameEventReturnCode EventWarpSequenceIn_RunObjectAnime(GameEvent *event, u32 *st
         }
         (*state)++;
         break;
-    case 2:
+    case WARP_IN_WALK_STEP:
         GameEvent_ChainNext(event, CallMoveOneTileFrontEvent(gsys, field));
         (*state)++;
         break;
-    case 3:
+    case WARP_IN_WALK_END:
         EventWarpSequenceIn_ShowPlaceName(in);
         return GAMEEVENT_DONE;
     }
@@ -469,11 +501,11 @@ GameEventReturnCode EventWarpSequence_CallbackSpinDown(GameEvent *event, u32 *st
     Field *field = in->warp->field;
 
     switch (*state) {
-    case 0:
+    case WARP_STEP_START:
         GameEvent_ChainNext(event, EventPlayerSpinDown_Create(NULL, gsys, field));
         (*state)++;
         break;
-    case 1:
+    case WARP_STEP_END:
         EventWarpSequenceIn_ShowPlaceName(in);
         return GAMEEVENT_DONE;
     }
@@ -486,16 +518,23 @@ GameEventReturnCode EventWarpSequenceIn_RunCamera(GameEvent *event, u32 *state, 
 
     Field_GetCameraSystem(warp->field);
     switch (*state) {
-    case 0:
+    case WARP_STEP_START:
         GameEvent_ChainNext(event, EntranceEffect_CreateA(warp));
         (*state)++;
         break;
-    case 1:
+    case WARP_STEP_END:
         EventWarpSequenceIn_ShowPlaceName(in);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
+
+// The steps of the gate's entrance: fade the BGM in, play the transition and end
+enum {
+    WARP_IN_FADE_SE_BGM,
+    WARP_IN_FADE_SE_TRANSITION,
+    WARP_IN_FADE_SE_END,
+};
 
 GameEventReturnCode EventWarpSequenceIn_RunFadeSe(GameEvent *event, u32 *state, void *work) {
     WarpInData *in = work;
@@ -504,18 +543,18 @@ GameEventReturnCode EventWarpSequenceIn_RunFadeSe(GameEvent *event, u32 *state, 
     Field *field = warp->field;
 
     switch (*state) {
-    case 0:
+    case WARP_IN_FADE_SE_BGM:
         if (warp->zoneBGMChanged != 0) {
             EventWarpSequenceIn_FadeInBGM(in);
         }
         (*state)++;
         break;
-    case 1:
+    case WARP_IN_FADE_SE_TRANSITION:
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_BUILDING, 0, 0, 0, 0));
         (*state)++;
         break;
-    case 2:
+    case WARP_IN_FADE_SE_END:
         EventWarpSequenceIn_ShowPlaceName(in);
         return GAMEEVENT_DONE;
     }

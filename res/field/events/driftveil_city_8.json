@@ -26,8 +26,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_83",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02c4",
             "script": 1,
             "direction": "DIR_UP",
@@ -45,8 +45,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_76",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 4,
             "direction": "DIR_RIGHT",
@@ -64,8 +64,8 @@
         {
             "id": 2,
             "model": "OBJ_CODE_ACE_TRAINER_F",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 3,
             "direction": "DIR_LEFT",

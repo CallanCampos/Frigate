@@ -5,8 +5,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_76",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10740,
             "direction": "DIR_DOWN",
@@ -24,8 +24,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_SCIENTIST_F_46",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 1,
             "direction": "DIR_DOWN",
@@ -43,8 +43,8 @@
         {
             "id": 2,
             "model": "OBJ_CODE_PSYCHIC_M",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2,
             "direction": "DIR_DOWN",
@@ -62,8 +62,8 @@
         {
             "id": 3,
             "model": "OBJ_CODE_ACE_TRAINER_M",
-            "movement": 0,
-            "type": 0,
+            "movement": "MOVE_CODE_NONE",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02ee",
             "script": 3,
             "direction": "DIR_UP",

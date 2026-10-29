@@ -33,8 +33,14 @@
                         "type": [ "string", "integer" ], "x-constant": "OBJ_CODE_", "minimum": 0, "maximum": 65535,
                         "description": "Its model, an OBJ_CODE_* constant (res/field/actors/)"
                     },
-                    "movement": { "$ref": "#/$defs/u16", "description": "How it moves, its move code" },
-                    "type": { "$ref": "#/$defs/u16", "description": "What kind of event it is, such as a trainer" },
+                    "movement": {
+                        "type": [ "string", "integer" ], "x-constant": "MOVE_CODE_", "minimum": 0, "maximum": 65535,
+                        "description": "How it moves, its move code, a MOVE_CODE_* constant"
+                    },
+                    "type": {
+                        "type": [ "string", "integer" ], "x-constant": "ACTOR_EVENT_TYPE_", "minimum": 0, "maximum": 65535,
+                        "description": "What kind of event it is, such as a Trainer, an ACTOR_EVENT_TYPE_* constant"
+                    },
                     "flag": {
                         "type": [ "string", "integer" ], "x-constant": "EVENT_FLAG_", "x-hex": true, "minimum": 0, "maximum": 65535,
                         "description": "Its spawn flag (swan's spawnFlag): an EVENT_FLAG_* constant, or the flag's ID in hex, as \"0x03d0\", or 0 for none"

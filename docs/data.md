@@ -26,6 +26,7 @@ res/
   town_map/
   sound/{sequences,banks,wave_archives,streams}/
   graphics/<archive>/       the menus', apps' and screens' 2D graphics, an archive each
+  demo/<archive>/           the demos and cutscenes: the movies' frames, an archive each
   text/{system,script}/
 generated/                  the constant lists: species.txt, items.txt, obj_codes.txt, sound.txt and the others
 ```
@@ -1027,7 +1028,9 @@ field, with swan's names and layouts (`include/field/zone.h`, `include/field/fie
 ```
 
 An event is at a `grid` position or, in a zone with rails, a `rail` one. A warp names the zone it leads to and the warp
-of that zone it arrives at, and an NPC the direction it faces (`DIR_*`). An NPC's spawn flag and a trigger's variable
+of that zone it arrives at, and an NPC the direction it faces (`DIR_*`), its move code (`MOVE_CODE_*` of `generated/move_codes.txt`,
+such as a random walk) and its event type (`ACTOR_EVENT_TYPE_*` of `generated/actor_event_types.txt`, such as a
+Trainer that sees the way it faces). An NPC's spawn flag and a trigger's variable
 are written by name where the constant lists have one, and otherwise as their IDs in hex, as `"0x4176"`, as IDs are
 read; a file can write any ID that way. The init scripts are a map script table (see [Scripts](scripts.md)): a script by
 when it runs, or, for type 1, conditions on variables. A zone's header gives the number of its entities file (`entities`
@@ -1068,3 +1071,15 @@ has a PCMP section. A new member is the next number's file: a PNG becomes a size
 palette has more than 16 colors and 4bpp otherwise, a `.pal` a palette, and the rest go in as they are.
 `tools/data/graphics_archive.py dump ARCID_TITLE` writes an archive's directory again from both versions' files,
 replacing it and any edits.
+
+The same packer takes archives of other subjects, each in the directory for what it holds (`ARCHIVE_ROOTS`):
+`res/graphics/` for the menus and apps, `res/demo/` for the demos and cutscenes, `res/field/gimmicks/` and
+`res/field/effects/`, `res/particles/` and `res/fonts/`; `dump ARCID_X res/demo` writes one there. A name, like its
+`ARCID_*`, is in one of them only.
+
+A movie's frames are direct color bitmaps, 15-bit color with bit 15 set where the pixel shows, as
+`cdemo_control.c` plays the Game Freak logo (`res/demo/cdemo_gflogo/`) and the opening (`res/demo/cdemo_openingsw/`):
+an archive whose `archive.json` has `"direct_color": [256, 256]` keeps each 256 by 256 frame as an RGBA PNG, each
+color's five bits widened to eight and alpha 255 where the pixel shows, 0 where it doesn't. Edit a frame as any
+image: the packer keeps each channel's top five bits and shows the pixels whose alpha is 128 or more. `dump ARCID_X
+res/demo --direct-color 256x256` writes such an archive.

@@ -5,8 +5,8 @@
         {
             "id": 0,
             "model": "OBJ_CODE_ROUGHNECK",
-            "movement": 16,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_LEFT",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 1,
             "direction": "DIR_LEFT",
@@ -24,8 +24,8 @@
         {
             "id": 1,
             "model": "OBJ_CODE_311",
-            "movement": 15,
-            "type": 0,
+            "movement": "MOVE_CODE_FACE_DOWN",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2,
             "direction": "DIR_DOWN",
@@ -43,8 +43,8 @@
         {
             "id": 2,
             "model": "OBJ_CODE_21",
-            "movement": 2,
-            "type": 0,
+            "movement": "MOVE_CODE_TURN_RANDOM",
+            "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 3,
             "direction": "DIR_LEFT",

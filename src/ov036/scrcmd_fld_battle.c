@@ -209,17 +209,23 @@ static GameEvent *TeamSelectEvent_Create(GameSystem *gsys, u32 partyResult, u32 
     return event;
 }
 
+// The steps of the team select: open the party select list, then wait for the choice
+enum {
+    TEAM_SELECT_STEP_OPEN,
+    TEAM_SELECT_STEP_WAIT,
+};
+
 static GameEventReturnCode TeamSelectEvent_Callback(GameEvent *event, u32 *state, void *data) {
     TeamSelectEvent *select = data;
     u32 ineligible;
 
     switch (*state) {
-    case 0:
+    case TEAM_SELECT_STEP_OPEN:
         select->select = PartySelectList_Create(select->field, select->party, select->battleBoxParty,
                                                 select->partyIneligible, select->battleBoxIneligible, select->heapId);
         (*state)++;
         break;
-    case 1:
+    case TEAM_SELECT_STEP_WAIT:
         if (PartySelectList_Main(select->select)) {
             *select->result = PartySelectList_Delete(select->select, &ineligible);
             if (ineligible == TRUE) {
