@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_exp_obj.h"
 #include "field/gimmick_underground_ruins.h"
@@ -21,7 +22,9 @@ static void UndergroundRuins_StepAnimations(GimmickWork *work);
 static const G3DSceneAnimationSetup sAnimations[] = { { 1, 0 } };
 
 static const G3DSceneResourceSetup sResources[] = {
-    { 0x12d, 0, 0 }, { 0x12d, 1, 0 }, { 0x12d, 2, 0 }, { 0x12d, 3, 0 }, { 0x12d, 4, 0 }, { 0x12d, 5, 0 },
+    { ARCID_GIMMICK_UNDERGROUND_RUINS, 0, 0 }, { ARCID_GIMMICK_UNDERGROUND_RUINS, 1, 0 },
+    { ARCID_GIMMICK_UNDERGROUND_RUINS, 2, 0 }, { ARCID_GIMMICK_UNDERGROUND_RUINS, 3, 0 },
+    { ARCID_GIMMICK_UNDERGROUND_RUINS, 4, 0 }, { ARCID_GIMMICK_UNDERGROUND_RUINS, 5, 0 },
 };
 
 static const G3DSceneActorSetup sActors[] = {

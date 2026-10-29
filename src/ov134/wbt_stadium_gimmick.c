@@ -81,12 +81,23 @@ static BOOL WbtStadiumGimmick_EndTask(void *data);
 // portraits and the name plates (not const, so in .data). These lie in this order only to give the original's .rodata
 // and .data: the size sort of MWCC's data puts equal sizes in an order that depends on every declaration
 static const G3DSceneResourceSetup sResources[] = {
-    { 0x107, 0, 0 },  { 0x107, 1, 0 },  { 0x107, 2, 0 },  { 0x107, 3, 0 },  { 0x107, 4, 0 },  { 0x107, 5, 0 },
-    { 0x107, 6, 0 },  { 0x107, 7, 0 },  { 0x107, 14, 0 }, { 0x107, 15, 0 }, { 0x107, 8, 0 },  { 0x107, 9, 0 },
-    { 0x107, 10, 0 }, { 0x107, 11, 0 }, { 0x107, 12, 0 }, { 0x107, 13, 0 }, { 0x107, 16, 0 }, { 0x107, 17, 0 },
-    { 0x107, 18, 0 }, { 0x107, 19, 0 }, { 0x107, 20, 0 }, { 0x107, 21, 0 }, { 0x107, 22, 0 }, { 0x107, 23, 0 },
-    { 0x107, 24, 0 }, { 0x107, 25, 0 }, { 0x107, 26, 0 }, { 0x107, 27, 0 }, { 0x107, 28, 0 }, { 0x107, 29, 0 },
-    { 0x107, 30, 0 }, { 0x107, 31, 0 }, { 0x107, 32, 0 }, { 0x107, 33, 0 },
+    { ARCID_WBT_STADIUM_GIMMICK_MODELS, 0, 0 },  { ARCID_WBT_STADIUM_GIMMICK_MODELS, 1, 0 },
+    { ARCID_WBT_STADIUM_GIMMICK_MODELS, 2, 0 },  { ARCID_WBT_STADIUM_GIMMICK_MODELS, 3, 0 },
+    { ARCID_WBT_STADIUM_GIMMICK_MODELS, 4, 0 },  { ARCID_WBT_STADIUM_GIMMICK_MODELS, 5, 0 },
+    { ARCID_WBT_STADIUM_GIMMICK_MODELS, 6, 0 },  { ARCID_WBT_STADIUM_GIMMICK_MODELS, 7, 0 },
+    { ARCID_WBT_STADIUM_GIMMICK_MODELS, 14, 0 }, { ARCID_WBT_STADIUM_GIMMICK_MODELS, 15, 0 },
+    { ARCID_WBT_STADIUM_GIMMICK_MODELS, 8, 0 },  { ARCID_WBT_STADIUM_GIMMICK_MODELS, 9, 0 },
+    { ARCID_WBT_STADIUM_GIMMICK_MODELS, 10, 0 }, { ARCID_WBT_STADIUM_GIMMICK_MODELS, 11, 0 },
+    { ARCID_WBT_STADIUM_GIMMICK_MODELS, 12, 0 }, { ARCID_WBT_STADIUM_GIMMICK_MODELS, 13, 0 },
+    { ARCID_WBT_STADIUM_GIMMICK_MODELS, 16, 0 }, { ARCID_WBT_STADIUM_GIMMICK_MODELS, 17, 0 },
+    { ARCID_WBT_STADIUM_GIMMICK_MODELS, 18, 0 }, { ARCID_WBT_STADIUM_GIMMICK_MODELS, 19, 0 },
+    { ARCID_WBT_STADIUM_GIMMICK_MODELS, 20, 0 }, { ARCID_WBT_STADIUM_GIMMICK_MODELS, 21, 0 },
+    { ARCID_WBT_STADIUM_GIMMICK_MODELS, 22, 0 }, { ARCID_WBT_STADIUM_GIMMICK_MODELS, 23, 0 },
+    { ARCID_WBT_STADIUM_GIMMICK_MODELS, 24, 0 }, { ARCID_WBT_STADIUM_GIMMICK_MODELS, 25, 0 },
+    { ARCID_WBT_STADIUM_GIMMICK_MODELS, 26, 0 }, { ARCID_WBT_STADIUM_GIMMICK_MODELS, 27, 0 },
+    { ARCID_WBT_STADIUM_GIMMICK_MODELS, 28, 0 }, { ARCID_WBT_STADIUM_GIMMICK_MODELS, 29, 0 },
+    { ARCID_WBT_STADIUM_GIMMICK_MODELS, 30, 0 }, { ARCID_WBT_STADIUM_GIMMICK_MODELS, 31, 0 },
+    { ARCID_WBT_STADIUM_GIMMICK_MODELS, 32, 0 }, { ARCID_WBT_STADIUM_GIMMICK_MODELS, 33, 0 },
 };
 static const G3DSceneAnimationSetup sActor0Anms[] = { { 1, 0 }, { 2, 0 } };
 static const G3DSceneAnimationSetup sActor2Anms[] = { { 5, 0 }, { 6, 0 } };
@@ -199,7 +210,7 @@ void WbtStadiumGimmick_LoadPortraitScene(Field *field, u8 position, u8 side) {
         return;
     }
     for (i = 0; i < 4; i++) {
-        resources[i].arcId = 0x107;
+        resources[i].arcId = ARCID_WBT_STADIUM_GIMMICK_MODELS;
         resources[i].fileId = resourceIds[i] + position * 8 + side * 4;
         resources[i].type = 0;
     }
@@ -659,12 +670,12 @@ static void WbtStadiumGimmick_LoadSinglePortraitScene(GimmickWork *work, u8 side
     SRTMatrix *matrix;
 
     for (i = 0; i < 2; i++) {
-        resources[i].arcId = 0x107;
+        resources[i].arcId = ARCID_WBT_STADIUM_GIMMICK_MODELS;
         resources[i].fileId = resourceIds[i] + side * 2;
         resources[i].type = 0;
     }
     for (; i < 6; i++) {
-        resources[i].arcId = 0x107;
+        resources[i].arcId = ARCID_WBT_STADIUM_GIMMICK_MODELS;
         resources[i].fileId = resourceIds[i] + side * 4;
         resources[i].type = 0;
     }

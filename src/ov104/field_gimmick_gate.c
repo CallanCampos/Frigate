@@ -151,14 +151,14 @@ static const G3DSceneActorSetup sScene1Actors[] = {
 
 // clang-format off
 static const G3DSceneResourceSetup sSceneResources[] = {
-    { 0x83, 0, 0 }, { 0x83, 1, 0 }, { 0x83, 2, 0 }, { 0x83, 3, 0 },
-    { 0x83, 4, 0 }, { 0x83, 5, 0 }, { 0x83, 6, 0 }, { 0x83, 7, 0 },
-    { 0x83, 8, 0 }, { 0x83, 9, 0 }, { 0x83, 10, 0 }, { 0x83, 11, 0 },
-    { 0x83, 12, 0 }, { 0x83, 13, 0 }, { 0x83, 14, 0 }, { 0x83, 15, 0 },
-    { 0x83, 16, 0 }, { 0x83, 17, 0 }, { 0x83, 18, 0 }, { 0x83, 19, 0 },
-    { 0x83, 20, 0 }, { 0x83, 21, 0 }, { 0x83, 24, 0 }, { 0x83, 25, 0 },
-    { 0x83, 26, 0 }, { 0x83, 27, 0 }, { 0x83, 28, 0 }, { 0x83, 29, 0 },
-    { 0x83, 30, 0 }, { 0x83, 31, 0 }, { 0x83, 32, 0 },
+    { ARCID_FIELD_GIMMICK_GATE, 0, 0 }, { ARCID_FIELD_GIMMICK_GATE, 1, 0 }, { ARCID_FIELD_GIMMICK_GATE, 2, 0 }, { ARCID_FIELD_GIMMICK_GATE, 3, 0 },
+    { ARCID_FIELD_GIMMICK_GATE, 4, 0 }, { ARCID_FIELD_GIMMICK_GATE, 5, 0 }, { ARCID_FIELD_GIMMICK_GATE, 6, 0 }, { ARCID_FIELD_GIMMICK_GATE, 7, 0 },
+    { ARCID_FIELD_GIMMICK_GATE, 8, 0 }, { ARCID_FIELD_GIMMICK_GATE, 9, 0 }, { ARCID_FIELD_GIMMICK_GATE, 10, 0 }, { ARCID_FIELD_GIMMICK_GATE, 11, 0 },
+    { ARCID_FIELD_GIMMICK_GATE, 12, 0 }, { ARCID_FIELD_GIMMICK_GATE, 13, 0 }, { ARCID_FIELD_GIMMICK_GATE, 14, 0 }, { ARCID_FIELD_GIMMICK_GATE, 15, 0 },
+    { ARCID_FIELD_GIMMICK_GATE, 16, 0 }, { ARCID_FIELD_GIMMICK_GATE, 17, 0 }, { ARCID_FIELD_GIMMICK_GATE, 18, 0 }, { ARCID_FIELD_GIMMICK_GATE, 19, 0 },
+    { ARCID_FIELD_GIMMICK_GATE, 20, 0 }, { ARCID_FIELD_GIMMICK_GATE, 21, 0 }, { ARCID_FIELD_GIMMICK_GATE, 24, 0 }, { ARCID_FIELD_GIMMICK_GATE, 25, 0 },
+    { ARCID_FIELD_GIMMICK_GATE, 26, 0 }, { ARCID_FIELD_GIMMICK_GATE, 27, 0 }, { ARCID_FIELD_GIMMICK_GATE, 28, 0 }, { ARCID_FIELD_GIMMICK_GATE, 29, 0 },
+    { ARCID_FIELD_GIMMICK_GATE, 30, 0 }, { ARCID_FIELD_GIMMICK_GATE, 31, 0 }, { ARCID_FIELD_GIMMICK_GATE, 32, 0 },
 };
 
 // clang-format on
@@ -355,9 +355,9 @@ void GimmickGate_LoadZoneData(GimmickGateWork *work) {
     zone = Field_GetPlayerStateZoneID(work->field);
     work->zoneData =
         GFL_HeapAllocate(work->heapId, sizeof(struct GimmickGateZoneData), FALSE, "field_gimmick_gate.c", 0x39b);
-    count = GFL_ArcSysGetDataMax(0xac);
+    count = GFL_ArcSysGetDataMax(ARCID_FIELD_GIMMICK_GATE_ZONE_DATA);
     for (i = 0; i < count; i++) {
-        GimmickGateZoneData_Load(&temp, 0xac, i);
+        GimmickGateZoneData_Load(&temp, ARCID_FIELD_GIMMICK_GATE_ZONE_DATA, i);
         if (temp.zoneId != zone) {
             continue;
         }
@@ -367,7 +367,7 @@ void GimmickGate_LoadZoneData(GimmickGateWork *work) {
         if (zone == 0x177 || zone == 0x17b) {
             switch (GameData_GetMyCity(work->gameData)) {
             case 0:
-                GimmickGateZoneData_Load(&temp, 0xac, i + 1);
+                GimmickGateZoneData_Load(&temp, ARCID_FIELD_GIMMICK_GATE_ZONE_DATA, i + 1);
                 break;
             case 1:
                 break;
@@ -489,11 +489,11 @@ void GimmickGate_LoadBoardEntries(GimmickGateWork *work) {
     s32 i;
 
     if (work->boardEntries == 0) {
-        count = GFL_ArcSysGetDataMax(0xa4);
+        count = GFL_ArcSysGetDataMax(ARCID_FIELD_GIMMICK_GATE_BOARD_ENTRIES);
         work->boardEntries = GFL_HeapAllocate(work->heapId, count * sizeof(struct GimmickGateBoardEntry), FALSE,
                                               "field_gimmick_gate.c", 0x4b5);
         for (i = 0; i < count; i++) {
-            GimmickGateBoardEntry_Load(&work->boardEntries[i], 0xa4, i);
+            GimmickGateBoardEntry_Load(&work->boardEntries[i], ARCID_FIELD_GIMMICK_GATE_BOARD_ENTRIES, i);
         }
         work->boardEntryCount = count;
     }

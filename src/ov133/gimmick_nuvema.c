@@ -1,6 +1,7 @@
 // The gimmick of Nuvema Town (zones 389, 397 and 317 load it), a model standing in Nuvema Town. The name is a guess:
 // the overlay embeds no file name
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_exp_obj.h"
@@ -23,7 +24,9 @@ static GameEventReturnCode GimmickNuvema_WaitEvent(GameEvent *event, u32 *state,
 
 static const G3DSceneAnimationSetup sAnimations[] = { { 1, 0 }, { 2, 0 } };
 
-static const G3DSceneResourceSetup sDayResources[] = { { 0xe0, 0, 0 }, { 0xe0, 1, 0 }, { 0xe0, 2, 0 } };
+static const G3DSceneResourceSetup sDayResources[] = { { ARCID_GIMMICK_NUVEMA, 0, 0 },
+                                                       { ARCID_GIMMICK_NUVEMA, 1, 0 },
+                                                       { ARCID_GIMMICK_NUVEMA, 2, 0 } };
 
 static const G3DSceneActorSetup sActors[] = {
     { 0, 0, 0, 0, sAnimations, NELEMS(sAnimations) },
@@ -31,7 +34,9 @@ static const G3DSceneActorSetup sActors[] = {
 
 static const G3DSceneSetup sDaySceneSetup = { sDayResources, NELEMS(sDayResources), sActors, NELEMS(sActors) };
 
-static const G3DSceneResourceSetup sNightResources[] = { { 0xe0, 3, 0 }, { 0xe0, 4, 0 }, { 0xe0, 5, 0 } };
+static const G3DSceneResourceSetup sNightResources[] = { { ARCID_GIMMICK_NUVEMA, 3, 0 },
+                                                         { ARCID_GIMMICK_NUVEMA, 4, 0 },
+                                                         { ARCID_GIMMICK_NUVEMA, 5, 0 } };
 
 static const G3DSceneSetup sNightSceneSetup = { sNightResources, NELEMS(sNightResources), sActors, NELEMS(sActors) };
 

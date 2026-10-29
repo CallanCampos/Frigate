@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_exp_obj.h"
 #include "field/gimmick_plasma_frigate_deck.h"
@@ -9,7 +10,7 @@
 
 // Overlay 118 has no name string. It is gimmick 45 of overlay 36's table, which only zone 552 uses: the Plasma
 // Frigate's deck, where the player boards the ship and fights its grunts with Cheren. The name is a guess. It places
-// two models of archive 0x120 on the map, one of them turned around
+// two models of ARCID_GIMMICK_PLASMA_FRIGATE_DECK on the map, one of them turned around
 
 typedef struct {
     FieldExpObjSystem *system;
@@ -21,8 +22,8 @@ static void PlasmaFrigateDeck_FreeObjects(GimmickWork *work);
 static void PlasmaFrigateDeck_StepAnimations(GimmickWork *work);
 
 static const G3DSceneResourceSetup sResources[] = {
-    { 0x120, 0, 0 },
-    { 0x120, 1, 0 },
+    { ARCID_GIMMICK_PLASMA_FRIGATE_DECK, 0, 0 },
+    { ARCID_GIMMICK_PLASMA_FRIGATE_DECK, 1, 0 },
 };
 
 static const G3DSceneActorSetup sActors[] = {

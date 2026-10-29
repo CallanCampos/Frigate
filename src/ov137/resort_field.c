@@ -327,7 +327,8 @@ static const G3DSceneActorSetup sSceneActors[] = {
     { 3, 0, 3, 0, sSceneAnimations1, 2 },
 };
 static const G3DSceneResourceSetup sSceneResources[] = {
-    { 298, 1, 0 }, { 298, 0, 0 }, { 298, 2, 0 }, { 298, 4, 0 }, { 298, 3, 0 }, { 298, 5, 0 },
+    { ARCID_RESORT_FIELD, 1, 0 }, { ARCID_RESORT_FIELD, 0, 0 }, { ARCID_RESORT_FIELD, 2, 0 },
+    { ARCID_RESORT_FIELD, 4, 0 }, { ARCID_RESORT_FIELD, 3, 0 }, { ARCID_RESORT_FIELD, 5, 0 },
 };
 static const G3DSceneSetup sScene = { sSceneResources, 6, sSceneActors, 2 };
 
