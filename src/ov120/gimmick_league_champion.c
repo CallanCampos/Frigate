@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_camera.h"
@@ -16,8 +17,6 @@
 
 #define GIMMICK_WORK_ID 1
 #define GIMMICK_STATE_ID 46
-// The archive of the room's models, a/2/8/0
-#define GIMMICK_ARCID 0x122
 // The camera's defaults once the room has changed
 #define CHANGED_CAMERA_INDEX 43
 
@@ -89,9 +88,12 @@ static const G3DSceneAnimationSetup sModel1Animations[] = { { 2, 0 }, { 3, 0 } }
 static const G3DSceneAnimationSetup sModel2And3Animations[] = { { 6, 0 }, { 7, 0 }, { 8, 0 } };
 
 static const G3DSceneResourceSetup sResources[12] = {
-    { GIMMICK_ARCID, 0, 0 }, { GIMMICK_ARCID, 1, 0 }, { GIMMICK_ARCID, 2, 0 },  { GIMMICK_ARCID, 3, 0 },
-    { GIMMICK_ARCID, 4, 0 }, { GIMMICK_ARCID, 5, 0 }, { GIMMICK_ARCID, 6, 0 },  { GIMMICK_ARCID, 7, 0 },
-    { GIMMICK_ARCID, 8, 0 }, { GIMMICK_ARCID, 9, 0 }, { GIMMICK_ARCID, 10, 0 }, { GIMMICK_ARCID, 11, 0 },
+    { ARCID_GIMMICK_LEAGUE_CHAMPION, 0, 0 },  { ARCID_GIMMICK_LEAGUE_CHAMPION, 1, 0 },
+    { ARCID_GIMMICK_LEAGUE_CHAMPION, 2, 0 },  { ARCID_GIMMICK_LEAGUE_CHAMPION, 3, 0 },
+    { ARCID_GIMMICK_LEAGUE_CHAMPION, 4, 0 },  { ARCID_GIMMICK_LEAGUE_CHAMPION, 5, 0 },
+    { ARCID_GIMMICK_LEAGUE_CHAMPION, 6, 0 },  { ARCID_GIMMICK_LEAGUE_CHAMPION, 7, 0 },
+    { ARCID_GIMMICK_LEAGUE_CHAMPION, 8, 0 },  { ARCID_GIMMICK_LEAGUE_CHAMPION, 9, 0 },
+    { ARCID_GIMMICK_LEAGUE_CHAMPION, 10, 0 }, { ARCID_GIMMICK_LEAGUE_CHAMPION, 11, 0 },
 };
 
 static const G3DSceneActorSetup sActors[5] = {

@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/vars.h"
 #include "constants/zones.h"
@@ -15,8 +16,6 @@
 #include "system/iss_sys.h"
 
 #define GIMMICK_WORK_ID 1
-// The archive of the gym's models
-#define GIMMICK_ARCID 0x108
 
 #define MODEL_COUNT 3
 // How many frames the music takes to fade to a volume
@@ -50,9 +49,9 @@ static const G3DSceneAnimationSetup sAnimations[] = { { 1, 0 }, { 2, 0 } };
 static const int sGridSizes[2][2] = { { 18, 12 }, { 16, 17 } };
 
 static const G3DSceneResourceSetup sResources[3] = {
-    { GIMMICK_ARCID, 0, 0 },
-    { GIMMICK_ARCID, 1, 0 },
-    { GIMMICK_ARCID, 2, 0 },
+    { ARCID_GYM_VIRBANK, 0, 0 },
+    { ARCID_GYM_VIRBANK, 1, 0 },
+    { ARCID_GYM_VIRBANK, 2, 0 },
 };
 
 static const G3DSceneActorSetup sActors[3] = {

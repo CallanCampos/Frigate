@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_exp_obj.h"
 #include "field/field_map.h"
@@ -11,8 +12,6 @@
 
 #define GIMMICK_WORK_ID 1
 #define GIMMICK_STATE_ID 40
-// The archive of the room's models, a/2/7/6
-#define GIMMICK_ARCID 0x116
 
 #define MODEL_0 0
 // The models after the first, in two groups: the first group has the last two, the second the four before
@@ -53,8 +52,10 @@ static void GrimsleyRoom_SetGroup1Played(GrimsleyRoomState *state, BOOL played);
 static BOOL GrimsleyRoom_GetGroup1Played(GrimsleyRoomState *state);
 
 static const G3DSceneResourceSetup sResources[8] = {
-    { GIMMICK_ARCID, 0, 0 }, { GIMMICK_ARCID, 1, 0 }, { GIMMICK_ARCID, 2, 0 }, { GIMMICK_ARCID, 3, 0 },
-    { GIMMICK_ARCID, 4, 0 }, { GIMMICK_ARCID, 5, 0 }, { GIMMICK_ARCID, 6, 0 }, { GIMMICK_ARCID, 7, 0 },
+    { ARCID_GIMMICK_LEAGUE_GRIMSLEY, 0, 0 }, { ARCID_GIMMICK_LEAGUE_GRIMSLEY, 1, 0 },
+    { ARCID_GIMMICK_LEAGUE_GRIMSLEY, 2, 0 }, { ARCID_GIMMICK_LEAGUE_GRIMSLEY, 3, 0 },
+    { ARCID_GIMMICK_LEAGUE_GRIMSLEY, 4, 0 }, { ARCID_GIMMICK_LEAGUE_GRIMSLEY, 5, 0 },
+    { ARCID_GIMMICK_LEAGUE_GRIMSLEY, 6, 0 }, { ARCID_GIMMICK_LEAGUE_GRIMSLEY, 7, 0 },
 };
 
 static const G3DSceneAnimationSetup sModel0Animations[] = { { 1, 0 }, { 2, 0 } };

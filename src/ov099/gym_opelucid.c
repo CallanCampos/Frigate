@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/trainers.h"
 #include "constants/vars.h"
@@ -31,8 +32,6 @@
 
 #define GIMMICK_WORK_ID 1
 #define GIMMICK_STATE_ID 10
-// The archive of the gym's models and curves
-#define GIMMICK_ARCID 0xa0
 
 #define OBJECT_COUNT 5
 #define MOVER_COUNT 3
@@ -238,12 +237,13 @@ static const u32 sStages[TIER_COUNT][COLUMN_COUNT][2] = {
 };
 
 static const G3DSceneResourceSetup sGymOpelucidResources[21] = {
-    { GIMMICK_ARCID, 0xe, 0 },  { GIMMICK_ARCID, 0xf, 0 },  { GIMMICK_ARCID, 0x10, 0 }, { GIMMICK_ARCID, 0x11, 0 },
-    { GIMMICK_ARCID, 0x13, 0 }, { GIMMICK_ARCID, 0x12, 0 }, { GIMMICK_ARCID, 0x14, 0 }, { GIMMICK_ARCID, 0, 0 },
-    { GIMMICK_ARCID, 1, 0 },    { GIMMICK_ARCID, 2, 0 },    { GIMMICK_ARCID, 3, 0 },    { GIMMICK_ARCID, 4, 0 },
-    { GIMMICK_ARCID, 5, 0 },    { GIMMICK_ARCID, 6, 0 },    { GIMMICK_ARCID, 7, 0 },    { GIMMICK_ARCID, 8, 0 },
-    { GIMMICK_ARCID, 9, 0 },    { GIMMICK_ARCID, 10, 0 },   { GIMMICK_ARCID, 11, 0 },   { GIMMICK_ARCID, 12, 0 },
-    { GIMMICK_ARCID, 13, 0 },
+    { ARCID_GYM_OPELUCID, 0xe, 0 },  { ARCID_GYM_OPELUCID, 0xf, 0 },  { ARCID_GYM_OPELUCID, 0x10, 0 },
+    { ARCID_GYM_OPELUCID, 0x11, 0 }, { ARCID_GYM_OPELUCID, 0x13, 0 }, { ARCID_GYM_OPELUCID, 0x12, 0 },
+    { ARCID_GYM_OPELUCID, 0x14, 0 }, { ARCID_GYM_OPELUCID, 0, 0 },    { ARCID_GYM_OPELUCID, 1, 0 },
+    { ARCID_GYM_OPELUCID, 2, 0 },    { ARCID_GYM_OPELUCID, 3, 0 },    { ARCID_GYM_OPELUCID, 4, 0 },
+    { ARCID_GYM_OPELUCID, 5, 0 },    { ARCID_GYM_OPELUCID, 6, 0 },    { ARCID_GYM_OPELUCID, 7, 0 },
+    { ARCID_GYM_OPELUCID, 8, 0 },    { ARCID_GYM_OPELUCID, 9, 0 },    { ARCID_GYM_OPELUCID, 10, 0 },
+    { ARCID_GYM_OPELUCID, 11, 0 },   { ARCID_GYM_OPELUCID, 12, 0 },   { ARCID_GYM_OPELUCID, 13, 0 },
 };
 
 static const G3DSceneSetup sGymOpelucidSceneSetup = { sGymOpelucidResources, NELEMS(sGymOpelucidResources),
@@ -655,7 +655,7 @@ static GameEventReturnCode GymOpelucid_MoveEventCallback(GameEvent *event, u32 *
 static inline void GymOpelucid_LoadMoverCurve(OpelucidGymMoveEvent *ev, OpelucidGymMover *mover, u8 object, u16 curve) {
     mover->object = object;
     mover->entry = &sCurves[curve];
-    mover->curve = GFL_G3DCurveLoadFileAll(ev->work->heapId, GIMMICK_ARCID, sCurveFiles[mover->entry->file]);
+    mover->curve = GFL_G3DCurveLoadFileAll(ev->work->heapId, ARCID_GYM_OPELUCID, sCurveFiles[mover->entry->file]);
 }
 
 static void GymOpelucid_StartMove(OpelucidGymMoveEvent *ev) {

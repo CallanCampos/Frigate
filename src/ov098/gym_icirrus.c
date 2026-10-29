@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_controller.h"
@@ -15,8 +16,6 @@
 
 #define GIMMICK_WORK_ID 1
 #define GIMMICK_STATE_ID 9
-// The archive of the gym's models
-#define GIMMICK_ARCID 0x98
 
 #define SWITCH_COUNT 3
 // The second model of each switch comes this many models after its first
@@ -53,9 +52,9 @@ static inline FieldExpObjAnm *GetAnimation(FieldExpObjSystem *expObj, u8 model, 
 }
 
 static const G3DSceneResourceSetup sResources[9] = {
-    { GIMMICK_ARCID, 0, 0 }, { GIMMICK_ARCID, 1, 0 }, { GIMMICK_ARCID, 2, 0 },
-    { GIMMICK_ARCID, 3, 0 }, { GIMMICK_ARCID, 4, 0 }, { GIMMICK_ARCID, 5, 0 },
-    { GIMMICK_ARCID, 6, 0 }, { GIMMICK_ARCID, 8, 0 }, { GIMMICK_ARCID, 7, 0 },
+    { ARCID_GYM_ICIRRUS, 0, 0 }, { ARCID_GYM_ICIRRUS, 1, 0 }, { ARCID_GYM_ICIRRUS, 2, 0 },
+    { ARCID_GYM_ICIRRUS, 3, 0 }, { ARCID_GYM_ICIRRUS, 4, 0 }, { ARCID_GYM_ICIRRUS, 5, 0 },
+    { ARCID_GYM_ICIRRUS, 6, 0 }, { ARCID_GYM_ICIRRUS, 8, 0 }, { ARCID_GYM_ICIRRUS, 7, 0 },
 };
 
 static const G3DSceneAnimationSetup sModelAAnimations[] = { { 5, 0 }, { 6, 0 } };

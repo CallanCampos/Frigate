@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_exp_obj.h"
@@ -14,8 +15,6 @@
 
 #define GIMMICK_WORK_ID 1
 #define GIMMICK_STATE_ID 42
-// The archive of the room's models, a/2/8/5
-#define GIMMICK_ARCID 0x117
 // The room's ambient sound
 #define AMBIENCE_SE 0x88f
 
@@ -86,12 +85,17 @@ static const G3DSceneAnimationSetup sModel0Animations[] = { { 1, 0 }, { 2, 0 }, 
 static const G3DSceneAnimationSetup sModel1Animations[] = { { 5, 0 }, { 6, 0 }, { 7, 0 }, { 8, 0 }, { 9, 0 } };
 
 static const G3DSceneResourceSetup sResources[22] = {
-    { GIMMICK_ARCID, 0, 0 },  { GIMMICK_ARCID, 1, 0 },  { GIMMICK_ARCID, 2, 0 },  { GIMMICK_ARCID, 3, 0 },
-    { GIMMICK_ARCID, 4, 0 },  { GIMMICK_ARCID, 5, 0 },  { GIMMICK_ARCID, 6, 0 },  { GIMMICK_ARCID, 7, 0 },
-    { GIMMICK_ARCID, 8, 0 },  { GIMMICK_ARCID, 9, 0 },  { GIMMICK_ARCID, 10, 0 }, { GIMMICK_ARCID, 11, 0 },
-    { GIMMICK_ARCID, 12, 0 }, { GIMMICK_ARCID, 13, 0 }, { GIMMICK_ARCID, 14, 0 }, { GIMMICK_ARCID, 15, 0 },
-    { GIMMICK_ARCID, 16, 0 }, { GIMMICK_ARCID, 17, 0 }, { GIMMICK_ARCID, 18, 0 }, { GIMMICK_ARCID, 19, 0 },
-    { GIMMICK_ARCID, 20, 0 }, { GIMMICK_ARCID, 21, 0 },
+    { ARCID_GIMMICK_LEAGUE_CAITLIN, 0, 0 },  { ARCID_GIMMICK_LEAGUE_CAITLIN, 1, 0 },
+    { ARCID_GIMMICK_LEAGUE_CAITLIN, 2, 0 },  { ARCID_GIMMICK_LEAGUE_CAITLIN, 3, 0 },
+    { ARCID_GIMMICK_LEAGUE_CAITLIN, 4, 0 },  { ARCID_GIMMICK_LEAGUE_CAITLIN, 5, 0 },
+    { ARCID_GIMMICK_LEAGUE_CAITLIN, 6, 0 },  { ARCID_GIMMICK_LEAGUE_CAITLIN, 7, 0 },
+    { ARCID_GIMMICK_LEAGUE_CAITLIN, 8, 0 },  { ARCID_GIMMICK_LEAGUE_CAITLIN, 9, 0 },
+    { ARCID_GIMMICK_LEAGUE_CAITLIN, 10, 0 }, { ARCID_GIMMICK_LEAGUE_CAITLIN, 11, 0 },
+    { ARCID_GIMMICK_LEAGUE_CAITLIN, 12, 0 }, { ARCID_GIMMICK_LEAGUE_CAITLIN, 13, 0 },
+    { ARCID_GIMMICK_LEAGUE_CAITLIN, 14, 0 }, { ARCID_GIMMICK_LEAGUE_CAITLIN, 15, 0 },
+    { ARCID_GIMMICK_LEAGUE_CAITLIN, 16, 0 }, { ARCID_GIMMICK_LEAGUE_CAITLIN, 17, 0 },
+    { ARCID_GIMMICK_LEAGUE_CAITLIN, 18, 0 }, { ARCID_GIMMICK_LEAGUE_CAITLIN, 19, 0 },
+    { ARCID_GIMMICK_LEAGUE_CAITLIN, 20, 0 }, { ARCID_GIMMICK_LEAGUE_CAITLIN, 21, 0 },
 };
 
 static const G3DSceneActorSetup sActors[6] = {

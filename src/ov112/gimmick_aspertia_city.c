@@ -21,8 +21,6 @@
 
 #define GIMMICK_WORK_ID 1
 #define GIMMICK_BG 3
-// The archive of the models
-#define GIMMICK_MODEL_ARCID 300
 // The BG's palette in that archive, one for each version
 #ifdef BLACK2
 #define GIMMICK_BG_NCLR 4
@@ -51,10 +49,12 @@ static const G3DSceneAnimationSetup sSummerAnimations[] = { { 4, 0 }, { 5, 0 } }
 static const G3DSceneAnimationSetup sAutumnAnimations[] = { { 7, 0 }, { 8, 0 } };
 
 static const G3DSceneResourceSetup sResources[] = {
-    { GIMMICK_MODEL_ARCID, 0, 0 }, { GIMMICK_MODEL_ARCID, 1, 0 },  { GIMMICK_MODEL_ARCID, 2, 0 },
-    { GIMMICK_MODEL_ARCID, 3, 0 }, { GIMMICK_MODEL_ARCID, 4, 0 },  { GIMMICK_MODEL_ARCID, 5, 0 },
-    { GIMMICK_MODEL_ARCID, 6, 0 }, { GIMMICK_MODEL_ARCID, 7, 0 },  { GIMMICK_MODEL_ARCID, 8, 0 },
-    { GIMMICK_MODEL_ARCID, 9, 0 }, { GIMMICK_MODEL_ARCID, 10, 0 }, { GIMMICK_MODEL_ARCID, 11, 0 },
+    { ARCID_GIMMICK_ASPERTIA_CITY, 0, 0 },  { ARCID_GIMMICK_ASPERTIA_CITY, 1, 0 },
+    { ARCID_GIMMICK_ASPERTIA_CITY, 2, 0 },  { ARCID_GIMMICK_ASPERTIA_CITY, 3, 0 },
+    { ARCID_GIMMICK_ASPERTIA_CITY, 4, 0 },  { ARCID_GIMMICK_ASPERTIA_CITY, 5, 0 },
+    { ARCID_GIMMICK_ASPERTIA_CITY, 6, 0 },  { ARCID_GIMMICK_ASPERTIA_CITY, 7, 0 },
+    { ARCID_GIMMICK_ASPERTIA_CITY, 8, 0 },  { ARCID_GIMMICK_ASPERTIA_CITY, 9, 0 },
+    { ARCID_GIMMICK_ASPERTIA_CITY, 10, 0 }, { ARCID_GIMMICK_ASPERTIA_CITY, 11, 0 },
 };
 
 static const G3DSceneActorSetup sActors[SEASON_COUNT] = {

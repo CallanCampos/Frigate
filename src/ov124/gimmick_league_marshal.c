@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -18,8 +19,6 @@
 
 #define GIMMICK_WORK_ID 1
 #define GIMMICK_STATE_ID 41
-// The archive of the room's models, a/2/8/1
-#define GIMMICK_ARCID 0x119
 
 // The models of the scene
 enum {
@@ -109,9 +108,9 @@ static const G3DSceneAnimationSetup sModel1Animations[] = { { 4, 0 }, { 5, 0 }, 
 
 // clang-format off
 static const G3DSceneResourceSetup sResources[11] = {
-    { GIMMICK_ARCID, 0, 0 }, { GIMMICK_ARCID, 1, 0 }, { GIMMICK_ARCID, 2, 0 }, { GIMMICK_ARCID, 3, 0 },
-    { GIMMICK_ARCID, 4, 0 }, { GIMMICK_ARCID, 5, 0 }, { GIMMICK_ARCID, 6, 0 }, { GIMMICK_ARCID, 7, 0 },
-    { GIMMICK_ARCID, 8, 0 }, { GIMMICK_ARCID, 9, 0 }, { GIMMICK_ARCID, 10, 0 },
+    { ARCID_GIMMICK_LEAGUE_MARSHAL, 0, 0 }, { ARCID_GIMMICK_LEAGUE_MARSHAL, 1, 0 }, { ARCID_GIMMICK_LEAGUE_MARSHAL, 2, 0 }, { ARCID_GIMMICK_LEAGUE_MARSHAL, 3, 0 },
+    { ARCID_GIMMICK_LEAGUE_MARSHAL, 4, 0 }, { ARCID_GIMMICK_LEAGUE_MARSHAL, 5, 0 }, { ARCID_GIMMICK_LEAGUE_MARSHAL, 6, 0 }, { ARCID_GIMMICK_LEAGUE_MARSHAL, 7, 0 },
+    { ARCID_GIMMICK_LEAGUE_MARSHAL, 8, 0 }, { ARCID_GIMMICK_LEAGUE_MARSHAL, 9, 0 }, { ARCID_GIMMICK_LEAGUE_MARSHAL, 10, 0 },
 };
 
 // clang-format on

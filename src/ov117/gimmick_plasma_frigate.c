@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/vars.h"
 #include "field/field.h"
@@ -19,8 +20,6 @@
 
 #define GIMMICK_WORK_ID 1
 #define GIMMICK_STATE_ID 43
-// The archive of the scene's models, a/2/8/6: 18 files, as many as the scene's resources
-#define GIMMICK_ARCID 0x11e
 
 // The switches, which the player presses, the panels they flip and the models that show the result. The names of the
 // models are guesses, only their numbers and what they do are certain
@@ -166,11 +165,15 @@ static const u32 sPanelPairs[14][2] = {
 };
 
 static const G3DSceneResourceSetup sResources[18] = {
-    { GIMMICK_ARCID, 0, 0 },  { GIMMICK_ARCID, 1, 0 },  { GIMMICK_ARCID, 2, 0 },  { GIMMICK_ARCID, 3, 0 },
-    { GIMMICK_ARCID, 4, 0 },  { GIMMICK_ARCID, 5, 0 },  { GIMMICK_ARCID, 6, 0 },  { GIMMICK_ARCID, 7, 0 },
-    { GIMMICK_ARCID, 8, 0 },  { GIMMICK_ARCID, 9, 0 },  { GIMMICK_ARCID, 10, 0 }, { GIMMICK_ARCID, 11, 0 },
-    { GIMMICK_ARCID, 12, 0 }, { GIMMICK_ARCID, 13, 0 }, { GIMMICK_ARCID, 14, 0 }, { GIMMICK_ARCID, 15, 0 },
-    { GIMMICK_ARCID, 16, 0 }, { GIMMICK_ARCID, 17, 0 },
+    { ARCID_GIMMICK_PLASMA_FRIGATE, 0, 0 },  { ARCID_GIMMICK_PLASMA_FRIGATE, 1, 0 },
+    { ARCID_GIMMICK_PLASMA_FRIGATE, 2, 0 },  { ARCID_GIMMICK_PLASMA_FRIGATE, 3, 0 },
+    { ARCID_GIMMICK_PLASMA_FRIGATE, 4, 0 },  { ARCID_GIMMICK_PLASMA_FRIGATE, 5, 0 },
+    { ARCID_GIMMICK_PLASMA_FRIGATE, 6, 0 },  { ARCID_GIMMICK_PLASMA_FRIGATE, 7, 0 },
+    { ARCID_GIMMICK_PLASMA_FRIGATE, 8, 0 },  { ARCID_GIMMICK_PLASMA_FRIGATE, 9, 0 },
+    { ARCID_GIMMICK_PLASMA_FRIGATE, 10, 0 }, { ARCID_GIMMICK_PLASMA_FRIGATE, 11, 0 },
+    { ARCID_GIMMICK_PLASMA_FRIGATE, 12, 0 }, { ARCID_GIMMICK_PLASMA_FRIGATE, 13, 0 },
+    { ARCID_GIMMICK_PLASMA_FRIGATE, 14, 0 }, { ARCID_GIMMICK_PLASMA_FRIGATE, 15, 0 },
+    { ARCID_GIMMICK_PLASMA_FRIGATE, 16, 0 }, { ARCID_GIMMICK_PLASMA_FRIGATE, 17, 0 },
 };
 
 static const G3DSceneActorSetup sActors[54] = {

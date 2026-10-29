@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -11,8 +12,6 @@
 #include "system/game_system.h"
 
 #define GIMMICK_WORK_ID 1
-// The archive of the scene's models, a/2/8/3
-#define GIMMICK_ARCID 0x12b
 
 // The models of the scene
 enum {
@@ -63,13 +62,18 @@ static const G3DSceneAnimationSetup sModel2Animations[] = { { 7, 0 }, { 8, 0 } }
 
 // White 2's archive has one member fewer ahead of two of the files
 static const G3DSceneResourceSetup sResources[12] = {
-    { GIMMICK_ARCID, 0, 0 },  { GIMMICK_ARCID, 1, 0 }, { GIMMICK_ARCID, 2, 0 },  { GIMMICK_ARCID, 3, 0 },
+    { ARCID_GIMMICK_GIANT_CHASM_6, 0, 0 },  { ARCID_GIMMICK_GIANT_CHASM_6, 1, 0 },
+    { ARCID_GIMMICK_GIANT_CHASM_6, 2, 0 },  { ARCID_GIMMICK_GIANT_CHASM_6, 3, 0 },
 #ifdef WHITE2
-    { GIMMICK_ARCID, 4, 0 },  { GIMMICK_ARCID, 5, 0 }, { GIMMICK_ARCID, 10, 0 }, { GIMMICK_ARCID, 11, 0 },
-    { GIMMICK_ARCID, 12, 0 }, { GIMMICK_ARCID, 6, 0 }, { GIMMICK_ARCID, 7, 0 },  { GIMMICK_ARCID, 8, 0 },
+    { ARCID_GIMMICK_GIANT_CHASM_6, 4, 0 },  { ARCID_GIMMICK_GIANT_CHASM_6, 5, 0 },
+    { ARCID_GIMMICK_GIANT_CHASM_6, 10, 0 }, { ARCID_GIMMICK_GIANT_CHASM_6, 11, 0 },
+    { ARCID_GIMMICK_GIANT_CHASM_6, 12, 0 }, { ARCID_GIMMICK_GIANT_CHASM_6, 6, 0 },
+    { ARCID_GIMMICK_GIANT_CHASM_6, 7, 0 },  { ARCID_GIMMICK_GIANT_CHASM_6, 8, 0 },
 #else
-    { GIMMICK_ARCID, 4, 0 },  { GIMMICK_ARCID, 5, 0 }, { GIMMICK_ARCID, 10, 0 }, { GIMMICK_ARCID, 11, 0 },
-    { GIMMICK_ARCID, 13, 0 }, { GIMMICK_ARCID, 6, 0 }, { GIMMICK_ARCID, 7, 0 },  { GIMMICK_ARCID, 9, 0 },
+    { ARCID_GIMMICK_GIANT_CHASM_6, 4, 0 },  { ARCID_GIMMICK_GIANT_CHASM_6, 5, 0 },
+    { ARCID_GIMMICK_GIANT_CHASM_6, 10, 0 }, { ARCID_GIMMICK_GIANT_CHASM_6, 11, 0 },
+    { ARCID_GIMMICK_GIANT_CHASM_6, 13, 0 }, { ARCID_GIMMICK_GIANT_CHASM_6, 6, 0 },
+    { ARCID_GIMMICK_GIANT_CHASM_6, 7, 0 },  { ARCID_GIMMICK_GIANT_CHASM_6, 9, 0 },
 #endif
 };
 

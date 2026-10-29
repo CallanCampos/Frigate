@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_exp_obj.h"
@@ -18,8 +19,6 @@
 // and the lanes use the copies. A vehicle's sound plays once, when it is next to the player. The file name is a guess
 
 #define GIMMICK_WORK_ID 1
-// The archive of the models, which has no name yet
-#define GIMMICK_ARCID 217
 #define MODEL_COUNT 6
 #define LANE_COUNT 3
 // The vehicles' road: where they start and where they end, along x
@@ -52,8 +51,9 @@ static void PassingVehicles_PlaceAll(GimmickWork *work, Field *field);
 static void PassingVehicles_PlaceVehicle(GimmickWork *work, Field *field, u32 first, u32 second);
 
 static const G3DSceneResourceSetup sResources[MODEL_COUNT] = {
-    { GIMMICK_ARCID, 0, 0 }, { GIMMICK_ARCID, 1, 0 }, { GIMMICK_ARCID, 2, 0 },
-    { GIMMICK_ARCID, 3, 0 }, { GIMMICK_ARCID, 4, 0 }, { GIMMICK_ARCID, 5, 0 },
+    { ARCID_GIMMICK_PASSING_VEHICLES, 0, 0 }, { ARCID_GIMMICK_PASSING_VEHICLES, 1, 0 },
+    { ARCID_GIMMICK_PASSING_VEHICLES, 2, 0 }, { ARCID_GIMMICK_PASSING_VEHICLES, 3, 0 },
+    { ARCID_GIMMICK_PASSING_VEHICLES, 4, 0 }, { ARCID_GIMMICK_PASSING_VEHICLES, 5, 0 },
 };
 
 static const G3DSceneActorSetup sActors[MODEL_COUNT * 2] = {

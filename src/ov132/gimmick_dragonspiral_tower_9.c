@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/version.h"
 #include "field/field.h"
@@ -13,8 +14,6 @@
 #include "system/version.h"
 
 #define GIMMICK_WORK_ID 1
-// The archive of the scene's models, a/2/8/2
-#define GIMMICK_ARCID 0x132
 
 // The models of the scene
 enum {
@@ -47,15 +46,19 @@ static const G3DSceneAnimationSetup sReleaseAnimations[] = { { 1, 0 }, { 2, 0 },
 
 // The Light Stone's model is the fifth file in White 2, the Dark Stone's in Black 2
 static const G3DSceneResourceSetup sResourcesWhite2[9] = {
-    { GIMMICK_ARCID, 0, 0 }, { GIMMICK_ARCID, 1, 0 }, { GIMMICK_ARCID, 2, 0 },
-    { GIMMICK_ARCID, 3, 0 }, { GIMMICK_ARCID, 4, 0 }, { GIMMICK_ARCID, 6, 0 },
-    { GIMMICK_ARCID, 7, 0 }, { GIMMICK_ARCID, 9, 0 }, { GIMMICK_ARCID, 8, 0 },
+    { ARCID_GIMMICK_DRAGONSPIRAL_TOWER_9, 0, 0 }, { ARCID_GIMMICK_DRAGONSPIRAL_TOWER_9, 1, 0 },
+    { ARCID_GIMMICK_DRAGONSPIRAL_TOWER_9, 2, 0 }, { ARCID_GIMMICK_DRAGONSPIRAL_TOWER_9, 3, 0 },
+    { ARCID_GIMMICK_DRAGONSPIRAL_TOWER_9, 4, 0 }, { ARCID_GIMMICK_DRAGONSPIRAL_TOWER_9, 6, 0 },
+    { ARCID_GIMMICK_DRAGONSPIRAL_TOWER_9, 7, 0 }, { ARCID_GIMMICK_DRAGONSPIRAL_TOWER_9, 9, 0 },
+    { ARCID_GIMMICK_DRAGONSPIRAL_TOWER_9, 8, 0 },
 };
 
 static const G3DSceneResourceSetup sResourcesBlack2[9] = {
-    { GIMMICK_ARCID, 0, 0 }, { GIMMICK_ARCID, 1, 0 }, { GIMMICK_ARCID, 2, 0 },
-    { GIMMICK_ARCID, 3, 0 }, { GIMMICK_ARCID, 5, 0 }, { GIMMICK_ARCID, 6, 0 },
-    { GIMMICK_ARCID, 7, 0 }, { GIMMICK_ARCID, 9, 0 }, { GIMMICK_ARCID, 8, 0 },
+    { ARCID_GIMMICK_DRAGONSPIRAL_TOWER_9, 0, 0 }, { ARCID_GIMMICK_DRAGONSPIRAL_TOWER_9, 1, 0 },
+    { ARCID_GIMMICK_DRAGONSPIRAL_TOWER_9, 2, 0 }, { ARCID_GIMMICK_DRAGONSPIRAL_TOWER_9, 3, 0 },
+    { ARCID_GIMMICK_DRAGONSPIRAL_TOWER_9, 5, 0 }, { ARCID_GIMMICK_DRAGONSPIRAL_TOWER_9, 6, 0 },
+    { ARCID_GIMMICK_DRAGONSPIRAL_TOWER_9, 7, 0 }, { ARCID_GIMMICK_DRAGONSPIRAL_TOWER_9, 9, 0 },
+    { ARCID_GIMMICK_DRAGONSPIRAL_TOWER_9, 8, 0 },
 };
 
 static const G3DSceneActorSetup sActors[2] = {
