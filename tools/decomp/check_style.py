@@ -159,7 +159,9 @@ def check_path(path, only=None):
 
 def added_lines(base):
     """The lines the working tree adds over base, by file: {path: set of line numbers}."""
-    diff = subprocess.run(["git", "diff", "-U0", "--no-color", base, "--"], capture_output=True, text=True)
+    # Non-C resources in a textual diff need not be UTF-8. Preserve their bytes while finding the checked files' hunks.
+    diff = subprocess.run(["git", "diff", "-U0", "--no-color", base, "--"], capture_output=True,
+                          encoding="utf-8", errors="surrogateescape")
     if diff.returncode != 0:
         print(diff.stderr.strip(), file=sys.stderr)
         return None

@@ -4,11 +4,12 @@ leave the same save files byte for byte: what the game writes may depend only on
 names, as on the DS, never on the host (where the program is loaded, how long a run takes). Each --expect also holds a
 save to bytes the oracle wrote at the same offset (port/tools/oracle/README.md, "Saves").
 
-    check_same_save.py [--expect FILE:OFFSET:HEX]... -- PROGRAM ARGUMENT...
+    check_same_save.py [--expect FILE:OFFSET:HEX]... [--require-valid-image FILE]... -- PROGRAM ARGUMENT...
 
 The program gets --save-dir DIR after its arguments. Exits 0 when both runs wrote the same files, at least one, with
 the expected bytes; 1 when they differ or wrote none; a run's own status when it fails, so 66, the program's status
-without the ROM, skips the test.
+without the ROM, skips the test. Optional --require-valid-image validates both main-save copies, all 73 blocks
+and their checksum tables/footers before accepting either output; early partial-format checks omit it.
 """
 
 from __future__ import annotations
@@ -18,6 +19,10 @@ import os
 import subprocess
 import sys
 import tempfile
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools" / "oracle"))
+from saveimage import validate_image
 
 
 def run(command: list[str], directory: str) -> tuple[int, str]:
@@ -56,6 +61,8 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--expect", action="append", default=[],
                         help="FILE:OFFSET:HEX, bytes the save file FILE holds at OFFSET (the oracle's)")
+    parser.add_argument("--require-valid-image", action="append", default=[], metavar="FILE",
+                        help="require both main-save copies, all 73 blocks and table/footer CRCs of FILE")
     parser.add_argument("command", nargs="+", help="the program and its arguments, after --")
     args = parser.parse_args(argv)
 
@@ -86,6 +93,14 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 print(f"FAIL: {name} differs between the runs in {differences(first[name], second[name])}")
                 failed = True
+        for name in args.require_valid_image:
+            for index, files in enumerate(runs, 1):
+                errors = validate_image(files.get(name, b""))
+                if errors:
+                    print(f"FAIL: run {index}: {name}: " + "; ".join(errors))
+                    failed = True
+                else:
+                    print(f"run {index}: {name}: both copies/all 73 blocks/table/footer valid")
         for expectation in args.expect:
             name, offset_text, hex_text = expectation.split(":")
             offset = int(offset_text, 0)

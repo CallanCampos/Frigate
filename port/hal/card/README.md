@@ -6,7 +6,7 @@ The player supplies the ROM/save; no cartridge data is stored here.
 | Module | Responsibility |
 | --- | --- |
 | [card_rom.c](card_rom.c), [port_card.h](port_card.h), [card_internal.h](card_internal.h) | Existing production reader/lifecycle, unchanged by this foundation. Requested DMA still uses the existing CARD-task fallback. |
-| [backup.c](backup.c), [card_backup_host.c](card_backup_host.c), [card_backup_calls.h](card_backup_calls.h) | Backup-image service and native pointer transport. |
+| [backup.c](backup.c), [card_backup_host.c](card_backup_host.c), [card_backup_calls.h](card_backup_calls.h) | Backup-image service, successful WRITE initial SDK wait, and native pointer transport ([ADR0029](../../docs/adr/0029-backup-write-service-wait.md)). |
 | [card_spi.c](card_spi.c), [card_spi.h](card_spi.h) | Cartridge infrared/SPI model. |
 | [port_card_bus.c](port_card_bus.c), [port_card_bus.h](port_card_bus.h) | Independent caller-owned NTR read/ID wire engine; `card_bus`. |
 | [port_card_hardware.c](port_card_hardware.c), [port_card_hardware.h](port_card_hardware.h) | One test-activated CPU/DMA owner, CPU latch-consume API, physical READY/COMMIT events and bounded native-mainRAM DMA; `card_hardware_*`. |
@@ -72,3 +72,20 @@ cause. Invalid output or deadline overflow does not silently consume a ready wor
 These are controller tests, not an activated SDK CPU reader. `card_rom.c` still supplies the existing production
 fallback. Cache/page/ID/task integration, original polling/store/copy work, DMA selection and authentic gameplay
 timing validation remain separate. No device minimum or observed scene duration is presented as a generic CPU cost.
+
+## Backup WRITE service
+
+Successful nonempty WRITE bytes precede a delayed result/PXI reply by `OS_MilliSecondsToTicks(spec.writePage) * 64` cycles;
+25 ms gives 837,824. This is the observed original ARM7 service policy, not flash-busy or CPU time. All other request
+costs remain unmodeled. Bus reset and backup boot retire pending replies without rolling back image bytes. Path changes also retire replies,
+but separately keep the existing API behavior of freeing the old image/dirty state; unflushed old-path bytes need
+not persist.
+An old queued callback checks current ownership and deadline before touching the command. The genuine SDK keeps
+page splitting, cancellation between pages, BUSY/REQ and callback ownership; host timed callbacks never call SDK.
+`card_backup_service_*` exercises actual SDK/PXI/OS; the explicit-clock `card_backup_deferred_reply` isolates stale
+callback and sentinel arithmetic. Full runtime acceptance remains separate.
+
+The actual-game `game_wrapper` and `game_error` scenarios call `writeFlashWaitSuccess` from
+`src/gfl/backup_card.c` through genuine CARD tasks. They prove three page waits, sound/independent timed work,
+high-buffer readback, error callback and released locks/flags. The host-only wait ignores its return: the original
+finisher remains the result/error/unlock authority. No replacement CARD API or clock increment is used.

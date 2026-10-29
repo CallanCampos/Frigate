@@ -14,6 +14,7 @@ import unittest
 from unittest.mock import patch
 
 MODULE = Path(__file__).resolve().parents[1] / 'upstream_sync.py'
+STYLE = MODULE.parents[2] / 'tools/decomp/check_style.py'
 spec = importlib.util.spec_from_file_location('upstream_sync', MODULE)
 sync = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(sync)
@@ -483,6 +484,34 @@ class PublicationRecoveryTests(unittest.TestCase):
         body = sync.conflict_body(sync.PREFIX + 'fixture', 'a' * 40, 'b' * 40, [name])
         listed = body.split('Conflicting files:\n\n', 1)[1].split('\n\nTo resolve', 1)[0]
         self.assertEqual(listed, '- `' + rendered + '`')
+
+
+class StyleDiffTests(GitFixture):
+    def mixed_diff(self, source):
+        self.write('src/fixture.c', 'int Fixture(void) {\n    return 0;\n}\n')
+        resource = self.root / 'res/non_utf8.dat'
+        resource.parent.mkdir()
+        resource.write_bytes(b'resource \xfe\n')
+        self.git('add', 'src/fixture.c', 'res/non_utf8.dat')
+        self.git('commit', '-m', 'Resource fixture')
+        base = self.git('rev-parse', 'HEAD')
+        resource.write_bytes(b'resource \xff\n')
+        self.write('src/fixture.c', source)
+        raw = subprocess.check_output(['git', '-C', str(self.root), 'diff', base])
+        self.assertIn(b'\xff', raw)
+        return subprocess.run(['python3', str(STYLE), '--diff', base, '--strict'], cwd=self.root,
+                              text=True, capture_output=True)
+
+    def test_non_utf8_resource_diff_does_not_break_clean_c(self):
+        result = self.mixed_diff('int Fixture(void) {\n    return 1;\n}\n')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(result.stdout, '')
+
+    def test_non_utf8_resource_diff_still_reports_added_c_violations(self):
+        result = self.mixed_diff('extern int gCounter;\nint Fixture(void) {\n    return 0;\n}\n')
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn('src/fixture.c:1: extern:', result.stdout)
+        self.assertNotIn('UnicodeDecodeError', result.stderr)
 
 
 class ShellVerificationTests(GitFixture):

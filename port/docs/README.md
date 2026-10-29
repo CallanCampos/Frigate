@@ -56,6 +56,7 @@ records keep what was decided or found at the time, and are added to, not rewrit
 | [adr/0026-native-archive-table-caches.md](adr/0026-native-archive-table-caches.md) | Native FAT/FNT cache representation, SDK seam, lifecycle and timing limits |
 | [adr/0027-recorded-input-streams.md](adr/0027-recorded-input-streams.md) | Effective video input, explicit initial state, bounded seeds and committed recording prefixes |
 | [adr/0028-card-wire-and-physical-dma-progress.md](adr/0028-card-wire-and-physical-dma-progress.md) | Independent CARD physical foundation, absolute waits and bounded test-only DMA events; production integration deferred |
+| [adr/0029-backup-write-service-wait.md](adr/0029-backup-write-service-wait.md) | The backup WRITE service initial SDK wait, separate from flash busy and CPU work |
 | [RESEARCH.md](RESEARCH.md) | The research of 2026-10-16 behind the plan, summarized |
 | [research/README.md](research/README.md) | The full research reports, with what each covers |
 | [research/decomp-progress.md](research/decomp-progress.md) | The decomp's C coverage per module, data and pointer coverage, pace, claims |

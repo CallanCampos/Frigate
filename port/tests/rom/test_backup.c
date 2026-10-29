@@ -72,6 +72,19 @@ void port_os_add_frame_hook(void (*hook)(void)) {
     sFrameHook = hook;
 }
 
+// Byte/file scenarios explicitly leave writePage=0. Deferred-reply edge cases below drive this small clock by
+// hand; they do not claim scheduler fidelity. test_backup_service.c uses the actual SDK/PXI/OS clock instead.
+static uint64_t sTestCycles;
+static uint64_t sTimedAt;
+static void (*sTimedWork)(void);
+uint64_t port_os_cycles(void) {
+    return sTestCycles;
+}
+void port_os_set_timed_work(void (*work)(void), uint64_t when) {
+    sTimedWork = work;
+    sTimedAt = when;
+}
+
 // --- Driving the service ------------------------------------------------------------------------------------------
 
 // Sends a word of the FS tag as the ARM9 does (the error bit set), and returns whether the ARM7 answered it
@@ -853,12 +866,57 @@ static int TestSavePath(void) {
     return 0;
 }
 
+// A queued old callback reads no retired command and cannot publish an early new owner's reply. The fake clock
+// only exercises this callback's ownership/arithmetic; normal stream/task/sound behavior is tested on the real OS.
+static int TestDeferredReply(void) {
+    const uint64_t wait = 13091u * 64u;
+    void (*oldWork)(void);
+    int replies;
+
+    sTestCycles = 0;
+    Start("deferred");
+    IdentifyFlash();
+    memset(sPageBuffer, 0x6d, sizeof(sPageBuffer));
+    sArg.src = PageAddress();
+    sArg.dst = 0x1000;
+    sArg.len = 256;
+    sArg.spec.writePage = 25;
+    sArg.result = CARD_RESULT_ERROR;
+    replies = sReplies;
+    Check(!Send(CARD_REQ_WRITE_BACKUP), "no immediate write acknowledgment");
+    Check(sArg.result == CARD_RESULT_ERROR && sTimedAt == wait, "result publication waits for exact SDK deadline");
+    Check(port_card_backup_image()[0x1000] == 0x6d, "flash bytes already written before service wait");
+    oldWork = sTimedWork;
+    sTestCycles = wait / 2;
+    oldWork();
+    Check(sReplies == replies, "not before deadline");
+    port_card_backup_reset();
+    oldWork();
+    Check(sReplies == replies, "reset retires old storage before queued callback");
+    Check(!Send(CARD_REQ_WRITE_BACKUP), "new owner defers independently");
+    sTestCycles = wait;
+    oldWork();
+    Check(sReplies == replies, "old queued invocation cannot complete early new owner");
+    sTestCycles = wait + wait / 2;
+    oldWork();
+    oldWork();
+    Check(sReplies == replies + 1 && sArg.result == CARD_RESULT_SUCCESS, "exactly once after new deadline");
+    sTestCycles = UINT64_MAX - wait;
+    Check(Send(CARD_REQ_WRITE_BACKUP) && sArg.result == CARD_RESULT_ERROR,
+          "UINT64_MAX cancellation sentinel is never a completion deadline");
+    port_card_backup_reset();
+    sTestCycles = 0;
+    Finish();
+    return 0;
+}
+
 typedef struct Test {
     const char *name;
     int (*run)(void);
 } Test;
 
 static const Test sTests[] = {
+    { "deferred_reply", TestDeferredReply },
     { "init", TestInit },
     { "identify", TestIdentify },
     { "flash", TestFlash },

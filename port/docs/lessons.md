@@ -3,6 +3,32 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-28: decode mixed resource diffs without weakening C checks
+
+- A NUL-free opaque resource can appear as text in Git's diff even when its bytes are not UTF-8. The opening archive's
+  `626.bin` exposed this in Standards before C checking began. Preserve undecodable diff bytes with `surrogateescape`;
+  leave the checked paths, hunk line selection and every style rule intact.
+- Keep both regression controls: a mixed resource/clean-C diff must pass, and a mixed resource/new-C-violation diff
+  must still fail with its expected diagnostic. The old checker fails both controls; original rule fixtures and the
+  actual imported diff also pass after the portability fix. A formatter pass alone does not cover the whole pipeline.
+
+## 2026-10-28: validate asynchronous saves through the game and original checkpoints
+
+- A genuine SDK request fixture can pass while the game's wrapper spins forever on a callback-owned flag.
+  When making a HAL completion asynchronous, test the actual game caller as well as the service: native cooperative
+  execution needs a scheduling boundary. `writeFlashWaitSuccess` uses the genuine SDK wait inside its existing
+  polling loop; its finisher keeps error reporting and lock release. Actual-source success/error cases and the
+  original-loop negative cover that boundary ([ADR 0029](adr/0029-backup-write-service-wait.md)).
+- A fixed replay deadline is not original-game evidence. Both original games still have incomplete New Game saves
+  at video 5600, despite the old native check expecting both banks complete. Unchanged-input original captures,
+  exact shorter/longer control prefixes and full 73-block validation established partial 5600 and complete 7800
+  checkpoints. Keep both assertions; require deterministic independent complete saves and checksum validation.
+  The immediate-reply baseline fails the partial-state check. Do not retime inputs or hide checksum failures.
+- Distinguish serial events, firmware waits and CPU work. Actual first-WRITE field loads and alarm arguments prove
+  the SDK's 25 ms initial wait; an inter-packet elapsed gap alone does not. Generic timed work can be deferred in
+  an IRQ handler, so it does not establish autonomous SPI progress. Keep broader timing claims and residual
+  differences explicit until their own original-game controls and ownership tests pass.
+
 ## 2026-10-28: validate the whole Standards pipeline after naming imports
 
 - A large rename can make inherited lines appear newly added. A passing formatter does not prove the added-line

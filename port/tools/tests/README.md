@@ -16,3 +16,6 @@ The `Sync tooling tests` job feeds the required `Frigate CI` gate. The publishin
 The sync fixtures also cover recovery after a lost PR-creation response, a genuine creation failure, separately
 retrying failed review requests without a push, existing/completed reviews and the owner's self-review exception,
 and conflict filenames containing blank lines, backticks and terminal controls. No fixture contacts GitHub.
+
+Mixed resource/C diff fixtures also verify that non-UTF-8 resource bytes cannot crash the inherited style checker,
+while newly added C violations still fail strict checking.

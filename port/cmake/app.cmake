@@ -199,17 +199,9 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/new_game_house_${PORT_VERSIO
     port_test_labels(replay_new_game_house route)
 endif()
 
-# The port's saves depend only on the input file and the clock it names (T3, T6): New Game's formatting of the blank
-# backup, done by frame 5600 as first_save_<version>.pbwinput starts it (port/tests/oracle), run twice, each run with a
-# save directory of its own, writes the same save byte for byte (port/tests/replay/check_same_save.py). The console's
-# pending Wi-Fi ID that New Game copies into both copies of the main save is the oracle's, which DWC makes from the
-# clock and the DS's address of OS_GetTick: a host's address, which moves at every launch, once made each run's save
-# different (port/include/port_host.h). The day care's egg seed, which New Game draws from GFL's Mersenne Twister
-# (src/system/daycare_savedata.c) into both copies too, is the oracle's: the input file gives the port the random seed
-# the DS built at start-up (port/hal/gfl/random_seed.h), and with the port's own seed the egg seed is another. Without
-# the player's ROM the program exits 66 and the test is skipped
-# The save file is named after the ROM's game code (port/hal/card/port_card.h); the ID's 8 bytes and the egg seed's are
-# the oracle's
+# Original DS first_save controls are partial at video 5600 and complete at 7800 in BOTH versions.
+# Keep the early-state gate and add complete-image validation; same immutable input/seed, no frame retiming.
+# Each checkpoint runs twice in independent blank directories and requires byte-identical output.
 if(PORT_VERSION STREQUAL "b2_us")
     set(replay_same_save_file IREO.sav)
     set(replay_same_save_wifi_id 280c0000f2a0b315)
@@ -223,13 +215,26 @@ add_test(NAME replay_same_save
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/check_same_save.py"
         --expect "${replay_same_save_file}:0x1aa04:${replay_same_save_wifi_id}"
-        --expect "${replay_same_save_file}:0x40a04:${replay_same_save_wifi_id}"
+        --expect "${replay_same_save_file}:0x40a04:ffffffffffffffff"
         --expect "${replay_same_save_file}:0x20ecc:${replay_same_save_egg_seed}"
-        --expect "${replay_same_save_file}:0x46ecc:${replay_same_save_egg_seed}" --
+        --expect "${replay_same_save_file}:0x46ecc:ffffffffffffffff" --
         $<TARGET_FILE:${PORT_PROGRAM}> --headless --frames 5600 --watchdog 30
         --input "${CMAKE_CURRENT_SOURCE_DIR}/tests/oracle/first_save_${PORT_VERSION}.pbwinput")
 set_tests_properties(replay_same_save PROPERTIES SKIP_RETURN_CODE 66 TIMEOUT 1200)
 port_test_labels(replay_same_save route)
+add_test(NAME replay_same_save_complete
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/check_same_save.py"
+        --require-valid-image "${replay_same_save_file}"
+        --expect "${replay_same_save_file}:0x1aa04:${replay_same_save_wifi_id}"
+        --expect "${replay_same_save_file}:0x40a04:${replay_same_save_wifi_id}"
+        --expect "${replay_same_save_file}:0x20ecc:${replay_same_save_egg_seed}"
+        --expect "${replay_same_save_file}:0x46ecc:${replay_same_save_egg_seed}" --
+        $<TARGET_FILE:${PORT_PROGRAM}> --headless --frames 7800 --watchdog 30
+        --input "${CMAKE_CURRENT_SOURCE_DIR}/tests/oracle/first_save_${PORT_VERSION}.pbwinput")
+set_tests_properties(replay_same_save_complete PROPERTIES SKIP_RETURN_CODE 66 TIMEOUT 1200)
+port_test_labels(replay_same_save_complete route)
+
 
 # The starter's route on the port, held to the oracle's save of it (T3, T6): first_save_<version>.pbwinput from a blank
 # save to the field menu's SAVE (the adventure's first save, made on the port as replay_same_save and oracle.py
@@ -277,7 +282,7 @@ add_test(NAME replay_recording_tool COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONT
 add_test(NAME replay_recording COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/check_recording.py" --binary "$<TARGET_FILE:${PORT_PROGRAM}>"
     --version "${PORT_VERSION}" --input "${CMAKE_CURRENT_SOURCE_DIR}/tests/oracle/first_save_${PORT_VERSION}.pbwinput"
-    --frames 5600 --require-save)
+    --frames 7800 --require-save)
 add_test(NAME replay_recording_live COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/check_recording.py" --binary "$<TARGET_FILE:${PORT_PROGRAM}>"
     --version "${PORT_VERSION}" --frames 1800)
