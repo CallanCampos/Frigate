@@ -148,7 +148,8 @@ def canonical_texture_name(filename, names):
     stem = Path(filename).stem
     if stem in names:
         return filename
-    matches = [name for name in names if name.replace(".", "_") == stem]
+    # Apicula names a PNG after its texture with the characters a file name may not have as underscores
+    matches = [name for name in names if re.sub(r"[^0-9A-Za-z_]", "_", name) == stem]
     if len(matches) != 1:
         raise ValueError(f"cannot identify Nitro texture for {filename}")
     return matches[0] + ".png"
@@ -393,8 +394,13 @@ def positions_from_gltf(directory, name, nitro, mapping):
                     if all(abs(a - b) < 0.000001 for a, b in zip(actual, original)):
                         adjusted.append(raw)
                     else:
+                        # A vertex that its joint puts back as near its Nitro position as the joints restore the
+                        # baseline is unchanged: Blender exports skinned positions with float rounding
                         local = inverse_joint_position(doc, joint, actual)
-                        adjusted.append(tuple(round(axis * 4096) / 4096 for axis in local))
+                        if all(abs(a - b) <= 0.001 for a, b in zip(local, raw)):
+                            adjusted.append(raw)
+                        else:
+                            adjusted.append(tuple(round(axis * 4096) / 4096 for axis in local))
                 return adjusted, True, (doc, primitives, binary)
         except (KeyError, IndexError, ValueError, ZeroDivisionError):
             pass
@@ -481,6 +487,13 @@ def pack_color5(values, name):
     return sum(round(value * 31) << shift for value, shift in zip(values, (0, 5, 10)))
 
 
+def material_settings(material):
+    """Returns the settings of a GLB material that patch_materials packs: its base color and opacity, its emission and
+    whether it is double-sided. Its texture is patch_material_bindings's."""
+    return (material.get("pbrMetallicRoughness", {}).get("baseColorFactor", [1, 1, 1, 1]),
+            material.get("emissiveFactor"), material.get("doubleSided", False))
+
+
 def patch_materials(chunk, doc, primitives, name):
     data = bytearray(chunk)
     model_start = u32(data, 4)
@@ -496,8 +509,11 @@ def patch_materials(chunk, doc, primitives, name):
         current = primitive.get("material")
         if current is None or current >= len(doc.get("materials", [])):
             raise ValueError(f"{name}: GLB material is missing")
-        if original in mapping and mapping[original] != current:
-            raise ValueError(f"{name}: one Nitro material maps to multiple GLB materials")
+        # A material that several draw calls use may be copied for each, as graphics_archive.py's GLBs have it, which
+        # Blender keeps apart; the copies must stay alike
+        if original in mapping and mapping[original] != current and material_settings(
+                doc["materials"][mapping[original]]) != material_settings(doc["materials"][current]):
+            raise ValueError(f"{name}: one Nitro material maps to multiple GLB materials that differ")
         mapping[original] = current
     for original, current in mapping.items():
         entry = entries[original]

@@ -906,6 +906,9 @@ re-exported with `tools/data/field_prop_model_data.py extract APICULA OUTPUT_DIR
 An unchanged Blender export of a prop also repacks byte for byte; adding a face to a prop model
 changes only its bundle, and the rebuilt model loads in Apicula.
 
+The models of the other archives (the demos', the gimmicks' and the effects') are GLBs in the same way, packed by
+`tools/data/graphics_archive.py` with these converters; see "2D graphics".
+
 ## Map matrices, areas and lights
 
 A zone's header names its map matrix, `res/field/matrices/<matrix>.json` (`a/0/0/9`), by its constant in
@@ -1058,9 +1061,12 @@ after their constant where `generated/narc_<archive>.txt` names them (`professor
   screen's to say. A background's PNG is as wide as the game's tile sheet, and a sprite's characters, which have no
   size, are drawn in rows of four tiles, as a 32 by 32 OBJ stores them.
 - a palette resource (NCLR) is a JASC palette (`11.pal`), which sets the colors.
+- a 3D model (BMD0) is a directory named as the member is (`05/`), as a field prop's model is: `model.glb`, its
+  `data.json` and, where the model embeds its textures (a TEX0 block), a PNG of each texture, named after it, which the
+  GLB's images show. A texture set (BTX0) is a directory of those PNGs alone. See below.
 - the rest are the members themselves, decompressed: screens (`.nscr`), which place the tiles, cells (`.ncer`), cell
-  animations (`.nanr`), multi-cells (`.nmcr`, `.nmar`), 3D models and animations (`.nsbmd`, `.nsbca`, `.nsbta`, `.nsbma`,
-  `.nsbtp`, `.nsbtx`) and other data (`.bin`). Tools such as NitroPaint edit them.
+  animations (`.nanr`), multi-cells (`.nmcr`, `.nmar`), 3D animations (`.nsbca`, `.nsbta`, `.nsbma`, `.nsbtp`,
+  `.nsbva`), as the field props keep theirs, and other data (`.bin`). Tools such as NitroPaint edit them.
 
 `archive.json` lists the members that the game stores LZ-compressed (`{"compressed": {"05.png": "lz10"}}`), which the
 packer compresses again: an edited one as a valid stream of literals, an eighth larger than its data. A member that
@@ -1076,6 +1082,31 @@ The same packer takes archives of other subjects, each in the directory for what
 `res/graphics/` for the menus and apps, `res/demo/` for the demos and cutscenes, `res/field/gimmicks/` and
 `res/field/effects/`, `res/particles/` and `res/fonts/`; `dump ARCID_X res/demo` writes one there. A name, like its
 `ARCID_*`, is in one of them only.
+
+A model's GLB and PNGs are edited and packed as the field props' are (see "Map model sources"), with the same
+converters. `dump` has [Apicula](https://github.com/scurest/apicula) convert each model, from `PATH` or `--apicula
+PATH`; `pack`, which the build runs, needs only Python. The model's `data.json` is a prop's without the resource ID:
+`glb_sha256`, the hash of the GLB as extracted, and `transformed` and `positions` where the GLB's positions went through
+the model's node transforms. A GLB that still has its hash packs the game's model, and an edited one is converted back
+into it: its positions, UVs, material colors and texture bindings, as for a prop. An edited PNG packs into the model's
+textures as a texture set's does, in the texture's format and its shared palette. The GLB gives each of the model's draw
+calls a material of its own, copying a material that several share (`awa_1.001`), since Blender joins the draw calls of
+one material on export; edit the copies alike. A model that the converters don't take stays its `.nsbmd` file, as
+`dump` says: one with textures that the texture converter doesn't decode (4x4 compressed or direct color), one without
+a mesh, or one whose materials pair a texture with another palette than the converter gives it. A new model or texture
+set is added as its `.nsbmd` or `.nsbtx` file. The archives dumped before the models were GLBs keep their `.nsbmd` and
+`.nsbtx` files, which pack as they are, until they are dumped again: in scratch copies of the 19 such archives in
+`res/graphics/`, 214 of their 233 models and all 31 texture sets convert and pack byte for byte.
+
+`ARCID_GIMMICK_EXPOBJ_MARINETUBE` (`res/field/gimmicks/gimmick_expobj_marinetube/`) has 13 models and their
+animations, and `ARCID_DEMO3D_RESOURCE` (`res/demo/demo3d_resource/`) the demos' 156 models, 2,472 textures and
+297 animations; both pack byte for byte in both versions. An unchanged Blender export repacks byte for byte for 11
+of the Marine Tube's 13 models and 126 of the demos' 156; moving one vertex of a Marine Tube model in Blender changes
+one byte of it, which Apicula loads with the vertex moved, and an edited pixel packs into its texture. Of the others,
+four demo models pack with their triangles encoded again, and the packer refuses the rest rather than move their
+vertices: 17 have parts that their node transforms scale to nothing until an animation shows them (`hoeru_1`) or to a
+hundredth (the eight `city_plasma_come`), whose positions Blender doesn't export exactly, eight have blended skin
+weights, and three have shapes that set matrices as they draw.
 
 A movie's frames are direct color bitmaps, 15-bit color with bit 15 set where the pixel shows, as
 `cdemo_control.c` plays the Game Freak logo (`res/demo/cdemo_gflogo/`) and the opening (`res/demo/cdemo_openingsw/`):
