@@ -1,0 +1,34 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A zone's camera boundaries: res/field/cameras/boundaries/<n>.json",
+    "description": "Boundary set n of ARCID_FIELD_CAMERA_MAP_BOUNDARY (a/1/0/9), which a zone names by its \"cam_bound\" (65535 for none) and FieldCameraBoundary_LoadFile reads: each boundary keeps the camera's target or eye inside a rectangle or a circle, or out of a rectangle, on the X-Z plane. tools/data/field_camera_data.py packs them in order.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "boundaries" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "boundaries": {
+            "type": "array", "maxItems": 4,
+            "description": "The boundaries, applied in order; the camera has room for four",
+            "items": {
+                "type": "object",
+                "required": [ "shape", "apply_to" ],
+                "properties": {
+                    "shape": { "enum": [ "none", "inside_rect", "inside_circle", "outside_rect" ], "description": "What the boundary does, by FieldCameraBoundary_RestrictRect, _RestrictCircle and _RepealRect; none does nothing" },
+                    "apply_to": { "enum": [ "target", "eye" ], "description": "Whether the boundary moves the camera's target or its eye" },
+                    "min_x": { "$ref": "#/$defs/whole" }, "max_x": { "$ref": "#/$defs/whole" },
+                    "min_z": { "$ref": "#/$defs/whole" }, "max_z": { "$ref": "#/$defs/whole" },
+                    "center_x": { "$ref": "#/$defs/fx32" }, "center_z": { "$ref": "#/$defs/fx32" },
+                    "radius": { "$ref": "#/$defs/fx32" },
+                    "angle_a": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "With angle_b, the arc of the circle that holds the camera, in 65536ths of a turn; the whole circle when they are equal" },
+                    "angle_b": { "type": "integer", "minimum": 0, "maximum": 65535 }
+                },
+                "additionalProperties": false
+            }
+        }
+    },
+    "$defs": {
+        "whole": { "type": "integer", "minimum": -524288, "maximum": 524287, "description": "A rectangle's side, in whole units, which the game shifts into fixed point" },
+        "fx32": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647, "description": "In 4096ths of a unit, as the game's fixed-point numbers" }
+    }
+}

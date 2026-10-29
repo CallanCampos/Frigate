@@ -17,16 +17,17 @@ res/
     data/<trainer>.json     record and party
     classes/  sprites/{front,back}/<sprite>/  ai/  facilities/<facility>/
   field/
-    zones/  events/  encounters/  scripts/  areas/  matrices/
+    zones/  events/  encounters/  scripts/  areas/  matrices/  cameras/
     maps/{models,textures}/
     props/{exterior,interior}/{models,textures}/
     actors/                 the overworld's people and objects, with pokemon/ and models/ for its Pokémon and 3D models
     trades/  places/
+    gimmicks/<archive>/  effects/<archive>/   the gyms' and other gimmicks' models, the field effects' animations
   lighting/{field,battle}/
   town_map/
   sound/{sequences,banks,wave_archives,streams}/
-  graphics/<archive>/       the menus', apps' and screens' 2D graphics, an archive each
-  demo/<archive>/           the demos and cutscenes: the movies' frames, an archive each
+  graphics/<archive>/       the menus', apps' and screens' graphics and models, an archive each
+  demo/<archive>/           the demos and cutscenes: the movies' frames and the 3D demos' models, an archive each
   text/{system,script}/
 generated/                  the constant lists: species.txt, items.txt, obj_codes.txt, sound.txt and the others
 ```
@@ -909,7 +910,7 @@ changes only its bundle, and the rebuilt model loads in Apicula.
 The models of the other archives (the demos', the gimmicks' and the effects') are GLBs in the same way, packed by
 `tools/data/graphics_archive.py` with these converters; see "2D graphics".
 
-## Map matrices, areas and lights
+## Map matrices, areas, lights and cameras
 
 A zone's header names its map matrix, `res/field/matrices/<matrix>.json` (`a/0/0/9`), by its constant in
 `generated/map_matrices.txt`, which names a matrix after the first zone that uses it, the overworld's
@@ -937,6 +938,17 @@ the battles' are `res/lighting/battle/<n>.json` (`a/0/6/1`). A set is the period
 lights (on or off, color and direction in 4096ths), the materials' diffuse, ambient, specular and emission colors, the
 fog's color and the color the screen clears to. Colors are 0 to 31 per component. `tools/data/light_data.py`
 packs them, and both versions have the same sets.
+
+The field camera's data is in `res/field/cameras/`, which `tools/data/field_camera_data.py` packs, the same in both
+versions. A zone's header names its camera setup by number, `setups/<n>.json` (the records of `a/0/5/9`'s one file,
+`FieldCameraDefaults`, which `FieldCamera_CoordsLoadDefaults` applies): its distance, pitch, yaw and field of view,
+clipping planes, depth buffer mode, and whether it follows the player at an offset or looks at a point. Its `cam_bound`
+names a boundary set, `boundaries/<n>.json` (`a/1/0/9`), 65535 for none: up to four rectangles and circles on the X-Z
+plane that keep the camera's target or eye inside them, or out of a rectangle (`FieldCameraBoundary_LoadFile`). A warp's
+transition type from `WARP_TRANSITION_CAMERA` (7) on has an entrance camera, `entrances/<n>.json` (`a/1/7/7`), where the
+camera moves as the player goes in or comes out (`entrance_camera.c`). Distances and positions are in whole units,
+except the setups' clipping planes and target and the circles, which are in 4096ths; angles are in 65536ths of a turn.
+`setup.schema.json`, `boundary.schema.json` and `entrance.schema.json` describe the fields.
 
 ## Town map
 

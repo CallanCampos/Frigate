@@ -1,0 +1,30 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "An entrance camera: res/field/cameras/entrances/<n>.json",
+    "description": "The entrance camera of transition type n, a warp's \"transition\" from WARP_TRANSITION_CAMERA (7) on: a file of ARCID_ENTRANCE_CAMERA (a/1/7/7), which entrance_camera.c reads to move the camera as the player goes in or comes out. tools/data/field_camera_data.py packs them in order, numbered from 007.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "pitch", "yaw", "distance", "use_target", "target", "offset", "frames", "departure_animation", "arrival_animation", "release_bind", "disable_boundary" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "pitch": { "$ref": "#/$defs/angle" },
+        "yaw": { "$ref": "#/$defs/angle" },
+        "distance": { "$ref": "#/$defs/whole", "description": "The camera's distance from its target, in whole units" },
+        "use_target": { "type": "boolean", "description": "Whether the camera looks at target; otherwise at the player" },
+        "target": { "$ref": "#/$defs/vector" },
+        "offset": { "$ref": "#/$defs/vector" },
+        "frames": { "type": "integer", "minimum": 0, "maximum": 4294967295, "description": "How long the camera takes to move" },
+        "departure_animation": { "type": "boolean", "description": "Whether the camera moves as the player goes in" },
+        "arrival_animation": { "type": "boolean", "description": "Whether the camera moves as the player comes out" },
+        "release_bind": { "type": "boolean", "description": "The camera animation's releaseBind" },
+        "disable_boundary": { "type": "boolean", "description": "The camera animation's disableBoundary" }
+    },
+    "$defs": {
+        "angle": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "An angle in 65536ths of a turn" },
+        "whole": { "type": "integer", "minimum": -524288, "maximum": 524287, "description": "In whole units, which the game shifts into fixed point, so 20 bits" },
+        "vector": {
+            "type": "object", "additionalProperties": false, "required": [ "x", "y", "z" ],
+            "properties": { "x": { "$ref": "#/$defs/whole" }, "y": { "$ref": "#/$defs/whole" }, "z": { "$ref": "#/$defs/whole" } }
+        }
+    }
+}

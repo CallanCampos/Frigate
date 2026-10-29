@@ -1,0 +1,13 @@
+{
+    "$schema": "../boundary.schema.json",
+    "boundaries": [
+        {
+            "shape": "inside_rect",
+            "apply_to": "target",
+            "min_x": 68,
+            "max_x": 742,
+            "min_z": 45,
+            "max_z": 104
+        }
+    ]
+}
