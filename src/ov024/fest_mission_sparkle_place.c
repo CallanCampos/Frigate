@@ -174,5 +174,5 @@ static void FestSparklePlace_AddZone(FestSparkleWork *work, u16 zoneId) {
     }
     MI_CpuFill8(&work->zones[index], 0, sizeof(FestSparkleZone));
     work->zones[index].zoneId = zoneId;
-    work->zones[index].unk2 = work->count;
+    work->zones[index].count = work->count;
 }

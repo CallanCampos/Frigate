@@ -15,7 +15,7 @@
 // The sparkles already found in one zone
 typedef struct {
     u16 zoneId;
-    u16 unk2;
+    u16 count;
     u8 found[FEST_SPARKLE_MAX];
 } FestSparkleZone;
 
