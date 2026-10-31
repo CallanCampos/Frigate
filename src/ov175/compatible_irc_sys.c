@@ -152,6 +152,46 @@ static const GFLNetInitData sCompatibleIrcSysNetInit = {
 // What the other player's beacon says of this game
 static u32 sCompatibleIrcSysInfo = 13;
 
+// The steps of the functions that run over several frames, each with the state it keeps in the work
+enum {
+    START_INIT,
+    START_WAIT,
+    START_SYNC_INIT,
+    START_DONE,
+};
+
+enum {
+    END_EXIT_SYNC,
+    END_EXIT_NET,
+    END_WAIT_NET,
+    END_DONE,
+};
+
+enum {
+    NEGOTIATE_START,
+    NEGOTIATE_WAIT,
+    NEGOTIATE_DONE,
+};
+
+enum {
+    TIMING_SEND,
+    TIMING_WAIT,
+    TIMING_DONE,
+};
+
+enum {
+    IDS_SEND,
+    IDS_CHECK,
+    IDS_REPLY,
+    IDS_WAIT_REPLY,
+    IDS_DONE,
+};
+
+enum {
+    PROFILE_SEND,
+    PROFILE_WAIT,
+};
+
 CompatibleIrcSys *CompatibleIrcSys_Create(int unk40, GameData *gameData, HeapID heapId, BOOL disabled) {
     CompatibleIrcSys *sys = GFL_HeapAllocate(heapId, sizeof(CompatibleIrcSys), FALSE, "compatible_irc_sys.c", 275);
 
@@ -175,29 +215,29 @@ BOOL CompatibleIrcSys_StartNet(CompatibleIrcSys *sys) {
         return TRUE;
     }
     switch (sys->state) {
-    case 0:
+    case START_INIT:
         // The first branch's state is overwritten by the state 1 below, as in the original
         if (GFL_NetIsInitialized()) {
-            sys->state = 2;
+            sys->state = START_SYNC_INIT;
         } else {
             init = sCompatibleIrcSysNetInit;
             init.unk68.word = sys->unk40;
             GFL_NetInit(&init, CompatibleIrcSys_NetInitDone, sys);
         }
-        sys->state = 1;
+        sys->state = START_WAIT;
         break;
-    case 1:
+    case START_WAIT:
         if (GFL_NetIsInitialized()) {
-            sys->state = 2;
+            sys->state = START_SYNC_INIT;
         }
         break;
-    case 2:
+    case START_SYNC_INIT:
         CompatibleIrcSync_Init(&sys->sync, sys, sys->heapId);
         sys->syncStarted = TRUE;
-        sys->state = 3;
+        sys->state = START_DONE;
         break;
-    case 3:
-        sys->state = 0;
+    case START_DONE:
+        sys->state = START_INIT;
         return TRUE;
     }
     return FALSE;
@@ -208,28 +248,28 @@ BOOL CompatibleIrcSys_EndNet(CompatibleIrcSys *sys) {
         return TRUE;
     }
     switch (sys->state) {
-    case 0:
+    case END_EXIT_SYNC:
         if (sys->syncStarted) {
             CompatibleIrcSync_Exit(&sys->sync);
             sys->syncStarted = FALSE;
         }
         sys->netEnded = FALSE;
-        sys->state = 1;
+        sys->state = END_EXIT_NET;
         break;
-    case 1:
+    case END_EXIT_NET:
         if (GFL_NetExit(CompatibleIrcSys_NetExitDone)) {
-            sys->state = 2;
+            sys->state = END_WAIT_NET;
         } else {
-            sys->state = 3;
+            sys->state = END_DONE;
         }
         break;
-    case 2:
+    case END_WAIT_NET:
         if (sys->netEnded) {
-            sys->state = 3;
+            sys->state = END_DONE;
         }
         break;
-    case 3:
-        sys->state = 0;
+    case END_DONE:
+        sys->state = END_EXIT_SYNC;
         return TRUE;
     }
     return FALSE;
@@ -240,21 +280,21 @@ BOOL CompatibleIrcSys_StartNegotiation(CompatibleIrcSys *sys) {
         return TRUE;
     }
     switch (sys->state) {
-    case 0:
+    case NEGOTIATE_START:
         GFL_NetChangeoverConnect(NULL);
-        sys->state = 1;
+        sys->state = NEGOTIATE_WAIT;
         sys->negotiating = TRUE;
         sys->connected = FALSE;
         sys->negotiatedBits = 0;
         break;
-    case 1:
+    case NEGOTIATE_WAIT:
         if (sys->connected) {
             sys->negotiating = FALSE;
-            sys->state = 2;
+            sys->state = NEGOTIATE_DONE;
         }
         break;
-    case 2:
-        sys->state = 0;
+    case NEGOTIATE_DONE:
+        sys->state = NEGOTIATE_START;
         return TRUE;
     }
     return FALSE;
@@ -265,17 +305,17 @@ BOOL CompatibleIrcSys_Sync(CompatibleIrcSys *sys) {
         return TRUE;
     }
     switch (sys->state) {
-    case 0:
+    case TIMING_SEND:
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 0xe, 0xd);
-        sys->state = 1;
+        sys->state = TIMING_WAIT;
         break;
-    case 1:
+    case TIMING_WAIT:
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0xe, 0xd)) {
-            sys->state = 2;
+            sys->state = TIMING_DONE;
         }
         break;
-    case 2:
-        sys->state = 0;
+    case TIMING_DONE:
+        sys->state = TIMING_SEND;
         return TRUE;
     }
     return FALSE;
@@ -295,13 +335,13 @@ BOOL CompatibleIrcSys_ExchangeIds(CompatibleIrcSys *sys, u32 value) {
         return TRUE;
     }
     switch (sys->state) {
-    case 0:
+    case IDS_SEND:
         sys->idsReplied = FALSE;
         if (CompatibleIrcSys_Send(sys, CMD_ID, 4, &value)) {
-            sys->state = 1;
+            sys->state = IDS_CHECK;
         }
         break;
-    case 1:
+    case IDS_CHECK:
         if (GFL_NetIsParent()) {
             for (i = 0; i < 2; i++) {
                 if (value != sys->ids[i]) {
@@ -309,24 +349,24 @@ BOOL CompatibleIrcSys_ExchangeIds(CompatibleIrcSys *sys, u32 value) {
                 }
             }
             if (i == 2) {
-                sys->state = 2;
+                sys->state = IDS_REPLY;
             }
         } else {
-            sys->state = 3;
+            sys->state = IDS_WAIT_REPLY;
         }
         break;
-    case 2:
+    case IDS_REPLY:
         if (CompatibleIrcSys_Send(sys, CMD_ID_REPLY, 4, &value)) {
-            sys->state = 4;
+            sys->state = IDS_DONE;
         }
         break;
-    case 3:
+    case IDS_WAIT_REPLY:
         if (sys->idsReplied) {
-            sys->state = 4;
+            sys->state = IDS_DONE;
         }
         break;
-    case 4:
-        sys->state = 0;
+    case IDS_DONE:
+        sys->state = IDS_SEND;
         return TRUE;
     }
     return FALSE;
@@ -606,7 +646,7 @@ static BOOL CompatibleIrcSync_PollPing(CompatibleIrcSync *sync) {
 
 static BOOL CompatibleIrcSync_ExchangeProfiles(CompatibleIrcSync *sync, GameSystem *gsys) {
     switch (sync->state) {
-    case 0:
+    case PROFILE_SEND:
         if (gsys != NULL) {
             CompatibleIrcSys_BuildProfile(gsys, sync->ownProfile);
         } else {
@@ -614,13 +654,13 @@ static BOOL CompatibleIrcSync_ExchangeProfiles(CompatibleIrcSync *sync, GameSyst
         }
         if (CompatibleIrcSys_SendEx(sync->sys, CMD_PROFILE, sizeof(CompatibleIrcProfile), sync->ownProfile, 0xff, 0, 0,
                                     TRUE)) {
-            sync->state = 1;
+            sync->state = PROFILE_WAIT;
         }
         break;
-    case 1:
+    case PROFILE_WAIT:
         if (sync->profileReceived) {
             sync->profileReceived = FALSE;
-            sync->state = 0;
+            sync->state = PROFILE_SEND;
             return TRUE;
         }
         break;
