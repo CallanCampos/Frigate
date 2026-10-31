@@ -317,6 +317,14 @@ static void PStaInfo_PrintInfo(PStatusWork *wk, PStaInfoWork *info, BoxPkm *pkm)
     info->isPrinted = TRUE;
 }
 
+// The event Pokemon's met locations, as offsets from LOCATION_EVENT_CELEBI
+enum {
+    EVENT_LOCATION_CELEBI,
+    EVENT_LOCATION_CELEBI_USED,
+    EVENT_LOCATION_BEASTS,
+    EVENT_LOCATION_BEASTS_USED,
+};
+
 static void PStaInfo_PrintMemo(PStatusWork *wk, PStaInfoWork *info, BoxPkm *pkm) {
     u32 y = 0;
     BOOL foreignOT;
@@ -403,16 +411,16 @@ static void PStaInfo_PrintMemo(PStatusWork *wk, PStaInfoWork *info, BoxPkm *pkm)
         } else if (metLocation >= LOCATION_EVENT_CELEBI && metLocation <= LOCATION_EVENT_BEASTS_USED &&
                    transferred == TRUE) {
             switch (metLocation - LOCATION_EVENT_CELEBI) {
-            case 0:
+            case EVENT_LOCATION_CELEBI:
                 msg = 0x31;
                 break;
-            case 1:
+            case EVENT_LOCATION_CELEBI_USED:
                 msg = 0x32;
                 break;
-            case 2:
+            case EVENT_LOCATION_BEASTS:
                 msg = 0x33;
                 break;
-            case 3:
+            case EVENT_LOCATION_BEASTS_USED:
                 msg = 0x34;
                 break;
             }
