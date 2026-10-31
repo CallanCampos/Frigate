@@ -106,6 +106,14 @@ struct PStaSubWork {
 
 static void PStaSub_PrintInfo(PStatusWork *wk, PStaSubWork *sub, BoxPkm *pkm);
 static void PStaSub_UpdateAnim(PStatusWork *wk, PStaSubWork *sub);
+// The steps of the swipe: out to the right and back, then out to the left and back
+enum {
+    SWIPE_RIGHT_OUT,
+    SWIPE_RIGHT_BACK,
+    SWIPE_LEFT_OUT,
+    SWIPE_LEFT_BACK,
+};
+
 static void PStaSub_StartAnim(PStatusWork *wk, PStaSubWork *sub);
 static BOOL PStaSub_CheckGesture(PStatusWork *wk, PStaSubWork *sub, PStaSubGesture *gesture);
 static BOOL PStaSub_AnimSwipeX(PStatusWork *wk, PStaSubWork *sub);
@@ -538,7 +546,7 @@ static void PStaSub_UpdateAnim(PStatusWork *wk, PStaSubWork *sub) {
 
 static void PStaSub_StartAnim(PStatusWork *wk, PStaSubWork *sub) {
     sub->gestureDone = TRUE;
-    sub->animStep = 0;
+    sub->animStep = SWIPE_RIGHT_OUT;
     sub->spinTarget = 0;
     sub->animFrame = 0;
     sub->spinSpeed = 0;
@@ -575,16 +583,16 @@ static BOOL PStaSub_AnimSwipeX(PStatusWork *wk, PStaSubWork *sub) {
     width = (wk->happiness >> 6) + 16;
     dist = sub->animFrame * width / 15;
     switch (sub->animStep) {
-    case 0:
+    case SWIPE_RIGHT_OUT:
         pos.x += FX32_CONST(dist);
         break;
-    case 1:
+    case SWIPE_RIGHT_BACK:
         pos.x += FX32_CONST(width - dist);
         break;
-    case 2:
+    case SWIPE_LEFT_OUT:
         pos.x -= FX32_CONST(dist);
         break;
-    case 3:
+    case SWIPE_LEFT_BACK:
         pos.x -= FX32_CONST(width - dist);
         break;
     }
@@ -594,8 +602,8 @@ static BOOL PStaSub_AnimSwipeX(PStatusWork *wk, PStaSubWork *sub) {
     if (sub->animFrame > 15) {
         sub->animFrame = 0;
         sub->animStep++;
-        if (sub->animStep > 3) {
-            sub->animStep = 0;
+        if (sub->animStep > SWIPE_LEFT_BACK) {
+            sub->animStep = SWIPE_RIGHT_OUT;
             return TRUE;
         }
     }
