@@ -66,6 +66,9 @@
 #define TEXT_ACTOR_COUNT 3
 #define MENU_ITEM_COUNT 3
 #define LOAD_COUNT_MAX 8
+// Ends a table of entries that is read until one starts with it
+#define TABLE_END 0xff
+#define LABEL_END 0xffff
 #define POSITION_COUNT 34
 // The first of the new marks' positions
 #define POSITION_NEW_MARKS 25
@@ -554,7 +557,7 @@ static const PkwdBookActorGroup sPkwdBookTrainerGroup = {
 
 static const PkwdBookWindowSetup sPkwdBookListWindows[2] = {
     { 4, 2, 1, 28, 4, 10 },
-    { 0xff, 0, 0, 0, 0, 0 },
+    { TABLE_END, 0, 0, 0, 0, 0 },
 };
 
 // Where the lower screen's BG 3 goes for each page
@@ -563,13 +566,13 @@ static const ClActorPos sPkwdBookPageScrolls[3] = { { 0, 192 }, { 256, 0 }, { 0,
 static const PkwdBookLoad sPkwdBookScreenLoads[3] = {
     { 3, 38, 0, 0 },
     { 7, 37, 0, 0 },
-    { 0xff, 0, 0, 0 },
+    { TABLE_END, 0, 0, 0 },
 };
 
 static const PkwdBookLoad sPkwdBookCharLoads[3] = {
     { 3, 25, 0, 0 },
     { 7, 24, 0, 0 },
-    { 0xff, 0, 0, 0 },
+    { TABLE_END, 0, 0, 0 },
 };
 
 static const FrameListCallbacks sPkwdBookListCallbacks = {
@@ -583,12 +586,12 @@ static const s16 sPkwdBookSeriesPalettes[SERIES_COUNT][2] = { { 6, 16 }, { 7, 17
 
 static const PkwdBookLabel sPkwdBookListLabels[2] = {
     { 7, 0, FALSE, MSG_LINES },
-    { 0xffff, 0, 0, 0 },
+    { LABEL_END, 0, 0, 0 },
 };
 
 static const PkwdBookActorEntry sPkwdBookTrainerActors[2] = {
     { 0, 0x30, 1, 0, 0, 1, 17, RES_TRAINER_CHARS },
-    { 0xff, 0, 0, 0, 0, 0, 0, 0 },
+    { TABLE_END, 0, 0, 0, 0, 0, 0, 0 },
 };
 
 static const TouchRect sPkwdBookCastTouchRects[4] = {
@@ -614,7 +617,7 @@ static const PkwdBookLoad sPkwdBookPaletteLoads[4] = {
     { PALTYPE_MAIN_BG, 9, 0, 0 },
     { PALTYPE_MAIN_BG, 44, 9, 1 },
     { PALTYPE_SUB_BG, 5, 6, 2 },
-    { 0xff, 0, 0, 0 },
+    { TABLE_END, 0, 0, 0 },
 };
 
 // The messages of a Pokémon's page: its name, the marks of its sex, its level, its item, its Ability, its moves and
@@ -628,33 +631,33 @@ static const s16 sPkwdBookPokemonMessages[11] = {
 static const PkwdBookLabel sPkwdBookCastLabels[3] = {
     { 3, 0, FALSE, MSG_LINES },
     { 6, 1, TRUE, MSG_LINES },
-    { 0xffff, 0, 0, 0 },
+    { LABEL_END, 0, 0, 0 },
 };
 
 static const PkwdBookWindowSetup sPkwdBookCastWindows[5] = {
-    { 4, 2, 1, 28, 2, 10 },  { 4, 1, 15, 15, 2, 13 }, { 4, 1, 17, 15, 2, 13 },
-    { 4, 1, 19, 15, 2, 13 }, { 0xff, 0, 0, 0, 0, 0 },
+    { 4, 2, 1, 28, 2, 10 },  { 4, 1, 15, 15, 2, 13 },      { 4, 1, 17, 15, 2, 13 },
+    { 4, 1, 19, 15, 2, 13 }, { TABLE_END, 0, 0, 0, 0, 0 },
 };
 
 static const PkwdBookLabel sPkwdBookMovieLabels[4] = {
     { 0, 0, FALSE, MSG_LINES },
     { 1, 1, FALSE, MSG_LINES },
     { 2, 2, FALSE, MSG_LINES },
-    { 0xffff, 0, 0, 0 },
+    { LABEL_END, 0, 0, 0 },
 };
 
 static const PkwdBookLabel sPkwdBookPokemonLabels[4] = {
     { 3, 0, FALSE, MSG_LINES },
     { 4, 3, TRUE, MSG_LINES },
     { 5, 9, TRUE, MSG_LINES },
-    { 0xffff, 0, 0, 0 },
+    { LABEL_END, 0, 0, 0 },
 };
 
 static const PkwdBookActorEntry sPkwdBookBarActors[4] = {
     { 1, 0x30, 1, 1, 0, 1, 3, RES_BAR_CHARS },
     { 4, 0x30, 1, 1, 0, 1, 0, RES_BAR_CHARS },
     { 5, 0x30, 1, 1, 0, 1, 1, RES_BAR_CHARS },
-    { 0xff, 0, 0, 0, 0, 0, 0, 0 },
+    { TABLE_END, 0, 0, 0, 0, 0, 0, 0 },
 };
 
 static const PkwdBookActorRes sPkwdBookMarkRes = {
@@ -668,7 +671,7 @@ static const PkwdBookTextActorEntry sPkwdBookTextActors[TEXT_ACTOR_COUNT + 1] = 
     { 2, 2, 0x38, 1, 1, 0, 20, 0 },
     { 2, 2, 0x38, 1, 1, 0, 21, 0 },
     { 2, 2, 0x38, 1, 1, 0, 22, 0 },
-    { 0xff, 0, 0, 0, 0, 0, 0, 0 },
+    { TABLE_END, 0, 0, 0, 0, 0, 0, 0 },
 };
 
 static const FrameListSetup sPkwdBookListSetup = {
@@ -696,20 +699,20 @@ static const u8 sPkwdBookPosterGraphics[MOVIE_COUNT] = {
 };
 
 static const PkwdBookWindowSetup sPkwdBookMainWindows[7] = {
-    { 1, 2, 1, 28, 2, 5 }, { 1, 2, 5, 28, 2, 6 },  { 1, 2, 12, 28, 2, 6 },  { 1, 2, 3, 28, 2, 7 },
-    { 1, 3, 7, 28, 4, 7 }, { 1, 3, 14, 28, 4, 7 }, { 0xff, 0, 0, 0, 0, 0 },
+    { 1, 2, 1, 28, 2, 5 }, { 1, 2, 5, 28, 2, 6 },  { 1, 2, 12, 28, 2, 6 },       { 1, 2, 3, 28, 2, 7 },
+    { 1, 3, 7, 28, 4, 7 }, { 1, 3, 14, 28, 4, 7 }, { TABLE_END, 0, 0, 0, 0, 0 },
 };
 
 static const PkwdBookLoad sPkwdBookPosterChars[14] = {
-    { 2, 0x2d, 0, 0 }, { 2, 0x2e, 0, 0 }, { 2, 0x2f, 0, 0 }, { 2, 0x30, 0, 0 }, { 2, 0x31, 0, 0 },
-    { 2, 0x32, 0, 0 }, { 2, 0x33, 0, 0 }, { 2, 0x34, 0, 0 }, { 2, 0x35, 0, 0 }, { 2, 0x36, 0, 0 },
-    { 2, 0x37, 0, 0 }, { 2, 0x38, 0, 0 }, { 2, 0x39, 0, 0 }, { 0xff, 0, 0, 0 },
+    { 2, 0x2d, 0, 0 }, { 2, 0x2e, 0, 0 }, { 2, 0x2f, 0, 0 }, { 2, 0x30, 0, 0 },      { 2, 0x31, 0, 0 },
+    { 2, 0x32, 0, 0 }, { 2, 0x33, 0, 0 }, { 2, 0x34, 0, 0 }, { 2, 0x35, 0, 0 },      { 2, 0x36, 0, 0 },
+    { 2, 0x37, 0, 0 }, { 2, 0x38, 0, 0 }, { 2, 0x39, 0, 0 }, { TABLE_END, 0, 0, 0 },
 };
 
 static const PkwdBookLoad sPkwdBookPosterScreens[14] = {
-    { 2, 0x3a, 0, 0 }, { 2, 0x3b, 0, 0 }, { 2, 0x3c, 0, 0 }, { 2, 0x3d, 0, 0 }, { 2, 0x3e, 0, 0 },
-    { 2, 0x3f, 0, 0 }, { 2, 0x40, 0, 0 }, { 2, 0x41, 0, 0 }, { 2, 0x42, 0, 0 }, { 2, 0x43, 0, 0 },
-    { 2, 0x44, 0, 0 }, { 2, 0x45, 0, 0 }, { 2, 0x46, 0, 0 }, { 0xff, 0, 0, 0 },
+    { 2, 0x3a, 0, 0 }, { 2, 0x3b, 0, 0 }, { 2, 0x3c, 0, 0 }, { 2, 0x3d, 0, 0 },      { 2, 0x3e, 0, 0 },
+    { 2, 0x3f, 0, 0 }, { 2, 0x40, 0, 0 }, { 2, 0x41, 0, 0 }, { 2, 0x42, 0, 0 },      { 2, 0x43, 0, 0 },
+    { 2, 0x44, 0, 0 }, { 2, 0x45, 0, 0 }, { 2, 0x46, 0, 0 }, { TABLE_END, 0, 0, 0 },
 };
 
 // clang-format off
@@ -717,7 +720,7 @@ static const PkwdBookActorEntry sPkwdBookTypeIconActors[TYPE_ICON_COUNT + 1] = {
     { 0, 0x30, 1, 0, 0, 1, 11, RES_TYPE_ICON_CHARS },     { 0, 0x30, 1, 0, 0, 1, 12, RES_TYPE_ICON_CHARS + 1 },
     { 0, 0x30, 1, 0, 0, 1, 13, RES_TYPE_ICON_CHARS + 2 }, { 0, 0x30, 1, 0, 0, 1, 14, RES_TYPE_ICON_CHARS + 3 },
     { 0, 0x30, 1, 0, 0, 1, 15, RES_TYPE_ICON_CHARS + 4 }, { 0, 0x30, 1, 0, 0, 1, 16, RES_TYPE_ICON_CHARS + 5 },
-    { 0xff, 0, 0, 0, 0, 0, 0, 0 },
+    { TABLE_END, 0, 0, 0, 0, 0, 0, 0 },
 };
 
 // clang-format on
@@ -728,14 +731,14 @@ static const PkwdBookActorEntry sPkwdBookPokeIconActors[POKE_ICON_COUNT + 1] = {
     { 1, 0x28, 1, 0, 0, 0, 4, RES_POKE_ICON_CHARS },      { 1, 0x28, 1, 0, 0, 0, 5, RES_POKE_ICON_CHARS + 1 },
     { 1, 0x28, 1, 0, 0, 0, 6, RES_POKE_ICON_CHARS + 2 },  { 1, 0x28, 1, 0, 0, 0, 7, RES_POKE_ICON_CHARS + 3 },
     { 1, 0x28, 1, 0, 0, 0, 8, RES_POKE_ICON_CHARS + 4 },  { 1, 0x28, 1, 0, 0, 0, 9, RES_POKE_ICON_CHARS + 5 },
-    { 1, 0x28, 1, 0, 0, 0, 10, RES_POKE_ICON_CHARS + 6 }, { 0xff, 0, 0, 0, 0, 0, 0, 0 },
+    { 1, 0x28, 1, 0, 0, 0, 10, RES_POKE_ICON_CHARS + 6 }, { TABLE_END, 0, 0, 0, 0, 0, 0, 0 },
 };
 
 // clang-format off
 static const PkwdBookWindowSetup sPkwdBookPokemonWindows[12] = {
     { 4, 2, 1, 28, 2, 10 },  { 4, 1, 6, 10, 2, 13 },  { 4, 2, 11, 10, 2, 13 }, { 4, 4, 15, 12, 2, 13 },
     { 4, 13, 15, 12, 2, 13 }, { 4, 16, 4, 12, 2, 13 }, { 4, 16, 7, 12, 2, 13 }, { 4, 16, 10, 12, 2, 13 },
-    { 4, 16, 13, 12, 2, 13 }, { 4, 4, 17, 12, 2, 13 }, { 4, 13, 17, 12, 2, 13 }, { 0xff, 0, 0, 0, 0, 0 },
+    { 4, 16, 13, 12, 2, 13 }, { 4, 4, 17, 12, 2, 13 }, { 4, 13, 17, 12, 2, 13 }, { TABLE_END, 0, 0, 0, 0, 0 },
 };
 
 // clang-format on
@@ -777,7 +780,7 @@ static const PkwdBookActorEntry sPkwdBookMarkActors[MARK_ACTOR_COUNT + 1] = {
     { 1, 0x30, 2, 0, 0, 1, 27, RES_MARK_CHARS }, { 1, 0x30, 2, 0, 0, 1, 28, RES_MARK_CHARS },
     { 1, 0x30, 2, 0, 0, 1, 29, RES_MARK_CHARS }, { 1, 0x30, 2, 0, 0, 1, 30, RES_MARK_CHARS },
     { 1, 0x30, 2, 0, 0, 1, 31, RES_MARK_CHARS }, { 1, 0x30, 2, 0, 0, 1, 32, RES_MARK_CHARS },
-    { 1, 0x30, 2, 0, 0, 1, 33, RES_MARK_CHARS }, { 0xff, 0, 0, 0, 0, 0, 0, 0 },
+    { 1, 0x30, 2, 0, 0, 1, 33, RES_MARK_CHARS }, { TABLE_END, 0, 0, 0, 0, 0, 0, 0 },
 };
 
 // The scripts of each movie, for a boy and then for a girl
@@ -902,26 +905,33 @@ static BOOL PkwdBook_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     return TRUE;
 }
 
+enum {
+    MAIN_STATE_WIPE_IN,
+    MAIN_STATE_RUN,
+    MAIN_STATE_START_WIPE_OUT,
+    MAIN_STATE_WIPE_OUT,
+};
+
 static BOOL PkwdBook_Main(GameProc *proc, u32 *state, void *param, void *work) {
     PkwdBookWork *wk = work;
 
     switch (*state) {
-    case 0:
+    case MAIN_STATE_WIPE_IN:
         if (GFL_WipeIsFinished()) {
             (*state)++;
             wk->flags |= FLAG_WIPE_IN_DONE;
         }
         break;
-    case 1:
+    case MAIN_STATE_RUN:
         if (wk->step == STEP_END) {
             (*state)++;
         }
         break;
-    case 2:
+    case MAIN_STATE_START_WIPE_OUT:
         GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 6, 1, wk->heapId);
         (*state)++;
         break;
-    case 3:
+    case MAIN_STATE_WIPE_OUT:
         if (GFL_WipeIsFinished()) {
             return TRUE;
         }
@@ -1081,20 +1091,20 @@ static void PkwdBook_LoadGraphics(PkwdBookWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
 
     for (i = 0; i < LOAD_COUNT_MAX; palette++, i++) {
-        if (palette->target == 0xff) {
+        if (palette->target == TABLE_END) {
             break;
         }
         GFL_G2DIOLoadArcNCLRDefault(arc, palette->fileId, palette->target, palette->offset << 5, palette->extra << 5,
                                     wk->heapId);
     }
     for (i = 0; i < LOAD_COUNT_MAX; i++, chars++) {
-        if (chars->target == 0xff) {
+        if (chars->target == TABLE_END) {
             break;
         }
         GFL_BGSysLoadArcNCGRStatic(arc, chars->fileId, chars->target, chars->offset, 0, FALSE, wk->heapId);
     }
     for (i = 0; i < LOAD_COUNT_MAX; i++, screen++) {
-        if (screen->target == 0xff) {
+        if (screen->target == TABLE_END) {
             break;
         }
         loadBGScrToVramByFileNoReserveNegAlign(arc, screen->fileId, screen->target, screen->offset, 0, FALSE,
@@ -1318,7 +1328,7 @@ static void PkwdBook_CreateActors(PkwdBookWork *wk, u32 surface, const PkwdBookA
         BOOL visible;
         BOOL animated;
 
-        if (entries->sequence == 0xff) {
+        if (entries->sequence == TABLE_END) {
             break;
         }
         positionIdx = entries->positionIdx * 2;
@@ -1521,7 +1531,7 @@ static void PkwdBook_CreateTextActors(PkwdBookWork *wk, u32 surface, const PkwdB
         s16 x;
         s16 y;
 
-        if (entries->width == 0xff) {
+        if (entries->width == TABLE_END) {
             break;
         }
         wk->textBitmaps[i] = GFL_BitmapCreate(entries->width, entries->height, 0x20, wk->heapId);
@@ -1588,7 +1598,7 @@ static void PkwdBook_CreateWindows(PkwdBookWork *wk, BOOL isSub, u32 page) {
         PkwdBook_FreeWindows(wk, TRUE);
     }
     for (i = 0; i < WINDOW_COUNT; i++, setup++) {
-        if (setup->bg == 0xff) {
+        if (setup->bg == TABLE_END) {
             break;
         }
         if (!isSub) {
@@ -1715,7 +1725,7 @@ static void PkwdBook_PrintLabels(PkwdBookWork *wk, BOOL isSub, u32 page) {
         s32 x;
         StrBuf *strbuf;
 
-        if (message == 0xffff) {
+        if (message == LABEL_END) {
             break;
         }
         window = labels[i].window;
@@ -1896,6 +1906,31 @@ static void PkwdBook_LeaveList(PkwdBookWork *wk) {
     PkwdBook_ClearList(wk);
 }
 
+// What PkwdBook_HandleListResult returns
+enum {
+    LIST_RESULT_NONE,
+    LIST_RESULT_MOVED,
+    LIST_RESULT_PICKED,
+    LIST_RESULT_CURSOR_SHOWN,
+};
+
+// The list page's touch: the return button
+#define LIST_TOUCH_RETURN 0
+
+// The touch of the cast and Pokemon pages, and what their input does
+enum {
+    PAGE_TOUCH_LEFT,
+    PAGE_TOUCH_RIGHT,
+    PAGE_TOUCH_RETURN,
+};
+
+enum {
+    PAGE_ACTION_NONE,
+    PAGE_ACTION_LEFT,
+    PAGE_ACTION_RIGHT,
+    PAGE_ACTION_RETURN,
+};
+
 static void PkwdBook_ListInput(PkwdBookWork *wk) {
     s32 action = 0;
     BOOL cancel = FALSE;
@@ -1905,9 +1940,9 @@ static void PkwdBook_ListInput(PkwdBookWork *wk) {
         return;
     }
     result = PkwdBook_HandleListResult(wk, PkwdBook_UpdateList(wk));
-    if (result == 1) {
+    if (result == LIST_RESULT_MOVED) {
         action = 2;
-    } else if (result == 2) {
+    } else if (result == LIST_RESULT_PICKED) {
         action = 1;
     }
     if (wk->flags & FLAG_MOVIE_CHANGED) {
@@ -1917,7 +1952,7 @@ static void PkwdBook_ListInput(PkwdBookWork *wk) {
     if (action == 0) {
         s32 touch = PkwdBook_ReadTouch(wk, wk->page);
 
-        if (touch == 0) {
+        if (touch == LIST_TOUCH_RETURN) {
             cancel = TRUE;
         }
         if (!cancel) {
@@ -1929,7 +1964,7 @@ static void PkwdBook_ListInput(PkwdBookWork *wk) {
             PkwdBook_PlayAnim(wk, GROUP_BAR, BAR_RETURN, 9);
             wk->pageStep = PAGE_STEP_WAIT_RETURN;
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
-            if (touch == 0) {
+            if (touch == LIST_TOUCH_RETURN) {
                 GCTX_HIDSetUsingTouch(TRUE);
             } else {
                 GCTX_HIDSetUsingTouch(FALSE);
@@ -2049,45 +2084,45 @@ static void PkwdBook_LeaveCast(PkwdBookWork *wk) {
 }
 
 static void PkwdBook_CastInput(PkwdBookWork *wk) {
-    s32 action = 0;
+    s32 action = PAGE_ACTION_NONE;
     s32 touch;
 
     if (!PrintQueue_IsEmpty(wk->printQueue)) {
         return;
     }
     touch = PkwdBook_ReadTouch(wk, wk->page);
-    if (touch == 0) {
-        action = 1;
-    } else if (touch == 1) {
-        action = 2;
-    } else if (touch == 2) {
-        action = 3;
+    if (touch == PAGE_TOUCH_LEFT) {
+        action = PAGE_ACTION_LEFT;
+    } else if (touch == PAGE_TOUCH_RIGHT) {
+        action = PAGE_ACTION_RIGHT;
+    } else if (touch == PAGE_TOUCH_RETURN) {
+        action = PAGE_ACTION_RETURN;
     }
-    if (action == 0) {
+    if (action == PAGE_ACTION_NONE) {
         if (GCTX_HIDGetPressedKeys() & PAD_KEY_LEFT) {
-            action = 1;
+            action = PAGE_ACTION_LEFT;
         } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_RIGHT) {
-            action = 2;
+            action = PAGE_ACTION_RIGHT;
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-            action = 3;
+            action = PAGE_ACTION_RETURN;
         }
     }
-    if (action == 1) {
+    if (action == PAGE_ACTION_LEFT) {
         wk->nextPageState = PAGE_STATE_ENTER_POKEMON;
         PkwdBook_PlayAnim(wk, GROUP_BAR, BAR_LEFT, 12);
         wk->pageStep = PAGE_STEP_WAIT_LEFT;
         GFL_SndSEPlay(SEQ_SE_SELECT1);
-    } else if (action == 2) {
+    } else if (action == PAGE_ACTION_RIGHT) {
         wk->nextPageState = PAGE_STATE_ENTER_POKEMON;
         PkwdBook_PlayAnim(wk, GROUP_BAR, BAR_RIGHT, 13);
         wk->pageStep = PAGE_STEP_WAIT_RIGHT;
         GFL_SndSEPlay(SEQ_SE_SELECT1);
-    } else if (action == 3) {
+    } else if (action == PAGE_ACTION_RETURN) {
         wk->nextPageState = PAGE_STATE_ENTER_LIST;
         PkwdBook_PlayAnim(wk, GROUP_BAR, BAR_RETURN, 9);
         wk->pageStep = PAGE_STEP_WAIT_RETURN;
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        if (touch == 2) {
+        if (touch == PAGE_TOUCH_RETURN) {
             GCTX_HIDSetUsingTouch(TRUE);
         } else {
             GCTX_HIDSetUsingTouch(FALSE);
@@ -2198,45 +2233,45 @@ static void PkwdBook_LeavePokemon(PkwdBookWork *wk) {
 }
 
 static void PkwdBook_PokemonInput(PkwdBookWork *wk) {
-    s32 action = 0;
+    s32 action = PAGE_ACTION_NONE;
     s32 touch;
 
     if (!PrintQueue_IsEmpty(wk->printQueue)) {
         return;
     }
     touch = PkwdBook_ReadTouch(wk, wk->page);
-    if (touch == 0) {
-        action = 1;
-    } else if (touch == 1) {
-        action = 2;
-    } else if (touch == 2) {
-        action = 3;
+    if (touch == PAGE_TOUCH_LEFT) {
+        action = PAGE_ACTION_LEFT;
+    } else if (touch == PAGE_TOUCH_RIGHT) {
+        action = PAGE_ACTION_RIGHT;
+    } else if (touch == PAGE_TOUCH_RETURN) {
+        action = PAGE_ACTION_RETURN;
     }
-    if (action == 0) {
+    if (action == PAGE_ACTION_NONE) {
         if (GCTX_HIDGetPressedKeys() & PAD_KEY_LEFT) {
-            action = 1;
+            action = PAGE_ACTION_LEFT;
         } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_RIGHT) {
-            action = 2;
+            action = PAGE_ACTION_RIGHT;
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-            action = 3;
+            action = PAGE_ACTION_RETURN;
         }
     }
-    if (action == 1) {
+    if (action == PAGE_ACTION_LEFT) {
         wk->nextPageState = PAGE_STATE_ENTER_CAST;
         PkwdBook_PlayAnim(wk, GROUP_BAR, BAR_LEFT, 12);
         wk->pageStep = PAGE_STEP_WAIT_LEFT;
         GFL_SndSEPlay(SEQ_SE_SELECT1);
-    } else if (action == 2) {
+    } else if (action == PAGE_ACTION_RIGHT) {
         wk->nextPageState = PAGE_STATE_ENTER_CAST;
         PkwdBook_PlayAnim(wk, GROUP_BAR, BAR_RIGHT, 13);
         wk->pageStep = PAGE_STEP_WAIT_RIGHT;
         GFL_SndSEPlay(SEQ_SE_SELECT1);
-    } else if (action == 3) {
+    } else if (action == PAGE_ACTION_RETURN) {
         wk->nextPageState = PAGE_STATE_ENTER_LIST;
         PkwdBook_PlayAnim(wk, GROUP_BAR, BAR_RETURN, 9);
         wk->pageStep = PAGE_STEP_WAIT_RETURN;
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        if (touch == 2) {
+        if (touch == PAGE_TOUCH_RETURN) {
             GCTX_HIDSetUsingTouch(TRUE);
         } else {
             GCTX_HIDSetUsingTouch(FALSE);
@@ -2269,11 +2304,11 @@ static void PkwdBook_PrintPokemon(PkwdBookWork *wk, BOOL keepLabels) {
     GFL_StrBufFree(nameFormat);
     sexMessage = 1;
     color = PRINT_COLOR(6, 5, 0);
-    if (wk->cast[wk->castIdx].sex == 1) {
+    if (wk->cast[wk->castIdx].sex == GENDER_FEMALE) {
         sexMessage = 2;
         color = PRINT_COLOR(4, 3, 0);
     }
-    if (wk->cast[wk->castIdx].sex != 2) {
+    if (wk->cast[wk->castIdx].sex != GENDER_UNKNOWN) {
         StrBuf *mark = GFL_MsgDataLoadStrbufNew(wk->msgData[MSG_LINES], sPkwdBookPokemonMessages[sexMessage]);
 
         PkwdBook_PrintText(wk, TRUE, 1, 62, 0, mark, PRINT_ALIGN_LEFT, (u16)color, TRUE);
@@ -2623,7 +2658,7 @@ static s32 PkwdBook_UpdateList(PkwdBookWork *wk) {
 // Acts on what the list returned. Returns 1 when the cursor moved or the list scrolled, 2 when a movie was picked
 // and 3 for FRAMELIST_CURSOR_SHOWN, else 0
 static s32 PkwdBook_HandleListResult(PkwdBookWork *wk, u32 result) {
-    s32 action = 0;
+    s32 action = LIST_RESULT_NONE;
     BOOL moved = FALSE;
 
     switch (result) {
@@ -2634,33 +2669,33 @@ static s32 PkwdBook_HandleListResult(PkwdBookWork *wk, u32 result) {
     case 4:
     case 5:
     case 6:
-        action = 2;
+        action = LIST_RESULT_PICKED;
         break;
     case FRAMELIST_PAGE_UP:
     case FRAMELIST_CURSOR_TOP:
         wk->flags |= FLAG_PAGE_UP;
-        action = 1;
+        action = LIST_RESULT_MOVED;
         break;
     case FRAMELIST_PAGE_DOWN:
     case FRAMELIST_CURSOR_BOTTOM:
         wk->flags |= FLAG_PAGE_DOWN;
-        action = 1;
+        action = LIST_RESULT_MOVED;
         break;
     case FRAMELIST_JUMP_TOP:
     case FRAMELIST_JUMP_BOTTOM:
-        action = 1;
+        action = LIST_RESULT_MOVED;
         moved = TRUE;
         break;
     case FRAMELIST_BAR:
     case FRAMELIST_SCROLL:
     case FRAMELIST_CURSOR_MOVE:
-        action = 1;
+        action = LIST_RESULT_MOVED;
         break;
     case FRAMELIST_CURSOR_SHOWN:
-        action = 3;
+        action = LIST_RESULT_CURSOR_SHOWN;
         break;
     }
-    if (action == 1) {
+    if (action == LIST_RESULT_MOVED) {
         wk->pageStep = PAGE_STEP_LIST_SCROLL;
         if (wk->flags & FLAG_PAGE_UP) {
             PkwdBook_PlayAnim(wk, GROUP_BAR, BAR_LEFT, 12);
@@ -2671,7 +2706,7 @@ static s32 PkwdBook_HandleListResult(PkwdBookWork *wk, u32 result) {
             FrameList_SetCursor(wk->list, FrameList_GetCursor(wk->list));
             PkwdBook_UpdateNewMarks(wk, TRUE);
         }
-    } else if (action == 2) {
+    } else if (action == LIST_RESULT_PICKED) {
         PkwdBook_SaveListPos(wk);
         wk->pageStep = PAGE_STEP_LIST_WAIT_PRINT;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -2679,7 +2714,7 @@ static s32 PkwdBook_HandleListResult(PkwdBookWork *wk, u32 result) {
         FrameList_SetRowPalette(wk->list, (u16)wk->cursorPos, 1);
         PkwdBook_SetArrows(wk, 0, wk->movieCount - 1, wk->selected);
     }
-    if (action != 0 && action != 2) {
+    if (action != LIST_RESULT_NONE && action != LIST_RESULT_PICKED) {
         PkwdBook_ShowMovie(wk, FALSE);
     }
     return action;
