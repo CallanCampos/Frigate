@@ -280,12 +280,12 @@ AppTaskMenu *GtsNegoMessage_CreateYesNo(GtsNegoMessage *msg, u32 layout) {
     init.itemCount = NELEMS(msg->items);
     init.items = msg->items;
     switch (layout) {
-    case 0:
+    case GTSNEGO_MENU_HIGH:
         init.x = 32;
         init.y = 14;
         init.posType = APP_TASKMENU_POS_BOTTOM_RIGHT;
         break;
-    case 1:
+    case GTSNEGO_MENU_LOW:
         init.x = 32;
         init.y = 24;
         init.posType = APP_TASKMENU_POS_BOTTOM_RIGHT;
@@ -602,12 +602,12 @@ AppTaskMenu *GtsNegoMessage_CreateConfirm(GtsNegoMessage *msg, u32 layout) {
     init.itemCount = NELEMS(msg->items);
     init.items = msg->items;
     switch (layout) {
-    case 0:
+    case GTSNEGO_MENU_HIGH:
         init.x = 32;
         init.y = 14;
         init.posType = APP_TASKMENU_POS_BOTTOM_RIGHT;
         break;
-    case 1:
+    case GTSNEGO_MENU_LOW:
         init.x = 32;
         init.y = 24;
         init.posType = APP_TASKMENU_POS_BOTTOM_RIGHT;

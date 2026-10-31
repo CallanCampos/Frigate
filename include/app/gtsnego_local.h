@@ -139,6 +139,12 @@ void GtsNegoMessage_Print(GtsNegoMessage *msg, u32 msgNo);
 void GtsNegoMessage_PrintShort(GtsNegoMessage *msg, u32 msgNo);
 BOOL GtsNegoMessage_IsDone(GtsNegoMessage *msg);
 void GtsNegoMessage_ClearWindow(GtsNegoMessage *msg);
+// The heights that the yes/no menu is at
+enum {
+    GTSNEGO_MENU_HIGH,
+    GTSNEGO_MENU_LOW,
+};
+
 // The yes/no menu, at one of two heights
 AppTaskMenu *GtsNegoMessage_CreateYesNo(GtsNegoMessage *msg, u32 layout);
 void GtsNegoMessage_UpdateButtons(GtsNegoMessage *msg);
