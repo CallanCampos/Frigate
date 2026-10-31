@@ -18,6 +18,39 @@ enum {
 // A wait that takes longer than this many frames times out
 #define DOWNLOAD_TIMEOUT 7200
 
+// The steps of the commands that download a file out of a list, a file by its name, and the beacons
+enum {
+    FILE_LIST_INIT,
+    FILE_LIST_SET_ATTR,
+    FILE_LIST_COUNT,
+    FILE_LIST_GET_LIST,
+    FILE_LIST_PICK,
+    FILE_LIST_GET_FILE,
+    FILE_LIST_RECEIVE,
+    FILE_LIST_CANCEL,
+    FILE_LIST_CLEANED,
+    FILE_LIST_FREE,
+};
+
+enum {
+    FILE_INIT,
+    FILE_SET_ATTR,
+    FILE_GET_FILE,
+    FILE_RECEIVE,
+    FILE_CANCEL,
+    FILE_CLEANED,
+    FILE_FREE,
+};
+
+enum {
+    BEACON_INIT,
+    BEACON_WAIT_NET,
+    BEACON_RECEIVE,
+    BEACON_END,
+    BEACON_WAIT_NET_END,
+    BEACON_DONE,
+};
+
 typedef BOOL (*NetCommonDownloadHandler)(NetCommonDownload *download, u32 *state);
 
 // What the download library is doing
@@ -76,7 +109,7 @@ static BOOL NetCommonDownload_Idle(NetCommonDownload *download, u32 *state);
 static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 *state);
 static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *state);
 static BOOL NetCommonDownload_ReceiveBeacons(NetCommonDownload *download, u32 *state);
-static u32 NetCommonDownload_OnDwcEvent(void *work, int a1, int event, int a3);
+static u32 NetCommonDownload_OnDwcEvent(void *work, int code, int event, int error);
 static void NetCommonDownload_AllocFileList(NetCommonDownloadSession *session,
                                             const NetCommonDownloadFileListArgs *args, HeapID heapId);
 static void NetCommonDownload_AllocFile(NetCommonDownloadSession *session, const NetCommonDownloadFileArgs *args,
@@ -233,49 +266,49 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
     u32 i;
 
     switch (*state) {
-    case 0:
+    case FILE_LIST_INIT:
         DWCRap_SetEventFunc(NetCommonDownload_OnDwcEvent, session);
         NetCommonDownload_AllocFileList(session, args, download->param.heapId);
         download->status = NET_COMMON_DOWNLOAD_STATUS_NONE;
         if (!DWC_NdInitAsync(NetCommonDownload_OnNdEvent, "IRAO", "WX9x7Zh6J3aBC4zQ")) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_ERROR;
-            *state = 9;
+            *state = FILE_LIST_FREE;
             break;
         }
         session->initialized = TRUE;
-        NetCommonDownload_Wait(session, state, 1);
+        NetCommonDownload_Wait(session, state, FILE_LIST_SET_ATTR);
         break;
-    case 1:
+    case FILE_LIST_SET_ATTR:
         if (session->cancelled) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_CANCELLED;
-            NetCommonDownload_Cleanup(session, 3, state, 7, 7);
+            NetCommonDownload_Cleanup(session, 3, state, FILE_LIST_CANCEL, FILE_LIST_CANCEL);
             break;
         }
         if (!DWC_NdSetAttr(args->attr1, args->attr2, args->attr3)) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_ERROR;
-            NetCommonDownload_Cleanup(session, 4, state, 9, 9);
+            NetCommonDownload_Cleanup(session, 4, state, FILE_LIST_FREE, FILE_LIST_FREE);
             break;
         }
-        *state = 3;
+        *state = FILE_LIST_GET_LIST;
         break;
-    case 3:
+    case FILE_LIST_GET_LIST:
         if (!DWC_NdGetFileListAsync(session->files, 0, args->fileCount)) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_ERROR;
-            NetCommonDownload_Cleanup(session, 4, state, 9, 9);
+            NetCommonDownload_Cleanup(session, 4, state, FILE_LIST_FREE, FILE_LIST_FREE);
             break;
         }
-        NetCommonDownload_Wait(session, state, 2);
+        NetCommonDownload_Wait(session, state, FILE_LIST_COUNT);
         break;
-    case 2:
+    case FILE_LIST_COUNT:
         session->count = 0;
         for (i = 0; i < args->fileCount; i++) {
             if (!NetCommonDownload_IsZero((u32 *)&session->files[i], sizeof(DWCNdFileInfo))) {
                 session->count++;
             }
         }
-        *state = 4;
+        *state = FILE_LIST_PICK;
         break;
-    case 4:
+    case FILE_LIST_PICK:
         if (session->count == 1) {
             for (i = 0; i < args->fileCount; i++) {
                 if (!NetCommonDownload_IsZero((u32 *)&session->files[i], sizeof(DWCNdFileInfo))) {
@@ -287,35 +320,35 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
             session->selected = args->select(session->files, args->fileCount);
         } else {
             download->status = NET_COMMON_DOWNLOAD_STATUS_NO_FILE;
-            NetCommonDownload_Cleanup(session, 1, state, 8, 8);
+            NetCommonDownload_Cleanup(session, 1, state, FILE_LIST_CLEANED, FILE_LIST_CLEANED);
             break;
         }
-        *state = 5;
+        *state = FILE_LIST_GET_FILE;
         break;
-    case 5:
+    case FILE_LIST_GET_FILE:
         if (!DWC_NdGetFileAsync(&session->files[session->selected], download->data,
                                 session->files[session->selected].size)) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_ERROR;
-            NetCommonDownload_Cleanup(session, 4, state, 9, 9);
+            NetCommonDownload_Cleanup(session, 4, state, FILE_LIST_FREE, FILE_LIST_FREE);
             break;
         }
         session->percent = 0;
         sNdState.ready = FALSE;
         sNdState.error = 0;
         session->timeout = 0;
-        *state = 6;
+        *state = FILE_LIST_RECEIVE;
         break;
-    case 6:
+    case FILE_LIST_RECEIVE:
         NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
             NetState_RecordError(0, 0, 0, 1013);
             download->status = NET_COMMON_DOWNLOAD_STATUS_TIMEOUT;
-            NetCommonDownload_Cleanup(session, 3, state, 7, 7);
+            NetCommonDownload_Cleanup(session, 3, state, FILE_LIST_CANCEL, FILE_LIST_CANCEL);
         }
         if (!sNdState.ready) {
             if (session->cancel) {
                 download->status = NET_COMMON_DOWNLOAD_STATUS_CANCELLED;
-                NetCommonDownload_Cleanup(session, 3, state, 7, 7);
+                NetCommonDownload_Cleanup(session, 3, state, FILE_LIST_CANCEL, FILE_LIST_CANCEL);
                 break;
             }
             if (DWC_NdGetProgress(&session->received, &session->contentLength) == TRUE) {
@@ -327,23 +360,23 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
             }
         } else if (sNdState.error != 0) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_ERROR;
-            NetCommonDownload_Cleanup(session, 4, state, 9, 9);
+            NetCommonDownload_Cleanup(session, 4, state, FILE_LIST_FREE, FILE_LIST_FREE);
         } else if (!session->cancelled) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_DONE;
-            NetCommonDownload_Cleanup(session, 1, state, 8, 8);
+            NetCommonDownload_Cleanup(session, 1, state, FILE_LIST_CLEANED, FILE_LIST_CLEANED);
         } else {
             download->status = NET_COMMON_DOWNLOAD_STATUS_CANCELLED;
-            NetCommonDownload_Cleanup(session, 3, state, 8, 8);
+            NetCommonDownload_Cleanup(session, 3, state, FILE_LIST_CLEANED, FILE_LIST_CLEANED);
         }
         break;
-    case 7:
+    case FILE_LIST_CANCEL:
         DWC_NdCancelAsync();
-        *state = 8;
+        *state = FILE_LIST_CLEANED;
         break;
-    case 8:
-        *state = 9;
+    case FILE_LIST_CLEANED:
+        *state = FILE_LIST_FREE;
         break;
-    case 9:
+    case FILE_LIST_FREE:
         NetCommonDownload_FreeSession(session);
         DWCRap_SetEventFunc(NULL, NULL);
         session->initialized = FALSE;
@@ -353,13 +386,13 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
             NetState_RecordError(0, 0, 0, 1013);
             download->status = NET_COMMON_DOWNLOAD_STATUS_TIMEOUT;
-            NetCommonDownload_Cleanup(session, 3, state, 9, 9);
+            NetCommonDownload_Cleanup(session, 3, state, FILE_LIST_FREE, FILE_LIST_FREE);
         }
         if (sNdState.ready) {
             sNdState.ready = FALSE;
             if (sNdState.error != 0) {
                 download->status = NET_COMMON_DOWNLOAD_STATUS_ERROR;
-                NetCommonDownload_Cleanup(session, 3, state, 9, 9);
+                NetCommonDownload_Cleanup(session, 3, state, FILE_LIST_FREE, FILE_LIST_FREE);
                 break;
             }
             *state = session->nextState;
@@ -394,54 +427,54 @@ static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *sta
     const NetCommonDownloadFileArgs *args = NetCommonDownload_GetArgs(download);
 
     switch (*state) {
-    case 0:
+    case FILE_INIT:
         DWCRap_SetEventFunc(NetCommonDownload_OnDwcEvent, session);
         NetCommonDownload_AllocFile(session, args, download->param.heapId);
         download->status = NET_COMMON_DOWNLOAD_STATUS_NONE;
         if (!DWC_NdInitAsync(NetCommonDownload_OnNdEvent, "IRAO", "WX9x7Zh6J3aBC4zQ")) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_ERROR;
-            *state = 6;
+            *state = FILE_FREE;
             break;
         }
         session->initialized = TRUE;
-        NetCommonDownload_Wait(session, state, 1);
+        NetCommonDownload_Wait(session, state, FILE_SET_ATTR);
         break;
-    case 1:
+    case FILE_SET_ATTR:
         if (session->cancelled) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_CANCELLED;
-            NetCommonDownload_Cleanup(session, 3, state, 4, 4);
+            NetCommonDownload_Cleanup(session, 3, state, FILE_CANCEL, FILE_CANCEL);
             break;
         }
         if (!DWC_NdSetAttr("", "", "")) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_ERROR;
-            NetCommonDownload_Cleanup(session, 4, state, 6, 6);
+            NetCommonDownload_Cleanup(session, 4, state, FILE_FREE, FILE_FREE);
             break;
         }
-        *state = 2;
+        *state = FILE_GET_FILE;
         break;
-    case 2:
+    case FILE_GET_FILE:
         if (!DWC_NdGetFileAsync(session->files, download->data, session->files->size)) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_ERROR;
-            NetCommonDownload_Cleanup(session, 4, state, 6, 6);
+            NetCommonDownload_Cleanup(session, 4, state, FILE_FREE, FILE_FREE);
             break;
         }
         session->percent = 0;
         sNdState.ready = FALSE;
         sNdState.error = 0;
         session->timeout = 0;
-        *state = 3;
+        *state = FILE_RECEIVE;
         break;
-    case 3:
+    case FILE_RECEIVE:
         NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
             NetState_RecordError(0, 0, 0, 1013);
             download->status = NET_COMMON_DOWNLOAD_STATUS_TIMEOUT;
-            NetCommonDownload_Cleanup(session, 3, state, 4, 4);
+            NetCommonDownload_Cleanup(session, 3, state, FILE_CANCEL, FILE_CANCEL);
         }
         if (!sNdState.ready) {
             if (session->cancel) {
                 download->status = NET_COMMON_DOWNLOAD_STATUS_CANCELLED;
-                NetCommonDownload_Cleanup(session, 3, state, 4, 4);
+                NetCommonDownload_Cleanup(session, 3, state, FILE_CANCEL, FILE_CANCEL);
                 break;
             }
             if (DWC_NdGetProgress(&session->received, &session->contentLength) == TRUE) {
@@ -453,23 +486,23 @@ static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *sta
             }
         } else if (sNdState.error != 0) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_ERROR;
-            NetCommonDownload_Cleanup(session, 4, state, 6, 6);
+            NetCommonDownload_Cleanup(session, 4, state, FILE_FREE, FILE_FREE);
         } else if (!session->cancelled) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_DONE;
-            NetCommonDownload_Cleanup(session, 1, state, 5, 5);
+            NetCommonDownload_Cleanup(session, 1, state, FILE_CLEANED, FILE_CLEANED);
         } else {
             download->status = NET_COMMON_DOWNLOAD_STATUS_CANCELLED;
-            NetCommonDownload_Cleanup(session, 3, state, 5, 5);
+            NetCommonDownload_Cleanup(session, 3, state, FILE_CLEANED, FILE_CLEANED);
         }
         break;
-    case 4:
+    case FILE_CANCEL:
         DWC_NdCancelAsync();
-        *state = 5;
+        *state = FILE_CLEANED;
         break;
-    case 5:
-        *state = 6;
+    case FILE_CLEANED:
+        *state = FILE_FREE;
         break;
-    case 6:
+    case FILE_FREE:
         NetCommonDownload_FreeSession(session);
         DWCRap_SetEventFunc(NULL, NULL);
         session->initialized = FALSE;
@@ -479,13 +512,13 @@ static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *sta
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
             NetState_RecordError(0, 0, 0, 1013);
             download->status = NET_COMMON_DOWNLOAD_STATUS_TIMEOUT;
-            NetCommonDownload_Cleanup(session, 3, state, 6, 6);
+            NetCommonDownload_Cleanup(session, 3, state, FILE_FREE, FILE_FREE);
         }
         if (sNdState.ready) {
             sNdState.ready = FALSE;
             if (sNdState.error != 0) {
                 download->status = NET_COMMON_DOWNLOAD_STATUS_ERROR;
-                NetCommonDownload_Cleanup(session, 3, state, 6, 6);
+                NetCommonDownload_Cleanup(session, 3, state, FILE_FREE, FILE_FREE);
                 break;
             }
             *state = session->nextState;
@@ -520,7 +553,7 @@ static BOOL NetCommonDownload_ReceiveBeacons(NetCommonDownload *download, u32 *s
     DeliveryInit init;
 
     switch (*state) {
-    case 0:
+    case BEACON_INIT:
         MI_CpuFill8(&init, 0, sizeof(DeliveryInit));
         init.code = args->code;
         init.data[0].datasize = args->dataSize;
@@ -536,32 +569,32 @@ static BOOL NetCommonDownload_ReceiveBeacons(NetCommonDownload *download, u32 *s
         download->status = NET_COMMON_DOWNLOAD_STATUS_NONE;
         (*state)++;
         break;
-    case 1:
+    case BEACON_WAIT_NET:
         if (GFL_NetIsInitialized()) {
             GFL_NetSetIconScreen(TRUE, download->param.heapId);
             (*state)++;
         }
         break;
-    case 2:
+    case BEACON_RECEIVE:
         DeliveryBeacon_Main(download->beacon);
         if (DeliveryBeacon_IsReceiveDone(download->beacon)) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_DONE;
-            *state = 3;
+            *state = BEACON_END;
         } else if (download->stopBeacon) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_CANCELLED;
-            *state = 3;
+            *state = BEACON_END;
         }
         break;
-    case 3:
+    case BEACON_END:
         DeliveryBeacon_End(download->beacon);
         (*state)++;
         break;
-    case 4:
+    case BEACON_WAIT_NET_END:
         if (GFL_NetIsNotInitialized()) {
             (*state)++;
         }
         break;
-    case 5:
+    case BEACON_DONE:
         return TRUE;
     }
     return FALSE;
@@ -583,7 +616,7 @@ static BOOL NetCommonDownload_CanRequest(NetCommonDownload *download, unsigned i
     return allowed;
 }
 
-static u32 NetCommonDownload_OnDwcEvent(void *work, int a1, int event, int a3) {
+static u32 NetCommonDownload_OnDwcEvent(void *work, int code, int event, int error) {
     NetCommonDownloadSession *session = work;
 
     switch (event) {
