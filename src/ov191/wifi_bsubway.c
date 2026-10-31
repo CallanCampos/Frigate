@@ -1103,7 +1103,7 @@ static u32 WifiBSubway_GetCodeInNumber(WifiBSubwayWork *wk) {
 static void WifiBSubway_CallLogin(WifiBSubwayWork *wk) {
     wk->login.gameData = wk->gameData;
     wk->login.unk4 = 0;
-    wk->login.unk18 = TRUE;
+    wk->login.keepBgm = TRUE;
     wk->login.unk8 = 1;
     wk->login.unkC = 0x2c;
     wk->login.buffer = wk->loginBuffer;
@@ -1121,7 +1121,7 @@ static void WifiBSubway_CallLogout(WifiBSubwayWork *wk) {
     wk->logout.gameData = wk->gameData;
     wk->logout.unk4 = 0;
     wk->logout.unk8 = 1;
-    wk->logout.unkC = 1;
+    wk->logout.keepBgm = 1;
     GSYS_QueueProc(wk->param->gsys, OVERLAY_WIFILOGIN, &WIFILOGOUT_PROC_FUNCTIONS, &wk->logout);
 }
 

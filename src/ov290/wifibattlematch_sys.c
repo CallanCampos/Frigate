@@ -910,7 +910,7 @@ static void *WifiBattleMatchSys_CreateLogoutParam(WifiBattleMatchChain *chain, H
     param->unk4 = 0;
     param->unk8 = 1;
     if (sys->unk24) {
-        param->unk10 = 0x12;
+        param->wipeFlags = 0x12;
     }
     return param;
 }

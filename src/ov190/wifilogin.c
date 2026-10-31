@@ -11,6 +11,7 @@
 #include "constants/sound.h"
 #include "constants/text_banks.h"
 #include "dwc/dwc.h"
+#include "gfl/backup_system.h"
 #include "gfl/dwc_rap.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
@@ -261,8 +262,8 @@ static void WifiLogin_CheckLoggedIn(WifiLoginWork *work) {
 static void WifiLogin_StateWaitSave(WifiLoginWork *work) {
     if (DWCRap_IsUserDataDirty()) {
         switch (GameData_UpdateSave(work->gameData)) {
-        case 0:
-        case 1:
+        case SAVE_RESULT_CONTINUE:
+        case SAVE_RESULT_LAST:
             return;
         }
         DWCRap_ClearUserDataDirty();
@@ -297,12 +298,12 @@ static void WifiLogin_StateStartNet(WifiLoginWork *work) {
     } else {
         sNetInit.wifiHeapSize = 0x5e400;
     }
-    if (work->param->unkC == 0x2c) {
+    if (work->param->unkC == WIFILOGIN_SERVICE_BATTLE_SUBWAY) {
         sNetInit.wifiHeapSize = 0x50000;
-    } else if (work->param->unkC == 0x24) {
+    } else if (work->param->unkC == WIFILOGIN_SERVICE_WIFI_BATTLE_MATCH) {
         sNetInit.wifiHeapSize = 0x6e000;
     }
-    if (work->param->unkC != 0xa) {
+    if (work->param->unkC != WIFILOGIN_SERVICE_WIFI_CLUB) {
         sNetInit.getFriendData = NULL;
     }
     sNetInit.gameCommandBase = work->param->unkC;
@@ -358,7 +359,7 @@ static void WifiLogin_StateWaitConfirmRetry(WifiLoginWork *work) {
 
 static void WifiLogin_StateOpenConfirmStart(WifiLoginWork *work) {
     if (GFL_WipeIsFinished() && WifiLoginMessage_IsDone(work->msg)) {
-        work->menu = WifiLoginMessage_CreateMenu(work->msg, 1, work->param->unk4 == 0, 0);
+        work->menu = WifiLoginMessage_CreateMenu(work->msg, WIFILOGIN_MENU_LAYOUT_LOW, work->param->unk4 == 0, 0);
         WifiLogin_SetState(work, WifiLogin_StateWaitConfirmStart);
     }
 }
@@ -366,7 +367,7 @@ static void WifiLogin_StateOpenConfirmStart(WifiLoginWork *work) {
 static void WifiLogin_StateOpenConfirmError(WifiLoginWork *work) {
     if (GFL_WipeIsFinished()) {
         WifiLoginMessage_ClearTitle(work->msg);
-        work->menu = WifiLoginMessage_CreateMenu(work->msg, 1, work->param->unk4 == 0, 0);
+        work->menu = WifiLoginMessage_CreateMenu(work->msg, WIFILOGIN_MENU_LAYOUT_LOW, work->param->unk4 == 0, 0);
         WifiLogin_SetState(work, WifiLogin_StateWaitConfirmRetry);
     }
 }
@@ -375,12 +376,12 @@ static void WifiLogin_StateOpenConfirmError(WifiLoginWork *work) {
 static BOOL WifiLogin_CheckNetError(WifiLoginWork *work) {
     if (GFL_NetErrCheck()) {
         switch (NetState_GetErrorInfo()->errorType) {
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-        case 6:
+        case DWC_ETYPE_LIGHT:
+        case DWC_ETYPE_SHOW_ERROR:
+        case DWC_ETYPE_SHUTDOWN_FM:
+        case DWC_ETYPE_SHUTDOWN_GHTTP:
+        case DWC_ETYPE_SHUTDOWN_ND:
+        case DWC_ETYPE_DISCONNECT:
             WifiLoginMessage_ClearNotice(work->msg);
             WifiLoginMessage_ClearTitle(work->msg);
             WifiLoginMessage_ClearWindow(work->msg);
@@ -395,7 +396,7 @@ static BOOL WifiLogin_CheckNetError(WifiLoginWork *work) {
             WifiLoginMessage_PrintNotice(work->msg, WifiError_Text_DisconnectedFromNintendoWi);
             WifiLogin_SetState(work, WifiLogin_StateOpenConfirmError);
             return TRUE;
-        case 7:
+        case DWC_ETYPE_FATAL:
             GFL_NetErrAbort();
             break;
         }
@@ -405,7 +406,7 @@ static BOOL WifiLogin_CheckNetError(WifiLoginWork *work) {
 
 static void WifiLogin_StateOpenYesNo(WifiLoginWork *work) {
     if (GFL_WipeIsFinished() && WifiLoginMessage_IsDone(work->msg)) {
-        work->menu = WifiLoginMessage_CreateMenu(work->msg, 0, work->param->unk4 == 0, 0);
+        work->menu = WifiLoginMessage_CreateMenu(work->msg, WIFILOGIN_MENU_LAYOUT_HIGH, work->param->unk4 == 0, 0);
         WifiLogin_SetState(work, WifiLogin_StateWaitConfirmRetry);
     }
 }
@@ -435,7 +436,7 @@ static void WifiLogin_StateWaitResetConfirm(WifiLoginWork *work) {
 }
 
 static void WifiLogin_StateOpenResetConfirm(WifiLoginWork *work) {
-    work->menu = WifiLoginMessage_CreateMenu(work->msg, 1, work->param->unk4 == 0, 1);
+    work->menu = WifiLoginMessage_CreateMenu(work->msg, WIFILOGIN_MENU_LAYOUT_LOW, work->param->unk4 == 0, 1);
     WifiLogin_SetState(work, WifiLogin_StateWaitResetConfirm);
 }
 
@@ -472,7 +473,7 @@ static void WifiLogin_StateWaitProfileConfirm(WifiLoginWork *work) {
 }
 
 static void WifiLogin_StateOpenProfileConfirm(WifiLoginWork *work) {
-    work->menu = WifiLoginMessage_CreateMenu(work->msg, 1, work->param->unk4 == 0, 1);
+    work->menu = WifiLoginMessage_CreateMenu(work->msg, WIFILOGIN_MENU_LAYOUT_LOW, work->param->unk4 == 0, 1);
     WifiLogin_SetState(work, WifiLogin_StateWaitProfileConfirm);
 }
 
@@ -497,7 +498,7 @@ static void WifiLogin_StateWaitFixConfirm(WifiLoginWork *work) {
 }
 
 static void WifiLogin_StateOpenFixConfirm(WifiLoginWork *work) {
-    work->menu = WifiLoginMessage_CreateMenu(work->msg, 1, work->param->unk4 == 0, 1);
+    work->menu = WifiLoginMessage_CreateMenu(work->msg, WIFILOGIN_MENU_LAYOUT_LOW, work->param->unk4 == 0, 1);
     WifiLogin_SetState(work, WifiLogin_StateWaitFixConfirm);
 }
 
@@ -574,18 +575,18 @@ static void WifiLogin_StateWaitFadeOut(WifiLoginWork *work) {
 
 // Calls the caller's callback until it is done, then fades out
 static void WifiLogin_StateRunCallback(WifiLoginWork *work) {
-    if (work->param->unk20 != NULL && work->param->result == 0) {
-        int status = work->param->unk20(work->msg, work->param->unk24);
+    if (work->param->callback != NULL && work->param->result == 0) {
+        int status = work->param->callback(work->msg, work->param->callbackData);
 
-        if (status == 2) {
+        if (status == WIFILOGIN_CALLBACK_RUNNING) {
             return;
         }
         switch (status) {
-        case 0:
+        case WIFILOGIN_CALLBACK_DONE:
             work->param->result = 0;
             WifiLogin_SetState(work, WifiLogin_StateStartFadeOut);
             break;
-        case 1:
+        case WIFILOGIN_CALLBACK_ERROR:
             work->param->result = 1;
             WifiLoginMessage_ClearNotice(work->msg);
             WifiLoginMessage_ClearTitle(work->msg);
@@ -607,7 +608,7 @@ static void WifiLogin_StateRunCallback(WifiLoginWork *work) {
 
 static void WifiLogin_StateStartFadeOut(WifiLoginWork *work) {
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 6, 1, work->heapId);
-    if (work->param->unk4 == 0 && work->param->unk18 == 0) {
+    if (work->param->unk4 == 0 && work->param->keepBgm == 0) {
         GFL_SndBGMFadeOut(8);
     }
     WifiLogin_SetState(work, WifiLogin_StateWaitFadeOut);
@@ -632,9 +633,10 @@ static void WifiLogin_StateWaitConnect(WifiLoginWork *work) {
     if (!WifiLogin_CheckNetError(work)) {
         int connection = DWC_SVLProcess();
 
-        if (connection == 3) {
+        if (connection == DWC_SVL_STATE_SUCCESS) {
             WifiLogin_SetState(work, WifiLogin_StateRunCallback);
-        } else if (connection == 4 || connection == 0 || connection == 5) {
+        } else if (connection == DWC_SVL_STATE_ERROR || connection == DWC_SVL_STATE_DIRTY ||
+                   connection == DWC_SVL_STATE_CANCELED) {
             WifiLogin_CheckNetError(work);
         }
     }
@@ -666,10 +668,10 @@ static BOOL WifiLoginProc_Init(GameProc *proc, u32 *state, void *param, void *wo
     WifiLogin_SetState(wk, WifiLogin_StateCheckStart);
     if (wk->param->unk4 == 0) {
         WifiLoginMessage_PrintTitle(wk->msg, WIFILOGIN_TITLE_MSG);
-        if (wk->param->unk18 == 0) {
+        if (wk->param->keepBgm == 0) {
             GFL_SndBGMPlay(SEQ_BGM_WIFI_ACCESS, SND_CHANNEL_MASK_ALL);
         }
-    } else if (wk->param->unk18 == 0) {
+    } else if (wk->param->keepBgm == 0) {
         GFL_SndBGMPlay(SEQ_BGM_GAME_SYNC, SND_CHANNEL_MASK_ALL);
     }
     return TRUE;

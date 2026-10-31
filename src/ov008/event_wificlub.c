@@ -253,7 +253,7 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         wk->login.unk8 = 1;
         wk->login.unk4 = 0;
         wk->login.unkC = 10;
-        wk->login.unk18 = 1;
+        wk->login.keepBgm = 1;
         GFL_SndBGMPlay(SEQ_BGM_WIFI_ACCESS, SND_CHANNEL_MASK_ALL);
         wk->procManager = CreateGameProcManager(HEAPID_GAMEEVENT);
         QueueGameProc(wk->procManager, OVERLAY_WIFILOGIN, &WIFILOGIN_PROC_FUNCTIONS, &wk->login);
@@ -283,8 +283,8 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         wk->logout.gameData = GSYS_GetGameData(gsys);
         wk->logout.unk8 = 1;
         wk->logout.unk4 = 0;
-        wk->logout.unkC = 1;
-        wk->logout.unk10 = 0;
+        wk->logout.keepBgm = 1;
+        wk->logout.wipeFlags = 0;
         wk->logout.unk14 = 0;
         wk->logout.unk18 = 0;
         wk->procManager = CreateGameProcManager(HEAPID_GAMEEVENT);

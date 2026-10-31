@@ -1060,7 +1060,7 @@ static void DataConvert_SeqWifiLogin(KeySystemSeq *seq, int *state, void *work) 
         param->unk4 = 0;
         param->unk8 = 1;
         param->buffer = wk->loginBuffer;
-        param->unk18 = 0;
+        param->keepBgm = 0;
         param->unkC = 0x38;
         if (SaveControl_IsDataAlreadyPresent(GameData_GetSaveControl(wk->param->gameData))) {
             param->unk14 = 0;
@@ -1105,8 +1105,8 @@ static void DataConvert_SeqWifiLogout(KeySystemSeq *seq, int *state, void *work)
         param->gameData = wk->param->gameData;
         param->unk4 = 0;
         param->unk8 = 1;
-        param->unkC = 0;
-        param->unk10 = 0;
+        param->keepBgm = 0;
+        param->wipeFlags = 0;
         wk->subProcParam = param;
         GCTX_ProcMgrQueueProc(OVERLAY_ID(190), &WIFILOGOUT_PROC_FUNCTIONS, param);
         (*state)++;
