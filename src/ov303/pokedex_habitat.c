@@ -1267,7 +1267,7 @@ static void PokedexHabitat_PrintHabitat(PokedexHabitatWork *wk) {
     StrBuf *format;
 
     if (wk->empty == FALSE) {
-        message = PokedexHabitat_GetHabitatMessage(wk->type, area->unk8);
+        message = PokedexHabitat_GetHabitatMessage(wk->type, area->landMessage);
     } else {
         message = PokedexHabitat_Text_NoPokemonLivesHere;
     }
