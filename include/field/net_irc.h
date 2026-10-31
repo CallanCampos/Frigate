@@ -13,7 +13,7 @@ void NetIrc_SetRecvCallback(GFLNetRecvFunc callback);
 void NetIrc_SetInitialized(void);
 BOOL NetIrc_IsInitialized(void);
 u8 NetIrc_GetSendTurn(void);
-u8 NetIrc_GetUnkCF0(void);
+u8 NetIrc_IsSendBlocked(void);
 BOOL NetIrc_CanSend(void);
 void NetIrc_Send(const u8 *data, u8 size, u8 cmd);
 void NetIrc_SendPending(void);

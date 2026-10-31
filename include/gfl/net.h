@@ -169,7 +169,7 @@ typedef struct {
     BOOL (*isSendTurn)(void);
     BOOL (*isPeerSeen)(void);
     BOOL (*isLinked)(void);
-    BOOL (*unkB0)(void);
+    BOOL (*isSendBlocked)(void);
     void (*startLink)(void);
     // Whether connections are accepted
     void (*setAcceptConnect)(int a0);

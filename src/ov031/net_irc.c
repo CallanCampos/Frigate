@@ -26,6 +26,9 @@ typedef struct {
     u8 data[_IRC_SEND_SIZE];
 } _NETIRC_DATA;
 
+// How many frames the link stays down before it is set up again
+#define NETIRC_RELINK_FRAMES 5
+
 typedef struct {
     // Called with each packet that came in
     GFLNetRecvFunc recvCallback;
@@ -44,7 +47,8 @@ typedef struct {
     u8 unkCD;
     // Whether this machine may send now: the machines take turns
     u8 send_turn;
-    u8 unkCF_0 : 1;
+    // Whether sending is held back, which the network system checks before it writes a packet
+    u8 sendBlocked : 1;
     u8 peerSeen : 1;
     u8 unkD0[0xc];
     u8 isParent;
@@ -127,12 +131,12 @@ u8 NetIrc_GetSendTurn(void) {
     return NetIrcSys.send_turn;
 }
 
-u8 NetIrc_GetUnkCF0(void) {
-    return NetIrcSys.unkCF_0;
+u8 NetIrc_IsSendBlocked(void) {
+    return NetIrcSys.sendBlocked;
 }
 
 BOOL NetIrc_CanSend(void) {
-    if (NetIrcSys.send_turn == TRUE && !NetIrcSys.unkCF_0 && NetIrcSys.elapsed == 0 && !NetIrcSys.sendPending) {
+    if (NetIrcSys.send_turn == TRUE && !NetIrcSys.sendBlocked && NetIrcSys.elapsed == 0 && !NetIrcSys.sendPending) {
         return TRUE;
     }
     return FALSE;
@@ -323,9 +327,9 @@ void NetIrc_Update(void) {
                 if (sys->sendPending == TRUE) {
                     sys->resend = TRUE;
                 }
-            } else if (sys->elapsed < 5) {
+            } else if (sys->elapsed < NETIRC_RELINK_FRAMES) {
                 sys->elapsed++;
-            } else if (sys->elapsed == 5) {
+            } else if (sys->elapsed == NETIRC_RELINK_FRAMES) {
                 IrcLink_Reset(3);
                 IrcLink_SetRecvCallback(NetIrc_OnFrame);
                 sys->elapsed++;
