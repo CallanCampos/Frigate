@@ -57,12 +57,12 @@ static const u8 sWF2DMAP_OBJDrawStAnm[WF2DMAP_OBJST_NUM] = {
     WF_2DC_ANMHIGHWALK2, WF_2DC_ANMHIGHWALK4, WF_2DC_ANMWALK,     WF_2DC_ANMSLOWWALK,
 };
 
-WF2DMAP_OBJDRAWSYS *WF2DMAP_OBJDrawSysInit(ClActUnit *unit, void *unk1, u32 objNum, u32 charaId, u32 moveType,
+WF2DMAP_OBJDRAWSYS *WF2DMAP_OBJDrawSysInit(ClActUnit *unit, void *unused, u32 objNum, u32 charaId, u32 moveType,
                                            u32 vramType, u32 heapId) {
     WF2DMAP_OBJDRAWSYS *sys;
 
     sys = GFL_HeapAllocate(heapId, sizeof(WF2DMAP_OBJDRAWSYS), TRUE, "wf2dmap_objdraw.c", 161);
-    sys->charSys = WF_2DC_SysInit(unit, unk1, objNum, heapId);
+    sys->charSys = WF_2DC_SysInit(unit, unused, objNum, heapId);
     sys->num = objNum;
     sys->wk = GFL_HeapAllocate(heapId, sizeof(WF2DMAP_OBJDRAWWK) * sys->num, TRUE, "wf2dmap_objdraw.c", 168);
     sys->bgPriority = WF2DMAP_OBJDRAW_BG_PRI;

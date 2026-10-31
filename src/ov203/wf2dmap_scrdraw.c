@@ -26,7 +26,7 @@ enum {
 
 struct WF2DMAP_SCRDRAW {
     ClActRenderer *renderer;
-    void *unk4;
+    void *unused;
     void *scrnBuff;
     NNSG2dScreenData *scrn;
     u32 surface;
@@ -41,25 +41,25 @@ typedef struct {
     s16 height;
 } WF2DMAP_SCRDRAWSIZE;
 
-static void WF2DMAP_SCRDrawSysBGInit(void *unk0, u32 bg, const WF2DMAP_SCRDRAWINIT *init);
+static void WF2DMAP_SCRDrawSysBGInit(void *unused, u32 bg, const WF2DMAP_SCRDRAWINIT *init);
 static void WF2DMAP_SCRDrawSysBGScroll(WF2DMAP_SCRDRAW *sys, s16 x, s16 y);
-static void WF2DMAP_SCRDrawSysScrnWrite(void *unk0, u32 bg, const NNSG2dScreenData *scrn, s16 x, s16 y);
-static void WF2DMAP_SCRDrawSysScrnAreaWrite(void *unk0, u8 bg, u8 x, u8 y, u8 width, u8 height, const void *buff,
+static void WF2DMAP_SCRDrawSysScrnWrite(void *unused, u32 bg, const NNSG2dScreenData *scrn, s16 x, s16 y);
+static void WF2DMAP_SCRDrawSysScrnAreaWrite(void *unused, u8 bg, u8 x, u8 y, u8 width, u8 height, const void *buff,
                                             u8 srcX, u8 srcY, u8 srcWidth, u8 srcHeight);
 static u32 WF2DMAP_SCRDrawSysScrnTypeGet(u32 width, u32 height);
 static const void *WF2DMAP_SCRDrawSysBlockBuffGet(const void *buff, u8 blockX, u8 blockY, u32 type, u8 width, u8 height,
                                                   WF2DMAP_SCRDRAWSIZE *size);
 
-WF2DMAP_SCRDRAW *WF2DMAP_SCRDrawSysInit(ClActRenderer *renderer, void *unk1, const WF2DMAP_SCRDRAWINIT *init,
+WF2DMAP_SCRDRAW *WF2DMAP_SCRDrawSysInit(ClActRenderer *renderer, void *unused, const WF2DMAP_SCRDRAWINIT *init,
                                         u32 heapId) {
     WF2DMAP_SCRDRAW *sys;
 
     sys = GFL_HeapAllocate(heapId, sizeof(WF2DMAP_SCRDRAW), TRUE, "wf2dmap_scrdraw.c", 104);
     sys->renderer = renderer;
-    sys->unk4 = unk1;
+    sys->unused = unused;
     sys->surface = init->surface;
     sys->bg = init->bg;
-    WF2DMAP_SCRDrawSysBGInit(unk1, init->bg, init);
+    WF2DMAP_SCRDrawSysBGInit(unused, init->bg, init);
     sys->scrnBuff = GFL_G2DIOReadNSCR(init->arcId, init->fileId, init->compressed, &sys->scrn, heapId);
     return sys;
 }
@@ -89,7 +89,7 @@ void WF2DMAP_SCRDrawSysMain(WF2DMAP_SCRDRAW *sys, const WF2DMAP_SCROLL *scroll) 
     WF2DMAP_SCRDrawSysBGScroll(sys, left, top);
 }
 
-static void WF2DMAP_SCRDrawSysBGInit(void *unk0, u32 bg, const WF2DMAP_SCRDRAWINIT *init) {
+static void WF2DMAP_SCRDrawSysBGInit(void *unused, u32 bg, const WF2DMAP_SCRDRAWINIT *init) {
     BGSetup setup = { 0, 0, 0x1000, 0, BGRES_512x256, 0, 0, 0, 0, 0, 0, 0, 0 };
 
     setup.colorMode = init->colorMode;
@@ -120,7 +120,7 @@ static void WF2DMAP_SCRDrawSysBGScroll(WF2DMAP_SCRDRAW *sys, s16 x, s16 y) {
     if (scrnX != sys->scrnX || scrnY != sys->scrnY) {
         sys->scrnX = scrnX;
         sys->scrnY = scrnY;
-        WF2DMAP_SCRDrawSysScrnWrite(sys->unk4, sys->bg, sys->scrn, -scrnX, -scrnY);
+        WF2DMAP_SCRDrawSysScrnWrite(sys->unused, sys->bg, sys->scrn, -scrnX, -scrnY);
         GFL_BGSysQueueScrLoad(sys->bg);
     }
 
@@ -129,7 +129,7 @@ static void WF2DMAP_SCRDrawSysBGScroll(WF2DMAP_SCRDRAW *sys, s16 x, s16 y) {
 }
 
 // Writes the map with its top left corner at character (x, y) of the BG, which is negative when the map is scrolled
-static void WF2DMAP_SCRDrawSysScrnWrite(void *unk0, u32 bg, const NNSG2dScreenData *scrn, s16 x, s16 y) {
+static void WF2DMAP_SCRDrawSysScrnWrite(void *unused, u32 bg, const NNSG2dScreenData *scrn, s16 x, s16 y) {
     s16 scrnWidth;
     s16 scrnHeight;
     s16 srcX;
@@ -167,11 +167,11 @@ static void WF2DMAP_SCRDrawSysScrnWrite(void *unk0, u32 bg, const NNSG2dScreenDa
     }
 
     GFL_BGSysFillScrArea(bg, 0, 0, 0, WF2DMAP_SCRDRAW_WIDTH, WF2DMAP_SCRDRAW_HEIGHT, 17);
-    WF2DMAP_SCRDrawSysScrnAreaWrite(unk0, bg, x, y, width, height, scrn->rawData, srcX, srcY, scrnWidth, scrnHeight);
+    WF2DMAP_SCRDrawSysScrnAreaWrite(unused, bg, x, y, width, height, scrn->rawData, srcX, srcY, scrnWidth, scrnHeight);
 }
 
 // GFL_BGSysLoadScrArea for a source of any size: a source stored as blocks is written block by block
-static void WF2DMAP_SCRDrawSysScrnAreaWrite(void *unk0, u8 bg, u8 x, u8 y, u8 width, u8 height, const void *buff,
+static void WF2DMAP_SCRDrawSysScrnAreaWrite(void *unused, u8 bg, u8 x, u8 y, u8 width, u8 height, const void *buff,
                                             u8 srcX, u8 srcY, u8 srcWidth, u8 srcHeight) {
     s8 restHeight;
     s8 writeHeight;

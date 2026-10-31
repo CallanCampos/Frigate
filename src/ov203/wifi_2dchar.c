@@ -70,7 +70,7 @@ struct WF_2DCWK {
 
 struct WF_2DCSYS {
     ClActUnit *unit;
-    void *unk4;
+    void *unused;
     WF_2DCWK *objs;
     u32 objNum;
     WF_2DCRES res[WF_2DC_CHARA_NUM];
@@ -150,13 +150,13 @@ static void (*const sWF_2DC_AnmMainFuncs[WF_2DC_ANMNUM])(WF_2DCWK *wk) = {
     NULL,
 };
 
-WF_2DCSYS *WF_2DC_SysInit(ClActUnit *unit, void *unk1, u32 objNum, u32 heapId) {
+WF_2DCSYS *WF_2DC_SysInit(ClActUnit *unit, void *unused, u32 objNum, u32 heapId) {
     WF_2DCSYS *sys;
     int i;
 
     sys = GFL_HeapAllocate(heapId, sizeof(WF_2DCSYS), TRUE, "wifi_2dchar.c", 339);
     sys->unit = unit;
-    sys->unk4 = unk1;
+    sys->unused = unused;
     sys->handles[0] = GFL_ArcSysCreateFileHandle(ARCID_WIFI_2DCHAR, heapId);
     sys->handles[1] = GFL_ArcSysCreateFileHandle(ARCID_WIFI_UNIONCHAR, heapId);
 
