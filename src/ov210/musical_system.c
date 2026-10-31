@@ -76,7 +76,7 @@ MusicalPoke *MusicalSystem_InitPoke(u16 species, u8 sex, u8 form, u8 rare, u32 p
 Ov210Work *MusicalSystem_InitProgramData(HeapID heapId) {
     Ov210Work *work = GFL_HeapAllocate(heapId, sizeof(Ov210Work), FALSE, "musical_system.c", 200);
 
-    work->unk4 = NULL;
+    work->programData = NULL;
     work->msgArc = NULL;
     work->script = NULL;
     work->soundData = NULL;
@@ -87,8 +87,8 @@ Ov210Work *MusicalSystem_InitProgramData(HeapID heapId) {
 }
 
 void MusicalSystem_FreeProgramData(Ov210Work *work) {
-    if (work->unk4 != NULL) {
-        GFL_HeapFree(work->unk4);
+    if (work->programData != NULL) {
+        GFL_HeapFree(work->programData);
     }
     if (work->msgArc != NULL) {
         GFL_HeapFree(work->msgArc);
@@ -119,7 +119,7 @@ void MusicalSystem_LoadProgramData(Ov210Work *work, SaveControl *save, GameData 
         arc = GFL_ArcSysCreateFileHandle(ARCID_MUSICAL_PROGRAM + program, HEAPID_TAIL(heapId));
     }
 
-    work->unk4 = GFL_ArcToolReadHeapNewLZGetLen(arc, 0, FALSE, heapId, &work->size[0]);
+    work->programData = GFL_ArcToolReadHeapNewLZGetLen(arc, 0, FALSE, heapId, &work->size[0]);
     work->msgArc = GFL_ArcToolReadHeapNewLZGetLen(arc, 1, FALSE, heapId, &work->size[1]);
     work->script = GFL_ArcToolReadHeapNewLZGetLen(arc, 2, FALSE, heapId, &work->size[2]);
 

@@ -13,7 +13,8 @@
 struct Ov210Work {
     // The program: 0 to 3 for the built-in ones, 4 or more for the downloaded one
     u8 program;
-    void *unk4;
+    // The program's data, which the program (overlay 12) reads
+    void *programData;
     // The archive of the program's messages
     void *msgArc;
     // The program's script for overlay 209's stage, a table of the offsets of its scripts
@@ -22,7 +23,7 @@ struct Ov210Work {
     u32 *soundData;
     // The program's sound data, which the stage passes to the sound functions
     void *sound[3];
-    // The sizes of unk4, msgArc and script
+    // The sizes of programData, msgArc and script
     u32 size[3];
     // The size of soundData
     u32 soundDataSize;
