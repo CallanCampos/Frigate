@@ -35,7 +35,7 @@ TwoChoiceMenu *TwoChoiceMenu_Create(HeapID heapId, u32 textBg, u32 priority, u32
     NNSG2dPaletteData *paletteData;
     UIObjResSetup setup;
     u16 *colors;
-    u32 palType = 0;
+    u32 palType = PALTYPE_MAIN_BG;
     BOOL isSub;
     u8 i;
     u8 j;
@@ -46,7 +46,7 @@ TwoChoiceMenu *TwoChoiceMenu_Create(HeapID heapId, u32 textBg, u32 priority, u32
     menu->font = font;
     menu->queue = queue;
     if (textBg > 3) {
-        palType = 4;
+        palType = PALTYPE_SUB_BG;
     }
     menu->palType = palType;
     menu->frameBg = textBg + 1;
@@ -354,16 +354,16 @@ static void TwoChoiceMenu_LoadPalette(u32 type, u32 palette, const u16 *src) {
     NNS_GFD_DST_TYPE dst;
 
     switch (type) {
-    case 0:
+    case PALTYPE_MAIN_BG:
         dst = NNS_GFD_DST_2D_BG_PLTT_MAIN;
         break;
-    case 1:
+    case PALTYPE_MAIN_OBJ:
         dst = NNS_GFD_DST_2D_OBJ_PLTT_MAIN;
         break;
-    case 4:
+    case PALTYPE_SUB_BG:
         dst = NNS_GFD_DST_2D_BG_PLTT_SUB;
         break;
-    case 5:
+    case PALTYPE_SUB_OBJ:
         dst = NNS_GFD_DST_2D_OBJ_PLTT_SUB;
         break;
     default:
