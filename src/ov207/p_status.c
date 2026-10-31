@@ -64,7 +64,7 @@ static BOOL PStatus_ProcInit(GameProc *proc, u32 *state, void *data, void *work)
                     GFL_HeapAllocate(HEAPID_USER, PML_GetPkmRawSize() * DEBUG_BOX_COUNT, TRUE, "p_status.c", 129);
                 param->dataType = PSTATUS_DATA_BOX;
                 param->partyCount = DEBUG_BOX_COUNT;
-                param->partyIndex = 0xff;
+                param->partyIndex = PSTATUS_PARTY_INDEX_NONE;
                 for (i = 0; i < param->partyCount; i++) {
                     boxPkm = (BoxPkm *)((u8 *)param->party + PML_GetPkmRawSize() * i);
                     PML_PkmInit(boxPkm);
@@ -77,7 +77,7 @@ static BOOL PStatus_ProcInit(GameProc *proc, u32 *state, void *data, void *work)
                             PML_PkmSetParam(boxPkm, PKM_PARAM_OT_NAME_RAW, (u32)otName);
                         }
                         PML_PkmSetParam(boxPkm, PKM_PARAM_OT_GENDER, 0);
-                        if (param->partyIndex == 0xff) {
+                        if (param->partyIndex == PSTATUS_PARTY_INDEX_NONE) {
                             param->partyIndex = i;
                         }
                     }
