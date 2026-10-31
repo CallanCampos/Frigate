@@ -11,6 +11,7 @@
 #include "constants/language.h"
 #include "constants/text_banks.h"
 #include "constants/version.h"
+#include "gfl/backup_system.h"
 #include "gfl/heap.h"
 #include "gfl/msg.h"
 #include "gfl/nhttp_rap.h"
@@ -23,6 +24,11 @@
 #include "save/player_info.h"
 #include "system/game_data.h"
 #include "system/wordset.h"
+
+#define HTTP_STATUS_OK 200
+#define HTTP_STATUS_BAD_REQUEST 400
+#define HTTP_STATUS_UNAUTHORIZED 401
+#define HTTP_STATUS_REQUEST_TIMEOUT 408
 
 // The server, and the frames to wait before a request with data is sent
 #define GDS_RAP_SERVER_URL "pkgdsprod.nintendo.co.jp"
@@ -336,15 +342,15 @@ static BOOL GdsRap_MainSend(GdsRapWork *gdsrap, BOOL *checkError) {
             int status = NHttpRap_GetStatus(gdsrap->p_nhttp);
             int error = NHttpRap_Poll(gdsrap->p_nhttp);
 
-            if (status != 200 && error != 15) {
+            if (status != HTTP_STATUS_OK && error != NHTTP_STATUS_RUNNING) {
                 switch (NHttpRap_GetStatus(gdsrap->p_nhttp)) {
-                case 400:
+                case HTTP_STATUS_BAD_REQUEST:
                     gdsrap->httpError = GDS_RAP_HTTP_ERROR_BAD_REQUEST;
                     break;
-                case 401:
+                case HTTP_STATUS_UNAUTHORIZED:
                     gdsrap->httpError = GDS_RAP_HTTP_ERROR_UNAUTHORIZED;
                     break;
-                case 408:
+                case HTTP_STATUS_REQUEST_TIMEOUT:
                     gdsrap->httpError = GDS_RAP_HTTP_ERROR_TIMEOUT;
                     break;
                 default:
@@ -408,7 +414,7 @@ static BOOL GdsRap_MainSend(GdsRapWork *gdsrap, BOOL *checkError) {
                 NHttpRap_Destroy(gdsrap->p_nhttp);
                 gdsrap->p_nhttp = NULL;
             } else {
-                if (error != 15 && gdsrap->p_nhttp != NULL) {
+                if (error != NHTTP_STATUS_RUNNING && gdsrap->p_nhttp != NULL) {
                     NHttpRap_FreePostData(gdsrap->p_nhttp);
                     NHttpRap_EndRequest(gdsrap->p_nhttp);
                     NHttpRap_Destroy(gdsrap->p_nhttp);
@@ -540,7 +546,7 @@ static BOOL GdsRap_SubProcSaveDataNumber(GdsRapWork *gdsrap, GdsRapSubProc *sub)
     res = POKE_NET_GDS_GetResponse();
     param = (POKE_NET_GDS_RESPONSE_REGIST *)res->Param;
     result = BattleRecOv_SaveDataNumber(gdsrap->gameData, param->Code, &sub->seq, &sub->saveSeq, gdsrap->heapId);
-    if (result == 2 || result == 3) {
+    if (result == SAVE_RESULT_OK || result == SAVE_RESULT_NG) {
         return TRUE;
     }
     return FALSE;
