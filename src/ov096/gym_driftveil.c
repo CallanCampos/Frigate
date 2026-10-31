@@ -74,7 +74,45 @@ enum {
 
 #define PAD_NONE 0xff
 
-#define STATE_END 5
+// The distances that a pad slides the player, named after the tiles that each goes
+enum {
+    PAD_DISTANCE_7_TILES,
+    PAD_DISTANCE_4_TILES,
+    PAD_DISTANCE_18_TILES,
+    PAD_DISTANCE_14_TILES,
+};
+
+// The steps of the slide on a pad
+enum {
+    SLIDE_STEP_JUMP_ON,
+    SLIDE_STEP_START_SLIDE,
+    SLIDE_STEP_SLIDING,
+    SLIDE_STEP_PRESS_LANDING,
+    SLIDE_STEP_JUMP_OFF,
+    SLIDE_STEP_END,
+};
+
+// The steps of an elevator ride
+enum {
+    ELEVATOR_STEP_START,
+    ELEVATOR_STEP_PLAY_SOUND,
+    ELEVATOR_STEP_MOVE,
+    ELEVATOR_STEP_FINISH,
+};
+
+// The steps of the freight elevator's ride
+enum {
+    FREIGHT_STEP_START,
+    FREIGHT_STEP_MOVE,
+    FREIGHT_STEP_SHAKE,
+    FREIGHT_STEP_FINISH,
+};
+
+// The steps of the camera shake
+enum {
+    SHAKE_STEP_RELEASE_CAMERA,
+    SHAKE_STEP_SHAKE,
+};
 
 typedef struct {
     u16 heapId;
@@ -501,54 +539,54 @@ static GameEventReturnCode DriftveilGym_SlideEventCallback(GameEvent *event, u32
     FieldTask *task;
 
     switch (*state) {
-    case 0:
+    case SLIDE_STEP_JUMP_ON:
         if (FieldPlayer_CheckAnimePaused(ev->player)) {
             direction = FieldPlayer_GetFaceDir(ev->player);
             FldAct_SetAcmd(FieldPlayer_GetActor(ev->player), direction + ACMD_JUMP_1);
-            *state = 1;
+            *state = SLIDE_STEP_START_SLIDE;
         }
         break;
-    case 1:
+    case SLIDE_STEP_START_SLIDE:
         if (FieldPlayer_CheckAnimePaused(ev->player)) {
             switch (sPads[ev->pad].distance) {
-            case 0:
+            case PAD_DISTANCE_7_TILES:
                 tiles = 7;
                 break;
-            case 1:
+            case PAD_DISTANCE_4_TILES:
                 tiles = 4;
                 break;
-            case 2:
+            case PAD_DISTANCE_18_TILES:
                 tiles = 18;
                 break;
-            case 3:
+            case PAD_DISTANCE_14_TILES:
                 tiles = 14;
                 break;
             }
             ev->duration = tiles * SLIDE_FRAMES_PER_TILE;
             FieldPlayer_GetWPos(ev->player, &pos);
             switch (sPads[ev->pad].direction) {
-            case 0:
+            case DIR_UP:
                 pos.z -= TILE(tiles);
                 break;
-            case 1:
+            case DIR_DOWN:
                 pos.z += TILE(tiles);
                 break;
-            case 2:
+            case DIR_LEFT:
                 pos.x -= TILE(tiles);
                 break;
-            case 3:
+            case DIR_RIGHT:
                 pos.x += TILE(tiles);
                 break;
             }
             task = FieldPlayerMoveTask_Create(ev->field, tiles * SLIDE_FRAMES_PER_TILE, &pos);
             FieldTaskManager_AddTask(Field_GetTaskManager(ev->field), task, 0);
             DriftveilGym_StartPadAnimation(work->expObj, ev->pad, sPads[ev->pad].direction);
-            *state = 2;
+            *state = SLIDE_STEP_SLIDING;
         }
         break;
-    case 2:
+    case SLIDE_STEP_SLIDING:
         if (FieldTaskManager_IsIdle(Field_GetTaskManager(ev->field))) {
-            *state = 3;
+            *state = SLIDE_STEP_PRESS_LANDING;
         }
         if (sPads[ev->pad].distance - 2 <= 1) {
             ev->frame++;
@@ -560,18 +598,18 @@ static GameEventReturnCode DriftveilGym_SlideEventCallback(GameEvent *event, u32
             }
         }
         break;
-    case 3:
+    case SLIDE_STEP_PRESS_LANDING:
         DriftveilGym_PressSwitch(work, sPads[ev->pad].landing);
-        *state = 4;
+        *state = SLIDE_STEP_JUMP_OFF;
         break;
-    case 4:
+    case SLIDE_STEP_JUMP_OFF:
         if (FieldPlayer_CheckAnimePaused(ev->player)) {
             direction = FieldPlayer_GetFaceDir(ev->player);
             FldAct_SetAcmd(FieldPlayer_GetActor(ev->player), direction + ACMD_JUMP_1);
-            *state = STATE_END;
+            *state = SLIDE_STEP_END;
         }
         break;
-    case STATE_END:
+    case SLIDE_STEP_END:
         if (FieldPlayer_CheckAnimePaused(ev->player)) {
             DriftveilGym_StopPadAnimation(work->expObj, ev->pad);
             return TRUE;
@@ -600,12 +638,12 @@ static void DriftveilGym_StartPadAnimation(FieldExpObjSystem *expObj, u32 pad, u
 
     if (FieldExpObjAnm_IsPaused(anm) == 1) {
         switch (direction) {
-        case 0:
-        case 3:
+        case DIR_UP:
+        case DIR_RIGHT:
             step = PAD_ANM_STEP;
             break;
-        case 1:
-        case 2:
+        case DIR_DOWN:
+        case DIR_LEFT:
             step = -PAD_ANM_STEP;
             break;
         }
@@ -697,26 +735,26 @@ static GameEventReturnCode DriftveilGym_ElevatorEventCallback(GameEvent *event, 
     FieldExpObjAnm *anm;
 
     switch (*state) {
-    case 0:
+    case ELEVATOR_STEP_START:
         if (ev->down == 0) {
             anm = FieldExpObj_GetAnmInfo(expObj, 0, ev->elevator + ACTOR_ELEVATOR, ANM_MAIN);
             FieldExpObjAnm_SetPaused(anm, FALSE);
             DriftveilGym_ShowElevatorRider(ev, FALSE, ev->model);
         }
-        *state = 1;
+        *state = ELEVATOR_STEP_PLAY_SOUND;
         break;
-    case 1:
+    case ELEVATOR_STEP_PLAY_SOUND:
         GFL_SndSEPlay(SEQ_SE_FLD_59);
-        *state = 2;
-    case 2:
+        *state = ELEVATOR_STEP_MOVE;
+    case ELEVATOR_STEP_MOVE:
         ev->height += ev->step;
         if (DriftveilGym_HasReachedHeight(ev)) {
             ev->height = ev->target;
-            *state = 3;
+            *state = ELEVATOR_STEP_FINISH;
         }
         DriftveilGym_MoveElevator(ev);
         break;
-    case 3:
+    case ELEVATOR_STEP_FINISH:
         if (ev->down == 1) {
             u32 actor = ev->elevator + ACTOR_ELEVATOR;
 
@@ -841,7 +879,7 @@ static GameEventReturnCode DriftveilGym_FreightEventCallback(GameEvent *event, u
     FieldPlayer *player;
 
     switch (*state) {
-    case 0:
+    case FREIGHT_STEP_START:
         if (ev->up != 0) {
             work->cameraBind = FieldCamera_GetBind(camera);
             FieldCamera_ClearBind(camera);
@@ -879,7 +917,7 @@ static GameEventReturnCode DriftveilGym_FreightEventCallback(GameEvent *event, u
         }
         *state += 1;
         break;
-    case 1:
+    case FREIGHT_STEP_MOVE:
         ev->height += ev->step;
         if (DriftveilGym_HasFreightReachedTarget(ev)) {
             ev->height = ev->target;
@@ -914,7 +952,7 @@ static GameEventReturnCode DriftveilGym_FreightEventCallback(GameEvent *event, u
             matrix->translation.y = ev->height;
         }
         break;
-    case 2:
+    case FREIGHT_STEP_SHAKE:
         if (ev->up != 0) {
             return TRUE;
         }
@@ -926,7 +964,7 @@ static GameEventReturnCode DriftveilGym_FreightEventCallback(GameEvent *event, u
             *state += 1;
         }
         break;
-    case 3:
+    case FREIGHT_STEP_FINISH:
         if (FieldExpObjAnm_IsPlaybackFinished(FieldExpObj_GetAnmInfo(expObj, 0, ev->model, ANM_MAIN))) {
             DriftveilGym_ResetFreight(expObj);
             return TRUE;
@@ -950,7 +988,7 @@ static BOOL DriftveilGym_HasFreightReachedTarget(DriftveilGymFreightEvent *ev) {
 }
 
 static void DriftveilGym_InitShake(int step, BOOL light, FieldCamera *camera, DriftveilGymShake *shake) {
-    shake->state = 0;
+    shake->state = SHAKE_STEP_RELEASE_CAMERA;
     shake->count = 0;
     shake->camera = camera;
     shake->bind = FieldCamera_GetBind(camera);
@@ -971,10 +1009,10 @@ static BOOL DriftveilGym_UpdateShake(DriftveilGymShake *shake) {
     VecFx32 offset;
 
     switch (shake->state) {
-    case 0:
+    case SHAKE_STEP_RELEASE_CAMERA:
         FieldCamera_ClearBind(shake->camera);
         shake->state++;
-    case 1:
+    case SHAKE_STEP_SHAKE:
         if (shake->toggle % 2 == 0) {
             FieldCamera_CoordsGetTargetOffset(shake->camera, &offset);
             offset.y += shake->amplitude;
