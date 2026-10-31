@@ -56,6 +56,12 @@ enum {
 };
 
 // The frames in the gym at which the stage becomes 1 and 2
+enum {
+    STAGE_SLOW,
+    STAGE_MEDIUM,
+    STAGE_FAST,
+};
+
 #define STAGE_1_FRAMES 0x3c
 #define STAGE_2_FRAMES 0x78
 
@@ -105,6 +111,69 @@ typedef struct {
     FieldSound *sound;
     MistraltonSave *save;
 } MistraltonWork;
+
+// How a ride was stopped
+enum {
+    STOP_WALL,
+    STOP_ACTOR,
+    STOP_NONE,
+};
+
+// The steps of the tasks and events below
+enum {
+    LERP_START,
+    LERP_RUN,
+};
+
+enum {
+    BOB_RUN,
+    BOB_DONE,
+};
+
+enum {
+    TRAVEL_BUBBLE,
+    TRAVEL_WAIT_SOUND,
+    TRAVEL_SPIN,
+    TRAVEL_LAUNCH,
+    TRAVEL_WAIT_END,
+    TRAVEL_WAIT_SOUND_END,
+    TRAVEL_RIDE,
+    TRAVEL_FINISH,
+};
+
+enum {
+    BUMP_BUBBLE,
+    BUMP_WAIT_SOUND,
+    BUMP_SET_RIDING,
+    BUMP_START_BOB,
+    BUMP_WAIT_END,
+    BUMP_FINISH,
+};
+
+enum {
+    CANNON_SLOW_EFFECTS,
+    CANNON_BUBBLE,
+    CANNON_WAIT_SOUND,
+    CANNON_SPEED_UP,
+    CANNON_WAIT_SPEED,
+    CANNON_SPIN,
+    CANNON_LAUNCH,
+    CANNON_RIDE,
+    CANNON_DONE,
+    CANNON_WARP,
+};
+
+enum {
+    TRIGGER_WAIT_ACTOR,
+    TRIGGER_DELAY,
+    TRIGGER_SPEED_UP,
+    TRIGGER_WAIT_SPEED,
+    TRIGGER_LAUNCH,
+    TRIGGER_WAIT_END,
+    TRIGGER_STEP_FORWARD,
+    TRIGGER_WAIT_TASKS,
+    TRIGGER_FINISH,
+};
 
 // What the ride events keep: the cannon ride, the bump and the start trigger share it
 typedef struct {
@@ -242,7 +311,7 @@ void GymMistralton_Init(Field *field) {
     work->fadingIn[0] = 0;
     work->fadingIn[1] = 0;
     work->fadingOut = 0;
-    work->stage = 0;
+    work->stage = STAGE_SLOW;
     work->system = Field_GetExpObjSystem(field);
     work->player = Field_GetPlayer(field);
     work->sound = GameData_GetFieldSoundSystem(gameData);
@@ -339,7 +408,7 @@ GameEvent *GymMistralton_CheckStep(GameSystem *gsys) {
     stage = Mistralton_GetStage(work->frames);
     if (work->stage != stage) {
         Mistralton_SetStage(field, stage);
-        if (work->stage == 2) {
+        if (work->stage == STAGE_FAST) {
             return Mistralton_CreateRideEvent(NULL, gsys);
         }
     }
@@ -358,7 +427,7 @@ static FieldTask *Mistralton_CreateLerpTask(Field *field, FieldActor *actor, u32
     FieldTask *task = FieldTask_Create(Field_GetHeapID(field), sizeof(LerpTask), MistraltonLerpTask_Run);
     LerpTask *data = FieldTask_GetData(task);
 
-    data->state = 0;
+    data->state = LERP_START;
     data->field = field;
     data->frame = 0;
     data->duration = duration;
@@ -376,11 +445,11 @@ static BOOL MistraltonLerpTask_Run(void *taskData) {
     int duration;
 
     switch (data->state) {
-    case 0:
+    case LERP_START:
         CopyActorWPos(data->actor, &data->start);
         data->state++;
         break;
-    case 1:
+    case LERP_RUN:
         data->frame++;
         duration = data->duration;
         t = FX32_CONST((f32)data->frame / (f32)duration);
@@ -401,7 +470,7 @@ static FieldTask *Mistralton_CreateBobTask(Field *field, FieldActor *actor, u16 
     FieldTask *task = FieldTask_Create(Field_GetHeapID(field), sizeof(BobTask), MistraltonBobTask_Run);
     BobTask *data = FieldTask_GetData(task);
 
-    data->state = 0;
+    data->state = BOB_RUN;
     data->field = field;
     data->unused08 = 0;
     data->actor = actor;
@@ -421,7 +490,7 @@ static BOOL MistraltonBobTask_Run(void *taskData) {
     u16 angle;
 
     switch (data->state) {
-    case 0:
+    case BOB_RUN:
         frame = data->frame + 1;
         period = data->period;
         data->frame = frame;
@@ -451,7 +520,7 @@ static BOOL MistraltonBobTask_Run(void *taskData) {
             SetActorWPosOffset(data->actor, &offset);
         }
         break;
-    case 1:
+    case BOB_DONE:
         return TRUE;
     }
     return FALSE;
@@ -474,12 +543,12 @@ static void Mistralton_ApplyFrames(MistraltonWork *work, u16 frames) {
 
 static u32 Mistralton_GetStage(u32 frames) {
     if (frames >= STAGE_2_FRAMES) {
-        return 2;
+        return STAGE_FAST;
     }
     if (frames >= STAGE_1_FRAMES) {
-        return 1;
+        return STAGE_MEDIUM;
     }
-    return 0;
+    return STAGE_SLOW;
 }
 
 static void Mistralton_SetStage(Field *field, int stage) {
@@ -494,14 +563,14 @@ static void Mistralton_SetStage(Field *field, int stage) {
     work->centerAnm.targetSpeed = centerSpeeds[work->stage];
     work->fanAnm.targetSpeed = fanSpeeds[work->stage];
     switch (work->stage) {
-    case 0:
+    case STAGE_SLOW:
         work->fadingOut = 1;
         break;
-    case 1:
+    case STAGE_MEDIUM:
         count = 1;
         actor = ACTOR_EFFECT_FIRST + 1;
         break;
-    case 2:
+    case STAGE_FAST:
         count = 1;
         work->frames = 0;
         actor = ACTOR_EFFECT_FIRST + 2;
@@ -548,7 +617,7 @@ static GameEvent *Mistralton_CreateRideEvent(GameEvent *parent, GameSystem *gsys
     data->field = field;
     data->player = player;
     data->actor = FieldPlayer_GetActor(player);
-    data->stopReason = 2;
+    data->stopReason = STOP_NONE;
     data->timer = 0;
     data->startTimer = 0;
     data->turns = 0;
@@ -577,30 +646,30 @@ static GameEventReturnCode MistraltonTravelEvent_Run(GameEvent *event, u32 *stat
 
     work = Field_GetGimmickWorkBlock(data->field, WORK_BLOCK);
     switch (*state) {
-    case 0:
+    case TRAVEL_BUBBLE:
         if (FldAct_CheckAcmdEnd(data->actor)) {
             FldAct_SetAcmd(data->actor, ACMD_EMOTION_BUBBLE);
             GFL_SndSEPlay(SEQ_SE_GYM_H07);
-            *state = 1;
+            *state = TRAVEL_WAIT_SOUND;
         }
         break;
-    case 1:
+    case TRAVEL_WAIT_SOUND:
         if (!GFL_SndPlayerIsActive(GFL_SndSeqGetPlayerIndex(SEQ_SE_GYM_H05))) {
             GFL_SndSEPlay(SEQ_SE_GYM_H05);
-            *state = 2;
+            *state = TRAVEL_SPIN;
         }
         break;
-    case 2:
+    case TRAVEL_SPIN:
         if (FldAct_CheckAcmdEnd(data->actor)) {
             dir = (s32)FieldPlayer_GetFaceDir(data->player) % 4;
             FldAct_SetAcmd(data->actor, ACMD_STAY_WALK_4F + dir);
             data->turns++;
             if (data->turns >= 4) {
-                *state = 3;
+                *state = TRAVEL_LAUNCH;
             }
         }
         break;
-    case 3:
+    case TRAVEL_LAUNCH:
         if (FldAct_CheckAcmdEnd(data->actor)) {
             FieldPlayer_GetGPos(data->player, &x, &y, &z);
             distance = Mistralton_CountFreeCells(data->field, &data->stopReason, x, z);
@@ -624,10 +693,10 @@ static GameEventReturnCode MistraltonTravelEvent_Run(GameEvent *event, u32 *stat
             if (!data->blocked) {
                 GFL_SndSEPlay(SEQ_SE_GYM_H01);
             }
-            *state = 6;
+            *state = TRAVEL_RIDE;
         }
         break;
-    case 6:
+    case TRAVEL_RIDE:
         if (FldAct_CheckAcmdEnd(data->actor)) {
             dir = FieldPlayer_GetFaceDir(data->player) + 1;
             dir = dir % 4;
@@ -639,18 +708,18 @@ static GameEventReturnCode MistraltonTravelEvent_Run(GameEvent *event, u32 *stat
             }
             if (!data->blocked) {
                 switch (data->stopReason) {
-                case 0:
+                case STOP_WALL:
                     GFL_SndSEPlay(SEQ_SE_GYM_H08);
                     break;
-                case 1:
+                case STOP_ACTOR:
                     GFL_SndSEPlay(SEQ_SE_GYM_H03);
                     break;
                 }
             }
-            *state = 4;
+            *state = TRAVEL_WAIT_END;
         }
         break;
-    case 4: {
+    case TRAVEL_WAIT_END: {
         BOOL ready = FALSE;
 
         if (FldAct_CheckAcmdEnd(data->actor)) {
@@ -666,24 +735,24 @@ static GameEventReturnCode MistraltonTravelEvent_Run(GameEvent *event, u32 *stat
         }
         if (ready == TRUE) {
             if (!data->blocked) {
-                *state = 5;
+                *state = TRAVEL_WAIT_SOUND_END;
             } else {
-                *state = 7;
+                *state = TRAVEL_FINISH;
             }
         }
         break;
     }
-    case 5:
+    case TRAVEL_WAIT_SOUND_END:
         if (!GFL_SndPlayerIsActive(GFL_SndSeqGetPlayerIndex(SEQ_SE_GYM_H08))) {
-            *state = 7;
+            *state = TRAVEL_FINISH;
         }
         if (!GFL_SndPlayerIsActive(GFL_SndSeqGetPlayerIndex(SEQ_SE_GYM_H03))) {
-            *state = 7;
+            *state = TRAVEL_FINISH;
         }
         break;
-    case 7:
+    case TRAVEL_FINISH:
         ClearActorFlag(data->actor, 0x200);
-        if (data->stopReason == 1 && !data->blocked) {
+        if (data->stopReason == STOP_ACTOR && !data->blocked) {
             if (Mistralton_StopTrainerAhead(data->field, data->player) == TRUE) {
                 FldAct_SetAcmd(data->actor, 1);
             } else {
@@ -708,46 +777,46 @@ static GameEventReturnCode MistraltonBumpEvent_Run(GameEvent *event, u32 *state,
 
     Field_GetGimmickWorkBlock(data->field, WORK_BLOCK);
     switch (*state) {
-    case 0:
+    case BUMP_BUBBLE:
         if (FldAct_CheckAcmdEnd(data->actor)) {
             FldAct_SetAcmd(data->actor, ACMD_EMOTION_BUBBLE);
             GFL_SndSEPlay(SEQ_SE_GYM_H07);
-            *state = 1;
+            *state = BUMP_WAIT_SOUND;
         }
         break;
-    case 1:
+    case BUMP_WAIT_SOUND:
         if (!GFL_SndPlayerIsActive(GFL_SndSeqGetPlayerIndex(SEQ_SE_GYM_H05))) {
             GFL_SndSEPlay(SEQ_SE_GYM_H05);
-            *state = 2;
+            *state = BUMP_SET_RIDING;
         }
         break;
-    case 2:
+    case BUMP_SET_RIDING:
         if (FldAct_CheckAcmdEnd(data->actor)) {
             code = FieldPlayer_GetObjCodeByForme(FieldPlayer_GetSex(data->player), FORME_RIDING);
             if (code != FldAct_GetObjCode(data->actor)) {
                 FieldPlayer_ForceObjCode(data->player, code);
             }
             data->startTimer = data->timer;
-            *state = 3;
+            *state = BUMP_START_BOB;
         }
         break;
-    case 3:
+    case BUMP_START_BOB:
         if (data->timer - data->startTimer > 20) {
             task = Mistralton_CreateBobTask(data->field, data->actor, 1, 4, 6);
             FieldTaskManager_AddTask(Field_GetTaskManager(data->field), task, 0);
-            *state = 4;
+            *state = BUMP_WAIT_END;
         }
         break;
-    case 4:
+    case BUMP_WAIT_END:
         ready = FALSE;
         if (data->timer >= 0x5a) {
             ready = TRUE;
         }
         if (FieldTaskManager_IsIdle(Field_GetTaskManager(data->field)) && ready == TRUE) {
-            *state = 5;
+            *state = BUMP_FINISH;
         }
         break;
-    case 5:
+    case BUMP_FINISH:
         code = FieldPlayer_GetObjCodeByForme(FieldPlayer_GetSex(data->player), 0);
         if (code != FldAct_GetObjCode(data->actor)) {
             FieldPlayer_ForceObjCode(data->player, code);
@@ -781,57 +850,57 @@ static GameEventReturnCode MistraltonCannonEvent_Run(GameEvent *event, u32 *stat
 
     work = Field_GetGimmickWorkBlock(data->field, WORK_BLOCK);
     switch (*state) {
-    case 0:
+    case CANNON_SLOW_EFFECTS:
         FieldExpObjAnm_SetFrameStep(FieldExpObj_GetAnmInfo(work->system, SCENE, ACTOR_EFFECT_FIRST + 1, 0),
                                     FX32_CONST(1.5));
         FieldExpObjAnm_SetFrameStep(FieldExpObj_GetAnmInfo(work->system, SCENE, ACTOR_EFFECT_FIRST + 2, 0),
                                     FX32_CONST(1.5));
-        *state = 1;
+        *state = CANNON_BUBBLE;
         break;
-    case 1:
+    case CANNON_BUBBLE:
         if (FldAct_CheckAcmdEnd(data->actor)) {
             FldAct_SetAcmd(data->actor, ACMD_EMOTION_BUBBLE);
             GFL_SndSEPlay(SEQ_SE_GYM_H07);
-            *state = 2;
+            *state = CANNON_WAIT_SOUND;
         }
         break;
-    case 2:
+    case CANNON_WAIT_SOUND:
         if (!GFL_SndPlayerIsActive(GFL_SndSeqGetPlayerIndex(SEQ_SE_GYM_H05))) {
             GFL_SndSEPlay(SEQ_SE_GYM_H05);
-            *state = 3;
+            *state = CANNON_SPEED_UP;
         }
         break;
-    case 3: {
+    case CANNON_SPEED_UP: {
         FieldTask *pitchTask;
         FieldTask *zoomTask;
         FieldTaskManager *manager;
 
-        Mistralton_SetStage(data->field, 2);
+        Mistralton_SetStage(data->field, STAGE_FAST);
         pitchTask = FieldCameraMoveTaskPitch_Callback(data->field, 30, 0x20d8);
         zoomTask = FieldCameraMoveTaskZoom_Create(data->field, 30, 0xd5000);
         manager = Field_GetTaskManager(data->field);
         FieldTaskManager_AddTask(manager, pitchTask, 0);
         FieldTaskManager_AddTask(manager, zoomTask, 0);
-        *state = 4;
+        *state = CANNON_WAIT_SPEED;
         break;
     }
-    case 4:
+    case CANNON_WAIT_SPEED:
         if (Mistralton_IsCenterAnmDone(&work->centerAnm) == TRUE && Mistralton_IsFanAnmDone(&work->fanAnm) == TRUE) {
-            *state = 5;
+            *state = CANNON_SPIN;
         }
         break;
-    case 5:
+    case CANNON_SPIN:
         if (FldAct_CheckAcmdEnd(data->actor)) {
             u16 dir = (s32)FieldPlayer_GetFaceDir(data->player) % 4;
 
             FldAct_SetAcmd(data->actor, ACMD_STAY_WALK_4F + dir);
             data->turns++;
             if (FieldTaskManager_IsIdle(Field_GetTaskManager(data->field)) && data->turns >= 4) {
-                *state = 6;
+                *state = CANNON_LAUNCH;
             }
         }
         break;
-    case 6:
+    case CANNON_LAUNCH:
         if (FldAct_CheckAcmdEnd(data->actor)) {
             VecFx32 pos;
             FieldTask *moveTask;
@@ -854,10 +923,10 @@ static GameEventReturnCode MistraltonCannonEvent_Run(GameEvent *event, u32 *stat
             FieldTaskManager_AddTask(Field_GetTaskManager(data->field), spinTask, 0);
             SetActorFlag(data->actor, 0x200);
             GFL_SndSEPlay(SEQ_SE_GYM_H01);
-            *state = 7;
+            *state = CANNON_RIDE;
         }
         break;
-    case 7: {
+    case CANNON_RIDE: {
         FieldExpObjAnm *anm;
         s16 x;
         s16 y;
@@ -884,11 +953,11 @@ static GameEventReturnCode MistraltonCannonEvent_Run(GameEvent *event, u32 *stat
             GFL_SndPlayerStop(GFL_SndSeqGetPlayerIndex(SEQ_SE_GYM_H01));
             GFL_SndPlayerStop(GFL_SndSeqGetPlayerIndex(SEQ_SE_GYM_H01 + 4));
             ClearActorFlag(data->actor, 0x200);
-            *state = 9;
+            *state = CANNON_WARP;
         }
         break;
     }
-    case 9: {
+    case CANNON_WARP: {
         VecFx32 pos;
         EventData *eventDataBase;
         ZoneWarp *warp;
@@ -901,10 +970,10 @@ static GameEventReturnCode MistraltonCannonEvent_Run(GameEvent *event, u32 *stat
         warp = GetZoneWarpByID(eventDataBase, GetWarpAtPosition(eventDataBase, &pos));
         next = EventMapChangeWarp_CreateFromEntity(gsys, data->field, warp, ZoneWarp_CalcPosWeightBitsGrid(warp, &pos));
         GameEvent_Replace(event, next);
-        *state = 8;
+        *state = CANNON_DONE;
         break;
     }
-    case 8:
+    case CANNON_DONE:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -921,7 +990,7 @@ static GameEvent *Mistralton_CreateTriggerEvent(GameEvent *parent, GameSystem *g
     data->field = field;
     data->player = player;
     data->actor = FindFieldActor(actorSystem, actorId);
-    data->stopReason = 2;
+    data->stopReason = STOP_NONE;
     data->timer = 0;
     data->startTimer = 0;
     data->turns = 0;
@@ -934,28 +1003,28 @@ static GameEventReturnCode MistraltonTriggerEvent_Run(GameEvent *event, u32 *sta
 
     work = Field_GetGimmickWorkBlock(data->field, WORK_BLOCK);
     switch (*state) {
-    case 0:
+    case TRIGGER_WAIT_ACTOR:
         if (FldAct_CheckAcmdEnd(data->actor)) {
             GFL_SndSEPlay(SEQ_SE_GYM_H07);
-            *state = 1;
+            *state = TRIGGER_DELAY;
         }
         break;
-    case 1:
+    case TRIGGER_DELAY:
         if (data->timer++ > 20) {
             GFL_SndSEPlay(SEQ_SE_GYM_H05);
-            *state = 2;
+            *state = TRIGGER_SPEED_UP;
         }
         break;
-    case 2:
-        Mistralton_SetStage(data->field, 2);
-        *state = 3;
+    case TRIGGER_SPEED_UP:
+        Mistralton_SetStage(data->field, STAGE_FAST);
+        *state = TRIGGER_WAIT_SPEED;
         break;
-    case 3:
+    case TRIGGER_WAIT_SPEED:
         if (Mistralton_IsCenterAnmDone(&work->centerAnm) == TRUE && Mistralton_IsFanAnmDone(&work->fanAnm) == TRUE) {
-            *state = 4;
+            *state = TRIGGER_LAUNCH;
         }
         break;
-    case 4:
+    case TRIGGER_LAUNCH:
         if (FldAct_CheckAcmdEnd(data->actor)) {
             FieldTask *task;
             VecFx32 pos;
@@ -977,10 +1046,10 @@ static GameEventReturnCode MistraltonTriggerEvent_Run(GameEvent *event, u32 *sta
             task = FieldCameraShakeTask_Create(data->field, &shake);
             FieldTaskManager_AddTask(Field_GetTaskManager(data->field), task, 0);
             GFL_SndSEPlay(SEQ_SE_GYM_H01);
-            *state = 5;
+            *state = TRIGGER_WAIT_END;
         }
         break;
-    case 5:
+    case TRIGGER_WAIT_END:
         if (FldAct_CheckAcmdEnd(data->actor)) {
             u16 dir = GetActorFaceDir(data->actor) + 1;
 
@@ -990,11 +1059,11 @@ static GameEventReturnCode MistraltonTriggerEvent_Run(GameEvent *event, u32 *sta
         if (FieldTaskManager_GetActiveTaskCount(Field_GetTaskManager(data->field)) <= 1) {
             GFL_SndPlayerStop(GFL_SndSeqGetPlayerIndex(SEQ_SE_GYM_H01));
             GFL_SndSEPlay(SEQ_SE_GYM_H03);
-            Mistralton_SetStage(data->field, 0);
-            *state = 6;
+            Mistralton_SetStage(data->field, STAGE_SLOW);
+            *state = TRIGGER_STEP_FORWARD;
         }
         break;
-    case 6: {
+    case TRIGGER_STEP_FORWARD: {
         FieldTask *task;
         VecFx32 pos;
 
@@ -1002,15 +1071,15 @@ static GameEventReturnCode MistraltonTriggerEvent_Run(GameEvent *event, u32 *sta
         pos.z += 1 << 16;
         task = FieldPlayerMoveTask_Create(data->field, 2, &pos);
         FieldTaskManager_AddTask(Field_GetTaskManager(data->field), task, 0);
-        *state = 7;
+        *state = TRIGGER_WAIT_TASKS;
         break;
     }
-    case 7:
+    case TRIGGER_WAIT_TASKS:
         if (FieldTaskManager_IsIdle(Field_GetTaskManager(data->field))) {
-            *state = 8;
+            *state = TRIGGER_FINISH;
         }
         break;
-    case 8: {
+    case TRIGGER_FINISH: {
         VecFx32 pos;
 
         ClearActorFlag(data->actor, 0x200);
@@ -1030,11 +1099,11 @@ static u8 Mistralton_CountFreeCells(Field *field, int *stopReason, s16 x, s16 z)
     while (z < GRID_ROWS) {
         z++;
         if (sMistraltonGrid[z][x] != GRID_FREE) {
-            *stopReason = 0;
+            *stopReason = STOP_WALL;
             break;
         }
         if (GetFirstActorOnGPos(Field_GetActorSystem(field), x, z, TRUE) != NULL) {
-            *stopReason = 1;
+            *stopReason = STOP_ACTOR;
             break;
         }
         count++;
