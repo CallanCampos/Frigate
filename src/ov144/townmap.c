@@ -85,6 +85,21 @@ enum {
     TOWNMAP_ANIM_NONE = 0xff,
 };
 
+// The steps of the fades, and the states of the touch bar's zoom button
+enum {
+    TOWNMAP_FADE_START,
+    TOWNMAP_FADE_WAIT,
+    TOWNMAP_FADE_NEXT,
+};
+
+enum {
+    APPBAR_IDLE,
+    APPBAR_PRESSED,
+};
+
+// TownMap_GetNearestPlace's index when no place is near enough
+#define TOWNMAP_NO_NEAREST 0xffffffff
+
 typedef struct {
     s32 x;
     s32 y;
@@ -477,16 +492,16 @@ static void TownMapSeq_End(TownMapSeq *seq) {
 
 static void TownMap_SeqFadeIn(TownMapSeq *seq, u32 *state, void *data) {
     switch (*state) {
-    case 0:
+    case TOWNMAP_FADE_START:
         GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 0, 0);
-        *state = 1;
+        *state = TOWNMAP_FADE_WAIT;
         break;
-    case 1:
+    case TOWNMAP_FADE_WAIT:
         if (!GFL_FadeIsRunning()) {
-            *state = 2;
+            *state = TOWNMAP_FADE_NEXT;
         }
         break;
-    case 2:
+    case TOWNMAP_FADE_NEXT:
         TownMapSeq_SetNext(seq, TownMap_SeqMain);
         break;
     }
@@ -494,16 +509,16 @@ static void TownMap_SeqFadeIn(TownMapSeq *seq, u32 *state, void *data) {
 
 static void TownMap_SeqFadeOut(TownMapSeq *seq, u32 *state, void *data) {
     switch (*state) {
-    case 0:
+    case TOWNMAP_FADE_START:
         GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 0, 16, 0);
-        *state = 1;
+        *state = TOWNMAP_FADE_WAIT;
         break;
-    case 1:
+    case TOWNMAP_FADE_WAIT:
         if (!GFL_FadeIsRunning()) {
-            *state = 2;
+            *state = TOWNMAP_FADE_NEXT;
         }
         break;
-    case 2:
+    case TOWNMAP_FADE_NEXT:
         TownMapSeq_End(seq);
         break;
     }
@@ -728,7 +743,7 @@ static void TownMapAppBar_Main(TownMapAppBar *appBar, TownMapMap *map) {
     TouchBar_Main(appBar->bar);
     appBar->decided = TOUCHBAR_ICON_NONE;
     switch (appBar->state) {
-    case 0: {
+    case APPBAR_IDLE: {
         BOOL pressed = FALSE;
         u32 x;
         u32 y;
@@ -752,18 +767,18 @@ static void TownMapAppBar_Main(TownMapAppBar *appBar, TownMapMap *map) {
             }
             ClActor_StartAnim(appBar->zoomButton);
             appBar->decided = TOWNMAP_ICON_ZOOM;
-            appBar->state = 1;
+            appBar->state = APPBAR_PRESSED;
         }
         break;
     }
-    case 1:
+    case APPBAR_PRESSED:
         if (!ClActor_IsAnimActive(appBar->zoomButton)) {
             if (ClActor_GetSequence(appBar->zoomButton) == TOWNMAP_ANIM_ZOOM_IN_PRESSED) {
                 ClActor_SetSequence(appBar->zoomButton, TOWNMAP_ANIM_ZOOM_OUT);
             } else {
                 ClActor_SetSequence(appBar->zoomButton, TOWNMAP_ANIM_ZOOM_IN);
             }
-            appBar->state = 0;
+            appBar->state = APPBAR_IDLE;
         }
         break;
     }
@@ -1099,7 +1114,7 @@ static TownMapPlace *TownMapPlaces_GetNearest(const TownMapPlaces *places, const
     u32 nearestDistance;
 
     TownMapCursor_GetPos(cursor, &pos);
-    nearest = 0xffffffff;
+    nearest = TOWNMAP_NO_NEAREST;
     nearestDistance = 0xffffffff;
     for (i = 0; i < places->count; i++) {
         if (TownMapPlace_GetDistance(&places->places[i], &pos, &places->scroll, &distance)) {
@@ -1109,7 +1124,7 @@ static TownMapPlace *TownMapPlaces_GetNearest(const TownMapPlaces *places, const
             }
         }
     }
-    if (nearest == 0xffffffff) {
+    if (nearest == TOWNMAP_NO_NEAREST) {
         return NULL;
     }
     return &places->places[nearest];
@@ -1208,20 +1223,20 @@ static void TownMapPlace_Init(TownMapPlace *place, void *data, u32 index, ClActU
         place->hidden = FALSE;
     }
     switch (TownMapPlace_GetParam(place, TOWNMAP_PARAM_TYPE)) {
-    case 0:
+    case TOWNMAP_PLACE_TYPE_CITY:
         place->animSelected = TOWNMAP_ANIM_CITY_SELECTED;
         place->anim = TOWNMAP_ANIM_CITY;
         break;
-    case 2:
+    case TOWNMAP_PLACE_TYPE_LANDMARK:
         place->animSelected = TOWNMAP_ANIM_SELECTED;
         place->anim = TOWNMAP_ANIM_NONE;
         place->arrived = TRUE;
         break;
-    case 1:
+    case TOWNMAP_PLACE_TYPE_ROUTE:
         place->animSelected = TOWNMAP_ANIM_NONE;
         place->anim = TOWNMAP_ANIM_NONE;
         break;
-    case 3:
+    case TOWNMAP_PLACE_TYPE_FACILITY:
         place->animSelected = TOWNMAP_ANIM_SELECTED;
         place->anim = 13;
         break;
@@ -1229,7 +1244,7 @@ static void TownMapPlace_Init(TownMapPlace *place, void *data, u32 index, ClActU
         place->animSelected = 15;
         place->anim = 14;
         break;
-    case 5:
+    case TOWNMAP_PLACE_TYPE_UNITY_TOWER:
         place->animSelected = 18;
         if (place->arrived) {
             place->anim = 17;
@@ -1239,7 +1254,7 @@ static void TownMapPlace_Init(TownMapPlace *place, void *data, u32 index, ClActU
         break;
     }
     // A route has no marker
-    if (TownMapPlace_GetParam(place, TOWNMAP_PARAM_TYPE) != 1) {
+    if (TownMapPlace_GetParam(place, TOWNMAP_PARAM_TYPE) != TOWNMAP_PLACE_TYPE_ROUTE) {
         ClActorSetup setup;
 
         MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
@@ -1265,7 +1280,7 @@ static void TownMapPlace_SetVisible(TownMapPlace *place, BOOL visible) {
         if (place->hidden) {
             ClActor_SetVisible(place->actor, FALSE);
         } else if (TownMapPlace_GetParam(place, TOWNMAP_PARAM_TYPE) == TOWNMAP_PLACE_TYPE_TOWN ||
-                   TownMapPlace_GetParam(place, TOWNMAP_PARAM_TYPE) == 5) {
+                   TownMapPlace_GetParam(place, TOWNMAP_PARAM_TYPE) == TOWNMAP_PLACE_TYPE_UNITY_TOWER) {
             TownMapPlace_SetAnim(place, place->anim);
             ClActor_SetVisible(place->actor, TRUE);
         } else {
@@ -1376,7 +1391,7 @@ static void TownMapPlace_Select(TownMapPlace *place) {
     BOOL shown = FALSE;
 
     if (TownMapPlace_GetParam(place, TOWNMAP_PARAM_TYPE) == TOWNMAP_PLACE_TYPE_TOWN ||
-        TownMapPlace_GetParam(place, TOWNMAP_PARAM_TYPE) == 5) {
+        TownMapPlace_GetParam(place, TOWNMAP_PARAM_TYPE) == TOWNMAP_PLACE_TYPE_UNITY_TOWER) {
         shown = TRUE;
         if (place->hidden) {
             shown = FALSE;
@@ -1394,7 +1409,7 @@ static void TownMapPlace_Deselect(TownMapPlace *place) {
     BOOL shown = FALSE;
 
     if (TownMapPlace_GetParam(place, TOWNMAP_PARAM_TYPE) == TOWNMAP_PLACE_TYPE_TOWN ||
-        TownMapPlace_GetParam(place, TOWNMAP_PARAM_TYPE) == 5) {
+        TownMapPlace_GetParam(place, TOWNMAP_PARAM_TYPE) == TOWNMAP_PLACE_TYPE_UNITY_TOWER) {
         shown = TRUE;
         if (place->hidden) {
             shown = FALSE;
@@ -1619,23 +1634,23 @@ static void TownMapInfo_Draw(TownMapInfo *info, TownMapPlace *place) {
             GFL_TextRendererDrawToBitmap(bitmap, center, 48, info->strbuf, info->font);
         }
         messageId = TownMapPlace_GetParam(place, TOWNMAP_PARAM_DESCRIPTION);
-        if (messageId != 0xffff) {
+        if (messageId != TOWNMAP_NO_MESSAGE) {
             GFL_MsgDataLoadStrbuf(info->msgData, messageId, info->strbuf);
             GFL_TextRendererDrawToBitmap(bitmap, 28, 80, info->strbuf, info->font);
         }
         if (TownMapPlace_IsDescribed(place) && landmarks) {
             messageId = TownMapPlace_GetParam(place, TOWNMAP_PARAM_LANDMARK_FIRST);
-            if (messageId != 0xffff) {
+            if (messageId != TOWNMAP_NO_MESSAGE) {
                 GFL_MsgDataLoadStrbuf(info->msgData, messageId, info->strbuf);
                 GFL_TextRendererDrawToBitmap(bitmap, 16, 128, info->strbuf, info->font);
             }
             messageId = TownMapPlace_GetParam(place, TOWNMAP_PARAM_LANDMARK_FIRST + 1);
-            if (messageId != 0xffff) {
+            if (messageId != TOWNMAP_NO_MESSAGE) {
                 GFL_MsgDataLoadStrbuf(info->msgData, messageId, info->strbuf);
                 GFL_TextRendererDrawToBitmap(bitmap, 16, 144, info->strbuf, info->font);
             }
             messageId = TownMapPlace_GetParam(place, TOWNMAP_PARAM_LANDMARK_FIRST + 2);
-            if (messageId != 0xffff) {
+            if (messageId != TOWNMAP_NO_MESSAGE) {
                 GFL_MsgDataLoadStrbuf(info->msgData, messageId, info->strbuf);
                 GFL_TextRendererDrawToBitmap(bitmap, 16, 160, info->strbuf, info->font);
             }
@@ -1654,7 +1669,7 @@ static void TownMapInfo_Draw(TownMapInfo *info, TownMapPlace *place) {
                     people += JoinAvenuePersonList_CountUsed(*visitors);
                 }
                 messageId = TownMapPlace_GetParam(place, TOWNMAP_PARAM_LANDMARK_FIRST + 3);
-                if (messageId != 0xffff) {
+                if (messageId != TOWNMAP_NO_MESSAGE) {
                     u32 x;
 
                     GFL_MsgDataLoadStrbuf(info->msgData, messageId, format);
@@ -1664,7 +1679,7 @@ static void TownMapInfo_Draw(TownMapInfo *info, TownMapPlace *place) {
                     GFL_TextRendererDrawToBitmap(bitmap, x, 128, info->strbuf, info->font);
                 }
                 messageId = TownMapPlace_GetParam(place, TOWNMAP_PARAM_LANDMARK_FIRST + 4);
-                if (messageId != 0xffff) {
+                if (messageId != TOWNMAP_NO_MESSAGE) {
                     u32 x;
 
                     GFL_MsgDataLoadStrbuf(info->msgData, messageId, format);
@@ -1674,7 +1689,7 @@ static void TownMapInfo_Draw(TownMapInfo *info, TownMapPlace *place) {
                     GFL_TextRendererDrawToBitmap(bitmap, x, 144, info->strbuf, info->font);
                 }
                 messageId = TownMapPlace_GetParam(place, TOWNMAP_PARAM_LANDMARK_LAST);
-                if (messageId != 0xffff) {
+                if (messageId != TOWNMAP_NO_MESSAGE) {
                     u32 x;
 
                     GFL_MsgDataLoadStrbuf(info->msgData, messageId, format);
@@ -1686,17 +1701,17 @@ static void TownMapInfo_Draw(TownMapInfo *info, TownMapPlace *place) {
                 GFL_StrBufFree(format);
             } else {
                 messageId = TownMapPlace_GetParam(place, TOWNMAP_PARAM_LANDMARK_FIRST + 3);
-                if (messageId != 0xffff) {
+                if (messageId != TOWNMAP_NO_MESSAGE) {
                     GFL_MsgDataLoadStrbuf(info->msgData, messageId, info->strbuf);
                     GFL_TextRendererDrawToBitmap(bitmap, 136, 128, info->strbuf, info->font);
                 }
                 messageId = TownMapPlace_GetParam(place, TOWNMAP_PARAM_LANDMARK_FIRST + 4);
-                if (messageId != 0xffff) {
+                if (messageId != TOWNMAP_NO_MESSAGE) {
                     GFL_MsgDataLoadStrbuf(info->msgData, messageId, info->strbuf);
                     GFL_TextRendererDrawToBitmap(bitmap, 136, 144, info->strbuf, info->font);
                 }
                 messageId = TownMapPlace_GetParam(place, TOWNMAP_PARAM_LANDMARK_LAST);
-                if (messageId != 0xffff) {
+                if (messageId != TOWNMAP_NO_MESSAGE) {
                     GFL_MsgDataLoadStrbuf(info->msgData, messageId, info->strbuf);
                     GFL_TextRendererDrawToBitmap(bitmap, 136, 160, info->strbuf, info->font);
                 }

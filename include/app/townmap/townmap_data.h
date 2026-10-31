@@ -52,10 +52,21 @@ enum {
     TOWNMAP_PARAM_COUNT
 };
 
-// The Pokédex's map gives this type its own marker; in the data it is N's Castle's, the Plasma Frigate's and the
-// Abyssal Ruins', not the towns' (0)
-#define TOWNMAP_PLACE_TYPE_TOWN 4
+// The kinds of place (TOWNMAP_PARAM_TYPE), each with its own marker. TOWN is the Pokédex's map's name for the kind that
+// is N's Castle's, the Plasma Frigate's and the Abyssal Ruins' in the data, not the towns' (CITY)
+enum {
+    TOWNMAP_PLACE_TYPE_CITY = 0,
+    TOWNMAP_PLACE_TYPE_ROUTE = 1,
+    // Caves, forests and other landmarks
+    TOWNMAP_PLACE_TYPE_LANDMARK = 2,
+    // The PWT, Pokéstar Studios, Join Avenue and Victory Road
+    TOWNMAP_PLACE_TYPE_FACILITY = 3,
+    TOWNMAP_PLACE_TYPE_TOWN = 4,
+    TOWNMAP_PLACE_TYPE_UNITY_TOWER = 5,
+};
 #define TOWNMAP_NO_FLAG 0xffff
+// What ends a place's landmarks, and what a missing description is
+#define TOWNMAP_NO_MESSAGE 0xffff
 
 // Reads the table of places, and frees it
 void *TownMapData_Load(HeapID heapId);
