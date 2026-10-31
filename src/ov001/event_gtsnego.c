@@ -31,6 +31,26 @@ typedef struct {
     u32 unk3B0;
 } EventGtsNego;
 
+enum {
+    STEP_SAVE_BGM = 0,
+    STEP_CLOSE_FIELD,
+    STEP_LOGIN,
+    STEP_LOGIN_WAIT,
+    STEP_NEGOTIATE,
+    STEP_NEGOTIATE_WAIT,
+    STEP_TRADE,
+    STEP_TRADE_WAIT,
+    STEP_WAIT_PARTNER,
+    STEP_DISCONNECT,
+    STEP_EVOLVE,
+    STEP_EVOLVE_WAIT,
+    STEP_LOGOUT,
+    STEP_LOGOUT_WAIT,
+    STEP_CLEANUP,
+    STEP_OPEN_FIELD_WAIT,
+    STEP_DONE,
+};
+
 GameEventReturnCode EventGtsNego_Callback(GameEvent *event, u32 *state, void *data);
 EventGtsNego *EventGtsNego_Init(GameEvent *event, GameSystem *gsys, Field *field, u32 unk3B0);
 
@@ -41,90 +61,90 @@ GameEventReturnCode EventGtsNego_Callback(GameEvent *event, u32 *state, void *da
     Field *field = GSYS_GetField(gsys);
 
     switch (*state) {
-    case 0:
+    case STEP_SAVE_BGM:
         wk->bgm = GFL_SndBGMGetID();
         GFL_SndBGMFadeOut(6);
         (*state)++;
         break;
-    case 1:
+    case STEP_CLOSE_FIELD:
         // Wait for the comm system to shut down
         if (!GameCommSys_BootCheck(GSYS_GetGameCommSystem(gsys))) {
             GameEvent_ChainNext(event, CreateFieldCloseEvent(gsys, field));
             (*state)++;
         }
         break;
-    case 2:
+    case STEP_LOGIN:
         wk->login.buffer = wk->buffer;
         wk->login.unkC = 0x33;
         GSYS_QueueProc(gsys, OVERLAY_WIFILOGIN, &WIFILOGIN_PROC_FUNCTIONS, &wk->login);
         (*state)++;
         break;
-    case 3:
+    case STEP_LOGIN_WAIT:
         if (!GSYS_GetProcMgrState(gsys)) {
             if (wk->login.result == 0) {
                 (*state)++;
             } else {
-                *state = 14;
+                *state = STEP_CLEANUP;
             }
         }
         break;
-    case 4:
+    case STEP_NEGOTIATE:
         wk->nego.result = 0;
         GSYS_QueueProc(gsys, OVERLAY_GTSNEGO, &GTSNEGO_PROC_FUNCTIONS, &wk->nego);
         (*state)++;
         break;
-    case 5:
+    case STEP_NEGOTIATE_WAIT:
         if (!GSYS_GetProcMgrState(gsys)) {
             if (wk->nego.result == GTSNEGO_RESULT_EXIT) {
-                *state = 12;
+                *state = STEP_LOGOUT;
             } else if (wk->nego.result == GTSNEGO_RESULT_RETRY_LOGIN) {
                 wk->login.unk14 = 1;
-                *state = 2;
+                *state = STEP_LOGIN;
             } else {
                 wk->trade.next = 0;
                 (*state)++;
             }
         }
         break;
-    case 6:
+    case STEP_TRADE:
         wk->trade.gameData = gameData;
         wk->trade.nego = &wk->nego;
         wk->trade.buffer = wk->buffer;
         GSYS_QueueProc(gsys, OVERLAY_POKEMONTRADE, &POKEMONTRADE_PROC_FUNCTIONS, &wk->trade);
         (*state)++;
         break;
-    case 7:
+    case STEP_TRADE_WAIT:
         if (!GSYS_GetProcMgrState(gsys)) {
             if (!GFL_NetIsInitialized()) {
                 wk->login.unk14 = 1;
-                *state = 2;
+                *state = STEP_LOGIN;
             } else if (wk->trade.next == TRADE_NEXT_NEGOTIATE) {
-                *state = 4;
+                *state = STEP_NEGOTIATE;
             } else if (wk->trade.next == TRADE_NEXT_EVOLVE) {
-                *state = 10;
+                *state = STEP_EVOLVE;
             } else {
                 NetHandle_SendTimingPair(NetHandle_GetOwn(), 1, 12);
                 GflNet_SetAutoExit(FALSE);
                 GFL_NetSetDisconnectError(FALSE);
                 wk->timeout = 100;
-                *state = 8;
+                *state = STEP_WAIT_PARTNER;
             }
         }
         break;
-    case 8:
+    case STEP_WAIT_PARTNER:
         wk->timeout--;
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 1, 12)) {
-            *state = 9;
+            *state = STEP_DISCONNECT;
         }
         if (wk->timeout < 0) {
-            *state = 9;
+            *state = STEP_DISCONNECT;
         }
         break;
-    case 9:
+    case STEP_DISCONNECT:
         NetState_WifiDisconnect(1);
-        *state = 4;
+        *state = STEP_NEGOTIATE;
         break;
-    case 10: {
+    case STEP_EVOLVE: {
         EvolutionDemoParam *evolution =
             GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(EvolutionDemoParam), FALSE, "event_gtsnego.c", 204);
 
@@ -140,28 +160,28 @@ GameEventReturnCode EventGtsNego_Callback(GameEvent *event, u32 *state, void *da
         (*state)++;
         break;
     }
-    case 11:
+    case STEP_EVOLVE_WAIT:
         if (!GSYS_GetProcMgrState(gsys)) {
             GFL_HeapFree(wk->trade.evolution);
             if (!GFL_NetIsInitialized()) {
                 wk->login.unk14 = 1;
-                *state = 2;
+                *state = STEP_LOGIN;
             } else {
                 wk->trade.next = TRADE_NEXT_EVOLVE;
-                *state = 6;
+                *state = STEP_TRADE;
             }
         }
         break;
-    case 12:
+    case STEP_LOGOUT:
         GSYS_QueueProc(gsys, OVERLAY_WIFILOGIN, &WIFILOGOUT_PROC_FUNCTIONS, &wk->logout);
         (*state)++;
         break;
-    case 13:
+    case STEP_LOGOUT_WAIT:
         if (!GSYS_GetProcMgrState(gsys)) {
             (*state)++;
         }
         break;
-    case 14:
+    case STEP_CLEANUP:
         GFL_HeapFree(wk->nego.playerInfo);
         GFL_HeapFree(wk->nego.playerInfo2);
         GFL_HeapFree(wk->party);
@@ -170,10 +190,10 @@ GameEventReturnCode EventGtsNego_Callback(GameEvent *event, u32 *state, void *da
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
         (*state)++;
         break;
-    case 15:
+    case STEP_OPEN_FIELD_WAIT:
         (*state)++;
         break;
-    case 16:
+    case STEP_DONE:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
