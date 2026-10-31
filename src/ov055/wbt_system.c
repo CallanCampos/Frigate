@@ -31,7 +31,7 @@ WbtSystem *WbtSystem_Create(HeapID heapId, BOOL a1) {
     sys->partyBC = PokeParty_Create(sys->heapId);
     sys->partyC0 = PokeParty_Create(sys->heapId);
     sys->partyC4 = PokeParty_Create(sys->heapId);
-    sys->unk13AC = NULL;
+    sys->battleBoxParty = NULL;
     sys->trainers = WbtTrainers_Load(sys->heapId);
     return sys;
 }
@@ -43,8 +43,8 @@ void WbtSystem_Free(WbtSystem *sys) {
     GFL_HeapFree(sys->partyC4);
     GFL_HeapFree(sys->partyBC);
     GFL_HeapFree(sys->partyC0);
-    if (sys->unk13AC != NULL) {
-        GFL_HeapFree(sys->unk13AC);
+    if (sys->battleBoxParty != NULL) {
+        GFL_HeapFree(sys->battleBoxParty);
     }
     for (i = 0; i < 8; i++) {
         WbtEntrant_Free(&sys->entrants[i]);
@@ -97,23 +97,23 @@ u64 WbtSystem_GetSeed(WbtSystem *sys) {
 }
 
 void WbtSystem_SetDownloadSlot(WbtSystem *sys, u8 value) {
-    sys->unk1D = value;
+    sys->downloadSlot = value;
 }
 
 u8 WbtSystem_GetDownloadSlot(WbtSystem *sys) {
-    return sys->unk1D;
+    return sys->downloadSlot;
 }
 
 void WbtSystem_SetResultVar(WbtSystem *sys, u16 *var) {
-    sys->unk13E0 = var;
+    sys->resultVar = var;
 }
 
 u16 *WbtSystem_GetResultVar(WbtSystem *sys) {
-    return sys->unk13E0;
+    return sys->resultVar;
 }
 
 void WbtSystem_SetUseBattleBox(WbtSystem *sys, u8 value) {
-    sys->unk13A8 = value;
+    sys->useBattleBox = value;
 }
 
 void WbtSystem_SetPartyList(WbtSystem *sys, WbtPartyList *list) {
@@ -137,7 +137,7 @@ WbtEntrant *WbtSystem_GetPlayerEntrant(WbtSystem *sys) {
     int i;
 
     for (i = 0; i < 8; i++) {
-        if (sys->entrants[i].unk0_0 == 3) {
+        if (sys->entrants[i].kind == 3) {
             return &sys->entrants[i];
         }
     }
@@ -165,48 +165,48 @@ u32 WbtSystem_GetEntryCount(WbtSystem *sys) {
 }
 
 static void WbtEntrant_Init(WbtEntrant *entrant, HeapID heapId) {
-    entrant->unk0_0 = 0;
-    entrant->unk0_3 = 0;
-    entrant->unk0_4 = 1;
-    entrant->unk0_7 = 0;
+    entrant->kind = 0;
+    entrant->gender = 0;
+    entrant->rank = 1;
+    entrant->hasSpecialPokemon = 0;
     entrant->type = 0;
-    entrant->unk2 = 0;
-    entrant->unk3_0 = 0;
-    entrant->unk3_6 = 0;
+    entrant->trainerId = 0;
+    entrant->iv = 0;
+    entrant->downloadedRound = 0;
     entrant->objCode = 0xe7;
-    entrant->unk6_0 = 0;
+    entrant->trainerClass = 0;
     entrant->unk6_12 = 1;
     entrant->name = GFL_StrBufCreate(16, heapId);
-    entrant->unkC = GFL_StrBufCreate(0x16, heapId);
+    entrant->className = GFL_StrBufCreate(0x16, heapId);
 }
 
 static void WbtEntrant_Free(WbtEntrant *entrant) {
     GFL_StrBufFree(entrant->name);
-    GFL_StrBufFree(entrant->unkC);
+    GFL_StrBufFree(entrant->className);
 }
 
 u32 WbtEntrant_GetRank(WbtEntrant *entrant) {
-    return entrant->unk0_4;
+    return entrant->rank;
 }
 
 u8 WbtEntrant_GetIv(WbtEntrant *entrant) {
-    return entrant->unk3_0;
+    return entrant->iv;
 }
 
 u32 WbtEntrant_GetDownloadedRound(WbtEntrant *entrant) {
-    return entrant->unk3_6;
+    return entrant->downloadedRound;
 }
 
 u8 WbtEntrant_GetTrainerId(WbtEntrant *entrant) {
-    return entrant->unk2;
+    return entrant->trainerId;
 }
 
 u16 WbtEntrant_GetTrainerClass(WbtEntrant *entrant) {
-    return entrant->unk6_0;
+    return entrant->trainerClass;
 }
 
 u32 WbtEntrant_GetKind(WbtEntrant *entrant) {
-    return entrant->unk0_0;
+    return entrant->kind;
 }
 
 void WbtEntrant_GetName(const WbtEntrant *entrant, StrBuf *dest) {
@@ -214,7 +214,7 @@ void WbtEntrant_GetName(const WbtEntrant *entrant, StrBuf *dest) {
 }
 
 u32 WbtEntrant_HasSpecialPokemon(WbtEntrant *entrant) {
-    return entrant->unk0_7;
+    return entrant->hasSpecialPokemon;
 }
 
 // Copies the Pokémon picked for the tournament into its parties
@@ -301,7 +301,7 @@ Regulation *WbtSystem_GetRegulation(WbtSystem *sys) {
         for (i = 0; i < 0x4c; i++) {
             sys->regulation.bannedItems[i] = downloaded->unk5A[i];
         }
-        sys->regulation.battleType = downloaded->unkA7;
+        sys->regulation.battleType = downloaded->battleType;
     } else {
         PokeRegulation_Load(WbtSystem_GetRegulationId(sys), &sys->regulation);
         if (sys->tournament == 11 || sys->tournament == 4) {
@@ -333,8 +333,8 @@ WbtUnk18A *func_ov055_021e6024(WbtSystem *sys) {
         break;
     }
     sys->unk18A.type = type;
-    sys->unk18A.unk1 = 0;
-    sys->unk18A.unk2 = value;
+    sys->unk18A.rank = 0;
+    sys->unk18A.index = value;
     return &sys->unk18A;
 }
 
@@ -370,7 +370,7 @@ u32 WbtSystem_GetOpponentSeat(WbtSystem *sys) {
         secondWinners[i] = firstWinners[seat];
     }
     for (i = 0; i < 8; i++) {
-        if (sys->entrants[i].unk0_0 == 3) {
+        if (sys->entrants[i].kind == 3) {
             player = i;
             break;
         }
@@ -393,8 +393,8 @@ u32 WbtSystem_GetOpponentSeat(WbtSystem *sys) {
 }
 
 static void WbtMatch_Play(WbtMatch *match, MATHRandContext32 *rand, WbtEntrant *first, WbtEntrant *second) {
-    int firstRank = first->unk0_4;
-    int secondRank = second->unk0_4;
+    int firstRank = first->rank;
+    int secondRank = second->rank;
     u8 firstEffect = WbtMatch_GetTypeEffectiveness(first->type, second->type);
     u8 secondEffect = WbtMatch_GetTypeEffectiveness(second->type, first->type);
     int kind;
@@ -412,9 +412,9 @@ static void WbtMatch_Play(WbtMatch *match, MATHRandContext32 *rand, WbtEntrant *
     } else {
         match->firstWon = firstRank > secondRank;
     }
-    if (first->unk0_0 == 3) {
+    if (first->kind == 3) {
         match->firstWon = TRUE;
-    } else if (second->unk0_0 == 3) {
+    } else if (second->kind == 3) {
         match->firstWon = FALSE;
     }
     if (firstRank >= 4 && secondRank >= 4) {

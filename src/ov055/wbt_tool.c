@@ -79,11 +79,11 @@ BOOL WbtTrainers_IsValid(WbtTrainers *trainers, u8 index) {
 }
 
 u16 WbtTrainers_GetObjCode(WbtTrainers *trainers, u8 index) {
-    return trainers->trainers[index].unk2;
+    return trainers->trainers[index].objCode;
 }
 
 int WbtTrainers_GetRank(WbtTrainers *trainers, u8 index) {
-    return trainers->trainers[index].unk8_0;
+    return trainers->trainers[index].rank;
 }
 
 // Meant to keep the style in range, but it can never change it

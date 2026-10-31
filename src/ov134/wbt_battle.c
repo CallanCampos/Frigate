@@ -380,9 +380,9 @@ void WbtBattle_MakeOpponentParty(WbtSystem *sys, GameSystem *gsys, const WbtEntr
     HeapID heapId = HEAPID_TAIL(sys->heapId);
     u32 count = WbtSystem_GetEntryCount(sys);
 
-    switch (opponent->unk0_0) {
+    switch (opponent->kind) {
     case 0:
-        if (opponent->unk6_0 == TRAINER_CLASS_PKMN_TRAINER_RIVAL) {
+        if (opponent->trainerClass == TRAINER_CLASS_PKMN_TRAINER_RIVAL) {
             TrainerUtil_LoadParty(WbtBattle_GetRivalTrainerId(gsys), sys->partyC0, heapId);
             return;
         }
@@ -392,7 +392,7 @@ void WbtBattle_MakeOpponentParty(WbtSystem *sys, GameSystem *gsys, const WbtEntr
         return;
     case 1:
     case 2:
-        WbtBattle_MakeDownloadedParty(sys->partyC0, &sys->download, opponent->unk3_6, count, heapId);
+        WbtBattle_MakeDownloadedParty(sys->partyC0, &sys->download, opponent->downloadedRound, count, heapId);
         break;
     case 3:
         break;
@@ -407,9 +407,9 @@ static void WbtBattle_SetBattleTrainer(BtlSetupTrainer *trainer, const WbtEntran
     if (flags & 8) {
         aiFlags |= 0x80;
     }
-    trainer->trainerId = 0x800 + entrant->unk2;
+    trainer->trainerId = 0x800 + entrant->trainerId;
     trainer->aiFlags = aiFlags;
-    trainer->trainerClass = entrant->unk6_0;
+    trainer->trainerClass = entrant->trainerClass;
     WbtEntrant_GetName(entrant, trainer->name);
     MI_CpuClear16(trainer->items, sizeof(trainer->items));
     PMSData_Clear(&trainer->winWords);
@@ -434,7 +434,7 @@ BtlSetup *WbtBattle_SetupBattle(WbtSystem *sys, GameSystem *gsys) {
     WbtBattle_SetBattleTrainer(setup->trainers[1], opponent);
     PokeParty_Copy(sys->partyC0, setup->party[1]);
     PokeRegulation_ApplyLevelToParty(WbtSystem_GetRegulation(sys), setup->party[1]);
-    setup->trainerNames[1] = opponent->unkC;
+    setup->trainerNames[1] = opponent->className;
     sys->unk13D4 = GFL_StrBufCreate(0x130, sys->heapId);
     sys->unk13D8 = GFL_StrBufCreate(0x130, sys->heapId);
     WbtBattle_LoadOpponentLine(sys, 3, sys->unk13D4);
@@ -495,11 +495,11 @@ static u8 WbtBattle_GetRoundSlot(u32 round) {
 }
 
 u8 WbtBattle_GetRoundRemaining(WbtSystem *sys, u16 round) {
-    return sys->unk13DC[WbtBattle_GetRoundSlot(round)];
+    return sys->roundRemaining[WbtBattle_GetRoundSlot(round)];
 }
 
 static void WbtBattle_SetRoundRemaining(WbtSystem *sys, u32 round, u8 remaining) {
-    sys->unk13DC[WbtBattle_GetRoundSlot(round)] = remaining;
+    sys->roundRemaining[WbtBattle_GetRoundSlot(round)] = remaining;
 }
 
 // Ends the battle: records its result, and the Trainer beaten, and whether the player may go on
@@ -524,16 +524,16 @@ void WbtBattle_EndBattle(WbtSystem *sys, GameData *gameData, BtlSetup *setup) {
     }
     opponent = WbtBattle_GetOpponent(sys);
     save = GameData_GetWbtSave(gameData);
-    if (sys->tournament != 3 && opponent->unk2 < 54) {
+    if (sys->tournament != 3 && opponent->trainerId < 54) {
         u8 slot = WbtBattle_GetRoundSlot(sys->round);
 
-        if (opponent->unk2 == 53) {
+        if (opponent->trainerId == 53) {
             WbtSave_SetSlot(save, slot, 0xff);
         } else {
-            WbtSave_SetSlot(save, slot, opponent->unk2);
+            WbtSave_SetSlot(save, slot, opponent->trainerId);
         }
-        WbtSave_SetTrainerBeaten(save, opponent->unk2);
-    } else if (sys->tournament == 11 && opponent->unk2 == 56) {
+        WbtSave_SetTrainerBeaten(save, opponent->trainerId);
+    } else if (sys->tournament == 11 && opponent->trainerId == 56) {
         WbtSave_SetTrainerBeaten(save, 0);
     }
     if (result == 0 || sys->unk4 == 1) {
@@ -550,7 +550,7 @@ WbtEntrant *WbtBattle_GetOpponent(WbtSystem *sys) {
 }
 
 u32 WbtBattle_GetOpponentFlag(WbtSystem *sys) {
-    return WbtBattle_GetOpponent(sys)->unk0_3;
+    return WbtBattle_GetOpponent(sys)->gender;
 }
 
 u16 WbtBattle_GetOpponentObjCode(WbtSystem *sys) {
@@ -580,7 +580,7 @@ static void WbtBattle_GetBattleMusic(WbtSystem *sys, u16 *bgm, u16 *winBgm) {
         return;
     case 0:
     case 2:
-        WbtTrainers_Get(sys->trainers, opponent->unk2, &trainer);
+        WbtTrainers_Get(sys->trainers, opponent->trainerId, &trainer);
         *bgm = trainer.bgm;
         *winBgm = trainer.winBgm;
         if (sys->round == 4 && sys->tournament != 1) {

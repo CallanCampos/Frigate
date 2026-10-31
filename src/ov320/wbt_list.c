@@ -55,11 +55,18 @@
 #define TRAINER_PALETTE 6
 #define TEXT_COLOR 0x3dc0
 
-// What the screen shows, the unk4 of its WbtSetup
+// What the screen shows, the mode of its WbtSetup
 enum {
     MODE_OPENING,
     MODE_FIRST_ROUND,
     MODE_SECOND_ROUND,
+};
+
+enum {
+    PROC_STEP_WAIT_WIPE_IN,
+    PROC_STEP_WAIT_END,
+    PROC_STEP_WIPE_OUT,
+    PROC_STEP_WAIT_WIPE_OUT,
 };
 
 enum {
@@ -478,21 +485,21 @@ static BOOL WbtListProc_Main(GameProc *proc, u32 *state, void *param, void *work
     WbtList *list = work;
 
     switch (*state) {
-    case 0:
+    case PROC_STEP_WAIT_WIPE_IN:
         if (GFL_WipeIsFinished()) {
             (*state)++;
         }
         break;
-    case 1:
+    case PROC_STEP_WAIT_END:
         if (list->state == STATE_END && PrintQueue_IsEmpty(list->queue) == TRUE) {
             (*state)++;
         }
         break;
-    case 2:
+    case PROC_STEP_WIPE_OUT:
         GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 6, 1, list->heapId);
         (*state)++;
         break;
-    case 3:
+    case PROC_STEP_WAIT_WIPE_OUT:
         if (GFL_WipeIsFinished()) {
             return TRUE;
         }
@@ -550,8 +557,8 @@ static void WbtList_CreateTrainerActors(WbtList *work, const WbtListTrainerSetup
         x = WbtList_GetPosition(work, position);
         y = WbtList_GetPosition(work, position + 1);
         work->trainerActors[i] = UIObjRes_CreateActor(&work->trainerRes, unit, x, y, 0, work->heapId);
-        NsbtxToClwk_LoadTexture(work->trainerActors[i], ARCID_MMODEL_GRA, work->setup->entrants[i].unk4,
-                                work->setup->entrants[i].unk6, 4, 4, 0, resSetup.vramType, work->heapId);
+        NsbtxToClwk_LoadTexture(work->trainerActors[i], ARCID_MMODEL_GRA, work->setup->entrants[i].resIndex,
+                                work->setup->entrants[i].face, 4, 4, 0, resSetup.vramType, work->heapId);
         work->trainerActorCount++;
         ClActor_SetPriority(work->trainerActors[i], setups->priority);
         setups++;
@@ -573,7 +580,7 @@ static void WbtList_InitView(WbtList *work) {
 
     WbtList_Stub(work);
     work->strbuf = GFL_StrBufCreate(200, work->heapId);
-    work->mode = work->setup->unk4;
+    work->mode = work->setup->mode;
     work->state = STATE_START;
     work->step = 0;
     work->playerIndex = 0;
@@ -591,7 +598,7 @@ static void WbtList_InitView(WbtList *work) {
     work->positions = GFL_ArcSysReadHeapNew(ARCID_WBT_SUBSCREEN, 12, work->heapId);
     WbtList_CreateWindows(work);
     WbtList_PrintTitle(work, WINDOW_TITLE, sWbtListTitleX[WINDOW_TITLE], 0, work->setup->tournamentName);
-    WbtList_PrintTitle(work, WINDOW_SUBTITLE, sWbtListTitleX[WINDOW_SUBTITLE], 0, work->setup->unk9C);
+    WbtList_PrintTitle(work, WINDOW_SUBTITLE, sWbtListTitleX[WINDOW_SUBTITLE], 0, work->setup->styleName);
     WbtList_InitObjects(work);
     for (i = 0; i < ENTRANT_COUNT; i++) {
         GFL_BitmapFill(work->nameBitmaps[i], 0);
@@ -1174,7 +1181,7 @@ static void WbtList_PrintMessage(WbtList *work, u32 messageId) {
     }
     if (work->mode == MODE_OPENING && words == 1) {
         GFL_WordSetSetStrbuf(wordSet, 0, work->setup->tournamentName, 0, 1, 2);
-        GFL_WordSetSetStrbuf(wordSet, 1, work->setup->unk9C, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, 1, work->setup->styleName, 0, 1, 2);
     } else {
         first = WbtList_GetMatchValue(work, MATCH_FIRST, 0);
         second = WbtList_GetMatchValue(work, MATCH_SECOND, 0);
@@ -1183,7 +1190,7 @@ static void WbtList_PrintMessage(WbtList *work, u32 messageId) {
         }
         if (words == 2) {
             GFL_WordSetSetStrbuf(wordSet, 0, work->setup->tournamentName, 0, 1, 2);
-            GFL_WordSetSetStrbuf(wordSet, 1, work->setup->unk9C, 0, 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, 1, work->setup->styleName, 0, 1, 2);
         } else {
             GFL_WordSetSetStrbuf(wordSet, 0, work->setup->entrants[first].name, 0, 1, 2);
             GFL_WordSetSetStrbuf(wordSet, 1, work->setup->entrants[second].name, 0, 1, 2);
@@ -1398,18 +1405,18 @@ static void WbtList_InitEntrants(WbtList *work) {
 
         if (i < COLUMN_SIZE) {
             sequence = 2;
-            if (work->setup->entrants[i].unk7 == 1) {
+            if (work->setup->entrants[i].gender == 1) {
                 sequence = 3;
             }
         } else {
             sequence = 6;
-            if (work->setup->entrants[i].unk7 == 1) {
+            if (work->setup->entrants[i].gender == 1) {
                 sequence = 7;
             }
         }
         WbtList_SetActorAnim(work, ACTOR_PLATE + i, sequence);
         palette = 0;
-        if (work->setup->entrants[i].unk7 == 1) {
+        if (work->setup->entrants[i].gender == 1) {
             palette = 1;
         }
         BmpOam_ActorSetPaletteOffset(work->nameActors[i], (u8)palette);
@@ -1458,7 +1465,7 @@ static void WbtList_InitMatches(WbtList *work) {
     }
     if (work->mode == MODE_FIRST_ROUND || work->mode == MODE_SECOND_ROUND) {
         for (i = 0; i < 4; i++) {
-            if (work->setup->firstRound[i].unk0 == 1) {
+            if (work->setup->firstRound[i].firstWon == 1) {
                 work->matches[3 + i].winner = i * 2;
                 work->matches[3 + i].loser = i * 2 + 1;
                 work->matches[3 + i].side = 0;
@@ -1470,7 +1477,7 @@ static void WbtList_InitMatches(WbtList *work) {
             work->matches[3 + i].mask = 1 << (i * 2);
             work->matches[3 + i].mask |= 1 << (i * 2 + 1);
             work->matches[3 + i].line = i;
-            work->matches[3 + i].message = work->setup->firstRound[i].unk4;
+            work->matches[3 + i].message = work->setup->firstRound[i].message;
             work->matches[3 + i].first = i * 2;
             work->matches[3 + i].second = i * 2 + 1;
         }
@@ -1491,7 +1498,7 @@ static void WbtList_InitMatches(WbtList *work) {
     }
     if (work->mode == MODE_SECOND_ROUND) {
         for (i = 0; i < 2; i++) {
-            if (work->setup->secondRound[i].unk0 == 1) {
+            if (work->setup->secondRound[i].firstWon == 1) {
                 work->matches[8 + i].winner = work->matches[3 + i * 2].winner;
                 work->matches[8 + i].loser = work->matches[4 + i * 2].winner;
                 work->matches[8 + i].side = 0;
@@ -1503,7 +1510,7 @@ static void WbtList_InitMatches(WbtList *work) {
             work->matches[8 + i].mask = 1 << work->matches[3 + i * 2].winner;
             work->matches[8 + i].mask |= 1 << work->matches[4 + i * 2].winner;
             work->matches[8 + i].line = 4 + i;
-            work->matches[8 + i].message = work->setup->secondRound[i].unk4;
+            work->matches[8 + i].message = work->setup->secondRound[i].message;
             work->matches[8 + i].first = work->matches[3 + i * 2].winner;
             work->matches[8 + i].second = work->matches[4 + i * 2].winner;
         }
