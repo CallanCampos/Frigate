@@ -366,7 +366,7 @@ PokedexDetailBackground *PokedexDetailBackground_Create(HeapID heapId, u32 page,
                          32, heapId);
     background->chars = GFL_BGSysLoadArcNCGRDynamic(arc, sBackgroundFiles[screen].ncgr, bg, 0, FALSE, heapId);
     nscr = sBackgroundFiles[screen].nscr;
-    if (page == 3 && screen == 0) {
+    if (page == POKEDEX_DETAIL_PAGE_FORM - 1 && screen == 0) {
         nscr = 33;
     }
     GFL_G2DIOLoadNSCRSync(arc, nscr, bg, 0, CHAR_POS(background->chars), 0, FALSE, heapId);
