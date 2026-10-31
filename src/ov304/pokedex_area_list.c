@@ -49,6 +49,37 @@ enum {
     STATE_COUNT = 9,
 };
 
+// The steps of the process's init, of the states that fade in and out, of a button and of the decision
+enum {
+    INIT_CREATE,
+    INIT_SETUP,
+    INIT_DRAW,
+};
+
+enum {
+    FADE_IN_WAIT_PRINT,
+    FADE_IN_WAIT_FADE,
+    FADE_IN_SLIDE,
+};
+
+enum {
+    FADE_OUT_WAIT_PRINT,
+    FADE_OUT_SLIDE,
+};
+
+enum {
+    BUTTON_START,
+    BUTTON_WAIT,
+};
+
+enum {
+    DECIDE_START,
+    DECIDE_RESTORE_1,
+    DECIDE_FLASH_2,
+    DECIDE_RESTORE_2,
+    DECIDE_FADE,
+};
+
 // What the next state of a button is given
 #define STATE_PARAM_NORMAL 8
 #define STATE_PARAM_NO_WAIT 9
@@ -143,19 +174,19 @@ static BOOL PokedexAreaList_ProcInit(GameProc *proc, u32 *state, void *param, vo
     PokedexAreaListWork *wk = work;
 
     switch (*state) {
-    case 0:
+    case INIT_CREATE:
         GFL_HeapCreateChild(HEAPID_USER, HEAPID_POKEDEX_AREA_LIST, 0x60000);
         PokedexAreaList_CreateWork(proc, param);
         (*state)++;
         break;
-    case 1:
+    case INIT_SETUP:
         PokedexAreaListView_Init(&wk->view, wk->param->gameData);
         PokedexAreaList_InitVBlank(wk);
         PokedexAreaList_InitHBlank(wk);
         PokedexAreaList_InitList(wk);
         (*state)++;
         break;
-    case 2:
+    case INIT_DRAW:
         if (PokedexAreaListView_Draw(&wk->view) == TRUE) {
             return TRUE;
         }
@@ -267,7 +298,7 @@ static void PokedexAreaList_SetState(PokedexAreaListWork *wk, u32 state, u32 par
 // Fades in while the touch bar and the heading slide into place
 static void PokedexAreaList_StateFadeIn(PokedexAreaListWork *wk) {
     switch (wk->step) {
-    case 0:
+    case FADE_IN_WAIT_PRINT:
         if (PokedexAreaListView_IsPrinted(&wk->view)) {
             wk->touchbarOffset = SLIDE_DISTANCE;
             wk->headingOffset = -SLIDE_DISTANCE;
@@ -277,7 +308,7 @@ static void PokedexAreaList_StateFadeIn(PokedexAreaListWork *wk) {
             wk->step++;
         }
         break;
-    case 1:
+    case FADE_IN_WAIT_FADE:
         if (!PokedexAreaListView_IsFading(&wk->view)) {
             GX_SetMasterBrightness(0);
             GXS_SetMasterBrightness(0);
@@ -285,7 +316,7 @@ static void PokedexAreaList_StateFadeIn(PokedexAreaListWork *wk) {
             wk->step++;
         }
         break;
-    case 2:
+    case FADE_IN_SLIDE:
         if (wk->touchbarOffset <= 0) {
             if (!PokedexAreaListView_IsFading(&wk->view)) {
                 PokedexAreaListView_SetBlinkPaused(&wk->view, FALSE);
@@ -303,7 +334,7 @@ static void PokedexAreaList_StateFadeIn(PokedexAreaListWork *wk) {
 
 static void PokedexAreaList_StateFadeOut(PokedexAreaListWork *wk) {
     switch (wk->step) {
-    case 0:
+    case FADE_OUT_WAIT_PRINT:
         if (PokedexAreaListView_IsPrinted(&wk->view)) {
             PokedexAreaListView_SetBlinkPaused(&wk->view, TRUE);
             wk->touchbarOffset = 0;
@@ -312,7 +343,7 @@ static void PokedexAreaList_StateFadeOut(PokedexAreaListWork *wk) {
             wk->step++;
         }
         break;
-    case 1:
+    case FADE_OUT_SLIDE:
         if (!PokedexAreaListView_IsFading(&wk->view)) {
             if (wk->touchbarOffset >= SLIDE_DISTANCE) {
                 GX_SetMasterBrightness(-16);
@@ -358,12 +389,12 @@ static void PokedexAreaList_StateList(PokedexAreaListWork *wk) {
         PokedexAreaList_Input(wk);
         break;
     case FRAMELIST_PAGE_UP:
-        PokedexAreaList_StartButton(wk, POKEDEX_AREA_LIST_OBJ_PAGE_UP, 12, STATE_LIST, STATE_PARAM_NO_WAIT,
-                                    STATE_PARAM_NORMAL);
+        PokedexAreaList_StartButton(wk, POKEDEX_AREA_LIST_OBJ_PAGE_UP, POKEDEX_AREA_LIST_ANIM_PAGE_UP_PRESSED,
+                                    STATE_LIST, STATE_PARAM_NO_WAIT, STATE_PARAM_NORMAL);
         break;
     case FRAMELIST_PAGE_DOWN:
-        PokedexAreaList_StartButton(wk, POKEDEX_AREA_LIST_OBJ_PAGE_DOWN, 13, STATE_LIST, STATE_PARAM_NO_WAIT,
-                                    STATE_PARAM_NORMAL);
+        PokedexAreaList_StartButton(wk, POKEDEX_AREA_LIST_OBJ_PAGE_DOWN, POKEDEX_AREA_LIST_ANIM_PAGE_DOWN_PRESSED,
+                                    STATE_LIST, STATE_PARAM_NO_WAIT, STATE_PARAM_NORMAL);
         break;
     case FRAMELIST_CURSOR_TOP:
         PokedexAreaListView_SetActorAnim(&wk->view, POKEDEX_AREA_LIST_OBJ_PAGE_UP, 18);
@@ -394,10 +425,10 @@ static void PokedexAreaList_StateList(PokedexAreaListWork *wk) {
 // Plays the animation of the button that was pressed, then goes on to the state it leads to
 static void PokedexAreaList_StateButton(PokedexAreaListWork *wk) {
     switch (wk->step) {
-    case 0:
+    case BUTTON_START:
         PokedexAreaListView_SetActorAnim(&wk->view, wk->buttonActor, wk->buttonAnim);
         wk->step++;
-    case 1:
+    case BUTTON_WAIT:
         if (!ClActor_IsAnimActive(PokedexAreaListView_GetActor(&wk->view, wk->buttonActor)) ||
             wk->stateParam == STATE_PARAM_NO_WAIT) {
             PokedexAreaList_SetState(wk, wk->nextState, wk->nextStateParam);
@@ -563,19 +594,20 @@ static void PokedexAreaList_StateDecide(PokedexAreaListWork *wk) {
     PokedexHabitatSummary *area = PokedexAreaListView_GetArea(&wk->view, scroll + cursor);
 
     for (i = 0; i < POKEDEX_AREA_LIST_KINDS; i++) {
-        if (area->conditions[i] == 1 && area->conditionsMet[i] == 1 && area->states[i] != 2) {
+        if (area->conditions[i] == 1 && area->conditionsMet[i] == 1 &&
+            area->states[i] != POKEDEX_HABITAT_STATE_CAUGHT) {
             complete = FALSE;
         }
     }
     switch (wk->step) {
-    case 0: {
+    case DECIDE_START: {
         ClActor *frame = PokedexAreaListView_GetActor(&wk->view, POKEDEX_AREA_LIST_OBJ_MARK_FRAME);
 
         ClActor_SetSequence(frame, ClActor_GetSequence(frame) + 1);
         ClActor_SetAutoAnim(frame, TRUE);
         PokedexAreaListView_SetActorAnim(&wk->view, POKEDEX_AREA_LIST_OBJ_DECIDE, 40);
     }
-    case 2:
+    case DECIDE_FLASH_2:
         if (wk->blinkTimer == 0) {
             if (complete == TRUE) {
                 PokedexAreaListView_SetCursorPalette(&wk->view, 6);
@@ -588,8 +620,8 @@ static void PokedexAreaList_StateDecide(PokedexAreaListWork *wk) {
             wk->blinkTimer--;
         }
         break;
-    case 1:
-    case 3:
+    case DECIDE_RESTORE_1:
+    case DECIDE_RESTORE_2:
         if (wk->blinkTimer == 0) {
             PokedexAreaListView_SetCursorPalette(&wk->view, 7);
             wk->blinkTimer = BLINK_FRAMES;
@@ -598,7 +630,7 @@ static void PokedexAreaList_StateDecide(PokedexAreaListWork *wk) {
             wk->blinkTimer--;
         }
         break;
-    case 4:
+    case DECIDE_FADE:
         if (wk->blinkTimer == 0) {
             PokedexAreaList_SetState(wk, STATE_FADE_OUT, STATE_PARAM_NORMAL);
         } else {
