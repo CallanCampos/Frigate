@@ -193,7 +193,7 @@ u8 PassPowerData_GetEffect(PassPowerData *data, u32 passPower) {
 }
 
 u16 PassPowerData_GetPrice(PassPowerData *data, u32 passPower) {
-    return data[passPower].unk02;
+    return data[passPower].price;
 }
 
 static void PassPower_Dummy(void) {
