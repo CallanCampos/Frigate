@@ -133,6 +133,40 @@ static u8 GimmickPlasmaFrigate_GetSavedVar(PlasmaFrigateState *state, int index)
 static void GimmickPlasmaFrigate_SetSaved(PlasmaFrigateState *state);
 static BOOL GimmickPlasmaFrigate_GetSaved(PlasmaFrigateState *state);
 
+// Stands in the pair table for the partner of a panel that goes alone
+#define PANEL_NO_PAIR 0xff
+
+// The panels that are flipped together, which the pair table starts with
+enum {
+    PANEL_PAIR_A_FIRST = 3,
+    PANEL_PAIR_A_SECOND,
+    PANEL_PAIR_B_FIRST = 11,
+    PANEL_PAIR_B_SECOND,
+};
+
+// The steps of a switch's event
+enum {
+    SWITCH_STEP_PRESS,
+    SWITCH_STEP_WAIT_TASKS,
+    SWITCH_STEP_SAVE,
+    SWITCH_STEP_END,
+};
+
+// The steps of a panel's turning off
+enum {
+    PANEL_OFF_STEP_START,
+    PANEL_OFF_STEP_WAIT,
+    PANEL_OFF_STEP_END,
+};
+
+// The steps of a panel's turning on
+enum {
+    PANEL_ON_STEP_START,
+    PANEL_ON_STEP_WAIT,
+    PANEL_ON_STEP_LIGHT,
+    PANEL_ON_STEP_END,
+};
+
 // The indicator of each panel that has none shared with another
 static int sPanelIndicators[12] = { 0, 1, 6, 2, 10, 3, 14, 7, 15, 11, 16, 17 };
 
@@ -160,8 +194,20 @@ static const PanelArea sAreasOff[PANEL_COUNT] = {
 // The panels that go together, in pairs of one that is flipped with the other, or alone, with 0xff in place of the
 // other
 static const u32 sPanelPairs[14][2] = {
-    { 3, 4 },    { 11, 12 },  { 0, 0xff }, { 1, 0xff },  { 2, 0xff },  { 5, 0xff },  { 6, 0xff },
-    { 7, 0xff }, { 8, 0xff }, { 9, 0xff }, { 10, 0xff }, { 13, 0xff }, { 14, 0xff }, { 15, 0xff },
+    { PANEL_PAIR_A_FIRST, PANEL_PAIR_A_SECOND },
+    { PANEL_PAIR_B_FIRST, PANEL_PAIR_B_SECOND },
+    { 0, PANEL_NO_PAIR },
+    { 1, PANEL_NO_PAIR },
+    { 2, PANEL_NO_PAIR },
+    { 5, PANEL_NO_PAIR },
+    { 6, PANEL_NO_PAIR },
+    { 7, PANEL_NO_PAIR },
+    { 8, PANEL_NO_PAIR },
+    { 9, PANEL_NO_PAIR },
+    { 10, PANEL_NO_PAIR },
+    { 13, PANEL_NO_PAIR },
+    { 14, PANEL_NO_PAIR },
+    { 15, PANEL_NO_PAIR },
 };
 
 static const G3DSceneResourceSetup sResources[18] = {
@@ -407,16 +453,16 @@ static void GimmickPlasmaFrigate_InitPanels(PlasmaFrigateWork *work) {
 // Keeps the panels and the event variables in the save
 static void GimmickPlasmaFrigate_Save(PlasmaFrigateWork *work) {
     EventWork *eventWork = GameData_GetEventWork(GSYS_GetGameData(Field_GetGameSystem(work->field)));
-    u16 *var0 = EventWork_GetWkPtr(eventWork, EVENT_WORK_0x4000);
-    u16 *var1 = EventWork_GetWkPtr(eventWork, EVENT_WORK_0x4001);
-    u16 *var2 = EventWork_GetWkPtr(eventWork, EVENT_WORK_0x4002);
-    u16 *var3 = EventWork_GetWkPtr(eventWork, EVENT_WORK_0x4003);
+    u16 *switch0 = EventWork_GetWkPtr(eventWork, EVENT_WORK_0x4000);
+    u16 *switch1 = EventWork_GetWkPtr(eventWork, EVENT_WORK_0x4001);
+    u16 *switch2 = EventWork_GetWkPtr(eventWork, EVENT_WORK_0x4002);
+    u16 *switch3 = EventWork_GetWkPtr(eventWork, EVENT_WORK_0x4003);
     int i;
 
-    GimmickPlasmaFrigate_SetSavedVar(work->state, *var0, 0);
-    GimmickPlasmaFrigate_SetSavedVar(work->state, *var1, 1);
-    GimmickPlasmaFrigate_SetSavedVar(work->state, *var2, 2);
-    GimmickPlasmaFrigate_SetSavedVar(work->state, *var3, 3);
+    GimmickPlasmaFrigate_SetSavedVar(work->state, *switch0, 0);
+    GimmickPlasmaFrigate_SetSavedVar(work->state, *switch1, 1);
+    GimmickPlasmaFrigate_SetSavedVar(work->state, *switch2, 2);
+    GimmickPlasmaFrigate_SetSavedVar(work->state, *switch3, 3);
     for (i = 0; i < PANEL_COUNT; i++) {
         GimmickPlasmaFrigate_SetSavedPanel(work->state, work->panelOn[i], i);
     }
@@ -741,22 +787,22 @@ static GameEventReturnCode GimmickPlasmaFrigate_SwitchEvent(GameEvent *event, u3
     PlasmaFrigateWork *work = Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
 
     switch (*state) {
-    case 0:
+    case SWITCH_STEP_PRESS:
         GimmickPlasmaFrigate_PressSwitch(work, eventWork->switchIndex);
         GimmickPlasmaFrigate_ShowPressedSwitch(work, eventWork->switchIndex);
         GFL_SndSEPlay(SEQ_SE_SW_PLAZMASHIP_04);
-        *state = 1;
+        *state = SWITCH_STEP_WAIT_TASKS;
         break;
-    case 1:
+    case SWITCH_STEP_WAIT_TASKS:
         if (FieldTaskManager_IsIdle(Field_GetTaskManager(field)) == TRUE) {
-            *state = 2;
+            *state = SWITCH_STEP_SAVE;
         }
         break;
-    case 2:
+    case SWITCH_STEP_SAVE:
         GimmickPlasmaFrigate_Save(work);
-        *state = 3;
+        *state = SWITCH_STEP_END;
         break;
-    case 3:
+    case SWITCH_STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -812,7 +858,7 @@ static BOOL GimmickPlasmaFrigate_PanelOffTask(void *data) {
     u16 linkedModel;
 
     switch (taskWork->state) {
-    case 0:
+    case PANEL_OFF_STEP_START:
         GimmickPlasmaFrigate_PlayPanelOff(taskWork->work, taskWork->model);
         GFL_SndSEPlay(SEQ_SE_SW_PLAZMASHIP_07);
         if (GimmickPlasmaFrigate_IsPanelListed(taskWork->model)) {
@@ -823,12 +869,12 @@ static BOOL GimmickPlasmaFrigate_PanelOffTask(void *data) {
         }
         taskWork->state++;
         break;
-    case 1:
+    case PANEL_OFF_STEP_WAIT:
         if (GimmickPlasmaFrigate_IsPanelOffDone(taskWork->work, taskWork->model)) {
             taskWork->state++;
         }
         break;
-    case 2:
+    case PANEL_OFF_STEP_END:
         return TRUE;
     }
     return FALSE;
@@ -851,18 +897,18 @@ static BOOL GimmickPlasmaFrigate_PanelOnTask(void *data) {
     u16 linkedModel;
 
     switch (taskWork->state) {
-    case 0:
+    case PANEL_ON_STEP_START:
         GimmickPlasmaFrigate_PlayPanelOn(taskWork->work, taskWork->model);
         GimmickPlasmaFrigate_SpawnEffectA(taskWork->work, taskWork->model);
         GFL_SndSEPlay(SEQ_SE_SW_PLAZMASHIP_06);
         taskWork->state++;
         break;
-    case 1:
+    case PANEL_ON_STEP_WAIT:
         if (GimmickPlasmaFrigate_IsPanelOnDone(taskWork->work, taskWork->model)) {
             taskWork->state++;
         }
         break;
-    case 2:
+    case PANEL_ON_STEP_LIGHT:
         if (GimmickPlasmaFrigate_IsPanelListed(taskWork->model)) {
             linkedModel = 0;
             if (GimmickPlasmaFrigate_FindLinkedModel(taskWork->work, taskWork->model, &linkedModel) == FALSE) {
@@ -875,7 +921,7 @@ static BOOL GimmickPlasmaFrigate_PanelOnTask(void *data) {
         GFL_SndSEPlay(SEQ_SE_SW_PLAZMASHIP_07);
         taskWork->state++;
         break;
-    case 3:
+    case PANEL_ON_STEP_END:
         return TRUE;
     }
     return FALSE;
@@ -914,7 +960,7 @@ static BOOL GimmickPlasmaFrigate_FindLinkedModel(PlasmaFrigateWork *work, u16 mo
         first = sPanelPairs[i][0];
         if (first == panel) {
             second = sPanelPairs[i][1];
-            if (second == 0xff) {
+            if (second == PANEL_NO_PAIR) {
                 *linkedModel = sPanelIndicators[i - 2] + MODEL_INDICATOR;
                 return TRUE;
             }
@@ -952,10 +998,11 @@ static void GimmickPlasmaFrigate_SetPanelArea(PlasmaFrigateWork *work, int panel
         u16 linkedModel = 0;
 
         first = -1;
-        if (panel == 3 || panel == 11 || panel == 4 || panel == 12) {
+        if (panel == PANEL_PAIR_A_FIRST || panel == PANEL_PAIR_B_FIRST || panel == PANEL_PAIR_A_SECOND ||
+            panel == PANEL_PAIR_B_SECOND) {
             if (GimmickPlasmaFrigate_FindLinkedModel(work, model, &linkedModel) == FALSE) {
                 first = panel;
-                if (panel == 4 || panel == 12) {
+                if (panel == PANEL_PAIR_A_SECOND || panel == PANEL_PAIR_B_SECOND) {
                     first--;
                 }
                 HeightEx_SetAreaInUse(first, 0, list);
@@ -971,7 +1018,7 @@ static void GimmickPlasmaFrigate_SetPanelArea(PlasmaFrigateWork *work, int panel
         u16 model = MODEL_PANEL + panel;
         u16 linkedModel = 0;
 
-        if (panel == 4 || panel == 12) {
+        if (panel == PANEL_PAIR_A_SECOND || panel == PANEL_PAIR_B_SECOND) {
             if (GimmickPlasmaFrigate_FindLinkedModel(work, model, &linkedModel) == FALSE) {
                 first = panel - 1;
                 HeightEx_SetAreaInUse(first, 0, list);
