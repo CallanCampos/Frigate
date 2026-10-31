@@ -139,6 +139,46 @@ enum {
     MSG_MODE_QUEUE,
 };
 
+// The items that change the text speed: the first three
+enum {
+    ITEM_TEXT_SPEED_0,
+    ITEM_TEXT_SPEED_1,
+    ITEM_TEXT_SPEED_2,
+};
+
+// The steps of the fades
+enum {
+    FADE_STEP_START,
+    FADE_STEP_WAIT,
+    FADE_STEP_DONE,
+};
+
+// The steps of the input, the last of which waits for a message that the others print
+enum {
+    INPUT_STEP_MAIN,
+    INPUT_STEP_PRINT_HAVE_SAVED,
+    INPUT_STEP_PRINT_WIRELESS_OFF,
+    INPUT_STEP_PRINT_WIRELESS_OFF_2,
+    INPUT_STEP_PRINT_EMPTY,
+    INPUT_STEP_WAIT_MSG,
+};
+
+// The steps of the question about the changes
+enum {
+    CONFIRM_STEP_ASK,
+    CONFIRM_STEP_WAIT_ANSWER,
+    CONFIRM_STEP_SAVE,
+    CONFIRM_STEP_QUIT,
+};
+
+// The steps of the question's window: its message, its menu and the choice
+enum {
+    CONFIRM_WINDOW_WAIT_MSG,
+    CONFIRM_WINDOW_CREATE_MENU,
+    CONFIRM_WINDOW_WAIT_CHOICE,
+    CONFIRM_WINDOW_DONE,
+};
+
 // The answer to the question
 enum {
     CONFIRM_NONE,
@@ -1372,9 +1412,9 @@ static void ConfigPanelScroll_Main(ConfigPanelScroll *scroll, ConfigPanelUi *ui,
 
     // A new text speed shows in the explanation
     switch (ConfigPanelOptions_PopChanged(&scroll->options)) {
-    case 0:
-    case 1:
-    case 2:
+    case ITEM_TEXT_SPEED_0:
+    case ITEM_TEXT_SPEED_1:
+    case ITEM_TEXT_SPEED_2:
         scroll->update = TRUE;
         break;
     }
@@ -1601,20 +1641,20 @@ static void ConfigPanelConfirm_Exit(ConfigPanelConfirm *confirm) {
 
 static void ConfigPanelConfirm_Main(ConfigPanelConfirm *confirm) {
     switch (confirm->state) {
-    case 0:
+    case CONFIRM_WINDOW_WAIT_MSG:
         if (ConfigPanelMsg_IsDone(&confirm->msg)) {
-            confirm->state = 1;
+            confirm->state = CONFIRM_WINDOW_CREATE_MENU;
         }
         break;
-    case 1:
+    case CONFIRM_WINDOW_CREATE_MENU:
         confirm->menu = AppTaskMenu_Create(&confirm->init, confirm->res);
-        confirm->state = 2;
+        confirm->state = CONFIRM_WINDOW_WAIT_CHOICE;
         break;
-    case 2:
+    case CONFIRM_WINDOW_WAIT_CHOICE:
         AppTaskMenu_Update(confirm->menu);
         if (AppTaskMenu_IsFlashFinished(confirm->menu)) {
             confirm->result = AppTaskMenu_GetCursorPos(confirm->menu) + 1;
-            confirm->state = 3;
+            confirm->state = CONFIRM_WINDOW_DONE;
             AppTaskMenu_Free(confirm->menu);
         }
         break;
@@ -1777,16 +1817,16 @@ static void ConfigPanelSeq_End(ConfigPanelSeq *seq) {
 
 static void ConfigPanelSeq_FadeIn(ConfigPanelSeq *seq, u32 *state, void *data) {
     switch (*state) {
-    case 0:
+    case FADE_STEP_START:
         GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 0, 0);
-        *state = 1;
+        *state = FADE_STEP_WAIT;
         break;
-    case 1:
+    case FADE_STEP_WAIT:
         if (!GFL_FadeIsRunning()) {
-            *state = 2;
+            *state = FADE_STEP_DONE;
         }
         break;
-    case 2:
+    case FADE_STEP_DONE:
         ConfigPanelSeq_SetNext(seq, ConfigPanelSeq_Input);
         break;
     }
@@ -1794,16 +1834,16 @@ static void ConfigPanelSeq_FadeIn(ConfigPanelSeq *seq, u32 *state, void *data) {
 
 static void ConfigPanelSeq_FadeOut(ConfigPanelSeq *seq, u32 *state, void *data) {
     switch (*state) {
-    case 0:
+    case FADE_STEP_START:
         GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 0, 16, 0);
-        *state = 1;
+        *state = FADE_STEP_WAIT;
         break;
-    case 1:
+    case FADE_STEP_WAIT:
         if (!GFL_FadeIsRunning()) {
-            *state = 2;
+            *state = FADE_STEP_DONE;
         }
         break;
-    case 2:
+    case FADE_STEP_DONE:
         ConfigPanelSeq_End(seq);
         break;
     }
@@ -1818,7 +1858,7 @@ static void ConfigPanelSeq_Input(ConfigPanelSeq *seq, u32 *state, void *data) {
     }
 
     switch (*state) {
-    case 0:
+    case INPUT_STEP_MAIN:
         ConfigPanelUi_Main(&wk->ui);
         if (!ConfigPanelAppBar_GetDecided(&wk->appBar, NULL)) {
             ConfigPanelScroll_Main(&wk->scroll, &wk->ui, &wk->msg, &wk->graphic, &wk->appBar);
@@ -1871,52 +1911,52 @@ static void ConfigPanelSeq_Input(ConfigPanelSeq *seq, u32 *state, void *data) {
 
             ConfigPanelScroll_GetOptions(&wk->scroll, &options);
             if (options.values[OPTION_SAVE_BEFORE_IR] == 0 && otherSave) {
-                *state = 1;
+                *state = INPUT_STEP_PRINT_HAVE_SAVED;
             }
         }
         break;
-    case 1: {
+    case INPUT_STEP_PRINT_HAVE_SAVED: {
         ConfigPanelOptions options;
 
         ConfigPanelScroll_GetOptions(&wk->scroll, &options);
         ConfigPanelConfirm_PrintMsg(&wk->confirm, Title2_Text_HaveSavedDataAlready,
                                     ConfigPanelOptions_GetTextWait(&options));
         ConfigPanelScroll_SetSaveBeforeIr(&wk->scroll, 1);
-        *state = 5;
+        *state = INPUT_STEP_WAIT_MSG;
         break;
     }
-    case 2: {
+    case INPUT_STEP_PRINT_WIRELESS_OFF: {
         ConfigPanelOptions options;
 
         ConfigPanelScroll_GetOptions(&wk->scroll, &options);
         ConfigPanelConfirm_PrintScriptMsg(&wk->confirm, Global10520_Text_WirelessCommunicationsTurnedOff,
                                           ConfigPanelOptions_GetTextWait(&options));
         ConfigPanelScroll_Redraw(&wk->scroll, FALSE);
-        *state = 5;
+        *state = INPUT_STEP_WAIT_MSG;
         break;
     }
-    case 3: {
+    case INPUT_STEP_PRINT_WIRELESS_OFF_2: {
         ConfigPanelOptions options;
 
         ConfigPanelScroll_GetOptions(&wk->scroll, &options);
         ConfigPanelConfirm_PrintScriptMsg(&wk->confirm, Global10520_Text_WirelessCommunicationsTurnedOff,
                                           ConfigPanelOptions_GetTextWait(&options));
         ConfigPanelScroll_Redraw(&wk->scroll, FALSE);
-        *state = 5;
+        *state = INPUT_STEP_WAIT_MSG;
         break;
     }
-    case 4: {
+    case INPUT_STEP_PRINT_EMPTY: {
         ConfigPanelOptions options;
 
         ConfigPanelScroll_GetOptions(&wk->scroll, &options);
         ConfigPanelConfirm_PrintMsg(&wk->confirm, Title2_Text_Empty_8, ConfigPanelOptions_GetTextWait(&options));
         ConfigPanelScroll_Redraw(&wk->scroll, TRUE);
-        *state = 5;
+        *state = INPUT_STEP_WAIT_MSG;
         break;
     }
-    case 5:
+    case INPUT_STEP_WAIT_MSG:
         if (ConfigPanelConfirm_IsMsgDone(&wk->confirm)) {
-            *state = 0;
+            *state = INPUT_STEP_MAIN;
         }
         break;
     }
@@ -1927,29 +1967,29 @@ static void ConfigPanelSeq_Confirm(ConfigPanelSeq *seq, u32 *state, void *data) 
     ConfigPanelWork *wk = data;
 
     switch (*state) {
-    case 0: {
+    case CONFIRM_STEP_ASK: {
         ConfigPanelOptions options;
 
         ConfigPanelScroll_GetOptions(&wk->scroll, &options);
         ConfigPanelConfirm_Start(&wk->confirm, ConfigPanelOptions_GetTextWait(&options));
         GFL_BGSysSetBGEnabled(BG_MESSAGE, FALSE);
-        *state = 1;
+        *state = CONFIRM_STEP_WAIT_ANSWER;
         break;
     }
-    case 1:
+    case CONFIRM_STEP_WAIT_ANSWER:
         switch (ConfigPanelConfirm_GetResult(&wk->confirm)) {
         case CONFIRM_YES:
-            *state = 2;
+            *state = CONFIRM_STEP_SAVE;
             break;
         case CONFIRM_NO:
-            *state = 3;
+            *state = CONFIRM_STEP_QUIT;
             break;
         }
         break;
-    case 2:
+    case CONFIRM_STEP_SAVE:
         ConfigPanelSeq_SetNext(seq, ConfigPanelSeq_Save);
         break;
-    case 3:
+    case CONFIRM_STEP_QUIT:
         ConfigPanelSeq_SetNext(seq, ConfigPanelSeq_Quit);
         break;
     }
