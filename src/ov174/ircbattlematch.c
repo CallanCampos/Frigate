@@ -1117,7 +1117,7 @@ static void IrcBattleMatch_ShowConnectMessage(IrcBattleMatch *work) {
 
         IrcBattleMatch_ShowMessage(&msg, work);
     } else if (work->mode == IRCBATTLEMATCH_MODE_FRIEND) {
-        if (WifiList_CountFriends(GameData_GetWifiList(work->param->gameData)) == 32) {
+        if (WifiList_CountFriends(GameData_GetWifiList(work->param->gameData)) == WIFI_LIST_FRIEND_MAX) {
             IrcBattleMatchMsg msg = { IRCMATCH_MSG_FRIEND_ROSTER_FULL };
 
             IrcBattleMatch_ShowMessage(&msg, work);
@@ -1225,7 +1225,7 @@ static void IrcBattleMatch_InitScreen(IrcBattleMatch *work) {
 static void IrcBattleMatch_StateWaitFade(IrcBattleMatch *work) {
     if (GFL_FadeIsRunning()) {
         if (work->mode == IRCBATTLEMATCH_MODE_FRIEND &&
-            WifiList_CountFriends(GameData_GetWifiList(work->param->gameData)) == 32) {
+            WifiList_CountFriends(GameData_GetWifiList(work->param->gameData)) == WIFI_LIST_FRIEND_MAX) {
             IrcBattleMatch_SetState(work, IrcBattleMatch_StateWaitFriendFull);
             work->counter = 180;
             return;
@@ -1234,12 +1234,16 @@ static void IrcBattleMatch_StateWaitFade(IrcBattleMatch *work) {
     }
 }
 
+// The commands' bases of the two modes of the musical
+#define COMMAND_BASE_MUSICAL_ARG0 0x13
+#define COMMAND_BASE_MUSICAL_ARG1 0x12
+
 // Whether the commands' base is that of the musical, as a player of the other musical mode has
 static BOOL IrcBattleMatch_IsSameMusicalGame(int a, int b) {
-    if (a == 0x13 && b == 0x12) {
+    if (a == COMMAND_BASE_MUSICAL_ARG0 && b == COMMAND_BASE_MUSICAL_ARG1) {
         return TRUE;
     }
-    if (b == 0x13 && a == 0x12) {
+    if (b == COMMAND_BASE_MUSICAL_ARG0 && a == COMMAND_BASE_MUSICAL_ARG1) {
         return TRUE;
     }
     return FALSE;
@@ -1271,7 +1275,7 @@ static void IrcBattleMatch_StateStartNet(IrcBattleMatch *work) {
         break;
     case IRCBATTLEMATCH_MODE_MUSICAL_ARG0:
         init.negotiationCommandBase = 0x11;
-        init.gameCommandBase = 0x13;
+        init.gameCommandBase = COMMAND_BASE_MUSICAL_ARG0;
         init.bMPMode = TRUE;
         init.maxConnectNum = work->param->musicalNetInit->maxConnectNum;
         init.maxSendSize = work->param->musicalNetInit->maxSendSize;
@@ -1280,7 +1284,7 @@ static void IrcBattleMatch_StateStartNet(IrcBattleMatch *work) {
         break;
     case IRCBATTLEMATCH_MODE_MUSICAL_ARG1:
         init.negotiationCommandBase = 0x11;
-        init.gameCommandBase = 0x12;
+        init.gameCommandBase = COMMAND_BASE_MUSICAL_ARG1;
         init.bMPMode = TRUE;
         init.maxConnectNum = work->param->musicalNetInit->maxConnectNum;
         init.maxSendSize = work->param->musicalNetInit->maxSendSize;
