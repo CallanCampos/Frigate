@@ -62,6 +62,12 @@
 // How long the result of the save stays, in frames
 #define RESULT_WAIT 120
 
+// What BattleRec_FinishAndSaveSlot returns when it ends
+enum {
+    SAVE_RESULT_SUCCESS = 2,
+    SAVE_RESULT_FAILED,
+};
+
 // The palettes of BG1's windows, and that of the window frame
 #define PALETTE_TEXT 9
 #define PALETTE_FRAME 10
@@ -649,18 +655,18 @@ static BOOL BtlRecSelProc_Main(GameProc *proc, u32 *state, void *param, void *wo
         }
         break;
     case SEQ_SAVE:
-        if (wk->saveResult != 2 && wk->saveResult != 3) {
+        if (wk->saveResult != SAVE_RESULT_SUCCESS && wk->saveResult != SAVE_RESULT_FAILED) {
             wk->saveResult = BattleRec_FinishAndSaveSlot(prm->gameData, wk->heapId, prm->mode, prm->counter, 0,
                                                          &wk->saveSeq, &wk->saveSubSeq);
         }
-        if (wk->saveResult == 2 || wk->saveResult == 3) {
+        if (wk->saveResult == SAVE_RESULT_SUCCESS || wk->saveResult == SAVE_RESULT_FAILED) {
             BattleRec_DecryptBody();
             WaitIcon_Free(wk->waitIcon);
-            if (wk->saveResult == 2) {
+            if (wk->saveResult == SAVE_RESULT_SUCCESS) {
                 GFL_SndSEPlay(SEQ_SE_SAVE);
                 BtlRecSel_ShowMessage(state, prm, wk, SEQ_SAVED_WAIT, Title_Text_BattleVideoHasBeen);
                 wk->waitTimer = RESULT_WAIT;
-            } else if (wk->saveResult == 3) {
+            } else if (wk->saveResult == SAVE_RESULT_FAILED) {
                 BtlRecSel_ShowMessage(state, prm, wk, SEQ_SAVE_FAILED_WAIT, Title_Text_ThereErrorBattleVideo);
                 wk->waitTimer = RESULT_WAIT;
             }
