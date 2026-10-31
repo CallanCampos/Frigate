@@ -87,9 +87,9 @@ void WifiLoginMessage_Free(WifiLoginMessage *msg) {
         BmpWin_Free(msg->messageWin);
         msg->messageWin = NULL;
     }
-    if (msg->unk30 != NULL) {
-        BmpWin_Free(msg->unk30);
-        msg->unk30 = NULL;
+    if (msg->noticeWin != NULL) {
+        BmpWin_Free(msg->noticeWin);
+        msg->noticeWin = NULL;
     }
     BmpWin_FreeAllocator();
     GFL_HeapFree(msg);
@@ -216,12 +216,12 @@ WifiLoginMessageMenu *WifiLoginMessage_CreateMenu(WifiLoginMessage *msg, u32 lay
         init.itemCount = 2;
         init.items = menu->items;
         switch (layout) {
-        case 0:
+        case WIFILOGIN_MENU_LAYOUT_HIGH:
             init.x = 32;
             init.y = 13;
             init.posType = APP_TASKMENU_POS_BOTTOM_RIGHT;
             break;
-        case 1:
+        case WIFILOGIN_MENU_LAYOUT_LOW:
             init.x = 32;
             init.y = 24;
             init.posType = APP_TASKMENU_POS_BOTTOM_RIGHT;
@@ -314,10 +314,10 @@ void WifiLoginMessage_PrintNotice(WifiLoginMessage *msg, u32 msgNo) {
     GFL_MsgDataLoadStrbuf(msg->msgData, msgNo, msg->strbuf);
     formatted = GFL_StrBufClone(msg->strbuf, msg->heapId);
     GFL_WordSetFormatStrbuf(msg->wordSet, msg->strbuf, formatted);
-    if (msg->unk30 == NULL) {
-        msg->unk30 = BmpWin_CreateDynamic(WifiLoginMessage_GetNoticeBG(msg->style), 1, 1, 30, 16, 11, TRUE);
+    if (msg->noticeWin == NULL) {
+        msg->noticeWin = BmpWin_CreateDynamic(WifiLoginMessage_GetNoticeBG(msg->style), 1, 1, 30, 16, 11, TRUE);
     }
-    window = msg->unk30;
+    window = msg->noticeWin;
     GFL_BitmapFill(BmpWin_GetBitmap(window), 15);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
     GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(window), 0, 0, msg->strbuf, msg->font);
@@ -330,9 +330,9 @@ void WifiLoginMessage_PrintNotice(WifiLoginMessage *msg, u32 msgNo) {
 
 // Clears the window of the notices
 void WifiLoginMessage_ClearNotice(WifiLoginMessage *msg) {
-    if (msg->unk30 != NULL) {
-        BmpWin_ClearFrame(msg->unk30, WINFRAME_TRANSFER_NONE);
-        BmpWin_ClearScreen(msg->unk30);
+    if (msg->noticeWin != NULL) {
+        BmpWin_ClearFrame(msg->noticeWin, WINFRAME_TRANSFER_NONE);
+        BmpWin_ClearScreen(msg->noticeWin);
         GFL_BGSysQueueScrLoad(WifiLoginMessage_GetNoticeBG(msg->style));
     }
 }
@@ -369,11 +369,11 @@ BmpMenu *WifiLoginMessage_CreateConfirmDialog(WifiLoginMessage *msg, u32 layout,
 
     setup.unk4 = msg->frameChars;
     switch (layout) {
-    case 0:
+    case WIFILOGIN_MENU_LAYOUT_HIGH:
         setup.x = 24;
         setup.y = 13;
         break;
-    case 1:
+    case WIFILOGIN_MENU_LAYOUT_LOW:
         setup.x = 24;
         setup.y = 19;
         break;
