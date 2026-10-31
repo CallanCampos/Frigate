@@ -13,6 +13,9 @@
 // Added to the sort key of a hint medal, which puts them after the medals
 #define SORT_KEY_HINT 0xfffffff
 
+// An order slot that holds no medal
+#define ORDER_NONE 0xff
+
 // What a medal's file of ARCID_MEDAL_DEF holds, as far as the box reads it
 typedef struct {
     u32 threshold;
@@ -121,7 +124,7 @@ static MedalBoxEntry *MedalBoxDataSys_GetEntry(MedalBoxDataSys *data, u8 column,
     if (index >= MEDAL_COUNT) {
         return NULL;
     }
-    if (data->order[index] == 0xff) {
+    if (data->order[index] == ORDER_NONE) {
         return NULL;
     }
     return &data->entries[data->order[index]];
@@ -294,7 +297,7 @@ static void MedalBoxDataSys_ClearOrder(MedalBoxDataSys *data) {
     u16 i;
 
     for (i = 0; i < MEDAL_COUNT; i++) {
-        data->order[i] = 0xff;
+        data->order[i] = ORDER_NONE;
     }
 }
 
