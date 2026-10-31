@@ -255,13 +255,13 @@ static BOOL PokedexDetailInfo_Main(PokedexDetailProcSys *sys, int *seq, void *pa
         pokedex = GameData_GetPokedex(PokedexDetailCommon_GetGameData(common));
         unit = PokedexDetailGraphic_GetClActUnit(PokedexDetailCommon_GetGraphic(common));
         switch (PokeDex_GetMode(pokedex)) {
-        case 0:
+        case DEX_REGIONAL:
             national = FALSE;
             break;
-        case 1:
+        case DEX_NATIONAL:
             national = TRUE;
             break;
-        case 2:
+        case DEX_HABITAT:
             national = PokeDex_IsNationalObtained(pokedex);
             break;
         }
