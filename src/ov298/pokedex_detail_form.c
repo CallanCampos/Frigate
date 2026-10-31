@@ -1,6 +1,7 @@
 #include "types.h"
 #include "app/pokedex_detail.h"
 #include "constants/arc.h"
+#include "constants/pokemon.h"
 #include "constants/sound.h"
 #include "constants/species.h"
 #include "constants/text_banks.h"
@@ -194,6 +195,15 @@ enum {
 #define SELECT_TIME 0x8000
 #define SELECT_STEP 0x400
 
+// The slide to the next entry: none, moving, and in place
+enum {
+    FORM_SLIDE_NONE,
+    FORM_SLIDE_MOVING,
+    FORM_SLIDE_DONE,
+};
+// The sex that a sprite position is for, if it is for any
+#define SPRITE_SEX_ANY 3
+
 typedef struct PokedexDetailFormWork PokedexDetailFormWork;
 
 typedef struct {
@@ -202,7 +212,7 @@ typedef struct {
     // 3 for any sex
     u32 sex;
     u32 rare;
-    u32 a6;
+    u32 egg;
     BOOL back;
     u32 personality;
     PokedexDetailFormPos pos[POS_COUNT];
@@ -361,13 +371,13 @@ static void PokedexDetailForm_CreateMCSS(PokedexDetailFormParam *param, PokedexD
                                          PokedexDetailCommon *common);
 static void PokedexDetailForm_FreeMCSS(PokedexDetailFormParam *param, PokedexDetailFormWork *wk,
                                        PokedexDetailCommon *common);
-static MCSS *PokedexDetailForm_AddMCSS(MCSSSystem *system, u32 species, u32 form, u32 sex, u32 rare, u32 a6, u32 back,
+static MCSS *PokedexDetailForm_AddMCSS(MCSSSystem *system, u32 species, u32 form, u32 sex, u32 rare, u32 egg, u32 back,
                                        u32 personality);
 static void PokedexDetailForm_RemoveMCSS(MCSSSystem *system, MCSS *mcss);
 static void PokedexDetailForm_SetShadow(MCSS *mcss);
 static void PokedexDetailForm_GetBesidePos(MCSS *mcss, VecFx32 *pos);
 static void PokedexDetailForm_CreateSprite(Sprite *sprite, HeapID heapId, MCSSSystem *system, u32 species, u32 form,
-                                           u32 sex, u32 rare, u32 a6, u32 back, u32 personality);
+                                           u32 sex, u32 rare, u32 egg, u32 back, u32 personality);
 static void PokedexDetailForm_FreeSprite(Sprite *sprite, MCSSSystem *system);
 static void PokedexDetailForm_InitSpriteAnim(SpriteAnim *anim, int sprite, PokedexDetailFormWork *wk);
 static void PokedexDetailForm_PlaySpriteAnim(Sprite *sprite);
@@ -452,7 +462,7 @@ static void PokedexDetailForm_SetActorsOpaque(PokedexDetailFormParam *param, Pok
 static void PokedexDetailForm_SetActorsBlended(PokedexDetailFormParam *param, PokedexDetailFormWork *wk,
                                                PokedexDetailCommon *common);
 static void PokedexDetailForm_InitSpritePositions(PokedexDetailFormPos *pos, u32 species, u32 form, u32 sex, u32 rare,
-                                                  u32 a6, u32 back, u32 personality);
+                                                  u32 egg, u32 back, u32 personality);
 static void PokedexDetailForm_GetSpritePos(Sprite *sprite, int pos, VecFx32 *out);
 static void PokedexDetailForm_GetPlacePos(Sprite *sprite, int place, VecFx32 *out);
 static void PokedexDetailForm_GetSpritePosF32(Sprite *sprite, int pos, PokedexDetailFormPos *out);
@@ -767,8 +777,8 @@ static BOOL PokedexDetailForm_Main(PokedexDetailProcSys *sys, int *seq, void *pa
             MCSS_StartFade(wk->sprites[SPRITE_NEXT_FRONT].mcss, 16, 16, 0, 0);
         }
         wk->bgChars = PokedexDetail_LoadBG(FALSE, param->heapId, 7, 1, 1, 0, ARCID_POKEDEX_GRA, 2, 12, 36, 0);
-        wk->backgroundMain = PokedexDetailBackground_Create(param->heapId, 3, 3, 1, 2);
-        wk->backgroundSub = PokedexDetailBackground_Create(param->heapId, 3, 4, 2, 3);
+        wk->backgroundMain = PokedexDetailBackground_Create(param->heapId, POKEDEX_DETAIL_PAGE_FORM - 1, 3, 1, 2);
+        wk->backgroundSub = PokedexDetailBackground_Create(param->heapId, POKEDEX_DETAIL_PAGE_FORM - 1, 4, 2, 3);
         PokedexDetailPalFade_ReadPalettes(wk->palFade);
         PokedexDetailPalFade_SetHidden(wk->palFade);
         break;
@@ -1208,10 +1218,10 @@ static void PokedexDetailForm_GetEntryText(PokedexDetailFormParam *param, Pokede
     }
     case ENTRY_NAME_SEX:
         switch (wk->entries[index].value) {
-        case 0:
+        case GENDER_MALE:
             nameStr = wk->strbufs[STRBUF_MALE];
             break;
-        case 1:
+        case GENDER_FEMALE:
             nameStr = wk->strbufs[STRBUF_FEMALE];
             break;
         }
@@ -1506,7 +1516,7 @@ static void PokedexDetailForm_FreeMCSS(PokedexDetailFormParam *param, PokedexDet
     GFL_HeapFree(wk->tcbBuffer);
 }
 
-static MCSS *PokedexDetailForm_AddMCSS(MCSSSystem *system, u32 species, u32 form, u32 sex, u32 rare, u32 a6, u32 back,
+static MCSS *PokedexDetailForm_AddMCSS(MCSSSystem *system, u32 species, u32 form, u32 sex, u32 rare, u32 egg, u32 back,
                                        u32 personality) {
     VecFx32 scale = { FX32_ONE * 16, FX32_ONE * 16, FX32_ONE };
     MCSSLoadInfo info;
@@ -1515,7 +1525,7 @@ static MCSS *PokedexDetailForm_AddMCSS(MCSSSystem *system, u32 species, u32 form
     if (species == SPECIES_SPINDA) {
         MCSSSys_SetSpindaLoadCallback(system, personality);
     }
-    SetupPokemonLoaderFSTool(species, form, sex, rare, a6, &info, back);
+    SetupPokemonLoaderFSTool(species, form, sex, rare, egg, &info, back);
     mcss = MCSSSys_Add(system, 0, 0, 0, &info);
     MCSS_SetNoShadow(mcss, 1);
     MCSS_PauseAnimation(mcss);
@@ -1549,13 +1559,13 @@ static void PokedexDetailForm_GetBesidePos(MCSS *mcss, VecFx32 *pos) {
 }
 
 static void PokedexDetailForm_CreateSprite(Sprite *sprite, HeapID heapId, MCSSSystem *system, u32 species, u32 form,
-                                           u32 sex, u32 rare, u32 a6, u32 back, u32 personality) {
-    sprite->mcss = PokedexDetailForm_AddMCSS(system, species, form, sex, rare, a6, back, personality);
+                                           u32 sex, u32 rare, u32 egg, u32 back, u32 personality) {
+    sprite->mcss = PokedexDetailForm_AddMCSS(system, species, form, sex, rare, egg, back, personality);
     sprite->anim = GFL_HeapAllocate(heapId, sizeof(SpriteAnim), TRUE, "zukan_detail_form.c", 2737);
     NNS_G2dSetAnimCtrlCallBackFunctor(&MCSS_GetMultiCellAnimation(sprite->mcss)->animCtrl,
                                       NNS_G2D_ANMCALLBACKTYPE_LAST_FRM, (u32)sprite->anim,
                                       PokedexDetailForm_SpriteAnimEnd);
-    PokedexDetailForm_InitSpritePositions(sprite->pos, species, form, sex, rare, a6, back, personality);
+    PokedexDetailForm_InitSpritePositions(sprite->pos, species, form, sex, rare, egg, back, personality);
 }
 
 static void PokedexDetailForm_FreeSprite(Sprite *sprite, MCSSSystem *system) {
@@ -1716,13 +1726,13 @@ static void PokedexDetailForm_GatherEntries(PokedexDetailFormParam *param, Poked
         BOOL hasSex[3] = { FALSE, FALSE, FALSE };
 
         switch (sexRatio) {
-        case 0:
+        case GENDER_RATIO_MALE_ONLY:
             hasSex[0] = TRUE;
             break;
-        case 254:
+        case GENDER_RATIO_FEMALE_ONLY:
             hasSex[1] = TRUE;
             break;
-        case 255:
+        case GENDER_RATIO_GENDERLESS:
             hasSex[2] = TRUE;
             break;
         default:
@@ -1758,7 +1768,8 @@ static void PokedexDetailForm_GatherEntries(PokedexDetailFormParam *param, Poked
                                 entries[n].color = rare ? ENTRY_COLOR_RARE : ENTRY_COLOR_NORMAL;
                                 entries[n].value = form;
                             } else {
-                                entries[n].name = sexRatio == 255 ? ENTRY_NAME_SPECIES : ENTRY_NAME_SEX;
+                                entries[n].name =
+                                    sexRatio == GENDER_RATIO_GENDERLESS ? ENTRY_NAME_SPECIES : ENTRY_NAME_SEX;
                                 entries[n].color = rare ? ENTRY_COLOR_RARE : ENTRY_COLOR_NORMAL;
                                 entries[n].value = sex == 1 ? 1 : 0;
                             }
@@ -2163,10 +2174,10 @@ static void PokedexDetailForm_SetMode(PokedexDetailFormParam *param, PokedexDeta
     case FORM_MODE_SINGLE:
         switch (mode) {
         case FORM_MODE_SLIDE:
-            if (wk->slide == 0) {
+            if (wk->slide == FORM_SLIDE_NONE) {
                 PokedexDetailForm_StopSpriteAnim(&wk->sprites[SPRITE_NEXT_FRONT]);
                 PokedexDetailForm_StopSpriteAnim(&wk->sprites[SPRITE_NEXT_BACK]);
-                wk->slide = 1;
+                wk->slide = FORM_SLIDE_MOVING;
             }
             break;
         case FORM_MODE_OPEN:
@@ -2992,7 +3003,7 @@ static void PokedexDetailForm_PlaceNext(PokedexDetailFormParam *param, PokedexDe
 // The arrows' slide: both entries move 2 a frame until the second one is in the middle
 static void PokedexDetailForm_UpdateSlide(PokedexDetailFormParam *param, PokedexDetailFormWork *wk,
                                           PokedexDetailCommon *common) {
-    if (wk->slide == 1) {
+    if (wk->slide == FORM_SLIDE_MOVING) {
         VecFx32 pos;
         PokedexDetailFormPos target;
         BOOL done = FALSE;
@@ -3017,7 +3028,7 @@ static void PokedexDetailForm_UpdateSlide(PokedexDetailFormParam *param, Pokedex
         }
         if (done) {
             x = targetX;
-            wk->slide = 2;
+            wk->slide = FORM_SLIDE_DONE;
         }
         pos.x = FX32_CONST(x);
         if (wk->sprites[SPRITE_NEXT_FRONT].mcss != NULL) {
@@ -3041,7 +3052,7 @@ static void PokedexDetailForm_UpdateSlide(PokedexDetailFormParam *param, Pokedex
         if (wk->sprites[SPRITE_CUR_BACK].mcss != NULL) {
             MCSS_SetPosition(wk->sprites[SPRITE_CUR_BACK].mcss, &pos);
         }
-    } else if (wk->slide == 2) {
+    } else if (wk->slide == FORM_SLIDE_DONE) {
         BOOL rare = FALSE;
 
         PokedexDetailForm_SetMode(param, wk, common, FORM_MODE_SINGLE);
@@ -3076,7 +3087,7 @@ static void PokedexDetailForm_UpdateSlide(PokedexDetailFormParam *param, Pokedex
         }
         wk->slideFromRight = TRUE;
         PokedexDetailForm_StepNext(param, wk, common);
-        wk->slide = 0;
+        wk->slide = FORM_SLIDE_NONE;
     }
 }
 
@@ -3362,7 +3373,7 @@ static void PokedexDetailForm_SetActorsBlended(PokedexDetailFormParam *param, Po
 }
 
 static void PokedexDetailForm_InitSpritePositions(PokedexDetailFormPos *pos, u32 species, u32 form, u32 sex, u32 rare,
-                                                  u32 a6, u32 back, u32 personality) {
+                                                  u32 egg, u32 back, u32 personality) {
     u8 i;
     u16 j;
 
@@ -3373,7 +3384,7 @@ static void PokedexDetailForm_InitSpritePositions(PokedexDetailFormPos *pos, u32
         const SpritePositions *positions = &sPokedexDetailFormSpritePositions[j];
 
         if (species == positions->species && form == positions->form && back == positions->back &&
-            (positions->sex == 3 || sex == positions->sex)) {
+            (positions->sex == SPRITE_SEX_ANY || sex == positions->sex)) {
             for (i = 0; i < POS_COUNT; i++) {
                 pos[i] = positions->pos[i];
             }
