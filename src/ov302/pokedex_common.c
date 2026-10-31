@@ -282,7 +282,7 @@ void PokedexCommon_BuildHabitatList(PokedexHabitatSave *habitat, PokedexHabitatL
                     MI_CpuFill8(area, 0, 4);
                     area->complete = 1;
                     area->zone = entry->zone;
-                    area->landMessage = file.landMessage;
+                    area->landKind = file.landKind;
                     PokedexCommon_GetHabitatStates(area->states, &file, pokedex);
                     for (j = 0; j < 3; j++) {
                         area->values[j] = file.values[j];

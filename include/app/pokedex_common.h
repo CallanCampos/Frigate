@@ -63,7 +63,7 @@ typedef struct {
     // The conditions that make the area shown, 1 for each
     u8 conditions[3];
     // What the screen says lives on the area's land: an index of PokedexHabitat_GetHabitatMessage's messages
-    u16 landMessage;
+    u16 landKind;
     u16 count;
     PokedexHabitatFileEntry entries[30];
 } PokedexHabitatFile;
@@ -82,8 +82,8 @@ typedef struct {
 typedef struct {
     u16 zone;
     u16 values[3];
-    // The same, copied from the area's file
-    u32 landMessage;
+    // Which of the land habitats it is, as the habitat message's table lists them
+    u32 landKind;
     PokedexHabitatSpecies species[30];
     // For each condition: 2 if all of its species are caught, 1 if all are seen, else 0
     u32 states[3];

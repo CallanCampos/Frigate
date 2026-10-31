@@ -143,13 +143,13 @@ void PokedexHabitatGraphic_VBlank(PokedexHabitatGraphic *graphic) {
     }
     if (graphic->paletteRequested == TRUE) {
         switch (graphic->paletteType) {
-        case 0:
+        case POKEDEX_HABITAT_KIND_LAND:
             GFL_G2DIOLoadNCLR(ARCID_POKEDEX_GRA, 49, PALTYPE_MAIN_BG, 0x120, 0x120, 0x60, HEAPID_POKEDEX_HABITAT);
             break;
-        case 1:
+        case POKEDEX_HABITAT_KIND_WATER:
             GFL_G2DIOLoadNCLR(ARCID_POKEDEX_GRA, 50, PALTYPE_MAIN_BG, 0, 0x120, 0x60, HEAPID_POKEDEX_HABITAT);
             break;
-        case 2:
+        case POKEDEX_HABITAT_KIND_FISHING:
             GFL_G2DIOLoadNCLR(ARCID_POKEDEX_GRA, 50, PALTYPE_MAIN_BG, 0x60, 0x120, 0x60, HEAPID_POKEDEX_HABITAT);
             break;
         }
@@ -764,19 +764,19 @@ void PokedexHabitatGraphic_SetTab(PokedexHabitatGraphic *graphic, u32 tab, u32 s
     ClActor *actor;
 
     switch (tab) {
-    case 0:
+    case POKEDEX_HABITAT_KIND_LAND:
         actor = PokedexHabitatGraphic_GetActor(graphic, POKEDEX_HABITAT_OBJ_TAB);
         ClActor_SetVisible(actor, visible[state]);
         ClActor_SetSequence(actor, anims[0][state]);
         ClActor_SetAnimTime(actor, 0);
         break;
-    case 1:
+    case POKEDEX_HABITAT_KIND_WATER:
         actor = PokedexHabitatGraphic_GetActor(graphic, POKEDEX_HABITAT_OBJ_TAB + 1);
         ClActor_SetVisible(actor, visible[state]);
         ClActor_SetSequence(actor, anims[1][state]);
         ClActor_SetAnimTime(actor, 0);
         break;
-    case 2:
+    case POKEDEX_HABITAT_KIND_FISHING:
         actor = PokedexHabitatGraphic_GetActor(graphic, POKEDEX_HABITAT_OBJ_TAB + 2);
         ClActor_SetVisible(actor, visible[state]);
         ClActor_SetSequence(actor, anims[2][state]);
@@ -997,13 +997,13 @@ static void PokedexHabitatGraphic_ReloadBlink(PokedexHabitatGraphic *graphic, u3
     BlinkPalAnm_Free(graphic->blink[0]);
     graphic->blink[0] = BlinkPalAnm_Create(0xa0, 5, 2, HEAPID_POKEDEX_HABITAT);
     switch (type) {
-    case 0:
+    case POKEDEX_HABITAT_KIND_LAND:
         BlinkPalAnm_SetPalBufferArc(graphic->blink[0], ARCID_POKEDEX_GRA, 49, 0x90, 0xa0);
         break;
-    case 1:
+    case POKEDEX_HABITAT_KIND_WATER:
         BlinkPalAnm_SetPalBufferArc(graphic->blink[0], ARCID_POKEDEX_GRA, 50, 0, 0x10);
         break;
-    case 2:
+    case POKEDEX_HABITAT_KIND_FISHING:
         BlinkPalAnm_SetPalBufferArc(graphic->blink[0], ARCID_POKEDEX_GRA, 50, 0x30, 0x40);
         break;
     }
