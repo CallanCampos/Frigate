@@ -7,6 +7,16 @@
 // pokedex_list_obj.c: the actors of the Pokédex's list. The ROM doesn't name this file; pokedex_list_obj.c is a guess
 // after the search screen's pokedex_search_obj.c. The names are ours
 
+// The animations of the page buttons: ready, pressed and unavailable
+enum {
+    POKEDEX_LIST_PAGE_UP_ANM_READY = 4,
+    POKEDEX_LIST_PAGE_DOWN_ANM_READY,
+    POKEDEX_LIST_PAGE_UP_ANM_PRESSED = 12,
+    POKEDEX_LIST_PAGE_DOWN_ANM_PRESSED,
+    POKEDEX_LIST_PAGE_UP_ANM_UNAVAILABLE = 18,
+    POKEDEX_LIST_PAGE_DOWN_ANM_UNAVAILABLE,
+};
+
 void PokedexListObj_Init(PokedexListWork *wk);
 void PokedexListObj_Exit(PokedexListWork *wk);
 void PokedexListObj_Update(PokedexListWork *wk);

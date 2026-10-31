@@ -633,18 +633,18 @@ void PokedexListObj_UpdateScrollBar(PokedexListWork *wk) {
 void PokedexListObj_SetPageButtons(PokedexListWork *wk, BOOL keep) {
     s16 cursor = FrameList_GetCursor(wk->frameList);
 
-    if (PokedexListObj_GetAnm(wk, POKEDEX_LIST_OBJ_PAGE_UP) != 12 || keep == FALSE) {
+    if (PokedexListObj_GetAnm(wk, POKEDEX_LIST_OBJ_PAGE_UP) != POKEDEX_LIST_PAGE_UP_ANM_PRESSED || keep == FALSE) {
         if (FrameList_GetScroll(wk->frameList) == 0 && cursor == 0) {
-            PokedexListObj_SetAnm(wk, POKEDEX_LIST_OBJ_PAGE_UP, 18);
+            PokedexListObj_SetAnm(wk, POKEDEX_LIST_OBJ_PAGE_UP, POKEDEX_LIST_PAGE_UP_ANM_UNAVAILABLE);
         } else {
-            PokedexListObj_SetAnm(wk, POKEDEX_LIST_OBJ_PAGE_UP, 4);
+            PokedexListObj_SetAnm(wk, POKEDEX_LIST_OBJ_PAGE_UP, POKEDEX_LIST_PAGE_UP_ANM_READY);
         }
     }
-    if (PokedexListObj_GetAnm(wk, POKEDEX_LIST_OBJ_PAGE_DOWN) != 13 || keep == FALSE) {
+    if (PokedexListObj_GetAnm(wk, POKEDEX_LIST_OBJ_PAGE_DOWN) != POKEDEX_LIST_PAGE_DOWN_ANM_PRESSED || keep == FALSE) {
         if (FrameList_CanScrollDown(wk->frameList) == FALSE && cursor == wk->listRows - 1) {
-            PokedexListObj_SetAnm(wk, POKEDEX_LIST_OBJ_PAGE_DOWN, 19);
+            PokedexListObj_SetAnm(wk, POKEDEX_LIST_OBJ_PAGE_DOWN, POKEDEX_LIST_PAGE_DOWN_ANM_UNAVAILABLE);
         } else {
-            PokedexListObj_SetAnm(wk, POKEDEX_LIST_OBJ_PAGE_DOWN, 5);
+            PokedexListObj_SetAnm(wk, POKEDEX_LIST_OBJ_PAGE_DOWN, POKEDEX_LIST_PAGE_DOWN_ANM_READY);
         }
     }
 }

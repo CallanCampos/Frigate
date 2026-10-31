@@ -41,6 +41,28 @@ enum {
 // No button to wait for while the list jumps
 #define BUTTON_NONE POKEDEX_LIST_OBJ_COUNT
 
+// The steps of the start: drawing the list, the fade in and the slide of the touch bar
+enum {
+    START_STEP_DRAW,
+    START_STEP_FADE,
+    START_STEP_SLIDE,
+};
+
+// The steps of the wait after a scroll: for the list to stop and for the button's animation
+enum {
+    LIST_SCROLL_STEP_WAIT_LIST,
+    LIST_SCROLL_STEP_WAIT_BUTTON,
+};
+
+// The steps of the flashes of the row that was chosen
+enum {
+    DECIDE_STEP_FLASH_1_ON,
+    DECIDE_STEP_FLASH_1_OFF,
+    DECIDE_STEP_FLASH_2_ON,
+    DECIDE_STEP_FLASH_2_OFF,
+    DECIDE_STEP_END,
+};
+
 typedef int (*PokedexListSeqFunc)(PokedexListWork *wk);
 
 static int PokedexListSeq_Init(PokedexListWork *wk);
@@ -142,7 +164,7 @@ static int PokedexListSeq_WaitFade(PokedexListWork *wk) {
 // Draws the list, then fades in while the touch bar slides in
 static int PokedexListSeq_Start(PokedexListWork *wk) {
     switch (wk->initSeq) {
-    case 0:
+    case START_STEP_DRAW:
         if (FrameList_Draw(wk->frameList) == FALSE) {
             PokedexListObj_SetPageButtons(wk, FALSE);
             PokedexListObj_UpdateScrollBar(wk);
@@ -151,7 +173,7 @@ static int PokedexListSeq_Start(PokedexListWork *wk) {
             wk->initSeq++;
         }
         break;
-    case 1:
+    case START_STEP_FADE:
         if (PaletteFade_GetActiveMask(wk->paletteFade) == 0) {
             GX_SetMasterBrightness(0);
             GXS_SetMasterBrightness(0);
@@ -160,9 +182,9 @@ static int PokedexListSeq_Start(PokedexListWork *wk) {
             wk->initSeq++;
         }
         break;
-    case 2:
+    case START_STEP_SLIDE:
         if (PokedexListMain_UpdateFrameMove(wk) == FALSE && PaletteFade_GetActiveMask(wk->paletteFade) == 0) {
-            wk->initSeq = 0;
+            wk->initSeq = START_STEP_DRAW;
             return SEQ_LIST;
         }
         break;
@@ -184,13 +206,13 @@ static int PokedexListSeq_List(PokedexListWork *wk) {
         PokedexListObj_SetPageButtons(wk, FALSE);
         break;
     case FRAMELIST_PAGE_UP:
-        PokedexListObj_SetAnm(wk, POKEDEX_LIST_OBJ_PAGE_UP, 12);
+        PokedexListObj_SetAnm(wk, POKEDEX_LIST_OBJ_PAGE_UP, POKEDEX_LIST_PAGE_UP_ANM_PRESSED);
         wk->buttonId = POKEDEX_LIST_OBJ_PAGE_UP;
         wk->subSeq = 0;
         seq = SEQ_LIST_SCROLL;
         break;
     case FRAMELIST_PAGE_DOWN:
-        PokedexListObj_SetAnm(wk, POKEDEX_LIST_OBJ_PAGE_DOWN, 13);
+        PokedexListObj_SetAnm(wk, POKEDEX_LIST_OBJ_PAGE_DOWN, POKEDEX_LIST_PAGE_DOWN_ANM_PRESSED);
         wk->buttonId = POKEDEX_LIST_OBJ_PAGE_DOWN;
         wk->subSeq = 0;
         seq = SEQ_LIST_SCROLL;
@@ -342,12 +364,12 @@ static int PokedexListSeq_List(PokedexListWork *wk) {
 // Waits for the list to stop, then for the page button's animation
 static int PokedexListSeq_ListScroll(PokedexListWork *wk) {
     switch (wk->subSeq) {
-    case 0:
+    case LIST_SCROLL_STEP_WAIT_LIST:
         if (FrameList_Main(wk->frameList) == FRAMELIST_NONE) {
             wk->subSeq++;
         }
         break;
-    case 1:
+    case LIST_SCROLL_STEP_WAIT_BUTTON:
         if (wk->buttonId == BUTTON_NONE || PokedexListObj_IsAnmPlaying(wk, wk->buttonId) == FALSE) {
             wk->subSeq = 0;
             PokedexListObj_SetPageButtons(wk, FALSE);
@@ -369,8 +391,8 @@ static int PokedexListSeq_ButtonAnm(PokedexListWork *wk) {
 // Flashes the cursor's row twice
 static int PokedexListSeq_Decide(PokedexListWork *wk) {
     switch (wk->decideSeq) {
-    case 0:
-    case 2:
+    case DECIDE_STEP_FLASH_1_ON:
+    case DECIDE_STEP_FLASH_2_ON:
         if (wk->decideTimer == 0) {
             FrameList_SetRowPalette(wk->frameList, (u16)FrameList_GetCursor(wk->frameList), 1);
             wk->decideTimer = 4;
@@ -379,8 +401,8 @@ static int PokedexListSeq_Decide(PokedexListWork *wk) {
             wk->decideTimer--;
         }
         break;
-    case 1:
-    case 3:
+    case DECIDE_STEP_FLASH_1_OFF:
+    case DECIDE_STEP_FLASH_2_OFF:
         if (wk->decideTimer == 0) {
             FrameList_SetRowPalette(wk->frameList, (u16)FrameList_GetCursor(wk->frameList), 2);
             GFL_BGSysQueueScrLoad(2);
@@ -390,9 +412,9 @@ static int PokedexListSeq_Decide(PokedexListWork *wk) {
             wk->decideTimer--;
         }
         break;
-    case 4:
+    case DECIDE_STEP_END:
         if (wk->decideTimer == 0) {
-            wk->decideSeq = 0;
+            wk->decideSeq = DECIDE_STEP_FLASH_1_ON;
             return SEQ_FINISH;
         } else {
             wk->decideTimer--;
