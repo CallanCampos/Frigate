@@ -87,6 +87,38 @@ enum {
     ROLL_END,
 };
 
+// The steps of the logo, of the copyright screens, and of the fades of the titles and of the logo
+enum {
+    LOGO_WAIT,
+    LOGO_FADE,
+    LOGO_HOLD,
+};
+
+enum {
+    COPYRIGHT_LOAD_FIRST,
+    COPYRIGHT_SHOW_FIRST,
+    COPYRIGHT_LOAD_SECOND,
+    COPYRIGHT_SHOW_SECOND,
+};
+
+enum {
+    FADE_IN_START,
+    FADE_IN_RUN,
+};
+
+enum {
+    FADE_OUT_START,
+    FADE_OUT_RUN,
+    FADE_OUT_END,
+};
+
+enum {
+    LOGO_FADE_START,
+    LOGO_FADE_IN,
+    LOGO_FADE_WAIT,
+    LOGO_FADE_OUT,
+};
+
 // The commands of the list
 enum {
     CMD_LINE,
@@ -130,6 +162,9 @@ enum {
     PICTURE_FILE_CHAR,
     PICTURE_FILE_SCREEN,
 };
+
+// The message of a line that has none
+#define LINE_NO_MESSAGE 0xffff
 
 // An entry of the list, file 1 of the end archive
 typedef struct {
@@ -196,7 +231,8 @@ typedef struct {
     u32 unk22C;
     // The windows whose characters are copied at the next VBlank, SCREEN_*
     u8 flushScreens;
-    u8 unk231;
+    // What the last fade command gave
+    u8 fadeArg;
     u8 fadeState;
     u8 fadeScreens;
     s8 fadeAlpha;
@@ -396,7 +432,7 @@ static u32 StaffRollSeq_Exit(StaffRollWork *work) {
 // Waits, fades the logo in and out, and waits again
 static u32 StaffRollSeq_Logo(StaffRollWork *work) {
     switch (work->state) {
-    case 0:
+    case LOGO_WAIT:
         if (work->frames >= 20) {
             work->frames = 0;
             work->state++;
@@ -406,15 +442,15 @@ static u32 StaffRollSeq_Logo(StaffRollWork *work) {
             work->frames++;
         }
         break;
-    case 1:
+    case LOGO_FADE:
         if (!StaffRoll_UpdateLogo(work)) {
             work->state++;
         }
         break;
-    case 2:
+    case LOGO_HOLD:
         if (work->frames >= 130) {
             work->frames = 0;
-            work->state = 0;
+            work->state = LOGO_WAIT;
             return SEQ_ROLL;
         }
         if (work->fastForward == TRUE) {
@@ -490,7 +526,7 @@ static u32 StaffRollSeq_Copyright(StaffRollWork *work) {
     ArcTool *arc;
 
     switch (work->state) {
-    case 0:
+    case COPYRIGHT_LOAD_FIRST:
         arc = GFL_ArcSysCreateFileHandle(ARCID_COPYRIGHT, HEAPID_TAIL(HEAPID_STAFF_ROLL));
         GFL_G2DIOLoadArcNCLRDefault(arc, 0, PALTYPE_MAIN_BG, 0, 0, HEAPID_STAFF_ROLL);
         GFL_BGSysLoadArcNCGRStatic(arc, 7, 1, 0, 0x8000, FALSE, HEAPID_STAFF_ROLL);
@@ -499,11 +535,11 @@ static u32 StaffRollSeq_Copyright(StaffRollWork *work) {
         GFL_BGSysSetScrPaletteNo(1, 0, 0, 32, 24, COPYRIGHT_PALETTE);
         GFL_BGSysResetStdPalette(1, BACKGROUND_COLOR);
         GFL_BGSysLoadScr(1);
-        work->state = 1;
+        work->state = COPYRIGHT_SHOW_FIRST;
         return StaffRoll_StartWipeIn(work, SEQ_COPYRIGHT);
-    case 1:
+    case COPYRIGHT_SHOW_FIRST:
         if (work->frames >= 200) {
-            work->state = 2;
+            work->state = COPYRIGHT_LOAD_SECOND;
             work->frames = 0;
             return StaffRoll_StartWipeOut(work, SEQ_COPYRIGHT);
         }
@@ -513,7 +549,7 @@ static u32 StaffRollSeq_Copyright(StaffRollWork *work) {
             work->frames++;
         }
         break;
-    case 2:
+    case COPYRIGHT_LOAD_SECOND:
         arc = GFL_ArcSysCreateFileHandle(ARCID_COPYRIGHT, HEAPID_TAIL(HEAPID_STAFF_ROLL));
         GFL_G2DIOLoadArcNCLRDefault(arc, 0, PALTYPE_MAIN_BG, 0, 0, HEAPID_STAFF_ROLL);
         GFL_BGSysLoadArcNCGRStatic(arc, 1, 1, 0, 0x8000, FALSE, HEAPID_STAFF_ROLL);
@@ -522,12 +558,12 @@ static u32 StaffRollSeq_Copyright(StaffRollWork *work) {
         GFL_BGSysSetScrPaletteNo(1, 0, 0, 32, 24, COPYRIGHT_PALETTE);
         GFL_BGSysResetStdPalette(1, BACKGROUND_COLOR);
         GFL_BGSysLoadScr(1);
-        work->state = 3;
+        work->state = COPYRIGHT_SHOW_SECOND;
         return StaffRoll_StartWipeIn(work, SEQ_COPYRIGHT);
-    case 3:
+    case COPYRIGHT_SHOW_SECOND:
         if (work->frames >= 200) {
             work->frames = 0;
-            work->state = 0;
+            work->state = COPYRIGHT_LOAD_FIRST;
             return StaffRoll_StartWipeOut(work, SEQ_EXIT);
         }
         if (work->fastForward == TRUE) {
@@ -763,9 +799,9 @@ static void StaffRoll_CreateLineBitmaps(StaffRollWork *work) {
         if (line->command == CMD_END) {
             return;
         }
-        if (line->command == CMD_LINE && line->msgId != 0xffff) {
+        if (line->command == CMD_LINE && line->msgId != LINE_NO_MESSAGE) {
             next = &work->lines[i + 1];
-            if (next->wait == 0 && next->command == CMD_LINE && next->msgId != 0xffff) {
+            if (next->wait == 0 && next->command == CMD_LINE && next->msgId != LINE_NO_MESSAGE) {
                 work->lineBitmaps[work->lineBitmapCount].bitmap = GFL_BitmapCreate(32, 2, 0x20, HEAPID_STAFF_ROLL);
                 work->lineBitmaps[work->lineBitmapCount].line = i;
                 work->lineBitmapCount++;
@@ -982,7 +1018,7 @@ static BOOL StaffRoll_FadeIn(StaffRollWork *work) {
     int eva, evb;
 
     switch (work->fadeState) {
-    case 0:
+    case FADE_IN_START:
         if (work->fadeScreens & SCREEN_TOP) {
             G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BD,
                                0, 16);
@@ -994,7 +1030,7 @@ static BOOL StaffRoll_FadeIn(StaffRollWork *work) {
         work->flushScreens = work->fadeScreens;
         work->fadeState++;
         break;
-    case 1:
+    case FADE_IN_RUN:
         if (work->fastForward == TRUE) {
             work->fadeAlpha += 16;
         } else {
@@ -1021,7 +1057,7 @@ static BOOL StaffRoll_FadeIn(StaffRollWork *work) {
                 G2S_BlendNone();
             }
             work->fadeAlpha = 0;
-            work->fadeState = 0;
+            work->fadeState = FADE_IN_START;
             return FALSE;
         }
         break;
@@ -1034,7 +1070,7 @@ static BOOL StaffRoll_FadeOut(StaffRollWork *work) {
     int eva, evb;
 
     switch (work->fadeState) {
-    case 0:
+    case FADE_OUT_START:
         if (work->fadeScreens & SCREEN_TOP) {
             G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BD,
                                16, 0);
@@ -1044,7 +1080,7 @@ static BOOL StaffRoll_FadeOut(StaffRollWork *work) {
                                GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BD, 16, 0);
         }
         work->fadeState++;
-    case 1:
+    case FADE_OUT_RUN:
         if (work->fastForward == TRUE) {
             work->fadeAlpha += 16;
         } else {
@@ -1075,7 +1111,7 @@ static BOOL StaffRoll_FadeOut(StaffRollWork *work) {
             work->fadeState++;
         }
         break;
-    case 2:
+    case FADE_OUT_END:
         if (work->fadeScreens & SCREEN_TOP) {
             G2_BlendNone();
         }
@@ -1083,7 +1119,7 @@ static BOOL StaffRoll_FadeOut(StaffRollWork *work) {
             G2S_BlendNone();
         }
         work->fadeScreens = 0;
-        work->fadeState = 0;
+        work->fadeState = FADE_OUT_START;
         return FALSE;
     }
     return TRUE;
@@ -1095,7 +1131,7 @@ static BOOL StaffRoll_UpdateLogo(StaffRollWork *work) {
     s16 eva, evb;
 
     switch (work->fadeState) {
-    case 0:
+    case LOGO_FADE_START:
         G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3, GX_BLEND_PLANEMASK_BD, 0, 16);
         GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG3, TRUE);
         GX_SetMasterBrightness(0);
@@ -1103,7 +1139,7 @@ static BOOL StaffRoll_UpdateLogo(StaffRollWork *work) {
         work->logoFrame = 0;
         work->fadeState++;
         break;
-    case 1:
+    case LOGO_FADE_IN:
         if (work->fastForward == TRUE) {
             alpha = work->logoFrame * 16 / 34;
             eva = alpha;
@@ -1123,7 +1159,7 @@ static BOOL StaffRoll_UpdateLogo(StaffRollWork *work) {
             G2_ChangeBlendAlpha(eva, evb);
         }
         break;
-    case 2:
+    case LOGO_FADE_WAIT:
         if (work->fastForward == TRUE) {
             work->waitFrames -= 4;
         } else {
@@ -1134,7 +1170,7 @@ static BOOL StaffRoll_UpdateLogo(StaffRollWork *work) {
             work->fadeState++;
         }
         break;
-    case 3:
+    case LOGO_FADE_OUT:
         if (work->fastForward == TRUE) {
             alpha = work->logoFrame * 16 / 34;
             eva = 16 - alpha;
@@ -1149,7 +1185,7 @@ static BOOL StaffRoll_UpdateLogo(StaffRollWork *work) {
             G2_BlendNone();
             GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG3, FALSE);
             work->logoFrame = 0;
-            work->fadeState = 0;
+            work->fadeState = LOGO_FADE_START;
             return FALSE;
         }
         G2_ChangeBlendAlpha(eva, evb);
@@ -1336,7 +1372,7 @@ static u32 StaffRollPicture_GetFileID(StaffRollPicture *picture, u32 kind, u32 g
 
 // A line that scrolls alone, or the end of a block when its message is 0xffff
 static BOOL StaffRollCmd_Line(StaffRollWork *work, StaffRollLine *line) {
-    if (line->msgId == 0xffff) {
+    if (line->msgId == LINE_NO_MESSAGE) {
         work->waitFrames = line->wait;
         work->state = ROLL_WAIT;
         return TRUE;
@@ -1355,7 +1391,7 @@ static BOOL StaffRollCmd_Line(StaffRollWork *work, StaffRollLine *line) {
 // A title, which fades in with the titles after it
 static BOOL StaffRollCmd_FadeIn(StaffRollWork *work, StaffRollLine *line) {
     if (work->state == ROLL_READ) {
-        work->unk231 = line->arg;
+        work->fadeArg = line->arg;
         work->state = ROLL_FADE_IN;
     }
     StaffRoll_DrawTitle(work, line);
@@ -1366,7 +1402,7 @@ static BOOL StaffRollCmd_FadeIn(StaffRollWork *work, StaffRollLine *line) {
 }
 
 static BOOL StaffRollCmd_FadeOut(StaffRollWork *work, StaffRollLine *line) {
-    work->unk231 = line->arg;
+    work->fadeArg = line->arg;
     work->state = ROLL_FADE_OUT;
     return TRUE;
 }
