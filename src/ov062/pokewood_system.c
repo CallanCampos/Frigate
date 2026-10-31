@@ -15,8 +15,9 @@
 
 // The regulation of the movies' battles, in arc 106
 #define POKEWOOD_REGULATION 5
-// The movies of a series, until 0xff, and the medal for making them all
+// The movies of a series, until POKEWOOD_SERIES_END, and the medal for making them all
 #define SERIES_COUNT 13
+#define POKEWOOD_SERIES_END 0xff
 
 typedef struct {
     u8 movies[5];
@@ -43,9 +44,9 @@ void PokewoodSystem_Free(PokewoodSystem *sys) {
 
 void PokewoodSystem_SetCastFromPokeList(PokewoodSystem *sys, const PokeListParam *param) {
     MI_CpuCopy8(param->picked, sys->castSlots, sizeof(sys->castSlots));
-    sys->unkE = param->index;
-    sys->unk10 = param->result;
-    if (sys->unk10 != 0 || sys->unkE == 7 || sys->unkE == 8) {
+    sys->listIndex = param->index;
+    sys->listResult = param->result;
+    if (sys->listResult != 0 || sys->listIndex == 7 || sys->listIndex == 8) {
         *sys->resultVar = 0;
     } else {
         *sys->resultVar = 1;
@@ -91,11 +92,11 @@ u16 *PokewoodSystem_GetResultVar(PokewoodSystem *sys) {
 }
 
 void PokewoodSystem_SetUsePlayerCast(PokewoodSystem *sys, u16 value) {
-    sys->unkD8 = value;
+    sys->usePlayerCast = value;
 }
 
 u16 PokewoodSystem_GetUsePlayerCast(PokewoodSystem *sys) {
-    return sys->unkD8;
+    return sys->usePlayerCast;
 }
 
 void PokewoodSystem_SetMovie(PokewoodSystem *sys, int movie) {
@@ -107,11 +108,11 @@ u16 PokewoodSystem_GetMovie(PokewoodSystem *sys) {
 }
 
 void PokewoodSystem_SetSaveSlot(PokewoodSystem *sys, u16 value) {
-    sys->unkDA = value;
+    sys->saveSlot = value;
 }
 
 u16 PokewoodSystem_GetSaveSlot(PokewoodSystem *sys) {
-    return sys->unkDA;
+    return sys->saveSlot;
 }
 
 PokewoodBlock *PokewoodSystem_GetPokewoodBlk(PokewoodSystem *sys) {
@@ -160,23 +161,31 @@ void PokewoodSystem_SetResultFlag(PokewoodSystem *sys, GameData *gameData, u32 m
 }
 
 static const PokewoodSeries sSeries[SERIES_COUNT] = {
-    { { 0, 0xff }, 0xcb },           { { 1, 2, 0xff }, 0xcc },           { { 3, 4, 5, 6, 0xff }, 0xcd },
-    { { 7, 8, 9, 10, 0xff }, 0xce }, { { 11, 12, 13, 14, 0xff }, 0xcf }, { { 15, 16, 17, 0xff }, 0xd0 },
-    { { 18, 19, 20, 0xff }, 0xd1 },  { { 21, 22, 23, 0xff }, 0xd2 },     { { 24, 25, 26, 27, 0xff }, 0xd3 },
-    { { 28, 29, 30, 0xff }, 0xd4 },  { { 31, 32, 33, 34, 0xff }, 0xd5 }, { { 35, 36, 37, 38, 0xff }, 0xd6 },
-    { { 39, 0xff }, 0xd7 },
+    { { 0, POKEWOOD_SERIES_END }, 0xcb },
+    { { 1, 2, POKEWOOD_SERIES_END }, 0xcc },
+    { { 3, 4, 5, 6, POKEWOOD_SERIES_END }, 0xcd },
+    { { 7, 8, 9, 10, POKEWOOD_SERIES_END }, 0xce },
+    { { 11, 12, 13, 14, POKEWOOD_SERIES_END }, 0xcf },
+    { { 15, 16, 17, POKEWOOD_SERIES_END }, 0xd0 },
+    { { 18, 19, 20, POKEWOOD_SERIES_END }, 0xd1 },
+    { { 21, 22, 23, POKEWOOD_SERIES_END }, 0xd2 },
+    { { 24, 25, 26, 27, POKEWOOD_SERIES_END }, 0xd3 },
+    { { 28, 29, 30, POKEWOOD_SERIES_END }, 0xd4 },
+    { { 31, 32, 33, 34, POKEWOOD_SERIES_END }, 0xd5 },
+    { { 35, 36, 37, 38, POKEWOOD_SERIES_END }, 0xd6 },
+    { { 39, POKEWOOD_SERIES_END }, 0xd7 },
 };
 
 // Whether every movie of a series is in flag list 1
 static BOOL Pokewood_IsSeriesComplete(PokewoodSave *save, u32 series) {
     u32 i;
 
-    for (i = 0; sSeries[series].movies[i] != 0xff; i++) {
+    for (i = 0; sSeries[series].movies[i] != POKEWOOD_SERIES_END; i++) {
         if (PokewoodSave_CheckFlag(save, 1, sSeries[series].movies[i]) == FALSE) {
             break;
         }
     }
-    if (sSeries[series].movies[i] == 0xff) {
+    if (sSeries[series].movies[i] == POKEWOOD_SERIES_END) {
         return TRUE;
     }
     return FALSE;
@@ -232,7 +241,7 @@ void PokewoodSystem_SetRecord(PokewoodSystem *sys, const BtlSetup *setup, u32 mo
         }
     }
     sys->record = record;
-    sys->unkF4 = setup->studioEnding;
+    sys->studioEnding = setup->studioEnding;
 }
 
 void PokewoodSystem_KeepBestRecord(GameData *gameData, PokewoodSystem *sys) {
@@ -269,12 +278,12 @@ void PokewoodSystem_UpdateCastFame(GameData *gameData, PokewoodSystem *sys) {
     int i;
     int count;
 
-    if (sys->unkD8 != 0) {
+    if (sys->usePlayerCast != 0) {
         count = sys->regulation.maxCount;
         for (i = 0; i < count; i++) {
             pkm = PokeParty_GetPkm(party, sys->castSlots[i] - 1);
             fame = PokeParty_GetParam(pkm, PKM_PARAM_POKESTAR_FAME, NULL);
-            fame += sFameChanges[sys->unkF4];
+            fame += sFameChanges[sys->studioEnding];
             if (fame < 0) {
                 fame = 0;
             }

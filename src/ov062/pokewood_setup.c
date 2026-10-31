@@ -21,6 +21,18 @@ typedef struct {
     u16 *var;
 } PokewoodSaveEvent;
 
+enum {
+    STEP_KEEP_RESULTS,
+    STEP_SAVE,
+    STEP_FREE,
+};
+
+// What Pokewood_SaveDownloadedMovie returns when it ends
+enum {
+    SAVE_RESULT_SUCCESS = 2,
+    SAVE_RESULT_FAILED,
+};
+
 PkwdBookParam *PokewoodSetup_CreateBookParam(HeapID heapId, GameSystem *gsys, u16 *var) {
     GameData *gameData = GSYS_GetGameData(gsys);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
@@ -90,28 +102,28 @@ static GameEventReturnCode EventPokewoodSave_Callback(GameEvent *event, u32 *sta
     PokewoodSave *save = PokewoodSave_Get(wk->gameData);
 
     switch (*state) {
-    case 0:
+    case STEP_KEEP_RESULTS:
         Pokewood_KeepMovieResults(wk->sys, wk->gameData, save, wk->slot);
         allocatePokewoodBlk(HEAPID_FIELDMAP);
         setPokewoodBlk(PokewoodSystem_GetPokewoodBlk(wk->sys));
-        *state = 1;
-    case 1:
+        *state = STEP_SAVE;
+    case STEP_SAVE:
         switch (Pokewood_SaveDownloadedMovie(wk->gameData, HEAPID_FIELDMAP, wk->slot, &wk->state)) {
-        case 3:
+        case SAVE_RESULT_FAILED:
             if (wk->var != NULL) {
                 *wk->var = 0;
             }
-            *state = 2;
+            *state = STEP_FREE;
             break;
-        case 2:
+        case SAVE_RESULT_SUCCESS:
             if (wk->var != NULL) {
                 *wk->var = 1;
             }
-            *state = 2;
+            *state = STEP_FREE;
             break;
         }
         break;
-    case 2:
+    case STEP_FREE:
         freeAndClearPokewoodBlk();
         return GAMEEVENT_DONE;
     }

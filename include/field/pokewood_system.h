@@ -33,8 +33,8 @@ struct PokewoodSystem {
     u8 unk2[6];
     // The party slots, from 1, of the Pokémon picked for the movie
     u8 castSlots[6];
-    u16 unkE;
-    u16 unk10;
+    u16 listIndex;
+    u16 listResult;
     // The movie's rules, whose unk3 is how many Pokémon take part
     Regulation regulation;
     u8 unkCE;
@@ -42,11 +42,11 @@ struct PokewoodSystem {
     u16 unkD0;
     u16 movie;
     u16 *resultVar;
-    u16 unkD8;
-    u16 unkDA;
+    u16 usePlayerCast;
+    u16 saveSlot;
     PokewoodBlock *pokewoodBlk;
     PokewoodRecord record;
-    u32 unkF4;
+    u32 studioEnding;
     u8 unkF8[8];
 };
 
