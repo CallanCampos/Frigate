@@ -80,6 +80,15 @@ enum {
     MAP_EXIT_SCREEN,
 };
 
+// The steps of a change of the habitat, of the exit and of a change of the place: hide what is shown, request the
+// blend or the reset, then show the areas or finish
+enum {
+    MAP_STEP_NONE,
+    MAP_STEP_HIDE,
+    MAP_STEP_REQUEST,
+    MAP_STEP_FINISH,
+};
+
 // What the page is doing: showing the map, opening the panel to pick a place, picking one, closing the panel, or
 // changing the habitat shown in either mode
 enum {
@@ -480,7 +489,7 @@ static BOOL PokedexDetailMap_Init(PokedexDetailProcSys *sys, int *seq, void *par
     wk->iconSlide = SLIDE_NONE;
     wk->season = GameData_GetSeason(gameData);
     wk->place = NO_PLACE;
-    wk->step = 0;
+    wk->step = MAP_STEP_NONE;
     wk->active = TRUE;
     wk->townmap = TownMapData_Load(param->heapId);
     PokedexDetailMap_InitPlaceOrder(param, wk, common);
@@ -575,7 +584,7 @@ static BOOL PokedexDetailMap_Main(PokedexDetailProcSys *sys, int *seq, void *par
         PokedexDetailMap_CreateActors(param, wk, common);
         PokedexDetailMap_CreateAreas(param, wk, common);
         PokedexDetailMap_CreatePlaces(param, wk, common);
-        wk->background = PokedexDetailBackground_Create(param->heapId, 1, 4, 9, 10);
+        wk->background = PokedexDetailBackground_Create(param->heapId, POKEDEX_DETAIL_PAGE_MAP - 1, 4, 9, 10);
         PokedexDetailMap_CreateWindows(param, wk, common);
         PokedexDetailMap_LoadPanelBG(param, wk, common);
         PokedexDetailMap_LoadIconResources(param, wk, common);
@@ -625,7 +634,7 @@ static BOOL PokedexDetailMap_Main(PokedexDetailProcSys *sys, int *seq, void *par
         }
         break;
     case MAP_SEQ_WAIT_STEP:
-        if (wk->step == 0) {
+        if (wk->step == MAP_STEP_NONE) {
             PokedexDetailTouchbar_SetActive(touchbar, TRUE);
             wk->active = TRUE;
             *seq = MAP_SEQ_MAIN;
@@ -643,7 +652,7 @@ static BOOL PokedexDetailMap_Main(PokedexDetailProcSys *sys, int *seq, void *par
         }
         break;
     case MAP_SEQ_WAIT_EXIT:
-        if (wk->step == 0) {
+        if (wk->step == MAP_STEP_NONE) {
             PokedexDetailMap_SetActorsBlended(param, wk, common);
             *seq = MAP_SEQ_WAIT_FADE_OUT;
             PokedexDetailBlend_StartOut(wk->blendMain);
@@ -1814,34 +1823,34 @@ static void PokedexDetailMap_UpdateState(PokedexDetailMapParam *param, PokedexDe
         break;
     case MAP_STATE_CHANGE:
         switch (wk->step) {
-        case 1:
+        case MAP_STEP_HIDE:
             PokedexDetailMap_HideHabitat(param, wk, common);
-            wk->step = 2;
+            wk->step = MAP_STEP_REQUEST;
             break;
-        case 2:
+        case MAP_STEP_REQUEST:
             PokedexDetailMap_RequestHabitatBlend(param, wk, common);
-            wk->step = 3;
+            wk->step = MAP_STEP_FINISH;
             break;
-        case 3:
+        case MAP_STEP_FINISH:
             PokedexDetailMap_ShowAreas(param, wk, common);
-            wk->step = 0;
+            wk->step = MAP_STEP_NONE;
             PokedexDetailMap_SetState(param, wk, common, MAP_STATE_MAP);
             break;
         }
         break;
     case MAP_STATE_EXIT:
         switch (wk->step) {
-        case 1:
+        case MAP_STEP_HIDE:
             PokedexDetailMap_HideAreas(param, wk, common);
-            wk->step = 2;
+            wk->step = MAP_STEP_REQUEST;
             break;
-        case 2:
+        case MAP_STEP_REQUEST:
             PokedexDetailMap_RequestReset(param, wk, common);
-            wk->step = 3;
+            wk->step = MAP_STEP_FINISH;
             break;
-        case 3:
+        case MAP_STEP_FINISH:
             PokedexDetailMap_FinishExit(param, wk, common);
-            wk->step = 0;
+            wk->step = MAP_STEP_NONE;
             break;
         }
         break;
@@ -1855,17 +1864,17 @@ static void PokedexDetailMap_UpdateState(PokedexDetailMapParam *param, PokedexDe
         break;
     case MAP_STATE_PLACE_CHANGE:
         switch (wk->step) {
-        case 1:
+        case MAP_STEP_HIDE:
             PokedexDetailMap_HideHabitat(param, wk, common);
-            wk->step = 2;
+            wk->step = MAP_STEP_REQUEST;
             break;
-        case 2:
+        case MAP_STEP_REQUEST:
             PokedexDetailMap_RequestHabitatBlend(param, wk, common);
-            wk->step = 3;
+            wk->step = MAP_STEP_FINISH;
             break;
-        case 3:
+        case MAP_STEP_FINISH:
             PokedexDetailMap_ShowAreas(param, wk, common);
-            wk->step = 0;
+            wk->step = MAP_STEP_NONE;
             PokedexDetailMap_SetState(param, wk, common, MAP_STATE_PLACE);
             break;
         }
@@ -1881,9 +1890,9 @@ static void PokedexDetailMap_SetState(PokedexDetailMapParam *param, PokedexDetai
     case MAP_STATE_MAP:
         if (state == MAP_STATE_OPEN_START) {
         } else if (state == MAP_STATE_CHANGE) {
-            wk->step = 1;
+            wk->step = MAP_STEP_HIDE;
         } else if (state == MAP_STATE_EXIT) {
-            wk->step = 1;
+            wk->step = MAP_STEP_HIDE;
         }
         break;
     case MAP_STATE_OPEN_START:
@@ -1932,7 +1941,7 @@ static void PokedexDetailMap_SetState(PokedexDetailMapParam *param, PokedexDetai
     case MAP_STATE_PLACE:
         if (state == MAP_STATE_CLOSE_START) {
         } else if (state == MAP_STATE_PLACE_CHANGE) {
-            wk->step = 1;
+            wk->step = MAP_STEP_HIDE;
         }
         break;
     case MAP_STATE_CLOSE_START:
