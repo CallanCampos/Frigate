@@ -69,6 +69,43 @@ enum {
     DIRECTION_RIGHT,
 };
 
+// The stages, named after the statue's parts that the scripts open (the variables 0x4000 to 0x4003 that are set)
+enum {
+    STAGE_NONE,
+    STAGE_OPEN_0123,
+    STAGE_OPEN_123,
+    STAGE_OPEN_01,
+    STAGE_OPEN_23,
+    STAGE_OPEN_2,
+    STAGE_OPEN_3,
+    STAGE_OPEN_1,
+    STAGE_OPEN_0,
+};
+
+// What a tier's variable (0x40cf, 0x40d0 and 0x40d1) holds: its button has not been reached, is to be pressed after
+// the move, or has been pressed
+enum {
+    TIER_PROGRESS_NONE,
+    TIER_PROGRESS_BUTTON_PENDING,
+    TIER_PROGRESS_DONE,
+};
+
+// The steps of a move of the statues
+enum {
+    MOVE_STEP_START,
+    MOVE_STEP_RUN,
+    MOVE_STEP_CHECK_BUTTONS,
+    MOVE_STEP_SHOW_STATE,
+    MOVE_STEP_END,
+};
+
+// The steps of a button's press
+enum {
+    BUTTON_STEP_START,
+    BUTTON_STEP_PRESS,
+    BUTTON_STEP_SET_PROGRESS,
+};
+
 // What the save keeps of the gym: where the player is, and the frames that the models were left at
 typedef struct {
     u8 column;
@@ -230,10 +267,10 @@ static const OpelucidGymPlate sPlates[PLATE_COUNT] = {
 
 // The stage the statues are at, by tier, column and whether the tier is cleared
 static const u32 sStages[TIER_COUNT][COLUMN_COUNT][2] = {
-    { { 0, 0 }, { 0, 0 }, { 0, 8 } },
-    { { 6, 6 }, { 5, 5 }, { 2, 1 } },
-    { { 6, 6 }, { 5, 5 }, { 2, 1 } },
-    { { 0, 0 }, { 0, 0 }, { 7, 7 } },
+    { { STAGE_NONE, STAGE_NONE }, { STAGE_NONE, STAGE_NONE }, { STAGE_NONE, STAGE_OPEN_0 } },
+    { { STAGE_OPEN_3, STAGE_OPEN_3 }, { STAGE_OPEN_2, STAGE_OPEN_2 }, { STAGE_OPEN_123, STAGE_OPEN_0123 } },
+    { { STAGE_OPEN_3, STAGE_OPEN_3 }, { STAGE_OPEN_2, STAGE_OPEN_2 }, { STAGE_OPEN_123, STAGE_OPEN_0123 } },
+    { { STAGE_NONE, STAGE_NONE }, { STAGE_NONE, STAGE_NONE }, { STAGE_OPEN_1, STAGE_OPEN_1 } },
 };
 
 static const G3DSceneResourceSetup sGymOpelucidResources[21] = {
@@ -472,7 +509,7 @@ static BOOL GymOpelucid_IsTierCleared(EventWork *eventWork, int tier) {
 static BOOL GymOpelucid_IsTier0Cleared(EventWork *eventWork) {
     u16 progress = *EventWork_GetWkPtr(eventWork, EVENT_WORK_0x40cf);
 
-    if (TrainerFlagGet(eventWork, TRAINER_VETERAN_LUCIUS) == TRUE && progress == 2) {
+    if (TrainerFlagGet(eventWork, TRAINER_VETERAN_LUCIUS) == TRUE && progress == TIER_PROGRESS_DONE) {
         return TRUE;
     }
     return FALSE;
@@ -483,7 +520,7 @@ static BOOL GymOpelucid_IsTier1Cleared(EventWork *eventWork) {
     BOOL jerry = TrainerFlagGet(eventWork, TRAINER_VETERAN_JERRY);
     BOOL rhona = TrainerFlagGet(eventWork, TRAINER_VETERAN_RHONA);
 
-    if ((jerry == TRUE || rhona == TRUE) && progress == 2) {
+    if ((jerry == TRUE || rhona == TRUE) && progress == TIER_PROGRESS_DONE) {
         return TRUE;
     }
     return FALSE;
@@ -494,7 +531,7 @@ static BOOL GymOpelucid_IsTier2Cleared(EventWork *eventWork) {
     BOOL ron = TrainerFlagGet(eventWork, TRAINER_VETERAN_RON);
     BOOL denae = TrainerFlagGet(eventWork, TRAINER_VETERAN_DENAE);
 
-    if ((ron == TRUE || denae == TRUE) && progress == 2) {
+    if ((ron == TRUE || denae == TRUE) && progress == TIER_PROGRESS_DONE) {
         return TRUE;
     }
     return FALSE;
@@ -514,28 +551,28 @@ static void GymOpelucid_SetVarsOfStage(int stage, EventWork *eventWork) {
     GymOpelucid_SetWork(eventWork, EVENT_WORK_0x4001, 0);
     GymOpelucid_SetWork(eventWork, EVENT_WORK_0x4002, 0);
     GymOpelucid_SetWork(eventWork, EVENT_WORK_0x4003, 0);
-    if (stage == 1) {
+    if (stage == STAGE_OPEN_0123) {
         GymOpelucid_SetWork(eventWork, EVENT_WORK_0x4000, 1);
         GymOpelucid_SetWork(eventWork, EVENT_WORK_0x4001, 1);
         GymOpelucid_SetWork(eventWork, EVENT_WORK_0x4002, 1);
         GymOpelucid_SetWork(eventWork, EVENT_WORK_0x4003, 1);
-    } else if (stage == 2) {
+    } else if (stage == STAGE_OPEN_123) {
         GymOpelucid_SetWork(eventWork, EVENT_WORK_0x4001, 1);
         GymOpelucid_SetWork(eventWork, EVENT_WORK_0x4002, 1);
         GymOpelucid_SetWork(eventWork, EVENT_WORK_0x4003, 1);
-    } else if (stage == 3) {
+    } else if (stage == STAGE_OPEN_01) {
         GymOpelucid_SetWork(eventWork, EVENT_WORK_0x4000, 1);
         GymOpelucid_SetWork(eventWork, EVENT_WORK_0x4001, 1);
-    } else if (stage == 4) {
+    } else if (stage == STAGE_OPEN_23) {
         GymOpelucid_SetWork(eventWork, EVENT_WORK_0x4002, 1);
         GymOpelucid_SetWork(eventWork, EVENT_WORK_0x4003, 1);
-    } else if (stage == 5) {
+    } else if (stage == STAGE_OPEN_2) {
         GymOpelucid_SetWork(eventWork, EVENT_WORK_0x4002, 1);
-    } else if (stage == 6) {
+    } else if (stage == STAGE_OPEN_3) {
         GymOpelucid_SetWork(eventWork, EVENT_WORK_0x4003, 1);
-    } else if (stage == 7) {
+    } else if (stage == STAGE_OPEN_1) {
         GymOpelucid_SetWork(eventWork, EVENT_WORK_0x4001, 1);
-    } else if (stage == 8) {
+    } else if (stage == STAGE_OPEN_0) {
         GymOpelucid_SetWork(eventWork, EVENT_WORK_0x4000, 1);
     }
 }
@@ -600,10 +637,10 @@ static GameEventReturnCode GymOpelucid_MoveEventCallback(GameEvent *event, u32 *
     int i;
 
     switch (*state) {
-    case 0:
+    case MOVE_STEP_START:
         GymOpelucid_StartMove(ev);
-        *state = 1;
-    case 1:
+        *state = MOVE_STEP_RUN;
+    case MOVE_STEP_RUN:
         ev->frame++;
         GymOpelucid_PlayMoveSounds(ev);
         GymOpelucid_UpdatePlayerMover(ev);
@@ -618,33 +655,33 @@ static GameEventReturnCode GymOpelucid_MoveEventCallback(GameEvent *event, u32 *
         if (GFL_SndPlayerIsActiveAny() == TRUE) {
             return FALSE;
         }
-        *state = 2;
+        *state = MOVE_STEP_CHECK_BUTTONS;
         break;
-    case 2: {
+    case MOVE_STEP_CHECK_BUTTONS: {
         u16 tier1 = *EventWork_GetWkPtr(ev->eventWork, EVENT_WORK_0x40d0);
         u16 tier2 = *EventWork_GetWkPtr(ev->eventWork, EVENT_WORK_0x40d1);
         GameSystem *gsys = Field_GetGameSystem(ev->field);
 
-        if (tier1 == 1) {
-            GameEvent_ChainNext(event, GymOpelucid_CreateButtonEvent(gsys, 1));
-            *state = 3;
+        if (tier1 == TIER_PROGRESS_BUTTON_PENDING) {
+            GameEvent_ChainNext(event, GymOpelucid_CreateButtonEvent(gsys, TIER_1));
+            *state = MOVE_STEP_SHOW_STATE;
             break;
         }
-        if (tier2 == 1) {
-            GameEvent_ChainNext(event, GymOpelucid_CreateButtonEvent(gsys, 2));
-            *state = 3;
+        if (tier2 == TIER_PROGRESS_BUTTON_PENDING) {
+            GameEvent_ChainNext(event, GymOpelucid_CreateButtonEvent(gsys, TIER_2));
+            *state = MOVE_STEP_SHOW_STATE;
             break;
         }
         GFL_SndSEPlay(SEQ_SE_SW_DRGGYM_07);
-        *state = 3;
+        *state = MOVE_STEP_SHOW_STATE;
         break;
     }
-    case 3:
+    case MOVE_STEP_SHOW_STATE:
         GymOpelucid_MoveState(ev);
         GymOpelucid_ShowState(ev->work);
-        *state = 4;
+        *state = MOVE_STEP_END;
         break;
-    case 4:
+    case MOVE_STEP_END:
         GymOpelucid_EndMove(ev);
         return TRUE;
     }
@@ -802,7 +839,7 @@ static void GymOpelucid_UpdateCamera(OpelucidGymMoveEvent *ev) {
     FieldCamera *camera;
     OpelucidGymMover *mover = &ev->movers[0];
 
-    if (ev->direction == DIRECTION_UP && ev->state->tier == 2) {
+    if (ev->direction == DIRECTION_UP && ev->state->tier == TIER_2) {
         length = GymOpelucid_GetMoverLength(mover);
         if (length == ev->frame + 0x50) {
             camera = Field_GetCameraSystem(ev->field);
@@ -870,7 +907,7 @@ static void GymOpelucid_PlayEndSounds(OpelucidGymMoveEvent *ev) {
             GFL_SndSEPlay(SEQ_SE_SW_DRGGYM_05);
         }
         if (length == ev->frame + 0xf) {
-            if (ev->direction != DIRECTION_UP || ev->state->tier != 2) {
+            if (ev->direction != DIRECTION_UP || ev->state->tier != TIER_2) {
                 GymOpelucid_ShakeCamera(ev->field);
             }
         }
@@ -970,7 +1007,7 @@ static GameEventReturnCode GymOpelucid_ButtonEventCallback(GameEvent *event, u32
     FieldExpObjAnm *anm = FieldExpObj_GetAnmInfo(obj->expObj, 0, obj->actor, ANM_STATE);
 
     switch (*state) {
-    case 0: {
+    case BUTTON_STEP_START: {
         fx32 frame;
 
         ev->frame = 0;
@@ -983,10 +1020,10 @@ static GameEventReturnCode GymOpelucid_ButtonEventCallback(GameEvent *event, u32
         }
         FieldExpObj_SetAnmFrame(obj->expObj, 0, obj->actor, ANM_STATE, frame);
         FieldExpObjAnm_SetPaused(anm, FALSE);
-        *state = 1;
+        *state = BUTTON_STEP_PRESS;
         break;
     }
-    case 1: {
+    case BUTTON_STEP_PRESS: {
         u32 limit;
 
         ev->frame++;
@@ -996,20 +1033,20 @@ static GameEventReturnCode GymOpelucid_ButtonEventCallback(GameEvent *event, u32
         }
         if (ev->frame >= limit) {
             FieldExpObjAnm_SetPaused(anm, TRUE);
-            *state = 2;
+            *state = BUTTON_STEP_SET_PROGRESS;
         }
         break;
     }
-    case 2:
+    case BUTTON_STEP_SET_PROGRESS:
         switch (ev->button) {
-        case 0:
-            GymOpelucid_SetWork(ev->eventWork, EVENT_WORK_0x40cf, 2);
+        case TIER_0:
+            GymOpelucid_SetWork(ev->eventWork, EVENT_WORK_0x40cf, TIER_PROGRESS_DONE);
             break;
-        case 1:
-            GymOpelucid_SetWork(ev->eventWork, EVENT_WORK_0x40d0, 2);
+        case TIER_1:
+            GymOpelucid_SetWork(ev->eventWork, EVENT_WORK_0x40d0, TIER_PROGRESS_DONE);
             break;
-        case 2:
-            GymOpelucid_SetWork(ev->eventWork, EVENT_WORK_0x40d1, 2);
+        case TIER_2:
+            GymOpelucid_SetWork(ev->eventWork, EVENT_WORK_0x40d1, TIER_PROGRESS_DONE);
             break;
         }
         GymOpelucid_ShowState(ev->work);
