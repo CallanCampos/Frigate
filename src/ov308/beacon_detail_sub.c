@@ -133,6 +133,9 @@ typedef struct {
     int *taskCount;
 } BeaconDetailFlushTask;
 
+// What GameBeacon_GetJob and GameBeacon_GetHobby return when the player gave no answer
+#define BEACON_ANSWER_NONE 0xff
+
 static BOOL BeaconDetailSub_IsMarkerTouched(BeaconDetailWork *work);
 static void BeaconDetailSub_PlaySE(u32 se);
 static void BeaconDetailSub_LoadPalette(const void *src, u32 dest, u16 offset, u32 count);
@@ -457,7 +460,7 @@ static void BeaconDetailSub_DrawPanel(BeaconDetailWork *work, GameBeacon *beacon
     BeaconDetailSub_DrawRow(work, &panel->windows[BEACON_DETAIL_WINDOW_NAME], work->formatBuf, 6, 48, 13, 2, 0);
 
     answer = GameBeacon_GetJob(beacon);
-    if (answer == 0xff) {
+    if (answer == BEACON_ANSWER_NONE) {
         GFL_StrBufClear(work->textBuf);
     } else {
         loadJobAnswerToStrbuf(work->wordSet, 0, answer);
@@ -466,7 +469,7 @@ static void BeaconDetailSub_DrawPanel(BeaconDetailWork *work, GameBeacon *beacon
     BeaconDetailSub_DrawRow(work, &panel->windows[BEACON_DETAIL_WINDOW_JOB], work->textBuf, 6, 48, 13, 2, 1);
 
     answer = GameBeacon_GetHobby(beacon);
-    if (answer == 0xff) {
+    if (answer == BEACON_ANSWER_NONE) {
         GFL_StrBufClear(work->textBuf);
     } else {
         loadHobbyNameToStrbuf(work->wordSet, 0, answer);
@@ -635,26 +638,33 @@ static BOOL BeaconDetailSub_WaitPopup(BeaconDetailPopupTask *popup) {
     return TRUE;
 }
 
+enum {
+    POPUP_STEP_SLIDE_IN,
+    POPUP_STEP_WAIT_SLIDE_IN,
+    POPUP_STEP_SHOW,
+    POPUP_STEP_WAIT_SLIDE_OUT,
+};
+
 static void BeaconDetailSub_PopupTask(TCBEx *task, void *data) {
     BeaconDetailPopupTask *popup = data;
 
     switch (popup->seq) {
-    case 0:
+    case POPUP_STEP_SLIDE_IN:
         BeaconDetailSub_StartMapSlide(popup->work, FALSE, &popup->taskCount);
         popup->seq++;
         break;
-    case 1:
+    case POPUP_STEP_WAIT_SLIDE_IN:
         if (popup->taskCount == 0) {
             popup->seq++;
         }
         break;
-    case 2:
+    case POPUP_STEP_SHOW:
         if (!BeaconDetailSub_WaitPopup(popup)) {
             BeaconDetailSub_StartMapSlide(popup->work, TRUE, &popup->taskCount);
             popup->seq++;
         }
         break;
-    case 3:
+    case POPUP_STEP_WAIT_SLIDE_OUT:
         if (popup->taskCount) {
             break;
         }
@@ -731,6 +741,13 @@ static void BeaconDetailSub_StartPageTask(BeaconDetailWork *work, u8 direction, 
     (*taskCount)++;
 }
 
+enum {
+    PAGE_STEP_WAIT_INPUT,
+    PAGE_STEP_SLIDE,
+    PAGE_STEP_WAIT_SLIDE,
+    PAGE_STEP_END,
+};
+
 static void BeaconDetailSub_PageTask(TCBEx *task, void *data) {
     BeaconDetailPageTask *page = data;
 
@@ -742,14 +759,14 @@ static void BeaconDetailSub_PageTask(TCBEx *task, void *data) {
         return;
     }
     switch (page->seq) {
-    case 0:
+    case PAGE_STEP_WAIT_INPUT:
         if (!page->decided) {
             return;
         }
         TouchBar_SetActive(page->work->touchBar, FALSE);
         page->seq++;
         break;
-    case 1:
+    case PAGE_STEP_SLIDE:
         BeaconDetailSub_StartPanelSlide(page->work, page->work->page, PANEL_SLIDE_OUT, page->direction,
                                         &page->taskCount);
         BeaconDetailSub_StartPanelSlide(page->work, page->work->page ^ 1, sBeaconDetailSlideFrom[page->direction],
@@ -758,7 +775,7 @@ static void BeaconDetailSub_PageTask(TCBEx *task, void *data) {
         ClActor_SetVisible(page->work->actors[BEACON_DETAIL_ACTOR_RECENT], FALSE);
         page->seq++;
         break;
-    case 2:
+    case PAGE_STEP_WAIT_SLIDE:
         if (page->taskCount) {
             return;
         }
@@ -767,7 +784,7 @@ static void BeaconDetailSub_PageTask(TCBEx *task, void *data) {
         BeaconDetailSub_DrawMap(page->work);
         page->seq++;
         break;
-    case 3:
+    case PAGE_STEP_END:
     default:
         (*page->parentTaskCount)--;
         GFL_TCBExRequestEnd(task);
