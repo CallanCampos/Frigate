@@ -91,6 +91,33 @@ enum {
     PARTICLES_CONVERGE,
 };
 
+// The steps of the proc's main function
+enum {
+    MAIN_START,
+    MAIN_FADE_IN,
+    MAIN_WAIT_FADE_IN,
+    MAIN_RUN,
+    MAIN_FADE_OUT,
+    MAIN_WAIT_FADE_OUT,
+    MAIN_END,
+};
+
+// The steps of IrcRhythmCheck_StepInterrupted
+enum {
+    INTERRUPTED_CHECK,
+    INTERRUPTED_SET_RESULT,
+    INTERRUPTED_PRINT,
+    INTERRUPTED_EXCHANGE_IDS,
+    INTERRUPTED_FINISH,
+};
+
+// The steps of IrcRhythmNet_Send
+enum {
+    NET_SEND_COPY,
+    NET_SEND_SEND,
+    NET_SEND_WAIT_RECEIVE,
+};
+
 // The steps of IrcRhythmCheck_StepStart
 enum {
     START_BEGIN,
@@ -448,37 +475,37 @@ static BOOL IrcRhythmCheck_Main(GameProc *proc, u32 *state, void *param, void *w
     IrcRhythmCheckWork *wk = work;
 
     switch (*state) {
-    case 0:
-        *state = 1;
+    case MAIN_START:
+        *state = MAIN_FADE_IN;
         break;
-    case 1:
+    case MAIN_FADE_IN:
         GFL_FadeSet(3, 16, 0, 0);
-        *state = 2;
+        *state = MAIN_WAIT_FADE_IN;
         break;
-    case 2:
+    case MAIN_WAIT_FADE_IN:
         if (GFL_FadeIsRunning()) {
             break;
         }
-        *state = 3;
+        *state = MAIN_RUN;
         break;
-    case 3:
+    case MAIN_RUN:
         wk->step(wk, &wk->stepState);
         if (wk->stepDone) {
-            *state = 4;
+            *state = MAIN_FADE_OUT;
         }
         IrcRhythmFlash_Update(&wk->flash);
         break;
-    case 4:
+    case MAIN_FADE_OUT:
         GFL_FadeSet(3, 0, 16, 0);
-        *state = 5;
+        *state = MAIN_WAIT_FADE_OUT;
         break;
-    case 5:
+    case MAIN_WAIT_FADE_OUT:
         if (GFL_FadeIsRunning()) {
             break;
         }
-        *state = 6;
+        *state = MAIN_END;
         break;
-    case 6:
+    case MAIN_END:
         return TRUE;
     }
     if (IrcRhythmText_Update(&wk->text)) {
@@ -975,13 +1002,13 @@ static void IrcRhythmCheck_StepResult(IrcRhythmCheckWork *wk, u16 *state) {
         if (wk->resultTimer++ < SCORE_FRAMES) {
             return;
         }
-        wk->param->unk10 = IrcRhythmCheck_ComputeScore(wk);
+        wk->param->score = IrcRhythmCheck_ComputeScore(wk);
         IrcRhythmNet_GetReceived(&wk->net, &received);
         diff = wk->data.extraTaps - received.extraTaps;
         if (diff < 0) {
             diff = -diff;
         }
-        wk->param->unk14 = diff;
+        wk->param->extraTapDiff = diff;
         wk->param->result = IRC_RHYTHM_CHECK_RESULT_DONE;
         *state = RESULT_FINISH;
         return;
@@ -1002,33 +1029,33 @@ static void IrcRhythmCheck_StepResult(IrcRhythmCheckWork *wk, u16 *state) {
 // The link broke: ends the screen
 static void IrcRhythmCheck_StepInterrupted(IrcRhythmCheckWork *wk, u16 *state) {
     switch (*state) {
-    case 0:
+    case INTERRUPTED_CHECK:
         if (CompatibleIrcSys_GetPendingCount(wk->param->sys) > 0) {
-            wk->param->unk10 = 0;
+            wk->param->score = 0;
             wk->param->result = IRC_RHYTHM_CHECK_RESULT_CANCELLED;
             IrcRhythmCheck_SetStepDone(wk);
             return;
         }
         if (CompatibleIrcSys_GetPendingCount(wk->param->sys) < 0) {
-            *state = 1;
+            *state = INTERRUPTED_SET_RESULT;
             return;
         }
         break;
-    case 1:
-        wk->param->unk10 = 0;
+    case INTERRUPTED_SET_RESULT:
+        wk->param->score = 0;
         wk->param->result = IRC_RHYTHM_CHECK_RESULT_INTERRUPTED;
-        *state = 2;
+        *state = INTERRUPTED_PRINT;
         break;
-    case 2:
+    case INTERRUPTED_PRINT:
         IrcRhythmWindow_PrintMsg(&wk->messageWindow, &wk->text, BtlMain7_Text_ConnectionInterruptedPleaseRealign, 0, 0);
-        *state = 3;
+        *state = INTERRUPTED_EXCHANGE_IDS;
         break;
-    case 3:
+    case INTERRUPTED_EXCHANGE_IDS:
         if (CompatibleIrcSys_ExchangeIds(wk->param->sys, 6)) {
-            *state = 4;
+            *state = INTERRUPTED_FINISH;
         }
         break;
-    case 4:
+    case INTERRUPTED_FINISH:
         IrcRhythmCheck_SetStepDone(wk);
         break;
     }
@@ -1122,20 +1149,20 @@ static void IrcRhythmNet_Free(IrcRhythmNet *net) {
 // Sends the data, and returns TRUE once the other player's has also arrived
 static BOOL IrcRhythmNet_Send(IrcRhythmNet *net, const IrcRhythmData *data) {
     switch (net->state) {
-    case 0:
+    case NET_SEND_COPY:
         net->send = *data;
-        net->state = 1;
+        net->state = NET_SEND_SEND;
         break;
-    case 1:
+    case NET_SEND_SEND:
         if (CompatibleIrcSys_SendEx(net->sys, NET_COMMAND_BASE, sizeof(IrcRhythmData), &net->send,
                                     !GFL_NetGetHandleNetId(NetHandle_GetOwn()), 0, FALSE, TRUE)) {
-            net->state = 2;
+            net->state = NET_SEND_WAIT_RECEIVE;
         }
         break;
-    case 2:
+    case NET_SEND_WAIT_RECEIVE:
         if (net->received) {
             net->received = FALSE;
-            net->state = 0;
+            net->state = NET_SEND_COPY;
             return TRUE;
         }
         break;

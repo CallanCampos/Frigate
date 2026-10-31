@@ -28,6 +28,47 @@
 #define HEAP_ID_TAIL HEAPID_TAIL(HEAP_ID)
 #define SUB_PROC_COUNT 5
 
+// The screens, as indexes of the table of sub processes
+enum {
+    SCREEN_MENU,
+    SCREEN_SYNC_CHECK,
+    SCREEN_RHYTHM_CHECK,
+    SCREEN_RESULT,
+    SCREEN_RANKING,
+};
+
+// The steps of the proc's main function, and of the steps that run the screens
+enum {
+    MAIN_WAIT_BGM,
+    MAIN_RUN,
+};
+
+enum {
+    END_DELAY,
+    END_FINISH,
+};
+
+enum {
+    MENU_RUN_SCREEN,
+    MENU_NEXT,
+};
+
+enum {
+    FLOW_A_INIT,
+    FLOW_A_RHYTHM_CHECK,
+    FLOW_A_AFTER_RHYTHM_CHECK,
+    FLOW_A_SYNC_CHECK,
+    FLOW_A_AFTER_SYNC_CHECK,
+    FLOW_A_RESULT,
+    FLOW_A_BACK_TO_MENU,
+};
+
+enum {
+    FLOW_B_INIT,
+    FLOW_B_RANKING,
+    FLOW_B_BACK_TO_MENU,
+};
+
 // The steps of the sub process runner
 enum {
     SUB_PROC_CREATE_PARAM,
@@ -53,15 +94,15 @@ struct IrcCompatibleWork {
     u16 stepState;
     BOOL done;
     int mode;
-    int unk24;
-    int unk28;
-    u8 unk2C;
-    u8 unk2D;
-    u8 unk2E;
-    u8 unk2F;
-    int unk30;
+    int syncResult;
+    int rhythmResult;
+    u8 rhythmScore;
+    u8 rhythmTapDiff;
+    u8 syncScore;
+    u8 syncRetries;
+    int partnerIsNew;
     BOOL firstVisit;
-    BOOL unk38;
+    BOOL rankingVisited;
     CompatibleIrcProfile *profile;
 };
 
@@ -96,8 +137,9 @@ static void *IrcCompatible_CreateParam3(HeapID heapId, IrcCompatibleWork *wk);
 static void IrcCompatible_FreeParam3(void *param, IrcCompatibleWork *wk);
 static void *IrcCompatible_CreateParam4(HeapID heapId, IrcCompatibleWork *wk);
 static void IrcCompatible_FreeParam4(void *param, IrcCompatibleWork *wk);
-static int IrcCompatible_CalcCompatibility(u32 a, u32 b, u32 c, u32 d, CompatibleIrcProfile *mine,
-                                           CompatibleIrcProfile *other, BOOL isNew, u32 date, HeapID heapId);
+static int IrcCompatible_CalcCompatibility(u32 rhythmScore, u32 syncScore, u32 tapDiff, u32 syncRetries,
+                                           CompatibleIrcProfile *mine, CompatibleIrcProfile *other, BOOL isNew,
+                                           u32 date, HeapID heapId);
 static u32 IrcCompatible_NameMatch(const u16 *name0, const u16 *name1);
 static u32 IrcCompatible_HighestBit(u32 value, u32 count);
 static u8 IrcCompatible_BirthdayScore(const CompatibleIrcProfile *profile, u32 date);
@@ -156,12 +198,12 @@ static BOOL IrcCompatible_Main(GameProc *proc, u32 *state, void *param, void *wo
     IrcCompatibleWork *wk = work;
 
     switch (*state) {
-    case 0:
+    case MAIN_WAIT_BGM:
         if (!GFL_SndBGMIsFading()) {
             (*state)++;
         }
         break;
-    case 1:
+    case MAIN_RUN:
         if (!IrcCompatible_UpdateSubProc(&wk->subProc)) {
             wk->step(wk, &wk->stepState);
         }
@@ -190,10 +232,10 @@ static void IrcCompatible_StepStart(IrcCompatibleWork *wk, u16 *state) {
 
 static void IrcCompatible_StepEnd(IrcCompatibleWork *wk, u16 *state) {
     switch (*state) {
-    case 0:
-        *state = 1;
+    case END_DELAY:
+        *state = END_FINISH;
         break;
-    case 1:
+    case END_FINISH:
         IrcCompatible_Finish(wk);
         break;
     }
@@ -201,20 +243,20 @@ static void IrcCompatible_StepEnd(IrcCompatibleWork *wk, u16 *state) {
 
 static void IrcCompatible_StepMenu(IrcCompatibleWork *wk, u16 *state) {
     switch (*state) {
-    case 0:
-        if (IrcCompatible_RunSubProc(&wk->subProc, 0, HEAP_ID, wk)) {
-            *state = 1;
+    case MENU_RUN_SCREEN:
+        if (IrcCompatible_RunSubProc(&wk->subProc, SCREEN_MENU, HEAP_ID, wk)) {
+            *state = MENU_NEXT;
         }
         break;
-    case 1:
+    case MENU_NEXT:
         switch (wk->mode) {
-        case 0:
+        case IRC_COMPAT_MENU_RESULT_CHECK:
             IrcCompatible_SetStep(wk, IrcCompatible_StepFlowA);
             break;
-        case 1:
+        case IRC_COMPAT_MENU_RESULT_RANKING:
             IrcCompatible_SetStep(wk, IrcCompatible_StepFlowB);
             break;
-        case 2:
+        case IRC_COMPAT_MENU_RESULT_QUIT:
             IrcCompatible_SetStep(wk, IrcCompatible_StepEnd);
             break;
         }
@@ -224,49 +266,49 @@ static void IrcCompatible_StepMenu(IrcCompatibleWork *wk, u16 *state) {
 
 static void IrcCompatible_StepFlowA(IrcCompatibleWork *wk, u16 *state) {
     switch (*state) {
-    case 0:
-        wk->unk2E = 0;
-        wk->unk2C = 0;
-        *state = 1;
+    case FLOW_A_INIT:
+        wk->syncScore = 0;
+        wk->rhythmScore = 0;
+        *state = FLOW_A_RHYTHM_CHECK;
         break;
-    case 1:
-        if (IrcCompatible_RunSubProc(&wk->subProc, 2, HEAP_ID, wk)) {
-            *state = 2;
+    case FLOW_A_RHYTHM_CHECK:
+        if (IrcCompatible_RunSubProc(&wk->subProc, SCREEN_RHYTHM_CHECK, HEAP_ID, wk)) {
+            *state = FLOW_A_AFTER_RHYTHM_CHECK;
         }
         break;
-    case 2:
-        if (wk->unk28 == 0) {
-            *state = 3;
-        } else if (wk->unk28 == 2) {
-            wk->unk2E = 0;
-            wk->unk2C = 0;
-            *state = 5;
+    case FLOW_A_AFTER_RHYTHM_CHECK:
+        if (wk->rhythmResult == IRC_RHYTHM_CHECK_RESULT_DONE) {
+            *state = FLOW_A_SYNC_CHECK;
+        } else if (wk->rhythmResult == IRC_RHYTHM_CHECK_RESULT_INTERRUPTED) {
+            wk->syncScore = 0;
+            wk->rhythmScore = 0;
+            *state = FLOW_A_RESULT;
         } else {
-            *state = 6;
+            *state = FLOW_A_BACK_TO_MENU;
         }
         break;
-    case 3:
-        if (IrcCompatible_RunSubProc(&wk->subProc, 1, HEAP_ID, wk)) {
-            *state = 4;
+    case FLOW_A_SYNC_CHECK:
+        if (IrcCompatible_RunSubProc(&wk->subProc, SCREEN_SYNC_CHECK, HEAP_ID, wk)) {
+            *state = FLOW_A_AFTER_SYNC_CHECK;
         }
         break;
-    case 4:
-        if (wk->unk24 == 0) {
-            *state = 5;
-        } else if (wk->unk24 == 2) {
-            wk->unk2E = 0;
-            wk->unk2C = 0;
-            *state = 5;
+    case FLOW_A_AFTER_SYNC_CHECK:
+        if (wk->syncResult == IRC_SYNC_CHECK_RESULT_DONE) {
+            *state = FLOW_A_RESULT;
+        } else if (wk->syncResult == IRC_SYNC_CHECK_RESULT_INTERRUPTED) {
+            wk->syncScore = 0;
+            wk->rhythmScore = 0;
+            *state = FLOW_A_RESULT;
         } else {
-            *state = 6;
+            *state = FLOW_A_BACK_TO_MENU;
         }
         break;
-    case 5:
-        if (IrcCompatible_RunSubProc(&wk->subProc, 3, HEAP_ID, wk)) {
-            *state = 6;
+    case FLOW_A_RESULT:
+        if (IrcCompatible_RunSubProc(&wk->subProc, SCREEN_RESULT, HEAP_ID, wk)) {
+            *state = FLOW_A_BACK_TO_MENU;
         }
         break;
-    case 6:
+    case FLOW_A_BACK_TO_MENU:
         IrcCompatible_SetStep(wk, IrcCompatible_StepMenu);
         break;
     }
@@ -274,15 +316,15 @@ static void IrcCompatible_StepFlowA(IrcCompatibleWork *wk, u16 *state) {
 
 static void IrcCompatible_StepFlowB(IrcCompatibleWork *wk, u16 *state) {
     switch (*state) {
-    case 0:
-        *state = 1;
+    case FLOW_B_INIT:
+        *state = FLOW_B_RANKING;
         break;
-    case 1:
-        if (IrcCompatible_RunSubProc(&wk->subProc, 4, HEAP_ID, wk)) {
-            *state = 2;
+    case FLOW_B_RANKING:
+        if (IrcCompatible_RunSubProc(&wk->subProc, SCREEN_RANKING, HEAP_ID, wk)) {
+            *state = FLOW_B_BACK_TO_MENU;
         }
         break;
-    case 2:
+    case FLOW_B_BACK_TO_MENU:
         IrcCompatible_SetStep(wk, IrcCompatible_StepMenu);
         break;
     }
@@ -339,14 +381,14 @@ static void *IrcCompatible_CreateParam0(HeapID heapId, IrcCompatibleWork *wk) {
     param->sys = wk->sys;
     param->profile = wk->profile;
     if (wk->firstVisit == TRUE) {
-        param->visit = 0;
+        param->visit = IRC_COMPAT_VISIT_FIRST;
         wk->firstVisit = FALSE;
     } else {
-        if (wk->unk38) {
-            wk->unk38 = FALSE;
-            param->visit = 2;
+        if (wk->rankingVisited) {
+            wk->rankingVisited = FALSE;
+            param->visit = IRC_COMPAT_VISIT_AFTER_RESULT;
         } else {
-            param->visit = 1;
+            param->visit = IRC_COMPAT_VISIT_AGAIN;
         }
     }
     return param;
@@ -372,10 +414,10 @@ static void *IrcCompatible_CreateParam1(HeapID heapId, IrcCompatibleWork *wk) {
 static void IrcCompatible_FreeParam1(void *param, IrcCompatibleWork *wk) {
     IrcCompatibleParam1 *p = param;
 
-    wk->unk24 = p->result;
-    wk->unk2E = p->unk10;
-    wk->unk2F = p->unk11;
-    wk->unk30 = p->unk12;
+    wk->syncResult = p->result;
+    wk->syncScore = p->score;
+    wk->syncRetries = p->retries;
+    wk->partnerIsNew = p->isNew;
     GFL_HeapFree(p);
 }
 
@@ -392,9 +434,9 @@ static void *IrcCompatible_CreateParam2(HeapID heapId, IrcCompatibleWork *wk) {
 static void IrcCompatible_FreeParam2(void *param, IrcCompatibleWork *wk) {
     IrcCompatibleParam2 *p = param;
 
-    wk->unk28 = p->result;
-    wk->unk2C = p->unk10;
-    wk->unk2D = p->unk14;
+    wk->rhythmResult = p->result;
+    wk->rhythmScore = p->score;
+    wk->rhythmTapDiff = p->extraTapDiff;
     GFL_HeapFree(p);
 }
 
@@ -405,7 +447,7 @@ static void *IrcCompatible_CreateParam3(HeapID heapId, IrcCompatibleWork *wk) {
     param->gsys = wk->param->gsys;
     param->sys = wk->sys;
     param->profile = wk->profile;
-    if (wk->unk2C != 0 && wk->unk2E != 0) {
+    if (wk->rhythmScore != 0 && wk->syncScore != 0) {
         CompatibleIrcProfile mine;
         TrainerLogSave *log;
         BOOL isNewTrainer;
@@ -419,7 +461,7 @@ static void *IrcCompatible_CreateParam3(HeapID heapId, IrcCompatibleWork *wk) {
             isNew = TRUE;
         }
         isNewTrainer = FALSE;
-        if (wk->unk30 != 0 && isNew) {
+        if (wk->partnerIsNew != 0 && isNew) {
             isNewTrainer = TRUE;
         }
         CompatibleIrcSys_BuildProfile(wk->param->gsys, &mine);
@@ -428,8 +470,9 @@ static void *IrcCompatible_CreateParam3(HeapID heapId, IrcCompatibleWork *wk) {
         } else {
             date = wk->profile->date;
         }
-        param->result = IrcCompatible_CalcCompatibility(wk->unk2C, wk->unk2E, wk->unk2D, wk->unk2F, &mine, wk->profile,
-                                                        isNewTrainer, date, HEAP_ID);
+        param->result =
+            IrcCompatible_CalcCompatibility(wk->rhythmScore, wk->syncScore, wk->rhythmTapDiff, wk->syncRetries, &mine,
+                                            wk->profile, isNewTrainer, date, HEAP_ID);
     }
     return param;
 }
@@ -448,18 +491,19 @@ static void *IrcCompatible_CreateParam4(HeapID heapId, IrcCompatibleWork *wk) {
 
 static void IrcCompatible_FreeParam4(void *param, IrcCompatibleWork *wk) {
     GFL_HeapFree(param);
-    wk->unk38 = TRUE;
+    wk->rankingVisited = TRUE;
 }
 
-static int IrcCompatible_CalcCompatibility(u32 a, u32 b, u32 c, u32 d, CompatibleIrcProfile *mine,
-                                           CompatibleIrcProfile *other, BOOL isNew, u32 date, HeapID heapId) {
+static int IrcCompatible_CalcCompatibility(u32 rhythmScore, u32 syncScore, u32 tapDiff, u32 syncRetries,
+                                           CompatibleIrcProfile *mine, CompatibleIrcProfile *other, BOOL isNew,
+                                           u32 date, HeapID heapId) {
     u32 birthday0 = IrcCompatible_BirthdayScore(mine, date);
     u32 birthday1 = IrcCompatible_BirthdayScore(other, date);
     int score = (birthday0 + birthday1) / 2 * 10 / 100;
     u32 nameMatch;
     int ratio;
 
-    score += 50 * a / 100 + 40 * b / 100;
+    score += 50 * rhythmScore / 100 + 40 * syncScore / 100;
     nameMatch = IrcCompatible_NameMatch(GetPlayerName(&mine->trainer), GetPlayerName(&other->trainer));
     ratio = FX32_CONST(nameMatch) / 150;
     if (isNew) {
@@ -469,7 +513,7 @@ static int IrcCompatible_CalcCompatibility(u32 a, u32 b, u32 c, u32 d, Compatibl
     } else if (ratio < FX32_ONE / 2) {
         ratio = FX32_ONE / 2;
     }
-    score = score + (((100 - score) * ratio) >> FX32_SHIFT) - (d + c);
+    score = score + (((100 - score) * ratio) >> FX32_SHIFT) - (syncRetries + tapDiff);
     if (score > 100) {
         return 100;
     }

@@ -386,7 +386,7 @@ static BOOL IrcSyncCheck_Init(GameProc *proc, u32 *state, void *param, void *wor
     wk = GFL_ProcInitSubsystem(proc, sizeof(IrcSyncCheckWork), HEAP_ID);
     MI_CpuFill8(wk, 0, sizeof(IrcSyncCheckWork));
     wk->param = syncParam;
-    wk->param->unk11 = 0;
+    wk->param->retries = 0;
     IrcSyncNet_Init(&wk->net, wk->param->sys);
     IrcSyncCheckGraphic_Create(&wk->graphic, HEAP_ID);
     IrcSyncCheckText_Init(&wk->text, FALSE, HEAP_ID);
@@ -1179,10 +1179,10 @@ static void IrcSyncCheck_StepResult(IrcSyncCheckWork *wk, u16 *state) {
         if (wk->counter++ < DONE_FRAMES) {
             return;
         }
-        wk->param->unk10 = IrcSyncCheck_ComputeScore(wk);
+        wk->param->score = IrcSyncCheck_ComputeScore(wk);
         IrcSyncNet_GetReceived(&wk->net, &received);
-        wk->param->unk11 = wk->retries + received.retries;
-        wk->param->unk12 = received.isNew;
+        wk->param->retries = wk->retries + received.retries;
+        wk->param->isNew = received.isNew;
         wk->param->result = IRC_SYNC_CHECK_RESULT_DONE;
         *state = RESULT_FINISH;
         return;
@@ -1209,14 +1209,14 @@ static void IrcSyncCheck_StepInterrupted(IrcSyncCheckWork *wk, u16 *state) {
             return;
         }
         if (CompatibleIrcSys_GetPendingCount(wk->param->sys) < 0) {
-            wk->param->unk10 = 0;
+            wk->param->score = 0;
             wk->param->result = IRC_SYNC_CHECK_RESULT_INTERRUPTED;
             IrcSyncCheck_SetStepDone(wk);
             return;
         }
         break;
     case 1:
-        wk->param->unk10 = 0;
+        wk->param->score = 0;
         wk->param->result = IRC_SYNC_CHECK_RESULT_INTERRUPTED;
         *state = 2;
         break;

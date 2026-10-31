@@ -33,9 +33,11 @@ typedef struct {
     CompatibleIrcSys *sys;
     CompatibleIrcProfile *profile;
     int result;
-    u8 unk10;
-    u8 unk11;
-    u8 unk12;
+    u8 score;
+    // How many times the two players had to retry, together
+    u8 retries;
+    // Whether the other player is new to this player's trainer log
+    u8 isNew;
 } IrcCompatibleParam1;
 
 typedef struct {
@@ -43,8 +45,9 @@ typedef struct {
     CompatibleIrcSys *sys;
     CompatibleIrcProfile *profile;
     int result;
-    u8 unk10;
-    u32 unk14;
+    u8 score;
+    // How far apart the two players' extra taps are
+    u32 extraTapDiff;
 } IrcCompatibleParam2;
 
 typedef struct {
