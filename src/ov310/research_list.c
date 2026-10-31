@@ -893,15 +893,20 @@ static void ResearchList_SeqCursor(ResearchList *wk) {
     }
 }
 
+enum {
+    CURSOR_SCROLL_STEP_START = 0,
+    CURSOR_SCROLL_STEP_SCROLL,
+};
+
 static void ResearchList_SeqCursorScroll(ResearchList *wk) {
     switch (ResearchList_GetSeqState(wk)) {
-    case 0:
+    case CURSOR_SCROLL_STEP_START:
         ResearchList_StartCursorScroll(wk);
         ResearchList_MoveCursorTo(wk, wk->cursorTarget);
         ResearchList_PrintCursorSurvey(wk);
         ResearchList_NextSeqState(wk);
         break;
-    case 1:
+    case CURSOR_SCROLL_STEP_SCROLL:
         ResearchList_UpdateScroll(wk);
         ResearchList_ScrollToView(wk);
         ResearchList_UpdateListRects(wk);
@@ -916,12 +921,17 @@ static void ResearchList_SeqCursorScroll(ResearchList *wk) {
     }
 }
 
+enum {
+    DRAG_STEP_HOLD = 0,
+    DRAG_STEP_COAST,
+};
+
 static void ResearchList_SeqDrag(ResearchList *wk) {
     u32 x, y;
     BOOL touching = GFL_HIDGetTouchHeldPoint(&x, &y);
 
     switch (ResearchList_GetSeqState(wk)) {
-    case 0:
+    case DRAG_STEP_HOLD:
         if (!touching) {
             ResearchList_ReleaseDrag(wk);
             ResearchList_SetDragAccel(wk);
@@ -935,7 +945,7 @@ static void ResearchList_SeqDrag(ResearchList *wk) {
             ResearchList_SetDragSpeed(wk);
         }
         break;
-    case 1:
+    case DRAG_STEP_COAST:
         ResearchList_DragTo(wk, wk->scrollY + wk->dragSpeed);
         ResearchList_ScrollToDrag(wk);
         ResearchList_UpdateListRects(wk);
@@ -1023,9 +1033,14 @@ static void ResearchList_SeqConfirmCursor(ResearchList *wk) {
     }
 }
 
+enum {
+    CONFIRM_OPEN_TOUCH_STEP_START = 0,
+    CONFIRM_OPEN_TOUCH_STEP_SCROLL,
+};
+
 static void ResearchList_SeqConfirmOpenTouch(ResearchList *wk) {
     switch (ResearchList_GetSeqState(wk)) {
-    case 0:
+    case CONFIRM_OPEN_TOUCH_STEP_START:
         ResearchList_UnhighlightButton(wk, BUTTON_NO);
         ResearchList_UnhighlightButton(wk, BUTTON_YES);
         ResearchList_SetBmpOamVisible(wk, BMP_QUESTION, TRUE);
@@ -1038,7 +1053,7 @@ static void ResearchList_SeqConfirmOpenTouch(ResearchList *wk) {
         ResearchList_StartScrollToCursor(wk);
         ResearchList_NextSeqState(wk);
         break;
-    case 1:
+    case CONFIRM_OPEN_TOUCH_STEP_SCROLL:
         ResearchList_UpdateScroll(wk);
         ResearchList_ScrollToView(wk);
         ResearchList_UpdateListRects(wk);
@@ -1053,9 +1068,14 @@ static void ResearchList_SeqConfirmOpenTouch(ResearchList *wk) {
     }
 }
 
+enum {
+    CONFIRM_OPEN_CURSOR_STEP_START = 0,
+    CONFIRM_OPEN_CURSOR_STEP_SCROLL,
+};
+
 static void ResearchList_SeqConfirmOpenCursor(ResearchList *wk) {
     switch (ResearchList_GetSeqState(wk)) {
-    case 0:
+    case CONFIRM_OPEN_CURSOR_STEP_START:
         ResearchList_SetButtonCursor(wk, BUTTON_YES);
         ResearchList_UnhighlightButton(wk, BUTTON_NO);
         ResearchList_HighlightButton(wk, BUTTON_YES);
@@ -1070,7 +1090,7 @@ static void ResearchList_SeqConfirmOpenCursor(ResearchList *wk) {
         ResearchList_StartScrollToCursor(wk);
         ResearchList_NextSeqState(wk);
         break;
-    case 1:
+    case CONFIRM_OPEN_CURSOR_STEP_SCROLL:
         ResearchList_UpdateScroll(wk);
         ResearchList_ScrollToView(wk);
         ResearchList_UpdateListRects(wk);
@@ -1085,9 +1105,16 @@ static void ResearchList_SeqConfirmOpenCursor(ResearchList *wk) {
     }
 }
 
+enum {
+    DECIDE_STEP_MARK = 0,
+    DECIDE_STEP_WAIT,
+    DECIDE_STEP_FADE_WAIT,
+    DECIDE_STEP_PALETTE_WAIT,
+};
+
 static void ResearchList_SeqDecide(ResearchList *wk) {
     switch (ResearchList_GetSeqState(wk)) {
-    case 0:
+    case DECIDE_STEP_MARK:
         ResearchList_BrightenCurrentIcon(wk);
         ResearchList_UnindentItem(wk, ResearchList_GetCurrentSurvey(wk));
         ResearchList_SetCurrentSurvey(wk);
@@ -1097,19 +1124,19 @@ static void ResearchList_SeqDecide(ResearchList *wk) {
         GFL_SndSEPlay(SEQ_SE_SYS_80);
         ResearchList_NextSeqState(wk);
         break;
-    case 1:
+    case DECIDE_STEP_WAIT:
         if (wk->seqFrames >= DECIDE_WAIT_FRAMES) {
             ResearchList_FadeOut();
             ResearchList_NextSeqState(wk);
         }
         break;
-    case 2:
+    case DECIDE_STEP_FADE_WAIT:
         if (ResearchList_IsFadeDone()) {
             ResearchList_Brighten(wk);
             ResearchList_NextSeqState(wk);
         }
         break;
-    case 3:
+    case DECIDE_STEP_PALETTE_WAIT:
         if (ResearchList_IsPaletteFadeDone(wk)) {
             ResearchList_EndSeq(wk);
             ResearchList_PushSeq(wk, SEQ_TEARDOWN);
@@ -1117,22 +1144,28 @@ static void ResearchList_SeqDecide(ResearchList *wk) {
         break;
     }
 }
+
+enum {
+    RETURN_CURSOR_STEP_WAIT = 0,
+    RETURN_CURSOR_STEP_FADE_WAIT,
+    RETURN_CURSOR_STEP_PALETTE_WAIT,
+};
 
 static void ResearchList_SeqReturnCursor(ResearchList *wk) {
     switch (ResearchList_GetSeqState(wk)) {
-    case 0:
+    case RETURN_CURSOR_STEP_WAIT:
         if (ResearchList_GetWait(wk) < wk->seqFrames) {
             ResearchList_FadeOut();
             ResearchList_NextSeqState(wk);
         }
         break;
-    case 1:
+    case RETURN_CURSOR_STEP_FADE_WAIT:
         if (ResearchList_IsFadeDone()) {
             ResearchList_Brighten(wk);
             ResearchList_NextSeqState(wk);
         }
         break;
-    case 2:
+    case RETURN_CURSOR_STEP_PALETTE_WAIT:
         if (ResearchList_IsPaletteFadeDone(wk)) {
             BGFont_SetPalette(wk->itemFonts[wk->cursor], 15);
             ResearchList_EndSeq(wk);
@@ -1141,22 +1174,28 @@ static void ResearchList_SeqReturnCursor(ResearchList *wk) {
         break;
     }
 }
+
+enum {
+    RETURN_TOUCH_STEP_WAIT = 0,
+    RETURN_TOUCH_STEP_FADE_WAIT,
+    RETURN_TOUCH_STEP_PALETTE_WAIT,
+};
 
 static void ResearchList_SeqReturnTouch(ResearchList *wk) {
     switch (ResearchList_GetSeqState(wk)) {
-    case 0:
+    case RETURN_TOUCH_STEP_WAIT:
         if (ResearchList_GetWait(wk) < wk->seqFrames) {
             ResearchList_FadeOut();
             ResearchList_NextSeqState(wk);
         }
         break;
-    case 1:
+    case RETURN_TOUCH_STEP_FADE_WAIT:
         if (ResearchList_IsFadeDone()) {
             ResearchList_Brighten(wk);
             ResearchList_NextSeqState(wk);
         }
         break;
-    case 2:
+    case RETURN_TOUCH_STEP_PALETTE_WAIT:
         if (ResearchList_IsPaletteFadeDone(wk)) {
             BGFont_SetPalette(wk->itemFonts[wk->cursor], 15);
             ResearchList_EndSeq(wk);
@@ -1166,13 +1205,20 @@ static void ResearchList_SeqReturnTouch(ResearchList *wk) {
     }
 }
 
+enum {
+    CONFIRM_CANCEL_STEP_START = 0,
+    CONFIRM_CANCEL_STEP_SCROLL,
+    CONFIRM_CANCEL_STEP_ANIME_WAIT,
+    CONFIRM_CANCEL_STEP_PALETTE_WAIT,
+};
+
 static void ResearchList_SeqConfirmCancel(ResearchList *wk) {
     switch (ResearchList_GetSeqState(wk)) {
-    case 0:
+    case CONFIRM_CANCEL_STEP_START:
         ResearchList_StartScrollBack(wk);
         ResearchList_NextSeqState(wk);
         break;
-    case 1:
+    case CONFIRM_CANCEL_STEP_SCROLL:
         ResearchList_UpdateScroll(wk);
         ResearchList_ScrollToView(wk);
         ResearchList_UpdateListRects(wk);
@@ -1183,7 +1229,7 @@ static void ResearchList_SeqConfirmCancel(ResearchList *wk) {
             ResearchList_NextSeqState(wk);
         }
         break;
-    case 2:
+    case CONFIRM_CANCEL_STEP_ANIME_WAIT:
         if (ResearchList_IsPaletteAnimeEnd(wk, ANIME_BUTTON_DECIDE)) {
             ResearchList_SetBmpOamVisible(wk, BMP_QUESTION, FALSE);
             ResearchList_SetBmpOamVisible(wk, BMP_YES, FALSE);
@@ -1193,7 +1239,7 @@ static void ResearchList_SeqConfirmCancel(ResearchList *wk) {
             ResearchList_NextSeqState(wk);
         }
         break;
-    case 3:
+    case CONFIRM_CANCEL_STEP_PALETTE_WAIT:
         if (ResearchList_IsPaletteFadeDone(wk)) {
             BGFont_SetPalette(wk->itemFonts[wk->cursor], 15);
             ResearchList_EndSeq(wk);
