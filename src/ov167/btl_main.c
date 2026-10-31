@@ -503,7 +503,7 @@ void BtlMain_SetupTrainers(BtlMainModule *mainModule, BtlSetup *setup) {
 
 void BtlMain_SetupRecReader(BtlMainModule *mainModule, BtlSetup *setup) {
     if (setup->fieldSituation.unk1b != 0) {
-        BtlRecReader_Init(&mainModule->recReader, setup->unkB0, setup->unkB4);
+        BtlRecReader_Init(&mainModule->recReader, setup->recBuffer, setup->recSize);
         BattleClient_SetRecPlayData(mainModule->clients[0], &mainModule->recReader);
         BattleClient_SetRecPlayData(mainModule->clients[1], &mainModule->recReader);
     }
@@ -684,7 +684,7 @@ BOOL BtlMain_SetupAloneMulti(u32 *state, BtlMainModule *mainModule) {
         }
     }
     if (setup->fieldSituation.unk1b != 0) {
-        BtlRecReader_Init(&mainModule->recReader, setup->unkB0, setup->unkB4);
+        BtlRecReader_Init(&mainModule->recReader, setup->recBuffer, setup->recSize);
         for (i = 0; i < 4; i++) {
             if (DoesClientExist(mainModule, i)) {
                 BattleClient_SetRecPlayData(mainModule->clients[i], &mainModule->recReader);
@@ -942,7 +942,7 @@ BOOL BtlMain_CommExchangeSyncData(BtlMainModule *mainModule, s32 *state) {
         if (BtlNet_IsServerDecided()) {
             mainModule->unk46A = 0;
             mainModule->isServer = BtlNet_IsServer();
-            mainModule->setup->unkAD = BtlNet_GetCommonVersion();
+            mainModule->setup->commonVersion = BtlNet_GetCommonVersion();
             if (BtlNet_IsServer()) {
                 *state = 2;
             } else {
@@ -2273,7 +2273,7 @@ BagCursor *GetBagCursor(BtlMainModule *mainModule) {
 BOOL IsRecordingEnabled(BtlMainModule *mainModule) {
     BtlSetup *setup = mainModule->setup;
 
-    if (setup->unkB0 != 0 && setup->fieldSituation.unk1b == 0) {
+    if (setup->recBuffer != 0 && setup->fieldSituation.unk1b == 0) {
         return TRUE;
     }
     return FALSE;
@@ -3529,8 +3529,8 @@ void BtlMain_StoreRecData(BtlMainModule *mainModule) {
     if (IsRecordingEnabled(mainModule)) {
         data = BattleClient_GetRecordData(mainModule->clients[mainModule->playerClientId], &size);
         if (data != NULL) {
-            MI_CpuCopy8(data, mainModule->setup->unkB0, size);
-            mainModule->setup->unkB4 = size;
+            MI_CpuCopy8(data, mainModule->setup->recBuffer, size);
+            mainModule->setup->recSize = size;
             mainModule->setup->rand = mainModule->rand;
         }
     }

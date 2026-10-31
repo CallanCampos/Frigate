@@ -935,7 +935,7 @@ BOOL Scrcmd_Bsubway_Tool(VM *vm, FieldScriptEnv *env) {
         break;
     case 416:
         *retWk = FALSE;
-        if (bsw->btlSetup != NULL && BattleRec_IsVersionSupported(bsw->btlSetup->unkAD) == TRUE) {
+        if (bsw->btlSetup != NULL && BattleRec_IsVersionSupported(bsw->btlSetup->commonVersion) == TRUE) {
             *retWk = TRUE;
         }
         break;

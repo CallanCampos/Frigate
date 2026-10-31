@@ -60,6 +60,13 @@ typedef struct {
     u32 nameLength;
 } BtlCommTrainerData;
 
+// What BtlSetup.studioEnding is: how a Pokéstar Studios movie ended, which the audience reacts to
+enum {
+    STUDIO_ENDING_GOOD,
+    STUDIO_ENDING_BAD,
+    STUDIO_ENDING_STRANGE,
+};
+
 struct BtlSetup {
     u32 battleType;
     u32 battleStyle;
@@ -102,11 +109,11 @@ struct BtlSetup {
     u32 result;
     // The slot of the caught Pokémon in the second party, or 6 if none was caught
     u8 capturedSlot;
-    u8 unkAD;
+    u8 commonVersion;
     u8 unkAE;
     u8 unkAF;
-    void *unkB0;
-    u32 unkB4;
+    void *recBuffer;
+    u32 recSize;
     // The battle's random state, which the main module copies back
     MATHRandContext32 rand;
     u16 unkD0;
