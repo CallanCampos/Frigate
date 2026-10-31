@@ -197,12 +197,24 @@ static DrawingSeq sSeqTable[DRAWING_SEQ_COUNT] = {
 
 const GameProcFunctions DRAWING_PROC_FUNCTIONS = { Drawing_Init, Drawing_Main, Drawing_Exit };
 
+enum {
+    DRAWING_INIT_SETUP,
+    DRAWING_INIT_DONE,
+};
+
+// What Drawing_UpdateMenu returns: the menu's answers, or that it still runs
+enum {
+    DRAWING_MENU_YES,
+    DRAWING_MENU_NO,
+    DRAWING_MENU_RUNNING,
+};
+
 static BOOL Drawing_Init(GameProc *proc, u32 *state, void *param, void *work) {
     DrawingWork *wk;
     ArcTool *arc;
 
     switch (*state) {
-    case 0:
+    case DRAWING_INIT_SETUP:
         GFL_BGSysDisableAllA();
         GFL_BGSysDisableAllB();
         GFL_HeapCreateChild(HEAPID_USER, HEAPID_DRAWING, 0x50000);
@@ -230,8 +242,8 @@ static BOOL Drawing_Init(GameProc *proc, u32 *state, void *param, void *work) {
         GFL_ArcToolFree(arc);
         (*state)++;
         break;
-    case 1:
-        *state = 0;
+    case DRAWING_INIT_DONE:
+        *state = DRAWING_INIT_SETUP;
         return TRUE;
     }
     return FALSE;
@@ -298,11 +310,18 @@ static BOOL Drawing_Main(GameProc *proc, u32 *state, void *param, void *work) {
     return FALSE;
 }
 
+enum {
+    DRAWING_EXIT_FREE,
+    DRAWING_EXIT_DELAY,
+    DRAWING_EXIT_WAIT_ALONE,
+    DRAWING_EXIT_RELEASE,
+};
+
 static BOOL Drawing_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     DrawingWork *wk = work;
 
     switch (*state) {
-    case 0:
+    case DRAWING_EXIT_FREE:
         GFL_TCBRemove(wk->vblankTcb);
         ClActSys_FreeChars(wk->resources[DRAWING_RES_SUB].chars);
         ClActSys_FreePltt(wk->resources[DRAWING_RES_SUB].palette);
@@ -325,10 +344,10 @@ static BOOL Drawing_Exit(GameProc *proc, u32 *state, void *param, void *work) {
         GFL_FontFree(wk->font);
         (*state)++;
         break;
-    case 1:
+    case DRAWING_EXIT_DELAY:
         (*state)++;
         break;
-    case 2:
+    case DRAWING_EXIT_WAIT_ALONE:
         if (wk->waitAlone) {
             if (Drawing_GetJoined(wk) == 1) {
                 (*state)++;
@@ -337,7 +356,7 @@ static BOOL Drawing_Exit(GameProc *proc, u32 *state, void *param, void *work) {
             (*state)++;
         }
         break;
-    case 3:
+    case DRAWING_EXIT_RELEASE:
         Drawing_FreeWork(wk);
         GFL_ProcReleaseSubsystem(proc);
         GFL_HeapDelete(HEAPID_DRAWING);
@@ -920,7 +939,7 @@ static int Drawing_SeqEndSelect(DrawingWork *wk, int seq) {
         return seq;
     }
     switch (Drawing_UpdateMenu(wk)) {
-    case 0:
+    case DRAWING_MENU_YES:
         if (NetSystem_GetNetId() == 0) {
             Drawing_SetNextSeq(wk, DRAWING_SEQ_PARENT_END_SELECT_MSG_WAIT);
             Drawing_PrintMessage(wk, EventMapchange_Text_IfLeaderDropsOut, TRUE);
@@ -930,7 +949,7 @@ static int Drawing_SeqEndSelect(DrawingWork *wk, int seq) {
         }
         BmpWin_TransferNow(wk->drawWindow);
         break;
-    case 1:
+    case DRAWING_MENU_NO:
         Drawing_SetNextSeq(wk, DRAWING_SEQ_MAIN);
         Drawing_SetEndButton(wk->endButton, FALSE);
         BmpWin_ClearFrame(wk->msgWindow, 2);
@@ -1044,11 +1063,11 @@ static int Drawing_SeqParentEndSelect(DrawingWork *wk, int seq) {
         return seq;
     }
     switch (result) {
-    case 0:
+    case DRAWING_MENU_YES:
         Drawing_SetNextSeq(wk, DRAWING_SEQ_PARENT_END_SEND);
         UnionApp_CloseEntry(wk->param->app);
         break;
-    case 1:
+    case DRAWING_MENU_NO:
         Drawing_SetNextSeq(wk, DRAWING_SEQ_MAIN);
         Drawing_SetEndButton(wk->endButton, FALSE);
         BmpWin_ClearFrame(wk->msgWindow, 2);
@@ -1654,7 +1673,7 @@ static int Drawing_UpdateParent(DrawingWork *wk) {
         }
         break;
     case 0:
-    case 5:
+    case DRAWING_MEMBER_MAX:
         break;
     }
     if (count < wk->memberCount) {
@@ -1792,14 +1811,14 @@ static AppTaskMenu *Drawing_CreateMenu(DrawingWork *wk) {
 
 // Returns the item picked, or 2 while none is
 static int Drawing_UpdateMenu(DrawingWork *wk) {
-    int result = 2;
+    int result = DRAWING_MENU_RUNNING;
 
     AppTaskMenu_Update(wk->menu);
     if (AppTaskMenu_IsFlashFinished(wk->menu)) {
         if (AppTaskMenu_GetCursorPos(wk->menu) == 0) {
-            result = 0;
+            result = DRAWING_MENU_YES;
         } else {
-            result = 1;
+            result = DRAWING_MENU_NO;
         }
         Drawing_FreeMenu(wk);
     }
