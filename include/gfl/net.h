@@ -27,7 +27,7 @@ typedef struct {
     int (*getBeaconSize)(void *work);
     // Whether a beacon's game is one to join, a BOOL (*)(u8 gameCommandBase, u8 beaconCommandBase, void *work) that the
     // games give with fewer parameters
-    void *unk20;
+    void *beaconFilter;
     // Called with the wireless library's error when it fails
     void (*errorCallback)(NetHandle *handle, int a1, void *work);
     void (*unk28)(NetHandle *handle, int a1, void *work);
@@ -42,7 +42,7 @@ typedef struct {
             u8 unk34_0[8];
             void (*callback)(int code, int param, void *work);
         } wifiError;
-    } unk34;
+    } wifiHooks;
     // The Wi-Fi friend list (DWCFriendData) and user data (DWCUserData)
     int (*getFriendData)(void *work);
     int (*getUserData)(void *work);
@@ -56,7 +56,7 @@ typedef struct {
             u32 unk4C_0;
             u32 gameId;
         } id;
-    } unk4C;
+    } beaconId;
     HeapID parentHeapId;
     HeapID heapId;
     HeapID wifiHeapId;
@@ -120,7 +120,7 @@ typedef struct {
     int (*update)(u16 connectBits);
     BOOL (*disconnect)(int a0, int a1);
     BOOL (*end)(void (*callback)(BOOL ok));
-    BOOL (*unk18)(void);
+    BOOL (*clearBeacons)(void);
     BOOL (*unk1C)(void);
     BOOL (*unk20)(void);
     BOOL (*unk24)(void);
@@ -160,8 +160,8 @@ typedef struct {
     void (*setDisconnectError)(int a0);
     // Whether the Wi-Fi friend of an index can be connected to
     int (*canConnectFriend)(int a0);
-    int (*unk94)(void);
-    int (*unk98)(void);
+    int (*isVoiceChatEnabled)(void);
+    int (*getLastNetId)(void);
     // The infrared device's work each frame, whether it can send, whether it is its turn, whether the other machine
     // was seen, and whether the two are linked
     void (*poll)(void);

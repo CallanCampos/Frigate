@@ -1,6 +1,7 @@
 // net_devwifi.c is the name from the ROM's own string. The GFL net's device for Wi-Fi: each slot of its table passes
 // the call on to dwc_rap.c or dwc_rapcommon.c. The names are ours: each function is named after the slot it fills
-// (net.h's GFLNetDevTable), and those of the slots unk94 and unk98 after the dwc_rap.c function they return.
+// (net.h's GFLNetDevTable), and those of the slots isVoiceChatEnabled and getLastNetId after the dwc_rap.c function
+// they return.
 
 #include "gfl/net_devwifi.h"
 #include "types.h"
@@ -26,7 +27,7 @@ static int NetDevWifi_Update(u16 connectBits);
 static BOOL NetDevWifi_Disconnect(int a0, int a1);
 static BOOL NetDevWifi_Exit(void (*callback)(BOOL ok));
 static BOOL NetDevWifi_StartMatch(int key, int numEntry, int a2, int a3);
-static BOOL NetDevWifi_ConnectFriend(int friendIndex, int numEntry, int a2);
+static BOOL NetDevWifi_ConnectFriend(int friendIndex, int numEntry, int twoEntries);
 static BOOL NetDevWifi_Close(BOOL a0, int a1);
 static BOOL NetDevWifi_Send(u8 *data, int size, int a2, GFLNetSendDoneFunc callback);
 static BOOL NetDevWifi_SetRecvCallback(GFLNetRecvFunc callback);
@@ -67,8 +68,8 @@ static GFLNetDevTable sNetDevWifiTable = {
     .isError = NetDevWifi_IsError,
     .setDisconnectError = NetDevWifi_SetDisconnectError,
     .canConnectFriend = NetDevWifi_CanConnectFriend,
-    .unk94 = NetDevWifi_IsVoiceChatEnabled,
-    .unk98 = NetDevWifi_GetLastNetId,
+    .isVoiceChatEnabled = NetDevWifi_IsVoiceChatEnabled,
+    .getLastNetId = NetDevWifi_GetLastNetId,
     .isLinked = NetDevWifi_IsLinked,
     .setAcceptConnect = NetDevWifi_SetAcceptConnect,
 };
@@ -129,8 +130,8 @@ static BOOL NetDevWifi_StartMatch(int key, int numEntry, int a2, int a3) {
     return DWCRap_StartMatch((const char *)key, numEntry, a2, a3);
 }
 
-static BOOL NetDevWifi_ConnectFriend(int friendIndex, int numEntry, int a2) {
-    return DWCRap_Connect(friendIndex, numEntry, a2);
+static BOOL NetDevWifi_ConnectFriend(int friendIndex, int numEntry, int twoEntries) {
+    return DWCRap_Connect(friendIndex, numEntry, twoEntries);
 }
 
 static BOOL NetDevWifi_Close(BOOL a0, int a1) {
@@ -216,7 +217,7 @@ static void NetDevWifi_SetDisconnectError(int report) {
 }
 
 static int NetDevWifi_CanConnectFriend(int index) {
-    if (DWCRap_GetFriendStatus(index) == 6) {
+    if (DWCRap_GetFriendStatus(index) == DWCRAP_FRIEND_STATUS_JOINABLE) {
         return TRUE;
     }
     return FALSE;

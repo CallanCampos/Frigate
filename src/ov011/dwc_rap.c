@@ -410,7 +410,7 @@ int DWCRap_Process(int cancelMatch) {
             DWCRap_SetState(DWCRAP_STATE_MATCH_CANCEL);
         }
         if (_dWork->matchType == DWCRAP_MATCH_FRIEND && _dWork->friendIndex >= 0 &&
-            _dWork->friendStatus[_dWork->friendIndex] != 6) {
+            _dWork->friendStatus[_dWork->friendIndex] != DWCRAP_FRIEND_STATUS_JOINABLE) {
             DWCRap_SetState(DWCRAP_STATE_MATCH_FAILED);
         }
         break;
@@ -878,6 +878,14 @@ void DWCRap_SetVoiceChatReady(void) {
     _dWork->vctReady = 1;
 }
 
+// The voice chat modes, named after the codec that each one uses
+enum {
+    DWCRAP_VCT_MODE_G711_ULAW = 2,
+    DWCRAP_VCT_MODE_2BIT_ADPCM,
+    DWCRAP_VCT_MODE_3BIT_ADPCM,
+    DWCRAP_VCT_MODE_4BIT_ADPCM,
+};
+
 static void DWCRap_StartVct(HeapID heapId) {
     int codec;
 
@@ -886,16 +894,16 @@ static void DWCRap_StartVct(HeapID heapId) {
     _dWork->unk796 = 1;
     if (_dWork->vctActive == 0) {
         switch (_dWork->vctMode) {
-        case 2:
+        case DWCRAP_VCT_MODE_G711_ULAW:
             codec = VCT_CODEC_G711_ULAW;
             break;
-        case 3:
+        case DWCRAP_VCT_MODE_2BIT_ADPCM:
             codec = VCT_CODEC_2BIT_ADPCM;
             break;
-        case 4:
+        case DWCRAP_VCT_MODE_3BIT_ADPCM:
             codec = VCT_CODEC_3BIT_ADPCM;
             break;
-        case 5:
+        case DWCRAP_VCT_MODE_4BIT_ADPCM:
             codec = VCT_CODEC_4BIT_ADPCM;
             break;
         default:
@@ -1157,7 +1165,7 @@ u8 DWCRap_GetFriendStatus(int index) {
     return _dWork->friendStatus[index];
 }
 
-int DWCRap_Connect(int friendIndex, int numEntry, BOOL a2) {
+int DWCRap_Connect(int friendIndex, int numEntry, BOOL twoEntries) {
     int i;
     int entries = numEntry;
     BOOL ok;
@@ -1178,7 +1186,7 @@ int DWCRap_Connect(int friendIndex, int numEntry, BOOL a2) {
     _dWork->friendIndex = friendIndex;
     _dWork->maxPlayers = numEntry;
     _dWork->lastIndex = -1;
-    if (a2) {
+    if (twoEntries) {
         entries = 2;
     }
     _dWork->matchingBusy = 1;
@@ -1355,8 +1363,9 @@ static void DWCRap_FlushPendingErrors(void) {
         if (_dWork->pendingCode[i] != -1) {
             GFLNetInitData *netInit = GFL_NetGetInitData();
 
-            if (netInit->unk34.wifiError.callback != NULL) {
-                netInit->unk34.wifiError.callback(_dWork->pendingCode[i], _dWork->pendingParam[i], GFL_NetGetWork());
+            if (netInit->wifiHooks.wifiError.callback != NULL) {
+                netInit->wifiHooks.wifiError.callback(_dWork->pendingCode[i], _dWork->pendingParam[i],
+                                                      GFL_NetGetWork());
             }
             _dWork->pendingCode[i] = -1;
         }

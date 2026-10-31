@@ -45,6 +45,8 @@ enum {
 enum {
     WH_ERRCODE_NO_RADIO = 0x16,
     WH_ERRCODE_NOMORE_CHANNEL = 0x18,
+    // Reported when the manager's indication fails
+    WH_ERRCODE_FATAL = 0x19,
 };
 
 // How a machine connects (WH_CONNECTMODE_*): in the multi-point mode, with the keys shared, or with the data shared

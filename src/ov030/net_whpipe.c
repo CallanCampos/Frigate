@@ -49,6 +49,13 @@ typedef struct {
     NetWhpipeBeaconInfo info;
 } NetWhpipeBeacon;
 
+// How to end (endKind): 1 to finalize, 2 to end
+#define END_KIND_FINALIZE 1
+#define END_KIND_END 2
+// startCount before the first beacon scan sets it, and the channel that WH measures the quietest
+#define START_COUNT_UNSET 0xffff
+#define CHANNEL_AUTO 0xff
+
 typedef struct {
     NetWhpipeState base;
     // What the game gets each machine's data with
@@ -118,11 +125,11 @@ BOOL NetWhpipe_Init(HeapID heapId, WHCallback callback, void *gameWork, BOOL unu
     }
     work = GFL_HeapAllocate(heapId, sizeof(NetWhpipeWork), TRUE, "net_whpipe.c", 237);
     sWork = work;
-    work->channel = 0xff;
+    work->channel = CHANNEL_AUTO;
     if (!WH_Initialize(heapId, callback, unused)) {
         return FALSE;
     }
-    WH_SetGgid(init->unk4C.id.gameId);
+    WH_SetGgid(init->beaconId.id.gameId);
     work->gameWork = gameWork;
     work->endKind = 0;
     work->unkCE4 = 0;
@@ -144,7 +151,7 @@ static BOOL CheckBeacon(const NetWhpipeBeacon *beacon) {
     work = sWork;
     init = GFL_NetGetInitData();
     gameCommandBase = init->gameCommandBase;
-    gameId = init->unk4C.id.gameId;
+    gameId = init->beaconId.id.gameId;
     info = &beacon->info;
 
     if (info->closed != 0) {
@@ -162,8 +169,8 @@ static BOOL CheckBeacon(const NetWhpipeBeacon *beacon) {
     if (sWork->scanCallback != NULL) {
         sWork->scanCallback(sWork->scanArg, beacon, info->gameCommandBase, info->childCount);
     }
-    if (init->unk20 != NULL) {
-        if (!((NetWhpipeGameFilter)init->unk20)(gameCommandBase, info->gameCommandBase, work->gameWork)) {
+    if (init->beaconFilter != NULL) {
+        if (!((NetWhpipeGameFilter)init->beaconFilter)(gameCommandBase, info->gameCommandBase, work->gameWork)) {
             return FALSE;
         }
     } else if (gameCommandBase != info->gameCommandBase) {
@@ -345,7 +352,7 @@ void NetWhpipe_UpdateGameBeacon(void) {
         }
         info = &work->info;
         info->gameCommandBase = init->gameCommandBase;
-        info->gameId = init->unk4C.id.gameId;
+        info->gameId = init->beaconId.id.gameId;
         info->unk5 = 0;
         info->closed = work->entryClosed;
         MI_CpuCopy8(init->getBeaconData(work->gameWork), info->data, size);
@@ -382,7 +389,7 @@ static void Update(u16 count) {
     if (!NetWhpipe_IsStopped()) {
         UpdateBeacon();
     }
-    if (work->startCount == 0xffff) {
+    if (work->startCount == START_COUNT_UNSET) {
         work->startCount = count;
     }
     if (work->lockEnabled) {
@@ -393,22 +400,22 @@ static void Update(u16 count) {
             work->stopped = TRUE;
         }
     }
-    if (WH_GetLastError() == 0x19) {
+    if (WH_GetLastError() == WH_ERRCODE_FATAL) {
         GflNet_CallErrorStateFunc(0);
     }
     switch (state) {
     case WH_SYSSTATE_STOP:
-        if (work->endKind == 1) {
+        if (work->endKind == END_KIND_FINALIZE) {
             FreeWork();
         }
         break;
     case WH_SYSSTATE_IDLE:
-        if (work->endKind == 1) {
+        if (work->endKind == END_KIND_FINALIZE) {
             if (WH_End(NULL)) {
                 break;
             }
         }
-        if (work->endKind == 2) {
+        if (work->endKind == END_KIND_END) {
             if (WH_End(NULL)) {
                 return;
             }
@@ -525,7 +532,7 @@ void NetWhpipe_SetLockEnabled(int lock) {
 
     if (work != NULL) {
         work->lockEnabled = lock;
-        work->startCount = 0xffff;
+        work->startCount = START_COUNT_UNSET;
     }
 }
 
@@ -621,7 +628,7 @@ static void StateStartParent(void *arg) {
         work->unkCE9 = FALSE;
         work->running = FALSE;
         channel = WH_GetMeasureChannel();
-        if (work->channel == 0xff) {
+        if (work->channel == CHANNEL_AUTO) {
             work->channel = channel;
         } else {
             channel = work->channel;
@@ -648,7 +655,7 @@ BOOL NetWhpipe_StartParent(BOOL anyChannel) {
         return FALSE;
     }
     if (anyChannel) {
-        work->channel = 0xff;
+        work->channel = CHANNEL_AUTO;
     }
     WH_SetReceiver(RecvCallback);
     sWork->running = TRUE;
@@ -666,7 +673,7 @@ static void SetBeaconInfo(NetWhpipeBeaconInfo *info, int size) {
         if (WH_GetSystemState() == WH_SYSSTATE_IDLE) {
             WH_SetUserGameInfo(info, size);
         } else {
-            WH_SetGameInfo(info, size, init->unk4C.id.gameId, work->tgid);
+            WH_SetGameInfo(info, size, init->beaconId.id.gameId, work->tgid);
         }
     }
 }

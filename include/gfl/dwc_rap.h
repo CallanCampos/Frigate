@@ -73,9 +73,11 @@ void DWCRap_Shutdown(void);
 void DWCRap_SetOwnStatusData(const char *data, int size);
 // A friend's location data, and their state
 char *DWCRap_GetFriendStatusData(int index);
+// The state of a friend that DWCRap_Connect can join: the one that waits as the match server
+#define DWCRAP_FRIEND_STATUS_JOINABLE 6
 u8 DWCRap_GetFriendStatus(int index);
 // Connects to a friend, or to anybody if the index is negative; returns 0, or a negative number when it can't yet
-int DWCRap_Connect(int friendIndex, int numEntry, BOOL a2);
+int DWCRap_Connect(int friendIndex, int numEntry, BOOL twoEntries);
 // The friend index of the connection
 int DWCRap_GetFriendIndex(void);
 BOOL DWCRap_GetVoiceChatSpeaking(void);

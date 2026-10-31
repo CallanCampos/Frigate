@@ -984,9 +984,9 @@ void WH_Release(void) {
 static void WH_IndicationCallback(void *arg) {
     WMCallback *cb = arg;
 
-    if (cb->errcode == 8) {
+    if (cb->errcode == WM_ERRCODE_FIFO_ERROR) {
         WH_ChangeSysState(WH_SYSSTATE_ERROR);
-        WH_ReportError(0x19);
+        WH_ReportError(WH_ERRCODE_FATAL);
     }
 }
 
@@ -1096,10 +1096,10 @@ u8 *WH_GetSharedDataAdr(u16 netId) {
 BOOL WH_StepDS(u8 *data) {
     int result = WM_StepDataSharing(&_pWmInfo->sDataSharing, (const u16 *)data, &_pWmInfo->sDataSet);
 
-    if (result == 7) {
+    if (result == WM_ERRCODE_NO_CHILD) {
         return FALSE;
     }
-    if (result == 5) {
+    if (result == WM_ERRCODE_NO_DATASET) {
         return FALSE;
     }
     if (result != WM_ERRCODE_SUCCESS) {
