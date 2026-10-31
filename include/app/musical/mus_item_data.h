@@ -19,7 +19,8 @@ typedef struct MusicalItemData {
     u16 flags;
     // The kind of position it is worn at
     u8 category;
-    u8 unk9;
+    // The kind of prop it is, which the program gives points for
+    u8 kind;
     // The kind of its effect when it is used
     u8 effect;
 } MusicalItemData;
