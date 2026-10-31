@@ -15,6 +15,34 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
+// The value of a gate's event work once the gate is open
+#define GATE_WORK_OPENED 2
+
+// The scenes of a gate: its check, the closed gate and the opening
+enum {
+    GATE_SCENE_CHECK,
+    GATE_SCENE_CLOSED,
+    GATE_SCENE_OPEN,
+};
+
+// The steps of a gate's check
+enum {
+    CHECK_STEP_SHOW,
+    CHECK_STEP_WAIT_ANIM,
+    CHECK_STEP_OPEN,
+};
+
+// The steps of the last gate's event
+enum {
+    LAST_STEP_FADE_OUT,
+    LAST_STEP_SET_CAMERA,
+    LAST_STEP_FADE_IN,
+    LAST_STEP_SHOW_GATE,
+    LAST_STEP_WAIT_ANIM_1,
+    LAST_STEP_WAIT_ANIM_0,
+    LAST_STEP_WAIT_SHAKES,
+};
+
 // An actor of one of the gimmick's scenes
 typedef struct {
     u32 scene;
@@ -285,7 +313,7 @@ BOOL BadgeGate_IsGateOpened(u32 badge, EventWork *work) {
     u16 *value;
 
     value = EventWork_GetWkPtr(work, sGateWorks[badge]);
-    return *value == 2;
+    return *value == GATE_WORK_OPENED;
 }
 
 void BadgeGate_End(Field *field) {
@@ -330,21 +358,21 @@ GameEventReturnCode BadgeGate_CheckEvent(GameEvent *event, u32 *state, void *arg
     fx32 frame;
 
     data = arg;
-    entry0 = BadgeGate_GetActor(data->gimmickWork, data->badge, 0);
-    entry1 = BadgeGate_GetActor(data->gimmickWork, data->badge, 1);
-    entry2 = BadgeGate_GetActor(data->gimmickWork, data->badge, 2);
+    entry0 = BadgeGate_GetActor(data->gimmickWork, data->badge, GATE_SCENE_CHECK);
+    entry1 = BadgeGate_GetActor(data->gimmickWork, data->badge, GATE_SCENE_CLOSED);
+    entry2 = BadgeGate_GetActor(data->gimmickWork, data->badge, GATE_SCENE_OPEN);
     BadgeGate_PlayCheckSounds(data);
     data->state++;
 
     switch (*state) {
-    case 0:
+    case CHECK_STEP_SHOW:
         FieldExpObj_SetActorHidden(entry1->expObj, entry1->scene, entry1->actor, TRUE);
         FieldExpObj_SetActorHidden(entry0->expObj, entry0->scene, entry0->actor, FALSE);
         BadgeGate_SetAnimPaused(entry0, 0, FALSE);
         BadgeGate_SetAnimPaused(entry0, 1, FALSE);
         (*state)++;
         break;
-    case 1:
+    case CHECK_STEP_WAIT_ANIM:
         anm = FieldExpObj_GetAnmInfo(entry0->expObj, entry0->scene, entry0->actor, 0);
         if (FieldExpObjAnm_IsPlaybackFinished(anm) == TRUE) {
             BadgeGate_SetAnimPaused(entry0, 0, TRUE);
@@ -352,7 +380,7 @@ GameEventReturnCode BadgeGate_CheckEvent(GameEvent *event, u32 *state, void *arg
             return GAMEEVENT_CONTINUE_DIRECT;
         }
         break;
-    case 2:
+    case CHECK_STEP_OPEN:
         FieldExpObj_SetActorHidden(entry0->expObj, entry0->scene, entry0->actor, TRUE);
         FieldExpObj_SetActorHidden(entry2->expObj, entry2->scene, entry2->actor, FALSE);
         frame = BadgeGate_GetOpenAnimFrame(data->gimmickWork);
@@ -374,11 +402,11 @@ void BadgeGate_PlayCheckSounds(BadgeGateCheckEventData *data) {
 
 BadgeGateActor *BadgeGate_GetActor(BadgeGateWork *work, u32 index, u32 scene) {
     switch (scene) {
-    case 0:
+    case GATE_SCENE_CHECK:
         return &work->actors0[index];
-    case 1:
+    case GATE_SCENE_CLOSED:
         return &work->actors1[index];
-    case 2:
+    case GATE_SCENE_OPEN:
         return &work->actors2[index];
     default:
         return NULL;
@@ -395,7 +423,7 @@ fx32 BadgeGate_GetOpenAnimFrame(BadgeGateWork *work) {
     FieldExpObjAnm *anm;
 
     for (i = 0; i < 8; i++) {
-        entry = BadgeGate_GetActor(work, i, 2);
+        entry = BadgeGate_GetActor(work, i, GATE_SCENE_OPEN);
         anm = FieldExpObj_GetAnmInfo(entry->expObj, entry->scene, entry->actor, 0);
         if (!FieldExpObjAnm_IsPaused(anm)) {
             return FieldExpObj_GetAnmFrame(entry->expObj, entry->scene, entry->actor, 0);
@@ -425,28 +453,28 @@ GameEvent *BadgeGate_CreateLastGateEvent(GameSystem *gsys) {
 
 GameEventReturnCode BadgeGate_LastGateEvent(GameEvent *event, u32 *state, void *arg) {
     BadgeGateLastEventData *data = arg;
-    BadgeGateActor *gate = BadgeGate_GetActor(data->gimmickWork, 8, 1);
-    BadgeGateActor *open = BadgeGate_GetActor(data->gimmickWork, 8, 2);
+    BadgeGateActor *gate = BadgeGate_GetActor(data->gimmickWork, 8, GATE_SCENE_CLOSED);
+    BadgeGateActor *open = BadgeGate_GetActor(data->gimmickWork, 8, GATE_SCENE_OPEN);
     FieldTaskManager *tasks;
     FieldEvCameraAnimationSetup setup;
     u32 i;
 
     BadgeGate_UpdateCameraShakes(data);
     switch (*state) {
-    case 4:
-    case 5:
-    case 6:
+    case LAST_STEP_WAIT_ANIM_1:
+    case LAST_STEP_WAIT_ANIM_0:
+    case LAST_STEP_WAIT_SHAKES:
         BadgeGate_PlayLastGateSounds(data);
         data->state++;
         break;
     }
     switch (*state) {
-    case 0:
+    case LAST_STEP_FADE_OUT:
         tasks = Field_GetTaskManager(data->field);
         FieldTaskManager_AddTask(tasks, FieldFadeTask_Create(data->field, 3, 0, 16, 2), 0);
         (*state)++;
         break;
-    case 1:
+    case LAST_STEP_SET_CAMERA:
         if (GFL_FadeIsRunning()) {
             break;
         }
@@ -466,12 +494,12 @@ GameEventReturnCode BadgeGate_LastGateEvent(GameEvent *event, u32 *state, void *
         BadgeGate_AddLastGateScene(&data->lastActor, data->gimmickWork->expObj);
         (*state)++;
         break;
-    case 2:
+    case LAST_STEP_FADE_IN:
         tasks = Field_GetTaskManager(data->field);
         FieldTaskManager_AddTask(tasks, FieldFadeTask_Create(data->field, 3, 16, 0, 2), 0);
         (*state)++;
         break;
-    case 3:
+    case LAST_STEP_SHOW_GATE:
         if (GFL_FadeIsRunning()) {
             break;
         }
@@ -480,7 +508,7 @@ GameEventReturnCode BadgeGate_LastGateEvent(GameEvent *event, u32 *state, void *
         BadgeGate_SetAnimPaused(&data->lastActor, 1, FALSE);
         (*state)++;
         break;
-    case 4:
+    case LAST_STEP_WAIT_ANIM_1:
         if (FieldExpObjAnm_IsPlaybackFinished(FieldExpObj_GetAnmInfo(data->lastActor.expObj, data->lastActor.scene,
                                                                      data->lastActor.actor, 1)) == TRUE) {
             BadgeGate_SetAnimPaused(&data->lastActor, 1, TRUE);
@@ -493,14 +521,14 @@ GameEventReturnCode BadgeGate_LastGateEvent(GameEvent *event, u32 *state, void *
             (*state)++;
         }
         break;
-    case 5:
+    case LAST_STEP_WAIT_ANIM_0:
         if (FieldExpObjAnm_IsPlaybackFinished(FieldExpObj_GetAnmInfo(data->lastActor.expObj, data->lastActor.scene,
                                                                      data->lastActor.actor, 0)) == TRUE) {
             BadgeGate_SetAnimPaused(&data->lastActor, 0, TRUE);
             (*state)++;
         }
         break;
-    case 6:
+    case LAST_STEP_WAIT_SHAKES:
         for (i = 0; i < 2; i++) {
             if (data->shakeDone[i] == 0) {
                 return GAMEEVENT_CONTINUE;
