@@ -20,6 +20,9 @@
 #include "system/printsys.h"
 #include "system/str_tool.h"
 
+// What ends a table of setups, in the field that comes first
+#define BSCENARIO_SETUP_END 0xff
+
 // The scenario screen's graphics (b_scenario_graphic.c, a guessed name; the ROM names only b_scenario_main.c, and
 // this file's data is laid out apart from that one's): the BG's files, the windows and their printing, the touch
 // rectangles, the actors, and the flash of the choice made.
@@ -111,12 +114,12 @@ static const s16 sBScenarioMarkerPositions[2] = { 38, 39 };
 
 static const BScenarioBGLoad sBScenarioCharLoads[2] = {
     { 7, 23, 0, 0 },
-    { 0xff, 0, 0, 0 },
+    { BSCENARIO_SETUP_END, 0, 0, 0 },
 };
 
 static const BScenarioBGLoad sBScenarioScreenLoads[2] = {
     { 7, 36, 0, 0 },
-    { 0xff, 0, 0, 0 },
+    { BSCENARIO_SETUP_END, 0, 0, 0 },
 };
 
 // The palette, an unused entry, the cells, the number and the group of each kind of actor
@@ -166,7 +169,7 @@ static const TouchRect sBScenarioCastTouchRects[5] = {
 
 // The palette of each series
 static const BScenarioPaletteLoad sBScenarioPaletteLoads[5] = {
-    { 4, 11, 0, 8 }, { 4, 12, 0, 8 }, { 4, 13, 0, 8 }, { 4, 14, 0, 8 }, { 0xff, 0, 0, 0 },
+    { 4, 11, 0, 8 }, { 4, 12, 0, 8 }, { 4, 13, 0, 8 }, { 4, 14, 0, 8 }, { BSCENARIO_SETUP_END, 0, 0, 0 },
 };
 
 static const TouchRect sBScenarioScriptTouchRects[5] = {
@@ -200,11 +203,9 @@ static const s16 sBScenarioCursorPositions[5 * 4] = {
 };
 
 static const BScenarioActorSetup sBScenarioCursorSetups[5] = {
-    { 0, 40, 1, 0, 0, 1, 0, BSCENARIO_CHARS_CURSOR },
-    { 1, 40, 1, 0, 0, 1, 0, BSCENARIO_CHARS_CURSOR },
-    { 2, 40, 1, 0, 0, 1, 0, BSCENARIO_CHARS_CURSOR },
-    { 3, 40, 1, 0, 0, 1, 0, BSCENARIO_CHARS_CURSOR },
-    { 0xff, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 40, 1, 0, 0, 1, 0, BSCENARIO_CHARS_CURSOR }, { 1, 40, 1, 0, 0, 1, 0, BSCENARIO_CHARS_CURSOR },
+    { 2, 40, 1, 0, 0, 1, 0, BSCENARIO_CHARS_CURSOR }, { 3, 40, 1, 0, 0, 1, 0, BSCENARIO_CHARS_CURSOR },
+    { BSCENARIO_SETUP_END, 0, 0, 0, 0, 0, 0, 0 },
 };
 
 // The series of each film, which gives the screen its colors
@@ -216,38 +217,57 @@ static const u8 sBScenarioGraphicSeries[BSCENARIO_SCENARIO_COUNT] = {
 static const BScenarioActorSetup sBScenarioButtonSetups[6] = {
     { 3, 40, 1, 0, 0, 1, 34, BSCENARIO_CHARS_BUTTON },  { 6, 40, 1, 0, 0, 1, 35, BSCENARIO_CHARS_BUTTON },
     { 0, 40, 1, 0, 0, 1, 36, BSCENARIO_CHARS_BUTTON },  { 9, 40, 3, 0, 0, 1, 37, BSCENARIO_CHARS_BUTTON },
-    { 10, 40, 3, 0, 0, 1, 38, BSCENARIO_CHARS_BUTTON }, { 0xff, 0, 0, 0, 0, 0, 0, 0 },
+    { 10, 40, 3, 0, 0, 1, 38, BSCENARIO_CHARS_BUTTON }, { BSCENARIO_SETUP_END, 0, 0, 0, 0, 0, 0, 0 },
 };
 
 static const BScenarioWindowSetup sBScenarioSummaryWindows[9] = {
     { 5, 2, 1, 28, 2, 10 }, { 5, 2, 5, 28, 2, 11 },  { 5, 2, 12, 28, 2, 11 },
     { 5, 2, 3, 28, 2, 12 }, { 5, 3, 7, 28, 4, 12 },  { 5, 3, 14, 28, 4, 12 },
-    { 5, 1, 21, 10, 2, 8 }, { 5, 14, 21, 10, 2, 8 }, { 0xff, 0, 0, 0, 0, 0 },
+    { 5, 1, 21, 10, 2, 8 }, { 5, 14, 21, 10, 2, 8 }, { BSCENARIO_SETUP_END, 0, 0, 0, 0, 0 },
 };
 
 static const BScenarioActorSetup sBScenarioTypeSetups[7] = {
-    { 0, 48, 1, 0, 0, 1, 0, 0 },   { 0, 48, 1, 0, 0, 1, 1, 1 }, { 0, 48, 1, 0, 0, 1, 2, 2 },
-    { 0, 48, 1, 0, 0, 1, 3, 3 },   { 0, 48, 1, 0, 0, 1, 4, 4 }, { 0, 48, 1, 0, 0, 1, 5, 5 },
-    { 0xff, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 48, 1, 0, 0, 1, 0, 0 },
+    { 0, 48, 1, 0, 0, 1, 1, 1 },
+    { 0, 48, 1, 0, 0, 1, 2, 2 },
+    { 0, 48, 1, 0, 0, 1, 3, 3 },
+    { 0, 48, 1, 0, 0, 1, 4, 4 },
+    { 0, 48, 1, 0, 0, 1, 5, 5 },
+    { BSCENARIO_SETUP_END, 0, 0, 0, 0, 0, 0, 0 },
 };
 
 static const BScenarioActorSetup sBScenarioIconSetups[7] = {
-    { 1, 40, 1, 0, 0, 0, 6, 6 },   { 1, 40, 1, 0, 0, 0, 6, 7 },  { 1, 40, 1, 0, 0, 0, 6, 8 },
-    { 1, 40, 1, 0, 0, 0, 6, 9 },   { 1, 40, 1, 0, 0, 0, 6, 10 }, { 1, 40, 1, 0, 0, 0, 6, 11 },
-    { 0xff, 0, 0, 0, 0, 0, 0, 0 },
+    { 1, 40, 1, 0, 0, 0, 6, 6 },
+    { 1, 40, 1, 0, 0, 0, 6, 7 },
+    { 1, 40, 1, 0, 0, 0, 6, 8 },
+    { 1, 40, 1, 0, 0, 0, 6, 9 },
+    { 1, 40, 1, 0, 0, 0, 6, 10 },
+    { 1, 40, 1, 0, 0, 0, 6, 11 },
+    { BSCENARIO_SETUP_END, 0, 0, 0, 0, 0, 0, 0 },
 };
 
 static const BScenarioWindowSetup sBScenarioScriptWindows[10] = {
-    { 5, 2, 1, 28, 2, 8 },  { 5, 2, 3, 28, 2, 9 },   { 5, 2, 10, 28, 2, 9 }, { 5, 3, 5, 28, 4, 9 },
-    { 5, 3, 12, 28, 4, 9 }, { 5, 1, 21, 10, 2, 8 },  { 5, 12, 17, 2, 2, 8 }, { 5, 15, 17, 2, 2, 8 },
-    { 5, 14, 17, 1, 2, 8 }, { 0xff, 0, 0, 0, 0, 0 },
+    { 5, 2, 1, 28, 2, 8 },  { 5, 2, 3, 28, 2, 9 },
+    { 5, 2, 10, 28, 2, 9 }, { 5, 3, 5, 28, 4, 9 },
+    { 5, 3, 12, 28, 4, 9 }, { 5, 1, 21, 10, 2, 8 },
+    { 5, 12, 17, 2, 2, 8 }, { 5, 15, 17, 2, 2, 8 },
+    { 5, 14, 17, 1, 2, 8 }, { BSCENARIO_SETUP_END, 0, 0, 0, 0, 0 },
 };
 
 static const BScenarioWindowSetup sBScenarioCastWindows[13] = {
-    { 5, 2, 1, 28, 2, 8 },   { 5, 1, 6, 10, 2, 9 },  { 5, 2, 11, 10, 2, 9 },  { 5, 4, 15, 12, 2, 9 },
-    { 5, 13, 15, 12, 2, 9 }, { 5, 16, 4, 12, 2, 9 }, { 5, 16, 7, 12, 2, 9 },  { 5, 16, 10, 12, 2, 9 },
-    { 5, 16, 13, 12, 2, 9 }, { 5, 4, 17, 12, 2, 9 }, { 5, 13, 17, 12, 2, 9 }, { 5, 1, 21, 10, 2, 8 },
-    { 0xff, 0, 0, 0, 0, 0 },
+    { 5, 2, 1, 28, 2, 8 },
+    { 5, 1, 6, 10, 2, 9 },
+    { 5, 2, 11, 10, 2, 9 },
+    { 5, 4, 15, 12, 2, 9 },
+    { 5, 13, 15, 12, 2, 9 },
+    { 5, 16, 4, 12, 2, 9 },
+    { 5, 16, 7, 12, 2, 9 },
+    { 5, 16, 10, 12, 2, 9 },
+    { 5, 16, 13, 12, 2, 9 },
+    { 5, 4, 17, 12, 2, 9 },
+    { 5, 13, 17, 12, 2, 9 },
+    { 5, 1, 21, 10, 2, 8 },
+    { BSCENARIO_SETUP_END, 0, 0, 0, 0, 0 },
 };
 
 static const BScenarioWindowSetup *sBScenarioWindowTables[3] = { sBScenarioSummaryWindows, sBScenarioScriptWindows,
@@ -269,14 +289,14 @@ void BScenarioGraphic_LoadBG(BScenarioWork *work) {
     paletteLoad = &sBScenarioPaletteLoads[(u32)sBScenarioGraphicSeries[work->param->scenario] % 4];
     GFL_G2DIOLoadArcNCLRDefault(arc, paletteLoad->fileId, paletteLoad->type, paletteLoad->offset, 0, heapId);
     for (i = 0; i < 8; i++) {
-        if (charLoad->bg == 0xff) {
+        if (charLoad->bg == BSCENARIO_SETUP_END) {
             break;
         }
         GFL_BGSysLoadArcNCGRStatic(arc, charLoad->fileId, charLoad->bg, charLoad->offset, 0, FALSE, heapId);
         charLoad++;
     }
     for (i = 0; i < 8; i++) {
-        if (screenLoad->bg == 0xff) {
+        if (screenLoad->bg == BSCENARIO_SETUP_END) {
             break;
         }
         loadBGScrToVramByFileNoReserveNegAlign(arc, screenLoad->fileId, screenLoad->bg, screenLoad->offset, 0, FALSE,
@@ -298,7 +318,7 @@ void BScenarioGraphic_CreateWindows(BScenarioWork *work, int page) {
     work->shownWindows = 0;
     BScenarioGraphic_FreeWindows(work);
     for (i = 0; i < BSCENARIO_WINDOW_MAX; i++) {
-        if (setup->bg == 0xff) {
+        if (setup->bg == BSCENARIO_SETUP_END) {
             break;
         }
         work->windows[i].window =
@@ -502,7 +522,7 @@ static void BScenarioGraphic_CreateActors(BScenarioWork *work, u32 surface, cons
         actors = work->buttonActors;
     }
     for (i = 0; i < count; i++) {
-        if (setups->sequence == 0xff) {
+        if (setups->sequence == BSCENARIO_SETUP_END) {
             break;
         }
         u32 position = setups->position * 2;
