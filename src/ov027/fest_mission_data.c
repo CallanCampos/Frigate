@@ -67,22 +67,22 @@ void FestMission_Load(ArcTool *arc, u8 index, u32 level, FestMissionConfig *miss
     mission->info.index = index;
     mission->info.level = level;
     mission->info.target = params->target;
-    mission->info.targetVariant = params->unk0C;
+    mission->info.targetVariant = params->targetVariant;
     mission->info.unk0_30 = 0;
     mission->info.unk0_31 = MISSION_VERSION_BIT;
     mission->info.unk4_0 = params->unk0E;
     mission->info.unk4_10 = params->levels[level].unk3;
     mission->info.count = params->levels[level].count;
     mission->info.unk4_31 = params->unk00;
-    mission->info.stagePatterns = params->unk14;
-    mission->info.requiredFlag = params->unk12;
+    mission->info.stagePatterns = params->stagePatterns;
+    mission->info.requiredFlag = params->requiredFlag;
     mission->info.unk8_30 = params->unk03;
     mission->info.unkC_0 = 0;
-    mission->info.seconds = params->levels[level].unk0;
+    mission->info.seconds = params->levels[level].seconds;
     mission->info.unkC_22 = params->unk08;
     mission->info.unk10_0 = params->unk04;
-    mission->info.targetKind = params->unk05;
-    mission->info.extraSecondsIndex = params->unk02;
+    mission->info.targetKind = params->targetKind;
+    mission->info.extraSecondsIndex = params->extraSecondsIndex;
     mission->info.messageId = params->messageId;
     mission->info.resultMessageId = params->resultMessageId;
     mission->header = data.header;
@@ -118,10 +118,10 @@ void FestMission_GetResultMessage(FestivalText *text, StrBuf *dest, const FestMi
 
 void FestMission_SetTargetWord(WordSet *wordSet, StrBuf *unused, u32 index, u32 kind, u32 target) {
     switch (kind) {
-    case 1:
+    case FEST_TARGET_SPECIES:
         WordSet_LoadSpeciesName(wordSet, index, (u16)target);
         break;
-    case 2:
+    case FEST_TARGET_ITEM:
         loadItemNameToStrbuf(wordSet, index, target);
         break;
     }

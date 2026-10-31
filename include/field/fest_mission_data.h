@@ -35,22 +35,22 @@ enum {
 typedef struct {
     u8 unk00;
     u8 unk01;
-    u8 unk02;
+    u8 extraSecondsIndex;
     u8 unk03;
     u8 unk04;
-    u8 unk05;
+    u8 targetKind;
     u8 messageId;
     u8 resultMessageId;
     u16 unk08;
     u16 target;
-    u16 unk0C;
+    u16 targetVariant;
     u16 unk0E;
-    u16 unk10;
-    u16 unk12;
-    u32 unk14;
+    u16 unlockFlag;
+    u16 requiredFlag;
+    u32 stagePatterns;
     // By the mission's level
     struct {
-        u16 unk0;
+        u16 seconds;
         u8 count;
         u8 unk3;
     } levels[4];
@@ -61,6 +61,12 @@ typedef struct {
     FestMissionHeader header;
     FestMissionParams params;
 } FestMissionData;
+
+// What the kinds of target are
+enum {
+    FEST_TARGET_SPECIES = 1,
+    FEST_TARGET_ITEM,
+};
 
 // What the kinds of target are: 1 for a species and 2 for an item
 extern const u8 data_ov027_021711c0[8];

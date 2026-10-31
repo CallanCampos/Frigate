@@ -732,7 +732,7 @@ static void FMissionApp_DrawResult(FMissionApp *work) {
         FMissionApp_DrawTotal(work, TRUE);
         strbuf = GFL_MsgDataLoadStrbufNew(
             work->msgData[0],
-            sFMissionAppUnitTexts[work->missions[work->param->missionConfig->info.index].params.unk05].unit);
+            sFMissionAppUnitTexts[work->missions[work->param->missionConfig->info.index].params.targetKind].unit);
         FMissionAppDraw_Print(work, 7, 48, 0, strbuf, PRINT_ALIGN_RIGHT, FMISSION_APP_COLOR_TEXT);
         GFL_StrBufFree(strbuf);
         if (work->flags & FLAG_TIMED) {
@@ -813,7 +813,7 @@ static void FMissionApp_PrintText(FMissionApp *work, int text, int window, int x
         strbuf = GFL_StrBufCreate(128, work->heapId);
         FestMission_GetMessage(work->missionText, strbuf, work->param->missionConfig, work->heapId);
     } else if (text == TEXT_GOAL) {
-        u32 unit = work->missions[index].params.unk05;
+        u32 unit = work->missions[index].params.targetKind;
 
         WordSetNumber(work->wordSet, 0, work->missions[index].params.levels[level].count, 4, 0, TRUE);
         strbuf = GFL_StrBufCreate(64, work->heapId);
@@ -836,7 +836,7 @@ static void FMissionApp_PrintText(FMissionApp *work, int text, int window, int x
         GFL_WordSetFormatStrbuf(work->wordSet, strbuf, format);
         GFL_StrBufFree(format);
     } else if (text == TEXT_SCORE) {
-        u32 unit = work->missions[index].params.unk05;
+        u32 unit = work->missions[index].params.targetKind;
 
         WordSetNumber(work->wordSet, 0, work->ranking.score, 4, 0, TRUE);
         strbuf = GFL_StrBufCreate(128, work->heapId);
@@ -850,7 +850,7 @@ static void FMissionApp_PrintText(FMissionApp *work, int text, int window, int x
         if (work->best->name == NULL) {
             return;
         }
-        unit = work->missions[index].params.unk05;
+        unit = work->missions[index].params.targetKind;
         WordSetNumber(work->wordSet, 0, work->best->score, 4, 0, TRUE);
         strbuf = GFL_StrBufCreate(128, work->heapId);
         format = GFL_MsgDataLoadStrbufNew(work->msgData[0], sFMissionAppUnitTexts[unit].unit);
@@ -864,8 +864,8 @@ static void FMissionApp_PrintText(FMissionApp *work, int text, int window, int x
         FMissionAppDraw_Print(work, window, x, y, work->best->name, align, FMISSION_APP_COLOR_TEXT);
         return;
     } else if (text == TEXT_UNIT) {
-        strbuf =
-            GFL_MsgDataLoadStrbufNew(work->msgData[0], sFMissionAppUnitTexts[work->missions[index].params.unk05].unit);
+        strbuf = GFL_MsgDataLoadStrbufNew(work->msgData[0],
+                                          sFMissionAppUnitTexts[work->missions[index].params.targetKind].unit);
     } else if (text == TEXT_ITEM) {
         u32 count = work->result.itemCount;
         BOOL plural = TRUE;
@@ -907,7 +907,7 @@ static void FMissionApp_PrintText(FMissionApp *work, int text, int window, int x
 static void FMissionApp_DrawTotal(FMissionApp *work, BOOL result) {
     StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(
         work->msgData[0],
-        sFMissionAppUnitTexts[work->missions[work->param->missionConfig->info.index].params.unk05].unit);
+        sFMissionAppUnitTexts[work->missions[work->param->missionConfig->info.index].params.targetKind].unit);
     int offset = 24 - (u16)GFL_FontGetBlockWidth(strbuf, work->font, 0);
     int x;
     int y;
@@ -926,7 +926,7 @@ static void FMissionApp_DrawTotal(FMissionApp *work, BOOL result) {
 
 // Prints the log's line after the one that was shown last
 static void FMissionApp_PrintLog(FMissionApp *work, int window) {
-    u32 unit = work->missions[work->param->missionConfig->info.index].params.unk05;
+    u32 unit = work->missions[work->param->missionConfig->info.index].params.targetKind;
     int i;
     int shown;
     int next;

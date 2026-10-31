@@ -343,7 +343,7 @@ static void MonolithMissionInfo_DrawValue(MonolithWork *wk, MonolithMissionInfoW
 
     GFL_BitmapFill(BmpWin_GetBitmap(miw->prints[window].window), 0);
     if (window == MONOLITH_MISSION_INFO_WINDOW_TIME) {
-        u16 limit = miw->missions[miw->mission].params.levels[miw->level].unk0;
+        u16 limit = miw->missions[miw->mission].params.levels[miw->level].seconds;
 
         seconds = limit % 60;
         minutes = limit / 60;
@@ -357,7 +357,7 @@ static void MonolithMissionInfo_DrawValue(MonolithWork *wk, MonolithMissionInfoW
         }
         GFL_WordSetFormatStrbuf(wk->wordSet, str, format);
     } else if (window == MONOLITH_MISSION_INFO_WINDOW_TARGET) {
-        kind = miw->missions[miw->mission].params.unk05;
+        kind = miw->missions[miw->mission].params.targetKind;
 
         WordSetNumber(wk->wordSet, 0, miw->missions[miw->mission].params.levels[miw->level].count, 4, 0, TRUE);
         str = GFL_StrBufCreate(64, HEAPID_MONOLITH);
@@ -398,7 +398,7 @@ static void MonolithMissionInfo_DrawRecords(MonolithScreenParam *screen, Monolit
                                  str, screen->work->font);
         GFL_StrBufFree(str);
         WordSetNumber(screen->work->wordSet, 0, record.count, 4, 0, TRUE);
-        msgId = sMonolithMissionInfoTargetMsgs[miw->missions[miw->mission].params.unk05];
+        msgId = sMonolithMissionInfoTargetMsgs[miw->missions[miw->mission].params.targetKind];
         format = GFL_MsgDataLoadStrbufNew(screen->work->msgMonolith, msgId);
         str = GFL_StrBufCreate(64, HEAPID_MONOLITH);
         GFL_WordSetFormatStrbuf(screen->work->wordSet, str, format);
