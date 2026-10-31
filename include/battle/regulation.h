@@ -36,6 +36,15 @@ enum {
     REGULATION_PARAM_MAX_BATTLES
 };
 
+// The battle a regulation is for (battleType), in the order of the regulation data's battle_type
+enum {
+    REGULATION_BATTLE_SINGLE,
+    REGULATION_BATTLE_DOUBLE,
+    REGULATION_BATTLE_TRIPLE,
+    REGULATION_BATTLE_ROTATION,
+    REGULATION_BATTLE_MULTI,
+};
+
 struct Regulation {
     u8 name;
     u8 unk1;

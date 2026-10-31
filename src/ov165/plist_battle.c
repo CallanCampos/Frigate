@@ -120,7 +120,7 @@ void PokeListBattle_Update(PokeListWork *wk) {
     if (wk->param->timerEnabled == TRUE) {
         PokeListBattle_UpdateTimer(wk);
     }
-    if (wk->param->unk73 == 1) {
+    if (wk->param->forceExit == 1) {
         PokeList_TimeUp(wk);
     }
 }

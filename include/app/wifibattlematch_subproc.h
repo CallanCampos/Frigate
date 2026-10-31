@@ -43,7 +43,7 @@ typedef struct {
     PokeParty *party;
     // Gets the other player's team
     PokeParty *otherParty;
-    WifiBattleMatchNetData *unk14;
+    WifiBattleMatchNetData *netData;
     u32 *unk18;
 } WifiBattleMatchExchangeParam;
 
