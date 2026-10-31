@@ -34515,7 +34515,7 @@ overlays/ov284 0x021e51b8 EvolutionDemoView_Reveal
 overlays/ov284 0x021e51c0 EvolutionDemoView_FadeIn
 overlays/ov284 0x021e51c8 EvolutionDemoView_IsDone
 overlays/ov284 0x021e51cc EvolutionDemoView_HavePiecesStarted
-overlays/ov284 0x021e51d0 EvolutionDemoView_GetUnk3C
+overlays/ov284 0x021e51d0 EvolutionDemoView_ShouldPushBGM
 overlays/ov284 0x021e51d4 EvolutionDemoView_Cancel
 overlays/ov284 0x021e51f8 EvolutionDemoView_InitMcss
 overlays/ov284 0x021e5218 EvolutionDemoView_FreeMcss

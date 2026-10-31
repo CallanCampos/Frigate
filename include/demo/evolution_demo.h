@@ -62,7 +62,7 @@ void EvolutionDemoView_FadeIn(EvolutionDemoView *view);
 BOOL EvolutionDemoView_IsDone(EvolutionDemoView *view);
 BOOL EvolutionDemoView_HavePiecesStarted(EvolutionDemoView *view);
 // Set with HavePiecesReturned
-BOOL EvolutionDemoView_GetUnk3C(EvolutionDemoView *view);
+BOOL EvolutionDemoView_ShouldPushBGM(EvolutionDemoView *view);
 // Stops the evolution while the pieces are moving, and returns whether it did
 BOOL EvolutionDemoView_Cancel(EvolutionDemoView *view);
 
