@@ -106,6 +106,14 @@ enum {
     JINGLE_FAILED,
 };
 
+// The steps of FMissionApp_Main
+enum {
+    MAIN_STEP_WAIT_WIPE_IN,
+    MAIN_STEP_WAIT_END,
+    MAIN_STEP_START_WIPE_OUT,
+    MAIN_STEP_WAIT_WIPE_OUT,
+};
+
 // The messages of a kind of score: the unit after a number, its heading and a line of the log
 typedef struct {
     s16 unk0;
@@ -259,17 +267,17 @@ static BOOL FMissionApp_Main(GameProc *proc, u32 *state, void *param, void *data
     FMissionApp *work = data;
 
     switch (*state) {
-    case 0:
+    case MAIN_STEP_WAIT_WIPE_IN:
         if (GFL_WipeIsFinished()) {
             (*state)++;
         }
         break;
-    case 1:
+    case MAIN_STEP_WAIT_END:
         if (work->seq == SEQ_END && PrintQueue_IsEmpty(work->printQueue) == TRUE) {
             (*state)++;
         }
         break;
-    case 2:
+    case MAIN_STEP_START_WIPE_OUT:
         if (work->mode == FMISSION_APP_MODE_MISSION) {
             GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 6, 1, work->heapId);
         } else {
@@ -277,7 +285,7 @@ static BOOL FMissionApp_Main(GameProc *proc, u32 *state, void *param, void *data
         }
         (*state)++;
         break;
-    case 3:
+    case MAIN_STEP_WAIT_WIPE_OUT:
         if (GFL_WipeIsFinished()) {
             return TRUE;
         }
@@ -589,7 +597,7 @@ static void FMissionApp_InitResult(FMissionApp *work) {
             }
         }
     }
-    if (work->param->missionConfig->info.unk4_31 == TRUE) {
+    if (work->param->missionConfig->info.endsAtTarget == TRUE) {
         work->flags |= FLAG_TIMED;
     }
     if (work->result.newCount == TRUE) {

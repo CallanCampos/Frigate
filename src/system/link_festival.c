@@ -283,7 +283,7 @@ BOOL LinkFestival_IsMissionOver(LinkFestival *festival) {
         return FALSE;
     }
     seconds = LinkFestival_GetSecondsLeft(festival);
-    if (LinkFestival_IsTargetReached(festival, &total) && festival->info->unk4_31 == TRUE) {
+    if (LinkFestival_IsTargetReached(festival, &total) && festival->info->endsAtTarget == TRUE) {
         over = TRUE;
     } else {
         over = TRUE;
@@ -293,7 +293,7 @@ BOOL LinkFestival_IsMissionOver(LinkFestival *festival) {
     }
     if (over) {
         LinkFestival_SetState(festival, 3);
-        festival->config.unk20 = seconds;
+        festival->config.secondsLeftAtEnd = seconds;
     }
     return over;
 }

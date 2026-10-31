@@ -20,7 +20,8 @@ typedef struct {
     // The kind of the mission's target, an index into data_ov027_021711c0
     u8 kind;
     u8 unk01;
-    u16 unk02;
+    // An event flag that is set when the mission is cleared for the first time, or 0
+    u16 clearFlag;
 } FestMissionHeader;
 
 // The kinds of mission that run on the field (fes_gimmick.c), FestMissionHeader's kind
@@ -38,6 +39,7 @@ typedef struct {
     u8 extraSecondsIndex;
     u8 unk03;
     u8 unk04;
+    // What the mission's target counts, which picks the unit of its score (FestMissionInfo's targetKind)
     u8 targetKind;
     u8 messageId;
     u8 resultMessageId;
