@@ -351,25 +351,32 @@ u16 Survey_GetCurrentHoursLeft(SaveControl *save) {
     return result;
 }
 
+enum {
+    STEP_SHOW_TEXT,
+    STEP_WAIT_PRINT,
+    STEP_WAIT_KEY,
+    STEP_CLOSE,
+};
+
 static GameEventReturnCode SurveyTextEvent_Run(GameEvent *event, u32 *state, void *data) {
     SurveyTextWork *work = data;
     switch (*state) {
-    case 0:
+    case STEP_SHOW_TEXT:
         getSurveyText(work);
         SurveyTextWork_CreateWindow(work);
         SurveyTextWork_CreateWordSet(work);
         SurveyTextWork_PrintRankMessage(work);
         (*state)++;
         break;
-    case 1:
+    case STEP_WAIT_PRINT:
         if (MsgBGPrinter_IsMsgWinTransDone(work->window) == 1)
             (*state)++;
         break;
-    case 2:
+    case STEP_WAIT_KEY:
         if (GCTX_HIDGetPressedKeys() & 0xf3)
             (*state)++;
         break;
-    case 3:
+    case STEP_CLOSE:
         SurveyTextWork_ClearWindow(work);
         SurveyTextWork_FreeWordSet(work);
         SurveyTextWork_DeleteWindow(work);
