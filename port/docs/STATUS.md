@@ -34,33 +34,40 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 ## 2026-11-02: verification v2's canonical digests, without a ROM: ADR 0031 proposed
 
-- **Upstream:** `41f42ca1af`, as reviewed main `10d017c010` (PR 67's merge, the upstream sync) has it; this change
-  merges no upstream commit of its own.
+- **Upstream:** `41f42ca1af`, PR 67's sync, as reviewed main `806b2a8f9d` (PR 73's merge) has it; this change merges
+  no upstream commit of its own.
 - **Port:** `PORT_SHA`, on the topic branch `port-digest-canonical` from `d19894b1f7` (PR 69's merge): `b33f06c1da`,
   the change; `5aac6f8389`, the merge of main at `10d017c010` (PR 67, the upstream sync, which merged meanwhile);
   `801fbcc16e`, this record's update; `33750aad94`, the fixes of the change's review; `a651ef5414`, the merge of main
-  at `36101609ad` (PR 70, ADR 0023 accepted, documents alone); then this record's revision. Both merges kept
-  STATUS.md's new entries, this one first. This entry fills PR 67's entry's `PORT_SHA` with `f53e767509` (both had
-  filled PR 69's with `2f9033d7b8`) and PR 70's with `cfb45c1be4`. The change itself is all in `port/`.
+  at `36101609ad` (PR 70, ADR 0023 accepted, documents alone); `2567a789e4`, this record's revision; `5a6d795a21`,
+  the merge of main at `806b2a8f9d` (PR 73, Castelia City's café, which merged while `2567a789e4` was verified); then
+  this record's update. Each merge kept STATUS.md's new entries, this one first. This entry fills PR 67's entry's
+  `PORT_SHA` with `f53e767509` (both had filled PR 69's with `2f9033d7b8`), PR 70's with `cfb45c1be4` (as PR 73's
+  entry did) and PR 73's with `867ce0bd96`. The change itself is all in `port/`.
 - **ROM (T0):** in this branch's worktree, `python3 configure.py && ninja` at `-j4`, with no compiler warning and
   both original US SHA1s matching, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2
   `b5d7490be7b415b8f1e672a53e978a9cc667e56a`: on the change (10,703 steps), on the merge of main (12,555 steps, the
   sync's sources), on the review's fixes and on the merge of PR 70 (2 steps each: nothing outside `port/` changed
-  since the first merge). The change has no ROM input.
+  since the first merge), and on the merge of PR 73 (18 steps, its `src/ov129/sp_poke_gimmick.c` among them).
+  The change has no ROM input.
 - **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both games with the verifier's configure flags
   (`build/port-verify-b2_us`, `build/port-verify-w2_us`; `-DPORT_SANITIZE_RECOVER=OFF
-  -DPORT_FRAME_TIME_REPORT_ONLY=OFF`) pass at `-j4` on each head: the change, the merge of PR 67, the review's fixes
-  and the merge of PR 70. The new test programs compile with `-Wall -Wextra -Werror`, xxHash's header, which each
-  configure fetched, on a system include path.
+  -DPORT_FRAME_TIME_REPORT_ONLY=OFF`) pass at `-j4` on each head: the change, the merge of PR 67, the review's fixes,
+  the merge of PR 70 and the merge of PR 73. The new test programs compile with `-Wall -Wextra -Werror`, xxHash's
+  header, which each configure fetched, on a system include path.
 - **Tests:**
-  - T2/T6: `ctest -LE route` at `-j3` passes in both games, 352 of 359 tests passing and 7 skipping in each, on each
-    head. The skips are this checkout's optional setups, as in PR 69's entry: `asm_oracle` (no Unicorn in this
-    Python), `oracle_boot`, `oracle_saves` and `oracle_floccesy_save` (no oracle built), the two function-sanitizer
-    negatives of the VM dispatch (Apple's compiler emits no such check) and `app_universal_slices` (one slice). The
-    two tests more than that entry's are the new `digest_format_plain` and `digest_format_sanitized`, 423 checks each
-    after the review (310 before it). CI's 13 checks passed on the change's earlier heads, `b33f06c1da` and
-    `801fbcc16e`, the new tests among those its host and sanitized jobs run on macOS, Linux and Windows; the pull
-    request's checks hold this record's head.
+  - T2/T6: `ctest -LE route` at `-j3` passes in both games on each head: 352 of 359 tests passing and 7 skipping in
+    each before PR 73's merge, and 357 of 364 passing and the same 7 skipping after it, with PR 73's own tests. The
+    skips are this checkout's optional setups, as in PR 69's entry: `asm_oracle` (no Unicorn in this Python),
+    `oracle_boot`, `oracle_saves` and `oracle_floccesy_save` (no oracle built), the two function-sanitizer negatives
+    of the VM dispatch (Apple's compiler emits no such check) and `app_universal_slices` (one slice). The two tests
+    more than that entry's are the new `digest_format_plain` and `digest_format_sanitized`, 423 checks each after
+    the review (310 before it). CI's 13 checks passed on the change's earlier heads, `b33f06c1da`,
+    `801fbcc16e` and `2567a789e4`, the new tests among those its host and sanitized jobs run on macOS, Linux and
+    Windows, and so did the exact-head local verification of `2567a789e4` (`sync_upstream.sh --verify-pr 72` in a
+    fresh worktree: both ROMs, then the full ctest of both games, replays included, 371 of 400 and 368 of 397 tests
+    passing and 29 skipping in each, the 25 that need the oracle or the saves it makes and the four other optional
+    setups above) before PR 73 merged; the pull request's checks hold this record's head.
   - Negative controls: 91 mutants of `digest.c`, each with one rule taken out, fail the test, and the unchanged file
     passes. The change's 27: a mask widened (WININ and WINOUT, the scrolls, MASTER_BRIGHT, DISPCAPCNT, CLEAR_COLOR,
     FOG_TABLE, VRAMCNT_E, POWCNT1, WRAMCNT, and engine B's DISPCNT in the decode and, apart, in the encoding); BG2's
@@ -86,7 +93,8 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 - **Tiers/trap stubs:** not measured: no game code changed.
 - **64-bit warnings:** the pointer cast guard passes in both games, and `check_ptrcasts.py --build-dir
   build/port-verify-b2_us --report` gives 365 sites in 229 keys (real 66, harmless 123, handled 141, unreachable
-  35), 1,711 files compiled and none missing, on each head: no change.
+  35) on each head, with 1,711 files compiled before PR 73's merge and 1,713 after it (its new files), none
+  missing: no change in the sites.
 - **Work done:** verification v2's first part, the canonical digests, which need no ROM:
   - **[ADR 0031](adr/0031-per-game-frame-digests-against-a-content-addressed-oracle-cache.md), proposed:** a digest of
     the DS's state at each game frame, taken at the last VBlank of each count and compared exactly, with oracle runs in
@@ -134,7 +142,7 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 - **Upstream:** `41f42ca1af`, by the merge of `main` at `10d017c010` (PR 67's merge, the 276-commit naming sync); this
   change merges no upstream commit of its own.
-- **Port:** `PORT_SHA`, on the topic branch `port-castelia22-exit` from `d19894b1f7` (PR 69's merge): `dee8830cad`, the
+- **Port:** `867ce0bd96`, on the topic branch `port-castelia22-exit` from `d19894b1f7` (PR 69's merge): `dee8830cad`, the
   fix, then the merge of `main` at `10d017c010` (PR 67, which merged while this was published; STATUS.md's new entries
   both kept, this one first, and both filled PR 69's entry's `PORT_SHA` alike, with `2f9033d7b8`), `9e9768e3ea` and
   `9d9f845ed7` (this entry and the lesson after the merge), `a7f1e10769`, the review's follow-ups (below), then the
