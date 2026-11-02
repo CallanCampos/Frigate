@@ -40,30 +40,52 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   `port/docs/`.
 - **ROM (T0):** a fresh `python3 configure.py && ninja` in this branch's new worktree, 10,703 steps with no compiler
   warning: both original US SHA1s match, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2
-  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. No ROM input changes.
-- **Host build (T1):** not run: no C, CMake, test or tool changes from reviewed main.
-- **Tests (T2–T7):** not run: no code, input, seed, golden, mask or test changes. Every relative link and anchor of
-  the eight changed Markdown files resolves (checked by script, anchors as GitHub makes them). The research note's 46
-  external links answer 200, but for speedrun.com, which answers a script with 403 for some of its pages (two of the
-  three on the last run; their URLs are the ones its API gives), and each GitHub line link points at the code it
-  cites in the raw file at its pinned commit. GitHub's Markdown API renders the note's table inside its list.
-- **Tiers, trap stubs and 64-bit warnings:** unchanged by this documentation change; not remeasured.
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. After the review's corrections the same commands ran again: ninja checked
+  both ROMs and had nothing to rebuild, and both SHA1s still match. No ROM input changes.
+- **Host build (T1):** before the push, on arm64 macOS in this branch's worktree, with the commands of
+  `port/tools/sync_upstream.sh --verify-pr`: `cmake --fresh -S port -B build/port-verify-VERSION -G Ninja
+  -DCMAKE_BUILD_TYPE=RelWithDebInfo -DPORT_VERSION=VERSION -DPORT_SANITIZE_RECOVER=OFF
+  -DPORT_FRAME_TIME_REPORT_ONLY=OFF`, then `cmake --build build/port-verify-VERSION --parallel`. Both builds pass,
+  `b2_us` and `w2_us`.
+- **Tests (T2–T7):** `ctest --test-dir build/port-verify-VERSION --output-on-failure --no-tests=error`, in the same
+  builds; neither version has a failure.
+  - `b2_us`: 369 of 398 pass, 29 skip, in 512 s.
+  - `w2_us`: 365 of 395 pass, 30 skip, in 1,024 s.
+  - Among the passes are the short replay and save routes (T3) and the save round trips and ROM dump checks (T6).
+  - The skips are by design:
+    - 24 of the `oracle_*` tests and `frame_times_party_menus`, which need the melonDS oracle that only
+      `-DPORT_BUILD_ORACLE=ON` builds (T4 not run);
+    - `asm_oracle`, since Unicorn isn't installed for this checkout's Python;
+    - `app_universal_slices`, since an arm64-only program has one slice;
+    - the two `integrate_vm_dispatch_*` negatives, which Apple clang skips;
+    - in `w2_us` only, `frame_times_title`: its title scene's 95th percentile was 10.01 ms against the 8.36 ms
+      budget, but the load average reached 34.76 on 8 cores while other sessions built, so it skipped rather than
+      failed.
+  - T5 (sanitizers) and T7 (playtests) were not run: nightly and milestone levels, for a documentation-only change.
+- **Tiers and trap stubs:** unchanged by this documentation change; not remeasured.
+- **64-bit warnings:** `port/tools/check_ptrcasts.py --build-dir build/port-verify-b2_us --report`: 365 sites in 229
+  keys (real 66, harmless 123, handled 141, unreachable 35), 1,711 files, 0 not compiled, the same as the last entry,
+  so the real sites are not above it. `game_ptrcasts` passes in both versions.
 - **Work done:** the owner settled [ADR 0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md) by a rule
   on 2026-11-01: if Ship of Harkinian doesn't match the original console's RNG, Frigate can accept the ADR; if it
   does, Frigate should fix its own difference too. A research agent and an independent adversarial check read Ship of
   Harkinian, libultraship, the Ocarina of Time and Majora's Mask decomps and gz at pinned commits: Ship of Harkinian
   reproduces neither the N64's random numbers nor its timing (about 98% confidence). It reseeds at every scene load
   from the PC's steady clock, makes its random floats the GameCube way even from an N64 ROM, and runs a fixed lockstep
-  loop with none of the console's lag; its tracker and code say so, and its draft TAS tools would inject recorded
-  console seeds.
+  loop with none of the console's lag; its tracker and code say so, and a draft pull request's TAS tools would inject
+  recorded console seeds.
   - [research/ship-of-harkinian-rng.md](research/ship-of-harkinian-rng.md) records the question, the answer, the
     evidence with links to the lines read, and what it means for Frigate, with its rows in the research and
-    documents indexes.
+    documents indexes. A review before publishing corrected it against the same sources: Darunia's dance fix is on
+    by default, gz's audio hook derives its number from the game's main random state, and SoH's savestates restore
+    the audio generator's state; the frog minigame issue's hedge, the 2S2H reading's scope and the commits read are
+    stated as they are.
   - ADR 0023's status line says accepted, with a dated note that links the research, and its index row says so;
     MODDING.md and decomp-findings.md no longer call it proposed. The ADR's body is unchanged. Past STATUS entries and
     ADRs 0028 and 0029, which are records, keep the words of their time.
-- **Next:** publish this branch as a topic PR; exact-head local verification, the hosted checks and owner review
-  precede the protected merge. Phase 5's story routes then go on, each trainer battle cut where ADR 0023 says.
+- **Next:** publish this branch as a topic PR. Before the protected merge come the exact-head local verification
+  from a clean worktree and the required hosted checks; as an owner-authored PR, it can merge under the owner's
+  review-only exception. Phase 5's story routes then go on, each trainer battle cut where ADR 0023 says.
 - **Blockers:** none for this change. Broader serial/CPU timing and later story coverage remain unfinished; Spanish
   issue 45 still lacks a local dump.
 

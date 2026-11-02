@@ -11,14 +11,16 @@ arithmetic run again) or **inferred**.
 
 The commits read: SoH `d4bf652`, the `develop` branch on 2026-11-01 (its release 9.3.1 of 2026-10-18 has the same
 random-number and timing code and the same libultraship, `da6daf1`); the OoT decomp `14759ab`; the MM decomp
-`710e1a7`; 2 Ship 2 Harkinian (2S2H) `222acd1`, with libultraship `7f9b86a`; and gz `1155b00`.
+`710e1a7`; 2 Ship 2 Harkinian (2S2H) `222acd1`, with libultraship `7f9b86a`; gz `1155b00`; snesrev's zelda3 `45a149d`
+and sm `578f90b`, with the A Link to the Past disassembly `79207d1`; the Super Mario 64 decomp `9921382` and sm64-port
+`2b17d08`; and `b3df5ad`, the head of SoH's draft pull request 7465.
 
 ## The question
 
 The owner's rule, in chat on 2026-11-01: if Ship of Harkinian doesn't match the original console's RNG, Frigate can
-accept ADR 0023; if it does match it, Frigate should fix its own difference too. SoH is the measure because Frigate is
-named in its line ([port/CLAUDE.md](../../CLAUDE.md#the-port-is-frigate)): a native PC port of a decompiled console
-game, played with the player's own ROM.
+accept ADR 0023; if it does match it, Frigate should fix its own difference too. Frigate was named in the line of
+community ports such as SoH ([port/CLAUDE.md](../../CLAUDE.md#the-port-is-frigate)), and SoH is, like Frigate, a native
+PC port of a decompiled console game, played with the player's own ROM.
 
 ADR 0023 covers where Frigate's play parts from the DS's. The trainers' AI thinks for at most 500 ticks of `OS_GetTick`
 a pass (`TRAI_TIME_LIMIT`, `src/ov170/tr_ai.c`), so the number of passes it takes, and with it the random number it
@@ -31,8 +33,9 @@ that time moves and goes on from melonDS's save.
 manipulation and console TAS inputs don't play the same in it. Two facts decide it, both read in source: every reseed
 reads the PC's clock, and the random floats are made the GameCube way. Its loop has none of the console's timing
 either. The check put its confidence at about 98%, the doubt being only in how narrowly the question is read: SoH keeps
-the game's generator, so equal states give equal integers, but it never reaches the console's states, and with an N64
-ROM its floats differ even from equal states. Under the owner's rule, ADR 0023 is accepted.
+the game's generator and its boot state, so equal states give equal integers, but every reseed comes from the PC's
+clock rather than the console's timer, and with an N64 ROM its floats differ even from equal states. Under the owner's
+rule, ADR 0023 is accepted.
 
 ## How OoT draws its random numbers on the N64 (read)
 
@@ -90,19 +93,26 @@ ROM its floats differ even from equal states. Under the owner's rule, ADR 0023 i
    A room loads at once, the non-blocking check replaced by `if (1)`
    ([z_scene_otr.cpp:471-487](https://github.com/HarbourMasters/Shipwright/blob/d4bf6528a3bb242bc5d862e4f1ab2b6d385c157b/soh/soh/z_scene_otr.cpp#L471-L487)).
    Gameplay runs at 20 Hz (the title and the menus at other rates), and a faster display only adds interpolated frames.
-4. **Its own tracker and code say so.** An issue open since 2022-11-28 puts the frog minigame's difficulty down to the
-   lack of "N64 slowdown" ([issue 2030](https://github.com/HarbourMasters/Shipwright/issues/2030)), and a contributor's
-   review of [PR 3438](https://github.com/HarbourMasters/Shipwright/pull/3438) (merged 2023-11-29) calls the frogs'
-   speed a slowdown of the console's hardware that the port lacks. Console timing comes back one option at a time, off
-   by default: a pause buffer window and simulated input lag
+4. **Its own tracker and code say so.** An issue open since 2022-11-28 suggests that the frog minigame may be harder
+   for the lack of "N64 slowdown": on an NTSC console its reporter found the minigame easier and the whole game seeming
+   to slow down while the frogs are on screen, which the issue offers as a possible explanation
+   ([issue 2030](https://github.com/HarbourMasters/Shipwright/issues/2030)). In the review of
+   [PR 3438](https://github.com/HarbourMasters/Shipwright/pull/3438) (merged 2023-11-29), a reviewer calls the frogs'
+   speed a slowdown of the console's hardware that the port lacks. Console timing comes back one fix or option at a
+   time. That pull request's fix, on by default, slows Darunia's dance to the beat of Saria's Song as on the console,
+   and its author believes it works against both PAL's adjustment and the console's lag
+   ([z_en_du.c:282](https://github.com/HarbourMasters/Shipwright/blob/d4bf6528a3bb242bc5d862e4f1ab2b6d385c157b/soh/src/overlays/actors/ovl_En_Du/z_en_du.c#L282),
+   [SohMenuEnhancements.cpp:1336-1340](https://github.com/HarbourMasters/Shipwright/blob/d4bf6528a3bb242bc5d862e4f1ab2b6d385c157b/soh/soh/SohGui/SohMenuEnhancements.cpp#L1336-L1340)).
+   A pause buffer window and simulated input lag are options, off by default
    ([SohMenuEnhancements.cpp:310-328](https://github.com/HarbourMasters/Shipwright/blob/d4bf6528a3bb242bc5d862e4f1ab2b6d385c157b/soh/soh/SohGui/SohMenuEnhancements.cpp#L310-L328)),
    the first's tooltip explaining that it restores a console behaviour SoH drops by default. There is no console-RNG
    mode: the RNG options are cheats and the randomizer's seeds, the speedrun mode leaves the RNG alone, and nothing
    loads `.m64`, `.bk2` or `.gzm` movies.
-5. **Its planned TAS tools inject the console's seeds.** The draft
-   [PR 7465](https://github.com/HarbourMasters/Shipwright/pull/7465) (opened 2026-10-26, not merged) would add tools
-   modelled on gz. Its reseed goes through a hook that substitutes recorded seeds, and its `.gzm` importer keeps the
-   inputs, resets and seeds, since the N64's lag and ocarina sync data have "no SoH equivalent"
+5. **A draft's TAS tools would inject the console's seeds.** The draft
+   [PR 7465](https://github.com/HarbourMasters/Shipwright/pull/7465), from a contributor's fork (opened 2026-10-26, not
+   merged), would add tools modelled on gz. Its reseed goes through a hook that substitutes recorded seeds, and its
+   `.gzm` importer keeps the inputs, resets and seeds, since the N64's lag and ocarina sync data have
+   "no SoH equivalent"
    ([ShipGZ.cpp:842](https://github.com/Pepper0ni/Shipwright/blob/b3df5ad11e858d001f4dbe8c4beb0eb1e8320ebb/soh/soh/Enhancements/tas/ShipGZ.cpp#L842),
    the pull request's head). Another open pull request,
    [PR 7256](https://github.com/HarbourMasters/Shipwright/pull/7256), would add an optional simulated N64 heap: the
@@ -110,7 +120,8 @@ ROM its floats differ even from equal states. Under the owner's rule, ADR 0023 i
 
 ## 2 Ship 2 Harkinian (read)
 
-The same as SoH, but for the floats. Its `Play_Init` reseeds from `osGetTime`
+What was read of it works as SoH does, but for the floats; its room loading and input polling weren't read. Its
+`Play_Init` reseeds from `osGetTime`
 ([z_play.c:2417](https://github.com/HarbourMasters/2ship2harkinian/blob/222acd182a79db990cec32b0d55c93d41d21fe75/mm/src/code/z_play.c#L2417),
 as the MM decomp's [z_play.c:2260](https://github.com/zeldaret/mm/blob/710e1a7d50a1f987f5fc55abca37f7fdcc8ee43d/src/code/z_play.c#L2260)),
 which its libultraship again reads from the PC's clock
@@ -120,7 +131,7 @@ and its audio updates in lockstep, `R_UPDATE_RATE` times a frame
 Its floats are MM's, both taking the high bits
 ([rand.c:32-34](https://github.com/HarbourMasters/2ship2harkinian/blob/222acd182a79db990cec32b0d55c93d41d21fe75/mm/src/boot/O2/rand.c#L32-L34),
 the MM decomp's [qrand.c:47-49](https://github.com/zeldaret/mm/blob/710e1a7d50a1f987f5fc55abca37f7fdcc8ee43d/src/boot/libc64/qrand.c#L47-L49)),
-so only the seed's source and the timing differ.
+so of what was read, only the seed's source and the timing differ from MM on the console.
 
 ## The speedrun and TAS community (read)
 
@@ -141,7 +152,8 @@ on TASVideos, and no claim anywhere that SoH matches the console's RNG.
   each new seed with its frame and puts it back on playback
   ([gz.c:776-830](https://github.com/glankk/gz/blob/1155b00b260d8c205a81f8d6b560077a4abbe784/src/gz/gz.c#L776-L830),
   stored by [gz_macro.c:122-158](https://github.com/glankk/gz/blob/1155b00b260d8c205a81f8d6b560077a4abbe784/src/gz/gz_macro.c#L122-L158)),
-  gives the audio thread a fixed random number during macros
+  during macros gives the audio thread, in place of its own random number, one derived from the game's main random
+  state, so that it replays the same
   ([gz.c:980-995](https://github.com/glankk/gz/blob/1155b00b260d8c205a81f8d6b560077a4abbe784/src/gz/gz.c#L980-L995)),
   and records the audio frames of each game frame for the ocarina
   ([gz.c:845-874](https://github.com/glankk/gz/blob/1155b00b260d8c205a81f8d6b560077a4abbe784/src/gz/gz.c#L845-L874))
@@ -186,5 +198,5 @@ and injects them (gz, the draft ShipGZ), or patches the timing out of the refere
 - Inferred, not read: that SoH runs don't count on the main OoT board, and the pattern across ports above.
 - The check's corrections, which this note follows: the lines of gz's ocarina recording; which participant of PR 3438
   said what; that SoH's frame advance is a runtime option, not a debug build's (SoH has savestates too, and neither
-  touches the RNG); and that two TASVideos threads on OoT desyncs, which don't name timing as their cause, are no
-  evidence here.
+  makes it reproduce the console's RNG); and that two TASVideos threads on OoT desyncs, which don't name timing as
+  their cause, are no evidence here.
