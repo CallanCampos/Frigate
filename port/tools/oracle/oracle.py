@@ -64,7 +64,10 @@ Terrell's trainer battle, to the last frame before the move his AI picks shows, 
 0023's cut)), from the save the sequence names, if any, made first on the oracle (or taken from --save-cache), and
 compares every frame the same way but the known differences, up to the frame where the port stops when the sequence
 allows it to stop on code with no C yet, after checking that the random seeds the input file gives the port are the ones
-the DS built in the oracle's run (seeds.py; a file without seeds leaves the port its own); with --update it writes
+the DS built in the oracle's run (seeds.py; a file without seeds leaves the port its own); for a sequence that holds
+digests (digest: the opening, the title and aspertia), both programs also write their digest streams (--digest), and
+compare.py digest holds every game frame's display state exactly but the groups the sequence declares (known_groups)
+and the screens that show 3D (README.md, "Digests"); with --update it writes
 port/tests/oracle/<name>_<version>.tsv, the oracle's hashes at sampled frames, of its screens and, where the sequence
 compares it, of the game's state (STATE). seeds plays a sequence's or a save's input file on the oracle, from the save
 it starts from, and prints the random seeds the DS built as the file's seed lines (README.md, "Random seeds").
@@ -73,8 +76,9 @@ against that reference. sound runs both programs on a sequence with their sound 
 --audio-dump) and compares the sound driver's state run by run, what the ARM9 sees of it frame by frame, and the sound
 by segment (sound.py, SOUND); with --update it writes port/tests/oracle/sound_<name>_<version>.tsv, the oracle's hashes
 and statistics. sound-check runs the port alone and checks it against that reference. check is the oracle's ctest test:
-the oracle runs the boot sequence twice with the same results (its screens, sound trace and WAV dump), and its screens
-match the hashes in port/tests/oracle/boot_<version>.tsv. save, port-save, round-trip, sequence, seeds, sound and check
+the oracle runs the boot sequence twice with the same results (its screens, sound trace and WAV dump, and with the ROM
+build's link map, which gives it the counter, its digest stream, whose counts run from 1 by one with every group in
+every row), and its screens match the hashes in port/tests/oracle/boot_<version>.tsv. save, port-save, round-trip, sequence, seeds, sound and check
 exit 77 without the oracle or the ROM, sequence-check and sound-check without the ROM.
 Standard library only.
 """
@@ -85,6 +89,7 @@ import argparse
 import hashlib
 import os
 import re
+import shlex
 import shutil
 import struct
 import subprocess
@@ -162,7 +167,9 @@ class Sequence:
     frames whose screens differ from the oracle's by construction, left out of the comparison and the reference;
     known_top, those whose top screen alone does, its bottom screen still compared (compare.py --known-top); and
     known_oracle the oracle frames that no port frame can show; each with why (README.md, "Known differences"), a cause
-    traced: a difference whose cause is open is a failure to fix, never declared here. close: by version, the port
+    traced: a difference whose cause is open is a failure to fix, never declared here. digest and known_groups: whether
+    the two programs' digest streams are held to each other, and by version the digest groups left out at port frames,
+    with why. close: by version, the port
     frames whose screens with 3D must also have few pixels that differ at all (compare.py --close), with why: where a 2D
     layer the 3D's tolerance would forgive shows. state_frames: the port frames whose game state (state: STATE, NNS
     G3D's, unless the sequence names more) is compared with the oracle's at the frames they pair with, which
@@ -195,6 +202,13 @@ class Sequence:
     stop_from: int = 0
     stop_trap: str = ""
     stop: str = ""
+    # Whether oracle_<seq> holds the two programs' digest streams (README.md, "Digests"): both write one, and compare.py
+    # digest compares every game frame's display state, record by record on the count, at each count's last VBlank
+    digest: bool = False
+    # By version, then by digest groups (digest.h's names, comma-separated), then by port frames (the port records'
+    # frames, a frame list), with why: the digest groups whose difference at those records is declared, each cause
+    # traced in both programs' code (README.md, "Known differences"); only a sequence with digest has any
+    known_groups: dict[str, dict[str, dict[str, str]]] = field(default_factory=dict)
 
 
 
@@ -937,8 +951,17 @@ def statics_file(version: str, directory: str) -> str | None:
     return path
 
 
+def oracle_counter(args) -> bool:
+    """Whether run_oracle passes the oracle --counter: GFL's frame count is a static that only the ROM build's link map
+    names (build/<version>/arm9.o.xMAP), and --no-counter leaves it out"""
+    return bool(symbols.read_map(args.version)) and not getattr(args, "no_counter", False)
+
+
 def run_oracle(args, out: str, frames: int, screens: str, dumps: list[str] | None = None,
-               quiet: bool = False, audio: str | None = None, trace: str | None = None) -> int:
+               quiet: bool = False, audio: str | None = None, trace: str | None = None,
+               digest: str | None = None) -> int:
+    """Runs pbw-oracle with the repository's defaults into out; with digest, its --digest stream there (README.md,
+    "Digests"), which needs the counter (oracle_counter)"""
     binary = args.oracle or DEFAULT_ORACLE
     if not os.path.exists(binary):
         print(f"oracle.py: no oracle at {binary}; configure the port with -DPORT_BUILD_ORACLE=ON and build",
@@ -970,6 +993,8 @@ def run_oracle(args, out: str, frames: int, screens: str, dumps: list[str] | Non
         command += ["--audio-dump", audio]
     if trace:
         command += ["--sound-trace", trace]
+    if digest:
+        command += ["--digest", digest]
     return subprocess.call(command)
 
 
@@ -994,11 +1019,12 @@ def rom_game_code(path: str) -> str:
 def run_port(binary: str, out: str, frames: int, screens: str, rom: str, time: str | None,
              input_path: str | None = None, timeout: int = 1200, dumps: list[str] | None = None,
              save: str | None = None, save_out: str | None = None, audio: str | None = None,
-             trace: str | None = None) -> tuple[int | None, str]:
+             trace: str | None = None, digest: str | None = None) -> tuple[int | None, str]:
     """Runs the port's program once, from power-on with a blank save or with the save memory in the file save, for
     frames frames, writing its run directory in out (--run-dir): frames.tsv for every frame it ran, a PNG file for each
     frame of screens (a frame list, "none" or "all") and memory.txt with the dumps (--run-dump specs), and with audio
-    and trace its WAV dump and sound trace (--audio-dump, --sound-trace). The save directory is a new one, given the
+    and trace its WAV dump and sound trace (--audio-dump, --sound-trace), with digest its digest stream (--digest). The
+    save directory is a new one, given the
     save as the port names its saves (the game code and .sav); save_out gets the save memory the run left there, which
     is the blank chip when the game neither had a save nor wrote one, never a file of an earlier run. Returns its exit
     status (None when it timed out) and its last message about why it stopped"""
@@ -1025,6 +1051,8 @@ def run_port(binary: str, out: str, frames: int, screens: str, rom: str, time: s
         command += ["--audio-dump", audio]
     if trace:
         command += ["--sound-trace", trace]
+    if digest:
+        command += ["--digest", digest]
     try:
         done = subprocess.run(command, capture_output=True, text=True, timeout=timeout)
         status = done.returncode
@@ -1759,6 +1787,29 @@ def check_sound_outputs(run: str) -> int:
     return failed
 
 
+def check_digest_stream(path: str) -> int:
+    """The failures of check's digest stream, read with compare.py's reader: counts from 1, each one more than the last,
+    every group digest.c knows in every row"""
+    try:
+        digest = compare.load_digest(path)
+    except compare.RunError as error:
+        print(f"FAIL: {error}")
+        return 1
+    counts = sorted(digest.records)
+    failed = 0
+    if not counts or counts != list(range(1, len(counts) + 1)):
+        print(f"FAIL: the digest stream's counts aren't 1, 2, 3 ... ({compare.describe_ranges(counts) or 'none'})")
+        failed += 1
+    lacking = [count for count, record in digest.records.items()
+               if set(record.hashes) != set(compare.DIGEST_GROUPS)]
+    if lacking:
+        print(f"FAIL: the digest stream's counts {compare.describe_ranges(sorted(lacking))} lack a group")
+        failed += 1
+    if not failed:
+        print(f"the digest stream: counts 1-{counts[-1]}, every group in every row")
+    return failed
+
+
 def command_check(args) -> int:
     binary = args.oracle or DEFAULT_ORACLE
     if not os.path.exists(binary):
@@ -1772,18 +1823,28 @@ def command_check(args) -> int:
     args.oracle = binary
     work = args.work or tempfile.mkdtemp(prefix="oracle-check-")
     runs = []
+    # The digest stream (--digest) needs GFL's frame count, which only the ROM build's link map names
+    digest = oracle_counter(args)
+    if not digest:
+        print(f"oracle.py check: no build/{args.version}/arm9.o.xMAP (run ninja), so no counter: the digest stream "
+              "isn't checked")
     for name in ("a", "b"):
         out = os.path.join(work, name)
         shutil.rmtree(out, ignore_errors=True)
         os.makedirs(out)
         trace, audio = sound.run_files(out)
-        status = run_oracle(args, out, CHECK_FRAMES, CHECK_SCREENS, quiet=True, audio=audio, trace=trace)
+        status = run_oracle(args, out, CHECK_FRAMES, CHECK_SCREENS, quiet=True, audio=audio, trace=trace,
+                            digest=os.path.join(out, "digest.tsv") if digest else None)
         if status != 0:
             print(f"oracle.py check: the oracle failed (status {status})")
             return 1
         runs.append(compare.load_run(out))
     failed = 0
-    for file in ("frames.tsv", *(os.path.basename(path) for path in sound.run_files(work))):
+    held = ("frames.tsv", *(os.path.basename(path) for path in sound.run_files(work)))
+    if digest:
+        held += ("digest.tsv",)
+        failed += check_digest_stream(os.path.join(work, "a", "digest.tsv"))
+    for file in held:
         with open(os.path.join(work, "a", file), "rb") as a, open(os.path.join(work, "b", file), "rb") as b:
             if a.read() != b.read():
                 print(f"FAIL: two runs of the same boot differ ({file})")
@@ -2013,10 +2074,20 @@ def state_dumps(sequence: Sequence) -> tuple[list[str], list[str]]:
             [dump.spec("port", sequence.state_frames) for dump in sequence.state])
 
 
+def known_group_arguments(sequence: Sequence, version: str) -> list[str]:
+    """compare.py digest's --known-group arguments for a sequence's declarations in a version"""
+    out = []
+    for groups, table in sequence.known_groups.get(version, {}).items():
+        for frames in table:
+            out += ["--known-group", f"{groups}={frames}"]
+    return out
+
+
 def compare_sequence(sequence: Sequence, version: str, oracle_dir: str, port_dir: str, report: str, last: int) -> int:
     """Compares a sequence's oracle and port runs up to the port's frame last, as oracle.py sequence does: every port
-    frame but the known differences, on the game's count, and the game's state where the sequence compares it; prints
-    what it compared and left out, and returns compare.py's status"""
+    frame but the known differences, on the game's count, the game's state where the sequence compares it, and for a
+    sequence with digests the two digest streams; prints what it compared and left out, and returns compare.py's worst
+    status"""
     known = by_frame(sequence.known.get(version, {}))
     compared = [frame for frame in range(1, last + 1) if frame not in known]
     align = ["--align", "counter", "--clock", sequence.clock]
@@ -2058,6 +2129,16 @@ def compare_sequence(sequence: Sequence, version: str, oracle_dir: str, port_dir
             print(f"state left out, port frames {frames}: {why}")
         for frames, why in sequence.known_random.get(version, {}).items():
             print(f"GFL's random state left out, port frames {frames}: {why}")
+    if sequence.digest:
+        # Every game frame's display state, at each count's last VBlank, on the same pairing as the screens'
+        command = ["digest", oracle_dir, port_dir, *align, "--frames", f"1-{last}",
+                   *known_group_arguments(sequence, version)]
+        print("\nthe digest streams, record by record on the count (README.md, \"Digests\"):")
+        print("  " + shlex.join([os.path.relpath(os.path.join(HERE, "compare.py"), REPO_ROOT), *command]))
+        result = max(result, compare.main(command))
+        for groups, table in sequence.known_groups.get(version, {}).items():
+            for frames, why in table.items():
+                print(f"digest groups {groups} left out, port frames {frames}: {why}")
     return result
 
 
@@ -2093,7 +2174,8 @@ def command_sequence(args) -> int:
             return 1
     args.input = input_path
     oracle_dumps, port_dumps = state_dumps(sequence)
-    status = run_oracle(args, oracle_dir, sequence.oracle_frames, "all", oracle_dumps + seeds.DUMPS, quiet=True)
+    status = run_oracle(args, oracle_dir, sequence.oracle_frames, "all", oracle_dumps + seeds.DUMPS, quiet=True,
+                        digest=os.path.join(oracle_dir, "digest.tsv") if sequence.digest else None)
     if status != 0:
         print(f"oracle.py sequence: the oracle failed (status {status})")
         return 1
@@ -2103,7 +2185,8 @@ def command_sequence(args) -> int:
         print(f"oracle.py sequence: {reason}")
         return 1
     status, message = run_port(args.port, port_dir, sequence.port_frames, "all", rom, args.time, input_path,
-                               dumps=port_dumps, save=args.save)
+                               dumps=port_dumps, save=args.save,
+                               digest=os.path.join(port_dir, "digest.tsv") if sequence.digest else None)
     print(f"port: {describe_port_run(status, message, sequence.port_frames, port_dir)}")
     port_run = compare.load_run(port_dir)
     last = max(port_run.frames) if port_run.frames else 0

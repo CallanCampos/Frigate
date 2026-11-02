@@ -12,19 +12,22 @@ port's, `sound.py` the sound ([Sound](#sound)). It also makes the saves the test
 
 It is a **test tool only**. It is never linked into or shipped with Frigate
 ([PLAN.md §1](../../docs/PLAN.md#1-goal-and-what-native-means)): it is a CMake project of its own, built only on
-request, and nothing under `port/` other than this directory, its tests and its CMake fragment refers to it, except two
-files of plain C11 with no melonDS in them. The input file reader (`pbwinput.c`) is compiled into Frigate for its
-replays (`port/app/replay.c`). The sound trace's format (`sndtrace.h`) is included by Frigate's sound driver, which
-writes its work in the DS's layout with it (`port/hal/snd7/snd7.c`, `port_snd7_trace_record`), by Frigate's
-`--sound-trace` (`port/app/sound_trace.c`) and by the sound driver's tests (`port/tests/snd/test_snd.c`).
+request, and nothing under `port/` other than this directory, its tests and its CMake fragment refers to it, except four
+files of plain C11 with no melonDS in them, and xxHash's header. The input file reader (`pbwinput.c`) is compiled into
+Frigate for its replays (`port/app/replay.c`). The sound trace's format (`sndtrace.h`) is included by Frigate's sound
+driver, which writes its work in the DS's layout with it (`port/hal/snd7/snd7.c`, `port_snd7_trace_record`), by
+Frigate's `--sound-trace` (`port/app/sound_trace.c`) and by the sound driver's tests (`port/tests/snd/test_snd.c`).
+The per-game-frame digest (`digest.c`, with xxHash's header, which every build fetches at configure time) and the
+tracking of the 3D that display captures leave in VRAM (`display3d.c`) are compiled into Frigate for its `--digest`
+(`port/app/digest_stream.c`, [Digests](#digests)), so that both programs encode and track with the same code.
 melonDS is GPL-3.0, as this repository is; the oracle links melonDS's core and is GPL-3.0 with it. melonDS is fetched
 at build time, pinned to a release, and never committed.
 
 | File | What it is |
 | --- | --- |
 | `oracle.cpp`, `oracle.h`, `platform.cpp`, `symtab.*`, `pngout.*` | `pbw-oracle`, the program on melonDS's core: `oracle.cpp` its options and run, `oracle.h` what melonDS's Platform layer (`platform.cpp`) reports to it, `symtab.*` the decomp's symbols for its memory dumps, `pngout.*` the screens' PNG files |
-| `display3d.c`, `display3d.h` | which screens show 3D in a frame, from the display registers; plain C11 |
-| `digest.c`, `digest.h` | the per-game-frame digest's canonical encoding, hash and stream format ([Digests](#digests)); plain C11, which only its tests compile so far |
+| `display3d.c`, `display3d.h` | which screens show 3D in a frame, from the display registers, and which VRAM banks hold a capture of 3D; plain C11, which Frigate also compiles for its digest stream |
+| `digest.c`, `digest.h` | the per-game-frame digest's canonical encoding, hash, stream format and stream writer ([Digests](#digests)); plain C11, which both programs compile for `--digest` |
 | `pbwinput.c`, `pbwinput.h` | the input file reader and writer and the game-frame clock, plain C11, which the port can compile as it is |
 | `oracle.py` | runs the oracle and the port with the repository's defaults; makes the saves the tests start from on the oracle, each from the save before it ([Saves](#saves)); the comparison sequences, the field menu's and its apps' among them, and the sound's comparison; the ctest check |
 | `compare.py` | compares two runs: screens, memory, alignment |
@@ -111,6 +114,7 @@ the DS builds playing a sequence's or a save's input file, as the file's `seed` 
 | `--save FILE`, `--save-out FILE` | the save memory at power-on (blank otherwise), and where to write it at the end |
 | `--audio-dump FILE` | the sound unit's mixed output as a WAV file: every sample melonDS's mixer makes, one each 1024 cycles from power-on, 16-bit stereo, before melonDS resamples it for a sound card ([Sound](#sound)) |
 | `--sound-trace FILE` | the ARM7 sound driver's state after each run of its thread (`sndtrace.h`, [Sound](#sound)); needs `--config` |
+| `--digest FILE` | the digest stream, `#pbwdigest 1`: a record per value of GFL's frame count, taken at its last VBlank, of the display state melonDS keeps ([Digests](#digests)); needs `--counter` (status 2 otherwise, and for a file it can't write). At each frame it also checks that the screens it took at the VBlank are the ones the frame ends with; a mismatch, a write that fails, a count that falls or jumps or a state that can't be encoded ends the run with status 1. `run.txt` names it (`digest:`) |
 
 A dump's TARGET is a symbol (`sVBlankCount`), `MODULE/NAME` or `FILE.c/NAME` for a name several modules or files have
 (`ov033/sWork`, `gfl_use.c/sWork`), with an optional `+OFFSET`, or an address (`0x0209da64`). Dumps read the ARM9's view
@@ -414,16 +418,22 @@ The screens comparison first says how each stretch of port frames was paired, an
 frames whose pictures no port frame shows ([above](#aligning-the-oracle-with-the-port)); `--known-oracle` names those
 that can't have a counterpart, which it leaves out of that check.
 
+`compare.py digest ORACLE PORT --align counter --clock LIST [--lag ...] [--frames LIST] [--known-group GROUPS=FRAMES]...`
+compares the two runs' digest streams, `digest.tsv`, record by record, every group exactly: the display state at each
+game frame, at the last VBlank of its count ([Digests](#digests)). It pairs them on the count, as the screens do, and
+needs `--align counter`.
+
 ## Digests
 
 Verification v2 ([ADR 0031](../../docs/adr/0031-per-game-frame-digests-against-a-content-addressed-oracle-cache.md),
 proposed) holds Frigate to melonDS at every game frame by a digest: one record per value of GFL's frame count, with a
 64-bit hash for each group of the DS's state, each group first put into canonical bytes so that the two programs'
-records are equal exactly when their state is. Its first part is here: the canonical encoding, the hash and the
-stream's format in `digest.c` and `digest.h`, plain C11 that both programs are to compile, tested without a ROM by
+records are equal exactly when their state is. Its first two parts are here: the canonical encoding, the hash and
+the stream's format in `digest.c` and `digest.h`, plain C11 that both programs compile, tested without a ROM by
 `digest_format_plain` and `digest_format_sanitized`
-([port/tests/oracle/test_digest.c](../../tests/oracle/test_digest.c)). Neither program writes a stream yet: the
-ADR's next part adds `--digest` to both, taken at the last VBlank of each count, and the comparison's pairing.
+([port/tests/oracle/test_digest.c](../../tests/oracle/test_digest.c)); the stream's writer, which both programs call
+with `--digest FILE`; and the comparison, `compare.py digest`, which `oracle.py sequence` runs for a sequence that
+holds digests ([below](#digests)).
 
 Each program fills a `PbwDigestFrame` from its own model; `digest.c` decodes, masks, encodes and hashes it. The groups
 and their canonical bytes, with 32-bit words little-endian:
@@ -457,7 +467,7 @@ melonDS `0x7ffe00` and Frigate `0xffffff` (`digest.h`, `pbw_digest_zbuffer_depth
 vertex as a `g3d.list` difference, Frigate's to fix: `ToScreen` cutting the product as melonDS does, a change to the
 geometry engine with its own replays, planned before the next part compares lists.
 
-Some stores melonDS 1.1 drops and Frigate keeps, which the next part's comparison of `regs2d`, `sys`, `pal`, `oam`,
+Some stores melonDS 1.1 drops and Frigate keeps, which the comparison of `regs2d`, `sys`, `pal`, `oam`,
 the VRAM banks and `g3d.regs` meets as differences to trace like any other, melonDS being the oracle:
 
 - **While an engine is powered off** (POWCNT1 bit 1 for engine A, bit 9 for engine B): its 2D registers, but for
@@ -490,8 +500,72 @@ count	frame	vblanks	vram.A	vram.B	...	g3d.stats	screen.top	screen.bottom
 
 A header names the groups in any order and may leave some out. A record has no column for the sequence's lag (the
 design's "lag applied"), on purpose: a stream records what its program saw, and neither program knows the lag, which
-`SEQUENCES` declares and the pairing applies when it compares. If the next part's expected stream needs to carry it,
-that part adds the column under a new format version, before any stream is kept.
+`SEQUENCES` declares and the pairing applies when it compares. If part 4's expected stream needs to carry it, that
+part adds the column under a new format version, before any stream is kept.
+
+Both programs write their streams through one writer in `digest.c`, `pbw_digest_writer_open`, `pbw_digest_writer_vblank`
+at every VBlank with GFL's frame count read there, and `pbw_digest_writer_close`, so that one rule, tested without a
+ROM, decides on both which VBlank's state is a game frame's record: the state at the **last VBlank of each count**,
+where the count's pass has finished and the game waits in `OS_WaitIrq` (`src/system/main.c`), before the VBlank's
+interrupt is taken (ADR 0031, decision 1). The count goes up at the end of `GFL_VBlankUpdate`
+(`src/system/gfl_use.c`), which runs once that wait returns, so a record holds its pass's main work but not the VBlank
+work that follows it: the IRQ handler's `GFL_VBlankExecCallback`, then the BG updates, `DMAVBlank_Update` and the
+fades, which run while the count is unchanged and first show in the next count's record, on both programs. The rules:
+
+- **The start.** Nothing is recorded before the first VBlank whose count is 1 after a VBlank whose count was 0. Until
+  start-up clears the BSS, the counter's address holds anything: on melonDS the compressed ARM9 binary, so the count
+  reads 0 at frame 1, a large number at frames 2 to 13 and 0 again until the main loop's first pass.
+- **The last VBlank.** A VBlank with the pending record's count replaces it (its video frame and every group's hash
+  become this VBlank's, and `vblanks` goes up by one); a VBlank with the next count writes the pending record, flushes
+  the file and becomes the pending record, with `vblanks` 1.
+- **Counts only stay or rise by one** after the start: the DS's main loop waits for each VBlank, so a pass can't end
+  twice in one frame. Anything else, a fall or a jump, is an error naming both counts and the frame.
+- **A frame that can't be encoded** (a vertex index past the list, a capture's region outside its bank, no memory) is
+  an error naming the group. A VBlank that fails writes nothing, and every later call fails with the same message.
+- **The end.** Closing never writes the pending record, whose count may have had more VBlanks to come: a run's last
+  count is never in its stream, on either program.
+- **Every row is flushed** as it is written, so that a run that a trap stub ends keeps every record it wrote, as
+  `frames.tsv` keeps its rows.
+
+**Frigate's writer** ([port/app/digest_stream.c](../../app/digest_stream.c), `--digest FILE`) runs in `AppFrame`, the
+program's frame hook, which the OS core runs at line 192 (`port/hal/os/core.c`) after the geometry engine's swap, before
+the VBlank's interrupt is taken, and before the run directory's row: VRAM page by page where the platform layer keeps
+it (`port_vram_bank_page`, `port_vram_vramcnt`), the palettes, OAM and the I/O registers' bytes (decoded by
+`pbw_digest_regs2d_from_io`, `pbw_digest_sys_from_io` and `pbw_digest_regs3d_from_io`; the 3D registers are the bytes
+`port_g3d_vblank` has just decoded for the renderer), the render list the swap made (`port_ge_render_list`, with its
+own vertex indices), and both screens as `frames.tsv` hashes them. It reads only the DS-native 256 × 192 path, so a
+digest run is a native run whatever enhancement may exist (ADR 0030). The capture group and the VRAM a capture of 3D
+holds come from the oracle's own [display3d.c](display3d.c), run at the oracle's three moments: as each frame starts,
+before line 0 (the screens' frame-start hook, `port/gfx/screens.c`), `pbw_display3d_check` and the banks' 3D then; at
+line 96, what the capture unit has (`port/gfx/capture.c`'s record, taken whether or not the unit runs); and at the
+VBlank, `pbw_display3d_capture`. Frigate's own frames.tsv still writes `-` for its 3D columns: the tracking feeds the
+digest alone. Frigate's CPU takes no time, so a pass's writes all land at the VBlank, before the next frame's line 0
+and line 96, where melonDS spreads them over the frame: a pass that writes a captured region, DISPCAPCNT or DISPCNT
+can move `holds3d` at the start, the capture's registers and the zeroed region by a frame, by construction. Without
+`--digest` nothing of this runs.
+
+**The oracle's writer** (`oracle.cpp`'s `DigestVBlank`, `--digest FILE`) runs in `OnVBlank`, the oracle's event at
+the start of line 192 after the LCD's own (which raises the VBlank interrupt, ends the 2D engines' VBlank work and swaps
+the 3D list), after the `--dump`s and before the input of the next pass, neither of which changes emulated state. It
+reads melonDS's own memory and fields: `GPU::VRAM` page by page and `GPU::VRAMCNT`, `GPU::Palette` and `GPU::OAM`; each
+2D unit's fields copied as they are (`BGXRef` and `BGYRef` the values written, not the renderer's moving reference
+points); `NDS::PowerControl9`, and WRAMCNT through `ARM9IORead8(0x04000247)`, which returns it with no side effect
+(`WRAMCnt` is protected); `GPU3D`'s live rendering registers, which the VBlank's latch has just copied for the next
+frame; the render list, the first `RenderNumPolygons` polygons of the polygon RAM bank the last swap closed
+(`PolygonRAM[CurRAMBank ? 0 : 2048]`), each vertex an index into that bank's vertex RAM (one that points elsewhere ends
+the run), its depth `pbw_digest_zbuffer_depth(Position[2], Position[3])`, `swapParam` the `FlushAttributes`' 2 bits and
+the overflow `DispCnt` bit 13; the capture and the banks' 3D as `SampleDisplay` left them for this frame; and the
+screens just drawn, which at line 192 are in the back buffer (`Framebuffer[FrontBuffer ? 0 : 1]`, top then bottom) and
+which the frame's end makes the front one (`GPU::FinishFrame`), the one `frames.tsv` hashes. With `--digest`, every frame
+with a VBlank checks that its front buffer's screens hash to what `OnVBlank` took, and stops the run (status 1) if they
+don't. Without `--digest` the oracle's output stays byte for byte what it was.
+
+melonDS models two things the stream meets: while the 3D rendering engine is off it keeps `RenderNumPolygons` at 0
+(`GPU3D::SetEnabled` resets the rendering state), so its list is empty then while its banks still flip with the
+geometry engine on, and it drops geometry commands while the geometry engine is off; Frigate's geometry engine ignores
+POWCNT1, so the lists can differ there. And it starts VBlank DMAs in the LCD's line-192 event, but `DMA::Start` only
+marks the channel running and stops the CPU, so their data moves after the oracle's event; Frigate's DMA copies at the
+call (`port/hal/dma/dma.c`).
 
 `pbw_digest_compare_streams` compares an expected stream (the oracle's) with an actual one (Frigate's) count by
 count, each with one row per count in rising order. The expected stream names what is held: a group it leaves out,
@@ -499,9 +573,54 @@ or writes `-` for, isn't compared. A group the expected row has and the actual r
 leaves it out or its row writes `-` (a writer that dropped the group), is a divergence, never a silent pass; and
 `groupCompared` counts, group by group, the counts at which both rows had it, so that a caller sees a group that was
 never compared. Counts that only one stream has are counted, not compared. The comparison stops at the first count
-where a group differs or is missing, naming each. It goes only as far as this part's tests need: pairing a count's
-rows where a program writes several (at the last VBlank of the count), the sequences' lags, known differences and
-clock stretches are the next part's, in `compare.py`.
+where a group differs or is missing, naming each. It is the comparison for this part's tests, and for part 4's
+port-alone check against an expected stream; the sequences' comparison, with the pairing, lags, clock stretches,
+screens with 3D and declarations, is `compare.py digest`'s.
+
+**The comparison**, `compare.py digest`, reads both runs' streams (with `load_digest`, which holds a stream to
+`digest.c`'s reader's rules) and their `frames.tsv`, and pairs each record of Frigate's with the oracle's on the count:
+
+- **Pairing.** A port record, the last VBlank of count c at port frame f, pairs with the oracle's record of the count of
+  the oracle frame that the screens' counter pairing gives f (`counter_mapping`, with the same `--clock` and `--lag`):
+  c less the lag at f, declared, or after a clock stretch with no declaration derived as the screens' pairing derives
+  it. The oracle's record is that count's last VBlank, wherever in the count the screens' pairing put the oracle frame:
+  so a count that the DS spent several VBlanks on is compared where its pass has finished on both. The pairing is the
+  screens' and the memory's, by construction, and the comparison prints its stretches as the screens do.
+- **What isn't compared.** Port frames of `--clock`, where the game waits on a clock (no count to pair); a port record
+  without an oracle frame, or whose paired count is past the oracle's stream, which is counted and listed (one whose
+  paired count is within the oracle's stream but missing from it fails); `screen.top` or `screen.bottom` where the
+  oracle record's frame shows 3D on that screen (`frames.tsv`'s `top_3d` and `bottom_3d`), which the screens' 3D
+  tolerance and the 3D groups hold instead; and the groups `--known-group` declares at f. `frame` and `vblanks` aren't
+  compared.
+- **What fails.** A group the oracle's record has whose hash the port's differs from, or which the port's record lacks
+  (`-`, or not in its header), where nothing declares it.
+- **Output.** The pairing's stretches; the port records compared, in clock stretches, unpaired and past the stream; per
+  group, the records compared, the screens left out for 3D, and the differing and missing port frames as ranges with
+  their counts; per declaration, how many of its frames differed and how many were equal, and "unused declaration" for
+  one none of whose frames differed; and the first difference nothing declares: its count, port frame, oracle frame and
+  groups. Exit status 0 when nothing undeclared differs or is missing, 1 otherwise, 2 for streams or runs it can't read.
+
+**The declarations** are a sequence's `known_groups` in `SEQUENCES` (`oracle.py`), keyed by version, then by groups
+(`digest.h`'s names, comma-separated), then by port frames (a frame list, as the other declarations' are), each with
+why:
+
+```python
+known_groups={
+    "b2_us": {"g3d.list,g3d.stats": {"3110-3124": CAMERA}, "vram.C,vram.D": {"175-312": COPYRIGHT_TILES}},
+    "w2_us": {...},
+}
+```
+
+A port frame is the port record's frame, the last VBlank of its count: on Frigate almost always the count + 1. The
+names and frames above are an example; the sequences' own are in "Known differences" below. Each declaration is
+minimal, its frames the records where one of its groups differs, and its cause traced in both programs' code; a
+difference whose cause is open is a failure to fix, never declared. `known_groups` replaces nothing yet: `known`,
+`known_top`, `known_oracle`, `close`, `known_state` and `known_random` keep holding the screens' and the state's
+comparisons, and a screen that differs at the last VBlank is declared in `known_groups` for `screen.top` or
+`screen.bottom`, with its cause, even where `known` declares the same cause for the screens' first-VBlank pairing.
+`oracle.py sequence` runs the comparison after the screens and the state for a sequence whose `digest` is set, prints
+the exact `compare.py digest` command it ran, for triage, and each declaration with its reason, and fails on the worst
+of the three.
 
 ## Symbols
 
@@ -524,7 +643,10 @@ first 500 frames twice, compares the results (`frames.tsv`, the sound trace and 
 the PNG files and `frames.tsv` agree, that the WAV dump has a sample for each 1024 cycles and the trace the driver's
 periodic runs 2728 ticks apart, each record in the frame whose VBlank comes next, and compares the screens of 11 frames
 with `port/tests/oracle/boot_<version>.tsv`, hashes the pinned melonDS gives (`oracle.py check --update` writes them).
-It exits 77 (skipped) without the oracle or without the ROM the decomp builds.
+When the ROM build's link map gives it the counter (`build/<version>/arm9.o.xMAP`), both runs also write their digest
+stream (`--digest`), which it holds byte for byte too and reads with `compare.py`'s reader: counts from 1, each one
+more than the last, every group in every row; without the map it says the digest wasn't checked. It exits 77
+(skipped) without the oracle or without the ROM the decomp builds.
 
 ## Random seeds
 
@@ -1370,8 +1492,8 @@ What the port needs to compare itself frame by frame:
 - **The sound** (done: `--sound-trace`, `port/app/sound_trace.c`, and `--audio-dump`, [Sound](#sound)): the sound
   driver's state after each run, which no dump at a VBlank can give the DS's of (the driver's runs fall at other
   moments of the frame on each program), and its samples.
-- **Digests** (the canonical encoding done, [Digests](#digests); the writers not yet): `--digest` in both programs,
-  filling `digest.h`'s structures at the last VBlank of each count, as ADR 0031's next part plans.
+- **Digests** (done, [Digests](#digests)): `--digest` in both programs, filling `digest.h`'s structures at each
+  VBlank for the writer, which keeps the last VBlank of each count, and `compare.py digest`.
 
 ## Known differences from the hardware
 

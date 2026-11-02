@@ -3,8 +3,9 @@
 # configured host build (port/cmake/macos_app.cmake) makes the app ("Frigate Black 2.app" or "Frigate White 2.app"),
 # signed ad hoc, and hdiutil makes a compressed disk image named after it, with the app and a link to /Applications to
 # drag it onto. The image is checked before the script ends: it verifies, the app in it passes codesign's strict check,
-# its program has the slices and its Info.plist the minimum macOS the build was configured for, and it holds no ROM,
-# save or other file of the game's, and no sanitizer's runtime; an image that fails a check, or that the script stops
+# its program has the slices and its Info.plist the minimum macOS the build was configured for, it carries the notice of
+# the third-party code compiled into its program (Contents/Resources/THIRD-PARTY-NOTICES.txt, xxHash's), and it holds
+# no ROM, save or other file of the game's, and no sanitizer's runtime; an image that fails a check, or that the script stops
 # before checking, is removed. A sanitized build (-DPORT_SANITIZE=ON, or -fsanitize= in any of the compiler's or the
 # linker's flags its cache holds, a configuration's such as CMAKE_C_FLAGS_RELWITHDEBINFO among them) is refused before
 # anything is built: its app carries the toolchain's sanitizer runtime, which make_app.sh copies into it, and is for
@@ -233,12 +234,18 @@ while :; do
 done
 
 # The checks: the image's checksums, the app's signature as it is in the image, the slices and the minimum macOS the
-# build was configured for (make_app.sh checked every binary already; this is the app as it is in the image), and
-# nothing of the game's in it
+# build was configured for (make_app.sh checked every binary already; this is the app as it is in the image), the
+# third-party notice, and nothing of the game's in it
 hdiutil verify -quiet "$out"
 mkdir "$mount_point"
 hdiutil attach -quiet -readonly -nobrowse -mountpoint "$mount_point" "$out"
 codesign --verify --deep --strict "$mount_point/$app_name.app"
+# xxHash's BSD-2-Clause notice, which a program with xxHash compiled in carries wherever it goes (make_app.sh copies it)
+if [ ! -s "$mount_point/$app_name.app/Contents/Resources/THIRD-PARTY-NOTICES.txt" ]; then
+    echo "package_macos.sh: the app has no Contents/Resources/THIRD-PARTY-NOTICES.txt, the notice of the third-party" \
+        "code its program carries" >&2
+    exit 1
+fi
 slices=$(lipo -archs "$mount_point/$app_name.app/Contents/MacOS/$executable")
 for wanted in $archs; do
     if ! printf '%s\n' $slices | grep -qxF -e "$wanted"; then

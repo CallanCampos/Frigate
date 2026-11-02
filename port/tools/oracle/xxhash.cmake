@@ -1,9 +1,11 @@
 # The xxHash release whose single header gives the per-game-frame digest its hash (digest.c, XXH3-64 with seed 0; ADR
-# 0031), pinned by tag and by the SHA-256 of GitHub's archive of it, as melonds.cmake pins melonDS. Read by the port's
-# fragment (port/cmake/oracle.cmake), which fetches it at configure time as port/cmake/os.cmake fetches minicoro and puts
-# the archive's top directory, where xxhash.h is, on a system include path; the oracle's own build reads it too once it
-# compiles digest.c (ADR 0031's second part). The digest touches every screen of the game: what the display hardware
-# holds at each VBlank.
+# 0031), pinned by tag and by the SHA-256 of GitHub's archive of it, as melonds.cmake pins melonDS. Both programs compile
+# digest.c for --digest, so both builds read it: Frigate's (port/cmake/app.cmake) fetches the archive at configure time,
+# as port/cmake/os.cmake fetches minicoro, puts its top directory, where xxhash.h is, on a system include path for the
+# program and the digest's tests, and writes the archive's LICENSE into the notice the program carries; the oracle's
+# own (port/tools/oracle/CMakeLists.txt) takes the directory the port's build fetched (XXHASH_SOURCE_DIR), or fetches it
+# itself when built on its own. The digest touches every screen of the game: what the display hardware holds at each
+# VBlank.
 #
 # 0.8.3's xxhash.h is byte for byte the one melonDS 1.1 bundles as src/xxhash/xxhash.h (both SHA-256
 # 17973c0dc49d9854ca26caa191f0e12f7a424b68858d9a78de3860d959d85e4b), so the oracle compiles the same hash whichever

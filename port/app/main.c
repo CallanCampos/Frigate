@@ -3,7 +3,8 @@
 // SDK threads on fibers, and the platform's own work on the dispatcher's stack: the scanline hook, which draws each
 // line of both screens (port/gfx/screens.c), and at each VBlank the geometry engine's swap (port/gfx/ge/ge_hal.h) and
 // this file's frame hook, which takes the player's input, presents the frame (port/app/present.c) and paces to the DS's
-// 59.8261 frames a second. Only the 3D renderer's workers run beside it, drawing their bands of the 3D frame's lines
+// 59.8261 frames a second, and with --digest hands each VBlank's display state to the digest stream
+// (port/app/digest_stream.c). Only the 3D renderer's workers run beside it, drawing their bands of the 3D frame's lines
 // (port/gfx/workers.h, --render-threads). The sound the ARM7's driver makes goes to the default playback device
 // (port/audio).
 //
@@ -14,6 +15,7 @@
 // controls are in port/app/present.c. Run from an app with stderr on /dev/null, as the Finder opens it, the program
 // writes its messages to ~/Library/Logs/Frigate/<program>.log instead (port/app/message_log.h).
 
+#include "app/digest_stream.h"
 #include "app/message_log.h"
 #include "app/present.h"
 #include "app/record.h"
@@ -103,6 +105,12 @@ static const Option sOptions[] = {
     { "sound-trace", "PATH", 0,
       "writes the sound driver's state after each run of its thread, as pbw-oracle's --sound-trace does the DS's "
       "(port/app/sound_trace.h)" },
+    { "digest", "FILE", 0,
+      "writes the digest stream for the melonDS oracle's comparisons, as pbw-oracle's --digest does the DS's "
+      "(port/app/digest_stream.h): \"#pbwdigest 1\", then a record for each value of GFL's frame count, taken at its "
+      "last VBlank, of the DS-native state the screens are drawn from (VRAM, palettes, OAM, the 2D and 3D registers, "
+      "display capture, the 3D render list and both screens), a hash for each part. One that can't be opened is a bad "
+      "option (status 2); a write that fails, or a count that falls or jumps, stops the run with status 1" },
     { "frame-times", "FILE", 0,
       "writes how long each frame took on this machine to FILE when the run ends, a row a frame in microseconds: the "
       "whole frame, the frame without the pacing wait, and its parts (the 3D frame, the geometry engine, the 2D lines, "
@@ -136,11 +144,13 @@ static const ExitStatus sExitStatuses[] = {
     { 1, "it can't go on or didn't do what it was asked, each cause with a \"port:\" line: the window didn't open, a "
          "write to the run directory failed during the run (a frame's row in frames.tsv, a screen's PNG file or "
          "memory.txt, which stops the run at once), a write to the recording, exhausted recording seeds, a write to "
-         "the sound trace or of --frame-times' file failed, a "
+         "the sound trace, the digest stream or --frame-times' file failed, GFL's frame count fell or jumped "
+         "under --digest, a "
          "module ran out of host memory (an arena, the geometry engine or its command log, the files over memory) or "
          "found a build that can't work (no overlay sections, an archive or a file over memory read through an "
          "address cut to 32 bits)" },
-    { EXIT_BAD_OPTIONS, "bad options, among them a run directory, WAV dump or sound trace that can't be opened" },
+    { EXIT_BAD_OPTIONS,
+      "bad options, among them a run directory, WAV dump, sound trace or digest stream that can't be opened" },
     // 65 and 67 are PORT_CARD_EXIT_STATUS (hal/card/port_card.h) and PORT_PXI_EXIT_STATUS (hal/pxi/pxi_bus.h), whose
     // headers need the decomp's, which this file doesn't include
     { 65, "a save file Frigate can't use (the wrong size, a directory, another emulator's format)" },
@@ -167,6 +177,7 @@ static const char *sScreenshotPath;
 static int sScreenshotWritten;
 static int sRunDirFailed;
 static int sRecordFailed;
+static int sDigestFailed;
 static char sEffectiveTime[20];
 
 // Exhaustion is called from buildSeed: returning to the game would expose an unrecorded fallback seed.
@@ -257,6 +268,12 @@ static void Help(void) {
         fprintf(stderr, "%*s", HELP_STATUS_COLUMN - at, "");
         WriteWrapped(sExitStatuses[i].meaning, HELP_STATUS_COLUMN);
     }
+    // The licence of the third-party code the program carries (port/cmake/app.cmake writes the notice)
+    fputc('\n', stderr);
+    WriteWrapped(
+        "This program includes xxHash (BSD-2-Clause), the digest's hash: its notice is THIRD-PARTY-NOTICES.txt "
+        "beside the program, and in the macOS app's Contents/Resources.",
+        0);
 }
 
 static int IsKnownOption(const char *name, size_t length) {
@@ -450,6 +467,12 @@ static void AppFrame(void) {
             port_os_stop();
         }
     }
+    // The digest stream's look at this VBlank: before the run directory's row, as on the oracle, before the input for
+    // the next pass (port_replay_vblank above sets only the keys, the lid and the touch, which no digest group reads)
+    if (port_digest_stream_active() && !port_digest_stream_frame((uint32_t)sFrames)) {
+        sDigestFailed = 1;
+        port_os_stop();
+    }
     if (port_run_dir_active()) {
         RunDirFrame();
     }
@@ -479,6 +502,7 @@ int main(int argc, char **argv) {
     long long arenaSize;
     const char *audioDump;
     const char *soundTrace;
+    const char *digestPath;
     const char *frameTimes;
     const char *inputPath;
     const char *recordPath;
@@ -543,19 +567,23 @@ int main(int argc, char **argv) {
         Usage();
         return EXIT_BAD_OPTIONS;
     }
+    digestPath = port_app_option("digest");
+    if (digestPath != NULL && *digestPath == '\0') {
+        fprintf(stderr, "port: --digest needs a path\n");
+        Usage();
+        return EXIT_BAD_OPTIONS;
+    }
     recordPath = port_app_option("record");
     inputPath = port_app_option("input");
     runDir = port_app_option("run-dir");
     frameTimes = port_app_option("frame-times");
     if (recordPath != NULL) {
-        const char *protectedPaths[] = { inputPath,
-                                         port_card_save_path(),
-                                         sScreenshotPath,
-                                         audioDump,
-                                         soundTrace,
-                                         frameTimes,
-                                         port_app_option("rom") != NULL ? port_app_option("rom")
-                                                                        : port_rom_default_path() };
+        const char *protectedPaths[] = {
+            inputPath,       port_card_save_path(),
+            sScreenshotPath, audioDump,
+            soundTrace,      digestPath,
+            frameTimes,      port_app_option("rom") != NULL ? port_app_option("rom") : port_rom_default_path()
+        };
         if ((uint64_t)frames > PBW_INPUT_MAX_FRAME ||
             !port_record_create(recordPath, protectedPaths, sizeof(protectedPaths) / sizeof(protectedPaths[0]),
                                 runDir)) {
@@ -674,6 +702,15 @@ int main(int argc, char **argv) {
         }
         return EXIT_BAD_OPTIONS;
     }
+    // The digest stream, which also sets the screens' frame-start hook that port_screens_attach below leaves alone
+    if (digestPath != NULL && !port_digest_stream_open(digestPath)) {
+        port_audio_close();
+        port_sound_trace_close();
+        if (sWindowOpen) {
+            port_present_close();
+        }
+        return EXIT_BAD_OPTIONS;
+    }
     // Nothing pressed, the lid open and the pen up, as the game's first reads must see, or a replay's first frame; then
     // the screens' line drawing
     port_input_set(0, 0);
@@ -731,6 +768,10 @@ int main(int argc, char **argv) {
     // so its dump keeps the header it was opened with, which counts no samples
     port_audio_close();
     if (!port_sound_trace_close() || sRunDirFailed) {
+        status = 1;
+    }
+    // The digest stream, without its last count, whose pass may not have ended
+    if (!port_digest_stream_close() || sDigestFailed) {
         status = 1;
     }
     // --frame-times' file, written now that the run is over

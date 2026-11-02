@@ -1,8 +1,8 @@
 // The DS's two screens as the port draws them (port/gfx/screens.h): the OS core's scanline hook, which draws each
 // visible line of both 2D engines from the state the game left (port/gfx/ref/ds2d.c), sends each line to the screen
-// POWCNT1 gives its engine, feeds engine A's to display capture, and has the 3D frame drawn before line 0. Every
-// screen of the game, raster effects included, is drawn here. With --frame-times, the 3D frame, the 2D lines and
-// capture are timed here (port/hal/os/frame_time.h).
+// POWCNT1 gives its engine, feeds engine A's to display capture, and has the 3D frame drawn before line 0, after the
+// frame-start hook that --digest sets. Every screen of the game, raster effects included, is drawn here. With
+// --frame-times, the 3D frame, the 2D lines and capture are timed here (port/hal/os/frame_time.h).
 #include "gfx/screens.h"
 #include "gfx/capture.h"
 #include "gfx/ge/ge_hal.h"
@@ -24,6 +24,8 @@ static uint32_t sScreens[2][PORT_SCREEN_HEIGHT * PORT_SCREEN_WIDTH];
 // which this file sets for engine A from the 3D renderer
 static PortDs2dSource sSources[2];
 
+void (*port_screens_frame_start_hook)(void);
+
 static void Fill(uint32_t *line, uint32_t color) {
     for (int x = 0; x < PORT_SCREEN_WIDTH; x++) {
         line[x] = color;
@@ -35,6 +37,9 @@ void port_screens_draw_line(int line) {
 
     if (line < 0 || line >= PORT_SCREEN_HEIGHT) {
         return;
+    }
+    if (line == 0 && port_screens_frame_start_hook != NULL) {
+        port_screens_frame_start_hook();
     }
     port_gx_display(&display);
     // The 3D picture, drawn whole before line 0 from the list and registers of the last VBlank (port/gfx/ge/ge_hal.h);

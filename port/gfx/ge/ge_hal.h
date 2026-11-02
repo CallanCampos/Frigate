@@ -12,7 +12,8 @@
 //     bg0_3d_line. The hardware draws the 3D picture during the frame from the list swapped and the registers latched
 //     at the VBlank before it, and keeps drawing that list until the next swap; here a frame whose inputs are all the
 //     last one's keeps the last picture, which is the same.
-//   - port_g3d_reset() runs once the I/O registers' memory is set up: it writes DISP_1DOT_DEPTH's power-on value there.
+//   - port_g3d_reset() runs once the I/O registers' memory is set up: it writes the power-on values of DISP_1DOT_DEPTH,
+//     CLEAR_COLOR and CLEAR_DEPTH there, the ones melonDS gives them.
 // Plain C types only.
 #ifndef PORT_GFX_GE_GE_HAL_H
 #define PORT_GFX_GE_GE_HAL_H
@@ -22,7 +23,9 @@
 struct PortGe;
 
 // The program's engine (made at the first use), and a power-on reset of it, of the picture (transparent) and of the
-// latched rendering registers (all 0), which also writes DISP_1DOT_DEPTH's power-on value, 0x7fff, to 0x04000610
+// latched rendering registers (all 0 but the rear plane's CLEAR_COLOR 0x3f000000 and CLEAR_DEPTH 0x7fff), which also
+// writes the power-on values of DISP_1DOT_DEPTH (0x7fff, to 0x04000610), CLEAR_COLOR (0x3f000000, to 0x04000350) and
+// CLEAR_DEPTH (0x7fff, to 0x04000354), melonDS's (ge_hal.c says where they come from)
 struct PortGe *port_g3d_engine(void);
 void port_g3d_reset(void);
 

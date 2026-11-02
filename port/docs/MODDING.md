@@ -187,11 +187,12 @@ which of these it was:
   [ADR 0013](adr/0013-windows-build-with-msys2-clang64.md)); a game bug that a 64-bit layout made worse is fixed under
   `PLATFORM_PC` ([below](#changing-the-games-code-here)).
 - **Bad options (status 2).** An option the program doesn't know (`port: unknown option ...`) or a value it can't use,
-  with the usage after it: among them a run directory, WAV dump, sound trace or `--frame-times` file that can't be
-  opened. `--help` says what each option takes.
+  with the usage after it: among them a run directory, WAV dump, sound trace, digest stream or `--frame-times` file
+  that can't be opened. `--help` says what each option takes.
 - **Status 1, 65, 66, 67, 72, 73.** The program couldn't go on, and the message says why: the window didn't open, a
-  write to the run directory or the sound trace failed during the run, `--frame-times`' file couldn't be written at its
-  end, the host ran out of memory, or a module found a build that can't work (1); a save it can't use (65), no usable
+  write to the run directory, the sound trace or the digest stream failed during the run, under `--digest` GFL's frame
+  count fell or jumped or a VBlank's state couldn't be encoded (`port: --digest: ...`, which names the frame and the
+  counts or the part of the state), `--frame-times`' file couldn't be written at its end, the host ran out of memory, or a module found a build that can't work (1); a save it can't use (65), no usable
   ROM (66), the PXI bus's arena check (67), every thread waiting for good (72), or the watchdog (73).
 
 ## Changing the game's code here

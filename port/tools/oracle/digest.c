@@ -7,8 +7,8 @@
 #include "digest.h"
 
 // xxHash's single header, from the release port/tools/oracle/xxhash.cmake pins, which the build fetches and puts on a
-// system include path (port/cmake/oracle.cmake). Its functions are inline and private to this file, so that they can't
-// meet the copy of xxHash that melonDS's core links into the oracle
+// system include path (port/cmake/app.cmake, for Frigate's program and the digest's tests). Its functions are inline
+// and private to this file, so that they can't meet the copy of xxHash that melonDS's core links into the oracle
 #define XXH_INLINE_ALL
 #include "xxhash.h"
 #include <inttypes.h>
@@ -701,6 +701,89 @@ int pbw_digest_write_record(FILE *file, const PbwDigestRecord *record) {
     }
     fputc('\n', file);
     return ferror(file) ? -1 : 0;
+}
+
+// --- The stream's writer
+
+int pbw_digest_writer_open(PbwDigestWriter *writer, FILE *file) {
+    memset(writer, 0, sizeof(*writer));
+    writer->file = file;
+    if (pbw_digest_write_header(file) != 0 || fflush(file) != 0) {
+        writer->failed = 1;
+        snprintf(writer->error, sizeof(writer->error), "can't write the stream's header");
+        return -1;
+    }
+    return 0;
+}
+
+static int WriterFail(PbwDigestWriter *writer) {
+    writer->failed = 1;
+    return -1;
+}
+
+int pbw_digest_writer_vblank(PbwDigestWriter *writer, uint32_t count, uint32_t frame, const PbwDigestFrame *state) {
+    PbwDigestRecord record;
+    PbwDigestStatus status;
+    int group = -1;
+
+    if (writer->failed) {
+        return -1;
+    }
+    if (!writer->started) {
+        // The start: a count of 1 at the VBlank after one whose count was 0. Anything before is nothing to record
+        int start = writer->seen && writer->previous == 0 && count == 1;
+        writer->seen = 1;
+        writer->previous = count;
+        if (!start) {
+            return 0;
+        }
+    } else if (count != writer->record.count && count != writer->record.count + 1) {
+        snprintf(writer->error, sizeof(writer->error),
+                 "frame %" PRIu32 ": GFL's frame count is %" PRIu32 " after %" PRIu32
+                 ": after the stream's start it only stays or rises by one",
+                 frame, count, writer->record.count);
+        return WriterFail(writer);
+    }
+    memset(&record, 0, sizeof(record));
+    status = pbw_digest_record_frame(&record, state, &group);
+    if (status != PBW_DIGEST_OK) {
+        snprintf(writer->error, sizeof(writer->error), "frame %" PRIu32 ", count %" PRIu32 ": %s can't be encoded (%s)",
+                 frame, count, pbw_digest_group_name(group) != NULL ? pbw_digest_group_name(group) : "a group",
+                 status == PBW_DIGEST_NO_MEMORY ? "out of memory" : "the structure breaks its own rules");
+        return WriterFail(writer);
+    }
+    record.count = count;
+    record.frame = frame;
+    record.vblanks = 1;
+    if (writer->started && count == writer->record.count) {
+        // A later VBlank of the pending count: its state is the record's now
+        record.vblanks = writer->record.vblanks + 1;
+    } else if (writer->started) {
+        // The next count: the pending record's count had its last VBlank at the one before
+        if (pbw_digest_write_record(writer->file, &writer->record) != 0 || fflush(writer->file) != 0) {
+            snprintf(writer->error, sizeof(writer->error), "frame %" PRIu32 ": can't write count %" PRIu32 "'s record",
+                     frame, writer->record.count);
+            return WriterFail(writer);
+        }
+    }
+    writer->started = 1;
+    writer->record = record;
+    return 0;
+}
+
+int pbw_digest_writer_close(PbwDigestWriter *writer) {
+    int failed = writer->failed;
+
+    // The pending record isn't written: its count may have had VBlanks still to come
+    if (writer->file != NULL && (fflush(writer->file) != 0 || ferror(writer->file))) {
+        if (!failed) {
+            snprintf(writer->error, sizeof(writer->error), "can't write the stream");
+        }
+        failed = 1;
+    }
+    writer->file = NULL;
+    writer->failed = failed;
+    return failed ? -1 : 0;
 }
 
 // The longest line a reader takes, and the most fields a line has

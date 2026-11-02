@@ -10,10 +10,10 @@
 # Pokédex, and the routes'), which the sequences start from; and the sound of the opening and the title (the ARM7 sound
 # driver run by run; its output: a stream and a cry to the bit, the music by its envelope and levels).
 #
-# The input file reader (pbwinput.c, which the port can compile as it is), the per-screen 3D decision (display3d.c),
-# the per-game-frame digest's canonical encoding (digest.c, with xxHash's header, which every build fetches at
-# configure time as port/tools/oracle/xxhash.cmake pins it), compare.py and sound.py are tested in every build: they
-# need neither melonDS nor a ROM. The oracle itself is a test tool, never part of Frigate (PLAN.md §1): it is built
+# The input file reader (pbwinput.c), the per-screen 3D decision (display3d.c) and the per-game-frame digest's
+# canonical encoding and stream writer (digest.c, with xxHash's header, which every build fetches at configure time as
+# port/tools/oracle/xxhash.cmake pins it: port/cmake/app.cmake does, since Frigate's program compiles all three too),
+# compare.py and sound.py are tested in every build: they need neither melonDS nor a ROM. The oracle itself is a test tool, never part of Frigate (PLAN.md §1): it is built
 # only when the port is configured with -DPORT_BUILD_ORACLE=ON, which fetches melonDS's pinned release
 # (port/tools/oracle/melonds.cmake) into the build directory at configure time and builds the oracle as a project of
 # its own (port/tools/oracle/CMakeLists.txt) in <build>/oracle. Normal builds and CI never download melonDS.
@@ -41,20 +41,12 @@ foreach(unit IN ITEMS pbwinput display3d)
     endforeach()
 endforeach()
 
-# xxHash, whose header gives the digest its hash: the release xxhash.cmake pins, fetched at configure time as minicoro
-# is (os.cmake). Its archive has no CMakeLists.txt at its top, so making it available only unpacks it
-include("${port_oracle_dir}/xxhash.cmake")
-include(FetchContent)
-FetchContent_Declare(xxhash
-    URL "${DIGEST_XXHASH_URL}"
-    URL_HASH "SHA256=${DIGEST_XXHASH_SHA256}")
-FetchContent_MakeAvailable(xxhash)
-
 # The canonical per-game-frame digest (digest.c, ADR 0031) on made-up states in melonDS's shape and the port's, plain
 # and under the sanitizers: both shapes' canonical words, the masks and decodes of melonDS 1.1, the render list's
-# vertices and depth, the VRAM a capture of 3D holds, the hash against xxHash's known answers, and the stream's format
-# and comparison. xxHash's header is on a system include path, so that its own code is held to its own warnings, not to
-# the tests' -Werror; neither program compiles digest.c yet
+# vertices and depth, the VRAM a capture of 3D holds, the hash against xxHash's known answers, the stream's format and
+# comparison, and the writer both programs call at every VBlank. xxHash's header, which port/cmake/app.cmake fetched
+# (xxhash_SOURCE_DIR), is on a system include path, so that its own code is held to its own warnings, not to the tests'
+# -Werror
 foreach(variant IN ITEMS plain sanitized)
     set(target port_test_oracle_digest_${variant})
     add_executable(${target} "${port_oracle_tests}/test_digest.c" "${port_oracle_dir}/digest.c")
@@ -110,6 +102,8 @@ if(PORT_BUILD_ORACLE)
         CMAKE_GENERATOR "${CMAKE_GENERATOR}"
         CMAKE_ARGS
             "-DMELONDS_SOURCE_DIR=${port_melonds_source}"
+            # The xxHash release port/cmake/app.cmake fetched, for the digest's hash (digest.c, --digest)
+            "-DXXHASH_SOURCE_DIR=${xxhash_SOURCE_DIR}"
             "-DCMAKE_BUILD_TYPE=Release"
             "-DORACLE_SANITIZE=${PORT_ORACLE_SANITIZE}"
         # Its own sources change without the port's build noticing; its ninja is quick when nothing did

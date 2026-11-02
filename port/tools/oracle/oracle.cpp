@@ -2,13 +2,14 @@
 // deterministic, plays an input file, and writes the screens and named memory at chosen frames, for compare.py to hold
 // Frigate's program against, and the sound, for sound.py: the mixer's output sample by sample (--audio-dump) and the
 // ARM7 sound driver's state after each run of its thread (--sound-trace, sndtrace.h), which hold the game's music,
-// sound effects and cries. It is a test tool only: it is never linked into or shipped with the port (PLAN.md §1), and
+// sound effects and cries; and with --digest, the per-game-frame digest of the display state every screen is drawn from
+// (digest.h, ADR 0031). It is a test tool only: it is never linked into or shipped with the port (PLAN.md §1), and
 // it is built only with -DPORT_BUILD_ORACLE=ON (port/cmake/oracle.cmake). README.md in this directory has the formats
 // and how frames line up with the port's.
 //
 //   pbw-oracle --rom PATH --out DIR --frames N [--input FILE] [--screens LIST] [--dump SPEC]... [--config DIR]
 //              [--symbols FILE]... [--counter TARGET] [--time "YYYY-MM-DD HH:MM:SS"] [--save FILE]
-//              [--save-out FILE] [--audio-dump FILE] [--sound-trace FILE] [--verbose]
+//              [--save-out FILE] [--audio-dump FILE] [--sound-trace FILE] [--digest FILE] [--verbose]
 //
 //   --rom PATH       the player's dump (orig/baserom_b2_us.nds)
 //   --out DIR        where the run's files go (created; files of an earlier run there are replaced)
@@ -35,15 +36,24 @@
 //                    1024 cycles from power-on, before melonDS resamples it for a sound card
 //   --sound-trace FILE
 //                    writes the ARM7 sound driver's state after each run of its thread (sndtrace.h); needs --config
+//   --digest FILE    writes the digest stream ("#pbwdigest 1", README.md "Digests"): at each VBlank, after the dumps
+//                    and before the input of the next pass, the display state melonDS keeps (VRAM, palettes, OAM, the
+//                    2D and 3D registers, the capture, the render list the last swap closed, the screens just drawn)
+//                    goes to the writer Frigate's --digest shares (digest.c), which keeps the last VBlank of each value
+//                    of GFL's frame count; needs --counter. It also checks at each frame that the screens it took at
+//                    the VBlank are the ones the frame ends with, which frames.tsv hashes
 //   --verbose        melonDS's own informational log
 //
-// Exit statuses: 0 when every frame ran, 1 for an error writing the results, 2 for bad options (an input file for the
-// other version among them), 3 for a ROM melonDS can't load, 4 when the console stopped before the last frame.
+// Exit statuses: 0 when every frame ran, 1 for an error writing the results (the digest stream's among them: a write,
+// a count that falls or jumps, a state that can't be encoded, screens that aren't the frame's), 2 for bad options (an
+// input file for the other version, a digest stream that can't be written or has no counter, among them), 3 for a ROM
+// melonDS can't load, 4 when the console stopped before the last frame.
 #include "oracle.h"
 #include "Args.h"
 #include "NDS.h"
 #include "NDSCart.h"
 #include "SPI_Firmware.h"
+#include "digest.h"
 #include "display3d.h"
 #include "pbwinput.h"
 #include "pngout.h"
@@ -246,6 +256,7 @@ struct Options {
     std::string saveOut;
     std::string audioDump;
     std::string soundTrace;
+    std::string digest;
     bool verbose = false;
 };
 
@@ -254,7 +265,7 @@ void Usage() {
                  "usage: pbw-oracle --rom PATH --out DIR --frames N [--input FILE] [--screens LIST] [--dump SPEC]...\n"
                  "                  [--config DIR] [--symbols FILE]... [--counter TARGET]\n"
                  "                  [--time \"YYYY-MM-DD HH:MM:SS\"] [--save FILE] [--save-out FILE]\n"
-                 "                  [--audio-dump FILE] [--sound-trace FILE] [--verbose]\n");
+                 "                  [--audio-dump FILE] [--sound-trace FILE] [--digest FILE] [--verbose]\n");
 }
 
 bool ParseOptions(int argc, char **argv, Options &options) {
@@ -318,6 +329,8 @@ bool ParseOptions(int argc, char **argv, Options &options) {
             options.audioDump = value;
         } else if (arg == "--sound-trace") {
             options.soundTrace = value;
+        } else if (arg == "--digest") {
+            options.digest = value;
         } else {
             Fail("unknown option %s", arg.c_str());
             return false;
@@ -594,6 +607,8 @@ class Oracle {
     uint32_t Peek7_32(uint32_t address);
     uint64_t PeekAlarmFire();
     bool WriteFrame(uint32_t frame);
+    void DigestVBlank(uint32_t frame);
+    bool CheckDigestScreens(uint32_t frame);
     void TraceRun();
     bool WriteAudio();
     bool CloseAudio();
@@ -648,6 +663,15 @@ class Oracle {
     uint64_t audioBytes_ = 0;
     bool audioFull_ = false;
     FILE *trace_ = nullptr;
+    // The digest stream (--digest): the file, its writer, the frame handed to it at each VBlank with the render list in
+    // the digest's form, and the screens' hashes it took there, which the frame's end must give again
+    FILE *digest_ = nullptr;
+    PbwDigestWriter digestWriter_{};
+    bool digestFailed_ = false;
+    PbwDigestFrame digestFrame_{};
+    std::vector<PbwDigestPolygon> digestPolygons_;
+    std::vector<PbwDigestVertex> digestVertices_;
+    uint64_t digestScreens_[2] = {};
     uint32_t sharedWorkPointer_ = 0;
     bool traceStarted_ = false;
     uint32_t traceSeed_ = 0;
@@ -783,6 +807,19 @@ bool Oracle::Prepare() {
             return false;
         }
         record_.resize(PBW_SNDTRACE_RECORD_SIZE);
+    }
+    if (!options_.digest.empty()) {
+        if (!haveCounter_) {
+            Fail("--digest needs GFL's frame count (--counter): a record is a value of the count");
+            return false;
+        }
+        digest_ = std::fopen(options_.digest.c_str(), "w");
+        if (digest_ == nullptr || pbw_digest_writer_open(&digestWriter_, digest_) != 0) {
+            Fail("can't write the digest stream %s", options_.digest.c_str());
+            return false;
+        }
+        digestPolygons_.resize(2048);
+        digestVertices_.resize(6144);
     }
     return true;
 }
@@ -1117,10 +1154,158 @@ void Oracle::OnVBlank(uint32_t frame) {
             }
         }
     }
+    // The digest of this VBlank, before the input of the next pass, which changes no emulated state either
+    if (digest_ != nullptr && !digestFailed_) {
+        DigestVBlank(frame);
+    }
     // The state the game reads after this VBlank: the file's frame on its count, game frames from GFL's frame count
     inputFrame = pbw_input_frame_at_vblank(&input_, &clock_, frame, counter_);
     gameFrame_ = clock_.frames + 1;
     ApplyInput(inputFrame);
+}
+
+// The digest's state at this VBlank, as melonDS keeps it (digest.h; README.md, "Digests"), handed to the stream's
+// writer. VRAM, palettes and OAM are melonDS's own memory; the 2D registers its units' decoded fields; POWCNT1 and
+// WRAMCNT the NDS's (WRAMCnt through ARM9IORead8, which returns it with no side effect); the 3D rendering registers
+// GPU3D's live ones, which the VBlank's latch has just copied for the next frame; the render list the bank of polygon
+// RAM the last swap closed, its first RenderNumPolygons polygons in the order they came, each vertex an index into that
+// bank's vertex RAM and its depth computed from clip Z and W as SubmitPolygon does; the capture and the banks' 3D as
+// SampleDisplay left them for this frame; and the screens the 2D renderer has just drawn into the back buffer, which
+// the frame's end makes the front one (GPU::FinishFrame), the one WriteFrame hashes
+void Oracle::DigestVBlank(uint32_t frame) {
+    melonDS::GPU &gpu = nds_->GPU;
+    melonDS::GPU3D &g3 = gpu.GPU3D;
+    PbwDigestFrame &out = digestFrame_;
+    const int back = gpu.FrontBuffer ? 0 : 1;
+    const uint32_t polygonBase = g3.CurRAMBank ? 0 : 2048;
+    const uint32_t vertexBase = g3.CurRAMBank ? 0 : 6144;
+    const melonDS::Vertex *bankVertices = &g3.VertexRAM[vertexBase];
+
+    out = PbwDigestFrame{};
+    for (int bank = 0; bank < PBW_DIGEST_VRAM_BANKS; bank++) {
+        for (unsigned page = 0; page < pbw_digest_vram_pages(bank); page++) {
+            out.vram.pages[bank][page] = gpu.VRAM[bank] + page * PBW_DIGEST_VRAM_PAGE_SIZE;
+        }
+        out.vram.vramcnt[bank] = gpu.VRAMCNT[bank];
+    }
+    out.palette = gpu.Palette;
+    out.oam = gpu.OAM;
+    for (int engine = 0; engine < 2; engine++) {
+        const melonDS::GPU2D::Unit &unit = engine == PBW_DIGEST_ENGINE_A ? gpu.GPU2D_A : gpu.GPU2D_B;
+        PbwDigestRegs2d &regs = out.regs2d[engine];
+        regs.dispcnt = unit.DispCnt;
+        for (int bg = 0; bg < 4; bg++) {
+            regs.bgcnt[bg] = unit.BGCnt[bg];
+            regs.bgHofs[bg] = unit.BGXPos[bg];
+            regs.bgVofs[bg] = unit.BGYPos[bg];
+        }
+        for (int i = 0; i < 2; i++) {
+            regs.bgPa[i] = static_cast<uint16_t>(unit.BGRotA[i]);
+            regs.bgPb[i] = static_cast<uint16_t>(unit.BGRotB[i]);
+            regs.bgPc[i] = static_cast<uint16_t>(unit.BGRotC[i]);
+            regs.bgPd[i] = static_cast<uint16_t>(unit.BGRotD[i]);
+            // The values written, not the reference points the renderer moves from line to line (BGXRefInternal)
+            regs.bgX[i] = static_cast<uint32_t>(unit.BGXRef[i]);
+            regs.bgY[i] = static_cast<uint32_t>(unit.BGYRef[i]);
+        }
+        std::memcpy(regs.win0, unit.Win0Coords, sizeof(regs.win0));
+        std::memcpy(regs.win1, unit.Win1Coords, sizeof(regs.win1));
+        std::memcpy(regs.winCnt, unit.WinCnt, sizeof(regs.winCnt));
+        std::memcpy(regs.bgMosaic, unit.BGMosaicSize, sizeof(regs.bgMosaic));
+        std::memcpy(regs.objMosaic, unit.OBJMosaicSize, sizeof(regs.objMosaic));
+        regs.bldcnt = unit.BlendCnt;
+        regs.bldalpha = unit.BlendAlpha;
+        regs.bldy = unit.EVY;
+        regs.masterBright = unit.MasterBrightness;
+        regs.dispcapcnt = unit.CaptureCnt;
+    }
+    out.sys.powcnt1 = nds_->PowerControl9;
+    out.sys.wramcnt = nds_->ARM9IORead8(0x04000247);
+    out.regs3d.disp3dcnt = g3.DispCnt;
+    out.regs3d.alphaTestRef = g3.AlphaRefVal;
+    out.regs3d.clearColor = g3.ClearAttr1;
+    out.regs3d.clearDepth = static_cast<uint16_t>(g3.ClearAttr2 & 0xffff);
+    out.regs3d.clearOffset = static_cast<uint16_t>(g3.ClearAttr2 >> 16);
+    out.regs3d.fogColor = g3.FogColor;
+    out.regs3d.fogOffset = static_cast<uint16_t>(g3.FogOffset);
+    for (int i = 0; i < 32; i++) {
+        out.regs3d.fogTable[i] = g3.FogDensityTable[i];
+        out.regs3d.toonTable[i] = g3.ToonTable[i];
+    }
+    for (int i = 0; i < 8; i++) {
+        out.regs3d.edgeColor[i] = g3.EdgeTable[i];
+    }
+    // The render list: each polygon's vertices as indices into its bank's vertex RAM, whose vertices the digest's list
+    // holds where they are, so that a strip's shared vertices stay shared
+    uint32_t vertexCount = 0;
+    for (uint32_t i = 0; i < g3.RenderNumPolygons && i < digestPolygons_.size(); i++) {
+        const melonDS::Polygon &polygon = g3.PolygonRAM[polygonBase + i];
+        PbwDigestPolygon &to = digestPolygons_[i];
+        to.attr = polygon.Attr;
+        to.texParam = polygon.TexParam;
+        to.plttBase = polygon.TexPalette;
+        to.vertexCount = polygon.NumVertices;
+        to.front = polygon.FacingView ? 1 : 0;
+        for (uint32_t j = 0; j < polygon.NumVertices && j < PBW_DIGEST_POLYGON_VERTICES; j++) {
+            const ptrdiff_t index = polygon.Vertices[j] - bankVertices;
+            if (polygon.Vertices[j] == nullptr || index < 0 || index >= 6144) {
+                Fail("--digest: frame %u: polygon %u's vertex %u isn't in the closed bank's vertex RAM", frame, i, j);
+                digestFailed_ = true;
+                return;
+            }
+            to.vertices[j] = static_cast<uint32_t>(index);
+            if (static_cast<uint32_t>(index) + 1 > vertexCount) {
+                vertexCount = static_cast<uint32_t>(index) + 1;
+            }
+        }
+    }
+    for (uint32_t i = 0; i < vertexCount; i++) {
+        const melonDS::Vertex &vertex = bankVertices[i];
+        PbwDigestVertex &to = digestVertices_[i];
+        to.x = static_cast<uint32_t>(vertex.FinalPosition[0]);
+        to.y = static_cast<uint32_t>(vertex.FinalPosition[1]);
+        to.depth = pbw_digest_zbuffer_depth(vertex.Position[2], static_cast<uint32_t>(vertex.Position[3]));
+        to.w = static_cast<uint32_t>(vertex.Position[3]) & 0xffffffu;
+        for (int c = 0; c < 3; c++) {
+            to.color[c] = static_cast<uint32_t>(vertex.FinalColor[c]);
+        }
+        to.s = static_cast<uint16_t>(vertex.TexCoords[0]);
+        to.t = static_cast<uint16_t>(vertex.TexCoords[1]);
+    }
+    out.list.polygons = digestPolygons_.data();
+    out.list.polygonCount = g3.RenderNumPolygons;
+    out.list.vertices = digestVertices_.data();
+    out.list.vertexCount = vertexCount;
+    out.list.swapParam = g3.FlushAttributes & 3;
+    out.list.ramOverflow = (g3.DispCnt & (1u << 13)) != 0 ? 1 : 0;
+    out.capture = capture_;
+    out.banks3d = banks_;
+    out.screens[0] = gpu.Framebuffer[back][0].get();
+    out.screens[1] = gpu.Framebuffer[back][1].get();
+    if (pbw_digest_group_hash(&out, PBW_DIGEST_SCREEN_TOP, &digestScreens_[0]) != PBW_DIGEST_OK ||
+        pbw_digest_group_hash(&out, PBW_DIGEST_SCREEN_BOTTOM, &digestScreens_[1]) != PBW_DIGEST_OK ||
+        pbw_digest_writer_vblank(&digestWriter_, counter_, frame, &out) != 0) {
+        Fail("--digest %s: %s", options_.digest.c_str(), digestWriter_.error);
+        digestFailed_ = true;
+    }
+}
+
+// At the frame's end, the screens the frame shows, which WriteFrame hashes, must be the ones DigestVBlank took from the
+// back buffer at the VBlank: else the digest's screens aren't frames.tsv's
+bool Oracle::CheckDigestScreens(uint32_t frame) {
+    const int front = nds_->GPU.FrontBuffer;
+    PbwDigestFrame screens{};
+    uint64_t hashes[2] = {};
+
+    screens.screens[0] = nds_->GPU.Framebuffer[front][0].get();
+    screens.screens[1] = nds_->GPU.Framebuffer[front][1].get();
+    if (pbw_digest_group_hash(&screens, PBW_DIGEST_SCREEN_TOP, &hashes[0]) != PBW_DIGEST_OK ||
+        pbw_digest_group_hash(&screens, PBW_DIGEST_SCREEN_BOTTOM, &hashes[1]) != PBW_DIGEST_OK ||
+        hashes[0] != digestScreens_[0] || hashes[1] != digestScreens_[1]) {
+        Fail("--digest: frame %u ends with other screens than the back buffer held at its VBlank", frame);
+        return false;
+    }
+    return true;
 }
 
 bool Oracle::WriteFrame(uint32_t frame) {
@@ -1245,6 +1430,11 @@ int Oracle::Run() {
             status = 1;
             break;
         }
+        // With --digest: the digest's writer failed at the VBlank, or the frame's screens aren't the ones it took
+        if (digest_ != nullptr && (digestFailed_ || (vblankSeen_ && !CheckDigestScreens(frame)))) {
+            status = 1;
+            break;
+        }
         if (stopped_) {
             Fail("the console stopped (melonDS reason %d) at frame %u", stopReason_, frame);
             status = 4;
@@ -1273,6 +1463,7 @@ int Oracle::Run() {
         std::fprintf(run, "save_written: %d\n", saveWritten_ ? 1 : 0);
         std::fprintf(run, "audio_dump: %s\n", options_.audioDump.empty() ? "-" : options_.audioDump.c_str());
         std::fprintf(run, "sound_trace: %s\n", options_.soundTrace.empty() ? "-" : options_.soundTrace.c_str());
+        std::fprintf(run, "digest: %s\n", options_.digest.empty() ? "-" : options_.digest.c_str());
         std::fprintf(run, "status: %d\n", status);
         std::fclose(run);
     }
@@ -1298,6 +1489,17 @@ int Oracle::Run() {
     if (trace_ != nullptr && std::fclose(trace_) != 0) {
         Fail("can't write the sound trace %s", options_.soundTrace.c_str());
         status = status != 0 ? status : 1;
+    }
+    // The digest stream, without its last count, whose pass may have had VBlanks still to come
+    if (digest_ != nullptr) {
+        bool closed = pbw_digest_writer_close(&digestWriter_) == 0;
+        closed = std::fclose(digest_) == 0 && closed;
+        if (!closed && !digestFailed_) {
+            Fail("can't write the digest stream %s", options_.digest.c_str());
+        }
+        if (!closed) {
+            status = status != 0 ? status : 1;
+        }
     }
     pbw_input_free(&input_);
     return status;

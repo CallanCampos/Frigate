@@ -1,7 +1,7 @@
 // Display capture (port/gfx/capture.h): engine A's DISPCAPCNT, which writes a line of engine A's picture, the 3D
 // layer, a VRAM bank or a blend of two into VRAM bank A to D as port/gfx/screens.c draws each line. The game uses it
 // for motion blur, for 3D on both screens (src/gfl/double3Ddisp.c) and for the title screen's picture in VRAM D
-// (src/ov162/title.c).
+// (src/ov162/title.c). At line 96 it also notes what the unit had, for the digest stream (port/app/digest_stream.c).
 #include "gfx/capture.h"
 #include "gfx/ref/ds2d.h"
 #include "hal/gx/vram.h"
@@ -24,6 +24,10 @@
 
 // Whether DISPCAPCNT's enable bit was set at the start of this frame's line 0: the capture runs for the frame then
 static int sLatched;
+// The frame's record at line 96 (capture.h), for the digest stream
+static PortCaptureRecord sRecord;
+// The line of the record: pbw-oracle's PROBE_LINE
+#define RECORD_LINE 96
 
 static unsigned Min16(unsigned value) {
     return value > 16 ? 16 : value;
@@ -181,12 +185,21 @@ void port_capture_draw_line(const PortDs2dSource *engine_a, int line) {
     dispcapcnt = Read32(engine_a->io + IO_DISPCAPCNT);
     if (line == 0) {
         sLatched = (dispcapcnt & DISPCAPCNT_ENABLE) != 0;
+        memset(&sRecord, 0, sizeof(sRecord));
+    }
+    dispcnt = Read32(engine_a->io + IO_DISPCNT);
+    bank = (dispcapcnt >> 16) & 3;
+    if (line == RECORD_LINE) {
+        // Whether or not the unit runs, as the oracle's probe reads melonDS's registers
+        LcdcBankPages(bank, dst);
+        sRecord.ran = sLatched;
+        sRecord.dispcapcnt = dispcapcnt;
+        sRecord.dispcnt_a = dispcnt;
+        sRecord.dest_in_lcdc = dst[0] != NULL;
     }
     if (!sLatched) {
         return;
     }
-    dispcnt = Read32(engine_a->io + IO_DISPCNT);
-    bank = (dispcapcnt >> 16) & 3;
     LcdcBankPages(bank, dst);
     LcdcBankPages((dispcnt >> 18) & 3, srcB);
     written = port_capture_line(dispcapcnt, dispcnt, line, port_ds2d_capture_source_a(), engine_a->bg0_3d_line, dst,
@@ -216,4 +229,9 @@ void port_capture_draw_line(const PortDs2dSource *engine_a, int line) {
 
 void port_capture_reset(void) {
     sLatched = 0;
+    memset(&sRecord, 0, sizeof(sRecord));
+}
+
+const PortCaptureRecord *port_capture_record(void) {
+    return &sRecord;
 }

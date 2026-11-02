@@ -1,8 +1,8 @@
 // The geometry engine and the 3D renderer in the running program (ge_hal.h): one engine fed from the platform layer's
-// log of geometry writes (port/hal/hw), the readback registers' values for hw.c's accessors, the swap at each
-// VBlank, and the 3D frame rasterized before line 0 for engine A's BG0, unless it would be the last one again. Every 3D
-// scene of the game (the title screen, the field, battles, Pokémon sprites) reaches the screens through here. With
-// --frame-times, the geometry engine's runs are timed here (port/hal/os/frame_time.h).
+// log of geometry writes (port/hal/hw), the readback registers' values for hw.c's accessors, the 3D registers' power-on
+// values, the swap at each VBlank, and the 3D frame rasterized before line 0 for engine A's BG0, unless it would be the
+// last one again. Every 3D scene of the game (the title screen, the field, battles, Pokémon sprites) reaches the
+// screens through here. With --frame-times, the geometry engine's runs are timed here (port/hal/os/frame_time.h).
 #include "gfx/ge/ge_hal.h"
 #include "gfx/ge/ge.h"
 #include "gfx/ref/ds3d.h"
@@ -15,6 +15,8 @@
 
 #define REG_IO 0x04000000u
 #define REG_DISP3DCNT 0x04000060u
+#define REG_CLEAR_COLOR 0x04000350u
+#define REG_CLEAR_DEPTH 0x04000354u
 #define REG_DISP_1DOT_DEPTH 0x04000610u
 #define DISP3DCNT_UNDERFLOW 0x1000u
 #define DISP3DCNT_RAM_OVERFLOW 0x2000u
@@ -79,6 +81,10 @@ static void Write16(uint32_t address, uint16_t value) {
     memcpy(port_hw_pointer(address), &value, sizeof(value));
 }
 
+static void Write32(uint32_t address, uint32_t value) {
+    memcpy(port_hw_pointer(address), &value, sizeof(value));
+}
+
 void port_g3d_reset(void) {
     port_ge_reset(port_g3d_engine());
     memset(sFrame, 0, sizeof(sFrame));
@@ -89,6 +95,19 @@ void port_g3d_reset(void) {
     sDisp3dcntRouted = 0;
     // DISP_1DOT_DEPTH's power-on value is the engine's, which hides no dot (ge.h); every sync copies the register
     Write16(REG_DISP_1DOT_DEPTH, 0x7fff);
+    // The rear plane's power-on values are melonDS 1.1's, the oracle's: CLEAR_COLOR 0x3f000000 (black, alpha 0,
+    // polygon ID 63, no fog) and CLEAR_DEPTH 0x7fff, the farthest, in the registers (src/GPU3D.cpp, GPU3D::Reset,
+    // lines 253-254) and in the copy the renderer latched (ResetRenderingState, lines 184-185). melonDS's own note
+    // there (line 248) says these initial values aren't confirmed on hardware. No picture changes: nothing before the
+    // title uses the 3D layer (port/tools/oracle/README.md), and the title's 3D setup (GFL_G3DSysCreate,
+    // src/ov162/title.c:499) leaves the same values before its first 3D frame: G3X_Init writes CLEAR_COLOR 0 and
+    // CLEAR_DEPTH 0x7fff (lib/nitro/src/gx/g3x.c:23-24, through NNS_G3dInit at src/gfl/g3d_system.c:125), then
+    // G3X_SetClearColor 0x3f000000 and 0x7fff (src/gfl/g3d_system.c:186). Until then the registers hold melonDS's
+    // values here too, which the digest's g3d.regs compares from power-on (port/tools/oracle/README.md, "Digests")
+    Write32(REG_CLEAR_COLOR, 0x3f000000);
+    Write16(REG_CLEAR_DEPTH, 0x7fff);
+    sRegs.clear_color = 0x3f000000;
+    sRegs.clear_depth = 0x7fff;
 }
 
 static void ApplyGxStatWrite(void) {

@@ -7,7 +7,8 @@
 //   of either engine (dual-screen 3D, src/gfl/double3Ddisp.c).
 // A bank holds 3D from a capture of 3D into it until a capture without 3D covers it, or until its captured region
 // changes otherwise (the CPU or a DMA writing it), which a hash of the region detects. Plain C11 without melonDS, so
-// that the tests can run it on made-up registers.
+// that the tests can run it on made-up registers, and so that Frigate's digest stream (port/app/digest_stream.c) tracks
+// the banks' 3D with the same code as the oracle, for the digest's capture group and the VRAM it zeroes (digest.h).
 #ifndef PORT_TOOLS_ORACLE_DISPLAY3D_H
 #define PORT_TOOLS_ORACLE_DISPLAY3D_H
 

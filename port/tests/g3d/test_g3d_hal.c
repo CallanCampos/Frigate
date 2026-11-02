@@ -4,6 +4,7 @@
 // game's register stores would, then reads the registers through the accessors port/hal/hw/hw.c forwards to.
 #include "gfx/ge/ge.h"
 #include "gfx/ge/ge_hal.h"
+#include "gfx/ref/ds3d.h"
 #include "hal/gx/vram.h"
 #include "hal/hw/hw.h"
 #include <stdio.h>
@@ -202,6 +203,31 @@ static void TestOneDotDepth(void) {
     Io16(0x610, 0);
 }
 
+// The rear plane's power-on values are melonDS's (GPU3D::Reset): the reset writes CLEAR_COLOR 0x3f000000 and
+// CLEAR_DEPTH 0x7fff, whatever the registers held, and the renderer's latched copy holds them too, so that a frame
+// drawn before the first VBlank is cleared to polygon ID 63 at the farthest depth (ResetRenderingState), still
+// transparent. The game's first write replaces them, and the next VBlank latches it
+static void TestPowerOnClear(void) {
+    Io32(0x350, 0x12345678);
+    Io16(0x354, 0x1234);
+    port_g3d_reset();
+    CHECK_HEX(Read32(&sIo[0x350]), 0x3f000000);
+    CHECK_HEX(Read16(&sIo[0x354]), 0x7fff);
+    CHECK_HEX(Read16(&sIo[0x610]), 0x7fff);
+    port_g3d_render_frame();
+    CHECK_HEX(port_ds3d_polygon_id(12, 12), 63);
+    CHECK_HEX(port_ds3d_depth(12, 12), 0xffffff);
+    CHECK_HEX(port_g3d_line(12)[12], 0);
+    Io32(0x350, 0x2a000000);
+    Io16(0x354, 0);
+    port_g3d_vblank();
+    port_g3d_render_frame();
+    CHECK_HEX(port_ds3d_polygon_id(12, 12), 42);
+    CHECK_HEX(port_ds3d_depth(12, 12), 0);
+    Io32(0x350, 0);
+    Io16(0x354, 0);
+}
+
 // The frame: commands, SWAP_BUFFERS, the VBlank, then the picture drawn from the registers the VBlank latched and the
 // texture slots. Until the next swap the same list is drawn every frame
 static void TestFrame(void) {
@@ -209,7 +235,7 @@ static void TestFrame(void) {
     Io32(0x350, 0x1fu << 10 | 31u << 16); // clear: blue, opaque
     Io16(0x354, 0x7fff);
     Io16(0x60, 1); // textures on
-    // Nothing latched yet: the registers are all 0, a transparent rear plane
+    // Nothing latched yet: the power-on registers, a transparent rear plane
     port_g3d_render_frame();
     CHECK_HEX(port_g3d_line(12)[12], 0);
     port_g3d_vblank();
@@ -364,6 +390,7 @@ int main(void) {
     TestReadbacks();
     TestGxstatWrites();
     TestOneDotDepth();
+    TestPowerOnClear();
     TestFrame();
     TestKeep();
     TestDisp3dcnt();

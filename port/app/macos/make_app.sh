@@ -2,16 +2,20 @@
 # Builds the macOS app from the program the host build made (port/cmake/macos_app.cmake runs it as the target
 # <program>_app): the app ("Frigate Black 2.app") with the program in Contents/MacOS, the libraries it loads from
 # outside macOS (SDL3, when it isn't linked statically) in Contents/Frameworks, the version's icon in
-# Contents/Resources/AppIcon.icns (made by make_icns.sh from port/assets/branding) and an Info.plist from
-# port/app/macos/Info.plist.in, signed ad hoc (ADR 0003: no Apple Developer account, no notarization, no hardened
+# Contents/Resources/AppIcon.icns (made by make_icns.sh from port/assets/branding), the notice of the third-party code
+# the program carries in Contents/Resources/THIRD-PARTY-NOTICES.txt (xxHash's, which port/cmake/app.cmake writes) and an
+# Info.plist from port/app/macos/Info.plist.in, signed ad hoc (ADR 0003: no Apple Developer account, no notarization, no hardened
 # runtime). The app holds no ROM and no game data: the player's ROM is found as the program finds it (port/hal/rom:
 # --rom, FRIGATE_ROM, then the checkout's orig/ that the build was made from), and saves go where the program puts
 # them (port/hal/card).
 #
-#   make_app.sh --program PATH --app PATH --plist TEMPLATE --icon ICNS --bundle-id ID --name NAME --display-name NAME
-#               --about TEXT --repo DIR [--archs "ARCH ..."] [--minimum VERSION]
+#   make_app.sh --program PATH --app PATH --plist TEMPLATE --icon ICNS --notices FILE --bundle-id ID --name NAME
+#               --display-name NAME --about TEXT --repo DIR [--archs "ARCH ..."] [--minimum VERSION]
 #
 #   --icon ICNS          the app's icon (CFBundleIconFile), an .icns file
+#   --notices FILE       the third-party notices the program must carry (THIRD-PARTY-NOTICES.txt beside the program the
+#                        build made: xxHash's BSD-2-Clause notice), copied into Contents/Resources before the app is
+#                        signed; an app is never made without it
 #   --bundle-id ID       the bundle identifier (CFBundleIdentifier), io.github.callancampos.frigate.black2; a
 #                        com.example one, a placeholder, is refused
 #   --name NAME          the product's name (CFBundleName), Frigate
@@ -39,6 +43,7 @@ program=
 app=
 plist=
 icon=
+notices=
 bundle_id=
 bundle_name=
 display_name=
@@ -52,6 +57,7 @@ while [ $# -gt 0 ]; do
     --app) app=$2 ;;
     --plist) plist=$2 ;;
     --icon) icon=$2 ;;
+    --notices) notices=$2 ;;
     --bundle-id) bundle_id=$2 ;;
     --name) bundle_name=$2 ;;
     --display-name) display_name=$2 ;;
@@ -66,7 +72,8 @@ while [ $# -gt 0 ]; do
     esac
     shift 2
 done
-for value in "$program" "$app" "$plist" "$icon" "$bundle_id" "$bundle_name" "$display_name" "$about" "$repo"; do
+for value in "$program" "$app" "$plist" "$icon" "$notices" "$bundle_id" "$bundle_name" "$display_name" "$about" \
+    "$repo"; do
     if [ -z "$value" ]; then
         echo "make_app.sh: every option is needed (see the script's header)" >&2
         exit 2
@@ -93,6 +100,10 @@ if [ ! -f "$icon" ] || [ "$(head -c 4 "$icon")" != icns ]; then
     echo "make_app.sh: $icon isn't an .icns file" >&2
     exit 2
 fi
+if [ ! -f "$notices" ] || [ ! -s "$notices" ]; then
+    echo "make_app.sh: $notices isn't the third-party notices file the app must carry" >&2
+    exit 2
+fi
 
 name=$(basename "$program")
 staging="$app.partial"
@@ -106,6 +117,8 @@ mkdir -p "$contents/MacOS" "$contents/Resources" "$frameworks"
 cp "$program" "$contents/MacOS/$name"
 # The Info.plist's CFBundleIconFile names it
 cp "$icon" "$contents/Resources/AppIcon.icns"
+# The licences of the third-party code compiled into the program, which a program given to others carries
+cp "$notices" "$contents/Resources/THIRD-PARTY-NOTICES.txt"
 program_dir=$(cd "$(dirname "$program")" && pwd -P)
 
 # The install names a binary loads, one per line, of every slice of a universal binary (otool alone reads only the

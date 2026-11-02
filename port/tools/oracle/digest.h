@@ -302,6 +302,43 @@ PbwDigestStatus pbw_digest_record_frame(PbwDigestRecord *record, const PbwDigest
 int pbw_digest_write_header(FILE *file);
 int pbw_digest_write_record(FILE *file, const PbwDigestRecord *record);
 
+// The stream's writer that both programs call at every VBlank (ADR 0031 decision 1), so that one rule decides which
+// VBlank's state is a game frame's record on both. A record is the state at the last VBlank of a value of GFL's frame
+// count: the VBlank at which the count's pass has finished and the game waits for the next one (OS_WaitIrq,
+// src/system/main.c), before the VBlank's interrupt is taken. It holds the pass's work but not the VBlank work that
+// follows it (the IRQ handler's callbacks, GFL_VBlankUpdate's BG updates, VBlank DMA and fades), which runs while the
+// count is unchanged and first shows in the next count's record. The rules, each held by test_digest.c:
+// - the start: nothing is recorded before the first VBlank whose count is 1 after a VBlank whose count was 0. Before
+//   it the counter's memory may hold anything (on melonDS the compressed ARM9 binary until start-up clears the BSS);
+// - the last VBlank: a VBlank with the pending record's count replaces it (its frame and hashes, one more VBlank); one
+//   with the next count writes the pending record, flushes the file and becomes the pending record;
+// - after the start the count only stays or rises by one: anything else is an error naming both counts and the frame;
+// - a frame that can't be encoded (PBW_DIGEST_INVALID, PBW_DIGEST_NO_MEMORY) is an error naming the group, and a VBlank
+//   that fails writes nothing;
+// - pbw_digest_writer_close never writes the pending record, whose count may have had more VBlanks to come: a run's
+//   last count is never in its stream;
+// - every record written is flushed, so that a run that ends abruptly (a trap stub) keeps the records it wrote.
+// After an error every call fails with the same message
+typedef struct PbwDigestWriter {
+    FILE *file;
+    int seen;               // a VBlank was seen: previous holds its count
+    uint32_t previous;      // the count at the last VBlank seen
+    int started;            // the stream has started: record is pending
+    PbwDigestRecord record; // the pending record: the last VBlank so far of its count
+    int failed;
+    char error[240]; // why the last call failed
+} PbwDigestWriter;
+
+// Starts a stream in file, which stays the caller's to close: writes the version line and the header
+// (pbw_digest_write_header). Returns 0, or -1 with writer->error saying why
+int pbw_digest_writer_open(PbwDigestWriter *writer, FILE *file);
+// One VBlank: GFL's frame count read there, the program's video frame, and the state the program has there. Returns
+// 0, or -1 with writer->error naming the frame and the counts or the group
+int pbw_digest_writer_vblank(PbwDigestWriter *writer, uint32_t count, uint32_t frame, const PbwDigestFrame *state);
+// Ends the stream without writing the pending record, and flushes it. Returns 0, or -1 with writer->error saying why
+// (an earlier call that failed, or a write the file couldn't take)
+int pbw_digest_writer_close(PbwDigestWriter *writer);
+
 // Reads a stream. A header may name the groups in any order and leave some out: those are absent from its records
 typedef struct PbwDigestReader {
     FILE *file;

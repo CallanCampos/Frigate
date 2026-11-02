@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Tests of the oracle's Python side (port/tools/oracle): compare.py's PNG reader and writer, frames.tsv's versions,
 screen comparisons exact and with the 3D tolerance screen by screen, comparisons by hash, frame alignment, memory
-comparisons, symbols.py's map parser and name lookup, seeds.py's reading of the random seeds the DS built from its
+comparisons, the digest streams' reader and their comparison on the count (compare.py digest), symbols.py's map parser
+and name lookup, seeds.py's reading of the random seeds the DS built from its
 memory and oracle.py's check of an input file's seeds against them, and oracle.py's handling of the port's runs (with a
 stand-in program), of the clock, of the saves made on the oracle from saves and their cache, of the comparison sequences
 and their references, of the round trips' save comparison (the bytes they declare, the mystery gift block decrypted)
@@ -702,6 +703,245 @@ class MemoryTests(unittest.TestCase):
         runs = Runs(self)
         runs.memory(runs.port, ["10 sVBlankCount 0x0209da64 4 0500"])
         self.assertEqual(quiet(compare.main, ["memory", runs.oracle, runs.port]), 2)
+
+
+def digest_text(groups: tuple[str, ...], rows: list[tuple]) -> str:
+    """A made-up digest stream: the version line, a header naming groups, and rows of (count, frame, vblanks, then a
+    hash for each group as a number or "-", or the cells as text when a row is a string)"""
+    lines = ["#pbwdigest 1", "\t".join(["count", "frame", "vblanks", *groups])]
+    for row in rows:
+        if isinstance(row, str):
+            lines.append(row)
+            continue
+        cells = [str(row[0]), str(row[1]), str(row[2])]
+        cells += ["-" if value == "-" else f"{value:016x}" for value in row[3:]]
+        lines.append("\t".join(cells))
+    return "\n".join(lines) + "\n"
+
+
+def write_digest(directory: str, groups: tuple[str, ...], rows: list[tuple]) -> str:
+    os.makedirs(directory, exist_ok=True)
+    path = os.path.join(directory, "digest.tsv")
+    with open(path, "w", newline="") as f:
+        f.write(digest_text(groups, rows))
+    return path
+
+
+class DigestReaderTests(unittest.TestCase):
+    """compare.py's reader of digest streams (load_digest), which follows digest.c's reader's rules"""
+
+    def setUp(self):
+        self.root = tempfile.mkdtemp(prefix="digest-test-")
+        self.addCleanup(shutil.rmtree, self.root, True)
+
+    def test_groups_are_digest_c_s(self):
+        # DIGEST_GROUPS is digest.c's sGroupNames, in its order
+        with open(os.path.join(TOOLS, "digest.c")) as f:
+            source = f.read()
+        table = re.search(r"sGroupNames\[PBW_DIGEST_GROUPS\] = \{(.*?)\};", source, re.S)
+        self.assertIsNotNone(table)
+        self.assertEqual(tuple(re.findall(r'"([^"]+)"', table.group(1))), compare.DIGEST_GROUPS)
+
+    def test_reads_a_stream(self):
+        path = write_digest(self.root, ("pal", "g3d.list"), [(1, 2, 1, 0xab, 5), (2, 3, 2, "-", 6), "3\t9\t1\t" +
+                                                              "00000000000000AB\t-"])
+        digest = compare.load_digest(path)
+        self.assertEqual(digest.groups, ("pal", "g3d.list"))
+        self.assertEqual(sorted(digest.records), [1, 2, 3])
+        self.assertEqual(digest.records[2].frame, 3)
+        self.assertEqual(digest.records[2].vblanks, 2)
+        self.assertEqual(digest.records[2].hashes, {"g3d.list": 6})
+        self.assertEqual(digest.records[3].hashes, {"pal": 0xab})
+        # Every group in its own header order, with \r\n line ends as digest.c's reader takes them
+        with open(path, "w", newline="") as f:
+            f.write(digest_text(compare.DIGEST_GROUPS, [(1, 2, 1, *range(len(compare.DIGEST_GROUPS)))])
+                    .replace("\n", "\r\n"))
+        self.assertEqual(len(compare.load_digest(path).records[1].hashes), len(compare.DIGEST_GROUPS))
+
+    def test_rejections(self):
+        # Each malformed stream the C reader refuses, and counts that don't rise, which its comparison refuses
+        header = "count\tframe\tvblanks\tpal\toam"
+        bad = {
+            "a version 2": "#pbwdigest 2\n" + header + "\n",
+            "frames.tsv": "#pbwframes 2\n",
+            "an empty file": "",
+            "no header": "#pbwdigest 1\n",
+            "keys out of order": "#pbwdigest 1\nframe\tcount\tvblanks\tpal\n",
+            "an unknown group": "#pbwdigest 1\ncount\tframe\tvblanks\tvram.J\n",
+            "a group twice": "#pbwdigest 1\ncount\tframe\tvblanks\tpal\tpal\n",
+            "a field too few": f"#pbwdigest 1\n{header}\n1\t1\t1\t-\n",
+            "a field too many": f"#pbwdigest 1\n{header}\n1\t1\t1\t-\t-\t-\n",
+            "a count that isn't a number": f"#pbwdigest 1\n{header}\n-1\t1\t1\t-\t-\n",
+            "a frame past 32 bits": f"#pbwdigest 1\n{header}\n1\t4294967296\t1\t-\t-\n",
+            "a hash of 17 digits": f"#pbwdigest 1\n{header}\n1\t1\t1\t00000000000000001\t-\n",
+            "a hash that isn't hex": f"#pbwdigest 1\n{header}\n1\t1\t1\t000000000000000g\t-\n",
+            "a count twice": f"#pbwdigest 1\n{header}\n3\t1\t1\t-\t-\n3\t2\t1\t-\t-\n",
+            "a count that falls": f"#pbwdigest 1\n{header}\n5\t1\t1\t-\t-\n3\t2\t1\t-\t-\n",
+        }
+        path = os.path.join(self.root, "digest.tsv")
+        for what, text in bad.items():
+            with self.subTest(what):
+                with open(path, "w", newline="") as f:
+                    f.write(text)
+                with self.assertRaises(compare.RunError):
+                    compare.load_digest(path)
+        with self.assertRaises(compare.RunError):
+            compare.load_digest(os.path.join(self.root, "none.tsv"))
+
+
+# The groups of the comparison's made-up streams, and a record's hashes: one number for every group, the number given
+# for the groups named
+DIGEST_TEST_GROUPS = ("vram.C", "pal", "g3d.list", "screen.top", "screen.bottom")
+
+
+def record(count: int, frame: int, base: int, **changed) -> tuple:
+    hashes = {group: base for group in DIGEST_TEST_GROUPS}
+    hashes.update({key.replace("_", "."): value for key, value in changed.items()})
+    return (count, frame, 1, *(hashes[group] for group in DIGEST_TEST_GROUPS))
+
+
+class DigestCompareTests(unittest.TestCase):
+    """compare.py digest on made-up runs: frames.tsv's counters and 3D columns, and digest streams"""
+
+    def setUp(self):
+        self.root = tempfile.mkdtemp(prefix="digest-compare-")
+        self.addCleanup(shutil.rmtree, self.root, True)
+        self.oracle = os.path.join(self.root, "oracle")
+        self.port = os.path.join(self.root, "port")
+
+    def frames(self, run: str, counters: list[int], top_3d: set[int] | None = None) -> None:
+        """frames.tsv for frames 1..n with these counters, each frame's pictures its own, top_3d the frames whose top
+        screen shows 3D"""
+        rows = [compare.Frame(i, i, counter, None, 1, i in (top_3d or set()), False, f"t{i}", f"b{i}", False, False)
+                for i, counter in enumerate(counters, 1)]
+        os.makedirs(run, exist_ok=True)
+        compare.write_frames_tsv(os.path.join(run, "frames.tsv"), rows)
+
+    def compare(self, *options: str) -> tuple[int, str]:
+        return captured(compare.main, ["digest", self.oracle, self.port, "--align", "counter", *options])
+
+    def test_last_vblank_pairing(self):
+        # The oracle's count 2 spans frames 3-5: the port's record of count 2 pairs with the oracle's record of the
+        # count, its last VBlank's state (frame 5), though the screens' pairing gives port frame 3 oracle frame 3
+        self.frames(self.oracle, [0, 1, 2, 2, 2, 3, 4], top_3d={5})
+        self.frames(self.port, [0, 1, 2, 3, 4])
+        write_digest(self.oracle, DIGEST_TEST_GROUPS,
+                     [record(1, 2, 10), record(2, 5, 20, screen_top=7), record(3, 6, 30)])
+        write_digest(self.port, DIGEST_TEST_GROUPS, [record(1, 2, 10), record(2, 3, 20), record(3, 4, 30)])
+        status, out = self.compare()
+        self.assertEqual(status, 0, out)
+        self.assertIn("3 of 3 paired records match", out)
+        # The top screen at count 2 is left out: the oracle record's frame, 5, shows 3D on it (frame 3 doesn't)
+        self.assertRegex(out, r"screen.top\s+2\s+1\s+0\s+0")
+        # A port record that holds the state of the count's first oracle VBlank, not its last, differs
+        write_digest(self.port, DIGEST_TEST_GROUPS, [record(1, 2, 10), record(2, 3, 20, pal=21), record(3, 4, 30)])
+        status, out = self.compare()
+        self.assertEqual(status, 1)
+        self.assertIn("first undeclared difference: count 2, port frame 3, oracle frame 5 (count 2): pal", out)
+        self.assertIn("FAIL: pal differs at port frames 3 (count 2)", out)
+        # Without 3D on the oracle record's frame the screen is compared exactly
+        self.frames(self.oracle, [0, 1, 2, 2, 2, 3, 4], top_3d={3})
+        write_digest(self.port, DIGEST_TEST_GROUPS, [record(1, 2, 10), record(2, 3, 20), record(3, 4, 30)])
+        status, out = self.compare()
+        self.assertEqual(status, 1)
+        self.assertIn("FAIL: screen.top differs at port frames 3 (count 2)", out)
+
+    def test_lags_by_port_frame(self):
+        # From port frame 4 on the port's count is the oracle's + 1: port count 4 pairs with the oracle's count 3
+        self.frames(self.oracle, [0, 1, 2, 3, 4, 5, 6])
+        self.frames(self.port, [0, 1, 2, 3, 4, 5])
+        write_digest(self.oracle, DIGEST_TEST_GROUPS, [record(c, c + 1, c * 10) for c in range(1, 6)])
+        write_digest(self.port, DIGEST_TEST_GROUPS,
+                     [record(1, 2, 10), record(2, 3, 20), record(3, 4, 20), record(4, 5, 30)])
+        status, out = self.compare("--lag", "1=0,4=1")
+        self.assertEqual(status, 0, out)
+        self.assertIn("4 of 4 paired records match", out)
+        # Without the lag the same records differ from port frame 4 on
+        status, out = self.compare("--lag", "1=0")
+        self.assertEqual(status, 1)
+        self.assertIn("first undeclared difference: count 3, port frame 4", out)
+
+    def test_clock_stretch(self):
+        # Port frames 2-3 wait on a clock and aren't compared; after them the lag is derived as the screens' pairing
+        # derives it: the oracle took two more frames to show port frame 3's pictures, and its counts are 1 behind
+        self.frames(self.oracle, [0, 0, 0, 1, 2, 3, 4])
+        self.frames(self.port, [0, 1, 2, 3, 4])
+        rows = [compare.Frame(i, i, c, None, 1, False, False, f"t{p}", f"b{p}", False, False)
+                for i, c, p in ((1, 0, 1), (2, 0, 2), (3, 0, 2), (4, 1, 3), (5, 2, 4), (6, 3, 5), (7, 4, 6))]
+        compare.write_frames_tsv(os.path.join(self.oracle, "frames.tsv"), rows)
+        write_digest(self.oracle, DIGEST_TEST_GROUPS, [record(1, 5, 99), record(2, 6, 30), record(3, 7, 40)])
+        write_digest(self.port, DIGEST_TEST_GROUPS, [record(1, 2, 10), record(2, 3, 20), record(3, 4, 30)])
+        status, out = self.compare("--clock", "2-3")
+        self.assertIn("2 in clock stretches (not compared)", out)
+        self.assertIn("port frames 2-3: by pictures", out)
+        self.assertEqual(status, 0, out)
+        self.assertIn("1 of 1 paired records match", out)
+
+    def test_declarations(self):
+        self.frames(self.oracle, [0, 1, 2, 3, 4, 5])
+        self.frames(self.port, [0, 1, 2, 3, 4, 5])
+        write_digest(self.oracle, DIGEST_TEST_GROUPS, [record(c, c + 1, c * 10) for c in range(1, 5)])
+        write_digest(self.port, DIGEST_TEST_GROUPS,
+                     [record(1, 2, 10), record(2, 3, 20, vram_C=5), record(3, 4, 30), record(4, 5, 40, vram_C=6)])
+        # Declared at its frames, the group is left out there only: elsewhere it is compared
+        status, out = self.compare("--known-group", "vram.C=3,5")
+        self.assertEqual(status, 0, out)
+        self.assertIn("declared vram.C at port frames 3,5: 2 differed (3 (count 2), 5 (count 4)), 0 equal", out)
+        self.assertNotIn("unused declaration", out)
+        status, out = self.compare("--known-group", "vram.C=3")
+        self.assertEqual(status, 1)
+        self.assertIn("FAIL: vram.C differs at port frames 5 (count 4)", out)
+        # A declaration none of whose frames differ is reported, which doesn't change the status
+        status, out = self.compare("--known-group", "vram.C=3,5", "--known-group", "pal,g3d.list=2-4")
+        self.assertEqual(status, 0, out)
+        self.assertIn("declared pal,g3d.list at port frames 2-4: 0 differed, 3 equal", out)
+        self.assertIn("unused declaration: pal,g3d.list=2-4", out)
+        # A group that isn't one, or no frames: bad arguments
+        self.assertEqual(self.compare("--known-group", "vram.J=3")[0], 2)
+        self.assertEqual(self.compare("--known-group", "vram.C")[0], 2)
+
+    def test_missing_groups_and_records(self):
+        self.frames(self.oracle, [0, 1, 2, 3, 4, 5])
+        self.frames(self.port, [0, 1, 2, 3, 4, 5, 6, 7])
+        # The port's stream lacks g3d.list: every record misses it
+        write_digest(self.oracle, DIGEST_TEST_GROUPS, [record(c, c + 1, c * 10) for c in range(1, 5)])
+        lacking = tuple(group for group in DIGEST_TEST_GROUPS if group != "g3d.list")
+        write_digest(self.port, lacking, [(c, c + 1, 1, *([c * 10] * len(lacking))) for c in range(1, 5)])
+        status, out = self.compare()
+        self.assertEqual(status, 1)
+        self.assertIn("FAIL: g3d.list missing from the port's records at port frames 2-5 (counts 1-4)", out)
+        # A "-" is missing too
+        write_digest(self.port, DIGEST_TEST_GROUPS, [record(1, 2, 10), (2, 3, 1, 20, 20, "-", 20, 20)])
+        status, out = self.compare()
+        self.assertEqual(status, 1)
+        self.assertIn("g3d.list missing", out)
+        # Port records past the oracle's stream, or without an oracle frame, are counted, not compared; one whose count
+        # the oracle's stream lacks within its counts fails
+        write_digest(self.port, DIGEST_TEST_GROUPS, [record(c, c + 1, c * 10) for c in range(1, 7)])
+        status, out = self.compare()
+        self.assertEqual(status, 0, out)
+        self.assertIn("1 without an oracle frame: port frames 7, 1 past the oracle's stream (its last count 4): port "
+                      "frames 6", out)
+        write_digest(self.oracle, DIGEST_TEST_GROUPS, [record(1, 2, 10), record(3, 4, 30), record(4, 5, 40)])
+        status, out = self.compare()
+        self.assertEqual(status, 1)
+        self.assertIn("FAIL: 1 port records whose count the oracle's stream lacks within its counts 1-4: port frames "
+                      "3 (count 2)", out)
+
+    def test_needs_the_counter_and_streams(self):
+        self.frames(self.oracle, [0, 1, 2])
+        self.frames(self.port, [0, 1, 2])
+        write_digest(self.oracle, DIGEST_TEST_GROUPS, [record(1, 2, 10)])
+        # No stream on one side, or a malformed one: status 2
+        self.assertEqual(self.compare()[0], 2)
+        with open(os.path.join(self.port, "digest.tsv"), "w") as f:
+            f.write("#pbwdigest 2\n")
+        self.assertEqual(self.compare()[0], 2)
+        write_digest(self.port, DIGEST_TEST_GROUPS, [record(1, 2, 10)])
+        self.assertEqual(self.compare()[0], 0)
+        # The pairing is the count's
+        with self.assertRaises(SystemExit):
+            quiet(compare.main, ["digest", self.oracle, self.port])
 
 
 def rand_context(state: int) -> bytes:
@@ -1465,6 +1705,80 @@ class OracleScriptTests(unittest.TestCase):
             labels = [dump.label for dump in sequence.state]
             self.assertEqual(len(labels), len(set(labels)), name)
             self.assertTrue(all(dump.oracle and dump.port and dump.size > 0 for dump in sequence.state), name)
+        # The digest's declarations: only a sequence with digests has any, for the versions the repository builds, each
+        # of groups digest.c knows at port frames the port runs, with why
+        for name, sequence in oracle.SEQUENCES.items():
+            self.assertTrue(sequence.digest or not sequence.known_groups, name)
+            for version, table in sequence.known_groups.items():
+                self.assertIn(version, ("b2_us", "w2_us"), name)
+                for groups, frames_table in table.items():
+                    self.assertTrue(groups and set(groups.split(",")) <= set(compare.DIGEST_GROUPS), (name, groups))
+                    for frames, why in frames_table.items():
+                        self.assertTrue(set(compare.parse_frames(frames)) <= set(range(1, sequence.port_frames + 1)),
+                                        (name, groups, frames))
+                        self.assertTrue(why, (name, groups, frames))
+
+    def test_which_sequences_hold_digests(self):
+        # The sequences whose oracle_<seq> holds the digest streams; every other sequence's comparison is unchanged
+        self.assertEqual(sorted(name for name, sequence in oracle.SEQUENCES.items() if sequence.digest), [])
+
+    def test_digest_only_when_given(self):
+        # run_oracle and run_port pass --digest only when given a path
+        with tempfile.TemporaryDirectory() as d:
+            arguments_file = os.path.join(d, "args")
+            program = stand_in(os.path.join(d, "pbw-oracle"),
+                               f"#!{sys.executable}\nimport sys\nopen({arguments_file!r}, 'w').write("
+                               "'\\n'.join(sys.argv[1:]))\n")
+            args = argparse.Namespace(oracle=program, version="b2_us", rom=None, time=None, no_counter=True)
+            out = os.path.join(d, "run")
+            for digest in (None, os.path.join(out, "digest.tsv")):
+                self.assertEqual(quiet(oracle.run_oracle, args, out, 1, "none", None, True, None, None, digest), 0)
+                with open(arguments_file) as f:
+                    arguments = f.read().split("\n")
+                if digest is None:
+                    self.assertNotIn("--digest", arguments)
+                else:
+                    self.assertEqual(arguments[arguments.index("--digest") + 1], digest)
+            port, record_file = fake_port(d)
+            for digest in (None, os.path.join(d, "port", "digest.tsv")):
+                oracle.run_port(port, os.path.join(d, "port"), 5, "none", "rom.nds", None, digest=digest)
+                with open(record_file) as f:
+                    arguments = f.read().split("\n")
+                if digest is None:
+                    self.assertNotIn("--digest", arguments)
+                else:
+                    self.assertEqual(arguments[arguments.index("--digest") + 1], digest)
+
+    def test_compare_sequence_digest_step(self):
+        # compare_sequence runs compare.py digest only for a sequence with digests, with its declarations
+        calls = []
+
+        def fake_main(command):
+            calls.append(command)
+            return 0
+
+        saved = oracle.compare.main
+        oracle.compare.main = fake_main
+        try:
+            plain = oracle.Sequence(port_frames=10, oracle_frames=20, sample="", clock="2-3")
+            quiet(oracle.compare_sequence, plain, "b2_us", "o", "p", "r", 10)
+            self.assertEqual([c[0] for c in calls], ["screens"])
+            calls.clear()
+            held = oracle.Sequence(port_frames=10, oracle_frames=20, sample="", clock="2-3", lags={"b2_us": "4=0"},
+                                   digest=True, known_groups={"b2_us": {"vram.C,pal": {"5-6,8": "why"}}})
+            status, out = captured(oracle.compare_sequence, held, "b2_us", "o", "p", "r", 9)
+            self.assertEqual(status, 0)
+            self.assertEqual([c[0] for c in calls], ["screens", "digest"])
+            self.assertEqual(calls[1], ["digest", "o", "p", "--align", "counter", "--clock", "2-3", "--lag", "4=0",
+                                        "--frames", "1-9", "--known-group", "vram.C,pal=5-6,8"])
+            self.assertIn("compare.py digest o p --align counter --clock 2-3 --lag 4=0 --frames 1-9 "
+                          "--known-group vram.C,pal=5-6,8", out)
+            self.assertIn("digest groups vram.C,pal left out, port frames 5-6,8: why", out)
+            # The worst status
+            oracle.compare.main = lambda command: 1 if command[0] == "digest" else 0
+            self.assertEqual(quiet(oracle.compare_sequence, held, "b2_us", "o", "p", "r", 9), 1)
+        finally:
+            oracle.compare.main = saved
 
     def test_floccesy_checks_the_story_before_saving(self):
         # A save/reload check alone cannot replace the frame comparison of the story that produced the save.

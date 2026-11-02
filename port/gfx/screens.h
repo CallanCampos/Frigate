@@ -20,6 +20,12 @@ enum {
 // Sets the OS core's scanline hook to this module's line drawing; called once before the game runs
 void port_screens_attach(void);
 
+// Called at the start of each frame, before line 0 is drawn (before the 3D frame and line 0's capture), when not NULL:
+// the digest stream's look at what the VRAM banks hold of 3D as the frame starts (port/app/digest_stream.c), as
+// pbw-oracle looks before melonDS's line 0. NULL unless --digest sets it; port_screens_attach leaves it as it is. The
+// game starts inside line 0, so the first frame may have no call
+extern void (*port_screens_frame_start_hook)(void);
+
 // Draws line 0-191 of both engines into the screens, as the scanline hook does
 void port_screens_draw_line(int line);
 

@@ -1,6 +1,8 @@
 // Tests of display capture (port/gfx/capture.h): port_capture_line's sources, blend, offsets, sizes and missing banks,
-// and port_capture_draw_line's frame latch, with the platform layer's VRAM and register services stubbed. Expected
-// halfwords are worked out by hand from GBATEK's DISPCAPCNT fields and the rules capture.h credits to melonDS.
+// port_capture_draw_line's frame latch, and the record of the unit at line 96 that the digest stream takes (latched or
+// not, the registers as line 96 saw them, the destination in the LCDC or not, cleared at line 0), with the platform
+// layer's VRAM and register services stubbed. Expected halfwords are worked out by hand from GBATEK's DISPCAPCNT
+// fields and the rules capture.h credits to melonDS.
 #include "gfx/capture.h"
 #include "gfx/ref/ds2d.h"
 #include "hal/gx/vram.h"
@@ -37,9 +39,12 @@ const uint8_t port_vram_bank_first_page[PORT_VRAM_BANK_COUNT] = { 0 };
 static uint32_t sDispcapcnt;
 static int sNotes;
 
+// Set, the LCDC view has no bank in it
+static int sLcdcEmpty;
+
 uint8_t *port_vram_slot_ptr(PortVramView view, int slot) {
     (void)view;
-    return slot >= 0 && slot < PORT_CAPTURE_BANK_PAGES ? sDstMemory[slot] : NULL;
+    return !sLcdcEmpty && slot >= 0 && slot < PORT_CAPTURE_BANK_PAGES ? sDstMemory[slot] : NULL;
 }
 
 void port_vram_note_write(uint32_t address, uint32_t size) {
@@ -203,6 +208,66 @@ static void TestFrame(void) {
     Expect("a cleared bit captures nothing", sNotes, 0);
 }
 
+// The record at line 96: zeros from line 0 until line 96 is drawn; then whether the enable was latched at line 0 and
+// DISPCAPCNT and DISPCNT as the registers held them at line 96, latched or not; and whether the destination bank was
+// in the LCDC
+static void TestRecord(void) {
+    uint8_t io[0x70] = { 0 };
+    PortDs2dSource engineA;
+    const PortCaptureRecord *record = port_capture_record();
+    uint32_t enabled = ENABLE | SIZE_256x64 | (2u << 16);
+    uint32_t later = enabled | WRITE_OFFSET(1);
+    uint32_t dispcnt = DISPCNT_VRAM_DISPLAY | (1u << 18);
+    uint32_t dispcntLater = dispcnt | 0x100;
+
+    memset(&engineA, 0, sizeof(engineA));
+    engineA.io = io;
+    Reset();
+    port_capture_reset();
+    Expect("no record after a reset", (unsigned)record->ran | record->dispcapcnt | record->dispcnt_a, 0);
+    // Latched: the registers change after line 0 and again after line 96; the record has line 96's
+    memcpy(io + 0x64, &enabled, sizeof(enabled));
+    memcpy(io, &dispcnt, sizeof(dispcnt));
+    for (int line = 0; line < 96; line++) {
+        port_capture_draw_line(&engineA, line);
+        if (line == 0) {
+            memcpy(io + 0x64, &later, sizeof(later));
+            memcpy(io, &dispcntLater, sizeof(dispcntLater));
+        }
+    }
+    Expect("nothing recorded before line 96", (unsigned)record->ran | record->dispcapcnt | record->dispcnt_a, 0);
+    port_capture_draw_line(&engineA, 96);
+    memcpy(io + 0x64, &enabled, sizeof(enabled));
+    memcpy(io, &dispcnt, sizeof(dispcnt));
+    for (int line = 97; line < 192; line++) {
+        port_capture_draw_line(&engineA, line);
+    }
+    Expect("latched at line 0", (unsigned)record->ran, 1);
+    Expect("DISPCAPCNT at line 96, not line 0's or the end's", record->dispcapcnt, later);
+    Expect("DISPCNT at line 96", record->dispcnt_a, dispcntLater);
+    Expect("the destination in the LCDC", (unsigned)record->dest_in_lcdc, 1);
+    // Line 0 clears it
+    port_capture_draw_line(&engineA, 0);
+    Expect("cleared at line 0", (unsigned)record->ran | record->dispcapcnt | record->dispcnt_a | record->dest_in_lcdc,
+           0);
+    // Not latched (the enable clear at line 0 and set at line 96): recorded all the same, with the enable bit the
+    // registers hold; and the destination out of the LCDC
+    later = enabled & ~ENABLE;
+    memcpy(io + 0x64, &later, sizeof(later));
+    port_capture_draw_line(&engineA, 0);
+    memcpy(io + 0x64, &enabled, sizeof(enabled));
+    sLcdcEmpty = 1;
+    sNotes = 0;
+    for (int line = 1; line < 192; line++) {
+        port_capture_draw_line(&engineA, line);
+    }
+    sLcdcEmpty = 0;
+    Expect("a frame that latched nothing writes nothing", sNotes, 0);
+    Expect("not latched", (unsigned)record->ran, 0);
+    Expect("recorded though not latched", record->dispcapcnt, enabled);
+    Expect("the destination out of the LCDC", (unsigned)record->dest_in_lcdc, 0);
+}
+
 int main(void) {
     TestSourceA();
     TestSource3d();
@@ -210,6 +275,7 @@ int main(void) {
     TestBlend();
     TestOffsetsAndSizes();
     TestFrame();
+    TestRecord();
     printf("%d checks, %d failed\n", sChecks, sFailures);
     return sFailures != 0;
 }

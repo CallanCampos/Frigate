@@ -76,9 +76,12 @@ ctest --test-dir build/port -j4 --output-on-failure                      # test
   from `sOptions` in [app/main.c](app/main.c): `--headless` runs without a window or pacing, `--frames N` stops after N
   frames, `--screenshot PATH` writes both screens at the end, `--save-dir PATH` keeps the saves elsewhere,
   `--input FILE` plays a replay, `--record FILE` records effective input to a fresh file
-  ([recording limits](tools/oracle/README.md#recordings)), `--frame-times FILE` writes frame times, and
-  `--render-threads N` draws the 3D frame on N threads (the machine's performance cores by default; the frames are the
-  same whatever N).
+  ([recording limits](tools/oracle/README.md#recordings)), `--frame-times FILE` writes frame times,
+  `--digest FILE` writes a digest of the DS-native display state at each game frame for the melonDS oracle's
+  comparisons ([Digests](tools/oracle/README.md#digests)), and `--render-threads N` draws the 3D frame on N threads (the
+  machine's performance cores by default; the frames are the same whatever N). `--help` ends with the notice of
+  xxHash, which the program carries for `--digest`'s hash: `THIRD-PARTY-NOTICES.txt` beside the program, and in the
+  macOS app's `Contents/Resources`.
 - **The tests** that need your ROM skip without it ([tests/README.md](tests/README.md)). In an optimized build the
   `frame_times_*` tests hold this machine's frames to a budget, half the DS's frame; on a machine too slow for it,
   `ctest -LE timing` leaves them out.
