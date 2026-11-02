@@ -1,8 +1,8 @@
-// MSL's exit as the game's heap check calls it (port/hal/msl/msl_exit.c; port/cmake/msl.cmake compiles src/gfl/heap.c
-// with exit renamed to it), on the whole program's objects: GFL's heaps (src/gfl/heap.c, src/gfl/heapsys.c) over
-// NitroSystem's expanded heaps and the main arena, made as the game makes them at boot (src/system/gfl_use.c). The
-// check is GFL_HeapDumpOnFailure, whose exit only notes a failure and returns on the DS. With the host's exit, each of
-// these ended the program in the check, with status 1 and no message:
+// MSL's exit as the game's heap check calls it (port/hal/msl/exit_host.c; port/cmake/msl.cmake forces
+// port/hal/msl/exit_calls.h into src/gfl/heap.c, which sends its calls there), on the whole program's objects: GFL's
+// heaps (src/gfl/heap.c, src/gfl/heapsys.c) over NitroSystem's expanded heaps and the main arena, made as the game
+// makes them at boot (src/system/gfl_use.c). The check is GFL_HeapDumpOnFailure, whose exit only notes a failure and
+// returns on the DS. With the host's exit, each of these ended the program in the check, with status 1 and no message:
 //   heap_check  the check's dump of a heap that holds a block returns and leaves the heap as it was, as the dumps
 //               that the Pokémon Musical's end and the C-Gear's beacon search make whatever their heaps hold do; and
 //               a heap deleted with a block still in it is deleted after its check

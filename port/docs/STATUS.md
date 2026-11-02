@@ -38,48 +38,63 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   change merges no upstream commit of its own.
 - **Port:** `PORT_SHA`, on the topic branch `port-castelia22-exit` from `d19894b1f7` (PR 69's merge): `dee8830cad`, the
   fix, then the merge of `main` at `10d017c010` (PR 67, which merged while this was published; STATUS.md's new entries
-  both kept, this one first, and both filled PR 69's entry's `PORT_SHA` alike, with `2f9033d7b8`). This entry fills the
+  both kept, this one first, and both filled PR 69's entry's `PORT_SHA` alike, with `2f9033d7b8`), `9e9768e3ea` and
+  `9d9f845ed7` (this entry and the lesson after the merge), then the review's follow-ups (below). This entry fills the
   sync's entry's `PORT_SHA` with `f53e767509`.
 - **ROM (T0):** `python3 configure.py && ninja` in a fresh worktree (10,703 steps) passes both original US SHA1s with
   zero compiler warnings: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`;
-  and again on the merge with `main` (12,555 steps), with the same SHA1s and no warning. `src/ov129/sp_poke_gimmick.c`
-  is complete in both versions, so this is its change's MWCC-neutral proof.
+  and again on the merge with `main` (12,555 steps), with the same SHA1s and no warning, and on the review's
+  follow-ups, which change nothing outside `port/` (18 steps, `sp_poke_gimmick.c` compiled again after its negative
+  control), the same. `src/ov129/sp_poke_gimmick.c` is complete in both versions, so this is its change's MWCC-neutral
+  proof.
 - **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both games (`build/port`, `build/port-w2`) pass, and
-  again on the merge with `main`, with no warning in the changed or new files; the sanitized Black 2 (`build/port-san`)
-  builds too (before the merge).
+  again on the merge with `main` and on the review's follow-ups, with no warning in the changed or new files; the
+  sanitized Black 2 (`build/port-san`) builds too, before the merge and on the follow-ups.
 - **Tests:**
   - T2/T6: `ctest -LE route -j3` passes in both games, before and after the merge with `main`: 354 of 361 tests pass,
     and 7 skip for the optional setups this checkout lacks, as in the last entries (`asm_oracle`, `oracle_boot`,
     `oracle_saves`, `oracle_floccesy_save`, the two function-sanitizer negatives of the VM dispatch and
     `app_universal_slices`). The 361 include the new `integrate_sp_poke_gimmick`, `msl_exit_heap_check`,
-    `msl_exit_heap_full` and the overlay sections' image check of their program. All four new tests pass in the
-    sanitized build too (before the merge).
-  - T3, short: the replays pass, B2 6 of 6 and W2 4 of 4, before and after the merge (`replay_new_game`, B2 only,
-    `replay_new_game_house`, `replay_same_save` and `replay_same_save_complete`, with their clean fixtures).
+    `msl_exit_heap_full` and the overlay sections' image check of their program. On the review's follow-ups, 355 of 362
+    pass in each game, the 362nd being `msl_exit_game_objects`, with the same 7 skips. The new tests pass in the
+    sanitized build too, before the merge and on the follow-ups.
+  - T3, short: the replays pass, B2 6 of 6 and W2 4 of 4, before and after the merge and on the follow-ups
+    (`replay_new_game`, B2 only, `replay_new_game_house`, `replay_same_save` and `replay_same_save_complete`, with
+    their clean fixtures).
   - The café, with the save lab's prototype minter and the sweep's boot input (2,200 frames, headless, clock pinned):
     before, status 1 at frame 1,543 with no `port:` line and `run.txt` at `status: -`, from the Route 19 save by warp 0;
     after, status 0 and all 2,200 frames from both the Route 19 save by warp 0 (top screen `d575a8456293`, bottom
     `a912c9dce413`) and the Route 20 save by Fly (top `3b0078014f10`), in the sanitized build from both with no report
-    and the same hashes, and again on the merge with `main`, with the same hashes.
+    and the same hashes, and again on the merge with `main` and on the review's follow-ups, with the same hashes.
   - Neighbours: nine zones run the same way from the Route 19 save, by the sweep's own arrivals, each end with status 0
-    at frame 2,200 and both screens' hashes equal to the lab's sweep's, before and after the merge:
-    `ZONE_CASTELIA_CITY`, `_7` (whose door leads into the café), `_20`, `_21`, `_23`, `_24`, `_25`, `ZONE_CASTELIA_GATE`
-    and `ZONE_PLEDGE_GROVE`, the other special Pokémon zone.
+    at frame 2,200 and both screens' hashes equal to the lab's sweep's, before and after the merge and on the review's
+    follow-ups: `ZONE_CASTELIA_CITY`, `_7` (whose door leads into the café), `_20`, `_21`, `_23`, `_24`, `_25`,
+    `ZONE_CASTELIA_GATE` and `ZONE_PLEDGE_GROVE`, the other special Pokémon zone.
   - Negative controls: with `WORK_SIZE` at 0x30, `integrate_sp_poke_gimmick` fails at gimmick A's size check (48 for
-    64), and without that check ASan reports gimmick B's own write, 8 bytes past a 48-byte block in
-    `SpPokeGimmickB_Init`, before and after the merge; without the rename of `exit`, `msl_exit_heap_check` and
-    `msl_exit_heap_full` both end with status 1 and no `port:` line.
+    64), before and after the merge. Without that check, ASan's first report is the fixture's own read of gimmick A's
+    `data.curve`, 8 bytes past A's 48-byte block, in `main`; without that read too, it is gimmick B's own write, a
+    heap-buffer-overflow 8 bytes past a 48-byte block in `SpPokeGimmickB_Init` (`sp_poke_gimmick.c:235`), as the
+    review found and the follow-ups ran again. Without the rename of `exit`, `msl_exit_heap_check` and
+    `msl_exit_heap_full` both end with status 1 and no `port:` line. After the review: without the forced header the
+    build stops at `gen_stubs.py`, which names `heap.c`'s object, and with that check turned off,
+    `msl_exit_game_objects` fails on its game file. `heap.c`'s LLVM IR, from its own compile command, shows what the
+    forced header prevents: with `-Dexit=port_msl_exit` and a `<stdlib.h>` read after it, `port_msl_exit` is declared
+    `noreturn`, the check's first call is followed by `unreachable` and the heap's visit is gone; with `exit_calls.h`
+    and the same `<stdlib.h>`, the declaration, both calls and the visit stay as without it.
   - `check_style.py --diff origin/main --strict` and clang-format pass on the game file; clang-format passes on the new
-    port C files. The changed documents' links, anchors and tables resolve, and no added line outside a table is over
-    120 characters.
+    port C files, the review's among them. The changed documents' links, anchors and tables resolve, and no added line
+    outside a table is over 120 characters.
   - T4 (oracle), the sanitized routes (T5) and T7 not run: no oracle is built in this worktree. The café's runs above
     are the sanitized build's only routes here.
 - **Tiers/trap stubs:** not measured: the change adds no game C and takes none away (one Neutral line in a complete
   file). The trap stubs are unchanged, 25 functions and 1 data placeholder in both games; `port_msl_exit` is a host
-  symbol, not one of the ROM's. No map load of the café or its neighbours reaches one.
-- **64-bit warnings:** the pointer cast guard passes in both games, before and after the merge, at 365 sites/229 keys
-  (real 66, harmless 123, handled 141, unreachable 35), no change; it compiles 1,713 files (1,711 before: MSL's `exit.c`
-  through `port/hal/msl/msl_exit.c`, and the gimmick's file through its fixture), none missing.
+  symbol, not one of the ROM's. No map load of the café or its neighbours reaches one. `gen_stubs.py`'s summary now
+  counts the game's objects' references alone: the host's C library provides 28 of the ROM's symbols to them in both
+  games, `exit` not among them (37 with the platform layer's and the program's, `exit` among those).
+- **64-bit warnings:** the pointer cast guard passes in both games, before and after the merge and on the review's
+  follow-ups, at 365 sites/229 keys (real 66, harmless 123, handled 141, unreachable 35), no change; it compiles 1,713
+  files (1,711 before: MSL's `exit.c` through `port/hal/msl/exit_host.c`, and the gimmick's file through its fixture),
+  none missing.
 - **Work done:** the save lab's prototype map sweep (saves minted to arrive in each of the 615 zones, each booted in a
   process of its own; ADR 0032 is reserved for the save lab, whose minter, L1, and map sweep, L3, come in their own PRs)
   found one zone that ended the program with status 1 and no `port:` line: CONTINUE into Castelia City's café,
@@ -105,25 +120,43 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     which notes the failure and returns, so `GFL_HeapAllocate` goes on to `OS_Terminate`. The host linked the C
     library's, which ended the program in the check: a heap out of room, a heap deleted with blocks in it, and the
     unconditional dumps of the Pokémon Musical's end and the C-Gear's beacon search, where the DS goes on. The host now
-    compiles `src/gfl/heap.c` with `exit` renamed to MSL's own, `port/hal/msl/msl_exit.c` compiling `lib/msl/src/exit.c`
-    as `port_msl_exit` ([../cmake/msl.cmake](../cmake/msl.cmake), as `nnsys.cmake` renames SDK functions): a heap that
-    runs out stops the game with `OS_Terminate`, status 71, its `port:` line and a backtrace through `GFL_HeapAllocate`,
-    which `--help` documents. The decomp finding that said the DS stops in the check is corrected
-    ([decomp-findings.md](decomp-findings.md)).
+    compiles `src/gfl/heap.c` with `port/hal/msl/exit_calls.h` forced in, which declares MSL's own `exit` as
+    `port_msl_exit` after the host's `<stdlib.h>` and sends the file's calls to it, and `port/hal/msl/exit_host.c`
+    compiles `lib/msl/src/exit.c` under that name ([../cmake/msl.cmake](../cmake/msl.cmake), as `rom.cmake` forces
+    `card_backup_calls.h` into `backup_card.c`): a heap that runs out stops the game with `OS_Terminate`, status 71, its
+    `port:` line and a backtrace through `GFL_HeapAllocate`, which `--help` documents. `port/tools/gen_stubs.py` fails
+    the build when another of the game's objects calls the host C library's `exit`. The decomp finding that said the
+    DS stops in the check is corrected ([decomp-findings.md](decomp-findings.md)).
   - **Tests**, port-alone in T2 with no ROM: `integrate_sp_poke_gimmick` runs the four gimmicks' initializations and
     ends from the actual source with typed spies and a work block of exactly the size each asks for, under ASan and
     UBSan; `msl_exit_heap_check` (the check's dump and a heap deleted with a block in it go on) and `msl_exit_heap_full`
     (an allocation with no room stops the game with status 71 and its line) run the heap check on the whole program's
-    objects.
-  - **The map sweep's case:** the map sweep's test (L3's `sweep_maps`, on the minter's saves) holds this zone's row, by
+    objects; `msl_exit_game_objects` runs `gen_stubs.py`'s check on three objects it compiles with the build's
+    compiler (a game file that calls `exit` fails it, the same file with `exit_calls.h` first and a port file that
+    calls `exit` pass).
+  - **The map sweep's case:** L3's `sweep_maps`, on the minter's saves, is to hold this zone's row when it lands, by
     warp 0 from the Route 19 save: `ok` at frame 2,200, top screen `d575a8456293` and bottom `a912c9dce413`, where the
     lab's sweep had `exit 1` at 1,543; its sanitized mode would have named the write.
+  - **The review**, independent, of `9d9f845ed7`, found no must-fix finding and nine on records, docs and hardening,
+    each handled in this PR: the first negative control's wording, which said ASan reports gimmick B's write
+    once the size check is gone, where the fixture's own read of gimmick A's data comes first (corrected above and in
+    the integration fixtures' guide); MODDING.md's "most often", which nothing measured, now one cause; the lesson's
+    relocations, which overlays keep in their own `relocs.txt`; `replaced.txt`'s MSL line, which now names the `exit`;
+    the fixture's comment, where gimmick C's NPC, its block from the heap's tail, lands in the head of the block after
+    it; `msl_exit.c`, now `exit_host.c` by the platform layer's naming rule, with a fifth pattern in the hal guide,
+    calls renamed by a forced `*_calls.h`; a check at build time that only the known callers reach MSL's `exit`, now
+    `gen_stubs.py`'s; `-Dexit=port_msl_exit`, which a `<stdlib.h>` read after it in `heap.c`'s unit (through
+    `port_host.h`, say) would have made `noreturn`, dropping the code after the check's first call, now the forced
+    header; and this case's record of L3, which hasn't landed.
   - **Docs:** `--help` and ARCHITECTURE.md's status 71 (one of the game's heaps out of room), MODDING.md's stops, the
-    feature map's field and heaps rows, the guides of `port/hal`, `port/cmake`, the tests and the integration fixtures,
-    the glossary's MSL, and a [lesson](lessons.md).
+    feature map's field and heaps rows, the guides of `port/hal` (its fifth pattern), `port/cmake`, `port/tools`, the
+    tests, the integration fixtures and the tools' tests, the glossary's MSL, and a [lesson](lessons.md).
   - **Out of scope, noted only:** the sweep's other rows that need a reason. The Union Room and its two colosseums stop
     on the watchdog at frame 1,898, as link rooms entered without a link do. 40 placeholder zones end on the same
-    generic house of `MAP_MATRIX_BLACK_CITY_3`, with no events.
+    generic house of `MAP_MATRIX_BLACK_CITY_3`, with no events. And another way MSL differs, which nothing covers yet:
+    `atexit`. DWC's GameSpy core (`lib/dwc/src/gscommon/gsCore.c`, overlay 11, online play) registers its shutdown with
+    it, the game's only call; MSL's `exit` never runs such functions, and the host's C library runs it as the program
+    ends, after the game's last frame ([../cmake/msl.cmake](../cmake/msl.cmake)'s header says so).
 - **Next:** the map sweep's L3 with the save lab's minter; Phase 5's story coverage after the Route 20 save, as the
   earlier entries say.
 - **Blockers:** decisions the owner holds: ADRs 0022, 0023, 0025 and 0030 are proposed. Spanish issue 45 still lacks a

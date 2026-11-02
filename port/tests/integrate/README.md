@@ -43,8 +43,10 @@ those diagnostics do not become a source-rewriting generator or a Git dependency
 `integrate_sp_poke_gimmick` includes the actual gimmick owner with typed spies for the field's gimmick work block,
 heap and 3D scenes only, and runs the four gimmicks' initializations and ends. The work block is a host block of
 exactly the size the gimmick asks for, so ASan reports a write past it, and the fixture checks that the size holds
-`SpPokeGimmickWork`, which its pointers make 64 bytes on a 64-bit host against the DS's 0x30. With the DS's size,
-gimmick B's initialization writes its curve's address 8 bytes past the block (ASan's heap-buffer-overflow at
-`SpPokeGimmickB_Init`); in the program that write broke the field heap's free list, and the map sweep's CONTINUE into
+`SpPokeGimmickWork`, which its pointers make 64 bytes on a 64-bit host against the DS's 0x30. With the DS's size the
+fixture fails that size check at gimmick A, the first, before it reads the work's data itself. Without the size
+check, ASan's first report is that read of the fixture's, gimmick A's `data.curve`, 8 bytes past A's block; without
+that check too, it is gimmick B's own write, its curve's address 8 bytes past the block (a heap-buffer-overflow in
+`SpPokeGimmickB_Init`). In the program that write broke the field heap's free list, and the map sweep's CONTINUE into
 Castelia City's café, `ZONE_CASTELIA_CITY_22`, ended without a message. The scenes' resources aren't loaded, so it
 needs no ROM.

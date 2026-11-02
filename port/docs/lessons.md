@@ -14,8 +14,10 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
 - The game has its own `exit`, MSL's, and on the DS it returns. Before taking a decomp finding about a library
   function's behaviour on the DS as true, read that function's C, if the decomp has it now: the heap check's finding
   said the DS stops there, written before upstream wrote `lib/msl/src/exit.c`. The ROM's relocations list every
-  caller of a ROM function (`to:0xADDRESS` in `config/<version>/arm9/relocs.txt`), which shows that a rename limited
-  to one file covers all of them.
+  caller of a ROM function, main's in `config/<version>/arm9/relocs.txt` and each overlay's in its own
+  `arm9/overlays/ovNNN/relocs.txt`, so search them all: `grep -r 'to:0xADDRESS' config/<version> --include=relocs.txt`
+  (the heap check's own callers are two in main and two in overlay 12). That shows whether a rename limited to one
+  file covers all of them; a build-time check then keeps it so (`gen_stubs.py`'s `MSL_OWN`).
 - A heap that is full where it shouldn't be may not be full. Walk the expanded heap's free and used lists, and the
   memory between their blocks, before scaling heaps: there the free list's head was the used list's last block, and
   the rest of the heap, 1.49 MB, sat in a free block that only a broken link reached, whose `prev` held the address

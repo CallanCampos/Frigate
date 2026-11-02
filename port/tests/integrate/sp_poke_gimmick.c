@@ -3,9 +3,11 @@
 // TU only. Each of the four gimmicks keeps its state in the field's gimmick work block 1, a SpPokeGimmickWork, which
 // its pointers make 64 bytes on a 64-bit host against the DS's 0x30. The fixture gives each initialization a block of
 // exactly the size it asks for, under ASan and UBSan, and checks that the size holds the whole struct and that the
-// game's writes stay in it: with the DS's 0x30, gimmick B's curve and gimmick C's NPC were written past the block, into
-// the head of the field heap's next free block, and the field's next allocation found the heap empty (the map sweep's
-// silent exit at CONTINUE into ZONE_CASTELIA_CITY_22, port/docs/STATUS.md). No ROM: the scenes' 3D resources are spies.
+// game's writes stay in it. With the DS's 0x30, gimmick B's curve was written past its block into the head of the field
+// heap's next free block, and the field's next allocation found the heap empty (the map sweep's silent exit at
+// CONTINUE into ZONE_CASTELIA_CITY_22, port/docs/STATUS.md); gimmick C's NPC, whose block comes from the heap's tail,
+// went past its block into the head of the block after it. With that size the fixture fails its size check at gimmick
+// A, before its own reads of the work's data. No ROM: the scenes' 3D resources are spies.
 #define Field_AllocGimmickWorkBlock SpyAllocWork
 #define Field_GetGimmickWorkBlock SpyGetWork
 #define Field_DeleteGimmickWorkBlock SpyDeleteWork
