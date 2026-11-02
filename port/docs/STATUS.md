@@ -32,11 +32,102 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-11-02: Castelia City's café loads: the gimmick's work at its host size, and MSL's exit for the heap check
+
+- **Upstream:** `9496bc869b`, unchanged: this change merges no upstream commit. Reviewed main is `d19894b1f7`, PR 69's
+  merge.
+- **Port:** `PORT_SHA`, on the topic branch `port-castelia22-exit` from `d19894b1f7`; this entry fills the last
+  entry's `PORT_SHA` with `2f9033d7b8`.
+- **ROM (T0):** `python3 configure.py && ninja` in a fresh worktree (10,703 steps) passes both original US SHA1s with
+  zero compiler warnings: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  `src/ov129/sp_poke_gimmick.c` is complete in both versions, so this is its change's MWCC-neutral proof.
+- **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both games (`build/port`, `build/port-w2`) pass,
+  with no warning in the changed or new files; the sanitized Black 2 (`build/port-san`) builds too.
+- **Tests:**
+  - T2/T6: `ctest -LE route -j3` passes in both games: 354 of 361 tests pass, and 7 skip for the optional setups this
+    checkout lacks, as in the last entry (`asm_oracle`, `oracle_boot`, `oracle_saves`, `oracle_floccesy_save`, the two
+    function-sanitizer negatives of the VM dispatch and `app_universal_slices`). The 361 include the new
+    `integrate_sp_poke_gimmick`, `msl_exit_heap_check`, `msl_exit_heap_full` and the overlay sections' image check of
+    their program. All four new tests pass in the sanitized build too.
+  - T3, short: the replays pass, B2 6 of 6 and W2 4 of 4 (`replay_new_game`, B2 only, `replay_new_game_house`,
+    `replay_same_save` and `replay_same_save_complete`, with their clean fixtures).
+  - The café, with the save lab's prototype minter and the sweep's boot input (2,200 frames, headless, clock pinned):
+    before, status 1 at frame 1,543 with no `port:` line and `run.txt` at `status: -`, from the Route 19 save by warp
+    0; after, status 0 and all 2,200 frames from both the Route 19 save by warp 0 (top screen `d575a8456293`, bottom
+    `a912c9dce413`) and the Route 20 save by Fly (top `3b0078014f10`), and in the sanitized build from both with no
+    report and the same hashes.
+  - Neighbours: nine zones run the same way from the Route 19 save, by the sweep's own arrivals, each end with status 0
+    at frame 2,200 and both screens' hashes equal to the lab's sweep's: `ZONE_CASTELIA_CITY`, `_7` (whose door leads
+    into the café), `_20`, `_21`, `_23`, `_24`, `_25`, `ZONE_CASTELIA_GATE` and `ZONE_PLEDGE_GROVE`, the other special
+    Pokémon zone.
+  - Negative controls: with `WORK_SIZE` at 0x30, `integrate_sp_poke_gimmick` fails at gimmick A's size check (48 for
+    64), and without that check ASan reports gimmick B's own write, 8 bytes past a 48-byte block in
+    `SpPokeGimmickB_Init`; without the rename of `exit`, `msl_exit_heap_check` and `msl_exit_heap_full` both end with
+    status 1 and no `port:` line.
+  - `check_style.py --diff origin/main --strict` and clang-format pass on the game file; clang-format passes on the new
+    port C files. The changed documents' links, anchors and tables resolve, and no added line outside a table is over
+    120 characters.
+  - T4 (oracle), the sanitized routes (T5) and T7 not run: no oracle is built in this worktree. The café's runs above
+    are the sanitized build's only routes here.
+- **Tiers/trap stubs:** not measured: the change adds no game C and takes none away (one Neutral line in a complete
+  file). The trap stubs are unchanged, 25 functions and 1 data placeholder in both games; `port_msl_exit` is a host
+  symbol, not one of the ROM's. No map load of the café or its neighbours reaches one.
+- **64-bit warnings:** the pointer cast guard passes in both games, at 365 sites/229 keys (real 66, harmless 123,
+  handled 141, unreachable 35), no change; it compiles 1,713 files (1,711 before: MSL's `exit.c` through
+  `port/hal/msl/msl_exit.c`, and the gimmick's file through its fixture), none missing.
+- **Work done:** the save lab's prototype map sweep (saves minted to arrive in each of the 615 zones, each booted in a
+  process of its own; ADR 0032 is reserved for the save lab, whose minter, L1, and map sweep, L3, come in their own
+  PRs) found one zone that ended the program with status 1 and no `port:` line: CONTINUE into Castelia City's café,
+  `ZONE_CASTELIA_CITY_22`, at game frame 1,543, with `run.txt` left at `status: -`, from the lab's Route 19 save by
+  warp 0 and its Route 20 save by Fly. It was the first item of the sweep's triage.
+  - **Diagnosis**, in this worktree only and taken out after: a temporary `atexit` handler printed the backtrace
+    (`backtrace_symbols_fd`): the C library's `exit`, called by GFL's heap check, `GFL_HeapDumpOnFailure`, from
+    `GFL_HeapAllocate`'s failure path, from the scene load of `SpPokeGimmickB_Init` (`FieldExpObj_AddScene`, archive
+    201, file 4, 3,320 bytes) during `FieldRoutine_MapLoad`. Temporary prints in the heap showed the field's heap
+    (`HEAPID_FIELDMAP`, 2,420,736 bytes on the host) with 48 bytes free and 912,224 in its used blocks. A walk of
+    the expanded heap's lists found its free list's head on the used list's last block, and the rest of the heap,
+    1,491,096 bytes, in a free block whose `prev` held the address of the gimmick's curve. The sanitized build then
+    named the write: use-after-poison, a write of 8, in `SpPokeGimmickB_Init` at `sp_poke_gimmick.c:216`.
+  - **The cause:** the four special Pokémon gimmicks of overlay 129 (zones 53, the café, and 614) allocate their work
+    block 1 with the DS's size of `SpPokeGimmickWork`, 0x30, which two pointers and a union of two more make 64 bytes
+    on a host. Gimmick B wrote its curve's address at offset 56, 8 bytes past the block, into the link of the field
+    heap's next free block; the next allocation took that block while the free list's head kept pointing at it. Fixed
+    in the game's file: `WORK_SIZE` is `sizeof(SpPokeGimmickWork)`, 0x30 under MWCC ([game-changes.md](game-changes.md),
+    Neutral; H9 of [sanitizers.md](sanitizers.md)).
+  - **The silence:** the heap check's `exit(1)` and `exit(0)` are the ROM's only calls of `exit` (relocations from
+    `0x0203a4bc` and `0x0203a4d0` in Black 2, `0x0203a4e8` and `0x0203a4fc` in White 2), and on the DS they are MSL's,
+    which notes the failure and returns, so `GFL_HeapAllocate` goes on to `OS_Terminate`. The host linked the C
+    library's, which ended the program in the check: a heap out of room, a heap deleted with blocks in it, and the
+    unconditional dumps of the Pokémon Musical's end and the C-Gear's beacon search, where the DS goes on. The host now
+    compiles `src/gfl/heap.c` with `exit` renamed to MSL's own, `port/hal/msl/msl_exit.c` compiling
+    `lib/msl/src/exit.c` as `port_msl_exit` ([../cmake/msl.cmake](../cmake/msl.cmake), as `nnsys.cmake` renames SDK
+    functions): a heap that runs out stops the game with `OS_Terminate`, status 71, its `port:` line and a backtrace
+    through `GFL_HeapAllocate`, which `--help` documents. The decomp finding that said the DS stops in the check is
+    corrected ([decomp-findings.md](decomp-findings.md)).
+  - **Tests**, port-alone in T2 with no ROM: `integrate_sp_poke_gimmick` runs the four gimmicks' initializations and
+    ends from the actual source with typed spies and a work block of exactly the size each asks for, under ASan and
+    UBSan; `msl_exit_heap_check` (the check's dump and a heap deleted with a block in it go on) and
+    `msl_exit_heap_full` (an allocation with no room stops the game with status 71 and its line) run the heap check on
+    the whole program's objects.
+  - **The map sweep's case:** the map sweep's test (L3's `sweep_maps`, on the minter's saves) holds this zone's row,
+    by warp 0 from the Route 19 save: `ok` at frame 2,200, top screen `d575a8456293` and bottom `a912c9dce413`, where
+    the lab's sweep had `exit 1` at 1,543; its sanitized mode would have named the write.
+  - **Docs:** `--help` and ARCHITECTURE.md's status 71 (one of the game's heaps out of room), MODDING.md's stops, the
+    feature map's field and heaps rows, the guides of `port/hal`, `port/cmake`, the tests and the integration
+    fixtures, the glossary's MSL, and a [lesson](lessons.md).
+  - **Out of scope, noted only:** the sweep's other rows that need a reason. The Union Room and its two colosseums stop
+    on the watchdog at frame 1,898, as link rooms entered without a link do. 40 placeholder zones end on the same
+    generic house of `MAP_MATRIX_BLACK_CITY_3`, with no events.
+- **Next:** the map sweep's L3 with the save lab's minter; Phase 5's story coverage after the Route 20 save, as the
+  earlier entries say. The pending upstream sync is resolved separately.
+- **Blockers:** decisions the owner holds: ADRs 0022, 0023, 0025 and 0030 are proposed. Spanish issue 45 still lacks a
+  local dump. None for this change.
+
 ## 2026-11-01: pin the verified head and keep the verifier's exit status
 
 - **Upstream:** `9496bc869b`, unchanged: this change merges no upstream commit. Reviewed main is `faad9927e8`, PR 68's
   merge.
-- **Port:** `PORT_SHA`, on the topic branch `port-verify-status-followups` from `e733ccc8a3` (PR 66's merge), with
+- **Port:** `2f9033d7b8`, on the topic branch `port-verify-status-followups` from `e733ccc8a3` (PR 66's merge), with
   reviewed main `faad9927e8` merged in; this entry fills the last entry's `PORT_SHA` with `d0833a7943`.
 - **ROM (T0):** configure and Ninja pass both original US SHA1s with zero compiler warnings: B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, in a full build

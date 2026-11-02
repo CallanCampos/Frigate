@@ -17,7 +17,7 @@
 #include "system/game_system.h"
 
 #define WORK_ID 1
-#define WORK_SIZE 0x30
+#define WORK_SIZE sizeof(SpPokeGimmickWork)
 
 #define ARCID_SP_POKE_ACTORS 201
 #define ARCID_SP_POKE_CURVE 305
