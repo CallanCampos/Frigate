@@ -1403,7 +1403,7 @@ CENTER_PLAY_SECONDS = ("the play time's seconds, which each program counts with 
                        "White 2's port saves 740 counts (12 seconds of passes) after the DS, past the cut on presses "
                        "of its own, and holds 0:08:10 against the DS's 0:08:06")
 MYSTERY_KEY = ("the mystery gift block's key (MysteryGiftSaveData.key, include/save/mystery_gift.h): the Pokemon "
-               "Center's deliveryman's scripts (res/field/scripts/global_10395.s, Cmd_01DB, "
+               "Center's deliveryman's scripts (res/field/scripts/global_10395.s, MysteryGifts, "
                "Scrcmd_PdwPostman_MysteryGifts in src/ov033/pdw_postman.c) read the block as the player enters, and "
                "every read decrypts it and encrypts it again with a key that mgEncryptData (src/system/mystery_data.c) "
                "takes from the VBlank count, (OS_GetVBlankCount() << 8) | OS_GetVBlankCount(): the DS's count runs "

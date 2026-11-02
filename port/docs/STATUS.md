@@ -39,13 +39,14 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   18,138 files they change being `res/`'s. It holds `931ff088a0`, the upstream head of the App's draft PR 67, so the
   merge's push fast-forwards that PR's branch. No incoming message names an issue of another repository or carries a
   closing keyword, and none changes a workflow.
-- **Port:** `PORT_SHA` on `codex/upstream-sync-931ff088a0c1-56a9ef2a1db0`, not pushed: `fea6b5c9ea`, the two-parent
+- **Port:** `PORT_SHA` on `codex/upstream-sync-931ff088a0c1-56a9ef2a1db0`: `fea6b5c9ea`, the two-parent
   merge of `56a9ef2a1d` (`main`) and `41f42ca1af` with its `Upstream-Commit` trailer, made by
   `sync_upstream.sh --no-push --branch codex/upstream-sync-931ff088a0c1-56a9ef2a1db0` (exit 3 at the conflicts, which
   the merge resolves); then `2a40413e7f` (the battle audit's keys), `48f72e208c` (comments and guides at the new
   names), `29c7e7fdb4`, the merge of `main` at `e733ccc8a3` (PR 66, which merged meanwhile: the local verification's
-  failure statuses and the App token's `client-id` input, no ROM or host build input), and this record, which fills
-  PR 66's entry's `PORT_SHA`.
+  failure statuses and the App token's `client-id` input, no ROM or host build input), `0350ba4ca3`, this record,
+  which fills PR 66's entry's `PORT_SHA`, and the review's fix, which names the deliveryman's script command as
+  upstream does (below) and brings this record up to date.
 - **ROM (T0):** a fresh `configure.py` and ninja (14,039 steps) of the merge's tree: both original US SHA1s, B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, with no compiler
   warning. All 1,790 C files of `src/` and `lib/` are complete in both versions' delinks, so the SHA1s prove what MWCC
@@ -99,7 +100,15 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   `BtlServerFlow.switchedInMons` (`5f5b5c6cd7`) beside the old name in sanitizers.md's R9 and the battle path's lesson;
   MODDING.md's unnamed function is one that has no name yet. Found by the identifiers and `symbols.txt` names of
   `9496bc869b` that `41f42ca1af` lacks (847 of four characters or more), the `Type.field` references of `port/` and
-  the host build; past STATUS.md entries, the research notes and ADR 0011 keep the names of their time.
+  the host build; past STATUS.md entries, the research notes and ADR 0011 keep the names of their time. That list
+  held no assembly macro, and the review found one more: the oracle's message and guide (`MYSTERY_KEY` in
+  `port/tools/oracle/oracle.py`, and its README) called the deliveryman's script command `Cmd_01DB`, which the same
+  `b1f86d5d7a` renames `MysteryGifts` in `include/asm/field_script.inc` and the scripts; the review's fix names it so.
+  Of the 886 names of four characters or more that the old versions of every text file the sync changes hold and
+  their new versions lack (the scripts, the `.inc` files, JSON and upstream's tools among them), 9 are gone from
+  upstream's whole tree and still in `port/`: that one; names the records keep (past entries, this entry's old names,
+  the research notes, ADR 0011); the guard's renamed baseline row; `unk1A68`, given beside its new name; and the
+  English word "Twelve".
 
   `port/tools/check_mwcc_neutral.py --base 41f42ca1af`: 3,002 of the 3,580 file and version pairs preprocess as
   upstream's do; the other 289 files, in both versions, differ only by the port's rows: 279 include `gfl/net.h`, whose
@@ -121,7 +130,14 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   this head again, pushes the fast-forward of PR 67's branch and marks it ready; the owner's
   `sync_upstream.sh --verify-pr 67` and review. If `main` moves again, merge it into the topic and validate again.
   After the sync merges, a PR that runs `check_ptrcasts.py --update` for `NetDevWifi_StartMatch`'s renamed row and
-  the rows no longer found. Then the phase's next criterion, as the earlier entries say.
+  the rows no longer found, and brings up to date what earlier syncs left in the living documents, none of it this
+  sync's: files upstream renamed before `9496bc869b` (`pointer_offsets.query`'s header's `scrcmd_fldmmdl.c`,
+  `scrcmd_field_actor.c` since `0e2d7f0974`; `zknd_tbar.c` in decomp-findings.md, game-changes.md and sanitizers.md,
+  `pokedex_detail_tbar.c` since `e2384ebfee`; sanitizers.md's R6's `fldeff_fes_kira.c`, `fldeff_fes_sparkle.c` since
+  `c13587cf78`), and sanitizers.md's R9, whose fix has had no game-changes.md row since upstream's `de6cd09688` made
+  it too. The tool's own messages want the same care: `sync_upstream.sh` says "N commits are not on origin/BRANCH"
+  and "merging origin/BRANCH" where it counts and merges against `origin/main` (its 281 here were the head's commits
+  that `main` lacks; PR 67's branch lacked 757). Then the phase's next criterion, as the earlier entries say.
 - **Blockers:** the owner's review of PR 67 once ready. None for the sync itself.
 
 ## 2026-10-28: finish local-verification failures and retain the scoped sync App

@@ -988,7 +988,7 @@ and variables, the mystery gifts and every other block are melonDS's:
   on the DS; White 2's port saves 740 counts later than the DS (X at count 15,160 against 14,420), and holds 0:08:10
   against 0:08:06.
 - 2 bytes of the mystery gift block's key (`0x1d292`, `MysteryGiftSaveData.key` at the end of the block at
-  `0x1c800`). The Pokémon Center's deliveryman's scripts (`res/field/scripts/global_10395.s`, `Cmd_01DB`;
+  `0x1c800`). The Pokémon Center's deliveryman's scripts (`res/field/scripts/global_10395.s`, `MysteryGifts`;
   `Scrcmd_PdwPostman_MysteryGifts` in `src/ov033/pdw_postman.c`) read the block as the player enters, and every read
   decrypts it and encrypts it again with a key that `mgEncryptData` (`src/system/mystery_data.c`) takes from the VBlank
   count, `(OS_GetVBlankCount() << 8) | OS_GetVBlankCount()`. The DS's count runs ahead of its passes (its dropped frames
