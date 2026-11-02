@@ -165,7 +165,8 @@ asm oracle, each spike, the artwork) lists its files there.
 | `cmake/` | The host build's fragments, one per module, with its tests, and the build's options | [cmake/README.md](cmake/README.md) |
 | `tests/` | Unit, integration, replay and oracle tests, one directory per module | [tests/README.md](tests/README.md) |
 | `tests/fs/` | Actual SDK archive-table cache lifecycle tests with synthetic storage | [tests/fs/README.md](tests/fs/README.md) |
-| `tools/` | The build's generators, the upstream sync, the pointer cast guard, the macOS packaging, the melonDS oracle, the measurement scripts | [tools/README.md](tools/README.md) |
+| `tools/` | The build's generators, the upstream sync, the pointer cast guard, the macOS packaging, the melonDS oracle, the save lab, the measurement scripts | [tools/README.md](tools/README.md) |
+| `tools/lab/` | The save lab: a save minted from a recipe in the game's names (CONTINUE then starts where it says), and a save read back as facts | [tools/lab/README.md](tools/lab/README.md) |
 | `assets/` | Files that aren't code and never game data: Frigate's logo and app icons | [assets/README.md](assets/README.md) |
 | `spikes/` | Phase 0's experiments, frozen; the live code took their answers | [spikes/README.md](spikes/README.md) |
 | `docs/` | The plan, the architecture, modding, the status log, the decisions, the research | [docs/README.md](docs/README.md) |
