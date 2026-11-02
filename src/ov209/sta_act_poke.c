@@ -179,7 +179,7 @@ static void StaActPoke_UpdateItems(StaActPokeSys *sys, StaActPoke *poke) {
                 if (equip->valid == TRUE) {
                     BOOL flipped = equip->info.scale.x < 0 ? TRUE : FALSE;
                     u16 rot = 0x10000 - equip->info.rotation;
-                    u16 itemRot = (0x10000 + equip->info.cellRotation + poke->equips[i]->unk2) % 0x10000;
+                    u16 itemRot = (0x10000 + equip->info.cellRotation + poke->equips[i]->rotation) % 0x10000;
                     fx32 scaleX;
                     MtxFx33 rotation;
                     VecFx32 center;
@@ -425,7 +425,7 @@ static void StaActPoke_ItemSpinInit(StaActPokeSys *sys, StaActPoke *poke) {
 
 static void StaActPoke_ItemSpin(StaActPokeSys *sys, StaActPoke *poke) {
     StaActPokeItemWork *work = &poke->itemWork;
-    poke->equips[work->pos]->unk2 += 0x1000;
+    poke->equips[work->pos]->rotation += 0x1000;
     work->timer++;
     if (work->timer >= 192) {
         poke->itemFunc = NULL;

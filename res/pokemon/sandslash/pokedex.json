@@ -1,0 +1,12 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "S",
+    "shapes": [ 9 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_RELIC_CASTLE": [ "grass" ],
+            "ZONE_ROUTE_15": [ "grass", "dark_grass" ]
+        }
+    }
+}

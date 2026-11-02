@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
@@ -10,9 +11,6 @@
 // The pass powers in effect: one for each effect, with the time it has left, and what each does to the game's
 // numbers. The file's name is a guess, from what it does: the ROM has no string for it. The functions' names are
 // swan's
-
-// The pass powers' table
-#define ARCID_PASS_POWER 37
 
 // A second of a pass power's time, and the HP that stands for all the party's HP and PP
 #define PASS_POWER_TICKS_PER_SECOND 60

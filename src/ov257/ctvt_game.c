@@ -99,6 +99,20 @@ enum {
     CTVT_GAME_PLAY_FREE,
 };
 
+// The steps of the results, CtvtGame_UpdateResults's: the scores come in, then the own rank is shown, with a crown for
+// the winner and a "try again" for a rank under second
+enum {
+    CTVT_GAME_RESULT_SHOW_SCORES,
+    CTVT_GAME_RESULT_FANFARE,
+    CTVT_GAME_RESULT_RANK,
+    CTVT_GAME_RESULT_WIN_FLASH,
+    CTVT_GAME_RESULT_SECOND,
+    CTVT_GAME_RESULT_LOWER,
+    CTVT_GAME_RESULT_CROWN,
+    CTVT_GAME_RESULT_WAIT,
+    CTVT_GAME_RESULT_DONE,
+};
+
 // A member's score on the sub screen, or a slot of the call that nobody is in
 typedef struct {
     TCB *tcb;
@@ -575,7 +589,7 @@ void CtvtGame_Enter(CommTvtWork *sys, CtvtGame *game) {
                 game->members[slot].pictures[i] = allocConfigDSSoftwareFeature(heapId, 0x2000, "ctvt_game.c", 773);
             }
         } else {
-            fileId = files[CtvtComm_GetUnk3dc(sys, comm, netId)];
+            fileId = files[CtvtComm_GetGameCharacter(sys, comm, netId)];
             for (i = 0; i < 3; i++) {
                 game->members[slot].pictures[i] =
                     GFL_ArcSysReadHeapNewLZ(ARCID_CTVT_GAME_CAM, i + fileId, FALSE, heapId);
@@ -586,10 +600,10 @@ void CtvtGame_Enter(CommTvtWork *sys, CtvtGame *game) {
     {
         BOOL cameraEnabled = CommTvt_IsCameraEnabled();
         CameraSystem *cameraSystem = CtvtCamera_GetCameraSystem(sys, CommTvt_GetCamera(sys));
-        u8 unk3dc = CtvtComm_GetUnk3dc(sys, comm, selfNetId);
+        u8 character = CtvtComm_GetGameCharacter(sys, comm, selfNetId);
 
         game->cam =
-            CtvtGameCam_Create(heapId, cameraEnabled, CtvtGame_GetType(game), unk3dc, game->members, cameraSystem);
+            CtvtGameCam_Create(heapId, cameraEnabled, CtvtGame_GetType(game), character, game->members, cameraSystem);
     }
     game->state = CTVT_GAME_STATE_START_CAMERA;
     game->replay = FALSE;
@@ -642,12 +656,12 @@ int CtvtGame_Main(CommTvtWork *sys, CtvtGame *game) {
         if (GFL_WipeIsFinished() == TRUE) {
             if (!CtvtGame_CheckError(sys, game)) {
                 switch (CtvtGameCam_UpdateTask(game->camTask)) {
-                case 0:
+                case CTVT_GAME_CAM_RUNNING:
                     break;
-                case 1:
+                case CTVT_GAME_CAM_DONE:
                     game->state = CTVT_GAME_STATE_FADE_OUT_CAMERA;
                     break;
-                case 2:
+                case CTVT_GAME_CAM_ERROR:
                     return COMM_TVT_MODE_EXIT_ERROR;
                 }
             } else {
@@ -881,13 +895,13 @@ u16 CtvtGame_GetHostFrame(CtvtGame *game) {
 void CtvtGame_CheckTouch(CtvtComm *comm, CtvtGame *game, const CtvtGamePacket *packet, int netId) {
     u16 index;
 
-    if (CtvtGame_FindTouchedTarget(game, packet->frame, packet->unk5[0], packet->unk5[1], &index) == TRUE) {
+    if (CtvtGame_FindTouchedTarget(game, packet->frame, packet->touchX, packet->touchY, &index) == TRUE) {
         CtvtGamePacket reply = { 0 };
 
         reply.values[netId] = index;
         reply.mask = 1 << netId;
         reply.frame = game->frame;
-        CtvtComm_QueueGamePacket(comm, reply, 4);
+        CtvtComm_QueueGamePacket(comm, reply, CTVT_GAME_PACKET_HITS);
         game->targets[index].hitPending = TRUE;
     }
 }
@@ -908,10 +922,10 @@ void CtvtGame_ApplyHits(CtvtGame *game, const CtvtGamePacket *packet, u8 mask) {
         if (i == game->targets[index].scene) {
             if (game->timeLeft <= 20) {
                 game->scores[i] += 4;
-                game->targets[index].hitKind = 1;
+                game->targets[index].hitKind = CTVT_TARGET_HIT_OWN_HURRY;
             } else {
                 game->scores[i] += 2;
-                game->targets[index].hitKind = 0;
+                game->targets[index].hitKind = CTVT_TARGET_HIT_OWN;
             }
             if (game->scores[i] > 999) {
                 game->scores[i] = 999;
@@ -922,10 +936,10 @@ void CtvtGame_ApplyHits(CtvtGame *game, const CtvtGamePacket *packet, u8 mask) {
         } else {
             if (game->timeLeft <= 20) {
                 game->scores[i] -= 2;
-                game->targets[index].hitKind = 3;
+                game->targets[index].hitKind = CTVT_TARGET_HIT_OTHER_HURRY;
             } else {
                 game->scores[i] -= 1;
-                game->targets[index].hitKind = 2;
+                game->targets[index].hitKind = CTVT_TARGET_HIT_OTHER;
             }
             if (game->scores[i] < 0) {
                 game->scores[i] = 0;
@@ -984,7 +998,7 @@ void CtvtGame_CountPump(CtvtComm *comm, CtvtGame *game, BOOL big, int netId) {
         CtvtGamePacket packet = { 0 };
 
         packet.mask = 1 << netId;
-        CtvtComm_QueueGamePacket(comm, packet, 7);
+        CtvtComm_QueueGamePacket(comm, packet, CTVT_GAME_PACKET_GROW_BALLOONS);
     }
 }
 
@@ -1129,7 +1143,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
             RTC_GetCachedDateTime(&date, &time);
             packet.value = date.year + date.month * 0x100 + date.day * 0x10000 + time.hour * 0x100000 +
                            (time.minute + time.second) * 0x1000000;
-            CtvtComm_QueueGamePacket(comm, packet, 1);
+            CtvtComm_QueueGamePacket(comm, packet, CTVT_GAME_PACKET_SEED);
         }
         game->playState = CTVT_GAME_PLAY_SYNC_SEED;
         break;
@@ -1393,7 +1407,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
                 AppTaskMenu_Free(game->yesNoMenu);
                 game->yesNoMenu = NULL;
             } else if (!AppTaskMenu_IsDecided(game->yesNoMenu) && CtvtGame_AreAllJoined(sys, game)) {
-                CtvtComm_QueueGameCommand(sys, CommTvt_GetComm(sys), 2);
+                CtvtComm_QueueGameCommand(sys, CommTvt_GetComm(sys), CTVT_GAME_COMMAND_ALL_JOINED);
                 game->playState = CTVT_GAME_PLAY_HOST_WAIT_READY;
             }
         } else {
@@ -1403,7 +1417,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
     case CTVT_GAME_PLAY_HOST_WAIT_READY:
         if (!CtvtGame_CheckQuit(sys, game)) {
             if (CtvtGame_AreAllReady(sys, game)) {
-                CtvtComm_QueueGameCommand(sys, CommTvt_GetComm(sys), 5);
+                CtvtComm_QueueGameCommand(sys, CommTvt_GetComm(sys), CTVT_GAME_COMMAND_REPLAY);
                 game->replay = TRUE;
                 game->playState = CTVT_GAME_PLAY_FADE_OUT_MENU;
             }
@@ -1417,7 +1431,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
             game->exitWait--;
         }
         if (game->exitWait == 0) {
-            CtvtComm_QueueGameCommand(sys, CommTvt_GetComm(sys), 3);
+            CtvtComm_QueueGameCommand(sys, CommTvt_GetComm(sys), CTVT_GAME_COMMAND_HOST_QUIT);
             game->playState = CTVT_GAME_PLAY_FADE_OUT_MENU;
             if (game->yesNoMenu != NULL) {
                 AppTaskMenu_Free(game->yesNoMenu);
@@ -1437,7 +1451,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
                 AppTaskMenu_Free(game->yesNoMenu);
                 game->yesNoMenu = NULL;
             } else if (!AppTaskMenu_IsDecided(game->yesNoMenu)) {
-                CtvtComm_QueueGameCommand(sys, comm, 0);
+                CtvtComm_QueueGameCommand(sys, comm, CTVT_GAME_COMMAND_JOIN);
                 if (game->allJoined == TRUE) {
                     game->allJoined = FALSE;
                     game->playState = CTVT_GAME_PLAY_CHILD_READY;
@@ -1449,7 +1463,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
         break;
     case CTVT_GAME_PLAY_CHILD_READY:
         if (!CtvtGame_CheckQuit(sys, game)) {
-            CtvtComm_QueueGameCommand(sys, comm, 4);
+            CtvtComm_QueueGameCommand(sys, comm, CTVT_GAME_COMMAND_READY);
             if (game->replayStarted == TRUE) {
                 game->replay = TRUE;
                 game->replayStarted = FALSE;
@@ -1465,7 +1479,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
         }
         if (game->exitWait == 0) {
             if (!CtvtGame_CheckQuit(sys, game)) {
-                CtvtComm_QueueGameCommand(sys, CommTvt_GetComm(sys), 1);
+                CtvtComm_QueueGameCommand(sys, CommTvt_GetComm(sys), CTVT_GAME_COMMAND_CHILD_QUIT);
             } else {
                 game->playState = CTVT_GAME_PLAY_FADE_OUT_MENU;
             }
@@ -1875,10 +1889,10 @@ static BOOL CtvtGame_UpdateTargets(CommTvtWork *sys, CtvtGame *game) {
     if (GFL_HIDGetTouchPressedPoint(&x, &y) == TRUE) {
         CtvtGamePacket packet = { 0 };
 
-        packet.unk5[0] = x;
-        packet.unk5[1] = y;
+        packet.touchX = x;
+        packet.touchY = y;
         packet.frame = game->frame;
-        CtvtComm_QueueGamePacket(comm, packet, 3);
+        CtvtComm_QueueGamePacket(comm, packet, CTVT_GAME_PACKET_TOUCH);
     }
     if (!game->frameReceived) {
         return FALSE;
@@ -1893,8 +1907,8 @@ static BOOL CtvtGame_UpdateTargets(CommTvtWork *sys, CtvtGame *game) {
             if (CtvtGame_FindFreeTarget(game, &index) == TRUE) {
                 CtvtGamePacket packet = { 0 };
 
-                packet.unk7 = index;
-                CtvtComm_QueueGamePacket(comm, packet, 0);
+                packet.target = index;
+                CtvtComm_QueueGamePacket(comm, packet, CTVT_GAME_PACKET_SPAWN_TARGET);
             }
             game->spawnNow = FALSE;
             game->spawnWait = 15;
@@ -2010,10 +2024,10 @@ static BOOL CtvtGame_UpdateBalloons(CommTvtWork *sys, CtvtGame *game) {
             CtvtGamePacket packet = { 0 };
 
             if (hit == 0 || hit == 4) {
-                CtvtComm_QueueGamePacket(comm, packet, 6);
+                CtvtComm_QueueGamePacket(comm, packet, CTVT_GAME_PACKET_PUMP_BIG);
                 GFL_SndSEPlay(SEQ_SE_LCG_10);
             } else {
-                CtvtComm_QueueGamePacket(comm, packet, 5);
+                CtvtComm_QueueGamePacket(comm, packet, CTVT_GAME_PACKET_PUMP);
                 GFL_SndSEPlay(SEQ_SE_LCG_11);
             }
             if (game->wobbleCooldown == 0) {
@@ -2334,7 +2348,7 @@ static void CtvtGame_InitResults(CommTvtWork *sys, CtvtGame *game) {
             slot++;
         }
     }
-    game->resultState = 0;
+    game->resultState = CTVT_GAME_RESULT_SHOW_SCORES;
     game->resultTimer = 0;
 }
 
@@ -2344,7 +2358,7 @@ static BOOL CtvtGame_UpdateResults(CommTvtWork *sys, CtvtGame *game) {
     u8 i;
 
     switch (game->resultState) {
-    case 0:
+    case CTVT_GAME_RESULT_SHOW_SCORES:
         for (i = 0; i < 4; i++) {
             if (!game->players[i]->absent && !game->shots[i]->active && game->players[i]->state == 0) {
                 game->players[i]->state = 1;
@@ -2352,10 +2366,10 @@ static BOOL CtvtGame_UpdateResults(CommTvtWork *sys, CtvtGame *game) {
         }
         game->resultTimer++;
         if (game->resultTimer > 462) {
-            game->resultState = 1;
+            game->resultState = CTVT_GAME_RESULT_FANFARE;
         }
         break;
-    case 1:
+    case CTVT_GAME_RESULT_FANFARE:
         for (i = 0; i < 4; i++) {
             game->players[i]->state = 1;
         }
@@ -2364,9 +2378,9 @@ static BOOL CtvtGame_UpdateResults(CommTvtWork *sys, CtvtGame *game) {
         } else {
             GFL_SndBGMPlay(SEQ_ME_LCG_04, SND_CHANNEL_MASK_ALL);
         }
-        game->resultState = 2;
+        game->resultState = CTVT_GAME_RESULT_RANK;
         break;
-    case 2:
+    case CTVT_GAME_RESULT_RANK:
         if (game->players[selfNetId]->rank == 1) {
             ClActor_SetVisible(game->winBanner, TRUE);
             ClActor_SetVisible(game->winBursts[0], TRUE);
@@ -2384,33 +2398,33 @@ static BOOL CtvtGame_UpdateResults(CommTvtWork *sys, CtvtGame *game) {
             ClActor_SetVisible(game->winGlow, TRUE);
             ClActor_SetAutoAnim(game->winGlow, TRUE);
             ClActor_RestartAnim(game->winGlow);
-            game->resultState = 3;
+            game->resultState = CTVT_GAME_RESULT_WIN_FLASH;
         } else if (game->players[selfNetId]->rank == 2) {
-            game->resultState = 4;
+            game->resultState = CTVT_GAME_RESULT_SECOND;
         } else {
-            game->resultState = 5;
+            game->resultState = CTVT_GAME_RESULT_LOWER;
         }
         ClActor_SetSequence(game->rankSign, game->players[selfNetId]->rank + 32);
         ClActor_SetVisible(game->rankSign, FALSE);
         break;
-    case 3:
+    case CTVT_GAME_RESULT_WIN_FLASH:
         if (!ClActor_IsAnimActive(game->winFlashes[0])) {
             ClActor_SetVisible(game->winFlashes[0], FALSE);
             ClActor_SetVisible(game->winFlashes[1], FALSE);
             ClActor_SetVisible(game->crown, TRUE);
             ClActor_SetAutoAnim(game->crown, TRUE);
             ClActor_RestartAnim(game->crown);
-            game->resultState = 6;
+            game->resultState = CTVT_GAME_RESULT_CROWN;
         }
         break;
-    case 4:
+    case CTVT_GAME_RESULT_SECOND:
         ClActor_SetVisible(game->rankSign, TRUE);
         ClActor_SetAutoAnim(game->rankSign, TRUE);
         ClActor_RestartAnim(game->rankSign);
         game->resultTimer = 0;
-        game->resultState = 7;
+        game->resultState = CTVT_GAME_RESULT_WAIT;
         break;
-    case 5:
+    case CTVT_GAME_RESULT_LOWER:
         ClActor_SetVisible(game->rankSign, TRUE);
         ClActor_SetAutoAnim(game->rankSign, TRUE);
         ClActor_RestartAnim(game->rankSign);
@@ -2418,9 +2432,9 @@ static BOOL CtvtGame_UpdateResults(CommTvtWork *sys, CtvtGame *game) {
         ClActor_SetAutoAnim(game->tryAgainSign, TRUE);
         ClActor_RestartAnim(game->tryAgainSign);
         game->resultTimer = 0;
-        game->resultState = 7;
+        game->resultState = CTVT_GAME_RESULT_WAIT;
         break;
-    case 6:
+    case CTVT_GAME_RESULT_CROWN:
         if (!ClActor_IsAnimActive(game->crown)) {
             ClActor_SetVisible(game->crown, FALSE);
             for (i = 0; i < 6; i++) {
@@ -2432,16 +2446,16 @@ static BOOL CtvtGame_UpdateResults(CommTvtWork *sys, CtvtGame *game) {
             ClActor_SetAutoAnim(game->rankSign, TRUE);
             ClActor_RestartAnim(game->rankSign);
             game->resultTimer = 0;
-            game->resultState = 7;
+            game->resultState = CTVT_GAME_RESULT_WAIT;
         }
         break;
-    case 7:
+    case CTVT_GAME_RESULT_WAIT:
         game->resultTimer++;
         if (game->resultTimer > 300) {
-            game->resultState = 8;
+            game->resultState = CTVT_GAME_RESULT_DONE;
         }
         break;
-    case 8:
+    case CTVT_GAME_RESULT_DONE:
         return TRUE;
     }
     CtvtGame_UpdatePlayers(game);

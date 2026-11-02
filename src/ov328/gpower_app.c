@@ -51,6 +51,9 @@
 #define ACTIVE_POWER_MAX 10
 #define POS_COUNT 9
 
+// Ends the tables of BG files, labels, actors and windows
+#define TABLE_END 0xff
+
 // The windows: the title, the running Pass Powers' names and times, and the message
 enum {
     WINDOW_TITLE,
@@ -62,8 +65,29 @@ enum {
 
 // The buttons, and what a touch gives beyond them
 enum {
-    BUTTON_ENTRALINK = 3,
+    BUTTON_POWER_0,
+    BUTTON_POWER_1,
+    BUTTON_POWER_2,
+    BUTTON_ENTRALINK,
     TOUCH_RETURN,
+};
+
+// The rectangles of sGPowerAppSelectTouchRects. The Entralink button has two, the second above its right end
+enum {
+    SELECT_RECT_POWER_0,
+    SELECT_RECT_POWER_1,
+    SELECT_RECT_POWER_2,
+    SELECT_RECT_ENTRALINK,
+    SELECT_RECT_ENTRALINK_TOP,
+    SELECT_RECT_RETURN,
+};
+
+// GPowerApp_Main's steps
+enum {
+    MAIN_FADE_IN,
+    MAIN_RUN,
+    MAIN_START_FADE_OUT,
+    MAIN_FADE_OUT,
 };
 
 enum {
@@ -266,14 +290,14 @@ const GameProcFunctions GPOWER_APP_PROC_FUNCTIONS = { GPowerApp_Init, GPowerApp_
 static const GPowerAppBGFile sGPowerAppPalettes[] = {
     { PALTYPE_SUB_BG, 0, 0, 3 },
     { PALTYPE_MAIN_BG, 0, 0, 3 },
-    { 0xff, 0, 0, 0 },
+    { TABLE_END, 0, 0, 0 },
 };
 
 static const GPowerAppBGFile sGPowerAppChars[] = {
     { 7, 2, 0, 0 },
     { 3, 2, 0, 0 },
     { 1, 2, 0, 0 },
-    { 0xff, 0, 0, 0 },
+    { TABLE_END, 0, 0, 0 },
 };
 
 // The screen's messages
@@ -301,7 +325,7 @@ static const GPowerAppBGFile sGPowerAppScreens[] = {
     { 7, 6, 0, 0 },
     { 3, 5, 0, 0 },
     { 1, 7, 0, 0 },
-    { 0xff, 0, 0, 0 },
+    { TABLE_END, 0, 0, 0 },
 };
 
 static const GPowerAppLabelSetup sGPowerAppLabelSetups[] = {
@@ -309,12 +333,12 @@ static const GPowerAppLabelSetup sGPowerAppLabelSetups[] = {
     { 20, 2, 40, 3, TRUE, 0, 6 },
     { 20, 2, 40, 3, TRUE, 0, 7 },
     { 20, 2, 40, 3, TRUE, 0, 8 },
-    { 0xff },
+    { TABLE_END },
 };
 
 static const GPowerAppActorSetup sGPowerAppReturnActorSetups[] = {
     { 1, 48, 2, TRUE, 0, ACTOR_AUTO_ANIM, 4 },
-    { 0xff },
+    { TABLE_END },
 };
 
 static const GPowerAppActorGroup sGPowerAppReturnActorGroup = { RES_COMMON_PALETTE, RES_COMMON_CHARS, RES_COMMON_CELLS,
@@ -335,33 +359,16 @@ static const GPowerAppActorSetup sGPowerAppButtonActorSetups[] = {
     { 0, 48, 3, TRUE, 0, ACTOR_AUTO_ANIM, 1 },
     { 0, 48, 3, TRUE, 0, ACTOR_AUTO_ANIM, 2 },
     { 1, 48, 3, TRUE, 0, ACTOR_AUTO_ANIM, 3 },
-    { 0xff },
+    { TABLE_END },
 };
 
 static const GPowerAppWindowSetup sGPowerAppWindowSetups[] = {
-    { 6, 1, 0, 30, 3, 8 },
-    { 6, 2, 3, 20, 2, 8 },
-    { 6, 2, 5, 20, 2, 8 },
-    { 6, 2, 7, 20, 2, 8 },
-    { 6, 2, 9, 20, 2, 8 },
-    { 6, 2, 11, 20, 2, 8 },
-    { 6, 2, 13, 20, 2, 8 },
-    { 6, 2, 15, 20, 2, 8 },
-    { 6, 2, 17, 20, 2, 8 },
-    { 6, 2, 19, 20, 2, 8 },
-    { 6, 2, 21, 20, 2, 8 },
-    { 6, 22, 3, 8, 2, 8 },
-    { 6, 22, 5, 8, 2, 8 },
-    { 6, 22, 7, 8, 2, 8 },
-    { 6, 22, 9, 8, 2, 8 },
-    { 6, 22, 11, 8, 2, 8 },
-    { 6, 22, 13, 8, 2, 8 },
-    { 6, 22, 15, 8, 2, 8 },
-    { 6, 22, 17, 8, 2, 8 },
-    { 6, 22, 19, 8, 2, 8 },
-    { 6, 22, 21, 8, 2, 8 },
-    { 0, 2, 14, 28, 6, 8 },
-    { 0xff },
+    { 6, 1, 0, 30, 3, 8 },  { 6, 2, 3, 20, 2, 8 },  { 6, 2, 5, 20, 2, 8 },  { 6, 2, 7, 20, 2, 8 },
+    { 6, 2, 9, 20, 2, 8 },  { 6, 2, 11, 20, 2, 8 }, { 6, 2, 13, 20, 2, 8 }, { 6, 2, 15, 20, 2, 8 },
+    { 6, 2, 17, 20, 2, 8 }, { 6, 2, 19, 20, 2, 8 }, { 6, 2, 21, 20, 2, 8 }, { 6, 22, 3, 8, 2, 8 },
+    { 6, 22, 5, 8, 2, 8 },  { 6, 22, 7, 8, 2, 8 },  { 6, 22, 9, 8, 2, 8 },  { 6, 22, 11, 8, 2, 8 },
+    { 6, 22, 13, 8, 2, 8 }, { 6, 22, 15, 8, 2, 8 }, { 6, 22, 17, 8, 2, 8 }, { 6, 22, 19, 8, 2, 8 },
+    { 6, 22, 21, 8, 2, 8 }, { 0, 2, 14, 28, 6, 8 }, { TABLE_END },
 };
 
 // The cursor's palette on the frames after a Pass Power is decided
@@ -432,21 +439,21 @@ static BOOL GPowerApp_Main(GameProc *proc, u32 *state, void *param, void *data) 
     GPowerApp *work = data;
 
     switch (*state) {
-    case 0:
+    case MAIN_FADE_IN:
         if (GFL_WipeIsFinished()) {
             (*state)++;
         }
         break;
-    case 1:
+    case MAIN_RUN:
         if (work->seq == SEQ_END && PrintQueue_IsEmpty(work->printQueue) == TRUE) {
             (*state)++;
         }
         break;
-    case 2:
+    case MAIN_START_FADE_OUT:
         GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 6, 1, work->heapId);
         (*state)++;
         break;
-    case 3:
+    case MAIN_FADE_OUT:
         if (GFL_WipeIsFinished()) {
             return TRUE;
         }
@@ -513,9 +520,9 @@ static void GPowerApp_FreeWork(GPowerApp *work) {
         case BUTTON_ENTRALINK:
             work->param->result = PASS_POWER_APP_ENTRALINK;
             break;
-        case 0:
-        case 1:
-        case 2:
+        case BUTTON_POWER_0:
+        case BUTTON_POWER_1:
+        case BUTTON_POWER_2:
             work->param->result = PASS_POWER_APP_USE;
             work->param->passPower = work->param->highLinkIds[work->result];
             break;
@@ -687,7 +694,7 @@ static void GPowerApp_LoadBG(GPowerApp *work) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_GPOWER_APP, work->heapId);
 
     for (i = 0; i < 8; i++) {
-        if (palette->target == 0xff) {
+        if (palette->target == TABLE_END) {
             break;
         }
         GFL_G2DIOLoadArcNCLRDefault(arc, palette->file, palette->target, palette->offset, palette->count * 32,
@@ -695,14 +702,14 @@ static void GPowerApp_LoadBG(GPowerApp *work) {
         palette++;
     }
     for (i = 0; i < 8; i++) {
-        if (chars->target == 0xff) {
+        if (chars->target == TABLE_END) {
             break;
         }
         GFL_BGSysLoadArcNCGRStatic(arc, chars->file, chars->target, chars->offset, 0, FALSE, work->heapId);
         chars++;
     }
     for (i = 0; i < 8; i++) {
-        if (screen->target == 0xff) {
+        if (screen->target == TABLE_END) {
             break;
         }
         loadBGScrToVramByFileNoReserveNegAlign(arc, screen->file, screen->target, screen->offset, 0, FALSE,
@@ -762,7 +769,7 @@ static void GPowerApp_AddActors(GPowerApp *work, u32 vramType, const GPowerAppAc
         BOOL visible;
         BOOL autoAnim;
 
-        if (setups->sequence == 0xff) {
+        if (setups->sequence == TABLE_END) {
             break;
         }
         pos = setups->pos * 2;
@@ -933,7 +940,7 @@ static void GPowerApp_AddLabels(GPowerApp *work, u32 vramType, const GPowerAppLa
         s16 x;
         s16 y;
 
-        if (setups->width == 0xff) {
+        if (setups->width == TABLE_END) {
             break;
         }
         work->labelBitmaps[i] = GFL_BitmapCreate(setups->width, setups->height, 0x20, work->heapId);
@@ -988,7 +995,7 @@ static void GPowerApp_InitWindows(GPowerApp *work) {
     ArcTool *arc;
 
     for (i = 0; i < WINDOW_COUNT; i++) {
-        if (setup->bg == 0xff) {
+        if (setup->bg == TABLE_END) {
             break;
         }
         work->windows[i].window =
@@ -1228,20 +1235,20 @@ static int GPowerApp_CheckTouch(GPowerApp *work) {
     int result = -1;
     int hit = GFL_HIDGetTouchPressedRect(sGPowerAppSelectTouchRects);
 
-    if (hit >= 0 && hit <= 2) {
+    if (hit >= SELECT_RECT_POWER_0 && hit <= SELECT_RECT_POWER_2) {
         if (work->powerCount > hit) {
             result = hit;
         } else {
             work->flags &= ~FLAG_KEYS;
             work->flags |= FLAG_REDRAW;
         }
-    } else if (hit == 3 || hit == 4) {
+    } else if (hit == SELECT_RECT_ENTRALINK || hit == SELECT_RECT_ENTRALINK_TOP) {
         if (!(work->flags & FLAG_NO_ENTRALINK)) {
             result = BUTTON_ENTRALINK;
         } else {
             work->flags = (work->flags & ~FLAG_KEYS) | FLAG_REDRAW;
         }
-    } else if (hit == 5) {
+    } else if (hit == SELECT_RECT_RETURN) {
         result = TOUCH_RETURN;
     }
     return result;

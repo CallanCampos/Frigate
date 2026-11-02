@@ -27,6 +27,7 @@
 #include "nitro/fx.h"
 #include "nitro/gx.h"
 #include "nitro/hw.h"
+#include "save/medal_box.h"
 #include "system/gf_font.h"
 #include "system/printsys.h"
 #include "system/version.h"
@@ -34,10 +35,6 @@
 #include "text/system/medal_info_viewer.h"
 
 // The viewer of the medal screens, named after the ROM's "medal_info_viewer.c". The names are ours
-
-// The archives of the medal screens. Our names; the archives hold, in order, each medal's picture data, the screen's BG
-// graphics and its cell actors' graphics
-#define ARCID_MEDAL_INFO_MEDAL_DATA 235
 
 // The BGs, in the order of sMedalInfoBGSetups
 enum {
@@ -83,10 +80,11 @@ enum {
     MEDAL_INFO_STATE_CHANGE_ENTRY,
 };
 
-// The result of the screen: the button that closed it
+// The steps of MedalInfoViewer_ChangeEntry
 enum {
-    MEDAL_INFO_RESULT_BACK,
-    MEDAL_INFO_RESULT_FIELD,
+    MEDAL_INFO_CHANGE_WAIT_BUTTONS,
+    MEDAL_INFO_CHANGE_LOAD,
+    MEDAL_INFO_CHANGE_WAIT_PRINT,
 };
 
 // The touch rectangles
@@ -106,7 +104,7 @@ typedef struct {
     u32 chars;
 } MedalInfoClActRes;
 
-// What a medal's file of ARCID_MEDAL_INFO_MEDAL_DATA holds, as far as the viewer reads it
+// What a medal's file of ARCID_MEDAL_DEF holds, as far as the viewer reads it
 typedef struct {
     u8 unk0[9];
     // The sequence of the medal's cell actor
@@ -418,7 +416,7 @@ static void MedalInfoViewer_ChangeEntry(MedalInfoViewer *viewer) {
     ArcTool *arc;
 
     switch (viewer->subState) {
-    case 0:
+    case MEDAL_INFO_CHANGE_WAIT_BUTTONS:
         if (ClActor_IsAnimActive(viewer->actors[MEDAL_INFO_ACTOR_PREV]) &&
             ClActor_IsAnimActive(viewer->actors[MEDAL_INFO_ACTOR_NEXT])) {
             return;
@@ -436,13 +434,13 @@ static void MedalInfoViewer_ChangeEntry(MedalInfoViewer *viewer) {
         GFL_BitmapFill(BmpWin_GetBitmap(viewer->window), 0);
         viewer->subState++;
         // fallthrough
-    case 1:
+    case MEDAL_INFO_CHANGE_LOAD:
         if (viewer->entry->medal >= MEDAL_INFO_NO_MEDAL) {
             viewer->hasMedal = FALSE;
         } else {
             viewer->hasMedal = TRUE;
         }
-        arc = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_INFO_MEDAL_DATA, viewer->heapId);
+        arc = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_DEF, viewer->heapId);
         if (viewer->hasMedal == TRUE) {
             GFL_ArcToolRead(arc, viewer->entry->medal, &data);
             ClActor_SetVisible(viewer->actors[MEDAL_INFO_ACTOR_MEDAL], TRUE);
@@ -469,7 +467,7 @@ static void MedalInfoViewer_ChangeEntry(MedalInfoViewer *viewer) {
         viewer->printing = TRUE;
         viewer->subState++;
         // fallthrough
-    case 2:
+    case MEDAL_INFO_CHANGE_WAIT_PRINT:
         if (!viewer->printing) {
             BmpWin_FlushChar(viewer->window);
             GFL_BGSysQueueScrLoad(MedalInfoViewer_GetBG(MEDAL_INFO_BG_TEXT));
@@ -559,7 +557,7 @@ static void MedalInfoViewer_BGInit(MedalInfoViewer *viewer) {
     commonArc = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, heapId);
     if (viewer->param->mode != MEDAL_INFO_VIEWER_MODE_LIST) {
         rank = viewer->entry->rank;
-        if (rank == 4 && getGameVersion() == VERSION_BLACK2) {
+        if (rank == MEDAL_RANK_MAX && getGameVersion() == VERSION_BLACK2) {
             rank++;
         }
     } else {
@@ -762,7 +760,7 @@ static void MedalInfoViewer_ClActInit(MedalInfoViewer *viewer) {
     }
 
     MI_CpuFill8(&actorSetup, 0, sizeof(ClActorSetup));
-    medalArc = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_INFO_MEDAL_DATA, heapId);
+    medalArc = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_DEF, heapId);
     if (viewer->hasMedal == TRUE) {
         GFL_ArcToolRead(medalArc, viewer->entry->medal, &data);
     } else {

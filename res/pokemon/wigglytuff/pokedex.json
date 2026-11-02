@@ -1,0 +1,13 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "W",
+    "shapes": [ 10 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_DREAMYARD": [ "shaking_grass" ],
+            "ZONE_ROUTE_1": [ "shaking_grass" ],
+            "ZONE_ROUTE_2": [ "shaking_grass" ]
+        }
+    }
+}

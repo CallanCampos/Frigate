@@ -9,6 +9,7 @@
 #include "app/festival.h"
 #include "app/fmission_app_gra.h"
 #include "app/fmission_log_accessor_fapp.h"
+#include "constants/arc.h"
 #include "field/fest_mission_data.h"
 #include "field/festival.h"
 #include "gfl/arc.h"
@@ -26,8 +27,6 @@
 #include "system/wordset.h"
 
 #define HEAPID_FMISSION_APP 0xa7
-// The missions' data
-#define ARCID_FMISSION_DATA 289
 
 // What FestivalEventParam's mode is: the running mission, or its result
 enum {

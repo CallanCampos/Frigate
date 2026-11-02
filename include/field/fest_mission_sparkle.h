@@ -22,7 +22,8 @@ typedef struct {
 // The mission's work, which the festival keeps (LinkFestival_GetMissionWork) and overlay 24 fills on entering a zone
 typedef struct {
     u16 zoneId;
-    u8 unk2;
+    // How many places the zone has, of which the sparkles take count
+    u8 placeCount;
     u8 count;
     // The places a sparkle can be, and which of them each sparkle is at
     ZoneBGEntity places[20];

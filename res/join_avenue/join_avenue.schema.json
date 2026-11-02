@@ -1,0 +1,769 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The Join Avenue's tables: res/join_avenue/<table>.json",
+    "description": "One of the 13 tables of ARCID_RESORT_BINARY (a/2/4/4), rows of u16 columns that ResortBinary_Load reads (system/resort_binary.h), as a list of its rows in order. Some meanings are inferred from the code's use. tools/data/join_avenue_data.py packs them.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "This schema, for editors"
+        },
+        "person_scripts": {
+            "type": "array",
+            "description": "File 0: the script of a person, which ResortBinary_FindRow finds by its first three columns (resort_people.c)",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "person_type", "shop_kind", "gender", "script" ],
+                "properties": {
+                    "person_type": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The person's type, ResortData_GetType"
+                    },
+                    "shop_kind": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The kind of the shop they are at, 0 to 7"
+                    },
+                    "gender": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "0 or 1"
+                    },
+                    "script": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The field script the person runs (resort_people.c's npc.scrId)"
+                    }
+                }
+            }
+        },
+        "shops": {
+            "type": "array",
+            "description": "File 1: the shops, by shop ID, which ResortShopData_Load reads with the goods; row 0 isn't a shop (ResortShopData_FindShop searches from 1)",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "kind",
+                    "variant",
+                    "level",
+                    "exp_to_next",
+                    "message",
+                    "script_value",
+                    "patch_odd",
+                    "patch_even",
+                    "column_8",
+                    "goods"
+                ],
+                "properties": {
+                    "kind": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The shop's kind, 0 to 7, whose name is message 280 plus it (resort_sys.c)"
+                    },
+                    "variant": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "A key of ResortShopData_FindShop that a level up keeps (resort_sys.c's AddShopExperience)"
+                    },
+                    "level": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The shop's level, 0 to 9"
+                    },
+                    "exp_to_next": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The experience its next level takes, 65535 for none"
+                    },
+                    "message": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The shop's text with its owner's name, a message of SCRIPT_TEXT_GLOBAL_10685 by number"
+                    },
+                    "script_value": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Returned to the scripts for the shop's occupants (scrcmd_resort.c)"
+                    },
+                    "patch_odd": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The land data patch of res/field/land_patches/ that the shop puts on an odd place (resort_mapcreate.c)"
+                    },
+                    "patch_even": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The patch for an even place"
+                    },
+                    "column_8": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Not read by the code"
+                    },
+                    "goods": {
+                        "type": "array",
+                        "maxItems": 16,
+                        "items": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 65535
+                        },
+                        "description": "The rows of goods.json the shop sells, up to RESORT_SHOP_GOODS_MAX; the packer ends them with 65535s"
+                    }
+                }
+            }
+        },
+        "goods": {
+            "type": "array",
+            "description": "File 2: what the shops sell, by the shops' goods",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "hidden_until_unlocked",
+                    "custom_text",
+                    "name_message",
+                    "description_message",
+                    "price",
+                    "kind",
+                    "item",
+                    "count",
+                    "message_male",
+                    "message_female"
+                ],
+                "properties": {
+                    "hidden_until_unlocked": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Whether the goods are left out until JOIN_AVE_INFO_UNLOCKED_6 is set (scrcmd_resort_shop.c)"
+                    },
+                    "custom_text": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Whether the name and description are the next two messages rather than the item's"
+                    },
+                    "name_message": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The goods' name, a message of SCRIPT_TEXT_GLOBAL_10685 by number"
+                    },
+                    "description_message": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Their description, a message of SCRIPT_TEXT_GLOBAL_10685 by number"
+                    },
+                    "price": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The price in tens: the shop asks ten times it"
+                    },
+                    "kind": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "What the goods are: 0 an item of the bag, 11 a raffle, others for the scripts (scrcmd_resort_shop.c)"
+                    },
+                    "item": {
+                        "type": [ "string", "integer" ],
+                        "x-constant": "ITEM_",
+                        "description": "The item, an ITEM_* constant for kind 0; a row of raffles.json for kind 11; else the scripts' value"
+                    },
+                    "count": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "How many of it"
+                    },
+                    "message_male": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "A value for the scripts for a male player (scrcmd_resort.c)"
+                    },
+                    "message_female": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The same for a female player"
+                    }
+                }
+            }
+        },
+        "occupant_places": {
+            "type": "array",
+            "description": "File 3: the eight places of the avenue's occupants, which resort_mapcreate.c lays the shops out by",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "column_0", "x", "z", "entity" ],
+                "properties": {
+                    "column_0": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The place's number, which the code doesn't read"
+                    },
+                    "x": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The tile column of the place's shop patch, also added to its people's and entities' x"
+                    },
+                    "z": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Its tile row, likewise"
+                    },
+                    "entity": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The place's BG entity"
+                    }
+                }
+            }
+        },
+        "person_types": {
+            "type": "array",
+            "description": "File 4: the types of the people who come to the avenue, by type; row 0 isn't one (resort_sys.c)",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "name_male", "name_female", "unlock", "tier", "base_value", "column_5", "conditions" ],
+                "properties": {
+                    "name_male": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The type's name for a man, a message of SCRIPT_TEXT_GLOBAL_10685 by number"
+                    },
+                    "name_female": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "For a woman, a message of SCRIPT_TEXT_GLOBAL_10685 by number"
+                    },
+                    "unlock": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "0 for always, else 1 plus the row of npcs.json whose rank the avenue's rank must reach"
+                    },
+                    "tier": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The type's tier, 0 to 3, which RollTier picks by the ranks' weights"
+                    },
+                    "base_value": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Scaled by sShopKindMultipliers for what the person brings (resort_sys.c)"
+                    },
+                    "column_5": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Not read by the code"
+                    },
+                    "conditions": {
+                        "type": "array",
+                        "minItems": 6,
+                        "maxItems": 6,
+                        "description": "Six conditions for the person's shop and messages (resort_sys.c)",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [ "condition", "value", "priority", "message_male", "message_female", "unk5" ],
+                            "properties": {
+                                "condition": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 65535,
+                                    "description": "0 a shop kind, 1 a gender, 2 to 17 a player value (JOIN_AVE_PARAM_VALUE plus it minus 2), 19 to 27 a record's or medal's threshold"
+                                },
+                                "value": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 65535,
+                                    "description": "What the condition compares with"
+                                },
+                                "priority": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 65535,
+                                    "description": "0 to 2, also the multiplier's index"
+                                },
+                                "message_male": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 65535,
+                                    "description": "a message of SCRIPT_TEXT_GLOBAL_10685 by number"
+                                },
+                                "message_female": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 65535,
+                                    "description": "a message of SCRIPT_TEXT_GLOBAL_10685 by number"
+                                },
+                                "unk5": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 65535,
+                                    "description": "Not read by the code"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "npcs": {
+            "type": "array",
+            "description": "File 5: the avenue's own NPCs, ResortSys_GetShopOpenings, which resort_npc.c places, each actor 0x94 plus its row",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "model",
+                    "zone",
+                    "x",
+                    "z",
+                    "rank",
+                    "move_code",
+                    "area_w",
+                    "area_h",
+                    "script",
+                    "text_row",
+                    "column_10"
+                ],
+                "properties": {
+                    "model": {
+                        "type": [ "string", "integer" ],
+                        "x-constant": "OBJ_CODE_",
+                        "description": "The NPC's model"
+                    },
+                    "zone": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "1 or 2: which of the avenue's zones it stands in"
+                    },
+                    "x": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Its tile column"
+                    },
+                    "z": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Its tile row"
+                    },
+                    "rank": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The avenue's rank from which it appears"
+                    },
+                    "move_code": {
+                        "type": [ "string", "integer" ],
+                        "x-constant": "MOVE_CODE_",
+                        "description": "How it moves"
+                    },
+                    "area_w": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Its movement area's width"
+                    },
+                    "area_h": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Its height"
+                    },
+                    "script": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "0 for field script 10694, 1 for 10695"
+                    },
+                    "text_row": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Its row of npc_texts.json"
+                    },
+                    "column_10": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Not read by the code"
+                    }
+                }
+            }
+        },
+        "npc_texts": {
+            "type": "array",
+            "description": "File 6: the NPCs' texts, by an NPC's text_row, which the scripts read by mode (scrcmd_resort.c)",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "messages", "column_19" ],
+                "properties": {
+                    "messages": {
+                        "type": "array",
+                        "minItems": 19,
+                        "maxItems": 19,
+                        "description": "Columns 0 to 18: messages of SCRIPT_TEXT_GLOBAL_10685 and values that the scripts ask for, 0 for none",
+                        "items": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 65535
+                        }
+                    },
+                    "column_19": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Not read by the code"
+                    }
+                }
+            }
+        },
+        "ranks": {
+            "type": "array",
+            "description": "File 7: the avenue's ranks, ranges that ResortBinary_FindRange finds the avenue's rank in (resort_sys.c)",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "rank_start",
+                    "rank_end",
+                    "tier_weights",
+                    "popularity_needed",
+                    "rank_message",
+                    "raffle",
+                    "raffle_chance",
+                    "unlock",
+                    "new_entry_chance",
+                    "script_value",
+                    "column_12"
+                ],
+                "properties": {
+                    "rank_start": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The range's first rank"
+                    },
+                    "rank_end": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Its last"
+                    },
+                    "tier_weights": {
+                        "type": "array",
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "description": "The percent chance of each of the first three tiers of person_types.json (RollTier)",
+                        "items": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 65535
+                        }
+                    },
+                    "popularity_needed": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The popularity the next rank takes"
+                    },
+                    "rank_message": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The rank's title, a message of SCRIPT_TEXT_GLOBAL_10685 by number"
+                    },
+                    "raffle": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The row of raffles.json of the rank's raffle (resort_data_manager.c)"
+                    },
+                    "raffle_chance": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Its percent chance"
+                    },
+                    "unlock": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The shop kind that the rank unlocks, 0 for none (ResortSys_FindUnlockRow)"
+                    },
+                    "new_entry_chance": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The percent chance of a new visitor (resort_field.c)"
+                    },
+                    "script_value": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "A value for the scripts (scrcmd_resort.c)"
+                    },
+                    "column_12": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Not read by the code"
+                    }
+                }
+            }
+        },
+        "raffles": {
+            "type": "array",
+            "description": "File 8: the raffles, by row: the ranks' and the raffle goods'",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "total_weight", "column_1", "prizes" ],
+                "properties": {
+                    "total_weight": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "What a draw rolls up to (ResortData_Roll)"
+                    },
+                    "column_1": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Not read by the code"
+                    },
+                    "prizes": {
+                        "type": "array",
+                        "minItems": 10,
+                        "maxItems": 10,
+                        "description": "Ten prizes, the first whose weights summed pass the roll (join_ave_raffle_shop)",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [ "weight", "prize" ],
+                            "properties": {
+                                "weight": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 65535,
+                                    "description": "The prize's weight"
+                                },
+                                "prize": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 65535,
+                                    "description": "The prize, an item for the item raffles (scrcmd_resort_shop.c)"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "visitors": {
+            "type": "array",
+            "description": "File 9: the visitors' entries, found by shop kind or by trainer type (resort_sys.c)",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "shop_kind",
+                    "name_message",
+                    "trainer_type",
+                    "gender",
+                    "trainer_id",
+                    "shop",
+                    "person_type",
+                    "greeting_message",
+                    "message_1",
+                    "message_2",
+                    "queries"
+                ],
+                "properties": {
+                    "shop_kind": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The kind of shop"
+                    },
+                    "name_message": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The visitor's name, a message of SCRIPT_TEXT_GLOBAL_10685 by number"
+                    },
+                    "trainer_type": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The visitor's trainer type"
+                    },
+                    "gender": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "0 or 1"
+                    },
+                    "trainer_id": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Their trainer ID"
+                    },
+                    "shop": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Their row of shops.json"
+                    },
+                    "person_type": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "Their row of person_types.json, JOIN_AVE_PARAM_UNK_6"
+                    },
+                    "greeting_message": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "a message of SCRIPT_TEXT_GLOBAL_10685 by number"
+                    },
+                    "message_1": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "a message of SCRIPT_TEXT_GLOBAL_10685 by number"
+                    },
+                    "message_2": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "a message of SCRIPT_TEXT_GLOBAL_10685 by number"
+                    },
+                    "queries": {
+                        "type": "array",
+                        "minItems": 13,
+                        "maxItems": 13,
+                        "description": "Columns 10 to 22, values that the scripts and resort_sys.c ask for: messages and the visit's messages when found and not",
+                        "items": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 65535
+                        }
+                    }
+                }
+            }
+        },
+        "trainer_type_points": {
+            "type": "array",
+            "description": "File 10: the points of a visit by the visitor's trainer type, a row each (UnionView_FindTrainerType)",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "days" ],
+                "properties": {
+                    "days": {
+                        "type": "array",
+                        "minItems": 7,
+                        "maxItems": 7,
+                        "description": "By the day of the week (resort_sys.c)",
+                        "items": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 65535
+                        }
+                    }
+                }
+            }
+        },
+        "shop_kind_points": {
+            "type": "array",
+            "description": "File 11: the points of a visit by season and shop kind, row 4 times the kind plus the season",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "days" ],
+                "properties": {
+                    "days": {
+                        "type": "array",
+                        "minItems": 7,
+                        "maxItems": 7,
+                        "description": "By the day of the week (resort_sys.c)",
+                        "items": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 65535
+                        }
+                    }
+                }
+            }
+        },
+        "visit_groups": {
+            "type": "array",
+            "description": "File 12: the groups of visits, one of which ChooseVisitGroup picks by weight",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "weight", "bonus_days" ],
+                "properties": {
+                    "weight": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The group's share of a roll of 100"
+                    },
+                    "bonus_days": {
+                        "type": "array",
+                        "minItems": 7,
+                        "maxItems": 7,
+                        "description": "A bonus for each day of the week, signed (resort_sys.c)",
+                        "items": {
+                            "type": "integer",
+                            "minimum": -32768,
+                            "maximum": 32767
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

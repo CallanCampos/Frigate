@@ -12,6 +12,12 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
+// The steps of the event
+enum {
+    STEP_UPDATE_GRID,
+    STEP_WAIT_FADE,
+};
+
 static GameEventReturnCode EncEffGrid_EventCallback(GameEvent *event, u32 *state, void *data);
 static BOOL EncEffGrid_Update(EncEffGrid *grid);
 
@@ -43,7 +49,7 @@ GameEvent *EncEffGrid_CreateEvent(GameSystem *gsys, const EncEffGridParam *param
         cell->pos.z = 0;
         cell->unk18 = 0;
         cell->offset = 0;
-        cell->unk20 = 0;
+        cell->angleZ = 0;
         cell->visible = FALSE;
         cell->done = FALSE;
         cell->update = param->cellUpdate;
@@ -53,11 +59,11 @@ GameEvent *EncEffGrid_CreateEvent(GameSystem *gsys, const EncEffGridParam *param
         param->init(grid);
     }
     if (mode) {
-        grid->unk3074 = 12;
-        grid->unk3078 = GX_RGB(31, 31, 31);
+        grid->fadeMode = FADE_ENGINE_A_WHITE | FADE_ENGINE_B_WHITE;
+        grid->clearColor = GX_RGB(31, 31, 31);
     } else {
-        grid->unk3074 = 3;
-        grid->unk3078 = GX_RGB(0, 0, 0);
+        grid->fadeMode = FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK;
+        grid->clearColor = GX_RGB(0, 0, 0);
     }
     return event;
 }
@@ -66,13 +72,13 @@ static GameEventReturnCode EncEffGrid_EventCallback(GameEvent *event, u32 *state
     EncEffGrid *grid = EncEff_GetWorkArea(Field_GetEncEff(GSYS_GetField(GameEvent_GetGameSystem(event))));
 
     switch (*state) {
-    case 0:
+    case STEP_UPDATE_GRID:
         if (EncEffGrid_Update(grid)) {
-            GFL_FadeSet(grid->unk3074, 0, 16, 0);
+            GFL_FadeSet(grid->fadeMode, 0, 16, 0);
             (*state)++;
         }
         break;
-    case 1:
+    case STEP_WAIT_FADE:
         if (!GFL_FadeIsRunning()) {
             return GAMEEVENT_DONE;
         }
@@ -114,7 +120,7 @@ void EncEffGrid_ClearAndDraw(EncEff *effect) {
     EncEffCaptureWork *eventData = EncEff_GetEventData(effect);
     EncEffGrid *grid = EncEff_GetWorkArea(effect);
 
-    G3X_SetClearColor(grid->unk3078, 31, 0x7fff, 0, FALSE);
+    G3X_SetClearColor(grid->clearColor, 31, 0x7fff, 0, FALSE);
     EncEffCapture_Draw(eventData);
 }
 
@@ -154,7 +160,7 @@ void EncEffGrid_Draw(EncEffGrid *grid) {
             G3_Scale(scale.x, scale.y, scale.z);
             MTX_RotY33_(&rot, FX_SinIdx(cell->offset), FX_CosIdx(cell->offset));
             G3_MultMtx33(&rot);
-            MTX_RotZ33_(&rot, FX_SinIdx(cell->unk20), FX_CosIdx(cell->unk20));
+            MTX_RotZ33_(&rot, FX_SinIdx(cell->angleZ), FX_CosIdx(cell->angleZ));
             G3_MultMtx33(&rot);
             G3_Begin(GX_BEGIN_QUADS);
             G3_Normal(0, 0, FX16_ONE);

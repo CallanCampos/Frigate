@@ -5,10 +5,12 @@
 #include "types.h"
 #include "battle/btl_main.h"
 #include "battle/btl_pokeparam.h"
+#include "battle/btl_result.h"
 #include "battle/btl_setup.h"
 #include "battle/btl_string.h"
 #include "battle/trainer_data.h"
 #include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "gfl/msg.h"
 #include "gfl/str.h"
 #include "save/player_info.h"
@@ -35,7 +37,7 @@ typedef struct BtlStringWork {
     HeapID heapId;
     u32 clientId;
     u16 unk68;
-    // Set while func_ov167_021d5778 formats, which names the Pokémon behind an Illusion
+    // Set while FormatLearnMsgCore formats, which names the Pokémon behind an Illusion
     u16 trueNames;
 } BtlStringWork;
 
@@ -55,14 +57,24 @@ static void FormatItemStatRise(StrBuf *strbuf, u16 message, const u32 *args);
 static void FormatStatChange(StrBuf *strbuf, u16 message, const u32 *args);
 static void FormatStatLimit(StrBuf *strbuf, u16 message, const u32 *args);
 static void FormatClientSideMsg(StrBuf *strbuf, u16 message, const u32 *args);
-static void func_ov167_021d5778(StrBuf *strbuf, u16 message, const u32 *args);
-static void BtlString_BuildTrainerStringBody(StrBuf *strbuf, u16 message, const u32 *args);
+static void FormatLearnMsgCore(StrBuf *strbuf, u16 message, const u32 *args);
+static void FormatYesNoMsgCore(StrBuf *strbuf, u16 message, const u32 *args);
 
 // The message files, in the order of BtlStringWork's msgData
-static const u16 sMsgFiles[] = { 0x13, 0x12, 0x10, 0x14, 0x176, 0x191, 0x1b8, 0x178, 0x197 };
+static const u16 sMsgFiles[] = {
+    TEXT_BANK_0019,
+    TEXT_BANK_0018,
+    TEXT_BANK_0016,
+    TEXT_BANK_0020,
+    TEXT_BANK_ABILITY_NAMES,
+    TEXT_BANK_EVOLUTION_DEMO_BTL_MAIN,
+    TEXT_BANK_YES_NO,
+    TEXT_BANK_BATTLE_SUBWAY_TRAINER_MESSAGES,
+    TEXT_BANK_WBT_TRAINER_MESSAGES,
+};
 
 // The message files of the studio's movies
-static const u32 sMovieMsgFiles[] = { 0x137, 0x138, 0x136, 0x135, 0x134 };
+static const u32 sMovieMsgFiles[] = { TEXT_BANK_0311, TEXT_BANK_0312, TEXT_BANK_0310, TEXT_BANK_0309, TEXT_BANK_0308 };
 
 // The standard messages that have a variant for the other side, at the next ID
 static const u16 sSideMessages[] = {
@@ -95,7 +107,8 @@ static BtlStringWork sWork;
 // Which variant of a message names a Pokémon: 0 for the player's side, 1 for a wild Pokémon, 2 for a foe's
 static inline int GetMonVariant(u8 monId) {
     if (sWork.unk68 == 0 && AreClientsOnOppositeSides(sWork.mainModule, sWork.clientId, GetClientIDFromMonID(monId))) {
-        if (BtlSetup_GetBattleType(sWork.mainModule) == 0 || BtlSetup_GetBattleType(sWork.mainModule) == 4) {
+        if (BtlSetup_GetBattleType(sWork.mainModule) == BTL_TYPE_WILD ||
+            BtlSetup_GetBattleType(sWork.mainModule) == BTL_TYPE_CAPTURE_DEMO) {
             return 1;
         }
         return 2;
@@ -105,21 +118,21 @@ static inline int GetMonVariant(u8 monId) {
 
 // The message file of a studio movie's script, one for each of the player's sexes
 static inline u16 GetMovieScriptMsgFile(u8 movie, u8 male) {
-    return 0xb5 + movie * 2 + male;
+    return TEXT_BANK_PKWD_BOOK_MOVIE_00_GIRL + movie * 2 + male;
 }
 
-// The message files of the Pokéstar Studios movie being shot, in a movie battle (mode 1) or its practice (mode 2?)
+// The message files of a Pokéstar Studios movie: its script's, filmed or played back, and its own while it is filmed
 static inline void LoadMovieMsgData(BtlMainModule *mainModule, u32 mode, HeapID heapId) {
     int male = FALSE;
 
-    if (mode != 0) {
+    if (mode != BTL_STUDIO_MODE_NONE) {
         BtlScriptedRules *rules = GetStudioRules(mainModule);
         if (getTrainerGender(GetPlayerInfo(mainModule)) == 0) {
             male = TRUE;
         }
         sWork.msgData[9] =
             GFL_MsgSysLoadData(FALSE, 2, GetMovieScriptMsgFile(GetStudioMovieId(mainModule), male), heapId);
-        if (mode == 1) {
+        if (mode == BTL_STUDIO_MODE_FILM) {
             sWork.msgData[10] = GFL_MsgSysLoadData(FALSE, 2, sMovieMsgFiles[rules->unk08], heapId);
         }
     }
@@ -141,8 +154,8 @@ void BtlString_Init(BtlMainModule *mainModule, u8 clientId, const BtlPokeCon *po
     sWork.strbuf = GFL_StrBufCreate(0x2f4, heapId);
     for (i = 0; i < 9; i++) {
         fileId = sMsgFiles[i];
-        if (mode == 1 && fileId == 0x13) {
-            fileId = 0x11;
+        if (mode == BTL_STUDIO_MODE_FILM && fileId == TEXT_BANK_0019) {
+            fileId = TEXT_BANK_0017;
         }
         sWork.msgData[i] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, fileId, heapId);
     }
@@ -514,17 +527,17 @@ void BtlString_FormatMoveMsg(StrBuf *strbuf, u8 monId, u16 move) {
     GFL_WordSetFormatStrbuf(sWork.wordSet, strbuf, sWork.strbuf);
 }
 
-void func_ov167_021d5700(StrBuf *strbuf, u16 arg1, u32 arg2) {
-    if (arg1 >= 0x800) {
+void BtlString_LoadTrainerWinLoseMsg(StrBuf *strbuf, u16 trainerId, u32 result) {
+    if (trainerId >= 0x800) {
         BtlSetup *setup = GetBattleSetupParam(sWork.mainModule);
-        if (arg2 == 0) {
-            GFL_StrBufCopy(strbuf, setup->unk6C);
+        if (result == BTL_RESULT_DEFEAT) {
+            GFL_StrBufCopy(strbuf, setup->trainerWinMsg);
         } else {
-            GFL_StrBufCopy(strbuf, setup->unk68);
+            GFL_StrBufCopy(strbuf, setup->trainerLoseMsg);
         }
-    } else if (arg1 != 0) {
-        u16 message = (arg1 - 1) * 3;
-        if (arg2 == 0) {
+    } else if (trainerId != 0) {
+        u16 message = (trainerId - 1) * 3;
+        if (result == BTL_RESULT_DEFEAT) {
             message += 1;
         } else {
             message += 2;
@@ -537,11 +550,11 @@ void BtlString_LoadUIMsg(StrBuf *strbuf, u16 message) {
     GFL_MsgDataLoadStrbuf(sWork.msgData[3], message, strbuf);
 }
 
-void func_ov167_021d5770(StrBuf *strbuf, u16 message, const u32 *args) {
-    func_ov167_021d5778(strbuf, message, args);
+void BtlString_FormatLearnMsg(StrBuf *strbuf, u16 message, const u32 *args) {
+    FormatLearnMsgCore(strbuf, message, args);
 }
 
-static void func_ov167_021d5778(StrBuf *strbuf, u16 message, const u32 *args) {
+static void FormatLearnMsgCore(StrBuf *strbuf, u16 message, const u32 *args) {
     GFL_MsgDataLoadStrbuf(sWork.msgData[5], message, sWork.strbuf);
     sWork.trueNames = TRUE;
     RegisterArgWords(sWork.strbuf, args, sWork.wordSet);
@@ -549,11 +562,11 @@ static void func_ov167_021d5778(StrBuf *strbuf, u16 message, const u32 *args) {
     GFL_WordSetFormatStrbuf(sWork.wordSet, strbuf, sWork.strbuf);
 }
 
-void func_ov167_021d57b0(StrBuf *strbuf, u16 message, const u32 *args) {
-    BtlString_BuildTrainerStringBody(strbuf, message, args);
+void BtlString_FormatYesNoMsg(StrBuf *strbuf, u16 message, const u32 *args) {
+    FormatYesNoMsgCore(strbuf, message, args);
 }
 
-static void BtlString_BuildTrainerStringBody(StrBuf *strbuf, u16 message, const u32 *args) {
+static void FormatYesNoMsgCore(StrBuf *strbuf, u16 message, const u32 *args) {
     GFL_MsgDataLoadStrbuf(sWork.msgData[6], message, sWork.strbuf);
     RegisterArgWords(sWork.strbuf, args, sWork.wordSet);
     GFL_WordSetFormatStrbuf(sWork.wordSet, strbuf, sWork.strbuf);

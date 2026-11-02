@@ -69,21 +69,67 @@ typedef struct {
     u8 size;
 } BtlHandlerWorkSize;
 
-// clang-format off
-static const BtlHandlerWorkSize data_ov167_021d6dd8[59] = {
-    { 0x00, 0x08 }, { 0x01, 0x04 }, { 0x05, 0x30 }, { 0x06, 0x30 }, { 0x08, 0x28 }, { 0x09, 0x30 },
-    { 0x0a, 0x30 }, { 0x0b, 0x40 }, { 0x0c, 0x3c }, { 0x0e, 0x40 }, { 0x0f, 0x0c }, { 0x12, 0x08 },
-    { 0x10, 0x0c }, { 0x11, 0x38 }, { 0x07, 0x34 }, { 0x13, 0x30 }, { 0x14, 0x08 }, { 0x04, 0x2c },
-    { 0x02, 0x04 }, { 0x03, 0x04 }, { 0x15, 0x0c }, { 0x16, 0x0c }, { 0x17, 0x0c }, { 0x18, 0x0c },
-    { 0x19, 0x38 }, { 0x1a, 0x08 }, { 0x1b, 0x38 }, { 0x1d, 0x30 }, { 0x1c, 0x08 }, { 0x1e, 0x20 },
-    { 0x1f, 0x34 }, { 0x20, 0x34 }, { 0x21, 0x0c }, { 0x22, 0x08 }, { 0x23, 0x30 }, { 0x24, 0x80 },
-    { 0x25, 0x0c }, { 0x26, 0x08 }, { 0x27, 0x08 }, { 0x28, 0x04 }, { 0x29, 0x58 }, { 0x2a, 0x08 },
-    { 0x2b, 0x08 }, { 0x2c, 0x30 }, { 0x2d, 0x30 }, { 0x2e, 0x30 }, { 0x2f, 0x30 }, { 0x30, 0x08 },
-    { 0x31, 0x30 }, { 0x32, 0x30 }, { 0x33, 0x30 }, { 0x34, 0x30 }, { 0x35, 0x04 }, { 0x36, 0x34 },
-    { 0x37, 0x34 }, { 0x38, 0x04 }, { 0x39, 0x30 }, { 0x3a, 0x08 }, { 0x3b, 0x04 },
+static const BtlHandlerWorkSize sHandlerWorkSizes[] = {
+    { BTL_HANDLER_USE_HELD_ITEM, 0x08 },
+    { BTL_HANDLER_USE_ITEM_ANIM, 0x04 },
+    { BTL_HANDLER_RECOVER_HP, 0x30 },
+    { BTL_HANDLER_DRAIN, 0x30 },
+    { BTL_HANDLER_CHANGE_HP, 0x28 },
+    { BTL_HANDLER_RECOVER_PP, 0x30 },
+    { BTL_HANDLER_DECREMENT_PP, 0x30 },
+    { BTL_HANDLER_CURE_CONDITION, 0x40 },
+    { BTL_HANDLER_ADD_CONDITION, 0x3c },
+    { BTL_HANDLER_STAT_CHANGE, 0x40 },
+    { BTL_HANDLER_SET_STAT_STAGE, 0x0c },
+    { BTL_HANDLER_RECOVER_STAT_STAGE, 0x08 },
+    { BTL_HANDLER_RESET_STAT_STAGE, 0x0c },
+    { BTL_HANDLER_SET_STATUS, 0x38 },
+    { BTL_HANDLER_DAMAGE, 0x34 },
+    { BTL_HANDLER_FAINT, 0x30 },
+    { BTL_HANDLER_CHANGE_TYPE, 0x08 },
+    { BTL_HANDLER_MESSAGE, 0x2c },
+    { BTL_HANDLER_ABILITY_POPUP_ADD, 0x04 },
+    { BTL_HANDLER_ABILITY_POPUP_REMOVE, 0x04 },
+    { BTL_HANDLER_SET_TURN_FLAG, 0x0c },
+    { BTL_HANDLER_RESET_TURN_FLAG, 0x0c },
+    { BTL_HANDLER_SET_CONTINUE_FLAG, 0x0c },
+    { BTL_HANDLER_RESET_CONTINUE_FLAG, 0x0c },
+    { BTL_HANDLER_ADD_SIDE_EFFECT, 0x38 },
+    { BTL_HANDLER_REMOVE_SIDE_EFFECT, 0x08 },
+    { BTL_HANDLER_ADD_FIELD_EFFECT, 0x38 },
+    { BTL_HANDLER_CHANGE_WEATHER, 0x30 },
+    { BTL_HANDLER_REMOVE_FIELD_EFFECT, 0x08 },
+    { BTL_HANDLER_ADD_POS_EFFECT, 0x20 },
+    { BTL_HANDLER_ABILITY_CHANGE, 0x34 },
+    { BTL_HANDLER_SET_ITEM, 0x34 },
+    { BTL_HANDLER_CHECK_HELD_ITEM, 0x0c },
+    { BTL_HANDLER_FORCE_USE_ITEM, 0x08 },
+    { BTL_HANDLER_CONSUME_ITEM, 0x30 },
+    { BTL_HANDLER_SWAP_ITEM, 0x80 },
+    { BTL_HANDLER_UPDATE_MOVE, 0x0c },
+    { BTL_HANDLER_SET_COUNTER, 0x08 },
+    { BTL_HANDLER_DELAY_MOVE_DAMAGE, 0x08 },
+    { BTL_HANDLER_QUIT_BATTLE, 0x04 },
+    { BTL_HANDLER_SWITCH, 0x58 },
+    { BTL_HANDLER_BATON_PASS, 0x08 },
+    { BTL_HANDLER_FLINCH, 0x08 },
+    { BTL_HANDLER_REVIVE, 0x30 },
+    { BTL_HANDLER_SET_WEIGHT, 0x30 },
+    { BTL_HANDLER_FORCE_SWITCH, 0x30 },
+    { BTL_HANDLER_INTERRUPT_ACTION, 0x30 },
+    { BTL_HANDLER_INTERRUPT_MOVE, 0x08 },
+    { BTL_HANDLER_SEND_LAST, 0x30 },
+    { BTL_HANDLER_SWAP_POKE, 0x30 },
+    { BTL_HANDLER_TRANSFORM, 0x30 },
+    { BTL_HANDLER_ILLUSION_BREAK, 0x30 },
+    { BTL_HANDLER_GRAVITY_CHECK, 0x04 },
+    { BTL_HANDLER_HIDE_TURN_CANCEL, 0x34 },
+    { BTL_HANDLER_EFFECT_AT_POS, 0x34 },
+    { BTL_HANDLER_REMOVE_MESSAGE_WINDOW, 0x04 },
+    { BTL_HANDLER_CHANGE_FORM, 0x30 },
+    { BTL_HANDLER_SET_MOVE_EFFECT_INDEX, 0x08 },
+    { BTL_HANDLER_SET_MOVE_EFFECT_ENABLE, 0x04 },
 };
-
-// clang-format on
 
 // Allocates a handler command's work on the stack, zeroed and with its header set up
 void *PushWork(BtlActionState *state, u32 command, u32 monId) {
@@ -93,9 +139,9 @@ void *PushWork(BtlActionState *state, u32 command, u32 monId) {
     u32 size;
     BattleHandlerHeader *header;
 
-    for (i = 0, size = 0; i < 59; i++) {
-        if (command == data_ov167_021d6dd8[i].command) {
-            size = data_ov167_021d6dd8[i].size;
+    for (i = 0, size = 0; i < NELEMS(sHandlerWorkSizes); i++) {
+        if (command == sHandlerWorkSizes[i].command) {
+            size = sHandlerWorkSizes[i].size;
             break;
         }
     }

@@ -1,0 +1,28 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The areas' edge color tables: res/lighting/edge_colors.json",
+    "description": "The files of ARCID_AREA_EDGE_COLOR_TABLES (a/0/1/5), in order: the table that an area's edge_color_table names (res/field/areas/; AreaData_GetEdgeColorTableID, 255 for none, which turns edge marking off), which Field_LoadEdgeColorTable in fieldmap.c gives the 3D engine (G3X_SetEdgeColorTable), with edge marking on except in the zones of IsZoneEntralinkEdgeColorTable. tools/data/area_color_data.py packs them.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "tables" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "tables": {
+            "type": "array",
+            "items": {
+                "type": "array", "minItems": 8, "maxItems": 8,
+                "description": "The colors of the outlines around the models, by the top three bits of their polygon IDs; the game replaces the last with gray (16, 16, 16)",
+                "items": { "$ref": "#/$defs/color" }
+            }
+        }
+    },
+    "$defs": {
+        "component": { "type": "integer", "minimum": 0, "maximum": 31 },
+        "color": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [ "red", "green", "blue" ],
+            "properties": { "red": { "$ref": "#/$defs/component" }, "green": { "$ref": "#/$defs/component" }, "blue": { "$ref": "#/$defs/component" } }
+        }
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "M",
+    "shapes": [ 9 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_DRAGONSPIRAL_TOWER": [ "grass", "dark_grass" ],
+            "ZONE_ROUTE_23": [ "dark_grass" ]
+        }
+    }
+}

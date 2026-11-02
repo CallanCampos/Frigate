@@ -130,7 +130,7 @@ static void PokemonTradeIrcDemo_Run(PokemonTradeWork *wk) {
     if (wk->timer == PokemonTradeIrcDemo_Frames(0x267)) {
         MCSS *shown;
 
-        if (wk->unk11EE == 0) {
+        if (wk->recvPkmReturns == 0) {
             shown = wk->mcss[3];
         } else {
             PokemonTradeIrcDemo_ShowSprite(wk->mcss[3], wk);
@@ -148,7 +148,7 @@ static void PokemonTradeIrcDemo_Run(PokemonTradeWork *wk) {
         MCSS_StartFade(wk->mcss[3], 0, 0, 0, 0x7fff);
         MCSS_StartFade(wk->mcss[1], 0, 0, 0, 0x7fff);
     }
-    if (PokemonTradeIrcDemo_Frames(0x267) < wk->timer && wk->unk11EE != 0 && wk->mcssMoves[3] != NULL &&
+    if (PokemonTradeIrcDemo_Frames(0x267) < wk->timer && wk->recvPkmReturns != 0 && wk->mcssMoves[3] != NULL &&
         wk->mcssMoves[3]->frame == 9) {
         MCSS_GetPosition(wk->mcss[1], &pos3);
         MCSS_SetPosition(wk->mcss[3], &pos3);

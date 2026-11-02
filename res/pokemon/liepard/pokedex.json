@@ -1,0 +1,15 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "L",
+    "shapes": [ 4 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_DREAMYARD": [ "grass", "dark_grass" ],
+            "ZONE_ROUTE_2": [ "grass" ],
+            "ZONE_ROUTE_5": [ "grass", "dark_grass" ],
+            "ZONE_ROUTE_9": [ "grass", "dark_grass" ],
+            "ZONE_ROUTE_16": [ "grass", "dark_grass" ]
+        }
+    }
+}

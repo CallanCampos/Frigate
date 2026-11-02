@@ -67,6 +67,21 @@ enum {
     CODEIN_NEXT_WAIT = 0xff,
 };
 
+// The animations of the cursors: the code's, the keys' on a digit and on Back or OK, and the flash of a pressed key
+enum {
+    CODEIN_CURSOR_SEQ_CODE,
+    CODEIN_CURSOR_SEQ_KEY,
+    CODEIN_CURSOR_SEQ_WIDE_KEY,
+    CODEIN_CURSOR_SEQ_PRESS,
+};
+
+// What a button's press animation is doing
+enum {
+    CODEIN_BUTTON_IDLE,
+    CODEIN_BUTTON_PRESSED,
+    CODEIN_BUTTON_RELEASED,
+};
+
 // An actor's movement: the step of each frame, the frames left and the index of its next scale
 typedef struct {
     s16 x;
@@ -77,7 +92,7 @@ typedef struct {
 
 typedef struct {
     // A digit: 0 while empty, or its value plus 1. A bar: the index of the digit before it. The code's cursor: the
-    // index of its digit. Another cursor: its animation. A button: 1 while its press animation runs
+    // index of its digit. Another cursor: its CODEIN_CURSOR_SEQ_*. A button: its CODEIN_BUTTON_*
     int state;
     // The group of a digit, from 1
     int group;

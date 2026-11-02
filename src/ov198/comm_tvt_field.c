@@ -579,7 +579,7 @@ static void CommTvtField_FreeGraphics(CommTvtFieldWork *wk) {
 
 static void CommTvtField_WaitExitWipe(CommTvtFieldWork *wk) {
     if (GFL_WipeIsFinished()) {
-        if (wk->mode == 1) {
+        if (wk->mode == COMM_TVT_FIELD_MODE_VIDEO_CHAT) {
             if (!GameCommSys_BootCheck(GSYS_GetGameCommSystem(wk->gsys))) {
                 CommTvtField_SetFuncLine(wk, NULL, 833);
             }
@@ -593,7 +593,7 @@ static void CommTvtField_StartExit(CommTvtFieldWork *wk) {
     wk->leaving = TRUE;
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
     NetWhpipe_SetScanCallback(NULL, NULL);
-    if (wk->mode == 1) {
+    if (wk->mode == COMM_TVT_FIELD_MODE_VIDEO_CHAT) {
         if (GameCommSys_BootCheck(GSYS_GetGameCommSystem(wk->gsys))) {
             GameCommSys_ExitReq(GSYS_GetGameCommSystem(wk->gsys));
         }
@@ -634,19 +634,19 @@ static BOOL CommTvtField_OnButton(u32 button, CommTvtFieldWork *wk) {
     case 0:
     case 3:
         wk->param->exitArgument = Intrude_GetAlertState(comm);
-        wk->mode = 0;
+        wk->mode = COMM_TVT_FIELD_MODE_ENTRALINK_RETURN;
         GFL_SndSEPlay(SEQ_SE_SYS_69);
         CommTvtField_SetFuncLine(wk, CommTvtField_StartPress, 964);
         break;
     case 1:
     case 4:
-        wk->mode = 1;
+        wk->mode = COMM_TVT_FIELD_MODE_VIDEO_CHAT;
         GFL_SndSEPlay(SEQ_SE_SYS_69);
         CommTvtField_SetFuncLine(wk, CommTvtField_StartPress, 973);
         break;
     case 2:
         GFL_SndSEPlay(SEQ_SE_SYS_70);
-        wk->mode = 2;
+        wk->mode = COMM_TVT_FIELD_MODE_CLOSE;
         CommTvtField_SetFuncLine(wk, CommTvtField_StartPress, 979);
         break;
     }
@@ -797,7 +797,7 @@ static void CommTvtField_SetAnswerMode(CommTvtFieldWork *wk, int index) {
 
     GFL_NetGetInitData();
     mac = GFL_NetGetBeaconMac(index);
-    wk->param->commParam.unk4 = 2;
+    wk->param->commParam.startMode = COMM_TVT_START_ANSWER;
     MI_CpuCopy8(mac, wk->param->commParam.parentMac, 6);
 }
 
@@ -805,7 +805,7 @@ static void CommTvtField_SetCallMode(CommTvtFieldWork *wk) {
     u8 mac[6] = { 0, 0, 0, 0, 0, 0 };
 
     GFL_NetGetInitData();
-    wk->param->commParam.unk4 = 1;
+    wk->param->commParam.startMode = COMM_TVT_START_CALL;
     MI_CpuCopy8(mac, wk->param->commParam.parentMac, 6);
 }
 
@@ -949,7 +949,7 @@ static BOOL CommTvtFieldApp_Init(GameProc *proc, u32 *state, void *param, void *
     CommTvtField_SetFuncLine(wk, CommTvtField_InitUI, 1739);
     wk->param = fieldParam;
     GFL_NetGetInitData();
-    wk->param->commParam.unk4 = 1;
+    wk->param->commParam.startMode = COMM_TVT_START_CALL;
     wk->param->commParam.gameData = wk->gameData;
     GFL_NetSetIconScreen(FALSE, wk->heapId);
     if (GFL_NetIsInitialized()) {
@@ -971,7 +971,7 @@ static BOOL CommTvtFieldApp_Main(GameProc *proc, u32 *state, void *param, void *
     if (wk->taskMenu != NULL) {
         AppTaskMenu_Update(wk->taskMenu);
     }
-    if (wk->mode != 1) {
+    if (wk->mode != COMM_TVT_FIELD_MODE_VIDEO_CHAT) {
         CommTvtField_UpdateCalls(wk);
     }
     CommTvtField_TickCallers(wk);
@@ -990,7 +990,7 @@ static BOOL CommTvtFieldApp_Main(GameProc *proc, u32 *state, void *param, void *
         GSYS_TryBootGameComm(wk->gsys);
     }
     if (GFL_WipeIsFinished() && GSYS_IsLowBatteryCGearOff(wk->gsys)) {
-        wk->mode = 2;
+        wk->mode = COMM_TVT_FIELD_MODE_CLOSE;
         result = TRUE;
         Wipe_SetScreenCovered(0, 0);
         Wipe_SetScreenCovered(1, 0);

@@ -272,14 +272,6 @@ typedef struct NHttpPostEvent {
     int offset;
 } NHttpPostEvent;
 
-// What the callback of a connection gets for the events of the buffer being full and of the body being received: the
-// buffer of the answer, its size, and how much of it is filled. The callback may set them to give another buffer
-typedef struct NHttpBufferEvent {
-    void *buffer;
-    int bufferSize;
-    int used;
-} NHttpBufferEvent;
-
 // Where the thread that waits for a connection to end sleeps
 typedef struct NHttpWaitInfo {
     BOOL ready;

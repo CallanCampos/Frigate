@@ -1,0 +1,130 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Black and White's species data: res/pokemon/black_white.json",
+    "description": "ARCID_PERSONAL_BW1 (a/3/0/2): Black and White's records of the species (PersonalData), which PML_PersonalFetchBW1 in poke_personal.c reads and the musical takes its forms from (musical_mcss.c), as the ways they differ from this game's records in res/pokemon/, which tools/data/personal_bw1_data.py packs: the species from SPECIES_NONE to Genesect, then the form records, then the Pokédex numbers.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "species", "form_records", "regional_dex" ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "This schema, for editors"
+        },
+        "species": {
+            "type": "object",
+            "description": "Each species whose record differs, by its constant, with its differences; the others' records are their data.json's",
+            "additionalProperties": {
+                "$ref": "#/$defs/differences"
+            }
+        },
+        "form_records": {
+            "type": "array",
+            "description": "The forms that have records of their own, in their order after the species', which gives each species' first form record (formFile): each a form_<n>.json, from 1 for each species and one after the other",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "species", "form" ],
+                "properties": {
+                    "species": {
+                        "type": "string",
+                        "x-constant": "SPECIES_"
+                    },
+                    "form": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 255
+                    },
+                    "differences": {
+                        "$ref": "#/$defs/differences"
+                    }
+                }
+            }
+        },
+        "regional_dex": {
+            "type": "array",
+            "description": "Black and White's Unova Pokédex, the species in its order from #000 (Victini): the archive's last file, each species' number, 999 for the others",
+            "items": {
+                "type": "string",
+                "x-constant": "SPECIES_"
+            }
+        }
+    },
+    "$defs": {
+        "differences": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "The fields in which Black and White's record differs from this game's, with Black and White's values: a field of data.json or form_<n>.json, as species.schema.json describes it, or by_tm, learnset's by_tm. pack checks the record with them against species.schema.json",
+            "properties": {
+                "base_stats": {
+                    "description": "data.json's base_stats"
+                },
+                "types": {
+                    "description": "data.json's types"
+                },
+                "catch_rate": {
+                    "description": "data.json's catch_rate"
+                },
+                "evolution_stage": {
+                    "description": "data.json's evolution_stage"
+                },
+                "ev_yields": {
+                    "description": "data.json's ev_yields"
+                },
+                "underground": {
+                    "description": "data.json's underground"
+                },
+                "held_items": {
+                    "description": "data.json's held_items"
+                },
+                "gender_ratio": {
+                    "description": "data.json's gender_ratio"
+                },
+                "hatch_cycles": {
+                    "description": "data.json's hatch_cycles"
+                },
+                "base_friendship": {
+                    "description": "data.json's base_friendship"
+                },
+                "growth_rate": {
+                    "description": "data.json's growth_rate"
+                },
+                "egg_groups": {
+                    "description": "data.json's egg_groups"
+                },
+                "abilities": {
+                    "description": "data.json's abilities"
+                },
+                "hidden_ability": {
+                    "description": "data.json's hidden_ability"
+                },
+                "flee_rate": {
+                    "description": "data.json's flee_rate"
+                },
+                "forms": {
+                    "description": "data.json's forms"
+                },
+                "color": {
+                    "description": "data.json's color"
+                },
+                "asymmetric": {
+                    "description": "data.json's asymmetric"
+                },
+                "palette_forms": {
+                    "description": "data.json's palette_forms"
+                },
+                "base_exp": {
+                    "description": "data.json's base_exp"
+                },
+                "height": {
+                    "description": "data.json's height"
+                },
+                "weight": {
+                    "description": "data.json's weight"
+                },
+                "by_tm": {
+                    "description": "learnset.by_tm, the TMs and HMs that it learns"
+                }
+            }
+        }
+    }
+}

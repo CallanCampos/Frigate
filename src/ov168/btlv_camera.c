@@ -38,9 +38,9 @@ static void BtlvCamera_Update(BtlvCamera *camera);
 static void BtlvCamera_UpdateAngles(BtlvCamera *camera);
 
 // The position, target and up vector the camera starts with; the declaration order lays them out as in the ROM
-static const VecFx32 data_ov168_021f2f80 = { FX32_CONST(6.7), FX32_CONST(6.7), FX32_CONST(17.3) };
-static const VecFx32 data_ov168_021f2f74 = { 0, FX32_CONST(2.6), 0 };
-static const VecFx32 data_ov168_021f2f8c = { 0, FX32_ONE, 0 };
+static const VecFx32 CAMERA_DEFAULT_POS = { FX32_CONST(6.7), FX32_CONST(6.7), FX32_CONST(17.3) };
+static const VecFx32 CAMERA_DEFAULT_TARGET = { 0, FX32_CONST(2.6), 0 };
+static const VecFx32 CAMERA_UP = { 0, FX32_ONE, 0 };
 
 BtlvCamera *BtlvCamera_Create(TCBManager *tcbManager, HeapID heapId) {
     BtlvCamera *camera = GFL_HeapAllocate(heapId, sizeof(BtlvCamera), TRUE, "btlv_camera.c", 0x56);
@@ -50,7 +50,7 @@ BtlvCamera *BtlvCamera_Create(TCBManager *tcbManager, HeapID heapId) {
     // The sine and cosine of 13 degrees
     camera->camera =
         GFL_G3DCameraCreate(G3DCAM_PROJECTION_PERSPECTIVE, 0x399, 0xf97, FX32_CONST(1.35), 0, FX32_ONE, FX32_CONST(512),
-                            0, &data_ov168_021f2f80, &data_ov168_021f2f8c, &data_ov168_021f2f74, heapId);
+                            0, &CAMERA_DEFAULT_POS, &CAMERA_UP, &CAMERA_DEFAULT_TARGET, heapId);
     BtlvCamera_UpdateAngles(camera);
     GFL_G3DCameraFlush(camera->camera);
     BtlvCamera_GetDefaultPosTarget(&camera->pos, &camera->target);

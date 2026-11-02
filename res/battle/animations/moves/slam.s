@@ -1,0 +1,28 @@
+// MOVE_SLAM's animation: member 21 of a/0/6/5
+
+#include "asm/btlv_effvm.inc"
+
+    ScriptHeader 1
+    ScriptVariant Slam
+
+Slam:
+    CameraMovePreset 1, 11, 16, 0, 8
+    Wait EFFVM_WAIT_ALL
+    McssMoveXY EFFVM_ATTACKER, 2, 0x1000, 0, 4, 1, 1
+    ParticleLoad 187
+    EmitterAdd 187, 0, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 187, 1, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    McssSetVanish EFFVM_DEFENDER, TRUE
+    McssScale EFFVM_DEFENDER, 2, 0x4cd, -0x333, 4, 2, 1
+    SetYield FALSE
+    PlaySE SEQ_SE_W002_01, 1, EFFVM_DEFENDER, 0, 200, 120, 0, 0, 0
+    PlaySE SEQ_SE_W121_01, 2, EFFVM_DEFENDER, 5, 0, 110, 0, 0, 0
+    PlaySE SEQ_SE_W011_01, 1, EFFVM_DEFENDER, 5, 0, 120, 0, 0, 0
+    SetYield TRUE
+    Wait EFFVM_WAIT_ALL
+    CameraMovePreset 1, 8, 16, 0, 8
+    Wait EFFVM_WAIT_ALL
+    McssSetVanish EFFVM_DEFENDER, FALSE
+    Wait EFFVM_WAIT_ALL
+    End
+    .balign 4

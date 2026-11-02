@@ -3,6 +3,7 @@
 // the stage of that event. Four gimmicks (A to D here, in address order) differ in which scene of 3D models they add;
 // each keeps its state in work block 1, which holds the field's expansion object system
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -19,11 +20,6 @@
 #define WORK_ID 1
 #define WORK_SIZE sizeof(SpPokeGimmickWork)
 
-#define ARCID_SP_POKE_ACTORS 201
-#define ARCID_SP_POKE_CURVE 305
-#define ARCID_SP_POKE_SCENE_C 214
-#define ARCID_SP_POKE_SCENE_D 304
-
 // The center of a grid square, in fx32
 #define GRID_CENTER(n) ((n) * FX32_CONST(16) + FX32_CONST(8))
 
@@ -38,6 +34,29 @@
 enum {
     CURVE_STATE_IDLE,
     CURVE_STATE_RUN,
+};
+
+// Which object code actor 2's effect gives the Pokémon, at its frame 12
+enum {
+    CURVE_PHASE_NONE,
+    CURVE_PHASE_TO_STILL,
+    CURVE_PHASE_TO_SWORD,
+};
+
+// The steps of the form change's event
+enum {
+    FORM_STEP_START,
+    FORM_STEP_SHOW_ACTOR2,
+    FORM_STEP_WAIT_TIMER,
+    FORM_STEP_SHOW_FIRST,
+    FORM_STEP_WAIT_FIRST,
+    FORM_STEP_SHOW_SECOND,
+    FORM_STEP_WAIT_SECOND,
+    FORM_STEP_SHOW_THIRD,
+    FORM_STEP_WAIT_THIRD,
+    FORM_STEP_WAIT_LEAVE,
+    FORM_STEP_WAIT_LEFT,
+    FORM_STEP_END,
 };
 
 // Gimmick B's work of actor 0, 0x198 bytes: it runs a Pokémon of the zone along a curve of archive 305
@@ -254,14 +273,14 @@ void SpPokeGimmickB_Update(Field *field) {
             GFL_G3DCurveGetNowTranslation(curve->curve, &pos);
             VEC_Add(&pos, &curve->basePos, &pos);
             SetActorWPosValue(curve->actor, &pos);
-            if (curve->phase != 0) {
+            if (curve->phase != CURVE_PHASE_NONE) {
                 SRTMatrix *matrix = FieldExpObj_GetActorMatrixPtr(system, 0, 2);
                 VecFx32 actorPos;
 
                 CopyActorWPos(curve->actor, &actorPos);
                 matrix->translation = actorPos;
                 if (FieldExpObj_GetAnmFrame(system, 0, 2, 0) == FX32_CONST(12)) {
-                    if (curve->phase == 2) {
+                    if (curve->phase == CURVE_PHASE_TO_SWORD) {
                         FldAct_UpdateBlInfoForNewObjCode(curve->actor, OBJ_CODE_SP_POKE_SWORD);
                     } else {
                         FldAct_UpdateBlInfoForNewObjCode(curve->actor, OBJ_CODE_SP_POKE_STILL);
@@ -270,7 +289,7 @@ void SpPokeGimmickB_Update(Field *field) {
                 }
                 if (FieldExpObjAnm_IsPlaybackFinished(FieldExpObj_GetAnmInfo(system, 0, 2, 0)) == TRUE) {
                     FieldExpObj_SetActorHidden(system, 0, 2, TRUE);
-                    curve->phase = 0;
+                    curve->phase = CURVE_PHASE_NONE;
                 }
             }
             switch (GFL_G3DCurveGetNowFrame(curve->curve) >> FX32_SHIFT) {
@@ -302,14 +321,14 @@ void SpPokeGimmickB_Update(Field *field) {
     FieldExpObj_StepAllAnimations(system);
 }
 
-void SpPokeGimmick_StartChase(Field *field, u16 a1) {
+void SpPokeGimmick_StartChase(Field *field, u16 actorId) {
     SpPokeGimmickWork *work = Field_GetGimmickWorkBlock(field, WORK_ID);
     SpPokeGimmickCurve *curve = work->data.curve;
     VecFx32 pos;
 
     curve->curve = GFL_G3DCurveCreateToLoadBuffer(Field_GetHeapID(field), ARCID_SP_POKE_CURVE, CURVE_ARC_FILE,
                                                   CURVE_TYPE, curve->buffer, sizeof(curve->buffer));
-    curve->actor = FindFieldActor(Field_GetActorSystem(field), a1);
+    curve->actor = FindFieldActor(Field_GetActorSystem(field), actorId);
     if (curve->actor != NULL) {
         SetActorMovementFlag(curve->actor, ACTOR_MOVEMENT_FLAG_SP_POKE);
         CopyActorWPos(curve->actor, &curve->basePos);
@@ -317,7 +336,7 @@ void SpPokeGimmick_StartChase(Field *field, u16 a1) {
         VEC_Add(&pos, &curve->basePos, &pos);
         SetActorWPosValue(curve->actor, &pos);
         curve->state = CURVE_STATE_RUN;
-        curve->phase = 0;
+        curve->phase = CURVE_PHASE_NONE;
     }
 }
 
@@ -576,75 +595,75 @@ static GameEventReturnCode SpPokeGimmick_FormEvent(GameEvent *event, u32 *state,
 
     Field_GetGimmickWorkBlock(GSYS_GetField(GameEvent_GetGameSystem(event)), WORK_ID);
     switch (*state) {
-    case 0:
-        *state = 1;
+    case FORM_STEP_START:
+        *state = FORM_STEP_SHOW_ACTOR2;
         break;
-    case 1:
+    case FORM_STEP_SHOW_ACTOR2:
         FieldExpObj_SetActorHidden(work->system, 0, 2, FALSE);
         for (i = 0; i < 2; i++) {
             SpPokeGimmick_PlayAnimation(work->system, 2, i);
         }
         GFL_SndSEPlay(SEQ_SE_SW_KERTIO_FORM_01);
         work->timer = 60;
-        *state = 2;
+        *state = FORM_STEP_WAIT_TIMER;
         break;
-    case 2:
+    case FORM_STEP_WAIT_TIMER:
         if (work->timer-- <= 0) {
-            *state = 3;
+            *state = FORM_STEP_SHOW_FIRST;
         }
         break;
-    case 3:
+    case FORM_STEP_SHOW_FIRST:
         SpPokeGimmick_ShowAndPlay01(work->system, 5);
         GFL_SndSEPlay(SEQ_SE_SW_KERTIO_FORM_02);
-        *state = 4;
+        *state = FORM_STEP_WAIT_FIRST;
         break;
-    case 4:
+    case FORM_STEP_WAIT_FIRST:
         if (SpPokeGimmick_IsAnimation01Done(work->system, 5)) {
             SpPokeGimmick_PlayAnimation23(work->system, 5);
-            *state = 5;
+            *state = FORM_STEP_SHOW_SECOND;
         }
         break;
-    case 5:
+    case FORM_STEP_SHOW_SECOND:
         SpPokeGimmick_ShowAndPlay01(work->system, 3);
         GFL_SndSEPlay(SEQ_SE_SW_KERTIO_FORM_02);
-        *state = 6;
+        *state = FORM_STEP_WAIT_SECOND;
         break;
-    case 6:
+    case FORM_STEP_WAIT_SECOND:
         if (SpPokeGimmick_IsAnimation01Done(work->system, 3)) {
             SpPokeGimmick_PlayAnimation23(work->system, 3);
-            *state = 7;
+            *state = FORM_STEP_SHOW_THIRD;
         }
         break;
-    case 7:
+    case FORM_STEP_SHOW_THIRD:
         SpPokeGimmick_ShowAndPlay01(work->system, 4);
         GFL_SndSEPlay(SEQ_SE_SW_KERTIO_FORM_02);
-        *state = 8;
+        *state = FORM_STEP_WAIT_THIRD;
         break;
-    case 8:
+    case FORM_STEP_WAIT_THIRD:
         if (SpPokeGimmick_IsAnimation01Done(work->system, 4)) {
             SpPokeGimmick_PlayAnimation23(work->system, 4);
             work->timer = 20;
-            *state = 9;
+            *state = FORM_STEP_WAIT_LEAVE;
         }
         break;
-    case 9:
+    case FORM_STEP_WAIT_LEAVE:
         if (work->timer-- <= 0) {
             SpPokeGimmick_PlayAnimation456(work->system, 5);
             SpPokeGimmick_PlayAnimation456(work->system, 3);
             SpPokeGimmick_PlayAnimation456(work->system, 4);
             GFL_SndSEPlay(SEQ_SE_SW_KERTIO_FORM_06);
-            *state = 10;
+            *state = FORM_STEP_WAIT_LEFT;
         }
         break;
-    case 10:
+    case FORM_STEP_WAIT_LEFT:
         if (SpPokeGimmick_IsAnimation456Done(work->system, 5)) {
             FieldExpObj_SetActorHidden(work->system, 0, 5, TRUE);
             FieldExpObj_SetActorHidden(work->system, 0, 3, TRUE);
             FieldExpObj_SetActorHidden(work->system, 0, 4, TRUE);
-            *state = 11;
+            *state = FORM_STEP_END;
         }
         break;
-    case 11:
+    case FORM_STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;

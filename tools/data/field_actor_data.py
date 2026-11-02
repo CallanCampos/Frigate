@@ -175,7 +175,9 @@ def sprite(path: Path) -> bytes:
     return sprite_texture_set(width, height, palette_indices(image, pixels, png_colors, colors), colors)
 
 
-def pack(root: Path, table_output: Path, graphics_output: Path):
+def table(root: Path) -> tuple[dict[str, bytes], list[bytes], list[Path]]:
+    """Returns the table's records, by object code in the list's order, and the graphics archive's members: the
+    models, and the directories of the sprites that follow them."""
     schema = load_schema(root / "field_actor.schema.json")
     entries = []
     for code, number in codes():
@@ -195,12 +197,12 @@ def pack(root: Path, table_output: Path, graphics_output: Path):
             check((path / "model.nsbmd").is_file(), path, "a model without \"model\" needs model.nsbmd")
             model_index[code] = len(models)
             models.append((path / "model.nsbmd").read_bytes())
-    sprites: list[bytes] = []
-    records = []
+    sprites: list[Path] = []
+    records = {}
     for code, number, path, data in entries:
         if data["type"] == "sprite":
             resource = len(models) + len(sprites)
-            sprites.append(sprite(path))
+            sprites.append(path)
         elif data["type"] == "model":
             owner = data.get("model", code)
             check(owner in model_index, path, f"{owner} is no 3D model with a model.nsbmd of its own, which a \"model\" "
@@ -210,16 +212,21 @@ def pack(root: Path, table_output: Path, graphics_output: Path):
             resource = 0
         others = (NO_RESOURCE,) * 4 if data["type"] == "model" else (0,) * 4
         gender = next(key for key, value in GENDERS.items() if value == data["gender"])
-        records.append(RECORD.pack(
+        records[code] = RECORD.pack(
             number, {value: key for key, value in TYPES.items()}[data["type"]], data["scene_node_type"],
             data["shadow"], data["footprint_type"], data["reflections"], data["billboard_size"],
             data["sprite_atlas_size"], data["sprite_controller_type"], gender, data["collision"]["width"],
             data["collision"]["height"], data["offset"]["x"], data["offset"]["y"], data["offset"]["z"], resource,
-            *others, 0))
+            *others, 0)
+    return records, models, sprites
+
+
+def pack(root: Path, table_output: Path, graphics_output: Path):
+    records, models, sprites = table(root)
     table_output.parent.mkdir(parents=True, exist_ok=True)
-    table_output.write_bytes(write_narc([struct.pack("<I", len(records)) + b"".join(records)]))
+    table_output.write_bytes(write_narc([struct.pack("<I", len(records)) + b"".join(records.values())]))
     graphics_output.parent.mkdir(parents=True, exist_ok=True)
-    graphics_output.write_bytes(write_narc(models + sprites))
+    graphics_output.write_bytes(write_narc(models + [sprite(path) for path in sprites]))
 
 
 if __name__ == "__main__":

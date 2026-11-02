@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field_weather.h"
 #include "field/weather_sandstorm.h"
 #include "gfl/clact.h"
@@ -46,7 +47,7 @@ static const int sWindSpeedX[8] = { 6, 10, 10, 6, 10, 12, 20, 12 };
 static const int sWindSpeedY[8] = { 4, 4, 4, 8, 8, 4, 4, 4 };
 
 WeatherData SANDSTORM_WEATHER = {
-    { 0x37, 1, 0, 0x22, 0x23, 0x21, 0x20, 0x2b, 0x303, 3, 0x102 },
+    { ARCID_WEATHER, 1, 0, 0x22, 0x23, 0x21, 0x20, 0x2b, 0x303, 3, 0x102 },
     sizeof(SandstormWork),
     {
         Sandstorm_Init,
@@ -61,7 +62,7 @@ WeatherData SANDSTORM_WEATHER = {
 };
 
 WeatherData SANDSTORM_WEATHER_2 = {
-    { 0x37, 1, 1, 0x22, 0x23, 0x21, 0x20, 0x2b, 0x303, 3, 0x102 },
+    { ARCID_WEATHER, 1, 1, 0x22, 0x23, 0x21, 0x20, 0x2b, 0x303, 3, 0x102 },
     sizeof(SandstormWork),
     {
         Sandstorm_Init,

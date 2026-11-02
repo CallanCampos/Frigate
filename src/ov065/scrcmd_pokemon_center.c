@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/flags.h"
 #include "constants/pokemon.h"
 #include "field/field_actor.h"
@@ -27,10 +28,8 @@
 // The script plugin of the Pokémon Centers (plugin 13), commands from 1000: Mr. Medal's Medal Rally, and records of
 // link battles
 
-// The medals' definitions, one file of MEDAL_COUNT MedalDef
-#define ARCID_MEDAL_DEF 235
-// The Pokémon whose types the type medals count, one file of MedalTypeSpecies
-#define ARCID_MEDAL_TYPE_SPECIES 239
+// ARCID_MEDAL_DEF has one file of MEDAL_COUNT MedalDef, and ARCID_MEDAL_TYPE_SPECIES one file of MedalTypeSpecies, the
+// Pokémon whose types the type medals count
 #define MEDAL_TYPE_SPECIES_COUNT 301
 
 #define TYPE_COUNT 17
@@ -48,12 +47,36 @@ enum {
     MEDAL_ACTION_RAISE_RANK,
 };
 
+// What a MedalDef's kind makes of it
+enum {
+    // Counts toward its rank
+    MEDAL_KIND_RANKED = 1,
+    // Counts toward its rank, and is discovered as the ranks fill
+    MEDAL_KIND_DISCOVERED_BY_RANK,
+};
+
+// What Scrcmd_PokemonCenter_GetMatchState reads
+enum {
+    MATCH_INFO_IN_PROGRESS,
+    MATCH_INFO_MAC_ADDRESS_SAME,
+    MATCH_INFO_TIMED_OUT,
+    // Reads and resets the points that the scripts award with Scrcmd_PokemonCenter_AddBattlePoints
+    MATCH_INFO_TAKE_BATTLE_POINTS,
+    MATCH_INFO_UNK_A3,
+};
+
+// What Scrcmd_PokemonCenter_SetMatchState does
+enum {
+    MATCH_ACTION_SET_UNK_A3 = 4,
+    MATCH_ACTION_COUNT_RECORD_0x35,
+};
+
 typedef struct {
     u32 threshold;
     int check;
     u8 unk8;
     u8 category;
-    // The medals of kinds 1 and 2 count toward their rank, and those of kind 2 are discovered as the ranks fill
+    // MEDAL_KIND_*, or 0 for a medal the ranks ignore
     u8 kind;
     u8 rank;
 } MedalDef;
@@ -234,7 +257,7 @@ static void PokemonCenter_CheckMedals(GameData *gameData, SaveControl *p_sv, Hea
             }
         }
         status = MedalBox_GetMedalStatus(box, i);
-        if (defs[i].kind == 1 || defs[i].kind == 2) {
+        if (defs[i].kind == MEDAL_KIND_RANKED || defs[i].kind == MEDAL_KIND_DISCOVERED_BY_RANK) {
             if (status == MEDAL_STATUS_EARNED || status == MEDAL_STATUS_OBTAINED) {
                 earned[defs[i].rank]++;
             }
@@ -246,7 +269,7 @@ static void PokemonCenter_CheckMedals(GameData *gameData, SaveControl *p_sv, Hea
         if (earned[j] >= total[j] / 2 + total[j] % 2) {
             for (i = 0; i < MEDAL_COUNT; i++) {
                 status = MedalBox_GetMedalStatus(box, i);
-                if (defs[i].kind == 2 && defs[i].rank <= j + 1) {
+                if (defs[i].kind == MEDAL_KIND_DISCOVERED_BY_RANK && defs[i].rank <= j + 1) {
                     MedalBox_DiscoverMedal(box, i);
                 }
             }
@@ -257,15 +280,15 @@ static void PokemonCenter_CheckMedals(GameData *gameData, SaveControl *p_sv, Hea
     maxRank = -1;
     for (i = 0; i < MEDAL_COUNT; i++) {
         status = MedalBox_GetMedalStatus(box, i);
-        if (defs[i].kind == 2 && (status == MEDAL_STATUS_EARNED || status == MEDAL_STATUS_OBTAINED) &&
-            maxRank < defs[i].rank) {
+        if (defs[i].kind == MEDAL_KIND_DISCOVERED_BY_RANK &&
+            (status == MEDAL_STATUS_EARNED || status == MEDAL_STATUS_OBTAINED) && maxRank < defs[i].rank) {
             maxRank = defs[i].rank;
         }
     }
     if (maxRank >= 0) {
         for (i = 0; i < MEDAL_COUNT; i++) {
             status = MedalBox_GetMedalStatus(box, i);
-            if (defs[i].kind == 2 && defs[i].rank <= maxRank) {
+            if (defs[i].kind == MEDAL_KIND_DISCOVERED_BY_RANK && defs[i].rank <= maxRank) {
                 MedalBox_DiscoverMedal(box, i);
             }
         }
@@ -593,7 +616,8 @@ static BOOL PokemonCenter_CheckFriendCount(MedalCheckContext *ctx, GameData *gam
     WifiList *wifiList = GameData_GetWifiList(gameData);
 
     for (i = 0; i < 32; i++) {
-        if (WifiList_IsFriendValid(wifiList, i) && WifiList_GetFriendParam(wifiList, i, WIFI_LIST_FRIEND_GENDER) != 2) {
+        if (WifiList_IsFriendValid(wifiList, i) &&
+            WifiList_GetFriendParam(wifiList, i, WIFI_LIST_FRIEND_GENDER) != WIFI_LIST_GENDER_UNKNOWN) {
             count++;
         }
     }
@@ -804,20 +828,20 @@ BOOL Scrcmd_PokemonCenter_GetMatchState(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
 
     switch (info) {
-    case 0:
+    case MATCH_INFO_IN_PROGRESS:
         *var = RecordSave_IsMatchInProgress(record);
         break;
-    case 1:
+    case MATCH_INFO_MAC_ADDRESS_SAME:
         *var = RecordSave_IsMacAddressSame(record);
         break;
-    case 2:
+    case MATCH_INFO_TIMED_OUT:
         *var = RecordSave_IsMatchTimedOut(record);
         break;
-    case 3:
+    case MATCH_INFO_TAKE_BATTLE_POINTS:
         *var = GameData_GetCounter(gameData);
         GameData_ResetCounter(gameData);
         break;
-    case 4:
+    case MATCH_INFO_UNK_A3:
         *var = func_0200f384(record);
         break;
     }
@@ -841,7 +865,7 @@ BOOL Scrcmd_PokemonCenter_ClearMatchInProgress(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-// Action 4 sets the value that Scrcmd_PokemonCenter_GetMatchState's info 4 returns, and action 5 counts record 0x35
+// MATCH_ACTION_SET_UNK_A3 sets the value that Scrcmd_PokemonCenter_GetMatchState's MATCH_INFO_UNK_A3 returns
 BOOL Scrcmd_PokemonCenter_SetMatchState(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
@@ -850,10 +874,10 @@ BOOL Scrcmd_PokemonCenter_SetMatchState(VM *vm, FieldScriptEnv *env) {
     u16 value = ScriptReadAny(vm, env);
 
     switch (action) {
-    case 4:
+    case MATCH_ACTION_SET_UNK_A3:
         func_0200f37c(record, value);
         break;
-    case 5:
+    case MATCH_ACTION_COUNT_RECORD_0x35:
         RecordAddOne(getTrainerCardInfoBlkAddress(save), 0x35);
         break;
     }

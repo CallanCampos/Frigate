@@ -266,11 +266,32 @@ def source_compiler(source: Path) -> SourceCompiler:
 # under files/ to the directory of its members, one assembly file each, in archive order.
 ARCHIVES = {
     "a/0/5/6": "res/field/scripts",  # Field scripts, see tools/script/field_script.py
+    "a/0/6/5": "res/battle/animations/moves",  # Move animations, see tools/script/btlv_effvm_script.py
+    "a/0/6/6": "res/battle/animations/effects",  # The other battle effects' animations, the same
     "a/1/6/9": "res/trainers/ai",  # Trainer AI scripts, see tools/script/tr_ai_script.py
 }
 
-# The constant list that names and orders each assembled archive's files, and the prefix of its constants
-ARCHIVE_LISTS = {"a/0/5/6": ("field_scripts", "SCRIPTS_"), "a/1/6/9": ("tr_ai_scripts", "TR_AI_SCRIPT_")}
+# The constant list that names and orders each assembled archive's files, and the prefix of its constants. Members
+# past the list's end are numbered, NNN.s, and so are all of an archive without a list.
+ARCHIVE_LISTS = {"a/0/5/6": ("field_scripts", "SCRIPTS_"), "a/0/6/5": ("moves", "MOVE_"),
+                 "a/1/6/9": ("tr_ai_scripts", "TR_AI_SCRIPT_")}
+
+
+def archive_sources(path: str, directory: Path) -> list[Path]:
+    """Returns the sources of an assembled archive's members, in archive order: the files named after its list's
+    constants, then the numbered files that follow them."""
+    sources = ordered_files(*ARCHIVE_LISTS[path], directory, ".s") if path in ARCHIVE_LISTS else []
+    while (directory / f"{len(sources):03d}.s").exists():
+        sources.append(directory / f"{len(sources):03d}.s")
+    return sources
+
+
+# Scripts that are members of archives that a DATA_PACKS script packs, among members of other kinds: by the script,
+# the pattern of their sources in its data directory. Each is assembled as ARCHIVES' members are, and the packer gets
+# the binaries after its archives, with --scripts, in the sources' order, each at its source's path under the build's
+# directory, which tells it the member's place.
+PACK_SCRIPTS = {"tools/data/musical_program_data.py": "*/script.s"}  # Each program's stage scripts
+
 
 # Archives packed from JSON (and CSV) data by a script's pack command: the script, its data directory, the archives it
 # writes, in the order it takes them, and whether it packs each version apart, which passes it the version's name
@@ -283,13 +304,27 @@ DATA_PACKS = [
     ("tools/data/pokemon_graphics.py", "res/pokemon",
      ["a/0/0/4", "a/0/0/7", "a/0/5/1", "a/1/6/5", "a/2/2/9"], True),
     ("tools/data/pokemon_cries.py", "res/pokemon", ["a/1/9/1"], True),  # The cries' volumes
+    # Black and White's species data, as its differences from this game's records
+    ("tools/data/personal_bw1_data.py", "res/pokemon", ["a/3/0/2"], False),
+    # The Pokédex's search data and orders, the species' areas and the habitat list, from res/pokedex and the species'
+    # pokedex.json
+    ("tools/data/pokedex_data.py", "res/pokedex", ["a/0/9/7", "a/1/7/6", "a/2/9/6"], True, ["res/pokemon"]),
     # The sound archive: sequences, banks, wave archives, players, groups and streams, and the Pokémon's cries
     ("tools/data/sound_data.py", "res/sound", ["swan_sound_data.sdat"], False, ["res/pokemon"]),
     ("tools/data/move_data.py", "res/moves", ["a/0/2/1"], False),  # Move data
     ("tools/data/item_data.py", "res/items", ["a/0/2/4"], False),  # Item data
     ("tools/data/item_icon_data.py", "res/items", ["a/0/2/5"], True),  # Item icons
+    # The battle bag's pockets of each item, from the items' data
+    ("tools/data/battle_bag_data.py", "res/items", ["a/2/2/8"], False),
     # The field actors' models: their table and their sprites' and 3D models' graphics
     ("tools/data/field_actor_data.py", "res/field/actors", ["a/0/4/7", "a/0/4/8"], False),
+    # The walking Pokémon's table: the species, sex and form of each walking Pokémon's object code
+    ("tools/data/walking_pokemon_data.py", "res/field/actors", ["a/2/0/8"], False),
+    # The zones' NPC info caches, with copies of their actors' records of the model table
+    ("tools/data/npc_cache_data.py", "res/field/actors/npc_caches", ["a/0/5/7"], False, ["res/field/actors"]),
+    # The actors' scripted animations
+    ("tools/data/field_actor_animation_data.py", "res/field/actors/animations", ["a/2/0/0"], False,
+     ["res/field/actors/animation.schema.json"]),
     # Trainers, their parties, and the table of their messages with its offsets
     ("tools/data/trainer_data.py", "res/trainers/data", ["a/0/9/1", "a/0/9/2", "a/0/8/9", "a/0/9/0"], False),
     # Trainer sprites, front and back, and a/0/6/3, a copy of the back sprites
@@ -298,7 +333,27 @@ DATA_PACKS = [
     # Zone headers, which give each zone the number of its events in res/field/events/order.json
     ("tools/data/zone_data.py", "res/field/zones", ["a/0/1/2"], False, ["res/field/events"]),
     ("tools/data/trade_data.py", "res/field/trades", ["a/1/6/3"], False),  # In-game trades
+    ("tools/data/shop_data.py", "res/field/shops", ["a/2/8/2", "a/2/8/3"], False),  # The Poké Marts' lists and counts
+    ("tools/data/zone_gimmick_data.py", "res/field/zone_gimmicks", ["a/1/0/2"], False),  # The zones' gimmicks
+    # The gates' news boards: each gate's board and the news they show
+    ("tools/data/gate_board_data.py", "res/field/gate_boards", ["a/1/7/2", "a/1/6/4"], False),
+    # The Entralink's luminance tables and the Entree Forest's levels
+    ("tools/data/entralink_data.py", "res/field/entralink", ["a/2/1/9", "a/2/2/3"], False),
+    ("tools/data/lens_flare_data.py", "res/field/lens_flares", ["a/2/4/1"], False),  # The zone transitions' lens flares
+    # The field's 3D cut-in effects: their scenes and bitmaps
+    ("tools/data/field_cutin_data.py", "res/field/cutins", ["a/1/1/8", "a/2/6/8"], False),
+    # The tables of the script commands: the event camera's positions, the stadiums' trainers, what the Hidden Grottoes
+    # hold and what the item collectors pay
+    ("tools/data/event_camera_data.py", "res/field/cameras/event", ["a/1/6/1"], False),
+    ("tools/data/stadium_data.py", "res/field/stadium", ["a/2/0/6"], False),
+    ("tools/data/hidden_hollow_data.py", "res/field/hidden_hollows", ["a/2/7/3"], False),
+    ("tools/data/item_collector_data.py", "res/field/item_collectors", ["a/2/0/5"], False),
     ("tools/data/map_matrix_data.py", "res/field/matrices", ["a/0/0/9"], False),  # Map matrices
+    # The map replacements, which swap a matrix's map models or the matrix by the season, version or an event
+    ("tools/data/map_replace_data.py", "res/field/matrices/replacements.json", ["a/0/1/0"], False,
+     ["res/field/matrices/replacements.schema.json"]),
+    # The Join Avenue shops' land data patches: their tiles and props
+    ("tools/data/land_patch_data.py", "res/field/land_patches", ["a/1/5/4"], False),
     # Map models, whose GLBs show the map texture sets' PNGs, which name the textures they bind
     ("tools/data/map_model_data.py", "res/field/maps/models", ["a/0/0/8"], True, ["res/field/maps/textures"]),
     # Field prop models, which their bundles' textures go with in the same way
@@ -309,10 +364,67 @@ DATA_PACKS = [
     ("tools/data/map_texture_data.py", "res/field/maps/textures", ["a/0/1/4"], True),  # Map texture PNG sources
     ("tools/data/map_texture_data.py", "res/field/props/exterior/textures", ["a/1/7/4"], True),
     ("tools/data/map_texture_data.py", "res/field/props/interior/textures", ["a/1/7/5"], True),
+    # The areas' texture pattern animations: their key frames and the textures they draw over the texture sets' with
+    ("tools/data/map_pattern_animation_data.py", "res/field/maps/pattern_animations", ["a/0/6/9"], False),
     ("tools/data/area_data.py", "res/field/areas", ["a/0/1/3"], False),  # Areas, a file of records rather than an archive
     ("tools/data/light_data.py", "res/lighting", ["a/0/6/0", "a/0/6/1"], False),  # Field and battle lighting
+    # Pokéstar Studios' movies: their casts, and their scripts with the default recorded movie
+    ("tools/data/pokewood_data.py", "res/pokewood/movies", ["a/2/7/2", "a/2/6/9"], False,
+     ["res/pokewood/cast.schema.json", "res/pokewood/movie.schema.json", "res/pokewood/default_record.bin"]),
+    # Pokéstar Studios' cut-in scripts, which the movies' battles play after some scenes
+    ("tools/data/pokewood_cutin_data.py", "res/pokewood/cutins.json", ["a/2/7/5"], False,
+     ["res/pokewood/cutin.schema.json"]),
+    # The battle backgrounds' types, fields and stages, and the battle regulations
+    ("tools/data/battle_bg_data.py", "res/battle/backgrounds", ["a/1/5/1"], False),
+    ("tools/data/regulation_data.py", "res/battle/regulations", ["a/1/0/6"], False,
+     ["res/text/system/load_battle_type_text_to_strbuf.txt"]),
+    # The areas' edge color tables and their billboard actors' material colors
+    ("tools/data/area_color_data.py", "res/lighting", ["a/0/1/5", "a/1/7/3"], False),
+    ("tools/data/flash_data.py", "res/field/flash", ["a/1/4/9"], False),  # The zones where Flash can be used
+    # The lighting sets that zones have instead of their area's, and the zones' table, as a/0/6/0's sets
+    ("tools/data/zone_light_data.py", "res/lighting/zones", ["a/0/8/1"], False, ["res/lighting/lights.schema.json"]),
+    ("tools/data/zone_fog_data.py", "res/field/fog", ["a/0/8/0"], False),  # The zones' fog and its table
+    # The field camera's setups, the zones' camera boundaries and the entrance cameras
+    ("tools/data/field_camera_data.py", "res/field/cameras", ["a/0/5/9", "a/1/0/9", "a/1/7/7"], False),
+    # The camera areas of the rail maps and of the other maps
+    ("tools/data/camera_area_data.py", "res/field/cameras", ["a/0/7/9", "a/1/5/6"], False),
+    # The rail maps' rails and their tiles, and the headers that name a rail map's rails and camera areas
+    ("tools/data/rail_data.py", "res/field/rails", ["a/0/7/8", "a/1/1/0"], False),
+    # The interactive sound system's towns, dungeons, zones, BGM switches and 3D sound
+    ("tools/data/interactive_sound_data.py", "res/sound/interactive",
+     ["a/1/3/3", "a/1/4/6", "a/1/3/6", "a/1/4/7", "a/1/8/2"], False),
+    # The BGM info: the interactive sound subsystem of each BGM
+    ("tools/data/bgm_info_data.py", "res/sound/interactive", ["a/0/8/6"], False),
     # The town map's places, whose texts are messages of town_map.txt
     ("tools/data/town_map_data.py", "res/town_map", ["a/0/8/5"], True, ["res/text/system/town_map.txt"]),
+    # The Medal Rally's medals, in the order of their names in medal_names.txt, and the Pokémon the type medals count
+    ("tools/data/medal_data.py", "res/medals", ["a/2/3/5", "a/2/3/9"], False, ["res/text/system/medal_names.txt"]),
+    # The Funfest Missions and the species their people missions pick from, whose messages are of their text file
+    ("tools/data/funfest_mission_data.py", "res/funfest", ["a/2/8/9"], False,
+     ["res/text/system/get_text_file_for_fest_missions.txt"]),
+    # The name input's lists of profane words
+    ("tools/data/profane_word_data.py", "res/name_input/profane_words.json", ["a/2/1/6"], False,
+     ["res/name_input/profane_words.schema.json"]),
+    # The weather calendar: the weather of 24 zones on each day of the year
+    ("tools/data/weather_calendar_data.py", "res/field/weather/calendar.json", ["a/0/9/6"], False,
+     ["res/field/weather/calendar.schema.json"]),
+    # Geonet's places of the countries and their regions, which name their messages of the countries' text banks
+    ("tools/data/geonet_place_data.py", "res/geonet", ["a/0/5/2"], False, ["res/text/system"]),
+    # The Join Avenue's tables: its shops, goods, people, NPCs, ranks, raffles and visitors
+    ("tools/data/join_avenue_data.py", "res/join_avenue", ["a/2/4/4"], False),
+    # The Xtransceiver's calls and the story's scripted calls, which name their messages of the text banks
+    ("tools/data/local_tvt_data.py", "res/local_tvt", ["a/2/4/0", "a/2/3/4"], False, ["res/text/system"]),
+    # The Pokémon World Tournament's Trainers: their tournaments, classes and music
+    ("tools/data/pwt_trainer_data.py", "res/trainers/facilities/pwt_trainers.json", ["a/2/4/7"], False,
+     ["res/trainers/facilities/pwt_trainers.schema.json"]),
+    # The name input's keyboards, word tables and conversion table
+    ("tools/data/name_input_data.py", "res/name_input/name_input.json", ["a/1/2/0"], False,
+     ["res/name_input/name_input.schema.json"]),
+    # The Pass Powers, whose names and descriptions are messages of their text files
+    ("tools/data/pass_power_data.py", "res/pass_powers", ["a/0/3/7"], False,
+     ["res/text/system/pass_powers.txt", "res/text/system/monolith_power_info.txt"]),
+    # The crowds of Castelia City's streets: their zones, lanes and passers-by
+    ("tools/data/castelia_rush_data.py", "res/field/castelia_rush", ["a/1/8/3"], False),
     # The battle facilities' trainers and Pokémon; the Battle Subway's are also the Trial House's
     ("tools/data/facility_data.py", "res/trainers/facilities/battle_subway", ["a/2/1/2", "a/2/1/1"], False,
      ["res/trainers/facilities"]),
@@ -329,6 +441,16 @@ DATA_PACKS = [
     ("tools/data/facility_data.py", "res/trainers/facilities/pwt_rental", ["a/2/5/7"], False, ["res/trainers/facilities"]),
     # The zones' events, in the order of res/field/events/order.json
     ("tools/data/event_data.py", "res/field/events", ["a/1/2/6"], False),
+    # The debug screens' 2D graphics at the root, a software keyboard's and a sound status screen's, which nothing loads
+    ("tools/data/debug_graphics_data.py", "res/debug/skb", ["skb.narc"], True),
+    ("tools/data/debug_graphics_data.py", "res/debug/soundstatus", ["soundstatus.narc"], True),
+    # The DS Download Play icons that the game gives the children it sends, Black 2's and White 2's
+    ("tools/data/download_play_icon_data.py", "res/download_play",
+     ["dl_rom/icon_b.char", "dl_rom/icon_b.plt", "dl_rom/icon_w.char", "dl_rom/icon_w.plt"], False),
+    # The musical's four programs: their data, messages, stage scripts (PACK_SCRIPTS) and sound, with the performers'
+    # names of btl_main_9.txt and the wave archives' schema
+    ("tools/data/musical_program_data.py", "res/musicals/programs", ["a/1/1/2", "a/1/1/3", "a/1/1/4", "a/1/1/5"],
+     False, ["res/text/system/btl_main_9.txt", "res/sound/wave_archive.schema.json"]),
 ]
 # The archives of Nitro resources and data, each a directory named after its ARCID_* constant, which gives its file, in
 # the root for what it holds (graphics_archive.ARCHIVE_ROOTS)
@@ -342,7 +464,9 @@ DATA_PACK_TOOLS = ["tools/data/datajson.py", "tools/text/text_ids.py", "tools/da
                    "src/ov036/scrcmd_shop.c", "tools/data/facility_data.py", "tools/data/make_constants.py"]
 # The C files a packer reads its tables from, besides scrcmd_shop.c
 DATA_PACK_SOURCES = {"tools/data/pokemon_graphics.py": ["src/system/poke_icon.c"],
-                     "tools/data/pokemon_cries.py": ["src/system/poke_icon.c"]}
+                     "tools/data/pokemon_cries.py": ["src/system/poke_icon.c"],
+                     "tools/data/graphics_archive.py": ["res/fonts/font.schema.json",
+                                                        "res/particles/particles.schema.json"]}
 
 
 def script_imports(script: str) -> list[str]:
@@ -666,16 +790,19 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
                                           *(a for _, _, pack, *_ in DATA_PACKS for a in pack)])})
     archives = []
     checks = []
+
+    def assembled(source: Path) -> Path:
+        """Assembles a script, an archive's member, and returns its binary."""
+        source = source.relative_to(ROOT)
+        obj = build_dir / source.with_suffix(".o")
+        n.build([obj], "as", [source], variables={"dep": obj.with_suffix(".d"), "defines": as_defines},
+                order_only=["constants_headers"])
+        member = obj.with_suffix(".bin")
+        n.build([member], "objcopy_bin", [obj])
+        return member
+
     for path, source_dir in ARCHIVES.items():
-        members = []
-        for source in ordered_files(*ARCHIVE_LISTS[path], ROOT / source_dir, ".s"):
-            source = source.relative_to(ROOT)
-            obj = build_dir / source.with_suffix(".o")
-            n.build([obj], "as", [source], variables={"dep": obj.with_suffix(".d"), "defines": as_defines},
-                    order_only=["constants_headers"])
-            member = obj.with_suffix(".bin")
-            n.build([member], "objcopy_bin", [obj])
-            members.append(member)
+        members = [assembled(source) for source in archive_sources(path, ROOT / source_dir)]
         archive = files_dir / path
         n.build([archive], "narc", members, implicit=["tools/data/narc.py"], order_only=[files_ok])
         archive_ok = stamp_dir / "files" / f"{path.replace('/', '_')}.ok"
@@ -695,8 +822,11 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
         game = VERSIONS[version]["defines"][0].lower() if per_version else ""
         dependencies = sorted({script, *DATA_PACK_TOOLS, *script_imports(script), *DATA_PACK_SOURCES.get(script, []),
                                *constant_sources})
-        n.build(outputs, "data_pack", sources, implicit=dependencies,
-                order_only=[files_ok], variables={"script": script, "dir": data_dir, "game": game})
+        scripts = ([assembled(source) for source in sorted((ROOT / data_dir).glob(PACK_SCRIPTS[script]))]
+                   if script in PACK_SCRIPTS else [])
+        n.build(outputs, "data_pack", sources, implicit=[*dependencies, *scripts], order_only=[files_ok],
+                variables={"script": script, "dir": data_dir, "game": game,
+                           "scripts": f"--scripts {' '.join(map(str, scripts))}" if scripts else ""})
         for path, archive in zip(paths, outputs):
             archive_ok = stamp_dir / "files" / f"{path.replace('/', '_')}.ok"
             n.build([archive_ok], "check_file", [archive], implicit=[extract_dir / "config.yaml"],
@@ -858,7 +988,7 @@ def main():
     n.rule("objcopy_bin", f"{shlex.quote(llvm_objcopy)} -O binary $in $out", "Converting $in")
     n.rule("narc", "$python tools/data/narc.py pack $out $in", "Packing $out")
     n.rule("text_pack", "$python tools/text/text_data.py pack $dir $out", "Packing $out")
-    n.rule("data_pack", "$python $script pack $dir $game $out", "Packing $dir")
+    n.rule("data_pack", "$python $script pack $dir $game $out $scripts", "Packing $dir")
     n.rule("check_file", "cmp $in $original && mkdir -p $$(dirname $out) && touch $out", "Checking $in")
     n.rule("files_tree", "$python tools/build/files_tree.py $source $output $built --stamp $out",
            "Linking the files of $output")

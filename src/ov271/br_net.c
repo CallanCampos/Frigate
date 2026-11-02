@@ -329,9 +329,10 @@ u32 BrNet_CheckError(BrNet *net) {
     BOOL ret;
 
     if (net == NULL) {
-        return FALSE;
+        return BR_NET_ERROR_NONE;
     }
 
+    // TRUE is also BR_NET_ERROR_DISCONNECTED
     ret = TRUE;
     switch (DWCRapCommon_CheckError(TRUE, FALSE)) {
     case DWCRAP_RESULT_DISCONNECTED:
@@ -340,13 +341,13 @@ u32 BrNet_CheckError(BrNet *net) {
     case DWCRAP_RESULT_FAILED:
         GFL_SndStop();
         net->isFailed = ret;
-        return 2;
+        return BR_NET_ERROR_FAILED;
     case DWCRAP_RESULT_NET_ERROR:
         GFL_SndStop();
         GFL_NetErrShowFatal();
         break;
     }
-    return FALSE;
+    return BR_NET_ERROR_NONE;
 }
 
 BOOL BrNet_IsFailed(BrNet *net) {

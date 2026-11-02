@@ -403,7 +403,7 @@ static BOOL CommBtlDemoProc_Init(GameProc *proc, u32 *state, void *param, void *
     MI_CpuFill8(wk, 0, sizeof(CommBtlDemoWork));
     wk->heapId = HEAPID_COMM_BTL_DEMO;
     wk->param = prm;
-    wk->type = prm->battle.unk44;
+    wk->type = prm->battle.demoType;
     wk->battleResult = wk->param->battle.result;
     CommBtlDemo_ResetStates(prm);
     wk->graphic = CommBtlDemoGraphic_Create(GX_DISP_SELECT_SUB_MAIN, wk->heapId);
@@ -427,7 +427,7 @@ static BOOL CommBtlDemoProc_End(GameProc *proc, u32 *state, void *param, void *w
     HeapID heapId;
 
     GFL_BGSysMoveBGReq(3, BG_MOVE_SET_X, 0);
-    if (prm->battle.unk44 == COMM_BTL_DEMO_TYPE_SINGLE_END || prm->battle.unk44 == COMM_BTL_DEMO_TYPE_MULTI_END) {
+    if (prm->battle.demoType == COMM_BTL_DEMO_TYPE_SINGLE_END || prm->battle.demoType == COMM_BTL_DEMO_TYPE_MULTI_END) {
         CommBtlDemo_AddRecords(wk);
     }
     UIScene_Free(wk->scene);
@@ -756,7 +756,7 @@ static BOOL CommBtlDemoDraw_End(UIScene *scene, void *param) {
 }
 
 static u16 CommBtlDemo_GetFirstScene(CommBtlDemoParam *param) {
-    switch (param->battle.unk44) {
+    switch (param->battle.demoType) {
     case COMM_BTL_DEMO_TYPE_SINGLE_START:
     case COMM_BTL_DEMO_TYPE_MULTI_START:
         return SCENE_START;
@@ -1463,13 +1463,13 @@ static void CommBtlDemo_ResetStates(CommBtlDemoParam *param) {
     int i;
     int j;
 
-    if (param->battle.unk44 == COMM_BTL_DEMO_TYPE_SINGLE_START) {
+    if (param->battle.demoType == COMM_BTL_DEMO_TYPE_SINGLE_START) {
         for (i = 0; i < 2; i++) {
             for (j = 0; j < PokeParty_GetPkmCount(param->battle.players[i].party); j++) {
                 param->battle.players[i].order[j] = COMM_BTL_DEMO_POKE_HEALTHY;
             }
         }
-    } else if (param->battle.unk44 == COMM_BTL_DEMO_TYPE_MULTI_START) {
+    } else if (param->battle.demoType == COMM_BTL_DEMO_TYPE_MULTI_START) {
         for (i = 0; i < 4; i++) {
             for (j = 0; j < PokeParty_GetPkmCount(param->battle.players[i].party); j++) {
                 param->battle.players[i].order[j] = COMM_BTL_DEMO_POKE_HEALTHY;

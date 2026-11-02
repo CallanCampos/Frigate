@@ -1,0 +1,12 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "P",
+    "shapes": [ 9 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_PINWHEEL_FOREST": [ "shaking_grass" ],
+            "ZONE_LOSTLORN_FOREST": [ "shaking_grass" ]
+        }
+    }
+}

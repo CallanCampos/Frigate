@@ -13,7 +13,7 @@ memory the oracle dumps at each frame (DUMPS, pbw-oracle's --dump), with what th
   that draw, the high half of the context's next state). Before the twister is drawn from (its index, mti, still 624),
   the context's state is walked back, one MATH_Rand32 step at a time, to the state whose high half is the twister's
   first word: the step before it is the seed.
-- A battle's: btl_calc.c's work (data_ov167_021dd844) takes a copy of the battle's context at the battle's start
+- A battle's: btl_calc.c's work (g_BtlCalcWork) takes a copy of the battle's context at the battle's start
   (BtlCalc_Init, again in BtlCalc_ResetRand) and draws every roll from it. Overlay 167's memory is cleared when it
   loads, so a context in it, MATH_InitRand32's multiplier and increment beside it, is a battle's from the first frame
   it holds one: its state at that frame, before the battle's first roll, is the seed. Each later state of the same
@@ -44,7 +44,7 @@ DUMPS = [
     f"seed_gfl=*gfl_use.c/sWork:24@{BOOT_FRAMES}",
     f"seed_mt=*gf_standard.c/sGFLStd:4@{BOOT_FRAMES}",
     f"seed_mti=*gf_standard.c/sGFLStd+2496:4@{BOOT_FRAMES}",
-    "seed_battle=data_ov167_021dd844:32@all",
+    "seed_battle=g_BtlCalcWork:32@all",
 ]
 # How many steps a battle's rolls may take its context on from one frame to the next before a state is taken for
 # another battle's seed; a turn draws a few dozen

@@ -3,8 +3,12 @@
 #include "types.h"
 #include "battle/btl_setup.h"
 #include "constants/arc.h"
+#include "constants/items.h"
+#include "constants/obj_codes.h"
 #include "constants/pokemon.h"
 #include "constants/text_banks.h"
+#include "constants/trainer_classes.h"
+#include "constants/version.h"
 #include "field/battle_facility.h"
 #include "field/bsubway_scr.h"
 #include "field/field.h"
@@ -38,7 +42,7 @@ static void BtlSetup_SetTrialHouseParty(BtlSetup *setup, BSubwayTrainer *trainer
                                         HeapID heapId);
 static void BtlInst_SetSetupTrainer(u32 mode, u32 trainerId, const BSubwayTrainer *trainer, BtlSetupTrainer *dest,
                                     u32 aiFlags, BOOL clearWords, BOOL copyWords);
-static BtlSetup *BtlSetup_SetTrainerTrialHouse(GameSystem *gsys, u16 mode, BtlFieldStatus *status, BOOL a3,
+static BtlSetup *BtlSetup_SetTrainerTrialHouse(GameSystem *gsys, u16 mode, BtlFieldStatus *status, BOOL record,
                                                HeapID heapId);
 static void RestrictPlayerParty(PokeParty *src, PokeParty *dest, int count, u16 level, HeapID heapId);
 static void LoadTrialHouseParty(BSubwayTrainer *trainer, PokeParty *party, u16 level, int count, HeapID heapId);
@@ -49,21 +53,66 @@ static u8 BtlInst_GetTrainerIV(u32 trainerId);
 static BOOL BtlInst_TrainerHasWords(const BSubwayTrainer *trainer);
 
 // The items of the rental Pokémon
-static const u16 data_ov012_0216d9ac[4] = { 213, 157, 234, 217 };
+static const u16 sRentalItems[4] = { ITEM_BRIGHT_POWDER, ITEM_LUM_BERRY, ITEM_LEFTOVERS, ITEM_QUICK_CLAW };
 
-// What each trainer class gives
+// The OBJ code of each trainer class's actor
 static const struct {
     u16 trainerClass;
-    u16 value;
-} data_ov012_0216d9b4[] = {
-    { 0x02, 0x0b }, { 0x03, 0x0f }, { 0x04, 0x0c }, { 0x05, 0x10 }, { 0x29, 0x0d }, { 0x2a, 0x11 }, { 0x0f, 0x99 },
-    { 0x0e, 0x9a }, { 0x1b, 0x30 }, { 0x1c, 0x31 }, { 0x08, 0x2a }, { 0x09, 0x2b }, { 0x3b, 0x18 }, { 0x3c, 0x1a },
-    { 0x3d, 0x32 }, { 0x3e, 0x33 }, { 0x5a, 0x26 }, { 0x5b, 0x27 }, { 0x4c, 0x2c }, { 0x4b, 0x2d }, { 0x11, 0x22 },
-    { 0x12, 0x23 }, { 0x34, 0x49 }, { 0x2e, 0x4a }, { 0x23, 0xb7 }, { 0x24, 0xb8 }, { 0x33, 0x2e }, { 0x40, 0x2f },
-    { 0x18, 0x24 }, { 0x19, 0x25 }, { 0x32, 0x1e }, { 0x31, 0x1f }, { 0x46, 0x20 }, { 0x47, 0x21 }, { 0x1d, 0x3f },
-    { 0x4a, 0x40 }, { 0x2c, 0x43 }, { 0x1a, 0x9b }, { 0x20, 0x36 }, { 0x21, 0x1c }, { 0x56, 0x48 }, { 0x39, 0x3d },
-    { 0x48, 0x3e }, { 0x3a, 0x45 }, { 0x53, 0x44 }, { 0x2b, 0x47 }, { 0x42, 0x34 }, { 0x43, 0x34 }, { 0x41, 0x54 },
-    { 0x22, 0x42 }, { 0x0d, 0x17 }, { 0x57, 0x41 }, { 0x30, 0x35 },
+    u16 objCode;
+} sTrainerClassObjCodes[] = {
+    { TRAINER_CLASS_YOUNGSTER, OBJ_CODE_YOUNGSTER },
+    { TRAINER_CLASS_LASS, OBJ_CODE_LASS },
+    { TRAINER_CLASS_SCHOOL_KID_M, OBJ_CODE_SCHOOL_KID_M },
+    { TRAINER_CLASS_SCHOOL_KID_F, OBJ_CODE_SCHOOL_KID_F },
+    { TRAINER_CLASS_RICH_BOY, OBJ_CODE_RICH_BOY },
+    { TRAINER_CLASS_LADY, OBJ_CODE_LADY },
+    { TRAINER_CLASS_PRESCHOOLER_M, OBJ_CODE_PRESCHOOLER_M },
+    { TRAINER_CLASS_PRESCHOOLER_F, OBJ_CODE_PRESCHOOLER_F },
+    { TRAINER_CLASS_BACKPACKER_M, OBJ_CODE_BACKPACKER_M },
+    { TRAINER_CLASS_BACKPACKER_F, OBJ_CODE_BACKPACKER_F },
+    { TRAINER_CLASS_WAITER, OBJ_CODE_WAITER },
+    { TRAINER_CLASS_WAITRESS, OBJ_CODE_WAITRESS },
+    { TRAINER_CLASS_POKEFAN_M, OBJ_CODE_POKEFAN_M },
+    { TRAINER_CLASS_POKEFAN_F, OBJ_CODE_POKEFAN_F },
+    { TRAINER_CLASS_DOCTOR, OBJ_CODE_DOCTOR },
+    { TRAINER_CLASS_NURSE, OBJ_CODE_NURSE },
+    { TRAINER_CLASS_CYCLIST_M, OBJ_CODE_CYCLIST_M },
+    { TRAINER_CLASS_CYCLIST_F, OBJ_CODE_CYCLIST_F },
+    { TRAINER_CLASS_GENTLEMAN, OBJ_CODE_GENTLEMAN },
+    { TRAINER_CLASS_SOCIALITE, OBJ_CODE_SOCIALITE },
+    { TRAINER_CLASS_PKMN_BREEDER_M, OBJ_CODE_PKMN_BREEDER_M },
+    { TRAINER_CLASS_PKMN_BREEDER_F, OBJ_CODE_PKMN_BREEDER_F },
+    { TRAINER_CLASS_SCIENTIST_M_52, OBJ_CODE_SCIENTIST_M_52 },
+    { TRAINER_CLASS_SCIENTIST_F_46, OBJ_CODE_SCIENTIST_F_46 },
+    { TRAINER_CLASS_PSYCHIC_M, OBJ_CODE_PSYCHIC_M },
+    { TRAINER_CLASS_PSYCHIC_F, OBJ_CODE_PSYCHIC_F },
+    { TRAINER_CLASS_BLACK_BELT, OBJ_CODE_BLACK_BELT },
+    { TRAINER_CLASS_BATTLE_GIRL, OBJ_CODE_BATTLE_GIRL },
+    { TRAINER_CLASS_PKMN_RANGER_M, OBJ_CODE_PKMN_RANGER_M },
+    { TRAINER_CLASS_PKMN_RANGER_F, OBJ_CODE_PKMN_RANGER_F },
+    { TRAINER_CLASS_ACE_TRAINER_M, OBJ_CODE_ACE_TRAINER_M },
+    { TRAINER_CLASS_ACE_TRAINER_F, OBJ_CODE_ACE_TRAINER_F },
+    { TRAINER_CLASS_VETERAN_M, OBJ_CODE_VETERAN_M },
+    { TRAINER_CLASS_VETERAN_F, OBJ_CODE_VETERAN_F },
+    { TRAINER_CLASS_FISHERMAN, OBJ_CODE_FISHERMAN },
+    { TRAINER_CLASS_HIKER, OBJ_CODE_HIKER },
+    { TRAINER_CLASS_WORKER_44, OBJ_CODE_WORKER_44 },
+    { TRAINER_CLASS_WORKER_26, OBJ_CODE_WORKER_26 },
+    { TRAINER_CLASS_HARLEQUIN_32, OBJ_CODE_HARLEQUIN_233 },
+    { TRAINER_CLASS_ARTIST, OBJ_CODE_ARTIST },
+    { TRAINER_CLASS_POLICEMAN, OBJ_CODE_POLICEMAN },
+    { TRAINER_CLASS_ROUGHNECK, OBJ_CODE_ROUGHNECK },
+    { TRAINER_CLASS_BIKER, OBJ_CODE_BIKER },
+    { TRAINER_CLASS_JANITOR, OBJ_CODE_JANITOR },
+    { TRAINER_CLASS_DEPOT_AGENT, OBJ_CODE_DEPOT_AGENT },
+    { TRAINER_CLASS_PILOT, OBJ_CODE_PILOT },
+    { TRAINER_CLASS_CLERK_M_66, OBJ_CODE_CLERK_M_67 },
+    { TRAINER_CLASS_CLERK_M_67, OBJ_CODE_CLERK_M_67 },
+    { TRAINER_CLASS_PARASOL_LADY, OBJ_CODE_PARASOL_LADY },
+    { TRAINER_CLASS_BAKER, OBJ_CODE_BAKER },
+    { TRAINER_CLASS_NURSERY_AIDE, OBJ_CODE_NURSERY_AIDE },
+    { TRAINER_CLASS_MAID, OBJ_CODE_65 },
+    { TRAINER_CLASS_CLERK_F, OBJ_CODE_CLERK_F },
 };
 
 static void BtlSetup_SetTrialHouseParty(BtlSetup *setup, BSubwayTrainer *trainer, int client, u32 mode, int count,
@@ -72,15 +121,15 @@ static void BtlSetup_SetTrialHouseParty(BtlSetup *setup, BSubwayTrainer *trainer
     BOOL clearWords, copyWords;
 
     switch (client) {
-    case 1:
+    case CLIENT_ENEMY:
         clearWords = TRUE;
         copyWords = TRUE;
         break;
-    case 3:
+    case CLIENT_ENEMY_2:
         clearWords = FALSE;
         copyWords = FALSE;
         break;
-    case 2:
+    case CLIENT_PARTNER:
         clearWords = TRUE;
         copyWords = FALSE;
         break;
@@ -98,14 +147,14 @@ BtlSetup *SetupTrialHouseBattle(GameSystem *gsys, PokeParty *party, u32 mode, BS
     SetupClient client = CLIENT_PLAYER;
     PlayerInfo *info = GetGameDataPlayerInfo(gameData);
 
-    setup->unk34[client] = info;
+    setup->playerInfo[client] = info;
     RestrictPlayerParty(party, setup->party[client], count, 50, 4);
-    BtlSetup_SetTrialHouseParty(setup, trainers, 1, type, count, 4);
-    if (setup->fieldSituation.unk1a != 0) {
-        BtlSetup_SetTrialHouseParty(setup, &trainers[1], 3, type, count, 4);
+    BtlSetup_SetTrialHouseParty(setup, trainers, CLIENT_ENEMY, type, count, 4);
+    if (setup->fieldSituation.multiMode != 0) {
+        BtlSetup_SetTrialHouseParty(setup, &trainers[1], CLIENT_ENEMY_2, type, count, 4);
     }
-    if (setup->fieldSituation.unk1a == 3) {
-        BtlSetup_SetTrialHouseParty(setup, partner, 2, type, count, 4);
+    if (setup->fieldSituation.multiMode == 3) {
+        BtlSetup_SetTrialHouseParty(setup, partner, CLIENT_PARTNER, type, count, 4);
     }
     BtlSetup_PostProcessTrialHouse(setup);
     return setup;
@@ -122,7 +171,7 @@ static inline void SetTrialHouseTrainer(BtlSetup *setup, SetupClient client, con
 // A Trial House battle against one trainer, of levels between minLevel and maxLevel
 BtlSetup *SetupInfinityDungeonBattle(GameSystem *gsys, PokeParty *party, int partyCount, int mode, int count,
                                      BSubwayTrainer *trainer, u32 a6, u32 trainerIdBase, u16 maxLevel, u16 minLevel,
-                                     u32 a10, u8 a11, u32 a12, Field *field, MATHRandContext32 *rand) {
+                                     u32 a10, u8 version, u32 bgType, Field *field, MATHRandContext32 *rand) {
     GameData *gameData = GSYS_GetGameData(gsys);
     BtlFieldStatus status;
     BtlSetup *setup;
@@ -136,17 +185,17 @@ BtlSetup *SetupInfinityDungeonBattle(GameSystem *gsys, PokeParty *party, int par
     }
     client = CLIENT_PLAYER;
     info = GetGameDataPlayerInfo(gameData);
-    setup->unk34[client] = info;
+    setup->playerInfo[client] = info;
     RestrictPlayerParty(party, setup->party[client], partyCount, 0, 4);
     client = CLIENT_ENEMY;
     SetTrialHouseTrainer(setup, client, trainer, trainerIdBase);
     level = minLevel + BtlInst_Random16(rand) % (maxLevel - minLevel + 1);
     LoadTrialHouseParty(trainer, setup->party[client], level, count, 4);
-    if (a11 == 0x17) {
-        setup->fieldSituation.env.bgType = a12;
+    if (version == VERSION_BLACK2) {
+        setup->fieldSituation.env.bgType = bgType;
         setup->fieldSituation.env.terrain = 0x12;
     } else {
-        setup->fieldSituation.env.bgType = a12;
+        setup->fieldSituation.env.bgType = bgType;
         setup->fieldSituation.env.terrain = 0x13;
     }
     adjustPkmLvForChallengeKeys(setup, gameData, Field_GetPlayerStateZoneID(field));
@@ -177,7 +226,7 @@ BtlSetup *BtlSetup_SetTrainerRental(GameSystem *gsys, PokeParty *party, int mode
         break;
     }
     client = CLIENT_PLAYER;
-    setup->unk34[client] = GetGameDataPlayerInfo(gameData);
+    setup->playerInfo[client] = GetGameDataPlayerInfo(gameData);
     PokeParty_Copy(party, setup->party[client]);
     if (setup->battleType == 1) {
         setup->battleType = 2;
@@ -198,7 +247,7 @@ void BtlInst_MakeParty(PokeParty *party, const BSubwayPokemon *pkms, u16 level, 
     GFL_HeapFree(pkm);
 }
 
-static BtlSetup *BtlSetup_SetTrainerTrialHouse(GameSystem *gsys, u16 mode, BtlFieldStatus *status, BOOL a3,
+static BtlSetup *BtlSetup_SetTrainerTrialHouse(GameSystem *gsys, u16 mode, BtlFieldStatus *status, BOOL record,
                                                HeapID heapId) {
     GameData *gameData = GSYS_GetGameData(gsys);
     BtlSetup *setup;
@@ -231,7 +280,7 @@ static BtlSetup *BtlSetup_SetTrainerTrialHouse(GameSystem *gsys, u16 mode, BtlFi
         BtlSetup_SetNetMultiVsAI(setup, gameData, handle, 1, netId, 0, 0, heapId);
         break;
     }
-    if (a3 == TRUE) {
+    if (record == TRUE) {
         BtlSetup_AllocRecBuffer(setup, heapId);
     }
     return setup;
@@ -263,17 +312,17 @@ static void BtlInst_SetSetupTrainer(u32 mode, u32 trainerId, const BSubwayTraine
     dest->aiFlags = aiFlags;
     GFL_StrBufLoadString(dest->name, trainer->name);
     if (clearWords == TRUE) {
-        PMSData_Clear(&dest->unk18);
-        PMSData_Clear(&dest->unk20);
+        PMSData_Clear(&dest->winWords);
+        PMSData_Clear(&dest->loseWords);
     }
     if (copyWords == TRUE) {
         // The trainer keeps its phrases as four words each, which BtlInst_TrainerHasWords checks one by one
         if (mode == 4) {
-            dest->unk18 = *(const PMSData *)trainer->winWords;
-            dest->unk20 = *(const PMSData *)trainer->loseWords;
+            dest->winWords = *(const PMSData *)trainer->winWords;
+            dest->loseWords = *(const PMSData *)trainer->loseWords;
         } else if (BtlInst_TrainerHasWords(trainer)) {
-            dest->unk18 = *(const PMSData *)trainer->winWords;
-            dest->unk20 = *(const PMSData *)trainer->loseWords;
+            dest->winWords = *(const PMSData *)trainer->winWords;
+            dest->loseWords = *(const PMSData *)trainer->loseWords;
         }
     }
 }
@@ -307,7 +356,7 @@ u32 BtlInst_MakeRomPokemon(BSubwayPokemon *pkm, u32 arcId, u16 file, u32 id, u32
     pkm->species = data.species;
     pkm->form = data.form;
     if (rentalItem) {
-        pkm->item = data_ov012_0216d9ac[index];
+        pkm->item = sRentalItems[index];
     } else {
         pkm->item = data.item;
     }
@@ -603,10 +652,10 @@ u16 BtlInst_GetRomTrainerClass(u32 arcId, u16 file, HeapID heapId) {
 u16 BtlInst_GetTrainerClassObjCode(u32 trainerClass) {
     u32 i;
 
-    for (i = 0; i < NELEMS(data_ov012_0216d9b4); i++) {
-        if (trainerClass == data_ov012_0216d9b4[i].trainerClass) {
-            return data_ov012_0216d9b4[i].value;
+    for (i = 0; i < NELEMS(sTrainerClassObjCodes); i++) {
+        if (trainerClass == sTrainerClassObjCodes[i].trainerClass) {
+            return sTrainerClassObjCodes[i].objCode;
         }
     }
-    return 10;
+    return OBJ_CODE_10;
 }

@@ -1219,7 +1219,7 @@ static const Demo3DVariant sDemo3D15_Variants0[] = {
 };
 static const Demo3DCmd sDemo3D05_Cmds[] = {
     { DEMO3D_CMD_BGM_PLAY, 0, { SEQ_BGM_SW_DEMO_OPENING } },
-    { DEMO3D_CMD_TELOP, 40, { 0xff, 0, 4, 1, 50, 8, 8 } },
+    { DEMO3D_CMD_TELOP, 40, { DEMO3D_TELOP_ANY_VERSION, 0, 4, 1, 50, 8, 8 } },
     { DEMO3D_CMD_TELOP, 300, { VERSION_BLACK2, 0, 4, 2, 90, 8, 8 } },
     { DEMO3D_CMD_TELOP, 300, { VERSION_WHITE2, 0, 4, 3, 90, 8, 8 } },
     { DEMO3D_CMD_BRIGHTNESS_FADE, 940, { 3, 60, 0, -16 } },

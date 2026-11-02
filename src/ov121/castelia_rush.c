@@ -4,6 +4,7 @@
 // embeds no name for this file, so its name is a guess after swan's name of its process, CASTELIA_RUSH_PROC_DEF
 #include "types.h"
 #include "constants/arc.h"
+#include "constants/directions.h"
 #include "constants/script_text_banks.h"
 #include "field/castelia_rush.h"
 #include "field/field.h"
@@ -18,7 +19,6 @@
 #include "system/game_data.h"
 #include "system/game_system.h"
 
-#define ARCID_CASTELIA_RUSH 183
 // File 5 of archive 183: the zones that have a crowd, as u32s, in the order of their files
 #define CASTELIA_RUSH_FILE_ZONES 5
 // File 6 of archive 183: the scripts of the object codes, CasteliaRushScripts entries
@@ -264,19 +264,19 @@ static const CasteliaRushPasserby *CasteliaRush_FindTalkerAhead(const CasteliaRu
     s16 dirZ;
 
     switch (dir) {
-    case 0:
+    case DIR_UP:
         dirX = 0;
         dirZ = -1;
         break;
-    case 1:
+    case DIR_DOWN:
         dirX = 0;
         dirZ = 1;
         break;
-    case 3:
+    case DIR_RIGHT:
         dirX = 1;
         dirZ = 0;
         break;
-    case 2:
+    case DIR_LEFT:
         dirX = -1;
         dirZ = 0;
         break;
@@ -488,13 +488,13 @@ static void CasteliaRush_SpawnPasserby(const CasteliaRush *rush, CasteliaRushCon
 
     if (dir <= 1) {
         x = lane->xMin + rand % (lane->xMax - lane->xMin + 1);
-        if (dir == 0) {
+        if (dir == DIR_UP) {
             z = lane->zMin - offset;
         } else {
             z = lane->zMin + offset;
         }
     } else {
-        if (dir == 2) {
+        if (dir == DIR_LEFT) {
             x = lane->xMin - offset;
         } else {
             x = lane->xMin + offset;
@@ -661,19 +661,19 @@ static BOOL IsPosAhead(s16 x, s16 z, s16 otherX, s16 otherZ, u16 maxDist, u16 mi
     int side;
 
     switch (dir) {
-    case 0:
+    case DIR_UP:
         ahead = z - otherZ;
         side = x - otherX;
         break;
-    case 1:
+    case DIR_DOWN:
         ahead = otherZ - z;
         side = x - otherX;
         break;
-    case 2:
+    case DIR_LEFT:
         ahead = x - otherX;
         side = z - otherZ;
         break;
-    case 3:
+    case DIR_RIGHT:
         ahead = otherX - x;
         side = z - otherZ;
         break;

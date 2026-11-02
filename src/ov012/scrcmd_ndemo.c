@@ -14,14 +14,14 @@ static GameEventReturnCode EventNDemoEnd_Callback(GameEvent *event, u32 *state, 
 BOOL Scrcmd_Ndemo_NDemoStart(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    u8 a0 = VM_Read16(vm);
-    u8 a1 = VM_Read16(vm);
-    u16 a2 = VM_Read16(vm);
+    u8 type = VM_Read16(vm);
+    u8 unused = VM_Read16(vm);
+    u16 endBlack = VM_Read16(vm);
     GameEvent *event;
 
     FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_NDEMO);
     GFL_OvlLoad(OVERLAY_ID(155));
-    event = EventFaceUpStart_Create(a0, a1, a2, gsys, env);
+    event = EventFaceUpStart_Create(type, unused, endBlack, gsys, env);
     if (event == NULL) {
         return TRUE;
     }

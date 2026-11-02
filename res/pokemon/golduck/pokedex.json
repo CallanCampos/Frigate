@@ -1,0 +1,17 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "G",
+    "shapes": [ 9 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_ABUNDANT_SHRINE": [ "grass", "dark_grass" ],
+            "ZONE_ROUTE_11": [ "grass", "dark_grass" ],
+            "ZONE_ROUTE_14": [ "grass", "dark_grass" ],
+            "ZONE_VILLAGE_BRIDGE": [ "grass", "dark_grass" ],
+            "ZONE_ROUTE_22": [ "grass", "dark_grass" ],
+            "ZONE_ROUTE_23": [ "grass", "dark_grass" ],
+            "ZONE_SEASIDE_CAVE": [ "grass" ]
+        }
+    }
+}

@@ -13,7 +13,7 @@
 
 // Makes a party Pokémon of a recorded one, which it encrypts
 void BattleRecTool_LoadPkm(BattleRecPkm *rec, PartyPkm *pkm);
-// Store a battle's setup in the loaded video, or in Pokéstar Studios' block when setup->unkDD_3 is 1 or 2, and load
+// Store a battle's setup in the loaded video, or in Pokéstar Studios' block when setup->studioMode is 1 or 2, and load
 // it from either, by mode
 void BattleRecTool_StoreSetup(BtlSetup *setup);
 void BattleRecTool_LoadSetup(BtlSetup *setup, u32 mode, HeapID heapId);

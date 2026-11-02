@@ -39,8 +39,9 @@ struct FieldAppCallInput {
     u32 eventId;
     u32 partySlot;
     u32 eventValue;
-    u32 unk38;
-    u32 unk3C;
+    // Fly's warp position on the town map
+    u32 warpX;
+    u32 warpZ;
     u32 unk40;
 };
 
@@ -64,8 +65,17 @@ enum {
     FIELD_APP_MAX,
 };
 
-// The results of an app: 4 opens nextApp, the others are event types for EventFieldAppCall_ConvAppResultToEventType
-#define FIELD_APP_RESULT_NEXT 4
+// The results of an app, which EventFieldAppCall_ConvAppResultToEventType gives the caller as its event types: back to
+// the menu that called it, out to the field, a hidden move (HM_EVENT_*) or a common event (FIELD_COMMON_EVENT_*) in
+// eventId, nextAppId opened next, or the field menu's script (the Infinite dungeon's retire)
+enum {
+    FIELD_APP_RESULT_RETURN,
+    FIELD_APP_RESULT_EXIT,
+    FIELD_APP_RESULT_HM_EVENT,
+    FIELD_APP_RESULT_COMMON_EVENT,
+    FIELD_APP_RESULT_NEXT,
+    FIELD_APP_RESULT_SCRIPT,
+};
 
 struct FieldAppCallWork {
     u16 code;
@@ -86,10 +96,12 @@ struct FieldAppCallWork {
     u8 partySlot;
     u8 pad69;
     u16 item;
-    u32 unk6C;
+    // The move slot to learn into, from the party screen to the summary and back
+    u32 learnIndex;
     // How the party screen or the mail screen was reached
     u32 subMode;
-    BOOL unk74;
+    // The party screen was opened to use a form-changing item (the Gracidea, the DNA Splicers or the Reveal Glass)
+    BOOL formItemUse;
     u32 unk78;
 };
 

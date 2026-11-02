@@ -22,6 +22,18 @@ typedef struct {
     BattlePlayers *players;
 } EventColosseumBattleWork;
 
+// The event's steps: the battle music, the battle, and the field again. Steps 1 and 2 are never used
+enum {
+    COLOSSEUM_BATTLE_STEP_START,
+    COLOSSEUM_BATTLE_STEP_PLAY_BGM = 3,
+    COLOSSEUM_BATTLE_STEP_BATTLE,
+    COLOSSEUM_BATTLE_STEP_POP_BGM,
+    COLOSSEUM_BATTLE_STEP_OPEN_FIELD,
+    COLOSSEUM_BATTLE_STEP_FADE_IN,
+    COLOSSEUM_BATTLE_STEP_WAIT_BGM,
+    COLOSSEUM_BATTLE_STEP_END,
+};
+
 static GameEventReturnCode EventColosseumBattle_Callback(GameEvent *event, u32 *state, void *data);
 static void SetRuleIfNone(u32 *rule, u32 value);
 
@@ -31,40 +43,40 @@ static GameEventReturnCode EventColosseumBattle_Callback(GameEvent *event, u32 *
     EventMakeArgs args;
 
     switch (*state) {
-    case 0:
-        *state = 3;
+    case COLOSSEUM_BATTLE_STEP_START:
+        *state = COLOSSEUM_BATTLE_STEP_PLAY_BGM;
         break;
-    case 3:
+    case COLOSSEUM_BATTLE_STEP_PLAY_BGM:
         // The battle's music, a u16 at 0x18 of the setup, which battle/btl_setup.h doesn't have yet
         GameEvent_ChainNext(event, EventBattleBGMPlay_Create(gsys, work->setup.fieldSituation.bgm));
         (*state)++;
         break;
-    case 4:
+    case COLOSSEUM_BATTLE_STEP_BATTLE:
         args.setup = &work->setup;
         args.players = work->players;
-        args.unk08 = 0;
+        args.markNetErrShown = FALSE;
         GameEvent_ChainNext(event, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_ID(10), eventMakeFunc, &args));
         (*state)++;
         break;
-    case 5:
+    case COLOSSEUM_BATTLE_STEP_POP_BGM:
         BtlSetup_FreeContents(&work->setup);
         GameEvent_ChainNext(event, EventBGMFadePop_Create(gsys));
         (*state)++;
         break;
-    case 6:
+    case COLOSSEUM_BATTLE_STEP_OPEN_FIELD:
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
         (*state)++;
         break;
-    case 7:
+    case COLOSSEUM_BATTLE_STEP_FADE_IN:
         GameEvent_ChainNext(
             event, CallFieldMapEntranceInTransition(gsys, work->field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         (*state)++;
         break;
-    case 8:
+    case COLOSSEUM_BATTLE_STEP_WAIT_BGM:
         GameEvent_ChainNext(event, EventBGMFadeWait_Create(gsys));
         (*state)++;
         break;
-    case 9:
+    case COLOSSEUM_BATTLE_STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;

@@ -1,0 +1,65 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "J",
+    "shapes": [ 7 ],
+    "area": {
+        "all_year": false,
+        "seasons": {
+            "spring": {
+                "ZONE_UNDELLA_TOWN": [ "rippling_surf" ],
+                "ZONE_P2_LABORATORY": [ "rippling_surf" ],
+                "ZONE_UNDELLA_BAY": [ "rippling_surf" ],
+                "ZONE_ROUTE_4": [ "rippling_surf" ],
+                "ZONE_ROUTE_13": [ "rippling_surf" ],
+                "ZONE_ROUTE_17": [ "rippling_surf" ],
+                "ZONE_ROUTE_18": [ "rippling_surf" ],
+                "ZONE_VIRBANK_CITY": [ "rippling_surf" ],
+                "ZONE_HUMILAU_CITY": [ "rippling_surf" ],
+                "ZONE_ROUTE_21": [ "rippling_surf" ],
+                "ZONE_VIRBANK_COMPLEX": [ "rippling_surf" ],
+                "ZONE_SEASIDE_CAVE": [ "rippling_surf" ]
+            },
+            "summer": {
+                "ZONE_UNDELLA_TOWN": [ "rippling_surf" ],
+                "ZONE_P2_LABORATORY": [ "rippling_surf" ],
+                "ZONE_UNDELLA_BAY": [ "rippling_surf" ],
+                "ZONE_ROUTE_4": [ "rippling_surf" ],
+                "ZONE_ROUTE_13": [ "rippling_surf" ],
+                "ZONE_ROUTE_17": [ "rippling_surf" ],
+                "ZONE_ROUTE_18": [ "rippling_surf" ],
+                "ZONE_VIRBANK_CITY": [ "rippling_surf" ],
+                "ZONE_HUMILAU_CITY": [ "rippling_surf" ],
+                "ZONE_ROUTE_21": [ "rippling_surf" ],
+                "ZONE_VIRBANK_COMPLEX": [ "rippling_surf" ],
+                "ZONE_SEASIDE_CAVE": [ "rippling_surf" ]
+            },
+            "autumn": {
+                "ZONE_UNDELLA_TOWN": [ "rippling_surf" ],
+                "ZONE_P2_LABORATORY": [ "rippling_surf" ],
+                "ZONE_UNDELLA_BAY": [ "rippling_surf" ],
+                "ZONE_ROUTE_4": [ "rippling_surf" ],
+                "ZONE_ROUTE_13": [ "rippling_surf" ],
+                "ZONE_ROUTE_17": [ "rippling_surf" ],
+                "ZONE_ROUTE_18": [ "rippling_surf" ],
+                "ZONE_VIRBANK_CITY": [ "rippling_surf" ],
+                "ZONE_HUMILAU_CITY": [ "rippling_surf" ],
+                "ZONE_ROUTE_21": [ "rippling_surf" ],
+                "ZONE_VIRBANK_COMPLEX": [ "rippling_surf" ],
+                "ZONE_SEASIDE_CAVE": [ "rippling_surf" ]
+            },
+            "winter": {
+                "ZONE_UNDELLA_TOWN": [ "rippling_surf" ],
+                "ZONE_P2_LABORATORY": [ "rippling_surf" ],
+                "ZONE_ROUTE_4": [ "rippling_surf" ],
+                "ZONE_ROUTE_13": [ "rippling_surf" ],
+                "ZONE_ROUTE_17": [ "rippling_surf" ],
+                "ZONE_ROUTE_18": [ "rippling_surf" ],
+                "ZONE_VIRBANK_CITY": [ "rippling_surf" ],
+                "ZONE_HUMILAU_CITY": [ "rippling_surf" ],
+                "ZONE_ROUTE_21": [ "rippling_surf" ],
+                "ZONE_VIRBANK_COMPLEX": [ "rippling_surf" ],
+                "ZONE_SEASIDE_CAVE": [ "rippling_surf" ]
+            }
+        }
+    }
+}

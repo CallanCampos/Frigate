@@ -1,0 +1,29 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The name input's profane words: res/name_input/profane_words.json",
+    "description": "ARCID_PROF_WORD (a/2/1/6): PROF_WORD_LIST_COUNT lists of words that ProfWord_Check (prof_word.c) rejects as a name, in every language, each encrypted with PROF_WORD_SEED. tools/data/profane_word_data.py packs it.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "lists" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "lists": {
+            "type": "array", "minItems": 7, "maxItems": 7,
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "words", "padding" ],
+                "properties": {
+                    "words": {
+                        "type": "array",
+                        "description": "The words, up to 31 characters each, in hiragana for katakana and capitals for Latin letters, as ProfWord_Check folds a name before it compares it",
+                        "items": { "type": "string", "pattern": "^.{0,31}$" }
+                    },
+                    "padding": {
+                        "type": "array",
+                        "description": "For each word, the characters after its terminator, in hex, four digits each: the original's leftovers, which the game doesn't read; the packer cuts them or fills them with 0 to fit, and a word without one gets 0s",
+                        "items": { "type": "string", "pattern": "^([0-9a-f]{4})*$" }
+                    }
+                }
+            }
+        }
+    }
+}

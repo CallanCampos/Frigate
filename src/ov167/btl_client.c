@@ -16,6 +16,7 @@
 #include "battle/btl_tables.h"
 #include "battle/btlv.h"
 #include "battle/btlv_effect.h"
+#include "battle/btlv_input.h"
 #include "battle/btlv_mcss.h"
 #include "battle/pokewood_cutin.h"
 #include "battle/tr_ai.h"
@@ -25,6 +26,7 @@
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/pokemon.h"
+#include "constants/sound.h"
 #include "constants/types.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
@@ -35,6 +37,7 @@
 #include "gfl/touchpanel.h"
 #include "nitro/fx.h"
 #include "nitro/math.h"
+#include "pml/item.h"
 #include "pml/move.h"
 #include "pml/poke_party.h"
 #include "save/join_avenue.h"
@@ -331,7 +334,7 @@ typedef struct {
     u8 quitStarted : 1;
     u8 quitDone : 1;
     u8 chapterReached : 1;
-    u8 unk2_4 : 1;
+    u8 locked : 1;
     u8 dataEnd : 1;
     u16 quitTimer;
     u16 chapter;
@@ -354,9 +357,12 @@ enum {
 typedef struct {
     s16 points[STUDIO_SCORE_MAX];
     s16 unk08;
-    s16 unk0A;
+    // The total is the sum of the points times unk08 times this
+    s16 audienceCount;
     u8 counts[STUDIO_SCORE_MAX];
-    u32 unk10;
+    // How the last choice scored: 1 for points won, 2 for none and 3 for points lost, which picks the next turn's
+    // message
+    u32 lastChoiceResult;
     // Clamped to +-9999
     s32 total;
 } BtlClientStudioScore;
@@ -365,26 +371,34 @@ typedef struct {
 typedef struct {
     u8 seq;
     u8 nextSeq;
-    u8 unk02;
-    u8 unk03;
-    u8 unk04;
+    // The steps of Studio_UpdateStaging, which runs the staging effects until the scene's step reaches its state
+    u8 stagingSeq;
+    u8 stagingNextSeq;
+    // The step of the scene's messages and states
+    u8 msgStep;
     u8 unk05;
     // The entry of the movie's script
     s8 scene;
-    u32 unk08;
-    s32 unk0C;
-    s8 unk10;
+    // The choice picked, or saved, in the scene
+    u32 choice;
+    // The field Studio_ChangeField changes to, from the choice or the turn, -1 for none
+    s32 newField;
+    // The last choice recorded plus 1, which the scenes that follow it check
+    s8 recordedChoice;
     u8 unk11[0xb];
     s32 msgId1;
     s32 msgId2;
-    u16 unk24;
-    u16 unk26;
+    // The move of the player's first action and the species of the last Pokemon that fainted, which start scenes
+    u16 usedMove;
+    u16 faintedSpecies;
     // One bit per script entry used
     u32 usedEventMask;
-    s32 unk2C;
+    // What the staging effects have set up: 0x10 or 0x20 in the high nibble and 1 or 2 in the low one
+    s32 stagingState;
     StrBuf *strBufs[4];
     BtlClientStudioScore score;
-    u16 unk58;
+    // The size of the audience, which picks how many leave and its sound effects
+    u16 audienceCount;
     u32 audienceMask;
     u16 audienceTimers[22];
     u8 waitTimer;
@@ -414,7 +428,8 @@ struct BtlClient {
     BtlvStringParam strParam2;
     BtlServer *cmdCheckServer;
     BtlvSelectTargetParam rotationParam;
-    u8 unkCC;
+    // The rotation picked, which is returned to the server
+    u8 rotationDir;
     BtlClientCmdProc cmdProc;
     s32 cmdSeq;
     BtlClientCmdProc selActProc;
@@ -461,7 +476,8 @@ struct BtlClient {
     u8 extraActionCount;
     u8 moveInfoPos;
     u8 moveInfoIdx;
-    u8 unk1BA_0 : 1;
+    // Set once a Gym Leader's hint has started SEQ_BGM_BATTLESUPERIOR
+    u8 superiorBgmPlayed : 1;
     u8 forceQuit : 1;
     u8 escapeSelected : 1;
     u8 cmdCheckEnable : 1;
@@ -516,7 +532,7 @@ static BOOL BattleClient_PlayerSelectActionStudio(BtlClient *client, s32 *seq);
 static BOOL BattleClient_PlayerSelectAction(BtlClient *client, s32 *seq);
 static void Studio_SetSeq(BtlClientStudioWork *studio, u8 seq, u8 nextSeq);
 static BOOL Studio_PlayTurnMessages(BtlClient *client);
-static s32 Studio_FindScene(const BtlScriptedRules *rules, BtlClientStudioWork *studio, s32 turn, s32 arg3);
+static s32 Studio_FindScene(const BtlScriptedRules *rules, BtlClientStudioWork *studio, s32 turn, s32 outcome);
 static BOOL Studio_HasChoiceScene(const BtlScriptedRules *rules, BtlClientStudioWork *studio, s32 turn);
 static void Studio_SetChoiceField(const BtlScriptedRules *rules, BtlClientStudioWork *studio);
 static BOOL Studio_IsStateReached(const BtlScriptedRules *rules, BtlClientStudioWork *studio);
@@ -761,7 +777,8 @@ typedef struct {
     BtlClientCmdProc procs[BTL_CLIENT_TYPE_MAX];
 } BtlClientCmdEntry;
 
-static const u8 data_ov167_021d6eb4[5] = { 0, 0, 0, 1, 2 };
+// The group of the studio's messages for each grade of the player's studio fame (BtlSetup.studioGrade)
+static const u8 sGradeMsgGroups[5] = { 0, 0, 0, 1, 2 };
 
 // 0x021d7070: the commands that the clients handle (also used by the other ranges' handlers)
 static const BtlClientCmdEntry sCmdProcTable[15] = {
@@ -851,8 +868,8 @@ static const u8 sAIItemMaxMons[4] = { 6, 4, 2, 1 };
 // The points a movie scores for its star's fame
 // The messages of an escape, by its kind
 BtlClient *BattleClient_Create(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u8 commMode, NetHandle *netHandle,
-                               u16 clientId, u16 numCoverPos, u8 isAI, u32 arg7, BOOL recPlay, MATHRandContext32 *rand,
-                               HeapID heapId) {
+                               u16 clientId, u16 numCoverPos, u8 isAI, u32 commCompetitor, BOOL recPlay,
+                               MATHRandContext32 *rand, HeapID heapId) {
     BtlClient *client = GFL_HeapAllocate(heapId, sizeof(BtlClient), TRUE, "btl_client.c", 0x281);
     BOOL netFlag = TRUE;
     u32 i;
@@ -871,7 +888,7 @@ BtlClient *BattleClient_Create(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u
     client->numCoverPos = numCoverPos;
     client->procActionIdx = 0;
     client->unk129 = clientId;
-    client->unkCC = 0;
+    client->rotationDir = 0;
     client->viewCore = NULL;
     client->savedHp = 0;
     client->cmdQueue = GFL_HeapAllocate(heapId, sizeof(BtlServerCmdQueue), TRUE, "btl_client.c", 0x292);
@@ -885,13 +902,13 @@ BtlClient *BattleClient_Create(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u
     client->cmdLimitTime = 0;
     client->gameLimitTime = 0;
     client->cmdLimitOver = 0;
-    client->unk1BA_0 = 0;
+    client->superiorBgmPlayed = 0;
     client->forceQuit = 0;
     client->recTimeUp = 0;
     client->recCanceled = 0;
     client->field = GetBtlField(mainModule);
     client->turnCount = 0;
-    client->bagMode = arg7;
+    client->bagMode = commCompetitor;
     BtlClientIDList_Init(&client->clientIdList);
     RecPlayer_Init(&client->recPlayer);
     BattleClient_LoadAIItems(client);
@@ -913,10 +930,10 @@ BtlClient *BattleClient_Create(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u
     } else {
         client->recorder = NULL;
     }
-    if (type == 2) {
+    if (type == BTL_STUDIO_MODE_PLAYBACK) {
         BtlSetup *setup = GetBattleSetup(client->mainModule);
-        client->studio.unk58 = setup->unk128;
-        client->studio.audienceMask = setup->unk12C;
+        client->studio.audienceCount = setup->audienceCount;
+        client->studio.audienceMask = setup->audience;
     }
     return client;
 }
@@ -967,10 +984,10 @@ BOOL BattleClient_Main(BtlClient *client) {
     return client->mainProc(client);
 }
 
-void BattleClient_StartChapterSkip(BtlClient *client, u32 arg1) {
+void BattleClient_StartChapterSkip(BtlClient *client, u32 chapter) {
     BtlRecReader_Reset(client->recReader);
     BtlAdapter_ClearSendCmd(client->adapter);
-    RecPlayer_StartSkip(&client->recPlayer, arg1);
+    RecPlayer_StartSkip(&client->recPlayer, chapter);
     BattleClient_SetMainProc(client, BattleClient_MainProcRecPlay);
 }
 
@@ -1139,7 +1156,7 @@ static BOOL BattleClient_MainProcRecPlay(BtlClient *client) {
                 GFL_SndPlayerSetMuteStateEx(1, 1);
                 BtlvCore_StartFadeIn(client->viewCore);
                 GFL_SndBGMFadeIn(30);
-                BtlvEffect_SetFlag26(0);
+                BtlvEffect_SetMuteSE(0);
                 PokeVoice_ResetMasterVolume();
             }
             client->mainSeq = CLIENT_SKIP_SEQ_FADE_IN;
@@ -1150,7 +1167,7 @@ static BOOL BattleClient_MainProcRecPlay(BtlClient *client) {
             client->mainSeq = CLIENT_SKIP_SEQ_RETURN;
             client->cmdSeq = 0;
             if (BtlvEffect_GetWork()) {
-                BtlvEffect_SetFlag26(1);
+                BtlvEffect_SetMuteSE(1);
             }
         }
         break;
@@ -1224,10 +1241,10 @@ static void Studio_InitAudienceTimers(BtlClientStudioWork *studio) {
 static BOOL BattleClient_SetupView(BtlClient *client, s32 *seq) {
     switch (*seq) {
     case 0:
-        if (BtlSetup_GetBattleType(client->mainModule) != 4) {
-            BtlvCore_StartCommand(client->viewCore, FALSE);
+        if (BtlSetup_GetBattleType(client->mainModule) != BTL_TYPE_CAPTURE_DEMO) {
+            BtlvCore_StartCommand(client->viewCore, BTLV_CMD_BATTLE_START);
         } else {
-            BtlvCore_StartCommand(client->viewCore, TRUE);
+            BtlvCore_StartCommand(client->viewCore, BTLV_CMD_CAPTURE_DEMO);
         }
         (*seq)++;
         break;
@@ -1243,7 +1260,7 @@ static BOOL BattleClient_SetupView(BtlClient *client, s32 *seq) {
             }
             BattleClient_SaveFrontMonHp(client);
             if (BattleClient_IsChapterSkipping(client)) {
-                func_ov167_021d0a7c(client->viewCore, RecPlayer_GetSkipTarget(&client->recPlayer));
+                BtlvCore_ShowRecorderSkipping(client->viewCore, RecPlayer_GetSkipTarget(&client->recPlayer));
             }
             client->studio.audienceMask = BtlvCore_GetTypeMask(client->viewCore);
             Studio_InitAudienceTimers(&client->studio);
@@ -1304,7 +1321,7 @@ static BOOL BattleClient_PlayerSelectRotation(BtlClient *client, s32 *seq) {
 
     switch (*seq) {
     case 0:
-        BtlvCore_ShowRotationScreen(client->viewCore, client->unkCC);
+        BtlvCore_ShowRotationScreen(client->viewCore, client->rotationDir);
         BattleClient_StartCmdLimitTimer(client);
         (*seq)++;
         break;
@@ -1313,12 +1330,12 @@ static BOOL BattleClient_PlayerSelectRotation(BtlClient *client, s32 *seq) {
             BtlvCore_HideRotationScreen(client->viewCore);
             *seq = 2;
         } else if (BtlvCore_PollRotationInput(client->viewCore, &select)) {
-            client->unkCC = select;
+            client->rotationDir = select;
             *seq = 3;
         }
         break;
     case 2:
-        client->unkCC = BattleClient_PickRotation(client->unkCC);
+        client->rotationDir = BattleClient_PickRotation(client->rotationDir);
         (*seq)++;
         break;
     case 3:
@@ -1326,7 +1343,7 @@ static BOOL BattleClient_PlayerSelectRotation(BtlClient *client, s32 *seq) {
         (*seq)++;
         break;
     case 4:
-        client->returnData = &client->unkCC;
+        client->returnData = &client->rotationDir;
         client->returnDataSize = 1;
         return TRUE;
     }
@@ -1366,8 +1383,8 @@ static BOOL BattleClient_RecPlaySelectRotation(BtlClient *client, s32 *seq) {
 }
 
 static BOOL BattleClient_AISelectRotation(BtlClient *client, s32 *seq) {
-    client->unkCC = BattleClient_PickRotation(client->unkCC);
-    client->returnData = &client->unkCC;
+    client->rotationDir = BattleClient_PickRotation(client->rotationDir);
+    client->returnData = &client->rotationDir;
     client->returnDataSize = 1;
     return TRUE;
 }
@@ -1406,12 +1423,12 @@ static void BattleClient_HideCmdLimitTimer(BtlClient *client) {
 }
 
 static void BattleClient_SetActionPromptMsg(BtlClient *client, BattleMon *mon, BtlvStringParam *param) {
-    if (BtlSetup_GetBattleStyle(client->mainModule) != 3) {
-        Btlv_StringParam_Setup(param, 1, 0x45);
+    if (BtlSetup_GetBattleStyle(client->mainModule) != BTL_STYLE_ROTATION) {
+        Btlv_StringParam_Setup(param, BTLV_STR_STD, 0x45);
         Btlv_StringParam_AddArg(param, GetMonID(mon));
         Btlv_StringParam_SetWait(param, 0);
     } else {
-        Btlv_StringParam_Setup(param, 1, 0x46);
+        Btlv_StringParam_Setup(param, BTLV_STR_STD, 0x46);
         Btlv_StringParam_AddArg(param, client->clientId);
         Btlv_StringParam_SetWait(param, 0);
     }
@@ -1436,15 +1453,15 @@ static s32 BattleClient_GetSelectSeq(void) {
 static u32 Studio_GetTurnMsgId(BtlClient *client) {
     BtlSetup *setup = GetBattleSetupParam(client->mainModule);
     const BtlScriptedRules *rules = GetStudioRules(client->mainModule);
-    u8 group = data_ov167_021d6eb4[setup->unk129];
+    u8 group = sGradeMsgGroups[setup->studioGrade];
     u32 msgId;
 
-    switch (client->studio.score.unk10) {
+    switch (client->studio.score.lastChoiceResult) {
     case 1:
     case 2:
     case 3:
-        msgId = client->studio.score.unk10 + 5 + group * 15;
-        client->studio.score.unk10 = 0;
+        msgId = client->studio.score.lastChoiceResult + 5 + group * 15;
+        client->studio.score.lastChoiceResult = 0;
         break;
     default:
         if (client->turnCount > rules->unk0C) {
@@ -1460,7 +1477,7 @@ static u32 Studio_GetTurnMsgId(BtlClient *client) {
 }
 
 static void Studio_SetLastChoiceResult(BtlClient *client, u32 value) {
-    client->studio.score.unk10 = value;
+    client->studio.score.lastChoiceResult = value;
 }
 
 static BOOL BattleClient_PlayerSelectActionNormal(BtlClient *client, s32 *seq) {
@@ -1517,7 +1534,7 @@ static BOOL BattleClient_PlayerSelectActionStudio(BtlClient *client, s32 *seq) {
         }
         break;
     case SELECT_ACTION_SEQ_TURN_MSG:
-        Btlv_StringParam_Setup(&client->strParam, 9, Studio_GetTurnMsgId(client));
+        Btlv_StringParam_Setup(&client->strParam, BTLV_STR_MOVIE, Studio_GetTurnMsgId(client));
         BtlvCore_StartMsg(client->viewCore, &client->strParam);
         *seq = SELECT_ACTION_SEQ_WAIT_TURN_MSG;
         break;
@@ -1545,7 +1562,7 @@ static BOOL BattleClient_PlayerSelectActionStudio(BtlClient *client, s32 *seq) {
     case SELECT_ACTION_SEQ_SELECT:
         CheckIfOverCmdLimit(client);
         if (BattleClient_RunSelActProc(client)) {
-            client->studio.unk24 = BattleClient_GetFirstActionMove(client);
+            client->studio.usedMove = BattleClient_GetFirstActionMove(client);
             return TRUE;
         }
         break;
@@ -1554,7 +1571,7 @@ static BOOL BattleClient_PlayerSelectActionStudio(BtlClient *client, s32 *seq) {
 }
 
 static BOOL BattleClient_PlayerSelectAction(BtlClient *client, s32 *seq) {
-    if (GetStudioMode(client->mainModule) == 1) {
+    if (GetStudioMode(client->mainModule) == BTL_STUDIO_MODE_FILM) {
         return BattleClient_PlayerSelectActionStudio(client, seq);
     }
     return BattleClient_PlayerSelectActionNormal(client, seq);
@@ -1592,7 +1609,7 @@ static BOOL Studio_PlayTurnMessages(BtlClient *client) {
     case STUDIO_TURN_SEQ_MSG_1:
         msgId = rules->unkA8[client->turnCount - 1];
         if (msgId != -1) {
-            Btlv_StringParam_Setup(&client->strParam, 8, msgId);
+            Btlv_StringParam_Setup(&client->strParam, BTLV_STR_MOVIE_SCRIPT, msgId);
             BtlvCore_StartMsg(client->viewCore, &client->strParam);
             client->studio.seq++;
         } else {
@@ -1607,7 +1624,7 @@ static BOOL Studio_PlayTurnMessages(BtlClient *client) {
     case STUDIO_TURN_SEQ_MSG_2:
         msgId = rules->unkD0[client->turnCount - 1];
         if (msgId != -1) {
-            Btlv_StringParam_Setup(&client->strParam, 8, msgId);
+            Btlv_StringParam_Setup(&client->strParam, BTLV_STR_MOVIE_SCRIPT, msgId);
             BtlvCore_StartMsg(client->viewCore, &client->strParam);
             client->studio.seq++;
         } else {
@@ -1638,7 +1655,7 @@ static BOOL Studio_PlayTurnMessages(BtlClient *client) {
     return FALSE;
 }
 
-static s32 Studio_FindScene(const BtlScriptedRules *rules, BtlClientStudioWork *studio, s32 turn, s32 arg3) {
+static s32 Studio_FindScene(const BtlScriptedRules *rules, BtlClientStudioWork *studio, s32 turn, s32 outcome) {
     s32 found = -1;
     s32 i;
 
@@ -1649,20 +1666,20 @@ static s32 Studio_FindScene(const BtlScriptedRules *rules, BtlClientStudioWork *
             if (turn == rules->scenes[i].unk00) {
                 found = i;
             }
-        } else if (turn == rules->scenes[i].unk00 && studio->unk10 == unk02) {
+        } else if (turn == rules->scenes[i].unk00 && studio->recordedChoice == unk02) {
             found = i;
         }
     }
     if (turn == 101) {
         for (i = 0; i < 12; i++) {
-            if (arg3 == rules->scenes[i].unk04) {
+            if (outcome == rules->scenes[i].unk04) {
                 found = i;
             }
         }
     }
     if (found < 0) {
         for (i = 0; i < 12; i++) {
-            if (rules->scenes[i].unk04 == 0 && studio->unk26 == rules->scenes[i].unk06 &&
+            if (rules->scenes[i].unk04 == 0 && studio->faintedSpecies == rules->scenes[i].unk06 &&
                 !((studio->usedEventMask >> i) & 1)) {
                 found = i;
             }
@@ -1670,7 +1687,7 @@ static s32 Studio_FindScene(const BtlScriptedRules *rules, BtlClientStudioWork *
     }
     if (found < 0) {
         for (i = 0; i < 12; i++) {
-            if (rules->scenes[i].unk04 == 1 && studio->unk24 == rules->scenes[i].unk06 &&
+            if (rules->scenes[i].unk04 == 1 && studio->usedMove == rules->scenes[i].unk06 &&
                 !((studio->usedEventMask >> i) & 1)) {
                 found = i;
             }
@@ -1693,17 +1710,17 @@ static BOOL Studio_HasChoiceScene(const BtlScriptedRules *rules, BtlClientStudio
 }
 
 static void Studio_SetChoiceField(const BtlScriptedRules *rules, BtlClientStudioWork *studio) {
-    s16 value = rules->scenes[studio->scene].choices[studio->unk08].unk06;
+    s16 value = rules->scenes[studio->scene].choices[studio->choice].unk06;
 
     if (value != -1) {
-        studio->unk0C = value;
+        studio->newField = value;
     }
 }
 
 static BOOL Studio_IsStateReached(const BtlScriptedRules *rules, BtlClientStudioWork *studio) {
-    s16 value = rules->scenes[studio->scene].events[studio->unk04];
+    s16 value = rules->scenes[studio->scene].events[studio->msgStep];
 
-    if (value != -1 && value != studio->unk2C) {
+    if (value != -1 && value != studio->stagingState) {
         return FALSE;
     }
     return TRUE;
@@ -1712,13 +1729,13 @@ static BOOL Studio_IsStateReached(const BtlScriptedRules *rules, BtlClientStudio
 static u32 Studio_GetSavedChoice(BtlClient *client, BtlClientStudioWork *studio) {
     BtlSetup *setup = GetBattleSetup(client->mainModule);
 
-    return setup->unk110[client->studio.scene];
+    return setup->studioChoices[client->studio.scene];
 }
 
 static void Studio_SaveChoice(BtlClient *client, s32 scene, u32 value) {
     BtlSetup *setup = GetBattleSetup(client->mainModule);
 
-    setup->unk110[scene] = value;
+    setup->studioChoices[scene] = value;
 }
 
 static u32 Studio_GetEnding(BtlClient *client) {
@@ -1734,7 +1751,7 @@ static void Studio_SetEnding(BtlClient *client, u32 value) {
 }
 
 static void Studio_DecideEnding(BtlClient *client, const BtlScriptedRules *rules, s32 scene) {
-    if (GetStudioMode(client->mainModule) == 1) {
+    if (GetStudioMode(client->mainModule) == BTL_STUDIO_MODE_FILM) {
         if (rules->unk0E == scene) {
             Studio_SetEnding(client, 1);
         } else if (rules->scenes[scene].unk0A >= 60) {
@@ -1750,19 +1767,19 @@ static void Studio_ScoreEndScene(BtlClient *client, const BtlScriptedRules *rule
 
     if (type == 100 || type == 101) {
         StudioScore_AddScenePoints(client, &client->studio.score, scene);
-        if (GetStudioMode(client->mainModule) == 2) {
+        if (GetStudioMode(client->mainModule) == BTL_STUDIO_MODE_PLAYBACK) {
             BtlSetup *setup;
 
             Studio_ReactToScenePoints(client->viewCore, &client->studio);
             setup = GetBattleSetup(client->mainModule);
-            setup->unk12C = client->studio.audienceMask;
+            setup->audience = client->studio.audienceMask;
         }
     }
 }
 
 static void Studio_ClearSceneTriggers(BtlClientStudioWork *studio) {
-    studio->unk24 = 0;
-    studio->unk26 = 0;
+    studio->usedMove = 0;
+    studio->faintedSpecies = 0;
 }
 
 static void Studio_StartChoiceSelect(BtlClient *client, const BtlScriptedRules *rules, BtlClientStudioWork *studio) {
@@ -1774,7 +1791,7 @@ static void Studio_StartChoiceSelect(BtlClient *client, const BtlScriptedRules *
             count++;
         }
     }
-    BtlvCore_SetupChoice(client->viewCore, count, &studio->unk08);
+    BtlvCore_SetupChoice(client->viewCore, count, &studio->choice);
     for (i = 0; i < count; i++) {
         studio->strBufs[i] = GFL_StrBufCreate(0x28, client->heapId);
         BtlString_FormatMovieScriptMsg(studio->strBufs[i], rules->scenes[studio->scene].choices[i].msgId);
@@ -1796,30 +1813,30 @@ static void Studio_FreeChoiceStrBufs(BtlClientStudioWork *studio) {
 
 static BOOL Studio_PlayScene(BtlClient *client) {
     const BtlScriptedRules *rules = GetStudioRules(client->mainModule);
-    BtlMainUnk478 *result = func_ov167_0219e3ac(client->mainModule);
+    BtlStudioWork *result = GetStudioWork(client->mainModule);
     PokewoodCutin *cutin = GetPokewoodCutin(client->mainModule);
     s16 msgId;
 
     switch (client->studio.seq) {
     case STUDIO_SCENE_SEQ_INIT:
         client->studio.scene =
-            Studio_FindScene(rules, &client->studio, client->turnCount, func_ov167_0219c9e0(client->mainModule));
+            Studio_FindScene(rules, &client->studio, client->turnCount, GetScriptedRulesOutcome(client->mainModule));
         Studio_ScoreEndScene(client, rules, client->studio.scene);
         Studio_DecideEnding(client, rules, client->studio.scene);
         BtlString_SetStudioWords();
         if (client->studio.scene >= 0) {
-            if (GetStudioMode(client->mainModule) == 2) {
+            if (GetStudioMode(client->mainModule) == BTL_STUDIO_MODE_PLAYBACK) {
                 u32 value = Studio_GetEnding(client);
 
                 if (PokewoodCutin_HasCutin(rules, client->studio.scene, value, ReturnZero(client->mainModule, 11))) {
                     client->studio.seq = STUDIO_SCENE_SEQ_CUTIN_START_EFFECT_1;
-                    client->studio.unk0C = -1;
+                    client->studio.newField = -1;
                     break;
                 }
             }
-            client->studio.unk04 = 0;
+            client->studio.msgStep = 0;
             client->studio.unk05 = 0;
-            client->studio.unk0C = -1;
+            client->studio.newField = -1;
             client->studio.seq++;
         } else {
             client->studio.seq = STUDIO_SCENE_SEQ_END;
@@ -1829,9 +1846,9 @@ static BOOL Studio_PlayScene(BtlClient *client) {
         if (!Studio_IsStateReached(rules, &client->studio)) {
             client->studio.seq = STUDIO_SCENE_SEQ_STAGING;
         } else {
-            if ((rules->scenes[client->studio.scene].messages[0][client->studio.unk04] == -1 &&
-                 rules->scenes[client->studio.scene].messages[1][client->studio.unk04] == -1) ||
-                client->studio.unk04 == 10) {
+            if ((rules->scenes[client->studio.scene].messages[0][client->studio.msgStep] == -1 &&
+                 rules->scenes[client->studio.scene].messages[1][client->studio.msgStep] == -1) ||
+                client->studio.msgStep == 10) {
                 client->studio.seq = STUDIO_SCENE_SEQ_CHOICE;
             } else {
                 client->studio.seq = STUDIO_SCENE_SEQ_MSG_1;
@@ -1844,9 +1861,9 @@ static BOOL Studio_PlayScene(BtlClient *client) {
         }
         break;
     case STUDIO_SCENE_SEQ_MSG_1:
-        msgId = rules->scenes[client->studio.scene].messages[0][client->studio.unk04];
+        msgId = rules->scenes[client->studio.scene].messages[0][client->studio.msgStep];
         if (msgId != -1) {
-            Btlv_StringParam_Setup(&client->strParam, 8, msgId);
+            Btlv_StringParam_Setup(&client->strParam, BTLV_STR_MOVIE_SCRIPT, msgId);
             BtlvCore_StartMsg(client->viewCore, &client->strParam);
             Studio_SetSeq(&client->studio, STUDIO_SCENE_SEQ_WAIT_MSG, STUDIO_SCENE_SEQ_MSG_2);
         } else {
@@ -1854,15 +1871,15 @@ static BOOL Studio_PlayScene(BtlClient *client) {
         }
         break;
     case STUDIO_SCENE_SEQ_MSG_2:
-        msgId = rules->scenes[client->studio.scene].messages[1][client->studio.unk04];
+        msgId = rules->scenes[client->studio.scene].messages[1][client->studio.msgStep];
         if (msgId != -1) {
-            Btlv_StringParam_Setup(&client->strParam, 8, msgId);
+            Btlv_StringParam_Setup(&client->strParam, BTLV_STR_MOVIE_SCRIPT, msgId);
             BtlvCore_StartMsg(client->viewCore, &client->strParam);
             Studio_SetSeq(&client->studio, STUDIO_SCENE_SEQ_WAIT_MSG, STUDIO_SCENE_SEQ_CHECK_STATE);
         } else {
             client->studio.seq = STUDIO_SCENE_SEQ_CHECK_STATE;
         }
-        client->studio.unk04++;
+        client->studio.msgStep++;
         break;
     case STUDIO_SCENE_SEQ_END_EFFECT_1:
         BtlvEffect_Start(0x299);
@@ -1871,11 +1888,11 @@ static BOOL Studio_PlayScene(BtlClient *client) {
     case STUDIO_SCENE_SEQ_END_EFFECT_2:
         BtlvEffect_Start(0x295);
         Studio_SetSeq(&client->studio, STUDIO_SCENE_SEQ_WAIT_EFFECT, STUDIO_SCENE_SEQ_END);
-        client->studio.unk2C = 0;
+        client->studio.stagingState = 0;
         break;
     case STUDIO_SCENE_SEQ_CHOICE:
         if (rules->scenes[client->studio.scene].choices[0].msgId != -1) {
-            if (GetStudioMode(client->mainModule) == 1) {
+            if (GetStudioMode(client->mainModule) == BTL_STUDIO_MODE_FILM) {
                 client->studio.seq = STUDIO_SCENE_SEQ_SELECT_CHOICE;
                 Studio_StartChoiceSelect(client, rules, &client->studio);
             } else {
@@ -1888,38 +1905,38 @@ static BOOL Studio_PlayScene(BtlClient *client) {
     case STUDIO_SCENE_SEQ_SELECT_CHOICE:
         if (BattleClient_RunSelActProc(client)) {
             Studio_FreeChoiceStrBufs(&client->studio);
-            Studio_SaveChoice(client, client->studio.scene, client->studio.unk08);
-            Studio_RecordChoice(rules, &client->studio, client->studio.scene, client->studio.unk08);
-            result->unk08 = rules->scenes[client->studio.scene].choices[client->studio.unk08].unk04;
-            StudioScore_AddChoicePoints(client, &client->studio.score, client->studio.scene, client->studio.unk08);
+            Studio_SaveChoice(client, client->studio.scene, client->studio.choice);
+            Studio_RecordChoice(rules, &client->studio, client->studio.scene, client->studio.choice);
+            result->aiMoveIndex = rules->scenes[client->studio.scene].choices[client->studio.choice].aiMoveIndex;
+            StudioScore_AddChoicePoints(client, &client->studio.score, client->studio.scene, client->studio.choice);
             Studio_SetChoiceField(rules, &client->studio);
             client->studio.seq = STUDIO_SCENE_SEQ_CHOICE_MSG_1;
         }
         break;
     case STUDIO_SCENE_SEQ_SAVED_CHOICE:
-        client->studio.unk08 = Studio_GetSavedChoice(client, &client->studio);
-        Studio_RecordChoice(rules, &client->studio, client->studio.scene, client->studio.unk08);
-        result->unk08 = rules->scenes[client->studio.scene].choices[client->studio.unk08].unk04;
-        StudioScore_AddChoicePoints(client, &client->studio.score, client->studio.scene, client->studio.unk08);
+        client->studio.choice = Studio_GetSavedChoice(client, &client->studio);
+        Studio_RecordChoice(rules, &client->studio, client->studio.scene, client->studio.choice);
+        result->aiMoveIndex = rules->scenes[client->studio.scene].choices[client->studio.choice].aiMoveIndex;
+        StudioScore_AddChoicePoints(client, &client->studio.score, client->studio.scene, client->studio.choice);
         Studio_SetChoiceField(rules, &client->studio);
         client->studio.seq = STUDIO_SCENE_SEQ_CHOICE_MSG_1;
         break;
     case STUDIO_SCENE_SEQ_CHOICE_MSG_1:
-        Btlv_StringParam_Setup(&client->strParam, 8,
-                               rules->scenes[client->studio.scene].choices[client->studio.unk08].msgId);
+        Btlv_StringParam_Setup(&client->strParam, BTLV_STR_MOVIE_SCRIPT,
+                               rules->scenes[client->studio.scene].choices[client->studio.choice].msgId);
         BtlvCore_StartMsg(client->viewCore, &client->strParam);
         Studio_SetSeq(&client->studio, STUDIO_SCENE_SEQ_WAIT_MSG, STUDIO_SCENE_SEQ_CHOICE_MSG_2);
         break;
     case STUDIO_SCENE_SEQ_CHOICE_MSG_2:
-        Btlv_StringParam_Setup(&client->strParam, 8,
-                               rules->scenes[client->studio.scene].choices[client->studio.unk08].msgId2);
+        Btlv_StringParam_Setup(&client->strParam, BTLV_STR_MOVIE_SCRIPT,
+                               rules->scenes[client->studio.scene].choices[client->studio.choice].msgId2);
         BtlvCore_StartMsg(client->viewCore, &client->strParam);
         Studio_SetSeq(&client->studio, STUDIO_SCENE_SEQ_WAIT_MSG, STUDIO_SCENE_SEQ_CHECK_TURN);
         break;
     case STUDIO_SCENE_SEQ_CHECK_TURN:
         if (client->turnCount >= 100) {
             client->studio.seq = STUDIO_SCENE_SEQ_END;
-            client->studio.unk2C = 0;
+            client->studio.stagingState = 0;
         } else {
             client->studio.seq = STUDIO_SCENE_SEQ_END_EFFECT_1;
         }
@@ -1954,8 +1971,8 @@ static BOOL Studio_PlayScene(BtlClient *client) {
         PokewoodCutin_SetViewCore(cutin, client->viewCore);
         PokewoodCutin_Start(cutin, rules, client->studio.scene, Studio_GetSavedChoice(client, &client->studio),
                             getTrainerGender(info));
-        client->studio.unk08 = Studio_GetSavedChoice(client, &client->studio);
-        Studio_RecordChoice(rules, &client->studio, client->studio.scene, client->studio.unk08);
+        client->studio.choice = Studio_GetSavedChoice(client, &client->studio);
+        Studio_RecordChoice(rules, &client->studio, client->studio.scene, client->studio.choice);
         Studio_SetChoiceField(rules, &client->studio);
         client->studio.seq++;
         break;
@@ -1963,7 +1980,7 @@ static BOOL Studio_PlayScene(BtlClient *client) {
     case STUDIO_SCENE_SEQ_CUTIN_MAIN:
         PokewoodCutin_Main(cutin);
         if (PokewoodCutin_IsDone(cutin)) {
-            StudioScore_AddChoicePoints(client, &client->studio.score, client->studio.scene, client->studio.unk08);
+            StudioScore_AddChoicePoints(client, &client->studio.score, client->studio.scene, client->studio.choice);
             client->studio.seq = STUDIO_SCENE_SEQ_CUTIN_END_EFFECT_1;
         }
         break;
@@ -1982,7 +1999,7 @@ static BOOL Studio_PlayScene(BtlClient *client) {
 static void Studio_RecordChoice(const BtlScriptedRules *rules, BtlClientStudioWork *studio, s32 scene, u32 value) {
     const BtlStudioScene *s = &rules->scenes[scene];
     if (s->unk00 != -1 || s->unk02 != -1 || (u16)s->unk04 > 1) {
-        studio->unk10 = value + 1;
+        studio->recordedChoice = value + 1;
     }
 }
 
@@ -1992,7 +2009,7 @@ static s32 Studio_GetNextState(BtlClientStudioWork *studio, s32 event) {
     s32 index = next - 1;
 
     for (i = 0; i < 7; i++) {
-        if (studio->unk2C == sStudioTransitions[i].state) {
+        if (studio->stagingState == sStudioTransitions[i].state) {
             index = i;
         }
     }
@@ -2031,18 +2048,18 @@ static s32 Studio_GetNextState(BtlClientStudioWork *studio, s32 event) {
 }
 
 static void Studio_SetStagingWait(BtlClientStudioWork *studio, u8 nextSeq) {
-    studio->unk02 = 9;
-    studio->unk03 = nextSeq;
+    studio->stagingSeq = 9;
+    studio->stagingNextSeq = nextSeq;
 }
 
 static BOOL Studio_UpdateStaging(const BtlScriptedRules *rules, BtlClient *client) {
-    switch (client->studio.unk02) {
+    switch (client->studio.stagingSeq) {
     case 0:
         if (Studio_IsStateReached(rules, &client->studio)) {
-            client->studio.unk02 = 10;
+            client->studio.stagingSeq = 10;
         } else {
-            client->studio.unk02 =
-                Studio_GetNextState(&client->studio, rules->scenes[client->studio.scene].events[client->studio.unk04]);
+            client->studio.stagingSeq = Studio_GetNextState(
+                &client->studio, rules->scenes[client->studio.scene].events[client->studio.msgStep]);
         }
         break;
     case 1:
@@ -2051,32 +2068,32 @@ static BOOL Studio_UpdateStaging(const BtlScriptedRules *rules, BtlClient *clien
         BtlvMcss_SetAnimation(BtlvEffect_GetMcss(), 9, 1);
         BtlvEffect_Start(0x298);
         Studio_SetStagingWait(&client->studio, 0);
-        client->studio.unk2C = (client->studio.unk2C & 0xf) | 0x10;
+        client->studio.stagingState = (client->studio.stagingState & 0xf) | 0x10;
         break;
     case 2:
         BtlvEffect_Start(0x294);
         Studio_SetStagingWait(&client->studio, 0);
-        client->studio.unk2C = (client->studio.unk2C & 0xf0) | 0x01;
+        client->studio.stagingState = (client->studio.stagingState & 0xf0) | 0x01;
         break;
     case 3:
         BtlvEffect_Start(0x299);
         Studio_SetStagingWait(&client->studio, 0);
-        client->studio.unk2C = client->studio.unk2C & 0xf;
+        client->studio.stagingState = client->studio.stagingState & 0xf;
         break;
     case 4:
         BtlvEffect_Start(0x295);
         Studio_SetStagingWait(&client->studio, 0);
-        client->studio.unk2C = client->studio.unk2C & 0xf0;
+        client->studio.stagingState = client->studio.stagingState & 0xf0;
         break;
     case 5:
         BtlvEffect_Start(0x29a);
         Studio_SetStagingWait(&client->studio, 0);
-        client->studio.unk2C = (client->studio.unk2C & 0xf) | 0x20;
+        client->studio.stagingState = (client->studio.stagingState & 0xf) | 0x20;
         break;
     case 6:
         BtlvEffect_Start(0x29b);
         Studio_SetStagingWait(&client->studio, 0);
-        client->studio.unk2C = (client->studio.unk2C & 0xf0) | 0x02;
+        client->studio.stagingState = (client->studio.stagingState & 0xf0) | 0x02;
         break;
     case 7:
         BtlvEffect_SetTrainer(
@@ -2085,21 +2102,21 @@ static BOOL Studio_UpdateStaging(const BtlScriptedRules *rules, BtlClient *clien
         BtlvEffect_Start(0x298);
         BtlvEffect_Start(0x29c);
         Studio_SetStagingWait(&client->studio, 0);
-        client->studio.unk2C = (client->studio.unk2C & 0xf) | 0x10;
+        client->studio.stagingState = (client->studio.stagingState & 0xf) | 0x10;
         break;
     case 8:
         BtlvEffect_Start(0x29d);
         Studio_SetStagingWait(&client->studio, 0);
-        client->studio.unk2C = (client->studio.unk2C & 0xf0) | 0x01;
+        client->studio.stagingState = (client->studio.stagingState & 0xf0) | 0x01;
         break;
     case 9:
         if (!BtlvEffect_IsBusy()) {
-            client->studio.unk02 = client->studio.unk03;
+            client->studio.stagingSeq = client->studio.stagingNextSeq;
         }
         break;
     case 10:
-        client->studio.unk02 = 0;
-        client->studio.unk03 = 0;
+        client->studio.stagingSeq = 0;
+        client->studio.stagingNextSeq = 0;
         return TRUE;
     }
     return FALSE;
@@ -2121,16 +2138,16 @@ static BOOL Studio_ChangeField(BtlClient *client) {
 
     switch (client->studio.seq) {
     case 0:
-        if (GetStudioMode(client->mainModule) != 2) {
+        if (GetStudioMode(client->mainModule) != BTL_STUDIO_MODE_PLAYBACK) {
             return TRUE;
         }
-        if (client->studio.unk0C < 0) {
+        if (client->studio.newField < 0) {
             s16 value = StudioRules_GetTurnEvent(rules, client->turnCount);
             if (value >= 0) {
-                client->studio.unk0C = value;
+                client->studio.newField = value;
             }
         }
-        if (client->studio.unk0C > 0) {
+        if (client->studio.newField > 0) {
             BtlvEffect_StartPaletteFade(BTLV_EFFECT_FADE_FIELD, 0, 0x10, 0, 0);
             client->studio.seq++;
         } else {
@@ -2144,7 +2161,7 @@ static BOOL Studio_ChangeField(BtlClient *client) {
         }
         break;
     case 2:
-        BtlvEffect_ReloadField(client->studio.unk0C);
+        BtlvEffect_ReloadField(client->studio.newField);
         BtlvEffect_StartPaletteFade(BTLV_EFFECT_FADE_FIELD, 0x10, 0, 0, 0);
         client->studio.seq++;
         break;
@@ -2155,7 +2172,7 @@ static BOOL Studio_ChangeField(BtlClient *client) {
         }
         break;
     case 4:
-        client->studio.unk0C = -1;
+        client->studio.newField = -1;
         return TRUE;
     }
     return FALSE;
@@ -2163,9 +2180,10 @@ static BOOL Studio_ChangeField(BtlClient *client) {
 
 static u32 Studio_GetResultMsgId(BtlClient *client, const BtlScriptedRules *rules, BtlSetup *setup) {
     u32 msgId;
-    s32 scene = Studio_FindScene(rules, &client->studio, client->turnCount, func_ov167_0219c9e0(client->mainModule));
+    s32 scene =
+        Studio_FindScene(rules, &client->studio, client->turnCount, GetScriptedRulesOutcome(client->mainModule));
     s16 value = rules->scenes[scene].unk0A;
-    u8 rank = data_ov167_021d6eb4[setup->unk110[0x19]];
+    u8 rank = sGradeMsgGroups[setup->studioGrade];
 
     if (value > 60) {
         msgId = rank * 15 + 12;
@@ -2210,7 +2228,7 @@ static BOOL Studio_ShowResult(BtlClient *client) {
         break;
     case STUDIO_RESULT_SEQ_MSG_1:
         if (client->studio.msgId1 >= 0) {
-            Btlv_StringParam_Setup(&client->strParam, 9, client->studio.msgId1);
+            Btlv_StringParam_Setup(&client->strParam, BTLV_STR_MOVIE, client->studio.msgId1);
             BtlvCore_StartMsg(client->viewCore, &client->strParam);
             Studio_SetSeq(&client->studio, STUDIO_RESULT_SEQ_WAIT_MSG, STUDIO_RESULT_SEQ_END);
         } else {
@@ -2219,7 +2237,7 @@ static BOOL Studio_ShowResult(BtlClient *client) {
         break;
     case STUDIO_RESULT_SEQ_MSG_2:
         if (client->studio.msgId2 >= 0) {
-            Btlv_StringParam_Setup(&client->strParam, 8, client->studio.msgId2);
+            Btlv_StringParam_Setup(&client->strParam, BTLV_STR_MOVIE_SCRIPT, client->studio.msgId2);
             BtlvCore_StartMsg(client->viewCore, &client->strParam);
             Studio_SetSeq(&client->studio, STUDIO_RESULT_SEQ_WAIT_MSG, STUDIO_RESULT_SEQ_END);
         } else {
@@ -2262,7 +2280,7 @@ static BOOL RecPlaySelectActionCore(BtlClient *client, s32 *seq, BOOL arg2) {
         if (action->bits.action == BATTLE_ACTION_REC_TIMEOUT) {
             RecPlayer_SetDataEnd(&client->recPlayer);
             if (client->viewCore != NULL) {
-                Btlv_StringParam_Setup(&client->strParam, 1, 0xb7);
+                Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0xb7);
                 BtlvCore_StartMsg(client->viewCore, &client->strParam);
                 *seq = REC_SELECT_SEQ_WAIT_TIME_UP_MSG;
             } else {
@@ -2274,7 +2292,7 @@ static BOOL RecPlaySelectActionCore(BtlClient *client, s32 *seq, BOOL arg2) {
             client->recCanceled = TRUE;
             RecPlayer_SetDataEnd(&client->recPlayer);
             if (client->viewCore != NULL) {
-                Btlv_StringParam_Setup(&client->strParam, 1, 0xb8);
+                Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0xb8);
                 BtlvCore_StartMsg(client->viewCore, &client->strParam);
                 *seq = REC_SELECT_SEQ_WAIT_CANCEL_MSG;
             } else {
@@ -2303,7 +2321,7 @@ static BOOL RecPlaySelectActionCore(BtlClient *client, s32 *seq, BOOL arg2) {
         }
         break;
     case REC_SELECT_SEQ_STUDIO:
-        if (GetStudioMode(client->mainModule) == 0) {
+        if (GetStudioMode(client->mainModule) == BTL_STUDIO_MODE_NONE) {
             client->studio.seq = 0;
             return TRUE;
         }
@@ -2333,7 +2351,7 @@ static BOOL RecPlaySelectActionCore(BtlClient *client, s32 *seq, BOOL arg2) {
         break;
     case REC_SELECT_SEQ_STUDIO_TURN_MSGS:
         if (Studio_PlayTurnMessages(client)) {
-            client->studio.unk24 = BattleClient_GetFirstActionMove(client);
+            client->studio.usedMove = BattleClient_GetFirstActionMove(client);
             return TRUE;
         }
         break;
@@ -2476,10 +2494,10 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
         case BTLV_COMMAND_BAG:
             if (CheckCondition(client->procMon, CONDITION_SKY_DROP)) {
                 *seq = ROOT_SEQ_BLOCKED_RESET_SCREEN;
-            } else if (client->bagMode == 1 && !func_ov167_0219db08(client->mainModule)) {
+            } else if (client->bagMode == 1 && !IsShooterEnabled(client->mainModule)) {
                 BtlvCore_ResetScreen(client->viewCore);
                 *seq = ROOT_SEQ_WAIT_SCREEN;
-            } else if (GetStudioMode(client->mainModule) == 1) {
+            } else if (GetStudioMode(client->mainModule) == BTL_STUDIO_MODE_FILM) {
                 BattleClient_SetSelActProc(client, BattleClient_ActionViewScript);
             } else {
                 BattleClient_SetSelActProc(client, BattleClient_ActionSelectItem);
@@ -2525,7 +2543,7 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
         break;
     case ROOT_SEQ_BLOCKED_MSG:
         if (BtlvCore_IsScreenIdle(client->viewCore)) {
-            Btlv_StringParam_Setup(&client->strParam, 1, 0xc5);
+            Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0xc5);
             Btlv_StringParam_AddArg(&client->strParam, GetMonID(client->procMon));
             BattleClient_ShowSelectMsg(client, &client->strParam);
             (*seq)++;
@@ -2549,8 +2567,9 @@ static BOOL BattleClient_ActionTrainerHint(BtlClient *client, s32 *seq) {
         BtlvEffect_Start(0x270);
         BtlvCore_StartMsgTrainer(client->viewCore, trainerId, client->hintMsgId);
         if ((client->hintMsgId == 19 || client->hintMsgId == 20) &&
-            BtlCalc_IsGymLeaderClass(GetClientTrainerClass(client->mainModule, clientId)) && !client->unk1BA_0) {
-            BtlvEffect_ReserveBgm(0x47b);
+            BtlCalc_IsGymLeaderClass(GetClientTrainerClass(client->mainModule, clientId)) &&
+            !client->superiorBgmPlayed) {
+            BtlvEffect_ReserveBgm(SEQ_BGM_BATTLESUPERIOR);
             if (!BtlvEffect_IsPinchBgm()) {
                 GFL_SndBGMFadeOut(8);
                 *seq = 1;
@@ -2562,8 +2581,8 @@ static BOOL BattleClient_ActionTrainerHint(BtlClient *client, s32 *seq) {
     }
     case 1:
         if (!GFL_SndBGMIsFading()) {
-            GFL_SndBGMPlay(0x47b, 0xffff);
-            client->unk1BA_0 = TRUE;
+            GFL_SndBGMPlay(SEQ_BGM_BATTLESUPERIOR, 0xffff);
+            client->superiorBgmPlayed = TRUE;
             (*seq)++;
         }
         break;
@@ -2686,9 +2705,9 @@ static BOOL BattleClient_ActionSelectFight(BtlClient *client, s32 *seq) {
         }
         if (BtlvCore_WaitMoveSelect(client->viewCore)) {
             u32 action = BattleAction_GetAction(client->procAction);
-            if (action == 0) {
+            if (action == BATTLE_ACTION_NULL) {
                 BattleClient_SetSelActProc(client, BattleClient_ActionSelectRoot);
-            } else if (action == 5) {
+            } else if (action == BATTLE_ACTION_SHIFT) {
                 BattleClient_SetSelActProc(client, BattleClient_ActionSelectAutoRest);
             } else {
                 BattleMon *mon = client->procMon;
@@ -2883,7 +2902,7 @@ static BOOL BattleClient_ActionSelectItem(BtlClient *client, s32 *seq) {
                 shooterWork_SetCost(client, client->procActionIdx, cost);
                 BattleAction_SetItemParam(client->procAction, item, target, param);
                 BtlvCore_SaveBagCursor(client->viewCore);
-                if (ItemGetParam(item, 15) == 4) {
+                if (ItemGetParam(item, ITEM_PARAM_KIND) == 4) {
                     client->escapeSelected = TRUE;
                 }
                 selItemWork_Reserve(client, client->procActionIdx, item);
@@ -2985,23 +3004,23 @@ static BOOL BattleClient_ActionSelectEscape(BtlClient *client, s32 *seq) {
                 *seq = ESCAPE_SEQ_ESCAPE;
             } else {
                 if (trapAbility != 0) {
-                    Btlv_StringParam_Setup(&client->strParam, 2, 0x365);
+                    Btlv_StringParam_Setup(&client->strParam, BTLV_STR_SET, 0x365);
                     Btlv_StringParam_AddArg(&client->strParam, trapMonId);
                     Btlv_StringParam_AddArg(&client->strParam, trapAbility);
                 } else {
-                    Btlv_StringParam_Setup(&client->strParam, 1, 0x4a);
+                    Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x4a);
                 }
                 BattleClient_ShowSelectMsg(client, &client->strParam);
                 *seq = ESCAPE_SEQ_WAIT_BLOCKED_MSG;
             }
             break;
         case 1:
-            Btlv_StringParam_Setup(&client->strParam, 1, 0x4c);
+            Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x4c);
             BattleClient_ShowSelectMsg(client, &client->strParam);
             *seq = ESCAPE_SEQ_WAIT_BLOCKED_MSG;
             break;
         case 2:
-            Btlv_StringParam_Setup(&client->strParam, 1, 0x4d);
+            Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x4d);
             Btlv_StringParam_SetWait(&client->strParam, 0xff);
             BattleClient_ShowSelectMsg(client, &client->strParam);
             *seq = ESCAPE_SEQ_ASK;
@@ -3024,8 +3043,8 @@ static BOOL BattleClient_ActionSelectEscape(BtlClient *client, s32 *seq) {
     case ESCAPE_SEQ_ASK:
         BtlvCore_WaitMsg(client->viewCore);
         if (BtlvCore_IsMsgJustDone(client->viewCore)) {
-            Btlv_StringParam_Setup(&client->strParam, 3, 8);
-            Btlv_StringParam_Setup(&client->strParam2, 3, 9);
+            Btlv_StringParam_Setup(&client->strParam, BTLV_STR_UI, 8);
+            Btlv_StringParam_Setup(&client->strParam2, BTLV_STR_UI, 9);
             BtlvCore_ShowYesNo(client->viewCore, &client->strParam, &client->strParam2, 1);
             *seq = ESCAPE_SEQ_ANSWER;
         }
@@ -3238,7 +3257,7 @@ static BOOL IsUnselectableMove(BtlClient *client, BattleMon *mon, u16 move, Btlv
         u16 lockedMove = Condition_GetParam(GetConditionContinuationParam(mon, CONDITION_CHOICE_LOCK));
         if (MoveIsUsable(mon, lockedMove) && lockedMove != move) {
             if (param != NULL) {
-                Btlv_StringParam_Setup(param, 1, 0x63);
+                Btlv_StringParam_Setup(param, BTLV_STR_STD, 0x63);
                 Btlv_StringParam_AddArg(param, GetBattleMonHeldItem(mon));
                 Btlv_StringParam_AddArg(param, lockedMove);
             }
@@ -3250,7 +3269,7 @@ static BOOL IsUnselectableMove(BtlClient *client, BattleMon *mon, u16 move, Btlv
         u16 encoreMove = Condition_GetParam(cont);
         if (move != encoreMove) {
             if (param != NULL) {
-                Btlv_StringParam_Setup(param, 1, 0x64);
+                Btlv_StringParam_Setup(param, BTLV_STR_STD, 0x64);
                 Btlv_StringParam_AddArg(param, GetMonID(mon));
                 Btlv_StringParam_AddArg(param, encoreMove);
             }
@@ -3259,7 +3278,7 @@ static BOOL IsUnselectableMove(BtlClient *client, BattleMon *mon, u16 move, Btlv
     }
     if (CheckCondition(mon, CONDITION_TAUNT) && !PML_MoveIsDamaging(move)) {
         if (param != NULL) {
-            Btlv_StringParam_Setup(param, 2, 0x23b);
+            Btlv_StringParam_Setup(param, BTLV_STR_SET, 0x23b);
             Btlv_StringParam_AddArg(param, GetMonID(mon));
             Btlv_StringParam_AddArg(param, move);
         }
@@ -3267,7 +3286,7 @@ static BOOL IsUnselectableMove(BtlClient *client, BattleMon *mon, u16 move, Btlv
     }
     if (CheckCondition(mon, CONDITION_TORMENT) && move == GetPreviousMoveUsed(mon)) {
         if (param != NULL) {
-            Btlv_StringParam_Setup(param, 2, 0x244);
+            Btlv_StringParam_Setup(param, BTLV_STR_SET, 0x244);
             Btlv_StringParam_AddArg(param, GetMonID(mon));
             Btlv_StringParam_AddArg(param, move);
         }
@@ -3276,7 +3295,7 @@ static BOOL IsUnselectableMove(BtlClient *client, BattleMon *mon, u16 move, Btlv
     if (CheckCondition(mon, CONDITION_DISABLE) && move == GetDisabledMove(mon, CONDITION_DISABLE) &&
         move != MOVE_STRUGGLE) {
         if (param != NULL) {
-            Btlv_StringParam_Setup(param, 2, 0x253);
+            Btlv_StringParam_Setup(param, BTLV_STR_SET, 0x253);
             Btlv_StringParam_AddArg(param, GetMonID(mon));
             Btlv_StringParam_AddArg(param, move);
         }
@@ -3284,7 +3303,7 @@ static BOOL IsUnselectableMove(BtlClient *client, BattleMon *mon, u16 move, Btlv
     }
     if (CheckCondition(mon, CONDITION_HEAL_BLOCK) && getMoveFlag(move, 12)) {
         if (param != NULL) {
-            Btlv_StringParam_Setup(param, 2, 0x37a);
+            Btlv_StringParam_Setup(param, BTLV_STR_SET, 0x37a);
             Btlv_StringParam_AddArg(param, GetMonID(mon));
             Btlv_StringParam_AddArg(param, move);
         }
@@ -3292,7 +3311,7 @@ static BOOL IsUnselectableMove(BtlClient *client, BattleMon *mon, u16 move, Btlv
     }
     if (CheckFieldEffect(client->field, 3) && CheckImprison(client->field, client->pokeCon, mon, move)) {
         if (param != NULL) {
-            Btlv_StringParam_Setup(param, 2, 0x24d);
+            Btlv_StringParam_Setup(param, BTLV_STR_SET, 0x24d);
             Btlv_StringParam_AddArg(param, GetMonID(mon));
             Btlv_StringParam_AddArg(param, move);
         }
@@ -3300,7 +3319,7 @@ static BOOL IsUnselectableMove(BtlClient *client, BattleMon *mon, u16 move, Btlv
     }
     if (CheckFieldEffect(client->field, FIELD_CONDITION_GRAVITY) && getMoveFlag(move, 9)) {
         if (param != NULL) {
-            Btlv_StringParam_Setup(param, 2, 0x43e);
+            Btlv_StringParam_Setup(param, BTLV_STR_SET, 0x43e);
             Btlv_StringParam_AddArg(param, GetMonID(mon));
             Btlv_StringParam_AddArg(param, move);
         }
@@ -3836,11 +3855,11 @@ static BOOL AISelectAction(BtlClient *client, s32 *seq) {
     u16 move;
     u8 moveIdx;
     u8 target;
-    BtlMainUnk478 *debug;
+    BtlStudioWork *debug;
 
     switch (*seq) {
     case AI_SELECT_SEQ_WAIT_PLAYER:
-        if (GetStudioMode(client->mainModule) == 1) {
+        if (GetStudioMode(client->mainModule) == BTL_STUDIO_MODE_FILM) {
             if (BattleClient_GetSelectSeq() >= SELECT_ACTION_SEQ_START_SELECT) {
                 *seq = AI_SELECT_SEQ_INIT;
             }
@@ -3919,9 +3938,9 @@ static BOOL AISelectAction(BtlClient *client, s32 *seq) {
         moveIdx = TrAI_GetChosenMove(client->aiVM);
         if (moveIdx != 4) {
             target = TrAI_GetChosenTarget(client->aiVM);
-            debug = func_ov167_0219e3ac(client->mainModule);
-            if (debug != NULL && debug->unk08 >= 0) {
-                moveIdx = debug->unk08;
+            debug = GetStudioWork(client->mainModule);
+            if (debug != NULL && debug->aiMoveIndex >= 0) {
+                moveIdx = debug->aiMoveIndex;
             }
             BattleAction_SetFightParam(client->procAction, MoveGetID(client->procMon, moveIdx), target);
             *seq = AI_SELECT_SEQ_NEXT;
@@ -4091,8 +4110,8 @@ static BOOL BattleClient_PlayerConfirmUseNextPoke(BtlClient *client, s32 *seq) {
 
     switch (*seq) {
     case 0:
-        Btlv_StringParam_Setup(&client->strParam, 3, 5);
-        Btlv_StringParam_Setup(&client->strParam2, 3, 1);
+        Btlv_StringParam_Setup(&client->strParam, BTLV_STR_UI, 5);
+        Btlv_StringParam_Setup(&client->strParam2, BTLV_STR_UI, 1);
         BtlvCore_ShowYesNo(client->viewCore, &client->strParam, &client->strParam2, 0);
         (*seq)++;
         break;
@@ -4308,7 +4327,7 @@ static BOOL BattleClient_PlayerConfirmShiftSwitch(BtlClient *client, s32 *seq) {
     case SHIFT_SWITCH_SEQ_INIT:
         BtlAdapter_GetRecvData(client->adapter, (const void **)&data);
         if (*data != 0x1f) {
-            Btlv_StringParam_Setup(&client->strParam, 1, 20);
+            Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 20);
             Btlv_StringParam_AddArg(&client->strParam, 1);
             Btlv_StringParam_AddArg(&client->strParam, *data);
             Btlv_StringParam_SetWait(&client->strParam, 0xff);
@@ -4321,8 +4340,8 @@ static BOOL BattleClient_PlayerConfirmShiftSwitch(BtlClient *client, s32 *seq) {
     case SHIFT_SWITCH_SEQ_ASK:
         BtlvCore_WaitMsg(client->viewCore);
         if (BtlvCore_IsMsgJustDone(client->viewCore)) {
-            Btlv_StringParam_Setup(&client->strParam, 3, 6);
-            Btlv_StringParam_Setup(&client->strParam2, 3, 7);
+            Btlv_StringParam_Setup(&client->strParam, BTLV_STR_UI, 6);
+            Btlv_StringParam_Setup(&client->strParam2, BTLV_STR_UI, 7);
             BtlvCore_ShowYesNo(client->viewCore, &client->strParam, &client->strParam2, 1);
             *seq = SHIFT_SWITCH_SEQ_ANSWER;
         }
@@ -4410,7 +4429,7 @@ static BOOL BattleClient_ExitCommBattle(BtlClient *client, s32 *seq) {
         default:
             return TRUE;
         }
-        Btlv_StringParam_Setup(&client->strParam, 1, msg);
+        Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, msg);
         Btlv_StringParam_AddArg(&client->strParam, name);
         if (isMulti) {
             Btlv_StringParam_AddArg(&client->strParam, GetPlayerOpponentClientID(client->mainModule, 1));
@@ -4482,16 +4501,16 @@ static BOOL BattleClient_ExitTrainerBattle(BtlClient *client, s32 *seq) {
 
     switch (*seq) {
     case EXIT_TRAINER_SEQ_INIT:
-        if (GetStudioMode(client->mainModule) == 0) {
+        if (GetStudioMode(client->mainModule) == BTL_STUDIO_MODE_NONE) {
             if (GetBattleResultForClient(client) == BTL_RESULT_VICTORY) {
                 BtlvEffect_PlayBgm(GetWinBGM(client->mainModule));
                 name1 = GetPlayerOpponentClientID(client->mainModule, 0);
                 name2 = GetPlayerOpponentClientID(client->mainModule, 1);
                 if (name1 == name2) {
-                    Btlv_StringParam_Setup(&client->strParam, 1, 0x2c);
+                    Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x2c);
                     Btlv_StringParam_AddArg(&client->strParam, name1);
                 } else {
-                    Btlv_StringParam_Setup(&client->strParam, 1, 0x2d);
+                    Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x2d);
                     Btlv_StringParam_AddArg(&client->strParam, name1);
                     Btlv_StringParam_AddArg(&client->strParam, name2);
                 }
@@ -4499,7 +4518,7 @@ static BOOL BattleClient_ExitTrainerBattle(BtlClient *client, s32 *seq) {
                 *seq = EXIT_TRAINER_SEQ_TRAINER_1_IN;
             } else if (!BtlSetup_IsBattleType(client->mainModule, 0x100)) {
                 name1 = GetPlayerClientID(client->mainModule);
-                Btlv_StringParam_Setup(&client->strParam, 1, 0x36);
+                Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x36);
                 Btlv_StringParam_AddArg(&client->strParam, name1);
                 Btlv_StringParam_AddArg(&client->strParam, name1);
                 BtlvCore_StartMsg(client->viewCore, &client->strParam);
@@ -4507,7 +4526,7 @@ static BOOL BattleClient_ExitTrainerBattle(BtlClient *client, s32 *seq) {
             } else {
                 return TRUE;
             }
-        } else if (GetStudioMode(client->mainModule) == 2) {
+        } else if (GetStudioMode(client->mainModule) == BTL_STUDIO_MODE_PLAYBACK) {
             result = GetBattleResultForClient(client);
             StudioScore_SetTurnPoints(client, &client->studio.score);
             if (result == 1) {
@@ -4519,7 +4538,7 @@ static BOOL BattleClient_ExitTrainerBattle(BtlClient *client, s32 *seq) {
             }
             *seq = EXIT_TRAINER_SEQ_STUDIO_SCENE;
             Studio_PlayEndingBgm(client->mainModule);
-        } else if (GetStudioMode(client->mainModule) == 1) {
+        } else if (GetStudioMode(client->mainModule) == BTL_STUDIO_MODE_FILM) {
             StudioScore_SetTurnPoints(client, &client->studio.score);
             client->studio.seq = 0;
             *seq = EXIT_TRAINER_SEQ_STUDIO_RESULT;
@@ -4581,7 +4600,7 @@ static BOOL BattleClient_ExitTrainerBattle(BtlClient *client, s32 *seq) {
         value = FixPrizeMoney(client->mainModule);
         if (value != 0) {
             name1 = GetPlayerClientID(client->mainModule);
-            Btlv_StringParam_Setup(&client->strParam, 1, 0x3a);
+            Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x3a);
             Btlv_StringParam_AddArg(&client->strParam, name1);
             Btlv_StringParam_AddArg(&client->strParam, value);
             BtlvCore_StartMsg(client->viewCore, &client->strParam);
@@ -4597,7 +4616,7 @@ static BOOL BattleClient_ExitTrainerBattle(BtlClient *client, s32 *seq) {
             value = GetBonusMoney(client->mainModule);
             if (value != 0) {
                 name1 = GetPlayerClientID(client->mainModule);
-                Btlv_StringParam_Setup(&client->strParam, 1, 0x3b);
+                Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x3b);
                 Btlv_StringParam_AddArg(&client->strParam, name1);
                 Btlv_StringParam_AddArg(&client->strParam, value);
                 BtlvCore_StartMsg(client->viewCore, &client->strParam);
@@ -4609,7 +4628,7 @@ static BOOL BattleClient_ExitTrainerBattle(BtlClient *client, s32 *seq) {
         if (BtlvCore_WaitMsg(client->viewCore)) {
             value = CalcLossMoney(client->mainModule);
             if (value != 0) {
-                Btlv_StringParam_Setup(&client->strParam, 1, 0x38);
+                Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x38);
                 Btlv_StringParam_AddArg(&client->strParam, client->clientId);
                 Btlv_StringParam_AddArg(&client->strParam, value);
                 BtlvCore_StartMsg(client->viewCore, &client->strParam);
@@ -4619,7 +4638,7 @@ static BOOL BattleClient_ExitTrainerBattle(BtlClient *client, s32 *seq) {
         break;
     case EXIT_TRAINER_SEQ_LOSE_MSG:
         if (BtlvCore_WaitMsg(client->viewCore)) {
-            Btlv_StringParam_Setup(&client->strParam, 1, 0x39);
+            Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x39);
             Btlv_StringParam_AddArg(&client->strParam, client->clientId);
             BtlvCore_StartMsg(client->viewCore, &client->strParam);
             *seq = EXIT_TRAINER_SEQ_END;
@@ -4636,8 +4655,8 @@ static BOOL BattleClient_ExitTrainerBattle(BtlClient *client, s32 *seq) {
         if (Studio_ShowResult(client)) {
             setup = GetBattleSetup(client->mainModule);
             rules = GetStudioRules(client->mainModule);
-            score =
-                Studio_FindScene(rules, &client->studio, client->turnCount, func_ov167_0219c9e0(client->mainModule));
+            score = Studio_FindScene(rules, &client->studio, client->turnCount,
+                                     GetScriptedRulesOutcome(client->mainModule));
             Studio_ScoreEndScene(client, rules, score);
             Studio_DecideEnding(client, rules, score);
             setup->studioScore = StudioScore_CalcTotal(client, &client->studio.score);
@@ -4742,7 +4761,7 @@ static void ShowTrainerWinLoseMsg(BtlClient *client, u32 result, u8 which) {
     } else {
         trainerId = GetClientTrainerID(client->mainModule, clientId);
         if (trainerId != 0) {
-            Btlv_StringParam_Setup(&client->strParam, 7, 0);
+            Btlv_StringParam_Setup(&client->strParam, BTLV_STR_TRAINER_WIN_LOSE, 0);
             Btlv_StringParam_AddArg(&client->strParam, trainerId);
             Btlv_StringParam_AddArg(&client->strParam, result);
             BtlvCore_MakeMsg(client->viewCore, &client->strParam);
@@ -4760,7 +4779,7 @@ static BOOL BattleClient_ExitWildBattleWin(BtlClient *client, s32 *seq) {
             value = GetBonusMoney(client->mainModule);
             if (value != 0) {
                 playerId = GetPlayerClientID(client->mainModule);
-                Btlv_StringParam_Setup(&client->strParam, 1, 0x3b);
+                Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x3b);
                 Btlv_StringParam_AddArg(&client->strParam, playerId);
                 Btlv_StringParam_AddArg(&client->strParam, value);
                 BtlvCore_StartMsg(client->viewCore, &client->strParam);
@@ -4782,7 +4801,7 @@ static BOOL BattleClient_ExitWildBattleLose(BtlClient *client, s32 *seq) {
 
     switch (*seq) {
     case 0:
-        Btlv_StringParam_Setup(&client->strParam, 1, 0x36);
+        Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x36);
         Btlv_StringParam_AddArg(&client->strParam, client->clientId);
         BtlvCore_StartMsg(client->viewCore, &client->strParam);
         (*seq)++;
@@ -4791,7 +4810,7 @@ static BOOL BattleClient_ExitWildBattleLose(BtlClient *client, s32 *seq) {
         if (BtlvCore_WaitMsg(client->viewCore)) {
             value = CalcLossMoney(client->mainModule);
             if (value != 0) {
-                Btlv_StringParam_Setup(&client->strParam, 1, 0x37);
+                Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x37);
                 Btlv_StringParam_AddArg(&client->strParam, client->clientId);
                 Btlv_StringParam_AddArg(&client->strParam, value);
                 BtlvCore_StartMsg(client->viewCore, &client->strParam);
@@ -4801,7 +4820,7 @@ static BOOL BattleClient_ExitWildBattleLose(BtlClient *client, s32 *seq) {
         break;
     case 2:
         if (BtlvCore_WaitMsg(client->viewCore)) {
-            Btlv_StringParam_Setup(&client->strParam, 1, 0x39);
+            Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x39);
             Btlv_StringParam_AddArg(&client->strParam, client->clientId);
             BtlvCore_StartMsg(client->viewCore, &client->strParam);
             (*seq)++;
@@ -4935,7 +4954,7 @@ static const struct {
 static BOOL BattleClient_ShowTimeUpMsg(BtlClient *client, s32 *seq) {
     switch (*seq) {
     case 0:
-        Btlv_StringParam_Setup(&client->strParam, 1, 0xb7);
+        Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0xb7);
         BtlvCore_StartMsg(client->viewCore, &client->strParam);
         (*seq)++;
         break;
@@ -5026,7 +5045,7 @@ static BOOL BattleClient_ScRecallMsg(BtlClient *client, s32 *seq, const u32 *arg
 
     switch (*seq) {
     case 0:
-        Btlv_StringParam_Setup(&client->strParam, 1, BattleClient_GetRecallMsg(client, args[0], &withName));
+        Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, BattleClient_GetRecallMsg(client, args[0], &withName));
         if (withName) {
             Btlv_StringParam_AddArg(&client->strParam, args[0]);
         }
@@ -5100,22 +5119,22 @@ static BOOL BattleClient_ScSendOut(BtlClient *client, s32 *seq, const u32 *args)
 
             if (!AreClientsOnOppositeSides(client->mainModule, client->clientId, clientId)) {
                 if (client->clientId == clientId) {
-                    Btlv_StringParam_Setup(&client->strParam, 1, BattleClient_GetPlayerSendOutMsg(client));
+                    Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, BattleClient_GetPlayerSendOutMsg(client));
                     Btlv_StringParam_AddArg(&client->strParam, monId);
                     BtlvCore_StartMsg(client->viewCore, &client->strParam);
                 } else {
-                    Btlv_StringParam_Setup(&client->strParam, 1, 0x11);
+                    Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x11);
                     Btlv_StringParam_AddArg(&client->strParam, clientId);
                     Btlv_StringParam_AddArg(&client->strParam, monId);
                     BtlvCore_StartMsg(client->viewCore, &client->strParam);
                 }
             } else if (IsClientNPCTrainer(client->mainModule, clientId)) {
-                Btlv_StringParam_Setup(&client->strParam, 1, 0xe);
+                Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0xe);
                 Btlv_StringParam_AddArg(&client->strParam, clientId);
                 Btlv_StringParam_AddArg(&client->strParam, monId);
                 BtlvCore_StartMsg(client->viewCore, &client->strParam);
             } else {
-                Btlv_StringParam_Setup(&client->strParam, 1, 0x11);
+                Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x11);
                 Btlv_StringParam_AddArg(&client->strParam, clientId);
                 Btlv_StringParam_AddArg(&client->strParam, monId);
                 BtlvCore_StartMsg(client->viewCore, &client->strParam);
@@ -5267,7 +5286,7 @@ static BOOL BattleClient_ScMoveMsg(BtlClient *client, s32 *seq, const u32 *args)
 }
 
 static s32 BattleClient_GetMoveAnimType(BtlClient *client, u16 move, u8 pos) {
-    if (move != 0xae) {
+    if (move != MOVE_CURSE) {
         return PML_MoveGetParam(move, MOVE_PARAM_TARGET);
     } else {
         BattleMon *mon = PokeCon_GetPosMonInner(client->pokeCon, pos);
@@ -5290,14 +5309,14 @@ static BOOL BattleClient_ScMoveAnim(BtlClient *client, s32 *seq, const u32 *args
             u8 attackerPos;
             u8 targetPos;
             u8 arg3;
-            s32 arg4;
+            s32 animType;
 
             attackerPos = args[0];
             targetPos = args[1];
             move = args[2];
             arg3 = args[3];
-            arg4 = BattleClient_GetMoveAnimType(client, move, attackerPos);
-            BtlvCore_StartMoveEffect(client->viewCore, attackerPos, targetPos, move, arg4, arg3, 0);
+            animType = BattleClient_GetMoveAnimType(client, move, attackerPos);
+            BtlvCore_StartMoveEffect(client->viewCore, attackerPos, targetPos, move, animType, arg3, 0);
             (*seq)++;
             break;
         }
@@ -5417,7 +5436,7 @@ static BOOL BattleClient_ScConfusionDamage(BtlClient *client, s32 *seq, const u3
         if (BtlvCore_WaitMoveEffect(client->viewCore)) {
             pos = MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]);
             if (!BattleClient_IsChapterSkipping(client)) {
-                GFL_SndSEPlay(0x564);
+                GFL_SndSEPlay(SEQ_SE_KOUKA_M);
             }
             BtlvCore_StartDamage(client->viewCore, 1, pos, 1);
             (*seq)++;
@@ -5436,7 +5455,7 @@ static BOOL BattleClient_ScFaint(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0:
         BtlvCore_StartFaint(client->viewCore, MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]));
-        client->studio.unk26 = GetBattleMonSpecies(GetPokeParamConst(client->pokeCon, args[0]));
+        client->studio.faintedSpecies = GetBattleMonSpecies(GetPokeParamConst(client->pokeCon, args[0]));
         (*seq)++;
         break;
     case 1:
@@ -5618,7 +5637,7 @@ static BOOL BattleClient_ScFaintHpGauge(BtlClient *client, s32 *seq, const u32 *
     switch (*seq) {
     case 0:
         BtlvCore_StartGaugeHP(client->viewCore, MonIDToBattlePos(client->mainModule, client->pokeCon, monId));
-        client->studio.unk26 = GetBattleMonSpecies(GetPokeParamConst(client->pokeCon, args[0]));
+        client->studio.faintedSpecies = GetBattleMonSpecies(GetPokeParamConst(client->pokeCon, args[0]));
         (*seq)++;
         break;
     case 1:
@@ -5719,7 +5738,7 @@ static BOOL BattleClient_ScSubstituteDelete(BtlClient *client, s32 *seq, const u
         u8 viewPos = BattlePosToViewPos(client->mainModule, args[0]);
 
         if (BattleClient_IsChapterSkipping(client)) {
-            BtlvEffect_SetFlag26(TRUE);
+            BtlvEffect_SetMuteSE(TRUE);
         }
         BtlvEffect_StartEffect26F(viewPos);
         (*seq)++;
@@ -5728,7 +5747,7 @@ static BOOL BattleClient_ScSubstituteDelete(BtlClient *client, s32 *seq, const u
     case 1:
         if (!BtlvEffect_IsBusy()) {
             if (BattleClient_IsChapterSkipping(client)) {
-                BtlvEffect_SetFlag26(FALSE);
+                BtlvEffect_SetMuteSE(FALSE);
             }
             return TRUE;
         }
@@ -5885,7 +5904,7 @@ static BOOL BattleClient_ScExpGain(BtlClient *client, s32 *seq, const u32 *args)
         }
         break;
     case EXP_SEQ_LEVEL_UP_MSG:
-        Btlv_StringParam_Setup(&client->strParam, 1, 0x3c);
+        Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x3c);
         Btlv_StringParam_AddArg(&client->strParam, monId);
         Btlv_StringParam_AddArg(&client->strParam, sLevelUp.level);
         BtlvCore_StartMsg(client->viewCore, &client->strParam);
@@ -5895,7 +5914,7 @@ static BOOL BattleClient_ScExpGain(BtlClient *client, s32 *seq, const u32 *args)
         if (BtlvCore_IsMsgJustDone(client->viewCore)) {
             GFL_SndBGMSetPaused(TRUE);
             GFL_SndBGMPush();
-            GFL_SndBGMPlay(0x515, 0xffff);
+            GFL_SndBGMPlay(SEQ_ME_LVUP, 0xffff);
         }
         if (BtlvCore_WaitMsg(client->viewCore) && !GFL_SndBGMIsPlaying()) {
             GFL_SndBGMPop();
@@ -5948,10 +5967,10 @@ static BOOL BattleClient_ScExpGain(BtlClient *client, s32 *seq, const u32 *args)
 static BOOL BattleClient_ForgetMoveSECallback(u32 arg0) {
     switch (arg0) {
     case 3:
-        GFL_SndSEPlay(0x56b);
+        GFL_SndSEPlay(SEQ_SE_KON);
         break;
     case 5:
-        if (GFL_SndIsPlaying(0x56b)) {
+        if (GFL_SndIsPlaying(SEQ_SE_KON)) {
             return TRUE;
         }
         break;
@@ -5987,7 +6006,7 @@ static BOOL BattleClient_LearnMoveSeq(BtlClient *client, s32 *seq, BattleMon *mo
 
         GetSrcData(bpp);
         BattleMon_ReloadSrcData(bpp);
-        Btlv_StringParam_Setup(&client->strParam, 5, 3);
+        Btlv_StringParam_Setup(&client->strParam, BTLV_STR_LEARN, 3);
         Btlv_StringParam_AddArg(&client->strParam, monId);
         Btlv_StringParam_AddArg(&client->strParam, sLearnMove);
         BtlvCore_StartMsg(client->viewCore, &client->strParam);
@@ -5997,7 +6016,7 @@ static BOOL BattleClient_LearnMoveSeq(BtlClient *client, s32 *seq, BattleMon *mo
         if (BtlvCore_IsMsgJustDone(client->viewCore)) {
             GFL_SndBGMSetPaused(TRUE);
             GFL_SndBGMPush();
-            GFL_SndBGMPlay(0x515, 0xffff);
+            GFL_SndBGMPlay(SEQ_ME_LVUP, 0xffff);
         }
         if (BtlvCore_WaitMsg(client->viewCore)) {
             *seq = LEARN_SEQ_WAIT_FANFARE;
@@ -6011,7 +6030,7 @@ static BOOL BattleClient_LearnMoveSeq(BtlClient *client, s32 *seq, BattleMon *mo
         }
         break;
     case LEARN_SEQ_ASK_FORGET:
-        Btlv_StringParam_Setup(&client->strParam, 5, 4);
+        Btlv_StringParam_Setup(&client->strParam, BTLV_STR_LEARN, 4);
         Btlv_StringParam_AddArg(&client->strParam, monId);
         Btlv_StringParam_AddArg(&client->strParam, sLearnMove);
         Btlv_StringParam_SetWait(&client->strParam, 0xff);
@@ -6022,8 +6041,8 @@ static BOOL BattleClient_LearnMoveSeq(BtlClient *client, s32 *seq, BattleMon *mo
             BtlvStringParam yesParam;
             BtlvStringParam noParam;
 
-            Btlv_StringParam_Setup(&yesParam, 6, 2);
-            Btlv_StringParam_Setup(&noParam, 6, 3);
+            Btlv_StringParam_Setup(&yesParam, BTLV_STR_YES_NO, 2);
+            Btlv_StringParam_Setup(&noParam, BTLV_STR_YES_NO, 3);
             BtlvCore_ShowYesNo(client->viewCore, &yesParam, &noParam, 1);
         }
         if (BtlvCore_WaitMsg(client->viewCore)) {
@@ -6056,7 +6075,7 @@ static BOOL BattleClient_LearnMoveSeq(BtlClient *client, s32 *seq, BattleMon *mo
                 u16 oldMove = PokeParty_GetParam(pkm, PKM_PARAM_MOVE1 + slot, NULL);
 
                 PokeParty_SetMove(pkm, sLearnMove, slot);
-                Btlv_StringParam_Setup(&client->strParam, 5, 5);
+                Btlv_StringParam_Setup(&client->strParam, BTLV_STR_LEARN, 5);
                 Btlv_StringParam_AddArg(&client->strParam, monId);
                 Btlv_StringParam_AddArg(&client->strParam, oldMove);
                 BtlvCore_StartMsgCallback(client->viewCore, &client->strParam, BattleClient_ForgetMoveSECallback);
@@ -6071,7 +6090,7 @@ static BOOL BattleClient_LearnMoveSeq(BtlClient *client, s32 *seq, BattleMon *mo
         }
         break;
     case LEARN_SEQ_ASK_GIVE_UP:
-        Btlv_StringParam_Setup(&client->strParam, 5, 7);
+        Btlv_StringParam_Setup(&client->strParam, BTLV_STR_LEARN, 7);
         Btlv_StringParam_AddArg(&client->strParam, monId);
         Btlv_StringParam_AddArg(&client->strParam, sLearnMove);
         Btlv_StringParam_SetWait(&client->strParam, 0xff);
@@ -6083,9 +6102,9 @@ static BOOL BattleClient_LearnMoveSeq(BtlClient *client, s32 *seq, BattleMon *mo
             BtlvStringParam yesParam;
             BtlvStringParam noParam;
 
-            Btlv_StringParam_Setup(&yesParam, 6, 4);
+            Btlv_StringParam_Setup(&yesParam, BTLV_STR_YES_NO, 4);
             Btlv_StringParam_AddArg(&yesParam, sLearnMove);
-            Btlv_StringParam_Setup(&noParam, 6, 5);
+            Btlv_StringParam_Setup(&noParam, BTLV_STR_YES_NO, 5);
             Btlv_StringParam_AddArg(&noParam, sLearnMove);
             BtlvCore_ShowYesNo(client->viewCore, &yesParam, &noParam, 1);
         }
@@ -6098,7 +6117,7 @@ static BOOL BattleClient_LearnMoveSeq(BtlClient *client, s32 *seq, BattleMon *mo
 
         if (BtlvCore_PollYesNo(client->viewCore, &answer)) {
             if (answer == 0) {
-                Btlv_StringParam_Setup(&client->strParam, 5, 8);
+                Btlv_StringParam_Setup(&client->strParam, BTLV_STR_LEARN, 8);
                 Btlv_StringParam_AddArg(&client->strParam, monId);
                 Btlv_StringParam_AddArg(&client->strParam, sLearnMove);
                 BtlvCore_StartMsg(client->viewCore, &client->strParam);
@@ -6125,14 +6144,14 @@ static BOOL BattleClient_ScBallThrow(BtlClient *client, s32 *seq, const u32 *arg
 
     switch (*seq) {
     case 0:
-        BtlvEffect_StartEffect23A(BattlePosToViewPos(client->mainModule, args[0]), args[5], args[1], args[2], args[4]);
+        BtlvEffect_StartBallThrow(BattlePosToViewPos(client->mainModule, args[0]), args[5], args[1], args[2], args[4]);
         (*seq)++;
         break;
     case 1:
         if (!BtlvEffect_IsBusy()) {
             if (args[2]) {
                 mon = PokeCon_GetPosMonInner(client->pokeCon, args[0]);
-                Btlv_StringParam_Setup(&client->strParam, 1, 0x41);
+                Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x41);
                 Btlv_StringParam_AddArg(&client->strParam, GetMonID(mon));
                 BtlvEffect_PlayBgmNoPinch(0x518);
             } else {
@@ -6141,7 +6160,7 @@ static BOOL BattleClient_ScBallThrow(BtlClient *client, s32 *seq, const u32 *arg
                 } else {
                     message = 0x3d;
                 }
-                Btlv_StringParam_Setup(&client->strParam, 1, message);
+                Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, message);
             }
             BtlvCore_StartMsg(client->viewCore, &client->strParam);
             (*seq)++;
@@ -6161,11 +6180,11 @@ static BOOL BattleClient_ScBallThrow(BtlClient *client, s32 *seq, const u32 *arg
     case 3:
         if (!GFL_SndBGMIsPlaying()) {
             BtlvEffect_Resume();
-            GFL_SndBGMPlay(0x47c, 0xffff);
+            GFL_SndBGMPlay(SEQ_BGM_WIN1, 0xffff);
             SkipExitBGMFadeOut(client->mainModule);
             if (args[3]) {
                 mon = PokeCon_GetPosMonInner(client->pokeCon, args[0]);
-                Btlv_StringParam_Setup(&client->strParam, 1, 0x42);
+                Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x42);
                 Btlv_StringParam_AddArg(&client->strParam, GetMonID(mon));
                 BtlvCore_StartMsg(client->viewCore, &client->strParam);
                 (*seq)++;
@@ -6193,7 +6212,7 @@ static BOOL BattleClient_ScBallThrowTrainer(BtlClient *client, s32 *seq, const u
         break;
     case 1:
         if (!BtlvEffect_IsBusy()) {
-            Btlv_StringParam_Setup(&client->strParam, 1, 0x43);
+            Btlv_StringParam_Setup(&client->strParam, BTLV_STR_STD, 0x43);
             BtlvCore_StartMsg(client->viewCore, &client->strParam);
             (*seq)++;
         }
@@ -6806,7 +6825,7 @@ u8 BattleClient_GetWeather(BtlClient *client) {
 }
 
 u16 BattleClient_GetAudienceSize(BtlClient *client) {
-    return client->studio.unk58;
+    return client->studio.audienceCount;
 }
 
 u32 BattleClient_GetAudienceMask(BtlClient *client) {
@@ -6839,7 +6858,7 @@ static u16 AICheckItemUse(BtlClient *client, BattleMon *mon, BattleParty *party)
         if (client->aiItems[i] != 0) {
             BOOL use = FALSE;
 
-            if (ItemGetParam(client->aiItems[i], 0x29)) {
+            if (ItemGetParam(client->aiItems[i], ITEM_PARAM_HP_RESTORE)) {
                 if (GetBattleMonStat(mon, BATTLEMON_HP) > DivideMaxHp(mon, 4)) {
                     continue;
                 }
@@ -6862,7 +6881,12 @@ static u16 AICheckItemUse(BtlClient *client, BattleMon *mon, BattleParty *party)
 }
 
 static const BtlClientItemStat sXItems[6] = {
-    { 0x1e, 1 }, { 0x1f, 2 }, { 0x20, 3 }, { 0x21, 4 }, { 0x22, 5 }, { 0x23, 6 },
+    { ITEM_PARAM_ATTACK_STAGES, BATTLEMON_ATTACK_STAGE },
+    { ITEM_PARAM_DEFENSE_STAGES, BATTLEMON_DEFENSE_STAGE },
+    { ITEM_PARAM_SP_ATTACK_STAGES, BATTLEMON_SP_ATTACK_STAGE },
+    { ITEM_PARAM_SP_DEFENSE_STAGES, BATTLEMON_SP_DEFENSE_STAGE },
+    { ITEM_PARAM_SPEED_STAGES, BATTLEMON_SPEED_STAGE },
+    { ITEM_PARAM_ACCURACY_STAGES, BATTLEMON_ACCURACY_STAGE },
 };
 
 static BOOL IsXItem(u16 item, BattleMon *mon) {
@@ -6873,14 +6897,17 @@ static BOOL IsXItem(u16 item, BattleMon *mon) {
             return TRUE;
         }
     }
-    if (ItemGetParam(item, 0x24) && BattleMon_GetCritStage(mon) == 0) {
+    if (ItemGetParam(item, ITEM_PARAM_CRIT_STAGES) && BattleMon_GetCritStage(mon) == 0) {
         return TRUE;
     }
     return FALSE;
 }
 
 static const BtlClientItemCondition sCureItems[7] = {
-    { 0x12, 2 }, { 0x13, 5 }, { 0x14, 4 }, { 0x15, 3 }, { 0x16, 1 }, { 0x17, 6 }, { 0x18, 7 },
+    { ITEM_PARAM_SLEEP_HEAL, CONDITION_SLEEP },         { ITEM_PARAM_POISON_HEAL, CONDITION_POISON },
+    { ITEM_PARAM_BURN_HEAL, CONDITION_BURN },           { ITEM_PARAM_FREEZE_HEAL, CONDITION_FREEZE },
+    { ITEM_PARAM_PARALYSIS_HEAL, CONDITION_PARALYSIS }, { ITEM_PARAM_CONFUSION_HEAL, CONDITION_CONFUSION },
+    { ITEM_PARAM_INFATUATION_HEAL, CONDITION_ATTRACT },
 };
 
 static BOOL IsStatusCureItem(u16 item, BattleMon *mon) {
@@ -6903,7 +6930,7 @@ static void RecPlayer_Init(BtlClientRecPlayer *recPlayer) {
     recPlayer->chapter = 0;
     recPlayer->skipping = FALSE;
     recPlayer->skipTarget = 0;
-    recPlayer->unk2_4 = FALSE;
+    recPlayer->locked = FALSE;
     recPlayer->maxChapter = 0;
     recPlayer->dataEnd = FALSE;
     recPlayer->skipCount = 0;
@@ -6954,12 +6981,12 @@ static BOOL RecPlayer_TryLock(BtlClientRecPlayer *recPlayer) {
     if (recPlayer->quitStarted) {
         return FALSE;
     }
-    recPlayer->unk2_4 = TRUE;
+    recPlayer->locked = TRUE;
     return TRUE;
 }
 
 static void RecPlayer_Unlock(BtlClientRecPlayer *recPlayer) {
-    recPlayer->unk2_4 = FALSE;
+    recPlayer->locked = FALSE;
 }
 
 static void RecPlayer_SetDataEnd(BtlClientRecPlayer *recPlayer) {
@@ -6967,7 +6994,7 @@ static void RecPlayer_SetDataEnd(BtlClientRecPlayer *recPlayer) {
 }
 
 static void RecPlayer_Update(BtlClient *client, BtlClientRecPlayer *recPlayer) {
-    if (client->clientType == BTL_CLIENT_TYPE_REC_PLAY && !recPlayer->unk2_4 && !recPlayer->dataEnd &&
+    if (client->clientType == BTL_CLIENT_TYPE_REC_PLAY && !recPlayer->locked && !recPlayer->dataEnd &&
         recPlayer->maxChapter != 0) {
         BOOL update = FALSE;
 
@@ -7006,9 +7033,9 @@ static void RecPlayer_Update(BtlClient *client, BtlClientRecPlayer *recPlayer) {
                     BtlvCore_StartFadeOut(client->viewCore);
                     recPlayer->quitStarted = TRUE;
                     recPlayer->seq = REC_PLAYER_SEQ_FADE_OUT;
-                    BtlvCore_ShowRecorderMessage(client->viewCore, recPlayer->chapter, 1);
-                    func_ov167_0219c9d4(client->mainModule);
-                    func_ov167_0219bdf0(client->mainModule);
+                    BtlvCore_ShowRecorderMessage(client->viewCore, recPlayer->chapter, BTLV_RECORDER_MSG_PAUSED);
+                    SetRecPlayQuit(client->mainModule);
+                    SetFastestTextSpeed(client->mainModule);
                     GFL_SndBGMFadeOut(30);
                     GFL_SndPlayerSetMuteStateEx(0, 0x3e);
                     PokeVoice_SetMasterVolume(0);
@@ -7067,7 +7094,7 @@ static void Studio_PlayAudienceSE(BtlClientStudioWork *studio, u32 reaction) {
         { 0x8bf, 0x8c0 }, { 0x8c3, 0x8c4 }, { 0x8cb, 0x8cc }, { 0x8cd, 0x8ce },
     };
 
-    if (studio->unk58 < 12) {
+    if (studio->audienceCount < 12) {
         if (sAudienceSE[reaction].se != 0) {
             GFL_SndSEPlay(sAudienceSE[reaction].se);
         }
@@ -7132,7 +7159,7 @@ static void Studio_AudienceLeave(BtlvCore *core, BtlClientStudioWork *studio, u1
 
 static void Studio_ReactToScenePoints(BtlvCore *core, BtlClientStudioWork *studio) {
     if (studio->score.points[STUDIO_SCORE_SCENE] < 0) {
-        Studio_AudienceLeave(core, studio, studio->unk58);
+        Studio_AudienceLeave(core, studio, studio->audienceCount);
         Studio_ReactAudience(core, studio, 5);
     } else if (studio->score.points[STUDIO_SCORE_SCENE] > 60) {
         Studio_ReactAudience(core, studio, 7);
@@ -7212,9 +7239,9 @@ static s32 StudioScore_CalcTotal(BtlClient *client, BtlClientStudioScore *score)
         sum = 1;
     }
     score->unk08 = rules->unk04;
-    score->unk0A = setup->unk128;
+    score->audienceCount = setup->audienceCount;
     total = sum * score->unk08;
-    score->total = total * score->unk0A;
+    score->total = total * score->audienceCount;
     if (score->total > 9999) {
         score->total = 9999;
     } else if (score->total < -9998) {
@@ -7226,7 +7253,7 @@ static s32 StudioScore_CalcTotal(BtlClient *client, BtlClientStudioScore *score)
 static void Studio_UpdateAudience(BtlClient *client) {
     int i;
 
-    if (GetStudioMode(client->mainModule) == 2 && client->clientId == 0) {
+    if (GetStudioMode(client->mainModule) == BTL_STUDIO_MODE_PLAYBACK && client->clientId == 0) {
         for (i = 0; i < 22; i++) {
             if (client->studio.audienceTimers[i] != 0) {
                 client->studio.audienceTimers[i]--;
@@ -7243,10 +7270,10 @@ static void Studio_PlayEndingBgm(BtlMainModule *mainModule) {
     BtlSetup *setup = GetBattleSetupParam(mainModule);
 
     if (setup->studioEnding == 0) {
-        BtlvEffect_PlayBgm(func_ov167_0219bf08(mainModule));
+        BtlvEffect_PlayBgm(GetStudioEndingBGM0(mainModule));
     } else if (setup->studioEnding == 1) {
         BtlvEffect_PlayBgm(GetWinBGM(mainModule));
     } else if (setup->studioEnding == 2) {
-        BtlvEffect_PlayBgm(func_ov167_0219bf14(mainModule));
+        BtlvEffect_PlayBgm(GetStudioEndingBGM2(mainModule));
     }
 }

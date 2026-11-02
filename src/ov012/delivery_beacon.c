@@ -35,7 +35,7 @@ struct DeliveryBeaconWork {
 static void DeliveryBeacon_OnDisconnect(void *work, int netId);
 static void DeliveryBeacon_RecvDummy(int netId, int size, const void *data, void *work, NetHandle *handle);
 static void DeliveryBeacon_OnNegotiation(void *work, int netId);
-static void func_ov012_02152928(void *work);
+static void DeliveryBeacon_OnNetEnd(void *work);
 static void *DeliveryBeacon_GetSendBeacon(void *work);
 static int DeliveryBeacon_GetBeaconSize(void *work);
 static BOOL DeliveryBeacon_IsMatchingBeacon(u32 a, u32 b);
@@ -49,14 +49,14 @@ static void DeliveryBeacon_DecryptData(DeliveryBeaconWork *pWork);
 static void DeliveryBeacon_SeqStartNet(void *work);
 static void DeliveryBeacon_OnNetInit(void *work);
 
-static const NetCommand data_ov012_0216af34[] = {
+static const NetCommand sDeliveryBeaconCommands[] = {
     { DeliveryBeacon_RecvDummy, NULL },
 };
 
 // clang-format off
-static GFLNetInitData data_ov012_0216e034 = {
-    data_ov012_0216af34,
-    NELEMS(data_ov012_0216af34),
+static GFLNetInitData sDeliveryBeaconNetInit = {
+    sDeliveryBeaconCommands,
+    NELEMS(sDeliveryBeaconCommands),
     DeliveryBeacon_OnDisconnect,
     DeliveryBeacon_OnNegotiation,
     NULL,
@@ -66,7 +66,7 @@ static GFLNetInitData data_ov012_0216e034 = {
     DeliveryBeacon_IsMatchingBeacon,
     NULL,
     NULL,
-    func_ov012_02152928,
+    DeliveryBeacon_OnNetEnd,
     NULL,
     {0},
     NULL,
@@ -103,7 +103,7 @@ static void DeliveryBeacon_RecvDummy(int netId, int size, const void *data, void
 static void DeliveryBeacon_OnNegotiation(void *work, int netId) {
 }
 
-static void func_ov012_02152928(void *work) {
+static void DeliveryBeacon_OnNetEnd(void *work) {
 }
 
 // The beacon to send
@@ -248,10 +248,10 @@ BOOL DeliveryBeacon_RecvStart(DeliveryBeaconWork *pWork) {
     if (GFL_NetIsInitialized()) {
         return FALSE;
     }
-    data_ov012_0216e034.gameCommandBase = pWork->aInit.code;
+    sDeliveryBeaconNetInit.gameCommandBase = pWork->aInit.code;
     pWork->unk5E = 0xff;
     DeliveryBeacon_CheckDataSize(pWork);
-    GFL_NetInit(&data_ov012_0216e034, DeliveryBeacon_OnNetInit, pWork);
+    GFL_NetInit(&sDeliveryBeaconNetInit, DeliveryBeacon_OnNetInit, pWork);
     DeliveryBeacon_SetSeqWithLine(pWork, DeliveryBeacon_SeqIdle, 498);
     return TRUE;
 }

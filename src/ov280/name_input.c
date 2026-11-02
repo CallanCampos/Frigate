@@ -556,8 +556,8 @@ BOOL NameEntry_ProcInit(GameProc *proc, u32 *state, void *arg, void *unused) {
     unit = NameInputGraphic_GetClActUnit(work->graphic);
     NameEntryObjs_Init(&work->objs, unit, HEAPID_NAME_INPUT);
     species = param->gender;
-    NameEntryIcon_Init(&work->icon, NameEntry_GetIconType(param->mode, species), species, param->unk6, unit, work->font,
-                       work->queue, work->msgData, work->bmpOam, HEAPID_NAME_INPUT);
+    NameEntryIcon_Init(&work->icon, NameEntry_GetIconType(param->mode, species), species, param->sexAndForm, unit,
+                       work->font, work->queue, work->msgData, work->bmpOam, HEAPID_NAME_INPUT);
     work->keyboards = NameInputData_LoadKeyboards(HEAPID_NAME_INPUT);
     work->name = GFL_StrBufClone(param->name, HEAPID_NAME_INPUT);
     if (GFL_StrBufGetCharCount(work->name) != 0) {
@@ -579,7 +579,8 @@ BOOL NameEntry_ProcInit(GameProc *proc, u32 *state, void *arg, void *unused) {
     NameEntryObjs_ShowSelectors(&work->objs, work->usesPresetNames);
     if (param->mode == NAME_ENTRY_POKEMON) {
         if (param->pkm == NULL) {
-            NameEntryMessage_PrintSpecies(&work->message, param->mode, param->gender, param->unk6, HEAPID_NAME_INPUT);
+            NameEntryMessage_PrintSpecies(&work->message, param->mode, param->gender, param->sexAndForm,
+                                          HEAPID_NAME_INPUT);
         } else {
             NameEntryMessage_PrintPokemon(&work->message, param->mode, param->pkm);
         }
@@ -2765,13 +2766,13 @@ static void NameEntryTalk_Start(NameEntryTalk *talk, NameEntryMessage *message, 
         GFL_WordSetSetStrbuf(wordSet, 0, name, 0, 0, 0);
         GFL_StrBufFree(name);
     }
-    loadBoxNameForDisplay(wordSet, 1, param->unk10, param->unk14);
+    loadBoxNameForDisplay(wordSet, 1, param->boxes, param->box);
     if (talk->stream != NULL) {
         PrintStream_Delete(talk->stream);
     }
     GFL_BitmapFill(BmpWin_GetBitmap(message->window), message->fillColor);
     GFL_StrBufClear(message->buf);
-    GFL_WordSetFormatStrbuf(wordSet, message->buf, param->unkC);
+    GFL_WordSetFormatStrbuf(wordSet, message->buf, param->boxMessage);
     talk->stream = PrintStream_Create(message->window, 0, 0, message->buf, message->font, TextSpeed_GetCurrentWait(),
                                       talk->tcbManager, 2, heapId, message->fillColor);
     talk->frame = 0;
@@ -3109,7 +3110,7 @@ static StrBuf *NameEntry_LoadPresetName(NameEntryParam *param, u32 which, HeapID
         GFL_StrBufLoadString(buf, TrainerGameInfo_GetThanks(param->gameInfo));
         break;
     case PRESET_NAME_CGEAR:
-        GFL_StrBufLoadString(buf, CGearName_Get(param->unk30));
+        GFL_StrBufLoadString(buf, CGearName_Get(param->presetNameSave));
         break;
     default:
         return NULL;
@@ -3185,11 +3186,11 @@ static void NameEntry_CheckChanged(NameEntryWork *work) {
                 GFL_StrBufLoadString(preset, TrainerGameInfo_GetThanks(work->param->gameInfo));
                 break;
             case PRESET_NAME_CGEAR:
-                GFL_StrBufLoadString(preset, CGearName_Get(work->param->unk30));
+                GFL_StrBufLoadString(preset, CGearName_Get(work->param->presetNameSave));
                 break;
             }
             if (GFL_StrBufCmp(preset, work->param->name)) {
-                work->param->unk34 = i + 1;
+                work->param->presetIndex = i + 1;
                 break;
             }
         }
@@ -3379,7 +3380,7 @@ static void NameEntryTask_Input(NameEntryTask *task, u32 *state, NameEntryWork *
             if (work->param->mode == NAME_ENTRY_POKEMON) {
                 if (work->param->pkm == NULL) {
                     NameEntryMessage_PrintSpecies(&work->message, work->param->mode, work->param->gender,
-                                                  work->param->unk6, HEAPID_NAME_INPUT);
+                                                  work->param->sexAndForm, HEAPID_NAME_INPUT);
                 } else {
                     NameEntryMessage_PrintPokemon(&work->message, work->param->mode, work->param->pkm);
                 }
@@ -3465,11 +3466,11 @@ static void NameEntryTask_Input(NameEntryTask *task, u32 *state, NameEntryWork *
                 work->messagePending = TRUE;
                 break;
             }
-            if (!(work->param->unk2C & 2) && ProfWord_Check(work->profWord, work->box.text, HEAPID_NAME_INPUT)) {
+            if (!(work->param->skipChecks & 2) && ProfWord_Check(work->profWord, work->box.text, HEAPID_NAME_INPUT)) {
                 GFL_SndSEPlay(SEQ_SE_BEEP);
                 break;
             }
-            if (!(work->param->unk2C & 1) &&
+            if (!(work->param->skipChecks & 1) &&
                 ProfWord_HasManyDigits(work->box.text, work->box.length, HEAPID_NAME_INPUT)) {
                 GFL_SndSEPlay(SEQ_SE_BEEP);
                 NameEntryMessage_Print(&work->message, AbilityHandlersBtlMain_Text_NumbersMayContainOnly);
@@ -3478,7 +3479,7 @@ static void NameEntryTask_Input(NameEntryTask *task, u32 *state, NameEntryWork *
             }
             GFL_SndSEPlay(SEQ_SE_DECIDE2);
             NameEntry_CheckChanged(work);
-            if (work->param->mode == NAME_ENTRY_POKEMON && work->param->unkC != NULL) {
+            if (work->param->mode == NAME_ENTRY_POKEMON && work->param->boxMessage != NULL) {
                 NameEntryTalk_Start(&work->talk, &work->message, work->param, HEAPID_NAME_INPUT);
                 NameEntryTask_SetFunc(task, NameEntryTask_Talk);
             } else {

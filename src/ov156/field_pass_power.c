@@ -31,6 +31,21 @@
 // The pass power whose script gets 16 in place of its effect
 #define PASS_POWER_027 0x27
 
+// The steps of the flash event; any later step ends it
+enum {
+    FLASH_STEP_FADE_TO_WHITE,
+    FLASH_STEP_WAIT_WHITE,
+    FLASH_STEP_WAIT_CLEAR,
+};
+
+// The steps of the list event; any later step closes it
+enum {
+    LIST_STEP_OPEN_MESSAGE,
+    LIST_STEP_WAIT_MESSAGE,
+    LIST_STEP_SHOW_LIST,
+    LIST_STEP_WAIT_KEY,
+};
+
 typedef struct {
     u32 unk00;
     GameSystem *gsys;
@@ -152,19 +167,19 @@ static void PassPowerList_Exit(PassPowerListWork *work) {
 
 static GameEventReturnCode EventPassPowerFlash_Callback(GameEvent *event, u32 *state, void *data) {
     switch (*state) {
-    case 0:
+    case FLASH_STEP_FADE_TO_WHITE:
         GFL_FadeSet(FADE_ENGINE_A_WHITE, 10, 16, 4);
         GFL_SndSEPlay(SEQ_SE_W295_01);
         (*state)++;
         break;
-    case 1:
+    case FLASH_STEP_WAIT_WHITE:
         if (GFL_FadeIsRunning()) {
             break;
         }
         GFL_FadeSet(FADE_ENGINE_A_WHITE, 16, 0, 8);
         (*state)++;
         // fallthrough
-    case 2:
+    case FLASH_STEP_WAIT_CLEAR:
         if (GFL_FadeIsRunning()) {
             break;
         }
@@ -195,24 +210,24 @@ static GameEventReturnCode EventPassPowerList_Callback(GameEvent *event, u32 *st
     PassPowerListWork *work = data;
 
     switch (*state) {
-    case 0:
+    case LIST_STEP_OPEN_MESSAGE:
         work->msgWindow = MsgBGPrinter_CreateInfoSysWin(work->msgBGSys, work->msgData, 19);
         MsgBGPrinter_InfoSysWinPrintMsg(work->msgWindow, 0, 0, 3);
         (*state)++;
         break;
-    case 1:
+    case LIST_STEP_WAIT_MESSAGE:
         if (MsgBGPrinter_InfoSysWinMain(work->msgWindow)) {
             MsgBGPrinter_DeleteInfoSysWin(work->msgWindow);
             (*state)++;
         }
         break;
-    case 2:
+    case LIST_STEP_SHOW_LIST:
         work->listWindow = MsgBGPrinter_CreateInfoMsgWin(work->msgBGSys, work->msgData, 4, 1, 24, 22);
         MsgBGPrinter_ClearInfoMsgWin(work->listWindow);
         PassPowerList_Print(work);
         (*state)++;
         break;
-    case 3:
+    case LIST_STEP_WAIT_KEY:
         if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
             (*state)++;
         }

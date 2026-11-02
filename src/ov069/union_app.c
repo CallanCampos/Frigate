@@ -28,8 +28,8 @@ UnionApp *UnionApp_Create(UnionSystem *sys, HeapID heapId, u8 memberMax, const P
         app->status.joined = 3;
     }
     app->status.memberMax = memberMax;
-    app->current = 0xff;
-    app->currentPending = 0xff;
+    app->current = UNION_APP_NET_ID_NONE;
+    app->currentPending = UNION_APP_NET_ID_NONE;
 
     MI_CpuFill8(&member, 0, sizeof(UnionAppMember));
     member.info = *info;
@@ -101,7 +101,7 @@ static void UnionApp_CheckJoinedLeft(UnionApp *app) {
     int bit;
     u32 connected = app->status.joined;
 
-    if (app->current != 0xff) {
+    if (app->current != UNION_APP_NET_ID_NONE) {
         return;
     }
     for (i = 0; i < UNION_APP_MEMBER_MAX; i++) {
@@ -133,12 +133,12 @@ static void UnionApp_UpdateQueue(UnionApp *app) {
     int bit;
     u8 queued;
 
-    if (app->current != 0xff) {
+    if (app->current != UNION_APP_NET_ID_NONE) {
         if (GFL_NetIsNegotiated(app->current)) {
             return;
         }
-        app->current = 0xff;
-        app->currentPending = 0xff;
+        app->current = UNION_APP_NET_ID_NONE;
+        app->currentPending = UNION_APP_NET_ID_NONE;
     }
     queued = app->queued;
     if (queued == 0) {
@@ -156,8 +156,8 @@ static void UnionApp_UpdateQueue(UnionApp *app) {
 }
 
 static void UnionApp_SendCurrent(UnionApp *app) {
-    if (app->currentPending != 0xff && UnionMain_SendUnkE(app->currentPending) == TRUE) {
-        app->currentPending = 0xff;
+    if (app->currentPending != UNION_APP_NET_ID_NONE && UnionMain_SendTurn(app->currentPending) == TRUE) {
+        app->currentPending = UNION_APP_NET_ID_NONE;
     }
 }
 
@@ -184,7 +184,7 @@ static void UnionApp_JoinConfirmed(UnionApp *app) {
                 if (app->onJoin != NULL) {
                     app->onJoin(i, &app->members[i], app->callbackWork);
                 }
-                app->current = 0xff;
+                app->current = UNION_APP_NET_ID_NONE;
             }
             app->confirmed ^= bit;
         }
@@ -234,11 +234,11 @@ void UnionApp_Enqueue(UnionApp *app, u8 netId) {
 }
 
 void UnionApp_SetTurnReceived(UnionApp *app) {
-    app->unk12 = TRUE;
+    app->turnReceived = TRUE;
 }
 
 u8 UnionApp_IsTurnReceived(UnionApp *app) {
-    return app->unk12;
+    return app->turnReceived;
 }
 
 void UnionApp_RequestSendStatus(UnionApp *app, u8 netId) {

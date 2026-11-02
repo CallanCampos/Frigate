@@ -8,6 +8,29 @@
 // The number of field actions that PlayerActionPerms blocks or allows
 #define PLAYER_ACTION_COUNT 12
 
+// The field actions, by the items and shortcuts that check them: the bag's (overlay 142) and the Y button's. No item
+// or shortcut checks actions 7 and 8
+enum {
+    PLAYER_ACTION_BICYCLE,
+    PLAYER_ACTION_TOWN_MAP,
+    PLAYER_ACTION_PAL_PAD,
+    PLAYER_ACTION_ESCAPE_ROPE,
+    PLAYER_ACTION_HONEY,
+    PLAYER_ACTION_FISHING,
+    PLAYER_ACTION_VS_RECORDER,
+    PLAYER_ACTION_DOWSING = 9,
+    PLAYER_ACTION_XTRANSCEIVER,
+    PLAYER_ACTION_MEDAL_BOX,
+};
+
+// Whether a field action is blocked where the player stands, which PlayerActionPerms keeps for each
+typedef enum {
+    FIELD_ACTION_BLOCKED = -1,
+    FIELD_ACTION_ALLOWED = 0,
+    // Allowed, while the player walks with a partner
+    FIELD_ACTION_ALLOWED_PAIRED = 1,
+} FieldActionResult;
+
 // What the player may do where they stand: player_action_perms.c holds the accessors, overlay 12 the Create
 struct PlayerActionPerms {
     u32 unk0;

@@ -11,13 +11,14 @@
 #define CURSORMOVE_CANCEL 0xfffffffe
 #define CURSORMOVE_CURSOR_MOVE 0xfffffffd
 #define CURSORMOVE_CURSOR_ON 0xfffffffc
+// A key pushed against the edge, as CursorMove_Update's CURSOR_MOVE_EDGE_*: right, left, down and up
 #define CURSORMOVE_SCROLL_R 0xfffffffb
 #define CURSORMOVE_SCROLL_L 0xfffffffa
-#define CURSORMOVE_UNK_7 0xfffffff9
-#define CURSORMOVE_UNK_8 0xfffffff8
+#define CURSORMOVE_SCROLL_D 0xfffffff9
+#define CURSORMOVE_SCROLL_U 0xfffffff8
 
 void Box2Ui_CreateCursor(Box2SysWork *syswk);
-void Box2Ui_ChangeCursor(Box2SysWork *syswk, u32 a1, u32 pos);
+void Box2Ui_ChangeCursor(Box2SysWork *syswk, u32 id, u32 pos);
 void Box2Ui_PlaceCursorActor(Box2SysWork *syswk, u32 pos);
 void Box2Ui_DeleteCursor(Box2SysWork *syswk);
 u32 Box2Ui_UpdateCursor0(Box2SysWork *syswk);

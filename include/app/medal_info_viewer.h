@@ -17,6 +17,12 @@ enum {
     MEDAL_INFO_VIEWER_MODE_LIST,
 };
 
+// How the viewer was closed: the button that closed it
+enum {
+    MEDAL_INFO_RESULT_BACK,
+    MEDAL_INFO_RESULT_FIELD,
+};
+
 // The medal id of an entry that holds no medal
 #define MEDAL_INFO_NO_MEDAL 0xff
 
@@ -49,7 +55,7 @@ typedef struct {
 MedalInfoViewer *MedalInfoViewer_Create(MedalInfoViewerParam *param);
 // Updates it each frame. Returns whether it is done
 BOOL MedalInfoViewer_Main(MedalInfoViewer *viewer);
-// Frees it and returns how it was left, 0 for its back button and 1 for the exit to the field
+// Frees it and returns how it was left, a MEDAL_INFO_RESULT_*
 u32 MedalInfoViewer_Delete(MedalInfoViewer *viewer);
 
 #endif // POKEBW2_APP_MEDAL_INFO_VIEWER_H

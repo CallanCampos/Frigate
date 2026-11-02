@@ -46,7 +46,7 @@ void SpPokeGimmickD_Init(Field *field);
 void SpPokeGimmickD_End(Field *field);
 void SpPokeGimmickD_Update(Field *field);
 
-void SpPokeGimmick_StartChase(Field *field, u16 a1);
+void SpPokeGimmick_StartChase(Field *field, u16 actorId);
 BOOL SpPokeGimmick_IsChaseDone(Field *field);
 void SpPokeGimmick_DropActor(Field *field);
 GameEvent *SpPokeGimmick_CallFormEvent(GameSystem *gsys);

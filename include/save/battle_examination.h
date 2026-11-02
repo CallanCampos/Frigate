@@ -7,6 +7,10 @@
 // Extra save block 5, a downloaded battle examination, which the Trial House plays (battle_examination.c).
 // save/trial_house.h declares the functions that the Trial House calls.
 
+// The extra save block, and the size of the buffer it is loaded into
+#define SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION 5
+#define BATTLE_EXAMINATION_LOAD_SIZE 0x800
+
 #define BATTLE_EXAMINATION_TRAINER_COUNT 5
 #define BATTLE_EXAMINATION_SIGNATURE 0xd68
 #define BATTLE_EXAMINATION_SIGNATURE_USED 0x7da
@@ -15,8 +19,8 @@
 
 struct BattleExaminationSave {
     BSubwayTrainer trainers[BATTLE_EXAMINATION_TRAINER_COUNT];
-    // What the Trial House copies into its own save block
-    u8 unk5A0[0x22];
+    // The examination's name, which the Trial House copies into its own save block
+    u16 name[17];
     // BATTLE_EXAMINATION_SIGNATURE, or BATTLE_EXAMINATION_SIGNATURE_USED once the examination was taken
     u16 signature;
     // The examination's number and BATTLE_EXAMINATION_DOUBLE

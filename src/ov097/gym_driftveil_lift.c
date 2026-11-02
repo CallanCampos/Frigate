@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -22,6 +23,14 @@
 
 // The work var that says which lift is in use: 1 for the second one
 #define WORK_LIFT 0x4000
+
+// The steps of the lift's move event
+enum {
+    LIFT_STEP_START,
+    LIFT_STEP_MOVE,
+    LIFT_STEP_ARRIVED,
+    LIFT_STEP_WAIT_ANM,
+};
 
 typedef struct {
     fx32 y;
@@ -48,10 +57,10 @@ static const G3DSceneActorSetup sActors[2] = {
 };
 
 static const G3DSceneResourceSetup sResources[] = {
-    { 0x8a, 5, 0 },
-    { 0x8a, 6, 0 },
-    { 0x8a, 11, 0 },
-    { 0x8a, 12, 0 },
+    { ARCID_GYM_DRIFTVEIL, 5, 0 },
+    { ARCID_GYM_DRIFTVEIL, 6, 0 },
+    { ARCID_GYM_DRIFTVEIL, 11, 0 },
+    { ARCID_GYM_DRIFTVEIL, 12, 0 },
 };
 
 static const G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };
@@ -147,7 +156,7 @@ static GameEventReturnCode DriftveilLift_MoveEvent(GameEvent *event, u32 *state,
     work = Field_GetGimmickWorkBlock(field, 1);
     camera = Field_GetCameraSystem(field);
     switch (*state) {
-    case 0:
+    case LIFT_STEP_START:
         if (work->down) {
             work->cameraBind = FieldCamera_GetBind(camera);
             FieldCamera_ClearBind(camera);
@@ -155,7 +164,7 @@ static GameEventReturnCode DriftveilLift_MoveEvent(GameEvent *event, u32 *state,
         GFL_SndSEPlay(!work->down ? SEQ_SE_FLD_75 : SEQ_SE_FLD_59);
         (*state)++;
         break;
-    case 1:
+    case LIFT_STEP_MOVE:
         work->y += work->speed;
         if (DriftveilLift_HasArrived(work)) {
             work->y = work->targetY;
@@ -176,7 +185,7 @@ static GameEventReturnCode DriftveilLift_MoveEvent(GameEvent *event, u32 *state,
             SetActorWPosValue(work->rider, &riderPos);
         }
         break;
-    case 2:
+    case LIFT_STEP_ARRIVED:
         if (work->down) {
             return GAMEEVENT_DONE;
         }
@@ -186,7 +195,7 @@ static GameEventReturnCode DriftveilLift_MoveEvent(GameEvent *event, u32 *state,
         FieldExpObjAnm_SetPaused(FieldExpObj_GetAnmInfo(system, 0, work->lift, 0), FALSE);
         (*state)++;
         break;
-    case 3:
+    case LIFT_STEP_WAIT_ANM:
         if (FieldExpObjAnm_IsPlaybackFinished(FieldExpObj_GetAnmInfo(system, 0, work->lift, 0))) {
             DriftveilLift_ResetAnm(system, work->lift);
             return GAMEEVENT_DONE;

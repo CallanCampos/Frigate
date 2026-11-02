@@ -28,6 +28,11 @@
 // The scripts that are loaded at once, each for one AI flag
 #define TRAI_SCRIPT_CACHE_SIZE 4
 #define TRAI_SCRIPT_NONE 0xff
+// The script of AI_FLAG_EXPERT, which is loaded from the tail of the heap
+#define TRAI_SCRIPT_EXPERT 2
+
+// What ends a list of values in a script
+#define TRAI_LIST_END 0xffffffff
 
 // TrAIContext.status
 #define TRAI_STATUS_MOVE_DONE 0x1
@@ -1004,7 +1009,7 @@ BOOL AIIfResultInList(VM *vm, void *work) {
             break;
         }
         i += 2;
-    } while (value != 0xffffffff);
+    } while (value != TRAI_LIST_END);
     return wk->cmdReturn;
 }
 
@@ -1022,7 +1027,7 @@ BOOL AIIfResultNotInList(VM *vm, void *work) {
             return wk->cmdReturn;
         }
         i += 2;
-    } while (value != 0xffffffff);
+    } while (value != TRAI_LIST_END);
     VM_Jump(vm, vm->pc + offset);
     return wk->cmdReturn;
 }
@@ -2384,7 +2389,7 @@ void *TrAI_LoadScript(TrAIContext *wk) {
             break;
         }
     }
-    if (wk->scriptIndex == 2) {
+    if (wk->scriptIndex == TRAI_SCRIPT_EXPERT) {
         heapId = HEAPID_TAIL(wk->heapId);
     } else {
         heapId = wk->heapId;

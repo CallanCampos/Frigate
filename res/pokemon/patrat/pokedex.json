@@ -1,0 +1,14 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "P",
+    "shapes": [ 4 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_ROUTE_19": [ "grass", "shaking_grass" ],
+            "ZONE_ROUTE_20": [ "grass", "dark_grass" ],
+            "ZONE_FLOCCESY_RANCH": [ "grass" ],
+            "ZONE_VIRBANK_COMPLEX": [ "grass", "dark_grass" ]
+        }
+    }
+}

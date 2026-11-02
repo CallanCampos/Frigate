@@ -1,0 +1,44 @@
+// MOVE_ICICLE_SPEAR's animation: member 333 of a/0/6/5
+
+#include "asm/btlv_effvm.inc"
+
+    ScriptHeader 1
+    ScriptVariant IcicleSpear
+
+IcicleSpear:
+    SetYield FALSE
+    PlaySE SEQ_SE_W042_01, 1, EFFVM_ATTACKER, 0, 0, 115, 0, 0, 0
+    PanSE 1, 0, EFFVM_ATTACKER, EFFVM_DEFENDER, 0, 20, 0, 0
+    SetYield TRUE
+    SetYield FALSE
+    PlaySE SEQ_SE_W042_01, 2, EFFVM_ATTACKER, 25, 0, 115, 0, 0, 0
+    PanSE 2, 0, EFFVM_ATTACKER, EFFVM_DEFENDER, 20, 20, 0, 0
+    SetYield TRUE
+    SetYield FALSE
+    PlaySE SEQ_SE_W042_01, 1, EFFVM_ATTACKER, 50, 0, 115, 0, 0, 0
+    PanSE 1, 0, EFFVM_ATTACKER, EFFVM_DEFENDER, 45, 20, 0, 0
+    SetYield TRUE
+    SetYield FALSE
+    PlaySE SEQ_SE_W181_01, 2, EFFVM_DEFENDER, 50, 400, 115, 0, 0, 0
+    SetYield TRUE
+    ParticleLoad 507
+    EmitterAdd 507, 0, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 507, 1, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 507, 2, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 12
+    McssSetVanish EFFVM_DEFENDER, TRUE
+    McssMoveXY EFFVM_DEFENDER, 2, 0x4cd, 0, 1, 2, 3
+    EmitterAdd 507, 0, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 507, 1, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 507, 2, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 12
+    McssMoveXY EFFVM_DEFENDER, 2, 0x4cd, 0, 1, 2, 3
+    EmitterAdd 507, 0, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 507, 1, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 507, 2, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 20
+    McssMoveXY EFFVM_DEFENDER, 2, 0x4cd, 0, 1, 2, 3
+    Wait EFFVM_WAIT_ALL
+    McssSetVanish EFFVM_DEFENDER, FALSE
+    End
+    .balign 4

@@ -1,0 +1,20 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "D",
+    "shapes": [ 12 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_DREAMYARD": [ "shaking_grass" ],
+            "ZONE_ROUTE_1": [ "shaking_grass" ],
+            "ZONE_ROUTE_2": [ "shaking_grass" ],
+            "ZONE_ROUTE_6": [ "shaking_grass" ],
+            "ZONE_ROUTE_12": [ "shaking_grass" ],
+            "ZONE_ROUTE_18": [ "shaking_grass" ],
+            "ZONE_VILLAGE_BRIDGE": [ "shaking_grass" ],
+            "ZONE_ROUTE_20": [ "shaking_grass" ],
+            "ZONE_FLOCCESY_RANCH": [ "shaking_grass" ],
+            "ZONE_VICTORY_ROAD": [ "shaking_grass" ]
+        }
+    }
+}

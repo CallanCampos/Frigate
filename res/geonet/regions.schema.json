@@ -1,0 +1,32 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Geonet's regions: res/geonet/regions.json",
+    "description": "Members 0 to 17 of ARCID_GEONET_PLACE (a/0/5/2): where each region of the countries with regions is on the globe, a member for each country by its placeDataId in sSubdividedCountries (country_region.c), which Geonet_LoadPlaces reads. tools/data/geonet_place_data.py packs them.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "countries" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "countries": {
+            "type": "array", "minItems": 18, "maxItems": 18,
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "country", "regions" ],
+                "properties": {
+                    "country": { "type": "string", "description": "The country's name in res/geonet/countries.json, which sSubdividedCountries gives this member; the packer checks it" },
+                    "regions": {
+                        "type": "array",
+                        "description": "The country's regions, a GeonetRegionPlace each by the region's number; the first isn't a place",
+                        "items": {
+                            "type": "object", "additionalProperties": false, "required": [ "name", "x", "y" ],
+                            "properties": {
+                                "name": { "type": [ "string", "null" ], "description": "The region's name, its message of the country's text bank in sSubdividedCountries by ID, in the same order, or null past its last; the packer checks it and doesn't pack it" },
+                                "x": { "type": "integer", "minimum": -32768, "maximum": 32767, "description": "The globe's turn about its X axis that brings the region to the front (Geonet_AddPlace), in 65536ths of a turn" },
+                                "y": { "type": "integer", "minimum": -32768, "maximum": 32767, "description": "The globe's turn about its Y axis, in 65536ths of a turn" }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

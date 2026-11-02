@@ -17,9 +17,12 @@ typedef struct {
     Field *field;
 } ScriptFieldWork;
 
+// What a ScriptWork holds in magic while it is alive
+#define SCRIPT_WORK_MAGIC 0x3643f
+
 // Fields accessed by the field script work helpers; the remaining storage is not yet identified.
 struct ScriptWork {
-    u32 unk00;
+    u32 magic;
     u16 scriptId;
     u16 unk06;
     FieldActor *parentActor;
@@ -99,7 +102,7 @@ struct ScriptSubwork {
 
 struct FieldScriptEnvArgs {
     u16 zoneId;
-    u16 unk02;
+    u16 scriptId;
     u32 featureLevel;
     u32 reducedFeatureLevel;
     ScriptWork *work;
@@ -153,7 +156,7 @@ void FieldScriptEnv_ShowListMenu(FieldScriptEnv *env);
 void FreeListMenuWork(ScriptListMenu *menu);
 BOOL FieldScriptEnv_UpdateListMenu(FieldScriptEnv *env);
 BOOL FieldScriptEnv_UpdateListMenuEx(FieldScriptEnv *env);
-void ListMenu_ShowDescription(BmpMenuList *list, s32 value, u8 a2);
+void ListMenu_ShowDescription(BmpMenuList *list, s32 value, u8 init);
 FieldMsgBG *FieldScriptEnv_GetMsgBGSys(FieldScriptEnv *env);
 MsgData *GetFieldScriptMsgData(FieldScriptEnv *env);
 u16 GetFieldScriptMsgFileNo(FieldScriptEnv *env);
@@ -170,20 +173,20 @@ void ActorMsgWin_SetPos(FieldScriptEnv *env, u8 pos);
 
 // Runs a script from an event, and returns its work
 ScriptWork *EventScriptCall_Start(GameEvent *event, u16 scriptId, FieldActor *actor, u32 param, HeapID heapId);
-ScriptWork *ScriptWork_Create(HeapID heapId, GameSystem *gsys, GameEvent *event, u16 scriptId, u32 arg4,
+ScriptWork *ScriptWork_Create(HeapID heapId, GameSystem *gsys, GameEvent *event, u16 scriptId, u32 param,
                               u32 featureLevel);
 void ScriptWork_Free(ScriptWork *work);
-// Sets the script's parameters, which it reads from its work
-void ScriptWork_SetParams(ScriptWork *work, u16 param0, u32 param1, u16 param2, u16 param3);
+// Sets the script's parameters, which it reads from its work vars 0x8000 to 0x8003
+void ScriptWork_SetParams(ScriptWork *work, u16 value8000, u32 value8001, u16 value8002, u16 value8003);
 void FieldScript_ResetMapLocalEvents(EventWork *eventWork);
 const u8 *FieldScript_GetInitSCRID(const u8 *script, u32 mode, u16 *scriptId);
 u16 FieldScript_GetSceneChangeSCRID(GameData *gameData, const u8 *script, u32 mode);
 GameEvent *FieldScript_CheckSceneChangeEvent(GameSystem *gsys, HeapID heapId);
-u32 FieldScript_CallZoneInitCore(GameSystem *gsys, u32 arg1, u32 mode, u32 featureLevel);
-void FieldScript_CallOnZoneReload(GameSystem *gsys, u32 arg1);
-void FieldScript_CallOnZoneNewLoad(GameSystem *gsys, u32 arg1);
-void FieldScript_CallOnZoneInit(GameSystem *gsys, u32 a1);
-void FieldScript_CallPlayerInitSetup(GameSystem *gsys, u32 a1);
+u32 FieldScript_CallZoneInitCore(GameSystem *gsys, u32 unused, u32 mode, u32 featureLevel);
+void FieldScript_CallOnZoneReload(GameSystem *gsys, u32 unused);
+void FieldScript_CallOnZoneNewLoad(GameSystem *gsys, u32 unused);
+void FieldScript_CallOnZoneInit(GameSystem *gsys, u32 unused);
+void FieldScript_CallPlayerInitSetup(GameSystem *gsys, u32 unused);
 void FieldScript_CallPlayerPostHOFSetup(GameSystem *gsys, u32 unused);
 void resetRebattleTrainers(EventWork *eventWork);
 

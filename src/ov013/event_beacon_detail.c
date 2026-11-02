@@ -9,13 +9,26 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
+// The steps of the event
+enum {
+    STEP_FADE_OUT,
+    STEP_CLOSE_FIELD,
+    STEP_PUSH_BGM,
+    STEP_START_SCREEN,
+    STEP_WAIT_SCREEN,
+    STEP_OPEN_FIELD,
+    STEP_FADE_IN,
+    STEP_WAIT_BGM,
+    STEP_END,
+};
+
 struct EventBeaconDetail {
     GameSystem *gsys;
     GameData *gameData;
     SaveControl *save;
     BeaconDetailParam param;
-    u8 subscreen;
-    u8 mode;
+    u8 logIndex;
+    u8 logRow;
 };
 
 GameEventReturnCode EventBeaconDetail_Callback(GameEvent *event, u32 *state, void *data);
@@ -27,50 +40,50 @@ GameEventReturnCode EventBeaconDetail_Callback(GameEvent *event, u32 *state, voi
     Field *field = GSYS_GetField(gsys);
 
     switch (*state) {
-    case 0:
+    case STEP_FADE_OUT:
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
         (*state)++;
         break;
-    case 1:
+    case STEP_CLOSE_FIELD:
         GameEvent_ChainNext(event, CreateFieldCloseEvent(gsys, field));
         (*state)++;
         break;
-    case 2:
+    case STEP_PUSH_BGM:
         GameEvent_ChainNext(event, EventBGMPlayPushEx_Create(gsys, 0x483, 6, 0));
         (*state)++;
-    case 3:
+    case STEP_START_SCREEN:
         MI_CpuFill8(&work->param, 0, sizeof(work->param));
         work->param.gsys = work->gsys;
         work->param.gameData = work->gameData;
-        work->param.subscreen = work->subscreen;
-        work->param.mode = work->mode;
+        work->param.logIndex = work->logIndex;
+        work->param.logRow = work->logRow;
         GSYS_QueueProc(gsys, OVERLAY_BEACON_DETAIL, &BeaconDetail_ProcFunctions, &work->param);
         (*state)++;
         break;
-    case 4:
+    case STEP_WAIT_SCREEN:
         if (!GSYS_GetProcMgrState(gsys)) {
             GameEvent_ChainNext(event, EventBGMPop_CreateEx(gsys, 6, 60));
             (*state)++;
         }
         break;
-    case 5:
+    case STEP_OPEN_FIELD:
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
         (*state)++;
         break;
-    case 6:
-        if (work->param.unk0A) {
+    case STEP_FADE_IN:
+        if (work->param.lowBatteryExit) {
             FieldSubscreen_ChangeImm(Field_GetSubscreen(field), 0);
         }
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         (*state)++;
         break;
-    case 7:
+    case STEP_WAIT_BGM:
         GameEvent_ChainNext(event, EventBGMFadeWait_Create(gsys));
         (*state)++;
         break;
-    case 8:
+    case STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -84,7 +97,7 @@ GameEvent *EventBeaconDetail_Create(GameSystem *gsys, const u32 *args) {
     work->gameData = GSYS_GetGameData(gsys);
     work->save = GameData_GetSaveControl(work->gameData);
     work->gsys = gsys;
-    work->subscreen = packed;
-    work->mode = packed >> 16;
+    work->logIndex = packed;
+    work->logRow = packed >> 16;
     return event;
 }

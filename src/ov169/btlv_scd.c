@@ -4,6 +4,7 @@
 #include "battle/btl_client.h"
 #include "battle/btl_main.h"
 #include "battle/btl_pokeparam.h"
+#include "battle/btl_pospoke.h"
 #include "battle/btlv.h"
 #include "battle/btlv_effect.h"
 #include "battle/btlv_input.h"
@@ -23,6 +24,45 @@
 
 // What BtlMain gets the positions of a group of targets by: a group, and the position of the user
 #define TARGET_FLAGS(group, pos) (((group) << 8) | (pos))
+
+// The target screen's range for MOVE_TARGET_SELECTED when a move with MOVE_FLAG_DISTANT is used in a triple battle,
+// after the move data's ranges
+#define TARGET_RANGE_DISTANT 14
+
+// The steps of the command screen: wait for a command, then, after Run, for the screen to close
+enum {
+    COMMAND_SEQ_SELECT,
+    COMMAND_SEQ_WAIT_CLOSE,
+};
+
+// The steps of the yes/no screen: wait for the answer, then for the screen to close
+enum {
+    YES_NO_SEQ_SELECT,
+    YES_NO_SEQ_WAIT_CLOSE,
+};
+
+// The steps of a forced quit of the input: wait for it to be idle, close the screen, wait for that, and end
+enum {
+    FORCE_QUIT_STEP_WAIT_INPUT,
+    FORCE_QUIT_STEP_CLOSE,
+    FORCE_QUIT_STEP_WAIT_CLOSE,
+    FORCE_QUIT_STEP_DONE,
+};
+
+// The move screen's buttons after the four moves (the rotation screen's are numbered the same), and the bit the input
+// sets on the button pressed with L held, which marks the action with BattleAction_SetMoveInfoFlag
+enum {
+    MOVE_BUTTON_BACK = 4,
+    MOVE_BUTTON_SHIFT,
+    MOVE_BUTTON_STRUGGLE = 7,
+};
+#define MOVE_BUTTON_L_HELD 0x8000
+
+// The target screen's back button, after the panels of a double and of a triple battle
+enum {
+    TARGET_BUTTON_BACK_DOUBLE = 4,
+    TARGET_BUTTON_BACK_TRIPLE = 6,
+};
 
 // How the target screen offers its targets: the mons to choose among, or all of a group
 enum {
@@ -82,189 +122,191 @@ struct BtlvScd {
     BtlvInput *input;                   // 0xBC
 }; // size 0xC0
 
-// The screens' buttons (data_ov169_0689da5c: the command screen's, 0689daa4 and 0689da08: the move screen's,
-// 0689da14: yes or no, 0689dabc: the recorder's, and the ones of data_ov169_0689e758 and 0689e7d0: the target
-// screen's, by position and move range), the cursor stops that go with them, and the tables of both by position and
-// range. They are declared in the order that makes MWCC's size sort lay .rodata out as the game's
-static const BtlvInputKeyStop data_ov169_0689dcb0[2] = {
+// The screens' buttons (the command screen's, the move screen's, its Shift variant for the side mons of a triple
+// battle, yes or no, the recorder's, and the target screen's, by the user's position and the move's range), the
+// cursor stops that go with them, and the tables of both by position and range. The target screen's are named after
+// the battle, the range (as MOVE_TARGET_*: Single flashes each panel alone, Distant is TARGET_RANGE_DISTANT) and the
+// user's place on the player's side, Left, Center or Right, where they differ by it. They are declared in the order
+// that makes MWCC's size sort lay .rodata out as the game's
+static const BtlvInputKeyStop sTargetStopsTripleAll[2] = {
     { { 5, 1, 0, 4, -1, -1 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 5, 6 },
     { { 6, 6, 6, 6, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689dfb4[3] = {
+static const BtlvInputKeyStop sTargetStopsDoubleUserOrAlly[3] = {
     { { 0, 0, 0, 0, -1, -1 }, KEY_CURSOR_NONE, 2, KEY_CURSOR_NONE, 1, 0, 4 },
     { { 2, 2, 2, 2, -1, -1 }, KEY_CURSOR_NONE, 2, 0, KEY_CURSOR_NONE, 2, 4 },
     { { 4, 4, 4, 4, -1, -1 }, -1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 4, 4 },
 };
-static const BtlvInputKeyStop data_ov169_0689dc38[2] = {
+static const BtlvInputKeyStop sTargetStopsDoubleUserSide[2] = {
     { { 0, 2, 0, 2, -1, -1 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 0, 4 },
     { { 4, 4, 4, 4, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 4, 4 },
 };
-static const BtlvInputKeyStop data_ov169_0689dfd8[3] = {
+static const BtlvInputKeyStop sTargetStopsTripleAllyCenter[3] = {
     { { 0, 0, 0, 0, -1, -1 }, KEY_CURSOR_NONE, 2, KEY_CURSOR_NONE, 1, 0, 6 },
     { { 4, 4, 4, 4, -1, -1 }, KEY_CURSOR_NONE, 2, 0, KEY_CURSOR_NONE, 4, 6 },
     { { 6, 6, 6, 6, -1, -1 }, -1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689dc50[2] = {
+static const BtlvInputKeyStop sTargetStopsTripleAllAdjacentCenter[2] = {
     { { 5, 1, 0, 4, 4, 0 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 5, 6 },
     { { 6, 6, 6, 6, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689dc68[2] = {
+static const BtlvInputKeyStop sTargetStopsTripleFoes[2] = {
     { { 5, 1, 5, 1, -1, -1 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 5, 6 },
     { { 6, 6, 6, 6, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689dffc[3] = {
+static const BtlvInputKeyStop sTargetStopsTripleFoeLeft[3] = {
     { { 5, 5, 5, 5, -1, -1 }, KEY_CURSOR_NONE, 2, KEY_CURSOR_NONE, 1, 5, 6 },
     { { 3, 3, 3, 3, -1, -1 }, KEY_CURSOR_NONE, 2, 0, KEY_CURSOR_NONE, 3, 6 },
     { { 6, 6, 6, 6, -1, -1 }, -1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689dc80[2] = {
+static const BtlvInputKeyStop sTargetStopsTripleAllAdjacentRight[2] = {
     { { 3, 1, 2, 2, -1, 1 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 3, 6 },
     { { 6, 6, 6, 6, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689e0bc[4] = {
+static const BtlvInputKeyStop sTargetStopsTripleFoeCenter[4] = {
     { { 5, 5, 5, 5, -1, -1 }, KEY_CURSOR_NONE, 3, KEY_CURSOR_NONE, 1, 5, 6 },
     { { 3, 3, 3, 3, -1, -1 }, KEY_CURSOR_NONE, 3, 0, 2, 3, 6 },
     { { 1, 1, 1, 1, -1, -1 }, KEY_CURSOR_NONE, 3, 1, KEY_CURSOR_NONE, 1, 6 },
     { { 6, 6, 6, 6, -1, -1 }, -1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689e0ec[4] = {
+static const BtlvInputKeyStop sCommandStops[4] = {
     { { 0, 0, 0, 0, -1, -1 }, KEY_CURSOR_NONE, -1, 1, 2, 0, -3 },
     { { 1, 1, 1, 1, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 3, 1, -3 },
     { { 2, 2, 2, 2, -1, -1 }, 0, KEY_CURSOR_NONE, 3, KEY_CURSOR_NONE, 2, -3 },
     { { 3, 3, 3, 3, -1, -1 }, 0, KEY_CURSOR_NONE, 1, 2, 3, -3 },
 };
-static const BtlvInputKeyStop data_ov169_0689dcc8[2] = {
+static const BtlvInputKeyStop sTargetStopsTripleUserSide[2] = {
     { { 0, 4, 0, 4, -1, -1 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 0, 6 },
     { { 6, 6, 6, 6, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689dd10[2] = {
+static const BtlvInputKeyStop sTargetStopsTripleLeft[2] = {
     { { 0, 0, 0, 0, -1, -1 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 0, 6 },
     { { 6, 6, 6, 6, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689dce0[2] = {
+static const BtlvInputKeyStop sTargetStopsTripleAdjacentFoesRight[2] = {
     { { 3, 1, 3, 1, -1, -1 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 3, 6 },
     { { 6, 6, 6, 6, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689dde8[2] = {
+static const BtlvInputKeyStop sTargetStopsTripleAdjacentFoesLeft[2] = {
     { { 5, 3, 5, 3, -1, -1 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 5, 6 },
     { { 6, 6, 6, 6, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const TouchRect data_ov169_0689dcf8[6] = {
+static const TouchRect sMoveRects[6] = {
     { 0x20, 0x50, 0x00, 0x80 }, { 0x20, 0x50, 0x80, 0xff }, { 0x50, 0x80, 0x00, 0x80 },
     { 0x50, 0x80, 0x80, 0xff }, { 0x90, 0xc0, 0xb0, 0xff }, { TOUCH_RECT_END, 0x00, 0x00, 0x00 },
 };
-static const TouchRect data_ov169_0689dbb0[5] = {
+static const TouchRect sCommandRects[5] = {
     { 0x18, 0x90, 0x00, 0xff }, { 0x90, 0xc0, 0x00, 0x50 },           { 0x90, 0xc0, 0xb0, 0xff },
     { 0x98, 0xc0, 0x58, 0xa8 }, { TOUCH_RECT_END, 0x00, 0x00, 0x00 },
 };
-static const TouchRect data_ov169_0689dd28[6] = {
+static const TouchRect sTargetRectsDouble[6] = {
     { 0x58, 0x80, 0x00, 0x80 }, { 0x20, 0x58, 0x80, 0xff }, { 0x58, 0x80, 0x80, 0xff },
     { 0x20, 0x58, 0x00, 0x80 }, { 0x90, 0xc0, 0xb0, 0xff }, { TOUCH_RECT_END, 0x00, 0x00, 0x00 },
 };
-static const BtlvInputKeyStop data_ov169_0689e14c[4] = {
+static const BtlvInputKeyStop sTargetStopsDoubleSelectedLeft[4] = {
     { { 3, 3, 3, 3, -1, -1 }, KEY_CURSOR_NONE, 3, KEY_CURSOR_NONE, 1, 3, 4 },
     { { 1, 1, 1, 1, -1, -1 }, KEY_CURSOR_NONE, 2, 0, KEY_CURSOR_NONE, 1, 4 },
     { { 2, 2, 2, 2, -1, -1 }, 1, 3, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 2, 4 },
     { { 4, 4, 4, 4, -1, -1 }, -2, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 4, 4 },
 };
-static const BtlvInputKeyStop data_ov169_0689dd58[2] = {
+static const BtlvInputKeyStop sTargetStopsTripleAllAdjacentLeft[2] = {
     { { 5, 3, 5, 2, 2, -1 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 5, 6 },
     { { 6, 6, 6, 6, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const s32 data_ov169_0689de34[7] = { 0x400, 0x200, 0x800, 0x100, 0x1000, 0x80, 0x10 };
-static const s32 data_ov169_0689de50[7] = { 0x980, 0x980, 0x980, 0x980, 0x980, 0x980, 0x10 };
-static const s32 data_ov169_0689de6c[7] = { 0x1780, 0x1780, 0x1780, 0x1780, 0x1780, 0x1780, 0x10 };
-static const BtlvInputKeyStop data_ov169_0689dd88[2] = {
+static const s32 sTargetFlashRowsTripleSingle[7] = { 0x400, 0x200, 0x800, 0x100, 0x1000, 0x80, 0x10 };
+static const s32 sTargetFlashRowsTripleAllAdjacentLeft[7] = { 0x980, 0x980, 0x980, 0x980, 0x980, 0x980, 0x10 };
+static const s32 sTargetFlashRowsTripleAllAdjacentCenter[7] = { 0x1780, 0x1780, 0x1780, 0x1780, 0x1780, 0x1780, 0x10 };
+static const BtlvInputKeyStop sTargetStopsTripleCenter[2] = {
     { { 2, 2, 2, 2, -1, -1 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 2, 6 },
     { { 6, 6, 6, 6, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689dbf0[2] = {
+static const BtlvInputKeyStop sTargetStopsDoubleFoes[2] = {
     { { 3, 1, 3, 1, -1, -1 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 3, 4 },
     { { 4, 4, 4, 4, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 4, 4 },
 };
-static const BtlvInputKeyStop data_ov169_0689dda0[2] = {
+static const BtlvInputKeyStop sTargetStopsTripleRight[2] = {
     { { 4, 4, 4, 4, -1, -1 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 4, 6 },
     { { 6, 6, 6, 6, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689e17c[4] = {
+static const BtlvInputKeyStop sTargetStopsDoubleSelectedRight[4] = {
     { { 3, 3, 3, 3, -1, -1 }, KEY_CURSOR_NONE, 2, KEY_CURSOR_NONE, 1, 3, 4 },
     { { 1, 1, 1, 1, -1, -1 }, KEY_CURSOR_NONE, 3, 0, KEY_CURSOR_NONE, 1, 4 },
     { { 0, 0, 0, 0, -1, -1 }, 0, 3, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 0, 4 },
     { { 4, 4, 4, 4, -1, -1 }, -2, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 4, 4 },
 };
-static const BtlvInputKeyStop data_ov169_0689e068[3] = {
+static const BtlvInputKeyStop sTargetStopsTripleUserOrAllyLeft[3] = {
     { { 0, 0, 0, 0, -1, -1 }, KEY_CURSOR_NONE, 2, KEY_CURSOR_NONE, 1, 0, 6 },
     { { 2, 2, 2, 2, -1, -1 }, KEY_CURSOR_NONE, 2, 0, KEY_CURSOR_NONE, 2, 6 },
     { { 6, 6, 6, 6, -1, -1 }, -1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689e1ac[4] = {
+static const BtlvInputKeyStop sTargetStopsTripleSelectedLeft[4] = {
     { { 5, 5, 5, 5, -1, -1 }, KEY_CURSOR_NONE, 3, KEY_CURSOR_NONE, 1, 5, 6 },
     { { 3, 3, 3, 3, -1, -1 }, KEY_CURSOR_NONE, 2, 0, KEY_CURSOR_NONE, 3, 6 },
     { { 2, 2, 2, 2, -1, -1 }, 1, 3, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 2, 6 },
     { { 6, 6, 6, 6, -1, -1 }, -2, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689ddd0[2] = {
+static const BtlvInputKeyStop sYesNoStops[2] = {
     { { 0, 0, 0, 0, -1, -1 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 0, 1 },
     { { 1, 1, 1, 1, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 1, 1 },
 };
-const u8 data_ov169_0689e218[2][15] = {
+const u8 BTLV_SCD_TARGET_STOP_COUNTS_DOUBLE[2][15] = {
     { 4, 3, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4 },
     { 4, 3, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4 },
 };
-static const u8 data_ov169_0689d9b0[4] = { 1, 2, 3, 4 };
-static const s32 data_ov169_0689de00[6] = { 0, 0, 0, 0, 1, 0 };
-static const s32 data_ov169_0689dec0[7] = { 0x380, 0x380, 0x380, 0x380, 0x380, 0x380, 0x10 };
-static const s32 data_ov169_0689db9c[5] = { 0x780, 0x780, 0x780, 0x780, 0x10 };
-static const s32 data_ov169_0689def8[7] = { 0x300, 0x300, 0x300, 0x300, 0x300, 0x300, 0x10 };
-static const s32 data_ov169_0689dbc4[5] = { 0x200, 0x400, 0x800, 0x1000, 0x10 };
-static const s32 data_ov169_0689df14[7] = { 0x1c00, 0x1c00, 0x1c00, 0x1c00, 0x1c00, 0x1c00, 0x10 };
-static const s32 data_ov169_0689daf0[4] = { 0x10003, 4, 8, 0x10 };
-static const s32 data_ov169_0689df30[7] = { 0x1f80, 0x1f80, 0x1f80, 0x1f80, 0x1f80, 0x1f80, 0x10 };
-static const s32 data_ov169_0689db10[5] = { 0x200, 0x100, 0x400, 0x80, 0x10 };
-static const s32 data_ov169_0689da38[3] = { 4, 8, 0x10 };
-static const s32 data_ov169_0689db24[5] = { 0x380, 0x380, 0x380, 0x380, 0x10 };
-static const s32 data_ov169_0689d9bc[2] = { 4, 8 };
-static const TouchRect data_ov169_0689df4c[8] = {
+static const u8 sCommandResults[4] = { BTLV_COMMAND_FIGHT, BTLV_COMMAND_BAG, BTLV_COMMAND_POKEMON, BTLV_COMMAND_RUN };
+static const s32 sMoveFlagsShift[6] = { 0, 0, 0, 0, 1, 0 };
+static const s32 sTargetFlashRowsTripleFoes[7] = { 0x380, 0x380, 0x380, 0x380, 0x380, 0x380, 0x10 };
+static const s32 sTargetFlashRowsDoubleAll[5] = { 0x780, 0x780, 0x780, 0x780, 0x10 };
+static const s32 sTargetFlashRowsTripleAdjacentFoesRight[7] = { 0x300, 0x300, 0x300, 0x300, 0x300, 0x300, 0x10 };
+static const s32 sMoveFlashRows[5] = { 0x200, 0x400, 0x800, 0x1000, 0x10 };
+static const s32 sTargetFlashRowsTripleUserSide[7] = { 0x1c00, 0x1c00, 0x1c00, 0x1c00, 0x1c00, 0x1c00, 0x10 };
+static const s32 sCommandFlashRows[4] = { 0x10003, 4, 8, 0x10 };
+static const s32 sTargetFlashRowsTripleAll[7] = { 0x1f80, 0x1f80, 0x1f80, 0x1f80, 0x1f80, 0x1f80, 0x10 };
+static const s32 sTargetFlashRowsDoubleSingle[5] = { 0x200, 0x100, 0x400, 0x80, 0x10 };
+static const s32 sRecorderFlashRows[3] = { 4, 8, 0x10 };
+static const s32 sTargetFlashRowsDoubleAllAdjacentRight[5] = { 0x380, 0x380, 0x380, 0x380, 0x10 };
+static const s32 sYesNoFlashRows[2] = { 4, 8 };
+static const TouchRect sTargetRectsTriple[8] = {
     { 0x58, 0x80, 0x08, 0x58 }, { 0x20, 0x58, 0xa8, 0xf8 },           { 0x58, 0x80, 0x58, 0xa8 },
     { 0x20, 0x58, 0x58, 0xa8 }, { 0x58, 0x80, 0xa8, 0xf8 },           { 0x20, 0x58, 0x08, 0x58 },
     { 0x90, 0xc0, 0xb0, 0xff }, { TOUCH_RECT_END, 0x00, 0x00, 0x00 },
 };
-static const BtlvInputKeyStop data_ov169_0689e1dc[5] = {
+static const BtlvInputKeyStop sMoveStops[5] = {
     { { 0, 0, 0, 0, -1, -1 }, KEY_CURSOR_NONE, 2, KEY_CURSOR_NONE, 1, 0, 4 },
     { { 1, 1, 1, 1, -1, -1 }, KEY_CURSOR_NONE, 3, 0, KEY_CURSOR_NONE, 1, 4 },
     { { 2, 2, 2, 2, -1, -1 }, 0, 4, KEY_CURSOR_NONE, 3, 2, 4 },
     { { 3, 3, 3, 3, -1, -1 }, 1, 4, 2, KEY_CURSOR_NONE, 3, 4 },
     { { 4, 4, 4, 4, -1, -1 }, -2, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 4, 4 },
 };
-static const BtlvInputKeyStop data_ov169_0689dbd8[2] = {
+static const BtlvInputKeyStop sTargetStopsDoubleAllAdjacentRight[2] = {
     { { 3, 1, 0, 1, -1, 0 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 3, 4 },
     { { 4, 4, 4, 4, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 4, 4 },
 };
-static const BtlvInputKeyStop data_ov169_0689df6c[3] = {
+static const BtlvInputKeyStop sTargetStopsDoubleFoe[3] = {
     { { 3, 3, 3, 3, -1, -1 }, KEY_CURSOR_NONE, 2, KEY_CURSOR_NONE, 1, 3, 4 },
     { { 1, 1, 1, 1, -1, -1 }, KEY_CURSOR_NONE, 2, 0, KEY_CURSOR_NONE, 1, 4 },
     { { 4, 4, 4, 4, -1, -1 }, -1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 4, 4 },
 };
-static const BtlvInputKeyStop data_ov169_0689dc08[2] = {
+static const BtlvInputKeyStop sTargetStopsDoubleLeft[2] = {
     { { 0, 0, 0, 0, -1, -1 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 0, 4 },
     { { 4, 4, 4, 4, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 4, 4 },
 };
-static const BtlvInputKeyStop data_ov169_0689dc20[2] = {
+static const BtlvInputKeyStop sTargetStopsTripleAllyOuter[2] = {
     { { 2, 2, 2, 2, -1, -1 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 2, 6 },
     { { 6, 6, 6, 6, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689e08c[4] = {
+static const BtlvInputKeyStop sTargetStopsTripleSelectedRight[4] = {
     { { 3, 3, 3, 3, -1, -1 }, KEY_CURSOR_NONE, 2, KEY_CURSOR_NONE, 1, 3, 6 },
     { { 1, 1, 1, 1, -1, -1 }, KEY_CURSOR_NONE, 3, 0, KEY_CURSOR_NONE, 1, 6 },
     { { 2, 2, 2, 2, -1, -1 }, 0, 3, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 2, 6 },
     { { 6, 6, 6, 6, -1, -1 }, -1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689df90[3] = {
+static const BtlvInputKeyStop sTargetStopsTripleUserOrAllyRight[3] = {
     { { 2, 2, 2, 2, -1, -1 }, KEY_CURSOR_NONE, 2, KEY_CURSOR_NONE, 1, 2, 6 },
     { { 4, 4, 4, 4, -1, -1 }, KEY_CURSOR_NONE, 2, 0, KEY_CURSOR_NONE, 4, 6 },
     { { 6, 6, 6, 6, -1, -1 }, -1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689e268[6] = {
+static const BtlvInputKeyStop sTargetStopsTripleSelectedCenter[6] = {
     { { 5, 5, 5, 5, -1, -1 }, KEY_CURSOR_NONE, 3, KEY_CURSOR_NONE, 1, 5, 6 },
     { { 3, 3, 3, 3, -1, -1 }, KEY_CURSOR_NONE, 5, 0, 2, 3, 6 },
     { { 1, 1, 1, 1, -1, -1 }, KEY_CURSOR_NONE, 4, 1, KEY_CURSOR_NONE, 1, 6 },
@@ -272,15 +314,15 @@ static const BtlvInputKeyStop data_ov169_0689e268[6] = {
     { { 4, 4, 4, 4, -1, -1 }, 2, 5, 3, KEY_CURSOR_NONE, 4, 6 },
     { { 6, 6, 6, 6, -1, -1 }, -1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689ddb8[2] = {
+static const BtlvInputKeyStop sTargetStopsDoubleAllAdjacentLeft[2] = {
     { { 3, 1, 3, 2, 2, -1 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 3, 4 },
     { { 4, 4, 4, 4, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 4, 4 },
 };
-static const BtlvInputKeyStop data_ov169_0689dd70[2] = {
+static const BtlvInputKeyStop sTargetStopsDoubleRight[2] = {
     { { 2, 2, 2, 2, -1, -1 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 2, 4 },
     { { 4, 4, 4, 4, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 4, 4 },
 };
-static const BtlvInputKeyStop data_ov169_0689e2b0[6] = {
+static const BtlvInputKeyStop sMoveStopsShift[6] = {
     { { 0, 0, 0, 0, -1, -1 }, KEY_CURSOR_NONE, 2, KEY_CURSOR_NONE, 1, 0, 4 },
     { { 1, 1, 1, 1, -1, -1 }, KEY_CURSOR_NONE, 3, 0, KEY_CURSOR_NONE, 1, 4 },
     { { 2, 2, 2, 2, -1, -1 }, 0, 5, KEY_CURSOR_NONE, 3, 2, 4 },
@@ -288,7 +330,7 @@ static const BtlvInputKeyStop data_ov169_0689e2b0[6] = {
     { { 4, 4, 4, 4, -1, -1 }, 3, KEY_CURSOR_NONE, 5, KEY_CURSOR_NONE, 4, 4 },
     { { 5, 5, 5, 5, -1, -1 }, 2, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 4, 5, 4 },
 };
-static const BtlvInputKeyStop data_ov169_0689e2f8[6] = {
+static const BtlvInputKeyStop sTargetStopsTripleDistantLeft[6] = {
     { { 5, 5, 5, 5, -1, -1 }, KEY_CURSOR_NONE, 5, KEY_CURSOR_NONE, 1, 5, 6 },
     { { 3, 3, 3, 3, -1, -1 }, KEY_CURSOR_NONE, 3, 0, 2, 3, 6 },
     { { 1, 1, 1, 1, -1, -1 }, KEY_CURSOR_NONE, 4, 1, KEY_CURSOR_NONE, 1, 6 },
@@ -296,13 +338,13 @@ static const BtlvInputKeyStop data_ov169_0689e2f8[6] = {
     { { 4, 4, 4, 4, -1, -1 }, 2, 5, 3, KEY_CURSOR_NONE, 4, 6 },
     { { 6, 6, 6, 6, -1, -1 }, -1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689e11c[4] = {
+static const BtlvInputKeyStop sTargetStopsTripleUserOrAllyCenter[4] = {
     { { 0, 0, 0, 0, -1, -1 }, KEY_CURSOR_NONE, 3, KEY_CURSOR_NONE, 1, 0, 6 },
     { { 2, 2, 2, 2, -1, -1 }, KEY_CURSOR_NONE, 3, 0, 2, 2, 6 },
     { { 4, 4, 4, 4, -1, -1 }, KEY_CURSOR_NONE, 3, 1, KEY_CURSOR_NONE, 4, 6 },
     { { 6, 6, 6, 6, -1, -1 }, -1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689e340[6] = {
+static const BtlvInputKeyStop sTargetStopsTripleDistantRight[6] = {
     { { 5, 5, 5, 5, -1, -1 }, KEY_CURSOR_NONE, 3, KEY_CURSOR_NONE, 1, 5, 6 },
     { { 3, 3, 3, 3, -1, -1 }, KEY_CURSOR_NONE, 4, 0, 2, 3, 6 },
     { { 1, 1, 1, 1, -1, -1 }, KEY_CURSOR_NONE, 5, 1, KEY_CURSOR_NONE, 1, 6 },
@@ -310,111 +352,144 @@ static const BtlvInputKeyStop data_ov169_0689e340[6] = {
     { { 2, 2, 2, 2, -1, -1 }, 2, 5, 3, KEY_CURSOR_NONE, 2, 6 },
     { { 6, 6, 6, 6, -1, -1 }, -1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689e020[3] = {
+static const BtlvInputKeyStop sTargetStopsTripleFoeRight[3] = {
     { { 3, 3, 3, 3, -1, -1 }, KEY_CURSOR_NONE, 2, KEY_CURSOR_NONE, 1, 3, 6 },
     { { 1, 1, 1, 1, -1, -1 }, KEY_CURSOR_NONE, 2, 0, KEY_CURSOR_NONE, 1, 6 },
     { { 6, 6, 6, 6, -1, -1 }, -1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 6 },
 };
-static const BtlvInputKeyStop data_ov169_0689dd40[2] = {
+static const BtlvInputKeyStop sTargetStopsDoubleAll[2] = {
     { { 3, 1, 0, 2, -1, -1 }, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 3, 4 },
     { { 4, 4, 4, 4, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 4, 4 },
 };
-static const BtlvInputKeyStop data_ov169_0689e044[3] = {
+static const BtlvInputKeyStop sRecorderStops[3] = {
     { { 0, 0, 0, 0, -1, -1 }, KEY_CURSOR_NONE, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 2, 0, KEY_CURSOR_NONE },
     { { 1, 1, 1, 1, -1, -1 }, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 2, KEY_CURSOR_NONE, 1, KEY_CURSOR_NONE },
     { { 2, 2, 2, 2, -1, -1 }, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 0, 1, 2, KEY_CURSOR_NONE },
 };
-static const s32 data_ov169_0689db74[5] = { 0x580, 0x580, 0x580, 0x580, 0x10 };
-static const s32 data_ov169_0689dc98[6] = { 0x200, 0x400, 0x800, 0x1000, 0x10, 4 };
-static const s32 data_ov169_0689db4c[5] = { 0x600, 0x600, 0x600, 0x600, 0x10 };
-static const s32 data_ov169_0689db88[5] = { 0x180, 0x180, 0x180, 0x180, 0x10 };
-static const s32 data_ov169_0689de88[7] = { 0xb00, 0xb00, 0xb00, 0xb00, 0xb00, 0xb00, 0x10 };
-static const s32 data_ov169_0689dea4[7] = { 0x180, 0x180, 0x180, 0x180, 0x180, 0x180, 0x10 };
-static const TouchRect data_ov169_0689dedc[7] = {
+static const s32 sTargetFlashRowsDoubleAllAdjacentLeft[5] = { 0x580, 0x580, 0x580, 0x580, 0x10 };
+static const s32 sMoveFlashRowsShift[6] = { 0x200, 0x400, 0x800, 0x1000, 0x10, 4 };
+static const s32 sTargetFlashRowsDoubleUserSide[5] = { 0x600, 0x600, 0x600, 0x600, 0x10 };
+static const s32 sTargetFlashRowsDoubleFoes[5] = { 0x180, 0x180, 0x180, 0x180, 0x10 };
+static const s32 sTargetFlashRowsTripleAllAdjacentRight[7] = { 0xb00, 0xb00, 0xb00, 0xb00, 0xb00, 0xb00, 0x10 };
+static const s32 sTargetFlashRowsTripleAdjacentFoesLeft[7] = { 0x180, 0x180, 0x180, 0x180, 0x180, 0x180, 0x10 };
+static const TouchRect sMoveRectsShift[7] = {
     { 0x20, 0x50, 0x00, 0x80 },           { 0x20, 0x50, 0x80, 0xff }, { 0x50, 0x80, 0x00, 0x80 },
     { 0x50, 0x80, 0x80, 0xff },           { 0x90, 0xc0, 0xb0, 0xff }, { 0x90, 0xc0, 0x00, 0x50 },
     { TOUCH_RECT_END, 0x00, 0x00, 0x00 },
 };
-static const TouchRect data_ov169_0689da80[3] = {
+static const TouchRect sYesNoRects[3] = {
     { 0x20, 0x50, 0x00, 0xff },
     { 0x50, 0x80, 0x00, 0xff },
     { TOUCH_RECT_END, 0x00, 0x00, 0x00 },
 };
-static const TouchRect data_ov169_0689dae0[4] = {
+static const TouchRect sRecorderRects[4] = {
     { 0x90, 0xc0, 0x00, 0x50 },
     { 0x90, 0xc0, 0xb0, 0xff },
     { 0x98, 0xc0, 0x58, 0xa8 },
     { TOUCH_RECT_END, 0x00, 0x00, 0x00 },
 };
-static const s32 data_ov169_0689db00[4] = { 0, 0, 0, 2 };
-static const s32 data_ov169_0689da68[3] = { 0, 0, 0 };
-static const s32 data_ov169_0689d9c4[2] = { 0, 0 };
-static const s32 data_ov169_0689de18[7] = { 0, 0, 0, 0, 0, 0, 3 };
-static const s32 data_ov169_0689db60[5] = { 0, 0, 0, 0, 1 };
-static const BtlvInputButtonSet data_ov169_0689da8c = { data_ov169_0689dd28, data_ov169_0689db60, data_ov169_0689db9c };
-static const BtlvInputButtonSet data_ov169_0689d9fc = { data_ov169_0689df4c, data_ov169_0689de18, data_ov169_0689de50 };
-static const BtlvInputButtonSet data_ov169_0689da74 = { data_ov169_0689dd28, data_ov169_0689db60, data_ov169_0689db24 };
-static const BtlvInputButtonSet data_ov169_0689da2c = { data_ov169_0689df4c, data_ov169_0689de18, data_ov169_0689de88 };
-static const BtlvInputButtonSet data_ov169_0689da50 = { data_ov169_0689dd28, data_ov169_0689db60, data_ov169_0689db88 };
-static const BtlvInputButtonSet data_ov169_0689d9cc = { data_ov169_0689df4c, data_ov169_0689de18, data_ov169_0689de34 };
-static const BtlvInputButtonSet data_ov169_0689da98 = { data_ov169_0689df4c, data_ov169_0689de18, data_ov169_0689dea4 };
-static const BtlvInputButtonSet data_ov169_0689dad4 = { data_ov169_0689df4c, data_ov169_0689de18, data_ov169_0689df14 };
-static const BtlvInputButtonSet data_ov169_0689d9d8 = { data_ov169_0689df4c, data_ov169_0689de18, data_ov169_0689dec0 };
-const u8 data_ov169_0689e238[3][15] = {
+static const s32 sCommandFlags[4] = { 0, 0, 0, 2 };
+static const s32 sRecorderFlags[3] = { 0, 0, 0 };
+static const s32 sYesNoFlags[2] = { 0, 0 };
+static const s32 sTargetFlagsTriple[7] = { 0, 0, 0, 0, 0, 0, 3 };
+static const s32 sTargetFlagsDouble[5] = { 0, 0, 0, 0, 1 };
+static const BtlvInputButtonSet sTargetButtonsDoubleAll = { sTargetRectsDouble, sTargetFlagsDouble,
+                                                            sTargetFlashRowsDoubleAll };
+static const BtlvInputButtonSet sTargetButtonsTripleAllAdjacentLeft = { sTargetRectsTriple, sTargetFlagsTriple,
+                                                                        sTargetFlashRowsTripleAllAdjacentLeft };
+static const BtlvInputButtonSet sTargetButtonsDoubleAllAdjacentRight = { sTargetRectsDouble, sTargetFlagsDouble,
+                                                                         sTargetFlashRowsDoubleAllAdjacentRight };
+static const BtlvInputButtonSet sTargetButtonsTripleAllAdjacentRight = { sTargetRectsTriple, sTargetFlagsTriple,
+                                                                         sTargetFlashRowsTripleAllAdjacentRight };
+static const BtlvInputButtonSet sTargetButtonsDoubleFoes = { sTargetRectsDouble, sTargetFlagsDouble,
+                                                             sTargetFlashRowsDoubleFoes };
+static const BtlvInputButtonSet sTargetButtonsTripleSingle = { sTargetRectsTriple, sTargetFlagsTriple,
+                                                               sTargetFlashRowsTripleSingle };
+static const BtlvInputButtonSet sTargetButtonsTripleAdjacentFoesLeft = { sTargetRectsTriple, sTargetFlagsTriple,
+                                                                         sTargetFlashRowsTripleAdjacentFoesLeft };
+static const BtlvInputButtonSet sTargetButtonsTripleUserSide = { sTargetRectsTriple, sTargetFlagsTriple,
+                                                                 sTargetFlashRowsTripleUserSide };
+static const BtlvInputButtonSet sTargetButtonsTripleFoes = { sTargetRectsTriple, sTargetFlagsTriple,
+                                                             sTargetFlashRowsTripleFoes };
+const u8 BTLV_SCD_TARGET_STOP_COUNTS_TRIPLE[3][15] = {
     { 4, 3, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 6 },
     { 6, 4, 3, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 6 },
     { 4, 3, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 6 },
 };
-static const u8 data_ov169_0689d9b4[6] = { 2, 3, 4, 5, 6, 7 };
-const BtlvInputKeyStop *data_ov169_0689e6e0[2][15] = {
-    { data_ov169_0689e14c, data_ov169_0689dfb4, data_ov169_0689dd70, data_ov169_0689df6c, data_ov169_0689ddb8,
-      data_ov169_0689dbf0, data_ov169_0689dc38, data_ov169_0689dc08, data_ov169_0689dd40, data_ov169_0689dc08,
-      data_ov169_0689dd40, data_ov169_0689dbf0, data_ov169_0689dc38, data_ov169_0689dc08, data_ov169_0689e14c },
-    { data_ov169_0689e17c, data_ov169_0689dfb4, data_ov169_0689dc08, data_ov169_0689df6c, data_ov169_0689dbd8,
-      data_ov169_0689dbf0, data_ov169_0689dc38, data_ov169_0689dd70, data_ov169_0689dd40, data_ov169_0689dd70,
-      data_ov169_0689dd40, data_ov169_0689dbf0, data_ov169_0689dc38, data_ov169_0689dd70, data_ov169_0689e17c },
+static const u8 sTargetButtonViewPos[6] = { 2, 3, 4, 5, 6, 7 };
+const BtlvInputKeyStop *BTLV_SCD_TARGET_STOPS_DOUBLE[2][15] = {
+    { sTargetStopsDoubleSelectedLeft, sTargetStopsDoubleUserOrAlly, sTargetStopsDoubleRight, sTargetStopsDoubleFoe,
+      sTargetStopsDoubleAllAdjacentLeft, sTargetStopsDoubleFoes, sTargetStopsDoubleUserSide, sTargetStopsDoubleLeft,
+      sTargetStopsDoubleAll, sTargetStopsDoubleLeft, sTargetStopsDoubleAll, sTargetStopsDoubleFoes,
+      sTargetStopsDoubleUserSide, sTargetStopsDoubleLeft, sTargetStopsDoubleSelectedLeft },
+    { sTargetStopsDoubleSelectedRight, sTargetStopsDoubleUserOrAlly, sTargetStopsDoubleLeft, sTargetStopsDoubleFoe,
+      sTargetStopsDoubleAllAdjacentRight, sTargetStopsDoubleFoes, sTargetStopsDoubleUserSide, sTargetStopsDoubleRight,
+      sTargetStopsDoubleAll, sTargetStopsDoubleRight, sTargetStopsDoubleAll, sTargetStopsDoubleFoes,
+      sTargetStopsDoubleUserSide, sTargetStopsDoubleRight, sTargetStopsDoubleSelectedRight },
 };
-static const s32 data_ov169_0689db38[5] = { 0, 0, 0, 0, 1 };
-static const BtlvInputButtonSet data_ov169_0689d9f0 = { data_ov169_0689dd28, data_ov169_0689db60, data_ov169_0689db74 };
-static const BtlvInputButtonSet data_ov169_0689da5c = { data_ov169_0689dbb0, data_ov169_0689db00, data_ov169_0689daf0 };
-static const BtlvInputButtonSet data_ov169_0689dabc = { data_ov169_0689dae0, data_ov169_0689da68, data_ov169_0689da38 };
-static const BtlvInputButtonSet data_ov169_0689da14 = { data_ov169_0689da80, data_ov169_0689d9c4, data_ov169_0689d9bc };
-static const BtlvInputButtonSet data_ov169_0689dab0 = { data_ov169_0689df4c, data_ov169_0689de18, data_ov169_0689de6c };
-static const BtlvInputButtonSet data_ov169_0689daa4 = { data_ov169_0689dcf8, data_ov169_0689db38, data_ov169_0689dbc4 };
-static const BtlvInputButtonSet data_ov169_0689da08 = { data_ov169_0689dedc, data_ov169_0689de00, data_ov169_0689dc98 };
-static const BtlvInputButtonSet data_ov169_0689d9e4 = { data_ov169_0689dd28, data_ov169_0689db60, data_ov169_0689db4c };
-static const BtlvInputButtonSet data_ov169_0689da20 = { data_ov169_0689dd28, data_ov169_0689db60, data_ov169_0689db10 };
-static const BtlvInputButtonSet data_ov169_0689dac8 = { data_ov169_0689df4c, data_ov169_0689de18, data_ov169_0689df30 };
-static const BtlvInputButtonSet data_ov169_0689da44 = { data_ov169_0689df4c, data_ov169_0689de18, data_ov169_0689def8 };
-static const BtlvInputButtonSet *data_ov169_0689e7d0[3][15] = {
-    { &data_ov169_0689d9cc, &data_ov169_0689d9cc, &data_ov169_0689d9cc, &data_ov169_0689d9cc, &data_ov169_0689d9fc,
-      &data_ov169_0689da98, &data_ov169_0689dad4, &data_ov169_0689d9cc, &data_ov169_0689dac8, &data_ov169_0689d9cc,
-      &data_ov169_0689dac8, &data_ov169_0689d9d8, &data_ov169_0689dad4, &data_ov169_0689d9cc, &data_ov169_0689d9cc },
-    { &data_ov169_0689d9cc, &data_ov169_0689d9cc, &data_ov169_0689d9cc, &data_ov169_0689d9cc, &data_ov169_0689dab0,
-      &data_ov169_0689d9d8, &data_ov169_0689dad4, &data_ov169_0689d9cc, &data_ov169_0689dac8, &data_ov169_0689d9cc,
-      &data_ov169_0689dac8, &data_ov169_0689d9d8, &data_ov169_0689dad4, &data_ov169_0689d9cc, &data_ov169_0689d9cc },
-    { &data_ov169_0689d9cc, &data_ov169_0689d9cc, &data_ov169_0689d9cc, &data_ov169_0689d9cc, &data_ov169_0689da2c,
-      &data_ov169_0689da44, &data_ov169_0689dad4, &data_ov169_0689d9cc, &data_ov169_0689dac8, &data_ov169_0689d9cc,
-      &data_ov169_0689dac8, &data_ov169_0689d9d8, &data_ov169_0689dad4, &data_ov169_0689d9cc, &data_ov169_0689d9cc },
+static const s32 sMoveFlags[5] = { 0, 0, 0, 0, 1 };
+static const BtlvInputButtonSet sTargetButtonsDoubleAllAdjacentLeft = { sTargetRectsDouble, sTargetFlagsDouble,
+                                                                        sTargetFlashRowsDoubleAllAdjacentLeft };
+static const BtlvInputButtonSet sCommandButtons = { sCommandRects, sCommandFlags, sCommandFlashRows };
+static const BtlvInputButtonSet sRecorderButtons = { sRecorderRects, sRecorderFlags, sRecorderFlashRows };
+static const BtlvInputButtonSet sYesNoButtons = { sYesNoRects, sYesNoFlags, sYesNoFlashRows };
+static const BtlvInputButtonSet sTargetButtonsTripleAllAdjacentCenter = { sTargetRectsTriple, sTargetFlagsTriple,
+                                                                          sTargetFlashRowsTripleAllAdjacentCenter };
+static const BtlvInputButtonSet sMoveButtons = { sMoveRects, sMoveFlags, sMoveFlashRows };
+static const BtlvInputButtonSet sMoveButtonsShift = { sMoveRectsShift, sMoveFlagsShift, sMoveFlashRowsShift };
+static const BtlvInputButtonSet sTargetButtonsDoubleUserSide = { sTargetRectsDouble, sTargetFlagsDouble,
+                                                                 sTargetFlashRowsDoubleUserSide };
+static const BtlvInputButtonSet sTargetButtonsDoubleSingle = { sTargetRectsDouble, sTargetFlagsDouble,
+                                                               sTargetFlashRowsDoubleSingle };
+static const BtlvInputButtonSet sTargetButtonsTripleAll = { sTargetRectsTriple, sTargetFlagsTriple,
+                                                            sTargetFlashRowsTripleAll };
+static const BtlvInputButtonSet sTargetButtonsTripleAdjacentFoesRight = { sTargetRectsTriple, sTargetFlagsTriple,
+                                                                          sTargetFlashRowsTripleAdjacentFoesRight };
+static const BtlvInputButtonSet *sTargetButtonSetsTriple[3][15] = {
+    { &sTargetButtonsTripleSingle, &sTargetButtonsTripleSingle, &sTargetButtonsTripleSingle,
+      &sTargetButtonsTripleSingle, &sTargetButtonsTripleAllAdjacentLeft, &sTargetButtonsTripleAdjacentFoesLeft,
+      &sTargetButtonsTripleUserSide, &sTargetButtonsTripleSingle, &sTargetButtonsTripleAll, &sTargetButtonsTripleSingle,
+      &sTargetButtonsTripleAll, &sTargetButtonsTripleFoes, &sTargetButtonsTripleUserSide, &sTargetButtonsTripleSingle,
+      &sTargetButtonsTripleSingle },
+    { &sTargetButtonsTripleSingle, &sTargetButtonsTripleSingle, &sTargetButtonsTripleSingle,
+      &sTargetButtonsTripleSingle, &sTargetButtonsTripleAllAdjacentCenter, &sTargetButtonsTripleFoes,
+      &sTargetButtonsTripleUserSide, &sTargetButtonsTripleSingle, &sTargetButtonsTripleAll, &sTargetButtonsTripleSingle,
+      &sTargetButtonsTripleAll, &sTargetButtonsTripleFoes, &sTargetButtonsTripleUserSide, &sTargetButtonsTripleSingle,
+      &sTargetButtonsTripleSingle },
+    { &sTargetButtonsTripleSingle, &sTargetButtonsTripleSingle, &sTargetButtonsTripleSingle,
+      &sTargetButtonsTripleSingle, &sTargetButtonsTripleAllAdjacentRight, &sTargetButtonsTripleAdjacentFoesRight,
+      &sTargetButtonsTripleUserSide, &sTargetButtonsTripleSingle, &sTargetButtonsTripleAll, &sTargetButtonsTripleSingle,
+      &sTargetButtonsTripleAll, &sTargetButtonsTripleFoes, &sTargetButtonsTripleUserSide, &sTargetButtonsTripleSingle,
+      &sTargetButtonsTripleSingle },
 };
-const BtlvInputKeyStop *data_ov169_0689e884[3][15] = {
-    { data_ov169_0689e1ac, data_ov169_0689e068, data_ov169_0689dc20, data_ov169_0689dffc, data_ov169_0689dd58,
-      data_ov169_0689dde8, data_ov169_0689dcc8, data_ov169_0689dd10, data_ov169_0689dcb0, data_ov169_0689dd10,
-      data_ov169_0689dcb0, data_ov169_0689dc68, data_ov169_0689dcc8, data_ov169_0689dd10, data_ov169_0689e2f8 },
-    { data_ov169_0689e268, data_ov169_0689e11c, data_ov169_0689dfd8, data_ov169_0689e0bc, data_ov169_0689dc50,
-      data_ov169_0689dc68, data_ov169_0689dcc8, data_ov169_0689dd88, data_ov169_0689dcb0, data_ov169_0689dd88,
-      data_ov169_0689dcb0, data_ov169_0689dc68, data_ov169_0689dcc8, data_ov169_0689dd88, data_ov169_0689e268 },
-    { data_ov169_0689e08c, data_ov169_0689df90, data_ov169_0689dc20, data_ov169_0689e020, data_ov169_0689dc80,
-      data_ov169_0689dce0, data_ov169_0689dcc8, data_ov169_0689dda0, data_ov169_0689dcb0, data_ov169_0689dda0,
-      data_ov169_0689dcb0, data_ov169_0689dc68, data_ov169_0689dcc8, data_ov169_0689dda0, data_ov169_0689e340 },
+const BtlvInputKeyStop *BTLV_SCD_TARGET_STOPS_TRIPLE[3][15] = {
+    { sTargetStopsTripleSelectedLeft, sTargetStopsTripleUserOrAllyLeft, sTargetStopsTripleAllyOuter,
+      sTargetStopsTripleFoeLeft, sTargetStopsTripleAllAdjacentLeft, sTargetStopsTripleAdjacentFoesLeft,
+      sTargetStopsTripleUserSide, sTargetStopsTripleLeft, sTargetStopsTripleAll, sTargetStopsTripleLeft,
+      sTargetStopsTripleAll, sTargetStopsTripleFoes, sTargetStopsTripleUserSide, sTargetStopsTripleLeft,
+      sTargetStopsTripleDistantLeft },
+    { sTargetStopsTripleSelectedCenter, sTargetStopsTripleUserOrAllyCenter, sTargetStopsTripleAllyCenter,
+      sTargetStopsTripleFoeCenter, sTargetStopsTripleAllAdjacentCenter, sTargetStopsTripleFoes,
+      sTargetStopsTripleUserSide, sTargetStopsTripleCenter, sTargetStopsTripleAll, sTargetStopsTripleCenter,
+      sTargetStopsTripleAll, sTargetStopsTripleFoes, sTargetStopsTripleUserSide, sTargetStopsTripleCenter,
+      sTargetStopsTripleSelectedCenter },
+    { sTargetStopsTripleSelectedRight, sTargetStopsTripleUserOrAllyRight, sTargetStopsTripleAllyOuter,
+      sTargetStopsTripleFoeRight, sTargetStopsTripleAllAdjacentRight, sTargetStopsTripleAdjacentFoesRight,
+      sTargetStopsTripleUserSide, sTargetStopsTripleRight, sTargetStopsTripleAll, sTargetStopsTripleRight,
+      sTargetStopsTripleAll, sTargetStopsTripleFoes, sTargetStopsTripleUserSide, sTargetStopsTripleRight,
+      sTargetStopsTripleDistantRight },
 };
-static const BtlvInputButtonSet *data_ov169_0689e758[2][15] = {
-    { &data_ov169_0689da20, &data_ov169_0689da20, &data_ov169_0689da20, &data_ov169_0689da20, &data_ov169_0689d9f0,
-      &data_ov169_0689da50, &data_ov169_0689d9e4, &data_ov169_0689da20, &data_ov169_0689da8c, &data_ov169_0689da20,
-      &data_ov169_0689da8c, &data_ov169_0689da50, &data_ov169_0689d9e4, &data_ov169_0689da20, &data_ov169_0689da20 },
-    { &data_ov169_0689da20, &data_ov169_0689da20, &data_ov169_0689da20, &data_ov169_0689da20, &data_ov169_0689da74,
-      &data_ov169_0689da50, &data_ov169_0689d9e4, &data_ov169_0689da20, &data_ov169_0689da8c, &data_ov169_0689da20,
-      &data_ov169_0689da8c, &data_ov169_0689da50, &data_ov169_0689d9e4, &data_ov169_0689da20, &data_ov169_0689da20 },
+static const BtlvInputButtonSet *sTargetButtonSetsDouble[2][15] = {
+    { &sTargetButtonsDoubleSingle, &sTargetButtonsDoubleSingle, &sTargetButtonsDoubleSingle,
+      &sTargetButtonsDoubleSingle, &sTargetButtonsDoubleAllAdjacentLeft, &sTargetButtonsDoubleFoes,
+      &sTargetButtonsDoubleUserSide, &sTargetButtonsDoubleSingle, &sTargetButtonsDoubleAll, &sTargetButtonsDoubleSingle,
+      &sTargetButtonsDoubleAll, &sTargetButtonsDoubleFoes, &sTargetButtonsDoubleUserSide, &sTargetButtonsDoubleSingle,
+      &sTargetButtonsDoubleSingle },
+    { &sTargetButtonsDoubleSingle, &sTargetButtonsDoubleSingle, &sTargetButtonsDoubleSingle,
+      &sTargetButtonsDoubleSingle, &sTargetButtonsDoubleAllAdjacentRight, &sTargetButtonsDoubleFoes,
+      &sTargetButtonsDoubleUserSide, &sTargetButtonsDoubleSingle, &sTargetButtonsDoubleAll, &sTargetButtonsDoubleSingle,
+      &sTargetButtonsDoubleAll, &sTargetButtonsDoubleFoes, &sTargetButtonsDoubleUserSide, &sTargetButtonsDoubleSingle,
+      &sTargetButtonsDoubleSingle },
 };
 
 static void BtlvScd_Nop(BtlvScd *scd);
@@ -455,11 +530,11 @@ BtlvScd *BtlvScd_Create(BtlvCore *core, BtlMainModule *mainModule, BtlPokeCon *p
     scd->unk74 = 0;
     scd->scdState = scdState;
     scd->shooterEnergy = 0;
-    scd->step = 0;
+    scd->step = FORCE_QUIT_STEP_WAIT_INPUT;
     scd->forceQuit = FALSE;
     scd->typeCount = BattleClient_GetAudienceSize(client);
     scd->typeMask = BattleClient_GetAudienceMask(client);
-    scd->noCancel = func_ov167_0219c9c0(mainModule);
+    scd->noCancel = IsStudioSkipDisabled(mainModule);
     scd->keyCursorFlag = GameData_GetBattleKeyCursorFlag(GetGameData(scd->mainModule));
     scd->printQueue = PrintQueue_CreateDefault(scd->heapId);
     BtlvScd_ClearProcs(scd);
@@ -471,12 +546,12 @@ void BtlvScd_CreateInput(BtlvScd *scd) {
     u32 rule = BtlSetup_GetBattleStyle(scd->mainModule);
     u32 battleType = BtlSetup_GetBattleType(scd->mainModule);
     PaletteFade *paletteFade = BtlvEffect_GetPaletteFade();
-    u8 unk328 = GetMultiMode(scd->mainModule);
-    u32 fileSet = GetStudioMode(scd->mainModule);
+    u8 multiMode = GetMultiMode(scd->mainModule);
+    u32 studioMode = GetStudioMode(scd->mainModule);
 
     scd->input = BtlvInput_CreateForBattle(gameData, rule, battleType, paletteFade, scd->font, &scd->keyCursorFlag,
-                                           scd->scdState, unk328, fileSet, scd->typeCount, scd->typeMask, scd->noCancel,
-                                           scd->heapId);
+                                           scd->scdState, multiMode, studioMode, scd->typeCount, scd->typeMask,
+                                           scd->noCancel, scd->heapId);
     GFL_BGSysSetBGEnabledB(0x10, TRUE);
     BtlvScd_Nop(scd);
 }
@@ -598,7 +673,7 @@ static BOOL BtlvScd_RunProcs(BtlvScd *scd) {
 void BtlvScd_StartCommandSelect(BtlvScd *scd, BattleMon *mon, u8 slot, u8 shooterEnergy, BattleAction *action) {
     scd->mon = mon;
     scd->action = action;
-    scd->result = 0;
+    scd->result = BTLV_COMMAND_NONE;
     scd->slot = slot;
     scd->shooterEnergy = shooterEnergy;
     BtlvScd_PushProc(scd, BtlvScd_CommandInit, BtlvScd_CommandMain);
@@ -607,7 +682,7 @@ void BtlvScd_StartCommandSelect(BtlvScd *scd, BattleMon *mon, u8 slot, u8 shoote
 void BtlvScd_StartCommandDemo(BtlvScd *scd, BattleMon *mon, u8 slot, BattleAction *action) {
     scd->mon = mon;
     scd->action = action;
-    scd->result = 0;
+    scd->result = BTLV_COMMAND_NONE;
     scd->slot = slot;
     BtlvScd_PushProc(scd, BtlvScd_CommandInit, BtlvScd_FingerDemoMain);
 }
@@ -616,7 +691,7 @@ u32 BtlvScd_GetCommandResult(BtlvScd *scd) {
     if (BtlvScd_RunProcs(scd)) {
         return scd->result;
     }
-    return 0;
+    return BTLV_COMMAND_NONE;
 }
 
 void BtlvScd_StartMoveSelect(BtlvScd *scd, BattleMon *mon, BattleAction *action) {
@@ -808,11 +883,11 @@ static BOOL BtlvScd_CommandMain(s32 *seq, void *arg) {
     s32 input;
 
     switch (*seq) {
-    case 0:
-        input = BtlvInput_CheckInput(scd->input, &data_ov169_0689da5c, data_ov169_0689e0ec);
+    case COMMAND_SEQ_SELECT:
+        input = BtlvInput_CheckInput(scd->input, &sCommandButtons, sCommandStops);
         if (input != TOUCH_RECT_NONE) {
-            scd->result = data_ov169_0689d9b0[input];
-            if (scd->result == 4) {
+            scd->result = sCommandResults[input];
+            if (scd->result == BTLV_COMMAND_RUN) {
                 BattleAction_SetEscape(scd->action);
                 BtlvInput_SetScreen(scd->input, 0, NULL);
                 BtlvEffect_GaugeAction(8);
@@ -823,7 +898,7 @@ static BOOL BtlvScd_CommandMain(s32 *seq, void *arg) {
             }
         }
         break;
-    case 1:
+    case COMMAND_SEQ_WAIT_CLOSE:
         if (!BtlvInput_IsBusy(scd->input)) {
             return TRUE;
         }
@@ -878,31 +953,31 @@ static BOOL BtlvScd_MoveMain(s32 *seq, void *arg) {
 
     pos = BattlePosToViewPos(scd->mainModule, MonIDToBattlePos(scd->mainModule, scd->pokeCon, GetMonID(scd->mon)));
     if (BtlSetup_GetBattleStyle(scd->mainModule) == BTL_STYLE_TRIPLE && pos != 4) {
-        set = &data_ov169_0689da08;
+        set = &sMoveButtonsShift;
     } else {
-        set = &data_ov169_0689daa4;
+        set = &sMoveButtons;
     }
     if (BtlSetup_GetBattleStyle(scd->mainModule) == BTL_STYLE_TRIPLE && pos != 4) {
-        stops = data_ov169_0689e2b0;
+        stops = sMoveStopsShift;
     } else {
-        stops = data_ov169_0689e1dc;
+        stops = sMoveStops;
     }
     input = BtlvInput_CheckInput(scd->input, set, stops);
     if (input != TOUCH_RECT_NONE) {
-        flagged = (input & 0x8000) != 0;
-        input &= ~0x8000;
-        if (input == 4) {
+        flagged = (input & MOVE_BUTTON_L_HELD) != 0;
+        input &= ~MOVE_BUTTON_L_HELD;
+        if (input == MOVE_BUTTON_BACK) {
             BattleAction_SetNull(scd->action);
             return TRUE;
         }
         if (input < GetBattleMonMoveCount(scd->mon)) {
-            BattleAction_SetFightParam(scd->action, MoveGetID(scd->mon, input), 6);
+            BattleAction_SetFightParam(scd->action, MoveGetID(scd->mon, input), BTL_POS_NONE);
             if (flagged) {
                 BattleAction_SetMoveInfoFlag(scd->action);
             }
             return TRUE;
         }
-        if (BtlSetup_GetBattleStyle(scd->mainModule) == BTL_STYLE_TRIPLE && input == 5) {
+        if (BtlSetup_GetBattleStyle(scd->mainModule) == BTL_STYLE_TRIPLE && input == MOVE_BUTTON_SHIFT) {
             BattleAction_SetShift(scd->action);
             return TRUE;
         }
@@ -935,25 +1010,25 @@ static BOOL BtlvScd_RotationMain(s32 *seq, void *arg) {
     BattleMon *mon;
 
     if (BtlvInput_MoveScreenMain(scd->input, &slot, &button)) {
-        flagged = (button & 0x8000) != 0;
-        button &= ~0x8000;
-        if (button != 4) {
+        flagged = (button & MOVE_BUTTON_L_HELD) != 0;
+        button &= ~MOVE_BUTTON_L_HELD;
+        if (button != MOVE_BUTTON_BACK) {
             if (slot == 0) {
                 slot = 1;
             }
-            if (button != 7) {
+            if (button != MOVE_BUTTON_STRUGGLE) {
                 mon = scd->targetParam->mons[GetRotationInSlot(slot)].mon;
                 move = MoveGetID(mon, button);
             } else {
                 move = MOVE_STRUGGLE;
             }
             BattleAction_SetRotationParam(&scd->targetParam->rotateAction, slot);
-            BattleAction_SetFightParam(&scd->targetParam->action, move, 6);
-            BattleAction_SetFightParam(scd->action, move, 6);
+            BattleAction_SetFightParam(&scd->targetParam->action, move, BTL_POS_NONE);
+            BattleAction_SetFightParam(scd->action, move, BTL_POS_NONE);
             if (flagged) {
                 BattleAction_SetMoveInfoFlag(scd->action);
             }
-        } else if (button == 4) { // tested again, as the original does
+        } else if (button == MOVE_BUTTON_BACK) { // tested again, as the original does
             BattleAction_SetNull(scd->action);
         }
         return TRUE;
@@ -995,7 +1070,7 @@ static BOOL BtlvScd_GetTargetPos(BtlvScdTargetList *list, u32 button, BtlMainMod
     u8 i;
 
     if (list->selectCount != 0) {
-        *outPos = ViewPosToBattlePos(mainModule, data_ov169_0689d9b4[button]);
+        *outPos = ViewPosToBattlePos(mainModule, sTargetButtonViewPos[button]);
         for (i = 0; i < list->selectCount; i++) {
             if (*outPos == list->pos[i]) {
                 return TRUE;
@@ -1003,7 +1078,7 @@ static BOOL BtlvScd_GetTargetPos(BtlvScdTargetList *list, u32 button, BtlMainMod
         }
         return FALSE;
     }
-    *outPos = 6;
+    *outPos = BTL_POS_NONE;
     return TRUE;
 }
 
@@ -1019,8 +1094,8 @@ static void BtlvScd_SetTargetScreen(const u8 *positions, u8 count, u32 kind, Btl
     if (move == MOVE_CURSE) {
         param.range = BtlCalc_GetCurseTarget(scd->mon);
     }
-    if (param.range == 0 && getMoveFlag(move, 0xb)) {
-        param.range = 14;
+    if (param.range == MOVE_TARGET_SELECTED && getMoveFlag(move, 0xb)) {
+        param.range = TARGET_RANGE_DISTANT;
     }
     while (count-- != 0) {
         BattleMon *mon = PokeCon_GetPosMonInner(scd->pokeCon, *positions);
@@ -1040,12 +1115,12 @@ static void BtlvScd_SetTargetScreen(const u8 *positions, u8 count, u32 kind, Btl
                 entry->msgForm = PokeParty_GetSex(BattleMon_GetViewSrcData(mon));
             }
             if (GetBattleMonStatus(mon) != 0) {
-                entry->unk1 = 3;
+                entry->iconAnim = 3;
             } else {
-                entry->unk1 = 1;
+                entry->iconAnim = 1;
             }
         } else {
-            entry->unk1 = 2;
+            entry->iconAnim = 2;
         }
         positions++;
     }
@@ -1071,7 +1146,7 @@ static BOOL BtlvScd_TargetInit(s32 *seq, void *arg) {
 
     BtlvScd_BuildTargetList(&scd->targets, scd);
     if (BtlSetup_GetBattleStyle(scd->mainModule) == BTL_STYLE_TRIPLE) {
-        u8 target = 6;
+        u8 target = BTL_POS_NONE;
 
         if (scd->targets.selectCount != 0) {
             target =
@@ -1105,16 +1180,16 @@ static BOOL BtlvScd_TargetMain(s32 *seq, void *arg) {
         range = scd->moveRange;
         index = (pos - 2) / 2;
         if (BtlSetup_GetBattleStyle(scd->mainModule) != BTL_STYLE_TRIPLE) {
-            set = data_ov169_0689e758[index][range];
-            stops = data_ov169_0689e6e0[index][range];
-            cancel = 4;
+            set = sTargetButtonSetsDouble[index][range];
+            stops = BTLV_SCD_TARGET_STOPS_DOUBLE[index][range];
+            cancel = TARGET_BUTTON_BACK_DOUBLE;
         } else {
-            if (range == 0 && getMoveFlag(scd->action->bits.move, 0xb)) {
-                range = 14;
+            if (range == MOVE_TARGET_SELECTED && getMoveFlag(scd->action->bits.move, 0xb)) {
+                range = TARGET_RANGE_DISTANT;
             }
-            set = data_ov169_0689e7d0[index][range];
-            stops = data_ov169_0689e884[index][range];
-            cancel = 6;
+            set = sTargetButtonSetsTriple[index][range];
+            stops = BTLV_SCD_TARGET_STOPS_TRIPLE[index][range];
+            cancel = TARGET_BUTTON_BACK_TRIPLE;
         }
         input = BtlvInput_CheckInput(scd->input, set, stops);
         if (input != -1) {
@@ -1143,42 +1218,42 @@ static void BtlvScd_BuildTargetList(BtlvScdTargetList *list, BtlvScd *scd) {
         range = BtlCalc_GetCurseTarget(scd->mon);
     }
     switch (range) {
-    case 0:
+    case MOVE_TARGET_SELECTED:
         BtlvScd_FillSelectTargets(list, scd->mainModule, TARGET_FLAGS(2, pos));
         BtlvScd_AddFarTargets(list, scd->mainModule, move, pos);
         break;
-    case 3:
+    case MOVE_TARGET_FOE:
         BtlvScd_FillSelectTargets(list, scd->mainModule, TARGET_FLAGS(1, pos));
         BtlvScd_AddFarTargets(list, scd->mainModule, move, pos);
         break;
-    case 1:
+    case MOVE_TARGET_USER_OR_ALLY:
         BtlvScd_FillSelectTargets(list, scd->mainModule, TARGET_FLAGS(3, pos));
         break;
-    case 2:
+    case MOVE_TARGET_ALLY:
         BtlvScd_FillSelectTargets(list, scd->mainModule, TARGET_FLAGS(4, pos));
         break;
-    case 5:
+    case MOVE_TARGET_ADJACENT_FOES:
         BtlvScd_FillGroupTargets(list, scd->mainModule, TARGET_FLAGS(1, pos));
         break;
-    case 4:
+    case MOVE_TARGET_ALL_ADJACENT:
         BtlvScd_FillGroupTargets(list, scd->mainModule, TARGET_FLAGS(2, pos));
         break;
-    case 7:
-    case 9:
+    case MOVE_TARGET_USER:
+    case MOVE_TARGET_RANDOM_FOE:
         BtlvScd_FillGroupTargets(list, scd->mainModule, TARGET_FLAGS(0, pos));
         break;
-    case 6:
-    case 12:
+    case MOVE_TARGET_USER_PARTY:
+    case MOVE_TARGET_USER_SIDE:
         BtlvScd_FillSideTargets(list, scd->mainModule, TARGET_FLAGS(7, pos));
         break;
-    case 11:
+    case MOVE_TARGET_FOE_SIDE:
         BtlvScd_FillSideTargets(list, scd->mainModule, TARGET_FLAGS(6, pos));
         break;
-    case 8:
-    case 10:
+    case MOVE_TARGET_ALL:
+    case MOVE_TARGET_FIELD:
         BtlvScd_FillSideTargets(list, scd->mainModule, TARGET_FLAGS(8, pos));
         break;
-    case 13:
+    case MOVE_TARGET_DEPENDS:
         BtlvScd_FillGroupTargets(list, scd->mainModule, TARGET_FLAGS(0, pos));
         break;
     }
@@ -1206,22 +1281,22 @@ void BtlvScd_HideRotationScreen(BtlvScd *scd) {
 
 void BtlvScd_ShowYesNo(BtlvScd *scd, void *param) {
     BtlvInput_SetScreen(scd->input, 4, param);
-    scd->yesNoSeq = 0;
+    scd->yesNoSeq = YES_NO_SEQ_SELECT;
 }
 
 BOOL BtlvScd_PollYesNo(BtlvScd *scd, u32 *answer) {
     s32 input;
 
     switch (scd->yesNoSeq) {
-    case 0:
-        input = BtlvInput_CheckInput(scd->input, &data_ov169_0689da14, data_ov169_0689ddd0);
+    case YES_NO_SEQ_SELECT:
+        input = BtlvInput_CheckInput(scd->input, &sYesNoButtons, sYesNoStops);
         if (input != -1) {
             scd->answer = input;
             BtlvInput_SetScreen(scd->input, 0, NULL);
             scd->yesNoSeq++;
         }
         break;
-    case 1:
+    case YES_NO_SEQ_WAIT_CLOSE:
         if (!BtlvInput_IsBusy(scd->input)) {
             *answer = scd->answer;
             return TRUE;
@@ -1237,30 +1312,30 @@ u8 *BtlvScd_GetKeyCursorFlag(BtlvScd *scd) {
 
 void BtlvScd_ForceQuitInput(BtlvScd *scd) {
     if (!scd->forceQuit) {
-        scd->step = 0;
+        scd->step = FORCE_QUIT_STEP_WAIT_INPUT;
         scd->forceQuit = TRUE;
     }
 }
 
 BOOL BtlvScd_IsForceQuitInputDone(BtlvScd *scd) {
     switch (scd->step) {
-    case 0:
+    case FORCE_QUIT_STEP_WAIT_INPUT:
         if (!BtlvInput_IsBusy(scd->input)) {
             scd->step++;
         }
         break;
-    case 1:
+    case FORCE_QUIT_STEP_CLOSE:
         BtlvInput_SetScreen(scd->input, 0, NULL);
         BtlvEffect_GaugeAction(8);
         BtlvEffect_StopIdleEffect();
         scd->step++;
         break;
-    case 2:
+    case FORCE_QUIT_STEP_WAIT_CLOSE:
         if (!BtlvInput_IsBusy(scd->input)) {
             scd->step++;
         }
         break;
-    case 3:
+    case FORCE_QUIT_STEP_DONE:
         scd->forceQuit = FALSE;
         return TRUE;
     }
@@ -1272,7 +1347,7 @@ void BtlvScd_ShowRecorderScreen(BtlvScd *scd, void *param) {
 }
 
 u32 BtlvScd_CheckRecorderInput(BtlvScd *scd) {
-    return BtlvInput_CheckInput(scd->input, &data_ov169_0689dabc, data_ov169_0689e044);
+    return BtlvInput_CheckInput(scd->input, &sRecorderButtons, sRecorderStops);
 }
 
 void BtlvScd_SetTypeIconVisible(BtlvScd *scd, BOOL visible, int index, int sequence) {

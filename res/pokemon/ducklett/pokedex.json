@@ -1,0 +1,11 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "D",
+    "shapes": [ 11 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_DRIFTVEIL_DRAWBRIDGE": [ "shaking_grass" ]
+        }
+    }
+}

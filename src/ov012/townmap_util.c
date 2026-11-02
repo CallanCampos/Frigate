@@ -35,8 +35,8 @@ u16 TownMap_GetMapZone(GameData *gameData, u16 zoneId) {
         }
     }
     if (parent == ZONE_HIDDEN_GROTTO) {
-        return GetZoneParentZone(
-            GetHiddenHollowEntranceParam(getHollowNum(getHollow_RivalData(GameData_GetSaveControl(gameData))), 0));
+        return GetZoneParentZone(GetHiddenHollowEntranceParam(
+            getHollowNum(getHollow_RivalData(GameData_GetSaveControl(gameData))), HIDDEN_HOLLOW_ENTRANCE_ZONE));
     }
     if (parent == ZONE_WHITE_TREEHOLLOW || IsZoneBlackCityOrWhiteForestLobby(parent)) {
 #ifdef BLACK2

@@ -1,0 +1,16 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "P",
+    "shapes": [ 10 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_GIANT_CHASM": [ "rippling_fishing" ],
+            "ZONE_WELLSPRING_CAVE": [ "rippling_fishing" ],
+            "ZONE_ROUTE_23": [ "rippling_fishing" ],
+            "ZONE_VICTORY_ROAD": [ "rippling_fishing" ],
+            "ZONE_RELIC_PASSAGE": [ "rippling_fishing" ],
+            "ZONE_CLAY_TUNNEL": [ "rippling_fishing" ]
+        }
+    }
+}

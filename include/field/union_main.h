@@ -42,8 +42,8 @@ void UnionMain_OnFieldOut(void *param, void *work, Field *field);
 // Accessors of the system that the field and overlay 82 use
 u32 UnionMain_GetAtCounter(UnionSystem *sys);
 u32 UnionMain_GetExiting(UnionSystem *sys);
-void UnionMain_SetSituUnk02(UnionSystem *sys, u8 value);
-u8 UnionMain_GetSituUnk02(UnionSystem *sys);
+void UnionMain_SetWantedKind(UnionSystem *sys, u8 value);
+u8 UnionMain_GetWantedKind(UnionSystem *sys);
 // Whether the Union Room is up and idle
 BOOL UnionMain_IsIdle(GameSystem *gsys);
 
@@ -63,7 +63,7 @@ void UnionNet_RecvEntryRequest(int netId, int size, const void *data, void *work
 void UnionNet_RecvEntryReply2(int netId, int size, const void *data, void *work, NetHandle *handle);
 void UnionNet_RecvEntryReply1(int netId, int size, const void *data, void *work, NetHandle *handle);
 void UnionNet_RecvEnqueue(int netId, int size, const void *data, void *work, NetHandle *handle);
-void UnionNet_RecvUnkE(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvTurn(int netId, int size, const void *data, void *work, NetHandle *handle);
 void UnionNet_RecvRequestStatus(int netId, int size, const void *data, void *work, NetHandle *handle);
 void UnionNet_RecvStatus(int netId, int size, const void *data, void *work, NetHandle *handle);
 void UnionNet_RecvAppProfile(int netId, int size, const void *data, void *work, NetHandle *handle);
@@ -90,7 +90,7 @@ BOOL UnionMain_SendEntryReply1(u8 sendTo);
 BOOL UnionMain_SendJoinAvenue(UnionSystem *sys);
 
 // Sends union_app.c's commands
-BOOL UnionMain_SendUnkE(u8 netId);
+BOOL UnionMain_SendTurn(u8 netId);
 BOOL UnionMain_SendStatus(const UnionAppStatus *status, u8 sendTo);
 BOOL UnionMain_SendProfile(u8 sendTo, const UnionAppMember *member);
 BOOL UnionMain_SendLeave(u8 sendTo, u8 leftNetId);

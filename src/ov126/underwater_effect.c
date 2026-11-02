@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/underwater_effect.h"
 #include "gfl/arc.h"
@@ -39,7 +40,7 @@ const FieldAsyncProcDef UNDERWATER_EFFECT_PROC = {
 static void UnderwaterEffect_Init(FieldAsyncProc *proc, Field *field, void *data) {
     UnderwaterEffectWork *work = data;
     HeapID heapId = Field_GetHeapID(field);
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0xbb, HEAPID_TAIL(heapId));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_UNDERWATER_EFFECT, HEAPID_TAIL(heapId));
     int i;
 
     for (i = 0; i < 7; i++) {

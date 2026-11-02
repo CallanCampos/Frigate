@@ -101,19 +101,19 @@ BOOL UnionEff_IsPlayerOnSpot(Field *field) {
 
 int UnionEff_GetKindStep(int kind) {
     if (kind >= 4 && kind <= 0x17) {
-        return 1;
+        return UNION_WANT_BATTLE;
     }
     switch (kind) {
     case 3:
-        return 4;
+        return UNION_WANT_DRAW;
     case 0x18:
-        return 2;
+        return UNION_WANT_TRADE;
     case 0x19:
-        return 5;
+        return UNION_WANT_SPIN_TRADE;
     case 0x1a:
-        return 3;
+        return UNION_WANT_3;
     default:
-        return 0;
+        return UNION_WANT_NONE;
     }
 }
 

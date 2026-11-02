@@ -21,6 +21,17 @@ typedef struct {
     BOOL useTransitions;
 } EventWorldTrade;
 
+// The steps of the event
+enum {
+    STEP_WAIT_COMM_EXIT,
+    STEP_FADE_OUT,
+    STEP_CLOSE_FIELD,
+    STEP_START_PROC,
+    STEP_WAIT_PROC,
+    STEP_FADE_IN,
+    STEP_END,
+};
+
 GameEventReturnCode EventWorldTrade_Callback(GameEvent *event, u32 *state, void *data);
 
 // Called through GameEvent_CreateOverlayDelegate, by the NetConnectGTS script command
@@ -67,45 +78,45 @@ GameEventReturnCode EventWorldTrade_Callback(GameEvent *event, u32 *state, void 
     EventWorldTrade *wk = data;
 
     switch (*state) {
-    case 0:
+    case STEP_WAIT_COMM_EXIT:
         // Wait for the comm system to shut down
         if (!GameCommSys_BootCheck(GSYS_GetGameCommSystem(wk->gsys))) {
-            *state = 1;
+            *state = STEP_FADE_OUT;
         }
         break;
-    case 1:
+    case STEP_FADE_OUT:
         if (wk->useTransitions) {
             GameEvent_ChainNext(
                 event, CallFieldMapEntranceOutTransitionDefault(wk->gsys, wk->field, FIELD_TRANSITION_FADE_BLACK, 0));
         }
         wk->bgm = GFL_SndBGMGetID();
         GFL_SndBGMFadeOut(6);
-        *state = 2;
+        *state = STEP_CLOSE_FIELD;
         break;
-    case 2:
+    case STEP_CLOSE_FIELD:
         GameEvent_ChainNext(event, CreateFieldCloseEvent(wk->gsys, wk->field));
-        *state = 3;
+        *state = STEP_START_PROC;
         break;
-    case 3:
+    case STEP_START_PROC:
         GSYS_QueueProc(wk->gsys, OVERLAY_WORLDTRADE, &WORLDTRADE_PROC_FUNCTIONS, &wk->param);
-        *state = 4;
+        *state = STEP_WAIT_PROC;
         break;
-    case 4:
+    case STEP_WAIT_PROC:
         if (!GSYS_GetProcMgrState(wk->gsys)) {
             GFL_SndBGMPlay(wk->bgm, SND_CHANNEL_MASK_ALL);
             GFL_SndBGMFadeIn(60);
             GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(wk->gsys));
-            *state = 5;
+            *state = STEP_FADE_IN;
         }
         break;
-    case 5:
+    case STEP_FADE_IN:
         if (wk->useTransitions) {
             GameEvent_ChainNext(
                 event, CallFieldMapEntranceInTransition(wk->gsys, wk->field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         }
-        *state = 6;
+        *state = STEP_END;
         break;
-    case 6:
+    case STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;

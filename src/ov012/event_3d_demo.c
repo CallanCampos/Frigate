@@ -11,6 +11,7 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 #include "system/season.h"
+#include "system/zone_weather.h"
 
 GameEvent *Event3DDemo_Create(GameSystem *gsys, GameEvent *parent, u32 demoId, u32 param, u32 realTime) {
     GameEvent *event = GameEvent_Create(gsys, parent, Event3DDemo_Callback, sizeof(Event3DDemoWork));
@@ -61,7 +62,7 @@ GameEventReturnCode Event3DDemo_Callback(GameEvent *event, u32 *state, void *dat
         if (work->demoId == 24 || work->demoId == 25) {
             GameEvent_ChainNext(event, CreateBGMFadeOutEvent(work->gameSystem, 0));
             if (work->demoId == 25) {
-                SetNowWeather(GSYS_GetGameData(work->gameSystem), 0);
+                SetNowWeather(GSYS_GetGameData(work->gameSystem), WEATHER_SUNNY);
             }
         }
         (*state)++;
@@ -72,13 +73,13 @@ GameEventReturnCode Event3DDemo_Callback(GameEvent *event, u32 *state, void *dat
     return GAMEEVENT_CONTINUE;
 }
 
-void CreateSeqLoadParam(Demo3DParam *out, GameSystem *gsys, u32 demoId, u8 param, u32 arg4, u8 hour, u8 minute,
+void CreateSeqLoadParam(Demo3DParam *out, GameSystem *gsys, u32 demoId, u8 param, u32 startFrame, u8 hour, u8 minute,
                         u8 season) {
     MI_CpuFill8(out, 0, sizeof(Demo3DParam));
     out->gsys = gsys;
     out->demoId = demoId;
     out->param = param;
-    out->unk08 = arg4;
+    out->startFrame = startFrame;
     out->hour = hour;
     out->minute = minute;
     out->season = season;

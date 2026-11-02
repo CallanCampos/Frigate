@@ -1,0 +1,412 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A Pokéstar Studios movie's script: res/pokewood/movies/<n>/movie.json",
+    "description": "File n of ARCID_POKEWOOD_MOVIE (a/2/6/9; BtlScriptedRules in btl_main.h, of which event_pokewood.c, pokewood_system.c, scrcmd_pokewood.c, pkwd_book.c and pkwd_briefing.c read parts), which tools/data/pokewood_data.py packs. Every value is a halfword, -1 for none; messages are of the director's message file (sMovieMsgFiles in btl_string.c). A field the code doesn't read keeps its C name. The 30 halfwords after unk3c are -1 in every movie, which pack writes.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "movie",
+        "unk02",
+        "score_multiplier",
+        "cast_count",
+        "director",
+        "turn_limit",
+        "ideal_turn",
+        "ending_scene",
+        "rule",
+        "species",
+        "unk16",
+        "trainer_classes",
+        "unk20",
+        "recorded_trainer_class",
+        "unk24",
+        "bgm",
+        "win_bgm",
+        "unk2a",
+        "unk2c",
+        "star_level",
+        "turn_events",
+        "unk3c",
+        "turn_messages",
+        "scenes"
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "This schema, for editors"
+        },
+        "movie": {
+            "type": "integer",
+            "minimum": -32768,
+            "maximum": 32767,
+            "description": "The movie's number plus 1, which the cut-ins are found by (sCutins in pokewood_cutin.c)"
+        },
+        "unk02": {
+            "type": "integer",
+            "minimum": -32768,
+            "maximum": 32767,
+            "description": "Unread"
+        },
+        "score_multiplier": {
+            "type": "integer",
+            "minimum": -32768,
+            "maximum": 32767,
+            "description": "What the scenes' scores add up to is multiplied by (the score's unk08); half of it less 1 is the difficulty column of Pokewood_GetMovieField"
+        },
+        "cast_count": {
+            "type": "integer",
+            "minimum": -32768,
+            "maximum": 32767,
+            "description": "How many Pokémon each side has, the regulation's count (PokewoodSystem_SetupPokeList)"
+        },
+        "director": {
+            "type": "integer",
+            "minimum": -32768,
+            "maximum": 32767,
+            "description": "The director, 0 to 4: the credits' name (pkwd_briefing.c) and the movie's message file (sMovieMsgFiles)"
+        },
+        "turn_limit": {
+            "type": "integer",
+            "minimum": -32768,
+            "maximum": 32767,
+            "description": "The turns the movie may last"
+        },
+        "ideal_turn": {
+            "type": "integer",
+            "minimum": -32768,
+            "maximum": 32767,
+            "description": "The turn the movie should end on, the score has 5 less the turns between them (unk0C)"
+        },
+        "ending_scene": {
+            "type": "integer",
+            "minimum": -32768,
+            "maximum": 32767,
+            "description": "The scene that is the ending (unk0E, Studio_DecideEnding)"
+        },
+        "rule": {
+            "type": "integer",
+            "minimum": -32768,
+            "maximum": 32767,
+            "description": "The movie's rule, 0 to 8, which btl_server_flow_sub.c switches on"
+        },
+        "species": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+                "type": [ "string", "integer" ],
+                "x-constant": "SPECIES_",
+                "minimum": -1,
+                "maximum": 32767,
+                "description": ""
+            },
+            "description": "The species the rule targets (GetRulesTargetSpecies), -1 for none"
+        },
+        "unk16": {
+            "type": "integer",
+            "minimum": -32768,
+            "maximum": 32767,
+            "description": "What rule 2 compares, -1 for none"
+        },
+        "trainer_classes": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [ "male", "female" ],
+            "description": "The trainers of the two sides for each sex of the player (EventPokewood_SetupMovieTrainer, pkwd_book.c)",
+            "properties": {
+                "male": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [ "film", "watch" ],
+                    "properties": {
+                        "film": {
+                            "type": [ "string", "integer" ],
+                            "x-constant": "TRAINER_CLASS_",
+                            "minimum": -1,
+                            "maximum": 32767,
+                            "description": "The trainer class on the side that films"
+                        },
+                        "watch": {
+                            "type": [ "string", "integer" ],
+                            "x-constant": "TRAINER_CLASS_",
+                            "minimum": -1,
+                            "maximum": 32767,
+                            "description": "The trainer class on the side that watches"
+                        }
+                    }
+                },
+                "female": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [ "film", "watch" ],
+                    "properties": {
+                        "film": {
+                            "type": [ "string", "integer" ],
+                            "x-constant": "TRAINER_CLASS_",
+                            "minimum": -1,
+                            "maximum": 32767,
+                            "description": "The trainer class on the side that films"
+                        },
+                        "watch": {
+                            "type": [ "string", "integer" ],
+                            "x-constant": "TRAINER_CLASS_",
+                            "minimum": -1,
+                            "maximum": 32767,
+                            "description": "The trainer class on the side that watches"
+                        }
+                    }
+                }
+            }
+        },
+        "unk20": {
+            "type": "integer",
+            "minimum": -32768,
+            "maximum": 32767,
+            "description": "Unread"
+        },
+        "recorded_trainer_class": {
+            "type": [ "string", "integer" ],
+            "x-constant": "TRAINER_CLASS_",
+            "minimum": -1,
+            "maximum": 32767,
+            "description": "The trainer class of a recorded movie's trainer (EventPokewood_SetupRecordTrainer)"
+        },
+        "unk24": {
+            "type": "integer",
+            "minimum": -32768,
+            "maximum": 32767,
+            "description": "Passed to the battle field in studio mode (btlv_effect.c)"
+        },
+        "bgm": {
+            "type": [ "string", "integer" ],
+            "x-constant": "SEQ_",
+            "minimum": -1,
+            "maximum": 32767,
+            "description": "The movie's music"
+        },
+        "win_bgm": {
+            "type": [ "string", "integer" ],
+            "x-constant": "SEQ_",
+            "minimum": -1,
+            "maximum": 32767,
+            "description": "The music of a win"
+        },
+        "unk2a": {
+            "type": [ "string", "integer" ],
+            "x-constant": "SEQ_",
+            "minimum": -1,
+            "maximum": 32767,
+            "description": "Music that the watched movie's setup keeps (unk138)"
+        },
+        "unk2c": {
+            "type": [ "string", "integer" ],
+            "x-constant": "SEQ_",
+            "minimum": -1,
+            "maximum": 32767,
+            "description": "Music that the watched movie's setup keeps (unk13a)"
+        },
+        "star_level": {
+            "type": "integer",
+            "minimum": -32768,
+            "maximum": 32767,
+            "description": "The movie's stars, 1 to 3 (pkwd_briefing.c)"
+        },
+        "turn_events": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "turn", "value" ],
+                "properties": {
+                    "turn": {
+                        "type": "integer",
+                        "minimum": -32768,
+                        "maximum": 32767,
+                        "description": ""
+                    },
+                    "value": {
+                        "type": "integer",
+                        "minimum": -32768,
+                        "maximum": 32767,
+                        "description": ""
+                    }
+                }
+            },
+            "description": "The events of turns (StudioRules_GetTurnEvent): {0, -1} for none"
+        },
+        "unk3c": {
+            "type": "array",
+            "minItems": 6,
+            "maxItems": 6,
+            "items": {
+                "type": "array",
+                "minItems": 4,
+                "maxItems": 4,
+                "items": {
+                    "type": "integer",
+                    "minimum": -32768,
+                    "maximum": 32767,
+                    "description": ""
+                },
+                "description": ""
+            },
+            "description": "Unread records of four halfwords"
+        },
+        "turn_messages": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+                "type": "array",
+                "minItems": 20,
+                "maxItems": 20,
+                "items": {
+                    "type": "integer",
+                    "minimum": -32768,
+                    "maximum": 32767,
+                    "description": ""
+                },
+                "description": ""
+            },
+            "description": "The message of each turn, from the first, for the two kinds (unkA8 and unkD0), -1 for none"
+        },
+        "scenes": {
+            "type": "array",
+            "minItems": 12,
+            "maxItems": 12,
+            "items": {
+                "$ref": "#/$defs/scene"
+            },
+            "description": "The movie's scenes (BtlStudioScene)"
+        }
+    },
+    "$defs": {
+        "scene": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [ "turn", "unk02", "unk04", "unk06", "reaction", "score", "messages", "events", "choices" ],
+            "properties": {
+                "turn": {
+                    "type": "integer",
+                    "minimum": -32768,
+                    "maximum": 32767,
+                    "description": "The turn or trigger the scene belongs to (Studio_FindScene), -1 for none"
+                },
+                "unk02": {
+                    "type": "integer",
+                    "minimum": -32768,
+                    "maximum": 32767,
+                    "description": "Matched with the studio's unk10 (Studio_FindScene), -1 for none"
+                },
+                "unk04": {
+                    "type": "integer",
+                    "minimum": -32768,
+                    "maximum": 32767,
+                    "description": "The kind of trigger (Studio_FindScene), -1 for none"
+                },
+                "unk06": {
+                    "type": "integer",
+                    "minimum": -32768,
+                    "maximum": 32767,
+                    "description": "The value the trigger compares, -1 for none"
+                },
+                "reaction": {
+                    "type": "integer",
+                    "minimum": -32768,
+                    "maximum": 32767,
+                    "description": "The audience's reaction, an index into sReactions"
+                },
+                "score": {
+                    "type": "integer",
+                    "minimum": -32768,
+                    "maximum": 32767,
+                    "description": "The scene's score; 60 and more makes the good ending"
+                },
+                "messages": {
+                    "type": "array",
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "items": {
+                        "type": "array",
+                        "minItems": 10,
+                        "maxItems": 10,
+                        "items": {
+                            "type": "integer",
+                            "minimum": -32768,
+                            "maximum": 32767,
+                            "description": ""
+                        },
+                        "description": ""
+                    },
+                    "description": "The messages of two kinds by step, which the cut-ins' message command picks between, -1 for none"
+                },
+                "events": {
+                    "type": "array",
+                    "minItems": 10,
+                    "maxItems": 10,
+                    "items": {
+                        "type": "integer",
+                        "minimum": -32768,
+                        "maximum": 32767,
+                        "description": ""
+                    },
+                    "description": "The script event each step waits for (Studio_IsStateReached), -1 for none"
+                },
+                "choices": {
+                    "type": "array",
+                    "minItems": 4,
+                    "maxItems": 4,
+                    "items": {
+                        "$ref": "#/$defs/choice"
+                    },
+                    "description": "The choices the scene offers the player (BtlStudioChoice)"
+                }
+            }
+        },
+        "choice": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [ "message", "message2", "unk04", "unk06", "points", "unk0a" ],
+            "properties": {
+                "message": {
+                    "type": "integer",
+                    "minimum": -32768,
+                    "maximum": 32767,
+                    "description": "The choice's message (msgId), -1 for none: the scene offers choices if its first has one"
+                },
+                "message2": {
+                    "type": "integer",
+                    "minimum": -32768,
+                    "maximum": 32767,
+                    "description": "msgId2"
+                },
+                "unk04": {
+                    "type": "integer",
+                    "minimum": -32768,
+                    "maximum": 32767,
+                    "description": "Kept as the result's unk08"
+                },
+                "unk06": {
+                    "type": "integer",
+                    "minimum": -32768,
+                    "maximum": 32767,
+                    "description": "The value that Studio_SetChoiceField sets"
+                },
+                "points": {
+                    "type": "integer",
+                    "minimum": -32768,
+                    "maximum": 32767,
+                    "description": "The points the choice gives"
+                },
+                "unk0a": {
+                    "type": "integer",
+                    "minimum": -32768,
+                    "maximum": 32767,
+                    "description": "Unread"
+                }
+            }
+        }
+    }
+}

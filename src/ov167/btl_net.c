@@ -13,6 +13,22 @@
 #include "save/player_info.h"
 #include "system/str_tool.h"
 
+// The link battle's commands, in the order of BTL_NET_COMMANDS
+enum {
+    BTL_NET_CMD_VERSION = 0x100,
+    BTL_NET_CMD_SYNC_DATA,
+    BTL_NET_CMD_PARTY,
+    BTL_NET_CMD_CHATTER,
+    BTL_NET_CMD_PARTY_PACKET,
+    BTL_NET_CMD_PLAYER_INFO,
+    BTL_NET_CMD_TRAINER,
+    BTL_NET_CMD_SERVER_CMD,
+    BTL_NET_CMD_REPLY,
+};
+
+// The net id of no machine: the server's until it is decided, and a client's that no machine plays
+#define BTL_NET_ID_NONE 40
+
 // What a command that arrives whole is received into
 typedef struct {
     u8 data[0xbb8];
@@ -51,7 +67,7 @@ typedef struct {
     NetHandle *netHandle;
     HeapID heapId;
     u8 myNetId;
-    // 40 until decided
+    // BTL_NET_ID_NONE until decided
     u8 serverNetId;
     u16 clientMask;
     u8 syncDataReceived;
@@ -135,7 +151,7 @@ void BtlNet_Init(NetHandle *netHandle, u16 clientMask, HeapID heapId) {
         sWork->clientMask = clientMask;
         sWork->heapId = heapId;
         sWork->myNetId = GFL_NetGetHandleNetId(netHandle);
-        sWork->serverNetId = 40;
+        sWork->serverNetId = BTL_NET_ID_NONE;
         sWork->serverCmdReceived = FALSE;
         sWork->unkE = 0;
         for (i = 0, count = 0; i < 4; i++) {
@@ -188,7 +204,7 @@ BOOL BtlNet_SendVersion(u8 clientId) {
 
     packet->version = 100;
     packet->clientId = clientId;
-    return GFL_NetSendCommand(sWork->netHandle, 0x100, sizeof(BtlNetVersionPacket), packet);
+    return GFL_NetSendCommand(sWork->netHandle, BTL_NET_CMD_VERSION, sizeof(BtlNetVersionPacket), packet);
 }
 
 // Command 0x100: records a machine's version, and once every machine's is in, makes the highest the server
@@ -208,7 +224,7 @@ static void RecvVersion(int netId, int size, const void *data, void *work, NetHa
         }
         versions->count++;
         if (versions->count >= sWork->numClients) {
-            sWork->serverNetId = 40;
+            sWork->serverNetId = BTL_NET_ID_NONE;
             for (i = 0; i < 4; i++) {
                 if (versions->clients[i].received && versions->max == versions->clients[i].version) {
                     sWork->serverNetId = i;
@@ -225,7 +241,7 @@ static BOOL HasMachineVersion(int netId) {
 
 // Whether the server is decided
 BOOL BtlNet_IsServerDecided(void) {
-    if (sWork->serverNetId != 40) {
+    if (sWork->serverNetId != BTL_NET_ID_NONE) {
         return TRUE;
     }
     return FALSE;
@@ -247,7 +263,7 @@ u8 BtlNet_GetCommonVersion(void) {
     return 100;
 }
 
-// The net id of a client, or 40
+// The net id of a client, or BTL_NET_ID_NONE
 static u8 GetClientNetId(u8 clientId) {
     int i;
 
@@ -256,12 +272,13 @@ static u8 GetClientNetId(u8 clientId) {
             return i;
         }
     }
-    return 40;
+    return BTL_NET_ID_NONE;
 }
 
 // Sends the server's sync data to everyone
 BOOL BtlNet_SendSyncData(BtlMainSyncData *data) {
-    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, 0x101, sizeof(BtlMainSyncData), data, 0, 0, 0);
+    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, BTL_NET_CMD_SYNC_DATA, sizeof(BtlMainSyncData), data, 0,
+                                       0, 0);
 }
 
 // Command 0x101: keeps the first sync data that arrives
@@ -283,7 +300,8 @@ BOOL BtlNet_GetSyncData(BtlMainSyncData *data) {
 
 // Sends this machine's party to everyone
 u8 BtlNet_SendParty(PokeParty *party) {
-    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, 0x102, PokeParty_GetSaveDataSize(), party, 0, 1, 1);
+    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, BTL_NET_CMD_PARTY, PokeParty_GetSaveDataSize(), party, 0,
+                                       1, 1);
 }
 
 // Command 0x102's buffer
@@ -325,7 +343,7 @@ BOOL BtlNet_SendChatter(void *chatter) {
         chatter = &sWork->sendBuf.noChatter;
         sWork->sendBuf.noChatter = 0;
     }
-    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, 0x103, size, chatter, 0, 1, 1);
+    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, BTL_NET_CMD_CHATTER, size, chatter, 0, 1, 1);
 }
 
 // Command 0x103's buffer: a word for no cry, which goes in the machine's reply buffer
@@ -365,7 +383,7 @@ BOOL BtlNet_AreChattersReceived(void) {
 PerapVoice *BtlNet_GetChatter(u8 clientId) {
     u8 netId = GetClientNetId(clientId);
 
-    if (netId != 40 && sWork->recvSizes[netId] != 0) {
+    if (netId != BTL_NET_ID_NONE && sWork->recvSizes[netId] != 0) {
         return sWork->recvBuffers[netId];
     }
     return NULL;
@@ -378,8 +396,8 @@ void BtlNet_EndChatterExchange(void) {
 
 // Sends a party for one client to everyone
 BOOL BtlNet_SendPartyPacket(BtlNetPartyPacket *packet) {
-    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, 0x104, packet->size + sizeof(BtlNetPartyPacket), packet,
-                                       0, 1, 1);
+    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, BTL_NET_CMD_PARTY_PACKET,
+                                       packet->size + sizeof(BtlNetPartyPacket), packet, 0, 1, 1);
 }
 
 // Command 0x104's buffer
@@ -418,7 +436,7 @@ PokeParty *BtlNet_GetParty(u8 clientId) {
     u32 count;
     u32 i;
 
-    if (netId != 40) {
+    if (netId != BTL_NET_ID_NONE) {
         return sWork->recvBuffers[netId];
     }
     party = sWork->parties[clientId];
@@ -438,7 +456,8 @@ void BtlNet_EndPartyExchange(void) {
 
 // Sends this machine's player info to everyone
 BOOL BtlNet_SendPlayerInfo(PlayerInfo *info) {
-    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, 0x105, PlayerInfo_GetSize(), info, 0, 1, 1);
+    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, BTL_NET_CMD_PLAYER_INFO, PlayerInfo_GetSize(), info, 0,
+                                       1, 1);
 }
 
 // Command 0x105's buffer
@@ -468,7 +487,7 @@ BOOL BtlNet_ArePlayerInfosReceived(void) {
 PlayerInfo *BtlNet_GetPlayerInfo(u8 clientId) {
     u8 netId = GetClientNetId(clientId);
 
-    if (netId != 40) {
+    if (netId != BTL_NET_ID_NONE) {
         return sWork->recvBuffers[netId];
     }
     if (sWork->tempBuffer != NULL && sWork->tempSize != 0) {
@@ -480,7 +499,8 @@ PlayerInfo *BtlNet_GetPlayerInfo(u8 clientId) {
 // Sends this machine's trainer to everyone
 BOOL BtlNet_SendTrainer(BtlSetupTrainer *trainer) {
     BtlCommTrainerData *data = CreateCommTrainerData(trainer, HEAPID_TAIL(sWork->heapId));
-    BOOL result = GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, 0x106, sizeof(BtlCommTrainerData), data, 0, 1, 0);
+    BOOL result = GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, BTL_NET_CMD_TRAINER, sizeof(BtlCommTrainerData),
+                                              data, 0, 1, 0);
 
     FreeCommTrainerData(data);
     return result;
@@ -592,8 +612,8 @@ BOOL BtlNet_CheckTiming(u8 id) {
 BOOL BtlNet_SendServerCmd(u8 clientId, void *data, u32 size) {
     u8 netId = GetClientNetId(clientId);
 
-    if (netId != 40) {
-        return GFL_NetSendCommandToMachine(sWork->netHandle, netId, 0x107, size, data, 0, 0, 1);
+    if (netId != BTL_NET_ID_NONE) {
+        return GFL_NetSendCommandToMachine(sWork->netHandle, netId, BTL_NET_CMD_SERVER_CMD, size, data, 0, 0, 1);
     }
     return TRUE;
 }
@@ -653,7 +673,8 @@ u16 BtlNet_GetServerCmd(void **data) {
 
 // Sends this machine's reply to the server
 BOOL BtlNet_SendReply(void *data, u32 size) {
-    BOOL result = GFL_NetSendCommandToMachine(sWork->netHandle, sWork->serverNetId, 0x108, size, data, 0, 1, 1);
+    BOOL result =
+        GFL_NetSendCommandToMachine(sWork->netHandle, sWork->serverNetId, BTL_NET_CMD_REPLY, size, data, 0, 1, 1);
 
     if (result) {
         sWork->serverCmdReceived = FALSE;
@@ -708,7 +729,7 @@ void BtlNet_SetPartyPacket(BtlNetPartyPacket *packet, PokeParty *party, u8 clien
 }
 
 // The link battle's commands, from 0x100
-const NetCommand data_ov167_021d7448[9] = {
+const NetCommand BTL_NET_COMMANDS[9] = {
     { RecvVersion, NULL },
     { RecvSyncData, NULL },
     { RecvParty, GetPartyRecvBuffer },

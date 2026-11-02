@@ -19,6 +19,21 @@
 // The play modes the scores are kept for
 #define BSUBWAY_SCORE_MODE_MAX 9
 
+// The play modes, a playMode: the kinds of train of the normal line, the Wi-Fi train, and those of the super line
+enum {
+    BSUBWAY_MODE_SINGLE,
+    BSUBWAY_MODE_DOUBLE,
+    // A multi train with one of the partners of BsubwayScr_CreatePartners
+    BSUBWAY_MODE_MULTI,
+    // A multi train with a partner over the wireless network
+    BSUBWAY_MODE_COMM_MULTI,
+    BSUBWAY_MODE_WIFI,
+    BSUBWAY_MODE_SUPER_SINGLE,
+    BSUBWAY_MODE_SUPER_DOUBLE,
+    BSUBWAY_MODE_SUPER_MULTI,
+    BSUBWAY_MODE_SUPER_COMM_MULTI,
+};
+
 // The values of the current play, which BSubwayPlayData_GetData reads and BSubwayPlayData_SetData sets
 enum {
     BSUBWAY_PLAY_MODE,
@@ -26,12 +41,12 @@ enum {
     BSUBWAY_PLAY_WIFI_DOWN,
     BSUBWAY_PLAY_WIFI_TURN,
     BSUBWAY_PLAY_WIFI_DAMAGE,
-    BSUBWAY_PLAY_UNK8,
-    BSUBWAY_PLAY_UNK28,
-    BSUBWAY_PLAY_UNK0_0,
-    BSUBWAY_PLAY_UNKC,
-    BSUBWAY_PLAY_UNK0_6,
-    BSUBWAY_PLAY_UNK0_9,
+    BSUBWAY_PLAY_MEMBER_SLOTS,
+    BSUBWAY_PLAY_PARTNER_CONFIG,
+    BSUBWAY_PLAY_PARTNER_RENTAL_ITEM,
+    BSUBWAY_PLAY_TRAINER_NOS,
+    BSUBWAY_PLAY_PARTNER_INDEX,
+    BSUBWAY_PLAY_USE_BATTLE_BOX,
     BSUBWAY_PLAY_UNK0_10,
 };
 
@@ -46,12 +61,14 @@ enum {
 
 // Block 0x38: the play the player saved in the middle of
 struct BSubwayPlayData {
-    u16 unk0_0 : 1;
+    // Whether the partner's team was made with rental items
+    u16 partnerRentalItem : 1;
     // Whether the play was saved
     u16 saved : 1;
     u16 playMode : 4;
-    u16 unk0_6 : 3;
-    u16 unk0_9 : 1;
+    u16 partnerIndex : 3;
+    // Whether the Pokémon entered are the Battle Box's
+    u16 useBattleBox : 1;
     u16 unk0_10 : 1;
     u16 : 5;
     u8 round;
@@ -59,9 +76,10 @@ struct BSubwayPlayData {
     u8 wifiDown;
     u16 wifiTurn;
     u16 wifiDamage;
-    u8 unk8[4];
-    u8 unkC[0x1c];
-    u8 unk28[0x14];
+    // The party slots of the members, the trainers of each round, and the partner's team, a BSubwayTeamConfig
+    u8 memberSlots[4];
+    u8 trainerNos[0x1c];
+    u8 partnerConfig[0x14];
 };
 
 // Block 0x39: the scores

@@ -65,7 +65,7 @@ __attribute__((no_sanitize("address"), noinline)) static BOOL SectionIs(const u8
 // Two statics of overlay files, for the check that they lie in their overlay's sections and are set back: an
 // initialized one of ov036's field_g3d_mapper.c and a zeroed one of ov167's battle_event.c
 extern FieldTerrainAnimatorSetup GND_ANIME_WK;
-extern BattleEventItem *data_ov167_021db1a0[];
+extern BattleEventItem *g_BattleEventPool[];
 
 // The part of OS_Init that the file system and the card need, in OS_Init's order, then FS_Init and FS_TryLoadTable as
 // SystemInit does them. Returns the table's memory
@@ -260,8 +260,8 @@ static void OverlayMain(void) {
               sTerrainSetup < overlay->data.start + overlay->data.size,
           "an initialized global of overlay 36 is in its data section");
     overlay = port_ovsec_get(167);
-    Check(overlay != NULL && (u8 *)data_ov167_021db1a0 >= overlay->bss.start &&
-              (u8 *)data_ov167_021db1a0 < overlay->bss.start + overlay->bss.size,
+    Check(overlay != NULL && (u8 *)g_BattleEventPool >= overlay->bss.start &&
+              (u8 *)g_BattleEventPool < overlay->bss.start + overlay->bss.size,
           "a zeroed global of overlay 167 is in its bss section");
 
     // Loading sets the statics back; unloading leaves them; loading again sets them back again
@@ -488,7 +488,7 @@ static void MemoryFilesMain(void) {
 
 // The game's genuine-card check (src/ov338/ir_check.c), which runs at every CONTINUE and NEW GAME
 // (src/system/game_beacon.c's GameBeaconSys_CheckGenuineCard) and when a Pokémon faints in a wild or trainer battle
-// (src/ov167/btl_main.c's func_ov167_0219bdfc), against the card's infrared chip on the SPI registers
+// (src/ov167/btl_main.c's IsExpGainEnabled), against the card's infrared chip on the SPI registers
 // (port/hal/card/card_spi.c). It takes the card's backup lock, which CARD_Init (through FS_Init) sets up. The check
 // passes on melonDS, which the oracle runs: after CONTINUE, the oracle's HBlank task list holds no task, where a failed
 // check would leave GameBeaconSys_HideNewHBlank in it for good, and battles there give experience

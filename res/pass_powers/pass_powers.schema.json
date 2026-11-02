@@ -1,0 +1,84 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The Pass Powers: res/pass_powers/pass_powers.json",
+    "description": "ARCID_PASS_POWER (a/0/3/7): a PassPowerData (save/high_link.h) for each Pass Power by its number, to PASS_POWER_MAX, which PassPowerData_Create (pass_power.c) reads. tools/data/pass_power_data.py packs it.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "pass_powers" ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "This schema, for editors"
+        },
+        "pass_powers": {
+            "type": "array",
+            "maxItems": 64,
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "name", "description", "effect", "value", "minutes", "level_white", "level_black", "price" ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "Its name, a message of res/text/system/pass_powers.txt (TEXT_BANK_PASS_POWERS) by ID"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Its description, a message of res/text/system/monolith_power_info.txt (TEXT_BANK_MONOLITH_POWER_INFO) by ID"
+                    },
+                    "effect": {
+                        "enum": [
+                            "PASS_POWER_EFFECT_ENCOUNTER_UP",
+                            "PASS_POWER_EFFECT_ENCOUNTER_DOWN",
+                            "PASS_POWER_EFFECT_HATCH",
+                            "PASS_POWER_EFFECT_BEFRIEND",
+                            "PASS_POWER_EFFECT_BARGAIN",
+                            "PASS_POWER_EFFECT_HP_RESTORE",
+                            "PASS_POWER_EFFECT_PP_RESTORE",
+                            "PASS_POWER_EFFECT_EXP_UP",
+                            "PASS_POWER_EFFECT_EXP_DOWN",
+                            "PASS_POWER_EFFECT_PRIZE_MONEY",
+                            "PASS_POWER_EFFECT_CAPTURE",
+                            "PASS_POWER_EFFECT_11",
+                            "PASS_POWER_EFFECT_12",
+                            "PASS_POWER_EFFECT_EXPLORING",
+                            "PASS_POWER_EFFECT_GROTTO",
+                            "PASS_POWER_EFFECT_LUCKY"
+                        ],
+                        "description": "What it does, a PASS_POWER_EFFECT_* of save/high_link.h; one Pass Power of each effect runs at a time"
+                    },
+                    "value": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The strength of the effect: a percentage, an amount or a level"
+                    },
+                    "minutes": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "How long it lasts, in minutes"
+                    },
+                    "level_white": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "PassPowerData.level1: the level that unlocks it in White 2"
+                    },
+                    "level_black": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "PassPowerData.level2: the level that unlocks it in Black 2"
+                    },
+                    "price": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "The price in Pass Orbs, which the description shows (PassPowerData_GetPrice)"
+                    }
+                }
+            }
+        }
+    }
+}

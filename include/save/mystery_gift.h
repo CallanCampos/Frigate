@@ -18,7 +18,7 @@ struct MysteryGift {
     u16 id;
     // Which of the gift messages the card shows
     u8 msgIndex;
-    // What the gift gives, 1 for a Pokémon and 2 for an item
+    // What the gift gives, a MYSTERY_GIFT_KIND_*
     u8 kind;
     // Received at most once per game, by its ID
     u8 once : 1;
@@ -27,6 +27,22 @@ struct MysteryGift {
     u8 unkB4_2 : 6;
     u8 unkB5[0x17];
 };
+
+// What a gift gives, a MysteryGift's kind
+enum {
+    MYSTERY_GIFT_KIND_NONE,
+    MYSTERY_GIFT_KIND_POKEMON,
+    MYSTERY_GIFT_KIND_ITEM,
+    MYSTERY_GIFT_KIND_PASS_POWER,
+    MYSTERY_GIFT_KIND_ONE_SHOT,
+    MYSTERY_GIFT_KIND_MAX,
+};
+
+// The values of a gift that gives no item, Pass Power or one-shot power, as Mystery_GetGiftItem and the other getters
+// of app/mystery/mystery_gift_data.h give them
+#define MYSTERY_GIFT_ITEM_NONE 0
+#define MYSTERY_GIFT_PASS_POWER_NONE 0x30
+#define MYSTERY_GIFT_ONE_SHOT_NONE 0x7f
 
 // A gift as it is received, with its card's text
 typedef struct {

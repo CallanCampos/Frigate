@@ -1,0 +1,169 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The weather calendar: res/field/weather/calendar.json",
+    "description": "ARCID_CALENDAR (a/0/9/6): the weather of each day of the year for CALENDAR_ZONE_MAX zones, which Calendar_GetWeather (calender.c) reads when the season is the real one (GetWeatherAll); a zone it doesn't have keeps its header's weather. tools/data/weather_calendar_data.py packs it.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "zones" ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "This schema, for editors"
+        },
+        "zones": {
+            "type": "array",
+            "minItems": 24,
+            "maxItems": 24,
+            "description": "The zones, CalendarZone's of file 1, which the code reads all 24 of",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "zone", "weather" ],
+                "properties": {
+                    "zone": {
+                        "type": "string",
+                        "x-constant": "ZONE_"
+                    },
+                    "weather": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "january",
+                            "february",
+                            "march",
+                            "april",
+                            "may",
+                            "june",
+                            "july",
+                            "august",
+                            "september",
+                            "october",
+                            "november",
+                            "december"
+                        ],
+                        "description": "The weather of each day of each month, a WEATHER_* of system/zone_weather.h; February has 29 days, as Calendar_GetDayOfYear counts",
+                        "properties": {
+                            "january": {
+                                "type": "array",
+                                "minItems": 31,
+                                "maxItems": 31,
+                                "items": {
+                                    "$ref": "#/$defs/weather"
+                                }
+                            },
+                            "february": {
+                                "type": "array",
+                                "minItems": 29,
+                                "maxItems": 29,
+                                "items": {
+                                    "$ref": "#/$defs/weather"
+                                }
+                            },
+                            "march": {
+                                "type": "array",
+                                "minItems": 31,
+                                "maxItems": 31,
+                                "items": {
+                                    "$ref": "#/$defs/weather"
+                                }
+                            },
+                            "april": {
+                                "type": "array",
+                                "minItems": 30,
+                                "maxItems": 30,
+                                "items": {
+                                    "$ref": "#/$defs/weather"
+                                }
+                            },
+                            "may": {
+                                "type": "array",
+                                "minItems": 31,
+                                "maxItems": 31,
+                                "items": {
+                                    "$ref": "#/$defs/weather"
+                                }
+                            },
+                            "june": {
+                                "type": "array",
+                                "minItems": 30,
+                                "maxItems": 30,
+                                "items": {
+                                    "$ref": "#/$defs/weather"
+                                }
+                            },
+                            "july": {
+                                "type": "array",
+                                "minItems": 31,
+                                "maxItems": 31,
+                                "items": {
+                                    "$ref": "#/$defs/weather"
+                                }
+                            },
+                            "august": {
+                                "type": "array",
+                                "minItems": 31,
+                                "maxItems": 31,
+                                "items": {
+                                    "$ref": "#/$defs/weather"
+                                }
+                            },
+                            "september": {
+                                "type": "array",
+                                "minItems": 30,
+                                "maxItems": 30,
+                                "items": {
+                                    "$ref": "#/$defs/weather"
+                                }
+                            },
+                            "october": {
+                                "type": "array",
+                                "minItems": 31,
+                                "maxItems": 31,
+                                "items": {
+                                    "$ref": "#/$defs/weather"
+                                }
+                            },
+                            "november": {
+                                "type": "array",
+                                "minItems": 30,
+                                "maxItems": 30,
+                                "items": {
+                                    "$ref": "#/$defs/weather"
+                                }
+                            },
+                            "december": {
+                                "type": "array",
+                                "minItems": 31,
+                                "maxItems": 31,
+                                "items": {
+                                    "$ref": "#/$defs/weather"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "weather": {
+            "enum": [
+                "WEATHER_SUNNY",
+                "WEATHER_FLAKE",
+                "WEATHER_RAIN",
+                "WEATHER_SANDSTORM",
+                "WEATHER_BLIZZARD",
+                "WEATHER_FLUTTER",
+                "WEATHER_THUNDERSTORM",
+                "WEATHER_GUSTY_RAIN",
+                "WEATHER_DIAMOND_DUST",
+                "WEATHER_TINT_9",
+                "WEATHER_TINT_10",
+                "WEATHER_TINT_11",
+                "WEATHER_SANDSTORM_2",
+                "WEATHER_TINT_13",
+                "WEATHER_TINT_14"
+            ]
+        }
+    }
+}

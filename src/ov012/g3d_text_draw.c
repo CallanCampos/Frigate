@@ -1,6 +1,7 @@
 // Text drawn into a texture of a 3D model, as the Pokémon World Tournament's scoreboard shows it. Function names from
 // swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0); the file's name is descriptive
 #include "types.h"
+#include "constants/arc.h"
 #include "gfl/bmp.h"
 #include "gfl/g3d.h"
 #include "gfl/graphics.h"
@@ -36,8 +37,8 @@ static void G3DTextDraw_StringToTexture(G3DTextDrawWork *work, const StrBuf *tex
                                         HeapID heapId);
 static void G3DTextDraw_ConvertPalette(G3DTextDrawWork *work, const void *palette);
 
-BOOL G3DTextDraw_CreateResource(G3DResource *texture, const char *texName, uptr a2, const char *plName,
-                                const StrBuf *text, u16 a5, u16 a6, u16 color, HeapID heapId,
+BOOL G3DTextDraw_CreateResource(G3DResource *texture, const char *texName, uptr palette, const char *plName,
+                                const StrBuf *text, u16 x, u16 y, u16 color, HeapID heapId,
                                 G3DTextDrawResource *resource) {
     G3DTextDrawResource res;
     NNSG3dResName texResName;
@@ -54,13 +55,13 @@ BOOL G3DTextDraw_CreateResource(G3DResource *texture, const char *texName, uptr 
     u16 *plEntry;
     Font *font;
 
-    res.unk0 = 6;
-    res.unk2 = 6;
-    res.unkC = 0;
-    res.unk10 = 0;
+    res.widthIndex = 6;
+    res.heightIndex = 6;
+    res.texOffset = 0;
+    res.plttOffset = 0;
     texData = GFL_G3DResGetTexData(texture);
-    res.unk4 = texData->texInfo.vramKey;
-    res.unk8 = texData->plttInfo.vramKey;
+    res.texVramKey = texData->texInfo.vramKey;
+    res.plttVramKey = texData->plttInfo.vramKey;
     dictOffset = texData->texInfo.ofsDict;
     for (i = 0; i < STD_GetStringLength(texName); i++) {
         texResName.name[i] = texName[i];
@@ -73,18 +74,18 @@ BOOL G3DTextDraw_CreateResource(G3DResource *texture, const char *texName, uptr 
         return FALSE;
     }
     texParam = texEntry[0];
-    res.unkC = (texParam & 0xffff) << 3;
+    res.texOffset = (texParam & 0xffff) << 3;
     sizeS = (texParam & 0x700000) >> 20;
     sizeT = (texParam & 0x3800000) >> 23;
     for (n = 0; n < TEX_DIM_COUNT; n++) {
         if (sizeS == TEX_DIM_LUT[n].sizeS) {
-            res.unk0 = n;
+            res.widthIndex = n;
             break;
         }
     }
     for (n = 0; n < TEX_DIM_COUNT; n++) {
         if (sizeT == TEX_DIM_LUT[n].sizeT) {
-            res.unk2 = n;
+            res.heightIndex = n;
             break;
         }
     }
@@ -102,18 +103,18 @@ BOOL G3DTextDraw_CreateResource(G3DResource *texture, const char *texName, uptr 
     if (plEntry[1] == 1) {
         return FALSE;
     }
-    res.unk10 = (plEntry[0] & 0xffff) << 3;
-    font = GFL_FontCreate(0x17, 0, 0, FALSE, heapId);
-    work.resource.unk0 = res.unk0;
-    work.resource.unk2 = res.unk2;
+    res.plttOffset = (plEntry[0] & 0xffff) << 3;
+    font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
+    work.resource.widthIndex = res.widthIndex;
+    work.resource.heightIndex = res.heightIndex;
     work.font = font;
-    work.resource.unk4 = res.unk4;
-    work.resource.unkC = res.unkC;
-    work.resource.unk8 = res.unk8;
-    work.resource.unk10 = res.unk10;
-    G3DTextDraw_StringToTexture(&work, text, a5, a6, color, heapId);
-    if (a2 != 0) {
-        G3DTextDraw_ConvertPalette(&work, (const void *)a2);
+    work.resource.texVramKey = res.texVramKey;
+    work.resource.texOffset = res.texOffset;
+    work.resource.plttVramKey = res.plttVramKey;
+    work.resource.plttOffset = res.plttOffset;
+    G3DTextDraw_StringToTexture(&work, text, x, y, color, heapId);
+    if (palette != 0) {
+        G3DTextDraw_ConvertPalette(&work, (const void *)palette);
     }
     GFL_FontFree(font);
     if (resource != NULL) {
@@ -161,8 +162,8 @@ static void G3DTextDraw_BitmapTiledToLinear(GFLBitmap *tiled, GFLBitmap *linear)
 
 static void G3DTextDraw_StringToTexture(G3DTextDrawWork *work, const StrBuf *text, u16 x, u16 y, u16 color,
                                         HeapID heapId) {
-    u16 width = TEX_DIM_LUT[work->resource.unk0].size;
-    u16 height = TEX_DIM_LUT[work->resource.unk2].size;
+    u16 width = TEX_DIM_LUT[work->resource.widthIndex].size;
+    u16 height = TEX_DIM_LUT[work->resource.heightIndex].size;
     GFLBitmap *linear = GFL_BitmapCreate(width / 8, height / 8, 0x20, heapId);
     GFLBitmap *tiled = GFL_BitmapCreate(width / 8, height / 8, 0x20, heapId);
     u8 *pixels;
@@ -173,8 +174,8 @@ static void G3DTextDraw_StringToTexture(G3DTextDrawWork *work, const StrBuf *tex
     G3DTextDraw_RenderBitmap(text, x, y, color, tiled, work->font);
     G3DTextDraw_BitmapTiledToLinear(tiled, linear);
     pixels = GFL_BitmapGetPixelData(linear);
-    texOffset = work->resource.unkC;
-    texKey = (work->resource.unk4 & 0xffff) << 3;
+    texOffset = work->resource.texOffset;
+    texKey = (work->resource.texVramKey & 0xffff) << 3;
     size = width / 8 * height / 8 * 32;
     GX_BeginLoadTex();
     DC_FlushRange(pixels, size);
@@ -186,9 +187,9 @@ static void G3DTextDraw_StringToTexture(G3DTextDrawWork *work, const StrBuf *tex
 
 static void G3DTextDraw_ConvertPalette(G3DTextDrawWork *work, const void *palette) {
     u32 plttKey;
-    u32 plttOffset = work->resource.unk10;
+    u32 plttOffset = work->resource.plttOffset;
 
-    plttKey = (work->resource.unk8 & 0xffff) << 3;
+    plttKey = (work->resource.plttVramKey & 0xffff) << 3;
 
     GX_BeginLoadTexPltt();
     DC_FlushRange(palette, 0x20);

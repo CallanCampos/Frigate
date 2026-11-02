@@ -515,9 +515,9 @@ BOOL Scrcmd_Pokemon_PokePartyAddNPoke(VM *vm, FieldScriptEnv *env) {
     u16 *result;
     u16 species;
     u16 level;
-    u16 unk5;
-    u16 unk7;
-    u16 unk6;
+    u16 nature;
+    u16 ability;
+    u16 sex;
     PartyPkm *pkm;
     NPokeSpec spec;
 
@@ -529,16 +529,16 @@ BOOL Scrcmd_Pokemon_PokePartyAddNPoke(VM *vm, FieldScriptEnv *env) {
     result = ScriptReadVar(vm, env);
     species = ScriptReadAny(vm, env);
     level = ScriptReadAny(vm, env);
-    unk5 = ScriptReadAny(vm, env);
-    unk7 = ScriptReadAny(vm, env);
-    unk6 = ScriptReadAny(vm, env);
+    nature = ScriptReadAny(vm, env);
+    ability = ScriptReadAny(vm, env);
+    sex = ScriptReadAny(vm, env);
     pkm = GFL_HeapAllocate(HEAPID_TAIL(heapId), PokeParty_GetPkmRawSize(), TRUE, "scrcmd_pokemon.c", 0x3bd);
     MI_CpuFill8(&spec, 0, sizeof(NPokeSpec));
     spec.species = species;
     spec.level = level;
-    spec.nature = unk5;
-    spec.sex = unk6;
-    spec.ability = unk7;
+    spec.nature = nature;
+    spec.sex = sex;
+    spec.ability = ability;
     createNPkm(pkm, &spec);
     PokeParty_SetParam(pkm, PKM_PARAM_POKEBALL, PML_ItemGetMonsBallID(4));
     PokeParty_SetupMetData(pkm, 7, playerInfo,
@@ -942,12 +942,12 @@ PartyPkm *GameData_MakeBoxPkm(GameData *gameData, BoxPkmCreateParams *params) {
     pid = PML_GenPID(trainerId, (u16)params->species, (u16)params->form, params->sex, params->ability, params->param1C);
     pkm = PokeParty_NewPkm((u16)params->species, (u16)params->level, trainerId, PKM_IVS_RANDOM, pid, params->heapId);
     PokeParty_ChangeForme(pkm, params->form);
-    PokeParty_SetParam(pkm, 6, params->item);
+    PokeParty_SetParam(pkm, PKM_PARAM_ITEM, params->item);
     if (params->hiddenAbility != 0) {
         PokeParty_SetHiddenAbil(pkm, params->species, params->form);
     }
-    if (GetItemParam((u16)params->ball, 15, params->heapId) == 4) {
-        PokeParty_SetParam(pkm, 0x98, PML_ItemGetMonsBallID((u16)params->ball));
+    if (GetItemParam((u16)params->ball, ITEM_PARAM_KIND, params->heapId) == 4) {
+        PokeParty_SetParam(pkm, PKM_PARAM_POKEBALL, PML_ItemGetMonsBallID((u16)params->ball));
     }
     zoneId = PlayerState_GetZoneID(GameData_GetPlayerState(gameData));
     placeName = ZoneData_GetPlaceNameID(zoneId);

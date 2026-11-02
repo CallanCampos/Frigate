@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/species.h"
 #include "field/fest_mission_data.h"
 #include "field/fest_mission_gimmick.h"
 #include "field/fest_mission_hollow.h"
@@ -7,22 +8,25 @@
 #include "gfl/std.h"
 #include "nitro/math.h"
 
-// A person of a hollow mission, by the mission's unk0_20: the object code (probably) and an unknown byte
+// The Pokémon of a hollow mission, by the mission's targetVariant
 typedef struct {
-    u16 unk0;
-    u8 unk2;
+    u16 species;
+    u8 form;
 } FesMissionHollowPerson;
 
-static u16 FesMissionHollow_GetPersonObjCode(FesGimmick *gimmick);
-static u8 FesMissionHollow_GetPersonUnk2(FesGimmick *gimmick);
+static u16 FesMissionHollow_GetPersonSpecies(FesGimmick *gimmick);
+static u8 FesMissionHollow_GetPersonForm(FesGimmick *gimmick);
 static void FesMissionHollow_Shuffle(u8 *list, int count, MATHRandContext32 *rand);
 
 // clang-format off
-static const FesMissionHollowPerson data_ov026_0216fa50[] = {
-    { 1, 0 },   { 431, 0 }, { 434, 0 }, { 133, 0 }, { 136, 0 }, { 134, 0 }, { 135, 0 },
-    { 196, 0 }, { 197, 0 }, { 471, 0 }, { 470, 0 }, { 276, 0 }, { 285, 0 }, { 290, 0 },
-    { 316, 0 }, { 327, 0 }, { 293, 0 }, { 261, 0 }, { 263, 0 }, { 270, 0 }, { 296, 0 },
-    { 148, 0 }, { 82, 0 },  { 444, 0 }, { 372, 0 }, { 176, 0 }, { 113, 0 },
+static const FesMissionHollowPerson sFesMissionHollowPeople[] = {
+    { SPECIES_BULBASAUR, 0 }, { SPECIES_GLAMEOW, 0 },   { SPECIES_STUNKY, 0 },    { SPECIES_EEVEE, 0 },
+    { SPECIES_FLAREON, 0 },   { SPECIES_VAPOREON, 0 },  { SPECIES_JOLTEON, 0 },   { SPECIES_ESPEON, 0 },
+    { SPECIES_UMBREON, 0 },   { SPECIES_GLACEON, 0 },   { SPECIES_LEAFEON, 0 },   { SPECIES_TAILLOW, 0 },
+    { SPECIES_SHROOMISH, 0 }, { SPECIES_NINCADA, 0 },   { SPECIES_GULPIN, 0 },    { SPECIES_SPINDA, 0 },
+    { SPECIES_WHISMUR, 0 },   { SPECIES_POOCHYENA, 0 }, { SPECIES_ZIGZAGOON, 0 }, { SPECIES_LOTAD, 0 },
+    { SPECIES_MAKUHITA, 0 },  { SPECIES_DRAGONAIR, 0 }, { SPECIES_MAGNETON, 0 },  { SPECIES_GABITE, 0 },
+    { SPECIES_SHELGON, 0 },   { SPECIES_TOGETIC, 0 },   { SPECIES_CHANSEY, 0 },
 };
 
 // clang-format on
@@ -47,8 +51,8 @@ void FesMissionHollow_Setup(FesGimmick *gimmick) {
         entry->female = FALSE;
         entry->selected = 1;
         entry->active = 0;
-        entry->species = FesMissionHollow_GetPersonObjCode(gimmick);
-        entry->form = FesMissionHollow_GetPersonUnk2(gimmick);
+        entry->species = FesMissionHollow_GetPersonSpecies(gimmick);
+        entry->form = FesMissionHollow_GetPersonForm(gimmick);
     }
     FesMissionHollow_Shuffle(hollows, 20, &rand);
     for (i = 0; i < 10; i++) {
@@ -60,14 +64,14 @@ void FesMissionHollow_Setup(FesGimmick *gimmick) {
     }
 }
 
-static u16 FesMissionHollow_GetPersonObjCode(FesGimmick *gimmick) {
+static u16 FesMissionHollow_GetPersonSpecies(FesGimmick *gimmick) {
     FestMissionConfig *mission = GetFestMissionCfg(gimmick->festival);
-    return data_ov026_0216fa50[mission->info.unk0_20].unk0;
+    return sFesMissionHollowPeople[mission->info.targetVariant].species;
 }
 
-static u8 FesMissionHollow_GetPersonUnk2(FesGimmick *gimmick) {
+static u8 FesMissionHollow_GetPersonForm(FesGimmick *gimmick) {
     FestMissionConfig *mission = GetFestMissionCfg(gimmick->festival);
-    return data_ov026_0216fa50[mission->info.unk0_20].unk2;
+    return sFesMissionHollowPeople[mission->info.targetVariant].form;
 }
 
 // Shuffles the list
@@ -84,7 +88,7 @@ static void FesMissionHollow_Shuffle(u8 *list, int count, MATHRandContext32 *ran
 
 BOOL FesMissionHollow_IsActive(FesGimmick *gimmick) {
     FestMissionConfig *mission = GetFestMissionCfg(gimmick->festival);
-    if (mission->info.target == 5 && mission->info.unk0_20 != 0) {
+    if (mission->info.target == 5 && mission->info.targetVariant != 0) {
         return TRUE;
     }
     return FALSE;

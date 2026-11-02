@@ -2,12 +2,15 @@
 #include "battle/btl_calc.h"
 #include "battle/btl_main.h"
 #include "battle/btl_pokeparam.h"
+#include "battle/btl_pospoke.h"
 #include "battle/btl_result.h"
 #include "battle/btl_setup.h"
 #include "battle/btl_tables.h"
 #include "battle/trainer_data.h"
 #include "constants/battle.h"
+#include "constants/moves.h"
 #include "constants/pokemon.h"
+#include "constants/types.h"
 #include "gfl/heap.h"
 #include "pml/item.h"
 #include "pml/move.h"
@@ -27,38 +30,39 @@ typedef struct {
     MATHRandContext32 rand;
 } BtlCalcWork;
 
-BtlCalcWork data_ov167_021dd844;
+BtlCalcWork g_BtlCalcWork;
 
 // MWCC sorts these tables by size, swapping each pair of the same size, so the two 6-byte tables and the two
 // stage ratio tables are each declared in the reverse of the ROM's order
 
 // The chance of a critical hit at each critical hit stage is 1 in this
-const u8 data_ov167_021d74a0[5] = { 16, 8, 4, 3, 2 };
+const u8 CRITICAL_HIT_CHANCES[5] = { 16, 8, 4, 3, 2 };
 
 // The damage multiplier in quarters of each type effectiveness
-const u8 data_ov167_021d74ab[6] = { 0, 1, 2, 4, 8, 16 };
+const u8 TYPE_EFFECTIVENESS_QUARTERS[6] = { 0, 1, 2, 4, 8, 16 };
 
 // The percentages below which a move that hits 2 to 5 times hits each number of times
-const u8 data_ov167_021d74a5[6] = { 0, 0, 35, 70, 85, 100 };
+const u8 MULTI_HIT_CHANCES[6] = { 0, 0, 35, 70, 85, 100 };
 
-const u8 data_ov167_021d74b1[9] = { 2, 4, 6, 9, 12, 16, 20, 25, 30 };
+// The multiplier of the money lost, by BtlCalc_GetLostMoney's index up to 8
+const u8 LOST_MONEY_MULTIPLIERS[9] = { 2, 4, 6, 9, 12, 16, 20, 25, 30 };
 
 const u16 data_ov167_021d74ba[9] = { 0x73, 0x871, 0x10db, 0x1836, 0x216e, 0x297d, 0x30bf, 0x3986, 0x41be };
 
 // The ratio of each accuracy and evasion stage, -6 to +6
-const BtlCalcRatio data_ov167_021d74e6[13] = {
+const BtlCalcRatio ACCURACY_STAGE_RATIOS[13] = {
     { 6, 18 }, { 6, 16 }, { 6, 14 }, { 6, 12 }, { 6, 10 }, { 6, 8 },  { 6, 6 },
     { 8, 6 },  { 10, 6 }, { 12, 6 }, { 14, 6 }, { 16, 6 }, { 18, 6 },
 };
 
 // The ratio of each stat stage, -6 to +6
-const BtlCalcRatio data_ov167_021d74cc[13] = {
+const BtlCalcRatio STAT_STAGE_RATIOS[13] = {
     { 2, 8 }, { 2, 7 }, { 2, 6 }, { 2, 5 }, { 2, 4 }, { 2, 3 }, { 2, 2 },
     { 3, 2 }, { 4, 2 }, { 5, 2 }, { 6, 2 }, { 7, 2 }, { 8, 2 },
 };
 
 // The damage of each attacking type against each defending type in halves: 0, 2 (half), 4 (normal) or 8 (double)
-const u8 data_ov167_021d7500[17][17] = {
+const u8 TYPE_CHART[17][17] = {
     { 4, 4, 4, 4, 4, 2, 4, 0, 2, 4, 4, 4, 4, 4, 4, 4, 4 }, { 8, 4, 2, 2, 4, 8, 2, 0, 8, 4, 4, 4, 4, 2, 8, 4, 8 },
     { 4, 8, 4, 4, 4, 2, 8, 4, 2, 4, 4, 8, 2, 4, 4, 4, 4 }, { 4, 4, 4, 2, 2, 2, 4, 2, 0, 4, 4, 8, 4, 4, 4, 4, 4 },
     { 4, 4, 0, 8, 4, 8, 2, 4, 8, 8, 4, 2, 8, 4, 4, 4, 4 }, { 4, 2, 8, 4, 2, 4, 8, 4, 2, 8, 4, 4, 4, 4, 8, 4, 4 },
@@ -78,33 +82,33 @@ static inline u16 BtlCalc_GetUnkTableValue(u32 index) {
 }
 
 void BtlCalc_Init(const MATHRandContext32 *rand, HeapID heapId) {
-    data_ov167_021dd844.moves = GFL_HeapAllocate(heapId, 0x230 * sizeof(u16), TRUE, "btl_calc.c", 0x50);
-    data_ov167_021dd844.rand = *rand;
+    g_BtlCalcWork.moves = GFL_HeapAllocate(heapId, 0x230 * sizeof(u16), TRUE, "btl_calc.c", 0x50);
+    g_BtlCalcWork.rand = *rand;
 }
 
 void BtlCalc_ResetRand(const MATHRandContext32 *rand) {
-    data_ov167_021dd844.rand = *rand;
+    g_BtlCalcWork.rand = *rand;
 }
 
 void BtlCalc_Exit(void) {
-    if (data_ov167_021dd844.moves != NULL) {
-        GFL_HeapFree(data_ov167_021dd844.moves);
-        data_ov167_021dd844.moves = NULL;
+    if (g_BtlCalcWork.moves != NULL) {
+        GFL_HeapFree(g_BtlCalcWork.moves);
+        g_BtlCalcWork.moves = NULL;
     }
 }
 
 u32 BattleRandom(u32 max) {
-    return MATH_Rand32(&data_ov167_021dd844.rand, max);
+    return MATH_Rand32(&g_BtlCalcWork.rand, max);
 }
 
 u16 GetBoostFromStatStage(u16 value, u8 stage) {
-    u32 result = (u16)(value * data_ov167_021d74cc[stage].numerator);
+    u32 result = (u16)(value * STAT_STAGE_RATIOS[stage].numerator);
 
-    return result / data_ov167_021d74cc[stage].denominator;
+    return result / STAT_STAGE_RATIOS[stage].denominator;
 }
 
 u8 BtlCalc_ApplyAccuracyStage(u32 value, u32 stage) {
-    value = (s32)(value * data_ov167_021d74e6[stage].numerator) / data_ov167_021d74e6[stage].denominator;
+    value = (s32)(value * ACCURACY_STAGE_RATIOS[stage].numerator) / ACCURACY_STAGE_RATIOS[stage].denominator;
     if (value > 100) {
         value = 100;
     }
@@ -112,7 +116,7 @@ u8 BtlCalc_ApplyAccuracyStage(u32 value, u32 stage) {
 }
 
 BOOL BtlCalc_RollCritical(u8 critStage) {
-    u8 roll = BattleRandom(data_ov167_021d74a0[critStage]);
+    u8 roll = BattleRandom(CRITICAL_HIT_CHANCES[critStage]);
 
     if (roll == 0) {
         return TRUE;
@@ -121,20 +125,20 @@ BOOL BtlCalc_RollCritical(u8 critStage) {
 }
 
 u32 GetTypeEffectiveness(u8 attackType, u8 defenseType) {
-    if (attackType == 17 || defenseType == 17) {
-        return 3;
+    if (attackType == TYPE_NULL || defenseType == TYPE_NULL) {
+        return TYPE_EFFECTIVENESS_NORMAL;
     }
-    switch (data_ov167_021d7500[attackType][defenseType]) {
+    switch (TYPE_CHART[attackType][defenseType]) {
     case 0:
-        return 0;
+        return TYPE_EFFECTIVENESS_IMMUNE;
     case 2:
-        return 2;
+        return TYPE_EFFECTIVENESS_HALF;
     case 4:
-        return 3;
+        return TYPE_EFFECTIVENESS_NORMAL;
     case 8:
-        return 4;
+        return TYPE_EFFECTIVENESS_DOUBLE;
     }
-    return 0;
+    return TYPE_EFFECTIVENESS_IMMUNE;
 }
 
 s32 BtlCalc_GetTypePairEffectiveness(u8 attackType, PokeTypePair defenseTypes) {
@@ -151,23 +155,23 @@ s32 BtlCalc_GetTypePairEffectiveness(u8 attackType, PokeTypePair defenseTypes) {
 }
 
 u32 GetTypeEffectivenessMultiplier(u32 effectiveness1, u32 effectiveness2) {
-    u32 multiplier = data_ov167_021d74ab[effectiveness1] * data_ov167_021d74ab[effectiveness2] / 4;
+    u32 multiplier = TYPE_EFFECTIVENESS_QUARTERS[effectiveness1] * TYPE_EFFECTIVENESS_QUARTERS[effectiveness2] / 4;
 
     switch (multiplier) {
     case 0:
-        return 0;
+        return TYPE_EFFECTIVENESS_IMMUNE;
     case 1:
-        return 1;
+        return TYPE_EFFECTIVENESS_QUARTER;
     case 2:
-        return 2;
+        return TYPE_EFFECTIVENESS_HALF;
     case 4:
-        return 3;
+        return TYPE_EFFECTIVENESS_NORMAL;
     case 8:
-        return 4;
+        return TYPE_EFFECTIVENESS_DOUBLE;
     case 16:
-        return 5;
+        return TYPE_EFFECTIVENESS_QUADRUPLE;
     }
-    return 0;
+    return TYPE_EFFECTIVENESS_IMMUNE;
 }
 
 u32 CalcBaseDamage(u32 power, u32 attack, u32 level, u32 defense) {
@@ -176,17 +180,17 @@ u32 CalcBaseDamage(u32 power, u32 attack, u32 level, u32 defense) {
 
 u32 TypeEffectivenessPowerMod(u32 damage, u32 effectiveness) {
     switch (effectiveness) {
-    case 0:
+    case TYPE_EFFECTIVENESS_IMMUNE:
         return 0;
-    case 1:
+    case TYPE_EFFECTIVENESS_QUARTER:
         return damage >> 2;
-    case 2:
+    case TYPE_EFFECTIVENESS_HALF:
         return damage >> 1;
-    case 3:
+    case TYPE_EFFECTIVENESS_NORMAL:
         return damage;
-    case 4:
+    case TYPE_EFFECTIVENESS_DOUBLE:
         return damage << 1;
-    case 5:
+    case TYPE_EFFECTIVENESS_QUADRUPLE:
         return damage << 2;
     }
     return damage;
@@ -197,7 +201,7 @@ u8 GetTypeWeaknesses(u8 attackType, u8 *defenseTypes) {
     u8 i;
 
     for (i = 0, count = 0; i < 17; i++) {
-        if (data_ov167_021d7500[attackType][i] == 0 || data_ov167_021d7500[attackType][i] == 2) {
+        if (TYPE_CHART[attackType][i] == 0 || TYPE_CHART[attackType][i] == 2) {
             defenseTypes[count++] = i;
         }
     }
@@ -205,13 +209,13 @@ u8 GetTypeWeaknesses(u8 attackType, u8 *defenseTypes) {
 }
 
 u32 BtlCalc_GetEffectivenessCategory(s32 value) {
-    if (value > 3) {
+    if (value > TYPE_EFFECTIVENESS_NORMAL) {
         return 2;
     }
-    if (value == 3) {
+    if (value == TYPE_EFFECTIVENESS_NORMAL) {
         return 1;
     }
-    if (value != 0) {
+    if (value != TYPE_EFFECTIVENESS_IMMUNE) {
         return 3;
     }
     return 0;
@@ -301,7 +305,7 @@ u8 BtlCalc_RollHitCount(u8 hits) {
         u8 i;
 
         for (i = 0; i < 6; i++) {
-            if (roll < data_ov167_021d74a5[i]) {
+            if (roll < MULTI_HIT_CHANCES[i]) {
                 return i;
             }
         }
@@ -315,19 +319,19 @@ u32 BtlCalc_GetWeatherDamage(BattleMon *mon, u32 weather) {
     u16 damage;
 
     switch (weather) {
-    case 4:
-        if (DoesMonHaveType(mon, 5)) {
+    case BTL_WEATHER_SANDSTORM:
+        if (DoesMonHaveType(mon, TYPE_ROCK)) {
             return 0;
         }
-        if (DoesMonHaveType(mon, 8)) {
+        if (DoesMonHaveType(mon, TYPE_STEEL)) {
             return 0;
         }
-        if (DoesMonHaveType(mon, 4)) {
+        if (DoesMonHaveType(mon, TYPE_GROUND)) {
             return 0;
         }
         break;
-    case 3:
-        if (DoesMonHaveType(mon, 14)) {
+    case BTL_WEATHER_HAIL:
+        if (DoesMonHaveType(mon, TYPE_ICE)) {
             return 0;
         }
         break;
@@ -343,19 +347,19 @@ u32 BtlCalc_GetWeatherDamage(BattleMon *mon, u32 weather) {
 
 fx32 WeatherPowerMod(u32 weather, u32 moveType) {
     switch (weather) {
-    case 1:
-        if (moveType == 9) {
+    case BTL_WEATHER_SUN:
+        if (moveType == TYPE_FIRE) {
             return FX32_CONST(1.5);
         }
-        if (moveType == 10) {
+        if (moveType == TYPE_WATER) {
             return FX32_CONST(0.5);
         }
         break;
-    case 2:
-        if (moveType == 9) {
+    case BTL_WEATHER_RAIN:
+        if (moveType == TYPE_FIRE) {
             return FX32_CONST(0.5);
         }
-        if (moveType == 10) {
+        if (moveType == TYPE_WATER) {
             return FX32_CONST(1.5);
         }
         break;
@@ -388,18 +392,18 @@ BattleCondition BtlCalc_MakeStatusCondition(u32 status) {
 
     condition.raw = 0;
     switch (status) {
-    case 1:
-    case 3:
-    case 4:
-    case 5:
-        condition.common.type = 1;
+    case CONDITION_PARALYSIS:
+    case CONDITION_FREEZE:
+    case CONDITION_BURN:
+    case CONDITION_POISON:
+        condition.common.type = BTL_CONDITION_TYPE_PERMANENT;
         break;
-    case 2:
-        condition.common.type = 2;
+    case CONDITION_SLEEP:
+        condition.common.type = BTL_CONDITION_TYPE_TURNS;
         condition.common.turns = BtlCalc_RandomRange(2, 4);
         break;
     default:
-        condition.common.type = 0;
+        condition.common.type = BTL_CONDITION_TYPE_NONE;
         break;
     }
     return condition;
@@ -416,17 +420,17 @@ BattleCondition BtlCalc_MakeTurnCondition(u32 turns) {
     BattleCondition condition;
 
     condition.raw = 0;
-    condition.common.type = 2;
+    condition.common.type = BTL_CONDITION_TYPE_TURNS;
     condition.common.turns = turns;
     return condition;
 }
 
-BattleCondition BtlCalc_MakePokeCondition(u32 turns) {
+BattleCondition BtlCalc_MakePokeCondition(u32 monId) {
     BattleCondition condition;
 
     condition.raw = 0;
-    condition.common.type = 3;
-    condition.common.turns = turns;
+    condition.common.type = BTL_CONDITION_TYPE_DEPEND_MON;
+    condition.common.turns = monId;
     return condition;
 }
 
@@ -437,10 +441,10 @@ void BtlCalc_MakeDefaultCondition(s32 condition, BattleMon *mon, BattleCondition
     }
     out->raw = 0;
     switch (condition) {
-    case 7:
+    case CONDITION_ATTRACT:
         *out = MakeConditionDependPoke(GetMonID(mon));
         break;
-    case 6:
+    case CONDITION_CONFUSION:
         *out = SetConditionTurns(BtlCalc_RandomRange(2, 5));
         break;
     default:
@@ -472,11 +476,11 @@ u16 BtlCalc_PickRandomMove(const u16 *excluded, u16 count) {
 
     for (move = 1; move < 0x230; move++) {
         if (!BtlCalc_IsMoveInList(excluded, count, move)) {
-            data_ov167_021dd844.moves[numMoves++] = move;
+            g_BtlCalcWork.moves[numMoves++] = move;
         }
     }
     index = BattleRandom(numMoves);
-    return data_ov167_021dd844.moves[index];
+    return g_BtlCalcWork.moves[index];
 }
 
 BOOL BtlCalc_IsMoveInList(const u16 *moves, u32 count, u16 move) {
@@ -507,7 +511,7 @@ u32 CalcBaseExpGain(BattleMon *mon, s32 levelDiff) {
 }
 
 BOOL BtlCalc_IsDoubleOrTripleStyle(u32 value) {
-    if (value != 0 && value != 3) {
+    if (value != BTL_STYLE_SINGLE && value != BTL_STYLE_ROTATION) {
         return TRUE;
     }
     return FALSE;
@@ -515,13 +519,13 @@ BOOL BtlCalc_IsDoubleOrTripleStyle(u32 value) {
 
 u32 BtlCalc_GetFrontPosCount(u32 value) {
     switch (value) {
-    case 0:
+    case BTL_STYLE_SINGLE:
         return 1;
-    case 1:
+    case BTL_STYLE_DOUBLE:
         return 2;
-    case 2:
+    case BTL_STYLE_TRIPLE:
         return 3;
-    case 3:
+    case BTL_STYLE_ROTATION:
         return 1;
     }
     return 1;
@@ -529,7 +533,7 @@ u32 BtlCalc_GetFrontPosCount(u32 value) {
 
 // Function name from swan.
 u8 GetNumMonsOnField(u32 battleStyle, u8 count) {
-    if (battleStyle == 3) {
+    if (battleStyle == BTL_STYLE_ROTATION) {
         count = 3;
     }
     return count;
@@ -605,18 +609,18 @@ u32 BtlCalc_GetLostMoney(u32 index, BattleParty *party) {
     if (index >= 9) {
         index = 8;
     }
-    return maxLevel * 4 * data_ov167_021d74b1[index];
+    return maxLevel * 4 * LOST_MONEY_MULTIPLIERS[index];
 }
 
 void BtlCalc_SetHeapID(HeapID heapId) {
-    data_ov167_021dd844.heapId = heapId;
+    g_BtlCalcWork.heapId = heapId;
 }
 
 void func_ov167_021bd880(void) {
 }
 
 u32 ItemGetParam(u16 item, u32 param) {
-    return GetItemParam(item, param, data_ov167_021dd844.heapId);
+    return GetItemParam(item, param, g_BtlCalcWork.heapId);
 }
 
 // Packs six 5-bit values
@@ -641,10 +645,10 @@ void BtlCalc_UnpackMonIDs(u32 packed, u8 *values) {
 
 // Curse's move target: the user unless it's a Ghost type
 u32 BtlCalc_GetCurseTarget(BattleMon *mon) {
-    u32 target = 7;
+    u32 target = MOVE_TARGET_USER;
 
-    if (DoesMonHaveType(mon, 7)) {
-        target = 0;
+    if (DoesMonHaveType(mon, TYPE_GHOST)) {
+        target = MOVE_TARGET_SELECTED;
     }
     return target;
 }
@@ -656,61 +660,61 @@ u8 DecideMoveTargetAuto(BtlMainModule *mainModule, BtlPokeCon *pokeCon, BattleMo
     u8 monIds[6];
     u8 count;
 
-    if (move == 0xae) {
+    if (move == MOVE_CURSE) {
         target = BtlCalc_GetCurseTarget(mon);
     }
-    if (battleStyle == 0) {
+    if (battleStyle == BTL_STYLE_SINGLE) {
         switch (target) {
-        case 0:
-        case 3:
-        case 4:
-        case 5:
-        case 9:
+        case MOVE_TARGET_SELECTED:
+        case MOVE_TARGET_FOE:
+        case MOVE_TARGET_ALL_ADJACENT:
+        case MOVE_TARGET_ADJACENT_FOES:
+        case MOVE_TARGET_RANDOM_FOE:
             return GetOpposingPos(mainModule, pos, 0);
-        case 1:
-        case 7:
+        case MOVE_TARGET_USER_OR_ALLY:
+        case MOVE_TARGET_USER:
             return pos;
-        case 2:
-        case 6:
-        case 8:
-        case 10:
-        case 11:
-        case 12:
-        case 13:
+        case MOVE_TARGET_ALLY:
+        case MOVE_TARGET_USER_PARTY:
+        case MOVE_TARGET_ALL:
+        case MOVE_TARGET_FIELD:
+        case MOVE_TARGET_FOE_SIDE:
+        case MOVE_TARGET_USER_SIDE:
+        case MOVE_TARGET_DEPENDS:
         default:
-            return 6;
+            return BTL_POS_NONE;
         }
     } else {
         u16 posFlags;
         u8 farTarget = FALSE;
 
-        if (battleStyle == 2) {
+        if (battleStyle == BTL_STYLE_TRIPLE) {
             farTarget = getMoveFlag(move, 0xb);
         }
         switch (target) {
-        case 0:
-        case 3:
-        case 9:
+        case MOVE_TARGET_SELECTED:
+        case MOVE_TARGET_FOE:
+        case MOVE_TARGET_RANDOM_FOE:
             if (farTarget) {
                 posFlags = (6 << 8) | pos;
             } else {
                 posFlags = (1 << 8) | pos;
             }
             break;
-        case 1:
+        case MOVE_TARGET_USER_OR_ALLY:
             posFlags = (3 << 8) | pos;
             break;
-        case 2:
+        case MOVE_TARGET_ALLY:
             if (farTarget) {
                 posFlags = (7 << 8) | pos;
             } else {
                 posFlags = (4 << 8) | pos;
             }
             break;
-        case 7:
+        case MOVE_TARGET_USER:
             return pos;
         default:
-            return 6;
+            return BTL_POS_NONE;
         }
         count = ExpandPosFlagsToMonIDs(mainModule, pokeCon, posFlags, monIds);
         if (count != 0) {
@@ -722,7 +726,7 @@ u8 DecideMoveTargetAuto(BtlMainModule *mainModule, BtlPokeCon *pokeCon, BattleMo
             u8 index = BattleRandom(count);
             return monIds[index];
         }
-        return 6;
+        return BTL_POS_NONE;
     }
 }
 
@@ -731,9 +735,9 @@ u8 DecideMoveTargetAutoForClient(BtlMainModule *mainModule, BtlPokeCon *pokeCon,
                                  MATHRandContext32 *saved) {
     u8 pos;
 
-    *saved = data_ov167_021dd844.rand;
+    *saved = g_BtlCalcWork.rand;
     pos = DecideMoveTargetAuto(mainModule, pokeCon, mon, move);
-    data_ov167_021dd844.rand = *saved;
+    g_BtlCalcWork.rand = *saved;
     return pos;
 }
 

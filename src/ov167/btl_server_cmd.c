@@ -419,7 +419,7 @@ static void ReadCmdArgs(BtlServerCmdQueue *que, s32 format, u32 *args) {
 }
 
 // Each command's format
-static const u8 data_ov167_021d6e50[SC_MAX] = {
+static const u8 sCmdFormats[SC_MAX] = {
     [SC_NULL] = SC_ARGS_NONE,
     [SC_OP_SUBTRACT_HP] = SC_ARGS_U8_U16,
     [SC_OP_ADD_HP] = SC_ARGS_U8_U16,
@@ -525,7 +525,7 @@ void BtlServerCmdQueue_Put(BtlServerCmdQueue *que, BtlServerCmd event, ...) {
     u32 i;
     u32 count;
 
-    format = data_ov167_021d6e50[event];
+    format = sCmdFormats[event];
     count = format & 0xf;
     va_start(list, event);
     for (i = 0; i < count; i++) {
@@ -537,7 +537,7 @@ void BtlServerCmdQueue_Put(BtlServerCmdQueue *que, BtlServerCmd event, ...) {
 
 // Function name from swan.
 u16 SCQUE_RESERVE_Pos(BtlServerCmdQueue *que, BtlServerCmd event) {
-    u8 format = data_ov167_021d6e50[event];
+    u8 format = sCmdFormats[event];
     u8 count = format & 0xf;
     u8 i;
     u16 pos;
@@ -564,7 +564,7 @@ void BtlServerCmdQueue_PutReserved(BtlServerCmdQueue *que, u32 reserve, BtlServe
     u32 count;
     u16 pos;
 
-    format = data_ov167_021d6e50[event];
+    format = sCmdFormats[event];
     count = format & 0xf;
     va_start(list, event);
     for (i = 0; i < count; i++) {
@@ -597,7 +597,7 @@ u16 BtlServerCmdQueue_Read(BtlServerCmdQueue *que, u32 *args) {
         }
         event = ReadU16(que);
     }
-    format = data_ov167_021d6e50[event];
+    format = sCmdFormats[event];
     if (format != SC_ARGS_NONE && format != SC_ARGS_MSG_SE) {
         ReadCmdArgs(que, format, args);
     } else {

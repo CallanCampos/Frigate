@@ -8,15 +8,13 @@
 #include "app/pkwd_selectscreen.h"
 #include "app/pokelist.h"
 #include "battle/regulation.h"
+#include "constants/arc.h"
 #include "gfl/heap.h"
 #include "save/pokewood.h"
 #include "struct_decls.h"
 
 // Pokéstar Studios' state while the player makes a movie, in overlay 62 with its script plugin (plugin 10). Overlay
 // 23's event_pokewood.c runs the movie
-
-// The movies, a file each
-#define ARCID_POKEWOOD_MOVIE 269
 
 typedef struct {
     u32 unk0;

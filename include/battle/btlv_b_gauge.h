@@ -9,9 +9,9 @@
 #include "struct_decls.h"
 
 typedef struct {
-    u32 side;     // 0x00  0: the player's, slides in from the right; 1: the opponent's, from the left
-    u32 balls[6]; // 0x04  each ball's state, the column of its animations
-    u32 mode;     // 0x1c  2: nothing is shown
+    u32 side;       // 0x00  0: the player's, slides in from the right; 1: the opponent's, from the left
+    u32 balls[6];   // 0x04  each ball's state, the column of its animations
+    u32 studioMode; // 0x1c  BTL_STUDIO_MODE_*: a movie's playback shows nothing
 } BtlvBGaugeParam;
 
 BtlvBGauge *BtlvBGauge_Create(const BtlvBGaugeParam *param, HeapID heapId);

@@ -1,0 +1,9 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "D",
+    "shapes": [ 10, 10, 10, 10 ],
+    "area": {
+        "all_year": true,
+        "places": {}
+    }
+}

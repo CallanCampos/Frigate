@@ -64,17 +64,17 @@ void MapReplace_Patch(MapMatrix *matrix, MapReplace *replace, HeapID heapId) {
     u32 i;
 
     switch (result) {
-    case 2:
+    case MAP_REPLACE_RESULT_MATRIX:
         MapMatrix_Load(matrix, (u16)newValue, matrix->zoneId, heapId);
         return;
-    case 1:
+    case MAP_REPLACE_RESULT_CHUNK:
         for (i = 0; i < matrix->chunkIdCount; i++) {
             if (matrix->chunkIds[i] == oldValue) {
                 matrix->chunkIds[i] = newValue;
             }
         }
         break;
-    case 0:
+    case MAP_REPLACE_RESULT_NONE:
         break;
     }
 }

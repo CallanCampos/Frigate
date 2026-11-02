@@ -52,7 +52,8 @@ static void GameBeacon_FillTournament(GameBeacon *info, u16 value, u8 extra, u32
 static void GameBeacon_FillJoinAvenueShopping(GameBeacon *info);
 static void GameBeacon_FillArea(GameBeacon *info, u8 extra, u16 value, u16 type);
 
-static const u8 data_ov012_0216d718[5] = { 10, 30, 50, 100, 200 };
+// The numbers of thanks received that are broadcast
+static const u8 sThankedCountMilestones[5] = { 10, 30, 50, 100, 200 };
 
 void GameBeacon_BroadcastWildBattleStart(u16 value) {
     if (GameBeacon_IsSpecialSpecies(value)) {
@@ -280,8 +281,8 @@ void GameBeacon_BroadcastThankedCount(u32 value) {
     u32 i;
 
     if (GameBeaconSys_CanSendType(0x16)) {
-        for (i = 0; i < NELEMS(data_ov012_0216d718); i++) {
-            if (value == data_ov012_0216d718[i]) {
+        for (i = 0; i < NELEMS(sThankedCountMilestones); i++) {
+            if (value == sThankedCountMilestones[i]) {
                 GameBeaconSendSlot_Reset(&GameBeaconSys->mine);
                 GameBeacon_FillThankedCount(&GameBeaconSys->mine.beacon, value);
                 return;

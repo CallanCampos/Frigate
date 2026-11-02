@@ -8,12 +8,12 @@
 
 typedef struct {
     Field *field;
-    u32 unk4;
-    u32 unk8;
-    u32 unkC;
+    u32 startFrom;
+    u32 teamSource;
+    u32 battleType;
 } EventWifiBattleMatchArgs;
 
-GameEvent *EventWifiBattleMatch_Create(GameSystem *gsys, Field *field, u32 unk10, u32 unk14, u32 unk18);
+GameEvent *EventWifiBattleMatch_Create(GameSystem *gsys, Field *field, u32 startFrom, u32 teamSource, u32 battleType);
 GameEvent *EventWifiBattleMatch_CreateFromArgs(GameSystem *gsys, void *args);
 
 #endif // POKEBW2_FIELD_EVENT_WIFIBATTLEMATCH_H

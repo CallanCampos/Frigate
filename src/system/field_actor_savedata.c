@@ -76,7 +76,7 @@ static void ActorSave_SaveActor(FieldActor *actor, FieldActorSaveEntry *entry) {
     entry->gPosZ = actor->gPos.z;
     entry->wPosY = actor->wPos.y;
     MI_CpuCopy8(&actor->defaultRailPos, entry->railPos, sizeof(entry->railPos));
-    MI_CpuCopy8(actor->unkA4, entry->unk40, sizeof(entry->unk40));
+    MI_CpuCopy8(actor->moveSubProcWork, entry->unk40, sizeof(entry->unk40));
 }
 
 // Puts the actor at the center of its tile, at the saved height
@@ -121,7 +121,7 @@ static void ActorSave_LoadActor(FieldActor *actor, const FieldActorSaveEntry *en
     actor->gPos.y = entry->gPosY;
     actor->gPos.z = entry->gPosZ;
     MI_CpuCopy8(entry->railPos, &actor->defaultRailPos, sizeof(entry->railPos));
-    MI_CpuCopy8(entry->unk40, actor->unkA4, sizeof(entry->unk40));
+    MI_CpuCopy8(entry->unk40, actor->moveSubProcWork, sizeof(entry->unk40));
     actor->actorSystem = system;
 
     ActorSave_SetActorPos(actor, entry);

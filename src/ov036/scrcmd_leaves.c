@@ -159,7 +159,7 @@ BOOL Scrcmd_Leaves_PokeDexCheckHabitatList(VM *vm, FieldScriptEnv *env) {
     time = ScriptReadAny(vm, env);
     caught = ScriptReadAny(vm, env);
     result = ScriptReadVar(vm, env);
-    arc = GFL_ArcSysCreateFileHandle(0x128, heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_HABITAT, heapId);
     MI_CpuFill8(&list, 0, sizeof(HabitatList));
     for (i = 0; i < 57; i++) {
         header = &HABITAT_LIST_HEADERS[i];
@@ -373,7 +373,7 @@ void DiscoverInitialMedalsCore(MedalBox *p_medal_box, HeapID heapId) {
     MedalData medals[MEDAL_COUNT];
 
     GFL_ASSERT(p_medal_box);
-    arc = GFL_ArcSysCreateFileHandle(0xeb, heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_DEF, heapId);
     GFL_ArcToolReadRange(arc, 0, 0, sizeof(medals), medals);
     RTC_GetCachedDate(&date);
     for (i = 0; i < MEDAL_COUNT; i++) {

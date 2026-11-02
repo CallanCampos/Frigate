@@ -1,0 +1,60 @@
+// MOVE_GEAR_GRIND's animation: member 544 of a/0/6/5
+
+#include "asm/btlv_effvm.inc"
+
+    ScriptHeader 1
+    ScriptVariant GearGrind
+
+GearGrind:
+    SetYield FALSE
+    PlaySE SEQ_SE_W029_01, 1, EFFVM_DEFENDER, 5, 100, 70, 0, 0, 0
+    PlaySE SEQ_SE_W029_01, 1, EFFVM_DEFENDER, 25, 100, 80, 0, 0, 0
+    PlaySE SEQ_SE_W306_01, 1, EFFVM_DEFENDER, 54, 0, 127, 0, 0, 0
+    PlaySE SEQ_SE_FLD_29, 2, EFFVM_DEFENDER, 76, 500, 50, 0, 0, 0
+    PlaySE SEQ_SE_DUMMY5, 2, EFFVM_DEFENDER, 135, 0, 0, 0, 0, 0
+    MoveSE 2, 0, 1, 50, 0, 130, 20, 0, 0
+    PlaySE SEQ_SE_W001_01, 1, EFFVM_DEFENDER, 75, -200, 127, 0, 0, 0
+    PlaySE SEQ_SE_W001_01, 1, EFFVM_DEFENDER, 80, -200, 127, 0, 0, 0
+    PlaySE SEQ_SE_W001_01, 1, EFFVM_DEFENDER, 85, -200, 127, 0, 0, 0
+    PlaySE SEQ_SE_W001_01, 1, EFFVM_DEFENDER, 90, -200, 127, 0, 0, 0
+    PlaySE SEQ_SE_W001_01, 1, EFFVM_DEFENDER, 95, -200, 127, 0, 0, 0
+    PlaySE SEQ_SE_W001_01, 1, EFFVM_DEFENDER, 100, -200, 127, 0, 0, 0
+    PlaySE SEQ_SE_W001_01, 1, EFFVM_DEFENDER, 105, -200, 127, 0, 0, 0
+    PlaySE SEQ_SE_W001_01, 1, EFFVM_DEFENDER, 110, -200, 127, 0, 0, 0
+    PlaySE SEQ_SE_W001_01, 1, EFFVM_DEFENDER, 115, -200, 127, 0, 0, 0
+    MoveSE 1, 0, 1, 127, 0, 130, 20, 0, 0
+    SetYield TRUE
+    ParticleLoad 713
+    EmitterAdd 713, 1, EFFVM_EMIT_DEFENDER, 8, 0x14cd, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 713, 2, EFFVM_EMIT_DEFENDER, 8, 0x14cd, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 713, 3, EFFVM_EMIT_DEFENDER, 8, 0x14cd, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 713, 4, EFFVM_EMIT_DEFENDER, 8, 0x14cd, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 713, 5, EFFVM_EMIT_DEFENDER, 8, 0x14cd, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 713, 6, EFFVM_EMIT_DEFENDER, 8, 0x14cd, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 713, 7, EFFVM_EMIT_DEFENDER, 8, 0x14cd, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 713, 8, EFFVM_EMIT_DEFENDER, 8, 0x14cd, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 713, 10, EFFVM_EMIT_DEFENDER, 8, 0x1ccd, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 713, 0, EFFVM_EMIT_DEFENDER, 8, 0x1ccd, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 60
+    McssSetVanish EFFVM_DEFENDER, TRUE
+    EmitterAdd 713, 9, EFFVM_EMIT_DEFENDER, 8, 0x1b33, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 3
+    McssScale EFFVM_DEFENDER, 2, 0x19a, -0x19a, 2, 0, 12
+    EmitterAdd 713, 9, EFFVM_EMIT_DEFENDER, 8, 0x1b33, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 3
+    EmitterAdd 713, 9, EFFVM_EMIT_DEFENDER, 8, 0x1b33, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 3
+    EmitterAdd 713, 9, EFFVM_EMIT_DEFENDER, 8, 0x1b33, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 3
+    EmitterAdd 713, 9, EFFVM_EMIT_DEFENDER, 8, 0x1b33, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 3
+    EmitterAdd 713, 9, EFFVM_EMIT_DEFENDER, 8, 0x1b33, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 3
+    EmitterAdd 713, 9, EFFVM_EMIT_DEFENDER, 8, 0x1b33, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 3
+    EmitterAdd 713, 9, EFFVM_EMIT_DEFENDER, 8, 0x1b33, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 36
+    Wait EFFVM_WAIT_ALL
+    McssSetVanish EFFVM_DEFENDER, FALSE
+    Wait EFFVM_WAIT_ALL
+    End

@@ -69,8 +69,8 @@ void BtlSetup_FreeContents(BtlSetup *setup) {
         if (setup->trainers[i] != NULL) {
             TrainerBattleSetup_Free(setup->trainers[i]);
         }
-        if (i != 0 && setup->unk34[i] != NULL) {
-            GFL_HeapFree(setup->unk34[i]);
+        if (i != 0 && setup->playerInfo[i] != NULL) {
+            GFL_HeapFree(setup->playerInfo[i]);
         }
     }
     if (setup->unkB0 != NULL) {
@@ -148,8 +148,8 @@ BtlSetupTrainer *TrainerBattleSetup_Create(HeapID heapId) {
 
     trainer->name = GFL_StrBufCreate(16, heapId);
     trainer->trainerId = 0;
-    PMSData_Clear(&trainer->unk18);
-    PMSData_Clear(&trainer->unk20);
+    PMSData_Clear(&trainer->winWords);
+    PMSData_Clear(&trainer->loseWords);
     return trainer;
 }
 
@@ -174,22 +174,22 @@ static void BtlSetup_LoadTrainer(BtlSetup *setup, GameData *gameData, u32 client
         switch (GetTrainerClassBGMGroupId(setup->trainers[client]->trainerClass)) {
         case 0:
         case 1:
-            setup->fieldSituation.unk12 = SEQ_BGM_WIN3;
+            setup->fieldSituation.winBgm = SEQ_BGM_WIN3;
             break;
         case 5:
         case 9:
-            setup->fieldSituation.unk12 = SEQ_BGM_WIN4;
+            setup->fieldSituation.winBgm = SEQ_BGM_WIN4;
             break;
         case 8:
         case 14:
-            setup->fieldSituation.unk12 = SEQ_BGM_WIN5;
+            setup->fieldSituation.winBgm = SEQ_BGM_WIN5;
             break;
         case 7:
         case 10:
-            setup->fieldSituation.unk12 = SEQ_BGM_WIN6;
+            setup->fieldSituation.winBgm = SEQ_BGM_WIN6;
             break;
         default:
-            setup->fieldSituation.unk12 = SEQ_BGM_WIN2;
+            setup->fieldSituation.winBgm = SEQ_BGM_WIN2;
             break;
         }
     }
@@ -211,24 +211,24 @@ static void BtlSetup_LoadGameData(BtlSetup *setup, GameData *gameData, BtlFieldS
     setup->unkA0 = 0xffff;
     setup->fieldSituation.unk18 = 0;
     setup->fieldSituation.unk19 = 0;
-    setup->fieldSituation.unk1a = 0;
+    setup->fieldSituation.multiMode = 0;
     setup->unkB0 = NULL;
     setup->fieldSituation.unk1b = 0;
     setup->unkDD_0 = FALSE;
     setup->gameData = gameData;
-    setup->unkDD_1 = FALSE;
+    setup->recReadComplete = FALSE;
     for (i = 0; i < 4; i++) {
         setup->party[i] = NULL;
-        setup->unk34[i] = NULL;
+        setup->playerInfo[i] = NULL;
     }
     for (i = 0; i < 6; i++) {
-        setup->unkE1[i] = 0;
+        setup->appeared[i] = 0;
     }
     setup->unk97 = 1;
     for (i = 0; i < 7; i++) {
         setup->unk90[i] = 0;
     }
-    setup->unk34[0] = GetGameDataPlayerInfo(gameData);
+    setup->playerInfo[0] = GetGameDataPlayerInfo(gameData);
     setup->bag = GameData_GetBag(gameData);
     setup->unk7C = GameData_GetBagCursor(gameData);
     setup->pokedex = GameData_GetPokedex(gameData);
@@ -240,7 +240,7 @@ static void BtlSetup_LoadGameData(BtlSetup *setup, GameData *gameData, BtlFieldS
     setup->unk98 = getBadgeCount(card);
     MI_CpuCopy8(status, &setup->fieldSituation.env, sizeof(BtlFieldEnv));
     setup->fieldSituation.bgm = SEQ_BGM_VS_NORAPOKE;
-    setup->fieldSituation.unk12 = SEQ_BGM_WIN1;
+    setup->fieldSituation.winBgm = SEQ_BGM_WIN1;
     setup->result = BTL_RESULT_VICTORY;
     if (EventWork_FlagGet(GameData_GetEventWork(gameData), EVENT_FLAG_0x096b)) {
         BtlSetup_SetFlag(setup, 2);
@@ -281,7 +281,7 @@ void BtlSetup_SetWildMulti(BtlSetup *setup, GameData *gameData, PokeParty *party
         PokeParty_Copy(party, setup->party[1]);
     }
     setup->battleStyle = 1;
-    setup->fieldSituation.unk1a = 5;
+    setup->fieldSituation.multiMode = 5;
     setup->battleType = 0;
     if (PokeParty_GetPkmCount(setup->party[0]) == PokeParty_GetCapacity(setup->party[0])) {
         BoxSaveAccessor *boxes = GameData_GetBoxSaveAccessor(gameData);
@@ -302,7 +302,7 @@ static void BtlSetup_LoadTrainerBase(BtlSetup *setup, GameData *gameData, u32 st
     BtlSetup_LoadPlayerParty(setup, gameData, heapId);
     setup->battleType = 1;
     setup->battleStyle = style;
-    setup->fieldSituation.unk12 = SEQ_BGM_WIN2;
+    setup->fieldSituation.winBgm = SEQ_BGM_WIN2;
 }
 
 // What every link battle starts from, with a party and a player's info for each other client
@@ -321,14 +321,14 @@ static void BtlSetup_SetNetImpl(BtlSetup *setup, GameData *gameData, u32 style, 
     setup->battleStyle = style;
     setup->fieldSituation.netHandle = handle;
     setup->fieldSituation.unk18 = a5;
-    setup->fieldSituation.unk1a = multiMode;
+    setup->fieldSituation.multiMode = multiMode;
     setup->fieldSituation.unk19 = a6;
     setup->unkA0 = 0xff;
-    setup->fieldSituation.unk12 = SEQ_BGM_WIN2;
+    setup->fieldSituation.winBgm = SEQ_BGM_WIN2;
     for (i = 0; i < 4; i++) {
         if (i != 0) {
-            if (setup->unk34[i] == NULL) {
-                setup->unk34[i] = PlayerInfo_Create(heapId);
+            if (setup->playerInfo[i] == NULL) {
+                setup->playerInfo[i] = PlayerInfo_Create(heapId);
             }
             if (setup->party[i] == NULL) {
                 setup->party[i] = PokeParty_Create(heapId);
@@ -378,7 +378,7 @@ void BtlSetup_SetTrainer1v2(BtlSetup *setup, GameData *gameData, BtlFieldStatus 
     BtlSetup_LoadTrainerBase(setup, gameData, 1, status, heapId);
     BtlSetup_LoadTrainer(setup, gameData, 1, &setup->party[1], trainerId, heapId);
     BtlSetup_LoadTrainer(setup, gameData, 3, &setup->party[3], trainerId2, heapId);
-    setup->fieldSituation.unk1a = 4;
+    setup->fieldSituation.multiMode = 4;
 }
 
 // a3 is the partner's trainer, a4 and a5 the opponents'
@@ -388,7 +388,7 @@ void BtlSetup_SetTrainer2v2(BtlSetup *setup, GameData *gameData, BtlFieldStatus 
     BtlSetup_LoadTrainer(setup, gameData, 2, &setup->party[2], a3, heapId);
     BtlSetup_LoadTrainer(setup, gameData, 1, &setup->party[1], a4, heapId);
     BtlSetup_LoadTrainer(setup, gameData, 3, &setup->party[3], a5, heapId);
-    setup->fieldSituation.unk1a = 3;
+    setup->fieldSituation.multiMode = 3;
 }
 
 void BtlSetup_SetNet1v1Single(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, HeapID heapId) {
@@ -427,7 +427,7 @@ void BtlSetup_InitForRecord(BtlSetup *setup, GameData *gameData, HeapID heapId) 
     MI_CpuFill8(setup, 0, sizeof(BtlSetup));
     for (i = 0; i < 4; i++) {
         setup->party[i] = PokeParty_Create(heapId);
-        setup->unk34[i] = PlayerInfo_Create(heapId);
+        setup->playerInfo[i] = PlayerInfo_Create(heapId);
         setup->trainers[i] = TrainerBattleSetup_Create(heapId);
     }
     setup->gameData = gameData;
@@ -485,10 +485,10 @@ void BtlSetup_PostProcessTrialHouse(BtlSetup *setup) {
         setup->battleType = 2;
         if (GetTrainerClassBGMGroupId(setup->trainers[1]->trainerClass) != 14) {
             setup->fieldSituation.bgm = SEQ_BGM_VS_SUBWAY_TRAINER;
-            setup->fieldSituation.unk12 = SEQ_BGM_WIN2;
+            setup->fieldSituation.winBgm = SEQ_BGM_WIN2;
         } else {
             setup->fieldSituation.bgm = SEQ_BGM_VS_CHAMP;
-            setup->fieldSituation.unk12 = SEQ_BGM_WIN5;
+            setup->fieldSituation.winBgm = SEQ_BGM_WIN5;
         }
     }
 }

@@ -34,11 +34,11 @@ GameEventReturnCode EventSave_Callback(GameEvent *event, u32 *state, void *data)
     u32 result = EventSave_Update(work, state);
 
     switch (result) {
-    case 0:
-        *work->result = 1;
+    case EVENT_SAVE_RESULT_DONE:
+        *work->result = FIELD_APP_RESULT_EXIT;
         return GAMEEVENT_DONE;
-    case 1:
-        *work->result = 0;
+    case EVENT_SAVE_RESULT_BACK:
+        *work->result = FIELD_APP_RESULT_RETURN;
         return GAMEEVENT_DONE;
     default:
         return GAMEEVENT_CONTINUE;
@@ -79,17 +79,17 @@ GameEventReturnCode EventPrepareResidentActors_Callback(GameEvent *event, u32 *s
         work->movingActors = 0;
         DisableAllActorsMovement(actorSystem);
         if (!FldAct_CheckAcmdEnd(player)) {
-            work->movingActors |= 1;
+            work->movingActors |= RESIDENT_ACTOR_PLAYER;
             EnableActorMovement(player);
         }
         kind = THIRD_ACTOR_NONE;
         third = NULL;
         if (kind != THIRD_ACTOR_NONE && IsActorFlag16(third) == TRUE) {
-            work->movingActors |= 4;
+            work->movingActors |= RESIDENT_ACTOR_THIRD;
             EnableActorMovement(third);
         }
         if (actor != NULL && IsActorFlag16(actor) == TRUE) {
-            work->movingActors |= 2;
+            work->movingActors |= RESIDENT_ACTOR_FOLLOWER;
             EnableActorMovement(actor);
         }
         (*state)++;
@@ -97,22 +97,22 @@ GameEventReturnCode EventPrepareResidentActors_Callback(GameEvent *event, u32 *s
     case 1:
         actorSystem = Field_GetActorSystem(field);
         player = FindPlayerFieldActor(actorSystem);
-        if ((work->movingActors & 1) && FldAct_CheckAcmdEnd(player) == TRUE) {
+        if ((work->movingActors & RESIDENT_ACTOR_PLAYER) && FldAct_CheckAcmdEnd(player) == TRUE) {
             DisableActorMovement(player);
-            work->movingActors &= ~1;
+            work->movingActors &= ~RESIDENT_ACTOR_PLAYER;
         }
-        if (work->movingActors & 4) {
+        if (work->movingActors & RESIDENT_ACTOR_THIRD) {
             third = NULL;
             if (!IsActorFlag16(third)) {
                 DisableActorMovement(third);
-                work->movingActors &= ~4;
+                work->movingActors &= ~RESIDENT_ACTOR_THIRD;
             }
         }
-        if (work->movingActors & 2) {
+        if (work->movingActors & RESIDENT_ACTOR_FOLLOWER) {
             actor = FindActorByMoveCode(actorSystem, MOVE_CODE_FOLLOW_PLAYER);
             if (!IsActorFlag16(actor)) {
                 DisableActorMovement(actor);
-                work->movingActors &= ~2;
+                work->movingActors &= ~RESIDENT_ACTOR_FOLLOWER;
             }
         }
         if (work->movingActors == 0) {

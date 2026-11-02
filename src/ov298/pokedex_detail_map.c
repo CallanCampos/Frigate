@@ -46,7 +46,6 @@
 
 // The Pokémon icons, and the habitats, a file per species
 #define ARCID_POKEICON 7
-#define ARCID_POKEDEX_AREA 176
 
 // The event flags that show the water and fishing habitats
 #define FLAG_HABITAT_WATER 0x987

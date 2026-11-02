@@ -54,7 +54,7 @@ GameEvent *SpPokeEvent_CreateJump(GameSystem *gsys, u16 mode, const VecFx32 *sta
     return event;
 }
 
-void SpPokeEvent_Appear(GameSystem *gsys, u16 a1, const VecFx32 *pos) {
+void SpPokeEvent_Appear(GameSystem *gsys, u16 mode, const VecFx32 *pos) {
     Field *field = GSYS_GetField(gsys);
     int actor = 1;
     int i;
@@ -62,7 +62,7 @@ void SpPokeEvent_Appear(GameSystem *gsys, u16 a1, const VecFx32 *pos) {
 
     Field_GetGimmickWorkBlock(field, WORK_ID);
     system = Field_GetExpObjSystem(field);
-    if (a1 == 0) {
+    if (mode == 0) {
         actor = 0;
         GFL_SndSEPlay(SEQ_SE_BOWA2);
     } else {
@@ -77,19 +77,19 @@ void SpPokeEvent_Appear(GameSystem *gsys, u16 a1, const VecFx32 *pos) {
     }
 }
 
-GameEvent *SpPokeEvent_CreateWaitFrame(GameSystem *gsys, u16 a1) {
+GameEvent *SpPokeEvent_CreateWaitFrame(GameSystem *gsys, u16 mode) {
     SpPokeGimmickWork *work = Field_GetGimmickWorkBlock(GSYS_GetField(gsys), WORK_ID);
     GameEvent *event = GameEvent_Create(gsys, NULL, SpPokeEvent_WaitFrame, 0);
 
-    work->mode = a1;
+    work->mode = mode;
     return event;
 }
 
-GameEvent *SpPokeEvent_CreateWaitAnimEnd(GameSystem *gsys, u16 a1) {
+GameEvent *SpPokeEvent_CreateWaitAnimEnd(GameSystem *gsys, u16 mode) {
     SpPokeGimmickWork *work = Field_GetGimmickWorkBlock(GSYS_GetField(gsys), WORK_ID);
     GameEvent *event = GameEvent_Create(gsys, NULL, SpPokeEvent_WaitAnimEnd, 0);
 
-    work->mode = a1;
+    work->mode = mode;
     return event;
 }
 

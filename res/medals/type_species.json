@@ -1,0 +1,1510 @@
+{
+    "$schema": "type_species.schema.json",
+    "species": [
+        {
+            "species": "SPECIES_RATTATA",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_RATICATE",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SANDSHREW",
+            "types": [ "TYPE_GROUND", "TYPE_GROUND" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SANDSLASH",
+            "types": [ "TYPE_GROUND", "TYPE_GROUND" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_CLEFAIRY",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_CLEFABLE",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_VULPIX",
+            "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_NINETALES",
+            "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_JIGGLYPUFF",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_WIGGLYTUFF",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ZUBAT",
+            "types": [ "TYPE_POISON", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_GOLBAT",
+            "types": [ "TYPE_POISON", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_PSYDUCK",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_GOLDUCK",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_GROWLITHE",
+            "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ARCANINE",
+            "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_MAGNEMITE",
+            "types": [ "TYPE_ELECTRIC", "TYPE_STEEL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_MAGNETON",
+            "types": [ "TYPE_ELECTRIC", "TYPE_STEEL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SEEL",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_DEWGONG",
+            "types": [ "TYPE_WATER", "TYPE_ICE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_GRIMER",
+            "types": [ "TYPE_POISON", "TYPE_POISON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_MUK",
+            "types": [ "TYPE_POISON", "TYPE_POISON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ONIX",
+            "types": [ "TYPE_ROCK", "TYPE_GROUND" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_LICKITUNG",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_KOFFING",
+            "types": [ "TYPE_POISON", "TYPE_POISON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_WEEZING",
+            "types": [ "TYPE_POISON", "TYPE_POISON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_TANGELA",
+            "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_STARYU",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_STARMIE",
+            "types": [ "TYPE_WATER", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ELECTABUZZ",
+            "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_MAGMAR",
+            "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_PINSIR",
+            "types": [ "TYPE_BUG", "TYPE_BUG" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_LAPRAS",
+            "types": [ "TYPE_WATER", "TYPE_ICE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_DITTO",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_EEVEE",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_VAPOREON",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_JOLTEON",
+            "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_FLAREON",
+            "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_CROBAT",
+            "types": [ "TYPE_POISON", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_CLEFFA",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_IGGLYBUFF",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_MAREEP",
+            "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_FLAAFFY",
+            "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_AMPHAROS",
+            "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_MARILL",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_AZUMARILL",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SUNKERN",
+            "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SUNFLORA",
+            "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_YANMA",
+            "types": [ "TYPE_BUG", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ESPEON",
+            "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_UMBREON",
+            "types": [ "TYPE_DARK", "TYPE_DARK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_DUNSPARCE",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_GLIGAR",
+            "types": [ "TYPE_GROUND", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_STEELIX",
+            "types": [ "TYPE_STEEL", "TYPE_GROUND" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SHUCKLE",
+            "types": [ "TYPE_BUG", "TYPE_ROCK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_HERACROSS",
+            "types": [ "TYPE_BUG", "TYPE_FIGHTING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SNEASEL",
+            "types": [ "TYPE_DARK", "TYPE_ICE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SWINUB",
+            "types": [ "TYPE_ICE", "TYPE_GROUND" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_PILOSWINE",
+            "types": [ "TYPE_ICE", "TYPE_GROUND" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_CORSOLA",
+            "types": [ "TYPE_WATER", "TYPE_ROCK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_REMORAID",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_OCTILLERY",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_DELIBIRD",
+            "types": [ "TYPE_ICE", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_MANTINE",
+            "types": [ "TYPE_WATER", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SKARMORY",
+            "types": [ "TYPE_STEEL", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ELEKID",
+            "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_MAGBY",
+            "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_LARVITAR",
+            "types": [ "TYPE_ROCK", "TYPE_GROUND" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_PUPITAR",
+            "types": [ "TYPE_ROCK", "TYPE_GROUND" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_TYRANITAR",
+            "types": [ "TYPE_ROCK", "TYPE_DARK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_WINGULL",
+            "types": [ "TYPE_WATER", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_PELIPPER",
+            "types": [ "TYPE_WATER", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SLAKOTH",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_VIGOROTH",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SLAKING",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_AZURILL",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_NOSEPASS",
+            "types": [ "TYPE_ROCK", "TYPE_ROCK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SKITTY",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_DELCATTY",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ARON",
+            "types": [ "TYPE_STEEL", "TYPE_ROCK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_LAIRON",
+            "types": [ "TYPE_STEEL", "TYPE_ROCK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_AGGRON",
+            "types": [ "TYPE_STEEL", "TYPE_ROCK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ROSELIA",
+            "types": [ "TYPE_GRASS", "TYPE_POISON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_WAILMER",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_WAILORD",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_NUMEL",
+            "types": [ "TYPE_FIRE", "TYPE_GROUND" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_CAMERUPT",
+            "types": [ "TYPE_FIRE", "TYPE_GROUND" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SPOINK",
+            "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_GRUMPIG",
+            "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_TRAPINCH",
+            "types": [ "TYPE_GROUND", "TYPE_GROUND" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_VIBRAVA",
+            "types": [ "TYPE_GROUND", "TYPE_DRAGON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_FLYGON",
+            "types": [ "TYPE_GROUND", "TYPE_DRAGON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SWABLU",
+            "types": [ "TYPE_NORMAL", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ALTARIA",
+            "types": [ "TYPE_DRAGON", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ZANGOOSE",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SEVIPER",
+            "types": [ "TYPE_POISON", "TYPE_POISON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_LUNATONE",
+            "types": [ "TYPE_ROCK", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SOLROCK",
+            "types": [ "TYPE_ROCK", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_CORPHISH",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_CRAWDAUNT",
+            "types": [ "TYPE_WATER", "TYPE_DARK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_BALTOY",
+            "types": [ "TYPE_GROUND", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_CLAYDOL",
+            "types": [ "TYPE_GROUND", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_CASTFORM",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SHUPPET",
+            "types": [ "TYPE_GHOST", "TYPE_GHOST" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_BANETTE",
+            "types": [ "TYPE_GHOST", "TYPE_GHOST" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_TROPIUS",
+            "types": [ "TYPE_GRASS", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ABSOL",
+            "types": [ "TYPE_DARK", "TYPE_DARK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SPHEAL",
+            "types": [ "TYPE_ICE", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SEALEO",
+            "types": [ "TYPE_ICE", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_WALREIN",
+            "types": [ "TYPE_ICE", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_BELDUM",
+            "types": [ "TYPE_STEEL", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_METANG",
+            "types": [ "TYPE_STEEL", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_METAGROSS",
+            "types": [ "TYPE_STEEL", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_BUDEW",
+            "types": [ "TYPE_GRASS", "TYPE_POISON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ROSERADE",
+            "types": [ "TYPE_GRASS", "TYPE_POISON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_COMBEE",
+            "types": [ "TYPE_BUG", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_VESPIQUEN",
+            "types": [ "TYPE_BUG", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_BUIZEL",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_FLOATZEL",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_DRIFLOON",
+            "types": [ "TYPE_GHOST", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_DRIFBLIM",
+            "types": [ "TYPE_GHOST", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_BUNEARY",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_LOPUNNY",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_BRONZOR",
+            "types": [ "TYPE_STEEL", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_BRONZONG",
+            "types": [ "TYPE_STEEL", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_RIOLU",
+            "types": [ "TYPE_FIGHTING", "TYPE_FIGHTING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_LUCARIO",
+            "types": [ "TYPE_FIGHTING", "TYPE_STEEL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SKORUPI",
+            "types": [ "TYPE_POISON", "TYPE_BUG" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_DRAPION",
+            "types": [ "TYPE_POISON", "TYPE_DARK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_CROAGUNK",
+            "types": [ "TYPE_POISON", "TYPE_FIGHTING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_TOXICROAK",
+            "types": [ "TYPE_POISON", "TYPE_FIGHTING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_CARNIVINE",
+            "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_MANTYKE",
+            "types": [ "TYPE_WATER", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_WEAVILE",
+            "types": [ "TYPE_DARK", "TYPE_ICE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_MAGNEZONE",
+            "types": [ "TYPE_ELECTRIC", "TYPE_STEEL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_LICKILICKY",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_TANGROWTH",
+            "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ELECTIVIRE",
+            "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_MAGMORTAR",
+            "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_YANMEGA",
+            "types": [ "TYPE_BUG", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_LEAFEON",
+            "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_GLACEON",
+            "types": [ "TYPE_ICE", "TYPE_ICE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_GLISCOR",
+            "types": [ "TYPE_GROUND", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_MAMOSWINE",
+            "types": [ "TYPE_ICE", "TYPE_GROUND" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_PROBOPASS",
+            "types": [ "TYPE_ROCK", "TYPE_STEEL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_VICTINI",
+            "types": [ "TYPE_PSYCHIC", "TYPE_FIRE" ],
+            "counted": false
+        },
+        {
+            "species": "SPECIES_SNIVY",
+            "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SERVINE",
+            "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SERPERIOR",
+            "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_TEPIG",
+            "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_PIGNITE",
+            "types": [ "TYPE_FIRE", "TYPE_FIGHTING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_EMBOAR",
+            "types": [ "TYPE_FIRE", "TYPE_FIGHTING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_OSHAWOTT",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_DEWOTT",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SAMUROTT",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_PATRAT",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_WATCHOG",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_LILLIPUP",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_HERDIER",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_STOUTLAND",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_PURRLOIN",
+            "types": [ "TYPE_DARK", "TYPE_DARK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_LIEPARD",
+            "types": [ "TYPE_DARK", "TYPE_DARK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_PANSAGE",
+            "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SIMISAGE",
+            "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_PANSEAR",
+            "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SIMISEAR",
+            "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_PANPOUR",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SIMIPOUR",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_MUNNA",
+            "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_MUSHARNA",
+            "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_PIDOVE",
+            "types": [ "TYPE_NORMAL", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_TRANQUILL",
+            "types": [ "TYPE_NORMAL", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_UNFEZANT",
+            "types": [ "TYPE_NORMAL", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_BLITZLE",
+            "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ZEBSTRIKA",
+            "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ROGGENROLA",
+            "types": [ "TYPE_ROCK", "TYPE_ROCK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_BOLDORE",
+            "types": [ "TYPE_ROCK", "TYPE_ROCK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_GIGALITH",
+            "types": [ "TYPE_ROCK", "TYPE_ROCK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_WOOBAT",
+            "types": [ "TYPE_PSYCHIC", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SWOOBAT",
+            "types": [ "TYPE_PSYCHIC", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_DRILBUR",
+            "types": [ "TYPE_GROUND", "TYPE_GROUND" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_EXCADRILL",
+            "types": [ "TYPE_GROUND", "TYPE_STEEL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_AUDINO",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_TIMBURR",
+            "types": [ "TYPE_FIGHTING", "TYPE_FIGHTING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_GURDURR",
+            "types": [ "TYPE_FIGHTING", "TYPE_FIGHTING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_CONKELDURR",
+            "types": [ "TYPE_FIGHTING", "TYPE_FIGHTING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_TYMPOLE",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_PALPITOAD",
+            "types": [ "TYPE_WATER", "TYPE_GROUND" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SEISMITOAD",
+            "types": [ "TYPE_WATER", "TYPE_GROUND" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_THROH",
+            "types": [ "TYPE_FIGHTING", "TYPE_FIGHTING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SAWK",
+            "types": [ "TYPE_FIGHTING", "TYPE_FIGHTING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SEWADDLE",
+            "types": [ "TYPE_BUG", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SWADLOON",
+            "types": [ "TYPE_BUG", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_LEAVANNY",
+            "types": [ "TYPE_BUG", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_VENIPEDE",
+            "types": [ "TYPE_BUG", "TYPE_POISON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_WHIRLIPEDE",
+            "types": [ "TYPE_BUG", "TYPE_POISON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SCOLIPEDE",
+            "types": [ "TYPE_BUG", "TYPE_POISON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_COTTONEE",
+            "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_WHIMSICOTT",
+            "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_PETILIL",
+            "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_LILLIGANT",
+            "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_BASCULIN",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SANDILE",
+            "types": [ "TYPE_GROUND", "TYPE_DARK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_KROKOROK",
+            "types": [ "TYPE_GROUND", "TYPE_DARK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_KROOKODILE",
+            "types": [ "TYPE_GROUND", "TYPE_DARK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_DARUMAKA",
+            "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_DARMANITAN",
+            "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_MARACTUS",
+            "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_DWEBBLE",
+            "types": [ "TYPE_BUG", "TYPE_ROCK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_CRUSTLE",
+            "types": [ "TYPE_BUG", "TYPE_ROCK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SCRAGGY",
+            "types": [ "TYPE_DARK", "TYPE_FIGHTING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SCRAFTY",
+            "types": [ "TYPE_DARK", "TYPE_FIGHTING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SIGILYPH",
+            "types": [ "TYPE_PSYCHIC", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_YAMASK",
+            "types": [ "TYPE_GHOST", "TYPE_GHOST" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_COFAGRIGUS",
+            "types": [ "TYPE_GHOST", "TYPE_GHOST" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_TIRTOUGA",
+            "types": [ "TYPE_WATER", "TYPE_ROCK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_CARRACOSTA",
+            "types": [ "TYPE_WATER", "TYPE_ROCK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ARCHEN",
+            "types": [ "TYPE_ROCK", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ARCHEOPS",
+            "types": [ "TYPE_ROCK", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_TRUBBISH",
+            "types": [ "TYPE_POISON", "TYPE_POISON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_GARBODOR",
+            "types": [ "TYPE_POISON", "TYPE_POISON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ZORUA",
+            "types": [ "TYPE_DARK", "TYPE_DARK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ZOROARK",
+            "types": [ "TYPE_DARK", "TYPE_DARK" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_MINCCINO",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_CINCCINO",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_GOTHITA",
+            "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_GOTHORITA",
+            "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_GOTHITELLE",
+            "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SOLOSIS",
+            "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_DUOSION",
+            "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_REUNICLUS",
+            "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_DUCKLETT",
+            "types": [ "TYPE_WATER", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SWANNA",
+            "types": [ "TYPE_WATER", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_VANILLITE",
+            "types": [ "TYPE_ICE", "TYPE_ICE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_VANILLISH",
+            "types": [ "TYPE_ICE", "TYPE_ICE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_VANILLUXE",
+            "types": [ "TYPE_ICE", "TYPE_ICE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_DEERLING",
+            "types": [ "TYPE_NORMAL", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SAWSBUCK",
+            "types": [ "TYPE_NORMAL", "TYPE_GRASS" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_EMOLGA",
+            "types": [ "TYPE_ELECTRIC", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_KARRABLAST",
+            "types": [ "TYPE_BUG", "TYPE_BUG" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ESCAVALIER",
+            "types": [ "TYPE_BUG", "TYPE_STEEL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_FOONGUS",
+            "types": [ "TYPE_GRASS", "TYPE_POISON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_AMOONGUSS",
+            "types": [ "TYPE_GRASS", "TYPE_POISON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_FRILLISH",
+            "types": [ "TYPE_WATER", "TYPE_GHOST" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_JELLICENT",
+            "types": [ "TYPE_WATER", "TYPE_GHOST" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ALOMOMOLA",
+            "types": [ "TYPE_WATER", "TYPE_WATER" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_JOLTIK",
+            "types": [ "TYPE_BUG", "TYPE_ELECTRIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_GALVANTULA",
+            "types": [ "TYPE_BUG", "TYPE_ELECTRIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_FERROSEED",
+            "types": [ "TYPE_GRASS", "TYPE_STEEL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_FERROTHORN",
+            "types": [ "TYPE_GRASS", "TYPE_STEEL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_KLINK",
+            "types": [ "TYPE_STEEL", "TYPE_STEEL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_KLANG",
+            "types": [ "TYPE_STEEL", "TYPE_STEEL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_KLINKLANG",
+            "types": [ "TYPE_STEEL", "TYPE_STEEL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_TYNAMO",
+            "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_EELEKTRIK",
+            "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_EELEKTROSS",
+            "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ELGYEM",
+            "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_BEHEEYEM",
+            "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_LITWICK",
+            "types": [ "TYPE_GHOST", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_LAMPENT",
+            "types": [ "TYPE_GHOST", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_CHANDELURE",
+            "types": [ "TYPE_GHOST", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_AXEW",
+            "types": [ "TYPE_DRAGON", "TYPE_DRAGON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_FRAXURE",
+            "types": [ "TYPE_DRAGON", "TYPE_DRAGON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_HAXORUS",
+            "types": [ "TYPE_DRAGON", "TYPE_DRAGON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_CUBCHOO",
+            "types": [ "TYPE_ICE", "TYPE_ICE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_BEARTIC",
+            "types": [ "TYPE_ICE", "TYPE_ICE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_CRYOGONAL",
+            "types": [ "TYPE_ICE", "TYPE_ICE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_SHELMET",
+            "types": [ "TYPE_BUG", "TYPE_BUG" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ACCELGOR",
+            "types": [ "TYPE_BUG", "TYPE_BUG" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_STUNFISK",
+            "types": [ "TYPE_GROUND", "TYPE_ELECTRIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_MIENFOO",
+            "types": [ "TYPE_FIGHTING", "TYPE_FIGHTING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_MIENSHAO",
+            "types": [ "TYPE_FIGHTING", "TYPE_FIGHTING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_DRUDDIGON",
+            "types": [ "TYPE_DRAGON", "TYPE_DRAGON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_GOLETT",
+            "types": [ "TYPE_GROUND", "TYPE_GHOST" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_GOLURK",
+            "types": [ "TYPE_GROUND", "TYPE_GHOST" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_PAWNIARD",
+            "types": [ "TYPE_DARK", "TYPE_STEEL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_BISHARP",
+            "types": [ "TYPE_DARK", "TYPE_STEEL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_BOUFFALANT",
+            "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_RUFFLET",
+            "types": [ "TYPE_NORMAL", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_BRAVIARY",
+            "types": [ "TYPE_NORMAL", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_VULLABY",
+            "types": [ "TYPE_DARK", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_MANDIBUZZ",
+            "types": [ "TYPE_DARK", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_HEATMOR",
+            "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_DURANT",
+            "types": [ "TYPE_BUG", "TYPE_STEEL" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_DEINO",
+            "types": [ "TYPE_DARK", "TYPE_DRAGON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ZWEILOUS",
+            "types": [ "TYPE_DARK", "TYPE_DRAGON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_HYDREIGON",
+            "types": [ "TYPE_DARK", "TYPE_DRAGON" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_LARVESTA",
+            "types": [ "TYPE_BUG", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_VOLCARONA",
+            "types": [ "TYPE_BUG", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_COBALION",
+            "types": [ "TYPE_STEEL", "TYPE_FIGHTING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_TERRAKION",
+            "types": [ "TYPE_ROCK", "TYPE_FIGHTING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_VIRIZION",
+            "types": [ "TYPE_GRASS", "TYPE_FIGHTING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_TORNADUS",
+            "types": [ "TYPE_FLYING", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_THUNDURUS",
+            "types": [ "TYPE_ELECTRIC", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_RESHIRAM",
+            "types": [ "TYPE_DRAGON", "TYPE_FIRE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_ZEKROM",
+            "types": [ "TYPE_DRAGON", "TYPE_ELECTRIC" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_LANDORUS",
+            "types": [ "TYPE_GROUND", "TYPE_FLYING" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_KYUREM",
+            "types": [ "TYPE_DRAGON", "TYPE_ICE" ],
+            "counted": true
+        },
+        {
+            "species": "SPECIES_KELDEO",
+            "types": [ "TYPE_WATER", "TYPE_FIGHTING" ],
+            "counted": false
+        },
+        {
+            "species": "SPECIES_MELOETTA",
+            "types": [ "TYPE_NORMAL", "TYPE_PSYCHIC" ],
+            "counted": false
+        },
+        {
+            "species": "SPECIES_GENESECT",
+            "types": [ "TYPE_BUG", "TYPE_STEEL" ],
+            "counted": false
+        }
+    ]
+}

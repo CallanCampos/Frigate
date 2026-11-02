@@ -1,0 +1,22 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "F",
+    "shapes": [ 7 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_UNDELLA_TOWN": [ "surf" ],
+            "ZONE_P2_LABORATORY": [ "surf" ],
+            "ZONE_UNDELLA_BAY": [ "surf" ],
+            "ZONE_ROUTE_4": [ "surf" ],
+            "ZONE_ROUTE_13": [ "surf" ],
+            "ZONE_ROUTE_17": [ "surf" ],
+            "ZONE_ROUTE_18": [ "surf" ],
+            "ZONE_VIRBANK_CITY": [ "surf" ],
+            "ZONE_HUMILAU_CITY": [ "surf" ],
+            "ZONE_ROUTE_21": [ "surf" ],
+            "ZONE_VIRBANK_COMPLEX": [ "surf" ],
+            "ZONE_SEASIDE_CAVE": [ "surf" ]
+        }
+    }
+}

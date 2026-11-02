@@ -1,0 +1,48 @@
+// MOVE_FAKE_OUT's animation: member 252 of a/0/6/5
+
+#include "asm/btlv_effvm.inc"
+
+    ScriptHeader 1
+    ScriptVariant FakeOut
+
+FakeOut:
+    CameraMovePreset 1, 11, 16, 0, 8
+    Wait EFFVM_WAIT_ALL
+    SetYield FALSE
+    PlaySE SEQ_SE_W003_01, 1, EFFVM_DEFENDER, 40, 0, 127, 0, 0, 0
+    PlaySE SEQ_SE_W278_01, 2, EFFVM_DEFENDER, 5, -2000, 50, 0, 0, 0
+    MoveSE 2, 0, 0, -2000, -500, 4, 12, 0, 0
+    MoveSE 2, 0, 1, 50, 0, 15, 5, 0, 0
+    PlaySE SEQ_SE_DUMMY5, 2, EFFVM_DEFENDER, 20, 0, 0, 0, 0, 0
+    SetYield TRUE
+    ParticleLoad 422
+    IfVarConst EFFVM_VAR_ATTACKER_SIDE, EFFVM_CMP_EQ, 1, FakeOut_02BC
+    EmitterAdd 422, 0, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 422, 1, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 422, 2, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 422, 3, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 422, 4, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 422, 5, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 422, 6, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 422, 16, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    IfVarConst EFFVM_VAR_ATTACKER_SIDE, EFFVM_CMP_EQ, 0, FakeOut_042C
+
+FakeOut_02BC:
+    EmitterAdd 422, 8, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 422, 9, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 422, 10, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 422, 11, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 422, 12, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 422, 13, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 422, 14, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 422, 16, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+
+FakeOut_042C:
+    McssSetVanish EFFVM_DEFENDER, TRUE
+    WaitFrames 30
+    McssScale EFFVM_DEFENDER, 2, -0x4cd, 0x4cd, 4, 1, 1
+    Wait EFFVM_WAIT_ALL
+    McssSetVanish EFFVM_DEFENDER, FALSE
+    CameraMovePreset 1, 8, 16, 0, 8
+    Wait EFFVM_WAIT_ALL
+    End

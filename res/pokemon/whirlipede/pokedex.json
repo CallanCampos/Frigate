@@ -1,0 +1,12 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "W",
+    "shapes": [ 0 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_PINWHEEL_FOREST": [ "grass", "dark_grass" ],
+            "ZONE_LOSTLORN_FOREST": [ "dark_grass" ]
+        }
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "W",
+    "shapes": [ 11 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_TWIST_MOUNTAIN": [ "grass" ],
+            "ZONE_WELLSPRING_CAVE": [ "grass" ],
+            "ZONE_MISTRALTON_CAVE": [ "grass" ],
+            "ZONE_REVERSAL_MOUNTAIN": [ "grass" ],
+            "ZONE_RELIC_PASSAGE": [ "grass" ],
+            "ZONE_SEASIDE_CAVE": [ "grass" ],
+            "ZONE_CLAY_TUNNEL": [ "grass" ]
+        }
+    }
+}

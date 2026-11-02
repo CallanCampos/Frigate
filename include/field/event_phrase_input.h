@@ -14,7 +14,7 @@ struct EventPhraseInputData {
     u16 *saveBlock;
     PlayerInfo *playerInfo;
     Field *field;
-    BeaconStatus *unk18;
+    BeaconStatus *beaconStatus;
     u16 *result;
     NameEntryParam nameEntry;
     u16 heapId;

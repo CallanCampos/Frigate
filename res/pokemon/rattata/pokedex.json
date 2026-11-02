@@ -1,0 +1,13 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "R",
+    "shapes": [ 4 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_CASTELIA_CITY": [ "grass", "dark_grass" ],
+            "ZONE_CASTELIA_SEWERS": [ "grass" ],
+            "ZONE_RELIC_PASSAGE": [ "grass" ]
+        }
+    }
+}

@@ -40,6 +40,34 @@ enum {
     MODE_NO_WIRELESS,
 };
 
+// The steps of the sequence that turns the C-Gear on
+enum {
+    SEQ_ON_ASK,
+    SEQ_ON_WAIT_WIPE,
+    SEQ_ON_WAIT_ANSWER,
+    SEQ_ON_SHOW_NOTICE,
+    SEQ_ON_WAIT_KEY,
+    SEQ_ON_CHECK_BATTERY,
+    SEQ_ON_WAIT_COMM_EXIT,
+};
+
+// The steps of the sequence that turns it off
+enum {
+    SEQ_OFF_ASK,
+    SEQ_OFF_WAIT_WIPE,
+    SEQ_OFF_WAIT_ANSWER,
+    SEQ_OFF_WAIT_COMM_EXIT,
+    SEQ_OFF_END,
+};
+
+// The steps of the sequence that says wireless communication is disabled
+enum {
+    SEQ_NO_WIRELESS_SHOW,
+    SEQ_NO_WIRELESS_WAIT_WIPE,
+    SEQ_NO_WIRELESS_WAIT_TOUCH,
+    SEQ_NO_WIRELESS_END,
+};
+
 // The yes/no menu's items
 #define YESNO_YES 0
 
@@ -362,53 +390,53 @@ static BOOL CGearPowerOnOff_IsYesNoFinished(CGearPowerOnOff *work) {
 
 static BOOL CGearPowerOnOff_SeqPowerOn(CGearPowerOnOff *work) {
     switch (work->seq) {
-    case 0:
+    case SEQ_ON_ASK:
         CGearPowerOnOff_PrintMessage(work, work->messageWindow, S019aCgearControlWarning_Text_TurnCGearEstablish);
         CGearPowerOnOff_PrintMessage(work, work->explanationWindow, S019aCgearControlWarning_Text_WarningPleaseTurnC);
         CGearPowerOnOff_CreateYesNo(work, work->heapId);
         GameData_SetCGearPowerRequest(GSYS_GetGameData(work->gsys), 0);
         work->seq++;
         break;
-    case 1:
+    case SEQ_ON_WAIT_WIPE:
         if (GFL_WipeIsFinished() == TRUE) {
             work->seq++;
         }
         break;
-    case 2:
+    case SEQ_ON_WAIT_ANSWER:
         if (CGearPowerOnOff_IsYesNoFinished(work)) {
             if (CGearPowerOnOff_GetYesNoPos(work) == YESNO_YES) {
                 GSYS_SetCGearOn(work->gsys, 1);
                 GSYS_TryBootGameComm(work->gsys);
-                work->seq = 3;
+                work->seq = SEQ_ON_SHOW_NOTICE;
             } else {
-                work->seq = 5;
+                work->seq = SEQ_ON_CHECK_BATTERY;
             }
             CGearPowerOnOff_FreeYesNo(work);
         }
         break;
-    case 3:
+    case SEQ_ON_SHOW_NOTICE:
         CGearPowerOnOff_PrintMessageResized(work, work->messageWindow,
                                             S019aCgearControlWarning_Text_WhenCommunicationsClosingSystem, 6);
         KeyCursor_Draw(work->keyCursor, BmpWin_GetBitmap(work->messageWindow), WINDOW_BG_COLOR);
         work->seq++;
         break;
-    case 4:
+    case SEQ_ON_WAIT_KEY:
         if (KeyCursor_UpdateWait(work->keyCursor, work->messageWindow) || GSYS_IsLowBatteryCGearOff(work->gsys)) {
             KeyCursor_Erase(work->keyCursor, BmpWin_GetBitmap(work->messageWindow), WINDOW_BG_COLOR);
             work->seq++;
         }
         break;
-    case 5:
+    case SEQ_ON_CHECK_BATTERY:
         if (GSYS_IsLowBatteryCGearOff(work->gsys)) {
             if (GameCommSys_BootCheck(work->comm)) {
                 GameCommSys_ExitReq(work->comm);
             }
-            work->seq = 6;
+            work->seq = SEQ_ON_WAIT_COMM_EXIT;
         } else {
             return TRUE;
         }
         break;
-    case 6:
+    case SEQ_ON_WAIT_COMM_EXIT:
         if (!GameCommSys_BootCheck(work->comm)) {
             return TRUE;
         }
@@ -420,19 +448,19 @@ static BOOL CGearPowerOnOff_SeqPowerOn(CGearPowerOnOff *work) {
 
 static BOOL CGearPowerOnOff_SeqPowerOff(CGearPowerOnOff *work) {
     switch (work->seq) {
-    case 0:
+    case SEQ_OFF_ASK:
         CGearPowerOnOff_PrintMessage(work, work->messageWindow, S019aCgearControlWarning_Text_WillTurnCGear);
         CGearPowerOnOff_PrintMessage(work, work->explanationWindow, S019aCgearControlWarning_Text_WarningPleaseTurnC);
         CGearPowerOnOff_CreateYesNo(work, work->heapId);
         GameData_SetCGearPowerRequest(GSYS_GetGameData(work->gsys), 0);
         work->seq++;
         break;
-    case 1:
+    case SEQ_OFF_WAIT_WIPE:
         if (GFL_WipeIsFinished() == TRUE) {
             work->seq++;
         }
         break;
-    case 2:
+    case SEQ_OFF_WAIT_ANSWER:
         if (CGearPowerOnOff_IsYesNoFinished(work) || GSYS_IsLowBatteryCGearOff(work->gsys) == TRUE) {
             if (CGearPowerOnOff_GetYesNoPos(work) == YESNO_YES || GSYS_IsLowBatteryCGearOff(work->gsys) == TRUE) {
                 if (GameCommSys_BootCheck(work->comm)) {
@@ -442,11 +470,11 @@ static BOOL CGearPowerOnOff_SeqPowerOff(CGearPowerOnOff *work) {
             } else {
                 work->powerOff = FALSE;
             }
-            work->seq = 3;
+            work->seq = SEQ_OFF_WAIT_COMM_EXIT;
             CGearPowerOnOff_FreeYesNo(work);
         }
         break;
-    case 3:
+    case SEQ_OFF_WAIT_COMM_EXIT:
         if (work->powerOff) {
             if (GameCommSys_BootCheck(work->comm)) {
                 break;
@@ -455,7 +483,7 @@ static BOOL CGearPowerOnOff_SeqPowerOff(CGearPowerOnOff *work) {
         }
         work->seq++;
         break;
-    case 4:
+    case SEQ_OFF_END:
         return TRUE;
     }
     CGearPowerOnOff_UpdateYesNo(work);
@@ -464,7 +492,7 @@ static BOOL CGearPowerOnOff_SeqPowerOff(CGearPowerOnOff *work) {
 
 static BOOL CGearPowerOnOff_SeqNoWireless(CGearPowerOnOff *work) {
     switch (work->seq) {
-    case 0:
+    case SEQ_NO_WIRELESS_SHOW:
         BmpWin_ClearScreen(work->messageWindow);
         BmpWin_ClearScreen(work->explanationWindow);
         BmpWin_SetPosY(work->explanationWindow, 6);
@@ -474,17 +502,17 @@ static BOOL CGearPowerOnOff_SeqNoWireless(CGearPowerOnOff *work) {
         GameData_SetCGearPowerRequest(GSYS_GetGameData(work->gsys), 0);
         work->seq++;
         break;
-    case 1:
+    case SEQ_NO_WIRELESS_WAIT_WIPE:
         if (GFL_WipeIsFinished() == TRUE) {
             work->seq++;
         }
         break;
-    case 2:
+    case SEQ_NO_WIRELESS_WAIT_TOUCH:
         if (GFL_HIDIsTouchPressed()) {
             work->seq++;
         }
         break;
-    case 3:
+    case SEQ_NO_WIRELESS_END:
         return TRUE;
     }
     return FALSE;

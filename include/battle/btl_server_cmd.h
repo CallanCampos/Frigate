@@ -153,9 +153,9 @@ void BtlServerCmdQueue_PutMsg(BtlServerCmdQueue *que, u8 event, ...);
 void func_ov167_021b1670(void);
 
 // SC_OP_UPDATE_USED_MOVE, with its arguments' types
-static inline void BtlServerCmd_Put18(BtlServerCmdQueue *queue, u8 monId, u8 target, u8 result, u8 arg4, u16 move,
-                                      u16 arg6) {
-    BtlServerCmdQueue_Put(queue, SC_OP_UPDATE_USED_MOVE, monId, target, result, arg4, move, arg6);
+static inline void BtlServerCmd_Put18(BtlServerCmdQueue *queue, u8 monId, u8 target, u8 result, u8 type, u16 move,
+                                      u16 selectedMove) {
+    BtlServerCmdQueue_Put(queue, SC_OP_UPDATE_USED_MOVE, monId, target, result, type, move, selectedMove);
 }
 
 // SC_DAMAGE_EFFECT, with its arguments' types

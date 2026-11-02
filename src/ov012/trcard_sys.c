@@ -68,8 +68,8 @@ typedef struct {
     PMSSelectParam greeting;
     TrainerCardMedalParam medal;
     TrainerCardParam *param;
-    // The card's unk06 when the screen opened
-    u32 unk34;
+    // The card's unionView when the screen opened
+    u32 startUnionView;
 } TrainerCardSysWork;
 
 static BOOL TrainerCardSys_InitView(GameProc *proc, u32 *state, void *param, void *work);
@@ -79,26 +79,26 @@ static BOOL TrainerCardSys_Init(GameProc *proc, u32 *state, void *param, void *w
 static BOOL TrainerCardSys_Exit(GameProc *proc, u32 *state, void *param, void *work);
 
 // The order of the declarations gives the order of the tables, which MWCC sorts by size
-const GameProcFunctions data_ov012_0216dd78 = {
+const GameProcFunctions TRCARD_SYS_PROC_FUNCTIONS = {
     TrainerCardSys_Init,
     TrainerCardSys_Main,
     TrainerCardSys_Exit,
 };
 
-const GameProcFunctions data_ov012_0216dd6c = {
+const GameProcFunctions TRCARD_SYS_VIEW_PROC_FUNCTIONS = {
     TrainerCardSys_InitView,
     TrainerCardSys_Main,
     TrainerCardSys_ExitView,
 };
 
-static const GameProcFunctions data_ov012_0216dd60 = {
+static const GameProcFunctions TRCARD_SCREEN_PROC_FUNCTIONS = {
     TrainerCard_Init,
     TrainerCard_Main,
     TrainerCard_Exit,
 };
 
 // The records that each sum on the card adds up, ending at 0
-static const u16 data_ov012_0216dd84[9][7] = {
+static const u16 TRCARD_RECORD_SUMS[9][7] = {
     { 0xc, 0xd, 0x10, 0x11, 0x24, 0x25, 0x5a },
     { 0xd, 0x11, 0x25 },
     { 0xe, 0x12, 0x26 },
@@ -145,7 +145,7 @@ static BOOL TrainerCardSys_Init(GameProc *proc, u32 *state, void *param, void *w
     wk->param->shownData = wk->param->data;
     TrainerCardData_Fill(wk->param->shownData, cardParam->gameData, FALSE, wk->param->canEdit, wk->heapId);
     TrainerCardData_FillExtras(wk->param->data, cardParam->gameData, wk->heapId);
-    wk->unk34 = wk->param->shownData->unk06;
+    wk->startUnionView = wk->param->shownData->unionView;
     return TRUE;
 }
 
@@ -203,7 +203,7 @@ static BOOL TrainerCardSys_Exit(GameProc *proc, u32 *state, void *param, void *w
     if (cardParam->canEdit) {
         u32 value = PlayerInfo_GetUnionView(GetGameDataPlayerInfo(cardParam->gameData));
 
-        if (wk->unk34 != value) {
+        if (wk->startUnionView != value) {
             GameBeaconSys_SetTrainerView(value);
         }
     }
@@ -242,7 +242,7 @@ static u32 TrainerCardSys_SeqCard(TrainerCardSysWork *wk) {
     if (wk->procMgr == NULL) {
         wk->procMgr = CreateGameProcManager(wk->heapId);
     }
-    QueueGameProc(wk->procMgr, OVERLAY_NONE, &data_ov012_0216dd60, wk->param);
+    QueueGameProc(wk->procMgr, OVERLAY_NONE, &TRCARD_SCREEN_PROC_FUNCTIONS, wk->param);
     return TRCARD_SEQ_CARD_WAIT;
 }
 
@@ -250,13 +250,13 @@ static u32 TrainerCardSys_SeqCardWait(TrainerCardSysWork *wk) {
     if (!TrainerCardSys_UpdateProcMgr(&wk->procMgr)) {
         return TRCARD_SEQ_CARD_WAIT;
     }
-    if (wk->param->next == 1) {
+    if (wk->param->next == TRCARD_NEXT_GREETING) {
         return TRCARD_SEQ_GREETING;
     }
-    if (wk->param->next == 2) {
+    if (wk->param->next == TRCARD_NEXT_BADGES) {
         return TRCARD_SEQ_OTHER;
     }
-    if (wk->param->next == 4) {
+    if (wk->param->next == TRCARD_NEXT_MEDALS) {
         return TRCARD_SEQ_MEDAL;
     }
     return TRCARD_SEQ_END;
@@ -299,7 +299,7 @@ static u32 TrainerCardSys_SeqOtherWait(TrainerCardSysWork *wk) {
     if (!TrainerCardSys_UpdateProcMgr(&wk->procMgr)) {
         return TRCARD_SEQ_OTHER_WAIT;
     }
-    if (wk->param->next == 3) {
+    if (wk->param->next == TRCARD_NEXT_CARD) {
         return TRCARD_SEQ_CARD;
     }
     return TRCARD_SEQ_END;
@@ -311,7 +311,7 @@ void TrainerCardData_FillExtras(TrainerCardData *data, GameData *gameData, HeapI
     WbtSave *wbt;
     JoinAvenueInfo *avenue;
     GameRecords *records;
-    FunfestSave *unk;
+    FunfestSave *funfest;
     EventWork *eventWork;
     u32 wins = 0;
     u32 i;
@@ -324,7 +324,7 @@ void TrainerCardData_FillExtras(TrainerCardData *data, GameData *gameData, HeapI
     wbt = TrialHouseSave_GetWbtSave(save);
     avenue = JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(save));
     records = getTrainerCardInfoBlkAddress(save);
-    unk = FestRecords_GetFromSave(save);
+    funfest = FestRecords_GetFromSave(save);
     data->lastMedal = MedalBox_GetLastMedal(box);
     data->medalCount = MedalBox_GetObtainedCount(box, 0);
     data->medalRank = MedalBox_GetRank(box);
@@ -341,23 +341,23 @@ void TrainerCardData_FillExtras(TrainerCardData *data, GameData *gameData, HeapI
         wins = 9999;
     }
     data->pwtWins = wins;
-    data->unk688 = RecordGet(records, 0x83);
+    data->movieShoots = RecordGet(records, 0x83);
     JoinAvenue_GetParam(avenue, JOIN_AVE_INFO_NAME, data->avenueName);
-    data->unk68A = RecordGet(records, 0x7f);
-    data->unk684 = FestRecords_GetCompleted(unk);
+    data->recommendedCustomers = RecordGet(records, 0x7f);
+    data->funfestMissions = FestRecords_GetCompleted(funfest);
     eventWork = GameData_GetEventWork(gameData);
     if (data->pwtWins != 0) {
-        data->unk690_2 = TRUE;
+        data->showPwtWins = TRUE;
     }
     if (EventWork_FlagGet(eventWork, 0x986) == TRUE) {
-        data->unk690_0 = TRUE;
-        data->unk68_1 = TRUE;
+        data->showFunfestMissions = TRUE;
+        data->showPassPowers = TRUE;
     }
-    if (data->unk688 != 0) {
-        data->unk690_1 = TRUE;
+    if (data->movieShoots != 0) {
+        data->showMovieShoots = TRUE;
     }
-    if (data->unk68A != 0) {
-        data->unk690_3 = TRUE;
+    if (data->recommendedCustomers != 0) {
+        data->showAvenue = TRUE;
     }
 }
 
@@ -400,10 +400,10 @@ static u32 TrainerCardData_SumRecords(GameRecords *records, u32 row, u32 max) {
     int i;
 
     for (i = 0; i < 7; i++) {
-        if (data_ov012_0216dd84[row][i] == 0) {
+        if (TRCARD_RECORD_SUMS[row][i] == 0) {
             break;
         }
-        sum += RecordGet(records, data_ov012_0216dd84[row][i]);
+        sum += RecordGet(records, TRCARD_RECORD_SUMS[row][i]);
         if (sum > max) {
             sum = max;
         }
@@ -457,18 +457,18 @@ void TrainerCardData_Fill(TrainerCardData *data, GameData *gameData, BOOL isSnap
     if (isSnapshot == TRUE) {
         PlayTime *playTime = (PlayTime *)GameData_GetPlayTime(gameData);
 
-        data->unk06 = PlayerInfo_GetUnionView(playerInfo);
+        data->unionView = PlayerInfo_GetUnionView(playerInfo);
         data->isOwn = FALSE;
         data->playTime = NULL;
         data->playHours = PlayTime_GetHours(playTime);
         data->playMinutes = PlayTime_GetMinutes(playTime);
     } else {
-        data->unk06 = PlayerInfo_GetUnionView(playerInfo);
+        data->unionView = PlayerInfo_GetUnionView(playerInfo);
         data->isOwn = TRUE;
         data->playTime = (PlayTime *)GameData_GetPlayTime(gameData);
     }
-    data->unk48 = TimeSigSave_GetPersonality(timeSig);
-    data->unk04_4 = TimeSigSave_GetSignBlinks(timeSig);
+    data->personality = TimeSigSave_GetPersonality(timeSig);
+    data->signBlinks = TimeSigSave_GetSignBlinks(timeSig);
     CGearPhrases_Get(cgear, 0, &data->greeting);
     RTC_ConvertSecondToDateTime(&date, &time, adventureTime->startSeconds);
     data->startYear = date.year;
@@ -488,43 +488,43 @@ void TrainerCardData_Fill(TrainerCardData *data, GameData *gameData, BOOL isSnap
         data->clearHour = time.hour;
         data->clearMinute = time.minute;
     }
-    data->unk38 = TrainerCardData_SumRecords(records, 0, 999999999);
-    data->unk3C = TrainerCardData_SumRecords(records, 1, 999999999);
-    data->unk40 = TrainerCardData_SumRecords(records, 2, 999999999);
-    data->unk44 = TrainerCardData_SumRecords(records, 3, 999999999);
-    data->unk4C = TrainerCardData_SumRecords(records, 4, 999999999);
-    data->unk50 = TrainerCardData_SumRecords(records, 5, 999999999);
-    data->unk54 = TrainerCardData_SumRecords(records, 6, 999999999);
-    data->unk58 = TrainerCard_GetPasserbyCount(card);
-    data->unk5C = TrainerCardData_SumRecords(records, 7, 9999);
+    data->timesLinked = TrainerCardData_SumRecords(records, 0, 999999999);
+    data->linkBattles = TrainerCardData_SumRecords(records, 1, 999999999);
+    data->linkBattleWins = TrainerCardData_SumRecords(records, 2, 999999999);
+    data->linkBattleLosses = TrainerCardData_SumRecords(records, 3, 999999999);
+    data->linkTrades = TrainerCardData_SumRecords(records, 4, 999999999);
+    data->wildEncounters = TrainerCardData_SumRecords(records, 5, 999999999);
+    data->trainersBattled = TrainerCardData_SumRecords(records, 6, 999999999);
+    data->passerbyCount = TrainerCard_GetPasserbyCount(card);
+    data->feelingChecks = TrainerCardData_SumRecords(records, 7, 9999);
     highLink = getHighLinkBlockAddress(save);
     passPowerData = PassPowerData_Create(heapId);
     HighLinkSave_GetSpecialFlags(highLink, passPowerFlags, 2);
     data->passPowerCount =
         GetUnlockedPassPowerCount(passPowerData, GameData_GetMyPassPowerLevels(gameData), passPowerFlags);
     PassPowerData_Free(passPowerData);
-    data->unk60 = TrainerCardData_SumRecords(records, 8, 9999);
+    data->musicalPerformances = TrainerCardData_SumRecords(records, 8, 9999);
     data->palParkHighScore = TrainerGameInfo_GetPalParkHighScore(card);
-    data->unk64 = RecordGetTrialHousePoints(records);
+    data->battleTestHighScore = RecordGetTrialHousePoints(records);
     data->battleTestRank = RecordGetTrialHouseRank(records);
-    data->unk68_0 = CGearSettings_IsOn(CGearSettings_GetFromGameData(gameData));
-    if (data->unk60 != 0) {
-        data->unk68_2 = TRUE;
+    data->cgearOn = CGearSettings_IsOn(CGearSettings_GetFromGameData(gameData));
+    if (data->musicalPerformances != 0) {
+        data->showMusicals = TRUE;
     }
     if (RecordGet(records, 0x78) != 0) {
-        data->unk68_3 = TRUE;
+        data->showPalPark = TRUE;
     }
     if (RecordGet(records, 0x79) != 0) {
-        data->unk68_4 = TRUE;
+        data->showBattleTest = TRUE;
     }
     if (EventWork_FlagGet(GameData_GetEventWork(gameData), 0x962) == TRUE) {
-        data->unk04_2 = TRUE;
+        data->hasPokedex = TRUE;
     } else {
-        data->unk04_2 = FALSE;
+        data->hasPokedex = FALSE;
     }
     data->seenCount = countSeenDexPokes(pokedex, heapId);
-    data->unk04_3 = TimeSigSave_HasSignature(timeSig);
-    MI_CpuCopy8(TimeSigSave_GetSignature(timeSig), data->unk74, sizeof(data->unk74));
+    data->hasSignature = TimeSigSave_HasSignature(timeSig);
+    MI_CpuCopy8(TimeSigSave_GetSignature(timeSig), data->signature, sizeof(data->signature));
     data->canEdit = canEdit;
 }
 
@@ -534,7 +534,7 @@ TrainerCardParam *TrainerCardParam_Create(GameData *gameData, HeapID heapId, BOO
     MI_CpuFill8(param, 0, sizeof(TrainerCardParam));
     param->shownData = NULL;
     param->gameData = gameData;
-    param->next = 0;
+    param->next = TRCARD_NEXT_END;
     param->canEdit = canEdit;
     return param;
 }
@@ -545,9 +545,9 @@ TrainerCardParam *TrainerCardParam_CreateView(GameData *gameData, TrainerCardDat
     param->data = data;
     param->shownData = data;
     param->gameData = gameData;
-    param->next = 0;
+    param->next = TRCARD_NEXT_END;
     data->canEdit = FALSE;
-    param->shownData->unk04_7 = TRUE;
+    param->shownData->isOtherCard = TRUE;
     return param;
 }
 

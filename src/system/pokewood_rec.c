@@ -127,10 +127,10 @@ PokewoodBlock *getPokewoodBlock(void) {
 
 u32 Pokewood_GetLoadedMovieField(u32 field, uptr a1) {
     switch (field) {
-    case POKEWOOD_BLOCK_FIELD_UNKDF:
-        return sBlock->info.unkDF;
-    case POKEWOOD_BLOCK_FIELD_UNK124:
-        return sBlock->info.unk124;
+    case POKEWOOD_BLOCK_FIELD_MOVIE:
+        return sBlock->info.movie;
+    case POKEWOOD_BLOCK_FIELD_ENDING:
+        return sBlock->info.ending;
     case POKEWOOD_BLOCK_FIELD_PKM_0:
     case POKEWOOD_BLOCK_FIELD_PKM_0 + 1:
     case POKEWOOD_BLOCK_FIELD_PKM_0 + 2:
@@ -147,8 +147,8 @@ u32 Pokewood_GetLoadedMovieField(u32 field, uptr a1) {
         return sBlock->date;
     case POKEWOOD_BLOCK_FIELD_TIME:
         return sBlock->time;
-    case POKEWOOD_BLOCK_FIELD_UNK130:
-        return sBlock->unk130;
+    case POKEWOOD_BLOCK_FIELD_SCORE:
+        return sBlock->score;
     }
     return 0;
 }

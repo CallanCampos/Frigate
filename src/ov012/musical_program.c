@@ -14,7 +14,8 @@ typedef struct {
     u8 name;
     u8 unk4;
     u8 form;
-    u16 unk6;
+    // When the performer uses a hand prop, MusicalPoke.handPropUse
+    u16 handPropUse;
     // The photos the player must have taken before the performer appears
     u16 minShots;
     u16 unkA;
@@ -27,7 +28,8 @@ typedef struct {
 
 // The program's data, which overlay 210 loads
 typedef struct {
-    u8 unk0;
+    // The built-in program this one is made on, whose stage the photo shows
+    u8 baseProgramId;
     // The points the audience has for each kind of prop
     u8 points[4];
     // The points the program shares out among the kinds of prop at random, by fives
@@ -145,7 +147,7 @@ void MusicalProgram_CalcPoints(HeapID heapId, MusicalProgram *program, MusicalSt
             u8 value = program->propPoints[j] * counts[i][j];
 
             poke->points += value;
-            poke->unk4C[j] = value;
+            poke->kindPoints[j] = value;
         }
     }
     MusItemData_Free(items);
@@ -198,7 +200,7 @@ void MusicalProgram_PutNpcOnStage(MusicalProgram *program, MusicalStageParam *st
 
     MusicalStageParam_CreateNpcPoke(stage, pos, npc->species, npc->form,
                                     npc->trainerClass + (npc->name << 8) + (npc->unk4 << 16) + (npc->form << 24),
-                                    npc->unk6, heapId);
+                                    npc->handPropUse, heapId);
     for (i = 0; i < 8; i++) {
         if (npc->equips[i].itemId != 0x1fe && npc->equips[i].itemId != 0x1ff) {
             MusicalStageParam_SetEquip(stage, pos, npc->equips[i].slot, npc->equips[i].itemId, 0, i);
@@ -207,7 +209,7 @@ void MusicalProgram_PutNpcOnStage(MusicalProgram *program, MusicalStageParam *st
 }
 
 u8 MusicalProgram_GetBaseProgramId(MusicalProgram *program) {
-    return program->data->unk0;
+    return program->data->baseProgramId;
 }
 
 u8 MusicalProgram_GetPropList(MusicalProgram *program) {

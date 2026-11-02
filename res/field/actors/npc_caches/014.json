@@ -1,0 +1,12 @@
+{
+    "$schema": "../npc_cache.schema.json",
+    "codes": [
+        "OBJ_CODE_MODEL_3",
+        "OBJ_CODE_110",
+        "OBJ_CODE_POKEFAN_M",
+        "OBJ_CODE_SCIENTIST_F_46",
+        "OBJ_CODE_POKEFAN_F",
+        "OBJ_CODE_BACKPACKER_M",
+        "OBJ_CODE_BACKPACKER_F"
+    ]
+}

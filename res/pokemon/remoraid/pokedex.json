@@ -1,0 +1,12 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "R",
+    "shapes": [ 2 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_UNDELLA_BAY": [ "surf", "fishing", "rippling_fishing" ],
+            "ZONE_ROUTE_21": [ "surf", "fishing", "rippling_fishing" ]
+        }
+    }
+}

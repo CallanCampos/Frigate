@@ -1,0 +1,772 @@
+{
+    "$schema": "rail.schema.json",
+    "tile_width": 4096,
+    "points": [
+        {
+            "name": "RE_POINT_0",
+            "position": {
+                "x": 1540096,
+                "y": 65536,
+                "z": 2916352
+            },
+            "camera": 0,
+            "lines": [
+                {
+                    "line": 0,
+                    "dir": "down",
+                    "width": 0
+                },
+                {
+                    "line": 1,
+                    "dir": "up",
+                    "width": 0
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "RE_POINT_1",
+            "position": {
+                "x": 1540096,
+                "y": 65536,
+                "z": 3047424
+            },
+            "camera": 1,
+            "lines": [
+                {
+                    "line": 0,
+                    "dir": "up",
+                    "width": 0
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "RE_POINT_2",
+            "position": {
+                "x": 1146880,
+                "y": 262144,
+                "z": 2654208
+            },
+            "camera": 2,
+            "lines": [
+                {
+                    "line": 1,
+                    "dir": "down",
+                    "width": 0
+                },
+                {
+                    "line": 4,
+                    "dir": "right",
+                    "width": 0
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "RE_POINT_3",
+            "position": {
+                "x": 1671168,
+                "y": 65536,
+                "z": 2457600
+            },
+            "camera": 3,
+            "lines": [
+                {
+                    "line": 2,
+                    "dir": "up",
+                    "width": 0
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "RE_POINT_4",
+            "position": {
+                "x": 1671168,
+                "y": 65536,
+                "z": 2326528
+            },
+            "camera": 4,
+            "lines": [
+                {
+                    "line": 2,
+                    "dir": "down",
+                    "width": 0
+                },
+                {
+                    "line": 3,
+                    "dir": "up",
+                    "width": 0
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "RE_POINT_5",
+            "position": {
+                "x": 1540096,
+                "y": 131072,
+                "z": 1998848
+            },
+            "camera": 5,
+            "lines": [
+                {
+                    "line": 3,
+                    "dir": "down",
+                    "width": 0
+                },
+                {
+                    "line": 4,
+                    "dir": "left",
+                    "width": 0
+                },
+                {
+                    "line": 9,
+                    "dir": "right",
+                    "width": 0
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "RE_POINT_6",
+            "position": {
+                "x": 2457600,
+                "y": 65536,
+                "z": 2457600
+            },
+            "camera": 6,
+            "lines": [
+                {
+                    "line": 5,
+                    "dir": "up",
+                    "width": 0
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "RE_POINT_7",
+            "position": {
+                "x": 2457600,
+                "y": 65536,
+                "z": 2326528
+            },
+            "camera": 7,
+            "lines": [
+                {
+                    "line": 5,
+                    "dir": "down",
+                    "width": 0
+                },
+                {
+                    "line": 6,
+                    "dir": "up",
+                    "width": 0
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "RE_POINT_8",
+            "position": {
+                "x": 2588672,
+                "y": 131072,
+                "z": 1998848
+            },
+            "camera": 8,
+            "lines": [
+                {
+                    "line": 6,
+                    "dir": "down",
+                    "width": 0
+                },
+                {
+                    "line": 9,
+                    "dir": "left",
+                    "width": 0
+                },
+                {
+                    "line": 10,
+                    "dir": "right",
+                    "width": 0
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "RE_POINT_9",
+            "position": {
+                "x": 2588672,
+                "y": 65536,
+                "z": 3047424
+            },
+            "camera": 9,
+            "lines": [
+                {
+                    "line": 7,
+                    "dir": "up",
+                    "width": 0
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "RE_POINT_10",
+            "position": {
+                "x": 2588672,
+                "y": 65536,
+                "z": 2916352
+            },
+            "camera": 10,
+            "lines": [
+                {
+                    "line": 7,
+                    "dir": "down",
+                    "width": 0
+                },
+                {
+                    "line": 8,
+                    "dir": "up",
+                    "width": 0
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "RE_POINT_11",
+            "position": {
+                "x": 2981888,
+                "y": 262144,
+                "z": 2654208
+            },
+            "camera": 11,
+            "lines": [
+                {
+                    "line": 8,
+                    "dir": "down",
+                    "width": 0
+                },
+                {
+                    "line": 10,
+                    "dir": "left",
+                    "width": 0
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        }
+    ],
+    "lines": [
+        {
+            "name": "RE_LINE_0",
+            "point_a": 1,
+            "point_b": 0,
+            "dir": "up",
+            "curve": 0,
+            "camera": 12,
+            "length": 2,
+            "tiles": [
+                [ "0x01810027" ],
+                [ "0x01800028" ]
+            ]
+        },
+        {
+            "name": "RE_LINE_1",
+            "point_a": 0,
+            "point_b": 2,
+            "dir": "up",
+            "curve": 1,
+            "camera": 13,
+            "length": 8,
+            "tiles": [
+                [ "0x01800026" ],
+                [ "0x01800026" ],
+                [ "0x01800026" ],
+                [ "0x01800026" ],
+                [ "0x01800026" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ]
+            ]
+        },
+        {
+            "name": "RE_LINE_2",
+            "point_a": 3,
+            "point_b": 4,
+            "dir": "up",
+            "curve": 2,
+            "camera": 14,
+            "length": 2,
+            "tiles": [
+                [ "0x01810027" ],
+                [ "0x01800028" ]
+            ]
+        },
+        {
+            "name": "RE_LINE_3",
+            "point_a": 4,
+            "point_b": 5,
+            "dir": "up",
+            "curve": 3,
+            "camera": 15,
+            "length": 6,
+            "tiles": [
+                [ "0x01800026" ],
+                [ "0x01800026" ],
+                [ "0x01800026" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ]
+            ]
+        },
+        {
+            "name": "RE_LINE_4",
+            "point_a": 2,
+            "point_b": 5,
+            "dir": "right",
+            "curve": 4,
+            "camera": 16,
+            "length": 12,
+            "tiles": [
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x00000000" ]
+            ]
+        },
+        {
+            "name": "RE_LINE_5",
+            "point_a": 6,
+            "point_b": 7,
+            "dir": "up",
+            "curve": 5,
+            "camera": 17,
+            "length": 2,
+            "tiles": [
+                [ "0x01810027" ],
+                [ "0x01800028" ]
+            ]
+        },
+        {
+            "name": "RE_LINE_6",
+            "point_a": 7,
+            "point_b": 8,
+            "dir": "up",
+            "curve": 6,
+            "camera": 18,
+            "length": 6,
+            "tiles": [
+                [ "0x01800026" ],
+                [ "0x01800026" ],
+                [ "0x01800026" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ]
+            ]
+        },
+        {
+            "name": "RE_LINE_7",
+            "point_a": 9,
+            "point_b": 10,
+            "dir": "up",
+            "curve": 7,
+            "camera": 19,
+            "length": 2,
+            "tiles": [
+                [ "0x01810027" ],
+                [ "0x01800028" ]
+            ]
+        },
+        {
+            "name": "RE_LINE_8",
+            "point_a": 10,
+            "point_b": 11,
+            "dir": "up",
+            "curve": 8,
+            "camera": 20,
+            "length": 8,
+            "tiles": [
+                [ "0x01800026" ],
+                [ "0x01800026" ],
+                [ "0x01800026" ],
+                [ "0x01800026" ],
+                [ "0x01800026" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ]
+            ]
+        },
+        {
+            "name": "RE_LINE_9",
+            "point_a": 5,
+            "point_b": 8,
+            "dir": "right",
+            "curve": 9,
+            "camera": 21,
+            "length": 16,
+            "tiles": [
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ]
+            ]
+        },
+        {
+            "name": "RE_LINE_10",
+            "point_a": 8,
+            "point_b": 11,
+            "dir": "right",
+            "curve": 10,
+            "camera": 22,
+            "length": 12,
+            "tiles": [
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ],
+                [ "0x01810027" ]
+            ]
+        }
+    ],
+    "cameras": [
+        {
+            "function": "FieldRailCamera_FixedEyeTarget",
+            "params": [ 2345276, 1214897, 3759263, 1867776, 118784, 2838528, 0, 0 ]
+        },
+        {
+            "function": "RailCameraFuncSetStaticPYDist",
+            "params": [ 8485, 0, 1499136, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FixedAngleShift",
+            "params": [ 8485, 1536, 1009136, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FixedEyeTarget",
+            "params": [ 1867776, 1154386, 3487890, 1867776, 65536, 2457600, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FixedEyeTarget",
+            "params": [ 1867776, 1154386, 3487890, 1867776, 65536, 2457600, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FixedEyeTarget",
+            "params": [ 1979343, 826658, 3118748, 1867776, 131072, 2457600, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FixedEyeTarget",
+            "params": [ 2326528, 1154309, 3487817, 2326528, 65536, 2457600, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FixedEyeTarget",
+            "params": [ 2326528, 1154309, 3487817, 2326528, 65536, 2457600, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FixedEyeTarget",
+            "params": [ 2227699, 836147, 3117408, 2326528, 131072, 2457600, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FixedEyeTarget",
+            "params": [ 2326528, 1154232, 4012032, 2326528, 65536, 2981888, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FixedEyeTarget",
+            "params": [ 2326528, 1154386, 4012178, 2326528, 65536, 2981888, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FixedEyeTarget",
+            "params": [ 1748170, 1563640, 3292383, 2326597, -372707, 2064395, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FixedEyeTarget",
+            "params": [ 1867776, 1154386, 4012178, 1867776, 65536, 2981888, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FixedEyeTarget",
+            "params": [ 2213722, 1189043, 3844313, 1867776, 118784, 2838528, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_BlendEyeTarget",
+            "params": [ 6568, 0, 917504, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_BlendEyeTarget",
+            "params": [ 6568, 0, 917504, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_BlendAngles",
+            "params": [ 6568, 0, 917504, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "RailCameraFuncSetStaticPYDist",
+            "params": [ 8485, 0, 1499136, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_BlendEyeTarget",
+            "params": [ 6568, 0, 917504, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FixedEyeTarget",
+            "params": [ 2326528, 1154386, 4012178, 2326528, 65536, 2981888, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FixedEyeTarget",
+            "params": [ 1915046, 1189043, 3844313, 2260992, 118784, 2838528, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_BlendEyeTarget",
+            "params": [ 6568, 0, 917504, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_BlendEyeTarget",
+            "params": [ 6568, 0, 917504, 0, 0, 0, 0, 0 ]
+        }
+    ],
+    "curves": [
+        {
+            "kind": "no_curve",
+            "center": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "kind": "no_curve",
+            "center": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "kind": "no_curve",
+            "center": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "kind": "no_curve",
+            "center": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "kind": "no_curve",
+            "center": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "kind": "no_curve",
+            "center": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "kind": "no_curve",
+            "center": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "kind": "no_curve",
+            "center": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "kind": "no_curve",
+            "center": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "kind": "no_curve",
+            "center": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "kind": "no_curve",
+            "center": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        }
+    ]
+}

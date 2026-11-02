@@ -4,6 +4,7 @@
 // .rodata. scrcmd_misc.c is descriptive. Function names from swan (https://github.com/ds-pokemon-hacking/swan,
 // GPL-3.0). Anville train names and collector group names are our descriptive names from the scripts and resources.
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/directions.h"
 #include "constants/language.h"
 #include "constants/pokemon.h"
@@ -32,7 +33,6 @@
 #define ELEVATOR_FLOOR_MAX 8
 #define ELEVATOR_TABLE_END 0xffff
 #define ITEM_COLLECTOR_GROUP_COUNT 8
-#define ARC_ITEM_COLLECTOR 205
 
 // The world position of a tile
 #define GRID_TO_FX32(n) ((n) * FX32_CONST(16))
@@ -220,8 +220,8 @@ BOOL Scrcmd_Misc_ItemCollectorGetPrice(VM *vm, FieldScriptEnv *env) {
     u16 group = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
-    prices = GFL_ArcSysReadHeapNewLZGetLen(ARC_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE, HEAPID_TAIL(heapId),
-                                           &size);
+    prices = GFL_ArcSysReadHeapNewLZGetLen(ARCID_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE,
+                                           HEAPID_TAIL(heapId), &size);
     size /= sizeof(ItemCollectorPrice);
     *result = 0;
     for (i = 0; i < size; i++) {
@@ -247,8 +247,8 @@ BOOL Scrcmd_Misc_ItemCollectorCheckGroup(VM *vm, FieldScriptEnv *env) {
     ItemCollectorPrice *prices;
     u32 i;
 
-    prices = GFL_ArcSysReadHeapNewLZGetLen(ARC_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE, HEAPID_TAIL(heapId),
-                                           &size);
+    prices = GFL_ArcSysReadHeapNewLZGetLen(ARCID_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE,
+                                           HEAPID_TAIL(heapId), &size);
     size /= sizeof(ItemCollectorPrice);
     *result = FALSE;
     for (i = 0; i < size; i++) {
@@ -274,8 +274,8 @@ BOOL Scrcmd_Misc_WordSetLoadItemCollectorPrice(VM *vm, FieldScriptEnv *env) {
     u16 digits = ScriptReadAny(vm, env);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
 
-    prices = GFL_ArcSysReadHeapNewLZGetLen(ARC_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE, HEAPID_TAIL(heapId),
-                                           &size);
+    prices = GFL_ArcSysReadHeapNewLZGetLen(ARCID_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE,
+                                           HEAPID_TAIL(heapId), &size);
     size /= sizeof(ItemCollectorPrice);
     for (i = 0; i < size; i++) {
         if (item == prices[i].item) {
@@ -300,8 +300,8 @@ BOOL Scrcmd_Misc_ItemCollectorSell(VM *vm, FieldScriptEnv *env) {
     gameData = FieldScriptEnv_GetGameData(env);
     // The player's state is read but not used
     GameData_GetPlayerState(gameData);
-    prices = GFL_ArcSysReadHeapNewLZGetLen(ARC_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE, HEAPID_TAIL(heapId),
-                                           &size);
+    prices = GFL_ArcSysReadHeapNewLZGetLen(ARCID_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE,
+                                           HEAPID_TAIL(heapId), &size);
     size /= sizeof(ItemCollectorPrice);
     for (i = 0; i < size; i++) {
         if (item == prices[i].item) {

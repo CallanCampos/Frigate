@@ -1,0 +1,21 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "C",
+    "shapes": [ 0 ],
+    "area": {
+        "black2": {
+            "all_year": true,
+            "places": {
+                "ZONE_CASTELIA_CITY": [ "grass", "dark_grass" ],
+                "ZONE_PINWHEEL_FOREST": [ "grass", "dark_grass" ],
+                "ZONE_ABUNDANT_SHRINE": [ "grass", "dark_grass" ],
+                "ZONE_LOSTLORN_FOREST": [ "grass", "dark_grass" ],
+                "ZONE_VICTORY_ROAD": [ "grass", "dark_grass" ]
+            }
+        },
+        "white2": {
+            "all_year": true,
+            "places": {}
+        }
+    }
+}

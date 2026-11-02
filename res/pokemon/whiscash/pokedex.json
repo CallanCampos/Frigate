@@ -1,0 +1,13 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "W",
+    "shapes": [ 2 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_ICIRRUS_CITY": [ "rippling_fishing" ],
+            "ZONE_MOOR_OF_ICIRRUS": [ "rippling_fishing" ],
+            "ZONE_ROUTE_8": [ "rippling_fishing" ]
+        }
+    }
+}

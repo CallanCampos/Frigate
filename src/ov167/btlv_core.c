@@ -8,11 +8,13 @@
 #include "battle/btl_main.h"
 #include "battle/btl_poke_select.h"
 #include "battle/btl_pokeparam.h"
+#include "battle/btl_pospoke.h"
 #include "battle/btl_string.h"
 #include "battle/btl_tables.h"
 #include "battle/btlv.h"
 #include "battle/btlv_clact.h"
 #include "battle/btlv_effect.h"
+#include "battle/btlv_input.h"
 #include "battle/btlv_scd.h"
 #include "battle/tr_ai.h"
 #include "battle/trainer_data.h"
@@ -42,13 +44,6 @@ typedef struct BtlvCmdEntry {
     BtlvMainProc proc;
 } BtlvCmdEntry;
 
-typedef struct BtlvViewParam {
-    u32 unk00;
-    u32 unk04;
-    u32 unk08;
-    u32 unk0C;
-} BtlvViewParam;
-
 struct BtlvCore {
     BtlMainModule *mainModule;
     BtlClient *client;
@@ -62,7 +57,8 @@ struct BtlvCore {
     StrBuf *strbuf;
     Font *font;
     Font *font2;
-    BattleAction *unkB8;
+    // The action being chosen
+    BattleAction *action;
     BattleMon *mon;
     u32 monId;
     u32 result;
@@ -71,10 +67,11 @@ struct BtlvCore {
     BScenarioParam ov288;
     BChoiceParam ov289;
     BtlvPokeSelectParam *selectParam;
-    BtlvViewParam unk1A0;
-    BtlvSelectTargetParam *unk1B0;
+    BtlvInputRecorderParam recorderParam;
+    BtlvSelectTargetParam *rotationParam;
     u8 subSeq;
-    u8 unk1B5;
+    // Set for a mon that chooses after the first one this turn (BtlvScd's slot)
+    u8 laterMon;
     u8 unk1B6[6];
     TCBExManager *tcbManager;
     BtlvScu *scu;
@@ -90,7 +87,7 @@ typedef struct BtlvCaptureDemoWork {
 } BtlvCaptureDemoWork;
 
 typedef struct BtlvPosEffectWork {
-    u16 unk00;
+    u16 move;
     u32 type;
     u16 unk08;
     u8 pos;
@@ -101,20 +98,20 @@ typedef struct BtlvMultiEffectWork {
     u8 count;
     u16 seq;
     u32 type;
-    u16 unk10;
+    u16 move;
 } BtlvMultiEffectWork;
 
 typedef struct BtlvMonEffectWork {
     u8 pos;
-    u8 unk01;
-    u8 unk02;
+    u8 clientId;
+    u8 slot;
     u8 monId;
 } BtlvMonEffectWork;
 
 typedef struct BtlvSwapWork {
     u8 clientId;
-    u8 unk01;
-    u8 unk02;
+    u8 viewPos1;
+    u8 viewPos2;
     u8 slot1;
     u8 slot2;
     u8 pos1;
@@ -123,28 +120,22 @@ typedef struct BtlvSwapWork {
 
 typedef struct BtlvRotateWork {
     u8 clientId;
-    u8 unk01;
+    u8 dir;
     u8 viewPos[3];
     u8 pos[3];
 } BtlvRotateWork;
 
-typedef struct BtlvTwoStringWork {
-    StrBuf *first;
-    StrBuf *second;
-    u32 unk08;
-} BtlvTwoStringWork;
-
 // The display commands that run a procedure of their own
-const BtlvCmdEntry data_ov167_021da8c4[2] = {
-    { 0, BtlvCore_CmdBattleStart },
-    { 1, BtlvCore_CmdCaptureDemo },
+const BtlvCmdEntry BTLV_CMD_PROCS[2] = {
+    { BTLV_CMD_BATTLE_START, BtlvCore_CmdBattleStart },
+    { BTLV_CMD_CAPTURE_DEMO, BtlvCore_CmdCaptureDemo },
 };
 
-const BGSysLCDConfig data_ov167_021da8d4 = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_3, GX_BG0_AS_3D };
+const BGSysLCDConfig BTLV_LCD_CONFIG = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_3, GX_BG0_AS_3D };
 
-const ClActSysSetup data_ov167_021da8e4 = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 56, 48, 48, 48, 16, 16 };
+const ClActSysSetup BTLV_CLACT_SETUP = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 56, 48, 48, 48, 16, 16 };
 
-const BGSysVRAMConfig data_ov167_021da900 = {
+const BGSysVRAMConfig BTLV_VRAM_CONFIG = {
     GX_VRAM_BG_128_D,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,       GX_VRAM_SUB_BGEXTPLTT_NONE,
     GX_VRAM_OBJ_64_E,  GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_16_I,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
     GX_VRAM_TEX_01_AB, GX_VRAM_TEXPLTT_01_FG,   GX_OBJVRAMMODE_CHAR_1D_64K, GX_OBJVRAMMODE_CHAR_1D_32K,
@@ -203,11 +194,11 @@ void BtlvCore_InitGraphics(HeapID heapId) {
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_TextRndInitColorIndexLUT();
-    GFL_BGSysSetVRAMBanks(&data_ov167_021da900);
+    GFL_BGSysSetVRAMBanks(&BTLV_VRAM_CONFIG);
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetDispSelect(GX_DISP_SELECT_MAIN_SUB);
-    GFL_BGSysSetLCDConfig(&data_ov167_021da8d4);
+    GFL_BGSysSetLCDConfig(&BTLV_LCD_CONFIG);
     GFL_G3DSysCreate(FALSE, 2, 0, 1, 0, heapId, NULL);
     GFL_G3DSysSetSwapBufferParams(1, 0);
     G3X_AlphaBlend(TRUE);
@@ -219,7 +210,7 @@ void BtlvCore_InitGraphics(HeapID heapId) {
                        GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 |
                            GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
                        0x1f, 3);
-    ClActSys_Create(&data_ov167_021da8e4, &data_ov167_021da900, heapId);
+    ClActSys_Create(&BTLV_CLACT_SETUP, &BTLV_VRAM_CONFIG, heapId);
 }
 
 void BtlvCore_ExitGraphics(void) {
@@ -230,7 +221,8 @@ void BtlvCore_ExitGraphics(void) {
     GFL_G3DSysFree();
 }
 
-BtlvCore *BtlvCore_Create(BtlMainModule *mainModule, BtlClient *client, BtlPokeCon *pokeCon, u32 arg3, HeapID heapId) {
+BtlvCore *BtlvCore_Create(BtlMainModule *mainModule, BtlClient *client, BtlPokeCon *pokeCon, u32 commCompetitor,
+                          HeapID heapId) {
     BtlvCore *core;
 
     core = GFL_HeapAllocate(heapId, sizeof(BtlvCore), FALSE, "btlv_core.c", 307);
@@ -238,7 +230,7 @@ BtlvCore *BtlvCore_Create(BtlMainModule *mainModule, BtlClient *client, BtlPokeC
     core->client = client;
     core->pokeCon = pokeCon;
     core->clientId = BattleClient_GetClientId(client);
-    core->cmd = 4;
+    core->cmd = BTLV_CMD_NONE;
     core->heapId = heapId;
     core->strbuf = GFL_StrBufCreate(0x300, heapId);
     core->font = GFL_FontCreate(0x17, 0, 0, 0, heapId);
@@ -246,8 +238,8 @@ BtlvCore *BtlvCore_Create(BtlMainModule *mainModule, BtlClient *client, BtlPokeC
     core->tcbManager = GFL_TCBExMgrCreate(heapId, heapId, 0x40, 0x80);
     core->scu = BtlvScu_Create(core, core->mainModule, pokeCon, core->tcbManager, core->font, core->font2,
                                core->clientId, heapId);
-    core->scd =
-        BtlvScd_Create(core, core->mainModule, pokeCon, core->tcbManager, core->font, core->client, arg3, heapId);
+    core->scd = BtlvScd_Create(core, core->mainModule, pokeCon, core->tcbManager, core->font, core->client,
+                               commCompetitor, heapId);
     core->mainProc = NULL;
     core->seq = 0;
     core->subSeq = 0;
@@ -275,9 +267,9 @@ void BtlvCore_StartCommand(BtlvCore *core, u32 cmd) {
     u32 i;
 
     for (i = 0; i < 2; i++) {
-        if (cmd == data_ov167_021da8c4[i].cmd) {
+        if (cmd == BTLV_CMD_PROCS[i].cmd) {
             core->cmd = cmd;
-            core->mainProc = data_ov167_021da8c4[i].proc;
+            core->mainProc = BTLV_CMD_PROCS[i].proc;
             core->seq = 0;
             return;
         }
@@ -285,9 +277,9 @@ void BtlvCore_StartCommand(BtlvCore *core, u32 cmd) {
 }
 
 BOOL BtlvCore_WaitCommand(BtlvCore *core) {
-    if (core->cmd != 4) {
+    if (core->cmd != BTLV_CMD_NONE) {
         if (core->mainProc(core, &core->seq, core->work)) {
-            core->cmd = 4;
+            core->cmd = BTLV_CMD_NONE;
             core->mainProc = NULL;
             return TRUE;
         }
@@ -319,12 +311,12 @@ BOOL BtlvCore_CmdBattleStart(BtlvCore *core, s32 *seq, void *work) {
     case 2:
         if (BtlvScu_WaitEncount(core->scu)) {
             if (BattleClient_IsRecPlay(core->client)) {
-                core->unk1A0.unk00 = 1;
-                core->unk1A0.unk04 = 1;
-                core->unk1A0.unk08 = BattleClient_GetRecMaxChapter(core->client);
-                core->unk1A0.unk0C = 0;
+                core->recorderParam.chapter = 1;
+                core->recorderParam.targetChapter = 1;
+                core->recorderParam.maxChapter = BattleClient_GetRecMaxChapter(core->client);
+                core->recorderParam.mode = BTLV_RECORDER_MSG_NONE;
                 if (!BattleClient_IsChapterSkipping(core->client)) {
-                    BtlvScd_ShowRecorderScreen(core->scd, &core->unk1A0);
+                    BtlvScd_ShowRecorderScreen(core->scd, &core->recorderParam);
                 }
             }
             return TRUE;
@@ -363,7 +355,7 @@ BOOL BtlvCore_CmdCaptureDemo(BtlvCore *core, s32 *seq, void *work) {
             BtlvStringParam param;
 
             mon = BtlvCore_GetMonAtViewPos(core, 0);
-            Btlv_StringParam_Setup(&param, 1, 0x45);
+            Btlv_StringParam_Setup(&param, BTLV_STR_STD, 0x45);
             Btlv_StringParam_AddArg(&param, GetMonID(mon));
             Btlv_StringParam_SetWait(&param, 0);
             BtlvCore_PrintMsg(core, &param);
@@ -373,15 +365,15 @@ BOOL BtlvCore_CmdCaptureDemo(BtlvCore *core, s32 *seq, void *work) {
     case 3:
         core->mon = BtlvCore_GetMonAtViewPos(core, 0);
         core->monId = GetMonID(core->mon);
-        core->unkB8 = 0;
+        core->action = 0;
         core->result = 0;
-        core->unk1B5 = 0;
-        BtlvScd_StartCommandDemo(core->scd, core->mon, core->unk1B5, 0);
+        core->laterMon = 0;
+        BtlvScd_StartCommandDemo(core->scd, core->mon, core->laterMon, 0);
         (*seq)++;
         break;
     case 4:
         if (BtlvScd_GetCommandResult(core->scd)) {
-            BtlvScd_StartMoveDemo(core->scd, core->mon, core->unkB8);
+            BtlvScd_StartMoveDemo(core->scd, core->mon, core->action);
             (*seq)++;
         }
         break;
@@ -430,7 +422,7 @@ BOOL BtlvCore_CmdCaptureDemo(BtlvCore *core, s32 *seq, void *work) {
             BtlvStringParam param;
 
             mon = BtlvCore_GetMonAtViewPos(core, 0);
-            Btlv_StringParam_Setup(&param, 2, 0x5a);
+            Btlv_StringParam_Setup(&param, BTLV_STR_SET, 0x5a);
             Btlv_StringParam_AddArg(&param, GetMonID(mon));
             Btlv_StringParam_AddArg(&param, 1);
             Btlv_StringParam_AddArg(&param, 0);
@@ -449,7 +441,7 @@ BOOL BtlvCore_CmdCaptureDemo(BtlvCore *core, s32 *seq, void *work) {
         break;
     case 13:
         if (BtlvCore_WaitMsg(core) && --wk->wait == 0) {
-            BtlvScd_StartCommandDemo(core->scd, core->mon, core->unk1B5, core->unkB8);
+            BtlvScd_StartCommandDemo(core->scd, core->mon, core->laterMon, core->action);
             (*seq)++;
         }
         break;
@@ -469,7 +461,7 @@ BOOL BtlvCore_CmdCaptureDemo(BtlvCore *core, s32 *seq, void *work) {
         break;
     case 16:
         if (BtlvCore_WaitMsg(core) && !BtlvEffect_IsBusy()) {
-            BtlvEffect_StartEffect23A(1, 4, 3, 1, 0);
+            BtlvEffect_StartBallThrow(1, 4, 3, 1, 0);
             (*seq)++;
         }
         break;
@@ -478,7 +470,7 @@ BOOL BtlvCore_CmdCaptureDemo(BtlvCore *core, s32 *seq, void *work) {
             BtlvStringParam param;
 
             mon = BtlvCore_GetMonAtViewPos(core, 1);
-            Btlv_StringParam_Setup(&param, 1, 0x41);
+            Btlv_StringParam_Setup(&param, BTLV_STR_STD, 0x41);
             Btlv_StringParam_AddArg(&param, GetMonID(mon));
             BtlvCore_StartMsg(core, &param);
             (*seq)++;
@@ -513,8 +505,8 @@ BattleMon *BtlvCore_GetMonAtViewPos(BtlvCore *core, u32 index) {
 BOOL BtlvCore_ProcCommandSelect(BtlvCore *core, s32 *seq, void *work) {
     switch (*seq) {
     case 0:
-        BtlvScd_StartCommandSelect(core->scd, core->mon, core->unk1B5, BattleClient_GetShooterEnergy(core->client),
-                                   core->unkB8);
+        BtlvScd_StartCommandSelect(core->scd, core->mon, core->laterMon, BattleClient_GetShooterEnergy(core->client),
+                                   core->action);
         (*seq)++;
     case 1:
         core->result = BtlvScd_GetCommandResult(core->scd);
@@ -529,7 +521,7 @@ BOOL BtlvCore_ProcCommandSelect(BtlvCore *core, s32 *seq, void *work) {
 BOOL BtlvCore_ProcTargetSelect(BtlvCore *core, s32 *seq, void *work) {
     switch (*seq) {
     case 0:
-        BtlvScd_StartTargetSelect(core->scd, core->mon, core->unkB8);
+        BtlvScd_StartTargetSelect(core->scd, core->mon, core->action);
         (*seq)++;
         break;
     case 1:
@@ -562,12 +554,12 @@ BOOL BtlvCore_RunMainProc(BtlvCore *core) {
     return TRUE;
 }
 
-void BtlvCore_StartCommandSelect(BtlvCore *core, BattleMon *mon, u32 arg2, BattleAction *arg3) {
+void BtlvCore_StartCommandSelect(BtlvCore *core, BattleMon *mon, u32 laterMon, BattleAction *action) {
     core->mon = mon;
     core->monId = GetMonID(mon);
-    core->unkB8 = arg3;
+    core->action = action;
     core->result = 0;
-    core->unk1B5 = arg2;
+    core->laterMon = laterMon;
     BtlvCore_SetMainProc(core, BtlvCore_ProcCommandSelect);
 }
 
@@ -582,23 +574,23 @@ u32 BtlvCore_WaitCommandSelect(BtlvCore *core) {
     return 0;
 }
 
-void BtlvCore_StartMoveSelect(BtlvCore *core, BattleMon *mon, BattleAction *arg2) {
+void BtlvCore_StartMoveSelect(BtlvCore *core, BattleMon *mon, BattleAction *action) {
     core->mon = mon;
     core->monId = GetMonID(mon);
-    core->unkB8 = arg2;
-    BtlvScd_StartMoveSelect(core->scd, core->mon, arg2);
+    core->action = action;
+    BtlvScd_StartMoveSelect(core->scd, core->mon, action);
     BtlvCore_SetMainProc(core, BtlvCore_ProcWaitSelect);
 }
 
-void BtlvCore_StartRotationSelect(BtlvCore *core, BtlvSelectTargetParam *param, BattleAction *arg2) {
+void BtlvCore_StartRotationSelect(BtlvCore *core, BtlvSelectTargetParam *param, BattleAction *action) {
     BattleMon *mon;
 
     mon = param->mons[0].mon;
     core->mon = mon;
     core->monId = GetMonID(mon);
-    core->unk1B0 = param;
-    core->unkB8 = arg2;
-    BtlvScd_StartRotationSelect(core->scd, param, arg2);
+    core->rotationParam = param;
+    core->action = action;
+    BtlvScd_StartRotationSelect(core->scd, param, action);
     BtlvCore_SetMainProc(core, BtlvCore_ProcWaitSelect);
 }
 
@@ -622,10 +614,10 @@ BOOL BtlvCore_WaitMoveSelect(BtlvCore *core) {
     return BtlvCore_RunMainProc(core);
 }
 
-void BtlvCore_StartTargetSelect(BtlvCore *core, BattleMon *mon, BattleAction *arg2) {
+void BtlvCore_StartTargetSelect(BtlvCore *core, BattleMon *mon, BattleAction *action) {
     core->mon = mon;
     core->monId = GetMonID(mon);
-    core->unkB8 = arg2;
+    core->action = action;
     BtlvCore_SetMainProc(core, BtlvCore_ProcTargetSelect);
 }
 
@@ -661,8 +653,9 @@ BOOL BtlvCore_IsScreenIdle(BtlvCore *core) {
     return BtlvScd_IsIdle(core->scd);
 }
 
-BOOL func_ov167_021cf210(BtlvCore *core) {
-    if (BtlSetup_GetBattleType(core->mainModule) == 3) {
+// Whether the party list plays its sound effects: in a communication battle, only in multi mode 2
+BOOL BtlvCore_CanPlayListSE(BtlvCore *core) {
+    if (BtlSetup_GetBattleType(core->mainModule) == BTL_TYPE_COMM) {
         if (GetMultiMode(core->mainModule) == 2) {
             return TRUE;
         }
@@ -673,7 +666,7 @@ BOOL func_ov167_021cf210(BtlvCore *core) {
 
 void BtlvCore_SetupPokeListParam(BtlvCore *core, BPlistParam *param, u8 mode, u8 partyIndex, u32 move) {
     u8 clientId;
-    u8 unk1C;
+    u8 trainerIndex;
     u8 index;
 
     clientId = BattleClient_GetClientId(core->client);
@@ -681,14 +674,14 @@ void BtlvCore_SetupPokeListParam(BtlvCore *core, BPlistParam *param, u8 mode, u8
     param->unk18 = mode != 3 ? BtlMain_IsCommMulti(core->mainModule) : 0;
     if (param->unk18) {
         param->unk8 = GetAllyPokeParty(core->mainModule, clientId);
-        unk1C = GetMultiTrainerIndex(core->mainModule, clientId);
+        trainerIndex = GetMultiTrainerIndex(core->mainModule, clientId);
     } else {
         param->unk8 = NULL;
-        unk1C = 0;
+        trainerIndex = 0;
     }
     param->unk1F = mode;
-    param->unk1C = unk1C;
-    if (BtlSetup_GetBattleStyle(core->mainModule) != 3) {
+    param->unk1C = trainerIndex;
+    if (BtlSetup_GetBattleStyle(core->mainModule) != BTL_STYLE_ROTATION) {
         param->unk22 = GetClientBattlerCount(core->mainModule, clientId);
     } else {
         param->unk22 = 3;
@@ -714,7 +707,7 @@ void BtlvCore_SetupPokeListParam(BtlvCore *core, BPlistParam *param, u8 mode, u8
     param->paletteFade = BtlvEffect_GetPaletteFade();
     param->gameData = GetGameData(core->mainModule);
     param->unk30 = 0;
-    param->unk40 = func_ov167_021cf210(core);
+    param->unk40 = BtlvCore_CanPlayListSE(core);
     param->unk34 = 0;
     param->done = FALSE;
 }
@@ -804,7 +797,8 @@ void BattleClientCmd_StartMoveInfoView(BtlvCore *core, u8 partyIndex, u8 slot) {
     core->subSeq = 0;
 }
 
-void BattleClientCmd_StartItemSelect(BtlvCore *core, u32 mode, u8 arg2, u8 arg3, u8 canUseItems, u8 arg5) {
+void BattleClientCmd_StartItemSelect(BtlvCore *core, u32 mode, u8 shooterEnergy, u8 shooterSpent, u8 canUseItems,
+                                     u8 targetHiding) {
     u32 kind;
     BattleParty *party;
     u32 count;
@@ -816,20 +810,20 @@ void BattleClientCmd_StartItemSelect(BtlvCore *core, u32 mode, u8 arg2, u8 arg3,
         core->ov286.mode = mode;
         core->ov286.font = core->font;
         core->ov286.heapId = core->heapId;
-        core->ov286.shooterEnergy = arg2;
-        core->ov286.shooterSpent = arg3;
+        core->ov286.shooterEnergy = shooterEnergy;
+        core->ov286.shooterSpent = shooterSpent;
         core->ov286.item = 0;
         core->ov286.usingKeys = BtlvScd_GetKeyCursorFlag(core->scd);
         core->ov286.quit = 0;
-        core->ov286.shooterDisabled = func_ov167_0219db00(core->mainModule);
+        core->ov286.shooterDisabled = GetShooterSettings(core->mainModule);
         kind = 0;
-        if (BtlSetup_GetBattleType(core->mainModule) != 3) {
+        if (BtlSetup_GetBattleType(core->mainModule) != BTL_TYPE_COMM) {
             kind = 1;
         }
         core->ov286.playSound = kind;
         kind = 0;
         core->ov286.abort = 0;
-        if (BtlSetup_GetBattleType(core->mainModule) == 0) {
+        if (BtlSetup_GetBattleType(core->mainModule) == BTL_TYPE_WILD) {
             kind = 1;
         }
         core->ov286.isWild = kind;
@@ -841,12 +835,12 @@ void BattleClientCmd_StartItemSelect(BtlvCore *core, u32 mode, u8 arg2, u8 arg3,
             kind = 1;
         } else {
             switch (BtlSetup_GetBattleType(core->mainModule)) {
-            case 0:
+            case BTL_TYPE_WILD:
                 if (PokeCon_GetClientAliveCount(core->pokeCon, 1) > 1) {
                     kind = 2;
                     break;
                 }
-                if (arg5) {
+                if (targetHiding) {
                     kind = 4;
                     break;
                 }
@@ -965,7 +959,7 @@ void BtlvCore_SaveBagCursor(BtlvCore *core) {
     }
 }
 
-void BtlvCore_StartScenario(BtlvCore *core, u32 arg1) {
+void BtlvCore_StartScenario(BtlvCore *core, u32 scene) {
     if (core->subSeq == 0) {
         core->ov288.done = FALSE;
         core->ov288.heapId = core->heapId;
@@ -974,7 +968,7 @@ void BtlvCore_StartScenario(BtlvCore *core, u32 arg1) {
         core->ov288.close = 0;
         core->ov288.party = GetClientPokeParty(core->mainModule, 1);
         core->ov288.scenario = GetStudioMovieId(core->mainModule);
-        core->ov288.scene = arg1;
+        core->ov288.scene = scene;
         core->subSeq = 1;
     }
 }
@@ -1032,9 +1026,9 @@ void BtlvCore_StartChoice(BtlvCore *core) {
     }
 }
 
-void BtlvCore_SetupChoice(BtlvCore *core, u32 arg1, u32 *arg2) {
-    core->ov289.count = arg1;
-    core->ov289.result = arg2;
+void BtlvCore_SetupChoice(BtlvCore *core, u32 count, u32 *result) {
+    core->ov289.count = count;
+    core->ov289.result = result;
 }
 
 void BtlvCore_SetChoiceStr(BtlvCore *core, u32 index, StrBuf *value) {
@@ -1080,31 +1074,32 @@ BOOL BtlvCore_WaitChoice(BtlvCore *core) {
     return FALSE;
 }
 
-void BtlvCore_StartMoveEffect(BtlvCore *core, u8 attackerPos, u8 targetPos, u16 move, s32 arg4, u32 arg5, u8 arg6) {
+void BtlvCore_StartMoveEffect(BtlvCore *core, u8 attackerPos, u8 targetPos, u16 move, s32 moveTarget, u32 variant,
+                              u8 arg6) {
     u8 attacker;
     u8 target;
 
     attacker = BattlePosToViewPos(core->mainModule, attackerPos);
-    if (targetPos != 6) {
+    if (targetPos != BTL_POS_NONE) {
         target = BattlePosToViewPos(core->mainModule, targetPos);
     } else {
         target = 0xff;
     }
-    BtlvScu_StartMoveEffect(core->scu, attacker, target, move, arg4, arg5, arg6);
+    BtlvScu_StartMoveEffect(core->scu, attacker, target, move, moveTarget, variant, arg6);
 }
 
 BOOL BtlvCore_WaitMoveEffect(BtlvCore *core) {
     return BtlvScu_WaitMoveEffect(core->scu);
 }
 
-void BtlvCore_StartDamage(BtlvCore *core, u16 arg1, u8 pos, u8 type) {
+void BtlvCore_StartDamage(BtlvCore *core, u16 move, u8 pos, u8 type) {
     BtlvPosEffectWork *work;
 
     work = BtlvCore_GetWork(core, sizeof(BtlvPosEffectWork));
     work->type = type;
     work->pos = pos;
     work->unk08 = 0;
-    work->unk00 = arg1;
+    work->move = move;
     BtlvCore_SetSubProc(core, BtlvCore_ProcDamage);
 }
 
@@ -1119,7 +1114,7 @@ BOOL BtlvCore_ProcDamage(s32 *seq, void *arg) {
     work = BtlvCore_GetWork(core, sizeof(BtlvPosEffectWork));
     switch (*seq) {
     case 0:
-        BtlvScu_StartDamage(core->scu, work->pos, work->unk00, BattleClient_IsChapterSkipping(core->client));
+        BtlvScu_StartDamage(core->scu, work->pos, work->move, BattleClient_IsChapterSkipping(core->client));
         BtlvCore_PlayDamageSE(core, work->type);
         (*seq)++;
         break;
@@ -1132,7 +1127,7 @@ BOOL BtlvCore_ProcDamage(s32 *seq, void *arg) {
     return FALSE;
 }
 
-void BtlvCore_StartDamageEffect(BtlvCore *core, u16 arg1, u8 pos, u32 type) {
+void BtlvCore_StartDamageEffect(BtlvCore *core, u16 move, u8 pos, u32 type) {
     BtlvPosEffectWork *work;
 
     if (!BattleClient_IsChapterSkipping(core->client)) {
@@ -1140,7 +1135,7 @@ void BtlvCore_StartDamageEffect(BtlvCore *core, u16 arg1, u8 pos, u32 type) {
         work->type = type;
         work->pos = pos;
         work->unk08 = 0;
-        work->unk00 = arg1;
+        work->move = move;
         BtlvCore_SetSubProc(core, BtlvCore_ProcDamageEffect);
     }
 }
@@ -1156,7 +1151,7 @@ BOOL BtlvCore_ProcDamageEffect(s32 *seq, void *arg) {
     work = BtlvCore_GetWork(core, sizeof(BtlvPosEffectWork));
     switch (*seq) {
     case 0:
-        BtlvScu_StartDamageEffect(core->scu, work->pos, work->unk00);
+        BtlvScu_StartDamageEffect(core->scu, work->pos, work->move);
         BtlvCore_PlayDamageSE(core, work->type);
         (*seq)++;
         break;
@@ -1169,14 +1164,14 @@ BOOL BtlvCore_ProcDamageEffect(s32 *seq, void *arg) {
     return FALSE;
 }
 
-void BtlvCore_StartMultiDamage(BtlvCore *core, u16 count, u32 type, const u8 *monIds, u16 arg4) {
+void BtlvCore_StartMultiDamage(BtlvCore *core, u16 count, u32 type, const u8 *monIds, u16 move) {
     BtlvMultiEffectWork *work;
     u32 i;
 
     work = BtlvCore_GetWork(core, sizeof(BtlvMultiEffectWork));
     work->type = type;
     work->count = count;
-    work->unk10 = arg4;
+    work->move = move;
     work->seq = 0;
     for (i = 0; i < count; i++) {
         work->pos[i] = MonIDToBattlePos(core->mainModule, core->pokeCon, monIds[i]);
@@ -1193,7 +1188,7 @@ BOOL BtlvCore_WaitMultiDamage(BtlvCore *core) {
     case 0:
         flag = BattleClient_IsChapterSkipping(core->client);
         for (i = 0; i < work->count; i++) {
-            BtlvScu_StartDamage(core->scu, work->pos[i], work->unk10, flag);
+            BtlvScu_StartDamage(core->scu, work->pos[i], work->move, flag);
         }
         BtlvCore_PlayDamageSE(core, work->type);
         work->seq++;
@@ -1245,9 +1240,9 @@ BOOL BtlvCore_WaitGaugeHP(BtlvCore *core) {
     return FALSE;
 }
 
-void BtlvCore_StartPosEffect(BtlvCore *core, u32 arg1, u16 arg2) {
+void BtlvCore_StartPosEffect(BtlvCore *core, u32 pos, u16 effect) {
     if (!BattleClient_IsChapterSkipping(core->client)) {
-        BtlvEffect_StartPos(arg1, arg2);
+        BtlvEffect_StartPos(pos, effect);
     }
 }
 
@@ -1258,8 +1253,8 @@ BOOL BtlvCore_WaitPosEffect(BtlvCore *core) {
     return FALSE;
 }
 
-void BtlvCore_StartAtkDefEffect(BtlvCore *core, u32 arg1, u32 arg2, u16 arg3) {
-    BtlvEffect_StartAtkDef(arg1, arg2, arg3);
+void BtlvCore_StartAtkDefEffect(BtlvCore *core, u32 atkPos, u32 defPos, u16 effect) {
+    BtlvEffect_StartAtkDef(atkPos, defPos, effect);
 }
 
 BOOL BtlvCore_WaitAtkDefEffect(BtlvCore *core) {
@@ -1285,22 +1280,22 @@ BOOL BtlvCore_WaitShowMon(BtlvCore *core) {
     return BtlvScu_WaitShowMon(core->scu);
 }
 
-void BtlvCore_StartSwitchOut(BtlvCore *core, u8 pos, u16 arg2) {
-    BtlvScu_StartMemberOut(core->scu, pos, arg2, BattleClient_IsChapterSkipping(core->client));
+void BtlvCore_StartSwitchOut(BtlvCore *core, u8 pos, u16 effect) {
+    BtlvScu_StartMemberOut(core->scu, pos, effect, BattleClient_IsChapterSkipping(core->client));
 }
 
 BOOL BtlvCore_WaitSwitchOut(BtlvCore *core) {
     return BtlvScu_WaitMemberOut(core->scu);
 }
 
-void BtlvCore_StartSwitchIn(BtlvCore *core, u8 pos, u8 arg2, u8 arg3) {
+void BtlvCore_StartSwitchIn(BtlvCore *core, u8 pos, u8 clientId, u8 slot) {
     BtlvMonEffectWork *work;
     BattleMon *mon;
 
     work = BtlvCore_GetWork(core, sizeof(BtlvMonEffectWork));
     mon = PokeCon_GetPosMonInner(core->pokeCon, pos);
-    work->unk01 = arg2;
-    work->unk02 = arg3;
+    work->clientId = clientId;
+    work->slot = slot;
     work->pos = pos;
     work->monId = GetMonID(mon);
     BtlvCore_SetSubProc(core, BtlvCore_ProcSwitchIn);
@@ -1317,7 +1312,7 @@ BOOL BtlvCore_ProcSwitchIn(s32 *seq, void *arg) {
     work = BtlvCore_GetWork(core, sizeof(BtlvMonEffectWork));
     switch (*seq) {
     case 0:
-        BtlvScu_StartMemberIn(core->scu, work->pos, work->unk01, work->unk02,
+        BtlvScu_StartMemberIn(core->scu, work->pos, work->clientId, work->slot,
                               BattleClient_IsChapterSkipping(core->client));
         (*seq)++;
         break;
@@ -1332,31 +1327,31 @@ BOOL BtlvCore_ProcSwitchIn(s32 *seq, void *arg) {
 
 void BtlvCore_MakeString(const BtlvStringParam *param, StrBuf *strbuf) {
     switch (param->type) {
-    case 1:
+    case BTLV_STR_STD:
         BtlString_FormatStdMsgArgs(strbuf, param->message, param->args);
         break;
-    case 2:
+    case BTLV_STR_SET:
         BtlString_FormatSetMsg(strbuf, param->message, param->args);
         break;
-    case 3:
+    case BTLV_STR_UI:
         BtlString_LoadUIMsg(strbuf, param->message);
         break;
-    case 5:
-        func_ov167_021d5770(strbuf, param->message, param->args);
+    case BTLV_STR_LEARN:
+        BtlString_FormatLearnMsg(strbuf, param->message, param->args);
         break;
-    case 6:
-        func_ov167_021d57b0(strbuf, param->message, param->args);
+    case BTLV_STR_YES_NO:
+        BtlString_FormatYesNoMsg(strbuf, param->message, param->args);
         break;
-    case 4:
+    case BTLV_STR_MOVE:
         BtlString_FormatMoveMsg(strbuf, param->args[0], param->args[1]);
         break;
-    case 7:
-        func_ov167_021d5700(strbuf, param->args[0], param->args[1]);
+    case BTLV_STR_TRAINER_WIN_LOSE:
+        BtlString_LoadTrainerWinLoseMsg(strbuf, param->args[0], param->args[1]);
         break;
-    case 8:
+    case BTLV_STR_MOVIE_SCRIPT:
         BtlString_FormatMovieScriptMsg(strbuf, param->message);
         break;
-    case 9:
+    case BTLV_STR_MOVIE:
         BtlString_FormatMovieMsg(strbuf, param->message);
         break;
     }
@@ -1456,15 +1451,15 @@ BOOL BtlvCore_WaitUpdateAbilityWin(BtlvCore *core, u8 pos) {
     return BtlvScu_WaitAbilityWinChange(core->scu, pos);
 }
 
-void BtlvCore_StartRankDownEffect(BtlvCore *core, u32 arg1) {
-    BtlvEffect_StartPos(arg1, 0x262);
+void BtlvCore_StartRankDownEffect(BtlvCore *core, u32 pos) {
+    BtlvEffect_StartPos(pos, 0x262);
 }
 
-void BtlvCore_StartRankUpEffect(BtlvCore *core, u32 arg1) {
-    BtlvEffect_StartPos(arg1, 0x261);
+void BtlvCore_StartRankUpEffect(BtlvCore *core, u32 pos) {
+    BtlvEffect_StartPos(pos, 0x261);
 }
 
-BOOL BtlvCore_WaitRankEffect(BtlvCore *core, u32 arg1) {
+BOOL BtlvCore_WaitRankEffect(BtlvCore *core, u32 pos) {
     if (!BtlvEffect_IsBusy()) {
         return TRUE;
     }
@@ -1493,24 +1488,24 @@ BOOL BtlvCore_WaitUseItemEffect(BtlvCore *core, u8 pos) {
     return BtlvScu_IsPosCueEffectDone(core->scu, BattlePosToViewPos(core->mainModule, pos));
 }
 
-void BtlvCore_StartIllusionBreak(BtlvCore *core, u8 pos, u32 arg2) {
-    BtlvScu_StartChangeMon(core->scu, pos, arg2);
+void BtlvCore_StartIllusionBreak(BtlvCore *core, u8 pos, u32 skip) {
+    BtlvScu_StartChangeMon(core->scu, pos, skip);
 }
 
 BOOL BtlvCore_WaitIllusionBreak(BtlvCore *core) {
     return BtlvScu_WaitChangeMon(core->scu);
 }
 
-void BtlvCore_StartFormChange(BtlvCore *core, u32 arg1) {
-    BtlvScu_StartChangeForm(core->scu, arg1, BattleClient_IsChapterSkipping(core->client));
+void BtlvCore_StartFormChange(BtlvCore *core, u32 pos) {
+    BtlvScu_StartChangeForm(core->scu, pos, BattleClient_IsChapterSkipping(core->client));
 }
 
 BOOL BtlvCore_WaitFormChange(BtlvCore *core) {
     return BtlvScu_WaitChangeSprite(core->scu);
 }
 
-void BtlvCore_StartTransform(BtlvCore *core, u32 arg1, u32 arg2) {
-    BtlvScu_StartTransform(core->scu, arg1, arg2, BattleClient_IsChapterSkipping(core->client));
+void BtlvCore_StartTransform(BtlvCore *core, u32 pos, u32 targetPos) {
+    BtlvScu_StartTransform(core->scu, pos, targetPos, BattleClient_IsChapterSkipping(core->client));
 }
 
 BOOL BtlvCore_WaitTransform(BtlvCore *core) {
@@ -1525,13 +1520,13 @@ BOOL BtlvCore_WaitHideMsgWin(BtlvCore *core) {
     return BtlvScu_WaitMsgWinHide(core->scu);
 }
 
-void BtlvCore_StartSwapPokemon(BtlvCore *core, u8 clientId, u8 arg2, u8 arg3, u8 slot1, u8 slot2) {
+void BtlvCore_StartSwapPokemon(BtlvCore *core, u8 clientId, u8 viewPos1, u8 viewPos2, u8 slot1, u8 slot2) {
     BtlvSwapWork *work;
 
     work = BtlvCore_GetWork(core, sizeof(BtlvSwapWork));
     work->clientId = clientId;
-    work->unk01 = arg2;
-    work->unk02 = arg3;
+    work->viewPos1 = viewPos1;
+    work->viewPos2 = viewPos2;
     work->slot1 = slot1;
     work->slot2 = slot2;
     work->pos1 = GetClientBattlePos(core->mainModule, clientId, slot1);
@@ -1550,7 +1545,7 @@ BOOL BtlvCore_ProcSwapPokemon(s32 *seq, void *arg) {
     work = BtlvCore_GetWork(core, sizeof(BtlvSwapWork));
     switch (*seq) {
     case 0:
-        BtlvEffect_SwapPokemon(work->unk01, work->unk02);
+        BtlvEffect_SwapPokemon(work->viewPos1, work->viewPos2);
         BtlvCore_PlaySE(core, 0x57b);
         (*seq)++;
         break;
@@ -1569,7 +1564,7 @@ BOOL BtlvCore_ProcSwapPokemon(s32 *seq, void *arg) {
     return FALSE;
 }
 
-void BtlvCore_ShowRotationScreen(BtlvCore *core, u8 arg1) {
+void BtlvCore_ShowRotationScreen(BtlvCore *core, u8 dir) {
     void *work;
 
     work = BtlvCore_GetWork(core, 0x3c);
@@ -1588,13 +1583,13 @@ void BtlvCore_HideRotationScreen(BtlvCore *core) {
     BtlvScd_HideRotationScreen(core->scd);
 }
 
-void BtlvCore_StartRotation(BtlvCore *core, u8 clientId, u8 arg2) {
+void BtlvCore_StartRotation(BtlvCore *core, u8 clientId, u8 dir) {
     BtlvRotateWork *work;
 
-    if (arg2 != 1) {
+    if (dir != 1) {
         work = BtlvCore_GetWork(core, sizeof(BtlvRotateWork));
         work->clientId = clientId;
-        work->unk01 = arg2;
+        work->dir = dir;
         work->pos[0] = GetClientBattlePos(core->mainModule, clientId, 0);
         work->pos[1] = GetClientBattlePos(core->mainModule, clientId, 1);
         work->pos[2] = GetClientBattlePos(core->mainModule, clientId, 2);
@@ -1617,7 +1612,7 @@ BOOL BtlvCore_ProcRotation(s32 *seq, void *arg) {
     work = BtlvCore_GetWork(core, sizeof(BtlvRotateWork));
     switch (*seq) {
     case 0:
-        BtlvEffect_StartRotation(work->unk01, work->viewPos[0] & 1, !BattleClient_IsChapterSkipping(core->client));
+        BtlvEffect_StartRotation(work->dir, work->viewPos[0] & 1, !BattleClient_IsChapterSkipping(core->client));
         (*seq)++;
         break;
     case 1:
@@ -1647,18 +1642,18 @@ BOOL BtlvCore_ProcRotation(s32 *seq, void *arg) {
     return FALSE;
 }
 
-void BtlvCore_ShowYesNo(BtlvCore *core, const BtlvStringParam *param1, const BtlvStringParam *param2, u32 arg3) {
-    BtlvTwoStringWork *work;
+void BtlvCore_ShowYesNo(BtlvCore *core, const BtlvStringParam *yes, const BtlvStringParam *no, u32 canCancel) {
+    BtlvInputYesNoParam *work;
 
-    work = BtlvCore_GetWork(core, sizeof(BtlvTwoStringWork));
-    work->first = GFL_StrBufCreate(0x20, HEAPID_TAIL(core->heapId));
-    work->second = GFL_StrBufCreate(0x20, HEAPID_TAIL(core->heapId));
-    work->unk08 = arg3;
-    BtlvCore_MakeString(param1, work->first);
-    BtlvCore_MakeString(param2, work->second);
+    work = BtlvCore_GetWork(core, sizeof(BtlvInputYesNoParam));
+    work->strs[0] = GFL_StrBufCreate(0x20, HEAPID_TAIL(core->heapId));
+    work->strs[1] = GFL_StrBufCreate(0x20, HEAPID_TAIL(core->heapId));
+    work->canCancel = canCancel;
+    BtlvCore_MakeString(yes, work->strs[0]);
+    BtlvCore_MakeString(no, work->strs[1]);
     BtlvScd_ShowYesNo(core->scd, work);
-    GFL_HeapFree(work->first);
-    GFL_HeapFree(work->second);
+    GFL_HeapFree(work->strs[0]);
+    GFL_HeapFree(work->strs[1]);
 }
 
 BOOL BtlvCore_PollYesNo(BtlvCore *core, u32 *answer) {
@@ -1759,25 +1754,26 @@ u32 BtlvCore_CheckRecorderInput(BtlvCore *core) {
     return BtlvScd_CheckRecorderInput(core->scd);
 }
 
-void BtlvCore_ShowRecorderChapter(BtlvCore *core, u16 arg1, u16 arg2) {
-    core->unk1A0.unk00 = arg1;
-    core->unk1A0.unk04 = arg2;
-    core->unk1A0.unk0C = 0;
-    BtlvScd_ShowRecorderScreen(core->scd, &core->unk1A0);
+void BtlvCore_ShowRecorderChapter(BtlvCore *core, u16 chapter, u16 targetChapter) {
+    core->recorderParam.chapter = chapter;
+    core->recorderParam.targetChapter = targetChapter;
+    core->recorderParam.mode = BTLV_RECORDER_MSG_NONE;
+    BtlvScd_ShowRecorderScreen(core->scd, &core->recorderParam);
 }
 
-void func_ov167_021d0a7c(BtlvCore *core, u16 arg1) {
-    core->unk1A0.unk00 = arg1;
-    core->unk1A0.unk04 = arg1;
-    core->unk1A0.unk0C = 3;
-    BtlvScd_ShowRecorderScreen(core->scd, &core->unk1A0);
+// Shows the recorder screen at the chapter skipped to, with the message that the video is being skipped
+void BtlvCore_ShowRecorderSkipping(BtlvCore *core, u16 chapter) {
+    core->recorderParam.chapter = chapter;
+    core->recorderParam.targetChapter = chapter;
+    core->recorderParam.mode = BTLV_RECORDER_MSG_SKIPPING;
+    BtlvScd_ShowRecorderScreen(core->scd, &core->recorderParam);
 }
 
-void BtlvCore_ShowRecorderMessage(BtlvCore *core, u32 arg1, u32 arg2) {
-    core->unk1A0.unk00 = arg1;
-    core->unk1A0.unk04 = arg1;
-    core->unk1A0.unk0C = arg2;
-    BtlvScd_ShowRecorderScreen(core->scd, &core->unk1A0);
+void BtlvCore_ShowRecorderMessage(BtlvCore *core, u32 chapter, u32 mode) {
+    core->recorderParam.chapter = chapter;
+    core->recorderParam.targetChapter = chapter;
+    core->recorderParam.mode = mode;
+    BtlvScd_ShowRecorderScreen(core->scd, &core->recorderParam);
 }
 
 void BtlvCore_PlaySE(BtlvCore *core, u32 se) {
@@ -1814,27 +1810,27 @@ void Btlv_StringParam_SetWait(BtlvStringParam *param, u8 mode) {
 }
 
 void BtlvCore_SetClactGauge(BtlvCore *core, u32 arg1, u32 arg2) {
-    if (GetStudioMode(core->mainModule) == 1) {
+    if (GetStudioMode(core->mainModule) == BTL_STUDIO_MODE_FILM) {
         BtlvClact_SetGauge(BtlvEffect_GetClact(), arg1, arg2);
     }
 }
 
-void BtlvCore_ShowClactPopup(BtlvCore *core, u32 arg1) {
-    if (GetStudioMode(core->mainModule) == 1) {
-        BtlvClact_ShowPopup(BtlvEffect_GetClact(), arg1, core->font);
+void BtlvCore_ShowClactPopup(BtlvCore *core, u32 number) {
+    if (GetStudioMode(core->mainModule) == BTL_STUDIO_MODE_FILM) {
+        BtlvClact_ShowPopup(BtlvEffect_GetClact(), number, core->font);
     }
 }
 
 BOOL BtlvCore_IsClactPopupShowing(BtlvCore *core) {
-    if (GetStudioMode(core->mainModule) == 1) {
+    if (GetStudioMode(core->mainModule) == BTL_STUDIO_MODE_FILM) {
         return BtlvClact_IsPopupShowing(BtlvEffect_GetClact());
     }
     return FALSE;
 }
 
-void BtlvCore_SetTypeIconVisible(BtlvCore *core, u32 arg1, u32 arg2, u32 arg3) {
-    if (GetStudioMode(core->mainModule) == 2) {
-        BtlvScd_SetTypeIconVisible(core->scd, arg1, arg2, arg3);
+void BtlvCore_SetTypeIconVisible(BtlvCore *core, u32 visible, u32 index, u32 sequence) {
+    if (GetStudioMode(core->mainModule) == BTL_STUDIO_MODE_PLAYBACK) {
+        BtlvScd_SetTypeIconVisible(core->scd, visible, index, sequence);
     }
 }
 
@@ -1842,8 +1838,8 @@ u32 BtlvCore_GetTypeMask(BtlvCore *core) {
     return BtlvScd_GetTypeMask(core->scd);
 }
 
-void BtlvCore_StartTypeIconAnim(BtlvCore *core, u32 arg1) {
-    if (GetStudioMode(core->mainModule) == 2) {
-        BtlvScd_StartTypeIconAnim(core->scd, arg1);
+void BtlvCore_StartTypeIconAnim(BtlvCore *core, u32 index) {
+    if (GetStudioMode(core->mainModule) == BTL_STUDIO_MODE_PLAYBACK) {
+        BtlvScd_StartTypeIconAnim(core->scd, index);
     }
 }

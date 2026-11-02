@@ -11,14 +11,27 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
+// The steps of the event
+enum {
+    STEP_WAIT_COMM_EXIT,
+    STEP_FADE_OUT,
+    STEP_CLOSE_FIELD,
+    STEP_CALL_PROC,
+    STEP_WAIT_PROC,
+    STEP_CLEAR_MATCH_IN_PROGRESS,
+    STEP_OPEN_FIELD,
+    STEP_FADE_IN,
+    STEP_END,
+};
+
 typedef struct {
     u32 bgm;
     GameSystem *gsys;
     Field *field;
     WifiBattleMatchParam *param;
-    u32 unk10;
-    u32 unk14;
-    u32 unk18;
+    u32 startFrom;
+    u32 teamSource;
+    u32 battleType;
     // Never set, so the field transitions are skipped
     BOOL useTransitions;
 } EventWifiBattleMatch;
@@ -30,7 +43,7 @@ GameEventReturnCode EventWifiBattleMatch_Callback(GameEvent *event, u32 *state, 
     GameSystem *gsys = wk->gsys;
 
     switch (*state) {
-    case 0:
+    case STEP_WAIT_COMM_EXIT:
         // Wait for the comm system to shut down
         if (!GameCommSys_BootCheck(GSYS_GetGameCommSystem(gsys))) {
             wk->bgm = GFL_SndBGMGetID();
@@ -38,60 +51,60 @@ GameEventReturnCode EventWifiBattleMatch_Callback(GameEvent *event, u32 *state, 
             (*state)++;
         }
         break;
-    case 1:
+    case STEP_FADE_OUT:
         if (wk->useTransitions) {
             GameEvent_ChainNext(
                 event, CallFieldMapEntranceOutTransitionDefault(gsys, wk->field, FIELD_TRANSITION_FADE_BLACK, 0));
         }
         (*state)++;
         break;
-    case 2:
+    case STEP_CLOSE_FIELD:
         GameEvent_ChainNext(event, CreateFieldCloseEvent(gsys, wk->field));
         (*state)++;
         break;
-    case 3: {
+    case STEP_CALL_PROC: {
         WifiBattleMatchParam *param =
             GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(WifiBattleMatchParam), TRUE, "event_wifibattlematch.c", 135);
 
         wk->param = param;
-        param->unk8 = wk->unk10;
+        param->startFrom = wk->startFrom;
         param->gameData = GSYS_GetGameData(gsys);
-        param->unk4 = wk->unk18;
-        param->unkC = wk->unk14;
+        param->battleType = wk->battleType;
+        param->teamSource = wk->teamSource;
         GSYS_QueueProc(gsys, OVERLAY_WIFIBATTLEMATCH, &WIFIBATTLEMATCH_PROC_FUNCTIONS, wk->param);
         (*state)++;
         break;
     }
-    case 4:
+    case STEP_WAIT_PROC:
         if (!GSYS_GetProcMgrState(gsys)) {
             GFL_HeapFree(wk->param);
             (*state)++;
         }
         break;
-    case 5:
+    case STEP_CLEAR_MATCH_IN_PROGRESS:
         RecordSave_ClearMatchInProgress(getRecordBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
         (*state)++;
         break;
-    case 6:
+    case STEP_OPEN_FIELD:
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
         GFL_SndBGMPlay(wk->bgm, SND_CHANNEL_MASK_ALL);
         GFL_SndBGMFadeIn(60);
         (*state)++;
         break;
-    case 7:
+    case STEP_FADE_IN:
         if (wk->useTransitions) {
             GameEvent_ChainNext(
                 event, CallFieldMapEntranceInTransition(gsys, wk->field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         }
         (*state)++;
         break;
-    case 8:
+    case STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *EventWifiBattleMatch_Create(GameSystem *gsys, Field *field, u32 unk10, u32 unk14, u32 unk18) {
+GameEvent *EventWifiBattleMatch_Create(GameSystem *gsys, Field *field, u32 startFrom, u32 teamSource, u32 battleType) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventWifiBattleMatch_Callback, sizeof(EventWifiBattleMatch));
     EventWifiBattleMatch *wk;
 
@@ -102,9 +115,9 @@ GameEvent *EventWifiBattleMatch_Create(GameSystem *gsys, Field *field, u32 unk10
     wk = GameEvent_GetData(event);
     wk->gsys = gsys;
     wk->field = field;
-    wk->unk10 = (u16)unk10;
-    wk->unk14 = unk14;
-    wk->unk18 = unk18;
+    wk->startFrom = (u16)startFrom;
+    wk->teamSource = teamSource;
+    wk->battleType = battleType;
     wk->useTransitions = FALSE;
     return event;
 }
@@ -113,5 +126,5 @@ GameEvent *EventWifiBattleMatch_Create(GameSystem *gsys, Field *field, u32 unk10
 GameEvent *EventWifiBattleMatch_CreateFromArgs(GameSystem *gsys, void *data) {
     EventWifiBattleMatchArgs *args = data;
 
-    return EventWifiBattleMatch_Create(gsys, args->field, args->unk4, args->unk8, args->unkC);
+    return EventWifiBattleMatch_Create(gsys, args->field, args->startFrom, args->teamSource, args->battleType);
 }

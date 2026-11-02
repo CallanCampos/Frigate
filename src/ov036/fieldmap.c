@@ -1152,7 +1152,7 @@ void Field_SwapZoneByMatrix(Field *field) {
     FestMission_OnZoneEnter(field->gameSystem, zoneId);
     FesGimmick_OnZoneEnter(field->fesGimmick);
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
-    func_ov012_02153668(GSYS_GetGameCommSystem(field->gameSystem));
+    Intrude_OnZoneChange(GSYS_GetGameCommSystem(field->gameSystem));
 }
 
 void Field_HotswapSpawnActors(Field *field, GameData *gameData, MMSys *actorSystem, EventData *eventData, u32 zoneId) {

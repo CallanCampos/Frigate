@@ -10,6 +10,16 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
+// The steps of both events
+enum {
+    STEP_FADE_OUT,
+    STEP_CLOSE_FIELD,
+    STEP_START_APP,
+    STEP_OPEN_FIELD,
+    STEP_FADE_IN,
+    STEP_END,
+};
+
 // The party list events' work
 typedef struct {
     GameSystem *gsys;
@@ -57,7 +67,7 @@ GameEvent *EventMoveTutorPokeSelect_Create(GameSystem *gsys, void *args) {
     GameEvent *event;
     PokeSelectWork *work;
 
-    listParam->unk6E = selectArgs->learnable;
+    listParam->learnable = selectArgs->learnable;
     listParam->move = selectArgs->move;
     event = GameEvent_Create(gsys, NULL, EventPokeSelect_Callback, sizeof(PokeSelectWork));
     work = GameEvent_GetData(event);
@@ -105,29 +115,29 @@ static GameEventReturnCode EventPokeSelect_Callback(GameEvent *event, u32 *state
     GameSystem *gsys = work->gsys;
 
     switch (*state) {
-    case 0:
+    case STEP_FADE_OUT:
         GameEvent_ChainNext(
             event, CallFieldMapEntranceOutTransitionDefault(gsys, work->field, FIELD_TRANSITION_FADE_BLACK, 0));
-        *state = 1;
+        *state = STEP_CLOSE_FIELD;
         break;
-    case 1:
+    case STEP_CLOSE_FIELD:
         GameEvent_ChainNext(event, CreateFieldCloseEvent(gsys, work->field));
-        *state = 2;
+        *state = STEP_START_APP;
         break;
-    case 2:
+    case STEP_START_APP:
         GameEvent_ChainNext(event, EventPokeList_Create(gsys, work->field, work->listParam, work->summaryParam));
-        *state = 3;
+        *state = STEP_OPEN_FIELD;
         break;
-    case 3:
+    case STEP_OPEN_FIELD:
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
-        *state = 4;
+        *state = STEP_FADE_IN;
         break;
-    case 4:
+    case STEP_FADE_IN:
         GameEvent_ChainNext(
             event, CallFieldMapEntranceInTransition(gsys, work->field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
-        *state = 5;
+        *state = STEP_END;
         break;
-    case 5:
+    case STEP_END:
         // A signed compare: the index is an s32 in the original, which PokeListParam doesn't declare yet
         if ((s32)work->listParam->index <= 5) {
             *work->index = work->listParam->index;
@@ -182,29 +192,29 @@ static GameEventReturnCode EventPokeMoveReplace_Callback(GameEvent *event, u32 *
     GameSystem *gsys = work->gsys;
 
     switch (*state) {
-    case 0:
+    case STEP_FADE_OUT:
         GameEvent_ChainNext(
             event, CallFieldMapEntranceOutTransitionDefault(gsys, work->field, FIELD_TRANSITION_FADE_BLACK, 0));
-        *state = 1;
+        *state = STEP_CLOSE_FIELD;
         break;
-    case 1:
+    case STEP_CLOSE_FIELD:
         GameEvent_ChainNext(event, CreateFieldCloseEvent(gsys, work->field));
-        *state = 2;
+        *state = STEP_START_APP;
         break;
-    case 2:
+    case STEP_START_APP:
         GSYS_QueueProc(gsys, OVERLAY_PSTATUS, &PSTATUS_PROC_FUNCTIONS, work->summaryParam);
-        *state = 3;
+        *state = STEP_OPEN_FIELD;
         break;
-    case 3:
+    case STEP_OPEN_FIELD:
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
-        *state = 4;
+        *state = STEP_FADE_IN;
         break;
-    case 4:
+    case STEP_FADE_IN:
         GameEvent_ChainNext(
             event, CallFieldMapEntranceInTransition(gsys, work->field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
-        *state = 5;
+        *state = STEP_END;
         break;
-    case 5:
+    case STEP_END:
         if (work->summaryParam->result == PSTATUS_RESULT_FORGET) {
             *work->slot = work->summaryParam->slot;
             *work->forgot = TRUE;

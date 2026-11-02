@@ -1,0 +1,55 @@
+{
+    "$schema": "flash.schema.json",
+    "zones": [
+        {
+            "zone": "ZONE_WELLSPRING_CAVE",
+            "allow": false,
+            "active": false
+        },
+        {
+            "zone": "ZONE_WELLSPRING_CAVE_2",
+            "allow": true,
+            "active": false
+        },
+        {
+            "zone": "ZONE_MISTRALTON_CAVE",
+            "allow": true,
+            "active": false
+        },
+        {
+            "zone": "ZONE_MISTRALTON_CAVE_2",
+            "allow": true,
+            "active": false
+        },
+        {
+            "zone": "ZONE_GUIDANCE_CHAMBER",
+            "allow": false,
+            "active": false
+        },
+        {
+            "zone": "ZONE_CHALLENGERS_CAVE",
+            "allow": true,
+            "active": false
+        },
+        {
+            "zone": "ZONE_CHALLENGERS_CAVE_2",
+            "allow": true,
+            "active": false
+        },
+        {
+            "zone": "ZONE_CHALLENGERS_CAVE_3",
+            "allow": true,
+            "active": false
+        },
+        {
+            "zone": "ZONE_BLACK_TOWER_5",
+            "allow": true,
+            "active": false
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_21",
+            "allow": true,
+            "active": false
+        }
+    ]
+}

@@ -12,9 +12,9 @@
 // how long the jump takes
 GameEvent *SpPokeEvent_CreateJump(GameSystem *gsys, u16 mode, const VecFx32 *start, const VecFx32 *end, fx32 height,
                                   u32 frames);
-void SpPokeEvent_Appear(GameSystem *gsys, u16 a1, const VecFx32 *pos);
-GameEvent *SpPokeEvent_CreateWaitFrame(GameSystem *gsys, u16 a1);
-GameEvent *SpPokeEvent_CreateWaitAnimEnd(GameSystem *gsys, u16 a1);
+void SpPokeEvent_Appear(GameSystem *gsys, u16 mode, const VecFx32 *pos);
+GameEvent *SpPokeEvent_CreateWaitFrame(GameSystem *gsys, u16 mode);
+GameEvent *SpPokeEvent_CreateWaitAnimEnd(GameSystem *gsys, u16 mode);
 // Shows actor 2 at pos and, at a frame of its animation, replaces the actor actorId with the zone's own definition of
 // the NPC uid
 GameEvent *SpPokeEvent_CreateAppear(GameSystem *gsys, const VecFx32 *pos, u16 actorId, u16 uid);

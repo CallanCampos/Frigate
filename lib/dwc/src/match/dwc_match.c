@@ -88,13 +88,13 @@ static MatchState sMatchState;
 // may fail before it is left out
 static s32 sMatchChance[2] = { -2, 5 };
 
-static BOOL func_ov011_02160fd8(void);
+static BOOL DWCi_UpdateSuspendState(void);
 static int DWCi_QR2Startup(s32 profileId);
 static void DWCi_SendStateChanged(qr2_t server);
 static void DWCi_FormatProfileID(char *dest, u32 size);
 static void DWCi_StopResendingMatchCommand(void);
-static void func_ov011_02162958(u8 conn, int kind, u32 *msg);
-static void func_ov011_02162bf8(u8 conn, int kind, u32 *msg);
+static void DWCi_HandleMatchSynPacket(u8 conn, int kind, u32 *msg);
+static void DWCi_HandleMatchSynPacketFullMesh(u8 conn, int kind, u32 *msg);
 static void DWCi_CloseConnectionsNotInBitmap(u32 mask);
 static void DWCi_ProcessServerAIDBitmapCommand(const u32 *msg);
 static void DWCi_ResetMatchParam(int mode);
@@ -112,8 +112,8 @@ static int DWCi_SendGPBuddyMsgCommand(void *gp, u8 command, int id, const char *
 static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 port, const u32 *data, int count);
 static u8 DWCi_CheckResvCommand(int profileId, int ip, u16 port, int nodeType, int skipChecks, int cookie,
                                 void *userData, int blocked);
-static u8 func_ov011_0216484c(int profileId, int ip, int port, int nodeType, int skipChecks, int cookie, void *userData,
-                              int blocked);
+static u8 DWCi_CheckResvCommandAsServer(int profileId, int ip, int port, int nodeType, int skipChecks, int cookie,
+                                        void *userData, int blocked);
 static int DWCi_ProcessResvOK(int profileId, u32 ip, u32 port);
 static int DWCi_HandleMatchCommandError(int error);
 static int DWCi_SendResvCommand(int profileId, int flag);
@@ -124,9 +124,9 @@ static int DWCi_CancelPreConnectedServerProcessWithResetLevel(int profileId, int
 static int DWCi_CancelPreConnectedServerProcess(int profileId);
 static int DWCi_CancelPreConnectedClientProcess(int unused);
 static void DWCi_PostProcessConnection(int a0);
-static void func_ov011_0216549c(void);
-static void func_ov011_021654c0(void);
-static void func_ov011_02165540(void);
+static void DWCi_AddPendingNodeInfo(void);
+static void DWCi_PushPendingNodeInfo(void);
+static void DWCi_PushPendingNodeInfoFullMesh(void);
 static int DWCi_StartMatchSyn(void);
 static int DWCi_SendClientLinkRequest(void);
 static void DWCi_FinishCancelMatching(void);
@@ -178,7 +178,7 @@ static u32 DWCi_MakeGroupID(void);
 static void DWCi_SetReservationCallback(MatchCheckFunc a, const void *userData, uptr c);
 static void DWCi_ChangeToServer(int isHost);
 static void DWCi_StartReservingServer(int profileId);
-static BOOL func_ov011_021679c0(void);
+static BOOL DWCi_GetNumConnectionHost(void);
 static BOOL DWCi_SetSuspendAndNotify(u8 index, int set, int mode);
 static BOOL DWCi_StartMatchingAfterSearchOwn(void);
 static void DWCi_SetSuspendRequest(int a, MatchCallback b, int c);
@@ -199,7 +199,7 @@ static void DWCi_ClearTargetNodeInfo(void);
 static BOOL DWCi_IsTargetNodeInfoValid(void);
 static void DWCi_ClearNodeInfo(void *address);
 static BOOL DWCi_IsValidNodeInfo(DWCNodeInfo *peer);
-static u64 func_ov011_021683b8(void);
+static u64 DWCi_GetNextConnectTick(void);
 static int DWCi_IsFirstServer(void);
 static BOOL DWCi_IsMatchLocked(void);
 static int DWCi_GetTopologyType(void);
@@ -291,7 +291,7 @@ int DWC_GetMatchIntValue(int index, const char *key, int defaultValue) {
     return defaultValue;
 }
 
-static BOOL func_ov011_02160fd8(void) {
+static BOOL DWCi_UpdateSuspendState(void) {
     int result = -1;
     u32 mask;
 
@@ -822,10 +822,10 @@ void DWCi_MatchProcess(int a0) {
 
             if (DWCi_GetOwnNodeInfo() != node && DWCi_GetGT2Connection(node->aid) == NULL) {
                 if (node->nextConnectTick == 0) {
-                    node->nextConnectTick = func_ov011_021683b8();
+                    node->nextConnectTick = DWCi_GetNextConnectTick();
                 }
                 if (node->nextConnectTick < OS_GetTick() && node->connectFailureCount <= sMatchChance[1]) {
-                    node->nextConnectTick = func_ov011_021683b8();
+                    node->nextConnectTick = DWCi_GetNextConnectTick();
                     DWCi_GetMatchCnt()->self = *node;
                     DWCi_GetMatchCnt()->memberConnecting = 1;
                     if (DWCi_HandleMatchCommandError(DWCi_SendResvCommand(node->profileId, 0)) != 0) {
@@ -1107,9 +1107,9 @@ void DWCi_ClearQR2Key(void) {
 
 void DWCi_ProcessMatchSynPacket(u8 aid, u16 type, const void *data) {
     if (DWCi_IsFullMesh()) {
-        func_ov011_02162bf8(aid, type, data);
+        DWCi_HandleMatchSynPacketFullMesh(aid, type, data);
     } else {
-        func_ov011_02162958(aid, type, data);
+        DWCi_HandleMatchSynPacket(aid, type, data);
     }
 }
 
@@ -1125,7 +1125,7 @@ static inline void MatchPeer_Read(DWCNodeInfo *peer, MatchPeerWire *wire) {
     memcpy(&peer->userData, wire->userData, sizeof(u32));
 }
 
-static void func_ov011_02162958(u8 conn, int kind, u32 *msg) {
+static void DWCi_HandleMatchSynPacket(u8 conn, int kind, u32 *msg) {
     int i;
     int count;
     int duration;
@@ -1207,8 +1207,8 @@ static void func_ov011_02162958(u8 conn, int kind, u32 *msg) {
     }
 }
 
-static void func_ov011_02162bf8(u8 conn, int kind, u32 *msg) {
-    func_ov011_02162958(conn, kind, msg);
+static void DWCi_HandleMatchSynPacketFullMesh(u8 conn, int kind, u32 *msg) {
+    DWCi_HandleMatchSynPacket(conn, kind, msg);
 }
 
 static void DWCi_CloseConnectionsNotInBitmap(u32 mask) {
@@ -2301,14 +2301,14 @@ static u8 DWCi_CheckResvCommand(int profileId, int ip, u16 port, int nodeType, i
         break;
     case 0:
     case 2:
-        result = func_ov011_0216484c(profileId, ip, port, nodeType, skipChecks, cookie, userData, blocked);
+        result = DWCi_CheckResvCommandAsServer(profileId, ip, port, nodeType, skipChecks, cookie, userData, blocked);
         break;
     }
     return result;
 }
 
-static u8 func_ov011_0216484c(int profileId, int ip, int port, int nodeType, int skipChecks, int cookie, void *userData,
-                              int blocked) {
+static u8 DWCi_CheckResvCommandAsServer(int profileId, int ip, int port, int nodeType, int skipChecks, int cookie,
+                                        void *userData, int blocked) {
     u8 result;
 
     if (DWCi_IsMatchLocked() != 0) {
@@ -2340,12 +2340,12 @@ static u8 func_ov011_0216484c(int profileId, int ip, int port, int nodeType, int
             }
         }
     }
-    if (DWCi_GetMatchCnt()->qr2NumEntry + 1 == func_ov011_021679c0()) {
+    if (DWCi_GetMatchCnt()->qr2NumEntry + 1 == DWCi_GetNumConnectionHost()) {
         result = 3;
         DWCi_GetMatchCnt()->error = 0x10;
     } else if (DWCi_GetMatchCnt()->state == 0x16) {
         result = 4;
-    } else if (func_ov011_02160fd8() != 0 || DWCi_GetMatchCnt()->suspendPending != 0) {
+    } else if (DWCi_UpdateSuspendState() != 0 || DWCi_GetMatchCnt()->suspendPending != 0) {
         result = 3;
         DWCi_GetMatchCnt()->error = 0x11;
     } else if (cookie != DWCi_GetMatchCnt()->topology) {
@@ -2712,7 +2712,7 @@ static void DWCi_PostProcessConnection(int a0) {
         break;
     case 3:
         DWCi_GetMatchCnt()->matched = 1;
-        func_ov011_0216549c();
+        DWCi_AddPendingNodeInfo();
         DWCi_GetMatchCnt()->unk_798 = 0;
         qr2_send_statechanged(DWCi_GetMatchCnt()->qr2Obj);
         MatchNotify(0, 0, DWCi_GetMatchCnt()->cbEventPid == 0, 0);
@@ -2739,16 +2739,16 @@ static void DWCi_PostProcessConnection(int a0) {
     }
 }
 
-static void func_ov011_0216549c(void) {
+static void DWCi_AddPendingNodeInfo(void) {
     DWCi_GetMatchCnt()->nnFailureCount = 0;
     if (DWCi_IsFullMesh() != 0) {
-        func_ov011_02165540();
+        DWCi_PushPendingNodeInfoFullMesh();
         return;
     }
-    func_ov011_021654c0();
+    DWCi_PushPendingNodeInfo();
 }
 
-static void func_ov011_021654c0(void) {
+static void DWCi_PushPendingNodeInfo(void) {
     DWCNodeInfo *pending;
     DWCNodeInfo *node;
 
@@ -2777,8 +2777,8 @@ static void func_ov011_021654c0(void) {
     }
 }
 
-static void func_ov011_02165540(void) {
-    func_ov011_021654c0();
+static void DWCi_PushPendingNodeInfoFullMesh(void) {
+    DWCi_PushPendingNodeInfo();
     DWCi_GetMatchCnt()->unk_62f = 0;
 }
 
@@ -4360,7 +4360,7 @@ static void DWCi_StartReservingServer(int profileId) {
     }
 }
 
-static BOOL func_ov011_021679c0(void) {
+static BOOL DWCi_GetNumConnectionHost(void) {
     return DWC_GetNumConnectionHost();
 }
 
@@ -4423,7 +4423,7 @@ static BOOL DWCi_SetSuspendAndNotify(u8 index, int set, int mode) {
     if (func_ov011_02167f0c() == 0) {
         flags &= ~(1 << DWC_GetMyAID());
     }
-    hasSet = func_ov011_02160fd8();
+    hasSet = DWCi_UpdateSuspendState();
     notify = TRUE;
     if ((set == 0 || hasSet == 0) && (set != 0 || hasSet != 0)) {
         notify = FALSE;
@@ -4522,7 +4522,7 @@ static BOOL DWCi_ProcessSuspendRequest(void) {
     if (value == 0xff) {
         return FALSE;
     }
-    hasSet = func_ov011_02160fd8();
+    hasSet = DWCi_UpdateSuspendState();
     if ((value != 0 && hasSet != 0) || (value == 0 && hasSet == 0)) {
         DWCi_FinishSuspendRequest(0);
         return TRUE;
@@ -4796,7 +4796,7 @@ static BOOL DWCi_IsValidNodeInfo(DWCNodeInfo *peer) {
     return FALSE;
 }
 
-static u64 func_ov011_021683b8(void) {
+static u64 DWCi_GetNextConnectTick(void) {
     int active;
     int i;
     int selfIndex;
