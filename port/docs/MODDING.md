@@ -110,6 +110,25 @@ build/port/frigate-black2 --save-dir SAVES --input port/tests/oracle/party_menus
   `party_menus`, the tests `oracle_field_menus` and `oracle_party_menus`;
   [../tools/oracle/README.md](../tools/oracle/README.md#the-comparison-sequences)).
 
+## Starting somewhere else
+
+To test a change in a place your saves don't reach, mint a save that continues there. The save lab
+([../tools/lab/README.md](../tools/lab/README.md)) applies a recipe, written in the game's constant names, to a save,
+and CONTINUE then takes the player to the place the recipe names, through the game's own spawn path (the one the Hall of
+Fame takes), with the zone's NPCs as its flags decide:
+
+```sh
+mkdir -p LAB
+printf 'place ZONE_FLOCCESY_RANCH_2 warp 0\nmoney 50000\n' > ranch.recipe
+python3 port/tools/lab/savelab.py mint ranch.recipe --base SAVES/IREO.sav --out LAB/IREO.sav
+build/port/frigate-black2 --save-dir LAB             # the start menu shows Floccesy Ranch; CONTINUE goes there
+python3 port/tools/lab/savelab.py read LAB/IREO.sav  # the save's facts: the place, flags, money, the party
+```
+
+The minted save keeps the base's story: the flags a place's scenes check are the base's, so a scene may start on
+arrival, and the recipe's `flag` and `work` lines can set them. A minted save is a place to test from, not evidence
+that the story reaches there.
+
 ## When the game stops
 
 A run ends with an exit status ([ARCHITECTURE.md](ARCHITECTURE.md#how-a-run-ends) has the table) and, unless it ended
