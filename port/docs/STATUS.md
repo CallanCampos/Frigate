@@ -34,15 +34,19 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 ## 2026-11-02: PR 74's follow-ups for the documents, and a check of their links and tables in CI
 
-- **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit. It started from reviewed main
-  `d1717b68d8`, PR 74's merge.
+- **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit. Reviewed main is `e936696a97`, PR 71's
+  merge, which this branch merges; it started from `d1717b68d8`, PR 74's.
 - **Port:** `PORT_SHA`, on the topic branch `port-docs-hygiene-1102` from `d1717b68d8`: `3c7a8f10dd` (the documents
-  check, its tests and its CI steps) and this entry's commit (the follow-ups). This entry fills the last entry's, the
-  hygiene's, `PORT_SHA` with `6eef75c290`. Only `port/` and two of Frigate's own files under `.github/` change: the
+  check, its tests and its CI steps), `991c2e6725` (the follow-ups, and this entry), `2f9a0dbb11` (the merge of `main`
+  at `e936696a97`, PR 71: the save lab's minter and reader, all in `port/`), `08bfb919e2` (the check's summary in the
+  singular for one document) and this record's update after it. The merge keeps both new STATUS.md entries, this one
+  first. This entry fills the last entry's, the save lab's, `PORT_SHA` with `a9d91adf59`, and the hygiene's with
+  `6eef75c290`, as PR 71's entry does too. Only `port/` and two of Frigate's own files under `.github/` change: the
   landing page's one wrapped paragraph and `port-ci.yml`'s two steps.
 - **ROM (T0):** `python3 configure.py && ninja` (`-j4`) in this branch's new worktree, every step run (14,039): both
   original US SHA1s, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`,
-  with no compiler warning. This branch's own changes are no ROM input.
+  with no compiler warning; again on the merge with `main` at `e936696a97` (2 steps, the checks: PR 71's files are all
+  in `port/`), the same SHA1s and no warning. This branch's own changes are no ROM input.
 - **Host build (T1):** not run: nothing this branch changes is a host build input. `git diff --stat` against `main`
   lists Markdown, `port/tools/**` (the documents check and its allowlist, `summarize.py`, `milestones.py`), the tools'
   tests and `.github/workflows/port-ci.yml`, and no CMake file reads any of them. The exact-head verification
@@ -57,15 +61,16 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     read, reasons not required, ignored files listed, delimiter widths unchecked, the landing page unread, HTML sources
     and reference definitions unchecked, a source view read as rendered, allowed problems counted by row) fails the
     tests that hold its rule.
-  - The check on the whole tree (`python3 port/tools/check_docs.py`, CI's other new step): 97 documents, one problem,
-    allowed: `research/platinum-port.md:25`, a record. Against GitHub: the 1,045 anchors that the contents API's HTML
-    gives the headings of all 97 documents on `main` (`d1717b68d8`) are the check's, document for document, and the 234
-    tables GitHub renders there, with their 2,892 rows, are the check's.
+  - The check on the whole tree (`python3 port/tools/check_docs.py`, CI's other new step): 98 documents after the
+    merge (97 before it; PR 71 adds `port/tools/lab/README.md`), one problem, allowed: `research/platinum-port.md:25`,
+    a record. Against GitHub: the 1,045 anchors that the contents API's HTML gives the headings of all 97 documents on
+    `main` (`d1717b68d8`) are the check's, document for document, and the 234 tables GitHub renders there, with their
+    2,892 rows, are the check's.
   - Wrapping: each of the 17 documents whose lines this change wraps renders the same as on `main` through GitHub's
     Markdown API (mode `markdown`, as files render, whitespace runs taken as one), with the same words in the same
     order.
   - The sync tooling tests, CI's command (`python3 -m unittest discover -s port/tools/tests -p
-    test_upstream_sync.py`): 64 of 64 pass.
+    test_upstream_sync.py`): 64 of 64 pass, before and after the merge, and so do the documents check's 33.
   - `progress_ownership` (`port/tests/progress/test_ownership.py`, run directly): 11 of 11 pass.
   - T2 to T7 not run: no test that CMake registers changes, and no game, host or test-target code; the exact-head
     verification runs the host tests and the short replays.
@@ -121,13 +126,13 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   - **The documents check** (`3c7a8f10dd`): `port/tools/check_docs.py` and `check_docs_allowlist.tsv`, its tests and
     CI's two steps in the sync-tooling job, as above; documented in port/tools/README.md, port/tools/tests/README.md
     and, in one line, port/docs/README.md, where the documents' rules are.
-- **Next:** the next task is as the last entry gives it: Phase 5's story coverage past the Route 20 save. The
-  documents' follow-ups left: the guides that still say the owner approves every sync PR (port/CLAUDE.md,
-  CONTRIBUTING.md, SYNC.md, PLAN.md, README.md and `upstream_sync.py`'s warning), for the owner's wording of the
-  delegation; `research/platinum-port.md:25`, a record whose code span's pipes split its row, the check's one allowed
-  problem; `include/field/field_effect.h:146`'s comment, which names `FesKiraTask`, for the next change that touches
-  `include/` anyway, since a game header's change needs its MWCC-neutral proof; and `summarize.py`'s overlay 11 gap
-  rule, which no gap reaches either now.
+- **Next:** the next task is as the last entries give it: L2's stations (PR 71's entry), and Phase 5's story coverage
+  past the Route 20 save. The documents' follow-ups left: the guides that still say the owner approves every sync PR
+  (port/CLAUDE.md, CONTRIBUTING.md, SYNC.md, PLAN.md, README.md and `upstream_sync.py`'s warning), for the owner's
+  wording of the delegation; `research/platinum-port.md:25`, a record whose code span's pipes split its row, the check's
+  one allowed problem; `include/field/field_effect.h:146`'s comment, which names `FesKiraTask`, for the next change that
+  touches `include/` anyway, since a game header's change needs its MWCC-neutral proof; and `summarize.py`'s overlay 11
+  gap rule, which no gap reaches either now.
 - **Blockers:** none for this change. Decisions the owner holds: ADRs 0022, 0025, 0030 and 0031 are proposed; the
   guides' wording of the delegation; whether escaping a record's pipes is a fix a record may take; and whether
   documents get a line limit, which no rule names, so that the check would hold it.
@@ -136,7 +141,7 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 - **Upstream:** `41f42ca1af`, as reviewed main `d1717b68d8` (PR 74's merge) has it: PR 67's sync brought it to main
   while this change was in review, and this change merges no upstream commit of its own.
-- **Port:** `PORT_SHA`, on the topic branch `port-save-lab-core` from `d19894b1f7` (PR 69's merge). Reviewed main was
+- **Port:** `a9d91adf59`, on the topic branch `port-save-lab-core` from `d19894b1f7` (PR 69's merge). Reviewed main was
   merged in five times, STATUS.md's new entries kept each time with this one first: `10d017c010` once PR 67 had
   landed, `36101609ad` once PR 70 had (`95f1d692cf`, documents only), `806b2a8f9d` once PR 73 had (`49ad7dd00a`: the
   café's fix, with `src/ov129/sp_poke_gimmick.c`, MSL's exit and `gen_stubs.py`), `c0a7941e4e` once PR 72 had
