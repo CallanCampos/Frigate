@@ -32,47 +32,61 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
-## 2026-11-02: verification v2's canonical digests, without a ROM: ADR 0031 proposed, xxHash vendored
+## 2026-11-02: verification v2's canonical digests, without a ROM: ADR 0031 proposed
 
 - **Upstream:** `41f42ca1af`, as reviewed main `10d017c010` (PR 67's merge, the upstream sync) has it; this change
   merges no upstream commit of its own.
 - **Port:** `PORT_SHA`, on the topic branch `port-digest-canonical` from `d19894b1f7` (PR 69's merge): `b33f06c1da`,
-  the change, then the merge of main at `10d017c010` (PR 67, which merged meanwhile; STATUS.md's two new entries are
-  both kept, this one first) and this record's update. This entry fills PR 67's entry's `PORT_SHA` with
-  `f53e767509`; both had filled PR 69's with `2f9033d7b8`. The change itself is all in `port/`.
-- **ROM (T0):** in this branch's new worktree, `python3 configure.py && ninja` at `-j4`, with no compiler warning and
+  the change; `5aac6f8389`, the merge of main at `10d017c010` (PR 67, the upstream sync, which merged meanwhile);
+  `801fbcc16e`, this record's update; `33750aad94`, the fixes of the change's review; `a651ef5414`, the merge of main
+  at `36101609ad` (PR 70, ADR 0023 accepted, documents alone); then this record's revision. Both merges kept
+  STATUS.md's new entries, this one first. This entry fills PR 67's entry's `PORT_SHA` with `f53e767509` (both had
+  filled PR 69's with `2f9033d7b8`) and PR 70's with `cfb45c1be4`. The change itself is all in `port/`.
+- **ROM (T0):** in this branch's worktree, `python3 configure.py && ninja` at `-j4`, with no compiler warning and
   both original US SHA1s matching, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2
-  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`: on the change (10,703 steps), and again on the merge of main (12,555
-  steps, the sync's sources). The change has no ROM input.
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`: on the change (10,703 steps), on the merge of main (12,555 steps, the
+  sync's sources), on the review's fixes and on the merge of PR 70 (2 steps each: nothing outside `port/` changed
+  since the first merge). The change has no ROM input.
 - **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both games with the verifier's configure flags
   (`build/port-verify-b2_us`, `build/port-verify-w2_us`; `-DPORT_SANITIZE_RECOVER=OFF
-  -DPORT_FRAME_TIME_REPORT_ONLY=OFF`) pass at `-j4`, on the change and again on the merge of main; the new test
-  programs compile with `-Wall -Wextra -Werror`.
+  -DPORT_FRAME_TIME_REPORT_ONLY=OFF`) pass at `-j4` on each head: the change, the merge of PR 67, the review's fixes
+  and the merge of PR 70. The new test programs compile with `-Wall -Wextra -Werror`, xxHash's header, which each
+  configure fetched, on a system include path.
 - **Tests:**
-  - T2/T6: `ctest -LE route` at `-j3` passes in both games, 352 of 359 tests passing and 7 skipping in each, on the
-    change (after its fresh builds, and again after the last edit to the digest's files) and on the merge of main.
-    The skips are this checkout's optional setups, as in PR 69's entry: `asm_oracle` (no Unicorn in this Python),
-    `oracle_boot`, `oracle_saves` and `oracle_floccesy_save` (no oracle built), the two function-sanitizer negatives
-    of the VM dispatch (Apple's compiler emits no such check) and `app_universal_slices` (one slice). The two tests
-    more than that entry's are the new `digest_format_plain` and `digest_format_sanitized`, 310 checks each. CI's 13
-    checks pass on the change's first head, `b33f06c1da`, the new tests among those its host and sanitized jobs run
-    on macOS, Linux and Windows.
-  - Negative controls: 27 mutants of `digest.c`, each with one rule taken out, fail the test, each by 1 to 17 checks,
-    and the unchanged file passes: a mask widened (WININ and WINOUT, the scrolls, MASTER_BRIGHT, DISPCAPCNT,
-    CLEAR_COLOR, FOG_TABLE, VRAMCNT_E, POWCNT1, WRAMCNT, and engine B's DISPCNT in the decode and, apart, in the
-    encoding); BG2's and BG3's X and Y not sign-extended, or decoded without the bits 28-31 melonDS sets; BLDY not
-    clamped; WIN0H and WIN1V split the wrong way; MOSAIC's sizes swapped; the depth kept where W is 0, or computed
-    without melonDS's cut to 32 bits; strips' vertices encoded as indices; a capture of 3D not zeroed, or a stale
-    region encoded; the screens' 8-bit channels or their alpha encoded; absent groups compared; streams whose counts
-    don't rise accepted; the hash seeded.
-  - The vendored header gives xxHash's own XXH3-64 known answers, 17 of them (lengths 0 to 403, seed 0 and seed
-    PRIME64), checked once; the test keeps the 9 with seed 0.
+  - T2/T6: `ctest -LE route` at `-j3` passes in both games, 352 of 359 tests passing and 7 skipping in each, on each
+    head. The skips are this checkout's optional setups, as in PR 69's entry: `asm_oracle` (no Unicorn in this
+    Python), `oracle_boot`, `oracle_saves` and `oracle_floccesy_save` (no oracle built), the two function-sanitizer
+    negatives of the VM dispatch (Apple's compiler emits no such check) and `app_universal_slices` (one slice). The
+    two tests more than that entry's are the new `digest_format_plain` and `digest_format_sanitized`, 423 checks each
+    after the review (310 before it). CI's 13 checks passed on the change's earlier heads, `b33f06c1da` and
+    `801fbcc16e`, the new tests among those its host and sanitized jobs run on macOS, Linux and Windows; the pull
+    request's checks hold this record's head.
+  - Negative controls: 91 mutants of `digest.c`, each with one rule taken out, fail the test, and the unchanged file
+    passes. The change's 27: a mask widened (WININ and WINOUT, the scrolls, MASTER_BRIGHT, DISPCAPCNT, CLEAR_COLOR,
+    FOG_TABLE, VRAMCNT_E, POWCNT1, WRAMCNT, and engine B's DISPCNT in the decode and, apart, in the encoding); BG2's
+    and BG3's X and Y not sign-extended, or decoded without the bits 28-31 melonDS sets; BLDY not clamped; WIN0H and
+    WIN1V split the wrong way; MOSAIC's sizes swapped; the depth kept where W is 0, or computed without melonDS's cut
+    to 32 bits; strips' vertices encoded as indices; a capture of 3D not zeroed, or a stale region encoded; the
+    screens' 8-bit channels or their alpha encoded; absent groups compared; streams whose counts don't rise accepted;
+    the hash seeded. The review's 49, the 24 that had passed among them: `g3d.stats` encoded as 0, 0 or without its
+    count or its overflow normalized; the capture's per-bank words and `destInLcdc`; only engine A's half of the
+    palettes or OAM hashed; `g3d.list`'s masks and its 0-or-1 facing and "holds 3D"; counts allowed to fall; a decode
+    mask dropped or added where the encoding masks again; a region larger than its bank; a hash of more than 16
+    digits. And 15 of this round's: a missing group not a divergence, `pbw_digest_record_missing` reversed or never
+    true, `groupCompared` not or wrongly counted, a failed record keeping its presence or its hashes, engine B's
+    DISPCAPCNT decoded, any version accepted, the 3D decode's masks dropped, and `g3d.list`'s words dropped, swapped
+    or moved.
+  - xxHash: the pinned archive, GitHub's of the tag `v0.8.3`, has the SHA-256 `xxhash.cmake` holds
+    (`aae608dfe8213dfd05d909a57718ef82f30722c392344583d3f39050c7f29a80`), the tag's commit `e626a72bc2` as its
+    embedded commit id, and an `xxhash.h` byte for byte melonDS 1.1's bundled copy and the header the change first
+    vendored (SHA-256 `17973c0dc49d9854ca26caa191f0e12f7a424b68858d9a78de3860d959d85e4b`). The change's check of the
+    header against 17 of xxHash's own XXH3-64 sanity vectors therefore holds; the test keeps the 9 with seed 0.
   - T3, T4, T5 and T7 not run: the digest is wired into neither program, so no replay, oracle sequence, sanitized
     route or playtest runs anything this change touches.
 - **Tiers/trap stubs:** not measured: no game code changed.
 - **64-bit warnings:** the pointer cast guard passes in both games, and `check_ptrcasts.py --build-dir
-  build/port-verify-b2_us --report` gives 365 sites in 229 keys (real 66, harmless 123, handled 141, unreachable 35),
-  1,711 files compiled and none missing, on the change and on the merge of main: no change.
+  build/port-verify-b2_us --report` gives 365 sites in 229 keys (real 66, harmless 123, handled 141, unreachable
+  35), 1,711 files compiled and none missing, on each head: no change.
 - **Work done:** verification v2's first part, the canonical digests, which need no ROM:
   - **[ADR 0031](adr/0031-per-game-frame-digests-against-a-content-addressed-oracle-cache.md), proposed:** a digest of
     the DS's state at each game frame, taken at the last VBlank of each count and compared exactly, with oracle runs in
@@ -89,28 +103,38 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     from its own model; the port's register bytes decoded as melonDS 1.1's writes store them; the encoding to
     canonical bytes with melonDS's masks and decodes, the list's vertices dereferenced, the depth the Z-buffer's and 0
     where W is 0, and the VRAM a capture of 3D holds zeroed; the hash, XXH3-64 with seed 0; the stream,
-    `#pbwdigest 1`, its writer and reader, and a comparison by count for one row per count. The last-VBlank pairing,
-    the lags and the declarations are the next part's.
-  - **xxHash 0.8.3's `xxhash.h`, vendored** as `port/third_party`'s first library, unmodified, with its BSD-2-Clause
-    license and its version, origin (melonDS 1.1's pinned archive) and SHA-256 in
-    [port/third_party/README.md](../third_party/README.md): the convention ADR 0031 proposes for vendored code.
+    `#pbwdigest 1`, its writer and reader, and a comparison by count for one row per count that stops where a group
+    differs or where the actual stream lacks a group the expected one holds. The last-VBlank pairing, the lags and the
+    declarations are the next part's.
+  - **xxHash 0.8.3, fetched at configure time** as minicoro is (`port/tools/oracle/xxhash.cmake` pins it by tag and
+    SHA-256, `port/cmake/oracle.cmake` fetches it onto a system include path), after the review found that the
+    repository's convention for third-party code, a single header like xxHash's included, is a pinned fetch: the change
+    had vendored it as `port/third_party`'s first library, which is gone.
+  - **The review's other findings:** the comparison reports missing groups and counts each group's comparisons
+    (`pbw_digest_record_missing`, `missing`, `groupCompared`); a record that can't be encoded holds no group; the
+    reader checks the version against `PBW_DIGEST_FORMAT`; `digest.h`, the oracle README and the ADR say that
+    `ToScreen` clamps the depth without melonDS's cut to 32 bits, a difference for vertices whose clip W is 2^24 or
+    more; the oracle README lists every store melonDS 1.1 drops; the 3D registers' source, engine B's DISPCAPCNT and
+    the stream's lack of a lag column are described as they are.
   - **Tests:** `digest_format_plain` and `digest_format_sanitized` (`port/cmake/oracle.cmake`), which CI runs on
     every host.
-  - **Documents:** the oracle README's "Digests" (the groups, their canonical bytes, the rules, the stream), the test
-    guide's row, ARCHITECTURE.md's feature map row and `third_party/`, the directory map, the documents' and ADR
-    indexes, the glossary, and the CMake and tools guides.
-- **Next:** verification v2's second part (ADR 0031): `--digest` in both programs, taken at the last VBlank of each
-  count, `compare.py`'s pairing with the sequences' lags and declarations, and the declarations of the opening, the
-  title and aspertia in both versions. Phase 5's story coverage after the Route 20 save stays the phase's earliest
-  unmet exit criterion.
-- **Blockers:** decisions the owner holds: ADRs 0022, 0023, 0025, 0030 and 0031 are proposed, and 0031's six defaults
-  wait for the owner's confirmation. Spanish issue 45 still lacks a local dump.
+  - **Documents:** the oracle README's "Digests" (the groups, their canonical bytes, the rules, the depth, the stores
+    melonDS drops, the stream and the comparison) and its file table, the test guide's row, ARCHITECTURE.md's feature
+    map row, the documents' and ADR indexes, the glossary, and the CMake and tools guides.
+- **Next:** before verification v2's second part compares lists, `ToScreen` (`port/gfx/ge/ge.c`) cuts the depth's
+  product to 32 bits before its clamp, as melonDS does, in a change of its own with its replays. Then the second part
+  (ADR 0031): `--digest` in both programs, taken at the last VBlank of each count, `compare.py`'s pairing with the
+  sequences' lags and declarations, the declarations of the opening, the title and aspertia in both versions, and
+  xxHash's notice in what the program and the macOS app carry. Phase 5's story coverage after the Route 20 save stays
+  the phase's earliest unmet exit criterion.
+- **Blockers:** decisions the owner holds: ADRs 0022, 0025, 0030 and 0031 are proposed (0023 was accepted in PR 70),
+  and 0031's six defaults wait for the owner's confirmation. Spanish issue 45 still lacks a local dump.
 
 ## 2026-11-01: ADR 0023 accepted under the owner's Ship of Harkinian rule
 
 - **Upstream:** `41f42ca1af`, as reviewed main `10d017c010` (PR 67's merge) has it. This branch takes upstream's
   commits only through its merges of reviewed main and imports none of its own.
-- **Port:** `PORT_SHA`, on `port-adr0023-accepted` from reviewed main `e733ccc8a3`. Reviewed main was merged in
+- **Port:** `cfb45c1be4`, on `port-adr0023-accepted` from reviewed main `e733ccc8a3`. Reviewed main was merged in
   twice: `d19894b1f7` once PRs 68 and 69 had landed, then `10d017c010` once PR 67 had. This entry fills the last
   entry's `PORT_SHA` with `f53e767509`. This branch's own changes are documentation only, all of it in `port/docs/`.
   The merges bring:
