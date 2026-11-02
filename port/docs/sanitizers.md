@@ -338,6 +338,18 @@ input, names the cause, a write into the field heap between its blocks, and the 
 | --- | --- | --- | --- |
 | H9 | `src/ov129/sp_poke_gimmick.c:235`, `SpPokeGimmickB_Init`, from `FieldRoutine_MapLoad` as the café loads | Allocates the special Pokémon gimmick's work block 1 at the DS's size of `SpPokeGimmickWork`, 0x30, and writes its curve's address at offset 56, which a host's pointers put 8 bytes past the block (ASan, use-after-poison, a write of 8): the head of the field heap's next free block, whose free list then lost the rest of the heap, so the scene's first file read found it full | Fixed in the game's file: `sizeof(SpPokeGimmickWork)`, which is 0x30 on the DS ([game-changes.md](game-changes.md)); `integrate_sp_poke_gimmick` gives each gimmick a block of exactly its size under ASan. The café loads, and the strict build runs its 2,200 frames without a report ([STATUS.md](STATUS.md)) |
 
+### Main's first baseline of T5's set
+
+On 2026-11-02 [../tools/strict_routes.py](../tools/strict_routes.py) ran T5's set as
+[ADR 0033](adr/0033-sanitizer-clean-replays-by-the-strict-routes-and-the-program-alone.md) (proposed) defines it, on
+`9672f23751` (`main` at `c6fcdd3f59` with this runner; `port/`, `src/`, `lib/` and `include/` clean), in the strict
+build of each game (Homebrew clang 23.1.3, `RelWithDebInfo`, `PORT_SANITIZE=ON`, `PORT_SANITIZE_RECOVER=OFF`), with
+`ASAN_OPTIONS=detect_leaks=1:detect_stack_use_after_return=1`, two runs at a time: ctest's routes that need no oracle,
+17 in Black 2 and 15 in White 2, then the program alone in 16 cases of 147,920 frames in each game, from the oracle's
+saves held to their SHA-1s and from the saves that the round trips' make legs left. Every case of both games was
+clean, with no report: Black 2's 33 in 1,935 s and White 2's 31 in 1,958 s, of wall time. With no report there is no
+new row above; each case's frames and time are in [STATUS.md](STATUS.md)'s entry of the day.
+
 ### The reports' lines
 
 The tables above give each report's site as the report gave it: a file and a line of the tree the build ran on. The

@@ -32,11 +32,142 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-11-02: T5's set in a strict build, its runner, and main's first baseline (T5-A)
+
+- **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit. Reviewed main is `c6fcdd3f59`, PR 75's
+  merge, which this branch merges; it started from `e936696a97`, PR 71's.
+- **Port:** `PORT_SHA`, on the topic branch `port-t5-strict-routes` from `e936696a97`: `9c7883345a` (the runner, its
+  test and its documents), `7cb1ec868f` (`port/tests/rom/test_backup.c`'s unread `sReplyData`, the warning that
+  stopped the first strict build), `a8d1fc6d38` (the merge of `main` at `c6fcdd3f59`, PR 75: the documents' hygiene
+  and their check in CI), `cbfd020fec` (the runner as the decisions PR's ADR 0033 has it: ctest's routes run by it
+  too, the function check before a run counts, a trap stop failed), `365f507e72` (a comment), `70d20f04d2` (an
+  assertion where a mutant's test erred), `9672f23751` (the build directory taken whole, the first calibration's
+  finding), and this record. This entry fills the last entry's, PR 75's, `PORT_SHA` with `7d87f98b8c`. Nothing
+  outside `port/` changes but PR 75's two files under `.github/`, which the merge brings.
+- **ROM (T0):** `python3 configure.py && ninja` on commit 1's tree, every step run (14,039) at load averages of 50 to
+  95: both original US SHA1s, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, no compiler warning; again on `a8d1fc6d38`, `cbfd020fec`, `365f507e72`
+  and `9672f23751` (2 steps each, the checks: nothing they change is a ROM input), the same SHA1s and no warning.
+- **Host build (T1):** the strict builds, `Homebrew clang version 23.1.3`, `RelWithDebInfo`, `-DPORT_SANITIZE=ON
+  -DPORT_SANITIZE_RECOVER=OFF`, each game in a tree of its own. Black 2 with the oracle (`build/port-san`, 776 MB):
+  2,116 steps on commit 1's tree, 749 warnings, 540 in `src/`, 208 in `lib/` and one in `port/`,
+  `port/tests/rom/test_backup.c:54`'s `-Wunused-but-set-global` (the stop); with its fix, the rebuilds of
+  `port_card_backup_tests` and of the merged tree compile with no warning. White 2 without the oracle
+  (`build/port-san-w2`, 738 MB), fresh on `a8d1fc6d38`: 748 warnings, 540 in `src/` and 208 in `lib/` (5 of them
+  reached as `port/../lib/`), none in `port/`. The fixed file compiles with no warning in both games by Homebrew clang
+  23.1.3 with the strict flags and by Apple clang 21 without the sanitizers' (its command from the strict tree's
+  `compile_commands.json`). Both strict programs import UBSan's `___ubsan_handle_function_type_mismatch_abort`
+  (`nm -u`), the function check that the runner looks for. The plain builds of both games are the exact-head
+  verification's (below).
+- **Tests:**
+  - T2/T6, strict: `ctest -LE 'route|oracle'` with `CTEST_PARALLEL_LEVEL=3` on `cbfd020fec`: Black 2 362 of 364 pass in
+    318 s and White 2 362 of 364 in 380 s, `asm_oracle` (no Unicorn in this Python) and `app_universal_slices` (one
+    slice) skipping as declared; among the passes `strict_routes_tool`, `game_ptrcasts` (the pointer cast guard) and
+    the 27 `card_backup_*` tests of the fixed file, in both games.
+  - `strict_routes_tool` (`python3 port/tests/tools/test_strict_routes.py`, Python 3.14.6): 36 tests pass in 19 to 26 s
+    at load averages of 20 to 25, and both files parse under Python 3.11's grammar. Nothing the test prints matches a
+    report's expression. Each of its 23 mutants (`MUTANTS`: the status, the markers or the frames not checked, the
+    start save's SHA-1 not checked, a missing save taken as clean, the produced save not passed on, a survey build or
+    Apple clang accepted, equal cases not merged or a merge across input files, the caller's `ASAN_OPTIONS` kept, the
+    markers one short, the referenced sequences not left out, an unchanged produced save accepted, the preflight
+    skipped, `:` kept in the directories' names, the function check not looked for, an allowed trap stop accepted,
+    ctest's failures or skips counted clean, ctest run without the criterion's options or not at all, the build
+    directory left relative) fails its tests by an assertion, with no error, and the runner as it is passes them. In
+    CI on `cbfd020fec` it passed on `windows-2025` (17.1 s), `ubuntu-26.04` (12.5 s) and the sanitized `ubuntu-26.04`
+    job (14.5 s).
+  - T3: the exact-head verification (`sync_upstream.sh --verify-pr 81`) runs on the pull request's head.
+  - T5, by `port/tools/strict_routes.py` on `9672f23751` (`port/`, `src/`, `lib/` and `include/` clean),
+    `ASAN_OPTIONS=detect_leaks=1:detect_stack_use_after_return=1`, the saves copied from the machine's pinned cache,
+    each held to `SAVES` (and `oracle.py save`, which reused all six in each game without running melonDS):
+    - The calibration, `run --build-dir DIR --only continue`: `seq:continue` clean in both games, 3,900 frames in
+      23.4 s (Black 2) and 24.4 s (White 2), about 10,000 frames a minute; the timeout stays 3,600 s, which the
+      longest case, 34,600 frames, is far inside. Its first attempt, on `70d20f04d2`, failed at once in both games
+      with no program run (the relative build directory; fixed in `9672f23751`, above).
+    - The controls, Black 2: (a) an empty save cache, 77, no program run, the `oracle.py save` command printed; (b) a
+      save with one byte changed, 1, naming `01f8ad065ee7...` and the kept `a7a58889e239...`; (c) a copied cache with
+      `PORT_SANITIZE:BOOL=OFF`, 2; (d) the caller's `ASAN_OPTIONS=detect_leaks=0`, dropped with a notice, the run
+      clean under the criterion's options; (e) `--timeout 10`, 1, "timeout after 10 s, killed", and `pgrep -f` of the
+      program's whole path finds nothing after it; (f) a copied cache from another checkout, 2.
+    - The baseline, `run --build-dir DIR --jobs 2 --timeout 3600`, each game after the load check (a 1-minute load
+      average of 20 or less): Black 2 from 12:13:42 (load 16.4) to 12:45:57 (load 8.1), 1,935 s, and White 2 from
+      12:45:58 (load 7.6) to 13:18:36 (load 22.8), 1,958 s. ctest's routes that need no oracle, 17 in Black 2 and 15
+      in White 2 (`ctest -N -L route -LE oracle`), then the 16 program-alone cases, 147,920 frames, in each: every
+      case clean, no report, exit 0 in both games:
+
+  | Case | Frames | Black 2 | White 2 |
+  | --- | --- | --- | --- |
+  | `ctest:replay_start_menu_clean` | - | clean, 0.0 s | clean, 0.0 s |
+  | `ctest:replay_start_menu` | - | clean, 17.8 s | clean, 14.5 s |
+  | `ctest:replay_new_game_clean` | - | clean, 0.0 s | not in this game |
+  | `ctest:replay_new_game` | - | clean, 74.9 s | not in this game |
+  | `ctest:replay_new_game_house_clean` | - | clean, 0.0 s | clean, 0.0 s |
+  | `ctest:replay_new_game_house` | - | clean, 167.4 s | clean, 116.0 s |
+  | `ctest:replay_same_save` | - | clean, 63.3 s | clean, 42.0 s |
+  | `ctest:replay_same_save_complete` | - | clean, 92.1 s | clean, 58.5 s |
+  | `ctest:replay_starter_save` | - | clean, 741.1 s | clean, 391.3 s |
+  | `ctest:replay_recording` | - | clean, 228.8 s | clean, 86.9 s |
+  | `ctest:replay_recording_live` | - | clean, 45.0 s | clean, 20.4 s |
+  | `ctest:oracle_opening_hashes` | - | clean, 44.5 s | clean, 23.6 s |
+  | `ctest:oracle_title_hashes` | - | clean, 84.9 s | clean, 48.6 s |
+  | `ctest:oracle_aspertia_hashes` | - | clean, 335.7 s | clean, 201.1 s |
+  | `ctest:oracle_sound_opening_hashes` | - | clean, 30.4 s | clean, 39.1 s |
+  | `ctest:oracle_sound_title_hashes` | - | clean, 36.2 s | clean, 66.7 s |
+  | `ctest:smoke_reaches_game_main` | - | clean, 0.9 s | clean, 1.3 s |
+  | `seq:continue` | 3,900 | clean, 33.2 s | clean, 59.0 s |
+  | `seq:continue_starter` | 3,900 | clean, 35.9 s | clean, 66.3 s |
+  | `seq:field_menus` | 5,200 | clean, 41.6 s | clean, 81.4 s |
+  | `seq:party_menus` | 8,500 | clean, 98.8 s | clean, 141.1 s |
+  | `seq:hugh` | 8,200 | clean, 97.8 s | clean, 146.1 s |
+  | `seq:route19` | 15,400 | clean, 270.0 s | clean, 295.0 s |
+  | `seq:catch_continue` | 4,700 | clean, 39.4 s | clean, 103.5 s |
+  | `seq:floccesy_continue` | 4,700 | clean, 40.5 s | clean, 92.4 s |
+  | `seq:center_continue` | 3,610 | clean, 31.6 s | clean, 63.1 s |
+  | `seq:pc` | 11,600 | clean, 130.2 s | clean, 196.7 s |
+  | `trip:catch:make` (also `seq:catch`) | 11,600 | clean, 150.5 s, its save `7dccc2407c3c` | clean, 218.3 s, its save `3ab0a1aa07b1` |
+  | `trip:catch:continue` | 4,700 | clean, 39.6 s | clean, 75.3 s |
+  | `trip:floccesy:make` (also `seq:floccesy`) | 34,600 | clean, 531.2 s, its save `902e95eaa5e9` | clean, 674.4 s, its save `ae17781116ca` |
+  | `trip:floccesy:continue` | 4,700 | clean, 38.2 s | clean, 76.1 s |
+  | `trip:hugh:make` | 19,000 | clean, 262.9 s, its save `14c53a153c06` | clean, 385.7 s, its save `c8bbffec71f3` |
+  | `trip:hugh:continue` | 3,610 | clean, 25.3 s | clean, 56.3 s |
+
+  - T4 not run, and none is due: no file this change touches is game C or under `port/tools/oracle/`, the one C file
+    is a unit test's (`port_card_backup_tests`), and no oracle test runs any of them. T7 not run: no playtest is due.
+- **Tiers:** not measured: no game C changes.
+- **Trap stubs:** 25 function stubs and 1 data placeholder (`CARDi_NdmaInterface`) in each version's generated
+  `stubs.c`, as on `main`; no case stopped on one.
+- **64-bit warnings:** the pointer cast guard passes in both strict trees (`game_ptrcasts`, above); its `--report` line
+  is the exact-head verification's, of `build/port-verify-b2_us`.
+- **Work done:** phase 5's T5-A, T5's set as the decisions PR's ADR 0033 (proposed) defines it:
+  - **`port/tools/strict_routes.py`** runs T5's set in a strict build, both halves with the criterion's
+    `ASAN_OPTIONS` in place of the caller's sanitizer options: ctest's routes that need no oracle (`ctest -L route
+    -LE oracle --parallel N`, read back from ctest's JUnit file), then the program alone on each comparison sequence
+    of `oracle.py` without a `_hashes` reference for the version and on both of the port's legs of each round trip,
+    each from the save it starts from (the oracle's cache, held to `SAVES`' SHA-1s, or the make leg's own save), the
+    same start and input file run once at the largest frame count (`catch` and `floccesy` run as their round trips'
+    make legs). It refuses a build that isn't strict, Apple clang, a program that doesn't run under ASan and one
+    without UBSan's function check among its symbols; fails a trap stop even where a sequence allows one; skips with
+    the `oracle.py save` command for a missing save; never runs melonDS or makes a save; and writes a table of the
+    cases. `--only NAME` runs one case or one of ctest's routes, a pull request's own T5.
+  - **`port/tests/tools/test_strict_routes.py`** (`strict_routes_tool`, `port/cmake/strict_routes.cmake`, no label,
+    so CI runs it on every host): 36 tests on the real tables, made-up ones and stand-ins for the program and ctest,
+    and the 23 mutants.
+  - **`port/tests/rom/test_backup.c`**: `sReplyData`, set and never read, is gone. The ARM9's only reader of the FS
+    tag's words, `CARDi_OnFifoRecv` (`lib/nitro/src/card/card_request.c`), reads the tag and the error bit, and the
+    result travels in the command block, which the scenarios check.
+  - **Documents:** sanitizers.md (running T5's set, Phase 5's criterion, and the baseline under "What it found"), the
+    guides of `port/tools`, `port/tests`, `port/tests/tools` and `port/cmake`, the glossary ("Strict build, strict
+    run"), the documents index's sanitizers.md row, ARCHITECTURE.md's T5 row and lessons.md. ADR 0033 and its index
+    rows are the decisions PR's (PR 80); the links to it resolve once that PR merges.
+- **Next:** the decisions PR (PR 80) for the owner, whose ADR 0033 this implements; then the story's next piece, whose
+  pull request runs its new cases as its T5 (`strict_routes.py run --only NAME` in both games); the save lab's
+  stations join T5's set once L2 lands (ADR 0033, item 1).
+- **Blockers:** none for this change. ADR 0033 is proposed: the owner decides it in PR 80.
+
 ## 2026-11-02: PR 74's follow-ups for the documents, and a check of their links and tables in CI
 
 - **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit. Reviewed main is `e936696a97`, PR 71's
   merge, which this branch merges; it started from `d1717b68d8`, PR 74's.
-- **Port:** `PORT_SHA`, on the topic branch `port-docs-hygiene-1102` from `d1717b68d8`: `3c7a8f10dd` (the documents
+- **Port:** `7d87f98b8c`, on the topic branch `port-docs-hygiene-1102` from `d1717b68d8`: `3c7a8f10dd` (the documents
   check, its tests and its CI steps), `991c2e6725` (the follow-ups, and this entry), `2f9a0dbb11` (the merge of `main`
   at `e936696a97`, PR 71: the save lab's minter and reader, all in `port/`), `08bfb919e2` (the check's summary in the
   singular for one document), `1fddd1c0fc` (this record's update after the merge), `a34cc8634a` (the fixes of the
