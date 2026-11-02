@@ -34,31 +34,40 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 ## 2026-11-02: ToScreen cuts the depth to 32 bits before its clamp, as melonDS does
 
-- **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit. Reviewed main is `e936696a97`, PR 71's
-  merge, which this branch merges; it started from `d1717b68d8`, PR 74's.
+- **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit. Reviewed main is `2d3b99c9ee`, PR 77's
+  merge, which this branch merges, as it merged `e936696a97` (PR 71's) and `c6fcdd3f59` (PR 75's) before; it started
+  from `d1717b68d8`, PR 74's.
 - **Port:** `PORT_SHA`, on the topic branch `port-ge-depth-cut` from `d1717b68d8` (PR 74's merge): `16c3658344`, the
-  change and this entry; `fcd13612a5`, the merge of `main` at `e936696a97` (PR 71, the save lab's L1, all in `port/`),
-  which kept STATUS.md's new entries both, this one first; `bb91cfe0d1`, this record's update after it; and the
-  review's fixes, comments and documents only, with this record's last update (below). This entry fills the
-  `PORT_SHA` of PR 71's entry with `a9d91adf59`, and PR 74's with `6eef75c290`, as PR 71's entry does. Only `port/`
-  changes.
+  change and this entry; `fcd13612a5`, the merge of `main` at `e936696a97` (PR 71, the save lab's L1, all in `port/`);
+  `bb91cfe0d1`, this record's update after it; `69422db812`, the review's fixes, comments and documents only;
+  `73af430f22`, the merge of `main` at `c6fcdd3f59` (PR 75, the documents check and PR 74's follow-ups for the
+  documents, all in `port/` but for the landing page and `port-ci.yml`); `8aeaad6aa0`, the merge of `main` at
+  `2d3b99c9ee` (PR 77, Youngster Terrell's battle held to melonDS, all in `port/`); and this record's update after it.
+  Each merge kept STATUS.md's new entries both, this one first. This entry fills the `PORT_SHA` of PR 77's entry with
+  `a7d768e2ee`, as the rule gives it; PR 75's (`7d87f98b8c`, which PR 77's merge gives too), PR 71's (`a9d91adf59`)
+  and PR 74's (`6eef75c290`) were filled the same way. Only `port/` changes.
 - **ROM (T0):** `python3 configure.py && ninja` in this branch's new worktree, every step run (14,039): both original US
   SHA1s, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, with no
-  compiler warning; and again on the merge with `main`, which changes nothing outside `port/` (2 steps, the two checks),
-  the same SHA1s, as again on the review's fixes (2 steps). This change has no ROM input.
+  compiler warning; and again on the merge with `main` at `e936696a97`, which changes nothing outside `port/` (2 steps,
+  the two checks), the same SHA1s, as again on the review's fixes and on the merges at `c6fcdd3f59` and `2d3b99c9ee`
+  (2 steps each), whose changes outside `port/` are no ROM input either. This change has no ROM input.
 - **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both versions, plain (`build/port`, `build/port-w2`)
   and with the oracle (`build/port-oracle`, `build/port-oracle-w2`, `-DPORT_BUILD_ORACLE=ON -DPORT_SANITIZE_RECOVER=OFF
   -DPORT_FRAME_TIME_REPORT_ONLY=OFF`), Apple clang, ninja at `-j4`, pass with 748 compiler warnings each, all in the
   decomp's C of `src/` and `lib/`, as on `main`; `ge.c` and the tests compile with none, and the four builds' rebuilds
-  on the merge, PR 71's layout program among them, with none. On the review's fixes, `build/port` and `build/port-w2`
-  rebuild with no warning, compiling only the digest's tests (`digest.c` and `test_digest.c`, plain and sanitized).
+  on the merge at `e936696a97`, PR 71's layout program among them, with none. On the review's fixes, `build/port` and
+  `build/port-w2` rebuild with no warning, compiling only the digest's tests (`digest.c` and `test_digest.c`, plain and
+  sanitized); on the merge at `c6fcdd3f59`, which changes no build input, the plain builds have nothing to build and
+  the oracle builds, not rebuilt for the review's fixes, compile only those tests, with no warning; on the merge at
+  `2d3b99c9ee`, PR 77's `oracle.cmake` configures the four builds again and none has anything to compile.
 - **Tests:**
-  - T2/T6: `ctest -LE route` (`CTEST_PARALLEL_LEVEL=3`) on the merge: 358 of 365 tests pass in each version, and 7 skip
-    for the optional setups this checkout lacks, as in the last entries (`asm_oracle`, `oracle_boot`, `oracle_saves`,
-    `oracle_floccesy_save`, the two function-sanitizer negatives of the VM dispatch and `app_universal_slices`); none
-    fails. The 365 include PR 71's `lab_savelab`, and `g3d_ge`, `g3d_ds3d`, `g3d_ds3d_bands` and the digest's tests,
-    each with its sanitized twin. In the oracle builds, `ctest -LE 'route|oracle'`: 358 of 362 pass in each version and
-    4 skip (`asm_oracle`, the two negatives and `app_universal_slices`).
+  - T2/T6: `ctest -LE route` (`CTEST_PARALLEL_LEVEL=3`) on the merge at `e936696a97`: 358 of 365 tests pass in each
+    version, and 7 skip for the optional setups this checkout lacks, as in the last entries (`asm_oracle`,
+    `oracle_boot`, `oracle_saves`, `oracle_floccesy_save`, the two function-sanitizer negatives of the VM dispatch and
+    `app_universal_slices`); none fails. The 365 include PR 71's `lab_savelab`, and `g3d_ge`, `g3d_ds3d`,
+    `g3d_ds3d_bands` and the digest's tests, each with its sanitized twin. In the oracle builds, `ctest -LE
+    'route|oracle'`: 358 of 362 pass in each version and 4 skip (`asm_oracle`, the two negatives and
+    `app_universal_slices`).
   - `g3d_ge` and `g3d_ge_sanitized`: 670 checks each, 14 of them the new depth cases (below). Negative controls, each
     the new test file built against another `ge.c`: `main`'s fails 8 of the 14, the 8 whose depth changes (W 0 and 2^24,
     and six products past 32 bits); one with the cut but the old 0 where W is 0 fails the 2 W cases; one with melonDS's
@@ -76,11 +85,12 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     that change (6 at W 0, 18 cut), so its zeros are counts. The fix changes no output, so T3 must pass unchanged and T4
     is the milestone check, for the opening, the title and aspertia in both versions.
   - T3: `ctest -L route -LE 'oracle|timing'` (`CTEST_PARALLEL_LEVEL=3`): on the counter's build, the change's `ge.c`
-    with the counter added, Black 2 17 of 17 and White 2 15 of 15 pass, and on the merge's build the same, their
-    references unchanged.
-  - T4: `ctest -R '^oracle_(opening|title|aspertia)$'` in the oracle builds, on the merge, one or two at a time under
-    the machine's rule; all six pass. Black 2: the opening 3,800 of 3,800 frames (3,526 exact, 274 with 3D within the
-    tolerance), 3D 17 pixels beyond the tolerance at the median and 58 at most, NNS_G3dGlb 274 of 274 equal; the title
+    with the counter added, Black 2 17 of 17 and White 2 15 of 15 pass, and on the build of the merge at `e936696a97`
+    the same, their references unchanged.
+  - T4: `ctest -R '^oracle_(opening|title|aspertia)$'` in the oracle builds, on the merge at `e936696a97`, one or two
+    at a time under the machine's rule; all six pass. Black 2: the opening 3,800 of 3,800 frames (3,526 exact, 274 with
+    3D within the tolerance), 3D 17 pixels beyond the tolerance at the median and 58 at most, NNS_G3dGlb 274 of 274
+    equal; the title
     3,579 of 3,579 frames (1,474 exact, 2,105 with 3D within the tolerance), 3D 17 pixels beyond the tolerance at the
     median and 80 at most, NNS_G3dGlb 2,470 of 2,470 equal; aspertia 15,708 of 15,708 frames (8,469 exact, 6,846 with 3D
     within the tolerance, 393 with the top screen left out), 3D 0 pixels beyond the tolerance at the median and 80 at
@@ -98,12 +108,21 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     builds, 358 of 365 pass in each version and the same 7 skip, none failing, `game_ptrcasts`, `g3d_ge` and
     `digest_format` among the passes. The oracle builds aren't rebuilt and T3 and T4 aren't run again: no compiled code
     changes, and neither program compiles `digest.h` yet.
+  - On the merges with `main`. At `c6fcdd3f59`: T2 as above, 358 of 365 in each version, the same 7 skipping, none
+    failing; the documents check, `python3 port/tools/check_docs.py`, "98 documents, 1 problem (1 allowed), 0
+    allowlist rows to fix", its tests 43 of 43 and the sync tooling tests 64 of 64; and T4's Black 2 half, its three
+    sequences with the counts above, its White 2 half held back while PR 77's verification ran. At `2d3b99c9ee`: T2
+    again, the same 358 of 365 in each version, 7 skipping and none failing; the documents check again, the same line;
+    and T4 in full, at most two runs at a time under the machine's rule, all six passing with the counts above, the
+    pixels beyond the tolerance (median and most) and the NNS_G3dGlb dumps compared, none differing, included. T3 runs
+    in the exact-head verification.
 - **Tiers:** not measured (no progress scan); no game C changes.
 - **Trap stubs:** 25 function stubs and 1 data placeholder (`CARDi_NdmaInterface`) in each version's generated
   `stubs.c`, as on `main`; no run stopped on one.
 - **64-bit warnings:** `check_ptrcasts.py --build-dir build/port --report` passes with 365 sites in 229 keys (real 66,
   harmless 123, handled 141, unreachable 35), 1,713 files compiled and none missing, the last entry's figures, and the
-  same on `build/port-w2`; the guard (`game_ptrcasts`) passes again in both versions' T2 on the merge.
+  same on `build/port-w2`; the guard (`game_ptrcasts`) passes again in both versions' T2 on both merges and on the
+  review's fixes.
 - **Work done:** verification v2's first part (PR 72) found that the geometry engine's `ToScreen` (`port/gfx/ge/ge.c`)
   clamped the depth's 64-bit product, where melonDS 1.1, the oracle's pin, keeps the product in a 32-bit signed integer
   before its clamp, and its entry planned the fix as a change of its own with its replays, before the second part
@@ -145,15 +164,27 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     the same way on both sides, for the same reason); the test guide's `g3d` row names `g3d_ge` for the cut and
     `g3d_ds3d` for the interpolation, in one band of lines and in three; and ADR 0031's header gets a dated note of
     its two corrected notes. No compiled code changes.
+  - **Main moved twice more:** PR 75 merged while `69422db812`'s exact-head verification ran, which was stopped (its
+    status says so) since that head no longer contained `main`. `73af430f22` merges `main` at `c6fcdd3f59`: only
+    STATUS.md conflicted, both new entries kept; the test guide and the oracle README merge without a conflict, this
+    branch's `g3d` row and depth paragraph beside PR 75's changes. PR 75 changes no build input, but its files include
+    the oracle README and tools under `port/tools/`, so T4 ran again. Its White 2 half was held back while PR 77's
+    verification ran, since PR 77 would move `main` again before this branch's could finish, and it did:
+    `8aeaad6aa0` merges `main` at `2d3b99c9ee` the same way, STATUS.md alone conflicting. PR 77 changes `oracle.py`,
+    `oracle.cmake` and the oracle's inputs, so T4 runs again in full on that merge.
 - **Next:** verification v2's second part (ADR 0031), which compares lists with the depth now computed the same way on
   both sides: `--digest` in both programs, taken at the last VBlank of each count, `compare.py`'s pairing with the
   sequences' lags and declarations, the declarations of the opening, the title and aspertia in both versions, and
   xxHash's notice in what the program and the macOS app carry. Phase 5's story coverage after the Route 20 save stays
-  the phase's earliest unmet exit criterion, each trainer battle cut where ADR 0023 says.
+  the phase's earliest unmet exit criterion, each trainer battle cut where ADR 0023 says, its next steps after
+  Terrell's battle as PR 77's entry gives them. L2's stations and the documents' follow-ups stay as PR 71's and PR
+  75's entries give them.
 - **Blockers:** none for this change. Decisions the owner holds: ADRs 0022, 0025, 0030 and 0031 are proposed (0031's six
   defaults wait for the owner's confirmation); the follow-up on the guides needs the owner's wording of the delegation
-  for port/CLAUDE.md; the save lab's design decisions come with its L2 and ADR 0032, as PR 71's entry says; and Spanish
-  issue 45 still lacks a local dump.
+  for port/CLAUDE.md; the save lab's design decisions come with its L2 and ADR 0032, as PR 71's entry says; whether
+  escaping a record's pipes is a fix a record may take, and whether documents get a line limit, as PR 75's entry says;
+  the chained battles in Alder's house come with an ADR of their own, as PR 77's entry says; and Spanish issue 45
+  still lacks a local dump.
 
 ## 2026-11-02: Youngster Terrell's battle held to melonDS up to his AI's first moved decision
 
