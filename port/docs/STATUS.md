@@ -48,7 +48,11 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   which fills PR 66's entry's `PORT_SHA`, `887af99fe1`, the review's fix, which names the deliveryman's script command
   as upstream does (below), `3f6f842e2b`, the merge of `main` at `faad9927e8` (PR 68, which merged during the
   publishing run: ADR 0030 and the widescreen rules, documents only; STATUS.md's two new entries are both kept, this
-  one first), and this record's update, which fills PR 68's entry's `PORT_SHA`.
+  one first), `dccc1f2614`, this record's update, which fills PR 68's entry's `PORT_SHA`, `77adb2d205`, the merge of
+  `main` at `d19894b1f7` (PR 69, which merged during the next run: the verifier's pinned head and exit status and
+  `check_mwcc_neutral.py`'s stale worktrees, no ROM or host build input; STATUS.md's new entries again both kept, this
+  one first, and both filled PR 68's `PORT_SHA` alike), and this record's last update, which fills PR 69's entry's
+  `PORT_SHA`. `sync_upstream.sh` at PR 69's version validates and publishes this head.
 - **ROM (T0):** a fresh `configure.py` and ninja (14,039 steps) of the merge's tree: both original US SHA1s, B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, with no compiler
   warning. All 1,790 C files of `src/` and `lib/` are complete in both versions' delinks, so the SHA1s prove what MWCC
@@ -146,7 +150,7 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 - **Upstream:** `9496bc869b`, unchanged: this change merges no upstream commit. Reviewed main is `faad9927e8`, PR 68's
   merge.
-- **Port:** `PORT_SHA`, on the topic branch `port-verify-status-followups` from `e733ccc8a3` (PR 66's merge), with
+- **Port:** `2f9033d7b8`, on the topic branch `port-verify-status-followups` from `e733ccc8a3` (PR 66's merge), with
   reviewed main `faad9927e8` merged in; this entry fills the last entry's `PORT_SHA` with `d0833a7943`.
 - **ROM (T0):** configure and Ninja pass both original US SHA1s with zero compiler warnings: B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, in a full build
