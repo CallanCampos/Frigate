@@ -45,8 +45,10 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   the merge resolves); then `2a40413e7f` (the battle audit's keys), `48f72e208c` (comments and guides at the new
   names), `29c7e7fdb4`, the merge of `main` at `e733ccc8a3` (PR 66, which merged meanwhile: the local verification's
   failure statuses and the App token's `client-id` input, no ROM or host build input), `0350ba4ca3`, this record,
-  which fills PR 66's entry's `PORT_SHA`, and the review's fix, which names the deliveryman's script command as
-  upstream does (below) and brings this record up to date.
+  which fills PR 66's entry's `PORT_SHA`, `887af99fe1`, the review's fix, which names the deliveryman's script command
+  as upstream does (below), `3f6f842e2b`, the merge of `main` at `faad9927e8` (PR 68, which merged during the
+  publishing run: ADR 0030 and the widescreen rules, documents only; STATUS.md's two new entries are both kept, this
+  one first), and this record's update, which fills PR 68's entry's `PORT_SHA`.
 - **ROM (T0):** a fresh `configure.py` and ninja (14,039 steps) of the merge's tree: both original US SHA1s, B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, with no compiler
   warning. All 1,790 C files of `src/` and `lib/` are complete in both versions' delinks, so the SHA1s prove what MWCC
@@ -54,8 +56,8 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   (1,792 files, the libraries' assembly among them) with no warning or dead-strip error, and its dead-strip tests pass.
 - **Host build:** fresh arm64 macOS RelWithDebInfo builds of both versions of the merge's tree with the local
   verification's options (`build/port-verify-b2_us` and `-w2_us`), after the native fixes below. The commits after the
-  merge change only `port/`'s documents, a query, two comments and a message, and `main`'s merge no build input;
-  `sync_upstream.sh --no-push` builds and tests this head again before it is pushed.
+  merge change only `port/`'s documents, a query, two comments and a message, and `main`'s merges no build input;
+  `sync_upstream.sh` builds and tests this head again before it pushes it.
 - **Tests:** ctest, every test (`-j4`): Black 2 398, 369 passed and 29 skipped, White 2 395, 367 passed and 28
   skipped, none failed. Skipped: the 24 that need the melonDS oracle and `frame_times_party_menus`, which needs its
   saves (T4; `PORT_BUILD_ORACLE` is off, as in CI), the VM dispatch's native and verifier checks (Apple clang has no C
@@ -143,7 +145,7 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 ## 2026-11-01: widescreen kept possible: ADR 0030 proposed, the rules every change keeps, and documentation fixes
 
 - **Upstream:** unchanged, `9496bc869b87`; reviewed main `e733ccc8a3` (PR 66's merge).
-- **Port:** `PORT_SHA`, on the topic `port-widescreen-rules` from that main; this entry fills the last entry's
+- **Port:** `d0833a7943`, on the topic `port-widescreen-rules` from that main; this entry fills the last entry's
   `PORT_SHA` with `22d3464507`. Documentation only: nothing outside `port/` changes.
 - **ROM (T0):** configure/Ninja (`-j4`) and both original US SHA1s pass with zero compiler warnings, on reviewed main
   and again on this commit: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2
