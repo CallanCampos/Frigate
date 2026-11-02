@@ -11,8 +11,8 @@
 # --no-build implies --no-push; --no-push leaves the merge for local inspection.
 # Rewrite and reference overrides require the user's explicit decision (SYNC.md).
 # Exit status: 0 done, 1 failed, 2 invalid origin/destination, 3 conflict, 4 rewrite (of upstream, or of a draft's
-# upstream head), 5 references; with --verify-pr, 129, 130, 131 or 143 when a hangup, interrupt, quit or termination
-# stops it.
+# upstream head) or a moved topic, 5 references; with --verify-pr, 129, 130, 131 or 143 when a hangup, interrupt, quit
+# or termination stops it.
 set -euo pipefail
 
 PORT_REPO=CallanCampos/Frigate
@@ -250,6 +250,8 @@ fi
 workflow_changes=""
 summary_ready=0
 verification_pending=0
+# The summary's outcome when the run exits 4, which two checks give: each says which before it stops
+exit4_outcome="stopped (exit 4)"
 
 # Prints the fields of a port/docs/STATUS.md entry that a sync knows; the session fills in the others. A --verify-pr
 # run that stops before it records success records failure here first.
@@ -273,7 +275,7 @@ summary() {
     case "$status" in
         0) ;;
         3) outcome="stopped at a merge conflict" ;;
-        4) outcome="stopped: upstream rewrote its history" ;;
+        4) outcome=$exit4_outcome ;;
         5) outcome="stopped: commit messages name issues in other repositories" ;;
         *) outcome="FAILED (exit status $status)" ;;
     esac
@@ -400,6 +402,7 @@ merge_upstream() {
             say "Upstream no longer contains $last, the last upstream commit merged here; merging anyway" \
                 "(--allow-rewrite)"
         else
+            exit4_outcome="stopped: upstream rewrote its history"
             die 4 "upstream $UPSTREAM_BRANCH no longer contains $last, the last upstream commit merged here, so its" \
                 "history was rewritten. Nothing was merged. Read 'Upstream rewrite (exit 4)' under 'Conflicts and" \
                 "stopped syncs' in port/docs/SYNC.md, then run again with --allow-rewrite if a merge is right."
@@ -467,10 +470,13 @@ topic_status=0
 "$PYTHON" "$publish_helper" --check-topic "$branch" "$upstream_ref" || topic_status=$?
 case "$topic_status" in
     0) ;;
-    4) die 4 "origin's $branch is at a commit that neither upstream's $UPSTREAM_BRANCH nor this branch contains, so the" \
-        "push couldn't be a fast-forward: upstream rewrote a draft conflict proposal's commits, or the branch moved." \
-        "Nothing was merged. Close that PR and resolve the sync on a new codex/upstream-sync- name, as 'Draft" \
-        "conflict proposal (the hourly sync)' under 'Conflicts and stopped syncs' in port/docs/SYNC.md says." ;;
+    4)
+        exit4_outcome="stopped: origin's $branch can't take the push as a fast-forward"
+        die 4 "origin's $branch is at a commit that neither upstream's $UPSTREAM_BRANCH nor this branch contains, so" \
+            "the push couldn't be a fast-forward: upstream rewrote a draft conflict proposal's commits, or the branch" \
+            "moved. Nothing was merged. Close that PR and resolve the sync on a new codex/upstream-sync- name, as" \
+            "'Draft conflict proposal (the hourly sync)' under 'Conflicts and stopped syncs' in port/docs/SYNC.md says."
+        ;;
     *) die 1 "could not read origin's $branch; the publishing helper's message is above" ;;
 esac
 merge_upstream

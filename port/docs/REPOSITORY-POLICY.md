@@ -52,9 +52,11 @@ new head must be validated again.
 
 ### Delegated approval of App-authored sync PRs
 
-On 2026-11-01 the owner delegated the approval of the upstream sync PRs that the sync App authors. The maintainer
-session, the agent session that works with CallanCampos's credentials, may approve such a PR as CallanCampos and merge
-it with a merge commit once all of these hold:
+On 2026-11-01 the owner delegated the approval of the upstream sync PRs that the sync App authors to the maintainer
+session: the agent session that the owner directs in chat as Frigate's maintainer, and that answers to the owner for
+what it merges. It is a role, not an account. Every agent session on the owner's machine runs `gh` as CallanCampos,
+and that alone doesn't make it the maintainer session. The maintainer session may approve such a PR as CallanCampos
+and merge it with a merge commit once all of these hold:
 
 - it has reviewed the merge's conflict resolutions, the names the sync renames and the upstream range it merges;
 - every required check and the `Frigate local verification` status pass on the PR's exact head, the status inspected
@@ -78,10 +80,12 @@ port Actions are pinned to full commit SHAs. Automatic CI never substitutes for 
 contributor and sync PRs require explicit owner approval before merge, which for App-authored sync PRs the owner has
 delegated ([above](#delegated-approval-of-app-authored-sync-prs)).
 
-The replacement scheduled publisher uses a dedicated GitHub App to start ordinary PR CI automatically, while
-retaining owner review and local ROM verification. Its narrow installation/token scopes, secret names and setup
-are documented once in [SYNC.md](SYNC.md#set-up-the-dedicated-sync-app). It cannot post the required local status,
-approve PRs, merge, or bypass rules through this workflow. No PAT is used.
+The replacement scheduled publisher uses a dedicated GitHub App to start ordinary PR CI automatically, while review
+stays with the owner, or with the maintainer session under the delegation
+[above](#delegated-approval-of-app-authored-sync-prs), and local ROM verification with a maintainer. Its narrow
+installation/token scopes, secret names and setup are documented once in
+[SYNC.md](SYNC.md#set-up-the-dedicated-sync-app). It cannot post the required local status, approve PRs, merge, or
+bypass rules through this workflow. No PAT is used.
 
 The dedicated **Frigate Upstream Sync** App (ID `5435198`, installation `174325863`) is installed on Frigate alone.
 Its Contents/Pull requests write and automatic Metadata read scopes, empty webhook subscription list and selected

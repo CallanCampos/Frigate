@@ -4,14 +4,17 @@ Exercises the publishing helper port/tools/upstream_sync.py (preservation of nat
 of a conflicting upstream head, the upstream history and reference boundaries), the hourly sync workflow's App token
 (.github/workflows/port-sync.yml), the inherited style checker on mixed diffs, and port/tools/sync_upstream.sh
 --verify-pr with stubbed builds and gh: the commit statuses it records and the status it exits with when a build, a
-request to GitHub or a signal stops it. It also holds sync_upstream.sh's messages to port/docs/SYNC.md: each section
-they send the reader to (the stops at an upstream rewrite and at a cross-repository reference among them) must exist.
+request to GitHub or a signal stops it; and, offline, the summary sync_upstream.sh prints when one of its two exit-4
+checks stops it, which must name that check. It also holds sync_upstream.sh's messages to port/docs/SYNC.md: each
+section they send the reader to (the stops at an upstream rewrite and at a cross-repository reference among them) must
+exist, named in a form the test reads.
 """
 import importlib.util
 import json
 import os
 from pathlib import Path
 import re
+import shutil
 import signal
 import subprocess
 import tempfile
@@ -873,28 +876,36 @@ def sync_doc_sections(doc):
     return sections, anchors
 
 
+SECTION_NAME = re.compile(r"'([^'\n]+)'(?: under '([^'\n]+)')? in (?:port/docs/)?SYNC\.md")
+SECTION_ANCHOR = re.compile(r'SYNC\.md#([\w-]+)')
+
+
 def sync_doc_references(script):
     """What sync_upstream.sh names in SYNC.md: each section, as (name, heading) for "'Name' under 'Heading' in
-    port/docs/SYNC.md" or (name, '') for "'Name' in port/docs/SYNC.md", and each anchor of a SYNC.md#anchor. A message
-    that the script writes as several strings, one per line, is read as it prints them, joined by spaces, and so is a
-    comment that goes on over several lines."""
-    text = re.sub(r'"\s*\\\n\s*"', ' ', script)
-    text = re.sub(r'\n\s*#\s?', ' ', text)
-    names = re.findall(r"'([^'\n]+)'(?: under '([^'\n]+)')? in (?:port/docs/)?SYNC\.md", text)
-    return names, re.findall(r'SYNC\.md#([\w-]+)', text)
+    port/docs/SYNC.md" or (name, '') for "'Name' in port/docs/SYNC.md", each anchor of a SYNC.md#anchor, and each line
+    of code (a message, unlike a comment) that names SYNC.md in neither form, which nothing could check. A message that
+    the script writes as several strings, one per line, is read as it prints them, joined by spaces, and so is a comment
+    that goes on over several lines."""
+    code = re.sub(r'"\s*\\\n\s*"', ' ', script)
+    text = re.sub(r'\n\s*#\s?', ' ', code)
+    unread = [line.strip() for line in code.splitlines() if not line.lstrip().startswith('#')
+              and 'SYNC.md' in SECTION_ANCHOR.sub('', SECTION_NAME.sub('', line))]
+    return SECTION_NAME.findall(text), SECTION_ANCHOR.findall(text), unread
 
 
 class SyncDocSectionTests(unittest.TestCase):
     def missing(self, script, doc):
-        """The sections and anchors that script names and doc lacks, with every section name the script names."""
+        """What script names in SYNC.md and doc lacks, and each message that names SYNC.md in a form this test can't
+        read, with every section name the script names."""
         sections, anchors = sync_doc_sections(doc)
         labels = set().union(*sections.values())
-        names, linked = sync_doc_references(script)
+        names, linked, unread = sync_doc_references(script)
         missing = [f"'{name}' under '{heading}'" for name, heading in names
                    if heading and name not in sections.get(heading, ())]
         missing += [f"'{name}'" for name, heading in names
                     if not heading and name not in sections and name not in labels]
         missing += [f'#{anchor}' for anchor in linked if anchor not in anchors]
+        missing += [f'a message that names no section in a form this test reads: {line}' for line in unread]
         return missing, names
 
     def test_messages_name_sections_that_the_sync_document_has(self):
@@ -915,12 +926,91 @@ class SyncDocSectionTests(unittest.TestCase):
             'a label under another heading': (script.replace(exit5, exit5.replace('Conflicts and stopped syncs',
                                                                                   'Scheduled proposals')), doc),
             'an anchor the document lacks': (script + '# port/docs/SYNC.md#no-such-section\n', doc),
+            'a message that names its section in another form': (
+                script + 'say "see port/docs/SYNC.md, section \\"No such section\\""\n', doc),
+            'a message that names no section': (script + 'die 1 "read port/docs/SYNC.md first"\n', doc),
         }
         for case, (changed_script, changed_doc) in cases.items():
             with self.subTest(case=case):
                 self.assertNotEqual((changed_script, changed_doc), (script, doc), 'the control changes nothing')
                 self.assertNotEqual(self.missing(changed_script, changed_doc)[0], [])
         self.assertEqual(self.missing(script + '# port/docs/SYNC.md#conflicts-and-stopped-syncs\n', doc)[0], [])
+        # A comment isn't a message: it may name the document in any form
+        self.assertEqual(self.missing(script + '# see port/docs/SYNC.md, section "Anything"\n', doc)[0], [])
+
+
+class ShellStopSummaryTests(GitFixture):
+    """sync_upstream.sh without --verify-pr, offline: the summary it prints when a check stops it names that check. A
+    git wrapper sends the fetches and ls-remote of the two GitHub remotes to local bare repositories, so the script's
+    own checks still see GitHub's URLs."""
+
+    BRANCH = 'codex/upstream-sync-fixture'
+
+    def fixture(self):
+        for name in ('sync_upstream.sh', 'upstream_sync.py'):
+            self.write('port/tools/' + name, (MODULE.parent / name).read_text())
+        self.git('add', '.')
+        self.git('commit', '-m', 'Sync tools')
+        self.git('remote', 'add', 'origin', 'https://github.com/CallanCampos/Frigate.git')
+        self.git('remote', 'add', 'upstream', 'https://github.com/fuddlesworth/pokebw2.git')
+        remotes = Path(self.temp.name).parent / (self.root.name + '-remotes')
+        remotes.mkdir()
+        self.addCleanup(lambda: shutil.rmtree(remotes))
+        self.origin, self.upstream = remotes / 'origin.git', remotes / 'upstream.git'
+        for bare in (self.origin, self.upstream):
+            subprocess.run(['git', 'init', '-q', '--bare', str(bare)], check=True)
+        bins = remotes / 'bin'
+        bins.mkdir()
+        wrapper = bins / 'git'
+        wrapper.write_text(f'''#!/bin/sh
+case "$1" in
+  fetch|ls-remote)
+    exec "{shutil.which('git')}" -c "url.{self.origin}.insteadOf=https://github.com/CallanCampos/Frigate.git" \\
+      -c "url.{self.upstream}.insteadOf=https://github.com/fuddlesworth/pokebw2.git" "$@" ;;
+esac
+exec "{shutil.which('git')}" "$@"
+''')
+        wrapper.chmod(0o755)
+        # Local paths only: a request that the wrapper missed fails here rather than reaching GitHub
+        return dict(os.environ, PATH=str(bins) + os.pathsep + os.environ['PATH'], PYTHON='python3',
+                    GIT_ALLOW_PROTOCOL='file')
+
+    def sync(self, environment):
+        return subprocess.run(['bash', 'port/tools/sync_upstream.sh', '--no-build', '--branch', self.BRANCH],
+                              cwd=self.root, env=environment, text=True, capture_output=True, timeout=120)
+
+    def test_a_topic_the_push_cant_fast_forward_is_the_summarys_stop(self):
+        environment = self.fixture()
+        # origin's branch of this name moved to a commit that neither upstream nor this branch has
+        self.git('checkout', '-b', 'elsewhere', self.base)
+        self.write('moved.c', 'moved\n')
+        self.git('add', 'moved.c')
+        self.git('commit', '-m', 'Where the topic moved')
+        moved = self.git('rev-parse', 'HEAD')
+        self.git('checkout', 'main')
+        self.git('push', str(self.origin), 'main:refs/heads/main', f'{moved}:refs/heads/{self.BRANCH}')
+        self.git('push', str(self.upstream), 'upstream:refs/heads/main')
+        result = self.sync(environment)
+        self.assertEqual(result.returncode, 4, result.stdout + result.stderr)
+        self.assertIn(f"origin's {self.BRANCH} is at a commit that neither", result.stderr)
+        self.assertIn(f"sync_upstream: stopped: origin's {self.BRANCH} can't take the push as a fast-forward\n",
+                      result.stdout)
+        self.assertNotIn('rewrote its history', result.stdout)
+
+    def test_an_upstream_rewrite_is_the_summarys_stop(self):
+        environment = self.fixture()
+        # The last sync merged incoming, which upstream's main no longer contains
+        incoming = self.incoming()
+        before = self.git('rev-parse', 'HEAD')
+        merge = self.git('commit-tree', 'HEAD^{tree}', '-p', before, '-p', incoming, '-m',
+                         f'Merge upstream fuddlesworth/pokebw2@{incoming[:9]}\n\nUpstream-Commit: {incoming}')
+        self.git('reset', '--hard', merge)
+        self.git('push', str(self.origin), 'main:refs/heads/main')
+        self.git('push', str(self.upstream), f'{self.base}:refs/heads/main')
+        result = self.sync(environment)
+        self.assertEqual(result.returncode, 4, result.stdout + result.stderr)
+        self.assertIn('so its history was rewritten', result.stderr)
+        self.assertIn('sync_upstream: stopped: upstream rewrote its history\n', result.stdout)
 
 
 if __name__ == '__main__':

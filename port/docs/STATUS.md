@@ -34,48 +34,62 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 ## 2026-11-02: after the naming sync: the guard's rows and the documents at upstream's names, the delegated sync review
 
-- **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit. Reviewed main is `36101609ad`, PR 70's
+- **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit. Reviewed main is `806b2a8f9d`, PR 73's
   merge, which this branch merges; it started from `10d017c010`, PR 67's.
 - **Port:** `PORT_SHA`, on the topic branch `port-sync-hygiene-1102` from `10d017c010`: `fd81336269` (the sync script's
-  messages and their test), `07c5e0c409` (the rest, and this entry) and this merge of `main` at `36101609ad` (PR 70,
-  which merged meanwhile: ADR 0023 accepted, documents only). The merge keeps both new STATUS.md entries, this one
-  first, and drops the "(proposed)" that `07c5e0c409` gave ADR 0023's row in docs/README.md. This entry fills the last
-  entry's (PR 70's) `PORT_SHA` with `cfb45c1be4`, and those of three 2026-10-25 entries (below); PR 70's entry and
-  this one fill PR 67's alike, `f53e767509`. Only `port/` changes.
+  messages and their test), `07c5e0c409` (the rest, and this entry), `0522fe9311` (the merge of `main` at
+  `36101609ad`, PR 70: ADR 0023 accepted, documents only), `55286eae4a` (the merge of `main` at `806b2a8f9d`, PR 73:
+  Castelia City's café) and this commit, the review's fixes (below). Each merge keeps both new STATUS.md entries, this
+  one first; the first drops the "(proposed)" that `07c5e0c409` gave ADR 0023's row in docs/README.md. This entry
+  fills the `PORT_SHA` of PR 73's entry with `867ce0bd96`, of PR 70's with `cfb45c1be4` (as PR 73's entry does) and
+  those of three 2026-10-25 entries (below); PR 70's entry and this one fill PR 67's alike, `f53e767509`. Only
+  `port/` changes.
 - **ROM (T0):** `python3 configure.py && ninja` in a new worktree, every step run (14,039): both original US SHA1s, B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, with no compiler
-  warning. No ROM input changes.
+  warning; again on the merge with `main` at `806b2a8f9d` (5,939 steps, PR 73's `src/ov129/sp_poke_gimmick.c` among
+  them), the same SHA1s and no warning. This branch's own changes are no ROM input.
 - **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both versions (`build/port`, `build/port-w2`, Apple
-  clang, ninja at `-j4`) pass. No host build input changes; their compiler warnings (748 in Black 2's build) are all
-  in the decomp's C of `src/` and `lib/`, as on `main`.
+  clang, ninja at `-j4`) pass, with 748 compiler warnings each, all in the decomp's C of `src/` and `lib/`, as on
+  `main`; and again on the merge with `main` at `806b2a8f9d`, which reconfigures both and compiles PR 73's files
+  (`exit_host.c`, `heap.c`, `sp_poke_gimmick.c`, `main.c` and their tests) with no warning. This branch's own changes
+  are no host build input.
 - **Tests:**
-  - T2/T6: `ctest -LE route` (`CTEST_PARALLEL_LEVEL=3`): in each version 350 of 357 tests pass, `game_ptrcasts`
-    among them, and 7 skip for the optional setups a new worktree lacks: `asm_oracle` (no Unicorn venv),
-    `oracle_boot`, `oracle_saves` and `oracle_floccesy_save` (no oracle built), the VM dispatch's native and
-    verifier negatives (Apple clang has no function check) and `app_universal_slices` (one slice). None fails.
-  - T3: not run: nothing that a replay runs changes (documents, the guard's baseline, a query's comment, a shell
-    script's messages and a Python test).
+  - T2/T6: `ctest -LE route` (`CTEST_PARALLEL_LEVEL=3`): before the merge with PR 73, 350 of 357 tests pass in each
+    version; on the merged tree, 355 of 362, PR 73's new tests and `game_ptrcasts` among them. In each, 7 skip for
+    the optional setups a new worktree lacks: `asm_oracle` (no Unicorn venv), `oracle_boot`, `oracle_saves` and
+    `oracle_floccesy_save` (no oracle built), the VM dispatch's native and verifier negatives (Apple clang has no
+    function check) and `app_universal_slices` (one slice). None fails.
+  - T3: not run here: nothing that a replay runs is this branch's change (documents, the guard's baseline, a query's
+    and a tool's comments, a shell script's messages and Python tests); PR 73's code, which the merge brings, was
+    replayed in PR 73. The verifier's full `ctest` on the exact head runs the replays.
   - The sync tooling tests, CI's command (`python3 -m unittest discover -s port/tools/tests -p test_upstream_sync.py`,
-    Python 3.14.6 here; CI's job runs 3.12): 62 of 62 pass, 60 before. Negative controls: against `main`'s
-    `sync_upstream.sh`, the new test fails, naming the three old section names; with this branch's script and
-    SYNC.md's "Upstream rewrite (exit 4)" renamed, it fails naming that item; its own four controls each fail as
-    they must. ShellCheck 0.11.0 reports the same 10 findings on the script as on `main`, and `bash -n` passes.
-  - A link checker over `port/`'s 95 Markdown documents and the port's `.github/` ones (written for this change, not
-    committed): on `main` it finds ADR 0001's three missing SYNC.md anchors and tests/README.md's short row, on this
-    branch nothing; it also finds a missing file, a missing anchor in another document and in the same one, a short
-    row and a row cut off by a blank line in a fixture, and the two cut-off rows of ARCHITECTURE.md before PR 68.
-  - T4, T5 and T7 not run: no game, host or test-target code changes.
-  - Again on the tree of the merge of `main` at `36101609ad`, which brings documents only: ninja had nothing to
-    rebuild and both SHA1s match, both host builds had nothing to rebuild, `ctest -LE route` again passes 350 of 357
-    in each version with the same 7 skipped, the sync tooling tests pass 62 of 62, and the link checker, over 96
-    documents now, finds nothing.
+    Python 3.14.6 here; CI's job runs 3.12): 64 of 64 pass, 60 on `main`. Negative controls, each in a scratch copy of
+    the tests: against `main`'s `sync_upstream.sh`, `SyncDocSectionTests` fails naming the three old section names, and
+    `ShellStopSummaryTests`' topic case fails on the summary's "stopped: upstream rewrote its history"; without either
+    check's outcome, that check's case fails; a new message that names its section in another form
+    (`see port/docs/SYNC.md, section "..."`), or names SYNC.md alone, fails; with SYNC.md's "Upstream rewrite (exit 4)"
+    renamed, it fails naming that item; the test's own six controls each fail as they must. ShellCheck 0.11.0 reports
+    the same 10 findings on the script as on `main`, and `bash -n` passes.
+  - A link and table checker over 96 Markdown documents, `port/`'s and the port's `.github/` ones (written for this
+    change, not committed), which splits a table's cells as GitHub does, at an unescaped `|` even in a code span: on
+    `main` (`806b2a8f9d`) it finds 6 problems, ADR 0001's three missing SYNC.md anchors, game-changes.md's R8 row and
+    tests/README.md's NODEMIX row, all fixed here, and `research/platinum-port.md:25`, a record; on this branch that
+    one alone. On a fixture it finds a missing file, a missing anchor in another document and in the same one, a row
+    split by a code span's pipes, a short row, a row cut off by a blank line and a stray row, and not a row whose
+    pipes are escaped or a list item's code span continued on a line that starts with `|`. The first checker, which
+    took a code span as one cell, had found 4 on `main` and none on this branch. GitHub's renderer (`gh api markdown`,
+    mode gfm) gives the R8 row its 6 cells, its guard's whole code span and its commit.
+  - T4, T5 and T7 not run: no game, host or test-target code of this branch's changes.
 - **Tiers:** not measured (no progress scan).
 - **Trap stubs:** 25 function stubs and 1 data placeholder (`CARDi_NdmaInterface`) in each version's generated
   `stubs.c`, as on `main`; no route ran.
 - **64-bit warnings:** the pointer cast guard passes in both versions, by `check_ptrcasts.py --report` and in ctest:
-  365 sites in 229 keys (real 66, harmless 123, handled 141, unreachable 35), 1,711 files, 0 not compiled, the last
-  entry's figures, now with no note: `--update` dropped the five rows it no longer found and renamed two (below).
-- **Work done:** the follow-up that PR 67's entry names, each item checked against `10d017c010` first:
+  365 sites in 229 keys (real 66, harmless 123, handled 141, unreachable 35), 1,713 files, 0 not compiled, the last
+  entry's figures, now with no note: `--update` dropped the five rows it no longer found and renamed two (below). The
+  files were 1,711 before the merge with PR 73, which compiles two more: MSL's `exit.c` through
+  `port/hal/msl/exit_host.c`, and the gimmick's file through its fixture.
+- **Work done:** the follow-up that PR 67's entry names, each item checked against `10d017c010` first, and its
+  review's fixes:
   - **The guard's baseline**, `check_ptrcasts.py --build-dir build/port --update`: 229 rows, 5 dropped, 2 renamed,
     none new, every class and note kept. Renamed, both `real`: `net_devwifi.c`'s `NetDevWifi_Unk4C` is
     `NetDevWifi_StartMatch` (upstream's `f406409614`), and `WcmWmcbScanEx` is in `wcm_wmif.c` since upstream's
@@ -85,37 +99,52 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     `CARDi_ReadSecureRomWithDMA` and `os_arena_twl.c`'s `OSi_InitArenaExTwl`, which upstream's `b2e9e3c1da` and
     `ff00b40907` merge into NitroSDK's `card_rom.c` and `os_arena.c`, files the host replaces and so never compiles
     (all three `unreachable`, TWL-only).
-  - **Living documents at upstream's file names:** `pointer_offsets.query`'s header names `scrcmd_field_actor.c`
+  - **Living documents at upstream's names:** `pointer_offsets.query`'s header names `scrcmd_field_actor.c`
     (`0e2d7f0974`); decomp-findings.md, game-changes.md and sanitizers.md's H4 name `pokedex_detail_tbar.c`, and the
     finding its `PokedexDetailTbarResource_Load` (`e2384ebfee`); sanitizers.md's R6 names `fldeff_fes_sparkle.c` and,
-    from the same `c13587cf78`, `fldeff_emotion_bubble.c`, with its three sites at their lines now; R9 says the fix
-    is upstream's since `de6cd09688`, which is why `892b9f4f74` dropped the game-changes.md row it pointed to.
+    from the same `c13587cf78`, `fldeff_emotion_bubble.c`, at the report's lines as the table's other rows are, and
+    game-changes.md's row for that fix `FesSparkleTask`; R9 says the fix is upstream's since `de6cd09688`, which is
+    why `892b9f4f74` dropped the game-changes.md row it pointed to; PLAN.md §9's 818-pointer tables are in
+    `field_actor_drawdata.c`, where upstream's `33a5ba6936` moved them out of `fldmmdl_blact.c`; `summarize.py`'s
+    comment on overlay 182's gaps names `lib/dwcutilui`'s `comment.c` and `lib/dwcutil`'s `dwc_moveid.c`.
   - **`sync_upstream.sh`'s messages** say that it fetches, merges and counts against `origin/main` (its `origin_ref`
     since `88237af41d`), where they said `origin/BRANCH`; a message that could never print goes. Its stops name the
     items of SYNC.md's "Conflicts and stopped syncs" as they are: "Upstream rewrite (exit 4)", "Cross-repository
-    reference (exit 5)" and "Draft conflict proposal (the hourly sync)". `test_upstream_sync.py`'s
-    `SyncDocSectionTests` fail when a section or anchor the script names isn't SYNC.md's, and its guide says so.
+    reference (exit 5)" and "Draft conflict proposal (the hourly sync)". The summary of a stopped run names which of
+    the two exit-4 checks stopped it (it said "upstream rewrote its history" for both), and the usage's exit statuses
+    name the moved topic. `test_upstream_sync.py`'s `SyncDocSectionTests` fail when a section or anchor the script
+    names isn't SYNC.md's, or when a line of its code names SYNC.md in a form the test can't read, and
+    `ShellStopSummaryTests` run the script offline to its two exit-4 stops; the tests' guide says so.
   - **Links and tables:** ADR 0001's three SYNC.md anchors, gone since `88237af41d`, point to the sections that hold
-    their subjects now; tests/README.md's NODEMIX row gets its two missing cells; docs/README.md lists ADRs 0022 to
-    0025 and links 0026 to 0029 as it does the others. ARCHITECTURE.md's feature map was one table already
-    (`d0833a7943`).
+    their subjects now; tests/README.md's NODEMIX row gets its two missing cells; game-changes.md's R8 row escapes its
+    code span's pipes, which split its cells; docs/README.md lists ADRs 0022 to 0025 and links 0026 to 0029 as it does
+    the others. ARCHITECTURE.md's feature map was one table already (`d0833a7943`).
   - **STATUS.md's `PORT_SHA`s:** three 2026-10-25 entries get theirs by the rule, each the commit that added the
     entry's work and whose text the entry still is: PR 35's sync `fa9e27ec24`, PR 33's conflict drafts `ddc4ff6048`
     and phase 4's coverage `883432299b`.
   - **lessons.md:** the three lines over 120 columns, two in the 2026-10-28 entry on verification statuses and one
     in the entry on card work, wrapped.
-  - **The repository policy** records the owner's standing delegation of 2026-11-01: the maintainer session may
-    approve an App-authored sync PR as CallanCampos and merge it with a merge commit, once it has reviewed the
-    conflict resolutions, the renamed names and the upstream range, every required check and the local verification
-    pass on the exact head, the branch is up to date and no review conversation is open, and then tells the owner
-    what the sync brought in; contributor PRs still need the owner's word each. port/CLAUDE.md, CONTRIBUTING.md and
-    SYNC.md point to it where they say who approves sync PRs.
+  - **The repository policy** records the owner's standing delegation of 2026-11-01: the maintainer session, defined
+    by its role (the agent session that the owner directs in chat as Frigate's maintainer and that answers to the
+    owner for what it merges), not by the account every session runs `gh` as, may approve an App-authored sync PR as
+    CallanCampos and merge it with a merge commit, once it has reviewed the conflict resolutions, the renamed names
+    and the upstream range, every required check and the local verification pass on the exact head, the branch is up
+    to date and no review conversation is open, and then tells the owner what the sync brought in; contributor PRs
+    still need the owner's word each. GLOSSARY.md defines the maintainer session, and its rows for upstream, sync PRs
+    and the owner review exception say who approves an App-authored sync PR. The pointers this PR first gave
+    port/CLAUDE.md, CONTRIBUTING.md and SYNC.md are withdrawn: the guides that say who approves a sync PR are one
+    follow-up, for the owner's wording.
 - **Next:** Phase 5's story coverage after the Route 20 save, each trainer battle cut where ADR 0023, accepted by PR
-  70, says: Floccesy Ranch, Hugh's Town Map, the lost Lillipup and the first gym. The follow-ups this PR lists (lines
-  over 120 columns in other living documents, the script VM test's old name in two guides, the summary's wording of a
-  moved topic's exit 4) are small separate PRs.
-- **Blockers:** the owner's review of this PR. Decisions the owner holds: ADRs 0022, 0025 and 0030 are proposed, and
-  Spanish issue 45 still lacks a local dump.
+  70, says: Floccesy Ranch, Hugh's Town Map, the ranch's lost Pokémon and the first gym. The follow-ups this PR lists
+  are small separate PRs: the guides that still say the owner approves every sync PR (port/CLAUDE.md, CONTRIBUTING.md,
+  SYNC.md, PLAN.md, README.md and `upstream_sync.py`'s warning); lines over 120 columns in other living documents; the
+  script VM test's old name in two guides; `milestones.py`'s overlay 36 set and `field_effect.h`'s comment at
+  upstream's names; sanitizers.md's report lines; `summarize.py`'s overlay 182 rule, which no gap reaches now; a
+  committed check of the documents' links and tables; and `research/platinum-port.md:25`, a record, whose `git grep`
+  pattern's pipes split its row.
+- **Blockers:** none for this change. Decisions the owner holds: ADRs 0022, 0025 and 0030 are proposed; the
+  follow-up on the guides needs the owner's wording of the delegation for port/CLAUDE.md; and Spanish issue 45 still
+  lacks a local dump.
 
 ## 2026-11-02: Castelia City's café loads: the gimmick's work at its host size, and MSL's exit for the heap check
 
