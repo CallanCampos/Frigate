@@ -417,6 +417,11 @@ The screens comparison first says how each stretch of port frames was paired, an
 frames whose pictures no port frame shows ([above](#aligning-the-oracle-with-the-port)); `--known-oracle` names those
 that can't have a counterpart, which it leaves out of that check.
 
+`compare.py digest ORACLE PORT --align counter --clock LIST [--lag ...] [--frames LIST] [--known-group GROUPS=FRAMES]...`
+compares the two runs' digest streams, `digest.tsv`, record by record, every group exactly: the display state at each
+game frame, at the last VBlank of its count ([Digests](#digests)). It pairs them on the count, as the screens do, and
+needs `--align counter`.
+
 ## Digests
 
 Verification v2 ([ADR 0031](../../docs/adr/0031-per-game-frame-digests-against-a-content-addressed-oracle-cache.md),
@@ -566,9 +571,54 @@ or writes `-` for, isn't compared. A group the expected row has and the actual r
 leaves it out or its row writes `-` (a writer that dropped the group), is a divergence, never a silent pass; and
 `groupCompared` counts, group by group, the counts at which both rows had it, so that a caller sees a group that was
 never compared. Counts that only one stream has are counted, not compared. The comparison stops at the first count
-where a group differs or is missing, naming each. It goes only as far as this part's tests need: pairing a count's
-rows where a program writes several (at the last VBlank of the count), the sequences' lags, known differences and
-clock stretches are the next part's, in `compare.py`.
+where a group differs or is missing, naming each. It is the comparison for this part's tests, and for part 4's
+port-alone check against an expected stream; the sequences' comparison, with the pairing, lags, clock stretches,
+screens with 3D and declarations, is `compare.py digest`'s.
+
+**The comparison**, `compare.py digest`, reads both runs' streams (with `load_digest`, which holds a stream to
+`digest.c`'s reader's rules) and their `frames.tsv`, and pairs each record of Frigate's with the oracle's on the count:
+
+- **Pairing.** A port record, the last VBlank of count c at port frame f, pairs with the oracle's record of the count of
+  the oracle frame that the screens' counter pairing gives f (`counter_mapping`, with the same `--clock` and `--lag`):
+  c less the lag at f, declared, or after a clock stretch with no declaration derived as the screens' pairing derives
+  it. The oracle's record is that count's last VBlank, wherever in the count the screens' pairing put the oracle frame:
+  so a count that the DS spent several VBlanks on is compared where its pass has finished on both. The pairing is the
+  screens' and the memory's, by construction, and the comparison prints its stretches as the screens do.
+- **What isn't compared.** Port frames of `--clock`, where the game waits on a clock (no count to pair); a port record
+  without an oracle frame, or whose paired count is past the oracle's stream, which is counted and listed (one whose
+  paired count is within the oracle's stream but missing from it fails); `screen.top` or `screen.bottom` where the
+  oracle record's frame shows 3D on that screen (`frames.tsv`'s `top_3d` and `bottom_3d`), which the screens' 3D
+  tolerance and the 3D groups hold instead; and the groups `--known-group` declares at f. `frame` and `vblanks` aren't
+  compared.
+- **What fails.** A group the oracle's record has whose hash the port's differs from, or which the port's record lacks
+  (`-`, or not in its header), where nothing declares it.
+- **Output.** The pairing's stretches; the port records compared, in clock stretches, unpaired and past the stream; per
+  group, the records compared, the screens left out for 3D, and the differing and missing port frames as ranges with
+  their counts; per declaration, how many of its frames differed and how many were equal, and "unused declaration" for
+  one none of whose frames differed; and the first difference nothing declares: its count, port frame, oracle frame and
+  groups. Exit status 0 when nothing undeclared differs or is missing, 1 otherwise, 2 for streams or runs it can't read.
+
+**The declarations** are a sequence's `known_groups` in `SEQUENCES` (`oracle.py`), keyed by version, then by groups
+(`digest.h`'s names, comma-separated), then by port frames (a frame list, as the other declarations' are), each with
+why:
+
+```python
+known_groups={
+    "b2_us": {"g3d.list,g3d.stats": {"3110-3124": CAMERA}, "vram.C,vram.D": {"175-312": COPYRIGHT_TILES}},
+    "w2_us": {...},
+}
+```
+
+A port frame is the port record's frame, the last VBlank of its count: on Frigate almost always the count + 1. The
+names and frames above are an example; the sequences' own are in "Known differences" below. Each declaration is
+minimal, its frames the records where one of its groups differs, and its cause traced in both programs' code; a
+difference whose cause is open is a failure to fix, never declared. `known_groups` replaces nothing yet: `known`,
+`known_top`, `known_oracle`, `close`, `known_state` and `known_random` keep holding the screens' and the state's
+comparisons, and a screen that differs at the last VBlank is declared in `known_groups` for `screen.top` or
+`screen.bottom`, with its cause, even where `known` declares the same cause for the screens' first-VBlank pairing.
+`oracle.py sequence` runs the comparison after the screens and the state for a sequence whose `digest` is set, prints
+the exact `compare.py digest` command it ran, for triage, and each declaration with its reason, and fails on the worst
+of the three.
 
 ## Symbols
 

@@ -17,8 +17,19 @@ shows the same pictures at the palettes' depth, whatever the timing).
                        [--known-top LIST] [--brief]
     compare.py memory ORACLE PORT [--offset N | --align ...] [--clock LIST] [--lag FRAME=N,...] [--frames LIST]
                       [--labels A,B,...]
+    compare.py digest ORACLE PORT --align counter [--clock LIST] [--lag FRAME=N,...] [--frames LIST]
+                      [--known-group GROUPS=FRAMES]...
     compare.py align ORACLE PORT
     compare.py hash PNG...
+
+digest compares the two runs' digest streams (digest.tsv, README.md "Digests"), whose records are each count's state at
+its last VBlank: each port record, at port frame f, pairs with the oracle's record of the count of the oracle frame that
+the counter pairing gives f (the port's count less the lag at f), and every group the oracle's record has is compared
+exactly but a screen that shows 3D in the oracle record's frame and the groups --known-group declares at f; a group the
+port's record lacks fails. Port frames of --clock aren't compared, and a port record without an oracle frame, or past
+the oracle's stream, is counted, not compared. It prints the pairing, each group's compared, left out, differing and
+missing records, each declaration's differing and equal frames (one with none differing is an unused declaration), and
+the first difference nothing declares.
 
 Each screen compares on its own, at the DS's colour depth (6 bits a channel, value >> 2), or with --depth 5 at its
 palettes' (value >> 3), which leaves out differences in the output's low bit. A screen that shows 3D in the oracle's
@@ -1036,6 +1047,171 @@ def command_memory(args) -> int:
     return 1 if differing else 0
 
 
+# Digests
+
+
+@dataclass
+class KnownGroups:
+    """A declaration of --known-group: groups whose difference at the port frames is declared, and what the
+    comparison found there (how many of its frames differed in one of its groups, and how many were equal)"""
+    text: str
+    groups: tuple[str, ...]
+    frames: set[int]
+    differed: list[int] = field(default_factory=list)
+    equal: int = 0
+
+
+def parse_known_groups(texts: list[str] | None) -> list[KnownGroups]:
+    """--known-group GROUPS=FRAMES, as many as given: "g3d.list,g3d.stats=3110-3124" """
+    out = []
+    for text in texts or []:
+        groups_text, _, frames_text = text.partition("=")
+        groups = tuple(group for group in groups_text.split(",") if group)
+        if not groups or not frames_text:
+            raise ValueError(f"--known-group {text!r} isn't GROUPS=FRAMES")
+        for group in groups:
+            if group not in DIGEST_GROUPS:
+                raise ValueError(f"--known-group {text!r}: {group} is no group digest.c knows")
+        frames = parse_frames(frames_text)
+        if frames is None:
+            raise ValueError(f"--known-group {text!r}: its frames must be listed")
+        out.append(KnownGroups(text, groups, set(frames)))
+    return out
+
+
+def describe_counted(frames: list[int], counts: dict[int, int], limit: int = 6) -> str:
+    """Port frames as ranges, each with its records' counts: "175-312 (counts 174-311), 400 (count 399)" """
+    out = []
+    ranges = frame_ranges(frames)
+    for first, final in ranges[:limit]:
+        a, b = counts[first], counts[final]
+        out.append(f"{first} (count {a})" if first == final else f"{first}-{final} (counts {a}-{b})")
+    more = f" and {len(ranges) - limit} more" if len(ranges) > limit else ""
+    return ", ".join(out) + more
+
+
+def command_digest(args) -> int:
+    """Pairs the two runs' digest streams (README.md, "Digests") and compares them group by group: each port record
+    (a count's last VBlank, at port frame f) with the oracle's record of the count of the oracle frame the screens'
+    counter pairing gives f (counter_mapping, with --clock and --lag: the port's count less the lag at f, declared or
+    derived after a clock stretch). Port frames of --clock aren't compared. A screen that shows 3D in the oracle record's
+    frame (frames.tsv's top_3d and bottom_3d) is left out, and so are the groups --known-group declares at f. A group
+    the oracle's record has and the port's lacks fails; frame and vblanks aren't compared"""
+    oracle = load_run(args.oracle)
+    port = load_run(args.port)
+    oracle_digest = load_digest(os.path.join(args.oracle, "digest.tsv"))
+    port_digest = load_digest(os.path.join(args.port, "digest.tsv"))
+    declarations = parse_known_groups(args.known_group)
+    pairing = counter_pairing(oracle, port, args)
+    clock = set(parse_frames(args.clock) or []) if args.clock else set()
+    wanted = set(parse_frames(args.frames) or []) if args.frames and args.frames != "all" else None
+    oracle_counts = sorted(oracle_digest.records)
+    if not oracle_counts or not port_digest.records:
+        raise RunError("a digest stream has no records")
+    for line in pairing.timing:
+        print(line)
+
+    port_counts: dict[int, int] = {}  # port frame -> its record's count
+    unpaired: list[int] = []
+    past: list[int] = []
+    in_clock = 0
+    pairs: list[tuple[DigestRecord, DigestRecord]] = []
+    failures: list[tuple[DigestRecord, DigestRecord, list[str]]] = []
+    missing_records: list[int] = []
+    for count in sorted(port_digest.records):
+        record = port_digest.records[count]
+        f = record.frame
+        if wanted is not None and f not in wanted:
+            continue
+        port_counts[f] = count
+        if f in clock:
+            in_clock += 1
+            continue
+        target = pairing.mapping.get(f)
+        row = oracle.frames.get(target) if target is not None else None
+        if row is None or row.counter is None:
+            unpaired.append(f)
+            continue
+        theirs = oracle_digest.records.get(row.counter)
+        if theirs is None:
+            if row.counter > oracle_counts[-1]:
+                past.append(f)
+            else:
+                missing_records.append(f)
+            continue
+        pairs.append((theirs, record))
+
+    # Group by group: compared, left out for 3D, declared, differing, missing
+    compared = {group: 0 for group in DIGEST_GROUPS}
+    left_3d = {group: 0 for group in ("screen.top", "screen.bottom")}
+    differing: dict[str, list[int]] = {group: [] for group in DIGEST_GROUPS}
+    lacking: dict[str, list[int]] = {group: [] for group in DIGEST_GROUPS}
+    for theirs, mine in pairs:
+        f = mine.frame
+        frame_row = oracle.frames.get(theirs.frame)
+        shows_3d = {"screen.top": bool(frame_row and frame_row.top_3d),
+                    "screen.bottom": bool(frame_row and frame_row.bottom_3d)}
+        declared = [d for d in declarations if f in d.frames]
+        declared_groups = {group for d in declared for group in d.groups}
+        undeclared: list[str] = []
+        for group in DIGEST_GROUPS:
+            if group not in theirs.hashes:
+                continue
+            if shows_3d.get(group):
+                left_3d[group] += 1
+                continue
+            if group not in mine.hashes:
+                lacking[group].append(f)
+                undeclared.append(f"{group} missing")
+                continue
+            if group in declared_groups:
+                continue
+            compared[group] += 1
+            if theirs.hashes[group] != mine.hashes[group]:
+                differing[group].append(f)
+                undeclared.append(group)
+        for d in declared:
+            if any(group in theirs.hashes and group in mine.hashes and theirs.hashes[group] != mine.hashes[group]
+                   and not shows_3d.get(group) for group in d.groups):
+                d.differed.append(f)
+            else:
+                d.equal += 1
+        if undeclared:
+            failures.append((theirs, mine, undeclared))
+
+    print(f"port records: {len(port_counts)} in the frames compared, {len(pairs)} paired on the count at their last "
+          f"VBlank, {in_clock} in clock stretches (not compared)" +
+          (f", {len(unpaired)} without an oracle frame: port frames {describe_ranges(unpaired)}" if unpaired else "") +
+          (f", {len(past)} past the oracle's stream (its last count {oracle_counts[-1]}): port frames "
+           f"{describe_ranges(past)}" if past else ""))
+    if missing_records:
+        print(f"FAIL: {len(missing_records)} port records whose count the oracle's stream lacks within its counts "
+              f"{oracle_counts[0]}-{oracle_counts[-1]}: port frames {describe_counted(missing_records, port_counts)}")
+    print("group          compared  3D left out  differ  missing")
+    for group in DIGEST_GROUPS:
+        print(f"{group:14s} {compared[group]:8d}  {left_3d.get(group, 0) if group in left_3d else '-':>11}  "
+              f"{len(differing[group]):6d}  {len(lacking[group]):7d}")
+    for group in DIGEST_GROUPS:
+        if differing[group]:
+            print(f"FAIL: {group} differs at port frames {describe_counted(differing[group], port_counts)}")
+        if lacking[group]:
+            print(f"FAIL: {group} missing from the port's records at port frames "
+                  f"{describe_counted(lacking[group], port_counts)}")
+    for d in declarations:
+        print(f"declared {','.join(d.groups)} at port frames {d.text.partition('=')[2]}: {len(d.differed)} differed"
+              + (f" ({describe_counted(d.differed, port_counts)})" if d.differed else "") + f", {d.equal} equal")
+        if not d.differed:
+            print(f"unused declaration: {d.text}")
+    if failures:
+        theirs, mine, groups = failures[0]
+        print(f"first undeclared difference: count {mine.count}, port frame {mine.frame}, oracle frame "
+              f"{theirs.frame} (count {theirs.count}): {', '.join(groups)}")
+    failed = bool(failures) or bool(missing_records)
+    print(f"{len(pairs) - len(failures)} of {len(pairs)} paired records match" +
+          (f"; {len(failures)} differ where nothing declares it" if failures else ""))
+    return 1 if failed else 0
+
+
 # Alignment report
 
 
@@ -1129,6 +1305,11 @@ def main(argv: list[str] | None = None) -> int:
     memory = commands.add_parser("memory", help="compare the memory dumps by label")
     pairing(memory)
     memory.add_argument("--labels", help="only these labels, comma-separated")
+    digest = commands.add_parser("digest", help="compare the digest streams (digest.tsv) on the count")
+    pairing(digest)
+    digest.add_argument("--known-group", action="append", metavar="GROUPS=FRAMES",
+                        help="digest groups (comma-separated) whose difference at these port frames is declared; "
+                        "may be given again")
     align = commands.add_parser("align", help="report how the runs' frames line up")
     align.add_argument("oracle")
     align.add_argument("port")
@@ -1138,11 +1319,15 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if (getattr(args, "clock", None) or getattr(args, "lag", None)) and args.align != "counter":
         parser.error("--clock and --lag go with --align counter")
+    if args.command == "digest" and args.align != "counter":
+        parser.error("digest pairs the streams on the count: it needs --align counter")
     try:
         if args.command == "screens":
             return command_screens(args)
         if args.command == "memory":
             return command_memory(args)
+        if args.command == "digest":
+            return command_digest(args)
         if args.command == "align":
             return command_align(args)
         return command_hash(args)
