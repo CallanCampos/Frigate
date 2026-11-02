@@ -3,6 +3,18 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-28: finish failed verification statuses on the pinned commit
+
+- Posting pending without a failure exit path leaves a stopped local build looking active indefinitely. Arm cleanup
+  before the pending API request, retain the verified head, and report failure from the exit trap. Preserve the verifier's original
+  failure or signal exit code even when failure reporting itself fails; disarm cleanup only after successful validation
+  and a successful success-status upload. Ordinary sync publication keeps its existing behavior.
+- Exercise command failure, failed status upload, SIGINT, SIGTERM, changed remote head and successful completion.
+  A changed head must still report failure on the originally verified commit. Network failure, shutdown and an
+  uncatchable kill can leave pending; rerun verification on the exact current head rather than manually asserting success.
+- Check the pinned action implementation before changing a deprecated input. The App-token action normalizes both
+  identifier inputs identically, so moving the existing numeric App ID to `client-id` needs no new credentials or scope.
+
 ## 2026-10-28: decode mixed resource diffs without weakening C checks
 
 - A NUL-free opaque resource can appear as text in Git's diff even when its bytes are not UTF-8. The opening archive's
