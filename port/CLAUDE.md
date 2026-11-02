@@ -220,6 +220,20 @@ wire or in the save stay pointer-free and get host `_Static_assert`s.
 - melonDS is a test oracle (`port/tools/oracle/`) only, never linked into or shipped with the port.
 - libntr, the Platinum port and other ports are references for patterns, never code to copy.
 
+## Keeping widescreen possible (PLAN.md §5.2)
+
+Phase 6's exit includes widescreen field play, so no change may close the door to it.
+[ADR 0030](docs/adr/0030-widescreen-by-an-engine-side-hor-plus-scale-with-native-readbacks.md) proposes a design for
+it (the owner decides). Its rules 1 to 10 keep the exit reachable under either of PLAN.md §5.2's options, and every
+change follows them now; its rules 11 to 13 come with its design. The essentials:
+
+- **Every tested frame comes from the native 256x192 path.** `ds2d.c` and `capture.c` stay DS-exact; anything wide
+  is new code beside them, and the 3D frame is read through a width-aware accessor, never with a literal 256.
+- **The geometry engine keeps its shape:** the viewport transform in `ToScreen` alone, clip space until then,
+  list-level state on `PortGeList`, and nothing that scales `ge->proj` or `ge->clip`, which the SDK reads back.
+- **Nothing changes the game's projection, aspect, viewport or ClAct surfaces in passing.**
+- **Visibility never feeds game logic,** and presentation never draws from the game's random numbers.
+
 ## Testing (PLAN.md §6)
 
 | Level | What | When |
@@ -273,7 +287,7 @@ The independent-upstream boundary of PLAN.md D10 and [ADR 0002](docs/adr/0002-so
   URL), and pushing such a commit can record a "referenced" event, naming this repository, on that issue. So the sync
   stops before pushing commits whose messages reference issues, whatever the repository's visibility (a private
   repository's references still show, without their details): `sync_upstream.sh` exits 5 and the Action fails with a reference error. Stop and ask the user; only the user decides to run `--allow-references`
-  ([SYNC.md](docs/SYNC.md#commit-messages-that-name-other-repositories)).
+  ([SYNC.md](docs/SYNC.md#conflicts-and-stopped-syncs)).
 - **The root `CLAUDE.md`'s overlay rules and the decomp skills never run in this clone.** Its "Claim an overlay" and
   "Record overlay progress" rules and the `decomp-file`, `finish-file` and `match-function` skills post claims and
   progress comments, with commit links, on upstream's issues; run from this clone, they would post about port commits

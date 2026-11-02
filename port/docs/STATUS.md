@@ -34,23 +34,26 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 ## 2026-11-01: ADR 0023 accepted under the owner's Ship of Harkinian rule
 
-- **Upstream:** unchanged, `9496bc869b87`, as reviewed main `e733ccc8a3` (PR 66) has it; this branch imports no
-  upstream commit.
-- **Port:** `PORT_SHA`, on `port-adr0023-accepted` from reviewed main `e733ccc8a3`: documentation only, all of it in
-  `port/docs/`.
+- **Upstream:** unchanged, `9496bc869b87`, as reviewed main `d19894b1f7` (PR 69's merge) has it; this branch imports
+  no upstream commit.
+- **Port:** `PORT_SHA`, on `port-adr0023-accepted` from reviewed main `e733ccc8a3`, with reviewed main `d19894b1f7`
+  merged in once PRs 68 and 69 had landed. This entry fills the last entry's `PORT_SHA` with `2f9033d7b8`. This
+  branch's own changes are documentation only, all of it in `port/docs/`. The merge brings PR 68's Markdown and PR
+  69's verifier changes (`sync_upstream.sh`, `check_mwcc_neutral.py` and their tests).
 - **ROM (T0):** a fresh `python3 configure.py && ninja` in this branch's new worktree, 10,703 steps with no compiler
   warning: both original US SHA1s match, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2
-  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. After the review's corrections the same commands ran again: ninja checked
-  both ROMs and had nothing to rebuild, and both SHA1s still match. No ROM input changes.
-- **Host build (T1):** before the push, on arm64 macOS in this branch's worktree, with the commands of
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. The same commands ran again after the review's corrections and after the
+  merge of reviewed main. Each time ninja checked both ROMs, had nothing to rebuild and gave no warning, and both
+  SHA1s still match. No ROM input changes.
+- **Host build (T1):** before each push, on arm64 macOS in this branch's worktree, with the commands of
   `port/tools/sync_upstream.sh --verify-pr`: `cmake --fresh -S port -B build/port-verify-VERSION -G Ninja
   -DCMAKE_BUILD_TYPE=RelWithDebInfo -DPORT_VERSION=VERSION -DPORT_SANITIZE_RECOVER=OFF
-  -DPORT_FRAME_TIME_REPORT_ONLY=OFF`, then `cmake --build build/port-verify-VERSION --parallel`. Both builds pass,
-  `b2_us` and `w2_us`.
+  -DPORT_FRAME_TIME_REPORT_ONLY=OFF`, then `cmake --build build/port-verify-VERSION --parallel`. Both builds, `b2_us`
+  and `w2_us`, pass on the first head and again on the merged tree.
 - **Tests (T2–T7):** `ctest --test-dir build/port-verify-VERSION --output-on-failure --no-tests=error`, in the same
-  builds; neither version has a failure.
-  - `b2_us`: 369 of 398 pass, 29 skip, in 512 s.
-  - `w2_us`: 365 of 395 pass, 30 skip, in 1,024 s.
+  builds. No run has a failure in either version.
+  - On the merged tree: `b2_us` 369 of 398 pass and 29 skip, in 618 s; `w2_us` 366 of 395 pass and 29 skip, in 681 s.
+  - On the first head: `b2_us` the same, in 512 s; `w2_us` 365 of 395 pass and 30 skip, in 1,024 s.
   - Among the passes are the short replay and save routes (T3) and the save round trips and ROM dump checks (T6).
   - The skips are by design:
     - 24 of the `oracle_*` tests and `frame_times_party_menus`, which need the melonDS oracle that only
@@ -58,9 +61,11 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     - `asm_oracle`, since Unicorn isn't installed for this checkout's Python;
     - `app_universal_slices`, since an arm64-only program has one slice;
     - the two `integrate_vm_dispatch_*` negatives, which Apple clang skips;
-    - in `w2_us` only, `frame_times_title`: its title scene's 95th percentile was 10.01 ms against the 8.36 ms
-      budget, but the load average reached 34.76 on 8 cores while other sessions built, so it skipped rather than
-      failed.
+    - on the first head only, `w2_us`'s `frame_times_title`. Its title scene's 95th percentile was 10.01 ms against
+      the 8.36 ms budget, but the load average reached 34.76 on 8 cores while other sessions built, so it skipped
+      rather than failed. It passes on the merged tree.
+  - The merge brings PR 69's verifier changes, so their tests ran too:
+    `python3 -m unittest discover -s port/tools/tests -p test_upstream_sync.py` ran 60 tests, OK.
   - T5 (sanitizers) and T7 (playtests) were not run: nightly and milestone levels, for a documentation-only change.
 - **Tiers and trap stubs:** unchanged by this documentation change; not remeasured.
 - **64-bit warnings:** `port/tools/check_ptrcasts.py --build-dir build/port-verify-b2_us --report`: 365 sites in 229
@@ -88,6 +93,131 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   review-only exception. Phase 5's story routes then go on, each trainer battle cut where ADR 0023 says.
 - **Blockers:** none for this change. Broader serial/CPU timing and later story coverage remain unfinished; Spanish
   issue 45 still lacks a local dump.
+
+## 2026-11-01: pin the verified head and keep the verifier's exit status
+
+- **Upstream:** `9496bc869b`, unchanged: this change merges no upstream commit. Reviewed main is `faad9927e8`, PR 68's
+  merge.
+- **Port:** `2f9033d7b8`, on the topic branch `port-verify-status-followups` from `e733ccc8a3` (PR 66's merge), with
+  reviewed main `faad9927e8` merged in; this entry fills the last entry's `PORT_SHA` with `d0833a7943`.
+- **ROM (T0):** configure and Ninja pass both original US SHA1s with zero compiler warnings: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, in a full build
+  (10,703 steps), again after the review's fixes, and again after merging main. No ROM input changes.
+- **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both games (`build/port`, `build/port-w2`) pass. No
+  host build input changes: only `port/tools/` scripts, their tests and documents.
+- **Tests:**
+  - T2/T6: `ctest -LE route -j3` passes in both games: 350 of 357 tests pass, and 7 skip for the optional setups
+    this checkout lacks: `asm_oracle` (no Unicorn in this Python), `oracle_boot`, `oracle_saves` and
+    `oracle_floccesy_save` (no oracle built), the two function-sanitizer negatives of the VM dispatch (Apple's compiler
+    emits no such check) and `app_universal_slices` (one slice).
+  - T3, short: the replays pass, B2 6 of 6 and W2 4 of 4 (`replay_new_game`, B2 only, `replay_new_game_house`,
+    `replay_same_save` and `replay_same_save_complete`, with their clean fixtures).
+  - The sync tooling tests, run with CI's command
+    (`python3 -m unittest discover -s port/tools/tests -p test_upstream_sync.py`), pass 60 of 60 (48 before) under
+    macOS's bash 3.2.57 and Python 3.14.6; CI's `Sync tooling tests` job runs them on Linux with bash 5 and Python
+    3.12.
+  - Negative controls: against main's `sync_upstream.sh`, 10 of the 12 new verifier controls fail, and so does the
+    success control's new check that every status request is `--silent`. The two that pass there guard what main
+    already did: an interrupt whose failure upload fails keeps 130, and the builds and tests get SIGPIPE at its
+    default. With one part of this change taken out at a time, a control fails for each: the HEAD check, `--silent`
+    on the pending, success or failure request, `|| true` on the warning, the SIGPIPE trap (also when SIGPIPE is
+    ignored instead, everywhere or in the exit trap only), the HUP and QUIT traps, and the exit status of a failed
+    pending or success upload or of either read of the PR's head.
+  - PR 66's review probes, rerun on this change's final scripts: Ctrl-C to the process group exits 130, SIGTERM to
+    it 143 and SIGHUP 129, each with failure on the pinned head, and a signal to bash alone exits 130 or 143 once its
+    command ends. A HEAD moved during the pending request leaves pending and failure on the original head. Piped to
+    `tail`, a group SIGINT exits 130 and a group SIGTERM 143, where main's script exited 1 and died of SIGPIPE. With
+    each signal trapped, bash 3.2 reports nothing for a command that a Ctrl-C to the group killed, "Hangup: 1" for a
+    hangup, "Quit: 3" for a quit and "Terminated: 15" for a termination.
+  - The sync mode, run offline (a `git` wrapper sends the fetches and pushes of `origin` and `upstream` to local bare
+    repositories; gh and the builds are stubs): when gh fails the success upload with its status 4, the run now exits
+    1 with "FAILED (exit status 1)" and the topic "published for review" in its summary, where the previous script
+    exited 4, "stopped: upstream rewrote its history", and called the published topic "not pushed". With the upload
+    working, it ends "done".
+  - ShellCheck 0.11.0 reports the same 10 findings on `sync_upstream.sh` as on main (SC2016, SC2086 and four unused
+    variables), none new, and `bash -n` passes.
+  - `check_mwcc_neutral.py --base HEAD --jobs 2 src/gfl/arc_tool.c` passes 2 of 2. Its cleanup, run in a throwaway
+    repository with six worktrees, removes only its own unlocked one whose directory is gone; it keeps its own live
+    and locked ones, another stale one, a moved one, and a stale one of another name in an `mwcc-neutral-` directory.
+  - T4, T5 and T7 not run: no game, host or test-target code changed.
+- **Tiers/trap stubs:** not measured: no game or host code changed.
+- **64-bit warnings:** the pointer cast guard passes in both games, at 365 sites/229 keys (real 66, harmless 123,
+  handled 141, unreachable 35), 1,711 files compiled and none missing: no change.
+- **Work done:** the follow-ups of PR 66's review of `port/tools/sync_upstream.sh --verify-pr`, the fixes that the
+  review of this change's first commit asked for, and a cleanup in `check_mwcc_neutral.py`:
+  - **The pinned head:** it is read once. A HEAD that another process moves while the pending status is posted now
+    stops the run with exit 1 and failure on the pinned head; before, the run read HEAD again and verified and
+    reported on the new commit, leaving the pinned one pending.
+  - **The exit status through a closed output:** a signal to the whole process group also stops the reader of
+    `... | tee log`. Every status request now discards gh's response (`--silent`), and SIGPIPE is caught while the
+    run can still report, so neither bash's own report of a command that a hangup, quit or termination killed nor the
+    warning that the failure couldn't be recorded ends the shell. A Ctrl-C exits 130, where bash 3.2 exited 1 (the
+    trap's failed warning, under `set -e`), and a SIGTERM 143, where it died of SIGPIPE. The review's `|| true` on the
+    warning isn't enough ([lessons.md](lessons.md)).
+  - **A hangup and a quit** exit 129 and 131 and record "exit 129" or "exit 131". A closed terminal used to kill the
+    shell, with a failure that said "exit 0", and a Ctrl-\ killed it before its exit trap ran, leaving the pending
+    status.
+  - **gh's own statuses stay out:** the verifier's gh requests exit 1 with a message when they fail. They used to
+    exit with gh's status, 4 when it needs a login, which the script documents as an upstream rewrite. The local
+    sync's success upload exits 1 too now, with its summary calling the topic published, where it exited 4 as an
+    upstream rewrite with the topic "not pushed".
+  - **Tests:** twelve verifier controls: failed pending and success uploads; a PR head that can't be read, before the
+    pending status or after the builds; a moved HEAD; a hangup; a quit; an interrupt whose failure upload fails; a
+    group signal that stops the reader of the whole output, with and without that failure, or of the standard output
+    alone; and builds and tests that keep SIGPIPE at its default. The success control checks that every status
+    request is silent, and the hourly sync workflow's token step is checked for its `client-id` input. A verifier
+    whose output never closes is killed rather than left running.
+  - **[SYNC.md](SYNC.md#validate-and-approve-a-proposed-pr)** says which exit status the verifier keeps: its own (1,
+    or 129, 130, 131 or 143), not the failed command's, with its output piped or not. It also says that a success
+    that can't be uploaded is recorded as failure, and that a signal sent to the script alone waits for its current
+    command. Its local sync section says what a failed success upload leaves.
+  - **`port/tools/check_mwcc_neutral.py`** removes the stale entries of its own temporary worktrees before it adds
+    one, so the next run clears what a killed run leaves, and only those: `git worktree prune` would also drop any
+    other session's worktree whose folder is missing, even one that was only moved.
+- **Next:** Phase 5's story coverage after the Route 20 save: the original SDK and CPU timing that the trainer AI's
+  choices still depend on, then Floccesy Ranch, Hugh's Town Map, the lost Lillipup and the first gym. The pending
+  upstream sync is resolved separately.
+- **Blockers:** decisions the owner holds: ADRs 0022, 0023, 0025 and 0030 are proposed, and 0023 decides whether oracle
+  routes may part where the DS's CPU time decides. Spanish issue 45 still lacks a local dump.
+
+## 2026-11-01: widescreen kept possible: ADR 0030 proposed, the rules every change keeps, and documentation fixes
+
+- **Upstream:** unchanged, `9496bc869b87`; reviewed main `e733ccc8a3` (PR 66's merge).
+- **Port:** `d0833a7943`, on the topic `port-widescreen-rules` from that main; this entry fills the last entry's
+  `PORT_SHA` with `22d3464507`. Documentation only: nothing outside `port/` changes.
+- **ROM (T0):** configure/Ninja (`-j4`) and both original US SHA1s pass with zero compiler warnings, on reviewed main
+  and again on this commit: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+- **Host build (T1):** no source, build or test change from reviewed main, so not rebuilt here; exact-head
+  `sync_upstream.sh --verify-pr` builds and tests both versions before merge.
+- **Tests (T2–T7):** not run here: no code, input, seed, golden, mask, budget or sanitizer policy changes. Self-checks
+  of the eleven changed documents pass: every relative link and heading anchor resolves, every table keeps its header's
+  column count with no blank line inside it, and no added line outside a table is over 120 characters.
+- **Tiers/trap stubs:** unchanged; no progress scan.
+- **64-bit warnings:** unchanged from the last entry, 365 sites/229 keys (real 66, harmless 123, handled 141,
+  unreachable 35); the exact-head verifier repeats the guard. No baseline change.
+- **Work done:** [ADR 0030](adr/0030-widescreen-by-an-engine-side-hor-plus-scale-with-native-readbacks.md), proposed for
+  the owner's decision: widescreen by a Hor+ scale in Frigate's geometry engine, with the clip and vector matrices and
+  the position and vector tests native and box tests answering for the wide view; 2D native and centred, anchored at
+  ClAct and BMP windows; three enhancement classes; the invariants the tests hold (centre crop equals native, logic
+  digests equal with it on, readbacks native); what stays 4:3; and the game-side projection, a projection matrix
+  scaled in the engine and anamorphic stretching compared on their evidence. Its rules 1 to 10, which keep phase 6's
+  exit reachable under either of PLAN.md §5.2's options, apply now:
+  [port/CLAUDE.md](../CLAUDE.md#keeping-widescreen-possible-planmd-52) has the essentials, ARCHITECTURE.md's boundary
+  rules and the renderers' guide a line each, and the glossary rows for Hor+, enhancement classes and readbacks. Rules
+  11 to 13 (`PORT_SCREEN_WIDTH` kept, no `MAP_CONFIGS` or actor-limit edits, a class for every enhancement) come with
+  its design. Fixes: ARCHITECTURE.md's feature map is one table again (two blank lines had left the Spanish ROM row and
+  the 32 rows from "SDK string length" on as raw text); the ADR index's next free number is 0033, with 0031 reserved
+  for verification v2, 0032 for the save lab and 0020 still for D6; ADR 0021 is accepted, since the developer merged
+  PR 18 (`1c5f322b71`), the merge its note waited on; bw2-mod-ecosystem.md §3 has a dated note with the names upstream
+  changed since (`field_actor_billboard.c`, `field_actor_g3dobj.c`, `field_actor.c`, `hall_of_fame_demo_main.c`,
+  `FieldG3DMapper_GetWindowStartEven`) and the counts on main; and port/CLAUDE.md and ADR 0002 link SYNC.md's
+  reference stop at its current heading.
+- **Next:** publish the topic PR; all hosted checks and exact-head local verification precede its protected merge under
+  the existing owner-authored review-only exception. The owner decides ADR 0030. Phase 5's story coverage continues as
+  the earlier entries say.
+- **Blockers:** none for this change. ADR 0030 waits on the owner's decision, and ADR 0022 stays proposed for the
+  owner's review, which its note waits on (PR 31 merged with none on record). Widescreen itself is phase 6 work.
 
 ## 2026-10-28: finish local-verification failures and retain the scoped sync App
 
