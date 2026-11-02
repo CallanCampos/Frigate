@@ -32,11 +32,42 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: finish local-verification failures and retain the scoped sync App
+
+- **Upstream:** reviewed main `56a9ef2a1d` contains `9496bc869b87` after PR 65 passed both full local suites, both
+  actual assembly oracles, both original ROM hashes and all 14 checks before owner approval and protected merge.
+- **Port:** `PORT_SHA`, a feature branch from that reviewed main; the preserved patch is reapplied without dropping
+  its named stash or backups. Test README conflict resolution retains both complete sets of controls.
+- **ROM (T0):** configure/Ninja and both original US SHA1s pass with zero ROM compiler warnings: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  No ROM input changes.
+- **Host build/tests (T1/T2):** fresh arm64 macOS RelWithDebInfo all-target builds pass in both games. Each
+  unit/static suite passes 338 tests with three explicit optional skips of 341. All 48 sync/style fixtures, original
+  style fixtures, strict style, shell syntax, copy/name/row checks and semantic workflow-alias comparison pass.
+  Old-script negative controls apply to the byte-identical reviewed-main verifier. All eight source/record hashes
+  remain fixed throughout these gates; afterward only this new entry and one lesson clarification are finalized.
+- **Replay/oracle/sanitizers/performance/save/play (T3/T4/T5/T6/T7):** short replay/save routes pass B2 6/6 and
+  W2 4/4, including cleanup, with no skips. Exact published-head full canonical verification remains mandatory;
+  no parent result substitutes. Inputs, seeds, references, masks, budgets and sanitizer policy stay fixed.
+  No new whole-app fatal-sanitizer, later-story or windowed-play claim.
+- **Tiers/trap stubs:** no new progress scan or experimental SDK-reader activation.
+- **64-bit warnings:** guard passes, 365 sites/229 keys (real 66, harmless 123, handled 141, unreachable 35);
+  all 1,711 files compiled, zero missing. No baseline change.
+- **Work done:** failed or caught-interrupted `--verify-pr` runs report failure on the original pinned head and keep
+  their failure exit status, including when the failure-status upload fails. Completed validation alone may report
+  success. The App action uses its supported `client-id` input with the existing identifier, key and narrow scope.
+  Documentation explains the remaining network/shutdown limits. Fill verified historical game-change commit
+  placeholders with their actual source commits, including both original signed-offset fixes.
+- **Next:** validate, commit, repeat T0 and publish the topic PR; exact-head full local verification, all hosted
+  checks and owner review precede normal protected merge. Continue causal save/init timing diagnosis separately.
+- **Blockers:** those gates remain required. Broader serial/CPU timing, the separate SDK-reader prototype and later
+  story coverage remain unfinished; Spanish issue 45 still lacks a local dump. No human setup blocks US work.
+
 ## 2026-10-28: validate actor names and reconstructed movie resources
 
 - **Upstream:** frozen `9496bc869b87`, 14 commits after `cdbe99de1c73`; PR 65 remains a proposal until protected
   merge. Reviewed main `e90c158810` includes the owner-reviewed backup service from PR 63, whose 14 checks pass.
-- **Port:** `PORT_SHA`, real integration of that reviewed main with the App's `e151a070c9` upstream merge.
+- **Port:** `3fc843c864`, real integration of that reviewed main with the App's `e151a070c9` upstream merge.
 - **ROM (T0):** the original App tree's 10,664-step rebuild passes both original US SHA1s with zero warnings;
   combined-tree configure/Ninja and both hashes also pass with zero warnings: B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.

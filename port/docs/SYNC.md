@@ -69,6 +69,10 @@ branches. Contents write enables ordinary repository pushes, so protected-main r
 Pull requests write is GitHub's coarse scope for PR creation; the publisher uses it only to inspect/create PRs and
 request owner review, never to submit reviews or approvals.
 
+The workflow supplies that existing identifier through the action's `client-id` input. The pinned implementation
+normalizes `client-id` and the deprecated `app-id` identically, so this input-name change needs no new variable,
+private key, installation or permissions.
+
 The pinned official [create-github-app-token action](https://github.com/actions/create-github-app-token) mints a
 short-lived installation token explicitly limited to this owner/repository and those two permissions. Its post-job
 cleanup revokes the token (`skip-token-revoke: false`). The ordinary workflow token has only Contents read for
@@ -96,8 +100,11 @@ port/tools/sync_upstream.sh --verify-pr NUMBER
 This verifies the exact checked-out PR head without merging or pushing. It requires clean tracked source and no
 nonignored untracked files, posts a pending status, runs both ROM builds and verifies both SHA1s, then configures,
 builds and tests the native host. It checks the local and remote PR head again before recording
-`Frigate local verification` success. Failed or interrupted validation cannot create a green status. A new push
-needs a new verification. Keep build logs locally and describe skips or optional unrun tests in the PR.
+`Frigate local verification` success. A failed command or a caught interrupt/termination records failure on the
+original pinned head and keeps the command's failure exit status. A failed status upload, machine shutdown or
+uncatchable kill can still leave a pending status; rerun verification on the exact current head. Failed or
+interrupted validation cannot create a green status. A new push needs a new verification. Keep build logs locally
+and describe skips or optional unrun tests in the PR.
 
 Also review [game-changes.md](game-changes.md): confirm each port adaptation still exists or was deliberately
 superseded. For changed incomplete C or shared headers, supply the matching-neutral evidence described there;
