@@ -79,7 +79,7 @@ def fix_cat(r):
     if r["sub"] == "c_gap" and r["module"] == "ov011":
         return "lib/dwc"  # every ov011 gap lies in the DWC/GameSpy stack (0x0215dd74 on, between lib/ files)
     if r["sub"] == "c_gap" and r["module"] == "ov182":
-        # after dwc_util_screen.c: the DWC utility's screens; after download_play_sys.c: unknown
+        # after lib/dwcutilui's comment.c: the DWC utility's screens; after lib/dwcutil's dwc_moveid.c: unknown
         return "lib/dwcutilui (likely)" if addr < 0x021b93e8 else "game"
     if r["tier"] != "c" or not cat.startswith("unknown"):
         return cat

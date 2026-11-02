@@ -507,10 +507,10 @@ Sessions working toward this plan follow one loop, so progress is measurable and
   `.claude/worktrees`, under `port/CLAUDE.md`. In the port clone, port/CLAUDE.md overrides the root's
   direct-publishing instruction: every change uses a topic PR.
 - **What the port needs from the decomp, in order:** overlay 36's C and data (mariano54, #83), including the
-  818-pointer tables of `fldmmdl_blact.c`; overlay 12's event-script command tables as C data (674 pointers); the
-  four ITCM ClAct renderers (no issue or owner yet: a decomp session can write them in the decomp checkout as ordinary
-  decomp work); overlays 11 and 182 for Wi-Fi (#72, #132), only for phase 7. As far as the research found, nothing
-  else blocks phases 0–5.
+  818-pointer tables now in `field_actor_drawdata.c`; overlay 12's event-script command tables as C data (674
+  pointers); the four ITCM ClAct renderers (no issue or owner yet: a decomp session can write them in the decomp
+  checkout as ordinary decomp work); overlays 11 and 182 for Wi-Fi (#72, #132), only for phase 7. As far as the
+  research found, nothing else blocks phases 0–5.
 - **The decomp session keeps its own workflow.** The port never edits decomp files except for the three kinds of
   change in §4.1, and never competes with an overlay claim.
 - **Nothing about the port goes upstream (D10).** No issues, comments, pull requests or proposals on

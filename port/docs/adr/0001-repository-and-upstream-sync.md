@@ -26,8 +26,8 @@ continues to get more decompiled. The port should be developed alongside the dec
   `.claude/` and the workflows are rewritten regularly; 14 commits changed `.github/workflows/` between 2026-10-04 and
   2026-10-15.
 - **The port needs its own home**: issues, releases, CI on macOS (free on public repositories), and a landing page.
-- **CI limits** ([SYNC.md](../SYNC.md#references)): `GITHUB_TOKEN` can't push changes to workflow files, and its pushes
-  start no other workflow.
+- **CI limits** ([SYNC.md](../SYNC.md#scheduled-proposals)): `GITHUB_TOKEN` can't push changes to workflow files, and
+  its pushes start no other workflow.
 
 ## Decision
 
@@ -61,11 +61,11 @@ continues to get more decompiled. The port should be developed alongside the dec
    [game-changes.md](../game-changes.md) row describes, at the code's new place if upstream moved it, or drop the
    change if upstream made it unnecessary. Never drop or rewrite upstream's matching work to keep a port change. The
    resolved merge must build both ROMs before it is pushed. A rewrite of upstream's history is the user's decision.
-   [SYNC.md](../SYNC.md#when-the-upstream-sync-issue-opens) has the procedure.
+   [SYNC.md](../SYNC.md#conflicts-and-stopped-syncs) has the procedure.
 7. **When the port first changes a game file**, the Action stops pushing to `main` by itself: its check of the tree
    outside `port/` fails, it pushes nothing, and its issue says that the switch to pull requests is due. After the
    switch, it proposes each merge as a pull request that a ROM-verified local sync supersedes
-   ([SYNC.md](../SYNC.md#when-the-port-changes-game-files)). The switch gets its own ADR, superseding the push part
+   ([SYNC.md](../SYNC.md#scheduled-proposals)). The switch gets its own ADR, superseding the push part
    of this one.
 
 ## Alternatives
