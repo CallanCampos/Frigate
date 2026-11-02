@@ -40,19 +40,23 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   the change, then the merge of main at `10d017c010` (PR 67, which merged meanwhile; STATUS.md's two new entries are
   both kept, this one first) and this record's update. This entry fills PR 67's entry's `PORT_SHA` with
   `f53e767509`; both had filled PR 69's with `2f9033d7b8`. The change itself is all in `port/`.
-- **ROM (T0):** in this branch's new worktree, `python3 configure.py && ninja` at `-j4`, 10,703 steps with no compiler
-  warning: both original US SHA1s match, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2
-  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. No ROM input changes.
+- **ROM (T0):** in this branch's new worktree, `python3 configure.py && ninja` at `-j4`, with no compiler warning and
+  both original US SHA1s matching, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`: on the change (10,703 steps), and again on the merge of main (12,555
+  steps, the sync's sources). The change has no ROM input.
 - **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both games with the verifier's configure flags
   (`build/port-verify-b2_us`, `build/port-verify-w2_us`; `-DPORT_SANITIZE_RECOVER=OFF
-  -DPORT_FRAME_TIME_REPORT_ONLY=OFF`) pass at `-j4`; the new test programs compile with `-Wall -Wextra -Werror`.
+  -DPORT_FRAME_TIME_REPORT_ONLY=OFF`) pass at `-j4`, on the change and again on the merge of main; the new test
+  programs compile with `-Wall -Wextra -Werror`.
 - **Tests:**
-  - T2/T6: `ctest -LE route` at `-j3` passes in both games, 352 of 359 tests passing and 7 skipping in each, after
-    the fresh builds and again after the last change to the digest's files. The skips are this checkout's optional
-    setups, as in the last entry: `asm_oracle` (no Unicorn in this Python), `oracle_boot`, `oracle_saves` and
-    `oracle_floccesy_save` (no oracle built), the two function-sanitizer negatives of the VM dispatch (Apple's
-    compiler emits no such check) and `app_universal_slices` (one slice). The two tests more than the last entry's
-    are the new `digest_format_plain` and `digest_format_sanitized`, 310 checks each.
+  - T2/T6: `ctest -LE route` at `-j3` passes in both games, 352 of 359 tests passing and 7 skipping in each, on the
+    change (after its fresh builds, and again after the last edit to the digest's files) and on the merge of main.
+    The skips are this checkout's optional setups, as in PR 69's entry: `asm_oracle` (no Unicorn in this Python),
+    `oracle_boot`, `oracle_saves` and `oracle_floccesy_save` (no oracle built), the two function-sanitizer negatives
+    of the VM dispatch (Apple's compiler emits no such check) and `app_universal_slices` (one slice). The two tests
+    more than that entry's are the new `digest_format_plain` and `digest_format_sanitized`, 310 checks each. CI's 13
+    checks pass on the change's first head, `b33f06c1da`, the new tests among those its host and sanitized jobs run
+    on macOS, Linux and Windows.
   - Negative controls: 27 mutants of `digest.c`, each with one rule taken out, fail the test, each by 1 to 17 checks,
     and the unchanged file passes: a mask widened (WININ and WINOUT, the scrolls, MASTER_BRIGHT, DISPCAPCNT,
     CLEAR_COLOR, FOG_TABLE, VRAMCNT_E, POWCNT1, WRAMCNT, and engine B's DISPCNT in the decode and, apart, in the
@@ -68,7 +72,7 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 - **Tiers/trap stubs:** not measured: no game code changed.
 - **64-bit warnings:** the pointer cast guard passes in both games, and `check_ptrcasts.py --build-dir
   build/port-verify-b2_us --report` gives 365 sites in 229 keys (real 66, harmless 123, handled 141, unreachable 35),
-  1,711 files compiled and none missing: no change.
+  1,711 files compiled and none missing, on the change and on the merge of main: no change.
 - **Work done:** verification v2's first part, the canonical digests, which need no ROM:
   - **[ADR 0031](adr/0031-per-game-frame-digests-against-a-content-addressed-oracle-cache.md), proposed:** a digest of
     the DS's state at each game frame, taken at the last VBlank of each count and compared exactly, with oracle runs in
