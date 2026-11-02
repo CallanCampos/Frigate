@@ -659,7 +659,10 @@ class CtestTests(World):
         self.use_tables({"alone": Sequence(40, 50, "", "")}, {}, {})
 
     def ctest_ran(self) -> str:
-        return (self.build / "ctest-env.txt").read_text(encoding="utf-8")
+        """What the stand-in ctest recorded of its last run: its environment's sanitizer options and its arguments"""
+        path = self.build / "ctest-env.txt"
+        self.assertTrue(path.exists(), "ctest didn't run")
+        return path.read_text(encoding="utf-8")
 
     def test_the_routes_run_first_with_the_criterions_options(self):
         self.routes(["replay_one", "replay_two"])
