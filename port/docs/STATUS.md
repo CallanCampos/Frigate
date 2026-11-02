@@ -34,51 +34,54 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 ## 2026-11-02: after the naming sync: the guard's rows and the documents at upstream's names, the delegated sync review
 
-- **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit. Reviewed main is `806b2a8f9d`, PR 73's
+- **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit. Reviewed main is `c0a7941e4e`, PR 72's
   merge, which this branch merges; it started from `10d017c010`, PR 67's.
 - **Port:** `PORT_SHA`, on the topic branch `port-sync-hygiene-1102` from `10d017c010`: `fd81336269` (the sync script's
   messages and their test), `07c5e0c409` (the rest, and this entry), `0522fe9311` (the merge of `main` at
   `36101609ad`, PR 70: ADR 0023 accepted, documents only), `55286eae4a` (the merge of `main` at `806b2a8f9d`, PR 73:
-  Castelia City's café) and this commit, the review's fixes (below). Each merge keeps both new STATUS.md entries, this
-  one first; the first drops the "(proposed)" that `07c5e0c409` gave ADR 0023's row in docs/README.md. This entry
-  fills the `PORT_SHA` of PR 73's entry with `867ce0bd96`, of PR 70's with `cfb45c1be4` (as PR 73's entry does) and
-  those of three 2026-10-25 entries (below); PR 70's entry and this one fill PR 67's alike, `f53e767509`. Only
-  `port/` changes.
+  Castelia City's café), `84c24fcd10` (the review's fixes, below), `eef1532091` (the merge of `main` at `c0a7941e4e`,
+  PR 72: verification v2's canonical digests, ADR 0031 proposed) and this record's update after it. Each merge keeps
+  both new STATUS.md entries, this one first; the first drops the "(proposed)" that `07c5e0c409` gave ADR 0023's row
+  in docs/README.md. This entry fills the `PORT_SHA` of PR 72's entry with `a98b983313`, of PR 73's with `867ce0bd96`
+  (as PR 72's entry does), of PR 70's with `cfb45c1be4` (as PR 73's entry does) and those of three 2026-10-25 entries
+  (below); PR 70's entry and this one fill PR 67's alike, `f53e767509`. Only `port/` changes.
 - **ROM (T0):** `python3 configure.py && ninja` in a new worktree, every step run (14,039): both original US SHA1s, B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, with no compiler
   warning; again on the merge with `main` at `806b2a8f9d` (5,939 steps, PR 73's `src/ov129/sp_poke_gimmick.c` among
-  them), the same SHA1s and no warning. This branch's own changes are no ROM input.
+  them) and on the merge with `main` at `c0a7941e4e` (PR 72's files are all in `port/`: the two checks), the same
+  SHA1s and no warning. This branch's own changes are no ROM input.
 - **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both versions (`build/port`, `build/port-w2`, Apple
   clang, ninja at `-j4`) pass, with 748 compiler warnings each, all in the decomp's C of `src/` and `lib/`, as on
   `main`; and again on the merge with `main` at `806b2a8f9d`, which reconfigures both and compiles PR 73's files
-  (`exit_host.c`, `heap.c`, `sp_poke_gimmick.c`, `main.c` and their tests) with no warning. This branch's own changes
-  are no host build input.
+  (`exit_host.c`, `heap.c`, `sp_poke_gimmick.c`, `main.c` and their tests) with no warning, and on the merge with
+  `c0a7941e4e`, which compiles PR 72's digest code and its tests with no warning. This branch's own changes are no host
+  build input.
 - **Tests:**
   - T2/T6: `ctest -LE route` (`CTEST_PARALLEL_LEVEL=3`): before the merge with PR 73, 350 of 357 tests pass in each
-    version; on the merged tree, 355 of 362, PR 73's new tests and `game_ptrcasts` among them. In each, 7 skip for
-    the optional setups a new worktree lacks: `asm_oracle` (no Unicorn venv), `oracle_boot`, `oracle_saves` and
-    `oracle_floccesy_save` (no oracle built), the VM dispatch's native and verifier negatives (Apple clang has no
-    function check) and `app_universal_slices` (one slice). None fails.
+    version; after it, 355 of 362, PR 73's new tests and `game_ptrcasts` among them; after the merge with PR 72, 357 of
+    364, its two digest tests among them. In each, 7 skip for the optional setups a new worktree lacks: `asm_oracle` (no
+    Unicorn venv), `oracle_boot`, `oracle_saves` and `oracle_floccesy_save` (no oracle built), the VM dispatch's native
+    and verifier negatives (Apple clang has no function check) and `app_universal_slices` (one slice). None fails.
   - T3: not run here: nothing that a replay runs is this branch's change (documents, the guard's baseline, a query's
-    and a tool's comments, a shell script's messages and Python tests); PR 73's code, which the merge brings, was
-    replayed in PR 73. The verifier's full `ctest` on the exact head runs the replays.
+    and a tool's comments, a shell script's messages and Python tests); PR 73's and PR 72's code, which the merges
+    bring, was verified in those PRs. The verifier's full `ctest` on the exact head runs the replays.
   - The sync tooling tests, CI's command (`python3 -m unittest discover -s port/tools/tests -p test_upstream_sync.py`,
-    Python 3.14.6 here; CI's job runs 3.12): 64 of 64 pass, 60 on `main`. Negative controls, each in a scratch copy of
-    the tests: against `main`'s `sync_upstream.sh`, `SyncDocSectionTests` fails naming the three old section names, and
-    `ShellStopSummaryTests`' topic case fails on the summary's "stopped: upstream rewrote its history"; without either
-    check's outcome, that check's case fails; a new message that names its section in another form
-    (`see port/docs/SYNC.md, section "..."`), or names SYNC.md alone, fails; with SYNC.md's "Upstream rewrite (exit 4)"
-    renamed, it fails naming that item; the test's own six controls each fail as they must. ShellCheck 0.11.0 reports
-    the same 10 findings on the script as on `main`, and `bash -n` passes.
-  - A link and table checker over 96 Markdown documents, `port/`'s and the port's `.github/` ones (written for this
+    Python 3.14.6 here; CI's job runs 3.12): 64 of 64 pass, 60 on `main`, also on each merged tree. Negative controls,
+    each in a scratch copy of the tests: against `main`'s `sync_upstream.sh`, `SyncDocSectionTests` fails naming the
+    three old section names, and `ShellStopSummaryTests`' topic case fails on the summary's "stopped: upstream rewrote
+    its history"; without either check's outcome, that check's case fails; a new message that names its section in
+    another form (`see port/docs/SYNC.md, section "..."`), or names SYNC.md alone, fails; with SYNC.md's "Upstream
+    rewrite (exit 4)" renamed, it fails naming that item; the test's own six controls each fail as they must. ShellCheck
+    0.11.0 reports the same 10 findings on the script as on `main`, and `bash -n` passes.
+  - A link and table checker over 97 Markdown documents, `port/`'s and the port's `.github/` ones (written for this
     change, not committed), which splits a table's cells as GitHub does, at an unescaped `|` even in a code span: on
-    `main` (`806b2a8f9d`) it finds 6 problems, ADR 0001's three missing SYNC.md anchors, game-changes.md's R8 row and
-    tests/README.md's NODEMIX row, all fixed here, and `research/platinum-port.md:25`, a record; on this branch that
-    one alone. On a fixture it finds a missing file, a missing anchor in another document and in the same one, a row
-    split by a code span's pipes, a short row, a row cut off by a blank line and a stray row, and not a row whose
-    pipes are escaped or a list item's code span continued on a line that starts with `|`. The first checker, which
-    took a code span as one cell, had found 4 on `main` and none on this branch. GitHub's renderer (`gh api markdown`,
-    mode gfm) gives the R8 row its 6 cells, its guard's whole code span and its commit.
+    `main` (`806b2a8f9d`, and `c0a7941e4e`) it finds 6 problems, ADR 0001's three missing SYNC.md anchors,
+    game-changes.md's R8 row and tests/README.md's NODEMIX row, all fixed here, and `research/platinum-port.md:25`, a
+    record; on this branch that one alone. On a fixture it finds a missing file, a missing anchor in another document
+    and in the same one, a row split by a code span's pipes, a short row, a row cut off by a blank line and a stray row,
+    and not a row whose pipes are escaped or a list item's code span continued on a line that starts with `|`. The first
+    checker, which took a code span as one cell, had found 4 on `main` and none on this branch. GitHub's renderer
+    (`gh api markdown`, mode gfm) gives the R8 row its 6 cells, its guard's whole code span and its commit.
   - T4, T5 and T7 not run: no game, host or test-target code of this branch's changes.
 - **Tiers:** not measured (no progress scan).
 - **Trap stubs:** 25 function stubs and 1 data placeholder (`CARDi_NdmaInterface`) in each version's generated
