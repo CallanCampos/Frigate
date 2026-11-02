@@ -3,6 +3,32 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-11-01: keep the verifier's exit status when its output is gone
+
+- A signal from the terminal (`Ctrl-C`, `Ctrl-\`, a closed terminal) or a `kill` of the process group reaches the
+  script, the command it runs and the reader of `... | tee log` alike, so what the script writes after it goes to a
+  closed pipe. Bash writes there its report of a command that a hangup, quit or termination killed (bash 3.2's
+  "Hangup: 1", "Quit: 3", "Terminated: 15"; nothing for Ctrl-C), and the SIGPIPE ends it after its EXIT trap, with
+  another status. A warning written from the trap fails the same way: under `set -e`, its failed write ends the trap
+  with status 1, which is how a Ctrl-C lost its 130, and with `|| true` on it, bash 3.2 dies of the SIGPIPE at the
+  trap's next command. While a run must still report, catch SIGPIPE with a trap that does nothing (`trap ':' PIPE`),
+  so that such writes only fail. Don't ignore it (`trap '' PIPE`): an ignored signal stays ignored in the commands
+  the shell starts, the builds and tests among them.
+- Catch each signal that a terminal or `kill` sends, HUP, INT, QUIT and TERM, and exit with 128 plus its number. A
+  shell dies of an uncaught SIGQUIT (`Ctrl-\`) without running its EXIT trap, which leaves the pending status behind.
+- A `gh api` request whose response nobody needs takes `--silent`, or gh fails writing it after GitHub has taken it,
+  and the script reports an upload that failed when it didn't.
+- Pin the commit that a run reports on once, and check HEAD against it later instead of reading HEAD again: another
+  process can move HEAD during a network request. Exit with the script's own statuses, never a tool's: gh exits 4
+  when it needs a login, which `sync_upstream.sh` documents as an upstream rewrite.
+- Run the controls with each part of a fix taken out alone, not only against the unfixed script: a part whose removal
+  no control notices is untested, however good its reason. This change's review found four such parts, `--silent` on
+  the failure request, catching SIGPIPE rather than ignoring it, and the exit status of the two reads of the PR's
+  head; each now has a control that fails without it. Ten of the twelve verifier controls added here fail on the
+  script before this change, and the group-signal one also fails when only the trap's warning is hardened, which is
+  how bash's own report came to light. The other two guard what that script already did: an interrupt whose failure
+  upload fails keeps its 130, and the builds and tests get SIGPIPE at its default.
+
 ## 2026-10-28: finish failed verification statuses on the pinned commit
 
 - Posting pending without a failure exit path leaves a stopped local build looking active indefinitely. Arm cleanup

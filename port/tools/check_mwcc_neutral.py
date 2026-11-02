@@ -11,8 +11,11 @@ every file's preprocessed text identical: the compiler gets the same input, so i
 and incomplete files alike. That proves a guard-only change neutral for the whole tree at once
 (port/docs/game-changes.md). Any difference is printed with its first differing lines, and the exit status is 1.
 
-The checkout of BASE is a temporary git worktree, removed at the end. Both trees use this tree's generated headers
-(build/include/generated), which the change doesn't touch.
+The checkout of BASE is a temporary git worktree, removed at the end. A run killed before then leaves it behind, and
+once the system has deleted the temporary directory, its entry in the repository is stale: each run first removes the
+stale entries of this tool's own worktrees, and only those. `git worktree prune` would drop every unlocked entry whose
+directory is missing, in a clone that other sessions' worktrees share, including a worktree that was only moved. Both
+trees use this tree's generated headers (build/include/generated), which the change doesn't touch.
 """
 import argparse
 import os
@@ -78,6 +81,25 @@ def compare(base: Path, source: str, version: str, generated: Path) -> str | Non
             f"  base:         {' '.join(old_tokens[context])}\n  working tree: {' '.join(head_tokens[context])}")
 
 
+# The name of the temporary directory that holds a run's worktree of BASE, as base/, starts with this
+TEMPORARY_PREFIX = "mwcc-neutral-"
+
+
+def remove_stale_worktrees():
+    """Removes the entries of this tool's own worktrees whose directory is gone, and no other (the docstring says
+    why). Git marks such an entry prunable unless it is locked, and `git worktree remove`, without --force, drops it."""
+    listing = subprocess.run(["git", "worktree", "list", "--porcelain", "-z"], cwd=ROOT, capture_output=True,
+                             text=True, check=True).stdout
+    for entry in listing.split("\0\0"):
+        fields = entry.split("\0")
+        if not fields[0].startswith("worktree "):
+            continue
+        path = Path(fields[0].removeprefix("worktree "))
+        prunable = any(field == "prunable" or field.startswith("prunable ") for field in fields)
+        if prunable and path.name == "base" and path.parent.name.startswith(TEMPORARY_PREFIX) and not path.exists():
+            subprocess.run(["git", "worktree", "remove", str(path)], cwd=ROOT, check=False)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--base", help="the revision to compare with, default the last merged upstream commit")
@@ -92,7 +114,8 @@ def main():
     generated = ROOT / "build" / "include" / "generated"
     sources = args.files or sorted(p.relative_to(ROOT).as_posix() for pattern in ("src/**/*.c", "lib/*/src/**/*.c")
                                    for p in ROOT.glob(pattern))
-    with tempfile.TemporaryDirectory(prefix="mwcc-neutral-") as tmp:
+    remove_stale_worktrees()
+    with tempfile.TemporaryDirectory(prefix=TEMPORARY_PREFIX) as tmp:
         base = Path(tmp) / "base"
         subprocess.run(["git", "worktree", "add", "--detach", "--quiet", str(base), args.base], cwd=ROOT, check=True)
         try:

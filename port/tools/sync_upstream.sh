@@ -11,7 +11,8 @@
 # --no-build implies --no-push; --no-push leaves the merge for local inspection.
 # Rewrite and reference overrides require the user's explicit decision (SYNC.md).
 # Exit status: 0 done, 1 failed, 2 invalid origin/destination, 3 conflict, 4 rewrite (of upstream, or of a draft's
-# upstream head), 5 references.
+# upstream head), 5 references; with --verify-pr, 129, 130, 131 or 143 when a hangup, interrupt, quit or termination
+# stops it.
 set -euo pipefail
 
 PORT_REPO=CallanCampos/Frigate
@@ -251,16 +252,21 @@ workflow_changes=""
 summary_ready=0
 verification_pending=0
 
-# Prints the fields of a port/docs/STATUS.md entry that a sync knows; the session fills in the others
+# Prints the fields of a port/docs/STATUS.md entry that a sync knows; the session fills in the others. A --verify-pr
+# run that stops before it records success records failure here first.
 summary() {
     local status=$?
     if [ "$verification_pending" = 1 ]; then
-        # Only this invocation's pinned head is affected. An EXIT trap preserves the build/signal exit status even
-        # if this best-effort API request fails; never replace a failed verification with success.
-        if ! gh api --method POST "repos/$PORT_REPO/statuses/$verified_head" -f state=failure \
+        # Only this invocation's pinned head is affected, and only with failure. The run exits with the status it
+        # stopped with, which an EXIT trap that returns keeps, so nothing here may end the shell. The response is
+        # discarded (--silent): when one signal stops this run and the reader of its output (Ctrl-C on
+        # `... | tee log`), gh would fail writing it after GitHub took the request.
+        if ! gh api --method POST --silent "repos/$PORT_REPO/statuses/$verified_head" -f state=failure \
             -f 'context=Frigate local verification' \
             -f "description=Local verification stopped (exit $status); rerun on this head"; then
-            printf 'sync_upstream: could not record failed local verification; the GitHub status may remain pending\n' >&2
+            # With that reader gone, this write fails too (SIGPIPE is caught), and `|| true` keeps the exit status
+            printf 'sync_upstream: could not record failed local verification; %s\n' \
+                'the GitHub status may remain pending' >&2 || true
         fi
     fi
     [ "$summary_ready" = 1 ] || return 0
@@ -422,15 +428,34 @@ merge_upstream() {
     merged_count=$((merged_count + count))
 }
 
-verified_head=$(git rev-parse HEAD)
 if [ -n "$verify_pr" ]; then
-    pr_head=$(gh pr view "$verify_pr" --repo "$PORT_REPO" --json headRefOid --jq .headRefOid)
+    # The commit that every status of this run names, pinned once: the run verifies it or stops, never another one
+    verified_head=$(git rev-parse HEAD)
+    pr_head=$(gh pr view "$verify_pr" --repo "$PORT_REPO" --json headRefOid --jq .headRefOid) ||
+        die 1 "could not read the head of PR $verify_pr"
     [ "$pr_head" = "$verified_head" ] || die 1 "check out the exact PR head before verification"
-    verification_pending=1
+    # From here until success is recorded, the exit trap records a stop as failure. The signals that a terminal or
+    # kill sends (a hangup, Ctrl-C, Ctrl-\ and a termination) are caught to exit with the shell's usual status for
+    # them, 128 plus the signal's number, which the failure's description then names; SIGKILL can't be caught. Sent to
+    # the whole process group, such a signal stops the reader of `... | tee log` too, and what the run writes after it
+    # goes to a closed pipe: the exit trap's warning, and bash's report of a command that a hangup, quit or termination
+    # killed ("Terminated"). So SIGPIPE is caught as well, to do nothing: such a write fails instead of ending the
+    # shell with another status. Unlike an ignored signal, a caught one goes back to its default in the commands that
+    # the shell starts.
+    trap 'exit 129' HUP
     trap 'exit 130' INT
+    trap 'exit 131' QUIT
     trap 'exit 143' TERM
-    gh api --method POST "repos/$PORT_REPO/statuses/$verified_head" -f state=pending \
-        -f 'context=Frigate local verification' -f 'description=Local ROM and host verification running'
+    trap ':' PIPE
+    verification_pending=1
+    # Every status request discards GitHub's response (--silent), which nothing reads: a closed output must not make
+    # a request that GitHub took look failed
+    gh api --method POST --silent "repos/$PORT_REPO/statuses/$verified_head" -f state=pending \
+        -f 'context=Frigate local verification' -f 'description=Local ROM and host verification running' ||
+        die 1 "could not record pending local verification"
+    # Another process can move HEAD during those two requests
+    [ "$(git rev-parse HEAD)" = "$verified_head" ] ||
+        die 1 "HEAD changed before verification began; check out the exact PR head and run this again"
 else
 say "Fetching origin/main and upstream/$UPSTREAM_BRANCH"
 fetch_all
@@ -458,9 +483,10 @@ if [ "$local_commits" -gt 0 ]; then
     say "$local_commits commits are not on origin/$branch yet:"
     git log --oneline --first-parent -n 20 "$origin_ref..HEAD"
 fi
+# The head that the merges made, which the builds verify and the push publishes
+verified_head=$(git rev-parse HEAD)
 
 fi
-verified_head=$(git rev-parse HEAD)
 
 # --- 4 and 5. Builds -------------------------------------------------------------------------------------------------
 
@@ -582,11 +608,14 @@ fi
 [ "$(git rev-parse HEAD)" = "$verified_head" ] || die 1 "HEAD changed during verification"
 if [ -n "$verify_pr" ]; then
     git diff --quiet && git diff --cached --quiet && [ -z "$(git ls-files --others --exclude-standard)" ] || die 1 "build changed source files"
-    pr_head=$(gh pr view "$verify_pr" --repo "$PORT_REPO" --json headRefOid --jq .headRefOid)
+    pr_head=$(gh pr view "$verify_pr" --repo "$PORT_REPO" --json headRefOid --jq .headRefOid) ||
+        die 1 "could not read the head of PR $verify_pr"
     [ "$pr_head" = "$verified_head" ] || die 1 "PR head changed during verification; rerun on new head"
-    gh api --method POST "repos/$PORT_REPO/statuses/$verified_head" -f state=success \
+    # Until GitHub has the success, the run hasn't passed: a failed upload exits 1, and the exit trap records failure
+    gh api --method POST --silent "repos/$PORT_REPO/statuses/$verified_head" -f state=success \
         -f 'context=Frigate local verification' \
-        -f 'description=Both ROM SHA1s and host build/tests verified locally'
+        -f 'description=Both ROM SHA1s and host build/tests verified locally' ||
+        die 1 "could not record local verification success"
     verification_pending=0
     rm -f "$publish_helper"
     exit 0
@@ -595,11 +624,14 @@ workflow_changes=$(git diff --name-only "$origin_ref" HEAD -- .github/workflows 
 if [ "$push" = 1 ]; then
     git diff --quiet && git diff --cached --quiet && [ -z "$(git ls-files --others --exclude-standard)" ] || die 1 "build changed source files; refusing publication"
     "$PYTHON" "$publish_helper" --publish "$branch" || die 1 "topic publication/PR failed"
-    [ "$(git rev-parse HEAD)" = "$verified_head" ] || die 1 "HEAD changed during publication"
-    gh api --method POST "repos/$PORT_REPO/statuses/$verified_head" -f state=success \
-        -f 'context=Frigate local verification' \
-        -f 'description=Both ROM SHA1s and host build/tests verified locally'
     push_result="topic PR published for review: $branch"
+    [ "$(git rev-parse HEAD)" = "$verified_head" ] || die 1 "HEAD changed during publication"
+    # A failed upload exits 1, never with gh's own status: gh exits 4 when it needs a login, which here means a rewrite
+    gh api --method POST --silent "repos/$PORT_REPO/statuses/$verified_head" -f state=success \
+        -f 'context=Frigate local verification' \
+        -f 'description=Both ROM SHA1s and host build/tests verified locally' ||
+        die 1 "the topic is published, but its local verification success could not be recorded; verify the PR's" \
+            "head with --verify-pr NUMBER"
 fi
 rm -f "$publish_helper"
 

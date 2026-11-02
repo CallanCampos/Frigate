@@ -142,6 +142,92 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   that `main` lacks; PR 67's branch lacked 757). Then the phase's next criterion, as the earlier entries say.
 - **Blockers:** the owner's review of PR 67 once ready. None for the sync itself.
 
+## 2026-11-01: pin the verified head and keep the verifier's exit status
+
+- **Upstream:** `9496bc869b`, unchanged: this change merges no upstream commit. Reviewed main is `faad9927e8`, PR 68's
+  merge.
+- **Port:** `PORT_SHA`, on the topic branch `port-verify-status-followups` from `e733ccc8a3` (PR 66's merge), with
+  reviewed main `faad9927e8` merged in; this entry fills the last entry's `PORT_SHA` with `d0833a7943`.
+- **ROM (T0):** configure and Ninja pass both original US SHA1s with zero compiler warnings: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, in a full build
+  (10,703 steps), again after the review's fixes, and again after merging main. No ROM input changes.
+- **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both games (`build/port`, `build/port-w2`) pass. No
+  host build input changes: only `port/tools/` scripts, their tests and documents.
+- **Tests:**
+  - T2/T6: `ctest -LE route -j3` passes in both games: 350 of 357 tests pass, and 7 skip for the optional setups
+    this checkout lacks: `asm_oracle` (no Unicorn in this Python), `oracle_boot`, `oracle_saves` and
+    `oracle_floccesy_save` (no oracle built), the two function-sanitizer negatives of the VM dispatch (Apple's compiler
+    emits no such check) and `app_universal_slices` (one slice).
+  - T3, short: the replays pass, B2 6 of 6 and W2 4 of 4 (`replay_new_game`, B2 only, `replay_new_game_house`,
+    `replay_same_save` and `replay_same_save_complete`, with their clean fixtures).
+  - The sync tooling tests, run with CI's command
+    (`python3 -m unittest discover -s port/tools/tests -p test_upstream_sync.py`), pass 60 of 60 (48 before) under
+    macOS's bash 3.2.57 and Python 3.14.6; CI's `Sync tooling tests` job runs them on Linux with bash 5 and Python
+    3.12.
+  - Negative controls: against main's `sync_upstream.sh`, 10 of the 12 new verifier controls fail, and so does the
+    success control's new check that every status request is `--silent`. The two that pass there guard what main
+    already did: an interrupt whose failure upload fails keeps 130, and the builds and tests get SIGPIPE at its
+    default. With one part of this change taken out at a time, a control fails for each: the HEAD check, `--silent`
+    on the pending, success or failure request, `|| true` on the warning, the SIGPIPE trap (also when SIGPIPE is
+    ignored instead, everywhere or in the exit trap only), the HUP and QUIT traps, and the exit status of a failed
+    pending or success upload or of either read of the PR's head.
+  - PR 66's review probes, rerun on this change's final scripts: Ctrl-C to the process group exits 130, SIGTERM to
+    it 143 and SIGHUP 129, each with failure on the pinned head, and a signal to bash alone exits 130 or 143 once its
+    command ends. A HEAD moved during the pending request leaves pending and failure on the original head. Piped to
+    `tail`, a group SIGINT exits 130 and a group SIGTERM 143, where main's script exited 1 and died of SIGPIPE. With
+    each signal trapped, bash 3.2 reports nothing for a command that a Ctrl-C to the group killed, "Hangup: 1" for a
+    hangup, "Quit: 3" for a quit and "Terminated: 15" for a termination.
+  - The sync mode, run offline (a `git` wrapper sends the fetches and pushes of `origin` and `upstream` to local bare
+    repositories; gh and the builds are stubs): when gh fails the success upload with its status 4, the run now exits
+    1 with "FAILED (exit status 1)" and the topic "published for review" in its summary, where the previous script
+    exited 4, "stopped: upstream rewrote its history", and called the published topic "not pushed". With the upload
+    working, it ends "done".
+  - ShellCheck 0.11.0 reports the same 10 findings on `sync_upstream.sh` as on main (SC2016, SC2086 and four unused
+    variables), none new, and `bash -n` passes.
+  - `check_mwcc_neutral.py --base HEAD --jobs 2 src/gfl/arc_tool.c` passes 2 of 2. Its cleanup, run in a throwaway
+    repository with six worktrees, removes only its own unlocked one whose directory is gone; it keeps its own live
+    and locked ones, another stale one, a moved one, and a stale one of another name in an `mwcc-neutral-` directory.
+  - T4, T5 and T7 not run: no game, host or test-target code changed.
+- **Tiers/trap stubs:** not measured: no game or host code changed.
+- **64-bit warnings:** the pointer cast guard passes in both games, at 365 sites/229 keys (real 66, harmless 123,
+  handled 141, unreachable 35), 1,711 files compiled and none missing: no change.
+- **Work done:** the follow-ups of PR 66's review of `port/tools/sync_upstream.sh --verify-pr`, the fixes that the
+  review of this change's first commit asked for, and a cleanup in `check_mwcc_neutral.py`:
+  - **The pinned head:** it is read once. A HEAD that another process moves while the pending status is posted now
+    stops the run with exit 1 and failure on the pinned head; before, the run read HEAD again and verified and
+    reported on the new commit, leaving the pinned one pending.
+  - **The exit status through a closed output:** a signal to the whole process group also stops the reader of
+    `... | tee log`. Every status request now discards gh's response (`--silent`), and SIGPIPE is caught while the
+    run can still report, so neither bash's own report of a command that a hangup, quit or termination killed nor the
+    warning that the failure couldn't be recorded ends the shell. A Ctrl-C exits 130, where bash 3.2 exited 1 (the
+    trap's failed warning, under `set -e`), and a SIGTERM 143, where it died of SIGPIPE. The review's `|| true` on the
+    warning isn't enough ([lessons.md](lessons.md)).
+  - **A hangup and a quit** exit 129 and 131 and record "exit 129" or "exit 131". A closed terminal used to kill the
+    shell, with a failure that said "exit 0", and a Ctrl-\ killed it before its exit trap ran, leaving the pending
+    status.
+  - **gh's own statuses stay out:** the verifier's gh requests exit 1 with a message when they fail. They used to
+    exit with gh's status, 4 when it needs a login, which the script documents as an upstream rewrite. The local
+    sync's success upload exits 1 too now, with its summary calling the topic published, where it exited 4 as an
+    upstream rewrite with the topic "not pushed".
+  - **Tests:** twelve verifier controls: failed pending and success uploads; a PR head that can't be read, before the
+    pending status or after the builds; a moved HEAD; a hangup; a quit; an interrupt whose failure upload fails; a
+    group signal that stops the reader of the whole output, with and without that failure, or of the standard output
+    alone; and builds and tests that keep SIGPIPE at its default. The success control checks that every status
+    request is silent, and the hourly sync workflow's token step is checked for its `client-id` input. A verifier
+    whose output never closes is killed rather than left running.
+  - **[SYNC.md](SYNC.md#validate-and-approve-a-proposed-pr)** says which exit status the verifier keeps: its own (1,
+    or 129, 130, 131 or 143), not the failed command's, with its output piped or not. It also says that a success
+    that can't be uploaded is recorded as failure, and that a signal sent to the script alone waits for its current
+    command. Its local sync section says what a failed success upload leaves.
+  - **`port/tools/check_mwcc_neutral.py`** removes the stale entries of its own temporary worktrees before it adds
+    one, so the next run clears what a killed run leaves, and only those: `git worktree prune` would also drop any
+    other session's worktree whose folder is missing, even one that was only moved.
+- **Next:** Phase 5's story coverage after the Route 20 save: the original SDK and CPU timing that the trainer AI's
+  choices still depend on, then Floccesy Ranch, Hugh's Town Map, the lost Lillipup and the first gym. The pending
+  upstream sync is resolved separately.
+- **Blockers:** decisions the owner holds: ADRs 0022, 0023, 0025 and 0030 are proposed, and 0023 decides whether oracle
+  routes may part where the DS's CPU time decides. Spanish issue 45 still lacks a local dump.
+
 ## 2026-11-01: widescreen kept possible: ADR 0030 proposed, the rules every change keeps, and documentation fixes
 
 - **Upstream:** unchanged, `9496bc869b87`; reviewed main `e733ccc8a3` (PR 66's merge).
