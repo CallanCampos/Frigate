@@ -41,28 +41,30 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   both kept, this one first, and both filled PR 69's entry's `PORT_SHA` alike, with `2f9033d7b8`), `9e9768e3ea` and
   `9d9f845ed7` (this entry and the lesson after the merge), `a7f1e10769`, the review's follow-ups (below), then the
   merge of `main` at `36101609ad` (PR 70, ADR 0023's acceptance, documents only, which merged while the follow-ups
-  were tested; STATUS.md's new entries both kept, this one first, and both filled the sync's entry's `PORT_SHA` alike).
-  This entry fills the sync's entry's `PORT_SHA` with `f53e767509` and PR 70's with `cfb45c1be4`.
+  were tested; STATUS.md's new entries both kept, this one first, and both filled the sync's entry's `PORT_SHA` alike),
+  `6543802f9d`, and this record's update after it. This entry fills the sync's entry's `PORT_SHA` with `f53e767509`
+  and PR 70's with `cfb45c1be4`.
 - **ROM (T0):** `python3 configure.py && ninja` in a fresh worktree (10,703 steps) passes both original US SHA1s with
   zero compiler warnings: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`;
   and again on the merge with `main` (12,555 steps), with the same SHA1s and no warning, and on the review's
   follow-ups, which change nothing outside `port/` (18 steps, `sp_poke_gimmick.c` compiled again after its negative
-  control), the same. `src/ov129/sp_poke_gimmick.c` is complete in both versions, so this is its change's MWCC-neutral
-  proof.
+  control), and on the merge with PR 70 (2 steps, the two checks), the same. `src/ov129/sp_poke_gimmick.c` is complete
+  in both versions, so this is its change's MWCC-neutral proof.
 - **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both games (`build/port`, `build/port-w2`) pass, and
-  again on the merge with `main` and on the review's follow-ups, with no warning in the changed or new files; the
-  sanitized Black 2 (`build/port-san`) builds too, before the merge and on the follow-ups.
+  again on the merge with `main` and on the review's follow-ups, with no warning in the changed or new files (on the
+  merge with PR 70, which changes documents only, they have no work to do); the sanitized Black 2 (`build/port-san`)
+  builds too, before the merge and on the follow-ups.
 - **Tests:**
   - T2/T6: `ctest -LE route -j3` passes in both games, before and after the merge with `main`: 354 of 361 tests pass,
     and 7 skip for the optional setups this checkout lacks, as in the last entries (`asm_oracle`, `oracle_boot`,
     `oracle_saves`, `oracle_floccesy_save`, the two function-sanitizer negatives of the VM dispatch and
     `app_universal_slices`). The 361 include the new `integrate_sp_poke_gimmick`, `msl_exit_heap_check`,
     `msl_exit_heap_full` and the overlay sections' image check of their program. On the review's follow-ups, 355 of 362
-    pass in each game, the 362nd being `msl_exit_game_objects`, with the same 7 skips. The new tests pass in the
-    sanitized build too, before the merge and on the follow-ups.
-  - T3, short: the replays pass, B2 6 of 6 and W2 4 of 4, before and after the merge and on the follow-ups
-    (`replay_new_game`, B2 only, `replay_new_game_house`, `replay_same_save` and `replay_same_save_complete`, with
-    their clean fixtures).
+    pass in each game, the 362nd being `msl_exit_game_objects`, with the same 7 skips, and again on the merge with
+    PR 70. The new tests pass in the sanitized build too, before the merge and on the follow-ups.
+  - T3, short: the replays pass, B2 6 of 6 and W2 4 of 4, before and after the merge, on the follow-ups and on the
+    merge with PR 70 (`replay_new_game`, B2 only, `replay_new_game_house`, `replay_same_save` and
+    `replay_same_save_complete`, with their clean fixtures).
   - The café, with the save lab's prototype minter and the sweep's boot input (2,200 frames, headless, clock pinned):
     before, status 1 at frame 1,543 with no `port:` line and `run.txt` at `status: -`, from the Route 19 save by warp 0;
     after, status 0 and all 2,200 frames from both the Route 19 save by warp 0 (top screen `d575a8456293`, bottom
