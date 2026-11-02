@@ -37,65 +37,95 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 - **Upstream:** `41f42ca1af`, as reviewed main `36101609ad` (PR 70's merge) has it: PR 67's sync brought it to main
   while this change was in review, and this change merges no upstream commit of its own.
 - **Port:** `PORT_SHA`, on the topic branch `port-save-lab-core` from `d19894b1f7` (PR 69's merge). Reviewed main was
-  merged in twice: `10d017c010` once PR 67 had landed, then `36101609ad` once PR 70 had (documents only; STATUS.md's
-  two new entries are both kept, this one first). This entry fills the last entry's, ADR 0023's, `PORT_SHA` with
-  `cfb45c1be4`; the sync's entry has `f53e767509`, as this branch and PR 70 both filled it, and PR 69's has
-  `2f9033d7b8`. Nothing outside `port/` changes.
-- **ROM (T0):** configure and Ninja (`-j4`) pass both original US SHA1s with zero compiler warnings: in a full build
-  (10,703 steps) of the branch's base, again on its first two commits, and in a full build (12,555 steps) after merging
-  main at `10d017c010`: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
-  This change adds no ROM input.
+  merged in twice: `10d017c010` once PR 67 had landed, then `36101609ad` once PR 70 had (`95f1d692cf`; documents only,
+  STATUS.md's two new entries both kept, this one first). This entry fills the last entry's, ADR 0023's, `PORT_SHA`
+  with `cfb45c1be4`; the sync's entry has `f53e767509`, as this branch and PR 70 both filled it, and PR 69's has
+  `2f9033d7b8`. `5d9a0706a1` is the review's fixes (below). Nothing outside `port/` changes.
+- **ROM (T0):** configure and Ninja (`-j4`) pass both original US SHA1s with zero compiler warnings, B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`: in a full build
+  (10,703 steps) of the branch's base, again on its first two commits, in a full build (12,555 steps) after merging
+  main at `10d017c010`, and on `5d9a0706a1`, after merging `36101609ad`, which had nothing to compile. This change adds
+  no ROM input.
 - **Host build (T1):** arm64 macOS RelWithDebInfo builds of both games (`build/port`, `build/port-w2`) pass, fresh on
-  the branch's base and rebuilt after the merge; the new `port_test_savelab_layout` builds with `-Wall -Wextra -Werror`.
+  the branch's base and rebuilt after each merge and on `5d9a0706a1`; `port_test_savelab_layout` builds with `-Wall
+  -Wextra -Werror`, and prints the same layout in both games.
 - **Tests:**
-  - T2/T6: `ctest -LE route -j3` passes in both games, on each commit and after the merge: 351 of 358 tests pass,
-    `lab_savelab` the one more than main's, and 7 skip for the optional setups this checkout lacks: `asm_oracle` (no
+  - T2/T6: `ctest -LE route -j3` passes in both games, on each of the first head's commits, after the first merge and
+    on `5d9a0706a1`: 351 of 358 tests pass, `lab_savelab` among them (in 15 s and 14 s on `5d9a0706a1`, where it runs
+    43 tests, the mutants among them), and 7 skip for the optional setups this checkout lacks: `asm_oracle` (no
     Unicorn in this Python), `oracle_boot`, `oracle_saves` and `oracle_floccesy_save` (no oracle built), the two
     function-sanitizer negatives of the VM dispatch (Apple's compiler emits no such check) and `app_universal_slices`
     (one slice).
-  - `lab_savelab`, 33 tests on synthetic saves built field by field from the offsets and sizes that
-    `port_test_savelab_layout` prints from the decomp's headers: savelab's `LAYOUT` is the headers' (77 entries); the
-    reader gives back every field; an empty recipe leaves the save unchanged; a recipe's writes are resealed in both
-    copies and change nothing but the written blocks, their footers' and table entries' CRCs and the table's CRC;
-    `place` writes the spawn, the continue flag and `SaveLocation` as `SetupZoneSpawnInfoWarp`, `CreateZoneChangeData`
-    and `LoadZoneSpawnInfoCheckRail` would; a bad base is refused (the wrong size, a broken CRC in either copy, copies
-    that differ, a foreign block size, another save than the recipe's `base`, a base saved surfing). Each has a control
-    that fails: an entry of `LAYOUT` or an offset of the reader moved, a copy left unsealed or written alone, a footer
-    offset moved, a recipe that changes something.
-  - Mutation controls (a scratch script, not committed): 24 of 24 deliberate bugs fail at least one test, each in a copy
-    of `savelab.py` loaded in its place: a copy written or sealed alone, a CRC left stale, the gate or one of the base's
-    checks taken out, an offset moved, the facing's angles swapped, a tile at its centre, the continue flag left clear,
-    rails or a surfing base let through, an empty recipe that writes, a duplicate taken, money uncapped, badges off by
-    one, the blocks left encrypted.
-  - T3, short: the replays pass, B2 6 of 6 and W2 4 of 4, before and after the merge (`replay_new_game`, B2 only,
-    `replay_new_game_house`, `replay_same_save` and `replay_same_save_complete`, with their clean fixtures). This change
-    touches no game or host code, so they can't have moved; they ran as every push's short replays do.
-  - With the ROM, on this machine (nothing committed or uploaded): `place ZONE_FLOCCESY_RANCH_2 warp 0` minted from the
-    oracle's Route 20 save (`floccesy_save`, Black 2, `07d26e593786`) gives SHA-1 `72e7ab2a3fa0`, the prototype's, in 38
-    bytes, 19 in each copy: `nextSpawn`'s zone, `SaveLocation`'s zone, position and rotation, the continue flag's byte,
-    two footer CRCs, two table entries and the table's CRC. `read` on the oracle's six saves gives back what the
-    oracle's README records for them: the Route 20 save at `ZONE_ROUTE_20` (446), tile `(130, 661)`, work `0x40a3` and
-    `0x40a5` at 2; Tepig at level 5 with 135 experience and 21/21 HP, flags 0x961 and 0x962, `0x40a1` at 4 and `0x4030`
-    at 1 in the starter save; Tepig at level 6 and 0:08:09 in the Pokémon Center save; the caught Purrloin (level 4) and
-    0:13:11 in the catch save; and the first save in the player's room with 0 badges at 0:01. A port-only run of
-    `frigate-black2` (6,200 frames, the prototype's station input: CONTINUE, then the field menu's SAVE) on the minted
-    save exits 0: its start menu shows "Floccesy Ranch", the field opens at the ranch's gate, and the save the game
-    writes reads back `ZONE_FLOCCESY_RANCH_2` at tile `(45, 54)`, height 2, its last arrival the game's own through warp
-    0, the continue flag cleared, Tepig at 6 and Purrloin at 4, money 3,500. That save is `53912fbe1b1a`, the
-    prototype's port save. The other two forms of `place`, minted from the same save and run with the same input, boot
-    as placed. `place ZONE_ROUTE_20 at 155 651 2 facing WARP_DIR_LEFT` stands the player on that tile facing Youngster
-    Petey, who challenges at once: his battle reaches "What will Tepig do?" and takes the input's SAVE presses, so no
-    save is written. `place ZONE_FLOCCESY_TOWN fly` puts the player in front of the town's Pokémon Center, facing down,
-    and the save the game writes reads back `ZONE_FLOCCESY_TOWN` at tile `(105, 694)`, the zone's Fly position, with the
-    continue flag cleared. After the merge, the mint gives `72e7ab2a3fa0` again, `read` the same facts, and the ranch's
-    run on the rebuilt program leaves the same save, `53912fbe1b1a`.
+  - `lab_savelab`, 43 tests on synthetic saves built field by field from the offsets and sizes that
+    `port_test_savelab_layout` prints from the decomp's headers:
+    - savelab's `LAYOUT` is the headers' (77 entries; two more, the follower's index and the step counter, are the
+      synthetic saves' own);
+    - the reader gives back every field of a save placed on the grid and of one placed on a rail with rail spawns, a
+      party of six (and refuses a count of seven), and a Pokémon stored decrypted;
+    - an empty recipe leaves both saves unchanged, and a recipe's writes are resealed in both copies;
+    - each verb (flags set on clear and on set, cleared on set and on clear, flag 0x967 in bit 7, work values, money,
+      `badges 1` over badges 0 and 2, `badges 0` and `8`, play time 1:02:03) and each form of `place` (a warp, a warp
+      at height -32 world units, a rail warp, a tile with and without its height and facing, one below level 0, the
+      Fly position, a rail map's grid Fly position) gives byte for byte the save built again with what the game's own
+      writes change. `place` starts from a save on a rail with `EVENT_WORK_CONTINUE_SCRIPT` at 1 and the work values on
+      either side set, the follower and step counter as a game leaves them (`0xff`, `0xffff`) and the rest of the
+      player block filler, so every field it writes changes and a write it shouldn't make shows;
+    - a bad base is refused (the wrong size, a broken CRC in either copy, copies that differ, a foreign block size,
+      another save than the recipe's `base`, a base saved surfing), and a base whose SHA-1 `SAVES` pins is taken, its
+      version reported;
+    - `at` is refused on the zones with a rail system, `fly` on those whose Fly position is on a rail or is (0, 0, 0).
+  - Controls, committed: the test's `MUTANTS` holds 62 deliberate bugs in `savelab.py`, each with the tests that must
+    catch it, and `MutationTests` loads each in `savelab`'s place and fails if one passes them or if its text is no
+    longer in `savelab.py`. All 62 are caught, and the same 28 tests pass on `savelab.py` as it is. They take in the
+    first head's 24 scratch controls and the review's 26 bugs (a copy written or sealed alone, a CRC left stale, the
+    gate or a base check taken out, an offset moved, the continue work or the rail flag left as the base had them,
+    `nowSpawn` or the follower written, a warp's height read unsigned, a rail warp's position kept, the facing's angles
+    wrong, the play time's fields swapped, flags toggled, bit 7's flag in the next byte, works one along, money
+    big-endian or clearing the badges, badges ORed with the base's, no base taken, a party of six refused, a Pokémon
+    stored decrypted decrypted again, `next_spawn` read from `nowSpawn`, a rail position's side and front swapped, the
+    rail flags ignored), and the refusals this change adds taken out. One of the review's bugs is none: writing the
+    player's state as walking writes the byte's own value, since `place` refuses a base saved in any other state;
+    `MUTANTS` writes cycling instead.
+  - T3, short: the replays passed, B2 6 of 6 and W2 4 of 4, before and after the first merge (`replay_new_game`, B2
+    only, `replay_new_game_house`, `replay_same_save` and `replay_same_save_complete`, with their clean fixtures). The
+    review's fixes touch no game or host code, so they can't move them; the exact-head verification runs them again,
+    with every route.
+  - With the ROM, on this machine (nothing committed or uploaded), on `5d9a0706a1`:
+    - `place ZONE_FLOCCESY_RANCH_2 warp 0` minted from the oracle's Route 20 save (`floccesy_save`, Black 2,
+      `07d26e593786`) gives SHA-1 `72e7ab2a3fa0`, the prototype's, in 38 bytes, 19 in each copy: `nextSpawn`'s zone,
+      `SaveLocation`'s zone, position and rotation, the continue flag's byte, two footer CRCs, two table entries and the
+      table's CRC.
+    - `read` on the oracle's six saves gives back what the oracle's README records for them: the Route 20 save at
+      `ZONE_ROUTE_20` (446), tile `(130, 661)`, work `0x40a3` and `0x40a5` at 2; Tepig at level 5 with 135 experience
+      and 21/21 HP, flags 0x961 and 0x962, `0x40a1` at 4 and `0x4030` at 1 in the starter save; Tepig at level 6 and
+      0:08:09 in the Pokémon Center save; the caught Purrloin (level 4) and 0:13:11 in the catch save; and the first
+      save in the player's room with 0 badges at 0:01.
+    - Port-only runs of `frigate-black2` (`oracle.py port`) on minted saves, with the prototype's station input:
+      `version b2_us`, `clock pinned`, `seed 0x5a0af77416c50a14`; START at game frames 1,100, 3,000 and 3,100 and A at
+      3,400 (CONTINUE), held a frame each; then X at 4,300, DOWN at 4,360, 4,390 and 4,420, and A at 4,450 and 4,730
+      (the field menu's SAVE and YES), held 6 frames each; 6,200 frames. The ranch's run exits 0: its start menu shows
+      "Floccesy Ranch", the field opens at the ranch's gate, and the save the game writes, `53912fbe1b1a` as on the
+      first head, reads back `ZONE_FLOCCESY_RANCH_2` at tile `(45, 54)`, height 2, its last arrival the game's own
+      through warp 0, the continue flag cleared, Tepig at 6 and Purrloin at 4, money 3,500. `place ZONE_ROUTE_20 at 130
+      661`, with no height, exits 0 and saves `3326b408217f`: `ZONE_ROUTE_20` at `(130, 661)`, height 2, the ground's,
+      which the game set.
+    - The design's Castelia street, with the same CONTINUE presses, then LEFT at 3,700 and DOWN at 3,900, held 16
+      frames each (4,000 frames): `place ZONE_CASTELIA_CITY_7 at 21 46` opens the street with no player in view, and
+      frames 3,800 and 4,000 are alike, so the presses move nothing; `at 19 46` stands the player on the street west of
+      its door at `(20, 46)`, and the player walks; `warp 1` arrives at that door. `ZONE_CASTELIA_CITY_7` has no rail
+      system: `(21, 46)` is the building east of the door, a tile off the ground, which the lab can't check without the
+      ROM's map data; its guide says so and where to take tiles from.
+    - On the first head, the builder's runs of the other two forms: `place ZONE_ROUTE_20 at 155 651 2 facing
+      WARP_DIR_LEFT` stands the player in front of Youngster Petey, whose battle reaches "What will Tepig do?", and
+      `place ZONE_FLOCCESY_TOWN fly` saves `ZONE_FLOCCESY_TOWN` at `(105, 694)`, the zone's Fly position.
   - T4 not run: the minted save held to melonDS frame by frame is L2's station. T5 and T7 not run: no game or host code
     changed.
 - **Tiers/trap stubs:** not measured: no game or host code changed.
 - **64-bit warnings:** the pointer cast guard passes in both games, and `check_ptrcasts.py --build-dir build/port
   --report` gives 365 sites in 229 keys (real 66, harmless 123, handled 141, unreachable 35), 1,711 files compiled and
-  none missing, before and after the merge: no change.
-- **Work done:** L1 of the save lab, the minter and the reader, as the save lab's design of 2026-11-01 plans it:
+  none missing, before and after each merge: no change.
+- **Work done:** L1 of the save lab, the minter and the reader, as the save lab's design of 2026-11-01 plans it, with
+  the review's fixes:
   - **[port/tools/lab/savelab.py](../tools/lab/savelab.py)** mints a save from a save the game wrote and a recipe in the
     game's constant names, read from the build's generated constants headers, and reads a save back as facts in the same
     names. `place` uses the game's own continue at a spawn, the one the Hall of Fame takes: it writes
@@ -106,15 +136,18 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     layout comes from `saveimage.find_blocks`; every value goes to both copies, the CRCs are resealed in each, and the
     result must pass `saveimage.validate_image` against the base with its copies alike. A base that fails it, whose
     copies differ, whose blocks don't have the game's sizes, or that isn't the recipe's oracle save is refused, and so
-    are `at` and `fly` in the 12 zones whose Fly position is on a rail (`ZONES_WITH_RAILS`, read from
-    `src/system/zonedata.c`) and `place` from a base saved cycling, surfing or diving. `read` gives the place and both
-    spawns, the flags asked for, every work value that isn't 0, the money, badges and play time, and the party decrypted
-    as `PokeParty_DecryptPkm` does.
+    is `place` from a base saved cycling, surfing or diving. Read from `src/system/zonedata.c`, `at` refuses the 28
+    zones the game gives a rail system (`ZONE_RAIL_ASSIGNMENTS`), and `fly` the 12 whose Fly position is on a rail
+    (`ZONES_WITH_RAILS`) and the 11 Castelia zones whose zone data has Fly (0, 0, 0). `at`'s height goes from -32,768
+    to 32,767, as `FieldSetNextZone`'s u16 wraps, and the guide says the game stands the player on the ground and
+    takes the height only to pick a level. `read` gives the place and both spawns, the flags asked for, every work value
+    that isn't 0, the money, badges and play time, and the party decrypted as `PokeParty_DecryptPkm` does.
   - **[port/tests/lab/](../tests/lab/)**: `test_savelab.py` and `savelab_layout.c`, the test `lab_savelab`
     ([port/cmake/lab.cmake](../cmake/lab.cmake)), with no ROM and no label, so CI runs it on every host.
   - **Documents:** the lab's guide ([port/tools/lab/README.md](../tools/lab/README.md)), its rows in
-    [port/tools/README.md](../tools/README.md), the directory map, the test and CMake guides, ARCHITECTURE.md's feature
-    map ("Save lab"), the glossary, and MODDING.md's "Starting somewhere else".
+    [port/tools/README.md](../tools/README.md) and the documents index, the directory map, the test and CMake guides,
+    ARCHITECTURE.md's feature map ("Save lab"), the glossary, and MODDING.md's "Starting somewhere else". ADR 0032 is
+    reserved for L2's stations and not written.
 - **Next:** L2, stations: `floccesy_ranch` in both versions held to melonDS from power-on as a sequence is held, its
   resulting saves read back and compared byte by byte, with ADR 0032 (reserved) for the stations' rules. Phase 5's story
   coverage continues past the Route 20 save as the earlier entries say.
