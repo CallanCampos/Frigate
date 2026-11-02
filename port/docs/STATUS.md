@@ -42,7 +42,8 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   with `src/ov129/sp_poke_gimmick.c`, MSL's exit and `gen_stubs.py`). This entry fills the last entry's, the café's,
   `PORT_SHA` with `867ce0bd96`; ADR 0023's entry has `cfb45c1be4` and the sync's `f53e767509`, as this branch and the
   PRs that merged before it filled them alike, and PR 69's has `2f9033d7b8`. `5d9a0706a1` is the review's fixes
-  (below). Nothing outside `port/` changes.
+  (below), and this entry's last commit drops a helper and two constants that the rewritten test no longer used.
+  Nothing outside `port/` changes.
 - **ROM (T0):** configure and Ninja (`-j4`) pass both original US SHA1s with zero compiler warnings, B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`: in a full build
   (10,703 steps) of the branch's base, again on its first two commits, in a full build (12,555 steps) after merging
@@ -53,11 +54,11 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   `port_test_savelab_layout` builds with `-Wall -Wextra -Werror`, and prints the same layout in both games.
 - **Tests:**
   - T2/T6: `ctest -LE route -j3` passes in both games, on each of the first head's commits, after the first merge, on
-    `5d9a0706a1` (351 of 358 tests pass) and on `49ad7dd00a`, with PR 73's tests: 356 of 363 tests pass, `lab_savelab`
-    among them (43 tests, the mutants among them), and 7 skip for the optional setups this checkout lacks:
-    `asm_oracle` (no Unicorn in this Python), `oracle_boot`, `oracle_saves` and `oracle_floccesy_save` (no oracle
-    built), the two function-sanitizer negatives of the VM dispatch (Apple's compiler emits no such check) and
-    `app_universal_slices` (one slice).
+    `5d9a0706a1` (351 of 358 tests pass), and on `49ad7dd00a` and this entry's last commit, with PR 73's tests: 356 of
+    363 tests pass, `lab_savelab` among them (43 tests, the mutants among them), and 7 skip for the optional setups
+    this checkout lacks: `asm_oracle` (no Unicorn in this Python), `oracle_boot`, `oracle_saves` and
+    `oracle_floccesy_save` (no oracle built), the two function-sanitizer negatives of the VM dispatch (Apple's compiler
+    emits no such check) and `app_universal_slices` (one slice).
   - `lab_savelab`, 43 tests on synthetic saves built field by field from the offsets and sizes that
     `port_test_savelab_layout` prints from the decomp's headers:
     - savelab's `LAYOUT` is the headers' (77 entries; two more, the follower's index and the step counter, are the

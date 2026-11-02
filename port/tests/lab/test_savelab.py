@@ -64,7 +64,6 @@ LAYOUT_PROGRAM = None
 CRYPTO_MULTIPLIER = 0x41c64e6d
 CRYPTO_INCREMENT = 0x6073
 # The constants the tests name, from build/include/generated/constants (zones.h, flags.h, vars.h, species.h, moves.h)
-ZONE_BLACK_CITY = 0
 ZONE_CASTELIA_CITY = 28
 ZONE_GIANT_CHASM = 230
 ZONE_VILLAGE_BRIDGE = 255
@@ -72,7 +71,6 @@ ZONE_ROUTE_19 = 437
 ZONE_FLOCCESY_RANCH = 444
 ZONE_FLOCCESY_RANCH_2 = 445
 ZONE_ROUTE_20 = 446
-EVENT_FLAG_RUNNING_SHOES = 0x963
 EVENT_FLAG_CONTINUE_SCRIPT = 0x965
 EVENT_FLAG_TRAINER_YOUNGSTER_PETEY = 0x778
 EVENT_WORK_CONTINUE_SCRIPT = 0x4041
@@ -359,10 +357,6 @@ class LabTest(unittest.TestCase):
         with self.assertRaises(savelab.LabError) as caught:
             self.mint(recipe, base)
         self.assertIn(text, str(caught.exception))
-
-    def field(self, data: bytes, fmt: str, block_name: str, field: int, copy: int = 0) -> tuple:
-        start, _ = saveimage.find_blocks(data)[self.layout[f"SAVE_BLOCK_{block_name}"]]
-        return struct.unpack_from(fmt, data, copy + start + field)
 
     def assertImage(self, minted: bytes, expected: bytes) -> None:
         """minted is expected byte for byte; else the first differences, by copy, block and offset in the block"""
