@@ -29,3 +29,18 @@ tests that keep SIGPIPE at its default; and successful completion. They require 
 verifier's own exit status, while reporting the result on the pinned commit; only completed validation may leave a
 successful local-verification status. The hourly sync workflow's App-token step is checked too: its repository and
 permission scope, its revocation, and its `client-id` input.
+
+`sync_upstream.sh`'s messages send the reader to [SYNC.md](../../docs/SYNC.md) by a section's name, as
+`'Upstream rewrite (exit 4)' under 'Conflicts and stopped syncs' in port/docs/SYNC.md`, or by an anchor
+(`SYNC.md#conflicts-and-stopped-syncs`). A test reads each such name as the script prints it and fails when SYNC.md
+has no such heading, or no list item of that bold label under that heading, so that renaming a section means updating
+the messages too. A line of the script's code (a message; a comment may name the document as it likes) that names
+SYNC.md in neither form fails as well, since nothing could check it. Its controls rename a label, change a message's
+name, move one under another heading, add an anchor SYNC.md lacks and add a message that names its section another
+way or names no section, and each must fail.
+
+The script's summary, printed when a run stops, names what stopped it. Two fixtures run `sync_upstream.sh --no-build`
+offline, through a `git` wrapper that sends the fetches and `ls-remote` of the GitHub remotes to local bare
+repositories: one whose topic branch on origin can't take the push as a fast-forward, one whose upstream no longer
+contains the last upstream commit merged. Both stop with exit 4, and the summary's last line must name the check that
+stopped each.

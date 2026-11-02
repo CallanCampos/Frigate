@@ -110,12 +110,10 @@ lib/nitrowifi/src/soc/socl_read.c	SOCL_ReadFrom	int-to-ptr	SOCLSocket * <- int	1
 lib/nitrowifi/src/soc/socl_shutdown.c	SOCL_Shutdown	int-to-ptr	SOCLSocket * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
 lib/nitrowifi/src/soc/socl_ssl.c	SOCL_EnableSsl	int-to-ptr	SOCLSocket * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
 lib/nitrowifi/src/soc/socl_write.c	SOCL_WriteTo	int-to-ptr	SOCLSocket * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
-lib/nitrowifi/src/wcm/wcm.c	WCM_NotifyResult	int-to-ptr	void * <- u32	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
-lib/nitrowifi/src/wcm/wcm.c	WCM_NotifyResult	ptr-to-int	s32 <- void *	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
-lib/nitrowifi/src/wcm/wcm.c	WcmWmcbScanEx	ptr-to-int	s32 <- WMBssDesc *	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
 lib/nitrowifi/src/wcm/wcm_dsi.c	func_0276a3d4	ptr-to-int	s32 <- NWMBssDesc *	1	unreachable	the DSi's wireless (WCM's mode 2, through NWM): the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
 lib/nitrowifi/src/wcm/wcm_system.c	WCMi_Notify	int-to-ptr	void * <- u32	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
 lib/nitrowifi/src/wcm/wcm_system.c	WCMi_Notify	ptr-to-int	s32 <- void *	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/wcm/wcm_wmif.c	WcmWmcbScanEx	ptr-to-int	s32 <- WMBssDesc *	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
 lib/nnsys/include/nnsys/fnd.h	NNS_FndGetMemBlockSizeForUnitHeap	ptr-to-int	u32 <- NNSFndHeapHandle	1	unreachable	the unit-heap allocator: nothing calls NNS_FndInitAllocatorForUnitHeap
 lib/nnsys/src/fnd/allocator.c	AllocatorAllocForSDKHeap	ptr-to-int	int <- void *	1	harmless	an int carried in a void * and back (the OS heap's handle)
 lib/nnsys/src/fnd/allocator.c	AllocatorFreeForSDKHeap	ptr-to-int	int <- void *	1	harmless	an int carried in a void * and back (the OS heap's handle)
@@ -172,8 +170,6 @@ lib/nnsys/src/snd/snd_arc_loader.c	SeqDisposeCallback	narrow	u32 <- uptr	1	harml
 lib/nnsys/src/snd/snd_arc_loader.c	WaveArcDisposeCallback	narrow	u32 <- uptr	1	harmless	the dispose callback's data2 is a file ID
 lib/nnsys/src/snd/snd_arc_loader.c	WaveArcTableDisposeCallback	narrow	u32 <- uptr	1	harmless	the dispose callback's data2 is a file ID
 lib/twl/src/camera/camera_api.c	func_02700230	ptr-to-int	int <- void *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
-lib/twl/src/card/card_rom_twl.c	CARDi_ReadSecureRomWithDMA	ptr-to-int	u32 <- void *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
-lib/twl/src/dsp/dsp_audio.c	func_027060b4	ptr-to-int	u32 <- const void *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
 lib/twl/src/dsp/dsp_pipe.c	DSP_LoadPipe	int-to-ptr	DSPPipe (*)[2] <- u32	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
 lib/twl/src/dsp/dsp_pipe.c	DSP_LoadPipe	ptr-to-int	u32 <- DSPPipe *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
 lib/twl/src/dsp/dsp_pipe.c	func_027067b4	int-to-ptr	void * <- u32	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
@@ -194,7 +190,6 @@ lib/twl/src/mic/mic_twl.c	func_02703f7c	ptr-to-int	u32 <- void *	2	unreachable	T
 lib/twl/src/nwm/nwm.c	NWMi_SendCommand	ptr-to-int	u32 <- NWMCmdBuf *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
 lib/twl/src/nwm/nwm.c	func_02703b24	ptr-to-int	u32 <- NWMCmdBuf *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
 lib/twl/src/nwm/nwm_events.c	func_02702740	int-to-ptr	NWMEvent * <- u32	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
-lib/twl/src/os/os_arena_twl.c	OSi_InitArenaExTwl	narrow	u32 <- uintptr_t	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
 lib/twl/src/photo_sign.c	PhotoSign_InitRandom	ptr-to-int	u32 <- MATHRandContext32 *	2	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
 lib/twl/src/photo_sign_client.c	PhotoSign_FifoCallback	int-to-ptr	OSMessage <- u32	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
 lib/twl/src/photo_sign_client.c	PhotoSign_WaitResult	ptr-to-int	int <- OSMessage	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
@@ -206,7 +201,7 @@ src/gfl/gf_overlay.c	GFL_OvlGetMemoryRegion	ptr-to-int	u32 <- u8 *	1	handled	por
 src/gfl/heapsys.c	GFL_HeapGetSize	ptr-to-int	u32 <- NNSiFndHeapHead *	1	harmless	a difference of two addresses in one block (a heap block's head and data)
 src/gfl/heapsys.c	GFL_HeapGetSize	ptr-to-int	u32 <- void *	1	harmless	a difference of two addresses in one block (a heap block's head and data)
 src/gfl/net_state.c	NetState_ConnectMac	ptr-to-int	u32 <- u8 *	1	harmless	an alignment or low-bit test: the low bits are the host address's
-src/ov011/net_devwifi.c	NetDevWifi_Unk4C	int-to-ptr	const char * <- int	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
+src/ov011/net_devwifi.c	NetDevWifi_StartMatch	int-to-ptr	const char * <- int	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
 src/ov012/script_plugin.c	GetCurrentScrPluginCmdCount	ptr-to-int	u32 <- FieldScriptCommand	1	harmless	a compare with the sentinel (u32)-1
 src/ov034/union_msg.c	UnionMsg_UpdateRuleMenu	int-to-ptr	const ListMenuRow * <- u32	1	real	R21: the Union Room's UnionComm_SetSelf u32 value and menu values (phase 7)
 src/ov034/union_msg.c	UnionMsg_UpdateRuleMenu	ptr-to-int	u32 <- const ListMenuRow *	2	real	R21: the Union Room's UnionComm_SetSelf u32 value and menu values (phase 7)

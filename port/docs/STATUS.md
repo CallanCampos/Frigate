@@ -34,17 +34,19 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 ## 2026-11-02: the save lab's minter and reader (L1)
 
-- **Upstream:** `41f42ca1af`, as reviewed main `c0a7941e4e` (PR 72's merge) has it: PR 67's sync brought it to main
+- **Upstream:** `41f42ca1af`, as reviewed main `d1717b68d8` (PR 74's merge) has it: PR 67's sync brought it to main
   while this change was in review, and this change merges no upstream commit of its own.
 - **Port:** `PORT_SHA`, on the topic branch `port-save-lab-core` from `d19894b1f7` (PR 69's merge). Reviewed main was
-  merged in four times, STATUS.md's new entries kept each time with this one first: `10d017c010` once PR 67 had
+  merged in five times, STATUS.md's new entries kept each time with this one first: `10d017c010` once PR 67 had
   landed, `36101609ad` once PR 70 had (`95f1d692cf`, documents only), `806b2a8f9d` once PR 73 had (`49ad7dd00a`: the
-  café's fix, with `src/ov129/sp_poke_gimmick.c`, MSL's exit and `gen_stubs.py`), and `c0a7941e4e` once PR 72 had
-  (the canonical digests and ADR 0031, all in `port/`). This entry fills the last entry's, the digests', `PORT_SHA`
-  with `a98b983313`; the café's has `867ce0bd96`, ADR 0023's `cfb45c1be4` and the sync's `f53e767509`, as this branch
-  and the PRs that merged before it filled them alike, and PR 69's has `2f9033d7b8`. `5d9a0706a1` is the review's
-  fixes (below), and `1d5f9be437` drops a helper and two constants that the rewritten test no longer used. Nothing
-  outside `port/` changes.
+  café's fix, with `src/ov129/sp_poke_gimmick.c`, MSL's exit and `gen_stubs.py`), `c0a7941e4e` once PR 72 had
+  (`41a31781b0`: the canonical digests and ADR 0031, all in `port/`), and `d1717b68d8` once PR 74 had (the sync's
+  hygiene: `sync_upstream.sh`, the cast guard's baseline at upstream's names and documents, all in `port/`). This
+  entry fills the last entry's, the hygiene's, `PORT_SHA` with `6eef75c290`; the digests' has `a98b983313`, the
+  café's `867ce0bd96`, ADR 0023's `cfb45c1be4` and the sync's `f53e767509`, as this branch and the PRs that merged
+  before it filled them alike, and PR 69's has `2f9033d7b8`. `5d9a0706a1` is the review's fixes (below), and
+  `1d5f9be437` drops a helper and two constants that the rewritten test no longer used. Nothing outside `port/`
+  changes.
 - **ROM (T0):** configure and Ninja (`-j4`) pass both original US SHA1s with zero compiler warnings, B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`: in a full build
   (10,703 steps) of the branch's base, again on its first two commits, in a full build (12,555 steps) after merging
@@ -168,6 +170,123 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   coverage continues past the Route 20 save as the earlier entries say.
 - **Blockers:** none for this change. The design's decisions for the owner (the stations as a breadth spine beside the
   story's, continue at a spawn as the placement, the sweep's tier and the rest) come with L2 and ADR 0032.
+
+## 2026-11-02: after the naming sync: the guard's rows and the documents at upstream's names, the delegated sync review
+
+- **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit. Reviewed main is `c0a7941e4e`, PR 72's
+  merge, which this branch merges; it started from `10d017c010`, PR 67's.
+- **Port:** `6eef75c290`, on the topic branch `port-sync-hygiene-1102` from `10d017c010`: `fd81336269` (the sync script's
+  messages and their test), `07c5e0c409` (the rest, and this entry), `0522fe9311` (the merge of `main` at
+  `36101609ad`, PR 70: ADR 0023 accepted, documents only), `55286eae4a` (the merge of `main` at `806b2a8f9d`, PR 73:
+  Castelia City's café), `84c24fcd10` (the review's fixes, below), `eef1532091` (the merge of `main` at `c0a7941e4e`,
+  PR 72: verification v2's canonical digests, ADR 0031 proposed) and this record's update after it. Each merge keeps
+  both new STATUS.md entries, this one first; the first drops the "(proposed)" that `07c5e0c409` gave ADR 0023's row
+  in docs/README.md. This entry fills the `PORT_SHA` of PR 72's entry with `a98b983313`, of PR 73's with `867ce0bd96`
+  (as PR 72's entry does), of PR 70's with `cfb45c1be4` (as PR 73's entry does) and those of three 2026-10-25 entries
+  (below); PR 70's entry and this one fill PR 67's alike, `f53e767509`. Only `port/` changes.
+- **ROM (T0):** `python3 configure.py && ninja` in a new worktree, every step run (14,039): both original US SHA1s, B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, with no compiler
+  warning; again on the merge with `main` at `806b2a8f9d` (5,939 steps, PR 73's `src/ov129/sp_poke_gimmick.c` among
+  them) and on the merge with `main` at `c0a7941e4e` (PR 72's files are all in `port/`: the two checks), the same
+  SHA1s and no warning. This branch's own changes are no ROM input.
+- **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both versions (`build/port`, `build/port-w2`, Apple
+  clang, ninja at `-j4`) pass, with 748 compiler warnings each, all in the decomp's C of `src/` and `lib/`, as on
+  `main`; and again on the merge with `main` at `806b2a8f9d`, which reconfigures both and compiles PR 73's files
+  (`exit_host.c`, `heap.c`, `sp_poke_gimmick.c`, `main.c` and their tests) with no warning, and on the merge with
+  `c0a7941e4e`, which compiles PR 72's digest code and its tests with no warning. This branch's own changes are no host
+  build input.
+- **Tests:**
+  - T2/T6: `ctest -LE route` (`CTEST_PARALLEL_LEVEL=3`): before the merge with PR 73, 350 of 357 tests pass in each
+    version; after it, 355 of 362, PR 73's new tests and `game_ptrcasts` among them; after the merge with PR 72, 357 of
+    364, its two digest tests among them. In each, 7 skip for the optional setups a new worktree lacks: `asm_oracle` (no
+    Unicorn venv), `oracle_boot`, `oracle_saves` and `oracle_floccesy_save` (no oracle built), the VM dispatch's native
+    and verifier negatives (Apple clang has no function check) and `app_universal_slices` (one slice). None fails.
+  - T3: not run here: nothing that a replay runs is this branch's change (documents, the guard's baseline, a query's
+    and a tool's comments, a shell script's messages and Python tests); PR 73's and PR 72's code, which the merges
+    bring, was verified in those PRs. The verifier's full `ctest` on the exact head runs the replays.
+  - The sync tooling tests, CI's command (`python3 -m unittest discover -s port/tools/tests -p test_upstream_sync.py`,
+    Python 3.14.6 here; CI's job runs 3.12): 64 of 64 pass, 60 on `main`, also on each merged tree. Negative controls,
+    each in a scratch copy of the tests: against `main`'s `sync_upstream.sh`, `SyncDocSectionTests` fails naming the
+    three old section names, and `ShellStopSummaryTests`' topic case fails on the summary's "stopped: upstream rewrote
+    its history"; without either check's outcome, that check's case fails; a new message that names its section in
+    another form (`see port/docs/SYNC.md, section "..."`), or names SYNC.md alone, fails; with SYNC.md's "Upstream
+    rewrite (exit 4)" renamed, it fails naming that item; the test's own six controls each fail as they must. ShellCheck
+    0.11.0 reports the same 10 findings on the script as on `main`, and `bash -n` passes.
+  - A link and table checker over 97 Markdown documents, `port/`'s and the port's `.github/` ones (written for this
+    change, not committed), which splits a table's cells as GitHub does, at an unescaped `|` even in a code span: on
+    `main` (`806b2a8f9d`, and `c0a7941e4e`) it finds 6 problems, ADR 0001's three missing SYNC.md anchors,
+    game-changes.md's R8 row and tests/README.md's NODEMIX row, all fixed here, and `research/platinum-port.md:25`, a
+    record; on this branch that one alone. On a fixture it finds a missing file, a missing anchor in another document
+    and in the same one, a row split by a code span's pipes, a short row, a row cut off by a blank line and a stray row,
+    and not a row whose pipes are escaped or a list item's code span continued on a line that starts with `|`. The first
+    checker, which took a code span as one cell, had found 4 on `main` and none on this branch. GitHub's renderer
+    (`gh api markdown`, mode gfm) gives the R8 row its 6 cells, its guard's whole code span and its commit.
+  - T4, T5 and T7 not run: no game, host or test-target code of this branch's changes.
+- **Tiers:** not measured (no progress scan).
+- **Trap stubs:** 25 function stubs and 1 data placeholder (`CARDi_NdmaInterface`) in each version's generated
+  `stubs.c`, as on `main`; no route ran.
+- **64-bit warnings:** the pointer cast guard passes in both versions, by `check_ptrcasts.py --report` and in ctest:
+  365 sites in 229 keys (real 66, harmless 123, handled 141, unreachable 35), 1,713 files, 0 not compiled, the last
+  entry's figures, now with no note: `--update` dropped the five rows it no longer found and renamed two (below). The
+  files were 1,711 before the merge with PR 73, which compiles two more: MSL's `exit.c` through
+  `port/hal/msl/exit_host.c`, and the gimmick's file through its fixture.
+- **Work done:** the follow-up that PR 67's entry names, each item checked against `10d017c010` first, and its
+  review's fixes:
+  - **The guard's baseline**, `check_ptrcasts.py --build-dir build/port --update`: 229 rows, 5 dropped, 2 renamed,
+    none new, every class and note kept. Renamed, both `real`: `net_devwifi.c`'s `NetDevWifi_Unk4C` is
+    `NetDevWifi_StartMatch` (upstream's `f406409614`), and `WcmWmcbScanEx` is in `wcm_wmif.c` since upstream's
+    `df847de7d1` splits `wcm.c`. Dropped: `wcm.c`'s two `WCM_NotifyResult` rows (`real`), which that split makes
+    `wcm_system.c`'s `WCMi_Notify`, whose rows `676a894d74` (PR 34) added; `dsp_audio.c`'s `func_027060b4`, which
+    upstream's `1574db16fe` makes `dsp_util.c`'s `DSPi_PlaySoundEx`, a row of PR 34's too; and `card_rom_twl.c`'s
+    `CARDi_ReadSecureRomWithDMA` and `os_arena_twl.c`'s `OSi_InitArenaExTwl`, which upstream's `b2e9e3c1da` and
+    `ff00b40907` merge into NitroSDK's `card_rom.c` and `os_arena.c`, files the host replaces and so never compiles
+    (all three `unreachable`, TWL-only).
+  - **Living documents at upstream's names:** `pointer_offsets.query`'s header names `scrcmd_field_actor.c`
+    (`0e2d7f0974`); decomp-findings.md, game-changes.md and sanitizers.md's H4 name `pokedex_detail_tbar.c`, and the
+    finding its `PokedexDetailTbarResource_Load` (`e2384ebfee`); sanitizers.md's R6 names `fldeff_fes_sparkle.c` and,
+    from the same `c13587cf78`, `fldeff_emotion_bubble.c`, at the report's lines as the table's other rows are, and
+    game-changes.md's row for that fix `FesSparkleTask`; R9 says the fix is upstream's since `de6cd09688`, which is
+    why `892b9f4f74` dropped the game-changes.md row it pointed to; PLAN.md §9's 818-pointer tables are in
+    `field_actor_drawdata.c`, where upstream's `33a5ba6936` moved them out of `fldmmdl_blact.c`; `summarize.py`'s
+    comment on overlay 182's gaps names `lib/dwcutilui`'s `comment.c` and `lib/dwcutil`'s `dwc_moveid.c`.
+  - **`sync_upstream.sh`'s messages** say that it fetches, merges and counts against `origin/main` (its `origin_ref`
+    since `88237af41d`), where they said `origin/BRANCH`; a message that could never print goes. Its stops name the
+    items of SYNC.md's "Conflicts and stopped syncs" as they are: "Upstream rewrite (exit 4)", "Cross-repository
+    reference (exit 5)" and "Draft conflict proposal (the hourly sync)". The summary of a stopped run names which of
+    the two exit-4 checks stopped it (it said "upstream rewrote its history" for both), and the usage's exit statuses
+    name the moved topic. `test_upstream_sync.py`'s `SyncDocSectionTests` fail when a section or anchor the script
+    names isn't SYNC.md's, or when a line of its code names SYNC.md in a form the test can't read, and
+    `ShellStopSummaryTests` run the script offline to its two exit-4 stops; the tests' guide says so.
+  - **Links and tables:** ADR 0001's three SYNC.md anchors, gone since `88237af41d`, point to the sections that hold
+    their subjects now; tests/README.md's NODEMIX row gets its two missing cells; game-changes.md's R8 row escapes its
+    code span's pipes, which split its cells; docs/README.md lists ADRs 0022 to 0025 and links 0026 to 0029 as it does
+    the others. ARCHITECTURE.md's feature map was one table already (`d0833a7943`).
+  - **STATUS.md's `PORT_SHA`s:** three 2026-10-25 entries get theirs by the rule, each the commit that added the
+    entry's work and whose text the entry still is: PR 35's sync `fa9e27ec24`, PR 33's conflict drafts `ddc4ff6048`
+    and phase 4's coverage `883432299b`.
+  - **lessons.md:** the three lines over 120 columns, two in the 2026-10-28 entry on verification statuses and one
+    in the entry on card work, wrapped.
+  - **The repository policy** records the owner's standing delegation of 2026-11-01: the maintainer session, defined
+    by its role (the agent session that the owner directs in chat as Frigate's maintainer and that answers to the
+    owner for what it merges), not by the account every session runs `gh` as, may approve an App-authored sync PR as
+    CallanCampos and merge it with a merge commit, once it has reviewed the conflict resolutions, the renamed names
+    and the upstream range, every required check and the local verification pass on the exact head, the branch is up
+    to date and no review conversation is open, and then tells the owner what the sync brought in; contributor PRs
+    still need the owner's word each. GLOSSARY.md defines the maintainer session, and its rows for upstream, sync PRs
+    and the owner review exception say who approves an App-authored sync PR. The pointers this PR first gave
+    port/CLAUDE.md, CONTRIBUTING.md and SYNC.md are withdrawn: the guides that say who approves a sync PR are one
+    follow-up, for the owner's wording.
+- **Next:** Phase 5's story coverage after the Route 20 save, each trainer battle cut where ADR 0023, accepted by PR
+  70, says: Floccesy Ranch, Hugh's Town Map, the ranch's lost Pokémon and the first gym. The follow-ups this PR lists
+  are small separate PRs: the guides that still say the owner approves every sync PR (port/CLAUDE.md, CONTRIBUTING.md,
+  SYNC.md, PLAN.md, README.md and `upstream_sync.py`'s warning); lines over 120 columns in other living documents; the
+  script VM test's old name in two guides; `milestones.py`'s overlay 36 set and `field_effect.h`'s comment at
+  upstream's names; sanitizers.md's report lines; `summarize.py`'s overlay 182 rule, which no gap reaches now; a
+  committed check of the documents' links and tables; and `research/platinum-port.md:25`, a record, whose `git grep`
+  pattern's pipes split its row.
+- **Blockers:** none for this change. Decisions the owner holds: ADRs 0022, 0025 and 0030 are proposed; the
+  follow-up on the guides needs the owner's wording of the delegation for port/CLAUDE.md; and Spanish issue 45 still
+  lacks a local dump.
 
 ## 2026-11-02: verification v2's canonical digests, without a ROM: ADR 0031 proposed
 
@@ -2270,7 +2389,7 @@ This entry is a preparation snapshot. Final validation and merge results are rec
   on it four times with "Upstream workflow changes require local sync with maintainer credentials" (runs 40132135150,
   40142482549, 40150273898 and 40168613080, the last at 06:18 UTC on `abf834a3a3`), since the sync App has no
   Workflows permission.
-- **Port:** `PORT_SHA`, on the topic `codex/upstream-sync-manual` from `main` at `abf834a3a3` (PR 32's merge): the merge
+- **Port:** `fa9e27ec24`, on the topic `codex/upstream-sync-manual` from `main` at `abf834a3a3` (PR 32's merge): the merge
   `ac06c5c88e` of `b67985f98f`, its two conflicts resolved and committed after `port/tools/sync_upstream.sh --branch
   codex/upstream-sync-manual --no-push` stopped on them (its message, the tool's first line and `Upstream-Commit`
   trailer, also names each resolution, where SYNC.md says `git commit --no-edit`); the merge `f193d8a5ca` of
@@ -2710,7 +2829,7 @@ This entry is a preparation snapshot. Final validation and merge results are rec
 - **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it since PR 27; this branch merges no upstream commit.
   Upstream's `main` has moved on with workflow changes, which the hourly sync still stops on, so the next sync is a
   local one.
-- **Port:** `PORT_SHA`, on the topic `port-sync-conflict-drafts` from `main` at `abf834a3a3` (PR 32's merge), one
+- **Port:** `ddc4ff6048`, on the topic `port-sync-conflict-drafts` from `main` at `abf834a3a3` (PR 32's merge), one
   commit. It fills the last entry's `PORT_SHA`, `1e107c917e`. No file outside `port/` changes
   (`git diff --stat origin/main -- . ':!port'` prints nothing).
 - **ROM:** T0 passes: `python3 configure.py && ninja` from an empty build directory compiled every C file of both
@@ -2761,7 +2880,7 @@ This entry is a preparation snapshot. Final validation and merge results are rec
 
 - **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it; this branch merges no upstream commit, and still
   needs upstream's encounter effects' entries (`b962ecf040`), verified as the same local, uncommitted candidate.
-- **Port:** `PORT_SHA`, on the topic branch `port-phase4-coverage`, local and not published, after `4ca0b4fd39`, whose
+- **Port:** `883432299b`, on the topic branch `port-phase4-coverage`, local and not published, after `4ca0b4fd39`, whose
   entry's `PORT_SHA` it fills: the fixes of that branch's review. It lands as that entry says, after
   `port-phase4-route`.
 - **ROM:** T0 passes on this commit's tree with the candidate: Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`,

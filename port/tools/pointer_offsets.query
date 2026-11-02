@@ -2,9 +2,9 @@
 # pointer is 32 bits, so a u32 added to it wraps: an offset of 0xffffff00 moves it 256 bytes back. On a host the
 # pointer is 64 bits and the u32 is zero-extended, so the same offset moves it 4 GiB forward, and a pointer subscripted
 # by such a u32 reaches as far. There is no cast, so the pointer cast guard (check_ptrcasts.py) can't see it. The field
-# script read its jump, call and movement offsets so until PR 29 (src/ov012/scrcmd_vm.c, src/ov036/scrcmd_fldmmdl.c
-# and src/ov012/script_sys.c, the row of port/docs/game-changes.md), and Black 2's starter scene crashed at its first
-# offset back.
+# script read its jump, call and movement offsets so until PR 29 (src/ov012/scrcmd_vm.c,
+# src/ov036/scrcmd_field_actor.c and src/ov012/script_sys.c, the row of port/docs/game-changes.md), and Black 2's
+# starter scene crashed at its first offset back.
 #
 # An offset is safe as a u32 when it can't be negative: one that counts from the start of its file or of a block, an
 # index, a size. One that counts from the reader's own place, as a script's jumps do, can point back, and is read as an

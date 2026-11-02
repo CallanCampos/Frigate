@@ -55,12 +55,12 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
 ## 2026-10-28: finish failed verification statuses on the pinned commit
 
 - Posting pending without a failure exit path leaves a stopped local build looking active indefinitely. Arm cleanup
-  before the pending API request, retain the verified head, and report failure from the exit trap. Preserve the verifier's original
-  failure or signal exit code even when failure reporting itself fails; disarm cleanup only after successful validation
-  and a successful success-status upload. Ordinary sync publication keeps its existing behavior.
-- Exercise command failure, failed status upload, SIGINT, SIGTERM, changed remote head and successful completion.
-  A changed head must still report failure on the originally verified commit. Network failure, shutdown and an
-  uncatchable kill can leave pending; rerun verification on the exact current head rather than manually asserting success.
+  before the pending API request, retain the verified head, and report failure from the exit trap. Preserve the
+  verifier's original failure or signal exit code even when failure reporting itself fails; disarm cleanup only after
+  successful validation and a successful success-status upload. Ordinary sync publication keeps its existing behavior.
+- Exercise command failure, failed status upload, SIGINT, SIGTERM, changed remote head and successful completion. A
+  changed head must still report failure on the originally verified commit. Network failure, shutdown and an uncatchable
+  kill can leave pending; rerun verification on the exact current head rather than manually asserting success.
 - Check the pinned action implementation before changing a deprecated input. The App-token action normalizes both
   identifier inputs identically, so moving the existing numeric App ID to `client-id` needs no new credentials or scope.
 
@@ -174,11 +174,11 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   reserved cache memory but did not load it. Controlled traces found 58 global FNT and two FAT reads beyond the
   DS's ten data reads in Hugh's first damage calculation. Use the SDK's actual cache lifecycle and existing native
   `load_mem` pointer before modeling physical transfers.
-- A script load exceeds the 500-tick budget in the pinned melonDS model, but its ideal wire time (21,700 bus cycles) and observed
-  CARD API spans (27,597–27,825) are each below 32,000 cycles; the whole load takes 32,938–33,089. Remaining
-  SDK/FS/copy/poll/IRQ work must not be mislabeled pure CPU time or hidden behind a Hugh-specific constant.
-  Private DS observers preserve all 10,750 control frame rows and RNG dumps; native observers preserve all 8,500
-  frame rows and 34,000 state snapshots. These are measurements, not a production timing fix.
+- A script load exceeds the 500-tick budget in the pinned melonDS model, but its ideal wire time (21,700 bus cycles) and
+  observed CARD API spans (27,597–27,825) are each below 32,000 cycles; the whole load takes 32,938–33,089. Remaining
+  SDK/FS/copy/poll/IRQ work must not be mislabeled pure CPU time or hidden behind a Hugh-specific constant. Private DS
+  observers preserve all 10,750 control frame rows and RNG dumps; native observers preserve all 8,500 frame rows and
+  34,000 state snapshots. These are measurements, not a production timing fix.
 - On this Mac an unsigned `wibo` launch entered kernel wait while a private ad-hoc-signed copy ran. Preserve the
   pinned unsigned download, record both hashes and identical executable code sections, and use configure's
   supported `--wine` runtime option. Keep its original checksum validation intact. No OS policy change is needed;

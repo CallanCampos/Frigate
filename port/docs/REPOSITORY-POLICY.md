@@ -50,6 +50,25 @@ upstream parent and `Upstream-Commit` trailer make later imports preserve histor
 merge is disabled; merged topic branches are deleted automatically. GitHub's update-branch button is enabled; any
 new head must be validated again.
 
+### Delegated approval of App-authored sync PRs
+
+On 2026-11-01 the owner delegated the approval of the upstream sync PRs that the sync App authors to the maintainer
+session: the agent session that the owner directs in chat as Frigate's maintainer, and that answers to the owner for
+what it merges. It is a role, not an account. Every agent session on the owner's machine runs `gh` as CallanCampos,
+and that alone doesn't make it the maintainer session. The maintainer session may approve such a PR as CallanCampos
+and merge it with a merge commit once all of these hold:
+
+- it has reviewed the merge's conflict resolutions, the names the sync renames and the upstream range it merges;
+- every required check and the `Frigate local verification` status pass on the PR's exact head, the status inspected
+  as above;
+- the branch is up to date with `main`;
+- no review conversation is open.
+
+It then tells the owner what the sync brought in. This is the one exception to the rule above that upstream syncs
+need the owner's own review: it covers App-authored sync PRs alone, so a sync PR that the owner's credentials created
+still waits for the owner, and a contributor's PR still needs the owner's word for that PR. The owner-authored
+review-only exception is unchanged. The delegation stands until the owner withdraws it.
+
 ## Actions settings
 
 The default workflow token remains read-only. The live fork policy is
@@ -58,12 +77,15 @@ for first-time contributors with new GitHub accounts. Established contributors' 
 If GitHub does request a run approval, inspect the proposed code and workflow changes before granting it.
 Public PR jobs use hosted runners without ROM or App secrets. Port checkouts do not persist credentials, and
 port Actions are pinned to full commit SHAs. Automatic CI never substitutes for the owner's human code review:
-contributor and sync PRs require explicit owner approval before merge.
+contributor and sync PRs require explicit owner approval before merge, which for App-authored sync PRs the owner has
+delegated ([above](#delegated-approval-of-app-authored-sync-prs)).
 
-The replacement scheduled publisher uses a dedicated GitHub App to start ordinary PR CI automatically, while
-retaining owner review and local ROM verification. Its narrow installation/token scopes, secret names and setup
-are documented once in [SYNC.md](SYNC.md#set-up-the-dedicated-sync-app). It cannot post the required local status,
-approve PRs, merge, or bypass rules through this workflow. No PAT is used.
+The replacement scheduled publisher uses a dedicated GitHub App to start ordinary PR CI automatically, while review
+stays with the owner, or with the maintainer session under the delegation
+[above](#delegated-approval-of-app-authored-sync-prs), and local ROM verification with a maintainer. Its narrow
+installation/token scopes, secret names and setup are documented once in
+[SYNC.md](SYNC.md#set-up-the-dedicated-sync-app). It cannot post the required local status, approve PRs, merge, or
+bypass rules through this workflow. No PAT is used.
 
 The dedicated **Frigate Upstream Sync** App (ID `5435198`, installation `174325863`) is installed on Frigate alone.
 Its Contents/Pull requests write and automatic Metadata read scopes, empty webhook subscription list and selected
