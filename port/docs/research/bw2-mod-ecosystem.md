@@ -742,6 +742,17 @@ boot), (3) converters for `a/2/7/3`, `a/2/8/2`/`a/2/8/3` and `a/2/0/2`, and (4) 
 Local paths are relative to the pokebw2 checkout. Addresses are Black 2 (US) unless marked W2. "Unverified" marks
 claims that rest on secondary sources, inference or something not checked in code.
 
+**Note (2026-11-01):** upstream has since renamed files and a function that this section names. On Frigate's `main`
+(upstream `9496bc869b`), `src/ov036/fldmmdl_blact.c` is `src/ov036/field_actor_billboard.c`, `fldmmdl_g3dobj.c` is
+`field_actor_g3dobj.c`, `src/ov012/fldmmdl.c` is `src/ov012/field_actor.c`, `src/ov265/ddemo_main.c` is
+`src/ov265/hall_of_fame_demo_main.c`, and `func_ov036_02184fb8` is `FieldG3DMapper_GetWindowStartEven`
+(`src/ov036/field_g3d_mapper.c:590`). The counts moved with the decompiled C: the aspect is `FX32_CONST(4.0 / 3.0)`
+at 25 sites in 23 files, 4:3 is written in 29 files counting `FX32_ONE * 4 / 3` and `1.333`, and `GX_BG0_AS_3D` is in
+44 files of `src/`. The 23 `G3_ViewPort(0, 0, 255, 191)` sites and the 19 files that route engine A to the bottom
+screen still hold; 15 of those 19 never set `GX_BG0_AS_3D` themselves.
+[ADR 0030](../adr/0030-widescreen-by-an-engine-side-hor-plus-scale-with-native-readbacks.md) proposes widening in
+Frigate's geometry engine instead of through the projection that §3.4 to §3.6 widen.
+
 ### 3.1 Summary
 
 - **One BW2 widescreen hack exists, and it only covers the overworld.** TWiLight Menu++ (DS-Homebrew) ships a 16:10

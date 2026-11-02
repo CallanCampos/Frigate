@@ -140,6 +140,45 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   that `main` lacks; PR 67's branch lacked 757). Then the phase's next criterion, as the earlier entries say.
 - **Blockers:** the owner's review of PR 67 once ready. None for the sync itself.
 
+## 2026-11-01: widescreen kept possible: ADR 0030 proposed, the rules every change keeps, and documentation fixes
+
+- **Upstream:** unchanged, `9496bc869b87`; reviewed main `e733ccc8a3` (PR 66's merge).
+- **Port:** `PORT_SHA`, on the topic `port-widescreen-rules` from that main; this entry fills the last entry's
+  `PORT_SHA` with `22d3464507`. Documentation only: nothing outside `port/` changes.
+- **ROM (T0):** configure/Ninja (`-j4`) and both original US SHA1s pass with zero compiler warnings, on reviewed main
+  and again on this commit: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+- **Host build (T1):** no source, build or test change from reviewed main, so not rebuilt here; exact-head
+  `sync_upstream.sh --verify-pr` builds and tests both versions before merge.
+- **Tests (T2–T7):** not run here: no code, input, seed, golden, mask, budget or sanitizer policy changes. Self-checks
+  of the eleven changed documents pass: every relative link and heading anchor resolves, every table keeps its header's
+  column count with no blank line inside it, and no added line outside a table is over 120 characters.
+- **Tiers/trap stubs:** unchanged; no progress scan.
+- **64-bit warnings:** unchanged from the last entry, 365 sites/229 keys (real 66, harmless 123, handled 141,
+  unreachable 35); the exact-head verifier repeats the guard. No baseline change.
+- **Work done:** [ADR 0030](adr/0030-widescreen-by-an-engine-side-hor-plus-scale-with-native-readbacks.md), proposed for
+  the owner's decision: widescreen by a Hor+ scale in Frigate's geometry engine, with the clip and vector matrices and
+  the position and vector tests native and box tests answering for the wide view; 2D native and centred, anchored at
+  ClAct and BMP windows; three enhancement classes; the invariants the tests hold (centre crop equals native, logic
+  digests equal with it on, readbacks native); what stays 4:3; and the game-side projection, a projection matrix
+  scaled in the engine and anamorphic stretching compared on their evidence. Its rules 1 to 10, which keep phase 6's
+  exit reachable under either of PLAN.md §5.2's options, apply now:
+  [port/CLAUDE.md](../CLAUDE.md#keeping-widescreen-possible-planmd-52) has the essentials, ARCHITECTURE.md's boundary
+  rules and the renderers' guide a line each, and the glossary rows for Hor+, enhancement classes and readbacks. Rules
+  11 to 13 (`PORT_SCREEN_WIDTH` kept, no `MAP_CONFIGS` or actor-limit edits, a class for every enhancement) come with
+  its design. Fixes: ARCHITECTURE.md's feature map is one table again (two blank lines had left the Spanish ROM row and
+  the 32 rows from "SDK string length" on as raw text); the ADR index's next free number is 0033, with 0031 reserved
+  for verification v2, 0032 for the save lab and 0020 still for D6; ADR 0021 is accepted, since the developer merged
+  PR 18 (`1c5f322b71`), the merge its note waited on; bw2-mod-ecosystem.md §3 has a dated note with the names upstream
+  changed since (`field_actor_billboard.c`, `field_actor_g3dobj.c`, `field_actor.c`, `hall_of_fame_demo_main.c`,
+  `FieldG3DMapper_GetWindowStartEven`) and the counts on main; and port/CLAUDE.md and ADR 0002 link SYNC.md's
+  reference stop at its current heading.
+- **Next:** publish the topic PR; all hosted checks and exact-head local verification precede its protected merge under
+  the existing owner-authored review-only exception. The owner decides ADR 0030. Phase 5's story coverage continues as
+  the earlier entries say.
+- **Blockers:** none for this change. ADR 0030 waits on the owner's decision, and ADR 0022 stays proposed for the
+  owner's review, which its note waits on (PR 31 merged with none on record). Widescreen itself is phase 6 work.
+
 ## 2026-10-28: finish local-verification failures and retain the scoped sync App
 
 - **Upstream:** reviewed main `56a9ef2a1d` contains `9496bc869b87` after PR 65 passed both full local suites, both

@@ -13,6 +13,11 @@ file here into the `port_gfx` target ([../CMakeLists.txt](../CMakeLists.txt)); t
 own, with their own flags ([../cmake/gfx_tests.cmake](../cmake/gfx_tests.cmake),
 [../cmake/g3d.cmake](../cmake/g3d.cmake)), and need no ROM.
 
+The 2D renderer and display capture stay DS-exact and 256 wide, the source of every tested frame, and widescreen will
+be new code beside them. Rules 1 to 10 of
+[ADR 0030](../docs/adr/0030-widescreen-by-an-engine-side-hor-plus-scale-with-native-readbacks.md), whose design is
+proposed, say what every change here keeps until then.
+
 | File | What it does | Game functionality that depends on it | Tests |
 | --- | --- | --- | --- |
 | [screens.c](screens.c), [screens.h](screens.h) | The scanline hook: at the start of each visible line, draws that line of both 2D engines from the state the game left, routes each to the screen POWCNT1 gives it, and feeds engine A's line to display capture; before line 0 it has the 3D frame drawn | Every screen of the game, with its raster effects (the HBlank tasks of `src/system/main.c` change registers between lines) | `integrate_screens`, `os_scanline_hook`, every replay and oracle test |
