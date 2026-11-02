@@ -16,8 +16,9 @@ renderer's workers, CI and the window's presentation. -->
   release candidate). Nothing in the code changes with it. Each numbered decision is a recommended default that is the
   owner's to confirm, with its alternatives and their costs below. It stays proposed until the owner reviews it; the
   change that records the owner's answers sets the status line. File and line references are to `main` at
-  `e936696a97` (`ADR NNNN:L` is a line of that ADR); STATUS.md's entries are named by their dates too, since every new
-  entry moves its lines. "Inferred" marks what was reasoned, not read or measured.
+  `e936696a97`, to be read there (`git show e936696a97:PATH`), unless a pull request's commit is named (`ADR NNNN:L`
+  is a line of that ADR); STATUS.md's entries are named by their dates too, since every new entry moves its lines.
+  "Inferred" marks what was reasoned, not read or measured.
 
 ## Context
 
@@ -187,11 +188,18 @@ timed route on time (2b), as the defaults below define them.
      an oracle save (`:45`); the café's neighbours, `ZONE_CASTELIA_CITY` among them, already run to frame 2,200
      (`STATUS.md:435-438`);
    - the C-Gear's bottom screen, once a story route reaches it (the game gives it in Aspertia City and then sends the
-     player on to Virbank City's Gym, `res/field/scripts/aspertia_city.s:1296-1328`);
+     player on to Virbank City's Gym, `res/field/scripts/aspertia_city.s:1296-1328`), timed as the route leaves the
+     C-Gear: off, or on only once ADR 0033's refusal check passes, since turning it on starts the game's
+     communication (`:1326`; `src/ov012/event_cgear_poweron.c:39-42`), which on a host meets a WM that refuses to
+     start (inferred, as ADR 0033's Context gives it);
    - each story leg's heaviest scene: the leg's pull request runs its route with `frame_times.py check --report-only`
      (3 runs, each frame's least, at whatever load), names in each game the steady stretch with the highest busy 95th
      percentile, and registers it as a timing test that plays the leg's input to that stretch's end, which changes no
-     program and holds the leg to no budget (5). When the save lab's map sweep lands (planned,
+     program and holds the leg to no budget (5). Each such test adds three headless runs and one paced run in each
+     game to every quiet window: at most the whole leg, as many as the 34,600 frames that the strict batch of
+     2026-10-28 played from the catch's save to Route 20's (`STATUS.md:1848-1849`), about 9.6 minutes paced and a few
+     minutes headless per game (inferred: 34,600 / 59.8261 s, and busy times of 1 to 2 ms a frame), so each leg can
+     add about 25 minutes in both games to every quiet window (inferred). When the save lab's map sweep lands (planned,
      `port/tools/lab/README.md:15-17`), one pass of it with `--frame-times`, one zone at a time, ranks the zones, and
      the two heaviest in each game join the list.
 
@@ -201,8 +209,10 @@ timed route on time (2b), as the defaults below define them.
      ADR 0031's sixth part (ADR 0031:85-86, 165); until those exist, `ctest -L timing` and the paced runs by hand.
    - The per-PR gate leaves them out: the exact-head verifier's ctest (`sync_upstream.sh:589`), and ADR 0031's `pr`
      preset once it exists, run with `-LE timing`. This reverses the verifier's choice to hold them with report-only
-     off (`sync_upstream.sh:584-587`). ADR 0018's native tests on the tested commit (ADR 0018:27-28) are then every
-     native test but these, and the change that does it says so where the local verification is described
+     off, which its comment gives as keeping local overrides from weakening the gates (`sync_upstream.sh:584-587`). ADR
+     0018 decided that "both ROM SHA1s and native tests are a separately required local status on the tested commit"
+     (ADR 0018:27-28); that status then attests every native test but these, so accepting this ADR amends ADR 0018
+     ([Consequences](#consequences)), and the change that does it says so where the local verification is described
      (`port/docs/REPOSITORY-POLICY.md:34`). If the owner confirms both this ADR and ADR 0031, this narrows ADR 0031's
      first default, "the full suite on the exact head" (ADR 0031:167-169), by that label. A developer's own `ctest`
      keeps them, as `port/README.md:81-83` says.
@@ -341,32 +351,38 @@ timed route on time (2b), as the defaults below define them.
   2. The new timing routes (4), each a test registration.
   3. `-LE timing` in the per-PR gate (`sync_upstream.sh` and its tests), with ADR 0031's presets or before them.
   4. The CI bench step (8).
-  5. The quiet record: a STATUS.md entry with every scene of both games on the M2, the x86_64 slice under Rosetta,
-     the paced runs and the one-thread numbers, about an hour to an hour and a half of a quiet machine (inferred), and
-     the documents brought to it: ARCHITECTURE.md's table, its "hasn't been measured since" for the x86_64 slice
-     (`ARCHITECTURE.md:146-147`, which the loaded run of 2026-10-19 already contradicts, `STATUS.md:5083-5088`), and
-     its feature map's "Frame times" row (`:312`); and `port/README.md:81-83`, `port/tests/README.md:83-91` and
-     `port/docs/MODDING.md:258-265`, which say where the timing tests run.
+  5. The quiet record: a STATUS.md entry with every scene of both games on the M2, the x86_64 slice under Rosetta, the
+     paced runs and the one-thread numbers, about an hour to an hour and a half of a quiet machine for the scenes that
+     (4) names before the story legs' (inferred), growing by up to about 25 minutes with each leg's scene, so several
+     hours once the story is done (inferred), and the documents brought to it: ARCHITECTURE.md's table, its "hasn't been
+     measured since" for the x86_64 slice (`ARCHITECTURE.md:146-147`, which the loaded run of 2026-10-19 already
+     contradicts, `STATUS.md:5083-5088`), and its feature map's "Frame times" row (`:312`); and `port/README.md:81-83`,
+     `port/tests/README.md:83-91` and `port/docs/MODDING.md:258-265`, which say where the timing tests run.
   6. Optimizations, only if the record misses on the M2 or the owner holds more (3, 6). Each proves its output
      unchanged (`g3d_ds3d`, `g3d_ds3d_bands`, the routes' `frames.tsv` at several render-thread counts, as
      `STATUS.md:5234-5239` did for three routes at 1, 2 and 8, and the digests once ADR 0031's second part lands) and
      keeps ADR 0016's and ADR 0030's rules (6). The last measurement named the candidates: the geometry engine on the
      game's thread, the 2D text backgrounds, the workers' wake-ups and the paced core's clock (`STATUS.md:5298-5299`).
-- The change that accepts it points PLAN.md's phase 5 item here; the verifier's `-LE timing` is the third step's.
+- The change that accepts it points PLAN.md's phase 5 item here and sets ADR 0018's status line, and its index row,
+  to "accepted; amended by 0024 and 0034": the required local status attests every native test but those labelled
+  `timing` (5), ADR 0018's other decisions standing. The verifier's `-LE timing` is the third step's, which says so
+  where the documents describe the local verification's tests (`port/docs/REPOSITORY-POLICY.md:34`,
+  `port/docs/SYNC.md:241-242`).
 - What the default gives up: a change that slows the frames merges past every gate. The base-and-head report (5) and
   the next quiet record find it, and the record on the release candidate's commit is the last of them.
-- Work in flight: each story leg adds its heaviest scene (4), and no story pull request is held to timing (5).
-  Verification v2's second part adds `--digest` to both programs (`STATUS.md:388-392`), which timed runs never pass,
-  and its digests become the optimizations' proof. The `ToScreen` depth fix changes the geometry engine's depth for
-  vertices whose clip W is 2^24 or more (ADR 0031:143-149; `STATUS.md:388-389`), so the optimizations' baselines come
-  after it. The save lab mints Castelia's start (4); its stations' rules are
+- Work in flight, as of 2026-11-02: each story leg adds its heaviest scene (4), and no story pull request is held to
+  timing (5). Verification v2's second part (PR 78) adds `--digest` to both programs (`STATUS.md:388-392`), which
+  timed runs never pass, and its digests become the optimizations' proof. The `ToScreen` depth fix (PR 76) changes
+  the geometry engine's depth for vertices whose clip W is 2^24 or more (ADR 0031:143-149; `STATUS.md:388-389`), so
+  the optimizations' baselines come after it. The save lab mints Castelia's start (4); its stations' rules are
   [ADR 0032](README.md#numbering-and-files)'s. ADR 0020's one program (D6), proposed with this one, keeps each
   version's program as a thin `main()` over the core the app ships, so the timing tests time that core under their
   names; only its optional one-tree stage renames them, as the branch `port-one-program` does (`4a4c2bc9f1`); the
   record is taken on the program's shape at the release candidate (inferred: a core built as a shared library may time
   differently). The sanitized build has no timing tests (`frame_times.cmake:11-12`), so sanitizer-clean replays
-  (ADR 0033) and timing never share a run. The release candidate (ADR 0035) waits for this record and carries its
-  numbers in its notes.
+  (ADR 0033) and timing never share a run. The release candidate (ADR 0035) waits for this record; its notes, written
+  before the record is made, name the machine and the slices it is held on and point to the release candidate's
+  STATUS.md entry, which holds the numbers (ADR 0035, item 7).
 - To watch:
   - the x86_64 slice, the likeliest miss (3);
   - the machine's state, which (b) feels and (a) mostly doesn't: its heat, its battery and Low Power Mode, and App Nap

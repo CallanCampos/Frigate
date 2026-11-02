@@ -462,16 +462,8 @@ Each phase ends when its exit criteria pass on macOS. Phases overlap where the d
   headroom; controller support; one executable for both versions; an ad-hoc signed `.app` in a DMG, with "Open
   Anyway" instructions (no notarization, D11), one universal app for Apple Silicon and Intel Macs with macOS 11 or
   later ([ADR 0015](adr/0015-universal-macos-app-for-macos-11.md)).
-  - What sanitizer-clean replays mean and when they run:
-    [ADR 0033](adr/0033-sanitizer-clean-replays-by-the-strict-routes-and-the-program-alone.md) (proposed).
-  - What 60 fps with headroom means and how it is held:
-    [ADR 0034](adr/0034-60-fps-with-headroom-the-ds-rate-on-time-and-half-a-frame-to-spare.md) (proposed).
-  - How one executable serves both versions (D6):
-    [ADR 0020](adr/0020-one-program-for-both-versions-a-core-per-version-loaded-by-a-launcher.md) (proposed).
 - Windows and Linux builds in CI.
 - **Exit:** the story can be finished on Black 2 and White 2; a private release candidate.
-  - What the private release candidate is and what it waits for:
-    [ADR 0035](adr/0035-the-private-release-candidate-shared-by-hand.md) (proposed).
 
 ### Phase 6: enhancement and mod platform
 

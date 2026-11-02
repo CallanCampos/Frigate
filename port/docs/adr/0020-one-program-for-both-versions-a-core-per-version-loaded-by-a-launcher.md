@@ -14,7 +14,8 @@ private release candidate, the Spanish ROM, and CI's time with the build trees; 
   (one commit, `4a4c2bc9f1`, on `a14364b6ba`: not pushed then, branch STATUS.md:32, and not on `origin` now), a number
   that has since gone to [ADR 0017](0017-external-contributions.md); renumbered to 0020, the number reserved for D6
   ([README.md](README.md#numbering-and-files)), and brought up to date with `main` at `e936696a97`, whose line numbers
-  the citations give ("branch 0017:N" and "branch STATUS.md:N" are lines of the branch's own files). It differs from
+  the citations give, to be read there (`git show e936696a97:PATH`, since later commits move them, STATUS.md's most;
+  "branch 0017:N" and "branch STATUS.md:N" are lines of the branch's own files). It differs from
   the branch's design in the order of the stages, with the one build tree last and optional, in keeping each
   version's test program as a thin `main()` over its core, and in its decisions for the owner, seven where the branch
   had four. Proposed by a maintainer session, from a read-only scout of phase 5's open exit items, in a documents-only
@@ -143,12 +144,12 @@ Each numbered item is a recommended default, the owner's to confirm.
 
 1. **What D6 means: one program, made of a launcher and a core per version.**
    - **The launcher**, `frigate`, is plain C11 with no decomp header and no SDL, so that the core it loads brings the
-     only SDL3 into the process. It finds the ROM as the program does, `--rom`, then `FRIGATE_ROM`, then the
-     development ROMs (`rom.c:499-516`), with the ROMs that ADR 0035's first-launch picker remembers where ADR 0035
-     puts them (item 4); `--version b2_us|w2_us`, the oracle's name for the game (`oracle.cmake:124`), picks or forces
-     a version. It reads the game code in the ROM's header: `IREO` takes Black 2's core and `IRDO` White 2's (item 6
-     for `IRES`); any other code ends it with the ROM's status, 66 (`port/hal/rom/port_rom.h:24`), and a message that
-     names what the ROM is, as `rom.c:358-378` names it.
+     only SDL3 into the process. It finds the ROM as the program does, `--rom`, then `FRIGATE_ROM`, then the development
+     ROMs (`rom.c:499-516`); only when it runs from the Finder (item 4) does it read the ROMs that ADR 0035's
+     first-launch picker remembers, as ADR 0035 reads them only there. `--version b2_us|w2_us`, the oracle's name for
+     the game (`oracle.cmake:124`), picks or forces a version. It reads the game code in the ROM's header: `IREO` takes
+     Black 2's core and `IRDO` White 2's (item 6 for `IRES`); any other code ends it with the ROM's status, 66
+     (`port/hal/rom/port_rom.h:24`), and a message that names what the ROM is, as `rom.c:358-378` names it.
    - It loads the core by its full path, at a place fixed relative to its own file, never through a search path
      (`dlopen` with `RTLD_NOW | RTLD_LOCAL`; `LoadLibraryExW` with an absolute path): beside it on Linux and Windows
      and in a build tree, `Contents/Frameworks` in the macOS app (stage 4). A game whose core isn't there, as in a
@@ -193,12 +194,12 @@ Each numbered item is a recommended default, the owner's to confirm.
      `rom.cmake:144-146`), the launcher refuses with status 66 and lists the choices (`--version b2_us`,
      `--version w2_us`, `--rom PATH`) rather than pick one.
    - From the Finder, where the app gets no arguments, no environment and no terminal
-     ([ADR 0010](0010-macos-app-as-a-signed-copy-of-the-program.md), lines 20-24), one ROM found in item 1's order
-     starts its game. With none, or with ROMs of both games, the launcher loads Black 2's core, the build's default
-     version (`CMakeLists.txt:88`), in a mode that names both games, since only a core has SDL3 for the alert that an
-     app shows today (`message_log.c:104-116`) and for the picker: its stop names both games, and once the picker
-     exists it offers the ROMs found and the open panel, and a ROM of White 2 starts the program again with it, since
-     a core is never unloaded.
+     ([ADR 0010](0010-macos-app-as-a-signed-copy-of-the-program.md), lines 20-24), one ROM found in item 1's order, or
+     else the one the picker remembers, starts its game. With none, or with ROMs of both games, the launcher loads Black
+     2's core, the build's default version (`CMakeLists.txt:88`), in a mode that names both games, since only a core has
+     SDL3 for the alert that an app shows today (`message_log.c:104-116`) and for the picker: its stop names both games,
+     and once the picker exists it offers the ROMs found and the open panel, and a ROM of White 2 starts the program
+     again with it, since a core is never unloaded.
    - The first-launch ROM picker that a downloaded app needs
      ([ADR 0015](0015-universal-macos-app-for-macos-11.md), lines 105-108; `PLAN.md:136`), on ADR 0035's terms
      (proposed with this one), is written in `port/app`, so that today's two programs have it first. Under D6 the
@@ -341,10 +342,12 @@ about as little, and can follow.
     Mach-O section check runs per core. Windows' 8 MiB stack (`CMakeLists.txt:335-339`) and UTF-8 manifest
     (`:434-451`) belong to executables, so the launcher and the test programs carry them; the sanitized launcher
     links the sanitizers' runtime; Linux needs position-independent objects (inferred). T1 on all three systems; T2,
-    T3 and T6 in both versions; T4 once in both; T5 with the cores as libraries, as ADR 0033 (proposed with this one)
-    defines sanitizer-clean replays; the frame-time routes held to ADR 0034's budget (proposed with this one), since a
-    core in a shared library may time differently (inferred); T7 through the launcher: each ROM, a wrong one (66), a
-    missing core, both development ROMs, and `--run-dump`. The riskiest stage, about 6 to 8 hours.
+    T3 and T6 in both versions; T4 once in both; T5's whole set with the cores as libraries, as ADR 0033 (proposed
+    with this one) asks of a change to how every route's program is built; the frame-time routes in a comparison of
+    the stage's base and head, as ADR 0034 (proposed with this one) has it in its item 5, a report rather than a
+    condition of the merge, since a core in a shared library may time differently (inferred); T7 through the
+    launcher: each ROM, a wrong one (66), a missing core, both development ROMs, and `--run-dump`. The riskiest stage,
+    about 6 to 8 hours.
   - **Stage 4: one app**, once the names are confirmed: `Frigate.app` with the launcher in `Contents/MacOS` and both
     universal cores in `Contents/Frameworks`, assembled from the two distribution trees (`build/port-dist` and
     `build/port-dist-w2`: `package_macos.sh:23-24`) and checked to come from one commit, with the same architectures
@@ -392,18 +395,19 @@ about as little, and can follow.
     preprocessed text in under a minute (52 s with 4 jobs, branch STATUS.md:67), catches a wrong classification in
     every build, and a full build of both versions runs on demand, where the branch had a CI job make it
     (branch 0017:194-196).
-- **Work in flight.** Story leg 2 (Terrell's cut, which follows
-  [ADR 0023](0023-oracle-routes-part-where-the-ds-cpu-time-decides.md) as every route does, on the branch
-  `port-terrell-cut` at `d6ef61348a`, and the decrypted save comparison), the save lab's L2 with ADR 0032 and v2's
-  later parts add per-version tests in each tree as they do today; no stage but stage 1 renames them, and no route's
-  command changes. v2's part 2 (`8cc7d9d20a` on the branch `port-digest-stream`) compiles the digest into Frigate's
-  program, whose code becomes the cores', and adds xxHash's notice to the app, which stage 4 carries once; its part
-  6's presets select tests in one build tree, so each version's tree has them, and stage 1, if it comes, would select
-  by version instead (inferred). The ToScreen depth fix (the branch `port-ge-depth-cut`, `port/gfx/ge/ge.c`) is the
-  same code in both versions. The documents pull request (the branch `port-docs-hygiene-1102`) adds a check of the
-  documents' links and tables to CI, which stage 4's renames pass through, and edits `port-ci.yml` beside item 7's job
-  (a text conflict at most, inferred). Stages 2 and 3 change the C that the oracle routes run, so each lands where it
-  doesn't restart a story pull request's final verification (inferred).
+- **Work in flight**, as of 2026-11-02, each pull request at the head it had then. Story leg 2 (Terrell's cut, PR 77
+  at `a7d768e2ee`, which follows [ADR 0023](0023-oracle-routes-part-where-the-ds-cpu-time-decides.md) as every route
+  does, and the decrypted save comparison, PR 79 at `d40edbfd06`), the save lab's L2 with ADR 0032 and v2's later
+  parts add per-version tests in each tree as they do today; no stage but stage 1 renames them, and no route's command
+  changes. v2's part 2 (PR 78 at `cfb18b4130`) compiles the digest into Frigate's program, whose code becomes the
+  cores', and adds xxHash's notice to the app, which stage 4 carries once; its part 6's presets select tests in one
+  build tree, so each version's tree has them, and stage 1, if it comes, would select by version instead (inferred).
+  The ToScreen depth fix (PR 76 at `69422db812`: `port/gfx/ge/ge.c` and `ge.h`, with the digest's `digest.c`,
+  `digest.h` and `test_digest.c`, and ADRs 0030 and 0031) is the same code in both versions. T5-A (PR 81 at
+  `9c7883345a`) runs each version's strict program from that version's own tree, which stage 1 would change (ADR
+  0033). The documents check (PR 75, merged at `c6fcdd3f59`) runs in CI over every document, stage 4's renames
+  among them. Stages 2 and 3 change the C that the oracle routes run, so each lands where it doesn't restart a story
+  pull request's final verification (inferred).
 - **To watch:** the launcher loads by full path alone, since a library found by a search path can be another's; the
   nested cores' ad-hoc signatures on macOS 11 to 14, which no runner covers (ADR 0015, line 136); each core's Mach-O
   sections within its own 255; `version_split`'s count as upstream decompiles more; and the ROMs the picker

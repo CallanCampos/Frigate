@@ -15,8 +15,9 @@ D6, sanitizer-clean replays and 60 fps it waits for. -->
   Nothing it describes is built yet. Each numbered decision is a recommended default that is the owner's to confirm,
   and [Alternatives](#alternatives) gives the other choices and what each costs. It stays proposed until the owner
   reviews it; the change that records that review sets the status line, and makes the changes that
-  [Consequences](#consequences) lists for an accepted ADR. Lines cited are `main`'s at `e936696a97` unless a branch
-  or another commit is named, and "inferred" marks what was reasoned rather than read.
+  [Consequences](#consequences) lists for an accepted ADR. Lines cited are `main`'s at `e936696a97`, to be read there
+  (`git show e936696a97:PATH`, since later commits move them, STATUS.md's most), unless a branch, a pull request or
+  another commit is named, and "inferred" marks what was reasoned rather than read.
 
 ## Context
 
@@ -35,15 +36,20 @@ gets the build and how. What there is, and what is missing:
   image holds no ROM, save, NARC or SDAT file (`:262-263`). CI makes Black 2's on four runners, in a job that the
   required check `Frigate CI` waits for, and keeps every app it makes there (`.github/workflows/port-ci.yml:151-160`,
   `:219-223`, `:312-315`); only a local command makes White 2's.
-- **Nothing is handed out today.** `port/README.md:254-255` says that the port's compiled game code is never uploaded
-  or distributed, and `package_macos.sh:11-12` and `port-ci.yml:18-19` repeat it, citing port/CLAUDE.md, which says
-  only that melonDS is never shipped (`port/CLAUDE.md:220`). ADR 0015 left downloads to the owner and put a
+- **Nothing is handed out today.** `port/README.md:254-255` says that the port's compiled game code is never uploaded or
+  distributed, and `package_macos.sh:11-12` and `port-ci.yml:18-19` and `:79-80` repeat it, the first two citing
+  port/CLAUDE.md, which says only that melonDS is never shipped (`port/CLAUDE.md:220`); accepted
+  [ADR 0010](0010-macos-app-as-a-signed-copy-of-the-program.md) says of the packaging that "Nothing is uploaded" (ADR
+  0010:58-59). The owner's rule is that nothing ROM-derived leaves the machine; port/CLAUDE.md writes the repository's
+  part of it, that nothing from the ROM is committed: no ROMs, extracted files, dumps or captured frames
+  (`port/CLAUDE.md:217-219`). ADR 0015 left downloads to the owner and put a
   first-launch ROM picker before any (ADR 0015:105-108), and STATUS.md left both as the owner's decisions
-  (`port/docs/STATUS.md:6185-6187`). The program is compiled from the decomp's C (`port/CLAUDE.md:216`) without a
-  ROM, as CI, which has none, compiles it (`port-ci.yml:4-5`), so it holds the game's code and the tables compiled
-  into it (`port/docs/MODDING.md:276-277`), and the licence that covers it grants no rights to Nintendo's data or
-  trademarks (`.github/README.md:101-102`): whether to hand it to anyone, and to whom, is a risk that only the owner
-  can weigh.
+  (`port/docs/STATUS.md:6185-6187`). The program is compiled from the decomp's C (`port/CLAUDE.md:216`) without a ROM,
+  as CI, which has none, compiles it (`port-ci.yml:4-5`), so it holds the game's code and the tables compiled into it
+  (`port/docs/MODDING.md:276-277`), and the licence that covers it grants no rights to Nintendo's data or trademarks
+  (`.github/README.md:101-102`). Whether the compiled game counts as ROM-derived under the owner's rule, though no ROM
+  goes into its build, and whether to hand it to anyone, and to whom, are the owner's to rule: a risk that only the
+  owner can weigh.
 - **Giving the ROM takes a terminal.** The program takes `--rom`, then `FRIGATE_ROM`, then the build checkout's
   `orig/` (`port/hal/rom/rom.c:499-517`); opened from the Finder with none of them, it says why in an alert and quits
   (`rom.c:519-541`, `port/app/main.c:509-511`). PLAN.md plans "first-launch ROM setup" in `port/app` (`PLAN.md:136`,
@@ -68,17 +74,19 @@ gets the build and how. What there is, and what is missing:
   pins); whether code of other projects that SDL3's sources carry reaches the program, and asks for a notice, is
   unread. Verification v2's part 2
   ([ADR 0031](0031-per-game-frame-digests-against-a-content-addressed-oracle-cache.md), ADR 0031:154-159), in review
-  on the branch `port-digest-stream` (`8cc7d9d20a`), compiles xxHash into both programs and begins the notices: its
+  as PR 78 (`cfb18b4130`, its head on 2026-11-02), compiles xxHash into both programs and begins the notices: its
   `port/cmake/app.cmake` writes `THIRD-PARTY-NOTICES.txt` beside the program at configure time from the fetched
   archive's `LICENSE` (the branch's `:29-40`), `make_app.sh --notices` copies it into `Contents/Resources`,
   `check_app.sh` and `package_macos.sh` fail an app or image without it, `--help` ends with a line naming it, and the
   test `app_notices` holds that the file ends with xxHash's licence byte for byte (the branch's
   `port/tests/app/check_notices.cmake:27-31`). It names xxHash alone. ADR 0003 puts the "Open Anyway" steps in
   release notes (ADR 0003:20-21, :45-46); only `port/README.md:354-367` has them.
-- **T7 has no checklist, and a milestone no definition.** T7 is "the app driven by scripted input with screenshots,
+- **T7 has no checklist, and phase 5 no milestone.** T7 is "the app driven by scripted input with screenshots,
   against each milestone's checklist", run at each milestone (`PLAN.md:396`, `port/CLAUDE.md:247`), and no checklist
-  has been written. GLOSSARY.md doesn't define a milestone (grep); ADR 0033 reads phase 5's, for T5, as each pull
-  request that ends a leg of the story.
+  has been written. PLAN.md numbers its milestones M1 to M7, the slices of the game that phases 1 to 4 reach, two of
+  them inside phase 3 and three inside phase 4 (`PLAN.md:426`, `:434`, `:442`, `:448`;
+  `port/tools/research/engine/milestones.py:9-12`), and gives phase 5 none; GLOSSARY.md has no row for the word
+  (grep).
 - **What has run.** With the ROM, macOS 26 on an M2 (ADR 0015:25), the x86_64 slice under Rosetta; on CI, the tests
   that need no ROM on macOS 15 and 26, Apple Silicon and Intel, on Black 2's app. No macOS older than 15 has run the
   app, and none older than 26 has played the game (`port/README.md:265-266`, `:279-283`; ADR 0015:102-104,
@@ -100,22 +108,27 @@ Each decision is a recommended default, the owner's to confirm.
    not in its source: the commit and its tag are public like the rest of the repository; the images are not. The
    first RC whose requirements (11) and checklist (8) pass, recorded in STATUS.md, meets phase 5's exit. An RC whose
    runs or checklist fail is handed to no one, and the fix is a new RC (10).
-2. **Who gets it, and how.** The owner keeps the images, their dSYMs (5) and the dependencies' sources (6) on the
-   owner's own machine, and gives an image by hand (AirDrop, a disk, or a link to a file in storage the owner
-   controls, sent to one person) only to people the owner chooses, each told that it is a private test build, not to
-   be passed on, that runs only with their own dump. No workflow or script uploads it, and it never goes to GitHub: no
-   release, draft or published, no Actions artifact, and no link to a copy in the repository, its issues or its pull
-   requests; nothing about it goes to the decomp's repository either
+2. **Who gets it, and how.** This default lifts the stance that Frigate's compiled game code is never distributed
+   (Context), and it waits first for the owner's ruling on whether that code counts as ROM-derived under the rule
+   that nothing ROM-derived leaves the machine: if it does, no RC is handed out, and the first alternative below, no
+   one but the owner, is the default. Otherwise the owner keeps the images, their dSYMs (5) and the dependencies'
+   sources (6) on the owner's own machine, and gives an image by hand, by AirDrop or on a physical disk, with its
+   source beside it (6), only to people the owner chooses, each told that it is a private test build, not to be
+   passed on, that runs only with their own dump. Nothing puts it on a server: no workflow or script uploads it, it
+   never goes to GitHub (no release, draft or published, no Actions artifact, and no link to a copy in the
+   repository, its issues or its pull requests), and no link to a copy in storage elsewhere is sent (an alternative
+   below); nothing about it goes to the decomp's repository either
    ([ADR 0002](0002-solo-project-no-upstream-posts.md)). A recipient reports to the owner directly, with the app's
    log, which names the recipient's own folders (the ROM's path, `rom.c:549`) and so stays with the owner; what needs
    work becomes an issue in the owner's words, with no ROM, save or captured frame (`port/CONTRIBUTING.md:108-111`)
    and nothing that names the recipient.
-3. **What it holds.** Each image holds the app, the link to `/Applications`, the release notes (7), the licence and
-   the third-party notices (6); the app holds the licence and the notices in `Contents/Resources` as well. No file in
-   either is a ROM's or made from one, as `package_macos.sh` checks (`:262-263`); the program is the decomp's C and
-   Frigate's, built without a ROM. It is macOS only: Windows and Linux builds are not part of it, CI keeps building
-   and testing both (T1, `port-ci.yml:35-41`, `:90-149`), and the notes point their players to building from source.
-   The apps are the US builds (IREO, IRDO); the Spanish Black 2 build of
+3. **What it holds.** Each image holds the app, the link to `/Applications`, the release notes (7), the licence and the
+   third-party notices (6); the app holds the licence and the notices in `Contents/Resources` as well. No file in either
+   is a ROM, a save or a file taken out of a ROM (a NARC or an SDAT), as `package_macos.sh` checks (`:262-263`). The
+   program is compiled from the decomp's C and Frigate's without a ROM, but it holds the game's code and the tables
+   compiled into it (Context): that is what the owner's ruling in 2 is about. It is macOS only: Windows and Linux builds
+   are not part of it, CI keeps building and testing both (T1, `port-ci.yml:35-41`, `:90-149`), and the notes point
+   their players to building from source. The apps are the US builds (IREO, IRDO); the Spanish Black 2 build of
    [ADR 0025](0025-a-spanish-rom-by-a-manifest-of-its-own.md) is not in it, since its manifest is written from one
    player's dump and isn't a shared input (ADR 0025:46-48, `port/.gitignore:9-10`).
 4. **The ROM: never bundled, given through a first-launch picker.** Nothing downloads a ROM, and nothing in the image
@@ -163,11 +176,16 @@ Each decision is a recommended default, the owner's to confirm.
    GNU GPL v3 with no warranty, where `LICENSE` and the notices are, and where the source is, which is what the GPL
    calls Appropriate Legal Notices (`LICENSE:103-110`). `--help`, compiled into the program, names the repository;
    the About window, whose text `make_app.sh` writes at each packaging, names the RC's tag as well, so that no
-   revision is compiled into the program. The GPL has whoever conveys object code give its Corresponding Source with
-   it, or say next to it where it is and keep it available (`LICENSE:245-286`); the default reads that as: the notes
-   name the public tag, whose tree pins every dependency by URL and SHA-256 or by commit
-   (`port/CMakeLists.txt:188-190`, `port/cmake/os.cmake:10-12`, `port/tools/oracle/xxhash.cmake:15-17`), and the
-   owner keeps those dependencies' sources with the RC. That is a reading of the licence, not legal advice.
+   revision is compiled into the program. The GPL has whoever conveys object code convey its Corresponding Source in
+   one of the ways its section 6 lists (`LICENSE:245-290`): with a physical medium, the source on a durable medium
+   beside it or a written offer valid for at least three years (`:252-267`); where access is offered from a
+   designated place, equal access to the source there (`:275-286`), which a hand-out by AirDrop or disk isn't
+   (inferred). The default reads that as: each image goes with its Corresponding Source beside it, in the same
+   hand-out, on the disk or in the same AirDrop: an archive of the tag's tree (`git archive`, about 190 MB compressed
+   at `main`'s head on 2026-11-02) and the archives of the dependencies that the tree pins by URL and SHA-256 or by
+   commit (`port/CMakeLists.txt:188-190`, `port/cmake/os.cmake:10-12`, `port/tools/oracle/xxhash.cmake:15-17`),
+   which the owner also keeps with the RC; and the notes name the public tag. That is a reading of the licence, not
+   legal advice.
 7. **Release notes.** One document, `port/docs/release-notes.md`, newest RC first. An RC's section is written in the
    pull request whose merge is the RC's commit, so that the tag's tree holds it, and each image carries it as text. It
    can't hold the results of runs made on that commit, nor those of the checklist, which runs on the images (8): it
@@ -185,8 +203,9 @@ Each decision is a recommended default, the owner's to confirm.
    every 5.75 s, and a present can tear where the window bypasses the system's compositor); no mods or widescreen
    before phase 6; no Windows or Linux build; how to report; and the licence, the notices and where the source is.
 8. **T7's checklist.** A document of its own, `port/docs/playtests.md`, one section per milestone, as
-   `port/docs/sanitizers.md` is T5's. For T7 a milestone is a phase's exit: the RC is phase 5's, and its section is
-   the first; a story leg's pull request, which ADR 0033 counts as a milestone for T5, owes no T7. The checklist runs
+   `port/docs/sanitizers.md` is T5's. PLAN.md's milestones M1 to M7 are slices of phases 1 to 4 (Context); phase 5
+   has no M number, so its milestone is its exit, the RC, whose section is the document's first. A story leg's pull
+   request is no milestone, and owes no T7. The checklist runs
    on each game's image, ADR 0033's windowed strict runs are recorded beside it, and every item is recorded in the
    RC's STATUS.md entry with the Mac and macOS it ran on, as text and hashes: no screenshot, save or log is committed
    (`port/CLAUDE.md:217-219`).
@@ -252,7 +271,12 @@ Each decision is a recommended default, the owner's to confirm.
     of every commit from a public repository's runs (inferred), made without the ROM or the checklist, and still none
     of White 2.
   - *A private repository or store for the images:* keeps them from public view, at the cost of a second place to
-    keep in step with this one; it hands the program out as much as 2 does.
+    keep in step with this one; it hands the program out as much as 2 does, and puts it on a server as the link
+    below does.
+  - *A link to a file in storage the owner controls, sent to one person:* the easiest hand-out to someone far away,
+    but it uploads the compiled game to a server, which the rule that nothing ROM-derived leaves the machine and the
+    "never uploaded" of the documents and of ADR 0010 (Context) would have to allow, and a link is easier to pass on
+    than a file (inferred).
 - **One image holding both apps (1, 3)**, which ADR 0020 leaves to this ADR: one file to hand out and one copy of the
   notes, for an image about twice the size (13 MB for one app, ADR 0015:128-129; inferred) of which a recipient who
   owns one game needs half, and a change to `package_macos.sh`, which makes an image per app (`:187-188`). ADR 0020's
@@ -290,8 +314,13 @@ Each decision is a recommended default, the owner's to confirm.
     fetched archives, it can't drift.
   - *A second file beside part 2's:* two lists of what the program carries, which the app, the image and their
     checks would each have to know.
-  - *The source in every image* (archives of the tag and of the dependencies): the plainest way to meet the GPL, for
-    images many times larger (inferred).
+  - *The source inside every image* rather than beside it: one file to hand out, but an image many times larger, about
+    200 MB in place of 13 (inferred), and the source in the window a player drags the app from.
+  - *A written offer in place of the source* (`LICENSE:257-267`): a hand-out of the image alone, but the owner keeps
+    the source ready for anyone who holds an image for at least three years, and the offer is the licence's way with
+    a physical product, which an AirDrop isn't (inferred).
+  - *The notes' pointer to the public tag alone:* nothing to hand out beside the image, but that is the licence's way
+    for access offered from a designated place (`:275-286`), which a hand-out by AirDrop or disk isn't (inferred).
   - *None:* SDL3's licence asks no notice of a binary, but the MIT notice in minicoro's header does, and so does
     xxHash's BSD-2-Clause licence.
 - **The notes (7).**
@@ -304,7 +333,7 @@ Each decision is a recommended default, the owner's to confirm.
     a person or interface automation (inferred).
   - *The whole story by hand:* the routes already hold it at T3 and T4; the checklist covers what they can't, the
     installed app, the Mac's prompts and a person's hands.
-  - *T7 at each story leg, as ADR 0033 reads a milestone:* the installed app tried on every leg, for an hour or two
+  - *T7 at each story leg, each leg taken as a milestone:* the installed app tried on every leg, for an hour or two
     by hand a leg (inferred), for what the routes already hold.
   - *None:* PLAN.md and port/CLAUDE.md hold T7 to one.
 - **The Macs it claims (9).**
@@ -342,7 +371,14 @@ Each decision is a recommended default, the owner's to confirm.
   leg.
 - **Each RC costs** two distribution builds (about 700 MB of build directory each, ADR 0015:128-129), the oracle
   suite, the sanitized routes and the timing runs in both games, all on demand (the owner declined scheduled runs on
-  2026-11-01, ADR 0031:170-173), and an hour or two of the checklist by hand (inferred).
+  2026-11-01, ADR 0031:170-173), and an hour or two of the checklist by hand (inferred). The runs grow with the
+  story, and the oracle's most: with both programs drawing every frame it keeps about 11 port frames a second
+  (aspertia's 15,708 in 1,459 to 1,464 s, `STATUS.md:3856`), so every 10,000 frames of a sequence cost about a
+  quarter of an hour per version before the saves and round trips that come with them, and the whole story's oracle
+  runs likely take days of a machine, unless ADR 0031's cache and port-alone digests have landed by then and run
+  only the port where the oracle's inputs haven't changed (inferred). ADR 0033's whole set is about 5 hours per
+  version today at most, and ADR 0034's quiet record an hour or more, each growing with every leg (their
+  Consequences, and ADR 0034's item 4; inferred).
 - **Per-PR checks stay as they are.** The RC's mode runs only when the owner packages an RC: CI's distribution job
   and every other build package as today, and nothing else here runs per pull request.
 - **When the owner accepts it,** that change also rewrites `port/README.md:254-255` and `:346-352`,
@@ -350,8 +386,10 @@ Each decision is a recommended default, the owner's to confirm.
   for "never uploaded" a rule that port/CLAUDE.md doesn't hold, to say that no workflow or script uploads the app and
   that only the owner hands out an RC; adds the owner's RC tags to what `port/CLAUDE.md:89-90` lets maintainers
   publish; sets ADR 0010's and ADR 0015's status lines to "accepted; amended by 0035" (the picker changes how the app
-  finds the ROM, and an RC is the distribution that 0015 left open); links phase 5's exit in PLAN.md §7 here; and adds
-  "release candidate", and "milestone" as decision 8 reads it, to GLOSSARY.md. The picker's own pull request rewrites
+  finds the ROM; the owner's hand-out of an RC changes ADR 0010's "Nothing is uploaded" (ADR 0010:58-59) to no
+  workflow or script uploading one; and an RC is the distribution that 0015 left open); links phase 5's exit in
+  PLAN.md §7 here; and adds "release candidate", and "milestone" (one of PLAN.md's M1 to M7, or the exit of a phase
+  that names none, as phase 5's RC is: 8), to GLOSSARY.md. The picker's own pull request rewrites
   the README's "The ROM" and "When the app stops" (`port/README.md:323-344`).
 - **To watch:** a recipient passing an image on, which nothing technical prevents; macOS asking again about a ROM in
   a protected folder after each new RC, since an ad hoc signature changes with every build (inferred); the strings

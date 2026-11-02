@@ -13,9 +13,10 @@ pull request. -->
   0035), from a read-only scan of `main`; nothing it describes runs yet. Every decision below is a recommended
   default, the owner's to confirm. It stays proposed until the owner reviews it; the change that records that review
   sets the status line and, for an acceptance, makes in the same commit the changes that
-  [Consequences](#consequences) lists. A later pull request (T5-A) implements it: a runner in `port/tools` and
-  `main`'s first baseline. Lines cited are `main`'s at `e936696a97` unless a branch is named, and "inferred" marks
-  what was reasoned rather than read.
+  [Consequences](#consequences) lists. A later pull request, T5-A (PR 81, a draft on 2026-11-02), implements it: a
+  runner in `port/tools` and `main`'s first baseline. Lines cited are `main`'s at `e936696a97`, to be read there
+  (`git show e936696a97:PATH`, since later commits move them, STATUS.md's most), unless a branch or a pull request's
+  commit is named; "inferred" marks what was reasoned rather than read.
 
 ## Context
 
@@ -40,13 +41,13 @@ the ignorelist since ADR 0014: R13's `VM_CallCommand`, on 2026-10-26 (`9a8d4f2a0
 What the documents leave open, for the owner's word to settle:
 
 - **What runs.** The routes that need no oracle go no further than the Aspertia City lookout, where
-  `replay_starter_save` ends (`port/cmake/app.cmake:239-242`; inferred from every such route's description): 17 in
-  Black 2 and 15 in White 2 without the timing routes, which the strict tree doesn't register
-  (`port/cmake/frame_times.cmake:24`; counted so in the `STATUS.md:58-59` of the branch `port-terrell-cut`, which adds
-  no such route), and 19 and 16 with them at PR 67 (`port/docs/STATUS.md:642-643`). Every sequence of phases 4 and 5
-  starts from a save that only the oracle makes, so it has no reference and no port-alone ctest test
-  (`port/cmake/oracle.cmake:149-175`, `:187-198`); the comparison sequences' committed references are the opening's,
-  the title's and aspertia's alone (`port/tests/oracle/*.tsv`). In the strict tree those sequences run only inside
+  `replay_starter_save` ends (`port/cmake/app.cmake:239-242`; inferred from every such route's description): 17 in Black
+  2 and 15 in White 2 without the timing routes, which the strict tree doesn't register
+  (`port/cmake/frame_times.cmake:24`; counted so in PR 77's STATUS.md, `:68-69` at `a7d768e2ee`, its head on 2026-11-02,
+  which adds no such route), and 19 and 16 with them at PR 67 (`port/docs/STATUS.md:642-643`). Every sequence of phases
+  4 and 5 starts from a save that only the oracle makes, so it has no reference and no port-alone ctest test
+  (`port/cmake/oracle.cmake:149-175`, `:187-198`); the comparison sequences' committed references are the opening's, the
+  title's and aspertia's alone (`port/tests/oracle/*.tsv`). In the strict tree those sequences run only inside
   `oracle_<seq>`, beside melonDS. Since phase 4 the practice has been the strict program alone on each piece's input
   from its save, in batches by hand (`STATUS.md:2259-2262`, `:2079-2082`, `:1848-1851`, `:1915-1918`); no tool in
   `port/tools` runs them, and the batches don't name their runtime options. Run as item 1 below has them, the tables
@@ -73,28 +74,38 @@ What the documents leave open, for the owner's word to settle:
   T5: CI has no ROM (`.github/workflows/port-ci.yml:234-289`), and the exact-head verification builds plain
   (`port/tools/sync_upstream.sh:581-590`).
 
-A release candidate raises four more questions about what clean covers:
+A release candidate raises three more questions about what clean covers, and one branch holds wireless work that this
+ADR leaves alone:
 
 - **Wireless.** The pointer cast guard's 66 real sites are all local wireless and Wi-Fi: R21 (3, the Union Room's rule
-  menu), R22 (1, `NetDevWifi_StartMatch`, which no game C calls), R23 (50, DWC and the Wi-Fi libraries) and R24 (12,
-  WM and Download Play) (`port/tools/ptrcast_baseline.tsv`, tallied; `STATUS.md:141-143`), a group that
+  menu), R22 (1, `NetDevWifi_StartMatch`, which no game C calls), R23 (50, DWC and the Wi-Fi libraries) and R24 (12, WM
+  and Download Play) (`port/tools/ptrcast_baseline.tsv`, tallied; `STATUS.md:141-143`), a group that
   [ADR 0019](0019-pointer-cast-guard-against-a-classified-baseline.md) gives phase 7 (`:97`, `:136-137`). On a host WM
   never starts: its PXI tag has no ARM7 service (`port/hal/pxi/arm7.c:7-9`; `port/tests/pxi/test_pxi.c:159`), so
-  `WmInitCore` answers `WM_ERRCODE_WM_DISABLE` (`lib/nitro/src/wm/wm_system.c:76-79`), unless one of the checks
-  before it refuses the buffer, among them the one that tests its address, cut to 32 bits, against the DS's video
-  memory, 0x05000000 to 0x07000800 (`wm_system.c:62`; `lib/nitro/src/os/os_address_check.c:15-16`), whose answer
-  depends on where the host put the buffer (`ptrcast_baseline.tsv:89`, whose note puts it at one buffer in 256; the
-  range is about one 128th of what a cut address can be, inferred). The game's wireless helper starts WM this way
-  (`src/ov030/wih.c:999`; `lib/nitro/src/wm/wm_standard.c:105-122`). What a player sees on choosing wireless is
-  unknown: the save lab's sweep found the Union Room and its colosseums stopping on the watchdog, entered from minted
-  saves without a link (`STATUS.md:520-521`). The watchdog ends a run with a frame that takes longer than its seconds
-  of host time, the game spinning where the platform layer never runs (`port/app/main.c:322-325`); a run with a
-  window has no watchdog unless asked (`main.c:515`), so a player would meet such a spin as a frozen game (inferred).
+  `WmInitCore` answers `WM_ERRCODE_WM_DISABLE` (`lib/nitro/src/wm/wm_system.c:76-79`), unless one of the checks before
+  it refuses the buffer, among them the one that tests its address, cut to 32 bits, against the DS's video memory,
+  0x05000000 to 0x07000800 (`wm_system.c:62`; `lib/nitro/src/os/os_address_check.c:15-16`), whose answer depends on
+  where the host put the buffer (`ptrcast_baseline.tsv:89`, whose note puts it at one buffer in 256; the range is about
+  one 128th of what a cut address can be, inferred). The game's wireless helper starts WM this way
+  (`src/ov030/wih.c:999`; `lib/nitro/src/wm/wm_standard.c:105-122`). The story asks too: in Aspertia City, before it
+  sends the player on to Virbank City's Gym, the game gives the C-Gear and asks "Turn on the C-Gear and establish
+  communications?" (`res/field/scripts/aspertia_city.s:1309`); the answer that turns it on runs `CGearPowerOn 1`
+  (`:1326`), after the script has asked whether the DSi's wireless is allowed (`:1319`, whose answer on a host nobody
+  has read), and its event sets the C-Gear on and tries to boot the game's communication
+  (`src/ov012/event_cgear_poweron.c:39-42`). That this boot reaches WM, and that the C-Gear stays on in every later
+  save, are inferred. What a player sees on choosing wireless is unknown: the save lab's sweep found the Union Room and
+  its colosseums stopping on the watchdog, entered from minted saves without a link (`STATUS.md:520-521`). The watchdog
+  ends a run with a frame that takes longer than its seconds of host time, the game spinning where the platform layer
+  never runs (`port/app/main.c:322-325`); a run with a window has no watchdog unless asked (`main.c:515`), so a player
+  would meet such a spin as a frozen game (inferred).
 - **The branch `port-64bit-sweep`** (`c516377abd`, 2026-10-19, six commits on `a14364b6ba`; a branch of the clone with
   no copy among `origin`'s) carried wireless pointers as `uptr`. Two of its fixes are on main in no form and still
   apply: `startMatch` taking its first argument as `sptr` (R22, `include/gfl/net.h:140`) and `WM_ReadMPData`'s step
   through `uptr` (R24, `lib/nitro/src/wm/wm_sync.c:153`). It can't merge as it is: it predates ADR 0019's guard
   (ADR 0019:12-13), and it classed WM's PXI rows as handled, which main keeps real (`ptrcast_baseline.tsv:87-88`).
+  What becomes of it and of those two fixes is the guard's real rows' question, ADR 0019's, which puts them in phase 7
+  (ADR 0019:97, :136-137), or in a window for port code if the owner wants the real count lowered sooner; this ADR
+  decides nothing about it, and nothing here waits on it.
 - **Threads.** The 3D renderer draws bands on worker threads, the game on one
   ([ADR 0016](0016-3d-frame-in-bands-on-worker-threads.md), `:48-55`). ThreadSanitizer can't be combined with ASan
   and is in no build; by-hand runs on `g3d_ds3d` and `g3d_ds3d_bands` reported nothing (ADR 0016:89-93).
@@ -130,7 +141,7 @@ their costs under the same numbers.
    build, and a sanitized comparison, as on 2026-10-24 or as ADR 0031's sanitized digests would be (ADR 0031:170-173),
    is an option beside T5, not part of it. The saves come from the oracle's cache, made beforehand once per version and
    held to their SHA-1s (`port/cmake/oracle.cmake:176-184`; `SAVES`, `oracle.py:791`). At a release candidate, items
-   6, 11 and 12 add their runs.
+   6, 10 and 11 add their runs.
 2. **The build: ASan, UBSan with its function check, and LeakSanitizer.** `-DPORT_SANITIZE=ON` with
    `PORT_SANITIZE_RECOVER` off, `RelWithDebInfo`, compiled by upstream clang 17 or later, Homebrew's on a Mac
    (`-DCMAKE_C_COMPILER=/opt/homebrew/opt/llvm/bin/clang`, `sanitizers.md:43-46`), for the function check and the
@@ -174,7 +185,10 @@ their costs under the same numbers.
    No runtime suppression of an ASan or UBSan report counts (ADR 0014:51-52). LeakSanitizer may be given one file of
    suppressions, by sanitizers.md's rule, for a leak inside SDL3 or a system library, each line with its reason
    (`sanitizers.md:104-108`); none exists, since none has been needed, and a counted run passes it to the program
-   itself (item 3). Each new exception of any of these kinds changes T5's criterion, so it comes in a pull request the
+   itself (item 3). This keeps sanitizers.md's rule as it stands, where the scout behind this ADR first proposed no
+   suppression at all: a leak in Frigate's or the game's code is still fixed, never suppressed (`sanitizers.md:104`),
+   and the file can hold only what Frigate can't fix, which would otherwise hold the exit until an amendment
+   (Alternatives, 5). Each new exception of any of these kinds changes T5's criterion, so it comes in a pull request the
    owner reviews, with its traced cause; an ignorelist entry meets ADR 0014's rule as well, code right on every host
    (ADR 0014:35-39). Every other report is fixed in a pull request of its own: in Frigate's code, or in the game's
    under `PLATFORM_PC` with its rows in game-changes.md and decomp-findings.md (`port/CLAUDE.md:190-192`); with its
@@ -196,16 +210,21 @@ their costs under the same numbers.
      LeakSanitizer (`port-ci.yml:234-289`); strict routes there with the ROM run on demand, not for the exit;
    - **Windows** has no sanitized build of the whole program ([ADR 0013](0013-windows-build-with-msys2-clang64.md),
      `:146-148`), and the exit asks for none; its `_sanitized` test variants go on running there.
-7. **When.** No run is scheduled: T5 runs on demand, under the owner's rule of 2026-11-01 (ADR 0031:170-173).
-   - **The whole set** is due on a release candidate's head (ADR 0035) and on the pull request that ends a leg of the
+7. **When.** No run is scheduled: T5 runs on demand, under the owner's rule of 2026-11-01 that long checks run on
+   demand and the checks of every pull request stay fast (ADR 0031:170-173), so a strict run is owed only where few
+   pull requests are:
+   - **The whole set** is due on a release candidate's head (ADR 0035); on the pull request that ends a leg of the
      story (the legs that `port/cmake/oracle.cmake:216` and STATUS.md name), so that a report a leg brings is fixed
-     before the next leg's oracle evidence is made on top of it (inferred). A maintainer may run it at any other time,
-     and should after a merge that changes code that every route runs, such as an upstream sync's game code.
-   - **A pull request that adds or changes a route** (a sequence, a round trip, a replay, a station) runs the strict
-     cases it adds or changes, in both versions, and records them as its T5, once T5-A's runner is on `main`; until
-     then it records T5 as not run, and the next whole run covers it. No other pull request owes one: it is the one
-     strict run a pull request owes, and only one that adds or changes a route.
+     before the next leg's oracle evidence is made on top of it (inferred); and on a pull request that changes how
+     every route's program is built, such as ADR 0020's stage 3, which builds each version's core as a shared
+     library, or a change to the strict build's sanitizer flags (`port/CMakeLists.txt:227-248`). A maintainer may run
+     it at any other time, and should after a merge that changes code that every route runs, such as an upstream
+     sync's game code.
    - **A pull request that fixes a report** runs again the cases that showed it, in both versions.
+   - **A pull request that adds or changes a route** (a sequence, a round trip, a replay, a station) owes none: once
+     T5-A's runner is on `main` it may run the strict cases it adds or changes, in both versions, and record them as
+     its T5, and otherwise it records T5 as not run; its leg's whole run covers it either way. No other pull request
+     owes a strict run.
    - **No strict route is in the merge gate.** Neither CI nor the exact-head verification runs one; the evidence above
      is the pull request's own, which its review checks. CI's `sanitize` job stays a check of every pull request,
      inside the `Frigate CI` aggregate (`port-ci.yml:244-289`, `:312-315`).
@@ -216,35 +235,36 @@ their costs under the same numbers.
    versions; a version whose save has no SHA-1 has no such piece (`oracle.py:784-785`), which item 4 counts as a gap.
 9. **Wireless in a release candidate: unsupported, and refused without a report or a freeze.** Local wireless and
    Wi-Fi stay phase 7's work, and R21 to R24 with them but for the row below (ADR 0019:97, :136-137); the candidate's
-   notes say that they don't work (ADR 0035 places the words). Two things come first:
+   notes say that they don't work (ADR 0035 places the words). Three things come first:
+   - **the C-Gear on the story's routes**: a route that reaches the C-Gear's prompt (Context) answers it so that the
+     C-Gear stays off, or, if it turns it on, declares the difference with its traced cause, since melonDS runs the
+     DS's wireless where the port refuses it (inferred); the route's pull request says which, for its review;
    - **a strict refusal check**: a program-alone case per version, from a story save with an input of the port's own,
-     that turns the game's wireless on in each way a player can reach in the story the candidate holds, and passes by
-     item 4 alone: it plays to its last frame with status 0 and no report, whatever the game shows once WM refuses to
-     start. Its first run establishes what that is, and the candidate's notes say it. A trap, a crash, a report or the
-     watchdog fails it: the watchdog means the game spinning where the platform layer never runs, which a player
-     would see as a frozen game (above). Each is fixed before the candidate: in the platform layer, so that the game
-     meets an answer its own code handles, the fix showing which and why, or as item 5 fixes a report. The check is
-     the port's alone: melonDS runs the DS's wireless, so it would not refuse (inferred);
+     that turns the game's wireless on in each way a player can reach in the story the candidate holds, its first case
+     the C-Gear's prompt answered to turn it on, and passes by item 4 alone: it plays to its last frame with status 0
+     and no report, whatever the game shows once WM refuses to start. Its first run establishes what that is, and the
+     candidate's notes say it. A trap, a crash, a report or the watchdog fails it: the watchdog means the game spinning
+     where the platform layer never runs, which a player would see as a frozen game (above). Each is fixed before the
+     candidate: in the platform layer, so that the game meets an answer its own code handles, the fix showing which and
+     why, or as item 5 fixes a report. The check is the port's alone: melonDS runs the DS's wireless, so it would not
+     refuse (inferred);
    - **`WmInitCore`'s check on a cut address** (`wm_system.c:62`), the real row whose answer depends on where the host
      put a buffer (`ptrcast_baseline.tsv:89`), is fixed before the refusal check counts, so that every run refuses
      alike, with its row in game-changes.md and its proof that MWCC's output didn't change (`port/CLAUDE.md:182-185`).
-     The other real rows stay phase 7's.
-10. **`port-64bit-sweep` stays unmerged, and goes once `main` has what it still holds.** Its two fixes that `main`
-    lacks (`startMatch`'s `sptr`, `WM_ReadMPData`'s `uptr`) are written again on `main`, against ADR 0019's guard and
-    baseline, when the owner wants the real count lowered before phase 7, or in phase 7. The branch, which `origin`
-    has no copy of, is deleted after that, so that nothing it holds is lost; the ADR index keeps its part in the
-    numbering's history (`port/docs/adr/README.md:24-25`; ADR 0019:12-13).
-11. **No ThreadSanitizer in the criterion.** The game, the platform layer and the frame hooks stay on one thread, and
+     It is game C, so it lands in a window for port code, in a pull request of its own: T0 and that proof in both
+     versions, and T4 run again for the oracle pull requests open then (inferred), at a time that restarts no story
+     pull request's final verification. The other real rows stay phase 7's.
+10. **No ThreadSanitizer in the criterion.** The game, the platform layer and the frame hooks stay on one thread, and
     only renderer code runs on the workers, on memory shared out by lines (ADR 0016:48-55); `g3d_ds3d_bands` holds the
     bands to one band pixel for pixel (ADR 0016:56-59, :86-88). On a release candidate's head, the by-hand
     ThreadSanitizer runs of `g3d_ds3d` and `g3d_ds3d_bands` (ADR 0016:89-93) are made again, in a build of their own,
     and recorded beside T5; a report there blocks the candidate as a T5 report does.
-12. **The window, on a release candidate.** One strict run per version with the window and the sound device: the
+11. **The window, on a release candidate.** One strict run per version with the window and the sound device: the
     sanitized program, or its app, which carries the runtime and is for this Mac only (`sanitizers.md:69-75`), plays
     one story piece from its save to its last frame and is judged by item 4, as windowed apps continued Route 20's
     save for 4,700 frames on 2026-10-28 (`STATUS.md:1915-1918`, which doesn't name their build). It is recorded beside
     the candidate's T7 playtest.
-13. **The record.** Each counted run fills T5's line in the Tests field of a STATUS.md entry, with the evidence that
+12. **The record.** Each counted run fills T5's line in the Tests field of a STATUS.md entry, with the evidence that
     STATUS.md asks for (`STATUS.md:14-16`, `:27`): the commands, the head, and whether `port/`, `src/`, `lib/` and
     `include/` were clean; the compiler's line and the options; per version, each case's frames, time and verdict, and
     each skip with its reason. Reports go to sanitizers.md's tables, as now. The exit's evidence is the record of the
@@ -289,12 +309,16 @@ their costs under the same numbers.
    so no machine for them is known. *A sanitized Windows build first*: untried, with how its fault handler meets
    ASan's unknown (ADR 0013:146-148), for a host the exit doesn't name.
 7. **When.** *Nightly*, as PLAN.md §6 says: the owner declined scheduled runs. *In the merge gate*: every pull request
-   would wait for a strict build and the set in each version, an hour or more (an estimate: nothing has timed the
-   program-alone set), against the owner's rule that per-PR checks stay fast. *A route pull request's own runs
-   optional too*: no pull request waits on a strict run, but a report that a new piece brings is found at its leg's
-   end, after the piece's oracle evidence is made, and its fix can send the oracle pull requests open then back to T4
-   (inferred). *Only on a release candidate*: a report found then lands late, and its fix makes stale the T4 evidence
-   of every oracle pull request open then (inferred).
+   would wait for a strict build and the set in each version, hours by the estimate in
+   [Consequences](#consequences), against the owner's rule that the checks of every pull request stay fast. *A route
+   pull request's own runs required*: a report that a new piece brings would be found before the piece's oracle
+   evidence is made on top of it, but every route pull request of the story would wait for a strict build of each
+   version and 10 to 30 minutes a case in each game (an estimate: nothing has timed the program-alone cases), a long
+   check on many pull requests, which the owner's rule asks to be optional. Under the default such a report is found
+   at its leg's end at the latest, and its fix can send the oracle pull requests open then back to T4 (inferred).
+   *Only on a release candidate*: a report found then lands late, and its fix makes stale the T4 evidence of every
+   oracle pull request open then (inferred). *A leg's whole run optional too*: no pull request waits on a strict run,
+   but nothing holds a leg's reports before the next leg's oracle evidence is made on top of them.
 8. **One process through the story.** It would need a whole-game input of the port's own past every AI cut, since the
    oracle's presses don't fit the port's own battles (ADR 0023:55-64); it would take hours per version in the strict
    build (an estimate), and start again from power-on after any failure.
@@ -304,44 +328,52 @@ their costs under the same numbers.
    change to the game's menus, which port/CLAUDE.md keeps for rare needs (`port/CLAUDE.md:166-180`), and a game that
    no longer shows what a DS shows, which phase 7 would undo. *A WM on the host that starts and finds no partner*:
    what a DS out of everyone's reach shows (inferred), but a model of the ARM7's wireless, phase 7's subject, before
-   phase 7 designs it.
-10. **The branch.** *Deleted now*: the two fixes are a few lines that this ADR names, but `origin` has no copy of its
-    six commits, which ADR 0019 and the ADR index name. *Kept for good*: its names and its baseline's format are
-    stale, and `main` records what it taught. *Merged or rebased*: its guard predates ADR 0019's, and its WM rows
-    contradict main's.
-11. **Threads.** *ThreadSanitizer on the whole program*: it can't share ASan's build, the fibers have no annotations
+   phase 7 designs it. *The routes' C-Gear turned on without a declaration*: the comparison with melonDS, which runs
+   the DS's wireless, would stop at the first frame where the two games answer differently (inferred).
+10. **Threads.** *ThreadSanitizer on the whole program*: it can't share ASan's build, the fibers have no annotations
     for it (none in `port/hal`), and the races it could find are the workers', which the renderer's tests reach. *A
     ThreadSanitizer job in CI for the renderer's tests*: a third sanitized configuration and its minutes, for code that
     changes only with the renderer; worth it if that starts to change often.
-12. **The window.** *Left to T7's plain playtests*: a memory error in the presentation or the sound device would show
+11. **The window.** *Left to T7's plain playtests*: a memory error in the presentation or the sound device would show
     only as a crash. *A ctest route with SDL's dummy video and audio drivers*: it would run the presentation's code
     without a display, but not the devices' paths (inferred).
+12. **The record.** *Each run's log and table committed*: every case's lines would be there to read, but a log holds
+    the machine's paths and the program's output, which STATUS.md's evidence rule doesn't ask for
+    (`STATUS.md:14-16`), and every save and frame stays local anyway (`port/CLAUDE.md:217-219`). No other form was
+    weighed.
 
 ## Consequences
 
 - Phase 5's T5 gets a definition that a run can be judged by, and the exit's evidence is one recorded run on the
   release candidate's head.
+- **The documents, while it is proposed.** T5-A (PR 81) writes the documents that describe T5's runs, marked as this
+  ADR's proposal and stating items 5 and 7 as they stand here: sanitizers.md's section on the criterion, its "nightly
+  run of them is still to come" (`sanitizers.md:54`) turned into the on-demand runs, and `port/tests/README.md:46`'s
+  "The routes are that build's T5 runs" naming the program-alone half too. Acceptance then only drops "(proposed)"
+  there, or makes those changes itself if T5-A hasn't landed.
 - **On acceptance**, the same change gives PLAN.md §6's T5 row (`PLAN.md:394`) and port/CLAUDE.md's testing table
   (`port/CLAUDE.md:246`) item 7's cadence in place of "nightly", and rewords PLAN.md's "Each level runs automatically,
-  from every commit to nightly" (`PLAN.md:385`) so that it no longer claims T5; drops sanitizers.md's "nightly run of
-  them is still to come" (`sanitizers.md:54`), adds a short section on the criterion there, and adds R13's entry to its
-  table of what the build leaves out, which lists two of the ignorelist's three (`sanitizers.md:139-142`); has
-  `port/tests/README.md:46`'s "The routes are that build's T5 runs" name the program-alone half too; and sets ADR
-  0014's status line, and its index row, to "accepted; amended by 0033": what may enter the ignorelist stays ADR
+  from every commit to nightly" (`PLAN.md:385`) so that it no longer claims T5; adds R13's entry to sanitizers.md's
+  table of what the build leaves out, which lists two of the ignorelist's three (`sanitizers.md:139-142`); and sets
+  ADR 0014's status line, and its index row, to "accepted; amended by 0033": what may enter the ignorelist stays ADR
   0014's rule (ADR 0014:35-39, :64-65), and item 5 adds that each new entry changes T5's criterion, for the owner's
-  review.
-- **T5-A**, a later pull request, implements it: a runner in `port/tools` that reads `oracle.py`'s tables through one
+  review. T3's and T4's "nightly" (`PLAN.md:392-393`, `port/CLAUDE.md:244-245`), which the owner's rule of 2026-11-01
+  ends as well, aren't this ADR's: they go with ADR 0031's second default, whose long tiers are on-demand presets
+  (ADR 0031:170-173), and the change that accepts ADR 0031 rewords them.
+- **T5-A** (PR 81) implements it: a runner in `port/tools` that reads `oracle.py`'s tables through one
   adapter, never makes a save, writes nothing into the repository and runs both halves of the set with item 3's
   options; its ROM-free test, which must print nothing that the reports' expressions match, since every test in CI's
   sanitized jobs carries them (`port/CMakeLists.txt:473-487`); and `main`'s first baseline, with any report it finds
   recorded as open and fixed in a pull request of its own. Until then STATUS.md entries record T5 as not run, as now.
-- **Story pull requests** run their new pieces as their T5 once the runner exists (item 7). Youngster Terrell's piece,
-  on `port-terrell-cut` (`d6ef61348a`), adds the sequence `terrell` from the Route 20 save (that branch's
-  `oracle.py:725` and `:747`) and joins the set through the tables alone; landing before the runner, it records T5 as
-  not run (that branch's `STATUS.md:74`), and the next whole run covers it.
-- **A change that every route runs but that adds no route**, such as the geometry engine's depth fix in flight
-  (`port-ge-depth-cut`), owes no T5 of its own: its tests run sanitized in CI, and the whole run that item 7 advises
-  after its merge covers it.
+- **Story pull requests** may run their new pieces as their T5 once the runner exists, and their leg's whole run holds
+  them (item 7). Youngster Terrell's piece, PR 77 (`a7d768e2ee`, its head on 2026-11-02), adds the sequence `terrell`
+  from the Route 20 save (its `oracle.py:727` and `:749`) and joins the set through the tables alone; landing before
+  the runner, it records T5 as not run (its `STATUS.md:88`), and its leg's whole run covers it.
+- **A change that every route runs but that adds no route**, such as the geometry engine's depth fix, PR 76
+  (`69422db812` on 2026-11-02, which also changes the digest's `digest.c`, `digest.h` and `test_digest.c` and ADRs
+  0030 and 0031), owes no T5 of its own: its tests run sanitized in CI, and the whole run that item 7 advises after
+  its merge covers it. A change to how every route's program is built is the exception, and runs the whole set
+  (item 7).
 - **ADR 0031** (proposed): its part 6's presets should name this set by what it runs and call the runner rather than
   repeat it (ADR 0031:160-173), and its long tier of the sanitized build's digests stays an option beside T5 (item 1).
   Once its `digest_<seq>` tests run the sequences from saves port-alone (parts 3 and 5), they may replace the runner's
@@ -349,11 +381,11 @@ their costs under the same numbers.
 - **ADR 0032** (the save lab, being written): its stations join the set, each run by the program alone, and its map
   sweep (L3) joins the whole runs, each stop it declares with a traced cause being item 5's exception.
 - **ADR 0020** (D6, proposed beside this one): as proposed, each version keeps a program of its own, a thin `main()`
-  over a core that every test and route runs, so the set runs as it is, and its stage that makes the cores libraries
-  runs T5 on them; one build tree for both versions, which it leaves optional, changes only how the runner finds the
-  programs.
+  over a core that every test and route runs, so the set runs as it is, and its stage 3, which makes the cores
+  libraries, runs the whole set on them, as item 7 asks of a change to how every route's program is built; one build
+  tree for both versions, which it leaves optional, changes only how the runner finds the programs.
 - **ADR 0035** (the release candidate, proposed beside this one): what the candidate waits for includes T5 as this ADR
-  defines it, run on the candidate's own head (item 4), with items 6, 11 and 12's runs, and its notes say what
+  defines it, run on the candidate's own head (item 4), with items 6, 10 and 11's runs, and its notes say what
   wireless does (item 9). The candidate's programs are plain builds: T5 holds the same source in the strict build, and
   `package_macos.sh` refuses a sanitized app (`sanitizers.md:69-80`).
 - **ADR 0034** (60 fps, proposed beside this one): T5 times nothing; the strict build refuses the timing gates and has
@@ -365,11 +397,16 @@ their costs under the same numbers.
   own strict cases in the change that adds it. The mod platform brings libraries of its own (ImGui and Lua,
   `PLAN.md:468-469`): one that the sanitized build leaves out, as it leaves out SDL3, or whose leak only a suppression
   can answer, gets its line in item 5 by an amendment.
-- **The cost** is a strict build per version and the set's runs, all on demand: today 16 program-alone cases and
-  147,920 port frames per version beside the ctest routes; then the stations and the map sweep, about 1.35 million
-  frames per version if each of its 615 zones runs the 2,200 frames of its boot input (`STATUS.md:430`, `:464`;
-  inferred); and at a candidate the x86_64 slice under Rosetta. No program-alone timing of the set is on record;
-  T5-A's first runs give one.
+- **The cost** is a strict build per version and the set's runs, all on demand, at each leg's end, at a candidate and
+  after a change to how every route's program is built. Today the set is 16 program-alone cases and 147,920 port
+  frames per version beside the ctest routes. No program-alone timing of it is on record: at the rate the strict
+  program kept beside melonDS on 2026-10-24, under load (`oracle_aspertia`'s 15,708 port frames in 1,894 s,
+  `STATUS.md:3511-3518`), it would take about 5 hours per version, and less alone (inferred); T5-A's first runs give
+  the real figure. It grows with every piece the story adds, then with the stations and the map sweep, about 1.35
+  million frames per version if each of its 615 zones runs the 2,200 frames of its boot input (`STATUS.md:430`,
+  `:464`; inferred), and at a candidate the x86_64 slice under Rosetta runs it again. A route pull request that runs
+  its own cases spends 10 to 30 minutes a case in each game after a strict build of each version (an estimate), the
+  reason item 7 leaves those runs optional.
 - **Watch** a compiler update (item 2), the runner's coupling to `oracle.py`'s tables, and the disk: each strict tree
   is a whole build of its own.
 - **Revisit** if a release candidate is built for Windows or Linux, if ADR 0031's digests run the sequences from saves
