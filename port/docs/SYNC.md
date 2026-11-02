@@ -101,15 +101,15 @@ This verifies the exact checked-out PR head without merging or pushing. It requi
 nonignored untracked files, pins that head, posts a pending status, runs both ROM builds and verifies both SHA1s, then
 configures, builds and tests the native host. It checks the local and remote PR head again before recording
 `Frigate local verification` success; a local HEAD found moved, before the builds or after them, stops the run rather
-than verifying another commit. Any stop after the pending status records failure on the pinned head, including one
-where the success status itself couldn't be uploaded. The script then exits with its own status, not the failed
-command's: 1 when a build, test, check or status upload fails, or 129, 130 or 143 for a caught hangup, interrupt or
-termination, whether or not the failure could be recorded, and also when the same signal stopped the reader of its
-output (`... | tee log`). A signal sent to the script alone takes effect once its current command finishes. If
-recording the failure fails too, or the machine shuts down, or an uncatchable kill stops the script, a pending status
-can remain; rerun verification on the exact current head. Failed or interrupted validation cannot create a green
-status. A new push needs a new verification. Keep build logs locally and describe skips or optional unrun tests in
-the PR.
+than verifying another commit. A stop after the pending status records failure on the pinned head, including one
+where the PR's head couldn't be read again or the success status itself couldn't be uploaded. The script then exits
+with its own status, not the failed command's: 1 when a build, test, check or request to GitHub fails, or 129, 130,
+131 or 143 for a hangup (a closed terminal), an interrupt (`Ctrl-C`), a quit (`Ctrl-\`) or a termination (`kill`),
+whether or not the failure could be recorded, and also when the same signal stopped the reader of its output
+(`... | tee log`). A signal sent to the script alone takes effect once its current command finishes. If recording the
+failure fails too, or the machine shuts down, or an uncatchable kill (SIGKILL) stops the script, a pending status can
+remain; rerun verification on the exact current head. Failed or interrupted validation cannot create a green status.
+A new push needs a new verification. Keep build logs locally and describe skips or optional unrun tests in the PR.
 
 Also review [game-changes.md](game-changes.md): confirm each port adaptation still exists or was deliberately
 superseded. For changed incomplete C or shared headers, supply the matching-neutral evidence described there;
@@ -137,12 +137,14 @@ port/tools/sync_upstream.sh --branch codex/upstream-sync-manual
 ```
 
 The tool fetches Frigate and upstream, merges them without rewriting history, runs local validation, then publishes
-only the topic branch and opens a PR. It refuses `--branch main`. When you are repairing an existing pending sync,
-check out that branch and pass its exact name; a draft conflict proposal is the exception, resolved from a branch of
-its name made from `main` ([below](#conflicts-and-stopped-syncs)). Do not start a second sync while one is pending.
-A locally prepared sync still requires the owner's explicit human review before merge, even when owner credentials
-created its PR. Automation must not treat it as ordinary owner-authored feature work and merge it under the solo
-exception without that review. Prefer an App-authored proposal so GitHub can record the owner's approval.
+only the topic branch, opens a PR and records `Frigate local verification` success on its head. When that last request
+fails, the run exits 1 with the PR published; record the status with `--verify-pr` on the PR's head
+([above](#validate-and-approve-a-proposed-pr)). It refuses `--branch main`. When you are repairing an existing
+pending sync, check out that branch and pass its exact name; a draft conflict proposal is the exception, resolved from
+a branch of its name made from `main` ([below](#conflicts-and-stopped-syncs)). Do not start a second sync while one is
+pending. A locally prepared sync still requires the owner's explicit human review before merge, even when owner
+credentials created its PR. Automation must not treat it as ordinary owner-authored feature work and merge it under
+the solo exception without that review. Prefer an App-authored proposal so GitHub can record the owner's approval.
 
 Useful options:
 

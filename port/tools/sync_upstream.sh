@@ -11,7 +11,8 @@
 # --no-build implies --no-push; --no-push leaves the merge for local inspection.
 # Rewrite and reference overrides require the user's explicit decision (SYNC.md).
 # Exit status: 0 done, 1 failed, 2 invalid origin/destination, 3 conflict, 4 rewrite (of upstream, or of a draft's
-# upstream head), 5 references; with --verify-pr, 129, 130 or 143 when a hangup, interrupt or termination stops it.
+# upstream head), 5 references; with --verify-pr, 129, 130, 131 or 143 when a hangup, interrupt, quit or termination
+# stops it.
 set -euo pipefail
 
 PORT_REPO=CallanCampos/Frigate
@@ -433,18 +434,23 @@ if [ -n "$verify_pr" ]; then
     pr_head=$(gh pr view "$verify_pr" --repo "$PORT_REPO" --json headRefOid --jq .headRefOid) ||
         die 1 "could not read the head of PR $verify_pr"
     [ "$pr_head" = "$verified_head" ] || die 1 "check out the exact PR head before verification"
-    # From here until success is recorded, the exit trap records any stop as failure. A hangup, interrupt or
-    # termination exits with the shell's usual status for it, 128 plus the signal's number, which the failure's
-    # description then names. SIGPIPE is caught, to do nothing: a write to a closed output then fails instead of ending
-    # the shell with another status. A signal sent to the whole process group (Ctrl-C, a closed terminal) stops the
-    # reader of `... | tee log` too, and bash then reports there the command that the signal stopped. Unlike an
-    # ignored signal, a caught one goes back to its default in the commands that the shell starts.
+    # From here until success is recorded, the exit trap records a stop as failure. The signals that a terminal or
+    # kill sends (a hangup, Ctrl-C, Ctrl-\ and a termination) are caught to exit with the shell's usual status for
+    # them, 128 plus the signal's number, which the failure's description then names; SIGKILL can't be caught. Sent to
+    # the whole process group, such a signal stops the reader of `... | tee log` too, and what the run writes after it
+    # goes to a closed pipe: the exit trap's warning, and bash's report of a command that a hangup, quit or termination
+    # killed ("Terminated"). So SIGPIPE is caught as well, to do nothing: such a write fails instead of ending the
+    # shell with another status. Unlike an ignored signal, a caught one goes back to its default in the commands that
+    # the shell starts.
     trap 'exit 129' HUP
     trap 'exit 130' INT
+    trap 'exit 131' QUIT
     trap 'exit 143' TERM
     trap ':' PIPE
     verification_pending=1
-    gh api --method POST "repos/$PORT_REPO/statuses/$verified_head" -f state=pending \
+    # Every status request discards GitHub's response (--silent), which nothing reads: a closed output must not make
+    # a request that GitHub took look failed
+    gh api --method POST --silent "repos/$PORT_REPO/statuses/$verified_head" -f state=pending \
         -f 'context=Frigate local verification' -f 'description=Local ROM and host verification running' ||
         die 1 "could not record pending local verification"
     # Another process can move HEAD during those two requests
@@ -606,7 +612,7 @@ if [ -n "$verify_pr" ]; then
         die 1 "could not read the head of PR $verify_pr"
     [ "$pr_head" = "$verified_head" ] || die 1 "PR head changed during verification; rerun on new head"
     # Until GitHub has the success, the run hasn't passed: a failed upload exits 1, and the exit trap records failure
-    gh api --method POST "repos/$PORT_REPO/statuses/$verified_head" -f state=success \
+    gh api --method POST --silent "repos/$PORT_REPO/statuses/$verified_head" -f state=success \
         -f 'context=Frigate local verification' \
         -f 'description=Both ROM SHA1s and host build/tests verified locally' ||
         die 1 "could not record local verification success"
@@ -618,11 +624,14 @@ workflow_changes=$(git diff --name-only "$origin_ref" HEAD -- .github/workflows 
 if [ "$push" = 1 ]; then
     git diff --quiet && git diff --cached --quiet && [ -z "$(git ls-files --others --exclude-standard)" ] || die 1 "build changed source files; refusing publication"
     "$PYTHON" "$publish_helper" --publish "$branch" || die 1 "topic publication/PR failed"
-    [ "$(git rev-parse HEAD)" = "$verified_head" ] || die 1 "HEAD changed during publication"
-    gh api --method POST "repos/$PORT_REPO/statuses/$verified_head" -f state=success \
-        -f 'context=Frigate local verification' \
-        -f 'description=Both ROM SHA1s and host build/tests verified locally'
     push_result="topic PR published for review: $branch"
+    [ "$(git rev-parse HEAD)" = "$verified_head" ] || die 1 "HEAD changed during publication"
+    # A failed upload exits 1, never with gh's own status: gh exits 4 when it needs a login, which here means a rewrite
+    gh api --method POST --silent "repos/$PORT_REPO/statuses/$verified_head" -f state=success \
+        -f 'context=Frigate local verification' \
+        -f 'description=Both ROM SHA1s and host build/tests verified locally' ||
+        die 1 "the topic is published, but its local verification success could not be recorded; verify the PR's" \
+            "head with --verify-pr NUMBER"
 fi
 rm -f "$publish_helper"
 
