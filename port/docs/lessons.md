@@ -5,15 +5,16 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
 
 ## 2026-11-02: Youngster Terrell's first decision
 
-- **Place each of the DS's AI suspensions from the AI's own context, not from the draws.** Terrell's AI has one flag
-  and two moves, and still thinks in five passes on the DS against one on the port. The twister's index showed only
-  that the draws came later. Dumping `TrAIContext` and its VM at every frame (found once in a main-RAM dump by its
-  fields, as below) gave, at each pass's end, the script and the VM's position and status, so each stop has its
-  command: after each script's read, after the damage command, after the first ability guess. Where a stop's cause is
-  a read, look for a cache that the read fills: `g_PMLPersonalNowLoadForme` (`src/system/poke_tool.c`) turning from
-  Patrat's species to Tepig's in a pass showed the guess's personal-data read there, without timing it. Expect every
-  trainer's first decision to part this way, since one script's read alone outlasts the 500 ticks (2026-10-28, below):
-  the cut comes before the first frame the moved numbers change (`oracle.py`'s `TERRELL_AI_TIME`, ADR 0023).
+- **Place each of the DS's AI suspensions from the AI's own context, not from the draws.** Terrell's AI has one flag and
+  two moves, and still thinks in five passes on the DS against one on the port. The twister's index showed only that the
+  draws came later. Dumping `TrAIContext` and its VM at every frame (found once in a main-RAM dump by its fields, as
+  below) gave, at each pass's end, the move whose run it was and the VM's position and status, so each stop has its
+  command: after each of the script's two reads (its one script is read again for each move's run), after the damage
+  command, after the first ability guess. Where a stop's cause is a read, look for a cache that the read fills:
+  `g_PMLPersonalNowLoadForme` (`src/system/poke_tool.c`) turning from Patrat's species to Tepig's in a pass showed the
+  guess's personal-data read there, without timing it. Expect every trainer's first decision to part this way, since one
+  script's read alone outlasts the 500 ticks (2026-10-28, below): the cut comes before the first frame the moved numbers
+  change (`oracle.py`'s `TERRELL_AI_TIME`, ADR 0023).
 - **A pass's second frame can be torn too.** The move menu's pass takes two frames on the DS, and in White 2's Terrell
   the beam drew the second frame's bottom screen while the pass took the buttons down: that frame is the first's above
   line 35 and the port's below. Check such a frame line by line before calling it `MOVE_MENU`'s kind, whose second

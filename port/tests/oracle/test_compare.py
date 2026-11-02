@@ -1505,17 +1505,27 @@ class OracleScriptTests(unittest.TestCase):
                              [(offset, offset) for offset in sorted(protected)])
 
     def test_terrell_holds_route_20_to_the_cut(self):
-        # Terrell's piece continues the Route 20 save to its cut (ADR 0023) and stops on no trap: the port runs no press
-        # past the cut, every frame it runs has its state compared, GFL's random state among it, and the random state
-        # it leaves out is only the DS's long passes and the AI's passes, within the frames compared. Both versions'
-        # files play the same presses, CONTINUE's as catch_continue's start, and give the two seeds the DS builds:
-        # GFL's at start-up with the clock pinned (README.md, "Random seeds") and the battle's
+        # Terrell's piece continues the Route 20 save to its cut (ADR 0023), port frame 5491, the last before the move
+        # his AI picks shows, and stops on no trap. Its state, GFL's random state among it, is compared through its
+        # last frame, and no declaration covers the battle: the AI's window leaves out GFL's random state alone, at
+        # exactly the four passes the trace found (Black 2's port frames 5175-5178, White 2's 5171-5174), the random
+        # state it leaves out besides is the DS's long passes', and the only spans of frames it declares are
+        # floccesy_continue's for the title and CONTINUE, from the same save and presses, so the DS's long passes and
+        # the move menu's are frames of their own. Both versions' files play the same presses, CONTINUE's as
+        # catch_continue's start, none after count 5488, the count the cut's frame shows (the files' lines are counts,
+        # three behind the port's frames there), and give the two seeds the DS builds: GFL's at start-up with the clock
+        # pinned (README.md, "Random seeds") and the battle's
         sequence = oracle.SEQUENCES["terrell"]
+        cut, cut_count = 5491, 5488
+        ai_window = {"b2_us": list(range(5175, 5179)), "w2_us": list(range(5171, 5175))}
         self.assertEqual(sequence.save, "floccesy_save")
         self.assertEqual(sequence.state, oracle.STATE + oracle.RANDOM_STATE)
         self.assertFalse(sequence.stop_from or sequence.stop_trap or sequence.stop)
+        self.assertEqual(sequence.port_frames, cut)
         state_frames = set(compare.parse_frames(sequence.state_frames))
-        self.assertIn(sequence.port_frames, state_frames)
+        self.assertEqual(max(state_frames), cut)
+        tables = ("known", "known_oracle", "known_state", "known_random")
+        same_start = oracle.SEQUENCES["floccesy_continue"]
         start_seeds = {"b2_us": 0x5a0af77416c50a14, "w2_us": 0x270fd5258c56ebe3}
         presses = {}
         for version, start_seed in start_seeds.items():
@@ -1533,13 +1543,23 @@ class OracleScriptTests(unittest.TestCase):
             frames = [line for line in lines if line.split()[0].isdigit()]
             continued = [line for line in oracle.input_lines(path("catch_continue")) if line.split()[0].isdigit()]
             self.assertEqual(frames[:8], continued[:8], version)
-            self.assertLessEqual(int(frames[-1].split()[0]), sequence.port_frames, version)
+            self.assertLessEqual(int(frames[-1].split()[0]), cut_count, version)
             presses[version] = frames
             known = oracle.by_frame(sequence.known_random.get(version, {}))
-            self.assertIn(oracle.TERRELL_AI_TIME, known.values(), version)
+            self.assertEqual(sorted(frame for frame, why in known.items() if why == oracle.TERRELL_AI_TIME),
+                             ai_window[version], version)
             for frame, why in known.items():
                 self.assertIn(why, (oracle.TERRELL_AI_TIME, oracle.MID_PASS), (version, frame))
                 self.assertIn(frame, state_frames, (version, frame))
+            for table in tables:
+                spans = {(item, why) for listed, why in getattr(same_start, table).get(version, {}).items()
+                         for item in listed.split(",") if "-" in item}
+                for listed, why in getattr(sequence, table).get(version, {}).items():
+                    if why == oracle.TERRELL_AI_TIME:
+                        self.assertEqual(table, "known_random", (version, listed))
+                        continue
+                    for item in listed.split(","):
+                        self.assertTrue("-" not in item or (item, why) in spans, (version, table, item))
         self.assertEqual(presses["b2_us"], presses["w2_us"])
 
     def test_save_differences(self):

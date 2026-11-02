@@ -884,7 +884,8 @@ Phase 5's second story leg goes on from the Route 20 save in pieces, each held t
 east along z = 661, 11 tiles from (130,661), into Youngster Terrell's sight: npc 7 of `res/field/events/route_20.json`,
 at (141,664) facing up with a sight of 3, stops the player at (141,661). His eye event
 (`res/field/scripts/global_3000.s`), his line and his trainer battle follow, Tepig against his level 4 Patrat
-(`res/trainers/data/youngster_terrell.json`: `AI_FLAG_BASIC`, Tackle and Leer), with A every 16 counts for his line, the
+(`res/trainers/data/youngster_terrell.json`: `AI_FLAG_BASIC`, and no moves of its own, so Patrat knows the moves its
+learnset gives by level 4, Tackle and Leer, `res/pokemon/patrat/data.json`), with A every 16 counts for his line, the
 battle's opening, FIGHT and Tackle. Tepig, at level 6, is the faster and moves first. The sequence ends at the cut,
 count 5488 (port frame 5491; the oracle runs 7,700 frames), the last before the foe's move shows in the message:
 Terrell's AI thinks in one pass on the port and in five on the DS, and so picks with another of the twister's numbers,
@@ -899,13 +900,14 @@ give the two seeds the DS builds there: GFL's at start-up with the clock pinned,
 | `oracle_terrell` / `sequence terrell` | `terrell_<version>.pbwinput`, from `floccesy_save` (the `oracle_floccesy_save` fixture): every port frame through 5,491 and the oracle's through 7,700, with screens, NNS G3D and GFL's random state, to the cut |
 | No save or round trip yet | Nothing holds the port past the cut yet: `SAVES` keeps no save made after the battle, and no round trip plays the rest of the battle on the port and holds its save to melonDS's. Until a later piece adds them, the battle past the cut is the port's own |
 
-Its known differences are floccesy_continue's for the title and CONTINUE, from the same save and presses; the pass that
-takes the move menu down once Tackle is chosen (count 5262: port frame 5265, and the pass's second frame on the DS,
-oracle frame 7410 in Black 2 and 7346 in White 2, where it is torn, `MOVE_MENU_TORN`); the DS's long passes in the
-game's state (`MID_PASS`: 11 port frames whose state is left out and 7 whose random state alone is, each checked
-against a later DS frame of the same count); and the AI's four passes in GFL's random state alone (`TERRELL_AI_TIME`,
-Black 2's port frames 5175-5178, White 2's 5171-5174). Nothing past the cut is declared. The comparison sequences'
-table has the results.
+Its known differences are floccesy_continue's for the title and CONTINUE, from the same save and presses, but at port
+frame 3432, a DS pass of several frames, where floccesy_continue leaves out the whole state and terrell GFL's random
+state alone, NNS G3D's having been found equal there; the pass that takes the move menu down once Tackle is chosen
+(count 5262: port frame 5265, and the pass's second frame on the DS, oracle frame 7410 in Black 2 and 7346 in White 2,
+where it is torn, `MOVE_MENU_TORN`); the DS's long passes in the game's state (`MID_PASS`: 11 port frames whose state is
+left out and 7 whose random state alone is, each checked against a later DS frame of the same count); and the AI's four
+passes in GFL's random state alone (`TERRELL_AI_TIME`, Black 2's port frames 5175-5178, White 2's 5171-5174). Nothing
+past the cut is declared. The comparison sequences' table has the results.
 
 ```sh
 python3 port/tools/oracle/oracle.py sequence terrell --port build/port-oracle/frigate-black2 \
@@ -1561,17 +1563,18 @@ failure to fix, never a known difference. By kind:
   twister's numbers than the port's. Oshawott's first pick is the same move by chance, its second another, and from that
   turn's rolls (count 8193) the battle parts from melonDS's, where the sequence ends
   ([../../docs/decomp-findings.md](../../docs/decomp-findings.md)). Youngster Terrell's first decision on Route 20 (the
-  terrell sequence) parts the same way over more passes, alike in both versions: his AI sets up his turn with five
-  draws on the same pass on both programs (Black 2's count 5171, White 2's 5167), the port runs his two moves' scripts
-  and picks in the next pass, and the DS's AI runs out of its 500 ticks four times and picks four passes later. Dumps
-  of its context place each stop: after Tackle's script is read from the card, after the damage command, after the
-  first ability guess, which reads Tepig's personal data, and after Leer's script is read, work that the port's virtual
-  clock gives no time. For those four passes the port's twister index is 5 to 9 ahead (`TERRELL_AI_TIME`: Black 2's
-  counts 5172-5175, White 2's 5168-5171). The six ability guesses and the pick take other numbers: the port picks Leer,
-  the DS Tackle, and no blink check of those passes draws a blink on either program; the move's name in the message
-  shows it from count 5489 in both versions, so the sequence ends at 5488. No host has the DS's time, so a trainer
-  battle is held to melonDS only while the AI thinks within a pass there: a sequence stops before the AI's first
-  decision that the DS's time moves, and the route goes on from melonDS's save made after the battle ([ADR
+  terrell sequence) parts the same way over more passes, alike in both versions: his AI sets up his turn with five draws
+  on the same pass on both programs (Black 2's count 5171, White 2's 5167), the port runs his one script
+  (`AI_FLAG_BASIC`'s) for each of his two moves and picks in the next pass, and the DS's AI runs out of its 500 ticks
+  four times and picks four passes later. Dumps of its context place each stop: after the script is read from the card
+  for Tackle's run, after the damage command, after the first ability guess, which reads Tepig's personal data, and
+  after the script is read again for Leer's run, work that the port's virtual clock gives no time. For those four passes
+  the port's twister index is 5 to 9 ahead (`TERRELL_AI_TIME`: Black 2's counts 5172-5175, White 2's 5168-5171). The six
+  ability guesses and the pick take other numbers: the port picks Leer, the DS Tackle, and no blink check of those
+  passes draws a blink on either program; the move's name in the message shows it from count 5489 in both versions, so
+  the sequence ends at 5488. No host has the DS's time, so a trainer battle is held to melonDS only while the AI thinks
+  within a pass there: a sequence stops before the AI's first decision that the DS's time moves, and the route goes on
+  from melonDS's save made after the battle ([ADR
   0023](../../docs/adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md)). A wild Pokémon has no AI scripts (no
   AI flags, `GetClientAIFlags` in `src/ov167/btl_main.c`) and picks at once.
 - **Random numbers.** GFL seeds its random numbers from a hash that includes a buffer the DS's stack fills

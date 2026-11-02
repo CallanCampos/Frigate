@@ -37,7 +37,8 @@ boundaries. Only four observed loop branches have the real SUSPENDED flag. These
 whole-game timing parity nor a generic CPU-cost model. No fixed choice delay or new battle-frame mask is introduced.
 
 **Youngster Terrell's first decision, traced 2026-11-02 (the `terrell` sequence on Route 20, both versions):** his
-Patrat knows Tackle and Leer, and his AI has `AI_FLAG_BASIC` alone, one script run a move. Both programs played the
+Patrat knows Tackle and Leer, and his AI has `AI_FLAG_BASIC` alone, whose one script runs once for each move: each run
+reads it from the card (`TrAI_LoadScript`) and frees it at its end (`TrAI_ReleaseScript`). Both programs played the
 sequence's file from the Route 20 save with the DS's seeds. The port's side was traced with a scratch log of
 `GFL_RandomMT`'s callers and of the AI's setup, passes, commands and pick, under `PLATFORM_PC` in a trace worktree,
 never committed; its runs' random state equals the sequence's port runs at every dump they share.
@@ -55,33 +56,36 @@ runs at every dump up to the cut. All the dumps stayed on this machine.
   - `TrAI_Setup`'s five at count 5171 (White 2 5167), on both programs and at the same indices. The DS's context holds
     the port's values: damage factors 92, 92, 86 and 91 and the random 122 in Black 2; 87, 100, 92, 100 and 42 in
     White 2.
-  - `GuessAbility`'s six, two in Tackle's script and four in Leer's.
+  - `GuessAbility`'s six, two in the script's run for Tackle and four in its run for Leer.
   - `TrAI_ChooseMove`'s pick.
 
   The port draws the guesses and the pick at the next count. The DS draws them over the next five counts: none, none,
   one, one, then four and the pick.
 - **(c) The passes and suspensions.** The port thinks in one pass and never suspends, as its log shows. Its virtual
-  clock moves a tick at each `OS_GetTick` and gives the card's reads no time, so its 46 commands and two script reads
-  stay within the 500 ticks. The DS thinks in five passes and suspends four times:
-  - at Tackle's script +6, after the script's read, still going at the end of the pass's second video frame, and the
-    first command;
+  clock moves a tick at each `OS_GetTick` and gives the card's reads no time, so its 46 commands and the script's two
+  reads stay within the 500 ticks. The DS thinks in five passes and suspends four times:
+  - at +6 in the script's run for Tackle, after the script's read, still going at the end of the pass's second video
+    frame, and the first command;
   - at +32, after the damage command (`AIGetHighestDamagingMove`, which works out both moves' damage), still running
     at the end of the pass's first frame;
   - at +74, after the first guess, which reads Tepig's personal data: the species whose data the game last read
     (`g_PMLPersonalNowLoadForme` in `src/system/poke_tool.c`) turns from Patrat's 504 to Tepig's 498 in that pass;
-  - at Leer's script +6, after its read (Tackle's script was freed when its run ended).
+  - at +6 in its run for Leer, after the script's second read (the copy read for Tackle was freed when that run ended).
 
-  Its fifth pass runs Leer's script to its end, where the guesses find Tepig's data already read, and picks. So the
-  DS's first guess comes two counts after the port's (5174 against 5172 in Black 2, 5170 against 5168 in White 2),
+  Its fifth pass runs the script for Leer to its end, where the guesses find Tepig's data already read, and picks. So
+  the DS's first guess comes two counts after the port's (5174 against 5172 in Black 2, 5170 against 5168 in White 2),
   because the reads before it take the DS's time. The DS's first two passes of the decision take three and two video
   frames.
-- **(d) The picks, and the first frame a consumer of these numbers changes.** The scores are equal on both programs
-  (100 and 100), so the pick is the next number scaled to two moves. The port's (index 53 in Black 2, 49 in White 2)
-  picks slot 1, Leer; the DS's (61, 57) picks slot 0, Tackle. Two of the six guesses differ in Black 2 and three in
-  White 2, but no score and no number of draws changes. No blink check of the four passes draws a blink (0 of 100) on
-  either program. So the first frame that changes is the foe's move in the top screen's message, at count 5489 in both
-  versions (port frame 5492): "Leer!" on the port, "Tackle!" on the DS. NNS G3D's state parts at count 5515, with the
-  move's animation. The sequence ends at port frame 5491, holding the four passes as `TERRELL_AI_TIME`.
+- **(d) The picks, and the first frame a consumer of these numbers changes.** The scores are equal on both programs (100
+  and 100), so the pick is the next number scaled to two moves. The port's (index 53 in Black 2, 49 in White 2) picks
+  slot 1, Leer; the DS's (61, 57) picks slot 0, Tackle. Each guess scales its number to Tepig's three ability slots,
+  Blaze, Blaze and Thick Fat (`res/pokemon/tepig/data.json`). Recomputed from the seeds at the traced indices, three
+  of the six guesses differ in Black 2 (the third, fifth and sixth) and one in White 2 (the fifth), Thick Fat on one
+  program and Blaze on the other each time; no score and no number of draws changes. No blink check of the four
+  passes draws a blink (0 of 100) on either program. So the first frame that changes is the foe's move in the top
+  screen's message, at count 5489 in both versions (port frame 5492): "Leer!" on the port, "Tackle!" on the DS. NNS
+  G3D's state parts at count 5515, with the move's animation. The sequence ends at port frame 5491, holding the four
+  passes as `TERRELL_AI_TIME`.
 
 | Where | What | How the port handles it | Found |
 | --- | --- | --- | --- |

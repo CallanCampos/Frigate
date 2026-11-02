@@ -240,16 +240,17 @@ AI_TIME = ("Hugh's AI runs its scripts for 500 ticks of OS_GetTick a pass (TRAI_
            "from the DS's pick on the index is the port's again: each of his two turns, the first pick by chance the "
            "same move, the second another (README.md, Known differences; ADR 0023)")
 TERRELL_AI_TIME = ("Youngster Terrell's AI (AI_FLAG_BASIC; Patrat's Tackle and Leer) sets up his first turn with five "
-                   "twister draws on the same pass on both programs (TrAI_Setup), then runs one script a move, for at "
-                   "most 500 ticks of OS_GetTick a pass (TRAI_TIME_LIMIT, src/ov170/tr_ai.c), with six ability guesses "
-                   "(GuessAbility), and picks between the two equal scores with the twister's next number "
-                   "(TrAI_ChooseMove), while the battle's view draws two numbers a pass (BtlvMcss_Main). The port's "
-                   "virtual clock gives the card's reads no time, so its AI thinks in the next pass; the DS's AI runs "
-                   "out of its 500 ticks four times, after reading Tackle's script, after the damage command, after "
-                   "the first guess and after reading Leer's script, and picks four passes later. For those four "
-                   "passes the port's twister index is 5 to 9 ahead, and from the DS's pick on it is the port's again; "
-                   "the guesses and the pick have taken other numbers, and the pick is Leer on the port, Tackle on the "
-                   "DS (README.md, Known differences; port/docs/decomp-findings.md; ADR 0023)")
+                   "twister draws on the same pass on both programs (TrAI_Setup), then runs its one script once for "
+                   "each move, read from the card for each run (TrAI_LoadScript), for at most 500 ticks of OS_GetTick "
+                   "a pass (TRAI_TIME_LIMIT, src/ov170/tr_ai.c), with six ability guesses (GuessAbility), and picks "
+                   "between the two equal scores with the twister's next number (TrAI_ChooseMove), while the battle's "
+                   "view draws two numbers a pass (BtlvMcss_Main). The port's virtual clock gives the card's reads no "
+                   "time, so its AI thinks in the next pass; the DS's AI runs out of its 500 ticks four times, after "
+                   "reading the script for Tackle's run, after the damage command, after the first guess and after "
+                   "reading the script again for Leer's run, and picks four passes later. For those four passes the "
+                   "port's twister index is 5 to 9 ahead, and from the DS's pick on it is the port's again; the "
+                   "guesses and the pick have taken other numbers, and the pick is Leer on the port, Tackle on the DS "
+                   "(README.md, Known differences; port/docs/decomp-findings.md; ADR 0023)")
 CURSOR_NEW_GAME = ("as CURSOR, with NEW GAME's press from a blank save in CONTINUE's place: the port's frame shows the "
                    "step after the DS's last one (its top screen hashes d3c85a7e), which the DS shows at counts 3274, "
                    "3296, 3338 and 3360 of the same run but not on that count")
@@ -721,7 +722,8 @@ SEQUENCES = {
     # last before the foe's move shows in the message (at 5489 in both versions), where the battle parts from melonDS's
     # by construction: Terrell's AI picks with another number, having thought four passes less than on the DS
     # (README.md, "Known differences": the AI's time a pass). The title's and CONTINUE's differences are
-    # floccesy_continue's, from the same save and presses
+    # floccesy_continue's, from the same save and presses, but at port frame 3432, a DS pass of several frames, where
+    # floccesy_continue leaves out the whole state and terrell GFL's random state alone, NNS G3D's being equal there
     "terrell": Sequence(
         port_frames=5491,
         oracle_frames=7700,
