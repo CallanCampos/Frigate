@@ -22,9 +22,10 @@ frame by frame with melonDS and check the sound driver, music and cries. Phase 4
 battle, Bianca's capture demo, a wild catch, PC deposit/withdraw/swap and save continuations, verified in both games
 including catch/save/new-process reload. Phase 5's first story checkpoint follows Alder through Route 19 and
 Floccesy Town to a Route 20 save, with DS comparisons, strict sanitizer runs and fresh-process save interchange.
-Floccesy Ranch and later story remain next. Hugh's CPU-time-dependent AI decision still uses an explicit comparison
-cut followed by save and continuation checks; trainer-AI fidelity remains unresolved. Both upstream encounter fixes
-are already included.
+From that save, Youngster Terrell's battle on Route 20 matches melonDS up to his AI's first decision, which the DS's
+CPU time moves, where its comparison is cut; Lass Isabel's battle is the next mandatory one, then Floccesy Ranch and
+later story. Hugh's CPU-time-dependent AI decision still uses an explicit comparison cut followed by save and
+continuation checks; trainer-AI fidelity remains unresolved. Both upstream encounter fixes are already included.
 [docs/STATUS.md](docs/STATUS.md) records the checks and remaining work.
 
 ## Contributing
