@@ -54,7 +54,7 @@ records keep what was decided or found at the time, and are added to, not rewrit
 | [adr/0019](adr/0019-pointer-cast-guard-against-a-classified-baseline.md) | The pointer cast guard: the game's casts that cut an address, held to a classified baseline |
 | [adr/0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md) | Root heaps in the game's own memory get host memory |
 | [adr/0022](adr/0022-the-ds-random-seeds-given-by-input-files.md) | The DS's random seeds given by input files, through a wrapper of `buildSeed` (proposed) |
-| [adr/0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md) | Oracle routes part where the DS's CPU time decides, and go on from melonDS's save (proposed) |
+| [adr/0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md) | Oracle routes part where the DS's CPU time decides, and go on from melonDS's save |
 | [adr/0024](adr/0024-a-conflicting-sync-proposes-a-draft-of-upstreams-head.md) | A conflicting sync proposes a draft of upstream's head |
 | [adr/0025](adr/0025-a-spanish-rom-by-a-manifest-of-its-own.md) | A Spanish ROM by a manifest of its own, read by the US code (proposed) |
 | [adr/0026](adr/0026-native-archive-table-caches.md) | Native FAT/FNT cache representation, SDK seam, lifecycle and timing limits |
@@ -74,6 +74,7 @@ records keep what was decided or found at the time, and are added to, not rewrit
 | [research/libntr.md](research/libntr.md) | libntr's architecture, coverage, licensing and gaps for BW2 |
 | [research/platinum-mods-alternatives.md](research/platinum-mods-alternatives.md) | Widescreen and single-screen mods, Gen4Recomp, other DS ports, multiplayer |
 | [research/port-landscape.md](research/port-landscape.md) | libultraship ports, sm64coopdx, static recompilation, GBA ports, mod architectures |
+| [research/ship-of-harkinian-rng.md](research/ship-of-harkinian-rng.md) | Whether Ship of Harkinian reproduces the N64's random numbers and timing, the evidence behind ADR 0023's acceptance |
 | [research/bw2-mod-ecosystem.md](research/bw2-mod-ecosystem.md) | Gen 5 projects, randomizers, widescreen, multiplayer and revival services, hacks and tools |
 | [research/tech-stack.md](research/tech-stack.md) | SDL3, SDL_GPU, renderers, the build, packaging, mod libraries, networking, testing |
 

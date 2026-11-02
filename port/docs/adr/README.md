@@ -89,7 +89,7 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0019](0019-pointer-cast-guard-against-a-classified-baseline.md) | The pointer cast guard: the game's casts that cut an address, held to a classified baseline | D5, §4.4, §4.8, §6 | accepted |
 | [0021](0021-root-heaps-in-the-games-own-memory-from-host-memory.md) | Root heaps in the game's own memory get host memory | D5, §4.5, §4.8 | accepted |
 | [0022](0022-the-ds-random-seeds-given-by-input-files.md) | The DS's random seeds given by input files, through a wrapper of `buildSeed` | §1, §4.5, §6 | proposed |
-| [0023](0023-oracle-routes-part-where-the-ds-cpu-time-decides.md) | Oracle routes part where the DS's CPU time decides, and go on from melonDS's save | §1, §6, §7 phases 4 and 5 | proposed |
+| [0023](0023-oracle-routes-part-where-the-ds-cpu-time-decides.md) | Oracle routes part where the DS's CPU time decides, and go on from melonDS's save | §1, §6, §7 phases 4 and 5 | accepted |
 | [0024](0024-a-conflicting-sync-proposes-a-draft-of-upstreams-head.md) | A conflicting sync proposes a draft of upstream's head | D1, §4.1, §8 | accepted |
 | [0025](0025-a-spanish-rom-by-a-manifest-of-its-own.md) | A Spanish ROM by a manifest of its own, read by the US code | §1, §4.5 | proposed |
 | [0026](0026-native-archive-table-caches.md) | Keep archive offsets and resolve cached tables through the native pointer | §4.5, §4.8, §6 | accepted |
