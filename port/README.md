@@ -521,5 +521,6 @@ merging. Neither automation nor the local sync script pushes `main`. Contributor
 
 [docs/SYNC.md](docs/SYNC.md) describes the commands, conflict handling and validation. The decisions are
 [ADR 0018](docs/adr/0018-protected-main-and-sync-prs.md) and
-[ADR 0024](docs/adr/0024-a-conflicting-sync-proposes-a-draft-of-upstreams-head.md); actual GitHub settings are documented in
-[repository policy](docs/REPOSITORY-POLICY.md). Record each local sync in [docs/STATUS.md](docs/STATUS.md).
+[ADR 0024](docs/adr/0024-a-conflicting-sync-proposes-a-draft-of-upstreams-head.md); actual GitHub settings are
+documented in [repository policy](docs/REPOSITORY-POLICY.md). Record each local sync in
+[docs/STATUS.md](docs/STATUS.md).

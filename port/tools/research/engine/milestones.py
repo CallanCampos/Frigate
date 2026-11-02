@@ -19,14 +19,24 @@ from collections import defaultdict
 S = sys.argv[1]
 W = sys.argv[2]
 
+# ov036's files by their names in upstream's delinks.txt as of 41f42ca1af. Each set holds every file of the .text
+# ranges the research put in it on 2026-10-16, which upstream has since split and renamed: 33a5ba6936 split
+# scrcmd_hidden_hollow.c (hidden_hollow_generate.c) and scrcmd_field.c (scrcmd_pep_quiz.c, scrcmd_poke_disp.c);
+# 12d5b7fa68 split fldmmdl_acmd.c into five files, the data-only fldmmdl_movedata.c among them, which has no function to
+# count, and registered ctalkmsgwin.c as talkmsgwin.c; 0e2d7f0974 named the fldmmdl_* files field_actor_*, c13587cf78
+# named fldeff_iaigiri.c fldeff_cut.c and fldeff_ochiba.c fldeff_leaves.c, and 96f384ead1 named sodateya.c day_care.c.
+# A file in no set counts as M3's
 OV36_DEFER = {
-    "ircbattlemenu.c", "comm_entry_menu.c", "union_mine_pms.c", "scrcmd_hidden_hollow.c", "party_select_list.c",
+    "ircbattlemenu.c", "comm_entry_menu.c", "union_mine_pms.c", "hidden_hollow_generate.c", "scrcmd_hidden_hollow.c",
+    "party_select_list.c",
 }
 OV36_M4 = {  # field interaction: NPC actions, talk, events, transitions, effects
-    "fldmmdl_acmd.c", "fieldmap_event.c", "ctalkmsgwin.c", "field_fade.c", "place_name_letter.c",
-    "fldeff_reflect.c", "fldeff_iaigiri.c", "fldeff_ochiba.c", "fldeff_hide.c", "fldeff_btrain.c",
-    "fldeff_ripple.c", "fldeff_splash.c", "scrcmd_field.c", "scrcmd_pokemon_misc.c", "scrcmd_pokemon_fld.c",
-    "sodateya.c", "pleasure_boat.c", "fes_gimmick.c", "field_fmission_info.c",
+    "field_actor_acmd.c", "field_actor_movecode.c", "field_actor_evtype.c", "field_actor_movecode_pair.c",
+    "fieldmap_event.c", "talkmsgwin.c", "field_fade.c", "place_name_letter.c",
+    "fldeff_reflect.c", "fldeff_cut.c", "fldeff_leaves.c", "fldeff_hide.c", "fldeff_btrain.c",
+    "fldeff_ripple.c", "fldeff_splash.c", "scrcmd_field.c", "scrcmd_pep_quiz.c", "scrcmd_poke_disp.c",
+    "scrcmd_pokemon_misc.c", "scrcmd_pokemon_fld.c", "day_care.c", "pleasure_boat.c", "fes_gimmick.c",
+    "field_fmission_info.c",
 }
 OV36_M5 = {"enceff.c"}
 OV36_M7 = {"shortcut_menu.c"}

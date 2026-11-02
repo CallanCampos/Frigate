@@ -20,10 +20,11 @@ Independent arithmetic: C5/L1=3/L2=2 gives first READY 85/COMMIT 94; 1024 bytes 
 and one extra 512-byte boundary gap. A 512-byte request ends 3777; own 4000 cycles ends 5152 after 1152 stalled cycles,
 while absolute 4000 remains 4000. Source/compile/binary hashes and plain/fatal sanitizer evidence are retained locally.
 
-The six `card_hardware_cpu_*` scenarios cover held/early reads, all 128 words of a page, next-READY pacing, final-consume
-IF before a separate destination store, masked IRQ delivery, bidirectional CPU/DMA exclusion, stale command tokens,
-cancel/reset ABA, zero-data completion, READ/ID backend failure and recovery, and an actual IRQ handler's timed ID read
-without nested IRQ delivery. Ordinary CPU consumption incurs no DMA stall or invented CPU-work charge.
+The six `card_hardware_cpu_*` scenarios cover held/early reads, all 128 words of a page, next-READY pacing,
+final-consume IF before a separate destination store, masked IRQ delivery, bidirectional CPU/DMA exclusion, stale
+command tokens, cancel/reset ABA, zero-data completion, READ/ID backend failure and recovery, and an actual IRQ
+handler's timed ID read without nested IRQ delivery. Ordinary CPU consumption incurs no DMA stall or invented CPU-work
+charge.
 
 These exercise the controller boundary; production card_rom.c is unchanged and no wire timing is activated for
 gameplay. Actual SDK page/cache/task integration and polling/store/copy costs are later work. Unit success establishes

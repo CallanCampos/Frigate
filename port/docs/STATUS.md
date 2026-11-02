@@ -32,11 +32,111 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-11-02: PR 74's follow-ups for the documents, and a check of their links and tables in CI
+
+- **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit. It started from reviewed main
+  `d1717b68d8`, PR 74's merge.
+- **Port:** `PORT_SHA`, on the topic branch `port-docs-hygiene-1102` from `d1717b68d8`: `3c7a8f10dd` (the documents
+  check, its tests and its CI steps) and this entry's commit (the follow-ups). This entry fills the last entry's, the
+  hygiene's, `PORT_SHA` with `6eef75c290`. Only `port/` and two of Frigate's own files under `.github/` change: the
+  landing page's one wrapped paragraph and `port-ci.yml`'s two steps.
+- **ROM (T0):** `python3 configure.py && ninja` (`-j4`) in this branch's new worktree, every step run (14,039): both
+  original US SHA1s, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`,
+  with no compiler warning. This branch's own changes are no ROM input.
+- **Host build (T1):** not run: nothing this branch changes is a host build input. `git diff --stat` against `main`
+  lists Markdown, `port/tools/**` (the documents check and its allowlist, `summarize.py`, `milestones.py`), the tools'
+  tests and `.github/workflows/port-ci.yml`, and no CMake file reads any of them. The exact-head verification
+  (`sync_upstream.sh --verify-pr`) builds both games.
+- **Tests:**
+  - The documents check's tests (`python3 -m unittest discover -s port/tools/tests -p test_check_docs.py`, CI's new
+    step, Python 3.14.6 here, 3.12 in CI): 33 of 33 pass. A clean fixture of every form the check reads passes; each of
+    20 seeded problems is reported with its kind and line; the allowlist's controls fail as they must. Negative
+    controls of the tests themselves: each of 17 mutations of the check in a scratch copy (cells not split in a code
+    span, links read line by line, a line without pipes ending a table, repeated headings unnumbered, stale rows
+    passing, headings in fenced blocks taken for anchors, no outside-repository kind, line anchors unchecked, comments
+    read, reasons not required, ignored files listed, delimiter widths unchecked, the landing page unread, HTML sources
+    and reference definitions unchecked, a source view read as rendered, allowed problems counted by row) fails the
+    tests that hold its rule.
+  - The check on the whole tree (`python3 port/tools/check_docs.py`, CI's other new step): 97 documents, one problem,
+    allowed: `research/platinum-port.md:25`, a record. Against GitHub: the 1,045 anchors that the contents API's HTML
+    gives the headings of all 97 documents on `main` (`d1717b68d8`) are the check's, document for document, and the 234
+    tables GitHub renders there, with their 2,892 rows, are the check's.
+  - Wrapping: each of the 17 documents whose lines this change wraps renders the same as on `main` through GitHub's
+    Markdown API (mode `markdown`, as files render, whitespace runs taken as one), with the same words in the same
+    order.
+  - The sync tooling tests, CI's command (`python3 -m unittest discover -s port/tools/tests -p
+    test_upstream_sync.py`): 64 of 64 pass.
+  - `progress_ownership` (`port/tests/progress/test_ownership.py`, run directly): 11 of 11 pass.
+  - T2 to T7 not run: no test that CMake registers changes, and no game, host or test-target code; the exact-head
+    verification runs the host tests and the short replays.
+- **Tiers:** `progress.py --rev d1717b68d8`, both versions: 41,017 functions in tier (a), none in (b) or (c), and 2,385
+  veneers (16,906 bytes); code bytes a/b/c B2 3,850,260/0/0, W2 3,850,348/0/0; 168 bytes of data owned by no file per
+  game (`.data` 144, `.bss` 24). Unchanged since the last entry that measured them. Overlay 182's 1,113 functions are
+  all tier (a), and no module has a gap.
+- **Trap stubs:** not measured: no host build ran, and nothing the stubs come from changes (25 function stubs and 1 data
+  placeholder per version on `main`, as the last entries give).
+- **64-bit warnings:** not measured: no host build ran, and nothing the pointer cast guard reads changes (`main`'s 365
+  sites in 229 keys, real 66, harmless 123, handled 141, unreachable 35, as the last entries give).
+- **Work done:** the follow-ups that PR 74 lists for the documents (its entry's Next, its description), each checked
+  against `main` first:
+  - **`milestones.py`'s overlay 36 sets** (`port/tools/research/engine/milestones.py`) name the files of the research's
+    ranges by upstream's names now. Five names were gone from the tree: `fldmmdl_acmd.c`, `fldeff_iaigiri.c`,
+    `fldeff_ochiba.c` and `sodateya.c`, which PR 74 lists, and `ctalkmsgwin.c`, which `12d5b7fa68` registered as
+    `talkmsgwin.c` (a scanner's artifact of the ROM's name). The .text ranges of 2026-10-16's delinks map to today's
+    files: `12d5b7fa68` split `fldmmdl_acmd.c`'s range into four files of code and a data-only one, which `0e2d7f0974`
+    named `field_actor_acmd.c`, `field_actor_movecode.c`, `field_actor_evtype.c`, `field_actor_movecode_pair.c` and
+    `field_actor_movedata.c`; `c13587cf78` named `fldeff_iaigiri.c` `fldeff_cut.c` and `fldeff_ochiba.c`
+    `fldeff_leaves.c`; `96f384ead1` named `sodateya.c` `day_care.c`; and `33a5ba6936` split `scrcmd_field.c`
+    (`scrcmd_pep_quiz.c`, `scrcmd_poke_disp.c`) and the deferred `scrcmd_hidden_hollow.c` (`hidden_hollow_generate.c`).
+    Each file of code goes in its range's set, so that a re-measure files its functions where the research put them:
+    with `main`'s sets 593 functions of 11 files fell to M3, with these 592 are M4's and 1 deferred, and every name in
+    the sets is an overlay 36 file. `coverage.py` and `milestones.py` on `main`'s tree write the same `milestones.txt`
+    with either set, since every milestone's overlays are complete C: no function of any milestone is without C or in an
+    incomplete file.
+  - **sanitizers.md's report lines:** the rows are records and keep their lines. A new subsection, "The reports'
+    lines", with a pointer at the top of "What it found", gives the tree each report's lines are of (the first parent
+    of the commit that wrote its row, but for the field's first survey, upstream's `b62c655bfa`, whose files its scratch
+    merge had) and where the same statements are on `d1717b68d8`. Of the 29 lines it names, each was checked by script:
+    the statement at the report's tree and line is the statement at today's line, its renames named, and the five
+    "under `#else`" are so. Beyond the four PR 74 named (H5, R6, R12, R13), R1, R5, R7, R8, R10 and R14 to R16 have
+    moved too.
+  - **`summarize.py`'s overlay 182 gap rule** is gone (`port/tools/progress/summarize.py`). On `main`'s tree
+    (`progress.py --rev d1717b68d8`) no module has a gap and overlay 182's functions are all tier (a), so no row reaches
+    it: `summarize.py`'s output before and after is the same byte for byte, Black 2's tables (67 lines), its
+    `--all-overlays` table (326 lines) and White 2's (67 lines). It has no tests to update: no test runs it.
+  - **Lines over 120 columns** in living documents, the 54 lines in 19 documents that PR 74 counted: 41 are wrapped,
+    every word kept, in 17 documents, by pushing the overflow into the paragraph's next line at a space outside code
+    spans, link destinations and HTML tags (inside a link's text only where nothing else fits), never letting a moved
+    line start a block. Left as they are: 8 whose single link is longer than the limit (the landing page's three
+    badges, REPOSITORY-POLICY.md's four GitHub documentation links, SYNC.md's link to GitHub's schedule
+    documentation), and the 5 of the spikes (`port/spikes/os-fibers/README.md`, `vram-alias/README.md`), phase 0's
+    experiments, which their guide says are frozen. Records keep theirs: STATUS.md's past entries (33), the research
+    records (228 in `research/` and RESEARCH.md), the accepted ADRs 0001, 0007, 0009, 0017, 0018, 0024, 0026, 0028 and
+    0029 (11), and the proposed ADR 0025 (3), whose text is the owner's to accept.
+  - **The script VM test's name:** port/tests/README.md's `game/` row and port/cmake/README.md's `game.cmake` row no
+    longer name `game_script_vm` and `test_script_vm.c`. Neither CMake file registers such a test (`game.cmake`
+    registers `game_ptrcasts` and `game_ptrcasts_tool`): since PR 42's integration the field script VM's jumps and
+    calls are `integrate_script_offsets` (`port/tests/integrate/script_offsets.c`), which `integrate.cmake` registers
+    and both guides' integrate rows describe; port/cmake/README.md's names it now.
+  - **The documents check** (`3c7a8f10dd`): `port/tools/check_docs.py` and `check_docs_allowlist.tsv`, its tests and
+    CI's two steps in the sync-tooling job, as above; documented in port/tools/README.md, port/tools/tests/README.md
+    and, in one line, port/docs/README.md, where the documents' rules are.
+- **Next:** the next task is as the last entry gives it: Phase 5's story coverage past the Route 20 save. The
+  documents' follow-ups left: the guides that still say the owner approves every sync PR (port/CLAUDE.md,
+  CONTRIBUTING.md, SYNC.md, PLAN.md, README.md and `upstream_sync.py`'s warning), for the owner's wording of the
+  delegation; `research/platinum-port.md:25`, a record whose code span's pipes split its row, the check's one allowed
+  problem; `include/field/field_effect.h:146`'s comment, which names `FesKiraTask`, for the next change that touches
+  `include/` anyway, since a game header's change needs its MWCC-neutral proof; and `summarize.py`'s overlay 11 gap
+  rule, which no gap reaches either now.
+- **Blockers:** none for this change. Decisions the owner holds: ADRs 0022, 0025, 0030 and 0031 are proposed; the
+  guides' wording of the delegation; whether escaping a record's pipes is a fix a record may take; and whether
+  documents get a line limit, which no rule names, so that the check would hold it.
+
 ## 2026-11-02: after the naming sync: the guard's rows and the documents at upstream's names, the delegated sync review
 
 - **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit. Reviewed main is `c0a7941e4e`, PR 72's
   merge, which this branch merges; it started from `10d017c010`, PR 67's.
-- **Port:** `PORT_SHA`, on the topic branch `port-sync-hygiene-1102` from `10d017c010`: `fd81336269` (the sync script's
+- **Port:** `6eef75c290`, on the topic branch `port-sync-hygiene-1102` from `10d017c010`: `fd81336269` (the sync script's
   messages and their test), `07c5e0c409` (the rest, and this entry), `0522fe9311` (the merge of `main` at
   `36101609ad`, PR 70: ADR 0023 accepted, documents only), `55286eae4a` (the merge of `main` at `806b2a8f9d`, PR 73:
   Castelia City's café), `84c24fcd10` (the review's fixes, below), `eef1532091` (the merge of `main` at `c0a7941e4e`,

@@ -1,9 +1,10 @@
 # Game changes
 
-Every change the port makes outside `port/`, other than its own new files under `.github/` (the landing page, contribution entry point, port-specific issue/PR templates and
-`workflows/port-*.yml`). Game code stays the decomp's ([PLAN.md §4.1](PLAN.md#41-repository),
-[§4.8](PLAN.md#48-64-bit-and-dual-target-rules)), so this list should stay short, and every row is something an
-upstream merge can conflict with. A change outside `port/` without a row here is a mistake.
+Every change the port makes outside `port/`, other than its own new files under `.github/` (the landing page,
+contribution entry point, port-specific issue/PR templates and `workflows/port-*.yml`). Game code stays the decomp's
+([PLAN.md §4.1](PLAN.md#41-repository), [§4.8](PLAN.md#48-64-bit-and-dual-target-rules)), so this list should stay
+short, and every row is something an upstream merge can conflict with. A change outside `port/` without a row here is a
+mistake.
 
 The sync of `be2c125a700c` also exposes three GameSpy SDK references in `lib/dwc/src/gstats/gstats.c` whose
 implementations are absent from the ROM, as `lib/dwc/include/dwc/gbucket.h` documents. This needs no source change

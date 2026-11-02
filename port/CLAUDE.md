@@ -86,13 +86,13 @@ the game each piece touches, for the modders who come later.
   [ADR 0002](docs/adr/0002-solo-project-no-upstream-posts.md)).
 - **Port work is open to contributors.** Human contributors, Claude Code and explicitly authorized Codex sessions
   follow this file and [CONTRIBUTING.md](CONTRIBUTING.md). Root agent instructions describe the decomp; for port work,
-  these rules take precedence. External contributors use personal forks and topic PRs to Frigate's `main`. Maintainers and automation also
-  publish only topic branches and PRs ([ADR 0018](docs/adr/0018-protected-main-and-sync-prs.md)).
+  these rules take precedence. External contributors use personal forks and topic PRs to Frigate's `main`. Maintainers
+  and automation also publish only topic branches and PRs ([ADR 0018](docs/adr/0018-protected-main-and-sync-prs.md)).
 - **Port files live in `port/`**, plus files upstream doesn't have: `.github/workflows/port-*.yml` and
   `.github/README.md`, `.github/CONTRIBUTING.md`, `.github/CODEOWNERS`, `.github/PULL_REQUEST_TEMPLATE/port.md` and
-  `.github/ISSUE_TEMPLATE/port_*.yml`. Never edit an upstream file for the port's own setup (root `CLAUDE.md`, `AGENTS.md`,
-  `README.md`, `CONTRIBUTING.md`, `.gitignore`, `.claude/`, `.agents/`, `.codex/`, upstream's `.github/` templates and
-  workflows, `docs/`, `tools/`, `config/`, `configure.py`): every sync would conflict.
+  `.github/ISSUE_TEMPLATE/port_*.yml`. Never edit an upstream file for the port's own setup (root `CLAUDE.md`,
+  `AGENTS.md`, `README.md`, `CONTRIBUTING.md`, `.gitignore`, `.claude/`, `.agents/`, `.codex/`, upstream's `.github/`
+  templates and workflows, `docs/`, `tools/`, `config/`, `configure.py`): every sync would conflict.
 - **Only upstream's `build.yml` is off here**, because it needs the ROM deploy key
   (`gh workflow disable build.yml -R CallanCampos/Frigate`). Disabling or enabling any other workflow needs the
   user's OK. Never disable `compile.yml` or `standards.yml` to make CI pass: fix the change instead.
@@ -106,8 +106,9 @@ The no-upstream-posts and reference rules below still apply to every contributor
 
 ## How the root rules apply here
 
-- **Both ROMs stay byte for byte.** Every maintainer commit ends with `python3 configure.py && ninja` and both SHA1s, even one
-  that touches only `port/`: it proves the last sync and every change outside `port/` left the DS build alone (T0).
+- **Both ROMs stay byte for byte.** Every maintainer commit ends with `python3 configure.py && ninja` and both SHA1s,
+  even one that touches only `port/`: it proves the last sync and every change outside `port/` left the DS build alone
+  (T0).
 - **The code rules apply to any edit in `src/`, `lib/` or `include/`**: natural C, names, `docs/code-standards.md`,
   clang-format 23.1.1. `post_edit.py` and CI's Standards workflow check those paths; they don't look at `port/`.
 - **Publish every commit through a PR.** Fetch `origin/main`, create a feature branch, and push that branch to
@@ -158,9 +159,9 @@ The no-upstream-posts and reference rules below still apply to every contributor
    scheduler) go to subagents in their own worktrees, one writer per set of files.
 4. **Verify** with the replay and oracle tests, and run the app and look at screenshots for anything visual.
 5. **Record**, in the same commit as the work: a [STATUS.md](docs/STATUS.md) entry after each session sync and each
-   finished task (a proposed PR gets no completed-sync entry), an [ADR](docs/adr/README.md) for each non-obvious choice, a row in
-   [game-changes.md](docs/game-changes.md) for every change outside `port/`, and lessons in `port/docs/lessons.md`
-   (created with the first one), never in `docs/matching.md` or the skills.
+   finished task (a proposed PR gets no completed-sync entry), an [ADR](docs/adr/README.md) for each non-obvious choice,
+   a row in [game-changes.md](docs/game-changes.md) for every change outside `port/`, and lessons in
+   `port/docs/lessons.md` (created with the first one), never in `docs/matching.md` or the skills.
 6. **Publish** a topic branch and PR as above; merge only after required validation and review.
 
 ## Changes outside port/ (PLAN.md §4.1, §4.8)
@@ -268,7 +269,8 @@ only when its exit criteria pass on macOS.
 ## Upstream doesn't know about the port
 
 The port accepts external contributions ([ADR 0017](docs/adr/0017-external-contributions.md)).
-The independent-upstream boundary of PLAN.md D10 and [ADR 0002](docs/adr/0002-solo-project-no-upstream-posts.md) remains.
+The independent-upstream boundary of PLAN.md D10 and [ADR 0002](docs/adr/0002-solo-project-no-upstream-posts.md)
+remains.
 
 - **Never post anything about the port on `fuddlesworth/pokebw2`**: no issues, comments, reactions, pull requests,
   discussions or proposals, and no mention of the port in decomp PRs or claims made from the decomp checkout. Read-only
@@ -286,7 +288,8 @@ The independent-upstream boundary of PLAN.md D10 and [ADR 0002](docs/adr/0002-so
 - **Upstream's own commit messages can reference issues** (`OWNER/REPO#N`, or an issue, pull request or discussion
   URL), and pushing such a commit can record a "referenced" event, naming this repository, on that issue. So the sync
   stops before pushing commits whose messages reference issues, whatever the repository's visibility (a private
-  repository's references still show, without their details): `sync_upstream.sh` exits 5 and the Action fails with a reference error. Stop and ask the user; only the user decides to run `--allow-references`
+  repository's references still show, without their details): `sync_upstream.sh` exits 5 and the Action fails with a
+  reference error. Stop and ask the user; only the user decides to run `--allow-references`
   ([SYNC.md](docs/SYNC.md#conflicts-and-stopped-syncs)).
 - **The root `CLAUDE.md`'s overlay rules and the decomp skills never run in this clone.** Its "Claim an overlay" and
   "Record overlay progress" rules and the `decomp-file`, `finish-file` and `match-function` skills post claims and
