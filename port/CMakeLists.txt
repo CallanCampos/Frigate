@@ -415,6 +415,9 @@ target_link_libraries(${PORT_PROGRAM} PRIVATE SDL3::SDL3 ${PORT_LIBM})
 #           optimized build only (port/cmake/frame_times.cmake), and the timing gates (PORT_G3D_TIMING_GATE,
 #           PORT_GFX_TIMING_GATE)
 #   static  the game's C read, not run: the pointer cast guard and its own test (port/cmake/game.cmake)
+#   station the save lab's stations (port/tools/lab/stations.py, ADR 0032): saves minted from the oracle's saves and
+#           held to melonDS (port/cmake/oracle.cmake). They also carry route and oracle; ctest -L station runs them, on
+#           demand
 function(port_test_labels test)
     set_property(TEST ${test} APPEND PROPERTY LABELS ${ARGN})
 endfunction()

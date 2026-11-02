@@ -32,11 +32,123 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-11-02: stations held to melonDS: Floccesy Ranch's gate in both games, ADR 0032 proposed (save lab L2)
+
+- **Upstream:** `41f42ca1af`, as reviewed main `2d3b99c9ee` (PR 77's merge) has it; this change merges no upstream
+  commit.
+- **Port:** `PORT_SHA`, on the topic branch `port-save-lab-stations` from `e936696a97` (PR 71's merge): `7c06f6bdc8`
+  (the work), `016f0aee48` (the merge of `main` at `c6fcdd3f59`, PR 75: the documents check and PR 74's follow-ups,
+  in `port/` and two of Frigate's own files under `.github/`, nothing a station runs), `e293cd1fc0` (this record's
+  update after it), `ed1333301b` (the merge of `main` at `2d3b99c9ee`, PR 77: Youngster Terrell's battle to its cut,
+  a sequence and its documents, nothing a station runs; with it, this entry's and ADR 0032's sentences on the story's
+  coverage say what `main` does) and this record's update after that. Each merge keeps the new STATUS.md entries,
+  this one first. This entry fills the save lab's (L1's) `PORT_SHA` with `a9d91adf59`, the documents' (PR 75's) with
+  `7d87f98b8c`, as the Terrell entry does too, and the Terrell entry's with `a7d768e2ee`.
+- **ROM (T0):** `python3 configure.py && ninja` in the branch's fresh worktree, 14,039 steps at `-j4`: both SHA1s match
+  (Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`), no
+  compiler warning; again on the work's tree (2 steps, the checks) and on each merge with `main`, at `c6fcdd3f59` and
+  at `2d3b99c9ee` (2 steps each), the same SHA1s and no warning. This change adds no ROM input.
+- **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both games with the oracle (`build/port-oracle`,
+  `build/port-oracle-w2`, `-DPORT_BUILD_ORACLE=ON -DPORT_SANITIZE_RECOVER=OFF -DPORT_FRAME_TIME_REPORT_ONLY=OFF`,
+  Apple clang, ninja at `-j4`) pass with no warning in a file under `port/`: each log's 748 warning lines are the
+  decomp's own C in `src/` and `lib/`, as on main, five of them `pm.c`'s `.ltdmain` pragmas compiled through
+  `port/hal/pm/pm_host.c`. After each merge both build again with no warning (nothing they compile changed).
+- **Tests:**
+  - T2/T6: `ctest -LE 'route|oracle'` (`CTEST_PARALLEL_LEVEL=3`) passes in both games, 363 tests each: 359 pass,
+    `lab_stations`, `lab_savelab`, `oracle_compare` and `game_ptrcasts` among them, and 4 skip, the setups this
+    machine lacks as PR 71 recorded (`asm_oracle` without Unicorn, the two VM dispatch negatives,
+    `app_universal_slices`).
+  - T3: `ctest -L route -LE 'oracle|timing'` passes in both games: Black 2 17 of 17 (the replays, the oracle's hashes
+    checks, the smoke test; 253 s) and White 2 15 of 15 (145 s), none skipped.
+  - T4: `ctest -L station` in each build, its fixtures (`oracle_saves`, `oracle_floccesy_save`) taking the saves from
+    each build's cache, all four tests pass in both games:
+    - Black 2: `oracle_station_floccesy_ranch` (255 s): minted `72e7ab2a3fa0`, the DS's seed the input file's,
+      4,269 of 4,269 compared frames match (1,479 exact, 2,790 with 3D within the tolerance, 80 pixels beyond it at
+      most, port frame 2144), 9,468 random-state and 3,157 NNS G3D dumps, none apart; melonDS's save `e80f47e53299` and
+      Frigate's `53912fbe1b1a`, each at the gate, differing in 14 bytes, all declared. `_check` (33 s): Frigate's save
+      `53912fbe1b1a` again, held.
+    - White 2: `oracle_station_floccesy_ranch` (205 s): minted `d82663c39d7c`, the DS's seed the input file's, 4,261 of
+      4,261 compared frames match (1,481 exact, 2,780 with 3D within the tolerance, 54 pixels beyond it at most, port
+      frame 1884), 9,468 random-state and 3,157 NNS G3D dumps, none apart; melonDS's save `7b38d635ffcd` and Frigate's
+      `6b75309d5b4d`, each at the gate, differing in 14 bytes, all declared. `_check` (15 s): Frigate's save
+      `6b75309d5b4d` again, held.
+  - T4's control, `ctest -R '^oracle_floccesy_continue$'`, the same boot and save through `oracle.py`'s unchanged code:
+    passes in both games (Black 2 239 s, White 2 221 s), its fixtures taking the saves from the cache.
+  - `lab_stations`: 43 tests, among them `MutationTests`, whose 23 mutants of `stations.py` each fail their tests by an
+    assertion while `stations.py` as it is passes them; 10 runs in a row in the Black 2 build
+    (`ctest -R '^lab_stations$' --repeat until-fail:10`, 233 s), and 6 to 30 s a run at loads of 25 to 47, against its
+    300 s.
+  - The first runs with nothing declared, `oracle.py station floccesy_ranch --out`, one per game, from which each
+    declared difference was traced (the oracle README's "Stations" has each trace): Black 2's failed on port frames
+    2878, 3001, 3101 and 3112-3129, oracle frame 4920, NNS G3D's state at 3110-3124, 3447, 3454 and 3600 and GFL's
+    linear generator at 3432 and 3447, and nothing else; White 2's on 2878, 3001, 3101, 3112-3128, 3219-3240 every
+    third and 3402, oracle frames 1260 and 4852, the same state frames, and its saves' play time's seconds and CRCs,
+    which that run declared nothing for.
+  - The saves: PR 71 had no White 2 save, so it minted and booted Black 2 only. The six saves of each version's chain,
+    made on melonDS on this machine by earlier runs (Black 2's by the save lab's prototype, White 2's by phase 4's
+    builds), each with the SHA-1 `SAVES` pins, were copied into each build's cache and checked by their SHA-1s again;
+    `oracle.py save first_save starter_save center_save route19_save catch_save floccesy_save --save-cache` took all six
+    from the cache by their pins in both games, as the station tests' fixtures then did. None is committed.
+  - After the merge of `main` at `c6fcdd3f59`: T2/T6 again in both games, 359 of 363 passing and the same 4 skipping;
+    T3 again, Black 2 17 of 17 (275 s) and White 2 15 of 15 (298 s); the cast guard's line the same. After the merge
+    at `2d3b99c9ee`: T2/T6 359 of 363 in both games and the same 4 skips, T3 Black 2 17 of 17 (183 s) and White 2
+    15 of 15 (168 s), the cast guard's line the same. T4 and its control not again: the first merge brings documents,
+    the documents check and its tests, `port-ci.yml` and the progress and research tools, the second the terrell
+    sequence (its `SEQUENCES` entry, two causes, its input files and registration, `test_compare.py`'s tests of it) and
+    documents, none of which a station runs. The documents check, `python3 port/tools/check_docs.py`, on the final
+    tree: 99 documents, 1 problem, allowed (`port/docs/research/platinum-port.md:25`, a record), 0 allowlist rows to
+    fix.
+  - T5 and T7 not run: no game, platform or app code changed.
+- **Tiers/trap stubs:** not measured: no game or host code changed.
+- **64-bit warnings:** the pointer cast guard passes in both games (`game_ptrcasts`), and `check_ptrcasts.py
+  --build-dir build/port-oracle --report` gives 365 sites in 229 keys (real 66, harmless 123, handled 141, unreachable
+  35), 1,713 files, 0 not compiled: PR 71's line.
+- **Work done:** L2 of the save lab, the stations, as the save lab's design of 2026-11-01 plans them, with ADR 0032:
+  - **[port/tools/lab/stations.py](../tools/lab/stations.py)**: `Station` and `STATIONS`, each station a recipe minted
+    from one of the oracle's saves, an input file per version and its spec (an `oracle.Sequence` for the comparison,
+    the facts its base and its resulting saves must show, the bytes the two resulting saves may differ in), and the
+    checks of its five levels' saves: `mint` (levels 1 and 2: the base the version's save, its recorded facts, the
+    minted save's structure and pinned SHA-1, the recipe read back and every other fact the base's),
+    `result_failures` (level 5 on one program's resulting save) and `compare_results` (level 5 between the programs:
+    the facts alike whatever the bytes declare, then the bytes, the mystery gift blocks decrypted).
+  - **[port/tools/oracle/oracle.py](../tools/oracle/oracle.py)**, additions only: `station NAME`, the five levels, and
+    `station-check NAME`, Frigate alone on the minted save with levels 1, 2 and 5; `load_stations()`, which only those
+    two call, so that no sequence, save or round trip depends on the lab; their parsers, dispatch and docstring lines.
+  - **The first station, `floccesy_ranch`**, in both games: the Route 20 save minted to Floccesy Ranch's gate
+    (`port/tests/stations/floccesy_ranch.recipe`), continued from power-on with floccesy_continue's presses to CONTINUE,
+    the ranch held to port frame 4,290, then the field menu's SAVE (`floccesy_ranch_<version>.pbwinput`). A state play
+    can't make (Terrell's battle not fought): never story evidence. Minted `72e7ab2a3fa0` (Black 2) and `d82663c39d7c`
+    (White 2), 38 bytes each. Its declared differences are the title's and CONTINUE's, at the frames floccesy_continue
+    declares for the same presses (`TORN_HIDE`, `TORN_BACK`, `TORN_START`, `CAMERA`, `MID_PASS`, and White 2's `CRY`,
+    `CURSOR` and `TORN_OPENING`), each traced again in its own runs, but port frame 3432, narrowed to GFL's random
+    state; and its saves' play time's seconds and the CRCs over them (`FLOCCESY_SAVE_BYTES`) in both games.
+  - **Tests:** `lab_stations` ([port/tests/lab/test_stations.py](../tests/lab/test_stations.py),
+    [port/cmake/lab.cmake](../cmake/lab.cmake)), no ROM and no label, so CI runs it on every host;
+    `oracle_station_floccesy_ranch` and `oracle_station_floccesy_ranch_check`
+    ([port/cmake/oracle.cmake](../cmake/oracle.cmake)), labels `route`, `oracle` and the new `station`, on demand.
+  - **[ADR 0032](adr/0032-stations-saves-minted-from-oracle-saves-held-to-melonds.md)**, proposed: stations as a
+    breadth spine beside the story's routes, never story evidence, placed only by the game's own continue at a spawn,
+    held at five levels, run on demand; the design's decisions D1–D7 written as defaults for the owner to confirm, with
+    the sweep's tier and every other periodic run on demand, never scheduled. Its index row, the numbering line (0031
+    and 0032 written, 0020 still reserved for D6, the next free number 0033) and its row in the documents index.
+  - **Documents:** the oracle README's "Stations" section, the lab's guide (with its sentence on what the start menu
+    shows corrected: while the continue flag is set it names `nextSpawn`'s zone, `src/ov162/startmenu.c:1117-1127`),
+    the tools, tests and CMake guides, ARCHITECTURE.md's "Stations" row and the save lab's and the field's rows, the
+    glossary, MODDING.md and the directory map.
+- **Next:** L3, the map sweep, port-alone and on demand, with the fast boot measured in both versions. A follow-up for
+  the next change to `savelab.py`: its docstring and a comment (`savelab.py:44`, `:519`) still say that `SaveLocation`
+  is what the start menu shows; while the continue flag is set, the start menu names `nextSpawn`'s zone. The story's
+  next leg as the Terrell entry says (T-a, then `terrell_save` and its round trip, and Lass Isabel's battle); its
+  follow-up on port frame 3432 finds this station's runs, from the same save and presses, showing NNS G3D's state equal
+  there in both games too.
+- **Blockers:** ADR 0032's defaults wait on the owner, and so does ADR 0022, which every input file's `seed` line rests
+  on, proposed.
+
 ## 2026-11-02: Youngster Terrell's battle held to melonDS up to his AI's first moved decision
 
 - **Upstream:** `41f42ca1af`, unchanged: reviewed main `c6fcdd3f59` (PR 75's merge) has it, and this change merges no
   upstream commit.
-- **Port:** `PORT_SHA`, on the topic branch `port-terrell-cut`, cut from `36101609ad` (PR 70's merge) and moved on by
+- **Port:** `a7d768e2ee`, on the topic branch `port-terrell-cut`, cut from `36101609ad` (PR 70's merge) and moved on by
   fast-forward, before its first commit, to `c0a7941e4e` (PR 72's merge, which brought PR 73) and then `e936696a97`
   (PR 71's merge, PR 74's `d1717b68d8` before it): `d6ef61348a` (the sequence, its test, the documents and this
   entry), `d577f8f95c` (the review's fixes) and the merge of `main` at `c6fcdd3f59` (PR 75: the documents' follow-ups

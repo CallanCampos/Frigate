@@ -26,7 +26,7 @@ at build time, pinned to a release, and never committed.
 | `display3d.c`, `display3d.h` | which screens show 3D in a frame, from the display registers; plain C11 |
 | `digest.c`, `digest.h` | the per-game-frame digest's canonical encoding, hash and stream format ([Digests](#digests)); plain C11, which only its tests compile so far |
 | `pbwinput.c`, `pbwinput.h` | the input file reader and writer and the game-frame clock, plain C11, which the port can compile as it is |
-| `oracle.py` | runs the oracle and the port with the repository's defaults; makes the saves the tests start from on the oracle, each from the save before it ([Saves](#saves)); the comparison sequences, the field menu's and its apps' among them, and the sound's comparison; the ctest check |
+| `oracle.py` | runs the oracle and the port with the repository's defaults; makes the saves the tests start from on the oracle, each from the save before it ([Saves](#saves)); the comparison sequences, the field menu's and its apps' among them, and the sound's comparison; the save lab's stations, minted from those saves and held to melonDS (`station`, `station-check`, [Stations](#stations)); the ctest check |
 | `compare.py` | compares two runs: screens, memory, alignment |
 | `saveimage.py` | verifies both main save copies' 73 block CRCs, the padded CRC table and its footer before any clock/CRC exceptions; native block extents come from the examined DS image |
 | `sound.py` | compares two runs' sound: the sound driver's state run by run, what the ARM9 sees of it frame by frame, and the sound by segment ([Sound](#sound)) |
@@ -77,6 +77,8 @@ oracle.py sequence continue --port build/port/frigate-black2 --out build/oracle-
 oracle.py seeds first_save
 oracle.py sound opening --port build/port/frigate-black2 --out build/oracle-runs/sound
 oracle.py sound-check title --port build/port/frigate-black2
+oracle.py station floccesy_ranch --port build/port/frigate-black2 --save-cache build/port/oracle-saves
+oracle.py station-check floccesy_ranch --port build/port/frigate-black2 --save-cache build/port/oracle-saves
 ```
 
 `oracle.py run` calls `pbw-oracle` with the version's ROM (`orig/baserom_b2_us.nds`), its symbols (`config/b2_us/arm9`),
@@ -95,7 +97,9 @@ its `--save-out` is the blank chip (524,288 bytes of 0xff) when the game neither
 left by an earlier run. `oracle.py save NAME` makes one of the saves the sequences start from on the oracle, and
 `oracle.py port-save` boots the port's own save on it ([below](#saves)). `oracle.py seeds NAME` prints the random seeds
 the DS builds playing a sequence's or a save's input file, as the file's `seed` lines ([below](#random-seeds)).
-`pbw-oracle --help` and the scripts' `-h` list every option.
+`oracle.py station NAME` mints one of the save lab's stations from the oracle's save its recipe names, has both
+programs continue it and holds Frigate to melonDS on it, and `station-check` runs Frigate alone on it
+([below](#stations)). `pbw-oracle --help` and the scripts' `-h` list every option.
 
 `pbw-oracle`'s options, which `oracle.py run` fills in:
 
@@ -1196,6 +1200,159 @@ field's process table in the sync of 2026-10-22; the port then stopped itself af
 ran out, until [ADR 0021](../../docs/adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md) gave the root
 heaps in the game's own memory host memory, and it crashed three frames later until upstream typed
 `Field.colorPostFX` for the host (`b62c655bfa`, merged into Frigate by PR 16).
+
+## Stations
+
+A station is a save the save lab mints from one of the oracle's saves ([../lab/README.md](../lab/README.md#stations)),
+which both programs continue from power-on, and which the oracle holds Frigate to as it holds a comparison sequence
+([ADR 0032](../../docs/adr/0032-stations-saves-minted-from-oracle-saves-held-to-melonds.md), proposed). It gives
+coverage of a place the story's routes haven't reached, held frame by frame to melonDS, without the hours of presses
+that would take the story there. It isn't a story route: its state may be one play can't make (the ranch's gate below
+has the Route 20 save's story, Terrell's battle not fought), so a station is never evidence that the story reaches its
+place; that stays the routes' ([Floccesy and Route 20](#floccesy-and-route-20)).
+
+Its files: its spec in [../lab/stations.py](../lab/stations.py)'s `STATIONS`, its recipe
+`port/tests/stations/<name>.recipe` (a `base` among `SAVES` and the verbs that mint it) and an input file per version,
+`port/tests/stations/<name>_<version>.pbwinput`. Each level gates the next:
+
+| Level | What holds | Held by |
+| --- | --- | --- |
+| 1 | The minted save's structure (`saveimage.validate_image` against its base) and its SHA-1, pinned for the version; the base is the version's save, its SHA-1 the one `SAVES` pins and its facts the ones this README records for it | `station`, `station-check`, `lab_stations` (on synthetic saves) |
+| 2 | The recipe read back from the minted save (`savelab.read`): the place and the spawn CONTINUE takes, the continue flag set and its work value 0, each line's value, and every other fact the base's | `station`, `station-check`, `lab_stations` |
+| 3 | melonDS boots the minted save from power-on to the recipe's place: the start menu names it, CONTINUE goes there, and the game writes the save when the station SAVEs | `station` |
+| 4 | Frigate held to melonDS frame by frame as a sequence is, its screens and its game state on the count, up to the last frame before the field menu's first press, every difference declared with its traced cause | `station` |
+| 5 | Each program's resulting save read back as facts (the place the game saved, the continue flag cleared, `nextSpawn` as minted, the party, money, badges, flags and work values the minted save's), and the two compared: their facts alike, and their bytes as a round trip compares them, the mystery gift blocks decrypted, only the declared bytes apart | `station` (both programs), `station-check` (Frigate's), `lab_stations` |
+
+A station whose input doesn't SAVE has no automated proof that CONTINUE reached its place (both programs could show the
+same message about a damaged save and compare equal), so the committed ones SAVE, and level 5 holds the place the game
+itself saved. The rules, in short
+([ADR 0032](../../docs/adr/0032-stations-saves-minted-from-oracle-saves-held-to-melonds.md)): a station's base is a
+save the oracle made, never Frigate's; its minted SHA-1 is pinned for each version, so a change
+to the minter or the recipe shows in review; placement is the game's own continue at a spawn and nothing else; its
+known differences are declared only with a traced cause, as a sequence's are; ADR 0023's cut applies inside it; and
+it is never story evidence.
+
+| Check | Input and scope |
+| --- | --- |
+| `oracle_station_floccesy_ranch` / `station floccesy_ranch` | `floccesy_ranch_<version>.pbwinput` on the minted Route 20 save: every port frame through 4,290 against melonDS, with screens, NNS G3D and GFL's random state, then SAVE on both programs and both resulting saves held at level 5; the oracle runs 9,000 frames, Frigate 6,200 |
+| `oracle_station_floccesy_ranch_check` / `station-check floccesy_ranch` | The same input on Frigate alone, from the oracle's Route 20 save in the cache: levels 1, 2 and 5 on its own resulting save; no frame compared |
+| `lab_stations` | No ROM: every station's files and spec, and the checks of levels 1, 2 and 5 on synthetic saves, with a table of deliberate bugs each check must catch; `oracle.py station` and `station-check` with stand-ins for both programs |
+
+The two station tests carry the labels `route`, `oracle` and `station` and take their base from the fixture
+`oracle_floccesy_save`; `ctest -L station` runs them, on demand, never on a schedule. `station` skips (77) without the
+oracle or the ROM, and `station-check` without the ROM or the oracle's base save in the cache; `--verify-pr`'s fresh
+builds have no oracle, so no oracle saves either, and both skip there.
+
+### Floccesy Ranch's gate (`floccesy_ranch`)
+
+The Route 20 save ([above](#floccesy-and-route-20)) minted to Floccesy Ranch's gate: `base floccesy_save` and
+`place ZONE_FLOCCESY_RANCH_2 warp 0` (`port/tests/stations/floccesy_ranch.recipe`). Warp 0 of
+`res/field/events/floccesy_ranch_2.json`, the zone's only warp, is the gate from `ZONE_FLOCCESY_RANCH`, at grid
+(728, 32, 872), facing up; the ranch has 17 NPCs and 6 triggers on `EVENT_WORK_0x40a7`, none at the gate (the nearest
+at (41, 45-46)), and its init scripts (`res/field/scripts/floccesy_ranch_2.s`, `Script_1` and `Script_2`) only halt or
+position actors. The input file plays floccesy_continue's presses to CONTINUE (START at game frames 1,100, 3,000 and
+3,100, A at 3,400), the ranch's field from its first frame to port frame 4,290, then the field menu's SAVE as
+floccesy_save presses it (X at 4,300, DOWN at 4,360, 4,390 and 4,420, A at 4,450, and A on YES at 4,730); the port runs
+6,200 frames, the oracle 9,000. The start menu names Floccesy Ranch (`nextSpawn`'s zone), CONTINUE opens the ranch's
+field at the gate, the player facing up, and both programs save there. The state is one play can't make: Terrell's
+battle on Route 20 isn't fought.
+
+Results, Black 2:
+
+| What | Black 2 |
+| --- | --- |
+| The base | `floccesy_save` `07d26e593786`: `ZONE_ROUTE_20` at `(130, 661)`, height 2, facing right, walking; its last arrival Route 19's warp 0; works `0x40a3` and `0x40a5` at 2 (this README's record above) and `0x4030` 1, `0x4043` 255, `0x40a0` 1, `0x40a1` 8, `0x40a4` 1, `0x40e0` 1, `0x4165` 1; 201 flags set; 3,500 money, 0 badges, 0:21:18; Tepig at level 6 (23/23 HP, 229 experience) and Purrloin at 4 (17/17, 64), their checksums valid |
+| The mint | `72e7ab2a3fa0`, 38 bytes changed, 19 in each copy: `nextSpawn.zoneId` (`0x1953c`-`0x1953d`), `SaveLocation`'s zone, position and rotation (`0x19580`, `0x19586`, `0x19588`, `0x1958e`-`0x1958f`, `0x19599`), the player block's footer CRC (`0x195aa`-`0x195ab`), the flag byte of `EVENT_FLAG_CONTINUE_SCRIPT` (`0x2038a`), the event work block's footer CRC (`0x203e2`-`0x203e3`), their two table entries (`0x25f38`-`0x25f39`, `0x25f5a`-`0x25f5b`) and the table's CRC (`0x25fa2`-`0x25fa3`) |
+| Read back | `ZONE_FLOCCESY_RANCH_2` at `(45, 54)`, height 2, facing `WARP_DIR_UP`; `next_spawn` a warp spawn of the ranch, warp 0; `now_spawn` the base's; 202 flags set, the continue flag added; every other fact the base's |
+| Frames | 4,269 of 4,269 compared port frames match from power-on to 4,290, before X (1,479 exact, 2,790 with 3D within the tolerance; of the 2,802 screens with 3D compared by their pictures, 13 pixels beyond the pixel tolerance at the median and 80 at most, on the title, port frame 2144): the start menu with the saved game ("Floccesy Ranch", Pokédex 3, time 0:21), CONTINUE, the season's banner ("Summer", counts 3459-3602) and the ranch's field at the gate from its first frame (count 3603), the player facing up |
+| State | GFL's random state (its three parts) at 3,156 port frames and NNS G3D's at 3,157, from 1,116 to 4,290 but the declared: 9,468 and 3,157 dumps, none apart |
+| Declared | The title's and CONTINUE's, at the frames floccesy_continue declares for the same presses, each traced again in this run (below), but port frame 3432, where only GFL's random state is the DS pass's work in progress, so only it is left out there (`known_random`), as the terrell sequence leaves it out from the same save and presses |
+| The DS's seed | `0x5a0af77416c50a14`, GFL's at start-up, read at oracle frame 20: the input file's |
+| Resulting saves | melonDS `e80f47e53299`, Frigate `53912fbe1b1a`, against the minted `72e7ab2a3fa0`: the game wrote both. Each passes `saveimage.validate_image` against the minted save, 73 CRCs in both copies, and reads `ZONE_FLOCCESY_RANCH_2` at `(45, 54)`, height 2, facing `WARP_DIR_UP`; `now_spawn` the game's own arrival through warp 0 (`ZONE_SPAWN_CHANGE_TYPE_WARP`, the ranch, warp 0, `WARP_DIR_UP`, `pos_weight_bits` 0, tile `(45, 54)`, height 2); `next_spawn` the minted save's, which the game never clears; the continue flag clear, 201 flags set (the minted save's but the continue flag), every work value the minted save's; Tepig 6 and Purrloin 4 as minted; money 3,500; 0 badges |
+| Their differences | 0:21:42 on melonDS and 0:21:40 on Frigate: the play time's seconds (`0x19427`) and the CRCs over them (`0x194b2`-`0x194b3`, `0x25f36`-`0x25f37`, `0x25fa2`-`0x25fa3`), in both copies, 14 bytes in 8 spans as written and decrypted alike, all `FLOCCESY_SAVE_BYTES`; the mystery gift blocks decrypt and agree; 0 bytes undeclared |
+| What SAVE rewrote | 1,008 bytes a copy, on both programs alike, from the minted save: the play time's seconds (block 0x1b); `nowSpawn` and `SaveLocation`'s height (block 0x1c, 7 bytes at `0x19504`-`0x1951b` and `0x19588`, `0x20000` to `0x2001f`: the game stands the player on the ground); the continue flag's byte (block 0x2d); the records (block 0x26, 471 bytes, which `src/system/trainer_card_savedata.c` encrypts with a key from the seed it keeps, so alike on both); the field actors (block 0x29, 499 bytes, now the ranch's); each written block's footer count and CRC, their CRC table entries, and the save footer's count (`0x25f94`) and CRC |
+| Cost | At a load of about 25: melonDS 425 s, Frigate 149 s (a PNG every frame), the comparison and the saves' checks 140 s; 12 minutes, its run directory 422 MB |
+
+Black 2's declared differences, each traced in this station's first run, which declared nothing
+([Known differences](#known-differences-from-the-hardware) has each mechanism):
+
+- Port frame 2878 (count 2877), `TORN_HIDE`: the DS's frame at that count, oracle 4696, is the port's frame before
+  (2877) above line 81 and port frame 2878's picture from line 81 down, on both screens (the top screen's 3D apart);
+  the DS's next frame, 4697, is port frame 2878's picture on both.
+- Port frame 3001 (count 3000), `TORN_BACK`: oracle 4819 is the port's frame before above line 89 and port frame
+  3001's picture from line 89 down.
+- Port frame 3101 and oracle frame 4920 (count 3100), `TORN_START`: the DS's pass at START takes two frames, 4919 and
+  4920. Its first, which the count pairs with port frame 3101's white, is still the title (the port's frame before);
+  its second is the title above line 163 and white below, on both screens, a picture no port frame shows; 4921, at
+  count 3101, is white as port frame 3101 is.
+- Port frames 3112-3129 (counts 3111-3128) and the state at 3110-3124, `CAMERA`: the bottom screen's 3D (Kyurem)
+  differs beyond the tolerance while the top screen is exact, and NNS G3D's state differs at 3110-3124 while GFL's
+  random state is equal there: the DS's `NNS_G3dGlb` at each count from 3109 to 3123 is the port's at the next count.
+- Port frame 3432 (count 3431), `MID_PASS`, GFL's random state only: oracle frames 5386-5424 (39 frames); the port's
+  linear generator's state is the DS's at 5417-5424, and NNS G3D's and the twister are the port's at all 39.
+- Port frame 3447 (count 3446), `MID_PASS`: oracle frames 5491-5499 (9 frames); the port's NNS G3D at 5498-5499, its
+  linear generator's state at 5496-5499.
+- Port frames 3454 (count 3453) and 3600 (count 3599), `MID_PASS`: oracle frames 5506-5507 and 5653-5654 (2 frames
+  each); the port's NNS G3D at 5507 and at 5654.
+- The two resulting saves' bytes, `FLOCCESY_SAVE_BYTES`: the play time's seconds, `TrainerDataSave.playTime` (block
+  0x1b +0x27), 42 on melonDS and 40 on Frigate (`PLAY_TIME`: each counts with its own clock's ticks), and the CRCs over
+  them recomputed, in both copies.
+
+Results, White 2. PR 71 had no White 2 save; White 2's six saves of the chain, made on melonDS by earlier runs on the
+same machine, each with the SHA-1 `SAVES` pins, were taken from the build's cache by their pins (`oracle.py save`):
+
+| What | White 2 |
+| --- | --- |
+| The base | `floccesy_save` `26ef0ed2e6ca`: `ZONE_ROUTE_20` at `(130, 661)`, height 2, facing right, walking; its last arrival Route 19's warp 0; works `0x40a3` and `0x40a5` at 2 (this README's record above) and `0x4030` 1, `0x4043` 255, `0x40a0` 1, `0x40a1` 8, `0x40a4` 1, `0x40e0` 1, `0x4165` 1; 201 flags set; 3,500 money, 0 badges, 0:21:21; Tepig at level 6 (24/24 HP, 229 experience) and Purrloin at 4 (17/17, 64), their checksums valid |
+| The mint | `d82663c39d7c`, 38 bytes changed, 19 in each copy, at Black 2's offsets |
+| Read back | As Black 2's: `ZONE_FLOCCESY_RANCH_2` at `(45, 54)`, height 2, facing `WARP_DIR_UP`; `next_spawn` a warp spawn of the ranch, warp 0; `now_spawn` the base's; 202 flags set, the continue flag added; every other fact the base's |
+| Frames | 4,261 of 4,261 compared port frames match from power-on to 4,290, before X (1,481 exact, 2,780 with 3D within the tolerance; of the 2,791 screens with 3D compared by their pictures, 7 pixels beyond the pixel tolerance at the median and 54 at most, port frame 1884), with floccesy_continue's lags (`1109=0,3241=-1,3403=0`): the start menu with the saved game ("Floccesy Ranch", Pokédex 4, time 0:21), CONTINUE, the season's banner and the ranch's field at the gate, the player facing up |
+| State | As Black 2's: GFL's random state at 3,156 port frames and NNS G3D's at 3,157, from 1,116 to 4,290 but the declared: 9,468 and 3,157 dumps, none apart |
+| Declared | The title's and CONTINUE's, at the frames floccesy_continue declares for White 2's same presses, each traced again in this run (below), and, as in Black 2, GFL's random state alone at port frame 3432 |
+| The DS's seed | `0x270fd5258c56ebe3`, GFL's at start-up, read at oracle frame 20: the input file's |
+| Resulting saves | melonDS `7b38d635ffcd`, Frigate `6b75309d5b4d`, against the minted `d82663c39d7c`: the game wrote both. Each passes `saveimage.validate_image` against the minted save and reads as Black 2's do: `ZONE_FLOCCESY_RANCH_2` at `(45, 54)`, height 2, facing `WARP_DIR_UP`; `now_spawn` the game's own arrival through warp 0; `next_spawn` the minted save's; the continue flag clear, 201 flags set, every work value the minted save's; Tepig 6 (24/24) and Purrloin 4 as minted; money 3,500; 0 badges |
+| Their differences | 0:21:45 on melonDS and 0:21:43 on Frigate, the same minute: the play time's seconds and the CRCs over them, at Black 2's offsets, 14 bytes in 8 spans as written and decrypted alike, all `FLOCCESY_SAVE_BYTES`; the mystery gift blocks decrypt and agree; 0 bytes undeclared |
+| What SAVE rewrote | 1,012 bytes a copy, on both programs alike, the same fields as Black 2's: the play time's seconds, `nowSpawn` and `SaveLocation`'s height (8 bytes), the continue flag's byte, the records (472 bytes), the field actors (502 bytes), and the footers, CRC table entries and the save footer's count and CRC |
+| Cost | At a load of about 30: melonDS 204 s, Frigate 146 s, the comparison and the saves' checks 146 s; 8 minutes, its run directory 405 MB |
+
+White 2's declared differences, each traced in this station's first run, which declared nothing:
+
+- Port frame 2878 (count 2877), `TORN_HIDE`: oracle 4628 is the port's frame before above line 102 and port frame
+  2878's picture from line 102 down, on both screens; 4629 is port frame 2878's picture on both.
+- Port frame 3001 (count 3000), `TORN_BACK`: oracle 4751 is the port's frame before above line 66 and port frame
+  3001's picture from line 66 down, on both screens.
+- Port frame 3101 and oracle frame 4852 (count 3100), `TORN_START`: the DS's pass at START takes 4851 and 4852; 4851
+  is still the title, and 4852 is the title above line 171 and white below, on both screens, a picture no port frame
+  shows.
+- Port frames 3112-3128 (counts 3111-3127) and the state at 3110-3124, `CAMERA`: as in Black 2, the bottom screen's 3D
+  beyond the tolerance, the top screen exact, and the DS's `NNS_G3dGlb` at each count from 3109 to 3123 the port's at
+  the next count, GFL's random state equal there.
+- Port frames 3219-3240, every third (counts 3218 to 3239), `CRY`: the port's frame is the fade's next step, a step
+  darker than the DS's at the same count (the top screen's mean level 179.1 against 205.9 at port frame 3219, 152.6
+  against 179.1 at 3222, 0 against 23.1 at 3240), the DS's frame at that count being at the level of the port's frame
+  before, and the DS's at the next count at the port's level, step for step.
+- Port frame 3402 (count 3401, paired with the DS's count 3402 by the lag of -1), `CURSOR`: the bottom screen is
+  exact; the port's pictures are the ones the DS shows at counts 3296, 3338 and 3360 of the cursor's pulse, not at
+  that count.
+- Oracle frame 1260 (count 632), `TORN_OPENING`: the third frame of the DS's pass at count 632, black above line 77
+  and the opening's first picture from line 77 down, between two blank frames and the whole picture; no port frame
+  shows it.
+- Port frames 3432, 3447, 3454 and 3600, `MID_PASS`, as in Black 2: oracle frames 5320-5358 (39 frames; GFL's linear
+  generator's state alone, the port's at 5351-5358), 5425-5433 (9; NNS G3D the port's at 5432-5433, the linear
+  generator at 5430-5433), 5440-5441 (2; NNS G3D at 5441) and 5587-5588 (2; NNS G3D at 5588).
+- The two resulting saves' bytes, `FLOCCESY_SAVE_BYTES`: the play time's seconds, 45 on melonDS and 43 on Frigate,
+  and the CRCs over them, in both copies. No minute turned between the two programs, so the minute's byte (`0x19426`,
+  `PLAY_TIME`) is the same on both and isn't declared.
+
+```sh
+python3 port/tools/oracle/oracle.py station floccesy_ranch --port build/port-oracle/frigate-black2 \
+    --version b2_us --save-cache build/port-oracle/oracle-saves
+python3 port/tools/oracle/oracle.py station-check floccesy_ranch --port build/port-oracle/frigate-black2 \
+    --version b2_us --save-cache build/port-oracle/oracle-saves
+```
+
+Use `--version w2_us` with the White 2 binary and its build's cache for the other game; `--out DIR` keeps the minted
+save, both runs, the difference images and both resulting saves, which are never committed.
 
 ## Sound
 

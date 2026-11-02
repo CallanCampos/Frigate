@@ -7,8 +7,9 @@
 # phase 5's story (Alder's scenes on Route 19 and in Floccesy Town and the road to Route 20, its save made and continued
 # by each program; Youngster Terrell's trainer battle on Route 20 up to his AI's first decision, which the DS's CPU time
 # moves) and a save; the saves made on the oracle from saves (the first save, the starter save with a Pokémon and the
-# Pokédex, and the routes'), which the sequences start from; and the sound of the opening and the title (the ARM7 sound
-# driver run by run; its output: a stream and a cry to the bit, the music by its envelope and levels).
+# Pokédex, and the routes'), which the sequences start from; the save lab's stations, saves minted from those
+# (Floccesy Ranch's gate), continued and saved by both programs; and the sound of the opening and the title (the ARM7
+# sound driver run by run; its output: a stream and a cry to the bit, the music by its envelope and levels).
 #
 # The input file reader (pbwinput.c, which the port can compile as it is), the per-screen 3D decision (display3d.c),
 # the per-game-frame digest's canonical encoding (digest.c, with xxHash's header, which every build fetches at
@@ -246,6 +247,39 @@ add_test(NAME oracle_round_trip_floccesy
 set_tests_properties(oracle_round_trip_floccesy PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 3600
     FIXTURES_REQUIRED oracle_floccesy_save)
 port_test_labels(oracle_round_trip_floccesy route oracle)
+
+# The save lab's stations (port/tools/lab/stations.py, ADR 0032): a save minted from one of the oracle's saves by a
+# recipe in the game's constant names (port/tests/stations/<name>.recipe), which both programs continue from power-on
+# with the station's input file (port/tests/stations/<name>_<version>.pbwinput). oracle_station_<name> holds the
+# station at its five levels (oracle.py station): the minted save's structure and its pinned SHA-1, the recipe read back
+# from it, melonDS booting it to the recipe's place, Frigate held to melonDS frame by frame as a sequence is up to the
+# field menu's first press, and each program's resulting save read back as facts and the two compared byte by byte as
+# a round trip compares them. oracle_station_<name>_check runs Frigate alone on the minted save (oracle.py
+# station-check), with the minted save's checks and its own resulting save read back, and compares no frames. Both need
+# the oracle's save the station is minted from, which its fixture makes into the cache, and skip (77) without it, the
+# oracle (the first) or the ROM. A station is never evidence that the story reaches its place. The label station runs
+# them, on demand (ctest -L station): no schedule runs them
+foreach(station IN ITEMS floccesy_ranch)
+    add_test(NAME oracle_station_${station}
+        COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+            "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" station ${station}
+                --oracle "${port_oracle_binary}" --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
+                --save-cache "${port_oracle_saves}"
+        WORKING_DIRECTORY "${REPO_ROOT}")
+    set_tests_properties(oracle_station_${station} PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 3600)
+    port_test_labels(oracle_station_${station} route oracle station)
+    add_test(NAME oracle_station_${station}_check
+        COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+            "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" station-check ${station}
+                --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
+                --save-cache "${port_oracle_saves}"
+        WORKING_DIRECTORY "${REPO_ROOT}")
+    set_tests_properties(oracle_station_${station}_check PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 1800)
+    port_test_labels(oracle_station_${station}_check route oracle station)
+endforeach()
+# floccesy_ranch starts from the Route 20 save, which oracle_floccesy_save makes
+set_tests_properties(oracle_station_floccesy_ranch oracle_station_floccesy_ranch_check
+    PROPERTIES FIXTURES_REQUIRED oracle_floccesy_save)
 
 # Phase 4's exit (T6): the port plays the catch save's input file from melonDS's Route 19 save and saves the game it
 # caught a wild Purrloin in; melonDS continues that save frame for frame as it continues its own, and the port
