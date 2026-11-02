@@ -1,29 +1,34 @@
 #!/usr/bin/env python3
-"""Tests of port/tools/strict_routes.py, the runner of the strict build's routes from the oracle's saves (T5,
-port/docs/sanitizers.md's "Phase 5's criterion"): Frigate's sanitized program alone on oracle.py's comparison sequences
-and on the port's legs of its round trips, each from the save it starts from, judged clean or not.
+"""Tests of port/tools/strict_routes.py, the runner of T5's set in a strict build (ADR 0033, port/docs/sanitizers.md):
+ctest's route tests that need no oracle, and Frigate's sanitized program alone on oracle.py's comparison sequences and
+on the port's legs of its round trips, each from the save it starts from, judged clean or not.
 
   - On oracle.py's real tables, the plan's invariants, with no counts and no names: every case resolves or is left out
     with why, no two share a start and an input file, a continue leg follows its make leg, every sequence without a
     reference is a case or merged into one, and every input file exists in both games.
   - On made-up tables: the sequences with a reference left to ctest and taken back by --all and --only, merges of an
     equal and of a shorter run but never across input files, a continue leg after a merged make leg, a save that a
-    version doesn't keep, and a sequence that may stop on a trap stub refused.
+    version doesn't keep, and a sequence that allows a trap stop planned as any other.
   - With a stand-in for the program (a script this test writes, run by this Python, which takes the program's options
     and does what its input file's "# standin:" lines say): the verdicts (a clean run; each of ctest's four report
-    markers at status 0; statuses 134, 73 and 70; a run a frame short; the frames line after a time prefix; a hang past
-    --timeout, killed; a crash by a signal), the saves (a missing one skips with the command that makes it, one changed
-    byte fails with both SHA-1s, a make leg's save reaches its continue leg, a make leg that saves nothing fails and
-    skips its continue leg), the build's checks (made-up CMake caches, Apple clang, a program without ASan), the
-    program's environment, the summary table and the directories' names. The markers are held to port/CMakeLists.txt's.
+    markers at status 0; statuses 134, 73 and 70, and a trap stop that the sequence allows; a run a frame short; the
+    frames line after a time prefix; a hang past --timeout, killed; a crash by a signal), the saves (a missing one skips
+    with the command that makes it, one changed byte fails with both SHA-1s, a make leg's save reaches its continue leg,
+    a make leg that saves nothing fails and skips its continue leg), the build's checks (made-up CMake caches, Apple
+    clang, a program without ASan, a program without the function check), the program's environment, the summary table
+    and the directories' names. The markers are held to port/CMakeLists.txt's.
+  - With a stand-in for ctest (another script, which lists the made-up build's route tests from its routes.txt and
+    writes ctest's JUnit file for them): ctest's half runs first with the criterion's options, its failures, skips and
+    a build without route tests count, and --only selects ctest's tests apart from the cases.
   - MUTANTS lists deliberate bugs in strict_routes.py, each with the tests that must catch it, and MutationTests applies
     each to the runner's source, loads the result in the runner's place and runs those tests, which must fail; the same
     tests pass on the runner as it is.
 
 What the runner prints is kept, never printed: a stand-in prints sanitizer report markers, and ctest fails a test of the
 sanitized build whose output has one (port/CMakeLists.txt), so the markers here are put together at run time. No ROM,
-no game, no oracle; standard library only. Game functionality: none runs here; the runner plays the routes from the
-oracle's saves (CONTINUE, the field menu's apps, Hugh's battle, Route 19, the catch, the PC, Floccesy to Route 20).
+no game, no oracle; standard library only. Game functionality: none runs here; the runner plays ctest's replays and the
+routes from the oracle's saves (CONTINUE, the field menu's apps, Hugh's battle, Route 19, the catch, the PC, Floccesy to
+Route 20).
 
     test_strict_routes.py [unittest options]
 """
@@ -55,6 +60,7 @@ Sequence = oracle.Sequence
 RoundTrip = oracle.RoundTrip
 POSIX = os.name != "nt"
 VERSIONS = ("b2_us", "w2_us")
+CRITERION = "detect_leaks=1:detect_stack_use_after_return=1"
 
 # The program's stand-in. Its report lines are put together at run time, so that no line of this file is one
 STANDIN = r'''
@@ -121,6 +127,62 @@ print(f"{prefix}port: stopped after {ran} frames", file=sys.stderr)
 sys.exit(int(said["status"][0]) if "status" in said else 0)
 '''
 
+# ctest's stand-in, with the same markers put together at run time
+STANDIN_CTEST = r'''
+"""A stand-in for ctest, for test_strict_routes.py: it reads the build's route tests from routes.txt in --test-dir, a
+line a test (its name, then what its run does: fail, skip, marker N); with -N it lists those -R selects, as ctest -N
+does, and else writes ctest's JUnit file for them (--output-junit) and its arguments and environment in ctest-env.txt
+beside routes.txt"""
+import os
+import re
+import sys
+from xml.sax.saxutils import escape, quoteattr
+
+MARKERS = ("==1==ERROR: " + "AddressSanitizer: heap-use-after-free on address 0x1",
+           "SUMMARY: " + "UndefinedBehaviorSanitizer: undefined-behavior x.c:1:1",
+           "x.c:1:1: runtime " + "error: load of misaligned address",
+           "==1==Leak" + "Sanitizer has encountered a fatal error")
+arguments = sys.argv[1:]
+
+
+def option(name):
+    return arguments[arguments.index(name) + 1]
+
+
+directory = option("--test-dir")
+with open(os.path.join(directory, "routes.txt")) as f:
+    tests = [line.split() for line in f if line.strip()]
+if "-R" in arguments:
+    tests = [test for test in tests if re.search(option("-R"), test[0])]
+if "-N" in arguments:
+    for number, test in enumerate(tests, 1):
+        print(f"  Test  #{number}: {test[0]}")
+    print(f"\nTotal Tests: {len(tests)}")
+    sys.exit(0)
+with open(os.path.join(directory, "ctest-env.txt"), "w") as f:
+    for name in ("ASAN_OPTIONS", "UBSAN_OPTIONS", "LSAN_OPTIONS"):
+        f.write(f"{name}={os.environ[name]}\n" if name in os.environ else f"{name} unset\n")
+    f.write("arguments " + " ".join(arguments) + "\n")
+cases = []
+failed = 0
+for name, *words in tests:
+    lines = [MARKERS[int(words[words.index("marker") + 1])]] if "marker" in words else []
+    lines.append("port: stopped after 40 frames")
+    inner, status = "", "run"
+    if "fail" in words or "marker" in words:
+        failed += 1
+        inner, status = '<failure message="Failed"/>', "fail"
+    elif "skip" in words:
+        inner, status = '<skipped message="SKIP_RETURN_CODE=77"/>', "notrun"
+    cases.append(f'<testcase name={quoteattr(name)} classname={quoteattr(name)} time="0.5" status="{status}">'
+                 f'{inner}<system-out>{escape(chr(10).join(lines))}</system-out></testcase>')
+with open(option("--output-junit"), "w") as f:
+    f.write(f'<?xml version="1.0" encoding="UTF-8"?>\n<testsuite tests="{len(tests)}" failures="{failed}">\n'
+            + "\n".join(cases) + "\n</testsuite>\n")
+print(f"{len(tests) - failed} of {len(tests)} tests passed")
+sys.exit(8 if failed else 0)
+'''
+
 
 def fail_expressions(text: str) -> list[str]:
     """The quoted arguments of port/CMakeLists.txt's FAIL_REGULAR_EXPRESSION property, up to the call's end"""
@@ -153,23 +215,12 @@ def names(plan) -> list[str]:
 class RealTableTests(unittest.TestCase):
     """oracle.py's own tables, as the runner plans them in each game"""
 
-    def plan(self, version: str, include_all: bool = False):
-        """The version's plan, or None where a sequence that may stop on a trap stub makes the runner refuse it, as it
-        must (such a sequence is refused, not a broken table)"""
-        try:
-            return strict_routes.plan_cases(version, include_all=include_all)
-        except strict_routes.Refusal:
-            self.assertTrue(any(sequence.stop_from > 0 for sequence in oracle.SEQUENCES.values()))
-            return None
-
     def test_the_plan_of_oracle_pys_tables(self):
         for version in VERSIONS:
             with self.subTest(version=version):
-                plan = self.plan(version)
-                every = self.plan(version, include_all=True)
+                plan = strict_routes.plan_cases(version)
+                every = strict_routes.plan_cases(version, include_all=True)
                 for each in (plan, every):
-                    if each is None:
-                        continue
                     cases = names(each)
                     for case, reason in each.left_out:
                         self.assertTrue(reason, f"{case.name} is left out without a reason")
@@ -187,7 +238,7 @@ class RealTableTests(unittest.TestCase):
                     for name in oracle.ROUND_TRIPS:
                         self.assertIn(f"trip:{name}:make", covered)
                         self.assertIn(f"trip:{name}:continue", covered)
-                for name in oracle.SEQUENCES if plan else ():
+                for name in oracle.SEQUENCES:
                     reference = os.path.join(oracle.REPO_ROOT,
                                              oracle.SEQUENCE_REFERENCE.format(name=name, version=version))
                     covered = set(names(plan)) | {other for case in plan.cases for other in case.also}
@@ -215,7 +266,7 @@ class RealTableTests(unittest.TestCase):
 
 class World(unittest.TestCase):
     """A made-up checkout, strict build, ROM, save cache and oracle.py tables in a temporary directory, and the runner
-    run on them in this process, with the stand-in as the program"""
+    run on them in this process, with the stand-ins as the program and as ctest"""
 
     def setUp(self):
         self.root = Path(tempfile.mkdtemp(prefix="strict-routes-"))
@@ -226,7 +277,7 @@ class World(unittest.TestCase):
         self.build = self.root / "build"
         self.build.mkdir()
         self.program = self.build / ("frigate-black2" + ("" if POSIX else ".exe"))
-        self.program.write_bytes(b"")
+        self.write_program()
         self.cache = self.root / "cache"
         self.cache.mkdir()
         self.work = self.root / "work"
@@ -234,6 +285,10 @@ class World(unittest.TestCase):
         self.rom.write_bytes(bytes(12) + b"IREO" + bytes(16))
         self.standin = self.root / "standin.py"
         self.standin.write_text(STANDIN, encoding="utf-8")
+        self.ctest = self.root / "ctest"
+        self.standin_ctest = self.root / "standin_ctest.py"
+        self.standin_ctest.write_text(STANDIN_CTEST, encoding="utf-8")
+        self.routes(["replay_clean"])
         self.compiler = "Homebrew clang version 23.1.3\nTarget: arm64-apple-darwin25.5.0\n"
         self.write_cache({})
         self.patch(oracle, "REPO_ROOT", str(self.checkout))
@@ -245,10 +300,22 @@ class World(unittest.TestCase):
         patcher.start()
         self.addCleanup(patcher.stop)
 
+    def write_program(self, function_check: bool = True) -> None:
+        """The program's file, naming the function check's handler as a program built with the check does among its
+        symbols, unless not function_check"""
+        handler = b"___ubsan_handle_" + strict_routes.FUNCTION_CHECK + b"_abort" if function_check else b"_main"
+        self.program.write_bytes(b"\0" + handler + b"\0")
+
+    def routes(self, lines: list[str]) -> None:
+        """The made-up build's ctest tests labelled route and not oracle, for the stand-in ctest: a line a test, its
+        name and what its run does"""
+        (self.build / "routes.txt").write_text("".join(f"{line}\n" for line in lines), encoding="utf-8")
+
     def write_cache(self, changes: dict[str, str | None]) -> None:
         """The build's CMakeCache.txt, a strict build of this checkout but for changes (None leaves an entry out)"""
         entries = {"CMAKE_HOME_DIRECTORY": ("INTERNAL", str(self.checkout / "port")),
                    "CMAKE_C_COMPILER": ("FILEPATH", str(self.root / "clang")),
+                   "CMAKE_CTEST_COMMAND": ("INTERNAL", str(self.ctest)),
                    "CMAKE_BUILD_TYPE": ("STRING", "RelWithDebInfo"),
                    "PORT_SANITIZE": ("BOOL", "ON"), "PORT_SANITIZE_RECOVER": ("BOOL", "OFF"),
                    "PORT_ROM_LANGUAGE": ("STRING", "us"), "PORT_VERSION": ("STRING", "b2_us")}
@@ -285,11 +352,16 @@ class World(unittest.TestCase):
         for name, version in references:
             (self.inputs / f"{name}_{version}.tsv").write_text("port\toracle\n", encoding="utf-8")
 
-    def run_runner(self, *arguments: str, launcher=None, environment=None, real_compiler=False) -> tuple[int, str]:
-        """strict_routes.py run on the made-up build, in this process: its status and what it printed"""
+    def run_runner(self, *arguments: str, program=None, environment=None, real_compiler=False) -> tuple[int, str]:
+        """strict_routes.py run on the made-up build, in this process: its status and what it printed. program gives
+        the command that starts the program (the stand-in by default); ctest is always its stand-in"""
         argv = ["run", "--build-dir", str(self.build), "--rom", str(self.rom), "--work", str(self.work),
                 "--save-cache", str(self.cache), "--summary", str(self.root / "summary.tsv"), *arguments]
-        standin = launcher or (lambda path: [sys.executable, str(self.standin)])
+        start = program or (lambda path: [sys.executable, str(self.standin)])
+
+        def launcher(path: str) -> list[str]:
+            return [sys.executable, str(self.standin_ctest)] if path == str(self.ctest) else start(path)
+
         printed = io.StringIO()
         with contextlib.ExitStack() as stack:
             if not real_compiler:
@@ -298,7 +370,7 @@ class World(unittest.TestCase):
             stack.enter_context(mock.patch.dict(os.environ, environment or {}))
             stack.enter_context(contextlib.redirect_stdout(printed))
             stack.enter_context(contextlib.redirect_stderr(printed))
-            status = strict_routes.main(argv, launcher=standin)
+            status = strict_routes.main(argv, launcher=launcher)
         return status, printed.getvalue()
 
     def summary(self) -> dict[str, dict[str, str]]:
@@ -375,12 +447,13 @@ class PlanTests(World):
         self.assertIn("second", reasons["seq:later"])
         self.assertIn("w2_us", reasons["seq:later"])
 
-    def test_a_sequence_that_may_stop_on_a_trap_is_refused(self):
+    def test_a_sequence_that_allows_a_trap_stop_is_a_case(self):
         self.made_up(stop_from=10)
         self.assertNotIn("seq:opening", names(strict_routes.plan_cases("b2_us")))
         for selection in ({"include_all": True}, {"only": ["opening"]}):
-            with self.subTest(**selection), self.assertRaises(strict_routes.Refusal):
-                strict_routes.plan_cases("b2_us", **selection)
+            with self.subTest(**selection):
+                cases = {case.name: case for case in strict_routes.plan_cases("b2_us", **selection).cases}
+                self.assertEqual(cases["seq:opening"].stop_from, 10)
 
     def test_only(self):
         self.made_up()
@@ -411,6 +484,17 @@ class VerdictTests(World):
         self.assertEqual(rows["seq:status_134"]["status"], "134")
         self.assertIn("39 of 40", rows["seq:short"]["reason"])
         self.assertEqual(rows["seq:prefix"]["reached"], "40")
+
+    def test_a_trap_stop_its_sequence_allows_fails(self):
+        allowed = {"stop_from": 10, "stop_trap": "func_ov099_0", "stop": "no C yet"}
+        self.use_tables({"gap": Sequence(40, 50, "", "", **allowed), "whole": Sequence(40, 50, "", "", **allowed)},
+                        {}, {}, said={"gap": ["status 70"]})
+        status, _ = self.run_runner()
+        self.assertEqual(status, 1)
+        rows = self.summary()
+        self.assertEqual((rows["seq:gap"]["verdict"], rows["seq:gap"]["status"]), ("failed", "70"))
+        self.assertIn("allows from frame 10", rows["seq:gap"]["reason"])
+        self.assertEqual(rows["seq:whole"]["verdict"], "clean")
 
     def test_a_hang_past_the_timeout_fails_and_is_killed(self):
         self.use_tables({"hang": Sequence(40, 50, "", "")}, {}, {}, said={"hang": ["hang"]})
@@ -513,7 +597,7 @@ class BuildTests(World):
         self.write_cache({})
         self.program.unlink()
         self.assertEqual(self.run_runner()[0], 2)
-        self.program.write_bytes(b"")
+        self.write_program()
         status, printed = self.run_runner()
         self.assertEqual(status, 0)
         self.assertIn("the criterion: yes", printed)
@@ -546,15 +630,96 @@ class BuildTests(World):
         self.assertEqual(self.run_runner(real_compiler=True)[0], 0)
 
     def test_a_program_without_asan_is_refused(self):
-        status, _ = self.run_runner(launcher=lambda path: [sys.executable, str(self.standin), "--standin-no-asan"])
+        status, _ = self.run_runner(program=lambda path: [sys.executable, str(self.standin), "--standin-no-asan"])
         self.assertEqual(status, 2)
         self.assertFalse(self.work.exists(), "a case ran")
+
+    def test_a_program_without_the_function_check_is_refused(self):
+        self.write_program(function_check=False)
+        status, printed = self.run_runner()
+        self.assertEqual(status, 2)
+        self.assertIn("has no function check", printed)
+        self.assertFalse(self.work.exists(), "a case ran")
+        status, printed = self.run_runner("--allow-apple-clang")
+        self.assertEqual(status, 0)
+        self.assertIn("the criterion: no: the program has no function check", printed)
 
     def test_another_build_type_isnt_the_criterion(self):
         self.write_cache({"CMAKE_BUILD_TYPE": "Debug"})
         status, printed = self.run_runner()
         self.assertEqual(status, 0)
         self.assertIn("the criterion: no: CMAKE_BUILD_TYPE is Debug", printed)
+
+
+class CtestTests(World):
+    """ctest's half: the build's route tests that need no oracle, as ctest's stand-in runs them"""
+
+    def setUp(self):
+        super().setUp()
+        self.use_tables({"alone": Sequence(40, 50, "", "")}, {}, {})
+
+    def ctest_ran(self) -> str:
+        return (self.build / "ctest-env.txt").read_text(encoding="utf-8")
+
+    def test_the_routes_run_first_with_the_criterions_options(self):
+        self.routes(["replay_one", "replay_two"])
+        caller = {"ASAN_OPTIONS": "detect_leaks=0", "UBSAN_OPTIONS": "print_stacktrace=0", "LSAN_OPTIONS": "verbosity=1"}
+        status, printed = self.run_runner("--jobs", "2", environment=caller)
+        self.assertEqual(status, 0)
+        ran = self.ctest_ran()
+        self.assertIn(f"ASAN_OPTIONS={CRITERION}\n", ran)
+        self.assertIn("UBSAN_OPTIONS unset", ran)
+        self.assertIn("LSAN_OPTIONS unset", ran)
+        self.assertIn(" -L route -LE oracle --parallel 2 ", ran)
+        self.assertNotIn(" -R ", ran)
+        self.assertIn("ctest's route tests that need no oracle: 2,", printed)
+        lines = (self.root / "summary.tsv").read_text(encoding="utf-8").splitlines()
+        self.assertEqual([line.split("\t")[1] for line in lines[1:]], ["ctest:replay_one", "ctest:replay_two",
+                                                                      "seq:alone"])
+        row = self.summary()["ctest:replay_one"]
+        self.assertEqual((row["verdict"], row["status"], row["frames"], row["reached"]), ("clean", "passed", "-", "40"))
+        self.assertFalse((self.work / strict_routes.CTEST_DIRECTORY).exists(), "a clean ctest half's files are kept")
+
+    def test_a_failed_route_fails(self):
+        self.routes(["replay_clean", "replay_report marker 2", "replay_plain fail"])
+        status, _ = self.run_runner()
+        self.assertEqual(status, 1)
+        rows = self.summary()
+        self.assertEqual({name: rows[f"ctest:{name}"]["verdict"] for name in
+                          ("replay_clean", "replay_report", "replay_plain")},
+                         {"replay_clean": "clean", "replay_report": "failed", "replay_plain": "failed"})
+        self.assertIn("misaligned address", rows["ctest:replay_report"]["reason"])
+        self.assertIn("stopped after 40 frames", rows["ctest:replay_plain"]["reason"])
+        self.assertTrue((self.work / strict_routes.CTEST_DIRECTORY / "junit.xml").exists())
+
+    def test_a_skipped_route_is_a_gap(self):
+        self.routes(["replay_clean", "replay_without_rom skip"])
+        status, _ = self.run_runner()
+        self.assertEqual(status, 77)
+        row = self.summary()["ctest:replay_without_rom"]
+        self.assertEqual((row["verdict"], row["status"]), ("skipped", "skipped"))
+
+    def test_a_build_without_routes_fails(self):
+        self.routes([])
+        status, _ = self.run_runner()
+        self.assertEqual(status, 1)
+        self.assertIn("lists no test", self.summary()["ctest:routes"]["reason"])
+
+    def test_only_selects_routes_apart_from_the_cases(self):
+        self.routes(["replay_one", "replay_two"])
+        status, _ = self.run_runner("--only", "replay_two")
+        self.assertEqual(status, 0)
+        self.assertIn(" -R ^(replay_two)$", self.ctest_ran())
+        self.assertEqual(list(self.summary()), ["ctest:replay_two"])
+        status, _ = self.run_runner("--only", "ctest:replay_one", "alone")
+        self.assertEqual(status, 0)
+        self.assertEqual(list(self.summary()), ["ctest:replay_one", "seq:alone"])
+        (self.build / "ctest-env.txt").unlink()
+        status, _ = self.run_runner("--only", "alone")
+        self.assertEqual(status, 0)
+        self.assertEqual(list(self.summary()), ["seq:alone"])
+        self.assertFalse((self.build / "ctest-env.txt").exists(), "ctest ran for a case of the program's alone")
+        self.assertEqual(self.run_runner("--only", "ctest:nothing")[0], 2)
 
 
 class MarkerTests(unittest.TestCase):
@@ -571,22 +736,21 @@ class EnvironmentTests(World):
         self.use_tables({"env": Sequence(40, 50, "", "")}, {}, {}, said={"env": ["print-env"]})
 
     def test_the_criterion_reaches_the_program(self):
-        criterion = "detect_leaks=1:detect_stack_use_after_return=1"
         caller = {"ASAN_OPTIONS": "detect_leaks=0", "UBSAN_OPTIONS": "print_stacktrace=0",
                   "LSAN_OPTIONS": "verbosity=1"}
         status, printed = self.run_runner("--keep", environment=caller)
         self.assertEqual(status, 0)
         output = self.output("seq-env")
-        self.assertIn(f"env ASAN_OPTIONS={criterion}\n", output)
+        self.assertIn(f"env ASAN_OPTIONS={CRITERION}\n", output)
         self.assertIn("env UBSAN_OPTIONS unset", output)
         self.assertIn("env LSAN_OPTIONS unset", output)
-        self.assertIn(f"ASAN_OPTIONS: {criterion}\n", printed)
+        self.assertIn(f"ASAN_OPTIONS: {CRITERION}\n", printed)
         self.assertIn("the criterion: yes", printed)
         for name, value in caller.items():
             self.assertIn(f"the caller's {name}={value} is dropped", printed)
         status, printed = self.run_runner("--keep", "--asan-extra", "halt_on_error=1")
         self.assertEqual(status, 0)
-        self.assertIn(f"env ASAN_OPTIONS={criterion}:halt_on_error=1\n", self.output("seq-env"))
+        self.assertIn(f"env ASAN_OPTIONS={CRITERION}:halt_on_error=1\n", self.output("seq-env"))
         self.assertIn("the criterion: no: --asan-extra halt_on_error=1", printed)
         status, printed = self.run_runner("--keep", "--no-stack-use-after-return")
         self.assertEqual(status, 0)
@@ -609,15 +773,19 @@ class SummaryTests(World):
         self.assertEqual(status, 0)
         lines = (self.root / "summary.tsv").read_text(encoding="utf-8").splitlines()
         self.assertEqual(lines[0].split("\t"), list(strict_routes.SUMMARY_COLUMNS))
-        self.assertEqual(len(lines), 3)
+        self.assertEqual(len(lines), 4)
         rows = [line.split("\t") for line in lines[1:]]
         self.assertTrue(all(len(row) == len(strict_routes.SUMMARY_COLUMNS) for row in rows))
-        one = dict(zip(strict_routes.SUMMARY_COLUMNS, rows[0]))
+        route, one = (dict(zip(strict_routes.SUMMARY_COLUMNS, row)) for row in rows[:2])
+        self.assertEqual({column: route[column] for column in route if column != "seconds"},
+                         {"version": "b2_us", "case": "ctest:replay_clean", "also": "-", "start": "-",
+                          "start_sha1": "-", "input": "-", "frames": "-", "reached": "40", "status": "passed",
+                          "verdict": "clean", "reason": "-", "produced_sha1": "-"})
         self.assertEqual({column: one[column] for column in one if column != "seconds"},
                          {"version": "b2_us", "case": "seq:one", "also": "-", "start": "blank", "start_sha1": "-",
                           "input": "one_b2_us.pbwinput", "frames": "40", "reached": "40", "status": "0",
                           "verdict": "clean", "reason": "-", "produced_sha1": "-"})
-        self.assertEqual(rows[1][1], "seq:two")
+        self.assertEqual(rows[2][1], "seq:two")
 
 
 class DirectoryTests(unittest.TestCase):
@@ -668,6 +836,23 @@ MUTANTS = (
      ("BuildTests.test_a_program_without_asan_is_refused",)),
     ("':' kept in the directories' names", '    return name.replace(":", "-")\n', "    return name\n",
      ("DirectoryTests.test_directory_names_are_windows_safe",)),
+    ("the function check not looked for", "    if not has_function_check(build.program):\n", "    if False:\n",
+     ("BuildTests.test_a_program_without_the_function_check_is_refused",)),
+    ("a trap stop its sequence allows accepted", "    if status != 0:\n        said =",
+     '    if status == oracle.TRAP_STATUS and case.stop_from > 0:\n        return CLEAN, "", reached\n'
+     "    if status != 0:\n        said =",
+     ("VerdictTests.test_a_trap_stop_its_sequence_allows_fails",)),
+    ("ctest's failures not counted", '        if failure is not None or test.get("status") == "fail":\n',
+     "        if False:\n", ("CtestTests.test_a_failed_route_fails",)),
+    ("ctest run without the criterion's options",
+     "stderr=subprocess.STDOUT, env=settings.environment,\n                                cwd=work)",
+     "stderr=subprocess.STDOUT, env=None,\n                                cwd=work)",
+     ("CtestTests.test_the_routes_run_first_with_the_criterions_options",)),
+    ("ctest's skips counted clean",
+     '        elif skipped is not None or test.get("status") in ("notrun", "disabled"):\n', "        elif False:\n",
+     ("CtestTests.test_a_skipped_route_is_a_gap",)),
+    ("ctest's half not run", "    if tests or whole:\n", "    if False:\n",
+     ("CtestTests.test_the_routes_run_first_with_the_criterions_options",)),
 )
 
 

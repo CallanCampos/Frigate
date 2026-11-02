@@ -1,23 +1,24 @@
 #!/usr/bin/env python3
-"""Runs the strict build's routes from the oracle's saves: Frigate's program alone, built with PORT_SANITIZE (ASan and
-UBSan, every report fatal) by upstream LLVM, on each comparison sequence of port/tools/oracle/oracle.py that has no
-`_hashes` reference for the version, and on both of the port's legs of each round trip, each from the save it starts
-from, and judges each run clean or not. It is the half of T5 that ctest doesn't run (`ctest -L route -LE oracle` in
-the same strict tree runs the other half: the replays, the port's checks of the oracle's hashes and the smoke test), by
-the criterion of ADR 0033 (port/docs/adr/, the sanitizer-clean replays of phase 5) and port/docs/sanitizers.md's
-"Phase 5's criterion".
+"""Runs T5's set in a strict build: the build made with PORT_SANITIZE (ASan and UBSan, every report fatal) by upstream
+LLVM runs its own route tests that need no oracle (`ctest -L route -LE oracle`: the replays, the port's checks of the
+oracle's hashes, the smoke test), and Frigate's program alone on each comparison sequence of
+port/tools/oracle/oracle.py that has no `_hashes` reference for the version and on both of the port's legs of each
+round trip, each from the save it starts from. Both halves run with the criterion's runtime options and are judged by
+the criterion of ADR 0033 (port/docs/adr/, the sanitizer-clean replays of phase 5); port/docs/sanitizers.md says how
+to run it.
 
-Game functionality: what those routes play from the oracle's saves. CONTINUE into the field; the field menu and its
-apps (the bag, the trainer card, the party, a summary, the Pokédex); Hugh's trainer battle; Route 19 and Bianca's
-capture demo; a wild Purrloin caught; the PC Box's storage system; Floccesy Town to Route 20; the saves these make
-(the round trips' make legs) and the games continued from them (their continue legs).
+Game functionality: what those routes play. ctest's replays, from power-on to the Aspertia City lookout (the opening,
+the title, New Game, the first save and its CONTINUE); and from the oracle's saves: CONTINUE into the field; the field
+menu and its apps (the bag, the trainer card, the party, a summary, the Pokédex); Hugh's trainer battle; Route 19 and
+Bianca's capture demo; a wild Purrloin caught; the PC Box's storage system; Floccesy Town to Route 20; the saves these
+make (the round trips' make legs) and the games continued from them (their continue legs).
 
-Its inputs: oracle.py's tables (SEQUENCES, SAVES, ROUND_TRIPS), read and never changed, each kind of entry by one
-adapter function (sequence_case, trip_cases, kept_save), so that a change of a table's shape changes that function
-alone; the input files, port/tests/oracle/<name>_<version>.pbwinput; the save cache, the oracle's saves as `oracle.py
-save` makes them (NAME_VERSION.sav, each held to the SHA-1 that SAVES keeps), by default the build's oracle-saves; and
-the strict build's CMakeCache.txt. It never runs melonDS, never makes a save, and never writes into the repository:
-its runs go in the build directory's strict-routes/ (or --work).
+Its inputs: the strict build's CMakeCache.txt and its ctest tests; oracle.py's tables (SEQUENCES, SAVES, ROUND_TRIPS),
+read and never changed, each kind of entry by one adapter function (sequence_case, trip_cases, kept_save), so that a
+change of a table's shape changes that function alone; the input files, port/tests/oracle/<name>_<version>.pbwinput;
+and the save cache, the oracle's saves as `oracle.py save` makes them (NAME_VERSION.sav, each held to the SHA-1 that
+SAVES keeps), by default the build's oracle-saves. It never runs melonDS, never makes a save, and never writes into the
+repository: its runs go in the build directory's strict-routes/ (or --work).
 
     strict_routes.py list [--version b2_us|w2_us] [--only NAME...] [--all]
     strict_routes.py run --build-dir DIR [--save-cache DIR] [--rom PATH] [--only NAME...] [--all] [--jobs N]
@@ -25,6 +26,8 @@ its runs go in the build directory's strict-routes/ (or --work).
                          [--no-stack-use-after-return] [--allow-apple-clang]
 
 The cases, per version:
+  - ctest:NAME, each of the build's ctest tests labelled route and not oracle, which ctest runs and judges (in this
+    build it fails a test whose output has a report), with its own timeout and the ROM the build was configured with;
   - seq:NAME, each sequence without a reference for the version (one with a reference, ctest's oracle_NAME_hashes runs
     in the same tree; --all, or NAME in --only, adds it): from its save (a blank one when it names none), its input
     file, its port frames;
@@ -35,22 +38,26 @@ The cases, per version:
 Cases with the same start and the same input file run once, at the largest frame count, the others named in its `also`
 (the same input from the same save makes the shorter run the start of the longer; a make leg is the one that runs, for
 its save). A case whose start save has no SHA-1 for the version is left out with why, as a skip; a missing input file
-fails its case; a sequence that may stop on a trap stub (stop_from) is refused, since the run doesn't see the trap's
-frame. --only NAME selects NAME, seq:NAME and trip:NAME:*, a continue leg bringing its make leg.
+fails its case. A sequence that allows the port a stop on a trap stub (stop_from) runs as any other, and such a stop
+fails it: a trap leaves without the leak check. --only NAME selects NAME, seq:NAME and trip:NAME:*, a continue leg
+bringing its make leg, and ctest's route test NAME (or ctest:NAME); without --only, both halves run whole.
 
 A run first checks the build (exit 2 when it refuses: no PORT_SANITIZE, PORT_SANITIZE_RECOVER on, a ROM language other
 than us, a build configured from another checkout, no program, Apple clang without --allow-apple-clang), that the
-program runs under ASan (ASAN_OPTIONS=help=1 PROGRAM --help prints ASan's flags, else 2) and that the ROM is the
-decomp's (else 77). Each case runs in a fresh directory, the start save copied in as the game code's .sav:
-PROGRAM --headless --frames N --watchdog S --rom ROM --save-dir D --input FILE, its output in output.txt, with
+program runs under ASan (ASAN_OPTIONS=help=1 PROGRAM --help prints ASan's flags, else 2) and has UBSan's function check
+(its handler, function_type_mismatch, among the program's symbols, else 2, or not the criterion with
+--allow-apple-clang), and that the ROM is the decomp's (else 77). ctest's half runs first: `ctest --test-dir DIR -L
+route -LE oracle --parallel N`, its output and JUnit file in ctest-routes/. Each other case runs in a fresh directory,
+the start save copied in as the game code's .sav: PROGRAM --headless --frames N --watchdog S --rom ROM --save-dir D
+--input FILE, its output in output.txt; --jobs at a time (1 by default), the longest first. Both halves run with
 ASAN_OPTIONS=detect_leaks=1:detect_stack_use_after_return=1 (the second dropped by --no-stack-use-after-return); the
-caller's ASAN_OPTIONS, UBSAN_OPTIONS and LSAN_OPTIONS are dropped, and --asan-extra is appended (never log_path). A case
-is clean when the program exits with status 0, a line says `port: stopped after N frames` for its frames, and no line
-matches the expressions on which ctest fails a test of the sanitized build (port/CMakeLists.txt). A clean case's
-directory is deleted (but a make leg's save, until its continue leg ends) unless --keep; a failure keeps everything. A
-build that isn't RelWithDebInfo, a compiler that isn't upstream LLVM (Apple's with --allow-apple-clang, which has no
-LeakSanitizer, so add --asan-extra detect_leaks=0), --asan-extra and --no-stack-use-after-return mark the run as not
-the criterion. Cases run --jobs at a time (1 by default), the longest first.
+caller's ASAN_OPTIONS, UBSAN_OPTIONS and LSAN_OPTIONS are dropped, and --asan-extra is appended (never log_path). A
+program-alone case is clean when the program exits with status 0, a line says `port: stopped after N frames` for its
+frames, and no line matches the expressions on which ctest fails a test of the sanitized build (port/CMakeLists.txt).
+A clean case's directory is deleted (but a make leg's save, until its continue leg ends) unless --keep; a failure
+keeps everything. A build that isn't RelWithDebInfo, a compiler that isn't upstream LLVM (Apple's with
+--allow-apple-clang, which has no LeakSanitizer, so add --asan-extra detect_leaks=0), --asan-extra and
+--no-stack-use-after-return mark the run as not the criterion.
 
 It prints a summary (the build, its compiler, the options, whether the run is the criterion's, the checkout's HEAD and
 whether port/, src/, lib/ or include/ have changes, then a line a case) and with --summary writes it as a table, a row a
@@ -62,6 +69,7 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures
+import mmap
 import os
 import re
 import shutil
@@ -70,6 +78,7 @@ import subprocess
 import sys
 import time
 from dataclasses import dataclass, field
+from xml.etree import ElementTree
 
 sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "oracle"))
@@ -98,6 +107,14 @@ MARKERS = (
 FRAMES_LINE = re.compile(r"port: stopped after (\d+) frames")
 # What ASan's runtime prints first with help=1, before the program runs
 ASAN_FLAG_LIST = "Available flags for AddressSanitizer"
+# The handler that UBSan's function check calls, which upstream clang emits for C with -fsanitize=function and Apple
+# clang never does (port/docs/lessons.md, 2026-10-18): a program whose code has the check names it among its symbols
+# (on macOS an import from the sanitizers' runtime, a library; where the runtime is linked in, every program has it)
+FUNCTION_CHECK = b"function_type_mismatch"
+# ctest's half: the build's route tests that need no oracle, their output and JUnit file in the work's ctest-routes/
+CTEST_ROUTES = ("-L", "route", "-LE", "oracle")
+CTEST_PREFIX = "ctest:"
+CTEST_DIRECTORY = "ctest-routes"
 CLEAN, FAILED, SKIPPED = "clean", "failed", "skipped"
 REFUSED = 2
 DEFAULT_WATCHDOG = 120
@@ -116,11 +133,11 @@ class Refusal(Exception):
 
 @dataclass
 class Case:
-    """One run of the program. start: the SAVES name of the save it starts from, "" for a blank save; a continue leg's
-    is its make leg's name (after), whose save it continues. kept: the SHA-1 that SAVES keeps for that save in the
-    version, "" when it keeps none. input: the input file's name, port/tests/oracle/<input>_<version>.pbwinput. also:
-    the cases merged into this one. produces: a make leg, whose save a continue leg starts from. stop_from: the frame
-    from which its sequence allows a trap stop"""
+    """One run of the program, or one of ctest's route tests (ctest). start: the SAVES name of the save it starts from,
+    "" for a blank save; a continue leg's is its make leg's name (after), whose save it continues. kept: the SHA-1 that
+    SAVES keeps for that save in the version, "" when it keeps none. input: the input file's name,
+    port/tests/oracle/<input>_<version>.pbwinput. also: the cases merged into this one. produces: a make leg, whose
+    save a continue leg starts from. stop_from: the frame from which its sequence allows the port a trap stop"""
     name: str
     version: str
     start: str
@@ -131,6 +148,7 @@ class Case:
     after: str = ""
     produces: bool = False
     stop_from: int = 0
+    ctest: bool = False
 
 
 @dataclass
@@ -164,12 +182,14 @@ class Build:
     compiler: str
     build_type: str
     not_criterion: list[str]
+    ctest: str = "ctest"
 
 
 @dataclass
 class Settings:
     """How each case runs: the program as a command, the ROM and its game code, the save cache, the work directory,
-    the watchdog and timeout, the program's environment, and whether to keep clean cases' directories"""
+    the watchdog and timeout, the program's environment, whether to keep clean cases' directories, and ctest as a
+    command"""
     command: list[str]
     rom: str
     game_code: str
@@ -180,6 +200,7 @@ class Settings:
     environment: dict[str, str]
     keep: bool
     oracle_binary: str
+    ctest: list[str] = field(default_factory=lambda: ["ctest"])
 
 
 # The adapters: the only functions that read the tables' entries
@@ -265,8 +286,7 @@ def merged(cases: list[Case]) -> list[Case]:
 
 
 def plan_cases(version: str, only: list[str] | None = None, include_all: bool = False) -> Plan:
-    """The version's cases: refuses (Refusal) a name in only that selects nothing and a selected sequence that may stop
-    on a trap stub"""
+    """The version's cases (those only selects, when given): refuses (Refusal) a name in only that selects nothing"""
     cases: list[Case] = []
     referenced: list[str] = []
     for name in oracle.SEQUENCES:
@@ -281,15 +301,12 @@ def plan_cases(version: str, only: list[str] | None = None, include_all: bool = 
     if only:
         unknown = [wanted for wanted in only if not any(selects(case.name, wanted) for case in cases)]
         if unknown:
-            raise Refusal(f"no case is named {', '.join(unknown)} (strict_routes.py list shows them)")
+            raise Refusal(f"no case is named {', '.join(unknown)} (strict_routes.py list shows them, and ctest -N -L "
+                          "route -LE oracle in the build ctest's)")
         chosen = {case.name for case in cases if any(selects(case.name, wanted) for wanted in only)}
         chosen |= {case.after for case in cases if case.name in chosen and case.after}
         cases = [case for case in cases if case.name in chosen]
         referenced = []
-    stops = [f"{case.name} (from frame {case.stop_from})" for case in cases if case.stop_from > 0]
-    if stops:
-        raise Refusal(f"{', '.join(stops)} may stop on a trap stub, whose frame this run doesn't see: run it with "
-                      "oracle.py sequence")
     left_out: list[tuple[Case, str]] = []
     runnable: list[Case] = []
     gone: dict[str, str] = {}
@@ -401,6 +418,9 @@ def inspect_build(directory: str, allow_apple_clang: bool) -> Build:
     program = os.path.join(directory, PROGRAMS[version] + (".exe" if os.name == "nt" else ""))
     if not os.path.isfile(program):
         raise Refusal(f"{directory} has no {os.path.basename(program)}: build it first")
+    ctest = cache.get("CMAKE_CTEST_COMMAND", "") or shutil.which("ctest") or ""
+    if not ctest:
+        raise Refusal(f"{directory}'s cache names no ctest (CMAKE_CTEST_COMMAND), and none is on PATH")
     compiler = cache.get("CMAKE_C_COMPILER", "")
     if not compiler:
         raise Refusal(f"{directory}'s cache names no C compiler")
@@ -417,7 +437,7 @@ def inspect_build(directory: str, allow_apple_clang: bool) -> Build:
     build_type = cache.get("CMAKE_BUILD_TYPE", "")
     if build_type != "RelWithDebInfo":
         not_criterion.append(f"CMAKE_BUILD_TYPE is {build_type or 'empty'}, not RelWithDebInfo")
-    return Build(directory, version, program, first, build_type, not_criterion)
+    return Build(directory, version, program, first, build_type, not_criterion, ctest)
 
 
 # The program's environment and the preflight
@@ -451,6 +471,111 @@ def preflight(command: list[str], environment: dict[str, str]) -> str | None:
     if ASAN_FLAG_LIST not in done.stdout + done.stderr:
         return f"ASAN_OPTIONS=help=1 {command[-1]} --help prints no ASan flags: the program isn't built with ASan"
     return None
+
+
+def has_function_check(program: str) -> bool:
+    """Whether the program's file names the function check's handler (FUNCTION_CHECK), as its symbols do when its
+    compiler emitted the check"""
+    try:
+        with open(program, "rb") as f:
+            if os.fstat(f.fileno()).st_size == 0:
+                return False
+            with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as data:
+                return data.find(FUNCTION_CHECK) >= 0
+    except (OSError, ValueError):
+        return False
+
+
+# ctest's half
+
+def ctest_routes(command: list[str], directory: str, environment: dict[str, str]) -> list[str]:
+    """The build's route tests that need no oracle, by name in ctest's order (ctest -N); a Refusal when ctest can't
+    list them"""
+    try:
+        done = subprocess.run(command + ["--test-dir", directory, "-N", *CTEST_ROUTES], capture_output=True,
+                              text=True, errors="replace", env=environment, timeout=300)
+    except (OSError, subprocess.SubprocessError) as error:
+        raise Refusal(f"ctest doesn't run: {error}") from error
+    if done.returncode != 0:
+        raise Refusal(f"ctest -N in {directory} exits with status {done.returncode}")
+    return re.findall(r"^\s*Test\s+#\d+: (\S+)", done.stdout, re.MULTILINE)
+
+
+def split_only(only: list[str], routes: list[str]) -> tuple[list[str], list[str]]:
+    """--only's names: those of ctest's route tests (NAME or ctest:NAME), and the others, the program-alone cases'"""
+    tests: list[str] = []
+    others: list[str] = []
+    for name in only:
+        bare = name[len(CTEST_PREFIX):] if name.startswith(CTEST_PREFIX) else name
+        if bare in routes:
+            tests.append(bare)
+        else:
+            others.append(name)
+    return tests, others
+
+
+def ctest_case(name: str, version: str) -> Case:
+    return Case(f"{CTEST_PREFIX}{name}", version, "", "", 0, ctest=True)
+
+
+def ctest_results(path: str, version: str, tests: list[str], status: int) -> list[Result]:
+    """ctest's verdicts from its JUnit file: a test it passed is clean, one it failed fails (with its first report's
+    line, else its last `port:` line), and one it didn't run is skipped; a test it listed and has no result for fails,
+    and so does ctest itself when it exits with a status other than 0 and no test failed"""
+    results: list[Result] = []
+    try:
+        root = ElementTree.parse(path).getroot()
+    except (OSError, ElementTree.ParseError) as error:
+        return [Result(ctest_case("routes", version), FAILED,
+                       short(f"ctest exited with {status_text(status)} and wrote no results: {error}"))]
+    for test in root.iter("testcase"):
+        case = ctest_case(test.get("name", ""), version)
+        lines = (test.findtext("system-out") or "").splitlines()
+        seconds = float(test.get("time") or 0)
+        failure = test.find("failure")
+        skipped = test.find("skipped")
+        if failure is not None or test.get("status") == "fail":
+            message = failure.get("message", "Failed") if failure is not None else "Failed"
+            said = [line[line.index("port: "):] for line in lines if "port: " in line]
+            detail = first_marker(lines) or (said[-1] if said else "")
+            results.append(Result(case, FAILED, short(f"ctest: {message}" + (f": {detail}" if detail else "")),
+                                  message.lower(), frames_reached(lines), seconds))
+        elif skipped is not None or test.get("status") in ("notrun", "disabled"):
+            message = skipped.get("message", "") if skipped is not None else test.get("status", "")
+            results.append(Result(case, SKIPPED, short(f"ctest didn't run it ({message})"), "skipped", None, seconds))
+        else:
+            results.append(Result(case, CLEAN, "", "passed", frames_reached(lines), seconds))
+    found = {result.case.name for result in results}
+    results += [Result(ctest_case(test, version), FAILED, "ctest has no result for it") for test in tests
+                if f"{CTEST_PREFIX}{test}" not in found]
+    if status != 0 and all(result.verdict != FAILED for result in results):
+        results.append(Result(ctest_case("routes", version), FAILED, f"ctest exited with {status_text(status)}"))
+    return results
+
+
+def run_ctest(tests: list[str], whole: bool, settings: Settings, directory: str, version: str,
+              jobs: int) -> list[Result]:
+    """ctest's half in the build in directory: every route test that needs no oracle (whole), or the tests named,
+    jobs at a time, with the program's environment; a Result a test. Its output and JUnit file go in the work's
+    ctest-routes/, deleted when every test passed unless --keep"""
+    if not tests:
+        return [Result(ctest_case("routes", version), FAILED,
+                       f"ctest lists no test labelled route and not oracle in {directory}")]
+    work = os.path.join(settings.work, CTEST_DIRECTORY)
+    shutil.rmtree(work, ignore_errors=True)
+    os.makedirs(work)
+    junit = os.path.join(work, "junit.xml")
+    command = settings.ctest + ["--test-dir", directory, *CTEST_ROUTES, "--parallel", str(jobs), "--output-on-failure",
+                                "--output-junit", junit]
+    if not whole:
+        command += ["-R", "^(" + "|".join(re.escape(test) for test in tests) + ")$"]
+    with open(os.path.join(work, "output.txt"), "wb") as output:
+        status = subprocess.run(command, stdout=output, stderr=subprocess.STDOUT, env=settings.environment,
+                                cwd=work).returncode
+    results = ctest_results(junit, version, tests, status)
+    if all(result.verdict == CLEAN for result in results) and not settings.keep:
+        remove(work)
+    return results
 
 
 # A case's run and verdict
@@ -496,7 +621,9 @@ def judge(case: Case, status: int | None, output: str, timeout: float) -> tuple[
         return FAILED, short(f"{ending}, killed"), reached
     if status != 0:
         said = [line[line.index("port: "):] for line in lines if "port: " in line]
-        return FAILED, short(f"{ending}" + (f": {said[-1]}" if said else "")), reached
+        allowed = f", a stop its sequence allows from frame {case.stop_from}" if status == oracle.TRAP_STATUS and \
+            case.stop_from > 0 else ""
+        return FAILED, short(f"{ending}{allowed}" + (f": {said[-1]}" if said else "")), reached
     if reached != case.frames:
         what = f"stopped after {reached} of {case.frames} frames" if reached is not None else \
             f"no line says it stopped after its {case.frames} frames"
@@ -640,12 +767,16 @@ def run_plan(plan: Plan, settings: Settings, jobs: int, report=None) -> list[Res
 # The summary
 
 def start_label(case: Case) -> str:
+    if case.ctest:
+        return "-"
     if case.after:
         return f"{case.after}'s save"
     return case.start or "blank"
 
 
 def input_label(case: Case) -> str:
+    if case.ctest:
+        return "-"
     return os.path.basename(oracle.SEQUENCE_INPUT.format(name=case.input, version=case.version))
 
 
@@ -654,6 +785,9 @@ def case_line(result: Result) -> str:
     also = f" (also {', '.join(case.also)})" if case.also else ""
     if result.verdict == SKIPPED or result.status == "-":
         return f"  {result.verdict:<8} {case.name}{also}: {result.reason}"
+    if case.ctest:
+        line = f"  {result.verdict:<8} {case.name}: {result.status}, {result.seconds:.1f} s"
+        return line + (f": {result.reason}" if result.reason else "")
     reached = "-" if result.reached is None else f"{result.reached:,}"
     line = f"  {result.verdict:<8} {case.name}{also}: {reached} of {case.frames:,} frames, {result.seconds:.1f} s"
     return line + (f": {result.reason}" if result.reason else "")
@@ -662,9 +796,9 @@ def case_line(result: Result) -> str:
 def summary_row(result: Result) -> list[str]:
     case = result.case
     return [case.version, case.name, ",".join(case.also) or "-", start_label(case), result.start_sha1[:12] or "-",
-            input_label(case), str(case.frames), "-" if result.reached is None else str(result.reached),
-            result.status, f"{result.seconds:.1f}", result.verdict, short(result.reason) or "-",
-            result.produced_sha1[:12] or "-"]
+            input_label(case), "-" if case.ctest else str(case.frames),
+            "-" if result.reached is None else str(result.reached), result.status, f"{result.seconds:.1f}",
+            result.verdict, short(result.reason) or "-", result.produced_sha1[:12] or "-"]
 
 
 def write_summary(path: str, results: list[Result]) -> None:
@@ -708,7 +842,8 @@ def command_list(args) -> int:
         except Refusal as refusal:
             print(f"strict_routes: refused: {refusal}", file=sys.stderr)
             return REFUSED
-        print(f"{GAMES[version]} ({version}): {len(plan.cases)} cases, {plan_frames(plan):,} frames")
+        print(f"{GAMES[version]} ({version}): {len(plan.cases)} cases, {plan_frames(plan):,} frames, after ctest's "
+              "route tests that need no oracle (ctest -N -L route -LE oracle in the build lists them)")
         for case in plan.cases:
             also = f", also {', '.join(case.also)}" if case.also else ""
             print(f"  {case.name}: from {start_label(case)}, {input_label(case)}, {case.frames:,} frames{also}")
@@ -726,7 +861,6 @@ def command_run(args, launcher=None) -> int:
         return REFUSED
     try:
         build = inspect_build(args.build_dir, args.allow_apple_clang)
-        plan = plan_cases(build.version, args.only, args.all)
     except Refusal as refusal:
         print(f"strict_routes: refused: {refusal}", file=sys.stderr)
         return REFUSED
@@ -741,9 +875,26 @@ def command_run(args, launcher=None) -> int:
         print(f"strict_routes: the caller's {name}={value} is dropped: the runs have the criterion's options",
               file=sys.stderr)
     command = launcher(build.program) if launcher else [build.program]
+    ctest = launcher(build.ctest) if launcher else [build.ctest]
     reason = preflight(command, environment)
     if reason:
         print(f"strict_routes: refused: {reason}", file=sys.stderr)
+        return REFUSED
+    if not has_function_check(build.program):
+        reason = (f"{build.program} has no function check: no {FUNCTION_CHECK.decode()} among its symbols, so its "
+                  "compiler emitted none (Apple clang emits none for C)")
+        if not args.allow_apple_clang:
+            print(f"strict_routes: refused: {reason}: rebuild it with upstream clang", file=sys.stderr)
+            return REFUSED
+        not_criterion.append("the program has no function check")
+    try:
+        routes = ctest_routes(ctest, build.directory, environment)
+        whole = not args.only
+        tests, wanted = split_only(args.only, routes) if args.only else (routes, [])
+        plan = plan_cases(build.version, wanted or None, args.all) if whole or wanted else \
+            Plan(build.version, [], [], [])
+    except Refusal as refusal:
+        print(f"strict_routes: refused: {refusal}", file=sys.stderr)
         return REFUSED
     rom = oracle.rom_path(build.version, args.rom)
     reason = oracle.rom_matches(build.version, rom)
@@ -755,7 +906,7 @@ def command_run(args, launcher=None) -> int:
     settings = Settings(command, os.path.abspath(rom), oracle.rom_game_code(rom),
                         os.path.abspath(args.save_cache or os.path.join(args.build_dir, "oracle-saves")), work,
                         args.watchdog, args.timeout, environment, args.keep,
-                        binary if os.path.exists(binary) else "PBW_ORACLE")
+                        binary if os.path.exists(binary) else "PBW_ORACLE", ctest)
     os.makedirs(work, exist_ok=True)
     began = time.monotonic()
     print(f"strict_routes: {GAMES[build.version]} ({build.version}), the build {os.path.abspath(build.directory)}")
@@ -765,6 +916,8 @@ def command_run(args, launcher=None) -> int:
     print(f"  ASAN_OPTIONS: {options}")
     print("  the criterion: " + ("yes" if not not_criterion else f"no: {'; '.join(not_criterion)}"))
     print(f"  checkout: {checkout_state()}")
+    print(f"  ctest's route tests that need no oracle: {len(tests)}" + (f" of {len(routes)}" if not whole else "")
+          + f", {args.jobs} at a time ({build.ctest})")
     print(f"  cases: {len(plan.cases)}, {plan_frames(plan):,} frames, {len(plan.left_out)} left out; "
           f"{args.jobs} at a time; save cache {settings.cache}; work {work}")
     print(f"  started {time.strftime('%Y-%m-%d %H:%M:%S')}, {load_text()}", flush=True)
@@ -772,7 +925,12 @@ def command_run(args, launcher=None) -> int:
     def report(result: Result) -> None:
         print(f"  [{time.strftime('%H:%M:%S')}]" + case_line(result)[1:], flush=True)
 
-    results = [Result(case, SKIPPED, reason) for case, reason in plan.left_out]
+    results: list[Result] = []
+    if tests or whole:
+        for result in run_ctest(tests, whole, settings, build.directory, build.version, args.jobs):
+            report(result)
+            results.append(result)
+    results += [Result(case, SKIPPED, reason) for case, reason in plan.left_out]
     results += run_plan(plan, settings, args.jobs, report)
     print(f"  ended {time.strftime('%Y-%m-%d %H:%M:%S')}, {load_text()}, after {time.monotonic() - began:.0f} s")
     print("summary:")
@@ -804,12 +962,14 @@ def job_count(text: str) -> int:
 
 
 def main(argv: list[str] | None = None, launcher=None) -> int:
-    """The command line; launcher, for the tests, gives the command that starts a program found at a path"""
-    parser = argparse.ArgumentParser(description="The strict build's routes from the oracle's saves (T5).")
+    """The command line; launcher, for the tests, gives the command that starts a program found at a path (the
+    build's program, or its ctest)"""
+    parser = argparse.ArgumentParser(description="T5's set in a strict build: ctest's routes and the program alone "
+                                                 "from the oracle's saves.")
     commands = parser.add_subparsers(dest="command", required=True)
-    listing = commands.add_parser("list", help="the cases of each version, without running them")
+    listing = commands.add_parser("list", help="the program-alone cases of each version, without running them")
     listing.add_argument("--version", choices=VERSIONS)
-    running = commands.add_parser("run", help="run the cases on a strict build")
+    running = commands.add_parser("run", help="run ctest's routes and the cases on a strict build")
     running.add_argument("--build-dir", required=True)
     running.add_argument("--save-cache")
     running.add_argument("--rom")
