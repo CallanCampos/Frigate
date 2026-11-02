@@ -29,3 +29,10 @@ tests that keep SIGPIPE at its default; and successful completion. They require 
 verifier's own exit status, while reporting the result on the pinned commit; only completed validation may leave a
 successful local-verification status. The hourly sync workflow's App-token step is checked too: its repository and
 permission scope, its revocation, and its `client-id` input.
+
+`sync_upstream.sh`'s messages send the reader to [SYNC.md](../../docs/SYNC.md) by a section's name, as
+`'Upstream rewrite (exit 4)' under 'Conflicts and stopped syncs' in port/docs/SYNC.md`, or by an anchor
+(`SYNC.md#conflicts-and-stopped-syncs`). A test reads each such name as the script prints it and fails when SYNC.md
+has no such heading, or no list item of that bold label under that heading, so that renaming a section means updating
+the messages too. Its controls rename a label, change a message's name, move one under another heading and add an
+anchor SYNC.md lacks, and each must fail.

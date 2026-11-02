@@ -4,12 +4,14 @@ Exercises the publishing helper port/tools/upstream_sync.py (preservation of nat
 of a conflicting upstream head, the upstream history and reference boundaries), the hourly sync workflow's App token
 (.github/workflows/port-sync.yml), the inherited style checker on mixed diffs, and port/tools/sync_upstream.sh
 --verify-pr with stubbed builds and gh: the commit statuses it records and the status it exits with when a build, a
-request to GitHub or a signal stops it.
+request to GitHub or a signal stops it. It also holds sync_upstream.sh's messages to port/docs/SYNC.md: each section
+they send the reader to (the stops at an upstream rewrite and at a cross-repository reference among them) must exist.
 """
 import importlib.util
 import json
 import os
 from pathlib import Path
+import re
 import signal
 import subprocess
 import tempfile
@@ -845,6 +847,80 @@ esac
         result = self.verify(environment)
         self.assertNotEqual(result.returncode, 0)
         self.assertFalse((bins / 'log').exists())
+
+
+SYNC_SCRIPT = MODULE.parent / 'sync_upstream.sh'
+SYNC_DOC = MODULE.parents[1] / 'docs/SYNC.md'
+
+
+def sync_doc_sections(doc):
+    """SYNC.md's headings, each with the bold labels that open its list items ("- **Upstream rewrite (exit 4):**"), and
+    the anchors GitHub gives the headings (lowercase, punctuation but hyphens and underscores dropped, spaces as
+    hyphens)."""
+    sections = {}
+    anchors = set()
+    heading = None
+    fenced = False
+    for line in doc.splitlines():
+        if line.lstrip().startswith('```'):
+            fenced = not fenced
+        elif not fenced and (match := re.match(r'#{1,6}\s+(.+?)\s*$', line)):
+            heading = match.group(1)
+            sections.setdefault(heading, set())
+            anchors.add(re.sub(r'[^\w\- ]', '', heading.lower()).replace(' ', '-'))
+        elif not fenced and heading and (match := re.match(r'\s*[-*]\s+\*\*(.+?):?\*\*', line)):
+            sections[heading].add(match.group(1))
+    return sections, anchors
+
+
+def sync_doc_references(script):
+    """What sync_upstream.sh names in SYNC.md: each section, as (name, heading) for "'Name' under 'Heading' in
+    port/docs/SYNC.md" or (name, '') for "'Name' in port/docs/SYNC.md", and each anchor of a SYNC.md#anchor. A message
+    that the script writes as several strings, one per line, is read as it prints them, joined by spaces, and so is a
+    comment that goes on over several lines."""
+    text = re.sub(r'"\s*\\\n\s*"', ' ', script)
+    text = re.sub(r'\n\s*#\s?', ' ', text)
+    names = re.findall(r"'([^'\n]+)'(?: under '([^'\n]+)')? in (?:port/docs/)?SYNC\.md", text)
+    return names, re.findall(r'SYNC\.md#([\w-]+)', text)
+
+
+class SyncDocSectionTests(unittest.TestCase):
+    def missing(self, script, doc):
+        """The sections and anchors that script names and doc lacks, with every section name the script names."""
+        sections, anchors = sync_doc_sections(doc)
+        labels = set().union(*sections.values())
+        names, linked = sync_doc_references(script)
+        missing = [f"'{name}' under '{heading}'" for name, heading in names
+                   if heading and name not in sections.get(heading, ())]
+        missing += [f"'{name}'" for name, heading in names
+                    if not heading and name not in sections and name not in labels]
+        missing += [f'#{anchor}' for anchor in linked if anchor not in anchors]
+        return missing, names
+
+    def test_messages_name_sections_that_the_sync_document_has(self):
+        missing, names = self.missing(SYNC_SCRIPT.read_text(), SYNC_DOC.read_text())
+        # At least the stops at an upstream rewrite and at a draft that can't be fast-forwarded (exit 4) and at a
+        # cross-repository reference (exit 5): fewer means a message names its section in a form this test can't read
+        self.assertGreaterEqual(len(names), 3, names)
+        self.assertEqual(missing, [], 'port/tools/sync_upstream.sh names what port/docs/SYNC.md lacks')
+
+    def test_a_section_the_document_lacks_fails(self):
+        script, doc = SYNC_SCRIPT.read_text(), SYNC_DOC.read_text()
+        exit5 = "'Cross-repository reference (exit 5)' under 'Conflicts and stopped syncs'"
+        cases = {
+            'a label the document renames': (script, doc.replace('**Upstream rewrite (exit 4):**',
+                                                                 '**Upstream rewrote its history:**')),
+            'a name the document never had': (script.replace("'Cross-repository reference (exit 5)'",
+                                                             "'Commit messages that name other repositories'"), doc),
+            'a label under another heading': (script.replace(exit5, exit5.replace('Conflicts and stopped syncs',
+                                                                                  'Scheduled proposals')), doc),
+            'an anchor the document lacks': (script + '# port/docs/SYNC.md#no-such-section\n', doc),
+        }
+        for case, (changed_script, changed_doc) in cases.items():
+            with self.subTest(case=case):
+                self.assertNotEqual((changed_script, changed_doc), (script, doc), 'the control changes nothing')
+                self.assertNotEqual(self.missing(changed_script, changed_doc)[0], [])
+        self.assertEqual(self.missing(script + '# port/docs/SYNC.md#conflicts-and-stopped-syncs\n', doc)[0], [])
 
 
 if __name__ == '__main__':

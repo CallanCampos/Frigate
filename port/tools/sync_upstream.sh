@@ -224,7 +224,6 @@ publish_helper=$(mktemp "${TMPDIR:-/tmp}/frigate-sync.XXXXXX")
 cp port/tools/upstream_sync.py "$publish_helper"
 if [ -z "$verify_pr" ] && [ "$current" != "$branch" ]; then
     git checkout -b "$branch" || die 2 "topic exists; check it out explicitly first"
-    current=$branch
 fi
 
 # Results for the summary, printed on exit
@@ -309,7 +308,7 @@ trap summary EXIT
 # --- 2 and 3. Merges -------------------------------------------------------------------------------------------------
 
 fetch_all() {
-    git fetch --no-tags origin "+refs/heads/main:$origin_ref" || die 1 "could not fetch $branch from origin"
+    git fetch --no-tags origin "+refs/heads/main:$origin_ref" || die 1 "could not fetch main from origin"
     git fetch --no-tags upstream "+refs/heads/$UPSTREAM_BRANCH:$upstream_ref" ||
         die 1 "could not fetch $UPSTREAM_BRANCH from upstream"
 }
@@ -337,8 +336,8 @@ stop_on_conflict() {
     exit 3
 }
 
-# Brings HEAD up to origin/NAME: nothing to do when HEAD already has it, a fast-forward when HEAD is behind, and the
-# project's usual merge when HEAD has commits of its own
+# Brings HEAD up to origin/main, the reviewed main that every sync starts from: nothing to do when HEAD already has it,
+# a fast-forward when HEAD is behind, and the project's usual merge when HEAD has commits of its own
 update_from_origin() {
     if git merge-base --is-ancestor "$origin_ref" HEAD; then
         return 0
@@ -347,8 +346,8 @@ update_from_origin() {
         git merge --ff-only --quiet "$origin_ref"
         return 0
     fi
-    say "HEAD has commits that origin/$branch doesn't; merging origin/$branch"
-    git merge --no-edit "$origin_ref" || stop_on_conflict "origin/$branch"
+    say "HEAD has commits that origin/main doesn't; merging origin/main"
+    git merge --no-edit "$origin_ref" || stop_on_conflict "origin/main"
 }
 
 # The upstream commit that the newest sync merge recorded in its Upstream-Commit trailer, or the merge base when no
@@ -364,8 +363,8 @@ own_merge_parent=""
 # repository: GitHub records such a reference on the target's timeline, naming the repository the commit was pushed to
 # (port/docs/SYNC.md, ADR 0002). People who can't read a private repository still see the reference, without its
 # details, so the check runs whatever the port repository's visibility, and only the user's --allow-references lets
-# such commits through. The range is every commit that the push would add to origin/NAME: the new upstream commits and
-# HEAD's own. Only short SHAs are printed, never the text that matched.
+# such commits through. The range is every commit that origin/main doesn't have: the new upstream commits and HEAD's
+# own. Only short SHAs are printed, never the text that matched.
 check_references() {
     local upstream=$1 found count closing
     found=$(git rev-list -i -E --reverse --abbrev-commit --abbrev=9 --grep="$REFERENCE_SHORT" \
@@ -387,8 +386,8 @@ check_references() {
     die 5 "$count commits that the push would add name issues, pull requests or discussions in other repositories:" \
         "$found. Pushed to $PORT_REPO, they could put a reference from it on those items' timelines, with its" \
         "details while the repository is public and without them while it is private. Stopped before merging." \
-        "Stop and ask the user, who alone decides whether to run this again with --allow-references; see 'Commit" \
-        "messages that name other repositories' in port/docs/SYNC.md."
+        "Stop and ask the user, who alone decides whether to run this again with --allow-references; see" \
+        "'Cross-repository reference (exit 5)' under 'Conflicts and stopped syncs' in port/docs/SYNC.md."
 }
 
 merge_upstream() {
@@ -402,8 +401,8 @@ merge_upstream() {
                 "(--allow-rewrite)"
         else
             die 4 "upstream $UPSTREAM_BRANCH no longer contains $last, the last upstream commit merged here, so its" \
-                "history was rewritten. Nothing was merged. Read 'Upstream rewrote its history' in" \
-                "port/docs/SYNC.md, then run again with --allow-rewrite if a merge is right."
+                "history was rewritten. Nothing was merged. Read 'Upstream rewrite (exit 4)' under 'Conflicts and" \
+                "stopped syncs' in port/docs/SYNC.md, then run again with --allow-rewrite if a merge is right."
         fi
     fi
     # Also when upstream is already merged here but not yet pushed
@@ -460,9 +459,6 @@ else
 say "Fetching origin/main and upstream/$UPSTREAM_BRANCH"
 fetch_all
 summary_ready=1
-if [ "$current" != "$branch" ]; then
-    say "On branch $current: syncing it with origin/$branch and publishing it there"
-fi
 update_from_origin
 # Before merging and building: origin's branch of this name, when there is one, must be in what the push carries, so
 # that the push is a fast-forward. A draft conflict proposal's upstream head is in upstream's newest one unless upstream
@@ -473,14 +469,14 @@ case "$topic_status" in
     0) ;;
     4) die 4 "origin's $branch is at a commit that neither upstream's $UPSTREAM_BRANCH nor this branch contains, so the" \
         "push couldn't be a fast-forward: upstream rewrote a draft conflict proposal's commits, or the branch moved." \
-        "Nothing was merged. Close that PR and resolve the sync on a new codex/upstream-sync- name ('Draft conflict" \
-        "proposal' in port/docs/SYNC.md)." ;;
+        "Nothing was merged. Close that PR and resolve the sync on a new codex/upstream-sync- name, as 'Draft" \
+        "conflict proposal (the hourly sync)' under 'Conflicts and stopped syncs' in port/docs/SYNC.md says." ;;
     *) die 1 "could not read origin's $branch; the publishing helper's message is above" ;;
 esac
 merge_upstream
 local_commits=$(git rev-list --count "$origin_ref..HEAD")
 if [ "$local_commits" -gt 0 ]; then
-    say "$local_commits commits are not on origin/$branch yet:"
+    say "$local_commits commits are not on origin/main yet:"
     git log --oneline --first-parent -n 20 "$origin_ref..HEAD"
 fi
 # The head that the merges made, which the builds verify and the push publishes
