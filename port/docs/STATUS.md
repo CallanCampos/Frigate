@@ -51,26 +51,26 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`: in a full build
   (10,703 steps) of the branch's base, again on its first two commits, in a full build (12,555 steps) after merging
   main at `10d017c010`, on `5d9a0706a1`, after merging `36101609ad`, which had nothing to compile, on `49ad7dd00a`,
-  after merging `806b2a8f9d`, whose 18 steps compile PR 73's `sp_poke_gimmick.c` again, and on `41a31781b0`, after
-  merging `c0a7941e4e`, which had nothing to compile. The exact-head verification of `1d5f9be437`
-  (`sync_upstream.sh --verify-pr 71`) built both ROMs in full, 14,039 steps in a fresh worktree, with the same SHA1s
-  and no warning. This change adds no ROM input.
+  after merging `806b2a8f9d`, whose 18 steps compile PR 73's `sp_poke_gimmick.c` again, and on `41a31781b0` and
+  `9e7af8b4ff`, after merging `c0a7941e4e` and `d1717b68d8`, which had nothing to compile. The exact-head
+  verifications of `1d5f9be437` and `4610e36297` (`sync_upstream.sh --verify-pr 71`) built both ROMs in full, 14,039
+  steps in a fresh worktree, with the same SHA1s and no warning. This change adds no ROM input.
 - **Host build (T1):** arm64 macOS RelWithDebInfo builds of both games (`build/port`, `build/port-w2`) pass with no
-  warning, fresh on the branch's base and rebuilt after each merge, on `5d9a0706a1`, `49ad7dd00a` and `41a31781b0`,
-  and fresh in the verification of `1d5f9be437`; `port_test_savelab_layout` builds with `-Wall -Wextra -Werror`, and
-  prints the same layout in both games.
+  warning, fresh on the branch's base and rebuilt after each merge, on `5d9a0706a1`, `49ad7dd00a`, `41a31781b0` and
+  `9e7af8b4ff`, and fresh in the verifications of `1d5f9be437` and `4610e36297`; `port_test_savelab_layout` builds
+  with `-Wall -Wextra -Werror`, and prints the same layout in both games.
 - **Tests:**
   - T2/T6: `ctest -LE route -j3` passes in both games, on each of the first head's commits, after the first merge, on
     `5d9a0706a1` (351 of 358 tests pass), on `49ad7dd00a` and `1d5f9be437`, with PR 73's tests (356 of 363), and on
-    `41a31781b0`, with PR 72's: 358 of 365 tests pass, `lab_savelab` among them (43 tests, the mutants among them),
-    and 7 skip for the optional setups this checkout lacks: `asm_oracle` (no Unicorn in this Python), `oracle_boot`,
-    `oracle_saves` and `oracle_floccesy_save` (no oracle built), the two function-sanitizer negatives of the VM
-    dispatch (Apple's compiler emits no such check) and `app_universal_slices` (one slice).
-  - Every test, the routes among them: the exact-head verification of `1d5f9be437` passed in both games, Black 2 375 of
-    404 tests and White 2 372 of 401, 29 skipping in each for want of the oracle (24 of the `oracle_*` tests and
-    `frame_times_party_menus`), Unicorn (`asm_oracle`), a second slice (`app_universal_slices`) and the
-    function-sanitizer check (the two VM dispatch negatives). Main then moved, with PR 72, so this head is verified
-    again before it merges.
+    `41a31781b0` and `9e7af8b4ff`, with PR 72's: 358 of 365 tests pass, `lab_savelab` among them (43 tests, the
+    mutants among them), and 7 skip for the optional setups this checkout lacks: `asm_oracle` (no Unicorn in this
+    Python), `oracle_boot`, `oracle_saves` and `oracle_floccesy_save` (no oracle built), the two function-sanitizer
+    negatives of the VM dispatch (Apple's compiler emits no such check) and `app_universal_slices` (one slice).
+  - Every test, the routes among them: the exact-head verifications passed in both games, on `1d5f9be437` Black 2 375
+    of 404 tests and White 2 372 of 401, and on `4610e36297`, with PR 72's tests, 377 of 406 and 374 of 403, 29
+    skipping in each for want of the oracle (24 of the `oracle_*` tests and `frame_times_party_menus`), Unicorn
+    (`asm_oracle`), a second slice (`app_universal_slices`) and the function-sanitizer check (the two VM dispatch
+    negatives). Main moved after each, with PR 72 and then PR 74, so this head is verified again before it merges.
   - `lab_savelab`, 43 tests on synthetic saves built field by field from the offsets and sizes that
     `port_test_savelab_layout` prints from the decomp's headers:
     - savelab's `LAYOUT` is the headers' (77 entries; two more, the follower's index and the step counter, are the
