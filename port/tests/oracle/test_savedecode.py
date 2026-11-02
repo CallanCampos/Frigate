@@ -1,22 +1,25 @@
 #!/usr/bin/env python3
-"""ROM-free tests of the save's decoder (port/tools/oracle/savedecode.py), on synthetic Pokémon, parties and records
-built from the decomp's headers' layout: savedecode_layout.c, compiled as the host build compiles the game's files,
-prints the offsets, sizes and bits of include/pml/poke_party.h, include/pml/mail.h, include/system/pms_data.h and
-include/save/records.h and of the blocks a round trip protects, and the tests build Pokémon, parties and records field
-by field from it, encrypted with their own copy of the game's generator, never the module's, so that a wrong
-generator in the module can't pass:
+"""ROM-free tests of the save's decoder and the round trips' save comparison (port/tools/oracle/savedecode.py), on
+synthetic saves built from the decomp's headers' layout: savedecode_layout.c, compiled as the host build compiles the
+game's files, prints the offsets, sizes and bits of include/pml/poke_party.h, include/pml/mail.h,
+include/system/pms_data.h and include/save/records.h and of the blocks a round trip protects, and the tests build
+Pokémon, parties and records field by field from it, encrypted with their own copy of the game's generator, never the
+module's, so that a wrong generator in the module can't pass:
 
   - the layout: the module's LAYOUT is the headers', name for name; its field views are the headers' members (each
     struct's members written here by hand from the headers, with their C types) and cover every bit of PokeParty and
     GameRecords once; its BLOCK_SHUFFLE is blockShufLUT and its generator, the PID's shuffle bits and the records'
     encrypted span are the game's, read from src/system/poke_tool.c, src/gfl/gf_standard.c and src/system/record.c,
-    with known answers for seeds 0 and 1;
+    with known answers for seeds 0 and 1; MAIN_SAVE_LAYOUT's sizes are the structs' rounded up to 4 and its offsets
+    the ones the oracle's code and records pin;
   - decoding: a party of six with every block order, an empty slot (PokeParty_ClearPkm's), a Pokémon stored
     decrypted, records, and data changed under a checksum, each a problem that names its save, copy and slot;
-  - the fields compared: the same block on both sides gives nothing; every field of every slot and every record,
-    changed alone and encrypted again as the game does, shows as itself and its checksum and nothing else; every byte
-    of both structs flipped alone shows; one PP shows as the PP and the checksum though most of the data's bytes
-    change; the HP and the status show alone;
+  - the comparison: the same save on both sides gives nothing; every field of every slot and every record, changed
+    alone and encrypted again as the game does, shows as itself and its checksum and nothing else; every byte of both
+    structs flipped alone shows; one PP shows as the PP and the checksum though most of the data's bytes change; the
+    HP and the status show alone; whole images in both copies, declared and undeclared, bytes and fields;
+  - the declarations: each of the README's rules ("Saves", "The party and the game records, compared decrypted"),
+    a sweep of every field outside the two lists, and the catch, Hugh and Floccesy trips' declarations accepted;
   - MUTANTS: deliberate bugs in savedecode.py, each with the tests that must catch it. MutationTests applies each to
     savedecode.py's source, loads the result in savedecode's place and runs those tests, which must fail; and it runs
     the same tests on savedecode as it is, which must pass.
@@ -49,7 +52,9 @@ HERE = Path(__file__).resolve().parent
 REPO_ROOT = HERE.parents[2]
 sys.path.insert(0, str(REPO_ROOT / "port" / "tools" / "oracle"))
 
+import oracle  # noqa: E402
 import savedecode  # noqa: E402
+import saveimage  # noqa: E402
 
 LAYOUT_PROGRAM = None
 
@@ -60,6 +65,15 @@ INCREMENT = 0x6073
 # EncryptRecordStorage (src/system/record.c): the records from words[1], 0x1d8 bytes, all of them but record 0
 RECORDS_ENCRYPTED_FROM = 4
 RECORDS_ENCRYPTED_SIZE = 0x1d8
+
+# Where the tests put the blocks savedecode decodes or protects in each copy of the main save, by block ID: the offsets
+# Black 2's and White 2's saves have, as saveimage.find_blocks reads them from the oracle's catch and Route 20 saves
+# (port/tools/oracle/README.md, "The party and the game records, compared decrypted"), and as the code and records pin
+# them besides (LayoutTests.test_main_save_layout_is_where_the_code_and_records_put_it)
+BLOCK_OFFSETS = {0x19: 0x18400, 0x1a: 0x18e00, 0x1c: 0x19500, 0x22: 0x1c800, 0x26: 0x1da00, 0x2d: 0x1ff00,
+                 0x34: 0x21100}
+BLOCK_STRUCTS = {0x19: "BagSave", 0x1a: "PokeParty", 0x1c: "PlayerSave", 0x22: "MysteryGiftSaveData",
+                 0x26: "GameRecords", 0x2d: "EventWork", 0x34: "TrainerGameInfoSave"}
 
 # Each struct's members as the headers declare them, in order, with the C type of one element (a struct's name for an
 # array of structs, "bits" for a bitfield): include/pml/poke_party.h, include/pml/mail.h, include/system/pms_data.h.
@@ -89,6 +103,12 @@ C_MEMBERS = {
     "PMSData": (("type", "u16"), ("id", "u16"), ("words", "u16")),
 }
 C_BYTES = {"u8": 1, "u16": 2, "u32": 4, "u64": 8}
+# The README's lists of the party fields a round trip may declare: a Pokémon that fought past a cut, and the mail's
+# heap leftovers (ResetMailData, src/system/mail.c), written here by hand
+POST_CUT = {"nowHP", "statusCond", "blockB.pp[0]", "blockB.pp[1]", "blockB.pp[2]", "blockB.pp[3]", "base.checksum"}
+HEAP_MAIL = {"mail.unk18[0]", "mail.unk18[1]", "mail.unk18[2]", "mail.message[0].id", "mail.message[1].id",
+             "mail.message[2].id"}
+CAUSE = "a cause traced to src/ov167/btl_server_flow.c"
 
 
 @functools.cache
@@ -264,6 +284,73 @@ def stored_records(layout: dict[str, int], plain: bytes, checksum: int | None = 
     return bytes(out)
 
 
+def gift_block(layout: dict[str, int], key: int) -> bytes:
+    """A mystery gift block that holds no gift, as mgEncryptData (src/system/mystery_data.c) leaves one: zeros
+    encrypted with their sum, 0, plus key << 16, then the checksum and the key"""
+    size = layout["MysteryGiftSaveData.checksum"]
+    return encrypt(bytes(size), key << 16) + struct.pack("<HH", 0, key)
+
+
+def layout_blocks(sizes: dict[int, int], offsets: dict[int, int]) -> list[tuple[int, int]]:
+    """The main save's 73 blocks as (offset, size): the given blocks at their offsets, and between them (before the
+    first, after the last) the others, each a page but the first of each gap, which takes the rest of it; each block
+    0x100-aligned after the one before and its 4-byte footer, as SaveData_BuildTable lays them out"""
+    blocks: list[tuple[int, int]] = []
+    start = 0
+    for fixed in sorted(offsets) + [saveimage.BLOCK_COUNT]:
+        end = offsets[fixed] if fixed < saveimage.BLOCK_COUNT else saveimage.CRC_TABLE
+        gap = fixed - len(blocks)
+        for index in range(gap):
+            pages = (end - start) // 0x100 - (gap - 1) if index == 0 else 1
+            blocks.append((start, pages * 0x100 - 4))
+            start += pages * 0x100
+        assert start == end, (fixed, hex(start), hex(end))
+        if fixed < saveimage.BLOCK_COUNT:
+            blocks.append((offsets[fixed], sizes[fixed]))
+            start = (offsets[fixed] + sizes[fixed] + 4 + 0xff) // 0x100 * 0x100
+    return blocks
+
+
+class SyntheticSave:
+    """A backup image laid out as the game lays one out: the blocks savedecode decodes or protects at offsets with their
+    structs' sizes rounded up to 4, the others filling the gaps with filler, each followed by its footer {u16 count;
+    u16 crc}, then the CRC table with its padding and the save footer {count, size, magic, unk, crc}
+    (src/gfl/backup_system.c), and the same main save again at 0x26000. A block is set in both copies; image() computes
+    every CRC. The party is a party of none and the records all zero until set, and the gift block holds no gift"""
+
+    def __init__(self, layout: dict[str, int], offsets: dict[int, int], seed: int = 2026):
+        self.layout = layout
+        sizes = {block: (layout[f"sizeof({name})"] + 3) // 4 * 4 for block, name in BLOCK_STRUCTS.items()}
+        self.blocks = layout_blocks(sizes, offsets)
+        self.data = bytearray(b"\xff" * saveimage.BACKUP_SIZE)
+        filler = random.Random(seed)
+        for start, size in self.blocks:
+            self.data[start:start + size] = filler.randbytes(size)
+        self.set(0x1a, stored_party(layout, []))
+        self.set(0x26, stored_records(layout, plain_records(layout, {}, 0x5959)))
+        self.set(0x22, gift_block(layout, 0x7560))
+
+    def set(self, block: int, data: bytes) -> None:
+        start, size = self.blocks[block]
+        assert len(data) <= size
+        self.data[start:start + len(data)] = data
+
+    def image(self) -> bytes:
+        main = bytearray(self.data[:saveimage.COPY_SIZE])
+        for index, (start, size) in enumerate(self.blocks):
+            crc = saveimage.crc16_ccitt(bytes(main[start:start + size]))
+            struct.pack_into("<HH", main, start + size, 1, crc)
+            struct.pack_into("<H", main, saveimage.CRC_TABLE + 2 * index, crc)
+        struct.pack_into("<H", main, saveimage.CRC_TABLE + 2 * len(self.blocks), 0)
+        table_crc = saveimage.crc16_ccitt(bytes(main[saveimage.CRC_TABLE:saveimage.SAVE_FOOTER]))
+        struct.pack_into("<IIIHH", main, saveimage.SAVE_FOOTER, 1, saveimage.MAIN_SAVE_SIZE, saveimage.SAVE_MAGIC, 0,
+                         table_crc)
+        image = bytearray(self.data)
+        image[:saveimage.COPY_SIZE] = main
+        image[saveimage.COPY_SIZE:2 * saveimage.COPY_SIZE] = main
+        return bytes(image)
+
+
 def differing(a: dict[str, int], b: dict[str, int]) -> set[str]:
     """The names whose values differ between two decoded views, and those only one has"""
     return {name for name in a.keys() | b.keys() if a.get(name) != b.get(name)}
@@ -371,6 +458,66 @@ class LayoutTests(DecodeTest):
         # The span ends at the checksum: every record but record 0
         self.assertEqual(savedecode.RECORDS_ENCRYPTED + RECORDS_ENCRYPTED_SIZE, self.layout["GameRecords.checksum"])
 
+    def test_main_save_layout_is_the_structs(self):
+        layout = self.layout
+        self.assertEqual(set(savedecode.MAIN_SAVE_LAYOUT), {layout[f"SAVE_BLOCK_{name}"] for name in (
+            "BAG", "PARTY", "PLAYER", "MYSTERY_GIFT", "RECORDS", "EVENT_WORK", "TRAINER_GAME_INFO")})
+        for block, (offset, size) in savedecode.MAIN_SAVE_LAYOUT.items():
+            with self.subTest(block=block):
+                self.assertEqual(size, (layout[f"sizeof({BLOCK_STRUCTS[block]})"] + 3) // 4 * 4)
+                self.assertEqual(offset % 0x100, 0)
+                self.assertEqual(offset, BLOCK_OFFSETS[block])
+        offsets = [savedecode.MAIN_SAVE_LAYOUT[block][0] for block in sorted(savedecode.MAIN_SAVE_LAYOUT)]
+        self.assertEqual(offsets, sorted(offsets))
+        # Each block ends, with its footer, before the next one starts
+        for block, next_block in zip(sorted(BLOCK_OFFSETS), sorted(BLOCK_OFFSETS)[1:]):
+            offset, size = savedecode.MAIN_SAVE_LAYOUT[block]
+            self.assertLessEqual(offset + size + 4, savedecode.MAIN_SAVE_LAYOUT[next_block][0])
+
+    def test_main_save_layout_is_where_the_code_and_records_put_it(self):
+        main = savedecode.MAIN_SAVE_LAYOUT
+        layout = self.layout
+        # The mystery gift block (oracle.MYSTERY_GIFT_BLOCK) and its CRC (CENTER_SAVE_BYTES' 0x1d296, in its footer)
+        self.assertEqual(main[0x22][0], oracle.MYSTERY_GIFT_BLOCK)
+        self.assertEqual(main[0x22][1], oracle.MYSTERY_GIFT_SIZE)
+        self.assertEqual(sum(main[0x22]) + 2, 0x1d296)
+        self.assertIn(0x1d296, oracle.parse_offsets(next(iter(text for text in oracle.CENTER_SAVE_BYTES
+                                                                if "0x1d296" in text))))
+        # The party's footer CRC 0x19336 and the trainer data's 0x194b2 (CATCH_SAVE_BYTES' CRCs): the party ends 2
+        # bytes before its footer's CRC, and the trainer data's block, whose CRC is on the page after the party's,
+        # leaves the page after it to the player's block
+        crcs = oracle.parse_offsets(next(text for text in oracle.CATCH_SAVE_BYTES if "0x19336" in text))
+        self.assertLessEqual({0x19336, 0x194b2}, set(crcs))
+        self.assertEqual(sum(main[0x1a]) + 2, 0x19336)
+        self.assertEqual((sum(main[0x1a]) + 4 + 0xff) // 0x100 * 0x100, 0x194b2 // 0x100 * 0x100)
+        self.assertEqual(main[0x1c][0], 0x194b2 // 0x100 * 0x100 + 0x100)
+        # pkms[0] at 0x18e08, the player's location at 0x19580 and the event work at 0x1ff00 (test_compare.py's
+        # Floccesy test), and the records' encrypted part at 0x1da04 (README.md, "Saves")
+        self.assertEqual(main[0x1a][0] + layout["PokeParty.pkms"], 0x18e08)
+        self.assertEqual(main[0x1c][0] + layout["PlayerSave.location"], 0x19580)
+        self.assertEqual(main[0x2d][0], 0x1ff00)
+        self.assertEqual(main[0x26][0] + savedecode.RECORDS_ENCRYPTED, 0x1da04)
+
+    def test_main_save_layout_is_the_starter_saves(self):
+        # The replay check's references of the oracle's starter save (check_oracle_save.py --update writes them from the
+        # save's find_blocks, hashes only) give every block's offset and size in each version: the seven blocks are
+        # MAIN_SAVE_LAYOUT's in both
+        for version in ("b2_us", "w2_us"):
+            rows = {}
+            header = None
+            for line in source(f"port/tests/replay/starter_save_{version}.save.tsv").splitlines():
+                if not line or line.startswith("#"):
+                    continue
+                columns = line.split("\t")
+                if header is None:
+                    header = columns
+                    continue
+                row = dict(zip(header, columns))
+                if row["block"].isdigit():
+                    rows[int(row["block"])] = (int(row["offset"], 16), int(row["size"], 16))
+            for block, placed in savedecode.MAIN_SAVE_LAYOUT.items():
+                with self.subTest(version=version, block=block):
+                    self.assertEqual(rows[block], placed)
 
 
 class DecodingTests(DecodeTest):
@@ -619,6 +766,272 @@ class ByteSweepTests(ComparisonTest):
         self.assertEqual(missed, [])
 
 
+class WholeImageTests(ComparisonTest):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        save = SyntheticSave(cls.layout, BLOCK_OFFSETS)
+        save.set(0x1a, cls.party)
+        save.set(0x26, cls.records)
+        cls.blocks = save.blocks
+        cls.image = save.image()
+
+    def changed(self, party: bytes | None = None, records: bytes | None = None, copies=saveimage.COPIES,
+                bytes_at: tuple[int, ...] = ()) -> bytes:
+        """The base image with the party or the records replaced in the copies given (their CRCs computed again), and
+        bytes flipped at offsets of the chip"""
+        image = bytearray(self.image)
+        for copy in copies:
+            save = SyntheticSave(self.layout, BLOCK_OFFSETS)
+            save.data[:] = self.image
+            save.set(0x1a, party or self.party)
+            save.set(0x26, records or self.records)
+            image[copy:copy + saveimage.COPY_SIZE] = save.image()[copy:copy + saveimage.COPY_SIZE]
+        for offset in bytes_at:
+            image[offset] ^= 1
+        return bytes(image)
+
+    def compare(self, port: bytes, known=None, known_party=None, known_records=None) -> savedecode.SaveComparison:
+        return savedecode.compare_saves(port, self.image, self.blocks, known or {}, known_party or {},
+                                        known_records or {})
+
+    def test_the_synthetic_layout_is_found(self):
+        self.assertEqual(saveimage.validate_image(self.image), [])
+        self.assertEqual(saveimage.find_blocks(self.image), self.blocks)
+        self.assertEqual(savedecode.layout_problems(self.blocks), [])
+
+    def test_the_same_save_differs_in_nothing(self):
+        comparison = self.compare(self.image)
+        self.assertEqual((comparison.spans, comparison.fields, comparison.problems), ([], [], []))
+        self.assertTrue(comparison.passed)
+        self.assertEqual(comparison.lines[-1], "the save comparison passes")
+
+    def test_a_difference_outside_the_structs_is_bytes(self):
+        party_start, party_size = self.blocks[0x1a]
+        # A byte of the trainer data, and the party block's footer CRC, in each copy
+        for copy in saveimage.COPIES:
+            for offset in (copy + 0x19427, copy + party_start + party_size + 2):
+                with self.subTest(offset=hex(offset)):
+                    comparison = self.compare(self.changed(bytes_at=(offset,)))
+                    self.assertEqual(comparison.spans, [(offset, offset)])
+                    self.assertEqual(comparison.undeclared_spans, [(offset, offset)])
+                    self.assertEqual(comparison.bytes_by_copy[copy], 1)
+                    self.assertEqual(comparison.fields, [])
+                    self.assertFalse(comparison.passed)
+                    # Declared, it passes
+                    self.assertTrue(self.compare(self.changed(bytes_at=(offset,)), {f"{offset:#x}": "declared"}).passed)
+
+    def test_a_field_difference_is_reported_with_its_copy(self):
+        bit, width = field_at(self.layout, "nowHP")
+        plain = self.decoded_slot(1)
+        put(plain, bit, width, get(plain, bit, width) ^ 2)
+        for copies in ((0,), (saveimage.COPY_SIZE,), saveimage.COPIES):
+            with self.subTest(copies=copies):
+                comparison = self.compare(self.changed(party=self.party_with(1, plain), copies=copies))
+                self.assertEqual([(difference.copy, difference.struct, difference.name, difference.cause)
+                                  for difference in comparison.fields],
+                                 [(copy, "the party", "pkms[1].nowHP", None) for copy in copies])
+                # The party block's footer CRC, table entry and the table's CRC differ as bytes
+                self.assertTrue(comparison.spans)
+                self.assertFalse(comparison.passed)
+                self.assertIn("pkms[1].nowHP", comparison.lines[-2])
+
+    def test_a_record_difference_is_reported_with_its_copy(self):
+        plain = bytearray(self.plain_records)
+        plain[self.layout["GameRecords.halfwords"] + 2 * (0x4b - 0x47)] ^= 1
+        for copies in ((0,), (saveimage.COPY_SIZE,)):
+            with self.subTest(copies=copies):
+                comparison = self.compare(self.changed(records=stored_records(self.layout, plain), copies=copies))
+                self.assertEqual({(difference.copy, difference.name) for difference in comparison.fields},
+                                 {(copies[0], "record 0x4b"), (copies[0], "checksum")})
+                self.assertFalse(comparison.passed)
+
+    def test_declared_fields_and_records_pass_and_undeclared_ones_fail(self):
+        layout = self.layout
+        crcs = {}
+        for block in (0x1a, 0x26):
+            start, size = self.blocks[block]
+            offsets = [start + size + 2, start + size + 3, saveimage.CRC_TABLE + 2 * block,
+                       saveimage.CRC_TABLE + 2 * block + 1, saveimage.SAVE_FOOTER + 14, saveimage.SAVE_FOOTER + 15]
+            crcs[",".join(f"{copy + offset:#x}" for copy in saveimage.COPIES for offset in offsets)] = "their CRCs"
+        bit, width = field_at(layout, "mail.message[1].id")
+        plain = self.decoded_slot(1)
+        put(plain, bit, width, 0xbf83)
+        records = bytearray(self.plain_records)
+        records[layout["GameRecords.words"] + 4 * 0x19] ^= 1
+        port = self.changed(party=self.party_with(1, plain), records=stored_records(layout, records))
+        party = {"pkms[1].mail.message[1].id": "the mail's heap leftover, src/system/mail.c"}
+        record = {"0x19": "an opponent's Pokémon fainted, src/ov167/btl_server_flow.c"}
+        comparison = self.compare(port, crcs, party, record)
+        self.assertEqual(comparison.undeclared_fields, [])
+        self.assertTrue(comparison.passed, comparison.lines)
+        # The records' checksum is declared by the record that moved it
+        self.assertIn("the checksum of the declared records that differ",
+                      {difference.cause for difference in comparison.fields if difference.name == "checksum"})
+        # Each left undeclared fails
+        self.assertFalse(self.compare(port, crcs, {}, record).passed)
+        self.assertFalse(self.compare(port, crcs, party, {}).passed)
+        self.assertFalse(self.compare(port, {}, party, record).passed)
+
+    def test_a_declared_item_that_does_not_differ_is_the_same(self):
+        comparison = self.compare(self.image, {"0x19427": "the play time's seconds"},
+                                  {"pkms[0].mail.message[0].id": "src/system/mail.c"},
+                                  {"0x4b": "src/ov167/btl_server_flow.c"})
+        self.assertTrue(comparison.passed)
+        self.assertEqual([line for line in comparison.lines if line.startswith("may differ")],
+                         ["may differ, bytes 0x19427: the play time's seconds (the same in this run)",
+                          "may differ, party fields pkms[0].mail.message[0].id: src/system/mail.c "
+                          "(the same in this run)",
+                          "may differ, records 0x4b: src/ov167/btl_server_flow.c (the same in this run)"])
+
+    def test_a_problem_names_its_save_copy_and_slot(self):
+        party = bytearray(self.party)
+        party[self.layout["PokeParty.pkms"] + self.layout["sizeof(PartyPkm)"] + 0x10] ^= 4
+        comparison = self.compare(self.changed(party=bytes(party), copies=(saveimage.COPY_SIZE,)))
+        self.assertEqual(len(comparison.problems), 1)
+        self.assertTrue(comparison.problems[0].startswith("the port's save, copy 0x26000, the party: pkms[1]: "),
+                        comparison.problems)
+        self.assertFalse(comparison.passed)
+        # The byte sweep's ends, in each copy, as whole images: the structs' first and last bytes
+        for block in (0x1a, 0x26):
+            start, _ = self.blocks[block]
+            size = self.layout["sizeof(PokeParty)"] if block == 0x1a else self.layout["sizeof(GameRecords)"]
+            for copy in saveimage.COPIES:
+                for offset in (start, start + size - 1):
+                    with self.subTest(block=block, offset=copy + offset):
+                        port = bytearray(self.image)
+                        port[copy + offset] ^= 1
+                        comparison = self.compare(bytes(port))
+                        self.assertFalse(comparison.passed)
+                        self.assertTrue(comparison.fields or comparison.problems)
+                        self.assertEqual(comparison.spans, [])
+
+
+class DeclarationTests(DecodeTest):
+    def problems(self, known=None, party=None, records=None, cut=False) -> list[str]:
+        return savedecode.declaration_problems(known or {}, party or {}, records or {}, cut)
+
+    def test_a_byte_in_a_protected_region_is_refused(self):
+        layout = self.layout
+        # The README's protected regions, from the headers: the party, the records, the mystery gifts' contents up to
+        # their checksum and key, the event work, the money and the badges, the player's place and four spawns, the bag
+        regions = {
+            "the party": (0x1a, 0, layout["sizeof(PokeParty)"]),
+            "the records": (0x26, 0, layout["sizeof(GameRecords)"]),
+            "the mystery gifts' contents": (0x22, 0, layout["MysteryGiftSaveData.checksum"]),
+            "the event work": (0x2d, 0, layout["sizeof(EventWork)"]),
+            "the money": (0x34, layout["TrainerGameInfoSave.cash"], layout["sizeof(TrainerGameInfoSave.cash)"]),
+            "the badges": (0x34, layout["TrainerGameInfoSave.badges"], layout["sizeof(TrainerGameInfoSave.badges)"]),
+            "the player's place": (0x1c, layout["PlayerSave.location"], layout["sizeof(PlayerSave.location)"]),
+            "the bag": (0x19, 0, layout["sizeof(BagSave)"]),
+        }
+        for spawn in ("nowSpawn", "unk1C", "nextSpawn", "escapeRopeSpawn"):
+            regions[f"the player's spawn PlayerSave.{spawn}"] = (0x1c, layout[f"PlayerSave.{spawn}"],
+                                                                 layout[f"sizeof(PlayerSave.{spawn})"])
+        for what, (block, offset, size) in regions.items():
+            for copy in saveimage.COPIES:
+                # Each region's first and last byte
+                for at in (offset, offset + size - 1):
+                    byte = copy + BLOCK_OFFSETS[block] + at
+                    with self.subTest(region=what, byte=hex(byte)):
+                        problems = self.problems({f"{byte:#x}": "a cause"})
+                        self.assertEqual(len(problems), 1, problems)
+                        self.assertIn(f"{byte:#x}, in copy {copy:#x}, is in {what}", problems[0])
+        # Controls: next to them, the footers and the CRC table stay declarable, and so does the gift block's key
+        for byte in (0x18e00 + layout["sizeof(PokeParty)"] + 2, 0x1da00 + layout["sizeof(GameRecords)"] + 2,
+                     0x1c800 + layout["MysteryGiftSaveData.key"], 0x1ff00 + layout["sizeof(EventWork)"] + 4,
+                     0x18400 + layout["sizeof(BagSave)"] + 3, 0x19500 + layout["PlayerSave.location"] - 1,
+                     0x19500 + layout["PlayerSave.escapeRopeSpawn"] + 0x1c, 0x25f34, 0x25fa2, 0x3f427):
+            with self.subTest(byte=hex(byte)):
+                self.assertEqual(self.problems({f"{byte:#x}": "a cause"}), [])
+
+    def test_bad_byte_spans_are_refused(self):
+        for text in ("0x80000", "nonsense", "0x20-0x10", ""):
+            with self.subTest(text=text):
+                self.assertEqual(len(self.problems({text: "a cause"})), 1)
+        self.assertEqual(len(self.problems({"0x19427": ""})), 1)
+
+    def test_fields_never_declared_are_refused(self):
+        # The item, the experience, the friendship, the level, a stat and a move
+        for path in ("blockA.item", "blockA.exp", "blockA.friendship", "level", "maxHP", "atk", "blockB.moves[0]"):
+            for cut in (False, True):
+                with self.subTest(path=path, cut=cut):
+                    problems = self.problems(party={f"pkms[2].{path}": CAUSE}, cut=cut)
+                    self.assertEqual(len(problems), 1, problems)
+                    self.assertIn("never declared", problems[0])
+
+    def test_every_field_outside_the_two_lists_is_refused(self):
+        paths = [path for path, _, _ in self.pokemon_view]
+        for slot in range(self.layout["PARTY_SIZE"]):
+            for path in paths:
+                name = f"pkms[{slot}].{path}"
+                problems = self.problems(party={name: CAUSE}, cut=True)
+                self.assertEqual(problems != [], path not in POST_CUT | HEAP_MAIL, name)
+        self.assertEqual(len(paths) - len(POST_CUT | HEAP_MAIL), 121)
+
+    def test_the_post_cut_fields_need_a_cut(self):
+        for path in sorted(POST_CUT):
+            with self.subTest(path=path):
+                problems = self.problems(party={f"pkms[0].{path}": CAUSE})
+                self.assertEqual(len(problems), 1)
+                self.assertIn("only past a cut", problems[0])
+                self.assertEqual(self.problems(party={f"pkms[0].{path}": CAUSE}, cut=True), [])
+        # The mail's heap leftovers need none
+        for path in sorted(HEAP_MAIL):
+            self.assertEqual(self.problems(party={f"pkms[5].{path}": CAUSE}), [], path)
+
+    def test_an_unknown_field_is_refused(self):
+        for name in ("pkms[6].nowHP", "pkms[1].blockA.speciez", "pkms[1].mail.message[3].id", "nowHP", "count",
+                     "pkms[01].nowHP", "pkms[1].mail.unk18"):
+            with self.subTest(name=name):
+                problems = self.problems(party={name: CAUSE}, cut=True)
+                self.assertEqual(len(problems), 1, problems)
+                self.assertIn("no field of the party's Pokémon", problems[0])
+
+    def test_bad_record_declarations_are_refused(self):
+        for name in ("0x4b-0x4c", "checksum", "seedHigh", "0xa7", "0x100", "75", "0x4B", "0xb", "record 0x4b"):
+            with self.subTest(name=name):
+                problems = self.problems(records={name: CAUSE})
+                self.assertEqual(len(problems), 1, problems)
+                self.assertIn("not a record", problems[0])
+        self.assertEqual(self.problems(records={"0x00,0xa6,0x4b": CAUSE}), [])
+
+    def test_a_cause_without_a_src_site_is_refused(self):
+        for party, records in (({"pkms[0].mail.message[0].id": "the heap's leftovers"}, {}),
+                               ({}, {"0x0b": "res/field/scripts/aspertia_city_pokemon_center.s:52 (RecordAdd 11, 1)"}),
+                               ({}, {"0x4b": "the battle"})):
+            with self.subTest(party=party, records=records):
+                problems = self.problems(party=party, records=records)
+                self.assertEqual(len(problems), 1, problems)
+                self.assertIn("cites no src/ site", problems[0])
+        # A script line with the script command's src/ site is a traced cause
+        self.assertEqual(self.problems(records={"0x0b": (
+            "res/field/scripts/aspertia_city_pokemon_center.s:51-52 (PokePartyRecoverAll, then RecordAdd 11, 1), "
+            "Scrcmd_PokeDisp_RecordAdd (src/ov036/scrcmd_poke_disp.c)")}), [])
+
+    def test_the_round_trips_declarations_are_accepted(self):
+        for name in ("catch", "hugh", "floccesy"):
+            trip = oracle.ROUND_TRIPS[name]
+            for version in ("b2_us", "w2_us"):
+                with self.subTest(trip=name, version=version):
+                    self.assertEqual(savedecode.declaration_problems(
+                        trip.known.get(version, {}), trip.known_party.get(version, {}),
+                        trip.known_records.get(version, {}), bool(trip.cut)), [])
+
+    def test_layout_problems(self):
+        blocks = layout_blocks({block: size for block, (_, size) in savedecode.MAIN_SAVE_LAYOUT.items()},
+                               {block: offset for block, (offset, _) in savedecode.MAIN_SAVE_LAYOUT.items()})
+        self.assertEqual(savedecode.layout_problems(blocks), [])
+        for block, change in ((0x1a, (0x100, 0)), (0x26, (0, 4)), (0x34, (0x100, 0))):
+            with self.subTest(block=block):
+                moved = list(blocks)
+                moved[block] = (blocks[block][0] + change[0], blocks[block][1] + change[1])
+                problems = savedecode.layout_problems(moved)
+                self.assertEqual(len(problems), 1)
+                self.assertTrue(problems[0].startswith(f"block {block:#x} "), problems)
+        self.assertEqual(len(savedecode.layout_problems(blocks[:0x20])), 4)
+
+
 # Deliberate bugs in savedecode.py, each the text it replaces (found exactly once in savedecode.py), the text that
 # replaces it, and the tests, ClassName or ClassName.test_name, at least one of which must fail on it
 MUTANTS = (
@@ -644,6 +1057,9 @@ MUTANTS = (
      ("DecodingTests.test_the_records_give_back_their_counters",)),
     ("seedHigh left out", ', ("seedHigh", 8 * RECORDS_SEED_HIGH, 16)', "",
      ("FieldSweepTests.test_every_record_changed_alone_shows_as_itself_and_the_checksum",)),
+    ("the second copy left out", "    for copy in saveimage.COPIES:\n        for part in structs:",
+     "    for copy in (0,):\n        for part in structs:",
+     ("WholeImageTests.test_a_field_difference_is_reported_with_its_copy",)),
     # A wrong key or seed
     ("the generator's multiplier", "CRYPTO_MULTIPLIER = 0x41c64e6d", "CRYPTO_MULTIPLIER = 0x41c64e6f",
      ("LayoutTests.test_the_generator_is_the_games",)),
@@ -677,6 +1093,68 @@ MUTANTS = (
     # The layout
     ("the level a byte on", '"PartyPkm.level": 0x8c,', '"PartyPkm.level": 0x8d,',
      ("LayoutTests.test_layout_is_the_headers",)),
+    ("the records block's offset a page on", "SAVE_BLOCK_RECORDS: (0x1da00,", "SAVE_BLOCK_RECORDS: (0x1db00,",
+     ("LayoutTests.test_main_save_layout_is_where_the_code_and_records_put_it",)),
+    ("layout_problems never reports", "        elif blocks[block] != (offset, size):\n", "        elif False:\n",
+     ("DeclarationTests.test_layout_problems",)),
+    # A declaration accepted
+    ("the event work declarable",
+     '        at(SAVE_BLOCK_EVENT_WORK, 0, LAYOUT["sizeof(EventWork)"],\n'
+     '           "the event work (EventWork), the story\'s flags and work values"),\n', "",
+     ("DeclarationTests.test_a_byte_in_a_protected_region_is_refused",)),
+    ("the player's place declarable",
+     '        at(SAVE_BLOCK_PLAYER, LAYOUT["PlayerSave.location"], LAYOUT["sizeof(PlayerSave.location)"],\n'
+     '           "the player\'s place (PlayerSave.location)"),\n', "",
+     ("DeclarationTests.test_a_byte_in_a_protected_region_is_refused",)),
+    ("the money declarable",
+     '        at(SAVE_BLOCK_TRAINER_GAME_INFO, LAYOUT["TrainerGameInfoSave.cash"],\n'
+     '           LAYOUT["sizeof(TrainerGameInfoSave.cash)"], "the money (TrainerGameInfoSave.cash)"),\n', "",
+     ("DeclarationTests.test_a_byte_in_a_protected_region_is_refused",)),
+    ("the bag declarable", '        at(SAVE_BLOCK_BAG, 0, LAYOUT["sizeof(BagSave)"], "the bag (BagSave)"),\n', "",
+     ("DeclarationTests.test_a_byte_in_a_protected_region_is_refused",)),
+    ("a byte span over the party accepted",
+     '        at(SAVE_BLOCK_PARTY, 0, LAYOUT["sizeof(PokeParty)"], "the party (PokeParty), declared by field"),\n', "",
+     ("DeclarationTests.test_a_byte_in_a_protected_region_is_refused",)),
+    ("a byte span over the records accepted",
+     '        at(SAVE_BLOCK_RECORDS, 0, LAYOUT["sizeof(GameRecords)"], "the records (GameRecords), declared by '
+     'record"),\n', "", ("DeclarationTests.test_a_byte_in_a_protected_region_is_refused",)),
+    ("the item declarable", "HEAP_MAIL_FIELDS = (", 'HEAP_MAIL_FIELDS = ("blockA.item", ',
+     ("DeclarationTests.test_fields_never_declared_are_refused",)),
+    ("the experience declarable", "HEAP_MAIL_FIELDS = (", 'HEAP_MAIL_FIELDS = ("blockA.exp", ',
+     ("DeclarationTests.test_fields_never_declared_are_refused",)),
+    ("the friendship declarable", "HEAP_MAIL_FIELDS = (", 'HEAP_MAIL_FIELDS = ("blockA.friendship", ',
+     ("DeclarationTests.test_fields_never_declared_are_refused",)),
+    ("the level declarable", "POST_CUT_FIELDS = (", 'POST_CUT_FIELDS = ("level", ',
+     ("DeclarationTests.test_fields_never_declared_are_refused",)),
+    ("the maximum HP declarable", "POST_CUT_FIELDS = (", 'POST_CUT_FIELDS = ("maxHP", ',
+     ("DeclarationTests.test_fields_never_declared_are_refused",)),
+    ("a move declarable", "HEAP_MAIL_FIELDS = (", 'HEAP_MAIL_FIELDS = ("blockB.moves[0]", ',
+     ("DeclarationTests.test_fields_never_declared_are_refused",)),
+    ("the post-cut fields taken without a cut", "                if not cut:\n", "                if False:\n",
+     ("DeclarationTests.test_the_post_cut_fields_need_a_cut",)),
+    ("a record range taken", "if not RECORD_ID.fullmatch(name) or int(name, 16) >= RECORD_COUNT:",
+     "if not RECORD_ID.match(name) or int(name[:4], 16) >= RECORD_COUNT:",
+     ("DeclarationTests.test_bad_record_declarations_are_refused",)),
+    ("a record past 0xa6 taken", "or int(name, 16) >= RECORD_COUNT:", "or int(name, 16) > RECORD_COUNT:",
+     ("DeclarationTests.test_bad_record_declarations_are_refused",)),
+    ("a cause without a src/ site taken", "    if SOURCE_SITE.search(cause):\n        return []\n",
+     "    if True:\n        return []\n", ("DeclarationTests.test_a_cause_without_a_src_site_is_refused",)),
+    ("an unknown field taken", " or match.group(2) not in POKEMON_PATHS:", ":",
+     ("DeclarationTests.test_an_unknown_field_is_refused",)),
+    # A whole block let through
+    ("every field taken as declared", "part.causes.get(name))", 'part.causes.get(name, "any"))',
+     ("WholeImageTests.test_a_field_difference_is_reported_with_its_copy",)),
+    ("the party's fields not compared", "        for part in structs:\n", "        for part in structs[1:]:\n",
+     ("WholeImageTests.test_a_field_difference_is_reported_with_its_copy",)),
+    ("the records not compared", "        for part in structs:\n", "        for part in structs[:1]:\n",
+     ("WholeImageTests.test_a_record_difference_is_reported_with_its_copy",)),
+    ("bytes outside the structs never undeclared",
+     "    undeclared_spans = join_offsets([offset for offset in differing if offset not in declared])\n",
+     "    undeclared_spans = []\n", ("WholeImageTests.test_a_difference_outside_the_structs_is_bytes",)),
+    ("the structs' footers left out of the bytes",
+     "    skipped = [(copy + part.start, copy + part.start + part.size)\n",
+     "    skipped = [(copy + part.start, copy + part.start + part.size + 4)\n",
+     ("WholeImageTests.test_a_difference_outside_the_structs_is_bytes",)),
 )
 
 

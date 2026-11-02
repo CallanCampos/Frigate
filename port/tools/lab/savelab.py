@@ -60,9 +60,9 @@ save footer's CRC of that table are recomputed in each copy (SaveData_FillFooter
 result must pass validate_image against the base. The save counts are left alone, so a minted save is laid out as the
 game writes one. The fields' offsets are the decomp's headers' (include/save/*.h, include/field/zone.h,
 include/pml/poke_party.h), which port/tests/lab/test_savelab.py holds LAYOUT to as the compiler lays them out. The
-party is decoded by port/tools/oracle/savedecode.py, the one copy of the save's crypto: each Pokémon decrypted as
-PokeParty_DecryptPkm does (src/system/poke_tool.c), its offsets held to the headers by
-port/tests/oracle/test_savedecode.py. The same base, recipe and tool give the same bytes.
+party is decoded by port/tools/oracle/savedecode.py, the one copy of the save's crypto, which the oracle's round trips
+compare the party with too: each Pokémon decrypted as PokeParty_DecryptPkm does (src/system/poke_tool.c), its offsets
+held to the headers by port/tests/oracle/test_savedecode.py. The same base, recipe and tool give the same bytes.
 Standard library only.
 """
 

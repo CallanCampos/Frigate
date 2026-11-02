@@ -48,8 +48,8 @@ which the comparison sequences of the field menu and its apps start from. It is 
 shipped with Frigate, and built only with `-DPORT_BUILD_ORACLE=ON`. Its README has the formats (input files, run
 directories, sound traces), how frames are aligned, the comparison sequences, saves, the sound and the known
 differences. Its `savedecode.py` decodes the saves' party and game records field by field, the one copy of the save's
-crypto, for the save lab's reader. `pbwinput.c` and `display3d.c` are plain C11 that the program's replays and the
-tests compile too;
+crypto, for the round trips, which compare those two by their fields and the rest by bytes, and for the save lab's
+reader. `pbwinput.c` and `display3d.c` are plain C11 that the program's replays and the tests compile too;
 `digest.c`, the per-game-frame digest's canonical encoding (ADR 0031), is plain C11 that only its tests compile so
 far, with its hash from xxHash's header, which every build fetches at configure time as `oracle/xxhash.cmake` pins
 it; and `sndtrace.h`, the sound trace's format, is plain C11 that Frigate itself includes: the platform layer's sound

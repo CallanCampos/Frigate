@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""The save's party and game records decoded field by field: the one copy of the save's crypto, for the save lab's
-reader (port/tools/lab/savelab.py) and the oracle (oracle.py's mystery_gift_decrypted takes its generator). The save
-lab's planned party verbs (port/tools/lab/README.md) build their Pokémon codec on this module, so that the crypto keeps
-one copy.
+"""The save's party and game records decoded field by field, and two saves compared by what they hold: the one copy of
+the save's crypto, for the oracle's round trips (oracle.py round-trip; README.md, "Saves") and the save lab's reader
+(port/tools/lab/savelab.py). The save lab's planned party verbs (port/tools/lab/README.md) build their Pokémon codec on
+this module, so that the crypto keeps one copy.
 
 Game functionality: the saves, and in them the party (block 0x1a) and the trainer card's records (block 0x26), with the
-generator the mystery gift block (0x22) shares.
+generator the mystery gift block (0x22) shares (oracle.py's mystery_gift_decrypted).
 
 - The party, PokeParty (include/pml/poke_party.h), holds six PartyPkm. Each is a BoxPkm's head in the clear (the
   personality value, PID; the flags; the checksum), its 128 bytes of data, the four blocks PkmBlockA to PkmBlockD in
@@ -24,16 +24,25 @@ generator the mystery gift block (0x22) shares.
   src/system/trainer_card_savedata.c). Every RecordAdd, RecordSet and RecordSetIfHigher encrypts them again with the
   new sum (EncryptRecordStorage, src/system/record.c), so one counter changed re-encrypts the block.
 
-So bytes can't say which field of those blocks changed, and this module names each field. LAYOUT holds every offset,
-size and number of the headers the module uses, under the names port/tests/oracle/savedecode_layout.c prints them with
-as the compiler lays the headers out. pokemon_fields, party_fields and records_fields give every field of a block by
-its path (POKEMON_FIELDS, PARTY_FIELDS, RECORD_FIELDS), and what doesn't add up to its checksum. Standard library
-only: never oracle.py or savelab.py, which import this module.
+So bytes can't say which field of those blocks changed: compare_saves holds two saves to each other field by field
+there, and byte by byte elsewhere. LAYOUT holds every offset, size and number of the headers the module uses, under the
+names port/tests/oracle/savedecode_layout.c prints them with as the compiler lays the headers out, and MAIN_SAVE_LAYOUT
+where SaveData_BuildTable (src/gfl/savedata.c) puts the blocks it decodes or protects. pokemon_fields, party_fields and
+records_fields give every field of a block by its path (POKEMON_FIELDS, PARTY_FIELDS, RECORD_FIELDS), and what doesn't
+add up to its checksum. declaration_problems refuses what a round trip may never declare: a party field other than
+those a battle past a cut changes (the HP, the status, the PP and the checksum) and the mail's heap leftovers, a record
+that isn't one, a cause that cites no src/ site, and a byte of the party, the records, the mystery gifts' contents, the
+event work, the money and badges, the player's place or the bag. Standard library and saveimage.py only: never
+oracle.py or savelab.py, which import this module.
 """
 
 from __future__ import annotations
 
+import re
 import struct
+from dataclasses import dataclass
+
+import saveimage
 
 # What the decomp's headers give for every offset, size and number below, under the names that
 # port/tests/oracle/savedecode_layout.c prints them with: a member's offset and its size (all of an array's elements),
@@ -198,6 +207,35 @@ RECORDS_SEED_HIGH = LAYOUT["GameRecords.seedHigh"]
 RECORDS_ENCRYPTED = LAYOUT["GameRecords.words"] + 4
 RECORDS_ENCRYPTED_SIZE = 0x1d8
 
+SAVE_BLOCK_BAG = LAYOUT["SAVE_BLOCK_BAG"]
+SAVE_BLOCK_PARTY = LAYOUT["SAVE_BLOCK_PARTY"]
+SAVE_BLOCK_PLAYER = LAYOUT["SAVE_BLOCK_PLAYER"]
+SAVE_BLOCK_MYSTERY_GIFT = LAYOUT["SAVE_BLOCK_MYSTERY_GIFT"]
+SAVE_BLOCK_RECORDS = LAYOUT["SAVE_BLOCK_RECORDS"]
+SAVE_BLOCK_EVENT_WORK = LAYOUT["SAVE_BLOCK_EVENT_WORK"]
+SAVE_BLOCK_TRAINER_GAME_INFO = LAYOUT["SAVE_BLOCK_TRAINER_GAME_INFO"]
+
+
+def round_up(size: int) -> int:
+    """A block's size in the save: its struct's, rounded up to 4 bytes (getSizeSaveTblBlk, src/gfl/savedata.c)"""
+    return (size + 3) // 4 * 4
+
+
+# Where SaveData_BuildTable (src/gfl/savedata.c) puts the blocks this module decodes or protects in each copy of the
+# main save, by block ID: (offset, size). Each block starts where the one before it ends, with its 4-byte footer,
+# rounded up to 0x100; the offsets are the ones Black 2's and White 2's saves have, read from the oracle's saves with
+# saveimage.find_blocks (README.md, "The party and the game records, compared decrypted"), and the sizes the headers'
+# structs', rounded up
+MAIN_SAVE_LAYOUT = {
+    SAVE_BLOCK_BAG: (0x18400, round_up(LAYOUT["sizeof(BagSave)"])),
+    SAVE_BLOCK_PARTY: (0x18e00, round_up(LAYOUT["sizeof(PokeParty)"])),
+    SAVE_BLOCK_PLAYER: (0x19500, round_up(LAYOUT["sizeof(PlayerSave)"])),
+    SAVE_BLOCK_MYSTERY_GIFT: (0x1c800, round_up(LAYOUT["sizeof(MysteryGiftSaveData)"])),
+    SAVE_BLOCK_RECORDS: (0x1da00, round_up(LAYOUT["sizeof(GameRecords)"])),
+    SAVE_BLOCK_EVENT_WORK: (0x1ff00, round_up(LAYOUT["sizeof(EventWork)"])),
+    SAVE_BLOCK_TRAINER_GAME_INFO: (0x21100, round_up(LAYOUT["sizeof(TrainerGameInfoSave)"])),
+}
+
 # blockShufLUT (src/system/poke_tool.c): the offsets of blocks A to D in a Pokémon's data, by bits 13 to 17 of its PID,
 # which PML_PkmGetParamBlockCore takes as (pid & 0x3e000) >> 13
 BLOCK_SHUFFLE = (
@@ -300,7 +338,8 @@ def _pokemon_view() -> tuple[tuple[str, int, int], ...]:
     return tuple(fields)
 
 
-# Every field of a decoded Pokémon, of a decoded PokeParty and of the plain records: (path, first bit, width in bits). Each view's fields cover every bit of its
+# Every field of a decoded Pokémon (the README's "The party and the game records, compared decrypted"), of a decoded
+# PokeParty and of the plain records: (path, first bit, width in bits). Each view's fields cover every bit of its
 # struct once
 POKEMON_FIELDS = _pokemon_view()
 POKEMON_PATHS = frozenset(path for path, _, _ in POKEMON_FIELDS)
@@ -400,3 +439,304 @@ def records_fields(block: bytes) -> tuple[dict[str, int], list[str]]:
     if records_sum != checksum:
         problems.append(f"they add up to {records_sum:#06x}, not to their checksum {checksum:#06x}")
     return _read(plain, _RECORD_READER), problems
+
+
+def parse_offsets(text: str) -> list[int]:
+    """A round trip's byte spans, "0x19427,0x18fa2-0x18fa3", as the offsets they name, in order"""
+    out = []
+    for item in text.split(","):
+        first, _, last = item.partition("-")
+        out.extend(range(int(first, 16), int(last or first, 16) + 1))
+    return out
+
+
+def join_offsets(offsets: list[int]) -> list[tuple[int, int]]:
+    """Byte offsets, in order, as spans (first byte, last byte), spans 8 bytes or less apart joined"""
+    spans: list[list[int]] = []
+    for offset in offsets:
+        if spans and offset - spans[-1][1] <= 8:
+            spans[-1][1] = offset
+        else:
+            spans.append([offset, offset])
+    return [(first, last) for first, last in spans]
+
+
+def show_spans(spans: list[tuple[int, int]]) -> str:
+    """Spans as the round trip prints them: 0x19427-0x19427, 0x18fa2-0x18fb3"""
+    return ", ".join(f"{first:#x}-{last:#x}" for first, last in spans)
+
+
+# The party fields of a Pokémon that a round trip may declare (README.md, "Saves"): past a cut, those a battle changes
+# in a Pokémon that fought (its HP, its status, the PP of its four moves) and the checksum its PP changes, its cause
+# tracing the battle and the slot; and on any trip the mail's fields that ResetMailData leaves as the heap held them
+# (src/system/mail.c). Every other field, the item, the experience, the friendship, the level, the stats and the
+# moves among them, is never declared
+POST_CUT_FIELDS = ("nowHP", "statusCond", "blockB.pp[0]", "blockB.pp[1]", "blockB.pp[2]", "blockB.pp[3]",
+                   "base.checksum")
+HEAP_MAIL_FIELDS = ("mail.unk18[0]", "mail.unk18[1]", "mail.unk18[2]", "mail.message[0].id", "mail.message[1].id",
+                    "mail.message[2].id")
+PARTY_FIELD = re.compile(r"pkms\[(0|[1-9]\d*)\]\.(.+)")
+RECORD_ID = re.compile(r"0x[0-9a-f]{2}")
+# A cause's citation of the game's C: a file of src/
+SOURCE_SITE = re.compile(r"\bsrc/[\w/]+\.[ch]\b")
+SCRIPT_LINE = re.compile(r"\bres/field/scripts/\w+\.s\b")
+
+
+def declared_names(text: str) -> list[str]:
+    """A declaration's fields or records, "pkms[1].nowHP,pkms[1].statusCond" or "0x4b,0x4c", in order"""
+    return [name.strip() for name in text.split(",")]
+
+
+def record_name(record_id: str) -> str:
+    """A declared record ID, 0x4b, as its field's name in RECORD_FIELDS, record 0x4b"""
+    return f"record {int(record_id, 16):#04x}"
+
+
+def protected_regions() -> list[tuple[int, int, str]]:
+    """The bytes of a copy of the main save that a round trip never declares by byte, as [start, end) at
+    MAIN_SAVE_LAYOUT's offsets, with what they hold: the party and the records (declared by field and by record), the
+    mystery gifts' contents (compared decrypted; only the key is declared), the event work (the story's flags and work
+    values), the money and the badges, the player's four spawns and place, and the bag"""
+    def at(block: int, offset: int, size: int, what: str) -> tuple[int, int, str]:
+        start = MAIN_SAVE_LAYOUT[block][0] + offset
+        return start, start + size, what
+
+    regions = [
+        at(SAVE_BLOCK_PARTY, 0, LAYOUT["sizeof(PokeParty)"], "the party (PokeParty), declared by field"),
+        at(SAVE_BLOCK_RECORDS, 0, LAYOUT["sizeof(GameRecords)"], "the records (GameRecords), declared by record"),
+        at(SAVE_BLOCK_MYSTERY_GIFT, 0, LAYOUT["MysteryGiftSaveData.checksum"],
+           "the mystery gifts' contents (MysteryGiftSaveData), compared decrypted: only its key is declared"),
+        at(SAVE_BLOCK_EVENT_WORK, 0, LAYOUT["sizeof(EventWork)"],
+           "the event work (EventWork), the story's flags and work values"),
+        at(SAVE_BLOCK_TRAINER_GAME_INFO, LAYOUT["TrainerGameInfoSave.cash"],
+           LAYOUT["sizeof(TrainerGameInfoSave.cash)"], "the money (TrainerGameInfoSave.cash)"),
+        at(SAVE_BLOCK_TRAINER_GAME_INFO, LAYOUT["TrainerGameInfoSave.badges"],
+           LAYOUT["sizeof(TrainerGameInfoSave.badges)"], "the badges (TrainerGameInfoSave.badges)"),
+        at(SAVE_BLOCK_PLAYER, LAYOUT["PlayerSave.location"], LAYOUT["sizeof(PlayerSave.location)"],
+           "the player's place (PlayerSave.location)"),
+        at(SAVE_BLOCK_BAG, 0, LAYOUT["sizeof(BagSave)"], "the bag (BagSave)"),
+    ]
+    for spawn in ("nowSpawn", "unk1C", "nextSpawn", "escapeRopeSpawn"):
+        regions.append(at(SAVE_BLOCK_PLAYER, LAYOUT[f"PlayerSave.{spawn}"], LAYOUT[f"sizeof(PlayerSave.{spawn})"],
+                          f"the player's spawn PlayerSave.{spawn}"))
+    return regions
+
+
+def _cause_problem(kind: str, text: str, cause: str) -> list[str]:
+    """Why a field's or a record's cause isn't traced to the game's C, if it isn't: it cites a src/ file (a script's
+    RecordAdd with the script command's own, Scrcmd_PokeDisp_RecordAdd in src/ov036/scrcmd_poke_disp.c)"""
+    if SOURCE_SITE.search(cause):
+        return []
+    script = " (a script line's RecordAdd is traced to its command too)" if SCRIPT_LINE.search(cause) else ""
+    return [f"{kind} {text}: its cause cites no src/ site of the game's C{script}"]
+
+
+def declaration_problems(known: dict[str, str], known_party: dict[str, str], known_records: dict[str, str],
+                         cut: bool) -> list[str]:
+    """One line for each declaration of a round trip, for one version, that the trip may not make (README.md, "Saves"):
+    known its byte spans, known_party its party fields (pkms[S].PATH, S from 0 to 5 as PokeParty.pkms indexes it and
+    PATH one of POKEMON_PATHS) and known_records its records (0x00 to 0xa6, in two hex digits), each comma-separated
+    with its traced cause; cut whether the trip has a cut, past which a Pokémon that fought may differ in
+    POST_CUT_FIELDS. Runs before any save exists: the regions are MAIN_SAVE_LAYOUT's"""
+    problems = []
+    regions = protected_regions()
+    for text, cause in known.items():
+        try:
+            offsets = parse_offsets(text)
+        except ValueError:
+            problems.append(f"bytes {text}: not byte spans (0x19427,0x18fa2-0x18fa3)")
+            continue
+        if not offsets or not all(0 <= offset < saveimage.BACKUP_SIZE for offset in offsets):
+            problems.append(f"bytes {text}: not spans of the chip's {saveimage.BACKUP_SIZE:#x} bytes")
+            continue
+        if not cause.strip():
+            problems.append(f"bytes {text}: no cause")
+        declared = set(offsets)
+        for copy in saveimage.COPIES:
+            for start, end, what in regions:
+                touched = sorted(declared & set(range(copy + start, copy + end)))
+                if touched:
+                    problems.append(f"bytes {text}: {touched[0]:#x}, in copy {copy:#x}, is in {what}")
+    for text, cause in known_party.items():
+        for name in declared_names(text):
+            match = PARTY_FIELD.fullmatch(name)
+            if match is None or int(match.group(1)) >= PARTY_SIZE or match.group(2) not in POKEMON_PATHS:
+                problems.append(f"party field {name}: no field of the party's Pokémon (pkms[0] to "
+                                f"pkms[{PARTY_SIZE - 1}], then a path of savedecode.POKEMON_FIELDS)")
+                continue
+            path = match.group(2)
+            if path in POST_CUT_FIELDS:
+                if not cut:
+                    problems.append(f"party field {name}: a Pokémon may differ in its HP, status, PP and checksum "
+                                    "only past a cut, and this trip has none")
+            elif path not in HEAP_MAIL_FIELDS:
+                problems.append(f"party field {name}: never declared; a round trip declares a Pokémon's HP, status, "
+                                "PP and checksum past a cut and the mail's heap leftovers, nothing else")
+        problems += _cause_problem("party fields", text, cause)
+    for text, cause in known_records.items():
+        for name in declared_names(text):
+            if not RECORD_ID.fullmatch(name) or int(name, 16) >= RECORD_COUNT:
+                problems.append(f"record {name}: not a record, 0x00 to {RECORD_COUNT - 1:#04x} in two hex digits (no "
+                                "range, checksum or seedHigh)")
+        problems += _cause_problem("records", text, cause)
+    return problems
+
+
+def layout_problems(blocks: list[tuple[int, int]]) -> list[str]:
+    """Where saveimage.find_blocks' blocks, (offset, size) by block ID, aren't MAIN_SAVE_LAYOUT's: a save whose party or
+    records, or a block a round trip protects, isn't where the headers put it isn't one this module reads"""
+    problems = []
+    for block, (offset, size) in MAIN_SAVE_LAYOUT.items():
+        if block >= len(blocks):
+            problems.append(f"block {block:#x}: the save has {len(blocks)} blocks")
+        elif blocks[block] != (offset, size):
+            found_offset, found_size = blocks[block]
+            problems.append(f"block {block:#x} is at {found_offset:#x} with {found_size:#x} bytes, not at {offset:#x} "
+                            f"with {size:#x} (MAIN_SAVE_LAYOUT)")
+    return problems
+
+
+
+@dataclass(frozen=True)
+class FieldDifference:
+    """A field or a record that differs between the two saves: the copy of the main save it is in, the struct ("the
+    party", "the records"), the field's name in its view, the port's value and melonDS's, and the cause that declares
+    it, None when nothing does"""
+    copy: int
+    struct: str
+    name: str
+    port: int
+    oracle: int
+    cause: str | None
+
+
+@dataclass(frozen=True)
+class SaveComparison:
+    """compare_saves' result: the spans where the saves differ outside the party and the records (both copies and the
+    rest of the chip), how many of those bytes are in each copy, the spans no byte declaration covers, the fields and
+    records that differ, the problems found decoding either save, and the lines that say all of it"""
+    spans: list[tuple[int, int]]
+    bytes_by_copy: dict[int, int]
+    undeclared_spans: list[tuple[int, int]]
+    fields: list[FieldDifference]
+    problems: list[str]
+    lines: list[str]
+
+    @property
+    def undeclared_fields(self) -> list[FieldDifference]:
+        return [difference for difference in self.fields if difference.cause is None]
+
+    @property
+    def passed(self) -> bool:
+        return not (self.undeclared_spans or self.undeclared_fields or self.problems)
+
+
+@dataclass(frozen=True)
+class _Compared:
+    """A struct that compare_saves compares field by field: its name, where it starts in a copy, its size, its
+    decoder, and the causes of its fields by name"""
+    name: str
+    start: int
+    size: int
+    decode: object
+    causes: dict[str, str]
+
+
+def _differing_outside(a: bytes, b: bytes, skipped: list[tuple[int, int]]) -> list[int]:
+    """The offsets where two images differ outside the skipped spans [start, end), in order, with the bytes only the
+    longer has: compared a page at a time first, so that two images alike but in a few bytes cost little"""
+    out = []
+    length = min(len(a), len(b))
+    for page in range(0, length, 0x1000):
+        end = min(page + 0x1000, length)
+        if a[page:end] != b[page:end]:
+            out += [offset for offset in range(page, end) if a[offset] != b[offset]]
+    out += range(length, max(len(a), len(b)))
+    return [offset for offset in out if not any(start <= offset < end for start, end in skipped)]
+
+
+def compare_saves(port: bytes, oracle: bytes, blocks: list[tuple[int, int]], known: dict[str, str],
+                  known_party: dict[str, str], known_records: dict[str, str]) -> SaveComparison:
+    """The port's save held to melonDS's, both with their mystery gift blocks decrypted (oracle.py's
+    mystery_gift_decrypted), blocks the DS image's layout (saveimage.find_blocks): byte by byte outside the party and
+    the records, in both copies and after them, each span declared or not (known); and the party and the records of
+    each copy decoded (party_fields, records_fields) and compared field by field, each field declared or not
+    (known_party, known_records), the declarations as declaration_problems takes them. The records' checksum may differ
+    in a copy where a declared record does, and each save's data must add up to its checksums. Fails on an undeclared
+    span, field or record, and on any problem"""
+    structs = (
+        _Compared("the party", blocks[SAVE_BLOCK_PARTY][0], POKE_PARTY_SIZE, party_fields,
+                  {name: cause for text, cause in known_party.items() for name in declared_names(text)}),
+        _Compared("the records", blocks[SAVE_BLOCK_RECORDS][0], RECORDS_SIZE, records_fields,
+                  {record_name(name): cause for text, cause in known_records.items() for name in declared_names(text)
+                   if RECORD_ID.fullmatch(name)}),
+    )
+    # The structs' bytes are left out of the byte comparison only because their fields are compared below; their
+    # footers and CRC table entries stay bytes
+    skipped = [(copy + part.start, copy + part.start + part.size)
+               for copy in saveimage.COPIES for part in structs]
+    differing = _differing_outside(port, oracle, skipped)
+    spans = join_offsets(differing)
+    declared = {offset for text in known for offset in parse_offsets(text)}
+    undeclared_spans = join_offsets([offset for offset in differing if offset not in declared])
+    bytes_by_copy = {copy: sum(1 for offset in differing if copy <= offset < copy + saveimage.COPY_SIZE)
+                     for copy in saveimage.COPIES}
+
+    differences: list[FieldDifference] = []
+    problems = []
+    for copy in saveimage.COPIES:
+        for part in structs:
+            port_block = port[copy + part.start:copy + part.start + part.size]
+            oracle_block = oracle[copy + part.start:copy + part.start + part.size]
+            port_fields, port_problems = part.decode(port_block)
+            # The same bytes decode to the same fields and the same problems
+            oracle_fields, oracle_problems = ((port_fields, port_problems) if oracle_block == port_block
+                                              else part.decode(oracle_block))
+            problems += [f"the port's save, copy {copy:#x}, {part.name}: {problem}" for problem in port_problems]
+            problems += [f"melonDS's save, copy {copy:#x}, {part.name}: {problem}" for problem in oracle_problems]
+            if oracle_block == port_block:
+                continue
+            found = [FieldDifference(copy, part.name, name, value, oracle_fields[name], part.causes.get(name))
+                     for name, value in port_fields.items() if value != oracle_fields[name]]
+            # The records' checksum follows the records: it differs in a copy where a declared record does
+            if part.name == "the records" and any(difference.cause for difference in found):
+                found = [FieldDifference(copy, part.name, difference.name, difference.port, difference.oracle,
+                                         "the checksum of the declared records that differ")
+                         if difference.name == "checksum" else difference for difference in found]
+            differences += found
+
+    elsewhere = len(differing) - sum(bytes_by_copy.values())
+    lines = [f"outside the party and the records, the saves differ in {len(differing)} bytes ("
+             + ", ".join(f"{count} in copy {copy:#x}" for copy, count in bytes_by_copy.items())
+             + (f", {elsewhere} after them" if elsewhere else "") + f"), in {len(spans)} spans: {show_spans(spans)}",
+             f"the party and the records, decoded and compared field by field (savedecode.py): {len(differences)} "
+             "fields and records differ" + (":" if differences else "")]
+    for difference in differences:
+        status = f"declared: {difference.cause}" if difference.cause else "undeclared"
+        lines.append(f"  copy {difference.copy:#x}, {difference.struct}, {difference.name}: the port's "
+                     f"{difference.port:#x}, melonDS's {difference.oracle:#x}; {status}")
+    # Each declaration, and whether it differed in this run: one that didn't is no failure
+    differing_set = set(differing)
+    differing_names = {(difference.struct, difference.name) for difference in differences}
+    for text, cause in known.items():
+        state = "differs" if differing_set & set(parse_offsets(text)) else "the same"
+        lines.append(f"may differ, bytes {text}: {cause} ({state} in this run)")
+    for text, cause in known_party.items():
+        hit = any(("the party", name) in differing_names for name in declared_names(text))
+        lines.append(f"may differ, party fields {text}: {cause} ({'differs' if hit else 'the same'} in this run)")
+    for text, cause in known_records.items():
+        hit = any(("the records", record_name(name)) in differing_names for name in declared_names(text)
+                  if RECORD_ID.fullmatch(name))
+        lines.append(f"may differ, records {text}: {cause} ({'differs' if hit else 'the same'} in this run)")
+    lines += problems
+    comparison = SaveComparison(spans, bytes_by_copy, undeclared_spans, differences, problems, lines)
+    if undeclared_spans:
+        lines.append(f"the saves differ where the trip declares nothing: {show_spans(undeclared_spans)}")
+    if comparison.undeclared_fields:
+        lines.append("fields and records differ where the trip declares nothing: "
+                     + ", ".join(f"copy {difference.copy:#x} {difference.struct} {difference.name}"
+                                 for difference in comparison.undeclared_fields))
+    lines.append("the save comparison passes" if comparison.passed else
+                 f"the save comparison fails: {len(undeclared_spans)} undeclared spans, "
+                 f"{len(comparison.undeclared_fields)} undeclared fields and records, {len(problems)} problems")
+    return comparison

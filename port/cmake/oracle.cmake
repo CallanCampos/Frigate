@@ -83,12 +83,13 @@ add_test(NAME oracle_save_image
 set_tests_properties(oracle_save_image PROPERTIES TIMEOUT 120)
 port_test_labels(oracle_save_image static)
 
-# The save's party and game records decoded field by field (port/tools/oracle/savedecode.py): port_test_savedecode_layout
-# prints the offsets, sizes and bits of the decomp's party and records headers and of the blocks a round trip protects,
-# compiled as the game's own files are (port_decomp_env), and port/tests/oracle/test_savedecode.py holds the module's
-# layout to it and its decoding to synthetic Pokémon, parties and records built from it, with a table of deliberate
-# bugs each test must catch. No ROM and no oracle: it runs in every build and in CI. Game functionality: the saves (the
-# party, block 0x1a, and the trainer card's records, block 0x26)
+# The save's party and game records decoded field by field, and the round trips' save comparison and declarations
+# (port/tools/oracle/savedecode.py): port_test_savedecode_layout prints the offsets, sizes and bits of the decomp's
+# party and records headers and of the blocks a round trip protects, compiled as the game's own files are
+# (port_decomp_env), and port/tests/oracle/test_savedecode.py holds the module's layout to it and its decoding,
+# comparison and declaration rules to synthetic saves built from it, with a table of deliberate bugs each test must
+# catch. No ROM and no oracle: it runs in every build and in CI. Game functionality: the saves (the party, block 0x1a,
+# and the trainer card's records, block 0x26)
 add_executable(port_test_savedecode_layout "${port_oracle_tests}/savedecode_layout.c")
 target_link_libraries(port_test_savedecode_layout PRIVATE port_decomp_env)
 target_compile_options(port_test_savedecode_layout PRIVATE -Wall -Wextra -Werror)
@@ -243,8 +244,9 @@ set_tests_properties(oracle_floccesy PROPERTIES TIMEOUT 7200)
 set_tests_properties(oracle_floccesy_continue PROPERTIES FIXTURES_REQUIRED oracle_floccesy_save)
 
 # The whole story up to SAVE is held frame for frame by oracle_floccesy. This separate trip plays SAVE to completion,
-# checks every save byte except the traced clock/CRC bytes, and continues both saves on the DS and in a fresh native
-# process. Neither an AI cut nor a shortened continuation is used.
+# checks every save byte except the traced clock/CRC bytes, the party and the game records decoded and compared field
+# by field (savedecode.py), and continues both saves on the DS and in a fresh native process. Neither an AI cut nor a
+# shortened continuation is used.
 add_test(NAME oracle_round_trip_floccesy
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
         "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" round-trip floccesy
@@ -258,8 +260,9 @@ port_test_labels(oracle_round_trip_floccesy route oracle)
 # Phase 4's exit (T6): the port plays the catch save's input file from melonDS's Route 19 save and saves the game it
 # caught a wild Purrloin in; melonDS continues that save frame for frame as it continues its own, and the port
 # continues it in a new run, held to melonDS's run on that same save as oracle_catch_continue holds the port on
-# melonDS's, its state too; the two saves may differ only in the bytes the trip declares, each with its cause (oracle.py
-# round-trip catch). Skipped (77) without the oracle or the ROM
+# melonDS's, its state too; the two saves may differ only in what the trip declares, each with its cause, the party and
+# the game records decoded and compared field by field (the caught Purrloin's mail's sentence ids, as fields) and the
+# rest byte by byte (oracle.py round-trip catch). Skipped (77) without the oracle or the ROM
 add_test(NAME oracle_round_trip_catch
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
         "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" round-trip catch
@@ -275,10 +278,10 @@ port_test_labels(oracle_round_trip_catch route oracle)
 # Center's scene and SAVE there, with the center save's input file, or in White 2 presses of its own past the cut
 # (hugh_port_w2_us.pbwinput); its save may differ from melonDS's only in the bytes the trip declares (the play time, the
 # mystery gift block's key, its block compared decrypted, a townsperson's turn and the CRCs), so Tepig's party data,
-# the money, the bag, the flags and the mystery gifts are melonDS's; melonDS continues both saves the same to the
-# field, and the port continues its own, held to melonDS's run on that same save (oracle.py round-trip hugh). Skipped
-# (77) without the oracle or the ROM. It runs both programs through Hugh's battle with a picture of every frame up to
-# the cut, and the continuations: an hour on a loaded machine
+# decoded and compared field by field with the game records, the money, the bag, the flags and the mystery gifts are
+# melonDS's; melonDS continues both saves the same to the field, and the port continues its own, held to melonDS's run
+# on that same save (oracle.py round-trip hugh). Skipped (77) without the oracle or the ROM. It runs both programs
+# through Hugh's battle with a picture of every frame up to the cut, and the continuations: an hour on a loaded machine
 add_test(NAME oracle_round_trip_hugh
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
         "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" round-trip hugh

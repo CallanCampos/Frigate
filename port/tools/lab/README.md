@@ -131,7 +131,8 @@ prints the save's SHA-1 and facts as JSON:
 - `works`: `EVENT_WORK_CONTINUE_SCRIPT`, each `--work NAME`, and every work value that isn't 0;
 - `money`, `badges` (how many, and their bits), `playtime`;
 - `party`: each Pokémon's species, level, HP, experience, held item and moves, decrypted as `PokeParty_DecryptPkm` does
-  (`src/system/poke_tool.c`) by [../oracle/savedecode.py](../oracle/savedecode.py), and whether its checksum holds.
+  (`src/system/poke_tool.c`) by [../oracle/savedecode.py](../oracle/savedecode.py), the module the oracle's round trips
+  compare the party with too, and whether its checksum holds.
 
 For the Route 20 save it gives `ZONE_ROUTE_20` at tile `[130, 661]` and the work values `0x40a3` and `0x40a5` at 2, the
 facts the oracle's README records for that save ([../oracle/README.md](../oracle/README.md)).

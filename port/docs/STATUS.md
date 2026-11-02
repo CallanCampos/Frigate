@@ -32,11 +32,132 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-11-02: the party and the game records compared decrypted in the save round trips (T-a)
+
+- **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit.
+- **Port:** `PORT_SHA`, on the topic branch `port-saves-decrypted` from `e936696a97` (PR 71's merge): `16a81b7b99`
+  decodes the party and the records in one module, for the save lab's reader and the oracle, and this entry's commit
+  gives the round trips the comparison and the declarations' rules. This entry fills the last entry's, the save lab's,
+  `PORT_SHA` with `a9d91adf59`. Nothing outside `port/` changes.
+- **ROM (T0):** configure and Ninja (`-j4`) pass both original US SHA1s with zero compiler warnings, B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, in a full build (14,039
+  steps) of the branch's base; the change adds no ROM input.
+- **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both games with the oracle (`build/port-oracle`,
+  `build/port-oracle-w2`, `-DPORT_BUILD_ORACLE=ON -DPORT_SANITIZE_RECOVER=OFF -DPORT_FRAME_TIME_REPORT_ONLY=OFF`, Apple
+  clang, ninja at `-j4`) pass, with 748 compiler warnings each, all in the decomp's C of `src/` and `lib/`, as on
+  `main`; the new `port_test_savedecode_layout` builds with `-Wall -Wextra -Werror` and prints the same layout in both
+  games.
+- **Tests:**
+  - T2/T6: `ctest -LE 'route|oracle'` (`CTEST_PARALLEL_LEVEL=3`) passes in both games on both commits, 359 of 363
+    tests in each, 4 skipping for this checkout's setup: `asm_oracle` (no Unicorn in this Python), the VM dispatch's
+    two function-sanitizer negatives (Apple's compiler emits no such check) and `app_universal_slices` (one slice).
+    Among them:
+    - `oracle_save_decode`, new, with no ROM: 44 tests (23 on `16a81b7b99`, the decoding's) on synthetic Pokémon,
+      parties, records and whole saves, encrypted with the test's own copy of the game's generator. `LAYOUT` is the
+      headers' (231 entries, name for name); the field views are the headers' members, written by hand with their C
+      types, and cover every bit of `PokeParty` and `GameRecords` once; `BLOCK_SHUFFLE`, the PID's shuffle bits,
+      the generator (with known answers for seeds 0 and 1) and the records' span (`&words[1]`, 0x1d8) are the game's,
+      read from `src/`; `MAIN_SAVE_LAYOUT` is the structs' sizes at the offsets that `oracle.py`'s declarations,
+      the README and the replay check's starter-save references pin. A party of six in every block order, an empty
+      slot, a Pokémon stored decrypted and records give back every field; data changed under a checksum is a problem
+      naming its save, copy and slot. Every field of every slot (those past `count` too) and every record, changed
+      alone and encrypted again, shows as itself and its checksum and nothing else (exp `0x00010000` to `1`, whose
+      halves cancel, alone); one PP shows as the PP and the checksum while most of the 128 bytes change as written;
+      every byte of both structs flipped alone shows. Whole images: bytes outside the structs (the party's footer CRC
+      among them) stay bytes, a field and a record show with their copy, declared ones pass and undeclared ones fail,
+      and a declared item that doesn't differ is printed as the same. Each declaration rule refuses its case, every
+      field outside the two lists is refused, and the catch, Hugh and Floccesy trips' declarations are accepted.
+    - `oracle_compare` (66 tests): every trip's declarations accepted in both versions; the catch trip's mail ids, on
+      a synthetic pair with the README's values, accepted by the old byte declaration and the new field one alike,
+      the 12 bytes that differ exactly those three fields'; the real `command_round_trip` with stand-ins for the
+      programs, its continuations passing: an undeclared `nowHP` and an undeclared record fail the trip naming
+      them, a declared mail id passes, a trip that declares `nowHP` without a cut fails before any program runs,
+      and a save laid out elsewhere fails.
+    - `oracle_save_image`: the real command still refuses an invalid save before it decrypts or decodes anything
+      (`savedecode.compare_saves` stood in for and not called).
+    - `lab_savelab` (43 tests): the reader's facts unchanged, its party now decoded by `savedecode.py`.
+  - Controls, committed: `test_savedecode.py`'s `MUTANTS` holds 48 deliberate bugs in `savedecode.py` (23 on
+    `16a81b7b99`), each with the tests that must catch it, and `MutationTests` fails if one passes them or if its
+    text is no longer in the module: a field left out (`nowHP`, block D, the mail, a u16 array read as bytes, the
+    slots past `count`, `slotExists` and the padding, the halfword records, `seedHigh`, the second copy), a wrong
+    key or seed (the generator's multiplier or increment, the state's low half, the party's fields with the checksum,
+    the data with the PID, either left encrypted, the blocks not unshuffled, the records' seed without `seedHigh <<
+    16` or without the checksum, the records from `words[0]`, a Pokémon stored decrypted decrypted again, either
+    checksum guard never failing), a declaration accepted (the event work, the player's place, the money, the bag,
+    the party and the records as bytes; the item, experience, friendship, level, maximum HP or a move as a field; the
+    post-cut fields without a cut; a record range or one past 0xa6; a cause without a `src/` site; an unknown field),
+    a whole block let through (every field taken as declared, the party's or the records' fields not compared, bytes
+    outside the structs never undeclared, the structs' footers left out of the bytes), and the layout (the level a
+    byte on, the records' block a page on, `layout_problems` never reporting). All 48 are caught, and the same tests
+    pass on `savedecode.py` as it is. `test_compare.py`'s `ORACLE_MUTANTS` holds 3 in `oracle.py`'s round trip
+    (its comparison's verdict ignored, its declarations not checked, its layout not checked), all caught.
+    `test_savelab.py`'s `MUTANTS` holds 60: the 5 of the decoding moved to `test_savedecode.py` (the level a byte
+    on, the blocks or the party's fields left encrypted, a Pokémon stored decrypted decrypted again, a checksum never
+    wrong), and 3 of the reader's glue added (a slot read from the next, the HP from another field, `checksum_ok`
+    whatever `savedecode` found); all caught.
+  - T3: `ctest -L route -LE 'oracle|timing'` passes in both games on both commits, 17 of 17 in Black 2 and 15 of 15
+    in White 2: the replays (`replay_starter_save`, whose check reads `oracle.py`, among them) and the sequences'
+    and sounds' hashes.
+  - T4/T6: running, on this commit's head: the three save round trips (`catch`, `floccesy`, `hugh`) in both games,
+    each run with its ctest command and `--work`, and main's comparison and this one applied to the same two saves.
+  - T5 and T7 not run: no game, platform or app change.
+- **Tiers/trap stubs:** not measured: no game or host code changed.
+- **64-bit warnings:** the pointer cast guard passes in both games, and `check_ptrcasts.py --build-dir
+  build/port-oracle --report` gives 365 sites in 229 keys (real 66, harmless 123, handled 141, unreachable 35), 1,713
+  files, none missing, as the last entry: the change compiles no game C.
+- **Work done:** story PR 2, T-a: the round trips compare the party and the game records decrypted, field by field, in
+  both games, so that a round trip past a cut can declare what a battle changes in a Pokémon (its HP, status, PP and
+  checksum) and the records it moves, each by its traced cause, and nothing else:
+  - **[port/tools/oracle/savedecode.py](../tools/oracle/savedecode.py)**, new: the one copy of the save's crypto. It
+    decrypts each party Pokémon as `PokeParty_DecryptPkm` does and the game records as `DecryptRecordStorage` does
+    (`src/system/poke_tool.c`, `src/system/record.c`, `src/gfl/gf_standard.c`), and names every field by its path in the
+    headers (`LAYOUT`, 231 entries, held to `port/tests/oracle/savedecode_layout.c`'s output): 134 fields a Pokémon,
+    808 a party, 169 records, every bit of `PokeParty` and `GameRecords` in one field. `compare_saves` holds two saves
+    to each other byte by byte outside those two structs and field by field inside them, each difference declared or
+    not; `declaration_problems` refuses what a trip may never declare; `layout_problems` holds `find_blocks`' layout to
+    `MAIN_SAVE_LAYOUT` (the bag, party, player, mystery gift, records, event work and trainer game info blocks, at the
+    offsets the oracle's catch and Route 20 saves have in both games). The save lab's reader decodes its party with it,
+    its JSON unchanged, and `mystery_gift_decrypted` takes its generator.
+  - **`oracle.py`:** `RoundTrip.known_party` and `.known_records`, by version, the party's fields (`pkms[S].PATH`) and
+    records (`0x4b`) a trip declares with their causes; `command_round_trip` refuses a trip's bad declarations before it
+    runs anything, fails a save laid out elsewhere, and compares with `savedecode.compare_saves`, printing each field or
+    record that differs with its copy and both values, each declaration with whether it differed, and its verdict. The
+    two "differ in N bytes" lines are as before. The catch trip's one declaration inside the party, the caught
+    Purrloin's mail's three sentence ids (`0x18fa2-0x18fa3`, `0x18faa-0x18fab`, `0x18fb2-0x18fb3` in each copy), is now
+    three fields, `pkms[1].mail.message[0].id` to `[2].id` (`CATCH_SAVE_PARTY`); no other declaration of any trip
+    falls in the party or the records, and every trip's declarations are accepted.
+  - **The rules** (the owner's decision 2 of the story's design, as this PR builds its default, with the records): past
+    a cut, a Pokémon that fought may differ in `nowHP`, `statusCond`, `blockB.pp[0]` to `[3]` and `base.checksum`; on
+    any trip, the mail's heap leftovers (`mail.unk18[0..2]`, `mail.message[0..2].id`, which `ResetMailData` leaves as
+    the heap held them); every other field is refused, the item, experience, friendship, level, stats and moves among
+    them, and a party cause cites a `src/` file. Records are declared by ID in two hex digits, each cause citing a
+    `src/` site (a script's `RecordAdd` with the command's own, `src/ov036/scrcmd_poke_disp.c`), never the records'
+    checksum, which may differ only where a declared record does. No byte declaration may touch the party, the records,
+    the mystery gifts' contents, the event work, the money, the badges, the player's spawns and place, or the bag.
+  - **Tests:** `oracle_save_decode` (new, no ROM, no label, so CI runs it on every host: `test_savedecode.py --layout
+    port_test_savedecode_layout`), `oracle_compare` (the round-trip loop's declarations, the catch's mail ids as fields
+    on a synthetic pair, and the real round-trip command wired with stand-ins, with `ORACLE_MUTANTS`),
+    `oracle_save_image` (nothing decoded before validation), `lab_savelab` (its decoding's mutants moved to
+    `test_savedecode.py`, two rows of its own for the reader's glue).
+  - **Documents:** the oracle README's "Saves" (a new part, "The party and the game records, compared decrypted": the
+    blocks' layout, the field names, the declarations and their rules, the records' sites for tracing a trip past a
+    cut), its file table, the catch, Hugh and Floccesy paragraphs; the lab's guide; the tools, test and CMake guides;
+    ARCHITECTURE.md's Saves, Save lab and Encounters rows; the glossary's Round trip row and a new Game records row.
+    No ADR: the PR asks the owner whether the rules need one.
+- **Next:** story PR 3, after PR 1 (Terrell's cut): `terrell_save`, its continuation and round trip, with traced party
+  and record declarations, and `SaveMaker`'s per-version facts.
+- **Blockers:** the owner's decisions: decision 2, what a save comparison may declare after a cut, built here as its
+  default (a Pokémon that fought may differ in its HP, status, PP and checksum; the records in traced IDs); whether
+  these rules apply ADR 0023's accepted "each difference declared with its traced cause" to encrypted blocks or need a
+  later ADR amending it (0034 would be next, 0032 and 0033 being reserved); decision 1, chained battles, with the Alder
+  piece (ADR 0033). ADR 0022 (the DS's seeds given by input files), on which every round trip's seed lines rest, is
+  still proposed.
+
 ## 2026-11-02: the save lab's minter and reader (L1)
 
 - **Upstream:** `41f42ca1af`, as reviewed main `d1717b68d8` (PR 74's merge) has it: PR 67's sync brought it to main
   while this change was in review, and this change merges no upstream commit of its own.
-- **Port:** `PORT_SHA`, on the topic branch `port-save-lab-core` from `d19894b1f7` (PR 69's merge). Reviewed main was
+- **Port:** `a9d91adf59`, on the topic branch `port-save-lab-core` from `d19894b1f7` (PR 69's merge). Reviewed main was
   merged in five times, STATUS.md's new entries kept each time with this one first: `10d017c010` once PR 67 had
   landed, `36101609ad` once PR 70 had (`95f1d692cf`, documents only), `806b2a8f9d` once PR 73 had (`49ad7dd00a`: the
   café's fix, with `src/ov129/sp_poke_gimmick.c`, MSL's exit and `gen_stubs.py`), `c0a7941e4e` once PR 72 had
