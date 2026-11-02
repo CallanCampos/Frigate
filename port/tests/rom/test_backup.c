@@ -47,11 +47,10 @@ u8 *port_card_page_buffer(void) {
     return sPageBuffer;
 }
 
-// The stand-in bus: the services by tag, and the last answer
+// The stand-in bus: the services by tag, and the last answer's tag and error bit
 static PortPxiService sServices[PXI_MAX_FIFO_TAG];
 static int sReplies;
 static u32 sReplyTag;
-static u32 sReplyData;
 static BOOL sReplyErr;
 
 void port_pxi_register_service(u32 tag, PortPxiService service) {
@@ -59,9 +58,9 @@ void port_pxi_register_service(u32 tag, PortPxiService service) {
 }
 
 void port_pxi_reply(u32 tag, u32 data, BOOL err) {
+    (void)data; // The scenarios check only the tag and the error: the ARM9's CARDi_OnFifoRecv reads no data
     sReplies++;
     sReplyTag = tag;
-    sReplyData = data & PORT_PXI_DATA_MASK;
     sReplyErr = err;
 }
 
