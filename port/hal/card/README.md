@@ -75,11 +75,11 @@ timing validation remain separate. No device minimum or observed scene duration 
 
 ## Backup WRITE service
 
-Successful nonempty WRITE bytes precede a delayed result/PXI reply by `OS_MilliSecondsToTicks(spec.writePage) * 64` cycles;
-25 ms gives 837,824. This is the observed original ARM7 service policy, not flash-busy or CPU time. All other request
-costs remain unmodeled. Bus reset and backup boot retire pending replies without rolling back image bytes. Path changes also retire replies,
-but separately keep the existing API behavior of freeing the old image/dirty state; unflushed old-path bytes need
-not persist.
+Successful nonempty WRITE bytes precede a delayed result/PXI reply by `OS_MilliSecondsToTicks(spec.writePage) * 64`
+cycles; 25 ms gives 837,824. This is the observed original ARM7 service policy, not flash-busy or CPU time. All other
+request costs remain unmodeled. Bus reset and backup boot retire pending replies without rolling back image bytes. Path
+changes also retire replies, but separately keep the existing API behavior of freeing the old image/dirty state;
+unflushed old-path bytes need not persist.
 An old queued callback checks current ownership and deadline before touching the command. The genuine SDK keeps
 page splitting, cancellation between pages, BUSY/REQ and callback ownership; host timed callbacks never call SDK.
 `card_backup_service_*` exercises actual SDK/PXI/OS; the explicit-clock `card_backup_deferred_reply` isolates stale

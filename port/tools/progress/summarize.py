@@ -4,7 +4,8 @@
 Usage: python3 summarize.py --in out/b2_us [--compile out/compile_b2_us.tsv] [--issues gh_issues.json] > tables.md
 
 The tables of port/docs/research/decomp-progress.md (by module, by origin, the overlays by missing C, data), which
-run_all.sh writes to tables_<version>.md and all_overlays_b2_us.md.
+run_all.sh writes to tables_<version>.md and all_overlays_b2_us.md. That record's row "lib/dwcutilui (+ likely the
+56,640 B ov182 gap)" came from a rule for overlay 182's gaps that PR 75 removed, once no module had a gap.
 """
 import argparse
 import csv
@@ -78,9 +79,6 @@ def fix_cat(r):
     addr = int(r["addr"], 16)
     if r["sub"] == "c_gap" and r["module"] == "ov011":
         return "lib/dwc"  # every ov011 gap lies in the DWC/GameSpy stack (0x0215dd74 on, between lib/ files)
-    if r["sub"] == "c_gap" and r["module"] == "ov182":
-        # after lib/dwcutilui's comment.c: the DWC utility's screens; after lib/dwcutil's dwc_moveid.c: unknown
-        return "lib/dwcutilui (likely)" if addr < 0x021b93e8 else "game"
     if r["tier"] != "c" or not cat.startswith("unknown"):
         return cat
     if r["module"] == "main" and addr < 0x02005124:
