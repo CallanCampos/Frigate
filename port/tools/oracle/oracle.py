@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Runs the melonDS oracle and Frigate's program alike, for compare.py and sound.py, makes the saves the tests start
 from on the oracle, and compares the two programs on the comparison sequences, from power-on through the title and
-CONTINUE into the field, its menu and the apps it opens, and through New Game into Aspertia City
-(port/tools/oracle/README.md).
+CONTINUE into the field, its menu and the apps it opens, through New Game into Aspertia City, and along the story's
+route, its battles and its saves (port/tools/oracle/README.md).
 
     oracle.py run --out DIR --frames N [--screens LIST] [--input FILE] [--dump SPEC]... [--time TIME]
                   [--version b2_us] [--rom PATH] [--oracle BIN] [--save FILE] [--save-out FILE] [--no-counter]
@@ -33,20 +33,21 @@ port's copy of it is the save directory's file, named after the ROM's game code,
 saves the sequences start from on the oracle (SAVES: first_save, power-on through New Game into the field and the field
 menu's SAVE; starter_save, first_save's CONTINUE through the story to the first Pokémon and SAVE; center_save, the
 starter save's CONTINUE through Hugh's battle to SAVE in the Pokémon Center; route19_save, from there to Bianca's
-catching lesson and SAVE beside Route 19's grass; catch_save, from there to a wild Purrloin caught and SAVE), each from
-the save it names as its start or a blank one, and checks each step against the SHA-1 kept for it; it writes one save to
+catching lesson and SAVE beside Route 19's grass; catch_save, from there to a wild Purrloin caught and SAVE;
+floccesy_save, from there through Alder's scenes on Route 19 and in Floccesy Town to Route 20 and SAVE), each from the
+save it names as its start or a blank one, and checks each step against the SHA-1 kept for it; it writes one save to
 FILE, or with --save-cache every save into DIR as NAME_VERSION.sav, where a later run reuses a file only while its SHA-1
 is still the one kept.
 port-save takes a save the other way: the port's New Game writes one, and the oracle boots it to the start menu frame
 for frame as it boots its own save of the same moment, without writing either, and the console's Wi-Fi ID that New Game
-copied into it is the oracle's. round-trip does it for a save of phase 4's route (ROUND_TRIPS: catch, a wild Purrloin
-caught; hugh, Hugh's trainer battle to its end): the port plays the input file the oracle made the kept save with, from
-the same start, or its own where its course past a cut would outlast those presses (ADR 0023), and saves, its run up to
-the cut held to the oracle's as the cut's sequence holds it; the two saves differ only in the bytes the trip declares,
-their mystery gift blocks compared decrypted; the oracle continues the port's save as it continues its own, frame for
-frame, and the port continues it in a new run, compared with the oracle's continuing the same save as sequence
-compares. boot does both for the boot sequence and compares them on the game's count, the movies by their pictures
-(compare.py), at the DS's 6 bits and at the palettes' 5.
+copied into it is the oracle's. round-trip does it for a save of the story's route (ROUND_TRIPS: catch, a wild
+Purrloin caught; hugh, Hugh's trainer battle to its end; floccesy, Alder's scenes and the road to Route 20): the port
+plays the input file the oracle made the kept save with, from the same start, or its own where its course past a cut
+would outlast those presses (ADR 0023), and saves, its run up to the cut held to the oracle's as the cut's sequence
+holds it; the two saves differ only in the bytes the trip declares, their mystery gift blocks compared decrypted; the
+oracle continues the port's save as it continues its own, frame for frame, and the port continues it in a new run,
+compared with the oracle's continuing the same save as sequence compares. boot does both for the boot sequence and
+compares them on the game's count, the movies by their pictures (compare.py), at the DS's 6 bits and at the palettes' 5.
 sequence does both on a comparison sequence's input file, port/tests/oracle/<name>_<version>.pbwinput (SEQUENCES:
 opening, power-on to the title with nothing pressed; title, the opening skipped to the title and START to the start
 menu; continue, the same from first_save's save, the start menu's CONTINUE and the field it goes to; continue_starter,
@@ -54,15 +55,18 @@ continue's presses from starter_save's, whose start menu shows the Pokédex; fie
 field menu's bag and trainer card from first_save's, the card closed by the pen on its return button; party_menus, the
 same menu from starter_save's with the party list, Tepig's summary, the Pokédex and its entry, the card and the bag, the
 clock pinned for both; aspertia, phase 3's exit route: New Game from a blank save through the intro into the field and
-the player's house, out into Aspertia City, a talk with a townsperson, into a house and out, the clock pinned; and phase
+the player's house, out into Aspertia City, a talk with a townsperson, into a house and out, the clock pinned; phase
 4's route, each piece from the oracle's save of the one before: hugh, Hugh's trainer battle from the starter save to his
 second move; route19, from the Pokémon Center to Bianca's capture demo and SAVE on Route 19; catch, a wild Purrloin
 caught and SAVE; catch_continue, that save continued; center_continue, the save after Hugh's battle continued to the
-field; pc, from the catch save back to the Pokémon Center's PC, the PC Box's deposit, withdrawal and swap, and SAVE),
-from the save the sequence names, if any, made first on the oracle (or taken from --save-cache), and compares every
-frame the same way but the known differences, up to the frame where the port stops when the sequence allows it to stop
-on code with no C yet, after checking that the random seeds the input file gives the port are the ones the DS built in
-the oracle's run (seeds.py; a file without seeds leaves the port its own); with --update it writes
+field; pc, from the catch save back to the Pokémon Center's PC, the PC Box's deposit, withdrawal and swap, and SAVE;
+and phase 5's story, from the catch save on: floccesy, Alder's scenes on Route 19 and in Floccesy Town and the road to
+Route 20, up to SAVE; floccesy_continue, the Route 20 save continued; terrell, from that save east into Youngster
+Terrell's trainer battle, to the last frame before the move his AI picks shows, a pick the DS's CPU time moves (ADR
+0023's cut)), from the save the sequence names, if any, made first on the oracle (or taken from --save-cache), and
+compares every frame the same way but the known differences, up to the frame where the port stops when the sequence
+allows it to stop on code with no C yet, after checking that the random seeds the input file gives the port are the ones
+the DS built in the oracle's run (seeds.py; a file without seeds leaves the port its own); with --update it writes
 port/tests/oracle/<name>_<version>.tsv, the oracle's hashes at sampled frames, of its screens and, where the sequence
 compares it, of the game's state (STATE). seeds plays a sequence's or a save's input file on the oracle, from the save
 it starts from, and prints the random seeds the DS built as the file's seed lines (README.md, "Random seeds").
@@ -246,6 +250,18 @@ AI_TIME = ("Hugh's AI runs its scripts for 500 ticks of OS_GetTick a pass (TRAI_
            "takes three, so for two passes the port's twister has drawn one number more (its index one ahead), and "
            "from the DS's pick on the index is the port's again: each of his two turns, the first pick by chance the "
            "same move, the second another (README.md, Known differences; ADR 0023)")
+TERRELL_AI_TIME = ("Youngster Terrell's AI (AI_FLAG_BASIC; Patrat's Tackle and Leer) sets up his first turn with five "
+                   "twister draws on the same pass on both programs (TrAI_Setup), then runs its one script once for "
+                   "each move, read from the card for each run (TrAI_LoadScript), for at most 500 ticks of OS_GetTick "
+                   "a pass (TRAI_TIME_LIMIT, src/ov170/tr_ai.c), with six ability guesses (GuessAbility), and picks "
+                   "between the two equal scores with the twister's next number (TrAI_ChooseMove), while the battle's "
+                   "view draws two numbers a pass (BtlvMcss_Main). The port's virtual clock gives the card's reads no "
+                   "time, so its AI thinks in the next pass; the DS's AI runs out of its 500 ticks four times, after "
+                   "reading the script for Tackle's run, after the damage command, after the first guess and after "
+                   "reading the script again for Leer's run, and picks four passes later. For those four passes the "
+                   "port's twister index is 5 to 9 ahead, and from the DS's pick on it is the port's again; the "
+                   "guesses and the pick have taken other numbers, and the pick is Leer on the port, Tackle on the DS "
+                   "(README.md, Known differences; port/docs/decomp-findings.md; ADR 0023)")
 CURSOR_NEW_GAME = ("as CURSOR, with NEW GAME's press from a blank save in CONTINUE's place: the port's frame shows the "
                    "step after the DS's last one (its top screen hashes d3c85a7e), which the DS shows at counts 3274, "
                    "3296, 3338 and 3360 of the same run but not on that count")
@@ -270,6 +286,10 @@ MOVE_MENU = ("the DS's pass that takes the move menu down after a move is chosen
              "it partway down (the moves' names cleared, their buttons still there) and the second the port's picture "
              "of that count: the count pairs the port's frame with the first, and the check of pictures no port frame "
              "shows finds the second neither pair's, its 3D within the tolerance of the port's")
+MOVE_MENU_TORN = ("as MOVE_MENU, but the pass takes the move buttons down while the beam draws its second frame's "
+                  "bottom screen: down to line 34 that frame shows the first's picture, the buttons' top edge still "
+                  "on line 34 (22 pixels from the port's), and from line 35 the port's picture of that count, so no "
+                  "port frame shows the frame whole (White 2's Terrell)")
 WIPE_STEP = ("a wipe's first frame (into the gate, out of it onto Route 19): the DS's shows lines 32 to 63 as its "
              "frame before, black where the port's frame has them covered or not yet uncovered, and lines 0 to 31 and "
              "64 on as the port's: the wipe's second step, set in the same pass as its first, written after the beam "
@@ -704,6 +724,38 @@ SEQUENCES = {
         state_oracle="2800-6900",
         known_state={"b2_us": {"3110-3124": CAMERA, "3432,3447,3454,3600,3804,4440,4443,4497": MID_PASS},
                      "w2_us": {"3110-3124": CAMERA, "3432,3447,3454,3600,3804,4440,4443,4497": MID_PASS}},
+        state=STATE + RANDOM_STATE,
+        save="floccesy_save",
+    ),
+    # Phase 5's second story leg, from the Route 20 save, in pieces that each end at a cut (ADR 0023). terrell: CONTINUE
+    # on Route 20, east into Youngster Terrell's sight, his eye event and his trainer battle, Tepig against Patrat, A
+    # every 16 counts for FIGHT and Tackle: the opening, the first turn's choices and Tepig's Tackle, to count 5488, the
+    # last before the foe's move shows in the message (at 5489 in both versions), where the battle parts from melonDS's
+    # by construction: Terrell's AI picks with another number, having thought four passes less than on the DS
+    # (README.md, "Known differences": the AI's time a pass). The title's and CONTINUE's differences are
+    # floccesy_continue's, from the same save and presses, but at port frame 3432, a DS pass of several frames, where
+    # floccesy_continue leaves out the whole state and terrell GFL's random state alone, NNS G3D's being equal there
+    "terrell": Sequence(
+        port_frames=5491,
+        oracle_frames=7700,
+        sample="",
+        clock="313-1108",
+        lags={"b2_us": "1109=0", "w2_us": "1109=0,3241=-1,3403=0"},
+        known={
+            "b2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3129": CAMERA, "5265": MOVE_MENU},
+            "w2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3128": CAMERA,
+                      "3219-3240/3": CRY, "3402": CURSOR, "5265": MOVE_MENU},
+        },
+        known_oracle={"b2_us": {"4920": TORN_START, "7410": MOVE_MENU},
+                      "w2_us": {"1260": TORN_OPENING, "4852": TORN_START, "7346": MOVE_MENU_TORN}},
+        state_frames="1116-5491",
+        state_oracle="2800-7700",
+        known_state={
+            "b2_us": {"3110-3124": CAMERA, "3447,3454,3600,3964,4350,4404,4472,4478,4896,5187,5265": MID_PASS},
+            "w2_us": {"3110-3124": CAMERA, "3447,3454,3600,3964,4350,4404,4472,4478,4892,5183,5265": MID_PASS},
+        },
+        known_random={"b2_us": {"3432,4741,4945,5046,5228,5292,5369": MID_PASS, "5175-5178": TERRELL_AI_TIME},
+                      "w2_us": {"3432,4741,4941,5042,5228,5292,5369": MID_PASS, "5171-5174": TERRELL_AI_TIME}},
         state=STATE + RANDOM_STATE,
         save="floccesy_save",
     ),

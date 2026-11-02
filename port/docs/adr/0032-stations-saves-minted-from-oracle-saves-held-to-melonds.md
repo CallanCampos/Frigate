@@ -16,11 +16,12 @@ built on them. -->
 
 ## Context
 
-- **Phase 5's story coverage stops at the Route 20 save.** That is `floccesy_save`, zone 446 at `(130,661)`. The
-  next leg starts with Terrell's mandatory trainer battle, whose AI the DS's CPU time decides.
-  [ADR 0023](0023-oracle-routes-part-where-the-ds-cpu-time-decides.md), accepted on 2026-11-01 (PR 70), parts a route
-  at the first decision that time moves and goes on from melonDS's save made after it; past the Route 20 save, no
-  sequence holds the story yet.
+- **Phase 5's story coverage reaches the Route 20 save and Terrell's battle up to its cut.** The save is
+  `floccesy_save`, zone 446 at `(130,661)`. The next leg starts with Youngster Terrell's mandatory trainer battle, whose
+  AI the DS's CPU time decides. [ADR 0023](0023-oracle-routes-part-where-the-ds-cpu-time-decides.md), accepted on
+  2026-11-01 (PR 70), parts a route at the first decision that time moves and goes on from melonDS's save made after
+  it: the `terrell` sequence (PR 77) holds the battle up to his AI's first moved decision, and the story past it waits
+  on melonDS's save made there.
 - **Replay is expensive.** Each organic save is made on melonDS from the one before. `SAVES`, in
   `port/tools/oracle/oracle.py`, chains six saves over 126,300 oracle frames a game. A story sequence costs about
   30 min per game, and no test boots most of the game's 615 zones.
