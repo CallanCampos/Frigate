@@ -30,7 +30,8 @@ Required checks (names are a compatibility interface):
 - `Compile src/ and lib/`: every decomp C file compiled and library assembly source assembled for both versions
   without ROMs.
 - `Code standards`: inherited decomp style and consistency checks.
-- `Frigate CI`: aggregate that succeeds only when every native build/test group and sync tooling tests succeed.
+- `Frigate CI`: aggregate that succeeds only when every native build/test group, the sync tooling tests and the
+  documents check succeed.
 - `Frigate local verification`: both local ROM SHA1s and native host build/tests on the exact PR head.
 
 The three Actions checks are bound to the GitHub Actions integration (`15368`), but a required check name does not
@@ -131,4 +132,5 @@ settings themselves; protection is an enforced development policy, not a lock ag
 [ADR 0018](adr/0018-protected-main-and-sync-prs.md) records the port-project research and why Frigate keeps one main
 branch. GitHub documents [rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets),
 [CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)
-and [workflow triggering](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow).
+and [workflow
+triggering](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow).
