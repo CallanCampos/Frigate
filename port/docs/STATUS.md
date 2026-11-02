@@ -77,7 +77,12 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     save exits 0: its start menu shows "Floccesy Ranch", the field opens at the ranch's gate, and the save the game
     writes reads back `ZONE_FLOCCESY_RANCH_2` at tile `(45, 54)`, height 2, its last arrival the game's own through warp
     0, the continue flag cleared, Tepig at 6 and Purrloin at 4, money 3,500. That save is `53912fbe1b1a`, the
-    prototype's port save.
+    prototype's port save. The other two forms of `place`, minted from the same save and run with the same input, boot
+    as placed. `place ZONE_ROUTE_20 at 155 651 2 facing WARP_DIR_LEFT` stands the player on that tile facing Youngster
+    Petey, who challenges at once: his battle reaches "What will Tepig do?" and takes the input's SAVE presses, so no
+    save is written. `place ZONE_FLOCCESY_TOWN fly` puts the player in front of the town's Pokémon Center, facing down,
+    and the save the game writes reads back `ZONE_FLOCCESY_TOWN` at tile `(105, 694)`, the zone's Fly position, with the
+    continue flag cleared.
   - T4 not run: the minted save held to melonDS frame by frame is L2's station. T5 and T7 not run: no game or host code
     changed.
 - **Tiers/trap stubs:** not measured: no game or host code changed.
