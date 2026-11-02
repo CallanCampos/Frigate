@@ -32,11 +32,74 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-11-02: phase 5's open items for the owner: ADRs 0020, 0033, 0034 and 0035 proposed
+
+- **Upstream:** `41f42ca1af`, unchanged, as reviewed main `e936696a97` (PR 71's merge) has it; this change merges no
+  upstream commit.
+- **Port:** `PORT_SHA`, on the topic branch `port-phase5-decisions` from `e936696a97`. This entry fills the last
+  entry's, the save lab's (L1), `PORT_SHA` with `a9d91adf59`. Documents only, all of them Markdown in `port/docs/`:
+  nothing outside `port/` changes.
+- **ROM (T0):** `python3 configure.py && ninja` in this branch's new worktree, every step run (14,039, ninja at
+  `-j4`), with no compiler warning: both original US SHA1s match, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. This change is no ROM input.
+- **Host build (T1):** no source, build or test change from reviewed main, so not rebuilt here; the exact-head
+  `sync_upstream.sh --verify-pr` builds and tests both versions before merge.
+- **Tests (T2–T7):** not run here: no code, input, seed, golden, mask, budget or sanitizer policy changes. The changed
+  documents (the four ADRs, the ADR index, docs/README.md, PLAN.md and this file) pass two read-only checks: a script
+  of this change's own, run from outside the repository, finds every relative link's file and heading anchor, every
+  table row at its header's column count, and no added line outside a table over 120 columns or ending in a space;
+  and the documents check that the branch `port-docs-hygiene-1102` proposes (its `port/tools/check_docs.py` at
+  `7d87f98b8c`, run from outside the repository on these files) reports 0 problems.
+- **Tiers/trap stubs:** unchanged; no progress scan.
+- **64-bit warnings:** unchanged from the last entry, 365 sites in 229 keys (real 66, harmless 123, handled 141,
+  unreachable 35); the exact-head verifier repeats the guard. No baseline change.
+- **Work done:** four ADRs on phase 5's open exit items, proposed for the owner's decision and waiting for it. Each
+  comes from a read-only scout of `main` at `e936696a97` and was checked against it by an adversarial review; every
+  numbered decision in them is a recommended default with its alternatives and their costs, and none of their work is
+  on `main`:
+  - [ADR 0020](adr/0020-one-program-for-both-versions-a-core-per-version-loaded-by-a-launcher.md) (D6): one program
+    for both versions, a launcher that reads the ROM's game code and loads that version's game core, today's program
+    built as a shared library, with each version's test program a thin `main()` over the same core, so that the tests
+    run the code the app ships; the names, one icon, a start without a ROM, the Spanish ROM, and one White 2 job in
+    CI (the Linux host build), with no job building both versions; its stages in order, with the one build tree of
+    the branch `port-one-program` (`4a4c2bc9f1`, whose design it is written from) last and optional. Accepting it
+    amends ADRs 0010 and 0015.
+  - [ADR 0033](adr/0033-sanitizer-clean-replays-by-the-strict-routes-and-the-program-alone.md) (T5): sanitizer-clean
+    replays are the strict build's routes that need no oracle and its program alone on every story piece from the
+    oracle's saves, built with ASan, UBSan's function check and LeakSanitizer by upstream clang, clean in both
+    versions on one head but for the declared exceptions; the whole set runs on demand at each story leg's end and on
+    the release candidate's head, a route's own cases in the pull request that adds or changes it, never on a
+    schedule or in the merge gate; and a release candidate adds wireless refused without a report or a freeze, the
+    x86_64 slice, the renderer's ThreadSanitizer runs and a windowed run. Accepting it amends ADR 0014.
+  - [ADR 0034](adr/0034-60-fps-with-headroom-the-ds-rate-on-time-and-half-a-frame-to-spare.md): 60 fps with headroom
+    is the DS's rate on time, every timed scene's busy 95th percentile within half a frame (8.36 ms) headless and
+    every timed route on time paced and windowed, held on the M2 by a quiet record made on demand on the release
+    candidate's commit; the timing tests leave the per-PR gate, the field, battles, Castelia City and each story
+    leg's heaviest scene join them, CI prints the renderers' benches as a report, and phase 6's modes bring limits of
+    their own.
+  - [ADR 0035](adr/0035-the-private-release-candidate-shared-by-hand.md): the private release candidate is a tagged
+    commit's two universal Mac apps, packaged in a release candidate's mode from a clean clone at a neutral path and
+    stripped, with a first-launch ROM picker, the licence, the third-party notices and release notes, checked by
+    T7's first checklist and handed out by the owner alone, never published; it waits for the story's routes, T4, T5
+    as ADR 0033 defines it, 60 fps as ADR 0034 does and the checklist, not for D6. Accepting it amends ADRs 0010 and
+    0015.
+  - The ADR index gets their rows; its next free number is 0036, with 0032 still reserved for the save lab, and D6
+    leaves its "Decisions waiting for an ADR". docs/README.md lists the four, and PLAN.md §7's phase 5 points each of
+    the four items to its ADR in one line, marked proposed. The ADRs are as reviewed: the repository's formatting
+    needed no change to them.
+- **Next:** the owner's decisions on ADRs 0020, 0033, 0034 and 0035, each of which unblocks work: under ADR 0033,
+  T5-A, the runner in `port/tools` and `main`'s first strict baseline in both versions; then ADR 0034's 60 fps work
+  (the paced check in `frame_times.py`, the new timing routes, `-LE timing` in the per-PR gate, the CI bench step,
+  then the quiet record); ADR 0035's release candidate engineering (the ROM picker, the notices, the packaging's
+  release candidate mode, the release notes and T7's checklist); and ADR 0020's D6, from CI's White 2 job through
+  stages 2 to 4. Phase 5's story coverage continues past the Route 20 save as the earlier entries say.
+- **Blockers:** none for this change. The four ADRs wait for the owner, and their work starts as each is decided.
+
 ## 2026-11-02: the save lab's minter and reader (L1)
 
 - **Upstream:** `41f42ca1af`, as reviewed main `d1717b68d8` (PR 74's merge) has it: PR 67's sync brought it to main
   while this change was in review, and this change merges no upstream commit of its own.
-- **Port:** `PORT_SHA`, on the topic branch `port-save-lab-core` from `d19894b1f7` (PR 69's merge). Reviewed main was
+- **Port:** `a9d91adf59`, on the topic branch `port-save-lab-core` from `d19894b1f7` (PR 69's merge). Reviewed main was
   merged in five times, STATUS.md's new entries kept each time with this one first: `10d017c010` once PR 67 had
   landed, `36101609ad` once PR 70 had (`95f1d692cf`, documents only), `806b2a8f9d` once PR 73 had (`49ad7dd00a`: the
   café's fix, with `src/ov129/sp_poke_gimmick.c`, MSL's exit and `gen_stubs.py`), `c0a7941e4e` once PR 72 had

@@ -27,8 +27,8 @@ A bug fix, a refactor or anything one comment explains needs no ADR.
   that those branches don't collide when they merge: 0019 for the pointer-cast guard against a classified baseline,
   0020 for one program for both versions (D6) and 0021 for root heaps in host memory, which was written first. A
   branch whose ADR took another number before the reservation renumbers it when it merges. On 2026-11-01, 0031 was
-  reserved in the same way for verification v2 and 0032 for the save lab. 0020 is still reserved for D6, and the
-  next free number is 0033.
+  reserved in the same way for verification v2 and 0032 for the save lab. On 2026-11-02, 0020 was written for D6,
+  with 0033 to 0035 beside it; 0032 is still reserved for the save lab, and the next free number is 0036.
 - An accepted ADR isn't rewritten. Only its status line changes: to "superseded by NNNN" when a later ADR replaces
   it, to "accepted; amended by NNNN" when a later ADR changes part of it, or to "accepted; superseded: retired when
   ..." when what it decided is removed with no later decision in its place, with a dated note that says what went.
@@ -87,6 +87,7 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0017](0017-external-contributions.md) | External contributions through forks and pull requests | D1, D10, §9 | accepted; amended by [0018](0018-protected-main-and-sync-prs.md) |
 | [0018](0018-protected-main-and-sync-prs.md) | Protected main and reviewed upstream syncs | D1, §4.1, §8 | accepted; amended by [0024](0024-a-conflicting-sync-proposes-a-draft-of-upstreams-head.md) |
 | [0019](0019-pointer-cast-guard-against-a-classified-baseline.md) | The pointer cast guard: the game's casts that cut an address, held to a classified baseline | D5, §4.4, §4.8, §6 | accepted |
+| [0020](0020-one-program-for-both-versions-a-core-per-version-loaded-by-a-launcher.md) | One program for both versions: a core per version, loaded by a launcher that reads the ROM's game code | D6, §4.4, §6, §7 phase 5 | proposed |
 | [0021](0021-root-heaps-in-the-games-own-memory-from-host-memory.md) | Root heaps in the game's own memory get host memory | D5, §4.5, §4.8 | accepted |
 | [0022](0022-the-ds-random-seeds-given-by-input-files.md) | The DS's random seeds given by input files, through a wrapper of `buildSeed` | §1, §4.5, §6 | proposed |
 | [0023](0023-oracle-routes-part-where-the-ds-cpu-time-decides.md) | Oracle routes part where the DS's CPU time decides, and go on from melonDS's save | §1, §6, §7 phases 4 and 5 | accepted |
@@ -98,6 +99,9 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0029](0029-backup-write-service-wait.md) | Preserve the backup WRITE service initial SDK wait | §4.5, §6 | accepted |
 | [0030](0030-widescreen-by-an-engine-side-hor-plus-scale-with-native-readbacks.md) | Widescreen by an engine-side Hor+ scale with native readbacks | §4.6, §5.2, §6, §7 phase 6, D9 | proposed |
 | [0031](0031-per-game-frame-digests-against-a-content-addressed-oracle-cache.md) | Per-game-frame digests against a content-addressed oracle cache, and their hash, xxHash, fetched at configure time as minicoro is | §6, §7 phase 5 | proposed |
+| [0033](0033-sanitizer-clean-replays-by-the-strict-routes-and-the-program-alone.md) | Sanitizer-clean replays: the strict build's routes and its program alone from the oracle's saves, clean but for declared exceptions, run on demand at each story leg's end and on the release candidate | §6, §7 phase 5 | proposed |
+| [0034](0034-60-fps-with-headroom-the-ds-rate-on-time-and-half-a-frame-to-spare.md) | 60 fps with headroom: the DS's rate on time and half a frame to spare, held on the M2 by quiet runs made on demand, never in the per-PR gate | §4.5, §4.6, §6, §7 phases 5 and 6 | proposed |
+| [0035](0035-the-private-release-candidate-shared-by-hand.md) | The private release candidate: a tagged commit's two universal Mac apps, packaged in a release candidate's mode from a clean clone at a neutral path and stripped, with a first-launch ROM picker, the licence, the third-party notices and release notes, checked by T7's first checklist and handed out by the owner alone, never published | §4.3, §6 (T7), §7 phase 5, D6, D11 | proposed |
 
 ## Decisions waiting for an ADR
 
@@ -110,6 +114,5 @@ changes. Each deserves an ADR when the work it governs starts, or sooner if some
 | D2 | Our own platform layer, not libntr | phase 0 |
 | D4 | Languages, compiler and libraries | phase 0 |
 | D5 | 64-bit native build | phase 0 |
-| D6 | One executable for both versions | phase 5; 0020 is reserved for it |
 | D7 | DS-compatible saves with a sidecar file | phase 1 |
 | D9 | Mods as a first-class design | phase 0 (hook macros), phase 6 (the rest) |
