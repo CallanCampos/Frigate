@@ -48,7 +48,9 @@ run, for `sound.py`. It also makes the saves the tests start from (a save with a
 which the comparison sequences of the field menu and its apps start from. It is a test tool only, never linked into or
 shipped with Frigate, and built only with `-DPORT_BUILD_ORACLE=ON`. Its README has the formats (input files, run
 directories, sound traces), how frames are aligned, the comparison sequences, saves, the sound and the known
-differences. `pbwinput.c` and `display3d.c` are plain C11 that the program's replays and the tests compile too;
+differences. Its `savedecode.py` decodes the saves' party and game records field by field, the one copy of the save's
+crypto, for the round trips, which compare those two by their fields and the rest by bytes, and for the save lab's
+reader. `pbwinput.c` and `display3d.c` are plain C11 that the program's replays and the tests compile too;
 `digest.c`, the per-game-frame digest's canonical encoding (ADR 0031), is plain C11 that only its tests compile so
 far, with its hash from xxHash's header, which every build fetches at configure time as `oracle/xxhash.cmake` pins
 it; and `sndtrace.h`, the sound trace's format, is plain C11 that Frigate itself includes: the platform layer's sound
@@ -63,8 +65,9 @@ the generated constants headers): `place` puts the player at a zone's warp, on a
 the game's own continue-at-spawn path, the one the Hall of Fame takes, and refuses a tile on a map with rails or a Fly
 position that is on a rail or empty; `flag`, `work`, `money`, `badges` and `playtime` set the rest. It reseals both
 copies' CRCs, with the layout from [oracle/saveimage.py](oracle/saveimage.py), and refuses a base that isn't a save the
-game finished writing. `read` prints a save's facts in the same names, the party decoded. Its test, `lab_savelab`,
-needs no ROM and runs in every build and in CI.
+game finished writing. `read` prints a save's facts in the same names, the party decoded by
+[oracle/savedecode.py](oracle/savedecode.py). Its test, `lab_savelab`, needs no ROM and runs in every build and in
+CI.
 
 | File | What it does | Run |
 | --- | --- | --- |

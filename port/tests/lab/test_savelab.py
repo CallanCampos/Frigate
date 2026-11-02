@@ -19,10 +19,12 @@ save footer, as src/gfl/backup_system.c lays them out), then hold savelab to the
 
 MUTANTS lists deliberate bugs in savelab.py, each with the tests that must catch it, and MutationTests applies each to
 savelab.py's source, loads the result in savelab's place and runs those tests, which must fail: each check is shown to
-fail on the bugs it is for, and the same tests are shown to pass on savelab as it is. The expected values are worked
-out by hand from the game's C and data (the comments say which), never from savelab. Nothing here is a game save or
-comes from the ROM. Game functionality: the saves (where CONTINUE puts the player, the event flags and work values, the
-play time, the money and badges, the party).
+fail on the bugs it is for, and the same tests are shown to pass on savelab as it is. The reader's party is decoded by
+port/tools/oracle/savedecode.py, whose own test, test_savedecode.py, holds its layout to the headers and has the
+decoding's deliberate bugs; here the reader's facts are held to the Pokémon the tests build, and MUTANTS has the bugs of
+savelab's own glue. The expected values are worked out by hand from the game's C and data (the comments say which),
+never from savelab. Nothing here is a game save or comes from the ROM. Game functionality: the saves (where CONTINUE
+puts the player, the event flags and work values, the play time, the money and badges, the party).
 
     test_savelab.py --layout PROGRAM [unittest options]
 
@@ -55,6 +57,7 @@ sys.path.insert(0, str(REPO_ROOT / "port" / "tools" / "lab"))
 sys.path.insert(0, str(REPO_ROOT / "port" / "tools" / "oracle"))
 
 import oracle  # noqa: E402
+import savedecode  # noqa: E402
 import saveimage  # noqa: E402
 import savelab  # noqa: E402
 
@@ -391,11 +394,12 @@ class LayoutTests(LabTest):
                                  [f"{name}: savelab has {moved[name]:#x}, the headers {self.layout[name]:#x}"])
 
     def test_block_shuffle_is_the_games(self):
+        # The reader's party is decoded by savedecode, with its table
         table = games_block_shuffle()
         self.assertEqual(len(table), 32)
-        self.assertEqual([tuple(row) for row in savelab.BLOCK_SHUFFLE], table)
+        self.assertEqual([tuple(row) for row in savedecode.BLOCK_SHUFFLE], table)
         # Control: the comparison sees a row swapped
-        swapped = list(savelab.BLOCK_SHUFFLE)
+        swapped = list(savedecode.BLOCK_SHUFFLE)
         swapped[1], swapped[2] = swapped[2], swapped[1]
         self.assertNotEqual(swapped, table)
 
@@ -481,13 +485,14 @@ class ReaderTests(LabTest):
         self.check(self.facts(castelia_rail_save(self.layout).image()), self.CASTELIA_RAIL)
 
     def test_a_moved_reader_offset_is_caught(self):
-        # Each of the reader's offsets matters: moved by 2, the facts are no longer the ones the images were built with
+        # Each of the reader's offsets matters: moved by 2, the facts are no longer the ones the images were built with.
+        # The offsets inside a Pokémon are savedecode's, held to the headers by test_savedecode.py; the reader's own
+        # are where it finds the party's Pokémon
         rail_save = castelia_rail_save(self.layout).image()
         # (The reader takes SaveLocation's rotation, rail flag and state together, at LOCATION_ROTATION)
         for name in ("LOCATION_ZONE", "LOCATION_POS", "LOCATION_RAIL_POS", "LOCATION_ROTATION", "PLAYER_NOW_SPAWN",
                      "PLAYER_NEXT_SPAWN", "TRAINER_DATA_PLAY_TIME", "TRAINER_GAME_INFO_CASH", "EVENT_WORK_FLAGS",
-                     "EVENT_WORK_WORKS", "PARTY_PKM_LEVEL", "PKM_BLOCK_A_SPECIES", "BOX_PKM_CHECKSUM",
-                     "POKE_PARTY_PKMS"):
+                     "EVENT_WORK_WORKS", "POKE_PARTY_PKMS"):
             with self.subTest(name=name), mock.patch.object(savelab, name, getattr(savelab, name) + 2):
                 try:
                     route20, castelia = self.facts(), self.facts(rail_save)
@@ -1006,8 +1011,6 @@ MUTANTS = (
      ("LayoutTests.test_savelab_layout_is_the_headers",)),
     ("the play time 2 bytes on", "TRAINER_DATA_PLAY_TIME = 0x24\n", "TRAINER_DATA_PLAY_TIME = 0x26\n",
      ("LayoutTests.test_savelab_layout_is_the_headers",)),
-    ("the level a byte on", "PARTY_PKM_LEVEL = 0x8c\n", "PARTY_PKM_LEVEL = 0x8d\n",
-     ("LayoutTests.test_savelab_layout_is_the_headers",)),
     # place
     ("the facings' angles swapped",
      "WARP_DIR_ANGLES = {1: 0x0000, 3: 0x4000, 2: 0x8000, 4: 0xc000}",
@@ -1125,17 +1128,15 @@ MUTANTS = (
      ("VerbTests.test_verb_refusals",)),
     ("an existing --out replaced without --force", "    if os.path.exists(path) and not force:\n", "    if False:\n",
      ("CommandLineTests.test_mint_and_read",)),
-    # The reader
-    ("the blocks left encrypted", "            content = crypt(content, checksum)\n", "",
+    # The reader. The party's decoding is savedecode's, whose deliberate bugs are test_savedecode.py's; these are the
+    # reader's glue: which slot it reads and which of savedecode's fields it reports as what
+    ("a slot's Pokémon read from the next slot",
+     "SAVE_BLOCK_PARTY, POKE_PARTY_PKMS + slot * PARTY_PKM_SIZE)[0]",
+     "SAVE_BLOCK_PARTY, POKE_PARTY_PKMS + (slot + 1) * PARTY_PKM_SIZE)[0]",
      ("ReaderTests.test_reader_gives_back_the_route_20_save",)),
-    ("the party's own fields left encrypted", "            stats = crypt(stats, pid)\n", "",
-     ("ReaderTests.test_reader_gives_back_the_route_20_save",)),
-    ("a Pokémon stored decrypted decrypted again",
-     "        if not raw[BOX_PKM_FLAGS] & BOX_PKM_PARTY_DECRYPTED:\n", "        if True:\n",
-     ("ReaderTests.test_a_pokemon_stored_decrypted_is_read_as_it_is",)),
-    ("a checksum never wrong",
-     '"checksum_ok": sum(struct.unpack(f"<{PKM_BUFFER_SIZE // 2}H", content)) & 0xffff == checksum,',
-     '"checksum_ok": True,',
+    ("the HP read from another field", '"hp": [fields["nowHP"], fields["maxHP"]],',
+     '"hp": [fields["maxHP"], fields["maxHP"]],', ("ReaderTests.test_a_pokemon_stored_decrypted_is_read_as_it_is",)),
+    ("checksum_ok whatever savedecode found", '"checksum_ok": not problems,', '"checksum_ok": True,',
      ("ReaderTests.test_a_bad_checksum_is_reported",)),
     ("a party of six refused", "    if not 0 <= count <= PARTY_SIZE:\n", "    if not 0 <= count < PARTY_SIZE:\n",
      ("ReaderTests.test_a_party_of_six",)),

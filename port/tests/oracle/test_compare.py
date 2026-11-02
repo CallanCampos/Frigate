@@ -4,33 +4,45 @@ screen comparisons exact and with the 3D tolerance screen by screen, comparisons
 comparisons, symbols.py's map parser and name lookup, seeds.py's reading of the random seeds the DS built from its
 memory and oracle.py's check of an input file's seeds against them, and oracle.py's handling of the port's runs (with a
 stand-in program), of the clock, of the saves made on the oracle from saves and their cache, of the comparison sequences
-and their references, of the round trips' save comparison (the bytes they declare, the mystery gift block decrypted)
-and of a missing oracle or ROM. They make up their own runs and need neither melonDS nor a ROM.
-Standard library only.
+and their references, of the round trips' save comparison (the bytes they declare, the mystery gift block decrypted,
+what savedecode.py lets them declare, and the catch trip's mail ids declared as the party's fields), of the real
+round-trip command's save comparison with stand-ins for the programs, on synthetic saves laid out as the game lays them
+out (test_savedecode.py's builders): an undeclared field or record fails the trip, a declared one passes, a trip that
+declares what it may not runs nothing, and a save laid out elsewhere fails, with deliberate bugs in oracle.py that those
+tests must catch (ORACLE_MUTANTS), and of a missing oracle or ROM. They make up their own runs and need neither melonDS
+nor a ROM. Standard library only.
 """
 
 from __future__ import annotations
 
 import argparse
+import contextlib
 import hashlib
 import io
 import os
+import random
 import re
 import shutil
 import stat
 import struct
 import sys
 import tempfile
+import types
+from types import SimpleNamespace
 import unittest
+from unittest import mock
 import zlib
 
 TOOLS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "tools", "oracle")
 sys.path.insert(0, os.path.abspath(TOOLS))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import compare  # noqa: E402
 import oracle  # noqa: E402
+import savedecode  # noqa: E402
 import seeds  # noqa: E402
 import symbols  # noqa: E402
+import test_savedecode  # noqa: E402 (its builders of synthetic saves)
 
 W = compare.SCREEN_WIDTH
 H = compare.SCREEN_HEIGHT * 2
@@ -1460,6 +1472,12 @@ class OracleScriptTests(unittest.TestCase):
                     self.assertTrue(offsets and all(0 <= i < oracle.BACKUP_SIZE for i in offsets), (name, spans))
                     self.assertFalse(encrypted & set(offsets), (name, spans))
                     self.assertTrue(why, (name, spans))
+            # Its bytes, its party fields and its records are all a round trip may declare (README.md, "Saves")
+            self.assertTrue(set(trip.known_party) | set(trip.known_records) <= {"b2_us", "w2_us"}, name)
+            for version in ("b2_us", "w2_us"):
+                self.assertEqual(savedecode.declaration_problems(
+                    trip.known.get(version, {}), trip.known_party.get(version, {}),
+                    trip.known_records.get(version, {}), bool(trip.cut)), [], (name, version))
         # A sequence's state has a label of its own for each part, and a dump for each program
         for name, sequence in oracle.SEQUENCES.items():
             labels = [dump.label for dump in sequence.state]
@@ -1625,6 +1643,65 @@ class OracleScriptTests(unittest.TestCase):
         self.assertEqual(len(problems), 1)
         self.assertIn(f"{oracle.MYSTERY_GIFT_BLOCK:#x}", problems[0])
 
+    def test_catch_declares_the_mail_ids_as_fields(self):
+        # The catch trip's one party declaration is the caught Purrloin's mail's three sentence ids, with MAIL_IDS, in
+        # both versions, and it declares no record
+        ids = "pkms[1].mail.message[0].id,pkms[1].mail.message[1].id,pkms[1].mail.message[2].id"
+        catch = oracle.ROUND_TRIPS["catch"]
+        for version in ("b2_us", "w2_us"):
+            self.assertEqual(catch.known_party[version], {ids: oracle.MAIL_IDS})
+            self.assertEqual(catch.known_records.get(version, {}), {})
+        # No byte declaration of any trip falls in the party or the records, in either copy
+        main = savedecode.MAIN_SAVE_LAYOUT
+        structs = {copy + main[block][0] + offset for copy in (0, oracle.SECOND_COPY)
+                   for block, size in ((0x1a, savedecode.LAYOUT["sizeof(PokeParty)"]),
+                                       (0x26, savedecode.LAYOUT["sizeof(GameRecords)"])) for offset in range(size)}
+        for name, trip in oracle.ROUND_TRIPS.items():
+            for version, table in trip.known.items():
+                for spans in table:
+                    self.assertFalse(structs & set(oracle.parse_offsets(spans)), (name, version, spans))
+        # A pair of saves whose only difference is those ids, the README's: melonDS's heap leftovers 0x0000, 0xfb5b
+        # and 0xff8b, the port's 0xbf83, 0xcbde and 0x0000, in the mail of the party's second Pokémon, the party at
+        # 0x18e00, both encrypted with the tests' own generator (test_savedecode.py)
+        layout = savedecode.LAYOUT
+        rng = random.Random(509)
+        tepig, purrloin = (test_savedecode.random_pokemon(layout, rng, pid) for pid in (0x1234_5678, 0x8765_4321))
+
+        def save_with(sentence_ids: tuple[int, int, int]) -> bytes:
+            plain = bytearray(purrloin)
+            for sentence, value in enumerate(sentence_ids):
+                test_savedecode.put(plain, *test_savedecode.field_at(layout, f"mail.message[{sentence}].id"), value)
+            party = test_savedecode.stored_party(layout, [test_savedecode.stored_pokemon(layout, tepig),
+                                                          test_savedecode.stored_pokemon(layout, plain)])
+            records = test_savedecode.stored_records(layout, test_savedecode.plain_records(layout, {}, 0x5959))
+            image = bytearray(b"\xff" * oracle.BACKUP_SIZE)
+            for copy in (0, oracle.SECOND_COPY):
+                image[copy + 0x18e00:copy + 0x18e00 + len(party)] = party
+                image[copy + main[0x26][0]:copy + main[0x26][0] + len(records)] = records
+            return bytes(image)
+
+        melonds, port = save_with((0x0000, 0xfb5b, 0xff8b)), save_with((0xbf83, 0xcbde, 0x0000))
+        # The bytes that differ are those 12: 0x18e00 + PokeParty.pkms (0x8) + 1 * 0xdc + PartyPkm.mail (0x9c) +
+        # MailData.message (0x20) + m * 8 + PMSData.id (0x2), 0x18fa2, 0x18faa and 0x18fb2, two bytes each, in each copy
+        self.assertEqual(oracle.differing_offsets(port, melonds),
+                         [copy + 0x18fa2 + 8 * sentence + byte for copy in (0, oracle.SECOND_COPY)
+                          for sentence in range(3) for byte in range(2)])
+        # The old byte declaration, written out, accepts them; so does the field declaration, which names the fields
+        old = {oracle.both_copies("0x18fa2-0x18fa3,0x18faa-0x18fab,0x18fb2-0x18fb3"): oracle.MAIL_IDS}
+        self.assertEqual(oracle.undeclared_differences(port, melonds, old), [])
+        blocks = [(0, 0)] * 73
+        blocks[0x1a], blocks[0x26] = main[0x1a], main[0x26]
+        comparison = savedecode.compare_saves(port, melonds, blocks, {}, catch.known_party["b2_us"], {})
+        self.assertTrue(comparison.passed, comparison.lines)
+        self.assertEqual([(difference.copy, difference.name, difference.port, difference.oracle)
+                          for difference in comparison.fields],
+                         [(copy, f"pkms[1].mail.message[{sentence}].id", ported, original)
+                          for copy in (0, oracle.SECOND_COPY)
+                          for sentence, (ported, original) in enumerate(((0xbf83, 0x0000), (0xcbde, 0xfb5b),
+                                                                         (0x0000, 0xff8b)))])
+        # Control: without the declaration the comparison fails on the three fields of each copy
+        self.assertEqual(len(savedecode.compare_saves(port, melonds, blocks, {}, {}, {}).undeclared_fields), 6)
+
     def test_input_starts_with(self):
         # An input file starts with another's lines as a program reads them: comments, blank lines and spacing aside
         with tempfile.TemporaryDirectory() as d:
@@ -1681,6 +1758,192 @@ class OracleScriptTests(unittest.TestCase):
             open(fake, "w").close()
             status = quiet(oracle.main, ["check", "--oracle", fake, "--rom", os.path.join(d, "missing.nds")])
         self.assertEqual(status, oracle.SKIP)
+
+
+class RoundTripComparisonTests(unittest.TestCase):
+    """The real round-trip command (oracle.command_round_trip) on synthetic saves laid out as the game lays them out,
+    MAIN_SAVE_LAYOUT's blocks at their offsets and the other 66 filling the gaps (test_savedecode.SyntheticSave), with
+    stand-ins for the programs: the oracle and the port write and continue the saves, and every continuation passes, so
+    that the trip's status is its save comparison's verdict"""
+
+    @classmethod
+    def setUpClass(cls):
+        layout = savedecode.LAYOUT
+        cls.offsets = {block: offset for block, (offset, _) in savedecode.MAIN_SAVE_LAYOUT.items()}
+        rng = random.Random(0x41c6)
+        cls.plains = [test_savedecode.random_pokemon(layout, rng, pid) for pid in (0x0002_6000, 0x0001_2345)]
+        cls.records = test_savedecode.plain_records(layout, {0x19: 1, 0x4b: 3}, 0x5959)
+        cls.oracle_image = cls.image(cls.plains, cls.records)
+
+    @classmethod
+    def image(cls, plains: list[bytes], records: bytes, offsets: dict[int, int] | None = None) -> bytes:
+        layout = savedecode.LAYOUT
+        save = test_savedecode.SyntheticSave(layout, offsets or cls.offsets)
+        save.set(0x1a, test_savedecode.stored_party(layout, [test_savedecode.stored_pokemon(layout, plain)
+                                                             for plain in plains]))
+        save.set(0x26, test_savedecode.stored_records(layout, records))
+        return save.image()
+
+    def with_field(self, slot: int, path: str, value: int) -> bytes:
+        plains = [bytearray(plain) for plain in self.plains]
+        test_savedecode.put(plains[slot], *test_savedecode.field_at(savedecode.LAYOUT, path), value)
+        return self.image(plains, self.records)
+
+    def with_record(self, record: int, value: int) -> bytes:
+        records = bytearray(self.records)
+        struct.pack_into("<H", records, savedecode.LAYOUT["GameRecords.halfwords"] + 2 * (record - 0x47), value)
+        return self.image(self.plains, records)
+
+    def crcs(self) -> dict[str, str]:
+        """The CRCs over the party and the records, in both copies: their blocks' footers, their entries in the CRC
+        table and the table's CRC in the save footer"""
+        offsets = []
+        for block in (0x1a, 0x26):
+            offset, size = savedecode.MAIN_SAVE_LAYOUT[block]
+            offsets += [offset + size + 2, offset + size + 3, 0x25f00 + 2 * block, 0x25f00 + 2 * block + 1]
+        offsets += [0x25fa2, 0x25fa3]
+        return {",".join(f"{copy + offset:#x}" for copy in (0, oracle.SECOND_COPY) for offset in offsets):
+                "the CRCs over the party and the records (src/gfl/backup_system.c)"}
+
+    def run_trip(self, port_image: bytes, known_party: dict[str, str] | None = None,
+                 known_records: dict[str, str] | None = None,
+                 oracle_image: bytes | None = None) -> tuple[int, str, int]:
+        """The trip's status, what it printed, and how many runs of the programs it started"""
+        trip = oracle.RoundTrip("floccesy_save", 34600, "floccesy_continue", known={"b2_us": self.crcs()},
+                                known_party={"b2_us": known_party or {}}, known_records={"b2_us": known_records or {}})
+        with tempfile.TemporaryDirectory() as directory:
+            oracle_path = os.path.join(directory, "oracle.sav")
+            with open(oracle_path, "wb") as f:
+                f.write(oracle_image or self.oracle_image)
+            binary = os.path.join(directory, "pbw-oracle")
+            open(binary, "w").close()
+
+            def run_port(*args, **kwargs):
+                # Its own save, then, continuing it, the same save left as it was
+                os.makedirs(args[1], exist_ok=True)
+                with open(kwargs["save"], "rb") as f:
+                    given = f.read()
+                with open(kwargs["save_out"], "wb") as f:
+                    f.write(port_image if kwargs["save_out"].endswith(os.sep + "port.sav") else given)
+                return 0, "synthetic run"
+
+            def run_oracle(made, out, *args, **kwargs):
+                os.makedirs(out, exist_ok=True)
+                shutil.copyfile(made.save, made.save_out)
+                return 0
+
+            args = SimpleNamespace(name="unit-wiring", version="b2_us", oracle=binary, rom=None, port="synthetic",
+                                   time=None, work=os.path.join(directory, "run"), save_cache=None)
+            output = io.StringIO()
+            with mock.patch.dict(oracle.ROUND_TRIPS, {"unit-wiring": trip}), \
+                 mock.patch.object(oracle, "rom_matches", return_value=None), \
+                 mock.patch.object(oracle, "obtain_save", return_value=(oracle_path, None)), \
+                 mock.patch.object(oracle, "run_port", side_effect=run_port) as port, \
+                 mock.patch.object(oracle, "run_oracle", side_effect=run_oracle) as boot, \
+                 mock.patch.object(oracle, "describe_port_run", return_value="synthetic run"), \
+                 mock.patch.object(oracle.compare, "load_run", return_value=SimpleNamespace(frames={1: None})), \
+                 mock.patch.object(oracle, "compare_boots", return_value=(1, None)), \
+                 mock.patch.object(oracle, "compare_sequence", return_value=0), \
+                 contextlib.redirect_stdout(output):
+                status = oracle.command_round_trip(args)
+            return status, output.getvalue(), port.call_count + boot.call_count
+
+    def test_the_same_saves_pass(self):
+        # Control: the port's save differs from melonDS's in a declared field only, and the stand-ins pass the rest
+        status, output, runs = self.run_trip(self.with_field(1, "mail.message[0].id", 0xbf83),
+                                             known_party={"pkms[1].mail.message[0].id": oracle.MAIL_IDS})
+        self.assertEqual((status, runs), (0, 4), output)
+        self.assertIn("the save comparison passes", output)
+        self.assertIn("pkms[1].mail.message[0].id: the port's 0xbf83", output)
+
+    def test_an_undeclared_field_fails_the_trip(self):
+        status, output, _ = self.run_trip(self.with_field(0, "nowHP", 7))
+        self.assertEqual(status, 1)
+        self.assertIn("copy 0x0 the party pkms[0].nowHP", output)
+        self.assertIn("the save comparison fails", output)
+
+    def test_an_undeclared_record_fails_the_trip(self):
+        status, output, _ = self.run_trip(self.with_record(0x4b, 4))
+        self.assertEqual(status, 1)
+        self.assertIn("copy 0x26000 the records record 0x4b", output)
+
+    def test_a_trip_that_declares_what_it_may_not_runs_nothing(self):
+        # nowHP, which only a Pokémon that fought past a cut may declare, on a trip without one
+        status, output, runs = self.run_trip(self.with_field(0, "nowHP", 7),
+                                             known_party={"pkms[0].nowHP": "src/ov167/btl_server_flow.c"})
+        self.assertEqual((status, runs), (1, 0))
+        self.assertIn("declares what a round trip may not: party field pkms[0].nowHP", output)
+
+    def test_a_save_laid_out_elsewhere_fails_the_trip(self):
+        offsets = dict(self.offsets)
+        offsets[0x34] += 0x100
+        moved = self.image(self.plains, self.records, offsets)
+        # The port's save, laid out as melonDS's, differs in a record, as a valid save of its own
+        records = bytearray(self.records)
+        records[savedecode.LAYOUT["GameRecords.halfwords"] + 2 * (0x4b - 0x47)] ^= 1
+        status, output, _ = self.run_trip(self.image(self.plains, bytes(records), offsets), oracle_image=moved)
+        self.assertEqual(status, 1)
+        self.assertIn("block 0x34 is at", output)
+        self.assertIn("aren't where savedecode reads them", output)
+
+
+# Deliberate bugs in oracle.py's round trip, each the text it replaces (found exactly once in oracle.py), the text that
+# replaces it, and the tests, ClassName or ClassName.test_name, at least one of which must fail on it
+ORACLE_MUTANTS = (
+    ("the save comparison's verdict ignored", "    if not comparison.passed:\n        failed = True\n",
+     "    if False:\n        failed = True\n", ("RoundTripComparisonTests.test_an_undeclared_field_fails_the_trip",)),
+    ("the declarations not checked",
+     '    if problems:\n        for problem in problems:\n            print(f"oracle.py round-trip: {args.name} '
+     'declares', '    if False:\n        for problem in problems:\n            print(f"oracle.py round-trip: '
+     '{args.name} declares', ("RoundTripComparisonTests.test_a_trip_that_declares_what_it_may_not_runs_nothing",)),
+    ("the layout not checked", "    problems = savedecode.layout_problems(blocks)\n", "    problems = []\n",
+     ("RoundTripComparisonTests.test_a_save_laid_out_elsewhere_fails_the_trip",)),
+)
+
+
+class OracleMutationTests(unittest.TestCase):
+    """Every row of ORACLE_MUTANTS: oracle.py with that one bug, loaded in oracle's place, fails at least one of its
+    tests; and oracle.py as it is passes all of them through the same runner, so that what fails is the bug"""
+
+    @classmethod
+    def setUpClass(cls):
+        with open(oracle.__file__, encoding="utf-8") as f:
+            cls.source = f.read()
+
+    def load(self, text: str) -> types.ModuleType:
+        """A module made from that source as oracle.py's, its path as oracle.py's own"""
+        module = types.ModuleType("oracle_mutant")
+        module.__file__ = oracle.__file__
+        with mock.patch.object(sys, "path", list(sys.path)), mock.patch.dict(sys.modules, {"oracle_mutant": module}):
+            exec(compile(text, oracle.__file__, "exec"), module.__dict__)
+        return module
+
+    def run_tests(self, module: types.ModuleType, names: tuple[str, ...], first_failure: bool) -> unittest.TestResult:
+        suite = unittest.TestSuite()
+        for name in names:
+            class_name, _, method = name.partition(".")
+            isolated = type(class_name, (globals()[class_name],), {"__module__": __name__})
+            suite.addTests([isolated(method)] if method else unittest.defaultTestLoader.loadTestsFromTestCase(isolated))
+        result = unittest.TestResult()
+        result.failfast = first_failure
+        with mock.patch.dict(globals(), {"oracle": module}):
+            suite.run(result)
+        return result
+
+    def test_oracle_as_it_is_passes_the_mutants_tests(self):
+        names = tuple(sorted({name for *_, tests in ORACLE_MUTANTS for name in tests}))
+        result = self.run_tests(self.load(self.source), names, first_failure=False)
+        self.assertEqual(result.testsRun, len(names))
+        self.assertTrue(result.wasSuccessful(), [str(test) for test, _ in result.failures + result.errors])
+
+    def test_each_mutant_fails_its_tests(self):
+        self.assertEqual(len({name for name, *_ in ORACLE_MUTANTS}), len(ORACLE_MUTANTS))
+        for name, old, new, tests in ORACLE_MUTANTS:
+            with self.subTest(mutant=name):
+                self.assertEqual(self.source.count(old), 1, "the text a mutant replaces is in oracle.py once")
+                self.assertNotEqual(old, new)
+                result = self.run_tests(self.load(self.source.replace(old, new)), tests, first_failure=True)
+                self.assertFalse(result.wasSuccessful(), f"oracle.py with this bug passes {', '.join(tests)}")
 
 
 if __name__ == "__main__":

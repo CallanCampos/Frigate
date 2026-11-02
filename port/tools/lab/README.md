@@ -10,11 +10,12 @@ oracle or the player's own.
 
 | File | What it does | Game functionality it serves | Run |
 | --- | --- | --- | --- |
-| [savelab.py](savelab.py) | `mint` applies a recipe in the game's constant names to a save and writes the result; `read` prints a save's facts in the same names, the party decoded | The saves: the player's place and the spawn CONTINUE takes (block 0x1c), the event flags and work values (0x2d), the play time (0x1b), the money and badges (0x34), the party (0x1a, read only) | by hand; its test `lab_savelab` ([../../tests/lab/test_savelab.py](../../tests/lab/test_savelab.py)) |
+| [savelab.py](savelab.py) | `mint` applies a recipe in the game's constant names to a save and writes the result; `read` prints a save's facts in the same names, the party decoded | The saves: the player's place and the spawn CONTINUE takes (block 0x1c), the event flags and work values (0x2d), the play time (0x1b), the money and badges (0x34), the party (0x1a, read only, decoded by [../oracle/savedecode.py](../oracle/savedecode.py)) | by hand; its test `lab_savelab` ([../../tests/lab/test_savelab.py](../../tests/lab/test_savelab.py)) |
 
 Planned beside it, from the save lab's design: stations, minted saves that the oracle holds Frigate to as it holds a
-sequence; a map sweep that places the player in every zone; and verbs for the party, the bag and the Pokédex. ADR 0032
-is reserved for the stations' rules.
+sequence; a map sweep that places the player in every zone; and verbs for the party, the bag and the Pokédex, the party's
+building their Pokémon on [../oracle/savedecode.py](../oracle/savedecode.py), which decodes them now, so that the
+save's crypto keeps one copy. ADR 0032 is reserved for the stations' rules.
 
 ## Minting a save
 
@@ -130,7 +131,8 @@ prints the save's SHA-1 and facts as JSON:
 - `works`: `EVENT_WORK_CONTINUE_SCRIPT`, each `--work NAME`, and every work value that isn't 0;
 - `money`, `badges` (how many, and their bits), `playtime`;
 - `party`: each Pokémon's species, level, HP, experience, held item and moves, decrypted as `PokeParty_DecryptPkm` does
-  (`src/system/poke_tool.c`), and whether its checksum holds.
+  (`src/system/poke_tool.c`) by [../oracle/savedecode.py](../oracle/savedecode.py), the module the oracle's round trips
+  compare the party with too, and whether its checksum holds.
 
 For the Route 20 save it gives `ZONE_ROUTE_20` at tile `[130, 661]` and the work values `0x40a3` and `0x40a5` at 2, the
 facts the oracle's README records for that save ([../oracle/README.md](../oracle/README.md)).
@@ -159,10 +161,14 @@ layout, with its two copies alike, or the minter refuses its own output.
 The offsets are the decomp's headers' (`include/save/*.h`, `include/field/zone.h`, `include/pml/poke_party.h`). The test
 `lab_savelab` compiles [../../tests/lab/savelab_layout.c](../../tests/lab/savelab_layout.c) as the host build compiles
 the game, holds `savelab.py`'s `LAYOUT` to the offsets it prints, and builds synthetic saves field by field from them.
+The party's offsets inside a Pokémon are `savedecode.py`'s, held to the headers by the test `oracle_save_decode`
+([../../tests/oracle/test_savedecode.py](../../tests/oracle/test_savedecode.py)), which has the decoding's deliberate
+bugs too.
 It checks the reader on them, a place on the grid and one on a rail among them, and holds each verb and each form of
 `place` byte for byte to the save the game's own writes would give, from a base on which every field `place` writes
 differs. It checks the resealing and the refusals too. Its table of deliberate bugs in `savelab.py`, `MUTANTS`, gives
-each check the bugs it must catch, and the test fails if one of them gets through; a change to `savelab.py` that a
-mutant's text no longer matches fails it too, so the table changes with the code. It needs no ROM. The reader's facts on
+each check the bugs it must catch (for the party, those of the reader's glue: the slot it reads and the fields it
+reports), and the test fails if one of them gets through; a change to `savelab.py` that a mutant's text no longer
+matches fails it too, so the table changes with the code. It needs no ROM. The reader's facts on
 the oracle's saves are the ones the oracle's README records for them, independently; the record of that check is in
 [STATUS.md](../../docs/STATUS.md).

@@ -3,7 +3,9 @@
 
 Synthetic full card images follow src/system/save_table.c's two main copies and src/gfl/backup_system.c's block
 footers, CRC table and SaveFooter. These checks protect SAVE/interchange validation: a good backup cannot hide a
-bad trainer CRC in the other copy, even where an oracle route permits clock/CRC differences. No game data or saves.
+bad trainer CRC in the other copy, even where an oracle route permits clock/CRC differences. The real round-trip
+command is held to validating both saves before anything is decrypted or decoded (the mystery gift block, and the
+party and records that savedecode.py compares field by field) or booted. No game data or saves.
 """
 
 from __future__ import annotations
@@ -99,7 +101,8 @@ class SaveImageTests(unittest.TestCase):
                 self.assert_broken(bytes(image), f"copy {copy:#x} block 27")
 
     def test_round_trip_rejects_masked_crc_before_decryption_or_boot(self):
-        # Exercise the real command, not just the validator: even a permitted CRC byte must be valid in each bank.
+        # Exercise the real command, not just the validator: even a permitted CRC byte must be valid in each bank. The
+        # trip declares a block's footer CRC, which a round trip may declare (savedecode.declaration_problems)
         oracle = replay.oracle
         for copy in saveimage.COPIES:
             with self.subTest(copy=copy), tempfile.TemporaryDirectory() as directory:
@@ -130,10 +133,12 @@ class SaveImageTests(unittest.TestCase):
                      mock.patch.object(oracle, "describe_port_run", return_value="synthetic run"), \
                      mock.patch.object(oracle, "run_oracle") as boot, \
                      mock.patch.object(oracle, "mystery_gift_decrypted") as decrypt, \
+                     mock.patch.object(oracle.savedecode, "compare_saves") as decode, \
                      contextlib.redirect_stdout(output):
                     self.assertEqual(oracle.command_round_trip(args), 1)
                 boot.assert_not_called()
                 decrypt.assert_not_called()
+                decode.assert_not_called()
                 self.assertIn("invalid save image", output.getvalue())
                 self.assertIn(f"copy {copy:#x} block 27", output.getvalue())
 

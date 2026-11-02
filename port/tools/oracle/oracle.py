@@ -42,8 +42,9 @@ copied into it is the oracle's. round-trip does it for a save of the story's rou
 Purrloin caught; hugh, Hugh's trainer battle to its end; floccesy, Alder's scenes and the road to Route 20): the port
 plays the input file the oracle made the kept save with, from the same start, or its own where its course past a cut
 would outlast those presses (ADR 0023), and saves, its run up to the cut held to the oracle's as the cut's sequence
-holds it; the two saves differ only in the bytes the trip declares, their mystery gift blocks compared decrypted; the
-oracle continues the port's save as it continues its own, frame for frame, and the port continues it in a new run,
+holds it; the two saves differ only in what the trip declares, bytes with their mystery gift blocks compared
+decrypted, and fields of the party and the game records, which savedecode.py decodes and compares field by field;
+the oracle continues the port's save as it continues its own, frame for frame, and the port continues it in a new run,
 compared with the oracle's continuing the same save as sequence compares. boot does both for the boot sequence and
 compares them on the game's count, the movies by their pictures (compare.py), at the DS's 6 bits and at the palettes' 5.
 sequence does both on a comparison sequence's input file, port/tests/oracle/<name>_<version>.pbwinput (SEQUENCES:
@@ -96,6 +97,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import compare  # noqa: E402
+import savedecode  # noqa: E402
 import saveimage  # noqa: E402
 import seeds  # noqa: E402
 import sound  # noqa: E402
@@ -1338,18 +1340,23 @@ def port_save(args) -> int:
 @dataclass(frozen=True)
 class RoundTrip:
     """A save that both programs make and that each continues in a new run (README.md, "Saves"): maker, the SAVES name
-    whose input file both play from its start save, the port to port_frames, by when the game has saved; continued,
-    the sequence whose input file continues the save, from power-on. The oracle continues the port's save as it
-    continues its own, frame for frame, and the port continues its own save in a new run, held to the oracle's run on
-    that same save as the sequence holds the port to the oracle on the oracle's save, its game state too. known: by
-    version, the bytes where the two saves differ by construction (save offsets, "0x19427" or "0x18fa2-0x18fa3",
-    comma-separated), each with why (README.md, "Saves"), a cause traced; the saves are compared with their mystery
-    gift blocks decrypted (mystery_gift_decrypted), so that only the block's key, not its encrypted contents, can be
-    declared, and a byte that differs anywhere else fails the trip, as an undeclared frame fails a sequence. A piece
-    whose course the DS's CPU time decides (ADR 0023) names its cut, the sequence that holds the piece frame by frame
-    up to that point, from the same start save: the port's run of the piece is compared with the oracle's run of the
-    cut's input file as that sequence compares it, up to its last port frame, the cut's input file being the start of
-    the port's, line for line; past it the port plays its own course. Where the oracle's presses would miss what that
+    whose input file both play from its start save, the port to port_frames, by when the game has saved; continued, the
+    sequence whose input file continues the save, from power-on. The oracle continues the port's save as it continues
+    its own, frame for frame, and the port continues its own save in a new run, held to the oracle's run on that same
+    save as the sequence holds the port to the oracle on the oracle's save, its game state too. known: by version, the
+    bytes where the two saves differ by construction (save offsets, "0x19427" or "0x18fa2-0x18fa3", comma-separated),
+    each with why (README.md, "Saves"), a cause traced; the saves are compared with their mystery gift blocks decrypted
+    (mystery_gift_decrypted), so that only the block's key, not its encrypted contents, can be declared, and a byte that
+    differs anywhere else fails the trip, as an undeclared frame fails a sequence. The party and the game records are
+    encrypted whole again whenever one of their fields changes, so they are decoded and compared field by field
+    (savedecode.compare_saves), never as bytes: known_party declares, by version, the party's fields that differ
+    ("pkms[1].nowHP", comma-separated, PokeParty.pkms's slot and a path of savedecode's POKEMON_FIELDS), and
+    known_records the records ("0x4b", the record's ID in hex), each with its cause traced to the game's C;
+    savedecode.declaration_problems refuses before anything runs what a trip may never declare (README.md, "Saves"). A
+    piece whose course the DS's CPU time decides (ADR 0023) names its cut, the sequence that holds the piece frame by
+    frame up to that point, from the same start save: the port's run of the piece is compared with the oracle's run of
+    the cut's input file as that sequence compares it, up to its last port frame, the cut's input file being the start
+    of the port's, line for line; past it the port plays its own course. Where the oracle's presses would miss what that
     course shows at them (a trainer battle whose turns, and so its scenes, outlast the presses), port_input names, by
     version, the input file the port plays instead (port/tests/oracle/<name>_<version>.pbwinput), the maker's with
     presses of its own after the cut. continued_last: the last count at which the oracle's runs on the two saves are
@@ -1361,6 +1368,8 @@ class RoundTrip:
     cut: str = ""
     port_input: dict[str, str] = field(default_factory=dict)
     continued_last: int = 0
+    known_party: dict[str, dict[str, str]] = field(default_factory=dict)
+    known_records: dict[str, dict[str, str]] = field(default_factory=dict)
 
 
 def input_lines(path: str) -> list[str]:
@@ -1386,13 +1395,9 @@ def input_starts_with(path: str, start: str) -> bool:
 SECOND_COPY = 0x26000
 
 
-def parse_offsets(text: str) -> list[int]:
-    """"0x19427,0x18fa2-0x18fa3" as the offsets it names, in order"""
-    out = []
-    for item in text.split(","):
-        first, _, last = item.partition("-")
-        out.extend(range(int(first, 16), int(last or first, 16) + 1))
-    return out
+# A round trip's byte spans, "0x19427,0x18fa2-0x18fa3", as the offsets they name, in order: savedecode's, which checks
+# and compares the same declarations
+parse_offsets = savedecode.parse_offsets
 
 
 def both_copies(text: str) -> str:
@@ -1411,9 +1416,10 @@ MYSTERY_GIFT_SIZE = 0xa94
 
 def mystery_gift_decrypted(contents: bytes) -> tuple[bytes, list[str]]:
     """A save with the mystery gift block of each copy of its main save decrypted, as mgDecryptData decrypts it
-    (src/system/mystery_data.c, with decryptData's generator in src/gfl/gf_standard.c), its checksum and key left as
-    the save holds them: two saves whose blocks hold the same contents under other keys then differ only in the key.
-    With why a copy's block doesn't decrypt (its contents don't add up to its checksum), for each that doesn't"""
+    (src/system/mystery_data.c, with decryptData's generator in src/gfl/gf_standard.c, savedecode.crypt, and
+    addUpDataStream's sum, savedecode.byte_sum), its checksum and key left as the save holds them: two saves whose
+    blocks hold the same contents under other keys then differ only in the key. With why a copy's block doesn't
+    decrypt (its contents don't add up to its checksum), for each that doesn't"""
     out = bytearray(contents)
     problems = []
     for copy in (0, SECOND_COPY):
@@ -1423,11 +1429,8 @@ def mystery_gift_decrypted(contents: bytes) -> tuple[bytes, list[str]]:
             problems.append(f"the save ends before the mystery gift block at {start:#x}")
             continue
         checksum, key = struct.unpack_from("<HH", out, end)
-        seed = checksum + (key << 16)
-        for offset in range(start, end, 2):
-            seed = (seed * 1103515245 + 24691) & 0xFFFFFFFF
-            struct.pack_into("<H", out, offset, struct.unpack_from("<H", out, offset)[0] ^ (seed >> 16))
-        if sum(out[start:end]) & 0xFFFF != checksum:
+        out[start:end] = savedecode.crypt(bytes(out[start:end]), checksum + (key << 16))
+        if savedecode.byte_sum(out[start:end]) & 0xFFFF != checksum:
             problems.append(f"the mystery gift block at {start:#x} doesn't add up to its checksum ({checksum:#06x}) "
                             f"decrypted with its key ({key:#06x})")
     return bytes(out), problems
@@ -1443,9 +1446,14 @@ PLAY_SECONDS = ("the play time's seconds, which each program counts with its own
 SAVE_CRCS = ("the CRCs over those: the party block's and the trainer's, their entries in the table of the blocks' "
              "CRCs, and the footer's CRC of that table (src/gfl/backup_system.c)")
 CATCH_SAVE_BYTES = {
-    both_copies("0x18fa2-0x18fa3,0x18faa-0x18fab,0x18fb2-0x18fb3"): MAIL_IDS,
     both_copies("0x19427"): PLAY_SECONDS,
     both_copies("0x19336-0x19337,0x194b2-0x194b3,0x25f34-0x25f37,0x25fa2-0x25fa3"): SAVE_CRCS,
+}
+# The caught Purrloin's mail's sentence ids, slot 1 of the party, by field (savedecode.POKEMON_FIELDS): in each copy of
+# the main save they are the bytes 0x18fa2-0x18fa3, 0x18faa-0x18fab and 0x18fb2-0x18fb3 of the save, encrypted with its
+# PID a u16 at a time, so those bytes differ exactly where these fields do
+CATCH_SAVE_PARTY = {
+    "pkms[1].mail.message[0].id,pkms[1].mail.message[1].id,pkms[1].mail.message[2].id": MAIL_IDS,
 }
 # The Pokemon Center saves' bytes that differ by construction after Hugh's battle, the same places in both versions
 # (README.md, "Saves")
@@ -1493,7 +1501,8 @@ FLOCCESY_SAVE_BYTES = {
 ROUND_TRIPS = {
     # Phase 4's exit: the wild Purrloin caught on Route 19 and the game saved, then quit, and continued from the save
     "catch": RoundTrip("catch_save", 11600, "catch_continue",
-                       known={"b2_us": CATCH_SAVE_BYTES, "w2_us": CATCH_SAVE_BYTES}),
+                       known={"b2_us": CATCH_SAVE_BYTES, "w2_us": CATCH_SAVE_BYTES},
+                       known_party={"b2_us": CATCH_SAVE_PARTY, "w2_us": CATCH_SAVE_PARTY}),
     "floccesy": RoundTrip("floccesy_save", 34600, "floccesy_continue",
                           known={"b2_us": FLOCCESY_SAVE_BYTES, "w2_us": FLOCCESY_SAVE_BYTES}),
     # A trainer battle to its end: Hugh's, from the starter save, held to melonDS frame by frame up to his AI's second
@@ -1507,15 +1516,8 @@ ROUND_TRIPS = {
 }
 
 
-def join_offsets(offsets: list[int]) -> list[tuple[int, int]]:
-    """Byte offsets, in order, as spans (first byte, last byte), spans 8 bytes or less apart joined"""
-    spans: list[list[int]] = []
-    for i in offsets:
-        if spans and i - spans[-1][1] <= 8:
-            spans[-1][1] = i
-        else:
-            spans.append([i, i])
-    return [(first, last) for first, last in spans]
+# Byte offsets, in order, as spans (first byte, last byte), spans 8 bytes or less apart joined: savedecode's too
+join_offsets = savedecode.join_offsets
 
 
 def differing_offsets(a: bytes, b: bytes) -> list[int]:
@@ -1536,6 +1538,13 @@ def undeclared_differences(a: bytes, b: bytes, known: dict[str, str]) -> list[tu
 
 def command_round_trip(args) -> int:
     trip = ROUND_TRIPS[args.name]
+    # What the trip declares, it may declare (README.md, "Saves"): checked before any program runs
+    problems = savedecode.declaration_problems(trip.known.get(args.version, {}), trip.known_party.get(args.version, {}),
+                                               trip.known_records.get(args.version, {}), bool(trip.cut))
+    if problems:
+        for problem in problems:
+            print(f"oracle.py round-trip: {args.name} declares what a round trip may not: {problem}")
+        return 1
     maker = SAVES[trip.maker]
     sequence = SEQUENCES[trip.continued]
     binary = args.oracle or DEFAULT_ORACLE
@@ -1631,6 +1640,16 @@ def command_round_trip(args) -> int:
             print(f"oracle.py round-trip: FAIL; invalid save image; the runs are in {work}")
             return 1
         print(f"the {name}'s save: both copies' 73 block CRCs, checksum tables and footers valid")
+    # The party, the records and the blocks the declarations protect are where the headers put them, in the DS's
+    # image, whose layout validate_image took too
+    blocks = saveimage.find_blocks(contents["oracle"])
+    problems = savedecode.layout_problems(blocks)
+    if problems:
+        for problem in problems:
+            print(f"the oracle's save: {problem}")
+        print("oracle.py round-trip: FAIL; the save's blocks aren't where savedecode reads them; the runs are in "
+              f"{work}")
+        return 1
     for name in saves:
         # The mystery gift block is compared by what it holds, each save's decrypted with its own key
         plain[name], problems = mystery_gift_decrypted(contents[name])
@@ -1643,14 +1662,14 @@ def command_round_trip(args) -> int:
         differing = len(differing_offsets(a, b))
         print(f"{label} differ in {differing} bytes, in {len(spans)} spans: "
               + ", ".join(f"{first:#x}-{last:#x}" for first, last in spans))
-    # Every byte that differs, the mystery gift blocks decrypted, is one the trip declares, with its cause
-    known = trip.known.get(args.version, {})
-    for text, why in known.items():
-        print(f"may differ, bytes {text}: {why}")
-    undeclared = undeclared_differences(plain["port"], plain["oracle"], known)
-    if undeclared:
-        print("the saves differ where the trip declares nothing: "
-              + ", ".join(f"{first:#x}-{last:#x}" for first, last in undeclared))
+    # Every byte that differs outside the party and the records, the mystery gift blocks decrypted, and every field of
+    # those two that differs, decoded, is one the trip declares, with its cause
+    comparison = savedecode.compare_saves(plain["port"], plain["oracle"], blocks, trip.known.get(args.version, {}),
+                                          trip.known_party.get(args.version, {}),
+                                          trip.known_records.get(args.version, {}))
+    for line in comparison.lines:
+        print(line)
+    if not comparison.passed:
         failed = True
 
     # Each save continued on the oracle: the same frames, count and both screens, and neither save written; with the

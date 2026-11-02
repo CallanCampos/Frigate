@@ -29,6 +29,7 @@ at build time, pinned to a release, and never committed.
 | `oracle.py` | runs the oracle and the port with the repository's defaults; makes the saves the tests start from on the oracle, each from the save before it ([Saves](#saves)); the comparison sequences, the field menu's and its apps' among them, and the sound's comparison; the ctest check |
 | `compare.py` | compares two runs: screens, memory, alignment |
 | `saveimage.py` | verifies both main save copies' 73 block CRCs, the padded CRC table and its footer before any clock/CRC exceptions; native block extents come from the examined DS image |
+| `savedecode.py` | decodes the saves' party and game records field by field, the one copy of the save's crypto, and compares two saves as the round trips do: bytes outside those two, their fields and records inside, each declared with its traced cause or not, and refuses what a trip may never declare ([Saves](#saves), "The party and the game records, compared decrypted"); the save lab's reader decodes the party with it too |
 | `sound.py` | compares two runs' sound: the sound driver's state run by run, what the ARM9 sees of it frame by frame, and the sound by segment ([Sound](#sound)) |
 | `sndtrace.h` | the sound trace's format, plain C11, which the port's sound driver (`port/hal/snd7/snd7.c`), its `--sound-trace` (`port/app/sound_trace.c`) and the sound driver's tests include |
 | `seeds.py` | the random seeds the DS built in an oracle run, read from the memory it dumps ([Random seeds](#random-seeds)) |
@@ -847,8 +848,8 @@ earlier and waits there before the common SAVE at count 32,000.
 Run the story comparison and round trip together: the sequence verifies the producing story; the round trip verifies
 the write and continuations. SAVE's asynchronous progress pictures are covered by content and reload checks. This
 route uses the full continuation and no trainer-AI cut. The only save differences allowed are the play-time seconds
-at `0x19427` and the trainer/table/footer CRCs over them, in each copy. Party data, position, story flags and decrypted
-gifts remain checked. The checkpoint has 73 valid block CRCs in both copies, zone 446 at grid `(130,661)`, and event
+at `0x19427` and the trainer/table/footer CRCs over them, in each copy. The party and the game records, decoded and
+compared field by field (`savedecode.py`, [Saves](#saves)), position, story flags and decrypted gifts remain checked. The checkpoint has 73 valid block CRCs in both copies, zone 446 at grid `(130,661)`, and event
 work `40a3=2` and `40a5=2`.
 
 Save integrity is enforced before the byte comparison or DS boot. `saveimage.py` checks all 73 blocks in each
@@ -1068,6 +1069,150 @@ into `<build>/oracle-saves` before the sequences that start from them (a fixture
 build tree; without `--save-cache`, as before, every save is made fresh. Nothing the game writes is committed: only the
 input files and the SHA-1s.
 
+**The party and the game records, compared decrypted** ([savedecode.py](savedecode.py)). Two blocks of the main save
+are encrypted whole again whenever one of their fields changes, so that their bytes can't say which field did; the
+round trips decode them and compare them field by field:
+
+- **The party** (block 0x1a, `PokeParty`, `include/pml/poke_party.h`) holds six `PartyPkm`. Each is a `BoxPkm` whose
+  head is in the clear (`pid`, the flags `partyDecrypted`, `boxDecrypted`, `badEgg` and `unk4_3`, and `checksum`), its
+  128 bytes of data, the blocks `PkmBlockA` to `PkmBlockD` in the order bits 13 to 17 of the PID pick (`blockShufLUT`,
+  `PML_PkmGetParamBlockCore` in `src/system/poke_tool.c`), encrypted with the checksum, and the party's own fields,
+  `statusCond` to `unkD8` (the level, the HP, the stats and the mail, `include/pml/mail.h`,
+  `include/system/pms_data.h`), encrypted with the PID (`PokeParty_EncryptPkm`). `PML_CryptoRun` XORs each u16 with the
+  high half of the next state of `x' = x * 0x41c64e6d + 0x6073`, and the checksum is `PML_CryptoGenKey`'s u16 sum of
+  the plain data, made again at every encryption. So the HP (`0x8e` in a Pokémon) and the status (`0x88`) change only
+  their own u16s, but one PP changes the checksum, and with it the key of all 128 bytes: written again, nearly every
+  byte of the data changes (a byte keeps its value about one time in 256), and no byte declaration can tell the PP
+  from the species. An empty slot holds `PokeParty_ClearPkm`'s Pokémon, zeros encrypted under keys 0
+  (`src/system/pokeparty.c`), and a Pokémon's mail is allocated from the heap uncleared (`CreateMailData`,
+  `src/system/mail.c`): `ResetMailData` sets every field of it but `unk18` and the three sentences' `id`, which keep what
+  each program's heap held there.
+- **The game records** (block 0x26, `GameRecords`, `include/save/records.h`; not `RecordSave`, block 0x3b) are the
+  trainer card's 0xa7 counters, records 0 to 0x46 u32 and 0x47 to 0xa6 u16, then `checksum` and `seedHigh`. Record 0,
+  the step counter, is in the clear; records 1 to 0xa6, 472 bytes from `0x1da04`, are encrypted with the same generator
+  (`decryptData`, `src/gfl/gf_standard.c`), seeded with the checksum, `addUpDataStream`'s byte sum of the plain
+  records, plus `seedHigh << 16`, which New Game takes from the VBlank count (`initTrainerCardInfoBlk`,
+  `src/system/trainer_card_savedata.c`). Every `RecordAdd`, `RecordSet` and `RecordSetIfHigher`
+  (`src/system/record.c`) encrypts them again with the new sum, so one counter changed rewrites all 472 bytes.
+
+This is the mystery gift block's rule ([lessons.md](../../docs/lessons.md): compare an encrypted block by what it
+holds, and declare only what the game's code makes differ) taken to the party and the records. `savedecode.py` is the
+one copy of the save's crypto: `mystery_gift_decrypted` takes its generator and its sum, and the save lab's reader its
+party ([../lab/README.md](../lab/README.md)). One block the game encrypts with a key from the VBlank count is still
+compared as bytes, the symbol encounters' (block 0x3c, at `0x22a00`), which `decryptNpcData` encrypts again under a
+new key whenever it writes it (`src/system/symbol_save.c`): no trip changes it yet.
+
+Where the blocks are in each copy, as `SaveData_BuildTable` lays them out (`src/gfl/savedata.c`: each struct's size
+rounded up to 4, a 4-byte footer, the next block on the next 0x100), read with `saveimage.find_blocks` from the
+oracle's catch and Route 20 saves of both versions, which agree with each other, with the headers' sizes and with the
+replay check's references of the starter save
+([../../tests/replay/starter_save_b2_us.save.tsv](../../tests/replay/starter_save_b2_us.save.tsv) and White 2's)
+(`savedecode.MAIN_SAVE_LAYOUT`; a round trip fails on a save whose blocks are elsewhere):
+
+| Block | ID | Struct and size | Offset in a copy |
+| --- | --- | --- | --- |
+| Bag | 0x19 | `BagSave`, 0x9ec | `0x18400` |
+| Party | 0x1a | `PokeParty`, 0x534 | `0x18e00` (`pkms[0]` at `0x18e08`) |
+| Player | 0x1c | `PlayerSave`, 0xa8 | `0x19500` |
+| Mystery gift | 0x22 | `MysteryGiftSaveData`, 0xa94 | `0x1c800` |
+| Records | 0x26 | `GameRecords`, 0x1e0 | `0x1da00` |
+| Event work | 0x2d | `EventWork`, 0x4de (0x4e0 with its padding) | `0x1ff00` |
+| Trainer game info | 0x34 | `TrainerGameInfoSave`, 0xf0 | `0x21100` |
+
+**The fields.** `savedecode.py` decodes each Pokémon as `PokeParty_DecryptPkm` does (one stored decrypted, with
+`partyDecrypted` set, as it is), puts its blocks back in order A to D, and names each field by its path in the
+headers (`POKEMON_FIELDS`, `PARTY_FIELDS`, `RECORD_FIELDS`), bitfields included, so that every bit of `PokeParty` and
+`GameRecords` belongs to one field:
+
+- the party: `capacity`, `count`, `pkms[0]` to `pkms[5]` (all six, those past `count` too), `slotExists`, and
+  `padding`, the struct's last 3 bytes;
+- a Pokémon, after `pkms[S].`: `base.pid`, `base.partyDecrypted`, `base.boxDecrypted`, `base.badEgg`, `base.unk4_3` and
+  `base.checksum`; `blockA.species`, `item`, `id`, `exp`, `friendship`, `ability`, `markings`, `language`, `hpEV` to
+  `spdEV`, `contest[0]` to `[5]` and `ribbons`; `blockB.moves[0]` to `[3]`, `pp[0]` to `[3]`, `ppUps[0]` to `[3]`,
+  `hpIV` to `spdIV`, `isEgg`, `isNicknamed`, `ribbons`, `fatefulEncounter`, `gender`, `form`, `nature`,
+  `hiddenAbility`, `nPoke`, `unk1A_2` and `unk1C`; `blockC.nickname[0]` to `[10]`, `unk16`, `originGame` and `ribbons`;
+  `blockD.otName[0]` to `[7]`, `eggDate[0]` to `[2]`, `metDate[0]` to `[2]`, `eggLocation`, `metLocation`, `pokerus`,
+  `ball`, `metLevel`, `otGender`, `unk1D`, `unk1E` and `pokestarFame`; then `statusCond`, `level`, `unk8D`, `nowHP`,
+  `maxHP`, `atk`, `def`, `spe`, `spa`, `spd`; `mail.trainerId`, `trainerGender`, `region`, `gameVersion`, `design`,
+  `trainerName[0]` to `[7]`, `unk18[0]` to `[2]`, `stampWord` and `message[0]` to `[2]`, each with `.type`, `.id` and
+  `.words[0]` and `[1]`; and `unkD4` and `unkD8`, 134 fields in all;
+- the records: `record 0x00` to `record 0xa6`, `checksum` and `seedHigh`.
+
+A Pokémon whose plain data doesn't add up to its checksum, or records that don't add up to theirs, is a problem, which
+fails the comparison and names its save, copy and slot.
+
+**What a trip declares, and what it never may.** `RoundTrip.known` declares bytes, as before; `known_party` declares
+the party's fields, `{"pkms[1].nowHP,pkms[1].statusCond": cause}`, the slot as `PokeParty.pkms` indexes it (the game's
+first Pokémon is `pkms[0]`); and `known_records` declares records by their IDs in two hex digits, `{"0x4b,0x4c":
+cause}`, whatever base the site that bumps one writes it in (a script's `RecordAdd 11, 1` is `0x0b`), with no ranges.
+A declaration covers both copies, and its cause is traced, as a byte's is. Before the trip runs anything,
+`savedecode.declaration_problems` refuses:
+
+- a party field outside two lists. Past a cut, a Pokémon that fought may differ in what a battle changes, `nowHP`,
+  `statusCond`, `blockB.pp[0]` to `[3]`, and the `base.checksum` its PP move; the code can check only that the trip has
+  a cut, and the cause traces the battle and the slot, which review checks. On any trip, the mail's heap leftovers,
+  `mail.unk18[0]` to `[2]` and `mail.message[0].id` to `[2].id`, which a piece that creates a Pokémon on both programs
+  can leave apart. Everything else is refused: the item, the experience, the friendship, the level, the stats, the
+  moves, the PID, the species. A party field's cause cites a `src/` file;
+- a record declaration that isn't a record ID from 0x00 to 0xa6 (a range, `checksum`, `seedHigh`), or whose cause
+  cites no `src/` site: a script's `RecordAdd` is traced to its line in `res/field/scripts/` and to the command's own
+  site, `Scrcmd_PokeDisp_RecordAdd` in `src/ov036/scrcmd_poke_disp.c`. The records' checksum is never declared: it may
+  differ only in a copy where a declared record does, and each save's must be its own records' byte sum;
+- a byte span that touches, in either copy, the party or the records (declared by field and by record), the mystery
+  gifts' contents, the event work (the story's flags and work values), the money or the badges
+  (`TrainerGameInfoSave.cash`, `.badges`), the player's four spawns and place (`PlayerSave`'s spawns and `location`),
+  or the bag (`BagSave`). Footers, the CRC table and the save footer stay declarable: they are the CRCs over a
+  declared difference.
+
+`savedecode.compare_saves` then holds the two saves, their gift blocks decrypted, byte by byte outside the party and
+the records (their footers and table entries included), and the two structs of each copy field by field, and prints
+each difference with its copy, the port's value and melonDS's; each declaration with its cause and whether it differed
+in this run (one that didn't is no failure: Hugh's direction byte is declared in both versions and differs only in
+Black 2); every problem; and its verdict. [../../tests/oracle/test_savedecode.py](../../tests/oracle/test_savedecode.py)
+(ctest `oracle_save_decode`, no ROM) holds the layout to the headers (`savedecode_layout.c`), the generator and the
+block orders to the game's source, the field views to every bit of both structs, every field and every byte of them
+to the comparison, and each rule above to its refusal, with a table of deliberate bugs in `savedecode.py` that its tests
+must catch (`MUTANTS`: a field left out, a wrong key or seed, a declaration accepted, a whole block let through, the
+layout moved); `test_compare.py` runs the real round-trip command on synthetic saves with its own bugs. Run on
+2026-11-02 in both versions, the three round trips give this comparison and the byte comparison before it the same
+verdicts and the same spans on the same saves: the catch trip's 22 bytes outside the two structs (11 a copy) and the
+three mail ids of each copy, Floccesy's 14 bytes (7 a copy), and Hugh's 38 in Black 2 and 36 in White 2 (19 and 18 a
+copy); no other field or record differs ([STATUS.md](../../docs/STATUS.md)).
+
+**Tracing a record past a cut.** The battle counts records only when `setup->fieldSituation.unk1b` is 0 (`IncRecord`
+and `AddRecord`, `src/ov167/btl_main.c`), and scripts add to them with `RecordAdd ID, VALUE` (command 0x227, the ID in
+decimal), as 22 scripts of `res/field/scripts/` do. These sites, their meanings read from the code around each call, are
+where a trip past a cut is likely to move the records; they are not all of them: search `RecordAdd` in `src/` and
+`res/field/scripts/` for the rest.
+
+| Record | Where | When |
+| --- | --- | --- |
+| 0x00 | `src/ov036/fieldmap_event.c` (`GameData_UpdateGlobalStepCounter`) | a step (in the clear) |
+| 0x01 | `src/ov036/scrcmd_save.c`, `src/ov012/report_event.c` | a save |
+| 0x03 | `src/ov036/fieldmap.c` | the bicycle, got on |
+| 0x04 | `src/ov167/btl_main.c` | a battle ends (not the capture demo) |
+| 0x05 | `src/ov012/event_battle.c` | a wild battle starts |
+| 0x06, 0x56 | `src/ov012/event_battle.c` | a trainer battle starts |
+| 0x07, 0x54 | `src/ov167/btl_server.c` | a Pokémon caught |
+| 0x0b | `res/field/scripts/aspertia_city_pokemon_center.s` (`PokePartyRecoverAll`, then `RecordAdd 11, 1`) | the Pokémon Center heals the party |
+| 0x16 | `src/ov036/scrcmd_shop.c` (`RECORD_MONEY_SPENT`) | money spent in a shop (adds the amount) |
+| 0x19, 0x52 | `src/ov167/btl_server_flow.c` | an opponent's Pokémon faints |
+| 0x1b | `src/ov167/btl_server_flow.c` | experience gained (adds the amount) |
+| 0x1e | `src/ov166/event_battle_return.c` | a Pokémon nicknamed after its capture |
+| 0x2f | `src/ov167/btl_server_flow.c` | the player's move is super effective |
+| 0x49, 0x4a | `src/ov167/btl_server_flow.c` | the player uses Splash, Struggle |
+| 0x4b | `src/ov167/btl_server_flow.c` | the player's move misses a target |
+| 0x4c | `src/ov167/btl_server_flow.c` | one of the player's Pokémon faints (its friendship changes too, `ChangeFriendshipWhenFainted`) |
+| 0x4d | `src/ov167/btl_server_flow.c` | the player's move damages an ally |
+| 0x4e | `src/ov167/btl_server_flow.c` | the player fails to escape |
+| 0x4f | `src/ov012/event_battle.c` | a wild Pokémon flees |
+| 0x6f | `src/ov167/btl_server_flow_sub.c` | the player uses an item in battle |
+| 0x70 | `src/ov036/field_encount.c` | an effect encounter |
+| several | `src/ov012/ev_time.c` (`RecordFinishDay`, `src/system/record.c`) | the day changes: five records move into their bests |
+
+Frigate's own presses past a cut use no item that melonDS's course doesn't use: the bag is never declarable, and an
+item used in battle bumps record 0x6f too.
+
 **The round trip** (`oracle.py round-trip catch`, ctest `oracle_round_trip_catch`): phase 4's exit, a save that
 continues from melonDS in the port and back. The port plays the catch save's input file from melonDS's Route 19 save,
 11,600 frames, catches the same Purrloin and saves the game; both saves are then continued on the oracle with
@@ -1085,17 +1230,20 @@ decrypted, is the same in both, written and decrypted):
   (`src/system/pms_data.c`) sets a sentence's type and words but not its `id`, so the `id` is what the heap held
   there: the DS's leftovers (`0x0000`, `0xfb5b`, `0xff8b`) and the port's (`0xbf83`, `0xcbde`, `0x0000`), the same
   in both versions. The game never reads it while the type is empty. Tepig's mail has the DS's leftovers on both, from
-  the starter save.
+  the starter save. The party is compared decoded, so these are three fields of each copy,
+  `pkms[1].mail.message[0].id` to `[2].id`, which the trip declares as fields (`CATCH_SAVE_PARTY`).
 - 1 byte of the play time's seconds (`0x19427`): 0:13:11 on the DS and 0:13:05 on the port in Black 2, 0:13:08 and
   0:13:02 in White 2, each counting its own clock's ticks ([Known differences](#known-differences-from-the-hardware)).
 - 10 bytes of CRCs over those: the party block's (`0x19336`) and the trainer's (`0x194b2`), their entries in the table
   of the blocks' CRCs (`0x25f34`, `0x25f36`), and the footer's CRC of that table (`0x25fa2`, `src/gfl/backup_system.c`).
 
 The second copy (`0x26000` on) differs in the same 17 places; the rest of the chip is the same. The round trip
-declares these bytes, each span with its cause (`ROUND_TRIPS` in `oracle.py`), and fails on a byte that differs
-anywhere else, including bytes one save lacks and the other has. The mystery gift block's contents are compared
-decrypted with each save's own key (`mystery_gift_decrypted`), so that a trip can declare the block's key but never what
-it encrypts.
+declares the 11 bytes of each copy outside the party, each span with its cause (`ROUND_TRIPS` in `oracle.py`), and the
+three ids as the party's fields, and fails on a byte that differs anywhere else, including bytes one save lacks and the
+other has, and on any other field of the party or the records. The mystery gift block's contents are compared
+decrypted with each save's own key (`mystery_gift_decrypted`), so that a trip can declare the block's key but never
+what it encrypts, and the party and the game records are decoded and compared field by field (above), so that a trip
+declares their fields and records, never their bytes.
 
 **A trainer battle to its end** (`oracle.py round-trip hugh`, ctest `oracle_round_trip_hugh`;
 [ADR 0023](../../docs/adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md)): Hugh's battle, which the hugh
@@ -1117,8 +1265,9 @@ without a save of the port's, which fails it, and would need presses of its own.
 through the scene and SAVE at the port's own counts. The port's save is then held to melonDS's `center_save` byte by
 byte, each save's mystery gift block decrypted with its own key first (`mystery_gift_decrypted`, below). They differ
 in 2,722 bytes of each copy of the main save in Black 2 and 2,715 in White 2 as written, and in 19 and 18 once
-decrypted, all declared (`CENTER_SAVE_BYTES`), each traced; Tepig's party data, the money, the bag, the event flags
-and variables, the mystery gifts and every other block are melonDS's:
+decrypted, all declared (`CENTER_SAVE_BYTES`), each traced, and no field of the party or the game records differs,
+both decoded and compared field by field; Tepig's party data, the money, the bag, the event flags and variables, the
+mystery gifts and every other block are melonDS's:
 
 - 1 byte of the play time's seconds (`0x19427`), each program counting its own clock's ticks
   ([Known differences](#known-differences-from-the-hardware)), the DS's some 8 seconds ahead of the port's at the same
