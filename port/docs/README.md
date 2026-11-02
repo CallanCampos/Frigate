@@ -53,10 +53,14 @@ records keep what was decided or found at the time, and are added to, not rewrit
 | [adr/0018](adr/0018-protected-main-and-sync-prs.md) | Protected main and reviewed upstream syncs |
 | [adr/0019](adr/0019-pointer-cast-guard-against-a-classified-baseline.md) | The pointer cast guard: the game's casts that cut an address, held to a classified baseline |
 | [adr/0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md) | Root heaps in the game's own memory get host memory |
-| [adr/0026-native-archive-table-caches.md](adr/0026-native-archive-table-caches.md) | Native FAT/FNT cache representation, SDK seam, lifecycle and timing limits |
-| [adr/0027-recorded-input-streams.md](adr/0027-recorded-input-streams.md) | Effective video input, explicit initial state, bounded seeds and committed recording prefixes |
-| [adr/0028-card-wire-and-physical-dma-progress.md](adr/0028-card-wire-and-physical-dma-progress.md) | Independent CARD physical foundation, absolute waits and bounded test-only DMA events; production integration deferred |
-| [adr/0029-backup-write-service-wait.md](adr/0029-backup-write-service-wait.md) | The backup WRITE service initial SDK wait, separate from flash busy and CPU work |
+| [adr/0022](adr/0022-the-ds-random-seeds-given-by-input-files.md) | The DS's random seeds given by input files, through a wrapper of `buildSeed` (proposed) |
+| [adr/0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md) | Oracle routes part where the DS's CPU time decides, and go on from melonDS's save (proposed) |
+| [adr/0024](adr/0024-a-conflicting-sync-proposes-a-draft-of-upstreams-head.md) | A conflicting sync proposes a draft of upstream's head |
+| [adr/0025](adr/0025-a-spanish-rom-by-a-manifest-of-its-own.md) | A Spanish ROM by a manifest of its own, read by the US code (proposed) |
+| [adr/0026](adr/0026-native-archive-table-caches.md) | Native FAT/FNT cache representation, SDK seam, lifecycle and timing limits |
+| [adr/0027](adr/0027-recorded-input-streams.md) | Effective video input, explicit initial state, bounded seeds and committed recording prefixes |
+| [adr/0028](adr/0028-card-wire-and-physical-dma-progress.md) | Independent CARD physical foundation, absolute waits and bounded test-only DMA events; production integration deferred |
+| [adr/0029](adr/0029-backup-write-service-wait.md) | The backup WRITE service initial SDK wait, separate from flash busy and CPU work |
 | [adr/0030](adr/0030-widescreen-by-an-engine-side-hor-plus-scale-with-native-readbacks.md) | Widescreen by an engine-side Hor+ scale with native readbacks (proposed), and the rules that keep widescreen possible meanwhile |
 | [RESEARCH.md](RESEARCH.md) | The research of 2026-10-16 behind the plan, summarized |
 | [research/README.md](research/README.md) | The full research reports, with what each covers |

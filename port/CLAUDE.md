@@ -115,9 +115,12 @@ The no-upstream-posts and reference rules below still apply to every contributor
   merge updates from `origin/main` and repeat verification when the base changes. Required CI and local verification
   must pass before merge. The sole owner may bypass only the separate review rule for owner-authored PRs; there is
   no bypass for the PR, CI, conversation-resolution, deletion or force-push rules. Contributor and bot sync PRs get
-  explicit owner approval before merge. Automatic CI does not approve code. The least restrictive fork CI policy
-  only requires run approval for first-time contributors with new GitHub accounts; inspect code/workflows if GitHub
-  requests that run approval. See [repository policy](docs/REPOSITORY-POLICY.md).
+  explicit owner approval before merge; for an App-authored sync PR, the owner's standing delegation of 2026-11-01
+  lets the maintainer session give it, on the conditions the policy lists
+  ([repository policy](docs/REPOSITORY-POLICY.md#delegated-approval-of-app-authored-sync-prs)). Automatic CI does not
+  approve code. The least restrictive fork CI policy only requires run approval for first-time contributors with new
+  GitHub accounts; inspect code/workflows if GitHub requests that run approval. See
+  [repository policy](docs/REPOSITORY-POLICY.md).
 - **Never here:** overlay claims, matching, new decomp source files, config changes (`add_source_file.py`,
   `mark_complete.py`, `rename_symbol.py`, `config_fixes.py`), and edits to `docs/nonmatching-functions.md` or
   `docs/matching.md`. The `decomp-file`, `match-function`, `finish-file` and `record-lesson` skills and the root

@@ -87,10 +87,12 @@ This runs both ROM builds and native tests and records success for the tested co
 credentials to set this status. A passing status is not a substitute for reviewing portability changes, incomplete
 functions' matching evidence, or relevant gameplay regressions.
 
-The owner explicitly reviews and approves contributor and bot sync PRs before merge. As the sole maintainer cannot
-approve their own PR, an owner-only exception can bypass review approval through a PR. It cannot bypass CI, the PR
-requirement, unresolved review threads, or history protection. Use it only for owner-authored work; no bot or
-contributor has bypass access.
+The owner explicitly reviews and approves contributor and bot sync PRs before merge; an upstream sync PR that the
+sync App authored may instead be approved by the maintainer session, under the owner's standing delegation and its
+conditions ([repository policy](docs/REPOSITORY-POLICY.md#delegated-approval-of-app-authored-sync-prs)). As the sole
+maintainer cannot approve their own PR, an owner-only exception can bypass review approval through a PR. It cannot
+bypass CI, the PR requirement, unresolved review threads, or history protection. Use it only for owner-authored work;
+no bot or contributor has bypass access.
 [Repository policy](docs/REPOSITORY-POLICY.md) records the settings and how to audit them.
 
 ## Scope and evidence

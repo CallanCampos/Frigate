@@ -123,7 +123,10 @@ completes; the follow-up that brings them up to date says what upstream now call
 
 When all four required checks pass on an up-to-date branch, approve contributor/bot PRs and merge using **Create a
 merge commit**. No auto-merge is enabled. The owner-authored exception is review-only; it still requires the PR,
-checks and resolved conversations. Do not bypass review on a bot sync merely to speed it up.
+checks and resolved conversations. Do not bypass review on a bot sync merely to speed it up. An App-authored sync PR
+may be approved and merged by the maintainer session, under the owner's standing delegation and its conditions
+([repository policy](REPOSITORY-POLICY.md#delegated-approval-of-app-authored-sync-prs)); the session then tells the
+owner what the sync brought in.
 
 ## Prepare or repair a sync locally
 
