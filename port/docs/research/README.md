@@ -3,7 +3,7 @@
 The full reports behind [RESEARCH.md](../RESEARCH.md), written by research agents on 2026-10-16 against
 `fuddlesworth/pokebw2` at `0c2bbee9d`. Each marks what it verified in code or sources and what it inferred. Paths to
 scratch directories inside them refer to that session and no longer exist; the scripts they mention are kept in
-[port/tools](../../tools/).
+[port/tools](../../tools/). Reports added since give their own date in the table.
 
 Where a report's recommendation differs from a decision in [PLAN.md §3](../PLAN.md#3-decisions), the plan wins. D10
 ([ADR 0002](../adr/0002-solo-project-no-upstream-posts.md)) replaces the reports' upstream proposals, such as
@@ -28,5 +28,6 @@ recommendations: macOS builds are ad-hoc signed and never notarized.
 | [libntr.md](libntr.md) | libntr's architecture, coverage, renderer, licensing, macOS blockers and BW2 gaps |
 | [platinum-mods-alternatives.md](platinum-mods-alternatives.md) | Widescreen and single-screen mods, Gen4Recomp, other DS ports, multiplayer |
 | [port-landscape.md](port-landscape.md) | libultraship ports, sm64coopdx, static recompilation, GBA ports, mod architectures |
+| [ship-of-harkinian-rng.md](ship-of-harkinian-rng.md) | Whether Ship of Harkinian reproduces the N64's random numbers and timing (it doesn't), the evidence, and what it means for ADR 0023 (2026-11-01) |
 | [bw2-mod-ecosystem.md](bw2-mod-ecosystem.md) | Existing Gen 5 projects, randomizer, widescreen, multiplayer and revival services, hacks and tools |
 | [tech-stack.md](tech-stack.md) | SDL3, SDL_GPU, renderers, build, packaging, mod libraries, networking, testing |
