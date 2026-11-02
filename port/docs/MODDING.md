@@ -15,9 +15,12 @@ Two limits shape everything below:
   [STATUS.md](STATUS.md) records exact validation, and
   [the oracle guide](../tools/oracle/README.md#floccesy-and-route-20) explains the checks. Trainer AI's CPU-deadline
   difference remains, and oracle routes part there
-  ([ADR 0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md), accepted). Floccesy Ranch and later story,
-  optional features and multiplayer still need verification or implementation under [PLAN.md](PLAN.md). Source coverage
-  and remaining native SDK traps are separate measures.
+  ([ADR 0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md), accepted). From the Route 20 save,
+  Youngster Terrell's trainer battle is held to melonDS up to its cut, the last frame before his AI's first decision
+  shows, a decision the DS's CPU time moves ([the oracle guide](../tools/oracle/README.md#route-20-youngster-terrell));
+  nothing holds the port past that cut yet, and Lass Isabel's battle, further east on Route 20, is the next mandatory
+  one. Floccesy Ranch and later story, optional features and multiplayer still need verification or implementation
+  under [PLAN.md](PLAN.md). Source coverage and remaining native SDK traps are separate measures.
 - **Frigate reads the game's data from the player's ROM, and checks it.** By default it accepts a US dump of the
   version it was built for, by its SHA-1 or by every NitroFS file's ([../hal/rom/port_rom.h](../hal/rom/port_rom.h)),
   so a patched ROM is refused. Changing data files (text, species, trainers, maps) needs the layered file system of
