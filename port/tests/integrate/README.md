@@ -16,6 +16,7 @@ test executable. Other dependencies remain the actual objects.
 | [test_integrate.c](test_integrate.c), [ovsec_probe.c](ovsec_probe.c) | DMA, heaps, input, screen output and overlay-section integration | Other `integrate_*` scenarios |
 | [pokedex_touch.c](pokedex_touch.c), [pokedex_touch_scanner.c](pokedex_touch_scanner.c) | Actual habitat touch tables and GFL scanner, with fatal ASan/UBSan on the scanner itself | `integrate_pokedex_touch` |
 | [pokedex_form.c](pokedex_form.c) | Actual list picture selection and the form passed to the personal-data loader | `integrate_pokedex_form` |
+| [sp_poke_gimmick.c](sp_poke_gimmick.c) | Actual `src/ov129/sp_poke_gimmick.c`, the special Pokémon's four field gimmicks: each initialization's work block 1 holds the host's `SpPokeGimmickWork`, and the writes of every initialization and end stay in it | `integrate_sp_poke_gimmick` |
 
 Run `ctest --test-dir <native-build> -R '^integrate_tr_ai_(tables|projection)$' --output-on-failure`.
 The target compiles exact source slices of the five actual AI definitions and their original headers/types/prototypes,
@@ -38,3 +39,14 @@ The production object retains its normal zero-init policy. This test does not lo
 Ordinary and full fatal LLVM builds run both fixtures without ROMs. Private original-source negative controls prove
 an out-of-bounds read in the original touch scanner and the unknown form's uninitialized value under pattern init;
 those diagnostics do not become a source-rewriting generator or a Git dependency in the permanent build.
+
+`integrate_sp_poke_gimmick` includes the actual gimmick owner with typed spies for the field's gimmick work block,
+heap and 3D scenes only, and runs the four gimmicks' initializations and ends. The work block is a host block of
+exactly the size the gimmick asks for, so ASan reports a write past it, and the fixture checks that the size holds
+`SpPokeGimmickWork`, which its pointers make 64 bytes on a 64-bit host against the DS's 0x30. With the DS's size the
+fixture fails that size check at gimmick A, the first, before it reads the work's data itself. Without the size
+check, ASan's first report is that read of the fixture's, gimmick A's `data.curve`, 8 bytes past A's block; without
+that check too, it is gimmick B's own write, its curve's address 8 bytes past the block (a heap-buffer-overflow in
+`SpPokeGimmickB_Init`). In the program that write broke the field heap's free list, and the map sweep's CONTINUE into
+Castelia City's café, `ZONE_CASTELIA_CITY_22`, ended without a message. The scenes' resources aren't loaded, so it
+needs no ROM.

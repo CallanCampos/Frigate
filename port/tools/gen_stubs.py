@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Writes the trap stubs that let the host build link before every DS function and data object exists as C.
 
-    gen_stubs.py --version b2_us --out build/port/gen/stubs.c --objects-file OBJECTS.txt [--nm NM] [--compiler CC]
+    gen_stubs.py --version b2_us --out build/port/gen/stubs.c --objects-file OBJECTS.txt
+                 [--game-objects-file GAME_OBJECTS.txt] [--nm NM] [--compiler CC]
 
 It reads the symbols that the given objects define and the ones they reference (the objects are listed one a line in
 OBJECTS.txt, or given with --objects OBJ...: a Windows command line can't hold their some 1,600 paths), and for each
@@ -23,10 +24,17 @@ one the objects reference, the script fails rather than let a trap stand in for 
 calls it too: backup.c's atexit). And since the decomp's wide strings are 16-bit (-fshort-wchar) while only Windows'
 C library's wchar_t is, a wide-character function the objects call is a warning: the build keeps the compiler from
 turning the decomp's loops into such calls (-fno-builtin-wcslen, port/CMakeLists.txt).
+
+The game's own objects (pokebw2_game's, listed in GAME_OBJECTS.txt) must not call a function of the host's C library
+that does something the game would see differently from MSL's of the same name, MSL being the DS's C library
+(MSL_OWN): the script fails, naming the objects, when one does. MSL's exit returns where the host's ends the program
+at once, with no message; port/cmake/msl.cmake sends the game's calls of it to MSL's own. The summary of the ROM's
+symbols that the host's C library provides counts the game's objects' references alone, when the list is given.
 """
 import argparse
 import ctypes
 import keyword
+import os
 import re
 import subprocess
 import sys
@@ -72,6 +80,16 @@ STANDARD_C = WIDE_C | {name + suffix for name in MATH_C for suffix in ("", "f", 
     strstr strtok memset strerror strlen clock difftime mktime time asctime ctime gmtime localtime strftime
     timespec_get""".split())
 
+# MSL's functions whose namesakes in the host's C library do something else that the game would see, with what differs
+# and how a game file reaches MSL's own instead. A game object that references the host's fails the generation: the
+# link would take the host's without a word
+MSL_OWN = {
+    "exit": ("MSL's only notes a failure and returns, as the game's heap check relies on, where the host's ends the "
+             "program at once with status 1 and no message",
+             "add its source file to port_msl_exit_callers in port/cmake/msl.cmake, which forces "
+             "port/hal/msl/exit_calls.h into it and so sends its calls to MSL's"),
+}
+
 
 def load_ds_symbols(version: str) -> dict[str, dict]:
     """Every function and data symbol of the version's ARM9 modules, with its module, address and size. A size the
@@ -103,23 +121,32 @@ def load_ds_symbols(version: str) -> dict[str, dict]:
     return symbols
 
 
-def read_object_symbols(objects: list[str], nm: str) -> tuple[set[str], set[str]]:
-    """The global symbols the objects define and the ones they reference without defining."""
-    defined, undefined = set(), set()
+def read_object_symbols(objects: list[str], nm: str) -> tuple[set[str], set[str], dict[str, set[str]]]:
+    """The global symbols the objects define, the ones they reference without defining, and the objects that reference
+    each name (as normpath gives their paths)."""
+    defined, referencing = set(), {}
     for start in range(0, len(objects), 200):
         output = subprocess.run([nm, "-g", "-P", "-A", *objects[start:start + 200]], capture_output=True,
                                 text=True, check=True).stdout
         for line in output.splitlines():
             # "<object>: <name> <type> [<value> <size>]"
-            _, _, rest = line.rpartition(": ")
+            path, _, rest = line.rpartition(": ")
             fields = rest.split()
             if len(fields) < 2:
                 continue
             name, kind = fields[0], fields[1]
             if MACHO and name.startswith("_"):
                 name = name[1:]
-            (undefined if kind == "U" else defined).add(name)
-    return defined, undefined - defined
+            if kind == "U":
+                referencing.setdefault(name, set()).add(os.path.normpath(path))
+            else:
+                defined.add(name)
+    return defined, set(referencing) - defined, referencing
+
+
+def game_callers(name: str, referencing: dict[str, set[str]], game_objects: set[str]) -> list[str]:
+    """The game's objects that reference name, by its own name or, on Windows, its import's (__imp_NAME)."""
+    return sorted((referencing.get(name, set()) | referencing.get("__imp_" + name, set())) & game_objects)
 
 
 def process_library():
@@ -262,6 +289,8 @@ def main():
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--objects", nargs="+", default=[])
     parser.add_argument("--objects-file", type=Path, help="a file that lists the objects, one a line")
+    parser.add_argument("--game-objects-file", type=Path,
+                        help="a file that lists which of the objects are the game's (pokebw2_game's), one a line")
     parser.add_argument("--nm", default="nm", help="the nm to read the objects with")
     parser.add_argument("--compiler",
                         help="the compiler driver whose libraries provide the C library too (Linux and Windows)")
@@ -272,8 +301,21 @@ def main():
         objects += [line for line in args.objects_file.read_text().splitlines() if line]
     if not objects:
         sys.exit("gen_stubs: no objects")
+    game_objects = None
+    if args.game_objects_file is not None:
+        game_objects = {os.path.normpath(line) for line in args.game_objects_file.read_text().splitlines() if line}
+        stray = sorted(game_objects - {os.path.normpath(path) for path in objects})
+        if stray:
+            sys.exit(f"gen_stubs: {len(stray)} of the game's objects aren't among the objects, {stray[0]} first")
     ds = load_ds_symbols(args.version)
-    defined, undefined = read_object_symbols(objects, args.nm)
+    defined, undefined, referencing = read_object_symbols(objects, args.nm)
+    if game_objects is not None:
+        for name, (difference, remedy) in sorted(MSL_OWN.items()):
+            # A name that one of the objects defines isn't the host C library's
+            callers = [] if name in defined else game_callers(name, referencing, game_objects)
+            if callers:
+                sys.exit(f"gen_stubs: the game's {', '.join(callers)} call{'s' if len(callers) == 1 else ''} the host "
+                         f"C library's {name}, where the DS has MSL's: {difference}; {remedy}")
     process = process_library()
     libraries = library_symbols(driver_libraries(args.compiler), args.nm) if args.compiler is not None else set()
     if process is None and not libraries:
@@ -289,7 +331,8 @@ def main():
                 unknown.append(name)
             continue
         if host_provides(name, process, libraries):
-            provided.append(name)
+            if game_objects is None or game_callers(name, referencing, game_objects):
+                provided.append(name)
             continue
         (functions if info["function"] else data).append((name, info))
     standard = sorted(name for name, _ in functions + data if name in STANDARD_C)
@@ -307,9 +350,11 @@ def main():
     print(f"gen_stubs: {len(functions)} function stubs, {len(data)} data placeholders, "
           f"{len(defined)} symbols defined", file=sys.stderr)
     # The ROM's functions the host's C library stands in for (memcpy, sprintf and the like): a name a host library
-    # happens to share with a game function would show here
-    print(f"gen_stubs: the host's C library provides {len(provided)} of the ROM's symbols: {', '.join(provided)}",
-          file=sys.stderr)
+    # happens to share with a game function would show here. With the game's objects given, only their references
+    # count: the platform layer and the program call the host's C library by design (its exit among them)
+    whose = "" if game_objects is None else " that the game's objects reference"
+    print(f"gen_stubs: the host's C library provides {len(provided)} of the ROM's symbols{whose}: "
+          f"{', '.join(provided)}", file=sys.stderr)
     if unknown:
         print(f"gen_stubs: {len(unknown)} referenced symbols are in neither the objects, the host's C library nor "
               f"the ROM: {', '.join(unknown[:40])}{' ...' if len(unknown) > 40 else ''}", file=sys.stderr)

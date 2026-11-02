@@ -3,6 +3,29 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-11-02: a silent status 1 was the game's own exit
+
+- A run that ends with status 1, no `port:` line and its run directory unclosed (`run.txt`'s `status: -`) left
+  through an `exit` that none of Frigate's code called, since every exit of the platform layer and the program prints
+  its line first. A temporary `atexit` handler that prints a backtrace (`backtrace_symbols_fd`) names the caller at
+  once: here GFL's heap check, `GFL_HeapDumpOnFailure`. Read the frames after a call that doesn't return with care: a
+  return address at a function's offset 0 belongs to the call at the end of the function before it, and clang moves
+  such paths into `.cold` pieces that take another function's name.
+- The game has its own `exit`, MSL's, and on the DS it returns. Before taking a decomp finding about a library
+  function's behaviour on the DS as true, read that function's C, if the decomp has it now: the heap check's finding
+  said the DS stops there, written before upstream wrote `lib/msl/src/exit.c`. The ROM's relocations list every
+  caller of a ROM function, main's in `config/<version>/arm9/relocs.txt` and each overlay's in its own
+  `arm9/overlays/ovNNN/relocs.txt`, so search them all: `grep -r 'to:0xADDRESS' config/<version> --include=relocs.txt`
+  (the heap check's own callers are two in main and two in overlay 12). That shows whether a rename limited to one
+  file covers all of them; a build-time check then keeps it so (`gen_stubs.py`'s `MSL_OWN`).
+- A heap that is full where it shouldn't be may not be full. Walk the expanded heap's free and used lists, and the
+  memory between their blocks, before scaling heaps: there the free list's head was the used list's last block, and
+  the rest of the heap, 1.49 MB, sat in a free block that only a broken link reached, whose `prev` held the address
+  that the gimmick had just written 8 bytes past its block. The sanitized build then names the write.
+- A work allocated with a literal size that the DS's struct has (`0x30`, `WORK_SIZE`) overruns its block on a host,
+  and has done so before: grep the allocation's callers for literals and compare them with the host's `sizeof`
+  ([game-changes.md](game-changes.md) has the earlier ones, `fld3d_ci.c`'s and the hidden-move events').
+
 ## 2026-11-01: keep the verifier's exit status when its output is gone
 
 - A signal from the terminal (`Ctrl-C`, `Ctrl-\`, a closed terminal) or a `kill` of the process group reaches the

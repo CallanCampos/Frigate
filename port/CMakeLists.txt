@@ -364,10 +364,13 @@ endif()
 # Trap stubs for every DS symbol the game references that no compiled C defines yet (port/tools/gen_stubs.py). The
 # objects' paths go in a file, one a line: on a command line, their 190 KB would pass Windows' limit of 32 KB. On Linux
 # and Windows the compiler driver's libraries say what the C library provides too, read with the toolchain's nm (glibc
-# keeps atexit in libc_nonshared.a, where Python's ctypes doesn't see it; Windows' Python has no such view at all)
+# keeps atexit in libc_nonshared.a, where Python's ctypes doesn't see it; Windows' Python has no such view at all). The
+# game's own objects go in a second file, for the check that none calls the host C library's exit where the DS has
+# MSL's (port/cmake/msl.cmake)
 set(port_stubs_objects "$<TARGET_OBJECTS:pokebw2_game>" "$<TARGET_OBJECTS:port_hal>" "$<TARGET_OBJECTS:port_app>"
     ${port_gfx_objects})
 file(GENERATE OUTPUT "${PORT_GEN}/stubs_objects.txt" CONTENT "$<JOIN:${port_stubs_objects},\n>\n")
+file(GENERATE OUTPUT "${PORT_GEN}/stubs_game_objects.txt" CONTENT "$<JOIN:$<TARGET_OBJECTS:pokebw2_game>,\n>\n")
 set(port_stubs_host_options "")
 if(NOT APPLE)
     if(NOT CMAKE_NM)
@@ -379,10 +382,10 @@ add_custom_command(
     OUTPUT "${PORT_GEN}/stubs.c"
     COMMAND "${PORT_PYTHON}" "${REPO_ROOT}/port/tools/gen_stubs.py"
         --version "${PORT_VERSION}" --out "${PORT_GEN}/stubs.c" --objects-file "${PORT_GEN}/stubs_objects.txt"
-        ${port_stubs_host_options}
+        --game-objects-file "${PORT_GEN}/stubs_game_objects.txt" ${port_stubs_host_options}
     # The objects themselves, not only their targets, so that the stubs follow every recompiled file
     DEPENDS pokebw2_game port_hal port_app ${port_gfx_targets} "${REPO_ROOT}/port/tools/gen_stubs.py"
-        "${PORT_GEN}/stubs_objects.txt" ${port_stubs_objects}
+        "${PORT_GEN}/stubs_objects.txt" "${PORT_GEN}/stubs_game_objects.txt" ${port_stubs_objects}
     WORKING_DIRECTORY "${REPO_ROOT}"
     COMMAND_EXPAND_LISTS
     VERBATIM)
