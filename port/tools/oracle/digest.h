@@ -7,11 +7,12 @@
 // Each program fills a PbwDigestFrame from its own model, and this file does the rest: the decodes and masks that make
 // the two models' registers comparable (melonDS 1.1 keeps some registers decoded and drops the bits the hardware
 // ignores; the port keeps the bytes the game wrote), the 3D list's vertices dereferenced and its depth made canonical,
-// the VRAM that holds a capture of 3D zeroed, the encoding, the hash (XXH3-64 from port/third_party/xxhash) and the
-// stream's format, "#pbwdigest 1" (port/tools/oracle/README.md, "Digests"). The groups that need probes of the game's
-// state (the random state, NNS G3D's globals, the save, the player, the procs, the sound driver) come with their
-// probes. The facts are melonDS 1.1's (the oracle's emulation core: GPU2D.cpp, GPU3D.cpp, GPU.cpp, NDS.cpp) and
-// GBATEK's ("DS Video", "DS 3D Video", "DS Memory Control"), cited in digest.c.
+// the VRAM that holds a capture of 3D zeroed, the encoding, the hash (XXH3-64, from the xxHash release that
+// port/tools/oracle/xxhash.cmake pins and the build fetches) and the stream's format, "#pbwdigest 1"
+// (port/tools/oracle/README.md, "Digests"). The groups that need probes of the game's state (the random state, NNS
+// G3D's globals, the save, the player, the procs, the sound driver) come with their probes. The facts are melonDS
+// 1.1's (the oracle's emulation core: GPU2D.cpp, GPU3D.cpp, GPU.cpp, NDS.cpp) and GBATEK's ("DS Video", "DS 3D
+// Video", "DS Memory Control"), cited in digest.c.
 //
 // Plain C11, with neither melonDS nor the decomp's headers in it, as pbwinput.c and display3d.c are, so that both
 // programs can compile it and its tests run without a ROM (port/tests/oracle/test_digest.c). The game functionality
@@ -119,7 +120,9 @@ typedef struct PbwDigestRegs2d {
     uint16_t bldalpha;     // BlendAlpha: BLDALPHA
     uint8_t bldy;          // EVY: BLDY's 5 bits clamped to 16, the only form melonDS keeps
     uint16_t masterBright; // MasterBrightness: MASTER_BRIGHT
-    uint32_t dispcapcnt;   // CaptureCnt: DISPCAPCNT, engine A's alone (engine B has none: 0)
+    uint32_t dispcapcnt;   // CaptureCnt: DISPCAPCNT, engine A's alone. Engine B has no capture unit, and melonDS sends
+                           // no store to 0x04001064 to it (NDS.cpp's ARM9IOWrite16 and ARM9IOWrite32), so its field
+                           // keeps its reset value, 0
 } PbwDigestRegs2d;
 
 // Fills regs from an engine's register file as the game wrote it, PBW_DIGEST_REGS2D_IO_SIZE bytes from 0x04000000
@@ -155,8 +158,10 @@ void pbw_digest_sys_from_io(PbwDigestSys *sys, const uint8_t *io);
 typedef struct PbwDigestVertex {
     uint32_t x;        // screen X: PortGeVertex.x, Vertex::FinalPosition[0] (9 bits)
     uint32_t y;        // screen Y: .y, FinalPosition[1] (8 bits)
-    uint32_t depth;    // the Z-buffer depth: .z; for melonDS pbw_digest_zbuffer_depth(Position[2], Position[3]), which
-                       // stays the Z-buffer's when the list W-buffers. 24 bits; the encoding makes it 0 when W is 0
+    uint32_t depth;    // the Z-buffer depth, 24 bits, the encoding making it 0 when W is 0: the port's .z, as ge.c's
+                       // ToScreen computes it; melonDS's pbw_digest_zbuffer_depth(Position[2], Position[3]), which
+                       // stays the Z-buffer's when the list W-buffers. ToScreen lacks melonDS's cut to 32 bits, so the
+                       // two differ for some vertices whose clip W is 2^24 or more (pbw_digest_zbuffer_depth)
     uint32_t w;        // W: .w, Position[3] (24 bits)
     uint32_t color[3]; // red, green, blue as c * 16 + 15, 0 staying 0: .color, FinalColor
     uint32_t s, t;     // the texture coordinates: .s and .t, TexCoords (16 bits each)
@@ -188,15 +193,23 @@ typedef struct PbwDigestList {
 } PbwDigestList;
 
 // The Z-buffer depth melonDS 1.1 gives a vertex from its clip-space Z and its W in 24 bits (GPU3D.cpp,
-// SubmitPolygon): ((Z * 0x4000 / W) + 0x3fff) * 0x200, cut to 32 bits, clamped to 0..0xffffff; 0x7ffe00 when W is 0
+// SubmitPolygon): ((Z * 0x4000 / W) + 0x3fff) * 0x200, cut to 32 bits, clamped to 0..0xffffff; 0x7ffe00 when W is 0.
+//
+// Frigate's ToScreen (port/gfx/ge/ge.c) computes the same formula in 64 bits and clamps it without the cut. The two
+// agree wherever the product fits in 32 signed bits, which it does for every vertex whose clip W is below 2^24 (after
+// clipping, Z is within -W..W). From 2^24 on, W's truncation to 24 bits can leave a small divisor and a product past
+// 32 bits: Z 0x400 with W 0x01000001 gives melonDS 0x7ffe00 and ToScreen 0xffffff, and Z -0x400 gives 0x7ffe00 and 0.
+// The digest reports such a vertex as a g3d.list difference. Making ToScreen cut the product to 32 bits before its
+// clamp is a change to the geometry engine with its own replays, planned before ADR 0031's second part compares lists
 uint32_t pbw_digest_zbuffer_depth(int32_t clipZ, uint32_t w);
 
 // --- 3D rendering registers (g3d.regs)
 
 // The 3D rendering registers in the form melonDS 1.1 keeps them (GPU3D's DispCnt, AlphaRefVal, ClearAttr1, ClearAttr2
 // as its two halves, FogColor, FogOffset, FogDensityTable, ToonTable, EdgeTable). The port fills it with
-// pbw_digest_regs3d_from_io from its register bytes, which port_g3d_vblank latches at the VBlank
-// (port/gfx/ge/ge_hal.c). The encoding keeps each register's bits that act
+// pbw_digest_regs3d_from_io from the I/O registers' bytes, read at its frame hook: the VBlank at which
+// port_g3d_vblank (port/gfx/ge/ge_hal.c) decodes the same bytes into the renderer's own copy (PortDs3dRegs). The
+// encoding keeps each register's bits that act
 typedef struct PbwDigestRegs3d {
     uint32_t disp3dcnt;     // DISP3DCNT, 0x04000060 (bits 12 and 13 are status: the overflow is in g3d.stats)
     uint8_t alphaTestRef;   // ALPHA_TEST_REF, 0x04000340 (5 bits)
@@ -210,7 +223,10 @@ typedef struct PbwDigestRegs3d {
     uint16_t edgeColor[8];  // EDGE_COLOR, 0x04000330 (15 bits each)
 } PbwDigestRegs3d;
 
-// Fills regs from the I/O registers as the game wrote them, from 0x04000000
+// Fills regs from the I/O registers as the game wrote them, from 0x04000000, decoded as melonDS's writes store each
+// register, but for DISP3DCNT: its status bits, 12 and 13, are set by melonDS itself and cleared by a write of 1, so
+// the bytes the game wrote can't give them (the encoding drops them, and g3d.stats holds the overflow), and it keeps
+// the other bits as written
 void pbw_digest_regs3d_from_io(PbwDigestRegs3d *regs, const uint8_t *io);
 
 // The canonical words: DISP3DCNT, ALPHA_TEST_REF, CLEAR_COLOR, CLEAR_DEPTH, CLRIMAGE_OFFSET, FOG_COLOR, FOG_OFFSET,
@@ -263,7 +279,9 @@ uint64_t pbw_digest_hash(const void *bytes, size_t size);
 
 // --- Records and streams
 
-// One game frame's record
+// One game frame's record. It holds what the program saw, never the comparison's choices: a sequence's lag between the
+// two programs' counts is the pairing's (ADR 0031's second part), applied when the streams are compared, so no
+// program's record can carry it
 typedef struct PbwDigestRecord {
     uint32_t count;                     // GFL's frame count, the game frame: the key two streams are paired on
     uint32_t frame;                     // the program's video frame
@@ -272,9 +290,10 @@ typedef struct PbwDigestRecord {
     uint64_t hash[PBW_DIGEST_GROUPS];
 } PbwDigestRecord;
 
-// Hashes every group of a frame into record's hashes and sets which are present; the caller sets count, frame and
-// vblanks. Returns PBW_DIGEST_OK, or the status of the first group that couldn't be encoded, whose number goes in
-// *group when group isn't NULL
+// Hashes every group of a frame into record's hashes and sets which are present, an absent group's hash being 0; the
+// caller sets count, frame and vblanks. Returns PBW_DIGEST_OK, or the status of the first group that couldn't be
+// encoded, whose number goes in *group when group isn't NULL; the record then holds no group at all, never part of a
+// frame nor what it held before
 PbwDigestStatus pbw_digest_record_frame(PbwDigestRecord *record, const PbwDigestFrame *frame, int *group);
 
 // A stream (digest.tsv): "#pbwdigest 1", a header of tab-separated names (count, frame, vblanks, then the groups'),
@@ -301,24 +320,36 @@ int pbw_digest_reader_next(PbwDigestReader *reader, PbwDigestRecord *record);
 // for each such group and 0 for the others
 int pbw_digest_record_differences(const PbwDigestRecord *a, const PbwDigestRecord *b,
                                   uint8_t differs[PBW_DIGEST_GROUPS]);
+// How many groups the expected record has and the actual one doesn't; missing, when it isn't NULL, gets 1 for each such
+// group and 0 for the others. The expected record names what is held: a group it leaves out isn't compared
+int pbw_digest_record_missing(const PbwDigestRecord *expected, const PbwDigestRecord *actual,
+                              uint8_t missing[PBW_DIGEST_GROUPS]);
 
 // Two streams' comparison, by count
 typedef struct PbwDigestComparison {
     uint32_t compared;     // the counts both streams have, compared
     uint32_t onlyExpected; // the counts only the expected stream has, up to the first divergence
     uint32_t onlyActual;   // the counts only the actual stream has, the same
-    int diverged;          // 1 when a compared count's groups differed: the first such count's records follow
-    uint8_t differs[PBW_DIGEST_GROUPS]; // 1 for each group that differs there
+    // At how many of the compared counts each group was compared, both records having it: a group the expected stream
+    // never has is never compared, which the caller can see here
+    uint32_t groupCompared[PBW_DIGEST_GROUPS];
+    int diverged;                       // 1 when a compared count's groups differed, or the actual record lacked one
+                                        // the expected record has: the first such count's records follow
+    uint8_t differs[PBW_DIGEST_GROUPS]; // 1 for each group whose hashes differ there
+    uint8_t missing[PBW_DIGEST_GROUPS]; // 1 for each group the expected record has there and the actual one lacks
     PbwDigestRecord expected;
     PbwDigestRecord actual;
     char error[240]; // why the comparison failed
 } PbwDigestComparison;
 
 // Compares two streams count by count, each stream with one row per count in rising order, and stops at the first
-// count whose groups differ. A count that only one stream has is counted, not compared; neither is the video frame
-// nor the VBlanks. Returns 0 when both streams could be read that far, diverged saying whether they differ, or -1
-// with error saying which stream is malformed and where. Pairing a count's rows when a program writes several, and
-// the sequences' lags, known differences and clock stretches, are the pairing's (ADR 0031), not this function's
+// count whose groups differ or where the actual record lacks a group the expected record has (a writer that left a
+// group out, or wrote "-" for one, is a divergence, never a silent pass). The expected stream names what is held: a
+// group it leaves out, or writes "-" for, isn't compared, and groupCompared counts the rest. A count that only one
+// stream has is counted, not compared; neither is the video frame nor the VBlanks. Returns 0 when both streams could
+// be read that far, diverged saying whether they differ, or -1 with error saying which stream is malformed and where.
+// Pairing a count's rows when a program writes several, at the last VBlank of the count, and the sequences' lags, known
+// differences and clock stretches, are the pairing's (ADR 0031's second part), not this function's
 int pbw_digest_compare_streams(FILE *expected, FILE *actual, PbwDigestComparison *comparison);
 
 #ifdef __cplusplus

@@ -1,7 +1,7 @@
 <!-- Records how Frigate is to hold itself to the melonDS oracle at every game frame without running melonDS for every
 change (verification v2): a digest of the DS's display state and, later, the pointer-free game state at each game
 frame, 3D as its clipped polygon list, compared with oracle runs kept in a local cache keyed by their inputs and
-stopped at the first frame that differs; and how its hash, xxHash, is vendored. -->
+stopped at the first frame that differs; and where its hash, xxHash, comes from. -->
 # 0031: Per-game-frame digests against a content-addressed oracle cache
 
 - **Status:** proposed
@@ -40,9 +40,11 @@ Three facts, measured by the prototype, make an exact, port-alone check possible
 Comparing the two programs' state needs one canonical form of it. melonDS 1.1 keeps some registers decoded (the
 windows' coordinates split, BLDY clamped, BG2X and BG3X sign-extended) and drops the bits its writes mask; Frigate keeps
 the bytes the game wrote. Strips share vertices in both, by different rules, and the two programs' depth differs where
-W is 0 or the list W-buffers. The repository had no third-party code in its tree: SDL3 and melonDS are fetched at
-configure time, pinned by SHA-256, and [PLAN.md §4.3](../PLAN.md#43-directory-structure) plans `port/third_party/` for
-pinned dependencies.
+W is 0 or the list W-buffers. The repository keeps no third-party code in its tree: its dependencies are fetched at
+configure time, pinned, into the build directory. minicoro, a single header like xxHash, is fetched by every host build
+([port/cmake/os.cmake](../../cmake/os.cmake), pinned to a commit) and put on a system include path; SDL3 is fetched
+when no installed SDL3 serves ([port/CMakeLists.txt](../../CMakeLists.txt), by the SHA-256 of its release archive);
+melonDS, for the oracle alone, the same way ([melonds.cmake](../../tools/oracle/melonds.cmake)).
 
 ## Decision
 
@@ -61,10 +63,11 @@ pinned dependencies.
    One plain C11 file pair, [port/tools/oracle/digest.c](../../tools/oracle/digest.c) and `digest.h`, compiled into
    both programs as `pbwinput.c` and `display3d.c` are, decodes, canonicalizes, encodes and hashes every group; each
    program fills its structures from its own model. Its canonical rules: registers masked to the bits the hardware
-   keeps and decoded where melonDS keeps a decoded form; vertices dereferenced; the depth the Z-buffer's from clip Z and
-   W on both sides, and 0 where W is 0; the VRAM a capture of 3D holds zeroed. The stream is `digest.tsv`, format
-   `#pbwdigest 1` ([oracle README](../../tools/oracle/README.md#digests)). Full canonical bytes are written only for
-   frames asked for.
+   keeps and decoded where melonDS keeps a decoded form; vertices dereferenced; the depth the Z-buffer's even where the
+   list W-buffers (melonDS's computed from clip Z and W as its `SubmitPolygon` does, Frigate's as its `ToScreen` gives
+   it), and 0 where W is 0; the VRAM a capture of 3D holds zeroed. The stream is `digest.tsv`, format `#pbwdigest 1`
+   ([oracle README](../../tools/oracle/README.md#digests)). Full canonical bytes are written only for frames asked
+   for.
 2. **Exactness.** Every group is compared exactly at every game frame that the sequence pairs on its count. A VRAM
    region that holds a capture of 3D is left out of the bytes on both sides and held through the 3D groups. The 3D
    picture itself is held by `oracle_<seq>`'s tolerance check and by a renderer corpus made from the full dumps.
@@ -85,15 +88,17 @@ pinned dependencies.
 5. **Native state only.** Digests are taken from the DS-native path. Enhancements that only change presentation
    (widescreen among them, [ADR 0030](0030-widescreen-by-an-engine-side-hor-plus-scale-with-native-readbacks.md)) leave
    every digest equal; those that change gameplay are excluded from oracle comparisons.
-6. **The hash is XXH3-64 from a vendored xxHash, the first code in `port/third_party/`.** The digest's hash is xxHash's
+6. **The hash is XXH3-64 from xxHash, fetched at configure time as minicoro is.** The digest's hash is xxHash's
    XXH3-64 with seed 0, whose output xxHash fixed at its 0.8.0 release, so that `xxhsum -H3` gives a group's hash from
-   its canonical bytes. Its single header lives in `port/third_party/xxhash/`, which sets the convention for vendored
-   code: each library in a directory of its own under `port/third_party/`, its files byte-identical to the release's
-   (no Frigate header comment), its license text beside them, and a row in
-   [port/third_party/README.md](../../third_party/README.md) with the version, where the files came from, each file's
-   SHA-256, what uses it and how to update it. A test pins what the code computes: `digest_format_*` checks XXH3-64
-   against xxHash's own known answers. `digest.c` includes the header with `XXH_INLINE_ALL`, which keeps xxHash's
-   functions private to it, so that they can't meet the copy of xxHash that melonDS's core links into the oracle.
+   its canonical bytes. Its single header comes from xxHash's 0.8.3 release, which
+   [port/tools/oracle/xxhash.cmake](../../tools/oracle/xxhash.cmake) pins by tag and by the SHA-256 of GitHub's archive
+   of it, as `melonds.cmake` pins melonDS; the build fetches the archive at configure time into the build directory and
+   puts its top directory on a system include path, as `os.cmake` does minicoro's header, so the repository keeps no
+   third-party code in its tree and xxHash's own code is held to its own warnings. That release's `xxhash.h` is byte for
+   byte the one melonDS 1.1 bundles, so the oracle compiles the same hash whichever copy it includes. A test pins what
+   the code computes: `digest_format_*` checks XXH3-64 against xxHash's own known answers. `digest.c` includes the
+   header with `XXH_INLINE_ALL`, which keeps xxHash's functions private to it, so that they can't meet the copy of
+   xxHash that melonDS's core links into the oracle.
 
 ## Alternatives
 
@@ -117,10 +122,14 @@ pinned dependencies.
   2026-11-02). SHA-256, which the cache uses for its keys, is slower still for about a mebibyte a frame, and its
   strength buys nothing here: the digest guards against accidents, not adversaries, and two different states hash
   alike at one group and frame with odds of 2^-64, about 5 × 10^-14 over a route's million group hashes.
-- **xxHash fetched at configure time, as SDL3 and melonDS are:** it keeps third-party text out of git, but once the
-  program compiles the digest, every host build would need the download, or an installed xxHash as one more dependency
-  for players, for a single header of 268 KiB. **xxHash taken from melonDS's archive at build time:** Frigate's own
-  program must never need melonDS ([PLAN.md §1](../PLAN.md#1-goal-and-what-native-means)).
+- **xxHash's header vendored in `port/third_party/`:** it would be the first third-party code in the tree, a second
+  convention beside the one minicoro, SDL3 and melonDS follow, for a single header like minicoro's; its files couldn't
+  open with the description every port file opens with ([port/CLAUDE.md](../../CLAUDE.md#code-that-modders-can-read)),
+  so that rule would need an exception; and it would save nothing, since every host build already fetches minicoro at
+  configure time, and the pinned SHA-256 holds the archive's bytes. **An installed xxHash** (`find_package`,
+  pkg-config): one more dependency for players and CI to install, at a version the build doesn't choose, for one
+  header. **xxHash taken from melonDS's archive at build time:** Frigate's own program must never need melonDS
+  ([PLAN.md §1](../PLAN.md#1-goal-and-what-native-means)).
 
 ## Consequences
 
@@ -131,16 +140,23 @@ pinned dependencies.
   traced cause before it can be declared. The prototype found two in aspertia.
 - Frigate is held to melonDS's register semantics (writes ignored while an engine is off, decoded storage). A
   difference found on hardware is declared with its evidence.
+- Frigate's `ToScreen` ([port/gfx/ge/ge.c](../../gfx/ge/ge.c)) clamps a vertex's depth without the cut to 32 bits that
+  melonDS's `SubmitPolygon` makes before its clamp ([digest.h](../../tools/oracle/digest.h),
+  `pbw_digest_zbuffer_depth`). The two agree for every vertex whose clip W is below 2^24 and can differ above it, where
+  W's truncation to 24 bits leaves a small divisor; the prototype computed melonDS's side without the cut, so its equal
+  lists don't cover that case. The digest will report such a vertex as a `g3d.list` difference. The fix, `ToScreen`
+  cutting the product to 32 bits before its clamp, is a change to the geometry engine with its own replays, planned
+  before the second part compares lists.
 - A digest costs about 0.4 ms a frame on Frigate in the prototype, with a slower hash; checkpoints take about 20 MB
   each before compression.
 - A machine without the oracle can't fill the cache: until it has one, the committed `_hashes` references are its
   check.
-- **Vendored code.** `port/third_party/` holds third-party files Frigate compiles from its tree, unmodified, each
-  library with its license and its row in the directory's README. Updating xxHash means replacing the header with a
-  release's, recording its version and SHA-256, and running `digest_format_*`, whose known answers hold XXH3's output.
-  xxHash is BSD-2-Clause, which GPL-3.0 code may include; a binary that links it must carry its notice in the
-  documentation it ships with, so the change that compiles the digest into Frigate's program adds the notice to what
-  the program and the macOS app carry. Until then only the tests link it.
+- **xxHash at configure time.** Every host build fetches xxHash's pinned archive (1.1 MB) at configure time, beside
+  minicoro, into its build directory. Updating xxHash means changing the tag and SHA-256 in `xxhash.cmake` and running
+  `digest_format_*`, whose known answers hold XXH3's output. xxHash is BSD-2-Clause, which GPL-3.0 code may include; a
+  binary that links it must carry its notice in the documentation it ships with, so the change that compiles the
+  digest into Frigate's program adds the notice, from the archive's `LICENSE`, to what the program and the macOS app
+  carry. Until then only the tests link it.
 - **Built in six parts**, each landable alone and each verified with the full suite on its head: (1) the canonical
   encoding, its format and its ROM-free tests, wired into neither program; (2) the digest stream in both programs, the
   comparison with last-VBlank pairing, lags and declarations, `oracle_<seq>` checking it, and the declarations of the

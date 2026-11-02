@@ -4,9 +4,12 @@
 // builds it. Both shapes must give the same canonical words; the masks must hold; BG2's and BG3's X and Y must be
 // sign-extended from bit 27, BLDY clamped and WINxH split; the depth must be canonical where W is 0; strips' shared
 // vertices must be dereferenced; and the VRAM that holds a capture of 3D must be zeroed. Each of those checks also
-// checks that its input gives other words without the rule, so that a digest without it fails. Then the hash against
-// xxHash's own known answers, and the stream's writer, reader and comparison. The game functionality it covers is
-// every screen's, the state the display hardware holds at a VBlank, with no ROM and no game code.
+// checks that its input gives other words without the rule, so that a digest without it fails. Every field of every
+// group counts: the render list's words one by one and the bits each keeps, the list's size and overflow, the
+// capture's words, both engines' palettes and OAM. Then the hash against xxHash's own known answers, and the stream's
+// writer, reader and comparison, which stops where a group differs or where the actual stream lacks a group the
+// expected one holds. The game functionality it covers is every screen's, the state the display hardware holds at a
+// VBlank, with no ROM and no game code.
 #include "digest.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -119,7 +122,8 @@ static void TestHash(void) {
 // GPU2D.cpp keeps of each. DISPCNT whole on engine A and 0xc0b1fff7 of it on B; BGxCNT, the scrolls, the affine
 // parameters, the windows' bytes, WININ and WINOUT and MASTER_BRIGHT as written; BGxX and BGxY with bits 28-31 set,
 // bit 27 being set; MOSAIC split into nibbles; BLDCNT 0x3fff; BLDALPHA 0x1f1f; EVY clamped to 16; DISPCAPCNT
-// 0xef3f1f1f, which unit B keeps too, though it has no capture
+// 0xef3f1f1f on engine A, and 0 on B: NDS.cpp's ARM9IOWrite16 and ARM9IOWrite32 send the stores at 0x04000064 and
+// 0x04000066 to unit A and none at 0x04001064 to any unit, so unit B's CaptureCnt keeps its reset value
 static void MelonAllOnes(PbwDigestRegs2d *regs, int engine) {
     int i;
 
@@ -147,7 +151,7 @@ static void MelonAllOnes(PbwDigestRegs2d *regs, int engine) {
     regs->bldalpha = 0x1f1f;
     regs->bldy = 16;
     regs->masterBright = 0xffff;
-    regs->dispcapcnt = 0xef3f1f1fu;
+    regs->dispcapcnt = engine == PBW_DIGEST_ENGINE_A ? 0xef3f1f1fu : 0;
 }
 
 // The masks: every register written with all ones, on both engines
@@ -204,21 +208,16 @@ static void TestRegs2dMasks(void) {
         pbw_digest_regs2d_words(&melon, engine, melonWords);
         CHECK(SameWords("regs2d, port, all ones", portWords, expected, PBW_DIGEST_REGS2D_WORDS));
         CHECK(SameWords("regs2d, melonDS, all ones", melonWords, expected, PBW_DIGEST_REGS2D_WORDS));
-        // Without the masks the words would differ: melonDS keeps the scrolls, WININ, WINOUT, MASTER_BRIGHT and unit
-        // B's DISPCAPCNT whole, and the port keeps every byte
+        // Without the masks the words would differ: melonDS keeps the scrolls, WININ, WINOUT and MASTER_BRIGHT whole,
+        // and the port keeps every byte, engine B's DISPCAPCNT among them
         CHECK(melon.bgVofs[0] != expected[W_BG0VOFS] && melon.winCnt[0] != expected[W_WININ]);
         CHECK(melon.masterBright != expected[W_MASTER_BRIGHT]);
         CHECK(sIo[0x1000 * engine + 0x51] != (expected[W_BLDCNT] >> 8));
         if (engine == PBW_DIGEST_ENGINE_B) {
-            CHECK(melon.dispcapcnt != expected[W_DISPCAPCNT]);
             CHECK(sIo[0x1000 + 0x03] != (expected[W_DISPCNT] >> 24));
+            CHECK(sIo[0x1000 + 0x64] != 0 && expected[W_DISPCAPCNT] == 0);
         }
-        // The decode is melonDS's unit field for field, but for engine B's DISPCAPCNT, which unit B keeps and the
-        // port's decode leaves at 0
-        if (engine == PBW_DIGEST_ENGINE_B) {
-            CHECK(port.dispcapcnt == 0);
-            melon.dispcapcnt = 0;
-        }
+        // The decode is melonDS's unit field for field, engine B's DISPCAPCNT left at 0 as unit B's is
         CHECK(SameRegs2d(&port, &melon));
         // The encoding masks whatever it is given, a structure of all ones too: it doesn't count on the decode
         memset(&melon, 0xff, sizeof(melon));
@@ -357,7 +356,8 @@ static void TestRegs2dSignExtension(void) {
     CHECK((0x08000000u & 0x0fffffffu) != portWords[W_BG2X] && melon.bgX[1] != portWords[W_BG3X]);
 }
 
-// BLDY: 5 bits, 17 to 31 acting as 16 (melonDS: "EVY = val & 0x1F; if (EVY > 16) EVY = 16")
+// BLDY: 5 bits, 17 to 31 acting as 16 (melonDS: "EVY = val & 0x1F; if (EVY > 16) EVY = 16"). The cases 0x11 and 0x1f
+// are the negative controls: a decode or an encoding without the clamp gives their own value, not 16
 static void TestRegs2dBldy(void) {
     static const struct {
         uint8_t written;
@@ -384,8 +384,15 @@ static void TestRegs2dBldy(void) {
         pbw_digest_regs2d_words(&melon, PBW_DIGEST_ENGINE_A, melonWords);
         CHECK(portWords[W_BLDY] == cases[i].word && melonWords[W_BLDY] == cases[i].word);
     }
-    // 31 isn't 16 without the clamp
-    CHECK((0x1fu & 0x1f) != 16);
+    // The encoding clamps whatever it is given, not only what the decode gave
+    {
+        PbwDigestRegs2d regs;
+        uint32_t words[PBW_DIGEST_REGS2D_WORDS];
+        memset(&regs, 0, sizeof(regs));
+        regs.bldy = 0x1d;
+        pbw_digest_regs2d_words(&regs, PBW_DIGEST_ENGINE_A, words);
+        CHECK(words[W_BLDY] == 16);
+    }
 }
 
 // WINxH and WINxV: X2 or Y2 in the low byte, X1 or Y1 in the high one; melonDS keeps X1, X2, Y1, Y2 ("Win0Coords[1] =
@@ -434,6 +441,8 @@ static void TestSysAndMap(void) {
     pbw_digest_sys_from_io(&port.sys, sIo);
     melon.sys.powcnt1 = 0x820f;
     melon.sys.wramcnt = 0xff;
+    // The decode stores both as melonDS does: POWCNT1's kept bits, WRAMCNT's whole byte
+    CHECK(port.sys.powcnt1 == melon.sys.powcnt1 && port.sys.wramcnt == melon.sys.wramcnt);
     for (bank = 0; bank < PBW_DIGEST_VRAM_BANKS; bank++) {
         port.vram.vramcnt[bank] = 0xff;
         melon.vram.vramcnt[bank] = melonVramcnt[bank];
@@ -454,6 +463,16 @@ static void TestSysAndMap(void) {
     // WRAMCNT's byte as melonDS keeps it isn't its 2 bits
     CHECK(melon.sys.wramcnt != expectedSys[4]);
     pbw_digest_bytes_free(&bytes);
+}
+
+// Whether the port's decode of its 3D register bytes is melonDS's GPU3D field for field, but for DISP3DCNT, whose
+// status bits melonDS sets itself (digest.h)
+static int SameRegs3dButDisp3dcnt(const PbwDigestRegs3d *a, const PbwDigestRegs3d *b) {
+    return a->alphaTestRef == b->alphaTestRef && a->clearColor == b->clearColor && a->clearDepth == b->clearDepth &&
+           a->clearOffset == b->clearOffset && a->fogColor == b->fogColor && a->fogOffset == b->fogOffset &&
+           memcmp(a->fogTable, b->fogTable, sizeof(a->fogTable)) == 0 &&
+           memcmp(a->toonTable, b->toonTable, sizeof(a->toonTable)) == 0 &&
+           memcmp(a->edgeColor, b->edgeColor, sizeof(a->edgeColor)) == 0;
 }
 
 static void TestRegs3d(void) {
@@ -500,6 +519,7 @@ static void TestRegs3d(void) {
         expected[n++] = 0x7fff;
     }
     CHECK(n == PBW_DIGEST_REGS3D_WORDS);
+    CHECK(SameRegs3dButDisp3dcnt(&port, &melon));
     pbw_digest_regs3d_words(&port, portWords);
     pbw_digest_regs3d_words(&melon, melonWords);
     CHECK(SameWords("regs3d, port, all ones", portWords, expected, PBW_DIGEST_REGS3D_WORDS));
@@ -559,6 +579,7 @@ static void TestRegs3d(void) {
     for (i = 0; i < 8; i++) {
         expected[n++] = 0x200 + (uint32_t)i;
     }
+    CHECK(SameRegs3dButDisp3dcnt(&port, &melon) && port.disp3dcnt != melon.disp3dcnt);
     pbw_digest_regs3d_words(&port, portWords);
     pbw_digest_regs3d_words(&melon, melonWords);
     CHECK(SameWords("regs3d fields, port", portWords, expected, PBW_DIGEST_REGS3D_WORDS));
@@ -581,6 +602,13 @@ static void TestDepth(void) {
     CHECK(pbw_digest_zbuffer_depth(123, 0x01000000) == 0x7ffe00);
     // Cut to 32 bits before the clamp: 0x3ffffffffffe00 becomes -0x200, then 0
     CHECK(pbw_digest_zbuffer_depth(0x7fffffff, 1) == 0);
+    // A clip W of 2^24 or more is truncated to 24 bits first, which can leave a small divisor and a product past 32
+    // bits, where the cut decides the depth: 0x2007ffe00, 0x4000007ffe00 and -0x1ff800200 all cut to 0x7ffe00.
+    // Frigate's ToScreen (ge.c) clamps the 64-bit product instead, giving 0xffffff, 0xffffff and 0 for these: the
+    // difference the digest reports for such vertices until ToScreen cuts too (digest.h)
+    CHECK(pbw_digest_zbuffer_depth(0x400, 0x01000001) == 0x7ffe00);
+    CHECK(pbw_digest_zbuffer_depth(0x800000, 0x01000010) == 0x7ffe00);
+    CHECK(pbw_digest_zbuffer_depth(-0x400, 0x01000001) == 0x7ffe00);
 }
 
 // Vertices of a quad drawn as a strip of two triangles, as both programs' viewports leave them
@@ -612,6 +640,14 @@ static uint32_t Word(const PbwDigestBytes *bytes, size_t word) {
     const uint8_t *at = bytes->data + word * 4;
 
     return (uint32_t)at[0] | (uint32_t)at[1] << 8 | (uint32_t)at[2] << 16 | (uint32_t)at[3] << 24;
+}
+
+// A group's hash, which must be encodable
+static uint64_t GroupHash(const PbwDigestFrame *frame, int group) {
+    uint64_t hash = 0;
+
+    CHECK(pbw_digest_group_hash(frame, group, &hash) == PBW_DIGEST_OK);
+    return hash;
 }
 
 // A strip's second triangle shares two vertices with the first. The port's list shares them by index (ge.c); melonDS
@@ -731,6 +767,116 @@ static void TestWZero(void) {
     pbw_digest_bytes_free(&melonBytes);
 }
 
+// A triangle whose every field has a value of its own, as the canonical form keeps it, and g3d.list's words for it one
+// by one: the polygon count and the SWAP_BUFFERS bits; the polygon's POLYGON_ATTR, TEXIMAGE_PARAM, PLTT_BASE, vertex
+// count and facing; then each vertex's X, Y, depth, W, red, green, blue, S and T. A field dropped, moved or read from
+// another one fails
+static const PbwDigestVertex sTriangle[3] = {
+    { 10, 20, 0xbffe00, 0x001000, { 511, 255, 31 }, 0x0010, 0x0020 },
+    { 300, 191, 0x7ffe00, 0x123456, { 47, 63, 79 }, 0xfff0, 0x0400 },
+    { 511, 0, 0xfffe00, 0xffffff, { 0, 31, 495 }, 0x8000, 0x7fff },
+};
+static const uint32_t sTriangleWords[2 + 5 + 3 * 9] = {
+    1,   2,   0x3f1f80c0, 0x1e9c0123, 0x1042, 3,   1,                   // the list, the polygon
+    10,  20,  0xbffe00,   0x001000,   511,    255, 31,  0x0010, 0x0020, // its first vertex
+    300, 191, 0x7ffe00,   0x123456,   47,     63,  79,  0xfff0, 0x0400, // its second
+    511, 0,   0xfffe00,   0xffffff,   0,      31,  495, 0x8000, 0x7fff, // its third
+};
+
+// A one-triangle list over vertices, with a polygon's fields as given
+static void SetTriangleList(PbwDigestList *list, PbwDigestPolygon *polygon, const PbwDigestVertex *vertices,
+                            uint32_t plttBase, uint32_t front, uint32_t swapParam) {
+    *polygon = Triangle(0, 1, 2);
+    polygon->attr = 0x3f1f80c0;
+    polygon->plttBase = plttBase;
+    polygon->front = front;
+    memset(list, 0, sizeof(*list));
+    list->polygons = polygon;
+    list->polygonCount = 1;
+    list->vertices = vertices;
+    list->vertexCount = 3;
+    list->swapParam = swapParam;
+}
+
+// The words of a list, checked against the expected ones
+static void CheckListWords(const char *what, const PbwDigestList *list, const uint32_t *expected, size_t count) {
+    PbwDigestFrame frame;
+    PbwDigestBytes bytes = { 0 };
+    uint32_t words[2 + 5 + 3 * 9];
+    size_t i;
+
+    memset(&frame, 0, sizeof(frame));
+    frame.list = *list;
+    CHECK(pbw_digest_group_bytes(&frame, PBW_DIGEST_G3D_LIST, &bytes) == PBW_DIGEST_OK);
+    CHECK(bytes.size == count * 4 && count <= sizeof(words) / sizeof(words[0]));
+    if (bytes.size == count * 4 && count <= sizeof(words) / sizeof(words[0])) {
+        for (i = 0; i < count; i++) {
+            words[i] = Word(&bytes, i);
+        }
+        CHECK(SameWords(what, words, expected, (int)count));
+    }
+    pbw_digest_bytes_free(&bytes);
+}
+
+static void TestListWords(void) {
+    PbwDigestList list;
+    PbwDigestPolygon polygon;
+
+    SetTriangleList(&list, &polygon, sTriangle, 0x1042, 1, 2);
+    CheckListWords("g3d.list, word by word", &list, sTriangleWords, sizeof(sTriangleWords) / sizeof(sTriangleWords[0]));
+}
+
+// Each field keeps the bits the hardware has, whatever else either program's copy holds: S and T 16 bits, sign-extended
+// in one program (the port's int16_t widened) and not in the other; X 9 bits and Y 8; the depth and W 24; PLTT_BASE 13;
+// the SWAP_BUFFERS parameter 2; the facing 0 or 1. Bits above those, set in one program's copy here, don't count
+static void TestListMasks(void) {
+    PbwDigestVertex wide[3];
+    PbwDigestList list;
+    PbwDigestPolygon polygon;
+    int i;
+
+    memcpy(wide, sTriangle, sizeof(wide));
+    for (i = 0; i < 3; i++) {
+        wide[i].x |= 0xfffffe00u;
+        wide[i].y |= 0xffffff00u;
+        wide[i].depth |= 0xff000000u;
+        wide[i].w |= 0x7f000000u;
+        // Sign-extended from bit 15, as an int16_t widens
+        wide[i].s = (wide[i].s ^ 0x8000u) - 0x8000u;
+        wide[i].t = (wide[i].t ^ 0x8000u) - 0x8000u;
+    }
+    // The second and third vertices' S, 0xfff0 and 0x8000, are negative: sign-extended, they aren't their words
+    CHECK(wide[1].s == 0xfffffff0u && wide[2].s == 0xffff8000u && wide[1].s != sTriangleWords[7 + 9 + 7]);
+    SetTriangleList(&list, &polygon, wide, 0x1042 | 0x2000, 5, 2 | 4);
+    CheckListWords("g3d.list, bits above each field's", &list, sTriangleWords,
+                   sizeof(sTriangleWords) / sizeof(sTriangleWords[0]));
+}
+
+// g3d.stats: the list's polygon count, and whether polygon or vertex RAM overflowed, which melonDS keeps as DISP3DCNT's
+// bit 13 (GPU3D::DispCnt & 0x2000) and the port as a flag (port_ge_ram_overflow): any nonzero value is 1
+static void TestStats(void) {
+    PbwDigestFrame port;
+    PbwDigestFrame melon;
+    PbwDigestBytes bytes = { 0 };
+
+    memset(&port, 0, sizeof(port));
+    memset(&melon, 0, sizeof(melon));
+    port.list.polygonCount = 2048;
+    melon.list.polygonCount = 2048;
+    port.list.ramOverflow = 1;
+    melon.list.ramOverflow = 0x2000;
+    CHECK(GroupHash(&port, PBW_DIGEST_G3D_STATS) == GroupHash(&melon, PBW_DIGEST_G3D_STATS));
+    CHECK(pbw_digest_group_bytes(&melon, PBW_DIGEST_G3D_STATS, &bytes) == PBW_DIGEST_OK);
+    CHECK(bytes.size == 8 && Word(&bytes, 0) == 2048 && Word(&bytes, 1) == 1);
+    // RAM that overflowed in one program only, and a polygon count apart, each show
+    melon.list.ramOverflow = 0;
+    CHECK(GroupHash(&port, PBW_DIGEST_G3D_STATS) != GroupHash(&melon, PBW_DIGEST_G3D_STATS));
+    melon.list.ramOverflow = 0x2000;
+    melon.list.polygonCount = 2047;
+    CHECK(GroupHash(&port, PBW_DIGEST_G3D_STATS) != GroupHash(&melon, PBW_DIGEST_G3D_STATS));
+    pbw_digest_bytes_free(&bytes);
+}
+
 // --- VRAM and capture
 
 // Both programs' VRAM: melonDS's banks one after another (GPU::VRAM_A to VRAM_I), the port's pages wherever its views
@@ -760,13 +906,6 @@ static void SetVram(PbwDigestFrame *melon, PbwDigestFrame *port) {
 
 static uint8_t *BankByte(const PbwDigestFrame *frame, int bank, uint32_t offset) {
     return (uint8_t *)frame->vram.pages[bank][offset / PBW_DIGEST_VRAM_PAGE_SIZE] + offset % PBW_DIGEST_VRAM_PAGE_SIZE;
-}
-
-static uint64_t GroupHash(const PbwDigestFrame *frame, int group) {
-    uint64_t hash = 0;
-
-    CHECK(pbw_digest_group_hash(frame, group, &hash) == PBW_DIGEST_OK);
-    return hash;
 }
 
 // The title screen captures its 3D into bank D each frame (src/ov162/title.c): 256x192 pixels at offset 0x18000,
@@ -832,9 +971,13 @@ static void TestCaptureZeroed(void) {
     *BankByte(&port, PBW_DIGEST_VRAM_C, 0x8000) ^= 0x0f;
     CHECK(GroupHash(&port, PBW_DIGEST_VRAM_C) != GroupHash(&melon, PBW_DIGEST_VRAM_C));
     CHECK(GroupHash(&port, PBW_DIGEST_CAPTURE) == GroupHash(&melon, PBW_DIGEST_CAPTURE));
-    // A region outside its bank is no region
+    // A region outside its bank, or larger than it, is no region
     port.banks3d.offset[PBW_DIGEST_VRAM_D] = 0x20000;
     bytes.size = 0;
+    CHECK(pbw_digest_group_bytes(&port, PBW_DIGEST_VRAM_D, &bytes) == PBW_DIGEST_INVALID);
+    CHECK(pbw_digest_group_bytes(&port, PBW_DIGEST_CAPTURE, &bytes) == PBW_DIGEST_INVALID);
+    port.banks3d.offset[PBW_DIGEST_VRAM_D] = 0;
+    port.banks3d.size[PBW_DIGEST_VRAM_D] = 0x20001;
     CHECK(pbw_digest_group_bytes(&port, PBW_DIGEST_VRAM_D, &bytes) == PBW_DIGEST_INVALID);
     CHECK(pbw_digest_group_bytes(&port, PBW_DIGEST_CAPTURE, &bytes) == PBW_DIGEST_INVALID);
     CHECK(bytes.size == 0);
@@ -863,6 +1006,31 @@ static void TestCaptureGroup(void) {
     b.capture.dispcapcnt = 0xef3f1f1fu;
     b.capture.destInLcdc = 1;
     CHECK(GroupHash(&a, PBW_DIGEST_CAPTURE) == GroupHash(&b, PBW_DIGEST_CAPTURE));
+    // A destination outside the LCDC is another capture
+    b.capture.destInLcdc = 0;
+    CHECK(GroupHash(&a, PBW_DIGEST_CAPTURE) != GroupHash(&b, PBW_DIGEST_CAPTURE));
+    b.capture.destInLcdc = 1;
+
+    // Then three words a bank, A to D: whether it holds 3D (any nonzero being 1), its region's offset and its size
+    a.banks3d.holds3d[PBW_DIGEST_VRAM_C] = 7;
+    a.banks3d.offset[PBW_DIGEST_VRAM_C] = 0x8000;
+    a.banks3d.size[PBW_DIGEST_VRAM_C] = 0x6000;
+    b.banks3d = a.banks3d;
+    b.banks3d.holds3d[PBW_DIGEST_VRAM_C] = 1;
+    bytes.size = 0;
+    CHECK(pbw_digest_group_bytes(&a, PBW_DIGEST_CAPTURE, &bytes) == PBW_DIGEST_OK);
+    CHECK(bytes.size == 16 * 4 && Word(&bytes, 4 + 3 * 2) == 1 && Word(&bytes, 4 + 3 * 2 + 1) == 0x8000 &&
+          Word(&bytes, 4 + 3 * 2 + 2) == 0x6000);
+    CHECK(GroupHash(&a, PBW_DIGEST_CAPTURE) == GroupHash(&b, PBW_DIGEST_CAPTURE));
+    // A bank that holds 3D in one program only, or a region at another offset or of another size, is another capture
+    b.banks3d.holds3d[PBW_DIGEST_VRAM_C] = 0;
+    CHECK(GroupHash(&a, PBW_DIGEST_CAPTURE) != GroupHash(&b, PBW_DIGEST_CAPTURE));
+    b.banks3d = a.banks3d;
+    b.banks3d.offset[PBW_DIGEST_VRAM_C] = 0x9000;
+    CHECK(GroupHash(&a, PBW_DIGEST_CAPTURE) != GroupHash(&b, PBW_DIGEST_CAPTURE));
+    b.banks3d = a.banks3d;
+    b.banks3d.size[PBW_DIGEST_VRAM_C] = 0x7000;
+    CHECK(GroupHash(&a, PBW_DIGEST_CAPTURE) != GroupHash(&b, PBW_DIGEST_CAPTURE));
     pbw_digest_bytes_free(&bytes);
 }
 
@@ -913,6 +1081,51 @@ static void TestScreens(void) {
     pbw_digest_bytes_free(&bytes);
 }
 
+// --- Palettes and OAM
+
+// pal and oam: 2 KiB each as stored, engine A's 1 KiB and then engine B's from 0x400. A byte changed at either end of
+// either engine's half changes the group
+static void TestPaletteAndOam(void) {
+    static uint8_t palettes[2][PBW_DIGEST_PALETTE_SIZE];
+    static uint8_t oam[2][PBW_DIGEST_OAM_SIZE];
+    static const uint32_t offsets[4] = { 0x000, 0x3ff, 0x400, 0x7ff };
+    PbwDigestFrame port;
+    PbwDigestFrame melon;
+    PbwDigestBytes bytes = { 0 };
+    size_t i;
+
+    for (i = 0; i < PBW_DIGEST_PALETTE_SIZE; i++) {
+        palettes[0][i] = (uint8_t)(i * 5 + 1);
+        palettes[1][i] = (uint8_t)(i * 5 + 1);
+    }
+    for (i = 0; i < PBW_DIGEST_OAM_SIZE; i++) {
+        oam[0][i] = (uint8_t)(i * 3 + 7);
+        oam[1][i] = (uint8_t)(i * 3 + 7);
+    }
+    memset(&port, 0, sizeof(port));
+    memset(&melon, 0, sizeof(melon));
+    port.palette = palettes[0];
+    port.oam = oam[0];
+    melon.palette = palettes[1];
+    melon.oam = oam[1];
+    CHECK(GroupHash(&port, PBW_DIGEST_PAL) == GroupHash(&melon, PBW_DIGEST_PAL));
+    CHECK(GroupHash(&port, PBW_DIGEST_OAM) == GroupHash(&melon, PBW_DIGEST_OAM));
+    CHECK(pbw_digest_group_bytes(&port, PBW_DIGEST_PAL, &bytes) == PBW_DIGEST_OK);
+    CHECK(bytes.size == PBW_DIGEST_PALETTE_SIZE && memcmp(bytes.data, palettes[0], PBW_DIGEST_PALETTE_SIZE) == 0);
+    bytes.size = 0;
+    CHECK(pbw_digest_group_bytes(&port, PBW_DIGEST_OAM, &bytes) == PBW_DIGEST_OK);
+    CHECK(bytes.size == PBW_DIGEST_OAM_SIZE && memcmp(bytes.data, oam[0], PBW_DIGEST_OAM_SIZE) == 0);
+    for (i = 0; i < sizeof(offsets) / sizeof(offsets[0]); i++) {
+        palettes[0][offsets[i]]++;
+        CHECK(GroupHash(&port, PBW_DIGEST_PAL) != GroupHash(&melon, PBW_DIGEST_PAL));
+        palettes[0][offsets[i]]--;
+        oam[0][offsets[i]]++;
+        CHECK(GroupHash(&port, PBW_DIGEST_OAM) != GroupHash(&melon, PBW_DIGEST_OAM));
+        oam[0][offsets[i]]--;
+    }
+    pbw_digest_bytes_free(&bytes);
+}
+
 // --- Whole frames, records and streams
 
 // The groups a record has, as a count; and whether exactly one group, only, is flagged in a per-group array
@@ -935,6 +1148,17 @@ static int OnlyGroup(const uint8_t flags[PBW_DIGEST_GROUPS], int group) {
         }
     }
     return 1;
+}
+
+// How many groups a per-group array flags
+static int Flagged(const uint8_t flags[PBW_DIGEST_GROUPS]) {
+    int count = 0;
+    int g;
+
+    for (g = 0; g < PBW_DIGEST_GROUPS; g++) {
+        count += flags[g] != 0;
+    }
+    return count;
 }
 
 static uint8_t sPalettes[2][PBW_DIGEST_PALETTE_SIZE];
@@ -1055,15 +1279,24 @@ static void TestRecords(void) {
     sPalettes[0][0x22]++;
     CHECK(pbw_digest_record_frame(&portRecord, &port, &group) == PBW_DIGEST_OK);
     CHECK(pbw_digest_record_differences(&melonRecord, &portRecord, differs) == 1 && OnlyGroup(differs, PBW_DIGEST_PAL));
-    // Groups a program doesn't have: absent, and not compared
+    // Groups a program doesn't have: absent, so their hashes aren't compared; but the record lacks them, which against
+    // a record that has them is a divergence (pbw_digest_compare_streams), and the other way round isn't
     port.oam = NULL;
     port.palette = NULL;
     CHECK(pbw_digest_record_frame(&portRecord, &port, &group) == PBW_DIGEST_OK);
     CHECK(!portRecord.present[PBW_DIGEST_OAM] && !portRecord.present[PBW_DIGEST_PAL] &&
           Present(&portRecord) == PBW_DIGEST_GROUPS - 2);
     CHECK(pbw_digest_record_differences(&melonRecord, &portRecord, NULL) == 0);
-    // A group that can't be encoded stops the record and says which
+    CHECK(pbw_digest_record_missing(&melonRecord, &portRecord, differs) == 2 && differs[PBW_DIGEST_OAM] &&
+          differs[PBW_DIGEST_PAL] && differs[PBW_DIGEST_VRAM_A] == 0);
+    CHECK(pbw_digest_record_missing(&portRecord, &melonRecord, differs) == 0 && differs[PBW_DIGEST_PAL] == 0);
+    // A group that can't be encoded stops the record and says which, and the record then holds no group: neither the
+    // groups before the bad one nor what the record held before, a whole frame's here
     polygons[0][0].vertices[1] = 9;
+    CHECK(Present(&melonRecord) == PBW_DIGEST_GROUPS);
+    CHECK(pbw_digest_record_frame(&melonRecord, &port, &group) == PBW_DIGEST_INVALID && group == PBW_DIGEST_G3D_LIST);
+    CHECK(Present(&melonRecord) == 0 && melonRecord.hash[PBW_DIGEST_VRAM_A] == 0 &&
+          melonRecord.hash[PBW_DIGEST_SCREEN_BOTTOM] == 0);
     CHECK(pbw_digest_record_frame(&portRecord, &port, &group) == PBW_DIGEST_INVALID && group == PBW_DIGEST_G3D_LIST);
     CHECK(pbw_digest_group_name(PBW_DIGEST_G3D_LIST) != NULL &&
           pbw_digest_group_find(pbw_digest_group_name(PBW_DIGEST_G3D_LIST)) == PBW_DIGEST_G3D_LIST);
@@ -1137,11 +1370,18 @@ static void TestStreams(void) {
     PbwDigestReader reader;
     PbwDigestRecord record;
     FILE *file;
+    int everyGroupThrice = 1;
+    int g;
 
-    // The melonDS-shaped and port-shaped streams of the same frames are equal; the video frames and VBlanks differ
+    // The melonDS-shaped and port-shaped streams of the same frames are equal; the video frames and VBlanks differ.
+    // Every group was compared at each of the three counts
     CHECK(Compare(WriteStream(1, 100, 3, 0), WriteStream(0, 100, 3, 0), &comparison) == 0);
     CHECK(!comparison.diverged && comparison.compared == 3 && comparison.onlyExpected == 0 &&
           comparison.onlyActual == 0);
+    for (g = 0; g < PBW_DIGEST_GROUPS; g++) {
+        everyGroupThrice &= comparison.groupCompared[g] == 3;
+    }
+    CHECK(everyGroupThrice && Flagged(comparison.differs) == 0 && Flagged(comparison.missing) == 0);
     // A palette a step off at count 101 is the first divergence, in pal alone
     CHECK(Compare(WriteStream(1, 100, 3, 0), WriteStream(0, 100, 3, 101), &comparison) == 0);
     CHECK(comparison.diverged && comparison.compared == 2 && OnlyGroup(comparison.differs, PBW_DIGEST_PAL));
@@ -1184,6 +1424,39 @@ static void TestStreams(void) {
                              "0000000000000001\n"),
                   &comparison) == 0);
     CHECK(!comparison.diverged && comparison.compared == 1);
+    CHECK(comparison.groupCompared[PBW_DIGEST_PAL] == 1 && comparison.groupCompared[PBW_DIGEST_OAM] == 0);
+
+    // The expected stream names what is held. An actual stream that lacks a group the expected record has diverges
+    // there, whether its header leaves the group out or its row writes "-" for it: a writer that dropped a group, or
+    // couldn't take it, never passes
+    CHECK(Compare(TextStream("#pbwdigest 1\ncount\tframe\tvblanks\tpal\tg3d.list\n"
+                             "7\t7\t1\t0000000000000001\t0000000000000002\n"),
+                  TextStream("#pbwdigest 1\ncount\tframe\tvblanks\tpal\n7\t9\t1\t0000000000000001\n"),
+                  &comparison) == 0);
+    CHECK(comparison.diverged && comparison.compared == 1 && comparison.expected.count == 7);
+    CHECK(OnlyGroup(comparison.missing, PBW_DIGEST_G3D_LIST) && Flagged(comparison.differs) == 0);
+    CHECK(comparison.groupCompared[PBW_DIGEST_PAL] == 1 && comparison.groupCompared[PBW_DIGEST_G3D_LIST] == 0);
+    CHECK(Compare(TextStream("#pbwdigest 1\ncount\tframe\tvblanks\tpal\tg3d.list\n"
+                             "7\t7\t1\t0000000000000001\t0000000000000002\n"),
+                  TextStream("#pbwdigest 1\ncount\tframe\tvblanks\tpal\tg3d.list\n7\t9\t1\t-\t0000000000000002\n"),
+                  &comparison) == 0);
+    CHECK(comparison.diverged && OnlyGroup(comparison.missing, PBW_DIGEST_PAL) && Flagged(comparison.differs) == 0);
+    // A count where one group differs and another is missing names both
+    CHECK(Compare(TextStream("#pbwdigest 1\ncount\tframe\tvblanks\tpal\tg3d.list\n"
+                             "7\t7\t1\t0000000000000001\t0000000000000002\n"),
+                  TextStream("#pbwdigest 1\ncount\tframe\tvblanks\tpal\tg3d.list\n7\t9\t1\t-\t0000000000000003\n"),
+                  &comparison) == 0);
+    CHECK(comparison.diverged && OnlyGroup(comparison.missing, PBW_DIGEST_PAL) &&
+          OnlyGroup(comparison.differs, PBW_DIGEST_G3D_LIST));
+    // A group the expected stream leaves out or writes "-" for isn't compared, and groupCompared shows it never was
+    CHECK(Compare(TextStream("#pbwdigest 1\ncount\tframe\tvblanks\tpal\tg3d.list\n7\t7\t1\t0000000000000001\t-\n"
+                             "8\t8\t1\t0000000000000003\t-\n"),
+                  TextStream("#pbwdigest 1\ncount\tframe\tvblanks\tpal\tg3d.list\tsys\n"
+                             "7\t9\t1\t0000000000000001\t0000000000000005\t0000000000000006\n"
+                             "8\t10\t1\t0000000000000003\t0000000000000005\t-\n"),
+                  &comparison) == 0);
+    CHECK(!comparison.diverged && comparison.compared == 2 && comparison.groupCompared[PBW_DIGEST_PAL] == 2 &&
+          comparison.groupCompared[PBW_DIGEST_G3D_LIST] == 0 && comparison.groupCompared[PBW_DIGEST_SYS] == 0);
 
     // Malformed streams: each one says where
     CHECK(Compare(TextStream("#pbwdigest 2\ncount\tframe\tvblanks\n"), TextStream(header), &comparison) == -1);
@@ -1204,13 +1477,28 @@ static void TestStreams(void) {
     CHECK(Compare(TextStream("#pbwdigest 1\ncount\tframe\tvblanks\tpal\toam\tsys\n1\t1\t1\t-\t-\t123\n"),
                   TextStream(header), &comparison) == -1);
     CHECK(strstr(comparison.error, "sys") != NULL);
+    CHECK(Compare(TextStream("#pbwdigest 1\ncount\tframe\tvblanks\tpal\toam\tsys\n1\t1\t1\t-\t-\t00000000000000001\n"),
+                  TextStream(header), &comparison) == -1);
+    CHECK(strstr(comparison.error, "not 16 hex digits") != NULL);
     CHECK(Compare(TextStream("#pbwdigest 1\ncount\tframe\tvblanks\tpal\toam\tsys\n-1\t1\t1\t-\t-\t-\n"),
                   TextStream(header), &comparison) == -1);
-    // One row per count, in rising order: a count written twice is the pairing's to resolve, not this comparison's
+    // One row per count, in rising order: a count written twice is the pairing's to resolve, not this comparison's, and
+    // a count that falls, 5 then 3, is as malformed, in either stream
     CHECK(Compare(
               TextStream("#pbwdigest 1\ncount\tframe\tvblanks\tpal\toam\tsys\n3\t1\t1\t-\t-\t-\n3\t2\t1\t-\t-\t-\n"),
               TextStream("#pbwdigest 1\ncount\tframe\tvblanks\tpal\toam\tsys\n3\t1\t1\t-\t-\t-\n"), &comparison) == -1);
     CHECK(strstr(comparison.error, "rising order") != NULL);
+    CHECK(Compare(
+              TextStream("#pbwdigest 1\ncount\tframe\tvblanks\tpal\toam\tsys\n5\t1\t1\t-\t-\t-\n3\t2\t1\t-\t-\t-\n"),
+              TextStream("#pbwdigest 1\ncount\tframe\tvblanks\tpal\toam\tsys\n5\t1\t1\t-\t-\t-\n"), &comparison) == -1);
+    CHECK(strstr(comparison.error, "expected stream") != NULL &&
+          strstr(comparison.error, "count 3 after count 5") != NULL);
+    CHECK(
+        Compare(TextStream("#pbwdigest 1\ncount\tframe\tvblanks\tpal\toam\tsys\n5\t1\t1\t-\t-\t-\n6\t2\t1\t-\t-\t-\n"),
+                TextStream("#pbwdigest 1\ncount\tframe\tvblanks\tpal\toam\tsys\n5\t1\t1\t-\t-\t-\n3\t2\t1\t-\t-\t-\n"),
+                &comparison) == -1);
+    CHECK(strstr(comparison.error, "actual stream") != NULL &&
+          strstr(comparison.error, "count 3 after count 5") != NULL);
 }
 
 int main(void) {
@@ -1225,9 +1513,13 @@ int main(void) {
     TestDepth();
     TestStripDereferenced();
     TestWZero();
+    TestListWords();
+    TestListMasks();
+    TestStats();
     TestCaptureZeroed();
     TestCaptureGroup();
     TestScreens();
+    TestPaletteAndOam();
     TestRecords();
     TestStreams();
     if (sFailed != 0) {

@@ -48,10 +48,10 @@ shipped with Frigate, and built only with `-DPORT_BUILD_ORACLE=ON`. Its README h
 directories, sound traces), how frames are aligned, the comparison sequences, saves, the sound and the known
 differences. `pbwinput.c` and `display3d.c` are plain C11 that the program's replays and the tests compile too;
 `digest.c`, the per-game-frame digest's canonical encoding (ADR 0031), is plain C11 that only its tests compile so
-far, with the hash from [../third_party](../third_party/README.md); and `sndtrace.h`, the sound trace's format, is
-plain C11 that Frigate itself includes: the platform layer's sound driver
-writes its trace with it (`port/hal/snd7/snd7.c`), as do the program's `--sound-trace` (`port/app/sound_trace.c`) and
-the sound driver's tests (`port/tests/snd/test_snd.c`).
+far, with its hash from xxHash's header, which every build fetches at configure time as `oracle/xxhash.cmake` pins
+it; and `sndtrace.h`, the sound trace's format, is plain C11 that Frigate itself includes: the platform layer's sound
+driver writes its trace with it (`port/hal/snd7/snd7.c`), as do the program's `--sound-trace`
+(`port/app/sound_trace.c`) and the sound driver's tests (`port/tests/snd/test_snd.c`).
 
 ## Measurement
 

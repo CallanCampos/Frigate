@@ -34,6 +34,7 @@ at build time, pinned to a release, and never committed.
 | `seeds.py` | the random seeds the DS built in an oracle run, read from the memory it dumps ([Random seeds](#random-seeds)) |
 | `symbols.py` | the decomp's symbols, statics included, for memory dumps |
 | `melonds.cmake` | the pinned melonDS release (tag and SHA-256) |
+| `xxhash.cmake` | the pinned xxHash release (tag and SHA-256) whose header gives the digest its hash, fetched by every build ([Digests](#digests)) |
 | `CMakeLists.txt` | the oracle's own build |
 
 Tests are in [port/tests/oracle](../../tests/oracle) and the build rules in
@@ -47,8 +48,9 @@ cmake --build build/port-oracle --target port_oracle      # build/port-oracle/or
 ctest --test-dir build/port-oracle -R '^oracle_' --output-on-failure
 ```
 
-`PORT_BUILD_ORACLE` is off by default, so normal builds and CI download nothing. When it is on, configuring fetches the
-release that `melonds.cmake` pins into `<build>/_deps`, and the build compiles melonDS's core (no frontend, no JIT, no
+`PORT_BUILD_ORACLE` is off by default, so normal builds and CI never download melonDS (they fetch only the xxHash
+header the digest's tests need, [Digests](#digests)). When it is on, configuring fetches the release that
+`melonds.cmake` pins into `<build>/_deps`, and the build compiles melonDS's core (no frontend, no JIT, no
 OpenGL, no GDB stub) and the oracle, as an external project in `<build>/oracle`. `-DPORT_ORACLE_SANITIZE=ON` builds the
 oracle's own sources with AddressSanitizer and UndefinedBehaviorSanitizer. melonDS's core compiles with `-fwrapv` and
 hands it on to what links it; the oracle's build keeps it for the core's sources only, so that the sanitizer checks the
@@ -433,8 +435,8 @@ and their canonical bytes, with 32-bit words little-endian:
 | `regs2d.A`, `regs2d.B` | 46 words: DISPCNT (`0xc0b1fff7` of engine B's); BG0CNT to BG3CNT; the scrolls (`0x1ff`); BG2's PA, PB, PC, PD, X, Y and BG3's, X and Y's 28 bits sign-extended from bit 27; WIN0's and WIN1's X1, X2, Y1, Y2 (WINxH and WINxV split as melonDS keeps them); WININ's and WINOUT's bytes (`0x3f`); MOSAIC's BG and OBJ width and height; BLDCNT (`0x3fff`); BLDALPHA (`0x1f1f`); BLDY clamped to 16; MASTER_BRIGHT (`0xc01f`); DISPCAPCNT (`0xef3f1f1f`, 0 for engine B) | `pbw_digest_regs2d_from_io` on the register bytes at 0x04000000 and 0x04001000, decoded as melonDS's writes store them | `GPU2D::Unit`'s fields |
 | `sys` | 2 words: POWCNT1 (`0x820f`), WRAMCNT (2 bits) | `pbw_digest_sys_from_io` | `NDS::PowerControl9`, `NDS::WRAMCnt` |
 | `capture` | 16 words: whether the capture unit ran, then its DISPCAPCNT (`0xef3f1f1f`), engine A's DISPCNT and whether the destination was in the LCDC, all 0 when it didn't run; then, for banks A to D, whether each holds 3D and its region's offset and size, 0 when it holds none | the capture's latch and `display3d.c`'s tracking | the line-96 probe's `PbwCapture` and the oracle's `PbwBanks3d` |
-| `g3d.list` | The polygon count and the closing SWAP_BUFFERS's 2 bits; then each polygon in the order it came: POLYGON_ATTR, TEXIMAGE_PARAM, PLTT_BASE (`0x1fff`), its vertex count and its facing (1 toward the viewer), then its vertices, dereferenced: screen X (9 bits), Y (8 bits), the Z-buffer's depth (24 bits, 0 when W is 0), W (24 bits), red, green and blue (`c * 16 + 15`), S and T (16 bits) | `port_ge_render_list` | the polygon RAM bank the swap closed, each vertex's depth from `pbw_digest_zbuffer_depth(Position[2], Position[3])` |
-| `g3d.regs` | 79 words: DISP3DCNT (`0x4fff`), ALPHA_TEST_REF (`0x1f`), CLEAR_COLOR (`0x3f1fffff`), CLEAR_DEPTH (`0x7fff`), CLRIMAGE_OFFSET, FOG_COLOR (`0x001f7fff`), FOG_OFFSET (`0x7fff`), FOG_TABLE's 32 entries (`0x7f`), TOON_TABLE's 32 and EDGE_COLOR's 8 (`0x7fff`) | `pbw_digest_regs3d_from_io`, the bytes `port_g3d_vblank` latches | `GPU3D`'s registers |
+| `g3d.list` | The polygon count and the closing SWAP_BUFFERS's 2 bits; then each polygon in the order it came: POLYGON_ATTR, TEXIMAGE_PARAM, PLTT_BASE (`0x1fff`), its vertex count and its facing (1 toward the viewer), then its vertices, dereferenced: screen X (9 bits), Y (8 bits), the Z-buffer's depth (24 bits, 0 when W is 0), W (24 bits), red, green and blue (`c * 16 + 15`), S and T (16 bits) | `port_ge_render_list`, each vertex's depth as `ToScreen` gives it | the polygon RAM bank the swap closed, each vertex's depth from `pbw_digest_zbuffer_depth(Position[2], Position[3])` |
+| `g3d.regs` | 79 words: DISP3DCNT (`0x4fff`), ALPHA_TEST_REF (`0x1f`), CLEAR_COLOR (`0x3f1fffff`), CLEAR_DEPTH (`0x7fff`), CLRIMAGE_OFFSET, FOG_COLOR (`0x001f7fff`), FOG_OFFSET (`0x7fff`), FOG_TABLE's 32 entries (`0x7f`), TOON_TABLE's 32 and EDGE_COLOR's 8 (`0x7fff`) | `pbw_digest_regs3d_from_io` on the register bytes at the frame hook, the VBlank at which `port_g3d_vblank` decodes the same bytes for the renderer | `GPU3D`'s registers |
 | `g3d.stats` | 2 words: the list's polygon count, and 1 when polygon RAM overflowed (DISP3DCNT bit 13) | `port_ge_ram_overflow` | `GPU3D::DispCnt` bit 13 |
 | `screen.top`, `screen.bottom` | 256 × 192 pixels row by row, each one's red, green and blue as the DS's 6 bits, a byte each: equal exactly when `frames.tsv`'s hashes are | the screens `frames.tsv` hashes | the framebuffer |
 
@@ -442,17 +444,39 @@ The rules that make the two models' state one: every register keeps only the bit
 where melonDS keeps a decoded form (the windows split, BLDY clamped, BGxX and BGxY sign-extended), whatever the program
 stored; the render list is in the order its polygons came (melonDS sorts its pointers to them at the swap, Frigate's
 renderer sorts its own), and each polygon's vertices are copied, so that the two programs' sharing of a strip's
-vertices doesn't count; the depth is the Z-buffer's from clip Z and W on both sides, even where the list W-buffers;
-where W is 0, both depths (melonDS's `0x7ffe00`, Frigate's 0) become 0, and X, Y and W are compared as they are. Neither
-the 3D picture, which `oracle_<seq>`'s tolerance holds, nor the registers written in an HBlank, which the screens hold,
-is in a group. Some writes melonDS drops and Frigate keeps: a 2D engine's, but for DISPCNT, DISPCAPCNT and
-MASTER_BRIGHT, while the engine is powered off; the 3D rendering registers' from 0x04000320 (all but DISP3DCNT) while
-the 3D renderer is powered off; and 8-bit stores to BG2's and BG3's affine registers, DISPCAPCNT and MASTER_BRIGHT
-(`GPU2D.cpp`'s `Write8` has no case for them). A game that made one would show in `regs2d` or `g3d.regs`, a difference
-to trace like any other, melonDS being the oracle.
+vertices doesn't count; the depth is the Z-buffer's even where the list W-buffers, melonDS's computed from clip Z and W
+as its `SubmitPolygon` does and Frigate's as `ToScreen` gives it; where W is 0, both depths (melonDS's `0x7ffe00`,
+Frigate's 0) become 0, and X, Y and W are compared as they are. Neither the 3D picture, which `oracle_<seq>`'s
+tolerance holds, nor the registers written in an HBlank, which the screens hold, is in a group.
 
-A group's hash is XXH3-64 with seed 0 of its canonical bytes, from the vendored xxHash header
-([port/third_party](../../third_party/README.md)), so that `xxhsum -H3` gives it from a dump of those bytes. A stream,
+The two depths are one formula, `((Z * 0x4000 / W) + 0x3fff) * 0x200` clamped to 24 bits, but melonDS cuts the
+product to 32 bits before its clamp and `ToScreen` doesn't. They agree for every vertex whose clip W is below 2^24,
+and can differ above it, where W's truncation to 24 bits leaves a small divisor: Z `0x400` with W `0x01000001` gives
+melonDS `0x7ffe00` and Frigate `0xffffff` (`digest.h`, `pbw_digest_zbuffer_depth`). The digest will report such a
+vertex as a `g3d.list` difference, Frigate's to fix: `ToScreen` cutting the product as melonDS does, a change to the
+geometry engine with its own replays, planned before the next part compares lists.
+
+Some stores melonDS 1.1 drops and Frigate keeps, which the next part's comparison of `regs2d`, `sys`, `pal`, `oam`,
+the VRAM banks and `g3d.regs` meets as differences to trace like any other, melonDS being the oracle:
+
+- **While an engine is powered off** (POWCNT1 bit 1 for engine A, bit 9 for engine B): its 2D registers, but for
+  DISPCNT, DISPCAPCNT and MASTER_BRIGHT (`GPU2D.cpp`'s `Write8`, `Write16` and `Write32`), and its standard palettes
+  and OAM, engine A's below 0x400 and engine B's from it (`NDS.cpp`'s `ARM9Write16` and `ARM9Write32`).
+- **While the 3D renderer is powered off:** the 3D rendering registers from 0x04000320, all but DISP3DCNT
+  (`GPU3D.cpp`'s `Write8`, `Write16` and `Write32`).
+- **Every 8-bit store** to the palettes, VRAM and OAM (`ARM9Write8` returns for all three).
+- **8-bit stores to registers** that no 8-bit path reaches: DISP3DCNT, DISPCAPCNT (0x04000064 to 0x04000067) and
+  POWCNT1, which `ARM9IOWrite8` sends nowhere; BG2's and BG3's affine registers (0x04000020 to 0x0400003f) and
+  MASTER_BRIGHT, which it sends to `GPU2D.cpp`'s `Write8`, which has no case for them; and CLEAR_COLOR, CLEAR_DEPTH
+  with CLRIMAGE_OFFSET, FOG_COLOR and FOG_OFFSET (0x04000350 to 0x0400035f), which it sends to `GPU3D.cpp`'s
+  `Write8`, which has none either.
+- **Every store to engine B's DISPCAPCNT** (0x04001064), of any size: engine B has no capture unit, and
+  `ARM9IOWrite16` and `ARM9IOWrite32` send only engine A's to a unit, so `regs2d.B`'s DISPCAPCNT is 0 on both sides.
+
+A group's hash is XXH3-64 with seed 0 of its canonical bytes, so that `xxhsum -H3` gives it from a dump of those bytes.
+It comes from xxHash 0.8.3's single header, which every build fetches at configure time as `xxhash.cmake` pins it,
+into the build directory and on a system include path, as `port/cmake/os.cmake` does minicoro's; it is byte for byte
+the header melonDS 1.1 bundles, so the oracle compiles the same hash whichever copy it includes. A stream,
 `digest.tsv`, is a `#pbwdigest 1` line, a header, and one row per game frame: the count, the program's video frame,
 the number of VBlanks that had the count, then each group's hash as 16 lowercase hex digits, or `-` for a group the
 program doesn't have:
@@ -463,11 +487,20 @@ count	frame	vblanks	vram.A	vram.B	...	g3d.stats	screen.top	screen.bottom
 1109	1234	1	9c1f6e0b6c3a1d2e	...
 ```
 
-A header names the groups in any order and may leave some out. `pbw_digest_compare_streams` compares two streams
-count by count, each with one row per count in rising order: it compares the groups both rows have, counts the counts
-that only one stream has, and stops at the first count whose groups differ, naming them. Pairing a count's rows where a
-program writes several, the sequences' lags, known differences and clock stretches are the next part's, in
-`compare.py`.
+A header names the groups in any order and may leave some out. A record has no column for the sequence's lag (the
+design's "lag applied"), on purpose: a stream records what its program saw, and neither program knows the lag, which
+`SEQUENCES` declares and the pairing applies when it compares. If the next part's expected stream needs to carry it,
+that part adds the column under a new format version, before any stream is kept.
+
+`pbw_digest_compare_streams` compares an expected stream (the oracle's) with an actual one (Frigate's) count by
+count, each with one row per count in rising order. The expected stream names what is held: a group it leaves out,
+or writes `-` for, isn't compared. A group the expected row has and the actual row lacks, whether the actual header
+leaves it out or its row writes `-` (a writer that dropped the group), is a divergence, never a silent pass; and
+`groupCompared` counts, group by group, the counts at which both rows had it, so that a caller sees a group that was
+never compared. Counts that only one stream has are counted, not compared. The comparison stops at the first count
+where a group differs or is missing, naming each. It goes only as far as this part's tests need: pairing a count's
+rows where a program writes several (at the last VBlank of the count), the sequences' lags, known differences and
+clock stretches are the next part's, in `compare.py`.
 
 ## Symbols
 

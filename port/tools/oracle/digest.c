@@ -1,12 +1,14 @@
 // The canonical per-game-frame digest (digest.h): the decodes of the port's register bytes into the form melonDS 1.1
 // keeps, each group's canonical bytes, the hash, and the stream's writer, reader and comparison. The facts are
 // melonDS 1.1's, the release port/tools/oracle/melonds.cmake pins (src/GPU2D.cpp's Unit::Write8, Write16 and Write32;
-// GPU3D.cpp's Write16, Write32 and SubmitPolygon; GPU.cpp's MapVRAM_*; NDS.cpp's ARM9IOWrite16 and MapSharedWRAM),
-// and GBATEK's for the bits each register keeps. Every screen of the game is made from the state encoded here.
+// GPU3D.cpp's Write16, Write32 and SubmitPolygon; GPU.cpp's MapVRAM_*; NDS.cpp's ARM9IOWrite16, ARM9IOWrite32 and
+// MapSharedWRAM), and GBATEK's for the bits each register keeps. Every screen of the game is made from the state
+// encoded here.
 #include "digest.h"
 
-// xxHash's functions inline and private to this file (port/third_party/xxhash), so that they can't meet the copy of
-// xxHash that melonDS's core links into the oracle
+// xxHash's single header, from the release port/tools/oracle/xxhash.cmake pins, which the build fetches and puts on a
+// system include path (port/cmake/oracle.cmake). Its functions are inline and private to this file, so that they can't
+// meet the copy of xxHash that melonDS's core links into the oracle
 #define XXH_INLINE_ALL
 #include "xxhash.h"
 #include <inttypes.h>
@@ -15,7 +17,7 @@
 
 // XXH3's output is fixed from xxHash 0.8.0, the release that declared it stable; the tests check known answers
 #if XXH_VERSION_NUMBER < 800
-#error "the digest's hash is XXH3-64 as xxHash 0.8.0 and later give it (port/third_party/README.md)"
+#error "the digest's hash is XXH3-64 as xxHash 0.8.0 and later give it (port/tools/oracle/xxhash.cmake)"
 #endif
 
 static const char *const sGroupNames[PBW_DIGEST_GROUPS] = {
@@ -152,6 +154,8 @@ void pbw_digest_regs2d_from_io(PbwDigestRegs2d *regs, const uint8_t *io, int eng
     regs->bldy = (uint8_t)Bldy(io[0x54]);
     // melonDS keeps MASTER_BRIGHT as written
     regs->masterBright = (uint16_t)Read16(io, 0x6c);
+    // Engine B has no capture unit: melonDS sends 16- and 32-bit stores at 0x04000064 and 0x04000066 to engine A and
+    // none at 0x04001064 anywhere (NDS.cpp's ARM9IOWrite16 and ARM9IOWrite32), so engine B's field stays 0 from reset
     regs->dispcapcnt = engine == PBW_DIGEST_ENGINE_A ? Read32(io, 0x64) & DISPCAPCNT_KEPT : 0;
 }
 
@@ -653,10 +657,15 @@ uint64_t pbw_digest_hash(const void *bytes, size_t size) {
 PbwDigestStatus pbw_digest_record_frame(PbwDigestRecord *record, const PbwDigestFrame *frame, int *group) {
     int g;
 
+    // Every group's hash and presence is set, an absent group's hash to 0
     for (g = 0; g < PBW_DIGEST_GROUPS; g++) {
         PbwDigestStatus status = pbw_digest_group_hash(frame, g, &record->hash[g]);
         record->present[g] = status == PBW_DIGEST_OK;
         if (status != PBW_DIGEST_OK && status != PBW_DIGEST_ABSENT) {
+            // A record of part of a frame, the rest absent or left from the record before, would compare as if it were
+            // a whole one: it holds none of it instead
+            memset(record->present, 0, sizeof(record->present));
+            memset(record->hash, 0, sizeof(record->hash));
             if (group != NULL) {
                 *group = g;
             }
@@ -792,6 +801,7 @@ static int ParseHash(const char *text, uint64_t *value) {
 int pbw_digest_reader_open(PbwDigestReader *reader, FILE *file) {
     static const char *const keys[3] = { "count", "frame", "vblanks" };
     char line[LINE_SIZE];
+    char version[16];
     char *fields[FIELDS];
     uint8_t named[PBW_DIGEST_GROUPS] = { 0 };
     int count;
@@ -812,7 +822,9 @@ int pbw_digest_reader_open(PbwDigestReader *reader, FILE *file) {
                  PBW_DIGEST_FORMAT);
         return -1;
     }
-    if (strcmp(line + 11, "1") != 0) {
+    // The version as pbw_digest_write_header writes it, digits alone
+    snprintf(version, sizeof(version), "%d", PBW_DIGEST_FORMAT);
+    if (strcmp(line + 11, version) != 0) {
         snprintf(reader->error, sizeof(reader->error), "line 1: version \"%.40s\", where this reader knows %d",
                  line + 11, PBW_DIGEST_FORMAT);
         return -1;
@@ -909,6 +921,21 @@ int pbw_digest_record_differences(const PbwDigestRecord *a, const PbwDigestRecor
     return count;
 }
 
+int pbw_digest_record_missing(const PbwDigestRecord *expected, const PbwDigestRecord *actual,
+                              uint8_t missing[PBW_DIGEST_GROUPS]) {
+    int count = 0;
+    int g;
+
+    for (g = 0; g < PBW_DIGEST_GROUPS; g++) {
+        int lacks = expected->present[g] && !actual->present[g];
+        if (missing != NULL) {
+            missing[g] = (uint8_t)lacks;
+        }
+        count += lacks;
+    }
+    return count;
+}
+
 // One stream of a comparison: its reader, its current record, and the last count, which must go up
 typedef struct Side {
     const char *name;
@@ -939,6 +966,21 @@ static int Advance(Side *side, PbwDigestComparison *comparison) {
         side->last = side->record.count;
     }
     return 0;
+}
+
+// Compares one count's two records: 1 when they diverge (a group's hashes differ, or the actual record lacks a group
+// the expected one has), the groups both have counted as compared either way
+static int CompareRecords(const PbwDigestRecord *expected, const PbwDigestRecord *actual,
+                          PbwDigestComparison *comparison) {
+    int differ = pbw_digest_record_differences(expected, actual, comparison->differs);
+    int lack = pbw_digest_record_missing(expected, actual, comparison->missing);
+    int g;
+
+    comparison->compared++;
+    for (g = 0; g < PBW_DIGEST_GROUPS; g++) {
+        comparison->groupCompared[g] += expected->present[g] && actual->present[g];
+    }
+    return differ != 0 || lack != 0;
 }
 
 int pbw_digest_compare_streams(FILE *expected, FILE *actual, PbwDigestComparison *comparison) {
@@ -973,8 +1015,7 @@ int pbw_digest_compare_streams(FILE *expected, FILE *actual, PbwDigestComparison
                 return -1;
             }
         } else {
-            comparison->compared++;
-            if (pbw_digest_record_differences(&e->record, &a->record, comparison->differs) != 0) {
+            if (CompareRecords(&e->record, &a->record, comparison)) {
                 comparison->diverged = 1;
                 comparison->expected = e->record;
                 comparison->actual = a->record;

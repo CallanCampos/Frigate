@@ -9,11 +9,12 @@
 # driver run by run; its output: a stream and a cry to the bit, the music by its envelope and levels).
 #
 # The input file reader (pbwinput.c, which the port can compile as it is), the per-screen 3D decision (display3d.c),
-# the per-game-frame digest's canonical encoding (digest.c), compare.py and sound.py are tested in every build: they
+# the per-game-frame digest's canonical encoding (digest.c, with xxHash's header, which every build fetches at
+# configure time as port/tools/oracle/xxhash.cmake pins it), compare.py and sound.py are tested in every build: they
 # need neither melonDS nor a ROM. The oracle itself is a test tool, never part of Frigate (PLAN.md §1): it is built
 # only when the port is configured with -DPORT_BUILD_ORACLE=ON, which fetches melonDS's pinned release
 # (port/tools/oracle/melonds.cmake) into the build directory at configure time and builds the oracle as a project of
-# its own (port/tools/oracle/CMakeLists.txt) in <build>/oracle. Normal builds and CI download nothing.
+# its own (port/tools/oracle/CMakeLists.txt) in <build>/oracle. Normal builds and CI never download melonDS.
 option(PORT_BUILD_ORACLE "Fetch melonDS and build the test oracle in port/tools/oracle (a test tool only)" OFF)
 option(PORT_ORACLE_SANITIZE "Build the oracle's own sources with AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
 
@@ -38,14 +39,25 @@ foreach(unit IN ITEMS pbwinput display3d)
     endforeach()
 endforeach()
 
+# xxHash, whose header gives the digest its hash: the release xxhash.cmake pins, fetched at configure time as minicoro
+# is (os.cmake). Its archive has no CMakeLists.txt at its top, so making it available only unpacks it
+include("${port_oracle_dir}/xxhash.cmake")
+include(FetchContent)
+FetchContent_Declare(xxhash
+    URL "${DIGEST_XXHASH_URL}"
+    URL_HASH "SHA256=${DIGEST_XXHASH_SHA256}")
+FetchContent_MakeAvailable(xxhash)
+
 # The canonical per-game-frame digest (digest.c, ADR 0031) on made-up states in melonDS's shape and the port's, plain
 # and under the sanitizers: both shapes' canonical words, the masks and decodes of melonDS 1.1, the render list's
 # vertices and depth, the VRAM a capture of 3D holds, the hash against xxHash's known answers, and the stream's format
-# and comparison. digest.c includes the vendored xxHash header (port/third_party/xxhash); neither program links it yet
+# and comparison. xxHash's header is on a system include path, so that its own code is held to its own warnings, not to
+# the tests' -Werror; neither program compiles digest.c yet
 foreach(variant IN ITEMS plain sanitized)
     set(target port_test_oracle_digest_${variant})
     add_executable(${target} "${port_oracle_tests}/test_digest.c" "${port_oracle_dir}/digest.c")
-    target_include_directories(${target} PRIVATE "${port_oracle_dir}" "${CMAKE_CURRENT_SOURCE_DIR}/third_party/xxhash")
+    target_include_directories(${target} PRIVATE "${port_oracle_dir}")
+    target_include_directories(${target} SYSTEM PRIVATE "${xxhash_SOURCE_DIR}")
     target_compile_options(${target} PRIVATE -std=c11 -Wall -Wextra -Werror)
     if(variant STREQUAL "sanitized")
         target_compile_options(${target} PRIVATE
