@@ -683,14 +683,22 @@ static int Clip(const ClipVertex *in, int n, ClipVertex out[PORT_GE_POLYGON_MAX_
 // The viewport transform (GBATEK "VIEWPORT"): X1, Y1, X2, Y2 in the parameter's bytes, Y1 and Y2 counted from the
 // bottom of the screen. Screen X is (x + w) * (X2 - X1 + 1) / 2w + X1 and screen Y, from the top,
 // (w - y) * (Y2 - Y1 + 1) / 2w + 191 - Y2; X, and the width, keep 9 bits and Y, and the height, 8, as the hardware's
-// registers do. The Z-buffer depth is ((z * 0x4000 / w) + 0x3fff) * 0x200, clamped to 24 bits; divisions round toward
-// zero.
+// registers do. The Z-buffer depth is ((z * 0x4000 / w) + 0x3fff) * 0x200, clamped to 24 bits after melonDS's cut to
+// 32 bits (below); divisions round toward zero.
 //
 // The hardware works with W truncated to 24 bits from here on, and divides X and Y with a 32-bit divider: for a W
 // above 0xffff it halves both numerators and W first, so that the products fit, and drops their low bits (melonDS's
 // measurements; GBATEK gives only the formulas). So a far vertex can land a pixel short of the exact quotient: the
 // lake of the flight over Aspertia City in New Game's intro starts a line higher on the DS than the exact division puts
 // it, and its scrolled water's ripples with it (port/tools/oracle/README.md, the exit route)
+//
+// The depth is melonDS 1.1's, the oracle's (src/GPU3D.cpp, GPU3D::SubmitPolygon, lines 1336-1346): melonDS works the
+// product out in 64 bits and stores it in a 32-bit signed integer, which keeps its low 32 bits, then clamps it; where
+// W is 0 its depth is 0x7ffe00. GBATEK doesn't say what the hardware does with a product past 32 bits. While the clip
+// W is below 2^24 the product fits (clipping leaves z within -w..w) and the cut changes nothing; from 2^24 on, W's
+// truncation can leave a small divisor and a product past 32 bits, whose low bits decide the depth: z 0x400 over a clip
+// W of 0x01000001, 1 in 24 bits, gives 0x2007ffe00, cut to 0x7ffe00, where clamping the whole product would give
+// 0xffffff (port/tools/oracle/digest.h, pbw_digest_zbuffer_depth)
 static void ToScreen(const PortGe *ge, const ClipVertex *v, PortGeVertex *o) {
     int64_t z = v->pos[2];
     uint32_t w = (uint32_t)v->pos[3] & 0xffffff;
@@ -700,7 +708,7 @@ static void ToScreen(const PortGe *ge, const ClipVertex *v, PortGeVertex *o) {
     uint32_t y2 = ge->viewport >> 24;
     uint32_t sx = x1;
     uint32_t sy = 191 - y2;
-    int64_t depth = 0;
+    int32_t depth = 0x7ffe00; // melonDS's where W is 0 (GPU3D.cpp line 1342)
     if (w != 0) {
         uint32_t nx = (uint32_t)v->pos[0] + w;
         uint32_t ny = w - (uint32_t)v->pos[1];
@@ -712,11 +720,12 @@ static void ToScreen(const PortGe *ge, const ClipVertex *v, PortGeVertex *o) {
         }
         sx += nx * ((x2 - x1 + 1) & 0x1ff) / (den << 1);
         sy += ny * ((y2 - y1 + 1) & 0xff) / (den << 1);
-        depth = (z * 0x4000 / (int64_t)w + 0x3fff) * 0x200;
+        // The 64-bit product's low 32 bits, as melonDS's 32-bit signed integer keeps them (GPU3D.cpp lines 1336-1340)
+        depth = (int32_t)(uint32_t)(uint64_t)((z * 0x4000 / (int64_t)w + 0x3fff) * 0x200);
     }
     o->x = (uint16_t)(sx & 0x1ff);
     o->y = (uint16_t)(sy & 0xff);
-    o->z = (int32_t)(depth < 0 ? 0 : depth > 0xffffff ? 0xffffff : depth);
+    o->z = depth < 0 ? 0 : depth > 0xffffff ? 0xffffff : depth;
     o->w = (int32_t)w;
     // The colour's 5 bits widened for the rasterizer: c * 16 + 15, 0 staying 0 (melonDS)
     for (int c = 0; c < 3; c++) {

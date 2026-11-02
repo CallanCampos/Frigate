@@ -32,11 +32,89 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-11-02: ToScreen cuts the depth to 32 bits before its clamp, as melonDS does
+
+- **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit. It starts from reviewed main
+  `d1717b68d8`, PR 74's merge.
+- **Port:** `PORT_SHA`, on the topic branch `port-ge-depth-cut` from `d1717b68d8`. This entry fills the `PORT_SHA` of PR
+  74's entry, the next below, with `6eef75c290`. Only `port/` changes.
+- **ROM (T0):** `python3 configure.py && ninja` in this branch's new worktree, every step run (14,039): both original US
+  SHA1s, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, with no
+  compiler warning. This change has no ROM input.
+- **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both versions, plain (`build/port`, `build/port-w2`)
+  and with the oracle (`build/port-oracle`, `build/port-oracle-w2`, `-DPORT_BUILD_ORACLE=ON -DPORT_SANITIZE_RECOVER=OFF
+  -DPORT_FRAME_TIME_REPORT_ONLY=OFF`), Apple clang, ninja at `-j4`, pass with 748 compiler warnings each, all in the
+  decomp's C of `src/` and `lib/`, as on `main`; `ge.c` and the tests compile with none.
+- **Tests:**
+  - T2/T6: not run on this commit: `main` moved (PR 71) while the reach was measured, so T2 runs on the merge.
+  - `g3d_ge` and `g3d_ge_sanitized`: 670 checks each, 14 of them the new depth cases (below). Negative controls, each
+    the new test file built against another `ge.c`: `main`'s fails 8 of the 14, the 8 whose depth changes (W 0 and 2^24,
+    and six products past 32 bits); one with the cut but the old 0 where W is 0 fails the 2 W cases; one with melonDS's
+    `0x7ffe00` where W is 0 but the whole product clamped fails the other 6.
+  - The reach, measured before deciding T4, with a temporary counter that ran only under an environment variable and was
+    taken out before the commit (`git grep` finds none of it): for every vertex of every polygon stored in polygon RAM,
+    as the digest dereferences them, the old depth against the new, and its clip W. In Black 2, T3's 19 runs and the
+    port-alone runs of the 15 comparison sequences and of the 3 round trips' own pieces (from the oracle's saves, their
+    SHA-1s checked), 347,711 frames and 351,529,291 vertices: no vertex whose depth changes, none whose W is 0 in 24
+    bits and none whose clip W is 2^24 or more; the largest clip W, `0x37de10` in Hugh's battle, is under a quarter of
+    2^24. In White 2, T3's 18 runs (135,501 frames, 93,557,782 vertices) the same, the largest `0x377ab6`; its sequences
+    need the oracle's White 2 saves, which were still being made. Run on `g3d_ge`, the counter found the new case's 24
+    vertices that change (6 at W 0, 18 cut), so its zeros are counts.
+  - T3: `ctest -L route -LE 'oracle|timing'` (`CTEST_PARALLEL_LEVEL=3`) on the counter's build, this commit's `ge.c`
+    with the counter added: Black 2 17 of 17 and White 2 15 of 15 pass, their references unchanged.
+  - T4: not yet: it runs on the merge of `main`.
+  - T5 and T7 not run: the sanitized `g3d_ge_sanitized`, the replays and the oracle comparisons above cover what the
+    change touches, and no screen changes.
+- **Tiers:** not measured (no progress scan); no game C changes.
+- **Trap stubs:** 25 function stubs and 1 data placeholder (`CARDi_NdmaInterface`) in each version's generated
+  `stubs.c`, as on `main`; no run stopped on one.
+- **64-bit warnings:** `check_ptrcasts.py --build-dir build/port --report` passes with 365 sites in 229 keys (real 66,
+  harmless 123, handled 141, unreachable 35), 1,713 files compiled and none missing, the last entry's figures.
+- **Work done:** verification v2's first part (PR 72) found that the geometry engine's `ToScreen` (`port/gfx/ge/ge.c`)
+  clamped the depth's 64-bit product, where melonDS 1.1, the oracle's pin, keeps the product in a 32-bit signed integer
+  before its clamp, and its entry planned the fix as a change of its own with its replays, before the second part
+  compares lists. This is that change.
+  - **melonDS's side, read first** in the pinned source this branch's oracle build fetched
+    (`_deps/melonds-1.1-src/src/GPU3D.cpp`, the same file as the design phase's copy, SHA-256 `44e35ce42b946be4…`),
+    `GPU3D::SubmitPolygon`: line 1110 truncates W to 24 bits; lines 1336-1340 store `((((s64)Position[2] * 0x4000) /
+    Position[3]) + 0x3FFF) * 0x200` in `s32 z`; line 1342 gives `0x7FFE00` where W is 0; lines 1345-1346 clamp to
+    0..`0xFFFFFF`. That is what PR 72 recorded, and its three cases cut to `0x7ffe00` as `TestDepth` says; but
+    `TestDepth`'s comment gave the second of their products a factor of 16 too large: Z `0x800000` over W `0x01000010`
+    (16 in 24 bits) gives `0x400007ffe00`, not `0x4000007ffe00`.
+  - **`ToScreen`** works the product out in 64 bits as before and keeps its low 32 bits as a signed integer (the file's
+    `Narrow` idiom), then clamps it to 0..`0xffffff`; where W's 24 bits are 0 the depth is `0x7ffe00`, where it was 0.
+    Its comment cites melonDS's file, function and lines, says what they model and that GBATEK doesn't say what the
+    hardware does with a product past 32 bits. Nothing else in `ge.c` changes. Only a vertex whose clip W is 2^24 or
+    more can change, where W's truncation to 24 bits can leave a small divisor for a large Z (Z `0x400` over W
+    `0x01000001` gives `0x2007ffe00`, cut to `0x7ffe00`, where the old clamp gave `0xffffff`), or one whose W is 0 in 24
+    bits.
+  - **Tests:** `g3d_ge`'s new depth cut case (`port/tests/g3d/test_ge.c`, `TestDepthCut` and its `DepthAt` dot) puts a
+    dot at chosen clip Z and W through the projection's last row and checks its depth against values worked out by hand
+    in its comments: W 0 and 2^24 (`0x7ffe00`); W `0xffffff`, just below 2^24, with Z at W, -W and 0 (the product fits);
+    W `0x01000001` with Z 1 (fits), `0x400` and `-0x400` (both cut to `0x7ffe00`), `0x100` (cut negative, 0) and
+    `-0x101` (cut past 24 bits, `0xffffff`); PR 72's Z `0x800000` over W `0x01000010`; and the largest products, Z
+    `±0x7f000001` over W `0x7f000001`, the largest clip W that is 1 in 24 bits, and Z `0x7fffffff` over W `0x7fffffff`.
+  - **Documents:** `ge.c`'s comment above `ToScreen`, `ge.h`'s `PortGeVertex.z`, `digest.h`'s vertex depth and
+    `pbw_digest_zbuffer_depth`, `digest.c`'s comment on the depth where W is 0, `test_digest.c`'s `TestDepth` comment
+    (with that product) and `TestWZero`'s (its port side keeps the depth 0, now said to be the old one, so that its
+    check still shows the encoding making two depths equal), the oracle README's digest rules and its paragraph on the
+    depth, and the test guide's `g3d` row. ADR 0031 is proposed, so its two factual notes on Frigate's depth, in its
+    context and its consequences, are corrected in place; its decisions are unchanged, the digest's depth of 0 where W
+    is 0 among them. ARCHITECTURE.md and GLOSSARY.md don't describe the depth.
+- **Next:** verification v2's second part (ADR 0031), which compares lists with the depth now the same on both sides:
+  `--digest` in both programs, taken at the last VBlank of each count, `compare.py`'s pairing with the sequences' lags
+  and declarations, the declarations of the opening, the title and aspertia in both versions, and xxHash's notice in
+  what the program and the macOS app carry. Phase 5's story coverage after the Route 20 save stays the phase's earliest
+  unmet exit criterion, each trainer battle cut where ADR 0023 says.
+- **Blockers:** none for this change. Decisions the owner holds: ADRs 0022, 0025, 0030 and 0031 are proposed (0031's six
+  defaults wait for the owner's confirmation); the follow-up on the guides needs the owner's wording of the delegation
+  for port/CLAUDE.md; and Spanish issue 45 still lacks a local dump.
+
 ## 2026-11-02: after the naming sync: the guard's rows and the documents at upstream's names, the delegated sync review
 
 - **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit. Reviewed main is `c0a7941e4e`, PR 72's
   merge, which this branch merges; it started from `10d017c010`, PR 67's.
-- **Port:** `PORT_SHA`, on the topic branch `port-sync-hygiene-1102` from `10d017c010`: `fd81336269` (the sync script's
+- **Port:** `6eef75c290`, on the topic branch `port-sync-hygiene-1102` from `10d017c010`: `fd81336269` (the sync script's
   messages and their test), `07c5e0c409` (the rest, and this entry), `0522fe9311` (the merge of `main` at
   `36101609ad`, PR 70: ADR 0023 accepted, documents only), `55286eae4a` (the merge of `main` at `806b2a8f9d`, PR 73:
   Castelia City's café), `84c24fcd10` (the review's fixes, below), `eef1532091` (the merge of `main` at `c0a7941e4e`,

@@ -160,8 +160,8 @@ typedef struct PbwDigestVertex {
     uint32_t y;        // screen Y: .y, FinalPosition[1] (8 bits)
     uint32_t depth;    // the Z-buffer depth, 24 bits, the encoding making it 0 when W is 0: the port's .z, as ge.c's
                        // ToScreen computes it; melonDS's pbw_digest_zbuffer_depth(Position[2], Position[3]), which
-                       // stays the Z-buffer's when the list W-buffers. ToScreen lacks melonDS's cut to 32 bits, so the
-                       // two differ for some vertices whose clip W is 2^24 or more (pbw_digest_zbuffer_depth)
+                       // stays the Z-buffer's when the list W-buffers. ToScreen computes it as melonDS does, its cut
+                       // to 32 bits included, so the two are equal for every vertex (pbw_digest_zbuffer_depth)
     uint32_t w;        // W: .w, Position[3] (24 bits)
     uint32_t color[3]; // red, green, blue as c * 16 + 15, 0 staying 0: .color, FinalColor
     uint32_t s, t;     // the texture coordinates: .s and .t, TexCoords (16 bits each)
@@ -195,12 +195,12 @@ typedef struct PbwDigestList {
 // The Z-buffer depth melonDS 1.1 gives a vertex from its clip-space Z and its W in 24 bits (GPU3D.cpp,
 // SubmitPolygon): ((Z * 0x4000 / W) + 0x3fff) * 0x200, cut to 32 bits, clamped to 0..0xffffff; 0x7ffe00 when W is 0.
 //
-// Frigate's ToScreen (port/gfx/ge/ge.c) computes the same formula in 64 bits and clamps it without the cut. The two
-// agree wherever the product fits in 32 signed bits, which it does for every vertex whose clip W is below 2^24 (after
-// clipping, Z is within -W..W). From 2^24 on, W's truncation to 24 bits can leave a small divisor and a product past
-// 32 bits: Z 0x400 with W 0x01000001 gives melonDS 0x7ffe00 and ToScreen 0xffffff, and Z -0x400 gives 0x7ffe00 and 0.
-// The digest reports such a vertex as a g3d.list difference. Making ToScreen cut the product to 32 bits before its
-// clamp is a change to the geometry engine with its own replays, planned before ADR 0031's second part compares lists
+// Frigate's ToScreen (port/gfx/ge/ge.c) computes the same, the cut and the 0x7ffe00 included, so the port's depth is
+// melonDS's for every vertex (g3d_ge's depth cut cases). The cut matters only from a clip W of 2^24 on: below it the
+// product fits in 32 signed bits (after clipping, Z is within -W..W), and from it W's truncation to 24 bits can leave
+// a small divisor and a product past 32 bits, whose low bits decide the depth: Z 0x400 with W 0x01000001 gives
+// 0x2007ffe00, cut to 0x7ffe00, where clamping the whole product would give 0xffffff, and Z -0x400 gives 0x7ffe00 too,
+// where it would give 0
 uint32_t pbw_digest_zbuffer_depth(int32_t clipZ, uint32_t w);
 
 // --- 3D rendering registers (g3d.regs)

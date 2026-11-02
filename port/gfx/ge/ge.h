@@ -36,7 +36,8 @@
 typedef struct PortGeVertex {
     int32_t w;         // the clip-space W, 20.12 fixed point, in the 24 bits the hardware keeps (ge.c's ToScreen):
                        // positive inside the view volume; W-buffering's depth
-    int32_t z;         // the Z-buffering depth, 0..0xffffff: ((Z * 0x4000 / W) + 0x3fff) * 0x200, clamped (GBATEK)
+    int32_t z;         // the Z-buffering depth, 0..0xffffff: ((Z * 0x4000 / W) + 0x3fff) * 0x200 (GBATEK), cut to 32
+                       // bits and clamped, 0x7ffe00 where W is 0, as melonDS computes it (ge.c's ToScreen)
     uint16_t x;        // screen X, 9 bits (0..256 for a viewport on the screen; the right end is past the last pixel)
     uint16_t y;        // screen Y, 8 bits, 0 at the top (0..192)
     uint16_t color[3]; // red, green, blue: a 5-bit c as c * 16 + 15 (0 stays 0), the 6-bit 2c + 1 with 3 fraction bits

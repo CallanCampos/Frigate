@@ -445,16 +445,19 @@ where melonDS keeps a decoded form (the windows split, BLDY clamped, BGxX and BG
 stored; the render list is in the order its polygons came (melonDS sorts its pointers to them at the swap, Frigate's
 renderer sorts its own), and each polygon's vertices are copied, so that the two programs' sharing of a strip's
 vertices doesn't count; the depth is the Z-buffer's even where the list W-buffers, melonDS's computed from clip Z and W
-as its `SubmitPolygon` does and Frigate's as `ToScreen` gives it; where W is 0, both depths (melonDS's `0x7ffe00`,
-Frigate's 0) become 0, and X, Y and W are compared as they are. Neither the 3D picture, which `oracle_<seq>`'s
-tolerance holds, nor the registers written in an HBlank, which the screens hold, is in a group.
+as its `SubmitPolygon` does and Frigate's as `ToScreen` gives it; where W is 0, where both programs give `0x7ffe00`
+and the hardware draws no polygon, the depth becomes 0, and X, Y and W are compared as they are. Neither the 3D
+picture, which `oracle_<seq>`'s tolerance holds, nor the registers written in an HBlank, which the screens hold, is in
+a group.
 
-The two depths are one formula, `((Z * 0x4000 / W) + 0x3fff) * 0x200` clamped to 24 bits, but melonDS cuts the
-product to 32 bits before its clamp and `ToScreen` doesn't. They agree for every vertex whose clip W is below 2^24,
-and can differ above it, where W's truncation to 24 bits leaves a small divisor: Z `0x400` with W `0x01000001` gives
-melonDS `0x7ffe00` and Frigate `0xffffff` (`digest.h`, `pbw_digest_zbuffer_depth`). The digest will report such a
-vertex as a `g3d.list` difference, Frigate's to fix: `ToScreen` cutting the product as melonDS does, a change to the
-geometry engine with its own replays, planned before the next part compares lists.
+The two depths are one computation, melonDS 1.1's (`src/GPU3D.cpp`, `GPU3D::SubmitPolygon`, lines 1336-1346), which
+`ToScreen` follows: `((Z * 0x4000 / W) + 0x3fff) * 0x200` worked out in 64 bits, cut to 32 bits as a signed integer
+and clamped to 24 bits, and `0x7ffe00` where W is 0. The cut matters only for a vertex whose clip W is 2^24 or more,
+where W's truncation to 24 bits can leave a small divisor and a product past 32 bits: Z `0x400` with W `0x01000001`
+gives `0x2007ffe00`, cut to `0x7ffe00`, where clamping the whole product would give `0xffffff` (`digest.h`,
+`pbw_digest_zbuffer_depth`; `g3d_ge`'s depth cut cases hold `ToScreen` to it). `ToScreen` clamped the whole product,
+and gave 0 where W is 0, until a change of its own made it cut before the next part compares lists; no vertex of the
+replays or of the comparison sequences' port runs changed with it ([STATUS.md](../../docs/STATUS.md)).
 
 Some stores melonDS 1.1 drops and Frigate keeps, which the next part's comparison of `regs2d`, `sys`, `pal`, `oam`,
 the VRAM banks and `g3d.regs` meets as differences to trace like any other, melonDS being the oracle:

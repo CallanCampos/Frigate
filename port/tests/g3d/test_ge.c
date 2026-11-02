@@ -858,6 +858,64 @@ static void TestViewportDivider(void) {
     CHECK_EQ(PolyVertex(list, 2, 0)->w, 0x800);
 }
 
+// The Z-buffer depth of a dot at clip Z z and clip W w: the projection's last row puts three vertices at the origin at
+// clip (0, 0, z, w), a polygon that polygon RAM takes whatever w is (a dot is hidden only past DISP_1DOT_DEPTH, whose
+// power-on value hides none). Returns the first vertex's depth, or 0xffffffff, never a depth, when the dot isn't taken
+static uint32_t DepthAt(int32_t z, int32_t w) {
+    int32_t m[16] = { ONE, 0, 0, 0, 0, ONE, 0, 0, 0, 0, 0, 0, 0, 0, z, w };
+    const PortGeList *list = Building();
+    uint32_t before = list->polygon_count;
+    MtxMode(0);
+    MtxLoad44(m);
+    MtxMode(2);
+    Begin(0);
+    Vtx16(0, 0, 0);
+    Vtx16(0, 0, 0);
+    Vtx16(0, 0, 0);
+    if (list->polygon_count != before + 1) {
+        return 0xffffffff;
+    }
+    return (uint32_t)PolyVertex(list, before, 0)->z;
+}
+
+// The depth's product past 32 bits (melonDS 1.1's arithmetic, ge.c's ToScreen): ((z * 0x4000 / w) + 0x3fff) * 0x200
+// with w the clip W's 24 bits, worked out in 64 bits and cut to its low 32 as a signed integer, then clamped to
+// 0..0xffffff; 0x7ffe00 where w is 0. Below a clip W of 2^24 the product fits in 32 bits, since clipping leaves z
+// within -W..W; from 2^24 on the cut decides it. "Whole" is what clamping the 64-bit product would give
+static void TestDepthCut(void) {
+    Start("depth cut");
+    Basic();
+    PolygonAttr(ATTR(31, 0));
+    // W 0, and 2^24, which is 0 in 24 bits: melonDS's 0x7ffe00 (whole: no product)
+    CHECK_HEX(DepthAt(0, 0), 0x7ffe00);
+    CHECK_HEX(DepthAt(0x400, 0x01000000), 0x7ffe00);
+    // Just below 2^24 the product fits: z = W gives (0x4000 + 0x3fff) * 0x200 = 0xfffe00, z = -W -0x200, clamped to 0,
+    // and z = 0 0x3fff * 0x200 = 0x7ffe00
+    CHECK_HEX(DepthAt(0xffffff, 0xffffff), 0xfffe00);
+    CHECK_HEX(DepthAt(-0xffffff, 0xffffff), 0);
+    CHECK_HEX(DepthAt(0, 0xffffff), 0x7ffe00);
+    // W 0x01000001 is 1 in 24 bits, so the product is (z * 0x4000 + 0x3fff) * 0x200 = z * 0x800000 + 0x7ffe00. z 1
+    // gives 0xfffe00, which fits; z 0x400 gives 0x2007ffe00, cut to 0x7ffe00 (whole 0xffffff); z -0x400
+    // -0x1ff800200, cut to 0x7ffe00 (whole 0); z 0x100 0x807ffe00, negative in 32 bits, so 0 (whole 0xffffff); z -0x101
+    // -0x80000200, cut to 0x7ffffe00, clamped to 0xffffff (whole 0)
+    CHECK_HEX(DepthAt(1, 0x01000001), 0xfffe00);
+    CHECK_HEX(DepthAt(0x400, 0x01000001), 0x7ffe00);
+    CHECK_HEX(DepthAt(-0x400, 0x01000001), 0x7ffe00);
+    CHECK_HEX(DepthAt(0x100, 0x01000001), 0);
+    CHECK_HEX(DepthAt(-0x101, 0x01000001), 0xffffff);
+    // W 0x01000010, 0x10 in 24 bits: z 0x800000 gives (0x800000 * 0x4000 / 0x10 + 0x3fff) * 0x200 = 0x400007ffe00, cut
+    // to 0x7ffe00 (whole 0xffffff)
+    CHECK_HEX(DepthAt(0x800000, 0x01000010), 0x7ffe00);
+    // The largest products: the largest clip W that is 1 in 24 bits, 0x7f000001, with z at either end, gives
+    // 0x7f000001 * 0x800000 + 0x7ffe00 = 0x3f800000fffe00, cut to 0xfffe00 (whole 0xffffff), and -0x3f800000000200,
+    // cut to 0xfffffe00, negative, so 0 (whole 0). The largest clip W, 0x7fffffff, is 0xffffff in 24 bits: z 0x7fffffff
+    // gives 0x7fffffff * 0x4000 / 0xffffff = 0x200000 and (0x200000 + 0x3fff) * 0x200 = 0x407ffe00, which fits and
+    // clamps to 0xffffff
+    CHECK_HEX(DepthAt(0x7f000001, 0x7f000001), 0xfffe00);
+    CHECK_HEX(DepthAt(-0x7f000001, 0x7f000001), 0);
+    CHECK_HEX(DepthAt(0x7fffffff, 0x7fffffff), 0xffffff);
+}
+
 // The dot of TestOneDot at W w: the projection diag(w, w, w, w) scales every coordinate alike, so the vertices land
 // on (128, 96) still. Returns whether polygon RAM took it
 static int DotAtW(int32_t w) {
@@ -951,6 +1009,7 @@ int main(void) {
     TestTests();
     TestViewport();
     TestViewportDivider();
+    TestDepthCut();
     TestOneDot();
     TestStatus();
     port_ge_destroy(sGe);
