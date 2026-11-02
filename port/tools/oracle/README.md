@@ -492,6 +492,30 @@ design's "lag applied"), on purpose: a stream records what its program saw, and 
 `SEQUENCES` declares and the pairing applies when it compares. If the next part's expected stream needs to carry it,
 that part adds the column under a new format version, before any stream is kept.
 
+Both programs write their streams through one writer in `digest.c`, `pbw_digest_writer_open`, `pbw_digest_writer_vblank`
+at every VBlank with GFL's frame count read there, and `pbw_digest_writer_close`, so that one rule, tested without a
+ROM, decides on both which VBlank's state is a game frame's record: the state at the **last VBlank of each count**,
+where the count's pass has finished and the game waits in `OS_WaitIrq` (`src/system/main.c`), before the VBlank's
+interrupt is taken (ADR 0031, decision 1). The count goes up at the end of `GFL_VBlankUpdate`
+(`src/system/gfl_use.c`), which runs once that wait returns, so a record holds its pass's main work but not the VBlank
+work that follows it: the IRQ handler's `GFL_VBlankExecCallback`, then the BG updates, `DMAVBlank_Update` and the
+fades, which run while the count is unchanged and first show in the next count's record, on both programs. The rules:
+
+- **The start.** Nothing is recorded before the first VBlank whose count is 1 after a VBlank whose count was 0. Until
+  start-up clears the BSS, the counter's address holds anything: on melonDS the compressed ARM9 binary, so the count
+  reads 0 at frame 1, a large number at frames 2 to 13 and 0 again until the main loop's first pass.
+- **The last VBlank.** A VBlank with the pending record's count replaces it (its video frame and every group's hash
+  become this VBlank's, and `vblanks` goes up by one); a VBlank with the next count writes the pending record, flushes
+  the file and becomes the pending record, with `vblanks` 1.
+- **Counts only stay or rise by one** after the start: the DS's main loop waits for each VBlank, so a pass can't end
+  twice in one frame. Anything else, a fall or a jump, is an error naming both counts and the frame.
+- **A frame that can't be encoded** (a vertex index past the list, a capture's region outside its bank, no memory) is
+  an error naming the group. A VBlank that fails writes nothing, and every later call fails with the same message.
+- **The end.** Closing never writes the pending record, whose count may have had more VBlanks to come: a run's last
+  count is never in its stream, on either program.
+- **Every row is flushed** as it is written, so that a run that a trap stub ends keeps every record it wrote, as
+  `frames.tsv` keeps its rows.
+
 `pbw_digest_compare_streams` compares an expected stream (the oracle's) with an actual one (Frigate's) count by
 count, each with one row per count in rising order. The expected stream names what is held: a group it leaves out,
 or writes `-` for, isn't compared. A group the expected row has and the actual row lacks, whether the actual header

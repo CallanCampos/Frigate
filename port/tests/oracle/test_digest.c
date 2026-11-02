@@ -8,8 +8,11 @@
 // group counts: the render list's words one by one and the bits each keeps, the list's size and overflow, the
 // capture's words, both engines' palettes and OAM. Then the hash against xxHash's own known answers, and the stream's
 // writer, reader and comparison, which stops where a group differs or where the actual stream lacks a group the
-// expected one holds. The game functionality it covers is every screen's, the state the display hardware holds at a
-// VBlank, with no ROM and no game code.
+// expected one holds. Last, the stream's writer that both programs call at every VBlank (pbw_digest_writer_*), rule by
+// rule: a record per count at its last VBlank, the start at the first count of 1 after a 0, a count that falls or
+// jumps refused, a frame that can't be encoded refused with its group named, the last count never written, every row
+// flushed; and two programs' VBlanks of different shapes giving streams that compare equal. The game functionality it
+// covers is every screen's, the state the display hardware holds at a VBlank, with no ROM and no game code.
 #include "digest.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -1501,7 +1504,276 @@ static void TestStreams(void) {
           strstr(comparison.error, "count 3 after count 5") != NULL);
 }
 
-int main(void) {
+// --- The stream's writer
+
+// What the writer made of a run of VBlanks: the VBlank that failed (-1 for none), its message, and what
+// pbw_digest_writer_close returned
+typedef struct WriterRun {
+    int failedAt;
+    char error[240];
+    int closed;
+} WriterRun;
+
+// The stream the writer makes in a temporary file, rewound, of n VBlanks: VBlank i with GFL's frame count counts[i],
+// the video frame i + 1 and the state MakeFrames makes of states[i], in melonDS's shape or the port's; at invalidAt
+// with a vertex index past the list. It stops at the first VBlank that fails
+static FILE *RunWriter(const uint32_t *counts, const uint32_t *states, int n, int melonShape, int invalidAt,
+                       WriterRun *run) {
+    FILE *file = tmpfile();
+    PbwDigestWriter writer;
+    int i;
+
+    run->failedAt = -1;
+    run->error[0] = '\0';
+    run->closed = 0;
+    CHECK(file != NULL);
+    if (file == NULL) {
+        return NULL;
+    }
+    CHECK(pbw_digest_writer_open(&writer, file) == 0);
+    for (i = 0; i < n; i++) {
+        PbwDigestFrame melon;
+        PbwDigestFrame port;
+        PbwDigestPolygon polygons[2][2];
+        PbwDigestVertex melonVertices[6];
+        MakeFrames(&melon, &port, states[i], polygons, melonVertices);
+        if (i == invalidAt) {
+            polygons[0][0].vertices[1] = 9;
+            polygons[1][0].vertices[1] = 9;
+        }
+        if (pbw_digest_writer_vblank(&writer, counts[i], (uint32_t)i + 1, melonShape ? &melon : &port) != 0) {
+            run->failedAt = i;
+            snprintf(run->error, sizeof(run->error), "%s", writer.error);
+            break;
+        }
+    }
+    run->closed = pbw_digest_writer_close(&writer);
+    rewind(file);
+    return file;
+}
+
+// A stream's records, at most max of them, and closes the file: how many, or -1 when it can't be read
+static int ReadRecords(FILE *file, PbwDigestRecord *records, int max) {
+    PbwDigestReader reader;
+    int n = 0;
+
+    if (file == NULL) {
+        return -1;
+    }
+    if (pbw_digest_reader_open(&reader, file) != 0) {
+        fclose(file);
+        return -1;
+    }
+    while (n < max) {
+        int got = pbw_digest_reader_next(&reader, &records[n]);
+        if (got <= 0) {
+            fclose(file);
+            return got < 0 ? -1 : n;
+        }
+        n++;
+    }
+    fclose(file);
+    return n;
+}
+
+// The record of the state MakeFrames makes of a number, in the port's shape
+static PbwDigestRecord RecordOf(uint32_t state) {
+    PbwDigestFrame melon;
+    PbwDigestFrame port;
+    PbwDigestPolygon polygons[2][2];
+    PbwDigestVertex melonVertices[6];
+    PbwDigestRecord record;
+
+    MakeFrames(&melon, &port, state, polygons, melonVertices);
+    memset(&record, 0, sizeof(record));
+    CHECK(pbw_digest_record_frame(&record, &port, NULL) == PBW_DIGEST_OK);
+    return record;
+}
+
+// Whether a record holds a state's hashes, every group present
+static int HoldsState(const PbwDigestRecord *record, uint32_t state) {
+    PbwDigestRecord expected = RecordOf(state);
+
+    return memcmp(record->present, expected.present, sizeof(expected.present)) == 0 &&
+           memcmp(record->hash, expected.hash, sizeof(expected.hash)) == 0 && Present(record) == PBW_DIGEST_GROUPS;
+}
+
+static void TestWriterLastVblank(void) {
+    // Counts 0, 0, 1, 2, 2, 3: rows for 1 and 2, each the state at its count's last VBlank; none for 3, whose count may
+    // have had more VBlanks to come
+    static const uint32_t counts[] = { 0, 0, 1, 2, 2, 3 };
+    static const uint32_t states[] = { 200, 201, 202, 203, 204, 205 };
+    PbwDigestRecord records[8];
+    PbwDigestRecord first = RecordOf(203);
+    WriterRun run;
+    int n = ReadRecords(RunWriter(counts, states, 6, 0, -1, &run), records, 8);
+
+    CHECK(run.failedAt == -1 && run.closed == 0);
+    CHECK(n == 2);
+    if (n == 2) {
+        CHECK(records[0].count == 1 && records[0].frame == 3 && records[0].vblanks == 1 &&
+              HoldsState(&records[0], 202));
+        CHECK(records[1].count == 2 && records[1].frame == 5 && records[1].vblanks == 2 &&
+              HoldsState(&records[1], 204));
+        // Without the rule, the first VBlank of count 2 would give the row other hashes
+        CHECK(pbw_digest_record_differences(&first, &records[1], NULL) != 0);
+    }
+}
+
+static void TestWriterStart(void) {
+    // On melonDS the counter's memory holds the compressed ARM9 binary until start-up clears the BSS: what comes
+    // before the first VBlank with count 1 after one with 0 is ignored
+    static const uint32_t garbage[] = { 0, 20999712, 0, 1, 2 };
+    static const uint32_t garbageStates[] = { 210, 211, 212, 213, 214 };
+    // And a stray 1 before any 0 doesn't start the stream: its 0 would be a fall
+    static const uint32_t stray[] = { 1, 0, 1, 2 };
+    static const uint32_t strayStates[] = { 220, 221, 222, 223 };
+    PbwDigestRecord records[8];
+    PbwDigestRecord strayRecord = RecordOf(220);
+    WriterRun run;
+    int n = ReadRecords(RunWriter(garbage, garbageStates, 5, 0, -1, &run), records, 8);
+
+    CHECK(run.failedAt == -1 && n == 1);
+    if (n == 1) {
+        CHECK(records[0].count == 1 && records[0].frame == 4 && HoldsState(&records[0], 213));
+    }
+    n = ReadRecords(RunWriter(stray, strayStates, 4, 0, -1, &run), records, 8);
+    CHECK(run.failedAt == -1 && n == 1);
+    if (n == 1) {
+        CHECK(records[0].count == 1 && records[0].frame == 3 && records[0].vblanks == 1 &&
+              HoldsState(&records[0], 222));
+        // A stream started at the stray 1 would have had that VBlank's hashes
+        CHECK(pbw_digest_record_differences(&strayRecord, &records[0], NULL) != 0);
+    }
+}
+
+static void TestWriterCounts(void) {
+    // After the start the count stays or rises by one; a fall or a jump fails, naming both counts and the frame, and
+    // its VBlank writes nothing: without the rule, count 2's row would be written
+    static const uint32_t fall[] = { 0, 1, 2, 1 };
+    static const uint32_t jump[] = { 0, 1, 2, 4 };
+    static const uint32_t stay[] = { 0, 1, 2, 2, 3 };
+    static const uint32_t states[] = { 230, 231, 232, 233, 234 };
+    PbwDigestRecord records[8];
+    WriterRun run;
+    int n = ReadRecords(RunWriter(fall, states, 4, 0, -1, &run), records, 8);
+
+    CHECK(run.failedAt == 3 && run.closed == -1 && n == 1 && records[0].count == 1);
+    CHECK(strstr(run.error, "frame 4") != NULL && strstr(run.error, "is 1 after 2") != NULL);
+    n = ReadRecords(RunWriter(jump, states, 4, 0, -1, &run), records, 8);
+    CHECK(run.failedAt == 3 && n == 1 && records[0].count == 1);
+    CHECK(strstr(run.error, "frame 4") != NULL && strstr(run.error, "is 4 after 2") != NULL);
+    n = ReadRecords(RunWriter(stay, states, 5, 0, -1, &run), records, 8);
+    CHECK(run.failedAt == -1 && run.closed == 0 && n == 2 && records[1].count == 2 && records[1].vblanks == 2);
+}
+
+static void TestWriterInvalid(void) {
+    // A frame that can't be encoded fails with its group named, and writes nothing, count 1's pending row included;
+    // every later call fails with the same message. The same VBlanks with a valid frame write count 1's row
+    static const uint32_t counts[] = { 0, 1, 2 };
+    static const uint32_t states[] = { 240, 241, 242 };
+    PbwDigestRecord records[8];
+    PbwDigestWriter writer;
+    PbwDigestFrame melon;
+    PbwDigestFrame port;
+    PbwDigestPolygon polygons[2][2];
+    PbwDigestVertex melonVertices[6];
+    WriterRun run;
+    FILE *file;
+    int n = ReadRecords(RunWriter(counts, states, 3, 0, 2, &run), records, 8);
+
+    CHECK(run.failedAt == 2 && run.closed == -1 && n == 0);
+    CHECK(strstr(run.error, "frame 3") != NULL && strstr(run.error, "count 2") != NULL &&
+          strstr(run.error, "g3d.list") != NULL);
+    n = ReadRecords(RunWriter(counts, states, 3, 1, 2, &run), records, 8);
+    CHECK(run.failedAt == 2 && n == 0 && strstr(run.error, "g3d.list") != NULL);
+    n = ReadRecords(RunWriter(counts, states, 3, 0, -1, &run), records, 8);
+    CHECK(run.failedAt == -1 && n == 1 && records[0].count == 1);
+    // Sticky: a valid VBlank after the failure fails too, with the first message
+    file = tmpfile();
+    CHECK(file != NULL);
+    if (file != NULL) {
+        MakeFrames(&melon, &port, 250, polygons, melonVertices);
+        CHECK(pbw_digest_writer_open(&writer, file) == 0);
+        CHECK(pbw_digest_writer_vblank(&writer, 0, 1, &port) == 0);
+        polygons[0][0].vertices[1] = 9;
+        CHECK(pbw_digest_writer_vblank(&writer, 1, 2, &port) == -1);
+        polygons[0][0].vertices[1] = 1;
+        CHECK(pbw_digest_writer_vblank(&writer, 1, 3, &port) == -1 && strstr(writer.error, "frame 2") != NULL);
+        CHECK(pbw_digest_writer_close(&writer) == -1);
+        fclose(file);
+    }
+}
+
+static void TestWriterBothShapes(void) {
+    // The oracle's counts span several VBlanks where the port's span one; at each count's last VBlank both programs
+    // have the same state, earlier VBlanks other states. The two streams read back as written and compare equal
+    static const uint32_t portCounts[] = { 0, 1, 2, 3, 4 };
+    static const uint32_t portStates[] = { 300, 301, 302, 303, 304 };
+    static const uint32_t melonCounts[] = { 0, 0, 1, 1, 2, 2, 2, 3, 3, 4 };
+    static const uint32_t melonStates[] = { 290, 300, 280, 301, 281, 282, 302, 283, 303, 304 };
+    PbwDigestComparison comparison;
+    PbwDigestRecord records[8];
+    WriterRun portRun;
+    WriterRun melonRun;
+    int n;
+
+    CHECK(Compare(RunWriter(melonCounts, melonStates, 10, 1, -1, &melonRun),
+                  RunWriter(portCounts, portStates, 5, 0, -1, &portRun), &comparison) == 0);
+    CHECK(melonRun.failedAt == -1 && portRun.failedAt == -1);
+    CHECK(!comparison.diverged && comparison.compared == 3 && comparison.onlyExpected == 0 &&
+          comparison.onlyActual == 0);
+    n = ReadRecords(RunWriter(melonCounts, melonStates, 10, 1, -1, &melonRun), records, 8);
+    CHECK(n == 3);
+    if (n == 3) {
+        CHECK(records[0].count == 1 && records[0].frame == 4 && records[0].vblanks == 2);
+        CHECK(records[1].count == 2 && records[1].frame == 7 && records[1].vblanks == 3);
+        CHECK(records[2].count == 3 && records[2].frame == 9 && records[2].vblanks == 2 &&
+              HoldsState(&records[2], 303));
+    }
+}
+
+static void TestWriterFlushes(const char *program) {
+    // Every row is in the file as soon as it is written, so that a run that ends abruptly keeps it: a second handle
+    // on the file reads the version line, the header and count 1's row once count 2's first VBlank came
+    char path[512];
+    char line[4096];
+    PbwDigestFrame melon;
+    PbwDigestFrame port;
+    PbwDigestPolygon polygons[2][2];
+    PbwDigestVertex melonVertices[6];
+    PbwDigestWriter writer;
+    FILE *file;
+    FILE *reader;
+    int lines = 0;
+
+    snprintf(path, sizeof(path), "%s.writer.tsv", program);
+    file = fopen(path, "w");
+    CHECK(file != NULL);
+    if (file == NULL) {
+        return;
+    }
+    CHECK(setvbuf(file, NULL, _IOFBF, 1 << 16) == 0);
+    MakeFrames(&melon, &port, 260, polygons, melonVertices);
+    CHECK(pbw_digest_writer_open(&writer, file) == 0);
+    CHECK(pbw_digest_writer_vblank(&writer, 0, 1, &port) == 0);
+    CHECK(pbw_digest_writer_vblank(&writer, 1, 2, &port) == 0);
+    CHECK(pbw_digest_writer_vblank(&writer, 2, 3, &port) == 0);
+    reader = fopen(path, "r");
+    CHECK(reader != NULL);
+    if (reader != NULL) {
+        while (fgets(line, sizeof(line), reader) != NULL) {
+            lines++;
+        }
+        fclose(reader);
+    }
+    CHECK(lines == 3);
+    CHECK(pbw_digest_writer_close(&writer) == 0);
+    fclose(file);
+    remove(path);
+}
+
+int main(int argc, char **argv) {
     TestHash();
     TestRegs2dMasks();
     TestRegs2dFields();
@@ -1522,6 +1794,13 @@ int main(void) {
     TestPaletteAndOam();
     TestRecords();
     TestStreams();
+    TestWriterLastVblank();
+    TestWriterStart();
+    TestWriterCounts();
+    TestWriterInvalid();
+    TestWriterBothShapes();
+    // The file is named after the program, so that the plain and sanitized variants can run at the same time
+    TestWriterFlushes(argc > 0 ? argv[0] : "test_digest");
     if (sFailed != 0) {
         fprintf(stderr, "%d of %d checks failed\n", sFailed, sChecks);
         return 1;
