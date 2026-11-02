@@ -32,11 +32,79 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-11-02: verification v2's canonical digests, without a ROM: ADR 0031 proposed, xxHash vendored
+
+- **Upstream:** `9496bc869b`, unchanged: this change merges no upstream commit. Reviewed main is `d19894b1f7`, PR 69's
+  merge.
+- **Port:** `PORT_SHA`, on the topic branch `port-digest-canonical` from `d19894b1f7`; this entry fills the last
+  entry's `PORT_SHA` with `2f9033d7b8`. Nothing outside `port/` changes.
+- **ROM (T0):** in this branch's new worktree, `python3 configure.py && ninja` at `-j4`, 10,703 steps with no compiler
+  warning: both original US SHA1s match, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. No ROM input changes.
+- **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both games with the verifier's configure flags
+  (`build/port-verify-b2_us`, `build/port-verify-w2_us`; `-DPORT_SANITIZE_RECOVER=OFF
+  -DPORT_FRAME_TIME_REPORT_ONLY=OFF`) pass at `-j4`; the new test programs compile with `-Wall -Wextra -Werror`.
+- **Tests:**
+  - T2/T6: `ctest -LE route` at `-j3` passes in both games, 352 of 359 tests passing and 7 skipping in each, after
+    the fresh builds and again after the last change to the digest's files. The skips are this checkout's optional
+    setups, as in the last entry: `asm_oracle` (no Unicorn in this Python), `oracle_boot`, `oracle_saves` and
+    `oracle_floccesy_save` (no oracle built), the two function-sanitizer negatives of the VM dispatch (Apple's
+    compiler emits no such check) and `app_universal_slices` (one slice). The two tests more than the last entry's
+    are the new `digest_format_plain` and `digest_format_sanitized`, 310 checks each.
+  - Negative controls: 27 mutants of `digest.c`, each with one rule taken out, fail the test, each by 1 to 17 checks,
+    and the unchanged file passes: a mask widened (WININ and WINOUT, the scrolls, MASTER_BRIGHT, DISPCAPCNT,
+    CLEAR_COLOR, FOG_TABLE, VRAMCNT_E, POWCNT1, WRAMCNT, and engine B's DISPCNT in the decode and, apart, in the
+    encoding); BG2's and BG3's X and Y not sign-extended, or decoded without the bits 28-31 melonDS sets; BLDY not
+    clamped; WIN0H and WIN1V split the wrong way; MOSAIC's sizes swapped; the depth kept where W is 0, or computed
+    without melonDS's cut to 32 bits; strips' vertices encoded as indices; a capture of 3D not zeroed, or a stale
+    region encoded; the screens' 8-bit channels or their alpha encoded; absent groups compared; streams whose counts
+    don't rise accepted; the hash seeded.
+  - The vendored header gives xxHash's own XXH3-64 known answers, 17 of them (lengths 0 to 403, seed 0 and seed
+    PRIME64), checked once; the test keeps the 9 with seed 0.
+  - T3, T4, T5 and T7 not run: the digest is wired into neither program, so no replay, oracle sequence, sanitized
+    route or playtest runs anything this change touches.
+- **Tiers/trap stubs:** not measured: no game code changed.
+- **64-bit warnings:** the pointer cast guard passes in both games, and `check_ptrcasts.py --build-dir
+  build/port-verify-b2_us --report` gives 365 sites in 229 keys (real 66, harmless 123, handled 141, unreachable 35),
+  1,711 files compiled and none missing: no change.
+- **Work done:** verification v2's first part, the canonical digests, which need no ROM:
+  - **[ADR 0031](adr/0031-per-game-frame-digests-against-a-content-addressed-oracle-cache.md), proposed:** a digest of
+    the DS's state at each game frame, taken at the last VBlank of each count and compared exactly, with oracle runs in
+    a content-addressed cache outside every checkout and a port-alone `digest_<seq>` test that stops at the first
+    divergence. It writes the design's six open decisions as defaults, each the owner's to confirm: the merge gate
+    stays the full suite on the exact head, with a `pr` preset of port-alone digests in place of the oracle runs once
+    the cache lands; no scheduled runs, the long tiers being on-demand presets named for what they run; the cache in
+    the per-user cache directory, capped at 20 GiB by default, with `oracle.py cache prune`; the `_hashes` references
+    kept as the cold tier; every latent difference declared; the fingerprint files committed. Its index row; the next
+    free number stays 0033.
+  - **`port/tools/oracle/digest.c` and `digest.h`:** the groups that need no game-state probe (each VRAM bank, the
+    VRAM mapping, the palettes, OAM, both engines' 2D registers, POWCNT1 and WRAMCNT, display capture, the 3D render
+    list, the 3D rendering registers, the list's size and overflow, both screens) as structures each program fills
+    from its own model; the port's register bytes decoded as melonDS 1.1's writes store them; the encoding to
+    canonical bytes with melonDS's masks and decodes, the list's vertices dereferenced, the depth the Z-buffer's and 0
+    where W is 0, and the VRAM a capture of 3D holds zeroed; the hash, XXH3-64 with seed 0; the stream,
+    `#pbwdigest 1`, its writer and reader, and a comparison by count for one row per count. The last-VBlank pairing,
+    the lags and the declarations are the next part's.
+  - **xxHash 0.8.3's `xxhash.h`, vendored** as `port/third_party`'s first library, unmodified, with its BSD-2-Clause
+    license and its version, origin (melonDS 1.1's pinned archive) and SHA-256 in
+    [port/third_party/README.md](../third_party/README.md): the convention ADR 0031 proposes for vendored code.
+  - **Tests:** `digest_format_plain` and `digest_format_sanitized` (`port/cmake/oracle.cmake`), which CI runs on
+    every host.
+  - **Documents:** the oracle README's "Digests" (the groups, their canonical bytes, the rules, the stream), the test
+    guide's row, ARCHITECTURE.md's feature map row and `third_party/`, the directory map, the documents' and ADR
+    indexes, the glossary, and the CMake and tools guides.
+- **Next:** verification v2's second part (ADR 0031): `--digest` in both programs, taken at the last VBlank of each
+  count, `compare.py`'s pairing with the sequences' lags and declarations, and the declarations of the opening, the
+  title and aspertia in both versions. Phase 5's story coverage after the Route 20 save stays the phase's earliest
+  unmet exit criterion.
+- **Blockers:** decisions the owner holds: ADRs 0022, 0023, 0025, 0030 and 0031 are proposed, and 0031's six defaults
+  wait for the owner's confirmation. Spanish issue 45 still lacks a local dump.
+
 ## 2026-11-01: pin the verified head and keep the verifier's exit status
 
 - **Upstream:** `9496bc869b`, unchanged: this change merges no upstream commit. Reviewed main is `faad9927e8`, PR 68's
   merge.
-- **Port:** `PORT_SHA`, on the topic branch `port-verify-status-followups` from `e733ccc8a3` (PR 66's merge), with
+- **Port:** `2f9033d7b8`, on the topic branch `port-verify-status-followups` from `e733ccc8a3` (PR 66's merge), with
   reviewed main `faad9927e8` merged in; this entry fills the last entry's `PORT_SHA` with `d0833a7943`.
 - **ROM (T0):** configure and Ninja pass both original US SHA1s with zero compiler warnings: B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, in a full build

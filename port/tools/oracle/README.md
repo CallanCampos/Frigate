@@ -24,6 +24,7 @@ at build time, pinned to a release, and never committed.
 | --- | --- |
 | `oracle.cpp`, `oracle.h`, `platform.cpp`, `symtab.*`, `pngout.*` | `pbw-oracle`, the program on melonDS's core: `oracle.cpp` its options and run, `oracle.h` what melonDS's Platform layer (`platform.cpp`) reports to it, `symtab.*` the decomp's symbols for its memory dumps, `pngout.*` the screens' PNG files |
 | `display3d.c`, `display3d.h` | which screens show 3D in a frame, from the display registers; plain C11 |
+| `digest.c`, `digest.h` | the per-game-frame digest's canonical encoding, hash and stream format ([Digests](#digests)); plain C11, which only its tests compile so far |
 | `pbwinput.c`, `pbwinput.h` | the input file reader and writer and the game-frame clock, plain C11, which the port can compile as it is |
 | `oracle.py` | runs the oracle and the port with the repository's defaults; makes the saves the tests start from on the oracle, each from the save before it ([Saves](#saves)); the comparison sequences, the field menu's and its apps' among them, and the sound's comparison; the ctest check |
 | `compare.py` | compares two runs: screens, memory, alignment |
@@ -409,6 +410,64 @@ port frames.
 The screens comparison first says how each stretch of port frames was paired, and after the pairs lists the oracle
 frames whose pictures no port frame shows ([above](#aligning-the-oracle-with-the-port)); `--known-oracle` names those
 that can't have a counterpart, which it leaves out of that check.
+
+## Digests
+
+Verification v2 ([ADR 0031](../../docs/adr/0031-per-game-frame-digests-against-a-content-addressed-oracle-cache.md),
+proposed) holds Frigate to melonDS at every game frame by a digest: one record per value of GFL's frame count, with a
+64-bit hash for each group of the DS's state, each group first put into canonical bytes so that the two programs'
+records are equal exactly when their state is. Its first part is here: the canonical encoding, the hash and the
+stream's format in `digest.c` and `digest.h`, plain C11 that both programs are to compile, tested without a ROM by
+`digest_format_plain` and `digest_format_sanitized`
+([port/tests/oracle/test_digest.c](../../tests/oracle/test_digest.c)). Neither program writes a stream yet: the
+ADR's next part adds `--digest` to both, taken at the last VBlank of each count, and the comparison's pairing.
+
+Each program fills a `PbwDigestFrame` from its own model; `digest.c` decodes, masks, encodes and hashes it. The groups
+and their canonical bytes, with 32-bit words little-endian:
+
+| Group | Canonical bytes | Frigate's source | melonDS's source |
+| --- | --- | --- | --- |
+| `vram.A` to `vram.I` | The bank's bytes, its 16 KiB pages in order (A to D 128 KiB, E 64, F and G 16, H 32, I 16), the region of a bank A to D that holds a capture of 3D ([display3d.h](display3d.h)) zeroed: it holds rasterized pixels, which the 3D groups stand for | `port_vram_bank_page`, a page with no place reading as zeros | `GPU::VRAM` |
+| `vram.map` | 9 words: VRAMCNT_A to VRAMCNT_I with the bits melonDS keeps, `0x9b`, `0x9b`, `0x9f`, `0x9f`, `0x87`, `0x9f`, `0x9f`, `0x83`, `0x83` | `port_vram_vramcnt` | `GPU::VRAMCNT` |
+| `pal`, `oam` | The 2 KiB of standard palettes and the 2 KiB of OAM, engine A's then engine B's, as stored | 0x05000000, 0x07000000 | `GPU::Palette`, `GPU::OAM` |
+| `regs2d.A`, `regs2d.B` | 46 words: DISPCNT (`0xc0b1fff7` of engine B's); BG0CNT to BG3CNT; the scrolls (`0x1ff`); BG2's PA, PB, PC, PD, X, Y and BG3's, X and Y's 28 bits sign-extended from bit 27; WIN0's and WIN1's X1, X2, Y1, Y2 (WINxH and WINxV split as melonDS keeps them); WININ's and WINOUT's bytes (`0x3f`); MOSAIC's BG and OBJ width and height; BLDCNT (`0x3fff`); BLDALPHA (`0x1f1f`); BLDY clamped to 16; MASTER_BRIGHT (`0xc01f`); DISPCAPCNT (`0xef3f1f1f`, 0 for engine B) | `pbw_digest_regs2d_from_io` on the register bytes at 0x04000000 and 0x04001000, decoded as melonDS's writes store them | `GPU2D::Unit`'s fields |
+| `sys` | 2 words: POWCNT1 (`0x820f`), WRAMCNT (2 bits) | `pbw_digest_sys_from_io` | `NDS::PowerControl9`, `NDS::WRAMCnt` |
+| `capture` | 16 words: whether the capture unit ran, then its DISPCAPCNT (`0xef3f1f1f`), engine A's DISPCNT and whether the destination was in the LCDC, all 0 when it didn't run; then, for banks A to D, whether each holds 3D and its region's offset and size, 0 when it holds none | the capture's latch and `display3d.c`'s tracking | the line-96 probe's `PbwCapture` and the oracle's `PbwBanks3d` |
+| `g3d.list` | The polygon count and the closing SWAP_BUFFERS's 2 bits; then each polygon in the order it came: POLYGON_ATTR, TEXIMAGE_PARAM, PLTT_BASE (`0x1fff`), its vertex count and its facing (1 toward the viewer), then its vertices, dereferenced: screen X (9 bits), Y (8 bits), the Z-buffer's depth (24 bits, 0 when W is 0), W (24 bits), red, green and blue (`c * 16 + 15`), S and T (16 bits) | `port_ge_render_list` | the polygon RAM bank the swap closed, each vertex's depth from `pbw_digest_zbuffer_depth(Position[2], Position[3])` |
+| `g3d.regs` | 79 words: DISP3DCNT (`0x4fff`), ALPHA_TEST_REF (`0x1f`), CLEAR_COLOR (`0x3f1fffff`), CLEAR_DEPTH (`0x7fff`), CLRIMAGE_OFFSET, FOG_COLOR (`0x001f7fff`), FOG_OFFSET (`0x7fff`), FOG_TABLE's 32 entries (`0x7f`), TOON_TABLE's 32 and EDGE_COLOR's 8 (`0x7fff`) | `pbw_digest_regs3d_from_io`, the bytes `port_g3d_vblank` latches | `GPU3D`'s registers |
+| `g3d.stats` | 2 words: the list's polygon count, and 1 when polygon RAM overflowed (DISP3DCNT bit 13) | `port_ge_ram_overflow` | `GPU3D::DispCnt` bit 13 |
+| `screen.top`, `screen.bottom` | 256 × 192 pixels row by row, each one's red, green and blue as the DS's 6 bits, a byte each: equal exactly when `frames.tsv`'s hashes are | the screens `frames.tsv` hashes | the framebuffer |
+
+The rules that make the two models' state one: every register keeps only the bits the hardware does, and is decoded
+where melonDS keeps a decoded form (the windows split, BLDY clamped, BGxX and BGxY sign-extended), whatever the program
+stored; the render list is in the order its polygons came (melonDS sorts its pointers to them at the swap, Frigate's
+renderer sorts its own), and each polygon's vertices are copied, so that the two programs' sharing of a strip's
+vertices doesn't count; the depth is the Z-buffer's from clip Z and W on both sides, even where the list W-buffers;
+where W is 0, both depths (melonDS's `0x7ffe00`, Frigate's 0) become 0, and X, Y and W are compared as they are. Neither
+the 3D picture, which `oracle_<seq>`'s tolerance holds, nor the registers written in an HBlank, which the screens hold,
+is in a group. Some writes melonDS drops and Frigate keeps: a 2D engine's, but for DISPCNT, DISPCAPCNT and
+MASTER_BRIGHT, while the engine is powered off; the 3D rendering registers' from 0x04000320 (all but DISP3DCNT) while
+the 3D renderer is powered off; and 8-bit stores to BG2's and BG3's affine registers, DISPCAPCNT and MASTER_BRIGHT
+(`GPU2D.cpp`'s `Write8` has no case for them). A game that made one would show in `regs2d` or `g3d.regs`, a difference
+to trace like any other, melonDS being the oracle.
+
+A group's hash is XXH3-64 with seed 0 of its canonical bytes, from the vendored xxHash header
+([port/third_party](../../third_party/README.md)), so that `xxhsum -H3` gives it from a dump of those bytes. A stream,
+`digest.tsv`, is a `#pbwdigest 1` line, a header, and one row per game frame: the count, the program's video frame,
+the number of VBlanks that had the count, then each group's hash as 16 lowercase hex digits, or `-` for a group the
+program doesn't have:
+
+```text
+#pbwdigest 1
+count	frame	vblanks	vram.A	vram.B	...	g3d.stats	screen.top	screen.bottom
+1109	1234	1	9c1f6e0b6c3a1d2e	...
+```
+
+A header names the groups in any order and may leave some out. `pbw_digest_compare_streams` compares two streams
+count by count, each with one row per count in rising order: it compares the groups both rows have, counts the counts
+that only one stream has, and stops at the first count whose groups differ, naming them. Pairing a count's rows where a
+program writes several, the sequences' lags, known differences and clock stretches are the next part's, in
+`compare.py`.
 
 ## Symbols
 
@@ -1232,6 +1291,8 @@ What the port needs to compare itself frame by frame:
 - **The sound** (done: `--sound-trace`, `port/app/sound_trace.c`, and `--audio-dump`, [Sound](#sound)): the sound
   driver's state after each run, which no dump at a VBlank can give the DS's of (the driver's runs fall at other
   moments of the frame on each program), and its samples.
+- **Digests** (the canonical encoding done, [Digests](#digests); the writers not yet): `--digest` in both programs,
+  filling `digest.h`'s structures at the last VBlank of each count, as ADR 0031's next part plans.
 
 ## Known differences from the hardware
 

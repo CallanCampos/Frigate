@@ -168,13 +168,14 @@ asm oracle, each spike, the artwork) lists its files there.
 | `tools/` | The build's generators, the upstream sync, the pointer cast guard, the macOS packaging, the melonDS oracle, the measurement scripts | [tools/README.md](tools/README.md) |
 | `assets/` | Files that aren't code and never game data: Frigate's logo and app icons | [assets/README.md](assets/README.md) |
 | `spikes/` | Phase 0's experiments, frozen; the live code took their answers | [spikes/README.md](spikes/README.md) |
+| `third_party/` | Third-party code Frigate compiles from its own tree, unmodified, each library with its license: xxHash's header, the per-game-frame digest's hash | [third_party/README.md](third_party/README.md) |
 | `docs/` | The plan, the architecture, modding, the status log, the decisions, the research | [docs/README.md](docs/README.md) |
 | [CMakeLists.txt](CMakeLists.txt) | The host build: the decomp's C and `port/` linked into one program | |
 | [CLAUDE.md](CLAUDE.md) | The rules for working on Frigate | |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | External contributions, fork and PR workflow, validation and scope | |
 
-[PLAN.md §4.3](docs/PLAN.md#43-directory-structure) also places `vfs/`, `save/`, `mod/`, `features/`, `net/`, `ui/`,
-`third_party/` and the GPU renderer's `gfx/gpu/` and `gfx/shaders/`, which appear as their phases start. Outside
+[PLAN.md §4.3](docs/PLAN.md#43-directory-structure) also places `vfs/`, `save/`, `mod/`, `features/`, `net/`, `ui/`
+and the GPU renderer's `gfx/gpu/` and `gfx/shaders/`, which appear as their phases start. Outside
 `port/`, Frigate's own files are `.github/README.md` (the repository's landing page), `.github/workflows/port-sync.yml`
 (the hourly upstream PR proposal) and `.github/workflows/port-ci.yml` (the host build and tests, plain and sanitized,
 the macOS distribution build and the sync tooling's tests), plus `.github/CODEOWNERS`, `.github/CONTRIBUTING.md`, the
