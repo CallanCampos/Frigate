@@ -34,23 +34,27 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 ## 2026-11-02: Youngster Terrell's battle held to melonDS up to his AI's first moved decision
 
-- **Upstream:** `41f42ca1af`, unchanged: reviewed main `e936696a97` (PR 71's merge) has it, and this change merges no
+- **Upstream:** `41f42ca1af`, unchanged: reviewed main `c6fcdd3f59` (PR 75's merge) has it, and this change merges no
   upstream commit.
 - **Port:** `PORT_SHA`, on the topic branch `port-terrell-cut`, cut from `36101609ad` (PR 70's merge) and moved on by
   fast-forward, before its first commit, to `c0a7941e4e` (PR 72's merge, which brought PR 73) and then `e936696a97`
-  (PR 71's merge, PR 74's `d1717b68d8` before it). This entry fills the last entry's, the save lab's, `PORT_SHA` with
-  `a9d91adf59`. Nothing outside `port/` changes.
+  (PR 71's merge, PR 74's `d1717b68d8` before it): `d6ef61348a` (the sequence, its test, the documents and this
+  entry), `d577f8f95c` (the review's fixes) and the merge of `main` at `c6fcdd3f59` (PR 75: the documents' follow-ups
+  and their check, in `port/` and two of Frigate's own files under `.github/`), which keeps both new STATUS.md
+  entries, this one first. This entry fills the save lab's `PORT_SHA` with `a9d91adf59` and the documents' (PR 75's)
+  with `7d87f98b8c`. This change touches nothing outside `port/`.
 - **ROM (T0):** `python3 configure.py && ninja` (ninja at `-j4`) passes both original US SHA1s with no compiler
   warning, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`: a full
   build of 14,039 steps on `36101609ad`, 18 steps on `c0a7941e4e`, which compile PR 73's `src/ov129/sp_poke_gimmick.c`
-  again, and on `d6ef61348a` and this head, where Ninja had only its two checks to run. This change adds no ROM input.
+  again, and on `d6ef61348a`, on `d577f8f95c` and on this head, the merge of `c6fcdd3f59`, where Ninja had only its
+  two checks to run. This change adds no ROM input.
 - **Host build (T1):** arm64 macOS RelWithDebInfo oracle builds of both versions (`build/port-oracle`,
   `build/port-oracle-w2`, configured with `-DPORT_BUILD_ORACLE=ON -DPORT_SANITIZE_RECOVER=OFF
   -DPORT_FRAME_TIME_REPORT_ONLY=OFF`, Apple clang, ninja at `-j4`) pass: fresh on `36101609ad` (2,101 steps each),
   with 748 compiler warnings each, all in the decomp's C of `src/` and `lib/`, as on `main`, none in port code; rebuilt
   on `c0a7941e4e`, on `d6ef61348a`, which configures again for `oracle.cmake` and compiles PR 71's
-  `port_test_savelab_layout` with no warning, and on this head, with nothing to rebuild: the review's fixes change
-  Python and documents alone.
+  `port_test_savelab_layout` with no warning, and on `d577f8f95c` and this head, with nothing to rebuild: the
+  review's fixes and PR 75's merge change no C or CMake.
 - **Tests:**
   - T2/T6: `ctest -LE 'route|oracle' --output-on-failure` (`CTEST_PARALLEL_LEVEL=3`) passes in both games on this head:
     358 of 362 tests pass and 4 skip, `asm_oracle` (no Unicorn in this Python), the VM dispatch's two function-sanitizer
@@ -65,20 +69,26 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     and White 2 15 of 15 (the replays with their clean fixtures, `replay_new_game` and its clean fixture in Black 2
     only, the recordings, `replay_starter_save`, the opening's, title's and exit route's `_hashes`, the opening's and
     title's sound hashes, and `smoke_reaches_game_main`).
-  - T4: `ctest -R '^oracle_terrell$' --output-on-failure` passes in both games on `d6ef61348a` and again on this
-    head, which changes the entry's comment and `TERRELL_AI_TIME`'s text, with the same results, after its fixtures
-    `oracle_saves` and `oracle_floccesy_save`, which took their saves from a cache made from empty on `36101609ad`
-    (Black 2's six saves in 27 minutes, White 2's in 23, each save's SHA-1 the one `SAVES` pins in both versions):
-    - Black 2 (294 s on this head, 307 s before): the DS built the file's seeds, `0x5a0af77416c50a14` (start-up, oracle
-      frame 20) and `0x90a2c9bbdca3bd1f` (the battle's, oracle frame 6573); the port exits 0 after 5,491 of 5,491
-      frames; 5,469 of 5,469 frames match (1,536 exact, 3,933 with 3D within the tolerance); 4,002 screens with 3D, 10
-      pixels beyond the pixel tolerance at the median and 80 at most (port frame 2144); at port frames 1116-5491, 13,017
-      dumps of GFL's random state and 4,350 of NNS G3D's state compared, and none differs.
-    - White 2 (309 s, 291 s before): the file's seeds, `0x270fd5258c56ebe3` (oracle frame 20) and `0xc24d726d9d1e7ee1`
+  - T4: `ctest -R '^oracle_terrell$' --output-on-failure` passes in both games on `d6ef61348a` and again on
+    `d577f8f95c`, which changes the entry's comment and `TERRELL_AI_TIME`'s text, with the same results. PR 75's merge
+    changes nothing that `oracle_terrell` runs or compares (24 documents, `port-ci.yml`, the documents check with its
+    allowlist and tests, and two scripts of `port/tools/progress` and `port/tools/research`), so T4 wasn't run again on
+    this head. Each run came after its fixtures `oracle_saves` and `oracle_floccesy_save`, which took their saves from a
+    cache made from empty on `36101609ad` (Black 2's six saves in 27 minutes, White 2's in 23, each save's SHA-1 the one
+    `SAVES` pins in both versions):
+    - Black 2 (294 s on `d577f8f95c`, 307 s on `d6ef61348a`): the DS built the file's seeds, `0x5a0af77416c50a14`
+      (start-up, oracle frame 20) and `0x90a2c9bbdca3bd1f` (the battle's, oracle frame 6573); the port exits 0 after
+      5,491 of 5,491 frames; 5,469 of 5,469 frames match (1,536 exact, 3,933 with 3D within the tolerance); 4,002
+      screens with 3D, 10 pixels beyond the pixel tolerance at the median and 80 at most (port frame 2144); at port
+      frames 1116-5491, 13,017 dumps of GFL's random state and 4,350 of NNS G3D's state compared, and none differs.
+    - White 2 (309 s and 291 s): the file's seeds, `0x270fd5258c56ebe3` (oracle frame 20) and `0xc24d726d9d1e7ee1`
       (oracle frame 6507); the port exits 0 after 5,491 of 5,491 frames; 5,461 of 5,461 frames match (1,538 exact, 3,923
       with 3D within the tolerance); 3,991 screens with 3D, 7 at the median and 54 at most (port frame 1884); 13,017 and
       4,350 dumps compared, and none differs.
   - T5 and T7 not run: no game, platform or app code changed.
+  - The documents check, `python3 port/tools/check_docs.py` (PR 75's), on this head:
+    `check_docs: 98 documents, 1 problem (1 allowed), 0 allowlist rows to fix`, the allowed one a record's table row
+    that its allowlist names.
 - **Tiers/trap stubs:** not measured: no game or host code changed.
 - **64-bit warnings:** the pointer cast guard passes in both games, and `check_ptrcasts.py --build-dir
   build/port-oracle --report` (and `build/port-oracle-w2`) gives 365 sites in 229 keys (real 66, harmless 123, handled
@@ -180,6 +190,154 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 - **Blockers:** ADR 0022, which every `seed` line rests on, is still proposed and waits on the owner. The chained
   battles in Alder's house (Seymour, then Cassie) come with an ADR of their own, which amends ADR 0023 and takes the
   next free number when it is written, when the route reaches them.
+
+## 2026-11-02: PR 74's follow-ups for the documents, and a check of their links and tables in CI
+
+- **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit. Reviewed main is `e936696a97`, PR 71's
+  merge, which this branch merges; it started from `d1717b68d8`, PR 74's.
+- **Port:** `7d87f98b8c`, on the topic branch `port-docs-hygiene-1102` from `d1717b68d8`: `3c7a8f10dd` (the documents
+  check, its tests and its CI steps), `991c2e6725` (the follow-ups, and this entry), `2f9a0dbb11` (the merge of `main`
+  at `e936696a97`, PR 71: the save lab's minter and reader, all in `port/`), `08bfb919e2` (the check's summary in the
+  singular for one document), `1fddd1c0fc` (this record's update after the merge), `a34cc8634a` (the fixes of the
+  review of `1fddd1c0fc`) and the check's note on headings in quotes and lists, with this entry's account of them
+  (below). The merge keeps both new STATUS.md entries, this one first. This entry fills the last entry's, the save
+  lab's, `PORT_SHA` with `a9d91adf59`, and the hygiene's with `6eef75c290`, as PR 71's entry does too. Only `port/`
+  and two of Frigate's own files under `.github/` change: the landing page's one wrapped paragraph and `port-ci.yml`'s
+  two steps.
+- **ROM (T0):** `python3 configure.py && ninja` (`-j4`) in this branch's new worktree, every step run (14,039): both
+  original US SHA1s, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`,
+  with no compiler warning; again on the merge with `main` at `e936696a97` (2 steps, the checks: PR 71's files are all
+  in `port/`), the same SHA1s and no warning, and on the review's fixes and the note after them (2 steps, the checks),
+  the same. This branch's own changes are no ROM input.
+- **Host build (T1):** not run: nothing this branch changes is a host build input. `git diff --stat` against `main`
+  lists Markdown, `port/tools/**` (the documents check and its allowlist, `summarize.py`, `milestones.py`), the tools'
+  tests and `.github/workflows/port-ci.yml`, and no CMake file reads any of them. The exact-head verification
+  (`sync_upstream.sh --verify-pr`) builds both games.
+- **Tests:**
+  - The documents check's tests (`python3 -m unittest discover -s port/tools/tests -p test_check_docs.py`, CI's new
+    step, Python 3.14.6 here, 3.12 in CI): 33 of 33 pass. A clean fixture of every form the check reads passes; each of
+    20 seeded problems is reported with its kind and line; the allowlist's controls fail as they must. Negative
+    controls of the tests themselves: each of 17 mutations of the check in a scratch copy (cells not split in a code
+    span, links read line by line, a line without pipes ending a table, repeated headings unnumbered, stale rows
+    passing, headings in fenced blocks taken for anchors, no outside-repository kind, line anchors unchecked, comments
+    read, reasons not required, ignored files listed, delimiter widths unchecked, the landing page unread, HTML sources
+    and reference definitions unchecked, a source view read as rendered, allowed problems counted by row) fails the
+    tests that hold its rule.
+  - The check on the whole tree (`python3 port/tools/check_docs.py`, CI's other new step): 98 documents after the
+    merge (97 before it; PR 71 adds `port/tools/lab/README.md`), one problem, allowed: `research/platinum-port.md:25`,
+    a record. Against GitHub: the 1,045 anchors that the contents API's HTML gives the headings of all 97 documents on
+    `main` (`d1717b68d8`) are the check's, document for document, and the 234 tables GitHub renders there, with their
+    2,892 rows, are the check's.
+  - Wrapping: each of the 17 documents whose lines this change wraps renders the same as on `main` through GitHub's
+    Markdown API (mode `markdown`, as files render, whitespace runs taken as one), with the same words in the same
+    order.
+  - The sync tooling tests, CI's command (`python3 -m unittest discover -s port/tools/tests -p
+    test_upstream_sync.py`): 64 of 64 pass, before and after the merge, and so do the documents check's 33.
+  - `progress_ownership` (`port/tests/progress/test_ownership.py`, run directly): 11 of 11 pass.
+  - On the review's fixes: the documents check's tests, 43 of 43 (10 new); the sync tooling tests, 64 of 64; the check
+    on the whole tree, 98 documents, one problem, the allowed one. The fixed check and `1fddd1c0fc`'s give the same
+    1,057 anchors, the same table rows and the same problems in every document, so no document changes. Each new
+    table control and anchor is what GitHub's Markdown API rendered for the same text (mode `markdown`, 2026-11-02).
+    Negative controls: each of 18 mutations of the round's rules in a scratch copy (pairs of backslashes skipped as
+    before, every pipe a split, comments read for anchors, repeats numbered per text, escapes dropped before emphasis,
+    entities left, or decoded without their semicolon, unpaired underscores stripped, letter numbers or circled
+    letters dropped, any tag ending a table, an empty list item continuing one, indentation ignored, a code block's
+    lines read as rows, quotes unread, a quote's fences unread or its lines misnumbered, one cell said as "cells")
+    fails the tests that hold its rule.
+  - T2 to T7 not run: no test that CMake registers changes, and no game, host or test-target code; the exact-head
+    verification runs the host tests and the short replays.
+- **Tiers:** `progress.py --rev d1717b68d8`, both versions: 41,017 functions in tier (a), none in (b) or (c), and 2,385
+  veneers (16,906 bytes); code bytes a/b/c B2 3,850,260/0/0, W2 3,850,348/0/0; 168 bytes of data owned by no file per
+  game (`.data` 144, `.bss` 24). Unchanged since the last entry that measured them. Overlay 182's 1,113 functions are
+  all tier (a), and no module has a gap.
+- **Trap stubs:** not measured: no host build ran, and nothing the stubs come from changes (25 function stubs and 1 data
+  placeholder per version on `main`, as the last entries give).
+- **64-bit warnings:** not measured: no host build ran, and nothing the pointer cast guard reads changes (`main`'s 365
+  sites in 229 keys, real 66, harmless 123, handled 141, unreachable 35, as the last entries give).
+- **Work done:** the follow-ups that PR 74 lists for the documents (its entry's Next, its description), each checked
+  against `main` first:
+  - **`milestones.py`'s overlay 36 sets** (`port/tools/research/engine/milestones.py`) name the files of the research's
+    ranges by upstream's names now. Five names were gone from the tree: `fldmmdl_acmd.c`, `fldeff_iaigiri.c`,
+    `fldeff_ochiba.c` and `sodateya.c`, which PR 74 lists, and `ctalkmsgwin.c`, which `12d5b7fa68` registered as
+    `talkmsgwin.c` (a scanner's artifact of the ROM's name). The .text ranges of 2026-10-16's delinks map to today's
+    files: `12d5b7fa68` split `fldmmdl_acmd.c`'s range into four files of code and a data-only one, which `0e2d7f0974`
+    named `field_actor_acmd.c`, `field_actor_movecode.c`, `field_actor_evtype.c`, `field_actor_movecode_pair.c` and
+    `field_actor_movedata.c`; `c13587cf78` named `fldeff_iaigiri.c` `fldeff_cut.c` and `fldeff_ochiba.c`
+    `fldeff_leaves.c`; `96f384ead1` named `sodateya.c` `day_care.c`; and `33a5ba6936` split `scrcmd_field.c`
+    (`scrcmd_pep_quiz.c`, `scrcmd_poke_disp.c`) and the deferred `scrcmd_hidden_hollow.c` (`hidden_hollow_generate.c`).
+    Each file of code goes in its range's set, so that a re-measure files its functions where the research put them:
+    with `main`'s sets 593 functions of 11 files fell to M3, with these 592 are M4's and 1 deferred, and every name in
+    the sets is an overlay 36 file. `coverage.py` and `milestones.py` on `main`'s tree write the same `milestones.txt`
+    with either set, since every milestone's overlays are complete C: no function of any milestone is without C or in an
+    incomplete file.
+  - **sanitizers.md's report lines:** the rows are records and keep their lines. A new subsection, "The reports'
+    lines", with a pointer at the top of "What it found", gives the tree each report's lines are of (the first parent
+    of the commit that wrote its row, but for the field's first survey, upstream's `b62c655bfa`, whose files its scratch
+    merge had) and where the same statements are on `d1717b68d8`. Of the 29 lines it names, each was checked by script:
+    the statement at the report's tree and line is the statement at today's line, its renames named, and the five
+    "under `#else`" are so. Beyond the four PR 74 named (H5, R6, R12, R13), R1, R5, R7, R8, R10 and R14 to R16 have
+    moved too.
+  - **`summarize.py`'s overlay 182 gap rule** is gone (`port/tools/progress/summarize.py`). On `main`'s tree
+    (`progress.py --rev d1717b68d8`) no module has a gap and overlay 182's functions are all tier (a), so no row reaches
+    it: `summarize.py`'s output before and after is the same byte for byte, Black 2's tables (67 lines), its
+    `--all-overlays` table (326 lines) and White 2's (67 lines). It has no tests to update: no test runs it.
+  - **Lines over 120 columns** in living documents, the 54 lines in 19 documents that PR 74 counted: 41 are wrapped,
+    every word kept, in 17 documents, by pushing the overflow into the paragraph's next line at a space outside code
+    spans, link destinations and HTML tags (inside a link's text only where nothing else fits), never letting a moved
+    line start a block. Left as they are: 8 whose single link is longer than the limit (the landing page's three
+    badges, REPOSITORY-POLICY.md's four GitHub documentation links, SYNC.md's link to GitHub's schedule
+    documentation), and the 5 of the spikes (`port/spikes/os-fibers/README.md`, `vram-alias/README.md`), phase 0's
+    experiments, which their guide says are frozen. Records keep theirs: STATUS.md's past entries (33), the research
+    records (228 in `research/` and RESEARCH.md), the accepted ADRs 0001, 0007, 0009, 0017, 0018, 0024, 0026, 0028 and
+    0029 (11), and the proposed ADR 0025 (3), whose text is the owner's to accept.
+  - **The script VM test's name:** port/tests/README.md's `game/` row and port/cmake/README.md's `game.cmake` row no
+    longer name `game_script_vm` and `test_script_vm.c`. Neither CMake file registers such a test (`game.cmake`
+    registers `game_ptrcasts` and `game_ptrcasts_tool`): since PR 42's integration the field script VM's jumps and
+    calls are `integrate_script_offsets` (`port/tests/integrate/script_offsets.c`), which `integrate.cmake` registers
+    and both guides' integrate rows describe; port/cmake/README.md's names it now.
+  - **The documents check** (`3c7a8f10dd`): `port/tools/check_docs.py` and `check_docs_allowlist.tsv`, its tests and
+    CI's two steps in the sync-tooling job, as above; documented in port/tools/README.md, port/tools/tests/README.md
+    and, in one line, port/docs/README.md, where the documents' rules are.
+  - **The review's fixes.** The independent review of `1fddd1c0fc` found no must-fix problem, two should-fix and three
+    minor; each is fixed:
+    - **A pipe after a backslash** stays in its cell: cmark-gfm reads a backslash and the `|` after it as an escaped
+      pipe even when the backslash is itself escaped, so `` `grep 'a\\|b'` ``, the only way to show the pattern
+      `a\|b` in a table's code span, is one cell on GitHub, where the check split it. `split_cells` now splits only at
+      a `|` with no backslash right before it; the docstring, the message and the tools' guide say so.
+    - **Sync PRs:** SYNC.md's "Validate and approve a proposed PR" says that the documents check runs on them, that
+      a sync that renames or removes a file of upstream's that a document links to (its README.md, CONTRIBUTING.md,
+      LICENSE and `docs/`'s guides, 20 links today) fails the `Sync tooling tests` job through the merged tree, and that
+      the link's fix is a native fix the merge carries, named in the sync's PR and entry, or in a record the broken
+      link's fix that records take.
+    - **The check where it read otherwise than GitHub**, none of it in today's documents: headings and ids in HTML
+      comments are no anchors; a heading keeps its escaped characters (`\_` is an underscore) and decodes its entities
+      (`&amp;`), and an underscore without its pair stays; a repeated heading takes the first of -1, -2 and so on that
+      no heading has (Foo, Foo-1, Foo, Foo give `foo-2` and `foo-3`); letter numbers (Ⅻ) and circled or squared
+      letters (Ⓐ) stay in an anchor; a line straight after a table is a row unless it starts one of CommonMark's
+      seven kinds of HTML block, so `<span>x</span>` is a row and `<div>` or a tag alone ends the table; an empty list
+      item ends one too; a line indented four columns past the header row is a code block, which ends the table and
+      whose lines are no stray rows; and a block quote's tables, nested ones too, are checked without their markers.
+      The check still doesn't follow a list's structure, which its docstring says: it reads a table's rows against
+      its header row's indentation. Its docstring also says, from a check against GitHub after the review, that a
+      heading inside a block quote or after a list marker makes an anchor on GitHub that the check doesn't see; no
+      document has one.
+    - **What CI runs:** port/README.md, CONTRIBUTING.md and REPOSITORY-POLICY.md name the documents check among
+      `Frigate CI`'s jobs; CONTRIBUTING.md's "Build and verify" asks for it after a change to a document, as it needs
+      no ROM; GLOSSARY.md defines it.
+    - **Wording:** sanitizers.md's pointer says the statements' lines are those of `d1717b68d8`, not "now"; the check
+      says "1 cell"; `summarize.py`'s docstring says that decomp-progress.md's "lib/dwcutilui (+ likely the 56,640 B
+      ov182 gap)" row came from the overlay 182 rule this PR removes.
+- **Next:** the next task is as the last entries give it: L2's stations (PR 71's entry), and Phase 5's story coverage
+  past the Route 20 save. The documents' follow-ups left: the guides that still say the owner approves every sync PR
+  (port/CLAUDE.md, CONTRIBUTING.md, SYNC.md, PLAN.md, README.md and `upstream_sync.py`'s warning), for the owner's
+  wording of the delegation; `research/platinum-port.md:25`, a record whose code span's pipes split its row, the check's
+  one allowed problem; `include/field/field_effect.h:146`'s comment, which names `FesKiraTask`, for the next change that
+  touches `include/` anyway, since a game header's change needs its MWCC-neutral proof; `summarize.py`'s overlay 11
+  gap rule, which no gap reaches either now; and the documents check's anchors for headings inside block quotes and
+  list items, which GitHub makes and the check doesn't see yet.
+- **Blockers:** none for this change. Decisions the owner holds: ADRs 0022, 0025, 0030 and 0031 are proposed; the
+  guides' wording of the delegation; whether escaping a record's pipes is a fix a record may take; and whether
+  documents get a line limit, which no rule names, so that the check would hold it.
 
 ## 2026-11-02: the save lab's minter and reader (L1)
 

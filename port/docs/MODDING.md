@@ -12,15 +12,15 @@ Two limits shape everything below:
   interchange with melonDS. Phase 5 now follows the real field scripts through Alder's Route 19 introduction and
   both Floccesy Town scenes to a Route 20 save. The same route runs under ASan/UBSan with recovery off; its expected
   story flags, position, party and other save contents agree with the DS except the traced play-time/CRC bytes.
-  [STATUS.md](STATUS.md) records exact validation, and [the oracle guide](../tools/oracle/README.md#floccesy-and-route-20)
-  explains the checks. Trainer AI's CPU-deadline difference remains, and oracle routes part there
+  [STATUS.md](STATUS.md) records exact validation, and
+  [the oracle guide](../tools/oracle/README.md#floccesy-and-route-20) explains the checks. Trainer AI's CPU-deadline
+  difference remains, and oracle routes part there
   ([ADR 0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md), accepted). From the Route 20 save,
   Youngster Terrell's trainer battle is held to melonDS up to its cut, the last frame before his AI's first decision
   shows, a decision the DS's CPU time moves ([the oracle guide](../tools/oracle/README.md#route-20-youngster-terrell));
   nothing holds the port past that cut yet, and Lass Isabel's battle, further east on Route 20, is the next mandatory
-  one.
-  Floccesy Ranch and later story, optional features and multiplayer still need verification or implementation under
-  [PLAN.md](PLAN.md). Source coverage and remaining native SDK traps are separate measures.
+  one. Floccesy Ranch and later story, optional features and multiplayer still need verification or implementation
+  under [PLAN.md](PLAN.md). Source coverage and remaining native SDK traps are separate measures.
 - **Frigate reads the game's data from the player's ROM, and checks it.** By default it accepts a US dump of the
   version it was built for, by its SHA-1 or by every NitroFS file's ([../hal/rom/port_rom.h](../hal/rom/port_rom.h)),
   so a patched ROM is refused. Changing data files (text, species, trainers, maps) needs the layered file system of

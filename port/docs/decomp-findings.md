@@ -120,7 +120,8 @@ Strict LLVM UBSan on the native early Hugh route stopped after 3,809 frames in
 difference. The host now uses a `BOOL(u32)` wrapper with an explicit `(u16)` argument, preserving the low-half tile
 class that the caller already passes. The original DS tokens stay under `#else`; no sanitizer check is disabled.
 Both-version MWCC tokens match `f786fed` (2/2). Replaying the same Hugh input and seed passes this earlier stop at
-3,809 frames, then stops at frame 3,873 on a separate typed-context mismatch in `VM_Run`; both complete six-case strict batches now pass.
+3,809 frames, then stops at frame 3,873 on a separate typed-context mismatch in `VM_Run`; both complete six-case strict
+batches now pass.
 
 ## Field VM's erased context callback type (R13)
 
@@ -144,13 +145,15 @@ The narrow host fix waits while owners are still alive, then releases them, in b
 the original DS order under `#else` and changes no hardware FIFO timing, sound data, poisoning or check coverage.
 Actual SDK heap/list functions with a mock queued command verify ownership during the wait and zero-callback
 behavior: all four new cases pass. With isolated old `f786fed` SDK source and the same driver/list implementation,
-both callback cases fail and both zero-callback cases pass. Both-version MWCC neutrality and both complete strict native replay batches now pass.
+both callback cases fail and both zero-callback cases pass. Both-version MWCC neutrality and both complete strict native
+replay batches now pass.
 
 The remaining H8 host failure was traced separately: the packet-first sound service invalidated an active PCM
 voice after `ExChannelMain` had already queued `SND7_SYNC_START`. The subsequent register update stopped and then
 restarted it from the disposed range. Invalidation now cancels that pending start as well as the existing start
 flag and hardware stop. Other pending updates and voices outside the range are preserved; no FIFO timing or wave
-snapshots change. The new strict audio regression and seven existing fidelity scenarios pass; both full strict route batches pass.
+snapshots change. The new strict audio regression and seven existing fidelity scenarios pass; both full strict route
+batches pass.
 
 ## Encounter callback prototypes (R14)
 
@@ -178,7 +181,8 @@ Both strict PC routes stop at frame 6,120 in `Box2Obj_UpdateRangeDots` (`src/ov2
 starts with all four coordinates zero, so its perimeter is zero even while hidden; its animation divisor is
 initialized to 384. MSL's DS `_s32_div_f` returns a zero remainder for a zero divisor, but host C modulo zero
 is undefined and x86 faults. The host now explicitly gives zero position for that perimeter, preserving all
-nonzero arithmetic and the original DS expression. Both full strict/oracle PC routes and both-version ROM neutrality pass.
+nonzero arithmetic and the original DS expression. Both full strict/oracle PC routes and both-version ROM neutrality
+pass.
 
 ### PC save repeatability within the tested route
 
