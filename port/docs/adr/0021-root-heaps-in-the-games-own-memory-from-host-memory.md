@@ -1,6 +1,6 @@
 # 0021: Root heaps in the game's own memory get host memory
 
-- **Status:** proposed
+- **Status:** accepted: the developer merged PR 18, which brought it (merge commit `1c5f322b71`)
 - **Date:** 2026-10-23
 - **Plan:** D5, §4.5 (heaps), §4.8 (rule 7: buffers sized for 4-byte pointers are sized from the real structs)
 - **Upstream:** `0a12a2bd3e` (merge of PR #480)
