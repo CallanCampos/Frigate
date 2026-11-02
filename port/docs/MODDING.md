@@ -137,7 +137,13 @@ which of these it was:
   ([../CLAUDE.md](../CLAUDE.md#code-that-isnt-c-yet)).
 - **The game stopped itself (status 71, 74).** `OS_Terminate` (71) or a reset, `OS_ResetSystem` (74), which Frigate
   can't do in place yet. Status 71 also comes from a DMA call that the host's card never makes
-  (`port: dma: MIi_CardDmaCopy32 was called`), a Frigate bug.
+  (`port: dma: MIi_CardDmaCopy32 was called`), a Frigate bug. One of the game's heaps out of room stops it here too,
+  as on the DS: the backtrace shows `GFL_HeapAllocate` and what asked for the block, once GFL's heap check has gone on,
+  which calls MSL's `exit`, the one that only notes a failure ([../hal/msl/exit_host.c](../hal/msl/exit_host.c)). One
+  cause on a host is a work that holds pointers allocated with the DS's size, whose writes past its block break the
+  heap's lists, as in Castelia City's café, where the special Pokémon gimmick's did
+  ([game-changes.md](game-changes.md)): the sanitized build names such a write ([sanitizers.md](sanitizers.md)).
+  `--heap-scale-root` and `--heap-scale-child` give the heaps more room, which helps only when the heap is really full.
 - **A check of the platform layer failed (an abort: SIGABRT, or status 3 on Windows).** A message such as
   `port: os: ...`, `port: fiber: ...` or `port: PXI: ...` before it: something the platform layer relies on didn't hold.
   That is a Frigate bug; report it with the message and how to get there (an input file, `--input`, makes it
