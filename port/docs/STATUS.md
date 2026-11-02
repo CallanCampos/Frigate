@@ -32,11 +32,132 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-11-02: Youngster Terrell's battle held to melonDS up to his AI's first moved decision
+
+- **Upstream:** `41f42ca1af`, unchanged: reviewed main `e936696a97` (PR 71's merge) has it, and this change merges no
+  upstream commit.
+- **Port:** `PORT_SHA`, on the topic branch `port-terrell-cut`, cut from `36101609ad` (PR 70's merge) and moved on by
+  fast-forward, before its first commit, to `c0a7941e4e` (PR 72's merge, which brought PR 73) and then `e936696a97`
+  (PR 71's merge, PR 74's `d1717b68d8` before it). This entry fills the last entry's, the save lab's, `PORT_SHA` with
+  `a9d91adf59`. Nothing outside `port/` changes.
+- **ROM (T0):** `python3 configure.py && ninja` (ninja at `-j4`) passes both original US SHA1s with no compiler
+  warning, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`: a full
+  build of 14,039 steps on `36101609ad`, 18 steps on `c0a7941e4e`, which compile PR 73's `src/ov129/sp_poke_gimmick.c`
+  again, and on this branch's head, where Ninja had only its two checks to run. This change adds no ROM input.
+- **Host build (T1):** arm64 macOS RelWithDebInfo oracle builds of both versions (`build/port-oracle`,
+  `build/port-oracle-w2`, configured with `-DPORT_BUILD_ORACLE=ON -DPORT_SANITIZE_RECOVER=OFF
+  -DPORT_FRAME_TIME_REPORT_ONLY=OFF`, Apple clang, ninja at `-j4`) pass: fresh on `36101609ad` (2,101 steps each),
+  with 748 compiler warnings each, all in the decomp's C of `src/` and `lib/`, as on `main`, none in port code; rebuilt
+  on `c0a7941e4e` and on this head, which configures again for `oracle.cmake` and compiles PR 71's
+  `port_test_savelab_layout` with no warning.
+- **Tests:**
+  - T2/T6: `ctest -LE 'route|oracle' --output-on-failure` (`CTEST_PARALLEL_LEVEL=3`) passes in both games on this
+    head: 358 of 362 tests pass, `oracle_compare` (59 tests, the new one among them) and `game_ptrcasts` among them,
+    and 4 skip: `asm_oracle` (no Unicorn in this Python), the VM dispatch's two function-sanitizer negatives (Apple's
+    compiler emits no such check) and `app_universal_slices` (one slice).
+  - T3: `ctest -L route -LE 'oracle|timing' --output-on-failure` passes in both games on this head, Black 2 17 of 17
+    and White 2 15 of 15 (the replays with their clean fixtures, `replay_new_game` and its clean fixture in Black 2
+    only, the recordings, `replay_starter_save`, the opening's, title's and exit route's `_hashes`, the opening's and
+    title's sound hashes, and `smoke_reaches_game_main`).
+  - T4: `ctest -R '^oracle_terrell$' --output-on-failure` passes in both games on this head, after its fixtures
+    `oracle_saves` and `oracle_floccesy_save`, which took their saves from a cache made from empty on `36101609ad`
+    (Black 2's six saves in 27 minutes, White 2's in 23, each save's SHA-1 the one `SAVES` pins in both versions):
+    - Black 2 (307 s): the DS built the file's seeds, `0x5a0af77416c50a14` (start-up, oracle frame 20) and
+      `0x90a2c9bbdca3bd1f` (the battle's, oracle frame 6573); the port exits 0 after 5,491 of 5,491 frames; 5,469 of
+      5,469 frames match (1,536 exact, 3,933 with 3D within the tolerance); 4,002 screens with 3D, 10 pixels beyond
+      the pixel tolerance at the median and 80 at most (port frame 2144); at port frames 1116-5491, 13,017 dumps of
+      GFL's random state and 4,350 of NNS G3D's state compared, and none differs.
+    - White 2 (291 s): the file's seeds, `0x270fd5258c56ebe3` (oracle frame 20) and `0xc24d726d9d1e7ee1` (oracle
+      frame 6507); the port exits 0 after 5,491 of 5,491 frames; 5,461 of 5,461 frames match (1,538 exact, 3,923
+      with 3D within the tolerance); 3,991 screens with 3D, 7 at the median and 54 at most (port frame 1884); 13,017
+      and 4,350 dumps compared, and none differs.
+  - T5 and T7 not run: no game, platform or app code changed.
+- **Tiers/trap stubs:** not measured: no game or host code changed.
+- **64-bit warnings:** the pointer cast guard passes in both games, and `check_ptrcasts.py --build-dir
+  build/port-oracle --report` (and `build/port-oracle-w2`) gives 365 sites in 229 keys (real 66, harmless 123, handled
+  141, unreachable 35), 1,713 files, none not compiled: the last entry's.
+- **Work done:** phase 5's second story leg, its first piece: `terrell`, Youngster Terrell's trainer battle on Route
+  20, held to melonDS frame by frame in both versions up to the last frame before his AI's first decision shows, a
+  decision the DS's CPU time moves ([ADR 0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md), accepted
+  in PR 70):
+  - **[port/tests/oracle/terrell_b2_us.pbwinput](../tests/oracle/terrell_b2_us.pbwinput) and `terrell_w2_us`:** from
+    the Route 20 save, floccesy_continue's first eight presses (the title and CONTINUE), RIGHT from count 3800 to 4060,
+    11 tiles from (130,661) into Terrell's sight (npc 7 of `res/field/events/route_20.json`, at (141,664) facing up,
+    sight 3), so he stops the player at (141,661), then A every 16 counts for his eye event, his line, the battle's
+    opening, FIGHT and Tackle, to `5488 A`: 189 press lines, the same in both versions, the clock pinned, and the two
+    seeds the DS builds there. `oracle.py seeds terrell` (11,500 oracle frames) printed exactly two in each version:
+    GFL's at start-up (oracle frame 20) and the battle's, Black 2 `0x90a2c9bbdca3bd1f` at oracle frame 6573 and White
+    2 `0xc24d726d9d1e7ee1` at 6507, both at count 4469; run again on the final files, the same two, in order.
+  - **[port/tools/oracle/oracle.py](../tools/oracle/oracle.py):** `SEQUENCES["terrell"]`, 5,491 port frames and
+    7,700 of the oracle's, the game's state with GFL's random state compared at port frames 1116-5491 (oracle frames
+    2800-7700), from `floccesy_save`; two new causes, `TERRELL_AI_TIME` and `MOVE_MENU_TORN`; the docstring's lists
+    name `floccesy_save`, the floccesy round trip and phase 5's three sequences.
+  - **The cut.** The provisional entry ran 9,000 port frames and 11,500 of the oracle's with nothing declared, and
+    failed as expected: Black 2 matched 6,717 of 9,000 frames, with 5,027 of 23,655 random-state dumps and 1,151 of
+    7,885 NNS G3D dumps differing, White 2 6,909, with 3,451 and 1,101. In both versions the first frame that anything
+    drawn from the AI's numbers changes is port frame 5492 (count 5489): the second line of the top screen's message,
+    the foe's move, Leer on the port and Tackle on melonDS (new differing pixels at x 8-13, y 170-180). Before it only
+    the declared frames differ, and 3D edges within the tolerance; NNS G3D's state parts at count 5515, with the
+    move's animation. So the sequence ends at port frame 5491 (count 5488) in both versions, and its files keep no
+    press after it.
+  - **The trace** ([decomp-findings.md](decomp-findings.md) has (a) to (d) for each version): the port's side with a
+    scratch log of `GFL_RandomMT`'s callers and of the AI's passes under `PLATFORM_PC`, in a trace worktree whose
+    edits were never committed and whose link map no oracle run used; the DS's with `TrAIContext` and its VM found in
+    one main-RAM dump by their fields (Black 2 `0x022623a8`, White 2 `0x022623e8`) and dumped at every frame. No
+    debugger. The setup's five draws come on the same pass on both programs (Black 2's count 5171, White 2's 5167).
+    The port thinks in the next pass and never suspends; the DS suspends four times, after Tackle's script's read,
+    after the damage command, after the first ability guess, which reads Tepig's personal data, and after Leer's
+    script's read, and picks four passes later, so for four counts the port's twister index is 5 to 9 ahead. Both
+    score Tackle and Leer 100 and 100; the port picks Leer with index 53 (White 2 49), the DS Tackle with 61 (57).
+    The guesses that differ change no score and no draw, and no blink check of the window draws a blink. Not
+    measured: why the DS's first two passes take three and two video frames (contention with the battle view's own
+    card reads is plausible), and the third stop's cause, which the personal-data cache's species changing in that
+    pass shows without timing it.
+  - **Declared, each traced:** the title's and CONTINUE's frames, floccesy_continue's from the same save and presses;
+    the move menu's pass once Tackle is chosen (count 5262: port frame 5265; the DS's second frames, Black 2's oracle
+    frame 7410 and White 2's 7346, which is torn at line 34/35, `MOVE_MENU_TORN`); 11 frames of the DS's long passes
+    in the state and 7 in the random state alone (`MID_PASS`), each found equal to a later DS frame of the same count
+    by a scratch state diff (Black 2's 3432 to oracle frame 5417, of the pass's 5386-5424; 5265 to 7410); and the AI's
+    four counts in the random state alone (`TERRELL_AI_TIME`, Black 2's port frames 5175-5178, White 2's 5171-5174).
+    Nothing past the cut is declared.
+  - **[port/cmake/oracle.cmake](../cmake/oracle.cmake):** `oracle_terrell`, labeled `route` and `oracle`, requires
+    `oracle_floccesy_save`'s fixture, with an hour's timeout; the header comments name phase 5's story.
+  - **[port/tests/oracle/test_compare.py](../tests/oracle/test_compare.py):** `test_terrell_holds_route_20_to_the_cut`
+    holds the entry to its save, its state and no stop, `port_frames` within the state's frames, both files to
+    `pbwinput 1`, their version, the pinned clock, exactly two seeds of which the first is the version's pinned-clock
+    start-up seed, catch_continue's first eight presses, no press past the cut and the same presses in both versions,
+    and `known_random` to `TERRELL_AI_TIME` and `MID_PASS` within the state's frames. Thirteen scratch mutations of
+    the entry and the files (another save, no random state, a stop, a third seed, another first seed, no pinned clock,
+    a press past the cut, `AI_TIME` for Terrell's window, among them) each make it fail.
+  - **A save past the battle, made locally and not committed** (ADR 0023's next step): an uncommitted
+    `SaveMaker(11500, start="floccesy_save")` played drafts that extend the cut files (A every 16 counts to the
+    battle's end, B through the scene, then the field menu's SAVE) on melonDS, twice in each version, with the same
+    SHA-1 each time: Black 2 `173dfc278835b926a9524f45315e08be7022decb`, White 2
+    `56cb06c080e36497bd7ad36218f96e5c4aad179b`. Read back with a scratch reader, both battles were won and saved:
+    `ZONE_ROUTE_20` (446) at (141,661) facing down, `EVENT_FLAG_TRAINER_YOUNGSTER_TERRELL` (0x694) set, work 0x40a3
+    and 0x40a5 at 2, 64 more money (3,564), Tepig at level 7 and Purrloin, both alive; `saveimage.validate_image`
+    finds no problem, and the main save's two copies are equal. The saves, drafts and runs stayed on this machine, and
+    the saves and runs were deleted once read.
+  - **Documents:** the oracle README's section "Route 20: Youngster Terrell" with its checks (no save or round trip
+    holds the port past the cut yet), its results rows, the sequences' count (fifteen files, sixteen sequences, stale
+    since floccesy), Terrell's facts in the AI's budget, the move menu's torn frame and the long passes' counts;
+    decomp-findings.md's trace; `oracle_terrell` in the tests README and in ARCHITECTURE.md's battles row; MODDING.md
+    and README.md (coverage reaches Terrell's first moved decision, and Lass Isabel's battle is the next mandatory
+    one); GLOSSARY.md's "Cut", a row of its own, and "Round trip" without it; lessons.md (placing the DS's AI stops
+    from its context, and a pass's torn second frame).
+- **Next:** PR 2, T-a: compare the party and the game's records decrypted past a cut, declaring only the traced fields
+  of a Pokémon that fought past it and traced record counters; then `terrell_save` and its round trip, and Lass
+  Isabel's battle from that save. The ranch's lost Pokémon is a Herdier (`res/field/scripts/floccesy_ranch_2.s`:189,
+  244), not the Lillipup that earlier entries name.
+- **Blockers:** ADR 0022, which every `seed` line rests on, is still proposed and waits on the owner. The chained
+  battles in Alder's house (Seymour, then Cassie) come with an ADR of their own (0033, to amend ADR 0023) when the
+  route reaches them.
+
 ## 2026-11-02: the save lab's minter and reader (L1)
 
 - **Upstream:** `41f42ca1af`, as reviewed main `d1717b68d8` (PR 74's merge) has it: PR 67's sync brought it to main
   while this change was in review, and this change merges no upstream commit of its own.
-- **Port:** `PORT_SHA`, on the topic branch `port-save-lab-core` from `d19894b1f7` (PR 69's merge). Reviewed main was
+- **Port:** `a9d91adf59`, on the topic branch `port-save-lab-core` from `d19894b1f7` (PR 69's merge). Reviewed main was
   merged in five times, STATUS.md's new entries kept each time with this one first: `10d017c010` once PR 67 had
   landed, `36101609ad` once PR 70 had (`95f1d692cf`, documents only), `806b2a8f9d` once PR 73 had (`49ad7dd00a`: the
   café's fix, with `src/ov129/sp_poke_gimmick.c`, MSL's exit and `gen_stubs.py`), `c0a7941e4e` once PR 72 had

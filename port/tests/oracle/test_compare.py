@@ -1504,6 +1504,44 @@ class OracleScriptTests(unittest.TestCase):
                              oracle.ROUND_TRIPS["floccesy"].known[version]),
                              [(offset, offset) for offset in sorted(protected)])
 
+    def test_terrell_holds_route_20_to_the_cut(self):
+        # Terrell's piece continues the Route 20 save to its cut (ADR 0023) and stops on no trap: the port runs no press
+        # past the cut, every frame it runs has its state compared, GFL's random state among it, and the random state
+        # it leaves out is only the DS's long passes and the AI's passes, within the frames compared. Both versions'
+        # files play the same presses, CONTINUE's as catch_continue's start, and give the two seeds the DS builds:
+        # GFL's at start-up with the clock pinned (README.md, "Random seeds") and the battle's
+        sequence = oracle.SEQUENCES["terrell"]
+        self.assertEqual(sequence.save, "floccesy_save")
+        self.assertEqual(sequence.state, oracle.STATE + oracle.RANDOM_STATE)
+        self.assertFalse(sequence.stop_from or sequence.stop_trap or sequence.stop)
+        state_frames = set(compare.parse_frames(sequence.state_frames))
+        self.assertIn(sequence.port_frames, state_frames)
+        start_seeds = {"b2_us": 0x5a0af77416c50a14, "w2_us": 0x270fd5258c56ebe3}
+        presses = {}
+        for version, start_seed in start_seeds.items():
+            def path(name):
+                return os.path.join(oracle.REPO_ROOT, oracle.SEQUENCE_INPUT.format(name=name, version=version))
+
+            lines = oracle.input_lines(path("terrell"))
+            header = [line for line in lines if not line.split()[0].isdigit()]
+            self.assertEqual(header[0], "pbwinput 1", version)
+            self.assertIn(f"version {version}", header)
+            self.assertIn("clock pinned", header, version)
+            seeds = oracle.input_seeds(path("terrell"))
+            self.assertEqual(len(seeds), 2, version)
+            self.assertEqual(seeds[0], start_seed, version)
+            frames = [line for line in lines if line.split()[0].isdigit()]
+            continued = [line for line in oracle.input_lines(path("catch_continue")) if line.split()[0].isdigit()]
+            self.assertEqual(frames[:8], continued[:8], version)
+            self.assertLessEqual(int(frames[-1].split()[0]), sequence.port_frames, version)
+            presses[version] = frames
+            known = oracle.by_frame(sequence.known_random.get(version, {}))
+            self.assertIn(oracle.TERRELL_AI_TIME, known.values(), version)
+            for frame, why in known.items():
+                self.assertIn(why, (oracle.TERRELL_AI_TIME, oracle.MID_PASS), (version, frame))
+                self.assertIn(frame, state_frames, (version, frame))
+        self.assertEqual(presses["b2_us"], presses["w2_us"])
+
     def test_save_differences(self):
         # The spans where two saves differ, bytes 8 or less apart joined
         a = bytes(64)
