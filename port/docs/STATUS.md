@@ -34,11 +34,13 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 ## 2026-11-02: the save lab's minter and reader (L1)
 
-- **Upstream:** `41f42ca1af`, which PR 67's sync brought to main while this change was in review; this change merges no
-  upstream commit of its own. Reviewed main is `10d017c010`, PR 67's merge.
-- **Port:** `PORT_SHA`, on the topic branch `port-save-lab-core` from `d19894b1f7` (PR 69's merge), with reviewed main
-  `10d017c010` merged in; this entry fills the last entry's `PORT_SHA` with `f53e767509`. PR 69's entry has
-  `2f9033d7b8`, as this branch and PR 67 both filled it. Nothing outside `port/` changes.
+- **Upstream:** `41f42ca1af`, as reviewed main `36101609ad` (PR 70's merge) has it: PR 67's sync brought it to main
+  while this change was in review, and this change merges no upstream commit of its own.
+- **Port:** `PORT_SHA`, on the topic branch `port-save-lab-core` from `d19894b1f7` (PR 69's merge). Reviewed main was
+  merged in twice: `10d017c010` once PR 67 had landed, then `36101609ad` once PR 70 had (documents only; STATUS.md's
+  two new entries are both kept, this one first). This entry fills the last entry's, ADR 0023's, `PORT_SHA` with
+  `cfb45c1be4`; the sync's entry has `f53e767509`, as this branch and PR 70 both filled it, and PR 69's has
+  `2f9033d7b8`. Nothing outside `port/` changes.
 - **ROM (T0):** configure and Ninja (`-j4`) pass both original US SHA1s with zero compiler warnings: in a full build
   (10,703 steps) of the branch's base, again on its first two commits, and in a full build (12,555 steps) after merging
   main at `10d017c010`: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
@@ -118,6 +120,82 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   coverage continues past the Route 20 save as the earlier entries say.
 - **Blockers:** none for this change. The design's decisions for the owner (the stations as a breadth spine beside the
   story's, continue at a spawn as the placement, the sweep's tier and the rest) come with L2 and ADR 0032.
+
+## 2026-11-01: ADR 0023 accepted under the owner's Ship of Harkinian rule
+
+- **Upstream:** `41f42ca1af`, as reviewed main `10d017c010` (PR 67's merge) has it. This branch takes upstream's
+  commits only through its merges of reviewed main and imports none of its own.
+- **Port:** `cfb45c1be4`, on `port-adr0023-accepted` from reviewed main `e733ccc8a3`. Reviewed main was merged in
+  twice: `d19894b1f7` once PRs 68 and 69 had landed, then `10d017c010` once PR 67 had. This entry fills the last
+  entry's `PORT_SHA` with `f53e767509`. This branch's own changes are documentation only, all of it in `port/docs/`.
+  The merges bring:
+  - PR 68's Markdown;
+  - PR 69's verifier changes (`sync_upstream.sh`, `check_mwcc_neutral.py` and their tests);
+  - PR 67's sync of 276 upstream commits.
+- **ROM (T0):** a fresh `python3 configure.py && ninja` in this branch's new worktree, 10,703 steps with no compiler
+  warning: both original US SHA1s match, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. The same commands ran again after the review's corrections and after
+  each merge of reviewed main. No run gave a warning, and both SHA1s match every time.
+  - After the first merge, ninja had nothing to rebuild.
+  - After the second merge, which brings PR 67's upstream sync, ninja ran 12,555 steps.
+
+  This branch changes no ROM input; the second merge brings the sync's.
+- **Host build (T1):** before each push, on arm64 macOS in this branch's worktree, with the commands of
+  `port/tools/sync_upstream.sh --verify-pr`: `cmake --fresh -S port -B build/port-verify-VERSION -G Ninja
+  -DCMAKE_BUILD_TYPE=RelWithDebInfo -DPORT_VERSION=VERSION -DPORT_SANITIZE_RECOVER=OFF
+  -DPORT_FRAME_TIME_REPORT_ONLY=OFF`, then `cmake --build build/port-verify-VERSION --parallel`. Both builds, `b2_us`
+  and `w2_us`, pass on the first head and after each merge.
+- **Tests (T2–T7):** `ctest --test-dir build/port-verify-VERSION --output-on-failure --no-tests=error`, in the same
+  builds. No run has a failure in either version.
+
+  | Tree | `b2_us` (of 398) | `w2_us` (of 395) |
+  | --- | --- | --- |
+  | First head | 369 pass, 29 skip, 512 s | 365 pass, 30 skip, 1,024 s |
+  | After the first merge | 369 pass, 29 skip, 618 s | 366 pass, 29 skip, 681 s |
+  | After the second merge, with `10d017c010` | 368 pass, 30 skip, 1,588 s | 366 pass, 29 skip, 447 s |
+
+  - Among the passes are the short replay and save routes (T3) and the save round trips and ROM dump checks (T6).
+  - The skips are by design:
+    - 24 of the `oracle_*` tests and `frame_times_party_menus`, which need the melonDS oracle that only
+      `-DPORT_BUILD_ORACLE=ON` builds (T4 not run);
+    - `asm_oracle`, since Unicorn isn't installed for this checkout's Python;
+    - `app_universal_slices`, since an arm64-only program has one slice;
+    - the two `integrate_vm_dispatch_*` negatives, which Apple clang skips;
+    - `frame_times_title`, twice, while other sessions' builds held the load average above the 8 cores. Its title
+      scene's 95th percentile was over the 8.36 ms budget, so it skipped rather than failed:
+      - in `w2_us` on the first head: 10.01 ms, at a load of 34.76;
+      - in `b2_us` after the second merge: 15.00 ms, at a load of 38.77.
+
+      It passes in the other runs.
+  - The merges bring PR 69's verifier changes, so their tests ran after each merge too:
+    `python3 -m unittest discover -s port/tools/tests -p test_upstream_sync.py` ran 60 tests, OK.
+  - T5 (sanitizers) and T7 (playtests) were not run: nightly and milestone levels, for a documentation-only change.
+- **Tiers and trap stubs:** unchanged by this documentation change; not remeasured.
+- **64-bit warnings:** `port/tools/check_ptrcasts.py --build-dir build/port-verify-b2_us --report`: 365 sites in 229
+  keys (real 66, harmless 123, handled 141, unreachable 35), 1,711 files, 0 not compiled, the same as the last entry,
+  so the real sites are not above it. `game_ptrcasts` passes in both versions.
+- **Work done:** the owner settled [ADR 0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md) by a rule
+  on 2026-11-01: if Ship of Harkinian doesn't match the original console's RNG, Frigate can accept the ADR; if it
+  does, Frigate should fix its own difference too. A research agent and an independent adversarial check read Ship of
+  Harkinian, libultraship, the Ocarina of Time and Majora's Mask decomps and gz at pinned commits: Ship of Harkinian
+  reproduces neither the N64's random numbers nor its timing (about 98% confidence). It reseeds at every scene load
+  from the PC's steady clock, makes its random floats the GameCube way even from an N64 ROM, and runs a fixed lockstep
+  loop with none of the console's lag; its tracker and code say so, and a draft pull request's TAS tools would inject
+  recorded console seeds.
+  - [research/ship-of-harkinian-rng.md](research/ship-of-harkinian-rng.md) records the question, the answer, the
+    evidence with links to the lines read, and what it means for Frigate, with its rows in the research and
+    documents indexes. A review before publishing corrected it against the same sources: Darunia's dance fix is on
+    by default, gz's audio hook derives its number from the game's main random state, and SoH's savestates restore
+    the audio generator's state; the frog minigame issue's hedge, the 2S2H reading's scope and the commits read are
+    stated as they are.
+  - ADR 0023's status line says accepted, with a dated note that links the research, and its index row says so;
+    MODDING.md and decomp-findings.md no longer call it proposed. The ADR's body is unchanged. Past STATUS entries and
+    ADRs 0028 and 0029, which are records, keep the words of their time.
+- **Next:** publish this branch as a topic PR. Before the protected merge come the exact-head local verification
+  from a clean worktree and the required hosted checks; as an owner-authored PR, it can merge under the owner's
+  review-only exception. Phase 5's story routes then go on, each trainer battle cut where ADR 0023 says.
+- **Blockers:** none for this change. Broader serial/CPU timing and later story coverage remain unfinished; Spanish
+  issue 45 still lacks a local dump.
 
 ## 2026-11-01: resolve the 276-commit naming sync's conflicts (PR 67)
 
