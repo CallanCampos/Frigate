@@ -7,7 +7,7 @@ built on them. -->
 - **Status:** proposed
 - **Date:** 2026-11-02
 - **Plan:** §6 (verification: T3, T4 the oracle, T5) and §7 (phase 5)
-- **Upstream:** `41f42ca1af`, as Frigate's `main` (`e936696a97`) has it
+- **Upstream:** `41f42ca1af`, as Frigate's `main` (`c6fcdd3f59`) has it
 - **Note (2026-11-02):** drafted from the save lab's design of 2026-11-01 and its prototype, both outside the
   repository. PR 71 (L1) committed the minter and reader (`port/tools/lab/savelab.py`), and the pull request that
   proposes this ADR (L2) the stations and the first one, Floccesy Ranch's gate, in both games. It stays proposed until
