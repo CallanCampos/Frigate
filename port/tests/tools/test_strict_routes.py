@@ -15,8 +15,8 @@ on the port's legs of its round trips, each from the save it starts from, judged
     frames line after a time prefix; a hang past --timeout, killed; a crash by a signal), the saves (a missing one skips
     with the command that makes it, one changed byte fails with both SHA-1s, a make leg's save reaches its continue leg,
     a make leg that saves nothing fails and skips its continue leg), the build's checks (made-up CMake caches, Apple
-    clang, a program without ASan, a program without the function check), the program's environment, the summary table
-    and the directories' names. The markers are held to port/CMakeLists.txt's.
+    clang, a program without ASan, a program without the function check, a build directory given relative), the
+    program's environment, the summary table and the directories' names. The markers are held to port/CMakeLists.txt's.
   - With a stand-in for ctest (another script, which lists the made-up build's route tests from its routes.txt and
     writes ctest's JUnit file for them): ctest's half runs first with the criterion's options, its failures, skips and
     a build without route tests count, and --only selects ctest's tests apart from the cases.
@@ -78,6 +78,11 @@ MARKERS = ("==1==ERROR: " + "AddressSanitizer: heap-use-after-free on address 0x
            "==1==Leak" + "Sanitizer has encountered a fatal error")
 
 arguments = sys.argv[1:]
+# The program's path as the runner gave it, which must name the program from the directory the run starts in, as an
+# executable's path must
+if "--standin-program" in arguments and not os.path.exists(arguments[arguments.index("--standin-program") + 1]):
+    print("standin: no program at that path from here", file=sys.stderr)
+    sys.exit(127)
 if "--help" not in arguments:
     # First, so that a run killed at once has left it
     with open("pid.txt", "w") as f:
@@ -352,12 +357,14 @@ class World(unittest.TestCase):
         for name, version in references:
             (self.inputs / f"{name}_{version}.tsv").write_text("port\toracle\n", encoding="utf-8")
 
-    def run_runner(self, *arguments: str, program=None, environment=None, real_compiler=False) -> tuple[int, str]:
-        """strict_routes.py run on the made-up build, in this process: its status and what it printed. program gives
-        the command that starts the program (the stand-in by default); ctest is always its stand-in"""
-        argv = ["run", "--build-dir", str(self.build), "--rom", str(self.rom), "--work", str(self.work),
+    def run_runner(self, *arguments: str, program=None, environment=None, real_compiler=False,
+                   build_dir=None) -> tuple[int, str]:
+        """strict_routes.py run on the made-up build (build_dir, by default its whole path), in this process: its status
+        and what it printed. program gives the command that starts the program (the stand-in by default, which, like an
+        executable, must find the program's path from the directory it starts in); ctest is always its stand-in"""
+        argv = ["run", "--build-dir", build_dir or str(self.build), "--rom", str(self.rom), "--work", str(self.work),
                 "--save-cache", str(self.cache), "--summary", str(self.root / "summary.tsv"), *arguments]
-        start = program or (lambda path: [sys.executable, str(self.standin)])
+        start = program or (lambda path: [sys.executable, str(self.standin), "--standin-program", path])
 
         def launcher(path: str) -> list[str]:
             return [sys.executable, str(self.standin_ctest)] if path == str(self.ctest) else start(path)
@@ -644,6 +651,16 @@ class BuildTests(World):
         self.assertEqual(status, 0)
         self.assertIn("the criterion: no: the program has no function check", printed)
 
+    def test_a_relative_build_directory(self):
+        # As T5's commands give it, from the checkout's root: each case and ctest's half run in directories of their
+        # own, from which the program and the build must still be found
+        self.addCleanup(os.chdir, os.getcwd())
+        os.chdir(self.root)
+        status, _ = self.run_runner(build_dir="build")
+        self.assertEqual(status, 0)
+        rows = self.summary()
+        self.assertEqual((rows["seq:clean"]["verdict"], rows["ctest:replay_clean"]["verdict"]), ("clean", "clean"))
+
     def test_another_build_type_isnt_the_criterion(self):
         self.write_cache({"CMAKE_BUILD_TYPE": "Debug"})
         status, printed = self.run_runner()
@@ -857,6 +874,8 @@ MUTANTS = (
      ("CtestTests.test_a_skipped_route_is_a_gap",)),
     ("ctest's half not run", "    if tests or whole:\n", "    if False:\n",
      ("CtestTests.test_the_routes_run_first_with_the_criterions_options",)),
+    ("the build directory left relative", "    directory = os.path.abspath(directory)\n", "",
+     ("BuildTests.test_a_relative_build_directory",)),
 )
 
 

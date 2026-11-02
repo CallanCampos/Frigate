@@ -400,7 +400,8 @@ def classify_compiler(text: str) -> str:
 
 def inspect_build(directory: str, allow_apple_clang: bool) -> Build:
     """The strict build in directory, checked (a Refusal when it isn't one this runner runs), with what makes a run of
-    it not the criterion's"""
+    it not the criterion's. Its directory and program are whole paths, since each case runs in a directory of its own"""
+    directory = os.path.abspath(directory)
     cache = read_cache(directory)
     home = cache.get("CMAKE_HOME_DIRECTORY", "")
     port = os.path.join(oracle.REPO_ROOT, "port")
@@ -902,15 +903,15 @@ def command_run(args, launcher=None) -> int:
     if reason:
         print(f"strict_routes: skipped: {reason}")
         return oracle.SKIP
-    work = os.path.abspath(args.work or os.path.join(args.build_dir, "strict-routes"))
-    binary = os.path.join(args.build_dir, "oracle", "pbw-oracle")
+    work = os.path.abspath(args.work or os.path.join(build.directory, "strict-routes"))
+    binary = os.path.join(build.directory, "oracle", "pbw-oracle")
     settings = Settings(command, os.path.abspath(rom), oracle.rom_game_code(rom),
-                        os.path.abspath(args.save_cache or os.path.join(args.build_dir, "oracle-saves")), work,
+                        os.path.abspath(args.save_cache or os.path.join(build.directory, "oracle-saves")), work,
                         args.watchdog, args.timeout, environment, args.keep,
                         binary if os.path.exists(binary) else "PBW_ORACLE", ctest)
     os.makedirs(work, exist_ok=True)
     began = time.monotonic()
-    print(f"strict_routes: {GAMES[build.version]} ({build.version}), the build {os.path.abspath(build.directory)}")
+    print(f"strict_routes: {GAMES[build.version]} ({build.version}), the build {build.directory}")
     print(f"  program: {build.program}")
     print(f"  compiler: {build.compiler}")
     print(f"  build type: {build.build_type or 'none'}")
