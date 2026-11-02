@@ -591,7 +591,7 @@ that bank in VRAM display mode (`bottom_3d` is 1; the top screen, engine B's log
 
 ## The comparison sequences
 
-Twelve input files on game frames for each version, `port/tests/oracle/<name>_<version>.pbwinput`, played by thirteen
+Fifteen input files on game frames for each version, `port/tests/oracle/<name>_<version>.pbwinput`, played by sixteen
 sequences, compared with `--align counter`, the movies by their pictures (`oracle.py`'s `SEQUENCES` says how):
 
 - **opening**: nothing pressed. Power-on, the boot screens, the Game Freak logo and the whole opening, the title and
@@ -718,7 +718,8 @@ start from a save, which leaves other bytes after the copyright screen's file on
 ([below](#known-differences-from-the-hardware)), so they don't hold those frames close.
 
 Each is two ctest tests, but sequences that start from a save (continue, continue_starter, field_menus, party_menus,
-phase 4's route, pc, floccesy and floccesy_continue), whose saves only the oracle can make, have only the first:
+phase 4's route, pc, floccesy, floccesy_continue and terrell), whose saves only the oracle can make, have only the
+first:
 
 - `oracle_<name>` (`oracle.py sequence NAME --port BIN`), with the oracle built: runs both programs and compares every
   port frame but the known differences ([below](#known-differences-from-the-hardware)): where the game counts passes,
@@ -747,7 +748,7 @@ phase 4's route, pc, floccesy and floccesy_continue), whose saves only the oracl
 
 Results, every port frame but the known differences:
 
-| Sequence | Port frames | Match | Exact | 3D within the tolerance | Known differences | Game state equal: NNS_G3dGlb (and, in phase 4's route, GFL's random state) |
+| Sequence | Port frames | Match | Exact | 3D within the tolerance | Known differences | Game state equal: NNS_G3dGlb (and, from phase 4's route on, GFL's random state) |
 | --- | --- | --- | --- | --- | --- | --- |
 | opening, Black 2 | 3,800 | 3,800 | 3,526 | 274 | none | 274 of 274 |
 | opening, White 2 | 3,800 | 3,800 | 3,526 | 274 | oracle frame 1283 | 274 of 274 |
@@ -775,6 +776,8 @@ Results, every port frame but the known differences:
 | center_continue, White 2 | 3,610 | 3,581 | 1,486 | 2,095 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | 2,474 of 2,474, 21 left out; 2,474 of 2,474, 21 left out |
 | pc, Black 2 | 11,600 | 11,003 | 4,941 | 6,062 | the title's 21 port frames, the wipes' 3, the zoom into the Pokémon Center's 86, the PC's windows' 10, the log-off's 2, the save's 385, the globe's 90, oracle frames 4920, the zoom's 79, 8795 | 10,369 of 10,369, 116 left out; 9,912 of 9,912, 573 left out |
 | pc, White 2 | 11,600 | 10,926 | 4,937 | 5,989 | the title's 28 port frames and 3402, the wipes' 4, the zoom's 86, the PC's windows' 10, the save's 385, the globe's 160, oracle frames 1260, 4852, the zoom's 80, the PC's windows' 5 | 10,369 of 10,369, 116 left out; 9,884 of 9,884, 601 left out |
+| terrell, Black 2 | 5,491 | 5,469 | 1,536 | 3,933 | the title's 21 port frames, the move menu's 1, oracle frames 4920, 7410 | 4,350 of 4,350, 26 left out; 4,339 of 4,339, 37 left out |
+| terrell, White 2 | 5,491 | 5,461 | 1,538 | 3,923 | the title's 28 port frames and 3402, the move menu's 1, oracle frames 1260, 4852, 7346 | 4,350 of 4,350, 26 left out; 4,339 of 4,339, 37 left out |
 
 Each comparison's summary gives its screens with 3D, compared by their pictures, and their pixels beyond the pixel
 tolerance at the median and at most: 5 to 18 at the median by sequence and version, 0 in the exit route, and in
@@ -873,6 +876,47 @@ python3 port/tools/oracle/oracle.py round-trip floccesy --port build/port-oracle
 ```
 
 Use `--version w2_us` with the White 2 binary for the other game. Both need the oracle built and the user's ROM.
+
+### Route 20: Youngster Terrell
+
+Phase 5's second story leg goes on from the Route 20 save in pieces, each held to melonDS up to a cut ([ADR
+0023](../../docs/adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md)). Its first, `terrell`, continues
+`floccesy_save` with floccesy_continue's first eight presses, the title's and CONTINUE's, into the field, then walks
+east along z = 661, 11 tiles from (130,661), into Youngster Terrell's sight: npc 7 of `res/field/events/route_20.json`,
+at (141,664) facing up with a sight of 3, stops the player at (141,661). His eye event
+(`res/field/scripts/global_3000.s`), his line and his trainer battle follow, Tepig against his level 4 Patrat
+(`res/trainers/data/youngster_terrell.json`: `AI_FLAG_BASIC`, and no moves of its own, so Patrat knows the moves its
+learnset gives by level 4, Tackle and Leer, `res/pokemon/patrat/data.json`), with A every 16 counts for his line, the
+battle's opening, FIGHT and Tackle. Tepig, at level 6, is the faster and moves first. The sequence ends at the cut,
+count 5488 (port frame 5491; the oracle runs 7,700 frames), the last before the foe's move shows in the message:
+Terrell's AI thinks in one pass on the port and in five on the DS, and so picks with another of the twister's numbers,
+Leer on the port and Tackle on the DS, which the message shows from count 5489 in both versions ([Known
+differences](#known-differences-from-the-hardware): a budget of the CPU's time a pass;
+[decomp-findings.md](../../docs/decomp-findings.md) has the trace). The two versions' files make the same presses and
+give the two seeds the DS builds there: GFL's at start-up with the clock pinned, and the battle's at count 4469 (Black 2
+`0x90a2c9bbdca3bd1f` at oracle frame 6573, White 2 `0xc24d726d9d1e7ee1` at 6507).
+
+| Check | Input and scope |
+| --- | --- |
+| `oracle_terrell` / `sequence terrell` | `terrell_<version>.pbwinput`, from `floccesy_save` (the `oracle_floccesy_save` fixture): every port frame through 5,491 and the oracle's through 7,700, with screens, NNS G3D and GFL's random state, to the cut |
+| No save or round trip yet | Nothing holds the port past the cut yet: `SAVES` keeps no save made after the battle, and no round trip plays the rest of the battle on the port and holds its save to melonDS's. Until a later piece adds them, the battle past the cut is the port's own |
+
+Its known differences are floccesy_continue's for the title and CONTINUE, from the same save and presses, but at port
+frame 3432, a DS pass of several frames, where floccesy_continue leaves out the whole state and terrell GFL's random
+state alone, NNS G3D's having been found equal there; the pass that takes the move menu down once Tackle is chosen
+(count 5262: port frame 5265, and the pass's second frame on the DS, oracle frame 7410 in Black 2 and 7346 in White 2,
+where it is torn, `MOVE_MENU_TORN`); the DS's long passes in the game's state (`MID_PASS`: 11 port frames whose state is
+left out and 7 whose random state alone is, each checked against a later DS frame of the same count); and the AI's four
+passes in GFL's random state alone (`TERRELL_AI_TIME`, Black 2's port frames 5175-5178, White 2's 5171-5174). Nothing
+past the cut is declared. The comparison sequences' table has the results.
+
+```sh
+python3 port/tools/oracle/oracle.py sequence terrell --port build/port-oracle/frigate-black2 \
+    --version b2_us --save-cache build/port-oracle/oracle-saves
+```
+
+Use `--version w2_us` with the White 2 binary for the other game; `ctest -R '^oracle_terrell$'` runs the sequence
+after the saves it starts from. Both need the oracle built and the user's ROM.
 
 ## Saves
 
@@ -1379,8 +1423,11 @@ failure to fix, never a known difference. By kind:
   - and a DS pass of two frames whose picture changes between them, which the count pairs by its first: after a move
     is chosen the move menu goes away on the bottom screen, and the DS's first frame shows it partway (the moves'
     names cleared, their buttons still there) and its second the port's picture of that count, its 3D within the
-    tolerance (hugh's port frames 7591 and 8167, route19's 10274; the second frames, oracle frames 9742 and 10331,
-    12714 in Black 2 and 9679, 10268 and 12659 in White 2, show no picture the check of missing pictures can pair).
+    tolerance (hugh's port frames 7591 and 8167, route19's 10274 and terrell's 5265; their second frames, oracle frames
+    9742, 10331, 12714 and 7410 in Black 2 and 9679, 10268, 12659 and 7346 in White 2, show no picture the check of
+    missing pictures can pair). In White 2's terrell that second frame is torn as well (`MOVE_MENU_TORN`): the pass
+    takes the buttons down while the beam draws its bottom screen, which is the first frame's down to line 34, the
+    buttons' top edge still there (22 pixels), and the port's picture from line 35.
     The PC's windows are the same kind with longer passes (`PC_WINDOW`): the DS's pass that closes its first menu for
     Someone's PC, shows the storage system's menu and shows it again after each app of the PC Box, moves the cursor
     down it with the message under it, shows the first menu again after B, or redraws the deposit screen's top screen
@@ -1503,7 +1550,8 @@ failure to fix, never a known difference. By kind:
   season's name, the field and each map, a battle's scenes), the game's state at its first frame, which the comparison
   pairs with the port's frame on the count, is the pass's work in progress, NNS G3D's or GFL's random state while the
   pass draws; at its later frames it is the port's. In the exit route these are 14 frames in each version (`MID_PASS`),
-  and in phase 4's route 8 to 62 a sequence, each checked against the DS's later frames of the same count.
+  in phase 4's route 8 to 62 a sequence and in phase 5's story 5 to 33 (terrell's 18, 7 of them in GFL's random state
+  alone), each checked against the DS's later frames of the same count.
 - **A budget of the CPU's time a pass.** The trainers' AI runs its scripts for at most 500 ticks of `OS_GetTick` a pass,
   about a millisecond, and goes on where it stopped at the next (`TRAI_TIME_LIMIT`, `TrAI_RunScripts` in
   `src/ov170/tr_ai.c`). On the DS the scripts take the CPU's time; on the port each `OS_GetTick` moves the virtual clock
@@ -1516,9 +1564,19 @@ failure to fix, never a known difference. By kind:
   Black 2's counts 7500-7501 and 7969-7970, White 2's 7496-7497 and 7969-7970). So the DS's AI picks with another of the
   twister's numbers than the port's. Oshawott's first pick is the same move by chance, its second another, and from that
   turn's rolls (count 8193) the battle parts from melonDS's, where the sequence ends
-  ([../../docs/decomp-findings.md](../../docs/decomp-findings.md)). No host has the DS's time, so a trainer battle is
-  held to melonDS only while the AI thinks within a pass there: a sequence stops before the AI's first decision that the
-  DS's time moves, and the route goes on from melonDS's save made after the battle ([ADR
+  ([../../docs/decomp-findings.md](../../docs/decomp-findings.md)). Youngster Terrell's first decision on Route 20 (the
+  terrell sequence) parts the same way over more passes, alike in both versions: his AI sets up his turn with five draws
+  on the same pass on both programs (Black 2's count 5171, White 2's 5167), the port runs his one script
+  (`AI_FLAG_BASIC`'s) for each of his two moves and picks in the next pass, and the DS's AI runs out of its 500 ticks
+  four times and picks four passes later. Dumps of its context place each stop: after the script is read from the card
+  for Tackle's run, after the damage command, after the first ability guess, which reads Tepig's personal data, and
+  after the script is read again for Leer's run, work that the port's virtual clock gives no time. For those four passes
+  the port's twister index is 5 to 9 ahead (`TERRELL_AI_TIME`: Black 2's counts 5172-5175, White 2's 5168-5171). The six
+  ability guesses and the pick take other numbers: the port picks Leer, the DS Tackle, and no blink check of those
+  passes draws a blink on either program; the move's name in the message shows it from count 5489 in both versions, so
+  the sequence ends at 5488. No host has the DS's time, so a trainer battle is held to melonDS only while the AI thinks
+  within a pass there: a sequence stops before the AI's first decision that the DS's time moves, and the route goes on
+  from melonDS's save made after the battle ([ADR
   0023](../../docs/adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md)). A wild Pokémon has no AI scripts (no
   AI flags, `GetClientAIFlags` in `src/ov167/btl_main.c`) and picks at once.
 - **Random numbers.** GFL seeds its random numbers from a hash that includes a buffer the DS's stack fills
