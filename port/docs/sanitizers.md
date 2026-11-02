@@ -172,7 +172,7 @@ The build also leaves out:
 ## What it found
 
 Each table below gives a report's site as the report gave it, at the line of the tree it ran on;
-[the reports' lines](#the-reports-lines) names that tree, and where the same statements are now.
+[the reports' lines](#the-reports-lines) names that tree, and where the same statements are on `d1717b68d8`.
 
 The survey of 2026-10-18 (port/docs/STATUS.md) ran the strict build, which stops at the first report, under Apple's
 clang on every route of both versions (Black 2's 24, and White 2's 20 but the two that need its starter save, which

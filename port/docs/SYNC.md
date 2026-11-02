@@ -122,6 +122,14 @@ sanitizer ignorelist holds, so also look in `port/` for the names the sync remov
 C's identifiers at the two upstream commits), and in decomp-findings.md and game-changes.md for the files it
 completes; the follow-up that brings them up to date says what upstream now calls them ([lessons.md](lessons.md)).
 
+CI's `Sync tooling tests` job also runs the documents check ([../tools/check_docs.py](../tools/check_docs.py)) on every
+PR, sync PRs included. Frigate's documents (the landing page, port/README.md, MODDING.md and docs/README.md among
+them) link to files that upstream owns: its root README.md, CONTRIBUTING.md and LICENSE, and `docs/`'s guides. A sync
+that renames or removes one of those files, or a heading that a link names, fails that job although the sync tooling
+is fine: the merged tree has a broken link. The link's fix is a native fix that the merged tree needs, which the merge
+carries ([below](#a-sync-merge-carries-only-the-sync)), and the sync's PR and STATUS.md entry name it with the upstream
+commit that forced it; a link in a record gets the broken link's fix that records take ([below](#records-are-added-to)).
+
 When all four required checks pass on an up-to-date branch, approve contributor/bot PRs and merge using **Create a
 merge commit**. No auto-merge is enabled. The owner-authored exception is review-only; it still requires the PR,
 checks and resolved conversations. Do not bypass review on a bot sync merely to speed it up.

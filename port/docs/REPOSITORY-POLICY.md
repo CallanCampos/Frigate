@@ -30,7 +30,8 @@ Required checks (names are a compatibility interface):
 - `Compile src/ and lib/`: every decomp C file compiled and library assembly source assembled for both versions
   without ROMs.
 - `Code standards`: inherited decomp style and consistency checks.
-- `Frigate CI`: aggregate that succeeds only when every native build/test group and sync tooling tests succeed.
+- `Frigate CI`: aggregate that succeeds only when every native build/test group, the sync tooling tests and the
+  documents check succeed.
 - `Frigate local verification`: both local ROM SHA1s and native host build/tests on the exact PR head.
 
 The three Actions checks are bound to the GitHub Actions integration (`15368`), but a required check name does not

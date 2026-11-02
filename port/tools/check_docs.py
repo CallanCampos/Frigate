@@ -17,23 +17,31 @@ whole tree. It prints each problem as DOCUMENT:LINE: KIND: what is wrong, the ki
                       from the repository's root, as GitHub reads it;
   outside-repository  a relative link that climbs out of the repository;
   missing-anchor      a link's #fragment that is neither a heading's anchor in its Markdown target, by GitHub's rule
-                      (the heading's text, lowercased, without the characters that aren't letters, marks, digits, _, -
-                      or spaces, and its spaces made hyphens; a repeated one gets -1, -2 and so on), nor an HTML id or
-                      name there; or a fragment on another file (or on a Markdown file shown as source, ?plain=1) that
-                      isn't one of GitHub's line anchors, #L10 or #L10-L20;
+                      (the heading's text as it renders, entities decoded and escaped characters kept, lowercased,
+                      without what isn't a letter, a mark, a digit, a letter number such as Ⅻ, a circled or squared
+                      letter, _, - or a space, and its spaces made hyphens; a heading whose anchor an earlier one has
+                      gets the first of -1, -2 and so on that none has), nor an HTML id or name there; or a fragment
+                      on another file (or on a Markdown file shown as source, ?plain=1) that isn't one of GitHub's line
+                      anchors, #L10 or #L10-L20;
   missing-line        such a line anchor past the end of its file;
   row-cells           a table row with another number of cells than the table's header. GitHub splits a cell at every
-                      | that isn't escaped as \\|, in a code span too, drops the cells past the header's number and
-                      makes up the missing ones empty; a line straight after a table, without the blank line that ends
-                      it, is one of its rows;
+                      | that has no backslash right before it, in a code span too (so \\| keeps its pipe in the cell,
+                      and so does \\\\|, after an escaped backslash), drops the cells past the header's number and
+                      makes up the missing ones empty. A line straight after a table, without the blank line that
+                      ends it, is one of its rows, unless it starts another block: a heading, a list item, a quote, a
+                      fence, a thematic break, an HTML block (a line of inline HTML, such as <span>x</span>, is a row)
+                      or a code block, indented four columns past the table's header row;
   delimiter-cells     a header row and the delimiter row under it (| --- | --- |) with different numbers of cells,
                       where GitHub shows no table at all;
   stray-row           a line that starts and ends with | outside any table: a row that a blank line cut off from the
                       table above it, or one with no header and delimiter row.
 
 Links and rows in fenced code blocks, code spans and HTML comments are left alone, as GitHub doesn't render them, and so
-are links with a scheme (https:, mailto:). A link's text may run over several lines, as wrapped prose has it. No
-document rule names a line length, so lines aren't measured.
+are headings and HTML ids in fenced blocks and comments, and links with a scheme (https:, mailto:). A block quote's
+tables are checked as the quote shows them, its > markers taken off. A link's text may run over several lines, as
+wrapped prose has it. The check doesn't follow a list's structure: it reads a table's rows, and the code block that
+ends one, against the indentation of the table's header row. No document rule names a line length, so lines aren't
+measured.
 
 The allowlist (check_docs_allowlist.tsv, next to this script; --allowlist FILE for another) names the problems that a
 document must keep, each with its reason: a record, which is added to and never rewritten
@@ -67,13 +75,35 @@ ATX_HEADING = re.compile(r"^ {0,3}(#{1,6})(?:[ \t]+(.*?))?(?:[ \t]+#+)?[ \t]*$")
 SETEXT_UNDERLINE = re.compile(r"^ {0,3}(?:=+|-+)[ \t]*$")
 HTML_HEADING = re.compile(r"^ {0,3}<h([1-6])(?:\s[^>]*)?>", re.IGNORECASE)
 DELIMITER_ROW = re.compile(r"^\s*\|?\s*:?-+:?\s*(?:\|\s*:?-+:?\s*)*\|?\s*$")
-# What ends a table besides a blank line: a heading, a list item, a quote, a fence, a thematic break, an HTML block
-BLOCK_START = re.compile(r"^\s*(?:#{1,6}(?:\s|$)|[-+*]\s|\d{1,9}[.)]\s|>|`{3,}|~{3,}|(?:[-*_]\s*){3,}$|<[A-Za-z!/])")
+# The lines that open an HTML block, CommonMark's seven kinds as GitHub's cmark-gfm has them: <script, <pre, <style or
+# <textarea; a comment; <?; a declaration; CDATA; a block-level tag, opening or closing; and a whole tag, opening or
+# closing, alone on its line. A line that only starts with inline HTML (<span>x</span>) opens none.
+HTML_BLOCK_TAGS = ("address|article|aside|base|basefont|blockquote|body|caption|center|col|colgroup|dd|details|dialog|"
+                   "dir|div|dl|dt|fieldset|figcaption|figure|footer|form|frame|frameset|h[1-6]|head|header|hr|html|"
+                   "iframe|legend|li|link|main|menu|menuitem|nav|noframes|ol|optgroup|option|p|param|section|source|"
+                   "summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul")
+HTML_ATTRIBUTE = r"""\s+[A-Za-z_:][A-Za-z0-9_.:-]*(?:\s*=\s*(?:[^\s"'=<>`]+|'[^']*'|"[^"]*"))?"""
+HTML_BLOCK = (r"<(?:script|pre|style|textarea)(?:\s|>|$)|<!--|<\?|<![A-Za-z]|<!\[CDATA\["
+              rf"|</?(?:{HTML_BLOCK_TAGS})(?:\s|/?>|$)"
+              rf"|(?:<[A-Za-z][A-Za-z0-9-]*(?:{HTML_ATTRIBUTE})*\s*/?>|</[A-Za-z][A-Za-z0-9-]*\s*>)\s*$")
+# What ends a table besides a blank line, and starts no paragraph: a heading, a list item (an empty one too), a quote, a
+# fence, a thematic break, an HTML block
+BLOCK_START = re.compile(r"^\s*(?:#{1,6}(?:\s|$)|[-+*](?:\s|$)|\d{1,9}[.)](?:\s|$)|>|`{3,}|~{3,}|(?:[-*_]\s*){3,}$"
+                         rf"|(?i:{HTML_BLOCK}))")
+QUOTE_MARKER = re.compile(r"^ {0,3}> ?")
 REFERENCE_DEFINITION = re.compile(r"^ {0,3}\[[^\]]+\]:[ \t]*(<[^>\n]*>|\S+)", re.MULTILINE)
 HTML_LINK = re.compile(r"""\b(?:href|src)\s*=\s*(?:"([^"]*)"|'([^']*)')""", re.IGNORECASE)
 HTML_ID = re.compile(r"""\b(?:id|name)\s*=\s*(?:"([^"]*)"|'([^']*)')""", re.IGNORECASE)
 LINE_ANCHOR = re.compile(r"^L(\d+)(?:-L(\d+))?$")
 SCHEME = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
+# An entity that CommonMark decodes: a decimal or hexadecimal reference, or a name, each with its semicolon
+ENTITY = re.compile(r"&(?:#[0-9]{1,7}|#[xX][0-9A-Fa-f]{1,6}|[A-Za-z][A-Za-z0-9]{1,31});")
+# Underscores that GitHub renders as emphasis: a run that opens at no letter or digit before it and a run as long that
+# closes at none after it, around text that neither starts nor ends with a space. One without its pair stays text.
+UNDERSCORE_EMPHASIS = re.compile(r"(?<![^\W_])(_+)(?!\s)(.+?)(?<!\s)\1(?![^\W_])")
+# The symbols that Unicode counts as letters (Other_Alphabetic), which GitHub keeps in an anchor: the circled and
+# squared Latin letters (Ⓐ, 🄰, 🅐, 🅰)
+ALPHABETIC_SYMBOLS = ((0x24B6, 0x24E9), (0x1F130, 0x1F149), (0x1F150, 0x1F169), (0x1F170, 0x1F189))
 
 
 @dataclass
@@ -203,22 +233,24 @@ def opens_link(text: str, close: int) -> bool:
 
 
 def heading_text(source: str) -> str:
-    """A heading's text as GitHub renders it, for its anchor: code spans' contents, links' and HTML's text, with the
-    marks of emphasis and escapes gone."""
-    spans = []
+    """A heading's text as GitHub renders it, for its anchor: code spans' contents, links' and HTML's text, entities
+    decoded, without the marks of emphasis, and escaped characters kept as text, so that \\_ is an underscore."""
+    literals = []
 
-    def keep(match):
-        spans.append(match.group(2).strip())
-        return f"\0{len(spans) - 1}\0"
+    def literal(text):
+        literals.append(text)
+        return f"\0{len(literals) - 1}\0"
 
-    text = re.sub(r"(`+)(.+?)(?<!`)\1(?!`)", keep, source)
+    text = re.sub(r"(`+)(.+?)(?<!`)\1(?!`)", lambda m: literal(m.group(2).strip()), source)
     text = re.sub(r"!\[[^\]]*\]\([^)]*\)", "", text)
     text = re.sub(r"\[([^\]]*)\](?:\([^)]*\)|\[[^\]]*\])", r"\1", text)
     text = re.sub(r"<[^>]+>", "", text)
-    text = re.sub(r"\\([!-/:-@\[-`{-~])", r"\1", text)
+    text = re.sub(r"\\([!-/:-@\[-`{-~])", lambda m: literal(m.group(1)), text)
+    text = ENTITY.sub(lambda m: literal(html.unescape(m.group(0))), text)
     text = text.replace("*", "")
-    text = re.sub(r"(?<![^\W_])_+|_+(?![^\W_])", "", text)
-    return re.sub(r"\0(\d+)\0", lambda m: spans[int(m.group(1))], text).strip()
+    while UNDERSCORE_EMPHASIS.search(text):
+        text = UNDERSCORE_EMPHASIS.sub(r"\2", text)
+    return re.sub(r"\0(\d+)\0", lambda m: literals[int(m.group(1))], text).strip()
 
 
 def slug(heading: str) -> str:
@@ -228,11 +260,12 @@ def slug(heading: str) -> str:
 
 def text_slug(text: str) -> str:
     """The anchor GitHub gives a heading whose rendered text is TEXT: lowercased, without what isn't a letter, a mark,
-    a digit, _, - or a space, and its spaces made hyphens."""
+    a digit, a letter number (Ⅻ), a circled or squared letter, _, - or a space, and its spaces made hyphens."""
     kept = []
     for ch in text.lower():
         category = unicodedata.category(ch)
-        if ch in "- " or category[0] in "LM" or category in ("Nd", "Pc"):
+        if (ch in "- " or category[0] in "LM" or category in ("Nd", "Nl", "Pc")
+                or any(first <= ord(ch) <= last for first, last in ALPHABETIC_SYMBOLS)):
             kept.append(ch)
     return "".join(kept).replace(" ", "-")
 
@@ -254,14 +287,15 @@ class Tree:
 
     def anchors(self, name: str) -> set[str]:
         if name not in self.anchor_sets:
-            self.anchor_sets[name] = document_anchors(self.text(name))
+            self.anchor_sets[name] = document_anchors(mask_comments(self.text(name)))
         return self.anchor_sets[name]
 
 
 def document_anchors(text: str) -> set[str]:
-    """Every anchor a Markdown document has: its headings' slugs, numbered on repeats, an HTML heading's (<h1>) from its
-    text as it is, spaces and all, and its HTML ids and names."""
-    found, seen = set(), {}
+    """Every anchor a Markdown document has: its headings' slugs, an HTML heading's (<h1>) from its text as it is,
+    spaces and all, and its HTML ids and names. A heading whose slug an earlier heading has taken gets the first of -1,
+    -2 and so on that none has, counted per slug, as GitHub numbers them. TEXT has its HTML comments blanked."""
+    found, counts = set(), {}
     lines = text.split("\n")
     fence = None
     paragraph = []
@@ -298,9 +332,12 @@ def document_anchors(text: str) -> set[str]:
         else:
             paragraph.append(line)
         if base is not None:
-            count = seen.get(base, 0)
-            found.add(base if count == 0 else f"{base}-{count}")
-            seen[base] = count + 1
+            anchor = base
+            while anchor in counts:
+                counts[base] += 1
+                anchor = f"{base}-{counts[base]}"
+            counts[anchor] = 0
+            found.add(anchor)
         for match in HTML_ID.finditer(line):
             found.add(match.group(1) if match.group(1) is not None else match.group(2))
     return found
@@ -321,21 +358,17 @@ def fence_state(fence, line: str):
 
 
 def split_cells(row: str) -> list[str]:
-    """A table row's cells as GitHub splits them: at every | that isn't escaped, in code spans too, without the empty
-    cells before a leading | and after a trailing one."""
+    """A table row's cells as GitHub splits them: at every | that has no backslash right before it, in code spans too,
+    without the empty cells before a leading | and after a trailing one. cmark-gfm reads a backslash and the | after it
+    as one escaped pipe even when the backslash is itself escaped, so \\\\| keeps its pipe in the cell too."""
     text = row.strip()
-    cells, current, i = [], [], 0
-    while i < len(text):
-        if text[i] == "\\" and i + 1 < len(text):
-            current.append(text[i:i + 2])
-            i += 2
-            continue
-        if text[i] == "|":
+    cells, current = [], []
+    for i, ch in enumerate(text):
+        if ch == "|" and (i == 0 or text[i - 1] != "\\"):
             cells.append("".join(current))
             current = []
         else:
-            current.append(text[i])
-        i += 1
+            current.append(ch)
     cells.append("".join(current))
     if text.startswith("|"):
         cells = cells[1:]
@@ -349,8 +382,42 @@ def looks_like_row(line: str) -> bool:
     return len(text) > 1 and text.startswith("|") and text.endswith("|") and not text.endswith("\\|")
 
 
-def check_tables(document: str, lines: list[str], fenced: list[bool]) -> tuple[list[Problem], set[int]]:
-    """The tables' problems, and the indexes of the lines that are table rows (whose text is no paragraph's)."""
+def counted(number: int, noun: str) -> str:
+    return f"{number} {noun}" if number == 1 else f"{number} {noun}s"
+
+
+def indentation(line: str) -> int:
+    """A line's indentation in columns, a tab taking it to the next multiple of 4 as CommonMark counts."""
+    expanded = line.expandtabs(4)
+    return len(expanded) - len(expanded.lstrip(" "))
+
+
+def fence_flags(lines: list[str]) -> list[bool]:
+    """Whether each line is in a fenced code block, its fences included."""
+    flags, fence = [], None
+    for line in lines:
+        fence, inside = fence_state(fence, line)
+        flags.append(inside)
+    return flags
+
+
+def quotes(lines: list[str], fenced: list[bool]):
+    """Each block quote outside fenced blocks, as (its first line's index, its lines without one level of > marker)."""
+    i = 0
+    while i < len(lines):
+        if fenced[i] or not QUOTE_MARKER.match(lines[i]):
+            i += 1
+            continue
+        j = i
+        while j < len(lines) and not fenced[j] and QUOTE_MARKER.match(lines[j]):
+            j += 1
+        yield i, [QUOTE_MARKER.sub("", line, count=1) for line in lines[i:j]]
+        i = j
+
+
+def check_tables(document: str, lines: list[str], fenced: list[bool], first: int = 0) -> tuple[list[Problem], set[int]]:
+    """The tables' problems, and the indexes of the lines that are table rows (whose text is no paragraph's). FIRST is
+    the index in the document of LINES' first line; a block quote's lines are checked again without their markers."""
     problems, rows = [], set()
     i = 0
     after_table = False
@@ -366,43 +433,53 @@ def check_tables(document: str, lines: list[str], fenced: list[bool]) -> tuple[l
             header = split_cells(line)
             columns = len(split_cells(lines[i + 1]))
             if len(header) != columns:
-                problems.append(Problem(document, i + 1, "delimiter-cells", header[0],
-                                        f"a table header of {len(header)} cells over a delimiter row of {columns}, so "
-                                        "GitHub shows no table here"))
+                problems.append(Problem(document, first + i + 1, "delimiter-cells", header[0],
+                                        f"a table header of {counted(len(header), 'cell')} over a delimiter row of "
+                                        f"{columns}, so GitHub shows no table here"))
                 j = i + 2
                 while j < len(lines) and lines[j].strip() and not fenced[j]:
                     j += 1
-                rows.update(range(i, j))
+                rows.update(range(first + i, first + j))
                 i, after_table = j, False
                 continue
-            rows.update((i, i + 1))
+            rows.update((first + i, first + i + 1))
+            code = indentation(line) + 4  # a line indented this far past the header is a code block, not a row
             j = i + 2
-            while j < len(lines) and lines[j].strip() and not fenced[j] and not BLOCK_START.match(lines[j]):
+            while (j < len(lines) and lines[j].strip() and not fenced[j] and not BLOCK_START.match(lines[j])
+                   and indentation(lines[j]) < code):
                 cells = split_cells(lines[j])
-                rows.add(j)
+                rows.add(first + j)
                 if len(cells) != len(header):
                     if len(cells) > len(header):
-                        why = (": GitHub splits a cell at every | that isn't escaped as \\|, in a code span too, and "
-                               f"drops the cells past the header's {len(header)}")
+                        why = (": GitHub splits a cell at every | without a backslash right before it, in a code span "
+                               f"too, and drops the cells past the header's {len(header)}")
                     elif not looks_like_row(lines[j]):
                         why = ": a line straight after a table is one of its rows, and a blank line ends the table"
                     else:
                         why = ", so GitHub makes up the missing cells empty"
-                    problems.append(Problem(document, j + 1, "row-cells", cells[0],
-                                            f"a table row of {len(cells)} cells under a header of {len(header)}{why}"))
+                    problems.append(Problem(document, first + j + 1, "row-cells", cells[0],
+                                            f"a table row of {counted(len(cells), 'cell')} under a header of "
+                                            f"{len(header)}{why}"))
                 j += 1
-            i, after_table = j, True
+            after_table = True
+            while j < len(lines) and lines[j].strip() and not fenced[j] and indentation(lines[j]) >= code:
+                j, after_table = j + 1, False  # the code block that ends the table: no row of it
+            i = j
             continue
         if looks_like_row(line):
             if after_table:
                 why = "a blank line cuts it off from the table above"
             else:
                 why = "no header and delimiter row above it"
-            problems.append(Problem(document, i + 1, "stray-row", split_cells(line)[0],
+            problems.append(Problem(document, first + i + 1, "stray-row", split_cells(line)[0],
                                     f"a table row outside a table: {why}"))
         elif line.strip():
             after_table = False
         i += 1
+    for start, quoted in quotes(lines, fenced):
+        quoted_problems, quoted_rows = check_tables(document, quoted, fence_flags(quoted), first + start)
+        problems += quoted_problems
+        rows |= quoted_rows
     return problems, rows
 
 
@@ -481,10 +558,7 @@ def check_link(tree: Tree, document: str, line: int, target: str) -> Problem | N
 def check_document(tree: Tree, document: str) -> list[Problem]:
     text = mask_comments(tree.text(document))
     lines = text.split("\n")
-    fenced, fence = [], None
-    for line in lines:
-        fence, inside = fence_state(fence, line)
-        fenced.append(inside)
+    fenced = fence_flags(lines)
     problems, rows = check_tables(document, lines, fenced)
     for first, block in blocks_of(lines, fenced, rows):
         masked = mask_code_spans(block)
@@ -557,9 +631,8 @@ def main() -> int:
               "finds: remove the row")
     for error in errors:
         print(error)
-    count = {"document": len(documents), "problem": failed + passed, "allowlist row": len(stale) + len(errors)}
-    said = {what: f"{n} {what}{'' if n == 1 else 's'}" for what, n in count.items()}
-    print(f"check_docs: {said['document']}, {said['problem']} ({passed} allowed), {said['allowlist row']} to fix")
+    print(f"check_docs: {counted(len(documents), 'document')}, {counted(failed + passed, 'problem')} "
+          f"({passed} allowed), {counted(len(stale) + len(errors), 'allowlist row')} to fix")
     return 1 if failed or stale or errors else 0
 
 

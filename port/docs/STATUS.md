@@ -39,14 +39,16 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 - **Port:** `PORT_SHA`, on the topic branch `port-docs-hygiene-1102` from `d1717b68d8`: `3c7a8f10dd` (the documents
   check, its tests and its CI steps), `991c2e6725` (the follow-ups, and this entry), `2f9a0dbb11` (the merge of `main`
   at `e936696a97`, PR 71: the save lab's minter and reader, all in `port/`), `08bfb919e2` (the check's summary in the
-  singular for one document) and this record's update after it. The merge keeps both new STATUS.md entries, this one
+  singular for one document), `1fddd1c0fc` (this record's update after the merge) and the fixes of the review of
+  `1fddd1c0fc`, with this entry's account of them (below). The merge keeps both new STATUS.md entries, this one
   first. This entry fills the last entry's, the save lab's, `PORT_SHA` with `a9d91adf59`, and the hygiene's with
   `6eef75c290`, as PR 71's entry does too. Only `port/` and two of Frigate's own files under `.github/` change: the
   landing page's one wrapped paragraph and `port-ci.yml`'s two steps.
 - **ROM (T0):** `python3 configure.py && ninja` (`-j4`) in this branch's new worktree, every step run (14,039): both
   original US SHA1s, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`,
   with no compiler warning; again on the merge with `main` at `e936696a97` (2 steps, the checks: PR 71's files are all
-  in `port/`), the same SHA1s and no warning. This branch's own changes are no ROM input.
+  in `port/`), the same SHA1s and no warning, and on the review's fixes (2 steps, the checks), the same. This branch's
+  own changes are no ROM input.
 - **Host build (T1):** not run: nothing this branch changes is a host build input. `git diff --stat` against `main`
   lists Markdown, `port/tools/**` (the documents check and its allowlist, `summarize.py`, `milestones.py`), the tools'
   tests and `.github/workflows/port-ci.yml`, and no CMake file reads any of them. The exact-head verification
@@ -72,6 +74,16 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   - The sync tooling tests, CI's command (`python3 -m unittest discover -s port/tools/tests -p
     test_upstream_sync.py`): 64 of 64 pass, before and after the merge, and so do the documents check's 33.
   - `progress_ownership` (`port/tests/progress/test_ownership.py`, run directly): 11 of 11 pass.
+  - On the review's fixes: the documents check's tests, 43 of 43 (10 new); the sync tooling tests, 64 of 64; the check
+    on the whole tree, 98 documents, one problem, the allowed one. The fixed check and `1fddd1c0fc`'s give the same
+    1,057 anchors, the same table rows and the same problems in every document, so no document changes. Each new
+    table control and anchor is what GitHub's Markdown API rendered for the same text (mode `markdown`, 2026-11-02).
+    Negative controls: each of 18 mutations of the round's rules in a scratch copy (pairs of backslashes skipped as
+    before, every pipe a split, comments read for anchors, repeats numbered per text, escapes dropped before emphasis,
+    entities left, or decoded without their semicolon, unpaired underscores stripped, letter numbers or circled
+    letters dropped, any tag ending a table, an empty list item continuing one, indentation ignored, a code block's
+    lines read as rows, quotes unread, a quote's fences unread or its lines misnumbered, one cell said as "cells")
+    fails the tests that hold its rule.
   - T2 to T7 not run: no test that CMake registers changes, and no game, host or test-target code; the exact-head
     verification runs the host tests and the short replays.
 - **Tiers:** `progress.py --rev d1717b68d8`, both versions: 41,017 functions in tier (a), none in (b) or (c), and 2,385
@@ -126,6 +138,33 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   - **The documents check** (`3c7a8f10dd`): `port/tools/check_docs.py` and `check_docs_allowlist.tsv`, its tests and
     CI's two steps in the sync-tooling job, as above; documented in port/tools/README.md, port/tools/tests/README.md
     and, in one line, port/docs/README.md, where the documents' rules are.
+  - **The review's fixes.** The independent review of `1fddd1c0fc` found no must-fix problem, two should-fix and three
+    minor; each is fixed:
+    - **A pipe after a backslash** stays in its cell: cmark-gfm reads a backslash and the `|` after it as an escaped
+      pipe even when the backslash is itself escaped, so `` `grep 'a\\|b'` ``, the only way to show the pattern
+      `a\|b` in a table's code span, is one cell on GitHub, where the check split it. `split_cells` now splits only at
+      a `|` with no backslash right before it; the docstring, the message and the tools' guide say so.
+    - **Sync PRs:** SYNC.md's "Validate and approve a proposed PR" says that the documents check runs on them, that
+      a sync that renames or removes a file of upstream's that a document links to (its README.md, CONTRIBUTING.md,
+      LICENSE and `docs/`'s guides, 20 links today) fails the `Sync tooling tests` job through the merged tree, and that
+      the link's fix is a native fix the merge carries, named in the sync's PR and entry, or in a record the broken
+      link's fix that records take.
+    - **The check where it read otherwise than GitHub**, none of it in today's documents: headings and ids in HTML
+      comments are no anchors; a heading keeps its escaped characters (`\_` is an underscore) and decodes its entities
+      (`&amp;`), and an underscore without its pair stays; a repeated heading takes the first of -1, -2 and so on that
+      no heading has (Foo, Foo-1, Foo, Foo give `foo-2` and `foo-3`); letter numbers (Ⅻ) and circled or squared
+      letters (Ⓐ) stay in an anchor; a line straight after a table is a row unless it starts one of CommonMark's
+      seven kinds of HTML block, so `<span>x</span>` is a row and `<div>` or a tag alone ends the table; an empty list
+      item ends one too; a line indented four columns past the header row is a code block, which ends the table and
+      whose lines are no stray rows; and a block quote's tables, nested ones too, are checked without their markers.
+      The check still doesn't follow a list's structure, which its docstring says: it reads a table's rows against
+      its header row's indentation.
+    - **What CI runs:** port/README.md, CONTRIBUTING.md and REPOSITORY-POLICY.md name the documents check among
+      `Frigate CI`'s jobs; CONTRIBUTING.md's "Build and verify" asks for it after a change to a document, as it needs
+      no ROM; GLOSSARY.md defines it.
+    - **Wording:** sanitizers.md's pointer says the statements' lines are those of `d1717b68d8`, not "now"; the check
+      says "1 cell"; `summarize.py`'s docstring says that decomp-progress.md's "lib/dwcutilui (+ likely the 56,640 B
+      ov182 gap)" row came from the overlay 182 rule this PR removes.
 - **Next:** the next task is as the last entries give it: L2's stations (PR 71's entry), and Phase 5's story coverage
   past the Route 20 save. The documents' follow-ups left: the guides that still say the owner approves every sync PR
   (port/CLAUDE.md, CONTRIBUTING.md, SYNC.md, PLAN.md, README.md and `upstream_sync.py`'s warning), for the owner's

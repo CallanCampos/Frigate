@@ -5,15 +5,21 @@ does. A clean tree that uses every form the check reads (links to files, directo
 and of another, repeated and punctuated headings, HTML ids, line anchors, a Markdown file's source lines, links whose
 text runs over two lines, angle brackets and titles, reference definitions, HTML sources, escaped pipes in a table's
 code span, a table without outer pipes, a list item's code span continued on a line that starts with |) must pass,
-and so must links that GitHub doesn't render (code spans, fenced blocks, HTML comments). Each negative control seeds
+and so must links that GitHub doesn't render (code spans, fenced blocks, HTML comments), pipes after an escaped
+backslash, which stay in their cells, the blocks that end a table without a blank line (a heading, a list item, an
+empty one, an HTML block, a tag alone on its line, a comment, a thematic break, an indented code block), a list item's
+table read from its header row's indentation, and a table in a fenced block in a quote. Each negative control seeds
 one problem, which must be reported with its kind and line: a missing file (in an inline link, a link over two lines,
 a reference definition, an HTML src), a link out of the repository, a missing anchor (in another document, in the same
-one, a heading inside a fenced block, a fragment on a file that isn't Markdown), a line anchor past the end of a file
-or of a Markdown file's source, a row split by a code span's pipes, a short row, a line straight after a table, a
-header over a delimiter row of another width, a row cut off by a blank line and a stray row. The allowlist's controls:
-an allowed problem passes and is printed with its reason, wherever it moves and at each place it repeats, and a row
-that names no problem, a row without a reason, an unknown kind or a row of the wrong width fails. The anchors' rule is
-held to headings whose anchors GitHub's renderer gave.
+one, a heading inside a fenced block, a heading or an id in a comment, a repeat's number past the ones GitHub gives, a
+fragment on a file that isn't Markdown), a line anchor past the end of a file or of a Markdown file's source, a row
+split by a code span's pipes, or by a pipe after a backslash and a space, a short row, a line straight after a table,
+a line of inline HTML there, a list item's short row, a quote's rows (nested too), a header over a delimiter row of
+another width, a row cut off by a blank line and a stray row. The allowlist's controls: an allowed problem passes and
+is printed with its reason, wherever it moves and at each place it repeats, and a row that names no problem, a row
+without a reason, an unknown kind or a row of the wrong width fails. The anchors' rule, and the blocks and cells that
+the tables' controls use, are held to what GitHub's renderer gave: repeats numbered past an anchor another heading
+has, escapes, entities, letter numbers and circled letters.
 """
 import importlib.util
 from pathlib import Path
@@ -174,6 +180,14 @@ class LinkControlTests(DocsFixture):
         found = self.problems('```md\n# Fenced\n```\n\n[fenced](#fenced)\n')[1]
         self.assertEqual(found, [(5, 'missing-anchor')])
 
+    def test_a_heading_or_an_id_in_a_comment_is_no_anchor(self):
+        document = '<!--\n## Hidden\n<a id="hidden-id"></a>\n-->\n\n[hidden](#hidden), [id](#hidden-id)\n'
+        self.assertEqual(self.problems(document)[1], [(6, 'missing-anchor'), (6, 'missing-anchor')])
+
+    def test_a_repeated_heading_skips_an_anchor_another_heading_has(self):
+        document = '## Foo\n\n## Foo-1\n\n## Foo\n\n## Foo\n\n[third](#foo-2), [fourth](#foo-3), [none](#foo-4)\n'
+        self.assertEqual(self.problems(document)[1], [(9, 'missing-anchor')])
+
     def test_a_repeated_headings_count_is_its_own(self):
         self.assertEqual(self.problems('[third](other.md#repeated-2)\n')[1], [(1, 'missing-anchor')])
 
@@ -197,18 +211,64 @@ class TableControlTests(DocsFixture):
         self.assertIn('a table row of 4 cells under a header of 2', output)
         self.assertEqual(status, 1)
 
+    def test_a_pipe_after_any_backslash_stays_in_its_cell(self):
+        # GitHub's renderer gave each of these rows 2 cells (the Markdown API, 2026-11-02): cmark-gfm reads a backslash
+        # and the | after it as an escaped pipe even when the backslash is itself escaped
+        rows = ('| `grep \'a\\\\|b\'` | z |\n| a \\\\| b | c |\n| a \\\\\\\\| b | c |\n| a | b \\\\|\n')
+        status, found, output = self.problems(self.TABLE + rows)
+        self.assertEqual(found, [], output)
+        self.assertEqual(status, 0, output)
+
+    def test_a_pipe_after_a_backslash_and_a_space_splits(self):
+        status, found, output = self.problems(self.TABLE + '| a \\\\ | b | c |\n')
+        self.assertEqual(found, [(3, 'row-cells')], output)
+        self.assertIn('a table row of 3 cells under a header of 2', output)
+
     def test_short_row(self):
-        found = self.problems(self.TABLE + '| a | b |\n| only one |\n')[1]
+        status, found, output = self.problems(self.TABLE + '| a | b |\n| only one |\n')
         self.assertEqual(found, [(4, 'row-cells')])
+        self.assertIn('a table row of 1 cell under a header of 2', output)
 
     def test_a_line_straight_after_a_table_is_a_row(self):
         status, found, output = self.problems(self.TABLE + '| a | b |\ntext right after the table\n')
         self.assertEqual(found, [(4, 'row-cells')], output)
         self.assertIn('a blank line ends the table', output)
 
+    def test_a_line_of_inline_html_straight_after_a_table_is_a_row(self):
+        found = self.problems(self.TABLE + '| a | b |\n<span>inline HTML opens no block</span>\n')[1]
+        self.assertEqual(found, [(4, 'row-cells')])
+
     def test_a_heading_or_a_list_ends_a_table(self):
         found = self.problems(self.TABLE + '| a | b |\n## Heading\n\n' + self.TABLE + '| c | d |\n- item\n')[1]
         self.assertEqual(found, [])
+
+    def test_what_else_ends_a_table(self):
+        # Each block that GitHub's renderer starts straight after a table's rows (the Markdown API, 2026-11-02)
+        for name, line in (('an empty list item', '-'), ('an empty ordered one', '1.'),
+                           ('an HTML block', '<div>x</div>'), ('a tag alone on its line', '<span>'),
+                           ('a comment', '<!-- a comment -->'), ('a thematic break', '***'),
+                           ('a code block', '    indented code'),
+                           ('a code block of pipes', '    | indented | code, not a row |')):
+            with self.subTest(name=name):
+                status, found, output = self.problems(self.TABLE + '| a | b |\n' + line + '\n')
+                self.assertEqual(found, [], output)
+
+    def test_a_list_items_table_reads_from_its_header_rows_indentation(self):
+        # A row indented past the header but by less than four columns is the table's; four columns more is code
+        document = ('- item\n\n  | One | Two |\n  | --- | --- |\n  | a | b |\n    | c | d |\n'
+                    '      code, not a row\n')
+        status, found, output = self.problems(document)
+        self.assertEqual(found, [], output)
+        status, found, output = self.problems(document.replace('    | c | d |', '    | c |'))
+        self.assertEqual(found, [(6, 'row-cells')], output)
+
+    def test_a_quotes_table_is_checked(self):
+        quoted = ('> | One | Two |\n> | --- | --- |\n> | a | b | c |\n>\n'
+                  '> > | One | Two |\n> > | --- | --- |\n> > | d |\n')
+        status, found, output = self.problems('Text.\n\n' + quoted)
+        self.assertEqual(found, [(5, 'row-cells'), (9, 'row-cells')], output)
+        fenced = '> ```md\n> | One | Two |\n> | --- | --- |\n> | not | a | row |\n> ```\n'
+        self.assertEqual(self.problems(fenced)[1], [])
 
     def test_header_over_a_delimiter_row_of_another_width(self):
         found = self.problems('| One | Two | Three |\n| --- | --- |\n| a | b | c |\n')[1]
@@ -309,6 +369,27 @@ class AnchorRuleTests(unittest.TestCase):
     def test_repeats_and_html_headings(self):
         anchors = check_docs.document_anchors('# Same\n\n## Same\n\nSame\n---\n\n<h2 align="center">\n  Wide\n</h2>\n')
         self.assertEqual(anchors, {'same', 'same-1', 'same-2', '--wide'})
+
+    def test_a_repeat_takes_the_first_number_no_heading_has(self):
+        # The anchors GitHub's renderer gave these headings, in this order (the Markdown API, 2026-11-02)
+        headings = ('Foo', 'Foo-1', 'Foo', 'Foo', 'Bar', 'Bar', 'Bar-1')
+        anchors = check_docs.document_anchors(''.join(f'## {heading}\n\n' for heading in headings))
+        self.assertEqual(anchors, {'foo', 'foo-1', 'foo-2', 'foo-3', 'bar', 'bar-1', 'bar-1-1'})
+
+    def test_escapes_entities_and_letters(self):
+        # Headings and the anchors GitHub's renderer gave them (the Markdown API, 2026-11-02)
+        for heading, anchor in (('\\_escaped\\_ underscores', '_escaped_-underscores'),
+                                ('_foo\\_', '_foo_'),
+                                ('A &amp; B', 'a--b'),
+                                ('\\&amp; escaped entity', 'amp-escaped-entity'),
+                                ('&copy without semicolon', 'copy-without-semicolon'),
+                                ('Tab\tin &#x41; numeric', 'tabin-a-numeric'),
+                                ('Roman Ⅻ twelve', 'roman-ⅻ-twelve'),
+                                ('Circled Ⓐ letter', 'circled-ⓐ-letter'),
+                                ('Squared \U0001f130 letter', 'squared-\U0001f130-letter'),
+                                ('Numero № sign', 'numero--sign')):
+            with self.subTest(heading=heading):
+                self.assertEqual(check_docs.slug(heading), anchor)
 
 
 if __name__ == '__main__':

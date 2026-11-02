@@ -4,7 +4,8 @@
 Usage: python3 summarize.py --in out/b2_us [--compile out/compile_b2_us.tsv] [--issues gh_issues.json] > tables.md
 
 The tables of port/docs/research/decomp-progress.md (by module, by origin, the overlays by missing C, data), which
-run_all.sh writes to tables_<version>.md and all_overlays_b2_us.md.
+run_all.sh writes to tables_<version>.md and all_overlays_b2_us.md. That record's row "lib/dwcutilui (+ likely the
+56,640 B ov182 gap)" came from a rule for overlay 182's gaps that PR 75 removed, once no module had a gap.
 """
 import argparse
 import csv
