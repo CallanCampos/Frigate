@@ -32,11 +32,103 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-11-02: phase 5's open items for the owner: ADRs 0020, 0033, 0034 and 0035 proposed
+
+- **Upstream:** `41f42ca1af`, unchanged, as reviewed main `2d3b99c9ee` (PR 77's merge) has it; this change merges no
+  upstream commit.
+- **Port:** `PORT_SHA`, on the topic branch `port-phase5-decisions` from `e936696a97` (PR 71's merge): `1751e811b2`
+  (the four ADRs), `6b2804107c` (the merge of `main` at `c6fcdd3f59`, PR 75: the documents check, all of it in `port/`
+  and `.github/`), `40b933970c` (the review's fixes), `a26dd099d8` (the merge of `main` at `2d3b99c9ee`, PR 77:
+  Terrell's cut, all of it in `port/`) and PR 77's landing noted in ADRs 0020 and 0033, with this entry's account of
+  them. Each merge keeps both new STATUS.md entries, this one first.
+  This entry fills the last entry's, Terrell's (PR 77's), `PORT_SHA` with `a7d768e2ee`; that entry filled the
+  documents' (PR 75's) with `7d87f98b8c` and the save lab's (L1) with `a9d91adf59`. Documents only, all of them
+  Markdown in `port/docs/`: nothing outside `port/` changes.
+- **ROM (T0):** `python3 configure.py && ninja` in this branch's worktree, every step run on `1751e811b2` (14,039, ninja
+  at `-j4`), with no compiler warning: both original US SHA1s match, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and
+  W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`; again on the merges with `main` at `c6fcdd3f59` and at `2d3b99c9ee`,
+  with the review's changes (2 steps each, the checks), the same SHA1s and no warning. This change is no ROM input, and
+  nothing outside `port/` and `.github/` differs between `e936696a97` and `2d3b99c9ee` (`git diff --stat`).
+- **Host build (T1):** no source, build or test change from reviewed main, so not rebuilt here; the exact-head
+  `sync_upstream.sh --verify-pr` builds and tests both versions before merge.
+- **Tests (T2–T7):** not run here: no code, input, seed, golden, mask, budget or sanitizer policy changes. The documents
+  check, `python3 port/tools/check_docs.py` (PR 75's, which CI runs), on this head: 102 documents, one problem, the
+  allowed one (`research/platinum-port.md:25`, a record). Every line this change adds outside a table is at most 120
+  columns and ends in no space, no link's text or code span is split across lines, and each new citation was read at the
+  commit its ADR names (`e936696a97`, or a pull request's head).
+- **Tiers/trap stubs:** unchanged; no progress scan.
+- **64-bit warnings:** unchanged from the last entry that measured them, 365 sites in 229 keys (real 66, harmless 123,
+  handled 141, unreachable 35); the exact-head verifier repeats the guard. No baseline change.
+- **Work done:** four ADRs on phase 5's open exit items, proposed for the owner's decision and waiting for it. Each
+  comes from a read-only scout of `main` at `e936696a97`, was checked against it by an adversarial review, and was
+  revised on this pull request's review; every numbered decision in them is a recommended default with its
+  alternatives and their costs, and none of their work is on `main`:
+  - [ADR 0020](adr/0020-one-program-for-both-versions-a-core-per-version-loaded-by-a-launcher.md) (D6): one program
+    for both versions, a launcher that reads the ROM's game code and loads that version's game core, today's program
+    built as a shared library, with each version's test program a thin `main()` over the same core, so that the tests
+    run the code the app ships; the names, one icon, a start without a ROM (the ROMs that ADR 0035's picker
+    remembers read only from the Finder), the Spanish ROM, and one White 2 job in CI (the Linux host build), with no
+    job building both versions; its stages in order, the third running ADR 0033's whole set and a base-and-head
+    timing report, with the one build tree of the branch `port-one-program` (`4a4c2bc9f1`, whose design it is
+    written from) last and optional. Accepting it amends ADRs 0010 and 0015.
+  - [ADR 0033](adr/0033-sanitizer-clean-replays-by-the-strict-routes-and-the-program-alone.md) (T5): sanitizer-clean
+    replays are the strict build's routes that need no oracle and its program alone on every story piece from the
+    oracle's saves, built with ASan, UBSan's function check and LeakSanitizer by upstream clang, clean in both
+    versions on one head but for the declared exceptions (LeakSanitizer keeping sanitizers.md's rule: none suppressed
+    today, and only a leak inside SDL3 or a system library ever, under the owner's review). The whole set runs on
+    demand at each story leg's end, on the release candidate's head and on a change to how every route's program is
+    built, never on a schedule or in the merge gate; a pull request that adds or changes a route may run its own
+    cases and owes none, under the owner's rule that per-PR checks stay fast, with the costs stated (about 5 hours
+    per version today at most, inferred). A release candidate adds wireless refused without a report or a freeze, the
+    C-Gear's prompt first, which the story's routes answer to keep the C-Gear off or declare; the x86_64 slice; the
+    renderer's ThreadSanitizer runs; and a windowed run. The branch `port-64bit-sweep` is left to ADR 0019's real
+    rows. Accepting it amends ADR 0014; T5-A (PR 81) writes its documents while it is proposed.
+  - [ADR 0034](adr/0034-60-fps-with-headroom-the-ds-rate-on-time-and-half-a-frame-to-spare.md): 60 fps with headroom
+    is the DS's rate on time, every timed scene's busy 95th percentile within half a frame (8.36 ms) headless and
+    every timed route on time paced and windowed, held on the M2 by a quiet record made on demand on the release
+    candidate's commit; the timing tests leave the per-PR gate, which amends ADR 0018's required local status; the
+    field, battles, Castelia City, the C-Gear (off, or on once ADR 0033's refusal check passes) and each story leg's
+    heaviest scene join them, each leg adding up to about 25 minutes to every quiet window (inferred); CI prints the
+    renderers' benches as a report; the release candidate's notes point to its STATUS.md entry for the numbers; and
+    phase 6's modes bring limits of their own.
+  - [ADR 0035](adr/0035-the-private-release-candidate-shared-by-hand.md): the private release candidate is a tagged
+    commit's two universal Mac apps, packaged in a release candidate's mode from a clean clone at a neutral path and
+    stripped, with a first-launch ROM picker, the licence, the third-party notices and release notes, checked by
+    T7's first checklist, phase 5's milestone being its exit, and handed out by the owner alone, by AirDrop or disk
+    with its Corresponding Source beside it, once the owner rules whether the compiled game counts as ROM-derived,
+    since the default lifts the documents' "never distributed"; never uploaded or published. It waits for the
+    story's routes, T4, T5 as ADR 0033 defines it, 60 fps as ADR 0034 does and the checklist, not for D6. Accepting
+    it amends ADRs 0010 (its "Nothing is uploaded" as well) and 0015.
+  - The ADR index gets their rows; its next free number is 0036, with 0032 still reserved for the save lab, and D6
+    leaves its "Decisions waiting for an ADR". docs/README.md lists the four. PLAN.md doesn't change: as for ADRs
+    0030 and 0031, the change that accepts each ADR links it there.
+  - What the review of this pull request changed: the costs the owner weighs (T5's set and a route's own runs, each
+    leg's timing scene, the release candidate's oracle runs); a route's own strict runs made optional, with stage 3
+    of D6 owing the whole set and a timing report rather than a budget; ADR 0018's amendment declared; the release
+    notes' numbers left to the release candidate's entry; the hand-out (AirDrop or disk, the owner's ruling first, ADR
+    0010's line named) and the licence's reading for it; what a milestone is; the C-Gear; when the remembered ROMs
+    are read; T3's and T4's "nightly" left to ADR 0031; the pull requests in flight named with their heads of
+    2026-11-02; and how to read the cited lines. Not changed: ADR 0033's number, which this pull request wrote first
+    and PR 81 builds on, though PR 79's entry and the save lab's L2 name 0033 for chained trainer battles (that ADR
+    takes the next free number when it is written, as PR 77's entry says); and the file names of 0033 and 0034,
+    which shorten their titles as those of ADRs 0013 to 0016, 0019 and 0021 to 0029 do.
+- **Next:** Phase 5's story coverage, its earliest unmet exit criterion, continues past the Route 20 save, where
+  Terrell's cut (PR 77) has landed: the decrypted save comparison (PR 79), then the rest of leg 2's pieces. Beside it,
+  the owner's decisions on ADRs 0020, 0033, 0034 and 0035, each of which unblocks work: T5-A (PR 81, in review) takes
+  ADR 0033's items 5 and 7 as revised here, then runs `main`'s first strict baseline in both versions; ADR 0034's 60
+  fps work (the paced check in `frame_times.py`, the new timing routes, `-LE timing` in the per-PR gate, the CI bench
+  step, then the quiet record); ADR 0035's release candidate engineering, after the owner's ruling on the hand-out
+  (the ROM picker, the notices, the packaging's release candidate mode, the release notes and T7's checklist); and
+  ADR 0020's D6, from CI's White 2 job through stages 2 to 4.
+- **Blockers:** none for this change. The four ADRs wait for the owner, and so does ADR 0035's first question,
+  whether the compiled game counts as ROM-derived. PR 79's entry and description, and the save lab's L2, name ADR
+  0033 for chained trainer battles; they take the next free number, 0036 once this lands.
+
 ## 2026-11-02: Youngster Terrell's battle held to melonDS up to his AI's first moved decision
 
 - **Upstream:** `41f42ca1af`, unchanged: reviewed main `c6fcdd3f59` (PR 75's merge) has it, and this change merges no
   upstream commit.
-- **Port:** `PORT_SHA`, on the topic branch `port-terrell-cut`, cut from `36101609ad` (PR 70's merge) and moved on by
+- **Port:** `a7d768e2ee`, on the topic branch `port-terrell-cut`, cut from `36101609ad` (PR 70's merge) and moved on by
   fast-forward, before its first commit, to `c0a7941e4e` (PR 72's merge, which brought PR 73) and then `e936696a97`
   (PR 71's merge, PR 74's `d1717b68d8` before it): `d6ef61348a` (the sequence, its test, the documents and this
   entry), `d577f8f95c` (the review's fixes) and the merge of `main` at `c6fcdd3f59` (PR 75: the documents' follow-ups

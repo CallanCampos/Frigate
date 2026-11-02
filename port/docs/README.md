@@ -53,6 +53,7 @@ CI checks every document's links, anchors and tables with [../tools/check_docs.p
 | [adr/0017](adr/0017-external-contributions.md) | External contributions through forks and PRs, with maintainer sync and ROM verification |
 | [adr/0018](adr/0018-protected-main-and-sync-prs.md) | Protected main and reviewed upstream syncs |
 | [adr/0019](adr/0019-pointer-cast-guard-against-a-classified-baseline.md) | The pointer cast guard: the game's casts that cut an address, held to a classified baseline |
+| [adr/0020](adr/0020-one-program-for-both-versions-a-core-per-version-loaded-by-a-launcher.md) | One program for both versions: a core per version, loaded by a launcher (proposed) |
 | [adr/0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md) | Root heaps in the game's own memory get host memory |
 | [adr/0022](adr/0022-the-ds-random-seeds-given-by-input-files.md) | The DS's random seeds given by input files, through a wrapper of `buildSeed` (proposed) |
 | [adr/0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md) | Oracle routes part where the DS's CPU time decides, and go on from melonDS's save |
@@ -64,6 +65,9 @@ CI checks every document's links, anchors and tables with [../tools/check_docs.p
 | [adr/0029](adr/0029-backup-write-service-wait.md) | The backup WRITE service initial SDK wait, separate from flash busy and CPU work |
 | [adr/0030](adr/0030-widescreen-by-an-engine-side-hor-plus-scale-with-native-readbacks.md) | Widescreen by an engine-side Hor+ scale with native readbacks (proposed), and the rules that keep widescreen possible meanwhile |
 | [adr/0031](adr/0031-per-game-frame-digests-against-a-content-addressed-oracle-cache.md) | Per-game-frame digests against a content-addressed oracle cache (proposed), with their hash, xxHash, fetched at configure time |
+| [adr/0033](adr/0033-sanitizer-clean-replays-by-the-strict-routes-and-the-program-alone.md) | Sanitizer-clean replays by the strict routes and the program alone from the oracle's saves, on demand (proposed) |
+| [adr/0034](adr/0034-60-fps-with-headroom-the-ds-rate-on-time-and-half-a-frame-to-spare.md) | 60 fps with headroom: the DS's rate on time and half a frame to spare, timed on demand (proposed) |
+| [adr/0035](adr/0035-the-private-release-candidate-shared-by-hand.md) | The private release candidate, shared by hand (proposed) |
 | [RESEARCH.md](RESEARCH.md) | The research of 2026-10-16 behind the plan, summarized |
 | [research/README.md](research/README.md) | The full research reports, with what each covers |
 | [research/decomp-progress.md](research/decomp-progress.md) | The decomp's C coverage per module, data and pointer coverage, pace, claims |
