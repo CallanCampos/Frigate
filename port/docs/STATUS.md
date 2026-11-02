@@ -37,24 +37,25 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 - **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit.
 - **Port:** `PORT_SHA`, on the topic branch `port-saves-decrypted` from `e936696a97` (PR 71's merge): `16a81b7b99`
   decodes the party and the records in one module, for the save lab's reader and the oracle, and `d40edbfd06` gives the
-  round trips the comparison and the declarations' rules. Reviewed main was merged in once, STATUS.md's new entries
-  kept with this one first: `c6fcdd3f59` once PR 75 had landed (the documents' check, `port/tools/check_docs.py`, and
-  the documents' follow-ups: tools and documents that the round trips don't run). This entry fills the last entry's,
-  the documents', `PORT_SHA` with `7d87f98b8c`; the save lab's has `a9d91adf59`, as both branches filled it. Nothing
-  outside `port/` changes.
+  round trips the comparison and the declarations' rules; this entry's last commit records T4's runs. Reviewed main was
+  merged in once, STATUS.md's new entries kept with this one first: `c6fcdd3f59` once PR 75 had landed (the documents'
+  check, `port/tools/check_docs.py`, and the documents' follow-ups: tools and documents that the round trips don't run).
+  This entry fills the last entry's, the documents', `PORT_SHA` with `7d87f98b8c`; the save lab's has `a9d91adf59`, as
+  both branches filled it. Nothing outside `port/` changes.
 - **ROM (T0):** configure and Ninja (`-j4`) pass both original US SHA1s with zero compiler warnings, B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, in a full build (14,039
-  steps) of the branch's base; the change adds no ROM input.
+  steps) of the branch's base, and again on the merge `147878f68d`, which had nothing to compile; the change adds no ROM
+  input.
 - **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both games with the oracle (`build/port-oracle`,
   `build/port-oracle-w2`, `-DPORT_BUILD_ORACLE=ON -DPORT_SANITIZE_RECOVER=OFF -DPORT_FRAME_TIME_REPORT_ONLY=OFF`, Apple
   clang, ninja at `-j4`) pass, with 748 compiler warnings each, all in the decomp's C of `src/` and `lib/`, as on
   `main`; the new `port_test_savedecode_layout` builds with `-Wall -Wextra -Werror` and prints the same layout in both
   games.
 - **Tests:**
-  - T2/T6: `ctest -LE 'route|oracle'` (`CTEST_PARALLEL_LEVEL=3`) passes in both games on both commits, 359 of 363
-    tests in each, 4 skipping for this checkout's setup: `asm_oracle` (no Unicorn in this Python), the VM dispatch's
-    two function-sanitizer negatives (Apple's compiler emits no such check) and `app_universal_slices` (one slice).
-    Among them:
+  - T2/T6: `ctest -LE 'route|oracle'` (`CTEST_PARALLEL_LEVEL=3`) passes in both games on `16a81b7b99`, `d40edbfd06` and
+    the merge `147878f68d`, 359 of 363 tests in each, 4 skipping for this checkout's setup: `asm_oracle` (no Unicorn in
+    this Python), the VM dispatch's two function-sanitizer negatives (Apple's compiler emits no such check) and
+    `app_universal_slices` (one slice). Among them:
     - `oracle_save_decode`, new, with no ROM: 44 tests (23 on `16a81b7b99`, the decoding's) on synthetic Pokémon,
       parties, records and whole saves, encrypted with the test's own copy of the game's generator. `LAYOUT` is the
       headers' (231 entries, name for name); the field views are the headers' members, written by hand with their C
@@ -98,11 +99,35 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     on, the blocks or the party's fields left encrypted, a Pokémon stored decrypted decrypted again, a checksum never
     wrong), and 3 of the reader's glue added (a slot read from the next, the HP from another field, `checksum_ok`
     whatever `savedecode` found); all caught.
-  - T3: `ctest -L route -LE 'oracle|timing'` passes in both games on both commits, 17 of 17 in Black 2 and 15 of 15
-    in White 2: the replays (`replay_starter_save`, whose check reads `oracle.py`, among them) and the sequences'
-    and sounds' hashes.
-  - T4/T6: running, on this commit's head: the three save round trips (`catch`, `floccesy`, `hugh`) in both games,
-    each run with its ctest command and `--work`, and main's comparison and this one applied to the same two saves.
+  - T3: `ctest -L route -LE 'oracle|timing'` passes in both games on `16a81b7b99`, `d40edbfd06` and the merge
+    `147878f68d`, 17 of 17 in Black 2 and 15 of 15 in White 2: the replays (`replay_starter_save`, whose check reads
+    `oracle.py`, among them) and the sequences' and sounds' hashes.
+  - T4/T6, on `147878f68d` (the merge of main at `c6fcdd3f59` into `d40edbfd06`; its round trips run and compare as
+    `d40edbfd06`'s): each save round trip in each game, one at a time after the machine check, with its ctest command
+    and `--work` (`oracle.py round-trip NAME --oracle BUILD/oracle/pbw-oracle --port BUILD/frigate-black2 --version
+    b2_us --save-cache BUILD/oracle-saves --work RUN`, `build/port-oracle`; White 2's with `build/port-oracle-w2`,
+    `frigate-white2` and `w2_us`), from fixtures made fresh for them (`ctest -R '^oracle_floccesy_save$'` with
+    `oracle_saves`, both games: the five saves and the Route 20 save, each at the SHA-1 `SAVES` pins). All six pass
+    (exit 0). On the same two saves of each run, main's comparison (`c6fcdd3f59`'s `port/tools/oracle`, extracted:
+    `validate_image`, `mystery_gift_decrypted`, then `undeclared_differences` with main's declarations) and this one
+    (`savedecode.compare_saves` with this branch's) give the same verdict and the same spans outside the party and the
+    records in both copies, and main's sees struct bytes differ in exactly the slots where this one sees fields
+    differ; every slot and the records of both copies of both saves add up to their checksums, and the slots past
+    `count` are `PokeParty_ClearPkm`'s. The saves' blocks are where `MAIN_SAVE_LAYOUT` puts them: the catch and Route 20
+    saves of both games, read with `find_blocks`, agree with each other and with it.
+
+    | Trip | Game | Bytes that differ, as written | With the gift blocks decrypted | Outside the party and the records | Fields and records that differ | Continuations |
+    | --- | --- | --- | --- | --- | --- | --- |
+    | `catch` | Black 2 | 34 | 34 | 22, 11 a copy | 6, `pkms[1].mail.message[0]` to `[2].id` in each copy, declared | melonDS 6,900 of 6,900 frames the same; Frigate 4,679 of 4,679, the state at 3,562 |
+    | `catch` | White 2 | 34 | 34 | 22, 11 a copy | 6, the same, declared | 6,900 of 6,900; 4,671 of 4,671, the state at 3,562 |
+    | `floccesy` | Black 2 | 14 | 14 | 14, 7 a copy | none | 6,900 of 6,900; 4,679 of 4,679, the state at 3,562 |
+    | `floccesy` | White 2 | 14 | 14 | 14, 7 a copy | none | 6,900 of 6,900; 4,671 of 4,671, the state at 3,562 |
+    | `hugh` | Black 2 | 5,444 | 38 | 38, 19 a copy | none | the cut 8,165 of 8,165 frames; melonDS 5,671 of 5,700 the same to count 3,602; Frigate 3,589 of 3,589, the state at 2,474 |
+    | `hugh` | White 2 | 5,430 | 36 | 36, 18 a copy | none | the cut 8,157 of 8,157; melonDS 5,606 of 5,700 to count 3,602; Frigate 3,581 of 3,581, the state at 2,474 |
+
+    The numbers are the recorded ones (the entries of 2026-10-27 and 2026-10-28 and the oracle README's): no drift. The
+    catch trip's ids are the README's, melonDS's `0x0000`, `0xfb5b` and `0xff8b` and Frigate's `0xbf83`, `0xcbde` and
+    `0x0000`, in both games. The runs, their logs and the base's extracted comparison were deleted once read.
   - T5 and T7 not run: no game, platform or app change.
 - **Tiers/trap stubs:** not measured: no game or host code changed.
 - **64-bit warnings:** the pointer cast guard passes in both games, and `check_ptrcasts.py --build-dir

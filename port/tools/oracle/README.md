@@ -1129,7 +1129,11 @@ Black 2); every problem; and its verdict. [../../tests/oracle/test_savedecode.py
 block orders to the game's source, the field views to every bit of both structs, every field and every byte of them
 to the comparison, and each rule above to its refusal, with a table of deliberate bugs in `savedecode.py` that its tests
 must catch (`MUTANTS`: a field left out, a wrong key or seed, a declaration accepted, a whole block let through, the
-layout moved); `test_compare.py` runs the real round-trip command on synthetic saves with its own bugs.
+layout moved); `test_compare.py` runs the real round-trip command on synthetic saves with its own bugs. Run on
+2026-11-02 in both versions, the three round trips give this comparison and the byte comparison before it the same
+verdicts and the same spans on the same saves: the catch trip's 22 bytes outside the two structs (11 a copy) and the
+three mail ids of each copy, Floccesy's 14 bytes (7 a copy), and Hugh's 38 in Black 2 and 36 in White 2 (19 and 18 a
+copy); no other field or record differs ([STATUS.md](../../docs/STATUS.md)).
 
 **Tracing a record past a cut.** The battle counts records only when `setup->fieldSituation.unk1b` is 0 (`IncRecord`
 and `AddRecord`, `src/ov167/btl_main.c`), and scripts add to them with `RecordAdd ID, VALUE` (command 0x227, the ID in
