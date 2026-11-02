@@ -272,22 +272,22 @@ seed 0xea56a175a2fffc8a       # optional, repeated: the random seeds the DS buil
   those as the DS has them (its CPU takes no time, and its stack holds other things), so the port builds other seeds,
   and every random outcome differs from the DS's (port/docs/decomp-findings.md). The port's game takes the file's
   seeds in place of the ones it builds, the n-th line for the n-th seed, and normally builds its own after the last
-  (port/hal/gfl/random_seed.h); recording instead stops before an unsupplied seed can reach the game. Its run directory's `run.txt` lists the seeds it used. melonDS builds the DS's own, so
-  the oracle reads the lines only as part of the file. With the DS's seeds the two programs draw the same random
-  numbers, and a battle or a wild encounter plays as the DS plays it. A file's seeds belong to its start: a DS that
-  starts from another save, or reaches a battle by other presses, builds other seeds. [Random seeds](#random-seeds)
-  says how to find a DS's.
+  (port/hal/gfl/random_seed.h); recording instead stops before an unsupplied seed can reach the game. Its run
+  directory's `run.txt` lists the seeds it used. melonDS builds the DS's own, so the oracle reads the lines only as part
+  of the file. With the DS's seeds the two programs draw the same random numbers, and a battle or a wild encounter plays
+  as the DS plays it. A file's seeds belong to its start: a DS that starts from another save, or reaches a battle by
+  other presses, builds other seeds. [Random seeds](#random-seeds) says how to find a DS's.
 - `frames` says what FRAME counts. **`game`**, the default, counts passes of the game's main loop, the only count that
   gives both programs the same input at the same moment of the game ([PLAN.md §6](../../docs/PLAN.md#6-verification)):
   the DS drops frames under load and its start-up takes 241 frames, and the port does neither. Game frame N is the pass
   after GFL's frame count (`sVBlankCount`) has gone up N times since power-on: the pass during which the count is N,
-  until a soft reset restarts the count (the steps go on counting). The first pass, game frame 0, has frame 1's state unless `initial` supplies a separate preboot state,
-  as everything before it does. A video frame the console sleeps through counts as one game frame, so that a later line
-  can open the lid. **`video`** counts VBlanks since power-on (on the port, since `main()`), for the boot itself or a
-  test of timing. `pbwinput.h`'s `pbw_input_frame_at_vblank` and `pbw_input_frame_asleep` say which frame's state a
-  program applies at each VBlank: the oracle uses them, and the port's replays are to ([Integration](#integration)).
-  In a run, `frames.tsv`'s `game_frame` is the number to write for a state the game reads right after that frame's
-  picture.
+  until a soft reset restarts the count (the steps go on counting). The first pass, game frame 0, has frame 1's state
+  unless `initial` supplies a separate preboot state, as everything before it does. A video frame the console sleeps
+  through counts as one game frame, so that a later line can open the lid. **`video`** counts VBlanks since power-on (on
+  the port, since `main()`), for the boot itself or a test of timing. `pbwinput.h`'s `pbw_input_frame_at_vblank` and
+  `pbw_input_frame_asleep` say which frame's state a program applies at each VBlank: the oracle uses them, and the
+  port's replays are to ([Integration](#integration)). In a run, `frames.tsv`'s `game_frame` is the number to write for
+  a state the game reads right after that frame's picture.
 - A frame line gives the **whole state from that frame on**, until the next frame line: not a change of state. Frames
   count from 1 and increase strictly. Before the first frame line, explicit `initial` holds when present; otherwise
   nothing is held, the lid is open and the pen is up.
@@ -342,8 +342,9 @@ The focused units cover initial/header-only playback, every numeric/touch/lid ta
 latest-touch sampling across repeated game passes, seed exhaustion and file lifecycle. The actual-game acceptance
 harness is [tests/replay/check_recording.py](../../tests/replay/check_recording.py): it compares record/replay frame
 records, every required RNG/NNS payload, supplied-seed accounting and saved images in isolated directories. See
-[its guide](../../tests/replay/README.md) for longer story/save runs and [ADR 0027](../../docs/adr/0027-recorded-input-streams.md)
-for the format and failure boundaries. Results belong in STATUS/PR evidence, not an implied whole-game guarantee.
+[its guide](../../tests/replay/README.md) for longer story/save runs and
+[ADR 0027](../../docs/adr/0027-recorded-input-streams.md) for the format and failure boundaries. Results belong in
+STATUS/PR evidence, not an implied whole-game guarantee.
 
 ## Run directories
 
@@ -1049,7 +1050,8 @@ decrypted, is the same in both, written and decrypted):
 The second copy (`0x26000` on) differs in the same 17 places; the rest of the chip is the same. The round trip
 declares these bytes, each span with its cause (`ROUND_TRIPS` in `oracle.py`), and fails on a byte that differs
 anywhere else, including bytes one save lacks and the other has. The mystery gift block's contents are compared
-decrypted with each save's own key (`mystery_gift_decrypted`), so that a trip can declare the block's key but never what it encrypts.
+decrypted with each save's own key (`mystery_gift_decrypted`), so that a trip can declare the block's key but never what
+it encrypts.
 
 **A trainer battle to its end** (`oracle.py round-trip hugh`, ctest `oracle_round_trip_hugh`;
 [ADR 0023](../../docs/adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md)): Hugh's battle, which the hugh
@@ -1410,10 +1412,10 @@ failure to fix, never a known difference. By kind:
   5063–5066 and White 2 frames 17987–17990 / 18067–18070 for the four-pixel scrolls (`BALLOON_SCROLL`). The latter
   follow `PrintStream_Task`'s bitmap copy/fill and `BmpWin_FlushChar`; the native text interior equals the same-counter
   DS interior shifted upward four pixels, exactly, and the next DS picture matches the native one. The InfoMsg
-  follows `Scrcmd_Msg_InfoMsg` → `MsgBGPrinter_CreatePlainWin` → `TalkMsgWin_AddFrameWindow` → char/map flushes and direct
-  `GX_LoadBGnChar/Scr` copies. A fresh Black 2 trace dumps the whole main BG VRAM (`0x06000000:0x80000`), main palette
-  and OAM at DS frames 6588 and 6589: all are identical at frame end, although the window appears on the LCD only
-  in 6589. Its rectangle equals native frame 4530 exactly. The same source path and adjacent-frame rectangle match
+  follows `Scrcmd_Msg_InfoMsg` → `MsgBGPrinter_CreatePlainWin` → `TalkMsgWin_AddFrameWindow` → char/map flushes and
+  direct `GX_LoadBGnChar/Scr` copies. A fresh Black 2 trace dumps the whole main BG VRAM (`0x06000000:0x80000`), main
+  palette and OAM at DS frames 6588 and 6589: all are identical at frame end, although the window appears on the LCD
+  only in 6589. Its rectangle equals native frame 4530 exactly. The same source path and adjacent-frame rectangle match
   identify White 2's case. These are after-scanout presentation differences, separate from the multi-frame-pass state
   snapshots; bottom screens and all game state remain compared on these nine frames.
 - **Memory the game reads past a heap block.** The copyright screen loads 0x8000 bytes of a smaller file's
@@ -1475,9 +1477,9 @@ failure to fix, never a known difference. By kind:
   the dialog on, the field's passes alternate between ending with NNS G3D's camera at the field's and at a 2D one, and
   the port reaches that step first, 232 counts before the DS in Black 2's catch and 144 in pc (`SAVE_CAMERA`); and the
   field's townspeople who walk or turn at random draw their waits and directions from GFL's linear generator
-  (`FieldActorMovecode_GetRandomTableEntry` and `_GetRandomDirFromSet`, `src/ov036/field_actor_movecode.c`) when their timers,
-  which wait while the field menu and the dialog show, run out, so from the port's dialog closing the DS makes each of
-  the port's draws as many counts later as its dialog closes later, 192 and 168 in route19, 228 and 232 in catch
+  (`FieldActorMovecode_GetRandomTableEntry` and `_GetRandomDirFromSet`, `src/ov036/field_actor_movecode.c`) when their
+  timers, which wait while the field menu and the dialog show, run out, so from the port's dialog closing the DS makes
+  each of the port's draws as many counts later as its dialog closes later, 192 and 168 in route19, 228 and 232 in catch
   (`SAVE_RANDOM`). In pc the draws come 126 counts later in both versions, a field pass less than the dialog's 128: the
   townsperson by the counter, the one who draws there, took up his wait again a field pass sooner on the DS after the
   PC's log-off (`PC_LOGOFF`, below), so when the field menu stops him he has one step less to go on the DS (25 against
