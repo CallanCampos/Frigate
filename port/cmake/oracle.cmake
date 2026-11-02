@@ -3,9 +3,11 @@
 # field menu and its apps (the bag, the trainer card, the party list, the summary and the Pokédex), New Game's intro
 # and its route through the field into Aspertia City (phase 3's exit: a walk, a talk, a house and four changes of map),
 # phase 4's route (Hugh's trainer battle, Route 19, a wild Pokémon caught, the game saved and continued, and that save
-# continued by each program from the other's; Hugh's battle played to its end and its save; the PC's storage system)
-# and a save; the saves made on the oracle from saves (the first save, the starter save with a Pokémon and the
-# Pokédex, and the route's), which the sequences start from; and the sound of the opening and the title (the ARM7 sound
+# continued by each program from the other's; Hugh's battle played to its end and its save; the PC's storage system),
+# phase 5's story (Alder's scenes on Route 19 and in Floccesy Town and the road to Route 20, its save made and continued
+# by each program; Youngster Terrell's trainer battle on Route 20 up to his AI's first decision, which the DS's CPU time
+# moves) and a save; the saves made on the oracle from saves (the first save, the starter save with a Pokémon and the
+# Pokédex, and the routes'), which the sequences start from; and the sound of the opening and the title (the ARM7 sound
 # driver run by run; its output: a stream and a cry to the bit, the music by its envelope and levels).
 #
 # The input file reader (pbwinput.c, which the port can compile as it is), the per-screen 3D decision (display3d.c),
@@ -172,7 +174,8 @@ port_test_labels(oracle_boot oracle)
 # center_continue plays the save made after Hugh's battle (center_save) to the start menu and CONTINUE, up to the field
 # (oracle_round_trip_hugh continues the port's own save with it); pc goes on from the catch save back to the Pokemon
 # Center's PC, deposits the Pokemon caught, looks at the box, withdraws it, swaps it with Tepig and saves, the PC Box's
-# first three apps against melonDS frame by frame
+# first three apps against melonDS frame by frame. Phase 5's story goes on from the catch save, its sequences below:
+# floccesy and floccesy_continue, then terrell, the second leg's first piece
 set(port_oracle_saves "${CMAKE_BINARY_DIR}/oracle-saves")
 add_test(NAME oracle_saves
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
@@ -183,7 +186,7 @@ add_test(NAME oracle_saves
 set_tests_properties(oracle_saves PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 7200 FIXTURES_SETUP oracle_saves)
 port_test_labels(oracle_saves oracle)
 foreach(sequence IN ITEMS opening title continue continue_starter field_menus party_menus aspertia hugh route19 catch
-                         catch_continue center_continue pc floccesy floccesy_continue)
+                         catch_continue center_continue pc floccesy floccesy_continue terrell)
     if(EXISTS "${port_oracle_tests}/${sequence}_${PORT_VERSION}.tsv")
         add_test(NAME oracle_${sequence}_hashes
             COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
@@ -225,6 +228,11 @@ set_tests_properties(oracle_floccesy_save PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT
 port_test_labels(oracle_floccesy_save oracle)
 set_tests_properties(oracle_floccesy PROPERTIES TIMEOUT 7200)
 set_tests_properties(oracle_floccesy_continue PROPERTIES FIXTURES_REQUIRED oracle_floccesy_save)
+# Phase 5's second story leg starts from the Route 20 save, in pieces that each end at a cut (ADR 0023). terrell:
+# CONTINUE there, east into Youngster Terrell's sight and his trainer battle, held to melonDS frame by frame, with GFL's
+# random state, up to the last frame before the move his AI picks shows, a pick the DS's CPU time moves; no save or
+# round trip holds the port past that cut yet (port/tools/oracle/README.md, "Route 20: Youngster Terrell")
+set_tests_properties(oracle_terrell PROPERTIES FIXTURES_REQUIRED oracle_floccesy_save TIMEOUT 3600)
 
 # The whole story up to SAVE is held frame for frame by oracle_floccesy. This separate trip plays SAVE to completion,
 # checks every save byte except the traced clock/CRC bytes, and continues both saves on the DS and in a fresh native

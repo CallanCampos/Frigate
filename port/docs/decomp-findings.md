@@ -36,6 +36,57 @@ and excluded from the analysis; game counters, normalized bus cycles and actual 
 boundaries. Only four observed loop branches have the real SUSPENDED flag. These measurements establish neither
 whole-game timing parity nor a generic CPU-cost model. No fixed choice delay or new battle-frame mask is introduced.
 
+**Youngster Terrell's first decision, traced 2026-11-02 (the `terrell` sequence on Route 20, both versions):** his
+Patrat knows Tackle and Leer, and his AI has `AI_FLAG_BASIC` alone, whose one script runs once for each move: each run
+reads it from the card (`TrAI_LoadScript`) and frees it at its end (`TrAI_ReleaseScript`). Both programs played the
+sequence's file from the Route 20 save with the DS's seeds. The port's side was traced with a scratch log of
+`GFL_RandomMT`'s callers and of the AI's setup, passes, commands and pick, under `PLATFORM_PC` in a trace worktree,
+never committed; its runs' random state equals the sequence's port runs at every dump they share.
+The DS's side came from per-frame dumps of melonDS's memory: the twister, and `TrAIContext` and its VM, found in one
+dump of main RAM by their fields (Black 2 `0x022623a8`, White 2 `0x022623e8`); those runs equal the sequence's oracle
+runs at every dump up to the cut. All the dumps stayed on this machine.
+
+- **(a) The twister per count.** Its first word is the same on both programs throughout. Its index is the same at
+  every count but four: Black 2's 5172-5175 and White 2's 5168-5171. There the port's is 9, 9, 6 and 5 ahead of the
+  DS's index at the count's first oracle frame, and 7, 7, 6 and 5 ahead of it at the count's last. From the next count
+  (5176, 5172) the indices are equal again. The other counts whose first oracle frame differs are DS passes of
+  several frames, equal at their later frames (`MID_PASS`).
+- **(b) Who drew each number.** On both programs the battle's view draws two numbers a pass for its blink checks
+  (`BtlvMcss_Main`), after the client's work of the same pass. The AI draws twelve:
+  - `TrAI_Setup`'s five at count 5171 (White 2 5167), on both programs and at the same indices. The DS's context holds
+    the port's values: damage factors 92, 92, 86 and 91 and the random 122 in Black 2; 87, 100, 92, 100 and 42 in
+    White 2.
+  - `GuessAbility`'s six, two in the script's run for Tackle and four in its run for Leer.
+  - `TrAI_ChooseMove`'s pick.
+
+  The port draws the guesses and the pick at the next count. The DS draws them over the next five counts: none, none,
+  one, one, then four and the pick.
+- **(c) The passes and suspensions.** The port thinks in one pass and never suspends, as its log shows. Its virtual
+  clock moves a tick at each `OS_GetTick` and gives the card's reads no time, so its 46 commands and the script's two
+  reads stay within the 500 ticks. The DS thinks in five passes and suspends four times:
+  - at +6 in the script's run for Tackle, after the script's read, still going at the end of the pass's second video
+    frame, and the first command;
+  - at +32, after the damage command (`AIGetHighestDamagingMove`, which works out both moves' damage), still running
+    at the end of the pass's first frame;
+  - at +74, after the first guess, which reads Tepig's personal data: the species whose data the game last read
+    (`g_PMLPersonalNowLoadForme` in `src/system/poke_tool.c`) turns from Patrat's 504 to Tepig's 498 in that pass;
+  - at +6 in its run for Leer, after the script's second read (the copy read for Tackle was freed when that run ended).
+
+  Its fifth pass runs the script for Leer to its end, where the guesses find Tepig's data already read, and picks. So
+  the DS's first guess comes two counts after the port's (5174 against 5172 in Black 2, 5170 against 5168 in White 2),
+  because the reads before it take the DS's time. The DS's first two passes of the decision take three and two video
+  frames.
+- **(d) The picks, and the first frame a consumer of these numbers changes.** The scores are equal on both programs (100
+  and 100), so the pick is the next number scaled to two moves. The port's (index 53 in Black 2, 49 in White 2) picks
+  slot 1, Leer; the DS's (61, 57) picks slot 0, Tackle. Each guess scales its number to Tepig's three ability slots,
+  Blaze, Blaze and Thick Fat (`res/pokemon/tepig/data.json`). Recomputed from the seeds at the traced indices, three
+  of the six guesses differ in Black 2 (the third, fifth and sixth) and one in White 2 (the fifth), Thick Fat on one
+  program and Blaze on the other each time; no score and no number of draws changes. No blink check of the four
+  passes draws a blink (0 of 100) on either program. So the first frame that changes is the foe's move in the top
+  screen's message, at count 5489 in both versions (port frame 5492): "Leer!" on the port, "Tackle!" on the DS. NNS
+  G3D's state parts at count 5515, with the move's animation. The sequence ends at port frame 5491, holding the four
+  passes as `TERRELL_AI_TIME`.
+
 | Where | What | How the port handles it | Found |
 | --- | --- | --- | --- |
 | `src/ov170/tr_ai.c` (`TrAI_RunScripts`, `TRAI_TIME_LIMIT`; complete) | The trainers' AI scores its moves by running its scripts for at most 500 ticks of `OS_GetTick` a pass, about a millisecond, and goes on where it stopped at the next pass. The DS's CPU takes time for the scripts' interpreter and the data they load, so how many passes the AI thinks is the DS's speed. Meanwhile the battle's view draws two numbers a pass from GFL's Mersenne Twister (`BtlvMcss_Main`'s blinks, `src/ov168/btlv_mcss.c`), and the AI picks among its best moves with the twister's next one (`TrAI_ChooseMove`), so its pick depends on the passes it took. On the port each `OS_GetTick` moves the virtual clock a tick, so the AI runs 500 of those checks a pass and thinks in one. Traced first by the twister's callers on both programs (a scratch log of `GFL_RandomMT`'s callers in the port and an instrumented scratch build of melonDS, Black 2, 2026-10-24): at each of Hugh's turns his AI's setup draws in the same pass on both, the port's AI picks at the next pass and the DS's two passes later. The `hugh` sequence now holds it as GFL's random state, with the DS's seeds, in both versions (`oracle_hugh`): the linear generator's state and the twister's first word and index are the DS's at every count of the title, CONTINUE, the field and the battle but two passes at each turn, where the port's twister index is one ahead (Black 2's counts 7500-7501 and 7969-7970, White 2's 7496-7497 and 7969-7970), and the DS's again from its pick on. Oshawott's first pick is the same by chance; its second is another, and from that turn's rolls on (count 8193) the battle differs | nothing: no host has the DS's time. On the port a trainer battle plays as a DS could play it, from the DS's seeds too, but not as melonDS plays it once the AI thinks for more than a pass there ([oracle README](../tools/oracle/README.md#known-differences-from-the-hardware)). An oracle sequence stops before the AI's first decision the DS's time moves, and the route goes on from melonDS's save made after the battle ([ADR 0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md)). Past the cut the port's battle is its own and is held by what the CPU's time doesn't decide: `oracle_round_trip_hugh` plays Hugh's battle to its end on the port, which takes 560 counts more than the DS's in Black 2 and 704 in White 2, and holds its save in the Pokémon Center to melonDS's byte by byte but the bytes it declares (2026-10-25) | 2026-10-24, phase 4's route |
