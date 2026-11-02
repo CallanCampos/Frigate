@@ -43,15 +43,17 @@ What the documents leave open, for the owner's word to settle:
 - **What runs.** The routes that need no oracle go no further than the Aspertia City lookout, where
   `replay_starter_save` ends (`port/cmake/app.cmake:239-242`; inferred from every such route's description): 17 in Black
   2 and 15 in White 2 without the timing routes, which the strict tree doesn't register
-  (`port/cmake/frame_times.cmake:24`; counted so in PR 77's STATUS.md, `:68-69` at `a7d768e2ee`, its head on 2026-11-02,
-  which adds no such route), and 19 and 16 with them at PR 67 (`port/docs/STATUS.md:642-643`). Every sequence of phases
-  4 and 5 starts from a save that only the oracle makes, so it has no reference and no port-alone ctest test
-  (`port/cmake/oracle.cmake:149-175`, `:187-198`); the comparison sequences' committed references are the opening's, the
-  title's and aspertia's alone (`port/tests/oracle/*.tsv`). In the strict tree those sequences run only inside
-  `oracle_<seq>`, beside melonDS. Since phase 4 the practice has been the strict program alone on each piece's input
-  from its save, in batches by hand (`STATUS.md:2259-2262`, `:2079-2082`, `:1848-1851`, `:1915-1918`); no tool in
+  (`port/cmake/frame_times.cmake:24`; counted so in the STATUS.md of `a7d768e2ee`, `:68-69`, the head that PR 77 merged
+  from on 2026-11-02, which adds no such route), and 19 and 16 with them at PR 67 (`port/docs/STATUS.md:642-643`). Every
+  sequence of phases 4 and 5 starts from a save that only the oracle makes, so it has no reference and no port-alone
+  ctest test (`port/cmake/oracle.cmake:149-175`, `:187-198`); the comparison sequences' committed references are the
+  opening's, the title's and aspertia's alone (`port/tests/oracle/*.tsv`). In the strict tree those sequences run only
+  inside `oracle_<seq>`, beside melonDS. Since phase 4 the practice has been the strict program alone on each piece's
+  input from its save, in batches by hand (`STATUS.md:2259-2262`, `:2079-2082`, `:1848-1851`, `:1915-1918`); no tool in
   `port/tools` runs them, and the batches don't name their runtime options. Run as item 1 below has them, the tables
-  give 16 such cases and 147,920 port frames per version today (counted from `SEQUENCES`, `SAVES` and `ROUND_TRIPS`).
+  give 16 such cases and 147,920 port frames per version at `e936696a97` (counted from `SEQUENCES`, `SAVES` and
+  `ROUND_TRIPS`); PR 77 has since added `terrell`, a sequence of 5,491 port frames from the Route 20 save with no
+  reference (`oracle.py:727-749` at `a7d768e2ee`).
 - **The compiler.** The build takes the compiler CMake finds, Apple clang on a Mac, which emits no function check for C
   and has no LeakSanitizer; upstream clang has both (`sanitizers.md:43-46`, `:163-164`;
   `port/docs/lessons.md:760-763`). R3 and R4 are marked as upstream clang's alone, and R12 to R14 are calls through
@@ -366,9 +368,10 @@ their costs under the same numbers.
   sanitized jobs carries them (`port/CMakeLists.txt:473-487`); and `main`'s first baseline, with any report it finds
   recorded as open and fixed in a pull request of its own. Until then STATUS.md entries record T5 as not run, as now.
 - **Story pull requests** may run their new pieces as their T5 once the runner exists, and their leg's whole run holds
-  them (item 7). Youngster Terrell's piece, PR 77 (`a7d768e2ee`, its head on 2026-11-02), adds the sequence `terrell`
-  from the Route 20 save (its `oracle.py:727` and `:749`) and joins the set through the tables alone; landing before
-  the runner, it records T5 as not run (its `STATUS.md:88`), and its leg's whole run covers it.
+  them (item 7). Youngster Terrell's piece, PR 77, merged on 2026-11-02 from `a7d768e2ee`, added the sequence
+  `terrell` from the Route 20 save (that commit's `oracle.py:727` and `:749`), which joins the set through the tables
+  alone; landing before the runner, it recorded T5 as not run (that commit's `STATUS.md:88`), and its leg's whole run
+  covers it.
 - **A change that every route runs but that adds no route**, such as the geometry engine's depth fix, PR 76
   (`69422db812` on 2026-11-02, which also changes the digest's `digest.c`, `digest.h` and `test_digest.c` and ADRs
   0030 and 0031), owes no T5 of its own: its tests run sanitized in CI, and the whole run that item 7 advises after
@@ -398,15 +401,15 @@ their costs under the same numbers.
   `PLAN.md:468-469`): one that the sanitized build leaves out, as it leaves out SDL3, or whose leak only a suppression
   can answer, gets its line in item 5 by an amendment.
 - **The cost** is a strict build per version and the set's runs, all on demand, at each leg's end, at a candidate and
-  after a change to how every route's program is built. Today the set is 16 program-alone cases and 147,920 port
-  frames per version beside the ctest routes. No program-alone timing of it is on record: at the rate the strict
-  program kept beside melonDS on 2026-10-24, under load (`oracle_aspertia`'s 15,708 port frames in 1,894 s,
-  `STATUS.md:3511-3518`), it would take about 5 hours per version, and less alone (inferred); T5-A's first runs give
-  the real figure. It grows with every piece the story adds, then with the stations and the map sweep, about 1.35
-  million frames per version if each of its 615 zones runs the 2,200 frames of its boot input (`STATUS.md:430`,
-  `:464`; inferred), and at a candidate the x86_64 slice under Rosetta runs it again. A route pull request that runs
-  its own cases spends 10 to 30 minutes a case in each game after a strict build of each version (an estimate), the
-  reason item 7 leaves those runs optional.
+  after a change to how every route's program is built. At `e936696a97` the set is 16 program-alone cases and 147,920
+  port frames per version beside the ctest routes, and PR 77's `terrell` has added 5,491 since. No program-alone timing
+  of it is on record: at the rate the strict program kept beside melonDS on 2026-10-24, under load (`oracle_aspertia`'s
+  15,708 port frames in 1,894 s, `STATUS.md:3511-3518`), it would take about 5 hours per version, and less alone
+  (inferred); T5-A's first runs give the real figure. It grows with every piece the story adds, then with the stations
+  and the map sweep, about 1.35 million frames per version if each of its 615 zones runs the 2,200 frames of its boot
+  input (`STATUS.md:430`, `:464`; inferred), and at a candidate the x86_64 slice under Rosetta runs it again. A route
+  pull request that runs its own cases spends 10 to 30 minutes a case in each game after a strict build of each version
+  (an estimate), the reason item 7 leaves those runs optional.
 - **Watch** a compiler update (item 2), the runner's coupling to `oracle.py`'s tables, and the disk: each strict tree
   is a whole build of its own.
 - **Revisit** if a release candidate is built for Windows or Linux, if ADR 0031's digests run the sequences from saves

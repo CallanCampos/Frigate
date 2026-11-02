@@ -38,16 +38,17 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   upstream commit.
 - **Port:** `PORT_SHA`, on the topic branch `port-phase5-decisions` from `e936696a97` (PR 71's merge): `1751e811b2`
   (the four ADRs), `6b2804107c` (the merge of `main` at `c6fcdd3f59`, PR 75: the documents check, all of it in `port/`
-  and `.github/`), `40b933970c` (the review's fixes), the merge of `main` at `2d3b99c9ee` (PR 77: Terrell's cut, all
-  of it in `port/`) and this entry's account of them. Each merge keeps both new STATUS.md entries, this one first.
+  and `.github/`), `40b933970c` (the review's fixes), `a26dd099d8` (the merge of `main` at `2d3b99c9ee`, PR 77:
+  Terrell's cut, all of it in `port/`) and PR 77's landing noted in ADRs 0020 and 0033, with this entry's account of
+  them. Each merge keeps both new STATUS.md entries, this one first.
   This entry fills the last entry's, Terrell's (PR 77's), `PORT_SHA` with `a7d768e2ee`; that entry filled the
   documents' (PR 75's) with `7d87f98b8c` and the save lab's (L1) with `a9d91adf59`. Documents only, all of them
   Markdown in `port/docs/`: nothing outside `port/` changes.
 - **ROM (T0):** `python3 configure.py && ninja` in this branch's worktree, every step run on `1751e811b2` (14,039, ninja
   at `-j4`), with no compiler warning: both original US SHA1s match, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and
-  W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`; again on the merge with `main` at `c6fcdd3f59` and the review's changes
-  (2 steps, the checks), the same SHA1s and no warning. This change is no ROM input, and nothing outside `port/` and
-  `.github/` differs between `e936696a97` and `c6fcdd3f59` (`git diff --stat`).
+  W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`; again on the merges with `main` at `c6fcdd3f59` and at `2d3b99c9ee`,
+  with the review's changes (2 steps each, the checks), the same SHA1s and no warning. This change is no ROM input, and
+  nothing outside `port/` and `.github/` differs between `e936696a97` and `2d3b99c9ee` (`git diff --stat`).
 - **Host build (T1):** no source, build or test change from reviewed main, so not rebuilt here; the exact-head
   `sync_upstream.sh --verify-pr` builds and tests both versions before merge.
 - **Tests (T2–T7):** not run here: no code, input, seed, golden, mask, budget or sanitizer policy changes. The documents
@@ -111,9 +112,9 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     and PR 81 builds on, though PR 79's entry and the save lab's L2 name 0033 for chained trainer battles (that ADR
     takes the next free number when it is written, as PR 77's entry says); and the file names of 0033 and 0034,
     which shorten their titles as those of ADRs 0013 to 0016, 0019 and 0021 to 0029 do.
-- **Next:** Phase 5's story coverage, its earliest unmet exit criterion, continues past the Route 20 save: Terrell's
-  cut (PR 77) and the decrypted save comparison (PR 79), then the rest of leg 2's pieces. Beside it, the owner's
-  decisions on ADRs 0020, 0033, 0034 and 0035, each of which unblocks work: T5-A (PR 81, in review) takes
+- **Next:** Phase 5's story coverage, its earliest unmet exit criterion, continues past the Route 20 save, where
+  Terrell's cut (PR 77) has landed: the decrypted save comparison (PR 79), then the rest of leg 2's pieces. Beside it,
+  the owner's decisions on ADRs 0020, 0033, 0034 and 0035, each of which unblocks work: T5-A (PR 81, in review) takes
   ADR 0033's items 5 and 7 as revised here, then runs `main`'s first strict baseline in both versions; ADR 0034's 60
   fps work (the paced check in `frame_times.py`, the new timing routes, `-LE timing` in the per-PR gate, the CI bench
   step, then the quiet record); ADR 0035's release candidate engineering, after the owner's ruling on the hand-out

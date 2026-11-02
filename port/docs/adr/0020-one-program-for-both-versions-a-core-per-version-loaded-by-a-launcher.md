@@ -395,19 +395,19 @@ about as little, and can follow.
     preprocessed text in under a minute (52 s with 4 jobs, branch STATUS.md:67), catches a wrong classification in
     every build, and a full build of both versions runs on demand, where the branch had a CI job make it
     (branch 0017:194-196).
-- **Work in flight**, as of 2026-11-02, each pull request at the head it had then. Story leg 2 (Terrell's cut, PR 77
-  at `a7d768e2ee`, which follows [ADR 0023](0023-oracle-routes-part-where-the-ds-cpu-time-decides.md) as every route
-  does, and the decrypted save comparison, PR 79 at `d40edbfd06`), the save lab's L2 with ADR 0032 and v2's later
+- **Work in flight**, as of 2026-11-02, each pull request at the head it had then. Story leg 2 (Terrell's cut, PR 77,
+  merged from `a7d768e2ee`, which follows [ADR 0023](0023-oracle-routes-part-where-the-ds-cpu-time-decides.md) as every
+  route does, and the decrypted save comparison, PR 79 at `d40edbfd06`), the save lab's L2 with ADR 0032 and v2's later
   parts add per-version tests in each tree as they do today; no stage but stage 1 renames them, and no route's command
   changes. v2's part 2 (PR 78 at `cfb18b4130`) compiles the digest into Frigate's program, whose code becomes the
   cores', and adds xxHash's notice to the app, which stage 4 carries once; its part 6's presets select tests in one
-  build tree, so each version's tree has them, and stage 1, if it comes, would select by version instead (inferred).
-  The ToScreen depth fix (PR 76 at `69422db812`: `port/gfx/ge/ge.c` and `ge.h`, with the digest's `digest.c`,
-  `digest.h` and `test_digest.c`, and ADRs 0030 and 0031) is the same code in both versions. T5-A (PR 81 at
-  `9c7883345a`) runs each version's strict program from that version's own tree, which stage 1 would change (ADR
-  0033). The documents check (PR 75, merged at `c6fcdd3f59`) runs in CI over every document, stage 4's renames
-  among them. Stages 2 and 3 change the C that the oracle routes run, so each lands where it doesn't restart a story
-  pull request's final verification (inferred).
+  build tree, so each version's tree has them, and stage 1, if it comes, would select by version instead (inferred). The
+  ToScreen depth fix (PR 76 at `69422db812`: `port/gfx/ge/ge.c` and `ge.h`, with the digest's `digest.c`, `digest.h` and
+  `test_digest.c`, and ADRs 0030 and 0031) is the same code in both versions. T5-A (PR 81 at `9c7883345a`) runs each
+  version's strict program from that version's own tree, which stage 1 would change (ADR 0033). The documents check (PR
+  75, merged at `c6fcdd3f59`) runs in CI over every document, stage 4's renames among them. Stages 2 and 3 change the C
+  that the oracle routes run, so each lands where it doesn't restart a story pull request's final verification
+  (inferred).
 - **To watch:** the launcher loads by full path alone, since a library found by a search path can be another's; the
   nested cores' ad-hoc signatures on macOS 11 to 14, which no runner covers (ADR 0015, line 136); each core's Mach-O
   sections within its own 255; `version_split`'s count as upstream decompiles more; and the ROMs the picker
