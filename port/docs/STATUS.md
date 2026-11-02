@@ -32,11 +32,46 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-11-01: ADR 0023 accepted under the owner's Ship of Harkinian rule
+
+- **Upstream:** unchanged, `9496bc869b87`, as reviewed main `e733ccc8a3` (PR 66) has it; this branch imports no
+  upstream commit.
+- **Port:** `PORT_SHA`, on `port-adr0023-accepted` from reviewed main `e733ccc8a3`: documentation only, all of it in
+  `port/docs/`.
+- **ROM (T0):** a fresh `python3 configure.py && ninja` in this branch's new worktree, 10,703 steps with no compiler
+  warning: both original US SHA1s match, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. No ROM input changes.
+- **Host build (T1):** not run: no C, CMake, test or tool changes from reviewed main.
+- **Tests (T2–T7):** not run: no code, input, seed, golden, mask or test changes. Every relative link and anchor of
+  the eight changed Markdown files resolves (checked by script, anchors as GitHub makes them). The research note's 46
+  external links answer 200, but for speedrun.com, which answers a script with 403 for some of its pages (two of the
+  three on the last run; their URLs are the ones its API gives), and each GitHub line link points at the code it
+  cites in the raw file at its pinned commit. GitHub's Markdown API renders the note's table inside its list.
+- **Tiers, trap stubs and 64-bit warnings:** unchanged by this documentation change; not remeasured.
+- **Work done:** the owner settled [ADR 0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md) by a rule
+  on 2026-11-01: if Ship of Harkinian doesn't match the original console's RNG, Frigate can accept the ADR; if it
+  does, Frigate should fix its own difference too. A research agent and an independent adversarial check read Ship of
+  Harkinian, libultraship, the Ocarina of Time and Majora's Mask decomps and gz at pinned commits: Ship of Harkinian
+  reproduces neither the N64's random numbers nor its timing (about 98% confidence). It reseeds at every scene load
+  from the PC's steady clock, makes its random floats the GameCube way even from an N64 ROM, and runs a fixed lockstep
+  loop with none of the console's lag; its tracker and code say so, and its draft TAS tools would inject recorded
+  console seeds.
+  - [research/ship-of-harkinian-rng.md](research/ship-of-harkinian-rng.md) records the question, the answer, the
+    evidence with links to the lines read, and what it means for Frigate, with its rows in the research and
+    documents indexes.
+  - ADR 0023's status line says accepted, with a dated note that links the research, and its index row says so;
+    MODDING.md and decomp-findings.md no longer call it proposed. The ADR's body is unchanged. Past STATUS entries and
+    ADRs 0028 and 0029, which are records, keep the words of their time.
+- **Next:** publish this branch as a topic PR; exact-head local verification, the hosted checks and owner review
+  precede the protected merge. Phase 5's story routes then go on, each trainer battle cut where ADR 0023 says.
+- **Blockers:** none for this change. Broader serial/CPU timing and later story coverage remain unfinished; Spanish
+  issue 45 still lacks a local dump.
+
 ## 2026-10-28: finish local-verification failures and retain the scoped sync App
 
 - **Upstream:** reviewed main `56a9ef2a1d` contains `9496bc869b87` after PR 65 passed both full local suites, both
   actual assembly oracles, both original ROM hashes and all 14 checks before owner approval and protected merge.
-- **Port:** `PORT_SHA`, a feature branch from that reviewed main; the preserved patch is reapplied without dropping
+- **Port:** `22d3464507`, a feature branch from that reviewed main; the preserved patch is reapplied without dropping
   its named stash or backups. Test README conflict resolution retains both complete sets of controls.
 - **ROM (T0):** configure/Ninja and both original US SHA1s pass with zero ROM compiler warnings: B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
