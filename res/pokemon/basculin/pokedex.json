@@ -1,0 +1,35 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "B",
+    "shapes": [ 2, 2 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_STRIATON_CITY": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_UNDELLA_TOWN": [ "surf", "rippling_surf" ],
+            "ZONE_PINWHEEL_FOREST": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_DRAGONSPIRAL_TOWER": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_GIANT_CHASM": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_WELLSPRING_CAVE": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_ABUNDANT_SHRINE": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_LOSTLORN_FOREST": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_ROUTE_1": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_ROUTE_3": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_ROUTE_6": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_ROUTE_11": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_ROUTE_13": [ "surf", "rippling_surf" ],
+            "ZONE_ROUTE_14": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_VILLAGE_BRIDGE": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_ASPERTIA_CITY": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_HUMILAU_CITY": [ "surf", "rippling_surf" ],
+            "ZONE_ROUTE_19": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_ROUTE_20": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_ROUTE_22": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_FLOCCESY_RANCH": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_ROUTE_23": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_VICTORY_ROAD": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_RELIC_PASSAGE": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "ZONE_CLAY_TUNNEL": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ]
+        }
+    }
+}

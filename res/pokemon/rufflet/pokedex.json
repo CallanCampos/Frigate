@@ -1,0 +1,17 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "R",
+    "shapes": [ 11 ],
+    "area": {
+        "black2": {
+            "all_year": true,
+            "places": {}
+        },
+        "white2": {
+            "all_year": true,
+            "places": {
+                "ZONE_ROUTE_23": [ "grass", "dark_grass" ]
+            }
+        }
+    }
+}

@@ -19,11 +19,13 @@ typedef struct {
     u8 type;
     u8 connectNum : 4;
     u8 connectMax : 4;
-    u8 unk2_0 : 1;
+    // Set when this machine's network has had an error: such a beacon is never joined
+    u8 netError : 1;
     u8 unk2_1 : 5;
-    u8 unk2_6 : 1;
+    // Set on a DSi whose parental controls (bits 0 and 5 of its OS info) are on
+    u8 parentalControl : 1;
     u8 isDSi : 1;
-    u8 unk3_0 : 1;
+    u8 inResearchOrMission : 1;
     u8 unk3_1 : 1;
     u8 lidOpen : 1;
     u8 unk3_3 : 5;
@@ -44,13 +46,14 @@ struct BeaconSearchWork {
     GameCommSys *commSys;
     // 0 once the network ended, 1 once it started, 2 once the scan is set up
     int state;
-    u8 unkC;
+    // Set by the network's error callback
+    u8 netError;
     u16 unkE;
     // While nonzero, beacons of type 0x35 are not taken
     u32 timer;
     BeaconSearchBeacon beacon;
     BeaconSearchFound found;
-    WihDwcWork *unk88;
+    WihDwcWork *wihDwc;
 };
 
 static void GameBeaconSearch_OnNetInit(void *work);
@@ -61,12 +64,12 @@ static void *GameBeaconSearch_GetSendBeacon(void *work);
 static void GameBeaconSearch_SetupBeacon(BeaconSearchBeacon *beacon, GameData *gameData, GameCommSys *commSys);
 static int GameBeaconSearch_GetBeaconSize(void *work);
 static BOOL GameBeaconSearch_AcceptAnyBeacon(u32 a, u32 b);
-static void func_ov012_0215f918(NetHandle *handle, int a1, void *work);
-static void func_ov012_0215f920(void *work);
+static void GameBeaconSearch_OnNetError(NetHandle *handle, int error, void *work);
+static void GameBeaconSearch_OnNetEnd(void *work);
 static BeaconSearchBeacon *GameBeaconSearch_PickBetterBeacon(BeaconSearchBeacon *beacon, BeaconSearchBeacon *other);
 
 // clang-format off
-static const GFLNetInitData data_ov012_0216d6a8 = {
+static const GFLNetInitData sGameBeaconSearchNetInit = {
     NULL,
     0,
     NULL,
@@ -76,9 +79,9 @@ static const GFLNetInitData data_ov012_0216d6a8 = {
     GameBeaconSearch_GetSendBeacon,
     GameBeaconSearch_GetBeaconSize,
     GameBeaconSearch_AcceptAnyBeacon,
-    func_ov012_0215f918,
+    GameBeaconSearch_OnNetError,
     NULL,
-    func_ov012_0215f920,
+    GameBeaconSearch_OnNetEnd,
     NULL,
     {0},
     NULL,
@@ -129,7 +132,7 @@ BOOL GameBeaconSearch_InitWait(u32 *seq, void *param, void *work) {
     switch (*seq) {
     case 0:
         GFL_HeapDumpOnFailure(HEAPID_DLP);
-        GFL_NetInit(&data_ov012_0216d6a8, GameBeaconSearch_OnNetInit, search);
+        GFL_NetInit(&sGameBeaconSearchNetInit, GameBeaconSearch_OnNetInit, search);
         (*seq)++;
         break;
     case 1:
@@ -145,14 +148,14 @@ static void GameBeaconSearch_OnNetInit(void *work) {
     BeaconSearchWork *search = work;
 
     search->state = 1;
-    search->unk88 = WihDwc_Create(4, HEAPID_TAIL(HEAPID_TRIAL_HOUSE));
+    search->wihDwc = WihDwc_Create(4, HEAPID_TAIL(HEAPID_TRIAL_HOUSE));
 }
 
 BOOL GameBeaconSearch_Exit(u32 *seq, void *param, void *work) {
     GameSystem *gsys = param;
     BeaconSearchWork *search = work;
 
-    WihDwc_Destroy(search->unk88);
+    WihDwc_Destroy(search->wihDwc);
     GFL_NetExit(GameBeaconSearch_OnNetExit);
     return TRUE;
 }
@@ -224,7 +227,7 @@ static BeaconSearchFound *GameBeaconSearch_ScanBeacons(BeaconSearchWork *work, i
     if (found->type == 0) {
         beacon = GameBeaconSearch_FindJoinableBeacon(work, index);
         if (beacon != NULL) {
-            if (beacon->unk2_0) {
+            if (beacon->netError) {
                 NetWhpipe_ConsumeBeacon(*index);
             } else if (beacon->unk2_1 == 1) {
                 MI_CpuFill8(found, 0, sizeof(BeaconSearchFound));
@@ -300,12 +303,12 @@ static void GameBeaconSearch_SetupBeacon(BeaconSearchBeacon *beacon, GameData *g
     beacon->type = 3;
     beacon->connectNum = GFL_NetGetNegotiatedCount();
     beacon->connectMax = 3;
-    beacon->unk2_0 = NetSystem_HasErrorChecked();
+    beacon->netError = NetSystem_HasErrorChecked();
     beacon->unk2_1 = 0;
-    beacon->unk3_0 = GameCommSys_IsInResearchGraphOrMission(commSys);
+    beacon->inResearchOrMission = GameCommSys_IsInResearchGraphOrMission(commSys);
     beacon->trainerId = getIDAsUInt(GetGameDataPlayerInfo(gameData));
     beacon->isDSi = OS_IsRunOnTwl();
-    beacon->unk2_6 = FALSE;
+    beacon->parentalControl = FALSE;
     beacon->unk3_1 = TRUE;
     if (PAD_DetectFold() == FALSE) {
         lidOpen = TRUE;
@@ -317,7 +320,7 @@ static void GameBeaconSearch_SetupBeacon(BeaconSearchBeacon *beacon, GameData *g
         } else {
             flag = FALSE;
         }
-        beacon->unk2_6 = flag;
+        beacon->parentalControl = flag;
     }
 }
 
@@ -329,17 +332,17 @@ static BOOL GameBeaconSearch_AcceptAnyBeacon(u32 a, u32 b) {
     return TRUE;
 }
 
-static void func_ov012_0215f918(NetHandle *handle, int a1, void *work) {
+static void GameBeaconSearch_OnNetError(NetHandle *handle, int error, void *work) {
     BeaconSearchWork *search = work;
 
-    search->unkC = TRUE;
+    search->netError = TRUE;
 }
 
-static void func_ov012_0215f920(void *work) {
+static void GameBeaconSearch_OnNetEnd(void *work) {
 }
 
 static BeaconSearchBeacon *GameBeaconSearch_PickBetterBeacon(BeaconSearchBeacon *beacon, BeaconSearchBeacon *other) {
-    if (beacon->unk2_0) {
+    if (beacon->netError) {
         return other;
     }
     if (beacon->connectNum < beacon->connectMax && beacon->connectNum >= other->connectNum) {

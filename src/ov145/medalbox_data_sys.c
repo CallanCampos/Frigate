@@ -1,5 +1,6 @@
 #include "types.h"
 #include "app/medalbox_data_sys.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
@@ -8,9 +9,6 @@
 #include "system/game_data.h"
 
 // The medals of the Medal Box screen and their order, named by the ROM's string; the function names are ours
-
-// The medals' definitions, one file each
-#define ARCID_MEDAL_DEF 235
 
 // Added to the sort key of a hint medal, which puts them after the medals
 #define SORT_KEY_HINT 0xfffffff

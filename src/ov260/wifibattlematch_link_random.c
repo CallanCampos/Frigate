@@ -182,7 +182,7 @@ static BOOL WifiBattleMatchLink_RandomInit(GameProc *proc, u32 *state, void *par
             WifiBattleMatchLink_ShowRankCard(link, 0);
         } else if (linkParam->mode == LINK_MODE_FREE) {
             if (linkParam->result == 1) {
-                WifiBattleMatchLink_AddMatchResult(linkParam->record, linkParam->param->unk4,
+                WifiBattleMatchLink_AddMatchResult(linkParam->record, linkParam->param->battleType,
                                                    linkParam->battleResult->result);
             }
             WifiBattleMatchLink_ShowRankCard(link, 1);
@@ -521,7 +521,7 @@ static void WifiBattleMatchLink_TaskRatingConnect(WifiBattleMatchTask *task, u32
         ready = WifiBattleMatchNet_ReadMain(link->net);
         if (ready == 1) {
             *link->param->unk20 = 1800;
-            link->recordChanged = WifiBattleMatchLink_UpdateRecord(param->record, param->param->unk4, link);
+            link->recordChanged = WifiBattleMatchLink_UpdateRecord(param->record, param->param->battleType, link);
             WifiBattleMatchLink_UpdatePlayerRecord(param->player, link);
             *link->param->unk28 = link->param->ratings->unk54;
             *seq = 3;
@@ -661,7 +661,7 @@ static void WifiBattleMatchLink_TaskRatingSearch(WifiBattleMatchTask *task, u32 
             return;
         default:
             WifiBattleMatchLink_FillCondition(&condition, link);
-            WifiBattleMatchNet_StartMatch(link->net, 2, 1, param->param->unk4, &condition);
+            WifiBattleMatchNet_StartMatch(link->net, 2, 1, param->param->battleType, &condition);
             *seq = 2;
             break;
         }
@@ -1004,8 +1004,8 @@ static void WifiBattleMatchLink_TaskRatingResult(WifiBattleMatchTask *task, u32 
         WifiBattleMatchTask_SetReturnSeq(task, 2);
         break;
     case 2:
-        WifiBattleMatchNet_StartReport(link->net, WBM_REPORT_MODE_RESULT, WBM_MATCH_MODE_RATING, param->param->unk4,
-                                       param->battleResult, param->result == 2);
+        WifiBattleMatchNet_StartReport(link->net, WBM_REPORT_MODE_RESULT, WBM_MATCH_MODE_RATING,
+                                       param->param->battleType, param->battleResult, param->result == 2);
         link->exchangeDone = 0;
         link->exchangeResult = 0;
         *seq = 3;
@@ -1457,7 +1457,7 @@ static void WifiBattleMatchLink_TaskFreeSearch(WifiBattleMatchTask *task, u32 *s
             return;
         default:
             WifiBattleMatchLink_FillCondition(&condition, link);
-            WifiBattleMatchNet_StartMatch(link->net, 3, 0, param->param->unk4, &condition);
+            WifiBattleMatchNet_StartMatch(link->net, 3, 0, param->param->battleType, &condition);
             *seq = 3;
             break;
         }
@@ -2010,12 +2010,12 @@ static void WifiBattleMatchLink_CreateRankCard(WifiBattleMatchLinkRandom *link, 
     MI_CpuFill8(&info, 0, sizeof(info));
     if (kind == 0) {
         titleMsg = 1;
-        info.titleMsg = link->param->param->unk4;
-        info.unk4 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,
+        info.titleMsg = link->param->param->battleType;
+        info.unk4 = RndMatchData_GetParam(link->param->record, link->param->param->battleType + RNDMATCH_RECORD_RATING,
                                           RNDMATCH_FIELD_RATING);
-        info.unk10 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,
+        info.unk10 = RndMatchData_GetParam(link->param->record, link->param->param->battleType + RNDMATCH_RECORD_RATING,
                                            RNDMATCH_FIELD_WIN);
-        info.unk12 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,
+        info.unk12 = RndMatchData_GetParam(link->param->record, link->param->param->battleType + RNDMATCH_RECORD_RATING,
                                            RNDMATCH_FIELD_LOSE);
         info.unkC = info.unk10 + info.unk12;
         if (info.unk4 == 0 && info.unkC == 0) {
@@ -2023,10 +2023,10 @@ static void WifiBattleMatchLink_CreateRankCard(WifiBattleMatchLinkRandom *link, 
         }
     } else if (kind == 1) {
         titleMsg = 0;
-        info.titleMsg = link->param->param->unk4;
+        info.titleMsg = link->param->param->battleType;
         info.unk4 = 0;
-        info.unk10 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, RNDMATCH_FIELD_WIN);
-        info.unk12 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, RNDMATCH_FIELD_LOSE);
+        info.unk10 = RndMatchData_GetParam(link->param->record, link->param->param->battleType, RNDMATCH_FIELD_WIN);
+        info.unk12 = RndMatchData_GetParam(link->param->record, link->param->param->battleType, RNDMATCH_FIELD_LOSE);
         info.unkC = info.unk10 + info.unk12;
     }
     info.look = PlayerInfo_GetUnionView(playerInfo);
@@ -2214,7 +2214,7 @@ static void WifiBattleMatchLink_FillCondition(WifiBattleMatchNetKeys *condition,
                          param->ratings->results[4].first + param->ratings->results[4].second +
                          param->ratings->results[1].first + param->ratings->results[1].second +
                          param->ratings->results[2].first + param->ratings->results[2].second;
-    switch (param->param->unk4) {
+    switch (param->param->battleType) {
     case 0:
         condition->rating = param->ratings->rating[3];
         break;
@@ -2243,28 +2243,32 @@ static void WifiBattleMatchLink_FillOwnPlayer(WifiBattleMatchPlayer *player, Wif
     MI_CpuCopy8(info, player, PlayerInfo_GetSize());
     CGearPhrases_Get(CGearPhrases_GetBlock(save), 0, &player->sentence);
     if (link->param->mode == LINK_MODE_RATING) {
-        player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,
-                                                RNDMATCH_FIELD_WIN);
-        player->record2 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,
-                                                RNDMATCH_FIELD_LOSE);
+        player->record1 = RndMatchData_GetParam(
+            link->param->record, link->param->param->battleType + RNDMATCH_RECORD_RATING, RNDMATCH_FIELD_WIN);
+        player->record2 = RndMatchData_GetParam(
+            link->param->record, link->param->param->battleType + RNDMATCH_RECORD_RATING, RNDMATCH_FIELD_LOSE);
     } else {
-        player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, RNDMATCH_FIELD_WIN);
-        player->record2 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, RNDMATCH_FIELD_LOSE);
+        player->record1 =
+            RndMatchData_GetParam(link->param->record, link->param->param->battleType, RNDMATCH_FIELD_WIN);
+        player->record2 =
+            RndMatchData_GetParam(link->param->record, link->param->param->battleType, RNDMATCH_FIELD_LOSE);
     }
     player->gsid = WifiList_GetMyGSID(GameData_GetWifiList(gameData));
 }
 
 static void WifiBattleMatchLink_UpdatePlayerRecord(WifiBattleMatchPlayer *player, WifiBattleMatchLinkRandom *link) {
     if (link->param->mode == LINK_MODE_RATING) {
-        player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,
-                                                RNDMATCH_FIELD_WIN);
-        player->record2 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,
-                                                RNDMATCH_FIELD_LOSE);
-        player->unk34 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,
-                                              RNDMATCH_FIELD_RATING);
+        player->record1 = RndMatchData_GetParam(
+            link->param->record, link->param->param->battleType + RNDMATCH_RECORD_RATING, RNDMATCH_FIELD_WIN);
+        player->record2 = RndMatchData_GetParam(
+            link->param->record, link->param->param->battleType + RNDMATCH_RECORD_RATING, RNDMATCH_FIELD_LOSE);
+        player->unk34 = RndMatchData_GetParam(
+            link->param->record, link->param->param->battleType + RNDMATCH_RECORD_RATING, RNDMATCH_FIELD_RATING);
     } else {
-        player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, RNDMATCH_FIELD_WIN);
-        player->record2 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, RNDMATCH_FIELD_LOSE);
+        player->record1 =
+            RndMatchData_GetParam(link->param->record, link->param->param->battleType, RNDMATCH_FIELD_WIN);
+        player->record2 =
+            RndMatchData_GetParam(link->param->record, link->param->param->battleType, RNDMATCH_FIELD_LOSE);
     }
 }
 

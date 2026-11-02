@@ -5,6 +5,7 @@
 #include "types.h"
 #include "battle/battle_rec_tool.h"
 #include "battle/btl_setup.h"
+#include "constants/battle.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
 #include "gfl/str.h"
@@ -206,8 +207,8 @@ void BattleRecTool_StoreSetup(BtlSetup *setup) {
     BattleRecBody *body;
     PokewoodBlock *block;
 
-    switch (setup->unkDD_3) {
-    case 0:
+    switch (setup->studioMode) {
+    case BTL_STUDIO_MODE_NONE:
     default:
         body = &data_02140f64->body;
         BattleRecTool_StoreParties(setup, body);
@@ -215,8 +216,8 @@ void BattleRecTool_StoreSetup(BtlSetup *setup) {
         BattleRecTool_StoreRecData(setup, body);
         BattleRecTool_StoreSetupParams(setup, &body->setup);
         break;
-    case 1:
-    case 2:
+    case BTL_STUDIO_MODE_FILM:
+    case BTL_STUDIO_MODE_PLAYBACK:
         block = getPokewoodBlock();
         BattleRecTool_StorePokewoodParty(setup, block);
         BattleRecTool_StorePokewoodClients(setup, &block->client, 1, &block->trainerClass);
@@ -249,7 +250,7 @@ void BattleRecTool_LoadSetup(BtlSetup *setup, u32 mode, HeapID heapId) {
         BattleRecTool_LoadSetupParams(setup, &block->setup);
         BattleRecTool_LoadPokewoodInfo(setup, &block->info);
         BattleRecTool_LoadPokewoodExtra(setup, block);
-        setup->unkDD_3 = 2;
+        setup->studioMode = BTL_STUDIO_MODE_PLAYBACK;
         break;
     }
 }
@@ -308,8 +309,8 @@ static void BattleRecTool_StoreClients(const BtlSetup *setup, BattleRecClient *c
         if (setup->trainers[i] != NULL) {
             BattleRecTool_StoreTrainer(setup->trainers[i], &clients[i].info.trainer);
             clients[i].type = BATTLE_REC_CLIENT_TRAINER;
-        } else if (setup->unk34[i] != NULL) {
-            PlayerInfo_Copy(setup->unk34[i], &clients[i].info.player);
+        } else if (setup->playerInfo[i] != NULL) {
+            PlayerInfo_Copy(setup->playerInfo[i], &clients[i].info.player);
             clients[i].type = BATTLE_REC_CLIENT_PLAYER;
         } else {
             clients[i].type = BATTLE_REC_CLIENT_NONE;
@@ -325,10 +326,10 @@ static void BattleRecTool_StorePokewoodClients(const BtlSetup *setup, BattleRecC
     for (i = 0; i < count; i++) {
         switch (i) {
         case 0:
-            PlayerInfo_Copy(setup->unk34[i], &clients[i].info.player);
+            PlayerInfo_Copy(setup->playerInfo[i], &clients[i].info.player);
             if (setup->trainers[i] != NULL) {
                 *trainerClass = setup->trainers[i]->trainerClass;
-            } else if (getTrainerGender(setup->unk34[i]) == GENDER_MALE) {
+            } else if (getTrainerGender(setup->playerInfo[i]) == GENDER_MALE) {
                 *trainerClass = 0;
             } else {
                 *trainerClass = 1;
@@ -352,7 +353,7 @@ static void BattleRecTool_LoadClients(BtlSetup *setup, BattleRecClient *clients,
         client = &clients[i];
         switch (clients[i].type) {
         case BATTLE_REC_CLIENT_PLAYER:
-            PlayerInfo_Copy(&client->info.player, setup->unk34[i]);
+            PlayerInfo_Copy(&client->info.player, setup->playerInfo[i]);
             break;
         case BATTLE_REC_CLIENT_TRAINER:
             BattleRecTool_LoadTrainer(setup->trainers[i], &client->info.trainer);
@@ -369,7 +370,7 @@ static void BattleRecTool_LoadPokewoodClients(BtlSetup *setup, const BattleRecCl
     for (i = 0; i < count; i++) {
         switch (i) {
         case 0:
-            PlayerInfo_Copy(&clients[i].info.player, setup->unk34[i]);
+            PlayerInfo_Copy(&clients[i].info.player, setup->playerInfo[i]);
             setup->trainers[i]->trainerId = 1;
             setup->trainers[i]->trainerClass = trainerClass;
             break;
@@ -387,8 +388,8 @@ static void BattleRecTool_StoreTrainer(const BtlSetupTrainer *trainer, BattleRec
     rec->trainerId = trainer->trainerId;
     rec->trainerClass = trainer->trainerClass;
     rec->aiFlags = trainer->aiFlags;
-    rec->unk30 = trainer->unk18;
-    rec->unk38 = trainer->unk20;
+    rec->unk30 = trainer->winWords;
+    rec->unk38 = trainer->loseWords;
     for (i = 0; i < 4; i++) {
         rec->items[i] = trainer->items[i];
     }
@@ -402,8 +403,8 @@ static void BattleRecTool_LoadTrainer(BtlSetupTrainer *trainer, const BattleRecT
     trainer->trainerId = rec->trainerId;
     trainer->trainerClass = rec->trainerClass;
     trainer->aiFlags = rec->aiFlags;
-    trainer->unk18 = rec->unk30;
-    trainer->unk20 = rec->unk38;
+    trainer->winWords = rec->unk30;
+    trainer->loseWords = rec->unk38;
     for (i = 0; i < 4; i++) {
         trainer->items[i] = rec->items[i];
     }
@@ -439,10 +440,10 @@ static BOOL BattleRecTool_StoreSetupParams(const BtlSetup *setup, BattleRecSetup
     rec->env = setup->fieldSituation.env;
     rec->rand = setup->rand;
     rec->bgm = setup->fieldSituation.bgm;
-    rec->winBgm = setup->fieldSituation.unk12;
+    rec->winBgm = setup->fieldSituation.winBgm;
     rec->battleType = setup->battleType;
     rec->battleStyle = setup->battleStyle;
-    rec->unk33_4 = setup->fieldSituation.unk1a;
+    rec->unk33_4 = setup->fieldSituation.multiMode;
     rec->unk30 = setup->unkA2;
     rec->unk32_5 = setup->fieldSituation.unk19;
     rec->unk33_7 = setup->unk97 ? TRUE : FALSE;
@@ -454,10 +455,10 @@ static BOOL BattleRecTool_LoadSetupParams(BtlSetup *setup, const BattleRecSetup 
     setup->fieldSituation.env = rec->env;
     setup->rand = rec->rand;
     setup->fieldSituation.bgm = rec->bgm;
-    setup->fieldSituation.unk12 = rec->winBgm;
+    setup->fieldSituation.winBgm = rec->winBgm;
     setup->battleType = rec->battleType;
     setup->battleStyle = rec->battleStyle;
-    setup->fieldSituation.unk1a = rec->unk33_4;
+    setup->fieldSituation.multiMode = rec->unk33_4;
     setup->unkA2 = rec->unk30;
     setup->fieldSituation.unk19 = rec->unk32_5;
     setup->unk97 = rec->unk33_7;
@@ -525,24 +526,24 @@ static void BattleRecTool_LoadPokewoodPartyCore(BattleRecParty *rec, PokeParty *
 }
 
 static void BattleRecTool_StorePokewoodInfo(const BtlSetup *setup, PokewoodBattleInfo *info) {
-    info->unkDF = setup->unkDF;
-    info->unk124 = setup->studioEnding;
-    MI_CpuCopy8(setup->unk110, info->unk110, sizeof(info->unk110));
+    info->movie = setup->unkDF;
+    info->ending = setup->studioEnding;
+    MI_CpuCopy8(setup->studioChoices, info->unk110, sizeof(info->unk110));
 }
 
 static void BattleRecTool_LoadPokewoodInfo(BtlSetup *setup, const PokewoodBattleInfo *info) {
-    setup->unkDF = info->unkDF;
-    setup->studioEnding = info->unk124;
-    MI_CpuCopy8(info->unk110, setup->unk110, sizeof(setup->unk110));
+    setup->unkDF = info->movie;
+    setup->studioEnding = info->ending;
+    MI_CpuCopy8(info->unk110, setup->studioChoices, sizeof(setup->studioChoices));
 }
 
 static void BattleRecTool_StorePokewoodExtra(const BtlSetup *setup, PokewoodBlock *block) {
-    block->unk128 = setup->unk128;
+    block->unk128 = setup->audienceCount;
     block->unkE0 = setup->unkE0;
-    block->unk130 = setup->studioScore;
+    block->score = setup->studioScore;
 }
 
 static void BattleRecTool_LoadPokewoodExtra(BtlSetup *setup, const PokewoodBlock *block) {
-    setup->unk128 = block->unk128;
+    setup->audienceCount = block->unk128;
     setup->unkE0 = block->unkE0;
 }

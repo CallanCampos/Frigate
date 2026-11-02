@@ -1,0 +1,177 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The battle backgrounds' tables: res/battle/backgrounds/{types,fields,stages}.json",
+    "description": "ARCID_BATTLE_BG_DATA (a/1/5/1), which tools/data/battle_bg_data.py packs: the background types (file 0), the fields (file 1) and the stages (file 2), each a list in its file's order. The models and animations are files of ARCID_BTLV (a/0/1/1), null for none (0xffff).",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "This schema, for editors"
+        },
+        "types": {
+            "type": "array",
+            "description": "types.json: each background type, a battle's bgType, which a zone's battle_bg gives (BtlvEffectBgData in btlv_effect.c)",
+            "items": {
+                "$ref": "#/$defs/type"
+            }
+        },
+        "fields": {
+            "type": "array",
+            "description": "fields.json: each field, the battle's backdrop (BtlvFieldResIds in btlv_field.c)",
+            "items": {
+                "$ref": "#/$defs/field"
+            }
+        },
+        "stages": {
+            "type": "array",
+            "description": "stages.json: each stage, the ground the Pokémon stand on (BtlvStageData in btlv_stage.c)",
+            "items": {
+                "$ref": "#/$defs/stage"
+            }
+        }
+    },
+    "$defs": {
+        "type": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [ "light", "seasonal", "fields", "stages", "unk2a" ],
+            "properties": {
+                "light": {
+                    "type": "boolean",
+                    "description": "Whether the zone's light at the time of day lights the battle (FieldLightStatus_Get)"
+                },
+                "seasonal": {
+                    "type": "boolean",
+                    "description": "Whether the season picks the field's and stage's variant; else it is 0"
+                },
+                "fields": {
+                    "type": "array",
+                    "minItems": 20,
+                    "maxItems": 20,
+                    "items": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255
+                    },
+                    "description": "The field of each of the battle's terrains (fieldEnv.terrain, 0 to 19), by its place in fields.json"
+                },
+                "stages": {
+                    "type": "array",
+                    "minItems": 20,
+                    "maxItems": 20,
+                    "items": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255
+                    },
+                    "description": "The stage of each terrain, by its place in stages.json, which is also the terrain that Burmy changes its form for (EventBattleReturn_GetBurmyTerrain, burmy_form.c)"
+                },
+                "unk2a": {
+                    "type": "array",
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "items": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255
+                    },
+                    "description": "Unread"
+                }
+            }
+        },
+        "field": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [ "models", "animations" ],
+            "properties": {
+                "models": {
+                    "type": "array",
+                    "minItems": 8,
+                    "maxItems": 8,
+                    "items": {
+                        "type": [ "integer", "null" ],
+                        "minimum": 0,
+                        "maximum": 65534
+                    },
+                    "description": "The field's model for each of the eight variants: the season, or the special forms from 4 (BtlvField_Create); a variant without one uses the first"
+                },
+                "animations": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                        "type": "array",
+                        "minItems": 8,
+                        "maxItems": 8,
+                        "items": {
+                            "type": [ "integer", "null" ],
+                            "minimum": 0,
+                            "maximum": 65534
+                        },
+                        "description": ""
+                    },
+                    "description": "The three animations' rows, the same way"
+                }
+            }
+        },
+        "stage": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [ "edge_color", "models", "animations" ],
+            "properties": {
+                "edge_color": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [ "red", "green", "blue" ],
+                    "description": "The stage's edgeColor (GXRgb), 0 to 31 each",
+                    "properties": {
+                        "red": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 31
+                        },
+                        "green": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 31
+                        },
+                        "blue": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 31
+                        }
+                    }
+                },
+                "models": {
+                    "type": "array",
+                    "minItems": 8,
+                    "maxItems": 8,
+                    "items": {
+                        "type": [ "integer", "null" ],
+                        "minimum": 0,
+                        "maximum": 65534
+                    },
+                    "description": "The stage's models, two to each of four variants (the season): the two sides' grounds; a variant without them uses the first"
+                },
+                "animations": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                        "type": "array",
+                        "minItems": 8,
+                        "maxItems": 8,
+                        "items": {
+                            "type": [ "integer", "null" ],
+                            "minimum": 0,
+                            "maximum": 65534
+                        },
+                        "description": ""
+                    },
+                    "description": "The three animations' rows, the same way"
+                }
+            }
+        }
+    }
+}

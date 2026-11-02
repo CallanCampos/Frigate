@@ -22,7 +22,7 @@ GameEvent *EncEffSpread_CreateGridEvent(GameSystem *gsys) {
 
 // Starts the waves at three cells
 void EncEffSpread_Init(EncEffGrid *grid) {
-    EncEffSpread *spread = (EncEffSpread *)grid->unk300C;
+    EncEffSpread *spread = (EncEffSpread *)grid->effectWork;
 
     spread->nextCount = 0;
     spread->waveCount = 0;
@@ -37,7 +37,7 @@ void EncEffSpread_Init(EncEffGrid *grid) {
 // Shows the next wave every other frame
 void EncEffSpread_Update(EncEffGrid *grid) {
     s32 *work = grid->work;
-    EncEffSpread *spread = (EncEffSpread *)grid->unk300C;
+    EncEffSpread *spread = (EncEffSpread *)grid->effectWork;
     int i;
 
     if (work[0] < grid->columns * grid->rows) {
@@ -84,7 +84,7 @@ BOOL EncEffSpread_IsCellNext(int cell, EncEffSpread *spread) {
 
 // Adds a cell to the next wave, unless it is shown or already there
 void EncEffSpread_AddCell(EncEffGrid *grid, int column, int row) {
-    EncEffSpread *spread = (EncEffSpread *)grid->unk300C;
+    EncEffSpread *spread = (EncEffSpread *)grid->effectWork;
     int cell = column + row * grid->columns;
 
     if (!grid->cells[cell].visible && !EncEffSpread_IsCellNext(cell, spread)) {
@@ -116,7 +116,7 @@ void EncEffSpread_AddNeighbors(EncEffGrid *grid, int cell) {
 void EncEffSpread_ShowNextWave(EncEffGrid *grid) {
     int i;
     s32 *work = grid->work;
-    EncEffSpread *spread = (EncEffSpread *)grid->unk300C;
+    EncEffSpread *spread = (EncEffSpread *)grid->effectWork;
 
     for (i = 0; i < spread->nextCount; i++) {
         EncEffCell *cell = &grid->cells[spread->next[i]];

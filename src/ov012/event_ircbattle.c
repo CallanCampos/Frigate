@@ -1,4 +1,5 @@
 #include "types.h"
+#include "app/comm_btl_demo.h"
 #include "app/irc_compatible.h"
 #include "app/ircbattlematch.h"
 #include "app/pokemon_trade.h"
@@ -84,7 +85,7 @@ void EventIRC_RecordFriendBattles(EventIRCWork *work, GameData *gameData) {
     PlayerInfo *info;
     u32 friendIndex;
 
-    if (work->btlSetup->fieldSituation.unk1a == 0) {
+    if (work->btlSetup->fieldSituation.multiMode == 0) {
         partner = -1;
         count = 2;
     } else {
@@ -121,7 +122,7 @@ void EventIRC_RecordFriendBattles(EventIRCWork *work, GameData *gameData) {
 
 // Puts each player's party and info in their place in the battle
 void EventIRC_SetBattlePlayers(EventIRCWork *work, GameSystem *gsys) {
-    if (work->btlSetup->fieldSituation.unk1a) {
+    if (work->btlSetup->fieldSituation.multiMode) {
         if (work->ircMatch.order[GFL_NetGetHandleNetId(NetHandle_GetOwn())] < 2) {
             s32 i = 0;
 
@@ -160,6 +161,39 @@ void EventIRC_SetBattlePlayers(EventIRCWork *work, GameSystem *gsys) {
     }
 }
 
+// The steps of the infrared event: the infrared menu, then the match screen and a battle, a trade with the
+// evolutions it brings, or the Feeling Check, and the field again. Steps 4, 24 and 25 only go on to the next
+enum {
+    IRC_STEP_FADE_OUT,
+    IRC_STEP_CLOSE_FIELD,
+    IRC_STEP_MENU,
+    IRC_STEP_WAIT_MENU,
+    IRC_STEP_START_MATCH,
+    IRC_STEP_MATCH,
+    IRC_STEP_WAIT_MATCH,
+    IRC_STEP_LOAD_BATTLE,
+    IRC_STEP_WAIT_LOAD_BATTLE,
+    IRC_STEP_SETUP_BATTLE,
+    IRC_STEP_WAIT_SETUP_BATTLE,
+    IRC_STEP_BATTLE,
+    IRC_STEP_WAIT_BATTLE,
+    IRC_STEP_TRADE,
+    IRC_STEP_WAIT_TRADE,
+    IRC_STEP_EVOLUTION,
+    IRC_STEP_WAIT_EVOLUTION,
+    IRC_STEP_END_SYNC,
+    IRC_STEP_WAIT_END_SYNC,
+    IRC_STEP_NET_EXIT,
+    IRC_STEP_WAIT_NET_EXIT,
+    IRC_STEP_OPEN_FIELD,
+    IRC_STEP_FADE_IN,
+    IRC_STEP_END,
+    IRC_STEP_START_FEELING_CHECK,
+    IRC_STEP_PREPARE_FEELING_CHECK,
+    IRC_STEP_FEELING_CHECK,
+    IRC_STEP_WAIT_FEELING_CHECK,
+};
+
 GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) {
     EventIRCWork *work = data;
     GameSystem *gsys = work->gsys;
@@ -167,35 +201,35 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
     EvolutionDemoParam *evolution;
 
     switch (*state) {
-    case 0:
+    case IRC_STEP_FADE_OUT:
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
         (*state)++;
         break;
-    case 1:
+    case IRC_STEP_CLOSE_FIELD:
         GameEvent_ChainNext(event, CreateFieldCloseEvent(gsys, field));
-        *state = 2;
+        *state = IRC_STEP_MENU;
         break;
-    case 2:
+    case IRC_STEP_MENU:
         GSYS_QueueProc(gsys, OVERLAY_ID(36), &IRC_MENU_PROC, work);
         (*state)++;
         break;
-    case 3:
+    case IRC_STEP_WAIT_MENU:
         if (GSYS_GetProcMgrState(gsys)) {
             break;
         }
-        if (work->mode == 8) {
-            *state = 24;
-        } else if (work->mode == 12) {
-            *state = 21;
+        if (work->mode == IRCBATTLEMATCH_MODE_FEELING_CHECK) {
+            *state = IRC_STEP_START_FEELING_CHECK;
+        } else if (work->mode == IRCBATTLEMATCH_RESULT_QUIT) {
+            *state = IRC_STEP_OPEN_FIELD;
         } else {
             (*state)++;
         }
         break;
-    case 4:
+    case IRC_STEP_START_MATCH:
         (*state)++;
         break;
-    case 5:
+    case IRC_STEP_MATCH:
         battleBoxToLv50Party(work->useBattleBox, work);
         work->ircMatch.gameData = work->gameData;
         work->ircMatch.party = work->party;
@@ -207,37 +241,37 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         GSYS_QueueProc(gsys, OVERLAY_IRCBATTLEMATCH, &IRCBATTLEMATCH_PROC_FUNCTIONS, &work->ircMatch);
         (*state)++;
         break;
-    case 6:
+    case IRC_STEP_WAIT_MATCH:
         if (GSYS_GetProcMgrState(gsys)) {
             break;
         }
         work->mode = work->ircMatch.result;
         switch (work->mode) {
-        case 7:
-            *state = 20;
+        case IRCBATTLEMATCH_MODE_FRIEND:
+            *state = IRC_STEP_WAIT_NET_EXIT;
             break;
-        case 12:
-            *state = 20;
+        case IRCBATTLEMATCH_RESULT_QUIT:
+            *state = IRC_STEP_WAIT_NET_EXIT;
             break;
-        case 13:
-            *state = 2;
+        case IRCBATTLEMATCH_RESULT_BACK:
+            *state = IRC_STEP_MENU;
             break;
-        case 6:
+        case IRCBATTLEMATCH_MODE_TRADE:
             work->trade.next = 0;
-            *state = 13;
+            *state = IRC_STEP_TRADE;
             break;
         default:
-            *state = 7;
+            *state = IRC_STEP_LOAD_BATTLE;
             break;
         }
         break;
-    case 7:
+    case IRC_STEP_LOAD_BATTLE:
         GFL_OvlLoad(OVERLAY_BATTLE_MAIN);
-        NetCommand_AddTable(0x100, data_ov167_021d7448, 9, NULL);
+        NetCommand_AddTable(0x100, BTL_NET_COMMANDS, 9, NULL);
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x6e, 12);
         (*state)++;
         break;
-    case 8:
+    case IRC_STEP_WAIT_LOAD_BATTLE:
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x6e, 12)) {
             (*state)++;
         }
@@ -248,43 +282,43 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
                 GFL_NetErrAbort();
             }
             GFL_OvlUnload(OVERLAY_BATTLE_MAIN);
-            *state = 20;
+            *state = IRC_STEP_WAIT_NET_EXIT;
         }
         break;
-    case 9:
+    case IRC_STEP_SETUP_BATTLE:
         work->btlSetup = BtlSetup_Create(HEAPID_GAMEEVENT);
         work->records = GameData_GetRecords(work->gameData);
         work->players.unk4C = 0;
         switch (work->mode) {
-        case 1:
-            work->players.unk44 = 1;
+        case IRCBATTLEMATCH_MODE_SINGLE:
+            work->players.demoType = COMM_BTL_DEMO_TYPE_SINGLE_START;
             work->players.rule = 2;
             BtlSetup_SetNet1v1Single(work->btlSetup, work->gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
             break;
-        case 2:
-            work->players.unk44 = 1;
+        case IRCBATTLEMATCH_MODE_DOUBLE:
+            work->players.demoType = COMM_BTL_DEMO_TYPE_SINGLE_START;
             work->players.rule = 6;
             BtlSetup_SetNet1v1Double(work->btlSetup, work->gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
             break;
-        case 3:
-            work->players.unk44 = 1;
+        case IRCBATTLEMATCH_MODE_TRIPLE:
+            work->players.demoType = COMM_BTL_DEMO_TYPE_SINGLE_START;
             work->players.rule = 10;
             BtlSetup_SetNetTriple(work->btlSetup, work->gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
             break;
-        case 4:
-            work->players.unk44 = 1;
+        case IRCBATTLEMATCH_MODE_ROTATION:
+            work->players.demoType = COMM_BTL_DEMO_TYPE_SINGLE_START;
             work->players.rule = 14;
             BtlSetup_SetNetRotation(work->btlSetup, work->gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
             break;
-        case 5: {
+        case IRCBATTLEMATCH_MODE_MULTI: {
             u32 positions[4] = { 0, 2, 1, 3 };
 
-            work->players.unk44 = 3;
+            work->players.demoType = COMM_BTL_DEMO_TYPE_MULTI_START;
             work->players.rule = 18;
             BtlSetup_SetNetMultiVsNet(work->btlSetup, work->gameData, NetHandle_GetOwn(), 1,
                                       positions[work->ircMatch.order[GFL_NetGetHandleNetId(NetHandle_GetOwn())]],
                                       HEAPID_GAMEEVENT);
-            work->btlSetup->fieldSituation.unk1a = 1;
+            work->btlSetup->fieldSituation.multiMode = 1;
             work->btlSetup->battleStyle = 1;
             TrimPartiesTo3Members(work);
             break;
@@ -297,7 +331,7 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 10, 12);
         (*state)++;
         break;
-    case 10:
+    case IRC_STEP_WAIT_SETUP_BATTLE:
         if (GFL_NetErrCheck()) {
             BtlSetup_Free(work->btlSetup);
             work->btlSetup = NULL;
@@ -307,7 +341,7 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
                 GFL_NetErrAbort();
             }
             GFL_OvlUnload(OVERLAY_BATTLE_MAIN);
-            *state = 20;
+            *state = IRC_STEP_WAIT_NET_EXIT;
         } else if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 10, 12)) {
             if (GFL_NetIsParent()) {
                 GFL_SndBGMPlay(SEQ_BGM_VS_TRAINER_M, SND_CHANNEL_MASK_ALL);
@@ -317,19 +351,19 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
             (*state)++;
         }
         break;
-    case 11: {
+    case IRC_STEP_BATTLE: {
         EventMakeArgs args;
 
         EventIRC_SetBattlePlayers(work, gsys);
         GFL_OvlUnload(OVERLAY_BATTLE_MAIN);
         args.setup = work->btlSetup;
         args.players = &work->players;
-        args.unk08 = 1;
+        args.markNetErrShown = TRUE;
         GameEvent_ChainNext(event, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_BATTLE, eventMakeFunc, &args));
         (*state)++;
         break;
     }
-    case 12:
+    case IRC_STEP_WAIT_BATTLE:
         if (GSYS_GetProcMgrState(gsys)) {
             break;
         }
@@ -338,25 +372,25 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         work->btlSetup = NULL;
         GFL_SndBGMStopImmediate();
         EventIRC_RestoreBgm(work);
-        *state = 17;
+        *state = IRC_STEP_END_SYNC;
         break;
-    case 13:
+    case IRC_STEP_TRADE:
         work->trade.gameData = work->gameData;
         work->trade.party = work->party;
-        GSYS_QueueProc(gsys, OVERLAY_POKEMONTRADE, &data_ov194_021c63dc, &work->trade);
+        GSYS_QueueProc(gsys, OVERLAY_POKEMONTRADE, &POKEMONTRADE_IRC_PROC_FUNCTIONS, &work->trade);
         (*state)++;
         break;
-    case 14:
+    case IRC_STEP_WAIT_TRADE:
         if (GSYS_GetProcMgrState(gsys)) {
             break;
         }
         if (work->trade.next == TRADE_NEXT_EVOLVE) {
-            *state = 15;
+            *state = IRC_STEP_EVOLUTION;
         } else {
-            *state = 17;
+            *state = IRC_STEP_END_SYNC;
         }
         break;
-    case 15:
+    case IRC_STEP_EVOLUTION:
         evolution = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(EvolutionDemoParam), FALSE, "event_ircbattle.c", 537);
         evolution->gameData = work->gameData;
         evolution->party = work->trade.party;
@@ -369,21 +403,21 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         GSYS_QueueProc(gsys, OVERLAY_EVOLUTION_DEMO, &EVOLUTION_DEMO_PROC_FUNCTIONS, evolution);
         (*state)++;
         break;
-    case 16:
+    case IRC_STEP_WAIT_EVOLUTION:
         if (GSYS_GetProcMgrState(gsys)) {
             break;
         }
         GFL_HeapFree(work->trade.evolution);
         work->trade.next = TRADE_NEXT_EVOLVE;
-        *state = 13;
+        *state = IRC_STEP_TRADE;
         break;
-    case 17:
+    case IRC_STEP_END_SYNC:
         if (GFL_NetIsInitialized() && !GFL_NetErrCheck()) {
             NetHandle_SendTimingPair(NetHandle_GetOwn(), 0xdc, 12);
         }
         (*state)++;
         break;
-    case 18:
+    case IRC_STEP_WAIT_END_SYNC:
         if (GFL_NetIsInitialized() && !GFL_NetErrCheck()) {
             if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0xdc, 12)) {
                 work->counter = 0;
@@ -394,7 +428,7 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
             (*state)++;
         }
         break;
-    case 19:
+    case IRC_STEP_NET_EXIT:
         if (GFL_NetIsInitialized()) {
             if (++work->counter >= 60) {
                 GFL_NetExit(0);
@@ -404,43 +438,43 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
             (*state)++;
         }
         break;
-    case 20:
+    case IRC_STEP_WAIT_NET_EXIT:
         if (!GFL_NetIsInitialized()) {
             GFL_NetErrClear();
-            *state = 21;
+            *state = IRC_STEP_OPEN_FIELD;
         }
         break;
-    case 21:
+    case IRC_STEP_OPEN_FIELD:
         EventIRC_RestoreBgm(work);
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
         (*state)++;
         break;
-    case 22:
+    case IRC_STEP_FADE_IN:
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         (*state)++;
         break;
-    case 23:
+    case IRC_STEP_END:
         GFL_NetIwFree();
         EventIRC_FreeParties(work);
         return GAMEEVENT_DONE;
-    case 24:
+    case IRC_STEP_START_FEELING_CHECK:
         (*state)++;
         break;
-    case 25:
+    case IRC_STEP_PREPARE_FEELING_CHECK:
         (*state)++;
         break;
-    case 26:
+    case IRC_STEP_FEELING_CHECK:
         work->ov175Param = work->gsys;
         GSYS_QueueProc(gsys, OVERLAY_ID(175), &IRC_COMPATIBLE_PROC_FUNCTIONS, &work->ov175Param);
         (*state)++;
         break;
-    case 27:
+    case IRC_STEP_WAIT_FEELING_CHECK:
         if (GSYS_GetProcMgrState(gsys)) {
             break;
         }
         GX_SetDispSelect(GX_DISP_SELECT_MAIN_SUB);
-        *state = 20;
+        *state = IRC_STEP_WAIT_NET_EXIT;
         break;
     }
     return GAMEEVENT_CONTINUE;

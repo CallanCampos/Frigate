@@ -23,6 +23,7 @@ u32 Intrude_GetAlertState(GameCommSys *commSys);
 u32 Intrude_CountEventPeers(GameCommSys *commSys);
 BOOL Intrude_GetRequesterStatus(GameCommSys *commSys, StrBuf *name);
 u32 Intrude_IsSessionEndPending(GameCommSys *commSys);
-void func_ov012_02153668(GameCommSys *commSys);
+// Called when the field changes zone, by the map change and the field's zone update; a stub
+void Intrude_OnZoneChange(GameCommSys *commSys);
 
 #endif // POKEBW2_FIELD_INTRUDE_WORK_H

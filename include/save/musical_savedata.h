@@ -31,7 +31,8 @@ typedef struct {
 
 // The photo of a musical's finale, which the musical event fills in and the save keeps. A month of 0 means no photo
 typedef struct {
-    u32 unk0_0 : 5;
+    // The program, MusicalProgram_GetBaseProgramId's, whose background the photo shows
+    u32 programId : 5;
     // A bit for each Pokémon that got the most points
     u32 tops : 4;
     u32 year : 7;

@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_exp_obj.h"
 #include "field/gimmick_underground_ruins.h"
@@ -21,7 +22,9 @@ static void UndergroundRuins_StepAnimations(GimmickWork *work);
 static const G3DSceneAnimationSetup sAnimations[] = { { 1, 0 } };
 
 static const G3DSceneResourceSetup sResources[] = {
-    { 0x12d, 0, 0 }, { 0x12d, 1, 0 }, { 0x12d, 2, 0 }, { 0x12d, 3, 0 }, { 0x12d, 4, 0 }, { 0x12d, 5, 0 },
+    { ARCID_GIMMICK_UNDERGROUND_RUINS, 0, 0 }, { ARCID_GIMMICK_UNDERGROUND_RUINS, 1, 0 },
+    { ARCID_GIMMICK_UNDERGROUND_RUINS, 2, 0 }, { ARCID_GIMMICK_UNDERGROUND_RUINS, 3, 0 },
+    { ARCID_GIMMICK_UNDERGROUND_RUINS, 4, 0 }, { ARCID_GIMMICK_UNDERGROUND_RUINS, 5, 0 },
 };
 
 static const G3DSceneActorSetup sActors[] = {
@@ -53,7 +56,7 @@ void UndergroundRuins_Update(Field *field) {
     UndergroundRuins_StepAnimations(Field_GetGimmickWorkBlock(field, 1));
 }
 
-void UndergroundRuins_ShowModel(GameSystem *gsys, u8 a1) {
+void UndergroundRuins_ShowModel(GameSystem *gsys, u8 model) {
     GameData *gameData;
     GimmickWork *work;
 
@@ -63,10 +66,10 @@ void UndergroundRuins_ShowModel(GameSystem *gsys, u8 a1) {
     FieldExpObj_SetActorHidden(work->expObj, 0, 2, TRUE);
     FieldExpObj_SetActorHidden(work->expObj, 0, 3, TRUE);
     FieldExpObj_SetActorHidden(work->expObj, 0, 4, TRUE);
-    FieldExpObj_SetActorHidden(work->expObj, 0, a1 + 1, FALSE);
+    FieldExpObj_SetActorHidden(work->expObj, 0, model + 1, FALSE);
 }
 
-void UndergroundRuins_SetAnmEnd(GameSystem *gsys, u16 a1) {
+void UndergroundRuins_SetAnmEnd(GameSystem *gsys, u16 atEnd) {
     GameData *gameData;
     GimmickWork *work;
     FieldExpObjAnm *anm;
@@ -79,7 +82,7 @@ void UndergroundRuins_SetAnmEnd(GameSystem *gsys, u16 a1) {
         anm = FieldExpObj_GetAnmInfo(work->expObj, 0, 0, i);
         FieldExpObj_SetAnm(work->expObj, 0, 0, i, TRUE);
         lastFrame = FieldExpObjAnm_GetLastFrame(anm);
-        if (a1 == 1) {
+        if (atEnd == 1) {
             FieldExpObj_SetAnmFrame(work->expObj, 0, 0, i, lastFrame);
         } else {
             FieldExpObj_SetAnmFrame(work->expObj, 0, 0, i, 0);
@@ -87,7 +90,7 @@ void UndergroundRuins_SetAnmEnd(GameSystem *gsys, u16 a1) {
     }
 }
 
-void UndergroundRuins_PlayAnm(GameSystem *gsys, u16 a1) {
+void UndergroundRuins_PlayAnm(GameSystem *gsys, u16 forward) {
     GameData *gameData;
     GimmickWork *work;
     int i;
@@ -98,7 +101,7 @@ void UndergroundRuins_PlayAnm(GameSystem *gsys, u16 a1) {
     for (i = 0; i < NELEMS(sAnimations); i++) {
         anm = FieldExpObj_GetAnmInfo(work->expObj, 0, 0, i);
         FieldExpObj_SetAnm(work->expObj, 0, 0, i, TRUE);
-        if (a1 == 1) {
+        if (forward == 1) {
             FieldExpObjAnm_SetFrameStep(anm, FX32_ONE);
         } else {
             FieldExpObjAnm_SetFrameStep(anm, -FX32_ONE);

@@ -422,7 +422,7 @@ static BOOL UnionOneself_StepIdleBegin(UnionSystem *unisys, UnionSelf *situ, Fie
     UnionComm_SetSelf(unisys, 4, 0);
     UnionMsg_FreeAll(unisys);
     UnionOneself_SetUpdateDisabled(unisys, field, FALSE);
-    unisys->unk282E = 0;
+    unisys->greetingRequested = 0;
     return TRUE;
 }
 
@@ -474,7 +474,7 @@ static BOOL UnionOneself_StepIdleRun(UnionSystem *unisys, UnionSelf *situ, Field
         UnionOneself_SetUpdateDisabled(unisys, field, TRUE);
         return TRUE;
     }
-    if (unisys->unk282E == 1) {
+    if (unisys->greetingRequested == 1) {
         UnionOneself_SetNextStep(unisys, UNION_STEP_GREETING);
         return TRUE;
     }
@@ -550,10 +550,10 @@ static BOOL UnionOneself_StepGreeting(UnionSystem *unisys, UnionSelf *situ, Fiel
 
     switch (*seq) {
     case 0:
-        if (unisys->unk282E == 0) {
+        if (unisys->greetingRequested == 0) {
             return TRUE;
         }
-        unisys->unk282E = 0;
+        unisys->greetingRequested = 0;
         GFL_SndSEPlay(SEQ_SE_SELECT4);
         param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(PMSSelectParam), TRUE, "union_oneself.c", 1050);
         param->save = GameData_GetSaveControl(unisys->param->gameData);
@@ -1586,7 +1586,7 @@ static BOOL UnionOneself_StepCardRun(UnionSystem *unisys, UnionSelf *situ, Field
         break;
     case 4:
         if (situ->mycomm.recvFlag == 1 && UnionMsg_IsPrintDone(unisys) == TRUE) {
-            unisys->alloc.target_card->unk04_5 = 1;
+            unisys->alloc.target_card->isLocked = 1;
             unisys->alloc.cardParam =
                 TrainerCardParam_CreateView(unisys->param->gameData, unisys->alloc.target_card, HEAPID_UNION);
             (*seq)++;
@@ -2945,7 +2945,7 @@ static BOOL UnionOneself_StepColosseumCardRun(UnionSystem *unisys, UnionSelf *si
     case 1:
         if (UnionMsg_IsPrintDone(unisys) == TRUE && (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             UnionMsg_FreeAll(unisys);
-            clsys->cardCheck[clsys->unk17C[0]]->unk04_5 = 1;
+            clsys->cardCheck[clsys->unk17C[0]]->isLocked = 1;
             unisys->cmdArg =
                 TrainerCardParam_CreateView(unisys->param->gameData, clsys->cardCheck[clsys->unk17C[0]], HEAPID_UNION);
             UnionCommand_Set(unisys, 0x1c, unisys->cmdArg);

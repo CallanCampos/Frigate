@@ -1,0 +1,12 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "T",
+    "shapes": [ 10 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_GIANT_CHASM": [ "shaking_grass" ],
+            "ZONE_ROUTE_13": [ "shaking_grass" ]
+        }
+    }
+}

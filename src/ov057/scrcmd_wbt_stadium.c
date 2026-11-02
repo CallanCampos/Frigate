@@ -89,11 +89,11 @@ BOOL Scrcmd_WbtStadium_WordSetOpponentName(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     WbtSystem *sys = WbtCmd_GetSystem(env);
     u8 index = VM_Read8(vm);
-    u32 unk = WbtBattle_GetOpponentFlag(sys);
+    u32 gender = WbtBattle_GetOpponentFlag(sys);
     StrBuf *strbuf = ScriptWork_GetAltStrBuf(work);
 
     WbtBattle_GetOpponentName(sys, strbuf);
-    GFL_WordSetSetStrbuf(wordSet, index, strbuf, unk, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, index, strbuf, gender, 1, 2);
     return FALSE;
 }
 
@@ -225,11 +225,11 @@ BOOL Scrcmd_WbtStadium_SetNamePlates(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     Field *field;
     WbtSystem *sys;
-    u16 opponentUnk;
+    u16 trainerClass;
     StrBuf *name;
     StrBuf *playerName;
     StrBuf *strbuf;
-    u16 playerUnk;
+    u16 playerClass;
     u8 mode;
 
     gsys = FieldScriptEnv_GetGameSystem(env);
@@ -239,10 +239,10 @@ BOOL Scrcmd_WbtStadium_SetNamePlates(VM *vm, FieldScriptEnv *env) {
     field = GSYS_GetField(gsys);
     sys = WbtCmd_GetSystem(env);
     mode = ScriptReadAny(vm, env);
-    opponentUnk = WbtEntrant_GetTrainerClass(WbtBattle_GetOpponent(sys));
-    playerUnk = WbtEntrant_GetTrainerClass(WbtSystem_GetPlayerEntrant(sys));
+    trainerClass = WbtEntrant_GetTrainerClass(WbtBattle_GetOpponent(sys));
+    playerClass = WbtEntrant_GetTrainerClass(WbtSystem_GetPlayerEntrant(sys));
     switch (mode) {
-    case 0:
+    case WBT_STADIUM_NAMES_BOTH:
         name = ScriptWork_GetAltStrBuf(work);
         strbuf = GFL_StrBufCreate(16, heapId);
         WbtBattle_GetOpponentName(sys, strbuf);
@@ -251,17 +251,17 @@ BOOL Scrcmd_WbtStadium_SetNamePlates(VM *vm, FieldScriptEnv *env) {
         GFL_StrBufFree(strbuf);
         playerName = copyTrainerNameToNewStrbuf(GetGameDataPlayerInfo(gameData)->name, heapId);
         break;
-    case 1: {
+    case WBT_STADIUM_NAMES_PLAYER: {
         PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
 
         name = ScriptWork_GetAltStrBuf(work);
         textCopy(playerInfo->name, name);
         playerName = NULL;
-        opponentUnk = playerUnk;
-        playerUnk = 0;
+        trainerClass = playerClass;
+        playerClass = 0;
         break;
     }
-    case 2:
+    case WBT_STADIUM_NAMES_OPPONENT:
         name = ScriptWork_GetAltStrBuf(work);
         strbuf = GFL_StrBufCreate(16, heapId);
         WbtBattle_GetOpponentName(sys, strbuf);
@@ -269,16 +269,16 @@ BOOL Scrcmd_WbtStadium_SetNamePlates(VM *vm, FieldScriptEnv *env) {
         GFL_StrBufUncompress(name, strbuf);
         GFL_StrBufFree(strbuf);
         playerName = NULL;
-        playerUnk = 0;
+        playerClass = 0;
         break;
     default:
         name = NULL;
         playerName = NULL;
-        opponentUnk = 0;
-        playerUnk = 0;
+        trainerClass = 0;
+        playerClass = 0;
         break;
     }
-    WbtStadiumGimmick_SetNames(field, mode, name, playerName, opponentUnk, playerUnk);
+    WbtStadiumGimmick_SetNames(field, mode, name, playerName, trainerClass, playerClass);
     if (playerName != NULL) {
         GFL_StrBufFree(playerName);
     }
@@ -288,26 +288,26 @@ BOOL Scrcmd_WbtStadium_SetNamePlates(VM *vm, FieldScriptEnv *env) {
 BOOL Scrcmd_WbtStadium_ShowPortraits(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field;
-    u8 value;
+    u8 mode;
 
     FieldScriptEnv_GetGameData(env);
     FieldScriptEnv_GetHeapID(env);
     field = GSYS_GetField(gsys);
     WbtCmd_GetSystem(env);
-    value = ScriptReadAny(vm, env);
-    WbtStadiumGimmick_ShowPortraits(field, value);
+    mode = ScriptReadAny(vm, env);
+    WbtStadiumGimmick_ShowPortraits(field, mode);
     return FALSE;
 }
 
 BOOL Scrcmd_WbtStadium_LoadPortraitScene(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
-    u8 a1 = ScriptReadAny(vm, env);
-    u8 a2 = ScriptReadAny(vm, env);
+    u8 position = ScriptReadAny(vm, env);
+    u8 side = ScriptReadAny(vm, env);
 
-    if (a1 >= 21) {
+    if (position >= 21) {
         return FALSE;
     }
-    WbtStadiumGimmick_LoadPortraitScene(field, a1, a2);
+    WbtStadiumGimmick_LoadPortraitScene(field, position, side);
     return FALSE;
 }
 
@@ -318,10 +318,10 @@ BOOL Scrcmd_WbtStadium_PlayStadiumIntro(VM *vm, FieldScriptEnv *env) {
 
 BOOL Scrcmd_WbtStadium_SwitchLights(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
-    u8 a1 = ScriptReadAny(vm, env);
-    u8 a2 = ScriptReadAny(vm, env);
+    u8 which = ScriptReadAny(vm, env);
+    u8 pair = ScriptReadAny(vm, env);
 
-    WbtStadiumGimmick_SwitchLights(field, a1, a2);
+    WbtStadiumGimmick_SwitchLights(field, which, pair);
     return FALSE;
 }
 

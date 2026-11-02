@@ -47,14 +47,14 @@ struct TrialHouseWork *CreateTrialHouseWk(GameSystem *gsys);
 void TrialHouse_LoadDeliveryState(GameSystem *gsys, struct TrialHouseWork *work);
 void TrialHouseWorkDelete(void *unused, struct TrialHouseWork **work);
 void TrialHouse_SetBattleMode(TrialHouseWork *work, u32 mode);
-void func_ov033_0217adbc(TrialHouseWork *work, u32 selectionFlag);
+void TrialHouse_SetSelectionFlag(TrialHouseWork *work, u32 selectionFlag);
 u32 TrialHouse_LoadTrainer(GameSystem *gsys, TrialHouseWork *work, u32 mode);
 void TrialHouse_BuildTrainerFromMode(TrialHouseWork *work, u32 mode);
 void TrialHouse_LoadDeliveredTrainer(GameSystem *gsys, TrialHouseWork *work, u32 mode);
 u32 TrialHouse_GetTrainerObjCode(TrialHouseWork *work);
 // The Trainer's message in a balloon over the actor
 GameEvent *TrialHouse_CreateTrainerMsgEvent(GameSystem *gsys, TrialHouseWork *work, u32 index, u32 actorId);
-GameEvent *func_ov033_0217aee8(GameSystem *gsys, TrialHouseWork *work, u16 *result);
+GameEvent *TrialHouse_CreateDeliveryTask(GameSystem *gsys, TrialHouseWork *work, u16 *result);
 GameEventReturnCode TrialHouse_DeliveryTaskMain(GameEvent *event, u32 *state, void *data);
 u8 TrialHouse_IsDeliveryIdReceived(TrialHouseSave *save, u32 index);
 void TrialHouse_MarkDeliveryIdReceived(TrialHouseSave *save, u32 index);
@@ -71,6 +71,6 @@ GameEvent *CallTrialHouseTeamSelect(GameSystem *gsys, TrialHouseWork *work, u32 
 GameEvent *CallTrialHouseBattle(GameSystem *gsys, TrialHouseWork *work);
 void SyncTrialHouseWkStatsFromBattle(TrialHouseWork *work, BtlSetup *setup);
 // Overlay 313's results screen
-GameEvent *CallTrialHouseResults(GameSystem *gsys, u32 a1, u32 a2);
+GameEvent *CallTrialHouseResults(GameSystem *gsys, u32 downloaded, u32 playJingle);
 
 #endif // POKEBW2_FIELD_TRIAL_HOUSE_H

@@ -20,6 +20,7 @@
 #include "system/game_data.h"
 #include "system/game_event.h"
 #include "system/game_system.h"
+#include "system/printsys.h"
 
 // The face-up (the file name is the ROM's): a close-up of a character's face over the field. The face is on BG 2 and
 // its eyes and mouth on BG 3, where two animations write the frames' map entries, which a VBlank task loads
@@ -29,6 +30,22 @@
 
 // The frames of the alpha fade from BG 3 to BG 2
 #define FACEUP_FADE_FRAMES 30
+
+// The steps of EventFaceUpStart_Callback
+enum {
+    START_STEP_FADE_OUT,
+    START_STEP_LOAD_GRAPHICS,
+    START_STEP_WAIT_FADE_IN,
+    START_STEP_BLEND_PARTS,
+};
+
+// The steps of EventFaceUpEnd_Callback
+enum {
+    END_STEP_FADE_OUT,
+    END_STEP_REMOVE_TASK,
+    END_STEP_FREE,
+    END_STEP_WAIT_FADE_IN,
+};
 
 typedef struct {
     u16 index;
@@ -146,11 +163,11 @@ static GameEventReturnCode EventFaceUpStart_Callback(GameEvent *event, u32 *stat
     FaceUpWork *work = *Field_GetNDemoDataHandle(field);
 
     switch (*state) {
-    case 0:
+    case START_STEP_FADE_OUT:
         GFL_FadeSet(FADE_ENGINE_A_BLACK, 0, 16, 0);
         (*state)++;
         break;
-    case 1:
+    case START_STEP_LOAD_GRAPHICS:
         if (GFL_FadeIsRunning()) {
             break;
         }
@@ -158,14 +175,14 @@ static GameEventReturnCode EventFaceUpStart_Callback(GameEvent *event, u32 *stat
         GFL_FadeSet(FADE_ENGINE_A_BLACK, 16, 0, 0);
         (*state)++;
         break;
-    case 2:
+    case START_STEP_WAIT_FADE_IN:
         if (GFL_FadeIsRunning()) {
             break;
         }
         work->fadeCount = 0;
         (*state)++;
         break;
-    case 3:
+    case START_STEP_BLEND_PARTS:
         if (FaceUp_UpdateFadeIn(work)) {
             return GAMEEVENT_DONE;
         }
@@ -277,7 +294,7 @@ static GameEventReturnCode EventFaceUpEnd_Callback(GameEvent *event, u32 *state,
     BOOL endBlack;
 
     switch (*state) {
-    case 0:
+    case END_STEP_FADE_OUT:
         if (work->endBlack) {
             GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 0, 16, -8);
         } else {
@@ -285,14 +302,14 @@ static GameEventReturnCode EventFaceUpEnd_Callback(GameEvent *event, u32 *state,
         }
         (*state)++;
         break;
-    case 1:
+    case END_STEP_REMOVE_TASK:
         if (GFL_FadeIsRunning()) {
             break;
         }
         GFL_TCBRemove(work->tcb);
         (*state)++;
         break;
-    case 2:
+    case END_STEP_FREE:
         if (work->eyes.updated || work->mouth.updated) {
             break;
         }
@@ -305,7 +322,7 @@ static GameEventReturnCode EventFaceUpEnd_Callback(GameEvent *event, u32 *state,
         GFL_FadeSet(FADE_ENGINE_A_BLACK, 16, 0, 0);
         (*state)++;
         break;
-    case 3:
+    case END_STEP_WAIT_FADE_IN:
         if (GFL_FadeIsRunning()) {
             break;
         }
@@ -373,10 +390,10 @@ static void FaceUp_Task(TCB *tcb, void *data) {
     if (!work->talkEnded && FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_MSG) &&
         (window = getMapDisplayInfoPtr(work->env)) != NULL) {
         msgState = MsgBGPrinter_GetPlainWinStreamState(window);
-        if (msgState == 0) {
+        if (msgState == PRINT_STREAM_RUNNING) {
             work->mouth.stopped = FALSE;
             work->waitingForMsg = FALSE;
-        } else if (msgState == 2 && !work->waitingForMsg) {
+        } else if (msgState == PRINT_STREAM_DONE && !work->waitingForMsg) {
             work->talkEnded = TRUE;
         }
     }

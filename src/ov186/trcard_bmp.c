@@ -125,18 +125,18 @@ void TrCardBmp_DrawFront(TrainerCardWork *wk, BmpWin **win, const TrainerCardDat
 
     for (i = 0; i < 5; i++) {
         GFL_BitmapFill(BmpWin_GetBitmap(win[i]), 0);
-        if (i != TRCARD_WIN_POKEDEX || (i == TRCARD_WIN_POKEDEX && data->unk04_2)) {
+        if (i != TRCARD_WIN_POKEDEX || (i == TRCARD_WIN_POKEDEX && data->hasPokedex)) {
             GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(win[i]), 0, 0, wk->labels[i], wk->font);
         }
     }
     tmp = wk->tmpBuf;
     GFL_StrBufLoadString(wk->nameBuf, data->name);
     TrCardBmp_PrintRight(wk, win[TRCARD_WIN_NAME], 136, 8, 0, wk->nameBuf);
-    if (data->unk04_2) {
+    if (data->hasPokedex) {
         TrCardBmp_PrintSeenCount(wk, win[TRCARD_WIN_POKEDEX], 136, 8, 0, tmp, data->seenCount, 1, 0);
     }
-    TrCardBmp_DrawUnionView(wk, data->unk06, FALSE);
-    TrCardBmp_DrawPersonality(wk, data->unk48, FALSE);
+    TrCardBmp_DrawUnionView(wk, data->unionView, FALSE);
+    TrCardBmp_DrawPersonality(wk, data->personality, FALSE);
     TrCardBmp_PrintMoney(wk, win[TRCARD_WIN_MONEY], 216, 8, 0, tmp, data->money, 7, 1, 1, 0);
     PMSDraw_SetBackColor(wk->pmsDraw, 0);
     PMSDraw_Print(wk->pmsDraw, win[TRCARD_WIN_GREETING], &wk->data->greeting, 0);
@@ -255,39 +255,39 @@ static void TrCardBmp_DrawRow(TrainerCardWork *wk, BmpWin *win, u32 row, int y, 
         break;
     case TRCARD_ROW_6:
         TrCardBmp_Print(win, wk, 0, y, wk->labels[9], color);
-        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->unk38, 9, 1, color);
+        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->timesLinked, 9, 1, color);
         break;
     case TRCARD_ROW_7:
         TrCardBmp_Print(win, wk, 0, y, wk->labels[10], color);
-        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->unk3C, 9, 1, color);
+        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->linkBattles, 9, 1, color);
         break;
     case TRCARD_ROW_8:
         TrCardBmp_Print(win, wk, 0, y, wk->labels[11], color);
-        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->unk40, 9, 1, color);
+        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->linkBattleWins, 9, 1, color);
         break;
     case TRCARD_ROW_9:
         TrCardBmp_Print(win, wk, 0, y, wk->labels[12], color);
-        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->unk44, 9, 1, color);
+        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->linkBattleLosses, 9, 1, color);
         break;
     case TRCARD_ROW_10:
         TrCardBmp_Print(win, wk, 0, y, wk->labels[13], color);
-        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->unk4C, 9, 1, color);
+        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->linkTrades, 9, 1, color);
         break;
     case TRCARD_ROW_11:
         TrCardBmp_Print(win, wk, 0, y, wk->labels[14], color);
-        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->unk50, 9, 1, color);
+        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->wildEncounters, 9, 1, color);
         break;
     case TRCARD_ROW_12:
         TrCardBmp_Print(win, wk, 0, y, wk->labels[15], color);
-        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->unk54, 9, 1, color);
+        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->trainersBattled, 9, 1, color);
         break;
     case TRCARD_ROW_13:
         TrCardBmp_Print(win, wk, 0, y, wk->labels[16], color);
-        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->unk58, 5, 1, color);
+        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->passerbyCount, 5, 1, color);
         break;
     case TRCARD_ROW_14:
         TrCardBmp_Print(win, wk, 0, y, wk->labels[17], color);
-        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->unk5C, 4, 1, color);
+        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->feelingChecks, 4, 1, color);
         break;
     case TRCARD_ROW_PASS_POWERS:
         TrCardBmp_Print(win, wk, 0, y, wk->labels[18], color);
@@ -295,15 +295,15 @@ static void TrCardBmp_DrawRow(TrainerCardWork *wk, BmpWin *win, u32 row, int y, 
         break;
     case TRCARD_ROW_16:
         TrCardBmp_Print(win, wk, 0, y, wk->labels[22], color);
-        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, own->unk684, 5, 1, color);
+        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, own->funfestMissions, 5, 1, color);
         break;
     case TRCARD_ROW_17:
         TrCardBmp_Print(win, wk, 0, y, wk->labels[23], color);
-        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, own->unk688, 4, 1, color);
+        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, own->movieShoots, 4, 1, color);
         break;
     case TRCARD_ROW_18:
         TrCardBmp_Print(win, wk, 0, y, wk->labels[19], color);
-        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->unk60, 4, 1, color);
+        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->musicalPerformances, 4, 1, color);
         break;
     case TRCARD_ROW_PWT_WINS:
         TrCardBmp_Print(win, wk, 0, y, wk->labels[24], color);
@@ -316,7 +316,7 @@ static void TrCardBmp_DrawRow(TrainerCardWork *wk, BmpWin *win, u32 row, int y, 
     case TRCARD_ROW_AVENUE:
         TrCardBmp_FormatAvenueLabel(wk, tmp, 26);
         TrCardBmp_Print(win, wk, 0, y, tmp, color);
-        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, own->unk68A, 4, 1, color);
+        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, own->recommendedCustomers, 4, 1, color);
         break;
     case TRCARD_ROW_PAL_PARK:
         TrCardBmp_Print(win, wk, 0, y, wk->labels[20], color);
@@ -324,7 +324,7 @@ static void TrCardBmp_DrawRow(TrainerCardWork *wk, BmpWin *win, u32 row, int y, 
         break;
     case TRCARD_ROW_23:
         TrCardBmp_Print(win, wk, 0, y, wk->labels[21], color);
-        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->unk64, 4, 1, color);
+        TrCardBmp_PrintNumber(wk, win, 216, 8, y, tmp, data->battleTestHighScore, 4, 1, color);
         break;
     }
 }
@@ -341,32 +341,32 @@ void TrCardBmp_InitRows(TrainerCardWork *wk, TrainerCardData *shown, TrainerCard
     for (i = 0; i < 13; i++) {
         TrCardBmp_AddRow(wk, i);
     }
-    if (shown->unk68_0) {
+    if (shown->cgearOn) {
         TrCardBmp_AddRow(wk, TRCARD_ROW_14);
         TrCardBmp_AddRow(wk, TRCARD_ROW_13);
     }
-    if (shown->unk68_1) {
+    if (shown->showPassPowers) {
         TrCardBmp_AddRow(wk, TRCARD_ROW_PASS_POWERS);
     }
-    if (shown->unk68_2) {
+    if (shown->showMusicals) {
         TrCardBmp_AddRow(wk, TRCARD_ROW_18);
     }
-    if (shown->unk68_3) {
+    if (shown->showPalPark) {
         TrCardBmp_AddRow(wk, TRCARD_ROW_PAL_PARK);
     }
-    if (shown->unk68_4) {
+    if (shown->showBattleTest) {
         TrCardBmp_AddRow(wk, TRCARD_ROW_23);
     }
-    if (own->unk690_0) {
+    if (own->showFunfestMissions) {
         TrCardBmp_AddRow(wk, TRCARD_ROW_16);
     }
-    if (own->unk690_1) {
+    if (own->showMovieShoots) {
         TrCardBmp_AddRow(wk, TRCARD_ROW_17);
     }
-    if (own->unk690_2) {
+    if (own->showPwtWins) {
         TrCardBmp_AddRow(wk, TRCARD_ROW_PWT_WINS);
     }
-    if (own->unk690_3) {
+    if (own->showAvenue) {
         TrCardBmp_AddRow(wk, TRCARD_ROW_AVENUE_NAME);
         TrCardBmp_AddRow(wk, TRCARD_ROW_AVENUE);
     }

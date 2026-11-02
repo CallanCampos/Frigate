@@ -54,7 +54,7 @@
 // What the communication reports when a Pokémon uses no prop
 #define STA_ACTING_EQUIP_NONE 10
 
-// MusicalPoke.unk78 of a Pokémon that uses a hand prop when it appeals, and at random, often or now and then;
+// MusicalPoke.handPropUse of a Pokémon that uses a hand prop when it appeals, and at random, often or now and then;
 // smaller values are the frame to use it on
 enum {
     STA_ACTING_USE_ON_APPEAL = 0xfffd,
@@ -1097,7 +1097,7 @@ static void StaActing_UpdateItemUse(StaActing *stage) {
                 if (stage->param->comm == NULL) {
                     u32 se = StaActing_ScoreItem(stage, stage->lightUpPos, stage->lightUpEquip);
 
-                    stage->param->pokes[stage->lightUpPos]->unk54[stage->lightUpEquip] = TRUE;
+                    stage->param->pokes[stage->lightUpPos]->likedEquips[stage->lightUpEquip] = TRUE;
                     GFL_SndSEPlay(se);
                 } else if (GFL_NetIsParent() == TRUE) {
                     if (StaActing_ScoreItem(stage, stage->lightUpPos, stage->lightUpEquip) == SEQ_SE_MSCL_11) {
@@ -1180,25 +1180,25 @@ void StaActing_SetNpcItemTiming(StaActing *stage, u32 timing, u8 pos) {
                     }
                     switch (timing) {
                     case 1:
-                        if (poke->unk78 == STA_ACTING_USE_ON_APPEAL && i == pos) {
+                        if (poke->handPropUse == STA_ACTING_USE_ON_APPEAL && i == pos) {
                             stage->npcUseWait[i] = 30 + GFL_RandomMTRange(30);
                             stage->npcUseEquip[i] = equip;
                         }
                         break;
                     case 2:
-                        if (poke->unk78 == STA_ACTING_USE_OFTEN && GFL_RandomMTRange(100) < 50) {
+                        if (poke->handPropUse == STA_ACTING_USE_OFTEN && GFL_RandomMTRange(100) < 50) {
                             stage->npcUseWait[i] = 60 + GFL_RandomMTRange(60);
                             stage->npcUseEquip[i] = equip;
                         }
-                        if (poke->unk78 == STA_ACTING_USE_SOMETIMES && GFL_RandomMTRange(100) < 25) {
+                        if (poke->handPropUse == STA_ACTING_USE_SOMETIMES && GFL_RandomMTRange(100) < 25) {
                             stage->npcUseWait[i] = 60 + GFL_RandomMTRange(60);
                             stage->npcUseEquip[i] = equip;
                         }
                         break;
                     case 0:
-                        if (poke->unk78 != 0 && poke->unk78 < STA_ACTING_USE_ON_APPEAL) {
+                        if (poke->handPropUse != 0 && poke->handPropUse < STA_ACTING_USE_ON_APPEAL) {
                             s8 jitter = GFL_RandomMTRange(121) - 60;
-                            int wait = poke->unk78 + jitter;
+                            int wait = poke->handPropUse + jitter;
 
                             if (wait < 0) {
                                 stage->npcUseWait[i] = 0;

@@ -1,0 +1,16 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A musical program's sound bank: res/musicals/programs/<n>/bank.json",
+    "description": "Member 3 of the archive ARCID_MUSICAL_PROGRAM + n, the bank that the stage's PlayStrm plays the program's sequence with (GFL_SndBGMSetLoadedData), as res/sound/bank.schema.json's instruments, which tools/data/sbnk.py writes and checks; except that an instrument names its wave archive by its slot, 0 to 3, among the four of the sound archive's bank of the sequence PlayStrm names.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "instruments" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "instruments": {
+            "type": "array",
+            "description": "The instruments, in the order of their data, each with the program number that a sequence's program picks it by, as a sound bank's",
+            "items": { "type": "object" }
+        }
+    }
+}

@@ -41,6 +41,13 @@ typedef struct {
     u16 species[640];
 } FesMissionWork;
 
+// Targets of a people mission, the ones that the gimmick and the people's parameters tell apart
+enum {
+    FES_MISSION_TARGET_ITEM_EXCHANGE = 2,
+    FES_MISSION_TARGET_ITEM_SALE = 3,
+    FES_MISSION_TARGET_BATTLE = 6,
+};
+
 // The Pokémon quiz
 typedef struct {
     // How many Pokémon were seen
@@ -86,8 +93,8 @@ void FesMissionGimmick_RemoveBlockedPeople(FesGimmick *gimmick, FesMissionWork *
 void FesMissionGimmick_RemovePerson(FesGimmick *gimmick, FesMissionWork *work, u16 zoneId, int index);
 BOOL FesMissionGimmick_End(FesGimmick *gimmick, FesMissionWork *work);
 void FesMissionGimmick_BoostPartyLevels(FesGimmick *gimmick, PokeParty *party);
-void FesMissionGimmick_GetItemExchangeInfo(FesGimmick *gimmick, FieldActor *actor, u16 arg0, u16 arg1, u16 *out0,
-                                           u16 *out1);
+void FesMissionGimmick_GetItemExchangeInfo(FesGimmick *gimmick, FieldActor *actor, u16 slot0, u16 slot1, u16 *item0,
+                                           u16 *item1);
 void FesMissionGimmick_GetItemSaleInfo(FesGimmick *gimmick, FieldActor *actor, u16 *item, u16 *price);
 void FesMissionGimmick_MakePokemonQuiz(FesGimmick *gimmick, u16 *count, u16 *answer, u16 *answerChoice);
 u16 FesMissionGimmick_GetQuizSpecies(FesGimmick *gimmick, u8 index);

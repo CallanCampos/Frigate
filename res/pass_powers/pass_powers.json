@@ -1,0 +1,645 @@
+{
+    "$schema": "pass_powers.schema.json",
+    "pass_powers": [
+        {
+            "name": "PassPowers_Text_EncounterPower",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceEncounteringWild",
+            "effect": "PASS_POWER_EFFECT_ENCOUNTER_UP",
+            "value": 150,
+            "minutes": 3,
+            "level_white": 3,
+            "level_black": 9,
+            "price": 2
+        },
+        {
+            "name": "PassPowers_Text_EncounterPower_2",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceEncounteringWild_2",
+            "effect": "PASS_POWER_EFFECT_ENCOUNTER_UP",
+            "value": 200,
+            "minutes": 3,
+            "level_white": 8,
+            "level_black": 12,
+            "price": 3
+        },
+        {
+            "name": "PassPowers_Text_EncounterPower_3",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceEncounteringWild_3",
+            "effect": "PASS_POWER_EFFECT_ENCOUNTER_UP",
+            "value": 300,
+            "minutes": 3,
+            "level_white": 14,
+            "level_black": 19,
+            "price": 4
+        },
+        {
+            "name": "PassPowers_Text_EncounterPower_4",
+            "description": "MonolithPowerInfo_Text_DecreasesChanceEncounteringWild",
+            "effect": "PASS_POWER_EFFECT_ENCOUNTER_DOWN",
+            "value": 66,
+            "minutes": 3,
+            "level_white": 5,
+            "level_black": 0,
+            "price": 2
+        },
+        {
+            "name": "PassPowers_Text_EncounterPower_5",
+            "description": "MonolithPowerInfo_Text_DecreasesChanceEncounteringWild_2",
+            "effect": "PASS_POWER_EFFECT_ENCOUNTER_DOWN",
+            "value": 50,
+            "minutes": 3,
+            "level_white": 10,
+            "level_black": 0,
+            "price": 3
+        },
+        {
+            "name": "PassPowers_Text_EncounterPower_6",
+            "description": "MonolithPowerInfo_Text_DecreasesChanceEncounteringWild_3",
+            "effect": "PASS_POWER_EFFECT_ENCOUNTER_DOWN",
+            "value": 33,
+            "minutes": 3,
+            "level_white": 26,
+            "level_black": 0,
+            "price": 4
+        },
+        {
+            "name": "PassPowers_Text_HatchingPower",
+            "description": "MonolithPowerInfo_Text_HelpsEggsHatchLittle",
+            "effect": "PASS_POWER_EFFECT_HATCH",
+            "value": 125,
+            "minutes": 3,
+            "level_white": 13,
+            "level_black": 0,
+            "price": 3
+        },
+        {
+            "name": "PassPowers_Text_HatchingPower_2",
+            "description": "MonolithPowerInfo_Text_HelpsEggsHatchFaster",
+            "effect": "PASS_POWER_EFFECT_HATCH",
+            "value": 150,
+            "minutes": 3,
+            "level_white": 22,
+            "level_black": 0,
+            "price": 4
+        },
+        {
+            "name": "PassPowers_Text_HatchingPower_3",
+            "description": "MonolithPowerInfo_Text_HelpsEggsHatchMuch",
+            "effect": "PASS_POWER_EFFECT_HATCH",
+            "value": 200,
+            "minutes": 3,
+            "level_white": 30,
+            "level_black": 0,
+            "price": 5
+        },
+        {
+            "name": "PassPowers_Text_BefriendingPower",
+            "description": "MonolithPowerInfo_Text_HelpsPokemonGrowFriendly",
+            "effect": "PASS_POWER_EFFECT_BEFRIEND",
+            "value": 1,
+            "minutes": 3,
+            "level_white": 7,
+            "level_black": 0,
+            "price": 2
+        },
+        {
+            "name": "PassPowers_Text_BefriendingPower_2",
+            "description": "MonolithPowerInfo_Text_HelpsPokemonGrowFriendly_2",
+            "effect": "PASS_POWER_EFFECT_BEFRIEND",
+            "value": 2,
+            "minutes": 3,
+            "level_white": 19,
+            "level_black": 0,
+            "price": 3
+        },
+        {
+            "name": "PassPowers_Text_BefriendingPower_3",
+            "description": "MonolithPowerInfo_Text_HelpsPokemonGrowFriendly_3",
+            "effect": "PASS_POWER_EFFECT_BEFRIEND",
+            "value": 3,
+            "minutes": 3,
+            "level_white": 25,
+            "level_black": 0,
+            "price": 4
+        },
+        {
+            "name": "PassPowers_Text_BargainPower",
+            "description": "MonolithPowerInfo_Text_PokeMartGives10",
+            "effect": "PASS_POWER_EFFECT_BARGAIN",
+            "value": 90,
+            "minutes": 3,
+            "level_white": 0,
+            "level_black": 13,
+            "price": 3
+        },
+        {
+            "name": "PassPowers_Text_BargainPower_2",
+            "description": "MonolithPowerInfo_Text_PokeMartGives25",
+            "effect": "PASS_POWER_EFFECT_BARGAIN",
+            "value": 75,
+            "minutes": 3,
+            "level_white": 0,
+            "level_black": 22,
+            "price": 4
+        },
+        {
+            "name": "PassPowers_Text_BargainPower_3",
+            "description": "MonolithPowerInfo_Text_PokeMartGives50",
+            "effect": "PASS_POWER_EFFECT_BARGAIN",
+            "value": 50,
+            "minutes": 3,
+            "level_white": 0,
+            "level_black": 30,
+            "price": 5
+        },
+        {
+            "name": "PassPowers_Text_HpRestoringPower",
+            "description": "MonolithPowerInfo_Text_ImmediatelyRestoresHpLead",
+            "effect": "PASS_POWER_EFFECT_HP_RESTORE",
+            "value": 20,
+            "minutes": 0,
+            "level_white": 0,
+            "level_black": 0,
+            "price": 2
+        },
+        {
+            "name": "PassPowers_Text_HpRestoringPower_2",
+            "description": "MonolithPowerInfo_Text_ImmediatelyRestoresHpLead_2",
+            "effect": "PASS_POWER_EFFECT_HP_RESTORE",
+            "value": 50,
+            "minutes": 0,
+            "level_white": 2,
+            "level_black": 0,
+            "price": 3
+        },
+        {
+            "name": "PassPowers_Text_HpRestoringPower_3",
+            "description": "MonolithPowerInfo_Text_ImmediatelyRestoresHpLead_3",
+            "effect": "PASS_POWER_EFFECT_HP_RESTORE",
+            "value": 200,
+            "minutes": 0,
+            "level_white": 16,
+            "level_black": 0,
+            "price": 4
+        },
+        {
+            "name": "PassPowers_Text_PpRestoringPower",
+            "description": "MonolithPowerInfo_Text_ImmediatelyRestoresPpLead",
+            "effect": "PASS_POWER_EFFECT_PP_RESTORE",
+            "value": 5,
+            "minutes": 0,
+            "level_white": 0,
+            "level_black": 7,
+            "price": 2
+        },
+        {
+            "name": "PassPowers_Text_PpRestoringPower_2",
+            "description": "MonolithPowerInfo_Text_ImmediatelyRestoresPpLead_2",
+            "effect": "PASS_POWER_EFFECT_PP_RESTORE",
+            "value": 10,
+            "minutes": 0,
+            "level_white": 0,
+            "level_black": 19,
+            "price": 3
+        },
+        {
+            "name": "PassPowers_Text_PpRestoringPower_3",
+            "description": "MonolithPowerInfo_Text_ImmediatelyRestoresPpLead_3",
+            "effect": "PASS_POWER_EFFECT_PP_RESTORE",
+            "value": 999,
+            "minutes": 0,
+            "level_white": 0,
+            "level_black": 25,
+            "price": 4
+        },
+        {
+            "name": "PassPowers_Text_ExpPointPower",
+            "description": "MonolithPowerInfo_Text_IncreasesExpPointsFrom",
+            "effect": "PASS_POWER_EFFECT_EXP_UP",
+            "value": 120,
+            "minutes": 3,
+            "level_white": 0,
+            "level_black": 0,
+            "price": 2
+        },
+        {
+            "name": "PassPowers_Text_ExpPointPower_2",
+            "description": "MonolithPowerInfo_Text_IncreasesExpPointsFrom_2",
+            "effect": "PASS_POWER_EFFECT_EXP_UP",
+            "value": 150,
+            "minutes": 3,
+            "level_white": 0,
+            "level_black": 2,
+            "price": 3
+        },
+        {
+            "name": "PassPowers_Text_ExpPointPower_3",
+            "description": "MonolithPowerInfo_Text_IncreasesExpPointsFrom_3",
+            "effect": "PASS_POWER_EFFECT_EXP_UP",
+            "value": 200,
+            "minutes": 3,
+            "level_white": 0,
+            "level_black": 16,
+            "price": 4
+        },
+        {
+            "name": "PassPowers_Text_ExpPointPower_4",
+            "description": "MonolithPowerInfo_Text_DecreasesExpPointsFrom",
+            "effect": "PASS_POWER_EFFECT_EXP_DOWN",
+            "value": 80,
+            "minutes": 3,
+            "level_white": 9,
+            "level_black": 3,
+            "price": 2
+        },
+        {
+            "name": "PassPowers_Text_ExpPointPower_5",
+            "description": "MonolithPowerInfo_Text_DecreasesExpPointsFrom_2",
+            "effect": "PASS_POWER_EFFECT_EXP_DOWN",
+            "value": 66,
+            "minutes": 3,
+            "level_white": 12,
+            "level_black": 8,
+            "price": 3
+        },
+        {
+            "name": "PassPowers_Text_ExpPointPower_6",
+            "description": "MonolithPowerInfo_Text_DecreasesExpPointsFrom_3",
+            "effect": "PASS_POWER_EFFECT_EXP_DOWN",
+            "value": 50,
+            "minutes": 3,
+            "level_white": 19,
+            "level_black": 14,
+            "price": 4
+        },
+        {
+            "name": "PassPowers_Text_PrizeMoneyPower",
+            "description": "MonolithPowerInfo_Text_IncreasesPrizeMoneyFrom",
+            "effect": "PASS_POWER_EFFECT_PRIZE_MONEY",
+            "value": 150,
+            "minutes": 3,
+            "level_white": 0,
+            "level_black": 5,
+            "price": 2
+        },
+        {
+            "name": "PassPowers_Text_PrizeMoneyPower_2",
+            "description": "MonolithPowerInfo_Text_IncreasesPrizeMoneyFrom_2",
+            "effect": "PASS_POWER_EFFECT_PRIZE_MONEY",
+            "value": 200,
+            "minutes": 3,
+            "level_white": 0,
+            "level_black": 10,
+            "price": 3
+        },
+        {
+            "name": "PassPowers_Text_PrizeMoneyPower_3",
+            "description": "MonolithPowerInfo_Text_IncreasesPrizeMoneyFrom_3",
+            "effect": "PASS_POWER_EFFECT_PRIZE_MONEY",
+            "value": 300,
+            "minutes": 3,
+            "level_white": 0,
+            "level_black": 26,
+            "price": 4
+        },
+        {
+            "name": "PassPowers_Text_CapturePower",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceCatchPokemon",
+            "effect": "PASS_POWER_EFFECT_CAPTURE",
+            "value": 110,
+            "minutes": 3,
+            "level_white": 5,
+            "level_black": 5,
+            "price": 4
+        },
+        {
+            "name": "PassPowers_Text_CapturePower_2",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceCatchPokemon_2",
+            "effect": "PASS_POWER_EFFECT_CAPTURE",
+            "value": 120,
+            "minutes": 3,
+            "level_white": 11,
+            "level_black": 11,
+            "price": 5
+        },
+        {
+            "name": "PassPowers_Text_CapturePower_3",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceCatchPokemon_3",
+            "effect": "PASS_POWER_EFFECT_CAPTURE",
+            "value": 130,
+            "minutes": 3,
+            "level_white": 30,
+            "level_black": 30,
+            "price": 6
+        },
+        {
+            "name": "PassPowers_Text_HatchingPowerS",
+            "description": "MonolithPowerInfo_Text_HelpsEggsHatchMuch_2",
+            "effect": "PASS_POWER_EFFECT_HATCH",
+            "value": 200,
+            "minutes": 30,
+            "level_white": 254,
+            "level_black": 254,
+            "price": 50
+        },
+        {
+            "name": "PassPowers_Text_BargainPowerS",
+            "description": "MonolithPowerInfo_Text_PokeMartGives50_2",
+            "effect": "PASS_POWER_EFFECT_BARGAIN",
+            "value": 50,
+            "minutes": 30,
+            "level_white": 254,
+            "level_black": 254,
+            "price": 50
+        },
+        {
+            "name": "PassPowers_Text_BefriendingPowerS",
+            "description": "MonolithPowerInfo_Text_HelpsPokemonGrowFriendly_4",
+            "effect": "PASS_POWER_EFFECT_BEFRIEND",
+            "value": 3,
+            "minutes": 30,
+            "level_white": 254,
+            "level_black": 254,
+            "price": 50
+        },
+        {
+            "name": "PassPowers_Text_ExpPointPowerS",
+            "description": "MonolithPowerInfo_Text_IncreasesExpPointsFrom_4",
+            "effect": "PASS_POWER_EFFECT_EXP_UP",
+            "value": 200,
+            "minutes": 30,
+            "level_white": 254,
+            "level_black": 254,
+            "price": 50
+        },
+        {
+            "name": "PassPowers_Text_PrizeMoneyPowerS",
+            "description": "MonolithPowerInfo_Text_IncreasesPrizeMoneyFrom_4",
+            "effect": "PASS_POWER_EFFECT_PRIZE_MONEY",
+            "value": 300,
+            "minutes": 30,
+            "level_white": 254,
+            "level_black": 254,
+            "price": 50
+        },
+        {
+            "name": "PassPowers_Text_CapturePowerS",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceCatchPokemon_4",
+            "effect": "PASS_POWER_EFFECT_CAPTURE",
+            "value": 130,
+            "minutes": 30,
+            "level_white": 254,
+            "level_black": 254,
+            "price": 50
+        },
+        {
+            "name": "PassPowers_Text_FullRecoveryPower",
+            "description": "MonolithPowerInfo_Text_WhenReceivedEveryPokemon",
+            "effect": "PASS_POWER_EFFECT_HP_RESTORE",
+            "value": 999,
+            "minutes": 0,
+            "level_white": 255,
+            "level_black": 255,
+            "price": 9999
+        },
+        {
+            "name": "PassPowers_Text_HatchingPowerMax",
+            "description": "MonolithPowerInfo_Text_HelpsEggsHatchMuch_3",
+            "effect": "PASS_POWER_EFFECT_HATCH",
+            "value": 200,
+            "minutes": 60,
+            "level_white": 255,
+            "level_black": 255,
+            "price": 9999
+        },
+        {
+            "name": "PassPowers_Text_BargainPowerMax",
+            "description": "MonolithPowerInfo_Text_PokeMartGives50_3",
+            "effect": "PASS_POWER_EFFECT_BARGAIN",
+            "value": 50,
+            "minutes": 60,
+            "level_white": 255,
+            "level_black": 255,
+            "price": 9999
+        },
+        {
+            "name": "PassPowers_Text_BefriendingPowerMax",
+            "description": "MonolithPowerInfo_Text_HelpsPokemonGrowFriendly_5",
+            "effect": "PASS_POWER_EFFECT_BEFRIEND",
+            "value": 3,
+            "minutes": 60,
+            "level_white": 255,
+            "level_black": 255,
+            "price": 9999
+        },
+        {
+            "name": "PassPowers_Text_ExpPointPowerMax",
+            "description": "MonolithPowerInfo_Text_IncreasesExpPointsFrom_5",
+            "effect": "PASS_POWER_EFFECT_EXP_UP",
+            "value": 200,
+            "minutes": 60,
+            "level_white": 255,
+            "level_black": 255,
+            "price": 9999
+        },
+        {
+            "name": "PassPowers_Text_PrizeMoneyPowerMax",
+            "description": "MonolithPowerInfo_Text_IncreasesPrizeMoneyFrom_5",
+            "effect": "PASS_POWER_EFFECT_PRIZE_MONEY",
+            "value": 300,
+            "minutes": 60,
+            "level_white": 255,
+            "level_black": 255,
+            "price": 9999
+        },
+        {
+            "name": "PassPowers_Text_CapturePowerMax",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceCatchPokemon_5",
+            "effect": "PASS_POWER_EFFECT_CAPTURE",
+            "value": 130,
+            "minutes": 60,
+            "level_white": 255,
+            "level_black": 255,
+            "price": 9999
+        },
+        {
+            "name": "PassPowers_Text_Empty",
+            "description": "MonolithPowerInfo_Text_Empty",
+            "effect": "PASS_POWER_EFFECT_11",
+            "value": 1,
+            "minutes": 0,
+            "level_white": 255,
+            "level_black": 255,
+            "price": 9999
+        },
+        {
+            "name": "PassPowers_Text_Empty_2",
+            "description": "MonolithPowerInfo_Text_Empty_2",
+            "effect": "PASS_POWER_EFFECT_12",
+            "value": 1,
+            "minutes": 0,
+            "level_white": 255,
+            "level_black": 255,
+            "price": 9999
+        },
+        {
+            "name": "PassPowers_Text_Empty_3",
+            "description": "MonolithPowerInfo_Text_Empty_3",
+            "effect": "PASS_POWER_EFFECT_12",
+            "value": 1,
+            "minutes": 0,
+            "level_white": 255,
+            "level_black": 255,
+            "price": 9999
+        },
+        {
+            "name": "PassPowers_Text_ExploringPower",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceFindingRustling",
+            "effect": "PASS_POWER_EFFECT_EXPLORING",
+            "value": 0,
+            "minutes": 3,
+            "level_white": 0,
+            "level_black": 0,
+            "price": 5
+        },
+        {
+            "name": "PassPowers_Text_ExploringPower_2",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceFindingRustling_2",
+            "effect": "PASS_POWER_EFFECT_EXPLORING",
+            "value": 1,
+            "minutes": 3,
+            "level_white": 5,
+            "level_black": 5,
+            "price": 10
+        },
+        {
+            "name": "PassPowers_Text_ExploringPower_3",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceFindingRustling_3",
+            "effect": "PASS_POWER_EFFECT_EXPLORING",
+            "value": 2,
+            "minutes": 3,
+            "level_white": 15,
+            "level_black": 15,
+            "price": 15
+        },
+        {
+            "name": "PassPowers_Text_GrottoPower",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceEncounteringPokemon",
+            "effect": "PASS_POWER_EFFECT_GROTTO",
+            "value": 0,
+            "minutes": 3,
+            "level_white": 10,
+            "level_black": 10,
+            "price": 5
+        },
+        {
+            "name": "PassPowers_Text_GrottoPower_2",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceEncounteringPokemon_2",
+            "effect": "PASS_POWER_EFFECT_GROTTO",
+            "value": 1,
+            "minutes": 3,
+            "level_white": 20,
+            "level_black": 20,
+            "price": 10
+        },
+        {
+            "name": "PassPowers_Text_GrottoPower_3",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceEncounteringPokemon_3",
+            "effect": "PASS_POWER_EFFECT_GROTTO",
+            "value": 2,
+            "minutes": 3,
+            "level_white": 30,
+            "level_black": 30,
+            "price": 15
+        },
+        {
+            "name": "PassPowers_Text_LuckyPower",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceEncounteringUncommon",
+            "effect": "PASS_POWER_EFFECT_LUCKY",
+            "value": 1,
+            "minutes": 3,
+            "level_white": 7,
+            "level_black": 7,
+            "price": 10
+        },
+        {
+            "name": "PassPowers_Text_LuckyPower_2",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceEncounteringUncommon_2",
+            "effect": "PASS_POWER_EFFECT_LUCKY",
+            "value": 2,
+            "minutes": 3,
+            "level_white": 21,
+            "level_black": 21,
+            "price": 20
+        },
+        {
+            "name": "PassPowers_Text_LuckyPower_3",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceEncounteringUncommon_3",
+            "effect": "PASS_POWER_EFFECT_LUCKY",
+            "value": 3,
+            "minutes": 3,
+            "level_white": 49,
+            "level_black": 49,
+            "price": 30
+        },
+        {
+            "name": "PassPowers_Text_ExploringPowerS",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceFindingRustling_4",
+            "effect": "PASS_POWER_EFFECT_EXPLORING",
+            "value": 2,
+            "minutes": 10,
+            "level_white": 100,
+            "level_black": 0,
+            "price": 50
+        },
+        {
+            "name": "PassPowers_Text_ExploringPowerMax",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceFindingRustling_5",
+            "effect": "PASS_POWER_EFFECT_EXPLORING",
+            "value": 2,
+            "minutes": 60,
+            "level_white": 255,
+            "level_black": 255,
+            "price": 9999
+        },
+        {
+            "name": "PassPowers_Text_GrottoPowerS",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceEncounteringPokemon_4",
+            "effect": "PASS_POWER_EFFECT_GROTTO",
+            "value": 3,
+            "minutes": 20,
+            "level_white": 50,
+            "level_black": 50,
+            "price": 50
+        },
+        {
+            "name": "PassPowers_Text_GrottoPowerMax",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceEncounteringPokemon_5",
+            "effect": "PASS_POWER_EFFECT_GROTTO",
+            "value": 3,
+            "minutes": 60,
+            "level_white": 255,
+            "level_black": 255,
+            "price": 9999
+        },
+        {
+            "name": "PassPowers_Text_LuckyPowerS",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceEncounteringUncommon_4",
+            "effect": "PASS_POWER_EFFECT_LUCKY",
+            "value": 3,
+            "minutes": 10,
+            "level_white": 0,
+            "level_black": 100,
+            "price": 50
+        },
+        {
+            "name": "PassPowers_Text_LuckyPowerMax",
+            "description": "MonolithPowerInfo_Text_IncreasesChanceEncounteringUncommon_5",
+            "effect": "PASS_POWER_EFFECT_LUCKY",
+            "value": 3,
+            "minutes": 60,
+            "level_white": 255,
+            "level_black": 255,
+            "price": 9999
+        }
+    ]
+}

@@ -126,7 +126,7 @@ static BOOL BrMusicalSend_ProcMain(GameProc *proc, u32 *state, void *param, void
     BrMusicalSendWork *wk = work;
     int i;
 
-    if (BrNet_CheckError(wk->param->net) == 2) {
+    if (BrNet_CheckError(wk->param->net) == BR_NET_ERROR_FAILED) {
         BrProcSys_Abort(wk->param->procSys);
         return TRUE;
     }

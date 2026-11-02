@@ -1,0 +1,41 @@
+{
+    "$schema": "../area.schema.json",
+    "areas": [
+        {
+            "shape": "rect",
+            "grid_x": 28,
+            "grid_z": 12,
+            "grid_w": 9,
+            "unk06": 1,
+            "grid_h": 9,
+            "unk0A": 0,
+            "start": {
+                "pitch": 9558,
+                "yaw": 0,
+                "distance": 983040,
+                "target_offset": {
+                    "x": 0,
+                    "y": 262144,
+                    "z": 0
+                },
+                "fov": 3640
+            },
+            "end": {
+                "pitch": 9690,
+                "yaw": 0,
+                "distance": 966656,
+                "target_offset": {
+                    "x": 0,
+                    "y": 16384,
+                    "z": 0
+                },
+                "fov": 3640
+            },
+            "forbid_delay_manager": false,
+            "unk3C": 0,
+            "stay": "FieldCameraAreaCalc_RECT_PitchYawTZLookatFOV_STAY",
+            "enter": "FieldCameraAreaCalc_RECT_PitchYawTZLookatFOV_BeginDisableDelay",
+            "exit": "FieldCameraAreaCalc_RECT_PitchYawTZLookatFOV_ResetEnableDelay"
+        }
+    ]
+}

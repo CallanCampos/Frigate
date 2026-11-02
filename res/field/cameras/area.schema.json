@@ -1,0 +1,73 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A zone's camera areas: res/field/cameras/areas/<n>.json and rail_areas/<n>.json",
+    "description": "A file of ARCID_FIELD_CAMERA_MAP_PARAM (a/1/5/6), areas/<n>.json, which GetCameraIDForZone gives a zone (ZONE_CAMERA_ASSIGNMENTS in src/system/zonedata.c), or of ARCID_FIELD_SCENE_AREA (a/0/7/9), rail_areas/<n>.json, which a rail map's header names (res/field/rails/headers.json): the camera areas that LoadCameraDataToSceneAreaLoader loads (fld_scenearea_loader.c). FieldCameraArea_Update checks every area each frame and takes the last that the player is in, calling its enter function when the player comes into it, its stay function while they stay and its exit function when they leave. tools/data/camera_area_data.py packs them in order.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "areas" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "areas": {
+            "type": "array",
+            "description": "The areas (CameraArea)",
+            "items": {
+                "type": "object",
+                "required": [ "shape", "unk3C", "stay", "enter", "exit" ],
+                "properties": {
+                    "shape": { "enum": [ "circle", "rect" ], "description": "The area's shape and the check of whether the player is in it, of CAM_COLL_CHECK_FUNCS: FieldCameraArea_CIRCLE_CheckColl, between two radii and two angles around the center, or FieldCameraAreaCalc_RECT_CheckColl, a rectangle of tiles, which is never true on a rail map" },
+                    "grid_x": { "$ref": "#/$defs/u16", "description": "A rectangle's west edge, in tiles" },
+                    "grid_z": { "$ref": "#/$defs/u16", "description": "A rectangle's north edge, in tiles" },
+                    "grid_w": { "$ref": "#/$defs/u16", "description": "A rectangle's width in tiles, east of grid_x; 1 for a rectangle that blends from west to east, whose width is then grid_h and its height unk06" },
+                    "unk06": { "$ref": "#/$defs/u16", "description": "The height, in tiles, of a rectangle whose grid_w is 1" },
+                    "grid_h": { "$ref": "#/$defs/u16", "description": "A rectangle's height in tiles, south of grid_z, and the length of the blend, from north to south (or from west to east when grid_w is 1; CalcFieldDynCameraLerpFactors)" },
+                    "unk0A": { "$ref": "#/$defs/u16", "description": "Not read by the code" },
+                    "start": { "$ref": "#/$defs/setting", "description": "A rectangle's camera at the start of the blend, its north (or west) edge" },
+                    "end": { "$ref": "#/$defs/setting", "description": "A rectangle's camera at the end of the blend" },
+                    "forbid_delay_manager": { "type": "boolean", "description": "Whether a rectangle whose function is a BeginDisableDelay or ResetEnableDelay one turns the camera's delay off on entering and on again on leaving (FieldCamera_DisableDelay, FieldCamera_EnableDelay)" },
+                    "angle_start": { "$ref": "#/$defs/angle", "description": "A circle's ring, from this angle around the center, in 65536ths of a turn as FX_Atan2Idx gives them" },
+                    "angle_end": { "$ref": "#/$defs/angle", "description": "To this angle; the ring passes angle 0 when it is less than angle_start" },
+                    "radius_start": { "$ref": "#/$defs/fx32", "description": "A circle's ring, from this distance from the center, in 4096ths of a unit" },
+                    "radius_end": { "$ref": "#/$defs/fx32", "description": "To this distance" },
+                    "center": { "$ref": "#/$defs/vector", "description": "A circle's center, which FieldCameraAreaCalc_CIRCLE_AimPlayerCentre looks at, in 4096ths of a unit" },
+                    "pitch": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647, "description": "The pitch from which FieldCameraAreaCalc_CIRCLE_AimPlayerCentre looks at the center past the player, in 65536ths of a turn" },
+                    "distance": { "$ref": "#/$defs/fx32", "description": "Its distance from the center, in 4096ths of a unit" },
+                    "target": { "$ref": "#/$defs/vector", "description": "Where FieldCameraAreaCalc_CIRCLE_FixedLookAt looks, in 4096ths of a unit" },
+                    "eye": { "$ref": "#/$defs/vector", "description": "Where FieldCameraAreaCalc_CIRCLE_FixedLookAt puts the camera, in 4096ths of a unit" },
+                    "unk3C": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647, "description": "Not read by the code" },
+                    "stay": { "$ref": "#/$defs/calc", "description": "The function called while the player stays in the area" },
+                    "enter": { "$ref": "#/$defs/calc", "description": "The function called when the player comes into the area" },
+                    "exit": { "$ref": "#/$defs/calc", "description": "The function called when the player leaves the area" }
+                },
+                "additionalProperties": false
+            }
+        }
+    },
+    "$defs": {
+        "u16": { "type": "integer", "minimum": 0, "maximum": 65535 },
+        "angle": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+        "fx32": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647 },
+        "vector": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [ "x", "y", "z" ],
+            "properties": { "x": { "$ref": "#/$defs/fx32" }, "y": { "$ref": "#/$defs/fx32" }, "z": { "$ref": "#/$defs/fx32" } }
+        },
+        "setting": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [ "pitch", "yaw", "distance", "target_offset", "fov" ],
+            "description": "A camera setting that the rectangle's functions blend toward the other across it: the pitch, yaw and distance (the PitchYawTZ functions), and the target's offset and the field of view (the LookatFOV ones)",
+            "properties": {
+                "pitch": { "$ref": "#/$defs/u16", "description": "In 65536ths of a turn" },
+                "yaw": { "$ref": "#/$defs/u16", "description": "In 65536ths of a turn" },
+                "distance": { "$ref": "#/$defs/fx32", "description": "The camera's distance from its target, in 4096ths of a unit (FieldCamera_CoordsSetZoom)" },
+                "target_offset": { "$ref": "#/$defs/vector", "description": "The offset of the camera's target, in 4096ths of a unit (FieldCamera_CoordsSetTargetOffset)" },
+                "fov": { "$ref": "#/$defs/u16", "description": "The field of view, in 65536ths of a turn (FieldCamera_SetFOV)" }
+            }
+        },
+        "calc": {
+            "enum": [ "FieldCameraAreaCalc_CIRCLE_AimPlayerCentre", "FieldCameraAreaCalc_CIRCLE_FixedLookAt", "FieldCameraAreaCalc_RECT_PitchYawTZ", "FieldCameraAreaCalc_RECT_PitchYawTZ_BeginDisableDelay", "FieldCameraAreaCalc_RECT_PitchYawTZ_ResetEnableDelay", "FieldCameraAreaCalc_RECT_PitchYawTZLookatFOV_STAY", "FieldCameraAreaCalc_RECT_PitchYawTZLookatFOV_BeginDisableDelay", "FieldCameraAreaCalc_RECT_PitchYawTZLookatFOV_ResetEnableDelay" ],
+            "description": "A function of CAM_CALC_FUNCS in fld_scenearea_loader.c: a circle's, which look at its center from behind the player or from a fixed eye, or a rectangle's, which blend its start and end settings by the player's position across it: the pitch, yaw and distance, also the target offset and field of view (LookatFOV), turning the camera's delay off (BeginDisableDelay, for enter) or on again (ResetEnableDelay, for exit) when forbid_delay_manager is set"
+        }
+    }
+}

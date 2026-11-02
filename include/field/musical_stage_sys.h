@@ -21,12 +21,12 @@ MusicalStageParam *MusicalStageParam_Create(HeapID heapId, MusCommWork *comm);
 void MusicalStageParam_Free(MusicalStageParam *param);
 // Puts a Pokémon on the stage
 void MusicalStageParam_SetPlayerPoke(MusicalStageParam *param, u8 pos, MusicalPoke *poke);
-void MusicalStageParam_CreateNpcPoke(MusicalStageParam *param, u8 pos, u16 species, u8 form, u32 personality, u16 a5,
-                                     HeapID heapId);
+void MusicalStageParam_CreateNpcPoke(MusicalStageParam *param, u8 pos, u16 species, u8 form, u32 personality,
+                                     u16 handPropUse, HeapID heapId);
 void MusicalStageParam_SetCommPoke(MusicalStageParam *param, u8 pos, MusicalPoke *poke);
-void MusicalStageParam_SetEquip(MusicalStageParam *param, u8 pos, u8 slot, u16 itemId, s16 a4, u8 a5);
+void MusicalStageParam_SetEquip(MusicalStageParam *param, u8 pos, u8 slot, u16 itemId, s16 rotation, u8 order);
 
-extern GameProcFunctions data_ov012_0216dfe8;
+extern GameProcFunctions MUSICAL_STAGE_PROC_FUNCTIONS;
 
 // Overlay 209's stage (sta_acting.c), whose main function returns TRUE once the show has faded out
 StaActing *StaActing_Init(MusicalStageParam *param, HeapID heapId);

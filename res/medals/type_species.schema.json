@@ -1,0 +1,26 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The type medals' Pokémon: res/medals/type_species.json",
+    "description": "ARCID_MEDAL_TYPE_SPECIES (a/2/3/9), one file of MEDAL_TYPE_SPECIES_COUNT MedalTypeSpecies (scrcmd_pokemon_center.c): the Pokémon whose types the medals of the types count, which PokemonCenter_CheckTypes reads. A type is caught while every counted Pokémon of it is. tools/data/medal_data.py packs it.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "species" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "species": {
+            "type": "array", "minItems": 301, "maxItems": 301,
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "species", "types", "counted" ],
+                "properties": {
+                    "species": { "type": "string", "x-constant": "SPECIES_", "description": "The Pokémon, which must be caught in the Pokédex" },
+                    "types": {
+                        "type": "array", "minItems": 2, "maxItems": 2,
+                        "items": { "type": "string", "x-constant": "TYPE_" },
+                        "description": "Its two types, the same twice for one type"
+                    },
+                    "counted": { "type": "boolean", "description": "Whether the type medals count it" }
+                }
+            }
+        }
+    }
+}

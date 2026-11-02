@@ -124,7 +124,7 @@ MusShotPhoto *MusShotPhoto_Create(MusicalShot *shot, HeapID heapId) {
 
             if (equip != 10) {
                 photo->pokes[i]->equips[equip].itemId = shot->pokes[i].equips[j].itemId;
-                photo->pokes[i]->equips[equip].unk2 = shot->pokes[i].equips[j].rotation;
+                photo->pokes[i]->equips[equip].rotation = shot->pokes[i].equips[j].rotation;
                 photo->pokes[i]->equips[equip].slot = j;
             }
         }
@@ -133,7 +133,7 @@ MusShotPhoto *MusShotPhoto_Create(MusicalShot *shot, HeapID heapId) {
     MusShotPhoto_InitPokes(photo);
     MusShotPhoto_InitText(photo);
     photo->bg = StaActBg_InitSystem(photo->heapId, NULL);
-    StaActBg_LoadBg(photo->bg, photo->shot->unk0_0);
+    StaActBg_LoadBg(photo->bg, photo->shot->programId);
     StaActPoke_SetScrollOffset(photo->staPoke, 0x80);
     StaActBg_SetScrollOffset(photo->bg, 0x80);
     return photo;

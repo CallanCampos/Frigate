@@ -1,0 +1,54 @@
+// MOVE_GUARD_SWAP's animation: member 385 of a/0/6/5
+
+#include "asm/btlv_effvm.inc"
+
+    ScriptHeader 1
+    ScriptVariant GuardSwap
+
+GuardSwap:
+    SetYield FALSE
+    PlaySE SEQ_SE_W113_02, 1, EFFVM_DEFENDER, 0, 0, 65, 0, 0, 0
+    PlaySE SEQ_SE_W051_01, 2, EFFVM_ATTACKER, 40, 0, 120, 0, 0, 0
+    PlaySE SEQ_SE_W051_01, 1, EFFVM_DEFENDER, 45, 0, 120, 0, 0, 0
+    PanSE 1, 0, EFFVM_DEFENDER, EFFVM_ATTACKER, 0, 48, 0, 0
+    SetYield TRUE
+    CameraMovePreset 1, 11, 10, 0, 6
+    ParticleLoad 564
+    EmitterAdd 564, 0, EFFVM_EMIT_ATTACKER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterMove 564, 0, 2, EFFVM_EMIT_DEFENDER, EFFVM_EMIT_ATTACKER, 0x2000, 0x1e000, 0x3000, 0x1000, 0x1000, 0
+    WaitFrames 3
+    EmitterMove 564, 0, 2, EFFVM_EMIT_DEFENDER, EFFVM_EMIT_ATTACKER, 0x2000, 0x1e000, 0x3000, 0x1000, 0x1000, 0
+    WaitFrames 3
+    EmitterMove 564, 0, 2, EFFVM_EMIT_DEFENDER, EFFVM_EMIT_ATTACKER, 0x2000, 0x1e000, 0x3000, 0x1000, 0x1000, 0
+    WaitFrames 3
+    EmitterMove 564, 0, 2, EFFVM_EMIT_DEFENDER, EFFVM_EMIT_ATTACKER, 0x2000, 0x1e000, 0x3000, 0x1000, 0x1000, 0
+    WaitFrames 3
+    EmitterMove 564, 0, 2, EFFVM_EMIT_DEFENDER, EFFVM_EMIT_ATTACKER, 0x2000, 0x1e000, 0x3000, 0x1000, 0x1000, 0
+    CameraMovePreset 1, 9, 10, 0, 6
+    WaitFrames 3
+    EmitterMove 564, 0, 2, EFFVM_EMIT_DEFENDER, EFFVM_EMIT_ATTACKER, 0x2000, 0x1e000, 0x3000, 0x1000, 0x1000, 0
+    WaitFrames 3
+    EmitterMove 564, 0, 2, EFFVM_EMIT_DEFENDER, EFFVM_EMIT_ATTACKER, 0x2000, 0x1e000, 0x3000, 0x1000, 0x1000, 0
+    Wait EFFVM_WAIT_ALL
+    EmitterMove 564, 0, 2, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x1e000, -0x1000, 0x1000, 0x1000, 0
+    WaitFrames 3
+    SetYield FALSE
+    PlaySE SEQ_SE_W112_02, 1, EFFVM_ATTACKER, 0, 0, 65, 0, 0, 0
+    PlaySE SEQ_SE_W051_01, 2, EFFVM_DEFENDER, 40, 0, 120, 0, 0, 0
+    PlaySE SEQ_SE_W051_01, 1, EFFVM_ATTACKER, 45, 0, 120, 0, 0, 0
+    PanSE 1, 0, EFFVM_ATTACKER, EFFVM_DEFENDER, 0, 48, 0, 0
+    SetYield TRUE
+    CameraMovePreset 1, 11, 10, 0, 6
+    EmitterMove 564, 0, 2, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x1e000, -0x1000, 0x1000, 0x1000, 0
+    WaitFrames 3
+    EmitterMove 564, 0, 2, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x1e000, -0x1000, 0x1000, 0x1000, 0
+    WaitFrames 3
+    EmitterMove 564, 0, 2, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x1e000, -0x1000, 0x1000, 0x1000, 0
+    WaitFrames 3
+    EmitterMove 564, 0, 2, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x1e000, -0x1000, 0x1000, 0x1000, 0
+    WaitFrames 3
+    EmitterMove 564, 0, 2, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x1e000, -0x1000, 0x1000, 0x1000, 0
+    Wait EFFVM_WAIT_ALL
+    CameraMovePreset 1, 8, 10, 0, 6
+    Wait EFFVM_WAIT_ALL
+    End

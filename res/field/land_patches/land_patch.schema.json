@@ -1,0 +1,60 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A Join Avenue shop's land data patch: res/field/land_patches/<n>.json",
+    "description": "File n of ARCID_LAND_DATA_PATCH (a/1/5/4), which a Join Avenue shop's column 6 names for the occupants at odd places and its column 7 for those at even places (ResortShopData_GetShopParam in resort_mapcreate.c): the tiles that LandDataPatch_OverwriteAttr writes over the avenue's terrain where the shop stands, six tiles wide and as many rows as fit in the chunk, and the props that LoadLandDataPatchBuildings adds there (land_data_patch.c). tools/data/land_patch_data.py packs them in order.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "tiles", "props" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "tiles": {
+            "type": "array", "minItems": 1, "maxItems": 65535,
+            "description": "The patch's tiles, row by row from north to south, each row from west to east (LandPatchGrid)",
+            "items": {
+                "type": "array", "minItems": 1, "maxItems": 65535,
+                "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [ "normal0", "normal1", "offset0", "offset1", "tile_type", "diagonal" ],
+                    "description": "A tile of an RD chunk's terrain (RDTile in field_map_chunk_rd.c): its two planes, cut along a diagonal, and its type",
+                    "properties": {
+                        "normal0": { "$ref": "#/$defs/normal", "description": "The normal of plane 0, the half nearer the origin, or the half with x > z" },
+                        "normal1": { "$ref": "#/$defs/normal", "description": "The normal of plane 1" },
+                        "offset0": { "$ref": "#/$defs/fx32", "description": "Plane 0's distance from the origin along its normal, in 4096ths of a unit" },
+                        "offset1": { "$ref": "#/$defs/fx32", "description": "Plane 1's distance" },
+                        "tile_type": { "type": "string", "pattern": "^0x[0-7][0-9a-fA-F]{7}$", "description": "The tile's type in hex, 31 bits: its flags (TILE_FLAG_* in include/field/field_map.h, GetTileFlags) in the high bits and its class (TILE_CLASS_*, GetTileClass) in the low 16" },
+                        "diagonal": { "type": "boolean", "description": "Whether the tile is cut along x = z rather than x + z = 16" }
+                    }
+                }
+            }
+        },
+        "props": {
+            "type": "array",
+            "description": "The props the patch adds (FieldPropSourceInfo)",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "position", "rotation_y", "model" ],
+                "properties": {
+                    "position": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [ "x", "y", "z" ],
+                        "description": "Where the prop stands, in 4096ths of a unit, from where the shop stands: LoadLandDataPatchBuildings adds the shop's column, in tiles of 16 units, to x and takes its row from z, which FieldPropSystem_InstantiateFromInfo negates",
+                        "properties": { "x": { "$ref": "#/$defs/fx32" }, "y": { "$ref": "#/$defs/fx32" }, "z": { "$ref": "#/$defs/fx32" } }
+                    },
+                    "rotation_y": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "Its turn around the Y axis, in 65536ths of a turn" },
+                    "model": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "Its model, by its ID in the area's props (FieldPropSystem_ConvResIDToIndex)" }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "fx32": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647 },
+        "normal": {
+            "type": "array", "minItems": 3, "maxItems": 3,
+            "description": "A unit normal's x, y and z, in 4096ths",
+            "items": { "type": "integer", "minimum": -32768, "maximum": 32767 }
+        }
+    }
+}

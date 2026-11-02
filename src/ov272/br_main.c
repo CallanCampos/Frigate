@@ -25,6 +25,22 @@ enum {
     BR_MAIN_PROCID_BATTLE,
 };
 
+// The steps of the Battle Recorder's proc
+enum {
+    BR_MAIN_STATE_START,
+    BR_MAIN_STATE_RUN,
+    BR_MAIN_STATE_END,
+};
+
+// The steps of running a proc: pick the next one, start it, wait for it and free its parameter
+enum {
+    BR_MAIN_SEQ_SWITCH,
+    BR_MAIN_SEQ_START,
+    BR_MAIN_SEQ_WAIT,
+    BR_MAIN_SEQ_FREE,
+    BR_MAIN_SEQ_END,
+};
+
 // Makes a proc's parameter. preID is the proc that ran before it
 typedef void *(*BrMainCreateParamFunc)(HeapID heapId, void *work, u32 preID);
 // Reads the results from a proc's parameter once it has ended and frees it
@@ -78,7 +94,7 @@ const GameProcFunctions BR_MAIN_PROC_FUNCTIONS = {
 
 static const BrMainProcData sBrMainProcTable[] = {
     [BR_MAIN_PROCID_CORE] = { OVERLAY_ID(271), &BR_CORE_PROC_FUNCTIONS, BrMain_CoreCreateParam, BrMain_CoreFreeParam },
-    [BR_MAIN_PROCID_BATTLE] = { OVERLAY_ID(167), &data_ov167_021d6ce0, BrMain_BattleCreateParam,
+    [BR_MAIN_PROCID_BATTLE] = { OVERLAY_ID(167), &BATTLE_PROC_FUNCTIONS, BrMain_BattleCreateParam,
                                 BrMain_BattleFreeParam },
 };
 
@@ -117,15 +133,15 @@ static BOOL BrMain_ProcMain(GameProc *proc, u32 *state, void *param, void *work)
     BrMainWork *wk = work;
 
     switch (*state) {
-    case 0:
-        *state = 1;
+    case BR_MAIN_STATE_START:
+        *state = BR_MAIN_STATE_RUN;
         break;
-    case 1:
+    case BR_MAIN_STATE_RUN:
         if (BrMainProcSys_Main(&wk->procSys)) {
-            *state = 2;
+            *state = BR_MAIN_STATE_END;
         }
         break;
-    case 2:
+    case BR_MAIN_STATE_END:
         return TRUE;
     }
     return FALSE;
@@ -141,12 +157,12 @@ static void BrMainProcSys_Init(BrMainProcSys *p_wk, const BrMainProcData *tbl, v
 
 static BOOL BrMainProcSys_Main(BrMainProcSys *p_wk) {
     switch (p_wk->seq) {
-    case 0:
+    case BR_MAIN_SEQ_SWITCH:
         p_wk->preProcID = p_wk->procID;
         p_wk->procID = p_wk->nextProcID;
-        p_wk->seq = 1;
+        p_wk->seq = BR_MAIN_SEQ_START;
         break;
-    case 1:
+    case BR_MAIN_SEQ_START:
         if (p_wk->tbl[p_wk->procID].createParam != NULL) {
             p_wk->p_proc_param = p_wk->tbl[p_wk->procID].createParam(p_wk->heapId, p_wk->work, p_wk->preProcID);
         } else {
@@ -154,25 +170,25 @@ static BOOL BrMainProcSys_Main(BrMainProcSys *p_wk) {
         }
         QueueGameProc(p_wk->procMgr, p_wk->tbl[p_wk->procID].overlayId, p_wk->tbl[p_wk->procID].procFuncs,
                       p_wk->p_proc_param);
-        p_wk->seq = 2;
+        p_wk->seq = BR_MAIN_SEQ_WAIT;
         break;
-    case 2:
+    case BR_MAIN_SEQ_WAIT:
         if (!GFL_ProcMgrUpdate(p_wk->procMgr)) {
-            p_wk->seq = 3;
+            p_wk->seq = BR_MAIN_SEQ_FREE;
         }
         break;
-    case 3:
+    case BR_MAIN_SEQ_FREE:
         if (p_wk->tbl[p_wk->procID].freeParam != NULL) {
             p_wk->tbl[p_wk->procID].freeParam(p_wk->p_proc_param, p_wk->work);
             p_wk->p_proc_param = NULL;
         }
         if (p_wk->procID != p_wk->nextProcID) {
-            p_wk->seq = 0;
+            p_wk->seq = BR_MAIN_SEQ_SWITCH;
         } else {
-            p_wk->seq = 4;
+            p_wk->seq = BR_MAIN_SEQ_END;
         }
         break;
-    case 4:
+    case BR_MAIN_SEQ_END:
         return TRUE;
     }
     return FALSE;
@@ -207,9 +223,9 @@ static void BrMain_CoreFreeParam(void *param, void *work) {
     BrCoreParam *coreParam = param;
 
     switch (coreParam->result) {
-    case 0:
+    case BR_CORE_RESULT_EXIT:
         break;
-    case 1:
+    case BR_CORE_RESULT_PLAY_VIDEO:
         BrMainProcSys_SetNext(work, BR_MAIN_PROCID_BATTLE);
         break;
     }
@@ -226,7 +242,7 @@ static void *BrMain_BattleCreateParam(HeapID heapId, void *work, u32 preID) {
     BattleRec_UnloadToolOverlay();
     GFL_SndBGMSetPaused(TRUE);
     GFL_SndBGMPush();
-    BrMain_CheckBgm(&setup->fieldSituation.bgm, &setup->fieldSituation.unk12);
+    BrMain_CheckBgm(&setup->fieldSituation.bgm, &setup->fieldSituation.winBgm);
     GFL_SndBGMPlay(setup->fieldSituation.bgm, 0xffff);
     return setup;
 }
@@ -242,8 +258,8 @@ static void BrMain_BattleFreeParam(void *param, void *work) {
     if (wk->param->mode == BR_MODE_BROWSE) {
         FieldSnd_SetPlayerVolumeFade(fieldSound, 64, 0);
     }
-    wk->data.unk_17bc = setup->unkDD_1;
-    GFL_HeapFree(setup->unk34[0]);
+    wk->data.recReadComplete = setup->recReadComplete;
+    GFL_HeapFree(setup->playerInfo[0]);
     BtlSetup_FreeForRecord(setup);
     BtlSetup_Free(setup);
     BrMainProcSys_SetNext(work, BR_MAIN_PROCID_CORE);

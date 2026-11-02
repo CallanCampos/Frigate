@@ -83,7 +83,7 @@ void BAppTool_QueueWindowScreens(PrintWindow *printWindows, const u8 *list) {
 
     i = 0;
     while (TRUE) {
-        if (list[i] == 0xff) {
+        if (list[i] == BAPP_TOOL_WINDOW_LIST_END) {
             break;
         }
         BAppTool_QueueWindowScreen(&printWindows[list[i]]);

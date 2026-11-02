@@ -49,14 +49,15 @@ typedef struct {
 extern const GameProcFunctions POKEMONTRADE_PROC_FUNCTIONS;
 extern const GameProcFunctions POKEMONTRADE_WIFICLUB_PROC_FUNCTIONS;
 // For the infrared event
-extern const GameProcFunctions data_ov194_021c63dc;
-// The procs that only show the trade's animation
-extern const GameProcFunctions data_ov194_021c63ac;
-extern const GameProcFunctions data_ov194_021c63b8;
-extern const GameProcFunctions data_ov194_021c63d0;
-extern const GameProcFunctions data_ov194_021c6400;
-// A trade that runs the GTS Negotiation's proc table with other values
-extern const GameProcFunctions data_ov194_021c640c;
+extern const GameProcFunctions POKEMONTRADE_IRC_PROC_FUNCTIONS;
+// The procs that only show the trade's animation: the infrared trade's, which the in-game trades show, and the Global
+// Trade Station's
+extern const GameProcFunctions POKEMONTRADE_IRCDEMO_PROC_FUNCTIONS;
+extern const GameProcFunctions POKEMONTRADE_GTS_WITHDRAW_PROC_FUNCTIONS;
+extern const GameProcFunctions POKEMONTRADE_GTS_TRADE_PROC_FUNCTIONS;
+extern const GameProcFunctions POKEMONTRADE_GTS_DEPOSIT_PROC_FUNCTIONS;
+// For the Union Room
+extern const GameProcFunctions POKEMONTRADE_UNION_PROC_FUNCTIONS;
 
 // The trade demo's parameter for the Global Trade Station
 typedef struct {
@@ -69,8 +70,8 @@ typedef struct {
 } PokemonTradeGtsParam;
 
 // For the Global Trade Station: a deposit, a received trade, and a trade made or picked up
-extern const GameProcFunctions data_ov194_021c6400;
-extern const GameProcFunctions data_ov194_021c63b8;
-extern const GameProcFunctions data_ov194_021c63d0;
+extern const GameProcFunctions POKEMONTRADE_GTS_DEPOSIT_PROC_FUNCTIONS;
+extern const GameProcFunctions POKEMONTRADE_GTS_WITHDRAW_PROC_FUNCTIONS;
+extern const GameProcFunctions POKEMONTRADE_GTS_TRADE_PROC_FUNCTIONS;
 
 #endif // POKEBW2_APP_POKEMON_TRADE_H

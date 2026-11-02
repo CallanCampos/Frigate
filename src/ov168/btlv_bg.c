@@ -39,7 +39,7 @@ typedef struct {
     s32 frames;     // 0x00c
     fx32 amplitude; // 0x010
     s32 step;       // 0x014  in degrees
-    u32 fadeMode;   // 0x018
+    u32 fadeMode;   // 0x018  BTLV_BG_WAVE_FADE_*
     s32 fadeFrames; // 0x01c
     s16 table[256]; // 0x020
     s16 shift;      // 0x220  the table's line at line 0
@@ -86,10 +86,10 @@ void BtlvBg_StartMove(BtlvBg *work, u32 pos, u32 mode, s32 x, s32 y, s32 frames,
     start.x = GFL_BGSysGetBGOffsetX(3) << FX32_SHIFT;
     start.y = GFL_BGSysGetBGOffsetY(3) << FX32_SHIFT;
     start.z = 0;
-    if (mode == 4 && (pos & 1)) {
+    if (mode == BTLV_EFFTOOL_MOVE_SCROLL && (pos & 1)) {
         end.x *= -1;
     }
-    if (mode == 1) {
+    if (mode == BTLV_EFFTOOL_MOVE_STEP) {
         end.x += start.x;
         end.y += start.y;
         end.z += start.z;
@@ -115,10 +115,10 @@ void BtlvBg_StartWave(BtlvBg *work, u32 mode, fx32 amplitude, s32 step, s32 fram
     wave->fadeFrames = fadeFrames;
     wave->fadeStep = FX_Div(amplitude, FX32_CONST(fadeFrames));
     switch (mode) {
-    case 0:
+    case BTLV_BG_WAVE_HORIZONTAL:
         wave->lines = 192;
         break;
-    case 1:
+    case BTLV_BG_WAVE_VERTICAL:
         wave->lines = 256;
         break;
     }
@@ -157,15 +157,15 @@ static void BtlvBg_AddMoveTask(BtlvBg *work, u32 mode, VecFx32 *start, const Vec
     move->move.end.y = end->y;
     move->move.end.z = end->z;
     switch (mode) {
-    case 0:
+    case BTLV_EFFTOOL_MOVE_JUMP:
         break;
-    case 1:
+    case BTLV_EFFTOOL_MOVE_STEP:
         BtlvEffTool_CalcStepVec(&move->move.start, end, &move->move.step, FX32_CONST(frames));
         break;
-    case 3:
+    case BTLV_EFFTOOL_MOVE_SHAKE:
         move->move.stepTimeReset *= 2;
         move->move.count *= 2;
-    case 2:
+    case BTLV_EFFTOOL_MOVE_SWING:
         move->move.step.x = FX_Div(end->x, FX32_CONST(frames));
         move->move.step.y = FX_Div(end->y, FX32_CONST(frames));
         move->move.step.z = FX_Div(end->z, FX32_CONST(frames));
@@ -214,18 +214,18 @@ static void BtlvBg_WaveTask(TCB *tcb, void *data) {
     fx32 amplitude;
 
     switch (wave->fadeMode) {
-    case 0:
+    case BTLV_BG_WAVE_FADE_NONE:
         break;
-    case 1:
-    case 3:
+    case BTLV_BG_WAVE_FADE_IN:
+    case BTLV_BG_WAVE_FADE_IN_OUT:
         if (wave->counter < wave->fadeFrames) {
             amplitude = FX_MUL(wave->fadeStep, FX32_CONST(wave->counter));
             SinWaveTable_Make(wave->table, wave->lines, 0xffff * wave->step / 360, amplitude);
-        } else if (wave->fadeMode == 3) {
-            wave->fadeMode = 2;
+        } else if (wave->fadeMode == BTLV_BG_WAVE_FADE_IN_OUT) {
+            wave->fadeMode = BTLV_BG_WAVE_FADE_OUT;
         }
         break;
-    case 2:
+    case BTLV_BG_WAVE_FADE_OUT:
         if (wave->counter > wave->frames - wave->fadeFrames) {
             amplitude = FX_MUL(wave->fadeStep, FX32_CONST(wave->frames - wave->counter));
             SinWaveTable_Make(wave->table, wave->lines, 0xffff * wave->step / 360, amplitude);

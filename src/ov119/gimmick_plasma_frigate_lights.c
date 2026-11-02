@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_exp_obj.h"
@@ -10,8 +11,6 @@
 #include "system/game_system.h"
 
 #define GIMMICK_WORK_ID 1
-// The archive of the scene's models, a/2/8/6: the same as overlay 117's, of which the scene is the first six files
-#define GIMMICK_ARCID 0x11e
 
 #define SWITCH_COUNT 4
 
@@ -40,8 +39,9 @@ static void PlasmaFrigateLights_ShowLightSecondEnd(PlasmaFrigateLightsWork *work
 static void PlasmaFrigateLights_LoopLightFirst(PlasmaFrigateLightsWork *work, u16 index);
 
 static const G3DSceneResourceSetup sResources[6] = {
-    { GIMMICK_ARCID, 0, 0 }, { GIMMICK_ARCID, 1, 0 }, { GIMMICK_ARCID, 2, 0 },
-    { GIMMICK_ARCID, 3, 0 }, { GIMMICK_ARCID, 4, 0 }, { GIMMICK_ARCID, 5, 0 },
+    { ARCID_GIMMICK_PLASMA_FRIGATE, 0, 0 }, { ARCID_GIMMICK_PLASMA_FRIGATE, 1, 0 },
+    { ARCID_GIMMICK_PLASMA_FRIGATE, 2, 0 }, { ARCID_GIMMICK_PLASMA_FRIGATE, 3, 0 },
+    { ARCID_GIMMICK_PLASMA_FRIGATE, 4, 0 }, { ARCID_GIMMICK_PLASMA_FRIGATE, 5, 0 },
 };
 
 static const G3DSceneAnimationSetup sSwitchAnimations[] = { { 1, 0 }, { 2, 0 } };

@@ -1,0 +1,705 @@
+{
+    "$schema": "../pattern_animation.schema.json",
+    "animations": [
+        {
+            "length": 360,
+            "textures": [
+                {
+                    "name": "kisetu01.1",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "kisetu01.2",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "kisetu01.3",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "kisetu01.4",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "mori01ca.1",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "mori01ca.2",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "mori01ca.3",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "mori01ca.4",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "sea_kira.1",
+                    "format": "palette4",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "sea_kira.2",
+                    "format": "palette4",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "sea_kira.3",
+                    "format": "palette4",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "sea_simi.1",
+                    "format": "palette16",
+                    "color0_transparent": false
+                },
+                {
+                    "name": "sea_simi.2",
+                    "format": "palette16",
+                    "color0_transparent": false
+                },
+                {
+                    "name": "sea_simi.3",
+                    "format": "palette16",
+                    "color0_transparent": false
+                },
+                {
+                    "name": "sea_simi.4",
+                    "format": "palette16",
+                    "color0_transparent": false
+                }
+            ],
+            "palettes": [
+                [ "kisetu01.1_pl", "kisetu01.2_pl", "kisetu01.3_pl", "kisetu01.4_pl" ],
+                [ "mori01ca.1_pl", "mori01ca.2_pl", "mori01ca.3_pl", "mori01ca.4_pl" ],
+                [ "sea_kira.1_pl", "sea_kira.2_pl", "sea_kira.3_pl" ],
+                [ "sea_simi.1_pl", "sea_simi.2_pl", "sea_simi.3_pl", "sea_simi.4_pl" ]
+            ],
+            "targets": [
+                [
+                    {
+                        "frame": 0,
+                        "texture": "kisetu01.1"
+                    },
+                    {
+                        "frame": 5,
+                        "texture": "kisetu01.2"
+                    },
+                    {
+                        "frame": 14,
+                        "texture": "kisetu01.3"
+                    },
+                    {
+                        "frame": 24,
+                        "texture": "kisetu01.4"
+                    }
+                ],
+                [
+                    {
+                        "frame": 0,
+                        "texture": "sea_simi.4"
+                    },
+                    {
+                        "frame": 59,
+                        "texture": "sea_simi.1"
+                    },
+                    {
+                        "frame": 94,
+                        "texture": "sea_simi.2"
+                    },
+                    {
+                        "frame": 101,
+                        "texture": "sea_simi.3"
+                    },
+                    {
+                        "frame": 107,
+                        "texture": "sea_simi.4"
+                    }
+                ],
+                [
+                    {
+                        "frame": 0,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 1,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 2,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 3,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 4,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 5,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 6,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 7,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 8,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 9,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 10,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 11,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 12,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 13,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 14,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 15,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 16,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 17,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 18,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 19,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 20,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 21,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 22,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 23,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 24,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 25,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 26,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 27,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 28,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 29,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 30,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 31,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 32,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 33,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 34,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 35,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 36,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 37,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 38,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 39,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 40,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 41,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 42,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 43,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 44,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 45,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 46,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 47,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 48,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 49,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 50,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 51,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 52,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 53,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 54,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 55,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 56,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 57,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 58,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 59,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 60,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 61,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 62,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 63,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 64,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 65,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 66,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 67,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 68,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 69,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 70,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 71,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 72,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 73,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 74,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 75,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 76,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 77,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 78,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 79,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 80,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 81,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 82,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 83,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 84,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 85,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 86,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 87,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 88,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 89,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 90,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 91,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 92,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 93,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 94,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 95,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 96,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 97,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 98,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 99,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 100,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 101,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 102,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 103,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 104,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 105,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 106,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 107,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 108,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 109,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 110,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 111,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 112,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 113,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 114,
+                        "texture": "sea_kira.1"
+                    },
+                    {
+                        "frame": 115,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 116,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 117,
+                        "texture": "sea_kira.3"
+                    },
+                    {
+                        "frame": 118,
+                        "texture": "sea_kira.2"
+                    },
+                    {
+                        "frame": 119,
+                        "texture": "sea_kira.3"
+                    }
+                ],
+                [
+                    {
+                        "frame": 0,
+                        "texture": "mori01ca.1"
+                    },
+                    {
+                        "frame": 20,
+                        "texture": "mori01ca.2"
+                    },
+                    {
+                        "frame": 25,
+                        "texture": "mori01ca.3"
+                    },
+                    {
+                        "frame": 30,
+                        "texture": "mori01ca.4"
+                    },
+                    {
+                        "frame": 35,
+                        "texture": "mori01ca.1"
+                    },
+                    {
+                        "frame": 40,
+                        "texture": "mori01ca.2"
+                    },
+                    {
+                        "frame": 45,
+                        "texture": "mori01ca.3"
+                    },
+                    {
+                        "frame": 50,
+                        "texture": "mori01ca.4"
+                    },
+                    {
+                        "frame": 55,
+                        "texture": "mori01ca.1"
+                    },
+                    {
+                        "frame": 60,
+                        "texture": "mori01ca.2"
+                    },
+                    {
+                        "frame": 65,
+                        "texture": "mori01ca.3"
+                    },
+                    {
+                        "frame": 70,
+                        "texture": "mori01ca.4"
+                    },
+                    {
+                        "frame": 75,
+                        "texture": "mori01ca.1"
+                    },
+                    {
+                        "frame": 80,
+                        "texture": "mori01ca.2"
+                    },
+                    {
+                        "frame": 85,
+                        "texture": "mori01ca.3"
+                    },
+                    {
+                        "frame": 90,
+                        "texture": "mori01ca.4"
+                    },
+                    {
+                        "frame": 95,
+                        "texture": "mori01ca.1"
+                    },
+                    {
+                        "frame": 103,
+                        "texture": "mori01ca.2"
+                    },
+                    {
+                        "frame": 114,
+                        "texture": "mori01ca.3"
+                    },
+                    {
+                        "frame": 129,
+                        "texture": "mori01ca.4"
+                    },
+                    {
+                        "frame": 144,
+                        "texture": "mori01ca.1"
+                    },
+                    {
+                        "frame": 359,
+                        "texture": "mori01ca.2"
+                    }
+                ]
+            ]
+        }
+    ]
+}

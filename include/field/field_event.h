@@ -132,7 +132,7 @@ GameEvent *EventQuicksandArrive_CreateMoveAnime(GameEvent *event, GameSystem *gs
 GameEvent *EventDig_CreateRisingSpin(GameEvent *event, GameSystem *gsys, Field *field);
 GameEvent *EventWarpSequence_CreateIn(WarpSequence *warp);
 GameEvent *EventWarpSequence_CreateOut(WarpSequence *warp);
-GameEvent *func_ov033_021773e4(GameSystem *gsys, void *args);
+GameEvent *EventEntralinkWarpReturn_Create(GameSystem *gsys, void *args);
 // What starts the events of the field in each kind of map
 GameEvent *FieldEventProvider_Grid(GameSystem *gsys, void *data);
 GameEvent *FieldEventProvider_UnionRoom(GameSystem *gsys, void *data);

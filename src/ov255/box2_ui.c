@@ -713,22 +713,22 @@ void Box2Ui_CreateCursor(Box2SysWork *syswk) {
 
     visible = GCTX_HIDIsUsingTouch() == TRUE ? FALSE : TRUE;
     switch (syswk->param->mode) {
-    case 0:
+    case BOX2_MODE_DEPOSIT:
         id = 0;
         break;
-    case 1:
+    case BOX2_MODE_WITHDRAW:
         id = 2;
         break;
-    case 2:
+    case BOX2_MODE_MOVE_POKEMON:
         id = 3;
         break;
-    case 3:
+    case BOX2_MODE_MOVE_ITEMS:
         id = 7;
         break;
-    case 4:
+    case BOX2_MODE_BATTLE_BOX:
         id = 13;
         break;
-    case 5:
+    case BOX2_MODE_DREAM_WORLD:
         id = 15;
         break;
     }
@@ -969,16 +969,16 @@ void Box2Ui_SetButtonStates(Box2SysWork *syswk, u32 pos) {
     u8 button3 = 0;
     u8 button4 = 0;
 
-    if (syswk->unk18 != 0) {
+    if (syswk->pickState != BOX2_PICK_NONE) {
         button1 = 2;
-        if (syswk->param->mode == 3) {
+        if (syswk->param->mode == BOX2_MODE_MOVE_ITEMS) {
             button3 = 1;
             button4 = 1;
         } else if (syswk->moveMode == 2) {
             button3 = button1;
             button4 = button1;
         }
-    } else if (syswk->param->mode == 3) {
+    } else if (syswk->param->mode == BOX2_MODE_MOVE_ITEMS) {
         button3 = 1;
         button4 = 1;
     } else if (pos >= BOX2_PARTY_POS) {

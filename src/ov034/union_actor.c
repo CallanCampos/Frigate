@@ -413,7 +413,9 @@ static BOOL UnionOneself_ActorIdle(UnionSystem *unisys, UnionActorSlot *slot, Fi
         UnionOneself_SetActorNextStep(slot, 3);
         return TRUE;
     }
-    if (situ->unk02 != 0 && (situ->unk02 == beaconAct || (beaconAct == 0 && situ->unk02 == entry->beacon.unk07_5)) &&
+    if (situ->wantedKind != UNION_WANT_NONE &&
+        (situ->wantedKind == beaconAct ||
+         (beaconAct == UNION_WANT_NONE && situ->wantedKind == entry->beacon.wantedKind)) &&
         slot->member == 0 && UnionMsg_GetTableByte(entry->beacon.activity) > entry->beacon.memberCount) {
         FieldActor *actor = UnionOneself_FindActor(unisys, slot->entry, slot);
 

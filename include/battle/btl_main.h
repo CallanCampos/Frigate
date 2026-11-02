@@ -34,15 +34,17 @@ struct BtlPokeCon {
     // The parties the clients' Pokémon come from
     PokeParty *srcParties[4];
     BattleMon *mons[24];
-    u32 unkE4;
+    // Whether it is the server's, whose parties are copies of the clients' (GetClientSrcParty)
+    u32 forServer;
 };
 
-// A buffer of the main module that BtlMain_LoadStudioData allocates
+// A buffer of the main module that BtlMain_LoadStudioData allocates with the movie's rules
 typedef struct {
     u8 unk00[8];
-    s8 unk08;
+    // The move index that replaces the AI's choice, which a scene's choice sets; -1 for none
+    s8 aiMoveIndex;
     u8 unk09[0xb];
-} BtlMainUnk478;
+} BtlStudioWork;
 
 // A step of the main module's setup or cleanup, run until it returns TRUE
 typedef BOOL (*BtlMainSeqFunc)(u32 *state, BtlMainModule *mainModule);
@@ -58,10 +60,10 @@ typedef struct {
 struct BtlMainSyncData {
     MATHRandContext32 rand;
     u16 unk18;
-    u16 unk1A;
-    u16 unk1C;
-    u8 unk1E;
-    u8 unk1F_0 : 4;
+    u16 gameTimeLimit;
+    u16 commandTimeLimit;
+    u8 textSpeed;
+    u8 battleSceneOff : 4;
     u8 unk1F_4 : 4;
 };
 
@@ -69,12 +71,13 @@ struct BtlMainSyncData {
 typedef struct {
     PlayerInfo *playerInfo;
     StrBuf *name;
-    u16 unk08;
-    u16 unk0A;
-    u32 unk0C;
-    u16 unk10[4];
-    PMSData unk18;
-    PMSData unk20;
+    u16 trainerClass;
+    u16 trainerId;
+    u32 aiFlags;
+    u16 items[4];
+    // The phrases the trainer says on winning and on losing
+    PMSData winWords;
+    PMSData loseWords;
 } BtlTrainerData;
 
 // A choice the player is offered in a Pokestar Studios scene
@@ -82,7 +85,8 @@ typedef struct {
     // -1 for none
     s16 msgId;
     s16 msgId2;
-    s16 unk04;
+    // The move index the foe's AI uses once the choice is made (BtlStudioWork)
+    s16 aiMoveIndex;
     s16 unk06;
     s16 points;
     s16 unk0A;
@@ -139,20 +143,24 @@ struct BtlMainModule {
     BtlSetup *setup;
     BtlvCore *viewCore;
     BtlServer *server;
-    BtlServer *unk0C;
+    // The server a link battle's client runs to check the commands it receives
+    BtlServer *cmdCheckServer;
     BtlClient *clients[4];
     BtlTrainerData trainers[4];
-    PlayerInfo *unkC0;
-    u8 unkC4[4];
+    PlayerInfo *playerInfo;
+    // Which clients' main functions have returned TRUE, in a link battle the server runs
+    u8 clientsDone[4];
     BtlPokeCon pokeCons[2];
-    PokeParty *unk298[4];
-    PokeParty *unk2A8[4];
-    PokeParty *unk2B8;
+    // The parties the clients' and the server's Pokémon come from (GetClientSrcParty)
+    PokeParty *clientSrcParties[4];
+    PokeParty *serverSrcParties[4];
+    PokeParty *tempParty;
     BtlField *field;
-    PartyPkm *unk2C0;
-    BtlNetPartyPacket *unk2C4;
+    // The Pokémon a wild Zoroark disguises itself as
+    PartyPkm *wildIllusionPkm;
+    BtlNetPartyPacket *partyPacket;
     BtlRecReader recReader;
-    PerapVoice *unk3E0[4];
+    PerapVoice *chatters[4];
     MATHRandContext32 rand;
     // What the clients of a link battle agree on before it starts
     BtlMainSyncData syncData;
@@ -161,12 +169,12 @@ struct BtlMainModule {
     // The prize money, which FixPrizeMoney doubles and finalizes
     u32 prizeMoney;
     u32 money;
-    u32 unk438;
-    u32 unk43C;
-    u16 unk440;
-    u16 unk442;
+    u32 lossMoney;
+    u32 textSpeed;
+    u16 gameTimeLimit;
+    u16 commandTimeLimit;
     u32 result;
-    BtlClientIDList unk448;
+    BtlClientIDList clientIdList;
     BtlMainSeq seq;
     s32 unk460;
     BOOL (*mainFunc)(BtlMainModule *mainModule);
@@ -174,22 +182,26 @@ struct BtlMainModule {
     u8 unk46A;
     u8 clientCount;
     u8 playerClientId;
-    u8 unk46D;
-    u8 unk46E;
+    u8 playerPos;
+    // Whether this machine runs the battle's server
+    u8 isServer;
     u8 unk46F;
-    u8 unk470;
-    u8 unk471;
-    u8 unk472;
-    u8 unk473_0 : 1;
-    u8 unk473_1 : 1;
-    u8 unk473_2 : 1;
-    u8 unk473_3 : 1;
-    u8 unk473_4 : 1;
-    u8 unk473_5 : 1;
-    u8 unk473_6 : 1;
-    u8 unk473_7 : 1;
-    BtlScriptedRules *unk474;
-    BtlMainUnk478 *unk478;
+    // The link battle's server sends the parties and trainers of npcCount NPC partners, one at a time
+    u8 npcIndex;
+    u8 npcCount;
+    u8 npcClientId;
+    u8 commError : 1;
+    // Set when a link error ended the setup
+    u8 setupFailed : 1;
+    u8 battleSceneOff : 1;
+    u8 prizeMoneyFixed : 1;
+    u8 lossMoneyCalculated : 1;
+    u8 skipExitBgmFadeOut : 1;
+    u8 moneyDoubled : 1;
+    // Set when the module set the sound volume callbacks, which it restores on exit
+    u8 volumeCallbacksSet : 1;
+    BtlScriptedRules *studioRules;
+    BtlStudioWork *studioWork;
     PokewoodCutin *cutin;
 };
 
@@ -202,8 +214,8 @@ u8 GetMultiMode(BtlMainModule *mainModule);
 u8 GetCommMode(BtlMainModule *mainModule);
 BOOL IsMultiMode(BtlMainModule *mainModule);
 u16 GetWinBGM(BtlMainModule *mainModule);
-u16 func_ov167_0219bf08(BtlMainModule *mainModule);
-u16 func_ov167_0219bf14(BtlMainModule *mainModule);
+u16 GetStudioEndingBGM0(BtlMainModule *mainModule);
+u16 GetStudioEndingBGM2(BtlMainModule *mainModule);
 u32 BtlSetup_IsBattleType(BtlMainModule *mainModule, u32 flag);
 u8 IsRecPlayMode(BtlMainModule *mainModule);
 void BtlMain_StoreSlotNthResult(BtlMainModule *mainModule, u8 pos);
@@ -294,8 +306,8 @@ void BtlMain_LoadSetupParties(BtlMainModule *mainModule, BtlSetup *setup);
 void BtlMain_ForceQuitClients(BtlMainModule *mainModule);
 BOOL BtlMain_AreAllClientsDone(BtlMainModule *mainModule);
 s32 GetTextWait(BtlMainModule *mainModule);
-void func_ov167_0219bdf0(BtlMainModule *mainModule);
-BOOL func_ov167_0219bdfc(BtlMainModule *mainModule);
+void SetFastestTextSpeed(BtlMainModule *mainModule);
+BOOL IsExpGainEnabled(BtlMainModule *mainModule);
 CommPlayerSupport *GetCommPlayerSupport(BtlMainModule *mainModule);
 PlayerInfo *GetPlayerInfo(BtlMainModule *mainModule);
 BOOL IsMonCaught(BtlMainModule *mainModule, BattleMon *mon);
@@ -324,9 +336,9 @@ BagCursor *GetBagCursor(BtlMainModule *mainModule);
 BOOL IsRecordingEnabled(BtlMainModule *mainModule);
 u32 func_ov167_0219c99c(BtlMainModule *mainModule);
 u8 GetStudioMovieId(BtlMainModule *mainModule);
-u32 func_ov167_0219c9c0(BtlMainModule *mainModule);
-void func_ov167_0219c9d4(BtlMainModule *mainModule);
-u32 func_ov167_0219c9e0(BtlMainModule *mainModule);
+u32 IsStudioSkipDisabled(BtlMainModule *mainModule);
+void SetRecPlayQuit(BtlMainModule *mainModule);
+u32 GetScriptedRulesOutcome(BtlMainModule *mainModule);
 u32 ReturnZero(BtlMainModule *mainModule, u32 flag);
 void SetCmdCheckError(BtlMainModule *mainModule);
 u32 FixPrizeMoney(BtlMainModule *mainModule);
@@ -335,7 +347,7 @@ u32 CalcLossMoney(BtlMainModule *mainModule);
 void SkipExitBGMFadeOut(BtlMainModule *mainModule);
 void SyncServerMonMoves(BtlMainModule *mainModule, u8 monId);
 BattleMon *GetIllusionDisguise(BtlMainModule *mainModule, BtlPokeCon *pokeCon, BattleMon *mon);
-void PokeCon_Init(BtlPokeCon *pokeCon, BtlMainModule *mainModule, u32 unkE4);
+void PokeCon_Init(BtlPokeCon *pokeCon, BtlMainModule *mainModule, u32 forServer);
 void PokeCon_Clear(BtlPokeCon *pokeCon);
 void PokeCon_CreateClientParty(BtlPokeCon *pokeCon, BtlMainModule *mainModule, u8 clientId);
 void PokeCon_FreeMons(BtlPokeCon *pokeCon);
@@ -370,11 +382,11 @@ BtlField *GetBtlField(BtlMainModule *mainModule);
 void BtlMain_CreateSrcParties(BtlMainModule *mainModule);
 void BtlMain_FreeSrcParties(BtlMainModule *mainModule);
 void SetClientSrcParty(BtlMainModule *mainModule, u8 clientId, const PokeParty *party);
-PokeParty *GetClientSrcParty(BtlMainModule *mainModule, u8 clientId, u32 useSecond);
+PokeParty *GetClientSrcParty(BtlMainModule *mainModule, u8 clientId, u32 forServer);
 void AddRecord(BtlMainModule *mainModule, u32 record, u32 value);
-u8 *func_ov167_0219db00(BtlMainModule *mainModule);
-BOOL func_ov167_0219db08(BtlMainModule *mainModule);
-BOOL func_ov167_0219db28(BtlMainModule *mainModule);
+u8 *GetShooterSettings(BtlMainModule *mainModule);
+BOOL IsShooterEnabled(BtlMainModule *mainModule);
+BOOL IsBagEnabled(BtlMainModule *mainModule);
 void NotifyMonLevelUp(BtlMainModule *mainModule, BattleMon *mon);
 void ChangeFriendshipByItem(BtlMainModule *mainModule, BattleMon *mon, u16 item);
 void NotifyMonCaught(BtlMainModule *mainModule, BattleMon *mon);
@@ -388,18 +400,18 @@ void SetSetupPlayerInfo(BtlMainModule *mainModule, u8 clientId, const PlayerInfo
 void SetSetupChatterEffect(BtlMainModule *mainModule, u8 clientId);
 void BtlMain_StoreRecData(BtlMainModule *mainModule);
 u8 ClientIDToSetupIndex(u8 playerClientId, u8 clientId);
-void BtlMain_StartRecSkip(BtlMainModule *mainModule, u32 arg1);
+void BtlMain_StartRecSkip(BtlMainModule *mainModule, u32 chapter);
 void BtlMain_EndRecSkip(BtlMainModule *mainModule);
 BtlServerFlow *GetServerFlow(BtlMainModule *mainModule);
 void BtlSetup_ClearResults(BtlSetup *setup);
 void BtlMain_StoreResultStats(BtlMainModule *mainModule);
-u32 func_ov167_0219e300(BtlMainModule *mainModule);
+u32 GetPlayerFirstActionMove(BtlMainModule *mainModule);
 BtlSetup *GetBattleSetup(BtlMainModule *mainModule);
 BtlSetup *GetBattleSetupParam(BtlMainModule *mainModule);
-void BtlMain_LoadStudioData(BtlMainModule *mainModule, u8 arg1);
+void BtlMain_LoadStudioData(BtlMainModule *mainModule, u8 movie);
 void BtlMain_FreeStudioData(BtlMainModule *mainModule);
 BtlScriptedRules *GetStudioRules(BtlMainModule *mainModule);
-BtlMainUnk478 *func_ov167_0219e3ac(BtlMainModule *mainModule);
+BtlStudioWork *GetStudioWork(BtlMainModule *mainModule);
 PokewoodCutin *GetPokewoodCutin(BtlMainModule *mainModule);
 void func_ov167_0219e3c8(BtlScriptedRules *data);
 
@@ -412,7 +424,7 @@ void BtlMain_SetCleanupSeq(BtlMainSeq *seq, BtlMainModule *mainModule, BtlSetup 
 void BtlMain_SetupClientTrainer(BtlMainModule *mainModule, u8 clientId);
 void BtlMain_SetupTrainers(BtlMainModule *mainModule, BtlSetup *setup);
 void BtlMain_SetupRecReader(BtlMainModule *mainModule, BtlSetup *setup);
-void BtlMain_CreateViewCore(BtlMainModule *mainModule, BtlSetup *setup, u32 arg2);
+void BtlMain_CreateViewCore(BtlMainModule *mainModule, BtlSetup *setup, u32 commCompetitor);
 BOOL BtlMain_SetupAloneSingle(u32 *state, BtlMainModule *mainModule);
 BOOL BtlMain_Cleanup(u32 *state, BtlMainModule *mainModule);
 BOOL BtlMain_SetupAloneDouble(u32 *state, BtlMainModule *mainModule);

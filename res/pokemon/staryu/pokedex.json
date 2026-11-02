@@ -1,0 +1,13 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "S",
+    "shapes": [ 8 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_UNDELLA_TOWN": [ "surf", "rippling_surf" ],
+            "ZONE_ROUTE_13": [ "surf", "rippling_surf" ],
+            "ZONE_HUMILAU_CITY": [ "surf" ]
+        }
+    }
+}

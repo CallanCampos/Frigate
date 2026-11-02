@@ -13,6 +13,22 @@ struct HiddenArea {
     u16 height;
 };
 
+// The hidden moves' events, in the order of HM_EVENTS_NORMAL and HM_EVENTS_RUINS
+enum {
+    HM_EVENT_CUT,
+    HM_EVENT_SURF,
+    HM_EVENT_WATERFALL,
+    HM_EVENT_STRENGTH,
+    HM_EVENT_FLY,
+    HM_EVENT_FLASH,
+    HM_EVENT_TELEPORT,
+    HM_EVENT_DIG,
+    HM_EVENT_SWEET_SCENT,
+    HM_EVENT_CHATTER,
+    HM_EVENT_DIVE,
+    HM_EVENT_MAX,
+};
+
 // What the field menu or a shortcut asks of a hidden move
 struct HiddenEventArgs {
     u16 partySlot;
@@ -38,8 +54,8 @@ typedef struct {
     HiddenCheckFunc check;
 } HiddenEventSpec;
 
-extern const HiddenEventSpec HM_EVENTS_NORMAL[11];
-extern const HiddenEventSpec HM_EVENTS_RUINS[11];
+extern const HiddenEventSpec HM_EVENTS_NORMAL[HM_EVENT_MAX];
+extern const HiddenEventSpec HM_EVENTS_RUINS[HM_EVENT_MAX];
 
 void CalcPlayerActionPossibilities(Field *field, PlayerActionPossibilities *action);
 HiddenCheckFunc GetHMEventCheckFunc(PlayerActionPossibilities *context, u32 kind);

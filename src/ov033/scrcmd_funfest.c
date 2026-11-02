@@ -173,7 +173,7 @@ BOOL Scrcmd_Funfest_FunfestGetPokemonQuizBogusSpecies(VM *vm, FieldScriptEnv *en
     return TRUE;
 }
 
-BOOL func_ov033_021772c8(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Funfest_IsFestMissionAvailable(VM *vm, FieldScriptEnv *env) {
     u16 *result;
     FestMissionConfig *missionCfg;
 
@@ -187,13 +187,13 @@ BOOL func_ov033_021772c8(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov033_021772f4(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Funfest_HasPassPower(VM *vm, FieldScriptEnv *env) {
     u16 *result;
     HighLinkSave *save;
 
     result = ScriptReadVar(vm, env);
     save = getHighLinkBlockAddress(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
-    if (HighLinkSave_GetPassPower(save, 0) != 0x30) {
+    if (HighLinkSave_GetPassPower(save, 0) != HIGH_LINK_POWER_NONE) {
         *result = 1;
     } else {
         *result = 0;
@@ -205,7 +205,7 @@ BOOL Scrcmd_Funfest_FunfestMissionStart(VM *vm, FieldScriptEnv *env) {
     ScriptWork *scriptWork = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    ScriptWork_CallEvent(scriptWork, func_ov033_02176d88(gsys));
+    ScriptWork_CallEvent(scriptWork, EventFunfestMission_Create(gsys));
     return TRUE;
 }
 

@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/sound.h"
 #include "field/encounter_effect.h"
 #include "field/event_sweet_scent.h"
 #include "field/event_wild_battle.h"
@@ -17,14 +18,15 @@
 #include "struct_decls.h"
 #include "system/game_event.h"
 #include "system/game_system.h"
+#include "system/zone_weather.h"
 
 static const SweetScentPalette sPalette = { 0, 0x5d5f };
 
 GameEvent *EventSweetScent_Create(Field *field, GameSystem *gsys) {
-    return func_ov033_021785d4(gsys, field, 0xff);
+    return EventSweetScent_CreateFromPartySlot(gsys, field, 0xff);
 }
 
-GameEvent *func_ov033_021785d4(GameSystem *gsys, Field *field, u8 partySlot) {
+GameEvent *EventSweetScent_CreateFromPartySlot(GameSystem *gsys, Field *field, u8 partySlot) {
     GameEvent *event;
     SweetScentEventData *data;
 
@@ -39,27 +41,42 @@ GameEvent *func_ov033_021785d4(GameSystem *gsys, Field *field, u8 partySlot) {
     return event;
 }
 
+// The steps of Sweet Scent: the player's form change and the Pokémon's sprite when a Pokémon uses it, then the fade
+// in clear weather and a wild battle, or the scripts of no encounter and of the wrong weather
+enum {
+    SWEET_SCENT_STEP_START,
+    SWEET_SCENT_STEP_WAIT_FORM_CHANGE,
+    SWEET_SCENT_STEP_WAIT_ANIME,
+    SWEET_SCENT_STEP_RETURN_FORM,
+    SWEET_SCENT_STEP_WAIT_RETURN_FORM,
+    SWEET_SCENT_STEP_CHECK_WEATHER,
+    SWEET_SCENT_STEP_ENCOUNTER,
+    SWEET_SCENT_STEP_NO_ENCOUNTER,
+    SWEET_SCENT_STEP_BAD_WEATHER,
+    SWEET_SCENT_STEP_END,
+};
+
 GameEventReturnCode EventSweetScent_Callback(GameEvent *event, u32 *state, void *data) {
     SweetScentEventData *work;
     GameEvent *next;
 
     work = data;
     switch (*state) {
-    case 0:
+    case SWEET_SCENT_STEP_START:
         if (work->partySlot >= 6) {
-            *state = 5;
+            *state = SWEET_SCENT_STEP_CHECK_WEATHER;
             break;
         }
         FieldPlayer_SetSpecialSeq(work->player, 0x80);
         (*state)++;
-    case 1:
+    case SWEET_SCENT_STEP_WAIT_FORM_CHANGE:
         if (FieldPlayer_StepFormChange(work->player) != TRUE) {
             break;
         }
         FldAct_SetAcmd(FieldPlayer_GetActor(work->player), 0xa2);
         (*state)++;
         break;
-    case 2:
+    case SWEET_SCENT_STEP_WAIT_ANIME:
         if (FldAct_EndAcmd(FieldPlayer_GetActor(work->player)) != TRUE) {
             break;
         }
@@ -69,40 +86,40 @@ GameEventReturnCode EventSweetScent_Callback(GameEvent *event, u32 *state, void 
         }
         (*state)++;
         break;
-    case 3:
+    case SWEET_SCENT_STEP_RETURN_FORM:
         FieldPlayer_SetSpecialSeq(work->player, 8);
         (*state)++;
-    case 4:
+    case SWEET_SCENT_STEP_WAIT_RETURN_FORM:
         if (FieldPlayer_StepFormChange(work->player) == TRUE) {
-            *state = 5;
+            *state = SWEET_SCENT_STEP_CHECK_WEATHER;
         }
         break;
-    case 5:
+    case SWEET_SCENT_STEP_CHECK_WEATHER:
         if (EventSweetScent_CheckWeatherClear(work) == 0) {
-            *state = 8;
+            *state = SWEET_SCENT_STEP_BAD_WEATHER;
             break;
         }
-        func_ov033_02178748(event, work->gsys, work->field);
-        *state = 6;
+        EventSweetScent_StartFade(event, work->gsys, work->field);
+        *state = SWEET_SCENT_STEP_ENCOUNTER;
         break;
-    case 6:
+    case SWEET_SCENT_STEP_ENCOUNTER:
         next = EventWildBattleCall_CreateRandom(Field_GetEncountSystem(work->field), ENCOUNT_MODE_SWEET_SCENT);
         if (next == NULL) {
-            *state = 7;
+            *state = SWEET_SCENT_STEP_NO_ENCOUNTER;
             break;
         }
         GameEvent_ChainNext(event, next);
-        *state = 9;
+        *state = SWEET_SCENT_STEP_END;
         break;
-    case 7:
+    case SWEET_SCENT_STEP_NO_ENCOUNTER:
         EventScriptCall_Start(event, 0x2793, NULL, 0, 0x15);
-        *state = 9;
+        *state = SWEET_SCENT_STEP_END;
         break;
-    case 8:
+    case SWEET_SCENT_STEP_BAD_WEATHER:
         EventScriptCall_Start(event, 0x2794, NULL, 0, 0x15);
-        *state = 9;
+        *state = SWEET_SCENT_STEP_END;
         break;
-    case 9:
+    case SWEET_SCENT_STEP_END:
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         return GAMEEVENT_DONE;
     }
@@ -110,13 +127,13 @@ GameEventReturnCode EventSweetScent_Callback(GameEvent *event, u32 *state, void 
 }
 
 BOOL EventSweetScent_CheckWeatherClear(SweetScentEventData *work) {
-    if (FieldWeather_GetWeatherId(Field_GetWeatherSystem(work->field)) == 0) {
+    if (FieldWeather_GetWeatherId(Field_GetWeatherSystem(work->field)) == WEATHER_SUNNY) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_ov033_02178748(GameEvent *event, GameSystem *gsys, Field *field) {
+void EventSweetScent_StartFade(GameEvent *event, GameSystem *gsys, Field *field) {
     GameEvent *next;
     SweetScentScreenWork *data;
 
@@ -130,17 +147,26 @@ void func_ov033_02178748(GameEvent *event, GameSystem *gsys, Field *field) {
     GameEvent_ChainNext(event, next);
 }
 
+// The steps of the fade: fill a BG with the scent's color, blend it in to 8, hold, blend it out, and clear it
+enum {
+    SWEET_SCENT_FADE_STEP_SETUP,
+    SWEET_SCENT_FADE_STEP_FADE_IN,
+    SWEET_SCENT_FADE_STEP_WAIT,
+    SWEET_SCENT_FADE_STEP_FADE_OUT,
+    SWEET_SCENT_FADE_STEP_CLEAR,
+};
+
 GameEventReturnCode EventSweetScent_FadeMain(GameEvent *event, u32 *state, void *data) {
     SweetScentScreenWork *work;
 
     work = data;
     switch (*state) {
-    case 0:
+    case SWEET_SCENT_FADE_STEP_SETUP:
         EventSweetScent_FadeSetup(work);
-        GFL_SndSEPlay(0x683);
+        GFL_SndSEPlay(SEQ_SE_FLD_18);
         (*state)++;
         break;
-    case 1:
+    case SWEET_SCENT_FADE_STEP_FADE_IN:
         if (work->timer++ >= work->step) {
             work->alpha++;
             FieldDispControl_ReqAdjustAlphaA(work->displayControl, work->alpha, 16 - work->alpha);
@@ -150,12 +176,12 @@ GameEventReturnCode EventSweetScent_FadeMain(GameEvent *event, u32 *state, void 
             (*state)++;
         }
         break;
-    case 2:
+    case SWEET_SCENT_FADE_STEP_WAIT:
         if (work->timer++ < 30) {
             (*state)++;
         }
         break;
-    case 3:
+    case SWEET_SCENT_FADE_STEP_FADE_OUT:
         if (work->timer++ >= work->step) {
             work->alpha--;
             FieldDispControl_ReqAdjustAlphaA(work->displayControl, work->alpha, 16 - work->alpha);
@@ -165,7 +191,7 @@ GameEventReturnCode EventSweetScent_FadeMain(GameEvent *event, u32 *state, void 
             (*state)++;
         }
         break;
-    case 4:
+    case SWEET_SCENT_FADE_STEP_CLEAR:
         FieldDispControl_ReqSetAlphaA(work->displayControl, 0, 0, 0, 0x1f);
         FieldDispControl_ReqSetBGEnabled(work->displayControl, work->bgId, FALSE);
         (*state)++;

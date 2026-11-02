@@ -1,0 +1,26 @@
+{
+    "$schema": "cutin.schema.json",
+    "particle": 65535,
+    "particle_delays": [ 0, 0 ],
+    "models": [ 238, 239 ],
+    "actor_delays": [ 0, 0 ],
+    "animations1": [ 240, 241, null, null ],
+    "animations2": [ 242, 243, null, null ],
+    "dim_capture": 0,
+    "key_list": 27,
+    "bitmap_flag": 0,
+    "bitmaps": [
+        {
+            "texture": "ci_item_medal",
+            "palette": "ci_item_medal_pl",
+            "resource": 1,
+            "char_file": 34,
+            "palette_file": 70,
+            "palette_offset": 3,
+            "width": 4,
+            "height": 4,
+            "source_stride": 32,
+            "source_offset": 20
+        }
+    ]
+}

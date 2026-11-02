@@ -92,11 +92,11 @@ typedef struct {
     // end
     GameData *gameData;
     // The battle type, from 0 to 4 (single, double, triple, rotation, and another triple); picks the regulation
-    u32 unk4;
+    u32 battleType;
     // 0 when started from the title screen's menu, 1 when started from the field
-    u32 unk8;
+    u32 startFrom;
     // Where the team comes from, 0 for the party and 1 for the battle box
-    u32 unkC;
+    u32 teamSource;
     // Set when the proc has to free the parameters itself
     u32 unk10;
 } WifiBattleMatchParam;

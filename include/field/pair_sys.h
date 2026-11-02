@@ -8,10 +8,13 @@
 #include "gfl/heap.h"
 #include "struct_decls.h"
 
+// The follower index, in FieldFollowWk and the follower's work, while nobody follows
+#define FOLLOWER_INDEX_NONE 0xff
+
 // What GameData keeps of the follower (GetFieldFollowerCfg)
 struct FieldFollowWk {
     u16 heapId;
-    // The follower's index, 0xff for none
+    // The follower's index, or FOLLOWER_INDEX_NONE
     u8 index;
     // The actor ID the follower had before it followed
     u8 originActorId;

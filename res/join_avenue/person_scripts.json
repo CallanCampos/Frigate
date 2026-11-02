@@ -1,0 +1,233 @@
+{
+    "$schema": "join_avenue.schema.json",
+    "person_scripts": [
+        {
+            "person_type": 2,
+            "shop_kind": 0,
+            "gender": 0,
+            "script": 10686
+        },
+        {
+            "person_type": 2,
+            "shop_kind": 0,
+            "gender": 1,
+            "script": 10686
+        },
+        {
+            "person_type": 1,
+            "shop_kind": 0,
+            "gender": 0,
+            "script": 10686
+        },
+        {
+            "person_type": 1,
+            "shop_kind": 0,
+            "gender": 1,
+            "script": 10686
+        },
+        {
+            "person_type": 1,
+            "shop_kind": 1,
+            "gender": 0,
+            "script": 10686
+        },
+        {
+            "person_type": 1,
+            "shop_kind": 1,
+            "gender": 1,
+            "script": 10686
+        },
+        {
+            "person_type": 0,
+            "shop_kind": 0,
+            "gender": 0,
+            "script": 10687
+        },
+        {
+            "person_type": 0,
+            "shop_kind": 0,
+            "gender": 1,
+            "script": 10687
+        },
+        {
+            "person_type": 0,
+            "shop_kind": 1,
+            "gender": 0,
+            "script": 10687
+        },
+        {
+            "person_type": 0,
+            "shop_kind": 1,
+            "gender": 1,
+            "script": 10687
+        },
+        {
+            "person_type": 0,
+            "shop_kind": 2,
+            "gender": 0,
+            "script": 10687
+        },
+        {
+            "person_type": 0,
+            "shop_kind": 2,
+            "gender": 1,
+            "script": 10687
+        },
+        {
+            "person_type": 0,
+            "shop_kind": 3,
+            "gender": 0,
+            "script": 10687
+        },
+        {
+            "person_type": 0,
+            "shop_kind": 3,
+            "gender": 1,
+            "script": 10687
+        },
+        {
+            "person_type": 0,
+            "shop_kind": 4,
+            "gender": 0,
+            "script": 10687
+        },
+        {
+            "person_type": 0,
+            "shop_kind": 4,
+            "gender": 1,
+            "script": 10687
+        },
+        {
+            "person_type": 0,
+            "shop_kind": 5,
+            "gender": 0,
+            "script": 10687
+        },
+        {
+            "person_type": 0,
+            "shop_kind": 5,
+            "gender": 1,
+            "script": 10687
+        },
+        {
+            "person_type": 0,
+            "shop_kind": 6,
+            "gender": 0,
+            "script": 10687
+        },
+        {
+            "person_type": 0,
+            "shop_kind": 6,
+            "gender": 1,
+            "script": 10687
+        },
+        {
+            "person_type": 0,
+            "shop_kind": 7,
+            "gender": 0,
+            "script": 10687
+        },
+        {
+            "person_type": 0,
+            "shop_kind": 7,
+            "gender": 1,
+            "script": 10687
+        },
+        {
+            "person_type": 3,
+            "shop_kind": 0,
+            "gender": 0,
+            "script": 10688
+        },
+        {
+            "person_type": 3,
+            "shop_kind": 0,
+            "gender": 1,
+            "script": 10688
+        },
+        {
+            "person_type": 3,
+            "shop_kind": 1,
+            "gender": 0,
+            "script": 10692
+        },
+        {
+            "person_type": 3,
+            "shop_kind": 1,
+            "gender": 1,
+            "script": 10692
+        },
+        {
+            "person_type": 3,
+            "shop_kind": 3,
+            "gender": 0,
+            "script": 10690
+        },
+        {
+            "person_type": 3,
+            "shop_kind": 3,
+            "gender": 1,
+            "script": 10690
+        },
+        {
+            "person_type": 3,
+            "shop_kind": 2,
+            "gender": 0,
+            "script": 10691
+        },
+        {
+            "person_type": 3,
+            "shop_kind": 2,
+            "gender": 1,
+            "script": 10691
+        },
+        {
+            "person_type": 1,
+            "shop_kind": 4,
+            "gender": 0,
+            "script": 10693
+        },
+        {
+            "person_type": 1,
+            "shop_kind": 4,
+            "gender": 1,
+            "script": 10693
+        },
+        {
+            "person_type": 1,
+            "shop_kind": 2,
+            "gender": 0,
+            "script": 10697
+        },
+        {
+            "person_type": 1,
+            "shop_kind": 2,
+            "gender": 1,
+            "script": 10697
+        },
+        {
+            "person_type": 1,
+            "shop_kind": 3,
+            "gender": 0,
+            "script": 10698
+        },
+        {
+            "person_type": 1,
+            "shop_kind": 3,
+            "gender": 1,
+            "script": 10698
+        },
+        {
+            "person_type": 1,
+            "shop_kind": 5,
+            "gender": 0,
+            "script": 10699
+        },
+        {
+            "person_type": 1,
+            "shop_kind": 5,
+            "gender": 1,
+            "script": 10699
+        }
+    ]
+}

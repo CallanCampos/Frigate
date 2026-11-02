@@ -1,0 +1,41 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "U",
+    "shapes": [ 11 ],
+    "area": {
+        "all_year": false,
+        "seasons": {
+            "spring": {
+                "ZONE_DRAGONSPIRAL_TOWER": [ "shaking_grass" ],
+                "ZONE_ROUTE_3": [ "shaking_grass" ],
+                "ZONE_ROUTE_6": [ "shaking_grass" ],
+                "ZONE_ROUTE_7": [ "shaking_grass" ],
+                "ZONE_ROUTE_12": [ "shaking_grass" ],
+                "ZONE_VICTORY_ROAD": [ "shaking_grass" ]
+            },
+            "summer": {
+                "ZONE_DRAGONSPIRAL_TOWER": [ "shaking_grass" ],
+                "ZONE_ROUTE_3": [ "shaking_grass" ],
+                "ZONE_ROUTE_6": [ "shaking_grass" ],
+                "ZONE_ROUTE_7": [ "shaking_grass" ],
+                "ZONE_ROUTE_12": [ "shaking_grass" ],
+                "ZONE_VICTORY_ROAD": [ "shaking_grass" ]
+            },
+            "autumn": {
+                "ZONE_DRAGONSPIRAL_TOWER": [ "shaking_grass" ],
+                "ZONE_ROUTE_3": [ "shaking_grass" ],
+                "ZONE_ROUTE_6": [ "shaking_grass" ],
+                "ZONE_ROUTE_7": [ "shaking_grass" ],
+                "ZONE_ROUTE_12": [ "shaking_grass" ],
+                "ZONE_VICTORY_ROAD": [ "shaking_grass" ]
+            },
+            "winter": {
+                "ZONE_ROUTE_3": [ "shaking_grass" ],
+                "ZONE_ROUTE_6": [ "shaking_grass" ],
+                "ZONE_ROUTE_7": [ "shaking_grass" ],
+                "ZONE_ROUTE_12": [ "shaking_grass" ],
+                "ZONE_VICTORY_ROAD": [ "shaking_grass" ]
+            }
+        }
+    }
+}

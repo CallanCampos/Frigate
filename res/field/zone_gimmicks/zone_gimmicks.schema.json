@@ -1,0 +1,22 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The zones' gimmicks: res/field/zone_gimmicks/zone_gimmicks.json",
+    "description": "ARCID_GIMMICK_TBL (a/1/0/2): the zones that have a gimmick, a ZoneGimmick each (event_mapchange.c), which GameData_SetGimmickByZone searches when the player enters a zone. tools/data/zone_gimmick_data.py packs it.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "zones" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "zones": {
+            "type": "array",
+            "description": "The zones, searched in order; a zone that isn't here has no gimmick",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "zone", "gimmick" ],
+                "properties": {
+                    "zone": { "type": [ "string", "integer" ], "x-constant": "ZONE_", "minimum": 0, "maximum": 65535, "description": "A ZONE_* constant" },
+                    "gimmick": { "type": "integer", "minimum": 0, "maximum": 58, "description": "The gimmick, its number in GIMMICK_OVERLAY_INFO (field_gimmick.c), which gives its overlay and its init, end and update functions: 2 to 7, 9, 10, 37 and 38 the gyms, 12 the gates' news boards (gate_boards/), 16 to 24 and 31 the Battle Subway, and so on" }
+                }
+            }
+        }
+    }
+}

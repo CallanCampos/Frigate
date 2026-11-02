@@ -61,7 +61,8 @@ typedef struct {
     u16 unk64;
     u32 unk68;
     u16 unk6C;
-    u8 unk6E;
+    // A bit for each Pokémon of the party that can learn the move on offer
+    u8 learnable;
     u8 season;
     // Seconds left to pick, counted down while timerEnabled is set
     u16 timeLeft;

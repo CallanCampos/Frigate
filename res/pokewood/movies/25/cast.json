@@ -1,0 +1,88 @@
+{
+    "$schema": "../../cast.schema.json",
+    "player": [
+        {
+            "species": "SPECIES_GRIMER",
+            "shown_species": "SPECIES_GRIMER",
+            "level": 30,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_NAUGHTY",
+            "ability": 0,
+            "held_item": "ITEM_LEPPA_BERRY",
+            "moves": [ "MOVE_POISON_GAS", "MOVE_ROCK_TOMB", "MOVE_SWAGGER", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 0,
+                "defense": 0,
+                "speed": 31,
+                "special_attack": 0,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 0,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        }
+    ],
+    "opponent": [
+        {
+            "species": "SPECIES_GLIGAR",
+            "shown_species": "SPECIES_GLIGAR",
+            "level": 15,
+            "form": 0,
+            "sex": "GENDER_FEMALE",
+            "nature": "NATURE_NAUGHTY",
+            "ability": 0,
+            "held_item": "ITEM_NONE",
+            "moves": [ "MOVE_BATON_PASS", "MOVE_SWORDS_DANCE", "MOVE_METAL_CLAW", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 0,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        },
+        {
+            "species": "SPECIES_DRIFLOON",
+            "shown_species": "SPECIES_DRIFLOON",
+            "level": 25,
+            "form": 0,
+            "sex": "GENDER_FEMALE",
+            "nature": "NATURE_NAUGHTY",
+            "ability": 1,
+            "held_item": "ITEM_NONE",
+            "moves": [ "MOVE_PAYBACK", "MOVE_FACADE", "MOVE_BATON_PASS", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 252,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        }
+    ]
+}

@@ -1,0 +1,29 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The name input's tables: res/name_input/name_input.json",
+    "description": "ARCID_NAME_INPUT (a/1/2/0): the name input's keyboards, word tables and conversion table (name_input_data.c, app/name_input_data.h). tools/data/name_input_data.py packs it.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "keyboards", "word_tables", "conversions" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "keyboards": {
+            "type": "array", "minItems": 5, "maxItems": 5,
+            "description": "NAME_INPUT_KEYBOARD_COUNT keyboards, members 0 to 4: each a grid of the characters that can be entered, a string per row, all of one width; an ideographic space (NAME_INPUT_EMPTY_CHAR) fills the unused places",
+            "items": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^.+$" } }
+        },
+        "word_tables": {
+            "type": "array", "minItems": 3, "maxItems": 3,
+            "description": "Members 5 to 7: the words that NameInputWordTable_Find looks up by their first spelling, each in four spellings of up to NAME_INPUT_WORD_CHARS characters; empty in this version",
+            "items": {
+                "type": "array",
+                "items": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "type": "string", "pattern": "^.{0,3}$" } }
+            }
+        },
+        "conversions": {
+            "type": "array",
+            "description": "Member 8: the rows of the characters that change into each other in turn (NameInputConvTable_GetNext), up to NAME_INPUT_WORD_CHARS each; the packer fills a row with ideographic spaces",
+            "items": { "type": "string", "pattern": "^.{1,3}$" }
+        }
+    }
+}

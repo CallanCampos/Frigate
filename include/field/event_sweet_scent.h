@@ -26,10 +26,10 @@ struct SweetScentPalette {
 };
 
 GameEvent *EventSweetScent_Create(Field *field, GameSystem *gsys);
-GameEvent *func_ov033_021785d4(GameSystem *gsys, Field *field, u8 partySlot);
+GameEvent *EventSweetScent_CreateFromPartySlot(GameSystem *gsys, Field *field, u8 partySlot);
 GameEventReturnCode EventSweetScent_Callback(GameEvent *event, u32 *state, void *data);
 BOOL EventSweetScent_CheckWeatherClear(SweetScentEventData *work);
-void func_ov033_02178748(GameEvent *event, GameSystem *gsys, Field *field);
+void EventSweetScent_StartFade(GameEvent *event, GameSystem *gsys, Field *field);
 GameEventReturnCode EventSweetScent_FadeMain(GameEvent *event, u32 *state, void *data);
 void EventSweetScent_FadeSetup(SweetScentScreenWork *work);
 void EventSweetScent_FadeCleanup(SweetScentScreenWork *work);

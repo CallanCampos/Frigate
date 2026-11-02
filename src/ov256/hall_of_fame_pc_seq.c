@@ -195,11 +195,17 @@ static u32 HallOfFamePCSeq_PageChange(HallOfFamePCWork *wk) {
     return HALL_OF_FAME_PC_SEQ_PAGE_MAIN;
 }
 
+// The sub-steps of bringing a Pokémon's page in and out: start the palettes' fade and wait for it
+enum {
+    HALL_OF_FAME_PC_SUBSEQ_START_FADE,
+    HALL_OF_FAME_PC_SUBSEQ_WAIT_FADE,
+};
+
 static u32 HallOfFamePCSeq_PokeIn(HallOfFamePCWork *wk) {
     s8 pos;
 
     switch (wk->subSeq) {
-    case 0:
+    case HALL_OF_FAME_PC_SUBSEQ_START_FADE:
         HallOfFamePCObj_SetAnime(wk, HALL_OF_FAME_PC_OBJ_ARROW_LEFT, 18);
         HallOfFamePCObj_SetAnime(wk, HALL_OF_FAME_PC_OBJ_ARROW_RIGHT, 19);
         HallOfFamePCObj_SetAnime(wk, HALL_OF_FAME_PC_OBJ_CLOSE, 14);
@@ -208,9 +214,9 @@ static u32 HallOfFamePCSeq_PokeIn(HallOfFamePCWork *wk) {
         HallOfFamePCMain_BlendPokePalettes(wk);
         wk->subSeq++;
         break;
-    case 1:
+    case HALL_OF_FAME_PC_SUBSEQ_WAIT_FADE:
         if (HallOfFamePCMain_IsPaletteFading(wk) == FALSE) {
-            wk->subSeq = 0;
+            wk->subSeq = HALL_OF_FAME_PC_SUBSEQ_START_FADE;
             pos = wk->pokePos;
             if (wk->pokeNext == pos) {
                 wk->pokePos = wk->pokeNext;
@@ -291,19 +297,19 @@ static u32 HallOfFamePCSeq_PokeMain(HallOfFamePCWork *wk) {
 
 static u32 HallOfFamePCSeq_PokeOut(HallOfFamePCWork *wk) {
     switch (wk->subSeq) {
-    case 0:
+    case HALL_OF_FAME_PC_SUBSEQ_START_FADE:
         HallOfFamePCObj_SetPokeFade(wk, FALSE);
         HallOfFamePCMain_BlendPokePalettes(wk);
         GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG1, FALSE);
         wk->subSeq++;
         break;
-    case 1:
+    case HALL_OF_FAME_PC_SUBSEQ_WAIT_FADE:
         if (HallOfFamePCMain_IsPaletteFading(wk) == FALSE) {
             HallOfFamePCObj_SetAnime(wk, HALL_OF_FAME_PC_OBJ_ARROW_LEFT, 4);
             HallOfFamePCObj_SetAnime(wk, HALL_OF_FAME_PC_OBJ_ARROW_RIGHT, 5);
             HallOfFamePCObj_SetAnime(wk, HALL_OF_FAME_PC_OBJ_CLOSE, 0);
             HallOfFamePCBmp_ClearPokeInfo(wk);
-            wk->subSeq = 0;
+            wk->subSeq = HALL_OF_FAME_PC_SUBSEQ_START_FADE;
             return HALL_OF_FAME_PC_SEQ_PAGE_MAIN;
         }
         break;

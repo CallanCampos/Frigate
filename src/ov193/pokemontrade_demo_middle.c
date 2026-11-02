@@ -208,8 +208,8 @@ static void PokemonTradeDemoMiddle_StartBgmTimer(PokemonTradeWork *wk) {
 static void PokemonTradeDemoMiddle_StateWaitDemo(PokemonTradeWork *wk) {
     Poketrade3D_FadeTexturePalette(wk);
     if (wk->unk854 == 1) {
-        PokemonTradeDemoMiddle_InitSide(wk, &wk->unk11ED, &wk->unk11EF, wk->partnerInfo, TRUE);
-        PokemonTradeDemoMiddle_InitSide(wk, &wk->unk11EE, wk->unk11F0, wk->myInfo, FALSE);
+        PokemonTradeDemoMiddle_InitSide(wk, &wk->sentPkmReturns, &wk->sentPkmNoBounce, wk->partnerInfo, TRUE);
+        PokemonTradeDemoMiddle_InitSide(wk, &wk->recvPkmReturns, wk->recvPkmNoBounce, wk->myInfo, FALSE);
         Poketrade3D_RemoveCurrentUnit(wk);
         if (PokemonTrade_IsNetwork(wk)) {
             NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x11, 8);
@@ -278,12 +278,12 @@ static void PokemonTradeDemoMiddle_StateMoves(PokemonTradeWork *wk) {
             GFL_HeapFree(wk->mcssMoves[0]);
             wk->mcssMoves[0] = NULL;
         }
-        if (wk->unk11ED == 0) {
+        if (wk->sentPkmReturns == 0) {
             VecFx32 pos;
 
             MCSS_GetPosition(wk->mcss[0], &pos);
             TradeMcssMove_Free(wk->mcssMoves[0]);
-            if (wk->unk11EF != 0) {
+            if (wk->sentPkmNoBounce != 0) {
                 wk->mcssMoves[0] =
                     TradeMcssMove_CreateWithPath(wk->mcss[0], 20, &pos, sTradeDemoMiddleScenePath, wk->heapId);
             } else {
@@ -298,7 +298,7 @@ static void PokemonTradeDemoMiddle_StateMoves(PokemonTradeWork *wk) {
 
             MCSS_GetPosition(wk->mcss[0], &pos);
             TradeMcssMove_Free(wk->mcssMoves[0]);
-            if (wk->unk11EF != 0) {
+            if (wk->sentPkmNoBounce != 0) {
                 wk->mcssMoves[0] =
                     TradeMcssMove_CreateWithPath(wk->mcss[0], 20, &pos, sTradeDemoMiddleScenePath, wk->heapId);
             } else {
@@ -312,11 +312,11 @@ static void PokemonTradeDemoMiddle_StateMoves(PokemonTradeWork *wk) {
 
 static void PokemonTradeDemoMiddle_ShowMessage(PokemonTradeWork *wk) {
     GFL_NetSetIconScreen(FALSE, wk->heapId);
-    if (wk->type == 6) {
+    if (wk->type == TRADE_TYPE_GTS_DEPOSIT) {
         GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_WillOffered, wk->strbufTemplate);
-    } else if (wk->type == 8) {
+    } else if (wk->type == TRADE_TYPE_GTS_TRADE) {
         GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_WillSent, wk->strbufTemplate);
-    } else if (wk->unk11ED != 0) {
+    } else if (wk->sentPkmReturns != 0) {
         GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_ReturningGoodBye, wk->strbufTemplate);
     } else {
         GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_SendingGoodBye, wk->strbufTemplate);
@@ -334,7 +334,7 @@ static void PokemonTradeDemoMiddle_StateMessage(PokemonTradeWork *wk) {
     if (wk->timer == 10) {
         PokemonTradeDemoMiddle_ShowMessage(wk);
     }
-    if (wk->unk11ED == 0 && wk->timer == 6) {
+    if (wk->sentPkmReturns == 0 && wk->timer == 6) {
         VecFx32 pos;
 
         MCSS_GetPosition(wk->mcss[0], &pos);
@@ -346,7 +346,7 @@ static void PokemonTradeDemoMiddle_StateMessage(PokemonTradeWork *wk) {
     }
     if (wk->timer > 200 && PoketradeSave_IsMessagePrintDone(wk)) {
         PoketradeSave_CloseMessageWindowClear(wk);
-        if (wk->unk11ED == 0) {
+        if (wk->sentPkmReturns == 0) {
             Poketrade3D_DeleteMcssSlot(wk, 0);
             wk->mcss[0] = wk->mcss[2];
             wk->mcss[2] = NULL;
@@ -397,10 +397,10 @@ static void PokemonTradeDemoMiddle_StartMove(PokemonTradeWork *wk, int index) {
         u32 form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
         PokeVoice_Play(species, form, 0x40, 0, 0, 0, 0, NULL);
     }
-    if (wk->unk11EE == 0) {
+    if (wk->recvPkmReturns == 0) {
         MCSS_GetPosition(wk->mcss[index], &pos);
         TradeMcssMove_Free(wk->mcssMoves[3]);
-        if (wk->unk11F0[0] != 0) {
+        if (wk->recvPkmNoBounce[0] != 0) {
             wk->mcssMoves[3] =
                 TradeMcssMove_CreateWithPath(wk->mcss[index], 20, &pos, sTradeDemoMiddleScenePath, wk->heapId);
         } else {
@@ -413,7 +413,7 @@ static void PokemonTradeDemoMiddle_StartMove(PokemonTradeWork *wk, int index) {
 
         MCSS_GetPosition(wk->mcss[index], &pos);
         TradeMcssMove_Free(wk->mcssMoves[3]);
-        if (wk->unk11F0[0] != 0) {
+        if (wk->recvPkmNoBounce[0] != 0) {
             wk->mcssMoves[3] = TradeMcssMove_CreateWithPath(target, 20, &pos, sTradeDemoMiddleScenePath, wk->heapId);
         } else {
             wk->mcssMoves[3] = TradeMcssMove_CreateWithPath(target, 18, &pos, sTradeDemoMiddleMoveHopPath, wk->heapId);
@@ -524,7 +524,7 @@ static void PokemonTradeDemoMiddle_Init(PokemonTradeWork *wk) {
     MCSS_Hide(wk->mcss[2]);
     MCSS_Hide(wk->mcss[3]);
     Poketrade3D_InitParticleSystems(wk->work3D);
-    func_ov194_021c1db4(wk->work3D);
+    Poketrade3D_SetupParticleSystemsLow(wk->work3D);
     Poketrade3D_CreateIcaStreamsForMode(wk->work3D, 0);
     PokemonTradeDemoMiddle_SetTimer(wk, 0);
     PokemonTrade_SetState(wk, PokemonTradeDemoMiddle_Wait1);
@@ -797,7 +797,7 @@ static void PokemonTradeDemoMiddle_Run(PokemonTradeWork *wk) {
     }
     other = pair[index];
     if (wk->timer == PokemonTradeDemoMiddle_Frame(0x48e)) {
-        if (wk->unk11EE == 0) {
+        if (wk->recvPkmReturns == 0) {
             PokemonTradeDemoMiddle_ShowSprite(wk, index);
             PokemonTradeDemoMiddle_StartMove(wk, index);
             MCSS_StartFade(wk->mcss[index], 16, 16, 0, 0x7fff);
@@ -815,7 +815,7 @@ static void PokemonTradeDemoMiddle_Run(PokemonTradeWork *wk) {
     if (wk->timer == PokemonTradeDemoMiddle_Frame(0x490)) {
         MCSS_StartFade(wk->mcss[index], 0, 0, 0, 0x7fff);
     }
-    if (PokemonTradeDemoMiddle_Frame(0x48e) < wk->timer && wk->unk11EE != 0 && wk->mcssMoves[3] != NULL &&
+    if (PokemonTradeDemoMiddle_Frame(0x48e) < wk->timer && wk->recvPkmReturns != 0 && wk->mcssMoves[3] != NULL &&
         wk->mcssMoves[3]->frame == 9) {
         VecFx32 pos8;
 

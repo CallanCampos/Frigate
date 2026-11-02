@@ -2571,7 +2571,7 @@ u32 PokeList_CheckLearnMove(PokeListWork *wk, PartyPkm *pkm, u8 pos) {
                 hasEmptySlot = TRUE;
             }
         }
-        if (wk->param->unk6E & (1 << pos)) {
+        if (wk->param->learnable & (1 << pos)) {
             if (hasEmptySlot == TRUE) {
                 return 0;
             }

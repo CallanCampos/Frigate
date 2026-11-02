@@ -10,9 +10,6 @@
 // The species' data of the personal archives: this game's, and Black and White's. The file's name is the ROM's
 // string; the functions' names are swan's
 
-// Black and White's personal data
-#define ARCID_PERSONAL_BW1 302
-
 // The file of ARCID_PERSONAL that holds the regional Pokédex numbers, and the number of a species that has none
 #define PERSONAL_FILE_REGIONAL_DEX 709
 #define REGIONAL_DEX_NONE 999

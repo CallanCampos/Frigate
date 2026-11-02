@@ -1,0 +1,22 @@
+{
+    "$schema": "../npc_cache.schema.json",
+    "codes": [
+        "OBJ_CODE_BACKERS_F",
+        "OBJ_CODE_18",
+        "OBJ_CODE_ARTIST",
+        "OBJ_CODE_ACE_TRAINER_M",
+        "OBJ_CODE_WORKER_44",
+        "OBJ_CODE_291",
+        "OBJ_CODE_227",
+        "OBJ_CODE_223",
+        "OBJ_CODE_250",
+        "OBJ_CODE_110",
+        "OBJ_CODE_14",
+        "OBJ_CODE_29",
+        "OBJ_CODE_SMASHER",
+        "OBJ_CODE_BATTLE_GIRL",
+        "OBJ_CODE_ROUGHNECK",
+        "OBJ_CODE_VETERAN_F",
+        "OBJ_CODE_BACKPACKER_F"
+    ]
+}

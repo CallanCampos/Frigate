@@ -21,19 +21,19 @@ void UpdateScriptFieldWk(ScriptFieldWork *fieldWork, GameSystem *gsys) {
     }
 }
 
-ScriptWork *ScriptWork_Create(HeapID heapId, GameSystem *gsys, GameEvent *event, u16 scriptId, u32 arg4,
+ScriptWork *ScriptWork_Create(HeapID heapId, GameSystem *gsys, GameEvent *event, u16 scriptId, u32 param,
                               u32 featureLevel) {
     ScriptWork *work;
     u32 reduced;
 
     work = GFL_HeapAllocate(heapId, sizeof(ScriptWork), TRUE, "script_work.c", 0xaf);
-    work->unk00 = 0x3643f;
+    work->magic = SCRIPT_WORK_MAGIC;
     work->heapId = heapId;
     work->gsys = gsys;
     work->event = event;
     work->scriptId = scriptId;
     work->parentActor = NULL;
-    work->unk20 = arg4;
+    work->unk20 = param;
     work->featureLevel = featureLevel;
     reduced = FieldScript_IsVMFeatureSetReduced(featureLevel);
     work->reducedFeatureLevel = reduced;
@@ -55,7 +55,7 @@ ScriptWork *ScriptWork_Create(HeapID heapId, GameSystem *gsys, GameEvent *event,
 }
 
 void ScriptWork_Free(ScriptWork *work) {
-    work->unk00 = 0;
+    work->magic = 0;
     if (work->wordSet != NULL) {
         GFL_WordSetSystemFree(work->wordSet);
     }
@@ -176,11 +176,11 @@ BOOL ScriptWork_SetWkValue(ScriptWork *work, u16 id, u32 value) {
     return TRUE;
 }
 
-void ScriptWork_SetParams(ScriptWork *work, u16 param0, u32 param1, u16 param2, u16 param3) {
-    ScriptWork_SetWkValue(work, 0x8000, param0);
-    ScriptWork_SetWkValue(work, 0x8001, param1);
-    ScriptWork_SetWkValue(work, 0x8002, param2);
-    ScriptWork_SetWkValue(work, 0x8003, param3);
+void ScriptWork_SetParams(ScriptWork *work, u16 value8000, u32 value8001, u16 value8002, u16 value8003) {
+    ScriptWork_SetWkValue(work, 0x8000, value8000);
+    ScriptWork_SetWkValue(work, 0x8001, value8001);
+    ScriptWork_SetWkValue(work, 0x8002, value8002);
+    ScriptWork_SetWkValue(work, 0x8003, value8003);
 }
 
 void *ScriptWork_CreateVarCopy(ScriptWork *work) {

@@ -1,5 +1,6 @@
 #include "field/encounter_effect_model.h"
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/encounter_effect.h"
 #include "field/field.h"
@@ -15,8 +16,15 @@
 // The encounter effects that play an animated 3D model, textured with a capture of the screen. The name is
 // descriptive, since the overlay embeds no name
 
-// The archive of the effects' models and animations
-#define ARCID_ENCOUNT_EFFECT_MODEL 130
+// The steps of the event
+enum {
+    STEP_START_FLASH,
+    STEP_WAIT_FLASH_IN,
+    STEP_WAIT_FLASH_OUT,
+    STEP_LOAD_MODEL,
+    STEP_PLAY_MODEL,
+    STEP_END,
+};
 
 typedef struct EncounterModelWork {
     // The flashes so far
@@ -111,28 +119,28 @@ GameEventReturnCode EncEffModel_EventCallback(GameEvent *event, u32 *state, void
     work = EncEff_GetWorkArea(Field_GetEncEff(GSYS_GetField(GameEvent_GetGameSystem(event))));
 
     switch (*state) {
-    case 0:
+    case STEP_START_FLASH:
         GFL_FadeSet(FADE_ENGINE_A_WHITE, 0, 16, 0);
         (*state)++;
         // Fall through to check the fade in the same frame.
-    case 1:
+    case STEP_WAIT_FLASH_IN:
         if (!GFL_FadeIsRunning()) {
             GFL_FadeSet(FADE_ENGINE_A_WHITE, 16, 0, 0);
             (*state)++;
         }
         break;
-    case 2:
+    case STEP_WAIT_FLASH_OUT:
         if (!GFL_FadeIsRunning()) {
             work->flashes++;
             if (work->flashes < 2) {
                 GFL_FadeSet(FADE_ENGINE_A_WHITE, 0, 16, 0);
-                *state = 1;
+                *state = STEP_WAIT_FLASH_IN;
             } else {
                 (*state)++;
             }
         }
         break;
-    case 3:
+    case STEP_LOAD_MODEL:
         work->texBanks = GX_GetBankForTex();
         work->addedTexBank = FALSE;
         if (!(work->texBanks & GX_VRAM_D)) {
@@ -158,7 +166,7 @@ GameEventReturnCode EncEffModel_EventCallback(GameEvent *event, u32 *state, void
         }
         (*state)++;
         break;
-    case 4:
+    case STEP_PLAY_MODEL:
         frame = GetAnimFrame(work->actor);
         if (!work->fadeStarted && frame >= work->fadeFrame) {
             GFL_FadeSet(work->fadeMode, 0, 16, 3);
@@ -168,7 +176,7 @@ GameEventReturnCode EncEffModel_EventCallback(GameEvent *event, u32 *state, void
             (*state)++;
         }
         break;
-    case 5:
+    case STEP_END:
         if (work->addedTexBank == TRUE) {
             work->texBanks &= ~GX_VRAM_D;
             GX_SetBankForTex(work->texBanks);

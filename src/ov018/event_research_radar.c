@@ -6,6 +6,16 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
+// The steps of the event
+enum {
+    STEP_FADE_OUT,
+    STEP_CLOSE_FIELD,
+    STEP_START_APP,
+    STEP_OPEN_FIELD,
+    STEP_FADE_IN,
+    STEP_END,
+};
+
 struct EventResearchRadar {
     GameSystem *gsys;
     Field *field;
@@ -22,29 +32,29 @@ GameEventReturnCode EventResearchRadar_Callback(GameEvent *event, u32 *state, vo
     Field *field = work->field;
 
     switch (*state) {
-    case 0:
+    case STEP_FADE_OUT:
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
-        *state = 1;
+        *state = STEP_CLOSE_FIELD;
         break;
-    case 1:
+    case STEP_CLOSE_FIELD:
         GameEvent_ChainNext(event, CreateFieldCloseEvent(gsys, field));
-        *state = 2;
+        *state = STEP_START_APP;
         break;
-    case 2:
+    case STEP_START_APP:
         GSYS_QueueProc(gsys, OVERLAY_RESEARCH_RADAR_APP, &RESEARCH_RADAR_PROC_FUNCTIONS, work->param);
-        *state = 3;
+        *state = STEP_OPEN_FIELD;
         break;
-    case 3:
+    case STEP_OPEN_FIELD:
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
-        *state = 4;
+        *state = STEP_FADE_IN;
         break;
-    case 4:
+    case STEP_FADE_IN:
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
-        *state = 5;
+        *state = STEP_END;
         break;
-    case 5:
+    case STEP_END:
         GFL_HeapFree(work->param);
         return GAMEEVENT_DONE;
     }

@@ -1,0 +1,25 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "M",
+    "shapes": [ 11 ],
+    "area": {
+        "all_year": false,
+        "seasons": {
+            "spring": {
+                "ZONE_UNDELLA_BAY": [ "rippling_surf" ],
+                "ZONE_ROUTE_21": [ "rippling_surf" ]
+            },
+            "summer": {
+                "ZONE_UNDELLA_BAY": [ "rippling_surf" ],
+                "ZONE_ROUTE_21": [ "rippling_surf" ]
+            },
+            "autumn": {
+                "ZONE_UNDELLA_BAY": [ "rippling_surf" ],
+                "ZONE_ROUTE_21": [ "rippling_surf" ]
+            },
+            "winter": {
+                "ZONE_ROUTE_21": [ "rippling_surf" ]
+            }
+        }
+    }
+}

@@ -1,0 +1,181 @@
+{
+    "$schema": "../pattern_animation.schema.json",
+    "animations": [
+        {
+            "length": 100,
+            "textures": [
+                {
+                    "name": "out56_hata.1",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "out56_hata.2",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "out56_hata.3",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "out56_hata.4",
+                    "format": "palette16",
+                    "color0_transparent": true
+                }
+            ],
+            "palettes": [
+                [ "out56_hata.1_pl", "out56_hata.2_pl", "out56_hata.3_pl", "out56_hata.4_pl" ]
+            ],
+            "targets": [
+                [
+                    {
+                        "frame": 0,
+                        "texture": "out56_hata.1"
+                    },
+                    {
+                        "frame": 3,
+                        "texture": "out56_hata.2"
+                    },
+                    {
+                        "frame": 6,
+                        "texture": "out56_hata.3"
+                    },
+                    {
+                        "frame": 9,
+                        "texture": "out56_hata.2"
+                    },
+                    {
+                        "frame": 12,
+                        "texture": "out56_hata.1"
+                    },
+                    {
+                        "frame": 15,
+                        "texture": "out56_hata.4"
+                    },
+                    {
+                        "frame": 18,
+                        "texture": "out56_hata.1"
+                    },
+                    {
+                        "frame": 21,
+                        "texture": "out56_hata.2"
+                    },
+                    {
+                        "frame": 24,
+                        "texture": "out56_hata.3"
+                    },
+                    {
+                        "frame": 27,
+                        "texture": "out56_hata.2"
+                    },
+                    {
+                        "frame": 28,
+                        "texture": "out56_hata.1"
+                    },
+                    {
+                        "frame": 31,
+                        "texture": "out56_hata.4"
+                    },
+                    {
+                        "frame": 34,
+                        "texture": "out56_hata.1"
+                    },
+                    {
+                        "frame": 37,
+                        "texture": "out56_hata.2"
+                    },
+                    {
+                        "frame": 41,
+                        "texture": "out56_hata.3"
+                    },
+                    {
+                        "frame": 44,
+                        "texture": "out56_hata.2"
+                    },
+                    {
+                        "frame": 47,
+                        "texture": "out56_hata.1"
+                    },
+                    {
+                        "frame": 50,
+                        "texture": "out56_hata.4"
+                    },
+                    {
+                        "frame": 53,
+                        "texture": "out56_hata.1"
+                    },
+                    {
+                        "frame": 56,
+                        "texture": "out56_hata.2"
+                    },
+                    {
+                        "frame": 59,
+                        "texture": "out56_hata.3"
+                    },
+                    {
+                        "frame": 62,
+                        "texture": "out56_hata.2"
+                    },
+                    {
+                        "frame": 65,
+                        "texture": "out56_hata.1"
+                    },
+                    {
+                        "frame": 68,
+                        "texture": "out56_hata.4"
+                    },
+                    {
+                        "frame": 71,
+                        "texture": "out56_hata.1"
+                    },
+                    {
+                        "frame": 74,
+                        "texture": "out56_hata.2"
+                    },
+                    {
+                        "frame": 77,
+                        "texture": "out56_hata.3"
+                    },
+                    {
+                        "frame": 80,
+                        "texture": "out56_hata.2"
+                    },
+                    {
+                        "frame": 83,
+                        "texture": "out56_hata.1"
+                    },
+                    {
+                        "frame": 86,
+                        "texture": "out56_hata.4"
+                    },
+                    {
+                        "frame": 88,
+                        "texture": "out56_hata.1"
+                    },
+                    {
+                        "frame": 89,
+                        "texture": "out56_hata.2"
+                    },
+                    {
+                        "frame": 91,
+                        "texture": "out56_hata.3"
+                    },
+                    {
+                        "frame": 94,
+                        "texture": "out56_hata.2"
+                    },
+                    {
+                        "frame": 97,
+                        "texture": "out56_hata.1"
+                    },
+                    {
+                        "frame": 99,
+                        "texture": "out56_hata.4"
+                    }
+                ]
+            ]
+        }
+    ]
+}

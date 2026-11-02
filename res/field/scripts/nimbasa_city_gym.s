@@ -23,7 +23,7 @@ Script_2:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_005D
     WorkSetConst EVENT_WORK_0x409b, 0
-    Cmd_025A 0
+    GimmickSetNimbasaGym 0
     VMJump L_00F2
 
 L_005D:
@@ -31,7 +31,7 @@ L_005D:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_007A
-    Cmd_025A 0
+    GimmickSetNimbasaGym 0
     VMJump L_00F2
 
 L_007A:
@@ -39,7 +39,7 @@ L_007A:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0097
-    Cmd_025A 1
+    GimmickSetNimbasaGym 1
     VMJump L_00F2
 
 L_0097:
@@ -47,7 +47,7 @@ L_0097:
     VMStackPushConst 2
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_00B4
-    Cmd_025A 2
+    GimmickSetNimbasaGym 2
     VMJump L_00F2
 
 L_00B4:
@@ -55,7 +55,7 @@ L_00B4:
     VMStackPushConst 3
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_00D1
-    Cmd_025A 3
+    GimmickSetNimbasaGym 3
     VMJump L_00F2
 
 L_00D1:
@@ -63,11 +63,11 @@ L_00D1:
     VMStackPushConst 4
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_00EE
-    Cmd_025A 4
+    GimmickSetNimbasaGym 4
     VMJump L_00F2
 
 L_00EE:
-    Cmd_025A 0
+    GimmickSetNimbasaGym 0
 
 L_00F2:
     VMHalt

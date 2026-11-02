@@ -1,0 +1,53 @@
+{
+    "$schema": "../pattern_animation.schema.json",
+    "animations": [
+        {
+            "length": 31,
+            "textures": [
+                {
+                    "name": "taki_shibu.1",
+                    "format": "palette4",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "taki_shibu.2",
+                    "format": "palette4",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "taki_shibu.3",
+                    "format": "palette4",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "taki_shibu.4",
+                    "format": "palette4",
+                    "color0_transparent": true
+                }
+            ],
+            "palettes": [
+                [ "taki_shibu.1_pl", "taki_shibu.2_pl", "taki_shibu.3_pl", "taki_shibu.4_pl" ]
+            ],
+            "targets": [
+                [
+                    {
+                        "frame": 0,
+                        "texture": "taki_shibu.1"
+                    },
+                    {
+                        "frame": 9,
+                        "texture": "taki_shibu.2"
+                    },
+                    {
+                        "frame": 17,
+                        "texture": "taki_shibu.3"
+                    },
+                    {
+                        "frame": 24,
+                        "texture": "taki_shibu.4"
+                    }
+                ]
+            ]
+        }
+    ]
+}

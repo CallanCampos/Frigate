@@ -1,4 +1,5 @@
 #include "app/cdemo.h"
+#include "constants/sound.h"
 #include "gfl/arc_util.h"
 #include "gfl/calctool.h"
 #include "gfl/gx_layers.h"
@@ -13,11 +14,65 @@ static BOOL CDemo_Exit(GameProc *proc, u32 *state, void *param, void *work);
 static void CDemo_VBlankCallback(TCB *tcb, void *data);
 
 const GameProcFunctions CDEMO_PROC_FUNCTIONS = { CDemo_Init, CDemo_Update, CDemo_Exit };
-// Demo scripts are arrays of opcode words and their arguments.
-static const u32 CDEMO_SCRIPT_LOGO[] = { 1, 1, 1, 5, 14, 1004, 19, 0, 18, 0, 19, 1, 2, 1, 1, 5, 20 };
-static const u32 CDEMO_SCRIPT_0[] = { 1, 1, 1, 5, 14, 1171, 19, 0, 18, 0, 19, 1, 0, 42, 2, 1, 1, 5, 20 };
-static const u32 CDEMO_SCRIPT_1[] = { 1, 1, 1, 5, 14, 1003, 0, 80, 19, 0, 18, 0, 19, 1, 0, 20, 2, 1, 1, 5, 20 };
-static const u32 *const CDEMO_SCRIPTS[] = { CDEMO_SCRIPT_0, CDEMO_SCRIPT_1, CDEMO_SCRIPT_LOGO };
+// Demo scripts are arrays of opcodes (CDEMO_CMD_*), each followed by its arguments.
+static const u32 CDEMO_SCRIPT_OPENING[] = { CDEMO_CMD_FADE_IN_BLACK,
+                                            1,
+                                            1,
+                                            CDEMO_CMD_WAIT_FADE,
+                                            CDEMO_CMD_PLAY_BGM,
+                                            SEQ_BGM_TITLE01,
+                                            CDEMO_CMD_NOP19,
+                                            0,
+                                            CDEMO_CMD_START_MOVIE,
+                                            0,
+                                            CDEMO_CMD_NOP19,
+                                            1,
+                                            CDEMO_CMD_FADE_OUT_BLACK,
+                                            1,
+                                            1,
+                                            CDEMO_CMD_WAIT_FADE,
+                                            CDEMO_CMD_END };
+static const u32 CDEMO_SCRIPT_GF_LOGO[] = { CDEMO_CMD_FADE_IN_BLACK,
+                                            1,
+                                            1,
+                                            CDEMO_CMD_WAIT_FADE,
+                                            CDEMO_CMD_PLAY_BGM,
+                                            SEQ_BGM_GF_LOGO,
+                                            CDEMO_CMD_NOP19,
+                                            0,
+                                            CDEMO_CMD_START_MOVIE,
+                                            0,
+                                            CDEMO_CMD_NOP19,
+                                            1,
+                                            CDEMO_CMD_WAIT_FRAMES,
+                                            42,
+                                            CDEMO_CMD_FADE_OUT_BLACK,
+                                            1,
+                                            1,
+                                            CDEMO_CMD_WAIT_FADE,
+                                            CDEMO_CMD_END };
+static const u32 CDEMO_SCRIPT_1[] = { CDEMO_CMD_FADE_IN_BLACK,
+                                      1,
+                                      1,
+                                      CDEMO_CMD_WAIT_FADE,
+                                      CDEMO_CMD_PLAY_BGM,
+                                      SEQ_BGM_TITLE,
+                                      CDEMO_CMD_WAIT_FRAMES,
+                                      80,
+                                      CDEMO_CMD_NOP19,
+                                      0,
+                                      CDEMO_CMD_START_MOVIE,
+                                      0,
+                                      CDEMO_CMD_NOP19,
+                                      1,
+                                      CDEMO_CMD_WAIT_FRAMES,
+                                      20,
+                                      CDEMO_CMD_FADE_OUT_BLACK,
+                                      1,
+                                      1,
+                                      CDEMO_CMD_WAIT_FADE,
+                                      CDEMO_CMD_END };
+static const u32 *const CDEMO_SCRIPTS[] = { CDEMO_SCRIPT_GF_LOGO, CDEMO_SCRIPT_1, CDEMO_SCRIPT_OPENING };
 static const BGSysVRAMConfig CDEMO_VRAM_CONFIG = { 6, 0x10, 0x80, 0, 1, 0, 0x100, 0, 0, 0, 0, 0 };
 
 static BOOL CDemo_Init(GameProc *proc, u32 *state, void *param, void *unused) {

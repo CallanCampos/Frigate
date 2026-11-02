@@ -1,0 +1,12 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "K",
+    "shapes": [ 3 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_VIRBANK_CITY": [ "rippling_fishing" ],
+            "ZONE_VIRBANK_COMPLEX": [ "rippling_fishing" ]
+        }
+    }
+}

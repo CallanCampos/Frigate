@@ -1,0 +1,24 @@
+{
+    "$schema": "../npc_cache.schema.json",
+    "codes": [
+        "OBJ_CODE_BACKPACKER_F",
+        "OBJ_CODE_BACKPACKER_M",
+        "OBJ_CODE_PKMN_RANGER_F",
+        "OBJ_CODE_PKMN_RANGER_M",
+        "OBJ_CODE_ACE_TRAINER_M",
+        "OBJ_CODE_ACE_TRAINER_F",
+        "OBJ_CODE_110",
+        "OBJ_CODE_18",
+        "OBJ_CODE_FISHERMAN",
+        "OBJ_CODE_14",
+        "OBJ_CODE_BACKERS_F",
+        "OBJ_CODE_TWINS",
+        "OBJ_CODE_BACKERS_M",
+        "OBJ_CODE_YOUNGSTER",
+        "OBJ_CODE_21",
+        "OBJ_CODE_ARTIST",
+        "OBJ_CODE_312",
+        "OBJ_CODE_29",
+        "OBJ_CODE_LASS"
+    ]
+}

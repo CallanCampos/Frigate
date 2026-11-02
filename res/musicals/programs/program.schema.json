@@ -1,0 +1,54 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A musical program's data: res/musicals/programs/<n>/data.json",
+    "description": "Member 0 of the archive ARCID_MUSICAL_PROGRAM + n (a/1/1/2 to a/1/1/5), the program's MusicalProgramData (src/ov012/musical_program.c), which MusicalSystem_LoadProgramData loads; tools/data/musical_program_data.py packs it with the program's other members.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "base_program", "points", "bonus", "prop_list", "unk07", "performers" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "base_program": { "$ref": "#/$defs/u8", "description": "The program's number, which MusicalProgram_GetBaseProgramId gives: each built-in program has its own, 0 to 3" },
+        "points": {
+            "type": "array", "minItems": 4, "maxItems": 4, "items": { "$ref": "#/$defs/u8" },
+            "description": "The points the audience has for each of the four kinds of prop (MusItemData_GetKind), which the props of a kind that the Pokémon wear share out"
+        },
+        "bonus": { "$ref": "#/$defs/u8", "description": "Points the program adds to the kinds at random, by fives, each time it is put on (MusicalProgram_Create)" },
+        "prop_list": { "$ref": "#/$defs/u8", "description": "The program's list of props to give away (MusicalProgram_GetPropList)" },
+        "unk07": {
+            "type": "array", "minItems": 5, "maxItems": 5, "items": { "$ref": "#/$defs/u8" },
+            "description": "Bytes 7 to 11, which musical_program.c doesn't read"
+        },
+        "performers": {
+            "type": "array", "minItems": 6, "maxItems": 6,
+            "description": "The program's performers (MusicalNpc), from which the game picks the other three entrants at random among those whose min_shots the player has reached, or the first three if fewer have",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "species", "form", "obj_code", "name", "personality_byte_2", "unk06", "min_shots", "props" ],
+                "properties": {
+                    "species": { "type": [ "string", "integer" ], "x-constant": "SPECIES_", "description": "The Pokémon" },
+                    "form": { "$ref": "#/$defs/u8", "description": "The Pokémon's form, which is also the top byte of its personality" },
+                    "obj_code": { "type": [ "string", "integer" ], "x-constant": "OBJ_CODE_", "description": "The performer's look, the low byte of the Pokémon's personality: an object code, as the player's is OBJ_CODE_HERO or OBJ_CODE_HEROINE (musical_program.c's trainerClass, MusicalEvent_GetOwnerTrainerClass)" },
+                    "name": { "type": [ "string", "integer" ], "description": "The performer's name, the second byte of the Pokémon's personality: a message of res/text/system/btl_main_9.txt by its ID, or a number; the same line of musical_event.txt is the Pokémon's nickname" },
+                    "personality_byte_2": { "$ref": "#/$defs/u8", "description": "The third byte of the Pokémon's personality" },
+                    "unk06": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "Given to MusicalStageParam_CreateNpcPoke, which keeps it in the MusicalPoke's unk78" },
+                    "min_shots": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "The photos the player must have taken before the performer appears" },
+                    "props": {
+                        "type": "array", "maxItems": 8,
+                        "description": "The props the Pokémon wears (MusicalProgram_PutNpcOnStage), each [item, slot]",
+                        "items": {
+                            "type": "array", "minItems": 2, "maxItems": 2,
+                            "prefixItems": [
+                                { "type": "integer", "minimum": 0, "maximum": 509, "description": "The prop, a musical item by number (MusItemData)" },
+                                { "$ref": "#/$defs/u8", "description": "Where the Pokémon wears it, a MusicalPoke equip slot, 0 to 8" }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "u8": { "type": "integer", "minimum": 0, "maximum": 255 }
+    }
+}

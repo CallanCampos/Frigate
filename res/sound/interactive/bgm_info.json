@@ -1,0 +1,181 @@
+{
+    "$schema": "bgm_info.schema.json",
+    "bgms": [
+        {
+            "bgm": "SEQ_BGM_T_02",
+            "subsystem": "ISS_SUBSYSTEM_SWITCH"
+        },
+        {
+            "bgm": "SEQ_BGM_T_03",
+            "subsystem": "ISS_SUBSYSTEM_CITY"
+        },
+        {
+            "bgm": "SEQ_BGM_T_05_SP",
+            "subsystem": "ISS_SUBSYSTEM_ZONE"
+        },
+        {
+            "bgm": "SEQ_BGM_T_05_SU",
+            "subsystem": "ISS_SUBSYSTEM_ZONE"
+        },
+        {
+            "bgm": "SEQ_BGM_T_05_AU",
+            "subsystem": "ISS_SUBSYSTEM_ZONE"
+        },
+        {
+            "bgm": "SEQ_BGM_T_05_WI",
+            "subsystem": "ISS_SUBSYSTEM_ZONE"
+        },
+        {
+            "bgm": "SEQ_BGM_C_02",
+            "subsystem": "ISS_SUBSYSTEM_CITY"
+        },
+        {
+            "bgm": "SEQ_BGM_C_07",
+            "subsystem": "ISS_SUBSYSTEM_CITY"
+        },
+        {
+            "bgm": "SEQ_BGM_C_08_B",
+            "subsystem": "ISS_SUBSYSTEM_CITY"
+        },
+        {
+            "bgm": "SEQ_BGM_C_08_W",
+            "subsystem": "ISS_SUBSYSTEM_CITY"
+        },
+        {
+            "bgm": "SEQ_BGM_R_A",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_R_B_SP",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_R_B_SU",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_R_B_AU",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_R_B_WI",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_R_C_SP",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_R_C_SU",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_R_C_AU",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_R_C_WI",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_R_D_SP",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_R_D_SU",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_R_D_AU",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_R_D_WI",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_R_E_SP",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_R_E_SU",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_R_E_AU",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_R_E_WI",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_H_01",
+            "subsystem": "ISS_SUBSYSTEM_3D_SOUND"
+        },
+        {
+            "bgm": "SEQ_BGM_H_03",
+            "subsystem": "ISS_SUBSYSTEM_3D_SOUND"
+        },
+        {
+            "bgm": "SEQ_BGM_H_04",
+            "subsystem": "ISS_SUBSYSTEM_SWITCH"
+        },
+        {
+            "bgm": "SEQ_BGM_BATTLE_SUBWAY",
+            "subsystem": "ISS_SUBSYSTEM_SWITCH"
+        },
+        {
+            "bgm": "SEQ_BGM_D_01",
+            "subsystem": "ISS_SUBSYSTEM_DUNGEON"
+        },
+        {
+            "bgm": "SEQ_BGM_D_02",
+            "subsystem": "ISS_SUBSYSTEM_DUNGEON"
+        },
+        {
+            "bgm": "SEQ_BGM_D_CHAMPROAD",
+            "subsystem": "ISS_SUBSYSTEM_ZONE"
+        },
+        {
+            "bgm": "SEQ_BGM_SW_R_19_SP",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_SW_R_19_SU",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_SW_R_19_AU",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_SW_R_19_WI",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_SW_R_22_SP",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_SW_R_22_SU",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_SW_R_22_AU",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_SW_R_22_WI",
+            "subsystem": "ISS_SUBSYSTEM_ROAD"
+        },
+        {
+            "bgm": "SEQ_BGM_ERECTRIC_GYM_01",
+            "subsystem": "ISS_SUBSYSTEM_SWITCH"
+        },
+        {
+            "bgm": "SEQ_BGM_POISONE_GYM_01",
+            "subsystem": "ISS_SUBSYSTEM_SWITCH"
+        }
+    ]
+}

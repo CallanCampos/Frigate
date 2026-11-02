@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
-"""Dump and pack the 2D graphics archives: the screens, windows, icons and sprites of the game's menus and apps.
+"""Dump and pack the archives of Nitro resources: the screens, windows, icons and sprites of the game's menus and apps,
+the 3D models of its demos, gimmicks and effects, its fonts and its particle effects.
 
     graphics_archive.py dump ARCID_TITLE            # writes res/graphics/title/ from both versions' archives
     graphics_archive.py dump ARCID_X res/demo       # or under another of the archive roots (ARCHIVE_ROOTS)
-    graphics_archive.py dump ARCID_X res/demo --direct-color 256x256    # members that are 256x256 bitmaps as PNGs
+    graphics_archive.py dump ARCID_X res/demo --movie 256x256    # its first members, 256x256 frames, as a movie
+    graphics_archive.py dump ARCID_X --bitmaps 256x192    # its members that are 256x192 bitmaps as PNGs
+    graphics_archive.py dump ARCID_X res/demo --apicula PATH    # Apicula, for models, where it isn't on PATH
     graphics_archive.py pack res/graphics/title black2 OUT
 
 Each archive is a directory named after its ARCID_* constant in include/constants/arc.h, whose number gives its file
 (ARCID_TITLE, 26, is a/0/2/6), in the root for what it holds (ARCHIVE_ROOTS: res/graphics/ for the menus and apps,
-res/demo/, res/field/gimmicks/ and effects/, res/particles/ and res/fonts/). It holds the archive's members in order,
-each a file named after its number in the archive, or after its constant where generated/narc_<archive>.txt names it, as
-narc_intro.txt does:
+res/demo/, res/field/gimmicks/ and effects/, res/particles/, res/fonts/ and res/sound/archives/). It holds the
+archive's members in order, each a file named after its number in the archive, or after its constant where
+generated/narc_<archive>.txt names it, as narc_intro.txt does:
 
 - a character resource (NCGR) is an indexed PNG, `03.png`, 4bpp or 8bpp as the resource is. Its pixels are the palette
   indices the game draws, so edit it in indexed mode and keep the palette's order: the packer reads the indices, not
@@ -18,9 +21,41 @@ narc_intro.txt does:
   screen or sprite uses is the code's to say. A sized resource is as wide as the game's; OBJ characters, which have
   no size, are laid out in rows of their tiles.
 - a palette resource (NCLR) is a JASC palette, `02.pal`, which sets the colors.
+- a 3D model (BMD0) is a directory named as the member is, `05/`, as a field prop's model is (field_prop_model_data.py):
+  model.glb, which dump has Apicula convert it to, its data.json, whose glb_sha256 is the GLB's hash as extracted
+  (MODEL_SCHEMA), and a PNG of each texture that the model embeds (a TEX0 block), named after it, which the GLB's
+  images name. A GLB that still has its hash packs the game's model; an edited one goes back into it as the props' do,
+  and edited PNGs as a field texture set's do (map_texture_data.py). Each of the GLB's draw calls has a material of its
+  own, a copy where the game's share one, since Blender joins the draw calls of one material on export; edit the copies
+  alike. A model that those converters don't take stays its .nsbmd file, as dump says: one with textures of a format
+  that map_texture_data.py doesn't decode, one without a mesh, or one whose materials pair a texture with another
+  palette than map_texture_data.py gives it. A new model is added as its .nsbmd file.
+- a texture set (BTX0) is a directory of its textures' PNGs, `07/`, packed as a field texture set's are.
+- a font (NFTR) is a directory named as the member is, `00/`, which nitro_font.py dumps and builds: glyphs.png, the
+  glyphs in the font's order, a cell each, whose pixels are the glyphs' values (0 clear, then the letter, its shadow
+  and the background), and font.json (res/fonts/font.schema.json), the font's metrics, its character maps' ranges and
+  methods, and each glyph's character, left offset, width and advance. The packer computes the rest; a new glyph is an
+  entry at the end of the glyphs and the next cell, which the map whose range holds its character takes. A font that
+  nitro_font.py doesn't read, or wouldn't build again byte for byte, stays its .nftr file, as dump says.
+- a particle resource (SPA) is a directory named as the member is, `000/`, which nitro_particles.py dumps and builds:
+  particles.json (res/particles/particles.schema.json), the emitters' fields under lib/spl's names, each with the
+  animation, child and behavior blocks it has, and the textures' formats, and a PNG of each texture, texture00.png and
+  on, as its format shows it. An unchanged texture packs as the game's bytes, an edited one encoded again in its
+  format and palette; the packer computes the counts, sizes, offsets and flags of the blocks there are, so emitters may
+  be added and removed. A resource that nitro_particles.py doesn't read, or wouldn't build again byte for byte, stays
+  its .spa file, as dump says.
+- a movie's frames, which the archive starts with, are one animated PNG, movie.png, of RGBA frames: direct color
+  bitmaps (RGB555, bit 15 set where a pixel shows) with each channel's five bits widened to eight and alpha 255 where
+  a pixel shows, 0 where it doesn't. archive.json's "movie" gives the frames' size, how many the archive had and their
+  compression; the members after them are numbered files from there. The PNG plays at the game's 15 frames a second.
+  Any APNG editor's output packs, its frames composed as a viewer shows them; a frame's colors go in by their top five
+  bits, and it shows where alpha is at least 128.
+- in an archive whose archive.json has "bitmaps", a member of that size that is no Nitro resource is a direct color
+  bitmap, an RGBA PNG as a movie's frame is (the manual's pages).
+- a sound file (RIFF), which the code plays itself, is its .wav file.
 - anything else is the member itself, decompressed, named by its kind: `.nscr` (screens), `.ncer` (cells), `.nanr`
-  (cell animations), `.nmcr`/`.nmar` (multi-cells), `.nsbmd`/`.nsbca`/`.nsbta`/`.nsbma`/`.nsbtp`/`.nsbtx` (3D), or
-  `.bin`.
+  (cell animations), `.nmcr`/`.nmar` (multi-cells), `.nsbca`/`.nsbta`/`.nsbma`/`.nsbtp`/`.nsbva` (3D animations),
+  `.nftr` (fonts), `.spa` (particle resources), or `.bin`.
 
 archive.json, where there is one, lists the members the game stores LZ-compressed, `{"compressed": {"03.nscr": "lz10"}}`;
 the packer compresses them again, an edited one as a valid stream of literals that is an eighth larger than its data.
@@ -29,31 +64,50 @@ member that is unchanged packs as the game's own bytes. An edited one keeps the 
 sizes: an image may change size, which a sized image's character position section follows, and a palette may change
 its number of colors unless it has a PCMP section. Add a member by adding the next number's file: a PNG becomes a
 sized character resource, 8bpp where its palette has more than 16 colors, a .pal a palette, and the rest as they are.
-dump writes an archive's directory again from scratch, so it replaces any edits.
+dump writes an archive's directory again from scratch, so it replaces any edits. pack needs only Python.
 """
 import json
 import math
 import re
 import shutil
 import struct
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
+# The field models' converters, which import their neighbors as narc and map_texture_data, also when configure.py
+# imports this as tools.data.graphics_archive
+if str(ROOT / "tools" / "data") not in sys.path:
+    sys.path.append(str(ROOT / "tools" / "data"))
+from tools.data.datajson import DataError, load, write  # noqa: E402
 from tools.data.narc import read_narc, write_narc  # noqa: E402
-from tools.data.nitro_2d import (bitmap_png, build_bitmap, compress_literals, decompress, palette_colors,  # noqa: E402
-                                 palette_resource, read_indexed_png, read_palette, write_indexed_png, write_palette)
+from tools.data.nitro_2d import (bitmap_pixels, compress_literals, decompress, palette_colors,  # noqa: E402
+                                 palette_resource, pixels_bitmap, read_indexed_png, read_palette, read_rgba_apng,
+                                 read_rgba_png, write_indexed_png, write_palette, write_rgba_apng, write_rgba_png)
+from tools.data.nitro_font import FontError, build_font_directory, export_font  # noqa: E402
+from tools.data.nitro_particles import ParticleError, build_directory as build_particles, export_particles  # noqa: E402
+from field_prop_model_data import edit_model, glb_fields  # noqa: E402
+from map_model_data import (canonical_texture_name, dictionary_offsets, model_name, pairing_entries, u32,  # noqa: E402
+                            write_glb)
+from map_texture_data import decode, pack_textures, palette_for, read_png, resources, write_textures  # noqa: E402
 
 GRAPHICS = ROOT / "res" / "graphics"
+# A movie's file, and its frames' delay: cdemo_control.c shows a frame each 0x1046b microseconds, 15 a second
+MOVIE = "movie.png"
+MOVIE_DELAY = (1, 15)
 # The directories that hold archive directories, by what the archives are: the menus' and apps' 2D graphics, the
-# demos and cutscenes, the field's gimmicks and effects, the particles and the fonts
+# demos and cutscenes, the field's gimmicks and effects, the particles, the fonts
+# and the sound files that the code plays itself
 ARCHIVE_ROOTS = [GRAPHICS, ROOT / "res" / "demo", ROOT / "res" / "field" / "gimmicks", ROOT / "res" / "field" / "effects",
-                 ROOT / "res" / "particles", ROOT / "res" / "fonts"]
+                 ROOT / "res" / "particles", ROOT / "res" / "fonts", ROOT / "res" / "sound" / "archives"]
 VERSIONS = {"black2": "b2_us", "white2": "w2_us"}
 EXTENSIONS = {b"RGCN": ".png", b"RLCN": ".pal", b"RCSN": ".nscr", b"RECN": ".ncer", b"RNAN": ".nanr",
               b"RCMN": ".nmcr", b"RAMN": ".nmar", b"BMD0": ".nsbmd", b"BCA0": ".nsbca", b"BTA0": ".nsbta",
-              b"BMA0": ".nsbma", b"BTP0": ".nsbtp", b"BTX0": ".nsbtx"}
+              b"BMA0": ".nsbma", b"BTP0": ".nsbtp", b"BTX0": ".nsbtx", b"BVA0": ".nsbva", b"RTFN": ".nftr",
+              b" APS": ".spa", b"RIFF": ".wav"}
 LZ = {0x10: "lz10", 0x11: "lz11"}
 
 
@@ -96,7 +150,8 @@ def directory_archive(directory: Path) -> str:
 
 KIND_EXTENSIONS = {"NCGR": ".png", "NCLR": ".pal", "NSCR": ".nscr", "NCER": ".ncer", "NANR": ".nanr", "NMCR": ".nmcr",
                    "NMAR": ".nmar", "BIN": ".bin", "NSBMD": ".nsbmd", "NSBCA": ".nsbca", "NSBTA": ".nsbta",
-                   "NSBMA": ".nsbma", "NSBTP": ".nsbtp", "NSBTX": ".nsbtx"}
+                   "NSBMA": ".nsbma", "NSBTP": ".nsbtp", "NSBTX": ".nsbtx", "NSBVA": ".nsbva", "NFTR": ".nftr",
+                   "SPA": ".spa"}
 
 
 def member_names(directory: Path) -> dict[int, str]:
@@ -259,6 +314,187 @@ def build_palette(path: Path, original: bytes | None) -> bytes:
     return bytes(data)
 
 
+# 3D models and textures
+
+# A model's data.json, as the field props' is (field_prop_model.schema.json) without their resource ID
+MODEL_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": ["glb_sha256"],
+    "properties": {
+        "transformed": {"enum": [True]},
+        "positions": {"type": "array",
+                      "items": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "number"}}},
+        "glb_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    },
+}
+
+
+def nitro_blocks(data: bytes) -> list[bytes]:
+    """Returns the blocks of a G3D file (BMD0, BTX0), which follow its header and its blocks' offsets in order."""
+    count = struct.unpack_from("<H", data, 14)[0]
+    offsets = [u32(data, 16 + 4 * index) for index in range(count)]
+    blocks = []
+    for offset, following in zip(offsets, offsets[1:] + [len(data)]):
+        if offset + 8 > following or offset + u32(data, offset + 4) != following:
+            raise GraphicsError("a 3D file whose blocks don't follow one another")
+        blocks.append(data[offset:following])
+    if u32(data, 8) != len(data) or not blocks or offsets[0] != 16 + 4 * count:
+        raise GraphicsError("a 3D file whose header doesn't give its size and blocks")
+    return blocks
+
+
+def nitro_file(magic: bytes, version: int, blocks: list[bytes]) -> bytes:
+    offsets, cursor = [], 16 + 4 * len(blocks)
+    for block in blocks:
+        offsets.append(cursor)
+        cursor += len(block)
+    return struct.pack(f"<4sHHIHH{len(blocks)}I", magic, 0xFEFF, version, cursor, 16, len(blocks), *offsets) + \
+        b"".join(blocks)
+
+
+def model_parts(data: bytes) -> tuple[bytes, bytes | None]:
+    """Returns a BMD0 file's model, as a BMD0 file of its MDL0 block, which the field models' converters take, and the
+    textures it embeds, as a BTX0 file of its TEX0 block, which map_texture_data.py's take, or None without any."""
+    blocks = nitro_blocks(data)
+    kinds = [block[:4] for block in blocks]
+    if kinds not in ([b"MDL0"], [b"MDL0", b"TEX0"]):
+        raise GraphicsError(f"a model of blocks {b' '.join(kinds).decode('ascii', 'replace')}, not MDL0 and TEX0")
+    version = struct.unpack_from("<H", data, 6)[0]
+    return nitro_file(b"BMD0", version, blocks[:1]), nitro_file(b"BTX0", 1, blocks[1:]) if len(blocks) == 2 else None
+
+
+def joined_model(original: bytes, model: bytes, textures: bytes | None) -> bytes:
+    """Returns the BMD0 file of original's header with model's MDL0 block and the TEX0 block of textures."""
+    mdl0 = bytearray(nitro_blocks(model)[0])
+    mdl0 += bytes(-len(mdl0) % 4)
+    struct.pack_into("<I", mdl0, 4, len(mdl0))
+    blocks = [bytes(mdl0)] + (nitro_blocks(textures) if textures is not None else [])
+    return nitro_file(b"BMD0", struct.unpack_from("<H", original, 6)[0], blocks)
+
+
+# The texture formats that map_texture_data.py decodes, which have palettes: A3I5, 4-color, 16-color, 256-color and
+# A5I3, but not the 4x4 compressed or direct color ones
+PALETTE_FORMATS = (1, 2, 3, 4, 6)
+
+
+def texture_problem(textures: bytes, model: bytes | None = None) -> str | None:
+    """Returns why a texture set's textures can't be PNGs that pack again, or None: a texture format that
+    map_texture_data.py doesn't decode, or a material of model's that pairs a texture with another palette than the
+    one map_texture_data.py gives it."""
+    images, palettes = resources(textures)
+    formats = {texture["kind"] for texture in images} - set(PALETTE_FORMATS)
+    if formats:
+        return f"textures of format {min(formats)}, which map_texture_data.py doesn't decode"
+    chosen = {}
+    try:
+        for index, texture in enumerate(images):
+            chosen[texture["name"]] = palette_for(texture, palettes, index)["name"]
+    except ValueError as error:
+        return str(error)
+    if model is None:
+        return None
+    block = u32(model, 16)
+    materials = block + dictionary_offsets(model, block + 8)[0]
+    materials += u32(model, materials + 8)
+    paired = {material: name for name, ids, *_ in pairing_entries(model, materials, 2)[1] for material in ids}
+    for name, ids, *_ in pairing_entries(model, materials, 0)[1]:
+        for material in ids:
+            if name in chosen and paired.get(material, chosen[name]) != chosen[name]:
+                return f"material {material} pairs {name} with palette {paired[material]}, not {chosen[name]}"
+    return None
+
+
+def export_textures(directory: Path, textures: bytes) -> str | None:
+    """Writes a texture set's directory of PNGs, or returns why it can't."""
+    problem = texture_problem(textures)
+    if problem is None:
+        write_textures(textures, directory)
+    return problem
+
+
+def separate_materials(document: dict):
+    """Gives each of a glTF's primitives, the model's draw calls, a material of its own, copying a material that
+    several use, since Blender joins the primitives of a material into one on export."""
+    used = set()
+    for mesh in document.get("meshes", []):
+        for primitive in mesh["primitives"]:
+            if "material" not in primitive:
+                continue
+            if primitive["material"] in used:
+                material = dict(document["materials"][primitive["material"]])
+                copies = sum(other.get("name", "").startswith(material.get("name", "") + ".")
+                             for other in document["materials"])
+                material["name"] = f"{material.get('name', 'material')}.{copies + 1:03d}"
+                document["materials"].append(material)
+                primitive["material"] = len(document["materials"]) - 1
+            used.add(primitive["material"])
+
+
+def export_model(directory: Path, data: bytes, apicula: str) -> str | None:
+    """Writes a model's directory: model.glb, which Apicula converts the model to, its data.json and the PNGs of the
+    textures it embeds, which the GLB's images name. Returns why it can't, writing nothing, where the model is one the
+    converters don't take."""
+    try:
+        model, textures = model_parts(data)
+        name = model_name(model)
+        problem = texture_problem(textures, model) if textures is not None else None
+    except (GraphicsError, ValueError) as error:
+        return str(error)
+    if problem is not None:
+        return problem
+    images = {texture["name"]: (index, texture) for index, texture in enumerate(resources(textures)[0])} \
+        if textures is not None else {}
+    with tempfile.TemporaryDirectory() as temporary:
+        temp = Path(temporary)
+        (temp / "model.nsbmd").write_bytes(data)
+        converted = subprocess.run([apicula, "convert", str(temp / "model.nsbmd"), "-o", str(temp / "converted"), "-f",
+                                    "gltf"], capture_output=True, text=True)
+        if converted.returncode:
+            return f"Apicula doesn't convert it: {converted.stderr.strip().splitlines()[-1:]}"
+        gltfs = list((temp / "converted").glob("*.gltf"))
+        if len(gltfs) != 1:
+            return f"Apicula wrote {len(gltfs)} glTF files for its one model"
+        document = json.loads(gltfs[0].read_text())
+        separate_materials(document)
+        for picture in document.get("images", []):
+            if "uri" not in picture:
+                continue
+            try:
+                canonical = canonical_texture_name(picture["uri"], images)
+            except ValueError as error:
+                return str(error)
+            index, texture = images[Path(canonical).stem]
+            pixels = decode(textures, texture, palette_for(texture, resources(textures)[1], index))
+            if read_png(temp / "converted" / picture["uri"], texture["width"], texture["height"]) != pixels:
+                return f"Apicula shows {texture['name']} otherwise than map_texture_data.py decodes it"
+            picture["uri"] = canonical
+        binary = gltfs[0].with_suffix(".bin").read_bytes()
+    directory.mkdir(parents=True)
+    if textures is not None:
+        write_textures(textures, directory)
+    write_glb(directory / "model.glb", document, binary)
+    try:
+        write(directory / "data.json", glb_fields(directory, name, model))
+    except (KeyError, ValueError) as error:
+        shutil.rmtree(directory)
+        return f"its GLB has no {error}" if isinstance(error, KeyError) else str(error)
+    return None
+
+
+def build_model(directory: Path, original: bytes) -> bytes:
+    """Returns the model of a model's directory: the original's bytes where its GLB has the hash it was extracted with
+    and its PNGs are unchanged, else the original with the GLB's edits, which the field props' converter makes, and the
+    PNGs' pixels."""
+    data = load(directory / "data.json", MODEL_SCHEMA)
+    model, textures = model_parts(original)
+    edited_textures = pack_textures(textures, directory, str(directory)) if textures is not None else None
+    edited = edit_model(directory, model_name(model), model, edited_textures, data, directory)
+    if edited == model and edited_textures == textures:
+        return original
+    return joined_model(original, edited, edited_textures)
+
+
 # Dumping
 
 def preview_colors(members: list[bytes], index: int, bits: int) -> list:
@@ -278,10 +514,10 @@ def preview_colors(members: list[bytes], index: int, bits: int) -> list:
 
 
 def member_file(name: str, data: bytes, members: list[bytes], index: int,
-                direct_color: tuple[int, int] | None = None) -> tuple[str, bytes]:
+                bitmaps: tuple[int, int] | None = None) -> tuple[str, bytes]:
     extension = EXTENSIONS.get(data[:4], ".bin")
-    if direct_color and extension == ".bin" and len(data) == direct_color[0] * direct_color[1] * 2:
-        return name + ".png", bitmap_png(data, *direct_color)
+    if bitmaps and extension == ".bin" and len(data) == bitmaps[0] * bitmaps[1] * 2:
+        return name + ".png", write_rgba_png(*bitmaps, bitmap_pixels(data, *bitmaps))
     if extension == ".png":
         _, _, bits, _, _ = characters(data)
         return name + ".png", character_png(data, preview_colors(members, index, bits))
@@ -290,7 +526,20 @@ def member_file(name: str, data: bytes, members: list[bytes], index: int,
     return name + extension, data
 
 
-def dump(arcid: str, root: Path = GRAPHICS, direct_color: tuple[int, int] | None = None):
+def movie_frames(games: dict, size: tuple[int, int], path: str) -> tuple[int, str | None]:
+    """Returns how many members a movie archive starts with that are frames of a size, and their compression."""
+    count = 0
+    while all(count < len(members) and EXTENSIONS.get(members[count][0][:4], ".bin") == ".bin"
+              and len(members[count][0]) == size[0] * size[1] * 2 for members in games.values()):
+        count += 1
+    kinds = {members[i][1] for members in games.values() for i in range(count)}
+    if not count or len(kinds) != 1:
+        raise SystemExit(f"{path}: no {size[0]}x{size[1]} frames at the start, or frames compressed in several ways")
+    return count, kinds.pop()
+
+
+def dump(arcid: str, root: Path = GRAPHICS, movie: tuple[int, int] | None = None, apicula: str | None = None,
+         bitmaps: tuple[int, int] | None = None):
     ids = archive_ids()
     if arcid not in ids:
         raise SystemExit(f"no {arcid} in include/constants/arc.h")
@@ -307,13 +556,26 @@ def dump(arcid: str, root: Path = GRAPHICS, direct_color: tuple[int, int] | None
              for game, folder in VERSIONS.items()}
     if len(games["black2"]) != len(games["white2"]):
         raise SystemExit(f"{path} has a different number of members in each version")
+    if apicula is None and any(data[:4] == b"BMD0" for members in games.values() for data, _ in members):
+        raise SystemExit(f"{path} has models, which Apicula converts to GLBs: install it or pass --apicula PATH")
     names = member_names(directory)
     digits = max(2, len(str(len(games["black2"]) - 1)))
     compressed = {}
     if directory.exists():
         shutil.rmtree(directory)
     directory.mkdir(parents=True)
-    for index in range(len(games["black2"])):
+    settings = {"bitmaps": list(bitmaps)} if bitmaps else {}
+    first = 0
+    if movie:
+        first, kind = movie_frames(games, movie, path)
+        settings["movie"] = {"size": list(movie), "frames": first, "compressed": kind}
+        frames = {game: [members[i][0] for i in range(first)] for game, members in games.items()}
+        for game in VERSIONS if frames["black2"] != frames["white2"] else ["black2"]:
+            folder = directory / game if frames["black2"] != frames["white2"] else directory
+            folder.mkdir(exist_ok=True)
+            pixels = [bitmap_pixels(frame, *movie) for frame in frames[game]]
+            (folder / MOVIE).write_bytes(write_rgba_apng(*movie, pixels, MOVIE_DELAY))
+    for index in range(first, len(games["black2"])):
         name = names.get(index, f"{index:0{digits}d}").split(".")[0]
         black, white = games["black2"][index], games["white2"][index]
         if black[1] != white[1]:
@@ -321,12 +583,21 @@ def dump(arcid: str, root: Path = GRAPHICS, direct_color: tuple[int, int] | None
         targets = {"": black} if black == white else {"black2/": black, "white2/": white}
         for sub, (data, _) in targets.items():
             members = [content for content, _ in games["black2" if sub != "white2/" else "white2"]]
-            file_name, content = member_file(name, data, members, index, direct_color)
             (directory / sub).mkdir(exist_ok=True)
-            (directory / sub / file_name).write_bytes(content)
+            file_name, converted = name, False
+            if data[:4] in (b"BMD0", b"BTX0", b"RTFN", b" APS"):
+                problem = export_model(directory / sub / name, data, apicula) if data[:4] == b"BMD0" else \
+                    export_textures(directory / sub / name, data) if data[:4] == b"BTX0" else \
+                    export_font(directory / sub / name, data) if data[:4] == b"RTFN" else \
+                    export_particles(directory / sub / name, data)
+                converted = problem is None
+                if problem is not None:
+                    print(f"{path}: member {index} stays a Nitro file: {problem}")
+            if not converted:
+                file_name, content = member_file(name, data, members, index, bitmaps)
+                (directory / sub / file_name).write_bytes(content)
             if black[1]:
                 compressed[file_name] = black[1]
-    settings = {"direct_color": list(direct_color)} if direct_color else {}
     if compressed:
         settings["compressed"] = compressed
     if settings:
@@ -336,15 +607,20 @@ def dump(arcid: str, root: Path = GRAPHICS, direct_color: tuple[int, int] | None
 
 # Packing
 
-def member_files(directory: Path, game: str) -> list[tuple[str, Path]]:
+def member_files(directory: Path, game: str, first: int = 0) -> list[tuple[str, Path]]:
     """Returns an archive's members, (name, file), in order: numbered files, or named ones at their constants'
-    numbers, each from the version's directory where it has one."""
+    numbers, each from the version's directory where it has one, from first, the number after a movie's frames. A
+    member's file is a directory where it is a model, a texture set, a font or a particle resource, named without an
+    extension."""
     files = {}
     for folder in (directory, directory / game):
         for path in folder.iterdir() if folder.is_dir() else []:
-            if path.is_file() and path.name != "archive.json":
+            if path.is_file() and path.name not in ("archive.json", MOVIE) or path.is_dir() and not (
+                    folder == directory and path.name in VERSIONS):
                 files[path.name] = path
     names = {name: number for number, name in member_names(directory).items()}
+    names |= {name.split(".")[0]: number for name, number in names.copy().items()
+              if name.endswith((".nsbmd", ".nsbtx", ".nftr", ".spa"))}
     numbered = {}
     for file_name, path in files.items():
         stem = file_name.split(".")[0]
@@ -357,15 +633,30 @@ def member_files(directory: Path, game: str) -> list[tuple[str, Path]]:
         if number in numbered:
             raise GraphicsError(f"{path}: member {number} also has {numbered[number][1].name}")
         numbered[number] = (stem, path)
-    if sorted(numbered) != list(range(len(numbered))):
-        missing = sorted(set(range(max(numbered, default=-1) + 1)) - set(numbered))
-        raise GraphicsError(f"{directory}: members {missing} have no file; an archive's members are numbered from 0")
-    return [numbered[number] for number in range(len(numbered))]
+    if sorted(numbered) != list(range(first, first + len(numbered))):
+        missing = sorted(set(range(first, max(numbered, default=first - 1) + 1)) - set(numbered))
+        raise GraphicsError(f"{directory}: members {missing} have no file; an archive's members are numbered from "
+                            f"{first}" + (", after the movie's frames" if first else ""))
+    return [numbered[number] for number in range(first, first + len(numbered))]
 
 
-def build_member(path: Path, original: bytes | None, direct_color: list[int] | None = None) -> bytes:
-    if path.suffix == ".png" and direct_color and not (original and original[:4] == b"RGCN"):
-        return build_bitmap(path, *direct_color)
+def build_member(path: Path, original: bytes | None, bitmaps: list[int] | None = None) -> bytes:
+    if path.is_dir():
+        if (path / "font.json").exists():
+            return build_font_directory(path)
+        if (path / "particles.json").exists():
+            return build_particles(path, original if original is not None and original[:4] == b" APS" else None)
+        if original is not None and original[:4] == b"BMD0":
+            return build_model(path, original)
+        if original is not None and original[:4] == b"BTX0":
+            return pack_textures(original, path, str(path))
+        raise GraphicsError(f"{path}: a directory, which only the game's models, texture sets, fonts and particle "
+                            "resources are; add a new model or texture set as its .nsbmd or .nsbtx file")
+    if path.suffix == ".png" and bitmaps and not (original and original[:4] == b"RGCN"):
+        width, height, pixels = read_rgba_png(path)
+        if [width, height] != bitmaps:
+            raise GraphicsError(f"{path}: a bitmap of this archive is {bitmaps[0]}x{bitmaps[1]}, not {width}x{height}")
+        return pixels_bitmap(pixels)
     if path.suffix == ".png":
         return build_characters(path, original if original and original[:4] == b"RGCN" else None)
     if path.suffix == ".pal":
@@ -378,21 +669,31 @@ def pack(directory: Path, game: str, output: Path):
     originals = read_narc((ROOT / "extract" / VERSIONS[game] / "files" / path).read_bytes())
     settings = json.loads((directory / "archive.json").read_text()) if (directory / "archive.json").exists() else {}
     compressed = settings.get("compressed", {})
-    members = member_files(directory, game)
+    movie = settings.get("movie")
+    members = member_files(directory, game, movie["frames"] if movie else 0)
     for name, kind in compressed.items():
         if kind not in ("lz10", "lz11"):
             raise GraphicsError(f"{directory / 'archive.json'}: {name}'s compression is {kind!r}, not lz10 or lz11")
         if name not in {file.name for _, file in members}:
             raise GraphicsError(f"{directory / 'archive.json'}: {name} is compressed, but there is no such member")
+    built_members = []
+    if movie:
+        file = directory / game / MOVIE if (directory / game / MOVIE).exists() else directory / MOVIE
+        width, height, frames = read_rgba_apng(file)
+        if [width, height] != movie["size"]:
+            raise GraphicsError(f"{file}: the movie is {width}x{height}, not {movie['size'][0]}x{movie['size'][1]}")
+        built_members += [(pixels_bitmap(frame), movie["compressed"]) for frame in frames]
+    built_members += [(build_member(file, None if index >= len(originals) else unpack(originals[index])[0],
+                                    settings.get("bitmaps")),
+                       compressed.get(file.name))
+                      for index, (_, file) in enumerate(members, len(built_members))]
     result = []
-    for index, (stem, file) in enumerate(members):
+    for index, (built, kind) in enumerate(built_members):
         original = originals[index] if index < len(originals) else None
-        content, kind = unpack(original) if original is not None else (None, None)
-        built = build_member(file, content, settings.get("direct_color"))
-        if original is not None and built == content and kind == compressed.get(file.name):
+        if original is not None and unpack(original) == (built, kind):
             result.append(original)
         else:
-            result.append(compress(built, compressed.get(file.name)))
+            result.append(compress(built, kind))
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_bytes(write_narc(result))
 
@@ -401,17 +702,27 @@ def main():
     try:
         if len(sys.argv) >= 3 and sys.argv[1] == "dump":
             args = sys.argv[2:]
-            direct_color = None
-            if "--direct-color" in args:
-                at = args.index("--direct-color")
-                direct_color = tuple(int(n) for n in args[at + 1].split("x"))
+            movie = None
+            if "--movie" in args:
+                at = args.index("--movie")
+                movie = tuple(int(n) for n in args[at + 1].split("x"))
                 del args[at:at + 2]
-            dump(args[0], *(Path(a) for a in args[1:]), direct_color=direct_color)
+            bitmaps = None
+            if "--bitmaps" in args:
+                at = args.index("--bitmaps")
+                bitmaps = tuple(int(n) for n in args[at + 1].split("x"))
+                del args[at:at + 2]
+            apicula = shutil.which("apicula")
+            if "--apicula" in args:
+                at = args.index("--apicula")
+                apicula = args[at + 1]
+                del args[at:at + 2]
+            dump(args[0], *(Path(a) for a in args[1:]), movie=movie, apicula=apicula, bitmaps=bitmaps)
         elif len(sys.argv) == 5 and sys.argv[1] == "pack":
             pack(Path(sys.argv[2]), sys.argv[3], Path(sys.argv[4]))
         else:
             raise SystemExit(__doc__)
-    except (GraphicsError, ValueError) as error:
+    except (GraphicsError, DataError, FontError, ParticleError, ValueError) as error:
         raise SystemExit(f"error: {error}") from None
 
 

@@ -55,7 +55,7 @@ void FestSparklePlace_OnZoneEnter(FestSparkleWork *work, GameSystem *gsys, LinkF
     MATHRandContext32 rand;
 
     work->zoneId = zoneId;
-    work->unk2 = 0;
+    work->placeCount = 0;
     work->count = 0;
     MI_CpuFill8(work->places, 0, sizeof(work->places));
     MI_CpuFill8(work->placeIndex, 0, sizeof(work->placeIndex));
@@ -78,16 +78,16 @@ static BOOL FestSparklePlace_PickPlaces(GameSystem *gsys, FestSparkleWork *work,
     if (entity == NULL) {
         return FALSE;
     }
-    work->unk2 = 0;
+    work->placeCount = 0;
     for (i = 0; i < count; i++, entity++) {
-        if (entity->condition == 4) {
-            work->places[work->unk2++] = *entity;
-            if (work->unk2 >= 20) {
+        if (entity->condition == BG_ENTITY_CONDITION_FEST_PLACE) {
+            work->places[work->placeCount++] = *entity;
+            if (work->placeCount >= 20) {
                 break;
             }
         }
     }
-    if (work->unk2 == 0) {
+    if (work->placeCount == 0) {
         return FALSE;
     }
     level = GetZoneEncIDHighest3Bits(work->zoneId);
@@ -95,16 +95,16 @@ static BOOL FestSparklePlace_PickPlaces(GameSystem *gsys, FestSparkleWork *work,
         work->count = 0;
         return FALSE;
     }
-    pattern = (mission->info.unk8_0 >> (level * 3)) & 7;
+    pattern = (mission->info.stagePatterns >> (level * 3)) & 7;
     work->count = sSparkleCounts[pattern][FestMission_RandExcluding(rand, 8, NULL, 0)];
-    if (work->count > work->unk2) {
-        work->count = work->unk2;
+    if (work->count > work->placeCount) {
+        work->count = work->placeCount;
     }
     if (work->count == 0) {
         return FALSE;
     }
     for (i = 0; i < work->count; i++) {
-        work->placeIndex[i] = FestMission_RandExcluding(rand, work->unk2, picked, i);
+        work->placeIndex[i] = FestMission_RandExcluding(rand, work->placeCount, picked, i);
         work->values[i] = FestSparklePlace_PickSpecies(work, mission, rand);
         picked[i] = work->placeIndex[i];
     }
@@ -150,7 +150,7 @@ static void FestSparklePlace_AddZone(FestSparkleWork *work, u16 zoneId) {
     int index;
     int i;
 
-    if (work->unk2 == 0) {
+    if (work->placeCount == 0) {
         return;
     }
     for (i = 0; i < work->zoneCount; i++) {

@@ -1,0 +1,116 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A rail map's rails: res/field/rails/<n>.json",
+    "description": "Rail file n of ARCID_RAIL_HEADERS (a/0/7/8), which a header of headers.json names: the points, lines, cameras and curves that FieldRailLoader_LoadFile loads for the rail system (field_rail.c), and the tiles of each line, which FieldRailTilemap_Load reads from the archive's file n plus the count of rail files (rail_attr.c). Lines, points, cameras and curves are named by their place in their lists, from 0, and null is RAIL_ID_NONE. tools/data/rail_data.py packs them in order.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "tile_width", "points", "lines", "cameras", "curves" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "tile_width": { "$ref": "#/$defs/fx32", "description": "The width of a tile, in 4096ths of a unit, which turns rail positions into world positions (RailDataHandle's tileWidth)" },
+        "points": {
+            "type": "array",
+            "description": "The points where lines meet (RailPoint)",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "name", "position", "camera", "lines" ],
+                "properties": {
+                    "name": { "$ref": "#/$defs/name", "description": "The rail editor's name of the point, which the code doesn't read; padded with spaces" },
+                    "position": { "$ref": "#/$defs/vector", "description": "Where the point is, in 4096ths of a unit" },
+                    "camera": { "$ref": "#/$defs/id", "description": "The camera of cameras that applies at the point, and that the blending cameras of its lines start or end at (GetRailCameraByPoint)" },
+                    "lines": {
+                        "type": "array", "minItems": 4, "maxItems": 4,
+                        "description": "The four slots of the lines that meet here (RAIL_POINT_LINE_MAX)",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [ "line", "dir", "width" ],
+                            "properties": {
+                                "line": { "$ref": "#/$defs/id", "description": "The line, of lines, or null for an empty slot" },
+                                "dir": { "$ref": "#/$defs/dir", "description": "The direction the line leaves the point in" },
+                                "width": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647, "description": "The rail's width at the point on this line, which a line's width blends between from end to end (GetLerpedLineWidthByLineYPos)" }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "lines": {
+            "type": "array",
+            "description": "The lines between points (RailLine), with their tiles",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "name", "point_a", "point_b", "dir", "curve", "camera", "length", "tiles" ],
+                "properties": {
+                    "name": { "$ref": "#/$defs/name", "description": "The rail editor's name of the line, which the code doesn't read; padded with NULs" },
+                    "point_a": { "$ref": "#/$defs/id", "description": "The point the line starts at" },
+                    "point_b": { "$ref": "#/$defs/id", "description": "The point the line ends at" },
+                    "dir": { "$ref": "#/$defs/dir", "description": "The direction along the line from point_a to point_b" },
+                    "curve": { "$ref": "#/$defs/id", "description": "The curve of curves that bends the line" },
+                    "camera": { "$ref": "#/$defs/id", "description": "The camera of cameras that applies on the line" },
+                    "length": { "type": "integer", "minimum": 0, "maximum": 4294967295, "description": "The line's length in tiles" },
+                    "tiles": {
+                        "type": "array", "minItems": 1, "maxItems": 65535,
+                        "description": "The line's tilemap (RailTilemap), a row for each tile along the line from point_a, each row the tiles across it from one side to the other, as many as the rail is wide; FieldRailTilemap_GetTileAtPos reads the tile at a rail position. Each tile is a map tile type in hex: its flags (TILE_FLAG_* in include/field/field_map.h, GetTileFlags) in the high 16 bits and its class (TILE_CLASS_*, GetTileClass) in the low 16",
+                        "items": {
+                            "type": "array", "minItems": 1, "maxItems": 65535,
+                            "items": { "type": "string", "pattern": "^0x[0-9a-fA-F]{8}$" }
+                        }
+                    }
+                }
+            }
+        },
+        "cameras": {
+            "type": "array",
+            "description": "The cameras of the points and lines (RailCamera)",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "function", "params" ],
+                "properties": {
+                    "function": {
+                        "description": "The camera function, of RAIL_CAMERA_CURVE_FUNC_SET in rail_data_handle.c, which field_rail_func.c defines. RailCameraFuncSetStaticPYR puts the eye at params 0 to 2 from the unit the camera follows; RailCameraFuncSetStaticPYDist and FieldRailCamera_FixedAngleAtCentre set the pitch, yaw and distance from params 0 to 2, and FieldRailCamera_FixedAngleShift and _FixedAngleShiftAtFocus also offset the target by params 3 to 5; FieldRailCamera_FixedEyeTarget puts the eye at params 0 to 2 and the target at 3 to 5; FieldRailCamera_Orbit orbits the target at params 2 to 4 at angle param 0 and distance param 1, and FieldRailCamera_OrbitMovingPoint moves the target to params 5 to 7 along the line; FieldRailCamera_YawFromPoint sets the pitch and distance from params 0 and 1 and faces from the point at X param 2 and Z param 3; the FollowHeading functions face along the line, adding param 0 to its yaw, with pitch param 1 (added to the slope's by FieldRailCamera_FollowHeadingSlope) and distance param 2. The Blend functions blend the parameters of the cameras of the line's two points as these read them, and FieldRailCamera_ApplyLineStart and _ApplyLineEnd apply the camera of the line's first or second point, without reading their own.",
+                        "enum": [ "RailCameraFuncSetStaticPYR", "RailCameraFuncSetStaticPYDist", "FieldRailCamera_BlendAngles", "FieldRailCamera_FixedEyeTarget", "FieldRailCamera_BlendEyeTarget", "FieldRailCamera_BlendOrbit", "FieldRailCamera_Orbit", "FieldRailCamera_OrbitMovingPoint", "FieldRailCamera_YawFromPoint", "FieldRailCamera_FollowHeading", "FieldRailCamera_FollowHeadingSlope", "FieldRailCamera_FollowHeadingAtCentre", "FieldRailCamera_ApplyLineStart", "FieldRailCamera_ApplyLineEnd", "FieldRailCamera_BlendAnglesAtFocus", "FieldRailCamera_FixedAngleAtCentre", "FieldRailCamera_BlendAnglesAtCentre", "FieldRailCamera_FixedAngleShift", "FieldRailCamera_BlendAnglesShift", "FieldRailCamera_FixedAngleShiftAtFocus" ]
+                    },
+                    "params": {
+                        "type": "array", "minItems": 8, "maxItems": 8,
+                        "description": "The function's eight parameters, as the function reads them: angles in 65536ths of a turn, distances and positions in 4096ths of a unit",
+                        "items": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647 }
+                    }
+                }
+            }
+        },
+        "curves": {
+            "type": "array",
+            "description": "How the lines bend (RailCurve)",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "kind", "center", "unk10" ],
+                "properties": {
+                    "kind": { "enum": [ "no_curve", "slerp_xz", "slerp_xyz" ], "description": "The conversion between rail and world positions, of RAIL_CONV_RAIL_TO_WORLD_FUNCS and RAIL_CONV_WORLD_TO_RAIL_FUNCS: RailMath_RailToWorldNoCurve for a straight line, or an arc around the center on the X-Z plane, or one that also rises along Y (RailMath_RailToWorldSlerpXZ, _SlerpXYZ)" },
+                    "center": { "$ref": "#/$defs/vector", "description": "The center of the arc, in 4096ths of a unit" },
+                    "unk10": {
+                        "type": "array", "minItems": 20, "maxItems": 20,
+                        "description": "Bytes that the code doesn't read",
+                        "items": { "type": "integer", "minimum": 0, "maximum": 255 }
+                    }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "id": { "type": [ "integer", "null" ], "minimum": 0, "maximum": 65534 },
+        "dir": { "enum": [ "none", "up", "right", "down", "left" ], "description": "A RAIL_DIR_* direction" },
+        "name": { "type": "string", "pattern": "^[!-~]{0,48}$" },
+        "fx32": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647 },
+        "vector": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [ "x", "y", "z" ],
+            "properties": { "x": { "$ref": "#/$defs/fx32" }, "y": { "$ref": "#/$defs/fx32" }, "z": { "$ref": "#/$defs/fx32" } }
+        }
+    }
+}

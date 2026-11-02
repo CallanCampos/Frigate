@@ -28,8 +28,8 @@ BOOL Scrcmd_Proc_callPoke3Select(VM *vm, FieldScriptEnv *env);
 BOOL Scrcmd_Proc_Nop(VM *vm, FieldScriptEnv *env);
 BOOL Scrcmd_Proc_NetConnectWiFiBattle(VM *vm, FieldScriptEnv *env);
 BOOL Scrcmd_Proc_NetConnectBattleVideo(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02157b7c(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02157bb4(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02157bdc(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Proc_GimmickSetNimbasaGym(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Proc_GimmickResetOpelucid(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Proc_GimmickSetNimbasaFlags(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_PROC_H

@@ -9,6 +9,7 @@
 #include "gfl/std.h"
 #include "nitro/fx.h"
 #include "nitro/math.h"
+#include "system/season.h"
 
 // The grid height of a height on the map
 #define HEIGHT_TO_GRID(height) ((s16)(((height) >> 4) / FX32_ONE))
@@ -20,7 +21,8 @@ static BOOL (*const TILE_EXIT_BLOCK_CHECKS[4])(u16 tileClass) = {
     TileExitBlockCheck_Right,
 };
 
-static const u16 data_ov012_0216cd60[4] = { 0x8000, 0x0000, 0x4000, 0xc000 };
+// The angle of each direction
+static const u16 DIRECTION_ANGLES[4] = { 0x8000, 0x0000, 0x4000, 0xc000 };
 
 static BOOL (*const TILE_ENTER_BLOCK_CHECKS[4])(u16 tileClass) = {
     TileExitBlockCheck_Down,
@@ -35,9 +37,11 @@ static const s32 DIRECTION_VEC_Z[4] = { -1, 1, 0, 0 };
 
 static const u32 INV_DIR_TABLE[4] = { DIR_DOWN, DIR_UP, DIR_RIGHT, DIR_LEFT };
 
-static const u8 data_ov012_0216cd68[16] = { 0, 1, 1, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 0 };
+// The quarter turn of each sixteenth of a turn, and each direction turned by a number of quarters, for
+// RotateDirByAngle
+static const u8 ANGLE_SECTOR_QUARTERS[16] = { 0, 1, 1, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 0 };
 
-static const u8 data_ov012_0216cdc8[4][4] = {
+static const u8 ROTATED_DIR_TABLE[4][4] = {
     { 0, 1, 2, 3 },
     { 3, 2, 0, 1 },
     { 1, 0, 3, 2 },
@@ -244,11 +248,11 @@ u32 ActorTerrainEffect_GetGrassKind(u32 tileClass, u8 season) {
         kind = 7;
     } else if (MapTile_IsGrassDoubleB(tileClass)) {
         kind = 1;
-        if (season == 3) {
+        if (season == SEASON_WINTER) {
             kind = 5;
         }
     } else if (MapTile_IsGrassSingleB(tileClass)) {
-        if (season == 3) {
+        if (season == SEASON_WINTER) {
             kind = 4;
         }
     } else if (MapTile_IsNormalTallGrassDoubleBtl(tileClass)) {
@@ -303,36 +307,36 @@ void ActorTerrainEffect_Footmark(FieldActor *actor, ActorTerrainEffectParam *par
     u32 kind;
 
     if (param->tileFlagsOrigY & 8) {
-        kind = 5;
+        kind = FOOTMARK_KIND_MAX;
         if (MapTile_IsPuddle(param->tileClassOrigY)) {
-            if (param->season == 3) {
-                kind = 2;
+            if (param->season == SEASON_WINTER) {
+                kind = FOOTMARK_KIND_SNOW;
                 if (param->config->footprintType == 2) {
-                    kind = 3;
+                    kind = FOOTMARK_KIND_SNOW_TRACKS;
                 }
             }
         } else if (MapTile_IsMud(param->tileClassOrigY)) {
-            if (param->season == 0 || param->season == 3) {
-                kind = 2;
+            if (param->season == SEASON_SPRING || param->season == SEASON_WINTER) {
+                kind = FOOTMARK_KIND_SNOW;
                 if (param->config->footprintType == 2) {
-                    kind = 3;
+                    kind = FOOTMARK_KIND_SNOW_TRACKS;
                 }
             }
         } else if (MapTile_IsSnow(param->tileClassOrigY) == TRUE ||
                    MapTile_IsSnowNoCycling(param->tileClassOrigY) == TRUE) {
-            kind = 2;
+            kind = FOOTMARK_KIND_SNOW;
             if (param->config->footprintType == 2) {
-                kind = 3;
+                kind = FOOTMARK_KIND_SNOW_TRACKS;
             }
         } else if (MapTile_IsDeepSand(param->tileClassOrigY) == TRUE) {
-            kind = 4;
+            kind = FOOTMARK_KIND_DEEP_SAND_TRACKS;
         } else {
-            kind = 0;
+            kind = FOOTMARK_KIND_SAND;
             if (param->config->footprintType == 2) {
-                kind = 1;
+                kind = FOOTMARK_KIND_SAND_TRACKS;
             }
         }
-        if (kind != 5) {
+        if (kind != FOOTMARK_KIND_MAX) {
             Footmark_SetActor(actor, param->effects, kind);
         }
     }
@@ -383,7 +387,7 @@ BOOL ActorTerrainEffect_IsShadowTile(ActorTerrainEffectParam *param) {
     if (!(param->tileFlags & 0x80)) {
         return FALSE;
     }
-    if (param->season == 3 && MapTile_IsPuddle(param->tileClass)) {
+    if (param->season == SEASON_WINTER && MapTile_IsPuddle(param->tileClass)) {
         return FALSE;
     }
     return TRUE;
@@ -878,16 +882,16 @@ s16 GetDirectionVectorCompZ(u16 direction) {
 
 void ExpandVecInGridDir(u16 direction, VecFx32 *position, fx32 amount) {
     switch (direction) {
-    case 0:
+    case DIR_UP:
         position->z -= amount;
         break;
-    case 1:
+    case DIR_DOWN:
         position->z += amount;
         break;
-    case 2:
+    case DIR_LEFT:
         position->x -= amount;
         break;
-    case 3:
+    case DIR_RIGHT:
         position->x += amount;
         break;
     }
@@ -895,16 +899,16 @@ void ExpandVecInGridDir(u16 direction, VecFx32 *position, fx32 amount) {
 
 void AdjusGridXZByDir(u32 direction, s16 *x, s16 *z, s16 amount) {
     switch (direction) {
-    case 0:
+    case DIR_UP:
         *z = (s16)(*z - amount);
         break;
-    case 1:
+    case DIR_DOWN:
         *z = (s16)(*z + amount);
         break;
-    case 2:
+    case DIR_LEFT:
         *x = (s16)(*x - amount);
         break;
-    case 3:
+    case DIR_RIGHT:
         *x = (s16)(*x + amount);
         break;
     }
@@ -929,22 +933,22 @@ u16 GetDirFromPosToPos(s32 x1, s32 z1, s32 x2, s32 z2) {
     s32 direction;
 
     if (x1 > x2) {
-        return 2;
+        return DIR_LEFT;
     }
     if (x1 < x2) {
-        return 3;
+        return DIR_RIGHT;
     }
-    direction = 1;
+    direction = DIR_DOWN;
     if (z1 > z2) {
-        direction = 0;
+        direction = DIR_UP;
     }
     return direction;
 }
 
 u8 RotateDirByAngle(u32 direction, u16 angle) {
-    u16 rotated = data_ov012_0216cd60[direction] + angle;
+    u16 rotated = DIRECTION_ANGLES[direction] + angle;
 
-    return data_ov012_0216cdc8[data_ov012_0216cd68[rotated / 0x1000]][DIR_DOWN];
+    return ROTATED_DIR_TABLE[ANGLE_SECTOR_QUARTERS[rotated / 0x1000]][DIR_DOWN];
 }
 
 void SetRailActorFlag(FieldActor *actor) {
@@ -973,13 +977,13 @@ void SetActorInitPositionRail(FieldActor *actor, const RailPosition *position) {
     ActorPositionRail *rail = GetNPCRailPosPtrAddr(actor);
 
     rail->position = *position;
-    rail->unk0 = ACTOR_RAIL_POS_SET;
+    rail->magic = ACTOR_RAIL_POS_SET;
 }
 
 BOOL GetActorInitPositionRail(FieldActor *actor, RailPosition *position) {
     ActorPositionRail *rail = GetNPCRailPosPtrAddr(actor);
 
-    if (rail->unk0 == ACTOR_RAIL_POS_SET) {
+    if (rail->magic == ACTOR_RAIL_POS_SET) {
         *position = rail->position;
         return TRUE;
     }

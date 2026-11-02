@@ -1,0 +1,196 @@
+{
+    "$schema": "../../cast.schema.json",
+    "player": [
+        {
+            "species": "SPECIES_LUCARIO",
+            "shown_species": "SPECIES_LUCARIO",
+            "level": 99,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_SERIOUS",
+            "ability": 1,
+            "held_item": "ITEM_FOCUS_SASH",
+            "moves": [ "MOVE_VACUUM_WAVE", "MOVE_REVERSAL", "MOVE_COUNTER", "MOVE_DRAIN_PUNCH" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 31,
+                "defense": 21,
+                "speed": 31,
+                "special_attack": 31,
+                "special_defense": 31
+            },
+            "evs": {
+                "hp": 20,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        }
+    ],
+    "opponent": [
+        {
+            "species": "SPECIES_WEAVILE",
+            "shown_species": "SPECIES_WEAVILE",
+            "level": 99,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_SERIOUS",
+            "ability": 0,
+            "held_item": "ITEM_QUICK_CLAW",
+            "moves": [ "MOVE_ICE_SHARD", "MOVE_NONE", "MOVE_NONE", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 31,
+                "defense": 31,
+                "speed": 0,
+                "special_attack": 31,
+                "special_defense": 31
+            },
+            "evs": {
+                "hp": 0,
+                "attack": 220,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        },
+        {
+            "species": "SPECIES_HOUNDOOM",
+            "shown_species": "SPECIES_HOUNDOOM",
+            "level": 99,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_ADAMANT",
+            "ability": 0,
+            "held_item": "ITEM_CHOPLE_BERRY",
+            "moves": [ "MOVE_FIRE_FANG", "MOVE_NONE", "MOVE_NONE", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 21,
+                "attack": 31,
+                "defense": 31,
+                "speed": 0,
+                "special_attack": 31,
+                "special_defense": 31
+            },
+            "evs": {
+                "hp": 0,
+                "attack": 255,
+                "defense": 255,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        },
+        {
+            "species": "SPECIES_HYDREIGON",
+            "shown_species": "SPECIES_HYDREIGON",
+            "level": 99,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_SERIOUS",
+            "ability": 0,
+            "held_item": "ITEM_ORAN_BERRY",
+            "moves": [ "MOVE_DRAGON_PULSE", "MOVE_NONE", "MOVE_NONE", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 31,
+                "defense": 31,
+                "speed": 0,
+                "special_attack": 31,
+                "special_defense": 31
+            },
+            "evs": {
+                "hp": 255,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 255
+            }
+        },
+        {
+            "species": "SPECIES_BISHARP",
+            "shown_species": "SPECIES_BISHARP",
+            "level": 99,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_SERIOUS",
+            "ability": 0,
+            "held_item": "ITEM_EXPERT_BELT",
+            "moves": [ "MOVE_IRON_HEAD", "MOVE_NONE", "MOVE_NONE", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 0,
+                "attack": 31,
+                "defense": 31,
+                "speed": 31,
+                "special_attack": 31,
+                "special_defense": 31
+            },
+            "evs": {
+                "hp": 0,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 255
+            }
+        },
+        {
+            "species": "SPECIES_SHARPEDO",
+            "shown_species": "SPECIES_SHARPEDO",
+            "level": 99,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_SERIOUS",
+            "ability": 0,
+            "held_item": "ITEM_WATER_GEM",
+            "moves": [ "MOVE_AQUA_JET", "MOVE_NONE", "MOVE_NONE", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 5,
+                "defense": 31,
+                "speed": 19,
+                "special_attack": 31,
+                "special_defense": 31
+            },
+            "evs": {
+                "hp": 255,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 255
+            }
+        },
+        {
+            "species": "SPECIES_ZOROARK",
+            "shown_species": "SPECIES_ZOROARK",
+            "level": 99,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_ADAMANT",
+            "ability": 0,
+            "held_item": "ITEM_DARK_GEM",
+            "moves": [ "MOVE_PAYBACK", "MOVE_NONE", "MOVE_NONE", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 0,
+                "attack": 31,
+                "defense": 31,
+                "speed": 31,
+                "special_attack": 31,
+                "special_defense": 31
+            },
+            "evs": {
+                "hp": 0,
+                "attack": 255,
+                "defense": 255,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        }
+    ]
+}

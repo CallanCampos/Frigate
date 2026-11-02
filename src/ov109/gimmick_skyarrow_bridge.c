@@ -3,6 +3,7 @@
 // zone's music fades in as the camera climbs; and a sound plays when the player passes a point on the way down. The
 // ROM embeds no name for this file, so its name is a guess
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_camera.h"
@@ -25,7 +26,6 @@
 #include "system/iss_sys.h"
 
 #define GIMMICK_STATE_ID 1
-#define ARCID_SKYARROW_BRIDGE 148
 #define OBJ_COUNT 5
 #define EYE_HISTORY_SIZE 32
 
@@ -48,6 +48,13 @@ typedef struct {
     f32 maxHeight;
 } BGMParams;
 
+// What PassingSE is doing with its sound
+enum {
+    PASSING_SE_IDLE,
+    PASSING_SE_PLAYING,
+    PASSING_SE_FADING_OUT,
+};
+
 // The sound of passing a point on the bridge while the camera descends
 typedef struct {
     fx32 prevEyeZ;
@@ -56,7 +63,6 @@ typedef struct {
     s16 head;
     s16 count;
     s16 fadeVolume;
-    // 0: idle, 1: playing, 2: fading out
     u16 state;
     u16 se;
 } PassingSE;
@@ -331,15 +337,15 @@ static void PassingSE_Update(PassingSE *se, FieldCamera *camera, FieldPlayer *pl
     fx32 border;
     u32 seNo;
 
-    if (se->state == 1 || se->state == 2) {
+    if (se->state == PASSING_SE_PLAYING || se->state == PASSING_SE_FADING_OUT) {
         if (!GFL_SndPlayerIsActive(GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_171))) {
-            se->state = 0;
+            se->state = PASSING_SE_IDLE;
         }
-        if (se->state == 2) {
+        if (se->state == PASSING_SE_FADING_OUT) {
             se->fadeVolume -= 16;
             if (se->fadeVolume < 0) {
                 GFL_SndPlayerStop(GFL_SndSeqGetPlayerIndex(se->se));
-                se->state = 0;
+                se->state = PASSING_SE_IDLE;
             } else {
                 GFL_SndPlayerSetVolume(GFL_SndSeqGetPlayerIndex(se->se), se->fadeVolume);
             }
@@ -359,8 +365,8 @@ static void PassingSE_Update(PassingSE *se, FieldCamera *camera, FieldPlayer *pl
     } else {
         se->count = 0;
         se->head = 0;
-        if (se->state == 1 && eye.z > FX32_CONST(1816)) {
-            se->state = 2;
+        if (se->state == PASSING_SE_PLAYING && eye.z > FX32_CONST(1816)) {
+            se->state = PASSING_SE_FADING_OUT;
             se->fadeVolume = 127;
         }
     }
@@ -376,7 +382,7 @@ static void PassingSE_Update(PassingSE *se, FieldCamera *camera, FieldPlayer *pl
         if ((eye.z < border && se->prevEyeZ > border) || (eye.z > border && se->prevEyeZ < border)) {
             if (se->eyeY[se->head] - eye.y >= FX32_CONST(100)) {
                 GFL_SndSEPlay(seNo);
-                se->state = 1;
+                se->state = PASSING_SE_PLAYING;
                 se->se = seNo;
             }
         }

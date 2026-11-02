@@ -6,6 +6,18 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
+// The steps of the event
+enum {
+    STEP_WAIT_COMM_EXIT,
+    STEP_FADE_OUT,
+    STEP_CLOSE_FIELD,
+    STEP_START_PROC,
+    STEP_WAIT_PROC,
+    STEP_OPEN_FIELD,
+    STEP_FADE_IN,
+    STEP_END,
+};
+
 // Also the parameter of the Wi-Fi Battle Subway proc, which sets procResult
 typedef struct {
     u32 mode;
@@ -43,26 +55,26 @@ GameEventReturnCode EventWifiBSubway_Callback(GameEvent *event, u32 *state, void
     Field *field = GSYS_GetField(gsys);
 
     switch (*state) {
-    case 0:
+    case STEP_WAIT_COMM_EXIT:
         // Wait for the comm system to shut down
         if (!GameCommSys_BootCheck(GSYS_GetGameCommSystem(gsys))) {
             (*state)++;
         }
         break;
-    case 1:
+    case STEP_FADE_OUT:
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
         (*state)++;
         break;
-    case 2:
+    case STEP_CLOSE_FIELD:
         GameEvent_ChainNext(event, CreateFieldCloseEvent(gsys, field));
         (*state)++;
         break;
-    case 3:
+    case STEP_START_PROC:
         GSYS_QueueProc(gsys, OVERLAY_WIFI_BSUBWAY, &WIFI_BSUBWAY_PROC_FUNCTIONS, wk);
         (*state)++;
         break;
-    case 4:
+    case STEP_WAIT_PROC:
         if (!GSYS_GetProcMgrState(gsys)) {
             if (wk->procResult == 0) {
                 *wk->result = TRUE;
@@ -72,16 +84,16 @@ GameEventReturnCode EventWifiBSubway_Callback(GameEvent *event, u32 *state, void
             (*state)++;
         }
         break;
-    case 5:
+    case STEP_OPEN_FIELD:
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
         (*state)++;
         break;
-    case 6:
+    case STEP_FADE_IN:
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         (*state)++;
         break;
-    case 7:
+    case STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;

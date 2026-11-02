@@ -20,10 +20,6 @@
 // version's zone as this one's.
 // The file's name is the ROM's string, from GFL_HeapAllocate's call. The names of the functions and tables are swan's
 
-// The archives of the fog and the static light of each zone, which have no name in swan
-#define ARCID_ZONE_FOG_TABLE 80
-#define ARCID_ZONE_LIGHT_TABLE 81
-
 #define ZONE_FOG_TABLE_FILE 29
 #define ZONE_LIGHT_TABLE_FILE 1
 

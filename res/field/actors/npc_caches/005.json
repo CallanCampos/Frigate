@@ -1,0 +1,14 @@
+{
+    "$schema": "../npc_cache.schema.json",
+    "codes": [
+        "OBJ_CODE_108",
+        "OBJ_CODE_MODEL_3",
+        "OBJ_CODE_BACKERS_M",
+        "OBJ_CODE_CYCLIST_F",
+        "OBJ_CODE_CYCLIST_M",
+        "OBJ_CODE_BACKPACKER_F",
+        "OBJ_CODE_BACKPACKER_M",
+        "OBJ_CODE_DEPOT_AGENT",
+        "OBJ_CODE_110"
+    ]
+}

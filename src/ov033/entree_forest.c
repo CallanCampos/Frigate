@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/entree_forest.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -102,7 +103,7 @@ PartyPkm *EntreeForest_CreateSymbolMon(HeapID heapId, GameData *gameData, const 
     u32 pid;
     PartyPkm *pkm;
 
-    levels = GFL_ArcSysReadHeapNewLZ(0xdf, 0, 0, heapId);
+    levels = GFL_ArcSysReadHeapNewLZ(ARCID_ENTREE_FOREST, 0, 0, heapId);
     level = levels[pokemon->species];
     GFL_HeapFree(levels);
     id = getIDAsUInt(GetGameDataPlayerInfo(gameData));

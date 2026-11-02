@@ -175,73 +175,165 @@
 
 // The 2D graphics archives that the code loads by number, named after the source files that load them, or the
 // app's prefix where several do (docs/data.md, 2D graphics). Our names, not swan's
-#define ARCID_BTLV 11                     // btlv_scu.c, btlv_stage.c, pkwd_briefing.c
-#define ARCID_ERROR_WINDOW_GRA 22         // net_err.c, error_window_screen.c, wfc_user_info_warning.c
-#define ARCID_CONFIG_PANEL 27             // config_panel.c
-#define ARCID_IRCBATTLE 28                // ircbattlemenu.c, ircbattlematch.c
-#define ARCID_WIFI_2DCHAR 30              // wifi_2dchar.c, startmenu.c, worldtrade.c
-#define ARCID_WIFI_UNIONCHAR 31           // wifi_2dchar.c
-#define ARCID_WIFIP2PMATCH 32             // wifi_p2pmatch.c
-#define ARCID_TRAINER_CARD_GRA 39         // trainer_card.c, trcard_obj.c, badge_view.c
-#define ARCID_TRAINER_CARD_UNION_GRA 40   // trainer_card.c, badge_view.c
-#define ARCID_SCRCMD_SHOP 53              // scrcmd_shop.c, scrcmd_resort_shop.c
-#define ARCID_CODEIN 58                   // codein.c, br_codein.c
-#define ARCID_WIFI_NOTE 62                // wifi_note.c
-#define ARCID_FIELD_MENU 70               // field_menu.c, field_subscreen.c
-#define ARCID_PLIST 75                    // plist_sys.c, plist_battle.c, plist_menu.c
-#define ARCID_FIELD_PLACE_NAME 83         // field_place_name.c, name_input.c
-#define ARCID_TOWNMAP_GRA 84              // townmap.c, townmap_grh.c, pokedex_detail_map.c
-#define ARCID_ITEMMENU 87                 // itemmenu.c, itemmenu_disp.c
-#define ARCID_BTLV_EFFVM_BG 94            // btlv_effvm.c
-#define ARCID_B_BAG 98                    // b_bag_anm.c, b_bag_main.c, b_bag_obj.c
-#define ARCID_B_PLIST 99                  // b_plist_main.c, vs_multi_list.c
-#define ARCID_PKWD 100                    // pkwd_book.c, pkwd_record_monitor.c, pkwd_selectscreen.c
-#define ARCID_B_CHOICE 101                // b_choice_main.c
-#define ARCID_POKEMONTRADE 103            // pokemontrade_2d.c, pokemontrade_nego.c
-#define ARCID_POKEMONTRADE_DEMO 104       // pokemontrade_demo_common.c, pokemontrade_demo_down.c
-#define ARCID_POKEMONTRADE_2D 105         // pokemontrade_2d.c
-#define ARCID_MIC_TEST 107                // mictest.c
-#define ARCID_NAME_INPUT_GRAPHIC 119      // name_input.c
-#define ARCID_MOVE_TUTOR 125              // move_tutor_main.c
-#define ARCID_SHORTCUT_MENU 129           // shortcut_menu.c
-#define ARCID_LOCAL_TVT 132               // local_tvt_chara.c, local_tvt_util.c
-#define ARCID_WIFIBATTLEMATCH 134         // wifibattlematch_view.c
-#define ARCID_BR_RES 137                  // br_res.c
-#define ARCID_MB_PARENT_SYS 142           // mb_parent_sys.c
-#define ARCID_GTSNEGO_DISP 144            // gtsnego_disp.c
-#define ARCID_MAILBOX 153                 // mailview.c
-#define ARCID_DEMO3D_2D 159               // demo3d_cmdsys.c
-#define ARCID_TVT 170                     // comm_tvt_sys.c, local_tvt_chara.c, local_tvt_util.c
-#define ARCID_BEACON 171                  // beacon_view_setup.c, beacon_detail.c
-#define ARCID_ENTRANCE_CAMERA 177         // entrance_camera.c
-#define ARCID_COMM_BTL_DEMO 178           // comm_btl_demo.c
-#define ARCID_SPIN_TRADE 180              // spin_trade_main.c
-#define ARCID_SPIN_TRADE_OBJ 181          // spin_trade_receipt.c, spin_trade_main.c
-#define ARCID_FLD_FACEUP 184              // fld_faceup.c
-#define ARCID_BTL_REC_SEL 185             // btl_rec_sel.c
-#define ARCID_DRAWING 188                 // drawing.c
-#define ARCID_REPORT 193                  // report.c
-#define ARCID_GEONET 194                  // geonet.c
-#define ARCID_TIME_ICON 195               // time_icon.c
-#define ARCID_FIELD_SAVEANIME 197         // field_saveanime.c
-#define ARCID_PSEL 202                    // psel.c
-#define ARCID_HALL_OF_FAME_PC 210         // hall_of_fame_pc_main.c
-#define ARCID_HALL_OF_FAME_DEMO 213       // hall_of_fame_demo_main.c, hall_of_fame_demo_obj.c
-#define ARCID_MANUAL 218                  // manual_common.c
-#define ARCID_ASSERT_WINDOW_GRA 230       // net_err.c
-#define ARCID_BTLV_EFFVM_PAL_ANIM 231     // btlv_effvm.c
-#define ARCID_CTVT_GAME 233               // ctvt_game.c
-#define ARCID_MEDALBOX 236                // medalbox.c
-#define ARCID_MEDAL_INFO_VIEWER 237       // medal_info_viewer.c
-#define ARCID_MEDAL 238                   // medalbox.c, medal_info_viewer.c
-#define ARCID_CTVT_GAME_CAM 242           // ctvt_game_cam.c, ctvt_game.c
-#define ARCID_FIELD_FMISSION_INFO 243     // field_fmission_info.c
-#define ARCID_FMISSION_VIEW 259           // fmission_view_setup.c
-#define ARCID_FLD3D_CI 267                // fld3d_ci.c
-#define ARCID_FMISSION_APP 270            // fmission_app.c, fmission_app_draw.c
-#define ARCID_GPOWER_APP 285              // gpower_app.c
-#define ARCID_WBT_STADIUM_GIMMICK 291     // wbt_stadium_gimmick.c
-#define ARCID_GIMMICK_POKEWOOD_POSTER 294 // gimmick_pokewood_poster.c
-#define ARCID_GIMMICK 303                 // gimmick_aspertia_city.c, gimmick_league_center.c
+#define ARCID_WM_ICON 0                            // wm_icon.c, net_define.c
+#define ARCID_MAP_REPLACE 10                       // map_replace.c
+#define ARCID_BTLV_EFFVM_PARTICLES 6               // btlv_effvm.c, intro_particle.c
+#define ARCID_BTLV 11                              // btlv_scu.c, btlv_stage.c, pkwd_briefing.c
+#define ARCID_ERROR_WINDOW_GRA 22                  // net_err.c, error_window_screen.c, wfc_user_info_warning.c
+#define ARCID_CONFIG_PANEL 27                      // config_panel.c
+#define ARCID_IRCBATTLE 28                         // ircbattlemenu.c, ircbattlematch.c
+#define ARCID_WIFI_2DCHAR 30                       // wifi_2dchar.c, startmenu.c, worldtrade.c
+#define ARCID_WIFI_UNIONCHAR 31                    // wifi_2dchar.c
+#define ARCID_WIFIP2PMATCH 32                      // wifi_p2pmatch.c
+#define ARCID_PASS_POWER 37                        // pass_power.c
+#define ARCID_TRAINER_CARD_GRA 39                  // trainer_card.c, trcard_obj.c, badge_view.c
+#define ARCID_TRAINER_CARD_UNION_GRA 40            // trainer_card.c, badge_view.c
+#define ARCID_GEONET_PLACE 52                      // geonet.c
+#define ARCID_SCRCMD_SHOP 53                       // scrcmd_shop.c, scrcmd_resort_shop.c
+#define ARCID_WEATHER 55                           // weather_task.c, weather_rain.c, weather_particles.c
+#define ARCID_FIELD_ACTOR_CONFIG 57                // field_actor.c
+#define ARCID_CODEIN 58                            // codein.c, br_codein.c
+#define ARCID_WIFI_NOTE 62                         // wifi_note.c
+#define ARCID_BTLV_EFFVM_MOVE_SCRIPTS 65           // btlv_effvm.c
+#define ARCID_BTLV_EFFVM_EFFECT_SCRIPTS 66         // btlv_effvm.c
+#define ARCID_FIELD_MENU 70                        // field_menu.c, field_subscreen.c
+#define ARCID_FIELD_WIPE_3DOBJ 73                  // fld_wipe_3dobj.c
+#define ARCID_FIELD_EFFECT 74                      // field_effect.c
+#define ARCID_PLIST 75                             // plist_sys.c, plist_battle.c, plist_menu.c
+#define ARCID_FIELD_SCENE_AREA 79                  // fld_scenearea_loader.c
+#define ARCID_ZONE_FOG_TABLE 80                    // zonedata.c, field_zonefog.c
+#define ARCID_ZONE_LIGHT_TABLE 81                  // zonedata.c, field_light_status.c
+#define ARCID_FIELD_PLACE_NAME 83                  // field_place_name.c, name_input.c
+#define ARCID_TOWNMAP_GRA 84                       // townmap.c, townmap_grh.c, pokedex_detail_map.c
+#define ARCID_BGM_INFO 86                          // bgm_info.c
+#define ARCID_ITEMMENU 87                          // itemmenu.c, itemmenu_disp.c
+#define ARCID_BTLV_EFFVM_BG 94                     // btlv_effvm.c
+#define ARCID_POKEDEX_DATA 97                      // pokedex_search_engine.c, pokedex_detail_form.c, box_search.c
+#define ARCID_B_BAG 98                             // b_bag_anm.c, b_bag_main.c, b_bag_obj.c
+#define ARCID_B_PLIST 99                           // b_plist_main.c, vs_multi_list.c
+#define ARCID_PKWD 100                             // pkwd_book.c, pkwd_record_monitor.c, pkwd_selectscreen.c
+#define ARCID_B_CHOICE 101                         // b_choice_main.c
+#define ARCID_POKEMONTRADE 103                     // pokemontrade_2d.c, pokemontrade_nego.c
+#define ARCID_POKEMONTRADE_DEMO 104                // pokemontrade_demo_common.c, pokemontrade_demo_down.c
+#define ARCID_POKEMONTRADE_2D 105                  // pokemontrade_2d.c
+#define ARCID_REGULATION 106                       // poke_regulation.c
+#define ARCID_MIC_TEST 107                         // mictest.c
+#define ARCID_GYM_ELEC 108                         // gym_elec.c
+#define ARCID_MUSICAL_PROGRAM 112                  // musical_system.c
+#define ARCID_MUSICAL_PROGRAM_1 113                // musical_system.c
+#define ARCID_MUSICAL_PROGRAM_2 114                // musical_system.c
+#define ARCID_MUSICAL_PROGRAM_3 115                // musical_system.c
+#define ARCID_FLD3D_CI_RESOURCES 116               // fld3d_ci.c
+#define ARCID_FLD3D_CI_FILE 118                    // fld3d_ci.c
+#define ARCID_NAME_INPUT_GRAPHIC 119               // name_input.c
+#define ARCID_NAME_INPUT 120                       // name_input_data.c
+#define ARCID_GYM_MISTRALTON 122                   // gym_mistralton.c
+#define ARCID_MOVE_TUTOR 125                       // move_tutor_main.c
+#define ARCID_TUBELINE_BRIDGE 128                  // gimmick_tubeline_bridge.c
+#define ARCID_SHORTCUT_MENU 129                    // shortcut_menu.c
+#define ARCID_ENCOUNT_EFFECT_MODEL 130             // encounter_effect_model.c
+#define ARCID_FIELD_GIMMICK_GATE 131               // field_gimmick_gate.c
+#define ARCID_LOCAL_TVT 132                        // local_tvt_chara.c, local_tvt_util.c
+#define ARCID_WIFIBATTLEMATCH 134                  // wifibattlematch_view.c
+#define ARCID_GYM_INSECT 135                       // gym_insect.c
+#define ARCID_BR_RES 137                           // br_res.c
+#define ARCID_GYM_DRIFTVEIL 138                    // gym_driftveil.c
+#define ARCID_MB_PARENT_SYS 142                    // mb_parent_sys.c
+#define ARCID_GTSNEGO_DISP 144                     // gtsnego_disp.c
+#define ARCID_SKYARROW_BRIDGE 148                  // gimmick_skyarrow_bridge.c
+#define ARCID_BATTLE_BG_DATA 151                   // event_battle_return.c, btlv_field.c, btlv_effect.c
+#define ARCID_GYM_ICIRRUS 152                      // gym_icirrus.c
+#define ARCID_MAILBOX 153                          // mailview.c
+#define ARCID_LAND_DATA_PATCH 154                  // land_data_patch.c
+#define ARCID_GIMMICK_LEAGUE_STATUE 155            // gimmick_league_statue.c
+#define ARCID_DEMO3D_2D 159                        // demo3d_cmdsys.c
+#define ARCID_GYM_OPELUCID 160                     // gym_opelucid.c
+#define ARCID_SCRCMD_CAMERA 161                    // scrcmd_camera.c
+#define ARCID_FIELD_GIMMICK_GATE_BOARD_ENTRIES 164 // field_gimmick_gate.c
+#define ARCID_TVT 170                              // comm_tvt_sys.c, local_tvt_chara.c, local_tvt_util.c
+#define ARCID_BEACON 171                           // beacon_view_setup.c, beacon_detail.c
+#define ARCID_FIELD_GIMMICK_GATE_ZONE_DATA 172     // field_gimmick_gate.c
+#define ARCID_POKEDEX_AREA 176                     // pokedex_detail_map.c
+#define ARCID_ENTRANCE_CAMERA 177                  // entrance_camera.c
+#define ARCID_COMM_BTL_DEMO 178                    // comm_btl_demo.c
+#define ARCID_SPIN_TRADE 180                       // spin_trade_main.c
+#define ARCID_SPIN_TRADE_OBJ 181                   // spin_trade_receipt.c, spin_trade_main.c
+#define ARCID_CASTELIA_RUSH 183                    // castelia_rush.c
+#define ARCID_FLD_FACEUP 184                       // fld_faceup.c
+#define ARCID_BTL_REC_SEL 185                      // btl_rec_sel.c
+#define ARCID_UNDERWATER_EFFECT 187                // underwater_effect.c
+#define ARCID_DRAWING 188                          // drawing.c
+#define ARCID_REPORT 193                           // report.c
+#define ARCID_GEONET 194                           // geonet.c
+#define ARCID_TIME_ICON 195                        // time_icon.c
+#define ARCID_FIELD_SAVEANIME 197                  // field_saveanime.c
+#define ARCID_FIELD_ACTOR_ANIMATION 200            // field_actor_animation.c
+#define ARCID_SP_POKE_ACTORS 201                   // sp_poke_gimmick.c
+#define ARCID_PSEL 202                             // psel.c
+#define ARCID_GIMMICK_FUNFEST_LEVELS_BODY 204      // gimmick_funfest_levels.c
+#define ARCID_ITEM_COLLECTOR 205                   // scrcmd_misc.c
+#define ARCID_SCRCMD_STADIUM 206                   // scrcmd_stadium.c
+#define ARCID_GIMMICK_FUNFEST_LEVELS_PARTS 207     // gimmick_funfest_levels.c
+#define ARCID_CAMERA_SOUND 209                     // camera_system.c
+#define ARCID_HALL_OF_FAME_PC 210                  // hall_of_fame_pc_main.c
+#define ARCID_HALL_OF_FAME_DEMO 213                // hall_of_fame_demo_main.c, hall_of_fame_demo_obj.c
+#define ARCID_SP_POKE_SCENE_C 214                  // sp_poke_gimmick.c
+#define ARCID_GIMMICK_PASSING_VEHICLES 217         // gimmick_passing_vehicles.c
+#define ARCID_MANUAL 218                           // manual_common.c
+#define ARCID_FIELD_PALACE_SYS 219                 // field_palace_sys.c
+#define ARCID_ENTREE_FOREST 223                    // entree_forest.c
+#define ARCID_GIMMICK_NUVEMA 224                   // gimmick_nuvema.c
+#define ARCID_MANUAL_IMAGE 227                     // manual_common.c
+#define ARCID_B_BAG_ITEM 228                       // b_bag_item.c
+#define ARCID_ASSERT_WINDOW_GRA 230                // net_err.c
+#define ARCID_BTLV_EFFVM_PAL_ANIM 231              // btlv_effvm.c
+#define ARCID_FIELD_GOOUT_EFFECT 232               // field_goout_effect.c
+#define ARCID_CTVT_GAME 233                        // ctvt_game.c
+#define ARCID_LOCAL_TVT_SCRIPT 234                 // local_tvt_scriptmode.c
+#define ARCID_MEDAL_DEF 235                        // scrcmd_pokemon_center.c, medalbox_data_sys.c, scrcmd_medal.c
+#define ARCID_MEDALBOX 236                         // medalbox.c
+#define ARCID_MEDAL_INFO_VIEWER 237                // medal_info_viewer.c
+#define ARCID_MEDAL 238                            // medalbox.c, medal_info_viewer.c
+#define ARCID_MEDAL_TYPE_SPECIES 239               // scrcmd_pokemon_center.c
+#define ARCID_LOCAL_TVT_CALL_DATA 240              // local_tvt_calldata.c
+#define ARCID_FIELD_GOOUT_EFFECT_DATA 241          // field_goout_effect_data.c
+#define ARCID_CTVT_GAME_CAM 242                    // ctvt_game_cam.c, ctvt_game.c
+#define ARCID_FIELD_FMISSION_INFO 243              // field_fmission_info.c
+#define ARCID_WBT_TOOL 247                         // wbt_tool.c
+#define ARCID_FMISSION_VIEW 259                    // fmission_view_setup.c
+#define ARCID_INFINITY_DUNGEON 260                 // infinity_dungeon_gimmick.c
+#define ARCID_WBT_STADIUM_GIMMICK_MODELS 263       // wbt_stadium_gimmick.c
+#define ARCID_GYM_VIRBANK 264                      // gym_virbank.c
+#define ARCID_FLD3D_CI 267                         // fld3d_ci.c
+#define ARCID_FLD3D_CI_BITMAP 268                  // fld3d_ci.c
+#define ARCID_POKEWOOD_MOVIE 269                   // pokewood_system.c, event_pokewood.c, pkwd_book.c, pkwd_briefing.c
+#define ARCID_FMISSION_APP 270                     // fmission_app.c, fmission_app_draw.c
+#define ARCID_SCRCMD_HIDDEN_HOLLOW 273             // scrcmd_hidden_hollow.c
+#define ARCID_GIMMICK_LEAGUE_GRIMSLEY 278          // gimmick_league_grimsley.c
+#define ARCID_GIMMICK_LEAGUE_CAITLIN 279           // gimmick_league_caitlin.c
+#define ARCID_GIMMICK_LEAGUE_SHAUNTAL 280          // gimmick_league_shauntal.c
+#define ARCID_GIMMICK_LEAGUE_MARSHAL 281           // gimmick_league_marshal.c
+#define ARCID_SHOP_ITEMS 282                       // scrcmd_shop.c
+#define ARCID_SHOP_ITEM_COUNTS 283                 // scrcmd_shop.c
+#define ARCID_GIMMICK_BADGE_GATE 284               // gimmick_badge_gate.c
+#define ARCID_GPOWER_APP 285                       // gpower_app.c
+#define ARCID_GIMMICK_PLASMA_FRIGATE 286           // gimmick_plasma_frigate.c, gimmick_plasma_frigate_lights.c
+#define ARCID_GIMMICK_PLASMA_FRIGATE_DECK 288      // gimmick_plasma_frigate_deck.c
+#define ARCID_FMISSION_DATA 289                    // fmission_app.c, fest_mission_data.c, monolith_mission_info.c
+#define ARCID_GIMMICK_LEAGUE_CHAMPION 290          // gimmick_league_champion.c
+#define ARCID_WBT_STADIUM_GIMMICK 291              // wbt_stadium_gimmick.c
+#define ARCID_ROLLER_COASTER 292                   // gimmick_roller_coaster.c
+#define ARCID_GIMMICK_POKEWOOD_POSTER_MODEL 293    // gimmick_pokewood_poster.c
+#define ARCID_GIMMICK_POKEWOOD_POSTER 294          // gimmick_pokewood_poster.c
+#define ARCID_POKEDEX_HABITAT 296                  // pokedex_common.c, scrcmd_leaves.c
+#define ARCID_RESORT_FIELD 298                     // resort_field.c
+#define ARCID_GIMMICK_GIANT_CHASM_6 299            // gimmick_giant_chasm_6.c
+#define ARCID_GIMMICK_ASPERTIA_CITY 300            // gimmick_aspertia_city.c
+#define ARCID_GIMMICK_UNDERGROUND_RUINS 301        // gimmick_underground_ruins.c
+#define ARCID_PERSONAL_BW1 302                     // poke_personal.c
+#define ARCID_GIMMICK 303                          // gimmick_aspertia_city.c, gimmick_league_center.c
+#define ARCID_SP_POKE_SCENE_D 304                  // sp_poke_gimmick.c
+#define ARCID_SP_POKE_CURVE 305                    // sp_poke_gimmick.c
+#define ARCID_GIMMICK_DRAGONSPIRAL_TOWER_9 306     // gimmick_dragonspiral_tower_9.c
 
 #endif // POKEBW2_CONSTANTS_ARC_H

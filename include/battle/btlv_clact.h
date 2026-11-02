@@ -2,8 +2,8 @@
 #define POKEBW2_BATTLE_BTLV_CLACT_H
 
 // Overlay 168's btlv_clact.c (named by its string), the battle view's 2D cell actors: the effects' OBJ actors with
-// their resources, their moves, scalings and palette fades, and the turn gauge and its popup on the main screen in
-// mode 1. The names are ours; swan has none for this file
+// their resources, their moves, scalings and palette fades, and the turn gauge and its popup on the main screen while a
+// movie is filmed. The names are ours; swan has none for this file
 
 #include "types.h"
 #include "gfl/clact.h"
@@ -11,7 +11,8 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
-BtlvClact *BtlvClact_Create(TCBManager *tcbManager, HeapID heapId, u32 mode);
+// studioMode is BTL_STUDIO_MODE_*
+BtlvClact *BtlvClact_Create(TCBManager *tcbManager, HeapID heapId, u32 studioMode);
 void BtlvClact_Delete(BtlvClact *wk);
 void BtlvClact_Draw(BtlvClact *wk);
 int BtlvClact_AddActor(BtlvClact *wk, u32 arcId, u32 fileId, s16 x, s16 y, fx32 scaleX, fx32 scaleY);

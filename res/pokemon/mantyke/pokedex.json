@@ -1,0 +1,25 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "M",
+    "shapes": [ 11 ],
+    "area": {
+        "all_year": false,
+        "seasons": {
+            "spring": {
+                "ZONE_UNDELLA_BAY": [ "surf" ],
+                "ZONE_ROUTE_21": [ "surf" ]
+            },
+            "summer": {
+                "ZONE_UNDELLA_BAY": [ "surf" ],
+                "ZONE_ROUTE_21": [ "surf" ]
+            },
+            "autumn": {
+                "ZONE_UNDELLA_BAY": [ "surf" ],
+                "ZONE_ROUTE_21": [ "surf" ]
+            },
+            "winter": {
+                "ZONE_ROUTE_21": [ "surf" ]
+            }
+        }
+    }
+}

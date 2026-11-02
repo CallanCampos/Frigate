@@ -43,7 +43,7 @@ void CtvtGameTarget_Init(CtvtGameTarget *target) {
     target->hitFrame = 0;
     target->hitAnimating = FALSE;
     target->grow = 0;
-    target->hitKind = 0;
+    target->hitKind = CTVT_TARGET_HIT_OWN;
     target->hitPending = FALSE;
     target->tcb = NULL;
 }
@@ -118,15 +118,15 @@ static BOOL CtvtGameTarget_UpdateHit(CtvtGameTarget *target) {
     u16 first;
 
     switch (target->hitKind) {
-    case 0:
-    case 1:
+    case CTVT_TARGET_HIT_OWN:
+    case CTVT_TARGET_HIT_OWN_HURRY:
         first = GFL_G3DMgrGetSceneFirstActorIdx(target->g3d, target->scene);
         if (!GFL_G3DActorStepAnmFrameLoop(GFL_G3DMgrGetActor(target->g3d, first + target->actor), 2, FX32_ONE)) {
             return TRUE;
         }
         break;
-    case 2:
-    case 3:
+    case CTVT_TARGET_HIT_OTHER:
+    case CTVT_TARGET_HIT_OTHER_HURRY:
         if (target->grow < 0x310) {
             target->grow += 0x4a;
             if (target->grow > 0x310) {
@@ -149,7 +149,7 @@ static BOOL CtvtGameTarget_Fade(CtvtGameTarget *target) {
     target->alpha -= 3;
     if (target->alpha <= 0) {
         target->alpha = 0;
-        if (target->hitKind <= 1) {
+        if (target->hitKind <= CTVT_TARGET_HIT_OWN_HURRY) {
             return TRUE;
         }
         if (target->active == TRUE) {

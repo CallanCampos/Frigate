@@ -22,8 +22,8 @@ static BOOL Scrcmd_Plugin15_JumpActorOut(VM *vm, FieldScriptEnv *env) {
     u16 actorId = ScriptReadAny(vm, env);
     u16 x = ScriptReadAny(vm, env);
     u16 z = ScriptReadAny(vm, env);
-    u16 a4 = ScriptReadAny(vm, env);
-    GameEvent *event = GimmickHumilau_CreateJumpEvent(gsys, actorId, x, z, a4);
+    u16 unused = ScriptReadAny(vm, env);
+    GameEvent *event = GimmickHumilau_CreateJumpEvent(gsys, actorId, x, z, unused);
 
     if (event == NULL) {
         return FALSE;

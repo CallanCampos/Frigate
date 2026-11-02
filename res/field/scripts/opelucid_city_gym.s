@@ -22,7 +22,7 @@
     WorkSetConst 0x8022, 0
 
 Script_1:
-    Cmd_02A4
+    GimmickResetOpelucid
     WorkSetConst 0x8023, 0
     TrainerFlagGet TRAINER_VETERAN_LUCIUS, 0x8023
     VMStackPush EVENT_WORK_0x40cf

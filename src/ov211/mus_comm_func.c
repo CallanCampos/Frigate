@@ -46,8 +46,8 @@ enum {
     MUS_MSG_MSG_ARC_SIZE,
     MUS_MSG_SCRIPT_SIZE,
     MUS_MSG_SOUND_SIZE,
-    MUS_MSG_UNK144,
-    MUS_MSG_UNK148,
+    MUS_MSG_PROGRAM_POINTS,
+    MUS_MSG_PROGRAM_NPCS,
     MUS_MSG_EQUIP_REQUEST,
     MUS_MSG_EQUIPS,
     MUS_MSG_EQUIP_RESULT,
@@ -165,8 +165,9 @@ struct MusCommWork {
     u8 *playerData;
     u8 *allPlayerData;
     Ov210Work *ov210;
-    u32 unk144;
-    u32 unk148;
+    // The program's points and performers, as the parent packs them (MusicalProgram_PackPoints and _PackNpcs)
+    u32 programPoints;
+    u32 programNpcs;
     // The chunk of the sound data being sent, or the next to be received
     u8 soundChunk;
     BOOL soundStarted;
@@ -566,12 +567,12 @@ static void MusComm_Main(MusCommWork *work) {
         }
         break;
     case MUS_COMM_STATE_SEND_UNK144:
-        if (MusComm_SendMsg(work, MUS_MSG_UNK144, work->unk144, 0xff) == 1) {
+        if (MusComm_SendMsg(work, MUS_MSG_PROGRAM_POINTS, work->programPoints, 0xff) == 1) {
             work->state = MUS_COMM_STATE_SEND_UNK148;
         }
         break;
     case MUS_COMM_STATE_SEND_UNK148:
-        if (MusComm_SendMsg(work, MUS_MSG_UNK148, work->unk148, 0xff) == 1) {
+        if (MusComm_SendMsg(work, MUS_MSG_PROGRAM_NPCS, work->programNpcs, 0xff) == 1) {
             work->state = MUS_COMM_STATE_SEND_PROGRAM_SIZE;
         }
         break;
@@ -826,11 +827,11 @@ static void MusComm_RecvMsg(int netId, int size, const void *data, void *work_, 
             work->ov210->soundDataSize = msg->value;
         }
         break;
-    case MUS_MSG_UNK144:
-        work->unk144 = msg->value;
+    case MUS_MSG_PROGRAM_POINTS:
+        work->programPoints = msg->value;
         break;
-    case MUS_MSG_UNK148:
-        work->unk148 = msg->value;
+    case MUS_MSG_PROGRAM_NPCS:
+        work->programNpcs = msg->value;
         break;
     case MUS_MSG_EQUIP_REQUEST:
         if (work->role == 1) {
@@ -1253,11 +1254,11 @@ BOOL MusComm_AreAllPokesReceived(MusCommWork *comm) {
     return comm->allPokesReceived;
 }
 
-void MusComm_BeginDataTiming(MusCommWork *comm, u32 a1, u32 a2) {
+void MusComm_BeginDataTiming(MusCommWork *comm, u32 programPoints, u32 programNpcs) {
     MusComm_SendTiming(comm, MUS_COMM_TIMING_DATA);
     comm->state = MUS_COMM_STATE_DATA_TIMING;
-    comm->unk144 = a1;
-    comm->unk148 = a2;
+    comm->programPoints = programPoints;
+    comm->programNpcs = programNpcs;
 }
 
 void MusComm_BeginProgramTiming(MusCommWork *comm) {
@@ -1270,12 +1271,12 @@ void MusComm_BeginSendPoke(MusCommWork *comm, MusicalPoke *poke) {
     comm->poke = poke;
 }
 
-u32 MusComm_GetUnk144(MusCommWork *comm) {
-    return comm->unk144;
+u32 MusComm_GetProgramPoints(MusCommWork *comm) {
+    return comm->programPoints;
 }
 
-u32 MusComm_GetUnk148(MusCommWork *comm) {
-    return comm->unk148;
+u32 MusComm_GetProgramNpcs(MusCommWork *comm) {
+    return comm->programNpcs;
 }
 
 u8 MusComm_GetPlayerEquip(MusCommWork *comm, u8 index, u8 a2) {

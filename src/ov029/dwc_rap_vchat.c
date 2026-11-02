@@ -18,6 +18,16 @@
 
 #define VCT_SAMPLE_BYTES 0x880
 
+// The voice's phase on this machine
+enum {
+    // Before a request
+    PHASE_IDLE,
+    // The machine that asks waits for the answer, then asks again
+    PHASE_WAITING,
+    // The voice flows
+    PHASE_TALKING,
+};
+
 typedef struct DWCRapVChatWork {
     // What the microphone samples into, a ring that the stream callback reads
     u8 micRing[VCT_SAMPLE_BYTES];
@@ -31,8 +41,9 @@ typedef struct DWCRapVChatWork {
     VCTSession session;
     // Whether the machine of each net ID is being heard
     int heard[2];
-    int callbackKind;
-    // 0 before a request, 1 while it waits, 2 once the voice flows
+    // The library's mode (a VCTMode), which the callback goes by
+    int mode;
+    // A PHASE_*
     int phase;
     u16 stalled;
     u16 muted;
@@ -139,7 +150,7 @@ static BOOL RequestVoice(u8 aid) {
 static BOOL AcceptVoice(u8 aid) {
     BOOL result;
 
-    if (sVChatWork->requestSession != NULL && sVChatWork->requestSession->state == 4) {
+    if (sVChatWork->requestSession != NULL && sVChatWork->requestSession->state == VCT_STATE_INCOMING) {
         result = FALSE;
         if (VCT_Response(sVChatWork->requestSession, VCT_RESPONSE_OK)) {
             return result;
@@ -154,13 +165,13 @@ static BOOL AcceptVoice(u8 aid) {
 
 static void ManualCallback(u8 aid, VCTEvent event, VCTSession *session, void *userData) {
     switch (event) {
-    case 9:
+    case VCT_EVENT_DISCONNECTED:
         DropSession(session);
         break;
-    case 7:
+    case VCT_EVENT_CONNECTED:
         VCT_StartStreaming(session);
         break;
-    case 12:
+    case VCT_EVENT_ABORT:
         DropSession(session);
         break;
     }
@@ -168,7 +179,7 @@ static void ManualCallback(u8 aid, VCTEvent event, VCTSession *session, void *us
 
 static void SessionCallback(u8 aid, VCTEvent event, VCTSession *session, void *userData) {
     switch (event) {
-    case 1:
+    case VCT_EVENT_INCOMING:
         if (sVChatWork->requestSession != NULL) {
             VCT_Response(session, VCT_RESPONSE_BUSY_HERE);
             VCT_DeleteSession(session);
@@ -176,30 +187,30 @@ static void SessionCallback(u8 aid, VCTEvent event, VCTSession *session, void *u
             sVChatWork->requestSession = session;
         }
         break;
-    case 8:
+    case VCT_EVENT_RESPONDBYE:
         VCT_Response(session, VCT_RESPONSE_OK);
         DropSession(session);
         break;
-    case 9:
+    case VCT_EVENT_DISCONNECTED:
         DropSession(session);
         break;
-    case 4:
+    case VCT_EVENT_CANCEL:
         VCT_Response(session, VCT_RESPONSE_TERMINATED);
         DropSession(session);
         break;
-    case 7:
-        if (session->mode != sVChatWork->callbackKind) {
+    case VCT_EVENT_CONNECTED:
+        if (session->mode != sVChatWork->mode) {
             DropSession(session);
         } else if (VCT_StartStreaming(session)) {
-            sVChatWork->phase = 2;
+            sVChatWork->phase = PHASE_TALKING;
         }
         break;
-    case 2:
+    case VCT_EVENT_REJECT:
         DropSession(session);
         break;
-    case 3:
-    case 11:
-    case 12:
+    case VCT_EVENT_BUSY:
+    case VCT_EVENT_TIMEOUT:
+    case VCT_EVENT_ABORT:
         DropSession(session);
         break;
     }
@@ -233,29 +244,29 @@ void DWCRapVChat_Update(BOOL stalled) {
             sVChatWork->tickBudget -= 0x411a;
         } while (sVChatWork->tickBudget >= 0x411a);
     }
-    if (sVChatWork->callbackKind == 3) {
+    if (sVChatWork->mode == VCT_MODE_CONFERENCE) {
         return;
     }
     switch (sVChatWork->phase) {
-    case 0:
+    case PHASE_IDLE:
         if (DWC_GetMyAID() == 0) {
             if (RequestVoice(1)) {
-                sVChatWork->phase = 1;
+                sVChatWork->phase = PHASE_WAITING;
                 sVChatWork->waitFrames = 60;
             }
         } else if (DWC_GetMyAID() == 1) {
             if (AcceptVoice(0)) {
-                sVChatWork->phase = 2;
+                sVChatWork->phase = PHASE_TALKING;
             }
         }
         break;
-    case 1:
+    case PHASE_WAITING:
         sVChatWork->waitFrames--;
         if (sVChatWork->waitFrames == 0) {
-            sVChatWork->phase = 0;
+            sVChatWork->phase = PHASE_IDLE;
         }
         break;
-    case 2:
+    case PHASE_TALKING:
         break;
     }
 }
@@ -300,15 +311,15 @@ void DWCRapVChat_Start(HeapID heapId, int codec, int count) {
     ret = NNS_SndStrmSetup((NNSSndStrm *)sVChatWork->stream, NNS_SND_STRM_FORMAT_PCM16, sVChatWork->streamBuffer,
                            VCT_SAMPLE_BYTES, isRunningOnDSi() ? 0x40 : 0x41, 2, StreamCallback, sVChatWork);
     GFL_ASSERT(ret);
-    sVChatWork->phase = 0;
+    sVChatWork->phase = PHASE_IDLE;
     sVChatWork->requestSession = NULL;
-    config.mode = 1;
-    sVChatWork->callbackKind = 1;
+    config.mode = VCT_MODE_PHONE;
+    sVChatWork->mode = VCT_MODE_PHONE;
     config.session = &sVChatWork->session;
     config.numSession = count;
     config.aid = DWC_GetMyAID();
     GFL_ASSERT((config.aid != -1));
-    if (sVChatWork->callbackKind == 3) {
+    if (sVChatWork->mode == VCT_MODE_CONFERENCE) {
         config.callback = ManualCallback;
     } else {
         config.callback = SessionCallback;
@@ -329,11 +340,11 @@ static void StartStream(void) {
 
 // Ends the voice chat of the machine that asked
 void DWCRapVChat_RequestEnd(void) {
-    if (sVChatWork->requestSession == NULL || sVChatWork->phase == 0) {
+    if (sVChatWork->requestSession == NULL || sVChatWork->phase == PHASE_IDLE) {
         DWCRap_ResetVoiceChat();
         return;
     }
-    if (sVChatWork->phase == 1) {
+    if (sVChatWork->phase == PHASE_WAITING) {
         if (VCT_Request(sVChatWork->requestSession, VCT_REQUEST_CANCEL)) {
             DWCRap_ResetVoiceChat();
             return;
@@ -387,7 +398,7 @@ BOOL DWCRapVChat_GetSpeaking(void) {
 BOOL DWCRapVChat_AddHeard(u32 netIds, int myNetId) {
     int i;
 
-    if (sVChatWork == NULL || sVChatWork->callbackKind != 3) {
+    if (sVChatWork == NULL || sVChatWork->mode != VCT_MODE_CONFERENCE) {
         return FALSE;
     }
     for (i = 0; i < 2; i++) {
@@ -404,7 +415,7 @@ BOOL DWCRapVChat_AddHeard(u32 netIds, int myNetId) {
 BOOL DWCRapVChat_RemoveHeard(int myNetId) {
     int i;
 
-    if (sVChatWork == NULL || sVChatWork->callbackKind != 3) {
+    if (sVChatWork == NULL || sVChatWork->mode != VCT_MODE_CONFERENCE) {
         return FALSE;
     }
     for (i = 0; i < 2; i++) {

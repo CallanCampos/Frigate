@@ -139,12 +139,12 @@ u32 UnionMain_GetExiting(UnionSystem *unisys) {
     return unisys->unk3634;
 }
 
-void UnionMain_SetSituUnk02(UnionSystem *unisys, u8 value) {
-    unisys->situ.unk02 = value;
+void UnionMain_SetWantedKind(UnionSystem *unisys, u8 value) {
+    unisys->situ.wantedKind = value;
 }
 
-u8 UnionMain_GetSituUnk02(UnionSystem *unisys) {
-    return unisys->situ.unk02;
+u8 UnionMain_GetWantedKind(UnionSystem *unisys) {
+    return unisys->situ.wantedKind;
 }
 
 BOOL UnionMain_IsIdle(GameSystem *gsys) {

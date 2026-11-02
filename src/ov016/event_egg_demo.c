@@ -16,6 +16,18 @@ struct EventEggDemo {
     EggDemoParam demo;
 };
 
+// The steps of the event
+enum {
+    STEP_CHECK_EGG,
+    STEP_SET_PARAM,
+    STEP_FADE_OUT,
+    STEP_CLOSE_FIELD,
+    STEP_START_DEMO,
+    STEP_OPEN_FIELD,
+    STEP_FADE_IN,
+    STEP_END,
+};
+
 GameEventReturnCode EventEggDemo_Callback(GameEvent *event, u32 *state, void *data);
 
 GameEventReturnCode EventEggDemo_Callback(GameEvent *event, u32 *state, void *data) {
@@ -25,42 +37,43 @@ GameEventReturnCode EventEggDemo_Callback(GameEvent *event, u32 *state, void *da
     Field *field = work->field;
 
     switch (*state) {
-    case 0:
-        if (!PokeParty_GetParam(work->pkm, PKM_PARAM_IS_EGG, NULL) || PokeParty_GetParam(work->pkm, 3, NULL) == 1) {
-            *state = 7;
+    case STEP_CHECK_EGG:
+        if (!PokeParty_GetParam(work->pkm, PKM_PARAM_IS_EGG, NULL) ||
+            PokeParty_GetParam(work->pkm, PKM_PARAM_BAD_EGG, NULL) == 1) {
+            *state = STEP_END;
         } else {
-            *state = 1;
+            *state = STEP_SET_PARAM;
         }
         break;
-    case 1:
+    case STEP_SET_PARAM:
         work->demo.gameData = gameData;
         work->demo.pkm = work->pkm;
-        *state = 2;
+        *state = STEP_FADE_OUT;
         break;
-    case 2:
+    case STEP_FADE_OUT:
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
-        *state = 3;
+        *state = STEP_CLOSE_FIELD;
         break;
-    case 3:
+    case STEP_CLOSE_FIELD:
         GameEvent_ChainNext(event, CreateFieldCloseEvent(gsys, field));
-        *state = 4;
+        *state = STEP_START_DEMO;
         break;
-    case 4:
+    case STEP_START_DEMO:
         GSYS_QueueProc(gsys, OVERLAY_EGG_DEMO, &EGG_DEMO_PROC_FUNCTIONS, &work->demo);
-        *state = 5;
+        *state = STEP_OPEN_FIELD;
         break;
-    case 5:
+    case STEP_OPEN_FIELD:
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
-        *state = 6;
+        *state = STEP_FADE_IN;
         break;
-    case 6:
+    case STEP_FADE_IN:
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         GameBeacon_BroadcastEggHatched((u16)PokeParty_GetParam(work->pkm, PKM_PARAM_SPECIES, NULL));
-        *state = 7;
+        *state = STEP_END;
         break;
-    case 7:
+    case STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;

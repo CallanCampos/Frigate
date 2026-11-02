@@ -1,0 +1,26 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "C",
+    "shapes": [ 10 ],
+    "area": {
+        "all_year": false,
+        "seasons": {
+            "spring": {
+                "ZONE_ICIRRUS_CITY": [ "grass" ],
+                "ZONE_MOOR_OF_ICIRRUS": [ "grass" ],
+                "ZONE_ROUTE_8": [ "grass" ]
+            },
+            "summer": {
+                "ZONE_ICIRRUS_CITY": [ "grass" ],
+                "ZONE_MOOR_OF_ICIRRUS": [ "grass" ],
+                "ZONE_ROUTE_8": [ "grass" ]
+            },
+            "autumn": {
+                "ZONE_ICIRRUS_CITY": [ "grass" ],
+                "ZONE_MOOR_OF_ICIRRUS": [ "grass" ],
+                "ZONE_ROUTE_8": [ "grass" ]
+            },
+            "winter": {}
+        }
+    }
+}

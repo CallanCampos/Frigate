@@ -12,18 +12,19 @@
 struct EventMakeArgs {
     BtlSetup *setup;
     BattlePlayers *players;
-    u32 unk08;
+    // Set, the battle proc marks a network error shown when it ends
+    u32 markNetErrShown;
 };
 
 typedef struct {
     GameSystem *gsys;
     BtlSetup *setup;
     BattlePlayers *players;
-    u32 unk0C;
+    u32 markNetErrShown;
     BattleParam param;
 } EventMakeWork;
 
-GameEvent *EventMake_Create(GameSystem *gsys, BtlSetup *setup, BattlePlayers *players, u32 a3);
+GameEvent *EventMake_Create(GameSystem *gsys, BtlSetup *setup, BattlePlayers *players, u32 markNetErrShown);
 GameEventReturnCode EventMake_Callback(GameEvent *event, u32 *state, void *data);
 // A GameEventProvider, for GameEvent_CreateOverlayDelegate
 GameEvent *eventMakeFunc(GameSystem *gsys, void *data);

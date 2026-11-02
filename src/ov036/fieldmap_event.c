@@ -1331,7 +1331,7 @@ static GameEvent *CheckRailDiveEvent(FieldInteractWk *wk, GameSystem *gsys, Fiel
     if (dir == DIR_DOWN && (wk->observeStatus == PLAYER_OBSERVE_NONE || wk->observeStatus == PLAYER_OBSERVE_END)) {
         if (FieldRailTilemap_IsSignBoard(GetTileClass(wk->tileType)) &&
             (RailActor_GetHitBitsDirNoAttr(actor, dir) & 3) != 0) {
-            return func_ov033_0217a0f4(gsys, field, dir);
+            return EventRailSlipdown_CreatePlayer(gsys, field, dir);
         }
     }
     return NULL;
@@ -1469,7 +1469,7 @@ static FieldActor *FindActorForInteraction(FieldInteractWk *wk, Field *field) {
         AdjusGridXZByDir(GetActorFaceDir(actor), &x, &z, 1);
     }
     found = FindActorByGPos(Field_GetActorSystem(field), x, z, GetActorPosY(actor), GRID_SIZE, FALSE);
-    if (found != NULL && func_ov012_021675b4(found)) {
+    if (found != NULL && IsActorFlag256Clear(found)) {
         return found;
     }
     return NULL;

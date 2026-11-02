@@ -1,0 +1,28 @@
+// MOVE_TRUMP_CARD's animation: member 376 of a/0/6/5
+
+#include "asm/btlv_effvm.inc"
+
+    ScriptHeader 1
+    ScriptVariant TrumpCard
+
+TrumpCard:
+    CameraMovePreset 1, 11, 16, 0, 8
+    ParticleLoad 555
+    Wait EFFVM_WAIT_ALL
+    SetYield FALSE
+    PlaySE SEQ_SE_W129_04, 1, EFFVM_DEFENDER, 0, 200, 110, 0, 0, 0
+    PlaySE SEQ_SE_W348_02, 2, EFFVM_DEFENDER, 45, 0, 120, 0, 0, 0
+    SetYield TRUE
+    EmitterAdd 555, 0, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 555, 1, EFFVM_EMIT_DEFENDER, 8, 0x3000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 555, 2, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 555, 3, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 50
+    McssSetVanish EFFVM_DEFENDER, TRUE
+    McssMoveXY EFFVM_DEFENDER, 2, 0x333, 0, 2, 1, 6
+    Wait EFFVM_WAIT_ALL
+    CameraMovePreset 1, 8, 16, 0, 8
+    McssSetVanish EFFVM_DEFENDER, FALSE
+    Wait EFFVM_WAIT_ALL
+    End
+    .balign 4

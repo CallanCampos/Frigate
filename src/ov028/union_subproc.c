@@ -183,7 +183,8 @@ BOOL UnionCommand_IsActive(UnionSystem *unisys) {
 static BOOL UnionCommand_TrainerCard(GameSystem *gsys, UnionSystem *unisys, Field *field, void *arg, GameEvent *event,
                                      GameEvent **next, u8 *step) {
     if (*step == 0) {
-        *next = EventFieldSubprocessTransition_Create(gsys, field, OVERLAY_ID(186), &data_ov012_0216dd6c, arg);
+        *next =
+            EventFieldSubprocessTransition_Create(gsys, field, OVERLAY_ID(186), &TRCARD_SYS_VIEW_PROC_FUNCTIONS, arg);
     } else {
         return TRUE;
     }
@@ -206,7 +207,7 @@ static BOOL UnionCommand_Trade(GameSystem *gsys, UnionSystem *unisys, Field *fie
         (*step)++;
         break;
     case 2:
-        GSYS_QueueProc(gsys, OVERLAY_POKEMONTRADE, &data_ov194_021c640c, trade);
+        GSYS_QueueProc(gsys, OVERLAY_POKEMONTRADE, &POKEMONTRADE_UNION_PROC_FUNCTIONS, trade);
         (*step)++;
         break;
     case 3:

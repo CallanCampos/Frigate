@@ -1,0 +1,34 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The Entralink's tables: res/field/entralink/luminance.json or forest_levels.json",
+    "description": "One of the Entralink's archives: luminance.json, ARCID_FIELD_PALACE_SYS (a/2/1/9), the grayscale of another player's worlds (field_palace_sys.c), or forest_levels.json, ARCID_ENTREE_FOREST (a/2/2/3), the Entree Forest's levels (entree_forest.c). tools/data/entralink_data.py packs them.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "luminance": {
+            "type": "array", "minItems": 4, "maxItems": 4,
+            "description": "The four files that FieldPalaceSys_InitPostFX picks from by the area owner's version class (Intrude_GetAreaOwnerVersionClass) and whether the player has been to the world's town (FieldPalaceSys_CheckEventFlag): 0 and 1 for class 2, 2 and 3 for class 1, the second of each once the player has",
+            "items": {
+                "type": "array", "minItems": 1,
+                "description": "A file's entries, a PalaceLuminanceEntry each: FieldPalaceSys_LoadLuminanceTable takes the first from the second on that matches the area and the season, or else the first",
+                "items": {
+                    "type": "object", "additionalProperties": false, "required": [ "area", "season", "unk2", "table" ],
+                    "properties": {
+                        "area": { "type": [ "integer", "null" ], "minimum": 0, "maximum": 254, "description": "The world, (the zone's area ID - 2) / 4 + 1, or null for any (PALACE_LUMINANCE_ANY)" },
+                        "season": { "enum": [ "spring", "summer", "autumn", "winter", null ], "description": "The season, or null for any (PALACE_LUMINANCE_ANY)" },
+                        "unk2": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "Never read" },
+                        "table": {
+                            "type": "array", "minItems": 32, "maxItems": 32, "items": { "type": "integer", "minimum": 0, "maximum": 31 },
+                            "description": "The gray, 0 to 31, of each luminance from 0 to 31, which ColorFilter_ApplyLUT draws a color of that luminance in"
+                        }
+                    }
+                }
+            }
+        },
+        "forest_levels": {
+            "type": "object",
+            "description": "The level, 0 to 100, of each species from SPECIES_NONE on, by its SPECIES_* constant, that EntreeForest_CreateSymbolMon gives an Entree Forest Pokémon of the species"
+        }
+    }
+}

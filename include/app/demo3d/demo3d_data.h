@@ -40,6 +40,8 @@ enum {
 // The frame of a command that runs when the demo starts, whatever frame it starts at
 #define DEMO3D_CMD_FRAME_START (-1)
 #define DEMO3D_CMD_PARAM_COUNT 8
+// DEMO3D_CMD_TELOP's version for a picture that both versions show
+#define DEMO3D_TELOP_ANY_VERSION 0xff
 
 // What picks one of a model's variants
 enum {

@@ -1,0 +1,12 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "S",
+    "shapes": [ 2 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_GIANT_CHASM": [ "surf", "rippling_surf" ],
+            "ZONE_SEASIDE_CAVE": [ "grass", "surf", "rippling_surf" ]
+        }
+    }
+}

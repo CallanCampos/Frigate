@@ -1,0 +1,5 @@
+MusicalProgram0_Text_Stardom = Stardom
+MusicalProgram0_Text_Empty =
+MusicalProgram0_Text_Empty_2 =
+MusicalProgram0_Text_Empty_3 =
+\pad{38}

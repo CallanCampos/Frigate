@@ -47,6 +47,14 @@ enum {
     EGG_3D_CLOSE,
 };
 
+// Manaphy's egg's sounds: wait to play the first, then for each to end
+enum {
+    MANAPHY_SE_START,
+    MANAPHY_SE_WAIT_FIRST,
+    MANAPHY_SE_WAIT_SECOND,
+    MANAPHY_SE_DONE,
+};
+
 typedef struct {
     u16 actor;
     SRTMatrix srt;
@@ -191,7 +199,7 @@ EggDemoView *EggDemoView_Create(HeapID heapId, PartyPkm *pkm) {
     view->frame = 0;
     view->crackSEPlaying = FALSE;
     view->crackSEWait = 0;
-    view->manaphySEStep = 0;
+    view->manaphySEStep = MANAPHY_SE_START;
     view->vblankTask = GFL_VBlankTCBAdd(EggDemoView_VBlank, view, 1);
     EggDemoView_InitMcss(view);
     EggDemoView_AddMcss(view);
@@ -236,24 +244,24 @@ void EggDemoView_Update(EggDemoView *view) {
         view->frame++;
         if (view->species == SPECIES_MANAPHY) {
             switch (view->manaphySEStep) {
-            case 0:
+            case MANAPHY_SE_START:
                 if (view->frame == 10) {
                     GFL_SndSEPlay(SEQ_SE_EDEMO_02);
-                    view->manaphySEStep = 1;
+                    view->manaphySEStep = MANAPHY_SE_WAIT_FIRST;
                 }
                 break;
-            case 1:
+            case MANAPHY_SE_WAIT_FIRST:
                 if (GFL_SndPlayerIsActiveAny() == FALSE) {
                     GFL_SndSEPlay(SEQ_SE_EDEMO_03);
-                    view->manaphySEStep = 2;
+                    view->manaphySEStep = MANAPHY_SE_WAIT_SECOND;
                 }
                 break;
-            case 2:
+            case MANAPHY_SE_WAIT_SECOND:
                 if (GFL_SndPlayerIsActiveAny() == FALSE) {
-                    view->manaphySEStep = 3;
+                    view->manaphySEStep = MANAPHY_SE_DONE;
                 }
                 break;
-            case 3:
+            case MANAPHY_SE_DONE:
                 break;
             }
         } else {

@@ -22,6 +22,27 @@
 #define MOVE_FRAMES 4
 #define SCALE_COUNT 6
 
+// The steps of the end, error, input and move states
+enum {
+    END_SEQ_FADE_OUT,
+    END_SEQ_WAIT_FADE,
+};
+
+enum {
+    ERROR_SEQ_SHOW,
+    ERROR_SEQ_WAIT,
+};
+
+enum {
+    INPUT_SEQ_WAIT_WIPE,
+    INPUT_SEQ_RUN,
+};
+
+enum {
+    MOVE_SEQ_MOVE,
+    MOVE_SEQ_SCALE,
+};
+
 typedef BOOL (*CodeInStateFunc)(CodeInWork *wk);
 
 // A key's center and half its size
@@ -153,11 +174,11 @@ static BOOL CodeIn_StateInit(CodeInWork *wk) {
 
 static BOOL CodeIn_StateEnd(CodeInWork *wk) {
     switch (wk->seq) {
-    case 0:
+    case END_SEQ_FADE_OUT:
         GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 6, 1, HEAPID_CODEIN);
         wk->seq++;
         break;
-    case 1:
+    case END_SEQ_WAIT_FADE:
         if (GFL_WipeIsFinished() == TRUE) {
             wk->seq++;
         }
@@ -170,11 +191,11 @@ static BOOL CodeIn_StateEnd(CodeInWork *wk) {
 
 static BOOL CodeIn_StateError(CodeInWork *wk) {
     switch (wk->seq) {
-    case 0:
+    case ERROR_SEQ_SHOW:
         CodeInDisp_DrawErrorMessage(wk->window, wk->param.mode, wk->font, wk->param.max);
         wk->seq++;
         break;
-    case 1:
+    case ERROR_SEQ_WAIT:
         if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) || (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) ||
             GFL_HIDIsTouchPressed()) {
             CodeInDisp_DrawMessage(wk->window, wk->param.mode, wk->font, wk->param.max);
@@ -186,7 +207,7 @@ static BOOL CodeIn_StateError(CodeInWork *wk) {
 }
 
 static BOOL CodeIn_StateInput(CodeInWork *wk) {
-    if (wk->seq == 0) {
+    if (wk->seq == INPUT_SEQ_WAIT_WIPE) {
         if (GFL_WipeIsFinished() == TRUE) {
             wk->seq++;
         }
@@ -205,7 +226,7 @@ static BOOL CodeIn_StateMove(CodeInWork *wk) {
     ClActorPos barPos;
 
     switch (wk->seq) {
-    case 0:
+    case MOVE_SEQ_MOVE:
         CodeInDisp_SetCursorVisible(wk, CODEIN_CURSOR_CODE, FALSE);
         for (i = 0; i < wk->codeMax; i++) {
             if (wk->code[i].move.wait == 0) {
@@ -250,7 +271,7 @@ static BOOL CodeIn_StateMove(CodeInWork *wk) {
         }
         wk->count++;
         break;
-    case 1:
+    case MOVE_SEQ_SCALE:
         for (i = wk->largeStart; i < wk->largeEnd; i++) {
             if (wk->code[i].move.scale == SCALE_COUNT) {
                 continue;
@@ -314,12 +335,12 @@ static void CodeIn_HandleKeys(CodeInWork *wk) {
         wk->touchMode = FALSE;
         CodeInDisp_SetKeyCursor(wk, key);
         if (key == CODEIN_KEY_BACK || key == CODEIN_KEY_OK) {
-            if (wk->cur[CODEIN_CURSOR_KEY].state != 2) {
-                wk->cur[CODEIN_CURSOR_KEY].state = 2;
+            if (wk->cur[CODEIN_CURSOR_KEY].state != CODEIN_CURSOR_SEQ_WIDE_KEY) {
+                wk->cur[CODEIN_CURSOR_KEY].state = CODEIN_CURSOR_SEQ_WIDE_KEY;
             }
         } else {
-            if (wk->cur[CODEIN_CURSOR_KEY].state != 1) {
-                wk->cur[CODEIN_CURSOR_KEY].state = 1;
+            if (wk->cur[CODEIN_CURSOR_KEY].state != CODEIN_CURSOR_SEQ_KEY) {
+                wk->cur[CODEIN_CURSOR_KEY].state = CODEIN_CURSOR_SEQ_KEY;
             }
         }
         return;
@@ -383,7 +404,7 @@ static void CodeIn_HandleKeys(CodeInWork *wk) {
             CodeInDisp_SetCursorOnKey(wk, key, CODEIN_CURSOR_PRESS);
             ClActor_SetSequence(wk->code[digit].actor,
                                 CodeInDisp_GetCodeSequence(wk->code[digit].state, wk->code[digit].size));
-            ClActor_SetSequence(wk->cur[CODEIN_CURSOR_PRESS].actor, 3);
+            ClActor_SetSequence(wk->cur[CODEIN_CURSOR_PRESS].actor, CODEIN_CURSOR_SEQ_PRESS);
             group = wk->code[digit].group;
             next = digit + 1;
             if (next == wk->codeMax) {
@@ -448,12 +469,12 @@ static void CodeIn_HandleKeys(CodeInWork *wk) {
         key = keys[wk->cur[CODEIN_CURSOR_KEY].move.y][wk->cur[CODEIN_CURSOR_KEY].move.x];
         CodeInDisp_SetKeyCursor(wk, key);
         if (key == CODEIN_KEY_BACK || key == CODEIN_KEY_OK) {
-            if (wk->cur[CODEIN_CURSOR_KEY].state != 2) {
-                wk->cur[CODEIN_CURSOR_KEY].state = 2;
+            if (wk->cur[CODEIN_CURSOR_KEY].state != CODEIN_CURSOR_SEQ_WIDE_KEY) {
+                wk->cur[CODEIN_CURSOR_KEY].state = CODEIN_CURSOR_SEQ_WIDE_KEY;
             }
         } else {
-            if (wk->cur[CODEIN_CURSOR_KEY].state != 1) {
-                wk->cur[CODEIN_CURSOR_KEY].state = 1;
+            if (wk->cur[CODEIN_CURSOR_KEY].state != CODEIN_CURSOR_SEQ_KEY) {
+                wk->cur[CODEIN_CURSOR_KEY].state = CODEIN_CURSOR_SEQ_KEY;
             }
         }
     }
@@ -476,7 +497,7 @@ static int CodeIn_GetNumber(CodeInWork *wk) {
 
 // Whether the number is at most the parameter's largest. A Friend Code always is
 static BOOL CodeIn_IsNumberValid(CodeInWork *wk) {
-    if (wk->param.mode == 0) {
+    if (wk->param.mode == CODEIN_MODE_FRIEND_CODE) {
         return TRUE;
     }
     if (CodeIn_GetNumber(wk) <= wk->param.max) {
@@ -490,7 +511,7 @@ static void CodeIn_Confirm(CodeInWork *wk) {
     int i;
     StrBuf *digit = GFL_StrBufCreate(100, HEAPID_CODEIN);
 
-    wk->btn[1].state = 1;
+    wk->btn[1].state = CODEIN_BUTTON_PRESSED;
     wk->btn[1].move.wait = 0;
     for (i = 0; i < wk->codeMax; i++) {
         if (wk->code[i].state == 0) {
@@ -510,7 +531,7 @@ static void CodeIn_Backspace(CodeInWork *wk) {
     int group;
     int prevGroup;
 
-    wk->btn[0].state = 1;
+    wk->btn[0].state = CODEIN_BUTTON_PRESSED;
     wk->btn[0].move.wait = 0;
     if (wk->focus == 0) {
         wk->cur[CODEIN_CURSOR_CODE].state = wk->codeMax - 1;
@@ -622,7 +643,7 @@ static void CodeIn_ButtonCallback(u32 button, u32 event, void *work) {
                 CodeInDisp_SetCursorVisible(wk, CODEIN_CURSOR_KEY, FALSE);
                 CodeInDisp_SetCursorVisible(wk, CODEIN_CURSOR_PRESS, TRUE);
                 CodeInDisp_SetCursorOnKey(wk, key, CODEIN_CURSOR_PRESS);
-                ClActor_SetSequence(wk->cur[CODEIN_CURSOR_PRESS].actor, 3);
+                ClActor_SetSequence(wk->cur[CODEIN_CURSOR_PRESS].actor, CODEIN_CURSOR_SEQ_PRESS);
                 group = wk->code[digit].group;
                 next = digit + 1;
                 if (next == wk->codeMax) {

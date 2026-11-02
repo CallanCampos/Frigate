@@ -1,5 +1,6 @@
 #include "types.h"
 #include "app/name_input_data.h"
+#include "constants/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/heap.h"
 #include "gfl/str.h"
@@ -7,9 +8,7 @@
 
 // The name-entry screen's tables, named after the ROM's "namein_data.c". The name-entry screen is overlay 280
 
-// The name-entry screen's archive
-#define ARCID_NAME_INPUT 0x78
-// Its members: the keyboards, then the word tables, then the conversion table
+// The members of ARCID_NAME_INPUT: the keyboards, then the word tables, then the conversion table
 #define NARC_NAME_INPUT_KEYBOARD_0 0
 #define NARC_NAME_INPUT_WORD_TABLE_0 5
 #define NARC_NAME_INPUT_CONV_TABLE 8

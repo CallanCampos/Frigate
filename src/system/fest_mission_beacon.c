@@ -44,7 +44,7 @@ static BOOL FestMissionLogEntry_FromBeacon(LinkFestival *festival, FestMissionLo
                                            u32 score, u32 mode, u32 own);
 static int FestMissionOffers_Find(LinkFestival *festival, const GameBeacon *beacon);
 
-// What unk0_20 has to be below for each target of a mission of kind 5, or 0 when it can be anything
+// What targetVariant has to be below for each target of a mission of kind 5, or 0 when it can be anything
 static const u16 FestMission_Kind5Max[10] = { 0, 0, 3, 5, 0, 0, 3, 2, 20, 0 };
 
 // Whether a mission's target is not valid, by the mission's kind
@@ -325,7 +325,7 @@ BOOL FestMission_IsBeaconInvalid(LinkFestival *festival, const GameBeacon *beaco
 }
 
 static BOOL FestMission_IsKind1TargetInvalid(const FestMissionInfo *info) {
-    if (info->target > SPECIES_GENESECT || info->unk0_20 != 0) {
+    if (info->target > SPECIES_GENESECT || info->targetVariant != 0) {
         return TRUE;
     }
     return FALSE;
@@ -340,7 +340,7 @@ static BOOL FestMission_IsKind2TargetInvalid(const FestMissionInfo *info) {
 #endif
         return TRUE;
     }
-    if (info->unk0_20 != 0) {
+    if (info->targetVariant != 0) {
         return TRUE;
     }
     return FALSE;
@@ -351,17 +351,17 @@ static BOOL FestMission_IsKind3TargetInvalid(const FestMissionInfo *info) {
         return TRUE;
     }
     if (info->target == 5) {
-        if (info->unk0_20 >= 27) {
+        if (info->targetVariant >= 27) {
             return TRUE;
         }
-    } else if (info->unk0_20 != 0) {
+    } else if (info->targetVariant != 0) {
         return TRUE;
     }
     return FALSE;
 }
 
 static BOOL FestMission_IsKind4TargetInvalid(const FestMissionInfo *info) {
-    if (info->target >= 17 || info->unk0_20 != 0) {
+    if (info->target >= 17 || info->targetVariant != 0) {
         return TRUE;
     }
     return FALSE;
@@ -374,7 +374,7 @@ static BOOL FestMission_IsKind5TargetInvalid(const FestMissionInfo *info) {
         return TRUE;
     }
     max = FestMission_Kind5Max[info->target];
-    if (max != 0 && info->unk0_20 >= max) {
+    if (max != 0 && info->targetVariant >= max) {
         return TRUE;
     }
     return FALSE;

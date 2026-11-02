@@ -1,0 +1,205 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A species' Pokédex data: res/pokemon/<species>/pokedex.json",
+    "description": "What the Pokédex's search and area map know of a species, which tools/data/pokedex_data.py packs into ARCID_POKEDEX_DATA's files 0 to 2 (a/0/9/7) and ARCID_POKEDEX_AREA (a/1/7/6), in the order of generated/species.txt. The species from SPECIES_NONE to SPECIES_EGG have one, and those after them have none: they have no shape and live nowhere.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "shapes" ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "This schema, for editors"
+        },
+        "initial": {
+            "description": "The letter the species' name starts with, which the search's initials pick from (ARCID_POKEDEX_DATA's file 1, PokedexSearchEngine's initials: 0 for A to 25 for Z, 26 for none); null for none. Every species before the last with one has one: SPECIES_NONE to SPECIES_GENESECT",
+            "anyOf": [
+                {
+                    "enum": [
+                        "A",
+                        "B",
+                        "C",
+                        "D",
+                        "E",
+                        "F",
+                        "G",
+                        "H",
+                        "I",
+                        "J",
+                        "K",
+                        "L",
+                        "M",
+                        "N",
+                        "O",
+                        "P",
+                        "Q",
+                        "R",
+                        "S",
+                        "T",
+                        "U",
+                        "V",
+                        "W",
+                        "X",
+                        "Y",
+                        "Z"
+                    ]
+                },
+                {
+                    "type": "null"
+                }
+            ]
+        },
+        "shapes": {
+            "type": "array",
+            "minItems": 1,
+            "description": "The body shape of the species and then of each of its other forms, in form order: the search's shape icon, 0 to 13 (POKEDEX_SEARCH_SHAPE_COUNT; PokedexSearchEngine_GetShape). ARCID_POKEDEX_DATA's file 2 has the species' shapes in species order, then every other form's, and file 0 links a species to its forms and each form to the next, which the search and pokedex_info.c's next form follow, so the count of shapes is the count of forms that the Pokédex knows",
+            "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 13
+            }
+        },
+        "area": {
+            "description": "Where the species lives, on the area map (PokedexHabitat in pokedex_detail_map.c, ARCID_POKEDEX_AREA's file of species - 1). Without one it lives nowhere",
+            "anyOf": [
+                {
+                    "$ref": "#/$defs/area"
+                },
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [ "black2", "white2" ],
+                    "description": "The area for Black 2 and for White 2, where they differ",
+                    "properties": {
+                        "black2": {
+                            "$ref": "#/$defs/area"
+                        },
+                        "white2": {
+                            "$ref": "#/$defs/area"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    "$defs": {
+        "area": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [ "all_year" ],
+            "properties": {
+                "all_year": {
+                    "type": "boolean",
+                    "description": "Whether the species lives in the same places all year (allYear), so the map shows no season; then it has places, else seasons"
+                },
+                "places": {
+                    "type": "object",
+                    "description": "The town map's places where the species lives, each by its zone (sPokedexDetailMapZones in pokedex_detail_map.c, which gives the places' order), with the kinds of habitat it has there: the encounter groups, which the map draws as land (HABITAT_LAND: grass, dark_grass, shaking_grass), water (HABITAT_WATER: surf, rippling_surf) and fishing (HABITAT_FISHING: fishing, rippling_fishing). No places is nowhere",
+                    "additionalProperties": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "minItems": 1,
+                        "items": {
+                            "enum": [
+                                "grass",
+                                "dark_grass",
+                                "shaking_grass",
+                                "surf",
+                                "rippling_surf",
+                                "fishing",
+                                "rippling_fishing"
+                            ]
+                        }
+                    }
+                },
+                "seasons": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [ "spring", "summer", "autumn", "winter" ],
+                    "description": "The places of each season, which the map shows for the game's season",
+                    "properties": {
+                        "spring": {
+                            "type": "object",
+                            "description": "The town map's places where the species lives, each by its zone (sPokedexDetailMapZones in pokedex_detail_map.c, which gives the places' order), with the kinds of habitat it has there: the encounter groups, which the map draws as land (HABITAT_LAND: grass, dark_grass, shaking_grass), water (HABITAT_WATER: surf, rippling_surf) and fishing (HABITAT_FISHING: fishing, rippling_fishing). No places is nowhere",
+                            "additionalProperties": {
+                                "type": "array",
+                                "uniqueItems": true,
+                                "minItems": 1,
+                                "items": {
+                                    "enum": [
+                                        "grass",
+                                        "dark_grass",
+                                        "shaking_grass",
+                                        "surf",
+                                        "rippling_surf",
+                                        "fishing",
+                                        "rippling_fishing"
+                                    ]
+                                }
+                            }
+                        },
+                        "summer": {
+                            "type": "object",
+                            "description": "The town map's places where the species lives, each by its zone (sPokedexDetailMapZones in pokedex_detail_map.c, which gives the places' order), with the kinds of habitat it has there: the encounter groups, which the map draws as land (HABITAT_LAND: grass, dark_grass, shaking_grass), water (HABITAT_WATER: surf, rippling_surf) and fishing (HABITAT_FISHING: fishing, rippling_fishing). No places is nowhere",
+                            "additionalProperties": {
+                                "type": "array",
+                                "uniqueItems": true,
+                                "minItems": 1,
+                                "items": {
+                                    "enum": [
+                                        "grass",
+                                        "dark_grass",
+                                        "shaking_grass",
+                                        "surf",
+                                        "rippling_surf",
+                                        "fishing",
+                                        "rippling_fishing"
+                                    ]
+                                }
+                            }
+                        },
+                        "autumn": {
+                            "type": "object",
+                            "description": "The town map's places where the species lives, each by its zone (sPokedexDetailMapZones in pokedex_detail_map.c, which gives the places' order), with the kinds of habitat it has there: the encounter groups, which the map draws as land (HABITAT_LAND: grass, dark_grass, shaking_grass), water (HABITAT_WATER: surf, rippling_surf) and fishing (HABITAT_FISHING: fishing, rippling_fishing). No places is nowhere",
+                            "additionalProperties": {
+                                "type": "array",
+                                "uniqueItems": true,
+                                "minItems": 1,
+                                "items": {
+                                    "enum": [
+                                        "grass",
+                                        "dark_grass",
+                                        "shaking_grass",
+                                        "surf",
+                                        "rippling_surf",
+                                        "fishing",
+                                        "rippling_fishing"
+                                    ]
+                                }
+                            }
+                        },
+                        "winter": {
+                            "type": "object",
+                            "description": "The town map's places where the species lives, each by its zone (sPokedexDetailMapZones in pokedex_detail_map.c, which gives the places' order), with the kinds of habitat it has there: the encounter groups, which the map draws as land (HABITAT_LAND: grass, dark_grass, shaking_grass), water (HABITAT_WATER: surf, rippling_surf) and fishing (HABITAT_FISHING: fishing, rippling_fishing). No places is nowhere",
+                            "additionalProperties": {
+                                "type": "array",
+                                "uniqueItems": true,
+                                "minItems": 1,
+                                "items": {
+                                    "enum": [
+                                        "grass",
+                                        "dark_grass",
+                                        "shaking_grass",
+                                        "surf",
+                                        "rippling_surf",
+                                        "fishing",
+                                        "rippling_fishing"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

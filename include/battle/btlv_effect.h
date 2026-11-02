@@ -19,9 +19,9 @@ typedef struct BtlvMoveEffectParam {
     u16 move;          // 0x00
     u32 attackerPos;   // 0x04
     u32 targetPos;     // 0x08
-    u8 unk0C;          // 0x0C arg5 of BtlvScu_StartMoveEffect
-    u8 unk0D;          // 0x0D its arg6
-    s32 unk10;         // 0x10 its arg4, PML_MoveGetParam(move, 27); BtlvEffect_StartMove keeps a byte of it
+    u8 variant;        // 0x0C which of the script's variants runs, the turn of a two-turn move
+    u8 unk0D;          // 0x0D arg6 of BtlvScu_StartMoveEffect
+    s32 target;        // 0x10 the move's MOVE_TARGET_* (MOVE_PARAM_TARGET); BtlvEffect_StartMove keeps a byte of it
 } BtlvMoveEffectParam; // size 0x14
 
 // How BtlvEffTool_Move moves a value
@@ -82,7 +82,8 @@ void BtlvEffect_StartMove(const BtlvMoveEffectParam *param);
 void BtlvEffect_Resume(void);
 void BtlvEffect_StartDamage(u32 pos, u16 move);
 void BtlvEffect_StartEffect23B(u8 viewPos);
-void BtlvEffect_StartEffect23A(u8 pos, u16 itemNo, u8 arg2, u32 arg3, u32 arg4);
+// A ball thrown at pos, from SC_BALL_THROW's arguments
+void BtlvEffect_StartBallThrow(u8 pos, u16 itemNo, u8 shakes, u32 caught, u32 critical);
 void BtlvEffect_StartEffect23D(u8 pos, u16 itemNo);
 void BtlvEffect_StartChangeSprite(PartyPkm *pkm, u32 viewPos);
 void BtlvEffect_ChangeSprite(PartyPkm *pkm, u32 viewPos);
@@ -143,7 +144,7 @@ enum {
 
 void BtlvEffect_SetVanish(u32 target, BOOL hide);
 // Turns a side of a rotation battle; mode 1 does nothing
-void BtlvEffect_StartRotation(u8 mode, u32 side, u32 arg2);
+void BtlvEffect_StartRotation(u8 mode, u32 side, u32 playSe);
 void BtlvEffect_SwapPokemon(u8 pos1, u8 pos2);
 s32 BtlvEffect_GetTrainerIndex(BtlvMcssPos pos);
 
@@ -190,11 +191,11 @@ void BtlvEffect_PlayBgmNoPinch(u32 bgm);
 
 void BtlvEffect_SetState(u32 state);
 u32 BtlvEffect_GetState(void);
-void BtlvEffect_SetFlag26(u32 arg0);
-u32 BtlvEffect_GetFlag26(void);
-BOOL BtlvEffect_GetUnk2E4(void);
-BOOL BtlvEffect_GetUnk304(void);
-void BtlvEffect_SetPokemonCheck(u32 arg0);
+void BtlvEffect_SetMuteSE(u32 mute);
+u32 BtlvEffect_GetMuteSE(void);
+BOOL BtlvEffect_IsShooterEnabled(void);
+BOOL BtlvEffect_IsBagEnabled(void);
+void BtlvEffect_SetPokemonReverse(u32 byPos);
 
 // The effect's task slots: a task with its end function and group, its end, and the end of a group's tasks
 void BtlvEffect_AddTask(TCB *tcb, void (*endFunc)(TCB *tcb), u32 group);

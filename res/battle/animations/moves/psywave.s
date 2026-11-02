@@ -1,0 +1,58 @@
+// MOVE_PSYWAVE's animation: member 149 of a/0/6/5
+
+#include "asm/btlv_effvm.inc"
+
+    ScriptHeader 1
+    ScriptVariant Psywave
+
+Psywave:
+    CameraMovePreset 1, 9, 12, 0, 8
+    Wait EFFVM_WAIT_ALL
+    SetYield FALSE
+    PlaySE SEQ_SE_W014_01, 1, EFFVM_DEFENDER, 0, 0, 120, 0, 0, 0
+    PlaySE SEQ_SE_W014_01, 2, EFFVM_DEFENDER, 20, 0, 120, 0, 0, 0
+    PlaySE SEQ_SE_W014_01, 1, EFFVM_DEFENDER, 40, 0, 120, 0, 0, 0
+    PlaySE SEQ_SE_W014_01, 2, EFFVM_DEFENDER, 60, 0, 120, 0, 0, 0
+    PanSE 1, 0, EFFVM_ATTACKER, EFFVM_DEFENDER, 0, 70, 0, 0
+    PanSE 2, 0, EFFVM_ATTACKER, EFFVM_DEFENDER, 0, 70, 0, 0
+    SetYield TRUE
+    ParticleLoad 317
+    EmitterMove 317, 0, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x1000, 0x1000, 0x1000, 0x3000
+    WaitFrames 1
+    EmitterMove 317, 0, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x3000
+    WaitFrames 1
+    EmitterMove 317, 0, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x3000
+    WaitFrames 1
+    EmitterMove 317, 0, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x3000
+    WaitFrames 1
+    EmitterMove 317, 0, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x3000
+    WaitFrames 1
+    EmitterMove 317, 0, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x3000
+    WaitFrames 1
+    EmitterMove 317, 0, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x3000
+    WaitFrames 1
+    EmitterMove 317, 0, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x3000
+    WaitFrames 1
+    EmitterMove 317, 0, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x3000
+    WaitFrames 1
+    EmitterMove 317, 0, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x3000
+    WaitFrames 20
+    CameraMovePreset 1, 11, 12, 0, 8
+    WaitFrames 10
+    Wait EFFVM_WAIT_ALL
+    SetYield FALSE
+    PlaySE SEQ_SE_W121_01, 1, EFFVM_DEFENDER, 0, 0, 125, 0, 0, 0
+    PlaySE SEQ_SE_W129_04, 2, EFFVM_DEFENDER, 0, 0, 105, 0, 0, 0
+    PlaySE SEQ_SE_DUMMY5, 2, EFFVM_DEFENDER, 80, 0, 0, 0, 0, 0
+    MoveSE 2, 0, 0, 0, 1500, 0, 80, 0, 0
+    MoveSE 2, 0, 1, 90, 0, 60, 20, 0, 0
+    SetYield TRUE
+    EmitterAdd 317, 1, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    McssSetVanish EFFVM_DEFENDER, TRUE
+    McssScale EFFVM_DEFENDER, 2, 0x4cd, -0x4cd, 2, 1, 1
+    Wait EFFVM_WAIT_ALL
+    CameraMovePreset 1, 8, 16, 0, 8
+    McssSetVanish EFFVM_DEFENDER, FALSE
+    Wait EFFVM_WAIT_ALL
+    End
+    .balign 4

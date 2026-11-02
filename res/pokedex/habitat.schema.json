@@ -1,0 +1,190 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "An area of the Pokédex's habitat list: res/pokedex/habitats/<zone>.json",
+    "description": "One file of ARCID_POKEDEX_HABITAT (a/2/9/6, PokedexHabitatFile in pokedex_common.h): an area of the habitat list, which the Pokédex's habitat screen (pokedex_habitat.c) and the script command PokeDexCheckHabitatList (scrcmd_leaves.c) read, named after the zone that sPokedexHabitats in pokedex_common.c gives the file, or by its number if the table gives it none. The kinds of habitat are TYPE_LAND, TYPE_WATER and TYPE_FISHING of pokedex_habitat.c. tools/data/pokedex_data.py packs them for each version; a value that differs between the versions is an object with one for each.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "kinds", "by_season", "land", "species" ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "This schema, for editors"
+        },
+        "kinds": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "enum": [ "land", "water", "fishing" ]
+            },
+            "description": "The kinds of habitat that the area has (conditions): the list shows the area once the player can reach one of them, the land always, the water and fishing after the story flags FLAG_CONDITION_1 and FLAG_CONDITION_2 of pokedex_common.c"
+        },
+        "by_season": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "enum": [ "land", "water", "fishing" ]
+            },
+            "description": "The kinds whose species differ by season (values), so the screen shows the season's; for the others it shows spring's all year"
+        },
+        "land": {
+            "enum": [ "tall_grass", "sand", "swamp", "place", "place_2", "land", "none" ],
+            "description": "What the screen says lives on the area's land (unk6, PokedexHabitat_GetHabitatMessage): PokedexHabitat_Text_PokemonLivingTallGrass, ...Sand, ...Swamp, ...Place, ...Place_2, ...Land, or NoPokemonLivesHere"
+        },
+        "species": {
+            "type": "array",
+            "maxItems": 30,
+            "description": "The species of the area, in the screen's order, at most 30",
+            "items": {
+                "$ref": "#/$defs/species"
+            }
+        }
+    },
+    "$defs": {
+        "species": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [ "species", "present" ],
+            "properties": {
+                "species": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/species_id"
+                        },
+                        {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [ "black2", "white2" ],
+                            "description": "The species for Black 2 and for White 2, where they differ",
+                            "properties": {
+                                "black2": {
+                                    "$ref": "#/$defs/species_id"
+                                },
+                                "white2": {
+                                    "$ref": "#/$defs/species_id"
+                                }
+                            }
+                        }
+                    ]
+                },
+                "present": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/present"
+                        },
+                        {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [ "black2", "white2" ],
+                            "description": "Where it is for Black 2 and for White 2, where they differ",
+                            "properties": {
+                                "black2": {
+                                    "$ref": "#/$defs/present"
+                                },
+                                "white2": {
+                                    "$ref": "#/$defs/present"
+                                }
+                            }
+                        }
+                    ]
+                },
+                "forms": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/forms"
+                        },
+                        {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [ "black2", "white2" ],
+                            "description": "The forms for Black 2 and for White 2, where they differ",
+                            "properties": {
+                                "black2": {
+                                    "$ref": "#/$defs/forms"
+                                },
+                                "white2": {
+                                    "$ref": "#/$defs/forms"
+                                }
+                            }
+                        }
+                    ]
+                },
+                "unk1a": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535,
+                    "description": "Unread; 0 when left out"
+                }
+            }
+        },
+        "species_id": {
+            "type": "string",
+            "x-constant": "SPECIES_"
+        },
+        "present": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [ "land", "water", "fishing" ],
+            "description": "The seasons in which the species is in each kind of habitat of the area (present)",
+            "properties": {
+                "land": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "enum": [ "spring", "summer", "autumn", "winter" ]
+                    }
+                },
+                "water": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "enum": [ "spring", "summer", "autumn", "winter" ]
+                    }
+                },
+                "fishing": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "enum": [ "spring", "summer", "autumn", "winter" ]
+                    }
+                }
+            }
+        },
+        "forms": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "The form whose icon the screen shows in each kind of habitat, in each season from spring, if the player has seen it (other); 0 for a kind that is left out",
+            "properties": {
+                "land": {
+                    "type": "array",
+                    "minItems": 4,
+                    "maxItems": 4,
+                    "items": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255
+                    }
+                },
+                "water": {
+                    "type": "array",
+                    "minItems": 4,
+                    "maxItems": 4,
+                    "items": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255
+                    }
+                },
+                "fishing": {
+                    "type": "array",
+                    "minItems": 4,
+                    "maxItems": 4,
+                    "items": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255
+                    }
+                }
+            }
+        }
+    }
+}

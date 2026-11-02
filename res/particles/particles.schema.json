@@ -1,0 +1,271 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A particle resource: res/particles/<archive>/<member>/particles.json, or res/graphics/<archive>/<member>/particles.json",
+    "description": "A particle resource (SPA) of ARCID_BTLV_EFFVM_PARTICLES (a/0/0/6), which btlv_effvm.c and intro_particle.c load, or of another archive: its emitters, which SPLManager_LoadResources reads and SPLManager_CreateEmitter creates by their index, and its textures, whose pixels are the PNGs beside it. Fields have lib/spl's names. tools/data/nitro_particles.py builds the resource from them for tools/data/graphics_archive.py, computing its header, its emitters' flags of the blocks they have, its texture animations' counts and its textures' headers. Fixed-point fields are the integers the game keeps: fx32 and fx16 in 4096ths, angles in 65536ths of a turn, and a particle's life, over which the animations run, from 0 to 255.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "emitters", "textures" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "emitters": {
+            "type": "array",
+            "description": "The resource's emitters (SPLResource), in order: each its header's fields (SPLResourceHeader), then the blocks that follow it, each only where the emitter has it",
+            "items": { "$ref": "#/$defs/emitter" }
+        },
+        "textures": {
+            "type": "array",
+            "description": "The resource's textures, in order (SPLTextureResource), each its PNG, <name>.png, or for a format that isn't decoded its data as it is, <name>.bin",
+            "items": { "$ref": "#/$defs/texture" }
+        }
+    },
+    "$defs": {
+        "emitter": {
+            "type": "object", "additionalProperties": false,
+            "required": [ "emissionType", "drawType", "emissionAxis", "hasRotation", "randomInitAngle", "autoTerminate", "followEmitter",
+                          "polygonRotAxis", "polygonReferencePlane", "randomLoopOffset", "drawChildrenFirst", "hideParent", "relativeToBasePos",
+                          "fixedPolygonID", "childFixedPolygonID", "emitterBasePos", "emissionCount", "radius", "length", "axis", "color",
+                          "initVelPositionAmplifier", "initVelAxisAmplifier", "baseScale", "aspectRatio", "startDelay", "minRotation",
+                          "maxRotation", "initAngle", "emitterLifeTime", "particleLifeTime", "scaleVariance", "lifeTimeVariance",
+                          "velocityVariance", "emissionInterval", "baseAlpha", "airResistance", "texture", "loopTime", "dirStretch",
+                          "textureRepeatShiftS", "textureRepeatShiftT", "scaleAnimDir", "dirFromPosition", "flipTextureS", "flipTextureT",
+                          "polygonX", "polygonY" ],
+            "properties": {
+                "emissionType": { "enum": [ "point", "sphere_surface", "circle_border", "circle_border_uniform", "sphere", "circle", "cylinder_surface", "cylinder", "hemisphere_surface", "hemisphere" ], "description": "Where particles start, relative to the emitter (SPL_EMISSION_*): circles and cylinders lie in the plane of the emitter's cross axes, hemispheres on the side their normal points to; circle_border_uniform spreads them evenly around the circle" },
+                "drawType": { "$ref": "#/$defs/drawType" },
+                "emissionAxis": { "enum": [ "z", "y", "x", "emitter" ], "description": "The axis the circles and cylinders of emission are around (SPL_AXIS_*): emitter for the emitter's axis" },
+                "hasRotation": { "type": "boolean", "description": "Turns the particles, each at an angular velocity from minRotation to maxRotation" },
+                "randomInitAngle": { "type": "boolean", "description": "Starts each particle at a random angle rather than at initAngle" },
+                "autoTerminate": { "type": "boolean", "description": "Deletes the emitter once it has emitted for its life time and its particles are gone" },
+                "followEmitter": { "type": "boolean", "description": "Moves the particles with the emitter after they are emitted" },
+                "polygonRotAxis": { "$ref": "#/$defs/polygonRotAxis" },
+                "polygonReferencePlane": { "$ref": "#/$defs/polygonReferencePlane" },
+                "randomLoopOffset": { "type": "boolean", "description": "Starts each particle's looped animations at a random point" },
+                "drawChildrenFirst": { "type": "boolean", "description": "Draws the child particles before their parents" },
+                "hideParent": { "type": "boolean", "description": "Draws only the child particles" },
+                "relativeToBasePos": { "type": "boolean", "description": "Draws the particles relative to the emitter's base position, translating them to it" },
+                "fixedPolygonID": { "type": "boolean", "description": "Gives the particles the manager's fixed polygon ID rather than a new one each" },
+                "childFixedPolygonID": { "type": "boolean", "description": "Gives the child particles the manager's fixed polygon ID rather than a new one each" },
+                "emitterBasePos": { "$ref": "#/$defs/vec32", "description": "Added to the position the emitter is created at, in 4096ths" },
+                "emissionCount": { "$ref": "#/$defs/fx32", "description": "The particles emitted each time, in 4096ths, the fraction carried to the next time" },
+                "radius": { "$ref": "#/$defs/fx32", "description": "The radius of the sphere, circle or cylinder of emission, in 4096ths" },
+                "length": { "$ref": "#/$defs/fx32", "description": "The length of the cylinder of emission, in 4096ths" },
+                "axis": { "$ref": "#/$defs/vec16", "description": "The emitter's axis, in 4096ths" },
+                "color": { "$ref": "#/$defs/color", "description": "The particles' color, which the color animation fades to and from" },
+                "initVelPositionAmplifier": { "$ref": "#/$defs/fx32", "description": "A particle's initial speed away from the emitter, in 4096ths, which velocityVariance varies" },
+                "initVelAxisAmplifier": { "$ref": "#/$defs/fx32", "description": "A particle's initial speed along the emitter's axis, in 4096ths, which velocityVariance varies" },
+                "baseScale": { "$ref": "#/$defs/fx32", "description": "The particles' scale, in 4096ths, which scaleVariance varies" },
+                "aspectRatio": { "$ref": "#/$defs/fx16", "description": "The particles' width over their height, in 4096ths" },
+                "startDelay": { "$ref": "#/$defs/u16", "description": "The frames before the emitter starts" },
+                "minRotation": { "$ref": "#/$defs/s16", "description": "The least angular velocity of a particle, in 65536ths of a turn a frame" },
+                "maxRotation": { "$ref": "#/$defs/s16", "description": "The greatest angular velocity of a particle, in 65536ths of a turn a frame" },
+                "initAngle": { "$ref": "#/$defs/u16", "description": "The particles' angle when emitted, in 65536ths of a turn" },
+                "emitterLifeTime": { "$ref": "#/$defs/u16", "description": "The frames the emitter emits for, or 0 for as long as it lives" },
+                "particleLifeTime": { "$ref": "#/$defs/u16", "description": "The frames a particle lives, which lifeTimeVariance varies" },
+                "scaleVariance": { "$ref": "#/$defs/u8", "description": "How much of its scale a particle may lose at random, out of 255" },
+                "lifeTimeVariance": { "$ref": "#/$defs/u8", "description": "How much of its life time a particle may lose at random, out of 255" },
+                "velocityVariance": { "$ref": "#/$defs/u8", "description": "How much of its initial speed a particle may lose at random, out of 255" },
+                "emissionInterval": { "type": "integer", "minimum": 1, "maximum": 255, "description": "The frames between emissions" },
+                "baseAlpha": { "type": "integer", "minimum": 0, "maximum": 31, "description": "The particles' alpha, 0 to 31" },
+                "airResistance": { "$ref": "#/$defs/u8", "description": "The part of their velocity particles keep each frame, as 384 more than this out of 512" },
+                "texture": { "$ref": "#/$defs/textureName", "description": "The particles' texture, without a texture animation" },
+                "loopTime": { "type": "integer", "minimum": 1, "maximum": 255, "description": "The frames of a looped animation" },
+                "dirStretch": { "$ref": "#/$defs/u16", "description": "How much directional billboards stretch along their velocity as it turns across the view, in 4096ths" },
+                "textureRepeatShiftS": { "type": "integer", "minimum": 0, "maximum": 3, "description": "The times the texture repeats across a particle, as a power of two" },
+                "textureRepeatShiftT": { "type": "integer", "minimum": 0, "maximum": 3, "description": "The times the texture repeats down a particle, as a power of two" },
+                "scaleAnimDir": { "enum": [ "xy", "x", "y" ], "description": "The particles' axes that the scale animation scales (SPL_SCALE_ANIM_DIR_*)" },
+                "dirFromPosition": { "type": "boolean", "description": "Points directional polygons back along their position rather than along their velocity" },
+                "flipTextureS": { "type": "boolean", "description": "Flips the texture across" },
+                "flipTextureT": { "type": "boolean", "description": "Flips the texture down" },
+                "polygonX": { "$ref": "#/$defs/fx16", "description": "Where the polygon is drawn across from the particle, in 4096ths of its size" },
+                "polygonY": { "$ref": "#/$defs/fx16", "description": "Where the polygon is drawn up from the particle, in 4096ths of its size" },
+                "unused": { "$ref": "#/$defs/unused", "description": "Fields the library doesn't read that the file doesn't leave 0: unk3a, unk43, unk54, and unk4c, the 30 bits after flipTextureT" },
+                "scaleAnim": {
+                    "type": "object", "additionalProperties": false, "required": [ "start", "mid", "end", "in", "out", "loop" ],
+                    "description": "The animation of the particles' scale (SPLScaleAnim), over the axes of scaleAnimDir: from start to mid until in, mid until out, and to end from there",
+                    "properties": {
+                        "start": { "$ref": "#/$defs/fx16", "description": "In 4096ths of the scale" },
+                        "mid": { "$ref": "#/$defs/fx16", "description": "In 4096ths of the scale" },
+                        "end": { "$ref": "#/$defs/fx16", "description": "In 4096ths of the scale" },
+                        "in": { "$ref": "#/$defs/u8", "description": "The point of the particle's life the fade from start ends at" },
+                        "out": { "$ref": "#/$defs/u8", "description": "The point of the particle's life the fade to end starts at" },
+                        "loop": { "type": "boolean", "description": "Animates over loopTime rather than the particle's life" },
+                        "unused": { "$ref": "#/$defs/unused", "description": "unk8, the 15 bits after loop, and padding" }
+                    }
+                },
+                "colorAnim": {
+                    "type": "object", "additionalProperties": false, "required": [ "start", "end", "in", "peak", "out", "randomStart", "loop", "interpolate" ],
+                    "description": "The animation of the particles' color (SPLColorAnim): start until in, a fade from it to the emitter's color until peak and from that to end until out, then end",
+                    "properties": {
+                        "start": { "$ref": "#/$defs/color" },
+                        "end": { "$ref": "#/$defs/color" },
+                        "in": { "$ref": "#/$defs/u8" },
+                        "peak": { "$ref": "#/$defs/u8" },
+                        "out": { "$ref": "#/$defs/u8" },
+                        "randomStart": { "type": "boolean", "description": "Gives each particle one of the three colors at random, and doesn't animate it" },
+                        "loop": { "type": "boolean", "description": "Animates over loopTime rather than the particle's life" },
+                        "interpolate": { "type": "boolean", "description": "Fades between the colors, rather than changing at in, peak and out" },
+                        "unused": { "$ref": "#/$defs/unused", "description": "padding, unk8, the 13 bits after interpolate, and padding2" }
+                    }
+                },
+                "alphaAnim": {
+                    "type": "object", "additionalProperties": false, "required": [ "start", "mid", "end", "randomRange", "loop", "in", "out" ],
+                    "description": "The animation of the particles' alpha (SPLAlphaAnim), 0 to 31: from start to mid until in, mid until out, and to end from there",
+                    "properties": {
+                        "start": { "type": "integer", "minimum": 0, "maximum": 31 },
+                        "mid": { "type": "integer", "minimum": 0, "maximum": 31 },
+                        "end": { "type": "integer", "minimum": 0, "maximum": 31 },
+                        "randomRange": { "$ref": "#/$defs/u8", "description": "How much of the alpha a particle may lose at random each frame, out of 255, which makes it flicker" },
+                        "loop": { "type": "boolean", "description": "Animates over loopTime rather than the particle's life" },
+                        "in": { "$ref": "#/$defs/u8" },
+                        "out": { "$ref": "#/$defs/u8" },
+                        "unused": { "$ref": "#/$defs/unused", "description": "unk0, the bit after end, unk2, the 7 bits after loop, and padding2" }
+                    }
+                },
+                "textureAnim": {
+                    "type": "object", "additionalProperties": false, "required": [ "textures", "step", "randomStart", "loop" ],
+                    "description": "The animation of the particles' texture (SPLTextureAnim): each texture in turn for step of the particle's life",
+                    "properties": {
+                        "textures": { "type": "array", "minItems": 1, "maxItems": 8, "items": { "$ref": "#/$defs/textureName" } },
+                        "step": { "$ref": "#/$defs/u8", "description": "The part of the particle's life, out of 255, that each texture shows for" },
+                        "randomStart": { "type": "boolean", "description": "Gives each particle one of the textures at random, and doesn't animate it" },
+                        "loop": { "type": "boolean", "description": "Animates over loopTime rather than the particle's life" },
+                        "unused": { "$ref": "#/$defs/unused", "description": "unk8, the 14 bits after loop" }
+                    }
+                },
+                "childResource": {
+                    "type": "object", "additionalProperties": false,
+                    "required": [ "hasBehaviors", "hasScaleAnim", "hasAlphaAnim", "rotationType", "followEmitter", "useChildColor", "drawType",
+                                  "polygonRotAxis", "polygonReferencePlane", "randomInitVelMag", "endScale", "lifeTime", "velocityRatio",
+                                  "scaleRatio", "color", "emissionCount", "emissionDelay", "emissionInterval", "texture", "textureRepeatShiftS",
+                                  "textureRepeatShiftT", "flipTextureS", "flipTextureT", "dirFromPosition" ],
+                    "description": "The particles that each particle emits (SPLChildResource)",
+                    "properties": {
+                        "hasBehaviors": { "type": "boolean", "description": "Applies the emitter's behaviors to the children too" },
+                        "hasScaleAnim": { "type": "boolean", "description": "Scales the children from their scale to endScale over their life" },
+                        "hasAlphaAnim": { "type": "boolean", "description": "Fades the children out over their life" },
+                        "rotationType": { "enum": [ "none", "angle", "angle_and_velocity" ], "description": "What the children take from their parent's rotation (SPL_CHILD_ROTATION_*)" },
+                        "followEmitter": { "type": "boolean", "description": "Moves the children with the emitter after they are emitted" },
+                        "useChildColor": { "type": "boolean", "description": "Gives the children their color, rather than their parent's" },
+                        "drawType": { "$ref": "#/$defs/drawType" },
+                        "polygonRotAxis": { "$ref": "#/$defs/polygonRotAxis" },
+                        "polygonReferencePlane": { "$ref": "#/$defs/polygonReferencePlane" },
+                        "randomInitVelMag": { "$ref": "#/$defs/fx16", "description": "Up to how much, in 4096ths, the children's velocities differ at random from their share of their parent's" },
+                        "endScale": { "$ref": "#/$defs/fx16", "description": "The scale the children grow or shrink to over their life, in 4096ths" },
+                        "lifeTime": { "$ref": "#/$defs/u16", "description": "The frames a child lives" },
+                        "velocityRatio": { "$ref": "#/$defs/u8", "description": "The part of their parent's velocity the children start with, out of 256" },
+                        "scaleRatio": { "$ref": "#/$defs/u8", "description": "The part of their parent's scale the children start with, as one more than this out of 64" },
+                        "color": { "$ref": "#/$defs/color", "description": "The children's color, with useChildColor" },
+                        "emissionCount": { "$ref": "#/$defs/u8", "description": "The children each particle emits each time" },
+                        "emissionDelay": { "$ref": "#/$defs/u8", "description": "The part of its life, out of 256, after which a particle emits children" },
+                        "emissionInterval": { "type": "integer", "minimum": 1, "maximum": 255, "description": "The frames between a particle's emissions of children" },
+                        "texture": { "$ref": "#/$defs/textureName" },
+                        "textureRepeatShiftS": { "type": "integer", "minimum": 0, "maximum": 3, "description": "The times the texture repeats across a child, as a power of two" },
+                        "textureRepeatShiftT": { "type": "integer", "minimum": 0, "maximum": 3, "description": "The times the texture repeats down a child, as a power of two" },
+                        "flipTextureS": { "type": "boolean" },
+                        "flipTextureT": { "type": "boolean" },
+                        "dirFromPosition": { "type": "boolean", "description": "Points directional children back along their position rather than along their velocity" },
+                        "unused": { "$ref": "#/$defs/unused", "description": "unk0, the 4 bits after polygonReferencePlane, and unk10, the 25 bits after dirFromPosition" }
+                    }
+                },
+                "gravityBehavior": {
+                    "type": "object", "additionalProperties": false, "required": [ "magnitude" ],
+                    "description": "A constant force on the particles (SPLGravityBehavior)",
+                    "properties": {
+                        "magnitude": { "$ref": "#/$defs/vec16", "description": "Added to a particle's velocity each frame, in 4096ths" },
+                        "unused": { "$ref": "#/$defs/unused", "description": "padding" }
+                    }
+                },
+                "randomBehavior": {
+                    "type": "object", "additionalProperties": false, "required": [ "magnitude", "applyInterval" ],
+                    "description": "A random force on the particles (SPLRandomBehavior)",
+                    "properties": {
+                        "magnitude": { "$ref": "#/$defs/vec16", "description": "Up to how much, either way, the force is on each axis, in 4096ths" },
+                        "applyInterval": { "type": "integer", "minimum": 1, "maximum": 65535, "description": "The frames between the forces" }
+                    }
+                },
+                "magnetBehavior": {
+                    "type": "object", "additionalProperties": false, "required": [ "target", "force" ],
+                    "description": "A pull of the particles towards a point (SPLMagnetBehavior)",
+                    "properties": {
+                        "target": { "$ref": "#/$defs/vec32", "description": "The point, relative to the emitter, in 4096ths" },
+                        "force": { "$ref": "#/$defs/fx16", "description": "The part of the way to the target from where a particle is headed that is added to its velocity each frame, in 4096ths" },
+                        "unused": { "$ref": "#/$defs/unused", "description": "padding" }
+                    }
+                },
+                "spinBehavior": {
+                    "type": "object", "additionalProperties": false, "required": [ "angle", "axis" ],
+                    "description": "A turn of the particles' positions about the emitter (SPLSpinBehavior)",
+                    "properties": {
+                        "angle": { "$ref": "#/$defs/u16", "description": "The turn each frame, in 65536ths of a turn" },
+                        "axis": { "enum": [ "x", "y", "z" ], "description": "The axis it turns about" }
+                    }
+                },
+                "collisionPlaneBehavior": {
+                    "type": "object", "additionalProperties": false, "required": [ "y", "elasticity", "type" ],
+                    "description": "A plane that particles crossing it die at or bounce off (SPLCollisionPlaneBehavior)",
+                    "properties": {
+                        "y": { "$ref": "#/$defs/fx32", "description": "The plane's height, in 4096ths, unless the emitter's collision plane height overrides it" },
+                        "elasticity": { "$ref": "#/$defs/fx16", "description": "The part of its vertical speed a bouncing particle keeps, in 4096ths" },
+                        "type": { "enum": [ "kill", "bounce" ], "description": "What a particle crossing it does (SPL_COLLISION_*)" },
+                        "unused": { "$ref": "#/$defs/unused", "description": "unk6, the 14 bits after type" }
+                    }
+                },
+                "convergenceBehavior": {
+                    "type": "object", "additionalProperties": false, "required": [ "target", "force" ],
+                    "description": "A pull of the particles' positions straight towards a point (SPLConvergenceBehavior)",
+                    "properties": {
+                        "target": { "$ref": "#/$defs/vec32", "description": "The point, relative to the emitter, in 4096ths" },
+                        "force": { "$ref": "#/$defs/fx16", "description": "The part of the way to the target a particle moves each frame, in 4096ths" },
+                        "unused": { "$ref": "#/$defs/unused", "description": "padding" }
+                    }
+                }
+            }
+        },
+        "texture": {
+            "type": "object", "additionalProperties": false, "required": [ "name", "format", "repeat", "flip", "palColor0" ],
+            "description": "A texture (SPLTextureResource and its SPLTextureParam). Its size is its PNG's, a power of two from 8 to 1024 each way; its palette grows to the colors an edited PNG needs, up to its format's",
+            "properties": {
+                "name": { "$ref": "#/$defs/textureName", "description": "Its file's name, without the extension, by which the emitters name it" },
+                "format": { "enum": [ "none", "a3i5", "palette4", "palette16", "palette256", "compressed4x4", "a5i3", "direct" ], "description": "Its format (GXTexFmt): a3i5 and a5i3 a palette's index and an alpha a texel, palette4 to palette256 an index, direct an RGB555 color and an alpha bit. compressed4x4 and none aren't decoded: their texture is its data as it is" },
+                "repeat": { "$ref": "#/$defs/repeat", "description": "The directions it repeats in (GXTexRepeat)" },
+                "flip": { "$ref": "#/$defs/repeat", "description": "The directions it flips in as it repeats (GXTexFlip)" },
+                "palColor0": { "type": "boolean", "description": "Makes a palette format's color 0 clear: the PNG's pixels clear where they are" },
+                "sharedTexture": { "$ref": "#/$defs/textureName", "description": "The texture whose VRAM it uses rather than uploading its own (useSharedTexture and sharedTexID)" },
+                "width": { "type": "integer", "enum": [ 8, 16, 32, 64, 128, 256, 512, 1024 ], "description": "For a texture that isn't decoded, its width" },
+                "height": { "type": "integer", "enum": [ 8, 16, 32, 64, 128, 256, 512, 1024 ], "description": "For a texture that isn't decoded, its height" },
+                "unused": { "$ref": "#/$defs/unused", "description": "unk4, the 6 bits after sharedTexID" }
+            }
+        },
+        "drawType": { "enum": [ "billboard", "directional_billboard", "polygon", "directional_polygon", "directional_polygon_center" ], "description": "How particles are drawn (SPL_DRAW_*): as billboards facing the camera, or polygons in the plane of the emitter's cross axes, either way stretched along their velocity if directional" },
+        "polygonRotAxis": { "enum": [ "y", "xyz" ], "description": "The axis polygons turn about with their rotation: y, or the diagonal (1, 1, 1)" },
+        "polygonReferencePlane": { "enum": [ "xy", "xz" ], "description": "The plane polygons are drawn in" },
+        "repeat": { "enum": [ "none", "s", "t", "st" ] },
+        "textureName": { "type": "string", "pattern": "^[A-Za-z0-9_.-]+$" },
+        "unused": {
+            "type": "object", "additionalProperties": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+            "description": "The bits of a block that the library never reads, by their field's name in lib/spl (or unk and their word's offset, for unnamed bits, as a number of those bits), where the game's file doesn't leave them 0; the packer writes 0 for the rest"
+        },
+        "color": {
+            "type": "object", "additionalProperties": false, "required": [ "red", "green", "blue" ],
+            "description": "A color, 0 to 31 for each component",
+            "properties": {
+                "red": { "type": "integer", "minimum": 0, "maximum": 31 },
+                "green": { "type": "integer", "minimum": 0, "maximum": 31 },
+                "blue": { "type": "integer", "minimum": 0, "maximum": 31 }
+            }
+        },
+        "vec32": {
+            "type": "object", "additionalProperties": false, "required": [ "x", "y", "z" ],
+            "properties": { "x": { "$ref": "#/$defs/fx32" }, "y": { "$ref": "#/$defs/fx32" }, "z": { "$ref": "#/$defs/fx32" } }
+        },
+        "vec16": {
+            "type": "object", "additionalProperties": false, "required": [ "x", "y", "z" ],
+            "properties": { "x": { "$ref": "#/$defs/fx16" }, "y": { "$ref": "#/$defs/fx16" }, "z": { "$ref": "#/$defs/fx16" } }
+        },
+        "fx32": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647 },
+        "fx16": { "type": "integer", "minimum": -32768, "maximum": 32767 },
+        "s16": { "type": "integer", "minimum": -32768, "maximum": 32767 },
+        "u16": { "type": "integer", "minimum": 0, "maximum": 65535 },
+        "u8": { "type": "integer", "minimum": 0, "maximum": 255 }
+    }
+}

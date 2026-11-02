@@ -6,6 +6,7 @@
 #include "types.h"
 #include "battle/btlv_effect.h"
 #include "constants/arc.h"
+#include "constants/battle.h"
 #include "gfl/arc.h"
 #include "gfl/g3d.h"
 #include "gfl/graphics.h"
@@ -14,9 +15,15 @@
 #include "nitro/gx.h"
 #include "nnsys/g3d.h"
 
+// How a ground's animation runs
+enum {
+    STAGE_ANM_LOOP,     // every frame, at normal speed
+    STAGE_ANM_ON_START, // when BtlvStage_StartAnimation starts it, for its frames
+};
+
 // A ground's animation, 16 bytes
 typedef struct {
-    s32 mode;    // 0x0  0 loops, 1 runs when started
+    s32 mode;    // 0x0  STAGE_ANM_*
     BOOL active; // 0x4
     fx32 speed;  // 0x8
     s32 frames;  // 0xc  left to run
@@ -50,7 +57,7 @@ static u32 BtlvStage_CountAnimations(const BtlvStageData *data, u32 stageId, u32
 static void BtlvStage_InitSRT(BtlvStage *stage, u32 side, fx32 scale);
 
 // Where each ground stands
-static const VecFx32 data_ov168_021f2f54[2] = {
+static const VecFx32 GROUND_POSITIONS[2] = {
     { 0, 0, 0x572f },
     { 0, 0, -0xcb7d },
 };
@@ -68,16 +75,16 @@ static u32 BtlvStage_CountAnimations(const BtlvStageData *data, u32 stageId, u32
 }
 
 static void BtlvStage_InitSRT(BtlvStage *stage, u32 side, fx32 scale) {
-    stage->srt[side].translation.x = data_ov168_021f2f54[side].x;
-    stage->srt[side].translation.y = data_ov168_021f2f54[side].y;
-    stage->srt[side].translation.z = data_ov168_021f2f54[side].z;
+    stage->srt[side].translation.x = GROUND_POSITIONS[side].x;
+    stage->srt[side].translation.y = GROUND_POSITIONS[side].y;
+    stage->srt[side].translation.z = GROUND_POSITIONS[side].z;
     stage->srt[side].scale.x = scale;
     stage->srt[side].scale.y = scale;
     stage->srt[side].scale.z = scale;
     MTX_Identity33_(&stage->srt[side].rotation);
 }
 
-BtlvStage *BtlvStage_Create(u32 rule, u32 stageId, u8 variant, HeapID heapId, u32 unk) {
+BtlvStage *BtlvStage_Create(u32 battleStyle, u32 stageId, u8 variant, HeapID heapId, u32 studioMode) {
     BtlvStage *stage;
     BtlvStageData *data;
     int anm;
@@ -86,14 +93,15 @@ BtlvStage *BtlvStage_Create(u32 rule, u32 stageId, u8 variant, HeapID heapId, u3
     fx32 scale;
 
     stage = GFL_HeapAllocate(heapId, sizeof(BtlvStage), TRUE, "btlv_stage.c", 0x9c);
-    data = GFL_ArcSysReadHeapNew(151, 2, HEAPID_TAIL(heapId));
+    data = GFL_ArcSysReadHeapNew(ARCID_BATTLE_BG_DATA, 2, HEAPID_TAIL(heapId));
     stage->heapId = heapId;
-    if (unk == 1 || unk == 2) {
+    // Pokéstar Studios' movies have their own stage
+    if (studioMode == BTL_STUDIO_MODE_FILM || studioMode == BTL_STUDIO_MODE_PLAYBACK) {
         stageId = 27;
     }
 
     // A rotation battle has its own ground, the same for both sides
-    if (rule == 3) {
+    if (battleStyle == BTL_STYLE_ROTATION) {
         stage->models[0] = GFL_G3DSysReadArcSysResource(ARCID_BTLV, 0x161);
         stage->models[1] = GFL_G3DSysReadArcSysResource(ARCID_BTLV, 0x161);
     } else if (data[stageId].resources[0][variant * 2] != 0xffff) {
@@ -110,7 +118,7 @@ BtlvStage *BtlvStage_Create(u32 rule, u32 stageId, u8 variant, HeapID heapId, u3
     stage->mdls[1] = GFL_G3DMdlCreate(stage->models[1], 0, stage->models[1]);
     anm = 0;
 
-    if (rule == 3) {
+    if (battleStyle == BTL_STYLE_ROTATION) {
         stage->anmCount = 1;
         stage->anmResCount = 1;
         stage->anmResources[0] = GFL_HeapAllocate(stage->heapId, 3 * sizeof(G3DResource *), TRUE, "btlv_stage.c", 0xd6);
@@ -119,7 +127,7 @@ BtlvStage *BtlvStage_Create(u32 rule, u32 stageId, u8 variant, HeapID heapId, u3
             stage->anmObjs[i] = GFL_HeapAllocate(stage->heapId, 3 * sizeof(G3DAnimation *), TRUE, "btlv_stage.c", 0xdb);
             stage->anms[i] = GFL_HeapAllocate(stage->heapId, sizeof(BtlvStageAnm), TRUE, "btlv_stage.c", 0xdc);
             stage->anmObjs[i][0] = GFL_G3DAnmCreate(stage->mdls[i], stage->anmResources[0][0], 0);
-            stage->anms[i][0].mode = 1;
+            stage->anms[i][0].mode = STAGE_ANM_ON_START;
             stage->actors[i] = GFL_G3DActorCreate(stage->mdls[i], stage->anmObjs[i], stage->anmCount);
             GFL_G3DActorBindAnm(stage->actors[i], 0);
         }
@@ -139,7 +147,7 @@ BtlvStage *BtlvStage_Create(u32 rule, u32 stageId, u8 variant, HeapID heapId, u3
                     stage->anmResources[j][anm] =
                         GFL_G3DSysReadArcSysResource(ARCID_BTLV, data[stageId].resources[i][variant * 2 + j]);
                     stage->anmObjs[j][anm] = GFL_G3DAnmCreate(stage->mdls[j], stage->anmResources[j][anm], 0);
-                    stage->anms[j][anm].mode = 0;
+                    stage->anms[j][anm].mode = STAGE_ANM_LOOP;
                 }
                 anm++;
             }
@@ -165,14 +173,14 @@ BtlvStage *BtlvStage_Create(u32 rule, u32 stageId, u8 variant, HeapID heapId, u3
 
     // Larger grounds for double and triple battles
     scale = FX32_ONE;
-    if (rule == 2) {
+    if (battleStyle == BTL_STYLE_TRIPLE) {
         scale = FX32_CONST(1.5);
-    } else if (rule == 1) {
+    } else if (battleStyle == BTL_STYLE_DOUBLE) {
         scale = FX32_CONST(1.2);
     }
     BtlvStage_InitSRT(stage, 0, scale);
     BtlvStage_InitSRT(stage, 1, scale);
-    if (rule == 3) {
+    if (battleStyle == BTL_STYLE_ROTATION) {
         stage->srt[0].translation.z = FX32_CONST(10);
         stage->srt[1].translation.z = FX32_CONST(-15);
     }
@@ -227,10 +235,10 @@ void BtlvStage_Main(BtlvStage *stage) {
             for (j = 0; j < 2; j++) {
                 speed = 0;
                 switch (stage->anms[j][i].mode) {
-                case 0:
+                case STAGE_ANM_LOOP:
                     speed = FX32_ONE;
                     break;
-                case 1:
+                case STAGE_ANM_ON_START:
                     if (stage->anms[j][i].active == TRUE) {
                         speed = stage->anms[j][i].speed;
                         stage->anms[j][i].frames--;
@@ -276,7 +284,7 @@ BOOL BtlvStage_IsPaletteFading(BtlvStage *stage) {
 }
 
 void BtlvStage_SetVanish(BtlvStage *stage, u32 side, BOOL hide) {
-    if (side == 2) {
+    if (side == BTLV_STAGE_SIDE_BOTH) {
         if (hide) {
             stage->hidden = 3;
         } else {
@@ -290,7 +298,7 @@ void BtlvStage_SetVanish(BtlvStage *stage, u32 side, BOOL hide) {
 }
 
 void BtlvStage_StartAnimation(BtlvStage *stage, u32 side, u32 anm, fx32 speed, s32 frames) {
-    if (stage->anms[side][anm].mode == 1) {
+    if (stage->anms[side][anm].mode == STAGE_ANM_ON_START) {
         stage->anms[side][anm].active = TRUE;
         stage->anms[side][anm].speed = speed;
         stage->anms[side][anm].frames = frames;

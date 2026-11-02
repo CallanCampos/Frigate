@@ -144,7 +144,7 @@ void SyncTrialHouseWkStatsFromBattle(TrialHouseWork *work, BtlSetup *setup) {
     work->stats[10] += (u16)(setup->unkD0 * 100 / totalHp);
 }
 
-GameEvent *CallTrialHouseResults(GameSystem *gsys, u32 a1, u32 a2) {
+GameEvent *CallTrialHouseResults(GameSystem *gsys, u32 downloaded, u32 playJingle) {
     GameData *gameData = GSYS_GetGameData(gsys);
     GameEvent *event = GameEvent_Create(gsys, NULL, EventTrialHouseResults_Callback, sizeof(TrialHouseResultsData));
     TrialHouseResultsData *data = GameEvent_GetData(event);
@@ -153,8 +153,8 @@ GameEvent *CallTrialHouseResults(GameSystem *gsys, u32 a1, u32 a2) {
     data->field = GSYS_GetField(gsys);
     data->param.gender = getTrainerGender(GetGameDataPlayerInfo(gameData));
     data->param.save = TrialHouseSave_Get(GameData_GetSaveControl(gameData));
-    data->param.downloaded = a1;
-    data->param.playJingle = a2;
+    data->param.downloaded = downloaded;
+    data->param.playJingle = playJingle;
     return event;
 }
 

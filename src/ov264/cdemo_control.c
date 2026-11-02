@@ -39,12 +39,12 @@ BOOL CDemo_Main(CDemoWork *work) {
             if (GFL_SndBGMIsPlaying() == TRUE) {
                 GFL_SndBGMFadeOut(8);
             }
-            work->state = 1;
+            work->state = CDEMO_STATE_EXIT;
             work->param->skipped = TRUE;
         }
     }
     work->state = CDEMO_STATES[work->state](work);
-    return work->state != 6;
+    return work->state != CDEMO_STATE_END;
 }
 static u32 CDemo_StateInit(CDemoWork *work) {
     GFL_BGSysSetEnabledBGsA(0);
@@ -57,15 +57,15 @@ static u32 CDemo_StateInit(CDemoWork *work) {
     work->arc = GFL_ArcSysCreateFileHandle(CDEMO_MOVIES[work->param->demo].arcId, HEAPID_CDEMO);
     CDemo_InitScript(work);
     CDemo_StartVBlank(work);
-    CDemo_FadeInBlack(work, 1, 1, 5);
+    CDemo_FadeInBlack(work, 1, 1, CDEMO_STATE_SCRIPT);
     work->initialized = TRUE;
-    return 2;
+    return CDEMO_STATE_WAIT_FADE;
 }
 static u32 CDemo_StateExit(CDemoWork *work) {
     if (!GFL_WipeIsFinished())
-        return 1;
+        return CDEMO_STATE_EXIT;
     if (GFL_SndBGMIsFading() == TRUE)
-        return 1;
+        return CDEMO_STATE_EXIT;
     GFL_SndBGMStopImmediate();
     if (work->initialized == TRUE) {
         CDemo_StopVBlank(work);
@@ -73,23 +73,23 @@ static u32 CDemo_StateExit(CDemoWork *work) {
         CDemo_FreeScript(work);
         CDemo_DisableGraphics();
     }
-    return 6;
+    return CDEMO_STATE_END;
 }
 static u32 CDemo_StateWaitFade(CDemoWork *work) {
     if (GFL_WipeIsFinished() == TRUE)
         return work->resumeState;
-    return 2;
+    return CDEMO_STATE_WAIT_FADE;
 }
 static u32 CDemo_StateTransition(CDemoWork *work) {
-    return 3;
+    return CDEMO_STATE_TRANSITION;
 }
 static u32 CDemo_StateScript(CDemoWork *work) {
     while (TRUE) {
-        if (*work->scriptCursor == 20) {
+        if (*work->scriptCursor == CDEMO_CMD_END) {
             work->param->skipped = FALSE;
-            return 1;
+            return CDEMO_STATE_EXIT;
         }
-        if (CDemo_RunCommand(work) != 1)
+        if (CDemo_RunCommand(work) != CDEMO_CMD_RESULT_NEXT)
             break;
     }
     return work->state;
@@ -103,38 +103,38 @@ static u32 CDemo_StateMovie(CDemoWork *work) {
         work->elapsedFrameTime += OS_TicksToMicroSeconds(now - work->lastTick);
         work->lastTick = now;
         if (work->elapsedFrameTime < 0x1046b)
-            return 4;
+            return CDEMO_STATE_MOVIE;
         work->elapsedFrameTime -= 0x1046b;
     }
     switch (work->frameState) {
-    case 0:
+    case CDEMO_MOVIE_LOAD_FIRST:
         CDemo_LoadMovieFrame(work->arc, work->nextFrame, movie->screenOffset, movie->frameSize, 0);
         work->nextFrame++;
         CDemo_LoadMovieFrame(work->arc, work->nextFrame, movie->screenOffset, movie->frameSize, 1);
         work->nextFrame++;
         GFL_BGSysSetBGPriority(2, 0);
         GFL_BGSysSetBGPriority(3, 1);
-        work->frameState = 1;
+        work->frameState = CDEMO_MOVIE_PLAY;
         break;
-    case 1:
+    case CDEMO_MOVIE_PLAY:
         GFL_BGSysSetBGPriority((u8)((work->currentBuffer ^ 1) + 2), 0);
         GFL_BGSysSetBGPriority((u8)(work->currentBuffer + 2), 1);
         CDemo_LoadMovieFrame(work->arc, work->nextFrame, movie->screenOffset, movie->frameSize, work->currentBuffer);
         work->nextFrame++;
         if (work->nextFrame >= movie->frameCount)
-            work->frameState = 2;
+            work->frameState = CDEMO_MOVIE_SHOW_LAST;
         else
             work->currentBuffer ^= 1;
         break;
-    case 2:
+    case CDEMO_MOVIE_SHOW_LAST:
         GFL_BGSysSetBGPriority((u8)(work->currentBuffer + 2), 0);
         GFL_BGSysSetBGPriority((u8)((work->currentBuffer ^ 1) + 2), 1);
-        work->frameState = 3;
+        work->frameState = CDEMO_MOVIE_DONE;
         break;
-    case 3:
-        return 5;
+    case CDEMO_MOVIE_DONE:
+        return CDEMO_STATE_SCRIPT;
     }
-    return 4;
+    return CDEMO_STATE_MOVIE;
 }
 static void CDemo_LoadMovieFrame(ArcTool *arc, u32 fileId, u32 offset, u32 size, u32 buffer) {
     void *data = GFL_ArcToolReadHeapNewLZ(arc, fileId, TRUE, HEAPID_TAIL(HEAPID_CDEMO));

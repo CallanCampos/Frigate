@@ -21,8 +21,9 @@ u8 PokemonTrade_GetStoredBoxIndex(PokemonTradeWork *wk);
 BOOL PokemonTrade_IsNetwork(PokemonTradeWork *wk);
 BOOL PokemonTrade_IsNegoType(PokemonTradeWork *wk);
 BOOL PokemonTrade_IsWifiMode(PokemonTradeWork *wk);
-int PokemonTrade_GetColumnBox(int a, PokemonTradeWork *wk);
-int PokemonTrade_GetColumnSlot(int a, int b);
+// The box, or the party after the last box, and the slot of a place of the strip
+int PokemonTrade_GetColumnBox(int column, PokemonTradeWork *wk);
+int PokemonTrade_GetColumnSlot(int column, int row);
 PartyPkm *PokemonTrade_CopyPartyPkm(BoxSaveAccessor *boxes, int box, int slot, PokemonTradeWork *wk);
 BoxPkm *PokemonTrade_GetBoxPkm(BoxSaveAccessor *boxes, int box, int slot, PokemonTradeWork *wk);
 TradeBoxEntry *PokemonTrade_GetBoxEntry(int box, int slot, PokemonTradeWork *wk);

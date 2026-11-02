@@ -50,9 +50,8 @@
 // Generation 4 globe's code (pokeplatinum's wifi_earth) moved to this game's libraries
 
 #define HEAPID_GEONET 0x7c
-// The places of the globe: member 18 has those of the countries, and each country with regions has a member of its
-// own
-#define ARCID_GEONET_PLACE 52
+// The places of the globe, in ARCID_GEONET_PLACE: member 18 has those of the countries, and each country with regions
+// has a member of its own
 #define NARC_GEONET_PLACE_COUNTRIES 18
 
 #define NARC_GEONET_EARTH_NSBMD 0
@@ -63,6 +62,26 @@
 #define COUNTRY_USA 220
 
 #define PLACE_MAX 1024
+
+// The entries of the main menu
+enum {
+    MENU_SEE_LIST,
+    MENU_REGISTER,
+    MENU_CANCEL,
+};
+
+// A touch: a tap while the timer runs, a drag after it
+enum {
+    TOUCH_STATE_TAP,
+    TOUCH_STATE_DRAG,
+};
+
+// The steps of printing a message
+enum {
+    MESSAGE_STATE_START,
+    MESSAGE_STATE_PRINT,
+    MESSAGE_STATE_WAIT,
+};
 
 // The marks: one for each UNITY_TOWER_REGION_* state but none, and the one at the middle of the screen
 enum {
@@ -361,9 +380,9 @@ static const GeonetMarkFile sGeonetMarkFiles[] = {
 
 // clang-format off
 static const GeonetMenuItem sGeonetMenuItems[] = {
-    {EventMapchange2_Text_SeeList, 0},
-    {EventMapchange2_Text_Register, 1},
-    {EventMapchange2_Text_Cancel, 2},
+    {EventMapchange2_Text_SeeList, MENU_SEE_LIST},
+    {EventMapchange2_Text_Register, MENU_REGISTER},
+    {EventMapchange2_Text_Cancel, MENU_CANCEL},
 };
 
 // clang-format on
@@ -542,15 +561,15 @@ static BOOL Geonet_Main(GeonetWork *work, u32 *state) {
                 Geonet_FreeList(work);
                 switch (choice) {
                 default:
-                case 0:
+                case MENU_SEE_LIST:
                     *state = SEQ_EARTH_INIT;
                     GFL_SndSEPlay(SEQ_SE_DECIDE1);
                     break;
-                case 1:
+                case MENU_REGISTER:
                     *state = SEQ_REGISTER_MESSAGE;
                     GFL_SndSEPlay(SEQ_SE_DECIDE1);
                     break;
-                case 2:
+                case MENU_CANCEL:
                 case BMPMENULIST_CANCEL:
                     *state = SEQ_FADE_OUT;
                     GFL_SndSEPlay(SEQ_SE_CANCEL1);
@@ -948,7 +967,7 @@ static void Geonet_ReadTouch(GeonetWork *work) {
             work->touchKeys = keys;
             return;
         }
-        work->touchState = 0;
+        work->touchState = TOUCH_STATE_TAP;
         work->touchMoveX = 0;
         work->touchMoveY = 0;
         work->tapTimer = 0;
@@ -960,14 +979,14 @@ static void Geonet_ReadTouch(GeonetWork *work) {
 
     if (work->touchHeld) {
         switch (work->touchState) {
-        case 0:
+        case TOUCH_STATE_TAP:
             if (work->tapTimer == 0) {
                 work->touchState++;
             } else {
                 work->tapTimer--;
             }
             // fallthrough
-        case 1:
+        case TOUCH_STATE_DRAG:
             if (keys == 0) {
                 Geonet_GetTouchMove(work, work->touchPrevX, work->touchPrevY, &keysX, &moveX, &keysY, &moveY);
                 work->touchKeys = keysX | keysY;
@@ -982,7 +1001,7 @@ static void Geonet_ReadTouch(GeonetWork *work) {
         if (keys == 0 && work->tapTimer != 0 && work->touchMoveX < 4 && work->touchMoveY < 4) {
             work->touchKeys = PAD_BUTTON_A;
         }
-        work->touchState = 0;
+        work->touchState = TOUCH_STATE_TAP;
         work->touchMoveX = 0;
         work->touchMoveY = 0;
         work->tapTimer = 0;
@@ -1051,7 +1070,7 @@ static void Geonet_LoadBG(GeonetWork *work, ArcTool *arc) {
     work->windows[WINDOW_INFO].window = Geonet_CreateWindow(&sGeonetInfoWindow, TRUE);
     BmpWin_DrawFrame(work->windows[WINDOW_INFO].window, 0, FRAME_MESSAGE_CHAR, FRAME_MESSAGE_PALETTE);
     BmpWin_FlushChar(work->windows[WINDOW_INFO].window);
-    work->messageState = 0;
+    work->messageState = MESSAGE_STATE_START;
 
     GFL_BGSysCreateBG(2, &sGeonetTextBGSetup, BGMODE_TEXT);
     GFL_BGSysClearScr(2);
@@ -1123,15 +1142,15 @@ static BOOL Geonet_PrintMessage(GeonetWork *work, u32 message, BOOL close) {
     BOOL done = FALSE;
 
     switch (work->messageState) {
-    case 0:
+    case MESSAGE_STATE_START:
         GFL_BitmapFill(BmpWin_GetBitmap(work->windows[WINDOW_INFO].window), 15);
         work->message = GFL_StrBufCreate(0x400, work->heapId);
         GFL_MsgDataLoadStrbuf(work->msgData, message, work->message);
         work->stream = PrintStream_Create(work->windows[WINDOW_INFO].window, 0, 0, work->message, work->font,
                                           TextSpeed_GetCurrentWait(), work->tcbManager, 0, work->heapId, 15);
-        work->messageState = 1;
+        work->messageState = MESSAGE_STATE_PRINT;
         break;
-    case 1: {
+    case MESSAGE_STATE_PRINT: {
         u32 streamState = PrintStream_GetState(work->stream);
 
         KeyCursor_Update(work->keyCursor, work->stream, work->windows[WINDOW_INFO].window);
@@ -1148,16 +1167,16 @@ static BOOL Geonet_PrintMessage(GeonetWork *work, u32 message, BOOL close) {
             }
             break;
         case PRINT_STREAM_DONE:
-            work->messageState = 2;
+            work->messageState = MESSAGE_STATE_WAIT;
             break;
         }
         break;
     }
-    case 2:
+    case MESSAGE_STATE_WAIT:
         if (close || (work->keysPressed & PAD_BUTTON_A)) {
             GFL_StrBufFree(work->message);
             PrintStream_Delete(work->stream);
-            work->messageState = 0;
+            work->messageState = MESSAGE_STATE_START;
             done = TRUE;
         }
         break;

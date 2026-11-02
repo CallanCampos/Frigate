@@ -1,0 +1,16 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "C",
+    "shapes": [ 9 ],
+    "area": {
+        "all_year": false,
+        "seasons": {
+            "spring": {},
+            "summer": {},
+            "autumn": {},
+            "winter": {
+                "ZONE_ROUTE_7": [ "grass", "dark_grass" ]
+            }
+        }
+    }
+}

@@ -28,6 +28,42 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
+// The menu's event, for two or more shortcuts: the menu slides in and is chosen from, then the app, the common event
+// or the hidden move it asks for runs, or a message says why it can't, and the menu comes back after an app
+enum {
+    SHORTCUT_MENU_EVENT_STATE_START,
+    SHORTCUT_MENU_EVENT_STATE_OPEN,
+    SHORTCUT_MENU_EVENT_STATE_SLIDE_IN,
+    SHORTCUT_MENU_EVENT_STATE_WAIT_SLIDE_IN,
+    SHORTCUT_MENU_EVENT_STATE_SELECT,
+    SHORTCUT_MENU_EVENT_STATE_SLIDE_OUT,
+    SHORTCUT_MENU_EVENT_STATE_WAIT_SLIDE_OUT,
+    SHORTCUT_MENU_EVENT_STATE_CLOSE,
+    SHORTCUT_MENU_EVENT_STATE_REOPEN,
+    SHORTCUT_MENU_EVENT_STATE_APP_CALL,
+    SHORTCUT_MENU_EVENT_STATE_APP_RESULT,
+    SHORTCUT_MENU_EVENT_STATE_COMMON_EVENT,
+    SHORTCUT_MENU_EVENT_STATE_ITEM_USE_BLOCKED,
+    SHORTCUT_MENU_EVENT_STATE_END,
+    SHORTCUT_MENU_EVENT_STATE_NO_RIBBON,
+    SHORTCUT_MENU_EVENT_STATE_NO_RIBBON_END,
+    SHORTCUT_MENU_EVENT_STATE_HM_EVENT,
+};
+
+// The event of a single shortcut, which calls it with no menu
+enum {
+    SHORTCUT_CALL_DIRECT_STATE_START,
+    SHORTCUT_CALL_DIRECT_STATE_CLOSE,
+    SHORTCUT_CALL_DIRECT_STATE_APP_CALL,
+    SHORTCUT_CALL_DIRECT_STATE_APP_RESULT,
+    SHORTCUT_CALL_DIRECT_STATE_COMMON_EVENT,
+    SHORTCUT_CALL_DIRECT_STATE_ITEM_USE_BLOCKED,
+    SHORTCUT_CALL_DIRECT_STATE_END,
+    SHORTCUT_CALL_DIRECT_STATE_NO_RIBBON,
+    SHORTCUT_CALL_DIRECT_STATE_NO_RIBBON_END,
+    SHORTCUT_CALL_DIRECT_STATE_HM_EVENT,
+};
+
 BOOL IsExistAnyYShortcut(GameSystem *gsys) {
     GameData *gameData = GSYS_GetGameData(gsys);
     SaveControl *save = GameData_GetSaveControl(gameData);
@@ -76,7 +112,7 @@ GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *sta
     u32 invalid;
     u32 result;
     BOOL checkPerms;
-    u32 mode;
+    u32 callKind;
     BOOL noRibbon;
     u32 id;
     PlayerActionPerms perms;
@@ -85,130 +121,131 @@ GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *sta
     GameEvent *next;
 
     switch (*state) {
-    case 0:
-        *state = 1;
+    case SHORTCUT_MENU_EVENT_STATE_START:
+        *state = SHORTCUT_MENU_EVENT_STATE_OPEN;
         break;
-    case 1:
+    case SHORTCUT_MENU_EVENT_STATE_OPEN:
         ShortcutMenu_Open(SHORTCUT_MENU_START_CLOSED, work);
-        *state = 2;
+        *state = SHORTCUT_MENU_EVENT_STATE_SLIDE_IN;
         break;
-    case 2:
+    case SHORTCUT_MENU_EVENT_STATE_SLIDE_IN:
         ShortcutMenu_Start(work->app);
-        *state = 3;
+        *state = SHORTCUT_MENU_EVENT_STATE_WAIT_SLIDE_IN;
         break;
-    case 3:
+    case SHORTCUT_MENU_EVENT_STATE_WAIT_SLIDE_IN:
         ShortcutMenu_Main(work->app);
         if (!ShortcutMenu_IsWaitingInput(work->app)) {
-            *state = 4;
+            *state = SHORTCUT_MENU_EVENT_STATE_SELECT;
         }
         break;
-    case 4:
+    case SHORTCUT_MENU_EVENT_STATE_SELECT:
         ShortcutMenu_Main(work->app);
         result = ShortcutMenu_GetResult(work->app, &item);
-        if (result == 1) {
+        if (result == SHORTCUT_MENU_RESULT_SELECTED) {
             noRibbon = FALSE;
-            work->blocked = 0;
+            work->blocked = FIELD_ACTION_ALLOWED;
             checkPerms = ShortcutMenu_GetActionFromKeyItem(item, &action, &invalid);
-            mode = ShortcutMenu_SetKeyItemID(work->input, item);
+            callKind = ShortcutMenu_SetKeyItemID(work->input, item);
             if (invalid == 0 && GameData_IsForceSeasonSync(GSYS_GetGameData(work->gameSystem)) == TRUE) {
-                work->blocked = -1;
+                work->blocked = FIELD_ACTION_BLOCKED;
             } else if (checkPerms == TRUE) {
                 PlayerActionPerms_Create(&perms, work->gameSystem, work->field);
                 work->blocked = PlayerActionPerms_IsActionBlocked(&perms, action);
             }
-            if (item == 11 && !CheckAnyRibbon(work)) {
+            if (item == SHORTCUT_PSTATUS_RIBBON && !CheckAnyRibbon(work)) {
                 noRibbon = TRUE;
             }
             if (work->blocked) {
-                *state = 12;
+                *state = SHORTCUT_MENU_EVENT_STATE_ITEM_USE_BLOCKED;
             } else if (noRibbon == TRUE) {
-                *state = 14;
+                *state = SHORTCUT_MENU_EVENT_STATE_NO_RIBBON;
             } else {
-                switch (mode) {
-                case 0:
-                    *state = 9;
+                switch (callKind) {
+                case SHORTCUT_CALL_APP:
+                    *state = SHORTCUT_MENU_EVENT_STATE_APP_CALL;
                     break;
-                case 1:
-                    *state = 11;
+                case SHORTCUT_CALL_COMMON_EVENT:
+                    *state = SHORTCUT_MENU_EVENT_STATE_COMMON_EVENT;
                     break;
                 }
             }
-        } else if (result == 2) {
-            *state = 5;
+        } else if (result == SHORTCUT_MENU_RESULT_CANCELLED) {
+            *state = SHORTCUT_MENU_EVENT_STATE_SLIDE_OUT;
         }
         break;
-    case 5:
+    case SHORTCUT_MENU_EVENT_STATE_SLIDE_OUT:
         ShortcutMenu_RequestClose(work->app);
-        *state = 6;
+        *state = SHORTCUT_MENU_EVENT_STATE_WAIT_SLIDE_OUT;
         break;
-    case 6:
+    case SHORTCUT_MENU_EVENT_STATE_WAIT_SLIDE_OUT:
         ShortcutMenu_Main(work->app);
         if (!ShortcutMenu_IsWaitingInput(work->app)) {
-            *state = 7;
+            *state = SHORTCUT_MENU_EVENT_STATE_CLOSE;
         }
         break;
-    case 7:
+    case SHORTCUT_MENU_EVENT_STATE_CLOSE:
         if (ShortcutMenu_Close(work)) {
             GFL_HeapFree(work->input);
             EnableAllActorsMovement(Field_GetActorSystem(work->field));
             return GAMEEVENT_DONE;
         }
         break;
-    case 8:
+    case SHORTCUT_MENU_EVENT_STATE_REOPEN:
         ShortcutMenu_Open(SHORTCUT_MENU_START_OPEN, work);
-        *state = 4;
+        *state = SHORTCUT_MENU_EVENT_STATE_SELECT;
         break;
-    case 9:
+    case SHORTCUT_MENU_EVENT_STATE_APP_CALL:
         GameEvent_ChainNext(event, EventFieldAppCall_Create(work->input, work->code));
-        *state = 10;
+        *state = SHORTCUT_MENU_EVENT_STATE_APP_RESULT;
         break;
-    case 10:
-        if (work->input->eventType == 0) {
+    case SHORTCUT_MENU_EVENT_STATE_APP_RESULT:
+        if (work->input->eventType == FIELD_APP_RESULT_RETURN) {
             if (work->done) {
-                *state = 7;
+                *state = SHORTCUT_MENU_EVENT_STATE_CLOSE;
             } else {
-                *state = 8;
+                *state = SHORTCUT_MENU_EVENT_STATE_REOPEN;
             }
-        } else if (work->input->eventType == 1) {
-            *state = 7;
-        } else if (work->input->eventType == 3) {
-            *state = 11;
-        } else if (work->input->eventType == 2) {
-            *state = 16;
+        } else if (work->input->eventType == FIELD_APP_RESULT_EXIT) {
+            *state = SHORTCUT_MENU_EVENT_STATE_CLOSE;
+        } else if (work->input->eventType == FIELD_APP_RESULT_COMMON_EVENT) {
+            *state = SHORTCUT_MENU_EVENT_STATE_COMMON_EVENT;
+        } else if (work->input->eventType == FIELD_APP_RESULT_HM_EVENT) {
+            *state = SHORTCUT_MENU_EVENT_STATE_HM_EVENT;
         }
         break;
-    case 11:
+    case SHORTCUT_MENU_EVENT_STATE_COMMON_EVENT:
         if (ShortcutMenu_Close(work)) {
             id = work->input->eventId;
             GFL_HeapFree(work->input);
             work->input = NULL;
             GameEvent_ChainNext(event, CallFieldCommonEventFunc(id, work->gameSystem, work->field));
-            *state = 13;
+            *state = SHORTCUT_MENU_EVENT_STATE_END;
         }
         break;
-    case 12:
+    case SHORTCUT_MENU_EVENT_STATE_ITEM_USE_BLOCKED:
         if (ShortcutMenu_Close(work)) {
             EventFieldItemUseBlock_Call(event, work->gameSystem, work->input->eventId, work->blocked);
             GFL_HeapFree(work->input);
             work->input = NULL;
-            *state = 13;
+            *state = SHORTCUT_MENU_EVENT_STATE_END;
         }
         break;
-    case 13:
+    case SHORTCUT_MENU_EVENT_STATE_END:
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         return GAMEEVENT_DONE;
-    case 14:
+    case SHORTCUT_MENU_EVENT_STATE_NO_RIBBON:
         if (ShortcutMenu_Close(work)) {
             GFL_HeapFree(work->input);
             work->input = NULL;
-            GameEvent_ChainNext(event, EventFieldItemUseBlock_Create(work->gameSystem, 2, 0));
-            *state = 15;
+            GameEvent_ChainNext(
+                event, EventFieldItemUseBlock_Create(work->gameSystem, ITEM_USE_BLOCK_MSG_NO_RIBBON, ITEM_NONE));
+            *state = SHORTCUT_MENU_EVENT_STATE_NO_RIBBON_END;
         }
         break;
-    case 15:
+    case SHORTCUT_MENU_EVENT_STATE_NO_RIBBON_END:
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         return GAMEEVENT_DONE;
-    case 16:
+    case SHORTCUT_MENU_EVENT_STATE_HM_EVENT:
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         CalcPlayerActionPossibilities(work->field, &possibilities);
         HiddenEventArgs_Set(&args, work->input->partySlot, work->input->eventId, work->input->eventValue);
@@ -216,7 +253,7 @@ GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *sta
         if (next != NULL) {
             GameEvent_ChainNext(event, next);
         }
-        *state = 7;
+        *state = SHORTCUT_MENU_EVENT_STATE_CLOSE;
         break;
     }
     return GAMEEVENT_CONTINUE;
@@ -228,7 +265,7 @@ GameEventReturnCode EventShortcutCallDirect_Callback(GameEvent *event, u32 *stat
     u32 action;
     u32 invalid;
     BOOL checkPerms;
-    u32 mode;
+    u32 callKind;
     BOOL noRibbon;
     u32 id;
     PlayerActionPerms perms;
@@ -237,84 +274,85 @@ GameEventReturnCode EventShortcutCallDirect_Callback(GameEvent *event, u32 *stat
     GameEvent *next;
 
     switch (*state) {
-    case 0:
+    case SHORTCUT_CALL_DIRECT_STATE_START:
         item = ShortcutSave_GetRegistItem(
             SaveControl_GetShortcutSave(GameData_GetSaveControl(GSYS_GetGameData(work->gameSystem))), 0);
         noRibbon = FALSE;
-        mode = ShortcutMenu_SetKeyItemID(work->input, item);
+        callKind = ShortcutMenu_SetKeyItemID(work->input, item);
         checkPerms = ShortcutMenu_GetActionFromKeyItem(item, &action, &invalid);
-        work->blocked = 0;
+        work->blocked = FIELD_ACTION_ALLOWED;
         if (invalid == 0 && GameData_IsForceSeasonSync(GSYS_GetGameData(work->gameSystem)) == TRUE) {
-            work->blocked = -1;
+            work->blocked = FIELD_ACTION_BLOCKED;
         } else if (checkPerms == TRUE) {
             PlayerActionPerms_Create(&perms, work->gameSystem, work->field);
             work->blocked = PlayerActionPerms_IsActionBlocked(&perms, action);
         }
-        if (item == 11 && !CheckAnyRibbon(work)) {
+        if (item == SHORTCUT_PSTATUS_RIBBON && !CheckAnyRibbon(work)) {
             noRibbon = TRUE;
         }
         if (work->blocked) {
-            *state = 5;
+            *state = SHORTCUT_CALL_DIRECT_STATE_ITEM_USE_BLOCKED;
         } else if (noRibbon == TRUE) {
-            *state = 7;
+            *state = SHORTCUT_CALL_DIRECT_STATE_NO_RIBBON;
         } else {
-            switch (mode) {
-            case 0:
-                *state = 2;
+            switch (callKind) {
+            case SHORTCUT_CALL_APP:
+                *state = SHORTCUT_CALL_DIRECT_STATE_APP_CALL;
                 break;
-            case 1:
-                *state = 4;
+            case SHORTCUT_CALL_COMMON_EVENT:
+                *state = SHORTCUT_CALL_DIRECT_STATE_COMMON_EVENT;
                 break;
             }
         }
         break;
-    case 1:
+    case SHORTCUT_CALL_DIRECT_STATE_CLOSE:
         GFL_HeapFree(work->input);
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         return GAMEEVENT_DONE;
-    case 2:
+    case SHORTCUT_CALL_DIRECT_STATE_APP_CALL:
         if (ShortcutMenu_Close(work)) {
             GameEvent_ChainNext(event, EventFieldAppCall_Create(work->input, work->code));
-            *state = 3;
+            *state = SHORTCUT_CALL_DIRECT_STATE_APP_RESULT;
         }
         break;
-    case 3:
-        if (work->input->eventType == 0) {
-            *state = 1;
-        } else if (work->input->eventType == 1) {
-            *state = 1;
-        } else if (work->input->eventType == 3) {
-            *state = 4;
-        } else if (work->input->eventType == 2) {
-            *state = 9;
+    case SHORTCUT_CALL_DIRECT_STATE_APP_RESULT:
+        if (work->input->eventType == FIELD_APP_RESULT_RETURN) {
+            *state = SHORTCUT_CALL_DIRECT_STATE_CLOSE;
+        } else if (work->input->eventType == FIELD_APP_RESULT_EXIT) {
+            *state = SHORTCUT_CALL_DIRECT_STATE_CLOSE;
+        } else if (work->input->eventType == FIELD_APP_RESULT_COMMON_EVENT) {
+            *state = SHORTCUT_CALL_DIRECT_STATE_COMMON_EVENT;
+        } else if (work->input->eventType == FIELD_APP_RESULT_HM_EVENT) {
+            *state = SHORTCUT_CALL_DIRECT_STATE_HM_EVENT;
         }
         break;
-    case 4:
+    case SHORTCUT_CALL_DIRECT_STATE_COMMON_EVENT:
         id = work->input->eventId;
         GFL_HeapFree(work->input);
         work->input = NULL;
         GameEvent_ChainNext(event, CallFieldCommonEventFunc(id, work->gameSystem, work->field));
-        *state = 6;
+        *state = SHORTCUT_CALL_DIRECT_STATE_END;
         break;
-    case 5:
+    case SHORTCUT_CALL_DIRECT_STATE_ITEM_USE_BLOCKED:
         EventFieldItemUseBlock_Call(event, work->gameSystem, work->input->eventId, work->blocked);
         GFL_HeapFree(work->input);
         work->input = NULL;
-        *state = 6;
+        *state = SHORTCUT_CALL_DIRECT_STATE_END;
         break;
-    case 6:
+    case SHORTCUT_CALL_DIRECT_STATE_END:
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         return GAMEEVENT_DONE;
-    case 7:
+    case SHORTCUT_CALL_DIRECT_STATE_NO_RIBBON:
         GFL_HeapFree(work->input);
         work->input = NULL;
-        GameEvent_ChainNext(event, EventFieldItemUseBlock_Create(work->gameSystem, 2, 0));
-        *state = 8;
+        GameEvent_ChainNext(event,
+                            EventFieldItemUseBlock_Create(work->gameSystem, ITEM_USE_BLOCK_MSG_NO_RIBBON, ITEM_NONE));
+        *state = SHORTCUT_CALL_DIRECT_STATE_NO_RIBBON_END;
         break;
-    case 8:
+    case SHORTCUT_CALL_DIRECT_STATE_NO_RIBBON_END:
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         return GAMEEVENT_DONE;
-    case 9:
+    case SHORTCUT_CALL_DIRECT_STATE_HM_EVENT:
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         CalcPlayerActionPossibilities(work->field, &possibilities);
         HiddenEventArgs_Set(&args, work->input->partySlot, work->input->eventId, work->input->eventValue);
@@ -322,7 +360,7 @@ GameEventReturnCode EventShortcutCallDirect_Callback(GameEvent *event, u32 *stat
         if (next != NULL) {
             GameEvent_ChainNext(event, next);
         }
-        *state = 1;
+        *state = SHORTCUT_CALL_DIRECT_STATE_CLOSE;
         break;
     }
     return GAMEEVENT_CONTINUE;
@@ -332,134 +370,134 @@ u32 ShortcutMenu_SetKeyItemID(FieldAppCallInput *input, u32 item) {
     switch (item) {
     case SHORTCUT_BICYCLE:
         input->eventId = FIELD_COMMON_EVENT_CYCLING;
-        return 1;
+        return SHORTCUT_CALL_COMMON_EVENT;
     case SHORTCUT_TOWN_MAP:
         input->appId = FIELD_APP_TOWNMAP;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_VS_RECORDER:
         input->appId = FIELD_APP_BATTLE_RECORDER;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_PAL_PAD:
         input->appId = FIELD_APP_WIFI_NOTE;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_SUPER_ROD:
         input->eventId = FIELD_COMMON_EVENT_FISHING;
-        return 1;
+        return SHORTCUT_CALL_COMMON_EVENT;
     case SHORTCUT_DOWSING_MCHN:
         input->eventId = FIELD_COMMON_EVENT_DOWSING;
-        return 1;
+        return SHORTCUT_CALL_COMMON_EVENT;
     case SHORTCUT_GRACIDEA:
         input->appId = FIELD_APP_POKELIST;
         input->appParam = ITEM_GRACIDEA;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_DNA_SPLICERS_FUSE:
         input->appId = FIELD_APP_POKELIST;
         input->appParam = ITEM_DNA_SPLICERS_FUSE;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_DNA_SPLICERS_SEPARATE:
         input->appId = FIELD_APP_POKELIST;
         input->appParam = ITEM_DNA_SPLICERS_SEPARATE;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_PSTATUS_INFO:
         input->appId = FIELD_APP_POKESTATUS;
         input->appParam = PSTATUS_PAGE_INFO;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_PSTATUS_SKILL:
         input->appId = FIELD_APP_POKESTATUS;
         input->appParam = PSTATUS_PAGE_SKILL;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_PSTATUS_RIBBON:
         input->appId = FIELD_APP_POKESTATUS;
         input->appParam = PSTATUS_PAGE_RIBBON;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_BAG_ITEMS:
         input->appId = FIELD_APP_BAG;
         input->appParam = BAG_POCKET_ITEMS;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_BAG_MEDICINE:
         input->appId = FIELD_APP_BAG;
         input->appParam = BAG_POCKET_MEDICINE;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_BAG_TMS_HMS:
         input->appId = FIELD_APP_BAG;
         input->appParam = BAG_POCKET_TMS_HMS;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_BAG_BERRIES:
         input->appId = FIELD_APP_BAG;
         input->appParam = BAG_POCKET_BERRIES;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_BAG_KEY_ITEMS:
         input->appId = FIELD_APP_BAG;
         input->appParam = BAG_POCKET_KEY_ITEMS;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_BAG_FREE_SPACE:
         input->appId = FIELD_APP_BAG;
         input->appParam = BAG_POCKET_FREE_SPACE;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_POKEDEX_LIST:
         input->appId = FIELD_APP_POKEDEX;
         input->appParam = POKEDEX_START_LIST;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_POKEDEX_SEARCH:
         input->appId = FIELD_APP_POKEDEX;
         input->appParam = POKEDEX_START_SEARCH;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_POKEDEX_INFO:
         input->appId = FIELD_APP_POKEDEX;
         input->appParam = POKEDEX_START_INFO;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_POKEDEX_MAP:
         input->appId = FIELD_APP_POKEDEX;
         input->appParam = POKEDEX_START_MAP;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_POKEDEX_VOICE:
         input->appId = FIELD_APP_POKEDEX;
         input->appParam = POKEDEX_START_VOICE;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_POKEDEX_FORM:
         input->appId = FIELD_APP_POKEDEX;
         input->appParam = POKEDEX_START_FORM;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_POKEDEX_AWARDS:
         input->appId = FIELD_APP_POKEDEX;
         input->appParam = POKEDEX_START_AWARDS;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_POKEDEX_HABITAT:
         input->appId = FIELD_APP_POKEDEX;
         input->appParam = POKEDEX_START_HABITATS;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_TRAINER_CARD_FRONT:
         input->appId = FIELD_APP_TRAINER_CARD;
         input->appParam = TRCARD_START_FRONT;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_TRAINER_CARD_BACK:
         input->appId = FIELD_APP_TRAINER_CARD;
         input->appParam = TRCARD_START_BACK;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_TRAINER_CARD_BADGES:
         input->appId = FIELD_APP_TRAINER_CARD;
         input->appParam = TRCARD_START_BADGES;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_CONFIG_PANEL:
         input->appId = FIELD_APP_CONFIG;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_XTRANSCEIVER:
         input->appId = FIELD_APP_XTRANSCEIVER;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_MEDAL_BOX:
         input->appId = FIELD_APP_MEDALBOX;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_POKELIST:
         input->appId = FIELD_APP_POKELIST;
         input->appParam = -1;
-        return 0;
+        return SHORTCUT_CALL_APP;
     case SHORTCUT_REVEAL_GLASS:
         input->appId = FIELD_APP_POKELIST;
         input->appParam = ITEM_REVEAL_GLASS;
-        return 0;
+        return SHORTCUT_CALL_APP;
     default:
         input->appId = FIELD_APP_POKEDEX;
-        return 0;
+        return SHORTCUT_CALL_APP;
     }
 }
 
@@ -467,28 +505,28 @@ BOOL ShortcutMenu_GetActionFromKeyItem(s32 item, u32 *action, u32 *invalid) {
     *invalid = 0;
     switch (item) {
     case SHORTCUT_BICYCLE:
-        *action = 0;
+        *action = PLAYER_ACTION_BICYCLE;
         return TRUE;
     case SHORTCUT_TOWN_MAP:
-        *action = 1;
+        *action = PLAYER_ACTION_TOWN_MAP;
         return TRUE;
     case SHORTCUT_VS_RECORDER:
-        *action = 6;
+        *action = PLAYER_ACTION_VS_RECORDER;
         return TRUE;
     case SHORTCUT_PAL_PAD:
-        *action = 2;
+        *action = PLAYER_ACTION_PAL_PAD;
         return TRUE;
     case SHORTCUT_SUPER_ROD:
-        *action = 5;
+        *action = PLAYER_ACTION_FISHING;
         return TRUE;
     case SHORTCUT_DOWSING_MCHN:
-        *action = 9;
+        *action = PLAYER_ACTION_DOWSING;
         return TRUE;
     case SHORTCUT_XTRANSCEIVER:
-        *action = 10;
+        *action = PLAYER_ACTION_XTRANSCEIVER;
         return TRUE;
     case SHORTCUT_MEDAL_BOX:
-        *action = 11;
+        *action = PLAYER_ACTION_MEDAL_BOX;
         return TRUE;
     case SHORTCUT_GRACIDEA:
     case SHORTCUT_DNA_SPLICERS_FUSE:
@@ -501,7 +539,7 @@ BOOL ShortcutMenu_GetActionFromKeyItem(s32 item, u32 *action, u32 *invalid) {
     }
 }
 
-void ShortcutMenu_Open(u32 arg0, ShortcutMenuWork *work) {
+void ShortcutMenu_Open(u32 mode, ShortcutMenuWork *work) {
     GameData *gameData;
     ShortcutMenuPos *listPos;
     FieldMsgBG *msgBGSys;
@@ -514,7 +552,7 @@ void ShortcutMenu_Open(u32 arg0, ShortcutMenuWork *work) {
         }
         gameData = GSYS_GetGameData(work->gameSystem);
         listPos = GameData_GetShortcutMenuPos(gameData);
-        work->app = ShortcutMenu_Create(gameData, arg0, listPos, HEAPID_FIELD_PARTICLE, HEAPID_FIELDMAP);
+        work->app = ShortcutMenu_Create(gameData, mode, listPos, HEAPID_FIELD_PARTICLE, HEAPID_FIELDMAP);
     }
 }
 
@@ -558,7 +596,8 @@ BOOL ShortcutMenu_CanRetry(FieldAppCallInput *input, void *arg) {
         if (ShortcutSave_GetShortcutCount(shortcut) == 0) {
             work->done = 1;
             work->state = 2;
-        } else if (input->eventType == 1 || input->eventType == 3 || input->eventType == 2 || input->eventType == 5) {
+        } else if (input->eventType == FIELD_APP_RESULT_EXIT || input->eventType == FIELD_APP_RESULT_COMMON_EVENT ||
+                   input->eventType == FIELD_APP_RESULT_HM_EVENT || input->eventType == FIELD_APP_RESULT_SCRIPT) {
             work->state = 2;
         } else {
             ShortcutMenu_Open(SHORTCUT_MENU_START_OPEN, work);
@@ -581,41 +620,41 @@ BOOL ShortcutMenu_CanLeaveField(FieldAppCallInput *input, void *arg) {
     return ShortcutMenu_Close(arg);
 }
 
-void EventFieldItemUseBlock_Call(GameEvent *parent, GameSystem *gsys, u32 action, u32 kind) {
-    u32 param = 0;
-    u32 item = 0;
+void EventFieldItemUseBlock_Call(GameEvent *parent, GameSystem *gsys, u32 eventId, u32 blocked) {
+    u32 message = ITEM_USE_BLOCK_MSG_CANT_USE;
+    u32 item = ITEM_NONE;
     GameEvent *event;
 
-    if (kind == 1) {
-        param = 3;
-        switch (action) {
-        case 0:
-            item = 0x1c2;
+    if (blocked == FIELD_ACTION_ALLOWED_PAIRED) {
+        message = ITEM_USE_BLOCK_MSG_PAIRED;
+        switch (eventId) {
+        case FIELD_COMMON_EVENT_CYCLING:
+            item = ITEM_BICYCLE;
             break;
-        case 2:
-            item = 0x4e;
+        case FIELD_COMMON_EVENT_ESCAPE_ROPE:
+            item = ITEM_ESCAPE_ROPE;
             break;
-        case 4:
-            item = 0x1bf;
+        case FIELD_COMMON_EVENT_FISHING:
+            item = ITEM_SUPER_ROD;
             break;
         }
-    } else if (action == 0) {
+    } else if (eventId == FIELD_COMMON_EVENT_CYCLING) {
         GameData *gameData = GSYS_GetGameData(gsys);
         PlayerState *state = GameData_GetPlayerState(gameData);
 
-        if (FieldPlayerState_GetExState(state) == 1) {
-            param = 1;
+        if (FieldPlayerState_GetExState(state) == FLD_PLAYER_EXSTATE_CYCLING) {
+            message = ITEM_USE_BLOCK_MSG_CANT_DISMOUNT;
         }
     }
-    event = EventFieldItemUseBlock_Create(gsys, param, item);
+    event = EventFieldItemUseBlock_Create(gsys, message, item);
     GameEvent_ChainNext(parent, event);
 }
 
-GameEvent *EventFieldItemUseBlock_Create(GameSystem *gsys, u32 arg1, u32 arg2) {
-    GameEvent *event = EventScriptCall_Create(gsys, 0x7d6, NULL, 0x15);
+GameEvent *EventFieldItemUseBlock_Create(GameSystem *gsys, u32 message, u32 item) {
+    GameEvent *event = EventScriptCall_Create(gsys, 0x7d6, NULL, HEAPID_FIELDMAP);
     ScriptWork *work = EventScriptCall_GetWork(event);
 
-    ScriptWork_SetParams(work, arg1, arg2, 0, 0);
+    ScriptWork_SetParams(work, message, item, 0, 0);
     return event;
 }
 

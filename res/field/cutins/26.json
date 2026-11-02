@@ -1,0 +1,38 @@
+{
+    "$schema": "cutin.schema.json",
+    "particle": 109,
+    "particle_delays": [ 91, 0 ],
+    "models": [ 110, 111 ],
+    "actor_delays": [ 4, 4 ],
+    "animations1": [ 112, 113, 114, null ],
+    "animations2": [ 115, 116, 117, null ],
+    "dim_capture": 1,
+    "key_list": 6,
+    "bitmap_flag": 2,
+    "bitmaps": [
+        {
+            "texture": "trsw_lead01",
+            "palette": "lead01",
+            "resource": 0,
+            "char_file": 13,
+            "palette_file": 66,
+            "palette_offset": 0,
+            "width": 16,
+            "height": 16,
+            "source_stride": 16,
+            "source_offset": 0
+        },
+        {
+            "texture": "trsw_lead02",
+            "palette": "lead02",
+            "resource": 0,
+            "char_file": 14,
+            "palette_file": 66,
+            "palette_offset": 0,
+            "width": 16,
+            "height": 16,
+            "source_stride": 16,
+            "source_offset": 0
+        }
+    ]
+}

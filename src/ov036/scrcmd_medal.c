@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_internal.h"
@@ -124,7 +125,7 @@ BOOL Scrcmd_Medal_MedalGetFieldEffectID(VM *vm, FieldScriptEnv *env) {
     SaveControl_GetMedalBox(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     medal = ScriptReadAny(vm, env);
     result = ScriptReadVar(vm, env);
-    GFL_ArcSysRead(&data, 0xeb, medal);
+    GFL_ArcSysRead(&data, ARCID_MEDAL_DEF, medal);
     *result = data.type + 0x4e;
     return FALSE;
 }
@@ -145,7 +146,7 @@ u32 CountMedalsByStatus(FieldScriptEnv *env, u32 status) {
 
 u32 GetHintableMedalCount(FieldScriptEnv *env) {
     MedalBox *box = SaveControl_GetMedalBox(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0xeb, FieldScriptEnv_GetHeapID(env));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_DEF, FieldScriptEnv_GetHeapID(env));
     u32 i, count;
     MedalData data;
 
@@ -177,7 +178,7 @@ BOOL Scrcmd_Medal_MedalGetMostCompleteCategory(VM *vm, FieldScriptEnv *env) {
     fx32 obtained[5] = { 0 };
     fx32 total[5] = { 0 };
     MedalBox *box = SaveControl_GetMedalBox(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0xeb, FieldScriptEnv_GetHeapID(env));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_DEF, FieldScriptEnv_GetHeapID(env));
     u16 *result = ScriptReadVar(vm, env);
     u32 typeToCategory[27] = { 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4 };
     MedalData data;

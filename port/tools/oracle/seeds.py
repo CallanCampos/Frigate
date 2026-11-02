@@ -44,7 +44,7 @@ DUMPS = [
     f"seed_gfl=*gfl_use.c/sWork:24@{BOOT_FRAMES}",
     f"seed_mt=*gf_standard.c/sGFLStd:4@{BOOT_FRAMES}",
     f"seed_mti=*gf_standard.c/sGFLStd+2496:4@{BOOT_FRAMES}",
-    "seed_battle=data_ov167_021dd844:32@all",
+    "seed_battle=g_BtlCalcWork:32@all",
 ]
 # How many steps a battle's rolls may take its context on from one frame to the next before a state is taken for
 # another battle's seed; a turn draws a few dozen

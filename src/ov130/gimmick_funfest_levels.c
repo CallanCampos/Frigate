@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_exp_obj.h"
@@ -13,10 +14,6 @@
 #include "system/game_system.h"
 
 #define GIMMICK_WORK_ID 0
-
-// The archives of the scene's models
-#define GIMMICK_ARCID_BODY 0xcc
-#define GIMMICK_ARCID_PARTS 0xcf
 
 // Models 0 to 4 show a player's Black level, 5 to 9 their White level, one lit each
 #define MODEL_BLACK_LEVEL 0
@@ -80,10 +77,12 @@ static const G3DSceneAnimationSetup sStartEffectAnimations[] = { { 7, 0 }, { 8, 
 static const int sAnimationCounts[MODEL_COUNT - MODEL_EFFECT_0] = { 2, 1, 3, 1 };
 
 static const G3DSceneResourceSetup sFunfestLevelsResources[12] = {
-    { GIMMICK_ARCID_BODY, 0, 0 },  { GIMMICK_ARCID_PARTS, 1, 0 },  { GIMMICK_ARCID_PARTS, 0, 0 },
-    { GIMMICK_ARCID_PARTS, 2, 0 }, { GIMMICK_ARCID_PARTS, 3, 0 },  { GIMMICK_ARCID_PARTS, 4, 0 },
-    { GIMMICK_ARCID_PARTS, 5, 0 }, { GIMMICK_ARCID_PARTS, 7, 0 },  { GIMMICK_ARCID_PARTS, 8, 0 },
-    { GIMMICK_ARCID_PARTS, 6, 0 }, { GIMMICK_ARCID_PARTS, 10, 0 }, { GIMMICK_ARCID_PARTS, 9, 0 },
+    { ARCID_GIMMICK_FUNFEST_LEVELS_BODY, 0, 0 },   { ARCID_GIMMICK_FUNFEST_LEVELS_PARTS, 1, 0 },
+    { ARCID_GIMMICK_FUNFEST_LEVELS_PARTS, 0, 0 },  { ARCID_GIMMICK_FUNFEST_LEVELS_PARTS, 2, 0 },
+    { ARCID_GIMMICK_FUNFEST_LEVELS_PARTS, 3, 0 },  { ARCID_GIMMICK_FUNFEST_LEVELS_PARTS, 4, 0 },
+    { ARCID_GIMMICK_FUNFEST_LEVELS_PARTS, 5, 0 },  { ARCID_GIMMICK_FUNFEST_LEVELS_PARTS, 7, 0 },
+    { ARCID_GIMMICK_FUNFEST_LEVELS_PARTS, 8, 0 },  { ARCID_GIMMICK_FUNFEST_LEVELS_PARTS, 6, 0 },
+    { ARCID_GIMMICK_FUNFEST_LEVELS_PARTS, 10, 0 }, { ARCID_GIMMICK_FUNFEST_LEVELS_PARTS, 9, 0 },
 };
 
 static const G3DSceneActorSetup sFunfestLevelsActors[MODEL_COUNT] = {

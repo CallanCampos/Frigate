@@ -1,0 +1,153 @@
+{
+    "$schema": "local_tvt.schema.json",
+    "scripts": [
+        {
+            "persons": [ 5, 0, null, null ],
+            "zones": [ "ZONE_ASPERTIA_CITY_2", "ZONE_VIRBANK_CITY", "ZONE_BLACK_CITY", "ZONE_BLACK_CITY" ],
+            "commands": [
+                {
+                    "command": "talk",
+                    "face": 0,
+                    "message": "LocalTvtScript01_Text_HiItsMomWhere"
+                }
+            ]
+        },
+        {
+            "persons": [ 8, 0, null, null ],
+            "zones": [ "ZONE_BLACK_CITY", "ZONE_NIMBASA_CITY_2", "ZONE_BLACK_CITY", "ZONE_BLACK_CITY" ],
+            "commands": [
+                {
+                    "command": "talk",
+                    "face": 0,
+                    "message": "LocalTvtScript02_Text_UmHelloYesThats"
+                },
+                {
+                    "command": "talk",
+                    "face": 0,
+                    "message": "LocalTvtScript02_Text_AlsoImSureYoull"
+                }
+            ]
+        },
+        {
+            "persons": [ 8, 0, null, null ],
+            "zones": [ "ZONE_BLACK_CITY", "ZONE_NIMBASA_CITY_2", "ZONE_BLACK_CITY", "ZONE_BLACK_CITY" ],
+            "commands": [
+                {
+                    "command": "talk",
+                    "face": 0,
+                    "message": "LocalTvtScript03_Text_HelloOhYesThats"
+                },
+                {
+                    "command": "talk",
+                    "face": 0,
+                    "message": "LocalTvtScript03_Text_AlsoImSureYoull"
+                }
+            ]
+        },
+        {
+            "persons": [ 5, 0, null, null ],
+            "zones": [ "ZONE_ASPERTIA_CITY_2", "ZONE_ROUTE_7", "ZONE_BLACK_CITY", "ZONE_BLACK_CITY" ],
+            "commands": [
+                {
+                    "command": "talk",
+                    "face": 0,
+                    "message": "LocalTvtScript04_Text_HiItsMomWhere"
+                }
+            ]
+        },
+        {
+            "persons": [ 1, 2, 0, null ],
+            "zones": [ "ZONE_HUMILAU_CITY", "ZONE_ROUTE_11", "ZONE_OPELUCID_CITY", "ZONE_BLACK_CITY" ],
+            "commands": [
+                {
+                    "command": "talk",
+                    "face": 0,
+                    "message": "LocalTvtScript05_Text_StrangeShipFlyingToward"
+                },
+                {
+                    "command": "talk",
+                    "face": 1,
+                    "message": "LocalTvtScript05_Text_SawTooImEn"
+                },
+                {
+                    "command": "talk",
+                    "face": 0,
+                    "message": "LocalTvtScript05_Text_CherenThatsTeamPlasmas"
+                },
+                {
+                    "command": "talk",
+                    "face": 1,
+                    "message": "LocalTvtScript05_Text_YesNoDoubtAbout"
+                },
+                {
+                    "command": "talk",
+                    "face": 0,
+                    "message": "LocalTvtScript05_Text_OkIllLeaveThings"
+                }
+            ]
+        },
+        {
+            "persons": [ 4, 0, 2, 3 ],
+            "zones": [ "ZONE_NUVEMA_TOWN", "ZONE_ASPERTIA_CITY", "ZONE_ASPERTIA_CITY", "ZONE_ASPERTIA_CITY" ],
+            "commands": [
+                {
+                    "command": "talk",
+                    "face": 0,
+                    "message": "LocalTvtScript06_Text_HiThereImProfessor"
+                },
+                {
+                    "command": "talk",
+                    "face": 3,
+                    "message": "LocalTvtScript06_Text_HiProfessorJuniperIts"
+                },
+                {
+                    "command": "talk",
+                    "face": 0,
+                    "message": "LocalTvtScript06_Text_ThankGoingFarErrand"
+                },
+                {
+                    "command": "talk",
+                    "face": 2,
+                    "message": "LocalTvtScript06_Text_ProfessorJuniperItsBeen"
+                },
+                {
+                    "command": "talk",
+                    "face": 0,
+                    "message": "LocalTvtScript06_Text_OhCherenHavingBattles"
+                },
+                {
+                    "command": "talk",
+                    "face": 3,
+                    "message": "LocalTvtScript06_Text_ItllFineCherensNew"
+                },
+                {
+                    "command": "talk",
+                    "face": 0,
+                    "message": "LocalTvtScript06_Text_ThatsRightBiancaOur"
+                }
+            ]
+        },
+        {
+            "persons": [ 1, 0, null, null ],
+            "zones": [ "ZONE_HUMILAU_CITY", "ZONE_UNDELLA_TOWN", "ZONE_BLACK_CITY", "ZONE_BLACK_CITY" ],
+            "commands": [
+                {
+                    "command": "talk",
+                    "face": 0,
+                    "message": "LocalTvtScript07_Text_WhereUndellaTownGot"
+                }
+            ]
+        },
+        {
+            "persons": [ 1, 0, null, null ],
+            "zones": [ "ZONE_HUMILAU_CITY", "ZONE_UNDELLA_BAY", "ZONE_BLACK_CITY", "ZONE_BLACK_CITY" ],
+            "commands": [
+                {
+                    "command": "talk",
+                    "face": 0,
+                    "message": "LocalTvtScript08_Text_WhereCloseSeasideCave"
+                }
+            ]
+        }
+    ]
+}
