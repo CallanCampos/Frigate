@@ -20,8 +20,8 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   memory between their blocks, before scaling heaps: there the free list's head was the used list's last block, and
   the rest of the heap, 1.49 MB, sat in a free block that only a broken link reached, whose `prev` held the address
   that the gimmick had just written 8 bytes past its block. The sanitized build then names the write.
-- A work allocated with a literal size that the DS's struct has (`0x30`, `WORK_SIZE`) is the host's most common heap
-  overrun: grep the allocation's callers for literals and compare them with the host's `sizeof`
+- A work allocated with a literal size that the DS's struct has (`0x30`, `WORK_SIZE`) overruns its block on a host,
+  and has done so before: grep the allocation's callers for literals and compare them with the host's `sizeof`
   ([game-changes.md](game-changes.md) has the earlier ones, `fld3d_ci.c`'s and the hidden-move events').
 
 ## 2026-11-01: keep the verifier's exit status when its output is gone
