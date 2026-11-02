@@ -488,7 +488,7 @@ static void MemoryFilesMain(void) {
 
 // The game's genuine-card check (src/ov338/ir_check.c), which runs at every CONTINUE and NEW GAME
 // (src/system/game_beacon.c's GameBeaconSys_CheckGenuineCard) and when a Pokémon faints in a wild or trainer battle
-// (src/ov167/btl_main.c's func_ov167_0219bdfc), against the card's infrared chip on the SPI registers
+// (src/ov167/btl_main.c's IsExpGainEnabled), against the card's infrared chip on the SPI registers
 // (port/hal/card/card_spi.c). It takes the card's backup lock, which CARD_Init (through FS_Init) sets up. The check
 // passes on melonDS, which the oracle runs: after CONTINUE, the oracle's HBlank task list holds no task, where a failed
 // check would leave GameBeaconSys_HideNewHBlank in it for good, and battles there give experience

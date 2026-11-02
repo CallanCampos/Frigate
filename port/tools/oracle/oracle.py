@@ -1403,12 +1403,12 @@ CENTER_PLAY_SECONDS = ("the play time's seconds, which each program counts with 
                        "White 2's port saves 740 counts (12 seconds of passes) after the DS, past the cut on presses "
                        "of its own, and holds 0:08:10 against the DS's 0:08:06")
 MYSTERY_KEY = ("the mystery gift block's key (MysteryGiftSaveData.key, include/save/mystery_gift.h): the Pokemon "
-               "Center's deliveryman's scripts (res/field/scripts/global_10395.s, Cmd_01DB, PdwPostman's "
-               "func_ov033_02177d78 in src/ov033/pdw_postman.c) read the block as the player enters, and every read "
-               "decrypts it and encrypts it again with a key that mgEncryptData (src/system/mystery_data.c) takes "
-               "from the VBlank count, (OS_GetVBlankCount() << 8) | OS_GetVBlankCount(): the DS's count runs ahead of "
-               "the game's passes (its dropped frames and long loads) and the port's doesn't, so the same contents "
-               "come out as other bytes. The trip compares the blocks decrypted, each with its own key "
+               "Center's deliveryman's scripts (res/field/scripts/global_10395.s, Cmd_01DB, "
+               "Scrcmd_PdwPostman_MysteryGifts in src/ov033/pdw_postman.c) read the block as the player enters, and "
+               "every read decrypts it and encrypts it again with a key that mgEncryptData (src/system/mystery_data.c) "
+               "takes from the VBlank count, (OS_GetVBlankCount() << 8) | OS_GetVBlankCount(): the DS's count runs "
+               "ahead of the game's passes (its dropped frames and long loads) and the port's doesn't, so the same "
+               "contents come out as other bytes. The trip compares the blocks decrypted, each with its own key "
                "(mystery_gift_decrypted): their contents and checksums are the same, and only the key differs (the "
                "port's 0x7f7f; the DS's 0x7560 in Black 2 and 0xb793 in White 2); the catch saves, made without "
                "entering a Pokemon Center, hold the block as the start save has it")
