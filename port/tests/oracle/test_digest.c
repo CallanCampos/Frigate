@@ -603,9 +603,9 @@ static void TestDepth(void) {
     // Cut to 32 bits before the clamp: 0x3ffffffffffe00 becomes -0x200, then 0
     CHECK(pbw_digest_zbuffer_depth(0x7fffffff, 1) == 0);
     // A clip W of 2^24 or more is truncated to 24 bits first, which can leave a small divisor and a product past 32
-    // bits, where the cut decides the depth: 0x2007ffe00, 0x4000007ffe00 and -0x1ff800200 all cut to 0x7ffe00.
-    // Frigate's ToScreen (ge.c) clamps the 64-bit product instead, giving 0xffffff, 0xffffff and 0 for these: the
-    // difference the digest reports for such vertices until ToScreen cuts too (digest.h)
+    // bits, where the cut decides the depth: 0x2007ffe00, 0x400007ffe00 and -0x1ff800200 all cut to 0x7ffe00, where
+    // clamping the whole 64-bit product would give 0xffffff, 0xffffff and 0. Frigate's ToScreen (ge.c) cuts as melonDS
+    // does, and g3d_ge's depth cut cases hold it to these values (digest.h)
     CHECK(pbw_digest_zbuffer_depth(0x400, 0x01000001) == 0x7ffe00);
     CHECK(pbw_digest_zbuffer_depth(0x800000, 0x01000010) == 0x7ffe00);
     CHECK(pbw_digest_zbuffer_depth(-0x400, 0x01000001) == 0x7ffe00);
@@ -718,9 +718,11 @@ static void TestStripDereferenced(void) {
 }
 
 // W = 0: melonDS puts the vertex at (0, 0) with the depth 0x7ffe00 (GPU3D.cpp: "z = 0x7FFE00") and marks the polygon
-// degenerate; the port puts it at the viewport's origin, (0, 0) for the whole screen, with the depth 0 (ge.c's
-// ToScreen). The canonical depth is 0 on both; X, Y and W are compared as they are. The other vertices' depths are the
-// Z-buffer's on both, though this list W-buffers (SWAP_BUFFERS bit 1), where melonDS's FinalZ would hold W
+// degenerate; the port puts it at the viewport's origin, (0, 0) for the whole screen, with the same depth (ge.c's
+// ToScreen). The canonical depth is 0 on both; X, Y and W are compared as they are. The port's side here has the depth
+// 0, which ToScreen gave until it took melonDS's value, so that the two depths differ and the check shows the encoding
+// making any depth 0 there. The other vertices' depths are the Z-buffer's on both, though this list W-buffers
+// (SWAP_BUFFERS bit 1), where melonDS's FinalZ would hold W
 static void TestWZero(void) {
     PbwDigestFrame port;
     PbwDigestFrame melon;
@@ -761,7 +763,7 @@ static void TestWZero(void) {
     CHECK(portBytes.size == melonBytes.size && memcmp(portBytes.data, melonBytes.data, portBytes.size) == 0);
     CHECK(Word(&melonBytes, 2 + 5 + 9 * 2 + 2) == 0);
     CHECK(Word(&melonBytes, 2 + 5 + 2) == 0xbffe00);
-    // melonDS's depth for that vertex isn't the port's
+    // The two sides' depths for that vertex differ, so the encoding is what makes their words equal
     CHECK(melonVertices[2].depth == 0x7ffe00 && melonVertices[2].depth != portVertices[2].depth);
     pbw_digest_bytes_free(&portBytes);
     pbw_digest_bytes_free(&melonBytes);

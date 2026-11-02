@@ -13,6 +13,8 @@ stopped at the first frame that differs; and where its hash, xxHash, comes from.
   request of its first part (the canonical encoding, its format and its tests, [below](#consequences)), which wires
   the digest into neither program. It stays proposed until the owner confirms the defaults that
   [Consequences](#consequences) marks as the owner's to confirm; the change that records that sets the status line.
+- **Note (2026-11-02):** PR 76, which made `ToScreen`'s depth melonDS's, corrected this record's two factual notes on
+  Frigate's depth, in [Context](#context) and [Consequences](#consequences); its decisions are unchanged.
 
 ## Context
 
@@ -40,11 +42,12 @@ Three facts, measured by the prototype, make an exact, port-alone check possible
 Comparing the two programs' state needs one canonical form of it. melonDS 1.1 keeps some registers decoded (the
 windows' coordinates split, BLDY clamped, BG2X and BG3X sign-extended) and drops the bits its writes mask; Frigate keeps
 the bytes the game wrote. Strips share vertices in both, by different rules, and the two programs' depth differs where
-W is 0 or the list W-buffers. The repository keeps no third-party code in its tree: its dependencies are fetched at
-configure time, pinned, into the build directory. minicoro, a single header like xxHash, is fetched by every host build
-([port/cmake/os.cmake](../../cmake/os.cmake), pinned to a commit) and put on a system include path; SDL3 is fetched
-when no installed SDL3 serves ([port/CMakeLists.txt](../../CMakeLists.txt), by the SHA-256 of its release archive);
-melonDS, for the oracle alone, the same way ([melonds.cmake](../../tools/oracle/melonds.cmake)).
+the list W-buffers (and differed where W is 0, until Frigate took melonDS's `0x7ffe00` there, below). The repository
+keeps no third-party code in its tree: its dependencies are fetched at configure time, pinned, into the build directory.
+minicoro, a single header like xxHash, is fetched by every host build ([port/cmake/os.cmake](../../cmake/os.cmake),
+pinned to a commit) and put on a system include path; SDL3 is fetched when no installed SDL3 serves
+([port/CMakeLists.txt](../../CMakeLists.txt), by the SHA-256 of its release archive); melonDS, for the oracle alone, the
+same way ([melonds.cmake](../../tools/oracle/melonds.cmake)).
 
 ## Decision
 
@@ -140,13 +143,13 @@ melonDS, for the oracle alone, the same way ([melonds.cmake](../../tools/oracle/
   traced cause before it can be declared. The prototype found two in aspertia.
 - Frigate is held to melonDS's register semantics (writes ignored while an engine is off, decoded storage). A
   difference found on hardware is declared with its evidence.
-- Frigate's `ToScreen` ([port/gfx/ge/ge.c](../../gfx/ge/ge.c)) clamps a vertex's depth without the cut to 32 bits that
-  melonDS's `SubmitPolygon` makes before its clamp ([digest.h](../../tools/oracle/digest.h),
-  `pbw_digest_zbuffer_depth`). The two agree for every vertex whose clip W is below 2^24 and can differ above it, where
-  W's truncation to 24 bits leaves a small divisor; the prototype computed melonDS's side without the cut, so its equal
-  lists don't cover that case. The digest will report such a vertex as a `g3d.list` difference. The fix, `ToScreen`
-  cutting the product to 32 bits before its clamp, is a change to the geometry engine with its own replays, planned
-  before the second part compares lists.
+- Frigate's `ToScreen` ([port/gfx/ge/ge.c](../../gfx/ge/ge.c)) computes a vertex's depth as melonDS's `SubmitPolygon`
+  does, cutting the product to 32 bits before its clamp and giving `0x7ffe00` where W is 0
+  ([digest.h](../../tools/oracle/digest.h), `pbw_digest_zbuffer_depth`; `g3d_ge`'s depth cut cases). The cut matters
+  only for a vertex whose clip W is 2^24 or more, where W's truncation to 24 bits can leave a small divisor; the
+  prototype computed melonDS's side without the cut, so its equal lists don't cover that case. `ToScreen` clamped the
+  whole 64-bit product, and gave 0 where W is 0, until a change of its own, with its replays, made it cut before the
+  second part compares lists.
 - A digest costs about 0.4 ms a frame on Frigate in the prototype, with a slower hash; checkpoints take about 20 MB
   each before compression.
 - A machine without the oracle can't fill the cache: until it has one, the committed `_hashes` references are its

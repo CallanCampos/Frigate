@@ -517,8 +517,9 @@ static PbwDigestStatus EncodeList(const PbwDigestList *list, Encoder *encoder) {
             uint32_t w = vertex->w & 0xffffff;
             PutWord(encoder, vertex->x & 0x1ff);
             PutWord(encoder, vertex->y & 0xff);
-            // W = 0: melonDS gives the vertex the depth 0x7ffe00 and marks the polygon degenerate, the port gives it 0;
-            // the hardware draws no such polygon, so the depth is 0 on both sides, and X, Y and W are still compared
+            // W = 0: melonDS gives the vertex the depth 0x7ffe00 and marks the polygon degenerate, and the port's
+            // ToScreen gives it 0x7ffe00 too; the hardware draws no such polygon, so the depth is 0 on both sides, and
+            // X, Y and W are still compared
             PutWord(encoder, w == 0 ? 0 : vertex->depth & 0xffffff);
             PutWord(encoder, w);
             PutWord(encoder, vertex->color[0]);
