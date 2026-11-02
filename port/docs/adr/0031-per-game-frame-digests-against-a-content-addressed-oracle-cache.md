@@ -13,6 +13,8 @@ stopped at the first frame that differs; and where its hash, xxHash, comes from.
   request of its first part (the canonical encoding, its format and its tests, [below](#consequences)), which wires
   the digest into neither program. It stays proposed until the owner confirms the defaults that
   [Consequences](#consequences) marks as the owner's to confirm; the change that records that sets the status line.
+- **Note (2026-11-02):** PR 76, which made `ToScreen`'s depth melonDS's, corrected this record's two factual notes on
+  Frigate's depth, in [Context](#context) and [Consequences](#consequences); its decisions are unchanged.
 
 ## Context
 

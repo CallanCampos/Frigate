@@ -38,18 +38,20 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   merge, which this branch merges; it started from `d1717b68d8`, PR 74's.
 - **Port:** `PORT_SHA`, on the topic branch `port-ge-depth-cut` from `d1717b68d8` (PR 74's merge): `16c3658344`, the
   change and this entry; `fcd13612a5`, the merge of `main` at `e936696a97` (PR 71, the save lab's L1, all in `port/`),
-  which kept STATUS.md's new entries both, this one first; and this record's update after it. This entry fills the
+  which kept STATUS.md's new entries both, this one first; `bb91cfe0d1`, this record's update after it; and the
+  review's fixes, comments and documents only, with this record's last update (below). This entry fills the
   `PORT_SHA` of PR 71's entry with `a9d91adf59`, and PR 74's with `6eef75c290`, as PR 71's entry does. Only `port/`
   changes.
 - **ROM (T0):** `python3 configure.py && ninja` in this branch's new worktree, every step run (14,039): both original US
   SHA1s, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, with no
   compiler warning; and again on the merge with `main`, which changes nothing outside `port/` (2 steps, the two checks),
-  the same SHA1s. This change has no ROM input.
+  the same SHA1s, as again on the review's fixes (2 steps). This change has no ROM input.
 - **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both versions, plain (`build/port`, `build/port-w2`)
   and with the oracle (`build/port-oracle`, `build/port-oracle-w2`, `-DPORT_BUILD_ORACLE=ON -DPORT_SANITIZE_RECOVER=OFF
   -DPORT_FRAME_TIME_REPORT_ONLY=OFF`), Apple clang, ninja at `-j4`, pass with 748 compiler warnings each, all in the
   decomp's C of `src/` and `lib/`, as on `main`; `ge.c` and the tests compile with none, and the four builds' rebuilds
-  on the merge, PR 71's layout program among them, with none.
+  on the merge, PR 71's layout program among them, with none. On the review's fixes, `build/port` and `build/port-w2`
+  rebuild with no warning, compiling only the digest's tests (`digest.c` and `test_digest.c`, plain and sanitized).
 - **Tests:**
   - T2/T6: `ctest -LE route` (`CTEST_PARALLEL_LEVEL=3`) on the merge: 358 of 365 tests pass in each version, and 7 skip
     for the optional setups this checkout lacks, as in the last entries (`asm_oracle`, `oracle_boot`, `oracle_saves`,
@@ -92,6 +94,10 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     must give.
   - T5 and T7 not run: the sanitized `g3d_ge_sanitized`, the replays and the oracle comparisons above cover what the
     change touches, and no screen changes.
+  - On the review's fixes, which change comments in `digest.h` and documents only: T2, `ctest -LE route` in both plain
+    builds, 358 of 365 pass in each version and the same 7 skip, none failing, `game_ptrcasts`, `g3d_ge` and
+    `digest_format` among the passes. The oracle builds aren't rebuilt and T3 and T4 aren't run again: no compiled code
+    changes, and neither program compiles `digest.h` yet.
 - **Tiers:** not measured (no progress scan); no game C changes.
 - **Trap stubs:** 25 function stubs and 1 data placeholder (`CARDi_NdmaInterface`) in each version's generated
   `stubs.c`, as on `main`; no run stopped on one.
@@ -129,11 +135,21 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     depth, and the test guide's `g3d` row. ADR 0031 is proposed, so its two factual notes on Frigate's depth, in its
     context and its consequences, are corrected in place; its decisions are unchanged, the digest's depth of 0 where W
     is 0 among them. ARCHITECTURE.md and GLOSSARY.md don't describe the depth.
-- **Next:** verification v2's second part (ADR 0031), which compares lists with the depth now the same on both sides:
-  `--digest` in both programs, taken at the last VBlank of each count, `compare.py`'s pairing with the sequences' lags
-  and declarations, the declarations of the opening, the title and aspertia in both versions, and xxHash's notice in
-  what the program and the macOS app carry. Phase 5's story coverage after the Route 20 save stays the phase's earliest
-  unmet exit criterion, each trainer battle cut where ADR 0023 says.
+  - **Review:** the independent review of `bb91cfe0d1` found nothing that must change, and one thing that should: ADR
+    0030 cites `ge.c` and `ge.h` by line, and this change moved nine of those citations. They now name where the code
+    is (`ToScreen`, `BoxTest`, `port_ge_clip_matrix`, the `Transform` calls of a vertex, of a box test's corners and of
+    POS_TEST, `PortGeVertex` and its `x`, and `PortGeList`); ADR 0030 is proposed, so they are corrected in place,
+    under a dated note that says so. Its three minor points are taken too. `digest.h`'s two sentences that called the
+    two programs' depths equal for every vertex say for the same clip Z and W, since the two programs' vertices can
+    still differ in clip Z or W, which `g3d.list` is there to catch (and this entry's Next says the depth is computed
+    the same way on both sides, for the same reason); the test guide's `g3d` row names `g3d_ge` for the cut and
+    `g3d_ds3d` for the interpolation, in one band of lines and in three; and ADR 0031's header gets a dated note of
+    its two corrected notes. No compiled code changes.
+- **Next:** verification v2's second part (ADR 0031), which compares lists with the depth now computed the same way on
+  both sides: `--digest` in both programs, taken at the last VBlank of each count, `compare.py`'s pairing with the
+  sequences' lags and declarations, the declarations of the opening, the title and aspertia in both versions, and
+  xxHash's notice in what the program and the macOS app carry. Phase 5's story coverage after the Route 20 save stays
+  the phase's earliest unmet exit criterion, each trainer battle cut where ADR 0023 says.
 - **Blockers:** none for this change. Decisions the owner holds: ADRs 0022, 0025, 0030 and 0031 are proposed (0031's six
   defaults wait for the owner's confirmation); the follow-up on the guides needs the owner's wording of the delegation
   for port/CLAUDE.md; the save lab's design decisions come with its L2 and ADR 0032, as PR 71's entry says; and Spanish

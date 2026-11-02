@@ -161,7 +161,7 @@ typedef struct PbwDigestVertex {
     uint32_t depth;    // the Z-buffer depth, 24 bits, the encoding making it 0 when W is 0: the port's .z, as ge.c's
                        // ToScreen computes it; melonDS's pbw_digest_zbuffer_depth(Position[2], Position[3]), which
                        // stays the Z-buffer's when the list W-buffers. ToScreen computes it as melonDS does, its cut
-                       // to 32 bits included, so the two are equal for every vertex (pbw_digest_zbuffer_depth)
+                       // to 32 bits included, so the two are equal for the same clip Z and W (pbw_digest_zbuffer_depth)
     uint32_t w;        // W: .w, Position[3] (24 bits)
     uint32_t color[3]; // red, green, blue as c * 16 + 15, 0 staying 0: .color, FinalColor
     uint32_t s, t;     // the texture coordinates: .s and .t, TexCoords (16 bits each)
@@ -196,9 +196,9 @@ typedef struct PbwDigestList {
 // SubmitPolygon): ((Z * 0x4000 / W) + 0x3fff) * 0x200, cut to 32 bits, clamped to 0..0xffffff; 0x7ffe00 when W is 0.
 //
 // Frigate's ToScreen (port/gfx/ge/ge.c) computes the same, the cut and the 0x7ffe00 included, so the port's depth is
-// melonDS's for every vertex (g3d_ge's depth cut cases). The cut matters only from a clip W of 2^24 on: below it the
-// product fits in 32 signed bits (after clipping, Z is within -W..W), and from it W's truncation to 24 bits can leave
-// a small divisor and a product past 32 bits, whose low bits decide the depth: Z 0x400 with W 0x01000001 gives
+// melonDS's for the same clip Z and W (g3d_ge's depth cut cases). The cut matters only from a clip W of 2^24 on: below
+// it the product fits in 32 signed bits (after clipping, Z is within -W..W), and from it W's truncation to 24 bits can
+// leave a small divisor and a product past 32 bits, whose low bits decide the depth: Z 0x400 with W 0x01000001 gives
 // 0x2007ffe00, cut to 0x7ffe00, where clamping the whole product would give 0xffffff, and Z -0x400 gives 0x7ffe00 too,
 // where it would give 0
 uint32_t pbw_digest_zbuffer_depth(int32_t clipZ, uint32_t w);

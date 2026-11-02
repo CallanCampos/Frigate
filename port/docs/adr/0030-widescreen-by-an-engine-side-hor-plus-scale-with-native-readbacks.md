@@ -16,6 +16,8 @@ built. -->
   exit reachable under either of §5.2's options, and
   [port/CLAUDE.md](../../CLAUDE.md#keeping-widescreen-possible-planmd-52) points every session to them; rules 11 to 13
   come with this design and bind only once it is accepted.
+- **Note (2026-11-02):** PR 76, which made `ToScreen`'s depth melonDS's, moved code in `ge.c` and `ge.h`; the line
+  numbers cited below now name where that code is, and nothing else changed.
 
 ## Context
 
@@ -36,15 +38,15 @@ overlays (12, 36), the battle's (167, 168) and the main module are decompiled wh
   (`src/ov036/weather_task.c:555-557`) do the same arithmetic themselves.
 - **The SDK reads the engine back.** It reads the position matrix as CLIPMTX under an identity projection that it
   loads first (`util.c:10-28`, `lib/nnsys/src/g3d/sbc.c:593-617`; Frigate's `port_ge_clip_matrix`,
-  `port/gfx/ge/ge.c:1432-1437`), and the vector matrix as it is (`util.c:23`, `sbc.c:821`). POS_TEST would run the
-  vertices' `Transform` (`ge.c:455-462`, `1167`), but nothing in the game or the SDK issues POS_TEST or VEC_TEST. The
+  `port/gfx/ge/ge.c:1441-1446`), and the vector matrix as it is (`util.c:23`, `sbc.c:821`). POS_TEST would run the
+  vertices' `Transform` (`ge.c:455-462`, `1176`), but nothing in the game or the SDK issues POS_TEST or VEC_TEST. The
   SDK's flushes multiply the camera into the projection matrix (`glbstate.c:74-100`), so the engine's projection is
   often more than a projection.
 - **Every box test decides only what is drawn.** The game box-tests in two places: GFL's
   `GFL_G3DSysDrawObjBBoxCull` (`src/gfl/g3d_system.c:876-937`), whose answer its 18 calls in 13 files ignore, and the
   field's chunks (`src/ov012/field_g3d_map.c:441-475`), whose count of chunks drawn only splits the next frame's
   chunks between the field's two render passes (`src/ov036/field_g3d_mapper.c:183-184`, `978-1000`). Frigate's
-  `BoxTest` runs the polygons' `Transform`, `Clip` and `ToScreen` (`ge.c:906-945`). NPC billboards are never culled
+  `BoxTest` runs the polygons' `Transform`, `Clip` and `ToScreen` (`ge.c:915-954`). NPC billboards are never culled
   (`src/gfl/billboard.c:401-552`). Polygon RAM's counts are read in two places: the dual-3D code reads the vertex
   count (`src/gfl/double3Ddisp.c:77`), and the battle reads the polygon count twice and drops it
   (`src/ov168/btlv_effect.c:384-388`). The game's 23 `G3_ViewPort` calls all set the full screen, (0, 0, 255, 191).
@@ -53,7 +55,7 @@ overlays (12, 36), the battle's (167, 168) and the main module are decompiled wh
   (`src/ov036/field_actor_movecode.c:1283`, `1289`) and weather particles (41 calls in overlays 75 to 77), and field
   actors read terrain through the mapper's loaded chunks (`src/ov012/field_actor_tool.c:647-678`).
 - **Frigate's renderers:** the 3D renderer's width is one constant (`port/gfx/ref/ds3d.h:23`); the engine's viewport
-  transform is the DS's, X in 9 bits (`ge.c:694-728`, `port/gfx/ge/ge.h:40`); the 2D reference, display capture, the
+  transform is the DS's, X in 9 bits (`ge.c:702-737`, `port/gfx/ge/ge.h:41`); the 2D reference, display capture, the
   screens, the window and the test tools are 256 wide by design (`port/gfx/ref/ds2d.h:66`, `port/gfx/capture.c:97`,
   `port/gfx/screens.h:12-13`, `port/app/present.c:81`, `99-100`, `port/app/run_dir.c:16`,
   `port/tools/oracle/compare.py:52-53`).
@@ -64,8 +66,8 @@ overlays (12, 36), the battle's (167, 168) and the main module are decompiled wh
   and box tests (`Clip`, `ge.c:656-681`) against left and right planes moved from ±w to ±w·W/256, and gives each
   vertex its native screen X plus the margin, (W − 256) / 2, computed with the native transform's arithmetic and X
   kept past 9 bits. This is the Hor+ scale of clip-space X by 256/W where vertices and box-test corners enter
-  clipping (`ge.c:892`, `920`), with the viewport mapped across W columns, kept bit for bit native inside the native
-  view volume. W rides on each `PortGeList`, as `swap_param` does (`ge.h:59-68`), and in the frame cache's key
+  clipping (`ge.c:901`, `929`), with the viewport mapped across W columns, kept bit for bit native inside the native
+  view volume. W rides on each `PortGeList`, as `swap_param` does (`ge.h:60-69`), and in the frame cache's key
   (`port/gfx/ge/ge_hal.c:27-44`).
 - **The matrix and test readbacks stay native.** `Transform`, `ge->proj` and `ge->clip` never see W, so CLIPMTX, the
   vector matrix, POS_TEST and VEC_TEST answer as on a DS. The other readbacks change with the wide view: box tests
@@ -129,7 +131,7 @@ Rules 1 to 10 hold for every change now: each keeps phase 6's exit reachable und
 3. **The geometry engine keeps its shape:** the viewport transform in `ToScreen` alone, clip space until then, no new
    8- or 9-bit narrowing of screen X or Y, list-level state on `PortGeList`, a frame cache key that covers every input
    to the picture, and nothing that scales `ge->proj` or `ge->clip`. A GPU 3D renderer takes positions finer than
-   `PortGeVertex`'s whole pixels (`ge.h:36-44`).
+   `PortGeVertex`'s whole pixels (`ge.h:36-45`).
 4. **The game's projection, aspect, viewport and ClAct surfaces don't change in passing:** the 25
    `FX32_CONST(4.0 / 3.0)` sites, the battle camera's 1.35 (`src/ov168/btlv_camera.c:50-53`), the 23 `G3_ViewPort`
    calls, `NNS_G3dGlb.prmViewPort` and `sSurfaceSetups` (`src/gfl/clact.c:311-314`).
