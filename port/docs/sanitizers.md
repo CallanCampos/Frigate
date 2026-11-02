@@ -16,6 +16,7 @@ cmake --build build/port-san                        # build/port-san/frigate-bla
 ctest --test-dir build/port-san -j4 --output-on-failure        # every test, sanitized
 ctest --test-dir build/port-san -L route -LE oracle            # the routes that need no oracle
 ctest --test-dir build/port-san -L route                       # every route, with the oracle in build/port-san/oracle
+port/tools/strict_routes.py run --build-dir build/port-san     # the program alone from the oracle's saves
 ```
 
 - **White 2** is `-DPORT_VERSION=w2_us` in a directory of its own (`build/port-san-w2`).
@@ -23,6 +24,15 @@ ctest --test-dir build/port-san -L route                       # every route, wi
   replays, the oracle's sequences and the port's checks of their hashes, the smoke test).
   The oracle's need its program and the ROM build's link map, as in the plain build
   ([../tests/README.md](../tests/README.md)); without the ROM they skip, as in CI.
+- **The routes from the oracle's saves:** [../tools/strict_routes.py](../tools/strict_routes.py) runs the program
+  alone, as one route by hand below, on each of the oracle's comparison sequences that has no `_hashes` reference for
+  the version (CONTINUE, the field menu and its apps, Hugh's battle, Route 19, the catch, the PC, Floccesy Town to
+  Route 20) and on both of the port's legs of each round trip, each from the save it starts from, and judges each run
+  by [Phase 5's criterion](#phase-5s-criterion); `strict_routes.py list` shows the cases. The saves come from the
+  build's `oracle-saves`, which ctest's `oracle_saves` and `oracle_floccesy_save` make in a tree with the oracle, or
+  from `--save-cache`: a tree without the oracle, such as White 2's, takes them from
+  `oracle.py save NAME... --version w2_us --save-cache build/port-san-w2/oracle-saves --oracle BIN`. It never runs
+  melonDS; a missing save skips its case with that command.
 - **One route by hand:** `build/port-san/frigate-black2 --headless --frames 4300 --watchdog 60 --save-dir
   /tmp/san-saves --input port/tests/replay/start_menu.pbwinput`. A run that hits a report aborts (SIGABRT, status 134)
   on every host: [../hal/os/sanitizers.c](../hal/os/sanitizers.c) makes `abort_on_error=1` the runtime's default.
@@ -51,7 +61,9 @@ ctest --test-dir build/port-san -L route                       # every route, wi
   the game's `main()`: the smoke test passes on the line the program logs before it looks for the ROM
   (`port/app/main.c`), whatever status the program then exits with, and the ROM check stops it there
   (`port_rom_boot`), so LeakSanitizer's check at its exit on Linux covers the program's start-up as far as that look.
-  The routes themselves run only on a machine with the ROM (a nightly run of them is still to come).
+  The routes themselves run only on a machine with the ROM (they run on demand: the owner declined scheduled runs on
+  2026-11-01, [ADR 0031](adr/0031-per-game-frame-digests-against-a-content-addressed-oracle-cache.md), proposed;
+  [ADR 0033](adr/0033-sanitizer-clean-replays-by-the-strict-routes-and-the-program-alone.md)).
 - **A survey** of every report of a route, rather than the first: `-DPORT_SANITIZE=ON -DPORT_SANITIZE_RECOVER=ON` in
   another build directory (the second alone is refused) makes every check go on after a report, and ASan's
   `halt_on_error=0` the default ([../hal/os/sanitizers.c](../hal/os/sanitizers.c)). ASan reports each place once
@@ -78,6 +90,23 @@ ctest --test-dir build/port-san -L route                       # every route, wi
     [../tools/ctest_one_slice.sh](../tools/ctest_one_slice.sh) the other, the x86_64 one under Rosetta on Apple
     Silicon, where ASan runs too. That is how the x86_64 code's routes are checked here: CI's Intel runners have no
     ROM. Its app is a sanitized one, never one to give out, and `package_macos.sh --distribution` refuses it too.
+
+## Phase 5's criterion
+
+Phase 5's "sanitizer-clean replays" ([PLAN.md §7](PLAN.md#phase-5-the-whole-game-hardened)) are what
+[ADR 0033](adr/0033-sanitizer-clean-replays-by-the-strict-routes-and-the-program-alone.md) (proposed) says: on macOS
+arm64, in both versions, the strict build (`-DPORT_SANITIZE=ON`, `PORT_SANITIZE_RECOVER` off, `RelWithDebInfo`, upstream
+LLVM, Homebrew's on a Mac, for the function check and LeakSanitizer that Apple clang lacks) runs every route that needs
+no oracle (`ctest -L route -LE oracle`) and, with [../tools/strict_routes.py](../tools/strict_routes.py), the program
+alone from the oracle's saves ([above](#running-it)), each distinct run once, under
+`ASAN_OPTIONS=detect_leaks=1:detect_stack_use_after_return=1`. A run is clean when it exits with status 0 after all its
+frames and its output has none of the reports on which ctest fails a test of this build. The only exceptions are the
+three entries of [../cmake/sanitizer_ignorelist.txt](../cmake/sanitizer_ignorelist.txt) (R1 and R2, R3, R13) and H1's
+read; no leak is suppressed, and every report found is fixed, with its rows and a regression test. The runner refuses a build that
+isn't strict (no `PORT_SANITIZE`, a survey build, another language's ROM, another checkout's build, Apple clang) and a
+program that doesn't run under ASan, holds each start save to the SHA-1 that `SAVES` keeps, and writes a table of
+every case (`--summary`). The runs are on demand, not scheduled: a pull request that adds a sequence from a save or a
+round trip runs its cases in both versions as its T5, `strict_routes.py run --only NAME`.
 
 ## Reading a report
 

@@ -32,6 +32,7 @@ build and tests are read in one place.
 | [pxi.cmake](pxi.cmake) | The per-file options of the decomp files the ARM7's services compile through | Everything the ARM7 serves | `pxi_*` |
 | [rom.cmake](rom.cmake) | The ROM manifest (`gen/rom/rom_manifest.c`, from `<version>.sha1` and the NitroFS manifest), the development ROM path, the backup's forced include, and the tests of the ROM, the card and the file system as the game links them | Every file read, saves, the genuine-card check | `card_bus`, `card_hardware_*` (physical foundation), `rom_*`, `card_backup_*` (including ROM-free actual SDK/PXI/OS `card_backup_service_*` and the single ROM-init fixture seam), `rom_game_*` (`rom_game_ir_genuine_card` among them) |
 | [sound.cmake](sound.cmake) | `audio/audio.c` into the program, and the sound driver's and sound unit's tests, one scenario a process | Music, sound effects, cries | `snd_*` |
+| [strict_routes.cmake](strict_routes.cmake) | The test of [../tools/strict_routes.py](../tools/strict_routes.py), the runner of the strict build's routes from the oracle's saves ([../docs/sanitizers.md](../docs/sanitizers.md#phase-5s-criterion)), on `oracle.py`'s real tables, made-up ones and a stand-in for the program; no ROM, no label | T5's routes from the oracle's saves: CONTINUE, the field menu and its apps, Hugh's battle, Route 19, the catch, the PC, Floccesy Town to Route 20, and the round trips' saves | `strict_routes_tool` |
 
 ## Options
 
