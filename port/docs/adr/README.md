@@ -97,6 +97,7 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0028](0028-card-wire-and-physical-dma-progress.md) | Keep the CARD physical model separate from production SDK integration | §4.5, §6 | accepted (physical foundation only) |
 | [0029](0029-backup-write-service-wait.md) | Preserve the backup WRITE service initial SDK wait | §4.5, §6 | accepted |
 | [0030](0030-widescreen-by-an-engine-side-hor-plus-scale-with-native-readbacks.md) | Widescreen by an engine-side Hor+ scale with native readbacks | §4.6, §5.2, §6, §7 phase 6, D9 | proposed |
+| [0031](0031-per-game-frame-digests-against-a-content-addressed-oracle-cache.md) | Per-game-frame digests against a content-addressed oracle cache, and their hash, xxHash, fetched at configure time as minicoro is | §6, §7 phase 5 | proposed |
 
 ## Decisions waiting for an ADR
 

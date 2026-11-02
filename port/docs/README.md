@@ -58,6 +58,7 @@ records keep what was decided or found at the time, and are added to, not rewrit
 | [adr/0028-card-wire-and-physical-dma-progress.md](adr/0028-card-wire-and-physical-dma-progress.md) | Independent CARD physical foundation, absolute waits and bounded test-only DMA events; production integration deferred |
 | [adr/0029-backup-write-service-wait.md](adr/0029-backup-write-service-wait.md) | The backup WRITE service initial SDK wait, separate from flash busy and CPU work |
 | [adr/0030](adr/0030-widescreen-by-an-engine-side-hor-plus-scale-with-native-readbacks.md) | Widescreen by an engine-side Hor+ scale with native readbacks (proposed), and the rules that keep widescreen possible meanwhile |
+| [adr/0031](adr/0031-per-game-frame-digests-against-a-content-addressed-oracle-cache.md) | Per-game-frame digests against a content-addressed oracle cache (proposed), with their hash, xxHash, fetched at configure time |
 | [RESEARCH.md](RESEARCH.md) | The research of 2026-10-16 behind the plan, summarized |
 | [research/README.md](research/README.md) | The full research reports, with what each covers |
 | [research/decomp-progress.md](research/decomp-progress.md) | The decomp's C coverage per module, data and pointer coverage, pace, claims |
@@ -90,7 +91,7 @@ Each directory of `port/` has a guide to its files: what each does, the part of 
 | [../tests/README.md](../tests/README.md) | The tests by directory, which need the ROM, how to write one |
 | [../tests/asm_oracle/README.md](../tests/asm_oracle/README.md) | The differential tests of the SDK's assembly in C against the ROM's code |
 | [../tools/README.md](../tools/README.md) | The generators, the sync, the packaging, the oracle, the save lab, the measurement scripts |
-| [../tools/oracle/README.md](../tools/oracle/README.md) | The melonDS oracle: building and running it, input files, run directories, comparing, saves, the sound, known differences |
+| [../tools/oracle/README.md](../tools/oracle/README.md) | The melonDS oracle: building and running it, input files, run directories, comparing, the per-game-frame digests, saves, the sound, known differences |
 | [../tools/lab/README.md](../tools/lab/README.md) | The save lab: a save minted from a recipe in the game's names, where `place` puts the player and how, what it refuses, and a save read back as facts |
 | [../tools/compile-probe/README.md](../tools/compile-probe/README.md) | The host-compiler probe: 64-bit warnings and struct layouts (the 64-bit metric is the pointer cast guard's, [SYNC.md](SYNC.md#when-the-pointer-cast-guard-fails)) |
 | [../assets/README.md](../assets/README.md) | Files that aren't code |
