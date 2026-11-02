@@ -46,18 +46,18 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 - **ROM (T0):** configure and Ninja (`-j4`) pass both original US SHA1s with zero compiler warnings, B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`: in a full build
   (10,703 steps) of the branch's base, again on its first two commits, in a full build (12,555 steps) after merging
-  main at `10d017c010`, and on `5d9a0706a1`, after merging `36101609ad`, which had nothing to compile. This change adds
-  no ROM input.
-- **Host build (T1):** arm64 macOS RelWithDebInfo builds of both games (`build/port`, `build/port-w2`) pass, fresh on
-  the branch's base and rebuilt after each merge and on `5d9a0706a1`; `port_test_savelab_layout` builds with `-Wall
-  -Wextra -Werror`, and prints the same layout in both games.
+  main at `10d017c010`, on `5d9a0706a1`, after merging `36101609ad`, which had nothing to compile, and on `49ad7dd00a`,
+  after merging `806b2a8f9d`, whose 18 steps compile PR 73's `sp_poke_gimmick.c` again. This change adds no ROM input.
+- **Host build (T1):** arm64 macOS RelWithDebInfo builds of both games (`build/port`, `build/port-w2`) pass with no
+  warning, fresh on the branch's base and rebuilt after each merge, on `5d9a0706a1` and on `49ad7dd00a`;
+  `port_test_savelab_layout` builds with `-Wall -Wextra -Werror`, and prints the same layout in both games.
 - **Tests:**
-  - T2/T6: `ctest -LE route -j3` passes in both games, on each of the first head's commits, after the first merge and
-    on `5d9a0706a1`: 351 of 358 tests pass, `lab_savelab` among them (in 15 s and 14 s on `5d9a0706a1`, where it runs
-    43 tests, the mutants among them), and 7 skip for the optional setups this checkout lacks: `asm_oracle` (no
-    Unicorn in this Python), `oracle_boot`, `oracle_saves` and `oracle_floccesy_save` (no oracle built), the two
-    function-sanitizer negatives of the VM dispatch (Apple's compiler emits no such check) and `app_universal_slices`
-    (one slice).
+  - T2/T6: `ctest -LE route -j3` passes in both games, on each of the first head's commits, after the first merge, on
+    `5d9a0706a1` (351 of 358 tests pass) and on `49ad7dd00a`, with PR 73's tests: 356 of 363 tests pass, `lab_savelab`
+    among them (43 tests, the mutants among them), and 7 skip for the optional setups this checkout lacks:
+    `asm_oracle` (no Unicorn in this Python), `oracle_boot`, `oracle_saves` and `oracle_floccesy_save` (no oracle
+    built), the two function-sanitizer negatives of the VM dispatch (Apple's compiler emits no such check) and
+    `app_universal_slices` (one slice).
   - `lab_savelab`, 43 tests on synthetic saves built field by field from the offsets and sizes that
     `port_test_savelab_layout` prints from the decomp's headers:
     - savelab's `LAYOUT` is the headers' (77 entries; two more, the follower's index and the step counter, are the
@@ -90,9 +90,10 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     `MUTANTS` writes cycling instead.
   - T3, short: the replays passed, B2 6 of 6 and W2 4 of 4, before and after the first merge (`replay_new_game`, B2
     only, `replay_new_game_house`, `replay_same_save` and `replay_same_save_complete`, with their clean fixtures). The
-    review's fixes touch no game or host code, so they can't move them; the exact-head verification runs them again,
-    with every route.
-  - With the ROM, on this machine (nothing committed or uploaded), on `5d9a0706a1`:
+    review's fixes touch no game or host code, so they can't move them, and the game and host code that PR 73's merge
+    brings was verified on main; the exact-head verification runs them again, with every route.
+  - With the ROM, on this machine (nothing committed or uploaded), on `5d9a0706a1`, and the ranch's mint and run again
+    on `49ad7dd00a`, after PR 73's merge, with the same SHA-1s:
     - `place ZONE_FLOCCESY_RANCH_2 warp 0` minted from the oracle's Route 20 save (`floccesy_save`, Black 2,
       `07d26e593786`) gives SHA-1 `72e7ab2a3fa0`, the prototype's, in 38 bytes, 19 in each copy: `nextSpawn`'s zone,
       `SaveLocation`'s zone, position and rotation, the continue flag's byte, two footer CRCs, two table entries and the
@@ -124,8 +125,8 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     changed.
 - **Tiers/trap stubs:** not measured: no game or host code changed.
 - **64-bit warnings:** the pointer cast guard passes in both games, and `check_ptrcasts.py --build-dir build/port
-  --report` gives 365 sites in 229 keys (real 66, harmless 123, handled 141, unreachable 35), 1,711 files compiled and
-  none missing, before and after each merge: no change.
+  --report` gives 365 sites in 229 keys (real 66, harmless 123, handled 141, unreachable 35), with none missing from
+  the files compiled: 1,711 before PR 73's merge and 1,713 after it, which brings two. The sites don't change.
 - **Work done:** L1 of the save lab, the minter and the reader, as the save lab's design of 2026-11-01 plans it, with
   the review's fixes:
   - **[port/tools/lab/savelab.py](../tools/lab/savelab.py)** mints a save from a save the game wrote and a recipe in the
