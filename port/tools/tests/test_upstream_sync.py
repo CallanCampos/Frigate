@@ -358,6 +358,9 @@ class SyncTests(GitFixture):
     def test_workflow_uses_repository_scoped_revoked_app_token(self):
         workflow = (MODULE.parents[2] / '.github/workflows/port-sync.yml').read_text()
         token_inputs = workflow.split('id: sync-token', 1)[1].split('      - name:', 1)[0]
+        # The App's identifier goes in the pinned action's client-id input; app-id is deprecated (port/docs/SYNC.md)
+        self.assertIn('client-id: ${{ vars.FRIGATE_SYNC_APP_ID }}', token_inputs)
+        self.assertNotIn('app-id:', token_inputs)
         self.assertIn('owner: CallanCampos', token_inputs)
         self.assertIn('repositories: Frigate', token_inputs)
         self.assertIn('permission-contents: write', token_inputs)
@@ -519,9 +522,25 @@ class ShellVerificationTests(GitFixture):
         for name in ('sync_upstream.sh', 'upstream_sync.py'):
             self.write('port/tools/' + name, (MODULE.parent / name).read_text())
         self.write('.gitignore', 'orig/\nbuild/\n*.sha1\n')
-        self.write('configure.py', '''import os, signal, sys
+        self.write('configure.py', '''import os, signal, sys, time
+if os.environ.get('CONFIGURE_CLOSES_OUTPUT'):
+    # The test stops reading the verifier's output at STOP and closes it: write until a write fails
+    os.write(1, b'STOP\\n')
+    for _ in range(1000):
+        try:
+            os.write(1, b'.\\n')
+        except BrokenPipeError:
+            break
+        time.sleep(0.01)
+    else:
+        sys.exit('the output was never closed')
 if os.environ.get('CONFIGURE_SIGNAL'):
-    os.kill(os.getppid(), getattr(signal, os.environ['CONFIGURE_SIGNAL']))
+    sig = getattr(signal, os.environ['CONFIGURE_SIGNAL'])
+    if os.environ.get('CONFIGURE_SIGNALS_GROUP'):
+        # As a terminal does: the verifier's whole process group, this process included
+        os.killpg(os.getpgrp(), sig)
+    else:
+        os.kill(os.getppid(), sig)
 sys.exit(int(os.environ.get('CONFIGURE_FAIL', '0')))
 ''')
         self.write('port/CMakeLists.txt', '# fixture\n')
@@ -540,6 +559,8 @@ sys.exit(int(os.environ.get('CONFIGURE_FAIL', '0')))
             target.write_text('#!/bin/sh\nexit "${' + name.upper() + '_FAIL:-0}"\n')
             target.chmod(0o755)
         target = bins / 'gh'
+        # A status request is logged, then can move HEAD (the pending one) or fail with GH_<STATE>_POST_FAIL's status;
+        # one that succeeds prints its response, as gh does without --silent
         target.write_text('''#!/bin/sh
 case "$1 $2" in
   "pr view")
@@ -552,7 +573,18 @@ case "$1 $2" in
     ;;
   "api --method")
     printf '%s\n' "$*" >> "$GH_LOG"
-    case "$*" in *state=failure*) exit "${GH_FAILURE_POST_FAIL:-0}" ;; esac
+    fail=0
+    case "$*" in
+      *state=pending*)
+        if [ "$GH_PENDING_MOVES_HEAD" = 1 ]; then
+          git commit -q --allow-empty -m 'Another process moves HEAD'
+        fi
+        fail=${GH_PENDING_POST_FAIL:-0} ;;
+      *state=success*) fail=${GH_SUCCESS_POST_FAIL:-0} ;;
+      *state=failure*) fail=${GH_FAILURE_POST_FAIL:-0} ;;
+    esac
+    [ "$fail" = 0 ] || exit "$fail"
+    case " $* " in *" --silent "*) ;; *) printf '{"state": "created"}\n' ;; esac
     ;;
 esac
 ''')
@@ -564,6 +596,30 @@ esac
     def verify(self, environment):
         return subprocess.run(['bash', 'port/tools/sync_upstream.sh', '--verify-pr', '123'],
                               cwd=self.root, env=environment, text=True, capture_output=True)
+
+    def verify_until_output_closes(self, environment):
+        """Runs the verifier in a process group of its own with its output piped here, stops reading and closes the
+        pipe when configure.py writes STOP, and has configure.py signal the whole group then, as Ctrl-C on
+        `... | tee log` stops the verifier, the command it runs and the reader. Returns the verifier's exit status and
+        its output until STOP."""
+        environment.update(CONFIGURE_CLOSES_OUTPUT='1', CONFIGURE_SIGNALS_GROUP='1')
+        verifier = subprocess.Popen(['bash', 'port/tools/sync_upstream.sh', '--verify-pr', '123'], cwd=self.root,
+                                    env=environment, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                    start_new_session=True)
+        output = []
+        for line in verifier.stdout:
+            if line == b'STOP\n':
+                break
+            output.append(line.decode(errors='replace'))
+        verifier.stdout.close()
+        return verifier.wait(timeout=60), ''.join(output)
+
+    def statuses(self, bins):
+        """The state and commit of each status request that the gh stub took, in order."""
+        log = bins / 'log'
+        lines = log.read_text().splitlines() if log.exists() else []
+        return [(line.split(' -f state=', 1)[1].split()[0], line.split('/statuses/', 1)[1].split()[0])
+                for line in lines]
 
     def test_shell_build_failure_records_failure(self):
         bins, environment = self.fixture()
@@ -594,6 +650,26 @@ esac
         self.assertIn('status may remain pending', result.stderr)
         self.assertNotIn('state=success', (bins / 'log').read_text())
 
+    def test_shell_failed_pending_upload_stops_before_building(self):
+        bins, environment = self.fixture()
+        head = self.git('rev-parse', 'HEAD')
+        # gh's status when it needs a login, which must not pass for the script's own 4 (a rewrite)
+        environment['GH_PENDING_POST_FAIL'] = '4'
+        result = self.verify(environment)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn('could not record pending local verification', result.stderr)
+        self.assertNotIn('Configuring', result.stdout)
+        self.assertEqual(self.statuses(bins), [('pending', head), ('failure', head)])
+
+    def test_shell_failed_success_upload_records_failure(self):
+        bins, environment = self.fixture()
+        head = self.git('rev-parse', 'HEAD')
+        environment['GH_SUCCESS_POST_FAIL'] = '4'
+        result = self.verify(environment)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn('could not record local verification success', result.stderr)
+        self.assertEqual(self.statuses(bins), [('pending', head), ('success', head), ('failure', head)])
+
     def test_shell_interrupt_records_failure(self):
         bins, environment = self.fixture()
         environment['CONFIGURE_SIGNAL'] = 'SIGINT'
@@ -613,6 +689,42 @@ esac
         self.assertIn('state=failure', log)
         self.assertIn('exit 143', log)
         self.assertNotIn('state=success', log)
+
+    def test_shell_hangup_records_failure(self):
+        bins, environment = self.fixture()
+        environment['CONFIGURE_SIGNAL'] = 'SIGHUP'
+        result = self.verify(environment)
+        self.assertEqual(result.returncode, 129, result.stdout + result.stderr)
+        log = (bins / 'log').read_text()
+        self.assertIn('state=failure', log)
+        self.assertIn('exit 129', log)
+        self.assertNotIn('state=success', log)
+
+    def test_shell_interrupt_keeps_its_status_when_the_failure_upload_fails(self):
+        bins, environment = self.fixture()
+        environment.update(CONFIGURE_SIGNAL='SIGINT', GH_FAILURE_POST_FAIL='77')
+        result = self.verify(environment)
+        self.assertEqual(result.returncode, 130, result.stdout + result.stderr)
+        self.assertIn('status may remain pending', result.stderr)
+        self.assertEqual([state for state, _ in self.statuses(bins)], ['pending', 'failure'])
+
+    def test_shell_group_signal_with_its_output_closed_keeps_its_status(self):
+        # One signal stops the verifier, the command it runs and the reader of its output. Neither bash's report of
+        # the stopped command nor the failure's response, both written where nobody reads anymore, may change the
+        # exit status or make the upload look failed
+        bins, environment = self.fixture()
+        environment['CONFIGURE_SIGNAL'] = 'SIGTERM'
+        status, output = self.verify_until_output_closes(environment)
+        self.assertEqual(status, 143, output)
+        self.assertEqual([state for state, _ in self.statuses(bins)], ['pending', 'failure'])
+
+    def test_shell_failed_failure_upload_with_its_output_closed_keeps_its_status(self):
+        # Nor may the warning that the failure couldn't be recorded, which can't be written there either
+        bins, environment = self.fixture()
+        environment.update(CONFIGURE_SIGNAL='SIGINT', GH_FAILURE_POST_FAIL='77')
+        status, output = self.verify_until_output_closes(environment)
+        self.assertEqual(status, 130, output)
+        self.assertEqual([state for state, _ in self.statuses(bins)], ['pending', 'failure'])
 
     def test_shell_success_is_not_overwritten_by_exit_trap(self):
         bins, environment = self.fixture()
@@ -637,6 +749,18 @@ esac
         target = 'repos/CallanCampos/Frigate/statuses/' + self.git('rev-parse', 'HEAD')
         self.assertEqual(len(log.splitlines()), 2)
         self.assertTrue(all(target in line for line in log.splitlines()))
+
+    def test_shell_head_moved_before_the_build_stops_on_the_pinned_head(self):
+        bins, environment = self.fixture()
+        pinned = self.git('rev-parse', 'HEAD')
+        # Another process commits in this worktree while the pending status is being posted
+        environment['GH_PENDING_MOVES_HEAD'] = '1'
+        result = self.verify(environment)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn('HEAD changed before verification began', result.stderr)
+        self.assertNotIn('Configuring', result.stdout)
+        self.assertNotEqual(self.git('rev-parse', 'HEAD'), pinned)
+        self.assertEqual(self.statuses(bins), [('pending', pinned), ('failure', pinned)])
 
     def test_shell_untracked_source_refused(self):
         bins, environment = self.fixture()

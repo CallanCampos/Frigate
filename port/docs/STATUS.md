@@ -32,11 +32,68 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-11-01: pin the verified head and keep the verifier's exit status
+
+- **Upstream:** `9496bc869b`, unchanged: this change merges nothing. Reviewed main is `e733ccc8a3`, PR 66's merge.
+- **Port:** `PORT_SHA`, on the topic branch `port-verify-status-followups` from that reviewed main.
+- **ROM (T0):** configure and Ninja (10,703 steps) pass both original US SHA1s with zero compiler warnings: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. No ROM input changes.
+- **Host build:** not rebuilt for this commit, which changes no host build input: only `port/tools/` scripts, their
+  tests and documents. The exact-head `--verify-pr` before merge builds and tests both versions.
+- **Tests:** the sync tooling tests, run with CI's command
+  (`python3 -m unittest discover -s port/tools/tests -p test_upstream_sync.py`), pass 55 of 55 (48 before) under
+  macOS's bash 3.2.57 and Python 3.14.6; CI's `Sync tooling tests` job runs them on Linux with bash 5 and Python 3.12.
+  - Negative controls: against main's `sync_upstream.sh`, 6 of the 7 new verifier controls fail. The seventh, an
+    interrupt whose failure upload fails, passes there too, as PR 66's review found. Without this change's SIGPIPE
+    trap, both closed-output controls fail (exit -13); with only the exit trap's warning hardened, the group-signal
+    one still fails.
+  - PR 66's review probes, rerun on this change: Ctrl-C to the process group exits 130, SIGTERM to it 143 and SIGHUP
+    129, each with failure on the pinned head. A HEAD moved during the pending request leaves pending and failure on
+    the original head. Piped to `tail`, a group SIGINT exits 130 and a group SIGTERM 143, where main's script exited 1
+    and died of SIGPIPE.
+  - ShellCheck 0.11.0 reports the same 10 findings on `sync_upstream.sh` as on main (SC2016, SC2086 and four unused
+    variables), none new, and `bash -n` passes.
+  - `check_mwcc_neutral.py --base HEAD --jobs 2 src/gfl/arc_tool.c` passes 2 of 2, through its new prune, its
+    temporary worktree and that worktree's removal. In a throwaway repository, `git worktree prune` drops the entry of
+    a worktree whose directory was deleted, and keeps a live one and a locked one.
+  - T2–T7 not run: no game, host or test-target code changed.
+- **Tiers/trap stubs:** not measured: no game or host code changed.
+- **64-bit warnings:** not measured: no C changed, so the guard's last line stands, 365 sites/229 keys (real 66,
+  harmless 123, handled 141, unreachable 35).
+- **Work done:** the follow-ups of PR 66's review of `port/tools/sync_upstream.sh --verify-pr`, and a cleanup in
+  `check_mwcc_neutral.py`:
+  - **The pinned head:** it is read once. A HEAD that another process moves while the pending status is posted now
+    stops the run with exit 1 and failure on the pinned head; before, the run read HEAD again and verified and
+    reported on the new commit, leaving the pinned one pending.
+  - **The exit status through a closed output:** a signal to the whole process group also stops the reader of
+    `... | tee log`. The failure request now discards gh's response (`--silent`), and SIGPIPE is caught while the
+    run can still report, so neither bash's own report of the stopped command nor the warning that the failure
+    couldn't be recorded ends the shell. A Ctrl-C exits 130, where bash 3.2 exited 1, and a SIGTERM 143, where it
+    died of SIGPIPE. The review's `|| true` on the warning isn't enough ([lessons.md](lessons.md)).
+  - **A hangup** exits 129 and records "exit 129"; a closed terminal used to kill the shell, and the failure said
+    "exit 0".
+  - **gh's own statuses stay out:** the verifier's gh requests exit 1 with a message when they fail. They used to
+    exit with gh's status, 4 when it needs a login, which the script documents as an upstream rewrite.
+  - **Tests:** seven verifier controls, for failed pending and success uploads, a moved HEAD, a hangup, an interrupt
+    whose failure upload fails, and a group signal that stops the output's reader too, with and without that
+    failure. The hourly sync workflow's token step is checked for its `client-id` input.
+  - **[SYNC.md](SYNC.md#validate-and-approve-a-proposed-pr)** says which exit status the verifier keeps: its own (1,
+    or 129, 130 or 143), not the failed command's, with its output piped or not. It also says that a success that
+    can't be uploaded is recorded as failure, and that a signal sent to the script alone waits for its current
+    command.
+  - **`port/tools/check_mwcc_neutral.py`** runs `git worktree prune` before it adds its temporary worktree, so the
+    next run clears the stale entry that a killed run leaves.
+- **Next:** Phase 5's story coverage after the Route 20 save: the original SDK and CPU timing that the trainer AI's
+  choices still depend on, then Floccesy Ranch, Hugh's Town Map, the lost Lillipup and the first gym. The pending
+  upstream sync is resolved separately.
+- **Blockers:** decisions the owner holds: ADRs 0021, 0022, 0023 and 0025 are proposed, and 0023 decides whether oracle
+  routes may part where the DS's CPU time decides. Spanish issue 45 still lacks a local dump.
+
 ## 2026-10-28: finish local-verification failures and retain the scoped sync App
 
 - **Upstream:** reviewed main `56a9ef2a1d` contains `9496bc869b87` after PR 65 passed both full local suites, both
   actual assembly oracles, both original ROM hashes and all 14 checks before owner approval and protected merge.
-- **Port:** `PORT_SHA`, a feature branch from that reviewed main; the preserved patch is reapplied without dropping
+- **Port:** `22d3464507`, a feature branch from that reviewed main; the preserved patch is reapplied without dropping
   its named stash or backups. Test README conflict resolution retains both complete sets of controls.
 - **ROM (T0):** configure/Ninja and both original US SHA1s pass with zero ROM compiler warnings: B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.

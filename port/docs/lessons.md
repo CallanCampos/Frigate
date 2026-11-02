@@ -3,6 +3,23 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-11-01: keep the verifier's exit status when its output is gone
+
+- A Ctrl-C or a closed terminal signals the whole process group: the script, the command it runs and the reader of
+  `... | tee log`. Bash then reports the stopped command ("Terminated: 15") on the closed output, and the SIGPIPE ends
+  it after its EXIT trap, with another status. A warning written from the trap fails the same way, and `|| true` on
+  it isn't enough: bash 3.2 acts on the pending signal at the next command. While a run must still report, catch
+  SIGPIPE with a trap that does nothing (`trap ':' PIPE`), so that such writes fail instead. Don't ignore it
+  (`trap '' PIPE`): an ignored signal stays ignored in the commands the shell starts, the builds and tests among them.
+- A `gh api` request whose response nobody needs takes `--silent`, or gh fails writing it after GitHub has taken it.
+- Pin the commit that a run reports on once, and check HEAD against it later instead of reading HEAD again: another
+  process can move HEAD during a network request. Exit with the script's own statuses, never a tool's: gh exits 4
+  when it needs a login, which `sync_upstream.sh` documents as an upstream rewrite.
+- Run each new control against the unfixed script, and against partial fixes. Six of the seven verifier controls
+  added here fail on the previous script; the group-signal one also fails when only the trap's warning is hardened,
+  which is how bash's own report came to light. The seventh, an interrupt whose failure upload fails, passes on the
+  previous script too: it guards behavior that already held.
+
 ## 2026-10-28: finish failed verification statuses on the pinned commit
 
 - Posting pending without a failure exit path leaves a stopped local build looking active indefinitely. Arm cleanup

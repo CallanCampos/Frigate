@@ -20,6 +20,10 @@ and conflict filenames containing blank lines, backticks and terminal controls. 
 Mixed resource/C diff fixtures also verify that non-UTF-8 resource bytes cannot crash the inherited style checker,
 while newly added C violations still fail strict checking.
 
-Shell-verifier controls cover build/test failures, caught interrupts/termination, a changed PR head, unsuccessful
-failure-status uploads and successful completion. They require failed runs to stay failed while reporting the
-result on the pinned commit; only completed validation may leave a successful local-verification status.
+Shell-verifier controls cover build/test failures; a caught hangup, interrupt or termination, also when the
+failure-status upload fails, or when the signal goes to the whole process group and stops the reader of the
+verifier's output too; a changed PR head; a local HEAD that another process moves before the build; unsuccessful
+pending, success and failure-status uploads; and successful completion. They require failed runs to stay failed,
+with the verifier's own exit status, while reporting the result on the pinned commit; only completed validation may
+leave a successful local-verification status. The hourly sync workflow's App-token step is checked too: its
+repository and permission scope, its revocation, and its `client-id` input.

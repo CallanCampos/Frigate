@@ -98,13 +98,18 @@ port/tools/sync_upstream.sh --verify-pr NUMBER
 ```
 
 This verifies the exact checked-out PR head without merging or pushing. It requires clean tracked source and no
-nonignored untracked files, posts a pending status, runs both ROM builds and verifies both SHA1s, then configures,
-builds and tests the native host. It checks the local and remote PR head again before recording
-`Frigate local verification` success. A failed command or a caught interrupt/termination records failure on the
-original pinned head and keeps the command's failure exit status. A failed status upload, machine shutdown or
-uncatchable kill can still leave a pending status; rerun verification on the exact current head. Failed or
-interrupted validation cannot create a green status. A new push needs a new verification. Keep build logs locally
-and describe skips or optional unrun tests in the PR.
+nonignored untracked files, pins that head, posts a pending status, runs both ROM builds and verifies both SHA1s, then
+configures, builds and tests the native host. It checks the local and remote PR head again before recording
+`Frigate local verification` success; a local HEAD found moved, before the builds or after them, stops the run rather
+than verifying another commit. Any stop after the pending status records failure on the pinned head, including one
+where the success status itself couldn't be uploaded. The script then exits with its own status, not the failed
+command's: 1 when a build, test, check or status upload fails, or 129, 130 or 143 for a caught hangup, interrupt or
+termination, whether or not the failure could be recorded, and also when the same signal stopped the reader of its
+output (`... | tee log`). A signal sent to the script alone takes effect once its current command finishes. If
+recording the failure fails too, or the machine shuts down, or an uncatchable kill stops the script, a pending status
+can remain; rerun verification on the exact current head. Failed or interrupted validation cannot create a green
+status. A new push needs a new verification. Keep build logs locally and describe skips or optional unrun tests in
+the PR.
 
 Also review [game-changes.md](game-changes.md): confirm each port adaptation still exists or was deliberately
 superseded. For changed incomplete C or shared headers, supply the matching-neutral evidence described there;

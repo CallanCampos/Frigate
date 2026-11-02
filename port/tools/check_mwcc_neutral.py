@@ -11,8 +11,10 @@ every file's preprocessed text identical: the compiler gets the same input, so i
 and incomplete files alike. That proves a guard-only change neutral for the whole tree at once
 (port/docs/game-changes.md). Any difference is printed with its first differing lines, and the exit status is 1.
 
-The checkout of BASE is a temporary git worktree, removed at the end. Both trees use this tree's generated headers
-(build/include/generated), which the change doesn't touch.
+The checkout of BASE is a temporary git worktree, removed at the end. A run killed before then leaves it behind, and
+once the system has deleted the temporary directory, its entry in the repository is stale: each run first prunes such
+entries (`git worktree prune`, which drops only the entries whose directory is gone and that aren't locked). Both
+trees use this tree's generated headers (build/include/generated), which the change doesn't touch.
 """
 import argparse
 import os
@@ -92,6 +94,8 @@ def main():
     generated = ROOT / "build" / "include" / "generated"
     sources = args.files or sorted(p.relative_to(ROOT).as_posix() for pattern in ("src/**/*.c", "lib/*/src/**/*.c")
                                    for p in ROOT.glob(pattern))
+    # Drops the stale entries that killed runs leave (the docstring says how), so that they don't pile up
+    subprocess.run(["git", "worktree", "prune"], cwd=ROOT, check=True)
     with tempfile.TemporaryDirectory(prefix="mwcc-neutral-") as tmp:
         base = Path(tmp) / "base"
         subprocess.run(["git", "worktree", "add", "--detach", "--quiet", str(base), args.base], cwd=ROOT, check=True)
