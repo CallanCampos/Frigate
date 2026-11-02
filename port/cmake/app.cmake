@@ -32,12 +32,18 @@ target_include_directories(port_app SYSTEM PRIVATE "${xxhash_SOURCE_DIR}")
 # of xxHash is committed
 set(PORT_THIRD_PARTY_NOTICES "${CMAKE_BINARY_DIR}/THIRD-PARTY-NOTICES.txt")
 file(READ "${xxhash_SOURCE_DIR}/LICENSE" port_xxhash_license)
-file(WRITE "${PORT_THIRD_PARTY_NOTICES}"
+# Written with LF line ends on every host: file(WRITE) would write CRLF on Windows, and the notice would no longer end
+# with the LICENSE byte for byte. file(CONFIGURE) ends every line it writes with the newline asked for, the last one
+# too, so the LICENSE's own last newline is left to it; @ONLY puts the text in as it is
+string(REGEX REPLACE "\n$" "" port_xxhash_license "${port_xxhash_license}")
+string(CONCAT port_third_party_notices_text
     "Third-party notices for ${PORT_PRODUCT_NAME}'s programs, frigate-black2 and frigate-white2\n\n"
     "${PORT_PRODUCT_NAME}'s programs include xxHash ${DIGEST_XXHASH_TAG} (the release port/tools/oracle/xxhash.cmake "
     "pins), compiled into the per-game-frame digest that --digest writes. Its licence follows, as the release's LICENSE "
     "file has it.\n\n"
     "${port_xxhash_license}")
+file(CONFIGURE OUTPUT "${PORT_THIRD_PARTY_NOTICES}" CONTENT "@port_third_party_notices_text@" @ONLY
+    NEWLINE_STYLE UNIX)
 # The version an input file's "version" line must name
 target_compile_definitions(port_app PRIVATE "PORT_VERSION_NAME=\"${PORT_VERSION}\"")
 # The app is strict C11. glibc hides the recorder's POSIX file/realpath declarations unless features are requested
