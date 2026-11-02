@@ -12,19 +12,22 @@ port's, `sound.py` the sound ([Sound](#sound)). It also makes the saves the test
 
 It is a **test tool only**. It is never linked into or shipped with Frigate
 ([PLAN.md §1](../../docs/PLAN.md#1-goal-and-what-native-means)): it is a CMake project of its own, built only on
-request, and nothing under `port/` other than this directory, its tests and its CMake fragment refers to it, except two
-files of plain C11 with no melonDS in them. The input file reader (`pbwinput.c`) is compiled into Frigate for its
-replays (`port/app/replay.c`). The sound trace's format (`sndtrace.h`) is included by Frigate's sound driver, which
-writes its work in the DS's layout with it (`port/hal/snd7/snd7.c`, `port_snd7_trace_record`), by Frigate's
-`--sound-trace` (`port/app/sound_trace.c`) and by the sound driver's tests (`port/tests/snd/test_snd.c`).
+request, and nothing under `port/` other than this directory, its tests and its CMake fragment refers to it, except four
+files of plain C11 with no melonDS in them, and xxHash's header. The input file reader (`pbwinput.c`) is compiled into
+Frigate for its replays (`port/app/replay.c`). The sound trace's format (`sndtrace.h`) is included by Frigate's sound
+driver, which writes its work in the DS's layout with it (`port/hal/snd7/snd7.c`, `port_snd7_trace_record`), by
+Frigate's `--sound-trace` (`port/app/sound_trace.c`) and by the sound driver's tests (`port/tests/snd/test_snd.c`).
+The per-game-frame digest (`digest.c`, with xxHash's header, which every build fetches at configure time) and the
+tracking of the 3D that display captures leave in VRAM (`display3d.c`) are compiled into Frigate for its `--digest`
+(`port/app/digest_stream.c`, [Digests](#digests)), so that both programs encode and track with the same code.
 melonDS is GPL-3.0, as this repository is; the oracle links melonDS's core and is GPL-3.0 with it. melonDS is fetched
 at build time, pinned to a release, and never committed.
 
 | File | What it is |
 | --- | --- |
 | `oracle.cpp`, `oracle.h`, `platform.cpp`, `symtab.*`, `pngout.*` | `pbw-oracle`, the program on melonDS's core: `oracle.cpp` its options and run, `oracle.h` what melonDS's Platform layer (`platform.cpp`) reports to it, `symtab.*` the decomp's symbols for its memory dumps, `pngout.*` the screens' PNG files |
-| `display3d.c`, `display3d.h` | which screens show 3D in a frame, from the display registers; plain C11 |
-| `digest.c`, `digest.h` | the per-game-frame digest's canonical encoding, hash and stream format ([Digests](#digests)); plain C11, which only its tests compile so far |
+| `display3d.c`, `display3d.h` | which screens show 3D in a frame, from the display registers, and which VRAM banks hold a capture of 3D; plain C11, which Frigate also compiles for its digest stream |
+| `digest.c`, `digest.h` | the per-game-frame digest's canonical encoding, hash, stream format and stream writer ([Digests](#digests)); plain C11, which both programs compile for `--digest` |
 | `pbwinput.c`, `pbwinput.h` | the input file reader and writer and the game-frame clock, plain C11, which the port can compile as it is |
 | `oracle.py` | runs the oracle and the port with the repository's defaults; makes the saves the tests start from on the oracle, each from the save before it ([Saves](#saves)); the comparison sequences, the field menu's and its apps' among them, and the sound's comparison; the ctest check |
 | `compare.py` | compares two runs: screens, memory, alignment |
@@ -111,6 +114,7 @@ the DS builds playing a sequence's or a save's input file, as the file's `seed` 
 | `--save FILE`, `--save-out FILE` | the save memory at power-on (blank otherwise), and where to write it at the end |
 | `--audio-dump FILE` | the sound unit's mixed output as a WAV file: every sample melonDS's mixer makes, one each 1024 cycles from power-on, 16-bit stereo, before melonDS resamples it for a sound card ([Sound](#sound)) |
 | `--sound-trace FILE` | the ARM7 sound driver's state after each run of its thread (`sndtrace.h`, [Sound](#sound)); needs `--config` |
+| `--digest FILE` | the digest stream, `#pbwdigest 1`: a record per value of GFL's frame count, taken at its last VBlank, of the display state melonDS keeps ([Digests](#digests)); needs `--counter` (status 2 otherwise, and for a file it can't write). At each frame it also checks that the screens it took at the VBlank are the ones the frame ends with; a mismatch, a write that fails, a count that falls or jumps or a state that can't be encoded ends the run with status 1. `run.txt` names it (`digest:`) |
 
 A dump's TARGET is a symbol (`sVBlankCount`), `MODULE/NAME` or `FILE.c/NAME` for a name several modules or files have
 (`ov033/sWork`, `gfl_use.c/sWork`), with an optional `+OFFSET`, or an address (`0x0209da64`). Dumps read the ARM9's view
@@ -421,8 +425,8 @@ proposed) holds Frigate to melonDS at every game frame by a digest: one record p
 records are equal exactly when their state is. Its first part is here: the canonical encoding, the hash and the
 stream's format in `digest.c` and `digest.h`, plain C11 that both programs are to compile, tested without a ROM by
 `digest_format_plain` and `digest_format_sanitized`
-([port/tests/oracle/test_digest.c](../../tests/oracle/test_digest.c)), and its second part's writer, which Frigate's
-program calls with `--digest FILE`. pbw-oracle's `--digest` and the comparison's pairing come next.
+([port/tests/oracle/test_digest.c](../../tests/oracle/test_digest.c)), and its second part's writer, which both
+programs call with `--digest FILE`. The comparison's pairing comes next.
 
 Each program fills a `PbwDigestFrame` from its own model; `digest.c` decodes, masks, encodes and hashes it. The groups
 and their canonical bytes, with 32-bit words little-endian:
@@ -533,6 +537,29 @@ and line 96, where melonDS spreads them over the frame: a pass that writes a cap
 can move `holds3d` at the start, the capture's registers and the zeroed region by a frame, by construction. Without
 `--digest` nothing of this runs.
 
+**The oracle's writer** (`oracle.cpp`'s `DigestVBlank`, `--digest FILE`) runs in `OnVBlank`, the oracle's event at
+the start of line 192 after the LCD's own (which raises the VBlank interrupt, ends the 2D engines' VBlank work and swaps
+the 3D list), after the `--dump`s and before the input of the next pass, neither of which changes emulated state. It
+reads melonDS's own memory and fields: `GPU::VRAM` page by page and `GPU::VRAMCNT`, `GPU::Palette` and `GPU::OAM`; each
+2D unit's fields copied as they are (`BGXRef` and `BGYRef` the values written, not the renderer's moving reference
+points); `NDS::PowerControl9`, and WRAMCNT through `ARM9IORead8(0x04000247)`, which returns it with no side effect
+(`WRAMCnt` is protected); `GPU3D`'s live rendering registers, which the VBlank's latch has just copied for the next
+frame; the render list, the first `RenderNumPolygons` polygons of the polygon RAM bank the last swap closed
+(`PolygonRAM[CurRAMBank ? 0 : 2048]`), each vertex an index into that bank's vertex RAM (one that points elsewhere ends
+the run), its depth `pbw_digest_zbuffer_depth(Position[2], Position[3])`, `swapParam` the `FlushAttributes`' 2 bits and
+the overflow `DispCnt` bit 13; the capture and the banks' 3D as `SampleDisplay` left them for this frame; and the
+screens just drawn, which at line 192 are in the back buffer (`Framebuffer[FrontBuffer ? 0 : 1]`, top then bottom) and
+which the frame's end makes the front one (`GPU::FinishFrame`), the one `frames.tsv` hashes. With `--digest`, every frame
+with a VBlank checks that its front buffer's screens hash to what `OnVBlank` took, and stops the run (status 1) if they
+don't. Without `--digest` the oracle's output stays byte for byte what it was.
+
+melonDS models two things the stream meets: while the 3D rendering engine is off it keeps `RenderNumPolygons` at 0
+(`GPU3D::SetEnabled` resets the rendering state), so its list is empty then while its banks still flip with the
+geometry engine on, and it drops geometry commands while the geometry engine is off; Frigate's geometry engine ignores
+POWCNT1, so the lists can differ there. And it starts VBlank DMAs in the LCD's line-192 event, but `DMA::Start` only
+marks the channel running and stops the CPU, so their data moves after the oracle's event; Frigate's DMA copies at the
+call (`port/hal/dma/dma.c`).
+
 `pbw_digest_compare_streams` compares an expected stream (the oracle's) with an actual one (Frigate's) count by
 count, each with one row per count in rising order. The expected stream names what is held: a group it leaves out,
 or writes `-` for, isn't compared. A group the expected row has and the actual row lacks, whether the actual header
@@ -564,7 +591,10 @@ first 500 frames twice, compares the results (`frames.tsv`, the sound trace and 
 the PNG files and `frames.tsv` agree, that the WAV dump has a sample for each 1024 cycles and the trace the driver's
 periodic runs 2728 ticks apart, each record in the frame whose VBlank comes next, and compares the screens of 11 frames
 with `port/tests/oracle/boot_<version>.tsv`, hashes the pinned melonDS gives (`oracle.py check --update` writes them).
-It exits 77 (skipped) without the oracle or without the ROM the decomp builds.
+When the ROM build's link map gives it the counter (`build/<version>/arm9.o.xMAP`), both runs also write their digest
+stream (`--digest`), which it holds byte for byte too and reads with `compare.py`'s reader: counts from 1, each one
+more than the last, every group in every row; without the map it says the digest wasn't checked. It exits 77
+(skipped) without the oracle or without the ROM the decomp builds.
 
 ## Random seeds
 

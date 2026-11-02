@@ -69,8 +69,9 @@ against that reference. sound runs both programs on a sequence with their sound 
 --audio-dump) and compares the sound driver's state run by run, what the ARM9 sees of it frame by frame, and the sound
 by segment (sound.py, SOUND); with --update it writes port/tests/oracle/sound_<name>_<version>.tsv, the oracle's hashes
 and statistics. sound-check runs the port alone and checks it against that reference. check is the oracle's ctest test:
-the oracle runs the boot sequence twice with the same results (its screens, sound trace and WAV dump), and its screens
-match the hashes in port/tests/oracle/boot_<version>.tsv. save, port-save, round-trip, sequence, seeds, sound and check
+the oracle runs the boot sequence twice with the same results (its screens, sound trace and WAV dump, and with the ROM
+build's link map, which gives it the counter, its digest stream, whose counts run from 1 by one with every group in
+every row), and its screens match the hashes in port/tests/oracle/boot_<version>.tsv. save, port-save, round-trip, sequence, seeds, sound and check
 exit 77 without the oracle or the ROM, sequence-check and sound-check without the ROM.
 Standard library only.
 """
@@ -885,8 +886,17 @@ def statics_file(version: str, directory: str) -> str | None:
     return path
 
 
+def oracle_counter(args) -> bool:
+    """Whether run_oracle passes the oracle --counter: GFL's frame count is a static that only the ROM build's link map
+    names (build/<version>/arm9.o.xMAP), and --no-counter leaves it out"""
+    return bool(symbols.read_map(args.version)) and not getattr(args, "no_counter", False)
+
+
 def run_oracle(args, out: str, frames: int, screens: str, dumps: list[str] | None = None,
-               quiet: bool = False, audio: str | None = None, trace: str | None = None) -> int:
+               quiet: bool = False, audio: str | None = None, trace: str | None = None,
+               digest: str | None = None) -> int:
+    """Runs pbw-oracle with the repository's defaults into out; with digest, its --digest stream there (README.md,
+    "Digests"), which needs the counter (oracle_counter)"""
     binary = args.oracle or DEFAULT_ORACLE
     if not os.path.exists(binary):
         print(f"oracle.py: no oracle at {binary}; configure the port with -DPORT_BUILD_ORACLE=ON and build",
@@ -918,6 +928,8 @@ def run_oracle(args, out: str, frames: int, screens: str, dumps: list[str] | Non
         command += ["--audio-dump", audio]
     if trace:
         command += ["--sound-trace", trace]
+    if digest:
+        command += ["--digest", digest]
     return subprocess.call(command)
 
 
@@ -1707,6 +1719,29 @@ def check_sound_outputs(run: str) -> int:
     return failed
 
 
+def check_digest_stream(path: str) -> int:
+    """The failures of check's digest stream, read with compare.py's reader: counts from 1, each one more than the last,
+    every group digest.c knows in every row"""
+    try:
+        digest = compare.load_digest(path)
+    except compare.RunError as error:
+        print(f"FAIL: {error}")
+        return 1
+    counts = sorted(digest.records)
+    failed = 0
+    if not counts or counts != list(range(1, len(counts) + 1)):
+        print(f"FAIL: the digest stream's counts aren't 1, 2, 3 ... ({compare.describe_ranges(counts) or 'none'})")
+        failed += 1
+    lacking = [count for count, record in digest.records.items()
+               if set(record.hashes) != set(compare.DIGEST_GROUPS)]
+    if lacking:
+        print(f"FAIL: the digest stream's counts {compare.describe_ranges(sorted(lacking))} lack a group")
+        failed += 1
+    if not failed:
+        print(f"the digest stream: counts 1-{counts[-1]}, every group in every row")
+    return failed
+
+
 def command_check(args) -> int:
     binary = args.oracle or DEFAULT_ORACLE
     if not os.path.exists(binary):
@@ -1720,18 +1755,28 @@ def command_check(args) -> int:
     args.oracle = binary
     work = args.work or tempfile.mkdtemp(prefix="oracle-check-")
     runs = []
+    # The digest stream (--digest) needs GFL's frame count, which only the ROM build's link map names
+    digest = oracle_counter(args)
+    if not digest:
+        print(f"oracle.py check: no build/{args.version}/arm9.o.xMAP (run ninja), so no counter: the digest stream "
+              "isn't checked")
     for name in ("a", "b"):
         out = os.path.join(work, name)
         shutil.rmtree(out, ignore_errors=True)
         os.makedirs(out)
         trace, audio = sound.run_files(out)
-        status = run_oracle(args, out, CHECK_FRAMES, CHECK_SCREENS, quiet=True, audio=audio, trace=trace)
+        status = run_oracle(args, out, CHECK_FRAMES, CHECK_SCREENS, quiet=True, audio=audio, trace=trace,
+                            digest=os.path.join(out, "digest.tsv") if digest else None)
         if status != 0:
             print(f"oracle.py check: the oracle failed (status {status})")
             return 1
         runs.append(compare.load_run(out))
     failed = 0
-    for file in ("frames.tsv", *(os.path.basename(path) for path in sound.run_files(work))):
+    held = ("frames.tsv", *(os.path.basename(path) for path in sound.run_files(work)))
+    if digest:
+        held += ("digest.tsv",)
+        failed += check_digest_stream(os.path.join(work, "a", "digest.tsv"))
+    for file in held:
         with open(os.path.join(work, "a", file), "rb") as a, open(os.path.join(work, "b", file), "rb") as b:
             if a.read() != b.read():
                 print(f"FAIL: two runs of the same boot differ ({file})")

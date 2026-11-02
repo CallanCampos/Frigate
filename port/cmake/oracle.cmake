@@ -100,6 +100,8 @@ if(PORT_BUILD_ORACLE)
         CMAKE_GENERATOR "${CMAKE_GENERATOR}"
         CMAKE_ARGS
             "-DMELONDS_SOURCE_DIR=${port_melonds_source}"
+            # The xxHash release port/cmake/app.cmake fetched, for the digest's hash (digest.c, --digest)
+            "-DXXHASH_SOURCE_DIR=${xxhash_SOURCE_DIR}"
             "-DCMAKE_BUILD_TYPE=Release"
             "-DORACLE_SANITIZE=${PORT_ORACLE_SANITIZE}"
         # Its own sources change without the port's build noticing; its ninja is quick when nothing did
