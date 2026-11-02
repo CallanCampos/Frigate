@@ -39,16 +39,17 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 - **Port:** `PORT_SHA`, on the topic branch `port-docs-hygiene-1102` from `d1717b68d8`: `3c7a8f10dd` (the documents
   check, its tests and its CI steps), `991c2e6725` (the follow-ups, and this entry), `2f9a0dbb11` (the merge of `main`
   at `e936696a97`, PR 71: the save lab's minter and reader, all in `port/`), `08bfb919e2` (the check's summary in the
-  singular for one document), `1fddd1c0fc` (this record's update after the merge) and the fixes of the review of
-  `1fddd1c0fc`, with this entry's account of them (below). The merge keeps both new STATUS.md entries, this one
-  first. This entry fills the last entry's, the save lab's, `PORT_SHA` with `a9d91adf59`, and the hygiene's with
-  `6eef75c290`, as PR 71's entry does too. Only `port/` and two of Frigate's own files under `.github/` change: the
-  landing page's one wrapped paragraph and `port-ci.yml`'s two steps.
+  singular for one document), `1fddd1c0fc` (this record's update after the merge), `a34cc8634a` (the fixes of the
+  review of `1fddd1c0fc`) and the check's note on headings in quotes and lists, with this entry's account of them
+  (below). The merge keeps both new STATUS.md entries, this one first. This entry fills the last entry's, the save
+  lab's, `PORT_SHA` with `a9d91adf59`, and the hygiene's with `6eef75c290`, as PR 71's entry does too. Only `port/`
+  and two of Frigate's own files under `.github/` change: the landing page's one wrapped paragraph and `port-ci.yml`'s
+  two steps.
 - **ROM (T0):** `python3 configure.py && ninja` (`-j4`) in this branch's new worktree, every step run (14,039): both
   original US SHA1s, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`,
   with no compiler warning; again on the merge with `main` at `e936696a97` (2 steps, the checks: PR 71's files are all
-  in `port/`), the same SHA1s and no warning, and on the review's fixes (2 steps, the checks), the same. This branch's
-  own changes are no ROM input.
+  in `port/`), the same SHA1s and no warning, and on the review's fixes and the note after them (2 steps, the checks),
+  the same. This branch's own changes are no ROM input.
 - **Host build (T1):** not run: nothing this branch changes is a host build input. `git diff --stat` against `main`
   lists Markdown, `port/tools/**` (the documents check and its allowlist, `summarize.py`, `milestones.py`), the tools'
   tests and `.github/workflows/port-ci.yml`, and no CMake file reads any of them. The exact-head verification
@@ -158,7 +159,9 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
       item ends one too; a line indented four columns past the header row is a code block, which ends the table and
       whose lines are no stray rows; and a block quote's tables, nested ones too, are checked without their markers.
       The check still doesn't follow a list's structure, which its docstring says: it reads a table's rows against
-      its header row's indentation.
+      its header row's indentation. Its docstring also says, from a check against GitHub after the review, that a
+      heading inside a block quote or after a list marker makes an anchor on GitHub that the check doesn't see; no
+      document has one.
     - **What CI runs:** port/README.md, CONTRIBUTING.md and REPOSITORY-POLICY.md name the documents check among
       `Frigate CI`'s jobs; CONTRIBUTING.md's "Build and verify" asks for it after a change to a document, as it needs
       no ROM; GLOSSARY.md defines it.
@@ -170,8 +173,9 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   (port/CLAUDE.md, CONTRIBUTING.md, SYNC.md, PLAN.md, README.md and `upstream_sync.py`'s warning), for the owner's
   wording of the delegation; `research/platinum-port.md:25`, a record whose code span's pipes split its row, the check's
   one allowed problem; `include/field/field_effect.h:146`'s comment, which names `FesKiraTask`, for the next change that
-  touches `include/` anyway, since a game header's change needs its MWCC-neutral proof; and `summarize.py`'s overlay 11
-  gap rule, which no gap reaches either now.
+  touches `include/` anyway, since a game header's change needs its MWCC-neutral proof; `summarize.py`'s overlay 11
+  gap rule, which no gap reaches either now; and the documents check's anchors for headings inside block quotes and
+  list items, which GitHub makes and the check doesn't see yet.
 - **Blockers:** none for this change. Decisions the owner holds: ADRs 0022, 0025, 0030 and 0031 are proposed; the
   guides' wording of the delegation; whether escaping a record's pipes is a fix a record may take; and whether
   documents get a line limit, which no rule names, so that the check would hold it.

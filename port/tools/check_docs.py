@@ -40,8 +40,9 @@ Links and rows in fenced code blocks, code spans and HTML comments are left alon
 are headings and HTML ids in fenced blocks and comments, and links with a scheme (https:, mailto:). A block quote's
 tables are checked as the quote shows them, its > markers taken off. A link's text may run over several lines, as
 wrapped prose has it. The check doesn't follow a list's structure: it reads a table's rows, and the code block that
-ends one, against the indentation of the table's header row. No document rule names a line length, so lines aren't
-measured.
+ends one, against the indentation of the table's header row. Nor does it take a heading inside a block quote or after
+a list marker (> ## Title, - ## Title) for an anchor, as GitHub does, so a link to one fails. No document rule names a
+line length, so lines aren't measured.
 
 The allowlist (check_docs_allowlist.tsv, next to this script; --allowlist FILE for another) names the problems that a
 document must keep, each with its reason: a record, which is added to and never rewritten
