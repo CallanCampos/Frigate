@@ -89,8 +89,9 @@ Each directory of `port/` has a guide to its files: what each does, the part of 
 | [../cmake/README.md](../cmake/README.md) | The build's fragments, their tests, and the build's options |
 | [../tests/README.md](../tests/README.md) | The tests by directory, which need the ROM, how to write one |
 | [../tests/asm_oracle/README.md](../tests/asm_oracle/README.md) | The differential tests of the SDK's assembly in C against the ROM's code |
-| [../tools/README.md](../tools/README.md) | The generators, the sync, the packaging, the oracle, the measurement scripts |
+| [../tools/README.md](../tools/README.md) | The generators, the sync, the packaging, the oracle, the save lab, the measurement scripts |
 | [../tools/oracle/README.md](../tools/oracle/README.md) | The melonDS oracle: building and running it, input files, run directories, comparing, saves, the sound, known differences |
+| [../tools/lab/README.md](../tools/lab/README.md) | The save lab: a save minted from a recipe in the game's names, where `place` puts the player and how, what it refuses, and a save read back as facts |
 | [../tools/compile-probe/README.md](../tools/compile-probe/README.md) | The host-compiler probe: 64-bit warnings and struct layouts (the 64-bit metric is the pointer cast guard's, [SYNC.md](SYNC.md#when-the-pointer-cast-guard-fails)) |
 | [../assets/README.md](../assets/README.md) | Files that aren't code |
 | [../assets/branding/README.md](../assets/branding/README.md) | Frigate's logo and app icons: the files, colours, how the build uses them, how to change them, the license |

@@ -23,7 +23,8 @@ and the host build's configure write from generated/*.txt), so the lab and the g
     base NAME                        the oracle save (port/tools/oracle/oracle.py SAVES) the recipe is minted from:
                                      --base must have one of the SHA-1s that SAVES pins for it
     place ZONE warp N                the player arrives through the zone's own warp N (res/field/events/<zone>.json)
-    place ZONE at X Z [Y] [facing D] the player stands on tile (X, Z) at height Y (0) facing D (WARP_DIR_DOWN)
+    place ZONE at X Z [Y] [facing D] the player stands on the ground of tile (X, Z), facing D (WARP_DIR_DOWN); Y, the
+                                     level in tiles (0), picks one only where the tile has more than one
     place ZONE fly                   the player stands where Fly lands in the zone (res/field/zones/<zone>.json)
     flag NAME set|clear              a saved event flag (EVENT_FLAG_*)
     work NAME VALUE                  a saved event work value (EVENT_WORK_*), 0 to 65535 or a name
@@ -42,10 +43,14 @@ from its events as its flags decide. So place writes nextSpawn as the game's con
 (SetupZoneSpawnInfoWarp, CreateZoneChangeData, LoadZoneSpawnInfoCheckRail; src/system/zone_spawn.c), sets the flag,
 clears EVENT_WORK_CONTINUE_SCRIPT so that no continue script runs, and writes SaveLocation, which the start menu shows,
 as the player state FieldMapControl_InitSpawn sets from that spawn. A rail warp's SaveLocation keeps only its zone and
-facing: the game puts the player on the rail from nextSpawn before anything reads the position. at and fly take grid
-positions, so they refuse the zones whose Fly position is on a rail (ZONES_WITH_RAILS, src/system/zonedata.c); place
-those by warp. place refuses a base saved while cycling, surfing or diving, a state the arrival would keep. The
-recipe's verbs leave EVENT_FLAG_CONTINUE_SCRIPT and EVENT_WORK_CONTINUE_SCRIPT to place.
+facing: the game puts the player on the rail from nextSpawn before anything reads the position. The game sets the
+player's height itself, on the ground of the tile (CheckRecalcActorY, src/ov012/field_actor_tool.c): at's Y only picks
+the level nearest it where the tile has more than one (FieldG3DMapper_GetTerrain, src/ov036/field_g3d_mapper.c). at and
+fly take grid positions, so at refuses the zones the game gives a rail system (ZONE_RAIL_ASSIGNMENTS,
+src/system/zonedata.c), fly the zones whose Fly position is on a rail (ZONES_WITH_RAILS, there too) and those whose zone
+data has no Fly position, only (0, 0, 0); place those by warp. place refuses a base saved while cycling, surfing or
+diving, a state the arrival would keep. The recipe's verbs leave EVENT_FLAG_CONTINUE_SCRIPT and
+EVENT_WORK_CONTINUE_SCRIPT to place.
 
 The layout of the backup image comes from port/tools/oracle/saveimage.py: find_blocks discovers the main save's 73
 blocks from their footers and CRC table, and validate_image checks both copies. A base must pass it, have its two copies
@@ -319,10 +324,11 @@ class Constants:
             raise LabError(f"no generated constants headers in {directory}: the ROM build's `ninja constants_headers` "
                            "or the host build's configure writes them")
         for path in headers:
+            kind = path.stem
             for line in path.read_text(encoding="utf-8").splitlines():
                 match = DEFINE.match(line)
                 if match:
-                    self.add(path.stem, match.group(1), int(match.group(2), 0))
+                    self.add(kind, match.group(1), int(match.group(2), 0))
         for name, value in WARP_DIRS.items():
             self.add("warp_dirs", name, value)
 
@@ -424,20 +430,23 @@ def read_json(path: Path, what: str) -> dict:
         raise LabError(f"can't read {what} {path}: {error.strerror}") from None
 
 
-def rail_fly_zones(constants: Constants) -> set[int]:
-    """The zones whose Fly position is on a rail, ZONES_WITH_RAILS of src/system/zonedata.c, which
-    LoadZoneSpawnInfoCheckRail reads: the game's own list, read from its source so that it can't drift"""
+def zonedata_zones(constants: Constants, table: str) -> set[int]:
+    """The zones of one of src/system/zonedata.c's tables, the game's own lists, read from its source so that they can't
+    drift: ZONES_WITH_RAILS, the zones whose Fly position is a rail position (LoadZoneSpawnInfoCheckRail), or
+    ZONE_RAIL_ASSIGNMENTS, the zones the game gives a rail system (GetZoneHasRailSystem; its version swap of Black City
+    for White Forest changes nothing here, since both are in the table)"""
+    what = {"ZONES_WITH_RAILS": "which zones' Fly positions are on a rail",
+            "ZONE_RAIL_ASSIGNMENTS": "which zones have a rail system"}[table]
     try:
         source = ZONEDATA_C.read_text(encoding="utf-8")
     except OSError as error:
         raise LabError(f"can't read {ZONEDATA_C}: {error.strerror}") from None
-    match = re.search(r"\bZONES_WITH_RAILS\[(\d+)\]\s*=\s*\{(.*?)\};", source, re.S)
+    match = re.search(rf"\b{table}\[(\d+)\]\s*=\s*\{{(.*?)\}};", source, re.S)
     if match is None:
-        raise LabError(f"{ZONEDATA_C} has no ZONES_WITH_RAILS table, which says which zones' Fly positions are on a "
-                       "rail")
+        raise LabError(f"{ZONEDATA_C} has no {table} table, which says {what}")
     names = re.findall(r"\bZONE_\w+", match.group(2))
     if len(names) != int(match.group(1)):
-        raise LabError(f"{ZONEDATA_C}: ZONES_WITH_RAILS lists {len(names)} zones, not its {match.group(1)}")
+        raise LabError(f"{ZONEDATA_C}: {table} lists {len(names)} zones, not its {match.group(1)}")
     return {constants.value(name, "zones", str(ZONEDATA_C)) for name in names}
 
 
@@ -480,20 +489,27 @@ def place(save: SaveImage, constants: Constants, words: list[str], where: str) -
             position = tuple(to_s16(grid[axis]) << FX32_SHIFT for axis in ("x", "y", "z"))
         what = {"zone": zone_name, "warp": warp_id}
     elif mode in ("at", "fly"):
-        if zone in rail_fly_zones(constants):
-            raise LabError(f"{where}: {zone_name}'s Fly position is on a rail (ZONES_WITH_RAILS), and {mode} takes a "
-                           "grid position; place it by warp")
         if mode == "at":
-            x, z, y, facing = parse_at(constants, rest, where)
+            # A map with a rail system keeps its player on rails in places, which only a rail position
+            # (CreateZoneChangeDataRail) can name, and the game resolves a warp onto its rail
+            if zone in zonedata_zones(constants, "ZONE_RAIL_ASSIGNMENTS"):
+                raise LabError(f"{where}: {zone_name} has a rail system (ZONE_RAIL_ASSIGNMENTS), and at takes a grid "
+                               "position; place it by warp")
             # CreateZoneChangeData, as the script command FieldSetNextZone builds it from tiles
+            x, z, y, facing = parse_at(constants, rest, where)
         else:
             if rest:
                 raise LabError(usage)
-            fly = read_json(ZONES_DIR / zone_file_name(zone_name), "the zone data of").get("fly")
-            if not fly:
-                raise LabError(f"{where}: {zone_name} has no Fly position")
+            if zone in zonedata_zones(constants, "ZONES_WITH_RAILS"):
+                raise LabError(f"{where}: {zone_name}'s Fly position is on a rail (ZONES_WITH_RAILS), and fly takes a "
+                               "grid position; place it by warp")
             # LoadZoneSpawnInfoCheckRail: the Fly position (LoadZoneFlyPosToVecFx32), facing down
+            fly = read_json(ZONES_DIR / zone_file_name(zone_name), "the zone data of")["fly"]
             x, y, z, facing = fly["x"], fly["y"], fly["z"], WARP_DIR_DOWN
+            if x == y == z == 0:
+                # The zone data's empty position: the game's own fallback would stand the player on the map's corner
+                raise LabError(f"{where}: {zone_name}'s zone data has no Fly position, only (0, 0, 0), the map's "
+                               "corner; place it by warp")
         position = (x << TILE_SHIFT, y << TILE_SHIFT, z << TILE_SHIFT)
         spawn = (ZONE_SPAWN_CHANGE_TYPE_POSITION, zone, -1, facing, 0, 0, struct.pack("<3i", *position))
         what = {"zone": zone_name, mode: [x, z] if mode == "at" else True}
@@ -532,9 +548,12 @@ def parse_at(constants: Constants, words: list[str], where: str) -> tuple[int, i
         words = words[:-2]
     if len(words) not in (2, 3):
         raise LabError(f"{where}: place ZONE at takes X Z [Y] [facing DIR]")
-    # FieldSetNextZone takes u16 tiles and shifts them into an s32 world position
-    tiles = [integer(word, 0, 0x7fff, "a tile", where) for word in words] + [0]
-    return tiles[0], tiles[1], tiles[2], facing
+    # FieldSetNextZone takes u16 tiles and shifts them into an s32 world position: X and Z count a map's tiles from 0,
+    # and Y's u16 wraps, so that its 65535 is -1, a tile below level 0
+    x = integer(words[0], 0, 0x7fff, "a tile", where)
+    z = integer(words[1], 0, 0x7fff, "a tile", where)
+    y = integer(words[2], -0x8000, 0x7fff, "a height", where) if len(words) == 3 else 0
+    return x, z, y, facing
 
 
 def write_flag(save: SaveImage, flag: int, value: bool) -> None:

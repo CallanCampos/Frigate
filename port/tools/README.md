@@ -1,9 +1,9 @@
 # port/tools/
 
-The scripts and programs that build, check, sync and measure Frigate, and make the saves its tests start from. None of
-them is part of the program the player runs; the generators run inside the host build, and everything else is run by
-hand or by a test. None writes into the repository unless its header says so: give each an output directory outside
-it, or under an ignored `build/`.
+The scripts and programs that build, check, sync and measure Frigate, and make and read saves: the oracle's, which its
+tests start from, and the save lab's, minted from a recipe. None of them is part of the program the player runs; the
+generators run inside the host build, and everything else is run by hand or by a test. None writes into the repository
+unless its header says so: give each an output directory outside it, or under an ignored `build/`.
 
 ## Generators the host build runs
 
@@ -57,10 +57,11 @@ the sound driver's tests (`port/tests/snd/test_snd.c`).
 [lab/](lab/README.md) makes and reads Black 2 and White 2 saves without changing the game or Frigate.
 [lab/savelab.py](lab/savelab.py) mints a save from one the game wrote and a recipe in the game's constant names (from
 the generated constants headers): `place` puts the player at a zone's warp, on a tile or at its Fly position, through
-the game's own continue-at-spawn path, the one the Hall of Fame takes, and `flag`, `work`, `money`, `badges` and
-`playtime` set the rest. It reseals both copies' CRCs, with the layout from [oracle/saveimage.py](oracle/saveimage.py),
-and refuses a base that isn't a save the game finished writing. `read` prints a save's facts in the same names, the
-party decoded. Its test, `lab_savelab`, needs no ROM and runs in every build and in CI.
+the game's own continue-at-spawn path, the one the Hall of Fame takes, and refuses a tile on a map with rails or a Fly
+position that is on a rail or empty; `flag`, `work`, `money`, `badges` and `playtime` set the rest. It reseals both
+copies' CRCs, with the layout from [oracle/saveimage.py](oracle/saveimage.py), and refuses a base that isn't a save the
+game finished writing. `read` prints a save's facts in the same names, the party decoded. Its test, `lab_savelab`,
+needs no ROM and runs in every build and in CI.
 
 | File | What it does | Run |
 | --- | --- | --- |

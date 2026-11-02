@@ -1,11 +1,12 @@
 <!-- The save lab's guide: minting Black 2 and White 2 saves from a recipe, and reading saves back as facts. -->
 # port/tools/lab/
 
-The save lab makes and reads Black 2 and White 2 saves, for tests and for starting the game somewhere other than where
-a save was made, with nothing in the game or in Frigate changed: a minted save is a save the game loads as its own, on
-Frigate and on melonDS alike. It serves the game's saves (the main save's blocks, `include/save/save_control.h`) and,
-through the game's own CONTINUE, the field's map changes. Nothing here is linked into Frigate, and no save is ever
-committed: a recipe is text, and what it is minted from is a save made on the oracle or the player's own.
+The save lab makes and reads Black 2 and White 2 saves, for starting the game somewhere other than where a save was
+made (by hand today, and in the stations' tests to come), with nothing in the game or in Frigate changed: a minted save
+is a save the game loads as its own, on Frigate and on melonDS alike. It serves the game's saves (the main save's
+blocks, `include/save/save_control.h`) and, through the game's own CONTINUE, the field's map changes. Nothing here is
+linked into Frigate, and no save is ever committed: a recipe is text, and what it is minted from is a save made on the
+oracle or the player's own.
 
 | File | What it does | Game functionality it serves | Run |
 | --- | --- | --- | --- |
@@ -43,12 +44,12 @@ the saves it makes. The save is named after the ROM's game code: `IREO.sav` for 
 | --- | --- | --- |
 | `base NAME` | Nothing: it names the oracle save the recipe starts from (`oracle.py`'s `SAVES`), and `mint` refuses a `--base` without one of the SHA-1s `SAVES` pins for it | |
 | `place ZONE warp N` | The player arrives through the zone's own warp `N` (`res/field/events/<zone>.json`), as through that door | `PlayerSave.nextSpawn` and `SaveLocation` (block 0x1c), `EVENT_FLAG_CONTINUE_SCRIPT`, `EVENT_WORK_CONTINUE_SCRIPT` (0x2d) |
-| `place ZONE at X Z [Y] [facing DIR]` | The player stands on tile (X, Z), at height Y (0 if left out), facing `WARP_DIR_UP`, `_DOWN` (if left out), `_LEFT` or `_RIGHT` | the same |
+| `place ZONE at X Z [Y] [facing DIR]` | The player stands on the ground of tile (X, Z), facing `WARP_DIR_UP`, `_DOWN` (if left out), `_LEFT` or `_RIGHT`. The game sets the height itself; Y, a level in tiles from -32,768 to 32,767 (0 if left out), only picks the level nearest it where the tile has more than one, such as a bridge over a path | the same |
 | `place ZONE fly` | The player stands where Fly lands in the zone (`res/field/zones/<zone>.json`'s `fly`), facing down | the same |
 | `flag NAME set`, `flag NAME clear` | A saved event flag, 1 to 3,063 | `EventWork.flags`, bit N % 8 of byte N / 8 |
 | `work NAME VALUE` | A saved event work value, `EVENT_WORK_0x4000` to `EVENT_WORK_0x41ae`, to a number or a name (0 to 65,535) | `EventWork.works` |
 | `money N` | The money, at most `TRAINER_GAME_INFO_CASH_MAX` (9,999,999) | `TrainerGameInfoSave.cash` (0x34) |
-| `badges N` | The first N of the 8 badges | `TrainerGameInfoSave.badges`, bit B for badge B |
+| `badges N` | The first N of the 8 badges, and no other, whatever the base had | `TrainerGameInfoSave.badges`, bit B for badge B |
 | `playtime H:MM:SS` | The play time, at most 999:59:59 | `TrainerDataSave.playTime` (0x1b) |
 
 A recipe places the player once at most and sets each flag, work value and the rest once. `EVENT_FLAG_CONTINUE_SCRIPT`
@@ -78,14 +79,33 @@ flag, clears the work value, and writes `SaveLocation`, which the start menu sho
 (`ConvWarpDirToAngle`) and not on a rail. The game snaps the player to the tile's centre and writes its own
 `SaveLocation` at its next SAVE.
 
+The game also sets the player's height: it stands the player on the ground of the tile (`CheckRecalcActorY`,
+`src/ov012/field_actor_tool.c`), and where the tile has more than one level, such as a bridge over a path, it takes the
+level nearest the height it was given (`FieldG3DMapper_GetTerrain`, `src/ov036/field_g3d_mapper.c`). So `at`'s Y matters
+only there. `place ZONE_ROUTE_20 at 130 661`, with no Y, saves at height 2, the route's ground there.
+
 Rewriting `SaveLocation` alone would not do: a plain CONTINUE keeps the actors the save restored, the old zone's NPCs,
 in the new map. And it is the continue's season transition that the player sees on arrival, not a door's walk-in, and
 the zone left behind runs no exit script; both are the same on Frigate and on melonDS.
 
 - **Rails.** A warp may arrive on a rail (Castelia City's streets, Skyarrow Bridge): the game resolves it from
   `nextSpawn`, and `SaveLocation` then keeps only the zone and the facing, since nothing reads its position before the
-  game sets the player on the rail. `at` and `fly` take grid positions, so they refuse the 12 zones whose Fly position
-  is on a rail, the game's `ZONES_WITH_RAILS` (`src/system/zonedata.c`, read from the source): place those by warp.
+  game sets the player on the rail. `at` and `fly` take grid positions. So `at` refuses the 28 zones the game gives a
+  rail system, `ZONE_RAIL_ASSIGNMENTS`, whose players walk on rails in places that only a rail position
+  (`CreateZoneChangeDataRail`) names; and `fly` refuses the 12 of them whose Fly position is a rail position,
+  `ZONES_WITH_RAILS`. Both tables are the game's own (`src/system/zonedata.c`), read from the source. Place those by
+  warp.
+- **Empty Fly positions.** Eleven of Castelia City's zones outside `ZONES_WITH_RAILS` (`ZONE_CASTELIA_CITY_2` to `_7`,
+  `_9` to `_11`, `_31` and `_32`) have Fly (0, 0, 0) in their zone data, no place but the map's corner, where the game's
+  own fallback would stand the player. `fly` refuses them: place those by warp.
+- **Tiles.** `at` stands the player on the tile it names, as a script's `FieldSetNextZone` would, and nothing checks
+  that the tile is ground the player can walk on: the map's ground is in the ROM, which the lab doesn't read. A tile
+  off it leaves the player where the game put them. `place ZONE_CASTELIA_CITY_7 at 21 46`, a Castelia street with no
+  rail system, names the tile east of the street's door at (20, 46), inside the building: the field opens with no
+  player in view, and the player doesn't move. `at 19 46`, the tile west of the door, stands the player on the street,
+  and they walk. Take tiles from the game's data: in `res/field/events/<zone>.json`, a warp's grid position (in world
+  units, 16 to a tile) or the tile beside an NPC's (its grid x and z, in tiles); or a tile that `read` gives for a save
+  of yours.
 - **The player's state.** `place` refuses a base saved while cycling, surfing or diving
   (`SaveLocation.exState`), which the continue would keep on arrival.
 - **Left as the base holds them:** the player's identity, the console the save was last played on (the adventure
@@ -127,7 +147,9 @@ with the reason and `savelab:` on the error output and status 1, when:
 - a block the lab reads doesn't have the size of the game's struct for it (`PlayerSave`, `EventWork`,
   `TrainerDataSave`, `TrainerGameInfoSave`, `PokeParty`, each rounded up to 4 bytes): not a Black 2 or White 2 save;
 - the recipe names a base whose SHA-1 the save doesn't have, or a name that isn't a constant of the right kind, a value
-  out of the game's range, a verb twice, or a verb that doesn't exist.
+  out of the game's range, a verb twice, or a verb that doesn't exist;
+- `place` names a place a grid position can't (`at` on a map with a rail system, `fly` where the Fly position is on a
+  rail or empty), or starts from a base saved cycling, surfing or diving.
 
 Every value is written to both copies. Then each written block's footer CRC and CRC table entry, and the save footer's
 CRC of the table, are computed again in each copy, as `SaveData_FillFooter` computes them
@@ -136,7 +158,11 @@ layout, with its two copies alike, or the minter refuses its own output.
 
 The offsets are the decomp's headers' (`include/save/*.h`, `include/field/zone.h`, `include/pml/poke_party.h`). The test
 `lab_savelab` compiles [../../tests/lab/savelab_layout.c](../../tests/lab/savelab_layout.c) as the host build compiles
-the game, holds `savelab.py`'s `LAYOUT` to the offsets it prints, builds synthetic saves field by field from them, and
-checks the reader, the minter's writes and resealing, and the refusals, each with a control that makes it fail. It needs
-no ROM. The reader's facts on the oracle's saves are the ones the oracle's README records for them, independently; the
-record of that check is in [STATUS.md](../../docs/STATUS.md).
+the game, holds `savelab.py`'s `LAYOUT` to the offsets it prints, and builds synthetic saves field by field from them.
+It checks the reader on them, a place on the grid and one on a rail among them, and holds each verb and each form of
+`place` byte for byte to the save the game's own writes would give, from a base on which every field `place` writes
+differs. It checks the resealing and the refusals too. Its table of deliberate bugs in `savelab.py`, `MUTANTS`, gives
+each check the bugs it must catch, and the test fails if one of them gets through; a change to `savelab.py` that a
+mutant's text no longer matches fails it too, so the table changes with the code. It needs no ROM. The reader's facts on
+the oracle's saves are the ones the oracle's README records for them, independently; the record of that check is in
+[STATUS.md](../../docs/STATUS.md).

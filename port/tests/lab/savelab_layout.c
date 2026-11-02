@@ -1,10 +1,11 @@
 // The save layout that port/tools/lab/savelab.py reads and writes, as the decomp's headers give it: a line for each
 // offset of a field, size of a struct and number savelab uses, "NAME VALUE" in hex, printed with offsetof and sizeof as
-// the compiler lays the headers out. port/tests/lab/test_savelab.py holds savelab's LAYOUT to this output, and builds
-// its synthetic saves' blocks field by field from it. The host build compiles the headers as the game's own files
-// (port_decomp_env), and these save structs hold no pointers, so they are laid out as on the DS: the saves Frigate
-// writes are melonDS's byte for byte. Game functionality: the saves (include/save/save_control.h's blocks: the player's
-// place and spawns, the event work, the play time, the money and badges, the party); no game code runs.
+// the compiler lays the headers out, and the offsets of the fields the lab leaves alone that the tests give the game's
+// values. port/tests/lab/test_savelab.py holds savelab's LAYOUT to this output, and builds its synthetic saves' blocks
+// field by field from it. The host build compiles the headers as the game's own files (port_decomp_env), and these
+// save structs hold no pointers, so they are laid out as on the DS: the saves Frigate writes are melonDS's byte for
+// byte. Game functionality: the saves (include/save/save_control.h's blocks: the player's place and spawns, the event
+// work, the play time, the money and badges, the party); no game code runs.
 #include "field/player_state.h"
 #include "field/zone.h"
 #include "pml/poke_party.h"
@@ -132,5 +133,10 @@ int main(void) {
     FIELD(PkmBlockA, item);
     FIELD(PkmBlockA, exp);
     FIELD(PkmBlockB, moves);
+
+    // Fields the lab leaves alone, which the test's synthetic saves hold at the values a game leaves in them (no
+    // follower, no step counter running) so that a write the lab shouldn't make shows
+    FIELD(PlayerSave, followIndex);
+    FIELD(PlayerSave, stepCounter);
     return 0;
 }
