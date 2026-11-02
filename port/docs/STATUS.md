@@ -34,20 +34,25 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 ## 2026-11-02: T5's set in a strict build, its runner, and main's first baseline (T5-A)
 
-- **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit. Reviewed main is `c6fcdd3f59`, PR 75's
-  merge, which this branch merges; it started from `e936696a97`, PR 71's.
+- **Upstream:** `41f42ca1af`, unchanged: this change merges no upstream commit. Reviewed main is `2d3b99c9ee`, PR 77's
+  merge, which this branch merges, as it merged `c6fcdd3f59`, PR 75's, before; it started from `e936696a97`, PR 71's.
 - **Port:** `PORT_SHA`, on the topic branch `port-t5-strict-routes` from `e936696a97`: `9c7883345a` (the runner, its
   test and its documents), `7cb1ec868f` (`port/tests/rom/test_backup.c`'s unread `sReplyData`, the warning that
   stopped the first strict build), `a8d1fc6d38` (the merge of `main` at `c6fcdd3f59`, PR 75: the documents' hygiene
   and their check in CI), `cbfd020fec` (the runner as the decisions PR's ADR 0033 has it: ctest's routes run by it
   too, the function check before a run counts, a trap stop failed), `365f507e72` (a comment), `70d20f04d2` (an
   assertion where a mutant's test erred), `9672f23751` (the build directory taken whole, the first calibration's
-  finding), and this record. This entry fills the last entry's, PR 75's, `PORT_SHA` with `7d87f98b8c`. Nothing
-  outside `port/` changes but PR 75's two files under `.github/`, which the merge brings.
+  finding), `04c7bd3c76` (this record), `0f33abb86c` (the merge of `main` at `2d3b99c9ee`, PR 77: Youngster
+  Terrell's piece, oracle.py's `terrell` sequence from the Route 20 save, all in `port/` and no C), the criterion's
+  section brought to the decisions PR's review (`40b933970c`: ADR 0033's items 5 and 7), and this record's update.
+  This entry fills the last entry's, PR 77's, `PORT_SHA` with `a7d768e2ee`; PR 75's has `7d87f98b8c`, as both
+  branches filled it alike. Nothing outside `port/` changes but PR 75's two files under `.github/`, which the first
+  merge brings.
 - **ROM (T0):** `python3 configure.py && ninja` on commit 1's tree, every step run (14,039) at load averages of 50 to
   95: both original US SHA1s, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2
-  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, no compiler warning; again on `a8d1fc6d38`, `cbfd020fec`, `365f507e72`
-  and `9672f23751` (2 steps each, the checks: nothing they change is a ROM input), the same SHA1s and no warning.
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, no compiler warning; again on `a8d1fc6d38`, `cbfd020fec`, `365f507e72`,
+  `9672f23751`, `04c7bd3c76` and `0f33abb86c` (2 steps each, the checks: nothing they change is a ROM input), the same
+  SHA1s and no warning.
 - **Host build (T1):** the strict builds, `Homebrew clang version 23.1.3`, `RelWithDebInfo`, `-DPORT_SANITIZE=ON
   -DPORT_SANITIZE_RECOVER=OFF`, each game in a tree of its own. Black 2 with the oracle (`build/port-san`, 776 MB):
   2,116 steps on commit 1's tree, 749 warnings, 540 in `src/`, 208 in `lib/` and one in `port/`,
@@ -154,13 +159,14 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   - **`port/tests/rom/test_backup.c`**: `sReplyData`, set and never read, is gone. The ARM9's only reader of the FS
     tag's words, `CARDi_OnFifoRecv` (`lib/nitro/src/card/card_request.c`), reads the tag and the error bit, and the
     result travels in the command block, which the scenarios check.
-  - **Documents:** sanitizers.md (running T5's set, Phase 5's criterion, and the baseline under "What it found"), the
-    guides of `port/tools`, `port/tests`, `port/tests/tools` and `port/cmake`, the glossary ("Strict build, strict
-    run"), the documents index's sanitizers.md row, ARCHITECTURE.md's T5 row and lessons.md. ADR 0033 and its index
-    rows are the decisions PR's (PR 80); the links to it resolve once that PR merges.
+  - **Documents:** sanitizers.md (running T5's set; Phase 5's criterion, marked as ADR 0033's proposal and stating its
+    items 5 and 7 as the decisions PR's review has them; and the baseline under "What it found"), the guides of
+    `port/tools`, `port/tests`, `port/tests/tools` and `port/cmake`, the glossary ("Strict build, strict run"), the
+    documents index's sanitizers.md row, ARCHITECTURE.md's T5 row and lessons.md. ADR 0033 and its index rows are the
+    decisions PR's (PR 80); the links to it resolve once that PR merges.
 - **Next:** the decisions PR (PR 80) for the owner, whose ADR 0033 this implements; then the story's next piece, whose
-  pull request runs its new cases as its T5 (`strict_routes.py run --only NAME` in both games); the save lab's
-  stations join T5's set once L2 lands (ADR 0033, item 1).
+  pull request may run its new cases as its T5 (`strict_routes.py run --only NAME` in both games), the whole set
+  being due at the leg's end (ADR 0033, item 7); the save lab's stations join T5's set once L2 lands (item 1).
 - **Blockers:** none for this change. ADR 0033 is proposed: the owner decides it in PR 80.
 
 ## 2026-11-02: Youngster Terrell's battle held to melonDS up to his AI's first moved decision

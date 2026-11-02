@@ -99,20 +99,36 @@ port/tools/strict_routes.py run --build-dir build/port-san     # T5's set: those
 ## Phase 5's criterion
 
 Phase 5's "sanitizer-clean replays" ([PLAN.md §7](PLAN.md#phase-5-the-whole-game-hardened)) are what
-[ADR 0033](adr/0033-sanitizer-clean-replays-by-the-strict-routes-and-the-program-alone.md) (proposed) says: on macOS
-arm64, in both versions, the strict build (`-DPORT_SANITIZE=ON`, `PORT_SANITIZE_RECOVER` off, `RelWithDebInfo`, upstream
-LLVM, Homebrew's on a Mac, for the function check and LeakSanitizer that Apple clang lacks) runs every route that needs
-no oracle (`ctest -L route -LE oracle`) and the program alone from the oracle's saves, both with
-[../tools/strict_routes.py](../tools/strict_routes.py) ([above](#running-it)), each distinct run once, under
-`ASAN_OPTIONS=detect_leaks=1:detect_stack_use_after_return=1`. A run is clean when it exits with status 0 after all its
-frames and its output has none of the reports on which ctest fails a test of this build. The only exceptions are the
-three entries of [../cmake/sanitizer_ignorelist.txt](../cmake/sanitizer_ignorelist.txt) (R1 and R2, R3, R13) and H1's
-read; no leak is suppressed, and every report found is fixed, with its rows and a regression test. The runner refuses
-a build that isn't strict (no `PORT_SANITIZE`, a survey build, another language's ROM, another checkout's build, Apple
+[ADR 0033](adr/0033-sanitizer-clean-replays-by-the-strict-routes-and-the-program-alone.md) proposes, for the owner to
+decide; this section states its proposal. On macOS arm64, in both versions, the strict build (`-DPORT_SANITIZE=ON`,
+`PORT_SANITIZE_RECOVER` off, `RelWithDebInfo`, upstream LLVM, Homebrew's on a Mac, for the function check and
+LeakSanitizer that Apple clang lacks) runs T5's set, each distinct run once, with
+[../tools/strict_routes.py](../tools/strict_routes.py) ([above](#running-it)), under
+`ASAN_OPTIONS=detect_leaks=1:detect_stack_use_after_return=1`: every route that needs no oracle (`ctest -L route -LE
+oracle`), clean when ctest passes it, and the program alone from the oracle's saves, clean when it exits with status 0
+after all its frames and its output has none of the reports on which ctest fails a test of this build. The set is
+clean when every case is, in both versions, on one head; a case that skips is a gap, not a pass. The runner refuses a
+build that isn't strict (no `PORT_SANITIZE`, a survey build, another language's ROM, another checkout's build, Apple
 clang) and a program that doesn't run under ASan or has no function check, holds each start save to the SHA-1 that
-`SAVES` keeps, fails a sequence's trap stop even where the sequence allows one (a trap leaves without the leak check),
-and writes a table of every case (`--summary`). The runs are on demand, not scheduled: a pull request that adds a
-sequence from a save or a round trip runs its cases in both versions as its T5, `strict_routes.py run --only NAME`.
+`SAVES` keeps, fails a trap stop even where a sequence allows one (a trap leaves without the leak check), and writes a
+table of every case (`--summary`).
+
+- **Exceptions, and nothing else** (the ADR's item 5): the three entries of
+  [../cmake/sanitizer_ignorelist.txt](../cmake/sanitizer_ignorelist.txt) (R1 and R2, R3, R13), each with its traced
+  cause; H1's read; and, in the save lab's map sweep alone once it lands, a zone's stop that the sweep declares with its
+  traced cause, that zone clean up to its stop. No runtime suppression of an ASan or UBSan report counts. LeakSanitizer
+  may be given one file of suppressions, by [the rule below](#reading-a-report), for a leak inside SDL3 or a system
+  library; none exists, and a leak in Frigate's or the game's code is fixed, never suppressed. Each new exception
+  changes the criterion, so it comes in a pull request the owner reviews, with its traced cause. Every other report is
+  fixed in a pull request of its own, with its row here and a regression test, and the cases that showed it run again
+  in both versions.
+- **When** (the ADR's item 7): no run is scheduled. The whole set is due on a release candidate's head, on the pull
+  request that ends a leg of the story, and on one that changes how every route's program is built (the strict
+  build's sanitizer flags, say); a maintainer may run it at any other time, and should after a merge that changes code
+  that every route runs. A pull request that fixes a report runs the cases that showed it again, in both versions. A
+  pull request that adds or changes a route owes none: it may run its cases as its T5, in both versions
+  (`strict_routes.py run --only NAME`), and otherwise records T5 as not run, and its leg's whole run covers it. No
+  strict route is in the merge gate.
 
 ## Reading a report
 
