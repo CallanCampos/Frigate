@@ -34,4 +34,19 @@ void port_capture_draw_line(const struct PortDs2dSource *engine_a, int line);
 // Forgets a capture in progress (a new run)
 void port_capture_reset(void);
 
+// What the capture unit had at line 96 of the frame being drawn: the line where pbw-oracle looks at melonDS's unit
+// (port/tools/oracle/oracle.cpp, PROBE_LINE), between the latch at line 0 and the end at the VBlank. The digest stream
+// (port/app/digest_stream.c) takes it at the VBlank for its capture group and for the tracking of the 3D that
+// captures leave in VRAM (port/tools/oracle/display3d.h), as the oracle does. It is taken whether or not the unit
+// captures in the frame, and is all zeros from line 0 until line 96 is drawn
+typedef struct PortCaptureRecord {
+    int ran;             // DISPCAPCNT's enable was latched at line 0, so the unit writes in this frame
+    uint32_t dispcapcnt; // DISPCAPCNT as the I/O registers held it at line 96
+    uint32_t dispcnt_a;  // engine A's DISPCNT, the same
+    int dest_in_lcdc;    // the destination bank's pages were in the LCDC, which the unit writes only then
+} PortCaptureRecord;
+
+// The frame's record so far
+const PortCaptureRecord *port_capture_record(void);
+
 #endif // PORT_GFX_CAPTURE_H

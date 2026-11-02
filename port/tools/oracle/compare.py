@@ -320,6 +320,90 @@ def load_memory(run: Run) -> dict[tuple[int, str], tuple[int, bytes]]:
     return out
 
 
+# Digest streams (README.md, "Digests"): digest.tsv as both programs' --digest write it
+
+
+# The groups a record can have, in the order of digest.c's sGroupNames (test_compare.py checks that it is the same)
+DIGEST_GROUPS = ("vram.A", "vram.B", "vram.C", "vram.D", "vram.E", "vram.F", "vram.G", "vram.H", "vram.I", "vram.map",
+                 "pal", "oam", "regs2d.A", "regs2d.B", "sys", "capture", "g3d.list", "g3d.regs", "g3d.stats",
+                 "screen.top", "screen.bottom")
+DIGEST_VERSION_LINE = "#pbwdigest 1"
+DIGEST_KEYS = ("count", "frame", "vblanks")
+
+
+@dataclass
+class DigestRecord:
+    """One game frame's record: GFL's frame count, the program's video frame (the last VBlank of the count), how many
+    VBlanks had the count, and each group's hash, a group the program didn't take (a "-") left out"""
+    count: int
+    frame: int
+    vblanks: int
+    hashes: dict[str, int]
+
+
+@dataclass
+class Digest:
+    """A digest stream: the groups its header names, in its order, and its records by count, in rising order"""
+    path: str
+    groups: tuple[str, ...]
+    records: dict[int, DigestRecord] = field(default_factory=dict)
+
+
+def digest_number(text: str) -> int | None:
+    """A count, frame or number of VBlanks as digest.c's reader takes it: decimal digits alone, up to 0xffffffff"""
+    if not text or any(c not in "0123456789" for c in text):
+        return None
+    value = int(text)
+    return value if value <= 0xffffffff else None
+
+
+def load_digest(path: str) -> Digest:
+    """Reads a digest stream by digest.c's reader's rules (pbw_digest_reader_open and _next): the line "#pbwdigest 1"
+    exactly; a header of count, frame, vblanks and then group names DIGEST_GROUPS has, none twice; rows with the
+    header's number of fields, the numbers in decimal and each hash 16 hex digits or "-"; and, as
+    pbw_digest_compare_streams requires, counts that rise. A RunError says what is wrong and where"""
+    if not os.path.exists(path):
+        raise RunError(f"{path}: no digest stream")
+    with open(path, encoding="ascii", errors="replace", newline="") as f:
+        lines = [line.rstrip("\n").rstrip("\r") for line in f]
+    if not lines or lines[0] != DIGEST_VERSION_LINE:
+        raise RunError(f"{path}: line 1 isn't \"{DIGEST_VERSION_LINE}\"")
+    if len(lines) < 2:
+        raise RunError(f"{path}: line 2: no header")
+    header = lines[1].split("\t")
+    if tuple(header[:3]) != DIGEST_KEYS:
+        raise RunError(f"{path}: line 2: the header must start with {', '.join(DIGEST_KEYS)}")
+    groups = tuple(header[3:])
+    for group in groups:
+        if group not in DIGEST_GROUPS:
+            raise RunError(f"{path}: line 2: \"{group}\" is no group digest.c knows")
+    if len(set(groups)) != len(groups):
+        raise RunError(f"{path}: line 2: a group named twice")
+    digest = Digest(path, groups)
+    last = None
+    for number, line in enumerate(lines[2:], 3):
+        cells = line.split("\t")
+        if len(cells) != len(header):
+            raise RunError(f"{path}: line {number}: {len(cells)} fields where the header has {len(header)}")
+        values = [digest_number(cell) for cell in cells[:3]]
+        if None in values:
+            raise RunError(f"{path}: line {number}: count, frame and vblanks must be decimal numbers")
+        hashes = {}
+        for group, cell in zip(groups, cells[3:]):
+            if cell == "-":
+                continue
+            if len(cell) != 16 or any(c not in "0123456789abcdefABCDEF" for c in cell):
+                raise RunError(f"{path}: line {number}: {group} is \"{cell[:40]}\", not 16 hex digits or \"-\"")
+            hashes[group] = int(cell, 16)
+        count, frame, vblanks = values
+        if last is not None and count <= last:
+            raise RunError(f"{path}: line {number}: count {count} after count {last}: a stream has one row per count, "
+                           "in rising order")
+        last = count
+        digest.records[count] = DigestRecord(count, frame, vblanks, hashes)
+    return digest
+
+
 # Frame lists
 
 

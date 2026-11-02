@@ -704,6 +704,90 @@ class MemoryTests(unittest.TestCase):
         self.assertEqual(quiet(compare.main, ["memory", runs.oracle, runs.port]), 2)
 
 
+def digest_text(groups: tuple[str, ...], rows: list[tuple]) -> str:
+    """A made-up digest stream: the version line, a header naming groups, and rows of (count, frame, vblanks, then a
+    hash for each group as a number or "-", or the cells as text when a row is a string)"""
+    lines = ["#pbwdigest 1", "\t".join(["count", "frame", "vblanks", *groups])]
+    for row in rows:
+        if isinstance(row, str):
+            lines.append(row)
+            continue
+        cells = [str(row[0]), str(row[1]), str(row[2])]
+        cells += ["-" if value == "-" else f"{value:016x}" for value in row[3:]]
+        lines.append("\t".join(cells))
+    return "\n".join(lines) + "\n"
+
+
+def write_digest(directory: str, groups: tuple[str, ...], rows: list[tuple]) -> str:
+    os.makedirs(directory, exist_ok=True)
+    path = os.path.join(directory, "digest.tsv")
+    with open(path, "w", newline="") as f:
+        f.write(digest_text(groups, rows))
+    return path
+
+
+class DigestReaderTests(unittest.TestCase):
+    """compare.py's reader of digest streams (load_digest), which follows digest.c's reader's rules"""
+
+    def setUp(self):
+        self.root = tempfile.mkdtemp(prefix="digest-test-")
+        self.addCleanup(shutil.rmtree, self.root, True)
+
+    def test_groups_are_digest_c_s(self):
+        # DIGEST_GROUPS is digest.c's sGroupNames, in its order
+        with open(os.path.join(TOOLS, "digest.c")) as f:
+            source = f.read()
+        table = re.search(r"sGroupNames\[PBW_DIGEST_GROUPS\] = \{(.*?)\};", source, re.S)
+        self.assertIsNotNone(table)
+        self.assertEqual(tuple(re.findall(r'"([^"]+)"', table.group(1))), compare.DIGEST_GROUPS)
+
+    def test_reads_a_stream(self):
+        path = write_digest(self.root, ("pal", "g3d.list"), [(1, 2, 1, 0xab, 5), (2, 3, 2, "-", 6), "3\t9\t1\t" +
+                                                              "00000000000000AB\t-"])
+        digest = compare.load_digest(path)
+        self.assertEqual(digest.groups, ("pal", "g3d.list"))
+        self.assertEqual(sorted(digest.records), [1, 2, 3])
+        self.assertEqual(digest.records[2].frame, 3)
+        self.assertEqual(digest.records[2].vblanks, 2)
+        self.assertEqual(digest.records[2].hashes, {"g3d.list": 6})
+        self.assertEqual(digest.records[3].hashes, {"pal": 0xab})
+        # Every group in its own header order, with \r\n line ends as digest.c's reader takes them
+        with open(path, "w", newline="") as f:
+            f.write(digest_text(compare.DIGEST_GROUPS, [(1, 2, 1, *range(len(compare.DIGEST_GROUPS)))])
+                    .replace("\n", "\r\n"))
+        self.assertEqual(len(compare.load_digest(path).records[1].hashes), len(compare.DIGEST_GROUPS))
+
+    def test_rejections(self):
+        # Each malformed stream the C reader refuses, and counts that don't rise, which its comparison refuses
+        header = "count\tframe\tvblanks\tpal\toam"
+        bad = {
+            "a version 2": "#pbwdigest 2\n" + header + "\n",
+            "frames.tsv": "#pbwframes 2\n",
+            "an empty file": "",
+            "no header": "#pbwdigest 1\n",
+            "keys out of order": "#pbwdigest 1\nframe\tcount\tvblanks\tpal\n",
+            "an unknown group": "#pbwdigest 1\ncount\tframe\tvblanks\tvram.J\n",
+            "a group twice": "#pbwdigest 1\ncount\tframe\tvblanks\tpal\tpal\n",
+            "a field too few": f"#pbwdigest 1\n{header}\n1\t1\t1\t-\n",
+            "a field too many": f"#pbwdigest 1\n{header}\n1\t1\t1\t-\t-\t-\n",
+            "a count that isn't a number": f"#pbwdigest 1\n{header}\n-1\t1\t1\t-\t-\n",
+            "a frame past 32 bits": f"#pbwdigest 1\n{header}\n1\t4294967296\t1\t-\t-\n",
+            "a hash of 17 digits": f"#pbwdigest 1\n{header}\n1\t1\t1\t00000000000000001\t-\n",
+            "a hash that isn't hex": f"#pbwdigest 1\n{header}\n1\t1\t1\t000000000000000g\t-\n",
+            "a count twice": f"#pbwdigest 1\n{header}\n3\t1\t1\t-\t-\n3\t2\t1\t-\t-\n",
+            "a count that falls": f"#pbwdigest 1\n{header}\n5\t1\t1\t-\t-\n3\t2\t1\t-\t-\n",
+        }
+        path = os.path.join(self.root, "digest.tsv")
+        for what, text in bad.items():
+            with self.subTest(what):
+                with open(path, "w", newline="") as f:
+                    f.write(text)
+                with self.assertRaises(compare.RunError):
+                    compare.load_digest(path)
+        with self.assertRaises(compare.RunError):
+            compare.load_digest(os.path.join(self.root, "none.tsv"))
+
+
 def rand_context(state: int) -> bytes:
     """A MATHRandContext32 as MATH_InitRand32 sets it up, at a state: x, the multiplier and the increment"""
     return (state.to_bytes(8, "little") + seeds.RAND_MUL.to_bytes(8, "little")

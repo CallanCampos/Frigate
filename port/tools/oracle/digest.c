@@ -7,8 +7,8 @@
 #include "digest.h"
 
 // xxHash's single header, from the release port/tools/oracle/xxhash.cmake pins, which the build fetches and puts on a
-// system include path (port/cmake/oracle.cmake). Its functions are inline and private to this file, so that they can't
-// meet the copy of xxHash that melonDS's core links into the oracle
+// system include path (port/cmake/app.cmake, for Frigate's program and the digest's tests). Its functions are inline
+// and private to this file, so that they can't meet the copy of xxHash that melonDS's core links into the oracle
 #define XXH_INLINE_ALL
 #include "xxhash.h"
 #include <inttypes.h>

@@ -13,7 +13,9 @@
 #   - libabs1, by its absolute path, as Homebrew names its libraries
 # The app must hold all four and load them from itself alone: it is moved and the originals taken away before it runs
 # again. Its icon must be the .icns given, with the ten images of a macOS icon set (the 16 and 32 pixel ones the small
-# images drawn for their size), and its Info.plist must hold the names, the identifier and the About text as given.
+# images drawn for their size), its Contents/Resources/THIRD-PARTY-NOTICES.txt the notices file given, byte for byte,
+# and its Info.plist must hold the names, the identifier and the About text as given. Without --notices, or with a file
+# that isn't there, no app is made; and check_app.sh fails an app whose notice was taken out.
 #
 # A universal program, arm64 and x86_64 for macOS 11.0 as the distribution build makes it (ADR 0015), with a universal
 # library: the app of both slices, its LSMinimumSystemVersion --minimum's, the program started as each slice this Mac
@@ -44,8 +46,8 @@ expect() {
 }
 
 # Builds an app from the program $1 into $2 with the icon $3 (the version's by default) and the bundle identifier $4
-# (a test one by default), and the options that follow (--archs, --minimum), and prints the script's exit status, its
-# output in $work/output and its messages in $work/messages. The About text has the characters that XML and sed's
+# (a test one by default), the notices file $notices, and the options that follow (--archs, --minimum), and prints the
+# script's exit status, its output in $work/output and its messages in $work/messages. The About text has the characters that XML and sed's
 # replacements give a meaning to
 about='Test & <About> | text \ with é; and more'
 make_app() {
@@ -56,9 +58,9 @@ make_app() {
     shift 2
     [ $# -gt 0 ] && shift
     [ $# -gt 0 ] && shift
-    "$script" --program "$program" --app "$bundle" --plist "$plist" --icon "$icon" --bundle-id "$id" \
-        --name "Test Name" --display-name "Prog App" --about "$about" --repo "$repo" "$@" >"$work/output" \
-        2>"$work/messages"
+    "$script" --program "$program" --app "$bundle" --plist "$plist" --icon "$icon" --notices "$notices" \
+        --bundle-id "$id" --name "Test Name" --display-name "Prog App" --about "$about" --repo "$repo" "$@" \
+        >"$work/output" 2>"$work/messages"
     echo $?
 }
 
@@ -97,6 +99,10 @@ EOF
 "$cc" -dynamiclib -install_name "$work/lib a/libabs1.dylib" -o "lib a/libabs1.dylib" abs1.c
 "$cc" -o "bin x/prog" prog.c -L"lib a" -L"bin x" -lbar -lqux -labs1 "-Wl,-rpath,$work/lib a"
 expect "the program before the app" "$("$work/bin x/prog")" 143
+# The notices the app carries, as port/cmake/app.cmake writes them beside the program: a header and a licence
+notices="$work/notices dir/THIRD-PARTY-NOTICES.txt"
+mkdir -p "$work/notices dir"
+printf 'Third-party notices for the test\n\nCopyright (c) a test & <its> | licence\n' >"$notices"
 
 # The icon: the version's master and its small images as an .icns, holding the ten images of a macOS icon set at their
 # pixel sizes, the 16 and 32 pixel ones the small images drawn for their size, not the master scaled
@@ -156,6 +162,8 @@ expect "CFBundleIconFile" "$(info CFBundleIconFile)" AppIcon
 expect "NSHumanReadableCopyright, the About window's text" "$(info NSHumanReadableCopyright)" "$about"
 cmp -s "$icns" "$app/Contents/Resources/AppIcon.icns"
 expect "the app's icon is the .icns given" $? 0
+cmp -s "$notices" "$app/Contents/Resources/THIRD-PARTY-NOTICES.txt"
+expect "the app's notices are the file given" $? 0
 mv "$app" "$work/Moved.app"
 mv "$work/lib a" "$work/lib a gone"
 mv "$work/lib b" "$work/lib b gone"
@@ -325,6 +333,32 @@ expect "a com.example bundle identifier: status" \
     "$(make_app "$work/bin x/prog" "$work/out dir/Example.app" "" com.example.pokebw2-native.black2)" 2
 expect "a com.example bundle identifier: message" "$(grep -c 'is a placeholder bundle identifier' "$work/messages")" 1
 expect "a com.example bundle identifier: nothing made" "$(ls "$work/out dir")" ""
+
+# No --notices, or a notices file that isn't there: no app
+"$script" --program "$work/bin x/prog" --app "$work/out dir/Bare.app" --plist "$plist" --icon "$icns" \
+    --bundle-id io.github.callancampos.frigate.test --name "Test Name" --display-name "Prog App" --about "$about" \
+    --repo "$repo" >"$work/output" 2>"$work/messages"
+expect "no --notices: status" $? 2
+expect "no --notices: message" "$(grep -c "every option is needed" "$work/messages")" 1
+expect "no --notices: nothing made" "$(ls "$work/out dir")" ""
+saved=$notices
+notices="$work/notices dir/none.txt"
+expect "a notices file that isn't there: status" "$(make_app "$work/bin x/prog" "$work/out dir/Gone.app")" 2
+expect "a notices file that isn't there: message" "$(grep -c "isn't the third-party notices file" "$work/messages")" 1
+expect "a notices file that isn't there: nothing made" "$(ls "$work/out dir")" ""
+notices=$saved
+
+# check_app.sh on an app whose notice was taken out: it fails, naming it; with it, the same app passes
+app="$work/out dir/Notice.app"
+expect "an app for check_app.sh: status" "$(make_app "$work/bin x/prog" "$app")" 0
+"$check_app" "$app" >"$work/check" 2>&1
+expect "check_app.sh on an app with its notice: status" $? 0
+rm "$app/Contents/Resources/THIRD-PARTY-NOTICES.txt"
+"$check_app" "$app" >"$work/check" 2>&1
+expect "check_app.sh on an app without its notice: status" $? 1
+expect "check_app.sh on an app without its notice: message" \
+    "$(grep -c '^FAIL: the app has no Contents/Resources/THIRD-PARTY-NOTICES.txt' "$work/check")" 1
+rm -rf "$app"
 
 # An icon that isn't an .icns: no app
 expect "a PNG as the icon: status" "$(make_app "$work/bin x/prog" "$work/out dir/Png.app" "$master")" 2

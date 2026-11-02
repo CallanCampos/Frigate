@@ -12,7 +12,9 @@
 # compiler, makes a stand-in app, signed ad hoc, with a library named as the sanitizer's runtime is
 # (libclang_rt.*_osx_dynamic.dylib) in its Frameworks, as make_app.sh copies the real one there, though its cache says
 # nothing of a sanitizer. The script packages it, fails the image's check with status 1 and leaves no image; the same
-# app without the library is packaged with status 0, and its image stays. Those two runs make real images (hdiutil).
+# app without the library is packaged with status 0, and its image stays. The stand-in carries a third-party notice in
+# Contents/Resources/THIRD-PARTY-NOTICES.txt, as make_app.sh puts xxHash's there; one without it fails the image's check
+# too, with status 1 and no image. Those three runs make real images (hdiutil).
 #
 #   test_package_macos.sh REPO BUILD_DIR WORK_DIR
 set -u
@@ -120,10 +122,11 @@ mkdir -p "$work/stand-in" "$work/images"
 cat >"$work/stand-in/CMakeLists.txt" <<'EOF'
 # A stand-in for Frigate's build, for package_macos.sh's check of the image (port/tests/app/test_package_macos.sh): an
 # app named as the build's cache names it, signed ad hoc, with STAND_IN_RUNTIME a library named as a sanitizer's
-# runtime in its Frameworks
+# runtime in its Frameworks, and with STAND_IN_NOTICE a third-party notice in its Resources
 cmake_minimum_required(VERSION 3.20)
 project(package_macos_stand_in C)
 option(STAND_IN_RUNTIME "A library named as a sanitizer's runtime in the app" OFF)
+option(STAND_IN_NOTICE "The third-party notice in the app's Resources" ON)
 add_executable(stand_in MACOSX_BUNDLE main.c)
 set_target_properties(stand_in PROPERTIES OUTPUT_NAME "Stand In"
     MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in")
@@ -137,6 +140,13 @@ if(STAND_IN_RUNTIME)
             "$<TARGET_BUNDLE_CONTENT_DIR:stand_in>/Frameworks/"
         COMMAND codesign --force --sign -
             "$<TARGET_BUNDLE_CONTENT_DIR:stand_in>/Frameworks/$<TARGET_FILE_NAME:stand_in_runtime>"
+        VERBATIM)
+endif()
+if(STAND_IN_NOTICE)
+    add_custom_command(TARGET stand_in POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E make_directory "$<TARGET_BUNDLE_CONTENT_DIR:stand_in>/Resources"
+        COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/THIRD-PARTY-NOTICES.txt"
+            "$<TARGET_BUNDLE_CONTENT_DIR:stand_in>/Resources/"
         VERBATIM)
 endif()
 add_custom_command(TARGET stand_in POST_BUILD COMMAND codesign --force --sign - "$<TARGET_BUNDLE_DIR:stand_in>"
@@ -164,18 +174,21 @@ cat >"$work/stand-in/Info.plist.in" <<'EOF'
 EOF
 printf 'int main(void) {\n    return 0;\n}\n' >"$work/stand-in/main.c"
 printf 'int stand_in_runtime(void) {\n    return 0;\n}\n' >"$work/stand-in/runtime.c"
+printf 'Third-party notices for the stand-in\n' >"$work/stand-in/THIRD-PARTY-NOTICES.txt"
 
-# The script's status for the stand-in, with STAND_IN_RUNTIME $1, and the image $2, its messages in $work/messages; a
-# stand-in that doesn't configure gives "no stand-in", with the end of its log on stderr
+# The script's status for the stand-in, with STAND_IN_RUNTIME $1, the image $2 and STAND_IN_NOTICE $3 (ON by
+# default), its messages in $work/messages; a stand-in that doesn't configure gives "no stand-in", with the end of its
+# log on stderr
 stand_in() {
-    "$cmake_command" -S "$work/stand-in" -B "$work/stand-in-$1" -G "$(cache_value CMAKE_GENERATOR)" \
+    notice=${3:-ON}
+    "$cmake_command" -S "$work/stand-in" -B "$work/stand-in-$1-$notice" -G "$(cache_value CMAKE_GENERATOR)" \
         -DCMAKE_MAKE_PROGRAM="$(cache_value CMAKE_MAKE_PROGRAM)" -DCMAKE_C_COMPILER="$(cache_value CMAKE_C_COMPILER)" \
-        -DCMAKE_C_FLAGS= -DSTAND_IN_RUNTIME="$1" >"$work/configure-$1.log" 2>&1 || {
-        tail -n 12 "$work/configure-$1.log" >&2
+        -DCMAKE_C_FLAGS= -DSTAND_IN_RUNTIME="$1" -DSTAND_IN_NOTICE="$notice" >"$work/configure-$1-$notice.log" 2>&1 || {
+        tail -n 12 "$work/configure-$1-$notice.log" >&2
         echo "no stand-in"
         return
     }
-    "$script" --build-dir "$work/stand-in-$1" --out "$2" >/dev/null 2>"$work/messages"
+    "$script" --build-dir "$work/stand-in-$1-$notice" --out "$2" >/dev/null 2>"$work/messages"
     echo $?
 }
 expect "an image with a sanitizer's runtime: status" "$(stand_in ON "$work/images/runtime.dmg")" 1
@@ -187,6 +200,11 @@ expect "an image with a sanitizer's runtime: no image" \
     "$(test -e "$work/images/runtime.dmg" && echo made || echo none)" none
 expect "an image without one: status" "$(stand_in OFF "$work/images/plain.dmg")" 0
 expect "an image without one: the image stays" "$(test -f "$work/images/plain.dmg" && echo made || echo none)" made
+expect "an app without its third-party notice: status" "$(stand_in OFF "$work/images/no-notice.dmg" OFF)" 1
+expect "an app without its third-party notice: message" \
+    "$(grep -c "the app has no Contents/Resources/THIRD-PARTY-NOTICES.txt" "$work/messages")" 1
+expect "an app without its third-party notice: no image" \
+    "$(test -e "$work/images/no-notice.dmg" && echo made || echo none)" none
 if [ "$failures" -ne 0 ]; then
     tail -n 12 "$work/messages"
 fi

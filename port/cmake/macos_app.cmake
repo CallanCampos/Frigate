@@ -1,7 +1,9 @@
 # The macOS app (PLAN.md phase 5, ADR 0003): the program as "Frigate Black 2.app" ("Frigate White 2.app" with
 # -DPORT_VERSION=w2_us) in the build directory, made by the target <program>_app from the program the build links
 # (port/app/macos/make_app.sh), signed ad hoc and never notarized. It holds the program, the libraries it loads from
-# outside macOS, the version's icon and an Info.plist, and no ROM or game data:
+# outside macOS, the version's icon, the notice of the third-party code the program carries (THIRD-PARTY-NOTICES.txt,
+# xxHash's, which port/cmake/app.cmake writes beside the program) in Contents/Resources, and an Info.plist, and no ROM or
+# game data:
 #
 #   cmake --build build/port --target frigate-black2_app        (frigate-white2_app with -DPORT_VERSION=w2_us)
 #
@@ -68,12 +70,14 @@ add_custom_target(${PORT_PROGRAM}_app ${port_app_all}
     COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/app/macos/make_app.sh"
         --program "$<TARGET_FILE:${PORT_PROGRAM}>" --app "${port_app_bundle}"
         --plist "${CMAKE_CURRENT_SOURCE_DIR}/app/macos/Info.plist.in" --icon "${port_app_icns}"
+        --notices "${PORT_THIRD_PARTY_NOTICES}"
         --bundle-id "${PORT_MACOS_BUNDLE_ID_PREFIX}.${port_app_id_suffix}" --name "${PORT_PRODUCT_NAME}"
         --display-name "${port_app_name}" --about "${PORT_PRODUCT_DESCRIPTION} ${PORT_PRODUCT_DISCLAIMER}"
         --repo "${REPO_ROOT}" ${port_app_targets}
-    DEPENDS "${port_app_icns}"
+    DEPENDS "${port_app_icns}" "${PORT_THIRD_PARTY_NOTICES}"
     BYPRODUCTS "${port_app_bundle}/Contents/MacOS/${PORT_PROGRAM}" "${port_app_bundle}/Contents/Info.plist"
         "${port_app_bundle}/Contents/Resources/AppIcon.icns"
+        "${port_app_bundle}/Contents/Resources/THIRD-PARTY-NOTICES.txt"
     COMMENT "Building and signing ${port_app_name}.app"
     VERBATIM)
 add_dependencies(${PORT_PROGRAM}_app ${PORT_PROGRAM})
@@ -88,7 +92,8 @@ add_test(NAME app_bundle_id
 set_tests_properties(app_bundle_id PROPERTIES TIMEOUT 120)
 
 # make_app.sh on small programs made at test time, whose libraries are named by every kind of install name dyld knows,
-# with the version's icon made by make_icns.sh, and both scripts' refusals (port/tests/app/test_make_app.sh)
+# with the version's icon made by make_icns.sh and a notices file, and both scripts' refusals, a missing notices file
+# among them; check_app.sh's refusal of an app without the notice (port/tests/app/test_make_app.sh)
 add_test(NAME app_make_app
     COMMAND sh "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_make_app.sh" "${CMAKE_C_COMPILER}"
         "${CMAKE_CURRENT_BINARY_DIR}/test_make_app" "${REPO_ROOT}" "${PORT_APP_ICON}" "${PORT_APP_ICON_16}"
@@ -121,7 +126,8 @@ set_tests_properties(app_universal_slices PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT
 # repository, the distribution build's options, and a sanitized build, whose app carries the sanitizer runtime, by
 # PORT_SANITIZE or by -fsanitize= in any of CMake's flags; and its check of the image behind them, which fails on a
 # sanitizer's runtime in it and removes the image, on a stand-in app that the test builds with this build's CMake and
-# compiler and packages for real (port/tests/app/test_package_macos.sh)
+# compiler and packages for real, and on the same app without the third-party notice, which the check also fails
+# (port/tests/app/test_package_macos.sh)
 add_test(NAME app_package_macos_out
     COMMAND sh "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_package_macos.sh" "${REPO_ROOT}" "${CMAKE_BINARY_DIR}"
         "${CMAKE_CURRENT_BINARY_DIR}/test_package_macos")

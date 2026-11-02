@@ -7,8 +7,10 @@
 #   - a slice is for another platform than macOS, the program's for another macOS than --minimum (it is linked for
 #     exactly that one), or a library's for a newer one; versions compare part by part, so 11 is 11.0;
 #   - for an app: its LSMinimumSystemVersion isn't --minimum; a binary loads a library from outside macOS and the app;
-#     its signature fails codesign's strict check, or a slice of its program isn't signed ad hoc or turns on the
-#     hardened runtime (ADR 0003; codesign -d reads one slice, so each is read with --arch);
+#     it lacks the notice of the third-party code its program carries (Contents/Resources/THIRD-PARTY-NOTICES.txt,
+#     xxHash's BSD-2-Clause notice, which make_app.sh copies there; the program alone has it beside it in the build and
+#     isn't asked for it); its signature fails codesign's strict check, or a slice of its program isn't signed ad hoc
+#     or turns on the hardened runtime (ADR 0003; codesign -d reads one slice, so each is read with --arch);
 #   - the program doesn't start (--help) as each of its slices this Mac runs, or, with --run-every-slice, as every one
 #     of them (an x86_64 slice on Apple Silicon needs Rosetta; an arm64 one never runs on an Intel Mac).
 #
@@ -162,6 +164,11 @@ if [ -n "$plist" ]; then
     done)
     if [ -n "$outside" ]; then
         fail "the app loads libraries from outside macOS and itself: $(printf '%s\n' "$outside" | paste -sd' ' -)"
+    fi
+    if [ -s "$path/Contents/Resources/THIRD-PARTY-NOTICES.txt" ]; then
+        echo "$path: Contents/Resources/THIRD-PARTY-NOTICES.txt, the third-party notices"
+    else
+        fail "the app has no Contents/Resources/THIRD-PARTY-NOTICES.txt, the notice of xxHash its program carries"
     fi
     if ! codesign --verify --deep --strict "$path" 2>/dev/null; then
         fail "the app's signature fails codesign --verify --deep --strict"

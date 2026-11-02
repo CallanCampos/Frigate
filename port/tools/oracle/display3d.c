@@ -1,6 +1,7 @@
 // Which screens show the 3D engine's output in a frame, for the oracle's frames.tsv, so that compare.py compares a
-// screen with 3D within a tolerance and the others exactly; the rules are in display3d.h, the registers' bits in
-// GBATEK.
+// screen with 3D within a tolerance and the others exactly, and which VRAM banks hold a capture of 3D, for the digest
+// (digest.h), which Frigate's program tracks with this same file (port/app/digest_stream.c); the rules are in
+// display3d.h, the registers' bits in GBATEK.
 #include "display3d.h"
 
 // DISPCNT: the BG mode (bits 0-2), BG0 as the 3D layer (bit 3, engine A), forced blank (bit 7), the layers shown (bits

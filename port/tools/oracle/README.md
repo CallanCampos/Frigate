@@ -421,8 +421,8 @@ proposed) holds Frigate to melonDS at every game frame by a digest: one record p
 records are equal exactly when their state is. Its first part is here: the canonical encoding, the hash and the
 stream's format in `digest.c` and `digest.h`, plain C11 that both programs are to compile, tested without a ROM by
 `digest_format_plain` and `digest_format_sanitized`
-([port/tests/oracle/test_digest.c](../../tests/oracle/test_digest.c)). Neither program writes a stream yet: the
-ADR's next part adds `--digest` to both, taken at the last VBlank of each count, and the comparison's pairing.
+([port/tests/oracle/test_digest.c](../../tests/oracle/test_digest.c)), and its second part's writer, which Frigate's
+program calls with `--digest FILE`. pbw-oracle's `--digest` and the comparison's pairing come next.
 
 Each program fills a `PbwDigestFrame` from its own model; `digest.c` decodes, masks, encodes and hashes it. The groups
 and their canonical bytes, with 32-bit words little-endian:
@@ -515,6 +515,23 @@ fades, which run while the count is unchanged and first show in the next count's
   count is never in its stream, on either program.
 - **Every row is flushed** as it is written, so that a run that a trap stub ends keeps every record it wrote, as
   `frames.tsv` keeps its rows.
+
+**Frigate's writer** ([port/app/digest_stream.c](../../app/digest_stream.c), `--digest FILE`) runs in `AppFrame`, the
+program's frame hook, which the OS core runs at line 192 (`port/hal/os/core.c`) after the geometry engine's swap, before
+the VBlank's interrupt is taken, and before the run directory's row: VRAM page by page where the platform layer keeps
+it (`port_vram_bank_page`, `port_vram_vramcnt`), the palettes, OAM and the I/O registers' bytes (decoded by
+`pbw_digest_regs2d_from_io`, `pbw_digest_sys_from_io` and `pbw_digest_regs3d_from_io`; the 3D registers are the bytes
+`port_g3d_vblank` has just decoded for the renderer), the render list the swap made (`port_ge_render_list`, with its
+own vertex indices), and both screens as `frames.tsv` hashes them. It reads only the DS-native 256 × 192 path, so a
+digest run is a native run whatever enhancement may exist (ADR 0030). The capture group and the VRAM a capture of 3D
+holds come from the oracle's own [display3d.c](display3d.c), run at the oracle's three moments: as each frame starts,
+before line 0 (the screens' frame-start hook, `port/gfx/screens.c`), `pbw_display3d_check` and the banks' 3D then; at
+line 96, what the capture unit has (`port/gfx/capture.c`'s record, taken whether or not the unit runs); and at the
+VBlank, `pbw_display3d_capture`. Frigate's own frames.tsv still writes `-` for its 3D columns: the tracking feeds the
+digest alone. Frigate's CPU takes no time, so a pass's writes all land at the VBlank, before the next frame's line 0
+and line 96, where melonDS spreads them over the frame: a pass that writes a captured region, DISPCAPCNT or DISPCNT
+can move `holds3d` at the start, the capture's registers and the zeroed region by a frame, by construction. Without
+`--digest` nothing of this runs.
 
 `pbw_digest_compare_streams` compares an expected stream (the oracle's) with an actual one (Frigate's) count by
 count, each with one row per count in rising order. The expected stream names what is held: a group it leaves out,

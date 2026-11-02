@@ -1,12 +1,43 @@
 # The program's own files besides main.c (port/app): the window, presentation, input and screenshots, the window's icon,
 # the gamepads, the log of an app opened from the Finder, the run directory for the oracle's comparisons, the sound
-# driver's trace, and input replays with the oracle's input file reader (port/tools/oracle/pbwinput.c, plain C11). The
-# screens they show are drawn by port/gfx/screens.c, which the port_gfx target builds. Their tests are here too, with
-# those of check_exit.py, the checker of the tests of the program's endings.
+# driver's trace, the digest stream (--digest), and input replays with the oracle's input file reader. Four files of
+# plain C11 come from the oracle's directory (port/tools/oracle): the input file reader (pbwinput.c), the digest's
+# canonical encoding and stream writer (digest.c) and the tracking of the 3D that display captures leave in VRAM
+# (display3d.c), with xxHash's header, which gives the digest its hash and which the build fetches at configure time;
+# the program carries xxHash's notice beside it (THIRD-PARTY-NOTICES.txt). The screens they show are drawn by
+# port/gfx/screens.c, which the port_gfx target builds. Their tests are here too, with those of check_exit.py, the
+# checker of the tests of the program's endings.
 target_sources(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/app/present.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/gamepad.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/app/record.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/message_log.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/replay.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/sound_trace.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/tools/oracle/pbwinput.c")
+    "${CMAKE_CURRENT_SOURCE_DIR}/app/digest_stream.c" "${CMAKE_CURRENT_SOURCE_DIR}/tools/oracle/pbwinput.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/tools/oracle/digest.c" "${CMAKE_CURRENT_SOURCE_DIR}/tools/oracle/display3d.c")
+
+# xxHash, whose single header gives the digest its hash (XXH3-64; ADR 0031): the release
+# port/tools/oracle/xxhash.cmake pins, fetched at configure time as minicoro is (port/cmake/os.cmake) and put on a
+# system include path, so that its own code is held to its own warnings. Its archive has no CMakeLists.txt at its top,
+# so making it available only unpacks it. The oracle's tests (port/cmake/oracle.cmake, which comes after this file)
+# and the oracle's own build use the same fetch
+include("${CMAKE_CURRENT_SOURCE_DIR}/tools/oracle/xxhash.cmake")
+include(FetchContent)
+FetchContent_Declare(xxhash
+    URL "${DIGEST_XXHASH_URL}"
+    URL_HASH "SHA256=${DIGEST_XXHASH_SHA256}")
+FetchContent_MakeAvailable(xxhash)
+target_include_directories(port_app SYSTEM PRIVATE "${xxhash_SOURCE_DIR}")
+
+# xxHash's notice, which a program given to others with xxHash compiled in carries (BSD-2-Clause): a short header, then
+# the fetched archive's LICENSE byte for byte, written at configure time beside the program, where a player's own
+# build finds it; port/cmake/macos_app.cmake puts it in the app's Contents/Resources, and so in its disk image. Nothing
+# of xxHash is committed
+set(PORT_THIRD_PARTY_NOTICES "${CMAKE_BINARY_DIR}/THIRD-PARTY-NOTICES.txt")
+file(READ "${xxhash_SOURCE_DIR}/LICENSE" port_xxhash_license)
+file(WRITE "${PORT_THIRD_PARTY_NOTICES}"
+    "Third-party notices for ${PORT_PRODUCT_NAME}'s programs, frigate-black2 and frigate-white2\n\n"
+    "${PORT_PRODUCT_NAME}'s programs include xxHash ${DIGEST_XXHASH_TAG} (the release port/tools/oracle/xxhash.cmake "
+    "pins), compiled into the per-game-frame digest that --digest writes. Its licence follows, as the release's LICENSE "
+    "file has it.\n\n"
+    "${port_xxhash_license}")
 # The version an input file's "version" line must name
 target_compile_definitions(port_app PRIVATE "PORT_VERSION_NAME=\"${PORT_VERSION}\"")
 # The app is strict C11. glibc hides the recorder's POSIX file/realpath declarations unless features are requested
@@ -62,6 +93,12 @@ add_test(NAME app_check_exit
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_check_exit.py")
 set_tests_properties(app_check_exit PROPERTIES TIMEOUT 120)
+
+# xxHash's notice beside the program ends with the fetched LICENSE, byte for byte (port/tests/app/check_notices.cmake)
+add_test(NAME app_notices COMMAND "${CMAKE_COMMAND}" "-DNOTICES=$<TARGET_FILE_DIR:${PORT_PROGRAM}>/THIRD-PARTY-NOTICES.txt"
+    "-DLICENSE=${xxhash_SOURCE_DIR}/LICENSE" "-DTAG=${DIGEST_XXHASH_TAG}"
+    -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/check_notices.cmake")
+set_tests_properties(app_notices PROPERTIES TIMEOUT 60)
 
 # --help's first lines against the product's names that the build read from port/hal/os/port_app.h, which the macOS
 # app's names and About window use too; then each option of its usage described (port/tests/app/check_about.cmake)
@@ -141,6 +178,20 @@ set_tests_properties(replay_start_menu PROPERTIES FIXTURES_REQUIRED replay_start
     SKIP_RETURN_CODE 66 PASS_REGULAR_EXPRESSION "stopped after 4300 frames" TIMEOUT 900)
 port_test_labels(replay_start_menu_clean route)
 port_test_labels(replay_start_menu route)
+
+# The digest stream (--digest, port/app/digest_stream.c) on the title sequence's input (port/tests/oracle), 1,200 frames
+# from power-on into the title's 3D, run twice from an empty save directory: check_digest_stream.py reads both streams
+# with compare.py's reader and checks that they are byte for byte the same, start with "#pbwdigest 1", count from 1 up
+# by one with no gap, and have every group in every row. It keeps --digest run where no oracle is built (the merge
+# gate's verification); without the player's ROM the program exits 66 and the test is skipped
+add_test(NAME app_digest_stream
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/check_digest_stream.py" --work
+        "${CMAKE_CURRENT_BINARY_DIR}/app_digest_stream" --saves "${CMAKE_CURRENT_BINARY_DIR}/app_digest_stream_saves" --
+        $<TARGET_FILE:${PORT_PROGRAM}> --headless --frames 1200 --watchdog 30
+        --input "${CMAKE_CURRENT_SOURCE_DIR}/tests/oracle/title_${PORT_VERSION}.pbwinput")
+set_tests_properties(app_digest_stream PROPERTIES SKIP_RETURN_CODE 66 TIMEOUT 600)
+port_test_labels(app_digest_stream route)
 
 # Black 2 only: the screens it checks are the oracle's hashes of Black 2's
 if(PORT_VERSION STREQUAL "b2_us")
