@@ -9,6 +9,7 @@
 #include "battle/btl_result.h"
 #include "battle/btl_setup.h"
 #include "constants/arc.h"
+#include "constants/battle.h"
 #include "constants/flags.h"
 #include "constants/pokemon.h"
 #include "constants/sound.h"
@@ -306,8 +307,8 @@ static void EventPokewood_SetupMovieTrainer(u32 movie, u32 kind, BtlSetupTrainer
     msgBase = EventPokewood_GetTitleMsgBase(kind, gender);
     GFL_MsgDataLoadStrbuf(msgData, msgBase + movie, trainer->name);
     GFL_MsgDataFree(msgData);
-    PMSData_Clear(&trainer->unk18);
-    PMSData_Clear(&trainer->unk20);
+    PMSData_Clear(&trainer->winWords);
+    PMSData_Clear(&trainer->loseWords);
     GFL_HeapFree(file);
 }
 
@@ -344,7 +345,7 @@ static BtlSetup *EventPokewood_CreateFilmSetup(GameSystem *gsys, Field *field, H
     BtlSetup_AllocRecBuffer(setup, heapId);
     EventPokewood_SetupMovieTrainer(movie, POKEWOOD_KIND_FILM, setup->trainers[1], playerInfo, heapId);
     EventPokewood_CreateCastParty(playerInfo, setup->party[1], heapId, movie, 1);
-    setup->unk34[0] = GetGameDataPlayerInfo(gameData);
+    setup->playerInfo[0] = GetGameDataPlayerInfo(gameData);
     if (PokewoodSystem_GetUsePlayerCast(*sys) == 1) {
         PokewoodSystem_CopyCast(*sys, gameData, setup->party[0]);
         setup->unkE0 = 0;
@@ -353,11 +354,11 @@ static BtlSetup *EventPokewood_CreateFilmSetup(GameSystem *gsys, Field *field, H
         setup->unkE0 = 1;
     }
     GFL_HeapFree(buffer);
-    setup->unkDD_3 = 1;
+    setup->studioMode = BTL_STUDIO_MODE_FILM;
     setup->unkDF = movie;
     grade = PokewoodSave_GetLevelOfPoints(PokewoodSave_GetLevelPoints(save));
-    setup->unk128 = sGradeTicks[grade].base + GFL_RandomLC(sGradeTicks[grade].range);
-    setup->unk129 = grade;
+    setup->audienceCount = sGradeTicks[grade].base + GFL_RandomLC(sGradeTicks[grade].range);
+    setup->studioGrade = grade;
     return setup;
 }
 
@@ -380,7 +381,7 @@ static BtlSetup *EventPokewood_LoadDownloadedSetup(GameSystem *gsys, Field *fiel
         BtlSetup_Reset(setup);
         BtlSetup_InitForRecord(setup, gameData, heapId);
         BattleRec_LoadToolOverlay();
-        movie = Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_UNKDF, 0);
+        movie = Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_MOVIE, 0);
         BattleRecTool_LoadSetup(setup, 1, heapId);
         BattleRec_UnloadToolOverlay();
         EventPokewood_FinishWatchSetup(gameData, setup, movie, heapId);
@@ -418,7 +419,7 @@ static BtlSetup *EventPokewood_LoadWatchSetup(GameSystem *gsys, Field *field, He
 // Loads the lines the movie opens with
 static void EventPokewood_LoadIntroText(PokewoodMovieParam *param, BtlSetup *setup, u32 movie, u32 kind,
                                         HeapID heapId) {
-    u32 gender = getTrainerGender(setup->unk34[0]);
+    u32 gender = getTrainerGender(setup->playerInfo[0]);
     u32 isMale = TRUE;
     MsgData *msgData;
 
@@ -448,14 +449,14 @@ static BtlSetup *EventPokewood_CreateSetup(PokewoodMovieParam *param, GameSystem
     case POKEWOOD_KIND_FILM:
         setup = EventPokewood_CreateFilmSetup(gsys, field, heapId, param->movie);
         setup->fieldSituation.bgm = SEQ_BGM_PW_FILMING;
-        setup->fieldSituation.unk12 = SEQ_BGM_WIN1;
+        setup->fieldSituation.winBgm = SEQ_BGM_WIN1;
         EventPokewood_LoadIntroText(param, setup, param->movie, POKEWOOD_KIND_FILM, heapId);
         break;
     case POKEWOOD_KIND_WATCH:
         setup = EventPokewood_LoadWatchSetup(gsys, field, heapId, param->slot);
         file = GFL_ArcSysReadHeapNew(ARCID_POKEWOOD_MOVIE, setup->unkDF, HEAPID_TAIL(heapId));
         setup->fieldSituation.bgm = file->bgm;
-        setup->fieldSituation.unk12 = file->bgm2;
+        setup->fieldSituation.winBgm = file->bgm2;
         setup->unk138 = file->unk2a;
         setup->unk13a = file->unk2c;
         EventPokewood_LoadIntroText(param, setup, setup->unkDF, POKEWOOD_KIND_WATCH, heapId);
@@ -472,8 +473,8 @@ static BtlSetup *EventPokewood_CreateSetup(PokewoodMovieParam *param, GameSystem
 }
 
 static void EventPokewood_FreeSetup(BtlSetup *setup) {
-    if (setup->unkDD_3 == 2) {
-        GFL_HeapFree(setup->unk34[0]);
+    if (setup->studioMode == BTL_STUDIO_MODE_PLAYBACK) {
+        GFL_HeapFree(setup->playerInfo[0]);
         BtlSetup_FreeForRecord(setup);
     }
     BtlSetup_Free(setup);
@@ -484,7 +485,7 @@ static void EventPokewood_StoreRecordedSetup(GameData *gameData, BtlSetup *setup
     GameData_GetPokewoodSystemPtr(gameData);
     BattleRec_LoadToolOverlay();
     setup->trainers[0] = TrainerBattleSetup_Create(heapId);
-    EventPokewood_SetupRecordTrainer(setup->unkDF, setup->trainers[0], setup->unk34[0], heapId);
+    EventPokewood_SetupRecordTrainer(setup->unkDF, setup->trainers[0], setup->playerInfo[0], heapId);
     BattleRecTool_StoreSetup(setup);
     BattleRec_UnloadToolOverlay();
 }
@@ -505,7 +506,7 @@ static void EventPokewood_InitTitleParam(PokewoodTitleParam *title, BtlSetup *se
     BattleRec_UnloadToolOverlay();
     GFL_HeapFree(pkm);
     title->movie = setup->unkDF;
-    title->gender = getTrainerGender(setup->unk34[0]);
+    title->gender = getTrainerGender(setup->playerInfo[0]);
 }
 
 static void EventPokewood_FreeTitleParam(PokewoodTitleParam *title) {
@@ -515,7 +516,7 @@ static void EventPokewood_FreeTitleParam(PokewoodTitleParam *title) {
 static void EventPokewood_InitBriefingParam(PkwdBriefingParam *briefing, BtlSetup *setup, PlayerInfo *playerInfo,
                                             GameData *gameData) {
     briefing->movie = setup->unkDF;
-    briefing->audienceCount = setup->unk128;
+    briefing->audienceCount = setup->audienceCount;
     briefing->setup = setup;
     briefing->playerInfo = playerInfo;
     briefing->noSkip = setup->unkDD_7;
@@ -526,8 +527,8 @@ static void EventPokewood_InitResultParam(PkwdBriefingParam *result, BtlSetup *s
     result->saveControl = GameData_GetSaveControl(gameData);
     result->gameData = gameData;
     result->playerInfo = playerInfo;
-    result->audienceCount = setup->unk128;
-    result->audience = setup->unk12C;
+    result->audienceCount = setup->audienceCount;
+    result->audience = setup->audience;
     result->setup = setup;
     result->movie = setup->unkDF;
     result->noSkip = setup->unkDD_7;
@@ -581,7 +582,7 @@ static GameEventReturnCode EventPokewood_RunWatch(GameEvent *event, u32 *state, 
         (*state)++;
         break;
     case 5:
-        wk->setup->unk12C = param->briefing.audience;
+        wk->setup->audience = param->briefing.audience;
         if (param->briefing.skip != 0) {
             *state = 8;
         } else {
@@ -591,7 +592,7 @@ static GameEventReturnCode EventPokewood_RunWatch(GameEvent *event, u32 *state, 
         break;
     case 6:
         GFL_SndBGMPlay(wk->setup->fieldSituation.bgm, 0xffff);
-        GSYS_QueueProcAsEvent(event, OVERLAY_ID(167), &data_ov167_021d6ce0, wk->setup);
+        GSYS_QueueProcAsEvent(event, OVERLAY_ID(167), &BATTLE_PROC_FUNCTIONS, wk->setup);
         (*state)++;
         break;
     case 7:
@@ -648,7 +649,7 @@ static void EventPokewood_LoadSlotInfo(GameData *gameData, HeapID heapId, Pokewo
     BattleRec_LoadToolOverlay();
     for (slot = 0; slot < 8; slot++) {
         if (Pokewood_LoadDownloadedMovie(saveControl, heapId, slot) == 1) {
-            param->slotInfo[slot] = sSlotInfo[Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_UNKDF, 0)] + 1;
+            param->slotInfo[slot] = sSlotInfo[Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_MOVIE, 0)] + 1;
         } else {
             param->slotInfo[slot] = 0;
         }
@@ -681,7 +682,7 @@ static GameEventReturnCode EventPokewood_RunFilm(GameEvent *event, u32 *state, v
         break;
     case 3:
         FieldSnd_SetPlayerVolumeFade(fieldSound, 127, 1);
-        GSYS_QueueProcAsEvent(event, OVERLAY_ID(167), &data_ov167_021d6ce0, wk->setup);
+        GSYS_QueueProcAsEvent(event, OVERLAY_ID(167), &BATTLE_PROC_FUNCTIONS, wk->setup);
         (*state)++;
         break;
     case 4:
@@ -1023,7 +1024,8 @@ static GameEventReturnCode EventPokewood_RunScreen(GameEvent *event, u32 *state,
 
 // Gives the opponent of a movie that is watched its class and name
 static void EventPokewood_SetupRecordedOpponent(BtlSetup *setup, HeapID heapId) {
-    EventPokewood_SetupMovieTrainer(setup->unkDF, POKEWOOD_KIND_WATCH, setup->trainers[1], setup->unk34[0], heapId);
+    EventPokewood_SetupMovieTrainer(setup->unkDF, POKEWOOD_KIND_WATCH, setup->trainers[1], setup->playerInfo[0],
+                                    heapId);
     setup->trainers[1]->trainerId = 1;
 }
 

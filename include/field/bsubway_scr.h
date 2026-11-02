@@ -103,42 +103,48 @@ struct BSubwayScrWork {
     u8 playMode;
     u8 gender;
     u8 partnerGender;
-    u16 unkC_0 : 1;
+    // Set once the seventh round is won
+    u16 winMax : 1;
     u16 unkC_1 : 2;
-    // Whether the partner retired
-    u16 unkC_3 : 1;
+    // Whether this player chose to retire, as sent to the partner: either's retiring retires both
+    u16 retired : 1;
     u16 unkC_4 : 1;
-    u16 unkC_5 : 3;
+    // The partners entry of a multi train's partner, or 5 plus the gender of a wireless partner
+    u16 partnerIndex : 3;
     u16 unkC_8 : 1;
     u16 unkC_9 : 1;
     u16 unkC_10 : 2;
     u16 unkC_12 : 1;
     u16 unkC_13 : 3;
-    u16 unkE;
+    u16 winCount;
     u16 unk10;
     // The BSUBWAY_COMM_* command to send
     u16 sendCommand;
     u8 unk14[4];
-    u16 unk18;
+    // The wireless partner's stage number, the least the trainers are drawn at
+    u16 partnerStageNo;
     u16 partnerSpecies[2];
     // The party slots and species and items of the members entered
     u8 memberSlots[4];
     u16 memberSpecies[4];
     u16 memberItems[4];
-    u16 unk32[0x1d];
+    // The trainers of each round, two a round on a multi train
+    u16 trainerNos[0x1d];
     GameData *gameData;
-    BSubwayPlayData *unk70;
-    BSubwayScoreData *unk74;
-    BSubwayWifiData *unk78;
+    BSubwayPlayData *playData;
+    BSubwayScoreData *scoreData;
+    BSubwayWifiData *wifiData;
     // Each member's chosen party slot plus 1
     u8 memberChoices[6];
-    u16 unk82;
-    u16 unk84;
+    // The party screen's last index and result
+    u16 pokeSelectIndex;
+    u16 pokeSelectResult;
     u8 unk86[2];
     BSubwayTrainer trainers[2];
-    BSubwayTrainer unk2C8[3];
+    // The partners to pick from on a multi train, their teams, and whether each team was made with rental items
+    BSubwayTrainer partners[3];
     BSubwayTeamConfig teamConfigs[3];
-    u8 unk664[4];
+    u8 partnerRentalItems[4];
     // The data of the command to send, and of the one received. Some commands write a PlayerInfo or a u32 over it,
     // which the array's 2-byte alignment and odd length rule out as a union member
     u16 sendBuf[BSUBWAY_COMM_BUF_LEN];
@@ -197,23 +203,23 @@ GameEvent *EventBSubwayLeaderMsg_Create(GameSystem *gsys, u16 index, u16 actorId
 
 // Overlay 33's bsubway_scr.c
 void BsubwayScr_ClearWorkPtr(GameSystem *gsys);
-BSubwayScrWork *BsubwayScr_CreateWork(GameSystem *gsys, u16 a1, u16 a2);
+BSubwayScrWork *BsubwayScr_CreateWork(GameSystem *gsys, u16 resume, u16 playMode);
 void BsubwayScr_DeleteWork(GameSystem *gsys, BSubwayScrWork *bsw);
 void BsubwayScr_ChangeCommMultiMode(BSubwayScrWork *bsw);
 void BsubwayScr_SaveRestPlayData(BSubwayScrWork *bsw);
 void BsubwayScr_LoadMembers(BSubwayScrWork *bsw, GameSystem *gsys);
 void BsubwayScr_SavePlayDataMembers(BSubwayScrWork *bsw);
-u16 func_ov033_0217b86c(GameSystem *gsys);
+u16 BsubwayScr_ResetSavedPlay(GameSystem *gsys);
 void BsubwayScr_SetLoseScore(GameSystem *gsys, BSubwayScrWork *bsw);
-u16 func_ov033_0217b8ec(BSubwayScrWork *bsw);
+u16 BsubwayScr_AddBattlePoints(BSubwayScrWork *bsw);
 void BsubwayScr_DrawTrainerNos(BSubwayScrWork *bsw);
 u16 BsubwayScr_SetSelectedMembers(BSubwayScrWork *bsw, GameSystem *gsys);
 BOOL BsubwayScr_IsWinMax(BSubwayScrWork *bsw);
 void BsubwayScr_SetClearScore(BSubwayScrWork *bsw, GameSystem *gsys);
 void BsubwayScr_ClearStateBits(BSubwayScrWork *bsw, GameSystem *gsys);
 void BsubwayScr_CreateRoundTrainers(BSubwayScrWork *bsw);
-u32 BsubwayScr_GetTrainerObjCode(BSubwayScrWork *bsw, u16 a1);
-u16 BsubwayScr_UpdateStageRank(BSubwayScoreData *score, GameSystem *gsys, u32 a2);
+u32 BsubwayScr_GetTrainerObjCode(BSubwayScrWork *bsw, u16 index);
+u16 BsubwayScr_UpdateStageRank(BSubwayScoreData *score, GameSystem *gsys, u32 op);
 void BsubwayScr_LoadPartyCopy(BSubwayScrWork *bsw);
 PokeParty *BsubwayScr_GetParty(BSubwayScrWork *bsw);
 BOOL BsubwayScr_IsTrainerNoUsed(const u16 *list, u16 value, u16 count);
@@ -221,12 +227,12 @@ u16 BsubwayScr_GetStageNo(s32 value);
 u16 BsubwayScr_GetWinCount(BSubwayScrWork *bsw);
 void BsubwayScr_IncWinCount(BSubwayScrWork *bsw);
 void BsubwayScr_SetWinCount(BSubwayScrWork *bsw, u32 score);
-void BsubwayScr_SaveRecordParty(BSubwayScrWork *bsw, SaveControl *save, u32 a2, u32 a3);
+void BsubwayScr_SaveRecordParty(BSubwayScrWork *bsw, SaveControl *save, u32 a2, u32 winCount);
 void BsubwayScr_SaveMemberParty(BSubwayScrWork *bsw, SaveControl *save, u32 value);
 void BsubwayScr_ClearWinCount(BSubwayScrWork *bsw);
 void BsubwayScr_SetWinCountFromRound(BSubwayScrWork *bsw, u32 count, u32 extra);
 u16 BsubwayScr_GetMemberNum(u16 mode);
-void BsubwayScr_CreatePartners(BSubwayScrWork *bsw, u8 a1);
+void BsubwayScr_CreatePartners(BSubwayScrWork *bsw, u8 variant);
 void BsubwayScr_DrawTrainerNos(BSubwayScrWork *bsw);
 void BsubwayScr_PackBattleMon(BSubwayPokemon *dest, PartyPkm *pkm);
 void *BsubwayScr_GetNameInputEncounterWork(BSubwayScrWork *bsw);

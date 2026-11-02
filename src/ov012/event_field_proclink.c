@@ -9,6 +9,7 @@
 #include "app/townmap.h"
 #include "app/wifi_note.h"
 #include "app/xtransceiver.h"
+#include "constants/items.h"
 #include "constants/pokemon.h"
 #include "demo/evolution_demo.h"
 #include "field/app_call.h"
@@ -39,12 +40,31 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
+// The app call's states: an app with a proc closes the field, runs and opens the next app until one gives another
+// result, then the field opens again; an app with a call function (the save) runs over the field
+enum {
+    FIELD_APP_CALL_STATE_START,
+    FIELD_APP_CALL_STATE_NEXT_APP,
+    FIELD_APP_CALL_STATE_END,
+    FIELD_APP_CALL_STATE_CALL,
+    FIELD_APP_CALL_STATE_CALL_RESULT,
+    FIELD_APP_CALL_STATE_CALL_RETRY,
+    FIELD_APP_CALL_STATE_FADE_OUT,
+    FIELD_APP_CALL_STATE_CLOSE_FIELD,
+    FIELD_APP_CALL_STATE_OPEN_FIELD,
+    FIELD_APP_CALL_STATE_SETUP_FIELD,
+    FIELD_APP_CALL_STATE_FADE_IN,
+    FIELD_APP_CALL_STATE_START_PROC,
+    FIELD_APP_CALL_STATE_WAIT_PROC,
+    FIELD_APP_CALL_STATE_PROC_RESULT,
+};
+
 // clang-format off
 const FieldProcLink FIELD_PROC_LINK_LIST[FIELD_APP_MAX] = {
     { OVERLAY_ID(165), &POKELIST_PROC_FUNCTIONS, FieldAppCall_CreatePokeListParam, FieldAppCall_GetPokeListResult, NULL, FieldProcLink_FreeParam },
     { OVERLAY_ID(302), &POKEDEX_PROC_FUNCTIONS, FieldAppCall_CreatePokedexParam, FieldAppCall_GetPokedexResult, NULL, FieldProcLink_FreeParam },
     { OVERLAY_ID(142), &BAG_PROC_FUNCTIONS, FieldAppCall_CreateBagParam, FieldAppCall_GetBagResult, NULL, FieldProcLink_FreeParam },
-    { OVERLAY_ID(186), &data_ov012_0216dd78, FieldAppCall_CreateTrainerCardParam, FieldAppCall_GetTrainerCardResult, NULL, FieldProcLink_FreeParam },
+    { OVERLAY_ID(186), &TRCARD_SYS_PROC_FUNCTIONS, FieldAppCall_CreateTrainerCardParam, FieldAppCall_GetTrainerCardResult, NULL, FieldProcLink_FreeParam },
     { 0, NULL, NULL, NULL, FieldAppCall_CallSave, FieldProcLink_FreeParam },
     { OVERLAY_ID(140), &CONFIG_PANEL_PROC_FUNCTIONS, FieldAppCall_CreateConfigParam, FieldAppCall_GetConfigResult, NULL, FieldProcLink_FreeParam },
     { 0, NULL, NULL, NULL, FieldProcLink_CallInfDungeonRetire, FieldProcLink_FreeParam },
@@ -88,71 +108,71 @@ GameEventReturnCode EventFieldAppCall_Callback(GameEvent *event, u32 *state, voi
     void *param;
 
     switch (*state) {
-    case 0:
-        *state = 1;
+    case FIELD_APP_CALL_STATE_START:
+        *state = FIELD_APP_CALL_STATE_NEXT_APP;
         break;
-    case 1:
+    case FIELD_APP_CALL_STATE_NEXT_APP:
         if (work->result == FIELD_APP_RESULT_NEXT) {
             if (FIELD_PROC_LINK_LIST[work->appId].call == NULL) {
-                *state = 6;
+                *state = FIELD_APP_CALL_STATE_FADE_OUT;
             } else {
-                *state = 3;
+                *state = FIELD_APP_CALL_STATE_CALL;
             }
         } else {
-            *state = 2;
+            *state = FIELD_APP_CALL_STATE_END;
         }
         break;
-    case 2:
+    case FIELD_APP_CALL_STATE_END:
         return GAMEEVENT_DONE;
-    case 3:
+    case FIELD_APP_CALL_STATE_CALL:
         if (FieldAppCallParam_RunCallback1(&work->params)) {
             FIELD_PROC_LINK_LIST[work->appId].call(work, work->input->appParam);
-            *state = 4;
+            *state = FIELD_APP_CALL_STATE_CALL_RESULT;
         }
         break;
-    case 4:
+    case FIELD_APP_CALL_STATE_CALL_RESULT:
         EventFieldAppCall_ConvAppResultToEventType(work->result, &work->input->eventType);
-        *state = 5;
+        *state = FIELD_APP_CALL_STATE_CALL_RETRY;
         break;
-    case 5:
-        if (work->result == 0) {
+    case FIELD_APP_CALL_STATE_CALL_RETRY:
+        if (work->result == FIELD_APP_RESULT_RETURN) {
             if (FieldAppCallParam_CanRetry(&work->params)) {
-                *state = 1;
+                *state = FIELD_APP_CALL_STATE_NEXT_APP;
             }
         } else {
-            *state = 1;
+            *state = FIELD_APP_CALL_STATE_NEXT_APP;
         }
         break;
-    case 6:
+    case FIELD_APP_CALL_STATE_FADE_OUT:
         GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(work->input->gameSystem, work->input->field,
                                                                             FIELD_TRANSITION_FADE_BLACK, 0));
-        *state = 7;
+        *state = FIELD_APP_CALL_STATE_CLOSE_FIELD;
         break;
-    case 7:
+    case FIELD_APP_CALL_STATE_CLOSE_FIELD:
         if (FieldAppCallParam_RunCallback1(&work->params)) {
             GameEvent_ChainNext(event, CreateFieldCloseEvent(work->input->gameSystem, work->input->field));
-            *state = 11;
+            *state = FIELD_APP_CALL_STATE_START_PROC;
         }
         break;
-    case 8:
+    case FIELD_APP_CALL_STATE_OPEN_FIELD:
         FieldAppCallParam_RunCallback2(&work->params);
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(work->input->gameSystem));
-        *state = 9;
+        *state = FIELD_APP_CALL_STATE_SETUP_FIELD;
         break;
-    case 9:
+    case FIELD_APP_CALL_STATE_SETUP_FIELD:
         work->input->field = GSYS_GetField(work->input->gameSystem);
         FieldG2D_SetLCDConfig();
         FieldG2D_Prepare3DSurface(work->input->field);
-        *state = 10;
+        *state = FIELD_APP_CALL_STATE_FADE_IN;
         break;
-    case 10:
+    case FIELD_APP_CALL_STATE_FADE_IN:
         if (FieldAppCallParam_CanRetry(&work->params)) {
             GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(work->input->gameSystem, work->input->field,
                                                                         FIELD_TRANSITION_FADE_BLACK, 0, 0, 0, 0));
-            *state = 1;
+            *state = FIELD_APP_CALL_STATE_NEXT_APP;
         }
         break;
-    case 11:
+    case FIELD_APP_CALL_STATE_START_PROC:
         param =
             FIELD_PROC_LINK_LIST[work->appId].createParam(work, work->input->appParam, work->prevAppId, work->appParam);
         if (work->appParam != NULL) {
@@ -163,29 +183,29 @@ GameEventReturnCode EventFieldAppCall_Callback(GameEvent *event, u32 *state, voi
         if (FIELD_PROC_LINK_LIST[work->appId].functions != NULL) {
             GSYS_QueueProc(work->input->gameSystem, FIELD_PROC_LINK_LIST[work->appId].overlayId,
                            FIELD_PROC_LINK_LIST[work->appId].functions, param);
-            *state = 12;
+            *state = FIELD_APP_CALL_STATE_WAIT_PROC;
         }
         break;
-    case 12:
+    case FIELD_APP_CALL_STATE_WAIT_PROC:
         if (GSYS_GetProcMgrState(work->input->gameSystem)) {
             break;
         }
-        *state = 13;
+        *state = FIELD_APP_CALL_STATE_PROC_RESULT;
         break;
-    case 13:
+    case FIELD_APP_CALL_STATE_PROC_RESULT:
         work->result = FIELD_PROC_LINK_LIST[work->appId].getResult(work, work->appParam);
         EventFieldAppCall_ConvAppResultToEventType(work->result, &work->input->eventType);
         if (work->result == FIELD_APP_RESULT_NEXT) {
             work->prevAppId = work->appId;
             work->appId = work->nextAppId;
-            *state = 11;
+            *state = FIELD_APP_CALL_STATE_START_PROC;
         } else {
             FieldAppCall_ClearBagFreeSpaceFilter(work);
             if (work->appParam != NULL) {
                 GFL_HeapFree(work->appParam);
                 work->appParam = NULL;
             }
-            *state = 8;
+            *state = FIELD_APP_CALL_STATE_OPEN_FIELD;
         }
         break;
     }
@@ -194,20 +214,20 @@ GameEventReturnCode EventFieldAppCall_Callback(GameEvent *event, u32 *state, voi
 
 void EventFieldAppCall_ConvAppResultToEventType(u32 result, u32 *eventType) {
     switch (result) {
-    case 0:
-        *eventType = 0;
+    case FIELD_APP_RESULT_RETURN:
+        *eventType = FIELD_APP_RESULT_RETURN;
         break;
-    case 1:
-        *eventType = 1;
+    case FIELD_APP_RESULT_EXIT:
+        *eventType = FIELD_APP_RESULT_EXIT;
         break;
-    case 3:
-        *eventType = 3;
+    case FIELD_APP_RESULT_COMMON_EVENT:
+        *eventType = FIELD_APP_RESULT_COMMON_EVENT;
         break;
-    case 2:
-        *eventType = 2;
+    case FIELD_APP_RESULT_HM_EVENT:
+        *eventType = FIELD_APP_RESULT_HM_EVENT;
         break;
-    case 5:
-        *eventType = 5;
+    case FIELD_APP_RESULT_SCRIPT:
+        *eventType = FIELD_APP_RESULT_SCRIPT;
         break;
     default:
         break;
@@ -264,18 +284,19 @@ void *FieldAppCall_CreatePokeListParam(FieldAppCallWork *work, s32 appParam, s32
     param->action = work->action;
     param->index = work->input->partySlot;
     param->move = 0;
-    param->unk6E = 0xff;
+    param->learnable = 0xff;
     param->zoneId = GameData_GetPlayerState(gameData)->zoneId;
     if (GameData_IsShortcutRegistered(gameData, SHORTCUT_POKELIST) == TRUE) {
         param->keyItemRegistered = TRUE;
     } else {
         param->keyItemRegistered = FALSE;
     }
-    if (appParam == 0x1d2 || appParam == 0x274 || appParam == 0x275 || appParam == 0x27e) {
+    if (appParam == ITEM_GRACIDEA || appParam == ITEM_DNA_SPLICERS_FUSE || appParam == ITEM_DNA_SPLICERS_SEPARATE ||
+        appParam == ITEM_REVEAL_GLASS) {
         param->index = 0;
         param->mode = 5;
         param->item = appParam;
-        work->unk74 = TRUE;
+        work->formItemUse = TRUE;
     } else if (prevAppId == FIELD_APP_POKELIST) {
         param->index = 0;
     } else if (prevAppId == FIELD_APP_BAG) {
@@ -316,12 +337,12 @@ void *FieldAppCall_CreatePokeListParam(FieldAppCallWork *work, s32 appParam, s32
     } else if (prevAppId == FIELD_APP_POKESTATUS) {
         status = prevParam;
         switch (status->result) {
-        case 0:
-        case 1:
+        case PSTATUS_RESULT_FORGET:
+        case PSTATUS_RESULT_BACK:
             if (status->mode == PSTATUS_MODE_FORGET_MOVE) {
                 if (work->subMode == 6) {
                     param->mode = 8;
-                    param->learnIndex = work->unk6C;
+                    param->learnIndex = work->learnIndex;
                 } else {
                     param->mode = 7;
                 }
@@ -369,11 +390,11 @@ u32 FieldAppCall_GetPokeListResult(FieldAppCallWork *work, void *data) {
 
     work->input->partySlot = param->index;
     work->partySlot = param->index;
-    if (work->unk74 == TRUE) {
+    if (work->formItemUse == TRUE) {
         if (param->index == 8) {
-            return 1;
+            return FIELD_APP_RESULT_EXIT;
         }
-        return 0;
+        return FIELD_APP_RESULT_RETURN;
     }
     gameData = GSYS_GetGameData(work->input->gameSystem);
     if (param->keyItemRegistered == TRUE) {
@@ -388,9 +409,9 @@ u32 FieldAppCall_GetPokeListResult(FieldAppCallWork *work, void *data) {
             return FIELD_APP_RESULT_NEXT;
         }
         if (param->index == 8) {
-            return 1;
+            return FIELD_APP_RESULT_EXIT;
         }
-        return 0;
+        return FIELD_APP_RESULT_RETURN;
     case 1:
         work->nextAppId = FIELD_APP_POKESTATUS;
         return FIELD_APP_RESULT_NEXT;
@@ -404,7 +425,7 @@ u32 FieldAppCall_GetPokeListResult(FieldAppCallWork *work, void *data) {
     case 5:
         work->nextAppId = FIELD_APP_POKESTATUS;
         work->item = param->item;
-        work->unk6C = param->learnIndex;
+        work->learnIndex = param->learnIndex;
         return FIELD_APP_RESULT_NEXT;
     case 6:
     case 7:
@@ -426,12 +447,12 @@ u32 FieldAppCall_GetPokeListResult(FieldAppCallWork *work, void *data) {
     case 20:
     case 21:
         work->input->eventId = param->result - 11;
-        return 2;
+        return FIELD_APP_RESULT_HM_EVENT;
     case 15:
         work->nextAppId = FIELD_APP_TOWNMAP;
         return FIELD_APP_RESULT_NEXT;
     }
-    return 1;
+    return FIELD_APP_RESULT_EXIT;
 }
 
 // The Pokédex
@@ -449,7 +470,7 @@ void *FieldAppCall_CreatePokedexParam(FieldAppCallWork *work, s32 appParam, s32 
     if (appParam != -1) {
         param->start = appParam;
     } else {
-        param->start = 0;
+        param->start = POKEDEX_START_OPEN;
     }
     return param;
 }
@@ -461,9 +482,9 @@ u32 FieldAppCall_GetPokedexResult(FieldAppCallWork *work, void *data) {
     FieldSnd_RestoreVolume(sound, GameSystem_GetISS(work->input->gameSystem));
     switch (param->result) {
     case 0:
-        return 0;
+        return FIELD_APP_RESULT_RETURN;
     default:
-        return 1;
+        return FIELD_APP_RESULT_EXIT;
     }
 }
 
@@ -556,17 +577,17 @@ u32 FieldAppCall_GetPStatusResult(FieldAppCallWork *work, void *data) {
     PStatusParam *param = data;
 
     switch (param->result) {
-    case 0:
-    case 1:
+    case PSTATUS_RESULT_FORGET:
+    case PSTATUS_RESULT_BACK:
         if (work->input->appId == FIELD_APP_POKESTATUS) {
-            return 0;
+            return FIELD_APP_RESULT_RETURN;
         }
         work->nextAppId = FIELD_APP_POKELIST;
         return FIELD_APP_RESULT_NEXT;
-    case 2:
-        return 1;
+    case PSTATUS_RESULT_CLOSE:
+        return FIELD_APP_RESULT_EXIT;
     }
-    return 1;
+    return FIELD_APP_RESULT_EXIT;
 }
 
 // The bag's mode where the player is
@@ -620,32 +641,32 @@ u32 FieldAppCall_GetBagResult(FieldAppCallWork *work, void *data) {
 
     switch (param->result) {
     case 0:
-        return 1;
+        return FIELD_APP_RESULT_EXIT;
     case 1:
         if (param->mode == 2) {
             work->nextAppId = FIELD_APP_POKELIST;
             return FIELD_APP_RESULT_NEXT;
         }
-        return 0;
+        return FIELD_APP_RESULT_RETURN;
     case 12:
         work->nextAppId = FIELD_APP_POKELIST;
         return FIELD_APP_RESULT_NEXT;
     case 10:
     case 11:
         work->input->eventId = FIELD_COMMON_EVENT_CYCLING;
-        return 3;
+        return FIELD_APP_RESULT_COMMON_EVENT;
     case 13:
         work->input->eventId = FIELD_COMMON_EVENT_ENTRALINK;
-        return 3;
+        return FIELD_APP_RESULT_COMMON_EVENT;
     case 15:
         work->input->eventId = FIELD_COMMON_EVENT_SWEET_SCENT;
-        return 3;
+        return FIELD_APP_RESULT_COMMON_EVENT;
     case 16:
         work->input->eventId = FIELD_COMMON_EVENT_FISHING;
-        return 3;
+        return FIELD_APP_RESULT_COMMON_EVENT;
     case 14:
         work->input->eventId = FIELD_COMMON_EVENT_ESCAPE_ROPE;
-        return 3;
+        return FIELD_APP_RESULT_COMMON_EVENT;
     case 8:
         work->nextAppId = FIELD_APP_WIFI_NOTE;
         return FIELD_APP_RESULT_NEXT;
@@ -676,7 +697,7 @@ u32 FieldAppCall_GetBagResult(FieldAppCallWork *work, void *data) {
         return FIELD_APP_RESULT_NEXT;
     case 20:
         work->input->eventId = FIELD_COMMON_EVENT_DOWSING;
-        return 3;
+        return FIELD_APP_RESULT_COMMON_EVENT;
     case 2:
         if (PML_ItemIsMail(param->item) == TRUE) {
             work->subMode = 0;
@@ -713,9 +734,9 @@ u32 FieldAppCall_GetTrainerCardResult(FieldAppCallWork *work, void *data) {
 
     FieldSnd_RestoreVolume(sound, GameSystem_GetISS(work->input->gameSystem));
     if (param->result == 1) {
-        return 1;
+        return FIELD_APP_RESULT_EXIT;
     }
-    return 0;
+    return FIELD_APP_RESULT_RETURN;
 }
 
 // The town map
@@ -745,11 +766,11 @@ u32 FieldAppCall_GetTownMapResult(FieldAppCallWork *work, void *data) {
     if (work->input->appId == FIELD_APP_TOWNMAP) {
         switch (param->result) {
         case TOWNMAP_RESULT_RETURN:
-            return 0;
+            return FIELD_APP_RESULT_RETURN;
         case TOWNMAP_RESULT_CLOSE:
-            return 1;
+            return FIELD_APP_RESULT_EXIT;
         default:
-            return 1;
+            return FIELD_APP_RESULT_EXIT;
         }
     } else if (work->input->appId == FIELD_APP_BAG) {
         switch (param->result) {
@@ -757,9 +778,9 @@ u32 FieldAppCall_GetTownMapResult(FieldAppCallWork *work, void *data) {
             work->nextAppId = FIELD_APP_BAG;
             return FIELD_APP_RESULT_NEXT;
         case TOWNMAP_RESULT_CLOSE:
-            return 1;
+            return FIELD_APP_RESULT_EXIT;
         default:
-            return 1;
+            return FIELD_APP_RESULT_EXIT;
         }
     } else if (work->input->appId == FIELD_APP_POKELIST) {
         switch (param->result) {
@@ -767,20 +788,20 @@ u32 FieldAppCall_GetTownMapResult(FieldAppCallWork *work, void *data) {
             work->nextAppId = FIELD_APP_POKELIST;
             return FIELD_APP_RESULT_NEXT;
         case TOWNMAP_RESULT_CLOSE:
-            return 1;
+            return FIELD_APP_RESULT_EXIT;
         case TOWNMAP_RESULT_FLY:
-            work->input->eventId = 4;
+            work->input->eventId = HM_EVENT_FLY;
             work->input->eventValue = param->zoneId;
-            work->input->unk38 = param->warpX;
-            work->input->unk3C = param->warpZ;
+            work->input->warpX = param->warpX;
+            work->input->warpZ = param->warpZ;
             work->input->unk40 = 0;
             RecordAddOne(GameData_GetRecords(GSYS_GetGameData(param->gsys)), 0x2a);
-            return 2;
+            return FIELD_APP_RESULT_HM_EVENT;
         default:
-            return 1;
+            return FIELD_APP_RESULT_EXIT;
         }
     }
-    return 1;
+    return FIELD_APP_RESULT_EXIT;
 }
 
 void *FieldAppCall_CreateConfigParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
@@ -796,9 +817,9 @@ u32 FieldAppCall_GetConfigResult(FieldAppCallWork *work, void *data) {
     ConfigPanelParam *param = data;
 
     if (param->result) {
-        return 1;
+        return FIELD_APP_RESULT_EXIT;
     }
-    return 0;
+    return FIELD_APP_RESULT_RETURN;
 }
 
 // The save, which has no proc
@@ -823,16 +844,16 @@ u32 FieldAppCall_GetWifiNoteResult(FieldAppCallWork *work, void *data) {
     if (work->input->appId == FIELD_APP_WIFI_NOTE) {
         switch (param->result) {
         case WIFI_NOTE_RESULT_RETURN:
-            return 0;
+            return FIELD_APP_RESULT_RETURN;
         default:
-            return 1;
+            return FIELD_APP_RESULT_EXIT;
         }
     }
     if (param->result == WIFI_NOTE_RESULT_RETURN) {
         work->nextAppId = FIELD_APP_BAG;
         return FIELD_APP_RESULT_NEXT;
     }
-    return 1;
+    return FIELD_APP_RESULT_EXIT;
 }
 
 // The mail
@@ -959,7 +980,7 @@ u32 FieldAppCall_GetEvolutionDemoResult(FieldAppCallWork *work, void *param) {
         work->nextAppId = FIELD_APP_POKELIST;
         return FIELD_APP_RESULT_NEXT;
     }
-    return 0;
+    return FIELD_APP_RESULT_RETURN;
 }
 
 void *FieldAppCall_CreateBattleRecorderParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId,
@@ -977,11 +998,11 @@ u32 FieldAppCall_GetBattleRecorderResult(FieldAppCallWork *work, void *data) {
     if (work->input->appId == FIELD_APP_BATTLE_RECORDER) {
         switch (param->result) {
         case 0:
-            return 0;
+            return FIELD_APP_RESULT_RETURN;
         case 1:
-            return 1;
+            return FIELD_APP_RESULT_EXIT;
         default:
-            return 0;
+            return FIELD_APP_RESULT_RETURN;
         }
     }
     switch (param->result) {
@@ -989,9 +1010,9 @@ u32 FieldAppCall_GetBattleRecorderResult(FieldAppCallWork *work, void *data) {
         work->nextAppId = FIELD_APP_BAG;
         return FIELD_APP_RESULT_NEXT;
     case 1:
-        return 1;
+        return FIELD_APP_RESULT_EXIT;
     default:
-        return 0;
+        return FIELD_APP_RESULT_RETURN;
     }
 }
 
@@ -1008,7 +1029,7 @@ void *FieldAppCall_CreateXtransceiverParam(FieldAppCallWork *work, s32 appParam,
 
 u32 FieldAppCall_GetXtransceiverResult(FieldAppCallWork *work, void *param) {
     if (work->input->appId == FIELD_APP_XTRANSCEIVER) {
-        return 0;
+        return FIELD_APP_RESULT_RETURN;
     }
     work->nextAppId = FIELD_APP_BAG;
     return FIELD_APP_RESULT_NEXT;
@@ -1028,11 +1049,11 @@ u32 FieldAppCall_GetMedalBoxResult(FieldAppCallWork *work, void *data) {
     if (work->input->appId == FIELD_APP_MEDALBOX) {
         switch (param->result) {
         case MEDALBOX_RESULT_RETURN:
-            return 0;
+            return FIELD_APP_RESULT_RETURN;
         case MEDALBOX_RESULT_EXIT:
-            return 1;
+            return FIELD_APP_RESULT_EXIT;
         default:
-            return 1;
+            return FIELD_APP_RESULT_EXIT;
         }
     }
     if (work->input->appId == FIELD_APP_BAG) {
@@ -1041,10 +1062,10 @@ u32 FieldAppCall_GetMedalBoxResult(FieldAppCallWork *work, void *data) {
             work->nextAppId = FIELD_APP_BAG;
             return FIELD_APP_RESULT_NEXT;
         case MEDALBOX_RESULT_EXIT:
-            return 1;
+            return FIELD_APP_RESULT_EXIT;
         default:
-            return 1;
+            return FIELD_APP_RESULT_EXIT;
         }
     }
-    return 0;
+    return FIELD_APP_RESULT_RETURN;
 }

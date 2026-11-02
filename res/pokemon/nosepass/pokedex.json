@@ -1,0 +1,12 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "N",
+    "shapes": [ 10 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_CHARGESTONE_CAVE": [ "grass" ],
+            "ZONE_CLAY_TUNNEL": [ "grass" ]
+        }
+    }
+}

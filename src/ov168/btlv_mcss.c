@@ -72,10 +72,10 @@ struct BtlvMcss {
     u32 rotating : 1;                         //        BtlvMcss_StartRotation's task runs
     u32 shadows : 1;                          //
     u32 moveTasks;                            // 0x514  the position, a circle or a shake
-    u32 unk518Tasks;                          // 0x518  MCSS_SetScaleOffset's vector
-    u32 unk51cTasks;                          // 0x51c  MCSS_SetRotation's vector
+    u32 scaleOffsetTasks;                     // 0x518  MCSS_SetScaleOffset's vector
+    u32 rotationTasks;                        // 0x51c  MCSS_SetRotation's vector
     u32 scaleTasks;                           // 0x520
-    u32 unk524Tasks;                          // 0x524  MCSS_SetShadowScaleOffset's vector
+    u32 shadowScaleTasks;                     // 0x524  MCSS_SetShadowScaleOffset's vector
     u32 blinkTasks;                           // 0x528
     u32 alphaTasks;                           // 0x52c
     u32 levelTasks;                           // 0x530  MCSS_SetMosaic's level
@@ -84,10 +84,10 @@ struct BtlvMcss {
     fx32 scaleFar;                            // 0x53c  the odd positions'
     HeapID heapId;                            // 0x540
     u8 moveSeq[BTLV_MCSS_POS_MAX];            // 0x542
-    u8 unk518Seq[BTLV_MCSS_POS_MAX];          // 0x550
+    u8 scaleOffsetSeq[BTLV_MCSS_POS_MAX];     // 0x550
     u8 scaleSeq[BTLV_MCSS_POS_MAX];           // 0x55e
-    u8 unk524Seq[BTLV_MCSS_POS_MAX];          // 0x56c
-    u8 unk51cSeq[BTLV_MCSS_POS_MAX];          // 0x57a
+    u8 shadowScaleSeq[BTLV_MCSS_POS_MAX];     // 0x56c
+    u8 rotationSeq[BTLV_MCSS_POS_MAX];        // 0x57a
     u8 blinkSeq[BTLV_MCSS_POS_MAX];           // 0x588
     u8 alphaSeq[BTLV_MCSS_POS_MAX];           // 0x596
     u8 levelSeq[BTLV_MCSS_POS_MAX];           // 0x5a4
@@ -128,7 +128,7 @@ typedef struct {
     u16 shadow : 1; // whether it has one
     s16 x;
     s16 z;
-    u16 unk6;
+    u16 rotZ; // MCSS_SetShadowRotZ's
 } BtlvMcssShadow;
 
 static void BtlvMcss_SetAnimStop(BtlvMcss *work, int pos, int mode);
@@ -142,14 +142,14 @@ static void BtlvMcss_StartMoveTask(BtlvMcss *work, int pos, int type, VecFx32 *s
                                    s32 wait, s32 count, TCBFunc func, void (*endFunc)(TCB *tcb), BOOL mirror, u8 seq);
 static void BtlvMcss_MoveTask_Position(TCB *tcb, void *data);
 static void BtlvMcss_MoveTaskEnd_Position(TCB *tcb);
-static void BtlvMcss_MoveTask_Vec518(TCB *tcb, void *data);
-static void BtlvMcss_MoveTaskEnd_Vec518(TCB *tcb);
+static void BtlvMcss_MoveTask_ScaleOffset(TCB *tcb, void *data);
+static void BtlvMcss_MoveTaskEnd_ScaleOffset(TCB *tcb);
 static void BtlvMcss_MoveTask_Scale(TCB *tcb, void *data);
 static void BtlvMcss_MoveTaskEnd_Scale(TCB *tcb);
-static void BtlvMcss_MoveTask_Vec524(TCB *tcb, void *data);
-static void BtlvMcss_MoveTaskEnd_Vec524(TCB *tcb);
-static void BtlvMcss_MoveTask_Vec51c(TCB *tcb, void *data);
-static void BtlvMcss_MoveTaskEnd_Vec51c(TCB *tcb);
+static void BtlvMcss_MoveTask_ShadowScaleOffset(TCB *tcb, void *data);
+static void BtlvMcss_MoveTaskEnd_ShadowScaleOffset(TCB *tcb);
+static void BtlvMcss_MoveTask_Rotation(TCB *tcb, void *data);
+static void BtlvMcss_MoveTaskEnd_Rotation(TCB *tcb);
 static void BtlvMcss_MoveTask_Blink(TCB *tcb, void *data);
 static void BtlvMcss_MoveTaskEnd_Blink(TCB *tcb);
 static void BtlvMcss_MoveTask_Alpha(TCB *tcb, void *data);
@@ -170,44 +170,44 @@ static void BtlvMcss_OnSetAnimationEnd(uptr index, fx32 frame);
 static void BtlvMcss_GetDefaultPosImpl(BtlvMcss *work, VecFx32 *out, int pos);
 static fx32 BtlvMcss_GetDefaultScaleImpl(BtlvMcss *work, int pos, BOOL flat);
 static int BtlvMcss_GetIndex(BtlvMcss *work, int pos);
-static BOOL BtlvMcss_GetShadowOffset(u32 species, int pos, VecFx32 *offset, u16 *unk6, BOOL *shadow);
+static BOOL BtlvMcss_GetShadowOffset(u32 species, int pos, VecFx32 *offset, u16 *rotZ, BOOL *shadow);
 
 // The cries' pan, the sprites' scale and their positions, by position: singles from 0, doubles, triples and rotation
 // from 2, and the trainers from 8, as BtlvMcss_PlayCry, BtlvMcss_GetDefaultScaleImpl and BtlvMcss_GetDefaultPosImpl
 // pick them. The declaration order lays them out as in the ROM
-static const s32 data_ov168_021f31ec[] = { 20, 107 };
-static const fx32 data_ov168_021f31f4[] = { 0x1030, 0x11bf };
-static const fx32 data_ov168_021f31fc[] = { 0x11b8, 0x118e, 0xe6a, 0x1320 };
-static const s32 data_ov168_021f320c[] = { 12, 115, 28, 99 };
-static const fx32 data_ov168_021f324c[] = { 0x1030, 0x1300, 0xf00, 0x1300, 0xd00, 0x1300 };
-static const s32 data_ov168_021f321c[] = { 12, 115, 28, 99, 20, 107 };
-static const VecFx32 data_ov168_021f32ac[] = {
+static const s32 CRY_PAN_SINGLE[] = { 20, 107 };
+static const fx32 DEFAULT_SCALE_SINGLE[] = { 0x1030, 0x11bf };
+static const fx32 DEFAULT_SCALE_DOUBLE[] = { 0x11b8, 0x118e, 0xe6a, 0x1320 };
+static const s32 CRY_PAN_DOUBLE[] = { 12, 115, 28, 99 };
+static const fx32 DEFAULT_SCALE_TRAINER[] = { 0x1030, 0x1300, 0xf00, 0x1300, 0xd00, 0x1300 };
+static const s32 CRY_PAN_ROTATION[] = { 12, 115, 28, 99, 20, 107 };
+static const VecFx32 DEFAULT_POS_DOUBLE[] = {
     { -0x1b00, 0x666, 0x6600 },
     { 0x26cd, 0x666, -0xa600 },
     { 0x2800, 0x666, 0x7a00 },
     { -0x2333, 0x666, -0xb900 },
 };
-static const fx32 data_ov168_021f3234[] = { 0x1040, 0x109c, 0xd80, 0x1440, 0xc00, 0x1610 };
-static const fx32 data_ov168_021f3264[] = { 0x11f0, 0x11f0, 0x1270, 0x110e, 0xec4, 0x13f0 };
-static const VecFx32 data_ov168_021f327c[] = {
+static const fx32 DEFAULT_SCALE_ROTATION[] = { 0x1040, 0x109c, 0xd80, 0x1440, 0xc00, 0x1610 };
+static const fx32 DEFAULT_SCALE_TRIPLE[] = { 0x11f0, 0x11f0, 0x1270, 0x110e, 0xec4, 0x13f0 };
+static const VecFx32 DEFAULT_POS_SINGLE[] = {
     { 0x800, 0x666, 0x7000 },
     { 0x4cd, 0x666, -0xa000 },
 };
-static const s32 data_ov168_021f3294[] = { 0, 127, 20, 107, 40, 87 };
-static const VecFx32 data_ov168_021f33cc[] = {
+static const s32 CRY_PAN_TRIPLE[] = { 0, 127, 20, 107, 40, 87 };
+static const VecFx32 DEFAULT_POS_ROTATION[] = {
     { 0, 0x666, 0x7000 },       { 0, 0x666, -0x8000 },     { -0x454c, 0x666, 0xe801 },
     { 0x454a, 0x666, -0xf801 }, { 0x454a, 0x666, 0xe801 }, { -0x454c, 0x666, -0xf801 },
 };
-static const VecFx32 data_ov168_021f333c[] = {
+static const VecFx32 DEFAULT_POS_TRAINER[] = {
     { 0x800, 0, 0x7000 },       { 0, 0x666, -0xc000 }, { 0, 0, 0x8800 },
     { 0x26cd, 0x666, -0xc000 }, { 0x3585, 0, 0x9000 }, { -0x2333, 0x666, -0xc000 },
 };
-static const VecFx32 data_ov168_021f3384[] = {
+static const VecFx32 DEFAULT_POS_TRIPLE[] = {
     { -0x4000, 0x666, 0x7000 }, { 0x4800, 0x666, -0xc000 }, { 0xc00, 0x666, 0x4c00 },
     { 0xbcd, 0x666, -0x9000 },  { 0x5300, 0x666, 0x6300 },  { -0x4633, 0x666, -0xc000 },
 };
 
-static const BtlvMcssShadow data_ov168_021f3414[] = {
+static const BtlvMcssShadow SPECIES_SHADOWS[] = {
     { SPECIES_RATTATA, 1, 1, 0x0, -0x1200, 0xee00 },       { SPECIES_PARASECT, 0, 1, -0x400, -0x400, 0xfc00 },
     { SPECIES_DIGLETT, 1, 0, -0x400, -0x400, 0xfc00 },     { SPECIES_DUGTRIO, 1, 0, -0x400, -0x400, 0xfc00 },
     { SPECIES_GROWLITHE, 1, 1, 0x0, -0x1200, 0xee00 },     { SPECIES_RHYHORN, 0, 1, -0x400, -0x600, 0xf400 },
@@ -235,7 +235,7 @@ static const BtlvMcssShadow data_ov168_021f3414[] = {
 };
 
 // The frames an idle animation waits for
-static u8 data_ov168_021f4184[] = { 0x30, 0x38, 0x40 };
+static u8 sIdleWaits[] = { 0x30, 0x38, 0x40 };
 
 BtlvMcss *BtlvMcss_Create(u32 battleStyle, TCBManager *tcbMgr, HeapID heapId) {
     BtlvMcss *work = GFL_HeapAllocate(heapId, sizeof(BtlvMcss), TRUE, "btlv_mcss.c", 0x186);
@@ -272,7 +272,7 @@ void BtlvMcss_Delete(BtlvMcss *work) {
 void BtlvMcss_Main(BtlvMcss *work) {
     BtlvMcssPos pos;
     int index;
-    u32 unk;
+    u32 hpColor;
     u32 status;
 
     for (pos = BTLV_MCSS_POS_FIRST; pos < BTLV_MCSS_POS_TRAINER; pos++) {
@@ -310,7 +310,7 @@ void BtlvMcss_Main(BtlvMcss *work) {
             if (BtlvMcss_GetFlags(work, pos) & BTLV_MCSS_FLAG_SUBSTITUTE) {
                 continue;
             }
-            if (!BtlvEffect_GetGaugeStatus(pos, &unk, &status)) {
+            if (!BtlvEffect_GetGaugeStatus(pos, &hpColor, &status)) {
                 continue;
             }
             if (work->entries[index].statusAnim == TRUE) {
@@ -327,14 +327,14 @@ void BtlvMcss_Main(BtlvMcss *work) {
                 }
             }
             switch (status) {
-            case 3:
+            case BTLV_GAUGE_STATUS_SLEEP:
                 BtlvMcss_ResetPaletteBlend(work, pos);
                 BtlvMcss_SetAnimStop(work, pos, 3);
                 BtlvMcss_SetAnimPause(work, pos, 3);
                 BtlvMcss_SetAnimSpeed(work, pos, 0x555);
                 work->entries[index].statusAnim = TRUE;
                 break;
-            case 1:
+            case BTLV_GAUGE_STATUS_PARALYSIS:
                 if (step == TRUE) {
                     BtlvMcss_SetPaletteBlend(work, pos, work->entries[index].statusEvy, GX_RGB(15, 15, 0));
                 }
@@ -342,7 +342,7 @@ void BtlvMcss_Main(BtlvMcss *work) {
                 BtlvMcss_SetAnimPause(work, pos, 3);
                 work->entries[index].statusAnim = TRUE;
                 break;
-            case 2:
+            case BTLV_GAUGE_STATUS_FREEZE:
                 if (step == TRUE) {
                     BtlvMcss_SetPaletteBlend(work, pos, 8, GX_RGB(15, 15, 31));
                 }
@@ -350,7 +350,7 @@ void BtlvMcss_Main(BtlvMcss *work) {
                 BtlvMcss_SetAnimPause(work, pos, 2);
                 work->entries[index].statusAnim = TRUE;
                 break;
-            case 5:
+            case BTLV_GAUGE_STATUS_BURN:
                 if (step == TRUE) {
                     BtlvMcss_SetPaletteBlend(work, pos, work->entries[index].statusEvy, GX_RGB(15, 0, 0));
                 }
@@ -358,7 +358,7 @@ void BtlvMcss_Main(BtlvMcss *work) {
                 BtlvMcss_SetAnimPause(work, pos, 3);
                 work->entries[index].statusAnim = TRUE;
                 break;
-            case 4:
+            case BTLV_GAUGE_STATUS_POISON:
             case 7:
                 if (step == TRUE) {
                     BtlvMcss_SetPaletteBlend(work, pos, work->entries[index].statusEvy, GX_RGB(15, 0, 15));
@@ -367,7 +367,7 @@ void BtlvMcss_Main(BtlvMcss *work) {
                 BtlvMcss_SetAnimPause(work, pos, 3);
                 work->entries[index].statusAnim = TRUE;
                 break;
-            case 8:
+            case BTLV_GAUGE_STATUS_NONE:
             default:
                 if (work->entries[index].statusAnim == TRUE) {
                     BtlvMcss_ResetPaletteBlend(work, pos);
@@ -380,8 +380,8 @@ void BtlvMcss_Main(BtlvMcss *work) {
                 }
                 break;
             }
-            if (status == 8) {
-                if (unk == 2 || unk == 3) {
+            if (status == BTLV_GAUGE_STATUS_NONE) {
+                if (hpColor == HP_GAUGE_COLOR_RED || hpColor == HP_GAUGE_COLOR_NONE) {
                     BtlvMcss_SetAnimSpeed(work, pos, 0x555);
                 } else {
                     BtlvMcss_SetAnimSpeed(work, pos, FX32_ONE);
@@ -398,7 +398,7 @@ void BtlvMcss_Draw(BtlvMcss *work) {
 void BtlvMcss_AddPokemon(BtlvMcss *work, PartyPkm *pkm, int pos) {
     int index;
     BOOL shadow;
-    u16 unk6;
+    u16 rotZ;
     VecFx32 pos3d;
     VecFx32 offset;
     u32 hp;
@@ -432,7 +432,7 @@ void BtlvMcss_AddPokemon(BtlvMcss *work, PartyPkm *pkm, int pos) {
     BtlvMcss_SetupPokemonLoadInfo(work, pkm, &work->entries[index].info, pos);
     BtlvMcss_GetDefaultPosImpl(work, &pos3d, pos);
     work->entries[index].mcss = MCSSSys_Add(work->mcssSys, pos3d.x, pos3d.y, pos3d.z, &work->entries[index].info);
-    BtlvMcss_SetUnkB270(work, pos, TRUE);
+    BtlvMcss_SetReverse(work, pos, TRUE);
     work->entries[index].mon.species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
     work->entries[index].mon.form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
     work->entries[index].mon.weight =
@@ -440,18 +440,18 @@ void BtlvMcss_AddPokemon(BtlvMcss *work, PartyPkm *pkm, int pos) {
     hp = PokeParty_GetParam(pkm, PKM_PARAM_HP, NULL);
     work->entries[index].mon.hpColor = HPGauge_GetColor(hp, PokeParty_GetParam(pkm, PKM_PARAM_MAX_HP, NULL));
     shadow = FALSE;
-    if (!BtlvMcss_GetShadowOffset(work->entries[index].mon.species, pos, &offset, &unk6, &shadow)) {
+    if (!BtlvMcss_GetShadowOffset(work->entries[index].mon.species, pos, &offset, &rotZ, &shadow)) {
         offset.x = -0x400;
         offset.y = 0;
         offset.z = -0x600;
-        unk6 = 0xf800;
+        rotZ = 0xf800;
         shadow = TRUE;
     }
     if (!shadow) {
         MCSS_SetShadowAlpha(work->entries[index].mcss, 0);
     } else {
         MCSS_SetShadowOffset(work->entries[index].mcss, &offset);
-        MCSS_SetShadowRotZ(work->entries[index].mcss, unk6);
+        MCSS_SetShadowRotZ(work->entries[index].mcss, rotZ);
     }
     work->entries[index].idleCount = 3;
     BtlvMcss_UpdateScale(work, pos);
@@ -665,26 +665,26 @@ void BtlvMcss_GetDefaultPosForStyle(BtlvMcss *work, VecFx32 *out, int pos, u32 b
     switch (pos) {
     case 0:
     case 1:
-        src = &data_ov168_021f327c[pos];
+        src = &DEFAULT_POS_SINGLE[pos];
         break;
     case 2:
     case 3:
     case 4:
     case 5:
         if (battleStyle == BTL_STYLE_ROTATION) {
-            src = &data_ov168_021f33cc[pos - 2];
+            src = &DEFAULT_POS_ROTATION[pos - 2];
         } else if (battleStyle == BTL_STYLE_TRIPLE) {
-            src = &data_ov168_021f3384[pos - 2];
+            src = &DEFAULT_POS_TRIPLE[pos - 2];
         } else {
-            src = &data_ov168_021f32ac[pos - 2];
+            src = &DEFAULT_POS_DOUBLE[pos - 2];
         }
         break;
     case 6:
     case 7:
         if (battleStyle == BTL_STYLE_ROTATION) {
-            src = &data_ov168_021f33cc[pos - 2];
+            src = &DEFAULT_POS_ROTATION[pos - 2];
         } else {
-            src = &data_ov168_021f3384[pos - 2];
+            src = &DEFAULT_POS_TRIPLE[pos - 2];
         }
         break;
     }
@@ -759,7 +759,7 @@ void BtlvMcss_MovePosition(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32
     work->moveTasks |= BtlvEffect_PosBit(pos);
 }
 
-void BtlvMcss_MoveVec518(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 frames, s32 wait, s32 count) {
+void BtlvMcss_MoveScaleOffset(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 frames, s32 wait, s32 count) {
     int index = BtlvMcss_GetIndex(work, pos);
     VecFx32 start;
 
@@ -767,10 +767,10 @@ void BtlvMcss_MoveVec518(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 f
         return;
     }
     MCSS_GetScaleOffset(work->entries[index].mcss, &start);
-    work->unk518Seq[pos]++;
-    BtlvMcss_StartMoveTask(work, pos, type, &start, dest, frames, wait, count, BtlvMcss_MoveTask_Vec518,
-                           BtlvMcss_MoveTaskEnd_Vec518, FALSE, work->unk518Seq[pos]);
-    work->unk518Tasks |= BtlvEffect_PosBit(pos);
+    work->scaleOffsetSeq[pos]++;
+    BtlvMcss_StartMoveTask(work, pos, type, &start, dest, frames, wait, count, BtlvMcss_MoveTask_ScaleOffset,
+                           BtlvMcss_MoveTaskEnd_ScaleOffset, FALSE, work->scaleOffsetSeq[pos]);
+    work->scaleOffsetTasks |= BtlvEffect_PosBit(pos);
 }
 
 void BtlvMcss_MoveScale(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 frames, s32 wait, s32 count) {
@@ -787,7 +787,7 @@ void BtlvMcss_MoveScale(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 fr
     work->scaleTasks |= BtlvEffect_PosBit(pos);
 }
 
-void BtlvMcss_MoveVec524(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 frames, s32 wait, s32 count) {
+void BtlvMcss_MoveShadowScaleOffset(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 frames, s32 wait, s32 count) {
     int index = BtlvMcss_GetIndex(work, pos);
     VecFx32 start;
 
@@ -800,13 +800,13 @@ void BtlvMcss_MoveVec524(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 f
 #else
     MCSS_GetScaleOffset(work->entries[index].mcss, &start);
 #endif
-    work->unk524Seq[pos]++;
-    BtlvMcss_StartMoveTask(work, pos, type, &start, dest, frames, wait, count, BtlvMcss_MoveTask_Vec524,
-                           BtlvMcss_MoveTaskEnd_Vec524, FALSE, work->unk524Seq[pos]);
-    work->unk524Tasks |= BtlvEffect_PosBit(pos);
+    work->shadowScaleSeq[pos]++;
+    BtlvMcss_StartMoveTask(work, pos, type, &start, dest, frames, wait, count, BtlvMcss_MoveTask_ShadowScaleOffset,
+                           BtlvMcss_MoveTaskEnd_ShadowScaleOffset, FALSE, work->shadowScaleSeq[pos]);
+    work->shadowScaleTasks |= BtlvEffect_PosBit(pos);
 }
 
-void BtlvMcss_MoveVec51c(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 frames, s32 wait, s32 count) {
+void BtlvMcss_MoveRotation(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 frames, s32 wait, s32 count) {
     int index = BtlvMcss_GetIndex(work, pos);
     VecFx32 start;
 
@@ -814,10 +814,10 @@ void BtlvMcss_MoveVec51c(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 f
         return;
     }
     MCSS_GetRotation(work->entries[index].mcss, &start);
-    work->unk51cSeq[pos]++;
-    BtlvMcss_StartMoveTask(work, pos, type, &start, dest, frames, wait, count, BtlvMcss_MoveTask_Vec51c,
-                           BtlvMcss_MoveTaskEnd_Vec51c, TRUE, work->unk51cSeq[pos]);
-    work->unk51cTasks |= BtlvEffect_PosBit(pos);
+    work->rotationSeq[pos]++;
+    BtlvMcss_StartMoveTask(work, pos, type, &start, dest, frames, wait, count, BtlvMcss_MoveTask_Rotation,
+                           BtlvMcss_MoveTaskEnd_Rotation, TRUE, work->rotationSeq[pos]);
+    work->rotationTasks |= BtlvEffect_PosBit(pos);
 }
 
 void BtlvMcss_SwapPositions(BtlvMcss *work, int pos1, int pos2) {
@@ -970,9 +970,9 @@ BOOL BtlvMcss_IsBusy(BtlvMcss *work, int pos) {
     if (BtlvMcss_Exists(work, pos)) {
         fading = MCSS_IsFading(work->entries[BtlvMcss_GetIndex(work, pos)].mcss);
     }
-    if ((BtlvEffect_PosBit(pos) & work->moveTasks) || (BtlvEffect_PosBit(pos) & work->unk518Tasks) ||
-        (BtlvEffect_PosBit(pos) & work->unk524Tasks) || (BtlvEffect_PosBit(pos) & work->scaleTasks) ||
-        (BtlvEffect_PosBit(pos) & work->unk51cTasks) || (BtlvEffect_PosBit(pos) & work->blinkTasks) ||
+    if ((BtlvEffect_PosBit(pos) & work->moveTasks) || (BtlvEffect_PosBit(pos) & work->scaleOffsetTasks) ||
+        (BtlvEffect_PosBit(pos) & work->shadowScaleTasks) || (BtlvEffect_PosBit(pos) & work->scaleTasks) ||
+        (BtlvEffect_PosBit(pos) & work->rotationTasks) || (BtlvEffect_PosBit(pos) & work->blinkTasks) ||
         (BtlvEffect_PosBit(pos) & work->alphaTasks) || (BtlvEffect_PosBit(pos) & work->levelTasks) || work->rotating ||
         fading) {
         return TRUE;
@@ -1095,7 +1095,7 @@ BOOL BtlvMcss_IsNoBounce(BtlvMcss *work, int pos) {
     return FALSE;
 }
 
-u8 BtlvMcss_GetUnk(BtlvMcss *work, int pos) {
+u8 BtlvMcss_GetStopCellFlags(BtlvMcss *work, int pos) {
     int index = BtlvMcss_GetIndex(work, pos);
 
     if (index == -1) {
@@ -1188,13 +1188,13 @@ void BtlvMcss_ReloadSprite(BtlvMcss *work, int pos, const MCSSLoadInfo *info) {
     MCSS_Reload(work->mcssSys, work->entries[index].mcss, dst);
 }
 
-u32 BtlvMcss_PlayCry(BtlvMcss *work, int pos, int speed, int volume, int arg4, int arg5, int arg6) {
+u32 BtlvMcss_PlayCry(BtlvMcss *work, int pos, int speed, int volume, int chorusVolume, int chorusSpeed, int reverse) {
     int index = BtlvMcss_GetIndex(work, pos);
     s32 pan;
     BtlMainModule *mainModule;
     PokeVoiceChatterInfo chatter;
     PokeVoiceChatterInfo *chatterInfo;
-    BOOL flag;
+    BOOL chorus;
     u32 handle;
 
     if (index == -1) {
@@ -1206,32 +1206,32 @@ u32 BtlvMcss_PlayCry(BtlvMcss *work, int pos, int speed, int volume, int arg4, i
     switch (pos) {
     case 0:
     case 1:
-        pan = data_ov168_021f31ec[pos];
+        pan = CRY_PAN_SINGLE[pos];
         break;
     case 2:
     case 3:
     case 4:
     case 5:
         if (work->rotation) {
-            pan = data_ov168_021f321c[pos - 2];
+            pan = CRY_PAN_ROTATION[pos - 2];
         } else if (work->triple) {
-            pan = data_ov168_021f3294[pos - 2];
+            pan = CRY_PAN_TRIPLE[pos - 2];
         } else {
-            pan = data_ov168_021f320c[pos - 2];
+            pan = CRY_PAN_DOUBLE[pos - 2];
         }
         break;
     case 6:
     case 7:
         if (work->rotation) {
-            pan = data_ov168_021f321c[pos - 2];
+            pan = CRY_PAN_ROTATION[pos - 2];
         } else {
-            pan = data_ov168_021f3294[pos - 2];
+            pan = CRY_PAN_TRIPLE[pos - 2];
         }
         break;
     }
     mainModule = BtlvEffect_GetMainModule();
     chatterInfo = &chatter;
-    flag = FALSE;
+    chorus = FALSE;
     if (mainModule != NULL) {
         if (!GetViewPosChatter(mainModule, pos, &chatterInfo->chatter)) {
             chatterInfo = NULL;
@@ -1239,15 +1239,15 @@ u32 BtlvMcss_PlayCry(BtlvMcss *work, int pos, int speed, int volume, int arg4, i
     } else {
         chatterInfo = NULL;
     }
-    if (arg4 != 0 || arg5 != 0) {
-        flag = TRUE;
+    if (chorusVolume != 0 || chorusSpeed != 0) {
+        chorus = TRUE;
     }
     // By the HP: lower in the yellow
     if (speed == (s32)0x80000000) {
         speed = work->entries[index].mon.hpColor == HP_GAUGE_COLOR_YELLOW ? -0xa00 : 0;
     }
-    handle = PokeVoice_Play(work->entries[index].mon.species, work->entries[index].mon.form, (u8)pan, flag, arg4, arg5,
-                            arg6, chatterInfo);
+    handle = PokeVoice_Play(work->entries[index].mon.species, work->entries[index].mon.form, (u8)pan, chorus,
+                            chorusVolume, chorusSpeed, reverse, chatterInfo);
     PokeVoice_AdjustVolume(handle, volume);
     PokeVoice_AdjustSpeed(handle, speed);
     return handle;
@@ -1351,7 +1351,7 @@ void BtlvMcss_ResetPosition(BtlvMcss *work, int pos) {
     }
 }
 
-void BtlvMcss_SetUnkB270(BtlvMcss *work, int pos, BOOL check) {
+void BtlvMcss_SetReverse(BtlvMcss *work, int pos, BOOL byPos) {
     BOOL flag = FALSE;
     int index = BtlvMcss_GetIndex(work, pos);
 
@@ -1361,11 +1361,11 @@ void BtlvMcss_SetUnkB270(BtlvMcss *work, int pos, BOOL check) {
     if (work->entries[index].mcss == NULL) {
         return;
     }
-    if (check == TRUE) {
+    if (byPos == TRUE) {
         switch (BtlvEffect_GetBattleStyle()) {
-        case 0:
+        case BTL_STYLE_SINGLE:
             break;
-        case 1:
+        case BTL_STYLE_DOUBLE:
             switch (pos) {
             case 3:
             case 4:
@@ -1373,7 +1373,7 @@ void BtlvMcss_SetUnkB270(BtlvMcss *work, int pos, BOOL check) {
                 break;
             }
             break;
-        case 2:
+        case BTL_STYLE_TRIPLE:
             switch (pos) {
             case 2:
             case 5:
@@ -1382,7 +1382,7 @@ void BtlvMcss_SetUnkB270(BtlvMcss *work, int pos, BOOL check) {
                 break;
             }
             break;
-        case 3:
+        case BTL_STYLE_ROTATION:
             break;
         }
     }
@@ -1486,13 +1486,13 @@ static void BtlvMcss_StartMoveTask(BtlvMcss *work, int pos, int type, VecFx32 *s
     task->value.z = start->z;
     task->seq = seq;
     switch (type) {
-    case 1:
-    case 4:
+    case BTLV_EFFTOOL_MOVE_STEP:
+    case BTLV_EFFTOOL_MOVE_SCROLL:
         BtlvEffTool_CalcStepVec(&task->move.start, end, &task->move.step, FX32_CONST(frames));
         break;
-    case 3:
+    case BTLV_EFFTOOL_MOVE_SHAKE:
         task->move.count *= 2;
-    case 2:
+    case BTLV_EFFTOOL_MOVE_SWING:
         task->move.step.x = FX_Div(end->x, FX32_CONST(frames));
         task->move.step.y = FX_Div(end->y, FX32_CONST(frames));
         task->move.step.z = FX_Div(end->z, FX32_CONST(frames));
@@ -1541,7 +1541,7 @@ static void BtlvMcss_MoveTaskEnd_Position(TCB *tcb) {
     }
 }
 
-static void BtlvMcss_MoveTask_Vec518(TCB *tcb, void *data) {
+static void BtlvMcss_MoveTask_ScaleOffset(TCB *tcb, void *data) {
     BtlvMcssMove *task = data;
     BtlvMcss *work = task->work;
     int index = BtlvMcss_GetIndex(work, task->pos);
@@ -1556,7 +1556,7 @@ static void BtlvMcss_MoveTask_Vec518(TCB *tcb, void *data) {
         BtlvEffect_EndTask(tcb);
         return;
     }
-    if (task->seq != work->unk518Seq[task->pos]) {
+    if (task->seq != work->scaleOffsetSeq[task->pos]) {
         BtlvEffect_EndTask(tcb);
         return;
     }
@@ -1568,11 +1568,11 @@ static void BtlvMcss_MoveTask_Vec518(TCB *tcb, void *data) {
     }
 }
 
-static void BtlvMcss_MoveTaskEnd_Vec518(TCB *tcb) {
+static void BtlvMcss_MoveTaskEnd_ScaleOffset(TCB *tcb) {
     BtlvMcssMove *task = GFL_TCBGetData(tcb);
 
-    if (task->seq == task->work->unk518Seq[task->pos]) {
-        task->work->unk518Tasks &= BtlvEffect_PosBit(task->pos) ^ 0xffffffff;
+    if (task->seq == task->work->scaleOffsetSeq[task->pos]) {
+        task->work->scaleOffsetTasks &= BtlvEffect_PosBit(task->pos) ^ 0xffffffff;
     }
 }
 
@@ -1611,7 +1611,7 @@ static void BtlvMcss_MoveTaskEnd_Scale(TCB *tcb) {
     }
 }
 
-static void BtlvMcss_MoveTask_Vec524(TCB *tcb, void *data) {
+static void BtlvMcss_MoveTask_ShadowScaleOffset(TCB *tcb, void *data) {
     BtlvMcssMove *task = data;
     BtlvMcss *work = task->work;
     int index = BtlvMcss_GetIndex(work, task->pos);
@@ -1626,7 +1626,7 @@ static void BtlvMcss_MoveTask_Vec524(TCB *tcb, void *data) {
         BtlvEffect_EndTask(tcb);
         return;
     }
-    if (task->seq != work->unk524Seq[task->pos]) {
+    if (task->seq != work->shadowScaleSeq[task->pos]) {
         BtlvEffect_EndTask(tcb);
         return;
     }
@@ -1638,15 +1638,15 @@ static void BtlvMcss_MoveTask_Vec524(TCB *tcb, void *data) {
     }
 }
 
-static void BtlvMcss_MoveTaskEnd_Vec524(TCB *tcb) {
+static void BtlvMcss_MoveTaskEnd_ShadowScaleOffset(TCB *tcb) {
     BtlvMcssMove *task = GFL_TCBGetData(tcb);
 
-    if (task->seq == task->work->unk524Seq[task->pos]) {
-        task->work->unk524Tasks &= BtlvEffect_PosBit(task->pos) ^ 0xffffffff;
+    if (task->seq == task->work->shadowScaleSeq[task->pos]) {
+        task->work->shadowScaleTasks &= BtlvEffect_PosBit(task->pos) ^ 0xffffffff;
     }
 }
 
-static void BtlvMcss_MoveTask_Vec51c(TCB *tcb, void *data) {
+static void BtlvMcss_MoveTask_Rotation(TCB *tcb, void *data) {
     BtlvMcssMove *task = data;
     BtlvMcss *work = task->work;
     int index = BtlvMcss_GetIndex(work, task->pos);
@@ -1661,7 +1661,7 @@ static void BtlvMcss_MoveTask_Vec51c(TCB *tcb, void *data) {
         BtlvEffect_EndTask(tcb);
         return;
     }
-    if (task->seq != work->unk51cSeq[task->pos]) {
+    if (task->seq != work->rotationSeq[task->pos]) {
         BtlvEffect_EndTask(tcb);
         return;
     }
@@ -1673,11 +1673,11 @@ static void BtlvMcss_MoveTask_Vec51c(TCB *tcb, void *data) {
     }
 }
 
-static void BtlvMcss_MoveTaskEnd_Vec51c(TCB *tcb) {
+static void BtlvMcss_MoveTaskEnd_Rotation(TCB *tcb) {
     BtlvMcssMove *task = GFL_TCBGetData(tcb);
 
-    if (task->seq == task->work->unk51cSeq[task->pos]) {
-        task->work->unk51cTasks &= BtlvEffect_PosBit(task->pos) ^ 0xffffffff;
+    if (task->seq == task->work->rotationSeq[task->pos]) {
+        task->work->rotationTasks &= BtlvEffect_PosBit(task->pos) ^ 0xffffffff;
     }
 }
 
@@ -1938,10 +1938,10 @@ static void BtlvMcss_IdleTask(TCB *tcb, void *data) {
         MCSS_GetMultiCellAnimation(work->entries[index].mcss)->animCtrl.bActive = FALSE;
         MCSS_TraverseNodes(work->entries[index].mcss, index | 0x80000000, BtlvMcss_IdleNodeCallback);
         idle->seq++;
-        idle->wait = data_ov168_021f4184[GFL_RandomMTRange(3)];
+        idle->wait = sIdleWaits[GFL_RandomMTRange(3)];
         break;
     case 1:
-        if (--idle->wait == 0 || work->unk51cTasks != 0 || !BtlvEffvm_GetScriptKind(BtlvEffect_GetEffvm())) {
+        if (--idle->wait == 0 || work->rotationTasks != 0 || !BtlvEffvm_GetScriptKind(BtlvEffect_GetEffvm())) {
             MCSS_SetAnimation(work->entries[index].mcss, 0);
             MCSS_GetMultiCellAnimation(work->entries[index].mcss)->animCtrl.bActive = TRUE;
             MCSS_TraverseNodes(work->entries[index].mcss, index, BtlvMcss_IdleNodeCallback);
@@ -2135,26 +2135,26 @@ static void BtlvMcss_GetDefaultPosImpl(BtlvMcss *work, VecFx32 *out, int pos) {
     switch (pos) {
     case 0:
     case 1:
-        src = &data_ov168_021f327c[pos];
+        src = &DEFAULT_POS_SINGLE[pos];
         break;
     case 2:
     case 3:
     case 4:
     case 5:
         if (work->rotation) {
-            src = &data_ov168_021f33cc[pos - 2];
+            src = &DEFAULT_POS_ROTATION[pos - 2];
         } else if (work->triple) {
-            src = &data_ov168_021f3384[pos - 2];
+            src = &DEFAULT_POS_TRIPLE[pos - 2];
         } else {
-            src = &data_ov168_021f32ac[pos - 2];
+            src = &DEFAULT_POS_DOUBLE[pos - 2];
         }
         break;
     case 6:
     case 7:
         if (work->rotation) {
-            src = &data_ov168_021f33cc[pos - 2];
+            src = &DEFAULT_POS_ROTATION[pos - 2];
         } else {
-            src = &data_ov168_021f3384[pos - 2];
+            src = &DEFAULT_POS_TRIPLE[pos - 2];
         }
         break;
     case 8:
@@ -2163,7 +2163,7 @@ static void BtlvMcss_GetDefaultPosImpl(BtlvMcss *work, VecFx32 *out, int pos) {
     case 11:
     case 12:
     case 13:
-        src = &data_ov168_021f333c[pos - 8];
+        src = &DEFAULT_POS_TRAINER[pos - 8];
         break;
     }
     out->x = src->x;
@@ -2176,31 +2176,31 @@ static fx32 BtlvMcss_GetDefaultScaleImpl(BtlvMcss *work, int pos, BOOL flat) {
         switch (pos) {
         case 0:
         case 1:
-            return data_ov168_021f31f4[pos];
+            return DEFAULT_SCALE_SINGLE[pos];
         case 2:
         case 3:
         case 4:
         case 5:
             if (work->rotation) {
-                return data_ov168_021f3234[pos - 2];
+                return DEFAULT_SCALE_ROTATION[pos - 2];
             }
             if (work->triple) {
-                return data_ov168_021f3264[pos - 2];
+                return DEFAULT_SCALE_TRIPLE[pos - 2];
             }
-            return data_ov168_021f31fc[pos - 2];
+            return DEFAULT_SCALE_DOUBLE[pos - 2];
         case 6:
         case 7:
             if (work->rotation) {
-                return data_ov168_021f3234[pos - 2];
+                return DEFAULT_SCALE_ROTATION[pos - 2];
             }
-            return data_ov168_021f3264[pos - 2];
+            return DEFAULT_SCALE_TRIPLE[pos - 2];
         case 8:
         case 9:
         case 10:
         case 11:
         case 12:
         case 13:
-            return data_ov168_021f324c[pos - 8];
+            return DEFAULT_SCALE_TRAINER[pos - 8];
         }
     } else if (pos < 8) {
         if (pos & 1) {
@@ -2223,17 +2223,17 @@ static int BtlvMcss_GetIndex(BtlvMcss *work, int pos) {
     return -1;
 }
 
-static BOOL BtlvMcss_GetShadowOffset(u32 species, int pos, VecFx32 *offset, u16 *unk6, BOOL *shadow) {
+static BOOL BtlvMcss_GetShadowOffset(u32 species, int pos, VecFx32 *offset, u16 *rotZ, BOOL *shadow) {
     BOOL found = FALSE;
     u32 i;
 
-    for (i = 0; i < NELEMS(data_ov168_021f3414); i++) {
-        if (species == data_ov168_021f3414[i].species && (pos & 1) == data_ov168_021f3414[i].enemy) {
-            offset->x = data_ov168_021f3414[i].x;
+    for (i = 0; i < NELEMS(SPECIES_SHADOWS); i++) {
+        if (species == SPECIES_SHADOWS[i].species && (pos & 1) == SPECIES_SHADOWS[i].enemy) {
+            offset->x = SPECIES_SHADOWS[i].x;
             offset->y = 0;
-            offset->z = data_ov168_021f3414[i].z;
-            *unk6 = data_ov168_021f3414[i].unk6;
-            *shadow = data_ov168_021f3414[i].shadow;
+            offset->z = SPECIES_SHADOWS[i].z;
+            *rotZ = SPECIES_SHADOWS[i].rotZ;
+            *shadow = SPECIES_SHADOWS[i].shadow;
             found = TRUE;
             break;
         }

@@ -24,9 +24,14 @@ struct ShortcutMenuWork {
 
 BOOL IsExistAnyYShortcut(GameSystem *gsys);
 BOOL CheckAnyRibbon(ShortcutMenuWork *work);
+// What a shortcut opens, which ShortcutMenu_SetKeyItemID sets in the app call's input: an app, or a common event
+enum {
+    SHORTCUT_CALL_APP,
+    SHORTCUT_CALL_COMMON_EVENT,
+};
 u32 ShortcutMenu_SetKeyItemID(FieldAppCallInput *input, u32 item);
 BOOL ShortcutMenu_GetActionFromKeyItem(s32 item, u32 *action, u32 *invalid);
-void ShortcutMenu_Open(u32 arg0, ShortcutMenuWork *work);
+void ShortcutMenu_Open(u32 mode, ShortcutMenuWork *work);
 BOOL ShortcutMenu_Close(ShortcutMenuWork *work);
 BOOL ShortcutMenu_CanRetry(FieldAppCallInput *input, void *arg);
 BOOL ShortcutMenu_CanLeaveField(FieldAppCallInput *input, void *arg);
@@ -47,6 +52,12 @@ void ShortcutMenu_Main(ShortcutMenuApp *app);
 void ShortcutMenu_Start(ShortcutMenuApp *app);
 void ShortcutMenu_RequestClose(ShortcutMenuApp *app);
 BOOL ShortcutMenu_IsWaitingInput(ShortcutMenuApp *app);
+// The menu's result: nothing yet, a shortcut chosen (its item given back) or the menu cancelled
+enum {
+    SHORTCUT_MENU_RESULT_NONE,
+    SHORTCUT_MENU_RESULT_SELECTED,
+    SHORTCUT_MENU_RESULT_CANCELLED,
+};
 u32 ShortcutMenu_GetResult(ShortcutMenuApp *app, u32 *item);
 // Puts the field back through a subprocess of overlay 0x118, then finishes
 GameEvent *ReturnToField_CreateNameInputEvent(GameSystem *gsys, Field *field, NameEntryParam *param, BOOL transition);

@@ -9,6 +9,7 @@
 #include "app/comm_tvt/ctvt_talk.h"
 #include "app/comm_tvt/draw_system.h"
 #include "app/comm_tvt/ima_adpcm.h"
+#include "constants/version.h"
 #include "gfl/heap.h"
 #include "gfl/net.h"
 #include "gfl/net_command.h"
@@ -134,15 +135,19 @@ struct CtvtComm {
     BOOL sendGameCommand;
     BOOL sendGamePacket;
     BOOL sendGameData;
-    u8 unk3dc[4];
+    // The character of each member in the minigames, which the host shuffles and sends with
+    // CTVT_PACKET_GAME_STARTING
+    u8 gameCharacters[4];
     BOOL talkRequestsChanged;
     BOOL sendInfo;
     BOOL sendZoom;
     BOOL zoom;
-    BOOL unk3f0;
-    BOOL sendUnk3f0;
-    BOOL unk3f8;
-    BOOL sendUnk3f8;
+    // Whether the strokes and the voice may be sent, which the others allow with CTVT_PACKET_ALLOW_DRAW and
+    // CTVT_PACKET_ALLOW_VOICE. Both start TRUE, nothing clears them and nothing asks for the packets to be sent
+    BOOL canSendDraw;
+    BOOL sendAllowDraw;
+    BOOL canSendVoice;
+    BOOL sendAllowVoice;
     u16 inviteTimer;
     BOOL sendTalker;
     u8 nextTalker;
@@ -261,10 +266,10 @@ CtvtComm *CtvtComm_Create(CommTvtWork *sys, HeapID heapId) {
     comm->sendZoom = FALSE;
     comm->zoom = FALSE;
     comm->sendTalker = FALSE;
-    comm->unk3f0 = TRUE;
-    comm->sendUnk3f0 = FALSE;
-    comm->unk3f8 = TRUE;
-    comm->sendUnk3f8 = FALSE;
+    comm->canSendDraw = TRUE;
+    comm->sendAllowDraw = FALSE;
+    comm->canSendVoice = TRUE;
+    comm->sendAllowVoice = FALSE;
     comm->nextTalker = CTVT_COMM_NONE;
     comm->sendGameCommand = FALSE;
     comm->sendGamePacket = FALSE;
@@ -598,9 +603,9 @@ static void CtvtComm_UpdateTalk(CommTvtWork *sys, CtvtComm *comm) {
                 comm->photoSending = FALSE;
             }
         } else if (comm->photoTargetMask == (comm->photoTargetMask & comm->photoReadyMask) &&
-                   comm->photoTargetMask != 0 && func_ov257_021aab5c(sys) == FALSE) {
-            func_ov257_021aab60(sys, TRUE);
-            if (func_ov257_021aab10(sys) == FALSE) {
+                   comm->photoTargetMask != 0 && CommTvt_IsPictureLocked(sys) == FALSE) {
+            CommTvt_SetPictureLocked(sys, TRUE);
+            if (CommTvt_IsEnding(sys) == FALSE) {
                 CtvtCamera *camera = CommTvt_GetCamera(sys);
                 void *picture = CtvtCamera_GetOwnPicture(sys, camera);
                 u32 size = CtvtCamera_GetPictureSize(sys, camera);
@@ -618,17 +623,17 @@ static void CtvtComm_UpdateTalk(CommTvtWork *sys, CtvtComm *comm) {
                     comm->photoSending = TRUE;
                 }
             }
-            func_ov257_021aab60(sys, FALSE);
+            CommTvt_SetPictureLocked(sys, FALSE);
         }
 
-        if (comm->drawWriteIndex != comm->drawReadIndex && comm->unk3f0 == TRUE) {
+        if (comm->drawWriteIndex != comm->drawReadIndex && comm->canSendDraw == TRUE) {
             CtvtComm_SendDraw(sys, comm);
         }
-        if (comm->sendUnk3f0 == TRUE && CtvtComm_SendPacket(sys, comm, CTVT_PACKET_UNK4, 0) == TRUE) {
-            comm->sendUnk3f0 = FALSE;
+        if (comm->sendAllowDraw == TRUE && CtvtComm_SendPacket(sys, comm, CTVT_PACKET_ALLOW_DRAW, 0) == TRUE) {
+            comm->sendAllowDraw = FALSE;
         }
-        if (comm->sendUnk3f8 == TRUE && CtvtComm_SendPacket(sys, comm, CTVT_PACKET_UNK5, 0) == TRUE) {
-            comm->sendUnk3f8 = FALSE;
+        if (comm->sendAllowVoice == TRUE && CtvtComm_SendPacket(sys, comm, CTVT_PACKET_ALLOW_VOICE, 0) == TRUE) {
+            comm->sendAllowVoice = FALSE;
         }
         if (comm->sendInfo == TRUE && CtvtComm_SendInfo(sys, comm) == TRUE) {
             comm->sendInfo = FALSE;
@@ -807,7 +812,7 @@ static void CtvtComm_UpdateMember(CommTvtWork *sys, CtvtComm *comm, CtvtCommMemb
 
 // The caller passes the member's net ID too, which this does not use
 static BOOL CtvtComm_IsMemberTalking(CommTvtWork *sys, CtvtComm *comm, CtvtCommMember *member, u8 netId) {
-    u8 status;
+    u8 version;
 
     CommTvt_GetCamera(sys);
     if (member->active == FALSE) {
@@ -819,8 +824,8 @@ static BOOL CtvtComm_IsMemberTalking(CommTvtWork *sys, CtvtComm *comm, CtvtCommM
     if (member->isSelf == TRUE) {
         return FALSE;
     }
-    status = PlayerInfo_GetVersion((PlayerInfo *)member->info.playerInfo);
-    if (status == 0x16 || status == 0x17) {
+    version = PlayerInfo_GetVersion((PlayerInfo *)member->info.playerInfo);
+    if (version == VERSION_WHITE2 || version == VERSION_BLACK2) {
         return FALSE;
     }
     return TRUE;
@@ -890,7 +895,7 @@ static void CtvtComm_RecvPacket(int netId, int size, const void *data, void *wor
     }
     case CTVT_PACKET_DRAW_INDEX:
         DrawSystem_SetWriteIndex(CommTvt_GetDrawSystem(comm->sys), packet->value);
-        func_ov257_021aab30(comm->sys, FALSE);
+        CommTvt_SetInputLocked(comm->sys, FALSE);
         break;
     case CTVT_PACKET_ZOOM: {
         CtvtCamera *camera = CommTvt_GetCamera(comm->sys);
@@ -902,14 +907,14 @@ static void CtvtComm_RecvPacket(int netId, int size, const void *data, void *wor
         }
         break;
     }
-    case CTVT_PACKET_UNK4:
+    case CTVT_PACKET_ALLOW_DRAW:
         if (netId != selfNetId) {
-            comm->unk3f0 = TRUE;
+            comm->canSendDraw = TRUE;
         }
         break;
-    case CTVT_PACKET_UNK5:
+    case CTVT_PACKET_ALLOW_VOICE:
         if (netId != selfNetId) {
-            comm->unk3f8 = TRUE;
+            comm->canSendVoice = TRUE;
         }
         break;
     case CTVT_PACKET_REQUEST_TALK:
@@ -942,7 +947,7 @@ static void CtvtComm_RecvPacket(int netId, int size, const void *data, void *wor
         }
         CommTvt_HideSlotMarker(comm->sys);
         break;
-    case CTVT_PACKET_UNK_B:
+    case CTVT_PACKET_GAME_INVITE:
         if (selfNetId != 0) {
             CtvtTalk *talk = CommTvt_GetTalk(comm->sys);
 
@@ -950,41 +955,41 @@ static void CtvtComm_RecvPacket(int netId, int size, const void *data, void *wor
             CtvtTalk_SetGameInvited(talk, TRUE);
         }
         break;
-    case CTVT_PACKET_UNK_C:
+    case CTVT_PACKET_GAME_JOIN:
         if (selfNetId == 0) {
             CtvtTalk_SetJoined(CommTvt_GetTalk(comm->sys), netId);
         }
         break;
-    case CTVT_PACKET_UNK_D:
+    case CTVT_PACKET_GAME_CANCEL_REQUEST:
         if (selfNetId == 0) {
             CtvtTalk_SetGameCancelRequested(CommTvt_GetTalk(comm->sys), TRUE);
         }
         break;
-    case CTVT_PACKET_UNK_E:
+    case CTVT_PACKET_GAME_STARTING:
         if (selfNetId != 0) {
             CtvtTalk_SetGameStarting(CommTvt_GetTalk(comm->sys), TRUE);
         }
         if (netId == 0) {
-            MI_CpuCopy8(packet, comm->unk3dc, sizeof(comm->unk3dc));
+            MI_CpuCopy8(packet, comm->gameCharacters, sizeof(comm->gameCharacters));
         }
         break;
-    case CTVT_PACKET_UNK_F:
+    case CTVT_PACKET_GAME_CANCEL:
         if (selfNetId != 0) {
             CtvtTalk_SetGameCancelled(CommTvt_GetTalk(comm->sys), TRUE);
         }
         break;
-    case CTVT_PACKET_UNK_10:
+    case CTVT_PACKET_GAME_READY:
         if (selfNetId == 0) {
             CtvtTalk_SetReady(CommTvt_GetTalk(comm->sys), netId);
         }
         break;
-    case CTVT_PACKET_UNK_11:
+    case CTVT_PACKET_GAME_START:
         if (selfNetId != 0) {
             CtvtTalk_SetGameStart(CommTvt_GetTalk(comm->sys), TRUE);
         }
         break;
-    case CTVT_PACKET_UNK_A:
-        func_ov257_021aab38(comm->sys, TRUE);
+    case CTVT_PACKET_EXIT:
+        CommTvt_SetEndRequested(comm->sys, TRUE);
         break;
     }
 }
@@ -1141,32 +1146,32 @@ static void CtvtComm_RecvGameCommand(int netId, int size, const void *data, void
     u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
 
     switch (*command) {
-    case 0:
+    case CTVT_GAME_COMMAND_JOIN:
         if (selfNetId == 0) {
             CtvtGame_SetJoined(game, netId);
         }
         break;
-    case 1:
+    case CTVT_GAME_COMMAND_CHILD_QUIT:
         if (selfNetId == 0) {
             CtvtGame_SetChildQuit(game, TRUE);
         }
         break;
-    case 2:
+    case CTVT_GAME_COMMAND_ALL_JOINED:
         if (selfNetId != 0) {
             CtvtGame_SetAllJoined(game, TRUE);
         }
         break;
-    case 3:
+    case CTVT_GAME_COMMAND_HOST_QUIT:
         if (selfNetId != 0) {
             CtvtGame_SetHostQuit(game, TRUE);
         }
         break;
-    case 4:
+    case CTVT_GAME_COMMAND_READY:
         if (selfNetId == 0) {
             CtvtGame_SetReady(game, netId);
         }
         break;
-    case 5:
+    case CTVT_GAME_COMMAND_REPLAY:
         if (selfNetId != 0) {
             CtvtGame_SetReplayStarted(game, TRUE);
         }
@@ -1178,10 +1183,10 @@ void CtvtComm_QueueGamePacket(CtvtComm *comm, CtvtGamePacket packet, u8 type) {
     u8 i;
 
     comm->sendGamePacket = TRUE;
-    if (type == 7 && packet.frame == comm->gamePacket.frame) {
+    if (type == CTVT_GAME_PACKET_GROW_BALLOONS && packet.frame == comm->gamePacket.frame) {
         packet.mask |= comm->gamePacket.mask;
     }
-    if (type == 4 && packet.frame == comm->gamePacket.frame) {
+    if (type == CTVT_GAME_PACKET_HITS && packet.frame == comm->gamePacket.frame) {
         for (i = 0; i < 4; i++) {
             if (!(packet.mask & (1 << i))) {
                 packet.values[i] = comm->gamePacket.values[i];
@@ -1216,33 +1221,33 @@ static void CtvtComm_RecvGamePacket(int netId, int size, const void *data, void 
         CtvtGame_SetFrame(game, packet->frame);
     }
     switch (packet->type) {
-    case 0:
-        CtvtGame_SpawnTarget(game, packet->unk7);
+    case CTVT_GAME_PACKET_SPAWN_TARGET:
+        CtvtGame_SpawnTarget(game, packet->target);
         break;
-    case 1:
+    case CTVT_GAME_PACKET_SEED:
         if (netId == 0) {
             CtvtGame_SetSeed(game, packet->value);
         }
         break;
-    case 3:
+    case CTVT_GAME_PACKET_TOUCH:
         if (selfNetId == 0 && CtvtGame_IsPlaying(game) == TRUE) {
             CtvtGame_CheckTouch(comm, game, packet, netId);
         }
         break;
-    case 4:
+    case CTVT_GAME_PACKET_HITS:
         CtvtGame_ApplyHits(game, packet, packet->mask);
         break;
-    case 5:
+    case CTVT_GAME_PACKET_PUMP:
         if (selfNetId == 0) {
             CtvtGame_CountPump(comm, game, FALSE, netId);
         }
         break;
-    case 6:
+    case CTVT_GAME_PACKET_PUMP_BIG:
         if (selfNetId == 0) {
             CtvtGame_CountPump(comm, game, TRUE, netId);
         }
         break;
-    case 7:
+    case CTVT_GAME_PACKET_GROW_BALLOONS:
         if (netId == 0 && CtvtGame_IsPlaying(game) == TRUE) {
             CtvtGame_PumpBalloons(game, packet->mask);
         }
@@ -1285,10 +1290,10 @@ void CtvtComm_ResetSession(CommTvtWork *sys, CtvtComm *comm) {
     comm->sendZoom = FALSE;
     comm->zoom = FALSE;
     comm->sendTalker = FALSE;
-    comm->unk3f0 = TRUE;
-    comm->sendUnk3f0 = FALSE;
-    comm->unk3f8 = TRUE;
-    comm->sendUnk3f8 = FALSE;
+    comm->canSendDraw = TRUE;
+    comm->sendAllowDraw = FALSE;
+    comm->canSendVoice = TRUE;
+    comm->sendAllowVoice = FALSE;
     comm->nextTalker = CTVT_COMM_NONE;
     WH_SetScanFilter(CtvtComm_FilterInvited);
     CtvtComm_UpdateMembers(sys, comm);
@@ -1325,8 +1330,8 @@ u8 CtvtComm_GetTalker(CommTvtWork *sys, CtvtComm *comm) {
     return comm->talker;
 }
 
-u8 CtvtComm_GetUnk3dc(CommTvtWork *sys, CtvtComm *comm, u8 index) {
-    return comm->unk3dc[index];
+u8 CtvtComm_GetGameCharacter(CommTvtWork *sys, CtvtComm *comm, u8 index) {
+    return comm->gameCharacters[index];
 }
 
 BOOL CtvtComm_IsVoiceBusy(CommTvtWork *sys, CtvtComm *comm) {
@@ -1397,6 +1402,6 @@ BOOL CtvtComm_IsInviteTimerDone(CommTvtWork *sys, CtvtComm *comm) {
     return FALSE;
 }
 
-BOOL CtvtComm_GetUnk3f8(CommTvtWork *sys, CtvtComm *comm) {
-    return comm->unk3f8;
+BOOL CtvtComm_CanSendVoice(CommTvtWork *sys, CtvtComm *comm) {
+    return comm->canSendVoice;
 }

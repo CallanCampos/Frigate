@@ -187,7 +187,7 @@ static BOOL BrBvRank_ProcMain(GameProc *proc, u32 *state, void *param, void *wor
     BrBvRankWork *p_wk = work;
     int i;
 
-    if (BrNet_CheckError(p_wk->p_param->net) == 2) {
+    if (BrNet_CheckError(p_wk->p_param->net) == BR_NET_ERROR_FAILED) {
         BrProcSys_Abort(p_wk->p_param->procSys);
         return TRUE;
     }

@@ -18,6 +18,7 @@
 #include "battle/btlv_mcss.h"
 #include "battle/btlv_stage.h"
 #include "battle/btlv_timer.h"
+#include "constants/arc.h"
 #include "constants/battle.h"
 #include "constants/trainer_classes.h"
 #include "field/field_light_status.h"
@@ -50,8 +51,8 @@ struct BtlvEffectSetup {
     BOOL multi;                // 0x20
     BtlvScu *scu;              // 0x24
     BtlMainModule *mainModule; // 0x28
-    u16 unk2C;                 // 0x2c  GetStudioMode's value; 1 and 2 are special
-    u16 unk2E;                 // 0x2e  the scripted rules' unk24, read when unk2C != 0
+    u16 studioMode;            // 0x2c  BTL_STUDIO_MODE_*, GetStudioMode's value
+    u16 studioField;           // 0x2e  the scripted rules' unk24, read when studioMode != 0: a playback's field
     u32 unk30;                 // 0x30  func_ov167_0219c99c's value
 };
 
@@ -82,10 +83,10 @@ struct BtlvEffect {
     BOOL executing;                                             // 0x1f0
     // 0x1f4
     u32 damageTasks : 8; // bits 0-7: one per view position
-    u32 unkTasks8 : 8;   // bits 8-15: one per view position
+    u32 changeTasks : 8; // bits 8-15: one per view position
     u32 rotateTasks : 2; // bits 16-17: one per side
     u32 state : 8;       // bits 18-25
-    u32 unk1F4_26 : 1;   // bit 26
+    u32 muteSE : 1;      // bit 26  BtlvEffvm_PlaySEAt plays nothing, while a movie's chapters are skipped
     u32 : 5;
     HeapID heapId;       // 0x1f8
     BOOL bgmChanged;     // 0x1fc
@@ -141,10 +142,10 @@ typedef struct {
 
 // The work of the rotation task that BtlvEffect_StartRotation starts, 0x10 bytes
 typedef struct {
-    u32 seq;  // 0x0
-    u8 arg4;  // 0x4  mode != 3
-    u32 side; // 0x8
-    u32 argC; // 0xc
+    u32 seq;     // 0x0
+    u8 dir;      // 0x4  mode != 3
+    u32 side;    // 0x8
+    BOOL playSe; // 0xc
 } BtlvEffectRotateWork;
 
 // The steps of BtlvEffect_UpdateIdleEffect: wait for the time to pass, then play an effect
@@ -171,19 +172,20 @@ static void BtlvEffect_VBlankTask(TCB *tcb, void *data);
 static void BtlvEffect_BlinkTask(TCB *tcb, void *data);
 static void BtlvEffect_DamageTaskEnd(TCB *tcb);
 static void BtlvEffect_SubstituteTask(TCB *tcb, void *data);
-static void BtlvEffect_Unk8TaskEnd(TCB *tcb);
+static void BtlvEffect_ChangeTaskEnd(TCB *tcb);
 static void BtlvEffect_RotateTask(TCB *tcb, void *data);
 static void BtlvEffect_RotateTaskEnd(TCB *tcb);
 static void BtlvEffect_DelayedMoveTask(TCB *tcb, void *data);
 static void BtlvEffect_DelayedMoveTaskEnd(TCB *tcb);
 static void BtlvEffect_UpdateIdleEffect(void);
 
-// The idle effects BtlvEffect_UpdateIdleEffect picks from: in mode 3 of a battle of type 0x400, and in the others
-static u32 data_ov168_021f3f50[] = { 0x24a, 0x24b };
-static u32 data_ov168_021f3f58[] = { 0x235, 0x24c, 0x24d, 0x24e, 0x24f, 0x250 };
+// The idle effects BtlvEffect_UpdateIdleEffect picks from: while a message waits in a battle of type 0x400, and in the
+// others
+static u32 sIdleEffectsWaitMsg[] = { 0x24a, 0x24b };
+static u32 sIdleEffects[] = { 0x235, 0x24c, 0x24d, 0x24e, 0x24f, 0x250 };
 
-// Picked by GetStudioMovieId when GetStudioMode is 2
-static u8 data_ov168_021f3f70[] = {
+// Whether the Pokémon cast shadows, by GetStudioMovieId, in a movie's playback
+static u8 sStudioMovieShadows[] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1,
 };
@@ -194,7 +196,7 @@ static u32 BtlvEffect_GetStudioMode(BtlMainModule *mainModule) {
     if (mainModule != NULL) {
         return GetStudioMode(mainModule);
     }
-    return 0;
+    return BTL_STUDIO_MODE_NONE;
 }
 
 static u32 BtlvEffect_GetStudioParam(BtlMainModule *mainModule) {
@@ -217,9 +219,9 @@ BtlvEffectSetup *BtlvEffect_Create(u32 battleStyle, u32 battleType, const BtlFie
     setup->scu = scu;
     setup->mainModule = mainModule;
     setup->unk30 = BtlvEffect_GetStudioParam(mainModule);
-    setup->unk2C = BtlvEffect_GetStudioMode(mainModule);
-    if (setup->unk2C != 0) {
-        setup->unk2E = GetStudioRules(mainModule)->unk24;
+    setup->studioMode = BtlvEffect_GetStudioMode(mainModule);
+    if (setup->studioMode != BTL_STUDIO_MODE_NONE) {
+        setup->studioField = GetStudioRules(mainModule)->unk24;
     }
     for (i = 0; i < 4; i++) {
         setup->trainerTypes[i] = trainerTypes[i];
@@ -277,27 +279,27 @@ void BtlvEffect_Init(BtlvEffectSetup *setup, Font *font, HeapID heapId) {
     PaletteFade_AllocBuffer(sBtlvEffect->palFade, PALFADE_BUFFER_MAIN_OBJ, 0x200, heapId);
     PaletteFade_AllocBuffer(sBtlvEffect->palFade, PALFADE_BUFFER_SUB_OBJ, 0x1e0, heapId);
     sBtlvEffect->mcss = BtlvMcss_Create(setup->battleStyle, sBtlvEffect->tcbManager, heapId);
-    if (BtlvEffect_GetStudioMode(setup->mainModule) == 2) {
-        BtlvMcss_SetShadows(sBtlvEffect->mcss, data_ov168_021f3f70[GetStudioMovieId(setup->mainModule)]);
+    if (BtlvEffect_GetStudioMode(setup->mainModule) == BTL_STUDIO_MODE_PLAYBACK) {
+        BtlvMcss_SetShadows(sBtlvEffect->mcss, sStudioMovieShadows[GetStudioMovieId(setup->mainModule)]);
     } else {
         BtlvMcss_SetShadows(sBtlvEffect->mcss, 1);
     }
 
-    bgData = GFL_ArcSysReadHeapNew(0x97, 0, HEAPID_TAIL(sBtlvEffect->heapId));
+    bgData = GFL_ArcSysReadHeapNew(ARCID_BATTLE_BG_DATA, 0, HEAPID_TAIL(sBtlvEffect->heapId));
     season = 0;
     if (bgData[setup->fieldEnv.bgType].seasonal * 2) {
         season = setup->fieldEnv.season;
     }
     sBtlvEffect->stage =
         BtlvStage_Create(setup->battleStyle, bgData[setup->fieldEnv.bgType].stageIds[setup->fieldEnv.terrain], season,
-                         heapId, setup->unk2C);
+                         heapId, setup->studioMode);
     if (sBtlvEffect->setup.mainModule != NULL) {
         sBtlvEffect->field = BtlvField_Create(BtlSetup_IsBattleType(sBtlvEffect->setup.mainModule, 0x400),
                                               bgData[setup->fieldEnv.bgType].fieldIds[setup->fieldEnv.terrain], season,
-                                              heapId, setup->unk2C, setup->unk2E, setup->unk30);
+                                              heapId, setup->studioMode, setup->studioField, setup->unk30);
     } else {
         sBtlvEffect->field = BtlvField_Create(FALSE, bgData[setup->fieldEnv.bgType].fieldIds[setup->fieldEnv.terrain],
-                                              season, heapId, setup->unk2C, setup->unk2E, setup->unk30);
+                                              season, heapId, setup->studioMode, setup->studioField, setup->unk30);
     }
     if (bgData[setup->fieldEnv.bgType].light) {
         Light light;
@@ -316,10 +318,10 @@ void BtlvEffect_Init(BtlvEffectSetup *setup, Font *font, HeapID heapId) {
     sBtlvEffect->camera = BtlvCamera_Create(sBtlvEffect->tcbManager, heapId);
     sBtlvEffect->clact =
         BtlvClact_Create(sBtlvEffect->tcbManager, heapId, BtlvEffect_GetStudioMode(sBtlvEffect->setup.mainModule));
-    sBtlvEffect->gauge = BtlvGauge_Create(font, setup->unk2C, heapId);
+    sBtlvEffect->gauge = BtlvGauge_Create(font, setup->studioMode, heapId);
     sBtlvEffect->timer = BtlvTimer_Create(heapId);
     sBtlvEffect->bg = BtlvBg_Create(sBtlvEffect->tcbManager, heapId);
-    if (BtlvEffect_GetStudioMode(sBtlvEffect->setup.mainModule) == 1) {
+    if (BtlvEffect_GetStudioMode(sBtlvEffect->setup.mainModule) == BTL_STUDIO_MODE_FILM) {
         BtlvClact_SetGauge(sBtlvEffect->clact, GetStudioRules(sBtlvEffect->setup.mainModule)->turnLimit, 0);
     }
     BtlvMcss_SetFlatAll(sBtlvEffect->mcss);
@@ -443,8 +445,8 @@ void BtlvEffect_StartMove(const BtlvMoveEffectParam *param) {
         BtlvEffvmParam vmParam;
 
         BtlvEffvmParam_Clear(&vmParam);
-        vmParam.unk0 = param->unk10;
-        vmParam.variant = param->unk0C;
+        vmParam.target = param->target;
+        vmParam.variant = param->variant;
         vmParam.unk2 = param->unk0D;
         BtlvEffvm_Start(sBtlvEffect->effvm, param->attackerPos, param->targetPos, param->move, &vmParam);
         sBtlvEffect->executing = TRUE;
@@ -456,8 +458,8 @@ void BtlvEffect_StartMove(const BtlvMoveEffectParam *param) {
         queued->atkPos = param->attackerPos;
         queued->defPos = param->targetPos;
         queued->effNo = param->move;
-        queued->param->unk0 = param->unk10;
-        queued->param->variant = param->unk0C;
+        queued->param->target = param->target;
+        queued->param->variant = param->variant;
         queued->param->unk2 = param->unk0D;
         BtlvEffect_AddTask(GFL_TCBMgrAddTask(sBtlvEffect->tcbManager, BtlvEffect_DelayedMoveTask, queued, 0),
                            BtlvEffect_DelayedMoveTaskEnd, 0);
@@ -498,13 +500,13 @@ void BtlvEffect_StartEffect23B(u8 viewPos) {
     BtlvEffect_SetAbility(viewPos, 0);
 }
 
-void BtlvEffect_StartEffect23A(u8 pos, u16 itemNo, u8 arg2, u32 arg3, u32 arg4) {
+void BtlvEffect_StartBallThrow(u8 pos, u16 itemNo, u8 shakes, u32 caught, u32 critical) {
     BtlvEffvmParam vmParam;
 
     BtlvEffvmParam_Clear(&vmParam);
-    vmParam.unk3 = arg2;
-    vmParam.unk8 = arg4;
-    vmParam.unk4 = arg3;
+    vmParam.shakes = shakes;
+    vmParam.critical = critical;
+    vmParam.caught = caught;
     vmParam.itemNo = itemNo;
     BtlvEffvm_Start(sBtlvEffect->effvm, 0, pos, 0x23a, &vmParam);
     sBtlvEffect->executing = TRUE;
@@ -527,9 +529,9 @@ void BtlvEffect_StartChangeSprite(PartyPkm *pkm, u32 viewPos) {
     change->viewPos = viewPos;
     BtlvMcss_ChangePokemon(sBtlvEffect->mcss, viewPos, pkm);
     BtlvMcss_SetupPokemonLoadInfo(sBtlvEffect->mcss, pkm, &change->info, viewPos);
-    sBtlvEffect->unkTasks8 |= BtlvEffect_PosBit(viewPos);
+    sBtlvEffect->changeTasks |= BtlvEffect_PosBit(viewPos);
     BtlvEffect_AddTask(GFL_TCBMgrAddTask(sBtlvEffect->tcbManager, BtlvEffect_SubstituteTask, change, 0),
-                       BtlvEffect_Unk8TaskEnd, 0);
+                       BtlvEffect_ChangeTaskEnd, 0);
 }
 
 void BtlvEffect_ChangeSprite(PartyPkm *pkm, u32 viewPos) {
@@ -557,7 +559,8 @@ void BtlvEffect_StartEffect26F(u8 pos) {
 }
 
 BOOL BtlvEffect_IsBusy(void) {
-    if ((sBtlvEffect->executing | sBtlvEffect->damageTasks | sBtlvEffect->unkTasks8 | sBtlvEffect->rotateTasks) != 0) {
+    if ((sBtlvEffect->executing | sBtlvEffect->damageTasks | sBtlvEffect->changeTasks | sBtlvEffect->rotateTasks) !=
+        0) {
         return TRUE;
     }
     return FALSE;
@@ -579,8 +582,8 @@ BOOL BtlvEffect_CheckExist(int pos) {
 }
 
 void BtlvEffect_SetTrainer(s32 trainerType, BtlvMcssPos pos, fx32 x, fx32 y, fx32 z) {
-    switch (sBtlvEffect->setup.unk2C) {
-    case 1:
+    switch (sBtlvEffect->setup.studioMode) {
+    case BTL_STUDIO_MODE_FILM:
         if (trainerType == TRAINER_CLASS_PKMN_TRAINER_NATE || trainerType == TRAINER_CLASS_PKMN_TRAINER_ROSA) {
             trainerType = TRAINER_CLASS_PKMN_TRAINER_NATE;
             if (getTrainerGender(GetClientPlayerInfo(sBtlvEffect->setup.mainModule, 0))) {
@@ -588,7 +591,7 @@ void BtlvEffect_SetTrainer(s32 trainerType, BtlvMcssPos pos, fx32 x, fx32 y, fx3
             }
         }
         break;
-    case 2:
+    case BTL_STUDIO_MODE_PLAYBACK:
         if (trainerType == TRAINER_CLASS_PKMN_TRAINER_NATE || trainerType == TRAINER_CLASS_PKMN_TRAINER_ROSA) {
             trainerType = GetClientTrainerClass(sBtlvEffect->setup.mainModule, 0);
         }
@@ -597,22 +600,22 @@ void BtlvEffect_SetTrainer(s32 trainerType, BtlvMcssPos pos, fx32 x, fx32 y, fx3
     if (!(pos & 1)) {
         switch (trainerType) {
         case TRAINER_CLASS_PKMN_TRAINER_NATE:
-            if (BtlvEffect_GetUnk2E4()) {
+            if (BtlvEffect_IsShooterEnabled()) {
                 trainerType = TRAINER_CLASS_PKMN_TRAINER_M_180;
             }
             break;
         case TRAINER_CLASS_PKMN_TRAINER_ROSA:
-            if (BtlvEffect_GetUnk2E4()) {
+            if (BtlvEffect_IsShooterEnabled()) {
                 trainerType = TRAINER_CLASS_PKMN_TRAINER_F_181;
             }
             break;
         case TRAINER_CLASS_PKMN_TRAINER_M_182:
-            if (BtlvEffect_GetUnk2E4()) {
+            if (BtlvEffect_IsShooterEnabled()) {
                 trainerType = TRAINER_CLASS_PKMN_TRAINER_M_184;
             }
             break;
         case TRAINER_CLASS_PKMN_TRAINER_F_183:
-            if (BtlvEffect_GetUnk2E4()) {
+            if (BtlvEffect_IsShooterEnabled()) {
                 trainerType = TRAINER_CLASS_PKMN_TRAINER_F_185;
             }
             break;
@@ -621,17 +624,17 @@ void BtlvEffect_SetTrainer(s32 trainerType, BtlvMcssPos pos, fx32 x, fx32 y, fx3
         switch (trainerType) {
         case TRAINER_CLASS_PKMN_TRAINER_NATE:
         case TRAINER_CLASS_PKMN_TRAINER_ROSA:
-            if (BtlvEffect_GetUnk2E4()) {
+            if (BtlvEffect_IsShooterEnabled()) {
                 trainerType += TRAINER_CLASS_PKMN_TRAINER_M_180;
             }
             break;
         case TRAINER_CLASS_PKMN_TRAINER_M_182:
-            if (BtlvEffect_GetUnk2E4()) {
+            if (BtlvEffect_IsShooterEnabled()) {
                 trainerType = TRAINER_CLASS_PKMN_TRAINER_M_184;
             }
             break;
         case TRAINER_CLASS_PKMN_TRAINER_F_183:
-            if (BtlvEffect_GetUnk2E4()) {
+            if (BtlvEffect_IsShooterEnabled()) {
                 trainerType = TRAINER_CLASS_PKMN_TRAINER_F_185;
             }
             break;
@@ -787,7 +790,7 @@ BOOL BtlvEffect_IsPaletteFading(u32 target) {
 void BtlvEffect_SetVanish(u32 target, BOOL hide) {
     switch (target) {
     case BTLV_EFFECT_VANISH_STAGE:
-        BtlvStage_SetVanish(sBtlvEffect->stage, 2, hide);
+        BtlvStage_SetVanish(sBtlvEffect->stage, BTLV_STAGE_SIDE_BOTH, hide);
         break;
     case BTLV_EFFECT_VANISH_FIELD:
         BtlvField_SetHidden(sBtlvEffect->field, hide);
@@ -804,16 +807,16 @@ void BtlvEffect_SetVanish(u32 target, BOOL hide) {
     }
 }
 
-void BtlvEffect_StartRotation(u8 mode, u32 side, u32 arg2) {
+void BtlvEffect_StartRotation(u8 mode, u32 side, u32 playSe) {
     BtlvEffectRotateWork *work =
         GFL_HeapAllocate(HEAPID_TAIL(sBtlvEffect->heapId), sizeof(BtlvEffectRotateWork), FALSE, "btlv_effect.c", 0x602);
 
     // BUG: mode 1 starts no task, so nothing frees its work
     if (mode != 1) {
         work->seq = 0;
-        work->arg4 = mode != 3;
+        work->dir = mode != 3;
         work->side = side;
-        work->argC = arg2;
+        work->playSe = playSe;
         sBtlvEffect->rotateTasks |= BtlvEffect_PosBit(side);
         BtlvEffect_AddTask(GFL_TCBMgrAddTask(sBtlvEffect->tcbManager, BtlvEffect_RotateTask, work, 0),
                            BtlvEffect_RotateTaskEnd, 0);
@@ -1012,38 +1015,38 @@ u32 BtlvEffect_GetState(void) {
     return sBtlvEffect->state;
 }
 
-void BtlvEffect_SetFlag26(u32 arg0) {
-    sBtlvEffect->unk1F4_26 = arg0;
+void BtlvEffect_SetMuteSE(u32 mute) {
+    sBtlvEffect->muteSE = mute;
 }
 
-u32 BtlvEffect_GetFlag26(void) {
-    return sBtlvEffect->unk1F4_26;
+u32 BtlvEffect_GetMuteSE(void) {
+    return sBtlvEffect->muteSE;
 }
 
-BOOL BtlvEffect_GetUnk2E4(void) {
+BOOL BtlvEffect_IsShooterEnabled(void) {
     BOOL result = FALSE;
 
     if (sBtlvEffect->setup.mainModule != NULL) {
-        result = func_ov167_0219db08(sBtlvEffect->setup.mainModule);
+        result = IsShooterEnabled(sBtlvEffect->setup.mainModule);
     }
     return result;
 }
 
-BOOL BtlvEffect_GetUnk304(void) {
+BOOL BtlvEffect_IsBagEnabled(void) {
     BOOL result = FALSE;
 
     if (sBtlvEffect->setup.mainModule != NULL) {
-        result = func_ov167_0219db28(sBtlvEffect->setup.mainModule);
+        result = IsBagEnabled(sBtlvEffect->setup.mainModule);
     }
     return result;
 }
 
-void BtlvEffect_SetPokemonCheck(u32 arg0) {
+void BtlvEffect_SetPokemonReverse(u32 byPos) {
     BtlvMcssPos pos;
 
     for (pos = BTLV_MCSS_POS_FIRST; pos < BTLV_MCSS_POS_TRAINER; pos++) {
         if (BtlvMcss_Exists(sBtlvEffect->mcss, pos)) {
-            BtlvMcss_SetUnkB270(sBtlvEffect->mcss, pos, arg0);
+            BtlvMcss_SetReverse(sBtlvEffect->mcss, pos, byPos);
         }
     }
 }
@@ -1279,10 +1282,10 @@ static void BtlvEffect_SubstituteTask(TCB *tcb, void *data) {
     }
 }
 
-static void BtlvEffect_Unk8TaskEnd(TCB *tcb) {
+static void BtlvEffect_ChangeTaskEnd(TCB *tcb) {
     BtlvEffectChange *work = GFL_TCBGetData(tcb);
 
-    sBtlvEffect->unkTasks8 &= BtlvEffect_PosBit(work->viewPos) ^ 0xffffffff;
+    sBtlvEffect->changeTasks &= BtlvEffect_PosBit(work->viewPos) ^ 0xffffffff;
 }
 
 static void BtlvEffect_RotateTask(TCB *tcb, void *data) {
@@ -1290,13 +1293,13 @@ static void BtlvEffect_RotateTask(TCB *tcb, void *data) {
 
     switch (work->seq) {
     case 0:
-        if ((sBtlvEffect->damageTasks | sBtlvEffect->executing | sBtlvEffect->unkTasks8) != 0) {
+        if ((sBtlvEffect->damageTasks | sBtlvEffect->executing | sBtlvEffect->changeTasks) != 0) {
             break;
         }
         work->seq++;
         // fallthrough
     case 1:
-        BtlvMcss_StartRotation(sBtlvEffect->mcss, work->side, work->arg4, work->argC);
+        BtlvMcss_StartRotation(sBtlvEffect->mcss, work->side, work->dir, work->playSe);
         work->seq++;
         break;
     case 2:
@@ -1365,13 +1368,13 @@ static void BtlvEffect_UpdateIdleEffect(void) {
                 pick = GFL_RandomMTRange(2);
             } while (sBtlvEffect->idleEffectLast == pick);
             sBtlvEffect->idleEffectLast = pick;
-            effect = data_ov168_021f3f50[sBtlvEffect->idleEffectLast];
+            effect = sIdleEffectsWaitMsg[sBtlvEffect->idleEffectLast];
         } else {
             do {
                 pick = GFL_RandomMTRange(6);
             } while (sBtlvEffect->idleEffectLast == pick);
             sBtlvEffect->idleEffectLast = pick;
-            effect = data_ov168_021f3f58[sBtlvEffect->idleEffectLast];
+            effect = sIdleEffects[sBtlvEffect->idleEffectLast];
         }
         BtlvEffect_Start(effect);
         sBtlvEffect->executing = TRUE;

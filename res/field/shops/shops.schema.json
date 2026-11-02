@@ -1,0 +1,34 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The Poké Marts' lists of items: res/field/shops/shops.json",
+    "description": "The lists of ARCID_SHOP_ITEMS (a/2/8/2) in order, whose lengths are ARCID_SHOP_ITEM_COUNTS (a/2/8/3), which ShopUI_LoadPokeMartItems reads (scrcmd_shop.c). The menu lists a list's items in order, at their price in the item data, and as TMs with their moves if the first is a TM or HM. tools/data/shop_data.py packs them.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "badge_marts", "marts", "special_marts" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "badge_marts": {
+            "type": "array", "minItems": 6, "maxItems": 6, "items": { "$ref": "#/$defs/items" },
+            "description": "Files 0 to 5: the Poké Mart whose stock grows with the badges (SHOP_ID_BADGE_MART), the list that BADGE_SHOP_DAT_IDS gives each number of badges: 0 for none, 1 for one or two, 2 for three or four, 3 for five or six, 4 for seven and 5 for all eight"
+        },
+        "marts": {
+            "type": "array", "minItems": 26, "maxItems": 26, "items": { "$ref": "#/$defs/items" },
+            "description": "Files 6 to 31: the other Poké Marts' lists, by the shop ID that the script's shop command names, its file less 6"
+        },
+        "special_marts": {
+            "type": "array", "minItems": 8, "maxItems": 8,
+            "description": "Files 32 to 79: the special marts of SPECIAL_POKE_MART_HEADERS, shop IDs 0xf7 to 0xfa and 0xef to 0xf2 in this order, whose stock grows with KeyDataSave_GetProgress",
+            "items": {
+                "type": "array", "minItems": 6, "maxItems": 6, "items": { "$ref": "#/$defs/items" },
+                "description": "The mart's list for each level, the last of sSpecialMartLevels (0, 2, 4, 6, 8, 10) that the progress reaches"
+            }
+        }
+    },
+    "$defs": {
+        "items": {
+            "type": "array", "maxItems": 255,
+            "items": { "type": [ "string", "integer" ], "x-constant": "ITEM_", "minimum": 0, "maximum": 65535, "description": "An ITEM_* constant" },
+            "description": "The items the shop sells, in the menu's order; the count is a byte"
+        }
+    }
+}

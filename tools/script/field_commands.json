@@ -3069,7 +3069,7 @@
    ]
   },
   "368": {
-   "handler": "func_ov033_021772f4",
+   "handler": "Scrcmd_Funfest_HasPassPower",
    "overlay": 33,
    "args": [
     "var"
@@ -3077,7 +3077,7 @@
    "area": "HighLink"
   },
   "370": {
-   "handler": "func_ov033_021772c8",
+   "handler": "Scrcmd_Funfest_IsFestMissionAvailable",
    "overlay": 33,
    "args": [
     "var"
@@ -3132,7 +3132,7 @@
    ]
   },
   "379": {
-   "handler": "func_ov012_02157bdc",
+   "handler": "Scrcmd_Proc_GimmickSetNimbasaFlags",
    "overlay": 12,
    "args": [
     "var",
@@ -3594,7 +3594,7 @@
    ]
   },
   "475": {
-   "handler": "func_ov033_02177d78",
+   "handler": "Scrcmd_PdwPostman_MysteryGifts",
    "overlay": 33,
    "args": [
     "any",
@@ -4080,7 +4080,7 @@
    ]
   },
   "536": {
-   "handler": "func_ov012_02164c68",
+   "handler": "Scrcmd_EntreeForest_EntreeForestGetInfo",
    "overlay": 12,
    "args": [
     "any",
@@ -4089,7 +4089,7 @@
    "area": "AreaNPC"
   },
   "537": {
-   "handler": "func_ov012_02164bcc",
+   "handler": "Scrcmd_EntreeForest_EntreeForestToggleKeepPkm",
    "overlay": 12,
    "args": [
     "any",
@@ -4134,7 +4134,7 @@
    ]
   },
   "543": {
-   "handler": "func_ov012_02156104",
+   "handler": "Scrcmd_GameState_SeasonTrainerGetObjCode",
    "overlay": 12,
    "args": [
     "any",
@@ -4142,7 +4142,7 @@
    ]
   },
   "544": {
-   "handler": "func_ov012_02156128",
+   "handler": "Scrcmd_GameState_SeasonTrainerGetTrainerID",
    "overlay": 12,
    "args": [
     "any",
@@ -4346,7 +4346,7 @@
    ]
   },
   "571": {
-   "handler": "func_ov012_02169c1c",
+   "handler": "Scrcmd_SpPoke_NuvemaGimmickSetVisible",
    "overlay": 12,
    "args": []
   },
@@ -4524,7 +4524,7 @@
    ]
   },
   "602": {
-   "handler": "func_ov012_02157b7c",
+   "handler": "Scrcmd_Proc_GimmickSetNimbasaGym",
    "overlay": 12,
    "args": [
     "any"
@@ -4601,7 +4601,7 @@
    "area": "HollowRival"
   },
   "615": {
-   "handler": "func_ov012_0216a7cc",
+   "handler": "Scrcmd_HollowRival_HollowRivalSetMet",
    "overlay": 12,
    "args": [],
    "area": "HollowRival"
@@ -4940,7 +4940,7 @@
    "args": []
   },
   "676": {
-   "handler": "func_ov012_02157bb4",
+   "handler": "Scrcmd_Proc_GimmickResetOpelucid",
    "overlay": 12,
    "args": []
   },
@@ -5124,7 +5124,7 @@
    ]
   },
   "707": {
-   "handler": "func_ov012_0216a7f4",
+   "handler": "Scrcmd_HollowRival_HollowRivalSetSpecies",
    "overlay": 12,
    "args": [
     "any"

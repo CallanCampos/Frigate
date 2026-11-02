@@ -65,8 +65,8 @@ static void PoketradeNego_PlaySeByEvent(int frame, PokemonTradeWork *wk) {
         { SEQ_SE_SYS_83, 25 }, { SEQ_SE_DANSA, 27 },  { SEQ_SE_SYS_83, 39 },
     };
     u32 i;
-    if (wk->unk11EF == 0) {
-        if (wk->unk11ED == 0) {
+    if (wk->sentPkmNoBounce == 0) {
+        if (wk->sentPkmReturns == 0) {
             for (i = 0; i < NELEMS(cues); i++) {
                 if (frame == cues[i].frame) {
                     GFL_SndSEPlay(cues[i].se);

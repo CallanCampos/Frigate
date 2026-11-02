@@ -1,0 +1,58 @@
+// MOVE_SLUDGE_WAVE's animation: member 482 of a/0/6/5
+
+#include "asm/btlv_effvm.inc"
+
+    ScriptHeader 1
+    ScriptVariant SludgeWave
+
+SludgeWave:
+    CameraMovePreset 1, 9, 12, 0, 8
+    Wait EFFVM_WAIT_ALL
+    ParticleLoad 657
+    SetYield FALSE
+    PlaySE SEQ_SE_W124_01, 1, EFFVM_ATTACKER, 0, -700, 70, 0, 0, 0
+    PlaySE SEQ_SE_FLD_112, 2, EFFVM_ATTACKER, 0, 500, 50, 0, 0, 0
+    MoveSE 1, 0, 0, -700, 0, 0, 80, 0, 0
+    MoveSE 1, 0, 1, 70, 0, 40, 40, 0, 0
+    MoveSE 2, 0, 1, 50, 0, 40, 40, 0, 0
+    PanSE 1, 0, EFFVM_ATTACKER, EFFVM_DEFENDER, 0, 80, 0, 0
+    PanSE 2, 0, EFFVM_ATTACKER, EFFVM_DEFENDER, 0, 80, 0, 0
+    SetYield TRUE
+    EmitterMove 657, 2, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 1
+    EmitterMove 657, 2, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 1
+    EmitterMove 657, 2, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 1
+    EmitterMove 657, 2, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 1
+    EmitterMove 657, 2, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 1
+    EmitterMove 657, 2, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 1
+    EmitterMove 657, 2, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 1
+    EmitterMove 657, 2, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 1
+    EmitterMove 657, 2, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 1
+    EmitterMove 657, 2, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 1
+    EmitterMove 657, 2, 5, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x64000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 1
+    WaitFrames 10
+    CameraMovePreset 1, 11, 16, 0, 8
+    McssSetVanish EFFVM_DEFENDER, TRUE
+    Wait EFFVM_WAIT_ALL
+    SetYield FALSE
+    PlaySE SEQ_SE_W464_02, 1, EFFVM_DEFENDER, 0, 0, 127, 0, 0, 0
+    PlaySE SEQ_SE_W474_DOKU, 2, EFFVM_DEFENDER, 10, -200, 127, 0, 0, 0
+    SetYield TRUE
+    EmitterAdd 657, 0, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 657, 1, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    McssScale EFFVM_DEFENDER, 2, 0x19a, -0x19a, 2, 1, 4
+    Wait EFFVM_WAIT_ALL
+    CameraMovePreset 1, 8, 16, 0, 8
+    McssSetVanish EFFVM_DEFENDER, FALSE
+    Wait EFFVM_WAIT_ALL
+    End

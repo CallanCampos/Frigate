@@ -302,10 +302,10 @@ BOOL Scrcmd_Survey_SurveyGetCurrentRemaining(VM *vm, FieldScriptEnv *env) {
     out = ScriptReadVar(vm, env);
     kind = Survey_GetQuestionType(TrainerGameInfo_GetSurveyQuestion(card));
     switch (kind) {
-    case 1:
+    case SURVEY_QUESTION_TYPE_HOURS:
         result = Survey_GetCurrentHoursLeft(save);
         break;
-    case 0:
+    case SURVEY_QUESTION_TYPE_COUNT:
         result = Survey_GetCurrentAnswersLeft(save);
         break;
     }

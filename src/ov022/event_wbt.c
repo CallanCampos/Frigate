@@ -18,6 +18,22 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
+// The steps of picking the Pokémon to enter
+enum {
+    POKE_SELECT_FADE_OUT,
+    POKE_SELECT_CLOSE_FIELD,
+    POKE_SELECT_START_LIST,
+    POKE_SELECT_OPEN_FIELD,
+    POKE_SELECT_FADE_IN,
+    POKE_SELECT_END,
+};
+
+// The steps of the events that run one thing: start it, then clean up after it
+enum {
+    RUN_START,
+    RUN_END,
+};
+
 typedef struct {
     GameSystem *gsys;
     Field *field;
@@ -30,7 +46,8 @@ typedef struct {
     GameSystem *gsys;
     Field *field;
     WbtSetup *setup;
-    u32 unkC;
+    // Whether the list runs through EventFieldSubprocessTransition_Create
+    u32 useTransition;
 } WbtListWork;
 
 typedef struct {
@@ -56,29 +73,29 @@ static GameEventReturnCode EventWbtPokeSelect_Callback(GameEvent *event, u32 *st
     GameSystem *gsys = work->gsys;
 
     switch (*state) {
-    case 0:
+    case POKE_SELECT_FADE_OUT:
         GameEvent_ChainNext(
             event, CallFieldMapEntranceOutTransitionDefault(gsys, work->field, FIELD_TRANSITION_FADE_BLACK, 0));
         (*state)++;
         break;
-    case 1:
+    case POKE_SELECT_CLOSE_FIELD:
         GameEvent_ChainNext(event, CreateFieldCloseEvent(gsys, work->field));
         (*state)++;
         break;
-    case 2:
+    case POKE_SELECT_START_LIST:
         GameEvent_ChainNext(event, EventPokeList_Create(gsys, work->field, &work->partyParam, &work->summaryParam));
         (*state)++;
         break;
-    case 3:
+    case POKE_SELECT_OPEN_FIELD:
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
         (*state)++;
         break;
-    case 4:
+    case POKE_SELECT_FADE_IN:
         GameEvent_ChainNext(
             event, CallFieldMapEntranceInTransition(gsys, work->field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         (*state)++;
         break;
-    case 5:
+    case POKE_SELECT_END:
         WbtMakeMatch_ReadPick(work->sys, &work->partyParam);
         return GAMEEVENT_DONE;
     }
@@ -110,7 +127,7 @@ GameEvent *EventWbtList_Create(GameSystem *gsys, void *args) {
     work->gsys = gsys;
     work->field = field;
     work->setup = setup;
-    work->unkC = setup->unkA0;
+    work->useTransition = setup->useTransition;
     return event;
 }
 
@@ -119,9 +136,9 @@ static GameEventReturnCode EventWbtList_Callback(GameEvent *event, u32 *state, v
     GameEvent *next;
 
     switch (*state) {
-    case 0:
+    case RUN_START:
         GFL_SndPlayerSetVolume(2, 63);
-        if (work->unkC) {
+        if (work->useTransition) {
             next = EventFieldSubprocessTransition_Create(work->gsys, work->field, OVERLAY_WBT_LIST,
                                                          &WBT_LIST_PROC_FUNCTIONS, work->setup);
         } else {
@@ -129,9 +146,9 @@ static GameEventReturnCode EventWbtList_Callback(GameEvent *event, u32 *state, v
                                                    work->setup);
         }
         GameEvent_ChainNext(event, next);
-        *state = 1;
+        *state = RUN_END;
         break;
-    case 1:
+    case RUN_END:
         WbtSetup_Free(work->setup);
         GFL_SndPlayerSetVolume(2, 127);
         return GAMEEVENT_DONE;
@@ -146,13 +163,13 @@ static GameEventReturnCode EventWbtBattle_Callback(GameEvent *event, u32 *state,
     Field *field;
 
     switch (*state) {
-    case 0:
+    case RUN_START:
         field = GSYS_GetField(gsys);
         work->setup = WbtBattle_SetupBattle(sys, gsys);
         GameEvent_ChainNext(event, EventWbtBattleCall_Create(gsys, field, work->setup));
-        *state = 1;
+        *state = RUN_END;
         break;
-    case 1:
+    case RUN_END:
         WbtBattle_EndBattle(sys, GSYS_GetGameData(gsys), work->setup);
         WbtBattle_FreeBattle(sys, work->setup);
         return GAMEEVENT_DONE;
@@ -185,12 +202,12 @@ static GameEventReturnCode EventWbtWinRecord_Callback(GameEvent *event, u32 *sta
     WbtProcWork *work = data;
 
     switch (*state) {
-    case 0:
+    case RUN_START:
         GameEvent_ChainNext(event, EventFieldSubprocessTransition_Create(work->gsys, work->field, OVERLAY_WIN_RECORD,
                                                                          &WIN_RECORD_PROC_FUNCTIONS, work->param));
-        *state = 1;
+        *state = RUN_END;
         break;
-    case 1:
+    case RUN_END:
         WbtSetup_FreeWinRecordParam(work->param);
         return GAMEEVENT_DONE;
     }
@@ -213,12 +230,12 @@ static GameEventReturnCode EventWbtDownload_Callback(GameEvent *event, u32 *stat
     WbtProcWork *work = data;
 
     switch (*state) {
-    case 0:
+    case RUN_START:
         GameEvent_ChainNext(event, EventFieldSubprocessTransition_Create(work->gsys, work->field, OVERLAY_T_DOWNLOAD,
                                                                          &T_DOWNLOAD_PROC_FUNCTIONS, work->param));
-        *state = 1;
+        *state = RUN_END;
         break;
-    case 1:
+    case RUN_END:
         WbtSetup_FreeDownloadParam(work->param);
         return GAMEEVENT_DONE;
     }

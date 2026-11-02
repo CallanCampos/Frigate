@@ -1,0 +1,26 @@
+{
+    "$schema": "cutin.schema.json",
+    "particle": 70,
+    "particle_delays": [ 47, 0 ],
+    "models": [ 95, 96 ],
+    "actor_delays": [ 0, 0 ],
+    "animations1": [ 97, 98, 99, null ],
+    "animations2": [ 100, 101, 102, null ],
+    "dim_capture": 1,
+    "key_list": 8,
+    "bitmap_flag": 1,
+    "bitmaps": [
+        {
+            "texture": "trwb_face001",
+            "palette": "trwb_face001_pl",
+            "resource": 0,
+            "char_file": 9,
+            "palette_file": 62,
+            "palette_offset": 0,
+            "width": 16,
+            "height": 16,
+            "source_stride": 16,
+            "source_offset": 0
+        }
+    ]
+}

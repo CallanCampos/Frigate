@@ -15,13 +15,6 @@
 // '*', and puts '.' and '-' for 62 and 63) and the answer comes back as a status and a body. A thread waits until the
 // Wi-Fi connection is up and sets the library up; NdReportResults then reports each result to the game's callback.
 
-// The events of the HTTP client's callback
-enum {
-    NHTTP_EVENT_BUFFER_FULL = 2,
-    NHTTP_EVENT_AFTER_BUFFER_FULL,
-    NHTTP_EVENT_ANSWER,
-};
-
 // The answer's buffer was too small; the callback sets whether the client may grow it
 typedef struct NdBufferFullEvent {
     u8 unk0[8];

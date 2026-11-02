@@ -31,7 +31,7 @@ Script_1:
     VMHalt
 
 L_003E:
-    AreaNPCCmd_0218 0, 0x8010
+    EntreeForestGetInfo 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -97,7 +97,7 @@ L_0117:
     VMReturn
 
 L_011F:
-    AreaNPCCmd_0218 1, 0x8010
+    EntreeForestGetInfo 1, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -111,7 +111,7 @@ L_011F:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_01A2
-    AreaNPCCmd_0219 0x8011, 0x8010
+    EntreeForestToggleKeepPkm 0x8011, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -145,7 +145,7 @@ L_01A8:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0212
-    AreaNPCCmd_0219 0x8011, 0x8010
+    EntreeForestToggleKeepPkm 0x8011, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -172,8 +172,8 @@ L_0212:
 L_0214:
     WorkSetConst 0x8020, 0
     WorkSetConst 0x8021, 0
-    AreaNPCCmd_0218 3, 0x8020
-    AreaNPCCmd_0218 4, 0x8021
+    EntreeForestGetInfo 3, 0x8020
+    EntreeForestGetInfo 4, 0x8021
     PVPlay 0x8020, 0x8021
     PVWait
     ActorDelete 0x8011

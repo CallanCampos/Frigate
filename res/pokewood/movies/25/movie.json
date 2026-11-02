@@ -1,0 +1,624 @@
+{
+    "$schema": "../../movie.schema.json",
+    "movie": 26,
+    "unk02": 2,
+    "score_multiplier": 4,
+    "cast_count": 1,
+    "director": 4,
+    "turn_limit": 10,
+    "ideal_turn": 4,
+    "ending_scene": 3,
+    "rule": 8,
+    "species": [ -1, -1 ],
+    "unk16": -1,
+    "trainer_classes": {
+        "male": {
+            "film": "TRAINER_CLASS_ACE_TRAINER_M",
+            "watch": "TRAINER_CLASS_ACE_TRAINER_M"
+        },
+        "female": {
+            "film": "TRAINER_CLASS_ACE_TRAINER_M",
+            "watch": "TRAINER_CLASS_ACE_TRAINER_M"
+        }
+    },
+    "unk20": 0,
+    "recorded_trainer_class": "TRAINER_CLASS_GUY",
+    "unk24": 287,
+    "bgm": "SEQ_BGM_PW_SCENARIO_04_F",
+    "win_bgm": "SEQ_BGM_PW_SCENARIO_06_F",
+    "unk2a": "SEQ_BGM_PW_SCENARIO_05_F",
+    "unk2c": "SEQ_BGM_PW_SCENARIO_07_F",
+    "star_level": 2,
+    "turn_events": [
+        {
+            "turn": 0,
+            "value": -1
+        },
+        {
+            "turn": 0,
+            "value": -1
+        },
+        {
+            "turn": 0,
+            "value": -1
+        }
+    ],
+    "unk3c": [
+        [ 0, -1, 0, 0 ],
+        [ 0, -1, 0, 0 ],
+        [ 0, -1, 0, 0 ],
+        [ 0, -1, 0, 0 ],
+        [ 0, -1, 0, 0 ],
+        [ 0, -1, 0, 0 ]
+    ],
+    "turn_messages": [
+        [ -1, -1, -1, -1, -1, -1, -1, -1, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+        [ -1, -1, -1, -1, -1, -1, 2, -1, -1, 4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ]
+    ],
+    "scenes": [
+        {
+            "turn": 0,
+            "unk02": -1,
+            "unk04": -1,
+            "unk06": -1,
+            "reaction": 4,
+            "score": 0,
+            "messages": [
+                [ -1, 6, 8, 10, 12, -1, -1, -1, -1, -1 ],
+                [ 5, 7, 9, 11, 13, -1, -1, -1, -1, -1 ]
+            ],
+            "events": [ 17, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+            "choices": [
+                {
+                    "message": 14,
+                    "message2": 15,
+                    "unk04": 1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": 16,
+                    "message2": 17,
+                    "unk04": 1,
+                    "unk06": -1,
+                    "points": 5,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                }
+            ]
+        },
+        {
+            "turn": 1,
+            "unk02": -1,
+            "unk04": -1,
+            "unk06": -1,
+            "reaction": 4,
+            "score": 0,
+            "messages": [
+                [ 18, 20, -1, -1, -1, -1, -1, -1, -1, -1 ],
+                [ 19, 21, -1, -1, -1, -1, -1, -1, -1, -1 ]
+            ],
+            "events": [ 17, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+            "choices": [
+                {
+                    "message": 22,
+                    "message2": 23,
+                    "unk04": 1,
+                    "unk06": -1,
+                    "points": -5,
+                    "unk0a": -1
+                },
+                {
+                    "message": 24,
+                    "message2": 25,
+                    "unk04": 0,
+                    "unk06": -1,
+                    "points": 5,
+                    "unk0a": -1
+                },
+                {
+                    "message": 26,
+                    "message2": 27,
+                    "unk04": 1,
+                    "unk06": -1,
+                    "points": -5,
+                    "unk0a": -1
+                },
+                {
+                    "message": 28,
+                    "message2": 29,
+                    "unk04": 0,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                }
+            ]
+        },
+        {
+            "turn": 101,
+            "unk02": -1,
+            "unk04": -1,
+            "unk06": -1,
+            "reaction": 4,
+            "score": -50,
+            "messages": [
+                [ -1, 31, -1, 34, -1, 36, -1, -1, -1, -1 ],
+                [ 30, 32, 33, -1, 35, -1, -1, -1, -1, -1 ]
+            ],
+            "events": [ 17, -1, -1, 18, -1, 34, -1, -1, -1, -1 ],
+            "choices": [
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                }
+            ]
+        },
+        {
+            "turn": 100,
+            "unk02": -1,
+            "unk04": -1,
+            "unk06": -1,
+            "reaction": 4,
+            "score": 12,
+            "messages": [
+                [ -1, 38, 40, 42, 43, -1, -1, -1, -1, -1 ],
+                [ 37, 39, 41, -1, -1, -1, -1, -1, -1, -1 ]
+            ],
+            "events": [ 17, -1, -1, 33, 34, -1, -1, -1, -1, -1 ],
+            "choices": [
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                }
+            ]
+        },
+        {
+            "turn": 101,
+            "unk02": -1,
+            "unk04": 2,
+            "unk06": -1,
+            "reaction": 4,
+            "score": 75,
+            "messages": [
+                [ 44, 46, 48, 50, 52, 54, 55, -1, -1, -1 ],
+                [ 45, 47, 49, 51, 53, -1, -1, -1, -1, -1 ]
+            ],
+            "events": [ 17, -1, -1, -1, 33, -1, -1, -1, -1, -1 ],
+            "choices": [
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                }
+            ]
+        },
+        {
+            "turn": 2,
+            "unk02": -1,
+            "unk04": -1,
+            "unk06": -1,
+            "reaction": 4,
+            "score": 0,
+            "messages": [
+                [ 56, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+                [ 57, -1, -1, -1, -1, -1, -1, -1, -1, -1 ]
+            ],
+            "events": [ 17, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+            "choices": [
+                {
+                    "message": 58,
+                    "message2": 59,
+                    "unk04": 0,
+                    "unk06": -1,
+                    "points": 5,
+                    "unk0a": -1
+                },
+                {
+                    "message": 60,
+                    "message2": 61,
+                    "unk04": 1,
+                    "unk06": -1,
+                    "points": -5,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                }
+            ]
+        },
+        {
+            "turn": -1,
+            "unk02": -1,
+            "unk04": -1,
+            "unk06": -1,
+            "reaction": 4,
+            "score": 0,
+            "messages": [
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ]
+            ],
+            "events": [ 17, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+            "choices": [
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                }
+            ]
+        },
+        {
+            "turn": -1,
+            "unk02": -1,
+            "unk04": -1,
+            "unk06": -1,
+            "reaction": 4,
+            "score": 0,
+            "messages": [
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ]
+            ],
+            "events": [ 17, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+            "choices": [
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                }
+            ]
+        },
+        {
+            "turn": -1,
+            "unk02": -1,
+            "unk04": -1,
+            "unk06": -1,
+            "reaction": 4,
+            "score": 0,
+            "messages": [
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ]
+            ],
+            "events": [ 17, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+            "choices": [
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                }
+            ]
+        },
+        {
+            "turn": -1,
+            "unk02": -1,
+            "unk04": -1,
+            "unk06": -1,
+            "reaction": 4,
+            "score": 0,
+            "messages": [
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ]
+            ],
+            "events": [ 17, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+            "choices": [
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                }
+            ]
+        },
+        {
+            "turn": -1,
+            "unk02": -1,
+            "unk04": -1,
+            "unk06": -1,
+            "reaction": 4,
+            "score": 0,
+            "messages": [
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ]
+            ],
+            "events": [ 17, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+            "choices": [
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                }
+            ]
+        },
+        {
+            "turn": -1,
+            "unk02": -1,
+            "unk04": -1,
+            "unk06": -1,
+            "reaction": 4,
+            "score": 0,
+            "messages": [
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ]
+            ],
+            "events": [ 17, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+            "choices": [
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                },
+                {
+                    "message": -1,
+                    "message2": -1,
+                    "unk04": -1,
+                    "unk06": -1,
+                    "points": 0,
+                    "unk0a": -1
+                }
+            ]
+        }
+    ]
+}

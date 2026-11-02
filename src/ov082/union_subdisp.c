@@ -133,8 +133,9 @@ static void UnionSubdisp_CancelOtherFlashes(UnionSubdisp *work, UnionVisitorList
 static BOOL UnionSubdisp_SetLinePalette(UnionSubdisp *work, int line, BOOL touched);
 static void UnionSubdisp_UpdateKeyScroll(UnionSubdisp *work, UnionSystem *sys);
 
-// The state that each icon picks, where 0 leaves the icon unselected
-static const u8 sIconStates[ICON_COUNT] = { 0, 1, 2, 4, 5 };
+// What each icon picks. The first picks nothing: it asks for the greeting instead
+static const u8 sIconStates[ICON_COUNT] = { UNION_WANT_NONE, UNION_WANT_BATTLE, UNION_WANT_TRADE, UNION_WANT_DRAW,
+                                            UNION_WANT_SPIN_TRADE };
 
 // The frame, the lines' background and the chat lines. One array: three objects would share a section with
 // sIconStates, ahead of the icons' and the messages' local initializers
@@ -152,7 +153,7 @@ static const BGSetup sBGSetups[] = {
 static inline void UnionSubdisp_ShowSelected(const UnionSubdisp *work) {
     u32 i;
 
-    if (work->selected == 0) {
+    if (work->selected == UNION_WANT_NONE) {
         return;
     }
     for (i = 0; i < ICON_COUNT ? TRUE : FALSE; i++) {
@@ -182,7 +183,7 @@ UnionSubdisp *UnionSubdisp_Create(GameSystem *gsys) {
     PMSDraw_SetBackColor(work->pmsDraw, 0);
     sys = GameCommSys_GetWork(comm);
     if (sys != NULL) {
-        work->selected = UnionMain_GetSituUnk02(sys);
+        work->selected = UnionMain_GetWantedKind(sys);
         UnionSubdisp_DrawAllLines(work, &sys->visitorList);
         UnionSubdisp_ShowSelected(work);
     }
@@ -202,7 +203,7 @@ void UnionSubdisp_Free(UnionSubdisp *work) {
     UnionSystem *sys = GameCommSys_GetWork(GSYS_GetGameCommSystem(work->gsys));
 
     if (sys != NULL) {
-        sys->unk282E = 0;
+        sys->greetingRequested = FALSE;
     }
     PMSDraw_Delete(work->pmsDraw);
     UnionSubdisp_FreeFrame(work);
@@ -272,17 +273,17 @@ void UnionSubdisp_UpdateAltFrame(UnionSubdisp *work, BOOL active) {
 
         if (sys != NULL && touched == 1) {
             switch (work->selected) {
-            case 1:
-                UnionComm_SetState(sys, 2);
+            case UNION_WANT_BATTLE:
+                UnionComm_SetState(sys, UNION_CHAT_KIND_BATTLE);
                 break;
-            case 2:
-                UnionComm_SetState(sys, 3);
+            case UNION_WANT_TRADE:
+                UnionComm_SetState(sys, UNION_CHAT_KIND_TRADE);
                 break;
-            case 4:
-                UnionComm_SetState(sys, 4);
+            case UNION_WANT_DRAW:
+                UnionComm_SetState(sys, UNION_CHAT_KIND_DRAW);
                 break;
-            case 5:
-                UnionComm_SetState(sys, 5);
+            case UNION_WANT_SPIN_TRADE:
+                UnionComm_SetState(sys, UNION_CHAT_KIND_SPIN_TRADE);
                 break;
             }
         }
@@ -301,8 +302,8 @@ void UnionSubdisp_UpdateAltFrame(UnionSubdisp *work, BOOL active) {
         }
         UnionSubdisp_UpdateFlash(work, &sys->visitorList);
     }
-    if (GameCommSys_BootCheck(comm) == 3 && sys != NULL) {
-        UnionMain_SetSituUnk02(sys, work->selected);
+    if (GameCommSys_BootCheck(comm) == GAME_COMM_NO_UNION && sys != NULL) {
+        UnionMain_SetWantedKind(sys, work->selected);
     }
 }
 
@@ -438,7 +439,7 @@ static void UnionSubdisp_FreeIcons(UnionSubdisp *work) {
     }
 }
 
-// Whether an icon was touched: the first leaves the Union Room, the others pick what to do
+// Whether an icon that picks what to do was touched. The first one asks overlay 34 for the greeting instead
 static BOOL UnionSubdisp_UpdateIcons(UnionSubdisp *work, UnionSystem *sys) {
     u32 x;
     u32 y;
@@ -461,7 +462,7 @@ static BOOL UnionSubdisp_UpdateIcons(UnionSubdisp *work, UnionSystem *sys) {
         left = pos.x - 10;
         if (left < x && right > x && top < y && bottom > y) {
             if (i == 0 && sys != NULL) {
-                sys->unk282E = 1;
+                sys->greetingRequested = TRUE;
                 return FALSE;
             }
             UnionSubdisp_SelectIcon(work, i);
@@ -477,12 +478,12 @@ static void UnionSubdisp_SelectIcon(UnionSubdisp *work, u32 icon) {
     int i;
 
     if (state == work->selected) {
-        work->selected = 0;
+        work->selected = UNION_WANT_NONE;
     } else {
         work->selected = state;
     }
     for (i = 0; i <= ICON_COUNT - 1 ? TRUE : FALSE; i++) {
-        if (i == icon && work->selected != 0) {
+        if (i == icon && work->selected != UNION_WANT_NONE) {
             ClActor_SetPalette(work->actors[i], 1, 1);
         } else {
             ClActor_SetPalette(work->actors[i], 0, 1);

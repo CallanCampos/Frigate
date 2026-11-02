@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_exp_obj.h"
 #include "field/gimmick_league_lift.h"
@@ -22,7 +23,9 @@ static const G3DSceneActorSetup sActors[2] = {
 };
 
 static const G3DSceneResourceSetup sResources[] = {
-    { 0x9b, 1, 0 }, { 0x9b, 8, 0 }, { 0x9b, 3, 0 }, { 0x9b, 14, 0 }, { 0x9b, 23, 0 },
+    { ARCID_GIMMICK_LEAGUE_STATUE, 1, 0 },  { ARCID_GIMMICK_LEAGUE_STATUE, 8, 0 },
+    { ARCID_GIMMICK_LEAGUE_STATUE, 3, 0 },  { ARCID_GIMMICK_LEAGUE_STATUE, 14, 0 },
+    { ARCID_GIMMICK_LEAGUE_STATUE, 23, 0 },
 };
 
 static const G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };

@@ -16,7 +16,8 @@ struct EncEffCell {
     u8 unk0C[0xc];
     u32 unk18;
     s32 offset;
-    u32 unk20;
+    // The turn around the z axis
+    u32 angleZ;
     // Added to pos.x each frame
     fx32 speed;
     u8 unk28[0x8];
@@ -33,10 +34,12 @@ struct EncEffGrid {
     s32 work[2];
     u16 columns;
     u16 rows;
-    u8 unk300C[0x64];
+    // The effect's own work: encounter_effect_spread.c keeps its EncEffSpread here
+    u8 effectWork[0x64];
     void (*update)(EncEffGrid *grid);
-    u32 unk3074;
-    u32 unk3078;
+    // The fade at the end, and the clear color behind the cells, both white or both black
+    u32 fadeMode;
+    u32 clearColor;
 };
 
 struct EncEffGridParam {

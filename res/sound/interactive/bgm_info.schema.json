@@ -1,0 +1,25 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The BGM info: res/sound/interactive/bgm_info.json",
+    "description": "ARCID_BGM_INFO (a/0/8/6), which BGMInfo_LoadArcData reads (bgm_info.c): the interactive sound subsystem that each BGM uses, which BGMInfo_GetISSSubsystem gives the interactive sound system (iss_sys.c) for the BGM that plays. tools/data/bgm_info_data.py packs it.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "bgms" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "bgms": {
+            "type": "array", "maxItems": 255,
+            "description": "The BGMs, searched in order; one that isn't here uses no subsystem. The count is a byte",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "bgm", "subsystem" ],
+                "properties": {
+                    "bgm": { "type": [ "string", "integer" ], "x-constant": "SEQ_", "minimum": 0, "maximum": 65535, "description": "A SEQ_* constant" },
+                    "subsystem": {
+                        "enum": [ "ISS_SUBSYSTEM_NONE", "ISS_SUBSYSTEM_UNUSED_1", "ISS_SUBSYSTEM_ROAD", "ISS_SUBSYSTEM_CITY", "ISS_SUBSYSTEM_3D_SOUND", "ISS_SUBSYSTEM_DUNGEON", "ISS_SUBSYSTEM_UNUSED_6", "ISS_SUBSYSTEM_SWITCH", "ISS_SUBSYSTEM_ZONE" ],
+                        "description": "The subsystem, of the ISS_SUBSYSTEM_* enum (include/system/iss_sys.h): the road's, the towns' (cities.json), 3D sound (3d_sound.json), the dungeons' (dungeons.json), the BGM switches' (switches.json) or the zones' (zones.json); 1 and 6 have none"
+                    }
+                }
+            }
+        }
+    }
+}

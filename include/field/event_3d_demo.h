@@ -20,7 +20,7 @@ struct Event3DDemoWork {
 
 GameEvent *Event3DDemo_Create(GameSystem *gsys, GameEvent *parent, u32 demoId, u32 param, u32 realTime);
 GameEventReturnCode Event3DDemo_Callback(GameEvent *event, u32 *state, void *data);
-void CreateSeqLoadParam(Demo3DParam *out, GameSystem *gsys, u32 demoId, u8 param, u32 arg4, u8 hour, u8 minute,
+void CreateSeqLoadParam(Demo3DParam *out, GameSystem *gsys, u32 demoId, u8 param, u32 startFrame, u8 hour, u8 minute,
                         u8 season);
 void SetupPlaySequenceEventRealTime(Demo3DParam *out, GameSystem *gsys, u8 demoId, u8 param);
 void SetupPlaySequenceEventGameTime(Demo3DParam *out, GameSystem *gsys, u8 demoId, u8 param);

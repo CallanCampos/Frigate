@@ -1,0 +1,61 @@
+{
+    "$schema": "../../cast.schema.json",
+    "player": [
+        {
+            "species": "SPECIES_SLOWBRO",
+            "shown_species": "SPECIES_SLOWBRO",
+            "level": 52,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_BOLD",
+            "ability": 0,
+            "held_item": "ITEM_SITRUS_BERRY",
+            "moves": [ "MOVE_SLACK_OFF", "MOVE_BRINE", "MOVE_RECYCLE", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 0,
+                "defense": 31,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 252,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        }
+    ],
+    "opponent": [
+        {
+            "species": "SPECIES_TYRANITAR",
+            "shown_species": "SPECIES_TYRANITAR",
+            "level": 60,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_NAUGHTY",
+            "ability": 0,
+            "held_item": "ITEM_CHOPLE_BERRY",
+            "moves": [ "MOVE_EARTHQUAKE", "MOVE_GIGA_IMPACT", "MOVE_CRUNCH", "MOVE_DRAGON_PULSE" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 14,
+                "defense": 31,
+                "speed": 31,
+                "special_attack": 31,
+                "special_defense": 31
+            },
+            "evs": {
+                "hp": 252,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 6
+            }
+        }
+    ]
+}

@@ -12,6 +12,10 @@
 #include "gfl/std.h"
 #include "nitro/os.h"
 #include "nnsys/fnd.h"
+#include "text/system/wifi_error.h"
+
+// The group ID of the second heap's blocks, which tells DWCRapCommon_Free which heap a block is from
+#define DWCRAP_SUB_HEAP_GROUP_ID 0xea
 
 typedef struct DWCRapCommonWork {
     NNSFndHeapHandle heap;
@@ -33,7 +37,7 @@ static int DWCRapCommon_Init(HeapID heapId);
 static void DWCRapCommon_ShutdownLibrary(void);
 
 void DWCRapCommon_StartLibrary(u32 heapId) {
-    if (DWCRapCommon_Init(heapId) == 3) {
+    if (DWCRapCommon_Init(heapId) == DWC_INIT_RESULT_DESTROY_OTHER_SETTING) {
         GFL_OvlLoad(OVERLAY_WFC_USER_INFO_WARNING);
         WFCUserInfoWarning_Show();
         GFL_OvlUnload(OVERLAY_WFC_USER_INFO_WARNING);
@@ -54,7 +58,7 @@ void DWCRapCommon_SetSubHeapEx(u32 name, u32 size, u32 minSize, HeapID heapId) {
         NNS_FndCreateExpHeapEx((void *)(((uptr)pDwcRapWork->heapPtrSub + 0x1f) & ~0x1f), size - 0xc0, 0);
     pDwcRapWork->subName = name;
     NNS_FndSetAllocModeForExpHeap(pDwcRapWork->headHandleSub, 1);
-    NNS_FndSetGroupIDForExpHeap(pDwcRapWork->headHandleSub, 0xea);
+    NNS_FndSetGroupIDForExpHeap(pDwcRapWork->headHandleSub, DWCRAP_SUB_HEAP_GROUP_ID);
     pDwcRapWork->subMinSize = minSize;
 }
 
@@ -114,7 +118,7 @@ void DWCRapCommon_Free(DWCAllocType name, void *ptr, u32 size) {
     u32 mask;
 
     if (ptr != NULL) {
-        if (NNS_FndGetGroupIDForMBlockExpHeap(ptr) == 0xea) {
+        if (NNS_FndGetGroupIDForMBlockExpHeap(ptr) == DWCRAP_SUB_HEAP_GROUP_ID) {
             if (pDwcRapWork->headHandleSub != NULL) {
                 mask = OS_DisableInterrupts();
                 NNS_FndFreeToExpHeap(pDwcRapWork->headHandleSub, ptr);
@@ -164,7 +168,7 @@ static int DWCRapCommon_Init(HeapID heapId) {
 }
 
 void DWCRapCommon_ResetUserData(DWCUserData *userData) {
-    MIi_CpuClearFast(0, userData, 0x40);
+    MIi_CpuClearFast(0, userData, sizeof(DWCUserData));
     if (!DWC_CheckUserData(userData)) {
         DWC_CreateUserData(userData);
         DWC_ClearDirtyFlag(userData);
@@ -185,8 +189,8 @@ int DWCRapCommon_CheckError(u32 a0, u32 a1) {
         error = NetState_GetErrorInfo();
         if (GFL_NetErrCheck()) {
             switch (error->errorType) {
-            case 1:
-            case 2:
+            case DWC_ETYPE_LIGHT:
+            case DWC_ETYPE_SHOW_ERROR:
                 if (a0 == 0) {
                     DWCRapCommon_ShutdownLibrary();
                     GFL_NetErrShowScreen();
@@ -195,17 +199,17 @@ int DWCRapCommon_CheckError(u32 a0, u32 a1) {
                 }
                 DWC_ClearError();
                 // fall through
-            case 3:
-            case 4:
-            case 5:
+            case DWC_ETYPE_SHUTDOWN_FM:
+            case DWC_ETYPE_SHUTDOWN_GHTTP:
+            case DWC_ETYPE_SHUTDOWN_ND:
                 GFL_NetErrMarkShown();
-                GFL_NetErrRecordWifi(13);
+                GFL_NetErrRecordWifi(WifiError_Text_CommunicationErrorHaveBeen_2);
                 return DWCRAP_RESULT_FAILED;
-            case 6:
+            case DWC_ETYPE_DISCONNECT:
                 GFL_NetErrMarkShown();
                 return DWCRAP_RESULT_FAILED;
-            case 7:
-                GFL_NetErrShowWifi(15);
+            case DWC_ETYPE_FATAL:
+                GFL_NetErrShowWifi(WifiError_Text_NintendoWiFiConnection_3);
                 return DWCRAP_RESULT_NET_ERROR;
             }
         }
@@ -234,12 +238,12 @@ int DWCRapCommon_CheckError(u32 a0, u32 a1) {
                 return DWCRAP_RESULT_DISCONNECTED;
             }
             GFL_NetErrMarkShown();
-            GFL_NetErrRecordWifi(13);
+            GFL_NetErrRecordWifi(WifiError_Text_CommunicationErrorHaveBeen_2);
             return DWCRAP_RESULT_FAILED;
         }
         if (type == 0x3ee || type == 0x3f7 || type == 0x3f5) {
             GFL_NetErrMarkShown();
-            GFL_NetErrRecordWifi(13);
+            GFL_NetErrRecordWifi(WifiError_Text_CommunicationErrorHaveBeen_2);
             return DWCRAP_RESULT_FAILED;
         }
     }

@@ -1,0 +1,6 @@
+{
+    "$schema": "../../walking_pokemon.schema.json",
+    "species": "SPECIES_BURMY",
+    "sex": null,
+    "form": 1
+}

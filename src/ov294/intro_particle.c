@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "demo/intro.h"
 #include "gfl/particle.h"
 
@@ -40,7 +41,8 @@ IntroParticle *IntroParticle_Create(IntroGraphic *graphic, HeapID heapId) {
     Particle_FreeCamera(particle->system);
     Particle_SetCamera(particle->system, &projection, FX32_CONST(2), &sCameraVectors[1], &sCameraVectors[0],
                        &sCameraVectors[2], particle->heapId);
-    Particle_SetResource(particle->system, Particle_ReadResource(6, 6, particle->heapId), TRUE, FALSE);
+    Particle_SetResource(particle->system, Particle_ReadResource(ARCID_BTLV_EFFVM_PARTICLES, 6, particle->heapId), TRUE,
+                         FALSE);
     return particle;
 }
 

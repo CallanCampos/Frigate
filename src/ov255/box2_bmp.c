@@ -24,6 +24,7 @@
 #include "system/printsys.h"
 #include "system/wordset.h"
 #include "text/system/box2_bmp.h"
+#include "text/system/btl_pokeparam_box_main_save_init.h"
 
 // The PC box's windows: the Pokémon's data on the upper screen, the buttons of the frames, the box names and counts on
 // OAM, and the messages. The ROM doesn't name this file; box2_bmp.c is a guess after box2_main.c. None of these
@@ -164,10 +165,10 @@ void Box2Bmp_PrintInfoLabels(Box2SysWork *syswk) {
     GFL_BitmapFill(BmpWin_GetBitmap(app->windows[11].window), 0);
     GFL_BitmapFill(BmpWin_GetBitmap(app->windows[12].window), 0);
     GFL_BitmapFill(BmpWin_GetBitmap(app->windows[13].window), 0);
-    PrintMsg(app, 10, app->msgData, 109, 0, 0, app->font, BOX2_COLOR_NORMAL);
-    PrintMsg(app, 11, app->msgData, 100, 0, 0, app->font, BOX2_COLOR_NORMAL);
-    PrintMsg(app, 12, app->msgData, 101, 0, 0, app->font, BOX2_COLOR_NORMAL);
-    PrintMsg(app, 13, app->msgData, 102, 0, 0, app->font, BOX2_COLOR_NORMAL);
+    PrintMsg(app, 10, app->msgData, BtlPokeparamBoxMainSaveInit_Text_MovesLearned, 0, 0, app->font, BOX2_COLOR_NORMAL);
+    PrintMsg(app, 11, app->msgData, BtlPokeparamBoxMainSaveInit_Text_Nature, 0, 0, app->font, BOX2_COLOR_NORMAL);
+    PrintMsg(app, 12, app->msgData, BtlPokeparamBoxMainSaveInit_Text_Ability, 0, 0, app->font, BOX2_COLOR_NORMAL);
+    PrintMsg(app, 13, app->msgData, BtlPokeparamBoxMainSaveInit_Text_Item, 0, 0, app->font, BOX2_COLOR_NORMAL);
 }
 
 // The species
@@ -175,7 +176,8 @@ static void PrintInfoSpecies(Box2AppWork *app, Box2PokeInfo *info, u32 index) {
     GFL_BitmapFill(BmpWin_GetBitmap(app->windows[index].window), 0);
     if (info->egg == FALSE) {
         setBoxPokemonSpeciesNameToStrbuf(app->wordSet, 0, info->pkm);
-        PrintFormattedMsg(app, index, app->msgData, 0, 0, 0, app->font, BOX2_COLOR_NORMAL);
+        PrintFormattedMsg(app, index, app->msgData, BtlPokeparamBoxMainSaveInit_Text_Empty, 0, 0, app->font,
+                          BOX2_COLOR_NORMAL);
     } else {
         RequestFlushChar(app, index);
         return;
@@ -187,7 +189,8 @@ static void PrintInfoSpecies(Box2AppWork *app, Box2PokeInfo *info, u32 index) {
 static void PrintInfoNickname(Box2AppWork *app, Box2PokeInfo *info, u32 index) {
     GFL_BitmapFill(BmpWin_GetBitmap(app->windows[index].window), 0);
     loadBoxPokemonNameToStrbuf(app->wordSet, 0, info->pkm);
-    PrintFormattedMsg(app, index, app->msgData, 1, 0, 0, app->font, BOX2_COLOR_NORMAL);
+    PrintFormattedMsg(app, index, app->msgData, BtlPokeparamBoxMainSaveInit_Text_Empty_2, 0, 0, app->font,
+                      BOX2_COLOR_NORMAL);
     PushWindowScreen(&app->windows[index]);
 }
 
@@ -197,10 +200,12 @@ static void PrintInfoLevel(Box2AppWork *app, Box2PokeInfo *info, u32 index) {
 
     GFL_BitmapFill(BmpWin_GetBitmap(app->windows[index].window), 0);
     if (info->egg == FALSE) {
-        PrintFormattedMsg(app, index, app->msgData, 107, 0, 0, app->font, BOX2_COLOR_NORMAL);
+        PrintFormattedMsg(app, index, app->msgData, BtlPokeparamBoxMainSaveInit_Text_Lv, 0, 0, app->font,
+                          BOX2_COLOR_NORMAL);
         width = GFL_FontGetBlockWidth(app->expandBuf, app->font, 0);
         WordSetNumber(app->wordSet, 0, info->level, 3, 0, TRUE);
-        PrintFormattedMsg(app, index, app->msgData, 103, width, 0, app->font, BOX2_COLOR_NORMAL);
+        PrintFormattedMsg(app, index, app->msgData, BtlPokeparamBoxMainSaveInit_Text_Empty_23, width, 0, app->font,
+                          BOX2_COLOR_NORMAL);
     } else {
         RequestFlushChar(app, index);
         return;
@@ -213,9 +218,11 @@ static void PrintInfoSex(Box2AppWork *app, Box2PokeInfo *info, u32 index) {
     GFL_BitmapFill(BmpWin_GetBitmap(app->windows[index].window), 0);
     if (info->egg == FALSE && info->sexPut == TRUE) {
         if (info->sex == GENDER_MALE) {
-            PrintMsg(app, index, app->msgData, 95, 0, 0, app->font, BOX2_COLOR_MALE);
+            PrintMsg(app, index, app->msgData, BtlPokeparamBoxMainSaveInit_Text_Empty_18, 0, 0, app->font,
+                     BOX2_COLOR_MALE);
         } else if (info->sex == GENDER_FEMALE) {
-            PrintMsg(app, index, app->msgData, 96, 0, 0, app->font, BOX2_COLOR_FEMALE);
+            PrintMsg(app, index, app->msgData, BtlPokeparamBoxMainSaveInit_Text_Empty_19, 0, 0, app->font,
+                     BOX2_COLOR_FEMALE);
         } else {
             RequestFlushChar(app, index);
             return;
@@ -240,11 +247,12 @@ static void PrintInfoDexNumber(Box2SysWork *syswk, Box2PokeInfo *info, u32 index
             number = syswk->app->regionalDex[info->species];
         }
         if (number != 999) {
-            PrintFormattedMsg(syswk->app, index, syswk->app->msgData, 108, 0, 0, syswk->app->font, BOX2_COLOR_NORMAL);
+            PrintFormattedMsg(syswk->app, index, syswk->app->msgData, BtlPokeparamBoxMainSaveInit_Text_No, 0, 0,
+                              syswk->app->font, BOX2_COLOR_NORMAL);
             width = GFL_FontGetBlockWidth(syswk->app->expandBuf, syswk->app->font, 0);
             WordSetNumber(syswk->app->wordSet, 0, number, 3, 2, TRUE);
-            PrintFormattedMsg(syswk->app, index, syswk->app->msgData, 104, width, 0, syswk->app->font,
-                              BOX2_COLOR_NORMAL);
+            PrintFormattedMsg(syswk->app, index, syswk->app->msgData, BtlPokeparamBoxMainSaveInit_Text_Empty_24, width,
+                              0, syswk->app->font, BOX2_COLOR_NORMAL);
         } else {
             RequestFlushChar(syswk->app, index);
             return;
@@ -261,9 +269,11 @@ static void PrintInfoNature(Box2AppWork *app, Box2PokeInfo *info, u32 index) {
     GFL_BitmapFill(BmpWin_GetBitmap(app->windows[index].window), 0);
     if (info->egg == FALSE) {
         loadNatureToStrbuf(app->wordSet, 0, info->nature);
-        PrintFormattedMsg(app, index, app->msgData, 98, 0, 0, app->font, BOX2_COLOR_NORMAL);
+        PrintFormattedMsg(app, index, app->msgData, BtlPokeparamBoxMainSaveInit_Text_Empty_21, 0, 0, app->font,
+                          BOX2_COLOR_NORMAL);
     } else {
-        PrintMsg(app, index, app->msgData, 106, 0, 0, app->font, BOX2_COLOR_NORMAL);
+        PrintMsg(app, index, app->msgData, BtlPokeparamBoxMainSaveInit_Text_Empty_25, 0, 0, app->font,
+                 BOX2_COLOR_NORMAL);
     }
     PushWindowScreen(&app->windows[index]);
 }
@@ -273,9 +283,11 @@ static void PrintInfoAbility(Box2AppWork *app, Box2PokeInfo *info, u32 index) {
     GFL_BitmapFill(BmpWin_GetBitmap(app->windows[index].window), 0);
     if (info->egg == FALSE) {
         loadAbilityNameToStrbuf(app->wordSet, 0, info->ability);
-        PrintFormattedMsg(app, index, app->msgData, 97, 0, 0, app->font, BOX2_COLOR_NORMAL);
+        PrintFormattedMsg(app, index, app->msgData, BtlPokeparamBoxMainSaveInit_Text_Empty_20, 0, 0, app->font,
+                          BOX2_COLOR_NORMAL);
     } else {
-        PrintMsg(app, index, app->msgData, 106, 0, 0, app->font, BOX2_COLOR_NORMAL);
+        PrintMsg(app, index, app->msgData, BtlPokeparamBoxMainSaveInit_Text_Empty_25, 0, 0, app->font,
+                 BOX2_COLOR_NORMAL);
     }
     PushWindowScreen(&app->windows[index]);
 }
@@ -285,9 +297,10 @@ static void PrintInfoItem(Box2AppWork *app, Box2PokeInfo *info, u32 index) {
     GFL_BitmapFill(BmpWin_GetBitmap(app->windows[index].window), 0);
     if (info->item != ITEM_NONE) {
         loadItemNameToStrbuf(app->wordSet, 0, info->item);
-        PrintFormattedMsg(app, index, app->msgData, 99, 0, 0, app->font, BOX2_COLOR_NORMAL);
+        PrintFormattedMsg(app, index, app->msgData, BtlPokeparamBoxMainSaveInit_Text_Empty_22, 0, 0, app->font,
+                          BOX2_COLOR_NORMAL);
     } else {
-        PrintMsg(app, index, app->msgData, 105, 0, 0, app->font, BOX2_COLOR_NORMAL);
+        PrintMsg(app, index, app->msgData, BtlPokeparamBoxMainSaveInit_Text_None, 0, 0, app->font, BOX2_COLOR_NORMAL);
     }
     PushWindowScreen(&app->windows[index]);
 }
@@ -304,7 +317,8 @@ static void PrintInfoMoves(Box2AppWork *app, Box2PokeInfo *info, u32 index) {
             PrintMsg(app, index, msgData, info->moveId[i], 0, i * 16, app->font, BOX2_COLOR_NORMAL);
         }
     } else {
-        PrintMsg(app, index, app->msgData, 106, 0, 0, app->font, BOX2_COLOR_NORMAL);
+        PrintMsg(app, index, app->msgData, BtlPokeparamBoxMainSaveInit_Text_Empty_25, 0, 0, app->font,
+                 BOX2_COLOR_NORMAL);
     }
     GFL_MsgDataFree(msgData);
     PushWindowScreen(&app->windows[index]);
@@ -443,16 +457,16 @@ void Box2Bmp_InitMenuFrames(Box2AppWork *app) {
 }
 
 void Box2Bmp_InitPartyButton(Box2SysWork *syswk) {
-    if (syswk->param->mode == 4) {
-        DrawFrameButton(syswk, 22, 71);
+    if (syswk->param->mode == BOX2_MODE_BATTLE_BOX) {
+        DrawFrameButton(syswk, 22, BtlPokeparamBoxMainSaveInit_Text_BattleBox);
     } else {
-        DrawFrameButton(syswk, 22, 69);
+        DrawFrameButton(syswk, 22, BtlPokeparamBoxMainSaveInit_Text_Party);
     }
     InitWindowFrame(syswk->app->bgWinFrame, 10, syswk->app->windows[22].window);
 }
 
 void Box2Bmp_InitBoxListButton(Box2SysWork *syswk) {
-    DrawFrameButton(syswk, 23, 70);
+    DrawFrameButton(syswk, 23, BtlPokeparamBoxMainSaveInit_Text_BoxList);
     InitWindowFrame(syswk->app->bgWinFrame, 11, syswk->app->windows[23].window);
 }
 
@@ -474,9 +488,9 @@ void Box2Bmp_PutTrayName(Box2SysWork *syswk, u32 tray, u32 index) {
 }
 
 void Box2Bmp_FlushTrayName(Box2SysWork *syswk) {
-    if (syswk->app->unkA5B8 == TRUE) {
+    if (syswk->app->trayNamePending == TRUE) {
         BmpOam_ActorBmpTrans(syswk->app->fontOam[0].oam);
-        syswk->app->unkA5B8 = FALSE;
+        syswk->app->trayNamePending = FALSE;
     }
 }
 
@@ -487,12 +501,12 @@ void Box2Bmp_DrawScrolledTrayName(Box2SysWork *syswk, u32 mv) {
         tray -= syswk->trayMax;
     }
     DrawTrayName(syswk, tray, 0);
-    syswk->app->unkA5B8 = TRUE;
+    syswk->app->trayNamePending = TRUE;
 }
 
 // Draws how many Pokémon a box holds into a text object
 void Box2Bmp_PutTrayCount(Box2SysWork *syswk, u32 tray, u32 index) {
-    StrBuf *str = GFL_MsgDataLoadStrbufNew(syswk->app->msgData, 30);
+    StrBuf *str = GFL_MsgDataLoadStrbufNew(syswk->app->msgData, BtlPokeparamBoxMainSaveInit_Text_Empty_7);
     u32 count = howManyPokesInGeneralAreInBox(syswk->param->boxes, tray);
 
     WordSetNumber(syswk->app->wordSet, 0, count, 2, 0, TRUE);
@@ -510,8 +524,8 @@ void Box2Bmp_PutTrayCount(Box2SysWork *syswk, u32 tray, u32 index) {
 }
 
 static void InitMarkingButtons(Box2SysWork *syswk) {
-    DrawMenuButton(syswk, 20, 84, FALSE);
-    DrawMenuButton(syswk, 21, 85, TRUE);
+    DrawMenuButton(syswk, 20, BtlPokeparamBoxMainSaveInit_Text_Confirm, FALSE);
+    DrawMenuButton(syswk, 21, BtlPokeparamBoxMainSaveInit_Text_Cancel_3, TRUE);
     BGWinFrame_SetPalette(syswk->app->bgWinFrame, 7, 0, 9, 11, 3, 12);
     BGWinFrame_SetPalette(syswk->app->bgWinFrame, 7, 0, 12, 11, 3, 12);
 }
@@ -619,31 +633,31 @@ void Box2Bmp_PrintReleaseMsg(Box2SysWork *syswk, u32 type, u32 index) {
     u32 msgId;
 
     switch (type) {
-    case 0:
+    case BOX2_RELEASE_MSG_ASK:
         msgId = Box2Bmp_Text_ReleasePokemon;
         break;
-    case 1:
+    case BOX2_RELEASE_MSG_RELEASED:
         msgId = Box2Bmp_Text_Released;
         loadBoxPokemonNameToStrbuf(syswk->app->wordSet, 0, Box2Main_GetBoxPkm(syswk, syswk->tray, syswk->pos));
         break;
-    case 2:
+    case BOX2_RELEASE_MSG_BYE_BYE:
         msgId = Box2Bmp_Text_ByeBye;
         loadBoxPokemonNameToStrbuf(syswk->app->wordSet, 0, Box2Main_GetBoxPkm(syswk, syswk->tray, syswk->pos));
         break;
-    case 3:
+    case BOX2_RELEASE_MSG_EGG:
         msgId = Box2Bmp_Text_CantReleaseEgg;
         break;
-    case 7:
+    case BOX2_RELEASE_MSG_FUSED_KYUREM:
         msgId = Box2Bmp_Text_CantReleaseFusedKyurem;
         break;
-    case 4:
+    case BOX2_RELEASE_MSG_CAME_BACK:
         msgId = Box2Bmp_Text_CameBack;
         loadBoxPokemonNameToStrbuf(syswk->app->wordSet, 0, Box2Main_GetBoxPkm(syswk, syswk->tray, syswk->pos));
         break;
-    case 5:
+    case BOX2_RELEASE_MSG_WORRIED:
         msgId = Box2Bmp_Text_WorriedAbout;
         break;
-    case 6:
+    case BOX2_RELEASE_MSG_LAST_POKEMON:
         msgId = Box2Bmp_Text_ThatsLastPokemon;
         break;
     }
@@ -654,16 +668,16 @@ void Box2Bmp_PrintPrompt(Box2SysWork *syswk, u32 type, u32 index) {
     u32 msgId;
 
     switch (type) {
-    case 0:
+    case BOX2_PROMPT_WHAT_TO_DO:
         msgId = Box2Bmp_Text_WhatWant;
         break;
-    case 1:
+    case BOX2_PROMPT_JUMP_TO_BOX:
         msgId = Box2Bmp_Text_JumpWhichBox;
         break;
-    case 2:
+    case BOX2_PROMPT_THEME:
         msgId = Box2Bmp_Text_PleasePickTheme;
         break;
-    case 3:
+    case BOX2_PROMPT_WALLPAPER:
         msgId = Box2Bmp_Text_PickWallpaper;
         break;
     }
@@ -674,23 +688,23 @@ void Box2Bmp_PrintPokeMoveMsg(Box2SysWork *syswk, u32 pos, u32 type, u32 index) 
     u32 msgId;
 
     switch (type) {
-    case 0:
+    case BOX2_POKEMOVE_MSG_WHICH_TO_TAKE:
         msgId = Box2Bmp_Text_WhichOneWillTake;
         break;
-    case 1:
+    case BOX2_POKEMOVE_MSG_SELECTED:
         msgId = Box2Bmp_Text_Selected;
         loadBoxPokemonNameToStrbuf(syswk->app->wordSet, 0, Box2Main_GetBoxPkm(syswk, syswk->tray, syswk->pos));
         break;
-    case 2:
+    case BOX2_POKEMOVE_MSG_PARTY_FULL:
         msgId = Box2Bmp_Text_PartysFull;
         break;
-    case 3:
+    case BOX2_POKEMOVE_MSG_WHICH_BOX:
         msgId = Box2Bmp_Text_PlaceWhichBox;
         break;
-    case 4:
+    case BOX2_POKEMOVE_MSG_BOX_FULL:
         msgId = Box2Bmp_Text_BoxFull;
         break;
-    case 5:
+    case BOX2_POKEMOVE_MSG_REMOVE_MAIL:
         msgId = Box2Bmp_Text_PleaseRemoveMail;
         break;
     }
@@ -701,31 +715,31 @@ void Box2Bmp_PrintItemMsg(Box2SysWork *syswk, u32 type, u32 index) {
     u32 msgId;
 
     switch (type) {
-    case 0:
+    case BOX2_ITEM_MSG_CAN_HOLD:
         msgId = Box2Bmp_Text_CanHoldItem;
         break;
-    case 1:
+    case BOX2_ITEM_MSG_SELECTED:
         msgId = Box2Bmp_Text_Selected_2;
         loadItemNameToStrbuf(syswk->app->wordSet, 0, syswk->app->getItem);
         break;
-    case 2:
+    case BOX2_ITEM_MSG_PUT_AWAY:
         msgId = Box2Bmp_Text_PutAway;
         loadItemNameToStrbuf(syswk->app->wordSet, 0, syswk->app->getItem);
         break;
-    case 3:
+    case BOX2_ITEM_MSG_PLACED_IN_BAG:
         msgId = Box2Bmp_Text_PlacedBag;
         loadItemNameToStrbuf(syswk->app->wordSet, 0, syswk->app->getItem);
         break;
-    case 4:
+    case BOX2_ITEM_MSG_MAIL_CANT_TAKE:
         msgId = Box2Bmp_Text_MailCantTakenAway;
         break;
-    case 5:
+    case BOX2_ITEM_MSG_EGG_CANT_HOLD:
         msgId = Box2Bmp_Text_EggCantHoldItem;
         break;
-    case 6:
+    case BOX2_ITEM_MSG_BAG_FULL:
         msgId = Box2Bmp_Text_BagFull;
         break;
-    case 7:
+    case BOX2_ITEM_MSG_MAIL_CANT_MOVE:
         msgId = Box2Bmp_Text_MailCannotMoved_2;
         break;
     }
@@ -757,8 +771,8 @@ void Box2Bmp_PrintTuckIn(Box2SysWork *syswk) {
     PrintBoxMsg(syswk, Box2Bmp_Text_WillTuckedOk, 27);
 }
 
-void Box2Bmp_PrintBattleBoxLocked(Box2SysWork *syswk, u32 a1) {
-    if (a1 == 0) {
+void Box2Bmp_PrintBattleBoxLocked(Box2SysWork *syswk, BOOL items) {
+    if (items == FALSE) {
         PrintBoxMsg(syswk, Box2Bmp_Text_BattleBoxLockedCannot, 27);
     } else {
         PrintBoxMsg(syswk, Box2Bmp_Text_BattleBoxLockedItems, 27);
@@ -779,7 +793,7 @@ void Box2Bmp_PutRangeCount(Box2SysWork *syswk) {
             }
         }
     }
-    str = GFL_MsgDataLoadStrbufNew(syswk->app->msgData, 30);
+    str = GFL_MsgDataLoadStrbufNew(syswk->app->msgData, BtlPokeparamBoxMainSaveInit_Text_Empty_7);
     WordSetNumber(syswk->app->wordSet, 0, count, 2, 1, TRUE);
     GFL_WordSetFormatStrbuf(syswk->app->wordSet, syswk->app->expandBuf, str);
     GFL_BitmapFill(syswk->app->fontOam[9].bitmap, 0);

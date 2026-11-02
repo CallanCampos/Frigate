@@ -1,0 +1,31 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A field actor's scripted animation: res/field/actors/animations/<n>.json",
+    "description": "File n of ARCID_FIELD_ACTOR_ANIMATION (a/2/0/0), which a script plays on an actor by its number (Scrcmd_FieldActorAnimation_ActorAnimationPlay, field_actor_animation.c): a curve (ica_anime.c) that FieldActorAnmProc_Update steps a frame at a time, moving the actor to its translation from where it started and turning it to face down, right, up or left as its rotation's Y is 0, 90, 180 or 270 degrees (FieldActorAnmProc_CommitTransform). The game turns each float into fixed point (FX32_CONST). tools/data/field_actor_animation_data.py packs them in order.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "values", "frames" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "values": {
+            "type": "array", "maxItems": 3, "items": { "enum": [ "scale", "rotation", "translation" ] },
+            "description": "The values each frame has, of scale, rotation and translation in that order (the file's flags)"
+        },
+        "frames": {
+            "type": "array",
+            "description": "The frames, each with the values that values names",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "scale": { "$ref": "#/$defs/vector", "description": "The scale on X, Y and Z, which the field actors' animations don't read" },
+                    "rotation": { "$ref": "#/$defs/vector", "description": "The rotation around X, Y and Z, in degrees" },
+                    "translation": { "$ref": "#/$defs/vector", "description": "Where the actor is from where it started, in units" }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "vector": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" } }
+    }
+}

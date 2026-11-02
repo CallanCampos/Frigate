@@ -1,0 +1,13 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "A",
+    "shapes": [ 11 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_ABUNDANT_SHRINE": [ "grass", "dark_grass" ],
+            "ZONE_ROUTE_14": [ "grass", "dark_grass" ],
+            "ZONE_VICTORY_ROAD": [ "grass", "dark_grass" ]
+        }
+    }
+}

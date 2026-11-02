@@ -45,92 +45,92 @@ GameEventReturnCode EventGameClear_Callback(GameEvent *event, u32 *state, void *
     u32 enabled;
 
     switch (work->current) {
-    case 0:
-        func_ov012_0215a670(work);
+    case GAME_CLEAR_STATE_START:
+        EventGameClear_SetHallOfFameMinutes(work);
         EventWork_FlagSet(GameData_GetEventWork(gameData), 0x9f8);
         EventGameClear_GiveMonotypeMedals(work);
         GFL_SndBGMFadeOut(30);
         EventGameClear_NextState(work, state);
         break;
-    case 1:
+    case GAME_CLEAR_STATE_FADE_OUT:
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
         EventGameClear_NextState(work, state);
         break;
-    case 2:
+    case GAME_CLEAR_STATE_END_COMM:
         if (GameCommSys_BootCheck(comm)) {
             GameCommSys_ExitReq(comm);
         }
         EventGameClear_NextState(work, state);
         break;
-    case 3:
+    case GAME_CLEAR_STATE_WAIT_COMM:
         if (!GameCommSys_BootCheck(comm)) {
             EventGameClear_NextState(work, state);
         }
         break;
-    case 4:
+    case GAME_CLEAR_STATE_CLOSE_FIELD:
         GameEvent_ChainNext(event, EventFieldCloseKeepSound_Create(gsys, field));
         EventGameClear_NextState(work, state);
         break;
-    case 5:
+    case GAME_CLEAR_STATE_HALL_OF_FAME:
         GSYS_QueueProc(gsys, OVERLAY_ID(265), &HALL_OF_FAME_DEMO_PROC_FUNCTIONS, &work->ov265Param);
         EventGameClear_NextState(work, state);
         break;
-    case 6:
+    case GAME_CLEAR_STATE_WAIT_HALL_OF_FAME:
         if (!GSYS_GetProcMgrState(gsys)) {
             EventGameClear_NextState(work, state);
         }
         break;
-    case 7:
+    case GAME_CLEAR_STATE_STAFF_ROLL:
         GSYS_QueueProc(gsys, OVERLAY_STAFF_ROLL, &STAFF_ROLL_PROC_FUNCTIONS, &work->staffRollParam);
         EventGameClear_NextState(work, state);
         break;
-    case 8:
+    case GAME_CLEAR_STATE_WAIT_STAFF_ROLL:
         if (!GSYS_GetProcMgrState(gsys)) {
             EventGameClear_NextState(work, state);
         }
         break;
-    case 9:
+    case GAME_CLEAR_STATE_DEMO:
         GameEvent_ChainNext(event, Event3DDemo_Create(gsys, event, EventGameClear_Get3DDemoID(), 0, 0));
         EventGameClear_NextState(work, state);
         break;
-    case 10:
+    case GAME_CLEAR_STATE_POST_HOF_SETUP:
         FieldScript_CallPlayerPostHOFSetup(gsys, 4);
         EventGameClear_NextState(work, state);
         break;
-    case 11:
+    case GAME_CLEAR_STATE_UNOVA_LINK:
         if (!KeyInfo_IsKeyUnlocked(getKeyInfoSaveBlk(save), work->unovaLinkParam.key)) {
             GSYS_QueueProcAsEvent(event, OVERLAY_ID(332), &UNOVA_LINK_PROC_FUNCTIONS, &work->unovaLinkParam);
         }
         EventGameClear_NextState(work, state);
         break;
-    case 12:
+    case GAME_CLEAR_STATE_SAVE:
         GSYS_QueueProcAsEvent(event, OVERLAY_ID(295), &GAME_CLEAR_SAVE_PROC_FUNCTIONS, &work->ov295Param);
         EventGameClear_NextState(work, state);
         break;
-    case 13:
+    case GAME_CLEAR_STATE_WAIT:
         if (work->counter > 60) {
             work->counter = 0;
             EventGameClear_NextState(work, state);
         }
         work->counter++;
         break;
-    case 14:
+    case GAME_CLEAR_STATE_THE_END:
         GSYS_QueueProcAsEvent(event, OVERLAY_THE_END, &THE_END_PROC_FUNCTIONS, &work->ov267Param);
         GSYS_SetCGearOn(gsys, 0);
         EventGameClear_NextState(work, state);
         break;
-    case 15:
+    case GAME_CLEAR_STATE_WARP_ENDING_A:
         positionA = sEndingPositionA;
         GameEvent_ChainNext(event, EventMapChangeEnding_Create(gsys, field, 0x8b, &positionA, 1));
         EventGameClear_NextState(work, state);
         break;
-    case 16:
+    case GAME_CLEAR_STATE_WARP_ENDING_B:
         positionB = sEndingPositionB;
         GameEvent_ChainNext(event, EventMapChangeEnding_Create(gsys, field, 0x1ab, &positionB, 1));
         EventGameClear_NextState(work, state);
         break;
-    case 17:
+    case GAME_CLEAR_STATE_SCRIPT_ENDING_A:
         enabled = GFL_BGSysGetEnabledBGsA();
         FieldG2D_SetLCDConfig();
         GFL_BGSysSetEnabledBGsA(enabled);
@@ -139,7 +139,7 @@ GameEventReturnCode EventGameClear_Callback(GameEvent *event, u32 *state, void *
         EventScriptCall_Start(event, 1, NULL, 0, 4);
         EventGameClear_NextState(work, state);
         break;
-    case 18:
+    case GAME_CLEAR_STATE_SCRIPT_ENDING_B:
         enabled = GFL_BGSysGetEnabledBGsA();
         FieldG2D_SetLCDConfig();
         GFL_BGSysSetEnabledBGsA(enabled);
@@ -148,30 +148,30 @@ GameEventReturnCode EventGameClear_Callback(GameEvent *event, u32 *state, void *
         EventScriptCall_Start(event, 0x20, NULL, 0, 4);
         EventGameClear_NextState(work, state);
         break;
-    case 19:
+    case GAME_CLEAR_STATE_OPEN_FIELD:
         GameEvent_ChainNext(event, EventFieldOpen_Create(gsys));
         EventGameClear_NextState(work, state);
         break;
-    case 20:
+    case GAME_CLEAR_STATE_FADE_IN:
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         EventGameClear_NextState(work, state);
         break;
-    case 21:
+    case GAME_CLEAR_STATE_STOP_BGM:
         GFL_SndBGMStop(0x3f8);
         EventGameClear_NextState(work, state);
         break;
-    case 22:
+    case GAME_CLEAR_STATE_PLAY_BGM:
         GFL_SndBGMPlay(0x4f4, 0xffff);
         EventGameClear_NextState(work, state);
         break;
-    case 23:
+    case GAME_CLEAR_STATE_FADE_OUT_BGM:
         if (GFL_SndBGMIsPlaying() == TRUE) {
             GFL_SndBGMFadeOut(64);
         }
         EventGameClear_NextState(work, state);
         break;
-    case 24:
+    case GAME_CLEAR_STATE_WAIT_BGM:
         if (GFL_SndBGMIsFading() == TRUE) {
             break;
         }
@@ -180,27 +180,27 @@ GameEventReturnCode EventGameClear_Callback(GameEvent *event, u32 *state, void *
         }
         EventGameClear_NextState(work, state);
         break;
-    case 25:
+    case GAME_CLEAR_STATE_END:
         EventWork_FlagReset(GameData_GetEventWork(gameData), 0x9f8);
         return GAMEEVENT_DONE;
-    case 26:
+    case GAME_CLEAR_STATE_IDLE:
         return GAMEEVENT_CONTINUE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *EventGameClear_Create(GameSystem *gsys, u32 param) {
+GameEvent *EventGameClear_Create(GameSystem *gsys, u32 repeat) {
     GameData *gameData = GSYS_GetGameData(gsys);
     GameEvent *event = GameEvent_Create(gsys, NULL, EventGameClear_Callback, sizeof(GameClearWork));
     GameClearWork *work = GameEvent_GetData(event);
 
     work->gameSystem = gsys;
     work->gameData = gameData;
-    work->unk08 = param;
-    work->unk10 = GetGameDataPlayerInfo(gameData);
+    work->repeat = repeat;
+    work->playerInfo = GetGameDataPlayerInfo(gameData);
     work->counter = 0;
     work->ov295Param.gsys = gsys;
-    work->ov295Param.param = param;
+    work->ov295Param.repeat = repeat;
     EncountSave_SpawnPendingEntries(gameData);
     SetGameClearGameData(work);
     SetGameClearStaffRollParam(work);
@@ -224,46 +224,46 @@ void SetGameClearGameData(GameClearWork *work) {
 void SetGameClearStaffRollParam(GameClearWork *work) {
     u32 value;
 
-    work->staffRollParam.skippable = work->unk08 == 1;
+    work->staffRollParam.skippable = work->repeat == TRUE;
     work->staffRollParam.playerInfo = GetGameDataPlayerInfo(work->gameData);
     value = Config_GetKanji((Config *)getTrainerDataBlkAddress(GameData_GetSaveControl(work->gameData)));
-    work->staffRollParam.unk04 = value;
-    work->ov267Param.unk00 = value;
+    work->staffRollParam.kanji = value;
+    work->ov267Param.kanji = value;
 }
 
 void SetGameClearStatusSequence(GameClearWork *work) {
     unsigned int index = 0;
 
-    work->states[1] = 2;
-    work->states[2] = 3;
-    work->states[3] = 4;
-    work->states[4] = 5;
-    work->states[5] = 6;
+    work->states[1] = GAME_CLEAR_STATE_END_COMM;
+    work->states[2] = GAME_CLEAR_STATE_WAIT_COMM;
+    work->states[3] = GAME_CLEAR_STATE_CLOSE_FIELD;
+    work->states[4] = GAME_CLEAR_STATE_HALL_OF_FAME;
+    work->states[5] = GAME_CLEAR_STATE_WAIT_HALL_OF_FAME;
     work->states[0] = index;
     index += 6;
-    if (work->unk08 == 0) {
-        work->states[index++] = 11;
-        work->states[index++] = 13;
+    if (work->repeat == FALSE) {
+        work->states[index++] = GAME_CLEAR_STATE_UNOVA_LINK;
+        work->states[index++] = GAME_CLEAR_STATE_WAIT;
     }
-    work->states[index + 0] = 10;
-    work->states[index + 1] = 12;
-    work->states[index + 2] = 13;
-    work->states[index + 3] = 19;
-    work->states[index + 4] = 15;
-    work->states[index + 5] = 21;
-    work->states[index + 6] = 17;
-    work->states[index + 7] = 4;
-    work->states[index + 8] = 7;
-    work->states[index + 9] = 8;
-    work->states[index + 10] = 19;
-    work->states[index + 11] = 16;
-    work->states[index + 12] = 18;
-    work->states[index + 13] = 23;
-    work->states[index + 14] = 24;
-    work->states[index + 15] = 4;
-    work->states[index + 16] = 22;
-    work->states[index + 17] = 14;
-    work->states[index + 18] = 25;
+    work->states[index + 0] = GAME_CLEAR_STATE_POST_HOF_SETUP;
+    work->states[index + 1] = GAME_CLEAR_STATE_SAVE;
+    work->states[index + 2] = GAME_CLEAR_STATE_WAIT;
+    work->states[index + 3] = GAME_CLEAR_STATE_OPEN_FIELD;
+    work->states[index + 4] = GAME_CLEAR_STATE_WARP_ENDING_A;
+    work->states[index + 5] = GAME_CLEAR_STATE_STOP_BGM;
+    work->states[index + 6] = GAME_CLEAR_STATE_SCRIPT_ENDING_A;
+    work->states[index + 7] = GAME_CLEAR_STATE_CLOSE_FIELD;
+    work->states[index + 8] = GAME_CLEAR_STATE_STAFF_ROLL;
+    work->states[index + 9] = GAME_CLEAR_STATE_WAIT_STAFF_ROLL;
+    work->states[index + 10] = GAME_CLEAR_STATE_OPEN_FIELD;
+    work->states[index + 11] = GAME_CLEAR_STATE_WARP_ENDING_B;
+    work->states[index + 12] = GAME_CLEAR_STATE_SCRIPT_ENDING_B;
+    work->states[index + 13] = GAME_CLEAR_STATE_FADE_OUT_BGM;
+    work->states[index + 14] = GAME_CLEAR_STATE_WAIT_BGM;
+    work->states[index + 15] = GAME_CLEAR_STATE_CLOSE_FIELD;
+    work->states[index + 16] = GAME_CLEAR_STATE_PLAY_BGM;
+    work->states[index + 17] = GAME_CLEAR_STATE_THE_END;
+    work->states[index + 18] = GAME_CLEAR_STATE_END;
     work->current = work->states[0];
 }
 
@@ -282,7 +282,7 @@ void EventGameClear_NextState(GameClearWork *work, u32 *state) {
     work->current = work->states[*state];
 }
 
-void func_ov012_0215a670(GameClearWork *work) {
+void EventGameClear_SetHallOfFameMinutes(GameClearWork *work) {
     TrainerCard_SetHallOfFameMinutes(getTrainerCardDataBlkAddress(work->gameData), 0x5a0);
 }
 

@@ -8,7 +8,8 @@
 
 // dwc_rapcommon.c, in overlay 11: what the Wi-Fi connection shares with the applications that use it
 
-// Starts the DWC library with a heap of its own in heapId, and shows the user info warning if that returns 3
+// Starts the DWC library with a heap of its own in heapId, and shows the user info warning if that returns
+// DWC_INIT_RESULT_DESTROY_OTHER_SETTING
 void DWCRapCommon_StartLibrary(u32 heapId);
 // Gives the library a second heap of size bytes in heapId, which allocations named name and larger than minSize use
 void DWCRapCommon_SetSubHeap(u32 name, u32 size, HeapID heapId);

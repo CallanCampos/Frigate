@@ -61,8 +61,8 @@ BOOL Scrcmd_GameState_TrainerBattleIsVictory(VM *vm, FieldScriptEnv *env);
 BOOL Scrcmd_GameState_CallWildLose(VM *vm, FieldScriptEnv *env);
 BOOL Scrcmd_GameState_WildBattleIsVictory(VM *vm, FieldScriptEnv *env);
 BOOL Scrcmd_GameState_WildBattleGetResult(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02156104(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02156128(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_GameState_SeasonTrainerGetObjCode(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_GameState_SeasonTrainerGetTrainerID(VM *vm, FieldScriptEnv *env);
 BOOL Scrcmd_GameState_FieldOpenRestoreLCD(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_GAME_STATE_H

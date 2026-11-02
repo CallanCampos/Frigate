@@ -340,7 +340,7 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         } else {
             EventWifiClub_SetBattleParty(wk, GSYS_GetGameData(gsys), seq);
             GFL_OvlLoad(OVERLAY_BATTLE_MAIN);
-            NetCommand_AddTable(0x100, data_ov167_021d7448, 9, 0);
+            NetCommand_AddTable(0x100, BTL_NET_COMMANDS, 9, 0);
             NetHandle_SendTimingPair(NetHandle_GetOwn(), 100, 10);
             (*state)++;
         }
@@ -359,7 +359,7 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         int i;
 
         GFL_SndBGMPlay(SEQ_BGM_VS_TRAINER_WIFI, SND_CHANNEL_MASK_ALL);
-        wk->players.unk44 = 1;
+        wk->players.demoType = 1;
         if (GFL_NetGetHandleNetId(NetHandle_GetOwn()) == 0) {
             for (i = 0; i < 2; i++) {
                 wk->players.players[i].info = GameData_GetPlayerInfoByNetID(GSYS_GetGameData(gsys), i);
@@ -376,7 +376,7 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         wk->battle.gameData = GSYS_GetGameData(wk->gsys);
         wk->battle.setup = wk->btlSetup;
         wk->battle.players = &wk->players;
-        wk->battle.unk14 = 1;
+        wk->battle.markNetErrShown = TRUE;
         wk->records = GameData_GetRecords(GSYS_GetGameData(wk->gsys));
         GFL_OvlUnload(OVERLAY_BATTLE_MAIN);
         GSYS_QueueProcAsEvent(wk->event, OVERLAY_BATTLE, &data_ov010_0215039c, &wk->battle);
@@ -454,7 +454,7 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         break;
     case 23:
         wk->tvt.gameData = GSYS_GetGameData(gsys);
-        wk->tvt.unk4 = 3;
+        wk->tvt.startMode = COMM_TVT_START_EXISTING;
         GSYS_QueueProcAsEvent(wk->event, OVERLAY_COMM_TVT, &COMM_TVT_PROC_FUNCTIONS, &wk->tvt);
         (*state)++;
         break;

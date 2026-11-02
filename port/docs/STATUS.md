@@ -34,10 +34,12 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 ## 2026-11-02: verification v2's canonical digests, without a ROM: ADR 0031 proposed, xxHash vendored
 
-- **Upstream:** `9496bc869b`, unchanged: this change merges no upstream commit. Reviewed main is `d19894b1f7`, PR 69's
-  merge.
-- **Port:** `PORT_SHA`, on the topic branch `port-digest-canonical` from `d19894b1f7`; this entry fills the last
-  entry's `PORT_SHA` with `2f9033d7b8`. Nothing outside `port/` changes.
+- **Upstream:** `41f42ca1af`, as reviewed main `10d017c010` (PR 67's merge, the upstream sync) has it; this change
+  merges no upstream commit of its own.
+- **Port:** `PORT_SHA`, on the topic branch `port-digest-canonical` from `d19894b1f7` (PR 69's merge): `b33f06c1da`,
+  the change, then the merge of main at `10d017c010` (PR 67, which merged meanwhile; STATUS.md's two new entries are
+  both kept, this one first) and this record's update. This entry fills PR 67's entry's `PORT_SHA` with
+  `f53e767509`; both had filled PR 69's with `2f9033d7b8`. The change itself is all in `port/`.
 - **ROM (T0):** in this branch's new worktree, `python3 configure.py && ninja` at `-j4`, 10,703 steps with no compiler
   warning: both original US SHA1s match, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2
   `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. No ROM input changes.
@@ -99,6 +101,120 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   unmet exit criterion.
 - **Blockers:** decisions the owner holds: ADRs 0022, 0023, 0025, 0030 and 0031 are proposed, and 0031's six defaults
   wait for the owner's confirmation. Spanish issue 45 still lacks a local dump.
+
+## 2026-11-01: resolve the 276-commit naming sync's conflicts (PR 67)
+
+- **Upstream:** `41f42ca1af`, 276 commits after `9496bc869b` (27 of them merges): names of functions, steps, fields and
+  constants (80 field and 39 battle commits among them) and resources extracted from the ROM's archives, 17,500 of the
+  18,138 files they change being `res/`'s. It holds `931ff088a0`, the upstream head of the App's draft PR 67, so the
+  merge's push fast-forwards that PR's branch. No incoming message names an issue of another repository or carries a
+  closing keyword, and none changes a workflow.
+- **Port:** `f53e767509` on `codex/upstream-sync-931ff088a0c1-56a9ef2a1db0`: `fea6b5c9ea`, the two-parent
+  merge of `56a9ef2a1d` (`main`) and `41f42ca1af` with its `Upstream-Commit` trailer, made by
+  `sync_upstream.sh --no-push --branch codex/upstream-sync-931ff088a0c1-56a9ef2a1db0` (exit 3 at the conflicts, which
+  the merge resolves); then `2a40413e7f` (the battle audit's keys), `48f72e208c` (comments and guides at the new
+  names), `29c7e7fdb4`, the merge of `main` at `e733ccc8a3` (PR 66, which merged meanwhile: the local verification's
+  failure statuses and the App token's `client-id` input, no ROM or host build input), `0350ba4ca3`, this record,
+  which fills PR 66's entry's `PORT_SHA`, `887af99fe1`, the review's fix, which names the deliveryman's script command
+  as upstream does (below), `3f6f842e2b`, the merge of `main` at `faad9927e8` (PR 68, which merged during the
+  publishing run: ADR 0030 and the widescreen rules, documents only; STATUS.md's two new entries are both kept, this
+  one first), `dccc1f2614`, this record's update, which fills PR 68's entry's `PORT_SHA`, `77adb2d205`, the merge of
+  `main` at `d19894b1f7` (PR 69, which merged during the next run: the verifier's pinned head and exit status and
+  `check_mwcc_neutral.py`'s stale worktrees, no ROM or host build input; STATUS.md's new entries again both kept, this
+  one first, and both filled PR 68's `PORT_SHA` alike), and this record's last update, which fills PR 69's entry's
+  `PORT_SHA`. `sync_upstream.sh` at PR 69's version validates and publishes this head.
+- **ROM (T0):** a fresh `configure.py` and ninja (14,039 steps) of the merge's tree: both original US SHA1s, B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, with no compiler
+  warning. All 1,790 C files of `src/` and `lib/` are complete in both versions' delinks, so the SHA1s prove what MWCC
+  makes of each; `tools/decomp/compile_all.py -j 6` (CI's Compile) compiles all 3,584 file and version pairs
+  (1,792 files, the libraries' assembly among them) with no warning or dead-strip error, and its dead-strip tests pass.
+- **Host build:** fresh arm64 macOS RelWithDebInfo builds of both versions of the merge's tree with the local
+  verification's options (`build/port-verify-b2_us` and `-w2_us`), after the native fixes below. The commits after the
+  merge change only `port/`'s documents, a query, two comments and a message, and `main`'s merges no build input;
+  `sync_upstream.sh` builds and tests this head again before it pushes it.
+- **Tests:** ctest, every test (`-j4`): Black 2 398, 369 passed and 29 skipped, White 2 395, 367 passed and 28
+  skipped, none failed. Skipped: the 24 that need the melonDS oracle and `frame_times_party_menus`, which needs its
+  saves (T4; `PORT_BUILD_ORACLE` is off, as in CI), the VM dispatch's native and verifier checks (Apple clang has no C
+  function check), `app_universal_slices` (a build of one slice) and, in Black 2's run, `asm_oracle`, which found no
+  `build/port-venv` in the new worktree: with the clone's venv linked there it passes its five files in Black 2 (203 s),
+  as it does within White 2's run. T3: the 19 replays and saves of Black 2's route label and White 2's 16 that need no
+  oracle pass; T4: not run, but the oracle's seed table resolves its renamed battle work in both versions
+  (`port/tools/oracle/symbols.py resolve g_BtlCalcWork`: `0x021dd844` and `0x021dd884`, 32 bytes, overlay 167); T5:
+  not run here, CI's sanitized jobs run on the PR; T6: the save and ROM tests within ctest pass; T7: not run.
+- **Tiers:** not measured (no progress scan).
+- **Trap stubs:** 25 trap symbols in each version's generated `stubs.c`; no route ran to a trap.
+- **64-bit warnings:** the pointer cast guard passes in both versions' ctest: 365 sites in 229 keys (real 66, harmless
+  123, handled 141, unreachable 35), 1,711 files, 0 not compiled, the last entry's figures. Its one new note is a
+  rename that passes as the same row: `src/ov011/net_devwifi.c`'s `NetDevWifi_Unk4C` is `NetDevWifi_StartMatch`
+  since upstream's `f406409614`. No new site, so no baseline row has to land first.
+- **Work done:** ten files conflict with the port's adaptations, each resolved with upstream's text and the
+  adaptation reapplied there ([game-changes.md](game-changes.md)'s rows, whose commit is now the merge):
+  `include/gfl/graphics.h` and `src/ov012/g3d_text_draw.c`, `uptr` for `G3DTextDraw_CreateResource`'s palette, which
+  `8d668a6a53` names with `x` and `y`; `include/system/vm.h` and `src/ov012/script_sys.c`, `uptr` for the field
+  script's file, `VM.scriptData` since `dfb3a5db1d` (`unk38`), and its cast; `src/ov012/hm_event.c`,
+  `sizeof(HiddenEventData)` beside `5c5f5ca8c6`'s `MOVE_DIG` and `MOVE_TELEPORT`; `src/ov036/fld3d_ci.c`, H7's host
+  includes before the opening comment that `c9c9930f39` rewrites; `src/ov167/battle_event.c` and
+  `src/ov167/btl_server_flow.c`, R06's `sptr` and `uptr` beside `b90c49e84c`'s `g_BattleEventVars` and the four
+  `(sptr)string` casts at `4d64efb7dd`'s `BTL_EVAR_STRING`; `src/ov168/btlv_finger_cursor.c`, the animation callback's
+  `uptr param` after `11308a6ecb`'s step enum; `src/ov302/pokedex_search_engine.c`, upstream's line, which fits in 120
+  columns since `f029c7e652` names its archive `ARCID_POKEDEX_DATA`, so the file matches upstream again and leaves the
+  formatting row. Of the 204 files the port changes outside `port/`, 198 keep the port's lines exactly (four of the
+  conflicting ones among them), five keep them at upstream's new names (`graphics.h`, `vm.h`, `g3d_text_draw.c`,
+  `script_sys.c`, `btl_server_flow.c`), and `pokedex_search_engine.c` needs none.
+
+  Native fixes in the merge, without which the merged tree doesn't build or the oracle can't run: `test_rom.c`'s zeroed
+  global of overlay 167 is `g_BattleEventPool` (`b90c49e84c`, was `data_ov167_021db1a0`); `script_offsets.c`'s actor
+  system's task priority is `MMSys.taskPriority` (`97b4ecd80b`, was `unkC`); the oracle's battle seed dump reads
+  `g_BtlCalcWork` (`929455000e`, was `data_ov167_021dd844`, which no longer resolves). After the merge, `2a40413e7f`
+  makes `port/tools/battle_event_values.query` match a variable's key by name: since `4d64efb7dd` the battle's C names
+  its keys, and the committed matchers found 0 reads and 0 sets of variable 0x3f and 1,117 computed keys on the merge.
+  With them, in both versions and at the same sites, the audit gives R06's results again: 1,128 calls; 8 reads of 0x3f,
+  8 casts to a pointer, 4 setters given 0x3f and 4 given a pointer; 9 computed keys (`run`, `key`,
+  `BTL_EVAR_TARGET_1 + i`); no use that differs at 64 bits; 20 comparisons and 10 arithmetic sites with a negation.
+  `48f72e208c` brings the names the sync removed up to date where only a comment or a guide held them:
+  `IsExpGainEnabled` (`8da7b20c00`), `g_BtlCalcWork`, `Scrcmd_PdwPostman_MysteryGifts` (`b1f86d5d7a`), and
+  `BtlServerFlow.switchedInMons` (`5f5b5c6cd7`) beside the old name in sanitizers.md's R9 and the battle path's lesson;
+  MODDING.md's unnamed function is one that has no name yet. Found by the identifiers and `symbols.txt` names of
+  `9496bc869b` that `41f42ca1af` lacks (847 of four characters or more), the `Type.field` references of `port/` and
+  the host build; past STATUS.md entries, the research notes and ADR 0011 keep the names of their time. That list
+  held no assembly macro, and the review found one more: the oracle's message and guide (`MYSTERY_KEY` in
+  `port/tools/oracle/oracle.py`, and its README) called the deliveryman's script command `Cmd_01DB`, which the same
+  `b1f86d5d7a` renames `MysteryGifts` in `include/asm/field_script.inc` and the scripts; the review's fix names it so.
+  Of the 886 names of four characters or more that the old versions of every text file the sync changes hold and
+  their new versions lack (the scripts, the `.inc` files, JSON and upstream's tools among them), 9 are gone from
+  upstream's whole tree and still in `port/`: that one; names the records keep (past entries, this entry's old names,
+  the research notes, ADR 0011); the guard's renamed baseline row; `unk1A68`, given beside its new name; and the
+  English word "Twelve".
+
+  `port/tools/check_mwcc_neutral.py --base 41f42ca1af`: 3,002 of the 3,580 file and version pairs preprocess as
+  upstream's do; the other 289 files, in both versions, differ only by the port's rows: 279 include `gfl/net.h`, whose
+  Wi-Fi callbacks return `sptr` (`s32` where upstream has `int`), and 273 of them by that alone; the rest by their own
+  rows: the events' `sizeof`s (`hm_event.c`, `field_fade.c`, `scrcmd_survey.c`, `event_battle_lose.c`), the trainer
+  cut-in's (`fld3d_ci.c`), the field script's signed offsets (`scrcmd_vm.c`, `scrcmd_field_actor.c`, `script_sys.c`),
+  the trainers' AI's operand reads (`tr_ai.c`), the VRAM and palette addresses (`field_transition.c`, `cg_help.c`),
+  the trade screen's plane mask (`pokemontrade_2d.c`), `printsys.c`'s `uptr` local, VCT's `(sptr)` and the Wi-Fi
+  login's and P2P match's callbacks. Standards' checks pass locally on the merge: clang-format 23.1.1 on the 539
+  changed C files, `check_style.py --diff origin/main --strict` and its fixtures, the skills' and hooks' copies,
+  `apply_names.py --dry-run` and `check_nonmatching_rows.py`; and so do the sync tooling tests, 43 and, with PR 66's,
+  48.
+  `port/tools/pointer_offsets.query`, run again in both versions since the sync renames the script interpreters'
+  handlers, finds PR 29's follow-up's 342 sites over the same 185 files, by kind and file as that entry reads them
+  (144 pointer sums, the interpreters' 10 and the other readers' 44 among them; 8 pointer steps; 57 sums with an
+  address in an integer; 133 subscripts): 560 matches where it had 540, as `nnsys/g3d.h`'s two sites count once for
+  each of the 98 of those files that include it now.
+- **Next:** publish with `sync_upstream.sh --branch codex/upstream-sync-931ff088a0c1-56a9ef2a1db0`, which validates
+  this head again, pushes the fast-forward of PR 67's branch and marks it ready; the owner's
+  `sync_upstream.sh --verify-pr 67` and review. If `main` moves again, merge it into the topic and validate again.
+  After the sync merges, a PR that runs `check_ptrcasts.py --update` for `NetDevWifi_StartMatch`'s renamed row and
+  the rows no longer found, and brings up to date what earlier syncs left in the living documents, none of it this
+  sync's: files upstream renamed before `9496bc869b` (`pointer_offsets.query`'s header's `scrcmd_fldmmdl.c`,
+  `scrcmd_field_actor.c` since `0e2d7f0974`; `zknd_tbar.c` in decomp-findings.md, game-changes.md and sanitizers.md,
+  `pokedex_detail_tbar.c` since `e2384ebfee`; sanitizers.md's R6's `fldeff_fes_kira.c`, `fldeff_fes_sparkle.c` since
+  `c13587cf78`), and sanitizers.md's R9, whose fix has had no game-changes.md row since upstream's `de6cd09688` made
+  it too. The tool's own messages want the same care: `sync_upstream.sh` says "N commits are not on origin/BRANCH"
+  and "merging origin/BRANCH" where it counts and merges against `origin/main` (its 281 here were the head's commits
+  that `main` lacks; PR 67's branch lacked 757). Then the phase's next criterion, as the earlier entries say.
+- **Blockers:** the owner's review of PR 67 once ready. None for the sync itself.
 
 ## 2026-11-01: pin the verified head and keep the verifier's exit status
 

@@ -59,10 +59,14 @@ static GameEvent *EncEffRipple_InitWhite(GameSystem *gsys) {
 }
 
 static GameEventReturnCode EncEffRipple_EventCallback(GameEvent *event, u32 *state, void *data) {
+    enum {
+        SEQ_RIPPLE,
+        SEQ_WAIT_FADE,
+    };
     EncEffRipple *ripple = EncEff_GetWorkArea(Field_GetEncEff(GSYS_GetField(GameEvent_GetGameSystem(event))));
 
     switch (*state) {
-    case 0:
+    case SEQ_RIPPLE:
         if (ripple->fadeDelay != 0) {
             ripple->fadeDelay--;
         } else if (!ripple->fadeStarted) {
@@ -74,7 +78,7 @@ static GameEventReturnCode EncEffRipple_EventCallback(GameEvent *event, u32 *sta
             (*state)++;
         }
         break;
-    case 1:
+    case SEQ_WAIT_FADE:
         if (ripple->timer != 0) {
             ripple->timer--;
         } else if (!GFL_FadeIsRunning()) {

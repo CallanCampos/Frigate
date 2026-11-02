@@ -12,6 +12,22 @@
 
 typedef struct NHttpRap NHttpRap;
 
+// The requests of overlay 189's table, after the page each one's URL asks for
+enum {
+    NHTTP_RAP_REQUEST_ACCOUNT_PLAYSTATUS,
+    NHTTP_RAP_REQUEST_SLEEPILY_BITLIST,
+    NHTTP_RAP_REQUEST_SAVEDATA_DOWNLOAD,
+    NHTTP_RAP_REQUEST_SAVEDATA_UPLOAD,
+    NHTTP_RAP_REQUEST_ACCOUNT_CREATE_DATA,
+    NHTTP_RAP_REQUEST_WORLDBATTLE_DOWNLOAD,
+    NHTTP_RAP_REQUEST_WORLDBATTLE_UPLOAD,
+    NHTTP_RAP_REQUEST_VALIDATE,
+    NHTTP_RAP_REQUEST_SAVEDATA_DOWNLOAD_FINISH,
+    NHTTP_RAP_REQUEST_ACCOUNT_CREATE_UPLOAD,
+    NHTTP_RAP_REQUEST_SAVEDATA_GET_BW,
+    NHTTP_RAP_REQUEST_MAX,
+};
+
 // Sets up the request at an index of overlay 189's table of URLs, such as Unova Link's requests to the Pokémon Dream
 // Radar's server and Game Sync's, and sends it; and one with an ID
 BOOL NHttpRap_SendRequest(u32 index, NHttpRap *rap);
@@ -23,7 +39,7 @@ int NHttpRap_GetConnection(NHttpRap *rap);
 int NHttpRap_StartRequest(NHttpRap *rap);
 // Ends the request
 void NHttpRap_EndRequest(NHttpRap *rap);
-// 0 once the request ended, 15 while it runs, or an error
+// 0 once the request ended, NHTTP_STATUS_RUNNING while it runs, or an error
 int NHttpRap_Poll(NHttpRap *rap);
 // The buffer that receives the answer
 void *NHttpRap_GetAnswer(NHttpRap *rap);

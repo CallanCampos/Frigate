@@ -20,8 +20,11 @@
 // The Pokémon World Tournament's touch screen, named after the ROM's "wbt_subscreen.c": the tournament's name and
 // battle style, centered on the sub screen, over a background from archive 245. The names are ours
 
-// The most entries a table of resources can have before its 0xff terminator
+// The most entries a table of resources can have before its terminator
 #define RES_MAX 4
+
+// Ends a table of resources or of windows, in its first field
+#define TABLE_END 0xff
 
 enum {
     WINDOW_TOURNAMENT,
@@ -89,24 +92,24 @@ static void WbtSubscreen_InitWirelessIcons(WbtSubscreen *work);
 
 static const WbtSubscreenRes sWbtSubscreenPalettes[] = {
     { PALTYPE_SUB_BG, 0, 0, 3 },
-    { 0xff },
+    { TABLE_END },
 };
 
 static const WbtSubscreenRes sWbtSubscreenChars[] = {
     { 6, 3, 0 },
-    { 0xff },
+    { TABLE_END },
 };
 
 static const WbtSubscreenRes sWbtSubscreenScreens[] = {
     { 5, 8, 0 },
     { 6, 7, 0 },
-    { 0xff },
+    { TABLE_END },
 };
 
 static const WbtSubscreenWindowSetup sWbtSubscreenWindows[] = {
     { 4, 2, 4, 28, 2, 2 },
     { 4, 2, 17, 28, 2, 2 },
-    { 0xff },
+    { TABLE_END },
 };
 
 static const WbtSubscreenBGSetup sWbtSubscreenBGSetups[] = {
@@ -204,7 +207,7 @@ static void WbtSubscreen_LoadGraphics(WbtSubscreen *work) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_WBT_SUBSCREEN, work->heapId);
 
     for (i = 0; i < RES_MAX; i++) {
-        if (palette->target == 0xff) {
+        if (palette->target == TABLE_END) {
             break;
         }
         GFL_G2DIOLoadArcNCLRDefault(arc, palette->fileId, palette->target, palette->offset * 32, palette->size * 32,
@@ -212,14 +215,14 @@ static void WbtSubscreen_LoadGraphics(WbtSubscreen *work) {
         palette++;
     }
     for (i = 0; i < RES_MAX; i++) {
-        if (chars->target == 0xff) {
+        if (chars->target == TABLE_END) {
             break;
         }
         GFL_BGSysLoadArcNCGRStatic(arc, chars->fileId, chars->target, chars->offset, 0, FALSE, work->heapId);
         chars++;
     }
     for (i = 0; i < RES_MAX; i++) {
-        if (screens->target == 0xff) {
+        if (screens->target == TABLE_END) {
             break;
         }
         loadBGScrToVramByFileNoReserveNegAlign(arc, screens->fileId, screens->target, screens->offset, 0, FALSE,
@@ -234,7 +237,7 @@ static void WbtSubscreen_CreateWindows(WbtSubscreen *work) {
     const WbtSubscreenWindowSetup *setup = sWbtSubscreenWindows;
 
     for (i = 0; i < WINDOW_MAX; i++) {
-        if (setup->bg == 0xff) {
+        if (setup->bg == TABLE_END) {
             break;
         }
         work->windows[i].window =

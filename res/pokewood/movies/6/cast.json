@@ -1,0 +1,196 @@
+{
+    "$schema": "../../cast.schema.json",
+    "player": [
+        {
+            "species": "SPECIES_SNEASEL",
+            "shown_species": "SPECIES_SNEASEL",
+            "level": 40,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_ADAMANT",
+            "ability": 0,
+            "held_item": "ITEM_FLYING_GEM",
+            "moves": [ "MOVE_AERIAL_ACE", "MOVE_SWAGGER", "MOVE_NONE", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 31,
+                "defense": 31,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 255,
+                "attack": 0,
+                "defense": 255,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        },
+        {
+            "species": "SPECIES_SNEASEL",
+            "shown_species": "SPECIES_SNEASEL",
+            "level": 40,
+            "form": 0,
+            "sex": "GENDER_FEMALE",
+            "nature": "NATURE_ADAMANT",
+            "ability": 0,
+            "held_item": "ITEM_ICE_GEM",
+            "moves": [ "MOVE_ICE_PUNCH", "MOVE_LOW_KICK", "MOVE_NONE", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 31,
+                "defense": 31,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 255,
+                "attack": 0,
+                "defense": 255,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        },
+        {
+            "species": "SPECIES_SNEASEL",
+            "shown_species": "SPECIES_SNEASEL",
+            "level": 40,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_ADAMANT",
+            "ability": 0,
+            "held_item": "ITEM_ICE_GEM",
+            "moves": [ "MOVE_ICE_PUNCH", "MOVE_LOW_KICK", "MOVE_NONE", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 31,
+                "defense": 31,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 255,
+                "attack": 0,
+                "defense": 255,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        },
+        {
+            "species": "SPECIES_SNEASEL",
+            "shown_species": "SPECIES_SNEASEL",
+            "level": 40,
+            "form": 0,
+            "sex": "GENDER_FEMALE",
+            "nature": "NATURE_ADAMANT",
+            "ability": 0,
+            "held_item": "ITEM_ICE_GEM",
+            "moves": [ "MOVE_ICE_PUNCH", "MOVE_LOW_KICK", "MOVE_NONE", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 31,
+                "defense": 31,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 255,
+                "attack": 0,
+                "defense": 255,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        },
+        {
+            "species": "SPECIES_SNEASEL",
+            "shown_species": "SPECIES_SNEASEL",
+            "level": 40,
+            "form": 0,
+            "sex": "GENDER_FEMALE",
+            "nature": "NATURE_ADAMANT",
+            "ability": 0,
+            "held_item": "ITEM_ICE_GEM",
+            "moves": [ "MOVE_ICE_PUNCH", "MOVE_LOW_KICK", "MOVE_NONE", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 31,
+                "defense": 31,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 255,
+                "attack": 0,
+                "defense": 255,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        },
+        {
+            "species": "SPECIES_WEAVILE",
+            "shown_species": "SPECIES_WEAVILE",
+            "level": 40,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_ADAMANT",
+            "ability": 0,
+            "held_item": "ITEM_DARK_GEM",
+            "moves": [ "MOVE_NIGHT_SLASH", "MOVE_REVENGE", "MOVE_NONE", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 31,
+                "defense": 31,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 255,
+                "attack": 0,
+                "defense": 255,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        }
+    ],
+    "opponent": [
+        {
+            "species": "SPECIES_ESCAVALIER",
+            "shown_species": "SPECIES_ESCAVALIER",
+            "level": 40,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_LONELY",
+            "ability": 1,
+            "held_item": "ITEM_LUM_BERRY",
+            "moves": [ "MOVE_TWINEEDLE", "MOVE_FALSE_SWIPE", "MOVE_NONE", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 0,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        }
+    ]
+}

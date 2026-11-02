@@ -207,7 +207,8 @@ GameEventReturnCode EventFieldTrade_Callback(GameEvent *event, u32 *state, void 
         work->tradeTrainer = work->input->trainer;
         work->tradePkm = work->input->tradeData;
         GameEvent_ChainNext(event, EventFieldSubprocessTransition_Create(gsys, field, OVERLAY_ID(194),
-                                                                         &data_ov194_021c63ac, work->subprocessData));
+                                                                         &POKEMONTRADE_IRCDEMO_PROC_FUNCTIONS,
+                                                                         work->subprocessData));
         *state = 2;
         break;
     case 2:

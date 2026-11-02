@@ -11,15 +11,15 @@
 #include "system/vm.h"
 
 // What btlv_effect.c tells BtlvEffvm_Start of the effect, 0x10 bytes; BtlvEffvmParam_Clear clears it. The scripts
-// read the fields as their variables 10 to 16
+// read the fields as their variables 9 to 15
 typedef struct {
-    u8 unk0;    // 0x0  a byte of the move's parameter 27
-    u8 variant; // 0x1  which of the script's variants runs, the turn of a two-turn move
-    u8 unk2;    // 0x2
-    u8 unk3;    // 0x3
-    u32 unk4;   // 0x4
-    u32 unk8;   // 0x8
-    u16 itemNo; // 0xc  the ball the ball effects show
+    u8 target;    // 0x0  the move's MOVE_TARGET_*
+    u8 variant;   // 0x1  which of the script's variants runs, the turn of a two-turn move
+    u8 unk2;      // 0x2
+    u8 shakes;    // 0x3  a thrown ball's, from SC_BALL_THROW
+    u32 caught;   // 0x4  the same
+    u32 critical; // 0x8  the same: a critical capture
+    u16 itemNo;   // 0xc  the ball the ball effects show
 } BtlvEffvmParam;
 
 VM *BtlvEffvm_Create(TCBManager *tcbManager, HeapID heapId);
@@ -30,7 +30,9 @@ void BtlvEffvm_Stop(VM *vm);
 void BtlvEffvm_Resume(VM *vm);
 s32 BtlvEffvm_GetScriptKind(VM *vm);
 void BtlvEffvmParam_Clear(BtlvEffvmParam *param);
-void BtlvEffvm_PlaySEAt(VM *vm, u32 se, u32 player, u32 pan, int arg4, int arg5, int vol, int pitch, int wait);
+// PlaySE's arguments; the modulation's depth and speed are capped at 255
+void BtlvEffvm_PlaySEAt(VM *vm, u32 se, u32 player, u32 pan, int pitch, int volume, int modDepth, int modSpeed,
+                        int wait);
 void BtlvEffvm_SlideSE(VM *vm, u32 player, u32 type, u32 param, int start, int end, int delay, int frames, int stepWait,
                        int count);
 void BtlvEffvm_ReleaseVoices(VM *vm);

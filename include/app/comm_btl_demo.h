@@ -14,7 +14,7 @@
 // The screen's heap. Our name, not swan's
 #define HEAPID_COMM_BTL_DEMO 0x74
 
-// What the screen shows, BattlePlayers' unk44: the introduction or the result, of a battle of two or of four players
+// What the screen shows, BattlePlayers' demoType: the introduction or the result, of a battle of two or of four players
 enum {
     COMM_BTL_DEMO_TYPE_NONE,
     COMM_BTL_DEMO_TYPE_SINGLE_START,

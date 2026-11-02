@@ -540,7 +540,7 @@ GameEventReturnCode EventMapChangeCore_Callback(GameEvent *event, u32 *state, vo
             ShutdownFollowWork(wk->gameData);
         }
         GFL_OvlUnload(OVERLAY_DSPROT);
-        func_ov012_02153668(comm);
+        Intrude_OnZoneChange(comm);
         (*state)++;
         break;
     case 4:

@@ -614,7 +614,7 @@ static void KeySystemNet_SeqWifiPost(KeySystemSeq *seq, int *state, void *work) 
         net->http =
             NHttpRap_Create(net->heapId, PlayerInfo_GetProfileId(GetGameDataPlayerInfo(net->gameData)), net->buffer);
         NHttpRap_SetAnswerBuffer(net->http, request->wifi.buffer, request->wifi.size);
-        if (NHttpRap_SendRequestWithId(10, request->wifi.id, net->http)) {
+        if (NHttpRap_SendRequestWithId(NHTTP_RAP_REQUEST_SAVEDATA_GET_BW, request->wifi.id, net->http)) {
             *state = 1;
         }
         net->timer = 0;
@@ -678,7 +678,7 @@ static void KeySystemNet_SeqWifiPost(KeySystemSeq *seq, int *state, void *work) 
                     *state = 3;
                     break;
                 }
-            } else if (status != 15) {
+            } else if (status != NHTTP_STATUS_RUNNING) {
                 request->wifi.result = 1;
                 *state = 3;
             }
@@ -713,7 +713,7 @@ static void KeySystemNet_SeqWifiGet(KeySystemSeq *seq, int *state, void *work) {
         request->wifiGet.result = 0;
         net->http =
             NHttpRap_Create(net->heapId, PlayerInfo_GetProfileId(GetGameDataPlayerInfo(net->gameData)), net->buffer);
-        if (NHttpRap_SendRequest(0, net->http)) {
+        if (NHttpRap_SendRequest(NHTTP_RAP_REQUEST_ACCOUNT_PLAYSTATUS, net->http)) {
             *state = 1;
         }
         break;
@@ -758,7 +758,7 @@ static void KeySystemNet_SeqWifiGet(KeySystemSeq *seq, int *state, void *work) {
                 request->wifiGet.result = 3;
                 *state = 3;
             }
-        } else if (status != 15) {
+        } else if (status != NHTTP_STATUS_RUNNING) {
             request->wifiGet.result = 1;
             *state = 3;
         }

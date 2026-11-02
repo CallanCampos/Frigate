@@ -1,0 +1,11 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "B",
+    "shapes": [ 0 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_ABUNDANT_SHRINE": [ "grass" ]
+        }
+    }
+}

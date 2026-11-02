@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_exp_obj.h"
 #include "field/gimmick_league_statue.h"
@@ -37,10 +38,10 @@ static const G3DSceneActorSetup sActors[6] = {
 
 // clang-format off
 static const G3DSceneResourceSetup sResources[] = {
-    { 0x9b, 0, 0 },  { 0x9b, 10, 0 }, { 0x9b, 2, 0 },  { 0x9b, 13, 0 },
-    { 0x9b, 4, 0 },  { 0x9b, 19, 0 }, { 0x9b, 15, 0 }, { 0x9b, 5, 0 },
-    { 0x9b, 20, 0 }, { 0x9b, 16, 0 }, { 0x9b, 6, 0 },  { 0x9b, 21, 0 },
-    { 0x9b, 17, 0 }, { 0x9b, 7, 0 },  { 0x9b, 22, 0 }, { 0x9b, 18, 0 },
+    { ARCID_GIMMICK_LEAGUE_STATUE, 0, 0 },  { ARCID_GIMMICK_LEAGUE_STATUE, 10, 0 }, { ARCID_GIMMICK_LEAGUE_STATUE, 2, 0 },  { ARCID_GIMMICK_LEAGUE_STATUE, 13, 0 },
+    { ARCID_GIMMICK_LEAGUE_STATUE, 4, 0 },  { ARCID_GIMMICK_LEAGUE_STATUE, 19, 0 }, { ARCID_GIMMICK_LEAGUE_STATUE, 15, 0 }, { ARCID_GIMMICK_LEAGUE_STATUE, 5, 0 },
+    { ARCID_GIMMICK_LEAGUE_STATUE, 20, 0 }, { ARCID_GIMMICK_LEAGUE_STATUE, 16, 0 }, { ARCID_GIMMICK_LEAGUE_STATUE, 6, 0 },  { ARCID_GIMMICK_LEAGUE_STATUE, 21, 0 },
+    { ARCID_GIMMICK_LEAGUE_STATUE, 17, 0 }, { ARCID_GIMMICK_LEAGUE_STATUE, 7, 0 },  { ARCID_GIMMICK_LEAGUE_STATUE, 22, 0 }, { ARCID_GIMMICK_LEAGUE_STATUE, 18, 0 },
 };
 
 // clang-format on

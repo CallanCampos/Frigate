@@ -5,6 +5,7 @@
 #include "types.h"
 #include "app/monolith/monolith_mission_info.h"
 #include "app/monolith/monolith_tool.h"
+#include "constants/arc.h"
 #include "field/fest_mission_data.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -297,7 +298,7 @@ static void MonolithMissionInfo_DrawAll(MonolithScreenParam *screen, MonolithWor
 
 static void MonolithMissionInfo_LoadMissions(MonolithMissionInfoWork *miw) {
     miw->festText = getTextFileForFestMissions(HEAPID_MONOLITH);
-    miw->arc = GFL_ArcSysCreateFileHandle(0x121, HEAPID_MONOLITH);
+    miw->arc = GFL_ArcSysCreateFileHandle(ARCID_FMISSION_DATA, HEAPID_MONOLITH);
     miw->missions = FestMissionData_LoadAll(miw->arc, HEAPID_MONOLITH);
 }
 

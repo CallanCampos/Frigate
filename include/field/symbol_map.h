@@ -13,10 +13,12 @@
 typedef struct {
     EntreeForestPokemon pokemon[20];
     u32 count : 6;
-    u32 unk50_6 : 4;
-    u32 unk50_10 : 4;
+    // How far the forest has grown and its trees' group, which pick its map
+    u32 deepestArea : 4;
+    u32 group : 4;
     u32 unk50_14 : 4;
-    u32 unk50_18 : 6;
+    // The area of the forest the player is in, whose Pokémon these are
+    u32 area : 6;
     u32 unk50_24 : 8;
 } SymbolMapList;
 

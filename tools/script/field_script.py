@@ -75,9 +75,7 @@ ENDS = {"VMHalt", "VMReturn", "VMJump", "RTEndGlobal"}
 # A script command's handler, Scrcmd_<Group>_<Name>: <Group> is its scrcmd_<group>.c file
 HANDLER_PREFIX = re.compile(r"^Scrcmd_[A-Za-z0-9]+_")
 
-COMMAND_NAMES = {
-    0x172: "IsFestMissionAvailable",      # isFesMissionAvailable
-}
+COMMAND_NAMES: dict[int, str] = {}
 
 
 class Command:

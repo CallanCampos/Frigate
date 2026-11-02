@@ -32,6 +32,7 @@
 #include "system/palanm.h"
 #include "system/printsys.h"
 #include "system/wipe.h"
+#include "text/system/btl_pokeparam_box_main_save_init.h"
 
 // The PC box's sequences: one function per state of the box, run each frame by Box2Seq_Main, each returning the
 // next state. Names are ours
@@ -242,24 +243,82 @@ static void SortRangeEnds(Box2SysWork *syswk);
 
 // The menus' items: a message and whether the item closes the menu. MWCC sorts static data by size, unstably, so
 // tables of one size are declared in the order that lays them out as the ROM has them
-static const Box2MenuItem sMenu70d4[] = { { 93, 0 }, { 80, 1 } };
-static const Box2MenuItem sMenu70cc[] = { { 83, 0 }, { 80, 1 } };
-static const Box2MenuItem sMenu70dc[] = { { 94, 0 }, { 92, 0 }, { 80, 1 } };
-static const Box2MenuItem sMenu70e8[] = { { 31, 0 }, { 32, 0 }, { 33, 0 }, { 34, 1 } };
-static const Box2MenuItem sMenu70f8[] = { { 82, 0 }, { 74, 0 }, { 75, 0 }, { 80, 1 } };
-// The wallpaper themes and their wallpapers
-static const Box2MenuItem sMenu7130[] = { { 79, 0 }, { 74, 0 }, { 76, 0 }, { 77, 0 }, { 80, 1 } };
-static const Box2MenuItem sMenu7108[] = { { 58, 0 }, { 59, 0 }, { 60, 0 }, { 61, 0 }, { 66, 1 } };
-static const Box2MenuItem sMenu7180[] = { { 53, 0 }, { 54, 0 }, { 55, 0 }, { 56, 0 }, { 66, 1 } };
-static const Box2MenuItem sMenu711c[] = { { 35, 0 }, { 36, 0 }, { 37, 0 }, { 38, 0 }, { 66, 1 } };
-static const Box2MenuItem sMenu7144[] = { { 41, 0 }, { 42, 0 }, { 43, 0 }, { 44, 0 }, { 66, 1 } };
-static const Box2MenuItem sMenu7158[] = { { 45, 0 }, { 46, 0 }, { 47, 0 }, { 48, 0 }, { 66, 1 } };
-static const Box2MenuItem sMenu716c[] = { { 49, 0 }, { 50, 0 }, { 51, 0 }, { 52, 0 }, { 66, 1 } };
-static const Box2MenuItem sMenu7194[] = { { 78, 0 }, { 74, 0 }, { 76, 0 }, { 77, 0 }, { 80, 1 } };
-static const Box2MenuItem sMenu71a8[] = { { 57, 0 }, { 35, 0 }, { 36, 0 }, { 37, 0 }, { 38, 0 }, { 66, 1 } };
-static const Box2MenuItem sMenu71c0[] = { { 58, 0 }, { 59, 0 }, { 60, 0 }, { 61, 0 }, { 68, 0 }, { 66, 1 } };
-static const Box2MenuItem sMenu71d8[] = { { 62, 0 }, { 63, 0 }, { 64, 0 }, { 65, 0 }, { 67, 0 }, { 66, 1 } };
-static const Box2MenuItem sMenu71f0[] = { { 81, 0 }, { 74, 0 }, { 75, 0 }, { 76, 0 }, { 77, 0 }, { 80, 1 } };
+static const Box2MenuItem sGiveItemMenu[] = { { BtlPokeparamBoxMainSaveInit_Text_Give, 0 },
+                                              { BtlPokeparamBoxMainSaveInit_Text_Cancel_2, 1 } };
+static const Box2MenuItem sDreamWorldMenu[] = { { BtlPokeparamBoxMainSaveInit_Text_Tuck, 0 },
+                                                { BtlPokeparamBoxMainSaveInit_Text_Cancel_2, 1 } };
+static const Box2MenuItem sHeldItemMenu[] = { { BtlPokeparamBoxMainSaveInit_Text_Move_3, 0 },
+                                              { BtlPokeparamBoxMainSaveInit_Text_Bag, 0 },
+                                              { BtlPokeparamBoxMainSaveInit_Text_Cancel_2, 1 } };
+static const Box2MenuItem sBoxMenu[] = { { BtlPokeparamBoxMainSaveInit_Text_SwitchBox, 0 },
+                                         { BtlPokeparamBoxMainSaveInit_Text_Wallpaper, 0 },
+                                         { BtlPokeparamBoxMainSaveInit_Text_Name, 0 },
+                                         { BtlPokeparamBoxMainSaveInit_Text_Cancel, 1 } };
+static const Box2MenuItem sBattleBoxMenu[] = { { BtlPokeparamBoxMainSaveInit_Text_Move_2, 0 },
+                                               { BtlPokeparamBoxMainSaveInit_Text_Summary, 0 },
+                                               { BtlPokeparamBoxMainSaveInit_Text_HeldItems, 0 },
+                                               { BtlPokeparamBoxMainSaveInit_Text_Cancel_2, 1 } };
+static const Box2MenuItem sDepositMenu[] = { { BtlPokeparamBoxMainSaveInit_Text_Deposit, 0 },
+                                             { BtlPokeparamBoxMainSaveInit_Text_Summary, 0 },
+                                             { BtlPokeparamBoxMainSaveInit_Text_Marking, 0 },
+                                             { BtlPokeparamBoxMainSaveInit_Text_Release, 0 },
+                                             { BtlPokeparamBoxMainSaveInit_Text_Cancel_2, 1 } };
+// The wallpaper themes and their wallpapers, the special ones on two pages
+static const Box2MenuItem sSpecialMenu[] = { { BtlPokeparamBoxMainSaveInit_Text_Monochrome, 0 },
+                                             { BtlPokeparamBoxMainSaveInit_Text_TeamPlasma, 0 },
+                                             { BtlPokeparamBoxMainSaveInit_Text_Movie, 0 },
+                                             { BtlPokeparamBoxMainSaveInit_Text_Pwt, 0 },
+                                             { BtlPokeparamBoxMainSaveInit_Text_Back, 1 } };
+static const Box2MenuItem sMiscMenu[] = { { BtlPokeparamBoxMainSaveInit_Text_PokeCenter, 0 },
+                                          { BtlPokeparamBoxMainSaveInit_Text_Machine, 0 },
+                                          { BtlPokeparamBoxMainSaveInit_Text_Checks, 0 },
+                                          { BtlPokeparamBoxMainSaveInit_Text_Simple, 0 },
+                                          { BtlPokeparamBoxMainSaveInit_Text_Back, 1 } };
+static const Box2MenuItem sThemeMenu[] = { { BtlPokeparamBoxMainSaveInit_Text_Scenery1, 0 },
+                                           { BtlPokeparamBoxMainSaveInit_Text_Scenery2, 0 },
+                                           { BtlPokeparamBoxMainSaveInit_Text_Scenery3, 0 },
+                                           { BtlPokeparamBoxMainSaveInit_Text_Misc, 0 },
+                                           { BtlPokeparamBoxMainSaveInit_Text_Back, 1 } };
+static const Box2MenuItem sScenery1Menu[] = { { BtlPokeparamBoxMainSaveInit_Text_Forest, 0 },
+                                              { BtlPokeparamBoxMainSaveInit_Text_City, 0 },
+                                              { BtlPokeparamBoxMainSaveInit_Text_Desert, 0 },
+                                              { BtlPokeparamBoxMainSaveInit_Text_Savanna, 0 },
+                                              { BtlPokeparamBoxMainSaveInit_Text_Back, 1 } };
+static const Box2MenuItem sScenery2Menu[] = { { BtlPokeparamBoxMainSaveInit_Text_Crag, 0 },
+                                              { BtlPokeparamBoxMainSaveInit_Text_Volcano, 0 },
+                                              { BtlPokeparamBoxMainSaveInit_Text_Snow, 0 },
+                                              { BtlPokeparamBoxMainSaveInit_Text_Cave, 0 },
+                                              { BtlPokeparamBoxMainSaveInit_Text_Back, 1 } };
+static const Box2MenuItem sScenery3Menu[] = { { BtlPokeparamBoxMainSaveInit_Text_Beach, 0 },
+                                              { BtlPokeparamBoxMainSaveInit_Text_Seafloor, 0 },
+                                              { BtlPokeparamBoxMainSaveInit_Text_River, 0 },
+                                              { BtlPokeparamBoxMainSaveInit_Text_Sky, 0 },
+                                              { BtlPokeparamBoxMainSaveInit_Text_Back, 1 } };
+static const Box2MenuItem sWithdrawMenu[] = { { BtlPokeparamBoxMainSaveInit_Text_Withdraw, 0 },
+                                              { BtlPokeparamBoxMainSaveInit_Text_Summary, 0 },
+                                              { BtlPokeparamBoxMainSaveInit_Text_Marking, 0 },
+                                              { BtlPokeparamBoxMainSaveInit_Text_Release, 0 },
+                                              { BtlPokeparamBoxMainSaveInit_Text_Cancel_2, 1 } };
+static const Box2MenuItem sThemeMenuSpecial[] = {
+    { BtlPokeparamBoxMainSaveInit_Text_Special, 0 },  { BtlPokeparamBoxMainSaveInit_Text_Scenery1, 0 },
+    { BtlPokeparamBoxMainSaveInit_Text_Scenery2, 0 }, { BtlPokeparamBoxMainSaveInit_Text_Scenery3, 0 },
+    { BtlPokeparamBoxMainSaveInit_Text_Misc, 0 },     { BtlPokeparamBoxMainSaveInit_Text_Back, 1 }
+};
+static const Box2MenuItem sSpecialMenuNext[] = {
+    { BtlPokeparamBoxMainSaveInit_Text_Monochrome, 0 }, { BtlPokeparamBoxMainSaveInit_Text_TeamPlasma, 0 },
+    { BtlPokeparamBoxMainSaveInit_Text_Movie, 0 },      { BtlPokeparamBoxMainSaveInit_Text_Pwt, 0 },
+    { BtlPokeparamBoxMainSaveInit_Text_Next, 0 },       { BtlPokeparamBoxMainSaveInit_Text_Back, 1 }
+};
+static const Box2MenuItem sSpecialMenu2[] = {
+    { BtlPokeparamBoxMainSaveInit_Text_Kyurem1, 0 },  { BtlPokeparamBoxMainSaveInit_Text_Kyurem2, 0 },
+    { BtlPokeparamBoxMainSaveInit_Text_Reshiram, 0 }, { BtlPokeparamBoxMainSaveInit_Text_Zekrom, 0 },
+    { BtlPokeparamBoxMainSaveInit_Text_Previous, 0 }, { BtlPokeparamBoxMainSaveInit_Text_Back, 1 }
+};
+static const Box2MenuItem sArrangeMenu[] = {
+    { BtlPokeparamBoxMainSaveInit_Text_Move, 0 },      { BtlPokeparamBoxMainSaveInit_Text_Summary, 0 },
+    { BtlPokeparamBoxMainSaveInit_Text_HeldItems, 0 }, { BtlPokeparamBoxMainSaveInit_Text_Marking, 0 },
+    { BtlPokeparamBoxMainSaveInit_Text_Release, 0 },   { BtlPokeparamBoxMainSaveInit_Text_Cancel_2, 1 }
+};
 
 static const Box2SubProc sSubProcs[] = {
     { Box2Main_PokeStatusCall, Box2Main_PokeStatusExit, 92 },
@@ -486,29 +545,29 @@ static int Box2Seq_SubProcMain(Box2SysWork *syswk) {
 static int Box2Seq_Start(Box2SysWork *syswk) {
     GFL_SndSEPlay(SEQ_SE_PC_LOGIN);
     switch (syswk->param->mode) {
-    case 0:
+    case BOX2_MODE_DEPOSIT:
         Box2Seq_PutPartyLeft(syswk);
         Box2Obj_ShowScrollArrows(syswk->app, 0);
         Box2Obj_SetIconsBlend(syswk, 1, 1);
         Box2Main_PokeInfoPut(syswk, BOX2_PARTY_POS);
         syswk->app->msgNextSeq = 59;
         break;
-    case 1:
+    case BOX2_MODE_WITHDRAW:
         Box2Main_PokeInfoPut(syswk, 0);
         syswk->app->msgNextSeq = 54;
         break;
-    case 2:
+    case BOX2_MODE_MOVE_POKEMON:
         Box2Main_PokeInfoPut(syswk, 0);
         Box2Frame_ShowPartyButton(syswk->app);
         syswk->app->msgNextSeq = 17;
         break;
-    case 3:
+    case BOX2_MODE_MOVE_ITEMS:
         Box2Obj_SetIconsBlend(syswk, 0x81, 1);
         Box2Main_PokeInfoPut(syswk, 0);
         Box2Frame_ShowPartyButton(syswk->app);
         syswk->app->msgNextSeq = 67;
         break;
-    case 4:
+    case BOX2_MODE_BATTLE_BOX:
         if (PokeParty_GetPkmCount(syswk->param->party) == 0) {
             Box2Frame_ShowPartyButton(syswk->app);
             Box2Main_PokeInfoPut(syswk, 0);
@@ -524,7 +583,7 @@ static int Box2Seq_Start(Box2SysWork *syswk) {
             syswk->app->msgNextSeq = 49;
         }
         break;
-    case 5:
+    case BOX2_MODE_DREAM_WORLD:
         Box2Main_PokeInfoPut(syswk, 0);
         Box2Obj_SetIconsBlend(syswk, 0x81, 1);
         Box2Obj_SetButtons(syswk, 0, 1, 1, 1);
@@ -543,17 +602,17 @@ static int Box2Seq_StartWait(Box2SysWork *syswk) {
 
 static int Box2Seq_PokeMoveEnd(Box2SysWork *syswk) {
     GFL_HeapFree(syswk->app->vfunk.work);
-    if (syswk->app->unkA552 == 1) {
-        if (syswk->param->mode == 3) {
+    if (syswk->app->menuMsgPending == 1) {
+        if (syswk->param->mode == BOX2_MODE_MOVE_ITEMS) {
             if (syswk->app->getItem == 0) {
-                Box2Bmp_PrintItemMsg(syswk, 0, 24);
+                Box2Bmp_PrintItemMsg(syswk, BOX2_ITEM_MSG_CAN_HOLD, 24);
             } else {
-                Box2Bmp_PrintItemMsg(syswk, 1, 24);
+                Box2Bmp_PrintItemMsg(syswk, BOX2_ITEM_MSG_SELECTED, 24);
             }
         } else {
-            Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+            Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
         }
-        syswk->app->unkA552 = 0;
+        syswk->app->menuMsgPending = 0;
     }
     return syswk->nextSeq;
 }
@@ -562,29 +621,29 @@ static int Box2Seq_OpenMenu(Box2SysWork *syswk) {
     switch (syswk->app->subSeq) {
     case 0:
         switch (syswk->param->mode) {
-        case 1:
-            Box2Bmp_OpenMenu(syswk, sMenu7194, 5);
+        case BOX2_MODE_WITHDRAW:
+            Box2Bmp_OpenMenu(syswk, sWithdrawMenu, 5);
             break;
-        case 0:
-            Box2Bmp_OpenMenu(syswk, sMenu7130, 5);
+        case BOX2_MODE_DEPOSIT:
+            Box2Bmp_OpenMenu(syswk, sDepositMenu, 5);
             break;
-        case 2:
-            Box2Bmp_OpenMenu(syswk, sMenu71f0, 6);
+        case BOX2_MODE_MOVE_POKEMON:
+            Box2Bmp_OpenMenu(syswk, sArrangeMenu, 6);
             break;
-        case 3:
+        case BOX2_MODE_MOVE_ITEMS:
             Box2Seq_OpenItemMenu(syswk, syswk->app->getItem);
             break;
-        case 4:
-            Box2Bmp_OpenMenu(syswk, sMenu70f8, 4);
+        case BOX2_MODE_BATTLE_BOX:
+            Box2Bmp_OpenMenu(syswk, sBattleBoxMenu, 4);
             break;
-        case 5:
+        case BOX2_MODE_DREAM_WORLD:
             Box2Bmp_ClearMsgWindow(syswk->app, 27);
-            Box2Bmp_OpenMenu(syswk, sMenu70cc, 2);
+            Box2Bmp_OpenMenu(syswk, sDreamWorldMenu, 2);
             break;
         }
-        if (syswk->app->unkA550 == 1) {
-            syswk->app->unkA550 = 0;
-            if (syswk->param->mode == 3) {
+        if (syswk->app->iconsDimmed == 1) {
+            syswk->app->iconsDimmed = 0;
+            if (syswk->param->mode == BOX2_MODE_MOVE_ITEMS) {
                 if (syswk->pos >= BOX2_PARTY_POS) {
                     Box2Obj_SetIconsBlend(syswk, 0x82, 0);
                 } else {
@@ -606,36 +665,36 @@ static int Box2Seq_OpenMenu(Box2SysWork *syswk) {
         Box2Obj_ShowCursor(syswk, 1);
         Box2Obj_SetToolButtons(syswk, 9, 1);
         switch (syswk->param->mode) {
-        case 1:
-            Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+        case BOX2_MODE_WITHDRAW:
+            Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
             return 54;
-        case 0:
-            Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+        case BOX2_MODE_DEPOSIT:
+            Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
             return 59;
-        case 2:
-            Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+        case BOX2_MODE_MOVE_POKEMON:
+            Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
             if (syswk->pos < BOX2_PARTY_POS) {
                 return 17;
             }
             return 27;
-        case 3:
+        case BOX2_MODE_MOVE_ITEMS:
             if (syswk->app->getItem == 0) {
-                Box2Bmp_PrintItemMsg(syswk, 0, 24);
+                Box2Bmp_PrintItemMsg(syswk, BOX2_ITEM_MSG_CAN_HOLD, 24);
             } else {
-                Box2Bmp_PrintItemMsg(syswk, 1, 24);
+                Box2Bmp_PrintItemMsg(syswk, BOX2_ITEM_MSG_SELECTED, 24);
             }
             if (syswk->pos < BOX2_PARTY_POS) {
                 return 67;
             }
             return 80;
-        case 4:
-            Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+        case BOX2_MODE_BATTLE_BOX:
+            Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
             if (syswk->pos < BOX2_PARTY_POS) {
                 return 45;
             }
             return 49;
-        case 5:
-            Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+        case BOX2_MODE_DREAM_WORLD:
+            Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
             return 85;
         }
     }
@@ -715,26 +774,26 @@ static int Box2Seq_ArrangeMain(Box2SysWork *syswk) {
     u32 res;
 
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
-        syswk->unk1B = 0;
+        syswk->fromParty = 0;
         return Box2Seq_NextMoveMode(syswk, 20);
     }
     if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_START) && Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE) {
         syswk->getTray = syswk->tray;
         syswk->pos = CursorMove_GetPos(syswk->app->cursorMove);
-        syswk->unk13 = 2;
+        syswk->subProcReturn = 2;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         Box2Main_ShowCursor(syswk);
         return Box2Seq_AnimActorButton(syswk, 30, 1, 91);
     }
 
     res = Box2Ui_GetTrayPokeTrigger();
-    if (res != 0xffffffff) {
+    if (res != CURSORMOVE_NONE) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
         if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_SYS_39);
             GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
             if (Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE) {
-                Box2Bmp_OpenMenu(syswk, sMenu71f0, 6);
+                Box2Bmp_OpenMenu(syswk, sArrangeMenu, 6);
             }
             Box2Main_PokeInfoPut(syswk, res);
             return Box2Seq_ArrangePickUpTouched(syswk, res);
@@ -786,18 +845,18 @@ static int Box2Seq_ArrangeMain(Box2SysWork *syswk) {
         return Box2Seq_AnimActorButton(syswk, 6, 9, 116);
     case 36:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        syswk->unk1B = 0;
+        syswk->fromParty = 0;
         syswk->moveMode = 0;
         return Box2Seq_AnimFrameButton(syswk, 0, Box2Seq_Goto(syswk, 20));
     case 37:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        syswk->unk13 = 0;
+        syswk->subProcReturn = 0;
         syswk->getTray = syswk->tray;
         syswk->curRcvPos = 37;
         return Box2Seq_AnimFrameButton(syswk, 1, 89);
     case 38:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        syswk->unk13 = 0;
+        syswk->subProcReturn = 0;
         syswk->curRcvPos = 38;
         return Box2Seq_AnimFrameButton(syswk, 2, Box2Seq_Goto(syswk, 90));
     case 39:
@@ -819,19 +878,19 @@ static int Box2Seq_ArrangeMain(Box2SysWork *syswk) {
     case 42:
         break;
     case 43:
-        syswk->unk1B = 0;
+        syswk->fromParty = 0;
         syswk->moveMode = 1;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_SetMoveMode(syswk, 20);
     case 44:
-        syswk->unk1B = 0;
+        syswk->fromParty = 0;
         syswk->moveMode = 2;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_SetMoveMode(syswk, 35);
     case 45:
         syswk->getTray = syswk->tray;
         syswk->pos = CursorMove_GetPos(syswk->app->cursorMove);
-        syswk->unk13 = 2;
+        syswk->subProcReturn = 2;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_AnimActorButton(syswk, 30, 1, 91);
     case CURSORMOVE_SCROLL_L:
@@ -875,13 +934,13 @@ static int Box2Seq_ArrangeMain(Box2SysWork *syswk) {
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         break;
     case CURSORMOVE_NONE:
-    case CURSORMOVE_UNK_7:
-    case CURSORMOVE_UNK_8:
+    case CURSORMOVE_SCROLL_D:
+    case CURSORMOVE_SCROLL_U:
         break;
     default:
         if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-            Box2Bmp_OpenMenu(syswk, sMenu71f0, 6);
+            Box2Bmp_OpenMenu(syswk, sArrangeMenu, 6);
             Box2Main_PokeInfoPut(syswk, res);
             Box2Ui_StartCursorMove(syswk->app, BOX2_BOXLIST_POS, CursorMove_GetPos(syswk->app->cursorMove));
             CursorMove_SetPos(syswk->app->cursorMove, BOX2_BOXLIST_POS);
@@ -901,7 +960,7 @@ static int Box2Seq_ArrangeMoveToBoxList(Box2SysWork *syswk) {
     Box2Ui_PlaceCursorActor(syswk, BOX2_BOXLIST_POS);
     Box2Obj_ShowCursor(syswk, 1);
     Box2Obj_SetButtons(syswk, 0, 0, 1, 0);
-    Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+    Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
     return 17;
 }
 
@@ -920,7 +979,7 @@ static int Box2Seq_ArrangeMoveStart(Box2SysWork *syswk) {
         if (Box2Frame_IsBoxListIn(syswk->app->bgWinFrame) == FALSE) {
             syswk->trayScroll = syswk->tray;
         }
-        if (syswk->moveMode == 1 && syswk->unk1C_4 == 0) {
+        if (syswk->moveMode == 1 && syswk->fromMenu == 0) {
             syswk->getTray = BOX2_GET_NONE;
             syswk->pos = CursorMove_GetPos(syswk->app->cursorMove);
             if (syswk->pos >= BOX2_PARTY_POS) {
@@ -950,7 +1009,7 @@ static int Box2Seq_ArrangeMoveStart(Box2SysWork *syswk) {
         syswk->app->oldCurPos = syswk->pos;
         syswk->app->subSeq = 0;
         if (syswk->moveMode == 1) {
-            if (syswk->unk1C_4 == 0) {
+            if (syswk->fromMenu == 0) {
                 if (Box2Main_GetPokeParam(syswk, syswk->pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) == 0) {
                     Box2Obj_SetButtons(syswk, 0, 1, 2, 0);
                 } else {
@@ -979,34 +1038,34 @@ static int Box2Seq_ArrangeMoveMain(Box2SysWork *syswk) {
     u32 x, y;
     u32 res;
 
-    if (syswk->unk1C_6 == 1) {
+    if (syswk->moveDone == 1) {
         syswk->moveMode = 0;
-        syswk->unk1C_6 = 0;
+        syswk->moveDone = 0;
         return Box2Seq_Goto(syswk, 22);
     }
-    if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) && syswk->moveMode != 0 && syswk->unk18 == 0) {
+    if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) && syswk->moveMode != 0 && syswk->pickState == BOX2_PICK_NONE) {
         Box2Main_ShowCursor(syswk);
         syswk->moveMode = 2;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_Goto(syswk, 22);
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_START) {
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             u8 pos = CursorMove_GetPos(syswk->app->cursorMove);
 
             Box2Seq_SetGetPos(syswk, pos, syswk->tray);
-            syswk->unk13 = 2;
+            syswk->subProcReturn = 2;
         } else {
-            syswk->unk13 = 3;
-            syswk->unk1D = CursorMove_GetPos(syswk->app->cursorMove);
+            syswk->subProcReturn = 3;
+            syswk->subProcCursorPos = CursorMove_GetPos(syswk->app->cursorMove);
         }
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         Box2Main_ShowCursor(syswk);
         return Box2Seq_AnimActorButton(syswk, 30, 1, 91);
     }
-    if (syswk->unk18 == 0) {
+    if (syswk->pickState == BOX2_PICK_NONE) {
         res = Box2Ui_GetTrayPokeTrigger();
-        if (res != 0xffffffff) {
+        if (res != CURSORMOVE_NONE) {
             CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
             Box2Obj_ShowBoxNameFrame(syswk, 0, 0);
             if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
@@ -1036,7 +1095,7 @@ static int Box2Seq_ArrangeMoveMain(Box2SysWork *syswk) {
     switch (res) {
     case 30:
         Box2Obj_ShowBoxNameFrame(syswk, 0, 0);
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -1049,7 +1108,7 @@ static int Box2Seq_ArrangeMoveMain(Box2SysWork *syswk) {
         Box2Ui_PlaceCursorActor(syswk, 30);
         Box2Ui_SetButtonStates(syswk, 30);
         syswk->app->oldCurPos = 30;
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             Box2Main_PokeSelectOff(syswk);
         } else {
             Box2Obj_MoveHeldIcons(syswk);
@@ -1062,7 +1121,7 @@ static int Box2Seq_ArrangeMoveMain(Box2SysWork *syswk) {
         Box2Ui_PlaceCursorActor(syswk, 30);
         Box2Ui_SetButtonStates(syswk, 30);
         syswk->app->oldCurPos = 30;
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             Box2Main_PokeSelectOff(syswk);
         } else {
             Box2Obj_MoveHeldIcons(syswk);
@@ -1070,12 +1129,12 @@ static int Box2Seq_ArrangeMoveMain(Box2SysWork *syswk) {
         return Box2Seq_ScrollTrayRight(syswk, 0, 21);
     case 39:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             Box2Main_PokeInfoOff(syswk);
         }
         return Box2Seq_AnimFrameButton(syswk, 10, Box2Seq_Goto(syswk, 25));
     case 40:
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             u8 pos = CursorMove_GetPos(syswk->app->cursorMove);
 
             if (pos >= BOX2_PARTY_POS ||
@@ -1084,22 +1143,22 @@ static int Box2Seq_ArrangeMoveMain(Box2SysWork *syswk) {
             }
             syswk->pos = pos;
             syswk->getTray = syswk->tray;
-            syswk->unk13 = 2;
+            syswk->subProcReturn = 2;
         } else {
-            syswk->unk13 = 3;
-            syswk->unk1D = CursorMove_GetPos(syswk->app->cursorMove);
+            syswk->subProcReturn = 3;
+            syswk->subProcCursorPos = CursorMove_GetPos(syswk->app->cursorMove);
         }
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_AnimActorButton(syswk, 8, 1, 89);
     case 41:
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         syswk->moveMode = 0;
         return Box2Seq_AnimActorButton(syswk, 6, 9, Box2Seq_Goto(syswk, 22));
     case 42:
-        if (syswk->moveMode == 0 || syswk->unk18 != 0) {
+        if (syswk->moveMode == 0 || syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         syswk->moveMode = 0;
@@ -1108,39 +1167,39 @@ static int Box2Seq_ArrangeMoveMain(Box2SysWork *syswk) {
     case 43:
         break;
     case 44:
-        if (syswk->moveMode == 0 || syswk->unk18 != 0) {
+        if (syswk->moveMode == 0 || syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         syswk->moveMode = 2;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_Goto(syswk, 22);
     case 45:
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             u8 pos = CursorMove_GetPos(syswk->app->cursorMove);
 
             Box2Seq_SetGetPos(syswk, pos, syswk->tray);
-            syswk->unk13 = 2;
+            syswk->subProcReturn = 2;
         } else {
-            syswk->unk13 = 3;
-            syswk->unk1D = CursorMove_GetPos(syswk->app->cursorMove);
+            syswk->subProcReturn = 3;
+            syswk->subProcCursorPos = CursorMove_GetPos(syswk->app->cursorMove);
         }
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_AnimActorButton(syswk, 30, 1, 91);
     case CURSORMOVE_CANCEL:
-        if (syswk->unk18 == 1) {
+        if (syswk->pickState == BOX2_PICK_KEY) {
             return Box2Seq_MoveDropKey(syswk, BOX2_GET_NONE, 21);
         }
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         syswk->moveMode = 0;
         return Box2Seq_AnimActorButton(syswk, 6, 9, Box2Seq_Goto(syswk, 22));
-    case CURSORMOVE_UNK_8:
+    case CURSORMOVE_SCROLL_U:
         if (CursorMove_GetPos(syswk->app->cursorMove) == 34) {
             GFL_SndSEPlay(SEQ_SE_SELECT1);
             Box2Main_StartBoxListScroll(syswk, -1);
             return Box2Seq_RunVFunc(syswk, Box2Main_VFuncBoxListScrollRight, 21);
         }
         break;
-    case CURSORMOVE_UNK_7:
+    case CURSORMOVE_SCROLL_D:
         if (CursorMove_GetPos(syswk->app->cursorMove) == 37) {
             GFL_SndSEPlay(SEQ_SE_SELECT1);
             Box2Main_StartBoxListScroll(syswk, 1);
@@ -1164,7 +1223,7 @@ static int Box2Seq_ArrangeMoveMain(Box2SysWork *syswk) {
 
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         pos = CursorMove_GetPos(syswk->app->cursorMove);
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             if (pos < BOX2_PARTY_POS) {
                 Box2Main_PokeInfoPut(syswk, pos);
             } else {
@@ -1194,16 +1253,16 @@ static int Box2Seq_ArrangeMoveMain(Box2SysWork *syswk) {
     case 36:
     case 37:
         Box2Obj_ShowBoxNameFrame(syswk, res - 34, 1);
-        if (syswk->unk18 == 1) {
+        if (syswk->pickState == BOX2_PICK_KEY) {
             return Box2Seq_MoveDropKey(syswk, res + 2, 21);
         }
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         Box2Main_PokeInfoOff(syswk);
-        syswk->app->unkA55F = syswk->trayScroll + res - 34;
-        if (syswk->app->unkA55F >= syswk->trayMax) {
-            syswk->app->unkA55F -= syswk->trayMax;
+        syswk->app->pickedTray = syswk->trayScroll + res - 34;
+        if (syswk->app->pickedTray >= syswk->trayMax) {
+            syswk->app->pickedTray -= syswk->trayMax;
         }
-        if (syswk->app->unkA55F != syswk->tray) {
+        if (syswk->app->pickedTray != syswk->tray) {
             return Box2Seq_ScrollToPickedBox(syswk, 21);
         }
         break;
@@ -1211,7 +1270,7 @@ static int Box2Seq_ArrangeMoveMain(Box2SysWork *syswk) {
         break;
     default:
         Box2Obj_ShowBoxNameFrame(syswk, 0, 0);
-        if (syswk->unk18 == 1) {
+        if (syswk->pickState == BOX2_PICK_KEY) {
             return Box2Seq_MoveDropKey(syswk, res, 21);
         }
         if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
@@ -1242,7 +1301,7 @@ static int Box2Seq_ArrangeMovePartyStart(Box2SysWork *syswk) {
         }
         return 35;
     case 1:
-        if (syswk->unk1B == 1) {
+        if (syswk->fromParty == 1) {
             Box2Frame_PutPartyRightBelow(syswk->app->bgWinFrame);
             Box2Frame_SlidePartyUp(syswk->app->bgWinFrame);
             syswk->app->subSeq++;
@@ -1272,7 +1331,7 @@ static int Box2Seq_ArrangeMoveEnd(Box2SysWork *syswk) {
     u8 n;
 
     Box2Main_PokeDataMove(syswk);
-    syswk->unk18 = 0;
+    syswk->pickState = BOX2_PICK_NONE;
     syswk->getTray = BOX2_GET_NONE;
     if (syswk->app->moveErr == BOX2_MOVE_ERR_NONE) {
         pos = CursorMove_GetPos(syswk->app->cursorMove);
@@ -1331,8 +1390,8 @@ static int Box2Seq_ArrangeMoveEnd(Box2SysWork *syswk) {
         n = 2;
     }
     if (syswk->moveMode == 0) {
-        syswk->unk1C_6 = 1;
-        n = syswk->unk21;
+        syswk->moveDone = 1;
+        n = syswk->button3;
     }
     Box2Obj_SetButtons(syswk, 0, 1, n, 0);
     switch (syswk->app->moveErr) {
@@ -1354,10 +1413,10 @@ static int Box2Seq_ArrangeMoveEnd(Box2SysWork *syswk) {
     case BOX2_MOVE_ERR_BATTLE_BOX_LOCKED:
         GFL_SndSEPlay(SEQ_SE_BEEP);
         Box2Obj_ShowCursor(syswk, 0);
-        Box2Bmp_PrintBattleBoxLocked(syswk, 0);
+        Box2Bmp_PrintBattleBoxLocked(syswk, FALSE);
         return 24;
     }
-    if (syswk->param->mode == 2) {
+    if (syswk->param->mode == BOX2_MODE_MOVE_POKEMON) {
         if (Box2Frame_IsBoxListIn(syswk->app->bgWinFrame) == TRUE) {
             Box2Frame_ShowPartyButton(syswk->app);
         } else {
@@ -1377,7 +1436,7 @@ static int Box2Seq_ArrangeMoveErrClose(Box2SysWork *syswk) {
     }
     Box2Bmp_ClearMsgWindow(syswk->app, syswk->app->moveErr == BOX2_MOVE_ERR_BATTLE_BOX_LOCKED ? 27 : 24);
     Box2Main_PutMessageFrame(syswk);
-    if (syswk->param->mode == 2) {
+    if (syswk->param->mode == BOX2_MODE_MOVE_POKEMON) {
         if (Box2Frame_IsBoxListIn(syswk->app->bgWinFrame) == TRUE) {
             Box2Frame_ShowPartyButton(syswk->app);
         } else {
@@ -1399,7 +1458,7 @@ static int Box2Seq_ArrangeMovePartyOut(Box2SysWork *syswk) {
     case 1:
         Box2Frame_PutPartyRightBelow(syswk->app->bgWinFrame);
         Box2Frame_SlidePartyUp(syswk->app->bgWinFrame);
-        if (syswk->unk18 == 1) {
+        if (syswk->pickState == BOX2_PICK_KEY) {
             Box2Obj_PutPartyIconsLeftBelow(syswk, 1);
         } else {
             Box2Obj_PutPartyIconsLeftBelow(syswk, 0);
@@ -1410,7 +1469,7 @@ static int Box2Seq_ArrangeMovePartyOut(Box2SysWork *syswk) {
     case 2:
         Box2Ui_ChangeCursor(syswk, 6, BOX2_PARTY_POS);
         Box2Ui_SetButtonStates(syswk, BOX2_PARTY_POS);
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             Box2Main_PokeInfoPut(syswk, BOX2_PARTY_POS);
         }
         Box2Frame_ShowBoxListButton(syswk->app);
@@ -1425,7 +1484,7 @@ static int Box2Seq_ArrangeMovePartyOut(Box2SysWork *syswk) {
 static int Box2Seq_RangeStart(Box2SysWork *syswk) {
     switch (syswk->app->subSeq) {
     case 0:
-        syswk->unk1C_4 = 0;
+        syswk->fromMenu = 0;
         if (Box2Frame_IsBoxListIn(syswk->app->bgWinFrame) == FALSE) {
             syswk->trayScroll = syswk->tray;
         }
@@ -1472,25 +1531,25 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
     u32 x, y;
     u32 res;
 
-    if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) && syswk->moveMode != 0 && syswk->unk18 == 0) {
+    if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) && syswk->moveMode != 0 && syswk->pickState == BOX2_PICK_NONE) {
         Box2Main_ShowCursor(syswk);
         syswk->moveMode = 0;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_Goto(syswk, 37);
     }
-    if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_START) && syswk->unk18 == 0) {
+    if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_START) && syswk->pickState == BOX2_PICK_NONE) {
         u8 pos = CursorMove_GetPos(syswk->app->cursorMove);
 
         Box2Seq_SetGetPos(syswk, pos, syswk->tray);
-        syswk->unk13 = 2;
+        syswk->subProcReturn = 2;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         Box2Main_ShowCursor(syswk);
         return Box2Seq_AnimActorButton(syswk, 30, 1, 91);
     }
 
-    if (syswk->unk18 == 0) {
+    if (syswk->pickState == BOX2_PICK_NONE) {
         res = Box2Ui_GetTrayPokeTrigger();
-        if (res != 0xffffffff) {
+        if (res != CURSORMOVE_NONE) {
             Box2Main_PokeInfoPut(syswk, res);
             CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
             Box2Obj_ShowBoxNameFrame(syswk, 0, 0);
@@ -1498,16 +1557,16 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
             Box2Obj_SetRangeRect(syswk, res, res, 0);
             syswk->app->rangeSelect.startPos = res;
             syswk->app->rangeSelect.endPos = res;
-            syswk->app->unkA5B4 = FALSE;
-            syswk->unk18 = 3;
+            syswk->app->rangeByKey = FALSE;
+            syswk->pickState = BOX2_PICK_TOUCH_TRAY;
             syswk->getTray = syswk->tray;
             Box2Ui_SetButtonStates(syswk, res);
             return 36;
         }
-    } else if (syswk->unk18 == 3) {
+    } else if (syswk->pickState == BOX2_PICK_TOUCH_TRAY) {
         if (GFL_HIDIsTouchHeld() == TRUE) {
             res = Box2Ui_GetTrayPokeHeld();
-            if (res != 0xffffffff) {
+            if (res != CURSORMOVE_NONE) {
                 Box2Obj_SetRangeRect(syswk, syswk->app->rangeSelect.startPos, res, 0);
                 syswk->app->rangeSelect.endPos = res;
             }
@@ -1527,16 +1586,16 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
                 Box2Obj_PickUpRangeIcons(syswk, syswk->pos, width, height);
                 Box2Obj_ResetRangeIconPriority(syswk->app, syswk->pos, width, height, 0);
                 Box2Bmp_PutRangeCount(syswk);
-                syswk->unk18 = 2;
+                syswk->pickState = BOX2_PICK_RANGE_HELD;
                 syswk->app->oldCurPos = syswk->pos;
             } else {
                 CancelRange(syswk);
             }
         }
         return 36;
-    } else if (syswk->unk18 == 2 && syswk->app->unkA5B4 == FALSE) {
+    } else if (syswk->pickState == BOX2_PICK_RANGE_HELD && syswk->app->rangeByKey == FALSE) {
         res = Box2Ui_GetTrayPokeTrigger();
-        if (res != 0xffffffff) {
+        if (res != CURSORMOVE_NONE) {
             // The touch position's y doubles as the row counter
             for (y = 0; y < syswk->app->rangeHeight; y++) {
                 if (res >= syswk->pos + y * 6 && res < syswk->app->rangeWidth + (syswk->pos + y * 6)) {
@@ -1544,7 +1603,7 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
                     GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
                     CursorMove_SetPos(syswk->app->cursorMove, syswk->pos);
                     Box2Main_PokeInfoPut(syswk, syswk->pos);
-                    syswk->app->unkA5B4 = TRUE;
+                    syswk->app->rangeByKey = TRUE;
                     return Box2Seq_RangePickUpTouched(syswk, 36);
                 }
             }
@@ -1561,17 +1620,17 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
 
     res = Box2Ui_UpdateCursor4(syswk);
     if (res != CURSORMOVE_NONE) {
-        syswk->app->unkA5B4 = TRUE;
+        syswk->app->rangeByKey = TRUE;
     }
     switch (res) {
     case 30:
         Box2Obj_ShowBoxNameFrame(syswk, 0, 0);
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             Box2Main_PokeInfoOff(syswk);
             return Box2Seq_Goto(syswk, 105);
         }
-        if (syswk->unk18 == 1) {
+        if (syswk->pickState == BOX2_PICK_KEY) {
             CancelRange(syswk);
             Box2Main_PokeInfoOff(syswk);
         }
@@ -1583,9 +1642,9 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
         Box2Ui_PlaceCursorActor(syswk, 30);
         Box2Ui_SetButtonStates(syswk, 30);
         syswk->app->oldCurPos = 30;
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             Box2Main_PokeSelectOff(syswk);
-        } else if (syswk->unk18 == 1) {
+        } else if (syswk->pickState == BOX2_PICK_KEY) {
             Box2Main_PokeSelectOff(syswk);
             CancelRange(syswk);
         } else {
@@ -1599,9 +1658,9 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
         Box2Ui_PlaceCursorActor(syswk, 30);
         Box2Ui_SetButtonStates(syswk, 30);
         syswk->app->oldCurPos = 30;
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             Box2Main_PokeSelectOff(syswk);
-        } else if (syswk->unk18 == 1) {
+        } else if (syswk->pickState == BOX2_PICK_KEY) {
             Box2Main_PokeSelectOff(syswk);
             CancelRange(syswk);
         } else {
@@ -1610,9 +1669,9 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
         return Box2Seq_ScrollTrayRight(syswk, 0, 36);
     case 39:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             Box2Main_PokeInfoOff(syswk);
-        } else if (syswk->unk18 == 1) {
+        } else if (syswk->pickState == BOX2_PICK_KEY) {
             CancelRange(syswk);
             Box2Main_PokeInfoOff(syswk);
         }
@@ -1620,7 +1679,7 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
     case 40: {
         u8 pos;
 
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         pos = CursorMove_GetPos(syswk->app->cursorMove);
@@ -1630,26 +1689,26 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
         }
         syswk->pos = pos;
         syswk->getTray = syswk->tray;
-        syswk->unk13 = 2;
+        syswk->subProcReturn = 2;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_AnimActorButton(syswk, 8, 1, 89);
     }
     case 41:
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         syswk->moveMode = 0;
         return Box2Seq_AnimActorButton(syswk, 6, 9, Box2Seq_Goto(syswk, 37));
     case 42:
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         syswk->moveMode = 0;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_Goto(syswk, 37);
     case 43:
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         syswk->moveMode = 1;
@@ -1658,17 +1717,17 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
     case 44:
         break;
     case 45:
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         u8 pos = CursorMove_GetPos(syswk->app->cursorMove);
 
         Box2Seq_SetGetPos(syswk, pos, syswk->tray);
-        syswk->unk13 = 2;
+        syswk->subProcReturn = 2;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_AnimActorButton(syswk, 30, 1, 91);
     case CURSORMOVE_CANCEL:
-        if (syswk->unk18 == 1) {
+        if (syswk->pickState == BOX2_PICK_KEY) {
             u8 pos = CursorMove_GetPos(syswk->app->cursorMove);
 
             if (pos < BOX2_PARTY_POS) {
@@ -1679,16 +1738,16 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
             CancelRange(syswk);
             break;
         }
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             Box2Obj_SetRangeAnm(syswk, 0);
             return Box2Seq_RangeDropKey(syswk, BOX2_GET_NONE, 36);
         }
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         syswk->moveMode = 0;
         return Box2Seq_AnimActorButton(syswk, 6, 9, Box2Seq_Goto(syswk, 37));
-    case CURSORMOVE_UNK_8:
+    case CURSORMOVE_SCROLL_U:
         if (CursorMove_GetPos(syswk->app->cursorMove) == 34) {
-            if (syswk->unk18 == 1) {
+            if (syswk->pickState == BOX2_PICK_KEY) {
                 Box2Main_PokeSelectOff(syswk);
                 CancelRange(syswk);
             }
@@ -1697,9 +1756,9 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
             return Box2Seq_RunVFunc(syswk, Box2Main_VFuncBoxListScrollRight, 36);
         }
         break;
-    case CURSORMOVE_UNK_7:
+    case CURSORMOVE_SCROLL_D:
         if (CursorMove_GetPos(syswk->app->cursorMove) == 37) {
-            if (syswk->unk18 == 1) {
+            if (syswk->pickState == BOX2_PICK_KEY) {
                 Box2Main_PokeSelectOff(syswk);
                 CancelRange(syswk);
             }
@@ -1710,7 +1769,7 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
         break;
     case CURSORMOVE_SCROLL_L:
         if (CursorMove_GetPos(syswk->app->cursorMove) == 30) {
-            if (syswk->unk18 == 1) {
+            if (syswk->pickState == BOX2_PICK_KEY) {
                 CancelRange(syswk);
             }
             GFL_SndSEPlay(SEQ_SE_SELECT1);
@@ -1719,7 +1778,7 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
         break;
     case CURSORMOVE_SCROLL_R:
         if (CursorMove_GetPos(syswk->app->cursorMove) == 30) {
-            if (syswk->unk18 == 1) {
+            if (syswk->pickState == BOX2_PICK_KEY) {
                 CancelRange(syswk);
             }
             GFL_SndSEPlay(SEQ_SE_SELECT1);
@@ -1731,13 +1790,13 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
 
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         pos = CursorMove_GetPos(syswk->app->cursorMove);
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             if (pos < BOX2_PARTY_POS) {
                 Box2Main_PokeInfoPut(syswk, pos);
             } else {
                 Box2Main_PokeInfoOff(syswk);
             }
-        } else if (syswk->unk18 == 1 && pos < BOX2_PARTY_POS) {
+        } else if (syswk->pickState == BOX2_PICK_KEY && pos < BOX2_PARTY_POS) {
             Box2Obj_SetRangeRect(syswk, syswk->app->rangeSelect.startPos, pos, 0);
         }
         if (pos >= 34 && pos <= 37) {
@@ -1751,14 +1810,14 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         break;
     case 33:
-        if (syswk->unk18 == 1) {
+        if (syswk->pickState == BOX2_PICK_KEY) {
             CancelRange(syswk);
         }
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         Box2Main_StartBoxListScroll(syswk, -1);
         return Box2Seq_RunVFunc(syswk, Box2Main_VFuncBoxListScrollRight, 36);
     case 38:
-        if (syswk->unk18 == 1) {
+        if (syswk->pickState == BOX2_PICK_KEY) {
             CancelRange(syswk);
         }
         GFL_SndSEPlay(SEQ_SE_SELECT1);
@@ -1772,19 +1831,19 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
         u32 slot = res - 34;
 
         Box2Obj_ShowBoxNameFrame(syswk, slot, 1);
-        if (syswk->unk18 == 2) {
+        if (syswk->pickState == BOX2_PICK_RANGE_HELD) {
             return Box2Seq_RangeDropKey(syswk, slot + 36, 36);
         }
-        if (syswk->unk18 == 1) {
+        if (syswk->pickState == BOX2_PICK_KEY) {
             CancelRange(syswk);
         }
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         Box2Main_PokeInfoOff(syswk);
-        syswk->app->unkA55F = syswk->trayScroll + slot;
-        if (syswk->app->unkA55F >= syswk->trayMax) {
-            syswk->app->unkA55F -= syswk->trayMax;
+        syswk->app->pickedTray = syswk->trayScroll + slot;
+        if (syswk->app->pickedTray >= syswk->trayMax) {
+            syswk->app->pickedTray -= syswk->trayMax;
         }
-        if (syswk->app->unkA55F != syswk->tray) {
+        if (syswk->app->pickedTray != syswk->tray) {
             return Box2Seq_ScrollToPickedBox(syswk, 36);
         }
         break;
@@ -1793,7 +1852,7 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
         break;
     default:
         Box2Obj_ShowBoxNameFrame(syswk, 0, 0);
-        if (syswk->unk18 == 1) {
+        if (syswk->pickState == BOX2_PICK_KEY) {
             u32 width, height;
 
             syswk->app->rangeSelect.endPos = res;
@@ -1810,12 +1869,12 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
                 Box2Obj_PickUpRangeIcons(syswk, syswk->pos, width, height);
                 Box2Obj_ResetRangeIconPriority(syswk->app, syswk->pos, width, height, 0);
                 Box2Bmp_PutRangeCount(syswk);
-                syswk->unk18 = 2;
+                syswk->pickState = BOX2_PICK_RANGE_HELD;
                 syswk->app->oldCurPos = syswk->pos;
                 return Box2Seq_RangePickUpKey(syswk, syswk->pos, 36);
             }
             CancelRange(syswk);
-        } else if (syswk->unk18 == 2) {
+        } else if (syswk->pickState == BOX2_PICK_RANGE_HELD) {
             if (Box2Main_RangePutCheck(syswk, syswk->tray, res) != FALSE) {
                 Box2Obj_SetRangeAnm(syswk, 0);
                 return Box2Seq_RangeDropKey(syswk, res, 36);
@@ -1826,10 +1885,10 @@ static int Box2Seq_RangeMain(Box2SysWork *syswk) {
             syswk->pos = res;
             syswk->app->rangeSelect.startPos = res;
             syswk->app->rangeSelect.endPos = res;
-            syswk->app->unkA5B4 = TRUE;
+            syswk->app->rangeByKey = TRUE;
             Box2Obj_SetRangeRect(syswk, res, res, 0);
             Box2Obj_SetRangeAnm(syswk, 1);
-            syswk->unk18 = 1;
+            syswk->pickState = BOX2_PICK_KEY;
             syswk->app->rangeWidth = 1;
             syswk->app->rangeHeight = 1;
             Box2Ui_SetButtonStates(syswk, res);
@@ -1859,7 +1918,7 @@ static int Box2Seq_RangePartyOut(Box2SysWork *syswk) {
         }
         return 20;
     case 1:
-        if (syswk->unk1B == 1) {
+        if (syswk->fromParty == 1) {
             Box2Frame_PutPartyRightBelow(syswk->app->bgWinFrame);
             Box2Frame_SlidePartyUp(syswk->app->bgWinFrame);
             syswk->app->subSeq++;
@@ -1889,7 +1948,7 @@ static int Box2Seq_RangeMoveEnd(Box2SysWork *syswk) {
     u8 n;
 
     Box2Main_PokeDataMove(syswk);
-    syswk->unk18 = 0;
+    syswk->pickState = BOX2_PICK_NONE;
     syswk->getTray = BOX2_GET_NONE;
     if (syswk->app->moveErr == BOX2_MOVE_ERR_NONE) {
         pos = CursorMove_GetPos(syswk->app->cursorMove);
@@ -1948,8 +2007,8 @@ static int Box2Seq_RangeMoveEnd(Box2SysWork *syswk) {
         n = 2;
     }
     if (syswk->moveMode == 0) {
-        syswk->unk1C_6 = 1;
-        n = syswk->unk21;
+        syswk->moveDone = 1;
+        n = syswk->button3;
     }
     Box2Obj_SetButtons(syswk, 0, 1, n, 0);
     Box2Obj_SetRangeAnm(syswk, 0);
@@ -1972,10 +2031,10 @@ static int Box2Seq_RangeMoveEnd(Box2SysWork *syswk) {
     case BOX2_MOVE_ERR_BATTLE_BOX_LOCKED:
         GFL_SndSEPlay(SEQ_SE_BEEP);
         Box2Obj_ShowCursor(syswk, 0);
-        Box2Bmp_PrintBattleBoxLocked(syswk, 0);
+        Box2Bmp_PrintBattleBoxLocked(syswk, FALSE);
         return 39;
     }
-    if (syswk->param->mode == 2) {
+    if (syswk->param->mode == BOX2_MODE_MOVE_POKEMON) {
         if (Box2Frame_IsBoxListIn(syswk->app->bgWinFrame) == TRUE) {
             Box2Frame_ShowPartyButton(syswk->app);
         } else {
@@ -1995,7 +2054,7 @@ static int Box2Seq_RangeMoveErrClose(Box2SysWork *syswk) {
     }
     Box2Bmp_ClearMsgWindow(syswk->app, syswk->app->moveErr == BOX2_MOVE_ERR_BATTLE_BOX_LOCKED ? 27 : 24);
     Box2Main_PutMessageFrame(syswk);
-    if (syswk->param->mode == 2) {
+    if (syswk->param->mode == BOX2_MODE_MOVE_POKEMON) {
         if (Box2Frame_IsBoxListIn(syswk->app->bgWinFrame) == TRUE) {
             Box2Frame_ShowPartyButton(syswk->app);
         } else {
@@ -2018,10 +2077,10 @@ static int Box2Seq_RangePartyAway(Box2SysWork *syswk) {
     case 1:
         Box2Frame_PutPartyRightBelow(syswk->app->bgWinFrame);
         Box2Frame_SlidePartyUp(syswk->app->bgWinFrame);
-        if (syswk->unk18 == 2) {
+        if (syswk->pickState == BOX2_PICK_RANGE_HELD) {
             Box2Obj_PutPartyIconsLeftBelow(syswk, 1);
             Box2Obj_HidePartyRangeIcons(syswk);
-        } else if (syswk->unk18 == 0) {
+        } else if (syswk->pickState == BOX2_PICK_NONE) {
             Box2Obj_PutPartyIconsLeftBelow(syswk, 0);
         }
         GFL_SndSEPlay(SEQ_SE_SYS_42);
@@ -2030,12 +2089,12 @@ static int Box2Seq_RangePartyAway(Box2SysWork *syswk) {
     case 2:
         Box2Ui_ChangeCursor(syswk, 6, BOX2_PARTY_POS);
         Box2Ui_SetButtonStates(syswk, BOX2_PARTY_POS);
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             Box2Main_PokeInfoPut(syswk, BOX2_PARTY_POS);
         }
         Box2Frame_ShowBoxListButton(syswk->app);
         syswk->app->oldCurPos = BOX2_PARTY_POS;
-        if (syswk->unk18 == 2) {
+        if (syswk->pickState == BOX2_PICK_RANGE_HELD) {
             Box2Obj_ShowRangeIcons(syswk, 0);
         }
         syswk->app->subSeq = 0;
@@ -2048,7 +2107,7 @@ static int Box2Seq_RangePartyAway(Box2SysWork *syswk) {
 static int Box2Seq_RangePartyIn(Box2SysWork *syswk) {
     switch (syswk->app->subSeq) {
     case 0:
-        syswk->unk1C_4 = 0;
+        syswk->fromMenu = 0;
         if (Box2Frame_IsPartyAtRight(syswk->app->bgWinFrame) == TRUE) {
             syswk->pos = CursorMove_GetPos(syswk->app->cursorMove);
             syswk->app->subSeq = 2;
@@ -2074,9 +2133,9 @@ static int Box2Seq_RangePartyIn(Box2SysWork *syswk) {
         syswk->app->subSeq++;
         return Box2Seq_RunVFunc(syswk, Box2Main_VFuncFrameMove, 41);
     case 1:
-        if (syswk->param->mode == 4 && syswk->param->battleBoxLocked == 1) {
+        if (syswk->param->mode == BOX2_MODE_BATTLE_BOX && syswk->param->battleBoxLocked == 1) {
             GFL_SndSEPlay(SEQ_SE_BEEP);
-            Box2Bmp_PrintBattleBoxLocked(syswk, 0);
+            Box2Bmp_PrintBattleBoxLocked(syswk, FALSE);
             syswk->moveMode = 0;
             syswk->app->subSeq = 0;
             syswk->nextSeq = 53;
@@ -2104,7 +2163,7 @@ static int Box2Seq_RangePartyIn(Box2SysWork *syswk) {
         } else {
             Box2Obj_SetButtons(syswk, 0, 1, 0, 0);
         }
-        if (syswk->param->mode == 4) {
+        if (syswk->param->mode == BOX2_MODE_BATTLE_BOX) {
             Box2Frame_HidePartyButton(syswk->app);
             Box2Frame_HideBoxListButton(syswk->app);
             CursorMove_DisablePos(syswk->app->cursorMove, 39);
@@ -2120,18 +2179,18 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
     u32 i;
     u32 res;
 
-    if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) && syswk->unk18 == 0) {
+    if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) && syswk->pickState == BOX2_PICK_NONE) {
         Box2Main_ShowCursor(syswk);
         syswk->moveMode = 0;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_Goto(syswk, 43);
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_START) {
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             u8 pos = CursorMove_GetPos(syswk->app->cursorMove);
 
             Box2Seq_SetGetPos(syswk, pos, syswk->tray);
-            syswk->unk13 = 4;
+            syswk->subProcReturn = 4;
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             Box2Main_ShowCursor(syswk);
             return Box2Seq_AnimActorButton(syswk, 30, 1, 91);
@@ -2139,23 +2198,23 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
         return 42;
     }
 
-    if (syswk->unk18 == 0) {
+    if (syswk->pickState == BOX2_PICK_NONE) {
         res = Box2Ui_GetTrayPokeTrigger();
-        if (res != 0xffffffff) {
+        if (res != CURSORMOVE_NONE) {
             Box2Main_PokeInfoPut(syswk, res);
             CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
             Box2Obj_SetRangeAnm(syswk, 1);
             Box2Obj_SetRangeRect(syswk, res, res, 0);
             syswk->app->rangeSelect.startPos = (u8)res;
             syswk->app->rangeSelect.endPos = (u8)res;
-            syswk->app->unkA5B4 = FALSE;
-            syswk->unk18 = 3;
+            syswk->app->rangeByKey = FALSE;
+            syswk->pickState = BOX2_PICK_TOUCH_TRAY;
             syswk->getTray = syswk->tray;
             Box2Ui_SetButtonStates(syswk, res);
             return 42;
         }
         res = Box2Ui_GetPartyPokeTrigger();
-        if (res != 0xffffffff) {
+        if (res != CURSORMOVE_NONE) {
             Box2Main_PokeInfoPut(syswk, res + BOX2_PARTY_POS);
             CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
             Box2Obj_SetRangeAnm(syswk, 1);
@@ -2163,16 +2222,16 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
             res += BOX2_PARTY_POS;
             syswk->app->rangeSelect.startPos = (u8)res;
             syswk->app->rangeSelect.endPos = (u8)res;
-            syswk->app->unkA5B4 = FALSE;
-            syswk->unk18 = 4;
+            syswk->app->rangeByKey = FALSE;
+            syswk->pickState = BOX2_PICK_TOUCH_PARTY;
             syswk->getTray = BOX2_GET_NONE;
             Box2Ui_SetButtonStates(syswk, res);
             return 42;
         }
-    } else if (syswk->unk18 == 3) {
+    } else if (syswk->pickState == BOX2_PICK_TOUCH_TRAY) {
         if (GFL_HIDIsTouchHeld() == TRUE) {
             res = Box2Ui_GetTrayPokeHeld();
-            if (res != 0xffffffff) {
+            if (res != CURSORMOVE_NONE) {
                 Box2Obj_SetRangeRect(syswk, syswk->app->rangeSelect.startPos, res, 0);
                 syswk->app->rangeSelect.endPos = res;
             }
@@ -2192,18 +2251,18 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
                 Box2Obj_PickUpRangeIcons(syswk, syswk->pos, width, height);
                 Box2Obj_ResetRangeIconPriority(syswk->app, syswk->pos, width, height, 0);
                 Box2Bmp_PutRangeCount(syswk);
-                syswk->unk18 = 2;
+                syswk->pickState = BOX2_PICK_RANGE_HELD;
                 syswk->app->oldCurPos = syswk->pos;
             } else {
                 CancelRange(syswk);
             }
         }
         return 42;
-    } else if (syswk->unk18 == 4) {
+    } else if (syswk->pickState == BOX2_PICK_TOUCH_PARTY) {
         if (GFL_HIDIsTouchHeld() == TRUE) {
             if (Box2Ui_IsPartyRightHeld() == TRUE) {
                 res = Box2Ui_GetPartyPokeHeld();
-                if (res != 0xffffffff) {
+                if (res != CURSORMOVE_NONE) {
                     Box2Obj_SetRangeRect(syswk, syswk->app->rangeSelect.startPos, res + BOX2_PARTY_POS, 0);
                     syswk->app->rangeSelect.endPos = res + BOX2_PARTY_POS;
                 }
@@ -2224,31 +2283,31 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
                 Box2Obj_PickUpRangeIcons(syswk, syswk->pos, width, height);
                 Box2Obj_ResetRangeIconPriority(syswk->app, syswk->pos, width, height, 0);
                 Box2Bmp_PutRangeCount(syswk);
-                syswk->unk18 = 2;
+                syswk->pickState = BOX2_PICK_RANGE_HELD;
                 syswk->app->oldCurPos = syswk->pos;
             } else {
                 CancelRange(syswk);
             }
         }
         return 42;
-    } else if (syswk->unk18 == 2 && syswk->app->unkA5B4 == FALSE) {
+    } else if (syswk->pickState == BOX2_PICK_RANGE_HELD && syswk->app->rangeByKey == FALSE) {
         if (syswk->pos < BOX2_PARTY_POS) {
             res = Box2Ui_GetTrayPokeTrigger();
-            if (res != 0xffffffff) {
+            if (res != CURSORMOVE_NONE) {
                 for (i = 0; i < syswk->app->rangeHeight; i++) {
                     if (res >= syswk->pos + i * 6 && res < syswk->app->rangeWidth + (syswk->pos + i * 6)) {
                         GFL_SndSEPlay(SEQ_SE_SYS_39);
                         GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
                         CursorMove_SetPos(syswk->app->cursorMove, syswk->pos);
                         Box2Main_PokeInfoPut(syswk, syswk->pos);
-                        syswk->app->unkA5B4 = TRUE;
+                        syswk->app->rangeByKey = TRUE;
                         return Box2Seq_RangePickUpTouched(syswk, 42);
                     }
                 }
             }
         } else {
             res = Box2Ui_GetPartyPokeTrigger();
-            if (res != 0xffffffff) {
+            if (res != CURSORMOVE_NONE) {
                 // The range's first slot in the party
                 u32 top = syswk->pos - BOX2_PARTY_POS;
 
@@ -2260,7 +2319,7 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
                         GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
                         CursorMove_SetPos(syswk->app->cursorMove, syswk->pos);
                         Box2Main_PokeInfoPut(syswk, syswk->pos);
-                        syswk->app->unkA5B4 = TRUE;
+                        syswk->app->rangeByKey = TRUE;
                         return Box2Seq_RangePickUpTouched(syswk, 42);
                     }
                 }
@@ -2270,16 +2329,16 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
 
     res = Box2Ui_UpdateCursor6(syswk);
     if (res != CURSORMOVE_NONE) {
-        syswk->app->unkA5B4 = TRUE;
+        syswk->app->rangeByKey = TRUE;
     }
     switch (res) {
     case 36:
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             Box2Main_PokeInfoOff(syswk);
             return Box2Seq_Goto(syswk, 105);
         }
-        if (syswk->unk18 == 1) {
+        if (syswk->pickState == BOX2_PICK_KEY) {
             CancelRange(syswk);
             Box2Main_PokeInfoOff(syswk);
         }
@@ -2290,9 +2349,9 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
         Box2Ui_PlaceCursorActor(syswk, BOX2_BOXLIST_POS);
         Box2Ui_SetButtonStates(syswk, BOX2_BOXLIST_POS);
         syswk->app->oldCurPos = BOX2_BOXLIST_POS;
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             Box2Main_PokeSelectOff(syswk);
-        } else if (syswk->unk18 == 1) {
+        } else if (syswk->pickState == BOX2_PICK_KEY) {
             Box2Main_PokeSelectOff(syswk);
             CancelRange(syswk);
         } else {
@@ -2305,9 +2364,9 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
         Box2Ui_PlaceCursorActor(syswk, BOX2_BOXLIST_POS);
         Box2Ui_SetButtonStates(syswk, BOX2_BOXLIST_POS);
         syswk->app->oldCurPos = BOX2_BOXLIST_POS;
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             Box2Main_PokeSelectOff(syswk);
-        } else if (syswk->unk18 == 1) {
+        } else if (syswk->pickState == BOX2_PICK_KEY) {
             Box2Main_PokeSelectOff(syswk);
             CancelRange(syswk);
         } else {
@@ -2316,9 +2375,9 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
         return Box2Seq_ScrollTrayRight(syswk, 0, 42);
     case 39:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             Box2Main_PokeInfoOff(syswk);
-        } else if (syswk->unk18 == 1) {
+        } else if (syswk->pickState == BOX2_PICK_KEY) {
             CancelRange(syswk);
             Box2Main_PokeInfoOff(syswk);
         }
@@ -2326,7 +2385,7 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
     case 40: {
         u8 pos;
 
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         pos = CursorMove_GetPos(syswk->app->cursorMove);
@@ -2336,26 +2395,26 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
         }
         syswk->pos = pos;
         syswk->getTray = syswk->tray;
-        syswk->unk13 = 4;
+        syswk->subProcReturn = 4;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_AnimActorButton(syswk, 8, 1, 89);
     }
     case 41:
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         syswk->moveMode = 0;
         return Box2Seq_AnimActorButton(syswk, 6, 9, Box2Seq_Goto(syswk, 43));
     case 42:
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         syswk->moveMode = 0;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_Goto(syswk, 43);
     case 43:
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         syswk->moveMode = 1;
@@ -2366,17 +2425,17 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
     case 45: {
         u8 pos;
 
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         pos = CursorMove_GetPos(syswk->app->cursorMove);
         Box2Seq_SetGetPos(syswk, pos, syswk->tray);
-        syswk->unk13 = 4;
+        syswk->subProcReturn = 4;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_AnimActorButton(syswk, 30, 1, 91);
     }
     case CURSORMOVE_CANCEL:
-        if (syswk->unk18 == 1) {
+        if (syswk->pickState == BOX2_PICK_KEY) {
             u8 pos = CursorMove_GetPos(syswk->app->cursorMove);
 
             if (pos < BOX2_BOXLIST_POS) {
@@ -2387,7 +2446,7 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
             CancelRange(syswk);
             break;
         }
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             Box2Obj_SetRangeAnm(syswk, 0);
             return Box2Seq_RangeDropKey(syswk, BOX2_GET_NONE, 42);
         }
@@ -2396,7 +2455,7 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
         return Box2Seq_AnimActorButton(syswk, 6, 9, Box2Seq_Goto(syswk, 43));
     case CURSORMOVE_SCROLL_L:
         if (CursorMove_GetPos(syswk->app->cursorMove) == BOX2_BOXLIST_POS) {
-            if (syswk->unk18 == 1) {
+            if (syswk->pickState == BOX2_PICK_KEY) {
                 Box2Main_PokeSelectOff(syswk);
                 CancelRange(syswk);
             }
@@ -2406,7 +2465,7 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
         break;
     case CURSORMOVE_SCROLL_R:
         if (CursorMove_GetPos(syswk->app->cursorMove) == BOX2_BOXLIST_POS) {
-            if (syswk->unk18 == 1) {
+            if (syswk->pickState == BOX2_PICK_KEY) {
                 Box2Main_PokeSelectOff(syswk);
                 CancelRange(syswk);
             }
@@ -2422,13 +2481,13 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
 
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         pos = CursorMove_GetPos(syswk->app->cursorMove);
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             if (pos < BOX2_BOXLIST_POS) {
                 Box2Main_PokeInfoPut(syswk, pos);
             } else {
                 Box2Main_PokeInfoOff(syswk);
             }
-        } else if (syswk->unk18 == 1) {
+        } else if (syswk->pickState == BOX2_PICK_KEY) {
             // The range stays in the tray or in the party it started in
             if (syswk->app->rangeSelect.startPos < BOX2_PARTY_POS) {
                 if (pos < BOX2_PARTY_POS) {
@@ -2440,12 +2499,12 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
         }
         return Box2Seq_RunRequestedVFunc(syswk, Box2Seq_PokeMoveEndTo(syswk, 42));
     }
-    case CURSORMOVE_UNK_7:
-    case CURSORMOVE_UNK_8:
+    case CURSORMOVE_SCROLL_D:
+    case CURSORMOVE_SCROLL_U:
     case CURSORMOVE_NONE:
         break;
     default:
-        if (syswk->unk18 == 1) {
+        if (syswk->pickState == BOX2_PICK_KEY) {
             u32 width, height;
 
             if ((syswk->app->rangeSelect.endPos < BOX2_PARTY_POS && res >= BOX2_PARTY_POS) ||
@@ -2474,12 +2533,12 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
                 Box2Obj_PickUpRangeIcons(syswk, syswk->pos, width, height);
                 Box2Obj_ResetRangeIconPriority(syswk->app, syswk->pos, width, height, 0);
                 Box2Bmp_PutRangeCount(syswk);
-                syswk->unk18 = 2;
+                syswk->pickState = BOX2_PICK_RANGE_HELD;
                 syswk->app->oldCurPos = syswk->pos;
                 return Box2Seq_RangePickUpKey(syswk, syswk->pos, 42);
             }
             CancelRange(syswk);
-        } else if (syswk->unk18 == 2) {
+        } else if (syswk->pickState == BOX2_PICK_RANGE_HELD) {
             if (Box2Main_RangePutCheck(syswk, syswk->tray, res) != FALSE) {
                 Box2Obj_SetRangeAnm(syswk, 0);
                 return Box2Seq_RangeDropKey(syswk, res, 42);
@@ -2492,10 +2551,10 @@ static int Box2Seq_RangePartyMain(Box2SysWork *syswk) {
             syswk->pos = (u8)res;
             syswk->app->rangeSelect.startPos = (u8)res;
             syswk->app->rangeSelect.endPos = (u8)res;
-            syswk->app->unkA5B4 = TRUE;
+            syswk->app->rangeByKey = TRUE;
             Box2Obj_SetRangeRect(syswk, res, res, 0);
             Box2Obj_SetRangeAnm(syswk, 1);
-            syswk->unk18 = 1;
+            syswk->pickState = BOX2_PICK_KEY;
             syswk->app->rangeWidth = 1;
             syswk->app->rangeHeight = 1;
             Box2Ui_SetButtonStates(syswk, res);
@@ -2515,7 +2574,7 @@ static int Box2Seq_RangePartySwitch(Box2SysWork *syswk) {
         if (syswk->moveMode == 0) {
             Box2Obj_SetVisible(syswk->app, BOX2_ACTOR_CURSOR, FALSE);
             Box2Obj_SetButtons(syswk, 0, 0, 1, 0);
-            if (syswk->unk1B == 0) {
+            if (syswk->fromParty == 0) {
                 Box2Frame_SlidePartyDown(syswk->app->bgWinFrame);
                 syswk->app->subSeq = 2;
             } else {
@@ -2539,7 +2598,7 @@ static int Box2Seq_RangePartySwitch(Box2SysWork *syswk) {
         Box2Main_PokeInfoPut(syswk, pos + BOX2_PARTY_POS);
         Box2Obj_SetCursorAnim(syswk, 6);
         Box2Obj_SetToolButtons(syswk, 9, 1);
-        if (syswk->param->mode == 2) {
+        if (syswk->param->mode == BOX2_MODE_MOVE_POKEMON) {
             Box2Ui_ChangeCursor(syswk, 5, pos);
             return 27;
         }
@@ -2556,7 +2615,7 @@ static int Box2Seq_RangePartySwitch(Box2SysWork *syswk) {
         Box2Frame_ShowPartyButton(syswk->app);
         Box2Obj_SetCursorAnim(syswk, 6);
         Box2Obj_SetToolButtons(syswk, 9, 1);
-        if (syswk->param->mode == 4) {
+        if (syswk->param->mode == BOX2_MODE_BATTLE_BOX) {
             Box2Ui_ChangeCursor(syswk, 13, pos);
             return 45;
         }
@@ -2604,7 +2663,7 @@ static int Box2Seq_ArrangePartyOut(Box2SysWork *syswk) {
         Box2Frame_PutPartyLeftBelow(syswk->app->bgWinFrame);
         Box2Frame_SlidePartyUp(syswk->app->bgWinFrame);
         Box2Obj_PutPartyIconsLeftBelow(syswk, 0);
-        if (syswk->param->mode == 3) {
+        if (syswk->param->mode == BOX2_MODE_MOVE_ITEMS) {
             Box2Obj_SetIconsBlend(syswk, 0x82, 1);
         }
         GFL_SndSEPlay(SEQ_SE_SYS_42);
@@ -2614,7 +2673,7 @@ static int Box2Seq_ArrangePartyOut(Box2SysWork *syswk) {
         syswk->app->subSeq = 0;
         Box2Main_PokeInfoPut(syswk, BOX2_PARTY_POS);
         Box2Frame_ShowBoxListButton(syswk->app);
-        if (syswk->param->mode == 3) {
+        if (syswk->param->mode == BOX2_MODE_MOVE_ITEMS) {
             Box2Ui_ChangeCursor(syswk, 8, 0);
             return 80;
         }
@@ -2629,26 +2688,26 @@ static int Box2Seq_ArrangePartyMain(Box2SysWork *syswk) {
     u32 res;
 
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
-        syswk->unk1B = 1;
+        syswk->fromParty = 1;
         return Box2Seq_NextMoveMode(syswk, 31);
     }
     if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_START) && Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE) {
         syswk->getTray = syswk->tray;
         syswk->pos = CursorMove_GetPos(syswk->app->cursorMove) + BOX2_PARTY_POS;
-        syswk->unk13 = 4;
+        syswk->subProcReturn = 4;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         Box2Main_ShowCursor(syswk);
         return Box2Seq_AnimActorButton(syswk, 30, 1, 91);
     }
 
     res = Box2Ui_GetMenuButtonTrigger();
-    if (res != 0xffffffff) {
+    if (res != CURSORMOVE_NONE) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
         if (Box2Main_GetPokeParam(syswk, res + BOX2_PARTY_POS, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_SYS_39);
             GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
             if (Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE) {
-                Box2Bmp_OpenMenu(syswk, sMenu71f0, 6);
+                Box2Bmp_OpenMenu(syswk, sArrangeMenu, 6);
             }
             Box2Main_PokeInfoPut(syswk, res + BOX2_PARTY_POS);
             return Box2Seq_ArrangePartyPickUpTouched(syswk, res + BOX2_PARTY_POS);
@@ -2681,17 +2740,17 @@ static int Box2Seq_ArrangePartyMain(Box2SysWork *syswk) {
         return Box2Seq_AnimActorButton(syswk, 6, 9, Box2Seq_Goto(syswk, 28));
     case 9:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        syswk->unk1B = 1;
+        syswk->fromParty = 1;
         syswk->moveMode = 0;
         return Box2Seq_AnimFrameButton(syswk, 0, Box2Seq_Goto(syswk, 31));
     case 10:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         syswk->getTray = syswk->tray;
-        syswk->unk13 = 1;
+        syswk->subProcReturn = 1;
         return Box2Seq_AnimFrameButton(syswk, 1, 89);
     case 11:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        syswk->unk13 = 1;
+        syswk->subProcReturn = 1;
         return Box2Seq_AnimFrameButton(syswk, 2, Box2Seq_Goto(syswk, 90));
     case 12:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -2712,19 +2771,19 @@ static int Box2Seq_ArrangePartyMain(Box2SysWork *syswk) {
     case 15:
         break;
     case 16:
-        syswk->unk1B = 1;
+        syswk->fromParty = 1;
         syswk->moveMode = 1;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_SetMoveMode(syswk, 31);
     case 17:
-        syswk->unk1B = 1;
+        syswk->fromParty = 1;
         syswk->moveMode = 2;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_SetMoveMode(syswk, 41);
     case 18:
         syswk->getTray = syswk->tray;
         syswk->pos = CursorMove_GetPos(syswk->app->cursorMove) + BOX2_PARTY_POS;
-        syswk->unk13 = 4;
+        syswk->subProcReturn = 4;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_AnimActorButton(syswk, 30, 1, 91);
     case CURSORMOVE_CURSOR_ON:
@@ -2755,13 +2814,13 @@ static int Box2Seq_ArrangePartyMain(Box2SysWork *syswk) {
     case CURSORMOVE_NONE:
     case CURSORMOVE_SCROLL_R:
     case CURSORMOVE_SCROLL_L:
-    case CURSORMOVE_UNK_7:
-    case CURSORMOVE_UNK_8:
+    case CURSORMOVE_SCROLL_D:
+    case CURSORMOVE_SCROLL_U:
         break;
     default:
         if (Box2Main_GetPokeParam(syswk, res + BOX2_PARTY_POS, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-            Box2Bmp_OpenMenu(syswk, sMenu71f0, 6);
+            Box2Bmp_OpenMenu(syswk, sArrangeMenu, 6);
             Box2Main_PokeInfoPut(syswk, res + BOX2_PARTY_POS);
             Box2Ui_StartCursorMove(syswk->app, 9, CursorMove_GetPos(syswk->app->cursorMove));
             CursorMove_SetPos(syswk->app->cursorMove, 9);
@@ -2788,7 +2847,7 @@ static int Box2Seq_ArrangePartyAway(Box2SysWork *syswk) {
         syswk->app->subSeq = 0;
         Box2Obj_ShowScrollArrows(syswk->app, 1);
         Box2Frame_ShowPartyButton(syswk->app);
-        if (syswk->param->mode == 3) {
+        if (syswk->param->mode == BOX2_MODE_MOVE_ITEMS) {
             Box2Obj_SetIconsBlend(syswk, 0x81, 1);
             Box2Ui_ChangeCursor(syswk, 7, 33);
             return 67;
@@ -2820,7 +2879,7 @@ static int Box2Seq_ArrangePartyMoveEnd(Box2SysWork *syswk) {
     Box2Ui_PlaceCursorActor(syswk, 9);
     Box2Obj_ShowCursor(syswk, 1);
     Box2Obj_SetButtons(syswk, 0, 0, 1, 0);
-    Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+    Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
     return 27;
 }
 
@@ -2833,7 +2892,7 @@ static int Box2Seq_MovePartyIn(Box2SysWork *syswk) {
             syswk->app->subSeq = 2;
             break;
         }
-        if (syswk->moveMode == 1 && syswk->unk1C_4 == 0) {
+        if (syswk->moveMode == 1 && syswk->fromMenu == 0) {
             syswk->getTray = BOX2_GET_NONE;
             syswk->pos = CursorMove_GetPos(syswk->app->cursorMove);
             if (Box2Frame_IsPartyAtLeft(syswk->app->bgWinFrame) == TRUE) {
@@ -2862,9 +2921,9 @@ static int Box2Seq_MovePartyIn(Box2SysWork *syswk) {
         syswk->app->subSeq++;
         return Box2Seq_RunVFunc(syswk, Box2Main_VFuncFrameMove, 31);
     case 1:
-        if (syswk->param->mode == 4 && syswk->param->battleBoxLocked == 1) {
+        if (syswk->param->mode == BOX2_MODE_BATTLE_BOX && syswk->param->battleBoxLocked == 1) {
             GFL_SndSEPlay(SEQ_SE_BEEP);
-            Box2Bmp_PrintBattleBoxLocked(syswk, 0);
+            Box2Bmp_PrintBattleBoxLocked(syswk, FALSE);
             syswk->moveMode = 0;
             syswk->app->subSeq = 0;
             syswk->nextSeq = 53;
@@ -2888,13 +2947,13 @@ static int Box2Seq_MovePartyIn(Box2SysWork *syswk) {
         syswk->app->oldCurPos = syswk->pos;
         syswk->app->subSeq = 0;
         if (syswk->moveMode == 1) {
-            if (syswk->unk1C_4 == 0) {
+            if (syswk->fromMenu == 0) {
                 if (Box2Main_GetPokeParam(syswk, syswk->pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) == 0) {
                     Box2Obj_SetButtons(syswk, 0, 1, 2, 0);
                 } else {
                     Box2Obj_SetButtons(syswk, 0, 1, 0, 0);
                 }
-                if (syswk->param->mode == 4) {
+                if (syswk->param->mode == BOX2_MODE_BATTLE_BOX) {
                     Box2Frame_HidePartyButton(syswk->app);
                     Box2Frame_HideBoxListButton(syswk->app);
                     CursorMove_DisablePos(syswk->app->cursorMove, 39);
@@ -2916,34 +2975,34 @@ static int Box2Seq_MovePartyIn(Box2SysWork *syswk) {
 static int Box2Seq_MovePartyMain(Box2SysWork *syswk) {
     u32 res;
 
-    if (syswk->unk1C_6 == 1) {
+    if (syswk->moveDone == 1) {
         syswk->moveMode = 0;
-        syswk->unk1C_6 = 0;
+        syswk->moveDone = 0;
         return Box2Seq_Goto(syswk, 33);
     }
-    if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) && syswk->moveMode != 0 && syswk->unk18 == 0) {
+    if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) && syswk->moveMode != 0 && syswk->pickState == BOX2_PICK_NONE) {
         Box2Main_ShowCursor(syswk);
         syswk->moveMode = 2;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_Goto(syswk, 33);
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_START) {
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             u8 pos = CursorMove_GetPos(syswk->app->cursorMove);
 
             Box2Seq_SetGetPos(syswk, pos, syswk->tray);
-            syswk->unk13 = 4;
+            syswk->subProcReturn = 4;
         } else {
-            syswk->unk13 = 5;
-            syswk->unk1D = CursorMove_GetPos(syswk->app->cursorMove);
+            syswk->subProcReturn = 5;
+            syswk->subProcCursorPos = CursorMove_GetPos(syswk->app->cursorMove);
         }
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         Box2Main_ShowCursor(syswk);
         return Box2Seq_AnimActorButton(syswk, 30, 1, 91);
     }
-    if (syswk->unk18 == 0) {
+    if (syswk->pickState == BOX2_PICK_NONE) {
         res = Box2Ui_GetTrayPokeTrigger();
-        if (res != 0xffffffff) {
+        if (res != CURSORMOVE_NONE) {
             CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
             if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
                 GFL_SndSEPlay(SEQ_SE_SYS_39);
@@ -2959,7 +3018,7 @@ static int Box2Seq_MovePartyMain(Box2SysWork *syswk) {
             return 32;
         }
         res = Box2Ui_GetPartyPokeTrigger();
-        if (res != 0xffffffff) {
+        if (res != CURSORMOVE_NONE) {
             CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
             if (Box2Main_GetPokeParam(syswk, res + BOX2_PARTY_POS, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
                 GFL_SndSEPlay(SEQ_SE_SYS_39);
@@ -2979,7 +3038,7 @@ static int Box2Seq_MovePartyMain(Box2SysWork *syswk) {
     res = Box2Ui_UpdateCursor6(syswk);
     switch (res) {
     case 36:
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -2991,7 +3050,7 @@ static int Box2Seq_MovePartyMain(Box2SysWork *syswk) {
         Box2Ui_PlaceCursorActor(syswk, BOX2_BOXLIST_POS);
         Box2Ui_SetButtonStates(syswk, BOX2_BOXLIST_POS);
         syswk->app->oldCurPos = BOX2_BOXLIST_POS;
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             Box2Main_PokeSelectOff(syswk);
         } else {
             Box2Obj_MoveHeldIcons(syswk);
@@ -3003,7 +3062,7 @@ static int Box2Seq_MovePartyMain(Box2SysWork *syswk) {
         Box2Ui_PlaceCursorActor(syswk, BOX2_BOXLIST_POS);
         Box2Ui_SetButtonStates(syswk, BOX2_BOXLIST_POS);
         syswk->app->oldCurPos = BOX2_BOXLIST_POS;
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             Box2Main_PokeSelectOff(syswk);
         } else {
             Box2Obj_MoveHeldIcons(syswk);
@@ -3011,12 +3070,12 @@ static int Box2Seq_MovePartyMain(Box2SysWork *syswk) {
         return Box2Seq_ScrollTrayRight(syswk, 0, 32);
     case 39:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             Box2Main_PokeInfoOff(syswk);
         }
         return Box2Seq_AnimFrameButton(syswk, 11, Box2Seq_Goto(syswk, 34));
     case 40:
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             u8 pos = CursorMove_GetPos(syswk->app->cursorMove);
 
             if (pos >= BOX2_BOXLIST_POS ||
@@ -3025,22 +3084,22 @@ static int Box2Seq_MovePartyMain(Box2SysWork *syswk) {
             }
             syswk->pos = pos;
             syswk->getTray = syswk->tray;
-            syswk->unk13 = 4;
+            syswk->subProcReturn = 4;
         } else {
-            syswk->unk13 = 5;
-            syswk->unk1D = CursorMove_GetPos(syswk->app->cursorMove);
+            syswk->subProcReturn = 5;
+            syswk->subProcCursorPos = CursorMove_GetPos(syswk->app->cursorMove);
         }
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_AnimActorButton(syswk, 8, 1, 89);
     case 41:
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         syswk->moveMode = 0;
         return Box2Seq_AnimActorButton(syswk, 6, 9, Box2Seq_Goto(syswk, 33));
     case 42:
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         syswk->moveMode = 0;
@@ -3049,26 +3108,26 @@ static int Box2Seq_MovePartyMain(Box2SysWork *syswk) {
     case 43:
         break;
     case 44:
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         syswk->moveMode = 2;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_Goto(syswk, 33);
     case 45:
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             u8 pos = CursorMove_GetPos(syswk->app->cursorMove);
 
             Box2Seq_SetGetPos(syswk, pos, syswk->tray);
-            syswk->unk13 = 4;
+            syswk->subProcReturn = 4;
         } else {
-            syswk->unk13 = 5;
-            syswk->unk1D = CursorMove_GetPos(syswk->app->cursorMove);
+            syswk->subProcReturn = 5;
+            syswk->subProcCursorPos = CursorMove_GetPos(syswk->app->cursorMove);
         }
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_AnimActorButton(syswk, 30, 1, 91);
     case CURSORMOVE_CANCEL:
-        if (syswk->unk18 == 1) {
+        if (syswk->pickState == BOX2_PICK_KEY) {
             return Box2Seq_MoveDropKey(syswk, BOX2_GET_NONE, 32);
         }
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
@@ -3091,7 +3150,7 @@ static int Box2Seq_MovePartyMain(Box2SysWork *syswk) {
         break;
     case CURSORMOVE_CURSOR_MOVE:
         GFL_SndSEPlay(SEQ_SE_SELECT1);
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             u8 pos = CursorMove_GetPos(syswk->app->cursorMove);
 
             if (pos < BOX2_BOXLIST_POS) {
@@ -3102,11 +3161,11 @@ static int Box2Seq_MovePartyMain(Box2SysWork *syswk) {
         }
         return Box2Seq_RunRequestedVFunc(syswk, Box2Seq_PokeMoveEndTo(syswk, 32));
     case CURSORMOVE_NONE:
-    case CURSORMOVE_UNK_7:
-    case CURSORMOVE_UNK_8:
+    case CURSORMOVE_SCROLL_D:
+    case CURSORMOVE_SCROLL_U:
         break;
     default:
-        if (syswk->unk18 == 1) {
+        if (syswk->pickState == BOX2_PICK_KEY) {
             return Box2Seq_MoveDropKey(syswk, res, 32);
         }
         if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
@@ -3128,7 +3187,7 @@ static int Box2Seq_MovePartySwitch(Box2SysWork *syswk) {
         if (syswk->moveMode != 2) {
             Box2Obj_SetVisible(syswk->app, BOX2_ACTOR_CURSOR, FALSE);
             Box2Obj_SetButtons(syswk, 0, 0, 1, 0);
-            if (syswk->unk1B == 0) {
+            if (syswk->fromParty == 0) {
                 Box2Frame_SlidePartyDown(syswk->app->bgWinFrame);
                 syswk->app->subSeq = 2;
             } else {
@@ -3152,7 +3211,7 @@ static int Box2Seq_MovePartySwitch(Box2SysWork *syswk) {
         Box2Main_PokeInfoPut(syswk, pos + BOX2_PARTY_POS);
         Box2Obj_SetCursorAnim(syswk, 6);
         Box2Obj_SetToolButtons(syswk, 9, 1);
-        if (syswk->param->mode == 2) {
+        if (syswk->param->mode == BOX2_MODE_MOVE_POKEMON) {
             Box2Ui_ChangeCursor(syswk, 5, pos);
             return 27;
         }
@@ -3169,7 +3228,7 @@ static int Box2Seq_MovePartySwitch(Box2SysWork *syswk) {
         Box2Frame_ShowPartyButton(syswk->app);
         Box2Obj_SetCursorAnim(syswk, 6);
         Box2Obj_SetToolButtons(syswk, 9, 1);
-        if (syswk->param->mode == 4) {
+        if (syswk->param->mode == BOX2_MODE_BATTLE_BOX) {
             Box2Ui_ChangeCursor(syswk, 13, pos);
             return 45;
         }
@@ -3210,29 +3269,29 @@ static int Box2Seq_ArrangeBoxMain(Box2SysWork *syswk) {
     u32 res;
 
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
-        syswk->unk1B = 0;
+        syswk->fromParty = 0;
         return Box2Seq_NextMoveMode(syswk, 31);
     }
     if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_START) && Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE) {
         syswk->getTray = syswk->tray;
         syswk->pos = CursorMove_GetPos(syswk->app->cursorMove);
-        syswk->unk13 = 2;
+        syswk->subProcReturn = 2;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         Box2Main_ShowCursor(syswk);
         return Box2Seq_AnimActorButton(syswk, 30, 1, 91);
     }
 
     res = Box2Ui_GetTrayPokeTrigger();
-    if (res != 0xffffffff) {
+    if (res != CURSORMOVE_NONE) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
         if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_SYS_39);
             GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
             if (Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE) {
-                Box2Bmp_OpenMenu(syswk, sMenu70f8, 4);
+                Box2Bmp_OpenMenu(syswk, sBattleBoxMenu, 4);
             }
             Box2Main_PokeInfoPut(syswk, res);
-            syswk->unk1B = 0;
+            syswk->fromParty = 0;
             return Box2Seq_MovePartyPickUpTouched(syswk, res);
         }
         CursorMove_SetPos(syswk->app->cursorMove, res);
@@ -3282,18 +3341,18 @@ static int Box2Seq_ArrangeBoxMain(Box2SysWork *syswk) {
         return Box2Seq_AnimActorButton(syswk, 6, 9, 116);
     case 36:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        syswk->unk1B = 0;
+        syswk->fromParty = 0;
         syswk->moveMode = 0;
         return Box2Seq_AnimFrameButton(syswk, 2, Box2Seq_Goto(syswk, 31));
     case 37:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        syswk->unk13 = 0;
+        syswk->subProcReturn = 0;
         syswk->getTray = syswk->tray;
         syswk->curRcvPos = 37;
         return Box2Seq_AnimFrameButton(syswk, 3, 89);
     case 38:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        syswk->unk13 = 0;
+        syswk->subProcReturn = 0;
         syswk->curRcvPos = 38;
         return Box2Seq_AnimFrameButton(syswk, 4, Box2Seq_Goto(syswk, 90));
     case 39: {
@@ -3309,17 +3368,17 @@ static int Box2Seq_ArrangeBoxMain(Box2SysWork *syswk) {
     case 40:
         break;
     case 41:
-        syswk->unk1B = 0;
+        syswk->fromParty = 0;
         syswk->moveMode = 1;
         return Box2Seq_SetMoveMode(syswk, 31);
     case 42:
-        syswk->unk1B = 0;
+        syswk->fromParty = 0;
         syswk->moveMode = 2;
         return Box2Seq_SetMoveMode(syswk, 41);
     case 43:
         syswk->getTray = syswk->tray;
         syswk->pos = CursorMove_GetPos(syswk->app->cursorMove);
-        syswk->unk13 = 2;
+        syswk->subProcReturn = 2;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_AnimActorButton(syswk, 30, 1, 91);
     case CURSORMOVE_SCROLL_L:
@@ -3363,13 +3422,13 @@ static int Box2Seq_ArrangeBoxMain(Box2SysWork *syswk) {
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         break;
     case CURSORMOVE_NONE:
-    case CURSORMOVE_UNK_7:
-    case CURSORMOVE_UNK_8:
+    case CURSORMOVE_SCROLL_D:
+    case CURSORMOVE_SCROLL_U:
         break;
     default:
         if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-            Box2Bmp_OpenMenu(syswk, sMenu70f8, 4);
+            Box2Bmp_OpenMenu(syswk, sBattleBoxMenu, 4);
             Box2Main_PokeInfoPut(syswk, res);
             Box2Ui_StartCursorMove(syswk->app, BOX2_BOXLIST_POS, CursorMove_GetPos(syswk->app->cursorMove));
             CursorMove_SetPos(syswk->app->cursorMove, BOX2_BOXLIST_POS);
@@ -3390,7 +3449,7 @@ static int Box2Seq_ArrangeBoxMoveEnd(Box2SysWork *syswk) {
     syswk->app->oldCurPos = BOX2_BOXLIST_POS;
     Box2Ui_PlaceCursorActor(syswk, BOX2_BOXLIST_POS);
     Box2Obj_SetButtons(syswk, 0, 0, 1, 0);
-    Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+    Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
     return 45;
 }
 
@@ -3434,26 +3493,26 @@ static int Box2Seq_ArrangeBoxPartyMain(Box2SysWork *syswk) {
     u32 res;
 
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
-        syswk->unk1B = 1;
+        syswk->fromParty = 1;
         return Box2Seq_NextMoveMode(syswk, 31);
     }
     if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_START) && Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE) {
         syswk->getTray = syswk->tray;
         syswk->pos = CursorMove_GetPos(syswk->app->cursorMove) + BOX2_PARTY_POS;
-        syswk->unk13 = 4;
+        syswk->subProcReturn = 4;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         Box2Main_ShowCursor(syswk);
         return Box2Seq_AnimActorButton(syswk, 30, 1, 91);
     }
 
     res = Box2Ui_GetMenuButtonTrigger();
-    if (res != 0xffffffff) {
+    if (res != CURSORMOVE_NONE) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
         if (Box2Main_GetPokeParam(syswk, res + BOX2_PARTY_POS, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_SYS_39);
             GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
             if (Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE) {
-                Box2Bmp_OpenMenu(syswk, sMenu70f8, 4);
+                Box2Bmp_OpenMenu(syswk, sBattleBoxMenu, 4);
             }
             Box2Main_PokeInfoPut(syswk, res + BOX2_PARTY_POS);
             return Box2Seq_ArrangeBoxPartyPickUpTouched(syswk, res + BOX2_PARTY_POS);
@@ -3486,17 +3545,17 @@ static int Box2Seq_ArrangeBoxPartyMain(Box2SysWork *syswk) {
         return Box2Seq_AnimActorButton(syswk, 6, 9, Box2Seq_Goto(syswk, 50));
     case 9:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        syswk->unk1B = 1;
+        syswk->fromParty = 1;
         syswk->moveMode = 0;
         return Box2Seq_AnimFrameButton(syswk, 2, Box2Seq_Goto(syswk, 31));
     case 10:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        syswk->unk13 = 1;
+        syswk->subProcReturn = 1;
         syswk->getTray = syswk->tray;
         return Box2Seq_AnimFrameButton(syswk, 3, 89);
     case 11:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        syswk->unk13 = 1;
+        syswk->subProcReturn = 1;
         return Box2Seq_AnimFrameButton(syswk, 4, Box2Seq_Goto(syswk, 90));
     case 12: {
         u8 pos;
@@ -3511,17 +3570,17 @@ static int Box2Seq_ArrangeBoxPartyMain(Box2SysWork *syswk) {
     case 13:
         break;
     case 14:
-        syswk->unk1B = 1;
+        syswk->fromParty = 1;
         syswk->moveMode = 1;
         return Box2Seq_SetMoveMode(syswk, 31);
     case 15:
-        syswk->unk1B = 1;
+        syswk->fromParty = 1;
         syswk->moveMode = 2;
         return Box2Seq_SetMoveMode(syswk, 41);
     case 16:
         syswk->getTray = syswk->tray;
         syswk->pos = CursorMove_GetPos(syswk->app->cursorMove) + BOX2_PARTY_POS;
-        syswk->unk13 = 4;
+        syswk->subProcReturn = 4;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return Box2Seq_AnimActorButton(syswk, 30, 1, 91);
     case CURSORMOVE_CANCEL:
@@ -3552,13 +3611,13 @@ static int Box2Seq_ArrangeBoxPartyMain(Box2SysWork *syswk) {
     case CURSORMOVE_NONE:
     case CURSORMOVE_SCROLL_R:
     case CURSORMOVE_SCROLL_L:
-    case CURSORMOVE_UNK_7:
-    case CURSORMOVE_UNK_8:
+    case CURSORMOVE_SCROLL_D:
+    case CURSORMOVE_SCROLL_U:
         break;
     default:
         if (Box2Main_GetPokeParam(syswk, res + BOX2_PARTY_POS, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-            Box2Bmp_OpenMenu(syswk, sMenu70f8, 4);
+            Box2Bmp_OpenMenu(syswk, sBattleBoxMenu, 4);
             Box2Main_PokeInfoPut(syswk, res + BOX2_PARTY_POS);
             Box2Ui_StartCursorMove(syswk->app, 9, CursorMove_GetPos(syswk->app->cursorMove));
             CursorMove_SetPos(syswk->app->cursorMove, 9);
@@ -3610,7 +3669,7 @@ static int Box2Seq_ArrangeBoxPartyMoveEnd(Box2SysWork *syswk) {
     syswk->app->oldCurPos = 9;
     Box2Ui_PlaceCursorActor(syswk, 9);
     Box2Obj_SetButtons(syswk, 0, 0, 1, 0);
-    Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+    Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
     return 49;
 }
 
@@ -3634,18 +3693,18 @@ static int Box2Seq_SubProcReturn(Box2SysWork *syswk) {
     return 45;
 }
 
-// The box's main state in mode 1: waits for a touch or for the cursor to pick something
+// The box's main state in the withdraw mode: waits for a touch or for the cursor to pick something
 static int Box2Seq_WithdrawMain(Box2SysWork *syswk) {
     u32 res;
 
     res = Box2Ui_GetTrayPokeTrigger();
-    if (res != 0xffffffff) {
+    if (res != CURSORMOVE_NONE) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
         if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_SYS_39);
             GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
             if (Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE) {
-                Box2Bmp_OpenMenu(syswk, sMenu7194, 5);
+                Box2Bmp_OpenMenu(syswk, sWithdrawMenu, 5);
             }
             Box2Main_PokeInfoPut(syswk, res);
             return Box2Seq_WithdrawPickUpTouched(syswk, res);
@@ -3752,13 +3811,13 @@ static int Box2Seq_WithdrawMain(Box2SysWork *syswk) {
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         break;
     case CURSORMOVE_NONE:
-    case CURSORMOVE_UNK_7:
-    case CURSORMOVE_UNK_8:
+    case CURSORMOVE_SCROLL_D:
+    case CURSORMOVE_SCROLL_U:
         break;
     default:
         if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-            Box2Bmp_OpenMenu(syswk, sMenu7194, 5);
+            Box2Bmp_OpenMenu(syswk, sWithdrawMenu, 5);
             Box2Main_PokeInfoPut(syswk, res);
             Box2Ui_StartCursorMove(syswk->app, 35, CursorMove_GetPos(syswk->app->cursorMove));
             CursorMove_SetPos(syswk->app->cursorMove, 35);
@@ -3769,7 +3828,7 @@ static int Box2Seq_WithdrawMain(Box2SysWork *syswk) {
     return 54;
 }
 
-// Closes the menu in mode 1
+// Closes the menu in the withdraw mode
 static int Box2Seq_WithdrawMenuClose(Box2SysWork *syswk) {
     Box2Frame_SlideMenuOut(syswk->app->bgWinFrame);
     Box2Obj_ShowPokeOutline(syswk, 0);
@@ -3778,7 +3837,7 @@ static int Box2Seq_WithdrawMenuClose(Box2SysWork *syswk) {
     return Box2Seq_RunVFunc(syswk, Box2Main_VFuncCursorMoveFrame, Box2Seq_PokeMoveEndTo(syswk, 54));
 }
 
-// Mode 1: closes the menu before taking a Pokémon into the party, unless it is full
+// Withdraw mode: closes the menu before taking a Pokémon into the party, unless it is full
 static int Box2Seq_WithdrawCheckParty(Box2SysWork *syswk) {
     switch (syswk->app->subSeq) {
     case 0:
@@ -3793,14 +3852,14 @@ static int Box2Seq_WithdrawCheckParty(Box2SysWork *syswk) {
             return Box2Seq_Goto(syswk, 57);
         }
         GFL_SndSEPlay(SEQ_SE_BEEP);
-        Box2Bmp_PrintPokeMoveMsg(syswk, 0, 2, 24);
+        Box2Bmp_PrintPokeMoveMsg(syswk, 0, BOX2_POKEMOVE_MSG_PARTY_FULL, 24);
         syswk->nextSeq = 14;
         return Box2Seq_Goto(syswk, BOX2SEQ_TRGWAIT);
     }
     return 56;
 }
 
-// Mode 1: takes a Pokémon into the party
+// Withdraw mode: takes a Pokémon into the party
 static int Box2Seq_WithdrawTake(Box2SysWork *syswk) {
     switch (syswk->app->subSeq) {
     case 0:
@@ -3808,7 +3867,7 @@ static int Box2Seq_WithdrawTake(Box2SysWork *syswk) {
         Box2Obj_PutPartyIconsRightBelow(syswk);
         Box2Frame_PutPartyRightBelow(syswk->app->bgWinFrame);
         Box2Frame_SlidePartyUp(syswk->app->bgWinFrame);
-        syswk->unk1A = 2;
+        syswk->iconPosMode = 2;
         syswk->app->subSeq++;
         return Box2Seq_RunVFunc(syswk, Box2Main_VFuncPartyFrameMove, 57);
     case 1:
@@ -3836,7 +3895,7 @@ static int Box2Seq_WithdrawTake(Box2SysWork *syswk) {
     return 57;
 }
 
-// Mode 1: after a Pokémon was taken into the party
+// Withdraw mode: after a Pokémon was taken into the party
 static int Box2Seq_WithdrawEnd(Box2SysWork *syswk) {
     Box2PokeMoveWork *work = syswk->app->vfunk.work;
     u32 pos = work->getPos;
@@ -3846,7 +3905,7 @@ static int Box2Seq_WithdrawEnd(Box2SysWork *syswk) {
     Box2Obj_ShowScrollArrows(syswk->app, 1);
     Box2Obj_SetButtons(syswk, 0, 0, 1, 1);
     if (syswk->pos != BOX2_GET_NONE) {
-        Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+        Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
         pos = 35;
     }
     CursorMove_SetPos(syswk->app->cursorMove, pos);
@@ -3854,18 +3913,18 @@ static int Box2Seq_WithdrawEnd(Box2SysWork *syswk) {
     return 54;
 }
 
-// The party's main state in mode 0: waits for a touch or for the cursor to pick something
+// The party's main state in the deposit mode: waits for a touch or for the cursor to pick something
 static int Box2Seq_DepositPartyMain(Box2SysWork *syswk) {
     u32 res;
 
     res = Box2Ui_GetMenuButtonTrigger();
-    if (res != 0xffffffff) {
+    if (res != CURSORMOVE_NONE) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
         if (Box2Main_GetPokeParam(syswk, res + BOX2_PARTY_POS, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_SYS_39);
             GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
             if (Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE) {
-                Box2Bmp_OpenMenu(syswk, sMenu7130, 5);
+                Box2Bmp_OpenMenu(syswk, sDepositMenu, 5);
             }
             Box2Main_PokeInfoPut(syswk, res + BOX2_PARTY_POS);
             return Box2Seq_DepositPickUpTouched(syswk, res + BOX2_PARTY_POS);
@@ -3943,13 +4002,13 @@ static int Box2Seq_DepositPartyMain(Box2SysWork *syswk) {
     case CURSORMOVE_NONE:
     case CURSORMOVE_SCROLL_R:
     case CURSORMOVE_SCROLL_L:
-    case CURSORMOVE_UNK_7:
-    case CURSORMOVE_UNK_8:
+    case CURSORMOVE_SCROLL_D:
+    case CURSORMOVE_SCROLL_U:
         break;
     default:
         if (Box2Main_GetPokeParam(syswk, res + BOX2_PARTY_POS, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-            Box2Bmp_OpenMenu(syswk, sMenu7130, 5);
+            Box2Bmp_OpenMenu(syswk, sDepositMenu, 5);
             Box2Main_PokeInfoPut(syswk, res + BOX2_PARTY_POS);
             Box2Ui_StartCursorMove(syswk->app, 8, CursorMove_GetPos(syswk->app->cursorMove));
             CursorMove_SetPos(syswk->app->cursorMove, 8);
@@ -3960,7 +4019,7 @@ static int Box2Seq_DepositPartyMain(Box2SysWork *syswk) {
     return 59;
 }
 
-// Closes the party's menu in mode 0
+// Closes the party's menu in the deposit mode
 static int Box2Seq_DepositPartyMenuClose(Box2SysWork *syswk) {
     Box2Frame_SlideMenuOut(syswk->app->bgWinFrame);
     Box2Obj_ShowPokeOutline(syswk, 0);
@@ -3969,7 +4028,7 @@ static int Box2Seq_DepositPartyMenuClose(Box2SysWork *syswk) {
     return Box2Seq_RunVFunc(syswk, Box2Main_VFuncCursorMoveFrame, Box2Seq_PokeMoveEndTo(syswk, 59));
 }
 
-// Back to the party's main state in mode 0
+// Back to the party's main state in the deposit mode
 static int Box2Seq_DepositPartyReturn(Box2SysWork *syswk) {
     CursorMove_SetPos(syswk->app->cursorMove, syswk->pos - BOX2_PARTY_POS);
     Box2Ui_PlaceCursorActor(syswk, syswk->pos - BOX2_PARTY_POS);
@@ -3979,7 +4038,7 @@ static int Box2Seq_DepositPartyReturn(Box2SysWork *syswk) {
     return 59;
 }
 
-// Mode 0: picks a Pokémon of the party up to deposit it, unless it can't leave the party
+// Deposit mode: picks a Pokémon of the party up to deposit it, unless it can't leave the party
 static int Box2Seq_DepositPickParty(Box2SysWork *syswk) {
     switch (syswk->app->subSeq) {
     case 0:
@@ -3992,7 +4051,7 @@ static int Box2Seq_DepositPickParty(Box2SysWork *syswk) {
     case 1:
         switch (GetDepositBlock(syswk)) {
         case 0:
-            syswk->unk18 = 1;
+            syswk->pickState = BOX2_PICK_KEY;
             Box2Obj_PickUpRangeIcons(syswk, syswk->pos, 1, 1);
             Box2Obj_SetIconPriority(syswk->app, BOX2_BOXLIST_POS, FALSE);
             Box2Obj_ShowCursor(syswk, 1);
@@ -4002,14 +4061,14 @@ static int Box2Seq_DepositPickParty(Box2SysWork *syswk) {
         case 1:
             GFL_SndSEPlay(SEQ_SE_BEEP);
             Box2Obj_ShowPokeOutline(syswk, 0);
-            Box2Bmp_PrintReleaseMsg(syswk, 6, 24);
+            Box2Bmp_PrintReleaseMsg(syswk, BOX2_RELEASE_MSG_LAST_POKEMON, 24);
             syswk->nextSeq = 61;
             syswk->app->subSeq = 0;
             return BOX2SEQ_TRGWAIT;
         case 2:
             GFL_SndSEPlay(SEQ_SE_BEEP);
             Box2Obj_ShowPokeOutline(syswk, 0);
-            Box2Bmp_PrintPokeMoveMsg(syswk, 0, 5, 24);
+            Box2Bmp_PrintPokeMoveMsg(syswk, 0, BOX2_POKEMOVE_MSG_REMOVE_MAIL, 24);
             syswk->nextSeq = 61;
             syswk->app->subSeq = 0;
             return BOX2SEQ_TRGWAIT;
@@ -4027,7 +4086,7 @@ static int Box2Seq_DepositPickParty(Box2SysWork *syswk) {
     case 4:
         GFL_HeapFree(syswk->app->vfunk.work);
         Box2Obj_ShowScrollArrows(syswk->app, 1);
-        Box2Bmp_PrintPokeMoveMsg(syswk, 0, 3, 26);
+        Box2Bmp_PrintPokeMoveMsg(syswk, 0, BOX2_POKEMOVE_MSG_WHICH_BOX, 26);
         Box2Obj_SetButtons(syswk, 0, 1, 1, 1);
         Box2Ui_ChangeCursor(syswk, 1, 0);
         syswk->app->subSeq = 0;
@@ -4036,7 +4095,7 @@ static int Box2Seq_DepositPickParty(Box2SysWork *syswk) {
     return 62;
 }
 
-// Mode 0: picks the box to deposit the Pokémon in
+// Deposit mode: picks the box to deposit the Pokémon in
 static int Box2Seq_DepositPickBox(Box2SysWork *syswk) {
     u32 res = CursorMove_Update(syswk->app->cursorMove);
 
@@ -4056,7 +4115,7 @@ static int Box2Seq_DepositPickBox(Box2SysWork *syswk) {
         CursorMove_SetPos(syswk->app->cursorMove, 0);
         if (countEmptySlotsInBox(syswk->param->boxes, syswk->tray) == 0) {
             GFL_SndSEPlay(SEQ_SE_BEEP);
-            Box2Bmp_PrintPokeMoveMsg(syswk, 0, 4, 24);
+            Box2Bmp_PrintPokeMoveMsg(syswk, 0, BOX2_POKEMOVE_MSG_BOX_FULL, 24);
             syswk->nextSeq = 65;
             return BOX2SEQ_TRGWAIT;
         } else {
@@ -4068,7 +4127,7 @@ static int Box2Seq_DepositPickBox(Box2SysWork *syswk) {
 
             BoxSaveAccessor_GetNextFreeBoxSlot(syswk->param->boxes, &tray, &pos);
             syswk->app->pokePutKey = pos;
-            syswk->unk1A = 0;
+            syswk->iconPosMode = 0;
             syswk->getTray = syswk->tray;
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             return Box2Seq_Goto(syswk, 64);
@@ -4088,21 +4147,21 @@ static int Box2Seq_DepositPickBox(Box2SysWork *syswk) {
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         syswk->app->pokePutKey = BOX2_GET_NONE;
         syswk->getTray = syswk->tray;
-        syswk->unk1A = 1;
+        syswk->iconPosMode = 1;
         return Box2Seq_AnimActorButton(syswk, 6, 9, Box2Seq_Goto(syswk, 64));
     case CURSORMOVE_CURSOR_ON:
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         break;
     case CURSORMOVE_NONE:
     case CURSORMOVE_CURSOR_MOVE:
-    case CURSORMOVE_UNK_7:
-    case CURSORMOVE_UNK_8:
+    case CURSORMOVE_SCROLL_D:
+    case CURSORMOVE_SCROLL_U:
         break;
     }
     return 63;
 }
 
-// Mode 0: deposits the Pokémon in the picked box, or puts it back in the party
+// Deposit mode: deposits the Pokémon in the picked box, or puts it back in the party
 static int Box2Seq_DepositPut(Box2SysWork *syswk) {
     switch (syswk->app->subSeq) {
     case 0:
@@ -4150,7 +4209,7 @@ static int Box2Seq_DepositPut(Box2SysWork *syswk) {
     case 6:
         FreePokeMoveWork(syswk);
     case 7:
-        syswk->unk18 = 0;
+        syswk->pickState = BOX2_PICK_NONE;
         Box2Obj_ShowPokeOutline(syswk, 0);
         Box2Obj_SetButtons(syswk, 0, 0, 1, 1);
         Box2Ui_ChangeCursor(syswk, 0, syswk->pos - BOX2_PARTY_POS);
@@ -4161,16 +4220,16 @@ static int Box2Seq_DepositPut(Box2SysWork *syswk) {
     return 64;
 }
 
-// Mode 0: closes the message about a full box
+// Deposit mode: closes the message about a full box
 static int Box2Seq_DepositFullClose(Box2SysWork *syswk) {
     Box2Bmp_ClearMsgWindow(syswk->app, 24);
     Box2Main_PutMessageFrame(syswk);
-    Box2Bmp_PrintPokeMoveMsg(syswk, 0, 3, 26);
+    Box2Bmp_PrintPokeMoveMsg(syswk, 0, BOX2_POKEMOVE_MSG_WHICH_BOX, 26);
     Box2Obj_SetButtons(syswk, 0, 1, 1, 1);
     return 63;
 }
 
-// Mode 0: after a deposit
+// Deposit mode: after a deposit
 static int Box2Seq_DepositEnd(Box2SysWork *syswk) {
     Box2Main_PokeDataMove(syswk);
     FreePokeMoveWork(syswk);
@@ -4180,7 +4239,7 @@ static int Box2Seq_DepositEnd(Box2SysWork *syswk) {
         Box2Ui_PlaceCursorActor(syswk, 0);
         Box2Main_PokeInfoPut(syswk, BOX2_PARTY_POS);
     } else {
-        Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+        Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
         CursorMove_SetPos(syswk->app->cursorMove, 8);
         Box2Ui_PlaceCursorActor(syswk, 8);
     }
@@ -4193,7 +4252,7 @@ static int Box2Seq_ItemMain(Box2SysWork *syswk) {
 
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
         res = Box2Seq_NextMoveMode(syswk, 73);
-        if (syswk->moveMode == 1 && syswk->unk1C_4 == 0) {
+        if (syswk->moveMode == 1 && syswk->fromMenu == 0) {
             u8 pos = CursorMove_GetPos(syswk->app->cursorMove);
 
             if (pos < BOX2_PARTY_POS) {
@@ -4206,7 +4265,7 @@ static int Box2Seq_ItemMain(Box2SysWork *syswk) {
     }
 
     res = Box2Ui_GetTrayPokeTrigger();
-    if (res != 0xffffffff) {
+    if (res != CURSORMOVE_NONE) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
         if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_SYS_39);
@@ -4263,7 +4322,7 @@ static int Box2Seq_ItemMain(Box2SysWork *syswk) {
     case 37:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         if (syswk->app->getItem == 0) {
-            syswk->unk13 = 0;
+            syswk->subProcReturn = 0;
             syswk->curRcvPos = 37;
             return Box2Seq_AnimFrameButton(syswk, 4, Box2Seq_Goto(syswk, 90));
         }
@@ -4287,7 +4346,7 @@ static int Box2Seq_ItemMain(Box2SysWork *syswk) {
         if (syswk->moveMode == 0) {
             syswk->moveMode = 1;
             res = Box2Seq_SetMoveMode(syswk, 73);
-            if (syswk->unk1C_4 == 0) {
+            if (syswk->fromMenu == 0) {
                 u8 pos = CursorMove_GetPos(syswk->app->cursorMove);
 
                 if (pos < BOX2_PARTY_POS) {
@@ -4339,8 +4398,8 @@ static int Box2Seq_ItemMain(Box2SysWork *syswk) {
         syswk->param->closed = FALSE;
         return Box2Seq_AnimActorButton(syswk, 6, 9, 116);
     case CURSORMOVE_NONE:
-    case CURSORMOVE_UNK_7:
-    case CURSORMOVE_UNK_8:
+    case CURSORMOVE_SCROLL_D:
+    case CURSORMOVE_SCROLL_U:
         break;
     default:
         if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
@@ -4370,7 +4429,7 @@ static int Box2Seq_ItemToBag(Box2SysWork *syswk) {
     Box2Seq_OpenItemMenu(syswk, 0);
     Box2Obj_SetItemIconAffine(syswk->app, FALSE);
     Box2Obj_SetVisible(syswk->app, BOX2_ACTOR_ITEM_ICON, FALSE);
-    Box2Bmp_PrintItemMsg(syswk, 3, 24);
+    Box2Bmp_PrintItemMsg(syswk, BOX2_ITEM_MSG_PLACED_IN_BAG, 24);
     if (syswk->pos < BOX2_PARTY_POS) {
         Box2Obj_SetIconsBlend(syswk, 0x81, 1);
         Box2Obj_ShowScrollArrows(syswk->app, 1);
@@ -4438,12 +4497,12 @@ static int Box2Seq_ItemPartyIn(Box2SysWork *syswk) {
         syswk->app->subSeq++;
         Box2Obj_ShowCursor(syswk, 0);
         if (Box2Frame_IsPartyAtLeft(syswk->app->bgWinFrame) == TRUE) {
-            syswk->unk1E = 1;
+            syswk->partyWasLeft = 1;
         } else {
-            syswk->unk1E = 0;
+            syswk->partyWasLeft = 0;
         }
         if (syswk->moveMode == 1) {
-            if (syswk->unk1C_4 == 0) {
+            if (syswk->fromMenu == 0) {
                 syswk->getTray = BOX2_GET_NONE;
                 syswk->app->getItem = 0;
                 Box2Main_PutMessageFrame(syswk);
@@ -4451,7 +4510,7 @@ static int Box2Seq_ItemPartyIn(Box2SysWork *syswk) {
             } else {
                 if (syswk->app->getItem == 0) {
                     syswk->getTray = BOX2_GET_NONE;
-                    syswk->unk1C_4 = 0;
+                    syswk->fromMenu = 0;
                 }
                 Box2Bmp_ClearMsgWindow(syswk->app, 24);
                 Box2Main_PutMessageFrame(syswk);
@@ -4487,7 +4546,7 @@ static int Box2Seq_ItemPartyIn(Box2SysWork *syswk) {
         CursorMove_DisablePos(syswk->app->cursorMove, 39);
         CursorMove_DisablePos(syswk->app->cursorMove, 40);
         if (syswk->moveMode == 1) {
-            if (syswk->unk1C_4 == 0) {
+            if (syswk->fromMenu == 0) {
                 Box2Obj_SetButtons(syswk, 0, 1, 1, 1);
                 Box2Obj_SetToolButtons(syswk, 10, 1);
                 return 74;
@@ -4506,19 +4565,19 @@ static int Box2Seq_ItemPartyIn(Box2SysWork *syswk) {
 static int Box2Seq_ItemPartyOutMain(Box2SysWork *syswk) {
     u32 res;
 
-    if (syswk->unk1C_6 == 1) {
+    if (syswk->moveDone == 1) {
         syswk->moveMode = 0;
-        syswk->unk1C_6 = 0;
+        syswk->moveDone = 0;
         return Box2Seq_Goto(syswk, 75);
     }
-    if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) && syswk->moveMode != 0 && syswk->unk18 == 0) {
+    if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) && syswk->moveMode != 0 && syswk->pickState == BOX2_PICK_NONE) {
         Box2Main_ShowCursor(syswk);
         syswk->moveMode = 0;
         return Box2Seq_Goto(syswk, 75);
     }
-    if (syswk->unk18 == 0) {
+    if (syswk->pickState == BOX2_PICK_NONE) {
         res = Box2Ui_GetPartyPokeTrigger();
-        if (res != 0xffffffff) {
+        if (res != CURSORMOVE_NONE) {
             CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
             if (Box2Main_GetPokeParam(syswk, res + BOX2_PARTY_POS, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
                 Box2Main_PokeInfoPut(syswk, res + BOX2_PARTY_POS);
@@ -4530,7 +4589,7 @@ static int Box2Seq_ItemPartyOutMain(Box2SysWork *syswk) {
             return 74;
         }
         res = Box2Ui_GetTrayPokeTrigger();
-        if (res != 0xffffffff) {
+        if (res != CURSORMOVE_NONE) {
             CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
             if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
                 Box2Main_PokeInfoPut(syswk, res);
@@ -4546,7 +4605,7 @@ static int Box2Seq_ItemPartyOutMain(Box2SysWork *syswk) {
     res = Box2Ui_UpdateCursor6(syswk);
     switch (res) {
     case 36:
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -4556,7 +4615,7 @@ static int Box2Seq_ItemPartyOutMain(Box2SysWork *syswk) {
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         CursorMove_SetPos(syswk->app->cursorMove, BOX2_BOXLIST_POS);
         Box2Ui_PlaceCursorActor(syswk, BOX2_BOXLIST_POS);
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             Box2Main_PokeSelectOff(syswk);
         } else {
             Box2Obj_MoveHeldIcons(syswk);
@@ -4566,7 +4625,7 @@ static int Box2Seq_ItemPartyOutMain(Box2SysWork *syswk) {
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         CursorMove_SetPos(syswk->app->cursorMove, BOX2_BOXLIST_POS);
         Box2Ui_PlaceCursorActor(syswk, BOX2_BOXLIST_POS);
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             Box2Main_PokeSelectOff(syswk);
         } else {
             Box2Obj_MoveHeldIcons(syswk);
@@ -4576,14 +4635,14 @@ static int Box2Seq_ItemPartyOutMain(Box2SysWork *syswk) {
     case 40:
         break;
     case 41:
-        if (syswk->unk18 != 0) {
+        if (syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         syswk->moveMode = 0;
         return Box2Seq_AnimActorButton(syswk, 6, 9, Box2Seq_Goto(syswk, 75));
     case 42:
-        if (syswk->moveMode == 0 || syswk->unk18 != 0) {
+        if (syswk->moveMode == 0 || syswk->pickState != BOX2_PICK_NONE) {
             break;
         }
         syswk->moveMode = 0;
@@ -4593,7 +4652,7 @@ static int Box2Seq_ItemPartyOutMain(Box2SysWork *syswk) {
     case 45:
         break;
     case CURSORMOVE_CANCEL:
-        if (syswk->unk18 == 1) {
+        if (syswk->pickState == BOX2_PICK_KEY) {
             return Box2Seq_ItemDropHeldKey(syswk, BOX2_GET_NONE);
         }
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
@@ -4616,7 +4675,7 @@ static int Box2Seq_ItemPartyOutMain(Box2SysWork *syswk) {
         break;
     case CURSORMOVE_CURSOR_MOVE:
         GFL_SndSEPlay(SEQ_SE_SELECT1);
-        if (syswk->unk18 == 0) {
+        if (syswk->pickState == BOX2_PICK_NONE) {
             u8 pos = CursorMove_GetPos(syswk->app->cursorMove);
 
             if (pos < BOX2_BOXLIST_POS) {
@@ -4627,11 +4686,11 @@ static int Box2Seq_ItemPartyOutMain(Box2SysWork *syswk) {
         }
         return Box2Seq_RunRequestedVFunc(syswk, Box2Seq_PokeMoveEndTo(syswk, 74));
     case CURSORMOVE_NONE:
-    case CURSORMOVE_UNK_7:
-    case CURSORMOVE_UNK_8:
+    case CURSORMOVE_SCROLL_D:
+    case CURSORMOVE_SCROLL_U:
         break;
     default:
-        if (syswk->unk18 == 1) {
+        if (syswk->pickState == BOX2_PICK_KEY) {
             return Box2Seq_ItemDropHeldKey(syswk, res);
         }
         return Box2Seq_ItemPartyOutTakeKey(syswk, res);
@@ -4647,7 +4706,7 @@ static int Box2Seq_ItemPartyAway(Box2SysWork *syswk) {
     case 0:
         Box2Main_PokeInfoOff(syswk);
         Box2Obj_SetVisible(syswk->app, BOX2_ACTOR_CURSOR, FALSE);
-        if (syswk->unk1E == 0) {
+        if (syswk->partyWasLeft == 0) {
             Box2Frame_SlidePartyDown(syswk->app->bgWinFrame);
         } else {
             Box2Obj_ShowScrollArrows(syswk->app, 0);
@@ -4662,7 +4721,7 @@ static int Box2Seq_ItemPartyAway(Box2SysWork *syswk) {
         Box2Obj_SetCursorAnim(syswk, 6);
         Box2Obj_SetToolButtons(syswk, 9, 1);
         Box2Obj_SetButtons(syswk, 0, 0, 1, 1);
-        if (syswk->unk1E == 0) {
+        if (syswk->partyWasLeft == 0) {
             pos = CursorMove_GetPos(syswk->app->cursorMove);
             if (pos >= BOX2_BOXLIST_POS) {
                 pos = 0;
@@ -4696,7 +4755,7 @@ static int Box2Seq_ItemDropKey(Box2SysWork *syswk) {
     u16 item;
 
     if (syswk->moveMode == 0) {
-        syswk->unk1C_6 = 1;
+        syswk->moveDone = 1;
     }
     Box2Obj_ShowPokeOutline(syswk, 0);
     work = syswk->app->vfunk.work;
@@ -4762,7 +4821,7 @@ static int Box2Seq_ItemDropTouch(Box2SysWork *syswk) {
     u8 pos;
 
     if (syswk->moveMode == 0) {
-        syswk->unk1C_6 = 1;
+        syswk->moveDone = 1;
     }
     work = syswk->app->vfunk.work;
     Box2Obj_SetIconBlend(syswk->app, work->putPos, FALSE);
@@ -4803,7 +4862,7 @@ static int Box2Seq_ItemDropKeyPartyOut(Box2SysWork *syswk) {
     u16 item;
 
     if (syswk->moveMode == 0) {
-        syswk->unk1C_6 = 1;
+        syswk->moveDone = 1;
     }
     if (syswk->app->pokePutKey == syswk->app->getItemInitPos &&
         (syswk->getTray == BOX2_GET_NONE || syswk->getTray == syswk->tray)) {
@@ -4857,7 +4916,7 @@ static int Box2Seq_ItemPartyMain(Box2SysWork *syswk) {
 
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
         res = Box2Seq_NextMoveMode(syswk, 73);
-        if (syswk->moveMode == 1 && syswk->unk1C_4 == 0) {
+        if (syswk->moveMode == 1 && syswk->fromMenu == 0) {
             u8 pos = CursorMove_GetPos(syswk->app->cursorMove);
 
             if (pos < 6) {
@@ -4870,7 +4929,7 @@ static int Box2Seq_ItemPartyMain(Box2SysWork *syswk) {
     }
 
     res = Box2Ui_GetMenuButtonTrigger();
-    if (res != 0xffffffff) {
+    if (res != CURSORMOVE_NONE) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
         if (Box2Main_GetPokeParam(syswk, res + BOX2_PARTY_POS, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_SYS_39);
@@ -4908,7 +4967,7 @@ static int Box2Seq_ItemPartyMain(Box2SysWork *syswk) {
     case 10:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         if (syswk->app->getItem == 0) {
-            syswk->unk13 = 1;
+            syswk->subProcReturn = 1;
             syswk->curRcvPos = 10;
             return Box2Seq_AnimFrameButton(syswk, 4, Box2Seq_Goto(syswk, 90));
         }
@@ -4932,7 +4991,7 @@ static int Box2Seq_ItemPartyMain(Box2SysWork *syswk) {
         if (syswk->moveMode == 0) {
             syswk->moveMode = 1;
             res = Box2Seq_SetMoveMode(syswk, 73);
-            if (syswk->unk1C_4 == 0) {
+            if (syswk->fromMenu == 0) {
                 u8 pos = CursorMove_GetPos(syswk->app->cursorMove);
 
                 if (pos < 6) {
@@ -4971,8 +5030,8 @@ static int Box2Seq_ItemPartyMain(Box2SysWork *syswk) {
     case CURSORMOVE_NONE:
     case CURSORMOVE_SCROLL_R:
     case CURSORMOVE_SCROLL_L:
-    case CURSORMOVE_UNK_7:
-    case CURSORMOVE_UNK_8:
+    case CURSORMOVE_SCROLL_D:
+    case CURSORMOVE_SCROLL_U:
         break;
     default:
         if (Box2Main_GetPokeParam(syswk, res + BOX2_PARTY_POS, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
@@ -5000,7 +5059,7 @@ static int Box2Seq_ItemPartyDrop(Box2SysWork *syswk) {
 
     if (syswk->app->getItem == 0) {
         FreeItemMoveWork(syswk);
-        Box2Bmp_PrintItemMsg(syswk, 0, 24);
+        Box2Bmp_PrintItemMsg(syswk, BOX2_ITEM_MSG_CAN_HOLD, 24);
         CursorMove_SetPos(syswk->app->cursorMove, 10);
         syswk->app->oldCurPos = 10;
         Box2Ui_PlaceCursorActor(syswk, 10);
@@ -5016,12 +5075,12 @@ static int Box2Seq_ItemPartyDrop(Box2SysWork *syswk) {
         Box2Ui_PlaceCursorActor(syswk, 9);
         if (PML_ItemIsMail(syswk->app->getItem) == TRUE && setPos != syswk->pos) {
             Box2Obj_SetIconBlend(syswk->app, syswk->pos, FALSE);
-            Box2Bmp_PrintItemMsg(syswk, 7, 24);
+            Box2Bmp_PrintItemMsg(syswk, BOX2_ITEM_MSG_MAIL_CANT_MOVE, 24);
             GFL_SndSEPlay(SEQ_SE_BEEP);
             syswk->nextSeq = 14;
             return Box2Seq_Goto(syswk, BOX2SEQ_TRGWAIT);
         }
-        Box2Bmp_PrintItemMsg(syswk, 1, 24);
+        Box2Bmp_PrintItemMsg(syswk, BOX2_ITEM_MSG_SELECTED, 24);
         Box2Obj_ShowCursor(syswk, 1);
         return 80;
     }
@@ -5029,7 +5088,7 @@ static int Box2Seq_ItemPartyDrop(Box2SysWork *syswk) {
         FreeItemMoveWork(syswk);
         GFL_SndSEPlay(SEQ_SE_BEEP);
         Box2Obj_SetIconBlend(syswk->app, syswk->pos, FALSE);
-        Box2Bmp_PrintItemMsg(syswk, 7, 24);
+        Box2Bmp_PrintItemMsg(syswk, BOX2_ITEM_MSG_MAIL_CANT_MOVE, 24);
         GFL_SndSEPlay(SEQ_SE_BEEP);
         CursorMove_SetPos(syswk->app->cursorMove, 9);
         syswk->app->oldCurPos = 9;
@@ -5119,7 +5178,7 @@ static int Box2Seq_ItemPartyReturn(Box2SysWork *syswk) {
     return 84;
 }
 
-// Mode 5's main state: waits for a touch or for the cursor to pick a Pokémon
+// The Dream World mode's main state: waits for a touch or for the cursor to pick a Pokémon
 static int Box2Seq_DreamWorldMain(Box2SysWork *syswk) {
     u32 res = Box2Ui_UpdateCursor15(syswk);
 
@@ -5199,14 +5258,14 @@ static int Box2Seq_DreamWorldMain(Box2SysWork *syswk) {
         syswk->param->position = BOX2_GET_NONE;
         return Box2Seq_AnimActorButton(syswk, 6, 9, 116);
     case CURSORMOVE_NONE:
-    case CURSORMOVE_UNK_7:
-    case CURSORMOVE_UNK_8:
+    case CURSORMOVE_SCROLL_D:
+    case CURSORMOVE_SCROLL_U:
         break;
     default:
         if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             syswk->pos = res;
-            Box2Bmp_OpenMenu(syswk, sMenu70cc, 2);
+            Box2Bmp_OpenMenu(syswk, sDreamWorldMenu, 2);
             Box2Main_PokeInfoPut(syswk, res);
             Box2Obj_PutPokeOutline(syswk);
             CursorMove_SetPos(syswk->app->cursorMove, 34);
@@ -5231,13 +5290,13 @@ static int Box2Seq_DreamWorldMain(Box2SysWork *syswk) {
     return 85;
 }
 
-// Mode 5: the picked Pokémon's menu was already open
+// Dream World mode: the picked Pokémon's menu was already open
 static int Box2Seq_DreamWorldMenuOpened(Box2SysWork *syswk) {
-    Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+    Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
     return 85;
 }
 
-// Mode 5: picks the Pokémon, unless it is an egg or can't be picked
+// Dream World mode: picks the Pokémon, unless it is an egg or can't be picked
 static int Box2Seq_DreamWorldPick(Box2SysWork *syswk) {
     switch (syswk->app->subSeq) {
     case 0:
@@ -5251,7 +5310,7 @@ static int Box2Seq_DreamWorldPick(Box2SysWork *syswk) {
             syswk->nextSeq = 14;
             return Box2Seq_Goto(syswk, BOX2SEQ_TRGWAIT);
         }
-        if (Box2Main_IsSpeciesFlagged(syswk, syswk->pos) == FALSE) {
+        if (Box2Main_IsSpeciesSendable(syswk, syswk->pos) == FALSE) {
             Box2Bmp_PrintDenyMsg(syswk, BOX2_MOVE_ERR_NOT_SLEEPY, 27);
             syswk->nextSeq = 14;
             return Box2Seq_Goto(syswk, BOX2SEQ_TRGWAIT);
@@ -5265,7 +5324,7 @@ static int Box2Seq_DreamWorldPick(Box2SysWork *syswk) {
     return 87;
 }
 
-// Mode 5: closes the menu
+// Dream World mode: closes the menu
 static int Box2Seq_DreamWorldMenuClose(Box2SysWork *syswk) {
     Box2Frame_SlideMenuOut(syswk->app->bgWinFrame);
     Box2Obj_ShowPokeOutline(syswk, 0);
@@ -5284,7 +5343,7 @@ static int Box2Seq_TakeItem(Box2SysWork *syswk) {
 
     switch (syswk->app->subSeq) {
     case 0:
-        if (syswk->param->mode == 4 && syswk->param->battleBoxLocked == 1) {
+        if (syswk->param->mode == BOX2_MODE_BATTLE_BOX && syswk->param->battleBoxLocked == 1) {
             Box2Obj_SetVisible(syswk->app, BOX2_ACTOR_CURSOR, FALSE);
             Box2Frame_SlideMenuOut(syswk->app->bgWinFrame);
             syswk->app->subSeq = 3;
@@ -5309,10 +5368,10 @@ static int Box2Seq_TakeItem(Box2SysWork *syswk) {
                 Box2Obj_SetIconsBlend(syswk, 2, 1);
             }
             Box2Obj_SetIconBlend(syswk->app, syswk->pos, FALSE);
-            syswk->app->unkA550 = 1;
+            syswk->app->iconsDimmed = 1;
             Box2Frame_HideMenu(syswk->app->bgWinFrame);
             Box2Bmp_PrintTakeItem(syswk, item, 24);
-            if (syswk->param->mode == 3) {
+            if (syswk->param->mode == BOX2_MODE_MOVE_ITEMS) {
                 return Box2Seq_OpenYesNo(syswk, 2);
             }
             return Box2Seq_OpenYesNo(syswk, 0);
@@ -5328,12 +5387,12 @@ static int Box2Seq_TakeItem(Box2SysWork *syswk) {
         return Box2Seq_Goto(syswk, BOX2SEQ_TRGWAIT);
     case 2:
         GFL_SndSEPlay(SEQ_SE_BEEP);
-        Box2Bmp_PrintItemMsg(syswk, 5, 24);
+        Box2Bmp_PrintItemMsg(syswk, BOX2_ITEM_MSG_EGG_CANT_HOLD, 24);
         syswk->nextSeq = 14;
         return Box2Seq_Goto(syswk, BOX2SEQ_TRGWAIT);
     case 3:
         GFL_SndSEPlay(SEQ_SE_BEEP);
-        Box2Bmp_PrintBattleBoxLocked(syswk, 1);
+        Box2Bmp_PrintBattleBoxLocked(syswk, TRUE);
         syswk->nextSeq = 53;
         return BOX2SEQ_TRGWAIT;
     }
@@ -5354,16 +5413,16 @@ static int Box2Seq_SummaryReturn(Box2SysWork *syswk) {
     Box2Obj_SetCursorAnim(syswk, 6);
     Box2Obj_SetToolButtons(syswk, syswk->moveMode + 9, 1);
     switch (syswk->param->mode) {
-    case 0:
+    case BOX2_MODE_DEPOSIT:
         syswk->app->msgNextSeq = Box2Seq_DepositSummaryReturn(syswk);
         break;
-    case 1:
+    case BOX2_MODE_WITHDRAW:
         syswk->app->msgNextSeq = Box2Seq_WithdrawSummaryReturn(syswk);
         break;
-    case 2:
+    case BOX2_MODE_MOVE_POKEMON:
         syswk->app->msgNextSeq = Box2Seq_ArrangeSummaryReturn(syswk);
         break;
-    case 4:
+    case BOX2_MODE_BATTLE_BOX:
         syswk->app->msgNextSeq = Box2Seq_BattleBoxSummaryReturn(syswk);
         break;
     }
@@ -5374,25 +5433,25 @@ static int Box2Seq_SummaryReturn(Box2SysWork *syswk) {
 static int Box2Seq_NameInputReturn(Box2SysWork *syswk) {
     Box2Main_PokeInfoOff(syswk);
     switch (syswk->param->mode) {
-    case 1:
+    case BOX2_MODE_WITHDRAW:
         Box2Ui_ChangeCursor(syswk, 2, BOX2_PARTY_POS);
         syswk->app->oldCurPos = BOX2_PARTY_POS;
         syswk->app->msgNextSeq = 54;
         break;
-    case 2:
+    case BOX2_MODE_MOVE_POKEMON:
         Box2Frame_ShowPartyButton(syswk->app);
         Box2Ui_ChangeCursor(syswk, 3, BOX2_PARTY_POS);
         syswk->app->oldCurPos = BOX2_PARTY_POS;
         syswk->app->msgNextSeq = 17;
         break;
-    case 3:
+    case BOX2_MODE_MOVE_ITEMS:
         Box2Obj_SetIconsBlend(syswk, 0x81, 1);
         Box2Frame_ShowPartyButton(syswk->app);
         Box2Ui_ChangeCursor(syswk, 7, BOX2_PARTY_POS);
         syswk->app->oldCurPos = BOX2_PARTY_POS;
         syswk->app->msgNextSeq = 67;
         break;
-    case 4:
+    case BOX2_MODE_BATTLE_BOX:
         Box2Frame_ShowPartyButton(syswk->app);
         Box2Ui_ChangeCursor(syswk, 13, BOX2_PARTY_POS);
         syswk->app->oldCurPos = BOX2_PARTY_POS;
@@ -5405,13 +5464,13 @@ static int Box2Seq_NameInputReturn(Box2SysWork *syswk) {
 // Back from the name entry: fades in
 static int Box2Seq_BagReturn(Box2SysWork *syswk) {
     switch (syswk->param->mode) {
-    case 2:
+    case BOX2_MODE_MOVE_POKEMON:
         syswk->app->msgNextSeq = Box2Seq_ArrangeGiveItemReturn(syswk);
         break;
-    case 3:
+    case BOX2_MODE_MOVE_ITEMS:
         syswk->app->msgNextSeq = Box2Seq_ItemGiveItemReturn(syswk);
         break;
-    case 4:
+    case BOX2_MODE_BATTLE_BOX:
         syswk->app->msgNextSeq = Box2Seq_BattleBoxGiveItemReturn(syswk);
         break;
     }
@@ -5422,7 +5481,7 @@ static int Box2Seq_BagReturn(Box2SysWork *syswk) {
 static int Box2Seq_BoxSearchReturn(Box2SysWork *syswk) {
     u32 max;
 
-    if (syswk->unk13 == 2 || syswk->unk13 == 3) {
+    if (syswk->subProcReturn == 2 || syswk->subProcReturn == 3) {
         max = BOX2_PARTY_POS;
     } else {
         max = BOX2_BOXLIST_POS;
@@ -5439,10 +5498,10 @@ static int Box2Seq_BoxSearchReturn(Box2SysWork *syswk) {
     Box2Obj_SetCursorAnim(syswk, 6);
     Box2Obj_SetToolButtons(syswk, syswk->moveMode + 9, 1);
     switch (syswk->param->mode) {
-    case 2:
+    case BOX2_MODE_MOVE_POKEMON:
         syswk->app->msgNextSeq = Box2Seq_ArrangeMoveSummaryReturn(syswk);
         break;
-    case 4:
+    case BOX2_MODE_BATTLE_BOX:
         syswk->app->msgNextSeq = Box2Seq_BattleBoxMoveSummaryReturn(syswk);
         break;
     }
@@ -5452,7 +5511,7 @@ static int Box2Seq_BoxSearchReturn(Box2SysWork *syswk) {
 // Says which item was given
 static int Box2Seq_GivenItemMsg(Box2SysWork *syswk) {
     Box2Bmp_PrintGiveItem(syswk, syswk->subRet, 24);
-    if (syswk->param->mode == 3) {
+    if (syswk->param->mode == BOX2_MODE_MOVE_ITEMS) {
         syswk->nextSeq = 70;
     } else {
         syswk->nextSeq = 14;
@@ -5472,8 +5531,8 @@ static int Box2Seq_MarkingOpen(Box2SysWork *syswk) {
         syswk->app->subSeq++;
         return Box2Seq_RunVFunc(syswk, Box2Main_VFuncFrameMove, 97);
     case 1:
-        syswk->app->unkA554 = Box2Main_GetPokeParam(syswk, syswk->pos, syswk->tray, PKM_PARAM_MARKINGS, NULL);
-        Box2Main_MarkingPutMain(syswk, syswk->app->unkA554);
+        syswk->app->markings = Box2Main_GetPokeParam(syswk, syswk->pos, syswk->tray, PKM_PARAM_MARKINGS, NULL);
+        Box2Main_MarkingPutMain(syswk, syswk->app->markings);
         Box2Frame_SlideMarkingIn(syswk->app->bgWinFrame);
         GFL_SndSEPlay(SEQ_SE_SYS_42);
         syswk->app->subSeq++;
@@ -5518,7 +5577,7 @@ static int Box2Seq_MarkingMain(Box2SysWork *syswk) {
         ToggleMark(syswk, 5);
         break;
     case 6: {
-        u8 mark = syswk->app->unkA554;
+        u8 mark = syswk->app->markings;
 
         Box2Main_SetPokeParam(syswk, syswk->pos, syswk->tray, PKM_PARAM_MARKINGS, mark);
         Box2Main_MarkingPutSub(syswk, mark);
@@ -5545,14 +5604,14 @@ static int Box2Seq_MarkingMain(Box2SysWork *syswk) {
 // Closes the markings
 static int Box2Seq_MarkingClose(Box2SysWork *syswk) {
     switch (syswk->param->mode) {
-    case 0:
+    case BOX2_MODE_DEPOSIT:
         Box2Ui_ChangeCursor(syswk, 0, 10);
         break;
-    case 1:
+    case BOX2_MODE_WITHDRAW:
         Box2Obj_ShowScrollArrows(syswk->app, 1);
         Box2Ui_ChangeCursor(syswk, 2, 37);
         break;
-    case 2:
+    case BOX2_MODE_MOVE_POKEMON:
     default:
         if (syswk->pos < BOX2_PARTY_POS) {
             Box2Obj_ShowScrollArrows(syswk->app, 1);
@@ -5602,16 +5661,16 @@ static int Box2Seq_ReleaseCheck(Box2SysWork *syswk) {
             partyPos = syswk->pos - BOX2_PARTY_POS;
             if (Box2Main_BattlePokeCheck(syswk, partyPos) == FALSE) {
                 GFL_SndSEPlay(SEQ_SE_BEEP);
-                Box2Bmp_PrintReleaseMsg(syswk, 6, 24);
-                syswk->app->unkA550 = 1;
+                Box2Bmp_PrintReleaseMsg(syswk, BOX2_RELEASE_MSG_LAST_POKEMON, 24);
+                syswk->app->iconsDimmed = 1;
                 syswk->nextSeq = 14;
                 return Box2Seq_Goto(syswk, BOX2SEQ_TRGWAIT);
             }
             if (PML_ItemIsMail(PokeParty_GetParam(PokeParty_GetPkm(syswk->param->party, partyPos), PKM_PARAM_ITEM,
                                                   NULL)) == TRUE) {
                 GFL_SndSEPlay(SEQ_SE_BEEP);
-                Box2Bmp_PrintPokeMoveMsg(syswk, 0, 5, 24);
-                syswk->app->unkA550 = 1;
+                Box2Bmp_PrintPokeMoveMsg(syswk, 0, BOX2_POKEMOVE_MSG_REMOVE_MAIL, 24);
+                syswk->app->iconsDimmed = 1;
                 syswk->nextSeq = 14;
                 return Box2Seq_Goto(syswk, BOX2SEQ_TRGWAIT);
             }
@@ -5625,18 +5684,18 @@ static int Box2Seq_ReleaseCheck(Box2SysWork *syswk) {
         form = PML_PkmGetParam(pkm, PKM_PARAM_FORM, NULL);
         msg = 0xffff;
         if (PML_PkmGetParam(pkm, PKM_PARAM_IS_EGG, NULL) != 0) {
-            msg = 3;
+            msg = BOX2_RELEASE_MSG_EGG;
         } else if (isKyuremTransformed(species, form)) {
-            msg = 7;
+            msg = BOX2_RELEASE_MSG_FUSED_KYUREM;
         }
         if (msg != 0xffff) {
             GFL_SndSEPlay(SEQ_SE_BEEP);
             Box2Bmp_PrintReleaseMsg(syswk, msg, 24);
-            syswk->app->unkA550 = 1;
+            syswk->app->iconsDimmed = 1;
             syswk->nextSeq = 14;
             return Box2Seq_Goto(syswk, BOX2SEQ_TRGWAIT);
         }
-        Box2Bmp_PrintReleaseMsg(syswk, 0, 24);
+        Box2Bmp_PrintReleaseMsg(syswk, BOX2_RELEASE_MSG_ASK, 24);
         return Box2Seq_Goto(syswk, Box2Seq_OpenYesNo(syswk, 1));
     }
     return 101;
@@ -5660,12 +5719,12 @@ static int Box2Seq_ReleaseCheckMoves(Box2SysWork *syswk) {
 static int Box2Seq_ReleaseDo(Box2SysWork *syswk) {
     switch (syswk->app->subSeq) {
     case 0:
-        Box2Bmp_PrintReleaseMsg(syswk, 1, 24);
+        Box2Bmp_PrintReleaseMsg(syswk, BOX2_RELEASE_MSG_RELEASED, 24);
         syswk->nextSeq = 103;
         syswk->app->subSeq++;
         return BOX2SEQ_TRGWAIT;
     case 1:
-        Box2Bmp_PrintReleaseMsg(syswk, 2, 24);
+        Box2Bmp_PrintReleaseMsg(syswk, BOX2_RELEASE_MSG_BYE_BYE, 24);
         syswk->nextSeq = 103;
         syswk->app->subSeq++;
         return BOX2SEQ_TRGWAIT;
@@ -5677,7 +5736,7 @@ static int Box2Seq_ReleaseDo(Box2SysWork *syswk) {
         if (syswk->pos < BOX2_PARTY_POS) {
             Box2Obj_MakeTrayIconChar(syswk, syswk->tray);
             Box2Obj_RefreshTrayIcon(syswk, syswk->tray);
-            if (syswk->param->mode == 1) {
+            if (syswk->param->mode == BOX2_MODE_WITHDRAW) {
                 syswk->nextSeq = 54;
             } else {
                 syswk->nextSeq = 17;
@@ -5694,7 +5753,7 @@ static int Box2Seq_ReleaseDo(Box2SysWork *syswk) {
             return syswk->nextSeq;
         }
         AllocPokeMoveWork(syswk);
-        syswk->unk1A = 1;
+        syswk->iconPosMode = 1;
         Box2Obj_SetIconsBlend(syswk, 2, 0);
         syswk->app->subSeq++;
         return Box2Seq_RunVFunc(syswk, Box2Main_VFuncPartyPokeFreeSort, 103);
@@ -5706,7 +5765,7 @@ static int Box2Seq_ReleaseDo(Box2SysWork *syswk) {
         Box2Ui_PlaceCursorActor(syswk, syswk->pos - BOX2_PARTY_POS);
         Box2Obj_ShowCursor(syswk, 1);
         syswk->pos = BOX2_GET_NONE;
-        if (syswk->param->mode == 0) {
+        if (syswk->param->mode == BOX2_MODE_DEPOSIT) {
             return 59;
         }
         Box2Obj_SetToolButtons(syswk, 9, 1);
@@ -5724,14 +5783,14 @@ static int Box2Seq_ReleaseMoveLocked(Box2SysWork *syswk) {
             Box2PokeFree_ResetActor(syswk->app->subWork);
             Box2Main_PokeFreeExit(syswk);
             Box2Obj_PutPokeOutline(syswk);
-            Box2Bmp_PrintReleaseMsg(syswk, 4, 24);
+            Box2Bmp_PrintReleaseMsg(syswk, BOX2_RELEASE_MSG_CAME_BACK, 24);
             syswk->nextSeq = 104;
             syswk->app->subSeq++;
             return BOX2SEQ_TRGWAIT;
         }
         break;
     case 1:
-        Box2Bmp_PrintReleaseMsg(syswk, 5, 24);
+        Box2Bmp_PrintReleaseMsg(syswk, BOX2_RELEASE_MSG_WORRIED, 24);
         syswk->nextSeq = 104;
         syswk->app->subSeq++;
         return BOX2SEQ_TRGWAIT;
@@ -5772,14 +5831,14 @@ static int Box2Seq_BoxMenuOpen(Box2SysWork *syswk) {
         }
         Box2Frame_HidePartyButton(syswk->app);
     case 1:
-        Box2Bmp_OpenMenu(syswk, sMenu70e8, 4);
+        Box2Bmp_OpenMenu(syswk, sBoxMenu, 4);
         Box2Frame_SlideMenuIn(syswk->app->bgWinFrame);
         syswk->app->subSeq++;
         return Box2Seq_RunVFunc(syswk, Box2Main_VFuncFrameMove, 105);
     case 2:
         syswk->app->subSeq = 0;
         Box2Obj_SetIconsBlend(syswk, 1, 1);
-        Box2Bmp_PrintPrompt(syswk, 0, 24);
+        Box2Bmp_PrintPrompt(syswk, BOX2_PROMPT_WHAT_TO_DO, 24);
         Box2Ui_ChangeCursor(syswk, 10, 0);
         syswk->moveMode = 0;
         Box2Obj_SetCursorAnim(syswk, 6);
@@ -5796,7 +5855,7 @@ static int Box2Seq_BoxMenuMain(Box2SysWork *syswk) {
         return Box2Seq_AnimFrameButton(syswk, 2, Box2Seq_Goto(syswk, 108));
     case 1:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        syswk->app->unkA55C = 0;
+        syswk->app->wallpaperTheme = 0;
         return Box2Seq_AnimFrameButton(syswk, 3, Box2Seq_Goto(syswk, 112));
     case 2:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -5821,7 +5880,7 @@ static int Box2Seq_BoxMenuClose(Box2SysWork *syswk) {
         Box2Obj_ShowCursor(syswk, 0);
         Box2Bmp_ClearMsgWindow(syswk->app, 24);
         Box2Main_PutMessageFrame(syswk);
-        if (syswk->param->mode == 2 || syswk->param->mode == 4) {
+        if (syswk->param->mode == BOX2_MODE_MOVE_POKEMON || syswk->param->mode == BOX2_MODE_BATTLE_BOX) {
             Box2Obj_SetButtons(syswk, 0, 0, 1, 0);
         } else {
             Box2Obj_SetButtons(syswk, 0, 0, 1, 1);
@@ -5833,24 +5892,24 @@ static int Box2Seq_BoxMenuClose(Box2SysWork *syswk) {
         syswk->app->subSeq = 0;
         Box2Obj_ShowScrollArrows(syswk->app, 1);
         Box2Obj_SetToolButtons(syswk, 9, 1);
-        if (syswk->param->mode == 2) {
+        if (syswk->param->mode == BOX2_MODE_MOVE_POKEMON) {
             Box2Obj_SetIconsBlend(syswk, 1, 0);
             Box2Frame_ShowPartyButton(syswk->app);
             Box2Ui_ChangeCursor(syswk, 3, BOX2_PARTY_POS);
             return 17;
         }
-        if (syswk->param->mode == 1) {
+        if (syswk->param->mode == BOX2_MODE_WITHDRAW) {
             Box2Obj_SetIconsBlend(syswk, 1, 0);
             Box2Ui_ChangeCursor(syswk, 2, BOX2_PARTY_POS);
             return 54;
         }
-        if (syswk->param->mode == 3) {
+        if (syswk->param->mode == BOX2_MODE_MOVE_ITEMS) {
             Box2Obj_SetIconsBlend(syswk, 0x81, 1);
             Box2Frame_ShowPartyButton(syswk->app);
             Box2Ui_ChangeCursor(syswk, 7, BOX2_PARTY_POS);
             return 67;
         }
-        if (syswk->param->mode == 4) {
+        if (syswk->param->mode == BOX2_MODE_BATTLE_BOX) {
             Box2Obj_SetIconsBlend(syswk, 1, 0);
             Box2Frame_ShowPartyButton(syswk->app);
             Box2Ui_ChangeCursor(syswk, 13, BOX2_PARTY_POS);
@@ -5864,7 +5923,7 @@ static int Box2Seq_BoxMenuClose(Box2SysWork *syswk) {
 static int Box2Seq_BoxJumpOpen(Box2SysWork *syswk) {
     switch (syswk->app->subSeq) {
     case 0:
-        syswk->app->unkA55A = 1;
+        syswk->app->boxJumpOpen = 1;
         Box2Obj_ShowCursor(syswk, 0);
         Box2Bmp_ClearMsgWindow(syswk->app, 24);
         Box2Main_PutMessageFrame(syswk);
@@ -5883,7 +5942,7 @@ static int Box2Seq_BoxJumpOpen(Box2SysWork *syswk) {
         Box2Obj_ShowBoxNameFrame(syswk, 0, 1);
         Box2Ui_ChangeCursor(syswk, 12, 1);
         syswk->app->oldCurPos = 1;
-        Box2Bmp_PrintPrompt(syswk, 1, 25);
+        Box2Bmp_PrintPrompt(syswk, BOX2_PROMPT_JUMP_TO_BOX, 25);
         Box2Obj_SetButtons(syswk, 0, 1, 1, 1);
         return 109;
     }
@@ -5917,11 +5976,11 @@ static int Box2Seq_BoxJumpMain(Box2SysWork *syswk) {
     case 2:
     case 3:
     case 4:
-        syswk->app->unkA55F = syswk->trayScroll + res - 1;
-        if (syswk->app->unkA55F >= syswk->trayMax) {
-            syswk->app->unkA55F -= syswk->trayMax;
+        syswk->app->pickedTray = syswk->trayScroll + res - 1;
+        if (syswk->app->pickedTray >= syswk->trayMax) {
+            syswk->app->pickedTray -= syswk->trayMax;
         }
-        if (syswk->app->unkA55F != syswk->tray) {
+        if (syswk->app->pickedTray != syswk->tray) {
             Box2Obj_ShowBoxNameFrame(syswk, 0, 0);
             return Box2Seq_ScrollToPickedBox(syswk, 111);
         }
@@ -5935,14 +5994,14 @@ static int Box2Seq_BoxJumpMain(Box2SysWork *syswk) {
     case CURSORMOVE_CURSOR_MOVE:
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         return Box2Seq_RunRequestedVFunc(syswk, Box2Seq_PokeMoveEndTo(syswk, 109));
-    case CURSORMOVE_UNK_8:
+    case CURSORMOVE_SCROLL_U:
         if (CursorMove_GetPos(syswk->app->cursorMove) == 1) {
             GFL_SndSEPlay(SEQ_SE_SELECT1);
             Box2Main_StartBoxListScroll(syswk, -1);
             return Box2Seq_RunVFunc(syswk, Box2Main_VFuncBoxMoveScrollRight, 109);
         }
         break;
-    case CURSORMOVE_UNK_7:
+    case CURSORMOVE_SCROLL_D:
         if (CursorMove_GetPos(syswk->app->cursorMove) == 4) {
             GFL_SndSEPlay(SEQ_SE_SELECT1);
             Box2Main_StartBoxListScroll(syswk, 1);
@@ -5957,7 +6016,7 @@ static int Box2Seq_BoxJumpMain(Box2SysWork *syswk) {
 static int Box2Seq_BoxJumpClose(Box2SysWork *syswk) {
     switch (syswk->app->subSeq) {
     case 0:
-        syswk->app->unkA55A = 0;
+        syswk->app->boxJumpOpen = 0;
         Box2Obj_ShowCursor(syswk, 0);
         Box2Bmp_ClearMsgWindow(syswk->app, 25);
         Box2Main_PutMessageFrame(syswk);
@@ -5968,30 +6027,30 @@ static int Box2Seq_BoxJumpClose(Box2SysWork *syswk) {
     case 1:
         syswk->app->subSeq = 0;
         Box2Obj_ShowScrollArrows(syswk->app, 1);
-        if (syswk->param->mode == 2 || syswk->param->mode == 4) {
+        if (syswk->param->mode == BOX2_MODE_MOVE_POKEMON || syswk->param->mode == BOX2_MODE_BATTLE_BOX) {
             Box2Obj_SetButtons(syswk, 0, 0, 1, 0);
         } else {
             Box2Obj_SetButtons(syswk, 0, 0, 1, 1);
         }
         Box2Obj_SetToolButtons(syswk, 9, 1);
-        if (syswk->param->mode == 2) {
+        if (syswk->param->mode == BOX2_MODE_MOVE_POKEMON) {
             Box2Obj_SetIconsBlend(syswk, 1, 0);
             Box2Frame_ShowPartyButton(syswk->app);
             Box2Ui_ChangeCursor(syswk, 3, BOX2_PARTY_POS);
             return 17;
         }
-        if (syswk->param->mode == 1) {
+        if (syswk->param->mode == BOX2_MODE_WITHDRAW) {
             Box2Obj_SetIconsBlend(syswk, 1, 0);
             Box2Ui_ChangeCursor(syswk, 2, BOX2_PARTY_POS);
             return 54;
         }
-        if (syswk->param->mode == 3) {
+        if (syswk->param->mode == BOX2_MODE_MOVE_ITEMS) {
             Box2Obj_SetIconsBlend(syswk, 0x81, 1);
             Box2Frame_ShowPartyButton(syswk->app);
             Box2Ui_ChangeCursor(syswk, 7, BOX2_PARTY_POS);
             return 67;
         }
-        if (syswk->param->mode == 4) {
+        if (syswk->param->mode == BOX2_MODE_BATTLE_BOX) {
             Box2Obj_SetIconsBlend(syswk, 1, 0);
             Box2Frame_ShowPartyButton(syswk->app);
             Box2Ui_ChangeCursor(syswk, 13, BOX2_PARTY_POS);
@@ -6020,49 +6079,49 @@ static int Box2Seq_WallpaperMenuOpen(Box2SysWork *syswk) {
         syswk->app->subSeq++;
         return Box2Seq_RunVFunc(syswk, Box2Main_VFuncFrameMove, 112);
     case 1:
-        if (syswk->app->unkA55C == 0) {
+        if (syswk->app->wallpaperTheme == 0) {
             if (BoxSaveAccessor_CheckFlags(syswk->param->boxes, 1) == TRUE) {
-                Box2Bmp_OpenMenu(syswk, sMenu71a8, 6);
+                Box2Bmp_OpenMenu(syswk, sThemeMenuSpecial, 6);
             } else {
-                Box2Bmp_OpenMenu(syswk, sMenu711c, 5);
+                Box2Bmp_OpenMenu(syswk, sThemeMenu, 5);
             }
-        } else if (syswk->app->unkA55C == 1) {
-            Box2Bmp_OpenMenu(syswk, sMenu7144, 5);
-        } else if (syswk->app->unkA55C == 2) {
-            Box2Bmp_OpenMenu(syswk, sMenu7158, 5);
-        } else if (syswk->app->unkA55C == 3) {
-            Box2Bmp_OpenMenu(syswk, sMenu716c, 5);
-        } else if (syswk->app->unkA55C == 4) {
-            Box2Bmp_OpenMenu(syswk, sMenu7180, 5);
-        } else if (syswk->app->unkA55C == 5) {
+        } else if (syswk->app->wallpaperTheme == 1) {
+            Box2Bmp_OpenMenu(syswk, sScenery1Menu, 5);
+        } else if (syswk->app->wallpaperTheme == 2) {
+            Box2Bmp_OpenMenu(syswk, sScenery2Menu, 5);
+        } else if (syswk->app->wallpaperTheme == 3) {
+            Box2Bmp_OpenMenu(syswk, sScenery3Menu, 5);
+        } else if (syswk->app->wallpaperTheme == 4) {
+            Box2Bmp_OpenMenu(syswk, sMiscMenu, 5);
+        } else if (syswk->app->wallpaperTheme == 5) {
             if (BoxSaveAccessor_CheckFlags(syswk->param->boxes, 2) == TRUE) {
-                Box2Bmp_OpenMenu(syswk, sMenu71c0, 6);
+                Box2Bmp_OpenMenu(syswk, sSpecialMenuNext, 6);
             } else {
-                Box2Bmp_OpenMenu(syswk, sMenu7108, 5);
+                Box2Bmp_OpenMenu(syswk, sSpecialMenu, 5);
             }
-        } else if (syswk->app->unkA55C == 6) {
-            Box2Bmp_OpenMenu(syswk, sMenu71d8, 6);
+        } else if (syswk->app->wallpaperTheme == 6) {
+            Box2Bmp_OpenMenu(syswk, sSpecialMenu2, 6);
         }
         Box2Frame_SlideMenuIn(syswk->app->bgWinFrame);
         syswk->app->subSeq++;
         return Box2Seq_RunVFunc(syswk, Box2Main_VFuncFrameMove, 112);
     case 2:
         syswk->app->subSeq = 0;
-        if (syswk->app->unkA55C == 0) {
-            Box2Bmp_PrintPrompt(syswk, 2, 24);
+        if (syswk->app->wallpaperTheme == 0) {
+            Box2Bmp_PrintPrompt(syswk, BOX2_PROMPT_THEME, 24);
         } else {
-            Box2Bmp_PrintPrompt(syswk, 3, 24);
+            Box2Bmp_PrintPrompt(syswk, BOX2_PROMPT_WALLPAPER, 24);
         }
         all = FALSE;
-        if (syswk->app->unkA55C == 0) {
+        if (syswk->app->wallpaperTheme == 0) {
             if (BoxSaveAccessor_CheckFlags(syswk->param->boxes, 1) == FALSE) {
                 all = TRUE;
             }
-        } else if (syswk->app->unkA55C == 5) {
+        } else if (syswk->app->wallpaperTheme == 5) {
             if (BoxSaveAccessor_CheckFlags(syswk->param->boxes, 2) == FALSE) {
                 all = TRUE;
             }
-        } else if (syswk->app->unkA55C != 6) {
+        } else if (syswk->app->wallpaperTheme != 6) {
             all = TRUE;
         }
         if (all == TRUE) {
@@ -6081,60 +6140,60 @@ static int Box2Seq_WallpaperMenuMain(Box2SysWork *syswk) {
     switch (CursorMove_Update(syswk->app->cursorMove)) {
     case 0:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        if (syswk->app->unkA55C == 0) {
-            syswk->app->unkA55C = 5;
+        if (syswk->app->wallpaperTheme == 0) {
+            syswk->app->wallpaperTheme = 5;
             return Box2Seq_AnimFrameButton(syswk, 0, Box2Seq_Goto(syswk, 112));
         }
         return Box2Seq_PickWallpaper(syswk, 0);
     case 1:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        if (syswk->app->unkA55C == 0) {
-            syswk->app->unkA55C = 1;
+        if (syswk->app->wallpaperTheme == 0) {
+            syswk->app->wallpaperTheme = 1;
             return Box2Seq_AnimFrameButton(syswk, 1, Box2Seq_Goto(syswk, 112));
         }
         return Box2Seq_PickWallpaper(syswk, 1);
     case 2:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        if (syswk->app->unkA55C == 0) {
-            syswk->app->unkA55C = 2;
+        if (syswk->app->wallpaperTheme == 0) {
+            syswk->app->wallpaperTheme = 2;
             return Box2Seq_AnimFrameButton(syswk, 2, Box2Seq_Goto(syswk, 112));
         }
         return Box2Seq_PickWallpaper(syswk, 2);
     case 3:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        if (syswk->app->unkA55C == 0) {
-            syswk->app->unkA55C = 3;
+        if (syswk->app->wallpaperTheme == 0) {
+            syswk->app->wallpaperTheme = 3;
             return Box2Seq_AnimFrameButton(syswk, 3, Box2Seq_Goto(syswk, 112));
         }
         return Box2Seq_PickWallpaper(syswk, 3);
     case 4:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        if (syswk->app->unkA55C == 0) {
-            syswk->app->unkA55C = 4;
+        if (syswk->app->wallpaperTheme == 0) {
+            syswk->app->wallpaperTheme = 4;
             return Box2Seq_AnimFrameButton(syswk, 4, Box2Seq_Goto(syswk, 112));
         }
-        if (syswk->app->unkA55C == 5 && BoxSaveAccessor_CheckFlags(syswk->param->boxes, 2) == TRUE) {
-            syswk->app->unkA55C = 6;
+        if (syswk->app->wallpaperTheme == 5 && BoxSaveAccessor_CheckFlags(syswk->param->boxes, 2) == TRUE) {
+            syswk->app->wallpaperTheme = 6;
             return Box2Seq_AnimFrameButton(syswk, 4, Box2Seq_Goto(syswk, 112));
         }
-        if (syswk->app->unkA55C == 6) {
-            syswk->app->unkA55C = 5;
+        if (syswk->app->wallpaperTheme == 6) {
+            syswk->app->wallpaperTheme = 5;
             return Box2Seq_AnimFrameButton(syswk, 4, Box2Seq_Goto(syswk, 112));
         }
         return Box2Seq_PickWallpaper(syswk, 4);
     case 5:
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        if (syswk->app->unkA55C == 0) {
+        if (syswk->app->wallpaperTheme == 0) {
             return Box2Seq_AnimFrameButton(syswk, 5, Box2Seq_Goto(syswk, 107));
         }
-        syswk->app->unkA55C = 0;
+        syswk->app->wallpaperTheme = 0;
         return Box2Seq_AnimFrameButton(syswk, 5, Box2Seq_Goto(syswk, 112));
     case CURSORMOVE_CANCEL:
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        if (syswk->app->unkA55C == 0) {
+        if (syswk->app->wallpaperTheme == 0) {
             return Box2Seq_AnimFrameButton(syswk, 5, Box2Seq_Goto(syswk, 107));
         }
-        syswk->app->unkA55C = 0;
+        syswk->app->wallpaperTheme = 0;
         return Box2Seq_AnimFrameButton(syswk, 5, Box2Seq_Goto(syswk, 112));
     case CURSORMOVE_CURSOR_MOVE:
         GFL_SndSEPlay(SEQ_SE_SELECT1);
@@ -6327,7 +6386,7 @@ static int Box2Seq_YesItemToBag(Box2SysWork *syswk) {
         return 69;
     }
     GFL_SndSEPlay(SEQ_SE_BEEP);
-    Box2Bmp_PrintItemMsg(syswk, 6, 24);
+    Box2Bmp_PrintItemMsg(syswk, BOX2_ITEM_MSG_BAG_FULL, 24);
     syswk->nextSeq = 14;
     return Box2Seq_Goto(syswk, BOX2SEQ_TRGWAIT);
 }
@@ -6351,14 +6410,14 @@ static int Box2Seq_ReturnToMain(Box2SysWork *syswk) {
     }
     Box2Obj_SetToolButtons(syswk, 9, 1);
     switch (syswk->param->mode) {
-    case 0:
+    case BOX2_MODE_DEPOSIT:
         Box2Obj_SetIconsBlend(syswk, 2, 0);
         return 59;
-    case 1:
+    case BOX2_MODE_WITHDRAW:
         Box2Obj_ShowScrollArrows(syswk->app, 1);
         Box2Obj_SetIconsBlend(syswk, 1, 0);
         return 54;
-    case 2:
+    case BOX2_MODE_MOVE_POKEMON:
         if (Box2Frame_IsPartyAtLeft(syswk->app->bgWinFrame) == TRUE) {
             Box2Obj_SetIconsBlend(syswk, 2, 0);
             Box2Frame_ShowBoxListButton(syswk->app);
@@ -6368,7 +6427,7 @@ static int Box2Seq_ReturnToMain(Box2SysWork *syswk) {
         Box2Obj_SetIconsBlend(syswk, 1, 0);
         Box2Frame_ShowPartyButton(syswk->app);
         return 17;
-    case 3:
+    case BOX2_MODE_MOVE_ITEMS:
         if (Box2Frame_IsPartyAtLeft(syswk->app->bgWinFrame) == TRUE) {
             Box2Obj_SetIconsBlend(syswk, 0x82, 0);
             Box2Frame_ShowBoxListButton(syswk->app);
@@ -6378,7 +6437,7 @@ static int Box2Seq_ReturnToMain(Box2SysWork *syswk) {
         Box2Obj_SetIconsBlend(syswk, 0x81, 0);
         Box2Frame_ShowPartyButton(syswk->app);
         return 67;
-    case 4:
+    case BOX2_MODE_BATTLE_BOX:
         if (Box2Frame_IsPartyAtLeft(syswk->app->bgWinFrame) == TRUE) {
             Box2Obj_SetIconsBlend(syswk, 2, 0);
             Box2Frame_ShowBoxListButton(syswk->app);
@@ -6388,7 +6447,7 @@ static int Box2Seq_ReturnToMain(Box2SysWork *syswk) {
         Box2Obj_SetIconsBlend(syswk, 1, 0);
         Box2Frame_ShowPartyButton(syswk->app);
         return 45;
-    case 5:
+    case BOX2_MODE_DREAM_WORLD:
         Box2Obj_ShowScrollArrows(syswk->app, 1);
         Box2Obj_SetIconsBlend(syswk, 0x81, 1);
         return 85;
@@ -6396,7 +6455,7 @@ static int Box2Seq_ReturnToMain(Box2SysWork *syswk) {
     return 17;
 }
 
-// Mode 5: picks the Pokémon and leaves the box
+// Dream World mode: picks the Pokémon and leaves the box
 static int Box2Seq_YesDreamWorldPick(Box2SysWork *syswk) {
     Box2Main_UpdateChatter(syswk);
     syswk->param->tray = syswk->tray;
@@ -6405,7 +6464,7 @@ static int Box2Seq_YesDreamWorldPick(Box2SysWork *syswk) {
     return Box2Seq_WipeIn(syswk, 1);
 }
 
-// Mode 5: the Pokémon wasn't picked
+// Dream World mode: the Pokémon wasn't picked
 static int Box2Seq_NoDreamWorldPick(Box2SysWork *syswk) {
     Box2Bmp_ClearMsgWindow(syswk->app, 27);
     Box2Main_PutMessageFrame(syswk);
@@ -6489,7 +6548,7 @@ static int Box2Seq_WipeOutCallSubProc(Box2SysWork *syswk, u32 type) {
 static int Box2Seq_ArrangeGiveItemReturn(Box2SysWork *syswk) {
     int seq;
 
-    switch (syswk->unk13) {
+    switch (syswk->subProcReturn) {
     case 0:
         Box2Frame_ShowPartyButton(syswk->app);
         seq = 17;
@@ -6506,9 +6565,9 @@ static int Box2Seq_ArrangeGiveItemReturn(Box2SysWork *syswk) {
     Box2Obj_PutPokeOutline(syswk);
     if (syswk->subRet == 0) {
         Box2Main_PokeInfoPut(syswk, syswk->pos);
-        Box2Bmp_OpenMenu(syswk, sMenu71f0, 6);
+        Box2Bmp_OpenMenu(syswk, sArrangeMenu, 6);
         Box2Frame_ShowMenu(syswk->app->bgWinFrame);
-        Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+        Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
         return seq;
     }
     if (PML_ItemIsMail(syswk->subRet) == FALSE) {
@@ -6531,7 +6590,7 @@ static int Box2Seq_ArrangeGiveItemReturn(Box2SysWork *syswk) {
 static int Box2Seq_ItemGiveItemReturn(Box2SysWork *syswk) {
     int seq;
 
-    switch (syswk->unk13) {
+    switch (syswk->subProcReturn) {
     case 0:
         Box2Obj_PutItemIconAtIcon(syswk->app, syswk->pos, 0);
         seq = 67;
@@ -6548,8 +6607,8 @@ static int Box2Seq_ItemGiveItemReturn(Box2SysWork *syswk) {
     if (syswk->subRet == 0) {
         Box2Main_PokeInfoPut(syswk, syswk->pos);
         Box2Frame_ShowMenu(syswk->app->bgWinFrame);
-        Box2Bmp_PrintItemMsg(syswk, 0, 24);
-        if (syswk->unk13 == 0) {
+        Box2Bmp_PrintItemMsg(syswk, BOX2_ITEM_MSG_CAN_HOLD, 24);
+        if (syswk->subProcReturn == 0) {
             Box2Obj_SetIconsBlend(syswk, 0x81, 1);
         } else {
             Box2Obj_SetIconsBlend(syswk, 1, 1);
@@ -6572,7 +6631,7 @@ static int Box2Seq_ItemGiveItemReturn(Box2SysWork *syswk) {
         Box2Obj_InitItemOutline(syswk->app);
         Box2Obj_ShowItemOutline(syswk->app);
     }
-    if (syswk->unk13 == 0) {
+    if (syswk->subProcReturn == 0) {
         Box2Obj_SetIconsBlend(syswk, 0x81, 1);
         Box2Frame_ShowPartyButton(syswk->app);
     } else {
@@ -6585,11 +6644,11 @@ static int Box2Seq_ItemGiveItemReturn(Box2SysWork *syswk) {
     return 96;
 }
 
-// Back from the bag after giving an item, in mode 4
+// Back from the bag after giving an item, in the Battle Box mode
 static int Box2Seq_BattleBoxGiveItemReturn(Box2SysWork *syswk) {
     int seq;
 
-    switch (syswk->unk13) {
+    switch (syswk->subProcReturn) {
     case 0:
         Box2Frame_ShowPartyButton(syswk->app);
         seq = 45;
@@ -6606,9 +6665,9 @@ static int Box2Seq_BattleBoxGiveItemReturn(Box2SysWork *syswk) {
     Box2Obj_PutPokeOutline(syswk);
     if (syswk->subRet == 0) {
         Box2Main_PokeInfoPut(syswk, syswk->pos);
-        Box2Bmp_OpenMenu(syswk, sMenu70f8, 4);
+        Box2Bmp_OpenMenu(syswk, sBattleBoxMenu, 4);
         Box2Frame_ShowMenu(syswk->app->bgWinFrame);
-        Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+        Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
         return seq;
     }
     if (PML_ItemIsMail(syswk->subRet) == FALSE) {
@@ -6627,20 +6686,20 @@ static int Box2Seq_BattleBoxGiveItemReturn(Box2SysWork *syswk) {
     return 96;
 }
 
-// Back from the summary in mode 1
+// Back from the summary in the withdraw mode
 static int Box2Seq_WithdrawSummaryReturn(Box2SysWork *syswk) {
-    Box2Bmp_OpenMenu(syswk, sMenu7194, 5);
+    Box2Bmp_OpenMenu(syswk, sWithdrawMenu, 5);
     Box2Frame_ShowMenu(syswk->app->bgWinFrame);
-    Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+    Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
     Box2Obj_PutPokeOutline(syswk);
     return 54;
 }
 
-// Back from the summary in mode 0
+// Back from the summary in the deposit mode
 static int Box2Seq_DepositSummaryReturn(Box2SysWork *syswk) {
-    Box2Bmp_OpenMenu(syswk, sMenu7130, 5);
+    Box2Bmp_OpenMenu(syswk, sDepositMenu, 5);
     Box2Frame_ShowMenu(syswk->app->bgWinFrame);
-    Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+    Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
     Box2Obj_SetIconsBlend(syswk, 1, 1);
     Box2Obj_ShowScrollArrows(syswk->app, 0);
     PutPartyLeft(syswk);
@@ -6650,17 +6709,17 @@ static int Box2Seq_DepositSummaryReturn(Box2SysWork *syswk) {
 
 // Back from the summary in the arrangement
 static int Box2Seq_ArrangeSummaryReturn(Box2SysWork *syswk) {
-    switch (syswk->unk13) {
+    switch (syswk->subProcReturn) {
     case 0:
-        Box2Bmp_OpenMenu(syswk, sMenu71f0, 6);
+        Box2Bmp_OpenMenu(syswk, sArrangeMenu, 6);
         Box2Frame_ShowMenu(syswk->app->bgWinFrame);
-        Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+        Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
         Box2Obj_PutPokeOutline(syswk);
         return 17;
     case 1:
-        Box2Bmp_OpenMenu(syswk, sMenu71f0, 6);
+        Box2Bmp_OpenMenu(syswk, sArrangeMenu, 6);
         Box2Frame_ShowMenu(syswk->app->bgWinFrame);
-        Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+        Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
         Box2Obj_SetIconsBlend(syswk, 1, 1);
         Box2Obj_ShowScrollArrows(syswk->app, 0);
         Box2Ui_ChangeCursor(syswk, 5, 10);
@@ -6668,7 +6727,7 @@ static int Box2Seq_ArrangeSummaryReturn(Box2SysWork *syswk) {
         Box2Obj_PutPokeOutline(syswk);
         return 27;
     case 2:
-        if (syswk->unk1B == 1) {
+        if (syswk->fromParty == 1) {
             Box2Obj_PutPartyIconsRightBelow(syswk);
         }
         Box2Ui_ChangeCursor(syswk, 4, syswk->pos);
@@ -6695,14 +6754,14 @@ static int Box2Seq_ArrangeSummaryReturn(Box2SysWork *syswk) {
         }
         Box2Main_HandGetPokeSet(syswk);
         Box2Obj_UpdateOutlinePriority(syswk, BOX2_BOXLIST_POS);
-        Box2Ui_ChangeCursor(syswk, 4, syswk->unk1D);
+        Box2Ui_ChangeCursor(syswk, 4, syswk->subProcCursorPos);
         Box2Main_OpenBoxList(syswk);
         while (Box2Main_VFuncBoxListSlideOut(syswk) != FALSE) {
         }
         Box2Obj_PlaceTrayHighlight(syswk);
         Box2Frame_ShowPartyButton(syswk->app);
-        if (syswk->unk1D >= 34 && syswk->unk1D <= 37) {
-            Box2Obj_ShowBoxNameFrame(syswk, syswk->unk1D - 34, 1);
+        if (syswk->subProcCursorPos >= 34 && syswk->subProcCursorPos <= 37) {
+            Box2Obj_ShowBoxNameFrame(syswk, syswk->subProcCursorPos - 34, 1);
         }
         Box2Obj_PutPokeOutlineAt(syswk, BOX2_BOXLIST_POS);
         return 21;
@@ -6726,7 +6785,7 @@ static int Box2Seq_ArrangeSummaryReturn(Box2SysWork *syswk) {
         }
         Box2Main_HandGetPokeSet(syswk);
         Box2Obj_UpdateOutlinePriority(syswk, BOX2_BOXLIST_POS);
-        Box2Ui_ChangeCursor(syswk, 6, syswk->unk1D);
+        Box2Ui_ChangeCursor(syswk, 6, syswk->subProcCursorPos);
         Box2Frame_ShowBoxListButton(syswk->app);
         Box2Obj_PutPokeOutlineAt(syswk, BOX2_BOXLIST_POS);
         return 32;
@@ -6734,20 +6793,20 @@ static int Box2Seq_ArrangeSummaryReturn(Box2SysWork *syswk) {
     return 0;
 }
 
-// Back from the summary in mode 4
+// Back from the summary in the Battle Box mode
 static int Box2Seq_BattleBoxSummaryReturn(Box2SysWork *syswk) {
-    switch (syswk->unk13) {
+    switch (syswk->subProcReturn) {
     case 0:
-        Box2Bmp_OpenMenu(syswk, sMenu70f8, 4);
+        Box2Bmp_OpenMenu(syswk, sBattleBoxMenu, 4);
         Box2Frame_ShowMenu(syswk->app->bgWinFrame);
-        Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+        Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
         Box2Ui_ChangeCursor(syswk, 13, 37);
         Box2Obj_PutPokeOutline(syswk);
         return 45;
     case 1:
-        Box2Bmp_OpenMenu(syswk, sMenu70f8, 4);
+        Box2Bmp_OpenMenu(syswk, sBattleBoxMenu, 4);
         Box2Frame_ShowMenu(syswk->app->bgWinFrame);
-        Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, 1, 24);
+        Box2Bmp_PrintPokeMoveMsg(syswk, syswk->pos, BOX2_POKEMOVE_MSG_SELECTED, 24);
         Box2Obj_SetIconsBlend(syswk, 1, 1);
         Box2Obj_ShowScrollArrows(syswk->app, 0);
         Box2Ui_ChangeCursor(syswk, 14, 10);
@@ -6774,7 +6833,7 @@ static int Box2Seq_BattleBoxSummaryReturn(Box2SysWork *syswk) {
         }
         Box2Main_HandGetPokeSet(syswk);
         Box2Obj_UpdateOutlinePriority(syswk, BOX2_BOXLIST_POS);
-        Box2Ui_ChangeCursor(syswk, 6, syswk->unk1D);
+        Box2Ui_ChangeCursor(syswk, 6, syswk->subProcCursorPos);
         CursorMove_DisablePos(syswk->app->cursorMove, 39);
         Box2Obj_PutPokeOutlineAt(syswk, BOX2_BOXLIST_POS);
         return 32;
@@ -6784,7 +6843,7 @@ static int Box2Seq_BattleBoxSummaryReturn(Box2SysWork *syswk) {
 
 // Back from the summary while moving Pokémon in the arrangement
 static int Box2Seq_ArrangeMoveSummaryReturn(Box2SysWork *syswk) {
-    switch (syswk->unk13) {
+    switch (syswk->subProcReturn) {
     case 2:
         if (syswk->moveMode == 0) {
             Box2Frame_ShowPartyButton(syswk->app);
@@ -6792,7 +6851,7 @@ static int Box2Seq_ArrangeMoveSummaryReturn(Box2SysWork *syswk) {
             syswk->pos = BOX2_GET_NONE;
             return 17;
         }
-        if (syswk->unk1B == 1) {
+        if (syswk->fromParty == 1) {
             Box2Obj_PutPartyIconsRightBelow(syswk);
         }
         Box2Ui_ChangeCursor(syswk, 4, syswk->pos);
@@ -6819,14 +6878,14 @@ static int Box2Seq_ArrangeMoveSummaryReturn(Box2SysWork *syswk) {
         }
         Box2Main_HandGetPokeSet(syswk);
         Box2Obj_UpdateOutlinePriority(syswk, BOX2_BOXLIST_POS);
-        Box2Ui_ChangeCursor(syswk, 4, syswk->unk1D);
+        Box2Ui_ChangeCursor(syswk, 4, syswk->subProcCursorPos);
         Box2Main_OpenBoxList(syswk);
         while (Box2Main_VFuncBoxListSlideOut(syswk) != FALSE) {
         }
         Box2Obj_PlaceTrayHighlight(syswk);
         Box2Frame_ShowPartyButton(syswk->app);
-        if (syswk->unk1D >= 34 && syswk->unk1D <= 37) {
-            Box2Obj_ShowBoxNameFrame(syswk, syswk->unk1D - 34, 1);
+        if (syswk->subProcCursorPos >= 34 && syswk->subProcCursorPos <= 37) {
+            Box2Obj_ShowBoxNameFrame(syswk, syswk->subProcCursorPos - 34, 1);
         }
         Box2Obj_PutPokeOutlineAt(syswk, BOX2_BOXLIST_POS);
         return 21;
@@ -6859,7 +6918,7 @@ static int Box2Seq_ArrangeMoveSummaryReturn(Box2SysWork *syswk) {
         }
         Box2Main_HandGetPokeSet(syswk);
         Box2Obj_UpdateOutlinePriority(syswk, BOX2_BOXLIST_POS);
-        Box2Ui_ChangeCursor(syswk, 6, syswk->unk1D);
+        Box2Ui_ChangeCursor(syswk, 6, syswk->subProcCursorPos);
         Box2Frame_ShowBoxListButton(syswk->app);
         Box2Obj_PutPokeOutlineAt(syswk, BOX2_BOXLIST_POS);
         return 32;
@@ -6867,9 +6926,9 @@ static int Box2Seq_ArrangeMoveSummaryReturn(Box2SysWork *syswk) {
     return 0;
 }
 
-// Back from the summary while moving Pokémon in mode 4
+// Back from the summary while moving Pokémon in the Battle Box mode
 static int Box2Seq_BattleBoxMoveSummaryReturn(Box2SysWork *syswk) {
-    switch (syswk->unk13) {
+    switch (syswk->subProcReturn) {
     case 2:
         Box2Frame_ShowPartyButton(syswk->app);
         Box2Ui_ChangeCursor(syswk, 13, syswk->pos);
@@ -6904,7 +6963,7 @@ static int Box2Seq_BattleBoxMoveSummaryReturn(Box2SysWork *syswk) {
         }
         Box2Main_HandGetPokeSet(syswk);
         Box2Obj_UpdateOutlinePriority(syswk, BOX2_BOXLIST_POS);
-        Box2Ui_ChangeCursor(syswk, 6, syswk->unk1D);
+        Box2Ui_ChangeCursor(syswk, 6, syswk->subProcCursorPos);
         CursorMove_DisablePos(syswk->app->cursorMove, 39);
         Box2Obj_PutPokeOutlineAt(syswk, BOX2_BOXLIST_POS);
         return 32;
@@ -6942,7 +7001,7 @@ static int Box2Seq_ScrollTrayRight(Box2SysWork *syswk, u32 frameOut, int seq) {
 
 // Moving Pokémon: picks up a touched Pokémon
 static int Box2Seq_ArrangePickUpTouched(Box2SysWork *syswk, u32 pos) {
-    syswk->unk1B = 0;
+    syswk->fromParty = 0;
     syswk->moveMode = 0;
     syswk->pos = pos;
     syswk->getTray = syswk->tray;
@@ -6955,7 +7014,7 @@ static int Box2Seq_ArrangePickUpTouched(Box2SysWork *syswk, u32 pos) {
     Box2Main_PutMessageFrame(syswk);
     Box2Frame_ShowPartyButton(syswk->app);
     syswk->nextSeq = 21;
-    syswk->unk1A = 0;
+    syswk->iconPosMode = 0;
     return Box2Seq_RunVFunc(syswk, Box2Main_VFuncPokeMoveTouch, 18);
 }
 
@@ -6963,7 +7022,7 @@ static int Box2Seq_ArrangePickUpTouched(Box2SysWork *syswk, u32 pos) {
 static int Box2Seq_MovePartyPickUpTouched(Box2SysWork *syswk, u32 pos) {
     syswk->pos = pos;
     syswk->getTray = syswk->tray;
-    syswk->unk1B = 0;
+    syswk->fromParty = 0;
     Box2Obj_SetIconPriority(syswk->app, syswk->pos, FALSE);
     Box2Obj_PickUpRangeIcons(syswk, syswk->pos, 1, 1);
     Box2Obj_PutPokeOutlineAt(syswk, BOX2_BOXLIST_POS);
@@ -6972,11 +7031,11 @@ static int Box2Seq_MovePartyPickUpTouched(Box2SysWork *syswk, u32 pos) {
     Box2Bmp_ClearMsgWindow(syswk->app, 24);
     Box2Main_PutMessageFrame(syswk);
     syswk->nextSeq = 32;
-    syswk->unk1A = 0;
+    syswk->iconPosMode = 0;
     return Box2Seq_RunVFunc(syswk, Box2Main_VFuncRangeMoveTouch, 46);
 }
 
-// Mode 1: picks up a touched Pokémon to take it into the party
+// Withdraw mode: picks up a touched Pokémon to take it into the party
 static int Box2Seq_WithdrawPickUpTouched(Box2SysWork *syswk, u32 pos) {
     syswk->pos = pos;
     syswk->getTray = syswk->tray;
@@ -6992,14 +7051,14 @@ static int Box2Seq_WithdrawPickUpTouched(Box2SysWork *syswk, u32 pos) {
     Box2Obj_SetButtons(syswk, 2, 2, 1, 1);
     Box2Bmp_ClearMsgWindow(syswk->app, 24);
     Box2Main_PutMessageFrame(syswk);
-    syswk->unk1A = 2;
+    syswk->iconPosMode = 2;
     return Box2Seq_RunVFunc(syswk, Box2Main_VFuncPartyInTouch, 58);
 }
 
 // Opens a Pokémon's menu
 static int Box2Seq_OpenPokeMenu(Box2SysWork *syswk, u32 pos, int seq) {
     syswk->pos = pos;
-    syswk->app->unkA552 = 1;
+    syswk->app->menuMsgPending = 1;
     Box2Obj_SetIconPriority(syswk->app, syswk->pos, TRUE);
     Box2Obj_PutPokeOutline(syswk);
     Box2Frame_SlideMenuIn(syswk->app->bgWinFrame);
@@ -7011,7 +7070,7 @@ static int Box2Seq_ArrangePartyPickUpTouched(Box2SysWork *syswk, u32 pos) {
     syswk->pos = pos;
     syswk->moveMode = 0;
     syswk->getTray = syswk->tray;
-    syswk->unk1B = 1;
+    syswk->fromParty = 1;
     Box2Obj_SetIconPriority(syswk->app, syswk->pos, FALSE);
     Box2Obj_PickUpRangeIcons(syswk, syswk->pos, 1, 1);
     Box2Obj_PutPokeOutlineAt(syswk, BOX2_BOXLIST_POS);
@@ -7022,7 +7081,7 @@ static int Box2Seq_ArrangePartyPickUpTouched(Box2SysWork *syswk, u32 pos) {
     Box2Main_PutMessageFrame(syswk);
     Box2Frame_ShowBoxListButton(syswk->app);
     syswk->nextSeq = 32;
-    syswk->unk1A = 1;
+    syswk->iconPosMode = 1;
     return Box2Seq_RunVFunc(syswk, Box2Main_VFuncPokeMoveTouchParty, 30);
 }
 
@@ -7030,7 +7089,7 @@ static int Box2Seq_ArrangePartyPickUpTouched(Box2SysWork *syswk, u32 pos) {
 static int Box2Seq_ArrangeBoxPartyPickUpTouched(Box2SysWork *syswk, u32 pos) {
     syswk->pos = pos;
     syswk->getTray = syswk->tray;
-    syswk->unk1B = 1;
+    syswk->fromParty = 1;
     Box2Obj_SetIconPriority(syswk->app, syswk->pos, FALSE);
     Box2Obj_PickUpRangeIcons(syswk, syswk->pos, 1, 1);
     Box2Obj_PutPokeOutlineAt(syswk, BOX2_BOXLIST_POS);
@@ -7040,11 +7099,11 @@ static int Box2Seq_ArrangeBoxPartyPickUpTouched(Box2SysWork *syswk, u32 pos) {
     Box2Bmp_ClearMsgWindow(syswk->app, 24);
     Box2Main_PutMessageFrame(syswk);
     syswk->nextSeq = 32;
-    syswk->unk1A = 1;
+    syswk->iconPosMode = 1;
     return Box2Seq_RunVFunc(syswk, Box2Main_VFuncPokeMoveTouchParty, 52);
 }
 
-// Mode 0: picks up a touched Pokémon of the party to deposit it
+// Deposit mode: picks up a touched Pokémon of the party to deposit it
 static int Box2Seq_DepositPickUpTouched(Box2SysWork *syswk, u32 pos) {
     syswk->pos = pos;
     Box2Obj_SetIconPriority(syswk->app, syswk->pos, FALSE);
@@ -7057,14 +7116,14 @@ static int Box2Seq_DepositPickUpTouched(Box2SysWork *syswk, u32 pos) {
     Box2Obj_SetButtons(syswk, 2, 2, 1, 1);
     Box2Bmp_ClearMsgWindow(syswk->app, 24);
     Box2Main_PutMessageFrame(syswk);
-    syswk->unk1A = 1;
+    syswk->iconPosMode = 1;
     return Box2Seq_RunVFunc(syswk, Box2Main_VFuncPartyOutTouch, 66);
 }
 
 // Opens a party Pokémon's menu
 static int Box2Seq_OpenPartyPokeMenu(Box2SysWork *syswk, u32 pos, int seq) {
     syswk->pos = pos;
-    syswk->app->unkA552 = 1;
+    syswk->app->menuMsgPending = 1;
     Box2Obj_SetIconPriority(syswk->app, syswk->pos, TRUE);
     Box2Obj_PutPokeOutline(syswk);
     Box2Frame_SlideMenuIn(syswk->app->bgWinFrame);
@@ -7082,7 +7141,7 @@ static int Box2Seq_MovePickUpTouched(Box2SysWork *syswk, u32 pos, int seq) {
     Box2Obj_SetButtons(syswk, 2, 1, 2, 1);
     AllocPokeMoveWork(syswk);
     syswk->nextSeq = seq;
-    syswk->unk1A = 2;
+    syswk->iconPosMode = 2;
     return Box2Seq_RunVFunc(syswk, Box2Main_VFuncPokeMoveTouch, 23);
 }
 
@@ -7095,18 +7154,18 @@ static int Box2Seq_RangePickUpTouched(Box2SysWork *syswk, int seq) {
     Box2Obj_SetButtons(syswk, 2, 1, 2, 2);
     AllocPokeMoveWork(syswk);
     syswk->nextSeq = seq;
-    syswk->unk1A = 2;
+    syswk->iconPosMode = 2;
     return Box2Seq_RunVFunc(syswk, Box2Main_VFuncPokeMoveTouch, 38);
 }
 
 // Moving Pokémon by the keys: picks up the Pokémon under the cursor
 static int Box2Seq_MovePickUpKey(Box2SysWork *syswk, u32 pos, int seq) {
-    syswk->unk18 = 1;
+    syswk->pickState = BOX2_PICK_KEY;
     syswk->pos = pos;
     Box2Obj_SetIconPriority(syswk->app, BOX2_BOXLIST_POS, FALSE);
     Box2Obj_PutPokeOutlineAt(syswk, BOX2_BOXLIST_POS);
     Box2Obj_SetButtons(syswk, 2, 1, 0, 0);
-    if (syswk->param->mode == 4) {
+    if (syswk->param->mode == BOX2_MODE_BATTLE_BOX) {
         Box2Frame_HidePartyButton(syswk->app);
         Box2Frame_HideBoxListButton(syswk->app);
         CursorMove_DisablePos(syswk->app->cursorMove, 39);
@@ -7116,7 +7175,7 @@ static int Box2Seq_MovePickUpKey(Box2SysWork *syswk, u32 pos, int seq) {
 
 // Moving Pokémon by the keys in the arrangement: picks up the Pokémon under the cursor
 static int Box2Seq_ArrangePickUpKey(Box2SysWork *syswk, u32 pos) {
-    syswk->unk18 = 1;
+    syswk->pickState = BOX2_PICK_KEY;
     syswk->pos = pos;
     Box2Obj_SetIconPriority(syswk->app, BOX2_BOXLIST_POS, FALSE);
     Box2Obj_PutPokeOutlineAt(syswk, BOX2_BOXLIST_POS);
@@ -7152,7 +7211,7 @@ static int Box2Seq_MoveDropKey(Box2SysWork *syswk, u32 pos, int seq) {
         }
     }
     syswk->app->pokePutKey = pos;
-    syswk->unk1A = 2;
+    syswk->iconPosMode = 2;
     syswk->nextSeq = seq;
     AllocPokeMoveWork(syswk);
     return Box2Seq_RunVFunc(syswk, Box2Main_VFuncPokeMovePutKey, 23);
@@ -7180,7 +7239,7 @@ static int Box2Seq_RangeDropKey(Box2SysWork *syswk, u32 pos, int seq) {
     }
     Box2Obj_SetRangeAnm(syswk, 0);
     syswk->app->pokePutKey = pos;
-    syswk->unk1A = 2;
+    syswk->iconPosMode = 2;
     syswk->nextSeq = seq;
     AllocPokeMoveWork(syswk);
     return Box2Seq_RunVFunc(syswk, Box2Main_VFuncPokeMovePutKey, 38);
@@ -7201,7 +7260,7 @@ static int Box2Seq_ItemTakeTouched(Box2SysWork *syswk, u32 pos) {
 
     syswk->pos = pos;
     syswk->getTray = syswk->tray;
-    syswk->app->unkA552 = 1;
+    syswk->app->menuMsgPending = 1;
     syswk->app->getItem = Box2Main_GetPokeParam(syswk, syswk->pos, syswk->tray, PKM_PARAM_ITEM, NULL);
     Box2Frame_HideMenu(syswk->app->bgWinFrame);
     Box2Bmp_ClearMsgWindow(syswk->app, 24);
@@ -7227,7 +7286,7 @@ static int Box2Seq_ItemTakeTouched(Box2SysWork *syswk, u32 pos) {
 static int Box2Seq_ItemOpenMenu(Box2SysWork *syswk, u32 pos) {
     syswk->pos = pos;
     syswk->getTray = syswk->tray;
-    syswk->app->unkA552 = 1;
+    syswk->app->menuMsgPending = 1;
     Box2Main_PokeInfoPut(syswk, syswk->pos);
     syswk->app->getItem = Box2Main_GetPokeParam(syswk, syswk->pos, syswk->tray, PKM_PARAM_ITEM, NULL);
     Box2Seq_OpenItemMenu(syswk, (s16)syswk->app->getItem);
@@ -7289,7 +7348,7 @@ static int Box2Seq_ItemPartyOutTakeKey(Box2SysWork *syswk, u32 pos) {
     if (syswk->app->getItem == 0) {
         return 74;
     }
-    syswk->unk18 = 1;
+    syswk->pickState = BOX2_PICK_KEY;
     Box2Obj_SetVisible(syswk->app, BOX2_ACTOR_ITEM_ICON, FALSE);
     Box2Obj_PutItemIconAtCursor(syswk->app, syswk->pos, 2);
     Box2Obj_SetItemIcon(syswk->app, syswk->app->getItem);
@@ -7315,7 +7374,7 @@ static int Box2Seq_ItemDropHeldKey(Box2SysWork *syswk, u32 pos) {
     s16 x, y;
 
     syswk->app->pokePutKey = pos;
-    syswk->unk18 = 0;
+    syswk->pickState = BOX2_PICK_NONE;
     Box2Obj_GetPos(syswk->app, BOX2_ACTOR_CURSOR, &x, &y, 0);
     Box2Obj_SetPos(syswk->app, BOX2_ACTOR_ITEM_ICON, x, y + 8, 0);
     Box2Obj_ShowPokeOutline(syswk, 0);
@@ -7359,7 +7418,7 @@ static int Box2Seq_ItemPartyTakeTouched(Box2SysWork *syswk, u32 pos) {
 static int Box2Seq_ItemPartyOpenMenu(Box2SysWork *syswk, u32 pos) {
     syswk->pos = pos;
     syswk->getTray = syswk->tray;
-    syswk->app->unkA552 = 1;
+    syswk->app->menuMsgPending = 1;
     Box2Main_PokeInfoPut(syswk, syswk->pos);
     syswk->app->getItem = Box2Main_GetPokeParam(syswk, syswk->pos, syswk->tray, PKM_PARAM_ITEM, NULL);
     Box2Seq_OpenItemMenu(syswk, (s16)syswk->app->getItem);
@@ -7406,10 +7465,10 @@ void Box2Seq_PutPartyLeft(Box2SysWork *syswk) {
 
 // Scrolls to the box picked in the list
 static int Box2Seq_ScrollToPickedBox(Box2SysWork *syswk, int seq) {
-    BOOL right = Box2Main_IsTrayScrollRight(syswk, syswk->tray, syswk->app->unkA55F);
+    BOOL right = Box2Main_IsTrayScrollRight(syswk, syswk->tray, syswk->app->pickedTray);
     Box2VFunc func;
 
-    syswk->tray = syswk->app->unkA55F;
+    syswk->tray = syswk->app->pickedTray;
     Box2Obj_LoadTrayPokeIcons(syswk, syswk->tray);
     Box2Main_WallPaperSet(syswk, Box2Main_GetWallPaperNumber(syswk, syswk->tray), right);
     if (right == TRUE) {
@@ -7452,18 +7511,18 @@ void Box2Seq_OpenItemMenu(Box2SysWork *syswk, s16 item) {
         } else {
             CursorMove_EnablePos(syswk->app->cursorMove, 9);
         }
-        Box2Bmp_OpenMenu(syswk, sMenu70dc, 3);
+        Box2Bmp_OpenMenu(syswk, sHeldItemMenu, 3);
     } else {
         if (syswk->pos < BOX2_PARTY_POS) {
             CursorMove_DisablePos(syswk->app->cursorMove, 36);
         } else {
             CursorMove_DisablePos(syswk->app->cursorMove, 9);
         }
-        Box2Bmp_OpenMenu(syswk, sMenu70d4, 2);
+        Box2Bmp_OpenMenu(syswk, sGiveItemMenu, 2);
     }
 }
 
-// Mode 0: whether the party Pokémon can be deposited: 0 if so, 1 for the last battler, 2 for mail
+// Deposit mode: whether the party Pokémon can be deposited: 0 if so, 1 for the last battler, 2 for mail
 static u32 GetDepositBlock(Box2SysWork *syswk) {
     // The party position, then the result
     u32 val = syswk->pos - BOX2_PARTY_POS;
@@ -7481,17 +7540,17 @@ static u32 GetDepositBlock(Box2SysWork *syswk) {
 
 // Toggles a mark
 static void ToggleMark(Box2SysWork *syswk, u32 mark) {
-    syswk->app->unkA554 ^= 1 << mark;
-    Box2Main_MarkingPutMain(syswk, syswk->app->unkA554);
+    syswk->app->markings ^= 1 << mark;
+    Box2Main_MarkingPutMain(syswk, syswk->app->markings);
 }
 
 // Picks a wallpaper of the theme's menu
 static int Box2Seq_PickWallpaper(Box2SysWork *syswk, u32 pos) {
-    if (syswk->app->unkA55C <= 4 ||
-        (syswk->app->unkA55C == 5 && BoxSaveAccessor_CheckFlags(syswk->param->boxes, 2) == FALSE)) {
-        syswk->app->wallpaperPos = pos + (syswk->app->unkA55C - 1) * 4 - 1;
+    if (syswk->app->wallpaperTheme <= 4 ||
+        (syswk->app->wallpaperTheme == 5 && BoxSaveAccessor_CheckFlags(syswk->param->boxes, 2) == FALSE)) {
+        syswk->app->wallpaperPos = pos + (syswk->app->wallpaperTheme - 1) * 4 - 1;
     } else {
-        syswk->app->wallpaperPos = pos + (syswk->app->unkA55C - 1) * 4;
+        syswk->app->wallpaperPos = pos + (syswk->app->wallpaperTheme - 1) * 4;
     }
     return Box2Seq_AnimFrameButton(syswk, pos, Box2Seq_Goto(syswk, 114));
 }
@@ -7499,17 +7558,17 @@ static int Box2Seq_PickWallpaper(Box2SysWork *syswk, u32 pos) {
 // Dims the actors behind the box's name entry
 static void DimActorsForNameInput(Box2SysWork *syswk) {
     switch (syswk->param->mode) {
-    case 0:
+    case BOX2_MODE_DEPOSIT:
         Box2Obj_SetIconsBlend(syswk, 2, 1);
         break;
-    case 1:
-    case 3:
+    case BOX2_MODE_WITHDRAW:
+    case BOX2_MODE_MOVE_ITEMS:
         Box2Obj_ShowScrollArrows(syswk->app, 0);
         Box2Obj_SetIconsBlend(syswk, 1, 1);
         break;
-    case 2:
-    case 4:
-    case 5:
+    case BOX2_MODE_MOVE_POKEMON:
+    case BOX2_MODE_BATTLE_BOX:
+    case BOX2_MODE_DREAM_WORLD:
         Box2Obj_ShowScrollArrows(syswk->app, 0);
         if (Box2Frame_IsPartyAtLeft(syswk->app->bgWinFrame) == TRUE) {
             Box2Obj_SetIconsBlend(syswk, 2, 1);
@@ -7523,19 +7582,19 @@ static void DimActorsForNameInput(Box2SysWork *syswk) {
 // Switches to the next way of moving Pokémon, by Select
 static int Box2Seq_NextMoveMode(Box2SysWork *syswk, int seq) {
     GFL_SndSEPlay(SEQ_SE_DECIDE1);
-    syswk->unk1C_4 = 0;
+    syswk->fromMenu = 0;
     if (syswk->moveMode == 2) {
         syswk->moveMode = 0;
     } else {
         syswk->moveMode++;
-        if (syswk->moveMode == 2 && syswk->param->mode == 3) {
+        if (syswk->moveMode == 2 && syswk->param->mode == BOX2_MODE_MOVE_ITEMS) {
             syswk->moveMode = 0;
         }
     }
     if (syswk->moveMode == 1 && Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == TRUE) {
-        syswk->unk1C_4 = 1;
+        syswk->fromMenu = 1;
     }
-    syswk->unk1C_6 = 0;
+    syswk->moveDone = 0;
     Box2Main_ShowCursor(syswk);
     return Box2Seq_Goto(syswk, seq);
 }
@@ -7543,11 +7602,11 @@ static int Box2Seq_NextMoveMode(Box2SysWork *syswk, int seq) {
 // Sets the way of moving Pokémon picked in the menu
 static int Box2Seq_SetMoveMode(Box2SysWork *syswk, int seq) {
     GFL_SndSEPlay(SEQ_SE_DECIDE1);
-    syswk->unk1C_4 = 0;
+    syswk->fromMenu = 0;
     if (syswk->moveMode == 1 && Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == TRUE) {
-        syswk->unk1C_4 = 1;
+        syswk->fromMenu = 1;
     }
-    syswk->unk1C_6 = 0;
+    syswk->moveDone = 0;
     return Box2Seq_Goto(syswk, seq);
 }
 
@@ -7555,7 +7614,7 @@ static int Box2Seq_SetMoveMode(Box2SysWork *syswk, int seq) {
 static void CancelRange(Box2SysWork *syswk) {
     Box2Obj_SetRangeAnm(syswk, 0);
     syswk->pos = BOX2_GET_NONE;
-    syswk->unk18 = 0;
+    syswk->pickState = BOX2_PICK_NONE;
     Box2Ui_SetButtonStates(syswk, CursorMove_GetPos(syswk->app->cursorMove));
 }
 

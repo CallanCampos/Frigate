@@ -9,11 +9,18 @@
 // wbt_battle.c): the field gimmick of the Pokémon World Tournament's stadium (zone 193), which script plugin 7 drives.
 // Scene 0 holds the stadium's models and scene 2 the portraits of the fighters
 
+// Whose names and portraits are shown: both Trainers', the player's alone or the opponent's alone
+enum {
+    WBT_STADIUM_NAMES_BOTH,
+    WBT_STADIUM_NAMES_PLAYER,
+    WBT_STADIUM_NAMES_OPPONENT,
+};
+
 // Overlay 36's gimmick table calls the first three: setup, end and update of the gimmick
 void WbtStadiumGimmick_Setup(Field *field);
 void WbtStadiumGimmick_End(Field *field);
 void WbtStadiumGimmick_Update(Field *field);
-// Writes the names on the name plates, mode 0 for both Trainers and 1 and 2 for one, and the files of the portraits
+// Writes the names on the name plates, by a WBT_STADIUM_NAMES_*, and the files of the portraits
 void WbtStadiumGimmick_SetNames(Field *field, u8 mode, StrBuf *name, StrBuf *playerName, u16 file, u16 playerFile);
 // Draws the portraits and starts the screens' animations
 void WbtStadiumGimmick_ShowPortraits(Field *field, u8 mode);

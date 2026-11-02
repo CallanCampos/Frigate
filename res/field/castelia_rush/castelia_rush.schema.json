@@ -1,0 +1,180 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The crowds of Castelia City's streets: res/field/castelia_rush/castelia_rush.json",
+    "description": "ARCID_CASTELIA_RUSH (a/1/8/3), which castelia_rush.c reads: the zones' crowds, the file of their zones (CASTELIA_RUSH_FILE_ZONES) and the passers-by's scripts (CASTELIA_RUSH_FILE_SCRIPTS). tools/data/castelia_rush_data.py packs it.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "crowds", "scripts" ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "This schema, for editors"
+        },
+        "crowds": {
+            "type": "array",
+            "description": "The zones' crowds in the order of their files, the first 0x32 bytes of a CasteliaRushConfig each, which CasteliaRushConfig_Load reads for the zone",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "zone",
+                    "intervals",
+                    "lane_count",
+                    "obj_code_count",
+                    "obj_codes",
+                    "msg_base",
+                    "msg_count",
+                    "step_frames",
+                    "lanes",
+                    "unkA",
+                    "unk19"
+                ],
+                "properties": {
+                    "zone": {
+                        "type": "string",
+                        "x-constant": "ZONE_",
+                        "description": "The zone, which the zones' file has in this crowd's place"
+                    },
+                    "intervals": {
+                        "type": "array",
+                        "minItems": 5,
+                        "maxItems": 5,
+                        "items": {
+                            "type": "integer",
+                            "minimum": -32768,
+                            "maximum": 32767
+                        },
+                        "description": "The frames between passers-by, and the base of the frames between balloons, by day period"
+                    },
+                    "lane_count": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "How many of the lanes have passers-by"
+                    },
+                    "obj_code_count": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "How many of the object codes the passers-by are"
+                    },
+                    "obj_codes": {
+                        "type": "array",
+                        "minItems": 4,
+                        "maxItems": 4,
+                        "items": {
+                            "type": [ "string", "integer" ],
+                            "x-constant": "OBJ_CODE_"
+                        },
+                        "description": "The passers-by's object codes, the first obj_code_count of them"
+                    },
+                    "msg_base": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "The balloons show messages msg_base to msg_base + msg_count - 1 of SCRIPT_TEXT_GLOBAL_10350"
+                    },
+                    "msg_count": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "How many messages"
+                    },
+                    "step_frames": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "The frames that a passer-by takes for a step"
+                    },
+                    "lanes": {
+                        "type": "array",
+                        "minItems": 2,
+                        "maxItems": 2,
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [ "z_min", "z_max", "x_min", "x_max", "dir", "steps" ],
+                            "properties": {
+                                "z_min": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 65535,
+                                    "description": "The lane's first tile row"
+                                },
+                                "z_max": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 65535,
+                                    "description": "Its last"
+                                },
+                                "x_min": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 65535,
+                                    "description": "Its first tile column"
+                                },
+                                "x_max": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 65535,
+                                    "description": "Its last"
+                                },
+                                "dir": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 3,
+                                    "description": "The direction the passers-by walk, the field's 0 to 3; for 0 and 1 they start at a random column of the lane, beyond z_min, and for 2 and 3 at a random row, beyond x_min (CasteliaRush_SpawnPasserby)"
+                                },
+                                "steps": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 65535,
+                                    "description": "How many steps they walk"
+                                }
+                            }
+                        },
+                        "description": "LANE_COUNT lanes (CasteliaRushLane): the passers-by start on one edge and walk in the lane's direction"
+                    },
+                    "unkA": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "CasteliaRushConfig.unkA, which the code doesn't read"
+                    },
+                    "unk19": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "CasteliaRushConfig.unk19, which the code doesn't read"
+                    }
+                }
+            }
+        },
+        "scripts": {
+            "type": "array",
+            "description": "CasteliaRushScripts: the scripts that a passer-by of an object code picks one of at random",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "obj_code", "scripts" ],
+                "properties": {
+                    "obj_code": {
+                        "type": [ "string", "integer" ],
+                        "x-constant": "OBJ_CODE_"
+                    },
+                    "scripts": {
+                        "type": "array",
+                        "minItems": 6,
+                        "maxItems": 6,
+                        "items": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 65535
+                        },
+                        "description": "Field script IDs"
+                    }
+                }
+            }
+        }
+    }
+}

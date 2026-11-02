@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/field_weather.h"
 #include "field/weather_rain.h"
@@ -200,7 +201,7 @@ static GustParticleFunc sGustParticleInit[3] = { GustSlant_Init, GustStreak_Init
 static GustParticleFunc sGustParticleMove[3] = { GustSlant_Move, GustStreak_Move, GustDriven_Move };
 
 WeatherData THUNDERSTORM_WEATHER = {
-    { 0x37, 1, 1, 0x11, 0xe, 0x10, 0xf, 0x29, 0x202, 3, 0x102 },
+    { ARCID_WEATHER, 1, 1, 0x11, 0xe, 0x10, 0xf, 0x29, 0x202, 3, 0x102 },
     sizeof(ThunderWork),
     {
         Thunder_Init,
@@ -215,7 +216,7 @@ WeatherData THUNDERSTORM_WEATHER = {
 };
 
 WeatherData GUSTY_RAIN_WEATHER = {
-    { 0x37, 1, 2, 6, 7, 5, 4, 0x28, 0x202, 3, 0x102, 0, 0, 0x27, 0x202, 3, 0x102 },
+    { ARCID_WEATHER, 1, 2, 6, 7, 5, 4, 0x28, 0x202, 3, 0x102, 0, 0, 0x27, 0x202, 3, 0x102 },
     sizeof(GustWork),
     {
         GustyRain_Init,
@@ -230,7 +231,7 @@ WeatherData GUSTY_RAIN_WEATHER = {
 };
 
 WeatherData RAIN_WEATHER = {
-    { 0x37, 1, 0, 0xd, 0xe, 0xc, 0xb },
+    { ARCID_WEATHER, 1, 0, 0xd, 0xe, 0xc, 0xb },
     sizeof(RainWork),
     {
         Rain_Init,

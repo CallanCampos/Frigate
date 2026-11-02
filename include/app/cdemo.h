@@ -8,6 +8,59 @@
 // The demos the game plays before the title screen, the Game Freak logo and the opening (ov264, cdemo_main.c). The
 // names are ours
 
+// The states of CDemo_Main, indices into its table of state functions; a state function returns the next one
+enum {
+    CDEMO_STATE_INIT,
+    CDEMO_STATE_EXIT,
+    CDEMO_STATE_WAIT_FADE,
+    CDEMO_STATE_TRANSITION,
+    CDEMO_STATE_MOVIE,
+    CDEMO_STATE_SCRIPT,
+    CDEMO_STATE_END,
+};
+
+// A demo script's opcodes, indices into the table of command functions. CDEMO_CMD_END has no function: it ends the
+// script
+enum {
+    CDEMO_CMD_WAIT_FRAMES,
+    CDEMO_CMD_FADE_IN_BLACK,
+    CDEMO_CMD_FADE_OUT_BLACK,
+    CDEMO_CMD_FADE_IN_WHITE,
+    CDEMO_CMD_FADE_OUT_WHITE,
+    CDEMO_CMD_WAIT_FADE,
+    CDEMO_CMD_LOAD_BACKGROUND,
+    CDEMO_CMD_ENABLE_BACKGROUND,
+    CDEMO_CMD_SET_BACKGROUND_PRIORITY,
+    CDEMO_CMD_SET_BACKGROUND_SETTINGS,
+    CDEMO_CMD_SET_TRANSITION_SETTINGS,
+    CDEMO_CMD_RESET_BACKGROUND_SETTINGS,
+    CDEMO_CMD_UNUSED12,
+    CDEMO_CMD_RESET_SOUND,
+    CDEMO_CMD_PLAY_BGM,
+    CDEMO_CMD_UNUSED15,
+    CDEMO_CMD_UNUSED16,
+    CDEMO_CMD_UNUSED17,
+    CDEMO_CMD_START_MOVIE,
+    CDEMO_CMD_NOP19,
+    CDEMO_CMD_END,
+};
+
+// What a command function returns: stay on this command, go on to the next in the same frame, or go to the next and
+// return to CDemo_Main
+enum {
+    CDEMO_CMD_RESULT_WAIT,
+    CDEMO_CMD_RESULT_NEXT,
+    CDEMO_CMD_RESULT_YIELD,
+};
+
+// The steps of the movie, in CDemoWork's frameState
+enum {
+    CDEMO_MOVIE_LOAD_FIRST,
+    CDEMO_MOVIE_PLAY,
+    CDEMO_MOVIE_SHOW_LAST,
+    CDEMO_MOVIE_DONE,
+};
+
 struct CDemoParam {
     // Which demo plays
     u16 demo;

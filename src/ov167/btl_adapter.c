@@ -11,6 +11,14 @@ typedef struct {
     u8 data[0xbbc];
 } BtlAdapterCmd;
 
+// Where an adapter's last command is in its exchange: idle, to be sent, sent and waiting for the reply, replied
+enum {
+    BTL_ADAPTER_STATE_IDLE,
+    BTL_ADAPTER_STATE_SEND,
+    BTL_ADAPTER_STATE_WAIT_REPLY = 3,
+    BTL_ADAPTER_STATE_REPLIED,
+};
+
 struct BtlAdapter {
     NetHandle *netHandle;
     // The client's reply to the last command, and its size
@@ -21,7 +29,7 @@ struct BtlAdapter {
     // The commands go over the link
     u8 isNet : 4;
     u8 clientId;
-    // Where the last command is in its exchange: 0 idle, 1 to send, 3 sent and waiting for the reply, 4 replied
+    // A BTL_ADAPTER_STATE_*
     u8 state;
     u8 cmd;
     BtlAdapterCmd sendCmd;
@@ -47,15 +55,15 @@ void BtlAdapter_InitSystem(u8 commMode) {
 void BtlAdapter_QuitSystem(void) {
 }
 
-BtlAdapter *BtlAdapter_Create(NetHandle *netHandle, u8 clientId, BOOL flag, HeapID heapId) {
+BtlAdapter *BtlAdapter_Create(NetHandle *netHandle, u8 clientId, BOOL isNet, HeapID heapId) {
     BtlAdapter *adapter = NULL;
 
     if (sAdapters[clientId] == NULL) {
         adapter = GFL_HeapAllocate(heapId, sizeof(BtlAdapter), TRUE, "btl_adapter.c", 0x7e);
         adapter->netHandle = netHandle;
         adapter->clientId = clientId;
-        adapter->isNet = flag;
-        adapter->state = 0;
+        adapter->isNet = isNet;
+        adapter->state = BTL_ADAPTER_STATE_IDLE;
         adapter->cmd = 0;
         adapter->returned = 0;
     }
@@ -70,7 +78,7 @@ BtlAdapter *BtlAdapter_Create(NetHandle *netHandle, u8 clientId, BOOL flag, Heap
 }
 
 void BtlAdapter_ResetState(BtlAdapter *adapter) {
-    adapter->state = 0;
+    adapter->state = BTL_ADAPTER_STATE_IDLE;
     adapter->cmd = 0;
     adapter->returned = 0;
 }
@@ -89,7 +97,7 @@ void BtlAdapter_Idle(void) {
 }
 
 void BtlAdapter_SetCmd(BtlAdapter *adapter, u32 cmd, const void *data, u32 size) {
-    adapter->state = 1;
+    adapter->state = BTL_ADAPTER_STATE_SEND;
     adapter->cmd = cmd;
     adapter->sendCmd.cmd = cmd;
     adapter->sendCmd.size = size;
@@ -101,19 +109,19 @@ void BtlAdapter_SetCmd(BtlAdapter *adapter, u32 cmd, const void *data, u32 size)
 
 BOOL BtlAdapter_WaitCmd(BtlAdapter *adapter) {
     switch (adapter->state) {
-    case 1:
+    case BTL_ADAPTER_STATE_SEND:
         if (!SendCmd(adapter)) {
             break;
         }
-        adapter->state = 3;
+        adapter->state = BTL_ADAPTER_STATE_WAIT_REPLY;
         // fallthrough
-    case 3:
+    case BTL_ADAPTER_STATE_WAIT_REPLY:
         if (!IsReplyReceived(adapter)) {
             break;
         }
-        adapter->state = 4;
+        adapter->state = BTL_ADAPTER_STATE_REPLIED;
         // fallthrough
-    case 4:
+    case BTL_ADAPTER_STATE_REPLIED:
         return TRUE;
     }
     return FALSE;
@@ -127,7 +135,7 @@ void *BtlAdapter_GetReturnData(BtlAdapter *adapter, u32 *size) {
 }
 
 void BtlAdapter_SetIdle(BtlAdapter *adapter) {
-    adapter->state = 0;
+    adapter->state = BTL_ADAPTER_STATE_IDLE;
     if (adapter->isNet) {
         BtlNet_ResetReplies();
     }

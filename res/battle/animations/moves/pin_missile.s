@@ -1,0 +1,42 @@
+// MOVE_PIN_MISSILE's animation: member 42 of a/0/6/5
+
+#include "asm/btlv_effvm.inc"
+
+    ScriptHeader 1
+    ScriptVariant PinMissile
+
+PinMissile:
+    SetYield FALSE
+    PlaySE SEQ_SE_W042_01, 1, EFFVM_ATTACKER, 0, 0, 115, 0, 0, 0
+    PanSE 1, 0, EFFVM_ATTACKER, EFFVM_DEFENDER, 5, 25, 0, 0
+    SetYield TRUE
+    SetYield FALSE
+    PlaySE SEQ_SE_W042_01, 2, EFFVM_ATTACKER, 20, 0, 115, 0, 0, 0
+    PanSE 2, 0, EFFVM_ATTACKER, EFFVM_DEFENDER, 25, 25, 0, 0
+    SetYield TRUE
+    SetYield FALSE
+    PlaySE SEQ_SE_W042_01, 1, EFFVM_ATTACKER, 40, 0, 115, 0, 0, 0
+    PanSE 1, 0, EFFVM_ATTACKER, EFFVM_DEFENDER, 45, 25, 0, 0
+    SetYield TRUE
+    SetYield FALSE
+    PlaySE SEQ_SE_W121_01, 2, EFFVM_DEFENDER, 50, 0, 115, 0, 0, 0
+    SetYield TRUE
+    ParticleLoad 207
+    EmitterAdd 207, 0, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 207, 1, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterMove 207, 2, 2, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x14000, 0x1800, 0x1000, 0x1000, 0
+    WaitFrames 12
+    McssMoveXY EFFVM_DEFENDER, 2, 0x4cd, 0, 1, 2, 3
+    EmitterAdd 207, 1, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 207, 0, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterMove 207, 2, 2, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x14000, 0x1800, 0x1000, 0x1000, 0
+    WaitFrames 12
+    McssMoveXY EFFVM_DEFENDER, 2, 0x4cd, 0, 1, 2, 3
+    EmitterMove 207, 2, 2, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x14000, 0x1800, 0x1000, 0x1000, 0
+    EmitterAdd 207, 0, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 207, 1, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 20
+    McssMoveXY EFFVM_DEFENDER, 2, 0x4cd, 0, 1, 2, 3
+    Wait EFFVM_WAIT_ALL
+    Wait EFFVM_WAIT_SE
+    End

@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/net_devirc.h"
 #include "gfl/net.h"
 #include "gfl/net_devwifi.h"
@@ -19,7 +20,7 @@
 static u8 sSkipFrame;
 
 u32 getWifiIconNarcIdxNum(void) {
-    return 0;
+    return ARCID_WM_ICON;
 }
 
 void WmIconFiles_Init(WmIconFiles *files) {

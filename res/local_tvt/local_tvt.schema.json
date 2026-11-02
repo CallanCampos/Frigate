@@ -1,0 +1,64 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The Xtransceiver's calls: res/local_tvt/<table>.json",
+    "description": "calls.json (ARCID_LOCAL_TVT_CALL_DATA, a/2/4/0) or scripts.json (ARCID_LOCAL_TVT_SCRIPT, a/2/3/4), the calls that local_tvt_calldata.c and local_tvt_scriptmode.c play. tools/data/local_tvt_data.py packs them.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "calls": {
+            "type": "array", "minItems": 142, "maxItems": 142,
+            "description": "CALL_DATA_COUNT LocalTvtCallEntry: LocalTvtCallData_GetEntry takes the first whose person and call count are the person's and the count of calls the save data has made with them",
+            "items": {
+                "type": "object", "additionalProperties": false,
+                "required": [ "person", "call_count", "background", "zone", "listed", "greeting_message", "chat_message", "bye_message", "extra_message", "unk12" ],
+                "properties": {
+                    "person": { "enum": [ "LOCAL_TVT_CALL_DOCTOR", "LOCAL_TVT_CALL_RIVAL", "LOCAL_TVT_CALL_CHELEN", "LOCAL_TVT_CALL_SUPPORT", "LOCAL_TVT_CALL_MOTHER", "LOCAL_TVT_CALL_SECRET" ], "description": "Who is called, of local_tvt_common.h" },
+                    "call_count": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "The count of calls made with them before" },
+                    "background": { "enum": [ "zone", "background_0", "background_1" ], "description": "Behind their face: their zone's, by its battle background (LocalTvtCallData_GetZoneBackground), or a fixed one (CALL_BACKGROUND_*)" },
+                    "zone": { "type": "string", "x-constant": "ZONE_", "description": "Where they are, whose weather picks the object of their face (LocalTvtCallData_GetZoneObject)" },
+                    "listed": { "type": "boolean", "description": "LocalTvtCallData_IsListed" },
+                    "greeting_message": { "type": "string", "description": "What they say first, a message of res/text/system/local_tvt_talk.txt by ID" },
+                    "chat_message": { "type": "string", "description": "Then, of the same file" },
+                    "bye_message": { "type": "string", "description": "At the end, of the same file" },
+                    "extra_message": { "type": [ "string", "null" ], "description": "Another message, which some persons say, or null" },
+                    "unk12": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "LocalTvtCallEntry.unk12, which the code doesn't read" }
+                }
+            }
+        },
+        "scripts": {
+            "type": "array",
+            "description": "The story's calls: script n, from 1, is file n - 1, whose messages are those of TEXT_BANK_LOCAL_TVT_TALK + n, res/text/system/local_tvt_script_<n>.txt",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "persons", "zones", "commands" ],
+                "properties": {
+                    "persons": {
+                        "type": "array", "minItems": 4, "maxItems": 4,
+                        "description": "The person of each of LOCAL_TVT_FACES faces, null for none (LOCAL_TVT_PERSON_NONE); with the last two none the call has two faces. 6 and 9 are the player's face by gender, and 8 takes its name from the secret calls",
+                        "items": { "type": [ "integer", "null" ], "minimum": 0, "maximum": 254 }
+                    },
+                    "zones": {
+                        "type": "array", "minItems": 4, "maxItems": 4,
+                        "description": "Where each face is, which picks its background and object",
+                        "items": { "type": "string", "x-constant": "ZONE_" }
+                    },
+                    "commands": {
+                        "type": "array",
+                        "description": "The commands in order (sLocalTvtScriptCommands); the packer adds the SCRIPT_COMMAND_END after them",
+                        "items": {
+                            "type": "object", "additionalProperties": false, "required": [ "command", "face" ],
+                            "properties": {
+                                "command": { "enum": [ "talk", "wait", "se", "wait_se" ], "description": "SCRIPT_COMMAND_TALK, _WAIT, _SE or _WAIT_SE" },
+                                "face": { "type": "integer", "minimum": 0, "maximum": 3, "description": "The face that talks" },
+                                "message": { "type": "string", "description": "For talk: the message the face says, of the script's text file by ID" },
+                                "frames": { "type": "integer", "minimum": 0, "maximum": 255, "description": "For wait: how many frames" },
+                                "se": { "type": "integer", "minimum": 0, "maximum": 255, "description": "For se: the sound effect, which the code reads as a u8" },
+                                "param": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "For wait_se: its param, which the code doesn't read" }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

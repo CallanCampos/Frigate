@@ -1,0 +1,11 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "M",
+    "shapes": [ 8 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_DESERT_RESORT": [ "grass" ]
+        }
+    }
+}

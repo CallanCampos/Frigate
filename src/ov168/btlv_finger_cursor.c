@@ -21,7 +21,7 @@ struct BtlvFingerCursor {
     u32 chars;       // 0x0c
     u32 palette;     // 0x10
     u32 cellAnims;   // 0x14
-    s32 seq;         // 0x18  0 waits, 1 taps, 2 hides, 3 done
+    s32 seq;         // 0x18  FINGER_SEQ_*
     u32 wait;        // 0x1c  frames before the tap
     s32 tapFrame;    // 0x20  the frame of the tap animation that touches the screen
     u32 hideWait;    // 0x24  frames the finger stays on the screen after touching it
@@ -29,10 +29,18 @@ struct BtlvFingerCursor {
     u16 heapId;      // 0x2c
 };
 
+// The steps of BtlvFingerCursor_AnimCallback: wait, tap, hide, done
+enum {
+    FINGER_SEQ_WAIT,
+    FINGER_SEQ_TAP,
+    FINGER_SEQ_HIDE,
+    FINGER_SEQ_DONE,
+};
+
 static void BtlvFingerCursor_AnimCallback(uptr param, fx32 frame);
 static void BtlvFingerCursor_Task(TCB *tcb, void *data);
 
-static const ClActorSetupEx data_ov168_021f3ef4 = { { 0, 0, 0, 0, 0 }, { 0, 0 }, FX32_ONE, FX32_ONE, 0, 2 };
+static const ClActorSetupEx FINGER_ACTOR_SETUP = { { 0, 0, 0, 0, 0 }, { 0, 0 }, FX32_ONE, FX32_ONE, 0, 2 };
 
 BtlvFingerCursor *BtlvFingerCursor_Create(PaletteFade *fade, u32 paletteRow, HeapID heapId) {
     BtlvFingerCursor *cursor = GFL_HeapAllocate(heapId, sizeof(BtlvFingerCursor), TRUE, "btlv_finger_cursor.c", 0x52);
@@ -60,7 +68,7 @@ void BtlvFingerCursor_Delete(BtlvFingerCursor *cursor) {
 }
 
 BOOL BtlvFingerCursor_Start(BtlvFingerCursor *cursor, s32 x, s32 y, u32 wait, s32 tapFrame, u32 hideWait) {
-    ClActorSetupEx setup = data_ov168_021f3ef4;
+    ClActorSetupEx setup = FINGER_ACTOR_SETUP;
     ClActorCallback callback;
 
     if (cursor->touched) {
@@ -88,7 +96,7 @@ BOOL BtlvFingerCursor_Start(BtlvFingerCursor *cursor, s32 x, s32 y, u32 wait, s3
     } else {
         cursor->hideWait = 1;
     }
-    cursor->seq = 0;
+    cursor->seq = FINGER_SEQ_WAIT;
     cursor->tapFrame = tapFrame;
     cursor->touched = FALSE;
     callback.param = (uptr)cursor;
@@ -115,7 +123,7 @@ static void BtlvFingerCursor_AnimCallback(uptr param, fx32 frame) {
     BtlvFingerCursor *cursor = (BtlvFingerCursor *)param;
 
     switch (cursor->seq) {
-    case 0:
+    case FINGER_SEQ_WAIT:
         if (--cursor->wait == 0) {
             ClActorCallback callback;
 
@@ -128,7 +136,7 @@ static void BtlvFingerCursor_AnimCallback(uptr param, fx32 frame) {
             ClActor_SetAnimCallback(cursor->actor, &callback);
         }
         break;
-    case 1: {
+    case FINGER_SEQ_TAP: {
         ClActorCallback callback;
 
         cursor->touched = TRUE;
@@ -140,12 +148,12 @@ static void BtlvFingerCursor_AnimCallback(uptr param, fx32 frame) {
         ClActor_SetAnimCallback(cursor->actor, &callback);
         break;
     }
-    case 2:
+    case FINGER_SEQ_HIDE:
         ClActor_SetVisible(cursor->actor, FALSE);
         cursor->touched = FALSE;
         cursor->seq++;
         break;
-    case 3:
+    case FINGER_SEQ_DONE:
         break;
     }
 }

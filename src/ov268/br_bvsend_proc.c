@@ -92,7 +92,8 @@ static BOOL BrBvSend_ProcMain(GameProc *proc, u32 *state, void *param, void *wor
     BrBvSendWork *p_wk = work;
     int i;
 
-    if (!GameData_CheckEventsPaused(p_wk->p_param->gameData) && BrNet_CheckError(p_wk->p_param->net) == 2) {
+    if (!GameData_CheckEventsPaused(p_wk->p_param->gameData) &&
+        BrNet_CheckError(p_wk->p_param->net) == BR_NET_ERROR_FAILED) {
         BrProcSys_Abort(p_wk->p_param->procSys);
         return TRUE;
     }

@@ -1,0 +1,33 @@
+{
+    "$schema": "../area.schema.json",
+    "areas": [
+        {
+            "shape": "circle",
+            "angle_start": 41880,
+            "angle_end": 19800,
+            "radius_start": 1999885,
+            "radius_end": 3145728,
+            "center": {
+                "x": 3145728,
+                "y": 12288,
+                "z": 3112960
+            },
+            "pitch": 2048,
+            "distance": 3723264,
+            "target": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "eye": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "unk3C": 0,
+            "stay": "FieldCameraAreaCalc_CIRCLE_AimPlayerCentre",
+            "enter": "FieldCameraAreaCalc_CIRCLE_AimPlayerCentre",
+            "exit": "FieldCameraAreaCalc_CIRCLE_AimPlayerCentre"
+        }
+    ]
+}

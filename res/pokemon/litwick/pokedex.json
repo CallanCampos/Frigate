@@ -1,0 +1,12 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "L",
+    "shapes": [ 8 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_CELESTIAL_TOWER_2": [ "grass" ],
+            "ZONE_STRANGE_HOUSE": [ "grass" ]
+        }
+    }
+}

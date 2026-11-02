@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -29,9 +30,6 @@
 
 #define GIMMICK_ID 0
 #define GIMMICK_STATE_ID 2
-
-// The archive of the gym's models
-#define ARC_GYM_ELEC 108
 
 #define OBJECT_COUNT 22
 // The object that is animated in time with the music, at 30 frames a second
@@ -309,15 +307,15 @@ static const G3DSceneActorSetup sActors[OBJECT_COUNT] = {
 };
 
 static const G3DSceneResourceSetup sResources[] = {
-    { ARC_GYM_ELEC, 7, 0 },  { ARC_GYM_ELEC, 8, 0 },  { ARC_GYM_ELEC, 9, 0 },  { ARC_GYM_ELEC, 10, 0 },
-    { ARC_GYM_ELEC, 22, 0 }, { ARC_GYM_ELEC, 23, 0 }, { ARC_GYM_ELEC, 24, 0 }, { ARC_GYM_ELEC, 25, 0 },
-    { ARC_GYM_ELEC, 26, 0 }, { ARC_GYM_ELEC, 27, 0 }, { ARC_GYM_ELEC, 18, 0 }, { ARC_GYM_ELEC, 17, 0 },
-    { ARC_GYM_ELEC, 19, 0 }, { ARC_GYM_ELEC, 12, 0 }, { ARC_GYM_ELEC, 11, 0 }, { ARC_GYM_ELEC, 13, 0 },
-    { ARC_GYM_ELEC, 15, 0 }, { ARC_GYM_ELEC, 14, 0 }, { ARC_GYM_ELEC, 16, 0 }, { ARC_GYM_ELEC, 6, 0 },
-    { ARC_GYM_ELEC, 5, 0 },  { ARC_GYM_ELEC, 28, 0 }, { ARC_GYM_ELEC, 29, 0 }, { ARC_GYM_ELEC, 30, 0 },
-    { ARC_GYM_ELEC, 31, 0 }, { ARC_GYM_ELEC, 32, 0 }, { ARC_GYM_ELEC, 33, 0 }, { ARC_GYM_ELEC, 3, 0 },
-    { ARC_GYM_ELEC, 4, 0 },  { ARC_GYM_ELEC, 0, 0 },  { ARC_GYM_ELEC, 1, 0 },  { ARC_GYM_ELEC, 2, 0 },
-    { ARC_GYM_ELEC, 20, 0 }, { ARC_GYM_ELEC, 21, 0 },
+    { ARCID_GYM_ELEC, 7, 0 },  { ARCID_GYM_ELEC, 8, 0 },  { ARCID_GYM_ELEC, 9, 0 },  { ARCID_GYM_ELEC, 10, 0 },
+    { ARCID_GYM_ELEC, 22, 0 }, { ARCID_GYM_ELEC, 23, 0 }, { ARCID_GYM_ELEC, 24, 0 }, { ARCID_GYM_ELEC, 25, 0 },
+    { ARCID_GYM_ELEC, 26, 0 }, { ARCID_GYM_ELEC, 27, 0 }, { ARCID_GYM_ELEC, 18, 0 }, { ARCID_GYM_ELEC, 17, 0 },
+    { ARCID_GYM_ELEC, 19, 0 }, { ARCID_GYM_ELEC, 12, 0 }, { ARCID_GYM_ELEC, 11, 0 }, { ARCID_GYM_ELEC, 13, 0 },
+    { ARCID_GYM_ELEC, 15, 0 }, { ARCID_GYM_ELEC, 14, 0 }, { ARCID_GYM_ELEC, 16, 0 }, { ARCID_GYM_ELEC, 6, 0 },
+    { ARCID_GYM_ELEC, 5, 0 },  { ARCID_GYM_ELEC, 28, 0 }, { ARCID_GYM_ELEC, 29, 0 }, { ARCID_GYM_ELEC, 30, 0 },
+    { ARCID_GYM_ELEC, 31, 0 }, { ARCID_GYM_ELEC, 32, 0 }, { ARCID_GYM_ELEC, 33, 0 }, { ARCID_GYM_ELEC, 3, 0 },
+    { ARCID_GYM_ELEC, 4, 0 },  { ARCID_GYM_ELEC, 0, 0 },  { ARCID_GYM_ELEC, 1, 0 },  { ARCID_GYM_ELEC, 2, 0 },
+    { ARCID_GYM_ELEC, 20, 0 }, { ARCID_GYM_ELEC, 21, 0 },
 };
 
 static const G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };

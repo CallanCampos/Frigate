@@ -18,8 +18,9 @@ struct FishingEventWork {
     s16 gridZ;
     u16 unk26;
     u32 playerExState;
-    FieldEffectTask *effect2C;
-    FieldEffectTask *effect30;
+    // The emotion bubble of a bite, and the line in the water
+    FieldEffectTask *bubble;
+    FieldEffectTask *line;
     VecFx32 playerPos;
     VecFx32 fishingPos;
     u8 unk4C[12];
@@ -35,11 +36,18 @@ struct FishingEventWork {
 GameEvent *EventFieldFishing_Create(Field *field, GameSystem *gsys);
 GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, void *data);
 
+// What Fishing_WaitBite returns: still waiting, A pressed, or the time up
+enum {
+    FISHING_WAIT_NONE,
+    FISHING_WAIT_PRESSED,
+    FISHING_WAIT_TIMEOUT,
+};
+
 u32 Fishing_StepCounter(FishingEventWork *work, u32 value);
 u32 Fishing_WaitBite(FishingEventWork *work, u32 value);
-void func_ov033_021795e8(FishingEventWork *work);
-void func_ov033_02179614(FishingEventWork *work);
-void func_ov033_02179628(FishingEventWork *work);
-void func_ov033_02179650(FishingEventWork *work);
+void Fishing_ShowBite(FishingEventWork *work);
+void Fishing_DeleteBubble(FishingEventWork *work);
+void Fishing_StartLine(FishingEventWork *work);
+void Fishing_DeleteLine(FishingEventWork *work);
 
 #endif // POKEBW2_FIELD_EVENT_FISHING_H

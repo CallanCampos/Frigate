@@ -1,0 +1,23 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "B",
+    "shapes": [ 4 ],
+    "area": {
+        "all_year": false,
+        "seasons": {
+            "spring": {
+                "ZONE_TWIST_MOUNTAIN": [ "grass" ]
+            },
+            "summer": {
+                "ZONE_TWIST_MOUNTAIN": [ "grass" ]
+            },
+            "autumn": {
+                "ZONE_TWIST_MOUNTAIN": [ "grass" ]
+            },
+            "winter": {
+                "ZONE_TWIST_MOUNTAIN": [ "grass" ],
+                "ZONE_DRAGONSPIRAL_TOWER": [ "grass", "dark_grass" ]
+            }
+        }
+    }
+}

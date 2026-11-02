@@ -1,0 +1,23 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Geonet's countries: res/geonet/countries.json",
+    "description": "Member 18 of ARCID_GEONET_PLACE (a/0/5/2, NARC_GEONET_PLACE_COUNTRIES in geonet.c): where each country is on the globe, a GeonetCountryPlace by the country's number, which Geonet_LoadPlaces reads; the first isn't a place. tools/data/geonet_place_data.py packs it.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "countries" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "countries": {
+            "type": "array",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "name", "state", "x", "y" ],
+                "properties": {
+                    "name": { "type": [ "string", "null" ], "description": "The country's name, its message of the countries' text bank (sSubdividedCountries[0]'s in country_region.c, res/text/system/event_mapchange_load_country_to_strbuf.txt) by ID, in the same order, or null past its last; the packer checks it and doesn't pack it" },
+                    "state": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "GeonetCountryPlace.state: Geonet_LoadPlaces leaves a country of 2 out, as its regions stand for it" },
+                    "x": { "type": "integer", "minimum": -32768, "maximum": 32767, "description": "The globe's turn about its X axis that brings the country to the front (Geonet_AddPlace), in 65536ths of a turn" },
+                    "y": { "type": "integer", "minimum": -32768, "maximum": 32767, "description": "The globe's turn about its Y axis, in 65536ths of a turn" }
+                }
+            }
+        }
+    }
+}

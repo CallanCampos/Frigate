@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_camera.h"
 #include "field/field_exp_obj.h"
@@ -215,7 +216,7 @@ void FieldLensFlare_Load(FieldExpObjSystem *expObjSys, FieldLensFlareData *data,
     for (index = 0; index < 5; index++) {
         resourceId = FieldLensFlareData_GetResDatID(data, effectId, index);
         if (resourceId != LENS_FLARE_RESOURCE_NONE) {
-            resources[resourceCount].arcId = 0xe8;
+            resources[resourceCount].arcId = ARCID_FIELD_GOOUT_EFFECT;
             resources[resourceCount].fileId = resourceId;
             resources[resourceCount].type = G3D_SCENE_RES_ARCSYS;
             resourceIndices[resourceCount] = index;

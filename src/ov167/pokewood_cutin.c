@@ -26,6 +26,18 @@
 #define CUTIN_CENTER_X 128
 #define CUTIN_CENTER_Y 96
 
+// The directions of a move command's script argument, by their offsets on the screen
+enum {
+    CUTIN_DIR_DOWN,
+    CUTIN_DIR_UP,
+    CUTIN_DIR_LEFT,
+    CUTIN_DIR_RIGHT,
+    CUTIN_DIR_UP_LEFT,
+    CUTIN_DIR_UP_RIGHT,
+    CUTIN_DIR_DOWN_LEFT,
+    CUTIN_DIR_DOWN_RIGHT,
+};
+
 // A loaded cut-in script
 typedef struct {
     u16 *data;
@@ -525,7 +537,7 @@ static BOOL Cutin_CmdPrintMessage(PokewoodCutin *cutin, u16 *seq, const u16 *arg
         } else {
             msgId = scene->messages[args[1]][args[0]];
         }
-        Btlv_StringParam_Setup(&cutin->strParam, 8, msgId);
+        Btlv_StringParam_Setup(&cutin->strParam, BTLV_STR_MOVIE_SCRIPT, msgId);
         BtlvCore_StartMsg(cutin->viewCore, &cutin->strParam);
         (*seq)++;
         break;
@@ -627,31 +639,31 @@ static void Cutin_GetCenterMove(u16 dir, ClActor *actor, CutinPoint *start, Cuti
 
     ClActor_GetSurfacePos(actor, &pos, 0);
     switch (dir) {
-    case 0:
+    case CUTIN_DIR_DOWN:
         offset.y = 256;
         break;
-    case 1:
+    case CUTIN_DIR_UP:
         offset.y = -256;
         break;
-    case 2:
+    case CUTIN_DIR_LEFT:
         offset.x = -256;
         break;
-    case 3:
+    case CUTIN_DIR_RIGHT:
         offset.x = 256;
         break;
-    case 4:
+    case CUTIN_DIR_UP_LEFT:
         offset.x = -256;
         offset.y = -256;
         break;
-    case 5:
+    case CUTIN_DIR_UP_RIGHT:
         offset.x = 256;
         offset.y = -256;
         break;
-    case 6:
+    case CUTIN_DIR_DOWN_LEFT:
         offset.x = -256;
         offset.y = 256;
         break;
-    case 7:
+    case CUTIN_DIR_DOWN_RIGHT:
         offset.x = 256;
         offset.y = 256;
         break;
@@ -683,31 +695,31 @@ static void Cutin_GetDistMove(u16 dir, u16 dist, ClActor *actor, CutinPoint *sta
 
     ClActor_GetSurfacePos(actor, &pos, 0);
     switch (dir) {
-    case 0:
+    case CUTIN_DIR_DOWN:
         offset.y = dist;
         break;
-    case 1:
+    case CUTIN_DIR_UP:
         offset.y = -dist;
         break;
-    case 2:
+    case CUTIN_DIR_LEFT:
         offset.x = -dist;
         break;
-    case 3:
+    case CUTIN_DIR_RIGHT:
         offset.x = dist;
         break;
-    case 4:
+    case CUTIN_DIR_UP_LEFT:
         offset.x = -diagonal;
         offset.y = -diagonal;
         break;
-    case 5:
+    case CUTIN_DIR_UP_RIGHT:
         offset.x = diagonal;
         offset.y = -diagonal;
         break;
-    case 6:
+    case CUTIN_DIR_DOWN_LEFT:
         offset.x = -diagonal;
         offset.y = diagonal;
         break;
-    case 7:
+    case CUTIN_DIR_DOWN_RIGHT:
         offset.x = diagonal;
         offset.y = diagonal;
         break;

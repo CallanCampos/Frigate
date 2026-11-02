@@ -1,0 +1,101 @@
+{
+    "$schema": "../program.schema.json",
+    "base_program": 3,
+    "points": [ 20, 80, 40, 40 ],
+    "bonus": 20,
+    "prop_list": 1,
+    "unk07": [ 170, 0, 0, 1, 1 ],
+    "performers": [
+        {
+            "species": "SPECIES_PIDOVE",
+            "form": 1,
+            "obj_code": "OBJ_CODE_PRESCHOOLER_F",
+            "name": "BtlMain9_Text_Linda",
+            "personality_byte_2": 1,
+            "unk06": 0,
+            "min_shots": 0,
+            "props": [
+                [ 5, 1 ],
+                [ 16, 0 ],
+                [ 62, 2 ]
+            ]
+        },
+        {
+            "species": "SPECIES_PATRAT",
+            "form": 1,
+            "obj_code": "OBJ_CODE_LASS",
+            "name": "BtlMain9_Text_Noa",
+            "personality_byte_2": 1,
+            "unk06": 750,
+            "min_shots": 0,
+            "props": [
+                [ 80, 7 ],
+                [ 2, 5 ],
+                [ 10, 1 ]
+            ]
+        },
+        {
+            "species": "SPECIES_PANPOUR",
+            "form": 1,
+            "obj_code": "OBJ_CODE_PKMN_BREEDER_F",
+            "name": "BtlMain9_Text_Amino",
+            "personality_byte_2": 1,
+            "unk06": 65534,
+            "min_shots": 0,
+            "props": [
+                [ 26, 7 ],
+                [ 0, 1 ],
+                [ 38, 2 ]
+            ]
+        },
+        {
+            "species": "SPECIES_PANSAGE",
+            "form": 1,
+            "obj_code": "OBJ_CODE_CLERK_F",
+            "name": "BtlMain9_Text_Veda",
+            "personality_byte_2": 1,
+            "unk06": 850,
+            "min_shots": 250,
+            "props": [
+                [ 12, 7 ],
+                [ 90, 8 ],
+                [ 5, 1 ],
+                [ 8, 2 ],
+                [ 10, 5 ]
+            ]
+        },
+        {
+            "species": "SPECIES_PETILIL",
+            "form": 1,
+            "obj_code": "OBJ_CODE_PSYCHIC_F",
+            "name": "BtlMain9_Text_Luli",
+            "personality_byte_2": 1,
+            "unk06": 0,
+            "min_shots": 250,
+            "props": [
+                [ 16, 0 ],
+                [ 9, 1 ],
+                [ 7, 2 ],
+                [ 86, 4 ],
+                [ 89, 5 ]
+            ]
+        },
+        {
+            "species": "SPECIES_CINCCINO",
+            "form": 1,
+            "obj_code": "OBJ_CODE_ACE_TRAINER_F",
+            "name": "BtlMain9_Text_Sayla",
+            "personality_byte_2": 1,
+            "unk06": 1750,
+            "min_shots": 1000,
+            "props": [
+                [ 28, 7 ],
+                [ 96, 8 ],
+                [ 66, 0 ],
+                [ 0, 1 ],
+                [ 7, 2 ],
+                [ 45, 5 ]
+            ]
+        }
+    ]
+}

@@ -1,0 +1,72 @@
+{
+    "$schema": "habitat.schema.json",
+    "kinds": [ "land", "water", "fishing" ],
+    "by_season": [ "land" ],
+    "land": "swamp",
+    "species": [
+        {
+            "species": "SPECIES_KARRABLAST",
+            "present": {
+                "land": [ "spring", "summer", "autumn" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_SHELMET",
+            "present": {
+                "land": [ "spring", "summer", "autumn" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_STUNFISK",
+            "present": {
+                "land": [ "spring", "summer", "autumn" ],
+                "water": [ "spring", "summer", "autumn", "winter" ],
+                "fishing": [ "spring", "summer", "autumn", "winter" ]
+            }
+        },
+        {
+            "species": "SPECIES_CROAGUNK",
+            "present": {
+                "land": [ "spring", "summer", "autumn" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_PALPITOAD",
+            "present": {
+                "land": [ "spring", "summer", "autumn" ],
+                "water": [ "spring", "summer", "autumn", "winter" ],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_BARBOACH",
+            "present": {
+                "land": [],
+                "water": [],
+                "fishing": [ "spring", "summer", "autumn", "winter" ]
+            }
+        },
+        {
+            "species": "SPECIES_SEISMITOAD",
+            "present": {
+                "land": [],
+                "water": [ "spring", "summer", "autumn", "winter" ],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_WHISCASH",
+            "present": {
+                "land": [],
+                "water": [],
+                "fishing": [ "spring", "summer", "autumn", "winter" ]
+            }
+        }
+    ]
+}

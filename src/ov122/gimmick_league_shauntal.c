@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -17,8 +18,6 @@
 
 #define GIMMICK_WORK_ID 1
 #define GIMMICK_STATE_ID 39
-// The archive of the room's models, a/2/8/0: 51 files, as many as the scene's resources
-#define GIMMICK_ARCID 0x118
 
 // The models of the scene. Model 0 is the room, 1 to 5 the five that play on a script's command, and 6 to 9 those of
 // its last events
@@ -33,6 +32,32 @@ enum {
     MODEL_7,
     MODEL_8,
     MODEL_9,
+};
+
+// The steps of GimmickShauntal_Model8Event
+enum {
+    MODEL8_STEP_WAIT_OPENING,
+    MODEL8_STEP_PLAY_FINALE,
+};
+
+// The steps of GimmickShauntal_RoomChangeEvent. No step 3
+enum {
+    ROOM_CHANGE_STEP_PLAYER_ACT,
+    ROOM_CHANGE_STEP_WAIT_PLAYER,
+    ROOM_CHANGE_STEP_WAIT_OPENING,
+    ROOM_CHANGE_STEP_WAIT = 4,
+    ROOM_CHANGE_STEP_FADE_OUT,
+    ROOM_CHANGE_STEP_WAIT_FADE_OUT,
+    ROOM_CHANGE_STEP_FADE_IN,
+    ROOM_CHANGE_STEP_WAIT_FADE_IN,
+    ROOM_CHANGE_STEP_END,
+};
+
+// The steps of GimmickShauntal_Models6And9Event
+enum {
+    MODELS_6_9_STEP_PLAY,
+    MODELS_6_9_STEP_WAIT,
+    MODELS_6_9_STEP_SHOW_END,
 };
 
 // What the save keeps of the room
@@ -131,19 +156,32 @@ static const G3DSceneAnimationSetup sModel8Animations[] = {
 };
 
 static const G3DSceneResourceSetup sResources[51] = {
-    { GIMMICK_ARCID, 0, 0 },  { GIMMICK_ARCID, 1, 0 },  { GIMMICK_ARCID, 2, 0 },  { GIMMICK_ARCID, 3, 0 },
-    { GIMMICK_ARCID, 4, 0 },  { GIMMICK_ARCID, 5, 0 },  { GIMMICK_ARCID, 6, 0 },  { GIMMICK_ARCID, 7, 0 },
-    { GIMMICK_ARCID, 8, 0 },  { GIMMICK_ARCID, 9, 0 },  { GIMMICK_ARCID, 10, 0 }, { GIMMICK_ARCID, 11, 0 },
-    { GIMMICK_ARCID, 12, 0 }, { GIMMICK_ARCID, 13, 0 }, { GIMMICK_ARCID, 14, 0 }, { GIMMICK_ARCID, 15, 0 },
-    { GIMMICK_ARCID, 16, 0 }, { GIMMICK_ARCID, 17, 0 }, { GIMMICK_ARCID, 18, 0 }, { GIMMICK_ARCID, 19, 0 },
-    { GIMMICK_ARCID, 20, 0 }, { GIMMICK_ARCID, 21, 0 }, { GIMMICK_ARCID, 22, 0 }, { GIMMICK_ARCID, 23, 0 },
-    { GIMMICK_ARCID, 24, 0 }, { GIMMICK_ARCID, 25, 0 }, { GIMMICK_ARCID, 26, 0 }, { GIMMICK_ARCID, 27, 0 },
-    { GIMMICK_ARCID, 28, 0 }, { GIMMICK_ARCID, 29, 0 }, { GIMMICK_ARCID, 30, 0 }, { GIMMICK_ARCID, 31, 0 },
-    { GIMMICK_ARCID, 32, 0 }, { GIMMICK_ARCID, 33, 0 }, { GIMMICK_ARCID, 34, 0 }, { GIMMICK_ARCID, 35, 0 },
-    { GIMMICK_ARCID, 36, 0 }, { GIMMICK_ARCID, 37, 0 }, { GIMMICK_ARCID, 38, 0 }, { GIMMICK_ARCID, 39, 0 },
-    { GIMMICK_ARCID, 40, 0 }, { GIMMICK_ARCID, 41, 0 }, { GIMMICK_ARCID, 42, 0 }, { GIMMICK_ARCID, 43, 0 },
-    { GIMMICK_ARCID, 44, 0 }, { GIMMICK_ARCID, 45, 0 }, { GIMMICK_ARCID, 46, 0 }, { GIMMICK_ARCID, 47, 0 },
-    { GIMMICK_ARCID, 48, 0 }, { GIMMICK_ARCID, 49, 0 }, { GIMMICK_ARCID, 50, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 0, 0 },  { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 1, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 2, 0 },  { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 3, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 4, 0 },  { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 5, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 6, 0 },  { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 7, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 8, 0 },  { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 9, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 10, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 11, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 12, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 13, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 14, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 15, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 16, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 17, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 18, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 19, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 20, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 21, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 22, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 23, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 24, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 25, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 26, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 27, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 28, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 29, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 30, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 31, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 32, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 33, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 34, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 35, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 36, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 37, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 38, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 39, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 40, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 41, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 42, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 43, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 44, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 45, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 46, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 47, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 48, 0 }, { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 49, 0 },
+    { ARCID_GIMMICK_LEAGUE_SHAUNTAL, 50, 0 },
 };
 
 static const G3DSceneActorSetup sActors[10] = {
@@ -587,12 +625,12 @@ static GameEventReturnCode GimmickShauntal_Model8Event(GameEvent *event, u32 *st
     ShauntalRoomWork *work = Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
 
     switch (*state) {
-    case 0:
+    case MODEL8_STEP_WAIT_OPENING:
         if (GimmickShauntal_IsModel8OpeningDone(work)) {
             (*state)++;
         }
         break;
-    case 1:
+    case MODEL8_STEP_PLAY_FINALE:
         GimmickShauntal_PlayModel8Finale(work);
         GFL_SndSEPlay(SEQ_SE_SW_SHIKIMI_01);
         return GAMEEVENT_DONE;
@@ -643,38 +681,38 @@ static GameEventReturnCode GimmickShauntal_RoomChangeEvent(GameEvent *event, u32
 
     work = Field_GetGimmickWorkBlock(eventWork->field, GIMMICK_WORK_ID);
     switch (*state) {
-    case 0:
+    case ROOM_CHANGE_STEP_PLAYER_ACT:
         FldAct_SetAcmd(eventWork->player, 0x4b);
-        *state = 1;
+        *state = ROOM_CHANGE_STEP_WAIT_PLAYER;
         break;
-    case 1:
+    case ROOM_CHANGE_STEP_WAIT_PLAYER:
         if (FldAct_CheckAcmdEnd(eventWork->player)) {
             GimmickShauntal_PlayModel0Opening(work);
             GFL_SndSEPlay(SEQ_SE_SW_SHIKIMI_03);
-            *state = 2;
+            *state = ROOM_CHANGE_STEP_WAIT_OPENING;
         }
         break;
-    case 2:
+    case ROOM_CHANGE_STEP_WAIT_OPENING:
         if (GimmickShauntal_IsModel0OpeningDone(work)) {
             FldAct_SetAcmd(eventWork->player, 0x21);
             GimmickShauntal_PlayModel0Finale(work);
             GFL_SndSEPlay(SEQ_SE_SW_SHIKIMI_06);
-            *state = 4;
+            *state = ROOM_CHANGE_STEP_WAIT;
         }
         break;
-    case 4:
+    case ROOM_CHANGE_STEP_WAIT:
         eventWork->wait--;
         if (eventWork->wait <= 0) {
-            *state = 5;
+            *state = ROOM_CHANGE_STEP_FADE_OUT;
         }
         break;
-    case 5:
+    case ROOM_CHANGE_STEP_FADE_OUT:
         GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 6, 1,
                     Field_GetHeapID(eventWork->field));
-        *state = 6;
+        *state = ROOM_CHANGE_STEP_WAIT_FADE_OUT;
         eventWork->wait = 15;
         break;
-    case 6:
+    case ROOM_CHANGE_STEP_WAIT_FADE_OUT:
         if (GFL_WipeIsFinished()) {
             eventWork->wait--;
             if (eventWork->wait <= 0) {
@@ -682,21 +720,21 @@ static GameEventReturnCode GimmickShauntal_RoomChangeEvent(GameEvent *event, u32
                 FieldFog_SetEnabled(fog, TRUE);
                 FieldFog_Flush(fog);
                 FieldExpObj_SetActorHidden(eventWork->expObj, 0, MODEL_9, FALSE);
-                *state = 7;
+                *state = ROOM_CHANGE_STEP_FADE_IN;
             }
         }
         break;
-    case 7:
+    case ROOM_CHANGE_STEP_FADE_IN:
         GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 6, 1,
                     Field_GetHeapID(eventWork->field));
-        *state = 8;
+        *state = ROOM_CHANGE_STEP_WAIT_FADE_IN;
         break;
-    case 8:
+    case ROOM_CHANGE_STEP_WAIT_FADE_IN:
         if (GFL_WipeIsFinished() == TRUE) {
-            *state = 9;
+            *state = ROOM_CHANGE_STEP_END;
         }
         break;
-    case 9:
+    case ROOM_CHANGE_STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -712,18 +750,18 @@ static GameEventReturnCode GimmickShauntal_Models6And9Event(GameEvent *event, u3
     ShauntalRoomWork *work = Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
 
     switch (*state) {
-    case 0:
+    case MODELS_6_9_STEP_PLAY:
         GimmickShauntal_PlayModel6Transition(work);
         GimmickShauntal_PlayModel9(work);
         GFL_SndSEPlay(SEQ_SE_SW_SHIKIMI_05);
         (*state)++;
         break;
-    case 1:
+    case MODELS_6_9_STEP_WAIT:
         if (GimmickShauntal_IsModel6TransitionDone(work) && GimmickShauntal_IsModel9Done(work)) {
             (*state)++;
         }
         break;
-    case 2:
+    case MODELS_6_9_STEP_SHOW_END:
         GimmickShauntal_ShowModel6End(work);
         GimmickShauntal_ShowModel9End(work);
         return GAMEEVENT_DONE;

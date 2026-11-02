@@ -1,0 +1,14 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "S",
+    "shapes": [ 4 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_P2_LABORATORY": [ "shaking_grass" ],
+            "ZONE_ROUTE_1": [ "shaking_grass" ],
+            "ZONE_ROUTE_2": [ "shaking_grass" ],
+            "ZONE_ROUTE_3": [ "shaking_grass" ]
+        }
+    }
+}

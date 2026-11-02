@@ -1,0 +1,32 @@
+{
+    "$schema": "habitat.schema.json",
+    "kinds": [ "land" ],
+    "by_season": [],
+    "land": "place",
+    "species": [
+        {
+            "species": "SPECIES_ELGYEM",
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_LITWICK",
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_GOLBAT",
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        }
+    ]
+}

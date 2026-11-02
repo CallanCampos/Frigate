@@ -26,8 +26,13 @@ GameEventReturnCode EventSave_Callback(GameEvent *event, u32 *state, void *data)
 // Callbacks of the save in FIELD_PROC_LINK_LIST
 void FieldProcLink_CallInfDungeonRetire(FieldAppCallWork *work, s32 appParam);
 void FieldProcLink_FreeParam(void *param);
-// Overlay 12's report_event.c: the report screen, which asks whether to save and saves. Returns 0 once saved, 1 when
-// the player backed out, and 2 until then
+// What EventSave_Update returns: done and back on the field (saved or not), backed out to the menu, or still running
+enum {
+    EVENT_SAVE_RESULT_DONE,
+    EVENT_SAVE_RESULT_BACK,
+    EVENT_SAVE_RESULT_RUNNING,
+};
+// Overlay 12's report_event.c: the report screen, which asks whether to save and saves, an EVENT_SAVE_RESULT_*
 u32 EventSave_Update(EventSaveWork *work, u32 *state);
 
 #endif // POKEBW2_FIELD_EVENT_SAVE_H

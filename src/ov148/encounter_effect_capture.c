@@ -18,6 +18,25 @@
 // The size of a VRAM bank of A to D in the texture image slots
 #define TEX_BANK_SIZE 0x20000
 
+// The steps of the flash event
+enum {
+    FLASH_SEQ_FADE_TO_WHITE,
+    FLASH_SEQ_WAIT_WHITE,
+    FLASH_SEQ_WAIT_CLEAR,
+    FLASH_SEQ_CAPTURE,
+    FLASH_SEQ_WAIT_CAPTURE,
+    FLASH_SEQ_RUN_EFFECT,
+    FLASH_SEQ_END,
+};
+
+// The steps of the event without a flash
+enum {
+    CAPTURE_SEQ_CAPTURE,
+    CAPTURE_SEQ_WAIT_CAPTURE,
+    CAPTURE_SEQ_RUN_EFFECT,
+    CAPTURE_SEQ_END,
+};
+
 static GameEventReturnCode EncEffCaptureFlash_Callback(GameEvent *event, u32 *state, void *data);
 static void EncEffCapture_StartCapture(EncEffCaptureWork *work);
 static void EncEffCapture_CaptureTask(TCB *tcb, void *data);
@@ -78,32 +97,32 @@ static GameEventReturnCode EncEffCaptureFlash_Callback(GameEvent *event, u32 *st
     gsys = GameEvent_GetGameSystem(event);
     field = GSYS_GetField(gsys);
     switch (*state) {
-    case 0:
+    case FLASH_SEQ_FADE_TO_WHITE:
         GFL_FadeSet(FADE_ENGINE_A_WHITE, 0, 16, 0);
         (*state)++;
         // Fall through to check the fade in the same frame
-    case 1:
+    case FLASH_SEQ_WAIT_WHITE:
         if (!GFL_FadeIsRunning()) {
             GFL_FadeSet(FADE_ENGINE_A_WHITE, 16, 0, 0);
             (*state)++;
         }
         break;
-    case 2:
+    case FLASH_SEQ_WAIT_CLEAR:
         if (!GFL_FadeIsRunning()) {
             work->flashes++;
             if (work->flashes < 2) {
                 GFL_FadeSet(FADE_ENGINE_A_WHITE, 0, 16, 0);
-                *state = 1;
+                *state = FLASH_SEQ_WAIT_WHITE;
             } else {
                 (*state)++;
             }
         }
         break;
-    case 3:
+    case FLASH_SEQ_CAPTURE:
         EncEffCapture_StartCapture(work);
         (*state)++;
         break;
-    case 4:
+    case FLASH_SEQ_WAIT_CAPTURE:
         if (work->captured) {
             GFL_BGSysSetBGPriority(0, 0);
             GFL_BGSysSetBGPriority(2, 3);
@@ -120,7 +139,7 @@ static GameEventReturnCode EncEffCaptureFlash_Callback(GameEvent *event, u32 *st
             (*state)++;
         }
         break;
-    case 5:
+    case FLASH_SEQ_RUN_EFFECT:
         GFL_BGSysSetBGEnabled(2, TRUE);
         GFL_BGSysSetBGEnabled(0, TRUE);
         Field_SetRenderMode(field, 2);
@@ -129,7 +148,7 @@ static GameEventReturnCode EncEffCaptureFlash_Callback(GameEvent *event, u32 *st
         GameEvent_ChainNext(event, next);
         (*state)++;
         break;
-    case 6:
+    case FLASH_SEQ_END:
         if (work->addedTexBank == TRUE) {
             work->texBanks &= ~GX_VRAM_D;
             GX_SetBankForTex(work->texBanks);
@@ -198,11 +217,11 @@ static GameEventReturnCode EncEffCapture_Callback(GameEvent *event, u32 *state, 
     gsys = GameEvent_GetGameSystem(event);
     field = GSYS_GetField(gsys);
     switch (*state) {
-    case 0:
+    case CAPTURE_SEQ_CAPTURE:
         EncEffCapture_StartCapture(work);
         (*state)++;
         break;
-    case 1:
+    case CAPTURE_SEQ_WAIT_CAPTURE:
         if (work->captured) {
             GFL_BGSysSetBGPriority(0, 0);
             GFL_BGSysSetBGPriority(2, 3);
@@ -219,7 +238,7 @@ static GameEventReturnCode EncEffCapture_Callback(GameEvent *event, u32 *state, 
             (*state)++;
         }
         break;
-    case 2:
+    case CAPTURE_SEQ_RUN_EFFECT:
         GFL_BGSysSetBGEnabled(2, TRUE);
         GFL_BGSysSetBGEnabled(0, TRUE);
         Field_SetRenderMode(field, 2);
@@ -228,7 +247,7 @@ static GameEventReturnCode EncEffCapture_Callback(GameEvent *event, u32 *state, 
         GameEvent_ChainNext(event, next);
         (*state)++;
         break;
-    case 3:
+    case CAPTURE_SEQ_END:
         if (work->addedTexBank == TRUE) {
             work->texBanks &= ~GX_VRAM_D;
             GX_SetBankForTex(work->texBanks);

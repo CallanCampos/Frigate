@@ -1,0 +1,32 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "P",
+    "shapes": [ 9 ],
+    "area": {
+        "all_year": false,
+        "seasons": {
+            "spring": {
+                "ZONE_ICIRRUS_CITY": [ "grass" ],
+                "ZONE_PINWHEEL_FOREST": [ "grass", "dark_grass" ],
+                "ZONE_MOOR_OF_ICIRRUS": [ "grass" ],
+                "ZONE_ROUTE_8": [ "grass", "surf", "rippling_surf" ]
+            },
+            "summer": {
+                "ZONE_ICIRRUS_CITY": [ "grass" ],
+                "ZONE_PINWHEEL_FOREST": [ "grass", "dark_grass" ],
+                "ZONE_MOOR_OF_ICIRRUS": [ "grass" ],
+                "ZONE_ROUTE_8": [ "grass", "surf", "rippling_surf" ]
+            },
+            "autumn": {
+                "ZONE_ICIRRUS_CITY": [ "grass" ],
+                "ZONE_PINWHEEL_FOREST": [ "grass", "dark_grass" ],
+                "ZONE_MOOR_OF_ICIRRUS": [ "grass" ],
+                "ZONE_ROUTE_8": [ "grass", "surf", "rippling_surf" ]
+            },
+            "winter": {
+                "ZONE_PINWHEEL_FOREST": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_8": [ "surf", "rippling_surf" ]
+            }
+        }
+    }
+}

@@ -18,6 +18,35 @@ typedef enum {
     MOVE_STAT_CHANGE_ALL = 10,
 } MoveStatChangeStat;
 
+// What a disobedient Pokémon does instead of its move, from ServerControl_CheckObedience: one whose level is above
+// what the player's badges allow
+enum {
+    OBEDIENCE_OBEYS = 0,
+    // Falls asleep, unless something prevents sleep
+    OBEDIENCE_NAPS = 2,
+    // Hurts itself, as when confused
+    OBEDIENCE_HURTS_ITSELF = 3,
+    // Ignores the order, which is all a sleeping Pokémon does
+    OBEDIENCE_IGNORES = 4,
+};
+
+// What a turn, or the switches after one, ends with (BtlServerFlow_RunTurn), which tells the server what comes next
+enum {
+    // The clients choose their next actions
+    BTL_FLOW_RESULT_NONE,
+    // A Pokémon switches out mid-turn, as BattleHandler_Switch does
+    BTL_FLOW_RESULT_MID_TURN_SWITCH,
+    // Pokémon fainted, and the clients replace them at the turn's end
+    BTL_FLOW_RESULT_FAINT_SWITCH,
+    // The turn goes on once the clients have shown the commands so far
+    BTL_FLOW_RESULT_CONTINUE,
+    // A side won, or the recorded battle's time ran out
+    BTL_FLOW_RESULT_BATTLE_END,
+    // A Pokémon escaped, or was blown away from a wild battle
+    BTL_FLOW_RESULT_ESCAPE,
+    BTL_FLOW_RESULT_CAPTURE,
+};
+
 // The move that a move calls instead of itself, such as Metronome's, and its target
 typedef struct {
     u16 move;
@@ -41,12 +70,13 @@ typedef struct {
 
 typedef struct {
     u32 multipleTargets : 1;
-    u32 unk1 : 1;
+    // The damage of a delayed move (BattleHandler_DelayMoveDamage)
+    u32 delayed : 1;
     u32 unk2 : 30;
 } BtlFlowDamageFlags;
 
 BtlServerFlow *BtlServerFlow_Create(BtlServer *server, BtlMainModule *mainModule, BtlPokeCon *pokeCon,
-                                    BtlServerCmdQueue *queue, u32 a4, HeapID heapId);
+                                    BtlServerCmdQueue *queue, u32 commCompetitor, HeapID heapId);
 void BtlServerFlow_ResetSystem(BtlServerFlow *serverFlow);
 void BtlServerFlow_Delete(BtlServerFlow *serverFlow);
 BOOL BtlServerFlow_StartBattle(BtlServerFlow *serverFlow);
@@ -105,7 +135,7 @@ u8 BtlServerFlow_GetMoveTargetPos(BtlServerFlow *flow, u8 monId, u16 move);
 u16 BtlServerFlow_CalcSpeed(BtlServerFlow *serverFlow, BattleMon *mon, BOOL a2);
 u32 BtlServerFlow_CountFasterMons(BtlServerFlow *serverFlow, BattleMon *mon, BOOL a2);
 u32 BtlServerFlow_GetSideEffectLayers(BtlServerFlow *serverFlow, u8 pos, u32 sideEffect);
-BOOL BtlServerFlow_IsPosEffectFree(BtlServerFlow *serverFlow, u8 pos, u32 a2);
+BOOL BtlServerFlow_IsPosEffectFree(BtlServerFlow *serverFlow, u8 pos, u32 effect);
 BOOL ServerControl_HideTurnCancel(BtlServerFlow *handler, BattleMon *mon, u32 flag);
 BOOL ServerControl_FlinchCore(BtlServerFlow *handler, BattleMon *mon, u32 chance);
 void ServerControl_SwitchInFillSlot(BtlServerFlow *handler, u8 target, u8 slot, u8 slotAgain, BOOL flag);
@@ -162,7 +192,7 @@ u16 BtlServerFlow_GetPlayerNotVeryEffectiveHitCount(BtlServerFlow *flow);
 u16 BtlServerFlow_GetFoeImmuneHitCount(BtlServerFlow *flow);
 u16 BtlServerFlow_GetFoeNotVeryEffectiveHitCount(BtlServerFlow *flow);
 u8 BtlServerFlow_GetSwitchCount(BtlServerFlow *flow, u32 arg1);
-u32 func_ov167_021ae320(BtlServerFlow *flow);
+u32 BtlServerFlow_GetScriptedRulesOutcome(BtlServerFlow *flow);
 
 // Not decompiled yet
 void BtlServerFlow_InitWork(BtlServerFlow *flow);
@@ -257,7 +287,7 @@ void ServerEvent_DelayMoveDecide(BtlServerFlow *flow, BattleMon *mon);
 void ServerEvent_MoveSeqStart(BtlServerFlow *flow, BattleMon *mon, u16 move);
 void ServerEvent_MoveSeqEnd(BtlServerFlow *flow, BattleMon *mon, u16 move, u8 result);
 void ServerDisplay_MoveFailed(BtlServerFlow *flow, BattleMon *mon, u16 move);
-void BtlFlowReactionList_Add(BtlFlowReactionList *list, u8 monId, u8 arg2, u8 target);
+void BtlFlowReactionList_Add(BtlFlowReactionList *list, u8 monId, u8 targetId, u8 target);
 void ServerEvent_CallMoveEvent(BtlServerFlow *flow, BattleMon *mon, BtlFlowMoveParam *param, u32 event);
 void ServerEvent_StealMove(BtlServerFlow *flow, BattleMon *mon, BattleMon *attacker, u16 move);
 void ServerEvent_ReflectMove(BtlServerFlow *flow, BattleMon *mon, BattleMon *target, u16 move);
@@ -319,7 +349,7 @@ void ServerControl_RemoveMissedTargets(BtlServerFlow *flow, BtlFlowMoveParam *pa
 void ServerControl_PutMoveAnimation(BtlServerFlow *flow, u16 move, BattleMoveEffectState *effect, u32 reserved);
 u32 ServerControl_CheckChargeTurn(BtlServerFlow *flow, BattleMon *mon, BtlMonSet *targets, u16 move);
 void ServerControl_DamageMove(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon *mon, BtlMonSet *targets,
-                              u32 *data, u32 arg5);
+                              u32 *data, u32 delayed);
 void ServerControl_SimpleEffect(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon *mon, BtlMonSet *targets);
 void ServerControl_SimpleCondition(BtlServerFlow *flow, u16 move, BattleMon *mon, BtlMonSet *targets);
 void ServerControl_StatChangeAndCondition(BtlServerFlow *flow, const BtlFlowMoveParam *param, BattleMon *mon,
@@ -369,21 +399,21 @@ void ServerControl_CalcDamageList(BtlServerFlow *flow, BattleMon *attacker, BtlM
 u32 BtlFlowDamageList_GetCount(const BtlFlowDamageList *list);
 u32 BtlFlowDamageList_GetMons(BtlServerFlow *flow, const BtlFlowDamageList *list, BattleMon **mons);
 u32 BtlFlowDamageList_GetDirectHits(BtlServerFlow *flow, const BtlFlowDamageList *list, BattleMon **mons, u16 *damages,
-                                    u32 *effectiveness, u8 *critical, u8 *unk9);
+                                    u32 *effectiveness, u8 *critical, u8 *endureCauses);
 u32 BtlFlowDamageList_GetTotalDamage(const BtlFlowDamageList *list);
 u32 ServerControl_DamageList(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon *attacker, BtlMonSet *monSet,
                              BtlFlowDamageList *list, BtlFlowHitWork *hitWork, u32 ratio, BtlFlowDamageFlags flags);
 u32 BtlFlowDamageList_GetSubstituteHits(BtlServerFlow *flow, const BtlFlowDamageList *list, BattleMon **mons,
                                         u16 *damages, u32 *effectiveness, u8 *critical);
 u32 ClampDamageToHP(BattleMon *mon, u32 damage);
-u32 ServerEvent_CheckEndure(BtlServerFlow *flow, BattleMon *attacker, BattleMon *target, u32 arg3, u16 *damage);
+u32 ServerEvent_CheckEndure(BtlServerFlow *flow, BattleMon *attacker, BattleMon *target, u32 byMove, u16 *damage);
 BOOL ServerEvent_CheckCritical(BtlServerFlow *flow, BattleMon *attacker, BattleMon *target, u16 move);
 BOOL ServerEvent_CalcDamage(BtlServerFlow *flow, BattleMon *attacker, BattleMon *defender,
                             const BtlFlowMoveParam *param, u32 effectiveness, u32 ratio, BOOL critical, BOOL fixedRoll,
                             u16 *damage);
 void ServerControl_DecrementPPCore(BtlServerFlow *flow, BattleMon *mon, u8 moveIndex, u8 amount);
 u32 ServerControl_DamageAllTargets(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon *mon, BtlMonSet *targets,
-                                   u32 *data, u32 *reserved, u32 arg6);
+                                   u32 *data, u32 *reserved, u32 delayed);
 u32 ServerControl_DamageMultiHit(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon *mon, BtlMonSet *targets,
                                  u32 *data);
 BOOL BtlFlowHitWork_IsFirstHit(BtlFlowHitWork *hitWork);
@@ -402,9 +432,9 @@ void ServerEvent_AfterDamage(BtlServerFlow *flow, BattleMon *attacker, BtlFlowMo
 void ServerEvent_CheckItemReaction(BtlServerFlow *flow, BattleMon *mon, u32 reaction);
 void ServerEvent_DamageProcessStart(BtlServerFlow *flow, BattleMon *mon, BtlFlowMoveParam *param);
 void ServerEvent_DamageProcessEndSub(BtlServerFlow *flow, BattleMon *mon, BtlMonSet *monSet, BtlFlowMoveParam *param,
-                                     u32 arg4, BOOL flag, u32 event);
+                                     u32 delayed, BOOL flag, u32 event);
 void ServerEvent_DamageProcessEnd(BtlServerFlow *flow, BattleMon *mon, BtlMonSet *monSet, BtlFlowMoveParam *param,
-                                  u32 arg4);
+                                  u32 delayed);
 void ServerControl_CheckFireThaw(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon *mon, BtlMonSet *monSet);
 u32 ServerEvent_GetFlinchChance(BtlServerFlow *flow, u16 move, BattleMon *attacker);
 BOOL ServerEvent_CheckFlinch(BtlServerFlow *flow, BattleMon *mon, u32 chance);
@@ -419,7 +449,7 @@ u16 ServerEvent_GetAttackPower(BtlServerFlow *flow, BattleMon *attacker, BattleM
 u16 ServerEvent_GetTargetDefenses(BtlServerFlow *flow, BattleMon *attacker, BattleMon *defender,
                                   const BtlFlowMoveParam *param, BOOL critical);
 u8 ServerEvent_GetWeather(BtlServerFlow *flow);
-BOOL func_ov167_021ae30c(BtlServerFlow *flow);
+BOOL BtlServerFlow_UsesDamageRoll(BtlServerFlow *flow);
 fx32 ServerEvent_SameTypeAttackBonus(BtlServerFlow *flow, BattleMon *attacker, u8 type);
 s32 ServerEvent_CalcRecoil(BtlServerFlow *flow, BattleMon *mon, u16 move, s32 damage, BOOL *forced);
 BOOL ServerEvent_CheckSimpleDamageEnabled(BtlServerFlow *flow, BattleMon *mon, u32 damage);
@@ -455,14 +485,14 @@ void ServerEvent_GetMoveStatChangeValue(BtlServerFlow *flow, u16 move, u32 index
                                         BattleMon *target, MoveStatChangeStat *stat, s32 *change);
 void ServerEvent_MoveStatChangeApplied(BtlServerFlow *flow, BattleMon *mon, u16 move, u32 stat, s32 change);
 BOOL ServerControl_StatChangeCore(BtlServerFlow *flow, u8 monId, BattleMon *mon, MoveStatChangeStat stat, s32 change,
-                                  u8 attackerId, u16 context, u32 value, BOOL showFail, BOOL flag);
+                                  u8 attackerId, u16 context, u32 serial, BOOL showFail, BOOL flag);
 s32 ServerEvent_CheckSubstituteInteraction(BtlServerFlow *flow, BattleMon *mon, u32 stat, u8 attackerId, u16 context,
                                            s32 change);
 void ServerDisplay_StatChangeLimit(BtlServerFlow *flow, BattleMon *mon, u32 stat, s32 change);
-BOOL ServerEvent_CheckStatChange(BtlServerFlow *flow, BattleMon *mon, u32 stat, u8 monId, s32 change, u32 value);
+BOOL ServerEvent_CheckStatChange(BtlServerFlow *flow, BattleMon *mon, u32 stat, u8 monId, s32 change, u32 serial);
 void ServerDisplay_StatChange(BtlServerFlow *flow, BattleMon *mon, u32 stat, s32 change, u16 context, BOOL flag);
 void ServerEvent_StatChangeApplied(BtlServerFlow *flow, u8 monId, BattleMon *mon, u32 stat, s32 change);
-void ServerEvent_StatChangeFailed(BtlServerFlow *flow, BattleMon *mon, u32 value);
+void ServerEvent_StatChangeFailed(BtlServerFlow *flow, BattleMon *mon, u32 serial);
 u32 ServerEvent_CalcMoveHealAmount(BtlServerFlow *flow, u16 move, BattleMon *mon);
 BOOL ServerControl_RecoverHPCheckFailSpecial(BtlServerFlow *flow, BattleMon *mon, BOOL showMessage);
 void ServerControl_RecoverHPCore(BtlServerFlow *flow, BattleMon *mon, u16 amount);
@@ -488,7 +518,7 @@ BOOL ServerControl_Substitute(BtlServerFlow *flow, BattleMon *mon);
 BOOL ServerEvent_UncategorizedMove(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon *mon, BtlMonSet *targets,
                                    BOOL *showFail);
 void ServerEvent_DamageReaction(BtlServerFlow *flow, BattleMon *attacker, BattleMon *target, BtlFlowMoveParam *param,
-                                u32 effectiveness, u32 damage, u32 critical, BOOL flag);
+                                u32 effectiveness, u32 damage, u32 critical, BOOL substitute);
 BOOL ServerEvent_AddCondition(BtlServerFlow *flow, BattleMon *target, BattleMon *attacker, u32 condition,
                               BattleCondition value, BOOL flag, BOOL defaultMessage);
 u32 ServerEvent_CheckMoveAddCondition(BtlServerFlow *flow, u16 move, BattleMon *attacker, BattleMon *target,
@@ -511,7 +541,7 @@ void ServerControl_DamageDrain(BtlServerFlow *flow, BtlFlowMoveParam *param, Bat
 u16 ServerControl_DamageSubstitute(BtlServerFlow *flow, BattleMon *attacker, BattleMon *target, u16 damage,
                                    u32 effectiveness, u8 critical, BtlFlowMoveParam *param);
 void ServerControl_DamageReaction(BtlServerFlow *flow, BattleMon *attacker, BattleMon *target, BtlFlowMoveParam *param,
-                                  u32 effectiveness, u32 damage, u32 critical, BOOL flag);
+                                  u32 effectiveness, u32 damage, u32 critical, BOOL substitute);
 void ServerDisplay_Damage(BtlServerFlow *flow, BtlFlowMoveParam *param, u32 count, u32 *effectiveness, BattleMon **mons,
                           u16 *damages, u8 *critical, BOOL multipleTargets);
 void ServerDisplay_EffectivenessMessageMulti(BtlServerFlow *flow, u32 count, u32 *effectiveness, BattleMon **mons,
@@ -526,7 +556,7 @@ void ServerControl_CheckDamageToRecover(BtlServerFlow *flow, BattleMon *mon, Btl
                                         BtlMonSet *targets);
 void ServerControl_DamageProcessStart(BtlServerFlow *flow, BattleMon *mon, BtlFlowMoveParam *param);
 void ServerControl_DamageProcessEnd(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon *mon, BtlMonSet *monSet,
-                                    u32 damage, u32 arg5);
+                                    u32 damage, u32 delayed);
 void ServerControl_CalcRecoil(BtlServerFlow *flow, BattleMon *mon, u16 move, u32 damage);
 BOOL ServerEvent_CheckMultihitHits(BtlServerFlow *flow, BattleMon *mon, u16 move, BtlFlowHitWork *hitWork);
 void ServerDisplay_MoveMessage(BtlServerFlow *flow, BattleMon *mon, u16 move);
@@ -536,7 +566,7 @@ BOOL ServerEvent_SetMoveMessage(BtlServerFlow *flow, BattleMon *mon, u16 move, u
 void ServerEvent_GetMoveParam(BtlServerFlow *flow, u16 move, BattleMon *mon, BtlFlowMoveParam *param);
 void ServerControl_SkyDropCheckRelease(BtlServerFlow *flow, BattleMon *mon, BOOL flag);
 void ServerEvent_MemberInComplete(BtlServerFlow *flow);
-BOOL ServerControl_EscapeCore(BtlServerFlow *flow, BattleMon *mon, BOOL arg2, BOOL arg3);
+BOOL ServerControl_EscapeCore(BtlServerFlow *flow, BattleMon *mon, BOOL sureEscape, BOOL noMessage);
 u16 GetEncoreReplacementMove(BattleMon *mon, BattleAction *action);
 void ServerControl_Fight(BtlServerFlow *flow, BattleMon *mon, BattleAction *action, u32 key);
 void ServerDisplay_MustRecharge(BtlServerFlow *flow, BattleMon *mon);

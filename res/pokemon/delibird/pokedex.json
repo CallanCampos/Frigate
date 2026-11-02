@@ -1,0 +1,12 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "D",
+    "shapes": [ 11 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_GIANT_CHASM": [ "grass", "dark_grass" ],
+            "ZONE_ROUTE_22": [ "grass", "dark_grass" ]
+        }
+    }
+}

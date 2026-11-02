@@ -1,0 +1,24 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "M",
+    "shapes": [ 4 ],
+    "area": {
+        "black2": {
+            "all_year": true,
+            "places": {
+                "ZONE_ROUTE_5": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_9": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_16": [ "grass", "dark_grass" ]
+            }
+        },
+        "white2": {
+            "all_year": true,
+            "places": {
+                "ZONE_ROUTE_4": [ "grass" ],
+                "ZONE_ROUTE_5": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_9": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_16": [ "grass", "dark_grass" ]
+            }
+        }
+    }
+}

@@ -55,11 +55,29 @@ def evaluate(expression: str, values: dict[str, int]) -> int:
 
 
 @cache
+def list_prefixes() -> list[str]:
+    """Returns each list's prefix in generated/: what all its constants start with, up to an underscore."""
+    prefixes = []
+    for path in sorted(LISTS_DIR.glob("*.txt")):
+        listed = list(parse(path))
+        if listed:
+            common = listed[0]
+            for name in listed[1:]:
+                while not name.startswith(common):
+                    common = common[:-1]
+            prefixes.append(common[:common.rfind("_") + 1])
+    return prefixes
+
+
+@cache
 def names(prefix: str) -> dict[int, str]:
-    """Returns the first constant with a prefix for each value, to write a value by its name."""
+    """Returns the first constant with a prefix for each value, to write a value by its name. A list whose own prefix
+    is longer is another family of constants (ITEM_ICON_ for ITEM_, TRAINER_CLASS_ for TRAINER_), so its constants
+    are left out."""
+    others = [other for other in list_prefixes() if len(other) > len(prefix) and other.startswith(prefix)]
     found: dict[int, str] = {}
     for name, value in constants().items():
-        if name.startswith(prefix):
+        if name.startswith(prefix) and not any(name.startswith(other) for other in others):
             found.setdefault(value, name)
     return found
 

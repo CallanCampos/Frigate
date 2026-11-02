@@ -1,0 +1,11 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "S",
+    "shapes": [ 11 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_MARVELOUS_BRIDGE": [ "shaking_grass" ]
+        }
+    }
+}

@@ -241,7 +241,7 @@ BOOL Scrcmd_Bsubway_Tool(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 7:
-        *retWk = func_ov033_0217b86c(gsys);
+        *retWk = BsubwayScr_ResetSavedPlay(gsys);
         break;
     case 12:
         *retWk = FieldPlayer_GetObjCodeByForme(FieldPlayer_GetSex(Field_GetPlayer(field)), 0);
@@ -256,7 +256,7 @@ BOOL Scrcmd_Bsubway_Tool(VM *vm, FieldScriptEnv *env) {
         *retWk = BSubwayPlayData_GetRound(playData) + 1;
         break;
     case 11:
-        *retWk = BSubwayPlayData_GetRound(bsw->unk70);
+        *retWk = BSubwayPlayData_GetRound(bsw->playData);
         *retWk = *retWk + 1;
         break;
     case 14:
@@ -525,7 +525,7 @@ BOOL Scrcmd_Bsubway_Tool(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 300: {
-        u8 value = BSubwayPlayData_GetData(playData, BSUBWAY_PLAY_UNK0_9, NULL);
+        u8 value = BSubwayPlayData_GetData(playData, BSUBWAY_PLAY_USE_BATTLE_BOX, NULL);
 
         ScriptWork_CallEvent(work, EventBSubwayPokeSelect_Create(bsw, gsys, value));
         result = TRUE;
@@ -573,13 +573,13 @@ BOOL Scrcmd_Bsubway_Tool(VM *vm, FieldScriptEnv *env) {
         *retWk = bsw->unkC_1;
         break;
     case 313:
-        *retWk = func_ov033_0217b8ec(bsw);
+        *retWk = BsubwayScr_AddBattlePoints(bsw);
         break;
     case 314:
-        bsw->unkC_5 = param0;
+        bsw->partnerIndex = param0;
         break;
     case 315:
-        *retWk = bsw->unkC_5;
+        *retWk = bsw->partnerIndex;
         break;
     case 316:
         BsubwayScr_DrawTrainerNos(bsw);
@@ -604,7 +604,7 @@ BOOL Scrcmd_Bsubway_Tool(VM *vm, FieldScriptEnv *env) {
     case 324: {
         u8 value = param0;
 
-        BSubwayPlayData_SetData(playData, BSUBWAY_PLAY_UNK0_9, &value);
+        BSubwayPlayData_SetData(playData, BSUBWAY_PLAY_USE_BATTLE_BOX, &value);
         break;
     }
     case 325:
@@ -676,7 +676,7 @@ BOOL Scrcmd_Bsubway_Tool(VM *vm, FieldScriptEnv *env) {
         u32 check;
 
         *retWk = 0;
-        useBattleBox = BSubwayPlayData_GetData(playData, BSUBWAY_PLAY_UNK0_9, NULL);
+        useBattleBox = BSubwayPlayData_GetData(playData, BSUBWAY_PLAY_USE_BATTLE_BOX, NULL);
         regulation = PokeRegulation_LoadNew(BSubway_GetModeRegulation(mode), HEAPID_GAMEEVENT);
         if (useBattleBox == TRUE) {
             party = convertBoxedPokeSetToParty(getBattleBox(save), HEAPID_GAMEEVENT);
@@ -772,10 +772,10 @@ BOOL Scrcmd_Bsubway_Tool(VM *vm, FieldScriptEnv *env) {
         case 3:
         case 7:
         case 8:
-            *retWk = bsw->unk32[param0 + index * 2];
+            *retWk = bsw->trainerNos[param0 + index * 2];
             break;
         default:
-            *retWk = bsw->unk32[index];
+            *retWk = bsw->trainerNos[index];
             break;
         }
         break;
@@ -814,7 +814,7 @@ BOOL Scrcmd_Bsubway_Tool(VM *vm, FieldScriptEnv *env) {
         *retWk = bsw->unkC_12;
         break;
     case 356:
-        *retWk = BSubwayPlayData_GetData(playData, BSUBWAY_PLAY_UNK0_9, NULL);
+        *retWk = BSubwayPlayData_GetData(playData, BSUBWAY_PLAY_USE_BATTLE_BOX, NULL);
         break;
     case 357:
         BSubwayPlayData_IncRound(playData);
@@ -1172,7 +1172,7 @@ static void BSubway_PlacePassengers(BSubwayScrWork *bsw, GameData *gameData, MMS
     }
     {
         const BSubwayActor *entry = sActors;
-        u16 stage = BSubwayScoreData_GetStage(bsw->unk74, mode);
+        u16 stage = BSubwayScoreData_GetStage(bsw->scoreData, mode);
         FieldActor *actor;
 
         switch (mode) {

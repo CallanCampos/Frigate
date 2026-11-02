@@ -9,6 +9,9 @@
 // gimmick sets them up when such a mission starts, and it and overlay 73 (rival_select.c) check whether the mission
 // is one. No string names the file; the name is a guess.
 
+// How many of the festival's entries a hollow mission uses
+#define FEST_MISSION_HOLLOW_ENTRY_COUNT 10
+
 // Picks the mission's hollows into the festival's entries (LinkFestival_GetMissionWork)
 void FesMissionHollow_Setup(FesGimmick *gimmick);
 // Whether the current mission is a hollow mission (target 5 with a person set)

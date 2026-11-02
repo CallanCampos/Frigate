@@ -6,6 +6,7 @@
 #include "pml/poke_party.h"
 #include "save/pokedex_savedata.h"
 #include "system/game_data.h"
+#include "system/season.h"
 
 void TransformVsPokePartyBySeason(GameData *gameData, PokeParty *party, u8 season) {
     PokeDexSave *pokedex = GameData_GetPokedex(gameData);
@@ -20,19 +21,19 @@ void TransformVsPokePartyBySeason(GameData *gameData, PokeParty *party, u8 seaso
     u32 form;
 
     switch (season) {
-    case 0:
+    case SEASON_SPRING:
         deerlingForm = 0;
         sawsbuckForm = 0;
         break;
-    case 1:
+    case SEASON_SUMMER:
         deerlingForm = 1;
         sawsbuckForm = 1;
         break;
-    case 2:
+    case SEASON_AUTUMN:
         deerlingForm = 2;
         sawsbuckForm = 2;
         break;
-    case 3:
+    case SEASON_WINTER:
         deerlingForm = 3;
         sawsbuckForm = 3;
         break;

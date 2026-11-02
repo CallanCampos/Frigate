@@ -1,0 +1,105 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The interactive sound system's tables: res/sound/interactive/<table>.json",
+    "description": "One of the five archives that the interactive sound system reads (iss_*.c), as a list of its entries in order: cities.json, dungeons.json, zones.json, switches.json or 3d_sound.json. tools/data/interactive_sound_data.py packs them.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "cities": {
+            "type": "array",
+            "description": "ARCID_ISS_CITY: the towns whose music grows louder toward their center, which ISSCityUnit plays",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "zone", "center", "keys" ],
+                "properties": {
+                    "zone": { "$ref": "#/$defs/zone" },
+                    "center": {
+                        "type": "object", "additionalProperties": false, "required": [ "x", "y", "z" ],
+                        "description": "Where the music is loudest, in whole units",
+                        "properties": { "x": { "$ref": "#/$defs/s32" }, "y": { "$ref": "#/$defs/s32" }, "z": { "$ref": "#/$defs/s32" } }
+                    },
+                    "keys": {
+                        "type": "array", "minItems": 6, "maxItems": 6,
+                        "description": "The volume at six distances from the center, from the farthest; between them it is interpolated",
+                        "items": {
+                            "type": "object", "additionalProperties": false, "required": [ "volume", "range" ],
+                            "properties": {
+                                "volume": { "$ref": "#/$defs/u8" },
+                                "range": {
+                                    "type": "object", "additionalProperties": false, "required": [ "x", "y", "z" ],
+                                    "description": "The distance from the center along each axis, in map cells of 16 units",
+                                    "properties": { "x": { "$ref": "#/$defs/u8" }, "y": { "$ref": "#/$defs/u8" }, "z": { "$ref": "#/$defs/u8" } }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "dungeons": {
+            "type": "array",
+            "description": "ARCID_ISS_DUNGEON: a dungeon's music in each season",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "zone", "pitch", "tempo", "pan" ],
+                "properties": {
+                    "zone": { "$ref": "#/$defs/zone" },
+                    "pitch": { "$ref": "#/$defs/seasons", "description": "In 64ths of a semitone, of the tracks that change pitch" },
+                    "tempo": { "$ref": "#/$defs/seasons", "description": "256 is the sequence's own tempo" },
+                    "pan": { "$ref": "#/$defs/seasons", "description": "Not read by the code" }
+                }
+            }
+        },
+        "zones": {
+            "type": "array",
+            "description": "ARCID_ISS_ZONE: the tracks of the music that a zone fades in and out as the player enters it",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "zone", "tracks_in", "tracks_out", "fade_frames" ],
+                "properties": {
+                    "zone": { "$ref": "#/$defs/zone" },
+                    "tracks_in": { "$ref": "#/$defs/tracks" },
+                    "tracks_out": { "$ref": "#/$defs/tracks" },
+                    "fade_frames": { "$ref": "#/$defs/u16" }
+                }
+            }
+        },
+        "switches": {
+            "type": "array",
+            "description": "ARCID_ISS_SWITCH: a BGM's switches, each a set of tracks that the scripts and the field turn on and off, and the zones where the set applies",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "bgm", "switches", "fade_frames", "zones" ],
+                "properties": {
+                    "bgm": { "$ref": "#/$defs/bgm" },
+                    "switches": { "type": "array", "minItems": 9, "maxItems": 9, "items": { "$ref": "#/$defs/tracks" } },
+                    "fade_frames": { "$ref": "#/$defs/u16", "description": "How long a switch's tracks take to fade in or out" },
+                    "zones": { "type": "array", "maxItems": 255, "items": { "$ref": "#/$defs/zone" } }
+                }
+            }
+        },
+        "3d_sound": {
+            "type": "array",
+            "description": "ARCID_ISS_3D_SOUND: the BGMs whose tracks play from places on the map, louder the nearer the player is",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "bgm", "tracks" ],
+                "properties": {
+                    "bgm": { "$ref": "#/$defs/bgm" },
+                    "tracks": { "$ref": "#/$defs/tracks", "description": "The tracks that the sound's units play, which start muted" }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "u8": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "u16": { "type": "integer", "minimum": 0, "maximum": 65535 },
+        "s32": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647 },
+        "zone": { "type": [ "string", "integer" ], "x-constant": "ZONE_", "minimum": 0, "maximum": 65535, "description": "A ZONE_* constant" },
+        "bgm": { "type": [ "string", "integer" ], "x-constant": "SEQ_", "minimum": 0, "maximum": 65535, "description": "A SEQ_* constant" },
+        "tracks": { "type": "array", "items": { "type": "integer", "minimum": 0, "maximum": 15 }, "description": "Track numbers of the sequence, 0 to 15" },
+        "seasons": {
+            "type": "object", "additionalProperties": false, "required": [ "spring", "summer", "autumn", "winter" ],
+            "properties": {
+                "spring": { "type": "integer", "minimum": -32768, "maximum": 65535 }, "summer": { "type": "integer", "minimum": -32768, "maximum": 65535 },
+                "autumn": { "type": "integer", "minimum": -32768, "maximum": 65535 }, "winter": { "type": "integer", "minimum": -32768, "maximum": 65535 }
+            }
+        }
+    }
+}

@@ -26,8 +26,8 @@ struct TrialHouseSave {
     // The challenges against the Trainers of the game and of a downloaded challenge
     TrialHouseRecord records[2];
     u8 bits[16];
-    // Copied from the downloaded challenge's save
-    u8 unk38[0x22];
+    // The downloaded challenge's name, copied from its save
+    u8 examinationName[0x22];
     u8 padding5A[2];
     // The Pokémon World Tournament's part (wbt_savedata.c)
     WbtSave wbt;

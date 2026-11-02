@@ -1,0 +1,531 @@
+{
+    "$schema": "fog.schema.json",
+    "fogs": [
+        {
+            "offset": 32671,
+            "slope": 9
+        },
+        {
+            "offset": 0,
+            "slope": 10
+        },
+        {
+            "offset": 32671,
+            "slope": 8
+        },
+        {
+            "offset": 2000,
+            "slope": 3
+        },
+        {
+            "offset": 8512,
+            "slope": 2
+        },
+        {
+            "offset": 2760,
+            "slope": 3
+        },
+        {
+            "offset": 0,
+            "slope": 1
+        },
+        {
+            "offset": 32703,
+            "slope": 9
+        },
+        {
+            "offset": 0,
+            "slope": 2
+        },
+        {
+            "offset": 20767,
+            "slope": 0
+        },
+        {
+            "offset": 32687,
+            "slope": 10
+        },
+        {
+            "offset": 32671,
+            "slope": 10
+        },
+        {
+            "offset": 32655,
+            "slope": 9
+        },
+        {
+            "offset": 32703,
+            "slope": 8
+        },
+        {
+            "offset": 32279,
+            "slope": 4
+        },
+        {
+            "offset": 31831,
+            "slope": 4
+        },
+        {
+            "offset": 31559,
+            "slope": 4
+        },
+        {
+            "offset": 32671,
+            "slope": 10
+        },
+        {
+            "offset": 11000,
+            "slope": 0
+        },
+        {
+            "offset": 32607,
+            "slope": 8
+        },
+        {
+            "offset": 28767,
+            "slope": 1
+        },
+        {
+            "offset": 32215,
+            "slope": 5
+        },
+        {
+            "offset": 24740,
+            "slope": 0
+        },
+        {
+            "offset": 32703,
+            "slope": 9
+        },
+        {
+            "offset": 19767,
+            "slope": 0
+        },
+        {
+            "offset": 32671,
+            "slope": 9
+        },
+        {
+            "offset": 32648,
+            "slope": 9
+        },
+        {
+            "offset": 32575,
+            "slope": 7
+        },
+        {
+            "offset": 32639,
+            "slope": 8
+        }
+    ],
+    "zones": [
+        {
+            "zone": "ZONE_SKYARROW_BRIDGE",
+            "fog": 4
+        },
+        {
+            "zone": "ZONE_DRIFTVEIL_CITY_GYM",
+            "fog": 1
+        },
+        {
+            "zone": "ZONE_TUBELINE_BRIDGE",
+            "fog": 6
+        },
+        {
+            "zone": "ZONE_ICIRRUS_CITY_2",
+            "fog": 2
+        },
+        {
+            "zone": "ZONE_ROUTE_10_2",
+            "fog": 0
+        },
+        {
+            "zone": "ZONE_ROUTE_10_3",
+            "fog": 0
+        },
+        {
+            "zone": "ZONE_ROUTE_10_4",
+            "fog": 0
+        },
+        {
+            "zone": "ZONE_ROUTE_10_5",
+            "fog": 0
+        },
+        {
+            "zone": "ZONE_ROUTE_10_6",
+            "fog": 0
+        },
+        {
+            "zone": "ZONE_ROUTE_10_7",
+            "fog": 0
+        },
+        {
+            "zone": "ZONE_ROUTE_10_8",
+            "fog": 0
+        },
+        {
+            "zone": "ZONE_ROUTE_10_9",
+            "fog": 0
+        },
+        {
+            "zone": "ZONE_ROUTE_10_10",
+            "fog": 0
+        },
+        {
+            "zone": "ZONE_MARVELOUS_BRIDGE",
+            "fog": 7
+        },
+        {
+            "zone": "ZONE_PINWHEEL_FOREST_2",
+            "fog": 25
+        },
+        {
+            "zone": "ZONE_CHARGESTONE_CAVE_2",
+            "fog": 10
+        },
+        {
+            "zone": "ZONE_CHARGESTONE_CAVE_3",
+            "fog": 10
+        },
+        {
+            "zone": "ZONE_CHARGESTONE_CAVE_4",
+            "fog": 10
+        },
+        {
+            "zone": "ZONE_ABYSSAL_RUINS_5",
+            "fog": 19
+        },
+        {
+            "zone": "ZONE_ABYSSAL_RUINS_6",
+            "fog": 19
+        },
+        {
+            "zone": "ZONE_ABYSSAL_RUINS_7",
+            "fog": 19
+        },
+        {
+            "zone": "ZONE_ABYSSAL_RUINS_8",
+            "fog": 19
+        },
+        {
+            "zone": "ZONE_BRIDGE_GATE",
+            "fog": 5
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_2",
+            "fog": 3
+        },
+        {
+            "zone": "ZONE_GIANT_CHASM_2",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_GIANT_CHASM_5",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_WELLSPRING_CAVE",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_WELLSPRING_CAVE_2",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_MISTRALTON_CAVE",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_MISTRALTON_CAVE_2",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_GUIDANCE_CHAMBER",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_CHALLENGERS_CAVE",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_CHALLENGERS_CAVE_2",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_CHALLENGERS_CAVE_3",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_3",
+            "fog": 11
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_4",
+            "fog": 11
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_5",
+            "fog": 11
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_6",
+            "fog": 11
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_7",
+            "fog": 11
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_8",
+            "fog": 11
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_9",
+            "fog": 11
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_10",
+            "fog": 11
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_11",
+            "fog": 11
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_12",
+            "fog": 11
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_13",
+            "fog": 11
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_14",
+            "fog": 11
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_15",
+            "fog": 11
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_16",
+            "fog": 11
+        },
+        {
+            "zone": "ZONE_TRIAL_CHAMBER",
+            "fog": 11
+        },
+        {
+            "zone": "ZONE_MARINE_TUBE",
+            "fog": 8
+        },
+        {
+            "zone": "ZONE_MISTRALTON_CITY_GYM",
+            "fog": 13
+        },
+        {
+            "zone": "ZONE_LENTIMAS_TOWN",
+            "fog": 27
+        },
+        {
+            "zone": "ZONE_REVERSAL_MOUNTAIN",
+            "fog": 27
+        },
+        {
+            "zone": "ZONE_CASTELIA_SEWERS",
+            "fog": 12
+        },
+        {
+            "zone": "ZONE_REVERSAL_MOUNTAIN_8",
+            "fog": 22
+        },
+        {
+            "zone": "ZONE_REVERSAL_MOUNTAIN_9",
+            "fog": 22
+        },
+        {
+            "zone": "ZONE_REVERSAL_MOUNTAIN_10",
+            "fog": 22
+        },
+        {
+            "zone": "ZONE_REVERSAL_MOUNTAIN_11",
+            "fog": 22
+        },
+        {
+            "zone": "ZONE_REVERSAL_MOUNTAIN_12",
+            "fog": 22
+        },
+        {
+            "zone": "ZONE_REVERSAL_MOUNTAIN_13",
+            "fog": 22
+        },
+        {
+            "zone": "ZONE_REVERSAL_MOUNTAIN_2",
+            "fog": 20
+        },
+        {
+            "zone": "ZONE_REVERSAL_MOUNTAIN_3",
+            "fog": 20
+        },
+        {
+            "zone": "ZONE_REVERSAL_MOUNTAIN_4",
+            "fog": 20
+        },
+        {
+            "zone": "ZONE_REVERSAL_MOUNTAIN_5",
+            "fog": 20
+        },
+        {
+            "zone": "ZONE_REVERSAL_MOUNTAIN_6",
+            "fog": 20
+        },
+        {
+            "zone": "ZONE_REVERSAL_MOUNTAIN_7",
+            "fog": 20
+        },
+        {
+            "zone": "ZONE_POKEMON_LEAGUE_5",
+            "fog": 1
+        },
+        {
+            "zone": "ZONE_STRANGE_HOUSE",
+            "fog": 21
+        },
+        {
+            "zone": "ZONE_STRANGE_HOUSE_2",
+            "fog": 21
+        },
+        {
+            "zone": "ZONE_STRANGE_HOUSE_3",
+            "fog": 21
+        },
+        {
+            "zone": "ZONE_STRANGE_HOUSE_4",
+            "fog": 21
+        },
+        {
+            "zone": "ZONE_STRANGE_HOUSE_5",
+            "fog": 21
+        },
+        {
+            "zone": "ZONE_STRANGE_HOUSE_6",
+            "fog": 21
+        },
+        {
+            "zone": "ZONE_STRANGE_HOUSE_7",
+            "fog": 21
+        },
+        {
+            "zone": "ZONE_STRANGE_HOUSE_8",
+            "fog": 21
+        },
+        {
+            "zone": "ZONE_STRANGE_HOUSE_9",
+            "fog": 21
+        },
+        {
+            "zone": "ZONE_STRANGE_HOUSE_10",
+            "fog": 21
+        },
+        {
+            "zone": "ZONE_OPELUCID_CITY",
+            "fog": 24
+        },
+        {
+            "zone": "ZONE_GIANT_CHASM_4",
+            "fog": 24
+        },
+        {
+            "zone": "ZONE_PLASMA_FRIGATE_11",
+            "fog": 28
+        },
+        {
+            "zone": "ZONE_RELIC_PASSAGE",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_RELIC_PASSAGE_2",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_RELIC_PASSAGE_3",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_SEASIDE_CAVE",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_SEASIDE_CAVE_2",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN_8",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_20",
+            "fog": 11
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_21",
+            "fog": 11
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_23",
+            "fog": 11
+        },
+        {
+            "zone": "ZONE_GIANT_CHASM_6",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_CLAY_TUNNEL",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_CLAY_TUNNEL_2",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_CLAY_TUNNEL_3",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_UNDERGROUND_RUINS",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN_3",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN_4",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN_5",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN_6",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_26",
+            "fog": 23
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_24",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_17",
+            "fog": 17
+        },
+        {
+            "zone": "ZONE_NATURE_PRESERVE",
+            "fog": 26
+        }
+    ]
+}

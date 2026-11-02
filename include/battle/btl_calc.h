@@ -47,7 +47,7 @@ BattleCondition BtlCalc_MakeStatusCondition(u32 status);
 u32 BtlCalc_FindMentalHerbCondition(BattleMon *mon);
 BOOL IsBasicStatus(s32 condition);
 BattleCondition BtlCalc_MakeTurnCondition(u32 turns);
-BattleCondition BtlCalc_MakePokeCondition(u32 turns);
+BattleCondition BtlCalc_MakePokeCondition(u32 monId);
 void BtlCalc_MakeDefaultCondition(s32 condition, BattleMon *mon, BattleCondition *out);
 u16 BtlCalc_PickRandomMove(const u16 *excluded, u16 count);
 BOOL BtlCalc_IsMoveInList(const u16 *moves, u32 count, u16 move);

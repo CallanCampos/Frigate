@@ -1,13 +1,13 @@
 # The audit of the battle's event variables on a 64-bit host, as clang-query matchers. The battle's handlers read and
 # rewrite their events' variables through include/battle/btl_event.h (src/ov167/battle_event.c). Since the pointer
 # cast guard's R06 was fixed, each variable's value is an sptr and BattleEventVar_GetValue returns a uptr, so that
-# variable 0x3f carries the address of the BattleHandlerString that a move's message is written to: the server sets it
-# in src/ov167/btl_server_flow.c, and eight message handlers (src/ov167/move_handlers.c, src/ov169/side_handlers.c)
-# make a pointer of it again. Every other variable holds a number set from an s32 (a mon, a move, a type, a power, a
-# multiplier), which the getter now gives as a 64-bit value where the DS gives a u32. The matchers below list every
-# use of that value through which a host could compute something other than what the DS does, and the address's path,
-# so that a change to the battle's C can be checked again; port/docs/STATUS.md's entry for R06 has the counts and the
-# reading of each listed site.
+# variable 0x3f (BTL_EVAR_STRING) carries the address of the BattleHandlerString that a move's message is written to:
+# the server sets it in src/ov167/btl_server_flow.c, and eight message handlers (src/ov167/move_handlers.c,
+# src/ov169/side_handlers.c) make a pointer of it again. Every other variable holds a number set from an s32 (a mon,
+# a move, a type, a power, a multiplier), which the getter now gives as a 64-bit value where the DS gives a u32. The
+# matchers below list every use of that value through which a host could compute something other than what the DS
+# does, and the address's path, so that a change to the battle's C can be checked again; port/docs/STATUS.md's entry
+# for R06 has the counts and the reading of each listed site.
 #
 # Run it from the repository's root on a host build's compile database (Homebrew LLVM's clang-query), over the C files
 # that include the header, directly or through battle/btl_ability.h:
@@ -37,22 +37,27 @@ let safeOperand ignoringParenImpCasts(anyOf(integerLiteral(hasType(asString("int
 # The functions that write a variable's value
 let setter functionDecl(matchesName("^::BattleEventVar_(Set|SetConst|SetRewriteOnce|SetMul|Rewrite|Mul)Value$"))
 
+# A variable named by a constant: a literal, or one of include/battle/btl_event.h's BTL_EVAR_ names, which the
+# battle's C uses for most variables since upstream's 4d64efb7dd; and variable 0x3f either way, BTL_EVAR_STRING
+let constantKey ignoringParenImpCasts(anyOf(integerLiteral(), declRefExpr(to(enumConstantDecl()))))
+let stringKey ignoringParenImpCasts(anyOf(integerLiteral(equals(63)),
+    declRefExpr(to(enumConstantDecl(hasName("BTL_EVAR_STRING"))))))
+
 # 1. Every call of the getter
 match getValue.bind("call")
 
 # 2. The address's path: the reads of variable 0x3f, the getter's results made a pointer again, the setters given 0x3f,
 #    and the setters given a pointer's value; each should be the same handlers' and the server's four sites
-match callExpr(callee(functionDecl(hasName("BattleEventVar_GetValue"))),
-    hasArgument(0, ignoringParenImpCasts(integerLiteral(equals(63))))).bind("read0x3f")
+match callExpr(callee(functionDecl(hasName("BattleEventVar_GetValue"))), hasArgument(0, stringKey)).bind("read0x3f")
 match cStyleCastExpr(hasType(pointerType()), hasSourceExpression(ignoringParenImpCasts(getValue))).bind("toPointer")
-match callExpr(callee(setter), hasArgument(0, ignoringParenImpCasts(integerLiteral(equals(63))))).bind("set0x3f")
+match callExpr(callee(setter), hasArgument(0, stringKey)).bind("set0x3f")
 match callExpr(callee(setter),
     hasAnyArgument(ignoringParenImpCasts(cStyleCastExpr(hasSourceExpression(ignoringParenImpCasts(
     expr(hasType(pointerType())))))))).bind("setAddress")
 
-# 3. Reads whose variable is computed, not a literal: each must be shown never to be 0x3f
+# 3. Reads whose variable is computed, not a constant: each must be shown never to be 0x3f
 match callExpr(callee(functionDecl(hasName("BattleEventVar_GetValue"))),
-    hasArgument(0, unless(ignoringParenImpCasts(integerLiteral())))).bind("computedKey")
+    hasArgument(0, unless(constantKey))).bind("computedKey")
 
 # 4. Uses that differ at 64 bits for a negative number: none should match
 match binaryOperator(hasAnyOperatorName("/", "%", ">>", "/=", "%=", ">>="), hasEitherOperand(wideValue)).bind("divide")

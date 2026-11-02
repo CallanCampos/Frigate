@@ -1,0 +1,11 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "L",
+    "shapes": [ 2 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_VILLAGE_BRIDGE": [ "rippling_surf" ]
+        }
+    }
+}

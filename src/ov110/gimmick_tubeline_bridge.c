@@ -2,6 +2,7 @@
 // motion curve and waiting a random time between crossings. The ROM embeds no name for this file, so its name is a
 // guess. Archive 128 holds the bridge's data: each train's sound range and volume, its curve and its wait range
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_camera.h"
 #include "field/field_exp_obj.h"
@@ -19,7 +20,6 @@
 #include "system/iss_sys.h"
 
 #define GIMMICK_STATE_ID 11
-#define ARCID_TUBELINE_BRIDGE 128
 #define TRAIN_COUNT 2
 
 // A train's sound, from files 1 and 2 of archive 128

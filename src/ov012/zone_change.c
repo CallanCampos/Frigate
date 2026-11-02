@@ -12,9 +12,9 @@
 
 void ZoneChange_OnSeamless(GameData *gameData, Field *field) {
     SaveControl_GetEncountSave(GameData_GetSaveControl(gameData));
-    func_ov012_021591f4(gameData);
+    Encount_OnZoneChange(gameData);
     EventWork_FlagReset(GameData_GetEventWork(gameData), 0x964);
-    func_ov012_0215917c(gameData, field);
+    GameData_LoadEncountZone(gameData, field);
 }
 
 void ZoneChange_OnMapChange(GameData *gameData, u16 zoneId) {

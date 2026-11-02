@@ -40,21 +40,21 @@ u32 BSubwayPlayData_GetData(BSubwayPlayData *data, u32 id, void *buffer) {
         return data->wifiTurn;
     case BSUBWAY_PLAY_WIFI_DAMAGE:
         return data->wifiDamage;
-    case BSUBWAY_PLAY_UNK8:
-        MI_CpuCopy8(data->unk8, buffer, sizeof(data->unk8));
+    case BSUBWAY_PLAY_MEMBER_SLOTS:
+        MI_CpuCopy8(data->memberSlots, buffer, sizeof(data->memberSlots));
         return 0;
-    case BSUBWAY_PLAY_UNK28:
-        MI_CpuCopy8(data->unk28, buffer, sizeof(data->unk28));
+    case BSUBWAY_PLAY_PARTNER_CONFIG:
+        MI_CpuCopy8(data->partnerConfig, buffer, sizeof(data->partnerConfig));
         return 0;
-    case BSUBWAY_PLAY_UNK0_0:
-        return data->unk0_0;
-    case BSUBWAY_PLAY_UNKC:
-        MI_CpuCopy8(data->unkC, buffer, sizeof(data->unkC));
+    case BSUBWAY_PLAY_PARTNER_RENTAL_ITEM:
+        return data->partnerRentalItem;
+    case BSUBWAY_PLAY_TRAINER_NOS:
+        MI_CpuCopy8(data->trainerNos, buffer, sizeof(data->trainerNos));
         return 0;
-    case BSUBWAY_PLAY_UNK0_6:
-        return data->unk0_6;
-    case BSUBWAY_PLAY_UNK0_9:
-        return data->unk0_9;
+    case BSUBWAY_PLAY_PARTNER_INDEX:
+        return data->partnerIndex;
+    case BSUBWAY_PLAY_USE_BATTLE_BOX:
+        return data->useBattleBox;
     case BSUBWAY_PLAY_UNK0_10:
         return data->unk0_10;
     }
@@ -78,23 +78,23 @@ void BSubwayPlayData_SetData(BSubwayPlayData *data, u32 id, const void *value) {
     case BSUBWAY_PLAY_WIFI_DAMAGE:
         data->wifiDamage = *(const u16 *)value;
         break;
-    case BSUBWAY_PLAY_UNK8:
-        MI_CpuCopy8(value, data->unk8, sizeof(data->unk8));
+    case BSUBWAY_PLAY_MEMBER_SLOTS:
+        MI_CpuCopy8(value, data->memberSlots, sizeof(data->memberSlots));
         break;
-    case BSUBWAY_PLAY_UNK28:
-        MI_CpuCopy8(value, data->unk28, sizeof(data->unk28));
+    case BSUBWAY_PLAY_PARTNER_CONFIG:
+        MI_CpuCopy8(value, data->partnerConfig, sizeof(data->partnerConfig));
         break;
-    case BSUBWAY_PLAY_UNK0_0:
-        data->unk0_0 = *(const u8 *)value;
+    case BSUBWAY_PLAY_PARTNER_RENTAL_ITEM:
+        data->partnerRentalItem = *(const u8 *)value;
         break;
-    case BSUBWAY_PLAY_UNKC:
-        MI_CpuCopy8(value, data->unkC, sizeof(data->unkC));
+    case BSUBWAY_PLAY_TRAINER_NOS:
+        MI_CpuCopy8(value, data->trainerNos, sizeof(data->trainerNos));
         break;
-    case BSUBWAY_PLAY_UNK0_6:
-        data->unk0_6 = *(const u8 *)value;
+    case BSUBWAY_PLAY_PARTNER_INDEX:
+        data->partnerIndex = *(const u8 *)value;
         break;
-    case BSUBWAY_PLAY_UNK0_9:
-        data->unk0_9 = *(const u8 *)value;
+    case BSUBWAY_PLAY_USE_BATTLE_BOX:
+        data->useBattleBox = *(const u8 *)value;
         break;
     case BSUBWAY_PLAY_UNK0_10:
         data->unk0_10 = *(const u8 *)value;

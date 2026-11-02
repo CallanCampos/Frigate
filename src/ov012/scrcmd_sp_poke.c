@@ -9,10 +9,10 @@
 #include "system/game_system.h"
 #include "system/vm.h"
 
-static void func_ov012_02169c64(GameSystem *gsys);
+static void NuvemaGimmick_SetVisible(GameSystem *gsys);
 
-BOOL func_ov012_02169c1c(VM *vm, FieldScriptEnv *env) {
-    func_ov012_02169c64(FieldScriptEnv_GetGameSystem(env));
+BOOL Scrcmd_SpPoke_NuvemaGimmickSetVisible(VM *vm, FieldScriptEnv *env) {
+    NuvemaGimmick_SetVisible(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
@@ -28,7 +28,7 @@ BOOL Scrcmd_SpPoke_NuvemaGimmickWaitAnim(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static void func_ov012_02169c64(GameSystem *gsys) {
+static void NuvemaGimmick_SetVisible(GameSystem *gsys) {
     u32 *state = GimmickState_GetUserData(GameData_GetGimmickState(GSYS_GetGameData(gsys)), GIMMICK_NUVEMA);
 
     *state = TRUE;

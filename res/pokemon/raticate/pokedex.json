@@ -1,0 +1,13 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "R",
+    "shapes": [ 4 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_DREAMYARD": [ "grass", "dark_grass" ],
+            "ZONE_STRANGE_HOUSE": [ "grass" ],
+            "ZONE_RELIC_PASSAGE": [ "grass" ]
+        }
+    }
+}

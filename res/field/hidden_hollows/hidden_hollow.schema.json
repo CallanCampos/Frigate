@@ -1,0 +1,47 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "What a Hidden Grotto holds: res/field/hidden_hollows/<n>.json",
+    "description": "File n of ARCID_SCRCMD_HIDDEN_HOLLOW (a/2/7/3), grotto n's HollowFile (scrcmd_hidden_hollow.c), which Scrcmd_HiddenHollow_HiddenHollowGetParam reads for the slot and the group that the grotto rolled (hidden_hollow_generate.c); a grotto's mission gives its own Pokémon instead. tools/data/hidden_hollow_data.py packs them in order.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "pokemon", "items", "hidden_items" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "pokemon": {
+            "type": "object", "additionalProperties": false, "required": [ "white2", "black2" ],
+            "description": "The Pokémon of slots 0 to 2 in each version, White 2's first in the file (HOLLOW_FILE_VERSION)",
+            "properties": { "white2": { "$ref": "#/$defs/slots" }, "black2": { "$ref": "#/$defs/slots" } }
+        },
+        "items": { "$ref": "#/$defs/items", "description": "The items in balls of slots 3 to 6, each slot's of each group (HIDDEN_HOLLOW_PARAM_ITEM)" },
+        "hidden_items": { "$ref": "#/$defs/items", "description": "The hidden items of slots 7 to 10, each slot's of each group (HIDDEN_HOLLOW_PARAM_HIDDEN_ITEM)" }
+    },
+    "$defs": {
+        "u8s": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "type": "integer", "minimum": 0, "maximum": 255 } },
+        "slots": {
+            "type": "array", "minItems": 3, "maxItems": 3,
+            "items": {
+                "type": "object", "additionalProperties": false,
+                "required": [ "species", "max_level", "min_level", "female_below", "form", "unk18" ],
+                "description": "A slot's Pokémon, a HollowSlot: each field is the value of each of the four groups",
+                "properties": {
+                    "species": {
+                        "type": "array", "minItems": 4, "maxItems": 4,
+                        "items": { "type": [ "string", "integer" ], "x-constant": "SPECIES_", "minimum": 0, "maximum": 65535, "description": "A SPECIES_* constant" }
+                    },
+                    "max_level": { "$ref": "#/$defs/u8s", "description": "The level is the minimum plus a random number below the maximum less the minimum" },
+                    "min_level": { "$ref": "#/$defs/u8s", "description": "The lowest level, no higher than the maximum" },
+                    "female_below": { "$ref": "#/$defs/u8s", "description": "The Pokémon is female if the grotto's gender roll is below this (HIDDEN_HOLLOW_PARAM_FEMALE)" },
+                    "form": { "$ref": "#/$defs/u8s", "description": "The Pokémon's form" },
+                    "unk18": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "integer", "minimum": 0, "maximum": 255 }, "description": "Never read" }
+                }
+            }
+        },
+        "items": {
+            "type": "array", "minItems": 4, "maxItems": 4,
+            "items": {
+                "type": "array", "minItems": 4, "maxItems": 4,
+                "items": { "type": [ "string", "integer" ], "x-constant": "ITEM_", "minimum": 0, "maximum": 65535, "description": "An ITEM_* constant" }
+            }
+        }
+    }
+}

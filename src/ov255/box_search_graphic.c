@@ -16,7 +16,7 @@
 #define BG_COUNT 7
 
 typedef struct {
-    u32 unk0;
+    u32 unused;
 } BoxSearchBG;
 
 typedef struct {
@@ -26,7 +26,7 @@ typedef struct {
 struct BoxSearchGraphic {
     BoxSearchBG bg;
     BoxSearchClAct clact;
-    u32 unk8;
+    u32 unused;
     TCB *vblankTask;
 };
 
@@ -48,12 +48,12 @@ static void BoxSearchClAct_Update(BoxSearchClAct *clact);
 static void BoxSearchClAct_VBlank(BoxSearchClAct *clact);
 static ClActUnit *BoxSearchClAct_GetUnit(BoxSearchClAct *clact);
 
-static const BGSysLCDConfig data_ov255_021d9490 = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_2D };
+static const BGSysLCDConfig sBoxSearchLCDConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_2D };
 
-static const ClActSysSetup data_ov255_021d94a0 = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 32, 32, 32, 32, 16, 16 };
+static const ClActSysSetup sBoxSearchClActSetup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 32, 32, 32, 32, 16, 16 };
 
 // clang-format off
-static const BGSysVRAMConfig data_ov255_021d94bc = {
+static const BGSysVRAMConfig sBoxSearchVRAMConfig = {
     GX_VRAM_BG_128_A,  GX_VRAM_BGEXTPLTT_NONE, GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
     GX_VRAM_OBJ_128_B, GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_16_I,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
     GX_VRAM_TEX_0_D,   GX_VRAM_TEXPLTT_0_F,    GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_32K,
@@ -62,7 +62,7 @@ static const BGSysVRAMConfig data_ov255_021d94bc = {
 // clang-format on
 
 // clang-format off
-static const BoxSearchBGSetup data_ov255_021d94ec[BG_COUNT] = {
+static const BoxSearchBGSetup sBoxSearchBGSetups[BG_COUNT] = {
     { 0,
       { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x0000), GX_BG_CHARBASE(0x04000), 0x4000,
         GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE },
@@ -104,14 +104,14 @@ BoxSearchGraphic *BoxSearchGraphic_Create(u32 layout, HeapID heapId) {
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
     GFL_BGSysInitVRAM(GX_VRAM_NONE);
-    GFL_BGSysSetVRAMBanks(&data_ov255_021d94bc);
+    GFL_BGSysSetVRAMBanks(&sBoxSearchVRAMConfig);
     GFL_BGSysSetDisplayLayout(layout);
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
     GFL_TextRndInitColorIndexLUT();
     BoxSearchBG_Create(&graphic->bg, heapId);
-    BoxSearchClAct_Create(&graphic->clact, &data_ov255_021d94bc, heapId);
+    BoxSearchClAct_Create(&graphic->clact, &sBoxSearchVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(BoxSearchGraphic_VBlank, graphic, 0);
     return graphic;
 }
@@ -157,19 +157,19 @@ static void BoxSearchBG_Create(BoxSearchBG *bg, HeapID heapId) {
     MI_CpuFill8(bg, 0, sizeof(BoxSearchBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
-    GFL_BGSysSetLCDConfig(&data_ov255_021d9490);
-    for (i = 0; i < NELEMS(data_ov255_021d94ec); i++) {
-        GFL_BGSysCreateBG(data_ov255_021d94ec[i].bg, &data_ov255_021d94ec[i].setup, data_ov255_021d94ec[i].mode);
-        GFL_BGSysClearBG(data_ov255_021d94ec[i].bg);
-        GFL_BGSysSetBGEnabled(data_ov255_021d94ec[i].bg, data_ov255_021d94ec[i].enabled);
+    GFL_BGSysSetLCDConfig(&sBoxSearchLCDConfig);
+    for (i = 0; i < NELEMS(sBoxSearchBGSetups); i++) {
+        GFL_BGSysCreateBG(sBoxSearchBGSetups[i].bg, &sBoxSearchBGSetups[i].setup, sBoxSearchBGSetups[i].mode);
+        GFL_BGSysClearBG(sBoxSearchBGSetups[i].bg);
+        GFL_BGSysSetBGEnabled(sBoxSearchBGSetups[i].bg, sBoxSearchBGSetups[i].enabled);
     }
 }
 
 static void BoxSearchBG_Delete(BoxSearchBG *bg) {
     u32 i;
 
-    for (i = 0; i < NELEMS(data_ov255_021d94ec); i++) {
-        GFL_BGSysReleaseBG(data_ov255_021d94ec[i].bg);
+    for (i = 0; i < NELEMS(sBoxSearchBGSetups); i++) {
+        GFL_BGSysReleaseBG(sBoxSearchBGSetups[i].bg);
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
@@ -185,7 +185,7 @@ static void BoxSearchBG_VBlank(BoxSearchBG *bg) {
 
 static void BoxSearchClAct_Create(BoxSearchClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(BoxSearchClAct));
-    ClActSys_Create(&data_ov255_021d94a0, vramConfig, heapId);
+    ClActSys_Create(&sBoxSearchClActSetup, vramConfig, heapId);
     clact->unit = ClActUnit_Create(128, 0, heapId);
     ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);

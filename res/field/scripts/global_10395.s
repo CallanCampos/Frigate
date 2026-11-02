@@ -30,18 +30,18 @@ L_0057:
     VMHalt
 
 L_0059:
-    Cmd_01DB 0, 0x8010
+    MysteryGifts 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_009F
     FlagSet EVENT_FLAG_0x0266
-    Cmd_01DB 6, 0x8010
+    MysteryGifts 6, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0099
-    Cmd_01DB 5, 0x8020
+    MysteryGifts 5, 0x8020
     ActorDelete 0x8020
 
 L_0099:
@@ -49,17 +49,17 @@ L_0099:
 
 L_009F:
     FlagReset EVENT_FLAG_0x0266
-    Cmd_01DB 6, 0x8010
+    MysteryGifts 6, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_00CE
-    Cmd_01DB 5, 0x8020
+    MysteryGifts 5, 0x8020
     VMCall L_00E0
     VMJump L_00DE
 
 L_00CE:
-    Cmd_01DB 5, 0x8020
+    MysteryGifts 5, 0x8020
     ActorAdd 0x8020
     VMCall L_00E0
 
@@ -93,7 +93,7 @@ Script_3:
     VMHalt
 
 L_0139:
-    Cmd_01DB 0, 0x8010
+    MysteryGifts 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -133,7 +133,7 @@ L_01B3:
 
 L_01BD:
     ActorMsgClose
-    Cmd_01DB 1, 0x8010
+    MysteryGifts 1, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -147,7 +147,7 @@ L_01BD:
     VMJump L_0206
 
 L_01F6:
-    Cmd_01DB 3, 0x8025
+    MysteryGifts 3, 0x8025
     SystemMsg 0x8025, 2
     LastKeyWait
     SystemMsgClose
@@ -156,8 +156,8 @@ L_0206:
     VMReturn
 
 L_0208:
-    Cmd_01DB 2, 0x8025
-    Cmd_01DB 7, 0x8010
+    MysteryGifts 2, 0x8025
+    MysteryGifts 7, 0x8010
     WorkCmpConst 0x8010, 1
     VMJumpIf CMP_EQ, L_0227
     VMJump L_0239
@@ -227,6 +227,6 @@ L_02E4:
 L_02F6:
     MsgWaitAdvance
     SystemMsgClose
-    Cmd_01DB 4, 0x8010
+    MysteryGifts 4, 0x8010
     VMReturn
     .balign 4, 0

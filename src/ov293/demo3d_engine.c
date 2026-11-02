@@ -45,7 +45,7 @@ Demo3DEngine *Demo3DEngine_Create(Demo3DGraphic *graphic, Demo3DParam *param, He
     engine->heapId = heapId;
     engine->scene.demoId = engine->demoId;
     engine->scene.param = param->param;
-    engine->scene.startFrame = param->unk08;
+    engine->scene.startFrame = param->startFrame;
     engine->scene.dayPeriod = GetDayPeriod(param->season, param->hour);
     engine->scene.playerSex = param->playerSex;
     engine->scene.hour = param->hour;

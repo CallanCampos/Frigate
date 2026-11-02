@@ -51,9 +51,6 @@
 #define GAUGE_PALETTE_FILE_BACK 0x1b0
 #endif
 
-// The status icon's sequence for no status
-#define GAUGE_STATUS_NONE 8
-
 // What a gauge shows of its mon, cleared when a mon is set, 0x44 bytes
 typedef struct {
     u32 type;       // 0x00  the battle's style, BTL_STYLE_*
@@ -89,7 +86,7 @@ typedef struct {
     u32 unk30_31 : 1;
     u32 hpSpeed;    // 0x34  0 to change at once
     s32 hpDots;     // 0x38  the HP bar's pixels
-    u32 status;     // 0x3c  the status icon's sequence, in mode 2
+    u32 status;     // 0x3c  the status icon's sequence, BTLV_GAUGE_STATUS_*, in a movie's playback
     TCB *slideTask; // 0x40
 } BtlvGaugeMon;
 
@@ -138,7 +135,7 @@ struct BtlvGauge {
     u32 noPinchBgm : 1;    // bit 21
     u32 toggleRequest : 1; // bit 22
     u32 loaded : 1;        // bit 23
-    u32 mode : 2;          // bits 24-25
+    u32 studioMode : 2;    // bits 24-25: BTL_STUDIO_MODE_*
     u32 unk460_26 : 6;
     u32 bgm;       // 0x464  the battle's music
     HeapID heapId; // 0x468
@@ -184,7 +181,7 @@ static void BtlvGauge_PauseBgm(BOOL paused);
 static u32 BtlvGauge_CalcFill(u32 value, u32 max, u32 width);
 static void BtlvGauge_ShowHpParts(BtlvGauge *gauge, int index, BOOL visible);
 
-BtlvGauge *BtlvGauge_Create(Font *font, u32 mode, HeapID heapId) {
+BtlvGauge *BtlvGauge_Create(Font *font, u32 studioMode, HeapID heapId) {
     BtlvGauge *gauge = GFL_HeapAllocate(heapId, sizeof(BtlvGauge), TRUE, "btlv_gauge.c", 340);
     BtlvGaugeFlashTask *flash;
 
@@ -196,8 +193,8 @@ BtlvGauge *BtlvGauge_Create(Font *font, u32 mode, HeapID heapId) {
     flash = GFL_HeapAllocate(heapId, sizeof(BtlvGaugeFlashTask), TRUE, "btlv_gauge.c", 355);
     flash->gauge = gauge;
     gauge->flashTask = GFL_TCBMgrAddTask(BtlvEffect_GetTCBManager(), BtlvGauge_FlashTask, flash, 0);
-    gauge->mode = mode;
-    if (mode != 2) {
+    gauge->studioMode = studioMode;
+    if (studioMode != BTL_STUDIO_MODE_PLAYBACK) {
         BtlvGauge_LoadResources(gauge);
     } else {
         BtlvGauge_InitStatusOnly(gauge);
@@ -288,7 +285,7 @@ void BtlvGauge_Update(BtlvGauge *gauge) {
             }
         }
     }
-    if (!gauge->noPinchBgm && gauge->mode == 0) {
+    if (!gauge->noPinchBgm && gauge->studioMode == BTL_STUDIO_MODE_NONE) {
         BtlvGauge_UpdatePinchBgm(gauge);
     }
 }
@@ -477,10 +474,10 @@ static u32 BtlvGauge_BackPaletteFile(void) {
 }
 
 static void BtlvGauge_CreateActors(BtlvGauge *gauge, u32 type, int index) {
-    // The gauges' priorities by view position: in single and double battles, triple and rotation
-    static const u8 data_ov168_021f3d8c[6] = { 0, 0, 3, 3, 0, 0 };
-    static const u8 data_ov168_021f3d92[8] = { 3, 0, 6, 6, 3, 3, 0, 0 };
-    static const u8 data_ov168_021f3d9a[8] = { 3, 0, 3, 3, 6, 6, 0, 0 };
+    // The gauges' priorities by view position: in single and double battles, triple and rotation battles
+    static const u8 sPriorities[6] = { 0, 0, 3, 3, 0, 0 };
+    static const u8 sPrioritiesTriple[8] = { 3, 0, 6, 6, 3, 3, 0, 0 };
+    static const u8 sPrioritiesRotation[8] = { 3, 0, 3, 3, 6, 6, 0, 0 };
     u32 charsFile;
     u32 cellFile;
     u32 animFile;
@@ -538,11 +535,11 @@ static void BtlvGauge_CreateActors(BtlvGauge *gauge, u32 type, int index) {
             slot = index - 2;
         }
         if (type == BTL_STYLE_TRIPLE) {
-            priority = data_ov168_021f3d92[index];
+            priority = sPrioritiesTriple[index];
         } else if (type == BTL_STYLE_ROTATION) {
-            priority = data_ov168_021f3d9a[index];
+            priority = sPrioritiesRotation[index];
         } else {
-            priority = data_ov168_021f3d8c[index];
+            priority = sPriorities[index];
         }
         setup.priority = priority + 2;
         gauge->entries[index].nameActor =
@@ -1362,9 +1359,17 @@ static void BtlvGauge_UpdateShake(BtlvGauge *gauge, int index) {
 }
 
 void BtlvGauge_SetStatus(BtlvGauge *gauge, u32 status, int index) {
-    const u32 sequences[7] = { GAUGE_STATUS_NONE, 1, 3, 2, 5, 4, 7 };
+    const u32 sequences[7] = {
+        BTLV_GAUGE_STATUS_NONE,
+        BTLV_GAUGE_STATUS_PARALYSIS,
+        BTLV_GAUGE_STATUS_SLEEP,
+        BTLV_GAUGE_STATUS_FREEZE,
+        BTLV_GAUGE_STATUS_BURN,
+        BTLV_GAUGE_STATUS_POISON,
+        7,
+    };
 
-    if (gauge->mode == 2) {
+    if (gauge->studioMode == BTL_STUDIO_MODE_PLAYBACK) {
         gauge->entries[index].mon.status = sequences[status];
         return;
     }
@@ -1417,14 +1422,14 @@ void BtlvGauge_SetNoPinchBgm(BtlvGauge *gauge, BOOL noPinchBgm) {
 }
 
 BOOL BtlvGauge_GetStatus(BtlvGauge *gauge, int index, u32 *color, u32 *status) {
-    if (gauge->mode == 2 && gauge->entries[index].mon.shown) {
+    if (gauge->studioMode == BTL_STUDIO_MODE_PLAYBACK && gauge->entries[index].mon.shown) {
         BtlvGauge_ReadStatus(gauge, index, color, status, FALSE);
         return TRUE;
     }
     if (gauge->entries[index].nameActor == NULL || !gauge->entries[index].mon.shown ||
         gauge->entries[index].mon.statusHidden) {
         *color = 0;
-        *status = GAUGE_STATUS_NONE;
+        *status = BTLV_GAUGE_STATUS_NONE;
         return FALSE;
     }
     BtlvGauge_ReadStatus(gauge, index, color, status, TRUE);
@@ -1439,13 +1444,13 @@ static void BtlvGauge_ReadStatus(BtlvGauge *gauge, int index, u32 *color, u32 *s
     }
     *color = HPGauge_GetColor(gauge->entries[index].mon.hp, gauge->entries[index].mon.maxHp);
     if (*status == 0) {
-        *status = GAUGE_STATUS_NONE;
+        *status = BTLV_GAUGE_STATUS_NONE;
     }
 }
 
 static void BtlvGauge_InitStatusOnly(BtlvGauge *gauge) {
-    gauge->entries[0].mon.status = GAUGE_STATUS_NONE;
-    gauge->entries[1].mon.status = GAUGE_STATUS_NONE;
+    gauge->entries[0].mon.status = BTLV_GAUGE_STATUS_NONE;
+    gauge->entries[1].mon.status = BTLV_GAUGE_STATUS_NONE;
 }
 
 void BtlvGauge_RequestNumberToggle(BtlvGauge *gauge) {

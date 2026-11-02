@@ -332,7 +332,7 @@ BOOL FieldScriptEnv_UpdateListMenuEx(FieldScriptEnv *env) {
     return done;
 }
 
-void ListMenu_ShowDescription(BmpMenuList *list, s32 value, u8 a2) {
+void ListMenu_ShowDescription(BmpMenuList *list, s32 value, u8 init) {
     u16 index = 0;
     FieldScriptEnv *env = BmpMenuList_GetWork(list);
     ScriptListMenu *menu = &env->subwork->listMenu;

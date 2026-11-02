@@ -17,11 +17,18 @@ typedef struct {
     MusicalDressUpParam *param;
 } MusicalDressUpWork;
 
+// The proc's steps: overlay 208's dressing room is made, run until it gives a result, and freed
+enum {
+    MUSICAL_DRESSUP_STEP_CREATE,
+    MUSICAL_DRESSUP_STEP_MAIN,
+    MUSICAL_DRESSUP_STEP_FREE,
+};
+
 static BOOL MusicalDressUpProc_Init(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL MusicalDressUpProc_Exit(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL MusicalDressUpProc_Main(GameProc *proc, u32 *state, void *param, void *work);
 
-GameProcFunctions data_ov012_0216dfc4 = {
+GameProcFunctions MUSICAL_DRESSUP_PROC_FUNCTIONS = {
     MusicalDressUpProc_Init,
     MusicalDressUpProc_Main,
     MusicalDressUpProc_Exit,
@@ -31,7 +38,7 @@ static BOOL MusicalDressUpProc_Init(GameProc *proc, u32 *state, void *param, voi
     MusicalDressUpParam *dressUp = param;
     MusicalDressUpWork *wk;
 
-    *state = 0;
+    *state = MUSICAL_DRESSUP_STEP_CREATE;
     GFL_OvlLoad(OVERLAY_ID(208));
     GFL_OvlLoad(OVERLAY_ID(209));
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_MUSICAL_DRESSUP, 0x40000);
@@ -61,21 +68,21 @@ static BOOL MusicalDressUpProc_Main(GameProc *proc, u32 *state, void *param, voi
     u32 result;
 
     switch (*state) {
-    case 0:
+    case MUSICAL_DRESSUP_STEP_CREATE:
         wk->work = DupFitting_Create(wk->dressUp, HEAPID_MUSICAL_DRESSUP);
-        *state = 1;
+        *state = MUSICAL_DRESSUP_STEP_MAIN;
         if (wk->param->comm != NULL && MusComm_IsParent(wk->param->comm) == TRUE) {
             MusComm_StartSendingSound(wk->param->comm);
         }
         break;
-    case 1:
+    case MUSICAL_DRESSUP_STEP_MAIN:
         result = DupFitting_Main(wk->work);
         if (result != 0) {
             wk->result = result;
-            *state = 2;
+            *state = MUSICAL_DRESSUP_STEP_FREE;
         }
         break;
-    case 2:
+    case MUSICAL_DRESSUP_STEP_FREE:
         DupFitting_Free(wk->work);
         return TRUE;
     }

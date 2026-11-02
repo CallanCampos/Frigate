@@ -71,7 +71,7 @@ static BOOL MusicalShotSys_Init(GameProc *proc, u32 *state, void *param, void *w
         sys->param->loadData = TRUE;
         shot = sys->param->shot;
         RTC_GetCachedDate(&date);
-        shot->unk0_0 = 3;
+        shot->programId = 3;
         shot->tops = 2;
         shot->year = date.year;
         shot->month = date.month;

@@ -1,0 +1,21 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "P",
+    "shapes": [ 1 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_GIANT_CHASM": [ "fishing" ],
+            "ZONE_WELLSPRING_CAVE": [ "fishing" ],
+            "ZONE_LOSTLORN_FOREST": [ "fishing" ],
+            "ZONE_ROUTE_6": [ "fishing" ],
+            "ZONE_ROUTE_19": [ "fishing" ],
+            "ZONE_ROUTE_20": [ "fishing" ],
+            "ZONE_FLOCCESY_RANCH": [ "fishing" ],
+            "ZONE_ROUTE_23": [ "fishing" ],
+            "ZONE_VICTORY_ROAD": [ "fishing" ],
+            "ZONE_RELIC_PASSAGE": [ "fishing" ],
+            "ZONE_CLAY_TUNNEL": [ "fishing" ]
+        }
+    }
+}

@@ -66,7 +66,7 @@ static void DeliveryIrc_SeqWaitNetInit(void *work);
 static BOOL DeliveryIrc_InitNet(DeliveryIrcWork *pWork);
 
 // clang-format off
-static const NetCommand data_ov012_0216af3c[] = {
+static const NetCommand sDeliveryIrcCommands[] = {
     {DeliveryIrc_RecvData, DeliveryIrc_GetRecvBuffer},
     {DeliveryIrc_RecvHeader, NULL},
     {DeliveryIrc_RecvWanted, NULL},
@@ -76,9 +76,9 @@ static const NetCommand data_ov012_0216af3c[] = {
 // clang-format on
 
 // clang-format off
-static GFLNetInitData data_ov012_0216e110 = {
-    data_ov012_0216af3c,
-    NELEMS(data_ov012_0216af3c),
+static GFLNetInitData sDeliveryIrcNetInit = {
+    sDeliveryIrcCommands,
+    NELEMS(sDeliveryIrcCommands),
     NULL,
     DeliveryIrc_OnNegotiation,
     NULL,
@@ -347,8 +347,8 @@ static BOOL DeliveryIrc_InitNet(DeliveryIrcWork *pWork) {
     if (GFL_NetIsInitialized()) {
         return FALSE;
     }
-    data_ov012_0216e110.gameCommandBase = pWork->aInit.code;
-    GFL_NetInit(&data_ov012_0216e110, NULL, pWork);
+    sDeliveryIrcNetInit.gameCommandBase = pWork->aInit.code;
+    GFL_NetInit(&sDeliveryIrcNetInit, NULL, pWork);
     return TRUE;
 }
 

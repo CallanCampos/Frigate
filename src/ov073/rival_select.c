@@ -17,24 +17,24 @@ RivalEntry *RivalSelect_GetEntry(FesGimmick *gimmick, u32 id) {
 }
 
 void RivalSelect_SelectOtherRandom(FesGimmick *gimmick, u32 id) {
-    u8 choices[10];
+    u8 choices[FEST_MISSION_HOLLOW_ENTRY_COUNT];
     int i;
     u8 current = RivalSelect_FindEntryIndex(gimmick, id);
     u8 count = 0;
     RivalEntry *entries = LinkFestival_GetMissionWork(gimmick->festival)->hollows;
     u8 choice;
 
-    if (current == 10) {
+    if (current == FEST_MISSION_HOLLOW_ENTRY_COUNT) {
         return;
     }
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < FEST_MISSION_HOLLOW_ENTRY_COUNT; i++) {
         if (current != i) {
             choices[count] = i;
             count++;
         }
     }
     entries[current].selected = 0;
-    choice = choices[GFL_RandomLC(9)];
+    choice = choices[GFL_RandomLC(FEST_MISSION_HOLLOW_ENTRY_COUNT - 1)];
     entries[choice].selected = 1;
 }
 
@@ -65,7 +65,7 @@ BOOL RivalSelect_RemoveHollowActor(FesGimmick *gimmick) {
 BOOL RivalSelect_IsSelectedAndActive(FesGimmick *gimmick, u32 id) {
     RivalEntry *entries = LinkFestival_GetMissionWork(gimmick->festival)->hollows;
     int i;
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < FEST_MISSION_HOLLOW_ENTRY_COUNT; i++) {
         if (entries[i].id == id && entries[i].selected == 1 && entries[i].active != 0) {
             return TRUE;
         }
@@ -76,7 +76,7 @@ BOOL RivalSelect_IsSelectedAndActive(FesGimmick *gimmick, u32 id) {
 void RivalSelect_SetActive(FesGimmick *gimmick, u32 id) {
     RivalEntry *entries = LinkFestival_GetMissionWork(gimmick->festival)->hollows;
     int i;
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < FEST_MISSION_HOLLOW_ENTRY_COUNT; i++) {
         if (entries[i].id == id) {
             entries[i].active = 1;
         }
@@ -86,10 +86,10 @@ void RivalSelect_SetActive(FesGimmick *gimmick, u32 id) {
 u8 RivalSelect_FindEntryIndex(FesGimmick *gimmick, u32 id) {
     RivalEntry *entries = LinkFestival_GetMissionWork(gimmick->festival)->hollows;
     int i;
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < FEST_MISSION_HOLLOW_ENTRY_COUNT; i++) {
         if (entries[i].id == id) {
             return i;
         }
     }
-    return 10;
+    return FEST_MISSION_HOLLOW_ENTRY_COUNT;
 }

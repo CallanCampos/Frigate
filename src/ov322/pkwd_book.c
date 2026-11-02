@@ -55,9 +55,6 @@
 // whether to film it or to see its details, which are a page for the cast and a page for each of its Pokémon. The
 // ROM names only the overlay's other file, "pkwd_book_graphic.c", so the name of this one is our guess
 
-// The archives of the screen's graphics and of the movies' data, as in pkwd_selectscreen.c and event_pokewood.c
-#define ARCID_POKEWOOD_MOVIE 269
-
 #define MOVIE_COUNT 41
 // The movies that the book can list
 #define LIST_MOVIE_COUNT 40

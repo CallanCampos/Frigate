@@ -13,7 +13,7 @@
 typedef struct {
     GameData *gameData;
     // Whether the diploma is shown again, without its jingle and its slide in
-    u32 unk04;
+    u32 skipIntro;
 } PokedexAwardParam;
 
 #endif // POKEBW2_APP_POKEDEX_AWARD_H

@@ -1,6 +1,7 @@
 // The sphere model of the darkness of a dark cave, which field_flash.c scales and fades, and the script commands that
 // play a field effect. The name is the ROM's string
 #include "types.h"
+#include "constants/arc.h"
 #include "field/encounter_effect.h"
 #include "field/field.h"
 #include "field/field_event.h"
@@ -37,7 +38,7 @@ static const FieldEffectScriptEntry FIELD_EFFECT_SCRIPT_ENTRIES[31] = {
 FieldFlashG3D *FieldFlashG3D_Create(HeapID heapId) {
     FieldFlashG3D *flash = GFL_HeapAllocate(heapId, sizeof(FieldFlashG3D), TRUE, "fld_wipe_3dobj.c", 36);
 
-    flash->resource = GFL_G3DSysReadArcSysResource(73, 0);
+    flash->resource = GFL_G3DSysReadArcSysResource(ARCID_FIELD_WIPE_3DOBJ, 0);
     flash->actor = GFL_G3DActorCreate(GFL_G3DMdlCreate(flash->resource, 0, NULL), NULL, 0);
     return flash;
 }

@@ -1,0 +1,797 @@
+{
+    "$schema": "trainers.schema.json",
+    "trainers": [
+        {
+            "unk00": 0,
+            "unk02": 1,
+            "model": "OBJ_CODE_SMASHER",
+            "trainer": "TRAINER_SMASHER_ELENA"
+        },
+        {
+            "unk00": 0,
+            "unk02": 2,
+            "model": "OBJ_CODE_SMASHER",
+            "trainer": "TRAINER_SMASHER_ELENA_2"
+        },
+        {
+            "unk00": 0,
+            "unk02": 3,
+            "model": "OBJ_CODE_SMASHER",
+            "trainer": "TRAINER_SMASHER_ELENA_3"
+        },
+        {
+            "unk00": 0,
+            "unk02": 4,
+            "model": "OBJ_CODE_SMASHER",
+            "trainer": "TRAINER_SMASHER_ELENA_4"
+        },
+        {
+            "unk00": 1,
+            "unk02": 1,
+            "model": "OBJ_CODE_SMASHER",
+            "trainer": "TRAINER_SMASHER_ASPEN_3"
+        },
+        {
+            "unk00": 1,
+            "unk02": 2,
+            "model": "OBJ_CODE_SMASHER",
+            "trainer": "TRAINER_SMASHER_ASPEN_4"
+        },
+        {
+            "unk00": 1,
+            "unk02": 3,
+            "model": "OBJ_CODE_SMASHER",
+            "trainer": "TRAINER_SMASHER_ASPEN"
+        },
+        {
+            "unk00": 1,
+            "unk02": 4,
+            "model": "OBJ_CODE_SMASHER",
+            "trainer": "TRAINER_SMASHER_ASPEN_2"
+        },
+        {
+            "unk00": 2,
+            "unk02": 1,
+            "model": "OBJ_CODE_SMASHER",
+            "trainer": "TRAINER_SMASHER_MARI_2"
+        },
+        {
+            "unk00": 2,
+            "unk02": 2,
+            "model": "OBJ_CODE_SMASHER",
+            "trainer": "TRAINER_SMASHER_MARI_3"
+        },
+        {
+            "unk00": 2,
+            "unk02": 3,
+            "model": "OBJ_CODE_SMASHER",
+            "trainer": "TRAINER_SMASHER_MARI_4"
+        },
+        {
+            "unk00": 2,
+            "unk02": 4,
+            "model": "OBJ_CODE_SMASHER",
+            "trainer": "TRAINER_SMASHER_MARI"
+        },
+        {
+            "unk00": 3,
+            "unk02": 1,
+            "model": "OBJ_CODE_INFIELDER",
+            "trainer": "TRAINER_INFIELDER_ALEX"
+        },
+        {
+            "unk00": 3,
+            "unk02": 2,
+            "model": "OBJ_CODE_INFIELDER",
+            "trainer": "TRAINER_INFIELDER_ALEX_2"
+        },
+        {
+            "unk00": 3,
+            "unk02": 3,
+            "model": "OBJ_CODE_INFIELDER",
+            "trainer": "TRAINER_INFIELDER_ALEX_3"
+        },
+        {
+            "unk00": 3,
+            "unk02": 4,
+            "model": "OBJ_CODE_INFIELDER",
+            "trainer": "TRAINER_INFIELDER_ALEX_4"
+        },
+        {
+            "unk00": 4,
+            "unk02": 1,
+            "model": "OBJ_CODE_INFIELDER",
+            "trainer": "TRAINER_INFIELDER_CONNOR_3"
+        },
+        {
+            "unk00": 4,
+            "unk02": 2,
+            "model": "OBJ_CODE_INFIELDER",
+            "trainer": "TRAINER_INFIELDER_CONNOR_4"
+        },
+        {
+            "unk00": 4,
+            "unk02": 3,
+            "model": "OBJ_CODE_INFIELDER",
+            "trainer": "TRAINER_INFIELDER_CONNOR"
+        },
+        {
+            "unk00": 4,
+            "unk02": 4,
+            "model": "OBJ_CODE_INFIELDER",
+            "trainer": "TRAINER_INFIELDER_CONNOR_2"
+        },
+        {
+            "unk00": 5,
+            "unk02": 1,
+            "model": "OBJ_CODE_INFIELDER",
+            "trainer": "TRAINER_INFIELDER_TODD_2"
+        },
+        {
+            "unk00": 5,
+            "unk02": 2,
+            "model": "OBJ_CODE_INFIELDER",
+            "trainer": "TRAINER_INFIELDER_TODD_3"
+        },
+        {
+            "unk00": 5,
+            "unk02": 3,
+            "model": "OBJ_CODE_INFIELDER",
+            "trainer": "TRAINER_INFIELDER_TODD_4"
+        },
+        {
+            "unk00": 5,
+            "unk02": 4,
+            "model": "OBJ_CODE_INFIELDER",
+            "trainer": "TRAINER_INFIELDER_TODD"
+        },
+        {
+            "unk00": 6,
+            "unk02": 1,
+            "model": "OBJ_CODE_STRIKER",
+            "trainer": "TRAINER_STRIKER_TONY"
+        },
+        {
+            "unk00": 6,
+            "unk02": 2,
+            "model": "OBJ_CODE_STRIKER",
+            "trainer": "TRAINER_STRIKER_TONY_2"
+        },
+        {
+            "unk00": 6,
+            "unk02": 3,
+            "model": "OBJ_CODE_STRIKER",
+            "trainer": "TRAINER_STRIKER_TONY_3"
+        },
+        {
+            "unk00": 6,
+            "unk02": 4,
+            "model": "OBJ_CODE_STRIKER",
+            "trainer": "TRAINER_STRIKER_TONY_4"
+        },
+        {
+            "unk00": 7,
+            "unk02": 1,
+            "model": "OBJ_CODE_STRIKER",
+            "trainer": "TRAINER_STRIKER_ROBERTO_3"
+        },
+        {
+            "unk00": 7,
+            "unk02": 2,
+            "model": "OBJ_CODE_STRIKER",
+            "trainer": "TRAINER_STRIKER_ROBERTO_4"
+        },
+        {
+            "unk00": 7,
+            "unk02": 3,
+            "model": "OBJ_CODE_STRIKER",
+            "trainer": "TRAINER_STRIKER_ROBERTO"
+        },
+        {
+            "unk00": 7,
+            "unk02": 4,
+            "model": "OBJ_CODE_STRIKER",
+            "trainer": "TRAINER_STRIKER_ROBERTO_2"
+        },
+        {
+            "unk00": 8,
+            "unk02": 1,
+            "model": "OBJ_CODE_STRIKER",
+            "trainer": "TRAINER_STRIKER_MARCO_2"
+        },
+        {
+            "unk00": 8,
+            "unk02": 2,
+            "model": "OBJ_CODE_STRIKER",
+            "trainer": "TRAINER_STRIKER_MARCO_3"
+        },
+        {
+            "unk00": 8,
+            "unk02": 3,
+            "model": "OBJ_CODE_STRIKER",
+            "trainer": "TRAINER_STRIKER_MARCO_4"
+        },
+        {
+            "unk00": 8,
+            "unk02": 4,
+            "model": "OBJ_CODE_STRIKER",
+            "trainer": "TRAINER_STRIKER_MARCO"
+        },
+        {
+            "unk00": 9,
+            "unk02": 1,
+            "model": "OBJ_CODE_LINEBACKER",
+            "trainer": "TRAINER_LINEBACKER_DAN"
+        },
+        {
+            "unk00": 9,
+            "unk02": 2,
+            "model": "OBJ_CODE_LINEBACKER",
+            "trainer": "TRAINER_LINEBACKER_DAN_2"
+        },
+        {
+            "unk00": 9,
+            "unk02": 3,
+            "model": "OBJ_CODE_LINEBACKER",
+            "trainer": "TRAINER_LINEBACKER_DAN_3"
+        },
+        {
+            "unk00": 9,
+            "unk02": 4,
+            "model": "OBJ_CODE_LINEBACKER",
+            "trainer": "TRAINER_LINEBACKER_DAN_4"
+        },
+        {
+            "unk00": 10,
+            "unk02": 1,
+            "model": "OBJ_CODE_LINEBACKER",
+            "trainer": "TRAINER_LINEBACKER_BOB_3"
+        },
+        {
+            "unk00": 10,
+            "unk02": 2,
+            "model": "OBJ_CODE_LINEBACKER",
+            "trainer": "TRAINER_LINEBACKER_BOB_4"
+        },
+        {
+            "unk00": 10,
+            "unk02": 3,
+            "model": "OBJ_CODE_LINEBACKER",
+            "trainer": "TRAINER_LINEBACKER_BOB"
+        },
+        {
+            "unk00": 10,
+            "unk02": 4,
+            "model": "OBJ_CODE_LINEBACKER",
+            "trainer": "TRAINER_LINEBACKER_BOB_2"
+        },
+        {
+            "unk00": 11,
+            "unk02": 1,
+            "model": "OBJ_CODE_LINEBACKER",
+            "trainer": "TRAINER_LINEBACKER_JONAH_2"
+        },
+        {
+            "unk00": 11,
+            "unk02": 2,
+            "model": "OBJ_CODE_LINEBACKER",
+            "trainer": "TRAINER_LINEBACKER_JONAH_3"
+        },
+        {
+            "unk00": 11,
+            "unk02": 3,
+            "model": "OBJ_CODE_LINEBACKER",
+            "trainer": "TRAINER_LINEBACKER_JONAH_4"
+        },
+        {
+            "unk00": 11,
+            "unk02": 4,
+            "model": "OBJ_CODE_LINEBACKER",
+            "trainer": "TRAINER_LINEBACKER_JONAH"
+        },
+        {
+            "unk00": 12,
+            "unk02": 1,
+            "model": "OBJ_CODE_HOOPSTER",
+            "trainer": "TRAINER_HOOPSTER_BOBBY"
+        },
+        {
+            "unk00": 12,
+            "unk02": 2,
+            "model": "OBJ_CODE_HOOPSTER",
+            "trainer": "TRAINER_HOOPSTER_BOBBY_2"
+        },
+        {
+            "unk00": 12,
+            "unk02": 3,
+            "model": "OBJ_CODE_HOOPSTER",
+            "trainer": "TRAINER_HOOPSTER_BOBBY_3"
+        },
+        {
+            "unk00": 12,
+            "unk02": 4,
+            "model": "OBJ_CODE_HOOPSTER",
+            "trainer": "TRAINER_HOOPSTER_BOBBY_4"
+        },
+        {
+            "unk00": 13,
+            "unk02": 1,
+            "model": "OBJ_CODE_HOOPSTER",
+            "trainer": "TRAINER_HOOPSTER_JOHN_3"
+        },
+        {
+            "unk00": 13,
+            "unk02": 2,
+            "model": "OBJ_CODE_HOOPSTER",
+            "trainer": "TRAINER_HOOPSTER_JOHN_4"
+        },
+        {
+            "unk00": 13,
+            "unk02": 3,
+            "model": "OBJ_CODE_HOOPSTER",
+            "trainer": "TRAINER_HOOPSTER_JOHN"
+        },
+        {
+            "unk00": 13,
+            "unk02": 4,
+            "model": "OBJ_CODE_HOOPSTER",
+            "trainer": "TRAINER_HOOPSTER_JOHN_2"
+        },
+        {
+            "unk00": 14,
+            "unk02": 1,
+            "model": "OBJ_CODE_HOOPSTER",
+            "trainer": "TRAINER_HOOPSTER_LAMARCUS_2"
+        },
+        {
+            "unk00": 14,
+            "unk02": 2,
+            "model": "OBJ_CODE_HOOPSTER",
+            "trainer": "TRAINER_HOOPSTER_LAMARCUS_3"
+        },
+        {
+            "unk00": 14,
+            "unk02": 3,
+            "model": "OBJ_CODE_HOOPSTER",
+            "trainer": "TRAINER_HOOPSTER_LAMARCUS_4"
+        },
+        {
+            "unk00": 14,
+            "unk02": 4,
+            "model": "OBJ_CODE_HOOPSTER",
+            "trainer": "TRAINER_HOOPSTER_LAMARCUS"
+        },
+        {
+            "unk00": 15,
+            "unk02": 2,
+            "model": "OBJ_CODE_18",
+            "trainer": "TRAINER_BACKERS_HAWK_DAR"
+        },
+        {
+            "unk00": 15,
+            "unk02": 3,
+            "model": "OBJ_CODE_18",
+            "trainer": "TRAINER_BACKERS_HAWK_DAR_2"
+        },
+        {
+            "unk00": 15,
+            "unk02": 4,
+            "model": "OBJ_CODE_18",
+            "trainer": "TRAINER_BACKERS_HAWK_DAR_3"
+        },
+        {
+            "unk00": 16,
+            "unk02": 4,
+            "model": "OBJ_CODE_BACKERS_F",
+            "trainer": "TRAINER_BACKERS_CAM_ABBY"
+        },
+        {
+            "unk00": 17,
+            "unk02": 2,
+            "model": "OBJ_CODE_BACKERS_F",
+            "trainer": "TRAINER_BACKERS_AMI_EIRA"
+        },
+        {
+            "unk00": 17,
+            "unk02": 3,
+            "model": "OBJ_CODE_BACKERS_F",
+            "trainer": "TRAINER_BACKERS_AMI_EIRA_2"
+        },
+        {
+            "unk00": 17,
+            "unk02": 4,
+            "model": "OBJ_CODE_BACKERS_F",
+            "trainer": "TRAINER_BACKERS_AMI_EIRA_3"
+        },
+        {
+            "unk00": 18,
+            "unk02": 4,
+            "model": "OBJ_CODE_18",
+            "trainer": "TRAINER_BACKERS_ALF_FRED"
+        },
+        {
+            "unk00": 19,
+            "unk02": 2,
+            "model": "OBJ_CODE_BACKERS_F",
+            "trainer": "TRAINER_BACKERS_KAY_ALI"
+        },
+        {
+            "unk00": 19,
+            "unk02": 3,
+            "model": "OBJ_CODE_BACKERS_F",
+            "trainer": "TRAINER_BACKERS_KAY_ALI_2"
+        },
+        {
+            "unk00": 19,
+            "unk02": 4,
+            "model": "OBJ_CODE_BACKERS_F",
+            "trainer": "TRAINER_BACKERS_KAY_ALI_3"
+        },
+        {
+            "unk00": 20,
+            "unk02": 4,
+            "model": "OBJ_CODE_18",
+            "trainer": "TRAINER_BACKERS_LES_WEB"
+        },
+        {
+            "unk00": 21,
+            "unk02": 2,
+            "model": "OBJ_CODE_18",
+            "trainer": "TRAINER_BACKERS_JOE_ROSS"
+        },
+        {
+            "unk00": 21,
+            "unk02": 3,
+            "model": "OBJ_CODE_18",
+            "trainer": "TRAINER_BACKERS_JOE_ROSS_2"
+        },
+        {
+            "unk00": 21,
+            "unk02": 4,
+            "model": "OBJ_CODE_18",
+            "trainer": "TRAINER_BACKERS_JOE_ROSS_3"
+        },
+        {
+            "unk00": 22,
+            "unk02": 4,
+            "model": "OBJ_CODE_BACKERS_F",
+            "trainer": "TRAINER_BACKERS_AI_CIEL"
+        },
+        {
+            "unk00": 23,
+            "unk02": 2,
+            "model": "OBJ_CODE_18",
+            "trainer": "TRAINER_BACKERS_MASA_YAS"
+        },
+        {
+            "unk00": 23,
+            "unk02": 3,
+            "model": "OBJ_CODE_18",
+            "trainer": "TRAINER_BACKERS_MASA_YAS_2"
+        },
+        {
+            "unk00": 23,
+            "unk02": 4,
+            "model": "OBJ_CODE_18",
+            "trainer": "TRAINER_BACKERS_MASA_YAS_3"
+        },
+        {
+            "unk00": 24,
+            "unk02": 4,
+            "model": "OBJ_CODE_BACKERS_F",
+            "trainer": "TRAINER_BACKERS_KAT_PHAE"
+        },
+        {
+            "unk00": 25,
+            "unk02": 4,
+            "model": "OBJ_CODE_CLERK_F",
+            "trainer": "TRAINER_CLERK_F_WREN"
+        },
+        {
+            "unk00": 26,
+            "unk02": 4,
+            "model": "OBJ_CODE_WAITER",
+            "trainer": "TRAINER_WAITER_CLINT"
+        },
+        {
+            "unk00": 27,
+            "unk02": 4,
+            "model": "OBJ_CODE_WAITRESS",
+            "trainer": "TRAINER_WAITRESS_BONITA"
+        },
+        {
+            "unk00": 28,
+            "unk02": 4,
+            "model": "OBJ_CODE_ACE_TRAINER_M",
+            "trainer": "TRAINER_ACE_TRAINER_CHARLIE"
+        },
+        {
+            "unk00": 29,
+            "unk02": 4,
+            "model": "OBJ_CODE_ACE_TRAINER_F",
+            "trainer": "TRAINER_ACE_TRAINER_LUCILLE"
+        },
+        {
+            "unk00": 30,
+            "unk02": 4,
+            "model": "OBJ_CODE_LADY",
+            "trainer": "TRAINER_LADY_SOPHIE"
+        },
+        {
+            "unk00": 31,
+            "unk02": 4,
+            "model": "OBJ_CODE_RICH_BOY",
+            "trainer": "TRAINER_RICH_BOY_ANTHONY"
+        },
+        {
+            "unk00": 32,
+            "unk02": 4,
+            "model": "OBJ_CODE_POLICEMAN",
+            "trainer": "TRAINER_POLICEMAN_JEFF"
+        },
+        {
+            "unk00": 33,
+            "unk02": 4,
+            "model": "OBJ_CODE_BLACK_BELT",
+            "trainer": "TRAINER_BLACK_BELT_LAO"
+        },
+        {
+            "unk00": 34,
+            "unk02": 4,
+            "model": "OBJ_CODE_HARLEQUIN_233",
+            "trainer": "TRAINER_HARLEQUIN_CHARLEY"
+        },
+        {
+            "unk00": 35,
+            "unk02": 4,
+            "model": "OBJ_CODE_ARTIST",
+            "trainer": "TRAINER_ARTIST_PIERRE"
+        },
+        {
+            "unk00": 36,
+            "unk02": 4,
+            "model": "OBJ_CODE_SCIENTIST_M_52",
+            "trainer": "TRAINER_SCIENTIST_SIMON"
+        },
+        {
+            "unk00": 37,
+            "unk02": 4,
+            "model": "OBJ_CODE_SCIENTIST_F_46",
+            "trainer": "TRAINER_SCIENTIST_BLYTHE"
+        },
+        {
+            "unk00": 38,
+            "unk02": 4,
+            "model": "OBJ_CODE_PSYCHIC_M",
+            "trainer": "TRAINER_PSYCHIC_GERARD"
+        },
+        {
+            "unk00": 39,
+            "unk02": 4,
+            "model": "OBJ_CODE_PSYCHIC_F",
+            "trainer": "TRAINER_PSYCHIC_MADHU"
+        },
+        {
+            "unk00": 40,
+            "unk02": 4,
+            "model": "OBJ_CODE_WORKER_44",
+            "trainer": "TRAINER_WORKER_MATTHEW"
+        },
+        {
+            "unk00": 41,
+            "unk02": 4,
+            "model": "OBJ_CODE_WORKER_26",
+            "trainer": "TRAINER_WORKER_TYLER"
+        },
+        {
+            "unk00": 42,
+            "unk02": 4,
+            "model": "OBJ_CODE_GENTLEMAN",
+            "trainer": "TRAINER_GENTLEMAN_RENAUD"
+        },
+        {
+            "unk00": 43,
+            "unk02": 4,
+            "model": "OBJ_CODE_SCHOOL_KID_M",
+            "trainer": "TRAINER_SCHOOL_KID_ALAN"
+        },
+        {
+            "unk00": 44,
+            "unk02": 4,
+            "model": "OBJ_CODE_SCHOOL_KID_F",
+            "trainer": "TRAINER_SCHOOL_KID_SALLY"
+        },
+        {
+            "unk00": 45,
+            "unk02": 4,
+            "model": "OBJ_CODE_ROUGHNECK",
+            "trainer": "TRAINER_ROUGHNECK_FLETCHER"
+        },
+        {
+            "unk00": 46,
+            "unk02": 4,
+            "model": "OBJ_CODE_JANITOR",
+            "trainer": "TRAINER_JANITOR_CALEB"
+        },
+        {
+            "unk00": 47,
+            "unk02": 4,
+            "model": "OBJ_CODE_POKEFAN_M",
+            "trainer": "TRAINER_POKEFAN_COLIN"
+        },
+        {
+            "unk00": 48,
+            "unk02": 4,
+            "model": "OBJ_CODE_POKEFAN_F",
+            "trainer": "TRAINER_POKEFAN_DARCY"
+        },
+        {
+            "unk00": 49,
+            "unk02": 4,
+            "model": "OBJ_CODE_DANCER",
+            "trainer": "TRAINER_DANCER_DAVEY"
+        },
+        {
+            "unk00": 50,
+            "unk02": 4,
+            "model": "OBJ_CODE_YOUNGSTER",
+            "trainer": "TRAINER_YOUNGSTER_KEVIN"
+        },
+        {
+            "unk00": 51,
+            "unk02": 4,
+            "model": "OBJ_CODE_FISHERMAN",
+            "trainer": "TRAINER_FISHERMAN_DEVON"
+        },
+        {
+            "unk00": 52,
+            "unk02": 4,
+            "model": "OBJ_CODE_DEPOT_AGENT",
+            "trainer": "TRAINER_DEPOT_AGENT_JOSH"
+        },
+        {
+            "unk00": 53,
+            "unk02": 4,
+            "model": "OBJ_CODE_DOCTOR",
+            "trainer": "TRAINER_DOCTOR_JULES"
+        },
+        {
+            "unk00": 54,
+            "unk02": 4,
+            "model": "OBJ_CODE_NURSE",
+            "trainer": "TRAINER_NURSE_KIRSTEN"
+        },
+        {
+            "unk00": 55,
+            "unk02": 4,
+            "model": "OBJ_CODE_PILOT",
+            "trainer": "TRAINER_PILOT_LEONARD"
+        },
+        {
+            "unk00": 56,
+            "unk02": 4,
+            "model": "OBJ_CODE_BACKPACKER_M",
+            "trainer": "TRAINER_BACKPACKER_ALEXANDER"
+        },
+        {
+            "unk00": 57,
+            "unk02": 4,
+            "model": "OBJ_CODE_BACKPACKER_F",
+            "trainer": "TRAINER_BACKPACKER_PATTY"
+        },
+        {
+            "unk00": 58,
+            "unk02": 4,
+            "model": "OBJ_CODE_BATTLE_GIRL",
+            "trainer": "TRAINER_BATTLE_GIRL_JANIE"
+        },
+        {
+            "unk00": 59,
+            "unk02": 4,
+            "model": "OBJ_CODE_PARASOL_LADY",
+            "trainer": "TRAINER_PARASOL_LADY_GWYNETH"
+        },
+        {
+            "unk00": 60,
+            "unk02": 4,
+            "model": "OBJ_CODE_CLERK_M_67",
+            "trainer": "TRAINER_CLERK_M_NELSON"
+        },
+        {
+            "unk00": 61,
+            "unk02": 4,
+            "model": "OBJ_CODE_CLERK_M_67",
+            "trainer": "TRAINER_CLERK_M_FREDRIC"
+        },
+        {
+            "unk00": 62,
+            "unk02": 4,
+            "model": "OBJ_CODE_BAKER",
+            "trainer": "TRAINER_BAKER_LILLY"
+        },
+        {
+            "unk00": 63,
+            "unk02": 4,
+            "model": "OBJ_CODE_VETERAN_M",
+            "trainer": "TRAINER_VETERAN_ARLEN"
+        },
+        {
+            "unk00": 64,
+            "unk02": 4,
+            "model": "OBJ_CODE_VETERAN_F",
+            "trainer": "TRAINER_VETERAN_SAYURI"
+        },
+        {
+            "unk00": 65,
+            "unk02": 4,
+            "model": "OBJ_CODE_NURSERY_AIDE",
+            "trainer": "TRAINER_NURSERY_AIDE_LEAH"
+        },
+        {
+            "unk00": 66,
+            "unk02": 4,
+            "model": "OBJ_CODE_PKMN_BREEDER_M",
+            "trainer": "TRAINER_PKMN_BREEDER_OWEN"
+        },
+        {
+            "unk00": 67,
+            "unk02": 4,
+            "model": "OBJ_CODE_PKMN_BREEDER_F",
+            "trainer": "TRAINER_PKMN_BREEDER_BROOKE"
+        },
+        {
+            "unk00": 68,
+            "unk02": 4,
+            "model": "OBJ_CODE_PKMN_RANGER_M",
+            "trainer": "TRAINER_PKMN_RANGER_ALAIN"
+        },
+        {
+            "unk00": 69,
+            "unk02": 4,
+            "model": "OBJ_CODE_PKMN_RANGER_F",
+            "trainer": "TRAINER_PKMN_RANGER_HEIDI"
+        },
+        {
+            "unk00": 70,
+            "unk02": 4,
+            "model": "OBJ_CODE_SOCIALITE",
+            "trainer": "TRAINER_SOCIALITE_EMILIA"
+        },
+        {
+            "unk00": 71,
+            "unk02": 4,
+            "model": "OBJ_CODE_LASS",
+            "trainer": "TRAINER_LASS_DANA"
+        },
+        {
+            "unk00": 72,
+            "unk02": 4,
+            "model": "OBJ_CODE_56",
+            "trainer": "TRAINER_MUSICIAN_BORIS"
+        },
+        {
+            "unk00": 73,
+            "unk02": 4,
+            "model": "OBJ_CODE_65",
+            "trainer": "TRAINER_MAID_ALICA"
+        },
+        {
+            "unk00": 74,
+            "unk02": 4,
+            "model": "OBJ_CODE_HIKER",
+            "trainer": "TRAINER_HIKER_RUSSEL"
+        },
+        {
+            "unk00": 75,
+            "unk02": 4,
+            "model": "OBJ_CODE_PRESCHOOLER_M",
+            "trainer": "TRAINER_PRESCHOOLER_EVAN"
+        },
+        {
+            "unk00": 76,
+            "unk02": 4,
+            "model": "OBJ_CODE_PRESCHOOLER_F",
+            "trainer": "TRAINER_PRESCHOOLER_MIA"
+        }
+    ]
+}

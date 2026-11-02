@@ -1,0 +1,18 @@
+{
+    "$schema": "../setup.schema.json",
+    "distance": 396,
+    "pitch": 7018,
+    "yaw": 0,
+    "fov": 3448,
+    "z_near": 4096,
+    "z_far": 6291456,
+    "buffer_mode": "z",
+    "bind": true,
+    "target": {
+        "x": 0,
+        "y": 536576,
+        "z": 495616
+    },
+    "unkC": 0,
+    "unk10": 0
+}

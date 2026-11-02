@@ -1,0 +1,877 @@
+{
+    "$schema": "black_white.schema.json",
+    "species": {
+        "SPECIES_RATTATA": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_CHILAN_BERRY",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_RATICATE": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_CHILAN_BERRY",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_PIKACHU": {
+            "held_items": {
+                "common": "ITEM_ORAN_BERRY",
+                "rare": "ITEM_NONE",
+                "very_rare": "ITEM_LIGHT_BALL"
+            }
+        },
+        "SPECIES_RAICHU": {
+            "held_items": {
+                "common": "ITEM_ORAN_BERRY",
+                "rare": "ITEM_NONE",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_CLEFAIRY": {
+            "asymmetric": false
+        },
+        "SPECIES_CLEFABLE": {
+            "asymmetric": false
+        },
+        "SPECIES_JIGGLYPUFF": {
+            "asymmetric": false
+        },
+        "SPECIES_WIGGLYTUFF": {
+            "asymmetric": false
+        },
+        "SPECIES_GROWLITHE": {
+            "held_items": {
+                "common": "ITEM_RAWST_BERRY",
+                "rare": "ITEM_RAWST_BERRY",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_ARCANINE": {
+            "held_items": {
+                "common": "ITEM_RAWST_BERRY",
+                "rare": "ITEM_RAWST_BERRY",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_KADABRA": {
+            "asymmetric": false
+        },
+        "SPECIES_MACHAMP": {
+            "asymmetric": false
+        },
+        "SPECIES_GRIMER": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_NUGGET",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_MUK": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_NUGGET",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_MR_MIME": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_LEPPA_BERRY",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_SPINARAK": {
+            "by_tm": [
+                "TM01",
+                "TM06",
+                "TM09",
+                "TM10",
+                "TM11",
+                "TM17",
+                "TM21",
+                "TM22",
+                "TM27",
+                "TM28",
+                "TM29",
+                "TM32",
+                "TM36",
+                "TM42",
+                "TM44",
+                "TM45",
+                "TM46",
+                "TM48",
+                "TM70",
+                "TM76",
+                "TM84",
+                "TM87",
+                "TM90"
+            ]
+        },
+        "SPECIES_ARIADOS": {
+            "by_tm": [
+                "TM01",
+                "TM06",
+                "TM09",
+                "TM10",
+                "TM11",
+                "TM15",
+                "TM17",
+                "TM21",
+                "TM22",
+                "TM27",
+                "TM28",
+                "TM29",
+                "TM32",
+                "TM36",
+                "TM42",
+                "TM44",
+                "TM45",
+                "TM46",
+                "TM48",
+                "TM68",
+                "TM70",
+                "TM76",
+                "TM84",
+                "TM87",
+                "TM90"
+            ]
+        },
+        "SPECIES_PICHU": {
+            "held_items": {
+                "common": "ITEM_ORAN_BERRY",
+                "rare": "ITEM_NONE",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_CLEFFA": {
+            "asymmetric": false
+        },
+        "SPECIES_SUNKERN": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_COBA_BERRY",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_HERACROSS": {
+            "by_tm": [
+                "TM06",
+                "TM09",
+                "TM10",
+                "TM11",
+                "TM15",
+                "TM17",
+                "TM18",
+                "TM21",
+                "TM23",
+                "TM26",
+                "TM27",
+                "TM28",
+                "TM31",
+                "TM32",
+                "TM39",
+                "TM40",
+                "TM42",
+                "TM44",
+                "TM45",
+                "TM46",
+                "TM48",
+                "TM52",
+                "TM54",
+                "TM56",
+                "TM65",
+                "TM67",
+                "TM68",
+                "TM71",
+                "TM75",
+                "TM76",
+                "TM78",
+                "TM80",
+                "TM83",
+                "TM87",
+                "TM90",
+                "TM94",
+                "HM01",
+                "HM04"
+            ]
+        },
+        "SPECIES_SKITTY": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_LEPPA_BERRY",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_DELCATTY": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_LEPPA_BERRY",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_ROSELIA": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_POISON_BARB",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_SPOINK": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_TANGA_BERRY",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_GRUMPIG": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_TANGA_BERRY",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_BELDUM": {
+            "asymmetric": false
+        },
+        "SPECIES_REGIROCK": {
+            "asymmetric": false
+        },
+        "SPECIES_ROSERADE": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_POISON_BARB",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_COMBEE": {
+            "held_items": {
+                "common": "ITEM_HONEY",
+                "rare": "ITEM_HONEY",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_BUIZEL": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_WACAN_BERRY",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_FLOATZEL": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_WACAN_BERRY",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_DRIFBLIM": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_NONE",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_BUNEARY": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_CHOPLE_BERRY",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_LOPUNNY": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_CHOPLE_BERRY",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_MIME_JR": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_LEPPA_BERRY",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_SNIVY": {
+            "base_exp": 28
+        },
+        "SPECIES_TEPIG": {
+            "base_exp": 28
+        },
+        "SPECIES_OSHAWOTT": {
+            "base_exp": 28
+        },
+        "SPECIES_WATCHOG": {
+            "ev_yields": {
+                "hp": 0,
+                "attack": 1,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        },
+        "SPECIES_PURRLOIN": {
+            "by_tm": [
+                "TM01",
+                "TM06",
+                "TM10",
+                "TM11",
+                "TM12",
+                "TM17",
+                "TM18",
+                "TM21",
+                "TM27",
+                "TM30",
+                "TM32",
+                "TM40",
+                "TM41",
+                "TM42",
+                "TM44",
+                "TM45",
+                "TM46",
+                "TM48",
+                "TM49",
+                "TM63",
+                "TM65",
+                "TM66",
+                "TM73",
+                "TM77",
+                "TM85",
+                "TM86",
+                "TM87",
+                "TM90",
+                "TM95",
+                "HM01"
+            ]
+        },
+        "SPECIES_LIEPARD": {
+            "by_tm": [
+                "TM01",
+                "TM06",
+                "TM10",
+                "TM11",
+                "TM12",
+                "TM15",
+                "TM17",
+                "TM18",
+                "TM21",
+                "TM27",
+                "TM30",
+                "TM32",
+                "TM40",
+                "TM41",
+                "TM42",
+                "TM44",
+                "TM45",
+                "TM46",
+                "TM48",
+                "TM49",
+                "TM63",
+                "TM65",
+                "TM66",
+                "TM68",
+                "TM73",
+                "TM77",
+                "TM85",
+                "TM86",
+                "TM87",
+                "TM90",
+                "TM94",
+                "TM95",
+                "HM01"
+            ]
+        },
+        "SPECIES_PANSEAR": {
+            "asymmetric": false
+        },
+        "SPECIES_SIMISEAR": {
+            "asymmetric": false
+        },
+        "SPECIES_TYMPOLE": {
+            "held_items": {
+                "common": "ITEM_PERSIM_BERRY",
+                "rare": "ITEM_NONE",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_PALPITOAD": {
+            "held_items": {
+                "common": "ITEM_PERSIM_BERRY",
+                "rare": "ITEM_NONE",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_SEISMITOAD": {
+            "held_items": {
+                "common": "ITEM_PERSIM_BERRY",
+                "rare": "ITEM_NONE",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_VENIPEDE": {
+            "held_items": {
+                "common": "ITEM_PECHA_BERRY",
+                "rare": "ITEM_POISON_BARB",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_WHIRLIPEDE": {
+            "held_items": {
+                "common": "ITEM_PECHA_BERRY",
+                "rare": "ITEM_POISON_BARB",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_SCOLIPEDE": {
+            "held_items": {
+                "common": "ITEM_PECHA_BERRY",
+                "rare": "ITEM_POISON_BARB",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_ZORUA": {
+            "asymmetric": false
+        },
+        "SPECIES_CINCCINO": {
+            "by_tm": [
+                "TM04",
+                "TM06",
+                "TM10",
+                "TM11",
+                "TM15",
+                "TM16",
+                "TM17",
+                "TM18",
+                "TM20",
+                "TM21",
+                "TM24",
+                "TM25",
+                "TM27",
+                "TM28",
+                "TM32",
+                "TM42",
+                "TM44",
+                "TM45",
+                "TM48",
+                "TM49",
+                "TM52",
+                "TM56",
+                "TM67",
+                "TM68",
+                "TM73",
+                "TM83",
+                "TM86",
+                "TM87",
+                "TM89",
+                "TM90"
+            ]
+        },
+        "SPECIES_GOTHITA": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_NONE",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_GOTHORITA": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_NONE",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_GOTHITELLE": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_NONE",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_SOLOSIS": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_NONE",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_DUOSION": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_NONE",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_REUNICLUS": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_NONE",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_KLINK": {
+            "by_tm": [
+                "TM06",
+                "TM10",
+                "TM15",
+                "TM17",
+                "TM21",
+                "TM24",
+                "TM27",
+                "TM32",
+                "TM37",
+                "TM42",
+                "TM44",
+                "TM48",
+                "TM57",
+                "TM69",
+                "TM72",
+                "TM73",
+                "TM87",
+                "TM90",
+                "TM91",
+                "TM94"
+            ]
+        },
+        "SPECIES_KLANG": {
+            "by_tm": [
+                "TM06",
+                "TM10",
+                "TM15",
+                "TM17",
+                "TM21",
+                "TM24",
+                "TM27",
+                "TM32",
+                "TM37",
+                "TM42",
+                "TM44",
+                "TM48",
+                "TM57",
+                "TM69",
+                "TM72",
+                "TM73",
+                "TM87",
+                "TM90",
+                "TM91",
+                "TM94"
+            ]
+        },
+        "SPECIES_KLINKLANG": {
+            "by_tm": [
+                "TM06",
+                "TM10",
+                "TM15",
+                "TM17",
+                "TM21",
+                "TM24",
+                "TM25",
+                "TM27",
+                "TM32",
+                "TM37",
+                "TM42",
+                "TM44",
+                "TM48",
+                "TM57",
+                "TM68",
+                "TM69",
+                "TM72",
+                "TM73",
+                "TM87",
+                "TM90",
+                "TM91",
+                "TM92",
+                "TM94"
+            ]
+        },
+        "SPECIES_HEATMOR": {
+            "held_items": {
+                "common": "ITEM_NONE",
+                "rare": "ITEM_NONE",
+                "very_rare": "ITEM_NONE"
+            }
+        },
+        "SPECIES_TORNADUS": {
+            "forms": {
+                "count": 1,
+                "sprite_offset": 0
+            }
+        },
+        "SPECIES_THUNDURUS": {
+            "forms": {
+                "count": 1,
+                "sprite_offset": 0
+            }
+        },
+        "SPECIES_LANDORUS": {
+            "forms": {
+                "count": 1,
+                "sprite_offset": 0
+            }
+        },
+        "SPECIES_KYUREM": {
+            "forms": {
+                "count": 1,
+                "sprite_offset": 55
+            }
+        },
+        "SPECIES_KELDEO": {
+            "forms": {
+                "count": 1,
+                "sprite_offset": 0
+            }
+        },
+        "SPECIES_MELOETTA": {
+            "forms": {
+                "count": 2,
+                "sprite_offset": 55
+            }
+        },
+        "SPECIES_GENESECT": {
+            "forms": {
+                "count": 5,
+                "sprite_offset": 56
+            }
+        }
+    },
+    "form_records": [
+        {
+            "species": "SPECIES_DEOXYS",
+            "form": 1
+        },
+        {
+            "species": "SPECIES_DEOXYS",
+            "form": 2
+        },
+        {
+            "species": "SPECIES_DEOXYS",
+            "form": 3
+        },
+        {
+            "species": "SPECIES_WORMADAM",
+            "form": 1
+        },
+        {
+            "species": "SPECIES_WORMADAM",
+            "form": 2
+        },
+        {
+            "species": "SPECIES_SHAYMIN",
+            "form": 1
+        },
+        {
+            "species": "SPECIES_GIRATINA",
+            "form": 1
+        },
+        {
+            "species": "SPECIES_ROTOM",
+            "form": 1
+        },
+        {
+            "species": "SPECIES_ROTOM",
+            "form": 2,
+            "differences": {
+                "asymmetric": false
+            }
+        },
+        {
+            "species": "SPECIES_ROTOM",
+            "form": 3
+        },
+        {
+            "species": "SPECIES_ROTOM",
+            "form": 4
+        },
+        {
+            "species": "SPECIES_ROTOM",
+            "form": 5
+        },
+        {
+            "species": "SPECIES_CASTFORM",
+            "form": 1
+        },
+        {
+            "species": "SPECIES_CASTFORM",
+            "form": 2
+        },
+        {
+            "species": "SPECIES_CASTFORM",
+            "form": 3,
+            "differences": {
+                "asymmetric": false
+            }
+        },
+        {
+            "species": "SPECIES_BASCULIN",
+            "form": 1
+        },
+        {
+            "species": "SPECIES_DARMANITAN",
+            "form": 1
+        },
+        {
+            "species": "SPECIES_MELOETTA",
+            "form": 1
+        }
+    ],
+    "regional_dex": [
+        "SPECIES_VICTINI",
+        "SPECIES_SNIVY",
+        "SPECIES_SERVINE",
+        "SPECIES_SERPERIOR",
+        "SPECIES_TEPIG",
+        "SPECIES_PIGNITE",
+        "SPECIES_EMBOAR",
+        "SPECIES_OSHAWOTT",
+        "SPECIES_DEWOTT",
+        "SPECIES_SAMUROTT",
+        "SPECIES_PATRAT",
+        "SPECIES_WATCHOG",
+        "SPECIES_LILLIPUP",
+        "SPECIES_HERDIER",
+        "SPECIES_STOUTLAND",
+        "SPECIES_PURRLOIN",
+        "SPECIES_LIEPARD",
+        "SPECIES_PANSAGE",
+        "SPECIES_SIMISAGE",
+        "SPECIES_PANSEAR",
+        "SPECIES_SIMISEAR",
+        "SPECIES_PANPOUR",
+        "SPECIES_SIMIPOUR",
+        "SPECIES_MUNNA",
+        "SPECIES_MUSHARNA",
+        "SPECIES_PIDOVE",
+        "SPECIES_TRANQUILL",
+        "SPECIES_UNFEZANT",
+        "SPECIES_BLITZLE",
+        "SPECIES_ZEBSTRIKA",
+        "SPECIES_ROGGENROLA",
+        "SPECIES_BOLDORE",
+        "SPECIES_GIGALITH",
+        "SPECIES_WOOBAT",
+        "SPECIES_SWOOBAT",
+        "SPECIES_DRILBUR",
+        "SPECIES_EXCADRILL",
+        "SPECIES_AUDINO",
+        "SPECIES_TIMBURR",
+        "SPECIES_GURDURR",
+        "SPECIES_CONKELDURR",
+        "SPECIES_TYMPOLE",
+        "SPECIES_PALPITOAD",
+        "SPECIES_SEISMITOAD",
+        "SPECIES_THROH",
+        "SPECIES_SAWK",
+        "SPECIES_SEWADDLE",
+        "SPECIES_SWADLOON",
+        "SPECIES_LEAVANNY",
+        "SPECIES_VENIPEDE",
+        "SPECIES_WHIRLIPEDE",
+        "SPECIES_SCOLIPEDE",
+        "SPECIES_COTTONEE",
+        "SPECIES_WHIMSICOTT",
+        "SPECIES_PETILIL",
+        "SPECIES_LILLIGANT",
+        "SPECIES_BASCULIN",
+        "SPECIES_SANDILE",
+        "SPECIES_KROKOROK",
+        "SPECIES_KROOKODILE",
+        "SPECIES_DARUMAKA",
+        "SPECIES_DARMANITAN",
+        "SPECIES_MARACTUS",
+        "SPECIES_DWEBBLE",
+        "SPECIES_CRUSTLE",
+        "SPECIES_SCRAGGY",
+        "SPECIES_SCRAFTY",
+        "SPECIES_SIGILYPH",
+        "SPECIES_YAMASK",
+        "SPECIES_COFAGRIGUS",
+        "SPECIES_TIRTOUGA",
+        "SPECIES_CARRACOSTA",
+        "SPECIES_ARCHEN",
+        "SPECIES_ARCHEOPS",
+        "SPECIES_TRUBBISH",
+        "SPECIES_GARBODOR",
+        "SPECIES_ZORUA",
+        "SPECIES_ZOROARK",
+        "SPECIES_MINCCINO",
+        "SPECIES_CINCCINO",
+        "SPECIES_GOTHITA",
+        "SPECIES_GOTHORITA",
+        "SPECIES_GOTHITELLE",
+        "SPECIES_SOLOSIS",
+        "SPECIES_DUOSION",
+        "SPECIES_REUNICLUS",
+        "SPECIES_DUCKLETT",
+        "SPECIES_SWANNA",
+        "SPECIES_VANILLITE",
+        "SPECIES_VANILLISH",
+        "SPECIES_VANILLUXE",
+        "SPECIES_DEERLING",
+        "SPECIES_SAWSBUCK",
+        "SPECIES_EMOLGA",
+        "SPECIES_KARRABLAST",
+        "SPECIES_ESCAVALIER",
+        "SPECIES_FOONGUS",
+        "SPECIES_AMOONGUSS",
+        "SPECIES_FRILLISH",
+        "SPECIES_JELLICENT",
+        "SPECIES_ALOMOMOLA",
+        "SPECIES_JOLTIK",
+        "SPECIES_GALVANTULA",
+        "SPECIES_FERROSEED",
+        "SPECIES_FERROTHORN",
+        "SPECIES_KLINK",
+        "SPECIES_KLANG",
+        "SPECIES_KLINKLANG",
+        "SPECIES_TYNAMO",
+        "SPECIES_EELEKTRIK",
+        "SPECIES_EELEKTROSS",
+        "SPECIES_ELGYEM",
+        "SPECIES_BEHEEYEM",
+        "SPECIES_LITWICK",
+        "SPECIES_LAMPENT",
+        "SPECIES_CHANDELURE",
+        "SPECIES_AXEW",
+        "SPECIES_FRAXURE",
+        "SPECIES_HAXORUS",
+        "SPECIES_CUBCHOO",
+        "SPECIES_BEARTIC",
+        "SPECIES_CRYOGONAL",
+        "SPECIES_SHELMET",
+        "SPECIES_ACCELGOR",
+        "SPECIES_STUNFISK",
+        "SPECIES_MIENFOO",
+        "SPECIES_MIENSHAO",
+        "SPECIES_DRUDDIGON",
+        "SPECIES_GOLETT",
+        "SPECIES_GOLURK",
+        "SPECIES_PAWNIARD",
+        "SPECIES_BISHARP",
+        "SPECIES_BOUFFALANT",
+        "SPECIES_RUFFLET",
+        "SPECIES_BRAVIARY",
+        "SPECIES_VULLABY",
+        "SPECIES_MANDIBUZZ",
+        "SPECIES_HEATMOR",
+        "SPECIES_DURANT",
+        "SPECIES_DEINO",
+        "SPECIES_ZWEILOUS",
+        "SPECIES_HYDREIGON",
+        "SPECIES_LARVESTA",
+        "SPECIES_VOLCARONA",
+        "SPECIES_COBALION",
+        "SPECIES_TERRAKION",
+        "SPECIES_VIRIZION",
+        "SPECIES_TORNADUS",
+        "SPECIES_THUNDURUS",
+        "SPECIES_RESHIRAM",
+        "SPECIES_ZEKROM",
+        "SPECIES_LANDORUS",
+        "SPECIES_KYUREM",
+        "SPECIES_KELDEO",
+        "SPECIES_MELOETTA",
+        "SPECIES_GENESECT"
+    ]
+}

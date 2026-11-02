@@ -148,10 +148,6 @@ enum {
     SHOP_AMOUNT_LESS,
 };
 
-// The archives of the Poké Marts' item lists, and of the number of items in each list
-#define ARCID_SHOP_ITEMS 282
-#define ARCID_SHOP_ITEM_COUNTS 283
-
 typedef struct {
     u16 item;
     u32 price;

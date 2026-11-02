@@ -55,11 +55,11 @@ static void PoketradeSave_StepWaitFade1(PokemonTradeWork *wk);
 static void PoketradeSave_StepWaitFade2(PokemonTradeWork *wk);
 static void PoketradeSave_StepWaitSyncRange(PokemonTradeWork *wk);
 static void PoketradeSave_SendTradeSummary(PokemonTradeWork *wk);
-static void *func_ov194_021bef14(GameData *gameData, HeapID heapId);
+static void *PoketradeSave_BackupSurvey(GameData *gameData, HeapID heapId);
 static void PoketradeSave_RestoreSaveControl(GameData *gameData, void *copy);
-static void *func_ov194_021bef7c(GameData *gameData, HeapID heapId);
+static void *PoketradeSave_BackupPokedex(GameData *gameData, HeapID heapId);
 static void PoketradeSave_RestorePokedex(GameData *gameData, void *copy);
-static void *func_ov194_021befdc(GameData *gameData, HeapID heapId);
+static void *PoketradeSave_BackupPlayersMet(GameData *gameData, HeapID heapId);
 static void PoketradeSave_RestoreBlock1F(GameData *gameData, void *copy);
 static void PoketradeSave_FreeBackups(void *work);
 static void PoketradeSave_RestoreBackups(PokemonTradeWork *wk);
@@ -113,7 +113,7 @@ void PoketradeSave_ResetClactAndBeginEvent(PokemonTradeWork *wk) {
         PokemonTrade_SetState(wk, PokemonTrade_FadeOutToEnd);
         return;
     }
-    if (wk->type == 6) {
+    if (wk->type == TRADE_TYPE_GTS_DEPOSIT) {
         PoketradeSave_PopBgmFadeIn60(wk);
         wk->param->next = 3;
         PokemonTrade_SetState(wk, NULL);
@@ -133,11 +133,11 @@ static void PoketradeSave_StepEventMessage1(PokemonTradeWork *wk) {
     if (wk->timer >= 6) {
         GFL_SndBGMPlay(SEQ_ME_POKEGET, 0xffff);
         GFL_SndBGMFadeIn(6);
-        if (wk->type == 7) {
+        if (wk->type == TRADE_TYPE_GTS_WITHDRAW) {
             GFL_MsgDataLoadStrbuf(wk->msgData, 154, wk->strbufTemplate);
-        } else if (wk->type == 8) {
+        } else if (wk->type == TRADE_TYPE_GTS_TRADE) {
             GFL_MsgDataLoadStrbuf(wk->msgData, 157, wk->strbufTemplate);
-        } else if (wk->unk11EE != 0) {
+        } else if (wk->recvPkmReturns != 0) {
             GFL_MsgDataLoadStrbuf(wk->msgData, 132, wk->strbufTemplate);
         } else {
             GFL_MsgDataLoadStrbuf(wk->msgData, 48, wk->strbufTemplate);
@@ -169,8 +169,8 @@ static void PoketradeSave_StepEventMessage2(PokemonTradeWork *wk) {
         }
         loadPokemonNicknameToStrbuf(wk->wordSet, 1, pkm);
         copyVarForText(wk->wordSet, 0, wk->partnerInfo);
-        if (wk->type != 7 && wk->type != 8) {
-            if (wk->unk11EE != 0) {
+        if (wk->type != TRADE_TYPE_GTS_WITHDRAW && wk->type != TRADE_TYPE_GTS_TRADE) {
+            if (wk->recvPkmReturns != 0) {
                 GFL_MsgDataLoadStrbuf(wk->msgData, 133, wk->strbufTemplate);
                 GFL_WordSetFormatStrbuf(wk->wordSet, wk->strbuf, wk->strbufTemplate);
                 PoketradeSave_OpenMessageWindowAtPos(wk, TRUE, 0);
@@ -232,7 +232,7 @@ static void PoketradeSave_SendTradeSummary(PokemonTradeWork *wk) {
     profile.countryCount = UnityTower_GetCountryCount(survey);
     profile.unk26_0 = UnityTower_GetRatingLevel(survey);
     if (PokemonTrade_IsNetwork(wk)) {
-        if (GFL_NetSendCommand(NetHandle_GetOwn(), TRADE_NET_CMD_UNK12, sizeof(profile), &profile)) {
+        if (GFL_NetSendCommand(NetHandle_GetOwn(), TRADE_NET_CMD_PROFILE, sizeof(profile), &profile)) {
             NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x17, 8);
             PokemonTrade_SetState(wk, PoketradeSave_StepWaitSyncRange);
         }
@@ -263,7 +263,7 @@ inline void *BackupRecords(GameData *gameData, HeapID heapId) {
     return copy;
 }
 
-static void *func_ov194_021bef14(GameData *gameData, HeapID heapId) {
+static void *PoketradeSave_BackupSurvey(GameData *gameData, HeapID heapId) {
     SaveControl *save = GameData_GetSaveControl(gameData);
     void *copy = GFL_HeapAllocate(heapId, UnityTower_GetSurveySaveSize(), FALSE, "pokemontrade_save.c", 431);
     u32 size = UnityTower_GetSurveySaveSize();
@@ -277,7 +277,7 @@ static void PoketradeSave_RestoreSaveControl(GameData *gameData, void *copy) {
     GFL_HeapFree(copy);
 }
 
-static void *func_ov194_021bef7c(GameData *gameData, HeapID heapId) {
+static void *PoketradeSave_BackupPokedex(GameData *gameData, HeapID heapId) {
     void *copy = GFL_HeapAllocate(heapId, getSizeofPokedexData(), FALSE, "pokemontrade_save.c", 460);
     u32 size = getSizeofPokedexData();
     MI_CpuCopy8(GameData_GetPokedex(gameData), copy, size);
@@ -289,7 +289,7 @@ static void PoketradeSave_RestorePokedex(GameData *gameData, void *copy) {
     GFL_HeapFree(copy);
 }
 
-static void *func_ov194_021befdc(GameData *gameData, HeapID heapId) {
+static void *PoketradeSave_BackupPlayersMet(GameData *gameData, HeapID heapId) {
     void *copy = GFL_HeapAllocate(heapId, PalPadFriendList_GetSize(), FALSE, "pokemontrade_save.c", 489);
     u32 size = PalPadFriendList_GetSize();
     MI_CpuCopy8(GameData_GetPalPadFriendList(gameData), copy, size);
@@ -326,7 +326,7 @@ static void PoketradeSave_FreeBackups(void *work) {
         GFL_HeapFree(wk->backup.box);
     }
     MI_CpuFill8(&wk->backup, 0, sizeof(wk->backup));
-    wk->unk11F7 = 0;
+    wk->tradeUnsaved = 0;
 }
 
 // Restores what the trade changed from the copies
@@ -357,7 +357,7 @@ static void PoketradeSave_RestoreBackups(PokemonTradeWork *wk) {
     }
     if (wk->backup.party != NULL) {
         PokeParty_Copy(wk->backup.party, wk->party);
-        PlayTime_SetLastSaved(GameData_GetPlayTime(wk->gameData), &wk->backup.unk1C);
+        PlayTime_SetLastSaved(GameData_GetPlayTime(wk->gameData), &wk->backup.lastSaved);
         GFL_HeapFree(wk->backup.party);
         wk->backup.party = NULL;
     }
@@ -403,10 +403,10 @@ static void PoketradeSave_ApplyTradeResult(PokemonTradeWork *wk) {
     if (!PokemonTrade_IsNegoType(wk)) {
         wk->backup.mail = BackupMail(wk->gameData, wk->heapId);
         wk->backup.records = BackupRecords(wk->gameData, wk->heapId);
-        wk->backup.survey = func_ov194_021bef14(wk->gameData, wk->heapId);
-        wk->backup.pokedex = func_ov194_021bef7c(wk->gameData, wk->heapId);
-        wk->backup.playersMet = func_ov194_021befdc(wk->gameData, wk->heapId);
-        PlayTime_GetLastSaved(GameData_GetPlayTime(wk->gameData), &wk->backup.unk1C);
+        wk->backup.survey = PoketradeSave_BackupSurvey(wk->gameData, wk->heapId);
+        wk->backup.pokedex = PoketradeSave_BackupPokedex(wk->gameData, wk->heapId);
+        wk->backup.playersMet = PoketradeSave_BackupPlayersMet(wk->gameData, wk->heapId);
+        PlayTime_GetLastSaved(GameData_GetPlayTime(wk->gameData), &wk->backup.lastSaved);
         if (wk->param->box == BoxSaveAccessor_GetAvailableBoxCount(wk->boxes)) {
             wk->backup.party = PokeParty_Create(wk->heapId);
             PokeParty_Copy(wk->party, wk->backup.party);
@@ -422,7 +422,7 @@ static void PoketradeSave_ApplyTradeResult(PokemonTradeWork *wk) {
         if (param->box == BoxSaveAccessor_GetAvailableBoxCount(wk->boxes)) {
             PoketradeSave_ConsumePerapVoice(wk, wk->party, param->slot);
         }
-        wk->unk11F7 = 1;
+        wk->tradeUnsaved = 1;
     }
     {
         PokemonTradeParam *param = wk->param;
@@ -499,19 +499,19 @@ static void PoketradeSave_ApplyTradeResult(PokemonTradeWork *wk) {
         PokeParty_SetupMetData(pkm, 6, wk->myInfo, 30003, wk->heapId);
     }
     switch (wk->type) {
-    case 2:
-    case 3:
+    case TRADE_TYPE_WIFICLUB:
+    case TRADE_TYPE_GTSNEGO:
         RecordAddOne(records, 16);
         break;
-    case 1:
+    case TRADE_TYPE_UNION:
         RecordAddOne(records, 12);
         break;
-    case 0:
+    case TRADE_TYPE_IRC:
         RecordAddOne(records, 36);
         break;
     }
     addPkmToDex(GameData_GetPokedex(wk->gameData), pkm);
-    if (wk->type == 3) {
+    if (wk->type == TRADE_TYPE_GTSNEGO) {
         PalPadFriendList_IncrementTradeCount(GameData_GetPalPadFriendList(wk->gameData));
     }
     if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL) == SPECIES_SHAYMIN &&
@@ -525,11 +525,11 @@ static void PoketradeSave_ApplyTradeResult(PokemonTradeWork *wk) {
         BoxSaveAccessor_SetPkm(wk->boxes, wk->param->box, wk->param->slot, PokeParty_ToBoxPkm(pkm));
     }
     switch (wk->type) {
-    case 2:
+    case TRADE_TYPE_WIFICLUB:
         WifiList_AddFriendRecord(GameData_GetWifiList(wk->gameData), wk->param->friendIndex - 1, 0, 0, 1);
         break;
-    case 0:
-    case 1: {
+    case TRADE_TYPE_IRC:
+    case TRADE_TYPE_UNION: {
         u32 index;
         if (WifiList_FindFriendByPlayerInfo(GameData_GetWifiList(wk->gameData), wk->partnerInfo, &index)) {
             WifiList_AddFriendRecord(GameData_GetWifiList(wk->gameData), index, 0, 0, 1);
@@ -544,11 +544,11 @@ static void PoketradeSave_StepAfterTrade(PokemonTradeWork *wk) {
     Poketrade3D_DeleteMcssSlot(wk, 1);
     Poketrade3D_DeleteMcssSlot(wk, 2);
     Poketrade3D_DeleteMcssSlot(wk, 3);
-    if (wk->type == 4 || wk->type == 7 || wk->type == 8) {
+    if (wk->type == TRADE_TYPE_IRCDEMO || wk->type == TRADE_TYPE_GTS_WITHDRAW || wk->type == TRADE_TYPE_GTS_TRADE) {
         wk->param->next = 3;
         PoketradeSave_PopBgmFadeIn60(wk);
         PokemonTrade_SetState(wk, PokemonTrade_FadeOutToEnd);
-    } else if (wk->type == 1 || wk->type == 2 || wk->type == 3) {
+    } else if (wk->type == TRADE_TYPE_UNION || wk->type == TRADE_TYPE_WIFICLUB || wk->type == TRADE_TYPE_GTSNEGO) {
         PokemonTrade_SetState(wk, PoketradeSave_SendTradeSummary);
     } else {
         PokemonTrade_SetState(wk, PoketradeSave_StepRegisterReceived);
@@ -566,7 +566,7 @@ static void PoketradeSave_StepRegisterReceived(PokemonTradeWork *wk) {
     PartyPkm *pkm;
     int slot;
     if (PokemonTrade_IsNegoType(wk)) {
-        int index = wk->unkFA0 % 3;
+        int index = wk->partnerCursor % 3;
         pkm = PokemonTrade_GetPkm(wk, 0);
         wk->param->box = wk->negoBox[0][index];
         slot = wk->negoSlot[0][index];
@@ -674,7 +674,7 @@ static void PoketradeSave_StepWaitSaveDone(PokemonTradeWork *wk) {
 static void PoketradeSave_StepBeginWipeOut(PokemonTradeWork *wk) {
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
     wk->timer = 0;
-    wk->unk11F7 = 0;
+    wk->tradeUnsaved = 0;
     PokemonTrade_SetState(wk, PoketradeSave_StepRebuildSceneAfterWipe);
 }
 

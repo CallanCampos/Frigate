@@ -1,0 +1,14 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "O",
+    "shapes": [ 12 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_TWIST_MOUNTAIN": [ "grass", "shaking_grass" ],
+            "ZONE_VICTORY_ROAD": [ "grass", "shaking_grass" ],
+            "ZONE_RELIC_PASSAGE": [ "grass", "shaking_grass" ],
+            "ZONE_CLAY_TUNNEL": [ "grass", "shaking_grass" ]
+        }
+    }
+}

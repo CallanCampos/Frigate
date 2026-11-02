@@ -1,0 +1,14 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "G",
+    "shapes": [ 10 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_PINWHEEL_FOREST": [ "grass", "dark_grass" ],
+            "ZONE_TWIST_MOUNTAIN": [ "grass" ],
+            "ZONE_VICTORY_ROAD": [ "grass", "dark_grass" ],
+            "ZONE_RELIC_PASSAGE": [ "grass" ]
+        }
+    }
+}

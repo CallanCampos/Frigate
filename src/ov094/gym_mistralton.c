@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/event_data.h"
 #include "field/event_mapchange.h"
@@ -196,9 +197,13 @@ static const G3DSceneAnimationSetup sMistraltonAnimations05[] = { { 5, 0 }, { 6,
 
 // clang-format off
 static const G3DSceneResourceSetup sMistraltonResources[] = {
-    { 0x7a, 0, 0, 0 }, { 0x7a, 1, 0, 0 }, { 0x7a, 2, 0, 0 }, { 0x7a, 3, 0, 0 },  { 0x7a, 4, 0, 0 },
-    { 0x7a, 5, 0, 0 }, { 0x7a, 6, 0, 0 }, { 0x7a, 7, 0, 0 }, { 0x7a, 8, 0, 0 },  { 0x7a, 9, 0, 0 },
-    { 0x7a, 10, 0, 0 }, { 0x7a, 11, 0, 0 }, { 0x7a, 12, 0, 0 },
+    { ARCID_GYM_MISTRALTON, 0, 0, 0 }, { ARCID_GYM_MISTRALTON, 1, 0, 0 },
+    { ARCID_GYM_MISTRALTON, 2, 0, 0 }, { ARCID_GYM_MISTRALTON, 3, 0, 0 },
+    { ARCID_GYM_MISTRALTON, 4, 0, 0 }, { ARCID_GYM_MISTRALTON, 5, 0, 0 },
+    { ARCID_GYM_MISTRALTON, 6, 0, 0 }, { ARCID_GYM_MISTRALTON, 7, 0, 0 },
+    { ARCID_GYM_MISTRALTON, 8, 0, 0 }, { ARCID_GYM_MISTRALTON, 9, 0, 0 },
+    { ARCID_GYM_MISTRALTON, 10, 0, 0 }, { ARCID_GYM_MISTRALTON, 11, 0, 0 },
+    { ARCID_GYM_MISTRALTON, 12, 0, 0 },
 };
 
 // clang-format on

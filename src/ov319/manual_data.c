@@ -134,7 +134,8 @@ BOOL ManualData_IsOpen(ManualData *data, u16 condition, GameData *gameData) {
         }
         break;
     case MANUAL_CONDITION_MEDAL_BOX:
-        if (MedalBox_GetMedalStatus(SaveControl_GetMedalBox(GameData_GetSaveControl(gameData)), 0) == 4) {
+        if (MedalBox_GetMedalStatus(SaveControl_GetMedalBox(GameData_GetSaveControl(gameData)), 0) ==
+            MEDAL_STATUS_OBTAINED) {
             open = TRUE;
         }
         break;
