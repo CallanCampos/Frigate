@@ -557,9 +557,9 @@ def main() -> int:
               "finds: remove the row")
     for error in errors:
         print(error)
-    problems, fixes = failed + passed, len(stale) + len(errors)
-    print(f"check_docs: {len(documents)} documents, {problems} problem{'' if problems == 1 else 's'} "
-          f"({passed} allowed), {fixes} allowlist row{'' if fixes == 1 else 's'} to fix")
+    count = {"document": len(documents), "problem": failed + passed, "allowlist row": len(stale) + len(errors)}
+    said = {what: f"{n} {what}{'' if n == 1 else 's'}" for what, n in count.items()}
+    print(f"check_docs: {said['document']}, {said['problem']} ({passed} allowed), {said['allowlist row']} to fix")
     return 1 if failed or stale or errors else 0
 
 
