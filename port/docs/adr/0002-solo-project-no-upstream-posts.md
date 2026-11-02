@@ -45,7 +45,7 @@ know about it."
   stops with exit code 5 and the `port-sync` Action with the `references` outcome; `--allow-references` pushes
   anyway, and only the user decides to use it. The check runs whatever the repository's visibility: GitHub still
   shows a reference from a private repository to people who can't read it, with a minimum of information
-  ([SYNC.md](../SYNC.md#commit-messages-that-name-other-repositories)).
+  ([SYNC.md](../SYNC.md#conflicts-and-stopped-syncs)).
 - Port sessions never run the upstream root `CLAUDE.md`'s overlay claim and progress comment rules or the
   `decomp-file`, `finish-file` and `match-function` skills, which post on upstream's issues; `port/CLAUDE.md` says so.
   Rule text isn't the only guard: `port/tools/hooks/port_guard.py`, a PreToolUse hook that
