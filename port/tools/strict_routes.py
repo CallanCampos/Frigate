@@ -8,10 +8,11 @@ the criterion of ADR 0033 (port/docs/adr/, the sanitizer-clean replays of phase 
 to run it.
 
 Game functionality: what those routes play. ctest's replays, from power-on to the Aspertia City lookout (the opening,
-the title, New Game, the first save and its CONTINUE); and from the oracle's saves: CONTINUE into the field; the field
-menu and its apps (the bag, the trainer card, the party, a summary, the Pokédex); Hugh's trainer battle; Route 19 and
-Bianca's capture demo; a wild Purrloin caught; the PC Box's storage system; Floccesy Town to Route 20; the saves these
-make (the round trips' make legs) and the games continued from them (their continue legs).
+the title, New Game, the first save, and CONTINUE from it to the starter's scene and its save); and from the oracle's
+saves: CONTINUE into the field; the field menu and its apps (the bag, the trainer card, the party, a summary, the
+Pokédex); Hugh's trainer battle; Route 19 and Bianca's capture demo; a wild Purrloin caught; the PC Box's storage
+system; Floccesy Town to Route 20; the saves these make (the round trips' make legs) and the games continued from them
+(their continue legs).
 
 Its inputs: the strict build's CMakeCache.txt and its ctest tests; oracle.py's tables (SEQUENCES, SAVES, ROUND_TRIPS),
 read and never changed, each kind of entry by one adapter function (sequence_case, trip_cases, kept_save), so that a
@@ -108,8 +109,8 @@ FRAMES_LINE = re.compile(r"port: stopped after (\d+) frames")
 # What ASan's runtime prints first with help=1, before the program runs
 ASAN_FLAG_LIST = "Available flags for AddressSanitizer"
 # The handler that UBSan's function check calls, which upstream clang emits for C with -fsanitize=function and Apple
-# clang never does (port/docs/lessons.md, 2026-10-18): a program whose code has the check names it among its symbols
-# (on macOS an import from the sanitizers' runtime, a library; where the runtime is linked in, every program has it)
+# clang never does (port/docs/lessons.md, 2026-10-18): on macOS, where the sanitizers' runtime is a library, a program
+# names it among its symbols only as an import that its own code calls
 FUNCTION_CHECK = b"function_type_mismatch"
 # ctest's half: the build's route tests that need no oracle, their output and JUnit file in the work's ctest-routes/
 CTEST_ROUTES = ("-L", "route", "-LE", "oracle")

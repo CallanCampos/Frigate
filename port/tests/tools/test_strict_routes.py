@@ -663,7 +663,8 @@ class CtestTests(World):
 
     def test_the_routes_run_first_with_the_criterions_options(self):
         self.routes(["replay_one", "replay_two"])
-        caller = {"ASAN_OPTIONS": "detect_leaks=0", "UBSAN_OPTIONS": "print_stacktrace=0", "LSAN_OPTIONS": "verbosity=1"}
+        caller = {"ASAN_OPTIONS": "detect_leaks=0", "UBSAN_OPTIONS": "print_stacktrace=0",
+                  "LSAN_OPTIONS": "verbosity=1"}
         status, printed = self.run_runner("--jobs", "2", environment=caller)
         self.assertEqual(status, 0)
         ran = self.ctest_ran()
