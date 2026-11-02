@@ -34,21 +34,23 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 ## 2026-11-02: the save lab's minter and reader (L1)
 
-- **Upstream:** `41f42ca1af`, which PR 67's sync brought to main while this change was in review; this change merges
-  no upstream commit of its own. Reviewed main is `10d017c010`, PR 67's merge.
+- **Upstream:** `41f42ca1af`, which PR 67's sync brought to main while this change was in review; this change merges no
+  upstream commit of its own. Reviewed main is `10d017c010`, PR 67's merge.
 - **Port:** `PORT_SHA`, on the topic branch `port-save-lab-core` from `d19894b1f7` (PR 69's merge), with reviewed main
   `10d017c010` merged in; this entry fills the last entry's `PORT_SHA` with `f53e767509`. PR 69's entry has
   `2f9033d7b8`, as this branch and PR 67 both filled it. Nothing outside `port/` changes.
-- **ROM (T0):** configure and Ninja (`-j4`) pass both original US SHA1s with zero compiler warnings, in a full build
-  (10,703 steps) of the branch's base and again on this commit: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2
-  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. No ROM input changes.
-- **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both games (`build/port`, `build/port-w2`) pass; the
-  new `port_test_savelab_layout` builds with `-Wall -Wextra -Werror`.
+- **ROM (T0):** configure and Ninja (`-j4`) pass both original US SHA1s with zero compiler warnings: in a full build
+  (10,703 steps) of the branch's base, again on its first two commits, and in a full build (12,555 steps) after merging
+  main at `10d017c010`: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  This change adds no ROM input.
+- **Host build (T1):** arm64 macOS RelWithDebInfo builds of both games (`build/port`, `build/port-w2`) pass, fresh on
+  the branch's base and rebuilt after the merge; the new `port_test_savelab_layout` builds with `-Wall -Wextra -Werror`.
 - **Tests:**
-  - T2/T6: `ctest -LE route -j3` passes in both games: 351 of 358 tests pass, `lab_savelab` the one more than main's,
-    and 7 skip for the optional setups this checkout lacks: `asm_oracle` (no Unicorn in this Python), `oracle_boot`,
-    `oracle_saves` and `oracle_floccesy_save` (no oracle built), the two function-sanitizer negatives of the VM dispatch
-    (Apple's compiler emits no such check) and `app_universal_slices` (one slice).
+  - T2/T6: `ctest -LE route -j3` passes in both games, on each commit and after the merge: 351 of 358 tests pass,
+    `lab_savelab` the one more than main's, and 7 skip for the optional setups this checkout lacks: `asm_oracle` (no
+    Unicorn in this Python), `oracle_boot`, `oracle_saves` and `oracle_floccesy_save` (no oracle built), the two
+    function-sanitizer negatives of the VM dispatch (Apple's compiler emits no such check) and `app_universal_slices`
+    (one slice).
   - `lab_savelab`, 33 tests on synthetic saves built field by field from the offsets and sizes that
     `port_test_savelab_layout` prints from the decomp's headers: savelab's `LAYOUT` is the headers' (77 entries); the
     reader gives back every field; an empty recipe leaves the save unchanged; a recipe's writes are resealed in both
@@ -63,9 +65,9 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     checks taken out, an offset moved, the facing's angles swapped, a tile at its centre, the continue flag left clear,
     rails or a surfing base let through, an empty recipe that writes, a duplicate taken, money uncapped, badges off by
     one, the blocks left encrypted.
-  - T3, short: the replays pass, B2 6 of 6 and W2 4 of 4 (`replay_new_game`, B2 only, `replay_new_game_house`,
-    `replay_same_save` and `replay_same_save_complete`, with their clean fixtures). No game or host code changed, so
-    they can't have moved; they ran as every push's short replays do.
+  - T3, short: the replays pass, B2 6 of 6 and W2 4 of 4, before and after the merge (`replay_new_game`, B2 only,
+    `replay_new_game_house`, `replay_same_save` and `replay_same_save_complete`, with their clean fixtures). This change
+    touches no game or host code, so they can't have moved; they ran as every push's short replays do.
   - With the ROM, on this machine (nothing committed or uploaded): `place ZONE_FLOCCESY_RANCH_2 warp 0` minted from the
     oracle's Route 20 save (`floccesy_save`, Black 2, `07d26e593786`) gives SHA-1 `72e7ab2a3fa0`, the prototype's, in 38
     bytes, 19 in each copy: `nextSpawn`'s zone, `SaveLocation`'s zone, position and rotation, the continue flag's byte,
@@ -83,13 +85,14 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     Petey, who challenges at once: his battle reaches "What will Tepig do?" and takes the input's SAVE presses, so no
     save is written. `place ZONE_FLOCCESY_TOWN fly` puts the player in front of the town's Pokémon Center, facing down,
     and the save the game writes reads back `ZONE_FLOCCESY_TOWN` at tile `(105, 694)`, the zone's Fly position, with the
-    continue flag cleared.
+    continue flag cleared. After the merge, the mint gives `72e7ab2a3fa0` again, `read` the same facts, and the ranch's
+    run on the rebuilt program leaves the same save, `53912fbe1b1a`.
   - T4 not run: the minted save held to melonDS frame by frame is L2's station. T5 and T7 not run: no game or host code
     changed.
 - **Tiers/trap stubs:** not measured: no game or host code changed.
 - **64-bit warnings:** the pointer cast guard passes in both games, and `check_ptrcasts.py --build-dir build/port
   --report` gives 365 sites in 229 keys (real 66, harmless 123, handled 141, unreachable 35), 1,711 files compiled and
-  none missing: no change.
+  none missing, before and after the merge: no change.
 - **Work done:** L1 of the save lab, the minter and the reader, as the save lab's design of 2026-11-01 plans it:
   - **[port/tools/lab/savelab.py](../tools/lab/savelab.py)** mints a save from a save the game wrote and a recipe in the
     game's constant names, read from the build's generated constants headers, and reads a save back as facts in the same
