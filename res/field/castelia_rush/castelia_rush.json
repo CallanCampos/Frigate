@@ -1,0 +1,177 @@
+{
+    "$schema": "castelia_rush.schema.json",
+    "crowds": [
+        {
+            "zone": "ZONE_CASTELIA_CITY_6",
+            "intervals": [ 25, 60, 25, 45, 125 ],
+            "lane_count": 2,
+            "obj_code_count": 3,
+            "obj_codes": [ "OBJ_CODE_CLERK_M_67", "OBJ_CODE_CLERK_F", "OBJ_CODE_GENTLEMAN", "OBJ_CODE_255" ],
+            "msg_base": 28,
+            "msg_count": 20,
+            "step_frames": 6,
+            "lanes": [
+                {
+                    "z_min": 0,
+                    "z_max": 0,
+                    "x_min": 16,
+                    "x_max": 20,
+                    "dir": 1,
+                    "steps": 63
+                },
+                {
+                    "z_min": 63,
+                    "z_max": 63,
+                    "x_min": 11,
+                    "x_max": 15,
+                    "dir": 0,
+                    "steps": 63
+                }
+            ],
+            "unkA": 0,
+            "unk19": 0
+        },
+        {
+            "zone": "ZONE_CASTELIA_CITY_4",
+            "intervals": [ 55, 90, 55, 80, 145 ],
+            "lane_count": 2,
+            "obj_code_count": 3,
+            "obj_codes": [ "OBJ_CODE_CLERK_M_67", "OBJ_CODE_CLERK_F", "OBJ_CODE_WORKER_26", "OBJ_CODE_255" ],
+            "msg_base": 28,
+            "msg_count": 20,
+            "step_frames": 6,
+            "lanes": [
+                {
+                    "z_min": 16,
+                    "z_max": 16,
+                    "x_min": 16,
+                    "x_max": 18,
+                    "dir": 1,
+                    "steps": 63
+                },
+                {
+                    "z_min": 63,
+                    "z_max": 63,
+                    "x_min": 13,
+                    "x_max": 15,
+                    "dir": 0,
+                    "steps": 47
+                }
+            ],
+            "unkA": 0,
+            "unk19": 0
+        },
+        {
+            "zone": "ZONE_CASTELIA_CITY_5",
+            "intervals": [ 55, 90, 55, 80, 145 ],
+            "lane_count": 2,
+            "obj_code_count": 2,
+            "obj_codes": [ "OBJ_CODE_CLERK_M_67", "OBJ_CODE_CLERK_F", "OBJ_CODE_255", "OBJ_CODE_255" ],
+            "msg_base": 28,
+            "msg_count": 20,
+            "step_frames": 6,
+            "lanes": [
+                {
+                    "z_min": 0,
+                    "z_max": 0,
+                    "x_min": 16,
+                    "x_max": 18,
+                    "dir": 1,
+                    "steps": 63
+                },
+                {
+                    "z_min": 63,
+                    "z_max": 63,
+                    "x_min": 13,
+                    "x_max": 15,
+                    "dir": 0,
+                    "steps": 63
+                }
+            ],
+            "unkA": 0,
+            "unk19": 0
+        },
+        {
+            "zone": "ZONE_TUBELINE_BRIDGE",
+            "intervals": [ 50, 50, 50, 50, 50 ],
+            "lane_count": 2,
+            "obj_code_count": 1,
+            "obj_codes": [ "OBJ_CODE_BIKER", "OBJ_CODE_255", "OBJ_CODE_255", "OBJ_CODE_255" ],
+            "msg_base": 48,
+            "msg_count": 10,
+            "step_frames": 2,
+            "lanes": [
+                {
+                    "z_min": 27,
+                    "z_max": 27,
+                    "x_min": 11,
+                    "x_max": 13,
+                    "dir": 1,
+                    "steps": 143
+                },
+                {
+                    "z_min": 170,
+                    "z_max": 170,
+                    "x_min": 17,
+                    "x_max": 19,
+                    "dir": 0,
+                    "steps": 143
+                }
+            ],
+            "unkA": 0,
+            "unk19": 0
+        },
+        {
+            "zone": "ZONE_BLACK_CITY",
+            "intervals": [ 0, 0, 0, 0, 0 ],
+            "lane_count": 0,
+            "obj_code_count": 0,
+            "obj_codes": [ "OBJ_CODE_0", "OBJ_CODE_0", "OBJ_CODE_0", "OBJ_CODE_0" ],
+            "msg_base": 0,
+            "msg_count": 0,
+            "step_frames": 0,
+            "lanes": [
+                {
+                    "z_min": 0,
+                    "z_max": 0,
+                    "x_min": 0,
+                    "x_max": 0,
+                    "dir": 0,
+                    "steps": 0
+                },
+                {
+                    "z_min": 0,
+                    "z_max": 0,
+                    "x_min": 0,
+                    "x_max": 0,
+                    "dir": 0,
+                    "steps": 0
+                }
+            ],
+            "unkA": 0,
+            "unk19": 0
+        }
+    ],
+    "scripts": [
+        {
+            "obj_code": "OBJ_CODE_CLERK_M_67",
+            "scripts": [ 10350, 10351, 10352, 10353, 10370, 10371 ]
+        },
+        {
+            "obj_code": "OBJ_CODE_CLERK_F",
+            "scripts": [ 10354, 10355, 10356, 10357, 10372, 10373 ]
+        },
+        {
+            "obj_code": "OBJ_CODE_GENTLEMAN",
+            "scripts": [ 10358, 10359, 10360, 10361, 10374, 10375 ]
+        },
+        {
+            "obj_code": "OBJ_CODE_WORKER_26",
+            "scripts": [ 10362, 10363, 10364, 10365, 10376, 10377 ]
+        },
+        {
+            "obj_code": "OBJ_CODE_BIKER",
+            "scripts": [ 10366, 10367, 10368, 10369, 10366, 10367 ]
+        }
+    ]
+}

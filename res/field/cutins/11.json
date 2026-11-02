@@ -1,0 +1,13 @@
+{
+    "$schema": "cutin.schema.json",
+    "particle": 57,
+    "particle_delays": [ 56, 0 ],
+    "models": [ 58, 59 ],
+    "actor_delays": [ 0, 0 ],
+    "animations1": [ 60, 61, 62, null ],
+    "animations2": [ 63, 64, null, null ],
+    "dim_capture": 0,
+    "key_list": 4,
+    "bitmap_flag": 0,
+    "bitmaps": []
+}

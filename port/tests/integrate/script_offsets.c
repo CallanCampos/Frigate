@@ -169,7 +169,7 @@ static void TestActorMovement(void (*check)(int ok, const char *what)) {
     actors.actorCapacity = 1;
     actors.actorHeap = &actor;
     actors.fieldHeapId = FIELD_HEAP;
-    actors.unkC = ACTOR_TASK_PRIORITY;
+    actors.taskPriority = ACTOR_TASK_PRIORITY;
     actors.tcbMgr = GFL_TCBMgrCreate(ACTOR_TASKS, taskMemory);
     memset(&actor, 0, sizeof(actor));
     actor.flags = ACTOR_FLAG_USED;

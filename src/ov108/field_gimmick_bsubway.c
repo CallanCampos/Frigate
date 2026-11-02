@@ -60,6 +60,12 @@ static void TrainSetup(BSubwayGimmickWork *work, Field *field);
 static void TrainEnd(BSubwayGimmickWork *work, Field *field);
 static void ShakeSetup(BSubwayGimmickWork *work, Field *field);
 static void ShakeEnd(BSubwayGimmickWork *work, Field *field);
+enum {
+    SHAKE_STEP_IDLE,
+    SHAKE_STEP_WAIT,
+    SHAKE_STEP_MOVE,
+};
+
 static void ShakeMove(BSubwayGimmickWork *work, Field *field);
 static void GetZoneGimmick(u32 zoneId, u32 *gimmickId, u32 *index);
 
@@ -214,7 +220,7 @@ static void ShakeMove(BSubwayGimmickWork *work, Field *field) {
     shake = work->data;
     mapper = Field_GetG3DMapper(field);
     switch (shake->state) {
-    case 0:
+    case SHAKE_STEP_IDLE:
         if (shake->stop == TRUE) {
             break;
         }
@@ -222,18 +228,18 @@ static void ShakeMove(BSubwayGimmickWork *work, Field *field) {
         shake->waitIndex++;
         shake->waitIndex %= NELEMS(waits);
         shake->state++;
-    case 1:
+    case SHAKE_STEP_WAIT:
         if (--shake->wait > 0) {
             break;
         }
         shake->shake = 1;
         shake->state++;
         break;
-    case 2:
+    case SHAKE_STEP_MOVE:
         pos.y = shake->shake * FX32_ONE;
         FieldG3DMapper_SetOriginOffset(mapper, &pos);
         if (shake->shake == 0) {
-            shake->state = 0;
+            shake->state = SHAKE_STEP_IDLE;
         }
         if (shake->shake < 0) {
             shake->shake += 2;

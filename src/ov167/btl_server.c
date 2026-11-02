@@ -5,6 +5,7 @@
 #include "battle/btl_main.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_rec.h"
+#include "battle/btl_result.h"
 #include "battle/btl_server.h"
 #include "battle/btl_server_flow.h"
 #include "constants/pokemon.h"
@@ -20,8 +21,8 @@
 #include "system/game_beacon.h"
 #include "system/game_comm.h"
 
-BtlServer *BattleServer_Create(BtlMainModule *mainModule, const MATHRandContext32 *rand, BtlPokeCon *pokeCon, u32 a3,
-                               HeapID heapId) {
+BtlServer *BattleServer_Create(BtlMainModule *mainModule, const MATHRandContext32 *rand, BtlPokeCon *pokeCon,
+                               u32 commCompetitor, HeapID heapId) {
     BtlServer *server = GFL_HeapAllocate(heapId, sizeof(BtlServer), TRUE, "btl_server.c", 0xae);
     int i;
 
@@ -33,15 +34,15 @@ BtlServer *BattleServer_Create(BtlMainModule *mainModule, const MATHRandContext3
     server->flow = NULL;
     server->count = 0;
     server->unkCBF = 0;
-    server->unk4C = a3;
+    server->commCompetitor = commCompetitor;
     server->rand = *rand;
     server->strBuf = GFL_StrBufCreate(0x20, heapId);
     BtlCalc_ResetRand(rand);
     for (i = 0; i < 4; i++) {
         ServerClient_Clear(&server->clients[i]);
     }
-    server->flow = BtlServerFlow_Create(server, server->mainModule, server->pokeCon, &server->queue, server->unk4C,
-                                        server->heapId);
+    server->flow = BtlServerFlow_Create(server, server->mainModule, server->pokeCon, &server->queue,
+                                        server->commCompetitor, server->heapId);
     server->clientIdList = BtlServerFlow_GetClientIDList(server->flow);
     BattleServer_SetProc(server, BattleServer_ProcStart);
     return server;
@@ -81,7 +82,7 @@ void BattleServer_Delete(BtlServer *server) {
     GFL_StrBufFree(server->strBuf);
     BtlServerFlow_Delete(server->flow);
     for (i = 0; i < 4; i++) {
-        if (server->clients[i].clientId != 0xff && server->clients[i].adapter != NULL &&
+        if (server->clients[i].clientId != BTL_SERVER_CLIENT_NONE && server->clients[i].adapter != NULL &&
             !server->clients[i].isAttached) {
             BtlAdapter_Delete(server->clients[i].adapter);
         }
@@ -122,7 +123,7 @@ BOOL BattleServer_ProcStart(BtlServer *server, int *seq) {
     case 1:
         if (BattleServer_AllClientsReplied(server)) {
             BattleServer_FinishCmd(server);
-            if (BtlSetup_GetBattleType(server->mainModule) != 4) {
+            if (BtlSetup_GetBattleType(server->mainModule) != BTL_TYPE_CAPTURE_DEMO) {
                 BattleServer_SendRecStartChunk(server, BtlServerFlow_StartBattle(server->flow));
                 (*seq)++;
             } else {
@@ -212,35 +213,35 @@ BOOL BattleServer_ProcSelectAction(BtlServer *server, int *seq) {
         if (BattleServer_AllClientsReplied(server)) {
             BattleServer_FinishCmd(server);
             switch (server->flowResult) {
-            case 0:
+            case BTL_FLOW_RESULT_NONE:
                 BattleServer_SetSelectActionProc(server);
                 break;
-            case 3:
+            case BTL_FLOW_RESULT_CONTINUE:
                 *seq = 6;
                 break;
-            case 2: {
+            case BTL_FLOW_RESULT_FAINT_SWITCH: {
                 u32 battleType = BtlSetup_GetBattleType(server->mainModule);
                 u32 battleStyle = BtlSetup_GetBattleStyle(server->mainModule);
 
-                if (battleType == 0 && battleStyle == 0) {
+                if (battleType == BTL_TYPE_WILD && battleStyle == BTL_STYLE_SINGLE) {
                     BattleServer_SetProc(server, BattleServer_ProcAskEscape);
                 } else {
                     BattleServer_SetProc(server, BattleServer_ProcChangePokemonEndTurn);
                 }
                 break;
             }
-            case 1:
+            case BTL_FLOW_RESULT_MID_TURN_SWITCH:
                 BattleServer_SetProc(server, BattleServer_ProcChangePokemonMidTurn);
                 break;
-            case 6:
+            case BTL_FLOW_RESULT_CAPTURE:
                 BtlMain_StoreSlotNthResult(server->mainModule, ServerControl_GetChosenSlot(server->flow));
                 BattleServer_SetProc(server, BattleServer_ProcBattleEnd);
                 return FALSE;
-            case 4:
+            case BTL_FLOW_RESULT_BATTLE_END:
                 SetBattleResult(server->mainModule, BtlServerFlow_GetBattleResult(server->flow));
                 BattleServer_SetProc(server, BattleServer_ProcBattleEnd);
                 return FALSE;
-            case 5:
+            case BTL_FLOW_RESULT_ESCAPE:
             default:
                 return TRUE;
             }
@@ -340,17 +341,17 @@ BOOL BattleServer_ProcChangePokemonEndTurn(BtlServer *server, int *seq) {
         if (BattleServer_AllClientsReplied(server)) {
             BattleServer_FinishCmd(server);
             switch (server->flowResult) {
-            case 2:
+            case BTL_FLOW_RESULT_FAINT_SWITCH:
                 *seq = 0;
                 break;
-            case 3:
+            case BTL_FLOW_RESULT_CONTINUE:
                 *seq = 5;
                 break;
-            case 4:
+            case BTL_FLOW_RESULT_BATTLE_END:
                 SetBattleResult(server->mainModule, BtlServerFlow_GetBattleResult(server->flow));
                 BattleServer_SetProc(server, BattleServer_ProcBattleEnd);
                 break;
-            case 5:
+            case BTL_FLOW_RESULT_ESCAPE:
                 return TRUE;
             default:
                 BattleServer_SetSelectActionProc(server);
@@ -440,20 +441,20 @@ BOOL BattleServer_ProcChangePokemonMidTurn(BtlServer *server, int *seq) {
         if (BattleServer_AllClientsReplied(server)) {
             BattleServer_FinishCmd(server);
             switch (server->flowResult) {
-            case 1:
+            case BTL_FLOW_RESULT_MID_TURN_SWITCH:
                 *seq = 0;
                 break;
-            case 3:
+            case BTL_FLOW_RESULT_CONTINUE:
                 *seq = 4;
                 break;
-            case 2:
+            case BTL_FLOW_RESULT_FAINT_SWITCH:
                 BattleServer_SetProc(server, BattleServer_ProcChangePokemonEndTurn);
                 break;
-            case 4:
+            case BTL_FLOW_RESULT_BATTLE_END:
                 SetBattleResult(server->mainModule, BtlServerFlow_GetBattleResult(server->flow));
                 BattleServer_SetProc(server, BattleServer_ProcBattleEnd);
                 break;
-            case 5:
+            case BTL_FLOW_RESULT_ESCAPE:
                 return TRUE;
             default:
                 BattleServer_SetSelectActionProc(server);
@@ -499,26 +500,26 @@ BOOL BattleServer_ProcBattleEnd(BtlServer *server, int *seq) {
     server->exitData.result = result;
     server->exitData.playerClientId = GetPlayerClientID(server->mainModule);
     switch (BtlSetup_GetBattleType(server->mainModule)) {
-    case 1:
+    case BTL_TYPE_TRAINER:
         BattleServer_SetProc(server, BattleServer_ProcTrainerEnd);
         break;
-    case 2:
+    case BTL_TYPE_FACILITY:
         BattleServer_SetProc(server, BattleServer_ProcFacilityEnd);
         break;
-    case 3:
+    case BTL_TYPE_COMM:
         BattleServer_SetProc(server, BattleServer_ProcCommEnd);
         break;
-    case 0:
-        if (result == 1) {
+    case BTL_TYPE_WILD:
+        if (result == BTL_RESULT_VICTORY) {
             BattleServer_SetProc(server, BattleServer_ProcWildWin);
-        } else if (result == 0 || result == 2) {
+        } else if (result == BTL_RESULT_DEFEAT || result == BTL_RESULT_DRAW) {
             BattleServer_SetProc(server, BattleServer_ProcWildLose);
         } else {
             BattleServer_SetProc(server, BattleServer_ProcWaitExit);
         }
         break;
     default:
-        if (result == 1) {
+        if (result == BTL_RESULT_VICTORY) {
             GFL_SndBGMPlay(GetWinBGM(server->mainModule), 0xffff);
         }
         BattleServer_SetProc(server, BattleServer_ProcWaitExit);
@@ -724,7 +725,7 @@ void *BattleServer_MakeRecActionsChunk(BtlServer *server, u8 value, BOOL flag, u
 
     BtlRecTool_Init(&server->recTool, flag);
     for (i = 0; i < 4; i++) {
-        if (server->clients[i].clientId != 0xff) {
+        if (server->clients[i].clientId != BTL_SERVER_CLIENT_NONE) {
             u32 actionSize;
             void *actions = BtlAdapter_GetReturnData(server->clients[i].adapter, &actionSize);
 
@@ -813,12 +814,12 @@ void BattleServer_ResetAdapters(BtlServer *server) {
 }
 
 void ServerClient_Clear(BtlServerClient *client) {
-    client->clientId = 0xff;
+    client->clientId = BTL_SERVER_CLIENT_NONE;
 }
 
 // Function name from swan.
 BOOL IsSwitchModeEnabled(BtlServerClient *client) {
-    if (client->clientId != 0xff) {
+    if (client->clientId != BTL_SERVER_CLIENT_NONE) {
         return TRUE;
     }
     return FALSE;
@@ -837,14 +838,14 @@ void ServerClient_SetParty(BtlServerClient *client, BattleParty *party, u8 numCo
 }
 
 BtlServerClient *BattleServer_GetClient(BtlServer *server, u8 clientId) {
-    if (clientId < 4 && server->clients[clientId].clientId != 0xff) {
+    if (clientId < 4 && server->clients[clientId].clientId != BTL_SERVER_CLIENT_NONE) {
         return &server->clients[clientId];
     }
     return NULL;
 }
 
 BtlServerClient *BattleServer_GetClientNoCheck(BtlServer *server, u8 clientId) {
-    if (server->clients[clientId].clientId != 0xff) {
+    if (server->clients[clientId].clientId != BTL_SERVER_CLIENT_NONE) {
         return &server->clients[clientId];
     }
     return NULL;

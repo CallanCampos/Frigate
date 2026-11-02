@@ -40,7 +40,7 @@ void BsubwayScr_ClearWorkPtr(GameSystem *gsys) {
     GameData_SetBSubwayScrWork(GSYS_GetGameData(gsys), NULL);
 }
 
-BSubwayScrWork *BsubwayScr_CreateWork(GameSystem *gsys, u16 a1, u16 a2) {
+BSubwayScrWork *BsubwayScr_CreateWork(GameSystem *gsys, u16 resume, u16 playMode) {
     GameData *gameData;
     PlayerInfo *playerInfo;
     SaveControl *save;
@@ -61,50 +61,50 @@ BSubwayScrWork *BsubwayScr_CreateWork(GameSystem *gsys, u16 a1, u16 a2) {
     bsw->magic = 0x12345678;
     bsw->gameData = gameData;
     bsw->gender = getTrainerGender(playerInfo);
-    bsw->unk70 = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_PLAY);
-    bsw->unk74 = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_SCORE);
-    bsw->unk78 = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_3A);
-    BSubwayPlayData_SetSaveFlag(bsw->unk70, 0);
+    bsw->playData = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_PLAY);
+    bsw->scoreData = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_SCORE);
+    bsw->wifiData = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_3A);
+    BSubwayPlayData_SetSaveFlag(bsw->playData, 0);
     GameData_SetBSubwayScrWork(gameData, bsw);
-    if (a1 == 0) {
-        bsw->playMode = a2;
+    if (resume == 0) {
+        bsw->playMode = playMode;
         bsw->memberCount = BsubwayScr_GetMemberNum(bsw->playMode);
         for (i = 0; i < 4; i++)
             bsw->memberSlots[i] = 0xff;
         for (i = 0; i < 14; i++)
-            bsw->unk32[i] = 0xffff;
-        BSubwayPlayData_Init(bsw->unk70);
-        BSubwayPlayData_ResetRound(bsw->unk70);
-        if (BSubwayScoreData_HasStage(bsw->unk74, bsw->playMode) == 1) {
-            score = BSubwayScoreData_GetStreak(bsw->unk74, bsw->playMode);
+            bsw->trainerNos[i] = 0xffff;
+        BSubwayPlayData_Init(bsw->playData);
+        BSubwayPlayData_ResetRound(bsw->playData);
+        if (BSubwayScoreData_HasStage(bsw->scoreData, bsw->playMode) == 1) {
+            score = BSubwayScoreData_GetStreak(bsw->scoreData, bsw->playMode);
             BsubwayScr_SetWinCount(bsw, score);
         }
         value = bsw->playMode;
-        BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_MODE, &value);
+        BSubwayPlayData_SetData(bsw->playData, BSUBWAY_PLAY_MODE, &value);
     } else {
-        bsw->playMode = BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_MODE, NULL);
+        bsw->playMode = BSubwayPlayData_GetData(bsw->playData, BSUBWAY_PLAY_MODE, NULL);
         bsw->memberCount = BsubwayScr_GetMemberNum(bsw->playMode);
-        if (BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_UNK0_9, NULL) != 0) {
+        if (BSubwayPlayData_GetData(bsw->playData, BSUBWAY_PLAY_USE_BATTLE_BOX, NULL) != 0) {
             BsubwayScr_LoadPartyCopy(bsw);
         }
-        BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_UNK8, bsw->memberSlots);
-        BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_UNKC, bsw->unk32);
-        if (bsw->playMode == 2 || bsw->playMode == 7) {
-            bsw->unkC_5 = (u8)BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_UNK0_6, NULL);
-            BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_UNK28, &bsw->teamConfigs[bsw->unkC_5]);
+        BSubwayPlayData_GetData(bsw->playData, BSUBWAY_PLAY_MEMBER_SLOTS, bsw->memberSlots);
+        BSubwayPlayData_GetData(bsw->playData, BSUBWAY_PLAY_TRAINER_NOS, bsw->trainerNos);
+        if (bsw->playMode == BSUBWAY_MODE_MULTI || bsw->playMode == BSUBWAY_MODE_SUPER_MULTI) {
+            bsw->partnerIndex = (u8)BSubwayPlayData_GetData(bsw->playData, BSUBWAY_PLAY_PARTNER_INDEX, NULL);
+            BSubwayPlayData_GetData(bsw->playData, BSUBWAY_PLAY_PARTNER_CONFIG, &bsw->teamConfigs[bsw->partnerIndex]);
             level = 303;
             if (getTrainerGender(&GameData_GetPlayerState(gameData)->playerInfo) != 0) {
                 level -= 3;
             }
-            teamIndex = bsw->unkC_5;
-            count = BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_UNK0_0, NULL);
-            BsubwayScr_CreatePartnerMons(bsw, &bsw->unk2C8[teamIndex], level + teamIndex, count,
+            teamIndex = bsw->partnerIndex;
+            count = BSubwayPlayData_GetData(bsw->playData, BSUBWAY_PLAY_PARTNER_RENTAL_ITEM, NULL);
+            BsubwayScr_CreatePartnerMons(bsw, &bsw->partners[teamIndex], level + teamIndex, count,
                                          &bsw->teamConfigs[teamIndex], bsw->heapId);
         }
         mode = bsw->playMode;
-        if (BSubwayScoreData_HasStage(bsw->unk74, mode) == 1) {
-            count = BSubwayPlayData_GetRound(bsw->unk70);
-            score = BSubwayScoreData_GetStage(bsw->unk74, mode);
+        if (BSubwayScoreData_HasStage(bsw->scoreData, mode) == 1) {
+            count = BSubwayPlayData_GetRound(bsw->playData);
+            score = BSubwayScoreData_GetStage(bsw->scoreData, mode);
             BsubwayScr_SetWinCountFromRound(bsw, score, count);
         }
     }
@@ -131,15 +131,15 @@ void BsubwayScr_ChangeCommMultiMode(BSubwayScrWork *bsw) {
     u8 mode;
     u32 score;
 
-    if (bsw->playMode == 2) {
-        mode = 3;
-    } else if (bsw->playMode == 7) {
-        mode = 8;
+    if (bsw->playMode == BSUBWAY_MODE_MULTI) {
+        mode = BSUBWAY_MODE_COMM_MULTI;
+    } else if (bsw->playMode == BSUBWAY_MODE_SUPER_MULTI) {
+        mode = BSUBWAY_MODE_SUPER_COMM_MULTI;
     }
     bsw->playMode = mode;
-    BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_MODE, &mode);
-    if (BSubwayScoreData_HasStage(bsw->unk74, bsw->playMode) == 1) {
-        score = BSubwayScoreData_GetStreak(bsw->unk74, bsw->playMode);
+    BSubwayPlayData_SetData(bsw->playData, BSUBWAY_PLAY_MODE, &mode);
+    if (BSubwayScoreData_HasStage(bsw->scoreData, bsw->playMode) == 1) {
+        score = BSubwayScoreData_GetStreak(bsw->scoreData, bsw->playMode);
         BsubwayScr_SetWinCount(bsw, score);
     } else {
         BsubwayScr_ClearWinCount(bsw);
@@ -150,15 +150,16 @@ void BsubwayScr_SaveRestPlayData(BSubwayScrWork *bsw) {
     u8 value;
 
     value = bsw->playMode;
-    BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_MODE, &value);
-    BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_UNK8, bsw->memberSlots);
-    BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_UNKC, bsw->unk32);
-    BSubwayPlayData_SetSaveFlag(bsw->unk70, 1);
-    if (bsw->playMode == 2 || bsw->playMode == 7) {
-        value = bsw->unkC_5;
-        BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_UNK0_6, &value);
-        BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_UNK28, &bsw->teamConfigs[bsw->unkC_5]);
-        BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_UNK0_0, bsw->unk664 + bsw->unkC_5);
+    BSubwayPlayData_SetData(bsw->playData, BSUBWAY_PLAY_MODE, &value);
+    BSubwayPlayData_SetData(bsw->playData, BSUBWAY_PLAY_MEMBER_SLOTS, bsw->memberSlots);
+    BSubwayPlayData_SetData(bsw->playData, BSUBWAY_PLAY_TRAINER_NOS, bsw->trainerNos);
+    BSubwayPlayData_SetSaveFlag(bsw->playData, 1);
+    if (bsw->playMode == BSUBWAY_MODE_MULTI || bsw->playMode == BSUBWAY_MODE_SUPER_MULTI) {
+        value = bsw->partnerIndex;
+        BSubwayPlayData_SetData(bsw->playData, BSUBWAY_PLAY_PARTNER_INDEX, &value);
+        BSubwayPlayData_SetData(bsw->playData, BSUBWAY_PLAY_PARTNER_CONFIG, &bsw->teamConfigs[bsw->partnerIndex]);
+        BSubwayPlayData_SetData(bsw->playData, BSUBWAY_PLAY_PARTNER_RENTAL_ITEM,
+                                bsw->partnerRentalItems + bsw->partnerIndex);
     }
 }
 
@@ -168,7 +169,7 @@ void BsubwayScr_LoadMembers(BSubwayScrWork *bsw, GameSystem *gsys) {
     s32 i;
 
     bsw->memberCount = BsubwayScr_GetMemberNum(bsw->playMode);
-    BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_UNK8, bsw->memberSlots);
+    BSubwayPlayData_GetData(bsw->playData, BSUBWAY_PLAY_MEMBER_SLOTS, bsw->memberSlots);
     party = BsubwayScr_GetParty(bsw);
     for (i = 0; i < bsw->memberCount; i++) {
         pkm = PokeParty_GetPkm(party, bsw->memberSlots[i]);
@@ -181,19 +182,20 @@ void BsubwayScr_SavePlayDataMembers(BSubwayScrWork *bsw) {
     u8 value;
 
     value = bsw->playMode;
-    BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_MODE, &value);
-    BSubwayPlayData_ResetRound(bsw->unk70);
-    BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_UNK8, bsw->memberSlots);
-    BSubwayPlayData_SetSaveFlag(bsw->unk70, 1);
-    if (bsw->playMode == 2 || bsw->playMode == 7) {
-        value = bsw->unkC_5;
-        BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_UNK0_6, &value);
-        BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_UNK28, &bsw->teamConfigs[bsw->unkC_5]);
-        BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_UNK0_0, bsw->unk664 + bsw->unkC_5);
+    BSubwayPlayData_SetData(bsw->playData, BSUBWAY_PLAY_MODE, &value);
+    BSubwayPlayData_ResetRound(bsw->playData);
+    BSubwayPlayData_SetData(bsw->playData, BSUBWAY_PLAY_MEMBER_SLOTS, bsw->memberSlots);
+    BSubwayPlayData_SetSaveFlag(bsw->playData, 1);
+    if (bsw->playMode == BSUBWAY_MODE_MULTI || bsw->playMode == BSUBWAY_MODE_SUPER_MULTI) {
+        value = bsw->partnerIndex;
+        BSubwayPlayData_SetData(bsw->playData, BSUBWAY_PLAY_PARTNER_INDEX, &value);
+        BSubwayPlayData_SetData(bsw->playData, BSUBWAY_PLAY_PARTNER_CONFIG, &bsw->teamConfigs[bsw->partnerIndex]);
+        BSubwayPlayData_SetData(bsw->playData, BSUBWAY_PLAY_PARTNER_RENTAL_ITEM,
+                                bsw->partnerRentalItems + bsw->partnerIndex);
     }
 }
 
-u16 func_ov033_0217b86c(GameSystem *gsys) {
+u16 BsubwayScr_ResetSavedPlay(GameSystem *gsys) {
     SaveControl *save;
     BSubwayPlayData *play;
     BSubwayScoreData *score;
@@ -213,17 +215,17 @@ void BsubwayScr_SetLoseScore(GameSystem *gsys, BSubwayScrWork *bsw) {
     u8 mode;
     BSubwayScoreData *score;
 
-    value = bsw->unkE;
+    value = bsw->winCount;
     mode = bsw->playMode;
-    score = bsw->unk74;
+    score = bsw->scoreData;
     BSubwayScoreData_SetStreak(score, mode, value);
     BSubwayScoreData_UpdateMaxStreak(score, mode, value);
     BsubwayScr_SaveRecordParty(bsw, GameData_GetSaveControl(bsw->gameData), 1, value);
-    BSubwayScoreData_ResetStage(bsw->unk74, mode);
-    BSubwayPlayData_ResetRound(bsw->unk70);
+    BSubwayScoreData_ResetStage(bsw->scoreData, mode);
+    BSubwayPlayData_ResetRound(bsw->playData);
 }
 
-u16 func_ov033_0217b8ec(BSubwayScrWork *bsw) {
+u16 BsubwayScr_AddBattlePoints(BSubwayScrWork *bsw) {
     u16 count;
     u16 countIndex;
     s32 index;
@@ -232,10 +234,10 @@ u16 func_ov033_0217b8ec(BSubwayScrWork *bsw) {
     SaveControl *save;
     const u8 *row;
 
-    if (bsw->playMode == 4) {
+    if (bsw->playMode == BSUBWAY_MODE_WIFI) {
         reward = 0;
-        if ((u16)BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_UNK0_10, NULL) == 1) {
-            index = (s8)BSubwayScoreData_GetWifiRank(bsw->unk74);
+        if ((u16)BSubwayPlayData_GetData(bsw->playData, BSUBWAY_PLAY_UNK0_10, NULL) == 1) {
+            index = (s8)BSubwayScoreData_GetWifiRank(bsw->scoreData);
             if (index < 0) {
                 index = 0;
             } else if (index >= 10) {
@@ -247,37 +249,37 @@ u16 func_ov033_0217b8ec(BSubwayScrWork *bsw) {
         }
     } else {
         reward = 0;
-        count = BSubwayScoreData_GetStage(bsw->unk74, bsw->playMode);
+        count = BSubwayScoreData_GetStage(bsw->scoreData, bsw->playMode);
         switch (bsw->playMode) {
-        case 0:
+        case BSUBWAY_MODE_SINGLE:
             category = 0;
             break;
-        case 5:
+        case BSUBWAY_MODE_SUPER_SINGLE:
             category = 1;
             reward = 1;
             break;
-        case 1:
+        case BSUBWAY_MODE_DOUBLE:
             category = 2;
             break;
-        case 6:
+        case BSUBWAY_MODE_SUPER_DOUBLE:
             category = 3;
             reward = 1;
             break;
-        case 2:
+        case BSUBWAY_MODE_MULTI:
             category = 4;
             break;
-        case 3:
+        case BSUBWAY_MODE_COMM_MULTI:
             category = 4;
             break;
-        case 7:
+        case BSUBWAY_MODE_SUPER_MULTI:
             category = 5;
             reward = 1;
             break;
-        case 8:
+        case BSUBWAY_MODE_SUPER_COMM_MULTI:
             category = 5;
             reward = 1;
             break;
-        case 4:
+        case BSUBWAY_MODE_WIFI:
             category = 6;
             break;
         default:
@@ -304,7 +306,7 @@ u16 func_ov033_0217b8ec(BSubwayScrWork *bsw) {
     if (reward == 0) {
         reward = 1;
     }
-    BSubwayScoreData_AddBattlePoints(bsw->unk74, reward);
+    BSubwayScoreData_AddBattlePoints(bsw->scoreData, reward);
     if (reward != 0) {
         save = GameData_GetSaveControl(bsw->gameData);
         RecordAdd(getTrainerCardInfoBlkAddress(save), 0x21, reward);
@@ -320,22 +322,23 @@ void BsubwayScr_DrawTrainerNos(BSubwayScrWork *bsw) {
 
     mode = bsw->playMode;
     level = BsubwayScr_GetStageNo(BsubwayScr_GetWinCount(bsw));
-    if (mode == 2 || mode == 3 || mode == 7 || mode == 8) {
-        if (level < bsw->unk18) {
-            level = bsw->unk18;
+    if (mode == BSUBWAY_MODE_MULTI || mode == BSUBWAY_MODE_COMM_MULTI || mode == BSUBWAY_MODE_SUPER_MULTI ||
+        mode == BSUBWAY_MODE_SUPER_COMM_MULTI) {
+        if (level < bsw->partnerStageNo) {
+            level = bsw->partnerStageNo;
         }
         for (i = 0; i < 14; i++) {
             do {
                 choice = BsubwayScr_DrawTrainerNo(bsw, level, (u8)(i / 2), mode, (u8)(i & 1));
-            } while (BsubwayScr_IsTrainerNoUsed(bsw->unk32, choice, i));
-            bsw->unk32[i] = choice;
+            } while (BsubwayScr_IsTrainerNoUsed(bsw->trainerNos, choice, i));
+            bsw->trainerNos[i] = choice;
         }
     } else {
         for (i = 0; i < 7; i++) {
             do {
                 choice = BsubwayScr_DrawTrainerNo(bsw, level, (u8)i, bsw->playMode, 0);
-            } while (BsubwayScr_IsTrainerNoUsed(bsw->unk32, choice, i));
-            bsw->unk32[i] = choice;
+            } while (BsubwayScr_IsTrainerNoUsed(bsw->trainerNos, choice, i));
+            bsw->trainerNos[i] = choice;
         }
     }
 }
@@ -345,7 +348,7 @@ u16 BsubwayScr_SetSelectedMembers(BSubwayScrWork *bsw, GameSystem *gsys) {
     PartyPkm *pkm;
     u16 i;
 
-    if (bsw->unk84 != 0 || bsw->unk82 == 7 || bsw->unk82 == 8) {
+    if (bsw->pokeSelectResult != 0 || bsw->pokeSelectIndex == 7 || bsw->pokeSelectIndex == 8) {
         return 0;
     }
     party = BsubwayScr_GetParty(bsw);
@@ -362,11 +365,11 @@ u16 BsubwayScr_SetSelectedMembers(BSubwayScrWork *bsw, GameSystem *gsys) {
 }
 
 BOOL BsubwayScr_IsWinMax(BSubwayScrWork *bsw) {
-    if (!bsw->unkC_0) {
-        if (BSubwayPlayData_GetRound(bsw->unk70) < 7) {
+    if (!bsw->winMax) {
+        if (BSubwayPlayData_GetRound(bsw->playData) < 7) {
             return FALSE;
         }
-        bsw->unkC_0 = 1;
+        bsw->winMax = 1;
     }
     return TRUE;
 }
@@ -377,15 +380,15 @@ void BsubwayScr_SetClearScore(BSubwayScrWork *bsw, GameSystem *gsys) {
 
     mode = bsw->playMode;
     value = BsubwayScr_GetWinCount(bsw);
-    BSubwayScoreData_SetStreak(bsw->unk74, mode, value);
-    BSubwayScoreData_UpdateMaxStreak(bsw->unk74, mode, BSubwayScoreData_GetStreak(bsw->unk74, mode));
-    BSubwayScoreData_IncStage(bsw->unk74, mode);
+    BSubwayScoreData_SetStreak(bsw->scoreData, mode, value);
+    BSubwayScoreData_UpdateMaxStreak(bsw->scoreData, mode, BSubwayScoreData_GetStreak(bsw->scoreData, mode));
+    BSubwayScoreData_IncStage(bsw->scoreData, mode);
     BsubwayScr_SaveRecordParty(bsw, GameData_GetSaveControl(bsw->gameData), 1, value);
-    BSubwayPlayData_ResetRound(bsw->unk70);
+    BSubwayPlayData_ResetRound(bsw->playData);
 }
 
 void BsubwayScr_ClearStateBits(BSubwayScrWork *bsw, GameSystem *gsys) {
-    bsw->unkC_0 = 0;
+    bsw->winMax = 0;
     bsw->unkC_1 = 0;
 }
 
@@ -396,27 +399,27 @@ void BsubwayScr_CreateRoundTrainers(BSubwayScrWork *bsw) {
     u32 round;
     unsigned int slot;
 
-    round = BSubwayPlayData_GetRound(bsw->unk70);
+    round = BSubwayPlayData_GetRound(bsw->playData);
     switch (bsw->playMode) {
-    case 4:
-        BSubwayWifiData_GetTrainer(bsw->unk78, bsw->trainers, round, bsw->heapId);
+    case BSUBWAY_MODE_WIFI:
+        BSubwayWifiData_GetTrainer(bsw->wifiData, bsw->trainers, round, bsw->heapId);
         break;
-    case 2:
-    case 3:
-    case 7:
-    case 8:
+    case BSUBWAY_MODE_MULTI:
+    case BSUBWAY_MODE_COMM_MULTI:
+    case BSUBWAY_MODE_SUPER_MULTI:
+    case BSUBWAY_MODE_SUPER_COMM_MULTI:
         slot = round * 2;
-        BsubwayScr_CreateTrainer(bsw, &bsw->trainers[0], bsw->unk32[slot], bsw->memberCount, NULL, NULL, NULL,
+        BsubwayScr_CreateTrainer(bsw, &bsw->trainers[0], bsw->trainerNos[slot], bsw->memberCount, NULL, NULL, NULL,
                                  bsw->heapId);
         for (index = 0; index < bsw->memberCount; index++) {
             ids[index] = bsw->trainers[0].pokemon[index].species;
             values[index] = bsw->trainers[0].pokemon[index].item;
         }
-        BsubwayScr_CreateTrainer(bsw, &bsw->trainers[1], bsw->unk32[slot + 1], bsw->memberCount, ids, values, NULL,
+        BsubwayScr_CreateTrainer(bsw, &bsw->trainers[1], bsw->trainerNos[slot + 1], bsw->memberCount, ids, values, NULL,
                                  bsw->heapId);
         break;
     default:
-        BsubwayScr_CreateTrainer(bsw, &bsw->trainers[0], bsw->unk32[round], bsw->memberCount, NULL, NULL, NULL,
+        BsubwayScr_CreateTrainer(bsw, &bsw->trainers[0], bsw->trainerNos[round], bsw->memberCount, NULL, NULL, NULL,
                                  bsw->heapId);
         break;
     }
@@ -467,28 +470,28 @@ void BsubwayScr_LoadPartyCopy(BSubwayScrWork *bsw) {
 }
 
 PokeParty *BsubwayScr_GetParty(BSubwayScrWork *bsw) {
-    if (BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_UNK0_9, NULL) == 0) {
+    if (BSubwayPlayData_GetData(bsw->playData, BSUBWAY_PLAY_USE_BATTLE_BOX, NULL) == 0) {
         return GameData_GetParty(bsw->gameData);
     }
     return bsw->allocatedBuffer;
 }
 
 u16 BsubwayScr_GetWinCount(BSubwayScrWork *bsw) {
-    return bsw->unkE;
+    return bsw->winCount;
 }
 
 void BsubwayScr_SetWinCount(BSubwayScrWork *bsw, u32 value) {
-    bsw->unkE = value;
+    bsw->winCount = value;
 }
 
 void BsubwayScr_IncWinCount(BSubwayScrWork *bsw) {
-    if (bsw->unkE < 0xffff) {
-        bsw->unkE++;
+    if (bsw->winCount < 0xffff) {
+        bsw->winCount++;
     }
 }
 
 void BsubwayScr_ClearWinCount(BSubwayScrWork *bsw) {
-    bsw->unkE = 0;
+    bsw->winCount = 0;
 }
 
 void BsubwayScr_SetWinCountFromRound(BSubwayScrWork *bsw, u32 count, u32 extra) {
@@ -500,22 +503,22 @@ void BsubwayScr_SetWinCountFromRound(BSubwayScrWork *bsw, u32 count, u32 extra) 
     if (value > 0xffff) {
         value = 0xffff;
     }
-    bsw->unkE = value;
+    bsw->winCount = value;
 }
 
 u16 BsubwayScr_GetMemberNum(u16 mode) {
     switch (mode) {
-    case 0:
-    case 4:
-    case 5:
+    case BSUBWAY_MODE_SINGLE:
+    case BSUBWAY_MODE_WIFI:
+    case BSUBWAY_MODE_SUPER_SINGLE:
         return 3;
-    case 1:
-    case 6:
+    case BSUBWAY_MODE_DOUBLE:
+    case BSUBWAY_MODE_SUPER_DOUBLE:
         return 4;
-    case 2:
-    case 3:
-    case 7:
-    case 8:
+    case BSUBWAY_MODE_MULTI:
+    case BSUBWAY_MODE_COMM_MULTI:
+    case BSUBWAY_MODE_SUPER_MULTI:
+    case BSUBWAY_MODE_SUPER_COMM_MULTI:
         return 2;
     default:
         return 0;
@@ -537,22 +540,22 @@ u16 BsubwayScr_GetStageNo(s32 value) {
     return value / 7;
 }
 
-void BsubwayScr_SaveRecordParty(BSubwayScrWork *bsw, SaveControl *save, u32 a2, u32 a3) {
+void BsubwayScr_SaveRecordParty(BSubwayScrWork *bsw, SaveControl *save, u32 a2, u32 winCount) {
     u8 mode;
 
     switch (bsw->playMode) {
-    case 0:
+    case BSUBWAY_MODE_SINGLE:
         BsubwayScr_SaveMemberParty(bsw, save, 0);
         return;
-    case 4:
+    case BSUBWAY_MODE_WIFI:
         BsubwayScr_SaveMemberParty(bsw, save, 1);
         mode = bsw->playMode;
-        BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_MODE, &mode);
-        mode = BSubwayPlayData_GetRound(bsw->unk70) + 1;
-        BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_ROUND, &mode);
-        BSubwayScoreData_CalcWifiScore(bsw->unk74, bsw->unk70);
+        BSubwayPlayData_SetData(bsw->playData, BSUBWAY_PLAY_MODE, &mode);
+        mode = BSubwayPlayData_GetRound(bsw->playData) + 1;
+        BSubwayPlayData_SetData(bsw->playData, BSUBWAY_PLAY_ROUND, &mode);
+        BSubwayScoreData_CalcWifiScore(bsw->scoreData, bsw->playData);
         return;
-    case 1:
+    case BSUBWAY_MODE_DOUBLE:
         return;
     }
 }
@@ -566,8 +569,8 @@ void BsubwayScr_CreatePartners(BSubwayScrWork *bsw, u8 variant) {
         base += 3;
     }
     for (index = 0; index < 3; index++) {
-        bsw->unk664[index] =
-            BsubwayScr_CreateTrainer(bsw, &bsw->unk2C8[index], base + index, bsw->memberCount, bsw->memberSpecies,
+        bsw->partnerRentalItems[index] =
+            BsubwayScr_CreateTrainer(bsw, &bsw->partners[index], base + index, bsw->memberCount, bsw->memberSpecies,
                                      bsw->memberItems, &bsw->teamConfigs[index], bsw->heapId);
     }
 }
@@ -606,7 +609,7 @@ void BsubwayScr_SaveMemberParty(BSubwayScrWork *bsw, SaveControl *save, u32 flag
     for (i = 0; i < 3; i++) {
         BsubwayScr_PackBattleMon(&team[i], PokeParty_GetPkm(party, bsw->memberSlots[i]));
     }
-    BSubwayScoreData_SetTeam(bsw->unk74, flag, team);
+    BSubwayScoreData_SetTeam(bsw->scoreData, flag, team);
     MI_CpuFill8(team, 0, sizeof(BSubwayPokemon) * 3);
     GFL_HeapFree(team);
 }

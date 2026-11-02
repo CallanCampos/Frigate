@@ -12,10 +12,13 @@
 typedef struct {
     GameSystem *gsys;
     GameData *gameData;
-    u8 subscreen;
-    u8 mode;
-    // Set when the field is to return to the default subscreen
-    u8 unk0A;
+    // The beacon's place in the log
+    u8 logIndex;
+    // The row of the log's list that the beacon was in
+    u8 logRow;
+    // Set when the screen closed for the low battery that turns the C-Gear off: the field then returns to the
+    // default subscreen
+    u8 lowBatteryExit;
     u8 unk0B;
 } BeaconDetailParam;
 

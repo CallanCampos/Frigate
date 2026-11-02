@@ -175,7 +175,7 @@ int NHTTPi_PostSendCallback(NHttpMutexInfo *mutexInfo, NHttpConnection *connecti
             event.buffer = connection->userBuffer;
             event.bufferSize = connection->userBufferSize;
             event.offset = offset;
-            result = connection->callback((int)connection, 1, &event);
+            result = connection->callback((int)connection, NHTTP_EVENT_POST, &event);
             NHTTPi_SetBufferInfo(mutexInfo, connection, event.buffer, event.bufferSize);
         }
     }
@@ -193,7 +193,7 @@ void NHTTPi_BufferFullCallback(NHttpMutexInfo *mutexInfo, NHttpConnection *conne
             event.buffer = response->buffer;
             event.bufferSize = response->bufferSize;
             event.used = response->bufferUsed;
-            connection->callback((int)connection, 2, &event);
+            connection->callback((int)connection, NHTTP_EVENT_BUFFER_FULL, &event);
             NHTTPi_SetResponseBuffer(mutexInfo, connection, event.buffer, event.bufferSize, event.used);
         }
     }
@@ -210,7 +210,7 @@ void NHTTPi_ReceivedCallback(NHttpMutexInfo *mutexInfo, NHttpConnection *connect
             event.buffer = response->buffer;
             event.bufferSize = response->bufferSize;
             event.used = response->bufferUsed;
-            connection->callback((int)connection, 3, &event);
+            connection->callback((int)connection, NHTTP_EVENT_AFTER_BUFFER_FULL, &event);
             NHTTPi_SetResponseBuffer(mutexInfo, connection, event.buffer, event.bufferSize, event.used);
         }
     }
@@ -219,7 +219,7 @@ void NHTTPi_ReceivedCallback(NHttpMutexInfo *mutexInfo, NHttpConnection *connect
 // Calls the callback of a connection when it has ended
 void NHTTPi_CompleteCallback(NHttpMutexInfo *mutexInfo, NHttpConnection *connection) {
     if (NHTTPi_GetConnection(mutexInfo, connection) != NULL && connection->callback != NULL) {
-        connection->callback((int)connection, 4, NULL);
+        connection->callback((int)connection, NHTTP_EVENT_ANSWER, NULL);
     }
 }
 

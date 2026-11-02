@@ -30,7 +30,7 @@ int NHTTPCreateConnection(const char *url, int method, void *buffer, u32 bufferS
     connection->userBufferSize = 0;
     connection->id = -1;
     NHTTPi_CommitConnectionList(mutexInfo, connection);
-    connection->status = 15;
+    connection->status = NHTTP_STATUS_RUNNING;
     connection->unk_08 = 0;
     connection->running = TRUE;
     NHTTPi_SetVirtualContentLength(connection, 0);
@@ -97,7 +97,7 @@ static int NHTTPi_WaitForConnection(NHttpConnection *connection) {
     stage = NHTTPGetConnectionState((int)connection);
     NHTTPi_CheckCurrentThread(thread, TRUE);
     if (stage != -1 && stage != 0) {
-        if (NHTTPGetConnectionError((int)connection) == 15) {
+        if (NHTTPGetConnectionError((int)connection) == NHTTP_STATUS_RUNNING) {
             NHTTPi_WaitConnection(found);
         }
     }
@@ -180,7 +180,7 @@ void *NHTTPGetUserParam(int handle) {
     return NULL;
 }
 
-// How the connection ended: 0 if well, an error otherwise, and 15 while it has not ended
+// How the connection ended: 0 if well, an error otherwise, and NHTTP_STATUS_RUNNING while it has not ended
 int NHTTPGetConnectionError(int handle) {
     NHttpConnection *connection =
         NHTTPi_GetConnection(NHTTPi_GetMutexInfoP(NHTTPi_GetSystemInfoP()), (NHttpConnection *)handle);

@@ -505,12 +505,26 @@ static GameEvent *GymHumilau_CreateRideEvent(GameEvent *parent, GameSystem *gsys
     return event;
 }
 
+enum {
+    RIDE_STEP_CLEAR_AREAS,
+    RIDE_STEP_JUMP,
+    RIDE_STEP_WAIT_JUMP,
+    RIDE_STEP_CAMERA_INIT,
+    RIDE_STEP_START_RIDE,
+    RIDE_STEP_RIDING,
+    RIDE_STEP_PUSH,
+    RIDE_STEP_ROCK_SETTLE,
+    RIDE_STEP_ARRIVE,
+    RIDE_STEP_SAVE,
+    RIDE_STEP_DONE,
+};
+
 static GameEventReturnCode GymHumilau_RideEventCallback(GameEvent *event, u32 *state, void *data) {
     HumilauGymRideEvent *ev = data;
     HumilauGymWork *work = Field_GetGimmickWorkBlock(ev->field, GIMMICK_WORK_ID);
 
     switch (*state) {
-    case 0: {
+    case RIDE_STEP_CLEAR_AREAS: {
         FieldActor *actor;
 
         GymHumilau_ClearAreas(work);
@@ -519,35 +533,35 @@ static GameEventReturnCode GymHumilau_RideEventCallback(GameEvent *event, u32 *s
         if (!FldAct_CheckAcmdEnd(actor) && FieldPlayer_CheckMoveBusy(ev->player) == TRUE) {
             FldAct_FreeAcmd(actor);
         }
-        *state = 1;
+        *state = RIDE_STEP_JUMP;
         break;
     }
-    case 1:
+    case RIDE_STEP_JUMP:
         if (IsAllActorAcmdFinished(FieldPlayer_GetActor(ev->player))) {
             u32 dir = FieldPlayer_GetFaceDir(ev->player);
 
             FldAct_SetAcmd(FieldPlayer_GetActor(ev->player), dir + ACMD_JUMP_2);
             ev->wait = 15;
-            *state = 2;
+            *state = RIDE_STEP_WAIT_JUMP;
         }
         break;
-    case 2:
+    case RIDE_STEP_WAIT_JUMP:
         if (ev->wait-- > 0) {
             break;
         }
         FieldCamera_FinishDelay(ev->camera);
-        *state = 3;
+        *state = RIDE_STEP_CAMERA_INIT;
         // fallthrough
-    case 3:
+    case RIDE_STEP_CAMERA_INIT:
         // The original asks whether the delay is still active and ignores the answer
         FieldCamera_IsDelayActive(ev->camera);
         FieldCamera_EVCameraInit(ev->camera);
         ev->cameraBind = FieldCamera_GetBind(ev->camera);
         FieldCamera_ClearBind(ev->camera);
         FieldCamera_ChangeTransformType(ev->camera, 0);
-        *state = 4;
+        *state = RIDE_STEP_START_RIDE;
         // fallthrough
-    case 4: {
+    case RIDE_STEP_START_RIDE: {
         int length = GymHumilau_GetRideLength(ev, ev->ride);
         VecFx32 target, from;
         int frames;
@@ -557,7 +571,7 @@ static GameEventReturnCode GymHumilau_RideEventCallback(GameEvent *event, u32 *s
             GymHumilau_PlaySplash(ev, SPLASH_STOP);
             GymHumilau_PlayStopSplash(ev, ev->platform, FALSE);
             GFL_SndSEPlay(SEQ_SE_SW_MIZUGYM_01);
-            *state = 8;
+            *state = RIDE_STEP_ARRIVE;
             break;
         }
         FieldPlayer_GetWPos(ev->player, &target);
@@ -587,10 +601,10 @@ static GameEventReturnCode GymHumilau_RideEventCallback(GameEvent *event, u32 *s
         GymHumilau_PlaySplash(ev, SPLASH_RIDE);
         GymHumilau_PlayWake(ev, ev->platform);
         GFL_SndSEPlay(SEQ_SE_SW_MIZUGYM_01);
-        *state = 5;
+        *state = RIDE_STEP_RIDING;
         break;
     }
-    case 5:
+    case RIDE_STEP_RIDING:
         if (GymHumilau_UpdateRide(ev) == TRUE) {
             GymHumilau_PlayStopSplash(ev, ev->platform, FALSE);
             if (ev->hit == TRUE) {
@@ -598,30 +612,30 @@ static GameEventReturnCode GymHumilau_RideEventCallback(GameEvent *event, u32 *s
                 GymHumilau_PlayStopSplash(ev, ev->hitPlatform, TRUE);
                 GymHumilau_StartRock(ev);
                 if (GymHumilau_StartPush(ev)) {
-                    *state = 6;
+                    *state = RIDE_STEP_PUSH;
                 } else {
-                    *state = 8;
+                    *state = RIDE_STEP_ARRIVE;
                 }
             } else {
-                *state = 8;
+                *state = RIDE_STEP_ARRIVE;
             }
             GFL_SndSEPlay(SEQ_SE_WALL_HIT);
         }
         break;
-    case 6:
+    case RIDE_STEP_PUSH:
         GymHumilau_UpdateRock(ev);
         if (GymHumilau_UpdatePush(ev) == TRUE) {
             GymHumilau_PlayStopSplash(ev, ev->hitPlatform, FALSE);
             GFL_SndSEPlay(SEQ_SE_WALL_HIT);
-            *state = 7;
+            *state = RIDE_STEP_ROCK_SETTLE;
         }
         break;
-    case 7:
+    case RIDE_STEP_ROCK_SETTLE:
         if (GymHumilau_UpdateRock(ev) == TRUE) {
-            *state = 8;
+            *state = RIDE_STEP_ARRIVE;
         }
         break;
-    case 8: {
+    case RIDE_STEP_ARRIVE: {
         GymHumilau_ClearAreas(work);
         GymHumilau_AddPlatformAreas(work, ev->platform);
         GymHumilau_AddNextAreas(work);
@@ -634,10 +648,10 @@ static GameEventReturnCode GymHumilau_RideEventCallback(GameEvent *event, u32 *s
         FieldCameraAnm_EVCameraEnd(ev->camera);
         FieldCamera_SetBind(ev->camera, ev->cameraBind);
         FieldCamera_EnableDelay(ev->camera);
-        *state = 9;
+        *state = RIDE_STEP_SAVE;
         break;
     }
-    case 9: {
+    case RIDE_STEP_SAVE: {
         SRTMatrix *matrix = FieldExpObj_GetActorMatrixPtr(work->expObj, 0, ev->platform);
 
         GymHumilauState_SetPlatformPos(work->state, matrix->translation.x, matrix->translation.z, ev->platform);
@@ -651,10 +665,10 @@ static GameEventReturnCode GymHumilau_RideEventCallback(GameEvent *event, u32 *s
             GymHumilau_SetShortcutUsed(GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(ev->field))),
                                        TRUE);
         }
-        *state = 10;
+        *state = RIDE_STEP_DONE;
         // fallthrough
     }
-    case 10:
+    case RIDE_STEP_DONE:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;

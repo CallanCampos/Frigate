@@ -1,0 +1,1415 @@
+{
+    "$schema": "countries.schema.json",
+    "countries": [
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_None",
+            "state": 26200,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Afghanistan",
+            "state": 0,
+            "x": 6304,
+            "y": 352
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Albania",
+            "state": 0,
+            "x": 7328,
+            "y": 9536
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Algeria",
+            "state": 0,
+            "x": 6624,
+            "y": 12672
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_AmericanSamoa",
+            "state": 1,
+            "x": -2656,
+            "y": -21632
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Andorra",
+            "state": 1,
+            "x": 7776,
+            "y": 12864
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Angola",
+            "state": 0,
+            "x": -1664,
+            "y": 10624
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Anguilla",
+            "state": 1,
+            "x": 3296,
+            "y": 24576
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_AntiguaBarbuda",
+            "state": 0,
+            "x": 3104,
+            "y": 24416
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Argentina",
+            "state": 0,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Armenia",
+            "state": 1,
+            "x": 7424,
+            "y": 4832
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Aruba",
+            "state": 1,
+            "x": 2208,
+            "y": 25632
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Australia",
+            "state": 0,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Austria",
+            "state": 0,
+            "x": 8768,
+            "y": 10336
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Azerbaijan",
+            "state": 1,
+            "x": 7424,
+            "y": 4064
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Bahamas",
+            "state": 0,
+            "x": 4576,
+            "y": 27136
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Bahrain",
+            "state": 0,
+            "x": 4704,
+            "y": 3872
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Bangladesh",
+            "state": 0,
+            "x": 4384,
+            "y": -3296
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Barbados",
+            "state": 0,
+            "x": 2432,
+            "y": 23936
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Belarus",
+            "state": 1,
+            "x": 9792,
+            "y": 8064
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Belgium",
+            "state": 0,
+            "x": 9312,
+            "y": 12320
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Belize",
+            "state": 0,
+            "x": 3200,
+            "y": 29248
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Benin",
+            "state": 0,
+            "x": 1184,
+            "y": 12512
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Bermuda",
+            "state": 0,
+            "x": 5440,
+            "y": 24640
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Bhutan",
+            "state": 1,
+            "x": 5184,
+            "y": -2848
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Bolivia",
+            "state": 0,
+            "x": -2688,
+            "y": 24096
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_BosniaHerzegovina",
+            "state": 1,
+            "x": 8064,
+            "y": 9728
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Botswana",
+            "state": 0,
+            "x": -4544,
+            "y": 8512
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Brazil",
+            "state": 0,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_BritishVirginIslands",
+            "state": 0,
+            "x": 3360,
+            "y": 24704
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_BruneiDarussalam",
+            "state": 1,
+            "x": 832,
+            "y": -7808
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Bulgaria",
+            "state": 0,
+            "x": 7904,
+            "y": 8672
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_BurkinaFaso",
+            "state": 1,
+            "x": 2208,
+            "y": 13184
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Burundi",
+            "state": 0,
+            "x": -704,
+            "y": 7872
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Cambodia",
+            "state": 0,
+            "x": 2080,
+            "y": -5952
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Cameroon",
+            "state": 0,
+            "x": 672,
+            "y": 10720
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Canada",
+            "state": 0,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_CapeVerde",
+            "state": 1,
+            "x": 2752,
+            "y": 17376
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_CaymanIslands",
+            "state": 1,
+            "x": 3616,
+            "y": 27776
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_CentralAfricanRepublic",
+            "state": 1,
+            "x": 800,
+            "y": 10112
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Chad",
+            "state": 0,
+            "x": 2112,
+            "y": 10336
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_ChannelIslands",
+            "state": 1,
+            "x": 9120,
+            "y": 13600
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Chile",
+            "state": 0,
+            "x": -7072,
+            "y": 26272
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_China",
+            "state": 0,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_ChristmasIsland",
+            "state": 1,
+            "x": -1984,
+            "y": -6144
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Colombia",
+            "state": 0,
+            "x": 416,
+            "y": 26528
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Comoros",
+            "state": 1,
+            "x": -2208,
+            "y": 5184
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Congo",
+            "state": 0,
+            "x": -480,
+            "y": 10176
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_CookIslands",
+            "state": 0,
+            "x": -2944,
+            "y": -22912
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_CostaRica",
+            "state": 0,
+            "x": 1792,
+            "y": 28320
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_CTeDivoire",
+            "state": 1,
+            "x": 1440,
+            "y": 13984
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Croatia",
+            "state": 0,
+            "x": 8384,
+            "y": 10016
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Cuba",
+            "state": 1,
+            "x": 4256,
+            "y": 28000
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Cyprus",
+            "state": 0,
+            "x": 6400,
+            "y": 7040
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_CzechRepublic",
+            "state": 0,
+            "x": 9024,
+            "y": 10496
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_NorthKorea",
+            "state": 1,
+            "x": 7052,
+            "y": -9824
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_DemocraticRepublicCongo",
+            "state": 1,
+            "x": -640,
+            "y": 9984
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_TimorLeste",
+            "state": 1,
+            "x": -1600,
+            "y": -9888
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Denmark",
+            "state": 0,
+            "x": 10272,
+            "y": 11360
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Djibouti",
+            "state": 1,
+            "x": 2048,
+            "y": 5248
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Dominica",
+            "state": 0,
+            "x": 2592,
+            "y": 24160
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_DominicanRepublic",
+            "state": 0,
+            "x": 3360,
+            "y": 25760
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Ecuador",
+            "state": 0,
+            "x": 192,
+            "y": 27232
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Egypt",
+            "state": 0,
+            "x": 5248,
+            "y": 7488
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_ElSalvador",
+            "state": 0,
+            "x": 2560,
+            "y": 29440
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_EquatorialGuinea",
+            "state": 1,
+            "x": 512,
+            "y": 11648
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Eritrea",
+            "state": 1,
+            "x": 2880,
+            "y": 6144
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Estonia",
+            "state": 1,
+            "x": 10752,
+            "y": 8544
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Ethiopia",
+            "state": 1,
+            "x": 1664,
+            "y": 6208
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_FalklandIslands",
+            "state": 1,
+            "x": -9472,
+            "y": 23680
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_FaroeIslands",
+            "state": 1,
+            "x": 11328,
+            "y": 14336
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Fiji",
+            "state": 0,
+            "x": -3296,
+            "y": -19360
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Finland",
+            "state": 0,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_France",
+            "state": 0,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_FrenchGuiana",
+            "state": 0,
+            "x": 832,
+            "y": 22592
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_FrenchPolynesia",
+            "state": 1,
+            "x": -3232,
+            "y": -28608
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Gabon",
+            "state": 0,
+            "x": -32,
+            "y": 11328
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Gambia",
+            "state": 1,
+            "x": 2432,
+            "y": 16096
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Georgia",
+            "state": 1,
+            "x": 7648,
+            "y": 5248
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Germany",
+            "state": 0,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Ghana",
+            "state": 0,
+            "x": 928,
+            "y": 13344
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Gibraltar",
+            "state": 0,
+            "x": 6656,
+            "y": 14016
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Greece",
+            "state": 0,
+            "x": 6944,
+            "y": 8832
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Greenland",
+            "state": 0,
+            "x": 11776,
+            "y": 22464
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Grenada",
+            "state": 0,
+            "x": 2112,
+            "y": 24320
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Guadeloupe",
+            "state": 0,
+            "x": 2688,
+            "y": 24128
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Guam",
+            "state": 1,
+            "x": 2464,
+            "y": -13312
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Guatemala",
+            "state": 0,
+            "x": 2720,
+            "y": 29600
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Guinea",
+            "state": 0,
+            "x": 1760,
+            "y": 15552
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_GuineaBissau",
+            "state": 1,
+            "x": 2080,
+            "y": 15872
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Guyana",
+            "state": 0,
+            "x": 1312,
+            "y": 23744
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Haiti",
+            "state": 0,
+            "x": 3424,
+            "y": 26304
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Honduras",
+            "state": 0,
+            "x": 2592,
+            "y": 28800
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Hungary",
+            "state": 0,
+            "x": 8704,
+            "y": 9664
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Iceland",
+            "state": 0,
+            "x": 11680,
+            "y": 17056
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_India",
+            "state": 0,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Indonesia",
+            "state": 0,
+            "x": -960,
+            "y": -8736
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Iran",
+            "state": 0,
+            "x": 6592,
+            "y": 3776
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Iraq",
+            "state": 1,
+            "x": 6112,
+            "y": 4992
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Ireland",
+            "state": 0,
+            "x": 9792,
+            "y": 14272
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_IsleMan",
+            "state": 0,
+            "x": 9888,
+            "y": 13920
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Israel",
+            "state": 1,
+            "x": 5856,
+            "y": 6624
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Italy",
+            "state": 0,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Jamaica",
+            "state": 0,
+            "x": 3328,
+            "y": 27104
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_JanMayenIsland",
+            "state": 0,
+            "x": 14176,
+            "y": 10336
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Japan",
+            "state": 1,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Jordan",
+            "state": 0,
+            "x": 5856,
+            "y": 6432
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Kashmir",
+            "state": 0,
+            "x": 6592,
+            "y": -672
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Kazakhstan",
+            "state": 1,
+            "x": 8960,
+            "y": -384
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Kenya",
+            "state": 1,
+            "x": -224,
+            "y": 6496
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Kiribati",
+            "state": 0,
+            "x": -864,
+            "y": -21728
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Kuwait",
+            "state": 1,
+            "x": 5312,
+            "y": 4384
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Kyrgyzstan",
+            "state": 0,
+            "x": 7616,
+            "y": -736
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Laos",
+            "state": 1,
+            "x": 3200,
+            "y": -5632
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Latvia",
+            "state": 1,
+            "x": 10400,
+            "y": 8736
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Lebanon",
+            "state": 1,
+            "x": 6048,
+            "y": 6624
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Lesotho",
+            "state": 0,
+            "x": -5440,
+            "y": 8096
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Liberia",
+            "state": 1,
+            "x": 1088,
+            "y": 14912
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Libya",
+            "state": 0,
+            "x": 5984,
+            "y": 10656
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Liechtenstein",
+            "state": 0,
+            "x": 8576,
+            "y": 11392
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Lithuania",
+            "state": 1,
+            "x": 10048,
+            "y": 8864
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Luxembourg",
+            "state": 1,
+            "x": 8992,
+            "y": 12224
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_MacedoniaFyrom",
+            "state": 0,
+            "x": 7680,
+            "y": 8960
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Madagascar",
+            "state": 0,
+            "x": -3520,
+            "y": 4448
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Malawi",
+            "state": 1,
+            "x": -2400,
+            "y": 7040
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Malaysia",
+            "state": 1,
+            "x": 448,
+            "y": -5504
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Maldives",
+            "state": 1,
+            "x": 448,
+            "y": -384
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Mali",
+            "state": 0,
+            "x": 2208,
+            "y": 14208
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Malta",
+            "state": 1,
+            "x": 6464,
+            "y": 10464
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_MarshallIslands",
+            "state": 1,
+            "x": 1248,
+            "y": -18112
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Martinique",
+            "state": 0,
+            "x": 2336,
+            "y": 24128
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Mauritania",
+            "state": 1,
+            "x": 3264,
+            "y": 16000
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Mauritius",
+            "state": 0,
+            "x": -3712,
+            "y": 2624
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Mayotte",
+            "state": 1,
+            "x": -2368,
+            "y": 4832
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Mexico",
+            "state": 0,
+            "x": 3456,
+            "y": 31072
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Micronesia",
+            "state": 1,
+            "x": 1600,
+            "y": -14240
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Monaco",
+            "state": 0,
+            "x": 8032,
+            "y": 11712
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Mongolia",
+            "state": 1,
+            "x": 8128,
+            "y": -6016
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Montenegro",
+            "state": 1,
+            "x": 7872,
+            "y": 9600
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Morocco",
+            "state": 1,
+            "x": 6208,
+            "y": 14272
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Mozambique",
+            "state": 0,
+            "x": -4832,
+            "y": 7168
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Myanmar",
+            "state": 0,
+            "x": 3104,
+            "y": -4352
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Namibia",
+            "state": 1,
+            "x": -4064,
+            "y": 9856
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Nauru",
+            "state": 0,
+            "x": -64,
+            "y": -17344
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Nepal",
+            "state": 1,
+            "x": 5056,
+            "y": -2112
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Netherlands",
+            "state": 1,
+            "x": 9696,
+            "y": 11968
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_NetherlandsAntilles",
+            "state": 1,
+            "x": 2176,
+            "y": 25568
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_NewCaledonia",
+            "state": 0,
+            "x": -4096,
+            "y": -17184
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_NewZealand",
+            "state": 1,
+            "x": -7552,
+            "y": -18784
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Nicaragua",
+            "state": 0,
+            "x": 2208,
+            "y": 28736
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Niger",
+            "state": 0,
+            "x": 2768,
+            "y": 12800
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Nigeria",
+            "state": 0,
+            "x": 2016,
+            "y": 11712
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Niue",
+            "state": 0,
+            "x": -3552,
+            "y": -21376
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_NorfolkIsland",
+            "state": 0,
+            "x": -5280,
+            "y": -17472
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_NorthernMarianaIslands",
+            "state": 1,
+            "x": 2720,
+            "y": -14272
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Norway",
+            "state": 1,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Oman",
+            "state": 1,
+            "x": 4288,
+            "y": 2432
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Pakistan",
+            "state": 0,
+            "x": 6496,
+            "y": -416
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Palau",
+            "state": 0,
+            "x": 1344,
+            "y": -11424
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Palestine",
+            "state": 0,
+            "x": 5728,
+            "y": 6752
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Panama",
+            "state": 1,
+            "x": 1664,
+            "y": 27520
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_PapuaNewGuinea",
+            "state": 1,
+            "x": -1760,
+            "y": -13728
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Paraguay",
+            "state": 0,
+            "x": -3872,
+            "y": 23296
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Peru",
+            "state": 0,
+            "x": -2144,
+            "y": 27136
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Philippines",
+            "state": 1,
+            "x": 2592,
+            "y": -8896
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_PitcairnIslands",
+            "state": 0,
+            "x": -4256,
+            "y": -30368
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Poland",
+            "state": 0,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Portugal",
+            "state": 1,
+            "x": 7072,
+            "y": 14656
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_PuertoRico",
+            "state": 0,
+            "x": 3360,
+            "y": 25152
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Qatar",
+            "state": 0,
+            "x": 4576,
+            "y": 3712
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_SouthKorea",
+            "state": 1,
+            "x": 6784,
+            "y": -10016
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Moldova",
+            "state": 1,
+            "x": 8512,
+            "y": 8032
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Reunion",
+            "state": 0,
+            "x": -3872,
+            "y": 3008
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Romania",
+            "state": 1,
+            "x": 8128,
+            "y": 8352
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_RussianFederation",
+            "state": 1,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Rwanda",
+            "state": 0,
+            "x": -352,
+            "y": 7552
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_SaintHelena",
+            "state": 0,
+            "x": -3264,
+            "y": 13408
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_SaintKittsNevis",
+            "state": 1,
+            "x": 2912,
+            "y": 24512
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_SaintLucia",
+            "state": 1,
+            "x": 2304,
+            "y": 24224
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_SaintVincentGrenadines",
+            "state": 1,
+            "x": 2208,
+            "y": 24224
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_SaintPierreMiquelon",
+            "state": 1,
+            "x": 8480,
+            "y": 23296
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Samoa",
+            "state": 1,
+            "x": -2560,
+            "y": -21120
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_SanMarino",
+            "state": 1,
+            "x": 8000,
+            "y": 10656
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_SaoTomePrincipe",
+            "state": 0,
+            "x": -160,
+            "y": 12064
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_SaudiArabia",
+            "state": 1,
+            "x": 4448,
+            "y": 4768
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Senegal",
+            "state": 1,
+            "x": 2720,
+            "y": 16192
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Serbia",
+            "state": 1,
+            "x": 8288,
+            "y": 9280
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Seychelles",
+            "state": 0,
+            "x": -864,
+            "y": 2880
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_SierraLeone",
+            "state": 0,
+            "x": 1504,
+            "y": 15456
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Singapore",
+            "state": 1,
+            "x": 160,
+            "y": -5824
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Slovakia",
+            "state": 0,
+            "x": 8832,
+            "y": 9920
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Slovenia",
+            "state": 0,
+            "x": 8352,
+            "y": 10432
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_SolomonIslands",
+            "state": 0,
+            "x": -1728,
+            "y": -16000
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Somalia",
+            "state": 0,
+            "x": 480,
+            "y": 4736
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_SouthAfrica",
+            "state": 1,
+            "x": -4736,
+            "y": 7904
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Spain",
+            "state": 1,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_SriLanka",
+            "state": 0,
+            "x": 1216,
+            "y": -1472
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Sudan",
+            "state": 0,
+            "x": 3456,
+            "y": 7392
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Suriname",
+            "state": 0,
+            "x": 1024,
+            "y": 23008
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Swaziland",
+            "state": 1,
+            "x": -4864,
+            "y": 7456
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Sweden",
+            "state": 0,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Switzerland",
+            "state": 0,
+            "x": 8512,
+            "y": 11616
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Syria",
+            "state": 0,
+            "x": 5952,
+            "y": 6400
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Taiwan",
+            "state": 0,
+            "x": 4576,
+            "y": -9056
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Tajikistan",
+            "state": 1,
+            "x": 7104,
+            "y": 288
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Thailand",
+            "state": 0,
+            "x": 2528,
+            "y": -5248
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Togo",
+            "state": 1,
+            "x": 1056,
+            "y": 13056
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Tokelau",
+            "state": 0,
+            "x": -1600,
+            "y": -21344
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Tonga",
+            "state": 0,
+            "x": -3840,
+            "y": -20640
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_TrinidadTobago",
+            "state": 1,
+            "x": 1952,
+            "y": 24224
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Tunisia",
+            "state": 1,
+            "x": 6752,
+            "y": 11296
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Turkey",
+            "state": 1,
+            "x": 7296,
+            "y": 7232
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Turkmenistan",
+            "state": 0,
+            "x": 7104,
+            "y": 2848
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_TurksCaicosIslands",
+            "state": 0,
+            "x": 3872,
+            "y": 26400
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Tuvalu",
+            "state": 1,
+            "x": -1024,
+            "y": -19264
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Uganda",
+            "state": 1,
+            "x": 32,
+            "y": 7200
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Ukraine",
+            "state": 1,
+            "x": 9056,
+            "y": 7424
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_UnitedArabEmirates",
+            "state": 0,
+            "x": 4480,
+            "y": 3136
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_UnitedKingdom",
+            "state": 1,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Tanzania",
+            "state": 0,
+            "x": -1152,
+            "y": 5984
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_UnitedStatesAmerica",
+            "state": 0,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_UnitedStatesVirginIslands",
+            "state": 0,
+            "x": 3264,
+            "y": 24832
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Uruguay",
+            "state": 0,
+            "x": -6368,
+            "y": 23264
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Uzbekistan",
+            "state": 0,
+            "x": 7584,
+            "y": 320
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Vanuatu",
+            "state": 0,
+            "x": -3264,
+            "y": -17536
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_HolySeeVaticanCity",
+            "state": 1,
+            "x": 7680,
+            "y": 10880
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Venezuela",
+            "state": 0,
+            "x": 1920,
+            "y": 25248
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Vietnam",
+            "state": 1,
+            "x": 3744,
+            "y": -5888
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_WallisFutuna",
+            "state": 0,
+            "x": -2560,
+            "y": -20352
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_WesternSahara",
+            "state": 0,
+            "x": 4928,
+            "y": 15424
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Yemen",
+            "state": 1,
+            "x": 2848,
+            "y": 4896
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Zambia",
+            "state": 1,
+            "x": -2720,
+            "y": 7872
+        },
+        {
+            "name": "EventMapchangeLoadCountryToStrbuf_Text_Zimbabwe",
+            "state": 1,
+            "x": -3264,
+            "y": 7264
+        },
+        {
+            "name": null,
+            "state": 1,
+            "x": -3264,
+            "y": 7264
+        },
+        {
+            "name": null,
+            "state": 1,
+            "x": -3264,
+            "y": 7264
+        }
+    ]
+}

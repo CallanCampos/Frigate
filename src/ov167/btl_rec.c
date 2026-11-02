@@ -1,6 +1,7 @@
 #include "types.h"
 #include "battle/btl_action.h"
 #include "battle/btl_rec.h"
+#include "constants/battle.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
 
@@ -30,9 +31,10 @@ struct BtlRecorder {
     u32 capacity;
 };
 
-BtlRecorder *BtlRecorder_Create(HeapID heapId, u32 type) {
+BtlRecorder *BtlRecorder_Create(HeapID heapId, u32 studioMode) {
     BtlRecorder *recorder = GFL_HeapAllocate(heapId, sizeof(BtlRecorder), TRUE, "btl_rec.c", 0x67);
-    if (type == 0) {
+    // A Pokéstar Studios movie records less
+    if (studioMode == BTL_STUDIO_MODE_NONE) {
         recorder->capacity = sizeof(recorder->data);
     } else {
         recorder->capacity = 0x164;

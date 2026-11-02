@@ -1,0 +1,30 @@
+{
+    "$schema": "../npc_cache.schema.json",
+    "codes": [
+        "OBJ_CODE_110",
+        "OBJ_CODE_BACKERS_F",
+        "OBJ_CODE_BLACK_BELT",
+        "OBJ_CODE_BATTLE_GIRL",
+        "OBJ_CODE_216",
+        "OBJ_CODE_210",
+        "OBJ_CODE_MODEL_3",
+        "OBJ_CODE_108",
+        "OBJ_CODE_ACE_TRAINER_F",
+        "OBJ_CODE_FISHERMAN",
+        "OBJ_CODE_PKMN_RANGER_M",
+        "OBJ_CODE_ACE_TRAINER_M",
+        "OBJ_CODE_PARASOL_LADY",
+        "OBJ_CODE_PKMN_RANGER_F",
+        "OBJ_CODE_115",
+        "OBJ_CODE_29",
+        "OBJ_CODE_SCHOOL_KID_M",
+        "OBJ_CODE_POLICEMAN",
+        "OBJ_CODE_105",
+        "OBJ_CODE_PKMN_BREEDER_M",
+        "OBJ_CODE_130",
+        "OBJ_CODE_249",
+        "OBJ_CODE_302",
+        "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
+        "OBJ_CODE_291"
+    ]
+}

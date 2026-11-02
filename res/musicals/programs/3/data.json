@@ -1,0 +1,103 @@
+{
+    "$schema": "../program.schema.json",
+    "base_program": 2,
+    "points": [ 40, 40, 20, 80 ],
+    "bonus": 20,
+    "prop_list": 3,
+    "unk07": [ 170, 0, 0, 1, 1 ],
+    "performers": [
+        {
+            "species": "SPECIES_HERDIER",
+            "form": 0,
+            "obj_code": "OBJ_CODE_PRESCHOOLER_M",
+            "name": "BtlMain9_Text_Sedgley",
+            "personality_byte_2": 0,
+            "unk06": 0,
+            "min_shots": 0,
+            "props": [
+                [ 16, 0 ],
+                [ 97, 1 ],
+                [ 59, 2 ],
+                [ 86, 4 ]
+            ]
+        },
+        {
+            "species": "SPECIES_PANSAGE",
+            "form": 0,
+            "obj_code": "OBJ_CODE_POKEFAN_M",
+            "name": "BtlMain9_Text_Teljin",
+            "personality_byte_2": 0,
+            "unk06": 65533,
+            "min_shots": 0,
+            "props": [
+                [ 83, 7 ],
+                [ 3, 1 ],
+                [ 8, 2 ]
+            ]
+        },
+        {
+            "species": "SPECIES_SCRAGGY",
+            "form": 1,
+            "obj_code": "OBJ_CODE_BATTLE_GIRL",
+            "name": "BtlMain9_Text_Rose",
+            "personality_byte_2": 1,
+            "unk06": 200,
+            "min_shots": 0,
+            "props": [
+                [ 75, 7 ],
+                [ 3, 1 ],
+                [ 17, 2 ],
+                [ 15, 5 ]
+            ]
+        },
+        {
+            "species": "SPECIES_PIGNITE",
+            "form": 0,
+            "obj_code": "OBJ_CODE_HARLEQUIN_233",
+            "name": "BtlMain9_Text_Ben",
+            "personality_byte_2": 0,
+            "unk06": 65533,
+            "min_shots": 250,
+            "props": [
+                [ 77, 7 ],
+                [ 76, 8 ],
+                [ 52, 4 ],
+                [ 53, 2 ],
+                [ 39, 5 ]
+            ]
+        },
+        {
+            "species": "SPECIES_PANPOUR",
+            "form": 1,
+            "obj_code": "OBJ_CODE_NURSERY_AIDE",
+            "name": "BtlMain9_Text_Nedra",
+            "personality_byte_2": 1,
+            "unk06": 65533,
+            "min_shots": 250,
+            "props": [
+                [ 76, 7 ],
+                [ 93, 8 ],
+                [ 16, 0 ],
+                [ 14, 1 ],
+                [ 5, 5 ]
+            ]
+        },
+        {
+            "species": "SPECIES_AUDINO",
+            "form": 1,
+            "obj_code": "OBJ_CODE_POKEFAN_F",
+            "name": "BtlMain9_Text_Janoah",
+            "personality_byte_2": 1,
+            "unk06": 65533,
+            "min_shots": 1000,
+            "props": [
+                [ 22, 7 ],
+                [ 23, 8 ],
+                [ 0, 1 ],
+                [ 25, 2 ],
+                [ 29, 4 ],
+                [ 36, 6 ]
+            ]
+        }
+    ]
+}

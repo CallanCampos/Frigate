@@ -14,8 +14,27 @@
 
 typedef void *(*NHTTPAlloc)(u32 size, int align);
 typedef void (*NHTTPFree)(void *ptr);
-// Called with the connection, the event and the argument given to NHTTPCreateConnection. The events are the post data
-// being sent (1), the buffer being full (2), the body being received (3) and the connection ending (4)
+// The events of a connection's callback: the post data being sent, the buffer being full, the body being received and
+// the connection ending
+enum {
+    NHTTP_EVENT_POST = 1,
+    NHTTP_EVENT_BUFFER_FULL,
+    NHTTP_EVENT_AFTER_BUFFER_FULL,
+    NHTTP_EVENT_ANSWER,
+};
+
+// What the callback of a connection gets for the events of the buffer being full and of the body being received: the
+// buffer of the answer, its size, and how much of it is filled. The callback may set them to give another buffer
+typedef struct NHttpBufferEvent {
+    void *buffer;
+    int bufferSize;
+    int used;
+} NHttpBufferEvent;
+
+// What NHTTPGetConnectionError returns while the connection hasn't ended
+#define NHTTP_STATUS_RUNNING 15
+
+// Called with the connection, the event and the event's data, which NHTTP_EVENT_ANSWER has none of
 typedef int (*NHttpCallback)(int connection, int event, void *arg);
 
 // The root certificate that the answers' TLS is checked against, in overlay 11 (dwc_rootcert_nintendo_class2.c): a
@@ -61,7 +80,8 @@ int NHTTPGetConnectionState(int connection);
 int NHTTPGetBodyBuffer(int connection, char **buffer, int *size);
 // The argument that the connection's request was made with
 void *NHTTPGetUserParam(int connection);
-// A connection's state: 0 once its answer is complete, 15 while it is receiving, negative for an unknown one
+// A connection's state: 0 once its answer is complete, NHTTP_STATUS_RUNNING while it is receiving, negative for an
+// unknown one
 int NHTTPGetConnectionError(int connection);
 // What has been received so far, and the size of the answer
 int NHTTPGetProgress(int connection, int *received, int *size);

@@ -21,14 +21,21 @@ typedef struct {
     // Set when the card is the player's own, whose play time keeps running
     u8 isOwn : 1;
     u8 gender : 1;
-    u8 unk04_2 : 1;
-    u8 unk04_3 : 1;
-    u8 unk04_4 : 1;
-    u8 unk04_5 : 1;
+    // Whether the card shows the Pokédex's window, from event flag 0x962
+    u8 hasPokedex : 1;
+    // TimeSigSave_HasSignature's
+    u8 hasSignature : 1;
+    // Whether the signature blinks (TimeSigSave_GetSignBlinks), which the pen button toggles
+    u8 signBlinks : 1;
+    // Set on a card received from another player: the pen and the back's buttons don't work, and the signature isn't
+    // saved (TrainerCard_IsLocked)
+    u8 isLocked : 1;
     u8 canEdit : 1;
-    u8 unk04_7 : 1;
+    // Set on a card that TRCARD_SYS_VIEW_PROC_FUNCTIONS shows, with the Union Room appearance and the other buttons
+    u8 isOtherCard : 1;
     u8 unk05;
-    u8 unk06;
+    // The player's Union Room appearance (PlayerInfo_GetUnionView)
+    u8 unionView;
     u8 unk07;
     // One bit for each badge
     u16 badges;
@@ -50,33 +57,37 @@ typedef struct {
     u8 clearDay;
     u8 clearMinute;
     u8 unk36[2];
-    // unk38 to unk44, unk4C to unk54, unk5C and unk60 are sums of records, from the rows of
-    // TrainerCardData_SumRecords's table
-    u32 unk38;
-    u32 unk3C;
-    u32 unk40;
-    u32 unk44;
-    u32 unk48;
-    u32 unk4C;
-    u32 unk50;
-    u32 unk54;
-    u32 unk58;
-    u16 unk5C;
+    // The counts on the back, named after its labels. timesLinked to linkBattleLosses, linkTrades to trainersBattled,
+    // feelingChecks and musicalPerformances are sums of records, from the rows of TrainerCardData_SumRecords's table
+    u32 timesLinked;
+    u32 linkBattles;
+    u32 linkBattleWins;
+    u32 linkBattleLosses;
+    // The nature on the front (TimeSigSave_GetPersonality), which the player can change
+    u32 personality;
+    u32 linkTrades;
+    u32 wildEncounters;
+    u32 trainersBattled;
+    u32 passerbyCount;
+    u16 feelingChecks;
     u16 passPowerCount;
-    u16 unk60;
+    u16 musicalPerformances;
     u16 palParkHighScore;
-    u16 unk64;
+    u16 battleTestHighScore;
     // The Battle Test rank
     u16 battleTestRank;
-    u32 unk68_0 : 1;
-    u32 unk68_1 : 1;
-    u32 unk68_2 : 1;
-    u32 unk68_3 : 1;
-    u32 unk68_4 : 1;
+    // Which of the back's rows show (TrCardBmp_InitRows): the C-Gear's two when it is on, and the others once the
+    // player has something to show there
+    u32 cgearOn : 1;
+    u32 showPassPowers : 1;
+    u32 showMusicals : 1;
+    u32 showPalPark : 1;
+    u32 showBattleTest : 1;
     u32 unk68_5 : 27;
     // The phrase the player greets with, which is also the C-Gear's
     PMSData greeting;
-    u8 unk74[0x600];
+    // The signature, as TimeSigSave_GetSignature keeps it
+    u8 signature[0x600];
     u32 unk674;
     // The medal obtained last, or 0xff
     u32 lastMedal;
@@ -86,15 +97,17 @@ typedef struct {
     u8 medalMonth;
     u8 medalDay;
     u8 unk682[2];
-    u32 unk684;
-    u16 unk688;
-    u16 unk68A;
+    // The cleared Funfest Missions, the movie shoots, and the customers recommended to Join Avenue
+    u32 funfestMissions;
+    u16 movieShoots;
+    u16 recommendedCustomers;
     // The tournaments won in the Pokémon World Tournament, up to 9999
     u32 pwtWins;
-    u32 unk690_0 : 1;
-    u32 unk690_1 : 1;
-    u32 unk690_2 : 1;
-    u32 unk690_3 : 1;
+    // Which of the back's rows that only the player's own card has show
+    u32 showFunfestMissions : 1;
+    u32 showMovieShoots : 1;
+    u32 showPwtWins : 1;
+    u32 showAvenue : 1;
     u32 unk690_4 : 28;
     u8 unk694[2];
     // Join Avenue's name
@@ -107,14 +120,23 @@ typedef struct {
     TrainerCardData *shownData;
     GameData *gameData;
     BOOL canEdit;
-    // What the screen asks for next: 1 the greeting's phrase select, 2 overlay 186's other screen, 3 back to the
-    // card, 4 the medals
+    // What the screen asks for next, a TRCARD_NEXT_*
     u32 next;
     // 1 when the medals screen asked to return to the field
     u32 result;
     // A TRCARD_START_*, or -1
     s32 appParam;
 } TrainerCardParam;
+
+// What the trainer card's screens ask for next: the end, the greeting's phrase select, overlay 186's badges, back to
+// the card, or the medals
+enum {
+    TRCARD_NEXT_END,
+    TRCARD_NEXT_GREETING,
+    TRCARD_NEXT_BADGES,
+    TRCARD_NEXT_CARD,
+    TRCARD_NEXT_MEDALS,
+};
 
 // What the trainer card starts on: the card as it was last left, its front, its back, or the badges
 enum {
@@ -134,9 +156,9 @@ u16 TrainerCardData_GetMedalCount(TrainerCardData *data);
 u8 TrainerCardData_GetMedalRank(TrainerCardData *data);
 
 // The proc of the player's own card, which FIELD_PROC_LINK_LIST opens
-extern const GameProcFunctions data_ov012_0216dd78;
+extern const GameProcFunctions TRCARD_SYS_PROC_FUNCTIONS;
 // The proc that shows a card it is given, which it frees
-extern const GameProcFunctions data_ov012_0216dd6c;
+extern const GameProcFunctions TRCARD_SYS_VIEW_PROC_FUNCTIONS;
 
 // Overlay 186, the trainer card screen
 BOOL TrainerCard_Init(GameProc *proc, u32 *state, void *param, void *work);

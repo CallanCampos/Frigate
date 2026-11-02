@@ -6,8 +6,25 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
+// The steps of the event: the screens flash white, then the cut-in plays
+enum {
+    STEP_START_FLASH,
+    STEP_WAIT_FADE_OUT,
+    STEP_WAIT_FADE_IN,
+    STEP_END,
+};
+
+// The steps of the fallback event, when there is no cut-in to play
+enum {
+    FALLBACK_STEP_START_FADE,
+    FALLBACK_STEP_WAIT_FADE,
+};
+
+// How many times the screens flash
+#define FLASH_COUNT 2
+
 struct EncounterCutinWork {
-    s32 state;
+    s32 flashes;
     u32 selection;
     u32 param;
 };
@@ -124,8 +141,8 @@ GameEvent *EventEncountEffectCutin_Create26(GameSystem *gsys, Field *field, u32 
 GameEvent *EventEncountEffectCutin_Create(GameSystem *gsys, Field *field, u32 selection, u32 param) {
     EncounterCutinWork *work;
 
-    work = EncEff_AllocWorkArea(Field_GetEncEff(GSYS_GetField(gsys)), 0xc, 0x50);
-    work->state = 0;
+    work = EncEff_AllocWorkArea(Field_GetEncEff(GSYS_GetField(gsys)), sizeof(EncounterCutinWork), 0x50);
+    work->flashes = 0;
     work->selection = selection;
     work->param = param;
     return GameEvent_Create(gsys, NULL, EventEncountEffectCutin_Callback, 0);
@@ -142,22 +159,22 @@ GameEventReturnCode EventEncountEffectCutin_Callback(GameEvent *event, u32 *stat
     work = EncEff_GetWorkArea(Field_GetEncEff(field));
 
     switch (*state) {
-    case 0:
-        GFL_FadeSet(4, 0, 0x10, 0);
+    case STEP_START_FLASH:
+        GFL_FadeSet(FADE_ENGINE_A_WHITE, 0, 0x10, 0);
         (*state)++;
         // Fall through to check the fade in the same frame.
-    case 1:
+    case STEP_WAIT_FADE_OUT:
         if (!GFL_FadeIsRunning()) {
-            GFL_FadeSet(4, 0x10, 0, 0);
+            GFL_FadeSet(FADE_ENGINE_A_WHITE, 0x10, 0, 0);
             (*state)++;
         }
         break;
-    case 2:
+    case STEP_WAIT_FADE_IN:
         if (!GFL_FadeIsRunning()) {
-            work->state++;
-            if (work->state < 2) {
-                GFL_FadeSet(4, 0, 0x10, 0);
-                *state = 1;
+            work->flashes++;
+            if (work->flashes < FLASH_COUNT) {
+                GFL_FadeSet(FADE_ENGINE_A_WHITE, 0, 0x10, 0);
+                *state = STEP_WAIT_FADE_OUT;
             } else {
                 next = EventFieldEffect_CreateBattleCutin(gsys, Field_Get3DCi(field), work->selection, work->param);
                 if (next != NULL) {
@@ -170,7 +187,7 @@ GameEventReturnCode EventEncountEffectCutin_Callback(GameEvent *event, u32 *stat
             }
         }
         break;
-    case 3:
+    case STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -179,11 +196,11 @@ GameEventReturnCode EventEncountEffectCutin_Callback(GameEvent *event, u32 *stat
 GameEventReturnCode EventEncountEffectCutinFallback_Callback(GameEvent *event, u32 *state, void *data) {
     GSYS_GetField(GameEvent_GetGameSystem(event));
     switch (*state) {
-    case 0:
-        GFL_FadeSet(3, 0, 0x10, 3);
+    case FALLBACK_STEP_START_FADE:
+        GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 0, 0x10, 3);
         (*state)++;
         break;
-    case 1:
+    case FALLBACK_STEP_WAIT_FADE:
         if (!GFL_FadeIsRunning()) {
             return GAMEEVENT_DONE;
         }

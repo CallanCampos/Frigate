@@ -1,0 +1,24 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The rail maps' headers: res/field/rails/headers.json",
+    "description": "The files of ARCID_RAIL_DATA (a/1/1/0), in order: the header that FieldNoGridMapper_LoadByHeader reads for a rail ID, which GetRailIDForZone gives a zone (ZONE_RAIL_ASSIGNMENTS in src/system/zonedata.c). tools/data/rail_data.py packs them.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "headers" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "headers": {
+            "type": "array",
+            "description": "The headers, by rail ID (NoGridMapperHeader)",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "rail", "camera_areas" ],
+                "properties": {
+                    "rail": { "type": [ "integer", "null" ], "minimum": 0, "maximum": 65534, "description": "The rail file, res/field/rails/<n>.json, or null for none (NOGRID_RAIL_NONE)" },
+                    "camera_areas": { "type": [ "integer", "null" ], "minimum": 0, "maximum": 65534, "description": "The camera areas, res/field/cameras/rail_areas/<n>.json, a file of ARCID_FIELD_SCENE_AREA (LoadCameraDataToSceneAreaLoader), or null for none (NOGRID_CAMERA_NONE)" }
+                }
+            }
+        }
+    }
+}

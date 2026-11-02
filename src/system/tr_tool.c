@@ -607,8 +607,8 @@ void TrainerUtil_LoadTrainer(GameData *gameData, int trainerId, BtlSetupTrainer 
         GFL_MsgDataFree(msgData);
     }
     MIi_CpuCopy16(data->items, trainer->items, sizeof(trainer->items));
-    PMSData_Clear(&trainer->unk18);
-    PMSData_Clear(&trainer->unk20);
+    PMSData_Clear(&trainer->winWords);
+    PMSData_Clear(&trainer->loseWords);
     GFL_HeapFree(data);
 }
 

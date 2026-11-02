@@ -1,5 +1,6 @@
 #include "types.h"
 #include "battle/btl_action.h"
+#include "battle/btl_pospoke.h"
 
 // Function names from swan.
 void BattleAction_SetFightParam(BattleAction *action, u16 move, u8 target) {
@@ -10,20 +11,20 @@ void BattleAction_SetFightParam(BattleAction *action, u16 move, u8 target) {
 }
 
 void BattleAction_ChangeFightTargetPos(BattleAction *action, u8 target) {
-    if (action->bits.action == BATTLE_ACTION_FIGHT && target != 6) {
+    if (action->bits.action == BATTLE_ACTION_FIGHT && target != BTL_POS_NONE) {
         action->bits.target = target;
     }
 }
 
 void BattleAction_SetMoveInfoFlag(BattleAction *action) {
     if (action->bits.action == BATTLE_ACTION_FIGHT) {
-        action->bits.unk26 = 1;
+        action->bits.moveInfoFlag = 1;
     }
 }
 
 BOOL BattleAction_GetMoveInfoFlag(const BattleAction *action) {
     if (action->bits.action == BATTLE_ACTION_FIGHT) {
-        return action->bits.unk26;
+        return action->bits.moveInfoFlag;
     }
     return FALSE;
 }
@@ -46,20 +47,20 @@ void BattleAction_SetItemParam(BattleAction *action, u16 item, u8 target, u8 par
 void BattleAction_SetChangeParam(BattleAction *action, u8 pos, u8 slot) {
     action->raw = 0;
     action->change.action = BATTLE_ACTION_CHANGE;
-    action->change.unk4 = pos;
+    action->change.pos = pos;
     action->change.slot = slot;
-    action->change.unk10 = 0;
+    action->change.deplete = 0;
 }
 
 void BattleAction_SetChangeDepleteParam(BattleAction *action) {
     action->raw = 0;
     action->change.action = BATTLE_ACTION_CHANGE;
     action->change.slot = 0;
-    action->change.unk10 = 1;
+    action->change.deplete = 1;
 }
 
 BOOL BattleAction_IsChangeDeplete(const BattleAction *action) {
-    if (action->change.action == BATTLE_ACTION_CHANGE && action->change.unk10 == 1) {
+    if (action->change.action == BATTLE_ACTION_CHANGE && action->change.deplete == 1) {
         return TRUE;
     }
     return FALSE;

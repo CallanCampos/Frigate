@@ -83,6 +83,13 @@ enum {
     BGM_FADE_OUT_END,
 };
 
+// The yes/no dialog
+enum {
+    DIALOG_CLOSED,
+    DIALOG_OPEN,
+    DIALOG_ANSWERED,
+};
+
 // The answer to whether to give a nickname
 enum {
     ANSWER_NO,
@@ -180,7 +187,7 @@ static BOOL EggDemo_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->wait = 5;
     wk->bgm = BGM_IDLE;
     wk->unk1C = 0;
-    wk->dialogState = 0;
+    wk->dialogState = DIALOG_CLOSED;
     EggDemo_InitGraphics(param, wk);
     EggDemo_InitBGM(param, wk);
     GFL_FadeSet(3, 16, 16, 0);
@@ -712,13 +719,13 @@ static void EggDemo_UpdateDialog(EggDemoParam *param, EggDemoWork *wk) {
     u32 result;
 
     switch (wk->dialogState) {
-    case 0:
+    case DIALOG_CLOSED:
         break;
-    case 1:
+    case DIALOG_OPEN:
         result = ConfirmDialog_Update(wk->dialog);
         if (result != BMPMENU_NULL) {
             wk->answer = result == 0 ? ANSWER_YES : ANSWER_NO;
-            wk->dialogState = 2;
+            wk->dialogState = DIALOG_ANSWERED;
         }
         break;
     }
@@ -727,7 +734,7 @@ static void EggDemo_UpdateDialog(EggDemoParam *param, EggDemoWork *wk) {
 static void EggDemo_OpenDialog(EggDemoParam *param, EggDemoWork *wk) {
     wk->dialog = ShopUI_CreateConfirmDialog(&wk->dialogSetup, CHAR_POS(wk->frameChars), 2, 0, wk->heapId);
     wk->answer = ANSWER_NONE;
-    wk->dialogState = 1;
+    wk->dialogState = DIALOG_OPEN;
 }
 
 static u32 EggDemo_GetAnswer(EggDemoParam *param, EggDemoWork *wk) {

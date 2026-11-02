@@ -17,10 +17,10 @@ void BtlString_FormatStdMsgArgs(StrBuf *strbuf, u16 message, const u32 *args);
 void BtlString_FormatSetMsg(StrBuf *strbuf, u16 message, const u32 *args);
 // "<Pokémon> used <move>!"
 void BtlString_FormatMoveMsg(StrBuf *strbuf, u8 monId, u16 move);
-void func_ov167_021d5700(StrBuf *strbuf, u16 arg1, u32 arg2);
+void BtlString_LoadTrainerWinLoseMsg(StrBuf *strbuf, u16 trainerId, u32 result);
 void BtlString_LoadUIMsg(StrBuf *strbuf, u16 message);
-void func_ov167_021d5770(StrBuf *strbuf, u16 message, const u32 *args);
-void func_ov167_021d57b0(StrBuf *strbuf, u16 message, const u32 *args);
+void BtlString_FormatLearnMsg(StrBuf *strbuf, u16 message, const u32 *args);
+void BtlString_FormatYesNoMsg(StrBuf *strbuf, u16 message, const u32 *args);
 // The six values of a level up's stat window, two digits each
 void BtlString_FormatLevelUpGains(StrBuf *strbuf, int hp, int attack, int defense, int spAttack, int spDefense,
                                   int speed);

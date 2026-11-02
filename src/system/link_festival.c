@@ -1,3 +1,4 @@
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/fest_mission_data.h"
 #include "field/fest_mission_gimmick.h"
@@ -35,7 +36,7 @@ LinkFestival *CreateLinkFestival(HeapID heapId, GameSystem *gsys) {
 
     festival->gsys = gsys;
     festival->gameData = GSYS_GetGameData(gsys);
-    festival->archive = GFL_ArcSysCreateFileHandle(0x121, heapId);
+    festival->archive = GFL_ArcSysCreateFileHandle(ARCID_FMISSION_DATA, heapId);
     festival->headers = FestMissionData_LoadHeaders(festival->archive, heapId);
     ClearFesMissionCfg(&festival->config);
     festival->info = &festival->config.info;

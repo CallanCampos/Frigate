@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -18,8 +19,6 @@
 
 #define GIMMICK_WORK_ID 1
 #define GIMMICK_STATE_ID 41
-// The archive of the room's models, a/2/8/1
-#define GIMMICK_ARCID 0x119
 
 // The models of the scene
 enum {
@@ -33,6 +32,22 @@ enum {
 #define PLATFORM_BOTTOM_Y FX32_CONST(192)
 
 #define POS_TO_GRID(pos) ((s16)(((pos) >> 4) / FX32_ONE))
+
+// The steps of the platform's descent
+enum {
+    PLATFORM_STEP_START,
+    PLATFORM_STEP_FALL,
+    PLATFORM_STEP_BOUNCE,
+    PLATFORM_STEP_WAIT_SHAKE,
+};
+
+// The states of the camera shake's task
+enum {
+    SHAKE_STATE_FINISH_DELAY,
+    SHAKE_STATE_WAIT_DELAY,
+    SHAKE_STATE_SHAKE,
+    SHAKE_STATE_END,
+};
 
 // What the save keeps of the room
 typedef struct {
@@ -109,9 +124,9 @@ static const G3DSceneAnimationSetup sModel1Animations[] = { { 4, 0 }, { 5, 0 }, 
 
 // clang-format off
 static const G3DSceneResourceSetup sResources[11] = {
-    { GIMMICK_ARCID, 0, 0 }, { GIMMICK_ARCID, 1, 0 }, { GIMMICK_ARCID, 2, 0 }, { GIMMICK_ARCID, 3, 0 },
-    { GIMMICK_ARCID, 4, 0 }, { GIMMICK_ARCID, 5, 0 }, { GIMMICK_ARCID, 6, 0 }, { GIMMICK_ARCID, 7, 0 },
-    { GIMMICK_ARCID, 8, 0 }, { GIMMICK_ARCID, 9, 0 }, { GIMMICK_ARCID, 10, 0 },
+    { ARCID_GIMMICK_LEAGUE_MARSHAL, 0, 0 }, { ARCID_GIMMICK_LEAGUE_MARSHAL, 1, 0 }, { ARCID_GIMMICK_LEAGUE_MARSHAL, 2, 0 }, { ARCID_GIMMICK_LEAGUE_MARSHAL, 3, 0 },
+    { ARCID_GIMMICK_LEAGUE_MARSHAL, 4, 0 }, { ARCID_GIMMICK_LEAGUE_MARSHAL, 5, 0 }, { ARCID_GIMMICK_LEAGUE_MARSHAL, 6, 0 }, { ARCID_GIMMICK_LEAGUE_MARSHAL, 7, 0 },
+    { ARCID_GIMMICK_LEAGUE_MARSHAL, 8, 0 }, { ARCID_GIMMICK_LEAGUE_MARSHAL, 9, 0 }, { ARCID_GIMMICK_LEAGUE_MARSHAL, 10, 0 },
 };
 
 // clang-format on
@@ -346,7 +361,7 @@ static GameEventReturnCode MarshalRoom_PlatformEvent(GameEvent *event, u32 *stat
     u16 angle;
 
     switch (*state) {
-    case 0:
+    case PLATFORM_STEP_START:
         FieldExpObj_SetActorHidden(work->expObj, 0, MODEL_PLATFORM, FALSE);
         MI_CpuFill8(&shake, 0, sizeof(shake));
         shake.amplitude = 4;
@@ -365,19 +380,19 @@ static GameEventReturnCode MarshalRoom_PlatformEvent(GameEvent *event, u32 *stat
         shake.delay = frames - 5;
         task = MarshalRoom_CreateCameraShakeTask(work->field, &shake);
         FieldTaskManager_AddTask(Field_GetTaskManager(work->field), task, 0);
-        *state = 1;
+        *state = PLATFORM_STEP_FALL;
         break;
-    case 1:
+    case PLATFORM_STEP_FALL:
         work->y -= work->speed;
         work->speed = FX_Mul(work->speed, 0x11a0);
         if (work->targetY >= work->y) {
             work->y = work->targetY;
             GFL_SndSEPlay(SEQ_SE_SW_RENBU_04);
-            *state = 2;
+            *state = PLATFORM_STEP_BOUNCE;
         }
         MarshalRoom_SetPlatformY(work, work->y);
         break;
-    case 2:
+    case PLATFORM_STEP_BOUNCE:
         work->bounceFrame++;
         angle = (u16)((work->bounceFrame << 15) / work->bouncePeriod) % 0x8000;
         sin = FX_SinIdx(angle);
@@ -387,11 +402,11 @@ static GameEventReturnCode MarshalRoom_PlatformEvent(GameEvent *event, u32 *stat
         }
         if (work->bounceHeight <= 0) {
             offset = 0;
-            *state = 3;
+            *state = PLATFORM_STEP_WAIT_SHAKE;
         }
         MarshalRoom_SetPlatformY(work, PLATFORM_BOTTOM_Y + offset);
         break;
-    case 3:
+    case PLATFORM_STEP_WAIT_SHAKE:
         if (FieldTaskManager_IsIdle(Field_GetTaskManager(work->field))) {
             FldAct_FreeAcmd(work->player);
             ClearActorFlag(work->player, 0x10);
@@ -437,7 +452,7 @@ static FieldTask *MarshalRoom_CreateCameraShakeTask(Field *field, const CameraSh
     work->field = field;
     work->camera = Field_GetCameraSystem(field);
     work->shake = *shake;
-    work->state = 0;
+    work->state = SHAKE_STATE_FINISH_DELAY;
     return task;
 }
 
@@ -453,11 +468,11 @@ static BOOL MarshalRoom_CameraShakeTask(void *data) {
         return FALSE;
     }
     switch (work->state) {
-    case 0:
+    case SHAKE_STATE_FINISH_DELAY:
         FieldCamera_FinishDelay(camera);
         work->state++;
         break;
-    case 1:
+    case SHAKE_STATE_WAIT_DELAY:
         if (FieldCamera_IsDelayActive(work->camera)) {
             break;
         }
@@ -470,7 +485,7 @@ static BOOL MarshalRoom_CameraShakeTask(void *data) {
         FieldCamera_ClearBind(camera);
         work->state++;
         // fallthrough
-    case 2:
+    case SHAKE_STATE_SHAKE:
         shake->frame++;
         angle = (shake->frame << 16) / shake->period;
         if (shake->frame >= shake->period) {
@@ -500,7 +515,7 @@ static BOOL MarshalRoom_CameraShakeTask(void *data) {
             FieldCamera_CoordsSetTarget(camera, &target);
         }
         break;
-    case 3:
+    case SHAKE_STATE_END:
         return TRUE;
     }
     return FALSE;

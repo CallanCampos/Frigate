@@ -2,6 +2,7 @@
 #include "types.h"
 #include "app/local_tvt/local_tvt_common.h"
 #include "app/local_tvt/local_tvt_person_secret.h"
+#include "constants/arc.h"
 #include "constants/zones.h"
 #include "field/player_state.h"
 #include "field/zone.h"
@@ -17,8 +18,6 @@
 // the ROM's "local_tvt_calldata.c". The table has an entry for each person and count of calls made with it, with
 // the messages of that call and where the person is
 
-// The archive of the table
-#define ARC_LOCAL_TVT_CALL_DATA 240
 #define CALL_DATA_COUNT 142
 
 // Where the face of a person is
@@ -66,7 +65,7 @@ LocalTvtCallData *LocalTvtCallData_Create(GameSystem *gsys, GameData *gameData, 
     data->gameData = gameData;
     data->gsys = gsys;
     data->save = getHollow_RivalBlk(GameData_GetSaveControl(gameData));
-    data->entries = GFL_ArcSysReadHeapNewLZ(ARC_LOCAL_TVT_CALL_DATA, 0, FALSE, heapId);
+    data->entries = GFL_ArcSysReadHeapNewLZ(ARCID_LOCAL_TVT_CALL_DATA, 0, FALSE, heapId);
     return data;
 }
 

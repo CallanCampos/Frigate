@@ -9,6 +9,7 @@
 #include "battle/btl_main.h"
 #include "battle/btl_net.h"
 #include "battle/btl_pokeparam.h"
+#include "battle/btl_pospoke.h"
 #include "battle/btl_result.h"
 #include "battle/btl_server.h"
 #include "battle/btl_server_cmd.h"
@@ -62,10 +63,10 @@
 #endif
 
 // The first mon ID of each client
-static const u8 data_ov167_021d6c24[4] = { 0, 12, 6, 18 };
+static const u8 sClientFirstMonIds[4] = { 0, 12, 6, 18 };
 
 // The battle system's proc
-const GameProcFunctions data_ov167_021d6ce0 = { BtlMain_ProcInit, BtlMain_ProcMain, BtlMain_ProcExit };
+const GameProcFunctions BATTLE_PROC_FUNCTIONS = { BtlMain_ProcInit, BtlMain_ProcMain, BtlMain_ProcExit };
 
 // Starts a step of the module
 static inline void BtlMainSeq_Set(BtlMainSeq *seq, BtlMainSeqFunc func, BtlMainModule *mainModule) {
@@ -112,36 +113,36 @@ BOOL BtlMain_ProcInit(GameProc *proc, u32 *state, void *param, void *work) {
         BattleOverlay_LoadDev();
         if (!GFL_SndIsVolumeControlCallbackSet()) {
             GFL_SndSetVolumeControlCallbacks();
-            mainModule->unk473_7 = 1;
+            mainModule->volumeCallbacksSet = 1;
         }
         mainModule->heapId = HEAPID_BATTLE;
         mainModule->setup = setup;
-        setup->unkAC = 6;
-        mainModule->unkC0 = mainModule->setup->unk34[0];
-        mainModule->unk440 = mainModule->setup->unk8C;
-        mainModule->unk442 = mainModule->setup->unk8E;
-        mainModule->unk473_3 = 0;
-        mainModule->unk473_4 = 0;
-        mainModule->unk473_0 = 0;
-        mainModule->unk473_1 = 0;
-        mainModule->unk473_5 = 0;
-        mainModule->unk473_6 = 0;
-        mainModule->unk471 = 0;
+        setup->capturedSlot = 6;
+        mainModule->playerInfo = mainModule->setup->playerInfo[0];
+        mainModule->gameTimeLimit = mainModule->setup->unk8C;
+        mainModule->commandTimeLimit = mainModule->setup->unk8E;
+        mainModule->prizeMoneyFixed = 0;
+        mainModule->lossMoneyCalculated = 0;
+        mainModule->commError = 0;
+        mainModule->setupFailed = 0;
+        mainModule->skipExitBgmFadeOut = 0;
+        mainModule->moneyDoubled = 0;
+        mainModule->npcCount = 0;
         mainModule->mainFunc = NULL;
         notInitialized = FALSE;
         mainModule->viewCore = NULL;
         mainModule->result = BTL_RESULT_NOT_SET;
-        mainModule->unk43C = Config_GetTextSpeed(mainModule->setup->config);
+        mainModule->textSpeed = Config_GetTextSpeed(mainModule->setup->config);
         if (!Config_GetBattleScene(setup->config)) {
             notInitialized = TRUE;
         }
-        mainModule->unk473_2 = (u8)notInitialized;
+        mainModule->battleSceneOff = (u8)notInitialized;
         mainModule->field = BtlField_Create(mainModule->heapId);
         PokeCon_Init(&mainModule->pokeCons[0], mainModule, FALSE);
         PokeCon_Init(&mainModule->pokeCons[1], mainModule, TRUE);
         BtlSetup_ClearResults(mainModule->setup);
-        mainModule->unk2C0 = NULL;
-        mainModule->unk2C4 = NULL;
+        mainModule->wildIllusionPkm = NULL;
+        mainModule->partyPacket = NULL;
         if (mainModule->setup->fieldSituation.unk1b == 0) {
             buildSeed(&mainModule->rand);
         } else {
@@ -151,7 +152,7 @@ BOOL BtlMain_ProcInit(GameProc *proc, u32 *state, void *param, void *work) {
         func_ov167_021b1670();
         mainModule->prizeMoney = BtlCalc_GetPrizeMoney(setup);
         mainModule->money = 0;
-        mainModule->unk438 = 0;
+        mainModule->lossMoney = 0;
         if (mainModule->setup->fieldSituation.unk1b == 0) {
             u32 i;
 
@@ -159,7 +160,7 @@ BOOL BtlMain_ProcInit(GameProc *proc, u32 *state, void *param, void *work) {
                 mainModule->setup->unk44[i] = 0;
             }
         }
-        BtlClientIDList_Init(&mainModule->unk448);
+        BtlClientIDList_Init(&mainModule->clientIdList);
         flag = Config_GetBattleStyle(setup->config);
         isSet = FALSE;
         if (flag) {
@@ -168,7 +169,7 @@ BOOL BtlMain_ProcInit(GameProc *proc, u32 *state, void *param, void *work) {
         mainModule->unk46F = isSet;
         BtlNet_Init(setup->fieldSituation.netHandle, setup->unkA0, 0x14);
         BtlCalc_SetHeapID(HEAPID_BATTLE);
-        if (setup->unkDD_3) {
+        if (setup->studioMode) {
             BtlMain_LoadStudioData(mainModule, setup->unkDF);
         }
         (*state)++;
@@ -176,8 +177,8 @@ BOOL BtlMain_ProcInit(GameProc *proc, u32 *state, void *param, void *work) {
     case 1:
         mainModule = work;
         if (mainModule->setup->fieldSituation.netHandle != NULL && BtlNet_CheckError()) {
-            mainModule->unk473_0 = 1;
-            mainModule->unk473_1 = 1;
+            mainModule->commError = 1;
+            mainModule->setupFailed = 1;
             return TRUE;
         }
         if (BtlNet_IsInitSynced()) {
@@ -192,11 +193,11 @@ BOOL BtlMain_ProcInit(GameProc *proc, u32 *state, void *param, void *work) {
     case 2:
         mainModule = work;
         if (BtlMainSeq_Run(&mainModule->seq)) {
-            if (mainModule->unk473_0) {
-                mainModule->unk473_1 = 1;
+            if (mainModule->commError) {
+                mainModule->setupFailed = 1;
                 return TRUE;
             }
-            if (mainModule->setup->battleType != 4) {
+            if (mainModule->setup->battleType != BTL_TYPE_CAPTURE_DEMO) {
                 IncRecord(mainModule, 4);
             }
             return TRUE;
@@ -220,16 +221,16 @@ BOOL BtlMain_ProcMain(GameProc *proc, u32 *state, void *param, void *work) {
             BtlMain_StoreResultStats(mainModule);
             BtlMain_StorePartiesToSetup(mainModule);
             switch (result) {
-            case 1:
-                mainModule->setup->unkA4 = mainModule->prizeMoney + GetBonusMoney(mainModule);
+            case BTL_RESULT_VICTORY:
+                mainModule->setup->moneyChange = mainModule->prizeMoney + GetBonusMoney(mainModule);
                 break;
-            case 0:
-            case 2:
-                mainModule->setup->unkA4 = -mainModule->unk438;
+            case BTL_RESULT_DEFEAT:
+            case BTL_RESULT_DRAW:
+                mainModule->setup->moneyChange = -mainModule->lossMoney;
                 break;
             }
         } else {
-            mainModule->setup->unkDD_1 = (u8)BtlMain_IsRecReadComplete(mainModule);
+            mainModule->setup->recReadComplete = (u8)BtlMain_IsRecReadComplete(mainModule);
         }
         return TRUE;
     }
@@ -253,7 +254,7 @@ BOOL BtlMain_ProcExit(GameProc *proc, u32 *state, void *param, void *work) {
 
     switch (*state) {
     case 0:
-        if (!mainModule->unk473_5) {
+        if (!mainModule->skipExitBgmFadeOut) {
             GFL_SndBGMFadeOut(30);
         }
         mainModule->unk460 = 0;
@@ -285,7 +286,7 @@ BOOL BtlMain_ProcExit(GameProc *proc, u32 *state, void *param, void *work) {
         (*state)++;
         break;
     case 2:
-        if (!mainModule->unk473_5) {
+        if (!mainModule->skipExitBgmFadeOut) {
             if (GFL_SndBGMIsFading()) {
                 break;
             }
@@ -300,13 +301,13 @@ BOOL BtlMain_ProcExit(GameProc *proc, u32 *state, void *param, void *work) {
             BtlField_Delete(mainModule->field);
             mainModule->field = NULL;
         }
-        if (mainModule->unk2C0 != NULL) {
-            GFL_HeapFree(mainModule->unk2C0);
-            mainModule->unk2C0 = NULL;
+        if (mainModule->wildIllusionPkm != NULL) {
+            GFL_HeapFree(mainModule->wildIllusionPkm);
+            mainModule->wildIllusionPkm = NULL;
         }
-        if (mainModule->unk2C4 != NULL) {
-            BtlNet_FreePartyPacket(mainModule->unk2C4);
-            mainModule->unk2C4 = NULL;
+        if (mainModule->partyPacket != NULL) {
+            BtlNet_FreePartyPacket(mainModule->partyPacket);
+            mainModule->partyPacket = NULL;
         }
         BtlCalc_Exit();
         BtlMain_FreeSrcParties(mainModule);
@@ -326,9 +327,9 @@ BOOL BtlMain_ProcExit(GameProc *proc, u32 *state, void *param, void *work) {
         BtlvCore_ExitSystem();
         GFL_SndPlayerSetMuteStateEx(1, 0x3e);
         PokeVoice_ResetMasterVolume();
-        if (mainModule->unk473_7) {
+        if (mainModule->volumeCallbacksSet) {
             RingtoneSys_RestoreLidCallbacks();
-            mainModule->unk473_7 = 0;
+            mainModule->volumeCallbacksSet = 0;
         }
         GFL_ProcReleaseSubsystem(proc);
         GFL_HeapDelete(0x13);
@@ -348,20 +349,20 @@ void BtlMain_SetSetupSeq(BtlMainSeq *seq, BtlMainModule *mainModule, BtlSetup *s
     }
     if (setup->fieldSituation.unk18 == 0) {
         switch (setup->battleStyle) {
-        case 0:
+        case BTL_STYLE_SINGLE:
             BtlMainSeq_Set(seq, BtlMain_SetupAloneSingle, mainModule);
             return;
-        case 1:
-            if (setup->fieldSituation.unk1a == 0) {
+        case BTL_STYLE_DOUBLE:
+            if (setup->fieldSituation.multiMode == 0) {
                 BtlMainSeq_Set(seq, BtlMain_SetupAloneDouble, mainModule);
                 return;
             }
             BtlMainSeq_Set(seq, BtlMain_SetupAloneMulti, mainModule);
             return;
-        case 2:
+        case BTL_STYLE_TRIPLE:
             BtlMainSeq_Set(seq, BtlMain_SetupAloneTriple, mainModule);
             return;
-        case 3:
+        case BTL_STYLE_ROTATION:
             BtlMainSeq_Set(seq, BtlMain_SetupAloneRotation, mainModule);
             return;
         default:
@@ -370,16 +371,16 @@ void BtlMain_SetSetupSeq(BtlMainSeq *seq, BtlMainModule *mainModule, BtlSetup *s
         }
     }
     switch (setup->battleStyle) {
-    case 0:
+    case BTL_STYLE_SINGLE:
         BtlMainSeq_Set(seq, BtlMain_SetupCommSingle, mainModule);
         return;
-    case 1:
+    case BTL_STYLE_DOUBLE:
         BtlMainSeq_Set(seq, BtlMain_SetupCommDouble, mainModule);
         return;
-    case 2:
+    case BTL_STYLE_TRIPLE:
         BtlMainSeq_Set(seq, BtlMain_SetupCommTriple, mainModule);
         return;
-    case 3:
+    case BTL_STYLE_ROTATION:
         BtlMainSeq_Set(seq, BtlMain_SetupCommRotation, mainModule);
         return;
     default:
@@ -394,13 +395,13 @@ void BtlMain_SetCleanupSeq(BtlMainSeq *seq, BtlMainModule *mainModule, BtlSetup 
 
 u8 BtlMain_IsCommCompetitor(BtlSetup *setup) {
     switch (setup->battleType) {
-    case 0:
+    case BTL_TYPE_WILD:
         return FALSE;
-    case 1:
+    case BTL_TYPE_TRAINER:
         return FALSE;
-    case 2:
+    case BTL_TYPE_FACILITY:
         return FALSE;
-    case 3:
+    case BTL_TYPE_COMM:
         return TRUE;
     default:
         return FALSE;
@@ -414,12 +415,12 @@ void BtlMain_SetupPlayerAndParties(BtlMainModule *mainModule, BtlSetup *setup) {
 
     mainModule->playerClientId = setup->fieldSituation.unk19;
     i = 0;
-    mainModule->unk46D = GetClientBattlePos(mainModule, mainModule->playerClientId, 0);
+    mainModule->playerPos = GetClientBattlePos(mainModule, mainModule->playerClientId, 0);
     BtlMain_LoadSetupParties(mainModule, setup);
     if (!IsRecPlayMode(mainModule)) {
         chatter = getChatterBlockAddress(GameData_GetSaveControl(setup->gameData));
-        mainModule->unk3E0[0] = allocChatotChatterBlk(mainModule->heapId);
-        moveChatter(mainModule->unk3E0[0], chatter);
+        mainModule->chatters[0] = allocChatotChatterBlk(mainModule->heapId);
+        moveChatter(mainModule->chatters[0], chatter);
         mainModule->setup->unk44[0] = GetClientChatterEffect(mainModule, i);
         return;
     }
@@ -459,7 +460,7 @@ void BtlMain_SetupClientTrainer(BtlMainModule *mainModule, u8 clientId) {
     if (setup->trainers[index]->trainerId != 0) {
         TrainerData_SetFromSetup(trainer, setup->trainers[index]);
     } else {
-        TrainerData_SetFromPlayer(trainer, mainModule->heapId, setup->unk34[index]);
+        TrainerData_SetFromPlayer(trainer, mainModule->heapId, setup->playerInfo[index]);
     }
 }
 
@@ -467,17 +468,17 @@ u8 CalcClientBattlerCount(BtlMainModule *mainModule, u8 clientId) {
     BtlSetup *setup = mainModule->setup;
 
     switch (setup->battleStyle) {
-    case 0:
+    case BTL_STYLE_SINGLE:
         return 1;
-    case 3:
+    case BTL_STYLE_ROTATION:
         return 1;
-    case 2:
+    case BTL_STYLE_TRIPLE:
         return 3;
-    case 1:
-        if (setup->fieldSituation.unk1a == 0) {
+    case BTL_STYLE_DOUBLE:
+        if (setup->fieldSituation.multiMode == 0) {
             return 2;
         }
-        if (setup->battleType == 3) {
+        if (setup->battleType == BTL_TYPE_COMM) {
             return 1;
         }
         if (setup->party[(u8)((clientId + 2) & 3)] != NULL &&
@@ -492,7 +493,7 @@ u8 CalcClientBattlerCount(BtlMainModule *mainModule, u8 clientId) {
 
 void BtlMain_SetupTrainers(BtlMainModule *mainModule, BtlSetup *setup) {
     if (setup->fieldSituation.unk1b == 0) {
-        TrainerData_SetFromPlayer(&mainModule->trainers[0], mainModule->heapId, mainModule->unkC0);
+        TrainerData_SetFromPlayer(&mainModule->trainers[0], mainModule->heapId, mainModule->playerInfo);
         TrainerData_SetFromSetup(&mainModule->trainers[1], setup->trainers[1]);
     } else {
         BtlMain_SetupClientTrainer(mainModule, 0);
@@ -508,7 +509,7 @@ void BtlMain_SetupRecReader(BtlMainModule *mainModule, BtlSetup *setup) {
     }
 }
 
-void BtlMain_CreateViewCore(BtlMainModule *mainModule, BtlSetup *setup, u32 arg2) {
+void BtlMain_CreateViewCore(BtlMainModule *mainModule, BtlSetup *setup, u32 commCompetitor) {
     BtlClient *client;
 
     if (setup->fieldSituation.unk1b != 0) {
@@ -516,13 +517,13 @@ void BtlMain_CreateViewCore(BtlMainModule *mainModule, BtlSetup *setup, u32 arg2
     } else {
         client = mainModule->clients[0];
     }
-    mainModule->viewCore = BtlvCore_Create(mainModule, client, &mainModule->pokeCons[0], arg2, 0x13);
+    mainModule->viewCore = BtlvCore_Create(mainModule, client, &mainModule->pokeCons[0], commCompetitor, 0x13);
     BattleClient_SetViewCore(client, mainModule->viewCore);
 }
 
 BOOL BtlMain_SetupAloneSingle(u32 *state, BtlMainModule *mainModule) {
     BtlSetup *setup = mainModule->setup;
-    u8 unk = BtlMain_IsCommCompetitor(setup);
+    u8 commCompetitor = BtlMain_IsCommCompetitor(setup);
 
     mainModule->clientCount = 2;
     mainModule->posClientIds[0] = 0;
@@ -534,18 +535,18 @@ BOOL BtlMain_SetupAloneSingle(u32 *state, BtlMainModule *mainModule) {
     PokeCon_Init(&mainModule->pokeCons[1], mainModule, TRUE);
     PokeCon_CreateClientParty(&mainModule->pokeCons[1], mainModule, 0);
     PokeCon_CreateClientParty(&mainModule->pokeCons[1], mainModule, 1);
-    mainModule->server =
-        BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1], unk, mainModule->heapId);
-    mainModule->unk46E = 1;
+    mainModule->server = BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1], commCompetitor,
+                                             mainModule->heapId);
+    mainModule->isServer = 1;
     BtlMain_SetupTrainers(mainModule, setup);
     mainModule->clients[0] =
-        BattleClient_Create(mainModule, &mainModule->pokeCons[0], 0, setup->fieldSituation.netHandle, 0, 1, 0, unk,
-                            setup->fieldSituation.unk1b, &mainModule->rand, mainModule->heapId);
+        BattleClient_Create(mainModule, &mainModule->pokeCons[0], 0, setup->fieldSituation.netHandle, 0, 1, 0,
+                            commCompetitor, setup->fieldSituation.unk1b, &mainModule->rand, mainModule->heapId);
     mainModule->clients[1] =
-        BattleClient_Create(mainModule, &mainModule->pokeCons[0], 0, setup->fieldSituation.netHandle, 1, 1, 1, unk,
-                            setup->fieldSituation.unk1b, &mainModule->rand, mainModule->heapId);
+        BattleClient_Create(mainModule, &mainModule->pokeCons[0], 0, setup->fieldSituation.netHandle, 1, 1, 1,
+                            commCompetitor, setup->fieldSituation.unk1b, &mainModule->rand, mainModule->heapId);
     BtlMain_SetupRecReader(mainModule, setup);
-    BtlMain_CreateViewCore(mainModule, setup, unk);
+    BtlMain_CreateViewCore(mainModule, setup, commCompetitor);
     BattleServer_AttachClient(mainModule->server, BattleClient_GetAdapter(mainModule->clients[0]), 0, 1);
     BattleServer_AttachClient(mainModule->server, BattleClient_GetAdapter(mainModule->clients[1]), 1, 1);
     BattleServer_Start(mainModule->server);
@@ -570,15 +571,15 @@ BOOL BtlMain_Cleanup(u32 *state, BtlMainModule *mainModule) {
     if (mainModule->server != NULL) {
         BattleServer_Delete(mainModule->server);
     }
-    if (mainModule->unk0C != NULL) {
-        BattleServer_Delete(mainModule->unk0C);
+    if (mainModule->cmdCheckServer != NULL) {
+        BattleServer_Delete(mainModule->cmdCheckServer);
     }
     return TRUE;
 }
 
 BOOL BtlMain_SetupAloneDouble(u32 *state, BtlMainModule *mainModule) {
     BtlSetup *setup = mainModule->setup;
-    u8 unk = BtlMain_IsCommCompetitor(setup);
+    u8 commCompetitor = BtlMain_IsCommCompetitor(setup);
 
     mainModule->playerClientId = 0;
     mainModule->clientCount = 2;
@@ -594,17 +595,17 @@ BOOL BtlMain_SetupAloneDouble(u32 *state, BtlMainModule *mainModule) {
     PokeCon_CreateClientParty(&mainModule->pokeCons[1], mainModule, 0);
     PokeCon_CreateClientParty(&mainModule->pokeCons[1], mainModule, 1);
     BtlMain_SetupTrainers(mainModule, setup);
-    mainModule->server =
-        BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1], unk, mainModule->heapId);
-    mainModule->unk46E = 1;
+    mainModule->server = BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1], commCompetitor,
+                                             mainModule->heapId);
+    mainModule->isServer = 1;
     mainModule->clients[0] =
-        BattleClient_Create(mainModule, &mainModule->pokeCons[0], 0, setup->fieldSituation.netHandle, 0, 2, 0, unk,
-                            setup->fieldSituation.unk1b, &mainModule->rand, mainModule->heapId);
+        BattleClient_Create(mainModule, &mainModule->pokeCons[0], 0, setup->fieldSituation.netHandle, 0, 2, 0,
+                            commCompetitor, setup->fieldSituation.unk1b, &mainModule->rand, mainModule->heapId);
     mainModule->clients[1] =
-        BattleClient_Create(mainModule, &mainModule->pokeCons[0], 0, setup->fieldSituation.netHandle, 1, 2, 1, unk,
-                            setup->fieldSituation.unk1b, &mainModule->rand, mainModule->heapId);
+        BattleClient_Create(mainModule, &mainModule->pokeCons[0], 0, setup->fieldSituation.netHandle, 1, 2, 1,
+                            commCompetitor, setup->fieldSituation.unk1b, &mainModule->rand, mainModule->heapId);
     BtlMain_SetupRecReader(mainModule, setup);
-    BtlMain_CreateViewCore(mainModule, setup, unk);
+    BtlMain_CreateViewCore(mainModule, setup, commCompetitor);
     BattleServer_AttachClient(mainModule->server, BattleClient_GetAdapter(mainModule->clients[0]), 0, 2);
     BattleServer_AttachClient(mainModule->server, BattleClient_GetAdapter(mainModule->clients[1]), 1, 2);
     BattleServer_Start(mainModule->server);
@@ -614,7 +615,7 @@ BOOL BtlMain_SetupAloneDouble(u32 *state, BtlMainModule *mainModule) {
 
 BOOL BtlMain_SetupAloneMulti(u32 *state, BtlMainModule *mainModule) {
     BtlSetup *setup = mainModule->setup;
-    u8 unk = BtlMain_IsCommCompetitor(setup);
+    u8 commCompetitor = BtlMain_IsCommCompetitor(setup);
     s32 i;
 
     mainModule->playerClientId = 0;
@@ -623,7 +624,7 @@ BOOL BtlMain_SetupAloneMulti(u32 *state, BtlMainModule *mainModule) {
     mainModule->posClientIds[2] = 0;
     mainModule->posClientIds[1] = 1;
     mainModule->posClientIds[3] = 1;
-    switch (setup->fieldSituation.unk1a) {
+    switch (setup->fieldSituation.multiMode) {
     case 1:
     case 2:
     case 3:
@@ -650,7 +651,7 @@ BOOL BtlMain_SetupAloneMulti(u32 *state, BtlMainModule *mainModule) {
         }
     }
     if (setup->fieldSituation.unk1b == 0) {
-        TrainerData_SetFromPlayer(&mainModule->trainers[0], mainModule->heapId, mainModule->unkC0);
+        TrainerData_SetFromPlayer(&mainModule->trainers[0], mainModule->heapId, mainModule->playerInfo);
         TrainerData_SetFromSetup(&mainModule->trainers[1], setup->trainers[1]);
         if (DoesClientExist(mainModule, 2)) {
             TrainerData_SetFromSetup(&mainModule->trainers[2], setup->trainers[2]);
@@ -665,9 +666,9 @@ BOOL BtlMain_SetupAloneMulti(u32 *state, BtlMainModule *mainModule) {
             }
         }
     }
-    mainModule->server =
-        BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1], unk, mainModule->heapId);
-    mainModule->unk46E = 1;
+    mainModule->server = BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1], commCompetitor,
+                                             mainModule->heapId);
+    mainModule->isServer = 1;
     for (i = 0; i < 4; i++) {
         if (DoesClientExist(mainModule, i)) {
             u8 count = GetClientPosCount(mainModule, i);
@@ -677,9 +678,9 @@ BOOL BtlMain_SetupAloneMulti(u32 *state, BtlMainModule *mainModule) {
                 isAI = TRUE;
             }
 
-            mainModule->clients[i] =
-                BattleClient_Create(mainModule, &mainModule->pokeCons[0], 0, setup->fieldSituation.netHandle, i, count,
-                                    isAI, unk, setup->fieldSituation.unk1b, &mainModule->rand, mainModule->heapId);
+            mainModule->clients[i] = BattleClient_Create(
+                mainModule, &mainModule->pokeCons[0], 0, setup->fieldSituation.netHandle, i, count, isAI,
+                commCompetitor, setup->fieldSituation.unk1b, &mainModule->rand, mainModule->heapId);
         }
     }
     if (setup->fieldSituation.unk1b != 0) {
@@ -690,7 +691,7 @@ BOOL BtlMain_SetupAloneMulti(u32 *state, BtlMainModule *mainModule) {
             }
         }
     }
-    BtlMain_CreateViewCore(mainModule, setup, unk);
+    BtlMain_CreateViewCore(mainModule, setup, commCompetitor);
     for (i = 0; i < 4; i++) {
         if (DoesClientExist(mainModule, i)) {
             u8 count = GetClientPosCount(mainModule, i);
@@ -705,10 +706,10 @@ BOOL BtlMain_SetupAloneMulti(u32 *state, BtlMainModule *mainModule) {
 
 BOOL BtlMain_SetupAloneTriple(u32 *state, BtlMainModule *mainModule) {
     BtlSetup *setup = mainModule->setup;
-    u8 unk = BtlMain_IsCommCompetitor(setup);
+    u8 commCompetitor = BtlMain_IsCommCompetitor(setup);
 
     mainModule->clientCount = 2;
-    mainModule->unk46E = 1;
+    mainModule->isServer = 1;
     mainModule->posClientIds[0] = 0;
     mainModule->posClientIds[1] = 1;
     mainModule->posClientIds[2] = 0;
@@ -723,17 +724,17 @@ BOOL BtlMain_SetupAloneTriple(u32 *state, BtlMainModule *mainModule) {
     PokeCon_CreateClientParty(&mainModule->pokeCons[1], mainModule, 0);
     PokeCon_CreateClientParty(&mainModule->pokeCons[1], mainModule, 1);
     BtlMain_SetupTrainers(mainModule, setup);
-    mainModule->server =
-        BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1], unk, mainModule->heapId);
-    mainModule->unk46E = 1;
+    mainModule->server = BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1], commCompetitor,
+                                             mainModule->heapId);
+    mainModule->isServer = 1;
     mainModule->clients[0] =
-        BattleClient_Create(mainModule, &mainModule->pokeCons[0], 0, setup->fieldSituation.netHandle, 0, 3, 0, unk,
-                            setup->fieldSituation.unk1b, &mainModule->rand, mainModule->heapId);
+        BattleClient_Create(mainModule, &mainModule->pokeCons[0], 0, setup->fieldSituation.netHandle, 0, 3, 0,
+                            commCompetitor, setup->fieldSituation.unk1b, &mainModule->rand, mainModule->heapId);
     mainModule->clients[1] =
-        BattleClient_Create(mainModule, &mainModule->pokeCons[0], 0, setup->fieldSituation.netHandle, 1, 3, 1, unk,
-                            setup->fieldSituation.unk1b, &mainModule->rand, mainModule->heapId);
+        BattleClient_Create(mainModule, &mainModule->pokeCons[0], 0, setup->fieldSituation.netHandle, 1, 3, 1,
+                            commCompetitor, setup->fieldSituation.unk1b, &mainModule->rand, mainModule->heapId);
     BtlMain_SetupRecReader(mainModule, setup);
-    BtlMain_CreateViewCore(mainModule, setup, unk);
+    BtlMain_CreateViewCore(mainModule, setup, commCompetitor);
     BattleServer_AttachClient(mainModule->server, BattleClient_GetAdapter(mainModule->clients[0]), 0, 3);
     BattleServer_AttachClient(mainModule->server, BattleClient_GetAdapter(mainModule->clients[1]), 1, 3);
     BattleServer_Start(mainModule->server);
@@ -743,7 +744,7 @@ BOOL BtlMain_SetupAloneTriple(u32 *state, BtlMainModule *mainModule) {
 
 BOOL BtlMain_SetupAloneRotation(u32 *state, BtlMainModule *mainModule) {
     BtlSetup *setup = mainModule->setup;
-    u8 unk = BtlMain_IsCommCompetitor(setup);
+    u8 commCompetitor = BtlMain_IsCommCompetitor(setup);
 
     mainModule->clientCount = 2;
     mainModule->posClientIds[0] = 0;
@@ -759,18 +760,18 @@ BOOL BtlMain_SetupAloneRotation(u32 *state, BtlMainModule *mainModule) {
     PokeCon_Init(&mainModule->pokeCons[1], mainModule, TRUE);
     PokeCon_CreateClientParty(&mainModule->pokeCons[1], mainModule, 0);
     PokeCon_CreateClientParty(&mainModule->pokeCons[1], mainModule, 1);
-    mainModule->server =
-        BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1], unk, mainModule->heapId);
-    mainModule->unk46E = 1;
+    mainModule->server = BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1], commCompetitor,
+                                             mainModule->heapId);
+    mainModule->isServer = 1;
     BtlMain_SetupTrainers(mainModule, setup);
     mainModule->clients[0] =
-        BattleClient_Create(mainModule, &mainModule->pokeCons[0], 0, setup->fieldSituation.netHandle, 0, 1, 0, unk,
-                            setup->fieldSituation.unk1b, &mainModule->rand, mainModule->heapId);
+        BattleClient_Create(mainModule, &mainModule->pokeCons[0], 0, setup->fieldSituation.netHandle, 0, 1, 0,
+                            commCompetitor, setup->fieldSituation.unk1b, &mainModule->rand, mainModule->heapId);
     mainModule->clients[1] =
-        BattleClient_Create(mainModule, &mainModule->pokeCons[0], 0, setup->fieldSituation.netHandle, 1, 1, 1, unk,
-                            setup->fieldSituation.unk1b, &mainModule->rand, mainModule->heapId);
+        BattleClient_Create(mainModule, &mainModule->pokeCons[0], 0, setup->fieldSituation.netHandle, 1, 1, 1,
+                            commCompetitor, setup->fieldSituation.unk1b, &mainModule->rand, mainModule->heapId);
     BtlMain_SetupRecReader(mainModule, setup);
-    BtlMain_CreateViewCore(mainModule, setup, unk);
+    BtlMain_CreateViewCore(mainModule, setup, commCompetitor);
     BattleServer_AttachClient(mainModule->server, BattleClient_GetAdapter(mainModule->clients[0]), 0, 1);
     BattleServer_AttachClient(mainModule->server, BattleClient_GetAdapter(mainModule->clients[1]), 1, 1);
     BattleServer_Start(mainModule->server);
@@ -780,7 +781,7 @@ BOOL BtlMain_SetupAloneRotation(u32 *state, BtlMainModule *mainModule) {
 
 BOOL BtlMain_SetupCommSingle(u32 *state, BtlMainModule *mainModule) {
     // The steps of setting up the link battle, after the first
-    static BOOL (*const data_ov167_021d6c50[7])(BtlMainModule *mainModule, s32 *state) = {
+    static BOOL (*const sCommSingleSetupSteps[7])(BtlMainModule *mainModule, s32 *state) = {
         NULL,
         BtlMain_CommExchangeSyncData,
         BtlMain_CommExchangeParties,
@@ -795,12 +796,12 @@ BOOL BtlMain_SetupCommSingle(u32 *state, BtlMainModule *mainModule) {
         mainModule->posClientIds[0] = 0;
         mainModule->posClientIds[1] = 1;
         mainModule->playerClientId = mainModule->setup->fieldSituation.unk19;
-        mainModule->unk46D = GetClientBattlePos(mainModule, mainModule->playerClientId, 0);
+        mainModule->playerPos = GetClientBattlePos(mainModule, mainModule->playerClientId, 0);
         (*state)++;
         return FALSE;
     }
     if (*state < 7) {
-        if (data_ov167_021d6c50[*state](mainModule, &mainModule->unk460)) {
+        if (sCommSingleSetupSteps[*state](mainModule, &mainModule->unk460)) {
             mainModule->unk460 = 0;
             (*state)++;
         }
@@ -811,7 +812,7 @@ BOOL BtlMain_SetupCommSingle(u32 *state, BtlMainModule *mainModule) {
 
 BOOL BtlMain_SetupCommDouble(u32 *state, BtlMainModule *mainModule) {
     // The steps of setting up the link battle, after the first
-    static BOOL (*const data_ov167_021d6c34[7])(BtlMainModule *mainModule, s32 *state) = {
+    static BOOL (*const sCommDoubleSetupSteps[7])(BtlMainModule *mainModule, s32 *state) = {
         NULL,
         BtlMain_CommExchangeSyncData,
         BtlMain_CommExchangeParties,
@@ -822,7 +823,7 @@ BOOL BtlMain_SetupCommDouble(u32 *state, BtlMainModule *mainModule) {
     };
 
     if (*state == 0) {
-        switch (mainModule->setup->fieldSituation.unk1a) {
+        switch (mainModule->setup->fieldSituation.multiMode) {
         case 0:
         default:
             mainModule->clientCount = 2;
@@ -832,7 +833,7 @@ BOOL BtlMain_SetupCommDouble(u32 *state, BtlMainModule *mainModule) {
             mainModule->posClientIds[3] = 1;
             break;
         case 2:
-            mainModule->unk471 = 2;
+            mainModule->npcCount = 2;
         case 1:
             mainModule->clientCount = 4;
             mainModule->posClientIds[0] = 0;
@@ -842,12 +843,12 @@ BOOL BtlMain_SetupCommDouble(u32 *state, BtlMainModule *mainModule) {
             break;
         }
         mainModule->playerClientId = mainModule->setup->fieldSituation.unk19;
-        mainModule->unk46D = GetClientBattlePos(mainModule, mainModule->playerClientId, 0);
+        mainModule->playerPos = GetClientBattlePos(mainModule, mainModule->playerClientId, 0);
         (*state)++;
         return FALSE;
     }
     if (*state < 7) {
-        if (data_ov167_021d6c34[*state](mainModule, &mainModule->unk460)) {
+        if (sCommDoubleSetupSteps[*state](mainModule, &mainModule->unk460)) {
             mainModule->unk460 = 0;
             (*state)++;
         }
@@ -858,7 +859,7 @@ BOOL BtlMain_SetupCommDouble(u32 *state, BtlMainModule *mainModule) {
 
 BOOL BtlMain_SetupCommRotation(u32 *state, BtlMainModule *mainModule) {
     // The steps of setting up the link battle, after the first
-    static BOOL (*const data_ov167_021d6c6c[7])(BtlMainModule *mainModule, s32 *state) = {
+    static BOOL (*const sCommRotationSetupSteps[7])(BtlMainModule *mainModule, s32 *state) = {
         NULL,
         BtlMain_CommExchangeSyncData,
         BtlMain_CommExchangeParties,
@@ -877,12 +878,12 @@ BOOL BtlMain_SetupCommRotation(u32 *state, BtlMainModule *mainModule) {
         mainModule->posClientIds[4] = 0;
         mainModule->posClientIds[5] = 1;
         mainModule->playerClientId = mainModule->setup->fieldSituation.unk19;
-        mainModule->unk46D = GetClientBattlePos(mainModule, mainModule->playerClientId, 0);
+        mainModule->playerPos = GetClientBattlePos(mainModule, mainModule->playerClientId, 0);
         (*state)++;
         return FALSE;
     }
     if (*state < 7) {
-        if (data_ov167_021d6c6c[*state](mainModule, &mainModule->unk460)) {
+        if (sCommRotationSetupSteps[*state](mainModule, &mainModule->unk460)) {
             mainModule->unk460 = 0;
             (*state)++;
         }
@@ -893,7 +894,7 @@ BOOL BtlMain_SetupCommRotation(u32 *state, BtlMainModule *mainModule) {
 
 BOOL BtlMain_SetupCommTriple(u32 *state, BtlMainModule *mainModule) {
     // The steps of setting up the link battle, after the first
-    static BOOL (*const data_ov167_021d6c88[7])(BtlMainModule *mainModule, s32 *state) = {
+    static BOOL (*const sCommTripleSetupSteps[7])(BtlMainModule *mainModule, s32 *state) = {
         NULL,
         BtlMain_CommExchangeSyncData,
         BtlMain_CommExchangeParties,
@@ -912,12 +913,12 @@ BOOL BtlMain_SetupCommTriple(u32 *state, BtlMainModule *mainModule) {
         mainModule->posClientIds[4] = 0;
         mainModule->posClientIds[5] = 1;
         mainModule->playerClientId = mainModule->setup->fieldSituation.unk19;
-        mainModule->unk46D = GetClientBattlePos(mainModule, mainModule->playerClientId, 0);
+        mainModule->playerPos = GetClientBattlePos(mainModule, mainModule->playerClientId, 0);
         (*state)++;
         return FALSE;
     }
     if (*state < 7) {
-        if (data_ov167_021d6c88[*state](mainModule, &mainModule->unk460)) {
+        if (sCommTripleSetupSteps[*state](mainModule, &mainModule->unk460)) {
             mainModule->unk460 = 0;
             (*state)++;
         }
@@ -928,7 +929,7 @@ BOOL BtlMain_SetupCommTriple(u32 *state, BtlMainModule *mainModule) {
 
 BOOL BtlMain_CommExchangeSyncData(BtlMainModule *mainModule, s32 *state) {
     if (BtlNet_CheckError()) {
-        mainModule->unk473_0 = 1;
+        mainModule->commError = 1;
         return TRUE;
     }
     switch (*state) {
@@ -940,7 +941,7 @@ BOOL BtlMain_CommExchangeSyncData(BtlMainModule *mainModule, s32 *state) {
     case 1:
         if (BtlNet_IsServerDecided()) {
             mainModule->unk46A = 0;
-            mainModule->unk46E = BtlNet_IsServer();
+            mainModule->isServer = BtlNet_IsServer();
             mainModule->setup->unkAD = BtlNet_GetCommonVersion();
             if (BtlNet_IsServer()) {
                 *state = 2;
@@ -952,14 +953,14 @@ BOOL BtlMain_CommExchangeSyncData(BtlMainModule *mainModule, s32 *state) {
     case 2:
         mainModule->syncData.rand = mainModule->rand;
         mainModule->syncData.unk18 = mainModule->setup->unkA2;
-        mainModule->syncData.unk1A = mainModule->setup->unk8C;
-        mainModule->syncData.unk1C = mainModule->setup->unk8E;
+        mainModule->syncData.gameTimeLimit = mainModule->setup->unk8C;
+        mainModule->syncData.commandTimeLimit = mainModule->setup->unk8E;
         if (BtlSetup_IsBattleType(mainModule, 0x1000)) {
-            mainModule->syncData.unk1E = mainModule->unk43C;
-            mainModule->syncData.unk1F_0 = mainModule->unk473_2;
+            mainModule->syncData.textSpeed = mainModule->textSpeed;
+            mainModule->syncData.battleSceneOff = mainModule->battleSceneOff;
         } else {
-            mainModule->syncData.unk1E = 2;
-            mainModule->syncData.unk1F_0 = 1;
+            mainModule->syncData.textSpeed = 2;
+            mainModule->syncData.battleSceneOff = 1;
         }
         if (BtlNet_SendSyncData(&mainModule->syncData)) {
             (*state)++;
@@ -971,10 +972,10 @@ BOOL BtlMain_CommExchangeSyncData(BtlMainModule *mainModule, s32 *state) {
             setup->unkA2 = mainModule->syncData.unk18;
             setup->rand = mainModule->syncData.rand;
             mainModule->rand = mainModule->syncData.rand;
-            mainModule->unk473_2 = mainModule->syncData.unk1F_0;
-            mainModule->unk43C = mainModule->syncData.unk1E;
-            mainModule->unk440 = mainModule->syncData.unk1A;
-            mainModule->unk442 = mainModule->syncData.unk1C;
+            mainModule->battleSceneOff = mainModule->syncData.battleSceneOff;
+            mainModule->textSpeed = mainModule->syncData.textSpeed;
+            mainModule->gameTimeLimit = mainModule->syncData.gameTimeLimit;
+            mainModule->commandTimeLimit = mainModule->syncData.commandTimeLimit;
             return TRUE;
         }
         break;
@@ -988,7 +989,7 @@ BOOL BtlMain_CommExchangeParties(BtlMainModule *mainModule, s32 *state) {
     u8 index;
 
     if (BtlNet_CheckError()) {
-        mainModule->unk473_0 = 1;
+        mainModule->commError = 1;
         return TRUE;
     }
     switch (*state) {
@@ -1008,47 +1009,48 @@ BOOL BtlMain_CommExchangeParties(BtlMainModule *mainModule, s32 *state) {
         break;
     case 3:
         if (BtlNet_ArePartiesReceived()) {
-            if (mainModule->unk471 == 0) {
+            if (mainModule->npcCount == 0) {
                 *state = 10;
                 break;
             }
-            if (mainModule->unk46E) {
-                mainModule->unk2C4 =
+            if (mainModule->isServer) {
+                mainModule->partyPacket =
                     BtlNet_CreatePartyPacket(PokeParty_GetSaveDataSize(), HEAPID_TAIL(mainModule->heapId));
             }
-            mainModule->unk470 = 0;
+            mainModule->npcIndex = 0;
             (*state)++;
         }
         break;
     case 4:
         index = 1;
-        if (mainModule->unk470 != 0) {
+        if (mainModule->npcIndex != 0) {
             index = 3;
         }
-        mainModule->unk472 = index;
-        if (mainModule->unk46E) {
-            BtlNet_SetPartyPacket(mainModule->unk2C4, setup->party[mainModule->unk472], mainModule->unk472);
+        mainModule->npcClientId = index;
+        if (mainModule->isServer) {
+            BtlNet_SetPartyPacket(mainModule->partyPacket, setup->party[mainModule->npcClientId],
+                                  mainModule->npcClientId);
         }
-        BtlNet_StartTiming(mainModule->unk470 + 6);
+        BtlNet_StartTiming(mainModule->npcIndex + 6);
         (*state)++;
         break;
     case 5:
-        if (BtlNet_CheckTiming(mainModule->unk470 + 6)) {
+        if (BtlNet_CheckTiming(mainModule->npcIndex + 6)) {
             (*state)++;
         }
         break;
     case 6:
-        if (!mainModule->unk46E || BtlNet_SendPartyPacket(mainModule->unk2C4)) {
+        if (!mainModule->isServer || BtlNet_SendPartyPacket(mainModule->partyPacket)) {
             (*state)++;
         }
         break;
     case 7:
-        if (BtlNet_IsClientPartyReceived(mainModule->unk472)) {
-            mainModule->unk470++;
-            if (mainModule->unk470 >= mainModule->unk471) {
-                if (mainModule->unk46E) {
-                    BtlNet_FreePartyPacket(mainModule->unk2C4);
-                    mainModule->unk2C4 = NULL;
+        if (BtlNet_IsClientPartyReceived(mainModule->npcClientId)) {
+            mainModule->npcIndex++;
+            if (mainModule->npcIndex >= mainModule->npcCount) {
+                if (mainModule->isServer) {
+                    BtlNet_FreePartyPacket(mainModule->partyPacket);
+                    mainModule->partyPacket = NULL;
                 }
                 *state = 10;
             } else {
@@ -1098,7 +1100,7 @@ BOOL BtlMain_CommExchangeTrainers(BtlMainModule *mainModule, s32 *state) {
     u8 index;
 
     if (BtlNet_CheckError()) {
-        mainModule->unk473_0 = 1;
+        mainModule->commError = 1;
         return TRUE;
     }
     switch (*state) {
@@ -1112,7 +1114,7 @@ BOOL BtlMain_CommExchangeTrainers(BtlMainModule *mainModule, s32 *state) {
         }
         break;
     case 2:
-        if (BtlNet_SendPlayerInfo(mainModule->unkC0)) {
+        if (BtlNet_SendPlayerInfo(mainModule->playerInfo)) {
             (*state)++;
         }
         break;
@@ -1149,38 +1151,38 @@ BOOL BtlMain_CommExchangeTrainers(BtlMainModule *mainModule, s32 *state) {
         }
         break;
     case 4:
-        if (mainModule->unk471 == 0) {
+        if (mainModule->npcCount == 0) {
             *state = 10;
             break;
         }
-        mainModule->unk470 = 0;
+        mainModule->npcIndex = 0;
         (*state)++;
         break;
     case 5:
-        BtlNet_StartTiming(mainModule->unk470 + 8);
+        BtlNet_StartTiming(mainModule->npcIndex + 8);
         (*state)++;
         break;
     case 6:
-        if (BtlNet_CheckTiming(mainModule->unk470 + 8)) {
+        if (BtlNet_CheckTiming(mainModule->npcIndex + 8)) {
             (*state)++;
         }
         break;
     case 7:
         index = 1;
-        if (mainModule->unk470 != 0) {
+        if (mainModule->npcIndex != 0) {
             index = 3;
         }
-        mainModule->unk472 = index;
-        if (mainModule->unk46E && !BtlNet_SendTrainer(setup->trainers[mainModule->unk472])) {
+        mainModule->npcClientId = index;
+        if (mainModule->isServer && !BtlNet_SendTrainer(setup->trainers[mainModule->npcClientId])) {
             break;
         }
         (*state)++;
     case 8:
         if (BtlNet_IsTrainerReceived()) {
-            TrainerData_SetFromComm(&mainModule->trainers[mainModule->unk472], BtlNet_GetTrainer());
+            TrainerData_SetFromComm(&mainModule->trainers[mainModule->npcClientId], BtlNet_GetTrainer());
             BtlNet_FreeTrainer();
-            mainModule->unk470++;
-            if (mainModule->unk470 >= mainModule->unk471) {
+            mainModule->npcIndex++;
+            if (mainModule->npcIndex >= mainModule->npcCount) {
                 *state = 10;
             } else {
                 *state = 5;
@@ -1203,7 +1205,7 @@ BOOL BtlMain_CommExchangeChatter(BtlMainModule *mainModule, s32 *state) {
     PerapVoice *chatter;
 
     if (BtlNet_CheckError()) {
-        mainModule->unk473_0 = 1;
+        mainModule->commError = 1;
         return TRUE;
     }
     switch (*state) {
@@ -1228,8 +1230,8 @@ BOOL BtlMain_CommExchangeChatter(BtlMainModule *mainModule, s32 *state) {
                 if (DoesClientExist(mainModule, i) && !IsClientNPCTrainer(mainModule, i)) {
                     chatter = BtlNet_GetChatter(i);
                     if (chatter != NULL) {
-                        mainModule->unk3E0[i] = allocChatotChatterBlk(mainModule->heapId);
-                        MI_CpuCopy8(chatter, mainModule->unk3E0[i], PerapVoice_GetSize());
+                        mainModule->chatters[i] = allocChatotChatterBlk(mainModule->heapId);
+                        MI_CpuCopy8(chatter, mainModule->chatters[i], PerapVoice_GetSize());
                     }
                 }
                 SetSetupChatterEffect(mainModule, i);
@@ -1247,20 +1249,20 @@ BOOL BtlMain_CommExchangeChatter(BtlMainModule *mainModule, s32 *state) {
 BOOL BtlMain_CommCreateSingle(BtlMainModule *mainModule, s32 *state) {
     BtlSetup *setup = mainModule->setup;
     u8 clientId = mainModule->playerClientId;
-    u8 unk = BtlMain_IsCommCompetitor(setup);
+    u8 commCompetitor = BtlMain_IsCommCompetitor(setup);
     u32 opponent;
     u32 i;
 
     if (BtlNet_CheckError()) {
-        mainModule->unk473_0 = 1;
+        mainModule->commError = 1;
         return TRUE;
     }
-    if (mainModule->unk46E) {
-        mainModule->server =
-            BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1], unk, mainModule->heapId);
+    if (mainModule->isServer) {
+        mainModule->server = BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1],
+                                                 commCompetitor, mainModule->heapId);
         mainModule->clients[clientId] = BattleClient_Create(
             mainModule, &mainModule->pokeCons[0], setup->fieldSituation.unk18, setup->fieldSituation.netHandle,
-            clientId, 1, 0, unk, 0, &mainModule->rand, mainModule->heapId);
+            clientId, 1, 0, commCompetitor, 0, &mainModule->rand, mainModule->heapId);
         opponent = 1;
         BattleServer_AttachClient(mainModule->server, BattleClient_GetAdapter(mainModule->clients[clientId]), clientId,
                                   1);
@@ -1272,15 +1274,15 @@ BOOL BtlMain_CommCreateSingle(BtlMainModule *mainModule, s32 *state) {
     } else {
         mainModule->clients[clientId] = BattleClient_Create(
             mainModule, &mainModule->pokeCons[0], setup->fieldSituation.unk18, setup->fieldSituation.netHandle,
-            clientId, 1, 0, unk, 0, &mainModule->rand, mainModule->heapId);
-        mainModule->unk0C =
-            BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1], unk, mainModule->heapId);
+            clientId, 1, 0, commCompetitor, 0, &mainModule->rand, mainModule->heapId);
+        mainModule->cmdCheckServer = BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1],
+                                                         commCompetitor, mainModule->heapId);
         for (i = 0; i < 4; i++) {
             if (DoesClientExist(mainModule, i)) {
-                BattleServer_AttachCmdCheckClient(mainModule->unk0C, i, 1);
+                BattleServer_AttachCmdCheckClient(mainModule->cmdCheckServer, i, 1);
             }
         }
-        BattleClient_SetCmdCheckServer(mainModule->clients[clientId], mainModule->unk0C);
+        BattleClient_SetCmdCheckServer(mainModule->clients[clientId], mainModule->cmdCheckServer);
     }
     return TRUE;
 }
@@ -1288,32 +1290,32 @@ BOOL BtlMain_CommCreateSingle(BtlMainModule *mainModule, s32 *state) {
 BOOL BtlMain_CommCreateDouble(BtlMainModule *mainModule, s32 *state) {
     BtlSetup *setup = mainModule->setup;
     u8 clientId = mainModule->playerClientId;
-    u8 unk = BtlMain_IsCommCompetitor(setup);
-    u8 posCount = setup->fieldSituation.unk1a == 0 ? 2 : 1;
+    u8 commCompetitor = BtlMain_IsCommCompetitor(setup);
+    u8 posCount = setup->fieldSituation.multiMode == 0 ? 2 : 1;
     u8 ally;
     u32 i;
 
     if (BtlNet_CheckError()) {
-        mainModule->unk473_0 = 1;
+        mainModule->commError = 1;
         return TRUE;
     }
-    if (mainModule->unk46E) {
-        mainModule->server =
-            BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1], unk, mainModule->heapId);
+    if (mainModule->isServer) {
+        mainModule->server = BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1],
+                                                 commCompetitor, mainModule->heapId);
         mainModule->clients[clientId] = BattleClient_Create(
             mainModule, &mainModule->pokeCons[0], setup->fieldSituation.unk18, setup->fieldSituation.netHandle,
-            clientId, posCount, 0, unk, 0, &mainModule->rand, mainModule->heapId);
+            clientId, posCount, 0, commCompetitor, 0, &mainModule->rand, mainModule->heapId);
         BattleServer_AttachClient(mainModule->server, BattleClient_GetAdapter(mainModule->clients[clientId]), clientId,
                                   posCount);
-        if (setup->fieldSituation.unk1a == 2) {
+        if (setup->fieldSituation.multiMode == 2) {
             ally = GetAllyClientID(mainModule, clientId);
-            mainModule->clients[1] = BattleClient_Create(mainModule, &mainModule->pokeCons[0],
-                                                         setup->fieldSituation.unk18, setup->fieldSituation.netHandle,
-                                                         1, posCount, 1, unk, 0, &mainModule->rand, mainModule->heapId);
+            mainModule->clients[1] = BattleClient_Create(
+                mainModule, &mainModule->pokeCons[0], setup->fieldSituation.unk18, setup->fieldSituation.netHandle, 1,
+                posCount, 1, commCompetitor, 0, &mainModule->rand, mainModule->heapId);
             BattleServer_AttachClient(mainModule->server, BattleClient_GetAdapter(mainModule->clients[1]), 1, posCount);
-            mainModule->clients[3] = BattleClient_Create(mainModule, &mainModule->pokeCons[0],
-                                                         setup->fieldSituation.unk18, setup->fieldSituation.netHandle,
-                                                         3, posCount, 1, unk, 0, &mainModule->rand, mainModule->heapId);
+            mainModule->clients[3] = BattleClient_Create(
+                mainModule, &mainModule->pokeCons[0], setup->fieldSituation.unk18, setup->fieldSituation.netHandle, 3,
+                posCount, 1, commCompetitor, 0, &mainModule->rand, mainModule->heapId);
             BattleServer_AttachClient(mainModule->server, BattleClient_GetAdapter(mainModule->clients[3]), 3, posCount);
             BattleServer_AttachNetClient(mainModule->server, setup->fieldSituation.unk18,
                                          setup->fieldSituation.netHandle, ally, posCount);
@@ -1328,15 +1330,15 @@ BOOL BtlMain_CommCreateDouble(BtlMainModule *mainModule, s32 *state) {
     } else {
         mainModule->clients[clientId] = BattleClient_Create(
             mainModule, &mainModule->pokeCons[0], setup->fieldSituation.unk18, setup->fieldSituation.netHandle,
-            clientId, posCount, 0, unk, 0, &mainModule->rand, mainModule->heapId);
-        mainModule->unk0C =
-            BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1], unk, mainModule->heapId);
+            clientId, posCount, 0, commCompetitor, 0, &mainModule->rand, mainModule->heapId);
+        mainModule->cmdCheckServer = BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1],
+                                                         commCompetitor, mainModule->heapId);
         for (i = 0; i < 4; i++) {
             if (DoesClientExist(mainModule, i)) {
-                BattleServer_AttachCmdCheckClient(mainModule->unk0C, i, CalcClientBattlerCount(mainModule, i));
+                BattleServer_AttachCmdCheckClient(mainModule->cmdCheckServer, i, CalcClientBattlerCount(mainModule, i));
             }
         }
-        BattleClient_SetCmdCheckServer(mainModule->clients[clientId], mainModule->unk0C);
+        BattleClient_SetCmdCheckServer(mainModule->clients[clientId], mainModule->cmdCheckServer);
     }
     return TRUE;
 }
@@ -1344,20 +1346,20 @@ BOOL BtlMain_CommCreateDouble(BtlMainModule *mainModule, s32 *state) {
 BOOL BtlMain_CommCreateTriple(BtlMainModule *mainModule, s32 *state) {
     BtlSetup *setup = mainModule->setup;
     u8 clientId = mainModule->playerClientId;
-    u8 unk = BtlMain_IsCommCompetitor(setup);
+    u8 commCompetitor = BtlMain_IsCommCompetitor(setup);
     u32 opponent;
     u32 i;
 
     if (BtlNet_CheckError()) {
-        mainModule->unk473_0 = 1;
+        mainModule->commError = 1;
         return TRUE;
     }
-    if (mainModule->unk46E) {
-        mainModule->server =
-            BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1], unk, mainModule->heapId);
+    if (mainModule->isServer) {
+        mainModule->server = BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1],
+                                                 commCompetitor, mainModule->heapId);
         mainModule->clients[clientId] = BattleClient_Create(
             mainModule, &mainModule->pokeCons[0], setup->fieldSituation.unk18, setup->fieldSituation.netHandle,
-            clientId, 3, 0, unk, 0, &mainModule->rand, mainModule->heapId);
+            clientId, 3, 0, commCompetitor, 0, &mainModule->rand, mainModule->heapId);
         opponent = 0;
         BattleServer_AttachClient(mainModule->server, BattleClient_GetAdapter(mainModule->clients[clientId]), clientId,
                                   3);
@@ -1369,15 +1371,15 @@ BOOL BtlMain_CommCreateTriple(BtlMainModule *mainModule, s32 *state) {
     } else {
         mainModule->clients[clientId] = BattleClient_Create(
             mainModule, &mainModule->pokeCons[0], setup->fieldSituation.unk18, setup->fieldSituation.netHandle,
-            clientId, 3, 0, unk, 0, &mainModule->rand, mainModule->heapId);
-        mainModule->unk0C =
-            BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1], unk, mainModule->heapId);
+            clientId, 3, 0, commCompetitor, 0, &mainModule->rand, mainModule->heapId);
+        mainModule->cmdCheckServer = BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1],
+                                                         commCompetitor, mainModule->heapId);
         for (i = 0; i < 4; i++) {
             if (DoesClientExist(mainModule, i)) {
-                BattleServer_AttachCmdCheckClient(mainModule->unk0C, i, CalcClientBattlerCount(mainModule, i));
+                BattleServer_AttachCmdCheckClient(mainModule->cmdCheckServer, i, CalcClientBattlerCount(mainModule, i));
             }
         }
-        BattleClient_SetCmdCheckServer(mainModule->clients[clientId], mainModule->unk0C);
+        BattleClient_SetCmdCheckServer(mainModule->clients[clientId], mainModule->cmdCheckServer);
     }
     return TRUE;
 }
@@ -1385,20 +1387,20 @@ BOOL BtlMain_CommCreateTriple(BtlMainModule *mainModule, s32 *state) {
 BOOL BtlMain_CommCreateRotation(BtlMainModule *mainModule, s32 *state) {
     BtlSetup *setup = mainModule->setup;
     u8 clientId = mainModule->playerClientId;
-    u8 unk = BtlMain_IsCommCompetitor(setup);
+    u8 commCompetitor = BtlMain_IsCommCompetitor(setup);
     u32 i;
 
     if (BtlNet_CheckError()) {
-        mainModule->unk473_0 = 1;
+        mainModule->commError = 1;
         return TRUE;
     }
-    if (mainModule->unk46E) {
-        mainModule->server =
-            BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1], unk, mainModule->heapId);
+    if (mainModule->isServer) {
+        mainModule->server = BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1],
+                                                 commCompetitor, mainModule->heapId);
         i = 0;
         mainModule->clients[clientId] = BattleClient_Create(
             mainModule, &mainModule->pokeCons[0], setup->fieldSituation.unk18, setup->fieldSituation.netHandle,
-            clientId, 1, i, unk, i, &mainModule->rand, mainModule->heapId);
+            clientId, 1, i, commCompetitor, i, &mainModule->rand, mainModule->heapId);
         BattleServer_AttachClient(mainModule->server, BattleClient_GetAdapter(mainModule->clients[clientId]), clientId,
                                   1);
         for (; i < mainModule->clientCount; i++) {
@@ -1411,22 +1413,22 @@ BOOL BtlMain_CommCreateRotation(BtlMainModule *mainModule, s32 *state) {
         i = 0;
         mainModule->clients[clientId] = BattleClient_Create(
             mainModule, &mainModule->pokeCons[0], setup->fieldSituation.unk18, setup->fieldSituation.netHandle,
-            clientId, 1, i, unk, i, &mainModule->rand, mainModule->heapId);
-        mainModule->unk0C =
-            BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1], unk, mainModule->heapId);
+            clientId, 1, i, commCompetitor, i, &mainModule->rand, mainModule->heapId);
+        mainModule->cmdCheckServer = BattleServer_Create(mainModule, &mainModule->rand, &mainModule->pokeCons[1],
+                                                         commCompetitor, mainModule->heapId);
         for (; i < 4; i++) {
             if (DoesClientExist(mainModule, i)) {
-                BattleServer_AttachCmdCheckClient(mainModule->unk0C, i, CalcClientBattlerCount(mainModule, i));
+                BattleServer_AttachCmdCheckClient(mainModule->cmdCheckServer, i, CalcClientBattlerCount(mainModule, i));
             }
         }
-        BattleClient_SetCmdCheckServer(mainModule->clients[clientId], mainModule->unk0C);
+        BattleClient_SetCmdCheckServer(mainModule->clients[clientId], mainModule->cmdCheckServer);
     }
     return TRUE;
 }
 
 BOOL BtlMain_CommCreateViewCore(BtlMainModule *mainModule, s32 *state) {
     if (BtlNet_CheckError()) {
-        mainModule->unk473_0 = 1;
+        mainModule->commError = 1;
         return TRUE;
     }
     switch (*state) {
@@ -1435,7 +1437,7 @@ BOOL BtlMain_CommCreateViewCore(BtlMainModule *mainModule, s32 *state) {
             BtlvCore_Create(mainModule, mainModule->clients[mainModule->playerClientId], &mainModule->pokeCons[0],
                             BtlMain_IsCommCompetitor(mainModule->setup), 0x13);
         BattleClient_SetViewCore(mainModule->clients[mainModule->playerClientId], mainModule->viewCore);
-        if (mainModule->unk46E) {
+        if (mainModule->isServer) {
             mainModule->mainFunc = BtlMain_MainLoopCommServer;
             BattleServer_Start(mainModule->server);
         } else {
@@ -1456,7 +1458,7 @@ BOOL BtlMain_MainLoopAlone(BtlMainModule *mainModule) {
     BattleServer_Main(mainModule->server);
     for (i = 0; i < 4; i++) {
         if (mainModule->clients[i] != NULL && BattleClient_Main(mainModule->clients[i])) {
-            BattleClient_GetClientIDList(mainModule->clients[i], &mainModule->unk448);
+            BattleClient_GetClientIDList(mainModule->clients[i], &mainModule->clientIdList);
             done = TRUE;
         }
     }
@@ -1468,25 +1470,25 @@ BOOL BtlMain_MainLoopCommServer(BtlMainModule *mainModule) {
     BOOL done;
     s32 i;
 
-    if (!mainModule->unk473_0) {
+    if (!mainModule->commError) {
         if (BtlNet_CheckError()) {
-            mainModule->unk473_0 = 1;
+            mainModule->commError = 1;
             BtlMain_ForceQuitClients(mainModule);
         }
-    } else if (mainModule->unk473_1) {
+    } else if (mainModule->setupFailed) {
         return TRUE;
     }
     done = BattleServer_Main(mainModule->server);
     if (done) {
-        BattleServer_GetClientIDList(mainModule->server, &mainModule->unk448);
+        BattleServer_GetClientIDList(mainModule->server, &mainModule->clientIdList);
     }
     for (i = 0; i < 4; i++) {
-        if (mainModule->clients[i] != NULL && mainModule->unkC4[i] == 0) {
-            mainModule->unkC4[i] = BattleClient_Main(mainModule->clients[i]);
+        if (mainModule->clients[i] != NULL && mainModule->clientsDone[i] == 0) {
+            mainModule->clientsDone[i] = BattleClient_Main(mainModule->clients[i]);
         }
     }
     if (BtlMain_AreAllClientsDone(mainModule)) {
-        BattleClient_GetClientIDList(mainModule->clients[mainModule->playerClientId], &mainModule->unk448);
+        BattleClient_GetClientIDList(mainModule->clients[mainModule->playerClientId], &mainModule->clientIdList);
         done = TRUE;
     }
     BtlvCore_Update(mainModule->viewCore);
@@ -1497,18 +1499,18 @@ BOOL BtlMain_MainLoopCommClient(BtlMainModule *mainModule) {
     BOOL done;
     s32 i;
 
-    if (!mainModule->unk473_0) {
+    if (!mainModule->commError) {
         if (BtlNet_CheckError()) {
-            mainModule->unk473_0 = 1;
+            mainModule->commError = 1;
             BtlMain_ForceQuitClients(mainModule);
         }
-    } else if (mainModule->unk473_1) {
+    } else if (mainModule->setupFailed) {
         return TRUE;
     }
     done = FALSE;
     for (i = 0; i < 4; i++) {
         if (mainModule->clients[i] != NULL && BattleClient_Main(mainModule->clients[i])) {
-            BattleClient_GetClientIDList(mainModule->clients[i], &mainModule->unk448);
+            BattleClient_GetClientIDList(mainModule->clients[i], &mainModule->clientIdList);
             done = TRUE;
         }
     }
@@ -1530,7 +1532,7 @@ BOOL BtlMain_AreAllClientsDone(BtlMainModule *mainModule) {
     u32 i;
 
     for (i = 0; i < 4; i++) {
-        if (mainModule->clients[i] != NULL && mainModule->unkC4[i] == 0) {
+        if (mainModule->clients[i] != NULL && mainModule->clientsDone[i] == 0) {
             return FALSE;
         }
     }
@@ -1543,7 +1545,7 @@ u32 BtlSetup_GetBattleStyle(BtlMainModule *mainModule) {
 }
 
 u32 IsBattleSceneOff(BtlMainModule *mainModule) {
-    return mainModule->unk473_2;
+    return mainModule->battleSceneOff;
 }
 
 u8 GetBadgeCount(BtlMainModule *mainModule) {
@@ -1551,26 +1553,26 @@ u8 GetBadgeCount(BtlMainModule *mainModule) {
 }
 
 BOOL IsSwitchMode(BtlMainModule *mainModule) {
-    if (BtlSetup_GetBattleType(mainModule) == 1 && BtlSetup_GetBattleStyle(mainModule) == 0 &&
-        GetCommMode(mainModule) == 0 && GetStudioMode(mainModule) == 0 &&
-        Config_GetBattleStyle(mainModule->setup->config) == 0) {
+    if (BtlSetup_GetBattleType(mainModule) == BTL_TYPE_TRAINER &&
+        BtlSetup_GetBattleStyle(mainModule) == BTL_STYLE_SINGLE && GetCommMode(mainModule) == 0 &&
+        GetStudioMode(mainModule) == BTL_STUDIO_MODE_NONE && Config_GetBattleStyle(mainModule->setup->config) == 0) {
         return TRUE;
     }
     return FALSE;
 }
 
 s32 GetTextWait(BtlMainModule *mainModule) {
-    return TextSpeed_GetWait(mainModule->unk43C);
+    return TextSpeed_GetWait(mainModule->textSpeed);
 }
 
-void func_ov167_0219bdf0(BtlMainModule *mainModule) {
-    mainModule->unk43C = 3;
+void SetFastestTextSpeed(BtlMainModule *mainModule) {
+    mainModule->textSpeed = 3;
 }
 
-BOOL func_ov167_0219bdfc(BtlMainModule *mainModule) {
+BOOL IsExpGainEnabled(BtlMainModule *mainModule) {
     BOOL result;
 
-    if (mainModule->setup->battleType <= 1) {
+    if (mainModule->setup->battleType <= BTL_TYPE_TRAINER) {
         GFL_OvlLoad(OVERLAY_ID(338));
         result = IrCheck_IsGenuineCard();
         GFL_OvlUnload(OVERLAY_ID(338));
@@ -1585,7 +1587,7 @@ BOOL func_ov167_0219bdfc(BtlMainModule *mainModule) {
 }
 
 CommPlayerSupport *GetCommPlayerSupport(BtlMainModule *mainModule) {
-    if (mainModule->setup->battleType <= 1) {
+    if (mainModule->setup->battleType <= BTL_TYPE_TRAINER) {
         return mainModule->setup->unk88;
     }
     return NULL;
@@ -1593,13 +1595,13 @@ CommPlayerSupport *GetCommPlayerSupport(BtlMainModule *mainModule) {
 
 u32 GetValidPosMax(BtlMainModule *mainModule) {
     switch (mainModule->setup->battleStyle) {
-    case 0:
+    case BTL_STYLE_SINGLE:
         return 1;
-    case 1:
+    case BTL_STYLE_DOUBLE:
         return 3;
-    case 2:
+    case BTL_STYLE_TRIPLE:
         return 5;
-    case 3:
+    case BTL_STYLE_ROTATION:
         return 5;
     default:
         return 5;
@@ -1608,13 +1610,13 @@ u32 GetValidPosMax(BtlMainModule *mainModule) {
 
 u32 GetActivePosCount(BtlMainModule *mainModule) {
     switch (mainModule->setup->battleStyle) {
-    case 0:
+    case BTL_STYLE_SINGLE:
         return 1;
-    case 1:
+    case BTL_STYLE_DOUBLE:
         return 2;
-    case 2:
+    case BTL_STYLE_TRIPLE:
         return 3;
-    case 3:
+    case BTL_STYLE_ROTATION:
         return 1;
     default:
         return 1;
@@ -1630,7 +1632,7 @@ u32 BtlSetup_GetBattleType(BtlMainModule *mainModule) {
 }
 
 u8 GetMultiMode(BtlMainModule *mainModule) {
-    return mainModule->setup->fieldSituation.unk1a;
+    return mainModule->setup->fieldSituation.multiMode;
 }
 
 u8 GetCommMode(BtlMainModule *mainModule) {
@@ -1638,33 +1640,33 @@ u8 GetCommMode(BtlMainModule *mainModule) {
 }
 
 BOOL IsMultiMode(BtlMainModule *mainModule) {
-    return mainModule->setup->fieldSituation.unk1a != 0;
+    return mainModule->setup->fieldSituation.multiMode != 0;
 }
 
 u16 GetWinBGM(BtlMainModule *mainModule) {
-    return mainModule->setup->fieldSituation.unk12;
+    return mainModule->setup->fieldSituation.winBgm;
 }
 
-u16 func_ov167_0219bf08(BtlMainModule *mainModule) {
+u16 GetStudioEndingBGM0(BtlMainModule *mainModule) {
     return mainModule->setup->unk138;
 }
 
-u16 func_ov167_0219bf14(BtlMainModule *mainModule) {
+u16 GetStudioEndingBGM2(BtlMainModule *mainModule) {
     return mainModule->setup->unk13a;
 }
 
 u32 GetRunMode(BtlMainModule *mainModule) {
     switch (mainModule->setup->battleType) {
-    case 0:
+    case BTL_TYPE_WILD:
         return 0;
-    case 1:
-        if (GetStudioMode(mainModule) == 1) {
+    case BTL_TYPE_TRAINER:
+        if (GetStudioMode(mainModule) == BTL_STUDIO_MODE_FILM) {
             return 2;
         }
         return 1;
-    case 2:
+    case BTL_TYPE_FACILITY:
         return 2;
-    case 3:
+    case BTL_TYPE_COMM:
         return 2;
     default:
         return 1;
@@ -1676,7 +1678,7 @@ BtlFieldSituation *GetFieldEffectData(BtlMainModule *mainModule) {
 }
 
 PlayerInfo *GetPlayerInfo(BtlMainModule *mainModule) {
-    return mainModule->unkC0;
+    return mainModule->playerInfo;
 }
 
 BOOL IsMonCaught(BtlMainModule *mainModule, BattleMon *mon) {
@@ -1693,9 +1695,10 @@ GameData *GetGameData(BtlMainModule *mainModule) {
 
 void RegisterDexMon(BtlMainModule *mainModule, u8 clientId, BattleMon *mon) {
     u32 battleType = BtlSetup_GetBattleType(mainModule);
-    u32 unk = GetStudioMode(mainModule);
+    u32 studioMode = GetStudioMode(mainModule);
 
-    if (mainModule->setup->unkDE_0 != 1 && battleType <= 1 && unk == 0 && clientId != 0) {
+    if (mainModule->setup->noPokedexRegistration != 1 && battleType <= BTL_TYPE_TRAINER &&
+        studioMode == BTL_STUDIO_MODE_NONE && clientId != 0) {
         PokeDex_RegistPkm(mainModule->setup->pokedex, GetSrcData(mon));
     }
 }
@@ -1706,22 +1709,22 @@ u8 ExpandPosFlags(BtlMainModule *mainModule, u16 posFlags, u8 *out) {
 
     if (type == 0) {
         *out = pos;
-        return *out != 6 ? 1 : 0;
+        return *out != BTL_POS_NONE ? 1 : 0;
     }
-    if (pos != 6) {
+    if (pos != BTL_POS_NONE) {
         switch (mainModule->setup->battleStyle) {
-        case 0:
+        case BTL_STYLE_SINGLE:
         default:
             return ExpandPosFlagsSingle(mainModule, type, pos, out);
-        case 1:
+        case BTL_STYLE_DOUBLE:
             return ExpandPosFlagsDouble(mainModule, type, pos, out);
-        case 2:
+        case BTL_STYLE_TRIPLE:
             return ExpandPosFlagsTriple(mainModule, type, pos, out);
-        case 3:
+        case BTL_STYLE_ROTATION:
             return ExpandPosFlagsSingle(mainModule, type, pos, out);
         }
     }
-    *out = 6;
+    *out = BTL_POS_NONE;
     return 0;
 }
 
@@ -1971,11 +1974,11 @@ u8 GetFacingPos(u32 battleStyle, u8 pos) {
 
     switch (battleStyle) {
     default:
-    case 0:
+    case BTL_STYLE_SINGLE:
         return GetOpposingPosForStyle(battleStyle, pos, 0);
-    case 1:
+    case BTL_STYLE_DOUBLE:
         return GetOpposingPosForStyle(battleStyle, pos, (u8)(pos >> 1) ^ 1);
-    case 2:
+    case BTL_STYLE_TRIPLE:
         index = pos >> 1;
         if (index == 0) {
             index = 2;
@@ -1983,20 +1986,20 @@ u8 GetFacingPos(u32 battleStyle, u8 pos) {
             index = 0;
         }
         return GetOpposingPosForStyle(battleStyle, pos, index);
-    case 3:
+    case BTL_STYLE_ROTATION:
         return GetOpposingPosForStyle(battleStyle, pos, 0);
     }
 }
 
 u8 GetPartnerPos(BtlMainModule *mainModule, u8 pos) {
     switch (mainModule->setup->battleStyle) {
-    case 0:
+    case BTL_STYLE_SINGLE:
         return pos;
-    case 3:
+    case BTL_STYLE_ROTATION:
         return pos;
-    case 1:
+    case BTL_STYLE_DOUBLE:
         return (pos + 2) & 3;
-    case 2:
+    case BTL_STYLE_TRIPLE:
         return pos;
     default:
         return pos;
@@ -2017,7 +2020,7 @@ u8 MonIDToClientID(u8 monId) {
     u8 last;
 
     for (i = 0; i < 4; i++) {
-        first = data_ov167_021d6c24[i];
+        first = sClientFirstMonIds[i];
         last = first + 5;
         if (monId >= first && monId <= last) {
             return i;
@@ -2052,11 +2055,11 @@ u8 MonIDToBattlePos(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u8 monId) {
     slot = PokeCon_FindClientMonIndex(pokeCon, clientId, monId);
     if (slot >= 0) {
         pos = GetClientBattlePos(mainModule, clientId, slot);
-        if (pos != 6) {
+        if (pos != BTL_POS_NONE) {
             return pos;
         }
     }
-    return 6;
+    return BTL_POS_NONE;
 }
 
 u8 MonIDToViewPos(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u8 monId) {
@@ -2108,12 +2111,12 @@ void GetPosClientAndIndex(BtlMainModule *mainModule, u8 pos, u8 *clientId, u8 *i
 }
 
 u8 BattlePosToViewPos(BtlMainModule *mainModule, u8 pos) {
-    static const u8 data_ov167_021d6c28[2][3] = {
+    static const u8 sDoubleViewPositions[2][3] = {
         { 3, 5, 0 },
         { 2, 4, 0 },
     };
 
-    static const u8 data_ov167_021d6c2e[2][3] = {
+    static const u8 sTripleViewPositions[2][3] = {
         { 3, 5, 7 },
         { 2, 4, 6 },
     };
@@ -2122,12 +2125,12 @@ u8 BattlePosToViewPos(BtlMainModule *mainModule, u8 pos) {
     u8 side;
     u32 battleStyle;
 
-    if ((mainModule->unk46D & 1) != (pos & 1)) {
+    if ((mainModule->playerPos & 1) != (pos & 1)) {
         sameSide = FALSE;
     }
     side = sameSide;
     battleStyle = mainModule->setup->battleStyle;
-    if (battleStyle == 0) {
+    if (battleStyle == BTL_STYLE_SINGLE) {
         u32 result = 0;
 
         if (side == 0) {
@@ -2135,23 +2138,23 @@ u8 BattlePosToViewPos(BtlMainModule *mainModule, u8 pos) {
         }
         return result;
     }
-    if (battleStyle == 1) {
-        return data_ov167_021d6c28[side][(u8)(pos >> 1)];
+    if (battleStyle == BTL_STYLE_DOUBLE) {
+        return sDoubleViewPositions[side][(u8)(pos >> 1)];
     }
-    return data_ov167_021d6c2e[side][(u8)(pos >> 1)];
+    return sTripleViewPositions[side][(u8)(pos >> 1)];
 }
 
 u8 ViewPosToBattlePos(BtlMainModule *mainModule, u8 index) {
     u8 isEnemy = index & 1;
     u8 playerSide;
 
-    if (mainModule->setup->battleStyle == 0) {
+    if (mainModule->setup->battleStyle == BTL_STYLE_SINGLE) {
         if (isEnemy) {
-            return mainModule->unk46D == 0 ? 1 : 0;
+            return mainModule->playerPos == 0 ? 1 : 0;
         }
-        return mainModule->unk46D;
+        return mainModule->playerPos;
     }
-    playerSide = mainModule->unk46D & 1;
+    playerSide = mainModule->playerPos & 1;
     if (isEnemy) {
         return (playerSide ^ 1) + (index - 3);
     }
@@ -2162,7 +2165,7 @@ BOOL BtlMain_IsCommMulti(BtlMainModule *mainModule) {
     if (IsMultiMode(mainModule)) {
         u32 battleType = BtlSetup_GetBattleType(mainModule);
 
-        if (battleType != 1 && battleType != 0) {
+        if (battleType != BTL_TYPE_TRAINER && battleType != BTL_TYPE_WILD) {
             return TRUE;
         }
     }
@@ -2282,7 +2285,7 @@ u8 IsRecPlayMode(BtlMainModule *mainModule) {
 
 u32 GetStudioMode(BtlMainModule *mainModule) {
     if (mainModule != NULL) {
-        return mainModule->setup->unkDD_3;
+        return mainModule->setup->studioMode;
     }
     return 0;
 }
@@ -2301,20 +2304,20 @@ u8 GetStudioMovieId(BtlMainModule *mainModule) {
     return 0;
 }
 
-u32 func_ov167_0219c9c0(BtlMainModule *mainModule) {
+u32 IsStudioSkipDisabled(BtlMainModule *mainModule) {
     if (mainModule != NULL) {
         return mainModule->setup->unkDD_7;
     }
     return 0;
 }
 
-void func_ov167_0219c9d4(BtlMainModule *mainModule) {
+void SetRecPlayQuit(BtlMainModule *mainModule) {
     mainModule->setup->unk134 = 1;
 }
 
-u32 func_ov167_0219c9e0(BtlMainModule *mainModule) {
+u32 GetScriptedRulesOutcome(BtlMainModule *mainModule) {
     if (mainModule != NULL) {
-        return func_ov167_021ae320(BattleServer_GetFlow(mainModule->server));
+        return BtlServerFlow_GetScriptedRulesOutcome(BattleServer_GetFlow(mainModule->server));
     }
     return 0;
 }
@@ -2324,8 +2327,8 @@ u32 ReturnZero(BtlMainModule *mainModule, u32 flag) {
 }
 
 void BtlMain_StoreSlotNthResult(BtlMainModule *mainModule, u8 pos) {
-    if (mainModule->setup->unkAC == 6) {
-        mainModule->setup->unkAC = CountClientPosBefore(mainModule, pos);
+    if (mainModule->setup->capturedSlot == 6) {
+        mainModule->setup->capturedSlot = CountClientPosBefore(mainModule, pos);
     }
 }
 
@@ -2344,18 +2347,18 @@ void SetCmdCheckError(BtlMainModule *mainModule) {
 }
 
 u32 FixPrizeMoney(BtlMainModule *mainModule) {
-    if (!mainModule->unk473_3) {
-        if (mainModule->unk473_6) {
+    if (!mainModule->prizeMoneyFixed) {
+        if (mainModule->moneyDoubled) {
             mainModule->prizeMoney *= 2;
         }
         mainModule->prizeMoney = PassPower_ApplyPrizeMoney(mainModule->prizeMoney);
-        mainModule->unk473_3 = 1;
+        mainModule->prizeMoneyFixed = 1;
     }
     return mainModule->prizeMoney;
 }
 
 void AddBonusMoney(BtlMainModule *mainModule, u32 money) {
-    if (!mainModule->unk473_3) {
+    if (!mainModule->prizeMoneyFixed) {
         mainModule->money += money;
         if (mainModule->money > 99999) {
             mainModule->money = 99999;
@@ -2366,7 +2369,7 @@ void AddBonusMoney(BtlMainModule *mainModule, u32 money) {
 u32 GetBonusMoney(BtlMainModule *mainModule) {
     u32 money = mainModule->money;
 
-    if (mainModule->unk473_6) {
+    if (mainModule->moneyDoubled) {
         money *= 2;
         if (money > 99999) {
             money = 99999;
@@ -2376,51 +2379,51 @@ u32 GetBonusMoney(BtlMainModule *mainModule) {
 }
 
 void SetMoneyDoubled(BtlMainModule *mainModule) {
-    mainModule->unk473_6 = 1;
+    mainModule->moneyDoubled = 1;
 }
 
 u32 CalcLossMoney(BtlMainModule *mainModule) {
     u32 loss = 0;
     u32 cash;
 
-    if (!mainModule->unk473_4) {
-        if (mainModule->setup->battleType <= 1) {
+    if (!mainModule->lossMoneyCalculated) {
+        if (mainModule->setup->battleType <= BTL_TYPE_TRAINER) {
             cash = getCash(getTrainerCardDataBlkAddress(mainModule->setup->gameData));
             loss = BtlCalc_GetLostMoney(mainModule->setup->unk98,
                                         GetClientParty(&mainModule->pokeCons[1], mainModule->playerClientId));
             if (loss > cash) {
                 loss = cash;
             }
-            mainModule->unk438 = loss;
+            mainModule->lossMoney = loss;
         }
-        mainModule->unk473_4 = 1;
+        mainModule->lossMoneyCalculated = 1;
     }
     return loss;
 }
 
 void SkipExitBGMFadeOut(BtlMainModule *mainModule) {
-    mainModule->unk473_5 = 1;
+    mainModule->skipExitBgmFadeOut = 1;
 }
 
 void ChangeFriendshipWhenFainted(BtlMainModule *mainModule, BattleMon *mon, BOOL reason) {
-    if (mainModule->setup->battleType <= 1 && mainModule->setup->fieldSituation.unk1b == 0) {
+    if (mainModule->setup->battleType <= BTL_TYPE_TRAINER && mainModule->setup->fieldSituation.unk1b == 0) {
         ChangeFriendship(mainModule, mon, reason ? 5 : 4);
     }
 }
 
 void ChangeFriendship(BtlMainModule *mainModule, BattleMon *mon, u32 reason) {
     u8 monId;
-    const BattleMon *param1;
-    const BattleMon *param2;
+    const BattleMon *serverMon;
+    const BattleMon *clientMon;
     PartyPkm *src1;
     PartyPkm *src2;
     const BtlFieldSituation *field;
 
     monId = GetMonID(mon);
-    param1 = GetPokeParamConst(&mainModule->pokeCons[1], monId);
-    param2 = GetPokeParamConst(&mainModule->pokeCons[0], monId);
-    src1 = GetSrcData(param1);
-    src2 = GetSrcData(param2);
+    serverMon = GetPokeParamConst(&mainModule->pokeCons[1], monId);
+    clientMon = GetPokeParamConst(&mainModule->pokeCons[0], monId);
+    src1 = GetSrcData(serverMon);
+    src2 = GetSrcData(clientMon);
     field = GetFieldEffectData(mainModule);
     FriendshipManagerCalc(src1, reason, field->env.zoneId, HEAPID_TAIL(mainModule->heapId));
     FriendshipManagerCalc(src2, reason, field->env.zoneId, HEAPID_TAIL(mainModule->heapId));
@@ -2455,11 +2458,11 @@ BattleMon *GetIllusionDisguise(BtlMainModule *mainModule, BtlPokeCon *pokeCon, B
     return mon;
 }
 
-void PokeCon_Init(BtlPokeCon *pokeCon, BtlMainModule *mainModule, u32 unkE4) {
+void PokeCon_Init(BtlPokeCon *pokeCon, BtlMainModule *mainModule, u32 forServer) {
     u32 i;
 
     pokeCon->mainModule = mainModule;
-    pokeCon->unkE4 = unkE4;
+    pokeCon->forServer = forServer;
     for (i = 0; i < 4; i++) {
         BattleParty_Clear(&pokeCon->parties[i]);
     }
@@ -2500,10 +2503,10 @@ void PokeCon_CreateClientParty(BtlPokeCon *pokeCon, BtlMainModule *mainModule, u
     PartyPkm *pkm;
     u8 firstMonId;
 
-    srcParty = GetClientSrcParty(mainModule, clientId, pokeCon->unkE4);
+    srcParty = GetClientSrcParty(mainModule, clientId, pokeCon->forServer);
     battleParty = &pokeCon->parties[clientId];
     count = PokeParty_GetPkmCount(srcParty);
-    firstMonId = data_ov167_021d6c24[clientId];
+    firstMonId = sClientFirstMonIds[clientId];
     pokeCon->srcParties[clientId] = srcParty;
     for (monId = firstMonId, i = 0; i < count; i++) {
         pkm = PokeParty_GetPkm(srcParty, i);
@@ -2520,12 +2523,12 @@ void PokeCon_CreateClientParty(BtlPokeCon *pokeCon, BtlMainModule *mainModule, u
             i++;
         }
     }
-    if (BtlSetup_GetBattleType(mainModule) == 0 && clientId == 1) {
+    if (BtlSetup_GetBattleType(mainModule) == BTL_TYPE_WILD && clientId == 1) {
         for (i = 0; i < count; firstMonId++) {
             mon = pokeCon->mons[firstMonId];
             if (GetBattleMonSpecies(mon) == SPECIES_ZOROARK &&
                 GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_ILLUSION) {
-                party = GetClientSrcParty(mainModule, 0, pokeCon->unkE4);
+                party = GetClientSrcParty(mainModule, 0, pokeCon->forServer);
                 species = 0;
                 partyCount = PokeParty_GetPkmCount(party);
                 for (k = 0; k < partyCount; k++) {
@@ -2545,11 +2548,11 @@ void PokeCon_CreateClientParty(BtlPokeCon *pokeCon, BtlMainModule *mainModule, u
                     }
                 }
                 if (species != 0) {
-                    if (mainModule->unk2C0 == NULL) {
-                        mainModule->unk2C0 = PokeParty_NewTempPkm(species, GetBattleMonStat(mon, BATTLEMON_LEVEL), 0,
-                                                                  mainModule->heapId);
+                    if (mainModule->wildIllusionPkm == NULL) {
+                        mainModule->wildIllusionPkm = PokeParty_NewTempPkm(
+                            species, GetBattleMonStat(mon, BATTLEMON_LEVEL), 0, mainModule->heapId);
                     }
-                    SetIllusionDisguise(mon, mainModule->unk2C0);
+                    SetIllusionDisguise(mon, mainModule->wildIllusionPkm);
                 }
             }
             i++;
@@ -2597,14 +2600,14 @@ void PokeCon_StoreClientSrcParty(BtlPokeCon *pokeCon, BtlMainModule *mainModule,
     srcParty = PokeCon_GetSrcParty(pokeCon, clientId);
     party = GetPartyData(pokeCon, clientId);
     count = PokeParty_GetPkmCount(srcParty);
-    PokeParty_Init(mainModule->unk2B8);
+    PokeParty_Init(mainModule->tempParty);
     for (i = 0; i < 6; i++) {
         disguiseSlots[i] = 6;
     }
     for (i = 0; i < count; i++) {
         mon = BattleParty_GetMon(party, i);
         BattleMon_WriteToSrc(mon, keepBaseForm);
-        PokeParty_AddPkm(mainModule->unk2B8, GetSrcData(mon));
+        PokeParty_AddPkm(mainModule->tempParty, GetSrcData(mon));
         if (IsIllusionEnabled(mon)) {
             disguise = BattleMon_GetViewSrcData(mon);
             for (j = 0; j < count; j++) {
@@ -2615,7 +2618,7 @@ void PokeCon_StoreClientSrcParty(BtlPokeCon *pokeCon, BtlMainModule *mainModule,
             }
         }
     }
-    PokeParty_Copy(mainModule->unk2B8, srcParty);
+    PokeParty_Copy(mainModule->tempParty, srcParty);
     for (i = 0; i < count; i++) {
         pkm = PokeParty_GetPkm(srcParty, i);
         mon = BattleParty_GetMon(party, i);
@@ -2638,22 +2641,22 @@ void PokeCon_StoreClientSrcPartyInOrder(BtlPokeCon *pokeCon, BtlMainModule *main
     srcParty = PokeCon_GetSrcParty(pokeCon, clientId);
     party = GetPartyData(pokeCon, clientId);
     count = PokeParty_GetPkmCount(srcParty);
-    PokeParty_Init(mainModule->unk2B8);
-    firstMonId = data_ov167_021d6c24[clientId];
+    PokeParty_Init(mainModule->tempParty);
+    firstMonId = sClientFirstMonIds[clientId];
     for (i = 0; i < count; i++) {
         for (j = 0; j < count; j++) {
             mon = BattleParty_GetMon(party, j);
             if (firstMonId + i == GetMonID(mon)) {
                 BattleMon_WriteToSrc(mon, TRUE);
-                PokeParty_AddPkm(mainModule->unk2B8, GetSrcData(mon));
+                PokeParty_AddPkm(mainModule->tempParty, GetSrcData(mon));
                 if (BattleMon_HasAppeared(mon)) {
-                    mainModule->setup->unkE1[i] = 1;
+                    mainModule->setup->appeared[i] = 1;
                 }
                 break;
             }
         }
     }
-    PokeParty_Copy(mainModule->unk2B8, srcParty);
+    PokeParty_Copy(mainModule->tempParty, srcParty);
 }
 
 PokeParty *PokeCon_GetSrcParty(BtlPokeCon *pokeCon, u8 clientId) {
@@ -2717,8 +2720,8 @@ const BattleMon *GetPokeParamConst(const BtlPokeCon *pokeCon, u8 monId) {
 BOOL GetViewPosChatter(BtlMainModule *mainModule, u32 index, PerapVoice **out) {
     u8 clientId = GetClientIDFromPos(mainModule, ViewPosToBattlePos(mainModule, index));
 
-    if (mainModule->unk3E0[clientId] != NULL) {
-        *out = mainModule->unk3E0[clientId];
+    if (mainModule->chatters[clientId] != NULL) {
+        *out = mainModule->chatters[clientId];
         return TRUE;
     }
     return FALSE;
@@ -2726,8 +2729,8 @@ BOOL GetViewPosChatter(BtlMainModule *mainModule, u32 index, PerapVoice **out) {
 
 u8 GetClientChatterEffect(BtlMainModule *mainModule, u8 clientId) {
     if (!IsRecPlayMode(mainModule)) {
-        if (mainModule->unk3E0[clientId] != NULL && doesChatotExist(mainModule->unk3E0[clientId])) {
-            return PerapVoice_GetChatterEffect(mainModule->unk3E0[clientId]);
+        if (mainModule->chatters[clientId] != NULL && doesChatotExist(mainModule->chatters[clientId])) {
+            return PerapVoice_GetChatterEffect(mainModule->chatters[clientId]);
         }
         return 0;
     }
@@ -2741,19 +2744,19 @@ u8 GetClientBattlerCount(BtlMainModule *mainModule, u8 clientId) {
 u8 GetClientBenchStart(BtlMainModule *mainModule, u8 clientId) {
     u8 count = CalcClientBattlerCount(mainModule, clientId);
 
-    if (BtlSetup_GetBattleStyle(mainModule) == 3) {
+    if (BtlSetup_GetBattleStyle(mainModule) == BTL_STYLE_ROTATION) {
         count += 2;
     }
     return count;
 }
 
 const AdjacentOpponentData *GetAdjacentOpponentData(u8 pos) {
-    static const AdjacentOpponentData data_ov167_021d6ca4[BTL_POS_MAX] = {
+    static const AdjacentOpponentData sAdjacentOpponentData[BTL_POS_MAX] = {
         { 2, 2, { 5, 3, 6 }, { 0, 2, 6 } }, { 2, 2, { 4, 2, 6 }, { 1, 3, 6 } }, { 3, 3, { 1, 3, 5 }, { 0, 2, 4 } },
         { 3, 3, { 0, 2, 4 }, { 1, 3, 5 } }, { 2, 2, { 1, 3, 6 }, { 4, 2, 6 } }, { 2, 2, { 0, 2, 6 }, { 5, 3, 6 } },
     };
 
-    return &data_ov167_021d6ca4[pos];
+    return &sAdjacentOpponentData[pos];
 }
 
 BOOL IsTripleCenterPos(u8 pos) {
@@ -2768,7 +2771,7 @@ BOOL IsTripleCenterPos(u8 pos) {
 
 BOOL GetNonAdjacentOpponentPos(u8 pos, u8 *out) {
     if (!IsTripleCenterPos(pos)) {
-        *out = GetOpposingPosForStyle(2, pos, pos >> 1);
+        *out = GetOpposingPosForStyle(BTL_STYLE_TRIPLE, pos, pos >> 1);
         return TRUE;
     }
     return FALSE;
@@ -2856,7 +2859,7 @@ u8 PokeCon_GetClientAliveCount(BtlPokeCon *pokeCon, u8 clientId) {
 }
 
 void AddClientShooterEnergy(BtlMainModule *mainModule, u8 clientId, u8 value) {
-    if (mainModule->unk46E != 0 && DoesClientExist(mainModule, clientId) && mainModule->clients[clientId] != NULL) {
+    if (mainModule->isServer != 0 && DoesClientExist(mainModule, clientId) && mainModule->clients[clientId] != NULL) {
         BattleClient_AddShooterEnergy(mainModule->clients[clientId], value);
     }
 }
@@ -3020,7 +3023,7 @@ void UpdatePartyIllusionDisguises(BtlMainModule *mainModule, BattleParty *party,
             break;
         }
     }
-    if (BtlSetup_GetBattleStyle(mainModule) != 3) {
+    if (BtlSetup_GetBattleStyle(mainModule) != BTL_STYLE_ROTATION) {
         i = GetClientPosCount(mainModule, clientId);
     } else {
         i = 3;
@@ -3030,7 +3033,7 @@ void UpdatePartyIllusionDisguises(BtlMainModule *mainModule, BattleParty *party,
         if (GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_ILLUSION) {
             if (i < last) {
                 SetIllusionDisguise(mon, GetSrcData(party->mons[last]));
-            } else if (BattleMon_GetViewSrcData(mon) != mainModule->unk2C0) {
+            } else if (BattleMon_GetViewSrcData(mon) != mainModule->wildIllusionPkm) {
                 BattleMon_ResetIllusion(mon);
             }
         }
@@ -3045,11 +3048,11 @@ void BtlMain_InitTrainers(BtlMainModule *mainModule) {
 
     for (i = 0; i < 4; i++) {
         mainModule->trainers[i].playerInfo = NULL;
-        mainModule->trainers[i].unk0A = 0;
-        mainModule->trainers[i].unk0C = 0;
+        mainModule->trainers[i].trainerId = 0;
+        mainModule->trainers[i].aiFlags = 0;
     }
     for (i = 0; i < 4; i++) {
-        mainModule->unk3E0[i] = NULL;
+        mainModule->chatters[i] = NULL;
     }
 }
 
@@ -3067,9 +3070,9 @@ void BtlMain_FreeTrainers(BtlMainModule *mainModule) {
         }
     }
     for (i = 0; i < 4; i++) {
-        if (mainModule->unk3E0[i] != NULL) {
-            GFL_HeapFree(mainModule->unk3E0[i]);
-            mainModule->unk3E0[i] = NULL;
+        if (mainModule->chatters[i] != NULL) {
+            GFL_HeapFree(mainModule->chatters[i]);
+            mainModule->chatters[i] = NULL;
         }
     }
 }
@@ -3081,19 +3084,19 @@ void TrainerData_SetFromPlayer(BtlTrainerData *trainer, HeapID heapId, PlayerInf
     trainer->playerInfo = PlayerInfo_Create(heapId);
     PlayerInfo_Copy(src, trainer->playerInfo);
     trainerClass = 0;
-    trainer->unk0A = 0;
+    trainer->trainerId = 0;
     version = PlayerInfo_GetVersion(src);
     if (version == VERSION_WHITE2 || version == VERSION_BLACK2) {
         if (getTrainerGender(trainer->playerInfo)) {
             trainerClass = 1;
         }
-        trainer->unk08 = trainerClass;
+        trainer->trainerClass = trainerClass;
     } else {
-        trainer->unk08 = getTrainerGender(trainer->playerInfo) == 0 ? 0xb6 : 0xb7;
+        trainer->trainerClass = getTrainerGender(trainer->playerInfo) == 0 ? 0xb6 : 0xb7;
     }
     trainer->name = copyTrainerNameToNewStrbuf(trainer->playerInfo->name, HEAPID_BATTLE);
-    PMSData_Clear(&trainer->unk18);
-    PMSData_Clear(&trainer->unk20);
+    PMSData_Clear(&trainer->winWords);
+    PMSData_Clear(&trainer->loseWords);
 }
 
 void TrainerData_SetFromSetup(BtlTrainerData *trainer, const BtlSetupTrainer *src) {
@@ -3101,22 +3104,22 @@ void TrainerData_SetFromSetup(BtlTrainerData *trainer, const BtlSetupTrainer *sr
 
     trainer->playerInfo = NULL;
     if (src != NULL) {
-        trainer->unk0A = src->trainerId;
-        trainer->unk08 = src->trainerClass;
+        trainer->trainerId = src->trainerId;
+        trainer->trainerClass = src->trainerClass;
         trainer->name = GFL_StrBufClone(src->name, HEAPID_BATTLE);
-        trainer->unk0C = src->aiFlags;
-        MI_CpuCopy8(src->items, trainer->unk10, sizeof(trainer->unk10));
-        PMSData_Copy(&trainer->unk18, &src->unk18);
-        PMSData_Copy(&trainer->unk20, &src->unk20);
+        trainer->aiFlags = src->aiFlags;
+        MI_CpuCopy8(src->items, trainer->items, sizeof(trainer->items));
+        PMSData_Copy(&trainer->winWords, &src->winWords);
+        PMSData_Copy(&trainer->loseWords, &src->loseWords);
     } else {
-        trainer->unk0A = 0;
-        trainer->unk08 = 0;
+        trainer->trainerId = 0;
+        trainer->trainerClass = 0;
         trainer->name = NULL;
         for (i = 0; i < 4; i++) {
-            trainer->unk10[i] = 0;
+            trainer->items[i] = 0;
         }
-        PMSData_Clear(&trainer->unk18);
-        PMSData_Clear(&trainer->unk20);
+        PMSData_Clear(&trainer->winWords);
+        PMSData_Clear(&trainer->loseWords);
     }
 }
 
@@ -3125,23 +3128,23 @@ void TrainerData_SetFromComm(BtlTrainerData *trainer, const BtlCommTrainerData *
 
     trainer->playerInfo = NULL;
     if (src != NULL) {
-        trainer->unk0A = src->trainerId;
-        trainer->unk08 = src->trainerClass;
+        trainer->trainerId = src->trainerId;
+        trainer->trainerClass = src->trainerClass;
         trainer->name = GFL_StrBufCreate(0x20, HEAPID_BATTLE);
         GFL_StrBufCopyString(trainer->name, src->name, src->nameLength + 1);
-        trainer->unk0C = src->aiFlags;
-        MI_CpuCopy8(src->items, trainer->unk10, sizeof(trainer->unk10));
-        PMSData_Copy(&trainer->unk18, &src->unk18);
-        PMSData_Copy(&trainer->unk20, &src->unk20);
+        trainer->aiFlags = src->aiFlags;
+        MI_CpuCopy8(src->items, trainer->items, sizeof(trainer->items));
+        PMSData_Copy(&trainer->winWords, &src->winWords);
+        PMSData_Copy(&trainer->loseWords, &src->loseWords);
     } else {
-        trainer->unk0A = 0;
-        trainer->unk08 = 0;
+        trainer->trainerId = 0;
+        trainer->trainerClass = 0;
         trainer->name = NULL;
         for (i = 0; i < 4; i++) {
-            trainer->unk10[i] = 0;
+            trainer->items[i] = 0;
         }
-        PMSData_Clear(&trainer->unk18);
-        PMSData_Clear(&trainer->unk20);
+        PMSData_Clear(&trainer->winWords);
+        PMSData_Clear(&trainer->loseWords);
     }
 }
 
@@ -3157,48 +3160,48 @@ u16 GetClientTrainerItem(BtlMainModule *mainModule, u8 clientId, u8 index) {
         BtlTrainerData *trainer = &mainModule->trainers[clientId];
 
         if (index < 4) {
-            return trainer->unk10[index];
+            return trainer->items[index];
         }
     }
     return 0;
 }
 
 StrBuf *GetClientTrainerName(BtlMainModule *mainModule, u8 clientId, u32 *trainerClass) {
-    *trainerClass = mainModule->trainers[clientId].unk08;
+    *trainerClass = mainModule->trainers[clientId].trainerClass;
     return mainModule->trainers[clientId].name;
 }
 
 u32 GetClientAIFlags(BtlMainModule *mainModule, u8 clientId) {
-    if (BtlSetup_GetBattleType(mainModule) == 0) {
+    if (BtlSetup_GetBattleType(mainModule) == BTL_TYPE_WILD) {
         if (BtlSetup_IsBattleType(mainModule, 8)) {
             return 0x800;
         }
-        if (BtlSetup_GetBattleStyle(mainModule) == 1) {
+        if (BtlSetup_GetBattleStyle(mainModule) == BTL_STYLE_DOUBLE) {
             return 0x80;
         }
     } else if (IsClientNPCTrainer(mainModule, clientId)) {
-        return mainModule->trainers[clientId].unk0C;
+        return mainModule->trainers[clientId].aiFlags;
     }
     return 0;
 }
 
 u16 GetClientTrainerID(BtlMainModule *mainModule, u8 clientId) {
     if (IsClientNPCTrainer(mainModule, clientId)) {
-        return mainModule->trainers[clientId].unk0A;
+        return mainModule->trainers[clientId].trainerId;
     }
     return 0;
 }
 
 u32 GetClientTrainerClass(BtlMainModule *mainModule, u8 clientId) {
-    return mainModule->trainers[clientId].unk08;
+    return mainModule->trainers[clientId].trainerClass;
 }
 
 PMSData *GetClientTrainerMsg(BtlMainModule *mainModule, u8 clientId, u32 which) {
-    if (BtlSetup_GetBattleType(mainModule) == 2 && IsClientNPCTrainer(mainModule, clientId)) {
+    if (BtlSetup_GetBattleType(mainModule) == BTL_TYPE_FACILITY && IsClientNPCTrainer(mainModule, clientId)) {
         if (which == 1) {
-            return &mainModule->trainers[clientId].unk20;
+            return &mainModule->trainers[clientId].loseWords;
         }
-        return &mainModule->trainers[clientId].unk18;
+        return &mainModule->trainers[clientId].winWords;
     }
     return NULL;
 }
@@ -3222,51 +3225,51 @@ void BtlMain_CreateSrcParties(BtlMainModule *mainModule) {
     u32 i;
 
     for (i = 0; i < 4; i++) {
-        mainModule->unk298[i] = PokeParty_Create(HEAPID_BATTLE);
-        mainModule->unk2A8[i] = PokeParty_Create(HEAPID_BATTLE);
+        mainModule->clientSrcParties[i] = PokeParty_Create(HEAPID_BATTLE);
+        mainModule->serverSrcParties[i] = PokeParty_Create(HEAPID_BATTLE);
     }
-    mainModule->unk2B8 = PokeParty_Create(HEAPID_BATTLE);
+    mainModule->tempParty = PokeParty_Create(HEAPID_BATTLE);
 }
 
 void BtlMain_FreeSrcParties(BtlMainModule *mainModule) {
     u32 i;
 
     for (i = 0; i < 4; i++) {
-        if (mainModule->unk298[i] != NULL) {
-            GFL_HeapFree(mainModule->unk298[i]);
-            mainModule->unk298[i] = NULL;
+        if (mainModule->clientSrcParties[i] != NULL) {
+            GFL_HeapFree(mainModule->clientSrcParties[i]);
+            mainModule->clientSrcParties[i] = NULL;
         }
-        if (mainModule->unk2A8[i] != NULL) {
-            GFL_HeapFree(mainModule->unk2A8[i]);
-            mainModule->unk2A8[i] = NULL;
+        if (mainModule->serverSrcParties[i] != NULL) {
+            GFL_HeapFree(mainModule->serverSrcParties[i]);
+            mainModule->serverSrcParties[i] = NULL;
         }
     }
-    if (mainModule->unk2B8 != NULL) {
-        GFL_HeapFree(mainModule->unk2B8);
-        mainModule->unk2B8 = NULL;
+    if (mainModule->tempParty != NULL) {
+        GFL_HeapFree(mainModule->tempParty);
+        mainModule->tempParty = NULL;
     }
 }
 
 void SetClientSrcParty(BtlMainModule *mainModule, u8 clientId, const PokeParty *party) {
-    if (mainModule->unk298[clientId] != NULL) {
-        PokeParty_Init(mainModule->unk298[clientId]);
-        PokeParty_Init(mainModule->unk2A8[clientId]);
-        PokeParty_Copy(party, mainModule->unk298[clientId]);
-        PokeParty_Copy(party, mainModule->unk2A8[clientId]);
-        if (PokeParty_GetPkmCount(mainModule->unk2A8[clientId]) != 0) {
-            PokeParty_GetPkm(mainModule->unk2A8[clientId], 0);
+    if (mainModule->clientSrcParties[clientId] != NULL) {
+        PokeParty_Init(mainModule->clientSrcParties[clientId]);
+        PokeParty_Init(mainModule->serverSrcParties[clientId]);
+        PokeParty_Copy(party, mainModule->clientSrcParties[clientId]);
+        PokeParty_Copy(party, mainModule->serverSrcParties[clientId]);
+        if (PokeParty_GetPkmCount(mainModule->serverSrcParties[clientId]) != 0) {
+            PokeParty_GetPkm(mainModule->serverSrcParties[clientId], 0);
         }
     }
 }
 
-PokeParty *GetClientSrcParty(BtlMainModule *mainModule, u8 clientId, u32 useSecond) {
-    if (useSecond) {
-        if (PokeParty_GetPkmCount(mainModule->unk2A8[clientId]) != 0) {
-            PokeParty_GetPkm(mainModule->unk2A8[clientId], 0);
+PokeParty *GetClientSrcParty(BtlMainModule *mainModule, u8 clientId, u32 forServer) {
+    if (forServer) {
+        if (PokeParty_GetPkmCount(mainModule->serverSrcParties[clientId]) != 0) {
+            PokeParty_GetPkm(mainModule->serverSrcParties[clientId], 0);
         }
-        return mainModule->unk2A8[clientId];
+        return mainModule->serverSrcParties[clientId];
     }
-    return mainModule->unk298[clientId];
+    return mainModule->clientSrcParties[clientId];
 }
 
 u32 BtlSetup_IsBattleType(BtlMainModule *mainModule, u32 flag) {
@@ -3289,11 +3292,11 @@ void AddRecord(BtlMainModule *mainModule, u32 record, u32 value) {
     }
 }
 
-u8 *func_ov167_0219db00(BtlMainModule *mainModule) {
+u8 *GetShooterSettings(BtlMainModule *mainModule) {
     return mainModule->setup->unk90;
 }
 
-BOOL func_ov167_0219db08(BtlMainModule *mainModule) {
+BOOL IsShooterEnabled(BtlMainModule *mainModule) {
     BOOL result = FALSE;
 
     switch (BtlMain_IsCommCompetitor(mainModule->setup)) {
@@ -3306,14 +3309,14 @@ BOOL func_ov167_0219db08(BtlMainModule *mainModule) {
     return result;
 }
 
-BOOL func_ov167_0219db28(BtlMainModule *mainModule) {
+BOOL IsBagEnabled(BtlMainModule *mainModule) {
     if (!mainModule->setup->unkDD_5) {
         if (BtlMain_IsCommCompetitor(mainModule->setup) == 1) {
-            return func_ov167_0219db08(mainModule);
+            return IsShooterEnabled(mainModule);
         }
         switch (BtlSetup_GetBattleType(mainModule)) {
-        case 0:
-        case 1:
+        case BTL_TYPE_WILD:
+        case BTL_TYPE_TRAINER:
             return TRUE;
         default:
             return FALSE;
@@ -3329,17 +3332,17 @@ void NotifyMonLevelUp(BtlMainModule *mainModule, BattleMon *mon) {
 
 void ChangeFriendshipByItem(BtlMainModule *mainModule, BattleMon *mon, u16 item) {
     u8 monId;
-    const BattleMon *param1;
-    const BattleMon *param2;
+    const BattleMon *serverMon;
+    const BattleMon *clientMon;
     PartyPkm *src1;
     PartyPkm *src2;
     const BtlFieldSituation *field;
 
     monId = GetMonID(mon);
-    param1 = GetPokeParamConst(&mainModule->pokeCons[1], monId);
-    param2 = GetPokeParamConst(&mainModule->pokeCons[0], monId);
-    src1 = GetSrcData(param1);
-    src2 = GetSrcData(param2);
+    serverMon = GetPokeParamConst(&mainModule->pokeCons[1], monId);
+    clientMon = GetPokeParamConst(&mainModule->pokeCons[0], monId);
+    src1 = GetSrcData(serverMon);
+    src2 = GetSrcData(clientMon);
     field = GetFieldEffectData(mainModule);
     FriendshipManagerCalcItem(src1, item, field->env.zoneId, HEAPID_TAIL(mainModule->heapId));
     FriendshipManagerCalcItem(src2, item, field->env.zoneId, HEAPID_TAIL(mainModule->heapId));
@@ -3370,17 +3373,18 @@ void BtlMain_StorePartiesToSetup(BtlMainModule *mainModule) {
     u8 slot;
     BattleMon *mon;
 
-    if (mainModule->setup->fieldSituation.unk1b != 0 || GetStudioMode(mainModule) != 0) {
+    if (mainModule->setup->fieldSituation.unk1b != 0 || GetStudioMode(mainModule) != BTL_STUDIO_MODE_NONE) {
         return;
     }
-    if (mainModule->setup->battleType <= 1) {
+    if (mainModule->setup->battleType <= BTL_TYPE_TRAINER) {
         PokeCon_StoreClientSrcPartyInOrder(&mainModule->pokeCons[1], mainModule, mainModule->playerClientId);
         party = PokeCon_GetSrcParty(&mainModule->pokeCons[1], mainModule->playerClientId);
-        if (mainModule->setup->battleType == 1 && BtlCalc_IsBossTrainerClass(GetClientTrainerClass(mainModule, 1))) {
+        if (mainModule->setup->battleType == BTL_TYPE_TRAINER &&
+            BtlCalc_IsBossTrainerClass(GetClientTrainerClass(mainModule, 1))) {
             FriendshipManagerCalcParty(party, GetFieldEffectData(mainModule)->env.zoneId,
                                        HEAPID_TAIL(mainModule->heapId));
         }
-        if (mainModule->setup->battleType == 1) {
+        if (mainModule->setup->battleType == BTL_TYPE_TRAINER) {
             count = PokeParty_GetPkmCount(party);
             for (i = 0; i < count; i++) {
                 original = PokeParty_GetPkm(mainModule->setup->party[0], i);
@@ -3398,12 +3402,12 @@ void BtlMain_StorePartiesToSetup(BtlMainModule *mainModule) {
             PokeParty_GetPkm(party, i);
         }
     }
-    if (mainModule->setup->battleType == 0) {
+    if (mainModule->setup->battleType == BTL_TYPE_WILD) {
         clientId = GetOpponentClientID(mainModule, mainModule->playerClientId, 0);
         PokeCon_StoreClientSrcParty(&mainModule->pokeCons[1], mainModule, clientId, TRUE);
         PokeParty_Copy(PokeCon_GetSrcParty(&mainModule->pokeCons[1], clientId), mainModule->setup->party[1]);
     }
-    if (mainModule->setup->battleType == 4) {
+    if (mainModule->setup->battleType == BTL_TYPE_CAPTURE_DEMO) {
         return;
     }
     for (j = 0; j < 4; j++) {
@@ -3416,7 +3420,7 @@ void BtlMain_StorePartiesToSetup(BtlMainModule *mainModule) {
             monCount = GetNumMonsInParty(battleParty);
             maxHP = 0;
             hp = 0;
-            firstMonId = data_ov167_021d6c24[index];
+            firstMonId = sClientFirstMonIds[index];
             for (i = 0; i < monCount; i++) {
                 mon = BattleParty_GetMon(battleParty, i);
                 slot = GetMonID(mon) - firstMonId;
@@ -3435,8 +3439,8 @@ void BtlMain_StorePartiesToSetup(BtlMainModule *mainModule) {
 
 BOOL BtlMain_IsCommTrainerBattle(BtlMainModule *mainModule) {
     switch (BtlSetup_GetBattleType(mainModule)) {
-    case 2:
-    case 3:
+    case BTL_TYPE_FACILITY:
+    case BTL_TYPE_COMM:
         return TRUE;
     default:
         return FALSE;
@@ -3446,14 +3450,14 @@ BOOL BtlMain_IsCommTrainerBattle(BtlMainModule *mainModule) {
 u32 BtlMain_DetermineResult(BtlMainModule *mainModule) {
     u32 result;
 
-    if (BtlSetup_GetBattleType(mainModule) == 4) {
+    if (BtlSetup_GetBattleType(mainModule) == BTL_TYPE_CAPTURE_DEMO) {
         result = BTL_RESULT_VICTORY;
-    } else if (mainModule->unk473_0) {
+    } else if (mainModule->commError) {
         result = BTL_RESULT_6;
-    } else if (mainModule->setup->unkAC != 6) {
+    } else if (mainModule->setup->capturedSlot != 6) {
         result = BTL_RESULT_CAPTURE;
-    } else if (BtlClientIDList_GetCount(&mainModule->unk448)) {
-        result = BtlClientIDList_GetEscapeResult(&mainModule->unk448, mainModule->playerClientId,
+    } else if (BtlClientIDList_GetCount(&mainModule->clientIdList)) {
+        result = BtlClientIDList_GetEscapeResult(&mainModule->clientIdList, mainModule->playerClientId,
                                                  BtlSetup_GetBattleType(mainModule));
     } else {
         if (mainModule->result == BTL_RESULT_NOT_SET) {
@@ -3466,16 +3470,16 @@ u32 BtlMain_DetermineResult(BtlMainModule *mainModule) {
 }
 
 u16 GetCommandTimeLimit(BtlMainModule *mainModule) {
-    return mainModule->unk442;
+    return mainModule->commandTimeLimit;
 }
 
 u16 GetGameTimeLimit(BtlMainModule *mainModule) {
-    return mainModule->unk440;
+    return mainModule->gameTimeLimit;
 }
 
 BOOL IsGameTimeUp(BtlMainModule *mainModule) {
     if (mainModule->setup->fieldSituation.unk1b == 0) {
-        if (mainModule->unk440 != 0) {
+        if (mainModule->gameTimeLimit != 0) {
             return BattleClient_IsGameTimeUp(mainModule->clients[mainModule->playerClientId]);
         }
         return FALSE;
@@ -3507,8 +3511,8 @@ void SetSetupParty(BtlMainModule *mainModule, u8 clientId, const PokeParty *part
 void SetSetupPlayerInfo(BtlMainModule *mainModule, u8 clientId, const PlayerInfo *src) {
     u8 index = ClientIDToSetupIndex(mainModule->playerClientId, clientId);
 
-    if (mainModule->setup->unk34[index] != NULL) {
-        PlayerInfo_Copy(src, mainModule->setup->unk34[index]);
+    if (mainModule->setup->playerInfo[index] != NULL) {
+        PlayerInfo_Copy(src, mainModule->setup->playerInfo[index]);
     }
 }
 
@@ -3548,11 +3552,11 @@ u8 ClientIDToSetupIndex(u8 playerClientId, u8 clientId) {
     return result;
 }
 
-void BtlMain_StartRecSkip(BtlMainModule *mainModule, u32 arg1) {
-    u8 unk;
+void BtlMain_StartRecSkip(BtlMainModule *mainModule, u32 chapter) {
+    u8 commCompetitor;
     u32 i;
 
-    unk = BtlMain_IsCommCompetitor(mainModule->setup);
+    commCompetitor = BtlMain_IsCommCompetitor(mainModule->setup);
     BtlCalc_ResetRand(&mainModule->rand);
     BtlMain_LoadSetupParties(mainModule, mainModule->setup);
     PokeCon_Clear(&mainModule->pokeCons[0]);
@@ -3561,13 +3565,13 @@ void BtlMain_StartRecSkip(BtlMainModule *mainModule, u32 arg1) {
         if (DoesClientExist(mainModule, i)) {
             PokeCon_CreateClientParty(&mainModule->pokeCons[1], mainModule, i);
             PokeCon_CreateClientParty(&mainModule->pokeCons[0], mainModule, i);
-            BattleClient_StartChapterSkip(mainModule->clients[i], arg1);
+            BattleClient_StartChapterSkip(mainModule->clients[i], chapter);
         }
     }
     BtlvCore_Delete(mainModule->viewCore);
     BtlvCore_ResetGraphics(0x13);
     mainModule->viewCore = BtlvCore_Create(mainModule, mainModule->clients[mainModule->setup->fieldSituation.unk19],
-                                           &mainModule->pokeCons[0], unk, 0x13);
+                                           &mainModule->pokeCons[0], commCompetitor, 0x13);
     BattleClient_SetViewCore(mainModule->clients[mainModule->setup->fieldSituation.unk19], mainModule->viewCore);
     BattleServer_Start(mainModule->server);
 }
@@ -3646,7 +3650,7 @@ void BtlMain_StoreResultStats(BtlMainModule *mainModule) {
     }
 }
 
-u32 func_ov167_0219e300(BtlMainModule *mainModule) {
+u32 GetPlayerFirstActionMove(BtlMainModule *mainModule) {
     return BattleClient_GetFirstActionMove(mainModule->clients[0]);
 }
 
@@ -3658,35 +3662,35 @@ BtlSetup *GetBattleSetupParam(BtlMainModule *mainModule) {
     return mainModule->setup;
 }
 
-void BtlMain_LoadStudioData(BtlMainModule *mainModule, u8 arg1) {
-    mainModule->unk474 = GFL_ArcSysReadHeapNew(0x10d, arg1, HEAPID_BATTLE);
-    mainModule->unk478 = GFL_HeapAllocate(HEAPID_BATTLE, 0x14, FALSE, "btl_main.c", 6432);
-    func_ov167_0219e3c8(mainModule->unk474);
-    mainModule->unk478->unk08 = 0xff;
+void BtlMain_LoadStudioData(BtlMainModule *mainModule, u8 movie) {
+    mainModule->studioRules = GFL_ArcSysReadHeapNew(ARCID_POKEWOOD_MOVIE, movie, HEAPID_BATTLE);
+    mainModule->studioWork = GFL_HeapAllocate(HEAPID_BATTLE, 0x14, FALSE, "btl_main.c", 6432);
+    func_ov167_0219e3c8(mainModule->studioRules);
+    mainModule->studioWork->aiMoveIndex = 0xff;
     mainModule->cutin = PokewoodCutin_Create(HEAPID_BATTLE);
-    if (GetStudioMode(mainModule) == 2) {
+    if (GetStudioMode(mainModule) == BTL_STUDIO_MODE_PLAYBACK) {
         SkipExitBGMFadeOut(mainModule);
     }
 }
 
 void BtlMain_FreeStudioData(BtlMainModule *mainModule) {
     PokewoodCutin_Delete(mainModule->cutin);
-    GFL_HeapFree(mainModule->unk478);
-    GFL_HeapFree(mainModule->unk474);
+    GFL_HeapFree(mainModule->studioWork);
+    GFL_HeapFree(mainModule->studioRules);
 }
 
 BtlScriptedRules *GetStudioRules(BtlMainModule *mainModule) {
-    if (mainModule->unk474 == NULL) {
+    if (mainModule->studioRules == NULL) {
         return NULL;
     }
-    return mainModule->unk474;
+    return mainModule->studioRules;
 }
 
-BtlMainUnk478 *func_ov167_0219e3ac(BtlMainModule *mainModule) {
-    if (mainModule->unk478 == NULL) {
+BtlStudioWork *GetStudioWork(BtlMainModule *mainModule) {
+    if (mainModule->studioWork == NULL) {
         return NULL;
     }
-    return mainModule->unk478;
+    return mainModule->studioWork;
 }
 
 PokewoodCutin *GetPokewoodCutin(BtlMainModule *mainModule) {

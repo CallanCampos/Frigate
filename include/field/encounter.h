@@ -86,9 +86,11 @@ BOOL EncData_Load(EncData *encData, ArcTool *arc, u16 zoneId, u8 season);
 EncountState *EncountState_Create(HeapID heapId);
 void EncountState_Free(EncountState *state);
 void EncountState_SetTerrain(EncountState *state, u32 terrain);
-void func_ov012_0215917c(GameData *gameData, Field *field);
+// Loads the zone's effect encounters and the terrain under the player, after a seamless zone change
+void GameData_LoadEncountZone(GameData *gameData, Field *field);
 void GameData_ResetPhenomenonSteps(GameData *gameData);
-void func_ov012_021591f4(GameData *gameData);
+// Called when the zone changes seamlessly; a stub
+void Encount_OnZoneChange(GameData *gameData);
 u16 EncountSave_GetRoamingPkmZone(EncountSave *save, u8 slot);
 u16 getSwarmLevelRangeFromData(GameData *gameData);
 u32 EncountSave_HasActiveEntry(EncountSave *save);

@@ -13,7 +13,8 @@
 
 // Where a player is, as the players send it to each other
 typedef struct {
-    u32 unk0;
+    // Set while the player's field is loading, which hides their actor
+    u32 busy;
     VecFx32 pos;
     u16 dir;
     u8 exState;
@@ -21,9 +22,9 @@ typedef struct {
 
 typedef struct {
     VecFx32 pos;
-    u32 unkC;
+    u32 busy;
     u16 dir;
-    u16 unk12;
+    u16 modelId;
     u8 active : 1;
     // Set while the actor is taken down for the field to close
     u8 hidden : 1;
@@ -46,15 +47,16 @@ struct CommPlayerSys {
     CommPlayerSent last;
     u32 unk88;
     u16 heapId;
-    u8 unk8E;
+    // FldCommActSys_Create's count and allowRun
+    u8 count;
     u8 unk8F;
-    u8 unk90;
+    u8 allowRun;
 };
 
-CommPlayerSys *CommPlayer_Init(u8 a0, GameSystem *gsys, HeapID heapId, u8 a3);
+CommPlayerSys *CommPlayer_Init(u8 count, GameSystem *gsys, HeapID heapId, u8 allowRun);
 void CommPlayer_Exit(GameSystem *gsys, CommPlayerSys *cps);
 void CommPlayer_Update(GameSystem *gsys, CommPlayerSys *cps);
-void CommPlayer_Add(CommPlayerSys *cps, int index, u16 a2, const CommPlayerStatus *status);
+void CommPlayer_Add(CommPlayerSys *cps, int index, u16 modelId, const CommPlayerStatus *status);
 // Takes the actors down before the field closes, and puts them back after
 void CommPlayer_HideActors(CommPlayerSys *cps);
 void CommPlayer_RestoreActors(CommPlayerSys *cps);

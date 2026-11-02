@@ -1,10 +1,13 @@
 #include "types.h"
 #include "app/pass_power.h"
+#include "constants/items.h"
+#include "constants/sound.h"
 #include "field/event_pass_power.h"
 #include "field/event_sound.h"
 #include "field/field.h"
 #include "field/field_event.h"
 #include "field/field_pass_power.h"
+#include "gfl/heap.h"
 #include "gfl/overlay.h"
 #include "save/bag.h"
 #include "save/high_link.h"
@@ -12,6 +15,22 @@
 #include "system/game_data.h"
 #include "system/game_event.h"
 #include "system/game_system.h"
+
+// The steps of the event: the field closes for the Pass Power screen and opens again, then what the screen chose
+// follows
+enum {
+    STEP_FADE_OUT,
+    STEP_CLOSE_FIELD,
+    STEP_PUSH_BGM,
+    STEP_START_APP,
+    STEP_WAIT_APP,
+    STEP_OPEN_FIELD,
+    STEP_FADE_IN,
+    STEP_CHOOSE_NEXT,
+    STEP_ACTIVATE_POWER,
+    STEP_ENTRALINK,
+    STEP_END,
+};
 
 struct EventPassPower {
     GameSystem *gsys;
@@ -22,10 +41,10 @@ struct EventPassPower {
     void *exitArgument;
 };
 
-void EventPassPower_SetupParam(PassPowerParam *param, u32 argument, GameSystem *gsys, GameData *gameData, u16 item);
+void EventPassPower_SetupParam(PassPowerParam *param, u32 argument, GameSystem *gsys, GameData *gameData, u16 heapId);
 GameEventReturnCode EventPassPower_Callback(GameEvent *event, u32 *state, void *data);
 
-void EventPassPower_SetupParam(PassPowerParam *param, u32 argument, GameSystem *gsys, GameData *gameData, u16 item) {
+void EventPassPower_SetupParam(PassPowerParam *param, u32 argument, GameSystem *gsys, GameData *gameData, u16 heapId) {
     SaveControl *save = GameData_GetSaveControl(gameData);
     BagSave *bag;
     HighLinkSave *highLink;
@@ -37,19 +56,19 @@ void EventPassPower_SetupParam(PassPowerParam *param, u32 argument, GameSystem *
     param->gsys = gsys;
     param->argument = argument;
     bag = GameData_GetBag(gameData);
-    param->itemCount = BagSave_GetItemCountByID(bag, 0x23f, item);
+    param->itemCount = BagSave_GetItemCountByID(bag, ITEM_PASS_ORB, heapId);
     highLink = getHighLinkBlockAddress(save);
     param->highLinkCount = 0;
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < HIGH_LINK_POWER_MAX; i++) {
         u32 id = HighLinkSave_GetPassPower(highLink, i);
-        if (id != 0x30) {
+        if (id != HIGH_LINK_POWER_NONE) {
             param->highLinkIds[param->highLinkCount++] = id;
         }
     }
-    for (i = 0; i < 16; i++) {
+    for (i = 0; i < PASS_POWER_EFFECT_COUNT; i++) {
         u32 id = PassPower_GetUsedIDByEffect(i);
-        if (id != 0x30) {
-            if (param->powerCount >= 10) {
+        if (id != PASS_POWER_NONE) {
+            if (param->powerCount >= NELEMS(param->powers)) {
                 break;
             }
             param->powers[param->powerCount].id = id;
@@ -76,34 +95,34 @@ GameEventReturnCode EventPassPower_Callback(GameEvent *event, u32 *state, void *
     Field *field = GSYS_GetField(gsys);
 
     switch (*state) {
-    case 0:
+    case STEP_FADE_OUT:
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
         (*state)++;
         break;
-    case 1:
+    case STEP_CLOSE_FIELD:
         GameEvent_ChainNext(event, CreateFieldCloseEvent(gsys, field));
         (*state)++;
         break;
-    case 2:
-        GameEvent_ChainNext(event, EventBGMPlayPushEx_Create(gsys, 0x483, 6, 0));
+    case STEP_PUSH_BGM:
+        GameEvent_ChainNext(event, EventBGMPlayPushEx_Create(gsys, SEQ_BGM_GAME_SYNC, 6, 0));
         (*state)++;
-    case 3:
-        EventPassPower_SetupParam(&work->param, work->paramArgument, gsys, gameData, 0x8004);
+    case STEP_START_APP:
+        EventPassPower_SetupParam(&work->param, work->paramArgument, gsys, gameData, HEAPID_TAIL(HEAPID_GAMEEVENT));
         GSYS_QueueProc(gsys, OVERLAY_PASS_POWER_APP, &GPOWER_APP_PROC_FUNCTIONS, &work->param);
         (*state)++;
         break;
-    case 4:
+    case STEP_WAIT_APP:
         if (!GSYS_GetProcMgrState(gsys)) {
             GameEvent_ChainNext(event, EventBGMPop_CreateEx(gsys, 6, 60));
             (*state)++;
         }
         break;
-    case 5:
+    case STEP_OPEN_FIELD:
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
         (*state)++;
         break;
-    case 6: {
+    case STEP_FADE_IN: {
         FieldSubscreen *subscreen = Field_GetSubscreen(field);
         if (work->param.result == PASS_POWER_APP_ABORTED) {
             FieldSubscreen_ChangeImm(subscreen, 0);
@@ -113,21 +132,21 @@ GameEventReturnCode EventPassPower_Callback(GameEvent *event, u32 *state, void *
         (*state)++;
         break;
     }
-    case 7:
+    case STEP_CHOOSE_NEXT:
         GameEvent_ChainNext(event, EventBGMFadeWait_Create(gsys));
         switch (work->param.result) {
         case PASS_POWER_APP_USE:
-            *state = 8;
+            *state = STEP_ACTIVATE_POWER;
             break;
         case PASS_POWER_APP_ENTRALINK:
-            *state = 9;
+            *state = STEP_ENTRALINK;
             break;
         default:
-            *state = 10;
+            *state = STEP_END;
             break;
         }
         break;
-    case 8: {
+    case STEP_ACTIVATE_POWER: {
         u32 args[2];
         args[0] = work->param.passPower;
         args[1] = 1;
@@ -135,10 +154,10 @@ GameEventReturnCode EventPassPower_Callback(GameEvent *event, u32 *state, void *
                           GameEvent_CreateOverlayDelegate(gsys, OVERLAY_ID(156), EventPassPowerActivate_Create, args));
         return GAMEEVENT_CONTINUE;
     }
-    case 9:
-        GameEvent_Replace(event, func_ov033_021773e4(gsys, work->exitArgument));
+    case STEP_ENTRALINK:
+        GameEvent_Replace(event, EventEntralinkWarpReturn_Create(gsys, work->exitArgument));
         return GAMEEVENT_CONTINUE;
-    case 10:
+    case STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;

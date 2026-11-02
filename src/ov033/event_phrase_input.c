@@ -39,18 +39,18 @@ GameEvent *EventPhraseInput_Create(GameSystem *gsys, Field *field, GameEvent *pa
     save = GameData_GetSaveControl(data->gameData);
     data->saveBlock = CGearName_GetFromSave(save);
     data->playerInfo = GetGameDataPlayerInfo(data->gameData);
-    data->unk18 = GameData_GetBeaconStatus(data->gameData);
+    data->beaconStatus = GameData_GetBeaconStatus(data->gameData);
     data->nameEntry.mode = mode;
     data->nameEntry.gender = getTrainerGender(data->playerInfo);
     data->nameEntry.gameInfo = data->trainerInfo;
-    data->nameEntry.unk30 = data->saveBlock;
+    data->nameEntry.presetNameSave = data->saveBlock;
     if (mode == NAME_ENTRY_TRAINER_MESSAGE || mode == NAME_ENTRY_HAPPY_MESSAGE) {
         data->nameEntry.maxLength = 8;
     } else {
         data->nameEntry.maxLength = sMaxLengths[mode - NAME_ENTRY_GREETING];
     }
     data->nameEntry.name = GFL_StrBufCreate(data->nameEntry.maxLength + 1, data->heapId);
-    data->nameEntry.unk2C = 0;
+    data->nameEntry.skipChecks = 0;
     switch (mode) {
     case NAME_ENTRY_PLAYER:
     case NAME_ENTRY_POKEMON:
@@ -79,16 +79,22 @@ GameEvent *EventPhraseInput_Create(GameSystem *gsys, Field *field, GameEvent *pa
     return event;
 }
 
+// The steps of the phrase input: run the name entry, then store what was entered
+enum {
+    PHRASE_INPUT_STEP_START,
+    PHRASE_INPUT_STEP_END,
+};
+
 GameEventReturnCode EventPhraseInput_Callback(GameEvent *event, u32 *state, void *eventData) {
     struct EventPhraseInputData *data = eventData;
 
     switch (*state) {
-    case 0:
+    case PHRASE_INPUT_STEP_START:
         GameEvent_ChainNext(event, EventFieldSubprocessTransition_Create(data->gsys, data->field, OVERLAY_ID(280),
                                                                          &NAME_ENTRY_PROC_FUNCTIONS, &data->nameEntry));
         (*state)++;
         break;
-    case 1:
+    case PHRASE_INPUT_STEP_END:
         EventPhraseInput_StoreResult(data, &data->nameEntry);
         GFL_StrBufFree(data->nameEntry.name);
         return GAMEEVENT_DONE;
@@ -127,12 +133,12 @@ void EventPhraseInput_StoreResult(struct EventPhraseInputData *data, NameEntryPa
         CGearName_Set(data->saveBlock, param->name);
         break;
     case NAME_ENTRY_PASSERBY_MESSAGE:
-        GFL_StrBufCopy(BeaconStatus_GetGreeting(data->unk18), data->nameEntry.name);
-        GameBeacon_BroadcastPhrase(param->name, param->unk34);
+        GFL_StrBufCopy(BeaconStatus_GetGreeting(data->beaconStatus), data->nameEntry.name);
+        GameBeacon_BroadcastPhrase(param->name, param->presetIndex);
         break;
     case NAME_ENTRY_TRAINER_MESSAGE:
-        GFL_StrBufCopy(BeaconStatus_GetGreeting(data->unk18), data->nameEntry.name);
-        GameBeacon_BroadcastPhrase(param->name, param->unk34);
+        GFL_StrBufCopy(BeaconStatus_GetGreeting(data->beaconStatus), data->nameEntry.name);
+        GameBeacon_BroadcastPhrase(param->name, param->presetIndex);
         break;
     }
 }

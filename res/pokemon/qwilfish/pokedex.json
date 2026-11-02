@@ -1,0 +1,14 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "Q",
+    "shapes": [ 2 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_P2_LABORATORY": [ "rippling_fishing" ],
+            "ZONE_ROUTE_4": [ "fishing", "rippling_fishing" ],
+            "ZONE_VIRBANK_CITY": [ "fishing" ],
+            "ZONE_VIRBANK_COMPLEX": [ "fishing" ]
+        }
+    }
+}

@@ -51,7 +51,7 @@ void EncountState_Free(EncountState *state) {
     GFL_HeapFree(state);
 }
 
-void func_ov012_0215917c(GameData *gameData, Field *field) {
+void GameData_LoadEncountZone(GameData *gameData, Field *field) {
     EncountSystem *system = Field_GetEncountSystem(field);
     FieldPlayer *player;
     EncountState *state;
@@ -84,7 +84,7 @@ void EncountState_SetTerrain(EncountState *state, u32 terrain) {
     state->rateStepIncrement = 0;
 }
 
-void func_ov012_021591f4(GameData *gameData) {
+void Encount_OnZoneChange(GameData *gameData) {
 }
 
 // The routes a roaming Pokémon moves between, by EncountSave's zone clock, and none for the last

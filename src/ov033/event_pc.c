@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_event.h"
 #include "field/field_g3d_mapper.h"
@@ -33,19 +34,25 @@ GameEvent *Scrcmd_CreateSubProcEvent(GameSystem *gsys, u16 option, u16 *result) 
     return event;
 }
 
+// The steps of the Hall of Fame PC: run its proc, then give the choice
+enum {
+    PC_SUBPROC_STEP_START,
+    PC_SUBPROC_STEP_END,
+};
+
 GameEventReturnCode Scrcmd_SubProcEventMain(GameEvent *event, u32 *state, void *eventData) {
     PCSubprocessEventData *data;
     GameEvent *next;
 
     data = eventData;
     switch (*state) {
-    case 0:
+    case PC_SUBPROC_STEP_START:
         next = EventFieldSubprocessTransition_Create(data->gsys, data->field, OVERLAY_ID(256),
                                                      &HALL_OF_FAME_PC_PROC_FUNCTIONS, &data->gameData);
         GameEvent_ChainNext(event, next);
         (*state)++;
         break;
-    case 1:
+    case PC_SUBPROC_STEP_END:
         switch (data->selection) {
         case 0:
             *data->result = 0;
@@ -59,6 +66,14 @@ GameEventReturnCode Scrcmd_SubProcEventMain(GameEvent *event, u32 *state, void *
     return GAMEEVENT_CONTINUE;
 }
 
+// The steps of turning a PC on: its sound and the prop's animation, then the login sound and animation
+enum {
+    PC_ENTRY_STEP_START,
+    PC_ENTRY_STEP_WAIT_SOUND,
+    PC_ENTRY_STEP_LOGIN,
+    PC_ENTRY_STEP_END,
+};
+
 GameEventReturnCode pcEntrySound(GameEvent *event, u32 *state, void *eventData) {
     struct PCSoundEventData *data = eventData;
     VecFx32 position;
@@ -67,8 +82,8 @@ GameEventReturnCode pcEntrySound(GameEvent *event, u32 *state, void *eventData) 
     FieldChunkPropHolder *prop;
 
     switch (*state) {
-    case 0:
-        GFL_SndSEPlay(0x55b);
+    case PC_ENTRY_STEP_START:
+        GFL_SndSEPlay(SEQ_SE_PC_ON);
         FieldPlayer_GetWPos(Field_GetPlayer(data->field), &position);
         bounds.minZ = position.z - (1 << 16);
         bounds.maxZ = position.z + (1 << 16);
@@ -82,21 +97,21 @@ GameEventReturnCode pcEntrySound(GameEvent *event, u32 *state, void *eventData) 
         }
         (*state)++;
         break;
-    case 1:
-        if (GFL_SndPlayerIsActive(GFL_SndSeqGetPlayerIndex(0x55b))) {
+    case PC_ENTRY_STEP_WAIT_SOUND:
+        if (GFL_SndPlayerIsActive(GFL_SndSeqGetPlayerIndex(SEQ_SE_PC_ON))) {
             break;
         }
         (*state)++;
         break;
-    case 2:
-        GFL_SndSEPlay(0x55c);
+    case PC_ENTRY_STEP_LOGIN:
+        GFL_SndSEPlay(SEQ_SE_PC_LOGIN);
         if (data->pcProp != NULL) {
             FieldChunkPropHolder_CallAnmCmd(FieldG3DMapper_GetBMSystem(Field_GetG3DMapper(data->field)), data->pcProp,
                                             1, 2);
         }
         (*state)++;
         break;
-    case 3:
+    case PC_ENTRY_STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -112,7 +127,13 @@ GameEvent *CreatePCSoundCallEvent(GameEvent *parent, GameSystem *gsys, Field *fi
     return event;
 }
 
-GameEventReturnCode func_ov033_021799e8(GameEvent *event, u32 *state, void *eventData) {
+// The steps of a PC left on: the prop's logged-in animation, without a sound
+enum {
+    PC_IDLE_STEP_START,
+    PC_IDLE_STEP_END,
+};
+
+GameEventReturnCode pcIdle(GameEvent *event, u32 *state, void *eventData) {
     struct PCSoundEventData *data;
     VecFx32 position;
     FieldPropAreaBounds bounds;
@@ -121,7 +142,7 @@ GameEventReturnCode func_ov033_021799e8(GameEvent *event, u32 *state, void *even
 
     data = eventData;
     switch (*state) {
-    case 0:
+    case PC_IDLE_STEP_START:
         FieldPlayer_GetWPos(Field_GetPlayer(data->field), &position);
         bounds.minZ = position.z - (1 << 16);
         bounds.maxZ = position.z + (1 << 16);
@@ -135,23 +156,30 @@ GameEventReturnCode func_ov033_021799e8(GameEvent *event, u32 *state, void *even
         }
         (*state)++;
         break;
-    case 1:
+    case PC_IDLE_STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *func_ov033_02179a58(GameEvent *parent, GameSystem *gsys, Field *field) {
+GameEvent *CreatePCIdleCallEvent(GameEvent *parent, GameSystem *gsys, Field *field) {
     GameEvent *event;
     struct PCSoundEventData *data;
 
-    event = GameEvent_Create(gsys, parent, func_ov033_021799e8, sizeof(struct PCSoundEventData));
+    event = GameEvent_Create(gsys, parent, pcIdle, sizeof(struct PCSoundEventData));
     data = GameEvent_GetData(event);
     data->gameSystem = gsys;
     data->field = field;
     data->pcProp = NULL;
     return event;
 }
+
+// The steps of turning a PC off: its sound, unless skipped, and the prop's animation
+enum {
+    PC_LOGOFF_STEP_START,
+    PC_LOGOFF_STEP_WAIT_SOUND,
+    PC_LOGOFF_STEP_END,
+};
 
 GameEventReturnCode pcLogOffSound(GameEvent *event, u32 *state, void *eventData) {
     struct PCSoundEventData *data = eventData;
@@ -162,9 +190,9 @@ GameEventReturnCode pcLogOffSound(GameEvent *event, u32 *state, void *eventData)
     u32 currentState = *state;
 
     switch (currentState) {
-    case 0:
+    case PC_LOGOFF_STEP_START:
         if (data->skipSound == 0) {
-            GFL_SndSEPlay(0x55d);
+            GFL_SndSEPlay(SEQ_SE_PC_LOGOFF);
         }
         FieldPlayer_GetWPos(Field_GetPlayer(data->field), &position);
         bounds.minZ = position.z - (1 << 16);
@@ -179,9 +207,9 @@ GameEventReturnCode pcLogOffSound(GameEvent *event, u32 *state, void *eventData)
         }
         (*state)++;
         break;
-    case 1:
+    case PC_LOGOFF_STEP_WAIT_SOUND:
         if (data->skipSound == 0) {
-            if (GFL_SndPlayerIsActive(GFL_SndSeqGetPlayerIndex(0x55d))) {
+            if (GFL_SndPlayerIsActive(GFL_SndSeqGetPlayerIndex(SEQ_SE_PC_LOGOFF))) {
                 break;
             }
             (*state)++;
@@ -189,7 +217,7 @@ GameEventReturnCode pcLogOffSound(GameEvent *event, u32 *state, void *eventData)
             *state = currentState + 1;
         }
         break;
-    case 2:
+    case PC_LOGOFF_STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;

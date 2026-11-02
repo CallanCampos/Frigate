@@ -158,8 +158,8 @@ static BOOL Scrcmd_Plugin14_CallDT9ThrowEvent(VM *vm, FieldScriptEnv *env) {
     u16 x = ScriptReadAny(vm, env);
     u16 y = ScriptReadAny(vm, env);
     u16 z = ScriptReadAny(vm, env);
-    u16 a4 = ScriptReadAny(vm, env);
-    u16 a5 = ScriptReadAny(vm, env);
+    u16 height = ScriptReadAny(vm, env);
+    u16 frames = ScriptReadAny(vm, env);
     FieldActor *actor = FindFieldActor(Field_GetActorSystem(field), actorId);
     VecFx32 from;
     VecFx32 to;
@@ -171,7 +171,7 @@ static BOOL Scrcmd_Plugin14_CallDT9ThrowEvent(VM *vm, FieldScriptEnv *env) {
     to.x = x * (16 * FX32_ONE) + 8 * FX32_ONE;
     to.y = y * (FX32_ONE / 2) * 16;
     to.z = z * (16 * FX32_ONE) + 8 * FX32_ONE;
-    event = GimmickDT9_CreateThrowEvent(gsys, &from, &to, a4 * (FX32_ONE / 2) * 16, a5);
+    event = GimmickDT9_CreateThrowEvent(gsys, &from, &to, height * (FX32_ONE / 2) * 16, frames);
     if (event == NULL) {
         return TRUE;
     }

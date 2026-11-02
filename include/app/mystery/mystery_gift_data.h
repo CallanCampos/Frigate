@@ -224,10 +224,7 @@ static inline PartyPkm *Mystery_CreateGiftPokemon(const MysteryGift *gift, HeapI
     return pkm;
 }
 
-// The values the getters below give for a gift that doesn't give one
-#define MYSTERY_GIFT_ITEM_NONE 0
-#define MYSTERY_GIFT_PASS_POWER_NONE 0x30
-#define MYSTERY_GIFT_ONE_SHOT_NONE 0x7f
+// The getters below give MYSTERY_GIFT_*_NONE for a gift that doesn't give one
 
 // The item of an item gift
 static inline u16 Mystery_GetGiftItem(const MysteryGift *gift) {
@@ -259,7 +256,7 @@ static inline u16 Mystery_GetGiftPassPower(const MysteryGift *gift) {
     return value;
 }
 
-// The one-shot power of a gift of kind 4, as overlay 33's func_ov033_021782d0 reads it
+// The one-shot power of a one-shot gift, as overlay 33's ScrcmdPokemonFld_GetGiftOneShotPower reads it
 static inline u32 Mystery_GetGiftOneShotPower(const MysteryGift *gift) {
     s32 value;
 

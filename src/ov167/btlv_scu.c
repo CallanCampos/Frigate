@@ -38,6 +38,15 @@
 // GFL_HeapAllocate(heapId, 0x180, TRUE, <btlv_scu.c>, 351). Swan has no names for this file; the names are ours, from
 // use.
 
+// The states of a BtlvScuWinFade
+enum {
+    BTLV_SCU_WIN_FADE_SHOWN,
+    BTLV_SCU_WIN_FADE_HIDING,
+    BTLV_SCU_WIN_FADE_HIDDEN,
+    BTLV_SCU_WIN_FADE_SHOWING,
+    BTLV_SCU_WIN_FADE_SHOW_REQUESTED,
+};
+
 // A window faded in and out by the BG1 alpha blend, its coefficients in fx32 (BtlvScuWinFade_Init, 021d3718,
 // 021d3748, 021d3798)
 typedef struct BtlvScuWinFade {
@@ -46,7 +55,7 @@ typedef struct BtlvScuWinFade {
     fx32 ev2;       // 0x08 the coefficient of the background, 7 shown and 16 hidden
     fx32 ev1Step;   // 0x0C
     fx32 ev2Step;   // 0x10
-    u8 state;       // 0x14 0 shown, 1 hiding, 2 hidden, 3 showing, 4 show requested
+    u8 state;       // 0x14 a BTLV_SCU_WIN_FADE_*
     u8 frames;      // 0x15 frames left of the fade, 6 at its start
 } BtlvScuWinFade;   // size 0x18
 
@@ -136,7 +145,7 @@ typedef struct BtlvScuSingleWork {
     u8 viewPos;      // 0x05
     u8 monId;        // 0x06
     u8 clientId;     // 0x07 of the trainer, or of the player
-    u8 unk08;        // 0x08 GetOpponentClientID(mainModule, playerClientId, 0), a client ID for the message
+    u8 opponentId;   // 0x08 GetOpponentClientID(mainModule, playerClientId, 0), the trainer of the message
 } BtlvScuSingleWork; // size 0x0C
 
 // Two wild mons: BtlvScu_EncountWildDouble, 021d1d64. The arrays are in another order than in BtlvScuDoubleWork
@@ -195,22 +204,22 @@ typedef struct BtlvScuGaugeShowTask {
 
 // BtlvScu_StartChangeMon and BtlvScu_ChangeMonTask
 typedef struct BtlvScuMonTask {
-    BtlvScu *scu; // 0x00
-    u8 pos;       // 0x04
-    u32 viewPos;  // 0x08
-    s32 seq;      // 0x0C
-    u32 arg2;     // 0x10 BtlvEffect_ChangeSprite rather than 021df6b4 if set
-    u8 *count;    // 0x14 &scu->taskCount
-} BtlvScuMonTask; // size 0x18
+    BtlvScu *scu;  // 0x00
+    u8 pos;        // 0x04
+    u32 viewPos;   // 0x08
+    s32 seq;       // 0x0C
+    u32 immediate; // 0x10 BtlvEffect_ChangeSprite at once rather than BtlvEffect_StartChangeSprite if set
+    u8 *count;     // 0x14 &scu->taskCount
+} BtlvScuMonTask;  // size 0x18
 
 // BtlvScu_StartTransform, BtlvScu_StartChangeForm and their task BtlvScu_ChangeSpriteTask
 typedef struct BtlvScuPkmTask {
     BtlvScu *scu;  // 0x00
-    u32 arg1;      // 0x04 the second argument of BtlvEffect_StartChangeSprite or 021df76c
+    u32 viewPos;   // 0x04 the view position whose sprite changes
     PartyPkm *pkm; // 0x08
     s32 seq;       // 0x0C
     u8 unk10;      // 0x10 never accessed
-    u8 flag;       // 0x11 BtlvEffect_ChangeSprite rather than 021df6b4 if set
+    u8 immediate;  // 0x11 BtlvEffect_ChangeSprite at once rather than BtlvEffect_StartChangeSprite if set
     u8 *count;     // 0x14 &scu->taskCount
 } BtlvScuPkmTask;  // size 0x18
 
@@ -292,7 +301,7 @@ static void BtlvScuAbilityWin_Hide(BtlvScuAbilityWin *win);
 static BOOL BtlvScuAbilityWin_WaitHide(BtlvScuAbilityWin *win);
 static void BtlvScuAbilityWin_StartChange(BtlvScuAbilityWin *win, u8 pos);
 static BOOL BtlvScuAbilityWin_RunChange(BtlvScuAbilityWin *win);
-static void BtlvScu_SetupBallGauge(BtlvScu *scu, BtlvBGaugeParam *status, u8 clientId1, u8 clientId2, s32 arg4);
+static void BtlvScu_SetupBallGauge(BtlvScu *scu, BtlvBGaugeParam *status, u8 clientId1, u8 clientId2, s32 side);
 static BOOL BtlvScu_LevelUpWinOpenProc(s32 *seq, void *arg);
 static BOOL BtlvScu_LevelUpWinStatsProc(s32 *seq, void *arg);
 static BOOL BtlvScu_LevelUpWinCloseProc(s32 *seq, void *arg);
@@ -420,7 +429,7 @@ void BtlvScu_Setup(BtlvScu *scu) {
     scu->msgWin = BmpWin_CreateDynamic(1, 1, 19, 30, 4, 0, 0);
     scu->msgBitmap = BmpWin_GetBitmap(scu->msgWin);
     BmpWin_FlushMap(scu->msgWin);
-    if (GetStudioMode(scu->mainModule) != 2) {
+    if (GetStudioMode(scu->mainModule) != BTL_STUDIO_MODE_PLAYBACK) {
         BmpWin_MakeFrameScreen(scu->msgWin, frameChar, 0);
     }
     GFL_BitmapFill(scu->msgBitmap, BtlvScu_GetClearColor(scu, 12));
@@ -438,7 +447,7 @@ void BtlvScu_Setup(BtlvScu *scu) {
     GFL_BGSysSetBGEnabled(1, TRUE);
     GFL_BGSysSetBGEnabled(2, TRUE);
     GFL_BGSysSetBGEnabled(3, TRUE);
-    if (GetStudioMode(scu->mainModule) != 2) {
+    if (GetStudioMode(scu->mainModule) != BTL_STUDIO_MODE_PLAYBACK) {
         GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
         GX_SetVisibleWnd(GX_WNDMASK_NONE);
     } else {
@@ -516,38 +525,38 @@ void BtlvScu_StartEncount(BtlvScu *scu, BOOL recPlay) {
     switch (BtlSetup_GetBattleStyle(scu->mainModule)) {
     case BTL_STYLE_SINGLE:
         switch (type) {
-        case 0:
-        case 4:
+        case BTL_TYPE_WILD:
+        case BTL_TYPE_CAPTURE_DEMO:
         default:
             BtlvScu_SetSubProc(scu, BtlvScu_EncountWildSingle);
             break;
-        case 1:
-        case 2:
+        case BTL_TYPE_TRAINER:
+        case BTL_TYPE_FACILITY:
             BtlvScu_SetSubProc(scu, BtlvScu_EncountTrainerSingle);
             break;
-        case 3:
+        case BTL_TYPE_COMM:
             BtlvScu_SetSubProc(scu, BtlvScu_EncountCommSingle);
             break;
         }
         break;
     case BTL_STYLE_DOUBLE:
         switch (type) {
-        case 0:
+        case BTL_TYPE_WILD:
             if (!IsMultiMode(scu->mainModule)) {
                 BtlvScu_SetSubProc(scu, BtlvScu_EncountWildDouble);
             } else {
                 BtlvScu_SetSubProc(scu, BtlvScu_EncountWildDoubleMulti);
             }
             break;
-        case 3:
+        case BTL_TYPE_COMM:
             if (!IsMultiMode(scu->mainModule)) {
                 BtlvScu_SetSubProc(scu, BtlvScu_EncountCommDouble);
             } else {
                 BtlvScu_SetSubProc(scu, BtlvScu_EncountCommDoubleMulti);
             }
             break;
-        case 1:
-        case 2:
+        case BTL_TYPE_TRAINER:
+        case BTL_TYPE_FACILITY:
             if (!IsMultiMode(scu->mainModule)) {
                 BtlvScu_SetSubProc(scu, BtlvScu_EncountTrainerDouble);
             } else {
@@ -557,14 +566,14 @@ void BtlvScu_StartEncount(BtlvScu *scu, BOOL recPlay) {
         }
         break;
     case BTL_STYLE_TRIPLE:
-        if (type != 3) {
+        if (type != BTL_TYPE_COMM) {
             BtlvScu_SetSubProc(scu, BtlvScu_EncountTriple);
         } else {
             BtlvScu_SetSubProc(scu, BtlvScu_EncountCommTriple);
         }
         break;
     case BTL_STYLE_ROTATION:
-        if (type != 3) {
+        if (type != BTL_TYPE_COMM) {
             BtlvScu_SetSubProc(scu, BtlvScu_EncountTriple);
         } else {
             BtlvScu_SetSubProc(scu, BtlvScu_EncountCommTriple);
@@ -673,7 +682,7 @@ static BOOL BtlvScu_EncountWildSingle(s32 *seq, void *arg) {
         break;
     case 5:
         if (BtlvScuWinFade_Update(&scu->msgFade)) {
-            BtlvEffect_Start(BtlSetup_GetBattleType(scu->mainModule) == 4 ? 0x23c : 0x232);
+            BtlvEffect_Start(BtlSetup_GetBattleType(scu->mainModule) == BTL_TYPE_CAPTURE_DEMO ? 0x23c : 0x232);
             (*seq)++;
         }
         break;
@@ -1172,7 +1181,7 @@ static BOOL BtlvScu_StepOneTrainerAppear(BtlvScu *scu, s32 *seq, u8 clientId) {
             u32 battleType = BtlSetup_GetBattleType(scu->mainModule);
             u32 message = 7;
 
-            if (battleType == 3) {
+            if (battleType == BTL_TYPE_COMM) {
                 message = 8;
             }
 
@@ -1227,7 +1236,7 @@ static BOOL BtlvScu_StepTwoTrainersAppear(BtlvScu *scu, s32 *seq, u8 clientId1, 
             u32 battleType = BtlSetup_GetBattleType(scu->mainModule);
             u32 message = 9;
 
-            if (battleType == 3) {
+            if (battleType == BTL_TYPE_COMM) {
                 message = 10;
             }
 
@@ -1261,11 +1270,11 @@ static BOOL BtlvScu_StepEnemySendOutSingle(BtlvScu *scu, s32 *seq) {
     switch (*seq) {
     case 0:
         work->viewPos = 1;
-        work->unk08 = GetOpponentClientID(scu->mainModule, GetPlayerClientID(scu->mainModule), 0);
+        work->opponentId = GetOpponentClientID(scu->mainModule, GetPlayerClientID(scu->mainModule), 0);
         work->pos = ViewPosToBattlePos(scu->mainModule, work->viewPos);
         work->mon = PokeCon_GetPosMonInner(scu->pokeCon, work->pos);
         work->monId = GetMonID(work->mon);
-        BtlString_FormatStdMsg(scu->strbuf, BtlvScu_GetSendOutMsg(scu, 1), 2, work->unk08, work->monId);
+        BtlString_FormatStdMsg(scu->strbuf, BtlvScu_GetSendOutMsg(scu, 1), 2, work->opponentId, work->monId);
         BtlvScu_StartMsg(scu, scu->strbuf, 80, NULL);
         (*seq)++;
         break;
@@ -1873,7 +1882,7 @@ BOOL BtlvScu_WaitMsg(BtlvScu *scu) {
                 } else {
                     scu->msgSeq = 4;
                 }
-                if (scu->streamState == 2) {
+                if (scu->streamState == PRINT_STREAM_DONE) {
                     scu->waitTimer = scu->endWait;
                     scu->msgFinished = TRUE;
                 }
@@ -1900,7 +1909,7 @@ BOOL BtlvScu_WaitMsg(BtlvScu *scu) {
         }
         break;
     case 5:
-        if (scu->streamState == 2) {
+        if (scu->streamState == PRINT_STREAM_DONE) {
             GFL_TextRndResetColorIndexLUT();
             PrintStream_Delete(scu->printStream);
             scu->printStream = NULL;
@@ -1926,15 +1935,16 @@ BOOL BtlvScu_WaitMsg(BtlvScu *scu) {
 }
 
 // Starts the effect of a move
-void BtlvScu_StartMoveEffect(BtlvScu *scu, u8 attackerPos, u8 targetPos, u16 move, s32 arg4, u32 arg5, u8 arg6) {
+void BtlvScu_StartMoveEffect(BtlvScu *scu, u8 attackerPos, u8 targetPos, u16 move, s32 moveTarget, u32 variant,
+                             u8 arg6) {
     BtlvMoveEffectParam *param = (BtlvMoveEffectParam *)scu->work;
 
     param->move = move;
     param->attackerPos = attackerPos;
     param->targetPos = targetPos;
-    param->unk0C = arg5;
+    param->variant = variant;
     param->unk0D = arg6;
-    param->unk10 = arg4;
+    param->target = moveTarget;
     BtlvScu_SetSubProc(scu, BtlvScu_MoveEffectProc);
 }
 
@@ -1970,11 +1980,11 @@ BOOL BtlvScu_WaitMoveEffect(BtlvScu *scu) {
     return BtlvScu_RunSubProc(scu);
 }
 
-void BtlvScu_StartDamage(BtlvScu *scu, u8 pos, u16 move, BOOL arg3) {
+void BtlvScu_StartDamage(BtlvScu *scu, u8 pos, u16 move, BOOL immediate) {
     u32 hp = GetBattleMonStat(PokeCon_GetPosMonInner(scu->pokeCon, pos), BATTLEMON_HP);
     u8 viewPos = BattlePosToViewPos(scu->mainModule, pos);
 
-    if (!arg3) {
+    if (!immediate) {
         BtlvEffect_CalcGaugeHP(viewPos, hp);
         BtlvEffect_StartDamage(viewPos, move);
     } else {
@@ -2000,11 +2010,11 @@ BOOL BtlvScu_WaitDamageEffect(BtlvScu *scu) {
     return FALSE;
 }
 
-void BtlvScu_StartFaint(BtlvScu *scu, u8 pos, BOOL arg2) {
+void BtlvScu_StartFaint(BtlvScu *scu, u8 pos, BOOL immediate) {
     u8 viewPos = BattlePosToViewPos(scu->mainModule, pos);
 
     BtlvEffect_DelGauge(viewPos);
-    if (!arg2) {
+    if (!immediate) {
         BtlvEffect_StartEffect23B(viewPos);
     } else {
         BtlvEffect_DelPokemon(viewPos);
@@ -2084,7 +2094,7 @@ static void BtlvScu_MemberOutTask(TCBEx *task, void *data) {
     }
 }
 
-void BtlvScu_StartMemberIn(BtlvScu *scu, u8 pos, u8 clientId, u8 monId, BOOL noEffect) {
+void BtlvScu_StartMemberIn(BtlvScu *scu, u8 pos, u8 clientId, u8 slot, BOOL noEffect) {
     BtlvScuGaugeShowTask *work;
     BattleMon *mon;
     u8 viewPos;
@@ -2095,7 +2105,7 @@ void BtlvScu_StartMemberIn(BtlvScu *scu, u8 pos, u8 clientId, u8 monId, BOOL noE
     work->count = &scu->gaugeShowTaskCount;
     work->seq = 0;
     (*work->count)++;
-    mon = GetClientMonData(scu->pokeCon, clientId, monId);
+    mon = GetClientMonData(scu->pokeCon, clientId, slot);
     viewPos = BattlePosToViewPos(scu->mainModule, pos);
     BtlvEffect_AddPokemon(BattleMon_GetViewSrcData(mon), viewPos);
     if (!noEffect) {
@@ -2127,11 +2137,11 @@ static void BtlvScu_MemberInTask(TCBEx *task, void *data) {
     }
 }
 
-void BtlvScu_StartGaugeHP(BtlvScu *scu, u8 pos, BOOL arg2) {
+void BtlvScu_StartGaugeHP(BtlvScu *scu, u8 pos, BOOL immediate) {
     u32 hp = GetBattleMonStat(PokeCon_GetPosMonInner(scu->pokeCon, pos), BATTLEMON_HP);
     u8 viewPos = BattlePosToViewPos(scu->mainModule, pos);
 
-    if (arg2) {
+    if (immediate) {
         BtlvEffect_CalcGaugeHPAtOnce(viewPos, hp);
     } else {
         BtlvEffect_CalcGaugeHP(viewPos, hp);
@@ -2180,7 +2190,7 @@ BOOL BtlvScu_IsPosCueEffectDone(BtlvScu *scu, u8 viewPos) {
     return FALSE;
 }
 
-void BtlvScu_StartChangeMon(BtlvScu *scu, u8 pos, u32 arg2) {
+void BtlvScu_StartChangeMon(BtlvScu *scu, u8 pos, u32 immediate) {
     BtlvScuMonTask *work;
 
     // BTL_POS_MAX stands for no position here
@@ -2188,7 +2198,7 @@ void BtlvScu_StartChangeMon(BtlvScu *scu, u8 pos, u32 arg2) {
         work = GFL_TCBExGetData(GFL_TCBExMgrAddTask(scu->tcbManager, BtlvScu_ChangeMonTask, sizeof(BtlvScuMonTask), 1));
         work->scu = scu;
         work->pos = pos;
-        work->arg2 = arg2;
+        work->immediate = immediate;
         work->viewPos = BattlePosToViewPos(scu->mainModule, pos);
         work->count = &scu->taskCount;
         work->seq = 0;
@@ -2210,7 +2220,7 @@ static void BtlvScu_ChangeMonTask(TCBEx *task, void *data) {
     switch (work->seq) {
     case 0:
         pkm = GetSrcData(PokeCon_GetPosMonInner(work->scu->pokeCon, work->pos));
-        if (!work->arg2) {
+        if (!work->immediate) {
             BtlvEffect_StartChangeSprite(pkm, work->viewPos);
         } else {
             BtlvEffect_ChangeSprite(pkm, work->viewPos);
@@ -2229,28 +2239,28 @@ static void BtlvScu_ChangeMonTask(TCBEx *task, void *data) {
     }
 }
 
-void BtlvScu_StartTransform(BtlvScu *scu, u32 arg1, u32 index, BOOL flag) {
+void BtlvScu_StartTransform(BtlvScu *scu, u32 viewPos, u32 targetViewPos, BOOL immediate) {
     BtlvScuPkmTask *work;
 
     work = GFL_TCBExGetData(GFL_TCBExMgrAddTask(scu->tcbManager, BtlvScu_ChangeSpriteTask, sizeof(BtlvScuPkmTask), 1));
-    work->pkm = GetSrcData(PokeCon_GetPosMonInner(scu->pokeCon, ViewPosToBattlePos(scu->mainModule, index)));
+    work->pkm = GetSrcData(PokeCon_GetPosMonInner(scu->pokeCon, ViewPosToBattlePos(scu->mainModule, targetViewPos)));
     work->scu = scu;
-    work->arg1 = arg1;
+    work->viewPos = viewPos;
     work->count = &scu->taskCount;
-    work->flag = flag;
+    work->immediate = immediate;
     work->seq = 0;
     (*work->count)++;
 }
 
-void BtlvScu_StartChangeForm(BtlvScu *scu, u32 index, BOOL flag) {
+void BtlvScu_StartChangeForm(BtlvScu *scu, u32 viewPos, BOOL immediate) {
     BtlvScuPkmTask *work;
 
     work = GFL_TCBExGetData(GFL_TCBExMgrAddTask(scu->tcbManager, BtlvScu_ChangeSpriteTask, sizeof(BtlvScuPkmTask), 1));
-    work->pkm = GetSrcData(PokeCon_GetPosMonInner(scu->pokeCon, ViewPosToBattlePos(scu->mainModule, index)));
+    work->pkm = GetSrcData(PokeCon_GetPosMonInner(scu->pokeCon, ViewPosToBattlePos(scu->mainModule, viewPos)));
     work->scu = scu;
-    work->arg1 = index;
+    work->viewPos = viewPos;
     work->count = &scu->taskCount;
-    work->flag = flag;
+    work->immediate = immediate;
     work->seq = 0;
     (*work->count)++;
 }
@@ -2267,10 +2277,10 @@ static void BtlvScu_ChangeSpriteTask(TCBEx *task, void *data) {
 
     switch (work->seq) {
     case 0:
-        if (!work->flag) {
-            BtlvEffect_StartChangeSprite(work->pkm, work->arg1);
+        if (!work->immediate) {
+            BtlvEffect_StartChangeSprite(work->pkm, work->viewPos);
         } else {
-            BtlvEffect_ChangeSprite(work->pkm, work->arg1);
+            BtlvEffect_ChangeSprite(work->pkm, work->viewPos);
         }
         work->seq++;
         break;
@@ -2289,25 +2299,25 @@ static void BtlvScu_ChangeSpriteTask(TCBEx *task, void *data) {
 
 static void BtlvScuWinFade_Init(BtlvScuWinFade *fade, BmpWin *window) {
     fade->window = window;
-    fade->state = 0;
+    fade->state = BTLV_SCU_WIN_FADE_SHOWN;
     fade->ev1 = FX32_CONST(31);
     fade->ev2 = FX32_CONST(7);
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, WIN_FADE_PLANES, 31, 7);
 }
 
 static void BtlvScuWinFade_StartHide(BtlvScuWinFade *fade) {
-    if (fade->state == 0 || fade->state == 3) {
+    if (fade->state == BTLV_SCU_WIN_FADE_SHOWN || fade->state == BTLV_SCU_WIN_FADE_SHOWING) {
         fade->ev1 = FX32_CONST(31);
         fade->ev2 = FX32_CONST(7);
         fade->ev1Step = -FX32_CONST(31) / 6;
         fade->ev2Step = FX32_CONST(9) / 6;
         fade->frames = 6;
-        fade->state = 1;
+        fade->state = BTLV_SCU_WIN_FADE_HIDING;
     }
 }
 
 static void BtlvScuWinFade_StartShow(BtlvScuWinFade *fade, BOOL keepWindow, u32 color) {
-    if (fade->state == 1 || fade->state == 2) {
+    if (fade->state == BTLV_SCU_WIN_FADE_HIDING || fade->state == BTLV_SCU_WIN_FADE_HIDDEN) {
         if (!keepWindow) {
             GFL_BitmapFill(BmpWin_GetBitmap(fade->window), color);
             BmpWin_FlushChar(fade->window);
@@ -2317,7 +2327,7 @@ static void BtlvScuWinFade_StartShow(BtlvScuWinFade *fade, BOOL keepWindow, u32 
         fade->ev1Step = FX32_CONST(31) / 6;
         fade->ev2Step = -FX32_CONST(9) / 6;
         fade->frames = 6;
-        fade->state = 4;
+        fade->state = BTLV_SCU_WIN_FADE_SHOW_REQUESTED;
     }
 }
 
@@ -2328,7 +2338,7 @@ static BOOL BtlvScuWinFade_Update(BtlvScuWinFade *fade) {
     case 0:
         return TRUE;
     case 4:
-        fade->state = 3;
+        fade->state = BTLV_SCU_WIN_FADE_SHOWING;
         return FALSE;
     case 3:
         if (fade->frames != 0) {
@@ -2338,7 +2348,7 @@ static BOOL BtlvScuWinFade_Update(BtlvScuWinFade *fade) {
         } else {
             fade->ev1 = FX32_CONST(31);
             fade->ev2 = FX32_CONST(7);
-            fade->state = 0;
+            fade->state = BTLV_SCU_WIN_FADE_SHOWN;
         }
         break;
     case 1:
@@ -2349,7 +2359,7 @@ static BOOL BtlvScuWinFade_Update(BtlvScuWinFade *fade) {
         } else {
             fade->ev1 = 0;
             fade->ev2 = FX32_CONST(16);
-            fade->state = 2;
+            fade->state = BTLV_SCU_WIN_FADE_HIDDEN;
         }
         break;
     }
@@ -2773,11 +2783,11 @@ static BOOL BtlvScuAbilityWin_RunChange(BtlvScuAbilityWin *win) {
     return FALSE;
 }
 
-static void BtlvScu_SetupBallGauge(BtlvScu *scu, BtlvBGaugeParam *status, u8 clientId1, u8 clientId2, s32 arg4) {
+static void BtlvScu_SetupBallGauge(BtlvScu *scu, BtlvBGaugeParam *status, u8 clientId1, u8 clientId2, s32 side) {
     BattleParty *parties[2] = { NULL, NULL };
     int counts[2] = { 0, 0 };
     BattleMon *mon;
-    int side;
+    int party;
     s8 index;
     int i;
 
@@ -2794,26 +2804,26 @@ static void BtlvScu_SetupBallGauge(BtlvScu *scu, BtlvBGaugeParam *status, u8 cli
             counts[1] = 3;
         }
     }
-    status->side = arg4;
-    status->mode = GetStudioMode(scu->mainModule);
+    status->side = side;
+    status->studioMode = GetStudioMode(scu->mainModule);
     for (i = 0; i < 6; i++) {
         if (i < counts[0] + counts[1]) {
             if (i < counts[0]) {
-                side = 0;
+                party = 0;
                 index = i;
             } else {
-                side = 1;
+                party = 1;
                 index = i - counts[0];
             }
-            mon = GetBattleMonFromParty(parties[side], index);
+            mon = GetBattleMonFromParty(parties[party], index);
             if (IsFainted(mon)) {
-                status->balls[side * 3 + index] = 2;
+                status->balls[party * 3 + index] = 2;
             } else if (GetBattleMonStatus(mon)) {
-                status->balls[side * 3 + index] = 3;
+                status->balls[party * 3 + index] = 3;
             } else if (!CanPokemonBattle(mon)) {
-                status->balls[side * 3 + index] = 0;
+                status->balls[party * 3 + index] = 0;
             } else {
-                status->balls[side * 3 + index] = 1;
+                status->balls[party * 3 + index] = 1;
             }
         }
     }
@@ -2964,7 +2974,7 @@ static BOOL BtlvScu_LevelUpWinCloseProc(s32 *seq, void *arg) {
 
 // The color the message window is cleared with: none in some mode of the battle
 static u16 BtlvScu_GetClearColor(BtlvScu *scu, u16 color) {
-    if (GetStudioMode(scu->mainModule) == 2) {
+    if (GetStudioMode(scu->mainModule) == BTL_STUDIO_MODE_PLAYBACK) {
         color = 0;
     }
     return color;

@@ -56,29 +56,27 @@
 #define COMM_TVT_PALETTE_FRAMES 10
 #define COMM_TVT_OBJ_RESOURCES 11
 
-enum {
-    COMM_TVT_START_WAIT,
-    COMM_TVT_START_CALL,
-    COMM_TVT_START_ANSWER,
-    COMM_TVT_START_EXISTING,
-};
-
 struct CommTvtWork {
     HeapID heapId;
     TCB *vblankTask;
     u32 mode;
     u32 nextMode;
-    BOOL unk10;
+    // Whether the next mode fades in both screens or only the sub screen
+    BOOL fadeInBoth;
     BOOL errorShown;
     u8 memberCount;
     u8 selfIndex;
     BOOL zoomed;
-    BOOL unk20;
-    BOOL unk24;
-    BOOL unk28;
-    BOOL unk2C;
+    // Set when the call ends, by leaving or being left; the own picture is no longer copied or sent
+    BOOL ending;
+    BOOL viewSwapped;
+    // Nothing sets it, only clears it
+    BOOL inputLocked;
+    // The parent asked everyone to leave, with CTVT_PACKET_EXIT
+    BOOL endRequested;
     BOOL canExchangePhotos;
-    BOOL unk34;
+    // Held while the own picture is copied into the screen or read to be sent
+    BOOL pictureLocked;
     u16 paletteAngle;
     u16 paletteFrame;
     u16 palettes[COMM_TVT_PALETTE_FRAMES][16];
@@ -277,20 +275,20 @@ static void CommTvt_Init(CommTvtWork *sys) {
     sys->mode = COMM_TVT_MODE_NONE;
     sys->paletteAngle = 0;
     sys->paletteFrame = 0;
-    sys->unk10 = TRUE;
-    sys->unk20 = FALSE;
-    sys->unk24 = FALSE;
-    sys->unk28 = FALSE;
-    sys->unk2C = FALSE;
+    sys->fadeInBoth = TRUE;
+    sys->ending = FALSE;
+    sys->viewSwapped = FALSE;
+    sys->inputLocked = FALSE;
+    sys->endRequested = FALSE;
     sys->canExchangePhotos = FALSE;
-    sys->unk34 = FALSE;
+    sys->pictureLocked = FALSE;
     sys->inGame = FALSE;
     if (canPlayerExchangePhotos() == TRUE) {
         sys->canExchangePhotos = TRUE;
     }
     GFL_NetSetIconScreen(FALSE, sys->heapId);
 
-    switch (sys->param->unk4) {
+    switch (sys->param->startMode) {
     case COMM_TVT_START_WAIT:
         CtvtComm_SetNextConnectType(sys, sys->comm, CTVT_CONNECT_SCAN);
         sys->nextMode = COMM_TVT_MODE_TALK;
@@ -326,12 +324,12 @@ static void CommTvt_Resume(CommTvtWork *sys) {
     sys->vblankTask = GFL_VBlankTCBAdd(CommTvt_VBlank, sys, 8);
     sys->paletteAngle = 0;
     sys->paletteFrame = 0;
-    sys->unk10 = TRUE;
-    sys->unk20 = FALSE;
-    sys->unk24 = FALSE;
-    sys->unk28 = FALSE;
-    sys->unk2C = FALSE;
-    sys->unk34 = FALSE;
+    sys->fadeInBoth = TRUE;
+    sys->ending = FALSE;
+    sys->viewSwapped = FALSE;
+    sys->inputLocked = FALSE;
+    sys->endRequested = FALSE;
+    sys->pictureLocked = FALSE;
     CommTvt_CreateNameWindows(sys);
     GFL_BGSysLoadNCLRDefault(23, 5, 0, 0x140, 0x20, sys->heapId);
     GFL_BGSysLoadNCLRDefault(23, 5, 4, 0x140, 0x20, sys->heapId);
@@ -823,12 +821,12 @@ ClActUnit *CommTvt_GetClActUnit(CommTvtWork *sys) {
     return sys->clactUnit;
 }
 
-BOOL func_ov257_021aaa74(CommTvtWork *sys) {
-    return sys->unk10;
+BOOL CommTvt_GetFadeInBoth(CommTvtWork *sys) {
+    return sys->fadeInBoth;
 }
 
-void func_ov257_021aaa78(CommTvtWork *sys, BOOL value) {
-    sys->unk10 = value;
+void CommTvt_SetFadeInBoth(CommTvtWork *sys, BOOL value) {
+    sys->fadeInBoth = value;
 }
 
 Font *CommTvt_GetFont(CommTvtWork *sys) {
@@ -907,40 +905,40 @@ void CommTvt_SetSelfIndex(CommTvtWork *sys, u8 index) {
     sys->selfIndex = index;
 }
 
-BOOL func_ov257_021aab10(CommTvtWork *sys) {
-    return sys->unk20;
+BOOL CommTvt_IsEnding(CommTvtWork *sys) {
+    return sys->ending;
 }
 
-void CommTvt_SetMessageActive(CommTvtWork *sys, BOOL value) {
-    sys->unk20 = value;
+void CommTvt_SetEnding(CommTvtWork *sys, BOOL value) {
+    sys->ending = value;
 }
 
 BOOL CommTvt_GetViewSwapped(CommTvtWork *sys) {
-    return sys->unk24;
+    return sys->viewSwapped;
 }
 
 void CommTvt_ToggleViewSwapped(CommTvtWork *sys) {
-    sys->unk24 = sys->unk24 == FALSE ? TRUE : FALSE;
+    sys->viewSwapped = sys->viewSwapped == FALSE ? TRUE : FALSE;
 }
 
 BOOL CommTvt_GetInputLocked(CommTvtWork *sys) {
-    return sys->unk28;
+    return sys->inputLocked;
 }
 
-void func_ov257_021aab30(CommTvtWork *sys, BOOL value) {
-    sys->unk28 = value;
+void CommTvt_SetInputLocked(CommTvtWork *sys, BOOL value) {
+    sys->inputLocked = value;
 }
 
 BOOL CommTvt_GetEndRequested(CommTvtWork *sys) {
-    return sys->unk2C;
+    return sys->endRequested;
 }
 
-void func_ov257_021aab38(CommTvtWork *sys, BOOL value) {
-    sys->unk2C = value;
+void CommTvt_SetEndRequested(CommTvtWork *sys, BOOL value) {
+    sys->endRequested = value;
 }
 
 BOOL CommTvt_IsLaunchModeCall(CommTvtWork *sys) {
-    if (sys->param->unk4 == COMM_TVT_START_EXISTING) {
+    if (sys->param->startMode == COMM_TVT_START_EXISTING) {
         return TRUE;
     }
     return FALSE;
@@ -954,12 +952,12 @@ void CommTvt_ClearCanExchangePhotos(CommTvtWork *sys) {
     sys->canExchangePhotos = FALSE;
 }
 
-BOOL func_ov257_021aab5c(CommTvtWork *sys) {
-    return sys->unk34;
+BOOL CommTvt_IsPictureLocked(CommTvtWork *sys) {
+    return sys->pictureLocked;
 }
 
-void func_ov257_021aab60(CommTvtWork *sys, BOOL value) {
-    sys->unk34 = value;
+void CommTvt_SetPictureLocked(CommTvtWork *sys, BOOL value) {
+    sys->pictureLocked = value;
 }
 
 BOOL CommTvt_IsCameraEnabled(void) {
@@ -994,7 +992,7 @@ AppTaskMenu *CommTvt_OpenConfirmMenu(CommTvtWork *sys) {
     return menu;
 }
 
-AppTaskMenu *func_ov257_021aac08(CommTvtWork *sys, u8 right, u8 bottom) {
+AppTaskMenu *CommTvt_OpenConfirmMenuAt(CommTvtWork *sys, u8 right, u8 bottom) {
     AppTaskMenuInit init = { 0 };
     AppTaskMenuItem items[2] = { 0 };
     AppTaskMenu *menu;
@@ -1019,7 +1017,7 @@ AppTaskMenu *func_ov257_021aac08(CommTvtWork *sys, u8 right, u8 bottom) {
     return menu;
 }
 
-AppTaskMenu *func_ov257_021aac98(CommTvtWork *sys, u8 right, u8 bottom) {
+AppTaskMenu *CommTvt_OpenCancelMenu(CommTvtWork *sys, u8 right, u8 bottom) {
     AppTaskMenuInit init = { 0 };
     AppTaskMenuItem item = { 0 };
     AppTaskMenu *menu;
@@ -1121,7 +1119,7 @@ void CommTvt_DeleteTimeIcon(CommTvtWork *sys) {
 static BOOL CommTvt_ProcInit(GameProc *proc, u32 *state, void *param, void *work) {
     CommTvtWork *sys;
 
-    if (param != NULL && ((CommTvtParam *)param)->unk4 == COMM_TVT_START_EXISTING) {
+    if (param != NULL && ((CommTvtParam *)param)->startMode == COMM_TVT_START_EXISTING) {
         GFL_HeapCreateChild(HEAPID_USER, HEAPID_COMM_TVT, 0xd0000);
     } else {
         GFL_HeapCreateChild(HEAPID_USER, HEAPID_COMM_TVT, 0x130000);
@@ -1132,12 +1130,12 @@ static BOOL CommTvt_ProcInit(GameProc *proc, u32 *state, void *param, void *work
         // Started on its own, for debugging: R calls, X answers
         sys->param = GFL_HeapAllocate(HEAPID_USER, sizeof(CommTvtParam), TRUE, "comm_tvt_sys.c", 1656);
         sys->param->gameData = GameData_Create(HEAPID_USER);
-        sys->param->unk4 = COMM_TVT_START_WAIT;
+        sys->param->startMode = COMM_TVT_START_WAIT;
         if (GCTX_HIDGetHeldKeys() & PAD_BUTTON_R) {
-            sys->param->unk4 = COMM_TVT_START_CALL;
+            sys->param->startMode = COMM_TVT_START_CALL;
         }
         if (GCTX_HIDGetHeldKeys() & PAD_BUTTON_X) {
-            sys->param->unk4 = COMM_TVT_START_ANSWER;
+            sys->param->startMode = COMM_TVT_START_ANSWER;
         }
     } else {
         sys->param = param;

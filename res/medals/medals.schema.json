@@ -1,0 +1,28 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The Medal Rally's medals: res/medals/medals.json",
+    "description": "ARCID_MEDAL_DEF (a/2/3/5), a file per medal (MedalDef in scrcmd_pokemon_center.c, MedalData in field/medal.h), MEDAL_COUNT of them in order. tools/data/medal_data.py packs them.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "medals" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "medals": {
+            "type": "array", "minItems": 255, "maxItems": 255,
+            "items": {
+                "type": "object", "additionalProperties": false,
+                "required": [ "name", "threshold", "type", "kind", "rank", "unk8" ],
+                "properties": {
+                    "name": { "type": "string", "description": "The medal's name, its message in res/text/system/medal_names.txt, whose messages are in the medals' order; the packer checks it and doesn't pack it" },
+                    "record": { "type": "integer", "minimum": 0, "maximum": 166, "description": "The record of the save data (RecordGet) that earns the medal when it reaches the threshold (PokemonCenter_CheckMedals); a medal has this or special" },
+                    "special": { "type": "integer", "minimum": 0, "maximum": 119, "description": "The check that earns the medal, an index into sMedalChecks of scrcmd_pokemon_center.c, stored as 10000 (MEDAL_CHECK_FIRST) plus it; a check that is NULL there leaves the medal to the scripts, which give it with Scrcmd_Medal_MedalGive" },
+                    "threshold": { "type": "integer", "minimum": 0, "maximum": 4294967295, "description": "What the record or the check must reach" },
+                    "type": { "type": "integer", "minimum": 0, "maximum": 26, "description": "The medal's picture: the sequence of its cell actor (medalbox_data_sys.c, medal_info_viewer.c), its field effect after 0x4e (Scrcmd_Medal_MedalGetFieldEffectID), and by the table in PokemonCenter_GetMedalCategory its category, five types each from 0 and seven from 20" },
+                    "kind": { "type": "integer", "minimum": 0, "maximum": 255, "description": "1 for a medal that Mr. Medal hints at while it is unknown, which DiscoverInitialMedalsCore discovers; the medals of 1 and 2 count toward their rank, and earning half of a rank's discovers those of 2 up to the rank after it (PokemonCenter_CheckMedals)" },
+                    "rank": { "type": "integer", "minimum": 0, "maximum": 5, "description": "The rank that the medal counts toward, of MEDAL_RANK_COUNT, whose names are res/text/system/medal_ranks.txt's" },
+                    "unk8": { "type": "integer", "minimum": 0, "maximum": 255, "description": "MedalDef.unk8, which the code doesn't read" }
+                }
+            }
+        }
+    }
+}

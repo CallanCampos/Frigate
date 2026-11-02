@@ -1,0 +1,460 @@
+{
+    "$schema": "backgrounds.schema.json",
+    "stages": [
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 0, 0, null, null, null, null, null, null ],
+            "animations": [
+                [ 1, 1, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 2, 2, 3, 3, 4, 4, 5, 5 ],
+            "animations": [
+                [ 6, 6, 7, 7, 8, 8, 9, 9 ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 10, 10, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 11, 11, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 12, 13, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 14, 15, null, null, null, null, null, null ],
+            "animations": [
+                [ 16, 17, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 14, 15, 14, 15, 14, 15, 14, 15 ],
+            "animations": [
+                [ 16, 17, 16, 17, 16, 17, 16, 17 ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 18, 19, null, null, null, null, null, null ],
+            "animations": [
+                [ 20, 21, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 22, 22, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ 23, 23, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 24, 24, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ 25, 25, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 26, 26, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 27, 27, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 28, 28, null, null, null, null, null, null ],
+            "animations": [
+                [ 29, 29, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 30, 30, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 31, 31, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 32, 32, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 33, 33, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 34, 34, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 35, 35, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 36, 36, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 37, 37, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 38, 38, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 39, 40, 41, 42, 43, 44, 45, 46 ],
+            "animations": [
+                [ 47, 48, 49, 50, 51, 52, 53, 54 ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 55, 56, null, null, null, null, null, null ],
+            "animations": [
+                [ 57, 58, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 59, 60, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 61, 61, null, null, null, null, null, null ],
+            "animations": [
+                [ 62, 62, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 63, 63, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 64, 64, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 65, 66, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 67, 67, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 68, 68, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 69, 69, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 70, 70, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 71, 71, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        },
+        {
+            "edge_color": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "models": [ 72, 73, null, null, null, null, null, null ],
+            "animations": [
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ],
+                [ null, null, null, null, null, null, null, null ]
+            ]
+        }
+    ]
+}

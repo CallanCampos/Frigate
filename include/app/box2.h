@@ -9,8 +9,17 @@
 // The PC Box
 #define OVERLAY_BOX2 OVERLAY_ID(255)
 
-#define BOX2_MODE_BATTLE_BOX 4
-#define BOX2_MODE_DREAM_WORLD 5
+// What the box is opened for, which picks its title: the messages from Box2Bmp_Text_DepositPokemon on are in this
+// order
+enum {
+    BOX2_MODE_DEPOSIT,
+    BOX2_MODE_WITHDRAW,
+    BOX2_MODE_MOVE_POKEMON,
+    BOX2_MODE_MOVE_ITEMS,
+    BOX2_MODE_BATTLE_BOX,
+    // Picking the Pokémon to send to the Dream World
+    BOX2_MODE_DREAM_WORLD,
+};
 
 typedef struct {
     GameData *gameData;
@@ -23,8 +32,9 @@ typedef struct {
     TrainerDataSave *trainerData;
     // Passed on to the summary
     u32 isNationalDex;
-    // Flags by species, which Box2Main_IsSpeciesFlagged reads
-    u8 *unk20;
+    // The Game Sync's flags of the species that can be sent to the Dream World, which Box2Main_IsSpeciesSendable reads
+    u8 *sendableSpecies;
+    // A BOX2_MODE_*
     u32 mode;
     // Set when the player left with the close button, cleared when he backed out
     u16 closed;

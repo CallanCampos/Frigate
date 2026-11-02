@@ -133,7 +133,7 @@ static void ReflectTask_Update(FieldEffectTask *task, void *data) {
 
             FldBillboardActor_AddActorPosOrReserve(work->params.mmSys, GetActorMdlInfo(work->params.actor),
                                                    work->billboardActor, &pos, ReflectTask_UpdateBillboard, work,
-                                                   func_ov012_02166fc0(work->params.mmSys));
+                                                   FldActSys_GetReflectLights(work->params.mmSys));
         }
         work->created = TRUE;
     }
@@ -191,7 +191,7 @@ static void ReflectTask_UpdateBillboard(u16 billboardActorIdx, void *data) {
     }
     zoneId = Field_GetPlayerStateZoneID(FieldEffects_GetField(work->params.effect->effects));
     visible = BillboardActorSys_IsActorVisible(sys, actorIdx);
-    if (visible && func_ov012_0216754c(work->params.actor)) {
+    if (visible && IsActorReflectionHidden(work->params.actor)) {
         visible = 0;
     }
     BillboardActorSys_SetActorVisible(sys, billboardActorIdx, visible);

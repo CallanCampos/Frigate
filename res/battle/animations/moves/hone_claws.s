@@ -1,0 +1,52 @@
+// MOVE_HONE_CLAWS's animation: member 468 of a/0/6/5
+
+#include "asm/btlv_effvm.inc"
+
+    ScriptHeader 1
+    ScriptVariant HoneClaws
+
+HoneClaws:
+    CameraMovePreset 1, 9, 16, 0, 8
+    Wait EFFVM_WAIT_ALL
+    ParticleLoad 648
+    SetYield FALSE
+    PlaySE SEQ_SE_W014_01, 1, EFFVM_ATTACKER, 0, 200, 60, 0, 0, 0
+    PlaySE SEQ_SE_W010_01, 1, EFFVM_ATTACKER, 10, 0, 127, 0, 0, 0
+    PlaySE SEQ_SE_W014_01, 1, EFFVM_ATTACKER, 20, 200, 60, 0, 0, 0
+    PlaySE SEQ_SE_W010_01, 1, EFFVM_ATTACKER, 30, 0, 127, 0, 0, 0
+    PlaySE SEQ_SE_W014_01, 1, EFFVM_ATTACKER, 40, 0, 60, 0, 0, 0
+    PlaySE SEQ_SE_W010_01, 1, EFFVM_ATTACKER, 50, 0, 127, 0, 0, 0
+    PlaySE SEQ_SE_W014_01, 1, EFFVM_ATTACKER, 60, 0, 60, 0, 0, 0
+    PlaySE SEQ_SE_W010_01, 1, EFFVM_ATTACKER, 70, 0, 127, 0, 0, 0
+    PlaySE SEQ_SE_W014_01, 1, EFFVM_ATTACKER, 80, 0, 60, 0, 0, 0
+    PlaySE SEQ_SE_W010_01, 1, EFFVM_ATTACKER, 90, 0, 127, 0, 0, 0
+    PlaySE SEQ_SE_W014_01, 1, EFFVM_ATTACKER, 100, 0, 60, 0, 0, 0
+    PlaySE SEQ_SE_W010_01, 1, EFFVM_ATTACKER, 110, 0, 127, 0, 0, 0
+    PlaySE SEQ_SE_W006_04, 2, EFFVM_ATTACKER, 18, -100, 100, 0, 0, 0
+    PlaySE SEQ_SE_W006_04, 2, EFFVM_ATTACKER, 20, 0, 100, 0, 0, 0
+    PlaySE SEQ_SE_W006_04, 2, EFFVM_ATTACKER, 55, -200, 30, 0, 0, 0
+    PlaySE SEQ_SE_W006_04, 2, EFFVM_ATTACKER, 60, 0, 60, 0, 0, 0
+    PlaySE SEQ_SE_W006_04, 2, EFFVM_ATTACKER, 80, -200, 20, 0, 0, 0
+    PlaySE SEQ_SE_W006_04, 2, EFFVM_ATTACKER, 90, -100, 50, 0, 0, 0
+    SetYield TRUE
+    McssSetVanish EFFVM_ATTACKER, TRUE
+    McssScale EFFVM_ATTACKER, 2, 0x19a, -0x19a, 6, 2, 2
+    EmitterAdd 648, 1, EFFVM_EMIT_ATTACKER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 648, 2, EFFVM_EMIT_ATTACKER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 10
+    EmitterAdd 648, 0, EFFVM_EMIT_ATTACKER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 20
+    EmitterAdd 648, 1, EFFVM_EMIT_ATTACKER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 648, 2, EFFVM_EMIT_ATTACKER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 10
+    EmitterAdd 648, 0, EFFVM_EMIT_ATTACKER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 20
+    EmitterAdd 648, 1, EFFVM_EMIT_ATTACKER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    EmitterAdd 648, 2, EFFVM_EMIT_ATTACKER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 10
+    EmitterAdd 648, 0, EFFVM_EMIT_ATTACKER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    Wait EFFVM_WAIT_ALL
+    McssSetVanish EFFVM_ATTACKER, FALSE
+    CameraMovePreset 1, 8, 16, 0, 8
+    Wait EFFVM_WAIT_ALL
+    End

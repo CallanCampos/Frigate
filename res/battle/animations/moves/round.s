@@ -1,0 +1,56 @@
+// MOVE_ROUND's animation: member 496 of a/0/6/5
+
+#include "asm/btlv_effvm.inc"
+
+    ScriptHeader 1
+    ScriptVariant Round
+
+Round:
+    CameraMovePreset 1, 9, 16, 0, 8
+    PaletteFade 2, 0, 10, 2, 32767
+    SetYield FALSE
+    PlaySE SEQ_SE_W235_01, 1, EFFVM_ATTACKER, 0, 0, 127, 0, 0, 0
+    PlaySE SEQ_SE_W235_01, 1, EFFVM_ATTACKER, 55, 0, 127, 0, 0, 0
+    PlaySE SEQ_SE_W047_01, 2, EFFVM_ATTACKER, 0, 100, 127, 0, 0, 0
+    MoveSE 2, 0, 1, 127, 0, 150, 30, 0, 0
+    PanSE 2, 0, EFFVM_ATTACKER, EFFVM_DEFENDER, 0, 200, 0, 0
+    SetYield TRUE
+    ParticleLoad 668
+    McssPalFade EFFVM_DEFENDER, 0, 12, 2, 0x295e
+    McssSetVanish EFFVM_DEFENDER, TRUE
+    EmitterAdd 668, 5, EFFVM_EMIT_ATTACKER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x2000
+    EmitterAdd 668, 6, EFFVM_EMIT_ATTACKER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x2000
+    EmitterMove 668, 2, 6, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x96000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 6
+    EmitterMove 668, 2, 6, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x96000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 6
+    EmitterMove 668, 2, 6, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x96000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 6
+    EmitterMove 668, 2, 6, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x96000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 6
+    EmitterMove 668, 2, 6, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x96000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 6
+    EmitterMove 668, 2, 6, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x96000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 1
+    EmitterMove 668, 3, 6, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x82000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 1
+    EmitterMove 668, 3, 6, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x82000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 1
+    EmitterMove 668, 3, 6, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x82000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 1
+    EmitterMove 668, 3, 6, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x82000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 1
+    EmitterMove 668, 3, 6, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x82000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 1
+    EmitterMove 668, 3, 6, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x82000, 0x800, 0x1000, 0x1000, 0x4000
+    WaitFrames 1
+    EmitterMove 668, 3, 6, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x8c000, 0x800, 0x1000, 0x1000, 0x4000
+    CameraMovePreset 1, 11, 32, 0, 8
+    Wait EFFVM_WAIT_ALL
+    McssPalFade EFFVM_DEFENDER, 12, 0, 2, 0x295e
+    WaitFrames 5
+    PaletteFade 2, 10, 0, 2, 32767
+    McssSetVanish EFFVM_DEFENDER, FALSE
+    CameraMovePreset 1, 8, 16, 0, 8
+    Wait EFFVM_WAIT_ALL
+    End

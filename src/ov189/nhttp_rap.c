@@ -15,8 +15,6 @@
 
 #define NHTTP_RAP_URL_SIZE 0x190
 #define NHTTP_RAP_BODY_SIZE 0x400
-#define NHTTP_RAP_NUM_REQUESTS 11
-#define NHTTP_RAP_REQUEST_VALIDATE 7
 
 typedef struct NHttpRapLogin {
     u8 unk_00[0x45];
@@ -71,7 +69,7 @@ static const char sUrlAccountCreateUpload[108] =
     "https://en-ds.pokemon-gl.com/dsio/gw?p=account.create.upload&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s";
 static const char sUrlSavedataDownloadFinish[112] =
     "https://en-ds.pokemon-gl.com/dsio/gw?p=savedata.download.finish&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s";
-static NHttpRapRequest sRequests[NHTTP_RAP_NUM_REQUESTS] = {
+static NHttpRapRequest sRequests[NHTTP_RAP_REQUEST_MAX] = {
     { sUrlAccountPlaystatus, 0 },   { sUrlSleepilyBitlist, 0 },   { sUrlSavedataDownload, 0 },
     { sUrlSavedataUpload, 1 },      { sUrlAccountCreateData, 1 }, { sUrlWorldbattleDownload, 0 },
     { sUrlWorldbattleUpload, 1 },   { sUrlValidate, 1 },          { sUrlSavedataDownloadFinish, 1 },
@@ -88,14 +86,14 @@ static void NHttpRap_Free(void *ptr) {
 }
 
 static int NHttpRap_RequestCallback(int request, int event, void *arg) {
-    NHttpRap *rap = arg;
+    NHttpBufferEvent *buffer = arg;
 
     switch (event) {
-    case 1:
+    case NHTTP_EVENT_POST:
         break;
-    case 2:
-    case 3:
-        rap->login = NULL;
+    case NHTTP_EVENT_BUFFER_FULL:
+    case NHTTP_EVENT_AFTER_BUFFER_FULL:
+        buffer->used = 0;
         break;
     }
     return 0;
@@ -134,7 +132,7 @@ static BOOL NHttpRap_CreateRequest(u32 index, NHttpRap *rap) {
 
 static void NHttpRap_BuildUrl(NHttpRap *rap, u32 index) {
     MI_CpuFill8(rap->url, 0, 4);
-    if (index == 4) {
+    if (index == NHTTP_RAP_REQUEST_ACCOUNT_CREATE_DATA) {
         STD_TSNPrintf(rap->url, NHTTP_RAP_URL_SIZE, sRequests[index].url, rap->login->token);
     } else {
         STD_TSNPrintf(rap->url, NHTTP_RAP_URL_SIZE, sRequests[index].url, rap->profileId, GAME_VERSION, GAME_LANGUAGE,
@@ -162,10 +160,10 @@ BOOL NHttpRap_SendRequestWithId(u32 index, u32 id, NHttpRap *rap) {
     if (rap == NULL) {
         return FALSE;
     }
-    if (index == 10) {
+    if (index == NHTTP_RAP_REQUEST_SAVEDATA_GET_BW) {
         MI_CpuFill8(rap->url, 0, 4);
-        STD_TSNPrintf(rap->url, NHTTP_RAP_URL_SIZE, sRequests[10].url, id, GAME_VERSION, GAME_LANGUAGE, 1,
-                      rap->login->token);
+        STD_TSNPrintf(rap->url, NHTTP_RAP_URL_SIZE, sRequests[NHTTP_RAP_REQUEST_SAVEDATA_GET_BW].url, id, GAME_VERSION,
+                      GAME_LANGUAGE, 1, rap->login->token);
     } else {
         NHttpRap_BuildUrl(rap, index);
     }
@@ -215,7 +213,7 @@ int NHttpRap_Poll(NHttpRap *rap) {
         return 0;
     }
     state = NHTTPGetConnectionError(rap->connection);
-    if (state == 15) {
+    if (state == NHTTP_STATUS_RUNNING) {
         NHTTPGetProgress(rap->connection, &received, &size);
     } else {
         error = NHTTPGetConnectionError(rap->connection);

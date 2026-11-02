@@ -4,6 +4,9 @@
 #include "types.h"
 #include "struct_decls.h"
 
+// The entries of the stadium's trainer table, file 0 of its archive
+#define STADIUM_TRAINER_COUNT 0x84
+
 struct StadiumTrainerEntry {
     u16 unk00;
     u16 unk02;

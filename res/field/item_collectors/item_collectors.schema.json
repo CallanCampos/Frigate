@@ -1,0 +1,29 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "What the item collectors pay: res/field/item_collectors/item_collectors.json",
+    "description": "ARCID_ITEM_COLLECTOR (a/2/0/5): the price list of each group of item collectors, files 0 to 4 in the order of the fields here, which ITEM_COLLECTOR_FILES gives each ITEM_COLLECTOR_* group and the script commands of scrcmd_misc.c read. tools/data/item_collector_data.py packs it.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "gourmet", "rare_bones", "mulch", "treasures", "minerals" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "gourmet": { "$ref": "#/$defs/prices", "description": "File 0, ITEM_COLLECTOR_GOURMET's, which groups 5 to 7 also read" },
+        "rare_bones": { "$ref": "#/$defs/prices", "description": "File 1, ITEM_COLLECTOR_RARE_BONES'" },
+        "mulch": { "$ref": "#/$defs/prices", "description": "File 2, ITEM_COLLECTOR_MULCH's" },
+        "treasures": { "$ref": "#/$defs/prices", "description": "File 3, ITEM_COLLECTOR_TREASURES'" },
+        "minerals": { "$ref": "#/$defs/prices", "description": "File 4, ITEM_COLLECTOR_MINERALS'" }
+    },
+    "$defs": {
+        "prices": {
+            "type": "array",
+            "description": "The items the collectors buy, an ItemCollectorPrice each, searched in order; they pay nothing for one that isn't here",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "item", "price" ],
+                "properties": {
+                    "item": { "type": [ "string", "integer" ], "x-constant": "ITEM_", "minimum": 0, "maximum": 65535, "description": "An ITEM_* constant" },
+                    "price": { "type": "integer", "minimum": 0, "maximum": 4294967295, "description": "What they pay for one, in money" }
+                }
+            }
+        }
+    }
+}

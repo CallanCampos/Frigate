@@ -18,8 +18,6 @@
 // poke_regulation.c, which the ROM names: checks of Pokémon and parties against a regulation, and the regulation's
 // rules as text. Names are not swan's, except PML_PkmIsLegendNational.
 
-#define ARCID_REGULATION 106
-
 #define PRINT_MSG_RULE_COUNT 6
 #define PRINT_MSG_STRBUF_SIZE 64
 

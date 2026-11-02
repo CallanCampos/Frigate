@@ -16,6 +16,21 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
+// The field menu event's states: the touch screen's menu opens and is chosen from, then the app, the hidden move, the
+// common event or the script it asks for runs, or the menu closes
+enum {
+    FIELD_MENU_EVENT_STATE_OPEN,
+    FIELD_MENU_EVENT_STATE_WAIT_SELECTION,
+    FIELD_MENU_EVENT_STATE_SELECTED,
+    FIELD_MENU_EVENT_STATE_CLOSE,
+    FIELD_MENU_EVENT_STATE_HM_EVENT,
+    FIELD_MENU_EVENT_STATE_APP_CALL,
+    FIELD_MENU_EVENT_STATE_APP_RESULT,
+    FIELD_MENU_EVENT_STATE_COMMON_EVENT,
+    FIELD_MENU_EVENT_STATE_END,
+    FIELD_MENU_EVENT_STATE_SCRIPT,
+};
+
 static u32 FieldMenu_GetAppId(u32 index);
 static BOOL FieldMenu_CanRetry(FieldAppCallInput *input, void *arg);
 static BOOL FieldMenu_CanLeaveField(FieldAppCallInput *input, void *arg);
@@ -32,7 +47,7 @@ GameEvent *EventFieldMenu_Create(GameSystem *gsys, Field *field, u16 param) {
     work->event = event;
     work->field = field;
     work->code = param;
-    work->state = 0;
+    work->state = FIELD_MENU_EVENT_STATE_OPEN;
     work->appCall.gameSystem = gsys;
     work->appCall.field = field;
     work->appCall.parent = event;
@@ -82,43 +97,43 @@ GameEventReturnCode EventFieldMenu_Callback(GameEvent *event, u32 *state, void *
     GameEvent *next;
 
     switch (work->state) {
-    case 0:
+    case FIELD_MENU_EVENT_STATE_OPEN:
         if (FieldSubscreen_IsReady(Field_GetSubscreen(work->field)) == TRUE) {
             actorSystem = Field_GetActorSystem(work->field);
             gameData = GSYS_GetGameData(GameEvent_GetGameSystem(event));
             DisableAllActorsMovement(actorSystem);
             GameData_SetFieldMenuItem(gameData, FIELD_MENU_ITEM_POKEMON);
             FieldSubscreen_ReqChange(Field_GetSubscreen(work->field), 1);
-            work->state = 1;
+            work->state = FIELD_MENU_EVENT_STATE_WAIT_SELECTION;
         }
         break;
-    case 1:
+    case FIELD_MENU_EVENT_STATE_WAIT_SELECTION:
         returnSubscreen = FieldSubscreen_GetReturnSubscreen(Field_GetSubscreen(work->field));
         if (returnSubscreen == FIELD_MENU_RESULT_SELECTED) {
-            work->state = 2;
+            work->state = FIELD_MENU_EVENT_STATE_SELECTED;
             FieldSubscreen_ResetReturnSubscreen(Field_GetSubscreen(work->field));
         } else if (returnSubscreen == FIELD_MENU_RESULT_CANCELLED) {
-            work->state = 3;
+            work->state = FIELD_MENU_EVENT_STATE_CLOSE;
             FieldSubscreen_ResetReturnSubscreen(Field_GetSubscreen(work->field));
         }
         break;
-    case 2:
+    case FIELD_MENU_EVENT_STATE_SELECTED:
         gameData = GSYS_GetGameData(GameEvent_GetGameSystem(event));
         selection = FieldSubscreen_GetMenuSelectedButton(Field_GetSubscreen(work->field));
         GameData_SetFieldMenuItem(gameData, selection);
-        work->unk10 = FieldSubscreen_GetMenuSelectedButton(Field_GetSubscreen(work->field));
+        work->selectedButton = FieldSubscreen_GetMenuSelectedButton(Field_GetSubscreen(work->field));
         work->appCall.appId = FieldMenu_GetAppId(selection);
-        work->state = 5;
+        work->state = FIELD_MENU_EVENT_STATE_APP_CALL;
         break;
-    case 3:
+    case FIELD_MENU_EVENT_STATE_CLOSE:
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
-        if (work->appCall.eventType != 1 && work->appCall.eventType != 4) {
+        if (work->appCall.eventType != FIELD_APP_RESULT_EXIT && work->appCall.eventType != FIELD_APP_RESULT_NEXT) {
             GameEvent_Replace(event,
                               EventFieldMenuReturn_Create(GameEvent_GetGameSystem(event), work->field, work->screenId));
             return GAMEEVENT_CONTINUE;
         }
         return GAMEEVENT_DONE;
-    case 4:
+    case FIELD_MENU_EVENT_STATE_HM_EVENT:
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         CalcPlayerActionPossibilities(GSYS_GetField(work->gameSystem), &action);
         HiddenEventArgs_Set(&args, work->appCall.partySlot, work->appCall.eventId, work->appCall.eventValue);
@@ -128,33 +143,33 @@ GameEventReturnCode EventFieldMenu_Callback(GameEvent *event, u32 *state, void *
         }
         GameEvent_Replace(work->event, next);
         break;
-    case 5:
+    case FIELD_MENU_EVENT_STATE_APP_CALL:
         GameEvent_ChainNext(event, EventFieldAppCall_Create(&work->appCall, work->code));
-        work->state = 6;
+        work->state = FIELD_MENU_EVENT_STATE_APP_RESULT;
         break;
-    case 6:
-        if (work->appCall.eventType == 0) {
-            work->state = 1;
-        } else if (work->appCall.eventType == 1) {
-            work->state = 3;
-        } else if (work->appCall.eventType == 3) {
-            work->state = 7;
-        } else if (work->appCall.eventType == 2) {
-            work->state = 4;
-        } else if (work->appCall.eventType == 4) {
-            work->state = 3;
-        } else if (work->appCall.eventType == 5) {
-            work->state = 9;
+    case FIELD_MENU_EVENT_STATE_APP_RESULT:
+        if (work->appCall.eventType == FIELD_APP_RESULT_RETURN) {
+            work->state = FIELD_MENU_EVENT_STATE_WAIT_SELECTION;
+        } else if (work->appCall.eventType == FIELD_APP_RESULT_EXIT) {
+            work->state = FIELD_MENU_EVENT_STATE_CLOSE;
+        } else if (work->appCall.eventType == FIELD_APP_RESULT_COMMON_EVENT) {
+            work->state = FIELD_MENU_EVENT_STATE_COMMON_EVENT;
+        } else if (work->appCall.eventType == FIELD_APP_RESULT_HM_EVENT) {
+            work->state = FIELD_MENU_EVENT_STATE_HM_EVENT;
+        } else if (work->appCall.eventType == FIELD_APP_RESULT_NEXT) {
+            work->state = FIELD_MENU_EVENT_STATE_CLOSE;
+        } else if (work->appCall.eventType == FIELD_APP_RESULT_SCRIPT) {
+            work->state = FIELD_MENU_EVENT_STATE_SCRIPT;
         }
         break;
-    case 7:
+    case FIELD_MENU_EVENT_STATE_COMMON_EVENT:
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         GameEvent_ChainNext(event, CallFieldCommonEventFunc(work->appCall.eventId, work->gameSystem, work->field));
-        work->state = 8;
+        work->state = FIELD_MENU_EVENT_STATE_END;
         break;
-    case 8:
+    case FIELD_MENU_EVENT_STATE_END:
         return GAMEEVENT_DONE;
-    case 9:
+    case FIELD_MENU_EVENT_STATE_SCRIPT:
         if (FieldSubscreen_IsReady(Field_GetSubscreen(work->field))) {
             EnableAllActorsMovement(Field_GetActorSystem(work->field));
             GameEvent_Replace(work->event,
@@ -186,8 +201,8 @@ static BOOL FieldMenu_CanRetry(FieldAppCallInput *input, void *arg) {
     FieldMenuWork *menu = arg;
     FieldSubscreen *subscreen = Field_GetSubscreen(menu->field);
 
-    if (input->eventType == 0) {
-        FieldSubscreen_SetMenuSelectedButton(subscreen, menu->unk10);
+    if (input->eventType == FIELD_APP_RESULT_RETURN) {
+        FieldSubscreen_SetMenuSelectedButton(subscreen, menu->selectedButton);
     }
     return TRUE;
 }
@@ -201,18 +216,18 @@ static BOOL FieldMenu_OnAppEnd(FieldAppCallInput *input, void *arg) {
     GameData *gameData = GSYS_GetGameData(menu->gameSystem);
 
     switch (input->eventType) {
-    case 4:
+    case FIELD_APP_RESULT_NEXT:
         GameData_SetLastSubscreen(gameData, 6);
         break;
-    case 0:
+    case FIELD_APP_RESULT_RETURN:
         GameData_SetLastSubscreen(gameData, 1);
         break;
-    case 5:
+    case FIELD_APP_RESULT_SCRIPT:
         GameData_SetLastSubscreen(gameData, 0);
         break;
-    case 1:
-    case 2:
-    case 3:
+    case FIELD_APP_RESULT_EXIT:
+    case FIELD_APP_RESULT_HM_EVENT:
+    case FIELD_APP_RESULT_COMMON_EVENT:
         GameData_SetLastSubscreen(gameData, menu->screenId);
         break;
     }

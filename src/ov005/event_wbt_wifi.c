@@ -8,6 +8,13 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
+// The steps of the event
+enum {
+    STEP_WAIT_COMM_EXIT,
+    STEP_START_DOWNLOAD,
+    STEP_END,
+};
+
 typedef struct {
     GameSystem *gsys;
     Field *field;
@@ -40,18 +47,18 @@ GameEventReturnCode EventWbtWifi_Callback(GameEvent *event, u32 *state, void *da
     EventWbtWifi *wk = data;
 
     switch (*state) {
-    case 0:
+    case STEP_WAIT_COMM_EXIT:
         // Wait for the comm system to shut down
         if (!GameCommSys_BootCheck(GSYS_GetGameCommSystem(wk->gsys))) {
-            *state = 1;
+            *state = STEP_START_DOWNLOAD;
         }
         break;
-    case 1:
+    case STEP_START_DOWNLOAD:
         GameEvent_ChainNext(event, EventFieldSubprocessTransition_Create(wk->gsys, wk->field, OVERLAY_WBT_DOWNLOAD,
                                                                          &WBT_DOWNLOAD_PROC_FUNCTIONS, wk->param));
-        *state = 2;
+        *state = STEP_END;
         break;
-    case 2:
+    case STEP_END:
         GFL_HeapFree(wk->param);
         return GAMEEVENT_DONE;
     }

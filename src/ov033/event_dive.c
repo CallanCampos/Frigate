@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/sound.h"
 #include "field/event_dive.h"
 #include "field/event_mapchange.h"
 #include "field/field.h"
@@ -13,6 +14,16 @@
 #include "struct_decls.h"
 #include "system/game_event.h"
 
+// The steps of diving: sink the player, play the dive's sound once it is under, change the map when the sound ends,
+// and wait for the player's animation in the new map
+enum {
+    DIVE_IN_STEP_SINK,
+    DIVE_IN_STEP_WAIT_SINK,
+    DIVE_IN_STEP_WAIT_SOUND,
+    DIVE_IN_STEP_MAP_CHANGE,
+    DIVE_IN_STEP_WAIT_ANIME,
+};
+
 GameEventReturnCode EventDiveIn_Callback(GameEvent *event, u32 *state, void *eventData) {
     DiveEventData *data = eventData;
     FieldTaskManager *taskManager;
@@ -22,7 +33,7 @@ GameEventReturnCode EventDiveIn_Callback(GameEvent *event, u32 *state, void *eve
     u16 zoneId;
 
     switch (*state) {
-    case 0:
+    case DIVE_IN_STEP_SINK:
         taskManager = Field_GetTaskManager(data->field);
         offset.x = 0;
         offset.y = -0x40000;
@@ -32,15 +43,15 @@ GameEventReturnCode EventDiveIn_Callback(GameEvent *event, u32 *state, void *eve
         data->timer = 8;
         (*state)++;
         break;
-    case 1:
+    case DIVE_IN_STEP_WAIT_SINK:
         if (--data->timer > 0) {
             break;
         }
-        GFL_SndSEPlay(0x63c);
+        GFL_SndSEPlay(SEQ_SE_FLD_123);
         (*state)++;
         break;
-    case 2:
-        if (GFL_SndPlayerIsActive(GFL_SndSeqGetPlayerIndex(0x63c))) {
+    case DIVE_IN_STEP_WAIT_SOUND:
+        if (GFL_SndPlayerIsActive(GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_123))) {
             break;
         }
         player = Field_GetPlayer(data->field);
@@ -50,11 +61,11 @@ GameEventReturnCode EventDiveIn_Callback(GameEvent *event, u32 *state, void *eve
         GameEvent_ChainNext(event, EventMapChangeDiveIn_Create(data->gsys, zoneId));
         (*state)++;
         break;
-    case 3:
+    case DIVE_IN_STEP_MAP_CHANGE:
         FldAct_SetAcmd(FieldPlayer_GetActor(Field_GetPlayer(data->field)), 8);
         (*state)++;
         break;
-    case 4:
+    case DIVE_IN_STEP_WAIT_ANIME:
         if (FldAct_CheckAcmdEnd(FieldPlayer_GetActor(Field_GetPlayer(data->field)))) {
             return GAMEEVENT_DONE;
         }
@@ -62,6 +73,15 @@ GameEventReturnCode EventDiveIn_Callback(GameEvent *event, u32 *state, void *eve
     }
     return GAMEEVENT_CONTINUE;
 }
+
+// The steps of surfacing: the sound and, when asked, the spin and the fog, the player's state, and the map change after
+// 24 frames
+enum {
+    DIVE_OUT_STEP_START,
+    DIVE_OUT_STEP_SET_STATE,
+    DIVE_OUT_STEP_WAIT,
+    DIVE_OUT_STEP_END,
+};
 
 GameEventReturnCode EventDiveOut_Callback(GameEvent *event, u32 *state, void *eventData) {
     DiveEventData *data = eventData;
@@ -71,8 +91,8 @@ GameEventReturnCode EventDiveOut_Callback(GameEvent *event, u32 *state, void *ev
     FieldTask *spinTask;
 
     switch (*state) {
-    case 0:
-        GFL_SndSEPlay(0x63c);
+    case DIVE_OUT_STEP_START:
+        GFL_SndSEPlay(SEQ_SE_FLD_123);
         data->timer = 0x18;
         if (data->param != 0) {
             fog = Field_GetFog(data->field);
@@ -84,18 +104,18 @@ GameEventReturnCode EventDiveOut_Callback(GameEvent *event, u32 *state, void *ev
         }
         (*state)++;
         break;
-    case 1:
+    case DIVE_OUT_STEP_SET_STATE:
         FieldPlayer_SetSpecialState(Field_GetPlayer(data->field), 2);
         (*state)++;
         break;
-    case 2:
+    case DIVE_OUT_STEP_WAIT:
         if (--data->timer > 0) {
             break;
         }
         GameEvent_ChainNext(event, EventMapChangeDiveOut_Create(data->gsys));
         (*state)++;
         break;
-    case 3:
+    case DIVE_OUT_STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -125,13 +145,13 @@ GameEvent *CreateDiveOutEvent(GameSystem *gsys, Field *field, u32 param) {
     return event;
 }
 
-GameEvent *func_ov033_0217a0f4(GameSystem *gsys, Field *field, u16 direction) {
+GameEvent *EventRailSlipdown_CreatePlayer(GameSystem *gsys, Field *field, u16 direction) {
     GameEvent *event;
     void **data;
     FieldPlayer *player;
     FieldActor *actor;
 
-    event = GameEvent_Create(gsys, NULL, func_ov033_0217a184, sizeof(void *));
+    event = GameEvent_Create(gsys, NULL, EventRailSlipdown_Callback, sizeof(void *));
     data = GameEvent_GetData(event);
     GFL_OvlLoad(OVERLAY_ID(131));
     player = Field_GetPlayer(field);
@@ -141,18 +161,18 @@ GameEvent *func_ov033_0217a0f4(GameSystem *gsys, Field *field, u16 direction) {
     return event;
 }
 
-GameEvent *func_ov033_0217a148(GameSystem *gsys, Field *field, FieldActor *actor) {
+GameEvent *EventRailSlipdown_CreateActor(GameSystem *gsys, Field *field, FieldActor *actor) {
     GameEvent *event;
     void **data;
 
-    event = GameEvent_Create(gsys, NULL, func_ov033_0217a184, sizeof(void *));
+    event = GameEvent_Create(gsys, NULL, EventRailSlipdown_Callback, sizeof(void *));
     data = GameEvent_GetData(event);
     GFL_OvlLoad(OVERLAY_ID(131));
     *data = RailSlipdown_Create(gsys, field, actor, FALSE);
     return event;
 }
 
-GameEventReturnCode func_ov033_0217a184(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventRailSlipdown_Callback(GameEvent *event, u32 *state, void *data) {
     void **work = GameEvent_GetData(event);
 
     if (RailSlipdown_IsDone(*work)) {

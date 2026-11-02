@@ -1,0 +1,14 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "P",
+    "shapes": [ 11 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_CASTELIA_CITY": [ "grass", "dark_grass" ],
+            "ZONE_ROUTE_20": [ "grass", "dark_grass" ],
+            "ZONE_FLOCCESY_RANCH": [ "grass" ],
+            "ZONE_VIRBANK_COMPLEX": [ "grass" ]
+        }
+    }
+}

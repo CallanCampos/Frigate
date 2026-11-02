@@ -1,0 +1,505 @@
+{
+    "$schema": "gate_boards.schema.json",
+    "gates": [
+        {
+            "zone": "ZONE_NACRENE_GATE",
+            "version": null,
+            "position": {
+                "x": 136,
+                "y": 0,
+                "z": 40
+            },
+            "direction": "DIR_DOWN",
+            "animation": 1,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 28, 29, 30, 31, 32, 33, 34, 35, 36 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_NACRENE_CITY", "ZONE_ROUTE_3", "ZONE_STRIATON_CITY" ]
+        },
+        {
+            "zone": "ZONE_CASTELIA_GATE",
+            "version": null,
+            "position": {
+                "x": 16,
+                "y": 0,
+                "z": 136
+            },
+            "direction": "DIR_RIGHT",
+            "animation": 3,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 46, 47, 48, 49, 50, 51, 52, 53, 54 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_CASTELIA_CITY", "ZONE_ROUTE_4", "ZONE_NIMBASA_CITY" ]
+        },
+        {
+            "zone": "ZONE_NIMBASA_GATE_GATE",
+            "version": null,
+            "position": {
+                "x": 136,
+                "y": 0,
+                "z": 40
+            },
+            "direction": "DIR_DOWN",
+            "animation": 4,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 55, 56, 57, 58, 59, 60, 61, 62, 63 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_NIMBASA_CITY", "ZONE_ROUTE_5", "ZONE_DRIFTVEIL_CITY" ]
+        },
+        {
+            "zone": "ZONE_NIMBASA_GATE_GATE_2",
+            "version": "VERSION_BLACK2",
+            "position": {
+                "x": 136,
+                "y": 0,
+                "z": 40
+            },
+            "direction": "DIR_DOWN",
+            "animation": 3,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 46, 47, 48, 49, 50, 51, 52, 53, 54 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_NIMBASA_CITY", "ZONE_ROUTE_16", "ZONE_ROUTE_15", "ZONE_BLACK_CITY" ]
+        },
+        {
+            "zone": "ZONE_NIMBASA_GATE_GATE_2",
+            "version": "VERSION_WHITE2",
+            "position": {
+                "x": 136,
+                "y": 0,
+                "z": 40
+            },
+            "direction": "DIR_DOWN",
+            "animation": 3,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 46, 47, 48, 49, 50, 51, 52, 53, 54 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_NIMBASA_CITY", "ZONE_ROUTE_16", "ZONE_ROUTE_15", "ZONE_WHITE_FOREST" ]
+        },
+        {
+            "zone": "ZONE_OPELUCID_GATE",
+            "version": "VERSION_BLACK2",
+            "position": {
+                "x": 136,
+                "y": 0,
+                "z": 40
+            },
+            "direction": "DIR_DOWN",
+            "animation": 6,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 196,
+                "swarm": 197,
+                "rotation": [ 91, 92, 93, 94, 95, 96, 97, 98, 99 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_OPELUCID_CITY", "ZONE_ROUTE_9", "ZONE_ROUTE_8", "ZONE_ICIRRUS_CITY" ]
+        },
+        {
+            "zone": "ZONE_OPELUCID_GATE",
+            "version": "VERSION_WHITE2",
+            "position": {
+                "x": 136,
+                "y": 0,
+                "z": 40
+            },
+            "direction": "DIR_DOWN",
+            "animation": 5,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 196,
+                "swarm": 197,
+                "rotation": [ 82, 83, 84, 85, 86, 87, 88, 89, 90 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_OPELUCID_CITY", "ZONE_ROUTE_9", "ZONE_ROUTE_8", "ZONE_ICIRRUS_CITY" ]
+        },
+        {
+            "zone": "ZONE_OPELUCID_GATE_GATE_2",
+            "version": "VERSION_BLACK2",
+            "position": {
+                "x": 136,
+                "y": 0,
+                "z": 40
+            },
+            "direction": "DIR_DOWN",
+            "animation": 6,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 91, 92, 93, 94, 95, 96, 97, 98, 99 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_OPELUCID_CITY", "ZONE_ROUTE_11", "ZONE_ROUTE_12", "ZONE_LACUNOSA_TOWN" ]
+        },
+        {
+            "zone": "ZONE_OPELUCID_GATE_GATE_2",
+            "version": "VERSION_WHITE2",
+            "position": {
+                "x": 136,
+                "y": 0,
+                "z": 40
+            },
+            "direction": "DIR_DOWN",
+            "animation": 5,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 82, 83, 84, 85, 86, 87, 88, 89, 90 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_OPELUCID_CITY", "ZONE_ROUTE_11", "ZONE_ROUTE_12", "ZONE_LACUNOSA_TOWN" ]
+        },
+        {
+            "zone": "ZONE_VIRBANK_GATE_GATE",
+            "version": null,
+            "position": {
+                "x": 16,
+                "y": 0,
+                "z": 136
+            },
+            "direction": "DIR_RIGHT",
+            "animation": 12,
+            "enabled": false,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 19, 20, 21, 22, 23, 24, 25, 26, 27 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_STRIATON_CITY", "ZONE_ROUTE_1", "ZONE_NACRENE_CITY" ]
+        },
+        {
+            "zone": "ZONE_ROUTE_GATE",
+            "version": null,
+            "position": {
+                "x": 16,
+                "y": 0,
+                "z": 136
+            },
+            "direction": "DIR_RIGHT",
+            "animation": 11,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 136, 137, 138, 139, 140, 141, 142, 143, 144 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_DESERT_RESORT_2", "ZONE_ROUTE_4", "ZONE_CASTELIA_CITY" ]
+        },
+        {
+            "zone": "ZONE_BRIDGE_GATE_2",
+            "version": null,
+            "position": {
+                "x": 136,
+                "y": 0,
+                "z": 48
+            },
+            "direction": "DIR_DOWN",
+            "animation": 2,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 37, 38, 39, 40, 41, 42, 43, 44, 45 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_NACRENE_CITY", "ZONE_CASTELIA_CITY" ]
+        },
+        {
+            "zone": "ZONE_BRIDGE_GATE_GATE",
+            "version": null,
+            "position": {
+                "x": 120,
+                "y": 0,
+                "z": 32
+            },
+            "direction": "DIR_DOWN",
+            "animation": 2,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 37, 38, 39, 40, 41, 42, 43, 44, 45 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_NACRENE_CITY", "ZONE_CASTELIA_CITY" ]
+        },
+        {
+            "zone": "ZONE_ROUTE_GATE_GATE",
+            "version": null,
+            "position": {
+                "x": 136,
+                "y": 0,
+                "z": 40
+            },
+            "direction": "DIR_DOWN",
+            "animation": 12,
+            "enabled": false,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 19, 20, 21, 22, 23, 24, 25, 26, 27 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_STRIATON_CITY", "ZONE_ROUTE_1", "ZONE_NACRENE_CITY" ]
+        },
+        {
+            "zone": "ZONE_ACCUMULA_GATE",
+            "version": null,
+            "position": {
+                "x": 136,
+                "y": 0,
+                "z": 40
+            },
+            "direction": "DIR_DOWN",
+            "animation": 0,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 19, 20, 21, 22, 23, 24, 25, 26, 27 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_STRIATON_CITY", "ZONE_ROUTE_2", "ZONE_ACCUMULA_TOWN" ]
+        },
+        {
+            "zone": "ZONE_BRIDGE_GATE_GATE_4",
+            "version": "VERSION_BLACK2",
+            "position": {
+                "x": 136,
+                "y": 0,
+                "z": 40
+            },
+            "direction": "DIR_DOWN",
+            "animation": 6,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 91, 92, 93, 94, 95, 96, 97, 98, 99 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_OPELUCID_CITY", "ZONE_ROUTE_11", "ZONE_ROUTE_12", "ZONE_LACUNOSA_TOWN" ]
+        },
+        {
+            "zone": "ZONE_BRIDGE_GATE_GATE_4",
+            "version": "VERSION_WHITE2",
+            "position": {
+                "x": 136,
+                "y": 0,
+                "z": 40
+            },
+            "direction": "DIR_DOWN",
+            "animation": 5,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 82, 83, 84, 85, 86, 87, 88, 89, 90 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_OPELUCID_CITY", "ZONE_ROUTE_11", "ZONE_ROUTE_12", "ZONE_LACUNOSA_TOWN" ]
+        },
+        {
+            "zone": "ZONE_BRIDGE_GATE_GATE_5",
+            "version": null,
+            "position": {
+                "x": 136,
+                "y": 0,
+                "z": 40
+            },
+            "direction": "DIR_DOWN",
+            "animation": 7,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 100, 101, 102, 103, 104, 105, 106, 107, 108 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_OPELUCID_CITY", "ZONE_ROUTE_11", "ZONE_ROUTE_12", "ZONE_LACUNOSA_TOWN" ]
+        },
+        {
+            "zone": "ZONE_UNDELLA_GATE",
+            "version": null,
+            "position": {
+                "x": 16,
+                "y": 0,
+                "z": 136
+            },
+            "direction": "DIR_RIGHT",
+            "animation": 8,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 194,
+                "swarm": 197,
+                "rotation": [ 109, 110, 111, 112, 113, 114, 115, 116, 117 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_LACUNOSA_TOWN", "ZONE_ROUTE_13", "ZONE_UNDELLA_TOWN" ]
+        },
+        {
+            "zone": "ZONE_BLACK_GATE",
+            "version": null,
+            "position": {
+                "x": 16,
+                "y": 0,
+                "z": 136
+            },
+            "direction": "DIR_RIGHT",
+            "animation": 9,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 194,
+                "swarm": 197,
+                "rotation": [ 118, 119, 120, 121, 122, 123, 124, 125, 126 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_UNDELLA_TOWN", "ZONE_ROUTE_14", "ZONE_WHITE_FOREST" ]
+        },
+        {
+            "zone": "ZONE_BLACK_GATE",
+            "version": null,
+            "position": {
+                "x": 16,
+                "y": 0,
+                "z": 136
+            },
+            "direction": "DIR_RIGHT",
+            "animation": 10,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 194,
+                "swarm": 197,
+                "rotation": [ 127, 128, 129, 130, 131, 132, 133, 134, 135 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_UNDELLA_TOWN", "ZONE_ROUTE_14", "ZONE_BLACK_CITY" ]
+        },
+        {
+            "zone": "ZONE_BLACK_GATE_GATE",
+            "version": null,
+            "position": {
+                "x": 136,
+                "y": 0,
+                "z": 40
+            },
+            "direction": "DIR_DOWN",
+            "animation": 9,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 118, 119, 120, 121, 122, 123, 124, 125, 126 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_NIMBASA_CITY", "ZONE_ROUTE_16", "ZONE_ROUTE_15", "ZONE_WHITE_FOREST" ]
+        },
+        {
+            "zone": "ZONE_BLACK_GATE_GATE",
+            "version": null,
+            "position": {
+                "x": 136,
+                "y": 0,
+                "z": 40
+            },
+            "direction": "DIR_DOWN",
+            "animation": 10,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 127, 128, 129, 130, 131, 132, 133, 134, 135 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_NIMBASA_CITY", "ZONE_ROUTE_16", "ZONE_ROUTE_15", "ZONE_BLACK_CITY" ]
+        },
+        {
+            "zone": "ZONE_ASPERTIA_GATE",
+            "version": null,
+            "position": {
+                "x": 16,
+                "y": 0,
+                "z": 136
+            },
+            "direction": "DIR_RIGHT",
+            "animation": 13,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 212, 213, 214, 215, 216, 217, 218, 219, 220 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_ASPERTIA_CITY", "ZONE_ROUTE_19", "ZONE_FLOCCESY_TOWN" ]
+        },
+        {
+            "zone": "ZONE_VIRBANK_GATE",
+            "version": null,
+            "position": {
+                "x": 136,
+                "y": 0,
+                "z": 40
+            },
+            "direction": "DIR_DOWN",
+            "animation": 14,
+            "enabled": true,
+            "messages": {
+                "date": 0,
+                "message1": 195,
+                "swarm": 197,
+                "rotation": [ 221, 222, 223, 224, 225, 226, 227, 228, 229 ],
+                "weekdays": [ 12, 13, 14, 15, 16, 17, 18 ]
+            },
+            "weather_zones": [ "ZONE_VIRBANK_CITY", "ZONE_ROUTE_20", "ZONE_FLOCCESY_TOWN" ]
+        }
+    ]
+}

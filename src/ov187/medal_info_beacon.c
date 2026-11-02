@@ -1,6 +1,7 @@
 #include "types.h"
 #include "app/medal_info.h"
 #include "app/medal_info_viewer.h"
+#include "constants/version.h"
 #include "gfl/heap.h"
 #include "gfl/proc.h"
 #include "gfl/std.h"
@@ -82,9 +83,9 @@ static BOOL MedalInfoBeacon_MedalExit(GameProc *proc, u32 *state, void *param, v
     MedalInfoWork *medalWork = work;
     u32 result = MedalInfoViewer_Delete(medalWork->viewer);
 
-    if (result == 0) {
+    if (result == MEDAL_INFO_RESULT_BACK) {
         medalWork->param->result = 0;
-    } else if (result == 1) {
+    } else if (result == MEDAL_INFO_RESULT_FIELD) {
         medalWork->param->result = 1;
     }
     GFL_ProcReleaseSubsystem(proc);
@@ -123,9 +124,9 @@ static BOOL MedalInfoBeacon_LogExit(GameProc *proc, u32 *state, void *param, voi
     int highest;
     int count;
 
-    if (result == 0) {
+    if (result == MEDAL_INFO_RESULT_BACK) {
         logWork->param->returnToField = 0;
-    } else if (result == 1) {
+    } else if (result == MEDAL_INFO_RESULT_FIELD) {
         logWork->param->returnToField = 1;
     }
     status = GameData_GetBeaconStatus(logWork->param->gameData);
@@ -157,7 +158,7 @@ static void MedalInfoBeacon_LoadBeacons(MedalInfoBeaconWork *work) {
     int i;
     int total;
     u16 time;
-    u32 kind;
+    u32 version;
     GameBeacon *beacon = GameBeacon_Alloc(work->heapId);
     GameBeaconInfoTable *status = BeaconStatus_GetInfoTable(GameData_GetBeaconStatus(work->param->gameData));
 
@@ -166,8 +167,9 @@ static void MedalInfoBeacon_LoadBeacons(MedalInfoBeaconWork *work) {
     total = GameBeaconInfoTable_GetCount(status);
     for (i = 0; i < total; i++) {
         GameBeaconInfoTable_RingGet(status, beacon, &time, i);
-        kind = GameBeacon_GetVersion(beacon);
-        if (!GameBeacon_IsInvalid(beacon) && !GameBeacon_IsGiftType(beacon) && (kind == 0x16 || kind == 0x17)) {
+        version = GameBeacon_GetVersion(beacon);
+        if (!GameBeacon_IsInvalid(beacon) && !GameBeacon_IsGiftType(beacon) &&
+            (version == VERSION_WHITE2 || version == VERSION_BLACK2)) {
             if (GameBeacon_GetFavoriteMedal(beacon) != MEDAL_INFO_NO_MEDAL) {
                 work->viewerParam.count++;
             }
@@ -177,8 +179,9 @@ static void MedalInfoBeacon_LoadBeacons(MedalInfoBeaconWork *work) {
                                                  "medal_info_beacon.c", 282);
     for (i = 0; i < total; i++) {
         GameBeaconInfoTable_RingGet(status, beacon, &time, i);
-        kind = GameBeacon_GetVersion(beacon);
-        if (!GameBeacon_IsInvalid(beacon) && !GameBeacon_IsGiftType(beacon) && (kind == 0x16 || kind == 0x17)) {
+        version = GameBeacon_GetVersion(beacon);
+        if (!GameBeacon_IsInvalid(beacon) && !GameBeacon_IsGiftType(beacon) &&
+            (version == VERSION_WHITE2 || version == VERSION_BLACK2)) {
             if (work->param->beaconIndex == i) {
                 work->viewerParam.startIndex = n;
             }

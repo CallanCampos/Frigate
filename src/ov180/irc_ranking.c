@@ -251,6 +251,12 @@ static void IrcRankingStepMan_Run(IrcRankingStepMan *mgr);
 static BOOL IrcRankingStepMan_IsDone(IrcRankingStepMan *mgr);
 static void IrcRankingStepMan_SetStep(IrcRankingStepMan *mgr, IrcRankingStepFunc step);
 static void IrcRankingStepMan_SetDone(IrcRankingStepMan *mgr);
+enum {
+    STEP_FADE_START,
+    STEP_FADE_WAIT,
+    STEP_FADE_DONE,
+};
+
 static void IrcRanking_StepFadeIn(IrcRankingStepMan *mgr, int *state, IrcRankingWork *wk);
 static void IrcRanking_StepFadeOut(IrcRankingStepMan *mgr, int *state, IrcRankingWork *wk);
 static void IrcRanking_StepInput(IrcRankingStepMan *mgr, int *state, IrcRankingWork *wk);
@@ -504,16 +510,16 @@ static void IrcRankingStepMan_SetDone(IrcRankingStepMan *mgr) {
 
 static void IrcRanking_StepFadeIn(IrcRankingStepMan *mgr, int *state, IrcRankingWork *wk) {
     switch (*state) {
-    case 0:
+    case STEP_FADE_START:
         GFL_FadeSet(3, 16, 0, 0);
-        *state = 1;
+        *state = STEP_FADE_WAIT;
         break;
-    case 1:
+    case STEP_FADE_WAIT:
         if (!GFL_FadeIsRunning()) {
-            *state = 2;
+            *state = STEP_FADE_DONE;
         }
         break;
-    case 2:
+    case STEP_FADE_DONE:
         // BUG: the list reports -1 when the player is not in it, and this compares with 0xffff
 #ifdef BUGFIX
         if (IrcRankingList_FindSelf(&wk->list) != -1) {
@@ -530,16 +536,16 @@ static void IrcRanking_StepFadeIn(IrcRankingStepMan *mgr, int *state, IrcRanking
 
 static void IrcRanking_StepFadeOut(IrcRankingStepMan *mgr, int *state, IrcRankingWork *wk) {
     switch (*state) {
-    case 0:
+    case STEP_FADE_START:
         GFL_FadeSet(3, 0, 16, 0);
-        *state = 1;
+        *state = STEP_FADE_WAIT;
         break;
-    case 1:
+    case STEP_FADE_WAIT:
         if (!GFL_FadeIsRunning()) {
-            *state = 2;
+            *state = STEP_FADE_DONE;
         }
         break;
-    case 2:
+    case STEP_FADE_DONE:
         IrcRankingStepMan_SetDone(mgr);
         break;
     }

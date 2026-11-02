@@ -1,0 +1,16 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A zone's NPC info cache: res/field/actors/npc_caches/<n>.json",
+    "description": "File n of ARCID_FIELD_ACTOR_CONFIG (a/0/5/7), which a zone's header names by its npc_cache (res/field/zones/; GetZoneNPCInfoCacheIdx) and LoadMModelSystemInfoCache loads as the player enters the zone (event_mapchange.c), or none for a number from 24 on. GetNPCMdlInfoForOBJCODE takes a code's record from the cache before it reads the model table (field_actor.c). tools/data/npc_cache_data.py packs the caches in order, each with a copy of its codes' records, written from their data.json in res/field/actors/.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "codes" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "codes": {
+            "type": "array", "maxItems": 26,
+            "description": "The object codes the cache holds, at most 26 to fit its 0x310 bytes; GetNPCMdlInfoForOBJCODE reads a cache only when it holds fewer than 26 (CONFIG_CACHE_MAX)",
+            "items": { "type": "string", "x-constant": "OBJ_CODE_" }
+        }
+    }
+}

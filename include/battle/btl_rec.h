@@ -46,7 +46,7 @@ typedef struct {
     BattleAction actions[4][16];
 } BtlRecReader;
 
-BtlRecorder *BtlRecorder_Create(HeapID heapId, u32 type);
+BtlRecorder *BtlRecorder_Create(HeapID heapId, u32 studioMode);
 void BtlRecorder_Delete(BtlRecorder *recorder);
 void BtlRecorder_AddData(BtlRecorder *recorder, const void *data, u32 size);
 u8 BtlRec_GetCmdCheckReq(const void *data);

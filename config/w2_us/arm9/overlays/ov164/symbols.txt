@@ -5,4 +5,4 @@ NetSync_Send kind:function(thumb,size=0x40) addr:0x02199984
 NetSync_RecvCallback kind:function(thumb,size=0x22) addr:0x021999c4
 NetSync_StartTiming kind:function(thumb,size=0x12) addr:0x021999e8
 NetSync_IsTimingDone kind:function(thumb,size=0x2a) addr:0x021999fc
-data_ov164_021999e8 kind:data(any) addr:0x02199a28
+NetSync_CommandTable kind:data(any) addr:0x02199a28

@@ -18,6 +18,9 @@ typedef struct {
     BOOL visible;
 } BAppCursor;
 
+// Ends the lists of window indices of BAppTool_QueueWindowScreens
+#define BAPP_TOOL_WINDOW_LIST_END 0xff
+
 BAppCursor *BAppCursor_Create(HeapID heapId);
 void BAppCursor_Delete(BAppCursor *cursor);
 // The corners use the animation sequences 0 to 3 of the resources
@@ -28,7 +31,7 @@ void BAppCursor_SetVisible(BAppCursor *cursor, BOOL visible);
 void BAppCursor_SetPos(BAppCursor *cursor, const CursorMoveData *pos);
 // Copies a window's screen at the next VBlank
 void BAppTool_QueueWindowScreen(PrintWindow *printWindow);
-// BAppTool_QueueWindowScreen on the windows of a list of indices that ends with 0xff
+// BAppTool_QueueWindowScreen on the windows of a list of indices that ends with BAPP_TOOL_WINDOW_LIST_END
 void BAppTool_QueueWindowScreens(PrintWindow *printWindows, const u8 *list);
 // Runs the print queue and flushes the count windows that it has printed
 void BAppTool_FlushPrintWindows(PrintWindow *printWindows, PrintQueue *queue, u32 count);

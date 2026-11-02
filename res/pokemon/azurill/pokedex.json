@@ -1,0 +1,12 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "A",
+    "shapes": [ 1 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_ROUTE_20": [ "surf" ],
+            "ZONE_FLOCCESY_RANCH": [ "grass", "surf" ]
+        }
+    }
+}

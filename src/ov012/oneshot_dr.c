@@ -6,13 +6,14 @@
 
 #define ONESHOT_DR_COUNT 8
 
-static const u32 data_ov012_0216dc1c[ONESHOT_DR_COUNT] = {
+// The key of each gift, which the table keeps XORed with the player's ID
+static const u32 ONESHOT_DR_KEYS[ONESHOT_DR_COUNT] = {
     0x0132b4e5, 0x0132b536, 0x0132df06, 0x01cb7587, 0x009a5c10, 0x0132e2f1, 0x042e464f, 0x01708483,
 };
 
 void setOneShotDRObtained(TrainerCardSave *trainerCard, int flag, PlayerInfo *playerInfo) {
     if (flag < ONESHOT_DR_COUNT) {
-        setToTrainerCardDRTable(trainerCard, flag, getIDAsUInt(playerInfo) ^ data_ov012_0216dc1c[flag]);
+        setToTrainerCardDRTable(trainerCard, flag, getIDAsUInt(playerInfo) ^ ONESHOT_DR_KEYS[flag]);
     }
 }
 
@@ -25,7 +26,7 @@ BOOL isOneShotDRObtained(TrainerCardSave *trainerCard, int flag, PlayerInfo *pla
     }
     id = getIDAsUInt(playerInfo);
     key = getOneShotDRKeyFromSave(trainerCard, flag);
-    if ((key ^ id) == data_ov012_0216dc1c[flag]) {
+    if ((key ^ id) == ONESHOT_DR_KEYS[flag]) {
         return TRUE;
     }
     return FALSE;

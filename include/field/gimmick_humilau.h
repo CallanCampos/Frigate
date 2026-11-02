@@ -14,6 +14,6 @@ void GimmickHumilau_Update(Field *field);
 // Script plugin 15 calls these. Shows the splash at a position given in grid squares, and plays its sound
 void GimmickHumilau_ShowSplash(GameSystem *gsys, u16 x, u16 y, u16 z);
 // Makes an actor jump out of the water and land on a grid square. a4 is not used
-GameEvent *GimmickHumilau_CreateJumpEvent(GameSystem *gsys, u16 actorId, u16 x, u16 z, u16 a4);
+GameEvent *GimmickHumilau_CreateJumpEvent(GameSystem *gsys, u16 actorId, u16 x, u16 z, u16 unused);
 
 #endif // POKEBW2_FIELD_GIMMICK_HUMILAU_H

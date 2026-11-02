@@ -57,7 +57,7 @@ BOOL Scrcmd_Buildmodel_PokecenPCIdle(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     Field *field = GSYS_GetField(gsys);
 
-    ScriptWork_CallEvent(work, func_ov033_02179a58(ScriptWork_GetEvent(work), gsys, field));
+    ScriptWork_CallEvent(work, CreatePCIdleCallEvent(ScriptWork_GetEvent(work), gsys, field));
     return TRUE;
 }
 

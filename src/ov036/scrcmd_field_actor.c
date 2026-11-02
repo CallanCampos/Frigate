@@ -996,7 +996,7 @@ BOOL Scrcmd_FieldActor_ActorPlayRailSlipdown(VM *vm, FieldScriptEnv *env) {
     FieldActor *actor = FindFieldActor(mmSys, ScriptReadAny(vm, env));
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
 
-    ScriptWork_CallEvent(work, func_ov033_0217a148(gsys, fieldWork->field, actor));
+    ScriptWork_CallEvent(work, EventRailSlipdown_CreateActor(gsys, fieldWork->field, actor));
     return TRUE;
 }
 

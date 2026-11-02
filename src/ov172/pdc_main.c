@@ -58,6 +58,23 @@ struct PdcMain {
     u8 keyCursorFlag;
 };
 
+// The steps of the intro proc
+enum {
+    PDC_INTRO_START,
+    PDC_INTRO_WAIT_HIDE,
+    PDC_INTRO_WAIT_APPEAR,
+    PDC_INTRO_WAIT_MESSAGE,
+    PDC_INTRO_WAIT_HIDE_GAUGE,
+    PDC_INTRO_WAIT_ENTRANCE,
+};
+
+// The steps of the ask proc
+enum {
+    PDC_ASK_START,
+    PDC_ASK_WAIT_MESSAGE,
+    PDC_ASK_WAIT_BUTTON,
+};
+
 // The steps of the bag proc
 enum {
     PDC_BAG_START,
@@ -73,6 +90,13 @@ enum {
     PDC_BAG_WAIT_EFFECT_END,
     PDC_BAG_WAIT_KEY,
     PDC_BAG_WAIT_FADE_OUT_END,
+};
+
+// The steps of the leave proc
+enum {
+    PDC_LEAVE_START,
+    PDC_LEAVE_WAIT_MESSAGE,
+    PDC_LEAVE_WAIT_FADE,
 };
 
 static void PdcMain_SetProc(PdcMain *work, PdcMainProc proc);
@@ -197,11 +221,11 @@ static void PdcMain_ExitGraphics(void) {
 // The Pokémon appears and the messages introduce it
 static u32 PdcMain_ProcIntro(PdcMain *work) {
     switch (work->seq) {
-    case 0:
+    case PDC_INTRO_START:
         PdcMsg_StartHide(work->msg);
         work->seq++;
         break;
-    case 1:
+    case PDC_INTRO_WAIT_HIDE:
         if (PdcMsg_IsHideDone(work->msg)) {
             BtlvEffect_AddPokemon(work->pkm, 1);
             BtlvEffect_Start(PDC_EFFECT_APPEAR);
@@ -209,26 +233,26 @@ static u32 PdcMain_ProcIntro(PdcMain *work) {
             work->seq++;
         }
         break;
-    case 2:
+    case PDC_INTRO_WAIT_APPEAR:
         if (!BtlvEffect_IsBusy()) {
             PdcMsg_StartSawDream(work->msg, work->pdc);
             work->seq++;
         }
         break;
-    case 3:
+    case PDC_INTRO_WAIT_MESSAGE:
         if (PdcMsg_Step(work->msg)) {
             BtlvEffect_AddGaugeByPkm(PdcWork_GetPokedex(work->pdc), PdcWork_GetPkm(work->pdc), 1);
             PdcMsg_StartHide(work->msg);
             work->seq++;
         }
         break;
-    case 4:
+    case PDC_INTRO_WAIT_HIDE_GAUGE:
         if (PdcMsg_IsHideDone(work->msg)) {
             BtlvEffect_Start(PDC_EFFECT_APPEAR_END);
             work->seq++;
         }
         break;
-    case 5:
+    case PDC_INTRO_WAIT_ENTRANCE:
         if (!BtlvEffect_IsBusy()) {
             PdcMain_SetProc(work, PdcMain_ProcAsk);
         }
@@ -240,17 +264,17 @@ static u32 PdcMain_ProcIntro(PdcMain *work) {
 // The choice between the bag and leaving
 static u32 PdcMain_ProcAsk(PdcMain *work) {
     switch (work->seq) {
-    case 0:
+    case PDC_ASK_START:
         PdcMsg_StartWhatWill(work->msg, work->pdc);
         work->seq++;
         break;
-    case 1:
+    case PDC_ASK_WAIT_MESSAGE:
         if (PdcMsg_Step(work->msg)) {
             BtlvInput_SetScreen(work->input, 7, NULL);
             work->seq++;
         }
         break;
-    case 2: {
+    case PDC_ASK_WAIT_BUTTON: {
         s32 button = BtlvInput_CheckInput(work->input, &sButtonSet, sKeyStops);
 
         if (button != -1) {
@@ -319,7 +343,7 @@ static u32 PdcMain_ProcBag(PdcMain *work) {
         break;
     case PDC_BAG_WAIT_CALL:
         if (PdcMsg_Step(work->msg)) {
-            BtlvEffect_StartEffect23A(1, work->bag.item, 4, 1, 0);
+            BtlvEffect_StartBallThrow(1, work->bag.item, 4, 1, 0);
             work->seq++;
         }
         break;
@@ -371,18 +395,18 @@ static u32 PdcMain_ProcBag(PdcMain *work) {
 // The player leaves
 static u32 PdcMain_ProcLeave(PdcMain *work) {
     switch (work->seq) {
-    case 0:
+    case PDC_LEAVE_START:
         PdcMsg_StartLeft(work->msg, work->pdc);
         work->seq++;
         break;
-    case 1:
+    case PDC_LEAVE_WAIT_MESSAGE:
         if (PdcMsg_Step(work->msg)) {
             GFL_FadeSet(3, 0, 16, 2);
             GFL_SndBGMFadeOut(8);
             work->seq++;
         }
         break;
-    case 2:
+    case PDC_LEAVE_WAIT_FADE:
         if (!GFL_FadeIsRunning()) {
             return PDC_RESULT_LEFT;
         }

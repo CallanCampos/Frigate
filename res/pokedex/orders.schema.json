@@ -1,0 +1,90 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The Pokédex search's orders: res/pokedex/orders.json",
+    "description": "ARCID_POKEDEX_DATA's files 3 to 9 (a/0/9/7), the lists of the species in the orders that the Pokédex's search sorts by (sPokedexSearchOrderFiles in pokedex_search_engine.c), which tools/data/pokedex_data.py packs. An entry is a species, or [ species, form ] for a form other than the first.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "national", "regional", "alphabetical", "tallest", "shortest", "heaviest", "lightest" ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "This schema, for editors"
+        },
+        "national": {
+            "type": "array",
+            "description": "File 3: the species by national number, which nothing reads (the search counts 1 to 649 itself)",
+            "items": {
+                "$ref": "#/$defs/entry"
+            }
+        },
+        "regional": {
+            "type": "array",
+            "description": "File 4: the search's order by number for the regional Pokédex (FILE_NATIONAL_ORDER of pokedex_search_engine.c), which it keeps the regional Pokédex's species of: the others in national order, then the regional Pokédex's in its order",
+            "items": {
+                "$ref": "#/$defs/entry"
+            }
+        },
+        "alphabetical": {
+            "type": "array",
+            "description": "File 5: the species by name, the search's order by name, which the Global Trade Station's and the Battle Video's searches also read",
+            "items": {
+                "$ref": "#/$defs/entry"
+            }
+        },
+        "tallest": {
+            "type": "array",
+            "description": "File 6: the species and forms by height, tallest first",
+            "items": {
+                "$ref": "#/$defs/entry"
+            }
+        },
+        "shortest": {
+            "type": "array",
+            "description": "File 7: the species and forms by height, shortest first",
+            "items": {
+                "$ref": "#/$defs/entry"
+            }
+        },
+        "heaviest": {
+            "type": "array",
+            "description": "File 8: the species and forms by weight, heaviest first",
+            "items": {
+                "$ref": "#/$defs/entry"
+            }
+        },
+        "lightest": {
+            "type": "array",
+            "description": "File 9: the species and forms by weight, lightest first",
+            "items": {
+                "$ref": "#/$defs/entry"
+            }
+        }
+    },
+    "$defs": {
+        "entry": {
+            "anyOf": [
+                {
+                    "type": "string",
+                    "x-constant": "SPECIES_"
+                },
+                {
+                    "type": "array",
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "description": "[ species, form ]: a form other than the first",
+                    "prefixItems": [
+                        {
+                            "type": "string",
+                            "x-constant": "SPECIES_"
+                        },
+                        {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 63
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

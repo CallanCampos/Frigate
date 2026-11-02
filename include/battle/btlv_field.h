@@ -8,7 +8,10 @@
 #include "gfl/heap.h"
 #include "struct_decls.h"
 
-BtlvField *BtlvField_Create(BOOL arg0, u8 fieldId, u8 variant, HeapID heapId, u32 mode, s32 fieldParam, BOOL arg6);
+// studioMode is BTL_STUDIO_MODE_*, which picks Pokéstar Studios' fields; fieldParam, from the studio's rules, is a
+// playback's field, the field in the low byte and its variant in the high one
+BtlvField *BtlvField_Create(BOOL arg0, u8 fieldId, u8 variant, HeapID heapId, u32 studioMode, s32 fieldParam,
+                            BOOL arg6);
 void BtlvField_Reload(BtlvField *field, s32 fieldParam);
 void BtlvField_Delete(BtlvField *field);
 void BtlvField_Main(BtlvField *field);

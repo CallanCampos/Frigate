@@ -1,0 +1,25 @@
+{
+    "$schema": "../npc_cache.schema.json",
+    "codes": [
+        "OBJ_CODE_110",
+        "OBJ_CODE_YOUNGSTER",
+        "OBJ_CODE_LASS",
+        "OBJ_CODE_228",
+        "OBJ_CODE_105",
+        "OBJ_CODE_PKMN_BREEDER_M",
+        "OBJ_CODE_316",
+        "OBJ_CODE_PKMN_RANGER_F",
+        "OBJ_CODE_21",
+        "OBJ_CODE_SCHOOL_KID_M",
+        "OBJ_CODE_PILOT",
+        "OBJ_CODE_WORKER_44",
+        "OBJ_CODE_BACKPACKER_F",
+        "OBJ_CODE_95",
+        "OBJ_CODE_PRESCHOOLER_M",
+        "OBJ_CODE_PRESCHOOLER_F",
+        "OBJ_CODE_TWINS",
+        "OBJ_CODE_HARLEQUIN_233",
+        "OBJ_CODE_NURSERY_AIDE",
+        "OBJ_CODE_BATTLE_GIRL"
+    ]
+}

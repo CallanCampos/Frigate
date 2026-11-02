@@ -41,8 +41,6 @@
 // The one in front is the one that the Pokédex shows of the species
 
 #define ARCID_POKEICON 7
-// For each species and form, the message of its next form's name in system message file 450
-#define ARCID_FORM_NAME_TABLE 97
 
 enum {
     FORM_SEQ_INIT,
@@ -1272,7 +1270,7 @@ static void PokedexDetailForm_CreateText(PokedexDetailFormParam *param, PokedexD
     }
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_SERVER_FLOW_TITLE, param->heapId);
     wk->formMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_POKEDEX_DETAIL_FORM, param->heapId);
-    wk->formNameTable = GFL_ArcSysReadHeapNewLZGetLen(ARCID_FORM_NAME_TABLE, 0, FALSE, param->heapId, &size);
+    wk->formNameTable = GFL_ArcSysReadHeapNewLZGetLen(ARCID_POKEDEX_DATA, 0, FALSE, param->heapId, &size);
 
     bitmap = BmpWin_GetBitmap(wk->windows[WINDOW_LABELS]);
     strbuf1 = GFL_MsgDataLoadStrbufNew(wk->msgData, BtlServerFlowTitle_Text_FormsSeen);

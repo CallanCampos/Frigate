@@ -28,20 +28,20 @@ enum {
     CTVT_PACKET_TALKER,
     CTVT_PACKET_ZOOM,
     CTVT_PACKET_DRAW_INDEX,
-    CTVT_PACKET_UNK4,
-    CTVT_PACKET_UNK5,
+    CTVT_PACKET_ALLOW_DRAW,
+    CTVT_PACKET_ALLOW_VOICE,
     CTVT_PACKET_REQUEST_TALK,
     CTVT_PACKET_PLAY_VOICE,
     CTVT_PACKET_CANCEL_TALK,
     CTVT_PACKET_TALK_DONE,
-    CTVT_PACKET_UNK_A,
-    CTVT_PACKET_UNK_B,
-    CTVT_PACKET_UNK_C,
-    CTVT_PACKET_UNK_D,
-    CTVT_PACKET_UNK_E,
-    CTVT_PACKET_UNK_F,
-    CTVT_PACKET_UNK_10,
-    CTVT_PACKET_UNK_11,
+    CTVT_PACKET_EXIT,
+    CTVT_PACKET_GAME_INVITE,
+    CTVT_PACKET_GAME_JOIN,
+    CTVT_PACKET_GAME_CANCEL_REQUEST,
+    CTVT_PACKET_GAME_STARTING,
+    CTVT_PACKET_GAME_CANCEL,
+    CTVT_PACKET_GAME_READY,
+    CTVT_PACKET_GAME_START,
 };
 
 // The beacon of this machine, which the machines that scan see
@@ -81,11 +81,44 @@ typedef struct {
         u8 values[4];
     };
     u8 type;
-    u8 unk5[2];
-    u8 unk7;
+    // Where a member touched, for CTVT_GAME_PACKET_TOUCH
+    u8 touchX;
+    u8 touchY;
+    // The target slot to launch, for CTVT_GAME_PACKET_SPAWN_TARGET
+    u8 target;
     u8 mask;
     u16 frame;
 } CtvtGamePacket;
+
+// The types of CtvtGamePacket
+enum {
+    // The host launches a target
+    CTVT_GAME_PACKET_SPAWN_TARGET,
+    // The host's seed for the game's random numbers
+    CTVT_GAME_PACKET_SEED,
+    // A member's touch, for the host to check against the targets
+    CTVT_GAME_PACKET_TOUCH = 3,
+    // The targets the members in mask hit, from the host
+    CTVT_GAME_PACKET_HITS,
+    // A member pumps, a small or a big pump
+    CTVT_GAME_PACKET_PUMP,
+    CTVT_GAME_PACKET_PUMP_BIG,
+    // The host grows the balloons of the members in mask
+    CTVT_GAME_PACKET_GROW_BALLOONS,
+};
+
+// The minigames' commands, which CtvtComm_QueueGameCommand sends
+enum {
+    // A member joins the host's next round
+    CTVT_GAME_COMMAND_JOIN,
+    CTVT_GAME_COMMAND_CHILD_QUIT,
+    // The host tells the members that all have joined
+    CTVT_GAME_COMMAND_ALL_JOINED,
+    CTVT_GAME_COMMAND_HOST_QUIT,
+    CTVT_GAME_COMMAND_READY,
+    // The host starts the next round
+    CTVT_GAME_COMMAND_REPLAY,
+};
 
 typedef struct {
     u32 data[4];
@@ -119,7 +152,7 @@ BOOL CtvtComm_IsSynced(CommTvtWork *sys, CtvtComm *comm, int no);
 u8 CtvtComm_GetSelfNetId(CommTvtWork *sys, CtvtComm *comm);
 // The member talking, or CTVT_COMM_NONE
 u8 CtvtComm_GetTalker(CommTvtWork *sys, CtvtComm *comm);
-u8 CtvtComm_GetUnk3dc(CommTvtWork *sys, CtvtComm *comm, u8 index);
+u8 CtvtComm_GetGameCharacter(CommTvtWork *sys, CtvtComm *comm, u8 index);
 BOOL CtvtComm_IsVoiceBusy(CommTvtWork *sys, CtvtComm *comm);
 CtvtCommBeacon *CtvtComm_GetBeacon(CommTvtWork *sys, CtvtComm *comm);
 CtvtVoicePacket *CtvtComm_GetVoicePacket(CommTvtWork *sys, CtvtComm *comm);
@@ -133,6 +166,6 @@ DrawCommand *CtvtComm_GetDrawSlot(CommTvtWork *sys, CtvtComm *comm, BOOL *full);
 void CtvtComm_CommitDrawSlot(CommTvtWork *sys, CtvtComm *comm);
 void CtvtComm_StartInviteTimer(CommTvtWork *sys, CtvtComm *comm);
 BOOL CtvtComm_IsInviteTimerDone(CommTvtWork *sys, CtvtComm *comm);
-BOOL CtvtComm_GetUnk3f8(CommTvtWork *sys, CtvtComm *comm);
+BOOL CtvtComm_CanSendVoice(CommTvtWork *sys, CtvtComm *comm);
 
 #endif // POKEBW2_APP_COMM_TVT_CTVT_COMM_H

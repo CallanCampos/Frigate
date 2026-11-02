@@ -46,8 +46,12 @@ def decompress(blob):
                 distance = ((first & 15) << 8 | second) + 1
             if distance > len(output):
                 raise ValueError("invalid LZ back-reference")
-            for _ in range(length):
-                output.append(output[-distance])
+            start = len(output) - distance
+            if distance >= length:
+                output += output[start:start + length]
+            else:
+                # An overlapping copy repeats the last distance bytes
+                output += (output[start:] * (length // distance + 1))[:length]
     if len(output) != size:
         raise ValueError("LZ stream exceeds declared size")
     return bytes(output)
@@ -343,6 +347,10 @@ def unfilter_png(raw, width, height, pixel_bytes, label):
         filter_type = raw[cursor]
         row = bytearray(raw[cursor + 1:cursor + 1 + stride])
         cursor += 1 + stride
+        if filter_type == 0:
+            out.extend(row)
+            previous = row
+            continue
         for x in range(stride):
             left = row[x - pixel_bytes] if x >= pixel_bytes else 0
             above = previous[x]
@@ -400,24 +408,149 @@ def read_rgba_png(path):
     return width, height, rows
 
 
-def bitmap_png(data, width, height):
-    """A direct color bitmap (RGB555, bit 15 set where the pixel shows) as an RGBA PNG: each channel's five bits
+def write_rgba_apng(width, height, frames, delay):
+    """An animated PNG of RGBA frames, each whole and replacing the last (blend op source), so that each frame's
+    pixels, transparent ones too, read back as they were; delay is each frame's (numerator, denominator) seconds."""
+    chunks = [png_chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0)),
+              png_chunk(b"acTL", struct.pack(">II", len(frames), 0))]
+    sequence = 0
+    for index, pixels in enumerate(frames):
+        if len(pixels) != width * height * 4:
+            raise ValueError("invalid RGBA frame")
+        chunks.append(png_chunk(b"fcTL", struct.pack(">IIIIIHHBB", sequence, width, height, 0, 0, *delay, 0, 0)))
+        sequence += 1
+        raw = b"".join(b"\0" + pixels[y * width * 4:(y + 1) * width * 4] for y in range(height))
+        data = zlib.compress(raw, 9)
+        if index == 0:
+            chunks.append(png_chunk(b"IDAT", data))
+        else:
+            chunks.append(png_chunk(b"fdAT", struct.pack(">I", sequence) + data))
+            sequence += 1
+    return b"\x89PNG\r\n\x1a\n" + b"".join(chunks) + png_chunk(b"IEND", b"")
+
+
+def read_rgba_apng(path):
+    """Returns an animated PNG's width, height and its frames as RGBA, composed as a viewer shows them: each frame's
+    region drawn by its blend op over what the last one's dispose op left. The PNG is 8-bit RGB or RGBA."""
+    data = path.read_bytes()
+    if not data.startswith(b"\x89PNG\r\n\x1a\n"):
+        raise ValueError(f"{path}: expected PNG")
+    cursor, width, height, color, controls, images = 8, None, None, None, [], {}
+    seen_control = False
+    while cursor < len(data):
+        size = struct.unpack_from(">I", data, cursor)[0]
+        kind = data[cursor + 4:cursor + 8]
+        payload = data[cursor + 8:cursor + 8 + size]
+        if zlib.crc32(kind + payload) != struct.unpack_from(">I", data, cursor + 8 + size)[0]:
+            raise ValueError(f"{path}: PNG CRC mismatch")
+        cursor += 12 + size
+        if kind == b"IHDR":
+            width, height, depth, color, comp, filt, interlace = struct.unpack(">IIBBBBB", payload)
+            if color not in (2, 6) or depth != 8 or comp or filt or interlace:
+                raise ValueError(f"{path}: expected a noninterlaced 8-bit RGB or RGBA PNG")
+        elif kind == b"fcTL":
+            controls.append(struct.unpack(">IIIIIHHBB", payload)[1:])
+            seen_control = True
+        elif kind == b"IDAT" and seen_control:
+            images.setdefault(len(controls) - 1, bytearray()).extend(payload)
+        elif kind == b"fdAT":
+            images.setdefault(len(controls) - 1, bytearray()).extend(payload[4:])
+        elif kind == b"IEND":
+            break
+    if not controls:
+        raise ValueError(f"{path}: not an animated PNG (it has no frames)")
+    pixel_bytes = 4 if color == 6 else 3
+    canvas = bytearray(width * height * 4)
+    frames = []
+    for index, (frame_width, frame_height, x, y, _, _, dispose, blend) in enumerate(controls):
+        dispose = 1 if index == 0 and dispose == 2 else dispose
+        if x + frame_width > width or y + frame_height > height or index not in images:
+            raise ValueError(f"{path}: frame {index} is outside the image or has no data")
+        rows = unfilter_png(zlib.decompress(images[index]), frame_width, frame_height, pixel_bytes, path)
+        if pixel_bytes == 3:
+            rows = b"".join(rows[i:i + 3] + b"\xff" for i in range(0, len(rows), 3))
+        previous = bytes(canvas)
+        if blend == 0 or not rows[3::4].translate(None, b"\xff"):
+            if (frame_width, frame_height) == (width, height):
+                canvas[:] = rows
+            else:
+                for row in range(frame_height):
+                    at = ((y + row) * width + x) * 4
+                    canvas[at:at + frame_width * 4] = rows[row * frame_width * 4:(row + 1) * frame_width * 4]
+            frames.append(bytes(canvas))
+            rows = None
+        for row in range(frame_height if rows is not None else 0):
+            for column in range(frame_width):
+                source = rows[(row * frame_width + column) * 4:(row * frame_width + column) * 4 + 4]
+                at = ((y + row) * width + x + column) * 4
+                if blend == 1 and source[3] < 255:
+                    alpha = source[3]
+                    under = canvas[at:at + 4]
+                    out_alpha = alpha + under[3] * (255 - alpha) // 255
+                    if out_alpha == 0:
+                        continue
+                    canvas[at:at + 4] = bytes(
+                        (source[c] * alpha + under[c] * under[3] * (255 - alpha) // 255) // out_alpha
+                        for c in range(3)) + bytes([out_alpha])
+                else:
+                    canvas[at:at + 4] = source
+        if rows is not None:
+            frames.append(bytes(canvas))
+        if dispose == 1:
+            for row in range(frame_height):
+                at = ((y + row) * width + x) * 4
+                canvas[at:at + frame_width * 4] = bytes(frame_width * 4)
+        elif dispose == 2:
+            canvas = bytearray(previous)
+    return width, height, frames
+
+
+def _table(function):
+    return bytes(function(value) & 255 for value in range(256))
+
+
+def _merge(*parts):
+    """ORs byte strings of one length together, byte by byte: as whole numbers, which is fast."""
+    value = 0
+    for part in parts:
+        value |= int.from_bytes(part, "little")
+    return value.to_bytes(len(parts[0]), "little")
+
+
+# The tables that take a direct color bitmap's two bytes to and from its pixels' channels: low is red and green's low
+# three bits, high is green's top two, blue and the shown bit
+_RED = _table(lambda low: low & 31)
+_GREEN_LOW = _table(lambda low: low >> 5)
+_GREEN_HIGH = _table(lambda high: (high & 3) << 3)
+_BLUE = _table(lambda high: high >> 2 & 31)
+_SHOWN = _table(lambda high: 255 if high & 0x80 else 0)
+_WIDEN = _table(lambda channel: channel << 3 | channel >> 2 if channel < 32 else 0)
+_TO_RED = _table(lambda red: red >> 3)
+_TO_GREEN_LOW = _table(lambda green: (green >> 3 & 7) << 5)
+_TO_GREEN_HIGH = _table(lambda green: green >> 6)
+_TO_BLUE = _table(lambda blue: (blue >> 3) << 2)
+_TO_SHOWN = _table(lambda alpha: 0x80 if alpha >= 128 else 0)
+
+
+def bitmap_pixels(data, width, height):
+    """A direct color bitmap's pixels (RGB555, bit 15 set where the pixel shows) as RGBA: each channel's five bits
     widened to eight, and alpha 255 where the pixel shows and 0 where it doesn't, keeping its color."""
     if len(data) != width * height * 2:
         raise ValueError(f"a {width}x{height} direct color bitmap is {width * height * 2} bytes, not {len(data)}")
-    pixels = bytearray()
-    for (value,) in struct.iter_unpack("<H", data):
-        for shift in (0, 5, 10):
-            channel = value >> shift & 31
-            pixels.append(channel << 3 | channel >> 2)
-        pixels.append(255 if value & 0x8000 else 0)
-    return write_rgba_png(width, height, bytes(pixels))
+    low, high = data[0::2], data[1::2]
+    pixels = bytearray(width * height * 4)
+    pixels[0::4] = low.translate(_RED).translate(_WIDEN)
+    pixels[1::4] = _merge(low.translate(_GREEN_LOW), high.translate(_GREEN_HIGH)).translate(_WIDEN)
+    pixels[2::4] = high.translate(_BLUE).translate(_WIDEN)
+    pixels[3::4] = high.translate(_SHOWN)
+    return bytes(pixels)
 
 
-def build_bitmap(path, width, height):
-    """An RGBA PNG as a direct color bitmap: each channel's top five bits, and bit 15 where alpha is at least 128."""
-    png_width, png_height, pixels = read_rgba_png(path)
-    if (png_width, png_height) != (width, height):
-        raise ValueError(f"{path}: a frame is {width}x{height}, not {png_width}x{png_height}")
-    return b"".join(struct.pack("<H", pixels[i] >> 3 | (pixels[i + 1] >> 3) << 5 | (pixels[i + 2] >> 3) << 10
-                                | (0x8000 if pixels[i + 3] >= 128 else 0)) for i in range(0, len(pixels), 4))
+def pixels_bitmap(pixels):
+    """RGBA pixels as a direct color bitmap: each channel's top five bits, and bit 15 where alpha is at least 128."""
+    pixels = bytes(pixels)
+    red, green, blue, alpha = pixels[0::4], pixels[1::4], pixels[2::4], pixels[3::4]
+    data = bytearray(len(pixels) // 2)
+    data[0::2] = _merge(red.translate(_TO_RED), green.translate(_TO_GREEN_LOW))
+    data[1::2] = _merge(green.translate(_TO_GREEN_HIGH), blue.translate(_TO_BLUE), alpha.translate(_TO_SHOWN))
+    return bytes(data)

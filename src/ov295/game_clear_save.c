@@ -6,6 +6,7 @@
 #include "field/ev_time.h"
 #include "field/game_clear_save.h"
 #include "gfl/arc_util.h"
+#include "gfl/backup_system.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmpwin.h"
 #include "gfl/fade.h"
@@ -198,14 +199,14 @@ static BOOL GameClearSave_Main(GameProc *proc, u32 *state, void *param, void *wo
     case STATE_WAIT_SAVE:
         if (!save->cannotSave) {
             switch (GameData_UpdateSave(save->gameData)) {
-            case 0:
-            case 1:
+            case SAVE_RESULT_CONTINUE:
+            case SAVE_RESULT_LAST:
                 break;
-            case 2:
+            case SAVE_RESULT_OK:
                 save->saved = TRUE;
                 (*state)++;
                 break;
-            case 3:
+            case SAVE_RESULT_NG:
                 save->saved = FALSE;
                 (*state)++;
                 break;
@@ -418,7 +419,7 @@ static void GameClearSave_FreeBlocks(GameClearSave *save) {
     if (!SaveControl_IsNewGameOverSave(saveControl)) {
         u32 state = GameData_UpdateSaveBlock(save->gameData, HALL_OF_FAME_BLOCK);
 
-        if (state == 2 || state == 3) {
+        if (state == SAVE_RESULT_OK || state == SAVE_RESULT_NG) {
             freeIntermediateSaveExtraBlksAfterLoad(saveControl, HALL_OF_FAME_BLOCK);
             save->blocksFreed = TRUE;
         }

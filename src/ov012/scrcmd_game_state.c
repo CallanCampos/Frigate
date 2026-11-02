@@ -1,5 +1,8 @@
 #include "types.h"
 #include "battle/btl_result.h"
+#include "constants/obj_codes.h"
+#include "constants/trainers.h"
+#include "constants/version.h"
 #include "field/event_battle_lose.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -35,9 +38,9 @@
 BOOL Scrcmd_GameState_GameGetVersion(VM *vm, FieldScriptEnv *env) {
     u16 *value = ScriptReadVar(vm, env);
 #if defined(BLACK2)
-    *value = 23;
+    *value = VERSION_BLACK2;
 #else
-    *value = 22;
+    *value = VERSION_WHITE2;
 #endif
     return FALSE;
 }
@@ -210,13 +213,13 @@ BOOL Scrcmd_GameState_SaveDataGetStatus(VM *vm, FieldScriptEnv *env) {
     u16 *present = ScriptReadVar(vm, env);
     u16 *status = ScriptReadVar(vm, env);
     u16 *result = ScriptReadVar(vm, env);
-    u32 a2 = 0;
-    u32 a1 = 0;
+    u32 total = 0;
+    u32 changed = 0;
 
     *present = SaveControl_IsDataAlreadyPresent(save);
     *status = SaveControl_GetStatus(save);
-    SaveControl_GetChangedSize(save, &a1, &a2);
-    if (a1 * 3 < a2) {
+    SaveControl_GetChangedSize(save, &changed, &total);
+    if (changed * 3 < total) {
         *result = 0;
     } else {
         *result = 1;
@@ -628,21 +631,28 @@ BOOL Scrcmd_GameState_WildBattleGetResult(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-// The values that func_ov012_02156104 and func_ov012_02156128 give for an index
-static const u16 data_ov012_0216c9e4[8] = { 0xf, 0x37, 0x17, 0x34, 0x35, 0x40, 0x12f, 0x128 };
-static const u16 data_ov012_0216c9f4[8] = { 0x2f, 0x8a, 0x323, 0x325, 0xa, 0x88, 0x324, 0x326 };
+// A trainer for each season and the player's sex, by the season times 2 plus the sex as the scripts index them: its
+// look and the trainer, which Scrcmd_GameState_SeasonTrainerGetObjCode and _GetTrainerID give
+static const u16 sSeasonTrainerObjCodes[8] = {
+    OBJ_CODE_LASS,    OBJ_CODE_DANCER, OBJ_CODE_NURSERY_AIDE, OBJ_CODE_CLERK_M_67,
+    OBJ_CODE_CLERK_F, OBJ_CODE_HIKER,  OBJ_CODE_303,          OBJ_CODE_GUITARIST,
+};
+static const u16 sSeasonTrainers[8] = {
+    TRAINER_LASS_PERSEPHONE, TRAINER_DANCER_DIRK, TRAINER_NURSERY_AIDE_JUNE, TRAINER_CLERK_M_AUGUSTIN,
+    TRAINER_CLERK_F_TRISHA,  TRAINER_HIKER_ANDY,  TRAINER_BEAUTY_DECEMBER,   TRAINER_GUITARIST_JANUARY,
+};
 
-BOOL func_ov012_02156104(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_SeasonTrainerGetObjCode(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
 
-    *ScriptReadVar(vm, env) = data_ov012_0216c9e4[index];
+    *ScriptReadVar(vm, env) = sSeasonTrainerObjCodes[index];
     return FALSE;
 }
 
-BOOL func_ov012_02156128(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GameState_SeasonTrainerGetTrainerID(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
 
-    *ScriptReadVar(vm, env) = data_ov012_0216c9f4[index];
+    *ScriptReadVar(vm, env) = sSeasonTrainers[index];
     return FALSE;
 }
 

@@ -1,0 +1,42 @@
+// MOVE_BONEMERANG's animation: member 155 of a/0/6/5
+
+#include "asm/btlv_effvm.inc"
+
+    ScriptHeader 1
+    ScriptVariant Bonemerang
+
+Bonemerang:
+    McssSetVanish EFFVM_ATTACKER, TRUE
+    SetYield FALSE
+    PlaySE SEQ_SE_W155_01, 1, EFFVM_ATTACKER, 0, 0, 110, 0, 0, 0
+    SetYield TRUE
+    SetYield FALSE
+    PlaySE SEQ_SE_W002_01, 2, EFFVM_ATTACKER, 5, 500, 90, 0, 0, 0
+    PlaySE SEQ_SE_W002_01, 2, EFFVM_ATTACKER, 10, 500, 90, 0, 0, 0
+    PlaySE SEQ_SE_W002_01, 2, EFFVM_ATTACKER, 15, 500, 90, 0, 0, 0
+    PlaySE SEQ_SE_W002_01, 2, EFFVM_ATTACKER, 20, 500, 90, 0, 0, 0
+    PlaySE SEQ_SE_W002_01, 2, EFFVM_ATTACKER, 25, 500, 90, 0, 0, 0
+    MoveSE 2, 0, 1, 90, 0, 40, 20, 0, 0
+    PanSE 2, 0, EFFVM_ATTACKER, EFFVM_DEFENDER, 0, 30, 0, 0
+    PanSE 2, 0, EFFVM_DEFENDER, EFFVM_ATTACKER, 30, 30, 0, 0
+    SetYield TRUE
+    SetYield FALSE
+    PlaySE SEQ_SE_W155_02, 1, EFFVM_DEFENDER, 30, 0, 120, 0, 0, 0
+    PlaySE SEQ_SE_W002_01, 2, EFFVM_DEFENDER, 35, 500, 90, 0, 0, 0
+    PlaySE SEQ_SE_W002_01, 2, EFFVM_DEFENDER, 40, 500, 90, 0, 0, 0
+    PlaySE SEQ_SE_W002_01, 2, EFFVM_DEFENDER, 45, 500, 90, 0, 0, 0
+    PlaySE SEQ_SE_W002_01, 1, EFFVM_DEFENDER, 50, 500, 90, 0, 0, 0
+    PanSE 1, 0, EFFVM_DEFENDER, EFFVM_ATTACKER, 25, 60, 0, 0
+    PanSE 2, 0, EFFVM_DEFENDER, EFFVM_ATTACKER, 25, 60, 0, 0
+    SetYield TRUE
+    ParticleLoad 323
+    EmitterMove 323, 0, 2, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x14000, 0x1800, 0x1000, 0x1000, 0
+    EmitterAdd 323, 1, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    WaitFrames 20
+    McssMoveXY EFFVM_DEFENDER, 2, 0x4cd, 0, 1, 2, 3
+    EmitterMove 323, 0, 1, EFFVM_EMIT_DEFENDER, EFFVM_EMIT_ATTACKER, 0x1000, 0x14000, 0, 0x1000, 0x1000, 0
+    Wait EFFVM_WAIT_ALL
+    McssSetVanish EFFVM_ATTACKER, FALSE
+    Wait EFFVM_WAIT_ALL
+    End
+    .balign 4

@@ -1,0 +1,35 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "S",
+    "shapes": [ 0 ],
+    "area": {
+        "all_year": false,
+        "seasons": {
+            "spring": {
+                "ZONE_ICIRRUS_CITY": [ "grass" ],
+                "ZONE_MOOR_OF_ICIRRUS": [ "grass" ],
+                "ZONE_ROUTE_6": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_8": [ "grass" ],
+                "ZONE_ROUTE_11": [ "grass", "dark_grass" ]
+            },
+            "summer": {
+                "ZONE_ICIRRUS_CITY": [ "grass" ],
+                "ZONE_MOOR_OF_ICIRRUS": [ "grass" ],
+                "ZONE_ROUTE_6": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_8": [ "grass" ],
+                "ZONE_ROUTE_11": [ "grass", "dark_grass" ]
+            },
+            "autumn": {
+                "ZONE_ICIRRUS_CITY": [ "grass" ],
+                "ZONE_MOOR_OF_ICIRRUS": [ "grass" ],
+                "ZONE_ROUTE_6": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_8": [ "grass" ],
+                "ZONE_ROUTE_11": [ "grass", "dark_grass" ]
+            },
+            "winter": {
+                "ZONE_ROUTE_6": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_11": [ "grass", "dark_grass" ]
+            }
+        }
+    }
+}

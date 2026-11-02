@@ -38,7 +38,7 @@ void FestSparkle_Show(FesGimmick *gimmick, FestSparkleWork *work) {
 BOOL FestSparkle_End(FesGimmick *gimmick, FestSparkleWork *work) {
     BOOL result;
 
-    if (work->unk2 != 0) {
+    if (work->placeCount != 0) {
         result = TRUE;
     } else {
         result = FALSE;

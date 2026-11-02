@@ -1,0 +1,115 @@
+{
+    "$schema": "../../cast.schema.json",
+    "player": [
+        {
+            "species": "SPECIES_VIGOROTH",
+            "shown_species": "SPECIES_VIGOROTH",
+            "level": 50,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_NAUGHTY",
+            "ability": 0,
+            "held_item": "ITEM_LAGGING_TAIL",
+            "moves": [ "MOVE_SHADOW_CLAW", "MOVE_SLASH", "MOVE_NONE", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 0,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 0,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        }
+    ],
+    "opponent": [
+        {
+            "species": "SPECIES_GASTLY",
+            "shown_species": "SPECIES_GASTLY",
+            "level": 30,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_NAUGHTY",
+            "ability": 0,
+            "held_item": "ITEM_NONE",
+            "moves": [ "MOVE_DESTINY_BOND", "MOVE_CURSE", "MOVE_SLUDGE_BOMB", "MOVE_WILL_O_WISP" ],
+            "ivs": {
+                "hp": 0,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 0,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        },
+        {
+            "species": "SPECIES_HAUNTER",
+            "shown_species": "SPECIES_HAUNTER",
+            "level": 30,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_NAUGHTY",
+            "ability": 0,
+            "held_item": "ITEM_NONE",
+            "moves": [ "MOVE_DESTINY_BOND", "MOVE_MEAN_LOOK", "MOVE_SLUDGE_BOMB", "MOVE_WILL_O_WISP" ],
+            "ivs": {
+                "hp": 0,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 0,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        },
+        {
+            "species": "SPECIES_GENGAR",
+            "shown_species": "SPECIES_GENGAR",
+            "level": 30,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_NAUGHTY",
+            "ability": 0,
+            "held_item": "ITEM_NONE",
+            "moves": [ "MOVE_DESTINY_BOND", "MOVE_LICK", "MOVE_FOCUS_BLAST", "MOVE_WILL_O_WISP" ],
+            "ivs": {
+                "hp": 0,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 0,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        }
+    ]
+}

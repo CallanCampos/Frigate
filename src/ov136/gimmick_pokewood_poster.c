@@ -37,8 +37,8 @@ static void PokewoodPoster_MakeResName(NNSG3dResName *resName, const char *name)
 static u32 PokewoodPoster_FindTexAddr(const NNSG3dResTex *tex, const char *name);
 static u32 PokewoodPoster_FindPlttAddr(const NNSG3dResTex *tex, const char *name);
 
-// The poster model, from archive 0x125
-static const G3DSceneResourceSetup sResources[] = { { 0x125, 0, 0 } };
+// The poster model, from ARCID_GIMMICK_POKEWOOD_POSTER_MODEL
+static const G3DSceneResourceSetup sResources[] = { { ARCID_GIMMICK_POKEWOOD_POSTER_MODEL, 0, 0 } };
 
 static const G3DSceneActorSetup sActors[] = { { 0, 0, 0, 0, NULL, 0 } };
 

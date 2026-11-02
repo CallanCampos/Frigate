@@ -108,7 +108,7 @@ static BOOL BSubwayCommBattleProc_Init(GameProc *proc, u32 *state, void *param, 
 static BOOL BSubwayCommBattleProc_Exit(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL BSubwayCommBattleProc_Main(GameProc *proc, u32 *state, void *param, void *work);
 
-static const GameProcFunctions data_ov012_0216dc5c = {
+static const GameProcFunctions BSUBWAY_COMM_BATTLE_PROC_FUNCTIONS = {
     BSubwayCommBattleProc_Init,
     BSubwayCommBattleProc_Main,
     BSubwayCommBattleProc_Exit,
@@ -184,8 +184,8 @@ GameEvent *EventBSubwayPokeSelect_Create(BSubwayScrWork *bsw, GameSystem *gsys, 
     data->gsys = gsys;
     data->field = field;
     data->picked = bsw->memberChoices;
-    data->choice = &bsw->unk82;
-    data->result = &bsw->unk84;
+    data->choice = &bsw->pokeSelectIndex;
+    data->result = &bsw->pokeSelectResult;
     if (rental == FALSE) {
         party = GameData_GetParty(gameData);
     } else {
@@ -355,7 +355,7 @@ static BOOL BSubwayCommBattleProc_Main(GameProc *proc, u32 *state, void *param, 
     switch (*state) {
     case 0:
         GFL_OvlLoad(OVERLAY_ID(167));
-        NetCommand_AddTable(0x100, data_ov167_021d7448, 9, NULL);
+        NetCommand_AddTable(0x100, BTL_NET_COMMANDS, 9, NULL);
         GFL_NetSendTiming(NetHandle_GetOwn(), BSUBWAY_COMM_TIMING_BATTLE);
         *state = 1;
         break;
@@ -367,7 +367,7 @@ static BOOL BSubwayCommBattleProc_Main(GameProc *proc, u32 *state, void *param, 
         }
         break;
     case 2:
-        QueueGameProc(procWork->procManager, -1, &data_ov167_021d6ce0, battleParam->setup);
+        QueueGameProc(procWork->procManager, -1, &BATTLE_PROC_FUNCTIONS, battleParam->setup);
         *state = 3;
         break;
     case 3:
@@ -397,7 +397,7 @@ static GameEventReturnCode EventBSubwayCommBattleProc_Callback(GameEvent *event,
         data->param.gameData = GSYS_GetGameData(gsys);
         param->setup = data->setup;
         param->unk08 = data->unk08;
-        GSYS_QueueProc(gsys, -1, &data_ov012_0216dc5c, param);
+        GSYS_QueueProc(gsys, -1, &BSUBWAY_COMM_BATTLE_PROC_FUNCTIONS, param);
         (*state)++;
         break;
     case 1:

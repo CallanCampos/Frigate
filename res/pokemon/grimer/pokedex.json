@@ -1,0 +1,11 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "G",
+    "shapes": [ 13 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_CASTELIA_SEWERS": [ "grass", "surf", "rippling_surf", "fishing", "rippling_fishing" ]
+        }
+    }
+}

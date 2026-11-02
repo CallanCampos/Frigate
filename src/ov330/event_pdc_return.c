@@ -29,6 +29,15 @@
 // Set once the player knows whose PC the boxes are
 #define FLAG_PDC_RETURN_BOX_MESSAGE 0x96b
 
+// The steps of EventPdcReturn_Main: register the Pokémon, offer it a nickname, take the name, then store it
+enum {
+    PDC_RETURN_SEQ_REGISTER,
+    PDC_RETURN_SEQ_NICKNAME,
+    PDC_RETURN_SEQ_NAME_ENTRY,
+    PDC_RETURN_SEQ_STORE,
+    PDC_RETURN_SEQ_END,
+};
+
 typedef struct {
     NameEntryParam *nameEntry;
     // The player's name, then the nickname
@@ -113,7 +122,7 @@ static BOOL EventPdcReturn_Main(GameProc *proc, u32 *state, void *param, void *w
         return FALSE;
     }
     switch (*state) {
-    case 0:
+    case PDC_RETURN_SEQ_REGISTER:
         party = GameData_GetParty(prm->gameData);
         playerInfo = GetGameDataPlayerInfo(prm->gameData);
         pokedex = GameData_GetPokedex(prm->gameData);
@@ -164,10 +173,10 @@ static BOOL EventPdcReturn_Main(GameProc *proc, u32 *state, void *param, void *w
             if (prm->result == PDC_RESULT_SEEN) {
                 PokeDex_RegistPkm(pokedex, prm->pkm);
             }
-            *state = 4;
+            *state = PDC_RETURN_SEQ_END;
         }
         break;
-    case 1:
+    case PDC_RETURN_SEQ_NICKNAME:
         // Already tested above, so always true
         if (procRunning != TRUE) {
             boxes = GameData_GetBoxSaveAccessor(prm->gameData);
@@ -181,13 +190,13 @@ static BOOL EventPdcReturn_Main(GameProc *proc, u32 *state, void *param, void *w
                 QueueGameProc(wk->procManager, OVERLAY_ID(280), &NAME_ENTRY_PROC_FUNCTIONS, wk->nameEntry);
                 (*state)++;
             } else {
-                *state = 3;
+                *state = PDC_RETURN_SEQ_STORE;
             }
         } else {
             return FALSE;
         }
         break;
-    case 2:
+    case PDC_RETURN_SEQ_NAME_ENTRY:
         if (procRunning != TRUE) {
             if (NameEntryParam_IsCanceled(wk->nameEntry) == FALSE) {
                 oldName = GFL_StrBufCreate(32, wk->heapId);
@@ -206,7 +215,7 @@ static BOOL EventPdcReturn_Main(GameProc *proc, u32 *state, void *param, void *w
             return FALSE;
         }
         break;
-    case 3:
+    case PDC_RETURN_SEQ_STORE:
         party = GameData_GetParty(prm->gameData);
         if (wk->boxMessage == NULL) {
             PokeParty_AddPkm(party, prm->pkm);
@@ -215,7 +224,7 @@ static BOOL EventPdcReturn_Main(GameProc *proc, u32 *state, void *param, void *w
         }
         (*state)++;
         break;
-    case 4:
+    case PDC_RETURN_SEQ_END:
     default:
         return TRUE;
     }

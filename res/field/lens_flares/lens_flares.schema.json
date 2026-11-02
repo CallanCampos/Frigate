@@ -1,0 +1,39 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The zone transitions' lens flares: res/field/lens_flares/lens_flares.json",
+    "description": "ARCID_FIELD_GOOUT_EFFECT_DATA (a/2/4/1), a FieldLensFlareEntry per transition (field_lens_flare.h), which FieldLensFlare_DecideForZoneTransit searches when the player goes from one zone into another in sunny weather or none, without fog, and FieldLensFlare_Create shows a lens flare of (field_goout_effect.c). tools/data/lens_flare_data.py packs it.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "transitions" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "transitions": {
+            "type": "array", "maxItems": 67,
+            "description": "The transitions, searched in order; one that isn't here shows none. The field uses only the first 0x43",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "zone", "from_zone", "effect_sets" ],
+                "properties": {
+                    "zone": { "$ref": "#/$defs/zone", "description": "The zone the player goes into (zoneId)" },
+                    "from_zone": { "$ref": "#/$defs/zone", "description": "The zone the player comes from (transitId)" },
+                    "effect_sets": {
+                        "type": "object", "additionalProperties": false, "required": [ "spring", "summer", "autumn", "winter" ],
+                        "description": "The effect set of each season and time of day (effectSetIds)",
+                        "properties": {
+                            "spring": { "$ref": "#/$defs/times" }, "summer": { "$ref": "#/$defs/times" },
+                            "autumn": { "$ref": "#/$defs/times" }, "winter": { "$ref": "#/$defs/times" }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "zone": { "type": [ "string", "integer" ], "x-constant": "ZONE_", "minimum": 0, "maximum": 65535, "description": "A ZONE_* constant" },
+        "set": { "type": "integer", "minimum": 0, "maximum": 9, "description": "An effect set, a row of LENS_FLARE_IDS (field_goout_effect_data.c), of whose lens flares one shows at random: 0 for none, 1 to 8 for lens flares 0 to 7, 9 for one of 0 to 3" },
+        "times": {
+            "type": "object", "additionalProperties": false, "required": [ "day", "evening", "night" ],
+            "description": "The effect set of each time of day: day for the morning and the day, night for the night and midnight (FieldLensFlare_GetSubIndexForDayPeriod)",
+            "properties": { "day": { "$ref": "#/$defs/set" }, "evening": { "$ref": "#/$defs/set" }, "night": { "$ref": "#/$defs/set" } }
+        }
+    }
+}

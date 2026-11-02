@@ -14,7 +14,8 @@
 typedef struct {
     // Whether START skips the credits; they then show no pictures
     BOOL skippable;
-    u32 unk04;
+    // The kanji setting, which the staff roll doesn't read
+    u32 kanji;
     PlayerInfo *playerInfo;
 } StaffRollParam;
 

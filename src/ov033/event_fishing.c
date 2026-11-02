@@ -1,5 +1,7 @@
 #include "types.h"
 #include "battle/btl_setup.h"
+#include "constants/pokemon.h"
+#include "constants/sound.h"
 #include "field/encounter.h"
 #include "field/event_battle.h"
 #include "field/event_fishing.h"
@@ -126,6 +128,22 @@ GameEvent *EventFieldFishing_Create(Field *field, GameSystem *gsys) {
     return event;
 }
 
+// The steps of fishing: the form change, casting the line, waiting for a bite and for A to hook it, the scripts of no
+// bite, of A pressed before the bite and of A not pressed in time, the form change back, and the battle
+enum {
+    FISHING_STEP_START,
+    FISHING_STEP_WAIT_FORM_CHANGE,
+    FISHING_STEP_CAST,
+    FISHING_STEP_WAIT_BITE,
+    FISHING_STEP_WAIT_HOOK,
+    FISHING_STEP_NO_BITE,
+    FISHING_STEP_TOO_EARLY,
+    FISHING_STEP_TOO_LATE,
+    FISHING_STEP_RETURN_FORM,
+    FISHING_STEP_WAIT_RETURN_FORM,
+    FISHING_STEP_BATTLE,
+};
+
 GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, void *data) {
     FishingEventWork *work;
     PokeParty *party;
@@ -137,71 +155,71 @@ GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, voi
 
     work = data;
     switch (*state) {
-    case 0:
+    case FISHING_STEP_START:
         if (work->noFishing != 0) {
-            *state = 8;
+            *state = FISHING_STEP_RETURN_FORM;
             break;
         }
         FieldPlayer_SetSpecialSeq(work->player, 0x200);
         ++*state;
-    case 1:
-        if (FieldPlayer_StepFormChange(work->player) == 1) {
+    case FISHING_STEP_WAIT_FORM_CHANGE:
+        if (FieldPlayer_StepFormChange(work->player) == TRUE) {
             FldAct_SetDrawStatus(work->actor, DRAW_STATUS_STOP);
-            func_ov012_02167564(work->actor, work->flag5B);
-            GFL_SndSEPlay(0x684);
+            SetActorReflectionHidden(work->actor, work->flag5B);
+            GFL_SndSEPlay(SEQ_SE_FLD_19);
             ++*state;
         }
         break;
-    case 2:
+    case FISHING_STEP_CAST:
         if (Fishing_StepCounter(work, 15) != 0) {
-            func_ov033_02179628(work);
+            Fishing_StartLine(work);
             if (work->battleSetup == NULL) {
-                *state = 5;
+                *state = FISHING_STEP_NO_BITE;
             } else {
                 work->timer = GFL_RandomLCAlt(90) + 30;
                 ++*state;
             }
         }
         break;
-    case 3:
+    case FISHING_STEP_WAIT_BITE:
         result = Fishing_WaitBite(work, work->timer);
-        if (result == 1) {
-            *state = 6;
-        } else if (result == 2) {
-            func_ov033_021795e8(work);
+        if (result == FISHING_WAIT_PRESSED) {
+            *state = FISHING_STEP_TOO_EARLY;
+        } else if (result == FISHING_WAIT_TIMEOUT) {
+            Fishing_ShowBite(work);
             ++*state;
         }
         break;
-    case 4:
+    case FISHING_STEP_WAIT_HOOK:
         result = Fishing_WaitBite(work, 30);
-        if (result != 0) {
-            func_ov033_02179614(work);
-            if (result == 1) {
-                func_ov033_02179650(work);
+        if (result != FISHING_WAIT_NONE) {
+            Fishing_DeleteBubble(work);
+            if (result == FISHING_WAIT_PRESSED) {
+                Fishing_DeleteLine(work);
                 FldAct_SetDrawStatus(work->actor, FISHING_ANIME_HOOKED);
                 party = BtlSetup_GetParty(work->battleSetup, 1);
                 pkm = PokeParty_GetPkm(party, 0);
-                species = PokeParty_GetParam(pkm, 5, NULL);
+                species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
                 GameBeacon_BroadcastMission(0x1c, species);
                 EventScriptCall_Start(event, 0x2796, NULL, 0, HEAPID_FIELDMAP);
-                *state = 10;
-            } else if (result == 2) {
+                *state = FISHING_STEP_BATTLE;
+            } else if (result == FISHING_WAIT_TIMEOUT) {
                 RecordAddOne(work->records, 0x50);
-                *state = 7;
+                *state = FISHING_STEP_TOO_LATE;
             }
         }
         break;
-    case 5:
+    case FISHING_STEP_NO_BITE:
         result = Fishing_WaitBite(work, 120);
-        if (result != 2) {
-            if (result == 1) {
-                *state = 6;
+        if (result != FISHING_WAIT_TIMEOUT) {
+            if (result == FISHING_WAIT_PRESSED) {
+                *state = FISHING_STEP_TOO_EARLY;
             }
             break;
         }
-    case 6:
-    case 7:
-        func_ov033_02179650(work);
+    case FISHING_STEP_TOO_EARLY:
+    case FISHING_STEP_TOO_LATE:
+        Fishing_DeleteLine(work);
         if (work->battleSetup != NULL) {
             if (work->isPhenomenon == 1) {
                 EncountSystem_CancelPhenomenon(work->encountSystem);
@@ -209,19 +227,19 @@ GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, voi
             BtlSetup_Free(work->battleSetup);
         }
         FldAct_SetDrawStatus(work->actor, FISHING_ANIME_REEL_IN_EMPTY);
-        EventScriptCall_Start(event, 0x2792 + *state, NULL, 0, 0x15);
-        *state = 8;
+        EventScriptCall_Start(event, 0x2792 + *state, NULL, 0, HEAPID_FIELDMAP);
+        *state = FISHING_STEP_RETURN_FORM;
         break;
-    case 8:
+    case FISHING_STEP_RETURN_FORM:
         FieldPlayer_SetSpecialSeq(work->player, 8);
-        *state = 9;
-    case 9:
-        if (FieldPlayer_StepFormChange(work->player) != 1) {
+        *state = FISHING_STEP_WAIT_RETURN_FORM;
+    case FISHING_STEP_WAIT_RETURN_FORM:
+        if (FieldPlayer_StepFormChange(work->player) != TRUE) {
             break;
         }
-        func_ov012_02167564(work->actor, 0);
+        SetActorReflectionHidden(work->actor, 0);
         return GAMEEVENT_DONE;
-    case 10:
+    case FISHING_STEP_BATTLE:
         RecordAddOne(work->records, 8);
         JoinAvenue_RecordActivity(13);
         battleMode = work->isPhenomenon == 1 ? ENCOUNT_MODE_EFFECT : ENCOUNT_MODE_FISHING;
@@ -250,32 +268,32 @@ u32 Fishing_WaitBite(FishingEventWork *work, u32 value) {
     if (elapsed < value) {
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
             work->elapsed = 0;
-            return 1;
+            return FISHING_WAIT_PRESSED;
         }
     } else {
         work->elapsed = 0;
-        return 2;
+        return FISHING_WAIT_TIMEOUT;
     }
-    return 0;
+    return FISHING_WAIT_NONE;
 }
 
-void func_ov033_021795e8(FishingEventWork *work) {
+void Fishing_ShowBite(FishingEventWork *work) {
     void *effects;
 
     effects = Field_GetFieldEffects(work->field);
     FldAct_SetDrawStatus(work->actor, FISHING_ANIME_BITE);
-    work->effect2C = FldeffEmotionBubble_SetActor(effects, work->actor, 0, 1);
-    FldeffFishing_SetAnimeSpeed(work->effect30, 1);
+    work->bubble = FldeffEmotionBubble_SetActor(effects, work->actor, 0, 1);
+    FldeffFishing_SetAnimeSpeed(work->line, 1);
 }
 
-void func_ov033_02179614(FishingEventWork *work) {
-    if (work->effect2C != NULL) {
-        FieldEffects_DeleteObject(work->effect2C);
-        work->effect2C = NULL;
+void Fishing_DeleteBubble(FishingEventWork *work) {
+    if (work->bubble != NULL) {
+        FieldEffects_DeleteObject(work->bubble);
+        work->bubble = NULL;
     }
 }
 
-void func_ov033_02179628(FishingEventWork *work) {
+void Fishing_StartLine(FishingEventWork *work) {
     void *effects;
     u32 sameHeight;
 
@@ -284,12 +302,12 @@ void func_ov033_02179628(FishingEventWork *work) {
     if (work->fishingPos.y != work->playerPos.y) {
         sameHeight = 0;
     }
-    work->effect30 = FldeffFishing_Start(effects, &work->fishingPos, work->faceDirection, sameHeight);
+    work->line = FldeffFishing_Start(effects, &work->fishingPos, work->faceDirection, sameHeight);
 }
 
-void func_ov033_02179650(FishingEventWork *work) {
-    if (work->effect30 != NULL) {
-        FieldEffects_DeleteObject(work->effect30);
-        work->effect30 = NULL;
+void Fishing_DeleteLine(FishingEventWork *work) {
+    if (work->line != NULL) {
+        FieldEffects_DeleteObject(work->line);
+        work->line = NULL;
     }
 }

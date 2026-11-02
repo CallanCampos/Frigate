@@ -28,7 +28,7 @@ void Box2Frame_Init(Box2SysWork *syswk) {
     Box2Bmp_InitBoxListButton(syswk);
 
     BGWinFrame_InitFrame(app->bgWinFrame, 8, 1, 11, 15);
-    if (syswk->param->mode == 4) {
+    if (syswk->param->mode == BOX2_MODE_BATTLE_BOX) {
         LoadFrameScreen(app->bgWinFrame, 8, 8);
     } else {
         LoadFrameScreen(app->bgWinFrame, 8, 9);

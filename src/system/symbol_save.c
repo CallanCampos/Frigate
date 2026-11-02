@@ -10,8 +10,6 @@
 // The symbol encounters of the Entree Forest: the Pokémon that came from the Dream World, kept encrypted in ranges
 // of slots by kind. The file's name is the ROM's string. Block 0x3c.
 
-#define SYMBOL_SLOT_NONE 0xffff
-
 // The slots of the last kind are the deep areas', 60 each after the first two
 #define SYMBOL_DEEP_AREA_FIRST_SLOT 50
 #define SYMBOL_DEEP_AREA_SLOTS 60
@@ -146,8 +144,8 @@ void SymbolSave_AddPokemon(AreaNPCSave *npcData, u16 species, u16 a2, u8 sex, u8
     pokemon->form = form;
     pokemon->actorType = a5;
     if (size == SYMBOL_KIND_FREE_LARGE) {
-        if (npcData->unk848 < 1) {
-            npcData->unk848++;
+        if (npcData->group < 1) {
+            npcData->group++;
         }
     } else if (size == SYMBOL_KIND_FREE_SMALL) {
         SymbolSave_UpdateDeepestArea(npcData, slot);

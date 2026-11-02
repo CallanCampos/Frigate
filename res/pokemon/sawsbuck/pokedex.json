@@ -1,0 +1,11 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "S",
+    "shapes": [ 4, 4, 4, 4 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_DRAGONSPIRAL_TOWER": [ "grass", "dark_grass" ]
+        }
+    }
+}

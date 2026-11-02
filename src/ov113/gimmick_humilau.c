@@ -99,7 +99,7 @@ void GimmickHumilau_ShowSplash(GameSystem *gsys, u16 x, u16 y, u16 z) {
     GFL_SndSEPlay(SEQ_SE_SW_SHIZUI);
 }
 
-GameEvent *GimmickHumilau_CreateJumpEvent(GameSystem *gsys, u16 actorId, u16 x, u16 z, u16 a4) {
+GameEvent *GimmickHumilau_CreateJumpEvent(GameSystem *gsys, u16 actorId, u16 x, u16 z, u16 unused) {
     GameData *gameData;
     FieldActor *actor;
     GameEvent *event;
@@ -181,11 +181,15 @@ static void GimmickHumilau_PlayActor(FieldExpObjSystem *system, u16 actor) {
 
 // Moves the actor along the jump, then lowers it to the ground
 static GameEventReturnCode GimmickHumilau_JumpEvent(GameEvent *event, u32 *state, void *data) {
+    enum {
+        SEQ_JUMP,
+        SEQ_LOWER,
+    };
     JumpWork *work = data;
     VecFx32 pos;
 
     switch (*state) {
-    case 0:
+    case SEQ_JUMP:
         pos = work->start;
         pos.y += sJumpHeights[work->frame];
         pos.x += FX_Div(FX_Mul(work->distance.x, work->frame * FX32_ONE), FX32_CONST(22));
@@ -196,7 +200,7 @@ static GameEventReturnCode GimmickHumilau_JumpEvent(GameEvent *event, u32 *state
             (*state)++;
         }
         break;
-    case 1:
+    case SEQ_LOWER:
         CopyActorWPos(work->actor, &pos);
         if (pos.y > work->end.y) {
             pos.y -= FX32_ONE;

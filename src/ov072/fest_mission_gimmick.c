@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/items.h"
 #include "constants/pokemon.h"
 #include "field/fest_mission_gimmick.h"
 #include "field/fest_mission_people.h"
@@ -11,6 +12,12 @@
 #include "nitro/mi.h"
 #include "pml/personal.h"
 #include "pml/poke_party.h"
+
+// What the Pokémon quiz's answerChoice holds while the answer isn't among the choices
+#define QUIZ_NO_ANSWER_CHOICE 0xff
+
+// What GetTriggerSCRIDAtPosGrid and GetTriggerSCRIDAtPosRail return where no trigger is
+#define SCRID_NONE 0xffff
 
 static BOOL FesMissionGimmick_IsInList(u16 value, const u16 *list, int count);
 static u16 FesMissionGimmick_RandomNotInList(u16 max, const u16 *list, int count);
@@ -63,7 +70,7 @@ void FesMissionGimmick_BoostPartyLevels(FesGimmick *gimmick, PokeParty *party) {
     int level;
     u32 species;
 
-    if (gimmick->mission->info.target == 6) {
+    if (gimmick->mission->info.target == FES_MISSION_TARGET_BATTLE) {
         count = PokeParty_GetPkmCount(party);
         bonus = LinkFestival_GetTotalScore(gimmick->festival);
         if (bonus > 30) {
@@ -83,26 +90,26 @@ void FesMissionGimmick_BoostPartyLevels(FesGimmick *gimmick, PokeParty *party) {
     }
 }
 
-void FesMissionGimmick_GetItemExchangeInfo(FesGimmick *gimmick, FieldActor *actor, u16 arg0, u16 arg1, u16 *out0,
-                                           u16 *out1) {
+void FesMissionGimmick_GetItemExchangeInfo(FesGimmick *gimmick, FieldActor *actor, u16 slot0, u16 slot1, u16 *item0,
+                                           u16 *item1) {
     const FesMissionAnswers *answers;
 
-    if (gimmick->mission->info.target != 2) {
-        *out0 = 0x11;
-        *out1 = 0x1a;
+    if (gimmick->mission->info.target != FES_MISSION_TARGET_ITEM_EXCHANGE) {
+        *item0 = ITEM_POTION;
+        *item1 = ITEM_SUPER_POTION;
         return;
     }
-    answers = &FesMissionPeople_Answers[gimmick->mission->info.unk0_20];
-    *out0 = answers->values[GetActorUserParam(actor, 0)][arg0];
-    *out1 = answers->values[GetActorUserParam(actor, 1)][arg1];
+    answers = &FesMissionPeople_Answers[gimmick->mission->info.targetVariant];
+    *item0 = answers->values[GetActorUserParam(actor, 0)][slot0];
+    *item1 = answers->values[GetActorUserParam(actor, 1)][slot1];
 }
 
 void FesMissionGimmick_GetItemSaleInfo(FesGimmick *gimmick, FieldActor *actor, u16 *item, u16 *price) {
     u8 onSale = FesMissionPeople_IsOnSale(gimmick->mission);
     int value;
 
-    if (gimmick->mission->info.target != 3) {
-        *item = 0x11;
+    if (gimmick->mission->info.target != FES_MISSION_TARGET_ITEM_SALE) {
+        *item = ITEM_POTION;
         *price = 300;
         return;
     }
@@ -159,14 +166,14 @@ void FesMissionGimmick_MakePokemonQuiz(FesGimmick *gimmick, u16 *count, u16 *ans
         order[j] = temp;
     }
 
-    quiz->answerChoice = 0xff;
+    quiz->answerChoice = QUIZ_NO_ANSWER_CHOICE;
     for (i = 0; i < 5; i++) {
         quiz->choices[i] = quiz->species[order[i]];
         if (order[i] == quiz->answer) {
             quiz->answerChoice = i;
         }
     }
-    if (quiz->answerChoice == 0xff) {
+    if (quiz->answerChoice == QUIZ_NO_ANSWER_CHOICE) {
         quiz->answerChoice = GFL_RandomLC(5);
         quiz->choices[quiz->answerChoice] = quiz->species[quiz->answer];
     }
@@ -243,7 +250,7 @@ static BOOL FesMissionGimmick_IsGridPlaceBlocked(FesGimmick *gimmick, FesMission
         return TRUE;
     }
     result = FALSE;
-    if (GetTriggerSCRIDAtPosGrid(gimmick->eventData, gimmick->eventWork, position, 8) != 0xffff) {
+    if (GetTriggerSCRIDAtPosGrid(gimmick->eventData, gimmick->eventWork, position, 8) != SCRID_NONE) {
         result = TRUE;
     }
     return result;
@@ -256,7 +263,7 @@ static BOOL FesMissionGimmick_IsRailPlaceBlocked(FesGimmick *gimmick, FesMission
     if (FindActorByRailPosExcluding(gimmick->actors, position, FALSE, work->actors[index]) != NULL) {
         return TRUE;
     }
-    if (GetTriggerSCRIDAtPosRail(gimmick->eventData, gimmick->eventWork, position) != 0xffff) {
+    if (GetTriggerSCRIDAtPosRail(gimmick->eventData, gimmick->eventWork, position) != SCRID_NONE) {
         result = TRUE;
     }
     return result;

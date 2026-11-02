@@ -1,0 +1,11 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "R",
+    "shapes": [ 1 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_RELIC_PASSAGE": [ "grass" ]
+        }
+    }
+}

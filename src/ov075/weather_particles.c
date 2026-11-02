@@ -1,4 +1,6 @@
 #include "types.h"
+#include "constants/arc.h"
+#include "constants/sound.h"
 #include "field/field_weather.h"
 #include "field/weather_particles.h"
 #include "gfl/clact.h"
@@ -11,6 +13,34 @@
 
 #define FLAKE_START_COLOR 0x7fdf
 #define WEATHER_SOUND_TYPE 0x3d
+// A blizzard flake's size is its animation frame, and scales its speed
+#define BLIZZARD_FLAKE_SIZE_COUNT 4
+
+// Flake's state
+enum {
+    FLAKE_FALLING,
+    FLAKE_LEAVING,
+};
+
+// BlizzardFlake's state
+enum {
+    BLIZZARD_FLAKE_MOVING,
+    BLIZZARD_FLAKE_GONE,
+};
+
+// FlutterFlake's phase
+enum {
+    FLUTTER_FLAKE_FALLING,
+    FLUTTER_FLAKE_FLUTTERING,
+    FLUTTER_FLAKE_GONE,
+};
+
+// How fast a flutter flake falls: the higher, the faster
+enum {
+    FLUTTER_KIND_SLOW,
+    FLUTTER_KIND_MEDIUM,
+    FLUTTER_KIND_FAST,
+};
 
 // Weather 1's work
 typedef struct {
@@ -36,7 +66,7 @@ typedef struct {
     int unused18;
     // Points to FlakeWork's done
     int *done;
-    // 0 until the weather is done, then 1
+    // FLAKE_LEAVING once the weather is done
     int state;
     // Frames left before the flake goes, once the weather is done
     int timer;
@@ -60,7 +90,7 @@ typedef struct {
     int frame;
     int lifetime;
     int speedY;
-    // 0 while it moves, 1 once its lifetime is over
+    // BLIZZARD_FLAKE_GONE once its lifetime is over
     int state;
     int speedX;
     // Added to speedX every 4 frames
@@ -78,7 +108,6 @@ typedef struct {
     int frame;
     int lifetime;
     int speedY;
-    // 0 while it falls, 1 while it flutters, 2 once it is gone
     int phase;
     int speedX;
     int unused14;
@@ -161,7 +190,7 @@ static const s8 sFlakeSway[0x151] = {
 };
 
 WeatherData SPECK_WEATHER = {
-    { 0x37, 1, 0, 0x1b, 0x1c, 0x1a, 0x19 },
+    { ARCID_WEATHER, 1, 0, 0x1b, 0x1c, 0x1a, 0x19 },
     sizeof(SpeckWork),
     {
         Speck_Init,
@@ -176,7 +205,7 @@ WeatherData SPECK_WEATHER = {
 };
 
 WeatherData BLIZZARD_WEATHER = {
-    { 0x37, 1, 1, 0x1f, 0x18, 0x1e, 0x1d, 0x2a, 0x303, 3, 0x102 },
+    { ARCID_WEATHER, 1, 1, 0x1f, 0x18, 0x1e, 0x1d, 0x2a, 0x303, 3, 0x102 },
     sizeof(BlizzardWork),
     {
         Blizzard_Init,
@@ -191,7 +220,7 @@ WeatherData BLIZZARD_WEATHER = {
 };
 
 WeatherData FLUTTER_WEATHER = {
-    { 0x37, 1, 0, 2, 3, 1 },
+    { ARCID_WEATHER, 1, 0, 2, 3, 1 },
     sizeof(FlutterWork),
     {
         Flutter_Init,
@@ -206,7 +235,7 @@ WeatherData FLUTTER_WEATHER = {
 };
 
 WeatherData FLAKE_WEATHER = {
-    { 0x37, 1, 0, 0x17, 0x18, 0x16, 0x15 },
+    { ARCID_WEATHER, 1, 0, 0x17, 0x18, 0x16, 0x15 },
     sizeof(FlakeWork),
     {
         Flake_Init,
@@ -319,7 +348,7 @@ static void Flake_Move(WeatherObj *obj) {
 
     WeatherTask_GetParticleActor(obj);
     done = flake->done;
-    if (flake->state == 0) {
+    if (flake->state == FLAKE_FALLING) {
         if (*done != 0) {
             flake->state++;
         }
@@ -364,7 +393,7 @@ static void Flake_Add(WeatherTask *task, int count, HeapID heapId) {
             ClActor_SetAnimFrame(actor, GFL_RandomLC(4));
             flake->acc = 0;
             flake->swayIdx = 0;
-            flake->state = 0;
+            flake->state = FLAKE_FALLING;
             flake->timer = (int)GFL_RandomLC(0) % 30 + 2;
             flake->rate = GFL_RandomLC(8) + 12;
             flake->mode = mode;
@@ -391,7 +420,7 @@ static BOOL Blizzard_Init(WeatherTask *task, u32 arg, HeapID heapId) {
     work->scrollY = 0;
     work->scrollStep = 0;
     WeatherTask_SaveCameraPos(task);
-    WeatherTask_PlaySe(task, 0x6e3);
+    WeatherTask_PlaySe(task, SEQ_SE_FLD_84);
     return TRUE;
 }
 
@@ -483,11 +512,11 @@ static void BlizzardFlake_Move(WeatherObj *obj) {
 
     ClActor_GetSurfacePos(actor, &pos, 0);
     switch (flake->state) {
-    case 0:
+    case BLIZZARD_FLAKE_MOVING:
         pos.x += (s16)flake->speedX;
         pos.y += (s16)flake->speedY;
         if (flake->frame++ > flake->lifetime) {
-            flake->state = 1;
+            flake->state = BLIZZARD_FLAKE_GONE;
         }
         if (flake->frame % 4 == 0) {
             flake->speedX += flake->accelX;
@@ -497,7 +526,7 @@ static void BlizzardFlake_Move(WeatherObj *obj) {
         }
         ClActor_SetSurfacePos(actor, &pos, 0);
         break;
-    case 1:
+    case BLIZZARD_FLAKE_GONE:
         WeatherTask_RemoveParticle(obj);
         break;
     }
@@ -526,12 +555,12 @@ static void Blizzard_AddFlakes(WeatherTask *task, int count, HeapID heapId) {
         actor = WeatherTask_GetParticleActor(obj);
         flake->frame = 0;
         flake->lifetime = GFL_RandomLC(3) + 9;
-        size = GFL_RandomLC(4);
+        size = GFL_RandomLC(BLIZZARD_FLAKE_SIZE_COUNT);
         ClActor_SetAnimFrame(actor, size);
         flake->speedX = (size + 1) * sBlizzardSpeedX[index];
         flake->speedY = (size + 1) * sBlizzardSpeedY[index];
-        flake->state = 0;
-        if (size == 3) {
+        flake->state = BLIZZARD_FLAKE_MOVING;
+        if (size == BLIZZARD_FLAKE_SIZE_COUNT - 1) {
             flake->speedX += sBlizzardSpeedX[index];
             flake->speedY += sBlizzardSpeedY[index];
         }
@@ -575,7 +604,7 @@ static BOOL Flutter_Init(WeatherTask *task, u32 arg, HeapID heapId) {
     WeatherTask_InitFog(task, 9, FLAKE_START_COLOR, arg);
     work->timer = 1;
     WeatherTask_SaveCameraPos(task);
-    WeatherTask_PlaySe(task, 0x6e4);
+    WeatherTask_PlaySe(task, SEQ_SE_FLD_85);
     return TRUE;
 }
 
@@ -659,9 +688,9 @@ static void FlutterFlake_Move(WeatherObj *obj) {
 
     WeatherTask_GetParticlePos(obj, &pos);
     switch (flake->phase) {
-    case 0:
+    case FLUTTER_FLAKE_FALLING:
         if (++flake->frame > flake->lifetime) {
-            flake->phase = 1;
+            flake->phase = FLUTTER_FLAKE_FLUTTERING;
             flake->frame = flake->seed % 4 * 2 + 8;
             flake->speedX = 2;
             flake->speedY = 2;
@@ -672,7 +701,7 @@ static void FlutterFlake_Move(WeatherObj *obj) {
         pos.y += (s16)flake->speedY;
         WeatherTask_SetParticlePosWrapped(obj, &pos);
         break;
-    case 1:
+    case FLUTTER_FLAKE_FLUTTERING:
         pos.x += (s16)flake->speedX;
         if (flake->frame % 2 == 0) {
             pos.y += (s16)flake->speedY;
@@ -689,10 +718,10 @@ static void FlutterFlake_Move(WeatherObj *obj) {
         }
         WeatherTask_SetParticlePos(obj, &pos);
         if (flake->frame-- <= 0) {
-            flake->phase = 2;
+            flake->phase = FLUTTER_FLAKE_GONE;
         }
         break;
-    case 2:
+    case FLUTTER_FLAKE_GONE:
         WeatherTask_RemoveParticle(obj);
         break;
     }
@@ -719,23 +748,23 @@ static void Flutter_AddFlakes(WeatherTask *task, int count, HeapID heapId) {
         seed = GFL_RandomLC(0);
         flake->frame = 0;
         if (seed % 100 < 30) {
-            kind = 0;
+            kind = FLUTTER_KIND_SLOW;
         } else if (seed % 100 < 95) {
-            kind = 1;
+            kind = FLUTTER_KIND_MEDIUM;
         } else if (seed % 100 < 100) {
-            kind = 2;
+            kind = FLUTTER_KIND_FAST;
         }
         ClActor_SetAnimFrame(actor, 2 - kind);
         m = seed % 23;
         flake->speedY = m + (kind + 1) * 10;
-        if (kind == 2) {
+        if (kind == FLUTTER_KIND_FAST) {
             flake->speedY += 3;
         }
         flake->speedX = m / 4 + (kind + 1) * 4;
-        if (kind == 2) {
+        if (kind == FLUTTER_KIND_FAST) {
             flake->speedX -= 2;
         }
-        flake->phase = 0;
+        flake->phase = FLUTTER_FLAKE_FALLING;
         flake->lifetime = (seed & 3) + 1;
         pos.x = seed % 0x10e + (kind * 15 - 0x40);
         pos.y = (seed & 0xf) - 8;

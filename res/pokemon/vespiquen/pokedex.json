@@ -1,0 +1,12 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "V",
+    "shapes": [ 5 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_LOSTLORN_FOREST": [ "shaking_grass" ],
+            "ZONE_ROUTE_12": [ "shaking_grass" ]
+        }
+    }
+}

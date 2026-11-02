@@ -64,5 +64,5 @@ u32 Intrude_IsSessionEndPending(GameCommSys *commSys) {
     return 0;
 }
 
-void func_ov012_02153668(GameCommSys *commSys) {
+void Intrude_OnZoneChange(GameCommSys *commSys) {
 }

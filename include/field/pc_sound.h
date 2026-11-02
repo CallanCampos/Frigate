@@ -17,8 +17,8 @@ struct PCSoundEventData {
 
 GameEventReturnCode pcEntrySound(GameEvent *event, u32 *state, void *data);
 GameEvent *CreatePCSoundCallEvent(GameEvent *parent, GameSystem *gsys, Field *field);
-GameEventReturnCode func_ov033_021799e8(GameEvent *event, u32 *state, void *data);
-GameEvent *func_ov033_02179a58(GameEvent *parent, GameSystem *gsys, Field *field);
+GameEventReturnCode pcIdle(GameEvent *event, u32 *state, void *data);
+GameEvent *CreatePCIdleCallEvent(GameEvent *parent, GameSystem *gsys, Field *field);
 GameEventReturnCode pcLogOffSound(GameEvent *event, u32 *state, void *data);
 GameEvent *FieldDoorAnime_StartClose(GameEvent *parent, GameSystem *gsys, Field *field, u32 skipSound);
 GameEvent *Scrcmd_CreateSubProcEvent(GameSystem *gsys, u16 option, u16 *result);

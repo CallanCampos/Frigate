@@ -223,7 +223,7 @@ static u32 BeaconDetail_SeqFadeOut(BeaconDetailWork *work) {
     switch (work->seq) {
     case 0:
         // The return button's animation ends first, unless the game itself ends the screen
-        if (!work->param->unk0A) {
+        if (!work->param->lowBatteryExit) {
             BeaconDetail_UpdateTouchBar(work->touchBar);
             if (TouchBar_GetDecided(work->touchBar) != TOUCHBAR_ICON_RETURN) {
                 break;
@@ -257,7 +257,7 @@ static void BeaconDetail_InitData(BeaconDetailWork *work) {
         if (GameBeacon_IsInvalid(work->beacon) || GameBeacon_IsGiftType(work->beacon)) {
             continue;
         }
-        if (work->param->subscreen == i) {
+        if (work->param->logIndex == i) {
             work->index = work->count;
         }
         work->logIndices[work->count++] = i;
@@ -276,7 +276,7 @@ static void BeaconDetail_InitData(BeaconDetailWork *work) {
 static void BeaconDetail_FreeData(BeaconDetailWork *work) {
     int logIndex = work->logIndices[work->index];
     int count = GameBeaconInfoTable_GetCount(work->infoTable);
-    int row = work->param->mode;
+    int row = work->param->logRow;
     int last = work->startLogIndex + (LOG_LIST_ROWS - 1 - row);
     int first = work->startLogIndex - row;
 

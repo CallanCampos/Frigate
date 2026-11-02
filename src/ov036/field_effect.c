@@ -2,6 +2,7 @@
 // own, from GFL_HeapAllocate's file argument. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_effect.h"
 #include "field/field_map.h"
@@ -135,7 +136,7 @@ FieldEffects *FieldEffects_Create(Field *field, int count, HeapID heapId) {
     effects->count = count;
     effects->heapId = heapId;
     effects->field = field;
-    effects->arc = GFL_ArcSysCreateFileHandle(74, heapId);
+    effects->arc = GFL_ArcSysCreateFileHandle(ARCID_FIELD_EFFECT, heapId);
     effects->season = GameSystem_GetSeason(Field_GetGameSystem(field));
     effects->isExterior = AreaData_IsExterior(Field_GetAreaData(field));
     FieldEffects_InitEffectBuffer(effects);

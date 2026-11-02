@@ -1,0 +1,245 @@
+{
+    "$schema": "rail.schema.json",
+    "tile_width": 4096,
+    "points": [
+        {
+            "name": "RE_POINT_0",
+            "position": {
+                "x": 1015808,
+                "y": 0,
+                "z": 1474560
+            },
+            "camera": 0,
+            "lines": [
+                {
+                    "line": 1,
+                    "dir": "left",
+                    "width": 16
+                },
+                {
+                    "line": 2,
+                    "dir": "right",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "RE_POINT_1",
+            "position": {
+                "x": 1015808,
+                "y": 696320,
+                "z": 622592
+            },
+            "camera": 1,
+            "lines": [
+                {
+                    "line": 0,
+                    "dir": "right",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "POINT__2_RE_LINE_0",
+            "position": {
+                "x": 622592,
+                "y": 327680,
+                "z": 1081344
+            },
+            "camera": 2,
+            "lines": [
+                {
+                    "line": 0,
+                    "dir": "left",
+                    "width": 16
+                },
+                {
+                    "line": 1,
+                    "dir": "right",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "RE_POINT_3",
+            "position": {
+                "x": 1146880,
+                "y": 0,
+                "z": 1474560
+            },
+            "camera": 3,
+            "lines": [
+                {
+                    "line": 2,
+                    "dir": "left",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        }
+    ],
+    "lines": [
+        {
+            "name": "RE_LINE_0",
+            "point_a": 2,
+            "point_b": 1,
+            "dir": "left",
+            "curve": 0,
+            "camera": 4,
+            "length": 10,
+            "tiles": [
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00810001", "0x00810001", "0x00810001" ],
+                [ "0x00810001", "0x00810001", "0x00810001" ]
+            ]
+        },
+        {
+            "name": "div_1_RE_LINE_0",
+            "point_a": 0,
+            "point_b": 2,
+            "dir": "left",
+            "curve": 1,
+            "camera": 5,
+            "length": 9,
+            "tiles": [
+                [ "0x00810001", "0x00840016", "0x00810001" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ]
+            ]
+        },
+        {
+            "name": "RE_LINE_2",
+            "point_a": 3,
+            "point_b": 0,
+            "dir": "left",
+            "curve": 2,
+            "camera": 6,
+            "length": 2,
+            "tiles": [
+                [ "0x00810001", "0x00810001", "0x00810001" ],
+                [ "0x00810001", "0x008000a3", "0x00810001" ]
+            ]
+        }
+    ],
+    "cameras": [
+        {
+            "function": "RailCameraFuncSetStaticPYDist",
+            "params": [ 6968, 0, 962560, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "RailCameraFuncSetStaticPYDist",
+            "params": [ 6568, 0, 917504, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "RailCameraFuncSetStaticPYDist",
+            "params": [ 6568, 0, 917504, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "RailCameraFuncSetStaticPYDist",
+            "params": [ 6968, 0, 962560, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_YawFromPoint",
+            "params": [ 6968, 962560, 1015808, 1081344, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_YawFromPoint",
+            "params": [ 6968, 962560, 1015808, 1081344, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_BlendAngles",
+            "params": [ 6568, 0, 917504, 0, 0, 0, 0, 0 ]
+        }
+    ],
+    "curves": [
+        {
+            "kind": "slerp_xz",
+            "center": {
+                "x": 1015808,
+                "y": 512000,
+                "z": 1081344
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "kind": "slerp_xz",
+            "center": {
+                "x": 1015808,
+                "y": 163840,
+                "z": 1081344
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "kind": "no_curve",
+            "center": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        }
+    ]
+}

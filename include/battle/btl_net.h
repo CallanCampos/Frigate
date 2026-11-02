@@ -56,6 +56,6 @@ void BtlNet_FreePartyPacket(BtlNetPartyPacket *packet);
 void BtlNet_SetPartyPacket(BtlNetPartyPacket *packet, PokeParty *party, u8 clientId);
 
 // The link battle's commands, registered from 0x100 by the events that start one
-extern const NetCommand data_ov167_021d7448[9];
+extern const NetCommand BTL_NET_COMMANDS[9];
 
 #endif // POKEBW2_BATTLE_BTL_NET_H

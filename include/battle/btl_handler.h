@@ -61,7 +61,8 @@ typedef struct {
     union {
         u32 raw;
         struct {
-            u32 unk0 : 1;
+            // Set when Magic Coat or Magic Bounce reflects the move back, which then keeps its targets
+            u32 reflected : 1;
             u32 unk1 : 31;
         };
     } flags;
@@ -72,7 +73,8 @@ typedef struct {
     u16 damage;
     u16 monId : 5;
     u16 effectiveness : 4;
-    u16 unk9 : 4;
+    // What let the target endure the hit (ServerEvent_CheckEndure), 0 for nothing
+    u16 endureCause : 4;
     u16 critical : 1;
     u16 fixedDamage : 1;
     u16 substitute : 1;
@@ -88,23 +90,27 @@ typedef struct {
 
 // Where the move goes, and its effect
 struct BattleMoveEffectState {
-    u16 unk00;
+    // The move whose animation plays instead of the move's own, 0 for its own
+    u16 animMove;
     u8 pos1;
     u8 pos2;
     u8 index;
     u8 enabled : 1;
-    u8 unk05_1 : 1;
+    // Set once ServerControl_PutMoveAnimation has queued the animation
+    u8 animShown : 1;
     u8 unk05_2 : 6;
 };
 
 // How many times a move hits, and how its hits are checked
 typedef struct {
     u8 count;
-    u8 unk01;
-    u8 unk02;
-    u8 unk03;
+    u8 hitsDone;
+    // Whether each hit checks its accuracy again
+    u8 checkEachHit;
+    u8 multiHit;
     u8 unk04;
-    u8 unk05;
+    // The effectiveness the message after the hits gives: the first hit's other than normal
+    u8 effectiveness;
 } BtlFlowHitWork;
 
 // The experience one party mon gets for a faint
@@ -131,8 +137,9 @@ typedef struct {
 typedef struct {
     u8 count;
     u8 monIds[6];
+    // The targets' positions and mon IDs
     u8 targets[6];
-    u8 unk0D[6];
+    u8 targetIds[6];
 } BtlFlowReactionList;
 
 // Client IDs the flow collected, such as those that must switch in
@@ -152,9 +159,9 @@ typedef struct {
     BtlFlowHitWork hitWork;
     BtlFlowReactionList reactionLists[2];
     BtlFlowDamageList damageLists[2];
-    u8 unk28C;
-    u8 unk28D;
-    u8 unk28E;
+    u8 targetPos;
+    u8 onceFlag;
+    u8 failMessageShown;
 } BtlFlowWorkFrame;
 
 struct BtlServerFlow {
@@ -162,70 +169,86 @@ struct BtlServerFlow {
     BtlMainModule *mainModule;
     BtlPokeCon *pokeCon;
     BtlServerCmdQueue *queue;
-    u32 unk10;
-    u32 unk14;
-    u32 unk18;
+    u32 turnCount;
+    // What the turn being run ends with, a BTL_FLOW_RESULT_*
+    u32 result;
+    // Whether it is a link battle's (BtlMain_IsCommCompetitor)
+    u32 commCompetitor;
     BtlMoveRec moveRec;
     BtlFaintRec faintRec;
-    ArcTool *unk4A4;
+    ArcTool *evolutionData;
     BattleMoveEffectState *moveEffect;
-    BtlFlowReactionList *unk4AC;
-    BtlFlowReactionList *unk4B0;
-    BtlFlowHitWork *unk4B4;
+    // The mons that steal the move being used, as with Snatch, and those that reflect it, as with Magic Coat
+    BtlFlowReactionList *stealList;
+    BtlFlowReactionList *reflectList;
+    BtlFlowHitWork *hitWork;
     BtlClientIDList clientIdList;
     BattleMonLevelUp levelUp;
-    BtlFlowClientList unk4CE;
+    BtlFlowClientList switchInClients;
     u8 unk4D4[0x2a0];
-    u32 unk774;
-    u32 unk778;
-    u8 unk77C;
+    // Above 0 while the AI's damage calculations run the flow (BtlServerFlow_IsSimulating)
+    u32 simulationDepth;
+    u32 serial;
+    // Set once a turn's or a switch's run has set up, which its next calls go on from
+    u8 runStarted;
     u8 unk77D;
-    u8 unk77E;
-    u8 unk77F;
+    u8 turnCheckSeq;
+    // The position of the move's one target, BTL_POS_NONE when it has several or none
+    u8 targetPos;
     HeapID heapId;
     u8 actionOrderCount;
-    u8 unk783;
-    u8 unk784;
-    u8 unk785;
-    u8 unk786;
+    // The index of the action order's next entry to run
+    u8 nextAction;
+    // The position of the Pokémon a ball caught
+    u8 capturePos;
+    u8 revivedCount;
+    // The player's failed escapes, which raise the chance of the next
+    u8 escapeAttempts;
     u8 unk787;
     // The mons that strike a mon switching out, such as with Pursuit
     u8 interruptCount;
-    u8 unk789;
-    u8 unk78A_0 : 1;
-    u8 unk78A_1 : 1;
-    u8 unk78A_2 : 1;
-    u8 unk78A_3 : 1;
-    u8 unk78A_4 : 1;
-    u8 unk78A_5 : 1;
+    // The target of the multi-hit move being used, whose faint message waits for the hits' end; 0x1f for none
+    u8 multiHitTargetId;
+    // Set while the moves of the mons that strike a mon switching out run
+    u8 monSwitchingOut : 1;
+    u8 winBgmPlayed : 1;
+    u8 escapeMessageShown : 1;
+    // ServerControl_TrySetOnceFlag's
+    u8 onceFlag : 1;
+    u8 failMessageShown : 1;
+    u8 healBlockMessageShown : 1;
     u8 unk78A_6 : 1;
     u8 unk78A_7 : 1;
     u8 interruptMonIds[6];
-    u8 unk791[0x18];
+    u8 revivedMonIds[0x18];
     // Per mon ID, cleared when the mon is revived
-    u8 unk7A9[24];
-    u8 unk7C1[24];
-    u8 unk7D9[4];
+    u8 faintRecorded[24];
+    // Per mon ID, set when the mon switches in until ServerControl_AfterSwitchIn runs its switch-in events
+    u8 switchInPending[24];
+    u8 switchCounts[4];
     u8 unk7DD[3];
     ActionOrderEntry actionOrder[6];
     // Where an entry is kept while the order is reshuffled
     ActionOrderEntry tempEntry;
-    // Two mon sets in overlay 169's format: the move's targets, and a copy
-    BtlMonSet *unk850;
-    BtlMonSet *unk854;
-    BtlMonSet *unk858;
-    BtlMonSet *unk85C;
-    BtlMonSet *unk860;
-    BtlMonSet *unk864;
+    // Mon sets in overlay 169's format: the move's targets, and the ones that have not fainted
+    BtlMonSet *targets;
+    BtlMonSet *liveTargets;
+    // The targets on the attacker's side and on the other, which are damaged apart
+    BtlMonSet *allyTargets;
+    BtlMonSet *foeTargets;
+    BtlMonSet *damagedMons;
+    // The targets of a stolen or reflected move
+    BtlMonSet *reactionTargets;
     BtlMonSet *unk868;
-    BtlFlowDamageList *unk86C;
-    BtlFlowDamageList *unk870;
+    BtlFlowDamageList *allyDamages;
+    BtlFlowDamageList *foeDamages;
     BtlFlowWorkFrame frames[7];
     u32 frameDepth;
     // The mons that came in this turn, in overlay 169's format
-    BtlMonSet unk1A68;
-    BtlFlowMoveParam *unk1AB0;
-    BtlFlowMoveParam *unk1AB4;
+    BtlMonSet switchedInMons;
+    // The parameters of the move being used, and of the move picked when that one calls another
+    BtlFlowMoveParam *moveParam;
+    BtlFlowMoveParam *selectedMoveParam;
     BtlPosPoke posPoke;
     u8 unk1AD0[0x14];
     BattleHandlerString message;
@@ -233,15 +256,17 @@ struct BtlServerFlow {
     BtlFlowUnk1B54 unk1B54;
     BtlActionState actionState;
     u8 unk1F70[8];
-    u16 unk1F78;
+    u16 lastUsedMove;
     u8 unk1F7A[2];
-    u32 unk1F7C;
+    // What ServerControl_CheckObedience returned for the fight being run
+    u32 obedience;
     // How often the player's mons and their opponents hit each other for no effect, super or not very effectively
-    u16 unk1F80[6];
-    u32 unk1F8C[24];
+    u16 effectivenessCounts[6];
+    u32 effectivenessTable[24];
     u8 unk1FEC[4];
-    u8 unk1FF0[0x140];
-    u32 unk2130;
+    u8 handlerWork[0x140];
+    // CheckScriptedBattleRules's result, negated
+    u32 scriptedRulesOutcome;
 };
 
 struct BattleHandlerAbilityChangeParam {
@@ -738,6 +763,70 @@ BOOL BattleHandler_StrIsEnabled(const BattleHandlerString *string);
 void BattleHandler_StrSetup(BattleHandlerString *string, u32 enabled, u16 message);
 void BattleHandler_AddArg(BattleHandlerString *string, u32 arg);
 void BattleHandler_AddSoundEffect(BattleHandlerString *string, u32 soundEffect);
+
+// The commands of the handlers' work (BattleHandler_PushWork), each run by the BattleHandler_* function of its name
+// (BattleHandler_Execute)
+enum {
+    BTL_HANDLER_USE_HELD_ITEM,
+    BTL_HANDLER_USE_ITEM_ANIM,
+    BTL_HANDLER_ABILITY_POPUP_ADD,
+    BTL_HANDLER_ABILITY_POPUP_REMOVE,
+    BTL_HANDLER_MESSAGE,
+    BTL_HANDLER_RECOVER_HP,
+    BTL_HANDLER_DRAIN,
+    BTL_HANDLER_DAMAGE,
+    BTL_HANDLER_CHANGE_HP,
+    BTL_HANDLER_RECOVER_PP,
+    BTL_HANDLER_DECREMENT_PP,
+    BTL_HANDLER_CURE_CONDITION,
+    BTL_HANDLER_ADD_CONDITION,
+    BTL_HANDLER_STAT_CHANGE = 14,
+    BTL_HANDLER_SET_STAT_STAGE,
+    BTL_HANDLER_RESET_STAT_STAGE,
+    BTL_HANDLER_SET_STATUS,
+    BTL_HANDLER_RECOVER_STAT_STAGE,
+    BTL_HANDLER_FAINT,
+    BTL_HANDLER_CHANGE_TYPE,
+    BTL_HANDLER_SET_TURN_FLAG,
+    BTL_HANDLER_RESET_TURN_FLAG,
+    BTL_HANDLER_SET_CONTINUE_FLAG,
+    BTL_HANDLER_RESET_CONTINUE_FLAG,
+    BTL_HANDLER_ADD_SIDE_EFFECT,
+    BTL_HANDLER_REMOVE_SIDE_EFFECT,
+    BTL_HANDLER_ADD_FIELD_EFFECT,
+    BTL_HANDLER_REMOVE_FIELD_EFFECT,
+    BTL_HANDLER_CHANGE_WEATHER,
+    BTL_HANDLER_ADD_POS_EFFECT,
+    BTL_HANDLER_ABILITY_CHANGE,
+    BTL_HANDLER_SET_ITEM,
+    BTL_HANDLER_CHECK_HELD_ITEM,
+    BTL_HANDLER_FORCE_USE_ITEM,
+    BTL_HANDLER_CONSUME_ITEM,
+    BTL_HANDLER_SWAP_ITEM,
+    BTL_HANDLER_UPDATE_MOVE,
+    BTL_HANDLER_SET_COUNTER,
+    BTL_HANDLER_DELAY_MOVE_DAMAGE,
+    BTL_HANDLER_QUIT_BATTLE,
+    BTL_HANDLER_SWITCH,
+    BTL_HANDLER_BATON_PASS,
+    BTL_HANDLER_FLINCH,
+    BTL_HANDLER_REVIVE,
+    BTL_HANDLER_SET_WEIGHT,
+    BTL_HANDLER_FORCE_SWITCH,
+    BTL_HANDLER_INTERRUPT_ACTION,
+    BTL_HANDLER_INTERRUPT_MOVE,
+    BTL_HANDLER_SEND_LAST,
+    BTL_HANDLER_SWAP_POKE,
+    BTL_HANDLER_TRANSFORM,
+    BTL_HANDLER_ILLUSION_BREAK,
+    BTL_HANDLER_GRAVITY_CHECK,
+    BTL_HANDLER_HIDE_TURN_CANCEL,
+    BTL_HANDLER_EFFECT_AT_POS,
+    BTL_HANDLER_REMOVE_MESSAGE_WINDOW,
+    BTL_HANDLER_CHANGE_FORM,
+    BTL_HANDLER_SET_MOVE_EFFECT_INDEX,
+    BTL_HANDLER_SET_MOVE_EFFECT_ENABLE,
+};
 
 void *BattleHandler_PushWork(BtlServerFlow *flow, u32 command, u32 monId);
 void BattleHandler_PushRun(BtlServerFlow *flow, u32 command, u32 monId);

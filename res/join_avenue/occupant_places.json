@@ -1,0 +1,53 @@
+{
+    "$schema": "join_avenue.schema.json",
+    "occupant_places": [
+        {
+            "column_0": 0,
+            "x": 19,
+            "z": 60,
+            "entity": 0
+        },
+        {
+            "column_0": 1,
+            "x": 6,
+            "z": 53,
+            "entity": 1
+        },
+        {
+            "column_0": 2,
+            "x": 19,
+            "z": 46,
+            "entity": 2
+        },
+        {
+            "column_0": 3,
+            "x": 6,
+            "z": 39,
+            "entity": 3
+        },
+        {
+            "column_0": 4,
+            "x": 19,
+            "z": 32,
+            "entity": 4
+        },
+        {
+            "column_0": 5,
+            "x": 6,
+            "z": 25,
+            "entity": 5
+        },
+        {
+            "column_0": 6,
+            "x": 19,
+            "z": 18,
+            "entity": 6
+        },
+        {
+            "column_0": 7,
+            "x": 6,
+            "z": 11,
+            "entity": 7
+        }
+    ]
+}

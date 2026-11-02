@@ -709,8 +709,8 @@ Same instructions, registers swapped.
   `GX_SetVisiblePlane(0); GXS_SetVisiblePlane(0);` (the SDK inline's parameter is what holds the zero in a
   register), and `(s32)work->badgeFrame < 45` gives the signed `bge` a `u16` field is otherwise compared without.
 - A spilled `u8` that is reloaded and narrowed at each use can come from a later callee's `u8` parameter, not from
-  the local's own type: the Dream World postman's `func_ov033_02177d78` matched once its callee
-  `func_ov033_021780a4` took `u8 kind` in place of `u32`.
+  the local's own type: the Dream World postman's `Scrcmd_PdwPostman_MysteryGifts` matched once its callee
+  `ScrcmdPokemonFld_IsLandorusTherianGift` took `u8 kind` in place of `u32`.
 - Whether an argument is loaded with `ldrh` or `ldrsh` follows the callee's parameter type, not the field's: the
   Funfest's `FesMissionPeople_PlaceActors` matched once `ZoneNPC_SetRailPos` took `u16 sidePos`. Consecutive
   halfword fields loaded as `adds r3, r4, #0; adds r3, #8; ldrh [r3, #2]; ldrh [r3, #4]` are read through a pointer
@@ -2430,7 +2430,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A value moved into an argument register just before a call, and used for nothing else, is an argument the prototype
   is missing. `GFL_SEPlayKeepVol` takes the sound's player as well as the sound. The value can be narrowed for it:
   `CtvtComm_RecvPacket` narrows `packet->value` into r1 (`lsls`/`lsrs #24`) but compares the unnarrowed value with
-  0xff, because `func_ov257_021aad74(sys, u8 talker)` takes it; with `u32 talker = packet->value` and the talker
+  0xff, because `CommTvt_PlaceSlotMarker(sys, u8 talker)` takes it; with `u32 talker = packet->value` and the talker
   passed, it matches, where a `u8` local or no argument cannot. A missing parameter can also swap the registers of
   the caller's loop variables, as it did in `CtvtComm_UpdateTalk` (`CtvtComm_IsMemberTalking` takes the net ID).
 - A value built once and passed both in `r3` and in the first stack slot (`mvn r3, r3; mov r0, r3; str r0, [sp]`)

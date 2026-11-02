@@ -24,7 +24,7 @@ void PoketradeSave_DrawSummaryPage(PokemonTradeWork *wk, int page, PartyPkm *pkm
 void PoketradeSave_ShowSummaryMon(PokemonTradeWork *wk, PartyPkm *pkm, int side, BOOL reload);
 void PoketradeSave_DeleteOfferCardWindow(PokemonTradeWork *wk, int side);
 void PoketradeSave_CloseSummaryWindow(PokemonTradeWork *wk, BOOL clear);
-void PoketradeSave_DrawOfferListWindows(PokemonTradeWork *wk, u32 a1);
+void PoketradeSave_DrawOfferListWindows(PokemonTradeWork *wk, u32 unused);
 void PoketradeSave_DeleteOfferListWindows(PokemonTradeWork *wk);
 void PoketradeSave_SetupWindowRegsSummary(PokemonTradeWork *wk);
 void PoketradeSave_DrawPartnerOfferCard(PokemonTradeWork *wk, int side, PartyPkm *pkm);

@@ -1,0 +1,26 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "E",
+    "shapes": [ 4 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_DRAGONSPIRAL_TOWER": [ "shaking_grass" ],
+            "ZONE_ABUNDANT_SHRINE": [ "shaking_grass" ],
+            "ZONE_LOSTLORN_FOREST": [ "shaking_grass" ],
+            "ZONE_ROUTE_5": [ "shaking_grass" ],
+            "ZONE_ROUTE_6": [ "shaking_grass" ],
+            "ZONE_ROUTE_7": [ "shaking_grass" ],
+            "ZONE_ROUTE_9": [ "shaking_grass" ],
+            "ZONE_ROUTE_11": [ "shaking_grass" ],
+            "ZONE_ROUTE_12": [ "shaking_grass" ],
+            "ZONE_ROUTE_13": [ "shaking_grass" ],
+            "ZONE_ROUTE_14": [ "shaking_grass" ],
+            "ZONE_ROUTE_15": [ "shaking_grass" ],
+            "ZONE_ROUTE_16": [ "shaking_grass" ],
+            "ZONE_VILLAGE_BRIDGE": [ "shaking_grass" ],
+            "ZONE_ROUTE_22": [ "shaking_grass" ],
+            "ZONE_ROUTE_23": [ "shaking_grass" ]
+        }
+    }
+}

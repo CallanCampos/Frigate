@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/zones.h"
 #include "field/event_mapchange.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -19,7 +20,13 @@ struct EntralinkWarpReturnWork {
 
 static const VecFx32 sWarpInPos = { FX32_CONST(511), FX32_CONST(32), FX32_CONST(584) };
 
-GameEventReturnCode func_ov033_02177370(GameEvent *event, u32 *state, void *data) {
+// The steps of the return: once the network is closed, warp into the Entralink, then end
+enum {
+    ENTRALINK_WARP_RETURN_STEP_WARP,
+    ENTRALINK_WARP_RETURN_STEP_END,
+};
+
+GameEventReturnCode EventEntralinkWarpReturn_Callback(GameEvent *event, u32 *state, void *data) {
     EntralinkWarpReturnWork *work;
     GameSystem *gsys;
     GameCommSys *comm;
@@ -33,7 +40,7 @@ GameEventReturnCode func_ov033_02177370(GameEvent *event, u32 *state, void *data
     gameData = GSYS_GetGameData(gsys);
     field = GSYS_GetField(gsys);
     switch (*state) {
-    case 0:
+    case ENTRALINK_WARP_RETURN_STEP_WARP:
         if (GameCommSys_IsTransitioning(comm)) {
             break;
         }
@@ -41,11 +48,11 @@ GameEventReturnCode func_ov033_02177370(GameEvent *event, u32 *state, void *data
             GameCommSys_ExitReq(comm);
             break;
         }
-        next = EventEntralinkWarpIn_Create(gsys, 0x117, &sWarpInPos, 0);
+        next = EventEntralinkWarpIn_Create(gsys, ZONE_ENTRALINK, &sWarpInPos, 0);
         GameEvent_ChainNext(event, next);
         (*state)++;
         break;
-    case 1:
+    case ENTRALINK_WARP_RETURN_STEP_END:
         return GAMEEVENT_DONE;
     default:
         return GAMEEVENT_DONE;
@@ -53,11 +60,11 @@ GameEventReturnCode func_ov033_02177370(GameEvent *event, u32 *state, void *data
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *func_ov033_021773e4(GameSystem *gsys, void *args) {
+GameEvent *EventEntralinkWarpReturn_Create(GameSystem *gsys, void *args) {
     GameEvent *event;
     EntralinkWarpReturnWork *work;
 
-    event = GameEvent_Create(gsys, NULL, func_ov033_02177370, sizeof(EntralinkWarpReturnWork));
+    event = GameEvent_Create(gsys, NULL, EventEntralinkWarpReturn_Callback, sizeof(EntralinkWarpReturnWork));
     work = GameEvent_GetData(event);
     work->gsys = gsys;
     work->field = args;
@@ -108,7 +115,7 @@ BOOL EventEntralinkWarpIn_CheckAllowed(GameSystem *gsys) {
             return FALSE;
         }
     }
-    if ((npcs == NULL || npcCount == 0) && zoneId != 0 && zoneId != 0x1a8) {
+    if ((npcs == NULL || npcCount == 0) && zoneId != ZONE_BLACK_CITY && zoneId != ZONE_WHITE_FOREST) {
         return TRUE;
     }
     for (i = 0; i < npcCount; i++) {

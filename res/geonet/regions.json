@@ -1,0 +1,2195 @@
+{
+    "$schema": "regions.schema.json",
+    "countries": [
+        {
+            "country": "EventMapchangeLoadCountryToStrbuf_Text_Argentina",
+            "regions": [
+                {
+                    "name": "Bank0419_Text_None",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "name": "Bank0419_Text_BuenosAires",
+                    "x": -6720,
+                    "y": 23872
+                },
+                {
+                    "name": "Bank0419_Text_CiudadAutNomaDe",
+                    "x": -6400,
+                    "y": 23744
+                },
+                {
+                    "name": "Bank0419_Text_Catamarca",
+                    "x": -4896,
+                    "y": 25024
+                },
+                {
+                    "name": "Bank0419_Text_Chaco",
+                    "x": -4416,
+                    "y": 23712
+                },
+                {
+                    "name": "Bank0419_Text_Chubut",
+                    "x": -7936,
+                    "y": 24992
+                },
+                {
+                    "name": "Bank0419_Text_CRdoba",
+                    "x": -5440,
+                    "y": 24800
+                },
+                {
+                    "name": "Bank0419_Text_Corrientes",
+                    "x": -4768,
+                    "y": 23648
+                },
+                {
+                    "name": "Bank0419_Text_EntreROs",
+                    "x": -5408,
+                    "y": 23968
+                },
+                {
+                    "name": "Bank0419_Text_Formosa",
+                    "x": -4064,
+                    "y": 23616
+                },
+                {
+                    "name": "Bank0419_Text_Jujuy",
+                    "x": -3776,
+                    "y": 24992
+                },
+                {
+                    "name": "Bank0419_Text_LaPampa",
+                    "x": -6720,
+                    "y": 24768
+                },
+                {
+                    "name": "Bank0419_Text_LaRioja",
+                    "x": -4992,
+                    "y": 24832
+                },
+                {
+                    "name": "Bank0419_Text_Mendoza",
+                    "x": -5952,
+                    "y": 25600
+                },
+                {
+                    "name": "Bank0419_Text_Misiones",
+                    "x": -4768,
+                    "y": 23104
+                },
+                {
+                    "name": "Bank0419_Text_Neuquen",
+                    "x": -7072,
+                    "y": 25504
+                },
+                {
+                    "name": "Bank0419_Text_RONegro",
+                    "x": -7488,
+                    "y": 24640
+                },
+                {
+                    "name": "Bank0419_Text_Salta",
+                    "x": -3936,
+                    "y": 24928
+                },
+                {
+                    "name": "Bank0419_Text_SanJuan",
+                    "x": -5440,
+                    "y": 25440
+                },
+                {
+                    "name": "Bank0419_Text_SanLuis",
+                    "x": -5792,
+                    "y": 24992
+                },
+                {
+                    "name": "Bank0419_Text_SantaCruz",
+                    "x": -9248,
+                    "y": 25952
+                },
+                {
+                    "name": "Bank0419_Text_SantaFe",
+                    "x": -5376,
+                    "y": 24192
+                },
+                {
+                    "name": "Bank0419_Text_SantiagoDelEstero",
+                    "x": -4256,
+                    "y": 24448
+                },
+                {
+                    "name": "Bank0419_Text_TierraDelFuego",
+                    "x": -10048,
+                    "y": 25440
+                },
+                {
+                    "name": "Bank0419_Text_TucumN",
+                    "x": -4160,
+                    "y": 24640
+                }
+            ]
+        },
+        {
+            "country": "EventMapchangeLoadCountryToStrbuf_Text_Australia",
+            "regions": [
+                {
+                    "name": "Bank0420_Text_None",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "name": "Bank0420_Text_AustralianCapitalTerritory",
+                    "x": -6576,
+                    "y": -14000
+                },
+                {
+                    "name": "Bank0420_Text_NewSouthWales",
+                    "x": -6176,
+                    "y": -14432
+                },
+                {
+                    "name": "Bank0420_Text_NorthernTerritory",
+                    "x": -2336,
+                    "y": -10688
+                },
+                {
+                    "name": "Bank0420_Text_Queensland",
+                    "x": -5024,
+                    "y": -14752
+                },
+                {
+                    "name": "Bank0420_Text_SouthAustralia",
+                    "x": -6400,
+                    "y": -12160
+                },
+                {
+                    "name": "Bank0420_Text_Tasmania",
+                    "x": -7840,
+                    "y": -13728
+                },
+                {
+                    "name": "Bank0420_Text_Victoria",
+                    "x": -6912,
+                    "y": -13312
+                },
+                {
+                    "name": "Bank0420_Text_WesternAustralia",
+                    "x": -5824,
+                    "y": -8000
+                }
+            ]
+        },
+        {
+            "country": "EventMapchangeLoadCountryToStrbuf_Text_Brazil",
+            "regions": [
+                {
+                    "name": "Bank0421_Text_None",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "name": "Bank0421_Text_Acre",
+                    "x": -1888,
+                    "y": 25376
+                },
+                {
+                    "name": "Bank0421_Text_RondNia",
+                    "x": -1888,
+                    "y": 25088
+                },
+                {
+                    "name": "Bank0421_Text_Alagoas",
+                    "x": -1760,
+                    "y": 19616
+                },
+                {
+                    "name": "Bank0421_Text_Amap",
+                    "x": -224,
+                    "y": 22752
+                },
+                {
+                    "name": "Bank0421_Text_Amazonas",
+                    "x": -1184,
+                    "y": 23712
+                },
+                {
+                    "name": "Bank0421_Text_Bahia",
+                    "x": -2336,
+                    "y": 20064
+                },
+                {
+                    "name": "Bank0421_Text_Cear",
+                    "x": -672,
+                    "y": 20096
+                },
+                {
+                    "name": "Bank0421_Text_FederalDistrict",
+                    "x": -3040,
+                    "y": 21824
+                },
+                {
+                    "name": "Bank0421_Text_EspRitoSanto",
+                    "x": -3744,
+                    "y": 20448
+                },
+                {
+                    "name": "Bank0421_Text_Goias",
+                    "x": -3392,
+                    "y": 22368
+                },
+                {
+                    "name": "Bank0421_Text_MaranhO",
+                    "x": -512,
+                    "y": 21088
+                },
+                {
+                    "name": "Bank0421_Text_MatoGrosso",
+                    "x": -64,
+                    "y": 22560
+                },
+                {
+                    "name": "Bank0421_Text_MatoGrossoSul",
+                    "x": -3744,
+                    "y": 22880
+                },
+                {
+                    "name": "Bank0421_Text_MinasGerais",
+                    "x": -3456,
+                    "y": 21440
+                },
+                {
+                    "name": "Bank0421_Text_Par",
+                    "x": -416,
+                    "y": 21888
+                },
+                {
+                    "name": "Bank0421_Text_ParaBa",
+                    "x": -1312,
+                    "y": 19488
+                },
+                {
+                    "name": "Bank0421_Text_Paran",
+                    "x": -4736,
+                    "y": 22272
+                },
+                {
+                    "name": "Bank0421_Text_Pernambuco",
+                    "x": -1440,
+                    "y": 19488
+                },
+                {
+                    "name": "Bank0421_Text_Piau",
+                    "x": -960,
+                    "y": 20608
+                },
+                {
+                    "name": "Bank0421_Text_RioDeJaneiro",
+                    "x": -4256,
+                    "y": 20992
+                },
+                {
+                    "name": "Bank0421_Text_RioGrandeSul",
+                    "x": -5568,
+                    "y": 22464
+                },
+                {
+                    "name": "Bank0421_Text_RioGrandeNorte",
+                    "x": -1056,
+                    "y": 19552
+                },
+                {
+                    "name": "Bank0421_Text_Roraima",
+                    "x": 0,
+                    "y": 25056
+                },
+                {
+                    "name": "Bank0421_Text_SantaCatarina",
+                    "x": -5120,
+                    "y": 21952
+                },
+                {
+                    "name": "Bank0421_Text_SOPaulo",
+                    "x": -4384,
+                    "y": 21664
+                },
+                {
+                    "name": "Bank0421_Text_Sergipe",
+                    "x": -1984,
+                    "y": 19808
+                },
+                {
+                    "name": "Bank0421_Text_Tocantins",
+                    "x": -1936,
+                    "y": 22368
+                }
+            ]
+        },
+        {
+            "country": "EventMapchangeLoadCountryToStrbuf_Text_Canada",
+            "regions": [
+                {
+                    "name": "Bank0422_Text_None",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "name": "Bank0422_Text_Alberta",
+                    "x": 9280,
+                    "y": -31744
+                },
+                {
+                    "name": "Bank0422_Text_BritishColumbia",
+                    "x": 8992,
+                    "y": -30080
+                },
+                {
+                    "name": "Bank0422_Text_Manitoba",
+                    "x": 9216,
+                    "y": 30816
+                },
+                {
+                    "name": "Bank0422_Text_NewBrunswick",
+                    "x": 8352,
+                    "y": 25088
+                },
+                {
+                    "name": "Bank0422_Text_NewfoundlandLabrador",
+                    "x": 8640,
+                    "y": 22752
+                },
+                {
+                    "name": "Bank0422_Text_NorthwestTerritories",
+                    "x": 11424,
+                    "y": -31712
+                },
+                {
+                    "name": "Bank0422_Text_NovaScotia",
+                    "x": 8224,
+                    "y": 24704
+                },
+                {
+                    "name": "Bank0422_Text_Nunavut",
+                    "x": 11616,
+                    "y": 25504
+                },
+                {
+                    "name": "Bank0422_Text_Ontario",
+                    "x": 8032,
+                    "y": 27392
+                },
+                {
+                    "name": "Bank0422_Text_PrinceEdwardIsland",
+                    "x": 8480,
+                    "y": 24512
+                },
+                {
+                    "name": "Bank0422_Text_Quebec",
+                    "x": 8352,
+                    "y": 26432
+                },
+                {
+                    "name": "Bank0422_Text_Saskatchewan",
+                    "x": 9184,
+                    "y": 32352
+                },
+                {
+                    "name": "Bank0422_Text_Yukon",
+                    "x": 11232,
+                    "y": -28352
+                }
+            ]
+        },
+        {
+            "country": "EventMapchangeLoadCountryToStrbuf_Text_China",
+            "regions": [
+                {
+                    "name": "Bank0423_Text_None",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "name": "Bank0423_Text_Anhui",
+                    "x": 5792,
+                    "y": -8160
+                },
+                {
+                    "name": "Bank0423_Text_Beijing",
+                    "x": 7296,
+                    "y": -7872
+                },
+                {
+                    "name": "Bank0423_Text_Chongqing",
+                    "x": 5024,
+                    "y": -5888
+                },
+                {
+                    "name": "Bank0423_Text_Fujian",
+                    "x": 4736,
+                    "y": -8544
+                },
+                {
+                    "name": "Bank0423_Text_Gansu",
+                    "x": 6272,
+                    "y": -5472
+                },
+                {
+                    "name": "Bank0423_Text_Guangdong",
+                    "x": 4256,
+                    "y": -7680
+                },
+                {
+                    "name": "Bank0423_Text_Guangxi",
+                    "x": 4224,
+                    "y": -6496
+                },
+                {
+                    "name": "Bank0423_Text_Guizhou",
+                    "x": 4704,
+                    "y": -5952
+                },
+                {
+                    "name": "Bank0423_Text_Hainan",
+                    "x": 3680,
+                    "y": -6976
+                },
+                {
+                    "name": "Bank0423_Text_Hebei",
+                    "x": 6592,
+                    "y": -7648
+                },
+                {
+                    "name": "Bank0423_Text_Heilongjiang",
+                    "x": 8512,
+                    "y": -9792
+                },
+                {
+                    "name": "Bank0423_Text_Henan",
+                    "x": 6496,
+                    "y": -7296
+                },
+                {
+                    "name": "Bank0423_Text_Hubei",
+                    "x": 5536,
+                    "y": -7584
+                },
+                {
+                    "name": "Bank0423_Text_Hunan",
+                    "x": 5216,
+                    "y": -7488
+                },
+                {
+                    "name": "Bank0423_Text_Jiangsu",
+                    "x": 5824,
+                    "y": -8512
+                },
+                {
+                    "name": "Bank0423_Text_Jiangxi",
+                    "x": 5184,
+                    "y": -8064
+                },
+                {
+                    "name": "Bank0423_Text_Jilin",
+                    "x": 7936,
+                    "y": -9696
+                },
+                {
+                    "name": "Bank0423_Text_Liaoning",
+                    "x": 7616,
+                    "y": -9408
+                },
+                {
+                    "name": "Bank0423_Text_InnerMongolia",
+                    "x": 7488,
+                    "y": -6656
+                },
+                {
+                    "name": "Bank0423_Text_Ningxia",
+                    "x": 6880,
+                    "y": -6144
+                },
+                {
+                    "name": "Bank0423_Text_Qinghai",
+                    "x": 6368,
+                    "y": -4960
+                },
+                {
+                    "name": "Bank0423_Text_Shaanxi",
+                    "x": 6080,
+                    "y": -6496
+                },
+                {
+                    "name": "Bank0423_Text_Shandong",
+                    "x": 6240,
+                    "y": -8064
+                },
+                {
+                    "name": "Bank0423_Text_Shanghai",
+                    "x": 5664,
+                    "y": -9024
+                },
+                {
+                    "name": "Bank0423_Text_Shanxi",
+                    "x": 6784,
+                    "y": -7168
+                },
+                {
+                    "name": "Bank0423_Text_Sichuan",
+                    "x": 5248,
+                    "y": -5632
+                },
+                {
+                    "name": "Bank0423_Text_Tianjin",
+                    "x": 7136,
+                    "y": -8288
+                },
+                {
+                    "name": "Bank0423_Text_Xinjiang",
+                    "x": 7648,
+                    "y": -3168
+                },
+                {
+                    "name": "Bank0423_Text_Tibet",
+                    "x": 4576,
+                    "y": -4704
+                },
+                {
+                    "name": "Bank0423_Text_Yunnan",
+                    "x": 4064,
+                    "y": -5216
+                },
+                {
+                    "name": "Bank0423_Text_Zhejiang",
+                    "x": 5536,
+                    "y": -8896
+                },
+                {
+                    "name": "Bank0423_Text_HongKong",
+                    "x": 4160,
+                    "y": -7808
+                },
+                {
+                    "name": "Bank0423_Text_Macau",
+                    "x": 4032,
+                    "y": -7552
+                }
+            ]
+        },
+        {
+            "country": "EventMapchangeLoadCountryToStrbuf_Text_Germany",
+            "regions": [
+                {
+                    "name": "Bank0424_Text_None",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "name": "Bank0424_Text_BadenWRttemberg",
+                    "x": 8800,
+                    "y": 11520
+                },
+                {
+                    "name": "Bank0424_Text_Bayern",
+                    "x": 8832,
+                    "y": 11008
+                },
+                {
+                    "name": "Bank0424_Text_Berlin",
+                    "x": 9600,
+                    "y": 10752
+                },
+                {
+                    "name": "Bank0424_Text_Brandenburg",
+                    "x": 9536,
+                    "y": 10880
+                },
+                {
+                    "name": "Bank0424_Text_Bremen",
+                    "x": 9600,
+                    "y": 11456
+                },
+                {
+                    "name": "Bank0424_Text_Hamburg",
+                    "x": 9728,
+                    "y": 11264
+                },
+                {
+                    "name": "Bank0424_Text_Hesse",
+                    "x": 9120,
+                    "y": 11520
+                },
+                {
+                    "name": "Bank0424_Text_MecklenburgWestPomerania",
+                    "x": 9760,
+                    "y": 10944
+                },
+                {
+                    "name": "Bank0424_Text_LowerSaxony",
+                    "x": 9504,
+                    "y": 11296
+                },
+                {
+                    "name": "Bank0424_Text_NorthRhineWestphalia",
+                    "x": 9248,
+                    "y": 11840
+                },
+                {
+                    "name": "Bank0424_Text_RhinelandPalatinate",
+                    "x": 8960,
+                    "y": 11680
+                },
+                {
+                    "name": "Bank0424_Text_Saarland",
+                    "x": 8832,
+                    "y": 11904
+                },
+                {
+                    "name": "Bank0424_Text_Saxony",
+                    "x": 9312,
+                    "y": 10592
+                },
+                {
+                    "name": "Bank0424_Text_SaxonyAnhalt",
+                    "x": 9440,
+                    "y": 11072
+                },
+                {
+                    "name": "Bank0424_Text_SchleswigHolstein",
+                    "x": 9920,
+                    "y": 11232
+                },
+                {
+                    "name": "Bank0424_Text_Thuringia",
+                    "x": 9280,
+                    "y": 10880
+                }
+            ]
+        },
+        {
+            "country": "EventMapchangeLoadCountryToStrbuf_Text_Spain",
+            "regions": [
+                {
+                    "name": "Bank0425_Text_None",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "name": "Bank0425_Text_Andalusia",
+                    "x": 6784,
+                    "y": 14208
+                },
+                {
+                    "name": "Bank0425_Text_Aragon",
+                    "x": 7552,
+                    "y": 13312
+                },
+                {
+                    "name": "Bank0425_Text_Asturias",
+                    "x": 7936,
+                    "y": 14112
+                },
+                {
+                    "name": "Bank0425_Text_BalearicIslands",
+                    "x": 7264,
+                    "y": 12576
+                },
+                {
+                    "name": "Bank0425_Text_BasqueCountry",
+                    "x": 7776,
+                    "y": 13504
+                },
+                {
+                    "name": "Bank0425_Text_CanaryIslands",
+                    "x": 5120,
+                    "y": 15904
+                },
+                {
+                    "name": "Bank0425_Text_Cantabria",
+                    "x": 7936,
+                    "y": 13728
+                },
+                {
+                    "name": "Bank0425_Text_CastileLaMancha",
+                    "x": 7200,
+                    "y": 13792
+                },
+                {
+                    "name": "Bank0425_Text_CastileLeN",
+                    "x": 7488,
+                    "y": 13888
+                },
+                {
+                    "name": "Bank0425_Text_Catalonia",
+                    "x": 7552,
+                    "y": 12672
+                },
+                {
+                    "name": "Bank0425_Text_Extremadura",
+                    "x": 7104,
+                    "y": 14208
+                },
+                {
+                    "name": "Bank0425_Text_Galicia",
+                    "x": 7776,
+                    "y": 14656
+                },
+                {
+                    "name": "Bank0425_Text_Madrid",
+                    "x": 7328,
+                    "y": 13792
+                },
+                {
+                    "name": "Bank0425_Text_Murcia",
+                    "x": 6848,
+                    "y": 13280
+                },
+                {
+                    "name": "Bank0425_Text_Navarre",
+                    "x": 7712,
+                    "y": 13408
+                },
+                {
+                    "name": "Bank0425_Text_LaRioja",
+                    "x": 7648,
+                    "y": 13472
+                },
+                {
+                    "name": "Bank0425_Text_Valencia",
+                    "x": 7136,
+                    "y": 13184
+                }
+            ]
+        },
+        {
+            "country": "EventMapchangeLoadCountryToStrbuf_Text_Finland",
+            "regions": [
+                {
+                    "name": "Bank0426_Text_None",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "name": "Bank0426_Text_LandIslands",
+                    "x": 10976,
+                    "y": 9408
+                },
+                {
+                    "name": "Bank0426_Text_Lapland",
+                    "x": 12320,
+                    "y": 7936
+                },
+                {
+                    "name": "Bank0426_Text_EastFinland",
+                    "x": 11424,
+                    "y": 8192
+                },
+                {
+                    "name": "Bank0426_Text_SouthFinland",
+                    "x": 11008,
+                    "y": 8480
+                },
+                {
+                    "name": "Bank0426_Text_Oulu",
+                    "x": 11904,
+                    "y": 8128
+                },
+                {
+                    "name": "Bank0426_Text_WestFinland",
+                    "x": 11328,
+                    "y": 8736
+                }
+            ]
+        },
+        {
+            "country": "EventMapchangeLoadCountryToStrbuf_Text_France",
+            "regions": [
+                {
+                    "name": "Bank0427_Text_None",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "name": "Bank0427_Text_Aquitaine",
+                    "x": 8064,
+                    "y": 13152
+                },
+                {
+                    "name": "Bank0427_Text_Alsace",
+                    "x": 8704,
+                    "y": 11808
+                },
+                {
+                    "name": "Bank0427_Text_LeDeFrance",
+                    "x": 8960,
+                    "y": 12544
+                },
+                {
+                    "name": "Bank0427_Text_Auvergne",
+                    "x": 8352,
+                    "y": 12480
+                },
+                {
+                    "name": "Bank0427_Text_Corse",
+                    "x": 7712,
+                    "y": 11456
+                },
+                {
+                    "name": "Bank0427_Text_ChampagneArdenne",
+                    "x": 8832,
+                    "y": 12352
+                },
+                {
+                    "name": "Bank0427_Text_NordPasDeCalais",
+                    "x": 9248,
+                    "y": 12672
+                },
+                {
+                    "name": "Bank0427_Text_LowerNormandy",
+                    "x": 8848,
+                    "y": 13136
+                },
+                {
+                    "name": "Bank0427_Text_UpperNormandy",
+                    "x": 8880,
+                    "y": 12944
+                },
+                {
+                    "name": "Bank0427_Text_Picardy",
+                    "x": 9152,
+                    "y": 12544
+                },
+                {
+                    "name": "Bank0427_Text_FrancheComte",
+                    "x": 8576,
+                    "y": 11968
+                },
+                {
+                    "name": "Bank0427_Text_Burgundy",
+                    "x": 8640,
+                    "y": 12256
+                },
+                {
+                    "name": "Bank0427_Text_Brittany",
+                    "x": 8768,
+                    "y": 13376
+                },
+                {
+                    "name": "Bank0427_Text_ProvenceAlpesCTe",
+                    "x": 8128,
+                    "y": 11744
+                },
+                {
+                    "name": "Bank0427_Text_PaysDeLaLoire",
+                    "x": 8576,
+                    "y": 13376
+                },
+                {
+                    "name": "Bank0427_Text_PoitouCharentes",
+                    "x": 8416,
+                    "y": 12960
+                },
+                {
+                    "name": "Bank0427_Text_MidiPyrenees",
+                    "x": 8000,
+                    "y": 12640
+                },
+                {
+                    "name": "Bank0427_Text_LanguedocRoussillon",
+                    "x": 8000,
+                    "y": 12192
+                },
+                {
+                    "name": "Bank0427_Text_Limousin",
+                    "x": 8320,
+                    "y": 12768
+                },
+                {
+                    "name": "Bank0427_Text_RhNeAlpes",
+                    "x": 8352,
+                    "y": 12032
+                },
+                {
+                    "name": "Bank0427_Text_Lorraine",
+                    "x": 8864,
+                    "y": 12064
+                },
+                {
+                    "name": "Bank0427_Text_Centre",
+                    "x": 8704,
+                    "y": 12672
+                }
+            ]
+        },
+        {
+            "country": "EventMapchangeLoadCountryToStrbuf_Text_UnitedKingdom",
+            "regions": [
+                {
+                    "name": "Bank0428_Text_None",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "name": "Bank0428_Text_EastEngland",
+                    "x": 9504,
+                    "y": 13056
+                },
+                {
+                    "name": "Bank0428_Text_EastMidlands",
+                    "x": 9632,
+                    "y": 13280
+                },
+                {
+                    "name": "Bank0428_Text_GreaterLondon",
+                    "x": 9376,
+                    "y": 13184
+                },
+                {
+                    "name": "Bank0428_Text_NorthEastEngland",
+                    "x": 9952,
+                    "y": 13376
+                },
+                {
+                    "name": "Bank0428_Text_NorthWestEngland",
+                    "x": 9760,
+                    "y": 13440
+                },
+                {
+                    "name": "Bank0428_Text_NorthernIreland",
+                    "x": 9952,
+                    "y": 14272
+                },
+                {
+                    "name": "Bank0428_Text_Scotland",
+                    "x": 10176,
+                    "y": 13824
+                },
+                {
+                    "name": "Bank0428_Text_SouthEastEngland",
+                    "x": 9312,
+                    "y": 13248
+                },
+                {
+                    "name": "Bank0428_Text_SouthWestEngland",
+                    "x": 9376,
+                    "y": 13600
+                },
+                {
+                    "name": "Bank0428_Text_Wales",
+                    "x": 9440,
+                    "y": 13728
+                },
+                {
+                    "name": "Bank0428_Text_WestMidlands",
+                    "x": 9504,
+                    "y": 13472
+                },
+                {
+                    "name": "Bank0428_Text_YorkshireHumber",
+                    "x": 9728,
+                    "y": 13312
+                }
+            ]
+        },
+        {
+            "country": "EventMapchangeLoadCountryToStrbuf_Text_India",
+            "regions": [
+                {
+                    "name": "Bank0429_Text_None",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "name": "Bank0429_Text_AndamanNicobarIslands",
+                    "x": 2240,
+                    "y": -3776
+                },
+                {
+                    "name": "Bank0429_Text_AndhraPradesh",
+                    "x": 3040,
+                    "y": -1088
+                },
+                {
+                    "name": "Bank0429_Text_ArunachalPradesh",
+                    "x": 5280,
+                    "y": -4256
+                },
+                {
+                    "name": "Bank0429_Text_Assam",
+                    "x": 5120,
+                    "y": -3744
+                },
+                {
+                    "name": "Bank0429_Text_Bihar",
+                    "x": 4448,
+                    "y": -2368
+                },
+                {
+                    "name": "Bank0429_Text_Chandigarh",
+                    "x": 6080,
+                    "y": -768
+                },
+                {
+                    "name": "Bank0429_Text_Chhattisgarh",
+                    "x": 3808,
+                    "y": -1728
+                },
+                {
+                    "name": "Bank0429_Text_DadraNagarHaveli",
+                    "x": 3392,
+                    "y": -352
+                },
+                {
+                    "name": "Bank0429_Text_DamanDiu",
+                    "x": 3712,
+                    "y": -192
+                },
+                {
+                    "name": "Bank0429_Text_Delhi",
+                    "x": 5280,
+                    "y": -960
+                },
+                {
+                    "name": "Bank0429_Text_Goa",
+                    "x": 2528,
+                    "y": -512
+                },
+                {
+                    "name": "Bank0429_Text_Gujarat",
+                    "x": 4160,
+                    "y": -160
+                },
+                {
+                    "name": "Bank0429_Text_Haryana",
+                    "x": 5824,
+                    "y": -832
+                },
+                {
+                    "name": "Bank0429_Text_HimachalPradesh",
+                    "x": 6336,
+                    "y": -1344
+                },
+                {
+                    "name": "Bank0429_Text_JammuKashmir",
+                    "x": 6656,
+                    "y": -992
+                },
+                {
+                    "name": "Bank0429_Text_Jharkhand",
+                    "x": 4320,
+                    "y": -2272
+                },
+                {
+                    "name": "Bank0429_Text_Karnataka",
+                    "x": 2368,
+                    "y": -1056
+                },
+                {
+                    "name": "Bank0429_Text_Kerala",
+                    "x": 1856,
+                    "y": -800
+                },
+                {
+                    "name": "Bank0429_Text_Lakshadweep",
+                    "x": 1888,
+                    "y": -32
+                },
+                {
+                    "name": "Bank0429_Text_MadhyaPradesh",
+                    "x": 4224,
+                    "y": -928
+                },
+                {
+                    "name": "Bank0429_Text_Maharashtra",
+                    "x": 2976,
+                    "y": -224
+                },
+                {
+                    "name": "Bank0429_Text_Meghalaya",
+                    "x": 4928,
+                    "y": -3264
+                },
+                {
+                    "name": "Bank0429_Text_Mizoram",
+                    "x": 4288,
+                    "y": -3904
+                },
+                {
+                    "name": "Bank0429_Text_Manipur",
+                    "x": 5056,
+                    "y": -4192
+                },
+                {
+                    "name": "Bank0429_Text_Nagaland",
+                    "x": 4864,
+                    "y": -4256
+                },
+                {
+                    "name": "Bank0429_Text_Orissa",
+                    "x": 3520,
+                    "y": -2304
+                },
+                {
+                    "name": "Bank0429_Text_Puducherry",
+                    "x": 2112,
+                    "y": -1344
+                },
+                {
+                    "name": "Bank0429_Text_Punjab",
+                    "x": 6176,
+                    "y": -768
+                },
+                {
+                    "name": "Bank0429_Text_Rajasthan",
+                    "x": 5152,
+                    "y": -256
+                },
+                {
+                    "name": "Bank0429_Text_Sikkim",
+                    "x": 5120,
+                    "y": -2656
+                },
+                {
+                    "name": "Bank0429_Text_TamilNadu",
+                    "x": 2336,
+                    "y": -1440
+                },
+                {
+                    "name": "Bank0429_Text_Tripura",
+                    "x": 4448,
+                    "y": -3616
+                },
+                {
+                    "name": "Bank0429_Text_UttarPradesh",
+                    "x": 4896,
+                    "y": -1536
+                },
+                {
+                    "name": "Bank0429_Text_Uttarakhand",
+                    "x": 5344,
+                    "y": -1440
+                },
+                {
+                    "name": "Bank0429_Text_WestBengal",
+                    "x": 4000,
+                    "y": -2976
+                }
+            ]
+        },
+        {
+            "country": "EventMapchangeLoadCountryToStrbuf_Text_Italy",
+            "regions": [
+                {
+                    "name": "Bank0430_Text_None",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "name": "Bank0430_Text_Abruzzo",
+                    "x": 7744,
+                    "y": 10624
+                },
+                {
+                    "name": "Bank0430_Text_Basilicata",
+                    "x": 7360,
+                    "y": 10176
+                },
+                {
+                    "name": "Bank0430_Text_Calabria",
+                    "x": 7040,
+                    "y": 10112
+                },
+                {
+                    "name": "Bank0430_Text_Campania",
+                    "x": 7424,
+                    "y": 10432
+                },
+                {
+                    "name": "Bank0430_Text_EmiliaRomagna",
+                    "x": 8128,
+                    "y": 11040
+                },
+                {
+                    "name": "Bank0430_Text_FriuliVeneziaGiulia",
+                    "x": 8320,
+                    "y": 10592
+                },
+                {
+                    "name": "Bank0430_Text_Lazio",
+                    "x": 7648,
+                    "y": 10752
+                },
+                {
+                    "name": "Bank0430_Text_Liguria",
+                    "x": 8160,
+                    "y": 11424
+                },
+                {
+                    "name": "Bank0430_Text_Lombardy",
+                    "x": 8256,
+                    "y": 11264
+                },
+                {
+                    "name": "Bank0430_Text_Marche",
+                    "x": 7904,
+                    "y": 10592
+                },
+                {
+                    "name": "Bank0430_Text_Molise",
+                    "x": 7552,
+                    "y": 10432
+                },
+                {
+                    "name": "Bank0430_Text_Piedmont",
+                    "x": 8256,
+                    "y": 11712
+                },
+                {
+                    "name": "Bank0430_Text_Apulia",
+                    "x": 7488,
+                    "y": 9984
+                },
+                {
+                    "name": "Bank0430_Text_Sardinia",
+                    "x": 7264,
+                    "y": 11456
+                },
+                {
+                    "name": "Bank0430_Text_Sicily",
+                    "x": 6976,
+                    "y": 10592
+                },
+                {
+                    "name": "Bank0430_Text_Tuscany",
+                    "x": 7936,
+                    "y": 11008
+                },
+                {
+                    "name": "Bank0430_Text_TrentinoAltoAdige",
+                    "x": 8320,
+                    "y": 11040
+                },
+                {
+                    "name": "Bank0430_Text_Umbria",
+                    "x": 7872,
+                    "y": 10816
+                },
+                {
+                    "name": "Bank0430_Text_ValleDaosta",
+                    "x": 8352,
+                    "y": 11776
+                },
+                {
+                    "name": "Bank0430_Text_Veneto",
+                    "x": 8288,
+                    "y": 10848
+                }
+            ]
+        },
+        {
+            "country": "EventMapchangeLoadCountryToStrbuf_Text_Japan",
+            "regions": [
+                {
+                    "name": "Bank0431_Text_None",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "name": "Bank0431_Text_HokkaidoSapporo",
+                    "x": 7872,
+                    "y": -12704
+                },
+                {
+                    "name": "Bank0431_Text_HokkaidoHakodate",
+                    "x": 7648,
+                    "y": -12512
+                },
+                {
+                    "name": "Bank0431_Text_HokkaidoWakkanai",
+                    "x": 8224,
+                    "y": -12736
+                },
+                {
+                    "name": "Bank0431_Text_HokkaidoKushiro",
+                    "x": 7840,
+                    "y": -13184
+                },
+                {
+                    "name": "Bank0431_Text_Aomori",
+                    "x": 7424,
+                    "y": -12480
+                },
+                {
+                    "name": "Bank0431_Text_Iwate",
+                    "x": 7264,
+                    "y": -12640
+                },
+                {
+                    "name": "Bank0431_Text_Miyagi",
+                    "x": 7040,
+                    "y": -12608
+                },
+                {
+                    "name": "Bank0431_Text_Akita",
+                    "x": 7296,
+                    "y": -12416
+                },
+                {
+                    "name": "Bank0431_Text_Yamagata",
+                    "x": 7168,
+                    "y": -12512
+                },
+                {
+                    "name": "Bank0431_Text_Fukushima",
+                    "x": 6912,
+                    "y": -12512
+                },
+                {
+                    "name": "Bank0431_Text_Ibaraki",
+                    "x": 6656,
+                    "y": -12448
+                },
+                {
+                    "name": "Bank0431_Text_Tochigi",
+                    "x": 6720,
+                    "y": -12384
+                },
+                {
+                    "name": "Bank0431_Text_Gunma",
+                    "x": 6688,
+                    "y": -12224
+                },
+                {
+                    "name": "Bank0431_Text_Saitama",
+                    "x": 6624,
+                    "y": -12352
+                },
+                {
+                    "name": "Bank0431_Text_Chiba",
+                    "x": 6528,
+                    "y": -12480
+                },
+                {
+                    "name": "Bank0431_Text_Tokyo",
+                    "x": 6528,
+                    "y": -12320
+                },
+                {
+                    "name": "Bank0431_Text_Kanagawa",
+                    "x": 6432,
+                    "y": -12320
+                },
+                {
+                    "name": "Bank0431_Text_Niigata",
+                    "x": 6912,
+                    "y": -12224
+                },
+                {
+                    "name": "Bank0431_Text_Toyama",
+                    "x": 6752,
+                    "y": -11936
+                },
+                {
+                    "name": "Bank0431_Text_Ishikawa",
+                    "x": 6752,
+                    "y": -11776
+                },
+                {
+                    "name": "Bank0431_Text_Fukui",
+                    "x": 6688,
+                    "y": -11712
+                },
+                {
+                    "name": "Bank0431_Text_Yamanashi",
+                    "x": 6560,
+                    "y": -12192
+                },
+                {
+                    "name": "Bank0431_Text_Nagano",
+                    "x": 6688,
+                    "y": -12128
+                },
+                {
+                    "name": "Bank0431_Text_Gifu",
+                    "x": 6528,
+                    "y": -11936
+                },
+                {
+                    "name": "Bank0431_Text_Shizuoka",
+                    "x": 6400,
+                    "y": -12096
+                },
+                {
+                    "name": "Bank0431_Text_Aichi",
+                    "x": 6432,
+                    "y": -11936
+                },
+                {
+                    "name": "Bank0431_Text_Mie",
+                    "x": 6336,
+                    "y": -11808
+                },
+                {
+                    "name": "Bank0431_Text_Shiga",
+                    "x": 6432,
+                    "y": -11680
+                },
+                {
+                    "name": "Bank0431_Text_Kyoto",
+                    "x": 6464,
+                    "y": -11584
+                },
+                {
+                    "name": "Bank0431_Text_Osaka",
+                    "x": 6336,
+                    "y": -11552
+                },
+                {
+                    "name": "Bank0431_Text_Hyogo",
+                    "x": 6368,
+                    "y": -11424
+                },
+                {
+                    "name": "Bank0431_Text_Nara",
+                    "x": 6304,
+                    "y": -11648
+                },
+                {
+                    "name": "Bank0431_Text_Wakayama",
+                    "x": 6240,
+                    "y": -11552
+                },
+                {
+                    "name": "Bank0431_Text_Tottori",
+                    "x": 6496,
+                    "y": -11392
+                },
+                {
+                    "name": "Bank0431_Text_Shimane",
+                    "x": 6464,
+                    "y": -11104
+                },
+                {
+                    "name": "Bank0431_Text_Okayama",
+                    "x": 6336,
+                    "y": -11264
+                },
+                {
+                    "name": "Bank0431_Text_Hiroshima",
+                    "x": 6272,
+                    "y": -11040
+                },
+                {
+                    "name": "Bank0431_Text_Yamaguchi",
+                    "x": 6304,
+                    "y": -10912
+                },
+                {
+                    "name": "Bank0431_Text_Tokushima",
+                    "x": 6176,
+                    "y": -11392
+                },
+                {
+                    "name": "Bank0431_Text_Kagawa",
+                    "x": 6240,
+                    "y": -11296
+                },
+                {
+                    "name": "Bank0431_Text_Ehime",
+                    "x": 6176,
+                    "y": -11072
+                },
+                {
+                    "name": "Bank0431_Text_Kochi",
+                    "x": 6112,
+                    "y": -11200
+                },
+                {
+                    "name": "Bank0431_Text_Fukuoka",
+                    "x": 6176,
+                    "y": -10720
+                },
+                {
+                    "name": "Bank0431_Text_Saga",
+                    "x": 6112,
+                    "y": -10624
+                },
+                {
+                    "name": "Bank0431_Text_Nagasaki",
+                    "x": 5984,
+                    "y": -10560
+                },
+                {
+                    "name": "Bank0431_Text_Kumamoto",
+                    "x": 5984,
+                    "y": -10688
+                },
+                {
+                    "name": "Bank0431_Text_Oita",
+                    "x": 6016,
+                    "y": -10880
+                },
+                {
+                    "name": "Bank0431_Text_Miyazaki",
+                    "x": 5824,
+                    "y": -10816
+                },
+                {
+                    "name": "Bank0431_Text_Kagoshima",
+                    "x": 5760,
+                    "y": -10688
+                },
+                {
+                    "name": "Bank0431_Text_Okinawa",
+                    "x": 4864,
+                    "y": -10208
+                }
+            ]
+        },
+        {
+            "country": "EventMapchangeLoadCountryToStrbuf_Text_Norway",
+            "regions": [
+                {
+                    "name": "Bank0432_Text_None",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "name": "Bank0432_Text_Akershus",
+                    "x": 10912,
+                    "y": 11008
+                },
+                {
+                    "name": "Bank0432_Text_AustAgder",
+                    "x": 10720,
+                    "y": 11680
+                },
+                {
+                    "name": "Bank0432_Text_Buskerud",
+                    "x": 11040,
+                    "y": 11488
+                },
+                {
+                    "name": "Bank0432_Text_Finnmark",
+                    "x": 12832,
+                    "y": 8928
+                },
+                {
+                    "name": "Bank0432_Text_Hedmark",
+                    "x": 11200,
+                    "y": 11232
+                },
+                {
+                    "name": "Bank0432_Text_Hordaland",
+                    "x": 11072,
+                    "y": 12096
+                },
+                {
+                    "name": "Bank0432_Text_JanMayenIsland",
+                    "x": 12880,
+                    "y": 14736
+                },
+                {
+                    "name": "Bank0432_Text_Lofoten",
+                    "x": 12576,
+                    "y": 10016
+                },
+                {
+                    "name": "Bank0432_Text_MReOgRomsdal",
+                    "x": 11424,
+                    "y": 11872
+                },
+                {
+                    "name": "Bank0432_Text_Nordland",
+                    "x": 12224,
+                    "y": 10464
+                },
+                {
+                    "name": "Bank0432_Text_NordTrNdelag",
+                    "x": 11904,
+                    "y": 10624
+                },
+                {
+                    "name": "Bank0432_Text_Oppland",
+                    "x": 11136,
+                    "y": 11360
+                },
+                {
+                    "name": "Bank0432_Text_Oslo",
+                    "x": 10848,
+                    "y": 11136
+                },
+                {
+                    "name": "Bank0432_Text_Rogaland",
+                    "x": 10720,
+                    "y": 12032
+                },
+                {
+                    "name": "Bank0432_Text_SognOgFjordane",
+                    "x": 11296,
+                    "y": 12096
+                },
+                {
+                    "name": "Bank0432_Text_SRTrNdelag",
+                    "x": 11648,
+                    "y": 10976
+                },
+                {
+                    "name": "Bank0432_Text_Svalbard",
+                    "x": 14240,
+                    "y": 10208
+                },
+                {
+                    "name": "Bank0432_Text_Telemark",
+                    "x": 10816,
+                    "y": 11616
+                },
+                {
+                    "name": "Bank0432_Text_Troms",
+                    "x": 12672,
+                    "y": 9504
+                },
+                {
+                    "name": "Bank0432_Text_VestAgder",
+                    "x": 10624,
+                    "y": 11680
+                },
+                {
+                    "name": "Bank0432_Text_Vestfold",
+                    "x": 10960,
+                    "y": 11184
+                },
+                {
+                    "name": "Bank0432_Text_Stfold",
+                    "x": 10816,
+                    "y": 10944
+                }
+            ]
+        },
+        {
+            "country": "EventMapchangeLoadCountryToStrbuf_Text_Poland",
+            "regions": [
+                {
+                    "name": "Bank0433_Text_None",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "name": "Bank0433_Text_LowerSilesia",
+                    "x": 9184,
+                    "y": 9920
+                },
+                {
+                    "name": "Bank0433_Text_KuyaviaPomerania",
+                    "x": 9504,
+                    "y": 9824
+                },
+                {
+                    "name": "Bank0433_Text_Lublin",
+                    "x": 9344,
+                    "y": 8928
+                },
+                {
+                    "name": "Bank0433_Text_Lubusz",
+                    "x": 9280,
+                    "y": 10144
+                },
+                {
+                    "name": "Bank0433_Text_Lodz",
+                    "x": 9248,
+                    "y": 9408
+                },
+                {
+                    "name": "Bank0433_Text_LesserPoland",
+                    "x": 9024,
+                    "y": 9376
+                },
+                {
+                    "name": "Bank0433_Text_Masovia",
+                    "x": 9472,
+                    "y": 9280
+                },
+                {
+                    "name": "Bank0433_Text_Opole",
+                    "x": 9152,
+                    "y": 9728
+                },
+                {
+                    "name": "Bank0433_Text_Subcarpathia",
+                    "x": 9120,
+                    "y": 9088
+                },
+                {
+                    "name": "Bank0433_Text_Podlachia",
+                    "x": 9568,
+                    "y": 8928
+                },
+                {
+                    "name": "Bank0433_Text_Pomerania",
+                    "x": 9824,
+                    "y": 10016
+                },
+                {
+                    "name": "Bank0433_Text_Silesia",
+                    "x": 9088,
+                    "y": 9504
+                },
+                {
+                    "name": "Bank0433_Text_HolyCross",
+                    "x": 9184,
+                    "y": 9216
+                },
+                {
+                    "name": "Bank0433_Text_WarmiaMasuria",
+                    "x": 9824,
+                    "y": 9536
+                },
+                {
+                    "name": "Bank0433_Text_GreaterPoland",
+                    "x": 9376,
+                    "y": 10048
+                },
+                {
+                    "name": "Bank0433_Text_WestPomerania",
+                    "x": 9632,
+                    "y": 10336
+                }
+            ]
+        },
+        {
+            "country": "EventMapchangeLoadCountryToStrbuf_Text_RussianFederation",
+            "regions": [
+                {
+                    "name": "Bank0434_Text_None",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "name": "Bank0434_Text_CentralFederalDistrict",
+                    "x": 9920,
+                    "y": 6304
+                },
+                {
+                    "name": "Bank0434_Text_FarEasternFederalDistrict",
+                    "x": 8928,
+                    "y": -11840
+                },
+                {
+                    "name": "Bank0434_Text_NorthwesternFederalDistrict",
+                    "x": 10880,
+                    "y": 7616
+                },
+                {
+                    "name": "Bank0434_Text_VolgaFederalDistrict",
+                    "x": 10208,
+                    "y": 7744
+                },
+                {
+                    "name": "Bank0434_Text_SiberianFederalDistrict",
+                    "x": 10112,
+                    "y": -4032
+                },
+                {
+                    "name": "Bank0434_Text_SouthernFederalDistrict",
+                    "x": 8960,
+                    "y": 5152
+                },
+                {
+                    "name": "Bank0434_Text_UralsFederalDistrict",
+                    "x": 8448,
+                    "y": -2880
+                },
+                {
+                    "name": "Bank0434_Text_NorthCaucasianFederalDistrict",
+                    "x": 10080,
+                    "y": 6272
+                }
+            ]
+        },
+        {
+            "country": "EventMapchangeLoadCountryToStrbuf_Text_Sweden",
+            "regions": [
+                {
+                    "name": "Bank0435_Text_None",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "name": "Bank0435_Text_Blekinge",
+                    "x": 10304,
+                    "y": 10176
+                },
+                {
+                    "name": "Bank0435_Text_Dalarna",
+                    "x": 11072,
+                    "y": 10400
+                },
+                {
+                    "name": "Bank0435_Text_GVleborg",
+                    "x": 11040,
+                    "y": 10048
+                },
+                {
+                    "name": "Bank0435_Text_Gotland",
+                    "x": 10464,
+                    "y": 9728
+                },
+                {
+                    "name": "Bank0435_Text_Halland",
+                    "x": 10368,
+                    "y": 10720
+                },
+                {
+                    "name": "Bank0435_Text_Jamtland",
+                    "x": 11648,
+                    "y": 10400
+                },
+                {
+                    "name": "Bank0435_Text_JNkPing",
+                    "x": 10592,
+                    "y": 10464
+                },
+                {
+                    "name": "Bank0435_Text_Kalmar",
+                    "x": 10400,
+                    "y": 10080
+                },
+                {
+                    "name": "Bank0435_Text_Kronoberg",
+                    "x": 10400,
+                    "y": 10368
+                },
+                {
+                    "name": "Bank0435_Text_Norrbotten",
+                    "x": 11968,
+                    "y": 9120
+                },
+                {
+                    "name": "Bank0435_Text_Oland",
+                    "x": 10400,
+                    "y": 9984
+                },
+                {
+                    "name": "Bank0435_Text_Rebro",
+                    "x": 10816,
+                    "y": 10368
+                },
+                {
+                    "name": "Bank0435_Text_StergTland",
+                    "x": 10656,
+                    "y": 10304
+                },
+                {
+                    "name": "Bank0435_Text_Skane",
+                    "x": 10176,
+                    "y": 10592
+                },
+                {
+                    "name": "Bank0435_Text_Sodermanland",
+                    "x": 10656,
+                    "y": 10080
+                },
+                {
+                    "name": "Bank0435_Text_Stockholm",
+                    "x": 10816,
+                    "y": 9984
+                },
+                {
+                    "name": "Bank0435_Text_Uppsala",
+                    "x": 10944,
+                    "y": 10112
+                },
+                {
+                    "name": "Bank0435_Text_Varmland",
+                    "x": 10848,
+                    "y": 10656
+                },
+                {
+                    "name": "Bank0435_Text_Vasterbotten",
+                    "x": 11776,
+                    "y": 9312
+                },
+                {
+                    "name": "Bank0435_Text_VSternorrland",
+                    "x": 11456,
+                    "y": 9888
+                },
+                {
+                    "name": "Bank0435_Text_Vastmanland",
+                    "x": 10912,
+                    "y": 10304
+                },
+                {
+                    "name": "Bank0435_Text_VStraGTaland",
+                    "x": 10592,
+                    "y": 10816
+                }
+            ]
+        },
+        {
+            "country": "EventMapchangeLoadCountryToStrbuf_Text_UnitedStatesAmerica",
+            "regions": [
+                {
+                    "name": "Bank0437_Text_None",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "name": "Bank0437_Text_Alabama",
+                    "x": 6016,
+                    "y": 28864
+                },
+                {
+                    "name": "Bank0437_Text_Alaska",
+                    "x": 10688,
+                    "y": -27968
+                },
+                {
+                    "name": "Bank0437_Text_Arizona",
+                    "x": 5984,
+                    "y": -32416
+                },
+                {
+                    "name": "Bank0437_Text_Arkansas",
+                    "x": 6336,
+                    "y": 29824
+                },
+                {
+                    "name": "Bank0437_Text_California",
+                    "x": 7552,
+                    "y": -30336
+                },
+                {
+                    "name": "Bank0437_Text_Colorado",
+                    "x": 7424,
+                    "y": 32448
+                },
+                {
+                    "name": "Bank0437_Text_Connecticut",
+                    "x": 7616,
+                    "y": 26368
+                },
+                {
+                    "name": "Bank0437_Text_Delaware",
+                    "x": 7104,
+                    "y": 26816
+                },
+                {
+                    "name": "Bank0437_Text_Florida",
+                    "x": 5568,
+                    "y": 28320
+                },
+                {
+                    "name": "Bank0437_Text_Georgia",
+                    "x": 6304,
+                    "y": 28544
+                },
+                {
+                    "name": "Bank0437_Text_Hawaii",
+                    "x": 3936,
+                    "y": -23712
+                },
+                {
+                    "name": "Bank0437_Text_Idaho",
+                    "x": 8032,
+                    "y": -31456
+                },
+                {
+                    "name": "Bank0437_Text_Illinois",
+                    "x": 7360,
+                    "y": 29568
+                },
+                {
+                    "name": "Bank0437_Text_Indiana",
+                    "x": 7040,
+                    "y": 28672
+                },
+                {
+                    "name": "Bank0437_Text_Iowa",
+                    "x": 7392,
+                    "y": 30368
+                },
+                {
+                    "name": "Bank0437_Text_Kansas",
+                    "x": 7072,
+                    "y": 30624
+                },
+                {
+                    "name": "Bank0437_Text_Kentucky",
+                    "x": 6848,
+                    "y": 28352
+                },
+                {
+                    "name": "Bank0437_Text_Louisiana",
+                    "x": 5600,
+                    "y": 29728
+                },
+                {
+                    "name": "Bank0437_Text_Maine",
+                    "x": 8128,
+                    "y": 25888
+                },
+                {
+                    "name": "Bank0437_Text_Maryland",
+                    "x": 6976,
+                    "y": 27072
+                },
+                {
+                    "name": "Bank0437_Text_Massachusetts",
+                    "x": 7680,
+                    "y": 26080
+                },
+                {
+                    "name": "Bank0437_Text_Michigan",
+                    "x": 7840,
+                    "y": 28480
+                },
+                {
+                    "name": "Bank0437_Text_Minnesota",
+                    "x": 8064,
+                    "y": 30112
+                },
+                {
+                    "name": "Bank0437_Text_Mississippi",
+                    "x": 6048,
+                    "y": 29280
+                },
+                {
+                    "name": "Bank0437_Text_Missouri",
+                    "x": 6848,
+                    "y": 29952
+                },
+                {
+                    "name": "Bank0437_Text_Montana",
+                    "x": 8512,
+                    "y": -32448
+                },
+                {
+                    "name": "Bank0437_Text_Nebraska",
+                    "x": 7360,
+                    "y": 31008
+                },
+                {
+                    "name": "Bank0437_Text_Nevada",
+                    "x": 7712,
+                    "y": -30720
+                },
+                {
+                    "name": "Bank0437_Text_NewHampshire",
+                    "x": 7936,
+                    "y": 26336
+                },
+                {
+                    "name": "Bank0437_Text_NewJersey",
+                    "x": 7296,
+                    "y": 26688
+                },
+                {
+                    "name": "Bank0437_Text_NewMexico",
+                    "x": 6688,
+                    "y": -32704
+                },
+                {
+                    "name": "Bank0437_Text_NewYork",
+                    "x": 7776,
+                    "y": 26432
+                },
+                {
+                    "name": "Bank0437_Text_NorthCarolina",
+                    "x": 6528,
+                    "y": 27488
+                },
+                {
+                    "name": "Bank0437_Text_NorthDakota",
+                    "x": 8704,
+                    "y": 31616
+                },
+                {
+                    "name": "Bank0437_Text_Ohio",
+                    "x": 7200,
+                    "y": 28032
+                },
+                {
+                    "name": "Bank0437_Text_Oklahoma",
+                    "x": 6720,
+                    "y": 31072
+                },
+                {
+                    "name": "Bank0437_Text_Oregon",
+                    "x": 8096,
+                    "y": -30112
+                },
+                {
+                    "name": "Bank0437_Text_Pennsylvania",
+                    "x": 7232,
+                    "y": 27328
+                },
+                {
+                    "name": "Bank0437_Text_RhodeIsland",
+                    "x": 7616,
+                    "y": 26144
+                },
+                {
+                    "name": "Bank0437_Text_SouthCarolina",
+                    "x": 6208,
+                    "y": 28000
+                },
+                {
+                    "name": "Bank0437_Text_SouthDakota",
+                    "x": 8032,
+                    "y": 31744
+                },
+                {
+                    "name": "Bank0437_Text_Tennessee",
+                    "x": 6528,
+                    "y": 28768
+                },
+                {
+                    "name": "Bank0437_Text_Texas",
+                    "x": 5984,
+                    "y": 30944
+                },
+                {
+                    "name": "Bank0437_Text_Utah",
+                    "x": 7648,
+                    "y": -32288
+                },
+                {
+                    "name": "Bank0437_Text_Vermont",
+                    "x": 8032,
+                    "y": 26432
+                },
+                {
+                    "name": "Bank0437_Text_Virginia",
+                    "x": 6784,
+                    "y": 27136
+                },
+                {
+                    "name": "Bank0437_Text_Washington",
+                    "x": 8608,
+                    "y": -30112
+                },
+                {
+                    "name": "Bank0437_Text_WashingtonDc",
+                    "x": 7040,
+                    "y": 27168
+                },
+                {
+                    "name": "Bank0437_Text_WestVirginia",
+                    "x": 6880,
+                    "y": 27968
+                },
+                {
+                    "name": "Bank0437_Text_Wisconsin",
+                    "x": 7872,
+                    "y": 29472
+                },
+                {
+                    "name": "Bank0437_Text_Wyoming",
+                    "x": 7904,
+                    "y": 32288
+                }
+            ]
+        }
+    ]
+}

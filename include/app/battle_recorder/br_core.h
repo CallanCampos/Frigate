@@ -98,8 +98,8 @@ typedef struct {
     u32 recordMode;
     BrRecordInfo recordInfo;
     BrBtnRecovery btnRecovery;
-    // Set from the battle setup's unkDD_1 when the video has played
-    u32 unk_17bc;
+    // Set from the battle setup's recReadComplete when the video has played
+    u32 recReadComplete;
     BrListPos bvRankListPos;
     u32 bvRankMode;
 } BrData;
@@ -111,9 +111,15 @@ enum {
     BR_CORE_MODE_RETURN,
 };
 
+// What the core proc ended for
+enum {
+    BR_CORE_RESULT_EXIT,
+    BR_CORE_RESULT_PLAY_VIDEO,
+};
+
 // The core proc's parameter
 typedef struct {
-    // 1 to play a battle video
+    // BR_CORE_RESULT_*
     u32 result;
     u32 mode;
     BrData *data;

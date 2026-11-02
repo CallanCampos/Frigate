@@ -1,0 +1,14 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "S",
+    "shapes": [ 0 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_UNDELLA_TOWN": [ "fishing", "rippling_fishing" ],
+            "ZONE_ROUTE_13": [ "fishing", "rippling_fishing" ],
+            "ZONE_HUMILAU_CITY": [ "fishing", "rippling_fishing" ],
+            "ZONE_SEASIDE_CAVE": [ "fishing", "rippling_fishing" ]
+        }
+    }
+}

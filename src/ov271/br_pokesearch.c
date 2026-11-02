@@ -7,6 +7,7 @@
 #include "app/battle_recorder/br_pokesearch.h"
 #include "app/battle_recorder/br_res.h"
 #include "app/battle_recorder/br_util.h"
+#include "constants/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
 #include "gfl/heap.h"
@@ -22,8 +23,7 @@
 // The first letters, which the buttons are for
 #define BR_POKESEARCH_LETTER_MAX 9
 
-// The archive with the Pokémon sorted by the first letter of their names, and its file
-#define BR_POKESEARCH_ARC 0x61
+// The file of ARCID_POKEDEX_DATA with the Pokémon sorted by the first letter of their names
 #define BR_POKESEARCH_ARC_FILE 5
 
 // BR_RES_BG_* of the letter buttons' screen and of the list's
@@ -446,7 +446,7 @@ static u16 *BrPokeSearch_CreateMonsList(PokeDexSave *pokedex, unsigned int lette
 
 static u16 *BrPokeSearch_LoadMonsTable(HeapID heapId, u32 *num) {
     u32 size;
-    u16 *table = GFL_ArcSysReadHeapNewLZGetLen(BR_POKESEARCH_ARC, BR_POKESEARCH_ARC_FILE, FALSE, heapId, &size);
+    u16 *table = GFL_ArcSysReadHeapNewLZGetLen(ARCID_POKEDEX_DATA, BR_POKESEARCH_ARC_FILE, FALSE, heapId, &size);
 
     *num = size / sizeof(u16);
     return table;

@@ -1,0 +1,17 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "N",
+    "shapes": [ 4 ],
+    "area": {
+        "black2": {
+            "all_year": true,
+            "places": {}
+        },
+        "white2": {
+            "all_year": true,
+            "places": {
+                "ZONE_REVERSAL_MOUNTAIN": [ "grass" ]
+            }
+        }
+    }
+}

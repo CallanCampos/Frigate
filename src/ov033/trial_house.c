@@ -5,6 +5,7 @@
 #include "field/field_effect.h"
 #include "field/fld_btl_inst_event.h"
 #include "field/trial_house.h"
+#include "gfl/backup_system.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
 #include "gfl/net.h"
@@ -13,6 +14,7 @@
 #include "gfl/touchpanel.h"
 #include "gfl/ui.h"
 #include "pml/poke_party.h"
+#include "save/battle_examination.h"
 #include "save/records.h"
 #include "save/save_control.h"
 #include "save/trial_house.h"
@@ -21,6 +23,7 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 #include "system/version.h"
+#include <stddef.h>
 
 struct TrialHouseWork *CreateTrialHouseWk(GameSystem *gsys) {
     u32 saveSize = BattleExamination_GetSize();
@@ -43,9 +46,10 @@ void TrialHouse_LoadDeliveryState(GameSystem *gsys, TrialHouseWork *work) {
     BattleExaminationSave *extraSave;
 
     save = GameData_GetSaveControl(GSYS_GetGameData(gsys));
-    buffer = GFL_HeapAllocate(0x8004, 0x800, TRUE, "trial_house.c", 0x79);
-    SaveControl_LoadExtraBlock(save, 5, 0x8004, buffer, 0x800);
-    extraSave = getAddressOfExtraSaveBlk(save, 5, 0);
+    buffer = GFL_HeapAllocate(HEAPID_TAIL(HEAPID_GAMEEVENT), BATTLE_EXAMINATION_LOAD_SIZE, TRUE, "trial_house.c", 0x79);
+    SaveControl_LoadExtraBlock(save, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION, HEAPID_TAIL(HEAPID_GAMEEVENT), buffer,
+                               BATTLE_EXAMINATION_LOAD_SIZE);
+    extraSave = getAddressOfExtraSaveBlk(save, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION, 0);
     state = 0;
     if (BattleExamination_IsValid(extraSave)) {
         if (BattleExamination_IsSingle(extraSave)) {
@@ -54,7 +58,7 @@ void TrialHouse_LoadDeliveryState(GameSystem *gsys, TrialHouseWork *work) {
             state = 2;
         }
     }
-    freeIntermediateSaveExtraBlksAfterLoad2(save, 5);
+    freeIntermediateSaveExtraBlksAfterLoad2(save, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION);
     GFL_HeapFree(buffer);
     work->initState = state;
 }
@@ -89,7 +93,7 @@ void TrialHouse_SetBattleMode(TrialHouseWork *work, u32 mode) {
     }
 }
 
-void func_ov033_0217adbc(TrialHouseWork *work, u32 selectionFlag) {
+void TrialHouse_SetSelectionFlag(TrialHouseWork *work, u32 selectionFlag) {
     work->selectionFlag = selectionFlag;
 }
 
@@ -143,12 +147,14 @@ void TrialHouse_LoadDeliveredTrainer(GameSystem *gsys, TrialHouseWork *work, u32
     BattleExaminationSave *extra;
 
     save = GameData_GetSaveControl(GSYS_GetGameData(gsys));
-    buffer = GFL_HeapAllocate(0x8004, 0x800, TRUE, "trial_house.c", 0x14c);
-    if (SaveControl_LoadExtraBlock(save, 5, 0x8004, buffer, 0x800) == 1) {
-        extra = getAddressOfExtraSaveBlk(save, 5, 0);
+    buffer =
+        GFL_HeapAllocate(HEAPID_TAIL(HEAPID_GAMEEVENT), BATTLE_EXAMINATION_LOAD_SIZE, TRUE, "trial_house.c", 0x14c);
+    if (SaveControl_LoadExtraBlock(save, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION, HEAPID_TAIL(HEAPID_GAMEEVENT), buffer,
+                                   BATTLE_EXAMINATION_LOAD_SIZE) == 1) {
+        extra = getAddressOfExtraSaveBlk(save, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION, 0);
         work->trainer = *BattleExamination_GetTrainer(extra, mode);
     }
-    freeIntermediateSaveExtraBlksAfterLoad2(save, 5);
+    freeIntermediateSaveExtraBlksAfterLoad2(save, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION);
     GFL_HeapFree(buffer);
 }
 
@@ -160,7 +166,7 @@ GameEvent *TrialHouse_CreateTrainerMsgEvent(GameSystem *gsys, TrialHouseWork *wo
     return EventBtlInstTrainerMsg_Create(gsys, &work->trainer, index, (u16)actorId);
 }
 
-GameEvent *func_ov033_0217aee8(GameSystem *gsys, TrialHouseWork *work, u16 *result) {
+GameEvent *TrialHouse_CreateDeliveryTask(GameSystem *gsys, TrialHouseWork *work, u16 *result) {
     GameEvent *event;
     struct TrialHouseEventData *data;
 
@@ -185,6 +191,19 @@ GameEvent *func_ov033_0217aee8(GameSystem *gsys, TrialHouseWork *work, u16 *resu
     return event;
 }
 
+// The steps of receiving a battle examination: start the beacon, let it run for 120 frames, see whether any examination
+// was found, receive it, end the beacon and wait for the network to close, and read the examination's state again.
+// B cancels while it runs
+enum {
+    TRIAL_HOUSE_DELIVERY_STEP_START,
+    TRIAL_HOUSE_DELIVERY_STEP_WAIT,
+    TRIAL_HOUSE_DELIVERY_STEP_SEARCH,
+    TRIAL_HOUSE_DELIVERY_STEP_RECEIVE,
+    TRIAL_HOUSE_DELIVERY_STEP_END,
+    TRIAL_HOUSE_DELIVERY_STEP_WAIT_NET_EXIT,
+    TRIAL_HOUSE_DELIVERY_STEP_RELOAD,
+};
+
 GameEventReturnCode TrialHouse_DeliveryTaskMain(GameEvent *event, u32 *state, void *arg) {
     TrialHouseEventData *data;
     GameSystem *gsys;
@@ -198,45 +217,45 @@ GameEventReturnCode TrialHouse_DeliveryTaskMain(GameEvent *event, u32 *state, vo
     data = arg;
     gsys = data->gsys;
     switch (*state) {
-    case 0:
+    case TRIAL_HOUSE_DELIVERY_STEP_START:
         data->subwork = DeliveryBeacon_Init(&data->init);
         if (DeliveryBeacon_RecvStart(data->subwork) == 0) {
             *data->result = 0;
-            *state = 4;
+            *state = TRIAL_HOUSE_DELIVERY_STEP_END;
         } else {
-            *state = 1;
+            *state = TRIAL_HOUSE_DELIVERY_STEP_WAIT;
         }
         break;
-    case 1:
-        if (GCTX_HIDGetPressedKeys() == 2) {
+    case TRIAL_HOUSE_DELIVERY_STEP_WAIT:
+        if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_B) {
             *data->result = 3;
-            *state = 4;
+            *state = TRIAL_HOUSE_DELIVERY_STEP_END;
             break;
         }
         DeliveryBeacon_Main(data->subwork);
         data->timeout++;
         if (data->timeout > 120) {
-            *state = 2;
+            *state = TRIAL_HOUSE_DELIVERY_STEP_SEARCH;
         }
         break;
-    case 2:
-        if (GCTX_HIDGetPressedKeys() == 2) {
+    case TRIAL_HOUSE_DELIVERY_STEP_SEARCH:
+        if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_B) {
             *data->result = 3;
-            *state = 4;
+            *state = TRIAL_HOUSE_DELIVERY_STEP_END;
             break;
         }
         DeliveryBeacon_Main(data->subwork);
         if (DeliveryBeacon_IsAnyReceived(data->subwork)) {
-            *state = 3;
+            *state = TRIAL_HOUSE_DELIVERY_STEP_RECEIVE;
         } else {
             *data->result = 0;
-            *state = 4;
+            *state = TRIAL_HOUSE_DELIVERY_STEP_END;
         }
         break;
-    case 3:
-        if (GCTX_HIDGetPressedKeys() == 2) {
+    case TRIAL_HOUSE_DELIVERY_STEP_RECEIVE:
+        if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_B) {
             *data->result = 3;
-            *state = 4;
+            *state = TRIAL_HOUSE_DELIVERY_STEP_END;
             break;
         }
         DeliveryBeacon_Main(data->subwork);
@@ -251,25 +270,25 @@ GameEventReturnCode TrialHouse_DeliveryTaskMain(GameEvent *event, u32 *state, vo
         c = TrialHouse_IsDeliveryIdReceived(save, a);
         if (b != 0 && (c == 0 || a == 0)) {
             TrialHouse_MarkDeliveryIdReceived(save, a);
-            BattleExamination_Load(gameData, data->work->saveBuffer, 0x8004);
+            BattleExamination_Load(gameData, data->work->saveBuffer, HEAPID_TAIL(HEAPID_GAMEEVENT));
             *data->result = 1;
         } else if (c != 0) {
             *data->result = 2;
         } else {
             *data->result = 0;
         }
-        *state = 4;
+        *state = TRIAL_HOUSE_DELIVERY_STEP_END;
         break;
-    case 4:
+    case TRIAL_HOUSE_DELIVERY_STEP_END:
         DeliveryBeacon_End(data->subwork);
-        *state = 5;
+        *state = TRIAL_HOUSE_DELIVERY_STEP_WAIT_NET_EXIT;
         break;
-    case 5:
+    case TRIAL_HOUSE_DELIVERY_STEP_WAIT_NET_EXIT:
         if (GFL_NetIsNotInitialized()) {
-            *state = 6;
+            *state = TRIAL_HOUSE_DELIVERY_STEP_RELOAD;
         }
         break;
-    case 6:
+    case TRIAL_HOUSE_DELIVERY_STEP_RELOAD:
         TrialHouse_LoadDeliveryState(gsys, data->work);
         return GAMEEVENT_DONE;
     }
@@ -349,13 +368,16 @@ void TrialHouseCalcPointScore(GameSystem *gsys, TrialHouseWork *work, u16 *rankO
     }
     if (work->initState != 0) {
         extraSaveControl = GameData_GetSaveControl(GSYS_GetGameData(gsys));
-        buffer = GFL_HeapAllocate(0x8004, 0x800, TRUE, "trial_house.c", 0x277);
-        if (SaveControl_LoadExtraBlock(extraSaveControl, 5, 0x8004, buffer, 0x800) == 1) {
-            MI_CpuCopy8((u8 *)getAddressOfExtraSaveBlk(extraSaveControl, 5, 0) + 0x5a0, thSave->unk38,
-                        sizeof(thSave->unk38));
+        buffer =
+            GFL_HeapAllocate(HEAPID_TAIL(HEAPID_GAMEEVENT), BATTLE_EXAMINATION_LOAD_SIZE, TRUE, "trial_house.c", 0x277);
+        if (SaveControl_LoadExtraBlock(extraSaveControl, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION,
+                                       HEAPID_TAIL(HEAPID_GAMEEVENT), buffer, BATTLE_EXAMINATION_LOAD_SIZE) == 1) {
+            MI_CpuCopy8((u8 *)getAddressOfExtraSaveBlk(extraSaveControl, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION, 0) +
+                            offsetof(BattleExaminationSave, name),
+                        thSave->examinationName, sizeof(thSave->examinationName));
         }
         GFL_HeapFree(buffer);
-        freeIntermediateSaveExtraBlksAfterLoad2(extraSaveControl, 5);
+        freeIntermediateSaveExtraBlksAfterLoad2(extraSaveControl, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION);
     }
     records = getTrainerCardInfoBlkAddress(save);
     RecordSetTrialHousePoints(records, points);
@@ -419,6 +441,12 @@ void TrialHouse_MarkDeliveryIdReceived(TrialHouseSave *save, u32 index) {
     }
 }
 
+// The steps of the save: start saving the examination block, marked as taken or cleared, then wait for it
+enum {
+    TRIAL_HOUSE_SAVE_STEP_START,
+    TRIAL_HOUSE_SAVE_STEP_WAIT,
+};
+
 GameEventReturnCode TrialHouse_SaveTaskMain(GameEvent *event, u32 *state, void *arg) {
     TrialHouseEffectEvent *data;
     GameData *gameData;
@@ -429,21 +457,23 @@ GameEventReturnCode TrialHouse_SaveTaskMain(GameEvent *event, u32 *state, void *
     gameData = GSYS_GetGameData(data->gsys);
     save = GameData_GetSaveControl(gameData);
     switch (*state) {
-    case 0:
-        data->buffer = GFL_HeapAllocate(0x8004, 0x800, FALSE, "trial_house.c", 0x34c);
-        SaveControl_LoadExtraBlock(save, 5, 0x8004, data->buffer, 0x800);
-        extraSave = getAddressOfExtraSaveBlk(save, 5, 0);
+    case TRIAL_HOUSE_SAVE_STEP_START:
+        data->buffer = GFL_HeapAllocate(HEAPID_TAIL(HEAPID_GAMEEVENT), BATTLE_EXAMINATION_LOAD_SIZE, FALSE,
+                                        "trial_house.c", 0x34c);
+        SaveControl_LoadExtraBlock(save, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION, HEAPID_TAIL(HEAPID_GAMEEVENT),
+                                   data->buffer, BATTLE_EXAMINATION_LOAD_SIZE);
+        extraSave = getAddressOfExtraSaveBlk(save, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION, 0);
         if (data->mode == 1) {
             BattleExamination_SetUsed(extraSave);
         } else {
             MI_CpuFill8(extraSave, 0, BattleExamination_GetSize());
         }
-        GameData_StartSaveBlock(gameData, 5);
+        GameData_StartSaveBlock(gameData, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION);
         (*state)++;
         break;
-    case 1:
-        if (GameData_UpdateSaveBlock(gameData, 5) == 2) {
-            freeIntermediateSaveExtraBlksAfterLoad2(save, 5);
+    case TRIAL_HOUSE_SAVE_STEP_WAIT:
+        if (GameData_UpdateSaveBlock(gameData, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION) == SAVE_RESULT_OK) {
+            freeIntermediateSaveExtraBlksAfterLoad2(save, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION);
             GFL_HeapFree(data->buffer);
             FieldSaveanime_Stop(data->effect);
             FieldSaveanime_Delete(data->effect);

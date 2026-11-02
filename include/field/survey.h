@@ -44,6 +44,11 @@ BOOL TrainerGameInfo_GetSurveyCount(TrainerGameInfoSave *info, u8 index);
 BOOL SurveyQuestion_IsNewInB2W2(u8 question);
 BOOL Survey_IsCurrentDone(GameData *gameData);
 // Overlay 12's survey.c: the questions of the surveys, and whether one is done
+// How a question's survey ends: when its answers reach a count, or when it has run for its hours
+enum {
+    SURVEY_QUESTION_TYPE_COUNT,
+    SURVEY_QUESTION_TYPE_HOURS,
+};
 u32 Survey_GetQuestionType(u16 question);
 u32 Survey_GetQuestionAnswerCount(u16 question);
 void Survey_GetQuestionAnswers(u16 question, u8 *answers);

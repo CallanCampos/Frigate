@@ -1,0 +1,41 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "T",
+    "shapes": [ 11 ],
+    "area": {
+        "all_year": false,
+        "seasons": {
+            "spring": {
+                "ZONE_DRAGONSPIRAL_TOWER": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_3": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_6": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_7": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_12": [ "grass", "dark_grass" ],
+                "ZONE_VICTORY_ROAD": [ "grass", "dark_grass" ]
+            },
+            "summer": {
+                "ZONE_DRAGONSPIRAL_TOWER": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_3": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_6": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_7": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_12": [ "grass", "dark_grass" ],
+                "ZONE_VICTORY_ROAD": [ "grass", "dark_grass" ]
+            },
+            "autumn": {
+                "ZONE_DRAGONSPIRAL_TOWER": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_3": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_6": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_7": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_12": [ "grass", "dark_grass" ],
+                "ZONE_VICTORY_ROAD": [ "grass", "dark_grass" ]
+            },
+            "winter": {
+                "ZONE_ROUTE_3": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_6": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_7": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_12": [ "grass", "dark_grass" ],
+                "ZONE_VICTORY_ROAD": [ "grass", "dark_grass" ]
+            }
+        }
+    }
+}

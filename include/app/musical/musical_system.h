@@ -31,14 +31,22 @@ struct Ov210Work {
 // A prop a Pokémon wears on the stage
 typedef struct {
     u16 itemId;
-    s16 unk2;
+    s16 rotation;
     // The slot it is worn on
     u8 slot;
 } MusicalPokeEquip;
 
+// Who frees a MusicalPoke: the event, the communication or the stage, and none yet when it is made
+enum {
+    MUSICAL_POKE_OWNER_EVENT,
+    MUSICAL_POKE_OWNER_COMM,
+    MUSICAL_POKE_OWNER_STAGE,
+    MUSICAL_POKE_OWNER_NONE = 4,
+};
+
 // A Pokémon on the stage
 struct MusicalPoke {
-    // Who frees it: 0 the event, 1 the communication, 2 the stage; 4 when it is made
+    // MUSICAL_POKE_OWNER_*
     u32 owner;
     // The party Pokémon it was made from, or NULL
     PartyPkm *pkm;
@@ -49,9 +57,12 @@ struct MusicalPoke {
     u32 personality;
     MusicalPokeEquip equips[9];
     u16 points;
-    u16 unk4C[4];
-    BOOL unk54[9];
-    u16 unk78;
+    // The points of its props of each kind
+    u16 kindPoints[4];
+    // The props, by equip, that scored when the audience looked at them
+    BOOL likedEquips[9];
+    // When it uses a hand prop on the stage, STA_ACTING_USE_* or the frame to use it on
+    u16 handPropUse;
 };
 
 // Whether a party Pokémon can join the musical: not an egg, and not in a form it would lose in a box

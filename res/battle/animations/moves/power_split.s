@@ -1,0 +1,48 @@
+// MOVE_POWER_SPLIT's animation: member 471 of a/0/6/5
+
+#include "asm/btlv_effvm.inc"
+
+    ScriptHeader 1
+    ScriptVariant PowerSplit
+
+PowerSplit:
+    CameraMovePreset 1, 9, 10, 0, 6
+    McssSetVanish EFFVM_DEFENDER, TRUE
+    PaletteFade 2, 0, 10, 2, 0
+    ParticleLoad 563
+    EmitterMove 563, 0, 1, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x1e000, 0x1000, 0x1000, 0x1000, 0
+    EmitterMove 563, 0, 1, EFFVM_EMIT_DEFENDER, EFFVM_EMIT_ATTACKER, 0x2000, 0x1e000, -0x1000, 0x1000, 0x1000, 0
+    WaitFrames 10
+    EmitterMove 563, 0, 1, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x1e000, 0x1000, 0x1000, 0x1000, 0
+    EmitterMove 563, 0, 1, EFFVM_EMIT_DEFENDER, EFFVM_EMIT_ATTACKER, 0x2000, 0x1e000, -0x1000, 0x1000, 0x1000, 0
+    SetYield FALSE
+    PlaySE SEQ_SE_W470_WA, 1, EFFVM_ATTACKER, 0, 0, 80, 0, 0, 0
+    MoveSE 1, 0, 1, 100, 0, 80, 20, 0, 0
+    PanSE 1, 1, EFFVM_ATTACKER, EFFVM_DEFENDER, 0, 50, 0, 0
+    PlaySE SEQ_SE_W357_JIRORI, 2, EFFVM_ATTACKER, 0, 0, 100, 0, 0, 0
+    PlaySE SEQ_SE_W357_JIRORI, 2, EFFVM_ATTACKER, 48, 0, 100, 0, 0, 0
+    PanSE 2, 1, EFFVM_ATTACKER, EFFVM_DEFENDER, 0, 50, 0, 0
+    SetYield TRUE
+    WaitFrames 10
+    EmitterMove 563, 0, 1, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x1e000, 0x1000, 0x1000, 0x1000, 0
+    EmitterMove 563, 0, 1, EFFVM_EMIT_DEFENDER, EFFVM_EMIT_ATTACKER, 0x2000, 0x1e000, -0x1000, 0x1000, 0x1000, 0
+    WaitFrames 10
+    CameraMovePreset 1, 11, 12, 0, 8
+    EmitterMove 563, 0, 1, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x1e000, 0x1000, 0x1000, 0x1000, 0
+    EmitterMove 563, 0, 1, EFFVM_EMIT_DEFENDER, EFFVM_EMIT_ATTACKER, 0x2000, 0x1e000, -0x1000, 0x1000, 0x1000, 0
+    WaitFrames 10
+    EmitterMove 563, 0, 1, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x1e000, 0x1000, 0x1000, 0x1000, 0
+    EmitterMove 563, 0, 1, EFFVM_EMIT_DEFENDER, EFFVM_EMIT_ATTACKER, 0x2000, 0x1e000, -0x1000, 0x1000, 0x1000, 0
+    WaitFrames 10
+    EmitterMove 563, 0, 1, EFFVM_EMIT_ATTACKER, EFFVM_EMIT_DEFENDER, 0x2000, 0x1e000, 0x1000, 0x1000, 0x1000, 0
+    EmitterMove 563, 0, 1, EFFVM_EMIT_DEFENDER, EFFVM_EMIT_ATTACKER, 0x2000, 0x1e000, -0x1000, 0x1000, 0x1000, 0
+    WaitFrames 10
+    McssScale EFFVM_DEFENDER, 2, 0x19a, -0x19a, 2, 0, 1
+    CameraMovePreset 1, 8, 10, 0, 6
+    Wait EFFVM_WAIT_ALL
+    PaletteFade 2, 10, 0, 2, 0
+    McssCameraMode 0, 0
+    McssSetVanish EFFVM_DEFENDER, FALSE
+    Wait EFFVM_WAIT_ALL
+    End
+    .balign 4

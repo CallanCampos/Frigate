@@ -1,0 +1,27 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A walking Pokémon's entry: res/field/actors/pokemon/<code>/pokemon.json",
+    "description": "The entry of ARCID_TPOKE's table (a/2/0/8, TPokeEntry in tpoke_data.c) for the object code whose directory it is in: the species, sex and form that GetPokemonFieldOBJCODE gives this code for, the first entry that fits in the order of generated/obj_codes.txt. tools/data/walking_pokemon_data.py packs them; a code without one is not in the table.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "species", "sex", "form" ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "This schema, for editors"
+        },
+        "species": {
+            "type": "string",
+            "x-constant": "SPECIES_"
+        },
+        "sex": {
+            "enum": [ "GENDER_MALE", "GENDER_FEMALE", null ],
+            "description": "The sex it is for, or null for either (TPOKE_SEX_ANY)"
+        },
+        "form": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535
+        }
+    }
+}

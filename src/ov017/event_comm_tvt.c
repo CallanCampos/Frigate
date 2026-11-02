@@ -9,6 +9,20 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
+enum {
+    STEP_FADE_OUT,
+    STEP_CLOSE_FIELD,
+    STEP_EMPTY,
+    STEP_START_FIELD_APP,
+    STEP_WAIT_FIELD_APP,
+    STEP_WAIT_VIDEO_CHAT,
+    STEP_CLEAR_COMM_PARAM,
+    STEP_OPEN_FIELD,
+    STEP_FADE_IN,
+    STEP_RETURN,
+    STEP_END,
+};
+
 struct EventCommTvt {
     GameSystem *gsys;
     GameData *gameData;
@@ -31,66 +45,66 @@ GameEventReturnCode EventCommTvt_Callback(GameEvent *event, u32 *state, void *da
     Field *field = GSYS_GetField(gsys);
 
     switch (*state) {
-    case 0:
+    case STEP_FADE_OUT:
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
         (*state)++;
         break;
-    case 1:
+    case STEP_CLOSE_FIELD:
         GameEvent_ChainNext(event, CreateFieldCloseEvent(gsys, field));
-        *state = 2;
+        *state = STEP_EMPTY;
         break;
-    case 2:
+    case STEP_EMPTY:
         (*state)++;
-    case 3:
+    case STEP_START_FIELD_APP:
         GSYS_QueueProc(gsys, OVERLAY_COMM_TVT_FIELD_APP, &COMM_TVT_FIELD_PROC_FUNCTIONS, work);
         (*state)++;
         break;
-    case 4:
+    case STEP_WAIT_FIELD_APP:
         if (!GSYS_GetProcMgrState(gsys)) {
             switch (work->mode) {
-            case 0:
-                *state = 6;
+            case COMM_TVT_FIELD_MODE_ENTRALINK_RETURN:
+                *state = STEP_CLEAR_COMM_PARAM;
                 break;
-            case 1:
+            case COMM_TVT_FIELD_MODE_VIDEO_CHAT:
                 work->bgm = GFL_SndBGMGetID();
                 GSYS_QueueProcAsEvent(event, OVERLAY_ID(257), &COMM_TVT_PROC_FUNCTIONS, work->commParam);
-                *state = 5;
+                *state = STEP_WAIT_VIDEO_CHAT;
                 break;
             default:
-                *state = 6;
+                *state = STEP_CLEAR_COMM_PARAM;
                 break;
             }
         }
         break;
-    case 5:
+    case STEP_WAIT_VIDEO_CHAT:
         if (!GSYS_GetProcMgrState(gsys)) {
             GFL_SndBGMPlay(work->bgm, 0xffff);
             GFL_SndBGMFadeIn(60);
-            *state = 6;
+            *state = STEP_CLEAR_COMM_PARAM;
         }
         break;
-    case 6:
+    case STEP_CLEAR_COMM_PARAM:
         work->commParam[4] = 0;
         (*state)++;
         break;
-    case 7:
+    case STEP_OPEN_FIELD:
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
         (*state)++;
         break;
-    case 8:
+    case STEP_FADE_IN:
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         (*state)++;
         break;
-    case 9:
-        if (work->mode == 0) {
-            GameEvent_Replace(event, func_ov033_021773e4(gsys, work->exitArgument));
+    case STEP_RETURN:
+        if (work->mode == COMM_TVT_FIELD_MODE_ENTRALINK_RETURN) {
+            GameEvent_Replace(event, EventEntralinkWarpReturn_Create(gsys, work->exitArgument));
             return GAMEEVENT_CONTINUE;
         }
-        *state = 10;
+        *state = STEP_END;
         break;
-    case 10:
+    case STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;

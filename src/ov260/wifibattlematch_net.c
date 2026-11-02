@@ -2597,7 +2597,7 @@ u32 WifiBattleMatchNet_AccountRequestMain(WifiBattleMatchNet *p_wk) {
     }
     switch (p_wk->state) {
     case WBM_ACCOUNT_SEQ_SEND:
-        if (NHttpRap_SendRequest(5, p_nhttp)) {
+        if (NHttpRap_SendRequest(NHTTP_RAP_REQUEST_WORLDBATTLE_DOWNLOAD, p_nhttp)) {
             p_wk->state = WBM_ACCOUNT_SEQ_START;
         }
         break;
@@ -2636,7 +2636,7 @@ u32 WifiBattleMatchNet_AccountRequestMain(WifiBattleMatchNet *p_wk) {
                 GFL_NetErrRecordWifi(WifiBattleMatchNet_GetHttpResultMessage(answer->result));
                 p_wk->state = WBM_ACCOUNT_SEQ_SERVER_ERROR;
             }
-        } else if (result != 15) {
+        } else if (result != NHTTP_STATUS_RUNNING) {
             if (p_wk->p_nhttp != NULL) {
                 NHttpRap_Destroy(p_wk->p_nhttp);
                 p_wk->p_nhttp = NULL;
@@ -2687,7 +2687,7 @@ u32 WifiBattleMatchNet_PostRequestMain(WifiBattleMatchNet *p_wk) {
     }
     switch (p_wk->state) {
     case WBM_POST_SEQ_SEND:
-        if (NHttpRap_SendRequest(6, p_nhttp)) {
+        if (NHttpRap_SendRequest(NHTTP_RAP_REQUEST_WORLDBATTLE_UPLOAD, p_nhttp)) {
             NHTTPSetPostDataRaw(NHttpRap_GetConnection(p_wk->p_nhttp), &p_wk->postData, sizeof(p_wk->postData));
             p_wk->state = WBM_POST_SEQ_START;
         }
@@ -2726,7 +2726,7 @@ u32 WifiBattleMatchNet_PostRequestMain(WifiBattleMatchNet *p_wk) {
                 GFL_NetErrRecordWifi(WifiBattleMatchNet_GetHttpResultMessage(answer->result));
                 p_wk->state = WBM_POST_SEQ_SERVER_ERROR;
             }
-        } else if (result != 15) {
+        } else if (result != NHTTP_STATUS_RUNNING) {
             WifiBattleMatchNet_SetHttpError(&p_wk->error, result, 5899);
             if (p_wk->p_nhttp != NULL) {
                 NHttpRap_Destroy(p_wk->p_nhttp);
@@ -2895,7 +2895,7 @@ u32 WifiBattleMatchNet_PokemonCheckMain(WifiBattleMatchNet *p_wk, WifiBattleMatc
                 p_wk->state++;
                 break;
             }
-        } else if (result != 15) {
+        } else if (result != NHTTP_STATUS_RUNNING) {
             WifiBattleMatchNet_SetHttpError(&p_wk->error, result, 6159);
             NHttpRap_FreePostData(p_wk->p_nhttp);
             if (p_wk->p_nhttp != NULL) {

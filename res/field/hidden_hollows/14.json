@@ -1,0 +1,69 @@
+{
+    "$schema": "hidden_hollow.schema.json",
+    "pokemon": {
+        "white2": [
+            {
+                "species": [ "SPECIES_MURKROW", "SPECIES_MURKROW", "SPECIES_MURKROW", "SPECIES_MURKROW" ],
+                "max_level": [ 60, 60, 60, 60 ],
+                "min_level": [ 55, 55, 55, 55 ],
+                "female_below": [ 30, 30, 30, 30 ],
+                "form": [ 0, 0, 0, 0 ],
+                "unk18": [ 0, 0 ]
+            },
+            {
+                "species": [ "SPECIES_BUTTERFREE", "SPECIES_BUTTERFREE", "SPECIES_BUTTERFREE", "SPECIES_BUTTERFREE" ],
+                "max_level": [ 60, 60, 60, 60 ],
+                "min_level": [ 55, 55, 55, 55 ],
+                "female_below": [ 30, 30, 30, 30 ],
+                "form": [ 0, 0, 0, 0 ],
+                "unk18": [ 0, 0 ]
+            },
+            {
+                "species": [ "SPECIES_AMOONGUSS", "SPECIES_AMOONGUSS", "SPECIES_AMOONGUSS", "SPECIES_BRELOOM" ],
+                "max_level": [ 60, 60, 60, 60 ],
+                "min_level": [ 55, 55, 55, 55 ],
+                "female_below": [ 30, 30, 30, 30 ],
+                "form": [ 0, 0, 0, 0 ],
+                "unk18": [ 0, 0 ]
+            }
+        ],
+        "black2": [
+            {
+                "species": [ "SPECIES_MURKROW", "SPECIES_MURKROW", "SPECIES_MURKROW", "SPECIES_MURKROW" ],
+                "max_level": [ 60, 60, 60, 60 ],
+                "min_level": [ 55, 55, 55, 55 ],
+                "female_below": [ 30, 30, 30, 30 ],
+                "form": [ 0, 0, 0, 0 ],
+                "unk18": [ 0, 0 ]
+            },
+            {
+                "species": [ "SPECIES_BEEDRILL", "SPECIES_BEEDRILL", "SPECIES_BEEDRILL", "SPECIES_BEEDRILL" ],
+                "max_level": [ 60, 60, 60, 60 ],
+                "min_level": [ 55, 55, 55, 55 ],
+                "female_below": [ 30, 30, 30, 30 ],
+                "form": [ 0, 0, 0, 0 ],
+                "unk18": [ 0, 0 ]
+            },
+            {
+                "species": [ "SPECIES_AMOONGUSS", "SPECIES_AMOONGUSS", "SPECIES_AMOONGUSS", "SPECIES_BRELOOM" ],
+                "max_level": [ 60, 60, 60, 60 ],
+                "min_level": [ 55, 55, 55, 55 ],
+                "female_below": [ 30, 30, 30, 30 ],
+                "form": [ 0, 0, 0, 0 ],
+                "unk18": [ 0, 0 ]
+            }
+        ]
+    },
+    "items": [
+        [ "ITEM_FIRE_STONE", "ITEM_WATER_STONE", "ITEM_THUNDERSTONE", "ITEM_LEAF_STONE" ],
+        [ "ITEM_ULTRA_BALL", "ITEM_ULTRA_BALL", "ITEM_MAX_REPEL", "ITEM_HYPER_POTION" ],
+        [ "ITEM_GREAT_BALL", "ITEM_GREAT_BALL", "ITEM_SUPER_REPEL", "ITEM_SUPER_POTION" ],
+        [ "ITEM_POKE_BALL", "ITEM_POKE_BALL", "ITEM_REPEL", "ITEM_POTION" ]
+    ],
+    "hidden_items": [
+        [ "ITEM_RARE_CANDY", "ITEM_PP_UP", "ITEM_PP_UP", "ITEM_PP_MAX" ],
+        [ "ITEM_RED_SHARD", "ITEM_BLUE_SHARD", "ITEM_YELLOW_SHARD", "ITEM_GREEN_SHARD" ],
+        [ "ITEM_BIG_MUSHROOM", "ITEM_TINY_MUSHROOM", "ITEM_TINY_MUSHROOM", "ITEM_TINY_MUSHROOM" ],
+        [ "ITEM_GROWTH_MULCH", "ITEM_DAMP_MULCH", "ITEM_STABLE_MULCH", "ITEM_GOOEY_MULCH" ]
+    ]
+}
