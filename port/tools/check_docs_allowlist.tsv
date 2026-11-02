@@ -1,0 +1,8 @@
+# The documents check's known exceptions (port/tools/check_docs.py, run by CI's sync-tooling job). A row per problem
+# that a document keeps: the document, the kind (missing-file, outside-repository, missing-anchor, missing-line,
+# row-cells, delimiter-cells, stray-row), the subject (a link's target as written, or a row's first cell as GitHub
+# splits it) and the reason, which says why the document can't be fixed. The check prints each allowed problem with its
+# reason, and fails on a row that names no problem: fix a document rather than add a row, unless it is a record that
+# its rules keep as it is (port/docs/SYNC.md#records-are-added-to).
+document	kind	subject	reason
+port/docs/research/platinum-port.md	row-cells	Guard sites	A record of the 2026-10-16 research, which is added to and never rewritten: its git grep pattern's unescaped pipes split the row into 7 cells, so GitHub shows its first 3 and cuts the command; whether escaping them counts as a typo's or a broken link's fix, the only edits a record takes, is the owner's call (a follow-up of PR 74)

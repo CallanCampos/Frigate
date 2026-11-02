@@ -80,17 +80,18 @@ alternatives are in [ADR 0001](adr/0001-repository-and-upstream-sync.md).
 name, and the decision is otherwise unchanged.
 
 - **Port files.** All port code is in `port/`. The only other port files are ones upstream doesn't have:
-  `.github/workflows/port-*.yml`, `.github/CODEOWNERS`, the port contribution templates and `.github/README.md`, which GitHub shows as
-  the landing page in place of upstream's `README.md`. The port never edits an upstream file for its own setup (the
-  root `CLAUDE.md`, `AGENTS.md`, `README.md`, `CONTRIBUTING.md`, `.claude/`, upstream's workflows), since every
-  merge would conflict there. Upstream's `build.yml`, which fetches the ROMs with a key the port repository doesn't
-  have, is turned off there with `gh workflow disable` rather than edited.
+  `.github/workflows/port-*.yml`, `.github/CODEOWNERS`, the port contribution templates and `.github/README.md`, which
+  GitHub shows as the landing page in place of upstream's `README.md`. The port never edits an upstream file for its own
+  setup (the root `CLAUDE.md`, `AGENTS.md`, `README.md`, `CONTRIBUTING.md`, `.claude/`, upstream's workflows), since
+  every merge would conflict there. Upstream's `build.yml`, which fetches the ROMs with a key the port repository
+  doesn't have, is turned off there with `gh workflow disable` rather than edited.
 - **Staying current.** The hourly Action proposes one bounded upstream merge PR, preserving full upstream history
   and port adaptations. It leaves a pending PR unchanged; the dedicated App starts public PR CI automatically.
-  The owner reviews and approves imported changes, and validates both ROM SHA1s and native tests on the exact PR head before merge. The local sync opens topic PRs
-  too; no sync pushes `main`. Contributors and maintainer feature work start from Frigate's reviewed `main`.
-  [SYNC.md](SYNC.md) gives the procedures; [ADR 0018](adr/0018-protected-main-and-sync-prs.md) supersedes direct sync
-  publishing and defines the two rulesets that protect `main`.
+  The owner reviews and approves imported changes, and validates both ROM SHA1s and native tests on the exact PR head
+  before merge. The local sync opens topic PRs too; no sync pushes `main`. Contributors and maintainer feature work
+  start from Frigate's reviewed `main`. [SYNC.md](SYNC.md) gives the procedures;
+  [ADR 0018](adr/0018-protected-main-and-sync-prs.md) supersedes direct sync publishing and defines the two rulesets
+  that protect `main`.
 - **Game code stays the decomp's.** Changes outside `port/` are limited to: (1) portability fixes that compile to the
   same bytes under MWCC; (2) hook macros that compile to nothing in the ROM build; (3) rare `#ifdef PLATFORM_PC`
   blocks. Each is listed in `port/docs/game-changes.md`. Shipwright's lesson is that an edited snapshot of a decomp
@@ -98,8 +99,9 @@ name, and the decision is otherwise unchanged.
   new source files, config changes, overlay claims) never happens in this repository (§9).
 - **Why not a branch of the existing fork:** `CallanCampos/pokebw2` carries the decomp PR branches, GitHub allows an
   account only one fork of a repository, and a port needs its own issues and releases.
-- **Why not in upstream:** Frigate accepts contributions in its own repository (D10, [ADR 0017](adr/0017-external-contributions.md)).
-  Port changes and discussion stay here; nothing from it is proposed upstream.
+- **Why not in upstream:** Frigate accepts contributions in its own repository (D10,
+  [ADR 0017](adr/0017-external-contributions.md)). Port changes and discussion stay here; nothing from it is proposed
+  upstream.
 - **Visibility:** public, so GitHub Actions minutes are free, macOS runners included
   ([tech-stack.md](research/tech-stack.md)). The tree holds no ROM data beyond what upstream already publishes in
   `data/`. Going private would end the free minutes and needs its own ADR

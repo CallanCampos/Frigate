@@ -2,6 +2,7 @@
 
 Every document about Frigate, one line each. Living documents describe how things are now and change with the code;
 records keep what was decided or found at the time, and are added to, not rewritten.
+CI checks every document's links, anchors and tables with [../tools/check_docs.py](../tools/check_docs.py).
 
 ## Start here
 

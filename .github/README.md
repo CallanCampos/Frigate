@@ -15,8 +15,8 @@ Frigate is a fan project, not affiliated with or endorsed by Nintendo, Game Frea
 
 This repository is pokebw2's tree with its full history, plus a `port/` directory, where Frigate lives. It follows the
 decomp through reviewed sync PRs: an hourly Action proposes upstream changes, and the maintainer verifies both ROMs
-and native tests before approval and merge ([how](../port/docs/SYNC.md)). Frigate is developed alongside the decomp, so each part of the game
-that upstream turns into C reaches Frigate at the next sync.
+and native tests before approval and merge ([how](../port/docs/SYNC.md)). Frigate is developed alongside the decomp, so
+each part of the game that upstream turns into C reaches Frigate at the next sync.
 
 ## Status
 

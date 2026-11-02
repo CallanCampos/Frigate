@@ -178,9 +178,9 @@ asm oracle, each spike, the artwork) lists its files there.
 `third_party/` and the GPU renderer's `gfx/gpu/` and `gfx/shaders/`, which appear as their phases start. Outside
 `port/`, Frigate's own files are `.github/README.md` (the repository's landing page), `.github/workflows/port-sync.yml`
 (the hourly upstream PR proposal) and `.github/workflows/port-ci.yml` (the host build and tests, plain and sanitized,
-the macOS distribution build and the sync tooling's tests), plus `.github/CODEOWNERS`, `.github/CONTRIBUTING.md`, the
-port PR template and `port_*.yml` issue templates. Game-source changes outside these port-owned paths are listed in
-[docs/game-changes.md](docs/game-changes.md).
+the macOS distribution build, the sync tooling's tests and the documents check), plus `.github/CODEOWNERS`,
+`.github/CONTRIBUTING.md`, the port PR template and `port_*.yml` issue templates. Game-source changes outside these
+port-owned paths are listed in [docs/game-changes.md](docs/game-changes.md).
 
 ## Where to go next
 
@@ -522,5 +522,6 @@ merging. Neither automation nor the local sync script pushes `main`. Contributor
 
 [docs/SYNC.md](docs/SYNC.md) describes the commands, conflict handling and validation. The decisions are
 [ADR 0018](docs/adr/0018-protected-main-and-sync-prs.md) and
-[ADR 0024](docs/adr/0024-a-conflicting-sync-proposes-a-draft-of-upstreams-head.md); actual GitHub settings are documented in
-[repository policy](docs/REPOSITORY-POLICY.md). Record each local sync in [docs/STATUS.md](docs/STATUS.md).
+[ADR 0024](docs/adr/0024-a-conflicting-sync-proposes-a-draft-of-upstreams-head.md); actual GitHub settings are
+documented in [repository policy](docs/REPOSITORY-POLICY.md). Record each local sync in
+[docs/STATUS.md](docs/STATUS.md).

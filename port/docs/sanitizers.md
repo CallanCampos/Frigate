@@ -200,6 +200,9 @@ The build also leaves out:
 
 ## What it found
 
+Each table below gives a report's site as the report gave it, at the line of the tree it ran on;
+[the reports' lines](#the-reports-lines) names that tree, and where the same statements are on `d1717b68d8`.
+
 The survey of 2026-10-18 (port/docs/STATUS.md) ran the strict build, which stops at the first report, under Apple's
 clang on every route of both versions (Black 2's 24, and White 2's 20 but the two that need its starter save, which
 skip); under upstream clang 23, which adds the function check, with LeakSanitizer, on Black 2's 244 tests that aren't
@@ -261,14 +264,15 @@ its encounters and battles track:
 | H6 | `lib/nnsys/src/gfd/gfd_VramTransferManager.c:327`, `NNS_GfdDoVramTransfer`, from the main loop (`src/system/main.c`) in the field | A transfer reads its source from memory of the game's heap that is no longer allocated (ASan, use-after-poison, twice) | Fixed in the game's file under `PLATFORM_PC` on 2026-10-24, with its cause traced ([below](#the-fields-sequences-under-the-strict-build)) |
 
 The battles' track ran the same survey build on 2026-10-23 on the Route 19 route from the starter save (the oracle's
-`route19_save_b2_us.pbwinput` as it was then (now `hugh_b2_us.pbwinput`), port frames 0 to 7,623: CONTINUE, Route 19, the trainer's VS cut-in and Hugh's battle to
-the first move's menu, where the battle's table of semi-invulnerable conditions, which had no C then
-(`data_ov167_021d7490`), stopped the program; [STATUS.md](STATUS.md)). The table is C since the sync of `629a53cccb`
-(`btl_pokeparam.c`'s `sSemiInvulnFlags`), and the survey build runs all 7,700 frames of the route's input with H7 and
-R10 alone ([below](#the-fields-sequences-under-the-strict-build); STATUS.md's T5 entry of 2026-10-24). The deep dive's
-survey of the same route, on its scratch build, showed R6 to R10 and H6; after the track's fixes it shows only H6 and
-R10, and `replay_new_game_house` in the survey build runs all 18,800 frames with only H5 and H6 (H5, at the change of
-map into the house, is now its first report, where the strict build would stop; the strict build wasn't run):
+`route19_save_b2_us.pbwinput` as it was then (now `hugh_b2_us.pbwinput`), port frames 0 to 7,623: CONTINUE, Route 19,
+the trainer's VS cut-in and Hugh's battle to the first move's menu, where the battle's table of semi-invulnerable
+conditions, which had no C then (`data_ov167_021d7490`), stopped the program; [STATUS.md](STATUS.md)). The table is C
+since the sync of `629a53cccb` (`btl_pokeparam.c`'s `sSemiInvulnFlags`), and the survey build runs all 7,700 frames of
+the route's input with H7 and R10 alone ([below](#the-fields-sequences-under-the-strict-build); STATUS.md's T5 entry of
+2026-10-24). The deep dive's survey of the same route, on its scratch build, showed R6 to R10 and H6; after the track's
+fixes it shows only H6 and R10, and `replay_new_game_house` in the survey build runs all 18,800 frames with only H5 and
+H6 (H5, at the change of map into the house, is now its first report, where the strict build would stop; the strict
+build wasn't run):
 
 | Report | Where | What the sanitizer saw | What the host does |
 | --- | --- | --- | --- |
@@ -290,8 +294,8 @@ empty and 11-byte literals, exact-sized allocations with lengths 0–33 at all f
 and strings ending at a guarded page. Its plain and sanitized targets are `hal_std_string_plain` and
 `hal_std_string_sanitized`; both pass, as do both ROM SHA1s and full strict native route batches. ASan's object redzones
 are the regression for the original word overread: a guarded-page case alone can pass the original implementation
-because aligned words remain inside the page. The isolated original SDK reproduces an ASan global-buffer-overflow on the one-byte empty literal. No ignorelist entry
-is added; the unchanged `#else` body remains the ROM implementation.
+because aligned words remain inside the page. The isolated original SDK reproduces an ASan global-buffer-overflow on the
+one-byte empty literal. No ignorelist entry is added; the unchanged `#else` body remains the ROM implementation.
 
 ### The field's sequences under the strict build
 
@@ -305,7 +309,8 @@ traced below: all three are memory bugs of the game, the same in the ROM, fixed 
 with its row in [game-changes.md](game-changes.md) and its finding in [decomp-findings.md](decomp-findings.md). With the
 fixes both survey runs end without a report, and every route of both versions passes in the strict build
 ([STATUS.md](STATUS.md)). H6 was two causes that report at the same place, the VBlank's copy: the field's, fixed, and
-the Route 19 route's, H7, which the same survey build shows there with H6 fixed, now reproduced independently and fixed with deferred upload ownership below (both strict route batches pass):
+the Route 19 route's, H7, which the same survey build shows there with H6 fixed, now reproduced independently and fixed
+with deferred upload ownership below (both strict route batches pass):
 
 | Report | Where | What the game does | What the host does |
 | --- | --- | --- | --- |
@@ -326,3 +331,21 @@ input, names the cause, a write into the field heap between its blocks, and the 
 | Report | Where | What the game does | What the host does |
 | --- | --- | --- | --- |
 | H9 | `src/ov129/sp_poke_gimmick.c:235`, `SpPokeGimmickB_Init`, from `FieldRoutine_MapLoad` as the café loads | Allocates the special Pokémon gimmick's work block 1 at the DS's size of `SpPokeGimmickWork`, 0x30, and writes its curve's address at offset 56, which a host's pointers put 8 bytes past the block (ASan, use-after-poison, a write of 8): the head of the field heap's next free block, whose free list then lost the rest of the heap, so the scene's first file read found it full | Fixed in the game's file: `sizeof(SpPokeGimmickWork)`, which is 0x30 on the DS ([game-changes.md](game-changes.md)); `integrate_sp_poke_gimmick` gives each gimmick a block of exactly its size under ASan. The café loads, and the strict build runs its 2,200 frames without a report ([STATUS.md](STATUS.md)) |
+
+### The reports' lines
+
+The tables above give each report's site as the report gave it: a file and a line of the tree the build ran on. The
+rows are records and keep those lines, which later changes move: the fixes' own `#ifdef PLATFORM_PC` blocks, upstream's
+changes and its English names of the field's files. A report's tree is the first parent of the commit that wrote its
+row here, but for the field's first survey, which ran on a scratch merge with upstream's `b62c655bfa` and gives that
+commit's lines. On `d1717b68d8` (2026-11-02) the same statements are at these lines; H1 to H4, H7 and H8 give none:
+
+| Reports | Their lines are those of | The same statements on `d1717b68d8` |
+| --- | --- | --- |
+| R1 to R4 | `521d483b23` (2026-10-18), the parent of `7773fd59c0` | R1 at `g2d_CellAnimation.c:29`; R2, R3 and R4 at the lines their rows give |
+| R5 | `77326dde87` (2026-10-19), the parent of `3dfcec981c` | `src/system/scroll_bar.c:31`, under `#else` |
+| R6, H5 and H6, in the field's first survey | upstream's `b62c655bfa` (2026-10-23), whose game files the survey's scratch merge had | R6 at `src/ov036/fldeff_fes_sparkle.c:211`, `fldeff_emotion_bubble.c:218` and `fldeff_shadow.c:128` to `194`, in code renamed since (`fldeff_fes_kira.c`, `fldeff_gyoe.c` and `BlActScene_*` then); H5 at `src/ov036/field_buildmodel.c:864`; H6 at the line its row gives |
+| R7 to R10 | `218d1c3a39` (2026-10-23), the parent of `dbaf173012` | R7 at `src/system/printsys.c:247` to `471`, and `:1196`; R8 at `src/ov167/btlv_scu.c:2420`; R9 at the lines its row gives; R10 at `lib/nitro/src/std/std_string.c:126`, under `#else`, and `src/ov012/g3d_text_draw.c:93` |
+| R11, H5 and H6, under the strict build | `def88de18f` (2026-10-24, PR 26's merge), the parent of `ebd05277eb` | R11 and H6 at the lines their rows give; H5 at `src/ov036/field_buildmodel.c:864` |
+| R12 to R16 | `91d0874aa9` (2026-10-25), the parent of `9a8d4f2a0c` | R12 at `src/ov036/field_player_grid.c:397`; R13 at `src/system/vm.c:108`, under `#else`; R14 at `src/ov036/enceff.c:111`; R15 at `lib/nnsys/src/g3d/sbc.c:847` and R16 at `src/ov255/box2_obj.c:1819`, both under `#else` |
+| H9 | `0d68e0d5a9` (2026-11-02), the parent of `9e9768e3ea`, which gave its row this line | At the line its row gives |
