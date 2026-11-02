@@ -3,7 +3,7 @@ such as the trainers' AI: a sequence ends before the first decision that time mo
 melonDS's save made after it. -->
 # 0023: Oracle routes part where the DS's CPU time decides, and go on from melonDS's save
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-10-24
 - **Plan:** §1 (no CPU emulator), §6 (T4: the oracle), §7 (phase 4's exit, and phase 5's story routes, each kept as a
   regression test)
@@ -16,6 +16,12 @@ melonDS's save made after it. -->
 - **Note (2026-10-28):** the [current source audit](../decomp-findings.md) qualifies the budget and identifies
   missing native work/I/O time. A measured timing model remains possible; this proposal is temporary test coverage,
   not evidence that faithful trainer AI is impossible. Its status remains proposed.
+- **Note (2026-11-01):** accepted by the owner, under the rule the owner set that day: if Ship of Harkinian doesn't
+  match the original console's random numbers, Frigate can accept this ADR; if it does, Frigate should fix its own
+  difference too. Ship of Harkinian doesn't reproduce the console's random numbers or timing either: it reseeds from
+  the PC's clock, makes its random floats the GameCube way even from an N64 ROM, and runs a fixed loop with none of
+  the console's lag ([research note](../research/ship-of-harkinian-rng.md)). As the note of 2026-10-28 says, a
+  measured timing model remains possible; the Consequences say when to revisit.
 
 ## Context
 

@@ -71,6 +71,7 @@ records keep what was decided or found at the time, and are added to, not rewrit
 | [research/libntr.md](research/libntr.md) | libntr's architecture, coverage, licensing and gaps for BW2 |
 | [research/platinum-mods-alternatives.md](research/platinum-mods-alternatives.md) | Widescreen and single-screen mods, Gen4Recomp, other DS ports, multiplayer |
 | [research/port-landscape.md](research/port-landscape.md) | libultraship ports, sm64coopdx, static recompilation, GBA ports, mod architectures |
+| [research/ship-of-harkinian-rng.md](research/ship-of-harkinian-rng.md) | Whether Ship of Harkinian reproduces the N64's random numbers and timing, the evidence behind ADR 0023's acceptance |
 | [research/bw2-mod-ecosystem.md](research/bw2-mod-ecosystem.md) | Gen 5 projects, randomizers, widescreen, multiplayer and revival services, hacks and tools |
 | [research/tech-stack.md](research/tech-stack.md) | SDL3, SDL_GPU, renderers, the build, packaging, mod libraries, networking, testing |
 

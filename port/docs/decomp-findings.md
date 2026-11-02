@@ -15,7 +15,8 @@ and `CARD_ReadRomAsync`'s synchronous host copy consume no modeled time. No tick
 The next bounded experiment must measure DS/native script-load and opcode timing, suspension boundaries and MT
 indices. Correct CARD latency is the smallest candidate if I/O accounts for the deficit; otherwise a measured
 work-cost model needs its own decision and validation. A fixed delay before the final choice cannot preserve
-intermediate `CompareToRandom` draws. No timing fix or new full-battle parity is claimed; ADR 0023 remains proposed.
+intermediate `CompareToRandom` draws. No timing fix or new full-battle parity is claimed; ADR 0023, proposed then, was
+accepted on 2026-11-01.
 
 **Controlled timing follow-up, 2026-10-28:** these are pinned melonDS 1.1-model observations, not retail-card
 hardware measurements. Four Black 2 AI script loads take 32,938–33,089 bus cycles on the
