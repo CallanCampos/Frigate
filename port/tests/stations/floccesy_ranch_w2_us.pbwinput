@@ -1,0 +1,31 @@
+pbwinput 1
+# Station floccesy_ranch (port/tools/lab/stations.py): the Route 20 save minted to Floccesy Ranch's gate
+# (floccesy_ranch.recipe), continued from power-on: the title's presses and CONTINUE as floccesy_continue_w2_us.pbwinput
+# plays them, the ranch's field from its first frame, then the field menu's SAVE as floccesy_save_w2_us.pbwinput presses
+# it (X, DOWN three times, A, and A on YES). Game functionality: the start menu's saved game, the field's continue at a
+# spawn (src/ov035/event_mapchange.c), the ranch's zone and NPCs, the field menu's SAVE. oracle.py station compares
+# both programs to port frame 4290, before X, and reads back the save each writes. Game frames (sVBlankCount), the
+# clock pinned, and the DS's start-up seed, which with the clock pinned is the same for every save.
+version w2_us
+clock pinned
+seed 0x270fd5258c56ebe3  # GFL's, at start-up (oracle frame 20)
+1100 START
+1101 -
+3000 START
+3001 -
+3100 START
+3101 -
+3400 A
+3401 -
+4300 X
+4306 -
+4360 DOWN
+4366 -
+4390 DOWN
+4396 -
+4420 DOWN
+4426 -
+4450 A
+4456 -
+4730 A
+4736 -

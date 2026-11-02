@@ -129,6 +129,9 @@ The minted save keeps the base's story: the flags a place's scenes check are the
 arrival, and the recipe's `flag` and `work` lines can set them. A minted save is a place to test from, not evidence
 that the story reaches there.
 
+The stations' recipes in `port/tests/stations/` are worked examples, each with its input files, held to melonDS by
+`oracle.py station` ([../tools/lab/README.md](../tools/lab/README.md#stations)).
+
 ## When the game stops
 
 A run ends with an exit status ([ARCHITECTURE.md](ARCHITECTURE.md#how-a-run-ends) has the table) and, unless it ended

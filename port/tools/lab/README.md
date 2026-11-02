@@ -1,20 +1,23 @@
-<!-- The save lab's guide: minting Black 2 and White 2 saves from a recipe, and reading saves back as facts. -->
+<!-- The save lab's guide: minting Black 2 and White 2 saves from a recipe, reading saves back as facts, and the
+stations, minted saves that both programs continue and that the oracle holds Frigate to. -->
 # port/tools/lab/
 
 The save lab makes and reads Black 2 and White 2 saves, for starting the game somewhere other than where a save was
-made (by hand today, and in the stations' tests to come), with nothing in the game or in Frigate changed: a minted save
-is a save the game loads as its own, on Frigate and on melonDS alike. It serves the game's saves (the main save's
-blocks, `include/save/save_control.h`) and, through the game's own CONTINUE, the field's map changes. Nothing here is
-linked into Frigate, and no save is ever committed: a recipe is text, and what it is minted from is a save made on the
-oracle or the player's own.
+made (by hand, and in the stations' tests, which hold Frigate to melonDS there), with nothing in the game or in Frigate
+changed: a minted save is a save the game loads as its own, on Frigate and on melonDS alike. It serves the game's saves
+(the main save's blocks, `include/save/save_control.h`) and, through the game's own CONTINUE, the field's map changes.
+Nothing here is linked into Frigate, and no save is ever committed: a recipe is text, and what it is minted from is a
+save made on the oracle or the player's own.
 
 | File | What it does | Game functionality it serves | Run |
 | --- | --- | --- | --- |
 | [savelab.py](savelab.py) | `mint` applies a recipe in the game's constant names to a save and writes the result; `read` prints a save's facts in the same names, the party decoded | The saves: the player's place and the spawn CONTINUE takes (block 0x1c), the event flags and work values (0x2d), the play time (0x1b), the money and badges (0x34), the party (0x1a, read only) | by hand; its test `lab_savelab` ([../../tests/lab/test_savelab.py](../../tests/lab/test_savelab.py)) |
+| [stations.py](stations.py) | `STATIONS`, the stations ([below](#stations)): each a recipe minted from one of the oracle's saves, an input file per version and its spec, with the checks of a station's minted save and of each program's resulting save | The start menu's saved game, the field's continue at a spawn, the station's zone and NPCs, the field menu's SAVE | by `oracle.py station` and `station-check` ([../oracle/README.md](../oracle/README.md#stations)); its test `lab_stations` ([../../tests/lab/test_stations.py](../../tests/lab/test_stations.py)) |
 
-Planned beside it, from the save lab's design: stations, minted saves that the oracle holds Frigate to as it holds a
-sequence; a map sweep that places the player in every zone; and verbs for the party, the bag and the Pokédex. ADR 0032
-is reserved for the stations' rules.
+Planned beside them, from the save lab's design: a map sweep that places the player in every zone, port-alone, run on
+demand; and verbs for the party, the bag and the Pokédex.
+[ADR 0032](../../docs/adr/0032-stations-saves-minted-from-oracle-saves-held-to-melonds.md) (proposed) holds the
+stations' rules.
 
 ## Minting a save
 
@@ -74,10 +77,12 @@ no hook in the game. The Hall of Fame puts the player back in their room with it
 So `place` writes `nextSpawn` as the game's own constructors write it (`src/system/zone_spawn.c`):
 `SetupZoneSpawnInfoWarp` for a warp, which leaves the arrival to the game; `CreateZoneChangeData` for a tile, with the
 position as `FieldSetNextZone` makes it from tiles (each `<< 16`); and `LoadZoneSpawnInfoCheckRail` for Fly. It sets the
-flag, clears the work value, and writes `SaveLocation`, which the start menu shows, as the player state
-`FieldMapControl_InitSpawn` sets from that spawn: the zone, the position, the rotation of the facing
-(`ConvWarpDirToAngle`) and not on a rail. The game snaps the player to the tile's centre and writes its own
-`SaveLocation` at its next SAVE.
+flag, clears the work value, and writes `SaveLocation` as the player state `FieldMapControl_InitSpawn` sets from that
+spawn: the zone, the position, the rotation of the facing (`ConvWarpDirToAngle`) and not on a rail. `SaveLocation` is
+the player state the save restores (`Continue_Exit`, `GameData_LoadBackup`) before the spawn replaces it; it isn't what
+the start menu shows: while the flag is set, the start menu names `nextSpawn`'s zone
+(`src/ov162/startmenu.c:1117-1127`). The game snaps the player to the tile's centre and writes its own `SaveLocation`
+at its next SAVE.
 
 The game also sets the player's height: it stands the player on the ground of the tile (`CheckRecalcActorY`,
 `src/ov012/field_actor_tool.c`), and where the tile has more than one level, such as a bridge over a path, it takes the
@@ -166,3 +171,48 @@ each check the bugs it must catch, and the test fails if one of them gets throug
 mutant's text no longer matches fails it too, so the table changes with the code. It needs no ROM. The reader's facts on
 the oracle's saves are the ones the oracle's README records for them, independently; the record of that check is in
 [STATUS.md](../../docs/STATUS.md).
+
+## Stations
+
+A station is a minted save that both programs continue from power-on and that the oracle holds Frigate to, as it holds
+a comparison sequence ([ADR 0032](../../docs/adr/0032-stations-saves-minted-from-oracle-saves-held-to-melonds.md),
+proposed). [stations.py](stations.py)'s `STATIONS` holds each one's spec: the oracle save its recipe is minted from
+(`base`, one of `oracle.py`'s `SAVES`) and facts of that save the oracle's README records, which anchor the reader on a
+save the game wrote; the minted save's SHA-1 for each version; how the two programs' runs are compared (an
+`oracle.Sequence`: frames, lags, the state compared, every declared difference with its cause); the last frame
+compared, before the field menu's first press; the facts each program's resulting save must show; and the save bytes
+where the two resulting saves may differ, each with its cause. Its files are its recipe,
+`port/tests/stations/<name>.recipe`, and an input file per version, `port/tests/stations/<name>_<version>.pbwinput`.
+Each level gates the next:
+
+1. the minted save's structure and its pinned SHA-1;
+2. the recipe read back from it: the place and the spawn CONTINUE takes, the continue flag set, each line's value, and
+   every other fact the base's;
+3. melonDS boots it to the recipe's place;
+4. Frigate is held to melonDS frame by frame, as a sequence is;
+5. each program's resulting save is read back as facts, and the two are compared byte by byte, as a round trip compares
+   them.
+
+`oracle.py station NAME` holds all five ([../oracle/README.md](../oracle/README.md#stations));
+`oracle.py station-check NAME` runs Frigate alone on the minted save, with levels 1, 2 and 5 on its own resulting save.
+A station whose input doesn't SAVE has no automated proof that CONTINUE reached its place (both programs could show the
+same message about a damaged save and compare equal), so the committed ones SAVE. A station's state may be one play
+can't make, so a station is never evidence that the story reaches its place.
+
+To add a station:
+
+1. Write its recipe: a `#` block that says what state it makes, whether play can make it and which game functionality it
+   touches, then `base` and the verbs. Base it on an oracle save, never on one Frigate made.
+2. Write an input file for each version: the title's presses and CONTINUE as `floccesy_continue_<version>.pbwinput`
+   plays them (`clock pinned`, the version's start-up seed), then what the station holds, then the field menu's SAVE.
+3. Mint it from each version's base (`savelab.py mint`, with the base from `oracle.py save BASE --save-cache DIR`), read
+   it back (`savelab.py read`), and pin each minted SHA-1 in `STATIONS`.
+4. Run `oracle.py station NAME` once with nothing declared, for each version, and trace every screen, state frame and
+   save byte that differs to its mechanism in the game's C and both runs, as the oracle's README's known differences
+   are traced; then declare each with its cause (an existing constant only where the evidence shows that mechanism, else
+   a constant of its own in `stations.py` and a line in the oracle's README) and run again until it holds.
+5. Add it to `port/cmake/oracle.cmake`'s list of stations, with its base's fixture (`oracle_floccesy_save` for a station
+   minted from the Route 20 save, `oracle_saves` for the earlier saves), and record its results in the oracle's README.
+
+Minted and resulting saves are never committed: the commands keep them in their work directories, and `lab_stations`
+builds its own saves from the headers' layout.

@@ -27,8 +27,8 @@ A bug fix, a refactor or anything one comment explains needs no ADR.
   that those branches don't collide when they merge: 0019 for the pointer-cast guard against a classified baseline,
   0020 for one program for both versions (D6) and 0021 for root heaps in host memory, which was written first. A
   branch whose ADR took another number before the reservation renumbers it when it merges. On 2026-11-01, 0031 was
-  reserved in the same way for verification v2 and 0032 for the save lab. 0020 is still reserved for D6, and the
-  next free number is 0033.
+  reserved in the same way for verification v2 and 0032 for the save lab; both are written. 0020 is still reserved
+  for D6, and the next free number is 0033.
 - An accepted ADR isn't rewritten. Only its status line changes: to "superseded by NNNN" when a later ADR replaces
   it, to "accepted; amended by NNNN" when a later ADR changes part of it, or to "accepted; superseded: retired when
   ..." when what it decided is removed with no later decision in its place, with a dated note that says what went.
@@ -98,6 +98,7 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0029](0029-backup-write-service-wait.md) | Preserve the backup WRITE service initial SDK wait | §4.5, §6 | accepted |
 | [0030](0030-widescreen-by-an-engine-side-hor-plus-scale-with-native-readbacks.md) | Widescreen by an engine-side Hor+ scale with native readbacks | §4.6, §5.2, §6, §7 phase 6, D9 | proposed |
 | [0031](0031-per-game-frame-digests-against-a-content-addressed-oracle-cache.md) | Per-game-frame digests against a content-addressed oracle cache, and their hash, xxHash, fetched at configure time as minicoro is | §6, §7 phase 5 | proposed |
+| [0032](0032-stations-saves-minted-from-oracle-saves-held-to-melonds.md) | Stations: saves minted from oracle saves, placed by the game's own spawn and held to melonDS | §6, §7 phase 5 | proposed |
 
 ## Decisions waiting for an ADR
 

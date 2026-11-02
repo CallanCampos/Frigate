@@ -1,0 +1,9 @@
+# Station floccesy_ranch (port/tools/lab/stations.py, ADR 0032): Floccesy Ranch's gate, minted from the oracle's Route
+# 20 save (port/tools/oracle/oracle.py SAVES floccesy_save, its SHA-1 pinned there for each version). The player
+# arrives through the ranch's own warp 0, the gate from ZONE_FLOCCESY_RANCH (res/field/events/floccesy_ranch_2.json),
+# by the game's continue at a spawn (port/tools/lab/README.md); the party, the bag, the money, the flags and the
+# story's work values stay the Route 20 save's. Play can't make this state: Terrell's battle on Route 20 isn't fought,
+# so the station is never evidence that the story reaches the ranch. Game functionality: the field's continue at a
+# spawn (src/ov035/event_mapchange.c), the ranch's zone and NPCs.
+base floccesy_save
+place ZONE_FLOCCESY_RANCH_2 warp 0

@@ -15,6 +15,8 @@ CONTINUE into the field, its menu and the apps it opens, and through New Game in
     oracle.py sequence NAME --port BIN [--out DIR] [--update] [--save-cache DIR] [--oracle BIN] [--version b2_us]
     oracle.py seeds NAME [--frames N] [--save-cache DIR] [--work DIR] [--oracle BIN] [--version b2_us]
     oracle.py sequence-check NAME --port BIN [--work DIR] [--version b2_us]
+    oracle.py station NAME --port BIN [--out DIR] [--save-cache DIR] [--oracle BIN] [--version b2_us]
+    oracle.py station-check NAME --port BIN [--save-cache DIR] [--work DIR] [--version b2_us]
     oracle.py sound NAME --port BIN [--out DIR] [--update] [--oracle BIN] [--version b2_us]
     oracle.py sound-check NAME --port BIN [--work DIR] [--version b2_us]
     oracle.py check --oracle BIN [--version b2_us] [--work DIR] [--update]
@@ -72,6 +74,15 @@ and statistics. sound-check runs the port alone and checks it against that refer
 the oracle runs the boot sequence twice with the same results (its screens, sound trace and WAV dump), and its screens
 match the hashes in port/tests/oracle/boot_<version>.tsv. save, port-save, round-trip, sequence, seeds, sound and check
 exit 77 without the oracle or the ROM, sequence-check and sound-check without the ROM.
+station holds a station of the save lab (port/tools/lab/stations.py, STATIONS; README.md, "Stations"): it mints the
+station's save by its recipe, port/tests/stations/<name>.recipe, from the oracle's save the recipe names (made first on
+the oracle, or taken from --save-cache), checks the minted save's structure, its pinned SHA-1 and the recipe read back
+from it, has both programs continue it from power-on with the station's input file, compares them as sequence compares
+a sequence's runs, and reads back the save each writes, held to the facts the station expects and to each other byte by
+byte as round-trip holds two saves. station-check runs the port alone on the station's minted save, from the oracle's
+save in --save-cache, and holds the save it writes the same way; it compares no frames, which only station does.
+station exits 77 without the oracle or the ROM, and station-check without the ROM or the oracle's base save in
+--save-cache.
 Standard library only.
 """
 
@@ -2194,6 +2205,219 @@ def command_sequence_check(args) -> int:
     return 1 if failures else 0
 
 
+def load_stations():
+    """The save lab's stations module (port/tools/lab/stations.py), which only the two station commands import, so that
+    no sequence, save or round trip depends on the lab. This module is registered as oracle first, so that the lab's
+    own import of oracle (stations.py's, and savelab.py's for a recipe's base line) gets the module that runs and not a
+    second copy of it, whose SAVES a test could patch apart from this one's; when this module was imported as oracle,
+    as the tests import it, that changes nothing. Then port/tools/lab goes on the path, once"""
+    sys.modules.setdefault("oracle", sys.modules[__name__])
+    lab = os.path.join(os.path.dirname(HERE), "lab")
+    if lab not in sys.path:
+        sys.path.insert(0, lab)
+    import stations  # the save lab's, imported by the station commands alone
+
+    return stations
+
+
+def unknown_station(command: str, stations, name: str) -> bool:
+    """Whether a station command was given a name STATIONS lacks, which it says, naming the stations: the parsers take
+    any name, so that building them never imports the lab"""
+    if name in stations.STATIONS:
+        return False
+    print(f"oracle.py {command}: no station {name} in port/tools/lab/stations.py; its stations are "
+          + ", ".join(sorted(stations.STATIONS)))
+    return True
+
+
+def mint_station(stations, name: str, version: str, base_path: str, minted_path: str) -> bytes | None:
+    """Levels 1 and 2 of a station (stations.mint): its recipe minted from the base at base_path, written to
+    minted_path; prints what each recipe line set, the base's and the minted save's SHA-1 and the bytes changed, and
+    each failure. The minted save, or None when a failure keeps both programs from running it"""
+    with open(base_path, "rb") as f:
+        base = f.read()
+    minted, applied, failures = stations.mint(name, version, base)
+    for line in applied:
+        print(f"recipe line {line['line']}: " + "; ".join(f"{key} {value}" for key, value in line.items()
+                                                          if key != "line"))
+    print(f"the base, {stations.STATIONS[name].base}: SHA-1 {hashlib.sha1(base).hexdigest()}")
+    if minted is not None:
+        print(f"the minted save: SHA-1 {hashlib.sha1(minted).hexdigest()}, "
+              f"{len(differing_offsets(base, minted))} bytes changed")
+        with open(minted_path, "wb") as f:
+            f.write(minted)
+    for failure in failures:
+        print(f"FAIL: {failure}")
+    if minted is None or failures:
+        print(f"{name}: the minted save fails its checks (levels 1 and 2), so neither program runs it")
+        return None
+    return minted
+
+
+def station_levels(args, stations, played: str, rom: str, work: str) -> int:
+    """oracle.py station's five levels in work, the station's input file at played: the base and the mint (1 and 2),
+    melonDS's run (3), Frigate's run compared with it (4) and the two resulting saves (5), which are read back whatever
+    the frames gave; 0 only when all five hold"""
+    station = stations.STATIONS[args.name]
+    base_path, why = obtain_save(args, station.base, work, args.save_cache)
+    if why:
+        print(f"oracle.py station: {station.base}, which {args.name} is minted from: {why}")
+        return 1
+    minted_path = os.path.join(work, "minted.sav")
+    minted = mint_station(stations, args.name, args.version, base_path, minted_path)
+    if minted is None:
+        return 1
+    results = {"melonDS": os.path.join(work, "oracle-result.sav"), "Frigate": os.path.join(work, "port-result.sav")}
+    for path in results.values():
+        if os.path.exists(path):
+            os.remove(path)
+
+    # melonDS continues the minted save from power-on, every frame pictured, with the state dumps the comparison needs
+    # and the random seeds the DS builds, which must be the ones the input file gives Frigate
+    ds_dir = os.path.join(work, "oracle")
+    shutil.rmtree(ds_dir, ignore_errors=True)
+    ds_args = argparse.Namespace(**vars(args))
+    ds_args.input, ds_args.save, ds_args.save_out = played, minted_path, results["melonDS"]
+    ds_dumps, host_dumps = state_dumps(station.sequence)
+    status = run_oracle(ds_args, ds_dir, station.sequence.oracle_frames, "all", ds_dumps + seeds.DUMPS, quiet=True)
+    if status != 0 or not os.path.exists(results["melonDS"]):
+        print(f"oracle.py station: melonDS's run on the minted save failed (status {status}) or left no save")
+        return 1
+    why = report_seeds(played, ds_dir)
+    if why:
+        print(f"oracle.py station: {why}")
+        return 1
+
+    # Frigate continues the same minted save with the same input file, and is held to melonDS's run up to the frame
+    # before the field menu's first press
+    host_dir = os.path.join(work, "port")
+    status, message = run_port(args.port, host_dir, station.sequence.port_frames, "all", rom, args.time, played,
+                               timeout=2400, dumps=host_dumps, save=minted_path, save_out=results["Frigate"])
+    print(f"Frigate: {describe_port_run(status, message, station.sequence.port_frames, host_dir)}")
+    frames_run = compare.load_run(host_dir).frames
+    reached = max(frames_run) if frames_run else 0
+    if status != 0 and not stop_allowed(station.sequence, status, reached, message):
+        return 1
+    held_to = min(reached, station.compare_last)
+    frames_verdict = compare_sequence(station.sequence, args.version, ds_dir, host_dir, os.path.join(work, "report"),
+                                      held_to)
+
+    # Level 5: each program's resulting save read back, and the two held to each other
+    written = {}
+    for who, path in results.items():
+        if not os.path.exists(path):
+            print(f"FAIL: {who} left no resulting save at {path}")
+            return 1
+        with open(path, "rb") as f:
+            written[who] = f.read()
+        print(f"{who}'s resulting save: SHA-1 {hashlib.sha1(written[who]).hexdigest()}")
+    readable = {who: mystery_gift_decrypted(data)[0] for who, data in written.items()}
+    for label, pair in (("as written", written), ("with their mystery gift blocks decrypted", readable)):
+        spans = save_differences(pair["Frigate"], pair["melonDS"])
+        print(f"the resulting saves, {label}, differ in {len(differing_offsets(pair['Frigate'], pair['melonDS']))} "
+              f"bytes, in {len(spans)} spans: " + ", ".join(f"{a:#x}-{b:#x}" for a, b in spans))
+    for spans_text, why in station.save_bytes.get(args.version, {}).items():
+        print(f"declared, bytes {spans_text}: {why}")
+    found = []
+    for who, data in written.items():
+        found += stations.result_failures(args.name, args.version, minted, data, who)
+    found += stations.compare_results(args.name, args.version, written["melonDS"], written["Frigate"])
+    for failure in found:
+        print(f"FAIL: {failure}")
+    held = frames_verdict == 0 and not found
+    print(f"station {args.name}, {args.version}: minted {hashlib.sha1(minted).hexdigest()}, frames compared to port "
+          f"frame {held_to}, melonDS's save {hashlib.sha1(written['melonDS']).hexdigest()}, Frigate's "
+          f"{hashlib.sha1(written['Frigate']).hexdigest()}: {'held' if held else 'FAILED'}")
+    return 0 if held else 1
+
+
+def command_station(args) -> int:
+    """oracle.py station NAME: a station of the save lab held at its five levels (port/tools/lab/stations.py)"""
+    stations = load_stations()
+    if unknown_station("station", stations, args.name):
+        return 2
+    station = stations.STATIONS[args.name]
+    oracle_program = args.oracle or DEFAULT_ORACLE
+    if not os.path.exists(oracle_program):
+        print(f"oracle.py station: skipped: no oracle at {oracle_program} (configure with -DPORT_BUILD_ORACLE=ON)")
+        return SKIP
+    rom = rom_path(args.version, args.rom)
+    why = rom_matches(args.version, rom) or save_kept(station.base, args.version)
+    if why:
+        print(f"oracle.py station: skipped: {why}")
+        return SKIP
+    played = stations.input_path(args.name, args.version)
+    if not os.path.exists(played):
+        print(f"oracle.py station: no input file {os.path.relpath(played, REPO_ROOT)} for {args.version}")
+        return 1
+    args.oracle = oracle_program
+    work = args.out or tempfile.mkdtemp(prefix=f"oracle-station-{args.name}-")
+    os.makedirs(work, exist_ok=True)
+    verdict = station_levels(args, stations, played, rom, work)
+    if not args.out:
+        if verdict == 0:
+            shutil.rmtree(work, ignore_errors=True)
+        else:
+            print(f"the station's saves, runs and difference images are in {work}")
+    return verdict
+
+
+def command_station_check(args) -> int:
+    """oracle.py station-check NAME: Frigate alone on a station's minted save, levels 1, 2 and 5 on the save it writes;
+    melonDS never runs, so the base is the oracle's save in --save-cache"""
+    stations = load_stations()
+    if unknown_station("station-check", stations, args.name):
+        return 2
+    station = stations.STATIONS[args.name]
+    rom = rom_path(args.version, args.rom)
+    why = rom_matches(args.version, rom)
+    if not why and not args.save_cache:
+        why = f"no --save-cache to take the oracle's {station.base} from"
+    if not why:
+        cached = cached_save(args.save_cache, station.base, args.version)
+        pinned = SAVES[station.base].sha1.get(args.version)
+        if not pinned or not os.path.exists(cached) or file_sha1(cached) != pinned:
+            why = (f"{args.save_cache} holds no {station.base} for {args.version} with the SHA-1 SAVES pins "
+                   f"({pinned or 'none'}); the oracle makes it: oracle.py save {station.base} --save-cache "
+                   f"{args.save_cache} --version {args.version}")
+    if why:
+        print(f"oracle.py station-check: skipped: {why}")
+        return SKIP
+    played = stations.input_path(args.name, args.version)
+    if not os.path.exists(played):
+        print(f"oracle.py station-check: no input file {os.path.relpath(played, REPO_ROOT)} for {args.version}")
+        return 1
+    work = args.work or tempfile.mkdtemp(prefix=f"oracle-station-{args.name}-check-")
+    os.makedirs(work, exist_ok=True)
+    verdict = 1
+    minted_path = os.path.join(work, "minted.sav")
+    minted = mint_station(stations, args.name, args.version, cached, minted_path)
+    if minted is not None:
+        result_path = os.path.join(work, "port-result.sav")
+        host_dir = os.path.join(work, "port")
+        status, message = run_port(args.port, host_dir, station.sequence.port_frames, "none", rom, args.time, played,
+                                   save=minted_path, save_out=result_path)
+        print(f"Frigate: {describe_port_run(status, message, station.sequence.port_frames, host_dir)}")
+        frames_run = compare.load_run(host_dir).frames
+        if status == 0 or stop_allowed(station.sequence, status, max(frames_run) if frames_run else 0, message):
+            with open(result_path, "rb") as f:
+                result = f.read()
+            print(f"Frigate's resulting save: SHA-1 {hashlib.sha1(result).hexdigest()}")
+            found = stations.result_failures(args.name, args.version, minted, result, "Frigate")
+            for failure in found:
+                print(f"FAIL: {failure}")
+            verdict = 1 if found else 0
+    print(f"station-check {args.name}, {args.version}: {'held' if verdict == 0 else 'FAILED'}; no frames are compared "
+          "here: oracle.py station compares them with melonDS's, and once ADR 0031's cache covers the sequences from "
+          "saves they will be compared by key")
+    if not args.work:
+        if verdict == 0:
+            shutil.rmtree(work, ignore_errors=True)
+        else:
+            print(f"the minted save and Frigate's run are in {work}")
+    return verdict
+
+
 def sound_paths(args) -> tuple[str, str, str]:
     """The sequence's input file and sound reference for the version, and the ROM"""
     return (os.path.join(REPO_ROOT, SEQUENCE_INPUT.format(name=args.name, version=args.version)),
@@ -2390,6 +2614,26 @@ def main(argv: list[str] | None = None) -> int:
     sequence_check.add_argument("--port", required=True, help="the port's program")
     sequence_check.add_argument("--work", help="keep the port's run here")
 
+    # A station's name is checked when the command runs, against STATIONS: building the parser never imports the lab
+    station_parser = commands.add_parser("station", help="a station of the save lab (port/tools/lab/stations.py): its "
+                                         "save minted and both programs held to each other on it, its resulting "
+                                         "saves read back")
+    station_parser.add_argument("name", metavar="NAME", help="a station of port/tools/lab/stations.py's STATIONS")
+    common(station_parser)
+    station_parser.add_argument("--port", required=True, help="the port's program")
+    station_parser.add_argument("--out", help="keep the saves, the runs and the difference images here")
+    station_parser.add_argument("--save-cache", help="take the oracle's save the station is minted from from this "
+                                "directory, or make it there (oracle.py save --save-cache)")
+
+    station_check = commands.add_parser("station-check", help="the port alone on a station's minted save, its "
+                                        "resulting save read back")
+    station_check.add_argument("name", metavar="NAME", help="a station of port/tools/lab/stations.py's STATIONS")
+    common(station_check, oracle=False)
+    station_check.add_argument("--port", required=True, help="the port's program")
+    station_check.add_argument("--save-cache", help="where the oracle's save the station is minted from is "
+                               "(oracle.py save --save-cache); skipped without it")
+    station_check.add_argument("--work", help="keep the minted save and the port's run here")
+
     sound_parser = commands.add_parser("sound", help="a sequence's sound on the oracle and the port, compared")
     sound_parser.add_argument("name", choices=sorted(SOUND))
     common(sound_parser)
@@ -2424,6 +2668,10 @@ def main(argv: list[str] | None = None) -> int:
             return command_seeds(args)
         if args.command == "sequence-check":
             return command_sequence_check(args)
+        if args.command == "station":
+            return command_station(args)
+        if args.command == "station-check":
+            return command_station_check(args)
         if args.command == "sound":
             return command_sound(args)
         if args.command == "sound-check":

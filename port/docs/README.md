@@ -63,6 +63,7 @@ records keep what was decided or found at the time, and are added to, not rewrit
 | [adr/0029](adr/0029-backup-write-service-wait.md) | The backup WRITE service initial SDK wait, separate from flash busy and CPU work |
 | [adr/0030](adr/0030-widescreen-by-an-engine-side-hor-plus-scale-with-native-readbacks.md) | Widescreen by an engine-side Hor+ scale with native readbacks (proposed), and the rules that keep widescreen possible meanwhile |
 | [adr/0031](adr/0031-per-game-frame-digests-against-a-content-addressed-oracle-cache.md) | Per-game-frame digests against a content-addressed oracle cache (proposed), with their hash, xxHash, fetched at configure time |
+| [adr/0032](adr/0032-stations-saves-minted-from-oracle-saves-held-to-melonds.md) | Stations: saves minted from oracle saves, placed by the game's own spawn and held to melonDS (proposed) |
 | [RESEARCH.md](RESEARCH.md) | The research of 2026-10-16 behind the plan, summarized |
 | [research/README.md](research/README.md) | The full research reports, with what each covers |
 | [research/decomp-progress.md](research/decomp-progress.md) | The decomp's C coverage per module, data and pointer coverage, pace, claims |

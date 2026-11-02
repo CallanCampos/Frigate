@@ -63,11 +63,15 @@ the game's own continue-at-spawn path, the one the Hall of Fame takes, and refus
 position that is on a rail or empty; `flag`, `work`, `money`, `badges` and `playtime` set the rest. It reseals both
 copies' CRCs, with the layout from [oracle/saveimage.py](oracle/saveimage.py), and refuses a base that isn't a save the
 game finished writing. `read` prints a save's facts in the same names, the party decoded. Its test, `lab_savelab`,
-needs no ROM and runs in every build and in CI.
+needs no ROM and runs in every build and in CI. [lab/stations.py](lab/stations.py) holds the stations, minted saves
+that `oracle.py station` has both programs continue and holds Frigate to melonDS on, frame by frame and by the saves
+each writes ([ADR 0032](../docs/adr/0032-stations-saves-minted-from-oracle-saves-held-to-melonds.md), proposed); its
+test, `lab_stations`, needs no ROM either.
 
 | File | What it does | Run |
 | --- | --- | --- |
 | [lab/savelab.py](lab/savelab.py) | `mint RECIPE --base SAVE --out SAVE` and `read SAVE` ([lab/README.md](lab/README.md)) | by hand, to start the game somewhere else or to see what a save holds; by `lab_savelab` ([../cmake/lab.cmake](../cmake/lab.cmake)) |
+| [lab/stations.py](lab/stations.py) | `STATIONS`, each a recipe, an input file per version and a spec, and the checks of a station's minted and resulting saves ([lab/README.md](lab/README.md#stations)) | by `oracle.py station` and `station-check` (`oracle_station_*`, [../cmake/oracle.cmake](../cmake/oracle.cmake), on demand with `ctest -L station`); by `lab_stations` |
 
 ## Measurement
 
