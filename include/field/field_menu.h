@@ -13,7 +13,9 @@ struct FieldMenuWork {
     GameEvent *event;
     GameSystem *gameSystem;
     Field *field;
-    u32 unk10;
+    // The menu's button chosen, which it is set back to when the app returns to the menu
+    u32 selectedButton;
+    // FIELD_MENU_EVENT_STATE_*
     u32 state;
     u32 screenId;
     // The app the menu opens, whose callbacks get the menu as their arg

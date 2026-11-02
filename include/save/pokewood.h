@@ -29,8 +29,8 @@ typedef struct {
 
 // BtlSetup fields that only Pokéstar Studios' block keeps
 typedef struct {
-    u32 unkDF;
-    u32 unk124;
+    u32 movie;
+    u32 ending;
     u8 unk110[0x14];
 } PokewoodBattleInfo;
 
@@ -49,7 +49,7 @@ typedef struct {
     // each from the top
     u32 date;
     u32 time;
-    u32 unk130;
+    u32 score;
     // getCRC16 of everything before it
     u32 crc;
 } PokewoodBlock; // size: 0x4b4
@@ -63,8 +63,8 @@ typedef struct {
 
 // The fields of the loaded movie that Pokewood_GetLoadedMovieField gives
 enum {
-    POKEWOOD_BLOCK_FIELD_UNKDF,
-    POKEWOOD_BLOCK_FIELD_UNK124,
+    POKEWOOD_BLOCK_FIELD_MOVIE,
+    POKEWOOD_BLOCK_FIELD_ENDING,
     // Makes the party Pokémon that the second argument points to of a Pokémon of the cast, and gives 1
     POKEWOOD_BLOCK_FIELD_PKM_0,
     POKEWOOD_BLOCK_FIELD_PKM_5 = POKEWOOD_BLOCK_FIELD_PKM_0 + 5,
@@ -72,7 +72,7 @@ enum {
     POKEWOOD_BLOCK_FIELD_UNKE0,
     POKEWOOD_BLOCK_FIELD_DATE,
     POKEWOOD_BLOCK_FIELD_TIME,
-    POKEWOOD_BLOCK_FIELD_UNK130,
+    POKEWOOD_BLOCK_FIELD_SCORE,
 };
 
 // The flag lists of the save, with a flag for each movie

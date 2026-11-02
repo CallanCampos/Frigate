@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/zones.h"
 #include "field/event_fishing.h"
 #include "field/event_mapchange.h"
 #include "field/event_sweet_scent.h"
@@ -16,14 +17,6 @@
 #include "system/game_data.h"
 #include "system/game_event.h"
 #include "system/game_system.h"
-
-// Whether a field action is blocked where the player stands
-typedef enum {
-    FIELD_ACTION_BLOCKED = -1,
-    FIELD_ACTION_ALLOWED = 0,
-    // Allowed, while the player walks with a partner
-    FIELD_ACTION_ALLOWED_PAIRED = 1,
-} FieldActionResult;
 
 typedef FieldActionResult (*FieldActionBlockCheck)(GameData *gameData, Field *field, PlayerState *state);
 
@@ -54,12 +47,15 @@ static GameEventReturnCode EventFieldToggleCycling_Callback(GameEvent *event, u3
 static GameEventReturnCode EventFieldToggleDowsing_Callback(GameEvent *event, u32 *state, void *data);
 
 static const FieldCommonEvent FIELD_COMMON_EVENTS[FIELD_COMMON_EVENT_COUNT] = {
-    { EventFieldToggleCycling_Create, 0 },  { EventEntralinkWarpIn_CreateDefault, 0xff },
-    { EventMapChangeEscapeRope_Create, 3 }, { EventSweetScent_Create, 0xff },
-    { EventFieldFishing_Create, 5 },        { EventFieldToggleDowsing_Create, 9 },
+    { EventFieldToggleCycling_Create, PLAYER_ACTION_BICYCLE },
+    { EventEntralinkWarpIn_CreateDefault, 0xff },
+    { EventMapChangeEscapeRope_Create, PLAYER_ACTION_ESCAPE_ROPE },
+    { EventSweetScent_Create, 0xff },
+    { EventFieldFishing_Create, PLAYER_ACTION_FISHING },
+    { EventFieldToggleDowsing_Create, PLAYER_ACTION_DOWSING },
 };
 
-static const FieldActionBlockCheck FIELD_ACTION_BLOCK_CHECKS[12] = {
+static const FieldActionBlockCheck FIELD_ACTION_BLOCK_CHECKS[PLAYER_ACTION_COUNT] = {
     FieldActionBlockCheck_Cycling,
     NULL,
     NULL,
@@ -80,7 +76,7 @@ void PlayerActionPerms_Create(PlayerActionPerms *perms, GameSystem *gsys, Field 
     int i;
 
     MI_CpuFill8(perms, 0, sizeof(PlayerActionPerms));
-    for (i = 0; i < 12; i++) {
+    for (i = 0; i < PLAYER_ACTION_COUNT; i++) {
         PlayerActionPerms_SetActionBlocked(perms, i, CheckFieldActionBlocked(i, gsys, field));
     }
     perms->exState = FieldPlayerState_GetExState(state);
@@ -106,7 +102,7 @@ static FieldActionResult FieldActionBlockCheck_Cycling(GameData *gameData, Field
     u8 exState = FieldPlayerState_GetExState(state);
     BOOL tileBlocks = MapTile_IsBlocksCycling(GetTileClass(FieldPlayer_GetTileTypeUnder(Field_GetPlayer(field))));
 
-    if (exState == 1) {
+    if (exState == FLD_PLAYER_EXSTATE_CYCLING) {
         if (tileBlocks) {
             return FIELD_ACTION_BLOCKED;
         }
@@ -115,7 +111,7 @@ static FieldActionResult FieldActionBlockCheck_Cycling(GameData *gameData, Field
     if (!GetZoneFlagsEnableCycling(zoneId)) {
         return FIELD_ACTION_BLOCKED;
     }
-    if (exState != 0) {
+    if (exState != FLD_PLAYER_EXSTATE_NONE) {
         return FIELD_ACTION_BLOCKED;
     }
     if (tileBlocks) {
@@ -220,17 +216,17 @@ GameEvent *EventEntralinkWarpIn_CreateDefault(Field *field, GameSystem *gsys) {
     pos.x = FX32_CONST(512);
     pos.y = 32;
     pos.z = FX32_CONST(488);
-    return EventEntralinkWarpIn_Create(gsys, 0x117, &pos, 0);
+    return EventEntralinkWarpIn_Create(gsys, ZONE_ENTRALINK, &pos, 0);
 }
 
 static GameEventReturnCode EventFieldToggleDowsing_Callback(GameEvent *event, u32 *state, void *data) {
     EventFieldToggleDowsingWork *work = data;
     FieldSubscreen *subscreen = Field_GetSubscreen(work->field);
 
-    if (FieldSubscreen_GetScreenID(subscreen) == 6) {
-        FieldSubscreen_ReqChange(subscreen, 0);
+    if (FieldSubscreen_GetScreenID(subscreen) == FLD_SUBSCREEN_ID_DOWSING) {
+        FieldSubscreen_ReqChange(subscreen, FLD_SUBSCREEN_ID_DEFAULT);
     } else {
-        FieldSubscreen_ReqChange(subscreen, 6);
+        FieldSubscreen_ReqChange(subscreen, FLD_SUBSCREEN_ID_DOWSING);
     }
     return GAMEEVENT_DONE;
 }

@@ -1,0 +1,93 @@
+{
+    "$schema": "habitat.schema.json",
+    "kinds": [ "land" ],
+    "by_season": [],
+    "land": "tall_grass",
+    "species": [
+        {
+            "species": "SPECIES_EEVEE",
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_COTTONEE",
+                "white2": "SPECIES_PIDOVE"
+            },
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_PIDOVE",
+                "white2": "SPECIES_RATTATA"
+            },
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_WHIMSICOTT",
+                "white2": "SPECIES_AUDINO"
+            },
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_RATTATA",
+                "white2": "SPECIES_SKITTY"
+            },
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_AUDINO",
+                "white2": "SPECIES_PETILIL"
+            },
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_BUNEARY",
+                "white2": "SPECIES_DELCATTY"
+            },
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_LOPUNNY",
+                "white2": "SPECIES_LILLIGANT"
+            },
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        }
+    ]
+}

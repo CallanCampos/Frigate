@@ -16,7 +16,7 @@ u32 SymbolSaveField_GetGroup(AreaNPCSave *npcData) {
     u8 value;
 
     SymbolSave_Decrypt(npcData);
-    value = npcData->unk848;
+    value = npcData->group;
     decryptNpcData(npcData);
     return value;
 }

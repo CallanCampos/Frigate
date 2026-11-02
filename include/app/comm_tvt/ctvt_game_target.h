@@ -7,6 +7,15 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
+// What a hit on a target scored: by the target's own member or by another, before or after the hurry. Each is an
+// actor of scene 4, the effects of the hits, in this order
+enum {
+    CTVT_TARGET_HIT_OWN,
+    CTVT_TARGET_HIT_OWN_HURRY,
+    CTVT_TARGET_HIT_OTHER,
+    CTVT_TARGET_HIT_OTHER_HURRY,
+};
+
 // A face that floats up in the target game. Its scene is its member's, whose actors are the face as it is, as its
 // member hit it and as another hit it; scene 4 holds the effects of the hits
 struct CtvtGameTarget {
@@ -24,7 +33,7 @@ struct CtvtGameTarget {
     fx32 hitFrame;
     BOOL hitAnimating;
     fx32 grow;
-    // What the hit scored: 0 or 1 by its member, before and after the hurry, 2 or 3 by another
+    // A CTVT_TARGET_HIT_*, what the hit scored
     u32 hitKind;
     VecFx32 velocity;
     // The last frame of the host that it moved for

@@ -28,7 +28,7 @@ BOOL BtlInst_MakeRomTrainerAndTeam(BSubwayTrainer *trainer, u16 trainerId, u32 c
 // A Trial House battle against one trainer, of levels between minLevel and maxLevel
 BtlSetup *SetupInfinityDungeonBattle(GameSystem *gsys, PokeParty *party, int partyCount, int mode, int count,
                                      BSubwayTrainer *trainer, u32 a6, u32 trainerIdBase, u16 maxLevel, u16 minLevel,
-                                     u32 a10, u8 a11, u32 a12, Field *field, MATHRandContext32 *rand);
+                                     u32 a10, u8 version, u32 bgType, Field *field, MATHRandContext32 *rand);
 // A battle with the player's rental Pokémon
 BtlSetup *BtlSetup_SetTrainerRental(GameSystem *gsys, PokeParty *party, int mode);
 BtlSetup *SetupTrialHouseBattle(GameSystem *gsys, PokeParty *party, u32 mode, BSubwayTrainer *trainers,

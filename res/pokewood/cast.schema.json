@@ -1,0 +1,171 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A Pokéstar Studios movie's cast: res/pokewood/movies/<n>/cast.json",
+    "description": "File n of ARCID_POKEWOOD_CAST (a/2/7/2; PokewoodCastFile in event_pokewood.c), the Pokémon of movie n's battle, which tools/data/pokewood_data.py packs.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "player", "opponent" ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "This schema, for editors"
+        },
+        "player": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/member"
+            },
+            "description": "The player's side's Pokémon"
+        },
+        "opponent": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/member"
+            },
+            "description": "The opponent's side's Pokémon"
+        }
+    },
+    "$defs": {
+        "member": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "species",
+                "shown_species",
+                "level",
+                "form",
+                "sex",
+                "nature",
+                "ability",
+                "held_item",
+                "moves",
+                "ivs",
+                "evs"
+            ],
+            "properties": {
+                "species": {
+                    "type": "string",
+                    "x-constant": "SPECIES_",
+                    "description": "The species the Pokémon is"
+                },
+                "shown_species": {
+                    "type": "string",
+                    "x-constant": "SPECIES_",
+                    "description": "The species it is shown as for the opponent's side (EventPokewood_ShowCastNames): a Pokéstar species, SPECIES_POKESTAR_UFO and on, has its name from the movie text"
+                },
+                "level": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100
+                },
+                "form": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 31
+                },
+                "sex": {
+                    "enum": [ "GENDER_MALE", "GENDER_FEMALE", "GENDER_UNKNOWN" ]
+                },
+                "nature": {
+                    "type": "string",
+                    "x-constant": "NATURE_"
+                },
+                "ability": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2,
+                    "description": "Which of the species' abilities, for makeSpecialPID"
+                },
+                "held_item": {
+                    "type": "string",
+                    "x-constant": "ITEM_"
+                },
+                "moves": {
+                    "type": "array",
+                    "maxItems": 4,
+                    "items": {
+                        "type": "string",
+                        "x-constant": "MOVE_"
+                    },
+                    "description": "Its moves, MOVE_NONE for none"
+                },
+                "ivs": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [ "hp", "attack", "defense", "speed", "special_attack", "special_defense" ],
+                    "description": "Its IVs, 0 to 31 as the game uses them; movie 34's second player Pokémon has an HP IV of 252, as an EV",
+                    "properties": {
+                        "hp": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 255
+                        },
+                        "attack": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 255
+                        },
+                        "defense": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 255
+                        },
+                        "speed": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 255
+                        },
+                        "special_attack": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 255
+                        },
+                        "special_defense": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 255
+                        }
+                    }
+                },
+                "evs": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [ "hp", "attack", "defense", "speed", "special_attack", "special_defense" ],
+                    "description": "Its EVs",
+                    "properties": {
+                        "hp": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 255
+                        },
+                        "attack": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 255
+                        },
+                        "defense": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 255
+                        },
+                        "speed": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 255
+                        },
+                        "special_attack": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 255
+                        },
+                        "special_defense": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 255
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

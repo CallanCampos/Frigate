@@ -67,10 +67,10 @@ static void ConditionEndTurnActive(BtlServerFlow *flow, BattleMon *mon, u8 monId
     case CONDITION_BIND:
         ConditionEndTurnBind(flow, mon, monId);
         break;
-    case 0x23:
+    case CONDITION_AQUA_RING:
         ConditionEndTurnAquaRing(flow, mon, monId);
         break;
-    case 0x17:
+    case CONDITION_ENCORE:
         ConditionEndTurnEncore(flow, mon, monId);
         break;
     }
@@ -133,7 +133,7 @@ static void ConditionEndTurnLeechSeed(BtlServerFlow *flow, BattleMon *mon, u8 mo
         if (amount > hp) {
             amount = hp;
         }
-        damage = BattleHandler_PushWork(flow, 7, monId);
+        damage = BattleHandler_PushWork(flow, BTL_HANDLER_DAMAGE, monId);
         message = 0x262;
         damage->targetIndex = monId;
         damage->amount = amount;
@@ -146,7 +146,7 @@ static void ConditionEndTurnLeechSeed(BtlServerFlow *flow, BattleMon *mon, u8 mo
         damage->effectArg2 = BtlServerFlow_MonIDToPos(flow, monId);
         BattleHandler_PopWork(flow, damage);
         if (sourceId != 0x1f) {
-            drain = BattleHandler_PushWork(flow, 6, monId);
+            drain = BattleHandler_PushWork(flow, BTL_HANDLER_DRAIN, monId);
             drain->header.checkPrevResult = TRUE;
             drain->monIndex = sourceId;
             drain->sourceIndex = monId;
@@ -161,7 +161,7 @@ static void ConditionEndTurnIngrain(BtlServerFlow *flow, BattleMon *mon, u8 monI
     BattleHandlerDrainParam *drain;
 
     if (!IsMonFullHP(mon)) {
-        drain = BattleHandler_PushWork(flow, 6, monId);
+        drain = BattleHandler_PushWork(flow, BTL_HANDLER_DRAIN, monId);
         drain->monIndex = monId;
         drain->sourceIndex = 0x1f;
         drain->amount = DivideMaxHPZeroCheck(mon, 16);
@@ -205,7 +205,7 @@ static void ConditionEndTurnBind(BtlServerFlow *flow, BattleMon *mon, u8 monId) 
             effect = 0x27c;
             break;
         }
-        damage = BattleHandler_PushWork(flow, 7, monId);
+        damage = BattleHandler_PushWork(flow, BTL_HANDLER_DAMAGE, monId);
         damage->targetIndex = monId;
         if (GetConditionFlag(cont) != 0) {
             damage->amount = DivideMaxHPZeroCheck(mon, 8);
@@ -230,7 +230,7 @@ static void ConditionEndTurnAquaRing(BtlServerFlow *flow, BattleMon *mon, u8 mon
     BattleHandlerDrainParam *drain;
 
     if (!IsMonFullHP(mon) && !IsFainted(mon)) {
-        drain = BattleHandler_PushWork(flow, 6, monId);
+        drain = BattleHandler_PushWork(flow, BTL_HANDLER_DRAIN, monId);
         drain->monIndex = monId;
         drain->sourceIndex = 0x1f;
         drain->amount = DivideMaxHPZeroCheck(mon, 16);
@@ -243,10 +243,10 @@ static void ConditionEndTurnAquaRing(BtlServerFlow *flow, BattleMon *mon, u8 mon
 // Cures the condition of a Pokemon whose move is gone
 static void ConditionEndTurnEncore(BtlServerFlow *flow, BattleMon *mon, u8 monId) {
     BattleHandlerCureConditionParam *cure;
-    u32 condition = 0x17;
+    u32 condition = CONDITION_ENCORE;
 
     if (!BattleMon_GetPPOfMove(mon, Condition_GetParam(GetConditionContinuationParam(mon, condition)))) {
-        cure = BattleHandler_PushWork(flow, 0xb, monId);
+        cure = BattleHandler_PushWork(flow, BTL_HANDLER_CURE_CONDITION, monId);
         cure->condition = condition;
         cure->monIds[0] = monId;
         cure->count = 1;
@@ -259,7 +259,7 @@ static void ConditionCured(BtlServerFlow *flow, BattleMon *mon, u8 monId, u32 co
     BattleHandlerString string;
 
     if (Condition_SetCureMessage(condition, cont, mon, 0, &string)) {
-        message = BattleHandler_PushWork(flow, 4, monId);
+        message = BattleHandler_PushWork(flow, BTL_HANDLER_MESSAGE, monId);
         message->string = string;
         BattleHandler_PopWork(flow, message);
     }
@@ -289,7 +289,7 @@ static void ConditionCuredYawn(BtlServerFlow *flow, BattleMon *mon) {
     if (turns > 0) {
         if (GetBattleMonStatus(mon) == 0) {
             monId = GetMonID(mon);
-            add = BattleHandler_PushWork(flow, 0xc, monId);
+            add = BattleHandler_PushWork(flow, BTL_HANDLER_ADD_CONDITION, monId);
             add->showFail = TRUE;
             add->condition = CONDITION_SLEEP;
             add->value = SetConditionTurns(turns);
@@ -306,7 +306,7 @@ static void ConditionCuredPerishSong(BtlServerFlow *flow, BattleMon *mon) {
 
     PerishSongMessage(flow, mon, 0);
     monId = GetMonID(mon);
-    faint = BattleHandler_PushWork(flow, 0x13, monId);
+    faint = BattleHandler_PushWork(flow, BTL_HANDLER_FAINT, monId);
     faint->monIndex = monId;
     BattleHandler_PopWork(flow, faint);
 }
@@ -316,7 +316,7 @@ static void PerishSongMessage(BtlServerFlow *flow, BattleMon *mon, u8 turns) {
     u8 monId;
 
     monId = GetMonID(mon);
-    message = BattleHandler_PushWork(flow, 4, monId);
+    message = BattleHandler_PushWork(flow, BTL_HANDLER_MESSAGE, monId);
     BattleHandler_StrSetup(&message->string, 2, 0x35c);
     BattleHandler_AddArg(&message->string, monId);
     BattleHandler_AddArg(&message->string, turns);
@@ -327,7 +327,7 @@ static void PerishSongMessage(BtlServerFlow *flow, BattleMon *mon, u8 turns) {
 static void ConditionCuredEmbargo(BtlServerFlow *flow, BattleMon *mon) {
     BattleHandlerCheckHeldItemParam *check;
 
-    check = BattleHandler_PushWork(flow, 0x21, GetMonID(mon));
+    check = BattleHandler_PushWork(flow, BTL_HANDLER_CHECK_HELD_ITEM, GetMonID(mon));
     check->monIndex = GetMonID(mon);
     check->reaction = 0;
     BattleHandler_PopWork(flow, check);
@@ -337,7 +337,7 @@ static void ConditionCuredEmbargo(BtlServerFlow *flow, BattleMon *mon) {
 static void ConditionCuredHealBlock(BtlServerFlow *flow, BattleMon *mon) {
     BattleHandlerCheckHeldItemParam *check;
 
-    check = BattleHandler_PushWork(flow, 0x21, GetMonID(mon));
+    check = BattleHandler_PushWork(flow, BTL_HANDLER_CHECK_HELD_ITEM, GetMonID(mon));
     check->monIndex = GetMonID(mon);
     check->reaction = 1;
     BattleHandler_PopWork(flow, check);
@@ -422,23 +422,12 @@ void Condition_SetAddMessage(u32 condition, BattleCondition value, BattleMon *mo
 
 // The messages of conditions that ended
 static const ConditionCureMessage sConditionCureMessages[] = {
-    { CONDITION_POISON, 0xf6, 0x395 },
-    { CONDITION_BURN, 0x108, 0x3a1 },
-    { CONDITION_SLEEP, 0x138, 0x39b },
-    { CONDITION_FREEZE, 0x126, 0x39e },
-    { CONDITION_PARALYSIS, 0x117, 0x398 },
-    { 0x17, 0x232, -1 },
-    { CONDITION_DISABLE, 0x256, -1 },
-    { CONDITION_EMBARGO, 0x2da, -1 },
-    { CONDITION_BIND, 0x177, 0x177 },
-    { CONDITION_LEECH_SEED, 0x177, 0x177 },
-    { 0x20, 0x477, -1 },
-    { CONDITION_TAUNT, 0x23e, -1 },
-    { 0x1e, 0x295, -1 },
-    { CONDITION_HEAL_BLOCK, 0x374, -1 },
-    { CONDITION_TORMENT, 0x247, -1 },
-    { CONDITION_CONFUSION, 0x15f, 0x3a4 },
-    { CONDITION_ATTRACT, 0x153, 0x3a7 },
+    { CONDITION_POISON, 0xf6, 0x395 },      { CONDITION_BURN, 0x108, 0x3a1 },      { CONDITION_SLEEP, 0x138, 0x39b },
+    { CONDITION_FREEZE, 0x126, 0x39e },     { CONDITION_PARALYSIS, 0x117, 0x398 }, { CONDITION_ENCORE, 0x232, -1 },
+    { CONDITION_DISABLE, 0x256, -1 },       { CONDITION_EMBARGO, 0x2da, -1 },      { CONDITION_BIND, 0x177, 0x177 },
+    { CONDITION_LEECH_SEED, 0x177, 0x177 }, { CONDITION_TELEKINESIS, 0x477, -1 },  { CONDITION_TAUNT, 0x23e, -1 },
+    { CONDITION_MAGNET_RISE, 0x295, -1 },   { CONDITION_HEAL_BLOCK, 0x374, -1 },   { CONDITION_TORMENT, 0x247, -1 },
+    { CONDITION_CONFUSION, 0x15f, 0x3a4 },  { CONDITION_ATTRACT, 0x153, 0x3a7 },
 };
 
 static s32 GetConditionCureMessage(u32 condition, BOOL alt) {
@@ -478,7 +467,7 @@ BOOL Condition_SetCureMessage(u32 condition, BattleCondition cont, BattleMon *mo
             BattleHandler_AddArg(string, Condition_GetParam(cont));
             break;
         case CONDITION_LEECH_SEED:
-            BattleHandler_AddArg(string, 0x49);
+            BattleHandler_AddArg(string, MOVE_LEECH_SEED);
             break;
         }
         return TRUE;
@@ -493,37 +482,37 @@ void Condition_CheckTypeImmunity(BtlServerFlow *flow, BattleMon *target) {
     if (CheckCondition(target, CONDITION_FORESIGHT)) {
         cont = GetConditionContinuationParam(target, CONDITION_FORESIGHT);
         pos = Condition_GetParam(cont);
-        if (pos == (u8)BattleEventVar_GetValue(0x15)) {
+        if (pos == (u8)BattleEventVar_GetValue(BTL_EVAR_DEFENDER_TYPE)) {
             if (GetConditionFlag(cont) == 0) {
                 BattleEventVar_RewriteValue(0x4b, TRUE);
             } else {
-                BattleEventVar_RewriteValue(0x4c, TRUE);
+                BattleEventVar_RewriteValue(BTL_EVAR_FORCE_NORMAL_FLAG, TRUE);
             }
         }
     }
-    if (CheckCondition(target, CONDITION_INGRAIN) && BattleEventVar_GetValue(0x16) == TYPE_GROUND) {
+    if (CheckCondition(target, CONDITION_INGRAIN) && BattleEventVar_GetValue(BTL_EVAR_MOVE_TYPE) == TYPE_GROUND) {
         BattleEventVar_RewriteValue(0x4b, TRUE);
     }
-    if (CheckCondition(target, CONDITION_SMACK_DOWN) && BattleEventVar_GetValue(0x16) == TYPE_GROUND) {
+    if (CheckCondition(target, CONDITION_SMACK_DOWN) && BattleEventVar_GetValue(BTL_EVAR_MOVE_TYPE) == TYPE_GROUND) {
         BattleEventVar_RewriteValue(0x4b, TRUE);
     }
 }
 
 void Condition_CheckTrapped(BtlServerFlow *flow, BattleMon *mon) {
     if (CheckCondition(mon, CONDITION_MEAN_LOOK) || CheckCondition(mon, CONDITION_BIND)) {
-        BattleEventVar_RewriteValue(0x41, TRUE);
+        BattleEventVar_RewriteValue(BTL_EVAR_FAIL_FLAG, TRUE);
     }
 }
 
 void Condition_CheckFloating(BtlServerFlow *flow, BattleMon *mon) {
     if (CheckCondition(mon, CONDITION_INGRAIN)) {
-        BattleEventVar_RewriteValue(0x41, TRUE);
+        BattleEventVar_RewriteValue(BTL_EVAR_FAIL_FLAG, TRUE);
     }
     if (CheckCondition(mon, CONDITION_SMACK_DOWN)) {
-        BattleEventVar_RewriteValue(0x41, TRUE);
+        BattleEventVar_RewriteValue(BTL_EVAR_FAIL_FLAG, TRUE);
     }
     if (CheckCondition(mon, CONDITION_TELEKINESIS) || CheckCondition(mon, CONDITION_MAGNET_RISE)) {
-        BattleEventVar_RewriteValue(0x51, TRUE);
+        BattleEventVar_RewriteValue(BTL_EVAR_FLAG, TRUE);
     }
 }
 
@@ -531,9 +520,9 @@ void Condition_CheckIngrainForceSwitch(BtlServerFlow *flow, BattleMon *mon) {
     BattleHandlerMessageParam *message;
     u8 monId;
 
-    if (CheckCondition(mon, CONDITION_INGRAIN) && BattleEventVar_RewriteValue(0x41, TRUE)) {
+    if (CheckCondition(mon, CONDITION_INGRAIN) && BattleEventVar_RewriteValue(BTL_EVAR_FAIL_FLAG, TRUE)) {
         monId = GetMonID(mon);
-        message = BattleHandler_PushWork(flow, 4, monId);
+        message = BattleHandler_PushWork(flow, BTL_HANDLER_MESSAGE, monId);
         BattleHandler_StrSetup(&message->string, 2, 0x2e6);
         BattleHandler_AddArg(&message->string, monId);
         BattleHandler_PopWork(flow, message);
@@ -542,20 +531,9 @@ void Condition_CheckIngrainForceSwitch(BtlServerFlow *flow, BattleMon *mon) {
 
 // The conditions that Baton Pass passes on
 static const u16 sBatonPassConditions[14] = {
-    CONDITION_CONFUSION,
-    CONDITION_HEAL_BLOCK,
-    CONDITION_GASTRO_ACID,
-    CONDITION_LEECH_SEED,
-    CONDITION_EMBARGO,
-    CONDITION_PERISH_SONG,
-    CONDITION_INGRAIN,
-    CONDITION_MEAN_LOOK,
-    0x1d,
-    0x1e,
-    CONDITION_MEAN_LOOK,
-    CONDITION_CURSE,
-    0x20,
-    0x23,
+    CONDITION_CONFUSION,   CONDITION_HEAL_BLOCK, CONDITION_GASTRO_ACID, CONDITION_LEECH_SEED, CONDITION_EMBARGO,
+    CONDITION_PERISH_SONG, CONDITION_INGRAIN,    CONDITION_MEAN_LOOK,   CONDITION_LOCK_ON,    CONDITION_MAGNET_RISE,
+    CONDITION_MEAN_LOOK,   CONDITION_CURSE,      CONDITION_TELEKINESIS, CONDITION_AQUA_RING,
 };
 
 BOOL Condition_IsPassedByBatonPass(u32 condition) {

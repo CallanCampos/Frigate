@@ -1,0 +1,20 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "M",
+    "shapes": [ 9 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_PINWHEEL_FOREST": [ "surf", "rippling_surf" ],
+            "ZONE_ABUNDANT_SHRINE": [ "grass", "dark_grass", "surf", "rippling_surf" ],
+            "ZONE_ROUTE_6": [ "grass", "dark_grass", "surf", "rippling_surf" ],
+            "ZONE_ROUTE_11": [ "grass", "dark_grass" ],
+            "ZONE_VILLAGE_BRIDGE": [ "grass", "dark_grass", "surf", "rippling_surf" ],
+            "ZONE_ROUTE_20": [ "rippling_surf" ],
+            "ZONE_ROUTE_22": [ "grass", "dark_grass", "surf", "rippling_surf" ],
+            "ZONE_FLOCCESY_RANCH": [ "rippling_surf" ],
+            "ZONE_VICTORY_ROAD": [ "surf", "rippling_surf" ],
+            "ZONE_RELIC_PASSAGE": [ "surf", "rippling_surf" ]
+        }
+    }
+}

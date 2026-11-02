@@ -1,0 +1,37 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "A",
+    "shapes": [ 9 ],
+    "area": {
+        "black2": {
+            "all_year": true,
+            "places": {
+                "ZONE_PINWHEEL_FOREST": [ "rippling_surf" ],
+                "ZONE_ABUNDANT_SHRINE": [ "rippling_surf" ],
+                "ZONE_ROUTE_6": [ "shaking_grass", "rippling_surf" ],
+                "ZONE_ROUTE_11": [ "shaking_grass" ],
+                "ZONE_VILLAGE_BRIDGE": [ "shaking_grass", "rippling_surf" ],
+                "ZONE_ROUTE_20": [ "rippling_surf" ],
+                "ZONE_ROUTE_22": [ "shaking_grass", "rippling_surf" ],
+                "ZONE_FLOCCESY_RANCH": [ "rippling_surf" ],
+                "ZONE_VICTORY_ROAD": [ "rippling_surf" ],
+                "ZONE_RELIC_PASSAGE": [ "rippling_surf" ]
+            }
+        },
+        "white2": {
+            "all_year": true,
+            "places": {
+                "ZONE_PINWHEEL_FOREST": [ "rippling_surf" ],
+                "ZONE_ABUNDANT_SHRINE": [ "shaking_grass", "rippling_surf" ],
+                "ZONE_ROUTE_6": [ "shaking_grass", "rippling_surf" ],
+                "ZONE_ROUTE_11": [ "shaking_grass" ],
+                "ZONE_VILLAGE_BRIDGE": [ "shaking_grass", "rippling_surf" ],
+                "ZONE_ROUTE_20": [ "rippling_surf" ],
+                "ZONE_ROUTE_22": [ "shaking_grass", "rippling_surf" ],
+                "ZONE_FLOCCESY_RANCH": [ "rippling_surf" ],
+                "ZONE_VICTORY_ROAD": [ "rippling_surf" ],
+                "ZONE_RELIC_PASSAGE": [ "rippling_surf" ]
+            }
+        }
+    }
+}

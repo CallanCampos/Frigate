@@ -1,0 +1,11 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "K",
+    "shapes": [ 0 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_VIRBANK_COMPLEX": [ "grass", "dark_grass" ]
+        }
+    }
+}

@@ -1,0 +1,375 @@
+{
+    "$schema": "land_patch.schema.json",
+    "tiles": [
+        [
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00c0001b",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            }
+        ],
+        [
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00c0001b",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            }
+        ],
+        [
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00c0001b",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            }
+        ],
+        [
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00c1001b",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            }
+        ],
+        [
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00c0001b",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            }
+        ],
+        [
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00c0001b",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            }
+        ],
+        [
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00c0001b",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            },
+            {
+                "normal0": [ 0, 4094, 0 ],
+                "normal1": [ 0, 4094, 0 ],
+                "offset0": 0,
+                "offset1": 0,
+                "tile_type": "0x00010000",
+                "diagonal": false
+            }
+        ]
+    ],
+    "props": [
+        {
+            "position": {
+                "x": -1048576,
+                "y": 0,
+                "z": 786432
+            },
+            "rotation_y": 0,
+            "model": 175
+        },
+        {
+            "position": {
+                "x": -851968,
+                "y": 0,
+                "z": 786432
+            },
+            "rotation_y": 0,
+            "model": 200
+        }
+    ]
+}

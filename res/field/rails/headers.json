@@ -1,0 +1,105 @@
+{
+    "$schema": "headers.schema.json",
+    "headers": [
+        {
+            "rail": 0,
+            "camera_areas": null
+        },
+        {
+            "rail": 11,
+            "camera_areas": 0
+        },
+        {
+            "rail": 12,
+            "camera_areas": null
+        },
+        {
+            "rail": 1,
+            "camera_areas": null
+        },
+        {
+            "rail": 2,
+            "camera_areas": null
+        },
+        {
+            "rail": 3,
+            "camera_areas": null
+        },
+        {
+            "rail": 4,
+            "camera_areas": null
+        },
+        {
+            "rail": 5,
+            "camera_areas": null
+        },
+        {
+            "rail": 6,
+            "camera_areas": null
+        },
+        {
+            "rail": 7,
+            "camera_areas": null
+        },
+        {
+            "rail": 8,
+            "camera_areas": null
+        },
+        {
+            "rail": 9,
+            "camera_areas": null
+        },
+        {
+            "rail": 10,
+            "camera_areas": null
+        },
+        {
+            "rail": 13,
+            "camera_areas": null
+        },
+        {
+            "rail": 14,
+            "camera_areas": null
+        },
+        {
+            "rail": 15,
+            "camera_areas": null
+        },
+        {
+            "rail": 16,
+            "camera_areas": null
+        },
+        {
+            "rail": 17,
+            "camera_areas": null
+        },
+        {
+            "rail": 18,
+            "camera_areas": null
+        },
+        {
+            "rail": 19,
+            "camera_areas": null
+        },
+        {
+            "rail": 20,
+            "camera_areas": null
+        },
+        {
+            "rail": 21,
+            "camera_areas": null
+        },
+        {
+            "rail": 22,
+            "camera_areas": null
+        },
+        {
+            "rail": 23,
+            "camera_areas": null
+        },
+        {
+            "rail": 24,
+            "camera_areas": null
+        }
+    ]
+}

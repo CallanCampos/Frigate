@@ -5,12 +5,14 @@
 #include "battle/btl_calc.h"
 #include "battle/btl_field.h"
 #include "battle/btl_pokeparam.h"
+#include "battle/btl_pospoke.h"
 #include "battle/condition_effects.h"
 #include "constants/abilities.h"
 #include "constants/battle.h"
 #include "constants/items.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
+#include "constants/types.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
 #include "pml/item.h"
@@ -36,14 +38,14 @@ BattleMon *BattleMon_Create(PartyPkm *src, u8 monId, HeapID heapId) {
     mon->core.transformed = 0;
     mon->core.illusionDisguise = NULL;
     mon->core.illusion = 0;
-    mon->core.unk1b_7 = 0;
+    mon->core.appeared = 0;
     mon->core.baseForm = PokeParty_GetParam(src, PKM_PARAM_FORM, NULL);
     mon->core.baseAbility = PokeParty_GetParam(src, PKM_PARAM_ABILITY, NULL);
     mon->core.level = PokeParty_GetParam(src, PKM_PARAM_LEVEL, NULL);
-    mon->core.unk1a = PML_PersonalGetParamSingle(mon->core.species, mon->core.baseForm, PERSONAL_BASE_ATTACK);
+    mon->core.baseAttack = PML_PersonalGetParamSingle(mon->core.species, mon->core.baseForm, PERSONAL_BASE_ATTACK);
     setupBySrcData(mon, src, TRUE, TRUE);
     mon->moveCount = GetNumMoves(mon, src, TRUE);
-    mon->unk143 = 0;
+    mon->usedMoveKindCount = 0;
     InitStatStages(&mon->statStages);
     ClearMoveStatusWork(mon, 1);
     status = GetStatusCond(src);
@@ -51,16 +53,16 @@ BattleMon *BattleMon_Create(PartyPkm *src, u8 monId, HeapID heapId) {
         mon->core.conditions[status] = BtlCalc_MakeStatusCondition(status);
         mon->core.conditionCounters[status] = 0;
     }
-    mon->unk148 = 10000;
-    mon->unk146 = 0;
+    mon->appearTurn = 10000;
+    mon->turnsOnField = 0;
     mon->substituteHP = 0;
     mon->prevMoveUsed = 0;
     mon->prevMoveId = 0;
-    mon->unk144 = 0x11;
+    mon->prevMoveType = TYPE_NULL;
     mon->consecutiveMoveCount = 0;
     mon->comboMove = 0;
-    mon->comboMonId = 0x1f;
-    mon->unk142 = 0;
+    mon->comboMonId = BTL_POSPOKE_NO_MON;
+    mon->critStage = 0;
     MI_CpuFill8(mon->turnFlags, 0, sizeof(mon->turnFlags));
     MI_CpuFill8(mon->conditionFlags, 0, sizeof(mon->conditionFlags));
     BattleMon_ClearDamageRecords(mon);
@@ -244,7 +246,7 @@ void ClearUsedMoveFlag(BattleMon *mon) {
     }
     mon->prevMoveUsed = 0;
     mon->prevMoveId = 0;
-    mon->unk144 = 0x11;
+    mon->prevMoveType = TYPE_NULL;
     mon->consecutiveMoveCount = 0;
 }
 
@@ -346,7 +348,7 @@ u8 CountUsedMoves(const BattleMon *mon) {
 }
 
 u8 BattleMon_GetUsedMoveKindCount(BattleMon *mon) {
-    return mon->unk143;
+    return mon->usedMoveKindCount;
 }
 
 u16 MoveGetID(BattleMon *mon, u8 index) {
@@ -474,7 +476,7 @@ void Move_SetUsed(BattleMon *mon, u8 index) {
 
     if (move->surface.flagsHigh == 0) {
         move->surface.flagsHigh = 1;
-        mon->unk143++;
+        mon->usedMoveKindCount++;
     }
     move->surface.flagsLow = 1;
     if (move->linked) {
@@ -517,23 +519,23 @@ void splitTypeCore(BattleMon *mon, u8 *type1, u8 *type2) {
 
     condition = CheckCondition(mon, CONDITION_ROOST);
     type = mon->type1;
-    if (type == 2 && condition) {
-        *type1 = 0x11;
+    if (type == TYPE_FLYING && condition) {
+        *type1 = TYPE_NULL;
     } else {
         *type1 = type;
     }
     type = mon->type2;
-    if (type == 2 && condition) {
-        *type2 = 0x11;
+    if (type == TYPE_FLYING && condition) {
+        *type2 = TYPE_NULL;
     } else {
         *type2 = type;
     }
-    if (*type1 == 0x11) {
-        if (*type2 == 0x11) {
+    if (*type1 == TYPE_NULL) {
+        if (*type2 == TYPE_NULL) {
             *type2 = 0;
         }
         *type1 = *type2;
-    } else if (*type2 == 0x11) {
+    } else if (*type2 == TYPE_NULL) {
         *type2 = *type1;
     }
 }
@@ -550,7 +552,7 @@ BOOL DoesMonHaveType(BattleMon *mon, u32 type) {
     u8 type1;
     u8 type2;
 
-    if (type != 0x11) {
+    if (type != TYPE_NULL) {
         splitTypeCore(mon, &type1, &type2);
         if (type1 == type || type2 == type) {
             return TRUE;
@@ -689,8 +691,8 @@ u32 GetBattleMonStat(const BattleMon *mon, u32 stat) {
         return mon->core.hp;
     case BATTLEMON_MAX_HP:
         return mon->core.maxHP;
-    case 21:
-        return mon->core.unk1a;
+    case BATTLEMON_BASE_ATTACK:
+        return mon->core.baseAttack;
     case BATTLEMON_EFFECTIVE_ABILITY:
         if (CheckCondition(mon, CONDITION_GASTRO_ACID)) {
             return 0;
@@ -773,7 +775,7 @@ BOOL CanPokemonBattle(BattleMon *mon) {
 }
 
 u16 BattleMon_GetTurnsOnField(BattleMon *mon) {
-    return mon->unk146;
+    return mon->turnsOnField;
 }
 
 u32 GetTurnFlag(BattleMon *mon, u32 flag) {
@@ -843,19 +845,19 @@ s8 *BattleMon_GetStatStagePtr(BattleMon *mon, u32 stat, s8 *min, s8 *max) {
     *min = 0;
     *max = 12;
     switch (stat) {
-    case 1:
+    case BATTLEMON_ATTACK_STAGE:
         return &mon->statStages.attack;
-    case 2:
+    case BATTLEMON_DEFENSE_STAGE:
         return &mon->statStages.defense;
-    case 3:
+    case BATTLEMON_SP_ATTACK_STAGE:
         return &mon->statStages.spAttack;
-    case 4:
+    case BATTLEMON_SP_DEFENSE_STAGE:
         return &mon->statStages.spDefense;
-    case 5:
+    case BATTLEMON_SPEED_STAGE:
         return &mon->statStages.speed;
-    case 6:
+    case BATTLEMON_ACCURACY_STAGE:
         return &mon->statStages.accuracy;
-    case 7:
+    case BATTLEMON_EVASION_STAGE:
         return &mon->statStages.evasion;
     default:
         return NULL;
@@ -912,25 +914,25 @@ u32 BattleMon_RaiseStatStage(BattleMon *mon, u32 stat, u8 amount) {
     s8 *stage;
 
     switch (stat) {
-    case 1:
+    case BATTLEMON_ATTACK_STAGE:
         stage = &mon->statStages.attack;
         break;
-    case 2:
+    case BATTLEMON_DEFENSE_STAGE:
         stage = &mon->statStages.defense;
         break;
-    case 3:
+    case BATTLEMON_SP_ATTACK_STAGE:
         stage = &mon->statStages.spAttack;
         break;
-    case 4:
+    case BATTLEMON_SP_DEFENSE_STAGE:
         stage = &mon->statStages.spDefense;
         break;
-    case 5:
+    case BATTLEMON_SPEED_STAGE:
         stage = &mon->statStages.speed;
         break;
-    case 6:
+    case BATTLEMON_ACCURACY_STAGE:
         stage = &mon->statStages.accuracy;
         break;
-    case 7:
+    case BATTLEMON_EVASION_STAGE:
         stage = &mon->statStages.evasion;
         break;
     default:
@@ -950,25 +952,25 @@ u32 BattleMon_LowerStatStage(BattleMon *mon, u32 stat, u8 amount) {
     s8 *stage;
 
     switch (stat) {
-    case 1:
+    case BATTLEMON_ATTACK_STAGE:
         stage = &mon->statStages.attack;
         break;
-    case 2:
+    case BATTLEMON_DEFENSE_STAGE:
         stage = &mon->statStages.defense;
         break;
-    case 3:
+    case BATTLEMON_SP_ATTACK_STAGE:
         stage = &mon->statStages.spAttack;
         break;
-    case 4:
+    case BATTLEMON_SP_DEFENSE_STAGE:
         stage = &mon->statStages.spDefense;
         break;
-    case 5:
+    case BATTLEMON_SPEED_STAGE:
         stage = &mon->statStages.speed;
         break;
-    case 6:
+    case BATTLEMON_ACCURACY_STAGE:
         stage = &mon->statStages.accuracy;
         break;
-    case 7:
+    case BATTLEMON_EVASION_STAGE:
         stage = &mon->statStages.evasion;
         break;
     default:
@@ -988,25 +990,25 @@ void BattleMon_SetStatStage(BattleMon *mon, u32 stat, u8 value) {
     s8 *stage;
 
     switch (stat) {
-    case 1:
+    case BATTLEMON_ATTACK_STAGE:
         stage = &mon->statStages.attack;
         break;
-    case 2:
+    case BATTLEMON_DEFENSE_STAGE:
         stage = &mon->statStages.defense;
         break;
-    case 3:
+    case BATTLEMON_SP_ATTACK_STAGE:
         stage = &mon->statStages.spAttack;
         break;
-    case 4:
+    case BATTLEMON_SP_DEFENSE_STAGE:
         stage = &mon->statStages.spDefense;
         break;
-    case 5:
+    case BATTLEMON_SPEED_STAGE:
         stage = &mon->statStages.speed;
         break;
-    case 6:
+    case BATTLEMON_ACCURACY_STAGE:
         stage = &mon->statStages.accuracy;
         break;
-    case 7:
+    case BATTLEMON_EVASION_STAGE:
         stage = &mon->statStages.evasion;
         break;
     default:
@@ -1026,7 +1028,7 @@ void StatStageReset(BattleMon *mon) {
 }
 
 u8 BattleMon_GetCritStage(BattleMon *mon) {
-    u8 stage = mon->unk142;
+    u8 stage = mon->critStage;
 
     if (GetAdditionalConditionFlag(mon, 9)) {
         stage += 2;
@@ -1041,21 +1043,21 @@ BOOL BattleMon_AddCritStage(BattleMon *mon, s32 amount) {
     s32 decrease;
 
     if (amount > 0) {
-        if (mon->unk142 < 4) {
-            mon->unk142 += amount;
-            if (mon->unk142 > 4) {
-                mon->unk142 = 4;
+        if (mon->critStage < 4) {
+            mon->critStage += amount;
+            if (mon->critStage > 4) {
+                mon->critStage = 4;
             }
             return TRUE;
         }
     } else {
         decrease = amount;
         decrease *= -1;
-        if (mon->unk142 != 0) {
-            if (mon->unk142 > decrease) {
-                mon->unk142 -= decrease;
+        if (mon->critStage != 0) {
+            if (mon->critStage > decrease) {
+                mon->critStage -= decrease;
             } else {
-                mon->unk142 = 0;
+                mon->critStage = 0;
             }
             return TRUE;
         }
@@ -1117,10 +1119,10 @@ BOOL BattleMon_TickCondition(BattleMon *mon, u32 index, BattleCondition *prev, B
     u8 turns;
     BattleCondition cond;
 
-    if (index == 2 || index == 6) {
+    if (index == CONDITION_SLEEP || index == CONDITION_CONFUSION) {
         return FALSE;
     }
-    if (GetConditionPtr(mon, index)->common.type != 0) {
+    if (GetConditionPtr(mon, index)->common.type != BTL_CONDITION_TYPE_NONE) {
         turns = Condition_GetTurns(*GetConditionPtr(mon, index));
         cond = *GetConditionPtr(mon, index);
         if (prev != NULL) {
@@ -1129,7 +1131,7 @@ BOOL BattleMon_TickCondition(BattleMon *mon, u32 index, BattleCondition *prev, B
         if (cured != NULL) {
             *cured = FALSE;
         }
-        if (index == 0x1b && !MoveIsUsable(mon, Condition_GetParam(cond))) {
+        if (index == CONDITION_CHOICE_LOCK && !MoveIsUsable(mon, Condition_GetParam(cond))) {
             *GetConditionPtr(mon, index) = ZeroConditionTurns();
             mon->core.conditionCounters[index] = 0;
             if (cured != NULL) {
@@ -1145,7 +1147,7 @@ BOOL BattleMon_TickCondition(BattleMon *mon, u32 index, BattleCondition *prev, B
                     *cured = TRUE;
                 }
             }
-        } else if (GetConditionPtr(mon, index)->common.type == 1) {
+        } else if (GetConditionPtr(mon, index)->common.type == BTL_CONDITION_TYPE_PERMANENT) {
             u32 max = GetConditionPtr(mon, index)->common.turns;
 
             if (max != 0 && mon->core.conditionCounters[index] < max) {
@@ -1173,7 +1175,7 @@ BOOL BattleMon_TickSleep(BattleMon *mon) {
     u8 turns;
     u8 amount;
 
-    if (condition->common.type != 0) {
+    if (condition->common.type != BTL_CONDITION_TYPE_NONE) {
         turns = Condition_GetTurns(*condition);
         if (turns != 0) {
             amount = CheckEffectiveAbility(mon, ABILITY_EARLY_BIRD) ? 2 : 1;
@@ -1191,7 +1193,7 @@ BOOL BattleMon_TickConfusion(BattleMon *mon) {
     BattleCondition *condition = &mon->core.conditions[6];
     u8 turns;
 
-    if (condition->common.type != 0) {
+    if (condition->common.type != BTL_CONDITION_TYPE_NONE) {
         turns = Condition_GetTurns(*condition);
         if (turns != 0) {
             mon->core.conditionCounters[6]++;
@@ -1216,9 +1218,9 @@ void CureCondition(BattleMon *mon) {
 }
 
 void CureDependentCondition(BattleMon *mon, u32 condition) {
-    if (condition == 2) {
-        mon->core.conditions[9] = ZeroConditionTurns();
-        mon->core.conditionCounters[9] = 0;
+    if (condition == CONDITION_SLEEP) {
+        mon->core.conditions[CONDITION_NIGHTMARE] = ZeroConditionTurns();
+        mon->core.conditionCounters[CONDITION_NIGHTMARE] = 0;
     }
 }
 
@@ -1234,7 +1236,7 @@ void CureMoveCondition(BattleMon *mon, u32 condition) {
 void BattleMon_CureConditionsFromMon(BattleMon *mon, u32 monId) {
     u32 i;
 
-    if (monId != 0x1f) {
+    if (monId != BTL_POSPOKE_NO_MON) {
         for (i = 0; i < 0x24; i++) {
             if (!Condition_IsNull(mon->core.conditions[i])) {
                 if (Condition_GetMonID(mon->core.conditions[i]) == monId) {
@@ -1250,7 +1252,7 @@ u32 GetBattleMonStatus(BattleMon *mon) {
     u32 i;
 
     for (i = 1; i < 6; i++) {
-        if (mon->core.conditions[i].common.type != 0) {
+        if (mon->core.conditions[i].common.type != BTL_CONDITION_TYPE_NONE) {
             return i;
         }
     }
@@ -1258,16 +1260,16 @@ u32 GetBattleMonStatus(BattleMon *mon) {
 }
 
 BOOL CheckCondition(const BattleMon *mon, u32 index) {
-    return mon->core.conditions[index].common.type != 0;
+    return mon->core.conditions[index].common.type != BTL_CONDITION_TYPE_NONE;
 }
 
 u16 GetDisabledMove(BattleMon *mon, u32 index) {
     switch (mon->core.conditions[index].common.type) {
-    case 2:
+    case BTL_CONDITION_TYPE_TURNS:
         return (mon->core.conditions[index].raw << 7) >> 16;
-    case 3:
+    case BTL_CONDITION_TYPE_DEPEND_MON:
         return (mon->core.conditions[index].raw << 23) >> 26;
-    case 4:
+    case BTL_CONDITION_TYPE_DEPEND_MON_TURNS:
         return (mon->core.conditions[index].raw << 17) >> 26;
     default:
         return 0;
@@ -1285,19 +1287,19 @@ u8 BattleMon_GetConditionTurnCount(BattleMon *mon, u32 index) {
 u32 BattleMon_GetResidualDamage(BattleMon *mon, u32 index) {
     if (CheckCondition(mon, index)) {
         switch (index) {
-        case 5:
+        case CONDITION_POISON:
             if (Condition_IsBadlyPoisoned(mon->core.conditions[index])) {
                 return DivideMaxHPZeroCheck(mon, 16) * mon->core.conditionCounters[index];
             }
             return DivideMaxHPZeroCheck(mon, 8);
-        case 4:
+        case CONDITION_BURN:
             return DivideMaxHPZeroCheck(mon, 8);
-        case 9:
+        case CONDITION_NIGHTMARE:
             if (CheckCondition(mon, CONDITION_SLEEP)) {
                 return DivideMaxHPZeroCheck(mon, 4);
             }
             break;
-        case 10:
+        case CONDITION_CURSE:
             return DivideMaxHPZeroCheck(mon, 4);
         default:
             return 0;
@@ -1315,22 +1317,22 @@ void ClearMoveStatusWork(BattleMon *mon, u32 flag) {
     }
     for (; i < 0x24; i++) {
         mon->core.conditions[i].raw = 0;
-        mon->core.conditions[i].common.type = 0;
+        mon->core.conditions[i].common.type = BTL_CONDITION_TYPE_NONE;
     }
     MI_CpuFill8(mon->core.conditionCounters, 0, 0x24);
 }
 
 void BattleMon_SetAppearTurn(BattleMon *mon, u16 turn) {
-    mon->unk148 = turn;
-    mon->unk146 = 0;
-    mon->core.unk1b_7 = 1;
+    mon->appearTurn = turn;
+    mon->turnsOnField = 0;
+    mon->core.appeared = 1;
     BattleMon_ClearDamageRecords(mon);
 }
 
 void BattleMon_EndTurn(BattleMon *mon) {
     MI_CpuFill8(mon->turnFlags, 0, sizeof(mon->turnFlags));
-    if (mon->unk146 < 9999) {
-        mon->unk146++;
+    if (mon->turnsOnField < 9999) {
+        mon->turnsOnField++;
     }
     BattleMon_AdvanceDamageRecordTurn(mon);
 }
@@ -1397,7 +1399,7 @@ void CopyBatonPassParams(BattleMon *target, BattleMon *source) {
     target->statStages = source->statStages;
     target->substituteHP = source->substituteHP;
     for (i = 0; i < 36; i++) {
-        if (GetConditionPtr(source, i)->common.type != 0 && Condition_IsPassedByBatonPass(i)) {
+        if (GetConditionPtr(source, i)->common.type != BTL_CONDITION_TYPE_NONE && Condition_IsPassedByBatonPass(i)) {
             *GetConditionPtr(target, i) = *GetConditionPtr(source, i);
             target->core.conditionCounters[i] = source->core.conditionCounters[i];
         }
@@ -1454,13 +1456,13 @@ u16 GetConsumedItem(BattleMon *mon) {
     return mon->core.consumedItem;
 }
 
-void BattleMon_SetPrevMove(BattleMon *mon, u8 targetPos, BOOL success, u8 unk144, u16 moveId, u16 moveUsed) {
+void BattleMon_SetPrevMove(BattleMon *mon, u8 targetPos, BOOL success, u8 prevMoveType, u16 moveId, u16 moveUsed) {
     u16 prevMoveId = mon->prevMoveId;
 
     mon->prevMoveUsed = moveUsed;
     mon->prevMoveId = moveId;
     mon->prevTargetPos = targetPos;
-    mon->unk144 = unk144;
+    mon->prevMoveType = prevMoveType;
     if (prevMoveId == moveId) {
         if (success) {
             mon->consecutiveMoveCount++;
@@ -1481,7 +1483,7 @@ u16 GetPreviousMoveID(BattleMon *mon) {
 }
 
 u8 BattleMon_GetPrevMoveType(BattleMon *mon) {
-    return mon->unk144;
+    return mon->prevMoveType;
 }
 
 u16 GetPreviousMoveUsed(BattleMon *mon) {
@@ -1493,7 +1495,7 @@ u8 GetPrevTargetPos(BattleMon *mon) {
 }
 
 BOOL BattleMon_HasAppeared(BattleMon *mon) {
-    return mon->core.unk1b_7;
+    return mon->core.appeared;
 }
 
 void SetWeight(BattleMon *mon, u16 weight) {
@@ -1716,11 +1718,11 @@ BOOL TransformSet(BattleMon *mon, BattleMon *target) {
         }
         MI_CpuFill8(mon->turnFlags, 0, sizeof(mon->turnFlags));
         MI_CpuFill8(mon->conditionFlags, 0, sizeof(mon->conditionFlags));
-        mon->unk148 = 10000;
-        mon->unk146 = 0;
+        mon->appearTurn = 10000;
+        mon->turnsOnField = 0;
         mon->prevMoveUsed = 0;
         mon->prevMoveId = 0;
-        mon->unk144 = 0x11;
+        mon->prevMoveType = TYPE_NULL;
         mon->consecutiveMoveCount = 0;
         mon->core.transformed = 1;
         return TRUE;
@@ -1763,32 +1765,32 @@ BOOL BattleMon_DamageSubstitute(BattleMon *mon, u16 *damage) {
 }
 
 void BattleMon_ClearConfrontedMons(BattleMon *mon) {
-    mon->core.unkD0Count = 0;
+    mon->core.confrontedMonCount = 0;
 }
 
 void BattleMon_AddConfrontedMon(BattleMon *mon, u8 monId) {
     u32 i;
 
-    for (i = 0; i < mon->core.unkD0Count; i++) {
-        if (monId == mon->core.unkD1[i]) {
+    for (i = 0; i < mon->core.confrontedMonCount; i++) {
+        if (monId == mon->core.confrontedMons[i]) {
             return;
         }
     }
     if (i < 24) {
-        mon->core.unkD1[i] = monId;
-        mon->core.unkD0Count++;
+        mon->core.confrontedMons[i] = monId;
+        mon->core.confrontedMonCount++;
     }
 }
 
 u8 BattleMon_GetConfrontedMonCount(BattleMon *mon) {
-    return mon->core.unkD0Count;
+    return mon->core.confrontedMonCount;
 }
 
 u8 BattleMon_GetConfrontedMonID(BattleMon *mon, u8 index) {
-    if (index < mon->core.unkD0Count) {
-        return mon->core.unkD1[index];
+    if (index < mon->core.confrontedMonCount) {
+        return mon->core.confrontedMons[index];
     }
-    return 0x1f;
+    return BTL_POSPOKE_NO_MON;
 }
 
 void BattleMon_SetCaughtBall(BattleMon *mon, u16 item) {
@@ -1806,7 +1808,7 @@ void BattleMon_SetComboMove(BattleMon *mon, u8 monId, u16 move) {
 }
 
 BOOL BattleMon_GetComboMove(BattleMon *mon, u8 *monId, u16 *move) {
-    if (mon->comboMonId != 0x1f) {
+    if (mon->comboMonId != BTL_POSPOKE_NO_MON) {
         *monId = mon->comboMonId;
         *move = mon->comboMove;
         return TRUE;
@@ -1815,15 +1817,15 @@ BOOL BattleMon_GetComboMove(BattleMon *mon, u8 *monId, u16 *move) {
 }
 
 BOOL BattleMon_HasComboMove(BattleMon *mon) {
-    if (mon->comboMonId != 0x1f) {
+    if (mon->comboMonId != BTL_POSPOKE_NO_MON) {
         return TRUE;
     }
     return FALSE;
 }
 
 void ComboMove_ClearParam(BattleMon *mon) {
-    if (mon->comboMonId != 0x1f) {
-        mon->comboMonId = 0x1f;
+    if (mon->comboMonId != BTL_POSPOKE_NO_MON) {
+        mon->comboMonId = BTL_POSPOKE_NO_MON;
         mon->comboMove = 0;
     }
 }

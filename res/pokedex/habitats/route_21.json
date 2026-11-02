@@ -1,0 +1,72 @@
+{
+    "$schema": "habitat.schema.json",
+    "kinds": [ "water", "fishing" ],
+    "by_season": [],
+    "land": "none",
+    "species": [
+        {
+            "species": "SPECIES_ALOMOMOLA",
+            "present": {
+                "land": [],
+                "water": [ "spring", "summer", "autumn", "winter" ],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_MANTINE",
+            "present": {
+                "land": [],
+                "water": [ "spring", "summer", "autumn", "winter" ],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_LUVDISC",
+            "present": {
+                "land": [],
+                "water": [],
+                "fishing": [ "spring", "summer", "autumn", "winter" ]
+            }
+        },
+        {
+            "species": "SPECIES_MANTYKE",
+            "present": {
+                "land": [],
+                "water": [ "spring", "summer", "autumn", "winter" ],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_REMORAID",
+            "present": {
+                "land": [],
+                "water": [ "spring", "summer", "autumn", "winter" ],
+                "fishing": [ "spring", "summer", "autumn", "winter" ]
+            }
+        },
+        {
+            "species": "SPECIES_FRILLISH",
+            "present": {
+                "land": [],
+                "water": [ "spring", "summer", "autumn", "winter" ],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_OCTILLERY",
+            "present": {
+                "land": [],
+                "water": [],
+                "fishing": [ "spring", "summer", "autumn", "winter" ]
+            }
+        },
+        {
+            "species": "SPECIES_JELLICENT",
+            "present": {
+                "land": [],
+                "water": [ "spring", "summer", "autumn", "winter" ],
+                "fishing": []
+            }
+        }
+    ]
+}

@@ -16,63 +16,63 @@
 
 // A question of the surveys
 typedef struct {
-    // 0 when the answers must reach a count, 1 when the survey runs for days
+    // A SURVEY_QUESTION_TYPE_*
     u8 type;
     u8 answerCount;
     u8 answers[3];
     u8 threshold;
-    u8 days;
+    u8 hours;
 } SurveyQuestion;
 
 // clang-format off
-static const SurveyQuestion data_ov012_0216dad0[] = {
-    {1, 0, {0xff, 0xff, 0xff}, 0, 0},
-    {1, 1, {0, 0xff, 0xff}, 1, 2},
-    {1, 1, {8, 0xff, 0xff}, 1, 2},
-    {1, 1, {29, 0xff, 0xff}, 1, 4},
-    {1, 1, {1, 0xff, 0xff}, 1, 4},
-    {1, 1, {26, 0xff, 0xff}, 1, 4},
-    {1, 1, {25, 0xff, 0xff}, 1, 4},
-    {1, 1, {2, 0xff, 0xff}, 1, 8},
-    {1, 1, {7, 0xff, 0xff}, 1, 8},
-    {1, 1, {28, 0xff, 0xff}, 1, 8},
-    {1, 1, {3, 0xff, 0xff}, 1, 8},
-    {1, 1, {5, 11, 0xff}, 1, 12},
-    {1, 3, {4, 6, 14}, 1, 12},
-    {1, 2, {12, 13, 0xff}, 1, 12},
-    {1, 2, {24, 20, 0xff}, 1, 12},
-    {1, 1, {20, 0xff, 0xff}, 1, 16},
-    {1, 2, {21, 22, 0xff}, 1, 16},
-    {1, 1, {10, 0xff, 0xff}, 1, 16},
-    {1, 2, {16, 17, 0xff}, 1, 16},
-    {1, 1, {23, 0xff, 0xff}, 1, 20},
-    {1, 2, {19, 9, 0xff}, 1, 20},
-    {1, 1, {18, 0xff, 0xff}, 1, 20},
-    {1, 1, {27, 0xff, 0xff}, 1, 24},
-    {1, 1, {15, 0xff, 0xff}, 1, 24},
-    {0, 1, {0, 0xff, 0xff}, 5, 0},
-    {0, 1, {8, 0xff, 0xff}, 5, 0},
-    {0, 1, {29, 0xff, 0xff}, 10, 0},
-    {0, 1, {1, 0xff, 0xff}, 10, 0},
-    {0, 1, {26, 0xff, 0xff}, 10, 0},
-    {0, 1, {25, 0xff, 0xff}, 10, 0},
-    {0, 1, {2, 0xff, 0xff}, 20, 0},
-    {0, 1, {7, 0xff, 0xff}, 20, 0},
-    {0, 1, {28, 0xff, 0xff}, 20, 0},
-    {0, 1, {3, 0xff, 0xff}, 20, 0},
-    {0, 2, {5, 11, 0xff}, 30, 0},
-    {0, 3, {4, 6, 14}, 30, 0},
-    {0, 2, {12, 13, 0xff}, 30, 0},
-    {0, 2, {24, 20, 0xff}, 30, 0},
-    {0, 1, {20, 0xff, 0xff}, 40, 0},
-    {0, 2, {21, 22, 0xff}, 40, 0},
-    {0, 1, {10, 0xff, 0xff}, 40, 0},
-    {0, 2, {16, 17, 0xff}, 40, 0},
-    {0, 1, {23, 0xff, 0xff}, 50, 0},
-    {0, 2, {19, 9, 0xff}, 50, 0},
-    {0, 1, {18, 0xff, 0xff}, 50, 0},
-    {0, 1, {27, 0xff, 0xff}, 100, 0},
-    {0, 1, {15, 0xff, 0xff}, 100, 0},
+static const SurveyQuestion SURVEY_QUESTIONS[] = {
+    {SURVEY_QUESTION_TYPE_HOURS, 0, {0xff, 0xff, 0xff}, 0, 0},
+    {SURVEY_QUESTION_TYPE_HOURS, 1, {0, 0xff, 0xff}, 1, 2},
+    {SURVEY_QUESTION_TYPE_HOURS, 1, {8, 0xff, 0xff}, 1, 2},
+    {SURVEY_QUESTION_TYPE_HOURS, 1, {29, 0xff, 0xff}, 1, 4},
+    {SURVEY_QUESTION_TYPE_HOURS, 1, {1, 0xff, 0xff}, 1, 4},
+    {SURVEY_QUESTION_TYPE_HOURS, 1, {26, 0xff, 0xff}, 1, 4},
+    {SURVEY_QUESTION_TYPE_HOURS, 1, {25, 0xff, 0xff}, 1, 4},
+    {SURVEY_QUESTION_TYPE_HOURS, 1, {2, 0xff, 0xff}, 1, 8},
+    {SURVEY_QUESTION_TYPE_HOURS, 1, {7, 0xff, 0xff}, 1, 8},
+    {SURVEY_QUESTION_TYPE_HOURS, 1, {28, 0xff, 0xff}, 1, 8},
+    {SURVEY_QUESTION_TYPE_HOURS, 1, {3, 0xff, 0xff}, 1, 8},
+    {SURVEY_QUESTION_TYPE_HOURS, 1, {5, 11, 0xff}, 1, 12},
+    {SURVEY_QUESTION_TYPE_HOURS, 3, {4, 6, 14}, 1, 12},
+    {SURVEY_QUESTION_TYPE_HOURS, 2, {12, 13, 0xff}, 1, 12},
+    {SURVEY_QUESTION_TYPE_HOURS, 2, {24, 20, 0xff}, 1, 12},
+    {SURVEY_QUESTION_TYPE_HOURS, 1, {20, 0xff, 0xff}, 1, 16},
+    {SURVEY_QUESTION_TYPE_HOURS, 2, {21, 22, 0xff}, 1, 16},
+    {SURVEY_QUESTION_TYPE_HOURS, 1, {10, 0xff, 0xff}, 1, 16},
+    {SURVEY_QUESTION_TYPE_HOURS, 2, {16, 17, 0xff}, 1, 16},
+    {SURVEY_QUESTION_TYPE_HOURS, 1, {23, 0xff, 0xff}, 1, 20},
+    {SURVEY_QUESTION_TYPE_HOURS, 2, {19, 9, 0xff}, 1, 20},
+    {SURVEY_QUESTION_TYPE_HOURS, 1, {18, 0xff, 0xff}, 1, 20},
+    {SURVEY_QUESTION_TYPE_HOURS, 1, {27, 0xff, 0xff}, 1, 24},
+    {SURVEY_QUESTION_TYPE_HOURS, 1, {15, 0xff, 0xff}, 1, 24},
+    {SURVEY_QUESTION_TYPE_COUNT, 1, {0, 0xff, 0xff}, 5, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 1, {8, 0xff, 0xff}, 5, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 1, {29, 0xff, 0xff}, 10, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 1, {1, 0xff, 0xff}, 10, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 1, {26, 0xff, 0xff}, 10, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 1, {25, 0xff, 0xff}, 10, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 1, {2, 0xff, 0xff}, 20, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 1, {7, 0xff, 0xff}, 20, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 1, {28, 0xff, 0xff}, 20, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 1, {3, 0xff, 0xff}, 20, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 2, {5, 11, 0xff}, 30, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 3, {4, 6, 14}, 30, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 2, {12, 13, 0xff}, 30, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 2, {24, 20, 0xff}, 30, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 1, {20, 0xff, 0xff}, 40, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 2, {21, 22, 0xff}, 40, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 1, {10, 0xff, 0xff}, 40, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 2, {16, 17, 0xff}, 40, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 1, {23, 0xff, 0xff}, 50, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 2, {19, 9, 0xff}, 50, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 1, {18, 0xff, 0xff}, 50, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 1, {27, 0xff, 0xff}, 100, 0},
+    {SURVEY_QUESTION_TYPE_COUNT, 1, {15, 0xff, 0xff}, 100, 0},
 };
 
 // clang-format on
@@ -83,25 +83,25 @@ static BOOL Survey_AreAllAnswersCounted(SaveControl *save);
 static BOOL Survey_AreAnswersAtMax(SurveySave *survey, u16 question);
 
 u32 Survey_GetQuestionType(u16 question) {
-    return data_ov012_0216dad0[question].type;
+    return SURVEY_QUESTIONS[question].type;
 }
 
 u32 Survey_GetQuestionAnswerCount(u16 question) {
-    return data_ov012_0216dad0[question].answerCount;
+    return SURVEY_QUESTIONS[question].answerCount;
 }
 
 void Survey_GetQuestionAnswers(u16 question, u8 *answers) {
-    answers[0] = data_ov012_0216dad0[question].answers[0];
-    answers[1] = data_ov012_0216dad0[question].answers[1];
-    answers[2] = data_ov012_0216dad0[question].answers[2];
+    answers[0] = SURVEY_QUESTIONS[question].answers[0];
+    answers[1] = SURVEY_QUESTIONS[question].answers[1];
+    answers[2] = SURVEY_QUESTIONS[question].answers[2];
 }
 
 u32 Survey_GetQuestionThreshold(u16 question) {
-    return data_ov012_0216dad0[question].threshold;
+    return SURVEY_QUESTIONS[question].threshold;
 }
 
 int Survey_GetQuestionHours(u8 question) {
-    return data_ov012_0216dad0[question].days;
+    return SURVEY_QUESTIONS[question].hours;
 }
 
 u16 Survey_GetCurrentState(SaveControl *save) {
@@ -109,13 +109,13 @@ u16 Survey_GetCurrentState(SaveControl *save) {
     u16 question = TrainerGameInfo_GetSurveyQuestion(getTrainerCardData_wrapper(save));
     u8 type = Survey_GetQuestionType(question);
 
-    if (type == 0) {
+    if (type == SURVEY_QUESTION_TYPE_COUNT) {
         if (Survey_AreAnswersAtThreshold(survey, question)) {
             return 1;
         }
         return 2;
     }
-    if (type == 1) {
+    if (type == SURVEY_QUESTION_TYPE_HOURS) {
         if (Survey_HasRunLongEnough(save)) {
             if (Survey_AreAllAnswersCounted(save)) {
                 return 1;
@@ -151,13 +151,13 @@ u16 Survey_GetQuestionState(SaveControl *save, u8 question) {
 
     getTrainerCardData_wrapper(save);
     type = Survey_GetQuestionType(question);
-    if (type == 0) {
+    if (type == SURVEY_QUESTION_TYPE_COUNT) {
         if (Survey_AreAnswersAtThreshold(survey, question)) {
             return 1;
         }
         return 2;
     }
-    if (type == 1) {
+    if (type == SURVEY_QUESTION_TYPE_HOURS) {
         if (Survey_AreAnswersAtMax(survey, question)) {
             return 1;
         }

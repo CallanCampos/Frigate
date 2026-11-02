@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_controller.h"
@@ -15,8 +16,6 @@
 
 #define GIMMICK_WORK_ID 1
 #define GIMMICK_STATE_ID 9
-// The archive of the gym's models
-#define GIMMICK_ARCID 0x98
 
 #define SWITCH_COUNT 3
 // The second model of each switch comes this many models after its first
@@ -24,6 +23,12 @@
 #define PLACE_COUNT 8
 // The controller type of maps with both grid and rail movement
 #define CONTROLLER_TYPE_HYBRID 2
+
+// The steps of both of the switch events
+enum {
+    STEP_START_ANIM,
+    STEP_WAIT_ANIM,
+};
 
 // What the save keeps of the gym: whether each switch is flipped
 typedef struct {
@@ -53,9 +58,9 @@ static inline FieldExpObjAnm *GetAnimation(FieldExpObjSystem *expObj, u8 model, 
 }
 
 static const G3DSceneResourceSetup sResources[9] = {
-    { GIMMICK_ARCID, 0, 0 }, { GIMMICK_ARCID, 1, 0 }, { GIMMICK_ARCID, 2, 0 },
-    { GIMMICK_ARCID, 3, 0 }, { GIMMICK_ARCID, 4, 0 }, { GIMMICK_ARCID, 5, 0 },
-    { GIMMICK_ARCID, 6, 0 }, { GIMMICK_ARCID, 8, 0 }, { GIMMICK_ARCID, 7, 0 },
+    { ARCID_GYM_ICIRRUS, 0, 0 }, { ARCID_GYM_ICIRRUS, 1, 0 }, { ARCID_GYM_ICIRRUS, 2, 0 },
+    { ARCID_GYM_ICIRRUS, 3, 0 }, { ARCID_GYM_ICIRRUS, 4, 0 }, { ARCID_GYM_ICIRRUS, 5, 0 },
+    { ARCID_GYM_ICIRRUS, 6, 0 }, { ARCID_GYM_ICIRRUS, 8, 0 }, { ARCID_GYM_ICIRRUS, 7, 0 },
 };
 
 static const G3DSceneAnimationSetup sModelAAnimations[] = { { 5, 0 }, { 6, 0 } };
@@ -228,14 +233,14 @@ static GameEventReturnCode GymIcirrus_SwitchAnimEvent(GameEvent *event, u32 *sta
     BOOL flipped = TRUE;
 
     switch (*state) {
-    case 0:
+    case STEP_START_ANIM:
         switchIndex = work->switchIndex;
         FieldExpObjAnm_SetPaused(
             GetAnimation(expObj, switchIndex + SECOND_MODEL_OFFSET, GymIcirrus_IsSwitchFlipped(gymState, switchIndex)),
             FALSE);
         (*state)++;
         break;
-    case 1:
+    case STEP_WAIT_ANIM:
         switchIndex = work->switchIndex;
         if (FieldExpObjAnm_IsPlaybackFinished(GetAnimation(expObj, switchIndex + SECOND_MODEL_OFFSET,
                                                            GymIcirrus_IsSwitchFlipped(gymState, switchIndex)))) {
@@ -261,14 +266,14 @@ static GameEventReturnCode GymIcirrus_FlipSwitchEvent(GameEvent *event, u32 *sta
     BOOL newFlipped;
 
     switch (*state) {
-    case 0:
+    case STEP_START_ANIM:
         switchIndex = work->switchIndex;
         FieldExpObjAnm_SetPaused(GetAnimation(expObj, switchIndex, GymIcirrus_IsSwitchFlipped(gymState, switchIndex)),
                                  FALSE);
         GFL_SndSEPlay(SEQ_SE_FLD_65);
         (*state)++;
         break;
-    case 1:
+    case STEP_WAIT_ANIM:
         switchIndex = work->switchIndex;
         if (FieldExpObjAnm_IsPlaybackFinished(
                 GetAnimation(expObj, switchIndex, GymIcirrus_IsSwitchFlipped(gymState, switchIndex)))) {

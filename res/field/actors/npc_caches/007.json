@@ -1,0 +1,31 @@
+{
+    "$schema": "../npc_cache.schema.json",
+    "codes": [
+        "OBJ_CODE_BIKER",
+        "OBJ_CODE_WORKER_44",
+        "OBJ_CODE_98",
+        "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
+        "OBJ_CODE_191",
+        "OBJ_CODE_291",
+        "OBJ_CODE_227",
+        "OBJ_CODE_110",
+        "OBJ_CODE_19",
+        "OBJ_CODE_BACKERS_F",
+        "OBJ_CODE_ACE_TRAINER_M",
+        "OBJ_CODE_YOUNGSTER",
+        "OBJ_CODE_ROUGHNECK",
+        "OBJ_CODE_TWINS",
+        "OBJ_CODE_131",
+        "OBJ_CODE_PKMN_BREEDER_F",
+        "OBJ_CODE_PARASOL_LADY",
+        "OBJ_CODE_SCHOOL_KID_F",
+        "OBJ_CODE_SCIENTIST_M_52",
+        "OBJ_CODE_SCIENTIST_F_46",
+        "OBJ_CODE_SCHOOL_KID_M",
+        "OBJ_CODE_PKMN_RANGER_M",
+        "OBJ_CODE_223",
+        "OBJ_CODE_ARTIST",
+        "OBJ_CODE_210",
+        "OBJ_CODE_HIKER"
+    ]
+}

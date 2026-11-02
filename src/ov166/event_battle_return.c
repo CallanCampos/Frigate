@@ -8,6 +8,7 @@
 #include "battle/btl_setup.h"
 #include "constants/abilities.h"
 #include "constants/arc.h"
+#include "constants/battle.h"
 #include "constants/items.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
@@ -35,15 +36,15 @@
 #include "save/save_control.h"
 #include "system/game_data.h"
 
-// The battle types of the field's wild and trainer battles
 enum {
-    BATTLE_TYPE_WILD,
-    BATTLE_TYPE_TRAINER,
+    STEP_APPLY_RESULT,
+    STEP_WAIT_POKEDEX_REGISTRATION,
+    STEP_WAIT_NAME_ENTRY,
+    STEP_STORE_CAUGHT,
+    STEP_CHECK_EVOLUTIONS,
+    STEP_WAIT_EVOLUTION,
+    STEP_END,
 };
-
-// The battle backgrounds, by BtlFieldEnv's bgType, with the terrain Burmy takes its form from for each of its
-// terrains
-#define ARCID_BATTLE_BG_DATA 0x97
 
 // Set once the player knows whose PC the boxes are
 #define FLAG_BATTLE_RETURN_BOX_MESSAGE 0x96b
@@ -174,14 +175,14 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
         return FALSE;
     }
     switch (*state) {
-    case 0:
+    case STEP_APPLY_RESULT:
         party = GameData_GetParty(prm->gameData);
         playerInfo = GetGameDataPlayerInfo(prm->gameData);
         pokedex = GameData_GetPokedex(prm->gameData);
         boxes = GameData_GetBoxSaveAccessor(prm->gameData);
         wk->evolveSlot = 0;
         wk->evolveMask = 0;
-        if (prm->setup->battleType <= BATTLE_TYPE_TRAINER) {
+        if (prm->setup->battleType <= BTL_TYPE_TRAINER) {
             EventBattleReturn_CheckLevelUps(wk, prm);
             PokeParty_Copy(prm->setup->party[0], party);
             pokerusHandler(party);
@@ -192,7 +193,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
             EventBattleReturn_BurmyForms(prm, party,
                                          EventBattleReturn_GetBurmyTerrain(&prm->setup->fieldSituation, wk->heapId));
             EventBattleReturn_ShayminForms(prm, party);
-            money = prm->setup->unkA4;
+            money = prm->setup->moneyChange;
             if (money > 0) {
                 addCashToTotal(getTrainerCardDataBlkAddress(prm->gameData), money);
             } else if (money < 0) {
@@ -201,7 +202,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
         }
         EventBattleReturn_NaturalCure(party);
         if (prm->setup->result == BTL_RESULT_CAPTURE) {
-            wk->pkm = PokeParty_GetPkm(prm->setup->party[1], prm->setup->unkAC);
+            wk->pkm = PokeParty_GetPkm(prm->setup->party[1], prm->setup->capturedSlot);
             if (PokeParty_GetPkmCount(party) >= PokeParty_GetCapacity(party)) {
                 box = BoxSaveAccessor_GetLastOpenedBox(boxes);
                 slot = 0;
@@ -243,10 +244,10 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
             QueueGameProc(wk->procManager, OVERLAY_ID(297), &POKEDEX_REGISTRATION_PROC_FUNCTIONS, &wk->dex);
             (*state)++;
         } else {
-            *state = 4;
+            *state = STEP_CHECK_EVOLUTIONS;
         }
         break;
-    case 1:
+    case STEP_WAIT_POKEDEX_REGISTRATION:
         if (procRunning != TRUE) {
             boxes = GameData_GetBoxSaveAccessor(prm->gameData);
             nickname = FALSE;
@@ -259,13 +260,13 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
                 QueueGameProc(wk->procManager, OVERLAY_ID(280), &NAME_ENTRY_PROC_FUNCTIONS, wk->nameEntry);
                 (*state)++;
             } else {
-                *state = 3;
+                *state = STEP_STORE_CAUGHT;
             }
         } else {
             return FALSE;
         }
         break;
-    case 2:
+    case STEP_WAIT_NAME_ENTRY:
         if (procRunning != TRUE) {
             if (NameEntryParam_IsCanceled(wk->nameEntry) == FALSE) {
                 oldName = GFL_StrBufCreate(32, wk->heapId);
@@ -284,7 +285,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
             return FALSE;
         }
         break;
-    case 3:
+    case STEP_STORE_CAUGHT:
         party = GameData_GetParty(prm->gameData);
         EventBattleReturn_HealBall(wk->pkm);
         if (wk->boxMessage == NULL) {
@@ -294,7 +295,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
         }
         (*state)++;
         break;
-    case 4:
+    case STEP_CHECK_EVOLUTIONS:
         if (!wk->musicDone) {
             if (prm->setup->result == BTL_RESULT_CAPTURE && wk->evolveMask != 0) {
                 if (!wk->musicFading) {
@@ -310,7 +311,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
         } else if (wk->evolveMask != 0) {
             species = 0;
             party = GameData_GetParty(prm->gameData);
-            *state = 6;
+            *state = STEP_END;
             while (wk->evolveMask != 0) {
                 if (wk->evolveMask & 1) {
                     pkm = PokeParty_GetPkm(party, wk->evolveSlot);
@@ -332,20 +333,20 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
                     demo->canCancel = TRUE;
                     wk->evolutionDemo = demo;
                     QueueGameProc(wk->procManager, OVERLAY_EVOLUTION_DEMO, &EVOLUTION_DEMO_PROC_FUNCTIONS, demo);
-                    *state = 5;
+                    *state = STEP_WAIT_EVOLUTION;
                     break;
                 }
             }
         } else {
-            *state = 6;
+            *state = STEP_END;
         }
         break;
-    case 5:
+    case STEP_WAIT_EVOLUTION:
         if (procRunning != TRUE) {
             GFL_HeapFree(wk->evolutionDemo);
             wk->evolutionDemo = NULL;
             if (wk->evolveMask != 0) {
-                *state = 4;
+                *state = STEP_CHECK_EVOLUTIONS;
             } else {
                 (*state)++;
             }
@@ -353,7 +354,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
             return FALSE;
         }
         break;
-    case 6:
+    case STEP_END:
     default:
         return TRUE;
     }
@@ -373,8 +374,8 @@ static void EventBattleReturn_CheckLevelUps(EventBattleReturnWork *wk, EventBatt
     case BTL_RESULT_FLEE:
     case BTL_RESULT_CAPTURE:
         switch (setup->battleType) {
-        case BATTLE_TYPE_WILD:
-        case BATTLE_TYPE_TRAINER:
+        case BTL_TYPE_WILD:
+        case BTL_TYPE_TRAINER:
             party = GameData_GetParty(prm->gameData);
             count = PokeParty_GetPkmCount(party);
             for (i = 0; i < count; i++) {
@@ -458,15 +459,15 @@ static void EventBattleReturn_NaturalCure(PokeParty *party) {
     }
 }
 
-// Changes the form of each Burmy that unkE1 marks for the battle's terrain
+// Changes the form of each Burmy that appeared in the battle for the battle's terrain
 static void EventBattleReturn_BurmyForms(EventBattleReturnParam *prm, PokeParty *party, u32 terrain) {
     int i;
 
-    if (prm->setup->battleType == 2 || prm->setup->battleType == 3) {
+    if (prm->setup->battleType == BTL_TYPE_FACILITY || prm->setup->battleType == BTL_TYPE_COMM) {
         return;
     }
     for (i = 0; i < PokeParty_GetPkmCount(party); i++) {
-        if (prm->setup->unkE1[i]) {
+        if (prm->setup->appeared[i]) {
             burmyTransform(prm->gameData, PokeParty_GetPkm(party, i), terrain);
         }
     }
@@ -481,16 +482,16 @@ static u8 EventBattleReturn_GetBurmyTerrain(BtlFieldSituation *situation, HeapID
     return terrain;
 }
 
-// Registers each Shaymin that unkE1 marks in the Pokédex again, for its form
+// Registers each Shaymin that appeared in the battle in the Pokédex again, for its form
 static void EventBattleReturn_ShayminForms(EventBattleReturnParam *prm, PokeParty *party) {
     int i;
     PartyPkm *pkm;
 
     switch (prm->setup->battleType) {
-    case BATTLE_TYPE_WILD:
-    case BATTLE_TYPE_TRAINER:
+    case BTL_TYPE_WILD:
+    case BTL_TYPE_TRAINER:
         for (i = 0; i < PokeParty_GetPkmCount(party); i++) {
-            if (prm->setup->unkE1[i]) {
+            if (prm->setup->appeared[i]) {
                 pkm = PokeParty_GetPkm(party, i);
                 if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL) == SPECIES_SHAYMIN) {
                     PokeDex_RegistPkm(GameData_GetPokedex(prm->gameData), pkm);

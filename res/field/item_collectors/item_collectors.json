@@ -1,0 +1,605 @@
+{
+    "$schema": "item_collectors.schema.json",
+    "gourmet": [
+        {
+            "item": "ITEM_BALM_MUSHROOM",
+            "price": 25000
+        },
+        {
+            "item": "ITEM_CHERI_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_CHESTO_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_PECHA_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_RAWST_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_ASPEAR_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_LEPPA_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_ORAN_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_PERSIM_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_LUM_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_SITRUS_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_FIGY_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_WIKI_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_MAGO_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_AGUAV_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_IAPAPA_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_RAZZ_BERRY",
+            "price": 500
+        },
+        {
+            "item": "ITEM_BLUK_BERRY",
+            "price": 500
+        },
+        {
+            "item": "ITEM_NANAB_BERRY",
+            "price": 500
+        },
+        {
+            "item": "ITEM_WEPEAR_BERRY",
+            "price": 500
+        },
+        {
+            "item": "ITEM_PINAP_BERRY",
+            "price": 500
+        },
+        {
+            "item": "ITEM_POMEG_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_KELPSY_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_QUALOT_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_HONDEW_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_GREPA_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_TAMATO_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_CORNN_BERRY",
+            "price": 500
+        },
+        {
+            "item": "ITEM_MAGOST_BERRY",
+            "price": 500
+        },
+        {
+            "item": "ITEM_RABUTA_BERRY",
+            "price": 500
+        },
+        {
+            "item": "ITEM_NOMEL_BERRY",
+            "price": 500
+        },
+        {
+            "item": "ITEM_SPELON_BERRY",
+            "price": 500
+        },
+        {
+            "item": "ITEM_PAMTRE_BERRY",
+            "price": 500
+        },
+        {
+            "item": "ITEM_WATMEL_BERRY",
+            "price": 500
+        },
+        {
+            "item": "ITEM_DURIN_BERRY",
+            "price": 500
+        },
+        {
+            "item": "ITEM_BELUE_BERRY",
+            "price": 500
+        },
+        {
+            "item": "ITEM_OCCA_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_PASSHO_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_WACAN_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_RINDO_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_YACHE_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_CHOPLE_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_KEBIA_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_SHUCA_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_COBA_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_PAYAPA_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_TANGA_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_CHARTI_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_KASIB_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_HABAN_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_COLBUR_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_BABIRI_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_CHILAN_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_LIECHI_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_GANLON_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_SALAC_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_PETAYA_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_APICOT_BERRY",
+            "price": 20
+        },
+        {
+            "item": "ITEM_LANSAT_BERRY",
+            "price": 30000
+        },
+        {
+            "item": "ITEM_STARF_BERRY",
+            "price": 30000
+        },
+        {
+            "item": "ITEM_ENIGMA_BERRY",
+            "price": 30000
+        },
+        {
+            "item": "ITEM_MICLE_BERRY",
+            "price": 30000
+        },
+        {
+            "item": "ITEM_CUSTAP_BERRY",
+            "price": 30000
+        },
+        {
+            "item": "ITEM_JABOCA_BERRY",
+            "price": 30000
+        },
+        {
+            "item": "ITEM_ROWAP_BERRY",
+            "price": 30000
+        },
+        {
+            "item": "ITEM_OLD_GATEAU",
+            "price": 4000
+        },
+        {
+            "item": "ITEM_LAVA_COOKIE",
+            "price": 4000
+        },
+        {
+            "item": "ITEM_BERRY_JUICE",
+            "price": 1500
+        },
+        {
+            "item": "ITEM_RAGE_CANDY_BAR",
+            "price": 6000
+        },
+        {
+            "item": "ITEM_HONEY",
+            "price": 500
+        },
+        {
+            "item": "ITEM_RARE_CANDY",
+            "price": 10000
+        },
+        {
+            "item": "ITEM_SHOAL_SALT",
+            "price": 7000
+        },
+        {
+            "item": "ITEM_TINY_MUSHROOM",
+            "price": 500
+        },
+        {
+            "item": "ITEM_BIG_MUSHROOM",
+            "price": 5000
+        },
+        {
+            "item": "ITEM_CASTELIACONE",
+            "price": 2000
+        },
+        {
+            "item": "ITEM_LEFTOVERS",
+            "price": 200
+        },
+        {
+            "item": "ITEM_LUCKY_EGG",
+            "price": 200
+        },
+        {
+            "item": "ITEM_STICK",
+            "price": 200
+        },
+        {
+            "item": "ITEM_SWEET_HEART",
+            "price": 100
+        },
+        {
+            "item": "ITEM_FRESH_WATER",
+            "price": 200
+        },
+        {
+            "item": "ITEM_SODA_POP",
+            "price": 300
+        },
+        {
+            "item": "ITEM_LEMONADE",
+            "price": 350
+        },
+        {
+            "item": "ITEM_MOOMOO_MILK",
+            "price": 500
+        }
+    ],
+    "rare_bones": [
+        {
+            "item": "ITEM_RARE_BONE",
+            "price": 10000
+        }
+    ],
+    "mulch": [
+        {
+            "item": "ITEM_GROWTH_MULCH",
+            "price": 1000
+        },
+        {
+            "item": "ITEM_DAMP_MULCH",
+            "price": 1000
+        },
+        {
+            "item": "ITEM_STABLE_MULCH",
+            "price": 1000
+        },
+        {
+            "item": "ITEM_GOOEY_MULCH",
+            "price": 1000
+        }
+    ],
+    "treasures": [
+        {
+            "item": "ITEM_RELIC_COPPER",
+            "price": 1000
+        },
+        {
+            "item": "ITEM_RELIC_SILVER",
+            "price": 5000
+        },
+        {
+            "item": "ITEM_RELIC_GOLD",
+            "price": 10000
+        },
+        {
+            "item": "ITEM_RELIC_VASE",
+            "price": 50000
+        },
+        {
+            "item": "ITEM_RELIC_BAND",
+            "price": 100000
+        },
+        {
+            "item": "ITEM_RELIC_STATUE",
+            "price": 200000
+        },
+        {
+            "item": "ITEM_RELIC_CROWN",
+            "price": 300000
+        },
+        {
+            "item": "ITEM_RED_FLUTE",
+            "price": 7500
+        },
+        {
+            "item": "ITEM_BLUE_FLUTE",
+            "price": 7000
+        },
+        {
+            "item": "ITEM_YELLOW_FLUTE",
+            "price": 7500
+        },
+        {
+            "item": "ITEM_WHITE_FLUTE",
+            "price": 8000
+        },
+        {
+            "item": "ITEM_BLACK_FLUTE",
+            "price": 8000
+        }
+    ],
+    "minerals": [
+        {
+            "item": "ITEM_BIG_NUGGET",
+            "price": 30000
+        },
+        {
+            "item": "ITEM_PEARL_STRING",
+            "price": 25000
+        },
+        {
+            "item": "ITEM_COMET_SHARD",
+            "price": 60000
+        },
+        {
+            "item": "ITEM_RED_SHARD",
+            "price": 200
+        },
+        {
+            "item": "ITEM_BLUE_SHARD",
+            "price": 200
+        },
+        {
+            "item": "ITEM_YELLOW_SHARD",
+            "price": 200
+        },
+        {
+            "item": "ITEM_GREEN_SHARD",
+            "price": 200
+        },
+        {
+            "item": "ITEM_STARDUST",
+            "price": 2000
+        },
+        {
+            "item": "ITEM_STAR_PIECE",
+            "price": 9800
+        },
+        {
+            "item": "ITEM_NUGGET",
+            "price": 10000
+        },
+        {
+            "item": "ITEM_PEARL",
+            "price": 1400
+        },
+        {
+            "item": "ITEM_BIG_PEARL",
+            "price": 7500
+        },
+        {
+            "item": "ITEM_DUSK_STONE",
+            "price": 3000
+        },
+        {
+            "item": "ITEM_FIRE_STONE",
+            "price": 3000
+        },
+        {
+            "item": "ITEM_OVAL_STONE",
+            "price": 1500
+        },
+        {
+            "item": "ITEM_WATER_STONE",
+            "price": 3000
+        },
+        {
+            "item": "ITEM_DAWN_STONE",
+            "price": 3000
+        },
+        {
+            "item": "ITEM_THUNDERSTONE",
+            "price": 3000
+        },
+        {
+            "item": "ITEM_SHINY_STONE",
+            "price": 3000
+        },
+        {
+            "item": "ITEM_EVERSTONE",
+            "price": 1000
+        },
+        {
+            "item": "ITEM_SUN_STONE",
+            "price": 3000
+        },
+        {
+            "item": "ITEM_MOON_STONE",
+            "price": 3000
+        },
+        {
+            "item": "ITEM_ODD_KEYSTONE",
+            "price": 3000
+        },
+        {
+            "item": "ITEM_SHOAL_SHELL",
+            "price": 7000
+        },
+        {
+            "item": "ITEM_FIRE_GEM",
+            "price": 200
+        },
+        {
+            "item": "ITEM_WATER_GEM",
+            "price": 200
+        },
+        {
+            "item": "ITEM_ELECTRIC_GEM",
+            "price": 200
+        },
+        {
+            "item": "ITEM_GRASS_GEM",
+            "price": 200
+        },
+        {
+            "item": "ITEM_ICE_GEM",
+            "price": 200
+        },
+        {
+            "item": "ITEM_FIGHTING_GEM",
+            "price": 200
+        },
+        {
+            "item": "ITEM_POISON_GEM",
+            "price": 200
+        },
+        {
+            "item": "ITEM_GROUND_GEM",
+            "price": 200
+        },
+        {
+            "item": "ITEM_FLYING_GEM",
+            "price": 200
+        },
+        {
+            "item": "ITEM_PSYCHIC_GEM",
+            "price": 200
+        },
+        {
+            "item": "ITEM_BUG_GEM",
+            "price": 200
+        },
+        {
+            "item": "ITEM_ROCK_GEM",
+            "price": 200
+        },
+        {
+            "item": "ITEM_GHOST_GEM",
+            "price": 200
+        },
+        {
+            "item": "ITEM_DRAGON_GEM",
+            "price": 200
+        },
+        {
+            "item": "ITEM_DARK_GEM",
+            "price": 200
+        },
+        {
+            "item": "ITEM_STEEL_GEM",
+            "price": 200
+        },
+        {
+            "item": "ITEM_NORMAL_GEM",
+            "price": 200
+        },
+        {
+            "item": "ITEM_HARD_STONE",
+            "price": 500
+        },
+        {
+            "item": "ITEM_ICY_ROCK",
+            "price": 1000
+        },
+        {
+            "item": "ITEM_SMOOTH_ROCK",
+            "price": 1000
+        },
+        {
+            "item": "ITEM_HEAT_ROCK",
+            "price": 1000
+        },
+        {
+            "item": "ITEM_DAMP_ROCK",
+            "price": 1000
+        },
+        {
+            "item": "ITEM_FLOAT_STONE",
+            "price": 1000
+        },
+        {
+            "item": "ITEM_LEAF_STONE",
+            "price": 3000
+        }
+    ]
+}

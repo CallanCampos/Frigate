@@ -36,6 +36,35 @@ enum {
     SE_PARAM_PITCH,
 };
 
+// The steps of a BGM change
+enum {
+    BGM_STATE_WAIT_FADE,
+    BGM_STATE_CHANGE,
+};
+
+// The steps of a flash: to the peak and back
+enum {
+    FLASH_STATE_START_IN,
+    FLASH_STATE_WAIT_IN,
+    FLASH_STATE_START_OUT,
+    FLASH_STATE_WAIT_OUT,
+};
+
+// The steps of a message
+enum {
+    MESSAGE_STATE_PRINT,
+    MESSAGE_STATE_WAIT,
+};
+
+// The steps of a picture, after which its task ends
+enum {
+    TELOP_STATE_LOAD,
+    TELOP_STATE_START_FADE_IN,
+    TELOP_STATE_FADE_IN,
+    TELOP_STATE_WAIT,
+    TELOP_STATE_FADE_OUT,
+};
+
 #define SE_PARAM_KEEP (-1)
 #define BGM_CHANNELS_ALL 0xffff
 #define BRIGHTNESS_PLANES_ALL 0x3f
@@ -328,7 +357,7 @@ static void Demo3DCmd_AddBgmChange(Demo3DCmdSys *sys, u32 bgm, s32 fadeOutFrames
     if (fadeOutFrames != 0) {
         GFL_SndBGMFadeOut(fadeOutFrames);
     } else {
-        work->state = 1;
+        work->state = BGM_STATE_CHANGE;
     }
 }
 
@@ -336,13 +365,13 @@ static void Demo3DCmd_BgmChangeTask(TCBEx *task, void *data) {
     Demo3DBgmChange *work = data;
 
     switch (work->state) {
-    case 0:
+    case BGM_STATE_WAIT_FADE:
         if (GFL_SndBGMIsFading()) {
             return;
         }
         work->state++;
         // fallthrough
-    case 1:
+    case BGM_STATE_CHANGE:
         if (work->push) {
             if (!work->sys->bgmPushed) {
                 GFL_SndBGMSetPaused(TRUE);
@@ -461,22 +490,22 @@ static void Demo3DCmd_FlashTask(TCBEx *task, void *data) {
         return;
     }
     switch (work->state) {
-    case 0:
+    case FLASH_STATE_START_IN:
         Demo3DCmd_AddBrightnessFade(sys, work->screens, work->planes, work->start, work->peak, work->inFrames,
                                     &work->fades);
         work->state++;
         break;
-    case 1:
+    case FLASH_STATE_WAIT_IN:
         if (work->fades == 0) {
             work->state++;
         }
         break;
-    case 2:
+    case FLASH_STATE_START_OUT:
         Demo3DCmd_AddBrightnessFade(sys, work->screens, work->planes, work->peak, work->end, work->outFrames,
                                     &work->fades);
         work->state++;
         break;
-    case 3:
+    case FLASH_STATE_WAIT_OUT:
         if (work->fades == 0) {
             GFL_TCBExRequestEnd(task);
         }
@@ -526,7 +555,7 @@ static void Demo3DCmd_MessageTask(TCBEx *task, void *data) {
         return;
     }
     switch (work->state) {
-    case 0: {
+    case MESSAGE_STATE_PRINT: {
         MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, work->textBank, sys->tailHeapId);
         BmpWin *window;
 
@@ -546,7 +575,7 @@ static void Demo3DCmd_MessageTask(TCBEx *task, void *data) {
         work->state++;
         break;
     }
-    case 1:
+    case MESSAGE_STATE_WAIT:
         if (work->counter++ >= work->frames) {
             Demo3DCmd_FreeMessage(work);
             GFL_TCBExRequestEnd(task);
@@ -583,10 +612,11 @@ static void Demo3DCmd_FreeMessage(Demo3DMessage *work) {
     GFL_BGSysSetBGEnabled(1, FALSE);
 }
 
-// Fades a picture of ARCID_DEMO3D_2D in over the 3D and out again: the game version it is for or 0xff for both, its
-// palette, characters and screen, the frames it stays, and the frames it fades in and out in
+// Fades a picture of ARCID_DEMO3D_2D in over the 3D and out again: the game version it is for or
+// DEMO3D_TELOP_ANY_VERSION, its palette, characters and screen, the frames it stays, and the frames it fades in and out
+// in
 static void Demo3DCmd_Telop(Demo3DCmdSys *sys, Demo3DEngine *engine, s32 *params) {
-    if (params[0] == 0xff || params[0] == game_version) {
+    if (params[0] == DEMO3D_TELOP_ANY_VERSION || params[0] == game_version) {
         s32 frames = Demo3DCmd_ConvFrames(sys, params[4]);
         s32 fadeInFrames = Demo3DCmd_ConvFrames(sys, params[5]);
         s32 fadeOutFrames = Demo3DCmd_ConvFrames(sys, params[6]);
@@ -612,12 +642,12 @@ static void Demo3DCmd_TelopTask(TCBEx *task, void *data) {
         return;
     }
     switch (work->state) {
-    case 0:
+    case TELOP_STATE_LOAD:
         GFL_G2DIOLoadArcNCLRDefault(sys->arc, work->paletteFile, 0, 0, 0, sys->tailHeapId);
         GFL_G2DIOLoadNSCRSync(sys->arc, work->screenFile, 1, 0, 0, 0, TRUE, sys->tailHeapId);
         work->state++;
         break;
-    case 1:
+    case TELOP_STATE_START_FADE_IN:
         work->counter = 0;
         work->alpha = 0;
         work->step = FX_Div(FX32_CONST(16), FX32_CONST(work->fadeInFrames));
@@ -627,7 +657,7 @@ static void Demo3DCmd_TelopTask(TCBEx *task, void *data) {
         GFL_BGSysSetBGEnabled(1, TRUE);
         work->state++;
         break;
-    case 2:
+    case TELOP_STATE_FADE_IN:
         if (work->counter++ < work->fadeInFrames) {
             work->alpha += work->step;
             G2_ChangeBlendAlpha(work->alpha >> FX32_SHIFT, 16 - (work->alpha >> FX32_SHIFT));
@@ -637,7 +667,7 @@ static void Demo3DCmd_TelopTask(TCBEx *task, void *data) {
             work->state++;
         }
         break;
-    case 3:
+    case TELOP_STATE_WAIT:
         if (work->counter++ >= work->frames) {
             work->counter = 0;
             work->alpha = 0;
@@ -645,7 +675,7 @@ static void Demo3DCmd_TelopTask(TCBEx *task, void *data) {
             work->state++;
         }
         break;
-    case 4:
+    case TELOP_STATE_FADE_OUT:
         if (work->counter++ < work->fadeOutFrames) {
             work->alpha += work->step;
             G2_ChangeBlendAlpha(16 - (work->alpha >> FX32_SHIFT), work->alpha >> FX32_SHIFT);

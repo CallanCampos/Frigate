@@ -1,0 +1,24 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The stadiums' trainers: res/field/stadium/trainers.json",
+    "description": "ARCID_SCRCMD_STADIUM (a/2/0/6), a StadiumTrainerEntry per trainer (include/field/stadium_script.h), which the stadium's script commands load and set NPCs up from (scrcmd_stadium.c). tools/data/stadium_data.py packs it.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "trainers" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "trainers": {
+            "type": "array", "minItems": 132, "maxItems": 132,
+            "description": "The trainers, always 0x84, as FindStadiumTrainerIndex searches that many and Scrcmd_Stadium_StadiumResetTrainerFlags clears their battle flags; Scrcmd_Stadium_StadiumSetupActorsTriple names them by their place",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "unk00", "unk02", "model", "trainer" ],
+                "properties": {
+                    "unk00": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "The first key that FindStadiumTrainerIndex matches the script's first argument to" },
+                    "unk02": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "The second key, which it matches the script's last argument to" },
+                    "model": { "type": [ "string", "integer" ], "x-constant": "OBJ_CODE_", "minimum": 0, "maximum": 65535, "description": "The NPC's model, an OBJ_CODE_* constant, which only Scrcmd_Stadium_StadiumSetupActorsTriple sets" },
+                    "trainer": { "type": [ "string", "integer" ], "minimum": 0, "maximum": 65535, "description": "The trainer, a constant of generated/trainers.txt, whose battle script the NPC gets (GetNormalSCRIDFromTrainerID, and GetPairMember2SCRIDFromTrainerID for the second of a double)" }
+                }
+            }
+        }
+    }
+}

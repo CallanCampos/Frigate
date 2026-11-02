@@ -7,6 +7,7 @@
 #include "dwc/dwc.h"
 #include "dwc/gdb.h"
 #include "dwc/nd.h"
+#include "dwc/vct_audio.h"
 #include "gfl/dwc_rapcommon.h"
 #include "gfl/dwc_vchat.h"
 #include "gfl/heap.h"
@@ -15,6 +16,7 @@
 #include "gfl/std.h"
 #include "nitro/os.h"
 #include "stdio.h"
+#include "text/system/wifi_error.h"
 
 #define _MATCHSTRINGNUM 0x80
 #define MYDWC_STATUS_DATA_SIZE_MAX 0x20
@@ -147,12 +149,12 @@ static void DWCRap_BuddyCallback(int index, void *param);
 static void DWCRap_ResetIdleFrames(void);
 static void DWCRap_SetRecvTimeouts(void);
 static void DWCRap_OnMatched(int index);
-static void DWCRap_MatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
+static void DWCRap_MatchedCallback(DWCError error, BOOL cancel, BOOL self, BOOL isServer, int index, void *param);
 static int DWCRap_EvalCallback(int index, void *param);
 static void DWCRap_SendCallback(int size, u8 aid, void *param);
 static void DWCRap_SetPeerVctReady(u32 header);
 static void DWCRap_RecvCallback(u8 aid, u8 *data, int size, void *param);
-static void DWCRap_ClosedCallback(DWCError error, BOOL a1, BOOL a2, u8 aid, int index, void *param);
+static void DWCRap_ClosedCallback(DWCError error, BOOL isLocal, BOOL isServer, u8 aid, int index, void *param);
 static u32 DWCRap_HandleError(void);
 static BOOL DWCRap_CanPing(void);
 static BOOL DWCRap_SendIdlePing(int index);
@@ -160,8 +162,9 @@ static u32 DWCRap_Update(void);
 static void DWCRap_VctEndCallback(void);
 static void DWCRap_StartVct(HeapID heapId);
 static void DWCRap_UpdateFriendStatus(void);
-static void DWCRap_AnybodyMatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
-static void DWCRap_FriendMatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
+static void DWCRap_AnybodyMatchedCallback(DWCError error, BOOL cancel, BOOL self, BOOL isServer, int index,
+                                          void *param);
+static void DWCRap_FriendMatchedCallback(DWCError error, BOOL cancel, BOOL self, BOOL isServer, int index, void *param);
 static void DWCRap_ConnectedCallback(int index, void *param);
 static void DWCRap_FreeRecvBuffer(int aid);
 static void DWCRap_AllocRecvBuffer(int aid);
@@ -390,7 +393,7 @@ static void DWCRap_MatchFailed(void) {
     }
 }
 
-int DWCRap_Process(int a0) {
+int DWCRap_Process(int cancelMatch) {
     u32 result;
 
     DWCRap_FlushAck();
@@ -403,7 +406,7 @@ int DWCRap_Process(int a0) {
     case DWCRAP_STATE_FRIENDS:
         return DWCRap_UpdateLogin();
     case DWCRAP_STATE_MATCHING:
-        if (a0 != 0) {
+        if (cancelMatch != 0) {
             DWCRap_SetState(DWCRAP_STATE_MATCH_CANCEL);
         }
         if (_dWork->matchType == DWCRAP_MATCH_FRIEND && _dWork->friendIndex >= 0 &&
@@ -482,7 +485,7 @@ BOOL DWCRap_SendPacket(const void *data, int size, int type) {
 }
 
 static BOOL DWCRap_SendAck(const void *data, int size) {
-    if (DWCRap_SendPacket(data, size, 3)) {
+    if (DWCRap_SendPacket(data, size, DWCRAP_PACKET_ACK)) {
         return TRUE;
     }
     return FALSE;
@@ -492,7 +495,7 @@ BOOL DWCRap_Send(const void *data, int size) {
     if (_dWork->sendReady == 0) {
         return FALSE;
     }
-    if (!DWCRap_SendPacket(data, size, 1)) {
+    if (!DWCRap_SendPacket(data, size, DWCRAP_PACKET_DATA)) {
         return FALSE;
     }
     _dWork->sendReady = 0;
@@ -590,7 +593,7 @@ static void DWCRap_OnMatched(int index) {
     DWCRap_SetRecvTimeouts();
 }
 
-static void DWCRap_MatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param) {
+static void DWCRap_MatchedCallback(DWCError error, BOOL cancel, BOOL self, BOOL isServer, int index, void *param) {
     if (error == 0) {
         if (cancel == 0) {
             DWCRap_OnMatched(index);
@@ -631,11 +634,11 @@ static void DWCRap_RecvCallback(u8 aid, u8 *data, int size, void *param) {
     GFL_ASSERT(aid < 2);
     if (aid < DWCRAP_NETID_MAX) {
         _dWork->connected = 1;
-        if ((u8)header == 1) {
+        if ((u8)header == DWCRAP_PACKET_DATA) {
             DWCRap_SetPeerVctReady(header);
             _dWork->recvSeq = data[2];
             _dWork->ackPending = 1;
-        } else if ((u8)header == 3) {
+        } else if ((u8)header == DWCRAP_PACKET_ACK) {
             _dWork->sendReady = 1;
             return;
         } else {
@@ -657,7 +660,7 @@ static void DWCRap_RecvCallback(u8 aid, u8 *data, int size, void *param) {
 }
 // clang-format on
 
-static void DWCRap_ClosedCallback(DWCError error, BOOL a1, BOOL a2, u8 aid, int index, void *param) {
+static void DWCRap_ClosedCallback(DWCError error, BOOL isLocal, BOOL isServer, u8 aid, int index, void *param) {
     if (aid < DWCRAP_NETID_MAX) {
         _dWork->sending = 0;
         _dWork->retryCount = 0;
@@ -671,7 +674,7 @@ static void DWCRap_ClosedCallback(DWCError error, BOOL a1, BOOL a2, u8 aid, int 
                     DWCRap_ResetVoiceChat();
                 }
             }
-            if (a1 == 0) {
+            if (isLocal == 0) {
                 DWCRap_SetState(DWCRAP_STATE_CLOSED);
             }
         }
@@ -811,7 +814,7 @@ static BOOL DWCRap_CanPing(void) {
 static BOOL DWCRap_SendIdlePing(int index) {
     if (_dWork->sending == 0 && DWCRap_CanPing() && (DWC_GetAIDBitmap() & 0xfffe)) {
         _dWork->sending = 1;
-        _dWork->header.word = 2 | (_dWork->vctReady << 8);
+        _dWork->header.word = DWCRAP_PACKET_PING | (_dWork->vctReady << 8);
         DWC_SendReliableBitmap(DWC_GetAIDBitmap(), &_dWork->header, 4);
         _dWork->idleFrames[index] = 0;
         return TRUE;
@@ -876,7 +879,7 @@ void DWCRap_SetVoiceChatReady(void) {
 }
 
 static void DWCRap_StartVct(HeapID heapId) {
-    int mode;
+    int codec;
 
     _dWork->vctReady = 1;
     _dWork->peerVctReady = 1;
@@ -884,22 +887,22 @@ static void DWCRap_StartVct(HeapID heapId) {
     if (_dWork->vctActive == 0) {
         switch (_dWork->vctMode) {
         case 2:
-            mode = 1;
+            codec = VCT_CODEC_G711_ULAW;
             break;
         case 3:
-            mode = 2;
+            codec = VCT_CODEC_2BIT_ADPCM;
             break;
         case 4:
-            mode = 3;
+            codec = VCT_CODEC_3BIT_ADPCM;
             break;
         case 5:
-            mode = 4;
+            codec = VCT_CODEC_4BIT_ADPCM;
             break;
         default:
-            mode = 4;
+            codec = VCT_CODEC_4BIT_ADPCM;
             break;
         }
-        DWCRapVChat_Start(heapId, mode, 1);
+        DWCRapVChat_Start(heapId, codec, 1);
         DWCRapVChat_SetEndCallback(DWCRap_VctEndCallback);
         _dWork->vctActive = 1;
     }
@@ -944,132 +947,132 @@ int DWCRap_GetErrorKind(int code, int type) {
     int thousands = code / 1000;
 
     if (code == 20101) {
-        return 1;
+        return WifiError_Text_EitherNintendoWiFi;
     }
     if (thousands == 23) {
-        return 1;
+        return WifiError_Text_EitherNintendoWiFi;
     }
     if (code == 20108) {
-        return 2;
+        return WifiError_Text_NintendoWiFiConnection;
     }
     if (code == 20110) {
-        return 3;
+        return WifiError_Text_NintendoWiFiConnection_2;
     }
     if (hundreds == 512) {
-        return 4;
+        return WifiError_Text_AccessPointBusyUnable;
     }
     if (hundreds == 500) {
-        return 5;
+        return WifiError_Text_NoAccessPointRange;
     }
     if (code == 51103) {
-        return 6;
+        return WifiError_Text_NoCompatibleAccessPoint;
     }
     if (hundreds == 510) {
-        return 6;
+        return WifiError_Text_NoCompatibleAccessPoint;
     }
     if (hundreds == 511) {
-        return 6;
+        return WifiError_Text_NoCompatibleAccessPoint;
     }
     if (hundreds == 513) {
-        return 6;
+        return WifiError_Text_NoCompatibleAccessPoint;
     }
     if (code >= 52000 && code <= 52003) {
-        return 8;
+        return WifiError_Text_UnableConnectNintendoWi_3;
     }
     if (code >= 52010 && code <= 52012) {
-        return 8;
+        return WifiError_Text_UnableConnectNintendoWi_3;
     }
     if (code >= 52100 && code <= 52103) {
-        return 8;
+        return WifiError_Text_UnableConnectNintendoWi_3;
     }
     if (code >= 52110 && code <= 52112) {
-        return 8;
+        return WifiError_Text_UnableConnectNintendoWi_3;
     }
     if (code >= 52200 && code <= 52203) {
-        return 8;
+        return WifiError_Text_UnableConnectNintendoWi_3;
     }
     if (code >= 52210 && code <= 52212) {
-        return 8;
+        return WifiError_Text_UnableConnectNintendoWi_3;
     }
     if (code >= 52400 && code <= 52403) {
-        return 8;
+        return WifiError_Text_UnableConnectNintendoWi_3;
     }
     if (code >= 52410 && code <= 52412) {
-        return 8;
+        return WifiError_Text_UnableConnectNintendoWi_3;
     }
     if (code >= 52500 && code <= 52503) {
-        return 8;
+        return WifiError_Text_UnableConnectNintendoWi_3;
     }
     if (code >= 52510 && code <= 52512) {
-        return 8;
+        return WifiError_Text_UnableConnectNintendoWi_3;
     }
     if (code >= 52700 && code <= 52703) {
-        return 8;
+        return WifiError_Text_UnableConnectNintendoWi_3;
     }
     if (code >= 52710 && code <= 52712) {
-        return 8;
+        return WifiError_Text_UnableConnectNintendoWi_3;
     }
     if (code == 80430) {
-        return 9;
+        return WifiError_Text_ThereNoResponseEither;
     }
     if (thousands == 20) {
-        return 0;
+        return WifiError_Text_UnableConnectNintendoWi;
     }
     if (hundreds == 520) {
-        return 0;
+        return WifiError_Text_UnableConnectNintendoWi;
     }
     if (hundreds == 521) {
-        return 0;
+        return WifiError_Text_UnableConnectNintendoWi;
     }
     if (hundreds == 522) {
-        return 0;
+        return WifiError_Text_UnableConnectNintendoWi;
     }
     if (hundreds == 523) {
-        return 0;
+        return WifiError_Text_UnableConnectNintendoWi;
     }
     if (hundreds == 530) {
-        return 0;
+        return WifiError_Text_UnableConnectNintendoWi;
     }
     if (hundreds == 531) {
-        return 0;
+        return WifiError_Text_UnableConnectNintendoWi;
     }
     if (hundreds == 532) {
-        return 0;
+        return WifiError_Text_UnableConnectNintendoWi;
     }
     if (code < 10000) {
-        return 14;
+        return WifiError_Text_CommunicationError;
     }
     if (thousands == 31) {
-        return 12;
+        return WifiError_Text_DownloadFailedHelpVisit;
     }
     switch (type) {
     case DWC_ETYPE_NO_ERROR:
     case DWC_ETYPE_LIGHT:
-        return 14;
+        return WifiError_Text_CommunicationError;
     case DWC_ETYPE_SHOW_ERROR:
     case DWC_ETYPE_SHUTDOWN_FM:
     case DWC_ETYPE_SHUTDOWN_GHTTP:
     case DWC_ETYPE_SHUTDOWN_ND:
     case DWC_ETYPE_DISCONNECT:
-        return 11;
+        return WifiError_Text_CommunicationErrorHelpVisit;
     default:
         GFL_ASSERT(0);
         break;
     case DWC_ETYPE_FATAL:
-        return 15;
+        return WifiError_Text_NintendoWiFiConnection_3;
     }
     return -1;
 }
 // clang-format on
 
-BOOL DWCRap_RequestClose(BOOL a0) {
+BOOL DWCRap_RequestClose(BOOL checkOnly) {
     int code;
     DWCErrorType type;
 
     if (DWC_GetLastErrorEx(&code, &type)) {
         DWC_ClearError();
     }
-    if (a0 == 0) {
+    if (checkOnly == 0) {
         switch (_dWork->state) {
         case DWCRAP_STATE_MATCHING:
         case DWCRAP_STATE_CONNECTED:
@@ -1216,7 +1219,8 @@ int DWCRap_GetFriendIndex(void) {
     return -1;
 }
 
-static void DWCRap_AnybodyMatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param) {
+static void DWCRap_AnybodyMatchedCallback(DWCError error, BOOL cancel, BOOL self, BOOL isServer, int index,
+                                          void *param) {
     BOOL failed = FALSE;
 
     _dWork->matchingBusy = 0;
@@ -1242,14 +1246,15 @@ static void DWCRap_AnybodyMatchedCallback(DWCError error, BOOL cancel, BOOL a2, 
             } else {
                 DWCRap_OnMatched(index);
             }
-        } else if (a2 == 0) {
+        } else if (self == 0) {
             _dWork->lastIndex = index;
             _dWork->lastNetId = -1;
         }
     }
 }
 
-static void DWCRap_FriendMatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param) {
+static void DWCRap_FriendMatchedCallback(DWCError error, BOOL cancel, BOOL self, BOOL isServer, int index,
+                                         void *param) {
     _dWork->matchingBusy = 0;
     if (error == 0 && cancel == 0) {
         DWCRap_OnMatched(index);
@@ -1377,8 +1382,8 @@ BOOL DWCRap_IsEnding(void) {
     return FALSE;
 }
 
-void DWCRap_SetReportError(int a0) {
-    _dWork->reportError = a0;
+void DWCRap_SetReportError(int report) {
+    _dWork->reportError = report;
 }
 
 void DWCRap_SetErrorFunc(DWCRapErrorFunc func, void *work) {

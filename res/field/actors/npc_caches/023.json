@@ -1,0 +1,17 @@
+{
+    "$schema": "../npc_cache.schema.json",
+    "codes": [
+        "OBJ_CODE_PKMN_RANGER_F",
+        "OBJ_CODE_HIKER",
+        "OBJ_CODE_ACE_TRAINER_M",
+        "OBJ_CODE_ACE_TRAINER_F",
+        "OBJ_CODE_BLACK_BELT",
+        "OBJ_CODE_BATTLE_GIRL",
+        "OBJ_CODE_108",
+        "OBJ_CODE_MODEL_3",
+        "OBJ_CODE_POKEMON_AZELF",
+        "OBJ_CODE_110",
+        "OBJ_CODE_PKMN_RANGER_M",
+        "OBJ_CODE_210"
+    ]
+}

@@ -12,9 +12,15 @@ struct PrepareResidentActorsWork {
     GameSystem *gameSystem;
     Field *field;
     GameData *gameData;
-    // Which actors the event let move: 1 the player, 2 the actor with move code 0x30 and 4 a third, always NULL
+    // Which actors the event let move, RESIDENT_ACTOR_* bits
     u8 movingActors;
 };
+
+// The actors that the event lets finish their moves: the player, the one that follows them (move code 0x30) and a
+// third, always NULL
+#define RESIDENT_ACTOR_PLAYER 1
+#define RESIDENT_ACTOR_FOLLOWER 2
+#define RESIDENT_ACTOR_THIRD 4
 #include "system/game_event.h"
 
 struct EventActionCallWork {

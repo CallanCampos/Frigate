@@ -1,0 +1,187 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A field 3D cut-in effect: res/field/cutins/<n>.json",
+    "description": "Effect n of fld3d_ci.c (FLD3DCI_* in field_event.h): file n of ARCID_FLD3D_CI_FILE (a/1/1/8, Fld3DCiFile) and of ARCID_FLD3D_CI_BITMAP (a/2/6/8), which tools/data/field_cutin_data.py packs. Models and animations are files of ARCID_FLD3D_CI_RESOURCES (a/1/1/6), null for none (0xffff).",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "particle",
+        "particle_delays",
+        "models",
+        "actor_delays",
+        "animations1",
+        "animations2",
+        "dim_capture",
+        "key_list",
+        "bitmap_flag",
+        "bitmaps"
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "This schema, for editors"
+        },
+        "particle": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295,
+            "description": "The effect's particle resource (the scene's particle)"
+        },
+        "particle_delays": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 65535,
+                "description": ""
+            },
+            "description": "The frames before each of the two particle emitters starts (particleDelay)"
+        },
+        "models": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+                "type": [ "integer", "null" ],
+                "minimum": 0,
+                "maximum": 65534
+            },
+            "description": "The two actors' models, which also give their textures"
+        },
+        "actor_delays": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 65535,
+                "description": ""
+            },
+            "description": "The frames before each actor starts (actorDelay)"
+        },
+        "animations1": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": {
+                "type": [ "integer", "null" ],
+                "minimum": 0,
+                "maximum": 65534
+            },
+            "description": "The first actor's animations; Fld3DCi_LoadG3DSceneTemplate loads the first three"
+        },
+        "animations2": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": {
+                "type": [ "integer", "null" ],
+                "minimum": 0,
+                "maximum": 65534
+            },
+            "description": "The second actor's animations, the same"
+        },
+        "dim_capture": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535,
+            "description": "Whether the field's captured colors are dimmed as the effect starts (EventFieldEffect_DimCaptureColor)"
+        },
+        "key_list": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535,
+            "description": "The slot of the effect's sound and fade lists in FLD3DCI_SOUND_KEYS and FLD3DCI_FADE_KEYS"
+        },
+        "bitmap_flag": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255,
+            "description": "The bitmap file's second byte, the cut-in's flag (CutinParam's flag); EventFieldEffect_CreateBattleCutin adds the cut-in's callback if it or the count of bitmaps is not 0"
+        },
+        "bitmaps": {
+            "type": "array",
+            "maxItems": 255,
+            "description": "The graphics that EventFld3DCiBitmapConv_Callback converts into the model's textures (Fld3DCiBitmapEntry)",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "texture",
+                    "palette",
+                    "resource",
+                    "char_file",
+                    "palette_file",
+                    "palette_offset",
+                    "width",
+                    "height",
+                    "source_stride",
+                    "source_offset"
+                ],
+                "properties": {
+                    "texture": {
+                        "type": "string",
+                        "pattern": "^[ -~]{0,19}$",
+                        "description": "The model's texture to fill (texName), at most 19 characters; the file pads it with its terminator and spaces"
+                    },
+                    "palette": {
+                        "type": "string",
+                        "pattern": "^[ -~]{0,19}$",
+                        "description": "The model's palette to fill (palName), the same"
+                    },
+                    "resource": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "The scene's resource whose textures it changes"
+                    },
+                    "char_file": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "The file of the graphics (charFile)"
+                    },
+                    "palette_file": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "The file of the palette (palFile)"
+                    },
+                    "palette_offset": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "palOffset"
+                    },
+                    "width": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "The width of the graphics"
+                    },
+                    "height": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "Their height"
+                    },
+                    "source_stride": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "srcStride"
+                    },
+                    "source_offset": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "srcOffset"
+                    }
+                }
+            }
+        }
+    }
+}

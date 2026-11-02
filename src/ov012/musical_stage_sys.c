@@ -14,11 +14,18 @@ typedef struct {
     u32 unk8;
 } MusicalStageWork;
 
+// The proc's steps: overlay 209's stage is made, run until the show has faded out, and freed
+enum {
+    MUSICAL_STAGE_STEP_INIT,
+    MUSICAL_STAGE_STEP_MAIN,
+    MUSICAL_STAGE_STEP_TERM,
+};
+
 static BOOL MusicalStageProc_Init(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL MusicalStageProc_Exit(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL MusicalStageProc_Main(GameProc *proc, u32 *state, void *param, void *work);
 
-GameProcFunctions data_ov012_0216dfe8 = {
+GameProcFunctions MUSICAL_STAGE_PROC_FUNCTIONS = {
     MusicalStageProc_Init,
     MusicalStageProc_Main,
     MusicalStageProc_Exit,
@@ -50,7 +57,7 @@ static BOOL MusicalStageProc_Init(GameProc *proc, u32 *state, void *param, void 
         MusicalStageParam_SetEquip(wk->param, 3, 7, 30, 0, 0);
         MusicalStageParam_SetEquip(wk->param, 3, 8, 30, 0, 1);
         MusicalStageParam_SetEquip(wk->param, 3, 2, 21, 0, 2);
-        wk->param->pokes[1]->owner = 0;
+        wk->param->pokes[1]->owner = MUSICAL_POKE_OWNER_EVENT;
         GFL_HeapCreateChild(HEAPID_USER, HEAPID_TAIL(HEAPID_MUSICAL_EVENT), 0x80000);
         wk->param->ov210 = MusicalSystem_InitProgramData(HEAPID_USER);
         MusicalSystem_LoadProgramData(wk->param->ov210, NULL, NULL, 0, HEAPID_MUSICAL_EVENT);
@@ -73,7 +80,7 @@ static BOOL MusicalStageProc_Exit(GameProc *proc, u32 *state, void *param, void 
         MusicalProgram_Free(wk->param->program);
         MusicalSystem_FreeProgramData(wk->param->ov210);
         GFL_HeapDelete(HEAPID_MUSICAL_EVENT);
-        wk->param->pokes[1]->owner = 2;
+        wk->param->pokes[1]->owner = MUSICAL_POKE_OWNER_STAGE;
         MusicalStageParam_Free(wk->param);
     }
     GFL_ProcReleaseSubsystem(proc);
@@ -86,16 +93,16 @@ static BOOL MusicalStageProc_Main(GameProc *proc, u32 *state, void *param, void 
     MusicalStageWork *wk = work;
 
     switch (*state) {
-    case 0:
+    case MUSICAL_STAGE_STEP_INIT:
         wk->stage = StaActing_Init(wk->param, HEAPID_MUSICAL);
-        *state = 1;
+        *state = MUSICAL_STAGE_STEP_MAIN;
         break;
-    case 1:
+    case MUSICAL_STAGE_STEP_MAIN:
         if (StaActing_Main(wk->stage) == TRUE) {
-            *state = 2;
+            *state = MUSICAL_STAGE_STEP_TERM;
         }
         break;
-    case 2:
+    case MUSICAL_STAGE_STEP_TERM:
         StaActing_Term(wk->stage);
         return TRUE;
     }
@@ -118,7 +125,7 @@ void MusicalStageParam_Free(MusicalStageParam *param) {
     u8 i;
 
     for (i = 0; i < 4; i++) {
-        if (param->pokes[i] != NULL && param->pokes[i]->owner == 2) {
+        if (param->pokes[i] != NULL && param->pokes[i]->owner == MUSICAL_POKE_OWNER_STAGE) {
             GFL_HeapFree(param->pokes[i]);
         }
     }
@@ -127,25 +134,25 @@ void MusicalStageParam_Free(MusicalStageParam *param) {
 
 void MusicalStageParam_SetPlayerPoke(MusicalStageParam *param, u8 pos, MusicalPoke *poke) {
     param->pokes[pos] = poke;
-    param->pokes[pos]->owner = 0;
+    param->pokes[pos]->owner = MUSICAL_POKE_OWNER_EVENT;
 }
 
-void MusicalStageParam_CreateNpcPoke(MusicalStageParam *param, u8 pos, u16 species, u8 form, u32 personality, u16 a5,
-                                     HeapID heapId) {
+void MusicalStageParam_CreateNpcPoke(MusicalStageParam *param, u8 pos, u16 species, u8 form, u32 personality,
+                                     u16 handPropUse, HeapID heapId) {
     param->pokes[pos] = MusicalSystem_InitPoke(species, form, 0, 0, personality, heapId);
-    param->pokes[pos]->owner = 2;
-    param->pokes[pos]->unk78 = a5;
+    param->pokes[pos]->owner = MUSICAL_POKE_OWNER_STAGE;
+    param->pokes[pos]->handPropUse = handPropUse;
 }
 
 void MusicalStageParam_SetCommPoke(MusicalStageParam *param, u8 pos, MusicalPoke *poke) {
     param->pokes[pos] = poke;
-    param->pokes[pos]->owner = 1;
+    param->pokes[pos]->owner = MUSICAL_POKE_OWNER_COMM;
 }
 
-void MusicalStageParam_SetEquip(MusicalStageParam *param, u8 pos, u8 slot, u16 itemId, s16 a4, u8 a5) {
+void MusicalStageParam_SetEquip(MusicalStageParam *param, u8 pos, u8 slot, u16 itemId, s16 rotation, u8 order) {
     MusicalPoke *poke = param->pokes[pos];
 
     poke->equips[slot].itemId = itemId;
-    poke->equips[slot].unk2 = a4;
-    poke->equips[slot].slot = a5;
+    poke->equips[slot].rotation = rotation;
+    poke->equips[slot].slot = order;
 }

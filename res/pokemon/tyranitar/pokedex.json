@@ -1,0 +1,11 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "T",
+    "shapes": [ 9 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_ROUTE_15": [ "shaking_grass" ]
+        }
+    }
+}

@@ -1,0 +1,208 @@
+{
+    "$schema": "habitat.schema.json",
+    "kinds": [ "land", "water", "fishing" ],
+    "by_season": [],
+    "land": "sand",
+    "species": [
+        {
+            "species": {
+                "black2": "SPECIES_FINNEON",
+                "white2": "SPECIES_GOREBYSS"
+            },
+            "present": {
+                "land": [],
+                "water": [],
+                "fishing": [ "spring", "summer", "autumn", "winter" ]
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_ALOMOMOLA",
+                "white2": "SPECIES_FINNEON"
+            },
+            "present": {
+                "black2": {
+                    "land": [],
+                    "water": [ "spring", "summer", "autumn", "winter" ],
+                    "fishing": []
+                },
+                "white2": {
+                    "land": [],
+                    "water": [],
+                    "fishing": [ "spring", "summer", "autumn", "winter" ]
+                }
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_RELICANTH",
+                "white2": "SPECIES_ALOMOMOLA"
+            },
+            "present": {
+                "black2": {
+                    "land": [],
+                    "water": [],
+                    "fishing": [ "spring", "summer", "autumn", "winter" ]
+                },
+                "white2": {
+                    "land": [],
+                    "water": [ "spring", "summer", "autumn", "winter" ],
+                    "fishing": []
+                }
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_LUMINEON",
+                "white2": "SPECIES_MINCCINO"
+            },
+            "present": {
+                "black2": {
+                    "land": [],
+                    "water": [],
+                    "fishing": [ "spring", "summer", "autumn", "winter" ]
+                },
+                "white2": {
+                    "land": [ "spring", "summer", "autumn", "winter" ],
+                    "water": [],
+                    "fishing": []
+                }
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_SANDILE",
+                "white2": "SPECIES_RELICANTH"
+            },
+            "present": {
+                "black2": {
+                    "land": [ "spring", "summer", "autumn", "winter" ],
+                    "water": [],
+                    "fishing": []
+                },
+                "white2": {
+                    "land": [],
+                    "water": [],
+                    "fishing": [ "spring", "summer", "autumn", "winter" ]
+                }
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_TRUBBISH",
+                "white2": "SPECIES_LUMINEON"
+            },
+            "present": {
+                "black2": {
+                    "land": [ "spring", "summer", "autumn", "winter" ],
+                    "water": [],
+                    "fishing": []
+                },
+                "white2": {
+                    "land": [],
+                    "water": [],
+                    "fishing": [ "spring", "summer", "autumn", "winter" ]
+                }
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_QWILFISH",
+                "white2": "SPECIES_SANDILE"
+            },
+            "present": {
+                "black2": {
+                    "land": [],
+                    "water": [],
+                    "fishing": [ "spring", "summer", "autumn", "winter" ]
+                },
+                "white2": {
+                    "land": [ "spring", "summer", "autumn", "winter" ],
+                    "water": [],
+                    "fishing": []
+                }
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_CLAMPERL",
+                "white2": "SPECIES_QWILFISH"
+            },
+            "present": {
+                "land": [],
+                "water": [],
+                "fishing": [ "spring", "summer", "autumn", "winter" ]
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_FRILLISH",
+                "white2": "SPECIES_CLAMPERL"
+            },
+            "present": {
+                "black2": {
+                    "land": [],
+                    "water": [ "spring", "summer", "autumn", "winter" ],
+                    "fishing": []
+                },
+                "white2": {
+                    "land": [],
+                    "water": [],
+                    "fishing": [ "spring", "summer", "autumn", "winter" ]
+                }
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_SCRAGGY",
+                "white2": "SPECIES_FRILLISH"
+            },
+            "present": {
+                "black2": {
+                    "land": [ "spring", "summer", "autumn", "winter" ],
+                    "water": [],
+                    "fishing": []
+                },
+                "white2": {
+                    "land": [],
+                    "water": [ "spring", "summer", "autumn", "winter" ],
+                    "fishing": []
+                }
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_HUNTAIL",
+                "white2": "SPECIES_SCRAGGY"
+            },
+            "present": {
+                "black2": {
+                    "land": [],
+                    "water": [],
+                    "fishing": [ "spring", "summer", "autumn", "winter" ]
+                },
+                "white2": {
+                    "land": [ "spring", "summer", "autumn", "winter" ],
+                    "water": [],
+                    "fishing": []
+                }
+            }
+        },
+        {
+            "species": "SPECIES_DARUMAKA",
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_JELLICENT",
+            "present": {
+                "land": [],
+                "water": [ "spring", "summer", "autumn", "winter" ],
+                "fishing": []
+            }
+        }
+    ]
+}

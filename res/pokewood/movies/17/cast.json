@@ -1,0 +1,88 @@
+{
+    "$schema": "../../cast.schema.json",
+    "player": [
+        {
+            "species": "SPECIES_REUNICLUS",
+            "shown_species": "SPECIES_REUNICLUS",
+            "level": 45,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_MODEST",
+            "ability": 0,
+            "held_item": "ITEM_MAGNET",
+            "moves": [ "MOVE_THUNDER", "MOVE_SKILL_SWAP", "MOVE_TRICK", "MOVE_RAIN_DANCE" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 0,
+                "defense": 31,
+                "speed": 0,
+                "special_attack": 31,
+                "special_defense": 31
+            },
+            "evs": {
+                "hp": 252,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 252,
+                "special_defense": 0
+            }
+        }
+    ],
+    "opponent": [
+        {
+            "species": "SPECIES_POKESTAR_PROP_K1",
+            "shown_species": "SPECIES_POKESTAR_BLACK_BELT",
+            "level": 40,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_ADAMANT",
+            "ability": 0,
+            "held_item": "ITEM_RED_CARD",
+            "moves": [ "MOVE_HAMMER_ARM", "MOVE_JUMP_KICK", "MOVE_MACH_PUNCH", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 0,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 0,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        },
+        {
+            "species": "SPECIES_POKESTAR_PROP_T1",
+            "shown_species": "SPECIES_POKESTAR_TRANSPORT",
+            "level": 50,
+            "form": 0,
+            "sex": "GENDER_UNKNOWN",
+            "nature": "NATURE_RASH",
+            "ability": 0,
+            "held_item": "ITEM_WIDE_LENS",
+            "moves": [ "MOVE_SIGNAL_BEAM", "MOVE_ICICLE_CRASH", "MOVE_OVERHEAT", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 0,
+                "attack": 31,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 0,
+                "attack": 252,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        }
+    ]
+}

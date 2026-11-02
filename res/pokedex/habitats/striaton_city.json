@@ -1,0 +1,55 @@
+{
+    "$schema": "habitat.schema.json",
+    "kinds": [ "water", "fishing" ],
+    "by_season": [],
+    "land": "none",
+    "species": [
+        {
+            "species": "SPECIES_CORPHISH",
+            "present": {
+                "land": [],
+                "water": [ "spring", "summer", "autumn", "winter" ],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_BASCULIN",
+            "present": {
+                "land": [],
+                "water": [ "spring", "summer", "autumn", "winter" ],
+                "fishing": [ "spring", "summer", "autumn", "winter" ]
+            },
+            "forms": {
+                "black2": {},
+                "white2": {
+                    "water": [ 1, 1, 1, 1 ],
+                    "fishing": [ 1, 1, 1, 1 ]
+                }
+            }
+        },
+        {
+            "species": "SPECIES_CRAWDAUNT",
+            "present": {
+                "land": [],
+                "water": [ "spring", "summer", "autumn", "winter" ],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_GOLDEEN",
+            "present": {
+                "land": [],
+                "water": [],
+                "fishing": [ "spring", "summer", "autumn", "winter" ]
+            }
+        },
+        {
+            "species": "SPECIES_SEAKING",
+            "present": {
+                "land": [],
+                "water": [],
+                "fishing": [ "spring", "summer", "autumn", "winter" ]
+            }
+        }
+    ]
+}

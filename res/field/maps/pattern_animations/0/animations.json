@@ -1,0 +1,274 @@
+{
+    "$schema": "../pattern_animation.schema.json",
+    "animations": [
+        {
+            "length": 120,
+            "textures": [
+                {
+                    "name": "sea_simi.1",
+                    "format": "palette16",
+                    "color0_transparent": false
+                },
+                {
+                    "name": "sea_simi.2",
+                    "format": "palette16",
+                    "color0_transparent": false
+                },
+                {
+                    "name": "sea_simi.3",
+                    "format": "palette16",
+                    "color0_transparent": false
+                },
+                {
+                    "name": "sea_simi.4",
+                    "format": "palette16",
+                    "color0_transparent": false
+                }
+            ],
+            "palettes": [
+                [ "sea_simi.1_pl", "sea_simi.2_pl", "sea_simi.3_pl", "sea_simi.4_pl" ]
+            ],
+            "targets": [
+                [
+                    {
+                        "frame": 0,
+                        "texture": "sea_simi.4"
+                    },
+                    {
+                        "frame": 59,
+                        "texture": "sea_simi.1"
+                    },
+                    {
+                        "frame": 94,
+                        "texture": "sea_simi.2"
+                    },
+                    {
+                        "frame": 101,
+                        "texture": "sea_simi.3"
+                    },
+                    {
+                        "frame": 107,
+                        "texture": "sea_simi.4"
+                    }
+                ]
+            ]
+        },
+        {
+            "length": 15,
+            "textures": [
+                {
+                    "name": "kawa_fuchi.1",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "kawa_fuchi.2",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "kawa_fuchi.3",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "kawa_fuchi.4",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "taki_sakai.1",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "taki_sakai.2",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "taki_sakai.3",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "taki_sakai.4",
+                    "format": "palette16",
+                    "color0_transparent": true
+                }
+            ],
+            "palettes": [
+                [ "kawa_fuchi.1_pl", "kawa_fuchi.2_pl", "kawa_fuchi.3_pl", "kawa_fuchi.4_pl" ],
+                [ "taki_sakai.1_pl", "taki_sakai.2_pl", "taki_sakai.3_pl", "taki_sakai.4_pl" ]
+            ],
+            "targets": [
+                [
+                    {
+                        "frame": 0,
+                        "texture": "taki_sakai.1"
+                    },
+                    {
+                        "frame": 3,
+                        "texture": "taki_sakai.2"
+                    },
+                    {
+                        "frame": 7,
+                        "texture": "taki_sakai.3"
+                    },
+                    {
+                        "frame": 11,
+                        "texture": "taki_sakai.4"
+                    }
+                ],
+                [
+                    {
+                        "frame": 0,
+                        "texture": "kawa_fuchi.1"
+                    },
+                    {
+                        "frame": 3,
+                        "texture": "kawa_fuchi.2"
+                    },
+                    {
+                        "frame": 7,
+                        "texture": "kawa_fuchi.3"
+                    },
+                    {
+                        "frame": 11,
+                        "texture": "kawa_fuchi.4"
+                    }
+                ]
+            ]
+        },
+        {
+            "length": 5,
+            "textures": [
+                {
+                    "name": "kawa_nose.1",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "kawa_nose.2",
+                    "format": "palette16",
+                    "color0_transparent": true
+                }
+            ],
+            "palettes": [
+                [ "kawa_nose.1_pl", "kawa_nose.2_pl" ]
+            ],
+            "targets": [
+                [
+                    {
+                        "frame": 0,
+                        "texture": "kawa_nose.1"
+                    },
+                    {
+                        "frame": 1,
+                        "texture": "kawa_nose.2"
+                    },
+                    {
+                        "frame": 3,
+                        "texture": "kawa_nose.1"
+                    }
+                ]
+            ]
+        },
+        {
+            "length": 30,
+            "textures": [
+                {
+                    "name": "hana01.1",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "hana01.2",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "hana01.3",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "hana01.4",
+                    "format": "palette16",
+                    "color0_transparent": true
+                }
+            ],
+            "palettes": [
+                [ "hana01.1_pl", "hana01.2_pl", "hana01.3_pl", "hana01.4_pl" ]
+            ],
+            "targets": [
+                [
+                    {
+                        "frame": 0,
+                        "texture": "hana01.1"
+                    },
+                    {
+                        "frame": 5,
+                        "texture": "hana01.2"
+                    },
+                    {
+                        "frame": 14,
+                        "texture": "hana01.3"
+                    },
+                    {
+                        "frame": 25,
+                        "texture": "hana01.4"
+                    }
+                ]
+            ]
+        },
+        {
+            "length": 12,
+            "textures": [
+                {
+                    "name": "taki_shibu.1",
+                    "format": "palette4",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "taki_shibu.2",
+                    "format": "palette4",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "taki_shibu.3",
+                    "format": "palette4",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "taki_shibu.4",
+                    "format": "palette4",
+                    "color0_transparent": true
+                }
+            ],
+            "palettes": [
+                [ "taki_shibu.1_pl", "taki_shibu.2_pl", "taki_shibu.3_pl", "taki_shibu.4_pl" ]
+            ],
+            "targets": [
+                [
+                    {
+                        "frame": 0,
+                        "texture": "taki_shibu.1"
+                    },
+                    {
+                        "frame": 3,
+                        "texture": "taki_shibu.2"
+                    },
+                    {
+                        "frame": 6,
+                        "texture": "taki_shibu.3"
+                    },
+                    {
+                        "frame": 9,
+                        "texture": "taki_shibu.4"
+                    }
+                ]
+            ]
+        }
+    ]
+}

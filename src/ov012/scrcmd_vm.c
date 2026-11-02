@@ -6,6 +6,7 @@
 // can't be script_plugin.c's, which starts with 2-byte tables, and EVCMD_MAX counts EVCMD_TABLE
 
 #include "types.h"
+#include "constants/field_script.h"
 #include "field/entree_scripts.h"
 #include "field/event_phrase_input.h"
 #include "field/event_sound.h"
@@ -463,9 +464,9 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     NULL,                                               // 0x16d
     Scrcmd_Proc_CallMonolith,                           // 0x16e
     NULL,                                               // 0x16f
-    func_ov033_021772f4,                                // 0x170
+    Scrcmd_Funfest_HasPassPower,                        // 0x170
     NULL,                                               // 0x171
-    func_ov033_021772c8,                                // 0x172
+    Scrcmd_Funfest_IsFestMissionAvailable,              // 0x172
     NULL,                                               // 0x173
     Scrcmd_Encount_CallWildBattle,                      // 0x174
     Scrcmd_Encount_CallWildBattleEnd,                   // 0x175
@@ -474,7 +475,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     Scrcmd_GameState_WildBattleGetResult,               // 0x178
     Scrcmd_Encount_CallCaptureDemo,                     // 0x179
     Scrcmd_FieldGimmickGate_GimmickGateViewBoard,       // 0x17a
-    func_ov012_02157bdc,                                // 0x17b
+    Scrcmd_Proc_GimmickSetNimbasaFlags,                 // 0x17b
     Scrcmd_Gym_RollerCoasterCallSwitch,                 // 0x17c
     Scrcmd_Gym_RollerCoasterSetCarIntroSeen,            // 0x17d
     NULL,                                               // 0x17e
@@ -570,7 +571,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     Scrcmd_GameState_ObjInitWarpGPos,                   // 0x1d8
     Scrcmd_GameState_ObjInitNPCGPos,                    // 0x1d9
     Scrcmd_PhraseSelect_CallPhraseSelect,               // 0x1da
-    func_ov033_02177d78,                                // 0x1db
+    Scrcmd_PdwPostman_MysteryGifts,                     // 0x1db
     Scrcmd_Musical_DreamWorldItems,                     // 0x1dc
     Scrcmd_FldeffCut_BroadcastGameBeacon,               // 0x1dd
     Scrcmd_FldeffCut_PassPowerPopDepletedID,            // 0x1de
@@ -631,15 +632,15 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     Scrcmd_SpPokeGimmick_SetSpecialTransferUsed,        // 0x215
     Scrcmd_PokeDisp_IsOneShotDRObtained,                // 0x216
     Scrcmd_EntreeForest_MapChangeEntreeForest,          // 0x217
-    func_ov012_02164c68,                                // 0x218
-    func_ov012_02164bcc,                                // 0x219
+    Scrcmd_EntreeForest_EntreeForestGetInfo,            // 0x218
+    Scrcmd_EntreeForest_EntreeForestToggleKeepPkm,      // 0x219
     Scrcmd_EntreeForest_WordSetLoadEntreeForestPkmName, // 0x21a
     Scrcmd_EntreeForest_EntreeForestSpawnAllPkm,        // 0x21b
     Scrcmd_EntreeForest_EntreeForestStartBattle,        // 0x21c
     Scrcmd_EntreeForest_EntreeForestRemovePkm,          // 0x21d
     Scrcmd_Encount_FishingChallengeGetRandomPkm,        // 0x21e
-    func_ov012_02156104,                                // 0x21f
-    func_ov012_02156128,                                // 0x220
+    Scrcmd_GameState_SeasonTrainerGetObjCode,           // 0x21f
+    Scrcmd_GameState_SeasonTrainerGetTrainerID,         // 0x220
     Scrcmd_Misc_AnvilleTrainGetModelID,                 // 0x221
     Scrcmd_Misc_AnvilleTrainGetDailyIndex,              // 0x222
     Scrcmd_PokemonMisc_PokePartyGetHiddenPowerType,     // 0x223
@@ -666,7 +667,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     Scrcmd_Sound_BGMChangeMapEx,                        // 0x238
     Scrcmd_FieldActor_CheckPlayerFormModel,             // 0x239
     Scrcmd_Sound_PokeVoicePlay,                         // 0x23a
-    func_ov012_02169c1c,                                // 0x23b
+    Scrcmd_SpPoke_NuvemaGimmickSetVisible,              // 0x23b
     Scrcmd_SpPoke_NuvemaGimmickPlay,                    // 0x23c
     Scrcmd_SpPoke_NuvemaGimmickWaitAnim,                // 0x23d
     Scrcmd_DayCare_DayCareGetSexForNamePrint,           // 0x23e
@@ -697,7 +698,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     NULL,                                               // 0x257
     NULL,                                               // 0x258
     NULL,                                               // 0x259
-    func_ov012_02157b7c,                                // 0x25a
+    Scrcmd_Proc_GimmickSetNimbasaGym,                   // 0x25a
     Scrcmd_Gym_GymElecReapplyProgress,                  // 0x25b
     Scrcmd_Gym_GymElecSetFollower,                      // 0x25c
     Scrcmd_Gym_GymElecSetProgress,                      // 0x25d
@@ -710,7 +711,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     func_ov012_0216a748,                                // 0x264
     Scrcmd_ProcFld_CallXTransceiverSecret,              // 0x265
     Scrcmd_HollowRival_HollowRivalGetCounter,           // 0x266
-    func_ov012_0216a7cc,                                // 0x267
+    Scrcmd_HollowRival_HollowRivalSetMet,               // 0x267
     Scrcmd_Gym_GymInsectPlayObject,                     // 0x268
     Scrcmd_Gym_GymInsectShowEffect,                     // 0x269
     NULL,                                               // 0x26a
@@ -771,7 +772,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     Scrcmd_Medal_MedalGetMostCompleteCategory,          // 0x2a1
     Scrcmd_Gym_HumilauGymPlayLeaderSplash,              // 0x2a2
     Scrcmd_Gym_HumilauGymPlayLeaderWaves,               // 0x2a3
-    func_ov012_02157bb4,                                // 0x2a4
+    Scrcmd_Proc_GimmickResetOpelucid,                   // 0x2a4
     Scrcmd_Gym_OpelucidGymCallMove,                     // 0x2a5
     Scrcmd_Gym_OpelucidGymRefreshVars,                  // 0x2a6
     Scrcmd_Gym_OpelucidGymCallButton,                   // 0x2a7
@@ -802,7 +803,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     Scrcmd_PokemonMisc_FieldTradeGetSpecies,            // 0x2c0
     NULL,                                               // 0x2c1
     Scrcmd_Encount_RepelRearm,                          // 0x2c2
-    func_ov012_0216a7f4,                                // 0x2c3
+    Scrcmd_HollowRival_HollowRivalSetSpecies,           // 0x2c3
     Scrcmd_HiddenHollow_HiddenHollowSetPeriod,          // 0x2c4
     Scrcmd_PokeDisp_JoinAvenueRecordActivity,           // 0x2c5
     Scrcmd_JoinAvenueStore_JoinAvenueStoreStart,        // 0x2c6
@@ -1037,28 +1038,28 @@ BOOL Scrcmd_Vm_VMStackCmp(VM *vm, FieldScriptEnv *env) {
     BOOL result;
 
     switch (comparison) {
-    case 0:
+    case CMP_LT:
         result = left < right;
         break;
-    case 1:
+    case CMP_EQ:
         result = left == right;
         break;
-    case 2:
+    case CMP_GT:
         result = left > right;
         break;
-    case 3:
+    case CMP_LE:
         result = left <= right;
         break;
-    case 4:
+    case CMP_GE:
         result = left >= right;
         break;
-    case 5:
+    case CMP_NE:
         result = left != right;
         break;
-    case 6:
+    case CMP_OR:
         result = left == 1 || right == 1;
         break;
-    case 7:
+    case CMP_AND:
         result = left == 1 && right == 1;
         break;
     default:
@@ -1137,7 +1138,7 @@ BOOL Scrcmd_Vm_VMJumpIf(VM *vm, FieldScriptEnv *env) {
     u8 condition = VM_Read8(vm);
     s32 offset = VM_Read32(vm);
 
-    if (condition == 0xff) {
+    if (condition == CMP_STACK) {
         if (VM_StackPop(vm) != 1) {
             VM_Jump(vm, vm->pc + offset);
         }

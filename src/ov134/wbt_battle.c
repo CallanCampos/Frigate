@@ -412,14 +412,14 @@ static void WbtBattle_SetBattleTrainer(BtlSetupTrainer *trainer, const WbtEntran
     trainer->trainerClass = entrant->unk6_0;
     WbtEntrant_GetName(entrant, trainer->name);
     MI_CpuClear16(trainer->items, sizeof(trainer->items));
-    PMSData_Clear(&trainer->unk18);
-    PMSData_Clear(&trainer->unk20);
+    PMSData_Clear(&trainer->winWords);
+    PMSData_Clear(&trainer->loseWords);
 }
 
 // The two lines that the opponent says in the battle
 static inline void BtlSetup_SetLines(BtlSetup *setup, StrBuf *line1, StrBuf *line2) {
-    setup->unk68 = line1;
-    setup->unk6C = line2;
+    setup->trainerLoseMsg = line1;
+    setup->trainerWinMsg = line2;
 }
 
 // The battle of the current round
@@ -440,7 +440,7 @@ BtlSetup *WbtBattle_SetupBattle(WbtSystem *sys, GameSystem *gsys) {
     WbtBattle_LoadOpponentLine(sys, 3, sys->unk13D4);
     WbtBattle_LoadOpponentLine(sys, 4, sys->unk13D8);
     BtlSetup_SetLines(setup, sys->unk13D4, sys->unk13D8);
-    WbtBattle_GetBattleMusic(sys, &setup->fieldSituation.bgm, &setup->fieldSituation.unk12);
+    WbtBattle_GetBattleMusic(sys, &setup->fieldSituation.bgm, &setup->fieldSituation.winBgm);
     if (WbtSystem_GetTournament(sys) == 3 && sys->download.tournament.unkA8 == 1) {
         setup->fieldSituation.env.bgType = 0x12;
         setup->fieldSituation.env.terrain = 0xe;

@@ -1,0 +1,24 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The zones' Flash flags: res/field/flash/flash.json",
+    "description": "The one file of ARCID_MAPEFF_SKILL_TBL (a/1/4/9): the zones that GetZoneFlashFlags in zonedata.c finds a zone's Flash flags in, the first entry of the zone's; a zone that isn't listed has neither flag. GameData_UpdateFlashStatus gives the zone's flags to the field (FieldStatus_SetFlashPerms), and a zone with neither makes the game forget that Flash was used (ZoneChange_OnMapChange). tools/data/flash_data.py packs it.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "zones" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "zones": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "zone", "allow", "active" ],
+                "properties": {
+                    "zone": { "type": [ "string", "integer" ], "x-constant": "ZONE_", "minimum": 0, "maximum": 65535, "description": "The zone, by its ZONE_* constant" },
+                    "allow": { "type": "boolean", "description": "Whether Flash can be used in the zone (FLD_FLASH_ALLOW in include/field/field_status.h), which becomes active once it has been" },
+                    "active": { "type": "boolean", "description": "Whether the zone is lit as if Flash had been used (FLD_FLASH_ACTIVE)" }
+                }
+            }
+        }
+    }
+}

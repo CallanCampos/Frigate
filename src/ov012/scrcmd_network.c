@@ -73,13 +73,13 @@ BOOL Scrcmd_Network_GameCommPause(VM *vm, FieldScriptEnv *env) {
     gsys = FieldScriptEnv_GetGameSystem(env);
     commSys = GSYS_GetGameCommSystem(gsys);
     switch (GameCommSys_BootCheck(commSys)) {
-    case 0:
-    case 3:
-    case 4:
+    case GAME_COMM_NO_NULL:
+    case GAME_COMM_NO_UNION:
+    case GAME_COMM_NO_MUSICAL:
         break;
-    case 1:
-    case 2:
-    case 5:
+    case GAME_COMM_NO_BEACON_SEARCH:
+    case GAME_COMM_NO_INTRUDE:
+    case GAME_COMM_NO_UNK5:
         GameCommSys_ExitReq(commSys);
         break;
     }

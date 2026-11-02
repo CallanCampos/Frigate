@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -29,9 +30,6 @@
 #define GIMMICK_STATE_ID 6
 
 #define ZONE_488 488
-
-// The archive of the rides' curves and the gym's models
-#define ARC_GYM_INSECT 135
 
 #define FLAG_OBJECT_0 0x109
 
@@ -139,8 +137,8 @@ static const u8 sObjectPositions[OBJECT_COUNT][3] = { { 8, 0, 4 }, { 25, 20, 15 
 static const G3DSceneAnimationSetup sObjectAnimations[] = { { 1, 0 }, { 2, 0 }, { 3, 0 } };
 
 static const G3DSceneResourceSetup sResources[] = {
-    { ARC_GYM_INSECT, 8, 0 },  { ARC_GYM_INSECT, 9, 0 },  { ARC_GYM_INSECT, 10, 0 }, { ARC_GYM_INSECT, 11, 0 },
-    { ARC_GYM_INSECT, 12, 0 }, { ARC_GYM_INSECT, 13, 0 }, { ARC_GYM_INSECT, 14, 0 },
+    { ARCID_GYM_INSECT, 8, 0 },  { ARCID_GYM_INSECT, 9, 0 },  { ARCID_GYM_INSECT, 10, 0 }, { ARCID_GYM_INSECT, 11, 0 },
+    { ARCID_GYM_INSECT, 12, 0 }, { ARCID_GYM_INSECT, 13, 0 }, { ARCID_GYM_INSECT, 14, 0 },
 };
 
 static const G3DSceneActorSetup sActors[] = {
@@ -316,25 +314,34 @@ static GameEvent *GymInsect_CreateRideEvent(GymInsectWork *wk, u8 index) {
     return event;
 }
 
+enum {
+    RIDE_STEP_WAIT_PLAYER,
+    RIDE_STEP_START,
+    RIDE_STEP_RIDING,
+    RIDE_STEP_WAIT_FADE_OUT,
+    RIDE_STEP_ZOOM_OUT,
+    RIDE_STEP_WAIT_ZOOM,
+};
+
 static GameEventReturnCode GymInsect_RideEvent(GameEvent *event, u32 *state, void *data) {
     RideWork *ride = data;
     GymInsectWork *wk = ride->gym;
     ScriptWork *script;
 
     switch (*state) {
-    case 0:
+    case RIDE_STEP_WAIT_PLAYER:
         if (IsAllActorAcmdFinished(wk->playerActor)) {
             DisableAllActorsMovement(wk->mmSys);
             EventScriptCall_Start(event, 1, NULL, 0, wk->tailHeapId);
             (*state)++;
         }
         break;
-    case 1:
+    case RIDE_STEP_START:
         FieldCameraZoomTCB_CreateLinear(wk->field, 20, FX32_CONST(200));
         GymInsect_StartRide(wk, ride);
         (*state)++;
         break;
-    case 2:
+    case RIDE_STEP_RIDING:
         if (ride->entry->script != 0 && ride->frame == 20) {
             FieldFadeTCB_Start(wk->gsys, wk->field, FIELD_FADE_TYPE_OUT, 0, 0);
         }
@@ -343,7 +350,7 @@ static GameEventReturnCode GymInsect_RideEvent(GameEvent *event, u32 *state, voi
             (*state)++;
         }
         break;
-    case 3:
+    case RIDE_STEP_WAIT_FADE_OUT:
         if (ride->entry->script != 0) {
             if (Field_GetFadeFlag(wk->field)) {
                 break;
@@ -355,12 +362,12 @@ static GameEventReturnCode GymInsect_RideEvent(GameEvent *event, u32 *state, voi
         script = EventScriptCall_Start(event, ride->entry->script + 2, NULL, 0, wk->tailHeapId);
         ScriptWork_SetParams(script, ride->index, ride->entry->scriptParam, 0, 0);
         break;
-    case 4:
+    case RIDE_STEP_ZOOM_OUT:
         FieldCameraZoomTCB_Create(wk->field, 10, -FX32_CONST(200));
         ride->wait = 10;
         (*state)++;
         break;
-    case 5:
+    case RIDE_STEP_WAIT_ZOOM:
         if (--ride->wait == 0) {
             (*state)++;
         }
@@ -372,19 +379,26 @@ static GameEventReturnCode GymInsect_RideEvent(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
+enum {
+    ZONE488_STEP_WAIT_PLAYER,
+    ZONE488_STEP_START,
+    ZONE488_STEP_RIDING,
+    ZONE488_STEP_WAIT_FADE_IN,
+};
+
 static GameEventReturnCode GymInsect_RideEventZone488(GameEvent *event, u32 *state, void *data) {
     RideWork *ride = data;
     GymInsectWork *wk = ride->gym;
 
     switch (*state) {
-    case 0:
+    case ZONE488_STEP_WAIT_PLAYER:
         if (IsAllActorAcmdFinished(wk->playerActor)) {
             DisableAllActorsMovement(wk->mmSys);
             EventScriptCall_Start(event, ride->entry->script + 1, NULL, 0, wk->tailHeapId);
             (*state)++;
         }
         break;
-    case 1:
+    case ZONE488_STEP_START:
         SetActorHidden(wk->playerActor, TRUE);
         GymInsect_StartRide(wk, ride);
         FieldCamera_DisableDelay(wk->camera);
@@ -393,14 +407,14 @@ static GameEventReturnCode GymInsect_RideEventZone488(GameEvent *event, u32 *sta
         FieldFadeTCB_Start(wk->gsys, wk->field, FIELD_FADE_TYPE_IN_QUICK, 0, 0);
         (*state)++;
         break;
-    case 2:
+    case ZONE488_STEP_RIDING:
         if (GymInsect_StepRide(wk, ride)) {
             GymInsect_EndRide(wk, ride);
             FldAct_SetShadowGroup(FieldPlayer_GetActor(wk->player), 1);
             (*state)++;
         }
         break;
-    case 3:
+    case ZONE488_STEP_WAIT_FADE_IN:
         if (Field_GetFadeFlag(wk->field) == FALSE) {
             EventScriptCall_Start(event, ride->entry->script + 4, NULL, 0, wk->tailHeapId);
             (*state)++;
@@ -432,7 +446,7 @@ static s16 GymInsect_GetRideSpeedParam(RideWork *ride) {
 }
 
 static void GymInsect_StartRide(GymInsectWork *wk, RideWork *ride) {
-    ride->curve = GFL_G3DCurveLoadFileAll(wk->tailHeapId, ARC_GYM_INSECT, ride->entry->curveFile);
+    ride->curve = GFL_G3DCurveLoadFileAll(wk->tailHeapId, ARCID_GYM_INSECT, ride->entry->curveFile);
     ride->frameCount = GFL_G3DCurveGetFrameCount(ride->curve);
     if (ride->entry->reverse) {
         ride->step = -1;

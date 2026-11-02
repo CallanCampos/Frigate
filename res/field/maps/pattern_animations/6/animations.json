@@ -1,0 +1,71 @@
+{
+    "$schema": "../pattern_animation.schema.json",
+    "animations": [
+        {
+            "length": 9,
+            "textures": [
+                {
+                    "name": "denki.1",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "denki.2",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "denki.3",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "denki.4",
+                    "format": "palette16",
+                    "color0_transparent": true
+                }
+            ],
+            "palettes": [
+                [ "denki.1_pl", "denki.2_pl", "denki.3_pl", "denki.4_pl" ]
+            ],
+            "targets": [
+                [
+                    {
+                        "frame": 0,
+                        "texture": "denki.1"
+                    },
+                    {
+                        "frame": 2,
+                        "texture": "denki.2"
+                    },
+                    {
+                        "frame": 5,
+                        "texture": "denki.3"
+                    },
+                    {
+                        "frame": 7,
+                        "texture": "denki.4"
+                    }
+                ],
+                [
+                    {
+                        "frame": 0,
+                        "texture": "denki.2"
+                    },
+                    {
+                        "frame": 2,
+                        "texture": "denki.3"
+                    },
+                    {
+                        "frame": 5,
+                        "texture": "denki.4"
+                    },
+                    {
+                        "frame": 7,
+                        "texture": "denki.1"
+                    }
+                ]
+            ]
+        }
+    ]
+}

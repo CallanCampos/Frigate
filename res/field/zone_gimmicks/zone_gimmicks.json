@@ -1,0 +1,405 @@
+{
+    "$schema": "zone_gimmicks.schema.json",
+    "zones": [
+        {
+            "zone": "ZONE_SKYARROW_BRIDGE",
+            "gimmick": 1
+        },
+        {
+            "zone": "ZONE_NIMBASA_CITY_GYM",
+            "gimmick": 2
+        },
+        {
+            "zone": "ZONE_NACRENE_CITY_3",
+            "gimmick": 3
+        },
+        {
+            "zone": "ZONE_STRIATON_CITY_2",
+            "gimmick": 4
+        },
+        {
+            "zone": "ZONE_MISTRALTON_CITY_GYM",
+            "gimmick": 5
+        },
+        {
+            "zone": "ZONE_CASTELIA_CITY_GYM",
+            "gimmick": 6
+        },
+        {
+            "zone": "ZONE_CASTELIA_CITY_GYM_2",
+            "gimmick": 6
+        },
+        {
+            "zone": "ZONE_DRIFTVEIL_CITY_GYM",
+            "gimmick": 7
+        },
+        {
+            "zone": "ZONE_DRIFTVEIL_CITY_GYM_2",
+            "gimmick": 8
+        },
+        {
+            "zone": "ZONE_ICIRRUS_CITY_2",
+            "gimmick": 9
+        },
+        {
+            "zone": "ZONE_OPELUCID_CITY_GYM",
+            "gimmick": 10
+        },
+        {
+            "zone": "ZONE_TUBELINE_BRIDGE",
+            "gimmick": 11
+        },
+        {
+            "zone": "ZONE_UNDELLA_GATE",
+            "gimmick": 12
+        },
+        {
+            "zone": "ZONE_ACCUMULA_GATE",
+            "gimmick": 12
+        },
+        {
+            "zone": "ZONE_NIMBASA_GATE_GATE",
+            "gimmick": 12
+        },
+        {
+            "zone": "ZONE_NIMBASA_GATE_GATE_2",
+            "gimmick": 12
+        },
+        {
+            "zone": "ZONE_NACRENE_GATE",
+            "gimmick": 12
+        },
+        {
+            "zone": "ZONE_BLACK_GATE",
+            "gimmick": 12
+        },
+        {
+            "zone": "ZONE_OPELUCID_GATE",
+            "gimmick": 12
+        },
+        {
+            "zone": "ZONE_OPELUCID_GATE_GATE_2",
+            "gimmick": 12
+        },
+        {
+            "zone": "ZONE_BRIDGE_GATE_2",
+            "gimmick": 12
+        },
+        {
+            "zone": "ZONE_BRIDGE_GATE_GATE",
+            "gimmick": 12
+        },
+        {
+            "zone": "ZONE_CASTELIA_GATE",
+            "gimmick": 12
+        },
+        {
+            "zone": "ZONE_CHARGESTONE_CAVE_2",
+            "gimmick": 13
+        },
+        {
+            "zone": "ZONE_CHARGESTONE_CAVE_3",
+            "gimmick": 13
+        },
+        {
+            "zone": "ZONE_CHARGESTONE_CAVE_4",
+            "gimmick": 13
+        },
+        {
+            "zone": "ZONE_POKEMON_LEAGUE_2",
+            "gimmick": 14
+        },
+        {
+            "zone": "ZONE_POKEMON_LEAGUE_3",
+            "gimmick": 15
+        },
+        {
+            "zone": "ZONE_ROUTE_GATE",
+            "gimmick": 12
+        },
+        {
+            "zone": "ZONE_GEAR_STATION_2",
+            "gimmick": 16
+        },
+        {
+            "zone": "ZONE_GEAR_STATION_3",
+            "gimmick": 17
+        },
+        {
+            "zone": "ZONE_GEAR_STATION_4",
+            "gimmick": 18
+        },
+        {
+            "zone": "ZONE_GEAR_STATION_5",
+            "gimmick": 19
+        },
+        {
+            "zone": "ZONE_GEAR_STATION_6",
+            "gimmick": 20
+        },
+        {
+            "zone": "ZONE_GEAR_STATION_7",
+            "gimmick": 21
+        },
+        {
+            "zone": "ZONE_GEAR_STATION_8",
+            "gimmick": 22
+        },
+        {
+            "zone": "ZONE_BATTLE_SUBWAY",
+            "gimmick": 23
+        },
+        {
+            "zone": "ZONE_BATTLE_SUBWAY_2",
+            "gimmick": 24
+        },
+        {
+            "zone": "ZONE_ROUTE_GATE_GATE",
+            "gimmick": 12
+        },
+        {
+            "zone": "ZONE_BLACK_GATE_GATE",
+            "gimmick": 12
+        },
+        {
+            "zone": "ZONE_BRIDGE_GATE_GATE_4",
+            "gimmick": 12
+        },
+        {
+            "zone": "ZONE_BRIDGE_GATE_GATE_5",
+            "gimmick": 12
+        },
+        {
+            "zone": "ZONE_ROUTE_4",
+            "gimmick": 25
+        },
+        {
+            "zone": "ZONE_ROUTE_4_16",
+            "gimmick": 25
+        },
+        {
+            "zone": "ZONE_DESERT_RESORT",
+            "gimmick": 25
+        },
+        {
+            "zone": "ZONE_MOOR_OF_ICIRRUS",
+            "gimmick": 26
+        },
+        {
+            "zone": "ZONE_CASTELIA_CITY_18",
+            "gimmick": 27
+        },
+        {
+            "zone": "ZONE_CASTELIA_CITY_22",
+            "gimmick": 28
+        },
+        {
+            "zone": "ZONE_ENTRALINK",
+            "gimmick": 29
+        },
+        {
+            "zone": "ZONE_GEAR_STATION_9",
+            "gimmick": 31
+        },
+        {
+            "zone": "ZONE_NUVEMA_TOWN",
+            "gimmick": 32
+        },
+        {
+            "zone": "ZONE_ACCUMULA_TOWN",
+            "gimmick": 32
+        },
+        {
+            "zone": "ZONE_ROUTE_1",
+            "gimmick": 32
+        },
+        {
+            "zone": "ZONE_JOIN_AVENUE",
+            "gimmick": 33
+        },
+        {
+            "zone": "ZONE_JOIN_AVENUE_2",
+            "gimmick": 34
+        },
+        {
+            "zone": "ZONE_WHITE_TREEHOLLOW",
+            "gimmick": 35
+        },
+        {
+            "zone": "ZONE_BLACK_TOWER",
+            "gimmick": 35
+        },
+        {
+            "zone": "ZONE_WHITE_TREEHOLLOW_2",
+            "gimmick": 35
+        },
+        {
+            "zone": "ZONE_BLACK_TOWER_2",
+            "gimmick": 35
+        },
+        {
+            "zone": "ZONE_WHITE_TREEHOLLOW_3",
+            "gimmick": 35
+        },
+        {
+            "zone": "ZONE_BLACK_TOWER_3",
+            "gimmick": 35
+        },
+        {
+            "zone": "ZONE_BLACK_TOWER_4",
+            "gimmick": 35
+        },
+        {
+            "zone": "ZONE_WHITE_TREEHOLLOW_4",
+            "gimmick": 35
+        },
+        {
+            "zone": "ZONE_BLACK_TOWER_5",
+            "gimmick": 35
+        },
+        {
+            "zone": "ZONE_WHITE_TREEHOLLOW_5",
+            "gimmick": 35
+        },
+        {
+            "zone": "ZONE_WHITE_TREEHOLLOW_6",
+            "gimmick": 35
+        },
+        {
+            "zone": "ZONE_BLACK_TOWER_6",
+            "gimmick": 35
+        },
+        {
+            "zone": "ZONE_PWT_3",
+            "gimmick": 36
+        },
+        {
+            "zone": "ZONE_VIRBANK_CITY_GYM",
+            "gimmick": 37
+        },
+        {
+            "zone": "ZONE_VIRBANK_CITY_GYM_2",
+            "gimmick": 37
+        },
+        {
+            "zone": "ZONE_ASPERTIA_GATE",
+            "gimmick": 12
+        },
+        {
+            "zone": "ZONE_VIRBANK_GATE",
+            "gimmick": 12
+        },
+        {
+            "zone": "ZONE_HUMILAU_CITY_GYM",
+            "gimmick": 38
+        },
+        {
+            "zone": "ZONE_POKEMON_LEAGUE_5",
+            "gimmick": 39
+        },
+        {
+            "zone": "ZONE_POKEMON_LEAGUE_6",
+            "gimmick": 40
+        },
+        {
+            "zone": "ZONE_POKEMON_LEAGUE_7",
+            "gimmick": 41
+        },
+        {
+            "zone": "ZONE_POKEMON_LEAGUE_8",
+            "gimmick": 42
+        },
+        {
+            "zone": "ZONE_PLASMA_FRIGATE_10",
+            "gimmick": 43
+        },
+        {
+            "zone": "ZONE_PLASMA_FRIGATE_13",
+            "gimmick": 43
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD",
+            "gimmick": 44
+        },
+        {
+            "zone": "ZONE_PLASMA_FRIGATE",
+            "gimmick": 45
+        },
+        {
+            "zone": "ZONE_POKEMON_LEAGUE_9",
+            "gimmick": 46
+        },
+        {
+            "zone": "ZONE_PLASMA_FRIGATE_2",
+            "gimmick": 47
+        },
+        {
+            "zone": "ZONE_PLASMA_FRIGATE_12",
+            "gimmick": 47
+        },
+        {
+            "zone": "ZONE_NIMBASA_CITY_17",
+            "gimmick": 48
+        },
+        {
+            "zone": "ZONE_POKESTAR_STUDIOS",
+            "gimmick": 49
+        },
+        {
+            "zone": "ZONE_MARINE_TUBE",
+            "gimmick": 50
+        },
+        {
+            "zone": "ZONE_PWT_2",
+            "gimmick": 51
+        },
+        {
+            "zone": "ZONE_GIANT_CHASM_6",
+            "gimmick": 52
+        },
+        {
+            "zone": "ZONE_ASPERTIA_CITY",
+            "gimmick": 53
+        },
+        {
+            "zone": "ZONE_HUMILAU_CITY",
+            "gimmick": 54
+        },
+        {
+            "zone": "ZONE_ROUTE_22",
+            "gimmick": 54
+        },
+        {
+            "zone": "ZONE_ROUTE_21",
+            "gimmick": 54
+        },
+        {
+            "zone": "ZONE_UNDERGROUND_RUINS",
+            "gimmick": 55
+        },
+        {
+            "zone": "ZONE_VIRBANK_GATE_GATE",
+            "gimmick": 12
+        },
+        {
+            "zone": "ZONE_POKEMON_LEAGUE_4",
+            "gimmick": 56
+        },
+        {
+            "zone": "ZONE_PLEDGE_GROVE",
+            "gimmick": 57
+        },
+        {
+            "zone": "ZONE_DRAGONSPIRAL_TOWER_9",
+            "gimmick": 58
+        },
+        {
+            "zone": "ZONE_OPELUCID_CITY",
+            "gimmick": 26
+        },
+        {
+            "zone": "ZONE_NS_CASTLE_5",
+            "gimmick": 26
+        }
+    ]
+}

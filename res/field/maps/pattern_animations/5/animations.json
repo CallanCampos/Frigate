@@ -1,0 +1,131 @@
+{
+    "$schema": "../pattern_animation.schema.json",
+    "animations": [
+        {
+            "length": 15,
+            "textures": [
+                {
+                    "name": "fire.1",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "fire.2",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "fire.3",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "fire.4",
+                    "format": "palette16",
+                    "color0_transparent": true
+                }
+            ],
+            "palettes": [
+                [ "fire.1_pl", "fire.2_pl", "fire.3_pl", "fire.4_pl" ]
+            ],
+            "targets": [
+                [
+                    {
+                        "frame": 0,
+                        "texture": "fire.1"
+                    },
+                    {
+                        "frame": 4,
+                        "texture": "fire.2"
+                    },
+                    {
+                        "frame": 8,
+                        "texture": "fire.3"
+                    },
+                    {
+                        "frame": 11,
+                        "texture": "fire.4"
+                    }
+                ]
+            ]
+        },
+        {
+            "length": 15,
+            "textures": [
+                {
+                    "name": "isi.1",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "isi.2",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "isi.3",
+                    "format": "palette16",
+                    "color0_transparent": true
+                }
+            ],
+            "palettes": [
+                [ "isi.1_pl", "isi.2_pl", "isi.3_pl" ]
+            ],
+            "targets": [
+                [
+                    {
+                        "frame": 0,
+                        "texture": "isi.1"
+                    },
+                    {
+                        "frame": 5,
+                        "texture": "isi.2"
+                    },
+                    {
+                        "frame": 10,
+                        "texture": "isi.3"
+                    }
+                ]
+            ]
+        },
+        {
+            "length": 15,
+            "textures": [
+                {
+                    "name": "water.1",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "water.2",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "water.3",
+                    "format": "palette16",
+                    "color0_transparent": true
+                }
+            ],
+            "palettes": [
+                [ "water.1_pl", "water.2_pl", "water.3_pl" ]
+            ],
+            "targets": [
+                [
+                    {
+                        "frame": 0,
+                        "texture": "water.1"
+                    },
+                    {
+                        "frame": 5,
+                        "texture": "water.2"
+                    },
+                    {
+                        "frame": 10,
+                        "texture": "water.3"
+                    }
+                ]
+            ]
+        }
+    ]
+}

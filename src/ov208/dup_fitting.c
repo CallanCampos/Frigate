@@ -2089,7 +2089,7 @@ static void DupFitting_ResetRotations(DupFittingWork *work) {
     u8 i;
 
     for (i = 0; i < 9; i++) {
-        work->param->poke->equips[i].unk2 = 0;
+        work->param->poke->equips[i].rotation = 0;
     }
     for (node = DupFittingItemList_GetHead(work->wornList); node != NULL; node = DupFittingItemNode_GetNext(node)) {
         u16 pos = DupFittingItemNode_GetEquipPos(node);
@@ -2148,7 +2148,7 @@ static void DupFitting_RotateHeld(DupFittingWork *work) {
     fy = FX32_CONST((s32)(work->touchY - y));
     angle = FX_Atan2Idx(fx, fy);
     if (work->dragging == TRUE) {
-        s16 oldRotation = work->param->poke->equips[pos].unk2;
+        s16 oldRotation = work->param->poke->equips[pos].rotation;
         s16 rotation = oldRotation + (s16)(work->prevAngle - angle);
 
         if (rotation < -0xaaa) {
@@ -2164,7 +2164,7 @@ static void DupFitting_RotateHeld(DupFittingWork *work) {
         }
         MusItemDraw_SetRotation(work->itemSys, DupFittingItemNode_GetDraw(work->heldNode),
                                 equip->info.cellRotation + rotation);
-        work->param->poke->equips[pos].unk2 = rotation;
+        work->param->poke->equips[pos].rotation = rotation;
     }
     work->prevAngle = angle;
     work->dragging = TRUE;
@@ -2183,7 +2183,7 @@ static void DupFitting_SaveWornItems(DupFittingWork *work) {
         MusPokeDraw_GetEquipPos(work->poke, pos);
         saved[i].pos = pos;
         saved[i].itemId = DupFittingItemNode_GetEntry(node)->itemId;
-        saved[i].rotation = work->param->poke->equips[pos].unk2;
+        saved[i].rotation = work->param->poke->equips[pos].rotation;
         work->param->poke->equips[pos].itemId = DupFittingItemNode_GetEntry(node)->itemId;
         work->param->poke->equips[pos].slot = i;
     }

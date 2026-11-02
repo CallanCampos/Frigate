@@ -10,7 +10,7 @@
 #include "gfl/sound.h"
 #include "gfl/std.h"
 
-// Where overlay 290 started the link from (WifiBattleMatchParam.unk8)
+// Where overlay 290 started the link from (WifiBattleMatchParam.startFrom)
 enum {
     START_TITLE,
     START_FIELD,
@@ -30,7 +30,7 @@ static BOOL WifiBattleMatchLink_Init(GameProc *proc, u32 *state, void *param, vo
     WifiBattleMatchLinkParam *linkParam = param;
 
     GFL_OvlLoad(OVERLAY_ID(262));
-    switch (linkParam->param->unk8) {
+    switch (linkParam->param->startFrom) {
     case START_FIELD:
         return WIFIBATTLEMATCH_LINK_RANDOM_PROC_FUNCTIONS.init(proc, state, param, work);
     case START_TITLE:
@@ -45,7 +45,7 @@ static BOOL WifiBattleMatchLink_Exit(GameProc *proc, u32 *state, void *param, vo
     WifiBattleMatchLinkParam *linkParam = param;
     BOOL result;
 
-    switch (linkParam->param->unk8) {
+    switch (linkParam->param->startFrom) {
     case START_FIELD:
         result = WIFIBATTLEMATCH_LINK_RANDOM_PROC_FUNCTIONS.exit(proc, state, param, work);
         break;
@@ -64,7 +64,7 @@ static BOOL WifiBattleMatchLink_Exit(GameProc *proc, u32 *state, void *param, vo
 static BOOL WifiBattleMatchLink_Main(GameProc *proc, u32 *state, void *param, void *work) {
     WifiBattleMatchLinkParam *linkParam = param;
 
-    switch (linkParam->param->unk8) {
+    switch (linkParam->param->startFrom) {
     case START_FIELD:
         return WIFIBATTLEMATCH_LINK_RANDOM_PROC_FUNCTIONS.main(proc, state, param, work);
     case START_TITLE:

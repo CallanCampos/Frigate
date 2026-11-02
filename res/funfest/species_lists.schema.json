@@ -1,0 +1,16 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The Funfest people missions' species: res/funfest/species_lists.json",
+    "description": "Files 2 to 21 of ARCID_FMISSION_DATA (a/2/8/9): the species that a people mission picks the Pokémon of its people from (FesMissionPeople_LoadSpecies in fest_mission_people.c), file 2 plus the mission's variant for target 8 and file 20 for target 5, up to 0x500 bytes. tools/data/funfest_mission_data.py packs them.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "lists" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "lists": {
+            "type": "array", "minItems": 20, "maxItems": 20,
+            "description": "List n is file n + 2",
+            "items": { "type": "array", "maxItems": 640, "items": { "type": "string", "x-constant": "SPECIES_" } }
+        }
+    }
+}

@@ -1,0 +1,50 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The Funfest Missions: res/funfest/missions.json",
+    "description": "Files 0 and 1 of ARCID_FMISSION_DATA (a/2/8/9): each mission's FestMissionHeader and FestMissionParams (field/fest_mission_data.h), FEST_MISSION_COUNT of them in order, which FestMission_Load copies into the mission's FestMissionInfo (system/fest_mission.h). tools/data/funfest_mission_data.py packs them.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "missions" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "missions": {
+            "type": "array", "minItems": 55, "maxItems": 55,
+            "items": {
+                "type": "object", "additionalProperties": false,
+                "required": [ "kind", "message", "result_message", "target", "target_kind", "variant", "reward_item", "second_item", "required_flag", "extra_seconds_index", "levels", "unk00", "unk03", "unk04", "unk10", "unk14", "header_unk01", "header_unk02", "params_unk01" ],
+                "properties": {
+                    "kind": { "type": "integer", "minimum": 0, "maximum": 7, "description": "FestMissionHeader.kind: what the target is by data_ov027_021711c0 (1 a species, 4 and 5 an item), and the field's missions MISSION_FLAGS (2), MISSION_HOLLOW, MISSION_SPARKLE and MISSION_PEOPLE (5) of field/fest_mission_data.h" },
+                    "message": { "type": "string", "description": "The mission's goal, a message of res/text/system/get_text_file_for_fest_missions.txt by ID, with the target and the count as its words (FestMission_GetMessage)" },
+                    "result_message": { "type": "string", "description": "The message of its result, of the same file (FestMission_GetResultMessage)" },
+                    "target": { "type": [ "integer", "string" ], "description": "The species or item the mission is about (FestMissionInfo.target), a SPECIES_* constant for kind 1; for a people mission the set of people (sPeopleSets in fest_mission_people.c)" },
+                    "target_kind": { "type": "integer", "minimum": 0, "maximum": 7, "description": "What the target counts, which picks the goal's message, its \"Target:\" line and its icon (FestMissionInfo.targetKind)" },
+                    "variant": { "type": "integer", "minimum": 0, "maximum": 1023, "description": "FestMissionInfo.unk0_20: a people mission's variant of its set of people (FesMissionPeople_GetPerson), and for target 8 its species list, file 2 plus it" },
+                    "reward_item": { "type": [ "string", "integer" ], "x-constant": "ITEM_", "description": "The item of the mission's reward (FestMissionInfo.unk4_0)" },
+                    "second_item": { "type": [ "string", "integer" ], "x-constant": "ITEM_", "description": "A second item, or ITEM_NONE (FestMissionInfo.unkC_22)" },
+                    "required_flag": { "type": [ "string", "integer" ], "x-constant": "EVENT_FLAG_", "description": "An event flag that must be set to join the mission, or 0 (FestMissionInfo.requiredFlag)" },
+                    "extra_seconds_index": { "type": "integer", "minimum": 0, "maximum": 3, "description": "Which of FestMission_ExtraSeconds a gain of time counts (FestMissionInfo.extraSecondsIndex)" },
+                    "levels": {
+                        "type": "array", "minItems": 4, "maxItems": 4,
+                        "description": "By the mission's level",
+                        "items": {
+                            "type": "object", "additionalProperties": false, "required": [ "seconds", "count", "unk3" ],
+                            "properties": {
+                                "seconds": { "type": "integer", "minimum": 0, "maximum": 3599, "description": "The mission's time, in seconds (FestMissionInfo.seconds)" },
+                                "count": { "type": "integer", "minimum": 0, "maximum": 255, "description": "The total score the mission wants (FestMissionInfo.count)" },
+                                "unk3": { "type": "integer", "minimum": 0, "maximum": 127, "description": "FestMissionInfo.unk4_10" }
+                            }
+                        }
+                    },
+                    "unk00": { "type": "integer", "minimum": 0, "maximum": 1, "description": "FestMissionInfo.unk4_31" },
+                    "unk03": { "type": "integer", "minimum": 0, "maximum": 3, "description": "FestMissionInfo.unk8_30" },
+                    "unk04": { "type": "integer", "minimum": 0, "maximum": 63, "description": "FestMissionInfo.unk10_0" },
+                    "unk10": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "FestMissionParams.unk10, which FestMission_Load doesn't read" },
+                    "unk14": { "type": "integer", "minimum": 0, "maximum": 262143, "description": "FestMissionInfo.unk8_0" },
+                    "header_unk01": { "type": "integer", "minimum": 0, "maximum": 255, "description": "FestMissionHeader.unk01" },
+                    "header_unk02": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "FestMissionHeader.unk02" },
+                    "params_unk01": { "type": "integer", "minimum": 0, "maximum": 255, "description": "FestMissionParams.unk01, which FestMission_Load doesn't read" }
+                }
+            }
+        }
+    }
+}

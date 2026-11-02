@@ -1,5 +1,6 @@
 // net_devwifi.c is the name from the ROM's own string. The GFL net's device for Wi-Fi: each slot of its table passes
-// the call on to dwc_rap.c or dwc_rapcommon.c. The names are ours.
+// the call on to dwc_rap.c or dwc_rapcommon.c. The names are ours: each function is named after the slot it fills
+// (net.h's GFLNetDevTable), and those of the slots unk94 and unk98 after the dwc_rap.c function they return.
 
 #include "gfl/net_devwifi.h"
 #include "types.h"
@@ -18,62 +19,62 @@ typedef struct {
 
 static NetDevWifiWork *sNetDevWifiWork;
 
-static void NetDevWifi_Prepare(int a0, int a1);
+static void NetDevWifi_Prepare(int heapId, int a1);
 static BOOL NetDevWifi_Init(HeapID heapId, GFLNetSys *sys, BOOL (*callback)(BOOL success), void *work);
 static BOOL NetDevWifi_Start(void (*callback)(BOOL ok));
 static int NetDevWifi_Update(u16 connectBits);
-static BOOL NetDevWifi_Unk10(int a0, int a1);
+static BOOL NetDevWifi_Disconnect(int a0, int a1);
 static BOOL NetDevWifi_Exit(void (*callback)(BOOL ok));
-static BOOL NetDevWifi_Unk4C(int a0, int a1, int a2, int a3);
-static BOOL NetDevWifi_Unk50(int a0, int a1, int a2);
-static BOOL NetDevWifi_Unk54(BOOL a0, int a1);
+static BOOL NetDevWifi_StartMatch(int key, int numEntry, int a2, int a3);
+static BOOL NetDevWifi_ConnectFriend(int friendIndex, int numEntry, int a2);
+static BOOL NetDevWifi_Close(BOOL a0, int a1);
 static BOOL NetDevWifi_Send(u8 *data, int size, int a2, GFLNetSendDoneFunc callback);
 static BOOL NetDevWifi_SetRecvCallback(GFLNetRecvFunc callback);
-static BOOL NetDevWifi_Unk6C(void);
+static BOOL NetDevWifi_IsRunning(void);
 static BOOL NetDevWifi_IsConnected(void);
-static BOOL NetDevWifi_Unk74(void);
-static BOOL NetDevWifi_Unk78(void);
+static BOOL NetDevWifi_IsEnded(void);
+static BOOL NetDevWifi_IsIdle(void);
 static int NetDevWifi_GetConnectBits(void);
 static int NetDevWifi_GetNetId(void);
 static int NetDevWifi_GetSignalLevel(void);
 static BOOL NetDevWifi_IsError(void);
-static void NetDevWifi_Unk8C(int a0);
-static int NetDevWifi_Unk90(int a0);
-static int NetDevWifi_Unk94(void);
-static int NetDevWifi_Unk98(void);
-static BOOL NetDevWifi_UnkAC(void);
-static void NetDevWifi_UnkB8(int a0);
+static void NetDevWifi_SetDisconnectError(int report);
+static int NetDevWifi_CanConnectFriend(int index);
+static int NetDevWifi_IsVoiceChatEnabled(void);
+static int NetDevWifi_GetLastNetId(void);
+static BOOL NetDevWifi_IsLinked(void);
+static void NetDevWifi_SetAcceptConnect(int accept);
 
 static GFLNetDevTable sNetDevWifiTable = {
     .prepare = NetDevWifi_Prepare,
     .init = NetDevWifi_Init,
     .start = NetDevWifi_Start,
     .update = NetDevWifi_Update,
-    .disconnect = NetDevWifi_Unk10,
+    .disconnect = NetDevWifi_Disconnect,
     .end = NetDevWifi_Exit,
-    .startMatch = NetDevWifi_Unk4C,
-    .connectFriend = NetDevWifi_Unk50,
-    .close = NetDevWifi_Unk54,
+    .startMatch = NetDevWifi_StartMatch,
+    .connectFriend = NetDevWifi_ConnectFriend,
+    .close = NetDevWifi_Close,
     .send = NetDevWifi_Send,
     .setRecvCallback = NetDevWifi_SetRecvCallback,
-    .isRunning = NetDevWifi_Unk6C,
+    .isRunning = NetDevWifi_IsRunning,
     .isConnected = NetDevWifi_IsConnected,
-    .isEnded = NetDevWifi_Unk74,
-    .isIdle = NetDevWifi_Unk78,
+    .isEnded = NetDevWifi_IsEnded,
+    .isIdle = NetDevWifi_IsIdle,
     .getConnectBits = NetDevWifi_GetConnectBits,
     .getNetId = NetDevWifi_GetNetId,
     .getSignalLevel = NetDevWifi_GetSignalLevel,
     .isError = NetDevWifi_IsError,
-    .setDisconnectError = NetDevWifi_Unk8C,
-    .canConnectFriend = NetDevWifi_Unk90,
-    .unk94 = NetDevWifi_Unk94,
-    .unk98 = NetDevWifi_Unk98,
-    .isLinked = NetDevWifi_UnkAC,
-    .setAcceptConnect = NetDevWifi_UnkB8,
+    .setDisconnectError = NetDevWifi_SetDisconnectError,
+    .canConnectFriend = NetDevWifi_CanConnectFriend,
+    .unk94 = NetDevWifi_IsVoiceChatEnabled,
+    .unk98 = NetDevWifi_GetLastNetId,
+    .isLinked = NetDevWifi_IsLinked,
+    .setAcceptConnect = NetDevWifi_SetAcceptConnect,
 };
 
-static void NetDevWifi_Prepare(int a0, int a1) {
-    DWCRapCommon_StartLibrary(a0);
+static void NetDevWifi_Prepare(int heapId, int a1) {
+    DWCRapCommon_StartLibrary(heapId);
 }
 
 static BOOL NetDevWifi_Init(HeapID heapId, GFLNetSys *sys, BOOL (*callback)(BOOL success), void *work) {
@@ -102,7 +103,7 @@ static int NetDevWifi_Update(u16 connectBits) {
     return DWCRap_Process(connectBits);
 }
 
-static BOOL NetDevWifi_Unk10(int a0, int a1) {
+static BOOL NetDevWifi_Disconnect(int a0, int a1) {
     if (DWCRap_RequestClose(a0 == 0)) {
         DWCRap_ResetToReady();
         return TRUE;
@@ -124,15 +125,15 @@ static BOOL NetDevWifi_Exit(void (*callback)(BOOL ok)) {
     return TRUE;
 }
 
-static BOOL NetDevWifi_Unk4C(int a0, int a1, int a2, int a3) {
-    return DWCRap_StartMatch((const char *)a0, a1, a2, a3);
+static BOOL NetDevWifi_StartMatch(int key, int numEntry, int a2, int a3) {
+    return DWCRap_StartMatch((const char *)key, numEntry, a2, a3);
 }
 
-static BOOL NetDevWifi_Unk50(int a0, int a1, int a2) {
-    return DWCRap_Connect(a0, a1, a2);
+static BOOL NetDevWifi_ConnectFriend(int friendIndex, int numEntry, int a2) {
+    return DWCRap_Connect(friendIndex, numEntry, a2);
 }
 
-static BOOL NetDevWifi_Unk54(BOOL a0, int a1) {
+static BOOL NetDevWifi_Close(BOOL a0, int a1) {
     if (DWCRap_RequestClose(a0 == 0)) {
         DWCRap_ResetToReady();
         return TRUE;
@@ -155,7 +156,7 @@ static BOOL NetDevWifi_SetRecvCallback(GFLNetRecvFunc callback) {
     return TRUE;
 }
 
-static BOOL NetDevWifi_Unk6C(void) {
+static BOOL NetDevWifi_IsRunning(void) {
     return DWCRap_IsInitialized();
 }
 
@@ -166,7 +167,7 @@ static BOOL NetDevWifi_IsConnected(void) {
     return FALSE;
 }
 
-static BOOL NetDevWifi_Unk74(void) {
+static BOOL NetDevWifi_IsEnded(void) {
     BOOL result = DWCRap_IsEnding();
 
     if (!DWCRap_IsInitialized()) {
@@ -175,7 +176,7 @@ static BOOL NetDevWifi_Unk74(void) {
     return result;
 }
 
-static BOOL NetDevWifi_Unk78(void) {
+static BOOL NetDevWifi_IsIdle(void) {
     return DWCRap_IsReady();
 }
 
@@ -210,30 +211,30 @@ static BOOL NetDevWifi_IsError(void) {
     return info->type != 0 ? info->type : code;
 }
 
-static void NetDevWifi_Unk8C(int a0) {
-    DWCRap_SetReportError(a0);
+static void NetDevWifi_SetDisconnectError(int report) {
+    DWCRap_SetReportError(report);
 }
 
-static int NetDevWifi_Unk90(int a0) {
-    if (DWCRap_GetFriendStatus(a0) == 6) {
+static int NetDevWifi_CanConnectFriend(int index) {
+    if (DWCRap_GetFriendStatus(index) == 6) {
         return TRUE;
     }
     return FALSE;
 }
 
-static int NetDevWifi_Unk94(void) {
+static int NetDevWifi_IsVoiceChatEnabled(void) {
     return DWCRap_IsVoiceChatEnabled();
 }
 
-static int NetDevWifi_Unk98(void) {
+static int NetDevWifi_GetLastNetId(void) {
     return DWCRap_GetLastNetId();
 }
 
-static void NetDevWifi_UnkB8(int a0) {
-    DWCRap_SetAcceptConnect(a0);
+static void NetDevWifi_SetAcceptConnect(int accept) {
+    DWCRap_SetAcceptConnect(accept);
 }
 
-static BOOL NetDevWifi_UnkAC(void) {
+static BOOL NetDevWifi_IsLinked(void) {
     return DWCRap_IsConnected();
 }
 

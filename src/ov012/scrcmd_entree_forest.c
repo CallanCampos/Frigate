@@ -3,7 +3,11 @@
 #include "types.h"
 #include "app/event_pdc_return.h"
 #include "app/pdc.h"
+#include "constants/directions.h"
+#include "constants/items.h"
 #include "constants/pokemon.h"
+#include "constants/sound.h"
+#include "constants/zones.h"
 #include "field/entree_forest.h"
 #include "field/event_mapchange.h"
 #include "field/event_sound.h"
@@ -27,8 +31,6 @@
 #include "system/vm.h"
 #include "system/wordset.h"
 
-#define ITEM_DREAM_BALL 576
-#define SEQ_SE_WARP 0x559
 // The script variable that holds the actor the player talks to
 #define VAR_TALK_ACTOR 0x8011
 // The area of the forest that isn't one, for warps out of it
@@ -58,7 +60,8 @@ typedef struct {
     u32 unk20;
 } EntreeForestWarpData;
 
-static const VecFx32 data_ov012_0216dac4 = { 0x1f8000, 0x20000, 0x168000 };
+// Where the player arrives in the Entralink, leaving the forest by its entrance
+static const VecFx32 sEntralinkArrivalPos = { 0x1f8000, 0x20000, 0x168000 };
 
 static FieldActor *FieldScriptEnv_FindActor(FieldScriptEnv *env, u16 actorId);
 static void GetTalkActorEntreeForestPkm(FieldScriptEnv *env, EntreeForestPokemon *pokemon);
@@ -97,7 +100,7 @@ BOOL Scrcmd_EntreeForest_EntreeForestSpawnAllPkm(VM *vm, FieldScriptEnv *env) {
     SymbolMapList *list = SymbolMap_CreatePokemonList(FieldScriptEnv_GetHeapID(env), gsys, &actorIdBase);
 
     if (list != NULL) {
-        EntreeForest_SpawnAllPokemon(field, actorIdBase, list->pokemon, list->count, list->unk50_18);
+        EntreeForest_SpawnAllPokemon(field, actorIdBase, list->pokemon, list->count, list->area);
         GFL_HeapFree(list);
     }
     return FALSE;
@@ -114,7 +117,7 @@ BOOL Scrcmd_EntreeForest_EntreeForestRemovePkm(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02164bcc(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_EntreeForest_EntreeForestToggleKeepPkm(VM *vm, FieldScriptEnv *env) {
     u16 actorId = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
     AreaNPCSave *npcData = getAreaNPCData(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
@@ -143,7 +146,7 @@ BOOL Scrcmd_EntreeForest_WordSetLoadEntreeForestPkmName(VM *vm, FieldScriptEnv *
     return FALSE;
 }
 
-BOOL func_ov012_02164c68(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_EntreeForest_EntreeForestGetInfo(VM *vm, FieldScriptEnv *env) {
     u16 mode = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -186,12 +189,12 @@ BOOL Scrcmd_EntreeForest_MapChangeEntreeForest(VM *vm, FieldScriptEnv *env) {
     VecFx32 pos;
     VecFx32 playerPos;
 
-    if (dir == 1 && SymbolMap_IsEntranceArea(area)) {
+    if (dir == DIR_DOWN && SymbolMap_IsEntranceArea(area)) {
         field = GSYS_GetField(gsys);
         FieldPlayer_GetWPos(Field_GetPlayer(field), &playerPos);
-        pos = data_ov012_0216dac4;
+        pos = sEntralinkArrivalPos;
         pos.x += playerPos.x - FX32_CONST(248);
-        event = EventMapChangeWarp_CreateGrid(gsys, field, 0x117, &pos, 1, 0);
+        event = EventMapChangeWarp_CreateGrid(gsys, field, ZONE_ENTRALINK, &pos, 1, 0);
     } else {
         if (dir != ENTREE_FOREST_DIR_EXIT) {
             area = SymbolMap_GetAdjacentArea(gsys, GameData_GetEntreeForestArea(gameData), dir);
@@ -261,7 +264,7 @@ static GameEventReturnCode EventEntreeForestBattleCall_Callback(GameEvent *event
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, EventBattleBGMPlay_Create(gsys, 0x468));
+        GameEvent_ChainNext(event, EventBattleBGMPlay_Create(gsys, SEQ_BGM_VS_NORAPOKE));
         (*state)++;
         break;
     case 1:
@@ -343,16 +346,16 @@ static GameEventReturnCode EventEntreeForestBattleCall_Callback(GameEvent *event
 static void GetEntreeForestArrivalPos(const VecFx32 *pos, u32 dir, VecFx32 *dest) {
     *dest = *pos;
     switch (dir) {
-    case 0:
+    case DIR_UP:
         dest->z = FX32_CONST(392);
         break;
-    case 1:
+    case DIR_DOWN:
         dest->z = FX32_CONST(152);
         break;
-    case 2:
+    case DIR_LEFT:
         dest->x = FX32_CONST(424);
         break;
-    case 3:
+    case DIR_RIGHT:
         dest->x = FX32_CONST(88);
         break;
     case ENTREE_FOREST_DIR_EXIT:
@@ -360,7 +363,7 @@ static void GetEntreeForestArrivalPos(const VecFx32 *pos, u32 dir, VecFx32 *dest
     }
 }
 
-GameEvent *EventEntreeForestWarp_Create(GameSystem *gsys, u32 mode, const VecFx32 *position, u32 arg3, u32 arg4) {
+GameEvent *EventEntreeForestWarp_Create(GameSystem *gsys, u32 playSound, const VecFx32 *position, u32 dir, u32 area) {
     GameEvent *event;
     EntreeForestWarpData *data;
 
@@ -369,10 +372,10 @@ GameEvent *EventEntreeForestWarp_Create(GameSystem *gsys, u32 mode, const VecFx3
     data = GameEvent_GetData(event);
     MI_CpuFill8(data, 0, sizeof(EntreeForestWarpData));
     data->pos = *position;
-    data->dir = arg3;
+    data->dir = dir;
     data->result = NULL;
-    data->area = arg4;
-    data->playSound = mode;
+    data->area = area;
+    data->playSound = playSound;
     data->unk20 = 1;
     return event;
 }
@@ -399,7 +402,7 @@ static GameEventReturnCode EventEntreeForestWarp_Callback(GameEvent *event, u32 
         break;
     case 1:
         if (data->playSound) {
-            GFL_SndSEPlay(SEQ_SE_WARP);
+            GFL_SndSEPlay(SEQ_SE_KAIDAN);
         }
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_WIPE_FACING, 0));

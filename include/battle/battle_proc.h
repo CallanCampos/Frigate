@@ -25,7 +25,8 @@ typedef struct {
 typedef struct {
     BattlePlayer players[4];
     u32 result;
-    u32 unk44; // 3 when every player has a party, else 1 (Colosseum_BuildBattlePlayers)
+    // What overlay 305's screen before and after the battle shows, COMM_BTL_DEMO_TYPE_*
+    u32 demoType;
     u32 rule;
     u32 unk4C;
 } BattlePlayers;
@@ -37,7 +38,8 @@ typedef struct {
     BattlePlayers *players;
     u32 rule;
     u32 unk10;
-    u32 unk14;
+    // Set, a network error is marked shown when the proc ends
+    u32 markNetErrShown;
     Ov306Param ov306Param;
 } BattleParam;
 
@@ -53,7 +55,7 @@ typedef struct {
 
 extern const GameProcFunctions data_ov010_0215039c;
 // The battle system's proc
-extern const GameProcFunctions data_ov167_021d6ce0;
+extern const GameProcFunctions BATTLE_PROC_FUNCTIONS;
 extern const GameProcFunctions CommBtlDemoProc;
 
 BOOL BattleProc_Init(GameProc *proc, u32 *state, void *param, void *work);

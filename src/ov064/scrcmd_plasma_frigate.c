@@ -25,6 +25,13 @@
 #define PASSWORD_COUNT 5u
 #define PASSWORD_MAX_LENGTH 10
 
+// The steps of the password event
+enum {
+    PASSWORD_STEP_NAME_ENTRY,
+    PASSWORD_STEP_CHECK,
+    PASSWORD_STEP_END,
+};
+
 typedef struct {
     GameSystem *gsys;
     GameData *gameData;
@@ -53,12 +60,12 @@ static BOOL Scrcmd_PlasmaFrigate_PressSwitch(VM *vm, FieldScriptEnv *env) {
 }
 
 static BOOL Scrcmd_PlasmaFrigate_SetLightsState(VM *vm, FieldScriptEnv *env) {
-    u16 a;
+    u16 index;
     GameSystem *gsys;
 
     gsys = FieldScriptEnv_GetGameSystem(env);
-    a = VM_Read16(vm);
-    GimmickPlasmaFrigate_SetLightsState(gsys, a, ScriptReadAny(vm, env) != TRUE);
+    index = VM_Read16(vm);
+    GimmickPlasmaFrigate_SetLightsState(gsys, index, ScriptReadAny(vm, env) != TRUE);
     return FALSE;
 }
 
@@ -99,12 +106,12 @@ static BOOL Scrcmd_PlasmaFrigate_GetPasswordIndex(VM *vm, FieldScriptEnv *env) {
 }
 
 static BOOL Scrcmd_PlasmaFrigate_SetSwitchLightState(VM *vm, FieldScriptEnv *env) {
-    u16 a;
+    u16 index;
     GameSystem *gsys;
 
     gsys = FieldScriptEnv_GetGameSystem(env);
-    a = VM_Read16(vm);
-    PlasmaFrigateLights_ShowSwitchState(gsys, a, ScriptReadAny(vm, env) != 0);
+    index = VM_Read16(vm);
+    PlasmaFrigateLights_ShowSwitchState(gsys, index, ScriptReadAny(vm, env) != 0);
     return FALSE;
 }
 
@@ -145,17 +152,17 @@ static GameEventReturnCode PlasmaFrigate_PasswordEvent(GameEvent *event, u32 *st
     PlasmaFrigatePassword *wk = data;
 
     switch (*state) {
-    case 0:
+    case PASSWORD_STEP_NAME_ENTRY:
         GameEvent_ChainNext(event, EventFieldSubprocessTransition_Create(wk->gsys, wk->field, OVERLAY_ID(280),
                                                                          &NAME_ENTRY_PROC_FUNCTIONS, wk->nameEntry));
         (*state)++;
         break;
-    case 1:
+    case PASSWORD_STEP_CHECK:
         PlasmaFrigate_CheckPassword(wk, wk->nameEntry);
         NameEntryParam_Free(wk->nameEntry);
         (*state)++;
         break;
-    case 2:
+    case PASSWORD_STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;

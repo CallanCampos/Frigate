@@ -1,0 +1,2300 @@
+{
+    "$schema": "medals.schema.json",
+    "medals": [
+        {
+            "name": "MedalNames_Text_FirstStep",
+            "special": 0,
+            "threshold": 1,
+            "type": 20,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_ParticipationPrize",
+            "special": 1,
+            "threshold": 1,
+            "type": 21,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_RookieMedalist",
+            "special": 2,
+            "threshold": 1,
+            "type": 22,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_EliteMedalist",
+            "special": 3,
+            "threshold": 1,
+            "type": 23,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_MasterMedalist",
+            "special": 4,
+            "threshold": 1,
+            "type": 24,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_LegendMedalist",
+            "special": 5,
+            "threshold": 1,
+            "type": 25,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_TopMedalist",
+            "special": 6,
+            "threshold": 1,
+            "type": 26,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_LightWalker",
+            "record": 0,
+            "threshold": 5000,
+            "type": 0,
+            "kind": 1,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_MiddleWalker",
+            "record": 0,
+            "threshold": 10000,
+            "type": 1,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_HeavyWalker",
+            "record": 0,
+            "threshold": 20000,
+            "type": 2,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_HonoredFootprints",
+            "record": 0,
+            "threshold": 100000,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_StepByStepSaver",
+            "record": 1,
+            "threshold": 10,
+            "type": 0,
+            "kind": 1,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_BusySaver",
+            "record": 1,
+            "threshold": 20,
+            "type": 1,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_ExperiencedSaver",
+            "record": 1,
+            "threshold": 50,
+            "type": 2,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_WonderWriter",
+            "record": 1,
+            "threshold": 100,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_PokemonCenterFan",
+            "record": 11,
+            "threshold": 10,
+            "type": 0,
+            "kind": 1,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_SignboardStarter",
+            "special": 7,
+            "threshold": 5,
+            "type": 0,
+            "kind": 2,
+            "rank": 1,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_SignboardSavvy",
+            "special": 7,
+            "threshold": 15,
+            "type": 1,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_GraffitiGazer",
+            "special": 8,
+            "threshold": 1,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_StarterCycling",
+            "record": 3,
+            "threshold": 1,
+            "type": 0,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_EasyCycling",
+            "record": 3,
+            "threshold": 30,
+            "type": 1,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_HardCycling",
+            "record": 3,
+            "threshold": 100,
+            "type": 2,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_PedalingLegend",
+            "record": 3,
+            "threshold": 500,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_OldRodFisherman",
+            "record": 8,
+            "threshold": 1,
+            "type": 0,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_GoodRodFisherman",
+            "record": 8,
+            "threshold": 10,
+            "type": 1,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_SuperRodFisherman",
+            "record": 8,
+            "threshold": 50,
+            "type": 2,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_MightyFisher",
+            "record": 8,
+            "threshold": 100,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_NormalTypeCatcher",
+            "special": 9,
+            "threshold": 0,
+            "type": 3,
+            "kind": 2,
+            "rank": 5,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_FireTypeCatcher",
+            "special": 10,
+            "threshold": 0,
+            "type": 3,
+            "kind": 2,
+            "rank": 5,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_WaterTypeCatcher",
+            "special": 11,
+            "threshold": 0,
+            "type": 3,
+            "kind": 2,
+            "rank": 5,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_ElectricTypeCatcher",
+            "special": 12,
+            "threshold": 0,
+            "type": 3,
+            "kind": 2,
+            "rank": 5,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_GrassTypeCatcher",
+            "special": 13,
+            "threshold": 0,
+            "type": 3,
+            "kind": 2,
+            "rank": 5,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_IceTypeCatcher",
+            "special": 14,
+            "threshold": 0,
+            "type": 3,
+            "kind": 2,
+            "rank": 5,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_FightingTypeCatcher",
+            "special": 15,
+            "threshold": 0,
+            "type": 3,
+            "kind": 2,
+            "rank": 5,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_PoisonTypeCatcher",
+            "special": 16,
+            "threshold": 0,
+            "type": 3,
+            "kind": 2,
+            "rank": 5,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_GroundTypeCatcher",
+            "special": 17,
+            "threshold": 0,
+            "type": 3,
+            "kind": 2,
+            "rank": 5,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_FlyingTypeCatcher",
+            "special": 18,
+            "threshold": 0,
+            "type": 3,
+            "kind": 2,
+            "rank": 5,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_PsychicTypeCatcher",
+            "special": 19,
+            "threshold": 0,
+            "type": 3,
+            "kind": 2,
+            "rank": 5,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_BugTypeCatcher",
+            "special": 20,
+            "threshold": 0,
+            "type": 3,
+            "kind": 2,
+            "rank": 5,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_RockTypeCatcher",
+            "special": 21,
+            "threshold": 0,
+            "type": 3,
+            "kind": 2,
+            "rank": 5,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_GhostTypeCatcher",
+            "special": 22,
+            "threshold": 0,
+            "type": 3,
+            "kind": 2,
+            "rank": 5,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_DragonTypeCatcher",
+            "special": 23,
+            "threshold": 0,
+            "type": 3,
+            "kind": 2,
+            "rank": 5,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_DarkTypeCatcher",
+            "special": 24,
+            "threshold": 0,
+            "type": 3,
+            "kind": 2,
+            "rank": 5,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_SteelTypeCatcher",
+            "special": 25,
+            "threshold": 0,
+            "type": 3,
+            "kind": 2,
+            "rank": 5,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_UnovaCatcher",
+            "special": 26,
+            "threshold": 1,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_NationalCatcher",
+            "special": 27,
+            "threshold": 1,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_30Boxed",
+            "special": 28,
+            "threshold": 30,
+            "type": 0,
+            "kind": 2,
+            "rank": 1,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_120Boxed",
+            "special": 28,
+            "threshold": 120,
+            "type": 1,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_360Boxed",
+            "special": 28,
+            "threshold": 360,
+            "type": 2,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_BoxesMax",
+            "special": 28,
+            "threshold": 720,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_CapturingSpree",
+            "special": 29,
+            "threshold": 50,
+            "type": 3,
+            "kind": 2,
+            "rank": 4,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_VendingVirtuoso",
+            "record": 125,
+            "threshold": 10,
+            "type": 0,
+            "kind": 2,
+            "rank": 2,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_LuckyDrink",
+            "special": 30,
+            "threshold": 1,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_EvolutionHopeful",
+            "record": 10,
+            "threshold": 1,
+            "type": 0,
+            "kind": 2,
+            "rank": 1,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_EvolutionTech",
+            "record": 10,
+            "threshold": 10,
+            "type": 1,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_EvolutionExpert",
+            "record": 10,
+            "threshold": 50,
+            "type": 2,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_EvolutionAuthority",
+            "record": 10,
+            "threshold": 100,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_AcePilot",
+            "record": 42,
+            "threshold": 20,
+            "type": 2,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_HustleMuscle",
+            "special": 31,
+            "threshold": 20,
+            "type": 2,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_TrashMaster",
+            "record": 43,
+            "threshold": 10,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_DowsingBeginner",
+            "record": 44,
+            "threshold": 1,
+            "type": 0,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_DowsingSpecialist",
+            "record": 44,
+            "threshold": 10,
+            "type": 1,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_DowsingCollector",
+            "record": 44,
+            "threshold": 50,
+            "type": 2,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_DowsingWizard",
+            "record": 44,
+            "threshold": 150,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_NamingChamp",
+            "record": 30,
+            "threshold": 10,
+            "type": 0,
+            "kind": 2,
+            "rank": 1,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_TelevisionKid",
+            "record": 23,
+            "threshold": 10,
+            "type": 0,
+            "kind": 2,
+            "rank": 2,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_RegularCustomer",
+            "record": 21,
+            "threshold": 100,
+            "type": 2,
+            "kind": 2,
+            "rank": 3,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_ModerateCustomer",
+            "record": 22,
+            "threshold": 10000,
+            "type": 0,
+            "kind": 2,
+            "rank": 3,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_GreatCustomer",
+            "record": 22,
+            "threshold": 100000,
+            "type": 1,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_IndulgentCustomer",
+            "record": 22,
+            "threshold": 1000000,
+            "type": 2,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_SuperRich",
+            "record": 22,
+            "threshold": 10000000,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_SmartShopper",
+            "record": 31,
+            "threshold": 1,
+            "type": 0,
+            "kind": 2,
+            "rank": 1,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_SweetHome",
+            "record": 72,
+            "threshold": 1,
+            "type": 0,
+            "kind": 2,
+            "rank": 2,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_FirstPasserby",
+            "special": 32,
+            "threshold": 1,
+            "type": 0,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_30Passersby",
+            "special": 32,
+            "threshold": 30,
+            "type": 1,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_100Passersby",
+            "special": 32,
+            "threshold": 100,
+            "type": 2,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_HeavyTraffic",
+            "special": 32,
+            "threshold": 1000,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_PassPower",
+            "record": 45,
+            "threshold": 1,
+            "type": 0,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_PassPower_2",
+            "record": 45,
+            "threshold": 10,
+            "type": 1,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_PassPower_3",
+            "record": 45,
+            "threshold": 50,
+            "type": 2,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_PassPowerMax",
+            "record": 45,
+            "threshold": 100,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_DozingCapture",
+            "record": 46,
+            "threshold": 1,
+            "type": 0,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_SleepingCapture",
+            "record": 46,
+            "threshold": 10,
+            "type": 1,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_DeepSleepCapture",
+            "record": 46,
+            "threshold": 50,
+            "type": 2,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_SweetDreamer",
+            "record": 46,
+            "threshold": 100,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_HiddenGrottoAdept",
+            "special": 33,
+            "threshold": 20,
+            "type": 2,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_EggBeginner",
+            "record": 9,
+            "threshold": 1,
+            "type": 0,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_EggBreeder",
+            "record": 9,
+            "threshold": 10,
+            "type": 1,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_EggElite",
+            "record": 9,
+            "threshold": 50,
+            "type": 2,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_HatchingAficionado",
+            "record": 9,
+            "threshold": 100,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_DayCareFaithful",
+            "record": 24,
+            "threshold": 100,
+            "type": 3,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_ArcheologyLover",
+            "record": 89,
+            "threshold": 1,
+            "type": 2,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_PureYouth",
+            "special": 34,
+            "threshold": 1,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_LuckyColor",
+            "special": 35,
+            "threshold": 1,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_PokerusDiscoverer",
+            "special": 36,
+            "threshold": 1,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_CasteliaBoss",
+            "special": 37,
+            "threshold": 1,
+            "type": 1,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_RailEnthusiast",
+            "special": 38,
+            "threshold": 10,
+            "type": 3,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_WailordWatcher",
+            "special": 39,
+            "threshold": 1,
+            "type": 2,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_FaceBoardMemorial",
+            "special": 40,
+            "threshold": 1,
+            "type": 0,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_HeavyMachineryPro",
+            "special": 41,
+            "threshold": 1,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_RuinsRaider",
+            "special": 42,
+            "threshold": 1,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_DiamondDust",
+            "special": 43,
+            "threshold": 1,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_BridgeEnthusiast",
+            "special": 44,
+            "threshold": 3,
+            "type": 3,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_AroundUnova",
+            "special": 45,
+            "threshold": 24,
+            "type": 3,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_GreatAdventurer",
+            "special": 46,
+            "threshold": 97,
+            "type": 4,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_BattleLearner",
+            "record": 4,
+            "threshold": 100,
+            "type": 5,
+            "kind": 1,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_BattleTeacher",
+            "record": 4,
+            "threshold": 200,
+            "type": 6,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_BattleVeteran",
+            "record": 4,
+            "threshold": 400,
+            "type": 7,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_BattleVirtuoso",
+            "record": 4,
+            "threshold": 2000,
+            "type": 8,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_LinkBattleAmateur",
+            "special": 47,
+            "threshold": 1,
+            "type": 5,
+            "kind": 1,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_LinkBattlePioneer",
+            "special": 47,
+            "threshold": 10,
+            "type": 6,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_LinkBattleExpert",
+            "special": 47,
+            "threshold": 50,
+            "type": 7,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_BornBattle",
+            "special": 47,
+            "threshold": 100,
+            "type": 8,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_MagikarpAward",
+            "record": 73,
+            "threshold": 1,
+            "type": 8,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_NeverGiveUp",
+            "record": 74,
+            "threshold": 1,
+            "type": 8,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_NoneffectiveArtist",
+            "record": 75,
+            "threshold": 1,
+            "type": 6,
+            "kind": 2,
+            "rank": 2,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_SupereffectiveSavant",
+            "record": 47,
+            "threshold": 100,
+            "type": 6,
+            "kind": 2,
+            "rank": 2,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_SubwayLowGear",
+            "record": 48,
+            "threshold": 1,
+            "type": 5,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_SubwayAccelerator",
+            "record": 48,
+            "threshold": 10,
+            "type": 6,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_SubwayTopGear",
+            "record": 48,
+            "threshold": 50,
+            "type": 7,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_RunawayExpress",
+            "record": 48,
+            "threshold": 100,
+            "type": 8,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_SingleExpress",
+            "special": 48,
+            "threshold": 21,
+            "type": 7,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_DoubleExpress",
+            "special": 49,
+            "threshold": 21,
+            "type": 7,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_MultiExpress",
+            "special": 50,
+            "threshold": 21,
+            "type": 7,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_TestNovice",
+            "record": 121,
+            "threshold": 1,
+            "type": 5,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_TestFan",
+            "record": 121,
+            "threshold": 10,
+            "type": 6,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_TestEnthusiast",
+            "record": 121,
+            "threshold": 30,
+            "type": 7,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_ExamGenius",
+            "record": 121,
+            "threshold": 50,
+            "type": 8,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_ExpMillionaire",
+            "special": 51,
+            "threshold": 1000000,
+            "type": 8,
+            "kind": 2,
+            "rank": 4,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_BpWealthy",
+            "record": 33,
+            "threshold": 100,
+            "type": 8,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_SuperbLocator",
+            "record": 112,
+            "threshold": 10,
+            "type": 6,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_BattleRepeater",
+            "record": 32,
+            "threshold": 30,
+            "type": 7,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_CruiseConnoisseur",
+            "record": 126,
+            "threshold": 10,
+            "type": 7,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_DriftveilMightiest",
+            "special": 52,
+            "threshold": 1,
+            "type": 5,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_RentalChamp",
+            "special": 53,
+            "threshold": 1,
+            "type": 6,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_MixChamp",
+            "special": 54,
+            "threshold": 1,
+            "type": 6,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_UnovaMightiest",
+            "special": 55,
+            "threshold": 1,
+            "type": 7,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_KantoMightiest",
+            "special": 56,
+            "threshold": 1,
+            "type": 7,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_JohtoMightiest",
+            "special": 57,
+            "threshold": 1,
+            "type": 7,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_HoennMightiest",
+            "special": 58,
+            "threshold": 1,
+            "type": 7,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_SinnohMightiest",
+            "special": 59,
+            "threshold": 1,
+            "type": 7,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_MightiestLeader",
+            "special": 60,
+            "threshold": 1,
+            "type": 7,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_WorldsMightiest",
+            "special": 61,
+            "threshold": 1,
+            "type": 8,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_RentalMaster",
+            "special": 62,
+            "threshold": 1,
+            "type": 8,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_MixMaster",
+            "special": 63,
+            "threshold": 1,
+            "type": 8,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_AllTypesChamp",
+            "special": 64,
+            "threshold": 17,
+            "type": 8,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_TowerJunior",
+            "special": 65,
+            "threshold": 5,
+            "type": 5,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_TowerMaster",
+            "special": 65,
+            "threshold": 10,
+            "type": 6,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_TreehollowJunior",
+            "special": 66,
+            "threshold": 5,
+            "type": 5,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_TreehollowMaster",
+            "special": 66,
+            "threshold": 10,
+            "type": 6,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_20Victories",
+            "record": 49,
+            "threshold": 20,
+            "type": 7,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_50Victories",
+            "record": 49,
+            "threshold": 50,
+            "type": 7,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_100Victories",
+            "record": 49,
+            "threshold": 100,
+            "type": 8,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_1000Wins",
+            "record": 49,
+            "threshold": 1000,
+            "type": 8,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_UndefeatedEasy",
+            "special": 67,
+            "threshold": 1,
+            "type": 7,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_UndefeatedHard",
+            "special": 67,
+            "threshold": 1,
+            "type": 8,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_PinpointEasy",
+            "special": 68,
+            "threshold": 1,
+            "type": 7,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_PinpointHard",
+            "special": 68,
+            "threshold": 1,
+            "type": 8,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_QuickClearEasy",
+            "special": 69,
+            "threshold": 1,
+            "type": 7,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_QuickClearHard",
+            "special": 69,
+            "threshold": 1,
+            "type": 8,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_BattleGuru",
+            "special": 70,
+            "threshold": 55,
+            "type": 9,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_BeginningTrader",
+            "special": 71,
+            "threshold": 1,
+            "type": 10,
+            "kind": 1,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_OccasionalTrader",
+            "special": 71,
+            "threshold": 10,
+            "type": 11,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_FrequentTrader",
+            "special": 71,
+            "threshold": 50,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_GreatTradeUp",
+            "special": 71,
+            "threshold": 100,
+            "type": 13,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_OppositeTrader",
+            "special": 72,
+            "threshold": 1,
+            "type": 11,
+            "kind": 2,
+            "rank": 1,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_PenPal",
+            "record": 29,
+            "threshold": 1,
+            "type": 10,
+            "kind": 2,
+            "rank": 3,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_TalentedCastMember",
+            "record": 114,
+            "threshold": 10,
+            "type": 12,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_RisingStar",
+            "record": 115,
+            "threshold": 1,
+            "type": 10,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_BigStar",
+            "record": 115,
+            "threshold": 5,
+            "type": 11,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_Superstar",
+            "record": 115,
+            "threshold": 10,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_MusicalStar",
+            "record": 115,
+            "threshold": 30,
+            "type": 13,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_Trendsetter",
+            "special": 73,
+            "threshold": 100,
+            "type": 13,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_10Followers",
+            "record": 118,
+            "threshold": 12000,
+            "type": 13,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_FirstFriend",
+            "special": 74,
+            "threshold": 1,
+            "type": 10,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_ExtensiveFriendship",
+            "special": 74,
+            "threshold": 5,
+            "type": 11,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_BroadFriendship",
+            "special": 74,
+            "threshold": 10,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_GlobalConnection",
+            "special": 74,
+            "threshold": 32,
+            "type": 13,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_SpinTradeWhiz",
+            "record": 90,
+            "threshold": 10,
+            "type": 12,
+            "kind": 2,
+            "rank": 4,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_FeelingMaster",
+            "record": 113,
+            "threshold": 5,
+            "type": 11,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_AceHearts",
+            "special": 75,
+            "threshold": 80,
+            "type": 13,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_FerrisWheelFan",
+            "special": 76,
+            "threshold": 10,
+            "type": 13,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_NewGuide",
+            "record": 127,
+            "threshold": 10,
+            "type": 10,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_EliteGuide",
+            "record": 127,
+            "threshold": 20,
+            "type": 11,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_VeteranGuide",
+            "record": 127,
+            "threshold": 50,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_GuidingChamp",
+            "record": 127,
+            "threshold": 100,
+            "type": 13,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_ShopStarter",
+            "record": 128,
+            "threshold": 5,
+            "type": 10,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_ShopBuilder",
+            "record": 128,
+            "threshold": 10,
+            "type": 11,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_ShopConstructor",
+            "record": 128,
+            "threshold": 20,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_ExtremeDeveloper",
+            "record": 128,
+            "threshold": 50,
+            "type": 13,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_OkSouvenirGetter",
+            "record": 130,
+            "threshold": 10,
+            "type": 10,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_GoodSouvenirGetter",
+            "record": 130,
+            "threshold": 30,
+            "type": 11,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_GreatSouvenirGetter",
+            "record": 130,
+            "threshold": 50,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_TycoonSouvenirs",
+            "record": 130,
+            "threshold": 100,
+            "type": 13,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_AvenueFame",
+            "special": 77,
+            "threshold": 1,
+            "type": 13,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_MinigameFan",
+            "record": 129,
+            "threshold": 10,
+            "type": 10,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_MinigameBuff",
+            "record": 129,
+            "threshold": 30,
+            "type": 11,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_MinigameExpert",
+            "record": 129,
+            "threshold": 50,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_BestMinigamer",
+            "record": 129,
+            "threshold": 100,
+            "type": 13,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_BalloonRookie",
+            "record": 50,
+            "threshold": 50,
+            "type": 10,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_BalloonTechnician",
+            "record": 50,
+            "threshold": 200,
+            "type": 11,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_BalloonExpert",
+            "record": 50,
+            "threshold": 500,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_BalloonConqueror",
+            "record": 50,
+            "threshold": 1000,
+            "type": 13,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_NewFaceHero",
+            "special": 78,
+            "threshold": 1,
+            "type": 10,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_HeroMovieStar",
+            "special": 79,
+            "threshold": 1,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_CopMovieMaster",
+            "special": 80,
+            "threshold": 1,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_UfoMovieMaster",
+            "special": 81,
+            "threshold": 1,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_MonsterMovieMaster",
+            "special": 82,
+            "threshold": 1,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_SciFiMovieMaster",
+            "special": 83,
+            "threshold": 1,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_RomanticMovieStar",
+            "special": 84,
+            "threshold": 1,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_FantasyMovieMaster",
+            "special": 85,
+            "threshold": 1,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_ComedicMovieStar",
+            "special": 86,
+            "threshold": 1,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_HorrorMovieStar",
+            "special": 87,
+            "threshold": 1,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_RobotMovieMaster",
+            "special": 88,
+            "threshold": 1,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_GhostMovieMaster",
+            "special": 89,
+            "threshold": 1,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_HeroEnding",
+            "special": 90,
+            "threshold": 1,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_PopularMovieStar",
+            "special": 91,
+            "threshold": 1,
+            "type": 13,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_MasterpieceStar",
+            "special": 92,
+            "threshold": 1,
+            "type": 13,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_BlockbusterStar",
+            "record": 51,
+            "threshold": 1000,
+            "type": 13,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 0
+        },
+        {
+            "name": "MedalNames_Text_FirstCultClassic",
+            "special": 93,
+            "threshold": 1,
+            "type": 13,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_CultClassicStar",
+            "special": 94,
+            "threshold": 1,
+            "type": 13,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_10PeopleFunfest",
+            "special": 95,
+            "threshold": 10,
+            "type": 11,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_30PeopleFunfest",
+            "special": 95,
+            "threshold": 30,
+            "type": 13,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_Scored100",
+            "special": 95,
+            "threshold": 100,
+            "type": 11,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_Scored1000",
+            "special": 95,
+            "threshold": 1000,
+            "type": 13,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_MissionHostLv1",
+            "special": 95,
+            "threshold": 10,
+            "type": 10,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_MissionHostLv2",
+            "special": 95,
+            "threshold": 50,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_ParticipantLv1",
+            "special": 96,
+            "threshold": 1,
+            "type": 10,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_ParticipantLv2",
+            "special": 96,
+            "threshold": 10,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_AchieverLv1",
+            "special": 97,
+            "threshold": 30,
+            "type": 10,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_AchieverLv2",
+            "special": 97,
+            "threshold": 100,
+            "type": 12,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_FunfestComplete",
+            "special": 96,
+            "threshold": 10,
+            "type": 13,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_GoodNight",
+            "special": 98,
+            "threshold": 1,
+            "type": 13,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_BeginningMemory",
+            "special": 99,
+            "threshold": 1,
+            "type": 12,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_MemoryMaster",
+            "special": 99,
+            "threshold": 8,
+            "type": 13,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_EntertainmentMaster",
+            "special": 100,
+            "threshold": 74,
+            "type": 14,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_NormalTypeChamp",
+            "special": 101,
+            "threshold": 1,
+            "type": 17,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_FireTypeChamp",
+            "special": 102,
+            "threshold": 1,
+            "type": 17,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_WaterTypeChamp",
+            "special": 103,
+            "threshold": 1,
+            "type": 17,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_ElectricTypeChamp",
+            "special": 104,
+            "threshold": 1,
+            "type": 17,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_GrassTypeChamp",
+            "special": 105,
+            "threshold": 1,
+            "type": 17,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_IceTypeChamp",
+            "special": 106,
+            "threshold": 1,
+            "type": 17,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_FightingTypeChamp",
+            "special": 107,
+            "threshold": 1,
+            "type": 17,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_PoisonTypeChamp",
+            "special": 108,
+            "threshold": 1,
+            "type": 17,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_GroundTypeChamp",
+            "special": 109,
+            "threshold": 1,
+            "type": 17,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_FlyingTypeChamp",
+            "special": 110,
+            "threshold": 1,
+            "type": 17,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_PsychicTypeChamp",
+            "special": 111,
+            "threshold": 1,
+            "type": 17,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_BugTypeChamp",
+            "special": 112,
+            "threshold": 1,
+            "type": 17,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_RockTypeChamp",
+            "special": 113,
+            "threshold": 1,
+            "type": 17,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_GhostTypeChamp",
+            "special": 114,
+            "threshold": 1,
+            "type": 17,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_DragonTypeChamp",
+            "special": 115,
+            "threshold": 1,
+            "type": 17,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_DarkTypeChamp",
+            "special": 116,
+            "threshold": 1,
+            "type": 17,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_SteelTypeChamp",
+            "special": 117,
+            "threshold": 1,
+            "type": 17,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_OneOnly",
+            "special": 118,
+            "threshold": 1,
+            "type": 18,
+            "kind": 3,
+            "rank": 0,
+            "unk8": 1
+        },
+        {
+            "name": "MedalNames_Text_SupremeChallenger",
+            "special": 119,
+            "threshold": 18,
+            "type": 19,
+            "kind": 0,
+            "rank": 0,
+            "unk8": 1
+        }
+    ]
+}

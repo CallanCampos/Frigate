@@ -1,0 +1,76 @@
+{
+    "$schema": "habitat.schema.json",
+    "kinds": [ "land" ],
+    "by_season": [],
+    "land": "tall_grass",
+    "species": [
+        {
+            "species": {
+                "black2": "SPECIES_MINCCINO",
+                "white2": "SPECIES_SOLOSIS"
+            },
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_CINCCINO",
+                "white2": "SPECIES_MINCCINO"
+            },
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_TRUBBISH",
+                "white2": "SPECIES_CINCCINO"
+            },
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_GOTHITA",
+                "white2": "SPECIES_TRUBBISH"
+            },
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_AUDINO",
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_EMOLGA",
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_LIEPARD",
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        }
+    ]
+}

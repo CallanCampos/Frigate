@@ -1,0 +1,11 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "F",
+    "shapes": [ 2 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_ROUTE_1": [ "fishing", "rippling_fishing" ]
+        }
+    }
+}

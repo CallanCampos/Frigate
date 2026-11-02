@@ -62,7 +62,7 @@ BOOL Scrcmd_HollowRival_HollowRivalGetCounter(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_0216a7cc(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_HollowRival_HollowRivalSetMet(VM *vm, FieldScriptEnv *env) {
     HollowRivalSave *block =
         getHollow_RivalBlk(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
 
@@ -71,7 +71,7 @@ BOOL func_ov012_0216a7cc(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_0216a7f4(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_HollowRival_HollowRivalSetSpecies(VM *vm, FieldScriptEnv *env) {
     HollowRivalSave *block =
         getHollow_RivalBlk(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
     u16 value = ScriptReadAny(vm, env);

@@ -1,0 +1,22 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The zones with lights of their own: res/lighting/zones/zones.json",
+    "description": "The last file of ARCID_ZONE_LIGHT_TABLE (a/0/8/1), ZONE_LIGHT_TABLE_FILE in zonedata.c: the zones lit by a lighting set of res/lighting/zones/ instead of their area's, a ZoneValue each, which GetZoneStaticLightDataIndex searches in order for FieldLightStatus_Get and the sunny weather. tools/data/zone_light_data.py packs it.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "zones" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "zones": {
+            "type": "array",
+            "description": "The zones, empty in both versions",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "zone", "lights" ],
+                "properties": {
+                    "zone": { "type": [ "string", "integer" ], "x-constant": "ZONE_", "minimum": 0, "maximum": 65535, "description": "A ZONE_* constant" },
+                    "lights": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "The zone's lighting set, res/lighting/zones/<n>.json" }
+                }
+            }
+        }
+    }
+}

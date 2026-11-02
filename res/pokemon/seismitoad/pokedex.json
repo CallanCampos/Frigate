@@ -1,0 +1,14 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "S",
+    "shapes": [ 10 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_ICIRRUS_CITY": [ "rippling_surf" ],
+            "ZONE_PINWHEEL_FOREST": [ "shaking_grass" ],
+            "ZONE_MOOR_OF_ICIRRUS": [ "rippling_surf" ],
+            "ZONE_ROUTE_8": [ "rippling_surf" ]
+        }
+    }
+}

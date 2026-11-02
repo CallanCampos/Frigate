@@ -462,7 +462,7 @@ clock's, and its stack holds its own frames ([../../docs/decomp-findings.md](../
   port its own, and says so). melonDS has no hook where `buildSeed` returns, so they are read from memory the oracle
   dumps at each frame (`seeds.py`): GFL's from its context and the twister's first word in the frames after start-up has
   built it, the context's state walked back to the draw that seeded the twister, whose step before is the seed; a
-  battle's from `btl_calc.c`'s work (`data_ov167_021dd844`), which takes a copy of the battle's context at its start,
+  battle's from `btl_calc.c`'s work (`g_BtlCalcWork`), which takes a copy of the battle's context at its start,
   before its first roll. The instrumented build's seeds and these are the same: the start-up's and each battle's of the
   Route 19 route in both versions.
 - **With the DS's seeds the port draws the DS's numbers** wherever its passes draw as the DS's do: New Game's day care
@@ -988,16 +988,16 @@ and variables, the mystery gifts and every other block are melonDS's:
   on the DS; White 2's port saves 740 counts later than the DS (X at count 15,160 against 14,420), and holds 0:08:10
   against 0:08:06.
 - 2 bytes of the mystery gift block's key (`0x1d292`, `MysteryGiftSaveData.key` at the end of the block at
-  `0x1c800`). The Pokémon Center's deliveryman's scripts (`res/field/scripts/global_10395.s`, `Cmd_01DB`;
-  `func_ov033_02177d78` in `src/ov033/pdw_postman.c`) read the block as the player enters, and every read decrypts it
-  and encrypts it again with a key that `mgEncryptData` (`src/system/mystery_data.c`) takes from the VBlank count,
-  `(OS_GetVBlankCount() << 8) | OS_GetVBlankCount()`. The DS's count runs ahead of its passes (its dropped frames and
-  long loads) and the port's doesn't, so the same contents come out as other bytes: as written, the whole block
+  `0x1c800`). The Pokémon Center's deliveryman's scripts (`res/field/scripts/global_10395.s`, `MysteryGifts`;
+  `Scrcmd_PdwPostman_MysteryGifts` in `src/ov033/pdw_postman.c`) read the block as the player enters, and every read
+  decrypts it and encrypts it again with a key that `mgEncryptData` (`src/system/mystery_data.c`) takes from the VBlank
+  count, `(OS_GetVBlankCount() << 8) | OS_GetVBlankCount()`. The DS's count runs ahead of its passes (its dropped frames
+  and long loads) and the port's doesn't, so the same contents come out as other bytes: as written, the whole block
   differs (`0x1c800`-`0x1d297`, 2,712 bytes with its footer). The trip decrypts each save's block as `mgDecryptData`
   does, with the key it keeps, checks that the contents add up to the block's checksum, and compares them: in both
   versions the contents are the same (no gift, all zero) under the same checksum (`0x0000`), and only the key differs,
-  `0x7f7f` on the port against the DS's `0x7560` (Black 2) and `0xb793` (White 2). A change to the gift data would
-  fail the trip. The catch saves, made without entering a Pokémon Center, hold the block as the start save has it.
+  `0x7f7f` on the port against the DS's `0x7560` (Black 2) and `0xb793` (White 2). A change to the gift data would fail
+  the trip. The catch saves, made without entering a Pokémon Center, hold the block as the start save has it.
 - 1 or 2 bytes of the field actors' block: the Pokémon Center's townsperson at (3,15) who turns at random (npc 9 of
   `res/field/events/aspertia_city_pokemon_center.json`, movement code 13, `FieldActorMovecode_MoveTurnRandom` in
   `src/ov036/field_actor_movecode.c`), its seventh actor: his turn's timer (`0x1e412`, `RailWanderWork.timer` in the

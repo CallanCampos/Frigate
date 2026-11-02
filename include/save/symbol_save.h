@@ -19,10 +19,13 @@ typedef enum {
 } SymbolKind;
 
 #define SYMBOL_POKEMON_MAX 530
+// No slot, which SymbolSave_FindFreeSlot returns when its kind's slots are full
+#define SYMBOL_SLOT_NONE 0xffff
 
 struct AreaNPCSave {
     EntreeForestPokemon pokemon[SYMBOL_POKEMON_MAX];
-    u8 unk848;
+    // 1 once a Pokémon of SYMBOL_KIND_FREE_LARGE has arrived, which picks the forest's map with deepestArea
+    u8 group;
     // The deepest area that got a Pokémon of the last kind, up to 6
     u8 deepestArea;
     u8 padding84A[2];

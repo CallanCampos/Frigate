@@ -1,0 +1,12 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "B",
+    "shapes": [ 9 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_STRANGE_HOUSE": [ "grass" ],
+            "ZONE_VICTORY_ROAD": [ "grass" ]
+        }
+    }
+}

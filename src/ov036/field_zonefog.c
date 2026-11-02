@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field_fog.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -23,7 +24,7 @@ FieldFogCtrl *FieldFogCtrl_Create(HeapID heapId) {
     FieldFogCtrl *ctrl = GFL_HeapAllocate(heapId, sizeof(FieldFogCtrl), TRUE, "field_zonefog.c", 81);
 
     ctrl->staticLightIndex = FOG_NONE;
-    ctrl->arc = GFL_ArcSysCreateFileHandle(0x50, heapId);
+    ctrl->arc = GFL_ArcSysCreateFileHandle(ARCID_ZONE_FOG_TABLE, heapId);
     return ctrl;
 }
 

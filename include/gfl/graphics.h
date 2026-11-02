@@ -10,16 +10,18 @@
 #include "struct_decls.h"
 
 struct G3DTextDrawResource {
-    u16 unk0;
-    u16 unk2;
-    u32 unk4;
-    u32 unk8;
-    u32 unkC;
-    u32 unk10;
+    // The texture's width and height, as indexes into g3d_text_draw.c's TEX_DIM_LUT
+    u16 widthIndex;
+    u16 heightIndex;
+    u32 texVramKey;
+    u32 plttVramKey;
+    // Where the texture's and the palette's data are, from the addresses of their VRAM keys
+    u32 texOffset;
+    u32 plttOffset;
 };
 
-BOOL G3DTextDraw_CreateResource(G3DResource *texture, const char *texName, uptr a2, const char *plName,
-                                const StrBuf *text, u16 a5, u16 a6, u16 color, HeapID heapId,
+BOOL G3DTextDraw_CreateResource(G3DResource *texture, const char *texName, uptr palette, const char *plName,
+                                const StrBuf *text, u16 x, u16 y, u16 color, HeapID heapId,
                                 G3DTextDrawResource *resource);
 u32 G3DTextDraw_GetTexDimCount(void);
 // NitroSDK's GX functions are in nitro/gx.h

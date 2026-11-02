@@ -31,7 +31,7 @@ GameEvent *EventEntralinkWarpIn_Create(GameSystem *gsys, u16 zoneId, const VecFx
 GameEvent *EventEntralinkWarpIn_CreateCore(GameSystem *gsys, Field *field, ZoneSpawnInfo *spawn, u32 a3, u32 a4);
 GameEvent *EventEntralinkWarp_Create(GameSystem *gsys, Field *field, ZoneSpawnInfo *spawn);
 GameEvent *EventEntralinkWarp_CreateOut(GameSystem *gsys);
-GameEventReturnCode func_ov033_02177370(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventEntralinkWarpReturn_Callback(GameEvent *event, u32 *state, void *data);
 void EventEntralinkWarp_CreateReturnLocation(ZoneSpawnInfo *spawn, Field *field);
 GameEvent *EventMapChangeWarp_CreateFromEntity(GameSystem *gsys, Field *field, ZoneWarp *warp, u32 a3);
 GameEvent *EventMapChange_CreateGrid(GameSystem *gsys, Field *field, u8 mode, u16 zoneId, VecFx32 *pos, u16 dir);

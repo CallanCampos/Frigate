@@ -1,0 +1,76 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Pokéstar Studios' cut-in scripts: res/pokewood/cutins.json",
+    "description": "ARCID_POKEWOOD_CUTIN_SCRIPT (a/2/7/5), the cut-ins that pokewood_cutin.c plays in the movies' battles after some scenes. tools/data/pokewood_cutin_data.py packs it.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "scripts" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "scripts": {
+            "type": "array",
+            "description": "Script n is the cut-in of sCutins[n], which PokewoodCutin_HasCutin and Cutin_FindScript look up by the movie and the scene",
+            "items": {
+                "type": "object", "additionalProperties": false,
+                "required": [ "movie", "scene", "unk04", "male", "female", "steps" ],
+                "properties": {
+                    "movie": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "The movie, as sCutins has it; the code doesn't read it" },
+                    "scene": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "The scene after which the cut-in plays, as sCutins has it; the code doesn't read it" },
+                    "unk04": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "1 to 3; the code doesn't read it" },
+                    "male": { "$ref": "#/$defs/resources", "description": "The resources the cut-in loads first for a male player (header halfwords 3 to 6)" },
+                    "female": { "$ref": "#/$defs/resources", "description": "And for a female player (7 to 10)" },
+                    "steps": {
+                        "type": "array",
+                        "description": "The steps in order; the cut-in ends after the last",
+                        "items": { "$ref": "#/$defs/step" }
+                    }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "resources": {
+            "type": "object", "additionalProperties": false,
+            "required": [ "palette", "characters", "cells", "animations" ],
+            "description": "Files of ARCID_POKEWOOD_CUTIN_GRA (res/graphics/pokewood_cutin_gra/) by number, which Cutin_LoadResources loads for the cut-in's CUTIN_ACTOR_COUNT actors",
+            "properties": {
+                "palette": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "The palette (NCLR)" },
+                "characters": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "The characters (NCGR)" },
+                "cells": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "The cells (NCER)" },
+                "animations": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "The cell animations (NANR)" }
+            }
+        },
+        "step": {
+            "type": "object", "additionalProperties": false, "required": [ "command" ],
+            "description": "A command of sCommands and the arguments its handler reads; the packer checks that each command has its own",
+            "properties": {
+                "command": {
+                    "enum": [ "move", "move_dist", "set_visible", "nudge", "load_resources", "wait", "print_message", "view_effect", "play_se", "wait_sound", "stop_sound" ],
+                    "description": "Cutin_CmdMove: move an actor between the screen's center and 256 pixels from it, out when it is at the center and in otherwise; Cutin_CmdMoveDist: move it a distance from where it is; Cutin_CmdSetVisible; Cutin_CmdNudge: move it 10 pixels and back; Cutin_CmdLoadResources: replace the resources; Cutin_CmdWait; Cutin_CmdPrintMessage: print a message and wait for it; Cutin_CmdViewEffect: hide the message window and wait; Cutin_CmdPlaySE; Cutin_CmdWaitSound: wait until no sound plays; Cutin_CmdStopSound"
+                },
+                "actor": { "type": "integer", "minimum": 0, "maximum": 3, "description": "For move, move_dist, set_visible and nudge: the actor, whose animation of the same number move, move_dist and nudge play" },
+                "motion": { "enum": [ "linear", "accelerating" ], "description": "For move and move_dist: at a constant speed or speeding up (sMoveFuncs)" },
+                "direction": {
+                    "enum": [ "down", "up", "left", "right", "up_left", "up_right", "down_left", "down_right" ],
+                    "description": "For move and move_dist, any of these (Cutin_GetCenterMove); for nudge, up, down, left or right (sNudgeFuncs)"
+                },
+                "frames": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "For move and move_dist: how many frames the move takes; for wait: one less than the frames it waits" },
+                "distance": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "For move_dist: how many pixels, along each axis of a diagonal move about 1.24 times this (a BUG of Cutin_GetDistMove)" },
+                "visible": { "type": "boolean", "description": "For set_visible: whether the actor shows" },
+                "male": { "$ref": "#/$defs/resources", "description": "For load_resources: the resources for a male player" },
+                "female": { "$ref": "#/$defs/resources", "description": "For load_resources: and for a female player" },
+                "step": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "For print_message: the step of the scene's messages (BtlStudioScene, the scene's messages in res/pokewood/movies/<n>/movie.json), 0 to 9, or 10 and more for the choice the player made" },
+                "kind": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "For print_message: which of the scene's two kinds of messages; for a choice, 0 for its message and any other for its message2" },
+                "se": { "type": "string", "x-constant": "SEQ_", "description": "For play_se: the sound effect" },
+                "arg0": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "An argument the command doesn't read, when it isn't 0" },
+                "arg1": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "An argument the command doesn't read, when it isn't 0" },
+                "arg2": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "An argument the command doesn't read, when it isn't 0" },
+                "arg3": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "An argument the command doesn't read, when it isn't 0" },
+                "arg4": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "An argument the command doesn't read, when it isn't 0" },
+                "arg5": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "An argument the command doesn't read, when it isn't 0" },
+                "arg6": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "An argument the command doesn't read, when it isn't 0" },
+                "arg7": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "An argument the command doesn't read, when it isn't 0" }
+            }
+        }
+    }
+}

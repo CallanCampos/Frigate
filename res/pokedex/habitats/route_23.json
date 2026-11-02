@@ -1,0 +1,211 @@
+{
+    "$schema": "habitat.schema.json",
+    "kinds": [ "land", "water", "fishing" ],
+    "by_season": [],
+    "land": "tall_grass",
+    "species": [
+        {
+            "species": "SPECIES_POLIWAG",
+            "present": {
+                "land": [],
+                "water": [],
+                "fishing": [ "spring", "summer", "autumn", "winter" ]
+            }
+        },
+        {
+            "species": "SPECIES_BUIZEL",
+            "present": {
+                "land": [],
+                "water": [ "spring", "summer", "autumn", "winter" ],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_BASCULIN",
+            "present": {
+                "land": [],
+                "water": [ "spring", "summer", "autumn", "winter" ],
+                "fishing": [ "spring", "summer", "autumn", "winter" ]
+            },
+            "forms": {
+                "black2": {},
+                "white2": {
+                    "water": [ 1, 1, 1, 1 ],
+                    "fishing": [ 1, 1, 1, 1 ]
+                }
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_GOLDUCK",
+                "white2": "SPECIES_SAWK"
+            },
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_SAWK",
+                "white2": "SPECIES_RUFFLET"
+            },
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_POLIWHIRL",
+                "white2": "SPECIES_GOLDUCK"
+            },
+            "present": {
+                "black2": {
+                    "land": [],
+                    "water": [],
+                    "fishing": [ "spring", "summer", "autumn", "winter" ]
+                },
+                "white2": {
+                    "land": [ "spring", "summer", "autumn", "winter" ],
+                    "water": [],
+                    "fishing": []
+                }
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_FLOATZEL",
+                "white2": "SPECIES_POLIWHIRL"
+            },
+            "present": {
+                "black2": {
+                    "land": [],
+                    "water": [ "spring", "summer", "autumn", "winter" ],
+                    "fishing": []
+                },
+                "white2": {
+                    "land": [],
+                    "water": [],
+                    "fishing": [ "spring", "summer", "autumn", "winter" ]
+                }
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_POLIWRATH",
+                "white2": "SPECIES_FLOATZEL"
+            },
+            "present": {
+                "black2": {
+                    "land": [],
+                    "water": [],
+                    "fishing": [ "spring", "summer", "autumn", "winter" ]
+                },
+                "white2": {
+                    "land": [],
+                    "water": [ "spring", "summer", "autumn", "winter" ],
+                    "fishing": []
+                }
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_VULLABY",
+                "white2": "SPECIES_POLIWRATH"
+            },
+            "present": {
+                "black2": {
+                    "land": [ "spring", "summer", "autumn", "winter" ],
+                    "water": [],
+                    "fishing": []
+                },
+                "white2": {
+                    "land": [],
+                    "water": [],
+                    "fishing": [ "spring", "summer", "autumn", "winter" ]
+                }
+            }
+        },
+        {
+            "species": "SPECIES_AMOONGUSS",
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_AUDINO",
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_MIENFOO",
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_GLIGAR",
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_EMOLGA",
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_MIENSHAO",
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_THROH",
+                "white2": "SPECIES_GLISCOR"
+            },
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": {
+                "black2": "SPECIES_GLISCOR",
+                "white2": "SPECIES_THROH"
+            },
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        },
+        {
+            "species": "SPECIES_BOUFFALANT",
+            "present": {
+                "land": [ "spring", "summer", "autumn", "winter" ],
+                "water": [],
+                "fishing": []
+            }
+        }
+    ]
+}

@@ -44,6 +44,16 @@ enum {
 // The frames a Pokémon icon takes to move
 #define BOX2_POKEMOVE_CNT 8
 
+// What is picked: nothing, a Pokémon or an item held by the keys (or a range being drawn by them), a range held, or a
+// range being drawn by touch on the tray or on the party
+enum {
+    BOX2_PICK_NONE,
+    BOX2_PICK_KEY,
+    BOX2_PICK_RANGE_HELD,
+    BOX2_PICK_TOUCH_TRAY,
+    BOX2_PICK_TOUCH_PARTY,
+};
+
 // Why a Pokémon can't be put where it was dropped, or picked, which Box2Bmp_PrintDenyMsg tells for some
 enum {
     BOX2_MOVE_ERR_NONE,
@@ -85,25 +95,35 @@ struct Box2SysWork {
     void *subProcWork;
     u16 subRet;
     u8 subProcType;
-    u8 unk13;
+    // What a sub proc's return puts back: 0 and 1 the menu, with the party's frame below or at the left; 2 and 3 the
+    // move mode's tray and box list, 3 with a Pokémon held; 4 and 5 the party at the right, 5 with a Pokémon held
+    u8 subProcReturn;
     u8 tray;
     u8 trayMax;
     u8 pos;
     // The tray of the held Pokémon, or BOX2_GET_NONE
     u8 getTray;
-    u8 unk18;
+    // A BOX2_PICK_*
+    u8 pickState;
     u8 trayScroll;
-    u8 unk1A;
-    u8 unk1B;
+    // Box2Obj_GetIconPos's mode for the moving icons: 1 with the party's frame at the left, 2 at the right
+    u8 iconPosMode;
+    // Set when the move mode or the move started on the party's frame
+    u8 fromParty;
     u8 moveMode : 4;
-    u8 unk1C_4 : 2;
-    u8 unk1C_6 : 2;
-    u8 unk1D;
-    u8 unk1E;
-    u8 unk1F;
-    u8 unk20;
-    u8 unk21;
-    u8 unk22;
+    // Set when moveMode 1 was picked with the menu open, so the Pokémon of the menu is picked up
+    u8 fromMenu : 2;
+    // Set when a move ended in moveMode 0, which then goes back to the main state
+    u8 moveDone : 2;
+    // The cursor's position that subProcReturn 3 and 5 put back
+    u8 subProcCursorPos;
+    // Set when the party's frame was at the left before the item arrangement brought it in
+    u8 partyWasLeft;
+    // What Box2Obj_SetButtons shows of the four buttons, kept to show them again
+    u8 button1;
+    u8 button2;
+    u8 button3;
+    u8 button4;
     u8 unk23;
     u32 curRcvPos;
     int nextSeq;
@@ -311,22 +331,28 @@ struct Box2AppWork {
     u32 oldCurPos;
     u16 getItem;
     u16 getItemInitPos;
-    u8 unkA550;
-    u8 unkA551;
-    u8 unkA552;
+    // Set when the icons were dimmed for a message, to be lit again when the menu opens
+    u8 iconsDimmed;
+    // Set while the held switch button has already switched the frames, until it is let go
+    u8 switchButtonHeld;
+    // Set when the menu's message is to be printed once the cursor's move ends
+    u8 menuMsgPending;
     // Why the last move check failed, a BOX2_MOVE_ERR_*
     u8 moveErr;
-    u32 unkA554;
+    // The markings being edited
+    u32 markings;
     s8 wallPx;
     u8 wallArea;
-    u8 unkA55A;
+    // Set while the box jump is open
+    u8 boxJumpOpen;
     u8 wallpaperPos;
-    u8 unkA55C;
+    // The wallpaper menu's page: 0 for the themes, else the theme
+    u8 wallpaperTheme;
     u8 unkA55D;
     // Where the hand puts a Pokémon or an item
     u8 pokePutKey;
-    // The box of the box list the cursor is on
-    u8 unkA55F;
+    // The box picked in the box list or the box jump
+    u8 pickedTray;
     u32 tpx;
     u32 tpy;
     int wipeSeq;
@@ -339,8 +365,10 @@ struct Box2AppWork {
     u8 rangeWidth;
     u8 rangeHeight;
     Box2RangeSelect rangeSelect;
-    BOOL unkA5B4;
-    BOOL unkA5B8;
+    // TRUE when the range was drawn or last moved by the keys, when a touch doesn't pick it up
+    BOOL rangeByKey;
+    // TRUE when a box's name was drawn to the first text object and is yet to be sent to VRAM
+    BOOL trayNamePending;
 };
 
 void Box2Main_InitVBlank(Box2SysWork *syswk);
@@ -371,7 +399,7 @@ void Box2Main_InitSettings(Box2SysWork *syswk);
 void Box2Main_PutMessageFrame(Box2SysWork *syswk);
 // Shows the previous or next box
 void Box2Main_ScrollTray(Box2SysWork *syswk, BOOL right);
-void Box2Main_StartBoxListScroll(Box2SysWork *syswk, u32 a1);
+void Box2Main_StartBoxListScroll(Box2SysWork *syswk, u32 mv);
 void Box2Main_OpenBoxList(Box2SysWork *syswk);
 BOOL Box2Main_IsTrayScrollRight(Box2SysWork *syswk, u32 from, u32 to);
 // Shows the cursor and leaves touch mode
@@ -391,7 +419,7 @@ BOOL Box2Main_PokeItemFormChange(Box2SysWork *syswk, BoxPkm *pkm);
 void Box2Main_RecalcPartyStats(Box2SysWork *syswk, u32 pos);
 void Box2Main_InitDexData(Box2SysWork *syswk);
 void Box2Main_ExitDexData(Box2SysWork *syswk);
-BOOL Box2Main_IsSpeciesFlagged(Box2SysWork *syswk, u32 pos);
+BOOL Box2Main_IsSpeciesSendable(Box2SysWork *syswk, u32 pos);
 BOOL Box2Main_PokeItemMoveCheck(Box2SysWork *syswk, u32 getPos, u32 putPos);
 void Box2Main_PokeFreeCreate(Box2SysWork *syswk);
 void Box2Main_PokeFreeExit(Box2SysWork *syswk);

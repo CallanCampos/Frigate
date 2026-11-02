@@ -44,7 +44,8 @@ static GameEventReturnCode EventCGearPowerOn_Callback(GameEvent *event, u32 *sta
         (*state)++;
         break;
     case 3:
-        FieldSubscreen_ReqChangeEx(subscreen, 8, EventCGearPowerOn_SubscreenCallback, data);
+        FieldSubscreen_ReqChangeEx(subscreen, FLD_SUBSCREEN_ID_CGEAR_WELCOME, EventCGearPowerOn_SubscreenCallback,
+                                   data);
         (*state)++;
         break;
     case 4:

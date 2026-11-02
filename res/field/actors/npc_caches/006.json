@@ -1,0 +1,23 @@
+{
+    "$schema": "../npc_cache.schema.json",
+    "codes": [
+        "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
+        "OBJ_CODE_TEAM_PLASMA_GRUNT_F",
+        "OBJ_CODE_291",
+        "OBJ_CODE_WORK_00",
+        "OBJ_CODE_207",
+        "OBJ_CODE_107",
+        "OBJ_CODE_309",
+        "OBJ_CODE_DEPOT_AGENT",
+        "OBJ_CODE_LINEBACKER",
+        "OBJ_CODE_HARLEQUIN_233",
+        "OBJ_CODE_ROUGHNECK",
+        "OBJ_CODE_25",
+        "OBJ_CODE_BACKPACKER_F",
+        "OBJ_CODE_SCHOOL_KID_F",
+        "OBJ_CODE_310",
+        "OBJ_CODE_TWINS",
+        "OBJ_CODE_POKEFAN_F",
+        "OBJ_CODE_ACE_TRAINER_F"
+    ]
+}

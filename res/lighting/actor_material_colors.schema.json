@@ -1,0 +1,42 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The billboard actors' material colors: res/lighting/actor_material_colors.json",
+    "description": "The files of ARCID_FIELD_BBD_COLOR (a/1/7/3), in order: the preset that an area's actor_material_color names (res/field/areas/; AreaData_GetActorMatColorID), which Field_LoadActorMatColorPreset gives the field's billboard actors as it loads the area (FldActMatColorPreset_Apply, field_bbd_color.c). tools/data/area_color_data.py packs them.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "presets" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "presets": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "normal", "diffuse", "ambient", "specular", "emission" ],
+                "properties": {
+                    "normal": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [ "x", "y", "z" ],
+                        "description": "The normal the billboards are lit with, in 4096ths, which the game takes as 16-bit values and normalizes (BillboardActorScene_SetCustomNormal)",
+                        "properties": { "x": { "$ref": "#/$defs/s32" }, "y": { "$ref": "#/$defs/s32" }, "z": { "$ref": "#/$defs/s32" } }
+                    },
+                    "diffuse": { "$ref": "#/$defs/color", "description": "The materials' diffuse color" },
+                    "ambient": { "$ref": "#/$defs/color", "description": "Their ambient color" },
+                    "specular": { "$ref": "#/$defs/color", "description": "Their specular color" },
+                    "emission": { "$ref": "#/$defs/color", "description": "Their emission color" }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "s32": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647 },
+        "component": { "type": "integer", "minimum": 0, "maximum": 31 },
+        "color": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [ "red", "green", "blue" ],
+            "properties": { "red": { "$ref": "#/$defs/component" }, "green": { "$ref": "#/$defs/component" }, "blue": { "$ref": "#/$defs/component" } }
+        }
+    }
+}

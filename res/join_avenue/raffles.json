@@ -1,0 +1,3087 @@
+{
+    "$schema": "join_avenue.schema.json",
+    "raffles": [
+        {
+            "total_weight": 100,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 25,
+                    "prize": 4
+                },
+                {
+                    "weight": 20,
+                    "prize": 17
+                },
+                {
+                    "weight": 16,
+                    "prize": 79
+                },
+                {
+                    "weight": 4,
+                    "prize": 28
+                },
+                {
+                    "weight": 1,
+                    "prize": 93
+                },
+                {
+                    "weight": 11,
+                    "prize": 30
+                },
+                {
+                    "weight": 10,
+                    "prize": 55
+                },
+                {
+                    "weight": 11,
+                    "prize": 56
+                },
+                {
+                    "weight": 1,
+                    "prize": 88
+                },
+                {
+                    "weight": 1,
+                    "prize": 92
+                }
+            ]
+        },
+        {
+            "total_weight": 100,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 25,
+                    "prize": 4
+                },
+                {
+                    "weight": 20,
+                    "prize": 17
+                },
+                {
+                    "weight": 16,
+                    "prize": 79
+                },
+                {
+                    "weight": 4,
+                    "prize": 28
+                },
+                {
+                    "weight": 1,
+                    "prize": 93
+                },
+                {
+                    "weight": 11,
+                    "prize": 30
+                },
+                {
+                    "weight": 10,
+                    "prize": 55
+                },
+                {
+                    "weight": 11,
+                    "prize": 56
+                },
+                {
+                    "weight": 1,
+                    "prize": 88
+                },
+                {
+                    "weight": 1,
+                    "prize": 92
+                }
+            ]
+        },
+        {
+            "total_weight": 100,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 25,
+                    "prize": 4
+                },
+                {
+                    "weight": 20,
+                    "prize": 17
+                },
+                {
+                    "weight": 16,
+                    "prize": 79
+                },
+                {
+                    "weight": 4,
+                    "prize": 28
+                },
+                {
+                    "weight": 1,
+                    "prize": 93
+                },
+                {
+                    "weight": 11,
+                    "prize": 30
+                },
+                {
+                    "weight": 10,
+                    "prize": 55
+                },
+                {
+                    "weight": 11,
+                    "prize": 56
+                },
+                {
+                    "weight": 1,
+                    "prize": 88
+                },
+                {
+                    "weight": 1,
+                    "prize": 92
+                }
+            ]
+        },
+        {
+            "total_weight": 100,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 25,
+                    "prize": 4
+                },
+                {
+                    "weight": 20,
+                    "prize": 26
+                },
+                {
+                    "weight": 16,
+                    "prize": 79
+                },
+                {
+                    "weight": 4,
+                    "prize": 28
+                },
+                {
+                    "weight": 1,
+                    "prize": 93
+                },
+                {
+                    "weight": 11,
+                    "prize": 30
+                },
+                {
+                    "weight": 10,
+                    "prize": 55
+                },
+                {
+                    "weight": 11,
+                    "prize": 56
+                },
+                {
+                    "weight": 1,
+                    "prize": 88
+                },
+                {
+                    "weight": 1,
+                    "prize": 92
+                }
+            ]
+        },
+        {
+            "total_weight": 100,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 25,
+                    "prize": 3
+                },
+                {
+                    "weight": 20,
+                    "prize": 26
+                },
+                {
+                    "weight": 15,
+                    "prize": 79
+                },
+                {
+                    "weight": 5,
+                    "prize": 28
+                },
+                {
+                    "weight": 2,
+                    "prize": 93
+                },
+                {
+                    "weight": 10,
+                    "prize": 31
+                },
+                {
+                    "weight": 10,
+                    "prize": 55
+                },
+                {
+                    "weight": 11,
+                    "prize": 56
+                },
+                {
+                    "weight": 1,
+                    "prize": 88
+                },
+                {
+                    "weight": 1,
+                    "prize": 92
+                }
+            ]
+        },
+        {
+            "total_weight": 100,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 25,
+                    "prize": 3
+                },
+                {
+                    "weight": 20,
+                    "prize": 25
+                },
+                {
+                    "weight": 15,
+                    "prize": 76
+                },
+                {
+                    "weight": 5,
+                    "prize": 28
+                },
+                {
+                    "weight": 2,
+                    "prize": 93
+                },
+                {
+                    "weight": 10,
+                    "prize": 31
+                },
+                {
+                    "weight": 10,
+                    "prize": 55
+                },
+                {
+                    "weight": 11,
+                    "prize": 56
+                },
+                {
+                    "weight": 1,
+                    "prize": 88
+                },
+                {
+                    "weight": 1,
+                    "prize": 92
+                }
+            ]
+        },
+        {
+            "total_weight": 100,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 25,
+                    "prize": 3
+                },
+                {
+                    "weight": 20,
+                    "prize": 25
+                },
+                {
+                    "weight": 15,
+                    "prize": 76
+                },
+                {
+                    "weight": 5,
+                    "prize": 28
+                },
+                {
+                    "weight": 2,
+                    "prize": 93
+                },
+                {
+                    "weight": 10,
+                    "prize": 31
+                },
+                {
+                    "weight": 10,
+                    "prize": 55
+                },
+                {
+                    "weight": 9,
+                    "prize": 56
+                },
+                {
+                    "weight": 2,
+                    "prize": 582
+                },
+                {
+                    "weight": 2,
+                    "prize": 581
+                }
+            ]
+        },
+        {
+            "total_weight": 100,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 25,
+                    "prize": 2
+                },
+                {
+                    "weight": 20,
+                    "prize": 24
+                },
+                {
+                    "weight": 15,
+                    "prize": 76
+                },
+                {
+                    "weight": 5,
+                    "prize": 28
+                },
+                {
+                    "weight": 2,
+                    "prize": 93
+                },
+                {
+                    "weight": 10,
+                    "prize": 32
+                },
+                {
+                    "weight": 10,
+                    "prize": 55
+                },
+                {
+                    "weight": 9,
+                    "prize": 56
+                },
+                {
+                    "weight": 2,
+                    "prize": 582
+                },
+                {
+                    "weight": 2,
+                    "prize": 581
+                }
+            ]
+        },
+        {
+            "total_weight": 100,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 25,
+                    "prize": 2
+                },
+                {
+                    "weight": 20,
+                    "prize": 24
+                },
+                {
+                    "weight": 15,
+                    "prize": 77
+                },
+                {
+                    "weight": 5,
+                    "prize": 28
+                },
+                {
+                    "weight": 2,
+                    "prize": 93
+                },
+                {
+                    "weight": 10,
+                    "prize": 32
+                },
+                {
+                    "weight": 10,
+                    "prize": 55
+                },
+                {
+                    "weight": 9,
+                    "prize": 56
+                },
+                {
+                    "weight": 2,
+                    "prize": 582
+                },
+                {
+                    "weight": 2,
+                    "prize": 581
+                }
+            ]
+        },
+        {
+            "total_weight": 100,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 25,
+                    "prize": 2
+                },
+                {
+                    "weight": 20,
+                    "prize": 23
+                },
+                {
+                    "weight": 15,
+                    "prize": 77
+                },
+                {
+                    "weight": 5,
+                    "prize": 28
+                },
+                {
+                    "weight": 2,
+                    "prize": 93
+                },
+                {
+                    "weight": 10,
+                    "prize": 33
+                },
+                {
+                    "weight": 10,
+                    "prize": 55
+                },
+                {
+                    "weight": 9,
+                    "prize": 56
+                },
+                {
+                    "weight": 2,
+                    "prize": 582
+                },
+                {
+                    "weight": 2,
+                    "prize": 581
+                }
+            ]
+        },
+        {
+            "total_weight": 100,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 25,
+                    "prize": 2
+                },
+                {
+                    "weight": 20,
+                    "prize": 23
+                },
+                {
+                    "weight": 15,
+                    "prize": 77
+                },
+                {
+                    "weight": 5,
+                    "prize": 28
+                },
+                {
+                    "weight": 2,
+                    "prize": 93
+                },
+                {
+                    "weight": 10,
+                    "prize": 33
+                },
+                {
+                    "weight": 10,
+                    "prize": 55
+                },
+                {
+                    "weight": 9,
+                    "prize": 56
+                },
+                {
+                    "weight": 2,
+                    "prize": 582
+                },
+                {
+                    "weight": 2,
+                    "prize": 581
+                }
+            ]
+        },
+        {
+            "total_weight": 100,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 25,
+                    "prize": 2
+                },
+                {
+                    "weight": 20,
+                    "prize": 23
+                },
+                {
+                    "weight": 15,
+                    "prize": 77
+                },
+                {
+                    "weight": 5,
+                    "prize": 28
+                },
+                {
+                    "weight": 4,
+                    "prize": 93
+                },
+                {
+                    "weight": 8,
+                    "prize": 33
+                },
+                {
+                    "weight": 8,
+                    "prize": 55
+                },
+                {
+                    "weight": 7,
+                    "prize": 56
+                },
+                {
+                    "weight": 4,
+                    "prize": 582
+                },
+                {
+                    "weight": 4,
+                    "prize": 581
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 10,
+                    "prize": 581
+                },
+                {
+                    "weight": 25,
+                    "prize": 92
+                },
+                {
+                    "weight": 20,
+                    "prize": 2
+                },
+                {
+                    "weight": 20,
+                    "prize": 3
+                },
+                {
+                    "weight": 20,
+                    "prize": 4
+                },
+                {
+                    "weight": 75,
+                    "prize": 72
+                },
+                {
+                    "weight": 75,
+                    "prize": 73
+                },
+                {
+                    "weight": 75,
+                    "prize": 74
+                },
+                {
+                    "weight": 75,
+                    "prize": 75
+                },
+                {
+                    "weight": 605,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 25,
+                    "prize": 581
+                },
+                {
+                    "weight": 50,
+                    "prize": 92
+                },
+                {
+                    "weight": 50,
+                    "prize": 2
+                },
+                {
+                    "weight": 50,
+                    "prize": 3
+                },
+                {
+                    "weight": 50,
+                    "prize": 4
+                },
+                {
+                    "weight": 75,
+                    "prize": 72
+                },
+                {
+                    "weight": 75,
+                    "prize": 73
+                },
+                {
+                    "weight": 75,
+                    "prize": 74
+                },
+                {
+                    "weight": 75,
+                    "prize": 75
+                },
+                {
+                    "weight": 475,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 50,
+                    "prize": 581
+                },
+                {
+                    "weight": 100,
+                    "prize": 92
+                },
+                {
+                    "weight": 100,
+                    "prize": 2
+                },
+                {
+                    "weight": 100,
+                    "prize": 3
+                },
+                {
+                    "weight": 100,
+                    "prize": 4
+                },
+                {
+                    "weight": 75,
+                    "prize": 72
+                },
+                {
+                    "weight": 75,
+                    "prize": 73
+                },
+                {
+                    "weight": 75,
+                    "prize": 74
+                },
+                {
+                    "weight": 75,
+                    "prize": 75
+                },
+                {
+                    "weight": 250,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 100,
+                    "prize": 581
+                },
+                {
+                    "weight": 200,
+                    "prize": 92
+                },
+                {
+                    "weight": 100,
+                    "prize": 2
+                },
+                {
+                    "weight": 100,
+                    "prize": 3
+                },
+                {
+                    "weight": 100,
+                    "prize": 4
+                },
+                {
+                    "weight": 75,
+                    "prize": 72
+                },
+                {
+                    "weight": 75,
+                    "prize": 73
+                },
+                {
+                    "weight": 75,
+                    "prize": 74
+                },
+                {
+                    "weight": 75,
+                    "prize": 75
+                },
+                {
+                    "weight": 100,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 0,
+                    "prize": 44
+                },
+                {
+                    "weight": 10,
+                    "prize": 89
+                },
+                {
+                    "weight": 10,
+                    "prize": 88
+                },
+                {
+                    "weight": 10,
+                    "prize": 221
+                },
+                {
+                    "weight": 10,
+                    "prize": 226
+                },
+                {
+                    "weight": 10,
+                    "prize": 227
+                },
+                {
+                    "weight": 10,
+                    "prize": 87
+                },
+                {
+                    "weight": 155,
+                    "prize": 86
+                },
+                {
+                    "weight": 100,
+                    "prize": 93
+                },
+                {
+                    "weight": 685,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 2,
+                    "prize": 44
+                },
+                {
+                    "weight": 25,
+                    "prize": 89
+                },
+                {
+                    "weight": 25,
+                    "prize": 88
+                },
+                {
+                    "weight": 20,
+                    "prize": 221
+                },
+                {
+                    "weight": 20,
+                    "prize": 226
+                },
+                {
+                    "weight": 20,
+                    "prize": 227
+                },
+                {
+                    "weight": 25,
+                    "prize": 87
+                },
+                {
+                    "weight": 170,
+                    "prize": 86
+                },
+                {
+                    "weight": 150,
+                    "prize": 93
+                },
+                {
+                    "weight": 543,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 4,
+                    "prize": 44
+                },
+                {
+                    "weight": 50,
+                    "prize": 89
+                },
+                {
+                    "weight": 50,
+                    "prize": 88
+                },
+                {
+                    "weight": 30,
+                    "prize": 221
+                },
+                {
+                    "weight": 30,
+                    "prize": 226
+                },
+                {
+                    "weight": 30,
+                    "prize": 227
+                },
+                {
+                    "weight": 50,
+                    "prize": 87
+                },
+                {
+                    "weight": 175,
+                    "prize": 86
+                },
+                {
+                    "weight": 200,
+                    "prize": 93
+                },
+                {
+                    "weight": 381,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 20,
+                    "prize": 44
+                },
+                {
+                    "weight": 100,
+                    "prize": 89
+                },
+                {
+                    "weight": 100,
+                    "prize": 88
+                },
+                {
+                    "weight": 60,
+                    "prize": 221
+                },
+                {
+                    "weight": 60,
+                    "prize": 226
+                },
+                {
+                    "weight": 60,
+                    "prize": 227
+                },
+                {
+                    "weight": 100,
+                    "prize": 87
+                },
+                {
+                    "weight": 200,
+                    "prize": 86
+                },
+                {
+                    "weight": 250,
+                    "prize": 93
+                },
+                {
+                    "weight": 50,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 10,
+                    "prize": 84
+                },
+                {
+                    "weight": 10,
+                    "prize": 83
+                },
+                {
+                    "weight": 10,
+                    "prize": 81
+                },
+                {
+                    "weight": 10,
+                    "prize": 108
+                },
+                {
+                    "weight": 10,
+                    "prize": 109
+                },
+                {
+                    "weight": 25,
+                    "prize": 539
+                },
+                {
+                    "weight": 25,
+                    "prize": 229
+                },
+                {
+                    "weight": 900,
+                    "prize": 238
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 20,
+                    "prize": 84
+                },
+                {
+                    "weight": 20,
+                    "prize": 83
+                },
+                {
+                    "weight": 20,
+                    "prize": 81
+                },
+                {
+                    "weight": 20,
+                    "prize": 108
+                },
+                {
+                    "weight": 20,
+                    "prize": 109
+                },
+                {
+                    "weight": 50,
+                    "prize": 539
+                },
+                {
+                    "weight": 50,
+                    "prize": 229
+                },
+                {
+                    "weight": 800,
+                    "prize": 238
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 30,
+                    "prize": 84
+                },
+                {
+                    "weight": 30,
+                    "prize": 83
+                },
+                {
+                    "weight": 30,
+                    "prize": 81
+                },
+                {
+                    "weight": 30,
+                    "prize": 108
+                },
+                {
+                    "weight": 30,
+                    "prize": 109
+                },
+                {
+                    "weight": 100,
+                    "prize": 539
+                },
+                {
+                    "weight": 100,
+                    "prize": 229
+                },
+                {
+                    "weight": 650,
+                    "prize": 238
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 60,
+                    "prize": 84
+                },
+                {
+                    "weight": 60,
+                    "prize": 83
+                },
+                {
+                    "weight": 60,
+                    "prize": 81
+                },
+                {
+                    "weight": 60,
+                    "prize": 108
+                },
+                {
+                    "weight": 60,
+                    "prize": 109
+                },
+                {
+                    "weight": 150,
+                    "prize": 539
+                },
+                {
+                    "weight": 150,
+                    "prize": 229
+                },
+                {
+                    "weight": 400,
+                    "prize": 238
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 10,
+                    "prize": 101
+                },
+                {
+                    "weight": 10,
+                    "prize": 103
+                },
+                {
+                    "weight": 10,
+                    "prize": 99
+                },
+                {
+                    "weight": 10,
+                    "prize": 104
+                },
+                {
+                    "weight": 10,
+                    "prize": 559
+                },
+                {
+                    "weight": 10,
+                    "prize": 106
+                },
+                {
+                    "weight": 25,
+                    "prize": 539
+                },
+                {
+                    "weight": 25,
+                    "prize": 229
+                },
+                {
+                    "weight": 890,
+                    "prize": 238
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 20,
+                    "prize": 101
+                },
+                {
+                    "weight": 20,
+                    "prize": 103
+                },
+                {
+                    "weight": 20,
+                    "prize": 99
+                },
+                {
+                    "weight": 20,
+                    "prize": 104
+                },
+                {
+                    "weight": 20,
+                    "prize": 559
+                },
+                {
+                    "weight": 20,
+                    "prize": 106
+                },
+                {
+                    "weight": 50,
+                    "prize": 539
+                },
+                {
+                    "weight": 50,
+                    "prize": 229
+                },
+                {
+                    "weight": 780,
+                    "prize": 238
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 30,
+                    "prize": 101
+                },
+                {
+                    "weight": 30,
+                    "prize": 103
+                },
+                {
+                    "weight": 30,
+                    "prize": 99
+                },
+                {
+                    "weight": 30,
+                    "prize": 104
+                },
+                {
+                    "weight": 30,
+                    "prize": 559
+                },
+                {
+                    "weight": 30,
+                    "prize": 106
+                },
+                {
+                    "weight": 100,
+                    "prize": 539
+                },
+                {
+                    "weight": 100,
+                    "prize": 229
+                },
+                {
+                    "weight": 620,
+                    "prize": 238
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 60,
+                    "prize": 101
+                },
+                {
+                    "weight": 60,
+                    "prize": 103
+                },
+                {
+                    "weight": 60,
+                    "prize": 99
+                },
+                {
+                    "weight": 60,
+                    "prize": 104
+                },
+                {
+                    "weight": 60,
+                    "prize": 559
+                },
+                {
+                    "weight": 60,
+                    "prize": 106
+                },
+                {
+                    "weight": 150,
+                    "prize": 539
+                },
+                {
+                    "weight": 150,
+                    "prize": 229
+                },
+                {
+                    "weight": 340,
+                    "prize": 238
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 10,
+                    "prize": 581
+                },
+                {
+                    "weight": 25,
+                    "prize": 92
+                },
+                {
+                    "weight": 20,
+                    "prize": 2
+                },
+                {
+                    "weight": 20,
+                    "prize": 3
+                },
+                {
+                    "weight": 20,
+                    "prize": 4
+                },
+                {
+                    "weight": 75,
+                    "prize": 72
+                },
+                {
+                    "weight": 75,
+                    "prize": 73
+                },
+                {
+                    "weight": 75,
+                    "prize": 74
+                },
+                {
+                    "weight": 75,
+                    "prize": 75
+                },
+                {
+                    "weight": 605,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 25,
+                    "prize": 581
+                },
+                {
+                    "weight": 50,
+                    "prize": 92
+                },
+                {
+                    "weight": 50,
+                    "prize": 2
+                },
+                {
+                    "weight": 50,
+                    "prize": 3
+                },
+                {
+                    "weight": 50,
+                    "prize": 4
+                },
+                {
+                    "weight": 75,
+                    "prize": 72
+                },
+                {
+                    "weight": 75,
+                    "prize": 73
+                },
+                {
+                    "weight": 75,
+                    "prize": 74
+                },
+                {
+                    "weight": 75,
+                    "prize": 75
+                },
+                {
+                    "weight": 475,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 50,
+                    "prize": 581
+                },
+                {
+                    "weight": 100,
+                    "prize": 92
+                },
+                {
+                    "weight": 100,
+                    "prize": 2
+                },
+                {
+                    "weight": 100,
+                    "prize": 3
+                },
+                {
+                    "weight": 100,
+                    "prize": 4
+                },
+                {
+                    "weight": 75,
+                    "prize": 72
+                },
+                {
+                    "weight": 75,
+                    "prize": 73
+                },
+                {
+                    "weight": 75,
+                    "prize": 74
+                },
+                {
+                    "weight": 75,
+                    "prize": 75
+                },
+                {
+                    "weight": 250,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 100,
+                    "prize": 581
+                },
+                {
+                    "weight": 200,
+                    "prize": 92
+                },
+                {
+                    "weight": 100,
+                    "prize": 2
+                },
+                {
+                    "weight": 100,
+                    "prize": 3
+                },
+                {
+                    "weight": 100,
+                    "prize": 4
+                },
+                {
+                    "weight": 75,
+                    "prize": 72
+                },
+                {
+                    "weight": 75,
+                    "prize": 73
+                },
+                {
+                    "weight": 75,
+                    "prize": 74
+                },
+                {
+                    "weight": 75,
+                    "prize": 75
+                },
+                {
+                    "weight": 100,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 0,
+                    "prize": 44
+                },
+                {
+                    "weight": 10,
+                    "prize": 89
+                },
+                {
+                    "weight": 10,
+                    "prize": 88
+                },
+                {
+                    "weight": 10,
+                    "prize": 233
+                },
+                {
+                    "weight": 10,
+                    "prize": 235
+                },
+                {
+                    "weight": 10,
+                    "prize": 252
+                },
+                {
+                    "weight": 10,
+                    "prize": 87
+                },
+                {
+                    "weight": 155,
+                    "prize": 86
+                },
+                {
+                    "weight": 100,
+                    "prize": 93
+                },
+                {
+                    "weight": 685,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 2,
+                    "prize": 44
+                },
+                {
+                    "weight": 25,
+                    "prize": 89
+                },
+                {
+                    "weight": 25,
+                    "prize": 88
+                },
+                {
+                    "weight": 20,
+                    "prize": 233
+                },
+                {
+                    "weight": 20,
+                    "prize": 235
+                },
+                {
+                    "weight": 20,
+                    "prize": 252
+                },
+                {
+                    "weight": 25,
+                    "prize": 87
+                },
+                {
+                    "weight": 170,
+                    "prize": 86
+                },
+                {
+                    "weight": 150,
+                    "prize": 93
+                },
+                {
+                    "weight": 543,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 4,
+                    "prize": 44
+                },
+                {
+                    "weight": 50,
+                    "prize": 89
+                },
+                {
+                    "weight": 50,
+                    "prize": 88
+                },
+                {
+                    "weight": 30,
+                    "prize": 233
+                },
+                {
+                    "weight": 30,
+                    "prize": 235
+                },
+                {
+                    "weight": 30,
+                    "prize": 252
+                },
+                {
+                    "weight": 50,
+                    "prize": 87
+                },
+                {
+                    "weight": 175,
+                    "prize": 86
+                },
+                {
+                    "weight": 200,
+                    "prize": 93
+                },
+                {
+                    "weight": 381,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 20,
+                    "prize": 44
+                },
+                {
+                    "weight": 100,
+                    "prize": 89
+                },
+                {
+                    "weight": 100,
+                    "prize": 88
+                },
+                {
+                    "weight": 60,
+                    "prize": 233
+                },
+                {
+                    "weight": 60,
+                    "prize": 235
+                },
+                {
+                    "weight": 60,
+                    "prize": 252
+                },
+                {
+                    "weight": 100,
+                    "prize": 87
+                },
+                {
+                    "weight": 200,
+                    "prize": 86
+                },
+                {
+                    "weight": 250,
+                    "prize": 93
+                },
+                {
+                    "weight": 50,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 10,
+                    "prize": 85
+                },
+                {
+                    "weight": 10,
+                    "prize": 82
+                },
+                {
+                    "weight": 10,
+                    "prize": 80
+                },
+                {
+                    "weight": 10,
+                    "prize": 107
+                },
+                {
+                    "weight": 10,
+                    "prize": 111
+                },
+                {
+                    "weight": 25,
+                    "prize": 539
+                },
+                {
+                    "weight": 25,
+                    "prize": 229
+                },
+                {
+                    "weight": 900,
+                    "prize": 238
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 20,
+                    "prize": 85
+                },
+                {
+                    "weight": 20,
+                    "prize": 82
+                },
+                {
+                    "weight": 20,
+                    "prize": 80
+                },
+                {
+                    "weight": 20,
+                    "prize": 107
+                },
+                {
+                    "weight": 20,
+                    "prize": 111
+                },
+                {
+                    "weight": 50,
+                    "prize": 539
+                },
+                {
+                    "weight": 50,
+                    "prize": 229
+                },
+                {
+                    "weight": 800,
+                    "prize": 238
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 30,
+                    "prize": 85
+                },
+                {
+                    "weight": 30,
+                    "prize": 82
+                },
+                {
+                    "weight": 30,
+                    "prize": 80
+                },
+                {
+                    "weight": 30,
+                    "prize": 107
+                },
+                {
+                    "weight": 30,
+                    "prize": 111
+                },
+                {
+                    "weight": 100,
+                    "prize": 539
+                },
+                {
+                    "weight": 100,
+                    "prize": 229
+                },
+                {
+                    "weight": 650,
+                    "prize": 238
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 60,
+                    "prize": 85
+                },
+                {
+                    "weight": 60,
+                    "prize": 82
+                },
+                {
+                    "weight": 60,
+                    "prize": 80
+                },
+                {
+                    "weight": 60,
+                    "prize": 107
+                },
+                {
+                    "weight": 60,
+                    "prize": 111
+                },
+                {
+                    "weight": 150,
+                    "prize": 539
+                },
+                {
+                    "weight": 150,
+                    "prize": 229
+                },
+                {
+                    "weight": 400,
+                    "prize": 238
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 10,
+                    "prize": 102
+                },
+                {
+                    "weight": 10,
+                    "prize": 100
+                },
+                {
+                    "weight": 10,
+                    "prize": 105
+                },
+                {
+                    "weight": 10,
+                    "prize": 572
+                },
+                {
+                    "weight": 10,
+                    "prize": 573
+                },
+                {
+                    "weight": 10,
+                    "prize": 106
+                },
+                {
+                    "weight": 25,
+                    "prize": 539
+                },
+                {
+                    "weight": 25,
+                    "prize": 229
+                },
+                {
+                    "weight": 890,
+                    "prize": 238
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 20,
+                    "prize": 102
+                },
+                {
+                    "weight": 20,
+                    "prize": 100
+                },
+                {
+                    "weight": 20,
+                    "prize": 105
+                },
+                {
+                    "weight": 20,
+                    "prize": 572
+                },
+                {
+                    "weight": 20,
+                    "prize": 573
+                },
+                {
+                    "weight": 20,
+                    "prize": 106
+                },
+                {
+                    "weight": 50,
+                    "prize": 539
+                },
+                {
+                    "weight": 50,
+                    "prize": 229
+                },
+                {
+                    "weight": 780,
+                    "prize": 238
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 30,
+                    "prize": 102
+                },
+                {
+                    "weight": 30,
+                    "prize": 100
+                },
+                {
+                    "weight": 30,
+                    "prize": 105
+                },
+                {
+                    "weight": 30,
+                    "prize": 572
+                },
+                {
+                    "weight": 30,
+                    "prize": 573
+                },
+                {
+                    "weight": 30,
+                    "prize": 106
+                },
+                {
+                    "weight": 100,
+                    "prize": 539
+                },
+                {
+                    "weight": 100,
+                    "prize": 229
+                },
+                {
+                    "weight": 620,
+                    "prize": 238
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 60,
+                    "prize": 102
+                },
+                {
+                    "weight": 60,
+                    "prize": 100
+                },
+                {
+                    "weight": 60,
+                    "prize": 105
+                },
+                {
+                    "weight": 60,
+                    "prize": 572
+                },
+                {
+                    "weight": 60,
+                    "prize": 573
+                },
+                {
+                    "weight": 60,
+                    "prize": 106
+                },
+                {
+                    "weight": 150,
+                    "prize": 539
+                },
+                {
+                    "weight": 150,
+                    "prize": 229
+                },
+                {
+                    "weight": 340,
+                    "prize": 238
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 0,
+                    "prize": 44
+                },
+                {
+                    "weight": 10,
+                    "prize": 89
+                },
+                {
+                    "weight": 10,
+                    "prize": 88
+                },
+                {
+                    "weight": 10,
+                    "prize": 321
+                },
+                {
+                    "weight": 10,
+                    "prize": 323
+                },
+                {
+                    "weight": 10,
+                    "prize": 325
+                },
+                {
+                    "weight": 10,
+                    "prize": 87
+                },
+                {
+                    "weight": 155,
+                    "prize": 86
+                },
+                {
+                    "weight": 100,
+                    "prize": 93
+                },
+                {
+                    "weight": 685,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 2,
+                    "prize": 44
+                },
+                {
+                    "weight": 25,
+                    "prize": 89
+                },
+                {
+                    "weight": 25,
+                    "prize": 88
+                },
+                {
+                    "weight": 20,
+                    "prize": 321
+                },
+                {
+                    "weight": 20,
+                    "prize": 323
+                },
+                {
+                    "weight": 20,
+                    "prize": 325
+                },
+                {
+                    "weight": 25,
+                    "prize": 87
+                },
+                {
+                    "weight": 170,
+                    "prize": 86
+                },
+                {
+                    "weight": 150,
+                    "prize": 93
+                },
+                {
+                    "weight": 543,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 4,
+                    "prize": 44
+                },
+                {
+                    "weight": 50,
+                    "prize": 89
+                },
+                {
+                    "weight": 50,
+                    "prize": 88
+                },
+                {
+                    "weight": 30,
+                    "prize": 321
+                },
+                {
+                    "weight": 30,
+                    "prize": 323
+                },
+                {
+                    "weight": 30,
+                    "prize": 325
+                },
+                {
+                    "weight": 50,
+                    "prize": 87
+                },
+                {
+                    "weight": 175,
+                    "prize": 86
+                },
+                {
+                    "weight": 200,
+                    "prize": 93
+                },
+                {
+                    "weight": 381,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 20,
+                    "prize": 44
+                },
+                {
+                    "weight": 100,
+                    "prize": 89
+                },
+                {
+                    "weight": 100,
+                    "prize": 88
+                },
+                {
+                    "weight": 60,
+                    "prize": 321
+                },
+                {
+                    "weight": 60,
+                    "prize": 323
+                },
+                {
+                    "weight": 60,
+                    "prize": 325
+                },
+                {
+                    "weight": 100,
+                    "prize": 87
+                },
+                {
+                    "weight": 200,
+                    "prize": 86
+                },
+                {
+                    "weight": 250,
+                    "prize": 93
+                },
+                {
+                    "weight": 50,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 0,
+                    "prize": 44
+                },
+                {
+                    "weight": 10,
+                    "prize": 89
+                },
+                {
+                    "weight": 10,
+                    "prize": 88
+                },
+                {
+                    "weight": 10,
+                    "prize": 324
+                },
+                {
+                    "weight": 10,
+                    "prize": 322
+                },
+                {
+                    "weight": 10,
+                    "prize": 537
+                },
+                {
+                    "weight": 10,
+                    "prize": 87
+                },
+                {
+                    "weight": 155,
+                    "prize": 86
+                },
+                {
+                    "weight": 100,
+                    "prize": 93
+                },
+                {
+                    "weight": 685,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 2,
+                    "prize": 44
+                },
+                {
+                    "weight": 25,
+                    "prize": 89
+                },
+                {
+                    "weight": 25,
+                    "prize": 88
+                },
+                {
+                    "weight": 20,
+                    "prize": 324
+                },
+                {
+                    "weight": 20,
+                    "prize": 322
+                },
+                {
+                    "weight": 20,
+                    "prize": 537
+                },
+                {
+                    "weight": 25,
+                    "prize": 87
+                },
+                {
+                    "weight": 170,
+                    "prize": 86
+                },
+                {
+                    "weight": 150,
+                    "prize": 93
+                },
+                {
+                    "weight": 543,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 4,
+                    "prize": 44
+                },
+                {
+                    "weight": 50,
+                    "prize": 89
+                },
+                {
+                    "weight": 50,
+                    "prize": 88
+                },
+                {
+                    "weight": 30,
+                    "prize": 324
+                },
+                {
+                    "weight": 30,
+                    "prize": 322
+                },
+                {
+                    "weight": 30,
+                    "prize": 537
+                },
+                {
+                    "weight": 50,
+                    "prize": 87
+                },
+                {
+                    "weight": 175,
+                    "prize": 86
+                },
+                {
+                    "weight": 200,
+                    "prize": 93
+                },
+                {
+                    "weight": 381,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 1000,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 20,
+                    "prize": 44
+                },
+                {
+                    "weight": 100,
+                    "prize": 89
+                },
+                {
+                    "weight": 100,
+                    "prize": 88
+                },
+                {
+                    "weight": 60,
+                    "prize": 324
+                },
+                {
+                    "weight": 60,
+                    "prize": 322
+                },
+                {
+                    "weight": 60,
+                    "prize": 537
+                },
+                {
+                    "weight": 100,
+                    "prize": 87
+                },
+                {
+                    "weight": 200,
+                    "prize": 86
+                },
+                {
+                    "weight": 250,
+                    "prize": 93
+                },
+                {
+                    "weight": 50,
+                    "prize": 238
+                }
+            ]
+        },
+        {
+            "total_weight": 65535,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 4,
+                    "prize": 1
+                },
+                {
+                    "weight": 100,
+                    "prize": 50
+                },
+                {
+                    "weight": 800,
+                    "prize": 53
+                },
+                {
+                    "weight": 1200,
+                    "prize": 51
+                },
+                {
+                    "weight": 1400,
+                    "prize": 29
+                },
+                {
+                    "weight": 1600,
+                    "prize": 41
+                },
+                {
+                    "weight": 2600,
+                    "prize": 39
+                },
+                {
+                    "weight": 4000,
+                    "prize": 2
+                },
+                {
+                    "weight": 6000,
+                    "prize": 27
+                },
+                {
+                    "weight": 47831,
+                    "prize": 43
+                }
+            ]
+        },
+        {
+            "total_weight": 65535,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 8,
+                    "prize": 1
+                },
+                {
+                    "weight": 200,
+                    "prize": 50
+                },
+                {
+                    "weight": 900,
+                    "prize": 53
+                },
+                {
+                    "weight": 1400,
+                    "prize": 51
+                },
+                {
+                    "weight": 1600,
+                    "prize": 29
+                },
+                {
+                    "weight": 1800,
+                    "prize": 41
+                },
+                {
+                    "weight": 2800,
+                    "prize": 39
+                },
+                {
+                    "weight": 5000,
+                    "prize": 2
+                },
+                {
+                    "weight": 8000,
+                    "prize": 27
+                },
+                {
+                    "weight": 43827,
+                    "prize": 43
+                }
+            ]
+        },
+        {
+            "total_weight": 65535,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 10,
+                    "prize": 1
+                },
+                {
+                    "weight": 400,
+                    "prize": 50
+                },
+                {
+                    "weight": 1000,
+                    "prize": 53
+                },
+                {
+                    "weight": 1600,
+                    "prize": 51
+                },
+                {
+                    "weight": 1800,
+                    "prize": 29
+                },
+                {
+                    "weight": 2000,
+                    "prize": 41
+                },
+                {
+                    "weight": 3000,
+                    "prize": 39
+                },
+                {
+                    "weight": 6000,
+                    "prize": 2
+                },
+                {
+                    "weight": 10000,
+                    "prize": 27
+                },
+                {
+                    "weight": 39725,
+                    "prize": 43
+                }
+            ]
+        },
+        {
+            "total_weight": 65535,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 20,
+                    "prize": 1
+                },
+                {
+                    "weight": 600,
+                    "prize": 50
+                },
+                {
+                    "weight": 1100,
+                    "prize": 53
+                },
+                {
+                    "weight": 1800,
+                    "prize": 51
+                },
+                {
+                    "weight": 2000,
+                    "prize": 29
+                },
+                {
+                    "weight": 2200,
+                    "prize": 41
+                },
+                {
+                    "weight": 3200,
+                    "prize": 39
+                },
+                {
+                    "weight": 7000,
+                    "prize": 2
+                },
+                {
+                    "weight": 12000,
+                    "prize": 27
+                },
+                {
+                    "weight": 35615,
+                    "prize": 43
+                }
+            ]
+        },
+        {
+            "total_weight": 65535,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 40,
+                    "prize": 1
+                },
+                {
+                    "weight": 800,
+                    "prize": 50
+                },
+                {
+                    "weight": 1200,
+                    "prize": 53
+                },
+                {
+                    "weight": 2200,
+                    "prize": 51
+                },
+                {
+                    "weight": 2200,
+                    "prize": 29
+                },
+                {
+                    "weight": 2400,
+                    "prize": 41
+                },
+                {
+                    "weight": 3400,
+                    "prize": 39
+                },
+                {
+                    "weight": 8000,
+                    "prize": 2
+                },
+                {
+                    "weight": 14000,
+                    "prize": 27
+                },
+                {
+                    "weight": 31295,
+                    "prize": 43
+                }
+            ]
+        },
+        {
+            "total_weight": 65535,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 60,
+                    "prize": 1
+                },
+                {
+                    "weight": 1000,
+                    "prize": 50
+                },
+                {
+                    "weight": 1600,
+                    "prize": 53
+                },
+                {
+                    "weight": 2600,
+                    "prize": 51
+                },
+                {
+                    "weight": 2400,
+                    "prize": 29
+                },
+                {
+                    "weight": 2600,
+                    "prize": 41
+                },
+                {
+                    "weight": 3600,
+                    "prize": 39
+                },
+                {
+                    "weight": 9000,
+                    "prize": 2
+                },
+                {
+                    "weight": 16000,
+                    "prize": 27
+                },
+                {
+                    "weight": 26675,
+                    "prize": 43
+                }
+            ]
+        },
+        {
+            "total_weight": 65535,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 80,
+                    "prize": 1
+                },
+                {
+                    "weight": 1500,
+                    "prize": 50
+                },
+                {
+                    "weight": 2000,
+                    "prize": 53
+                },
+                {
+                    "weight": 2800,
+                    "prize": 51
+                },
+                {
+                    "weight": 2600,
+                    "prize": 29
+                },
+                {
+                    "weight": 2800,
+                    "prize": 41
+                },
+                {
+                    "weight": 3800,
+                    "prize": 39
+                },
+                {
+                    "weight": 10000,
+                    "prize": 2
+                },
+                {
+                    "weight": 18000,
+                    "prize": 27
+                },
+                {
+                    "weight": 21955,
+                    "prize": 43
+                }
+            ]
+        },
+        {
+            "total_weight": 65535,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 100,
+                    "prize": 1
+                },
+                {
+                    "weight": 2000,
+                    "prize": 50
+                },
+                {
+                    "weight": 2400,
+                    "prize": 53
+                },
+                {
+                    "weight": 3000,
+                    "prize": 51
+                },
+                {
+                    "weight": 2800,
+                    "prize": 29
+                },
+                {
+                    "weight": 3000,
+                    "prize": 41
+                },
+                {
+                    "weight": 4000,
+                    "prize": 39
+                },
+                {
+                    "weight": 11000,
+                    "prize": 2
+                },
+                {
+                    "weight": 20000,
+                    "prize": 27
+                },
+                {
+                    "weight": 17235,
+                    "prize": 43
+                }
+            ]
+        },
+        {
+            "total_weight": 65535,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 120,
+                    "prize": 1
+                },
+                {
+                    "weight": 2500,
+                    "prize": 50
+                },
+                {
+                    "weight": 2800,
+                    "prize": 53
+                },
+                {
+                    "weight": 3200,
+                    "prize": 51
+                },
+                {
+                    "weight": 3000,
+                    "prize": 29
+                },
+                {
+                    "weight": 3200,
+                    "prize": 41
+                },
+                {
+                    "weight": 4200,
+                    "prize": 39
+                },
+                {
+                    "weight": 12000,
+                    "prize": 2
+                },
+                {
+                    "weight": 22000,
+                    "prize": 27
+                },
+                {
+                    "weight": 12515,
+                    "prize": 43
+                }
+            ]
+        },
+        {
+            "total_weight": 65535,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 140,
+                    "prize": 1
+                },
+                {
+                    "weight": 3000,
+                    "prize": 50
+                },
+                {
+                    "weight": 3200,
+                    "prize": 53
+                },
+                {
+                    "weight": 3400,
+                    "prize": 51
+                },
+                {
+                    "weight": 3600,
+                    "prize": 29
+                },
+                {
+                    "weight": 3800,
+                    "prize": 41
+                },
+                {
+                    "weight": 4400,
+                    "prize": 39
+                },
+                {
+                    "weight": 13000,
+                    "prize": 2
+                },
+                {
+                    "weight": 24000,
+                    "prize": 27
+                },
+                {
+                    "weight": 6995,
+                    "prize": 43
+                }
+            ]
+        },
+        {
+            "total_weight": 100,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 4,
+                    "prize": 100
+                },
+                {
+                    "weight": 4,
+                    "prize": 90
+                },
+                {
+                    "weight": 8,
+                    "prize": 75
+                },
+                {
+                    "weight": 12,
+                    "prize": 50
+                },
+                {
+                    "weight": 20,
+                    "prize": 25
+                },
+                {
+                    "weight": 24,
+                    "prize": 10
+                },
+                {
+                    "weight": 28,
+                    "prize": 5
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 100,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 10,
+                    "prize": 100
+                },
+                {
+                    "weight": 14,
+                    "prize": 90
+                },
+                {
+                    "weight": 16,
+                    "prize": 75
+                },
+                {
+                    "weight": 20,
+                    "prize": 50
+                },
+                {
+                    "weight": 16,
+                    "prize": 25
+                },
+                {
+                    "weight": 12,
+                    "prize": 10
+                },
+                {
+                    "weight": 12,
+                    "prize": 5
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 100,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 45,
+                    "prize": 100
+                },
+                {
+                    "weight": 15,
+                    "prize": 90
+                },
+                {
+                    "weight": 12,
+                    "prize": 75
+                },
+                {
+                    "weight": 10,
+                    "prize": 50
+                },
+                {
+                    "weight": 8,
+                    "prize": 25
+                },
+                {
+                    "weight": 4,
+                    "prize": 10
+                },
+                {
+                    "weight": 6,
+                    "prize": 5
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 100,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 85,
+                    "prize": 100
+                },
+                {
+                    "weight": 8,
+                    "prize": 90
+                },
+                {
+                    "weight": 2,
+                    "prize": 75
+                },
+                {
+                    "weight": 2,
+                    "prize": 50
+                },
+                {
+                    "weight": 2,
+                    "prize": 25
+                },
+                {
+                    "weight": 1,
+                    "prize": 10
+                },
+                {
+                    "weight": 0,
+                    "prize": 5
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        },
+        {
+            "total_weight": 100,
+            "column_1": 0,
+            "prizes": [
+                {
+                    "weight": 100,
+                    "prize": 100
+                },
+                {
+                    "weight": 0,
+                    "prize": 90
+                },
+                {
+                    "weight": 0,
+                    "prize": 75
+                },
+                {
+                    "weight": 0,
+                    "prize": 50
+                },
+                {
+                    "weight": 0,
+                    "prize": 25
+                },
+                {
+                    "weight": 0,
+                    "prize": 10
+                },
+                {
+                    "weight": 0,
+                    "prize": 5
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                },
+                {
+                    "weight": 0,
+                    "prize": 0
+                }
+            ]
+        }
+    ]
+}

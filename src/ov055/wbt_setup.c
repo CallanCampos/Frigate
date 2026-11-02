@@ -37,7 +37,7 @@ WbtSetup *WbtSetup_Create(HeapID heapId, GameSystem *gsys) {
         entrant->rank = 1;
         entrant->type = 0;
     }
-    setup->unkA0 = 0;
+    setup->useTransition = FALSE;
     return setup;
 }
 

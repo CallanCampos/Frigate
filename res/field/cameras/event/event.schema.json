@@ -1,0 +1,30 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "An event camera position: res/field/cameras/event/<n>.json",
+    "description": "File n of ARCID_SCRCMD_CAMERA (a/1/6/1), an EvCameraMoveData (scrcmd_camera.c): a position that the script command Scrcmd_Camera_EvCameraMoveToCommon names by its number and moves the event camera to (FieldCameraAnm_SetAnimation). tools/data/event_camera_data.py packs them in order.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "pitch", "yaw", "distance", "target", "animate" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "pitch": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "The camera's pitch, in 65536ths of a turn" },
+        "yaw": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "The camera's yaw, in 65536ths of a turn" },
+        "distance": { "$ref": "#/$defs/fx32", "description": "The camera's distance from its target, in 4096ths of a unit" },
+        "target": {
+            "type": "object", "additionalProperties": false, "required": [ "x", "y", "z" ],
+            "description": "The point the camera looks at, in 4096ths of a unit",
+            "properties": { "x": { "$ref": "#/$defs/fx32" }, "y": { "$ref": "#/$defs/fx32" }, "z": { "$ref": "#/$defs/fx32" } }
+        },
+        "animate": {
+            "type": "object", "additionalProperties": false, "required": [ "extra_translation", "pitch", "yaw", "distance", "fov", "target" ],
+            "description": "What the move animates (FieldEvCameraAnimationFlags): the camera's extra translation, pitch, yaw, distance, field of view and target; the rest stays",
+            "properties": {
+                "extra_translation": { "type": "boolean" }, "pitch": { "type": "boolean" }, "yaw": { "type": "boolean" },
+                "distance": { "type": "boolean" }, "fov": { "type": "boolean" }, "target": { "type": "boolean" }
+            }
+        }
+    },
+    "$defs": {
+        "fx32": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647 }
+    }
+}

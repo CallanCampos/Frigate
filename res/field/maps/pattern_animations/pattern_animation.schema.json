@@ -1,0 +1,59 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "An area's texture pattern animations: res/field/maps/pattern_animations/<n>/animations.json",
+    "description": "File n of ARCID_AREA_ANIME_PAT (a/0/6/9), the pack of the areas whose pattern_animation is n, which FieldTerrainAnimator_LoadTexPat loads (field_ground_anime.c). Each texture is <name>.png beside this file, an indexed PNG of its palette's indices, and each palette <first name>.pal, a JASC palette. tools/data/map_pattern_animation_data.py packs it.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "animations" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "animations": {
+            "type": "array", "maxItems": 16,
+            "description": "The pack's animations, at most FIELD_TERRAIN_TEXPAT_ANIMATION_MAX: each a GFBTP and its texture set (BTX0)",
+            "items": {
+                "type": "object", "additionalProperties": false,
+                "required": [ "length", "textures", "palettes", "targets" ],
+                "properties": {
+                    "length": { "type": "integer", "minimum": 1, "maximum": 4294967295, "description": "How many frames the animation lasts before it loops (GFBTPController's frameCount)" },
+                    "textures": {
+                        "type": "array", "minItems": 1, "maxItems": 255,
+                        "description": "The texture set's textures in its order, each <name>.png",
+                        "items": {
+                            "type": "object", "additionalProperties": false,
+                            "required": [ "name", "format", "color0_transparent" ],
+                            "properties": {
+                                "name": { "type": "string", "pattern": "^[\\x21-\\x7e]{1,16}$", "description": "The texture's name, which its palette's is with _pl; a target draws over the area's texture of the name of the first of its textures" },
+                                "format": { "enum": [ "palette4", "palette16" ], "description": "GX_TEXFMT_PLTT4 or GX_TEXFMT_PLTT16: 4 or 16 colors" },
+                                "color0_transparent": { "type": "boolean", "description": "Whether color 0 shows as transparent" }
+                            }
+                        }
+                    },
+                    "palettes": {
+                        "type": "array", "minItems": 1,
+                        "description": "The texture set's palettes in its order, each a list of the names that share one palette's colors, <first name>.pal",
+                        "items": {
+                            "type": "array", "minItems": 1,
+                            "items": { "type": "string", "pattern": "^[\\x21-\\x7e]{1,16}$" }
+                        }
+                    },
+                    "targets": {
+                        "type": "array", "minItems": 1, "maxItems": 255,
+                        "description": "The textures of the area's texture set that the animation draws over, each its key frames from frame 0: from each key frame on to the next, the target shows the key's texture",
+                        "items": {
+                            "type": "array", "minItems": 1,
+                            "items": {
+                                "type": "object", "additionalProperties": false,
+                                "required": [ "frame", "texture" ],
+                                "properties": {
+                                    "frame": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "The key's frame" },
+                                    "texture": { "type": "string", "description": "The texture it shows, by name" },
+                                    "palette": { "type": "string", "description": "Its palette by name, which the code doesn't read; when left out the one at the texture's index" }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

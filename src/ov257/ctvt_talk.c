@@ -401,7 +401,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
 
     switch (talk->state) {
     case TALK_STATE_FADE_IN:
-        if (func_ov257_021aaa74(sys) == TRUE) {
+        if (CommTvt_GetFadeInBoth(sys) == TRUE) {
             GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, wipeDivision, wipeSync, heapId);
         } else {
             GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, wipeDivision, wipeSync, heapId);
@@ -415,7 +415,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         break;
     case TALK_STATE_FADE_OUT_TO_GAME:
         GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, wipeDivision, wipeSync, heapId);
-        func_ov257_021aaa78(sys, FALSE);
+        CommTvt_SetFadeInBoth(sys, FALSE);
         talk->state = TALK_STATE_WAIT_FADE_OUT;
         break;
     case TALK_STATE_FADE_OUT: {
@@ -429,7 +429,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
             break;
         }
         GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, wipeDivision, wipeSync, heapId);
-        func_ov257_021aaa78(sys, TRUE);
+        CommTvt_SetFadeInBoth(sys, TRUE);
         talk->state = TALK_STATE_WAIT_FADE_OUT;
         break;
     }
@@ -499,11 +499,11 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         break;
     case TALK_STATE_SEND_INVITE:
         if (!CtvtTalk_CheckGameCancel(sys, talk) &&
-            CtvtComm_SendPacket(sys, CommTvt_GetComm(sys), CTVT_PACKET_UNK_B, CtvtGame_GetType(CommTvt_GetGame(sys))) ==
-                TRUE) {
+            CtvtComm_SendPacket(sys, CommTvt_GetComm(sys), CTVT_PACKET_GAME_INVITE,
+                                CtvtGame_GetType(CommTvt_GetGame(sys))) == TRUE) {
             talk->state = TALK_STATE_WAIT_ANSWERS;
             CtvtTalk_PrintGameMessage(sys, talk, 45, NULL, 0);
-            talk->gameMenu = func_ov257_021aac98(sys, 24, 15);
+            talk->gameMenu = CommTvt_OpenCancelMenu(sys, 24, 15);
         }
         break;
     case TALK_STATE_WAIT_ANSWERS: {
@@ -513,7 +513,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
             break;
         }
         comm = CommTvt_GetComm(sys);
-        CtvtComm_SendPacketAll(sys, comm, CTVT_PACKET_UNK_B, CtvtGame_GetType(CommTvt_GetGame(sys)));
+        CtvtComm_SendPacketAll(sys, comm, CTVT_PACKET_GAME_INVITE, CtvtGame_GetType(CommTvt_GetGame(sys)));
         AppTaskMenu_Update(talk->gameMenu);
         if (AppTaskMenu_IsFlashFinished(talk->gameMenu) == TRUE) {
             if (AppTaskMenu_GetCursorPos(talk->gameMenu) == 0) {
@@ -544,7 +544,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
                 sent[i] = order[i];
             }
             CtvtComm_ScanNone(sys, comm);
-            if (CtvtComm_SendPacketData(sys, comm, CTVT_PACKET_UNK_E, sent) == TRUE) {
+            if (CtvtComm_SendPacketData(sys, comm, CTVT_PACKET_GAME_STARTING, sent) == TRUE) {
                 talk->state = TALK_STATE_SEND_START;
             }
         }
@@ -573,7 +573,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
             break;
         }
         comm = CommTvt_GetComm(sys);
-        if (CtvtTalk_AreAllReady(sys, talk) && CtvtComm_SendPacket(sys, comm, CTVT_PACKET_UNK_11, 0) == TRUE) {
+        if (CtvtTalk_AreAllReady(sys, talk) && CtvtComm_SendPacket(sys, comm, CTVT_PACKET_GAME_START, 0) == TRUE) {
             talk->state = TALK_STATE_START_GAME;
         }
         break;
@@ -597,7 +597,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         break;
     }
     case TALK_STATE_CANCEL_GAME:
-        if (CtvtComm_SendPacket(sys, CommTvt_GetComm(sys), CTVT_PACKET_UNK_F, 0) == TRUE) {
+        if (CtvtComm_SendPacket(sys, CommTvt_GetComm(sys), CTVT_PACKET_GAME_CANCEL, 0) == TRUE) {
             talk->state = TALK_STATE_GAME_CANCELLED;
             CtvtTalk_PrintGameMessage(sys, talk, 46, NULL, 120);
         }
@@ -621,7 +621,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
                                           heapId);
         CtvtTalk_PrintGameMessage(sys, talk, 47, name, 0);
         GFL_StrBufFree(name);
-        talk->exitMenu = func_ov257_021aac08(sys, 24, 15);
+        talk->exitMenu = CommTvt_OpenConfirmMenuAt(sys, 24, 15);
         talk->state = TALK_STATE_INVITED_MENU;
         break;
     }
@@ -636,7 +636,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         if (AppTaskMenu_GetCursorPos(talk->exitMenu) == 0) {
             talk->state = TALK_STATE_INVITED_WAIT;
             CtvtTalk_PrintGameMessage(sys, talk, 45, NULL, 0);
-            talk->gameMenu = func_ov257_021aac98(sys, 24, 15);
+            talk->gameMenu = CommTvt_OpenCancelMenu(sys, 24, 15);
         } else {
             talk->state = TALK_STATE_REFUSED;
             CtvtTalk_PrintGameMessage(sys, talk, 48, NULL, 120);
@@ -660,7 +660,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
             AppTaskMenu_Free(talk->gameMenu);
             talk->gameMenu = NULL;
         } else if (AppTaskMenu_IsDecided(talk->gameMenu) == FALSE) {
-            CtvtComm_SendPacketAll(sys, comm, CTVT_PACKET_UNK_C, 0);
+            CtvtComm_SendPacketAll(sys, comm, CTVT_PACKET_GAME_JOIN, 0);
             if (talk->gameStarting == TRUE) {
                 talk->gameStarting = FALSE;
                 talk->state = TALK_STATE_JOIN_GAME;
@@ -672,7 +672,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         if (CtvtTalk_CheckGameCancel(sys, talk)) {
             break;
         }
-        CtvtComm_SendPacketAll(sys, CommTvt_GetComm(sys), CTVT_PACKET_UNK_10, 0);
+        CtvtComm_SendPacketAll(sys, CommTvt_GetComm(sys), CTVT_PACKET_GAME_READY, 0);
         if (talk->gameStart == TRUE) {
             talk->gameStart = FALSE;
             talk->state = TALK_STATE_FADE_OUT;
@@ -684,7 +684,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
             talk->messageFrames--;
         }
         if (talk->messageFrames == 0 && !CtvtTalk_CheckGameCancel(sys, talk)) {
-            CtvtComm_SendPacketAll(sys, CommTvt_GetComm(sys), CTVT_PACKET_UNK_D, 0);
+            CtvtComm_SendPacketAll(sys, CommTvt_GetComm(sys), CTVT_PACKET_GAME_CANCEL_REQUEST, 0);
         }
         break;
     case TALK_STATE_GAME_CANCELLED:
@@ -702,7 +702,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         }
         break;
     case TALK_STATE_SEND_EXIT:
-        if (CtvtComm_SendPacket(sys, CommTvt_GetComm(sys), CTVT_PACKET_UNK_A, 0) == TRUE) {
+        if (CtvtComm_SendPacket(sys, CommTvt_GetComm(sys), CTVT_PACKET_EXIT, 0) == TRUE) {
             talk->state = TALK_STATE_WAIT_EXIT;
         }
         // fallthrough
@@ -712,7 +712,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
 
             talk->next = TALK_NEXT_EXIT;
             talk->state = TALK_STATE_FADE_OUT;
-            CommTvt_SetMessageActive(sys, TRUE);
+            CommTvt_SetEnding(sys, TRUE);
             CtvtCamera_StopCamera(sys, camera);
             CtvtCamera_EndRecording(sys, camera);
             talk->waitSound = TRUE;
@@ -720,7 +720,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         break;
     case TALK_STATE_DISCONNECTED:
         CtvtComm_Disconnect(sys, CommTvt_GetComm(sys));
-        CommTvt_SetMessageActive(sys, TRUE);
+        CommTvt_SetEnding(sys, TRUE);
         CtvtTalk_PrintMessage(sys, talk, 36);
         talk->state = TALK_STATE_WAIT_DISCONNECTED;
         CtvtCamera_EndRecording(sys, CommTvt_GetCamera(sys));
@@ -735,10 +735,10 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         }
         break;
     case TALK_STATE_SEND_PARENT_EXIT:
-        if (CtvtComm_SendPacket(sys, CommTvt_GetComm(sys), CTVT_PACKET_UNK_A, 0) == TRUE) {
+        if (CtvtComm_SendPacket(sys, CommTvt_GetComm(sys), CTVT_PACKET_EXIT, 0) == TRUE) {
             CtvtCamera *camera = CommTvt_GetCamera(sys);
 
-            CommTvt_SetMessageActive(sys, TRUE);
+            CommTvt_SetEnding(sys, TRUE);
             CtvtCamera_EndRecording(sys, camera);
             talk->state = TALK_STATE_SYNC_EXIT;
         }
@@ -748,7 +748,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         CtvtTalk_PrintMessage(sys, talk, 37);
         talk->state = TALK_STATE_WAIT_PARENT_LEFT;
         talk->waitFrames = 0;
-        CommTvt_SetMessageActive(sys, TRUE);
+        CommTvt_SetEnding(sys, TRUE);
         CtvtCamera_EndRecording(sys, CommTvt_GetCamera(sys));
         talk->waitSound = TRUE;
         break;
@@ -768,7 +768,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
             talk->next = TALK_NEXT_EXIT;
             talk->state = TALK_STATE_FADE_OUT;
             CommTvt_DeleteTimeIcon(sys);
-            CommTvt_SetMessageActive(sys, TRUE);
+            CommTvt_SetEnding(sys, TRUE);
             CtvtCamera_StopCamera(sys, CommTvt_GetCamera(sys));
             talk->waitSound = TRUE;
         }
@@ -777,7 +777,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         CtvtComm_Disconnect(sys, CommTvt_GetComm(sys));
         CtvtTalk_PrintMessage(sys, talk, 38);
         talk->state = TALK_STATE_WAIT_ALONE;
-        CommTvt_SetMessageActive(sys, TRUE);
+        CommTvt_SetEnding(sys, TRUE);
         CtvtCamera_EndRecording(sys, CommTvt_GetCamera(sys));
         talk->waitSound = TRUE;
         break;
@@ -785,7 +785,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             talk->next = TALK_NEXT_EXIT;
             talk->state = TALK_STATE_FADE_OUT;
-            CommTvt_SetMessageActive(sys, TRUE);
+            CommTvt_SetEnding(sys, TRUE);
             CtvtCamera_StopCamera(sys, CommTvt_GetCamera(sys));
             talk->waitSound = TRUE;
         }
@@ -1045,7 +1045,7 @@ static void CtvtTalk_UpdateRecord(CommTvtWork *sys, CtvtTalk *talk) {
         u32 size;
 
         comm = CommTvt_GetComm(sys);
-        if (CtvtComm_GetUnk3f8(sys, comm) != TRUE) {
+        if (CtvtComm_CanSendVoice(sys, comm) != TRUE) {
             break;
         }
         busy = CtvtComm_IsVoiceBusy(sys, comm);
@@ -1317,7 +1317,7 @@ static void CtvtTalk_UpdateExitMenu(CommTvtWork *sys, CtvtTalk *talk) {
 
             talk->next = TALK_NEXT_EXIT;
             talk->state = TALK_STATE_FADE_OUT;
-            CommTvt_SetMessageActive(sys, TRUE);
+            CommTvt_SetEnding(sys, TRUE);
             camera = CommTvt_GetCamera(sys);
             CtvtCamera_StopCamera(sys, camera);
             CtvtCamera_EndRecording(sys, camera);

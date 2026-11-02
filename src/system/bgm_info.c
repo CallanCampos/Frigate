@@ -1,12 +1,10 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
 #include "gfl/sound.h"
 
 // The BGM info archive: which interactive sound subsystem each BGM uses. The name is the ROM's string.
-
-// The archive's one file: the count of BGMs in a byte, then for each its number in two bytes and its subsystem in one
-#define ARCID_BGM_INFO 86
 
 struct BGMInfo {
     u8 count;

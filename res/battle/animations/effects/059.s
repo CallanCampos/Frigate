@@ -1,0 +1,50 @@
+// Effect BTLV_EFFECT_FIRST + 59 (0x26c): member 59 of a/0/6/6
+
+#include "asm/btlv_effvm.inc"
+
+    ScriptHeader 1
+    ScriptVariant Effect059
+
+Effect059:
+    SetYield FALSE
+    IfVarConst EFFVM_VAR_BATTLE_STYLE, EFFVM_CMP_EQ, 0, Effect059_0120
+    IfVarConst EFFVM_VAR_BATTLE_STYLE, EFFVM_CMP_EQ, 3, Effect059_0120
+    IfVarConst EFFVM_VAR_BATTLE_STYLE, EFFVM_CMP_EQ, 2, Effect059_009E
+    IfVarConst EFFVM_VAR_ATTACKER, EFFVM_CMP_NE, 2, Effect059_0120
+    Call BTLV_EFFECT_FIRST + 87, EFFVM_ATTACKER, EFFVM_ATTACKER
+    Jump Effect059_012E
+
+Effect059_009E:
+    IfVarConst EFFVM_VAR_ATTACKER, EFFVM_CMP_EQ, 4, Effect059_0120
+    IfVarConst EFFVM_VAR_ATTACKER, EFFVM_CMP_EQ, 5, Effect059_0120
+    IfVarConst EFFVM_VAR_ATTACKER, EFFVM_CMP_EQ, 7, Effect059_0120
+    IfVarConst EFFVM_VAR_ATTACKER, EFFVM_CMP_EQ, 6, Effect059_010C
+    IfVarConst EFFVM_VAR_ATTACKER, EFFVM_CMP_EQ, 3, Effect059_010C
+    Call BTLV_EFFECT_FIRST + 88, EFFVM_ATTACKER, EFFVM_ATTACKER
+    Jump Effect059_012E
+
+Effect059_010C:
+    Call BTLV_EFFECT_FIRST + 89, EFFVM_ATTACKER, EFFVM_ATTACKER
+    Jump Effect059_012E
+
+Effect059_0120:
+    Call BTLV_EFFECT_FIRST + 86, EFFVM_ATTACKER, EFFVM_ATTACKER
+
+Effect059_012E:
+    McssPalFade EFFVM_ATTACKER, 0, 16, 0, 0x7fff
+    SetBallSource 9
+    ParticleLoad 29
+    EmitterAddAll 29, EFFVM_EMIT_ATTACKER, 8, 0, 0, FALSE, 0x1000, 0x1000, 0x1000, 0x1000
+    ParticleLoad 49
+    EmitterAdd 49, 1, EFFVM_EMIT_ATTACKER, 8, 0, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    PlaySE SEQ_SE_BOWA2, 5, EFFVM_ATTACKER, 0, 0, 127, 0, 0, 0
+    Wait EFFVM_WAIT_MCSS
+    McssScale EFFVM_ATTACKER, 1, 0, 0, 32, 0, 0
+    McssMoveXY EFFVM_ATTACKER, 1, 0, 0x800, 32, 0, 0
+    Wait EFFVM_WAIT_MCSS
+    ParticleLoad 46
+    EmitterAdd 46, 0, EFFVM_EMIT_ATTACKER, 8, 0xcd, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    ParticleDelete 49
+    Wait EFFVM_WAIT_ALL
+    End
+    .balign 4

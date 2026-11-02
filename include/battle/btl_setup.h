@@ -26,11 +26,12 @@ struct BtlFieldSituation {
     BtlFieldEnv env;
     // The battle's music, and the music of a win
     u16 bgm;
-    u16 unk12;
+    u16 winBgm;
     NetHandle *netHandle;
     u8 unk18;
     u8 unk19;
-    u8 unk1a;
+    // The kind of multi battle, which GetMultiMode returns: 0 for a battle of one player a side
+    u8 multiMode;
     u8 unk1b;
 };
 
@@ -41,8 +42,9 @@ struct BtlSetupTrainer {
     u32 aiFlags;
     u16 items[4];
     StrBuf *name;
-    PMSData unk18;
-    PMSData unk20;
+    // The phrases the trainer says on winning and on losing
+    PMSData winWords;
+    PMSData loseWords;
 };
 
 // A trainer as a link battle sends it, with the name as characters
@@ -52,8 +54,8 @@ typedef struct {
     u32 aiFlags;
     u16 items[4];
     u8 unk14[4];
-    PMSData unk18;
-    PMSData unk20;
+    PMSData winWords;
+    PMSData loseWords;
     u16 name[0x20];
     u32 nameLength;
 } BtlCommTrainerData;
@@ -64,14 +66,17 @@ struct BtlSetup {
     BtlFieldSituation fieldSituation;
     // The parties of the four clients
     PokeParty *party[4];
-    PlayerInfo *unk34[4];
+    // The players' infos, by client
+    PlayerInfo *playerInfo[4];
     u8 unk44[4];
     // The trainers of the four clients
     BtlSetupTrainer *trainers[4];
     // The trainers' names, by client
     StrBuf *trainerNames[4];
-    StrBuf *unk68;
-    StrBuf *unk6C;
+    // The opponent's lines when it loses and when it wins, for a trainer ID from 0x800 (a Pokémon World Tournament
+    // entrant's, wbt_battle.c), which BtlString_LoadTrainerWinLoseMsg shows
+    StrBuf *trainerLoseMsg;
+    StrBuf *trainerWinMsg;
     GameData *gameData;
     Config *config;
     BagSave *bag;
@@ -91,10 +96,12 @@ struct BtlSetup {
     u32 flags;
     u16 unkA0;
     u16 unkA2;
-    u32 unkA4;
+    // The money the player wins, or negative loses
+    u32 moneyChange;
     // How the battle ended, a BTL_RESULT_*
     u32 result;
-    u8 unkAC;
+    // The slot of the caught Pokémon in the second party, or 6 if none was caught
+    u8 capturedSlot;
     u8 unkAD;
     u8 unkAE;
     u8 unkAF;
@@ -115,28 +122,36 @@ struct BtlSetup {
     u8 unkDB;
     u8 unkDC;
     u8 unkDD_0 : 1;
-    u8 unkDD_1 : 1;
+    // Whether a played recording was read to its end on every client (BtlMain_IsRecReadComplete)
+    u8 recReadComplete : 1;
     u8 unkDD_2 : 1;
-    u8 unkDD_3 : 2;
+    // 1 for a Pokéstar Studios movie's battle and 2 for one loaded from its record (GetStudioMode)
+    u8 studioMode : 2;
     u8 unkDD_5 : 1;
     u8 unkDD_6 : 1;
     u8 unkDD_7 : 1;
-    u8 unkDE_0 : 1;
+    // Whether the battle doesn't register the foes in the Pokédex (RegisterDexMon)
+    u8 noPokedexRegistration : 1;
     u8 unkDE_1 : 7;
     u8 unkDF;
     u8 unkE0;
-    u8 unkE1[6];
+    // Whether each party slot's Pokémon appeared in the battle
+    u8 appeared[6];
     // The party slots each client sends out
     u8 unkE7[4][6];
     u8 unkFF;
     // Each client's remaining HP, in percent of its party's total
     u32 unk100[4];
-    u8 unk110[0x14];
+    // The choice made in each scene of a Pokéstar Studios movie, which its playback shows again
+    u8 studioChoices[0x14];
     // How a Pokéstar Studios movie ended, which picks its ending music
     u32 studioEnding;
-    u8 unk128;
-    u8 unk129;
-    u32 unk12C;
+    // The size of a Pokéstar Studios movie's audience, which event_pokewood.c draws from the grade
+    u8 audienceCount;
+    // The player's grade at the studio (PokewoodSave_GetLevelOfPoints)
+    u8 studioGrade;
+    // One bit per member of the audience still in it
+    u32 audience;
     // The Pokéstar Studios movie's score
     s32 studioScore;
     u32 unk134;

@@ -34,6 +34,16 @@ enum {
     GIFTS_BROKEN,
 };
 
+// The steps of SaveOutside_Save: write each copy of the gifts and wait for it, then the same for the keys
+enum {
+    SAVE_SEQ_FIRST_GIFTS_WRITE,
+    SAVE_SEQ_FIRST_GIFTS_WAIT,
+    SAVE_SEQ_SECOND_GIFTS_WRITE,
+    SAVE_SEQ_SECOND_GIFTS_WAIT,
+    SAVE_SEQ_KEYS_WRITE,
+    SAVE_SEQ_KEYS_WAIT,
+};
+
 typedef struct {
     u32 magic;
     // Counts the saves, so that the newer copy wins
@@ -167,7 +177,7 @@ void SaveOutside_Free(SaveOutside *work) {
 }
 
 void SaveOutside_StartSave(SaveOutside *work) {
-    work->saveSeq = 0;
+    work->saveSeq = SAVE_SEQ_FIRST_GIFTS_WRITE;
     if (work->giftsState == GIFTS_BACKUP_BROKEN) {
         work->saveSlot = 1;
     } else {
@@ -187,21 +197,21 @@ BOOL SaveOutside_Save(SaveOutside *work) {
     BOOL result;
 
     switch (work->saveSeq) {
-    case 0:
-    case 2:
+    case SAVE_SEQ_FIRST_GIFTS_WRITE:
+    case SAVE_SEQ_SECOND_GIFTS_WRITE:
         work->lockId = BackupSystem_WriteStart(work->saveSlot == 0 ? GIFTS_ADDR : GIFTS_BACKUP_ADDR, work,
                                                sizeof(SaveOutsideGiftsBlock));
         work->saveSeq++;
         break;
-    case 1:
-    case 3:
-    case 5:
+    case SAVE_SEQ_FIRST_GIFTS_WAIT:
+    case SAVE_SEQ_SECOND_GIFTS_WAIT:
+    case SAVE_SEQ_KEYS_WAIT:
         if (BackupSystem_FinishWrite(work->lockId, &result) == TRUE) {
             work->saveSlot ^= 1;
             work->saveSeq++;
         }
         break;
-    case 4:
+    case SAVE_SEQ_KEYS_WRITE:
         work->lockId = BackupSystem_WriteStart(KEYS_ADDR, &work->keys, sizeof(SaveOutsideKeysBlock));
         work->saveSeq++;
         break;

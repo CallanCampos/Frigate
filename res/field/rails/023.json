@@ -1,0 +1,279 @@
+{
+    "$schema": "rail.schema.json",
+    "tile_width": 4096,
+    "points": [
+        {
+            "name": "RE_POINT_0",
+            "position": {
+                "x": 1015808,
+                "y": 0,
+                "z": 688128
+            },
+            "camera": 0,
+            "lines": [
+                {
+                    "line": 0,
+                    "dir": "right",
+                    "width": 16
+                },
+                {
+                    "line": 1,
+                    "dir": "left",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "RE_POINT_1",
+            "position": {
+                "x": 1409024,
+                "y": 589824,
+                "z": 1015808
+            },
+            "camera": 1,
+            "lines": [
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "POINT__2_RE_LINE_0",
+            "position": {
+                "x": 1417216,
+                "y": 450560,
+                "z": 1081344
+            },
+            "camera": 2,
+            "lines": [
+                {
+                    "line": 2,
+                    "dir": "right",
+                    "width": 16
+                },
+                {
+                    "line": 0,
+                    "dir": "left",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "RE_POINT_3",
+            "position": {
+                "x": 884736,
+                "y": 0,
+                "z": 688128
+            },
+            "camera": 3,
+            "lines": [
+                {
+                    "line": 1,
+                    "dir": "right",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "POINT__4_RE_LINE_0",
+            "position": {
+                "x": 1081344,
+                "y": 786432,
+                "z": 1376256
+            },
+            "camera": 4,
+            "lines": [
+                {
+                    "line": 2,
+                    "dir": "left",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        }
+    ],
+    "lines": [
+        {
+            "name": "div_1_RE_LINE_0",
+            "point_a": 0,
+            "point_b": 2,
+            "dir": "right",
+            "curve": 0,
+            "camera": 5,
+            "length": 10,
+            "tiles": [
+                [ "0x00810001", "0x00840016", "0x00810001" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ]
+            ]
+        },
+        {
+            "name": "RE_LINE_2",
+            "point_a": 3,
+            "point_b": 0,
+            "dir": "right",
+            "curve": 1,
+            "camera": 6,
+            "length": 2,
+            "tiles": [
+                [ "0x00810001", "0x00810001", "0x00810001" ],
+                [ "0x00810001", "0x008000a3", "0x00810001" ]
+            ]
+        },
+        {
+            "name": "div_3_RE_LINE_0",
+            "point_a": 2,
+            "point_b": 4,
+            "dir": "right",
+            "curve": 2,
+            "camera": 7,
+            "length": 8,
+            "tiles": [
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00840016", "0x00840016", "0x00840016" ],
+                [ "0x00810001", "0x00810001", "0x00810001" ]
+            ]
+        }
+    ],
+    "cameras": [
+        {
+            "function": "RailCameraFuncSetStaticPYDist",
+            "params": [ 6568, 0, 917504, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "RailCameraFuncSetStaticPYDist",
+            "params": [ 6568, 0, 917504, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "RailCameraFuncSetStaticPYDist",
+            "params": [ 6568, 0, 917504, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "RailCameraFuncSetStaticPYDist",
+            "params": [ 6568, 0, 917504, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "RailCameraFuncSetStaticPYDist",
+            "params": [ 6568, 0, 917504, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FollowHeading",
+            "params": [ 16384, 6968, 962560, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FollowHeading",
+            "params": [ 16384, 6968, 962560, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FollowHeading",
+            "params": [ 16384, 6968, 962560, 0, 0, 0, 0, 0 ]
+        }
+    ],
+    "curves": [
+        {
+            "kind": "slerp_xz",
+            "center": {
+                "x": 1101381,
+                "y": 210944,
+                "z": 1069181
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "kind": "no_curve",
+            "center": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "kind": "slerp_xz",
+            "center": {
+                "x": 1085935,
+                "y": 417792,
+                "z": 1057089
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        }
+    ]
+}

@@ -1,0 +1,69 @@
+{
+    "$schema": "gate_boards.schema.json",
+    "news": [
+        {
+            "version": null,
+            "flag": "EVENT_FLAG_0x096e",
+            "clear_flag": true,
+            "message": 3,
+            "type": 2,
+            "zones": []
+        },
+        {
+            "version": null,
+            "flag": "EVENT_FLAG_0x096f",
+            "clear_flag": true,
+            "message": 4,
+            "type": 2,
+            "zones": []
+        },
+        {
+            "version": null,
+            "flag": "EVENT_FLAG_0x0970",
+            "clear_flag": true,
+            "message": 5,
+            "type": 2,
+            "zones": []
+        },
+        {
+            "version": null,
+            "flag": "EVENT_FLAG_0x0971",
+            "clear_flag": true,
+            "message": 6,
+            "type": 2,
+            "zones": []
+        },
+        {
+            "version": null,
+            "flag": "EVENT_FLAG_0x0972",
+            "clear_flag": true,
+            "message": 7,
+            "type": 2,
+            "zones": []
+        },
+        {
+            "version": null,
+            "flag": "EVENT_FLAG_0x0973",
+            "clear_flag": true,
+            "message": 8,
+            "type": 2,
+            "zones": []
+        },
+        {
+            "version": null,
+            "flag": "EVENT_FLAG_0x0974",
+            "clear_flag": true,
+            "message": 9,
+            "type": 2,
+            "zones": []
+        },
+        {
+            "version": null,
+            "flag": "EVENT_FLAG_0x0975",
+            "clear_flag": true,
+            "message": 10,
+            "type": 2,
+            "zones": []
+        }
+    ]
+}

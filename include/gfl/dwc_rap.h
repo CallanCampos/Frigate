@@ -39,9 +39,17 @@ void DWCRap_SetRequestFunc(DWCRapRequestFunc func);
 BOOL DWCRap_StartMatch(const char *key, int numEntry, BOOL a2, int a3);
 // Starts a match of numEntry machines on a query, with a function that rates the candidates
 BOOL DWCRap_StartMatchQuery(const char *query, int numEntry, DWCEvalPlayerCallback evalFunc, void *evalWork);
-// Runs the connection for a frame
-int DWCRap_Process(int a0);
-// Sends data to the other machines, as a packet of the type
+// Runs the connection for a frame; cancelMatch nonzero cancels a match that is being made
+int DWCRap_Process(int cancelMatch);
+// The types of the packets in the first byte of their header: the game's data, which the other side answers with
+// an ack before more is sent, and the ping sent when nothing was sent for a while
+enum {
+    DWCRAP_PACKET_DATA = 1,
+    DWCRAP_PACKET_PING,
+    DWCRAP_PACKET_ACK,
+};
+
+// Sends data to the other machines, as a packet of a DWCRAP_PACKET_* type
 BOOL DWCRap_SendPacket(const void *data, int size, int type);
 BOOL DWCRap_Send(const void *data, int size);
 // The machine's ID, or -1 when it is not in a match
@@ -54,9 +62,10 @@ void DWCRap_StopVoiceChat(void);
 int DWCRap_IsVoiceChatActive(void);
 void DWCRap_ResetVoiceChat(void);
 void DWCRap_SetMic(BOOL a0);
-// The kind of a Wi-Fi library error, from its code and type
+// The message in TEXT_BANK_WIFI_ERROR for a Wi-Fi library error, from its code and type
 int DWCRap_GetErrorKind(int code, int type);
-BOOL DWCRap_RequestClose(BOOL a0);
+// Closes the connection, or with checkOnly only checks on it; TRUE when it is already ready or ended
+BOOL DWCRap_RequestClose(BOOL checkOnly);
 BOOL DWCRap_ResetToReady(void);
 void DWCRap_Shutdown(void);
 // Sets the data that tells friends where this player is, from 0 to 0x20 bytes
@@ -80,7 +89,8 @@ BOOL DWCRap_IsConnected(void);
 int DWCRap_GetStatus(void);
 void DWCRap_SetAcceptConnect(int accept);
 BOOL DWCRap_IsEnding(void);
-void DWCRap_SetReportError(int a0);
+// Whether a machine leaving is recorded as an error
+void DWCRap_SetReportError(int report);
 // Sets the function called when the connection is lost
 void DWCRap_SetErrorFunc(DWCRapErrorFunc func, void *work);
 // Sets a function asked about connection events, with its work

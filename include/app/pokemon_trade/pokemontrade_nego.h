@@ -9,7 +9,7 @@ BOOL PokemonTrade_CanTradeMon(PokemonTradeWork *wk, BoxPkm *pkm);
 void PoketradeNego_FreeOfferMons(PokemonTradeWork *wk);
 void PoketradeNego_ClearOfferSlots(PokemonTradeWork *wk);
 BOOL PoketradeNego_CheckCancelTouch(PokemonTradeWork *wk);
-void PoketradeNego_CloseCancelMenu(PokemonTradeWork *wk, u32 a1, u32 a2);
+void PoketradeNego_CloseCancelMenu(PokemonTradeWork *wk, u32 showActor, u32 showButton);
 BOOL PoketradeNego_CanConfirmOffers(PokemonTradeWork *wk);
 BOOL PoketradeNego_HasOffer(PokemonTradeWork *wk);
 // The index of a Pokémon among the ones this player offers, or -1
@@ -21,6 +21,7 @@ void PoketradeNego_RegisterIconResources(PokemonTradeWork *wk, u32 vram);
 void PoketradeNego_ReleaseIconResources(PokemonTradeWork *wk);
 BOOL PoketradeNego_AddSelectedAsOffer(PokemonTradeWork *wk, int slot, int box);
 void PoketradeNego_DrawPlayerNames(PokemonTradeWork *wk);
+// Draws the label over a side's Pokémon, whose message msg picks by its TRADE_STATUS_*, if it changed or if forced
 void PoketradeNego_DrawOfferStatusLabel(PokemonTradeWork *wk, int side, u32 msg, BOOL force);
 void PoketradeNego_DeleteHeaderWindows(PokemonTradeWork *wk);
 void PoketradeNego_StepShowCancelMessage(PokemonTradeWork *wk);
@@ -28,7 +29,7 @@ BOOL PoketradeNego_IsMonOwnOffer(PokemonTradeWork *wk, int column, int row);
 BOOL PoketradeNego_IsMonPeerSelected(PokemonTradeWork *wk, int column, int row);
 void PoketradeNego_StepSendOfferRemoval(PokemonTradeWork *wk);
 void PoketradeNego_InitOfferMarkers(PokemonTradeWork *wk);
-void PoketradeNego_SetOfferMarkersState(PokemonTradeWork *wk, BOOL a1);
+void PoketradeNego_SetOfferMarkersState(PokemonTradeWork *wk, BOOL visible);
 void PoketradeNego_UpdateOfferMarkers(PokemonTradeWork *wk);
 void PoketradeNego_PollMarkerTouch(PokemonTradeWork *wk);
 void PoketradeNego_TickMarkerTimers(PokemonTradeWork *wk);

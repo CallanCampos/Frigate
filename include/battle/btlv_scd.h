@@ -12,10 +12,10 @@
 #include "struct_decls.h"
 
 // The cursor stops of btlv_input.c's target screen and their counts, by [pokeIndex][range], for doubles and triples
-extern const u8 data_ov169_0689e218[2][15];
-extern const u8 data_ov169_0689e238[3][15];
-extern const BtlvInputKeyStop *data_ov169_0689e6e0[2][15];
-extern const BtlvInputKeyStop *data_ov169_0689e884[3][15];
+extern const u8 BTLV_SCD_TARGET_STOP_COUNTS_DOUBLE[2][15];
+extern const u8 BTLV_SCD_TARGET_STOP_COUNTS_TRIPLE[3][15];
+extern const BtlvInputKeyStop *BTLV_SCD_TARGET_STOPS_DOUBLE[2][15];
+extern const BtlvInputKeyStop *BTLV_SCD_TARGET_STOPS_TRIPLE[3][15];
 
 // scdState is passed on to the input; the font is the one BtlvCore made. The TCB manager is not used
 BtlvScd *BtlvScd_Create(BtlvCore *core, BtlMainModule *mainModule, BtlPokeCon *pokeCon, TCBExManager *tcbManager,

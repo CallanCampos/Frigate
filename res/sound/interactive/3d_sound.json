@@ -1,0 +1,13 @@
+{
+    "$schema": "interactive_sound.schema.json",
+    "3d_sound": [
+        {
+            "bgm": "SEQ_BGM_H_01",
+            "tracks": [ 6, 7, 8, 9 ]
+        },
+        {
+            "bgm": "SEQ_BGM_H_03",
+            "tracks": [ 7, 8, 9 ]
+        }
+    ]
+}

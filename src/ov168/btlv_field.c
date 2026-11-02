@@ -6,6 +6,7 @@
 #include "battle/btlv_effect.h"
 #include "battle/btlv_stage.h"
 #include "constants/arc.h"
+#include "constants/battle.h"
 #include "gfl/arc.h"
 #include "gfl/g3d.h"
 #include "gfl/heap.h"
@@ -13,21 +14,24 @@
 #include "nitro/fx.h"
 #include "nnsys/g3d.h"
 
-// The archive of the field table
-#define BTLV_FIELD_TABLE_ARC 0x97
-
 #define BTLV_FIELD_RES_NONE 0xffff
 
 // A field's resources in file 1 of archive 0x97: the model, then three animations, each by variant, the season or a
 // special form; BTLV_FIELD_RES_NONE for none
 typedef u16 BtlvFieldResIds[4][8];
 
+// How an animation runs; the field's are all FIELD_ANM_LOOP
+enum {
+    FIELD_ANM_LOOP,  // every frame, at normal speed
+    FIELD_ANM_STEPS, // by speed while playing, for its frames
+};
+
 // An animation's playback, 0x10 bytes
 typedef struct {
-    u32 mode;    // 0x0  0: loops at normal speed; 1: steps by speed while playing
+    u32 mode;    // 0x0  FIELD_ANM_*
     u32 playing; // 0x4
     fx32 speed;  // 0x8
-    s32 frames;  // 0xc  mode 1: the steps left
+    s32 frames;  // 0xc  FIELD_ANM_STEPS: the steps left
 } BtlvFieldAnm;
 
 // The field's work, 0x7c bytes
@@ -54,10 +58,12 @@ static void BtlvField_FreeAnms(BtlvField *field);
 static void BtlvField_UploadTexTask(TCB *tcb, void *data);
 static void BtlvField_FreeResources(BtlvField *field);
 
-// The variant of each season, 0 for none
-static const u8 data_ov168_021f2f6c[] = { 0, 4, 5, 6, 7 };
+// The variant of each value of a field parameter's high byte, as BtlvField_Create makes it: 0 for none, the others 3
+// more
+static const u8 FIELD_PARAM_VARIANTS[] = { 0, 4, 5, 6, 7 };
 
-BtlvField *BtlvField_Create(BOOL arg0, u8 fieldId, u8 variant, HeapID heapId, u32 mode, s32 fieldParam, BOOL arg6) {
+BtlvField *BtlvField_Create(BOOL arg0, u8 fieldId, u8 variant, HeapID heapId, u32 studioMode, s32 fieldParam,
+                            BOOL arg6) {
     BtlvField *field;
     BtlvFieldResIds *table;
     u32 palSize;
@@ -65,11 +71,12 @@ BtlvField *BtlvField_Create(BOOL arg0, u8 fieldId, u8 variant, HeapID heapId, u3
     int j;
 
     field = GFL_HeapAllocate(heapId, sizeof(BtlvField), TRUE, "btlv_field.c", 0x76);
-    table = GFL_ArcSysReadHeapNew(BTLV_FIELD_TABLE_ARC, 1, HEAPID_TAIL(heapId));
+    table = GFL_ArcSysReadHeapNew(ARCID_BATTLE_BG_DATA, 1, HEAPID_TAIL(heapId));
 
-    if (mode == 1) {
+    // Pokéstar Studios' movies have their own fields; a playback's is fieldParam, or 0x15 when that is 0
+    if (studioMode == BTL_STUDIO_MODE_FILM) {
         fieldId = 0x14;
-    } else if (mode == 2) {
+    } else if (studioMode == BTL_STUDIO_MODE_PLAYBACK) {
         if (fieldParam == 0) {
             fieldId = 0x15;
             variant = 0;
@@ -115,7 +122,7 @@ BtlvField *BtlvField_Create(BOOL arg0, u8 fieldId, u8 variant, HeapID heapId, u3
             if (table[fieldId][i][variant] != BTLV_FIELD_RES_NONE) {
                 field->anmRes[j] = GFL_G3DSysReadArcSysResource(ARCID_BTLV, table[fieldId][i][variant]);
                 field->anms[j] = GFL_G3DAnmCreate(field->mdl, field->anmRes[j], 0);
-                field->anmParams[j].mode = 0;
+                field->anmParams[j].mode = FIELD_ANM_LOOP;
                 j++;
             }
         }
@@ -171,8 +178,8 @@ void BtlvField_Reload(BtlvField *field, s32 fieldParam) {
     int j;
 
     BtlvField_FreeResources(field);
-    table = GFL_ArcSysReadHeapNew(BTLV_FIELD_TABLE_ARC, 1, HEAPID_TAIL(field->heapId));
-    variant = data_ov168_021f2f6c[(fieldParam >> 8) & 0xff];
+    table = GFL_ArcSysReadHeapNew(ARCID_BATTLE_BG_DATA, 1, HEAPID_TAIL(field->heapId));
+    variant = FIELD_PARAM_VARIANTS[(fieldParam >> 8) & 0xff];
     if (table[fieldParam & 0xff][0][variant] != BTLV_FIELD_RES_NONE) {
         field->res = GFL_G3DSysReadArcSysResource(ARCID_BTLV, table[fieldParam & 0xff][0][variant]);
     }
@@ -199,7 +206,7 @@ void BtlvField_Reload(BtlvField *field, s32 fieldParam) {
             if (table[fieldParam & 0xff][i][variant] != BTLV_FIELD_RES_NONE) {
                 field->anmRes[j] = GFL_G3DSysReadArcSysResource(ARCID_BTLV, table[fieldParam & 0xff][i][variant]);
                 field->anms[j] = GFL_G3DAnmCreate(field->mdl, field->anmRes[j], 0);
-                field->anmParams[j].mode = 0;
+                field->anmParams[j].mode = FIELD_ANM_LOOP;
                 j++;
             }
         }
@@ -270,10 +277,10 @@ void BtlvField_Main(BtlvField *field) {
         for (i = 0; i < field->anmCount; i++) {
             step = 0;
             switch (field->anmParams[i].mode) {
-            case 0:
+            case FIELD_ANM_LOOP:
                 step = FX32_ONE;
                 break;
-            case 1:
+            case FIELD_ANM_STEPS:
                 if (field->anmParams[i].playing == TRUE) {
                     step = field->anmParams[i].speed;
                     field->anmParams[i].frames--;

@@ -12,8 +12,7 @@
 // The field's light colors at a time of day, read from the light files without a field, which the battle uses to
 // light its stage. The name is a guess, since the ROM has no string of this file.
 
-// The archive of the lights that a zone has instead of its area's, by GetZoneStaticLightDataIndex
-#define ARCID_LIGHTS_ZONE 81
+// ARCID_ZONE_LIGHT_TABLE has the lights that a zone has instead of its area's, by GetZoneStaticLightDataIndex
 #define ZONE_LIGHT_NONE 0x0fffffff
 
 // One of a light file's settings, which holds from the one before it until its own time of day
@@ -50,7 +49,7 @@ void FieldLightStatus_Get(u32 zoneId, u32 hour, u32 minute, u32 weather, u32 sea
         u32 index = GetZoneStaticLightDataIndex(zoneId);
 
         if (index != ZONE_LIGHT_NONE) {
-            data = FieldLightStatus_LoadData(ARCID_LIGHTS_ZONE, index, &count, HEAPID_TAIL(heapId));
+            data = FieldLightStatus_LoadData(ARCID_ZONE_LIGHT_TABLE, index, &count, HEAPID_TAIL(heapId));
         }
     }
     if (data == NULL) {

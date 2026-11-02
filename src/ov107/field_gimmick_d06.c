@@ -297,19 +297,25 @@ static GameEvent *StartPush(Field *field, FieldActor *stone, u16 dir) {
     return event;
 }
 
+enum {
+    PUSH_STEP_START,
+    PUSH_STEP_SLIDE,
+    PUSH_STEP_FINISH,
+};
+
 static GameEventReturnCode PushEvent(GameEvent *event, u32 *state, void *data) {
     PushData *push = data;
     FieldActor *player = FieldPlayer_GetActor(Field_GetPlayer(push->work->field));
 
     switch (*state) {
-    case 0:
+    case PUSH_STEP_START:
         if (IsAllActorAcmdFinished(player) == TRUE) {
             FldAct_SetAcmd(player, GetAcmdForDir(push->dir, ACMD_STAY_WALK_16F));
             GFL_SndSEPlay(SEQ_SE_FLD_63);
             (*state)++;
         }
         break;
-    case 1:
+    case PUSH_STEP_SLIDE:
         if (IsAllActorAcmdFinished(push->slot->actor) == TRUE) {
             if (push->distance > 0) {
                 u16 acmd = ACMD_WALK_16F;
@@ -329,7 +335,7 @@ static GameEventReturnCode PushEvent(GameEvent *event, u32 *state, void *data) {
             }
         }
         break;
-    case 2:
+    case PUSH_STEP_FINISH:
         if (FldAct_CheckAcmdEnd(player) == TRUE) {
             FldAct_EndAcmd(push->slot->actor);
             FldAct_EndAcmd(player);
@@ -341,27 +347,34 @@ static GameEventReturnCode PushEvent(GameEvent *event, u32 *state, void *data) {
     return GAMEEVENT_CONTINUE;
 }
 
+enum {
+    BLOCKED_STEP_START,
+    BLOCKED_STEP_END_EFFECT,
+    BLOCKED_STEP_WAIT_EFFECT,
+    BLOCKED_STEP_FINISH,
+};
+
 static GameEventReturnCode BlockedEvent(GameEvent *event, u32 *state, void *data) {
     PushData *push = data;
     FieldActor *player = FieldPlayer_GetActor(Field_GetPlayer(push->work->field));
 
     switch (*state) {
-    case 0:
+    case BLOCKED_STEP_START:
         if (IsAllActorAcmdFinished(player) == TRUE) {
             FldAct_SetAcmd(player, GetAcmdForDir(push->dir, ACMD_STAY_WALK_16F));
             GFL_SndSEPlay(SEQ_SE_WALL_HIT);
             (*state)++;
         }
-    case 1:
+    case BLOCKED_STEP_END_EFFECT:
         StoneTask_FollowStartEnding(push->slot->effect);
         (*state)++;
         break;
-    case 2:
+    case BLOCKED_STEP_WAIT_EFFECT:
         if (!StoneTask_FollowIsEnded(push->slot->effect)) {
             break;
         }
         (*state)++;
-    case 3:
+    case BLOCKED_STEP_FINISH:
         if (FldAct_CheckAcmdEnd(player) == TRUE) {
             FldAct_EndAcmd(player);
             return GAMEEVENT_DONE;

@@ -44,7 +44,7 @@ BOOL PosEventAdd(u32 effect, u8 pos, u8 monId, const u32 *args, u8 argCount) {
                 break;
             }
             handlers = sPosEventAddTable[i].eventAdd(&numHandlers);
-            item = BattleEvent_AddItem(1, effect, 1, 0, pos, handlers, numHandlers);
+            item = BattleEvent_AddItem(BTL_EVENT_FACTOR_POS, effect, 1, 0, pos, handlers, numHandlers);
             if (item != NULL) {
                 for (j = 0; j < argCount; j++) {
                     BattleEventItem_SetWorkValue(item, j, args[j]);
@@ -65,7 +65,7 @@ BOOL IsPosEffectFree(u32 effect, u8 pos) {
 static BOOL IsPosEffectFreeCore(u32 effect, u8 pos) {
     BattleEventItem *item;
 
-    for (item = BattleEvent_SeekItem(1, pos); item != NULL; item = BattleEvent_GetNextItem(item)) {
+    for (item = BattleEvent_SeekItem(BTL_EVENT_FACTOR_POS, pos); item != NULL; item = BattleEvent_GetNextItem(item)) {
         if (effect == BattleEventItem_GetSubID(item)) {
             return FALSE;
         }
@@ -74,7 +74,7 @@ static BOOL IsPosEffectFreeCore(u32 effect, u8 pos) {
 }
 
 static const BattleEventHandlerEntry sHandlersPosWish[] = {
-    { 0x76, HandlerPosWish },
+    { BTL_EVENT_TURN_CHECK_BEGIN, HandlerPosWish },
 };
 
 static const BattleEventHandlerEntry *EventAddPosWish(u32 *numHandlers) {
@@ -88,7 +88,7 @@ static void HandlerPosWish(BattleEventItem *item, BtlServerFlow *flow, u8 pos, s
     u8 wisherId;
     u8 targetId;
 
-    if (BattleEventVar_GetValue(2) == 0x1f && !BtlServerFlow_CheckMatchup(flow)) {
+    if (BattleEventVar_GetValue(BTL_EVAR_MON) == 0x1f && !BtlServerFlow_CheckMatchup(flow)) {
         if (work[0] == 0) {
             work[1] = GetTurnCounter(flow);
             work[0] = 1;
@@ -99,7 +99,7 @@ static void HandlerPosWish(BattleEventItem *item, BtlServerFlow *flow, u8 pos, s
             if (targetId != 0x1f && !IsMonFullHP(GetBattleMon(flow, targetId))) {
                 wisherId = work[6];
                 wisher = GetBattleMon(flow, wisherId);
-                recover = BattleHandler_PushWork(flow, 5, wisherId);
+                recover = BattleHandler_PushWork(flow, BTL_HANDLER_RECOVER_HP, wisherId);
                 recover->targetIndex = targetId;
                 recover->amount = DivideMaxHPZeroCheck(wisher, 2);
                 BattleHandler_StrSetup(&recover->string, 2, 0x2bc);
@@ -112,8 +112,8 @@ static void HandlerPosWish(BattleEventItem *item, BtlServerFlow *flow, u8 pos, s
 }
 
 static const BattleEventHandlerEntry sHandlersPosLunarDance[] = {
-    { 0x55, HandlerPosLunarDance },
-    { 0xa4, HandlerPosLunarDance },
+    { BTL_EVENT_MEMBER_IN, HandlerPosLunarDance },
+    { BTL_EVENT_AFTER_MOVE, HandlerPosLunarDance },
 };
 
 static const BattleEventHandlerEntry *EventAddPosLunarDance(u32 *numHandlers) {
@@ -134,7 +134,7 @@ static void HandlerPosLunarDance(BattleEventItem *item, BtlServerFlow *flow, u8 
     BattleHandlerCureConditionParam *cure;
     BattleHandlerPPParam *pp;
 
-    monId = BattleEventVar_GetValue(2);
+    monId = BattleEventVar_GetValue(BTL_EVAR_MON);
     if (pos != BtlServerFlow_MonIDToPos(flow, monId)) {
         return;
     }
@@ -153,7 +153,7 @@ static void HandlerPosLunarDance(BattleEventItem *item, BtlServerFlow *flow, u8 
         }
     }
     if (needsHeal) {
-        effect = BattleHandler_PushWork(flow, 0x37, monId);
+        effect = BattleHandler_PushWork(flow, BTL_HANDLER_EFFECT_AT_POS, monId);
         effect->effect = 0x280;
         effect->pos1 = pos;
         effect->pos2 = 6;
@@ -163,13 +163,13 @@ static void HandlerPosLunarDance(BattleEventItem *item, BtlServerFlow *flow, u8 
         BattleHandler_PopWork(flow, effect);
 
         if (!IsMonFullHP(mon)) {
-            recover = BattleHandler_PushWork(flow, 5, monId);
+            recover = BattleHandler_PushWork(flow, BTL_HANDLER_RECOVER_HP, monId);
             recover->targetIndex = monId;
             recover->amount = GetBattleMonStat(mon, BATTLEMON_MAX_HP) - GetBattleMonStat(mon, BATTLEMON_HP);
             BattleHandler_PopWork(flow, recover);
         }
         if (GetBattleMonStatus(mon)) {
-            cure = BattleHandler_PushWork(flow, 0xb, monId);
+            cure = BattleHandler_PushWork(flow, BTL_HANDLER_CURE_CONDITION, monId);
             cure->count = 1;
             cure->monIds[0] = monId;
             cure->condition = 0x24;
@@ -179,7 +179,7 @@ static void HandlerPosLunarDance(BattleEventItem *item, BtlServerFlow *flow, u8 
         for (j = 0; j < moveCount; j++) {
             ppUsed = GetMovePPUsed(mon, j);
             if (ppUsed) {
-                pp = BattleHandler_PushWork(flow, 9, monId);
+                pp = BattleHandler_PushWork(flow, BTL_HANDLER_RECOVER_PP, monId);
                 pp->monIndex = monId;
                 pp->amount = ppUsed;
                 pp->moveIndex = j;
@@ -191,8 +191,8 @@ static void HandlerPosLunarDance(BattleEventItem *item, BtlServerFlow *flow, u8 
 }
 
 static const BattleEventHandlerEntry sHandlersPosHealingWish[] = {
-    { 0x55, HandlerPosHealingWish },
-    { 0xa4, HandlerPosHealingWish },
+    { BTL_EVENT_MEMBER_IN, HandlerPosHealingWish },
+    { BTL_EVENT_AFTER_MOVE, HandlerPosHealingWish },
 };
 
 static const BattleEventHandlerEntry *EventAddPosHealingWish(u32 *numHandlers) {
@@ -208,7 +208,7 @@ static void HandlerPosHealingWish(BattleEventItem *item, BtlServerFlow *flow, u8
     BattleHandlerRecoverHPParam *recover;
     BattleHandlerCureConditionParam *cure;
 
-    monId = BattleEventVar_GetValue(2);
+    monId = BattleEventVar_GetValue(BTL_EVAR_MON);
     if (pos != BtlServerFlow_MonIDToPos(flow, monId)) {
         return;
     }
@@ -221,7 +221,7 @@ static void HandlerPosHealingWish(BattleEventItem *item, BtlServerFlow *flow, u8
         needsHeal = TRUE;
     }
     if (needsHeal) {
-        effect = BattleHandler_PushWork(flow, 0x37, monId);
+        effect = BattleHandler_PushWork(flow, BTL_HANDLER_EFFECT_AT_POS, monId);
         effect->effect = 0x27f;
         effect->pos1 = pos;
         effect->pos2 = 6;
@@ -230,13 +230,13 @@ static void HandlerPosHealingWish(BattleEventItem *item, BtlServerFlow *flow, u8
         BattleHandler_PopWork(flow, effect);
 
         if (!IsMonFullHP(mon)) {
-            recover = BattleHandler_PushWork(flow, 5, monId);
+            recover = BattleHandler_PushWork(flow, BTL_HANDLER_RECOVER_HP, monId);
             recover->targetIndex = monId;
             recover->amount = GetBattleMonStat(mon, BATTLEMON_MAX_HP) - GetBattleMonStat(mon, BATTLEMON_HP);
             BattleHandler_PopWork(flow, recover);
         }
         if (GetBattleMonStatus(mon)) {
-            cure = BattleHandler_PushWork(flow, 0xb, monId);
+            cure = BattleHandler_PushWork(flow, BTL_HANDLER_CURE_CONDITION, monId);
             cure->count = 1;
             cure->monIds[0] = monId;
             cure->condition = 0x24;
@@ -247,7 +247,7 @@ static void HandlerPosHealingWish(BattleEventItem *item, BtlServerFlow *flow, u8
 }
 
 static const BattleEventHandlerEntry sHandlersPosFutureSight[] = {
-    { 0x76, HandlerPosFutureSight },
+    { BTL_EVENT_TURN_CHECK_BEGIN, HandlerPosFutureSight },
 };
 
 static const BattleEventHandlerEntry *EventAddPosFutureSight(u32 *numHandlers) {
@@ -262,19 +262,19 @@ static void HandlerPosFutureSight(BattleEventItem *item, BtlServerFlow *flow, u8
     BattleHandlerMessageParam *msg;
     BattleHandlerDelayMoveDamageParam *damage;
 
-    if (BattleEventVar_GetValue(2) == 0x1f && !BtlServerFlow_CheckMatchup(flow)) {
+    if (BattleEventVar_GetValue(BTL_EVAR_MON) == 0x1f && !BtlServerFlow_CheckMatchup(flow)) {
         turn = GetTurnCounter(flow);
         if (turn >= work[0]) {
             targetId = BtlServerFlow_PosToMonID(flow, pos);
             attackerId = work[6];
             if (targetId != 0x1f && targetId != attackerId && !IsFainted(GetBattleMon(flow, targetId))) {
-                msg = BattleHandler_PushWork(flow, 4, attackerId);
+                msg = BattleHandler_PushWork(flow, BTL_HANDLER_MESSAGE, attackerId);
                 BattleHandler_StrSetup(&msg->string, 2, 0x438);
                 BattleHandler_AddArg(&msg->string, targetId);
                 BattleHandler_AddArg(&msg->string, work[1]);
                 BattleHandler_PopWork(flow, msg);
 
-                damage = BattleHandler_PushWork(flow, 0x27, attackerId);
+                damage = BattleHandler_PushWork(flow, BTL_HANDLER_DELAY_MOVE_DAMAGE, attackerId);
                 damage->attackerIndex = attackerId;
                 damage->targetIndex = targetId;
                 damage->move = work[1];
@@ -286,7 +286,7 @@ static void HandlerPosFutureSight(BattleEventItem *item, BtlServerFlow *flow, u8
 }
 
 static const BattleEventHandlerEntry sHandlersPosBatonPass[] = {
-    { 0x55, HandlerPosBatonPass },
+    { BTL_EVENT_MEMBER_IN, HandlerPosBatonPass },
 };
 
 static const BattleEventHandlerEntry *EventAddPosBatonPass(u32 *numHandlers) {
@@ -298,9 +298,9 @@ static void HandlerPosBatonPass(BattleEventItem *item, BtlServerFlow *flow, u8 p
     u8 monId;
     BattleHandlerBatonPassParam *param;
 
-    monId = BattleEventVar_GetValue(2);
+    monId = BattleEventVar_GetValue(BTL_EVAR_MON);
     if (monId == BtlServerFlow_PosToMonID(flow, pos)) {
-        param = BattleHandler_PushWork(flow, 0x2a, 0x1f);
+        param = BattleHandler_PushWork(flow, BTL_HANDLER_BATON_PASS, 0x1f);
         param->sourceMonIndex = work[0];
         param->targetMonIndex = monId;
         BattleHandler_PopWork(flow, param);

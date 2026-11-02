@@ -1,4 +1,6 @@
 #include "types.h"
+#include "constants/directions.h"
+#include "constants/sound.h"
 #include "field/event_action_call.h"
 #include "field/event_actor_move.h"
 #include "field/field.h"
@@ -10,10 +12,10 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
-const u32 ACMD_QUEUE_WALK_N_8F[2] = { ACMD(0xc, 1), ACMD_END };
-const u32 ACMD_QUEUE_WALK_S_8F[2] = { ACMD(0xd, 1), ACMD_END };
-const u32 ACMD_QUEUE_WALK_W_8F[2] = { ACMD(0xe, 1), ACMD_END };
-const u32 ACMD_QUEUE_WALK_E_8F[2] = { ACMD(0xf, 1), ACMD_END };
+const u32 ACMD_QUEUE_WALK_N_8F[2] = { ACMD(ACMD_WALK_8F + DIR_UP, 1), ACMD_END };
+const u32 ACMD_QUEUE_WALK_S_8F[2] = { ACMD(ACMD_WALK_8F + DIR_DOWN, 1), ACMD_END };
+const u32 ACMD_QUEUE_WALK_W_8F[2] = { ACMD(ACMD_WALK_8F + DIR_LEFT, 1), ACMD_END };
+const u32 ACMD_QUEUE_WALK_E_8F[2] = { ACMD(ACMD_WALK_8F + DIR_RIGHT, 1), ACMD_END };
 
 const fx32 JUMP_ANY_HEIGHT_TABLE[16] = {
     2 * FX32_ONE,
@@ -83,26 +85,26 @@ GameEvent *CallMoveOneTileFrontEvent(GameSystem *gsys, Field *field) {
     u32 direction = GetActorFaceDir(FieldPlayer_GetActor(Field_GetPlayer(field)));
     const u32 *queue;
     switch (direction) {
-    case 0:
+    case DIR_UP:
         queue = ACMD_QUEUE_WALK_N_8F;
         break;
-    case 1:
+    case DIR_DOWN:
         queue = ACMD_QUEUE_WALK_S_8F;
         break;
-    case 2:
+    case DIR_LEFT:
         queue = ACMD_QUEUE_WALK_W_8F;
         break;
-    case 3:
+    case DIR_RIGHT:
         queue = ACMD_QUEUE_WALK_E_8F;
         break;
     }
-    return EventActionCall_Create(gsys, field, 0xff, queue);
+    return EventActionCall_Create(gsys, field, ACTOR_UID_PLAYER, queue);
 }
 
 FieldActor *EventActionCall_FindActor(MMSys *mmSys, u16 actorId) {
     FieldActor *actor;
 
-    if (actorId == 0xf2) {
+    if (actorId == ACTOR_UID_FOLLOWER) {
         actor = FindActorByMoveCode(mmSys, MOVE_CODE_FOLLOW_PLAYER);
     } else if (actorId != 0xf1) {
         actor = FindFieldActor(mmSys, actorId);
@@ -176,7 +178,7 @@ GameEventReturnCode EventActorJump_Callback(GameEvent *event, u32 *state, void *
             position.x = work->start.x + work->displacement.x;
             position.z = work->start.z + work->displacement.z;
             SetActorWPosAll(work->actor, &position, GetActorFaceDir(work->actor));
-            GFL_SndSEPlay(0x67b);
+            GFL_SndSEPlay(SEQ_SE_FLD_10);
             FldeffDust_Start(work->actor, work->effects);
         }
         break;
@@ -191,7 +193,7 @@ GameEvent *EventActorJump_Create(GameSystem *gsys, FieldActor *actor, const VecF
     work->effects = Field_GetFieldEffects(GSYS_GetField(gsys));
     work->start = *start;
     VEC_Subtract(end, start, &work->displacement);
-    GFL_SndSEPlay(0x55e);
+    GFL_SndSEPlay(SEQ_SE_DANSA);
     return event;
 }
 
@@ -243,16 +245,16 @@ GameEvent *EventActorLinearMove_Create(GameSystem *gsys, FieldActor *actor, cons
 FieldAcmdTCB *FieldAcmdTCB_CreateWalkOneTile(FieldActor *actor, u32 direction) {
     const u32 *queue;
     switch (direction) {
-    case 0:
+    case DIR_UP:
         queue = ACMD_QUEUE_WALK_N_8F;
         break;
-    case 1:
+    case DIR_DOWN:
         queue = ACMD_QUEUE_WALK_S_8F;
         break;
-    case 2:
+    case DIR_LEFT:
         queue = ACMD_QUEUE_WALK_W_8F;
         break;
-    case 3:
+    case DIR_RIGHT:
         queue = ACMD_QUEUE_WALK_E_8F;
         break;
     }

@@ -1,0 +1,6 @@
+{
+    "$schema": "../../walking_pokemon.schema.json",
+    "species": "SPECIES_FEEBAS",
+    "sex": null,
+    "form": 0
+}

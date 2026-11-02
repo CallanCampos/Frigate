@@ -2,6 +2,7 @@
 #include "types.h"
 #include "app/pokedex_common.h"
 #include "app/pokedex_search_engine.h"
+#include "constants/arc.h"
 #include "constants/flags.h"
 #include "constants/species.h"
 #include "constants/zones.h"
@@ -20,9 +21,6 @@
 
 // What the Pokédex's overlays share: the list of the species, and the habitat lists
 
-// The heap of the Pokédex
-// The archive of the areas' files
-#define ARCID_POKEDEX_HABITAT 296
 // The file of an area that the table does not name
 #define FILE_NONE 0x18
 // The flags that make an area's conditions true

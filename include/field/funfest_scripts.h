@@ -16,7 +16,7 @@ BOOL Scrcmd_Funfest_FunfestGetItemSaleInfo(VM *vm, FieldScriptEnv *env);
 BOOL Scrcmd_Funfest_FunfestGetPokemonQuizInfo(VM *vm, FieldScriptEnv *env);
 BOOL Scrcmd_Funfest_FunfestGetPokemonQuizSpecies(VM *vm, FieldScriptEnv *env);
 BOOL Scrcmd_Funfest_FunfestGetPokemonQuizBogusSpecies(VM *vm, FieldScriptEnv *env);
-BOOL func_ov033_021772c8(VM *vm, FieldScriptEnv *env);
-BOOL func_ov033_021772f4(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Funfest_IsFestMissionAvailable(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Funfest_HasPassPower(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_FUNFEST_SCRIPTS_H

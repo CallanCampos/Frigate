@@ -1,0 +1,11 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "D",
+    "shapes": [ 9 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_DRAGONSPIRAL_TOWER": [ "rippling_fishing" ]
+        }
+    }
+}

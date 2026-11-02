@@ -1,0 +1,1747 @@
+{
+    "$schema": "lens_flares.schema.json",
+    "transitions": [
+        {
+            "zone": "ZONE_STRIATON_CITY",
+            "from_zone": "ZONE_STRIATON_CITY_POKEMON_CENTER",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_STRIATON_CITY",
+            "from_zone": "ZONE_STRIATON_CITY_2",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_NACRENE_CITY",
+            "from_zone": "ZONE_NACRENE_CITY_POKEMON_CENTER",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_NACRENE_CITY",
+            "from_zone": "ZONE_NACRENE_CITY_2",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_NIMBASA_CITY",
+            "from_zone": "ZONE_NIMBASA_CITY_POKEMON_CENTER",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_NIMBASA_CITY_2",
+            "from_zone": "ZONE_NIMBASA_CITY_17",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_NIMBASA_CITY",
+            "from_zone": "ZONE_GEAR_STATION",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_NIMBASA_CITY_2",
+            "from_zone": "ZONE_NIMBASA_CITY_GYM",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_DRIFTVEIL_CITY",
+            "from_zone": "ZONE_DRIFTVEIL_CITY_POKEMON_CENTER",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_DRIFTVEIL_CITY",
+            "from_zone": "ZONE_DRIFTVEIL_CITY_GYM_2",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_DRIFTVEIL_CITY",
+            "from_zone": "ZONE_CLAY_TUNNEL",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 6
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 6
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 6
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 6
+                }
+            }
+        },
+        {
+            "zone": "ZONE_MISTRALTON_CITY",
+            "from_zone": "ZONE_MISTRALTON_CITY_POKEMON_CENTER",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_MISTRALTON_CITY",
+            "from_zone": "ZONE_MISTRALTON_CITY_GYM",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_MISTRALTON_CITY",
+            "from_zone": "ZONE_CHARGESTONE_CAVE_2",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_ICIRRUS_CITY",
+            "from_zone": "ZONE_ICIRRUS_CITY_POKEMON_CENTER",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_ICIRRUS_CITY",
+            "from_zone": "ZONE_ICIRRUS_CITY_2",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_ICIRRUS_CITY",
+            "from_zone": "ZONE_TWIST_MOUNTAIN_5",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 6
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 6
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 6
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 6
+                }
+            }
+        },
+        {
+            "zone": "ZONE_OPELUCID_CITY",
+            "from_zone": "ZONE_OPELUCID_CITY_POKEMON_CENTER",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_OPELUCID_CITY",
+            "from_zone": "ZONE_OPELUCID_CITY_GYM",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_POKEMON_LEAGUE",
+            "from_zone": "ZONE_POKEMON_LEAGUE_11",
+            "effect_sets": {
+                "spring": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_ASPERTIA_CITY",
+            "from_zone": "ZONE_ASPERTIA_CITY_POKEMON_CENTER",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_ASPERTIA_CITY",
+            "from_zone": "ZONE_ASPERTIA_CITY_9",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_VIRBANK_CITY",
+            "from_zone": "ZONE_VIRBANK_CITY_POKEMON_CENTER",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_VIRBANK_CITY",
+            "from_zone": "ZONE_VIRBANK_CITY_GYM",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_HUMILAU_CITY",
+            "from_zone": "ZONE_HUMILAU_CITY_POKEMON_CENTER",
+            "effect_sets": {
+                "spring": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_HUMILAU_CITY",
+            "from_zone": "ZONE_HUMILAU_CITY_GYM",
+            "effect_sets": {
+                "spring": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_HUMILAU_CITY",
+            "from_zone": "ZONE_BRIDGE_GATE_GATE_9",
+            "effect_sets": {
+                "spring": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_POKESTAR_STUDIOS",
+            "from_zone": "ZONE_POKESTAR_STUDIOS_3",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_POKESTAR_STUDIOS",
+            "from_zone": "ZONE_POKESTAR_STUDIOS_4",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_ACCUMULA_TOWN",
+            "from_zone": "ZONE_ACCUMULA_TOWN_POKEMON_CENTER",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_LACUNOSA_TOWN",
+            "from_zone": "ZONE_LACUNOSA_TOWN_POKEMON_CENTER",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_UNDELLA_TOWN",
+            "from_zone": "ZONE_UNDELLA_TOWN_POKEMON_CENTER",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_UNDELLA_TOWN",
+            "from_zone": "ZONE_BRIDGE_GATE_GATE_8",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_UNDELLA_TOWN",
+            "from_zone": "ZONE_REVERSAL_MOUNTAIN_7",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 6
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 6
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 6
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 6
+                }
+            }
+        },
+        {
+            "zone": "ZONE_UNDELLA_TOWN",
+            "from_zone": "ZONE_REVERSAL_MOUNTAIN_13",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 6
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 6
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 6
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 6
+                }
+            }
+        },
+        {
+            "zone": "ZONE_FLOCCESY_TOWN",
+            "from_zone": "ZONE_FLOCCESY_TOWN_POKEMON_CENTER",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_DREAMYARD",
+            "from_zone": "ZONE_DREAMYARD_2",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 6
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 6
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 6
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 6
+                }
+            }
+        },
+        {
+            "zone": "ZONE_PWT",
+            "from_zone": "ZONE_PWT_2",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_PWT",
+            "from_zone": "ZONE_RELIC_PASSAGE_3",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 6
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 6
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 6
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 6
+                }
+            }
+        },
+        {
+            "zone": "ZONE_CHARGESTONE_CAVE",
+            "from_zone": "ZONE_CHARGESTONE_CAVE_2",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 6
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 6
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 6
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 6
+                }
+            }
+        },
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN",
+            "from_zone": "ZONE_TWIST_MOUNTAIN_3",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 6
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 6
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 6
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 6
+                }
+            }
+        },
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN_2",
+            "from_zone": "ZONE_TWIST_MOUNTAIN_3",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 6
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 6
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 6
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 6
+                }
+            }
+        },
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN_2",
+            "from_zone": "ZONE_TWIST_MOUNTAIN_4",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 6
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 6
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 6
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 6
+                }
+            }
+        },
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN_2",
+            "from_zone": "ZONE_TWIST_MOUNTAIN_5",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 6
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 6
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 6
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 6
+                }
+            }
+        },
+        {
+            "zone": "ZONE_DRAGONSPIRAL_TOWER_2",
+            "from_zone": "ZONE_DRAGONSPIRAL_TOWER_3",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_LIBERTY_GARDEN",
+            "from_zone": "ZONE_LIBERTY_GARDEN_2",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_UNDELLA_BAY",
+            "from_zone": "ZONE_ABYSSAL_RUINS",
+            "effect_sets": {
+                "spring": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_UNDELLA_BAY",
+            "from_zone": "ZONE_ABYSSAL_RUINS_2",
+            "effect_sets": {
+                "spring": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_UNDELLA_BAY",
+            "from_zone": "ZONE_ABYSSAL_RUINS_3",
+            "effect_sets": {
+                "spring": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_UNDELLA_BAY",
+            "from_zone": "ZONE_ABYSSAL_RUINS_4",
+            "effect_sets": {
+                "spring": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_UNDELLA_BAY",
+            "from_zone": "ZONE_SEASIDE_CAVE",
+            "effect_sets": {
+                "spring": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD",
+            "from_zone": "ZONE_VICTORY_ROAD_17",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 8,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 8,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 8,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 8,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD",
+            "from_zone": "ZONE_VICTORY_ROAD_24",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 8,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 8,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 8,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 8,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD",
+            "from_zone": "ZONE_VICTORY_ROAD_27",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 8,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 8,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 8,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 8,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_19",
+            "from_zone": "ZONE_VICTORY_ROAD_17",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 8,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 8,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 8,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 8,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_19",
+            "from_zone": "ZONE_VICTORY_ROAD_20",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 8,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 8,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 8,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 8,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_25",
+            "from_zone": "ZONE_VICTORY_ROAD_20",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 8,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 8,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 8,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 8,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD_25",
+            "from_zone": "ZONE_VICTORY_ROAD_24",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 8,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 8,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 8,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 8,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_3",
+            "from_zone": "ZONE_WELLSPRING_CAVE",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 6
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 6
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 6
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 6
+                }
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_4",
+            "from_zone": "ZONE_JOIN_AVENUE",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_6",
+            "from_zone": "ZONE_MISTRALTON_CAVE",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 6
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 6
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 6
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 6
+                }
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_7",
+            "from_zone": "ZONE_CELESTIAL_TOWER_2",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 6
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 6
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 6
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 6
+                }
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_9",
+            "from_zone": "ZONE_SHOPPING_MALL",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_20",
+            "from_zone": "ZONE_CAVE_OF_BEING",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 6
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 6
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 6
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 6
+                }
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_21",
+            "from_zone": "ZONE_SEASIDE_CAVE",
+            "effect_sets": {
+                "spring": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "summer": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "autumn": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                },
+                "winter": {
+                    "day": 7,
+                    "evening": 8,
+                    "night": 0
+                }
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_22",
+            "from_zone": "ZONE_GIANT_CHASM_2",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 6
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 6
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 6
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 6
+                }
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_23",
+            "from_zone": "ZONE_GIANT_CHASM_2",
+            "effect_sets": {
+                "spring": {
+                    "day": 1,
+                    "evening": 5,
+                    "night": 6
+                },
+                "summer": {
+                    "day": 2,
+                    "evening": 5,
+                    "night": 6
+                },
+                "autumn": {
+                    "day": 3,
+                    "evening": 5,
+                    "night": 6
+                },
+                "winter": {
+                    "day": 4,
+                    "evening": 5,
+                    "night": 6
+                }
+            }
+        }
+    ]
+}

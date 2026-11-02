@@ -8,6 +8,48 @@
 // The PC box's windows. The ROM doesn't name this file; box2_bmp.c is a guess after box2_main.c. None of these
 // functions has a name yet
 
+// The messages of Box2Bmp_PrintReleaseMsg
+enum {
+    BOX2_RELEASE_MSG_ASK,
+    BOX2_RELEASE_MSG_RELEASED,
+    BOX2_RELEASE_MSG_BYE_BYE,
+    BOX2_RELEASE_MSG_EGG,
+    BOX2_RELEASE_MSG_CAME_BACK,
+    BOX2_RELEASE_MSG_WORRIED,
+    BOX2_RELEASE_MSG_LAST_POKEMON,
+    BOX2_RELEASE_MSG_FUSED_KYUREM,
+};
+
+// The prompts of Box2Bmp_PrintPrompt
+enum {
+    BOX2_PROMPT_WHAT_TO_DO,
+    BOX2_PROMPT_JUMP_TO_BOX,
+    BOX2_PROMPT_THEME,
+    BOX2_PROMPT_WALLPAPER,
+};
+
+// The messages of Box2Bmp_PrintPokeMoveMsg
+enum {
+    BOX2_POKEMOVE_MSG_WHICH_TO_TAKE,
+    BOX2_POKEMOVE_MSG_SELECTED,
+    BOX2_POKEMOVE_MSG_PARTY_FULL,
+    BOX2_POKEMOVE_MSG_WHICH_BOX,
+    BOX2_POKEMOVE_MSG_BOX_FULL,
+    BOX2_POKEMOVE_MSG_REMOVE_MAIL,
+};
+
+// The messages of Box2Bmp_PrintItemMsg
+enum {
+    BOX2_ITEM_MSG_CAN_HOLD,
+    BOX2_ITEM_MSG_SELECTED,
+    BOX2_ITEM_MSG_PUT_AWAY,
+    BOX2_ITEM_MSG_PLACED_IN_BAG,
+    BOX2_ITEM_MSG_MAIL_CANT_TAKE,
+    BOX2_ITEM_MSG_EGG_CANT_HOLD,
+    BOX2_ITEM_MSG_BAG_FULL,
+    BOX2_ITEM_MSG_MAIL_CANT_MOVE,
+};
+
 // Creates and frees the windows
 void Box2Bmp_CreateWindows(Box2SysWork *syswk);
 void Box2Bmp_FreeWindows(Box2SysWork *syswk);
@@ -51,7 +93,8 @@ void Box2Bmp_PrintItemMsg(Box2SysWork *syswk, u32 type, u32 index);
 // Tells why a Pokémon can't be moved or picked: type is BOX2_MOVE_ERR_MAIL, _LAST_BATTLER, _EGG or _NOT_SLEEPY
 void Box2Bmp_PrintDenyMsg(Box2SysWork *syswk, u32 type, u32 index);
 void Box2Bmp_PrintTuckIn(Box2SysWork *syswk);
-void Box2Bmp_PrintBattleBoxLocked(Box2SysWork *syswk, u32 a1);
+// Says that the locked Battle Box's Pokémon can't be moved, or its items given or taken
+void Box2Bmp_PrintBattleBoxLocked(Box2SysWork *syswk, BOOL items);
 // Shows how many Pokémon the picked range holds
 void Box2Bmp_PutRangeCount(Box2SysWork *syswk);
 

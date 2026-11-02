@@ -14,9 +14,6 @@
 // Not from swan: the screen's heap, a child of HEAPID_USER
 #define HEAPID_MANUAL 0x90
 
-// Not from swan: the upper screen's pictures (a/2/2/7); the manual's graphics and tables are ARCID_MANUAL
-#define ARCID_MANUAL_IMAGE 227
-
 // The members of ARCID_MANUAL
 enum {
     MANUAL_ARC_BG_NCLR,

@@ -181,7 +181,7 @@ static BOOL RegionalPokedexAward_Init(GameProc *proc, u32 *state, void *param, v
     RegionalPokedexAward_StartSlide(wk);
     GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 16, 0);
     GFL_NetSetIconScreen(FALSE, wk->heapId);
-    if (wk->param->unk04 == 0) {
+    if (wk->param->skipIntro == 0) {
         GFL_SndBGMFadeOut(6);
     }
     return TRUE;
@@ -221,7 +221,7 @@ static BOOL RegionalPokedexAward_Main(GameProc *proc, u32 *state, void *param, v
         if (!RegionalPokedexAward_IsAllPrinted(wk)) {
             done = FALSE;
         }
-        if (done && wk->param->unk04 == 0) {
+        if (done && wk->param->skipIntro == 0) {
             if (GFL_SndBGMIsFading()) {
                 done = FALSE;
             } else {
@@ -237,7 +237,7 @@ static BOOL RegionalPokedexAward_Main(GameProc *proc, u32 *state, void *param, v
         break;
     case STEP_WAIT_FADE_IN:
         if (!GFL_FadeIsRunning()) {
-            if (wk->param->unk04 != 0) {
+            if (wk->param->skipIntro != 0) {
                 *state = STEP_WAIT_INPUT;
             } else {
                 *state = STEP_WAIT_SLIDE;
@@ -448,7 +448,7 @@ static void RegionalPokedexAward_StartSlide(RegionalPokedexAwardWork *wk) {
     ClActorPos pos;
     u32 i;
 
-    if (wk->param->unk04 == 0) {
+    if (wk->param->skipIntro == 0) {
         GFL_BGSysMoveBG(BG_MAIN_DIPLOMA, BG_MOVE_SET_Y, 64);
         GFL_BGSysMoveBG(BG_MAIN_BACKDROP, BG_MOVE_SET_Y, 64);
         for (i = 0; i < NELEMS(sRegionalPokedexAwardRibbonSetup); i++) {
@@ -464,7 +464,7 @@ static void RegionalPokedexAward_UpdateSlide(RegionalPokedexAwardWork *wk) {
     ClActorPos pos;
     int y;
 
-    if (wk->param->unk04 == 0) {
+    if (wk->param->skipIntro == 0) {
         y = GFL_BGSysGetBGOffsetY(BG_MAIN_DIPLOMA);
         if (y != 0) {
             if (wk->slideWait == 0) {
@@ -488,7 +488,7 @@ static BOOL RegionalPokedexAward_IsSlideDone(RegionalPokedexAwardWork *wk) {
     BOOL done;
     BOOL result;
 
-    if (wk->param->unk04 != 0) {
+    if (wk->param->skipIntro != 0) {
         return TRUE;
     }
     done = TRUE;

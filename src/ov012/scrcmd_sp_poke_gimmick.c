@@ -37,7 +37,7 @@ BOOL Scrcmd_SpPokeGimmick_SpPokeJump(VM *vm, FieldScriptEnv *env) {
     u16 y = ScriptReadAny(vm, env);
     u16 z = ScriptReadAny(vm, env);
     u16 height = ScriptReadAny(vm, env);
-    u16 a5 = ScriptReadAny(vm, env);
+    u16 frames = ScriptReadAny(vm, env);
     VecFx32 playerPos;
     VecFx32 pos;
     VecFx32 *start;
@@ -55,7 +55,7 @@ BOOL Scrcmd_SpPokeGimmick_SpPokeJump(VM *vm, FieldScriptEnv *env) {
         start = &pos;
         end = &playerPos;
     }
-    event = SpPokeEvent_CreateJump(gsys, mode, start, end, GRID_HEIGHT(height), a5);
+    event = SpPokeEvent_CreateJump(gsys, mode, start, end, GRID_HEIGHT(height), frames);
     if (event == NULL) {
         return TRUE;
     }

@@ -1,0 +1,21 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "W",
+    "shapes": [ 10 ],
+    "area": {
+        "black2": {
+            "all_year": true,
+            "places": {
+                "ZONE_CASTELIA_CITY": [ "shaking_grass" ],
+                "ZONE_PINWHEEL_FOREST": [ "shaking_grass" ],
+                "ZONE_ABUNDANT_SHRINE": [ "shaking_grass" ],
+                "ZONE_LOSTLORN_FOREST": [ "shaking_grass" ],
+                "ZONE_VICTORY_ROAD": [ "shaking_grass" ]
+            }
+        },
+        "white2": {
+            "all_year": true,
+            "places": {}
+        }
+    }
+}

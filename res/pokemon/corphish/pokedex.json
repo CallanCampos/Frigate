@@ -1,0 +1,12 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "C",
+    "shapes": [ 3 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_STRIATON_CITY": [ "surf" ],
+            "ZONE_ROUTE_3": [ "surf", "rippling_surf" ]
+        }
+    }
+}

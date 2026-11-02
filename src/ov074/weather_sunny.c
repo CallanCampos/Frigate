@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field_weather.h"
 
 WeatherData SUNNY_WEATHER = {
@@ -39,7 +40,7 @@ BOOL Sunny_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
             WeatherTask_ChangeFog(task, WeatherTask_GetZoneFogSlope(task), value, 0xa0, arg);
         }
         if (WeatherTask_IsZoneFogLight(task)) {
-            WeatherTask_FadeLight(task, 0x51, WeatherTask_GetZoneFogLightId(task));
+            WeatherTask_FadeLight(task, ARCID_ZONE_LIGHT_TABLE, WeatherTask_GetZoneFogLightId(task));
         }
         *state = 1;
     }
@@ -55,7 +56,7 @@ BOOL Sunny_InitNoFade(WeatherTask *task, u32 arg, HeapID heapId) {
         WeatherTask_InitFog(task, WeatherTask_GetZoneFogSlope(task), value, arg);
     }
     if (WeatherTask_IsZoneFogLight(task)) {
-        WeatherTask_SetLight(task, 0x51, WeatherTask_GetZoneFogLightId(task));
+        WeatherTask_SetLight(task, ARCID_ZONE_LIGHT_TABLE, WeatherTask_GetZoneFogLightId(task));
     }
     return TRUE;
 }

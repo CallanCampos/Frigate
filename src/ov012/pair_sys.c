@@ -65,7 +65,7 @@ void ShutdownFollowWork(GameData *gameData) {
 
     if (GameData_CheckPairFlag(gameData)) {
         EventWork_FlagReset(eventWork, FLAG_FOLLOWER);
-        *EventWork_GetWkPtr(eventWork, WORK_FOLLOWER) = 0xff;
+        *EventWork_GetWkPtr(eventWork, WORK_FOLLOWER) = FOLLOWER_INDEX_NONE;
         ClearFollowNpcData(wk);
     }
 }
@@ -138,14 +138,14 @@ static u16 getFollowFlagStatus(GameData *gameData) {
     if (EventWork_FlagGet(eventWork, FLAG_FOLLOWER)) {
         return *EventWork_GetWkPtr(eventWork, WORK_FOLLOWER);
     }
-    return 0xff;
+    return FOLLOWER_INDEX_NONE;
 }
 
 u16 GetNowFollowerAllyTrID(GameData *gameData) {
     u16 status = getFollowFlagStatus(gameData);
     FieldFollowWk *wk = GetFieldFollowerCfg(gameData);
 
-    if (status == 0xff) {
+    if (status == FOLLOWER_INDEX_NONE) {
         return 0;
     }
     return wk->trainerId;
@@ -160,7 +160,7 @@ static BOOL GetFollowWkIsPersistent(GameData *gameData) {
 }
 
 static void ClearFollowNpcData(FieldFollowWk *wk) {
-    wk->index = 0xff;
+    wk->index = FOLLOWER_INDEX_NONE;
     wk->isPersistent = FALSE;
     wk->originActorId = 0;
     wk->objCode = 0;

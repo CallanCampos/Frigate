@@ -68,6 +68,16 @@ struct ZoneWarpRailPosition {
     u16 param;
 };
 
+// What ZoneBGEntity.condition is known to hold. The event check skips an entity from 3 up, so the festival's places
+// are only found by the missions that look for them
+enum {
+    BG_ENTITY_CONDITION_HIDDEN_ITEM = 2,
+    // A place for a mission's sparkle or person
+    BG_ENTITY_CONDITION_FEST_PLACE = 4,
+    // A place for a mission's person only
+    BG_ENTITY_CONDITION_FEST_PEOPLE_PLACE = 5,
+};
+
 // Field names from swan's ZoneFurniture. The struct is halfword-aligned (the festival missions copy it as a loop
 // of 10 halfwords), so a grid entity's s32 x, y and z are read through a cast of its position.
 struct ZoneBGEntity {
@@ -139,9 +149,12 @@ enum {
 };
 
 struct ZoneWarp {
-    u16 unk0;
+    // The zone and the warp the player arrives at
+    u16 destZoneId;
     u16 destId;
-    u8 unk4;
+    // The direction the player faces on arriving at this warp, one more than its DIR_*, or 0 for none: the player
+    // walks the other way into it
+    u8 direction;
     u8 transitionType;
     u16 isRail;
     union {

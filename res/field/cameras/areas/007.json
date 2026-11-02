@@ -1,0 +1,77 @@
+{
+    "$schema": "../area.schema.json",
+    "areas": [
+        {
+            "shape": "rect",
+            "grid_x": 1,
+            "grid_z": 34,
+            "grid_w": 30,
+            "unk06": 1,
+            "grid_h": 5,
+            "unk0A": 0,
+            "start": {
+                "pitch": 9690,
+                "yaw": 0,
+                "distance": 966656,
+                "target_offset": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "fov": 0
+            },
+            "end": {
+                "pitch": 11763,
+                "yaw": 0,
+                "distance": 970752,
+                "target_offset": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "fov": 0
+            },
+            "forbid_delay_manager": true,
+            "unk3C": 0,
+            "stay": "FieldCameraAreaCalc_RECT_PitchYawTZ",
+            "enter": "FieldCameraAreaCalc_RECT_PitchYawTZ_BeginDisableDelay",
+            "exit": "FieldCameraAreaCalc_RECT_PitchYawTZ_ResetEnableDelay"
+        },
+        {
+            "shape": "rect",
+            "grid_x": 1,
+            "grid_z": 39,
+            "grid_w": 30,
+            "unk06": 1,
+            "grid_h": 25,
+            "unk0A": 0,
+            "start": {
+                "pitch": 11763,
+                "yaw": 0,
+                "distance": 970752,
+                "target_offset": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "fov": 0
+            },
+            "end": {
+                "pitch": 11763,
+                "yaw": 0,
+                "distance": 970752,
+                "target_offset": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "fov": 0
+            },
+            "forbid_delay_manager": true,
+            "unk3C": 0,
+            "stay": "FieldCameraAreaCalc_RECT_PitchYawTZ",
+            "enter": "FieldCameraAreaCalc_RECT_PitchYawTZ_BeginDisableDelay",
+            "exit": "FieldCameraAreaCalc_RECT_PitchYawTZ_ResetEnableDelay"
+        }
+    ]
+}

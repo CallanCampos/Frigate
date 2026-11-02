@@ -34,6 +34,7 @@ FORMATTED = ("src/", "include/", "lib/")
 NAMED_DATA = [
     ("species", "res/pokemon", "SPECIES_", "/"),
     ("moves", "res/moves", "MOVE_", "/"),
+    ("moves", "res/battle/animations/moves", "MOVE_", ".s"),
     ("items", "res/items", "ITEM_", "/"),
     ("abilities", "res/abilities", "ABILITY_", ".json"),
     ("types", "res/types", "TYPE_", ".json"),

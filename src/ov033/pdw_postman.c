@@ -1,7 +1,9 @@
 #include "types.h"
 #include "constants/arc.h"
+#include "constants/items.h"
 #include "constants/pokemon.h"
 #include "constants/script_text_banks.h"
+#include "constants/sound.h"
 #include "constants/text_banks.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -37,7 +39,7 @@
 
 #define MYSTERY_GIFT_DELIVERY_MAN_OBJ_CODE 0x46
 
-// The values of the gifts of kind 4 and the one-shot DR each gives
+// The values of the one-shot gifts and the one-shot DR each gives
 // clang-format off
 static const u8 sOneShotDRGifts[8] = {
     0x33, 2,
@@ -48,15 +50,20 @@ static const u8 sOneShotDRGifts[8] = {
 
 // clang-format on
 
-static const PdwPostmanGiftHandler sGiftHandlers[5] = {
-    { 0, NULL, NULL, NULL, NULL, NULL },
-    { 1, doesPartyHaveSpace, ScrcmdPokemonFld_ReceiveGiftMon, ScrcmdPokemonFld_GetGiftMonReceiveType,
-      ScrcmdPokemonFld_PrepareGiftMonMessage, func_ov033_021781e0 },
-    { 2, func_ov033_021781e4, func_ov033_021781e8, ScrcmdPokemonFld_GetGiftItemReceiveType,
-      ScrcmdPokemonFld_PrepareGiftItemMessage, ScrcmdPokemonFld_PrepareGiftItemFollowUpMessage },
-    { 3, func_ov033_02178274, ScrcmdPokemonFld_ReceiveGiftFlag, ScrcmdPokemonFld_GetGiftFlagReceiveType,
-      ScrcmdPokemonFld_PrepareGiftFlagMessage, func_ov033_021782cc },
-    { 4, func_ov033_021782f0, func_ov033_021782f4, func_ov033_02178334, func_ov033_02178338, func_ov033_02178374 },
+static const PdwPostmanGiftHandler sGiftHandlers[MYSTERY_GIFT_KIND_MAX] = {
+    { MYSTERY_GIFT_KIND_NONE, NULL, NULL, NULL, NULL, NULL },
+    { MYSTERY_GIFT_KIND_POKEMON, doesPartyHaveSpace, ScrcmdPokemonFld_ReceiveGiftMon,
+      ScrcmdPokemonFld_GetGiftMonReceiveType, ScrcmdPokemonFld_PrepareGiftMonMessage,
+      ScrcmdPokemonFld_PrepareGiftMonFollowUpMessage },
+    { MYSTERY_GIFT_KIND_ITEM, ScrcmdPokemonFld_CanReceiveGiftItem, ScrcmdPokemonFld_ReceiveGiftItem,
+      ScrcmdPokemonFld_GetGiftItemReceiveType, ScrcmdPokemonFld_PrepareGiftItemMessage,
+      ScrcmdPokemonFld_PrepareGiftItemFollowUpMessage },
+    { MYSTERY_GIFT_KIND_PASS_POWER, ScrcmdPokemonFld_CanReceiveGiftFlag, ScrcmdPokemonFld_ReceiveGiftFlag,
+      ScrcmdPokemonFld_GetGiftFlagReceiveType, ScrcmdPokemonFld_PrepareGiftFlagMessage,
+      ScrcmdPokemonFld_PrepareGiftFlagFollowUpMessage },
+    { MYSTERY_GIFT_KIND_ONE_SHOT, ScrcmdPokemonFld_CanReceiveGiftOneShot, ScrcmdPokemonFld_ReceiveGiftOneShot,
+      ScrcmdPokemonFld_GetGiftOneShotReceiveType, ScrcmdPokemonFld_PrepareGiftOneShotMessage,
+      ScrcmdPokemonFld_PrepareGiftOneShotFollowUpMessage },
 };
 
 PdwPostmanItemWindow *PdwPostman_CreateListWin(Field *field, PdwPostmanItem *items, u32 count) {
@@ -107,6 +114,16 @@ void PdwPostman_PrintListWin(PdwPostmanItemWindow *work) {
     GFL_BGSysLoadScr(BmpWin_GetBGIndex(MsgBGPrinter_GetMsgWinBmpWin(work->window)));
 }
 
+// The steps of the list: print a page of up to 7 items, wait for it to be shown and for a key, close it, and go on to
+// the next page
+enum {
+    PDW_POSTMAN_LIST_STEP_OPEN,
+    PDW_POSTMAN_LIST_STEP_WAIT_PRINT,
+    PDW_POSTMAN_LIST_STEP_WAIT_KEY,
+    PDW_POSTMAN_LIST_STEP_CLOSE,
+    PDW_POSTMAN_LIST_STEP_NEXT,
+};
+
 GameEventReturnCode PdwPostman_ListEvent(GameEvent *unused, u32 *state, void *data) {
     PdwPostmanItemEvent *event;
     BmpWin *bitmapWindow;
@@ -114,44 +131,44 @@ GameEventReturnCode PdwPostman_ListEvent(GameEvent *unused, u32 *state, void *da
 
     event = data;
     switch (*state) {
-    case 0:
+    case PDW_POSTMAN_LIST_STEP_OPEN:
         remaining = event->count - event->index;
         if (remaining > 7) {
             remaining = 7;
         }
         event->window = PdwPostman_CreateListWin(event->field, &event->items[event->index], remaining);
         PdwPostman_PrintListWin(event->window);
-        event->window->unk10 = MsgBGPrinter_CreateCursor(Field_GetMsgBGSys(event->field));
+        event->window->cursor = MsgBGPrinter_CreateCursor(Field_GetMsgBGSys(event->field));
         (*state)++;
         break;
-    case 1:
+    case PDW_POSTMAN_LIST_STEP_WAIT_PRINT:
         if (MsgBGPrinter_IsMsgWinTransDone(event->window->window) != TRUE) {
             break;
         }
         (*state)++;
         break;
-    case 2:
+    case PDW_POSTMAN_LIST_STEP_WAIT_KEY:
         bitmapWindow = MsgBGPrinter_GetMsgWinBmpWin(event->window->window);
-        MsgBGPrinter_AnimateCursor(event->window->unk10, BmpWin_GetBitmap(bitmapWindow), 15);
+        MsgBGPrinter_AnimateCursor(event->window->cursor, BmpWin_GetBitmap(bitmapWindow), 15);
         BmpWin_FlushChar(bitmapWindow);
-        if (!(GCTX_HIDGetPressedKeys() & 3)) {
+        if (!(GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             break;
         }
-        GFL_SndSEPlay(0x547);
+        GFL_SndSEPlay(SEQ_SE_MESSAGE);
         (*state)++;
         break;
-    case 3:
-        MsgBGPrinter_DeleteCursor(event->window->unk10);
+    case PDW_POSTMAN_LIST_STEP_CLOSE:
+        MsgBGPrinter_DeleteCursor(event->window->cursor);
         PdwPostman_DeleteListWin(event->window);
         (*state)++;
         break;
-    case 4:
+    case PDW_POSTMAN_LIST_STEP_NEXT:
         if (event->index + 7 >= event->count) {
             GFL_HeapFree(event->items);
             return TRUE;
         }
         event->index += 7;
-        *state = 0;
+        *state = PDW_POSTMAN_LIST_STEP_OPEN;
         break;
     }
     return FALSE;
@@ -258,7 +275,20 @@ GameEvent *PdwPostman_CreateListEvent(GameSystem *gsys) {
     return event;
 }
 
-BOOL func_ov033_02177d78(VM *vm, FieldScriptEnv *env) {
+// What Scrcmd_PdwPostman_MysteryGifts does: whether a card's gift waits, whether it can be received, set the words
+// of its messages, receive it, find the delivery man, and what the gift is
+enum {
+    MYSTERY_GIFTS_HAS_GIFT,
+    MYSTERY_GIFTS_CAN_RECEIVE,
+    MYSTERY_GIFTS_PREPARE_MESSAGE,
+    MYSTERY_GIFTS_PREPARE_FOLLOW_UP_MESSAGE,
+    MYSTERY_GIFTS_RECEIVE,
+    MYSTERY_GIFTS_GET_DELIVERY_MAN_ID,
+    MYSTERY_GIFTS_IS_DELIVERY_MAN_HERE,
+    MYSTERY_GIFTS_GET_RECEIVE_TYPE,
+};
+
+BOOL Scrcmd_PdwPostman_MysteryGifts(VM *vm, FieldScriptEnv *env) {
     u16 mode = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
@@ -267,56 +297,56 @@ BOOL func_ov033_02177d78(VM *vm, FieldScriptEnv *env) {
     u32 slot;
     MysteryGift buffer;
     MysteryGift *gift = PdwPostman_FindMysteryCard(save, &slot, &buffer);
-    u8 kind = func_ov033_02178428(save);
+    u8 kind = PdwPostman_GetMysteryCardKind(save);
 
     if (kind != sGiftHandlers[kind].kind) {
         MysteryGiftSave_Free(save);
         return FALSE;
     }
     switch (mode) {
-    case 0:
-        if (kind != 0) {
+    case MYSTERY_GIFTS_HAS_GIFT:
+        if (kind != MYSTERY_GIFT_KIND_NONE) {
             *result = TRUE;
         } else {
             *result = FALSE;
         }
         break;
-    case 1:
-        *result = func_ov033_02177ed0(kind, env, gameData, gift);
+    case MYSTERY_GIFTS_CAN_RECEIVE:
+        *result = ScrcmdPokemonFld_CanReceiveGift(kind, env, gameData, gift);
         break;
-    case 2:
+    case MYSTERY_GIFTS_PREPARE_MESSAGE:
         *result = ScrcmdPokemonFld_PrepareGiftReceiveMessage(kind, gift, env);
         break;
-    case 3:
+    case MYSTERY_GIFTS_PREPARE_FOLLOW_UP_MESSAGE:
         *result = ScrcmdPokemonFld_PrepareGiftFollowUpMessage(kind, gift, env);
         break;
-    case 4:
+    case MYSTERY_GIFTS_RECEIVE:
         if (ScrcmdPokemonFld_ReceiveGift(kind, env, gameData, gift) == TRUE) {
-            func_ov033_02178420(save, slot);
+            PdwPostman_SetCardDelivered(save, slot);
             if (ScrcmdPokemonFld_IsLibertyPassGift(gift, kind) == TRUE) {
                 setOneShotDRObtained(getTrainerCardDataBlkAddress(gameData), 1, GetGameDataPlayerInfo(gameData));
             }
-            if (func_ov033_021780a4(env, gift, kind) == TRUE) {
+            if (ScrcmdPokemonFld_IsLandorusTherianGift(env, gift, kind) == TRUE) {
                 setOneShotDRObtained(getTrainerCardDataBlkAddress(gameData), 7, GetGameDataPlayerInfo(gameData));
             }
         }
         *result = FALSE;
         break;
-    case 5:
+    case MYSTERY_GIFTS_GET_DELIVERY_MAN_ID:
         *result = GetActorIDOfMysteryGiftDeliveryMan(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)), gameData);
         break;
-    case 6:
+    case MYSTERY_GIFTS_IS_DELIVERY_MAN_HERE:
         *result = IsMysteryGiftDeliveryManActorAvailable(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
         break;
-    case 7:
-        *result = func_ov033_02177f84(kind, env, gameData, gift);
+    case MYSTERY_GIFTS_GET_RECEIVE_TYPE:
+        *result = ScrcmdPokemonFld_GetGiftReceiveType(kind, env, gameData, gift);
         break;
     }
     MysteryGiftSave_Free(save);
     return FALSE;
 }
 
-BOOL func_ov033_02177ed0(u32 kind, FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
+BOOL ScrcmdPokemonFld_CanReceiveGift(u32 kind, FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
     BOOL (*canReceive)(FieldScriptEnv *, GameData *, MysteryGift *) = sGiftHandlers[kind].canReceive;
 
     if (gift != NULL && canReceive != NULL) {
@@ -327,7 +357,7 @@ BOOL func_ov033_02177ed0(u32 kind, FieldScriptEnv *env, GameData *gameData, Myst
 
 u32 ScrcmdPokemonFld_PrepareGiftReceiveMessage(u32 kind, MysteryGift *gift, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
-    u32 (*getMessage)(WordSet *, MysteryGift *, FieldScriptEnv *) = sGiftHandlers[kind].unk10;
+    u32 (*getMessage)(WordSet *, MysteryGift *, FieldScriptEnv *) = sGiftHandlers[kind].prepareMessage;
 
     if (gift != NULL && getMessage != NULL) {
         return getMessage(wordSet, gift, env);
@@ -337,7 +367,7 @@ u32 ScrcmdPokemonFld_PrepareGiftReceiveMessage(u32 kind, MysteryGift *gift, Fiel
 
 u32 ScrcmdPokemonFld_PrepareGiftFollowUpMessage(u32 kind, MysteryGift *gift, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
-    u32 (*getMessage)(WordSet *, MysteryGift *, FieldScriptEnv *) = sGiftHandlers[kind].unk14;
+    u32 (*getMessage)(WordSet *, MysteryGift *, FieldScriptEnv *) = sGiftHandlers[kind].prepareFollowUpMessage;
 
     if (gift != NULL && getMessage != NULL) {
         return getMessage(wordSet, gift, env);
@@ -355,8 +385,8 @@ BOOL ScrcmdPokemonFld_ReceiveGift(u32 kind, FieldScriptEnv *env, GameData *gameD
     return FALSE;
 }
 
-u32 func_ov033_02177f84(u32 kind, FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
-    u32 (*handler)(FieldScriptEnv *, GameData *, MysteryGift *) = sGiftHandlers[kind].unk0C;
+u32 ScrcmdPokemonFld_GetGiftReceiveType(u32 kind, FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
+    u32 (*handler)(FieldScriptEnv *, GameData *, MysteryGift *) = sGiftHandlers[kind].getReceiveType;
 
     if (gift != NULL && handler != NULL) {
         return handler(env, gameData, gift);
@@ -416,24 +446,24 @@ s32 FindMysteryGiftDeliveryManNPCID(GameData *gameData) {
 }
 
 BOOL ScrcmdPokemonFld_IsLibertyPassGift(MysteryGift *gift, u8 kind) {
-    if (kind != 2) {
+    if (kind != MYSTERY_GIFT_KIND_ITEM) {
         return FALSE;
     }
     if (gift->id != 0x7fe) {
         return FALSE;
     }
-    if (gift->value == 0x23e) {
+    if (gift->value == ITEM_LIBERTY_PASS) {
         return TRUE;
     }
     return FALSE;
 }
 
-u32 func_ov033_021780a4(FieldScriptEnv *env, MysteryGift *gift, u8 kind) {
+u32 ScrcmdPokemonFld_IsLandorusTherianGift(FieldScriptEnv *env, MysteryGift *gift, u8 kind) {
     PartyPkm *pkm;
     PlayerInfo *playerInfo;
     u32 result;
 
-    if (kind == 1) {
+    if (kind == MYSTERY_GIFT_KIND_POKEMON) {
         pkm = ScrcmdPokemonFld_CreateGiftMon(env, gift);
         if (pkm != NULL) {
             playerInfo = GetGameDataPlayerInfo(FieldScriptEnv_GetGameData(env));
@@ -509,15 +539,15 @@ u32 ScrcmdPokemonFld_PrepareGiftMonMessage(WordSet *wordSet, MysteryGift *gift, 
     return result;
 }
 
-u32 func_ov033_021781e0(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env) {
+u32 ScrcmdPokemonFld_PrepareGiftMonFollowUpMessage(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env) {
     return 6;
 }
 
-BOOL func_ov033_021781e4(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
+BOOL ScrcmdPokemonFld_CanReceiveGiftItem(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
     return TRUE;
 }
 
-void func_ov033_021781e8(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
+void ScrcmdPokemonFld_ReceiveGiftItem(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
     HeapID heapId;
     BagSave *bag;
     u16 item;
@@ -525,7 +555,7 @@ void func_ov033_021781e8(FieldScriptEnv *env, GameData *gameData, MysteryGift *g
     heapId = FieldScriptEnv_GetHeapID(env);
     bag = GameData_GetBag(gameData);
     item = gift->value;
-    if (item != 0 && item <= 0x27e) {
+    if (item != ITEM_NONE && item <= ITEM_LAST) {
         BagSave_AddItem(bag, item, 1, heapId);
     }
 }
@@ -553,7 +583,7 @@ u32 ScrcmdPokemonFld_PrepareGiftItemFollowUpMessage(WordSet *wordSet, MysteryGif
     return 8;
 }
 
-BOOL func_ov033_02178274(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
+BOOL ScrcmdPokemonFld_CanReceiveGiftFlag(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
     return TRUE;
 }
 
@@ -579,29 +609,29 @@ u32 ScrcmdPokemonFld_PrepareGiftFlagMessage(WordSet *wordSet, MysteryGift *gift,
     return 9;
 }
 
-u32 func_ov033_021782cc(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env) {
+u32 ScrcmdPokemonFld_PrepareGiftFlagFollowUpMessage(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env) {
     return 10;
 }
 
-u8 func_ov033_021782d0(MysteryGift *gift) {
+u8 ScrcmdPokemonFld_GetGiftOneShotPower(MysteryGift *gift) {
     s32 value;
 
-    if (gift->kind != 4) {
-        value = 0x7f;
+    if (gift->kind != MYSTERY_GIFT_KIND_ONE_SHOT) {
+        value = MYSTERY_GIFT_ONE_SHOT_NONE;
     } else {
         value = gift->value;
         if (value < 0x33 || value > 0x36) {
-            value = 0x7f;
+            value = MYSTERY_GIFT_ONE_SHOT_NONE;
         }
     }
     return value;
 }
 
-BOOL func_ov033_021782f0(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
+BOOL ScrcmdPokemonFld_CanReceiveGiftOneShot(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
     return TRUE;
 }
 
-void func_ov033_021782f4(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
+void ScrcmdPokemonFld_ReceiveGiftOneShot(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
     PlayerInfo *playerInfo;
     TrainerCardSave *card;
     u32 value;
@@ -609,7 +639,7 @@ void func_ov033_021782f4(FieldScriptEnv *env, GameData *gameData, MysteryGift *g
 
     playerInfo = GetGameDataPlayerInfo(gameData);
     card = getTrainerCardDataBlkAddress(gameData);
-    value = func_ov033_021782d0(gift);
+    value = ScrcmdPokemonFld_GetGiftOneShotPower(gift);
     for (i = 0; i < 8; i += 2) {
         if (sOneShotDRGifts[i] == value) {
             setOneShotDRObtained(card, sOneShotDRGifts[i + 1], playerInfo);
@@ -618,28 +648,28 @@ void func_ov033_021782f4(FieldScriptEnv *env, GameData *gameData, MysteryGift *g
     }
 }
 
-u32 func_ov033_02178334(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
+u32 ScrcmdPokemonFld_GetGiftOneShotReceiveType(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
     return 6;
 }
 
-u32 func_ov033_02178338(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env) {
+u32 ScrcmdPokemonFld_PrepareGiftOneShotMessage(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env) {
     PlayerInfo *playerInfo;
     u8 value;
 
     playerInfo = GetGameDataPlayerInfo(FieldScriptEnv_GetGameData(env));
     FieldScriptEnv_GetHeapID(env);
-    value = func_ov033_021782d0(gift);
+    value = ScrcmdPokemonFld_GetGiftOneShotPower(gift);
     copyVarForText(wordSet, 0, playerInfo);
     WordSet_LoadFestivalMission(wordSet, 1, value, 0);
     return 12;
 }
 
-u32 func_ov033_02178374(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env) {
+u32 ScrcmdPokemonFld_PrepareGiftOneShotFollowUpMessage(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env) {
     PlayerInfo *playerInfo;
     u32 value;
 
     playerInfo = GetGameDataPlayerInfo(FieldScriptEnv_GetGameData(env));
-    value = func_ov033_021782d0(gift);
+    value = ScrcmdPokemonFld_GetGiftOneShotPower(gift);
     copyVarForText(wordSet, 0, playerInfo);
     loadPassPowerToStrbuf(wordSet, 1, value);
     return 13;
@@ -655,10 +685,10 @@ MysteryGift *PdwPostman_GetMysteryCard(MysteryGiftSave *save, u32 slot, MysteryG
     if (!MysteryGiftSave_GetCard(save, slot, gift)) {
         return NULL;
     }
-    if (gift->kind == 0) {
+    if (gift->kind == MYSTERY_GIFT_KIND_NONE) {
         return NULL;
     }
-    if (gift->kind >= 5) {
+    if (gift->kind >= MYSTERY_GIFT_KIND_MAX) {
         gift = NULL;
     }
     return gift;
@@ -676,11 +706,11 @@ MysteryGift *PdwPostman_FindMysteryCard(MysteryGiftSave *save, u32 *slot, Myster
     return NULL;
 }
 
-void func_ov033_02178420(MysteryGiftSave *save, u32 slot) {
+void PdwPostman_SetCardDelivered(MysteryGiftSave *save, u32 slot) {
     MysteryGiftSave_SetCardDelivered(save, slot);
 }
 
-u8 func_ov033_02178428(MysteryGiftSave *save) {
+u8 PdwPostman_GetMysteryCardKind(MysteryGiftSave *save) {
     u32 slot;
     MysteryGift gift;
     MysteryGift *result;

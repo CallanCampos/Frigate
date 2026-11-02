@@ -1,0 +1,17 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "E",
+    "shapes": [ 10 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_TWIST_MOUNTAIN": [ "shaking_grass" ],
+            "ZONE_GIANT_CHASM": [ "shaking_grass" ],
+            "ZONE_WELLSPRING_CAVE": [ "shaking_grass" ],
+            "ZONE_REVERSAL_MOUNTAIN": [ "shaking_grass" ],
+            "ZONE_VICTORY_ROAD": [ "shaking_grass" ],
+            "ZONE_SEASIDE_CAVE": [ "shaking_grass" ],
+            "ZONE_CLAY_TUNNEL": [ "shaking_grass" ]
+        }
+    }
+}

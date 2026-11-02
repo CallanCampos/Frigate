@@ -16,6 +16,16 @@
 // what is left to the event
 typedef struct CommTvtFieldParam CommTvtFieldParam;
 
+// How the screen was left, in CommTvtFieldParam.mode
+enum {
+    // The event ends in the return warp from the Entralink
+    COMM_TVT_FIELD_MODE_ENTRALINK_RETURN,
+    // The event starts the video chat
+    COMM_TVT_FIELD_MODE_VIDEO_CHAT,
+    // The event just ends
+    COMM_TVT_FIELD_MODE_CLOSE,
+};
+
 struct CommTvtFieldParam {
     GameSystem *gsys;
     GameData *gameData;
@@ -23,7 +33,7 @@ struct CommTvtFieldParam {
     // The parameter of the video chat (overlay 257): the screen sets unk4 to 1 to call or 2 to answer, and parentMac
     CommTvtParam commParam;
     u32 unk1C;
-    // 0 if the screen left to wait, 1 if it left to start the video chat
+    // COMM_TVT_FIELD_MODE_*
     u32 mode;
     u32 bgm;
     u32 exitArgument;

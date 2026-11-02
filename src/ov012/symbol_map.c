@@ -1,4 +1,6 @@
 #include "types.h"
+#include "constants/directions.h"
+#include "constants/zones.h"
 #include "field/symbol_map.h"
 #include "field/symbol_save_field.h"
 #include "gfl/heap.h"
@@ -243,7 +245,7 @@ static const u8 *const SYMBOL_MAP_TABLE[14] = {
 static u8 SymbolMap_FindAreaPos(const u8 *map, u8 area);
 static u16 SymbolMap_GetAreaZone(const u8 *map, u8 area);
 static u32 SymbolMap_GetNextArea(const u8 *map, u8 area, u8 dir);
-static BOOL SymbolMap_GetMapLevels(GameSystem *gsys, u32 *a, u32 *b);
+static BOOL SymbolMap_GetMapLevels(GameSystem *gsys, u32 *deepestArea, u32 *group);
 static const u8 *SymbolMap_GetMap(GameSystem *gsys);
 
 BOOL SymbolMap_ToggleKeepPokemon(AreaNPCSave *npcData, u32 index) {
@@ -251,28 +253,28 @@ BOOL SymbolMap_ToggleKeepPokemon(AreaNPCSave *npcData, u32 index) {
     u32 slot;
 
     switch (SymbolSave_GetKindOfSlot(index)) {
-    case 0:
-        kind = 2;
+    case SYMBOL_KIND_KEEP_LARGE:
+        kind = SYMBOL_KIND_FREE_LARGE;
         break;
-    case 1:
-        kind = 3;
+    case SYMBOL_KIND_KEEP_SMALL:
+        kind = SYMBOL_KIND_FREE_SMALL;
         break;
-    case 2:
-        kind = 0;
+    case SYMBOL_KIND_FREE_LARGE:
+        kind = SYMBOL_KIND_KEEP_LARGE;
         break;
-    case 3:
-        kind = 1;
+    case SYMBOL_KIND_FREE_SMALL:
+        kind = SYMBOL_KIND_KEEP_SMALL;
         break;
     default:
         return FALSE;
     }
     slot = SymbolSave_FindFreeSlot(npcData, kind);
-    if (slot == 0xffff) {
+    if (slot == SYMBOL_SLOT_NONE) {
         return FALSE;
     }
     SymbolSave_Decrypt(npcData);
     npcData->pokemon[slot] = npcData->pokemon[index];
-    if (kind == 3) {
+    if (kind == SYMBOL_KIND_FREE_SMALL) {
         SymbolSave_UpdateDeepestArea(npcData, slot);
     }
     decryptNpcData(npcData);
@@ -314,90 +316,90 @@ static u16 SymbolMap_GetAreaZone(const u8 *map, u8 area) {
         down = TRUE;
     }
     if (area == 1) {
-        return 0x119;
+        return ZONE_ENTREE_FOREST_2;
     }
     if (area == 5) {
-        return 0x118;
+        return ZONE_ENTREE_FOREST;
     }
     if (left && right) {
-        return 0x11d;
+        return ZONE_ENTREE_FOREST_6;
     }
     if (left && !right) {
         if (up && down) {
-            return 0x11e;
+            return ZONE_ENTREE_FOREST_7;
         }
         if (up) {
-            return 0x120;
+            return ZONE_ENTREE_FOREST_9;
         }
         if (down) {
-            return 0x11b;
+            return ZONE_ENTREE_FOREST_4;
         }
     }
     if (!left && right) {
         if (up && down) {
-            return 0x11c;
+            return ZONE_ENTREE_FOREST_5;
         }
         if (up) {
-            return 0x11f;
+            return ZONE_ENTREE_FOREST_8;
         }
         if (down) {
-            return 0x11a;
+            return ZONE_ENTREE_FOREST_3;
         }
     }
-    return 0x119;
+    return ZONE_ENTREE_FOREST_2;
 }
 
 static u32 SymbolMap_GetNextArea(const u8 *map, u8 area, u8 dir) {
     u8 pos = SymbolMap_FindAreaPos(map, area);
 
     switch (dir) {
-    case 0:
+    case DIR_UP:
         return map[pos - SYMBOL_MAP_WIDTH];
-    case 1:
+    case DIR_DOWN:
         return map[pos + SYMBOL_MAP_WIDTH];
-    case 2:
+    case DIR_LEFT:
         return map[pos - 1];
-    case 3:
+    case DIR_RIGHT:
         return map[pos + 1];
     }
     return area;
 }
 
-static BOOL SymbolMap_GetMapLevels(GameSystem *gsys, u32 *a, u32 *b) {
+static BOOL SymbolMap_GetMapLevels(GameSystem *gsys, u32 *deepestArea, u32 *group) {
     AreaNPCSave *npcData = getAreaNPCData(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
 
     GSYS_GetGameCommSystem(gsys);
-    *a = SymbolSaveField_GetDeepestArea(npcData);
-    *b = SymbolSaveField_GetGroup(npcData);
+    *deepestArea = SymbolSaveField_GetDeepestArea(npcData);
+    *group = SymbolSaveField_GetGroup(npcData);
     return TRUE;
 }
 
 static const u8 *SymbolMap_GetMap(GameSystem *gsys) {
-    u32 a;
-    u32 b;
+    u32 deepestArea;
+    u32 group;
 
-    if (SymbolMap_GetMapLevels(gsys, &a, &b) == FALSE) {
+    if (SymbolMap_GetMapLevels(gsys, &deepestArea, &group) == FALSE) {
         return NULL;
     }
-    return SYMBOL_MAP_TABLE[b * 7 + a];
+    return SYMBOL_MAP_TABLE[group * 7 + deepestArea];
 }
 
 SymbolMapList *SymbolMap_CreatePokemonList(HeapID heapId, GameSystem *gsys, u32 *count) {
     GameData *gameData = GSYS_GetGameData(gsys);
     AreaNPCSave *npcData = getAreaNPCData(GameData_GetSaveControl(gameData));
-    u8 season;
+    u8 area;
     SymbolMapList *list;
     u8 found;
 
     GSYS_GetGameCommSystem(gsys);
-    season = GameData_GetEntreeForestArea(gameData);
+    area = GameData_GetEntreeForestArea(gameData);
     list = GFL_HeapAllocate(heapId, sizeof(SymbolMapList), TRUE, "symbol_map.c", 466);
-    *count = SymbolSaveField_GetAreaPokemon(npcData, list->pokemon, 20, season, &found);
+    *count = SymbolSaveField_GetAreaPokemon(npcData, list->pokemon, 20, area, &found);
     list->count = found;
-    list->unk50_6 = SymbolSaveField_GetDeepestArea(npcData);
-    list->unk50_10 = SymbolSaveField_GetGroup(npcData);
+    list->deepestArea = SymbolSaveField_GetDeepestArea(npcData);
+    list->group = SymbolSaveField_GetGroup(npcData);
     list->unk50_14 = 4;
-    list->unk50_18 = season;
+    list->area = area;
     return list;
 }
 
@@ -407,7 +409,7 @@ u16 SymbolMap_GetZone(GameSystem *gsys, u8 area) {
     if (map != NULL) {
         return SymbolMap_GetAreaZone(map, area + 1);
     }
-    return 0x118;
+    return ZONE_ENTREE_FOREST;
 }
 
 u32 SymbolMap_GetAdjacentArea(GameSystem *gsys, u8 area, u32 dir) {

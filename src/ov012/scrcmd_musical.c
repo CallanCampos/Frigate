@@ -49,12 +49,6 @@ typedef struct {
     MusicalCommWork *work;
 } MusicalIrcMatchHolder;
 
-typedef struct {
-    u16 *a0;
-    u16 *a1;
-    u32 unk8;
-} MusicalOv020Args;
-
 void MusicalCommWork_Create(ScriptWork *work, GameData *gameData);
 void MusicalCommWork_Free(MusicalCommWork *work, GameData *gameData);
 void MusicalCommWork_BootComm(MusicalCommWork *work, GameSystem *gsys, GameCommSys *comm, u16 value);
@@ -63,8 +57,8 @@ GameEventReturnCode MusicalCallEvent_Callback(GameEvent *event, u32 *state, void
 GameEventReturnCode MusicalDressUpEvent_Callback(GameEvent *event, u32 *state, void *data);
 void MusicalShotHolder_Free(void *arg);
 void MusicalIrcMatch_OnReturn(void *arg);
-BOOL func_ov012_02158de8(VM *vm, void *arg);
-BOOL func_ov012_02158e44(VM *vm, void *arg);
+BOOL ScriptNative_MusicalLeaderMenuWait(VM *vm, void *arg);
+BOOL ScriptNative_MusicalSelectLeaderMenuWait(VM *vm, void *arg);
 BOOL ScriptNative_MusicalTimingWait(VM *vm, void *arg);
 BOOL ScriptNative_MusicalScriptRecvWait(VM *vm, void *arg);
 BOOL ScriptNative_MusicalCommBootWait(VM *vm, void *arg);
@@ -511,15 +505,15 @@ BOOL Scrcmd_Musical_MusicalClearAudienceGift(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL Scrcmd_Musical_MusicalSelectPoke(VM *vm, FieldScriptEnv *env) {
-    u16 *a0 = ScriptReadVar(vm, env);
-    u16 *a1 = ScriptReadVar(vm, env);
+    u16 *picked = ScriptReadVar(vm, env);
+    u16 *index = ScriptReadVar(vm, env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    MusicalOv020Args args;
+    PokeSelectArgs args;
 
-    MI_CpuFill8(&args, 0, sizeof(MusicalOv020Args));
-    args.a0 = a0;
-    args.a1 = a1;
+    MI_CpuFill8(&args, 0, sizeof(PokeSelectArgs));
+    args.picked = picked;
+    args.index = index;
     ScriptWork_CallEvent(
         work, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKE_STATUS, EventMusicalPokeSelect_Create, &args));
     return TRUE;
@@ -571,13 +565,13 @@ BOOL Scrcmd_Musical_MusicalComm(VM *vm, FieldScriptEnv *env) {
         commWork->result = result;
         commWork->menu = CommEntryMenu_Create(GetGameDataPlayerInfo(gameData), field, 2, 4, HEAPID_GAMEEVENT,
                                               COMM_ENTRY_MENU_LEADER, COMM_ENTRY_MENU_MUSICAL, NULL);
-        VM_SetNativeCallback(vm, func_ov012_02158de8);
+        VM_SetNativeCallback(vm, ScriptNative_MusicalLeaderMenuWait);
         return TRUE;
     case 13:
         commWork->result = result;
         commWork->menu = CommEntryMenu_Create(GetGameDataPlayerInfo(gameData), field, 2, 4, HEAPID_GAMEEVENT,
                                               COMM_ENTRY_MENU_SELECT_LEADER, COMM_ENTRY_MENU_MUSICAL, NULL);
-        VM_SetNativeCallback(vm, func_ov012_02158e44);
+        VM_SetNativeCallback(vm, ScriptNative_MusicalSelectLeaderMenuWait);
         return TRUE;
     case 14:
         allowed = TRUE;
@@ -763,7 +757,7 @@ GameEventReturnCode MusicalDressUpEvent_Callback(GameEvent *event, u32 *state, v
         (*state)++;
         break;
     case 3:
-        GSYS_QueueProc(gsys, OVERLAY_NONE, &data_ov012_0216dfc4, data->param);
+        GSYS_QueueProc(gsys, OVERLAY_NONE, &MUSICAL_DRESSUP_PROC_FUNCTIONS, data->param);
         (*state)++;
         break;
     case 4:
@@ -804,7 +798,7 @@ void MusicalIrcMatch_OnReturn(void *arg) {
     }
 }
 
-BOOL func_ov012_02158de8(VM *vm, void *arg) {
+BOOL ScriptNative_MusicalLeaderMenuWait(VM *vm, void *arg) {
     FieldScriptEnv *env = arg;
     MusicalCommWork *commWork;
     BOOL done;
@@ -836,7 +830,7 @@ BOOL func_ov012_02158de8(VM *vm, void *arg) {
     return done;
 }
 
-BOOL func_ov012_02158e44(VM *vm, void *arg) {
+BOOL ScriptNative_MusicalSelectLeaderMenuWait(VM *vm, void *arg) {
     FieldScriptEnv *env = arg;
     MusicalCommWork *commWork;
     BOOL done;
