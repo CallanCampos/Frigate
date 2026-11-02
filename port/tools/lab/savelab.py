@@ -60,8 +60,10 @@ save footer's CRC of that table are recomputed in each copy (SaveData_FillFooter
 result must pass validate_image against the base. The save counts are left alone, so a minted save is laid out as the
 game writes one. The fields' offsets are the decomp's headers' (include/save/*.h, include/field/zone.h,
 include/pml/poke_party.h), which port/tests/lab/test_savelab.py holds LAYOUT to as the compiler lays them out. The
-Pokémon are decrypted as PokeParty_DecryptPkm does (src/system/poke_tool.c). The same base, recipe and tool give the
-same bytes. Standard library only.
+party is decoded by port/tools/oracle/savedecode.py, the one copy of the save's crypto: each Pokémon decrypted as
+PokeParty_DecryptPkm does (src/system/poke_tool.c), its offsets held to the headers by
+port/tests/oracle/test_savedecode.py. The same base, recipe and tool give the same bytes.
+Standard library only.
 """
 
 from __future__ import annotations
@@ -82,6 +84,7 @@ REPO_ROOT = HERE.parents[2]
 sys.path.insert(0, str(HERE.parent / "oracle"))
 sys.path.insert(0, str(REPO_ROOT))
 
+import savedecode  # noqa: E402
 import saveimage  # noqa: E402
 from tools.data.event_data import file_name as events_file_name  # noqa: E402
 from tools.data.zone_data import file_name as zone_file_name  # noqa: E402
@@ -166,37 +169,13 @@ TRAINER_GAME_INFO_BADGES = 0x4
 TRAINER_GAME_INFO_CASH_MAX = 9999999
 TRAINER_GAME_INFO_GYM_COUNT = 8
 
-# include/pml/poke_party.h: PokeParty (block 0x1a), PartyPkm, BoxPkm, and blocks A and B of a Pokémon's data
-POKE_PARTY_SIZE = 0x534
-POKE_PARTY_COUNT = 0x04
-POKE_PARTY_PKMS = 0x08
-PARTY_SIZE = 6
-PARTY_PKM_SIZE = 0xdc
-BOX_PKM_PID = 0x00
-BOX_PKM_FLAGS = 0x04
-BOX_PKM_PARTY_DECRYPTED = 0x01  # the bit of the byte at BOX_PKM_FLAGS
-BOX_PKM_CHECKSUM = 0x06
-BOX_PKM_CONTENT = 0x08
-PKM_BUFFER_SIZE = 0x80
-PARTY_PKM_STATUS = 0x88  # the party's own fields, which follow the BoxPkm, encrypted with the PID
-PARTY_PKM_LEVEL = 0x8c
-PARTY_PKM_NOW_HP = 0x8e
-PARTY_PKM_MAX_HP = 0x90
-PKM_BLOCK_A_SPECIES = 0x0
-PKM_BLOCK_A_ITEM = 0x2
-PKM_BLOCK_A_EXP = 0x8
-PKM_BLOCK_B_MOVES = 0x0
-# blockShufLUT (src/system/poke_tool.c): the offsets of blocks A to D in a Pokémon's data, by bits 13 to 17 of its PID
-BLOCK_SHUFFLE = (
-    (0x00, 0x20, 0x40, 0x60), (0x00, 0x20, 0x60, 0x40), (0x00, 0x40, 0x20, 0x60), (0x00, 0x60, 0x20, 0x40),
-    (0x00, 0x40, 0x60, 0x20), (0x00, 0x60, 0x40, 0x20), (0x20, 0x00, 0x40, 0x60), (0x20, 0x00, 0x60, 0x40),
-    (0x40, 0x00, 0x20, 0x60), (0x60, 0x00, 0x20, 0x40), (0x40, 0x00, 0x60, 0x20), (0x60, 0x00, 0x40, 0x20),
-    (0x20, 0x40, 0x00, 0x60), (0x20, 0x60, 0x00, 0x40), (0x40, 0x20, 0x00, 0x60), (0x60, 0x20, 0x00, 0x40),
-    (0x40, 0x60, 0x00, 0x20), (0x60, 0x40, 0x00, 0x20), (0x20, 0x40, 0x60, 0x00), (0x20, 0x60, 0x40, 0x00),
-    (0x40, 0x20, 0x60, 0x00), (0x60, 0x20, 0x40, 0x00), (0x40, 0x60, 0x20, 0x00), (0x60, 0x40, 0x20, 0x00),
-    (0x00, 0x20, 0x40, 0x60), (0x00, 0x20, 0x60, 0x40), (0x00, 0x40, 0x20, 0x60), (0x00, 0x60, 0x20, 0x40),
-    (0x00, 0x40, 0x60, 0x20), (0x00, 0x60, 0x40, 0x20), (0x20, 0x00, 0x40, 0x60), (0x20, 0x00, 0x60, 0x40),
-)
+# include/pml/poke_party.h: where the reader finds the party's count and each Pokémon of block 0x1a, which
+# port/tools/oracle/savedecode.py decodes, and the block's size; the module's values, held to the headers there
+POKE_PARTY_SIZE = savedecode.POKE_PARTY_SIZE
+POKE_PARTY_COUNT = savedecode.LAYOUT["PokeParty.count"]
+POKE_PARTY_PKMS = savedecode.POKE_PARTY_PKMS
+PARTY_SIZE = savedecode.PARTY_SIZE
+PARTY_PKM_SIZE = savedecode.PARTY_PKM_SIZE
 
 # The footers that src/gfl/backup_system.c writes: BlockFooter {u16 count; u16 crc} after each block, and the CRC in
 # SaveFooter {u32 count, size, magic; u16 unk; u16 crc}, which covers the table of the blocks' CRCs
@@ -284,20 +263,22 @@ LAYOUT = {
     "PokeParty.pkms": POKE_PARTY_PKMS,
     "PARTY_SIZE": PARTY_SIZE,
     "sizeof(PartyPkm)": PARTY_PKM_SIZE,
-    "BoxPkm.pid": BOX_PKM_PID,
-    "BoxPkm.partyDecrypted.byte": BOX_PKM_FLAGS,
-    "BoxPkm.partyDecrypted.mask": BOX_PKM_PARTY_DECRYPTED,
-    "BoxPkm.checksum": BOX_PKM_CHECKSUM,
-    "BoxPkm.contentBuffer": BOX_PKM_CONTENT,
-    "sizeof(PkmBuffer)": PKM_BUFFER_SIZE,
-    "PartyPkm.statusCond": PARTY_PKM_STATUS,
-    "PartyPkm.level": PARTY_PKM_LEVEL,
-    "PartyPkm.nowHP": PARTY_PKM_NOW_HP,
-    "PartyPkm.maxHP": PARTY_PKM_MAX_HP,
-    "PkmBlockA.species": PKM_BLOCK_A_SPECIES,
-    "PkmBlockA.item": PKM_BLOCK_A_ITEM,
-    "PkmBlockA.exp": PKM_BLOCK_A_EXP,
-    "PkmBlockB.moves": PKM_BLOCK_B_MOVES,
+    # The Pokémon's fields that the reader reports, as savedecode decodes them (its LAYOUT, whose bitfields are a first
+    # bit and a width: savelab_layout.c prints BoxPkm.partyDecrypted as a byte and a mask)
+    "BoxPkm.pid": savedecode.LAYOUT["BoxPkm.pid"],
+    "BoxPkm.partyDecrypted.byte": savedecode.LAYOUT["BoxPkm.partyDecrypted.bit"] // 8,
+    "BoxPkm.partyDecrypted.mask": 1 << savedecode.LAYOUT["BoxPkm.partyDecrypted.bit"] % 8,
+    "BoxPkm.checksum": savedecode.LAYOUT["BoxPkm.checksum"],
+    "BoxPkm.contentBuffer": savedecode.LAYOUT["BoxPkm.contentBuffer"],
+    "sizeof(PkmBuffer)": savedecode.LAYOUT["sizeof(PkmBuffer)"],
+    "PartyPkm.statusCond": savedecode.LAYOUT["PartyPkm.statusCond"],
+    "PartyPkm.level": savedecode.LAYOUT["PartyPkm.level"],
+    "PartyPkm.nowHP": savedecode.LAYOUT["PartyPkm.nowHP"],
+    "PartyPkm.maxHP": savedecode.LAYOUT["PartyPkm.maxHP"],
+    "PkmBlockA.species": savedecode.LAYOUT["PkmBlockA.species"],
+    "PkmBlockA.item": savedecode.LAYOUT["PkmBlockA.item"],
+    "PkmBlockA.exp": savedecode.LAYOUT["PkmBlockA.exp"],
+    "PkmBlockB.moves": savedecode.LAYOUT["PkmBlockB.moves"],
 }
 
 # The generated constants headers' line for a constant: #define NAME VALUE
@@ -691,46 +672,27 @@ def mint(recipe: str, base: bytes, recipe_name: str = "recipe",
     return save.seal(), applied
 
 
-def crypt(data: bytes, key: int) -> bytes:
-    """PML_CryptoRun (src/system/poke_tool.c): each u16 XORed with the next value of the LCG seeded with key; its own
-    inverse"""
-    out = bytearray(data)
-    for offset in range(0, len(out) - 1, 2):
-        key = (key * 0x41c64e6d + 0x6073) & 0xffffffff
-        struct.pack_into("<H", out, offset, struct.unpack_from("<H", out, offset)[0] ^ (key >> 16))
-    return bytes(out)
-
-
 def party(save: SaveImage, constants: Constants) -> list[dict]:
-    """The party's Pokémon, decrypted as PokeParty_DecryptPkm decrypts one: the party's fields with the PID, the four
-    blocks with the checksum, which must then be the sum of the blocks' u16s (PML_CryptoGenKey)"""
+    """The party's Pokémon, the first count of them, each decoded by port/tools/oracle/savedecode.py as
+    PokeParty_DecryptPkm decrypts one (src/system/poke_tool.c): the party's fields with the PID, the four blocks with
+    the checksum, which must then be the sum of the blocks' u16s (PML_CryptoGenKey), else checksum_ok is false"""
     (count,) = save.read("<i", SAVE_BLOCK_PARTY, POKE_PARTY_COUNT)
     if not 0 <= count <= PARTY_SIZE:
         raise LabError(f"the party's count is {count}, not 0 to {PARTY_SIZE}")
     pokemon = []
     for slot in range(count):
-        start = POKE_PARTY_PKMS + slot * PARTY_PKM_SIZE
-        raw = save.read(f"<{PARTY_PKM_SIZE}s", SAVE_BLOCK_PARTY, start)[0]
-        (pid,) = struct.unpack_from("<I", raw, BOX_PKM_PID)
-        (checksum,) = struct.unpack_from("<H", raw, BOX_PKM_CHECKSUM)
-        content = raw[BOX_PKM_CONTENT:BOX_PKM_CONTENT + PKM_BUFFER_SIZE]
-        stats = raw[PARTY_PKM_STATUS:]
-        if not raw[BOX_PKM_FLAGS] & BOX_PKM_PARTY_DECRYPTED:
-            stats = crypt(stats, pid)
-            content = crypt(content, checksum)
-        blocks = BLOCK_SHUFFLE[(pid & 0x3e000) >> 13]
-        species, item = struct.unpack_from("<HH", content, blocks[0] + PKM_BLOCK_A_SPECIES)
-        (exp,) = struct.unpack_from("<I", content, blocks[0] + PKM_BLOCK_A_EXP)
-        moves = struct.unpack_from("<4H", content, blocks[1] + PKM_BLOCK_B_MOVES)
+        raw = save.read(f"<{PARTY_PKM_SIZE}s", SAVE_BLOCK_PARTY, POKE_PARTY_PKMS + slot * PARTY_PKM_SIZE)[0]
+        fields, problems = savedecode.pokemon_fields(raw)
+        moves = [fields[f"blockB.moves[{index}]"] for index in range(4)]
         pokemon.append({
             "slot": slot + 1,
-            "species": constants.name("species", species),
-            "level": stats[PARTY_PKM_LEVEL - PARTY_PKM_STATUS],
-            "hp": list(struct.unpack_from("<HH", stats, PARTY_PKM_NOW_HP - PARTY_PKM_STATUS)),
-            "exp": exp,
-            "item": constants.name("items", item),
+            "species": constants.name("species", fields["blockA.species"]),
+            "level": fields["level"],
+            "hp": [fields["nowHP"], fields["maxHP"]],
+            "exp": fields["blockA.exp"],
+            "item": constants.name("items", fields["blockA.item"]),
             "moves": [constants.name("moves", move) for move in moves if move],
-            "checksum_ok": sum(struct.unpack(f"<{PKM_BUFFER_SIZE // 2}H", content)) & 0xffff == checksum,
+            "checksum_ok": not problems,
         })
     return pokemon
 

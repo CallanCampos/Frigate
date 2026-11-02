@@ -29,6 +29,7 @@ at build time, pinned to a release, and never committed.
 | `oracle.py` | runs the oracle and the port with the repository's defaults; makes the saves the tests start from on the oracle, each from the save before it ([Saves](#saves)); the comparison sequences, the field menu's and its apps' among them, and the sound's comparison; the ctest check |
 | `compare.py` | compares two runs: screens, memory, alignment |
 | `saveimage.py` | verifies both main save copies' 73 block CRCs, the padded CRC table and its footer before any clock/CRC exceptions; native block extents come from the examined DS image |
+| `savedecode.py` | decodes the saves' party and game records field by field, the one copy of the save's crypto: the save lab's reader decodes the party with it, and `mystery_gift_decrypted` takes its generator |
 | `sound.py` | compares two runs' sound: the sound driver's state run by run, what the ARM9 sees of it frame by frame, and the sound by segment ([Sound](#sound)) |
 | `sndtrace.h` | the sound trace's format, plain C11, which the port's sound driver (`port/hal/snd7/snd7.c`), its `--sound-trace` (`port/app/sound_trace.c`) and the sound driver's tests include |
 | `seeds.py` | the random seeds the DS built in an oracle run, read from the memory it dumps ([Random seeds](#random-seeds)) |

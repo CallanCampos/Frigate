@@ -83,6 +83,22 @@ add_test(NAME oracle_save_image
 set_tests_properties(oracle_save_image PROPERTIES TIMEOUT 120)
 port_test_labels(oracle_save_image static)
 
+# The save's party and game records decoded field by field (port/tools/oracle/savedecode.py): port_test_savedecode_layout
+# prints the offsets, sizes and bits of the decomp's party and records headers and of the blocks a round trip protects,
+# compiled as the game's own files are (port_decomp_env), and port/tests/oracle/test_savedecode.py holds the module's
+# layout to it and its decoding to synthetic Pokémon, parties and records built from it, with a table of deliberate
+# bugs each test must catch. No ROM and no oracle: it runs in every build and in CI. Game functionality: the saves (the
+# party, block 0x1a, and the trainer card's records, block 0x26)
+add_executable(port_test_savedecode_layout "${port_oracle_tests}/savedecode_layout.c")
+target_link_libraries(port_test_savedecode_layout PRIVATE port_decomp_env)
+target_compile_options(port_test_savedecode_layout PRIVATE -Wall -Wextra -Werror)
+add_test(NAME oracle_save_decode
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+        "${PORT_PYTHON}" "${port_oracle_tests}/test_savedecode.py"
+            --layout "$<TARGET_FILE:port_test_savedecode_layout>"
+    WORKING_DIRECTORY "${REPO_ROOT}")
+set_tests_properties(oracle_save_decode PROPERTIES TIMEOUT 300)
+
 # sound.py, the sound comparison, on made-up sound traces and WAV dumps
 add_test(NAME oracle_sound_tool
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1

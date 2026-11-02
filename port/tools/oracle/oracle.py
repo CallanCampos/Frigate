@@ -92,6 +92,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import compare  # noqa: E402
+import savedecode  # noqa: E402
 import saveimage  # noqa: E402
 import seeds  # noqa: E402
 import sound  # noqa: E402
@@ -1359,9 +1360,10 @@ MYSTERY_GIFT_SIZE = 0xa94
 
 def mystery_gift_decrypted(contents: bytes) -> tuple[bytes, list[str]]:
     """A save with the mystery gift block of each copy of its main save decrypted, as mgDecryptData decrypts it
-    (src/system/mystery_data.c, with decryptData's generator in src/gfl/gf_standard.c), its checksum and key left as
-    the save holds them: two saves whose blocks hold the same contents under other keys then differ only in the key.
-    With why a copy's block doesn't decrypt (its contents don't add up to its checksum), for each that doesn't"""
+    (src/system/mystery_data.c, with decryptData's generator in src/gfl/gf_standard.c, savedecode.crypt, and
+    addUpDataStream's sum, savedecode.byte_sum), its checksum and key left as the save holds them: two saves whose
+    blocks hold the same contents under other keys then differ only in the key. With why a copy's block doesn't
+    decrypt (its contents don't add up to its checksum), for each that doesn't"""
     out = bytearray(contents)
     problems = []
     for copy in (0, SECOND_COPY):
@@ -1371,11 +1373,8 @@ def mystery_gift_decrypted(contents: bytes) -> tuple[bytes, list[str]]:
             problems.append(f"the save ends before the mystery gift block at {start:#x}")
             continue
         checksum, key = struct.unpack_from("<HH", out, end)
-        seed = checksum + (key << 16)
-        for offset in range(start, end, 2):
-            seed = (seed * 1103515245 + 24691) & 0xFFFFFFFF
-            struct.pack_into("<H", out, offset, struct.unpack_from("<H", out, offset)[0] ^ (seed >> 16))
-        if sum(out[start:end]) & 0xFFFF != checksum:
+        out[start:end] = savedecode.crypt(bytes(out[start:end]), checksum + (key << 16))
+        if savedecode.byte_sum(out[start:end]) & 0xFFFF != checksum:
             problems.append(f"the mystery gift block at {start:#x} doesn't add up to its checksum ({checksum:#06x}) "
                             f"decrypted with its key ({key:#06x})")
     return bytes(out), problems
