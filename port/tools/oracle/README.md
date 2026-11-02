@@ -427,11 +427,12 @@ needs `--align counter`.
 Verification v2 ([ADR 0031](../../docs/adr/0031-per-game-frame-digests-against-a-content-addressed-oracle-cache.md),
 proposed) holds Frigate to melonDS at every game frame by a digest: one record per value of GFL's frame count, with a
 64-bit hash for each group of the DS's state, each group first put into canonical bytes so that the two programs'
-records are equal exactly when their state is. Its first part is here: the canonical encoding, the hash and the
-stream's format in `digest.c` and `digest.h`, plain C11 that both programs are to compile, tested without a ROM by
+records are equal exactly when their state is. Its first two parts are here: the canonical encoding, the hash and
+the stream's format in `digest.c` and `digest.h`, plain C11 that both programs compile, tested without a ROM by
 `digest_format_plain` and `digest_format_sanitized`
-([port/tests/oracle/test_digest.c](../../tests/oracle/test_digest.c)), and its second part's writer, which both
-programs call with `--digest FILE`. The comparison's pairing comes next.
+([port/tests/oracle/test_digest.c](../../tests/oracle/test_digest.c)); the stream's writer, which both programs call
+with `--digest FILE`; and the comparison, `compare.py digest`, which `oracle.py sequence` runs for a sequence that
+holds digests ([below](#digests)).
 
 Each program fills a `PbwDigestFrame` from its own model; `digest.c` decodes, masks, encodes and hashes it. The groups
 and their canonical bytes, with 32-bit words little-endian:
@@ -465,7 +466,7 @@ melonDS `0x7ffe00` and Frigate `0xffffff` (`digest.h`, `pbw_digest_zbuffer_depth
 vertex as a `g3d.list` difference, Frigate's to fix: `ToScreen` cutting the product as melonDS does, a change to the
 geometry engine with its own replays, planned before the next part compares lists.
 
-Some stores melonDS 1.1 drops and Frigate keeps, which the next part's comparison of `regs2d`, `sys`, `pal`, `oam`,
+Some stores melonDS 1.1 drops and Frigate keeps, which the comparison of `regs2d`, `sys`, `pal`, `oam`,
 the VRAM banks and `g3d.regs` meets as differences to trace like any other, melonDS being the oracle:
 
 - **While an engine is powered off** (POWCNT1 bit 1 for engine A, bit 9 for engine B): its 2D registers, but for
@@ -498,8 +499,8 @@ count	frame	vblanks	vram.A	vram.B	...	g3d.stats	screen.top	screen.bottom
 
 A header names the groups in any order and may leave some out. A record has no column for the sequence's lag (the
 design's "lag applied"), on purpose: a stream records what its program saw, and neither program knows the lag, which
-`SEQUENCES` declares and the pairing applies when it compares. If the next part's expected stream needs to carry it,
-that part adds the column under a new format version, before any stream is kept.
+`SEQUENCES` declares and the pairing applies when it compares. If part 4's expected stream needs to carry it, that
+part adds the column under a new format version, before any stream is kept.
 
 Both programs write their streams through one writer in `digest.c`, `pbw_digest_writer_open`, `pbw_digest_writer_vblank`
 at every VBlank with GFL's frame count read there, and `pbw_digest_writer_close`, so that one rule, tested without a
@@ -1445,8 +1446,8 @@ What the port needs to compare itself frame by frame:
 - **The sound** (done: `--sound-trace`, `port/app/sound_trace.c`, and `--audio-dump`, [Sound](#sound)): the sound
   driver's state after each run, which no dump at a VBlank can give the DS's of (the driver's runs fall at other
   moments of the frame on each program), and its samples.
-- **Digests** (the canonical encoding done, [Digests](#digests); the writers not yet): `--digest` in both programs,
-  filling `digest.h`'s structures at the last VBlank of each count, as ADR 0031's next part plans.
+- **Digests** (done, [Digests](#digests)): `--digest` in both programs, filling `digest.h`'s structures at each
+  VBlank for the writer, which keeps the last VBlank of each count, and `compare.py digest`.
 
 ## Known differences from the hardware
 
