@@ -6,7 +6,15 @@
 #include "types.h"
 #include "struct_decls.h"
 
-// A parameter of the entrance of a Hidden Grotto: 0 is its zone
+// GetHiddenHollowEntranceParam's params: the zone of a Hidden Grotto's entrance, and the position in it
+enum {
+    HIDDEN_HOLLOW_ENTRANCE_ZONE,
+    HIDDEN_HOLLOW_ENTRANCE_X,
+    HIDDEN_HOLLOW_ENTRANCE_Y,
+    HIDDEN_HOLLOW_ENTRANCE_Z,
+};
+
+// A parameter of the entrance of a Hidden Grotto
 u32 GetHiddenHollowEntranceParam(u8 hollow, u32 param);
 BOOL Scrcmd_HiddenHollow_HiddenHollowSetPeriod(VM *vm, FieldScriptEnv *env);
 

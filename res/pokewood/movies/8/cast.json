@@ -1,0 +1,61 @@
+{
+    "$schema": "../../cast.schema.json",
+    "player": [
+        {
+            "species": "SPECIES_KLANG",
+            "shown_species": "SPECIES_KLANG",
+            "level": 32,
+            "form": 0,
+            "sex": "GENDER_UNKNOWN",
+            "nature": "NATURE_NAUGHTY",
+            "ability": 0,
+            "held_item": "ITEM_STEEL_GEM",
+            "moves": [ "MOVE_GEAR_GRIND", "MOVE_LOCK_ON", "MOVE_ZAP_CANNON", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 0,
+                "attack": 31,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 31,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 0,
+                "attack": 255,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 255,
+                "special_defense": 0
+            }
+        }
+    ],
+    "opponent": [
+        {
+            "species": "SPECIES_POKESTAR_PROP_U1",
+            "shown_species": "SPECIES_POKESTAR_UFO",
+            "level": 38,
+            "form": 0,
+            "sex": "GENDER_UNKNOWN",
+            "nature": "NATURE_NAUGHTY",
+            "ability": 0,
+            "held_item": "ITEM_BRIGHT_POWDER",
+            "moves": [ "MOVE_COUNTER", "MOVE_RECOVER", "MOVE_BUBBLE_BEAM", "MOVE_SIGNAL_BEAM" ],
+            "ivs": {
+                "hp": 0,
+                "attack": 31,
+                "defense": 31,
+                "speed": 0,
+                "special_attack": 31,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 6,
+                "attack": 0,
+                "defense": 252,
+                "speed": 0,
+                "special_attack": 252,
+                "special_defense": 0
+            }
+        }
+    ]
+}

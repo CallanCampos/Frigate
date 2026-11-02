@@ -1,0 +1,23 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "V",
+    "shapes": [ 8 ],
+    "area": {
+        "all_year": false,
+        "seasons": {
+            "spring": {
+                "ZONE_GIANT_CHASM": [ "grass", "dark_grass" ]
+            },
+            "summer": {
+                "ZONE_GIANT_CHASM": [ "grass", "dark_grass" ]
+            },
+            "autumn": {
+                "ZONE_GIANT_CHASM": [ "grass", "dark_grass" ]
+            },
+            "winter": {
+                "ZONE_DRAGONSPIRAL_TOWER": [ "grass", "dark_grass" ],
+                "ZONE_GIANT_CHASM": [ "grass", "dark_grass" ]
+            }
+        }
+    }
+}

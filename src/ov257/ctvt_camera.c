@@ -27,6 +27,15 @@
 
 #define CTVT_CAMERA_MEMBERS 4
 
+// The places of the members' windows on the screen, which are also their pictures' slots in the screen buffer. With
+// two members, the second one's window is the right half
+enum {
+    CTVT_WINDOW_TOP_LEFT,
+    CTVT_WINDOW_TOP_RIGHT,
+    CTVT_WINDOW_BOTTOM_LEFT,
+    CTVT_WINDOW_BOTTOM_RIGHT,
+};
+
 // The opening of the screen grows by this many lines each frame, up to the screen's height
 #define CTVT_OPEN_SPEED 8
 #define CTVT_OPEN_END 192
@@ -291,7 +300,7 @@ void CtvtCamera_Draw(CommTvtWork *sys, CtvtCamera *work) {
             if (CtvtComm_IsMemberInfoReceived(sys, comm, i) == TRUE) {
                 pos = i;
                 if (displayMode == CTDM_DOUBLE && i != 0) {
-                    pos = 1;
+                    pos = CTVT_WINDOW_TOP_RIGHT;
                 }
                 if (zoomed == FALSE) {
                     width = 128;
@@ -360,7 +369,7 @@ static void CtvtCamera_OnFrame(void *frame, void *data) {
     int width;
     u16 height;
 
-    if (func_ov257_021aab10(sys) == TRUE || CommTvt_GetMemberCount(sys) < 2) {
+    if (CommTvt_IsEnding(sys) == TRUE || CommTvt_GetMemberCount(sys) < 2) {
         return;
     }
     if (work->dirtyMask & (1 << self)) {
@@ -378,7 +387,7 @@ static void CtvtCamera_OnFrame(void *frame, void *data) {
     }
     pos = self;
     if (displayMode == CTDM_DOUBLE && self > 1) {
-        pos = 1;
+        pos = CTVT_WINDOW_TOP_RIGHT;
     }
     if (zoomed == FALSE) {
         left = 0;
@@ -392,13 +401,13 @@ static void CtvtCamera_OnFrame(void *frame, void *data) {
         height = displayMode == CTDM_DOUBLE ? 96 : 48;
     }
 
-    if (func_ov257_021aab5c(sys) == FALSE) {
-        func_ov257_021aab60(sys, TRUE);
+    if (CommTvt_IsPictureLocked(sys) == FALSE) {
+        CommTvt_SetPictureLocked(sys, TRUE);
         for (y = 0; y < height; y++) {
             MIi_CpuCopy32((void *)((uptr)work->frameCopy + (top + y) * 256 + left * 2),
                           (void *)((uptr)work->screen + pos * (width * height * 2) + width * y * 2), width * 2);
         }
-        func_ov257_021aab60(sys, FALSE);
+        CommTvt_SetPictureLocked(sys, FALSE);
         work->dirtyMask |= 1 << self;
     }
 }
@@ -549,16 +558,16 @@ void CtvtCamera_SetWindow(CommTvtWork *sys, CtvtCamera *work, u8 member) {
     int pos = member;
 
     if (displayMode == CTDM_DOUBLE && member != 0) {
-        pos = 1;
+        pos = CTVT_WINDOW_TOP_RIGHT;
     }
     if (work->zoomed == FALSE) {
-        work->windows[member].target.x = (pos == 0 || pos == 2) ? 0 : 128;
-        work->windows[member].target.y = (pos == 0 || pos == 1) ? 0 : 96;
+        work->windows[member].target.x = (pos == CTVT_WINDOW_TOP_LEFT || pos == CTVT_WINDOW_BOTTOM_LEFT) ? 0 : 128;
+        work->windows[member].target.y = (pos == CTVT_WINDOW_TOP_LEFT || pos == CTVT_WINDOW_TOP_RIGHT) ? 0 : 96;
         work->windows[member].target.width = 128;
         work->windows[member].target.height = displayMode == CTDM_DOUBLE ? 192 : 96;
     } else {
-        work->windows[member].target.x = (pos == 0 || pos == 2) ? 0 : 64;
-        work->windows[member].target.y = (pos == 0 || pos == 1) ? 0 : 48;
+        work->windows[member].target.x = (pos == CTVT_WINDOW_TOP_LEFT || pos == CTVT_WINDOW_BOTTOM_LEFT) ? 0 : 64;
+        work->windows[member].target.y = (pos == CTVT_WINDOW_TOP_LEFT || pos == CTVT_WINDOW_TOP_RIGHT) ? 0 : 48;
         work->windows[member].target.width = 64;
         work->windows[member].target.height = displayMode == CTDM_DOUBLE ? 96 : 48;
     }
@@ -572,28 +581,28 @@ void CtvtCamera_SetWindow(CommTvtWork *sys, CtvtCamera *work, u8 member) {
         // The window grows from the screen's corner or edge nearest to it
         work->windows[member].playSE = TRUE;
         switch (pos) {
-        case 0:
+        case CTVT_WINDOW_TOP_LEFT:
             if (work->zoomed == FALSE) {
                 CtvtCamera_SetWindowRect(&work->windows[member], 0, 0, 128, 0);
             } else {
                 CtvtCamera_SetWindowRect(&work->windows[member], 0, 0, 64, 0);
             }
             break;
-        case 1:
+        case CTVT_WINDOW_TOP_RIGHT:
             if (work->zoomed == FALSE) {
                 CtvtCamera_SetWindowRect(&work->windows[member], 128, 0, 0, displayMode == CTDM_DOUBLE ? 192 : 96);
             } else {
                 CtvtCamera_SetWindowRect(&work->windows[member], 64, 0, 0, displayMode == CTDM_DOUBLE ? 96 : 48);
             }
             break;
-        case 2:
+        case CTVT_WINDOW_BOTTOM_LEFT:
             if (work->zoomed == FALSE) {
                 CtvtCamera_SetWindowRect(&work->windows[member], 0, 96, 128, 0);
             } else {
                 CtvtCamera_SetWindowRect(&work->windows[member], 0, 48, 64, 0);
             }
             break;
-        case 3:
+        case CTVT_WINDOW_BOTTOM_RIGHT:
             if (work->zoomed == FALSE) {
                 CtvtCamera_SetWindowRect(&work->windows[member], 128, 96, 0, 96);
             } else {

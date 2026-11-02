@@ -1,0 +1,72 @@
+{
+    "$schema": "../../particles.schema.json",
+    "emitters": [
+        {
+            "emissionType": "point",
+            "drawType": "billboard",
+            "emissionAxis": "z",
+            "hasRotation": false,
+            "randomInitAngle": false,
+            "autoTerminate": true,
+            "followEmitter": false,
+            "polygonRotAxis": "y",
+            "polygonReferencePlane": "xy",
+            "randomLoopOffset": false,
+            "drawChildrenFirst": true,
+            "hideParent": false,
+            "relativeToBasePos": false,
+            "fixedPolygonID": false,
+            "childFixedPolygonID": false,
+            "emitterBasePos": { "x": 0, "y": 17359, "z": 0 },
+            "emissionCount": 4096,
+            "radius": 0,
+            "length": 0,
+            "axis": { "x": 0, "y": 4096, "z": 0 },
+            "color": { "red": 19, "green": 31, "blue": 19 },
+            "initVelPositionAmplifier": 0,
+            "initVelAxisAmplifier": 1218,
+            "baseScale": 6334,
+            "aspectRatio": 4096,
+            "startDelay": 0,
+            "minRotation": 0,
+            "maxRotation": 0,
+            "initAngle": 0,
+            "emitterLifeTime": 1,
+            "particleLifeTime": 70,
+            "scaleVariance": 0,
+            "lifeTimeVariance": 0,
+            "velocityVariance": 0,
+            "emissionInterval": 1,
+            "baseAlpha": 31,
+            "airResistance": 128,
+            "texture": "texture00",
+            "loopTime": 1,
+            "dirStretch": 0,
+            "textureRepeatShiftS": 0,
+            "textureRepeatShiftT": 0,
+            "scaleAnimDir": "xy",
+            "dirFromPosition": false,
+            "flipTextureS": false,
+            "flipTextureT": false,
+            "polygonX": 0,
+            "polygonY": 0,
+            "unused": { "unk4c": 917600 },
+            "scaleAnim": {
+                "start": 1584,
+                "mid": 4096,
+                "end": 4096,
+                "in": 46,
+                "out": 46,
+                "loop": false,
+                "unused": { "unk8": 14454, "padding": 56 }
+            },
+            "gravityBehavior": {
+                "magnitude": { "x": 0, "y": -183, "z": 0 }
+            },
+            "collisionPlaneBehavior": { "y": 0, "elasticity": 2457, "type": "bounce" }
+        }
+    ],
+    "textures": [
+        { "name": "texture00", "format": "a5i3", "repeat": "none", "flip": "none", "palColor0": true }
+    ]
+}

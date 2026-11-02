@@ -8,7 +8,7 @@ tools/script/field_commands.json names each command's handler. A handler still n
 looked up at that address in config/b2_us/arm9's symbols.txt and takes the name it has there; a handler that
 rename_symbol.py renamed after the manifest last changed takes its new name the same way, through HEAD's manifest.
 Then include/asm/field_script.inc is generated again, and the macros whose names changed are renamed in the scripts
-of res/**/*.s, matched command by command, the old names by HEAD's field_script.py and the new by the working tree's (the base commands by number, a plugin's by plugin, overlay and number).
+of res/field/scripts, matched command by command, the old names by HEAD's field_script.py and the new by the working tree's (the base commands by number, a plugin's by plugin, overlay and number).
 The build checks the scripts: they must assemble to the same bytes.
 """
 import argparse
@@ -22,6 +22,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 import tools.script.field_script as field_script  # noqa: E402
+import tools.script.btlv_effvm_script as btlv_effvm_script  # noqa: E402
+import tools.script.sta_script as sta_script  # noqa: E402
 
 MANIFEST = ROOT / "tools" / "script" / "field_commands.json"
 INC = ROOT / "include" / "asm" / "field_script.inc"
@@ -123,6 +125,10 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="list the renames and change nothing")
     args = parser.parse_args()
 
+    # The battle effect VM's commands take their names from btlv_effvm.c's MOVE_SCRCMD
+    btlv_effvm_script.sync(args.dry_run)
+    # The musical stage's, from script_command.c's STA_SCRIPT_COMMANDS
+    sta_script.sync(args.dry_run)
     raw = MANIFEST.read_text()
     by_address = symbols_by_address()
     head = subprocess.run(["git", "show", "HEAD:tools/script/field_commands.json"], capture_output=True, text=True,
@@ -166,7 +172,7 @@ def main():
     if mapping:
         pattern = re.compile(r"\b(" + "|".join(map(re.escape, sorted(mapping, key=len, reverse=True))) + r")\b")
         changed = 0
-        for path in sorted((ROOT / "res").rglob("*.s")):
+        for path in sorted((ROOT / "res" / "field" / "scripts").rglob("*.s")):
             text = path.read_text()
             new_text = pattern.sub(lambda m: mapping[m.group(1)], text)
             if new_text != text:

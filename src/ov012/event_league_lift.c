@@ -2,6 +2,9 @@
 // zone changes, and the lift lands with a shake. The name is descriptive; EventLeagueLiftWarp_Callback and
 // EventLeagueLiftWarp_Create are swan's names (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
+#include "constants/directions.h"
+#include "constants/sound.h"
+#include "constants/zones.h"
 #include "field/event_league_lift.h"
 #include "field/event_mapchange.h"
 #include "field/field.h"
@@ -14,11 +17,6 @@
 #include "gfl/sound.h"
 #include "nitro/fx.h"
 #include "system/game_event.h"
-
-#define SEQ_SE_LIFT 0x7a0
-#define SEQ_SE_LIFT_STOP 0x6ef
-// The Champion's room
-#define ZONE_LEAGUE_CHAMPION 0x8a
 
 typedef struct {
     GameSystem *gsys;
@@ -38,7 +36,8 @@ typedef struct {
     G3DCurve *curve;
 } LeagueLiftArrivalData;
 
-static const FieldCameraCoords data_ov012_0216dc3c = {
+// Where the camera turns to before the lift goes down
+static const FieldCameraCoords sLeagueLiftCameraCoords = {
     0x1d7d, 0, 0x16c000, { 0x1f8000, -0x40000, 0x264000 }, { 0, 0x9d000, 0x90000 },
 };
 
@@ -69,7 +68,7 @@ static GameEventReturnCode EventLeagueLiftWarp_Callback(GameEvent *event, u32 *s
         break;
     case 2:
         data->curve = GFL_G3DCurveLoadFileAll(Field_GetHeapID(field), 0x9b, 0x18);
-        GFL_SEPlayKeepVol(SEQ_SE_LIFT, GFL_SndSeqGetPlayerIndex(SEQ_SE_LIFT));
+        GFL_SEPlayKeepVol(SEQ_SE_FLD_148, GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_148));
         (*state)++;
         break;
     case 3:
@@ -93,7 +92,8 @@ static GameEventReturnCode EventLeagueLiftWarp_Callback(GameEvent *event, u32 *s
         spawnPos.x = 0;
         spawnPos.y = 0;
         spawnPos.z = 0;
-        GameEvent_ChainNext(event, EventMapChange_CreateGridDefault(gsys, field, ZONE_LEAGUE_CHAMPION, &spawnPos, 1));
+        GameEvent_ChainNext(event,
+                            EventMapChange_CreateGridDefault(gsys, field, ZONE_POKEMON_LEAGUE_3, &spawnPos, DIR_DOWN));
         (*state)++;
         break;
     case 6:
@@ -116,7 +116,7 @@ GameEvent *EventLeagueLiftWarp_Create(GameSystem *gsys, Field *field) {
     data->camera = Field_GetCameraSystem(field);
     data->taskManager = Field_GetTaskManager(field);
     data->animation.frames = 20;
-    data->animation.dst = data_ov012_0216dc3c;
+    data->animation.dst = sLeagueLiftCameraCoords;
     data->animation.releaseBind = TRUE;
     data->animation.disableBoundary = TRUE;
     data->cameraController = Field_CreateCameraAnimationController(field);
@@ -186,8 +186,8 @@ static GameEventReturnCode EventLeagueLiftArrival_Callback(GameEvent *event, u32
         }
         if (done) {
             GFL_G3DCurveFree(data->curve);
-            GFL_SndPlayerStop(GFL_SndSeqGetPlayerIndex(SEQ_SE_LIFT));
-            GFL_SndSEPlay(SEQ_SE_LIFT_STOP);
+            GFL_SndPlayerStop(GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_148));
+            GFL_SndSEPlay(SEQ_SE_FLD_94);
             shake.amplitudeX = 2;
             shake.amplitudeY = 0;
             shake.period = 3;

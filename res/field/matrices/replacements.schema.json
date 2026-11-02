@@ -1,0 +1,37 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The map replacements: res/field/matrices/replacements.json",
+    "description": "The one file of ARCID_MAP_REPLACE (a/0/1/0): the entries (MapReplaceEntry in include/field/field_map.h) that MapMatrix_Patch applies, in order, to a map matrix as the field loads it (map_matrix.c, map_replace.c). Each picks a value by its condition, and when that isn't the first, replaces the first. tools/data/map_replace_data.py packs them.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "replacements" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "replacements": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [ "matrix", "kind", "condition", "values", "unused" ],
+                "properties": {
+                    "matrix": { "type": [ "string", "integer" ], "x-constant": "MAP_MATRIX_", "minimum": 0, "maximum": 65535, "description": "The map matrix the entry applies to (its id)" },
+                    "kind": { "enum": [ "map_model", "matrix" ], "description": "What the values are and what is replaced: map_model (0) swaps every cell of the matrix whose map model is the first value for the picked one, matrix (1) loads the picked matrix instead (MapReplace_Patch)" },
+                    "condition": {
+                        "description": "What picks the value (MapReplaceVariables): the season, the version (black in Black and Black 2), the version and in White 2 the season, or, from 3 on, the condition of an event of EVENT_MAP_REPLACE_TABLE in map_replace.c, which is set when its work has the table's value",
+                        "anyOf": [ { "enum": [ "season", "version", "version_season" ] }, { "type": "integer", "minimum": 3, "maximum": 255 } ]
+                    },
+                    "values": {
+                        "type": "object",
+                        "description": "The value for each case of the condition, in this order: spring, summer, autumn and winter for season; black and white for version; black, white_spring, white_summer, white_autumn and white_winter for version_season; unset and set for an event. The first is the original, which a map_model entry looks for in the matrix. MAP_MODEL_* constants for map_model, MAP_MATRIX_* for matrix",
+                        "additionalProperties": { "type": [ "string", "integer" ], "pattern": "^MAP_(MODEL|MATRIX)_", "minimum": 0, "maximum": 65535 }
+                    },
+                    "unused": {
+                        "type": "array", "maxItems": 4,
+                        "description": "The entry's remaining value slots, of six, which the condition doesn't pick and the code doesn't read",
+                        "items": { "type": "integer", "minimum": 0, "maximum": 65535 }
+                    }
+                }
+            }
+        }
+    }
+}

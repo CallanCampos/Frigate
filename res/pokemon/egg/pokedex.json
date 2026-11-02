@@ -1,0 +1,4 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "shapes": [ 10 ]
+}

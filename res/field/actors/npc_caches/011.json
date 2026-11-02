@@ -1,0 +1,14 @@
+{
+    "$schema": "../npc_cache.schema.json",
+    "codes": [
+        "OBJ_CODE_ROUGHNECK",
+        "OBJ_CODE_BIKER",
+        "OBJ_CODE_110",
+        "OBJ_CODE_117",
+        "OBJ_CODE_216",
+        "OBJ_CODE_210",
+        "OBJ_CODE_PKMN_BREEDER_F",
+        "OBJ_CODE_PKMN_RANGER_M",
+        "OBJ_CODE_PKMN_RANGER_F"
+    ]
+}

@@ -1,0 +1,12 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "S",
+    "shapes": [ 11 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_ABUNDANT_SHRINE": [ "grass" ],
+            "ZONE_ROUTE_14": [ "grass" ]
+        }
+    }
+}

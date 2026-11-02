@@ -15,6 +15,9 @@
 #include "nitro/math.h"
 #include "struct_decls.h"
 
+// The client ID of a BtlServerClient slot without a client
+#define BTL_SERVER_CLIENT_NONE 0xff
+
 // A client the server sends commands to
 typedef struct {
     BtlAdapter *adapter;
@@ -23,7 +26,7 @@ typedef struct {
     u8 numCoverPos;
     // Whether the adapter was given to the server, rather than made by it
     u8 isAttached;
-    // 0xff for no client
+    // BTL_SERVER_CLIENT_NONE for no client
     u8 clientId;
 } BtlServerClient;
 
@@ -44,8 +47,10 @@ struct BtlServer {
     BtlPokeCon *pokeCon;
     BtlServerClient clients[4];
     BtlServerFlow *flow;
+    // What the flow's last turn ended with, a BTL_FLOW_RESULT_*
     u32 flowResult;
-    u32 unk4C;
+    // Whether it is a link battle's (BtlMain_IsCommCompetitor)
+    u32 commCompetitor;
     MATHRandContext32 rand;
     BtlRecTool recTool;
     // Sent to the clients when the battle ends
@@ -70,8 +75,8 @@ struct BtlServer {
     u8 unkCC2[2];
 };
 
-BtlServer *BattleServer_Create(BtlMainModule *mainModule, const MATHRandContext32 *rand, BtlPokeCon *pokeCon, u32 a3,
-                               HeapID heapId);
+BtlServer *BattleServer_Create(BtlMainModule *mainModule, const MATHRandContext32 *rand, BtlPokeCon *pokeCon,
+                               u32 commCompetitor, HeapID heapId);
 void BattleServer_AttachClient(BtlServer *server, BtlAdapter *adapter, u8 clientId, u8 numCoverPos);
 void BattleServer_AttachNetClient(BtlServer *server, u32 mode, NetHandle *netHandle, u8 clientId, u8 numCoverPos);
 void BattleServer_AttachCmdCheckClient(BtlServer *server, u8 clientId, u8 numCoverPos);

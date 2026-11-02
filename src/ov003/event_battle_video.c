@@ -8,6 +8,17 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
+// The steps of the event
+enum {
+    STEP_WAIT_COMM_EXIT,
+    STEP_CLOSE_FIELD,
+    STEP_START_BATTLE_VIDEO,
+    STEP_WAIT_BATTLE_VIDEO,
+    STEP_EMPTY,
+    STEP_OPEN_FIELD,
+    STEP_END,
+};
+
 typedef struct {
     u32 bgm;
     GameSystem *gsys;
@@ -24,7 +35,7 @@ GameEventReturnCode EventBattleVideo_Callback(GameEvent *event, u32 *state, void
     GameSystem *gsys = wk->gsys;
 
     switch (*state) {
-    case 0:
+    case STEP_WAIT_COMM_EXIT:
         // Wait for the comm system to shut down
         if (!GameCommSys_BootCheck(GSYS_GetGameCommSystem(gsys))) {
             wk->bgm = GFL_SndBGMGetID();
@@ -32,31 +43,31 @@ GameEventReturnCode EventBattleVideo_Callback(GameEvent *event, u32 *state, void
             (*state)++;
         }
         break;
-    case 1:
+    case STEP_CLOSE_FIELD:
         GameEvent_ChainNext(event, CreateFieldCloseEvent(gsys, wk->field));
-        *state = 2;
+        *state = STEP_START_BATTLE_VIDEO;
         break;
-    case 2:
+    case STEP_START_BATTLE_VIDEO:
         wk->param.gameData = GSYS_GetGameData(gsys);
         wk->param.mode = wk->mode;
         GSYS_QueueProc(gsys, OVERLAY_NONE, &BATTLE_VIDEO_PROC_FUNCTIONS, &wk->param);
         (*state)++;
         break;
-    case 3:
+    case STEP_WAIT_BATTLE_VIDEO:
         if (!GSYS_GetProcMgrState(gsys)) {
             (*state)++;
         }
         break;
-    case 4:
+    case STEP_EMPTY:
         (*state)++;
         break;
-    case 5:
+    case STEP_OPEN_FIELD:
         GFL_SndBGMPlay(wk->bgm, SND_CHANNEL_MASK_ALL);
         GFL_SndBGMFadeIn(60);
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
         (*state)++;
         break;
-    case 6:
+    case STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;

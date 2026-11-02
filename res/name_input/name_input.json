@@ -1,0 +1,43 @@
+{
+    "$schema": "name_input.schema.json",
+    "keyboards": [
+        [ "ABCDEFGHIJ ,.", "KLMNOPQRST '-", "UVWXYZ     ⑭⑮", "             ", "0123456789   " ],
+        [ "abcdefghij ,.", "klmnopqrst '-", "uvwxyz     ⑭⑮", "             ", "0123456789   " ],
+        [ ",.:;!?   ⑭⑮  ", "“”‘'()       ", "⑬･~#%+-*/=   ", "⑴⑵⑶⑷⑸⑯⑱⑲⑰⑳⑹  ", "⑺⑻⑼⑽⑾⑿⒀⒁⒄⒂⒃  " ],
+        [ "qwertyuiop", "asdfghjkl※", "zxcvbnm-※※" ],
+        [ "QWERTYUIOP", "ASDFGHJKL※", "ZXCVBNM-※※" ]
+    ],
+    "word_tables": [
+        [],
+        [],
+        []
+    ],
+    "conversions": [
+        "Aa",
+        "Bb",
+        "Cc",
+        "Dd",
+        "Ee",
+        "Ff",
+        "Gg",
+        "Hh",
+        "Ii",
+        "Jj",
+        "Kk",
+        "Ll",
+        "Mm",
+        "Nn",
+        "Oo",
+        "Pp",
+        "Qq",
+        "Rr",
+        "Ss",
+        "Tt",
+        "Uu",
+        "Vv",
+        "Ww",
+        "Xx",
+        "Yy",
+        "Zz"
+    ]
+}

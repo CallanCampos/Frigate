@@ -1,0 +1,34 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The Pokémon World Tournament's Trainers: res/trainers/facilities/pwt_trainers.json",
+    "description": "ARCID_WBT_TOOL (a/2/4/7): a WbtTrainer (field/wbt.h) for each Trainer of the tournaments, which WbtTrainers_Load (wbt_tool.c) reads and wbt_makematch.c and wbt_battle.c use. tools/data/pwt_trainer_data.py packs it.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "trainers" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "trainers": {
+            "type": "array",
+            "items": {
+                "type": "object", "additionalProperties": false,
+                "required": [ "trainer_class", "gender", "type", "unk2", "tournaments", "unk5_7", "tournament", "expert_type", "rank", "unk8_3", "unk9", "bgm", "win_bgm", "unkE" ],
+                "properties": {
+                    "trainer_class": { "type": [ "string", "integer" ], "x-constant": "TRAINER_CLASS_", "description": "The Trainer's class, which their entrant and battle take" },
+                    "gender": { "type": "integer", "minimum": 0, "maximum": 1 },
+                    "type": { "type": "integer", "minimum": 0, "maximum": 255, "description": "WbtTrainer.type, which WbtEntrant_Set takes" },
+                    "unk2": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "WbtTrainer.unk2, which WbtEntrant_Set takes" },
+                    "tournaments": { "type": "array", "items": { "enum": [ 11, 4, 10, 12, 14, 13, 15 ] }, "description": "The tournaments of 11, 4, 10, 12, 14, 13 and 15 that the Trainer takes part in (inTournament11 and the others)" },
+                    "unk5_7": { "type": "boolean", "description": "The last bit of those, WbtTrainer.unk5_7" },
+                    "tournament": { "type": "integer", "minimum": 0, "maximum": 255, "description": "The tournament that only has this Trainer, for tournaments 1 and 5 to 9" },
+                    "expert_type": { "type": [ "string", "integer" ], "x-constant": "TYPE_", "description": "The type the Type Expert Tournament picks the Trainer for, TYPE_NULL for any" },
+                    "rank": { "type": "integer", "minimum": 0, "maximum": 7, "description": "WbtTrainer.unk8_0, which WbtEntrant_Set takes as the entrant's rank" },
+                    "unk8_3": { "type": "integer", "minimum": 0, "maximum": 31, "description": "WbtTrainer.unk8_3, which WbtEntrant_Set takes" },
+                    "unk9": { "type": "integer", "minimum": 0, "maximum": 255, "description": "WbtTrainer.unk9, which the code doesn't read" },
+                    "bgm": { "type": [ "string", "integer" ], "x-constant": "SEQ_", "description": "The music of the battle against the Trainer" },
+                    "win_bgm": { "type": [ "string", "integer" ], "x-constant": "SEQ_", "description": "The music of winning it" },
+                    "unkE": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "WbtTrainer.unkE, whose being set WbtEntrant_Set takes" }
+                }
+            }
+        }
+    }
+}

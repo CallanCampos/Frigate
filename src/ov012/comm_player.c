@@ -18,13 +18,13 @@
 static void CommPlayer_Delete(CommPlayerSys *cps, int index);
 static void CommPlayer_CreateActSysIfReady(GameSystem *gsys, CommPlayerSys *cps);
 
-CommPlayerSys *CommPlayer_Init(u8 a0, GameSystem *gsys, HeapID heapId, u8 a3) {
+CommPlayerSys *CommPlayer_Init(u8 count, GameSystem *gsys, HeapID heapId, u8 allowRun) {
     CommPlayerSys *cps = GFL_HeapAllocate(heapId, sizeof(CommPlayerSys), TRUE, "comm_player.c", 97);
 
-    cps->unk8E = a0;
+    cps->count = count;
     cps->gsys = gsys;
     cps->heapId = heapId;
-    cps->unk90 = a3;
+    cps->allowRun = allowRun;
     return cps;
 }
 
@@ -58,19 +58,19 @@ void CommPlayer_Update(GameSystem *gsys, CommPlayerSys *cps) {
     }
 }
 
-void CommPlayer_Add(CommPlayerSys *cps, int index, u16 a2, const CommPlayerStatus *status) {
+void CommPlayer_Add(CommPlayerSys *cps, int index, u16 modelId, const CommPlayerStatus *status) {
     if (cps->act_ctrl == NULL || cps->players[index].active == TRUE) {
         return;
     }
     cps->players[index].pos = status->pos;
     cps->players[index].dir = status->dir;
-    cps->players[index].unkC = status->unk0;
-    cps->players[index].unk12 = a2;
+    cps->players[index].busy = status->busy;
+    cps->players[index].modelId = modelId;
     cps->players[index].hidden = FALSE;
     cps->players[index].active = TRUE;
     cps->players[index].actor = NULL;
-    FldCommActSys_CreateActor(cps->act_ctrl, index, a2, &cps->players[index].dir, &cps->players[index].pos,
-                              &cps->players[index].unkC);
+    FldCommActSys_CreateActor(cps->act_ctrl, index, modelId, &cps->players[index].dir, &cps->players[index].pos,
+                              &cps->players[index].busy);
 }
 
 static void CommPlayer_Delete(CommPlayerSys *cps, int index) {
@@ -104,15 +104,15 @@ void CommPlayer_RestoreActors(CommPlayerSys *cps) {
     GFL_ASSERT(GAMESYSTEM_CheckFieldMapWork(cps->gsys) == TRUE);
     GFL_ASSERT(cps->act_ctrl == NULL);
     cps->act_ctrl =
-        FldCommActSys_Create(cps->unk8E, Field_GetActorSystem(GSYS_GetField(cps->gsys)), cps->heapId, cps->unk90);
+        FldCommActSys_Create(cps->count, Field_GetActorSystem(GSYS_GetField(cps->gsys)), cps->heapId, cps->allowRun);
     MI_CpuFill8(&status, 0, sizeof(CommPlayerStatus));
     for (i = 0; i < COMM_PLAYER_MAX; i++) {
         if (cps->players[i].hidden == TRUE) {
             status.pos = cps->players[i].pos;
             status.dir = cps->players[i].dir;
-            status.unk0 = 0;
+            status.busy = FALSE;
             status.exState = cps->players[i].exState;
-            CommPlayer_Add(cps, i, cps->players[i].unk12, &status);
+            CommPlayer_Add(cps, i, cps->players[i].modelId, &status);
         }
     }
 }
@@ -125,7 +125,7 @@ BOOL CommPlayer_IsActive(CommPlayerSys *cps, int index) {
 void CommPlayer_SetStatus(CommPlayerSys *cps, int index, const CommPlayerStatus *status) {
     cps->players[index].pos = status->pos;
     cps->players[index].dir = status->dir;
-    cps->players[index].unkC = status->unk0;
+    cps->players[index].busy = status->busy;
 }
 
 BOOL CommPlayer_GetMyStatus(CommPlayerSys *cps, CommPlayerStatus *status) {
@@ -164,7 +164,7 @@ BOOL CommPlayer_GetMyStatus(CommPlayerSys *cps, CommPlayerStatus *status) {
     }
     status->dir = dir;
     status->pos = pos;
-    status->unk0 = busy;
+    status->busy = busy;
     status->exState = exState;
     if (dir != last->dir || exState != last->exState || busy != last->busy ||
         GFL_STD_MemCmp(&pos, &last->pos, sizeof(VecFx32)) != 0) {
@@ -190,7 +190,7 @@ static void CommPlayer_CreateActSysIfReady(GameSystem *gsys, CommPlayerSys *cps)
     if (cps->act_ctrl == NULL) {
         field = GSYS_GetField(gsys);
         if (field != NULL && Field_CheckMapLoadFinished(field)) {
-            cps->act_ctrl = FldCommActSys_Create(cps->unk8E, Field_GetActorSystem(field), cps->heapId, cps->unk90);
+            cps->act_ctrl = FldCommActSys_Create(cps->count, Field_GetActorSystem(field), cps->heapId, cps->allowRun);
         }
     }
 }

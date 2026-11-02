@@ -1481,7 +1481,7 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
         condition.disconnects = link->param->unk34->unk4;
         condition.cup = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_CUP_ID);
         condition.matches = link->param->unk34->unk8 + link->param->unk34->unkC;
-        WifiBattleMatchNet_StartMatch(link->net, 0, 0, param->param->unk4, &condition);
+        WifiBattleMatchNet_StartMatch(link->net, 0, 0, param->param->battleType, &condition);
         link->unkE4 = 0;
         link->unkE8 = 0;
         *seq = 12;
@@ -2014,7 +2014,7 @@ static void WifiBattleMatchLink_CompetitionTaskResult(WifiBattleMatchTask *task,
         break;
     case 2:
         WifiBattleMatchNet_StartReport(link->net, WBM_REPORT_MODE_RESULT, WBM_MATCH_MODE_COMPETITION,
-                                       param->param->unk4, param->battleResult, param->result == 2);
+                                       param->param->battleType, param->battleResult, param->result == 2);
         link->exchangeDone = 0;
         link->exchangeResult = 0;
         *seq = 3;

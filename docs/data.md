@@ -9,25 +9,41 @@ the C code's headers:
 
 ```
 res/
-  pokemon/<species>/        data, text, battle sprites, icon, footprint, cry
+  pokemon/<species>/        data, text, Pokédex data, battle sprites, icon, footprint, cry
+  pokedex/                  the Pokédex search's orders and the habitat list
   moves/<move>/             data and text
   items/<item>/             data, text and icon; shared/ for the icons' cells, animations and unused icons
   abilities/  natures/  types/
   trainers/
     data/<trainer>.json     record and party
     classes/  sprites/{front,back}/<sprite>/  ai/  facilities/<facility>/
+  battle/{animations,backgrounds,regulations}/
+  pokewood/movies/<n>/      Pokéstar Studios' movies: their casts and scripts
+  musicals/programs/<n>/    the musical's programs: their data, messages, stage scripts and sound
   field/
-    zones/  events/  encounters/  scripts/  areas/  matrices/
-    maps/{models,textures}/
+    zones/  events/  encounters/  scripts/  areas/  matrices/  cameras/  rails/  land_patches/  flash/
+    maps/{models,textures,pattern_animations}/
     props/{exterior,interior}/{models,textures}/
     actors/                 the overworld's people and objects, with pokemon/ and models/ for its Pokémon and 3D models
-    trades/  places/
-  lighting/{field,battle}/
+                            npc_caches/ for the zones' caches of their records, animations/ for the scripts'
+    trades/  places/  shops/  fog/  weather/  zone_gimmicks/  gate_boards/  entralink/  lens_flares/  cutins/
+    stadium/  hidden_hollows/  item_collectors/  castelia_rush/
+    gimmicks/<archive>/  effects/<archive>/   the gyms' and other gimmicks' models, the field effects' animations
+  lighting/{field,battle,zones}/  edge_colors.json  actor_material_colors.json
   town_map/
-  sound/{sequences,banks,wave_archives,streams}/
-  graphics/<archive>/       the menus', apps' and screens' 2D graphics, an archive each
-  demo/<archive>/           the demos and cutscenes: the movies' frames, an archive each
+  medals/                   the Medal Rally's medals
+  funfest/                  the Funfest Missions
+  name_input/               the name input's keyboards and profane words
+  geonet/                   Geonet's places on the globe
+  join_avenue/              the Join Avenue's tables
+  local_tvt/                the Xtransceiver's calls
+  pass_powers/              the Pass Powers
+  sound/{sequences,banks,wave_archives,streams,interactive,archives}/
+  graphics/<archive>/       the menus', apps' and screens' graphics and models, an archive each
+  demo/<archive>/           the demos and cutscenes: the movies' frames and the 3D demos' models, an archive each
   text/{system,script}/
+  debug/{skb,soundstatus}/  the 2D graphics of two debug screens that nothing loads
+  download_play/            the DS Download Play icons
 generated/                  the constant lists: species.txt, items.txt, obj_codes.txt, sound.txt and the others
 ```
 
@@ -65,11 +81,20 @@ which documents the format and can write them again.
 | `a/0/1/7` | `res/pokemon/growth_rates.csv` | Experience tables of the growth rates | `tools/data/species_data.py` |
 | `a/0/0/4`, `a/0/0/7`, `a/0/5/1`, `a/1/6/5`, `a/2/2/9` | `res/pokemon/<species>/` (PNG, palette, Nitro animation files) | Battle sprites, icons, musical sprites, and footprints | `tools/data/pokemon_graphics.py` |
 | `a/1/9/1` | `res/pokemon/<species>/data.json` (`cry_volume`) | The Pokémon cries' playback volumes | `tools/data/pokemon_cries.py` |
+| `a/3/0/2` | `res/pokemon/black_white.json` | Black and White's species data, as its differences from this game's | `tools/data/personal_bw1_data.py` |
+| `a/0/9/7`, `a/1/7/6`, `a/2/9/6` | `res/pokemon/<species>/pokedex.json`, `res/pokedex/` (JSON) | The Pokédex's search data and orders, the species' areas and the habitat list, see [The Pokédex](#the-pokédex) | `tools/data/pokedex_data.py` |
 | `swan_sound_data.sdat` | `res/sound/`, `res/pokemon/<species>/cry.wav` | The sound archive: sequences, banks, wave archives, players, groups, streams and the Pokémon cries | `tools/data/sound_data.py` |
 | `a/0/2/1` | `res/moves/` (JSON) | Move data | `tools/data/move_data.py` |
 | `a/0/2/4` | `res/items/` (JSON) | Item data | `tools/data/item_data.py` |
+| `a/2/2/8` | `res/items/` (JSON, `battle_pocket`) | The battle bag's pockets of each item | `tools/data/battle_bag_data.py` |
 | `a/0/2/5` | `res/items/<item>/` (PNG, palette), `res/items/shared/` | Item icons | `tools/data/item_icon_data.py` |
 | `a/0/5/6` | `res/field/scripts/` | Field scripts, see [Scripts](scripts.md#field-scripts) | `tools/script/field_script.py` |
+| `a/2/7/2`, `a/2/6/9` | `res/pokewood/movies/<n>/` (JSON), `res/pokewood/default_record.bin` | Pokéstar Studios' movies: their casts and scripts | `tools/data/pokewood_data.py` |
+| `a/1/1/2` to `a/1/1/5` | `res/musicals/programs/<n>/` (JSON, text, assembly, sound) | The musical's programs: their performers, title, stage scripts and sound, see [Musical programs](#musical-programs) | `tools/data/musical_program_data.py` |
+| `a/2/7/5` | `res/pokewood/cutins.json` | Pokéstar Studios' cut-in scripts | `tools/data/pokewood_cutin_data.py` |
+| `a/1/5/1` | `res/battle/backgrounds/` (JSON) | The battle backgrounds' types, fields and stages | `tools/data/battle_bg_data.py` |
+| `a/1/0/6` | `res/battle/regulations/` (JSON) | Battle regulations | `tools/data/regulation_data.py` |
+| `a/0/6/5`, `a/0/6/6` | `res/battle/animations/{moves,effects}/` | Battle animations: the moves' and the other effects' scripts, see [Scripts](scripts.md#battle-animation-scripts) | `tools/script/btlv_effvm_script.py` |
 | `a/0/9/1`, `a/0/9/2`, `a/0/8/9`, `a/0/9/0` | `res/trainers/data/` (JSON) | Trainers, their parties, and the table of their messages | `tools/data/trainer_data.py` |
 | `a/0/7/1`, `a/0/7/2`, `a/0/6/3` | `res/trainers/sprites/{front,back}/<sprite>/` (PNG, palette, Nitro cells and animations) | Trainer sprites, front and back | `tools/data/trainer_graphics.py` |
 | `a/0/0/9` | `res/field/matrices/` (JSON) | Map matrices | `tools/data/map_matrix_data.py` |
@@ -78,16 +103,32 @@ which documents the format and can write them again.
 | `a/1/7/4` | `res/field/props/exterior/textures/<bundle>/` (PNG) | Exterior field prop textures | `tools/data/map_texture_data.py` |
 | `a/1/7/5` | `res/field/props/interior/textures/<bundle>/` (PNG) | Interior field prop textures | `tools/data/map_texture_data.py` |
 | `a/0/1/4` | `res/field/maps/textures/<set>/` (PNG) | All 409 field texture sets | `tools/data/map_texture_data.py` |
+| `a/0/6/9` | `res/field/maps/pattern_animations/<n>/` (JSON, PNG, palette) | The areas' texture pattern animations | `tools/data/map_pattern_animation_data.py` |
 | `a/0/1/3` | `res/field/areas/<area>.json` | Area records | `tools/data/area_data.py` |
 | `a/1/2/6` | `res/field/events/` (JSON) | Zone events: signs, NPCs, warps, triggers and init scripts | `tools/data/event_data.py` |
 | `a/0/4/7`, `a/0/4/8` | `res/field/actors/<code>/` (JSON, PNG, palette, Nitro model) | The field actors' models: their table and graphics | `tools/data/field_actor_data.py` |
+| `a/2/0/8` | `res/field/actors/pokemon/<code>/pokemon.json` | The walking Pokémon's species, sex and form | `tools/data/walking_pokemon_data.py` |
 | `a/1/2/7` | `res/field/encounters/` (JSON) | Wild encounters | `tools/data/encounter_data.py` |
 | `a/1/6/3` | `res/field/trades/` (JSON) | In-game trades | `tools/data/trade_data.py` |
+| `a/1/1/8`, `a/2/6/8` | `res/field/cutins/` (JSON) | The field's 3D cut-in effects: their scenes and bitmaps | `tools/data/field_cutin_data.py` |
 | `a/2/1/2`, `a/2/1/1` | `res/trainers/facilities/battle_subway/` (JSON) | Battle Subway and Trial House trainers and Pokémon | `tools/data/facility_data.py` |
 | `a/2/6/2`, `a/2/6/1` | `res/trainers/facilities/black_tower/` (JSON) | Black Tower and White Treehollow trainers and Pokémon | `tools/data/facility_data.py` |
 | `a/2/4/8` to `a/2/5/7` | `res/trainers/facilities/pwt_*/` (JSON) | Pokémon World Tournament trainers, Pokémon and rental Pokémon | `tools/data/facility_data.py` |
+| `a/2/4/7` | `res/trainers/facilities/pwt_trainers.json` | The Pokémon World Tournament's table of its Trainers | `tools/data/pwt_trainer_data.py` |
 | `a/1/6/9` | `res/trainers/ai/` | Trainer AI scripts, see [Scripts](scripts.md) | `tools/script/tr_ai_script.py` |
+| `a/2/3/5`, `a/2/3/9` | `res/medals/` (JSON) | The Medal Rally's medals and the Pokémon the type medals count | `tools/data/medal_data.py` |
+| `a/2/8/9` | `res/funfest/` (JSON) | The Funfest Missions and their people's species | `tools/data/funfest_mission_data.py` |
+| `a/2/1/6` | `res/name_input/profane_words.json` | The words the name input rejects | `tools/data/profane_word_data.py` |
+| `a/1/2/0` | `res/name_input/name_input.json` | The name input's keyboards, word tables and conversion table | `tools/data/name_input_data.py` |
+| `a/0/9/6` | `res/field/weather/calendar.json` | The weather of 24 zones on each day of the year | `tools/data/weather_calendar_data.py` |
+| `a/1/8/3` | `res/field/castelia_rush/` (JSON) | The crowds of Castelia City's streets | `tools/data/castelia_rush_data.py` |
+| `a/0/5/2` | `res/geonet/` (JSON) | Geonet's places of the countries and their regions | `tools/data/geonet_place_data.py` |
+| `a/2/4/4` | `res/join_avenue/` (JSON) | The Join Avenue's tables of shops, goods, people, ranks and raffles | `tools/data/join_avenue_data.py` |
+| `a/2/4/0`, `a/2/3/4` | `res/local_tvt/` (JSON) | The Xtransceiver's calls and the story's scripted calls | `tools/data/local_tvt_data.py` |
+| `a/0/3/7` | `res/pass_powers/` (JSON) | The Pass Powers | `tools/data/pass_power_data.py` |
 | `ARCID_*` in `include/constants/arc.h` | `res/graphics/<archive>/` (PNG, palette, Nitro screens, cells and animations) | The 2D graphics of the menus, apps and screens, see [2D graphics](#2d-graphics) | `tools/data/graphics_archive.py` |
+| `skb.narc`, `soundstatus.narc` | `res/debug/{skb,soundstatus}/` (PNG, palette, Nitro screens) | The 2D graphics of two debug screens, a software keyboard and a sound status screen | `tools/data/debug_graphics_data.py` |
+| `dl_rom/icon_{b,w}.{char,plt}` | `res/download_play/` (PNG) | The DS Download Play icons of Black 2 and White 2 | `tools/data/download_play_icon_data.py` |
 
 The text archives are packed by `text_data.py` from text files rather than assembled; `configure.py` lists them in
 `TEXT_ARCHIVES`.
@@ -328,6 +369,35 @@ species up to Arceus, which a Pokémon from a game in that language shows, with 
 sizes, and the Japanese category of every species. Existing species' graphics and cries are built from the files
 beside `data.json`.
 
+Black and White's species data (`a/3/0/2`, `ARCID_PERSONAL_BW1`), which `poke_personal.c` reads beside this game's
+and the musical takes its forms from (`musical_mcss.c`), is `res/pokemon/black_white.json`, the ways its records differ
+from this game's: the fields, as `data.json` names them, of the 69 species whose records differ, such as Pikachu's held
+items; the 18 forms that had records of their own then, the first of `forms.json`, with their differences; and Black
+and White's Unova Pokédex, the species in its order. Every other field is the species' `data.json`'s, so the record
+follows an edit to it. A record stops after the type tutor's word of tutor moves, Black and White's only tutor.
+`tools/data/personal_bw1_data.py` packs it, the same in both versions, and `black_white.schema.json` describes the
+fields.
+
+### The Pokédex
+
+What the Pokédex's search and maps know of a species is its `pokedex.json`, beside `data.json`, from `SPECIES_NONE` to
+`SPECIES_EGG`: its `initial`, the letter its name starts with, which the search's initials pick from (null for
+`SPECIES_NONE`, none for the egg); its `shapes`, the body shape of the species and then of each of its other forms, 0 to
+13, the search's shape icons, whose count is the count of forms that the Pokédex knows; and its `area`, where it lives
+on the area map (`pokedex_detail_map.c`): the town map's places by their zones, each with the kinds of habitat it has
+there, the encounter groups (`grass` to `rippling_fishing`), all year or by season. A species without an area, such as
+the Pokéstar species, lives nowhere. `res/pokedex/orders.json` is the lists of the species in the search's orders: by
+national number (which nothing reads), by number for the regional Pokédex, by name, and by height and weight both ways,
+with forms as `[ species, form ]`. `res/pokedex/habitats/<zone>.json` is an area of the habitat list
+(`pokedex_habitat.c`), named after its zone in `sPokedexHabitats` (`pokedex_common.c`), or `16.json` for the file that
+the table gives no zone: the kinds of habitat it has, which of them change by season, what lives on its land, and its
+species, with the seasons when each is in each kind and the form whose icon it shows. `tools/data/pokedex_data.py` packs
+`ARCID_POKEDEX_DATA` (`a/0/9/7`), whose links of the forms it makes from the shapes, `ARCID_POKEDEX_AREA` (`a/1/7/6`)
+and `ARCID_POKEDEX_HABITAT` (`a/2/9/6`) for each version: the areas of 31 species and the habitat list's
+version-exclusive species differ, a value that differs being `{ "black2": ..., "white2": ... }`.
+`res/pokemon/pokedex.schema.json`, `res/pokedex/orders.schema.json` and `res/pokedex/habitat.schema.json` describe the
+fields.
+
 ### Pokémon graphics and cries
 
 Each species folder now keeps its battle graphics, icon, footprint, and cry next to its gameplay data, following the
@@ -395,6 +465,21 @@ a copy of one to start from; a new player, group or stream player needs its cons
 files of the sequences, banks, wave archives and streams, each kind in its list's order, so the sources pack it byte
 for byte, and stops with the file's name and line where a source is wrong. `.venv/bin/python
 tools/data/sound_data.py dump extract/b2_us/files res/sound` writes them again.
+
+The interactive sound system's tables, which change the field's music by where the player is, are
+`res/sound/interactive/`, a JSON file per archive with its entries in order, which
+`tools/data/interactive_sound_data.py` packs: `cities.json`, the towns whose music grows louder toward their center
+(`ARCID_ISS_CITY`); `dungeons.json`, a dungeon's pitch and tempo in each season; `zones.json`, the tracks that a zone
+fades in and out; `switches.json`, a BGM's nine switches of tracks and the zones they apply in; and `3d_sound.json`, the
+BGMs whose tracks play from places on the map. Zones and BGM are their `ZONE_*` and `SEQ_*` constants, and tracks are
+lists of track numbers, 0 to 15. `interactive_sound.schema.json` describes the fields, and both versions have the same
+tables.
+
+Which of these a BGM uses is `res/sound/interactive/bgm_info.json` (`a/0/8/6`, `ARCID_BGM_INFO`), which
+`tools/data/bgm_info_data.py` packs: a list of BGMs by their `SEQ_*` constants, each with its subsystem of the
+`ISS_SUBSYSTEM_*` enum in `include/system/iss_sys.h`, which `BGMInfo_GetISSSubsystem` (`bgm_info.c`) gives the
+interactive sound system for the BGM that plays; a BGM that isn't listed uses none. `bgm_info.schema.json` describes
+the fields, and both versions have the same list.
 
 ### Sequences
 
@@ -557,6 +642,11 @@ outside battle is a `BAG_POCKET_*`, and its battle bag pockets are a list of `BA
 is "a" or "an" by its first letter unless `name_article` says otherwise ("an HP Up", "the Leftovers", none for Honey).
 The 20 unused items, named "???", have constants of their own, as `ITEM_UNUSED_113`. Both versions have the same item
 data.
+
+The battle bag also reads each item's battle pockets from an archive of its own, `a/2/2/8` (`ARCID_B_BAG_ITEM`, a
+byte per item, `b_bag_item.c`), which holds the same bits as the items' `battle_pocket`, so
+`tools/data/battle_bag_data.py` packs it from `res/items/` too, and its `check` command compares the original with
+them.
 
 ### Item icons
 
@@ -772,6 +862,71 @@ names' message IDs from its place, and `res/field/trades/trade.schema.json` docu
 are null for random ones. The field scripts name the trades they start, as `FieldTradeCheck 0x8022, TRADE_GIGALITH,
 0x8020`. Both versions have the same trades.
 
+## Poké Marts
+
+The Poké Marts' lists of items are `res/field/shops/shops.json`, which `tools/data/shop_data.py` packs into `a/2/8/2`
+(`ARCID_SHOP_ITEMS`), a list of u16 items per file, and `a/2/8/3` (`ARCID_SHOP_ITEM_COUNTS`), their lengths, a byte
+each; `ShopUI_LoadPokeMartItems` in `scrcmd_shop.c` reads them. Items are their `ITEM_*` constants, in the menu's order,
+at their price in the item data, and a list whose first item is a TM or HM is shown as TMs with their moves. The file
+has the archive's three parts in order: `badge_marts`, the mart whose stock grows with the badges, the list that
+`BADGE_SHOP_DAT_IDS` gives each number of badges; `marts`, the other marts by the shop ID that the script's shop
+command names; and `special_marts`, the eight of `SPECIAL_POKE_MART_HEADERS`, a list per level of the key system's
+progress, all empty. The Battle Point shops and the move tutors keep their lists in the code. `shops.schema.json`
+describes the fields, and both versions have the same lists.
+
+## Gimmicks, news boards, the Entralink and lens flares
+
+The field's other tables are a JSON file per archive, each with a schema beside it, the same in both versions:
+
+- `res/field/zone_gimmicks/zone_gimmicks.json` (`a/1/0/2`, `ARCID_GIMMICK_TBL`), which `tools/data/zone_gimmick_data.py`
+  packs: the zones that have a gimmick, each with its number in `GIMMICK_OVERLAY_INFO` (`field_gimmick.c`), which gives
+  the gimmick's overlay and functions. `GameData_SetGimmickByZone` takes the first entry of the zone the player enters.
+- `res/field/gate_boards/` (`tools/data/gate_board_data.py`): `gates.json` (`a/1/7/2`,
+  `ARCID_FIELD_GIMMICK_GATE_ZONE_DATA`), the news board of each gate, by its zone and version: where it stands, which
+  way it faces, its animation, the messages it shows by the date and the day of the week, and the zones whose weather
+  it reports when nothing else gives one; and `news.json` (`a/1/6/4`, `ARCID_FIELD_GIMMICK_GATE_BOARD_ENTRIES`), the
+  news that the boards show while an event flag is set (`field_gimmick_gate.c`). Messages are numbers of the system
+  text bank 0x2b.
+- `res/field/entralink/` (`tools/data/entralink_data.py`): `luminance.json` (`a/2/1/9`, `ARCID_FIELD_PALACE_SYS`), the
+  tables of grays that another player's Entralink worlds are drawn in, by the owner's version class and whether the
+  player has been to the world's town (`field_palace_sys.c`); and `forest_levels.json` (`a/2/2/3`,
+  `ARCID_ENTREE_FOREST`), the level of each species in the Entree Forest, by its `SPECIES_*` constant
+  (`EntreeForest_CreateSymbolMon`).
+- `res/field/lens_flares/lens_flares.json` (`a/2/4/1`, `ARCID_FIELD_GOOUT_EFFECT_DATA`), which
+  `tools/data/lens_flare_data.py` packs: the zone transitions that show a lens flare in sunny weather, each with the
+  effect set of each season and time of day, a row of `LENS_FLARE_IDS` (`field_goout_effect.c` and
+  `field_goout_effect_data.c`).
+- `res/field/cutins/<n>.json` is the field's 3D cut-in effect n (`fld3d_ci.c`, `FLD3DCI_*` in `field_event.h`): the
+  field move's Pokémon sprite, the battle cut-ins and Alder's flight. Each is its scene (`a/1/1/8`,
+  `ARCID_FLD3D_CI_FILE`): its particle resource and the delays of its emitters, its two actors' models and animations,
+  files of `ARCID_FLD3D_CI_RESOURCES` (`a/1/1/6`, null for none), and its sound and fade lists' slot; and its bitmaps
+  (`a/2/6/8`, `ARCID_FLD3D_CI_BITMAP`), the graphics that it converts into the textures and palettes of its model,
+  which name them, and the cut-in's flag. `tools/data/field_cutin_data.py` packs both archives.
+
+Zones are their `ZONE_*` constants, directions `DIR_*`, versions `VERSION_*` and flags their constants of
+`generated/flags.txt`.
+
+## The script commands' tables
+
+Some of the field script's commands read tables of their own, each packed by its script, the same in both versions:
+
+- `res/field/cameras/event/<n>.json` (`a/1/6/1`, `ARCID_SCRCMD_CAMERA`), which `tools/data/event_camera_data.py`
+  packs: the event camera's stored positions, which `Scrcmd_Camera_EvCameraMoveToCommon` names by number and moves
+  the camera to: its pitch and yaw in 65536ths of a turn, its distance and target in 4096ths of a unit, and which of
+  them the move animates (`scrcmd_camera.c`).
+- `res/field/stadium/trainers.json` (`a/2/0/6`, `ARCID_SCRCMD_STADIUM`), which `tools/data/stadium_data.py` packs:
+  the stadiums' 0x84 trainers, each with the two keys that the script commands find it by, its model by its
+  `OBJ_CODE_*` constant and its trainer by its `TRAINER_*` constant, whose battle script an NPC gets
+  (`scrcmd_stadium.c`).
+- `res/field/hidden_hollows/<n>.json` (`a/2/7/3`, `ARCID_SCRCMD_HIDDEN_HOLLOW`), which
+  `tools/data/hidden_hollow_data.py` packs: what Hidden Grotto n holds in each slot and group, its Pokémon in each
+  version, with their levels, gender and form, its items in balls and its hidden items (`scrcmd_hidden_hollow.c`).
+- `res/field/item_collectors/item_collectors.json` (`a/2/0/5`, `ARCID_ITEM_COLLECTOR`), which
+  `tools/data/item_collector_data.py` packs: what each group of item collectors pays for each item it buys, by the
+  group that `ITEM_COLLECTOR_FILES` gives each file (`scrcmd_misc.c`).
+
+Species and items are their `SPECIES_*` and `ITEM_*` constants, and each directory has its schema.
+
 ## Battle facilities
 
 A battle facility's trainers and the Pokémon sets they pick from are in `res/trainers/facilities/<facility>/`, as
@@ -797,6 +952,32 @@ facility data.
 Unlike a regular trainer (see [Trainers](#trainers)), a facility trainer has no party of its own: the game picks some of
 its sets at random, and the facility sets the level and IVs. The sets are a pool that many trainers share, which is why
 they are files of their own that trainers name.
+
+The tournament's own table of its Trainers is `res/trainers/facilities/pwt_trainers.json` (`a/2/4/7`,
+`ARCID_WBT_TOOL`, `WbtTrainer` in `field/wbt.h`), which `WbtTrainers_Load` reads: for each, the tournaments it takes
+part in, the type the Type Expert Tournament picks it for, its trainer class and the music of its battle and its win,
+by their constants, and the values that `wbt_makematch.c` gives its entrant. `tools/data/pwt_trainer_data.py` packs
+it, the same in both versions, and `pwt_trainers.schema.json` describes the fields.
+
+## Battle backgrounds and regulations
+
+The battle backgrounds' tables (`a/1/5/1`, `ARCID_BATTLE_BG_DATA`) are `res/battle/backgrounds/`, a list for each of
+the archive's files, which `tools/data/battle_bg_data.py` packs. `types.json` is the background types, a zone's
+`battle_bg` (`BtlvEffectBgData`, `btlv_effect.c`): whether the zone's light lights the battle, whether the season picks
+the variant, and for each of the battle's 20 terrains the field, the backdrop, and the stage, the ground the Pokémon
+stand on, by their places in the other two lists; the stage is also the terrain that Burmy changes its form for.
+`fields.json` (`btlv_field.c`) is each field's model and three animations, and `stages.json` (`btlv_stage.c`) each
+stage's edge color and its models and animations, two to a variant, the two sides' grounds: files of `ARCID_BTLV`
+(`a/0/1/1`), for each variant (the season, or a field's special forms), null for none.
+
+The battle regulations (`a/1/0/6`, `ARCID_REGULATION`) are `res/battle/regulations/<n>.json`, regulation n, which the
+Union Room, the Wi-Fi and wireless battles, the Battle Subway and Pokéstar Studios load by number
+(`PokeRegulation_Load`): its name, a message of `load_battle_type_text_to_strbuf.txt`; how many Pokémon a team enters;
+the level and how it applies; whether a team may have two of a species or of a held item; the banned species and items;
+the species a team must have; the Wonder Launcher; whether nicknames are kept and the partners' teams shown; the
+selection's time limit; the battle type; and how many battles may be played. `tools/data/regulation_data.py` packs
+them. Both archives are the same in both versions, and `backgrounds.schema.json` and `regulation.schema.json` describe
+the fields.
 
 ## Map model sources
 
@@ -906,7 +1087,22 @@ re-exported with `tools/data/field_prop_model_data.py extract APICULA OUTPUT_DIR
 An unchanged Blender export of a prop also repacks byte for byte; adding a face to a prop model
 changes only its bundle, and the rebuilt model loads in Apicula.
 
-## Map matrices, areas and lights
+The models of the other archives (the demos', the gimmicks' and the effects') are GLBs in the same way, packed by
+`tools/data/graphics_archive.py` with these converters; see "2D graphics".
+
+The areas' texture pattern animations (`a/0/6/9`, `ARCID_AREA_ANIME_PAT`), the water, flowers, fire and flags whose
+frames `field_ground_anime.c` uploads over the area's textures in VRAM, are `res/field/maps/pattern_animations/<n>/`,
+the pack of the areas whose `pattern_animation` is n. Each of a pack's animations is a Game Freak texture pattern
+animation (GFBTP) and the texture set (BTX0) of its frames, which `animations.json`
+(`pattern_animation.schema.json`) gives: the animation's length in frames, its textures and palettes in the texture
+set's order, and its targets, each a texture of the area's set, the one named as the target's first texture, with its
+key frames, from which on the target shows a texture, by name. Each texture is `<name>.png`, an indexed PNG whose
+pixels are the indices of its palette, `<palette>.pal`, a JASC palette named after the first of the palette's names,
+whose colors are the ones the game shows, so edit the PNG in indexed mode and recolor in the `.pal`. The packer
+writes the texture sets again from these as the game's are, byte for byte, so textures, frames and key frames can be
+added; `tools/data/map_pattern_animation_data.py` packs the archive, the same in both versions.
+
+## Map matrices, areas, lights and cameras
 
 A zone's header names its map matrix, `res/field/matrices/<matrix>.json` (`a/0/0/9`), by its constant in
 `generated/map_matrices.txt`, which names a matrix after the first zone that uses it, the overworld's
@@ -915,6 +1111,20 @@ for `MAP_MODEL_M_DUN0403_00_00`). A matrix is a grid of its cells' maps, map mod
 none), row by row,
 and, for the overworld's, of their zones by name; `tools/data/map_matrix_data.py` packs them in the list's order. A
 row stays on one line, so the file reads as the grid.
+
+`res/field/matrices/replacements.json` is the map replacements (`a/0/1/0`, `MapReplaceEntry`), which
+`MapMatrix_Patch` applies to a matrix as the field loads it, and `tools/data/map_replace_data.py` packs, the same in
+both versions. Each names its matrix and picks a value by the season, the version, both, or an event of
+`EVENT_MAP_REPLACE_TABLE` in `map_replace.c` by its condition number, a value for each case by name (`"spring"`,
+`"white"`, `"set"`): a map model, which replaces every cell of the matrix with the first value's, or a matrix, which
+the field loads instead. `"unused"` keeps the slots of the six that the condition doesn't pick.
+`replacements.schema.json` describes the fields.
+
+The Join Avenue's shops change the avenue's map where they stand: `res/field/land_patches/<n>.json` (`a/1/5/4`) is
+the patch that a shop's column 6 or 7 names (`resort_mapcreate.c`), the tiles it writes over the avenue's terrain, each
+with an RD chunk's two planes and its tile type, and the props it adds there, by their model's ID in the area's props
+(`land_data_patch.c`). `tools/data/land_patch_data.py` packs them, the same in both versions, and
+`land_patch.schema.json` describes the fields.
 
 Each area is `res/field/areas/<area>.json`, named after its constant in `generated/areas.txt`, in whose order
 `a/0/1/3` has the records (`AreaData`), which name the graphics that zones share: their props, textures, animations
@@ -935,6 +1145,71 @@ lights (on or off, color and direction in 4096ths), the materials' diffuse, ambi
 fog's color and the color the screen clears to. Colors are 0 to 31 per component. `tools/data/light_data.py`
 packs them, and both versions have the same sets.
 
+An area also names its edge colors, a table of `res/lighting/edge_colors.json` (`a/0/1/5`), 255 for none: the eight
+colors of the outlines around the models, by the top three bits of their polygon IDs, which `Field_LoadEdgeColorTable`
+sets, replacing the last with gray; and its billboard actors' material colors, a preset of
+`res/lighting/actor_material_colors.json` (`a/1/7/3`, `field_bbd_color.c`): the normal they are lit with and their
+diffuse, ambient, specular and emission colors. `tools/data/area_color_data.py` packs both, the same in both versions,
+and `edge_colors.schema.json` and `actor_material_colors.schema.json` describe them. The zones where Flash can be used
+are in `res/field/flash/flash.json` (`a/1/4/9`, `ARCID_MAPEFF_SKILL_TBL`), which `GetZoneFlashFlags` looks a zone up
+in: each zone by its constant and whether it allows Flash (`FLD_FLASH_ALLOW`) or is lit as if it had been used
+(`FLD_FLASH_ACTIVE`). `tools/data/flash_data.py` packs it, the same in both versions.
+
+A zone can have a lighting set of its own instead of its area's: `res/lighting/zones/zones.json` is the table of such
+zones (the last file of `a/0/8/1`, `ARCID_ZONE_LIGHT_TABLE`), each with its set, `res/lighting/zones/<n>.json`, a set
+as the field's, which `GetZoneStaticLightDataIndex` finds for `FieldLightStatus_Get` and the sunny weather. The table
+is empty, so its one set goes unused. A zone's fog is in `res/field/fog/fog.json` (`a/0/8/0`,
+`ARCID_ZONE_FOG_TABLE`): the 29 fogs, each the depth where it starts and its slope, how fast it thickens, which
+`FieldFogCtrl` loads and the sunny weather fades in, and the table of the zones that have one (`GetZoneFogIndex`).
+Zones are their `ZONE_*` constants. As the code reads each table from a fixed file, the last (`ZONE_FOG_TABLE_FILE`
+and `ZONE_LIGHT_TABLE_FILE` in `zonedata.c`), the number of fogs and sets is fixed. `tools/data/zone_fog_data.py` and
+`tools/data/zone_light_data.py` pack them, and both versions have the same.
+
+Twenty-four zones have a weather for each day of the year: `res/field/weather/calendar.json` (`a/0/9/6`,
+`ARCID_CALENDAR`), which `Calendar_GetWeather` (`calender.c`) reads when the season is the real one, and which gives
+each zone, by its constant, the weather of each day of each month by its `WEATHER_*` name of `system/zone_weather.h`,
+February with 29 days. A zone it doesn't have keeps its header's weather. The code reads all 24 zones, so the
+calendar has 24. `tools/data/weather_calendar_data.py` packs it, the same in both versions, and
+`calendar.schema.json` describes the fields.
+
+The crowds that walk Castelia City's streets are `res/field/castelia_rush/castelia_rush.json` (`a/1/8/3`,
+`ARCID_CASTELIA_RUSH`, `castelia_rush.c`): each zone's crowd, by its constant, with the frames between passers-by by
+day period, their object codes, the balloons' messages, the frames of a step and the two lanes they walk; and the
+scripts a passer-by of each object code picks from. `tools/data/castelia_rush_data.py` packs it, the same in both
+versions, and `castelia_rush.schema.json` describes the fields.
+
+The field camera's data is in `res/field/cameras/`, which `tools/data/field_camera_data.py` packs, the same in both
+versions. A zone's header names its camera setup by number, `setups/<n>.json` (the records of `a/0/5/9`'s one file,
+`FieldCameraDefaults`, which `FieldCamera_CoordsLoadDefaults` applies): its distance, pitch, yaw and field of view,
+clipping planes, depth buffer mode, and whether it follows the player at an offset or looks at a point. Its `cam_bound`
+names a boundary set, `boundaries/<n>.json` (`a/1/0/9`), 65535 for none: up to four rectangles and circles on the X-Z
+plane that keep the camera's target or eye inside them, or out of a rectangle (`FieldCameraBoundary_LoadFile`). A warp's
+transition type from `WARP_TRANSITION_CAMERA` (7) on has an entrance camera, `entrances/<n>.json` (`a/1/7/7`), where the
+camera moves as the player goes in or comes out (`entrance_camera.c`). Distances and positions are in whole units,
+except the setups' clipping planes and target and the circles, which are in 4096ths; angles are in 65536ths of a turn.
+`setup.schema.json`, `boundary.schema.json` and `entrance.schema.json` describe the fields.
+
+A few zones have camera areas, where the camera changes as the player moves (`fld_scenearea_loader.c`), which
+`tools/data/camera_area_data.py` packs, the same in both versions: `areas/<n>.json` (`a/1/5/6`) are the files that
+`GetCameraIDForZone` gives a zone from `ZONE_CAMERA_ASSIGNMENTS` in `zonedata.c`, and `rail_areas/<n>.json`
+(`a/0/7/9`) the files that a rail map's header names (see below). Each lists its areas (`CameraArea`): a rectangle of
+tiles, across which the camera blends its pitch, yaw and distance, and with some functions the target's offset and the
+field of view, from the setting at its start to the one at its end, or a ring around a point, where the camera looks
+at the point from behind the player or from a fixed eye; and the functions of `CAM_CALC_FUNCS` that run as the player
+enters the area, stays in it and leaves it. `area.schema.json` describes the fields.
+
+The maps without a grid, where the player walks on rails, have their data in `res/field/rails/`, which
+`tools/data/rail_data.py` packs, the same in both versions. `GetRailIDForZone` gives such a zone a rail ID from
+`ZONE_RAIL_ASSIGNMENTS` in `zonedata.c`, and `headers.json` (`a/1/1/0`) gives each rail ID its rail file and its
+camera areas, of `res/field/cameras/rail_areas/` (`NoGridMapperHeader`), null for none. A rail file, `<n>.json`
+(`a/0/7/8`'s file n), is the width of a tile, the points, where up to four lines meet, the lines between them, the
+cameras, which name their function of `RAIL_CAMERA_CURVE_FUNC_SET` and its eight parameters, and the curves that bend
+the lines (`field_rail.h`); points, lines, cameras and curves name each other by their place in their lists. Each line
+also has its tiles, which the archive keeps after all the rail files, in its file n plus their count (`rail_attr.c`):
+a row for each tile along the line, each the tiles across it, a map tile type in hex with its flags in the high 16 bits
+and its class in the low 16, as `GetTileFlags` and `GetTileClass` split it. Positions are in 4096ths of a unit and
+angles in 65536ths of a turn. `rail.schema.json` and `headers.schema.json` describe the fields.
+
 ## Town map
 
 The town map's places, `res/town_map/<zone>.json` (`a/0/8/5`), form the table that the town map, the Pokédex's habitat
@@ -951,6 +1226,119 @@ show it (an event flag, or a `TOWNMAP_FLAG_*` that the code works out, from
 ```
 
 `res/town_map/place.schema.json` describes each file, and `tools/data/town_map_data.py` packs them for each version.
+
+## Medals, missions and the apps' other tables
+
+The Medal Rally's medals are `res/medals/medals.json` (`a/2/3/5`, `ARCID_MEDAL_DEF`, a file per medal), in the order of
+their names in `res/text/system/medal_names.txt`, whose message each names, as the packer checks. A medal is earned by
+a record of the save data that reaches its threshold or by one of the special checks of `sMedalChecks` in
+`scrcmd_pokemon_center.c`, by index, which leave it to the scripts where the table has none; its type is its picture,
+its field effect and its category, and its kind and rank decide when Mr. Medal hints at it and when it is discovered.
+`res/medals/type_species.json` (`a/2/3/9`) lists the Pokémon whose types the type medals count, by their constants.
+`tools/data/medal_data.py` packs both, the same in both versions, and `medals.schema.json` and
+`type_species.schema.json` describe the fields.
+
+The Funfest Missions are `res/funfest/missions.json`, files 0 and 1 of `a/2/8/9` (`ARCID_FMISSION_DATA`), each
+mission's header and parameters (`field/fest_mission_data.h`), which `FestMission_Load` copies into the mission's
+config: its goal's and result's messages of `res/text/system/get_text_file_for_fest_missions.txt` by ID, its target,
+a species by its constant where its kind says so, its reward and second item and the event flag it needs by their
+constants, and the time and score of each of its four levels. `res/funfest/species_lists.json` is the archive's other
+files, the species that a people mission picks its people's Pokémon from (`FesMissionPeople_LoadSpecies`).
+`tools/data/funfest_mission_data.py` packs them, the same in both versions, and `missions.schema.json` and
+`species_lists.schema.json` describe the fields.
+
+The words that the name input rejects as a name are `res/name_input/profane_words.json` (`a/2/1/6`,
+`ARCID_PROF_WORD`): seven lists, all of which `ProfWord_Check` (`prof_word.c`) checks, of words written as it folds a
+name, katakana as hiragana and Latin letters as capitals. The archive keeps each list encrypted and each word in 32
+characters with its terminator; the characters after the terminator are the original's leftovers, which the game
+doesn't read, and `padding` keeps them for each word so that the archive matches. `tools/data/profane_word_data.py`
+packs it, the same in both versions, and `profane_words.schema.json` describes the fields. Its other tables are
+`res/name_input/name_input.json` (`a/1/2/0`, `ARCID_NAME_INPUT`, `name_input_data.c`): the five keyboards, grids of
+the characters that can be entered with a string per row, the three word tables, empty in this version, and the
+conversion table, the rows of characters that a key changes into each other. An ideographic space fills a grid's
+unused places and the rest of a word or row. `tools/data/name_input_data.py` packs it, the same in both versions,
+and `name_input.schema.json` describes the fields.
+
+Geonet's places on the globe are in `res/geonet/` (`a/0/5/2`, `ARCID_GEONET_PLACE`): `countries.json` has where each
+country is, by its number, and `regions.json` where each region of the 18 countries with regions is, a list for each
+country in the order of `sSubdividedCountries` (`country_region.c`), which `Geonet_LoadPlaces` shows instead of the
+country. A place is the globe's turn about its X and Y axes that brings it to the front, in 65536ths of a turn. Each
+names its message of the countries' or its country's text bank, which `country_region.c` gives, by ID, null past the
+last, and the packer checks the names against the text. `tools/data/geonet_place_data.py` packs them, the same in
+both versions, and `countries.schema.json` and `regions.schema.json` describe the fields.
+
+The Join Avenue's tables are `res/join_avenue/<table>.json`, the 13 files of `a/2/4/4` (`ARCID_RESORT_BINARY`), each
+rows of u16 columns that `ResortBinary_Load` reads (`system/resort_binary.h`), as a list of its rows with each column
+by name: the people's scripts, the shops (whose `patch_odd` and `patch_even` name the land patches above) and their
+goods, the occupants' places, the people's types, the avenue's NPCs and their texts, its ranks, the raffles, the
+visitors, the points of a visit by trainer type and by shop kind and day, and the groups of visits. Columns the code
+doesn't read are `column_<n>`, messages are numbers of `SCRIPT_TEXT_GLOBAL_10685`, and an item of the goods, an NPC's
+model and its movement are their constants. `tools/data/join_avenue_data.py` packs them, the same in both versions,
+and `join_avenue.schema.json` describes every table and column, some from the code's use more than its names.
+
+The Xtransceiver's calls are in `res/local_tvt/`: `calls.json` (`a/2/4/0`, `ARCID_LOCAL_TVT_CALL_DATA`) is the calls
+the player can make, each a person's after a count of calls with them (`local_tvt_calldata.c`), with the background
+and zone of their face and what they say, messages of `res/text/system/local_tvt_talk.txt` by ID; `scripts.json`
+(`a/2/3/4`, `ARCID_LOCAL_TVT_SCRIPT`) is the calls the story makes (`local_tvt_scriptmode.c`), each its faces' persons
+and zones and its commands, which make a face talk, with a message of the script's own text file, wait or play a
+sound. `tools/data/local_tvt_data.py` packs both, the same in both versions, and `local_tvt.schema.json` describes
+the fields.
+
+The Pass Powers are `res/pass_powers/pass_powers.json` (`a/0/3/7`, `ARCID_PASS_POWER`, `PassPowerData` in
+`save/high_link.h`), by their numbers: the levels that unlock each in each version, its price in Pass Orbs, its name
+and description, messages of `res/text/system/pass_powers.txt` and `monolith_power_info.txt` by ID, its effect by
+its `PASS_POWER_EFFECT_*` name, the effect's strength and how many minutes it lasts. `tools/data/pass_power_data.py`
+packs it, the same in both versions, and `pass_powers.schema.json` describes the fields.
+
+## Pokéstar Studios
+
+Each of Pokéstar Studios' 41 movies is a directory, `res/pokewood/movies/<n>/`, by its number. Its `cast.json`
+(`a/2/7/2`, `ARCID_POKEWOOD_CAST`) is the Pokémon of the player's side and the opponent's, which the movie's battle makes the
+parties of (`event_pokewood.c`): each with its species, the species it is shown as, its level, form, sex, nature,
+ability slot, held item, moves, IVs and EVs. Its `movie.json` (`a/2/6/9`, `ARCID_POKEWOOD_MOVIE`, `BtlScriptedRules`
+in `btl_main.h`, which several overlays read parts of) is its script: the score multiplier, how many Pokémon each side
+has, the director, whose message file the movie's messages are of, the turn limit and the turn it should end on, its
+rule and the species the rule targets, each side's trainer class for each sex of the player, the music, the events and
+messages by turn, and its twelve scenes, each with its trigger, its score, its messages by step and the choices it
+offers. Every value is a halfword, -1 for none, and the fields that nothing reads keep their C names. The archive's
+last file, after the movies', is `res/pokewood/default_record.bin`, a recorded movie (`PokewoodBlock`, a battle
+recording) that `loadPokewoodAndCheck` loads. `tools/data/pokewood_data.py` packs both archives, the same in both
+versions, and `res/pokewood/cast.schema.json` and `movie.schema.json` describe the fields.
+
+The cut-ins that the movies' battles play after some scenes (`a/2/7/5`, `ARCID_POKEWOOD_CUTIN_SCRIPT`,
+`pokewood_cutin.c`) are `res/pokewood/cutins.json`, a script per cut-in, script n being the cut-in of `sCutins[n]`:
+its movie and scene, which the code doesn't read, the files of `ARCID_POKEWOOD_CUTIN_GRA`
+(`res/graphics/pokewood_cutin_gra/`) it loads for each sex of the player, and its steps, which run in order without
+jumps. A step is one of the eleven commands, which move, nudge or show the four actors, load other resources, wait,
+print one of the scene's messages (by its step and kind in the movie's `movie.json`, or the player's choice) and hide
+the message window again, and play, wait for or stop sounds, with its arguments named after what the command reads
+them as and sound effects as their `SEQ_*` constants; an argument it doesn't read is `argN` when it isn't 0.
+`tools/data/pokewood_cutin_data.py` packs it, the same in both versions, and `res/pokewood/cutin.schema.json`
+describes the fields.
+
+## Musical programs
+
+The musical's four programs are the archives `ARCID_MUSICAL_PROGRAM` + n (`a/1/1/2` to `a/1/1/5`), which
+`MusicalSystem_LoadProgramData` (`musical_system.c`) loads; a downloaded program is an archive of the same six
+members. Program n is the directory `res/musicals/programs/<n>/`, a file for each member, which
+`tools/data/musical_program_data.py` packs, the same in both versions:
+
+- `data.json`, the program's `MusicalProgramData` (`musical_program.c`): its number, the points its audience has for
+  each of the four kinds of prop and the bonus it adds to them at random, its list of props to give away, and its six
+  performers, of which the game picks the other three entrants among those whose `min_shots` the player has reached.
+  A performer has its Pokémon's species and form, its look as an `OBJ_CODE_*` (the C's `trainerClass`, which the
+  player's is `OBJ_CODE_HERO` or `OBJ_CODE_HEROINE`), its name as a message of `res/text/system/btl_main_9.txt` (the
+  same line of `musical_event.txt` is its Pokémon's nickname), and the props its Pokémon wears, each `[item, slot]`.
+  `res/musicals/programs/program.schema.json` describes the fields.
+- `messages.txt`, the program's messages, in the format of `res/text/`'s (see [Text](#text)), with IDs of the
+  program's own, `MusicalProgram0_Text_Stardom`; the first is the program's title.
+- `script.s`, the stage's scripts, which the build assembles with the macros of `include/asm/sta_script.inc` (see
+  [Scripts](scripts.md#musical-stage-scripts)) and gives the packer as `configure.py`'s `PACK_SCRIPTS` says.
+- `bank.json`, `sequence.s` and `waves/`, a bank, a sequence and a wave archive in the formats of `res/sound/`'s
+  (see [Sound](#sound)), which the stage's `PlayStrm` plays in place of a sequence of the sound archive and whose
+  wave `PlayWave` puts in place of one of its waves. The bank's instruments name a wave archive by its slot, 0 to 3,
+  among the four of the sound archive's bank of the sequence that `PlayStrm` names. The four programs have the same
+  sound, which their scripts don't play.
 
 ## Field actors
 
@@ -984,6 +1372,23 @@ Funfest Missions' player icons (`sFMissionViewPlayerModels`) and an entrant's de
 `tools/data/field_actor_data.py` writes the sprites' texture sets as the game's are, so the sources pack both archives
 byte for byte; `.venv/bin/python tools/data/field_actor_data.py dump extract/b2_us/files res/field/actors` writes
 them again.
+
+The walking Pokémon's table (`a/2/0/8`, `ARCID_TPOKE`, `tpoke_data.c`) is each walking Pokémon's `pokemon.json`
+beside its `data.json`: the species, the sex (null for either) and the form that the code shows, which
+`GetPokemonFieldOBJCODE` looks up for the Entree Forest, the Hidden Grottoes and Game Sync, the first entry that fits.
+`tools/data/walking_pokemon_data.py` packs the table from the codes that have one, in the list's order, the same in
+both versions, and `res/field/actors/walking_pokemon.schema.json` describes the fields.
+
+A zone's header names an NPC info cache by its `"npc_cache"`, `res/field/actors/npc_caches/<n>.json` (`a/0/5/7`),
+which the field loads as the player enters the zone (`LoadMModelSystemInfoCache`) and takes the records of its object
+codes from before it reads the model table (`GetNPCMdlInfoForOBJCODE`); a number from 24 on is none. Each cache lists
+its codes, at most 26, and `tools/data/npc_cache_data.py` writes each code's record into it from its `data.json`, as
+the table has it, so a cache follows its actors. Scripts play an actor's animations by number,
+`res/field/actors/animations/<n>.json` (`a/2/0/0`, `field_actor_animation.c`): curves of a scale, a rotation in
+degrees and a translation in units for each frame, which move the actor from where it started and turn it to face as
+the rotation's Y says. `tools/data/field_actor_animation_data.py` packs them, writing each float as the shortest
+decimal that gives it back. Both are the same in both versions; `npc_cache.schema.json` and `animation.schema.json`
+describe the fields.
 
 ## Zone events
 
@@ -1043,12 +1448,12 @@ events.
 The menus, apps and screens keep their 2D graphics in archives of Nitro resources, an archive each: the title screen's,
 the Pokédex's (`ARCID_POKEDEX_GRA`), the box's (`ARCID_BOX2`) and the others. Each is `res/graphics/<archive>/`, named
 after its `ARCID_*` constant in `include/constants/arc.h`, whose number gives the archive's file (`ARCID_TITLE`, 26, is
-`a/0/2/6`); `configure.py` packs a directory for each, 110 of them. An archive that swan doesn't name is named after
+`a/0/2/6`); `configure.py` packs a directory for each, 111 of them. An archive that swan doesn't name is named after
 the source file that loads it, or the prefix of an app's files where several load it (`ARCID_BTLV` for the
-`btlv_*.c` files), in the block at the end of `arc.h` with its loaders. Twelve archives with graphics, `a/0/0/0`,
-`a/0/0/1`, `a/0/3/5`, `a/0/4/3`, `a/0/5/4`, `a/0/5/5`, `a/0/6/4`, `a/0/6/7`, `a/1/2/1`, `a/1/4/0`, `a/1/4/1` and
-`a/2/4/6`, have no loader found yet, so no name, and stay as the ROM has them until code that loads them is; the font's
-archive is the font's. The members are files in the archive's order, named after their number in it, or
+`btlv_*.c` files), in the block at the end of `arc.h` with its loaders. Ten archives with graphics,
+`a/0/0/1`, `a/0/3/5`, `a/0/4/3`, `a/0/5/4`, `a/0/6/4`, `a/0/6/7`, `a/1/2/1`, `a/1/4/0`, `a/1/4/1` and
+`a/2/4/6`, have no loader found yet, so no name, and stay as the ROM has them until code that loads them is; the fonts'
+archive is `res/fonts/font/`. The members are files in the archive's order, named after their number in it, or
 after their constant where `generated/narc_<archive>.txt` names them (`professor.png` for `NARC_INTRO_PROFESSOR_NCGR`):
 
 - a character resource (NCGR), the tiles of a screen or the characters of a sprite, is an indexed PNG (`05.png`), 4bpp
@@ -1058,9 +1463,17 @@ after their constant where `generated/narc_<archive>.txt` names them (`professor
   screen's to say. A background's PNG is as wide as the game's tile sheet, and a sprite's characters, which have no
   size, are drawn in rows of four tiles, as a 32 by 32 OBJ stores them.
 - a palette resource (NCLR) is a JASC palette (`11.pal`), which sets the colors.
+- a 3D model (BMD0) is a directory named as the member is (`05/`), as a field prop's model is: `model.glb`, its
+  `data.json` and, where the model embeds its textures (a TEX0 block), a PNG of each texture, named after it, which the
+  GLB's images show. A texture set (BTX0) is a directory of those PNGs alone. See below.
+- a font (NFTR) is a directory named as the member is (`00/`): `glyphs.png`, a sheet of its glyphs, and `font.json`,
+  its metrics, character maps and glyphs' widths. See below.
+- a particle resource (SPA) is a directory named as the member is (`000/`): `particles.json`, its emitters' fields,
+  and a PNG of each texture. See below.
 - the rest are the members themselves, decompressed: screens (`.nscr`), which place the tiles, cells (`.ncer`), cell
-  animations (`.nanr`), multi-cells (`.nmcr`, `.nmar`), 3D models and animations (`.nsbmd`, `.nsbca`, `.nsbta`, `.nsbma`,
-  `.nsbtp`, `.nsbtx`) and other data (`.bin`). Tools such as NitroPaint edit them.
+  animations (`.nanr`), multi-cells (`.nmcr`, `.nmar`), 3D animations (`.nsbca`, `.nsbta`, `.nsbma`, `.nsbtp`,
+  `.nsbva`), as the field props keep theirs, a font or a particle resource that the converter doesn't take (`.nftr`,
+  `.spa`), and other data (`.bin`). Tools such as NitroPaint edit them.
 
 `archive.json` lists the members that the game stores LZ-compressed (`{"compressed": {"05.png": "lz10"}}`), which the
 packer compresses again: an edited one as a valid stream of literals, an eighth larger than its data. A member that
@@ -1074,12 +1487,110 @@ replacing it and any edits.
 
 The same packer takes archives of other subjects, each in the directory for what it holds (`ARCHIVE_ROOTS`):
 `res/graphics/` for the menus and apps, `res/demo/` for the demos and cutscenes, `res/field/gimmicks/` and
-`res/field/effects/`, `res/particles/` and `res/fonts/`; `dump ARCID_X res/demo` writes one there. A name, like its
-`ARCID_*`, is in one of them only.
+`res/field/effects/`, `res/particles/`, `res/fonts/` and `res/sound/archives/`; `dump ARCID_X res/demo` writes one
+there. A name, like its `ARCID_*`, is in one of them only. `res/fonts/font/` is `ARCID_FONT` (`a/0/2/3`): the game's
+five fonts, `00/` to `04/`, and three palettes, the same in both versions. `res/particles/btlv_effvm_particles/` is
+`ARCID_BTLV_EFFVM_PARTICLES` (`a/0/0/6`), the particle effects of the battle's moves, which `btlv_effvm.c` loads, and of
+the intro, which `intro_particle.c` does: 739 resources, `000/` to `738/`, the same in both versions.
+`res/graphics/manual_image/` is `ARCID_MANUAL_IMAGE` (`a/2/2/7`), the in-game manual's pages, which `manual_common.c`
+shows: 256 by 192 direct color bitmaps, kept as RGBA PNGs as a movie's frames are, since its `archive.json` has
+`"bitmaps": [256, 192]` (`dump ARCID_X --bitmaps 256x192`). `res/sound/archives/camera_sound/` is `ARCID_CAMERA_SOUND`
+(`a/2/0/9`), the DSi camera's shutter sounds, WAV files that `camera_system.c` plays itself.
 
-A movie's frames are direct color bitmaps, 15-bit color with bit 15 set where the pixel shows, as
-`cdemo_control.c` plays the Game Freak logo (`res/demo/cdemo_gflogo/`) and the opening (`res/demo/cdemo_openingsw/`):
-an archive whose `archive.json` has `"direct_color": [256, 256]` keeps each 256 by 256 frame as an RGBA PNG, each
-color's five bits widened to eight and alpha 255 where the pixel shows, 0 where it doesn't. Edit a frame as any
-image: the packer keeps each channel's top five bits and shows the pixels whose alpha is 128 or more. `dump ARCID_X
-res/demo --direct-color 256x256` writes such an archive.
+A model's GLB and PNGs are edited and packed as the field props' are (see "Map model sources"), with the same
+converters. `dump` has [Apicula](https://github.com/scurest/apicula) convert each model, from `PATH` or `--apicula
+PATH`; `pack`, which the build runs, needs only Python. The model's `data.json` is a prop's without the resource ID:
+`glb_sha256`, the hash of the GLB as extracted, and `transformed` and `positions` where the GLB's positions went through
+the model's node transforms. A GLB that still has its hash packs the game's model, and an edited one is converted back
+into it: its positions, UVs, material colors and texture bindings, as for a prop. An edited PNG packs into the model's
+textures as a texture set's does, in the texture's format and its shared palette. The GLB gives each of the model's draw
+calls a material of its own, copying a material that several share (`awa_1.001`), since Blender joins the draw calls of
+one material on export; edit the copies alike. A model that the converters don't take stays its `.nsbmd` file, as
+`dump` says: one with textures that the texture converter doesn't decode (4x4 compressed or direct color), one without
+a mesh, or one whose materials pair a texture with another palette than the converter gives it. A new model or texture
+set is added as its `.nsbmd` or `.nsbtx` file. The archives dumped before the models were GLBs keep their `.nsbmd` and
+`.nsbtx` files, which pack as they are, until they are dumped again: in scratch copies of the 19 such archives in
+`res/graphics/`, 214 of their 233 models and all 31 texture sets convert and pack byte for byte.
+
+`ARCID_GIMMICK_EXPOBJ_MARINETUBE` (`res/field/gimmicks/gimmick_expobj_marinetube/`) has 13 models and their
+animations, and `ARCID_DEMO3D_RESOURCE` (`res/demo/demo3d_resource/`) the demos' 156 models, 2,472 textures and
+297 animations; both pack byte for byte in both versions. An unchanged Blender export repacks byte for byte for 11
+of the Marine Tube's 13 models and 126 of the demos' 156; moving one vertex of a Marine Tube model in Blender changes
+one byte of it, which Apicula loads with the vertex moved, and an edited pixel packs into its texture. Of the others,
+four demo models pack with their triangles encoded again, and the packer refuses the rest rather than move their
+vertices: 17 have parts that their node transforms scale to nothing until an animation shows them (`hoeru_1`) or to a
+hundredth (the eight `city_plasma_come`), whose positions Blender doesn't export exactly, eight have blended skin
+weights, and three have shapes that set matrices as they draw.
+
+A font is converted by `tools/data/nitro_font.py`, which `dump` and `pack` call, from the format as `gf_font.c` reads
+it. `glyphs.png` has every glyph in the font's order, a cell each, left to right in rows of 32 (16 for a
+font of 256 glyphs or fewer), with a magenta guide line around each cell. Its pixels are the glyphs' values, 2 bits
+each: 0 is clear, and the game draws 1 in the letter color, 2 in the shadow's and 3 in the background's
+(`GFL_TextRndUpdateColorIndexLUT`), so edit it in indexed mode; its colors are only a preview. The packer reads the
+cells and not the guide lines. `font.json`, which `res/fonts/font.schema.json` describes, has the font information
+(`lineFeed`, the default widths, `encoding` and the rest of FINF) and the glyph cells' size (`cellWidth`, `cellHeight`,
+`baseline`, `maxCharWidth`, `bpp`), under `gf_font.c`'s names; the character maps, in the order the game searches them,
+each a range of characters and its method (`direct`, `table` or `scan`); and a line for each glyph, its character
+(with its code, `"code": "U+3000"`, where the character doesn't print) and its `left` offset, `width` and `advance`,
+which the game keeps at the start of the glyph's cell (`GFL_FontGlyphCopy`). The packer computes the rest: the blocks'
+offsets and sizes, each map's contents from the glyphs whose characters its range holds and no earlier range does, and
+the widths block. That block is Game Freak's, not the format's per-glyph table: the three commonest advances, a 2-bit
+class for each glyph, and a hash table of the other advances, with buckets where glyphs share a hash
+(`GFL_FontGetCharWidthDynamic`). Two fonts keep the bytes that pad their classes, which aren't zeros, as
+`classPadding`. To add a character, add its glyph at the end of `glyphs` and draw it in the next cell, adding a row of
+cells where the sheet is full; every font ends in a `scan` map of every character, which takes it, or a map can be
+added or a range extended. A changed pixel, width or advance, a new glyph and a new map pack and read back as the game
+reads them, and all five fonts pack byte for byte in both versions. A font that the converter doesn't read, or wouldn't
+build again byte for byte, stays its `.nftr` file, as `dump` says.
+
+A particle resource is converted by `tools/data/nitro_particles.py`, which `dump` and `pack` call, from the format as
+NitroSystem's particle library reads it (`SPLManager_LoadResources` in `lib/spl/`). `particles.json`, which
+`res/particles/particles.schema.json` describes, has the emitters in order, which the game creates by their index
+(`SPLManager_CreateEmitter`), and the textures. An emitter has its header's fields (`SPLResourceHeader`) under
+`lib/spl`'s names, then the blocks that follow it where it has them, under the names of `SPLResource`'s pointers:
+`scaleAnim`, `colorAnim`, `alphaAnim`, `textureAnim`, `childResource` and the behaviors (`gravityBehavior` to
+`convergenceBehavior`); the packer sets the header's flags of the blocks from the blocks there are. Fixed-point fields
+are the integers the game keeps, in 4096ths, angles in 65536ths of a turn, and the animations run over a particle's
+life from 0 to 255, as the schema says for each; colors are `{red, green, blue}`, 0 to 31 each, the enumerations names
+(`"emissionType": "circle_border"`), and textures are named. A block's `unused` keeps the fields and bits that the
+library never reads but that the game's files don't leave zero (most emitters have some), so that they pack byte for
+byte. Each texture is a PNG named after it (`texture00.png`, in the resource's order), RGBA as its format shows it:
+A3I5 and A5I3, a palette's index and an alpha a pixel, are the formats of all but 23 of the resources' 2,843
+textures, and 4 and 16 colors the rest, which `map_texture_data.py` decodes as a field texture's; direct color is
+decoded too, and a texture
+of another format (4x4 compressed, which none is) is its data as it is (`texture00.bin`). An unchanged texture packs as
+the game's bytes, and an edited one is encoded again in its format and palette, which grows to the colors the PNG
+needs, up to its format's; its size is the PNG's, a power of two from 8 to 1024. The packer computes the rest: the
+counts, sizes and offsets, a texture animation's count, and the textures' headers but for their format, repeat, flip,
+color 0 and sharing. An emitter is added by adding its object to `emitters`, and the code creates it by its index; a
+changed field, an edited pixel, and an emitter added or removed pack and read back as the game reads them
+(`tools/data/test_nitro_particles.py`). Besides the 739 of `a/0/0/6`, 40 resources of ten archives of
+`res/graphics/` are directories too (`plist/`, `hall_of_fame_demo/` and others), and all of them pack byte for byte in
+both versions. A resource that the converter doesn't read, or wouldn't build again byte for byte, stays its `.spa`
+file, as `dump` says.
+
+A movie is an animated PNG, `movie.png`, as `cdemo_control.c` plays the Game Freak logo (`res/demo/cdemo_gflogo/`) and
+the opening (`res/demo/cdemo_openingsw/`, a movie in each version's directory): its frames are the archive's first
+members, direct color bitmaps, 15-bit color with bit 15 set where the pixel shows, which the PNG keeps as RGBA, each
+color's five bits widened to eight and alpha 255 where the pixel shows, 0 where it doesn't. It plays at the game's 15
+frames a second in a browser or an image viewer, and an APNG editor, or `ffmpeg`, edits it; the packer composes the
+frames as a viewer shows them, keeps each channel's top five bits and shows the pixels whose alpha is 128 or more, so an
+unchanged frame packs as the game's own and an edited one changes only its member. `archive.json`'s `"movie"` gives the
+frames' size (256 by 256, of which the game shows the top 192 rows), how many the archive had and their compression; the
+members after them are numbered files from there (`626.bin`). The game plays as many frames as `cdemo_control.c`'s
+`CDEMO_MOVIES` says, so a movie with more or fewer needs its count changed there too. `dump ARCID_X res/demo --movie
+256x256` writes such an archive.
+
+Two archives at the file system's root hold the 2D graphics of debug screens that the retail game leaves out, since no
+code loads them by name: `skb.narc`, a software keyboard's, with hiragana, katakana and letters to type a name in
+Japanese, and `soundstatus.narc`, a sound status screen's, with the player's tempo, pitch, volume, reverb and tracks.
+They are `res/debug/skb/` and `res/debug/soundstatus/`, numbered members as an archive of `res/graphics/` has them
+(indexed PNGs, JASC palettes and `.nscr` screens), which `tools/data/debug_graphics_data.py` packs with
+`graphics_archive.py`'s converters, the same in both versions.
+
+The DS Download Play parent (`mb_parent_sys.c`, `mb_parent_dataconv_sys.c`) gives the children it sends, the programs
+`dl_rom/*.srl`, which stay as they are, an icon to show on their download menus: Black 2's, `dl_rom/icon_b.char` and
+`icon_b.plt`, and White 2's, `icon_w.char` and `icon_w.plt`, each 32 by 32 pixels in 16 colors. They are
+`res/download_play/icon_b.png` and `icon_w.png`, indexed PNGs whose pixels are the palette's indices and whose palette
+is the icon's 16 colors, color 0 transparent, so edit them in indexed mode and keep the palette's order;
+`tools/data/download_play_icon_data.py` writes the characters and the palette of each, the same in both versions.

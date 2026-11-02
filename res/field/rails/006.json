@@ -1,0 +1,305 @@
+{
+    "$schema": "rail.schema.json",
+    "tile_width": 4096,
+    "points": [
+        {
+            "name": "RE_POINT_0",
+            "position": {
+                "x": 1015808,
+                "y": 0,
+                "z": 1671168
+            },
+            "camera": 0,
+            "lines": [
+                {
+                    "line": 1,
+                    "dir": "up",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "RE_POINT_1",
+            "position": {
+                "x": 1015808,
+                "y": 786432,
+                "z": 557056
+            },
+            "camera": 1,
+            "lines": [
+                {
+                    "line": 0,
+                    "dir": "down",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "POINT__2_RE_LINE_0",
+            "position": {
+                "x": 1015808,
+                "y": 0,
+                "z": 1605632
+            },
+            "camera": 2,
+            "lines": [
+                {
+                    "line": 2,
+                    "dir": "up",
+                    "width": 16
+                },
+                {
+                    "line": 1,
+                    "dir": "down",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "POINT__3_RE_LINE_0",
+            "position": {
+                "x": 1015808,
+                "y": 786432,
+                "z": 819200
+            },
+            "camera": 3,
+            "lines": [
+                {
+                    "line": 3,
+                    "dir": "up",
+                    "width": 16
+                },
+                {
+                    "line": 2,
+                    "dir": "down",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "RE_POINT_4",
+            "position": {
+                "x": 1015808,
+                "y": 786432,
+                "z": 688128
+            },
+            "camera": 4,
+            "lines": [
+                {
+                    "line": 0,
+                    "dir": "up",
+                    "width": 16
+                },
+                {
+                    "line": 3,
+                    "dir": "down",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                },
+                {
+                    "line": null,
+                    "dir": "none",
+                    "width": 16
+                }
+            ]
+        }
+    ],
+    "lines": [
+        {
+            "name": "RE_LINE_0",
+            "point_a": 4,
+            "point_b": 1,
+            "dir": "up",
+            "curve": 0,
+            "camera": 5,
+            "length": 2,
+            "tiles": [
+                [ "0x00800000", "0x00800000", "0x00800000" ],
+                [ "0x008000a3", "0x008000a3", "0x008000a3" ]
+            ]
+        },
+        {
+            "name": "div_1_RE_LINE_0",
+            "point_a": 0,
+            "point_b": 2,
+            "dir": "up",
+            "curve": 1,
+            "camera": 6,
+            "length": 1,
+            "tiles": [
+                [ "0x00810001", "0x008000a3", "0x00810001" ]
+            ]
+        },
+        {
+            "name": "div_2_RE_LINE_0",
+            "point_a": 2,
+            "point_b": 3,
+            "dir": "up",
+            "curve": 2,
+            "camera": 7,
+            "length": 17,
+            "tiles": [
+                [ "0x00810001", "0x00800000", "0x00810001" ],
+                [ "0x00810001", "0x00800000", "0x00810001" ],
+                [ "0x00810001", "0x00800000", "0x00810001" ],
+                [ "0x00810001", "0x00800000", "0x00810001" ],
+                [ "0x00810001", "0x00800000", "0x00810001" ],
+                [ "0x00810001", "0x00800000", "0x00810001" ],
+                [ "0x00810001", "0x00800000", "0x00810001" ],
+                [ "0x00810001", "0x00800000", "0x00810001" ],
+                [ "0x00810001", "0x00800000", "0x00810001" ],
+                [ "0x00810001", "0x00800000", "0x00810001" ],
+                [ "0x00810001", "0x00800000", "0x00810001" ],
+                [ "0x00810001", "0x00800000", "0x00810001" ],
+                [ "0x00810001", "0x00800000", "0x00810001" ],
+                [ "0x00810001", "0x00800000", "0x00810001" ],
+                [ "0x00810001", "0x00800000", "0x00810001" ],
+                [ "0x00810001", "0x00800000", "0x00810001" ],
+                [ "0x00810001", "0x00800000", "0x00810001" ]
+            ]
+        },
+        {
+            "name": "RE_LINE_3",
+            "point_a": 3,
+            "point_b": 4,
+            "dir": "up",
+            "curve": 3,
+            "camera": 8,
+            "length": 2,
+            "tiles": [
+                [ "0x00810001", "0x00800000", "0x00810001" ],
+                [ "0x00810001", "0x00800000", "0x00810001" ]
+            ]
+        }
+    ],
+    "cameras": [
+        {
+            "function": "FieldRailCamera_FixedAngleShift",
+            "params": [ 8653, 0, 1036288, 0, 286720, -106496, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FixedAngleShift",
+            "params": [ 7892, 0, 1019904, 0, 192512, -73728, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FixedAngleShift",
+            "params": [ 8653, 0, 1036288, 0, 286720, -106496, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FixedAngleShift",
+            "params": [ 7892, 0, 1019904, 0, 192512, -73728, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_FixedAngleShift",
+            "params": [ 7892, 0, 1019904, 0, 192512, -73728, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_BlendAnglesShift",
+            "params": [ 6568, 0, 917504, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_BlendAnglesShift",
+            "params": [ 6568, 0, 917504, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_BlendAnglesShift",
+            "params": [ 6568, 0, 917504, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "function": "FieldRailCamera_BlendAnglesShift",
+            "params": [ 6568, 0, 917504, 0, 0, 0, 0, 0 ]
+        }
+    ],
+    "curves": [
+        {
+            "kind": "no_curve",
+            "center": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "kind": "no_curve",
+            "center": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "kind": "no_curve",
+            "center": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        },
+        {
+            "kind": "no_curve",
+            "center": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "unk10": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        }
+    ]
+}

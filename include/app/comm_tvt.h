@@ -9,11 +9,20 @@
 // Video chat with the Xtransceiver
 #define OVERLAY_COMM_TVT OVERLAY_ID(257)
 
+// How the Xtransceiver starts
+enum {
+    COMM_TVT_START_WAIT,
+    COMM_TVT_START_CALL,
+    // Answering the call of parentMac
+    COMM_TVT_START_ANSWER,
+    // Over the connection that exists, the Wi-Fi Club's
+    COMM_TVT_START_EXISTING,
+};
+
 struct CommTvtParam {
     GameData *gameData;
-    // How it starts: 0 waiting for calls, 1 calling, 2 answering the call of parentMac, 3 over the connection that
-    // exists (the Wi-Fi Club's)
-    u32 unk4;
+    // A COMM_TVT_START_*
+    u32 startMode;
     u8 parentMac[6];
 };
 

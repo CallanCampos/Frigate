@@ -1139,7 +1139,7 @@ static void DataConvert_SeqEnterId(KeySystemSeq *seq, int *state, void *work) {
         param = GFL_HeapAllocate(HEAPID_KEY_SYSTEM, sizeof(NameEntryParam), TRUE, "data_convert_flow.c", 1848);
         param->mode = NAME_ENTRY_GAME_SYNC_ID;
         param->maxLength = GAME_SYNC_ID_LENGTH;
-        param->unk2C = 3;
+        param->skipChecks = 3;
         param->name = GFL_StrBufCreate(GAME_SYNC_ID_LENGTH + 1, HEAPID_KEY_SYSTEM);
         wk->subProcParam = param;
         GCTX_ProcMgrQueueProc(OVERLAY_ID(280), &NAME_ENTRY_PROC_FUNCTIONS, param);

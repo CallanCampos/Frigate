@@ -27,8 +27,6 @@
 // The digits' animations: the ten large digits after an empty place, then the same small. The bar follows
 #define SEQ_SMALL 11
 #define SEQ_BAR 22
-// The animation of the cursor that flashes on a pressed key
-#define SEQ_CURSOR_PRESS 3
 
 #define CODE_X 76
 #define CODE_Y 24
@@ -162,18 +160,18 @@ void CodeInDisp_AddCursorActors(CodeInWork *wk) {
         ClActor_Create(unit, wk->charRes[CODEIN_RES_CURSOR], wk->plttRes[CODEIN_RES_CURSOR],
                        wk->cellAnimRes[CODEIN_RES_CURSOR], &setup, 0, HEAPID_CODEIN);
     CodeInDisp_SetCodeCursor(wk, 0);
-    ClActor_SetSequence(wk->cur[CODEIN_CURSOR_CODE].actor, 0);
+    ClActor_SetSequence(wk->cur[CODEIN_CURSOR_CODE].actor, CODEIN_CURSOR_SEQ_CODE);
     ClActor_SetAutoAnim(wk->cur[CODEIN_CURSOR_CODE].actor, TRUE);
     wk->cur[CODEIN_CURSOR_KEY].move.x = 0;
     wk->cur[CODEIN_CURSOR_KEY].move.y = 0;
-    wk->cur[CODEIN_CURSOR_KEY].state = 1;
+    wk->cur[CODEIN_CURSOR_KEY].state = CODEIN_CURSOR_SEQ_KEY;
     CodeInDisp_SetKeyCursor(wk, 0);
     ClActor_SetSequence(wk->cur[CODEIN_CURSOR_KEY].actor, wk->cur[CODEIN_CURSOR_KEY].state);
     ClActor_SetAutoAnim(wk->cur[CODEIN_CURSOR_KEY].actor, TRUE);
     ClActor_SetObjMode(wk->cur[CODEIN_CURSOR_KEY].actor, GX_OAM_MODE_XLU);
     wk->cur[CODEIN_CURSOR_PRESS].move.x = 0;
     wk->cur[CODEIN_CURSOR_PRESS].move.y = 0;
-    wk->cur[CODEIN_CURSOR_PRESS].state = 1;
+    wk->cur[CODEIN_CURSOR_PRESS].state = CODEIN_CURSOR_SEQ_KEY;
     CodeInDisp_SetKeyCursor(wk, 0);
     ClActor_SetSequence(wk->cur[CODEIN_CURSOR_PRESS].actor, wk->cur[CODEIN_CURSOR_PRESS].state);
     ClActor_SetObjMode(wk->cur[CODEIN_CURSOR_PRESS].actor, GX_OAM_MODE_XLU);
@@ -248,7 +246,7 @@ void CodeInDisp_UpdateCursors(CodeInWork *wk) {
     for (i = CODEIN_CURSOR_KEY; i < CODEIN_CURSOR_COUNT; i++) {
         int sequence = ClActor_GetSequence(wk->cur[i].actor);
 
-        if (sequence == SEQ_CURSOR_PRESS) {
+        if (sequence == CODEIN_CURSOR_SEQ_PRESS) {
             if (!ClActor_IsAnimActive(wk->cur[i].actor)) {
                 ClActor_SetSequence(wk->cur[i].actor, wk->cur[i].state);
                 if (wk->touchMode == TRUE) {
@@ -262,7 +260,7 @@ void CodeInDisp_UpdateCursors(CodeInWork *wk) {
             if (sequence != wk->cur[i].state) {
                 ClActor_SetSequence(wk->cur[i].actor, wk->cur[i].state);
             }
-            if (ClActor_GetSequence(wk->cur[i].actor) != SEQ_CURSOR_PRESS) {
+            if (ClActor_GetSequence(wk->cur[i].actor) != CODEIN_CURSOR_SEQ_PRESS) {
                 if (wk->touchMode == TRUE) {
                     CodeInDisp_SetCursorVisible(wk, CODEIN_CURSOR_KEY, FALSE);
                 } else {
@@ -290,10 +288,10 @@ void CodeInDisp_UpdateButtons(CodeInWork *wk) {
         y -= 7;
 
         switch (wk->btn[i].state) {
-        case 0:
+        case CODEIN_BUTTON_IDLE:
             wk->btn[i].move.wait = 0;
             break;
-        case 1:
+        case CODEIN_BUTTON_PRESSED:
             wk->btn[i].move.wait++;
             if (wk->btn[i].move.wait == 1) {
                 ClActor_SetSequence(wk->btn[i].actor, 1);
@@ -310,7 +308,7 @@ void CodeInDisp_UpdateButtons(CodeInWork *wk) {
         default:
             ClActor_SetSequence(wk->btn[i].actor, 0);
             CodeInDisp_SetButtonTextPos(wk->btnText[i], x, y);
-            wk->btn[i].state = 0;
+            wk->btn[i].state = CODEIN_BUTTON_IDLE;
             break;
         }
     }

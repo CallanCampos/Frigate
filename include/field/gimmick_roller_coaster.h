@@ -6,6 +6,16 @@
 
 // The roller coaster of Nimbasa City's zone 585 (gimmick 48), overlay 102
 
+#define ROLLER_COASTER_CAR_COUNT 4
+
+// The gimmick's saved state
+typedef struct {
+    fx32 frames[ROLLER_COASTER_CAR_COUNT];
+    u8 switches[ROLLER_COASTER_CAR_COUNT];
+    // Whether the first ride of cars 1 and 2 has been shown
+    u16 introSeen[2];
+} RollerCoasterSave;
+
 // Overlay 36's gimmick table calls these
 void RollerCoaster_Init(Field *field);
 void RollerCoaster_End(Field *field);

@@ -33,6 +33,6 @@ void EventFieldTrade_CreatePkm(GameData *gameData, HeapID heapId, PartyPkm *pkm,
 void EventFieldTrade_DebugLogPkm(PartyPkm *pkm);
 void FieldTradeInput_DumpTradeData(FieldTradeOfferData *param);
 
-extern const GameProcFunctions data_ov194_021c63ac;
+extern const GameProcFunctions POKEMONTRADE_IRCDEMO_PROC_FUNCTIONS;
 
 #endif // POKEBW2_FIELD_EVENT_FIELD_TRADE_H

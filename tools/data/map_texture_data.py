@@ -87,6 +87,12 @@ def palette_for(texture, palettes, index):
     palette = by_name.get(name + "_pl") or by_name.get(name) or by_name.get(exceptions.get(name))
     if palette is not None:
         return palette
+    # The frames of a texture pattern animation, t4x4x7.1 to t4x4x7.6, which no material pairs, are drawn in the
+    # palette of their name, as the animation (BTP0) pairs them
+    stem = name.rpartition(".")[0]
+    frames = by_name.get(stem + "_pl") or by_name.get(stem)
+    if index >= len(palettes) and frames is not None:
+        return frames
     if index >= len(palettes):
         raise ValueError(f"no Nitro palette for texture {name}")
     return palettes[index]
@@ -107,6 +113,8 @@ def decode(blob, texture, palette):
                       if palette["offset"] + 2 * i + 2 <= len(blob) else 0
                       for i in range({1: 32, 2: 4, 3: 16, 4: 256, 6: 8}[kind])]
     count = texture["width"] * texture["height"]
+    # Each color's RGBA, by its index and alpha, made once
+    colors = {}
     for pixel in range(count):
         if kind in (1, 4, 6):
             value = raw[pixel]
@@ -126,7 +134,9 @@ def decode(blob, texture, palette):
         else:
             index = value
             alpha = 0 if index == 0 and color0 else 31
-        pixels.extend(rgba555(palette_colors[index], alpha))
+        if (index, alpha) not in colors:
+            colors[index, alpha] = rgba555(palette_colors[index], alpha)
+        pixels.extend(colors[index, alpha])
     return bytes(pixels)
 
 
@@ -179,7 +189,8 @@ def decode_png(data, width, height, label="PNG"):
         cursor += stride + 1
         if len(line) != stride:
             raise ValueError(f"{label}: truncated PNG")
-        for i in range(stride):
+        # A line of filter 0 is stored as it is
+        for i in range(stride if mode else 0):
             left = line[i - channels] if i >= channels else 0
             above = previous[i]
             upper_left = previous[i - channels] if i >= channels else 0
@@ -239,6 +250,15 @@ def palette_segments(blob, palettes):
             for offset, following in zip(offsets, offsets[1:] + [end])]
 
 
+def write_textures(blob, folder):
+    """Writes each texture of a texture set (BTX0) to folder as a PNG named after it, in its palette's colors."""
+    textures, palettes = resources(blob)
+    folder.mkdir(parents=True, exist_ok=True)
+    for index, texture in enumerate(textures):
+        pixels = decode(blob, texture, palette_for(texture, palettes, index))
+        (folder / f"{texture['name']}.png").write_bytes(write_png(texture["width"], texture["height"], pixels))
+
+
 def export(directory, archive_name="a/0/1/4"):
     if archive_name not in TEXTURE_ARCHIVES:
         raise ValueError(f"unsupported field texture archive {archive_name}")
@@ -247,13 +267,7 @@ def export(directory, archive_name="a/0/1/4"):
     if len(folders) != len(archive):
         raise ValueError(f"{archive_name} has {len(archive)} texture sets and its list {len(folders)}")
     for blob, folder in zip(archive, folders):
-        textures, palettes = resources(blob)
-        folder.mkdir(parents=True, exist_ok=True)
-        for index, texture in enumerate(textures):
-            palette = palette_for(texture, palettes, index)
-            pixels = decode(blob, texture, palette)
-            (folder / f"{texture['name']}.png").write_bytes(
-                write_png(texture["width"], texture["height"], pixels))
+        write_textures(blob, folder)
 
 
 def quantized_pixels(pixels, texture):
@@ -323,6 +337,50 @@ def encode_palette_group(blob, members, start, end):
         yield texture, encoded
 
 
+def pack_textures(original, folder, label):
+    """Returns a texture set (BTX0) with the pixels of its PNGs in folder, one for each texture, named after it:
+    the original's bytes where no PNG shows an edit, else its texels and shared palettes encoded again."""
+    blob = bytearray(original)
+    textures, palettes = resources(blob)
+    pixels = []
+    changed = set()
+    for index, texture in enumerate(textures):
+        path = folder / f"{texture['name']}.png"
+        image = read_png(path, texture["width"], texture["height"])
+        pixels.append(image)
+        decoded = decode(original, texture, palette_for(texture, palettes, index))
+        if image != decoded and visible(image, texture) != visible(decoded, texture):
+            changed.add(index)
+    if changed:
+        segments = {start: end for start, end, _ in palette_segments(blob, palettes)}
+        groups = {}
+        for index, texture in enumerate(textures):
+            palette = palette_for(texture, palettes, index)
+            groups.setdefault(palette["offset"], []).append(index)
+        writes = {}
+        for start, indices in groups.items():
+            if not changed.intersection(indices):
+                continue
+            members = [(textures[index], pixels[index]) for index in indices]
+            for texture, encoded in encode_palette_group(blob, members, start, segments[start]):
+                key = (texture["offset"], texture["length"])
+                if key in writes and writes[key] != encoded:
+                    raise ValueError(f"{label}: shared texel data needs conflicting edits")
+                writes[key] = encoded
+        for (start, length), encoded in writes.items():
+            if len(encoded) != length:
+                raise ValueError(f"{label}: texture byte length changed")
+            blob[start:start + length] = encoded
+        for index, texture in enumerate(textures):
+            palette = palette_for(texture, palettes, index)
+            actual = quantized_pixels(decode(blob, texture, palette), texture)
+            desired = quantized_pixels(pixels[index], texture)
+            if actual != desired:
+                raise ValueError(f"{label}/{texture['name']}: "
+                                 "shared Nitro data cannot represent the edited PNGs together")
+    return bytes(blob)
+
+
 def pack(directory, game, output):
     version = {"black2": "b2_us", "white2": "w2_us"}[game]
     archive_name = next((name for name in TEXTURE_ARCHIVES if Path(output).as_posix().endswith("/" + name)), None)
@@ -332,48 +390,8 @@ def pack(directory, game, output):
     folders = directories(archive_name, directory)
     if len(folders) != len(archive):
         raise ValueError(f"{archive_name} has {len(archive)} texture sets and its list {len(folders)}")
-    result = []
-    for set_id, (original, folder) in enumerate(zip(archive, folders)):
-        blob = bytearray(original)
-        textures, palettes = resources(blob)
-        pixels = []
-        changed = set()
-        for index, texture in enumerate(textures):
-            path = folder / f"{texture['name']}.png"
-            image = read_png(path, texture["width"], texture["height"])
-            pixels.append(image)
-            if image != decode(original, texture, palette_for(texture, palettes, index)) and visible(
-                    image, texture) != visible(decode(original, texture, palette_for(texture, palettes, index)),
-                                               texture):
-                changed.add(index)
-        if changed:
-            segments = {start: end for start, end, _ in palette_segments(blob, palettes)}
-            groups = {}
-            for index, texture in enumerate(textures):
-                palette = palette_for(texture, palettes, index)
-                groups.setdefault(palette["offset"], []).append(index)
-            writes = {}
-            for start, indices in groups.items():
-                if not changed.intersection(indices):
-                    continue
-                members = [(textures[index], pixels[index]) for index in indices]
-                for texture, encoded in encode_palette_group(blob, members, start, segments[start]):
-                    key = (texture["offset"], texture["length"])
-                    if key in writes and writes[key] != encoded:
-                        raise ValueError(f"texture set {set_id}: shared texel data needs conflicting edits")
-                    writes[key] = encoded
-            for (start, length), encoded in writes.items():
-                if len(encoded) != length:
-                    raise ValueError(f"texture set {set_id}: texture byte length changed")
-                blob[start:start + length] = encoded
-            for index, texture in enumerate(textures):
-                palette = palette_for(texture, palettes, index)
-                actual = quantized_pixels(decode(blob, texture, palette), texture)
-                desired = quantized_pixels(pixels[index], texture)
-                if actual != desired:
-                    raise ValueError(f"texture set {set_id}/{texture['name']}: "
-                                     "shared Nitro data cannot represent the edited PNGs together")
-        result.append(bytes(blob))
+    result = [pack_textures(original, folder, f"texture set {set_id}")
+              for set_id, (original, folder) in enumerate(zip(archive, folders))]
     destination = Path(output)
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.unlink(missing_ok=True)

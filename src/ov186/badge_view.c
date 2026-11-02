@@ -896,15 +896,15 @@ static BOOL BadgeView_SeqFadeOutStart(BadgeViewWork *wk) {
 static BOOL BadgeView_SeqFadeOut(BadgeViewWork *wk) {
     if (GFL_WipeIsFinished()) {
         if (wk->result == BADGE_HIT_EXIT) {
-            wk->param->next = 0;
+            wk->param->next = TRCARD_NEXT_END;
             wk->param->result = 1;
             wk->seq = BADGE_SEQ_FADE_IN;
         } else if (wk->result == BADGE_HIT_RETURN) {
-            wk->param->next = 0;
+            wk->param->next = TRCARD_NEXT_END;
             wk->param->result = 0;
             wk->seq = BADGE_SEQ_FADE_IN;
         } else if (wk->result == BADGE_HIT_CARD) {
-            wk->param->next = 3;
+            wk->param->next = TRCARD_NEXT_CARD;
             wk->seq = BADGE_SEQ_FADE_IN;
         }
         return FALSE;

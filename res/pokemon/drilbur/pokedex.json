@@ -1,0 +1,13 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "D",
+    "shapes": [ 9 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_CHARGESTONE_CAVE": [ "shaking_grass" ],
+            "ZONE_MISTRALTON_CAVE": [ "shaking_grass" ],
+            "ZONE_RELIC_PASSAGE": [ "shaking_grass" ]
+        }
+    }
+}

@@ -1,4 +1,6 @@
 #include "types.h"
+#include "constants/arc.h"
+#include "constants/version.h"
 #include "field/field_map.h"
 #include "field/intrude_work.h"
 #include "field/zone.h"
@@ -31,7 +33,7 @@ MapReplace *MapReplace_Create(HeapID heapId, GameSystem *gsys) {
     MapReplace *replace = GFL_HeapAllocate(heapId, sizeof(MapReplace), TRUE, "map_replace.c", 0x77);
 
     replace->heapId = heapId;
-    replace->arc = GFL_ArcSysCreateFileHandle(10, heapId);
+    replace->arc = GFL_ArcSysCreateFileHandle(ARCID_MAP_REPLACE, heapId);
     replace->entryCount = (u16)GFL_ArcToolGetDataLength(replace->arc, 0) / sizeof(MapReplaceEntry);
     MapReplace_LoadVariables(&replace->variables, gsys);
     return replace;
@@ -59,13 +61,13 @@ u32 MapReplace_ResolvePatch(MapReplace *replace, u32 *oldValue, u32 *newValue) {
     u32 replacementValue;
 
     switch (entry->condition) {
-    case 0:
+    case MAP_REPLACE_COND_SEASON:
         index = variables->season;
         break;
-    case 1:
+    case MAP_REPLACE_COND_VERSION:
         index = variables->version;
         break;
-    case 2:
+    case MAP_REPLACE_COND_VERSION_SEASON:
         index = variables->versionSeason;
         break;
     default:
@@ -76,15 +78,15 @@ u32 MapReplace_ResolvePatch(MapReplace *replace, u32 *oldValue, u32 *newValue) {
     *oldValue = originalValue;
     *newValue = replacementValue;
     if (originalValue == replacementValue) {
-        return 0;
+        return MAP_REPLACE_RESULT_NONE;
     }
-    if (entry->kind == 1) {
-        return 2;
+    if (entry->kind == MAP_REPLACE_KIND_MATRIX) {
+        return MAP_REPLACE_RESULT_MATRIX;
     }
-    if (entry->kind == 0) {
-        return 1;
+    if (entry->kind == MAP_REPLACE_KIND_CHUNK) {
+        return MAP_REPLACE_RESULT_CHUNK;
     }
-    return 0;
+    return MAP_REPLACE_RESULT_NONE;
 }
 
 int MapReplace_GetEventByCond(u8 condition) {
@@ -105,7 +107,7 @@ void MapReplace_LoadVariables(MapReplaceVariables *variables, GameSystem *gsys) 
     s32 i;
 
     variables->season = season;
-    if (getGameOrigin(commSys) == 0x15 || getGameOrigin(commSys) == 0x17) {
+    if (getGameOrigin(commSys) == VERSION_BLACK || getGameOrigin(commSys) == VERSION_BLACK2) {
         variables->version = 0;
     } else {
         variables->version = 1;

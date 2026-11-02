@@ -41,11 +41,11 @@ u16 *MusComm_GetPlayerMusicalId(MusCommWork *comm, u8 index);
 BOOL MusComm_IsParent(MusCommWork *comm);
 BOOL MusComm_AreAllInfoReceived(MusCommWork *comm);
 BOOL MusComm_AreAllPokesReceived(MusCommWork *comm);
-void MusComm_BeginDataTiming(MusCommWork *comm, u32 a1, u32 a2);
+void MusComm_BeginDataTiming(MusCommWork *comm, u32 programPoints, u32 programNpcs);
 void MusComm_BeginProgramTiming(MusCommWork *comm);
 void MusComm_BeginSendPoke(MusCommWork *comm, MusicalPoke *poke);
-u32 MusComm_GetUnk144(MusCommWork *comm);
-u32 MusComm_GetUnk148(MusCommWork *comm);
+u32 MusComm_GetProgramPoints(MusCommWork *comm);
+u32 MusComm_GetProgramNpcs(MusCommWork *comm);
 u8 MusComm_GetPlayerEquip(MusCommWork *comm, u8 index, u8 a2);
 // The network init data, which overlay 174 gets as a number
 const GFLNetInitData *MusComm_GetNetInitData(GameData *gameData);

@@ -1,0 +1,59 @@
+{
+    "$schema": "actor_material_colors.schema.json",
+    "presets": [
+        {
+            "normal": {
+                "x": 0,
+                "y": 4881,
+                "z": 4096
+            },
+            "diffuse": {
+                "red": 16,
+                "green": 16,
+                "blue": 16
+            },
+            "ambient": {
+                "red": 16,
+                "green": 16,
+                "blue": 16
+            },
+            "specular": {
+                "red": 16,
+                "green": 16,
+                "blue": 16
+            },
+            "emission": {
+                "red": 18,
+                "green": 18,
+                "blue": 18
+            }
+        },
+        {
+            "normal": {
+                "x": 0,
+                "y": 4881,
+                "z": 4096
+            },
+            "diffuse": {
+                "red": 31,
+                "green": 31,
+                "blue": 31
+            },
+            "ambient": {
+                "red": 16,
+                "green": 16,
+                "blue": 16
+            },
+            "specular": {
+                "red": 16,
+                "green": 16,
+                "blue": 16
+            },
+            "emission": {
+                "red": 9,
+                "green": 9,
+                "blue": 9
+            }
+        }
+    ]
+}

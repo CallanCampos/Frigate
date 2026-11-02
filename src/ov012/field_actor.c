@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/obj_codes.h"
 #include "field/field_actor.h"
 #include "field/field_actor_internal.h"
@@ -185,8 +186,8 @@ MMSys *FldActSys_Create(HeapID heapId, u32 capacity, StrengthRockSave *save) {
     system->actorCapacity = capacity;
     system->heapId = heapId;
     system->mmodelSave = save;
-    system->unkC = 0x80;
-    system->unk10 = 1;
+    system->taskPriority = 0x80;
+    system->reflectLights = 1;
     FldActSys_InitConfigArc(system, heapId);
     system->actorConfigCache = GFL_HeapAllocate(heapId, 0x310, TRUE, "fldmmdl.c", 215);
     return system;
@@ -340,8 +341,8 @@ void DeleteActor(FieldActor *actor) {
         }
     }
     if (actor->flags & 2) {
-        if (actor->moveCodeVTable->unkC != NULL) {
-            actor->moveCodeVTable->unkC(actor);
+        if (actor->moveCodeVTable->delete != NULL) {
+            actor->moveCodeVTable->delete(actor);
         }
         RemoveActorTCB(actor);
     }
@@ -630,7 +631,7 @@ u16 GetActorLimit(const MMSys *system) {
 }
 
 u16 FldActSys_GetTaskPriority(MMSys *system) {
-    return system->unkC;
+    return system->taskPriority;
 }
 
 HeapID FldActSys_GetFieldHeapID(MMSys *system) {
@@ -688,12 +689,12 @@ u16 FldActSys_GetCameraAngle(MMSys *system) {
     return 0;
 }
 
-u32 func_ov012_02166fc0(MMSys *system) {
-    return system->unk10;
+u32 FldActSys_GetReflectLights(MMSys *system) {
+    return system->reflectLights;
 }
 
-void func_ov012_02166fc4(MMSys *system, u32 value) {
-    system->unk10 = value;
+void FldActSys_SetReflectLights(MMSys *system, u32 value) {
+    system->reflectLights = value;
 }
 
 void SetActorFlag(FieldActor *actor, u32 flag) {
@@ -868,11 +869,11 @@ s16 GetActorWalkAreaH(FieldActor *actor) {
 }
 
 void FldAct_SetDrawStatus(FieldActor *actor, u32 value) {
-    actor->unk2A = value;
+    actor->drawStatus = value;
 }
 
 u16 FldAct_GetDrawStatus(FieldActor *actor) {
-    return actor->unk2A;
+    return actor->drawStatus;
 }
 
 MMSys *GetActorMModelSystem(FieldActor *actor) {
@@ -898,7 +899,7 @@ void *FldAct_InitMoveSubProcWork(FieldActor *actor, u32 size) {
 }
 
 void *FldAct_GetMoveSubProcWork(FieldActor *actor) {
-    return actor->unkA4;
+    return actor->moveSubProcWork;
 }
 
 void *FldAct_InitMoveCmdWork(FieldActor *actor, u32 size) {
@@ -909,7 +910,7 @@ void *FldAct_InitMoveCmdWork(FieldActor *actor, u32 size) {
 }
 
 void *FldAct_GetMoveCmdWork(FieldActor *actor) {
-    return actor->unkB4;
+    return actor->moveCmdWork;
 }
 
 void *FldAct_ResetBillboardActorWork(FieldActor *actor, u32 size) {
@@ -924,20 +925,20 @@ void *FldAct_GetBillboardActorWorkPtr(FieldActor *actor) {
 }
 
 void FldAct_CallMoveInitProc(FieldActor *actor) {
-    if (actor->moveCodeVTable->unk4 != NULL) {
-        actor->moveCodeVTable->unk4(actor);
+    if (actor->moveCodeVTable->init != NULL) {
+        actor->moveCodeVTable->init(actor);
     }
 }
 
 void FldAct_CallMoveProc(FieldActor *actor) {
-    if (actor->moveCodeVTable->unk8 != NULL) {
-        actor->moveCodeVTable->unk8(actor);
+    if (actor->moveCodeVTable->move != NULL) {
+        actor->moveCodeVTable->move(actor);
     }
 }
 
 static void FldAct_CallMoveReturnProc(FieldActor *actor) {
-    if (actor->moveCodeVTable->unk10 != NULL) {
-        actor->moveCodeVTable->unk10(actor);
+    if (actor->moveCodeVTable->returnProc != NULL) {
+        actor->moveCodeVTable->returnProc(actor);
     }
 }
 
@@ -1125,19 +1126,19 @@ void SetActorWPosOffset(FieldActor *actor, const VecFx32 *offset) {
 }
 
 void FldAct_GetOuterDrawOffset(FieldActor *actor, VecFx32 *dest) {
-    *dest = actor->unk5C;
+    *dest = actor->outerDrawOffset;
 }
 
 void FldAct_SetOuterDrawOffset(FieldActor *actor, const VecFx32 *value) {
-    actor->unk5C = *value;
+    actor->outerDrawOffset = *value;
 }
 
 void FldAct_GetAttrDrawOffset(FieldActor *actor, VecFx32 *dest) {
-    *dest = actor->unk68;
+    *dest = actor->attrDrawOffset;
 }
 
 void FldAct_SetAttrDrawOffset(FieldActor *actor, const VecFx32 *offset) {
-    actor->unk68 = *offset;
+    actor->attrDrawOffset = *offset;
 }
 
 FieldBillboardActor *FldAct_GetFieldBillboardActor(FieldActor *actor) {
@@ -1278,14 +1279,14 @@ void SetActorHidden(FieldActor *actor, BOOL hidden) {
     }
 }
 
-BOOL func_ov012_0216754c(FieldActor *actor) {
+BOOL IsActorReflectionHidden(FieldActor *actor) {
     if (CheckActorFlag(actor, 0x4000)) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_ov012_02167564(FieldActor *actor, u32 value) {
+void SetActorReflectionHidden(FieldActor *actor, u32 value) {
     if (value == TRUE) {
         SetActorFlag(actor, 0x4000);
     } else {
@@ -1309,7 +1310,7 @@ void SetActorFlag8000(FieldActor *actor, BOOL value) {
     }
 }
 
-BOOL func_ov012_021675b4(FieldActor *actor) {
+BOOL IsActorFlag256Clear(FieldActor *actor) {
     if (!CheckActorFlag(actor, 0x100)) {
         return TRUE;
     }
@@ -1349,8 +1350,8 @@ BOOL FldAct_IsDrawReady(FieldActor *actor) {
     return FALSE;
 }
 
-void FldAct_SetHeightCalcDisabled(FieldActor *actor, BOOL a1) {
-    if (a1 == TRUE) {
+void FldAct_SetHeightCalcDisabled(FieldActor *actor, BOOL disabled) {
+    if (disabled == TRUE) {
         SetActorFlag(actor, 0x200);
     } else {
         ClearActorFlag(actor, 0x200);
@@ -1641,8 +1642,8 @@ void DeleteAllActors(MMSys *system) {
                 actor->sceneNodeVTable->onDelete(actor);
             }
             if (actor->flags & 2) {
-                if (actor->moveCodeVTable->unkC != NULL) {
-                    actor->moveCodeVTable->unkC(actor);
+                if (actor->moveCodeVTable->delete != NULL) {
+                    actor->moveCodeVTable->delete(actor);
                 }
                 RemoveActorTCB(actor);
             }
@@ -1706,8 +1707,8 @@ void SetActorGPos(FieldActor *actor, s16 x, s16 y, s16 z, u16 dir) {
 void FldAct_Transplant(FieldActor *actor, const ZoneNPC *npc) {
     MMSys *system = GetActorMModelSystem(actor);
 
-    if (actor->moveCodeVTable->unkC != NULL) {
-        actor->moveCodeVTable->unkC(actor);
+    if (actor->moveCodeVTable->delete != NULL) {
+        actor->moveCodeVTable->delete(actor);
     }
     LoadZoneNPCParamsToActor(actor, npc);
     SetupNPCPositionBasic(actor, npc);
@@ -1719,8 +1720,8 @@ void FldAct_Transplant(FieldActor *actor, const ZoneNPC *npc) {
 void ChangeActorMoveCodeSeq(FieldActor *actor, u16 moveCode) {
     MMSys *system = GetActorMModelSystem(actor);
 
-    if (actor->moveCodeVTable->unkC != NULL) {
-        actor->moveCodeVTable->unkC(actor);
+    if (actor->moveCodeVTable->delete != NULL) {
+        actor->moveCodeVTable->delete(actor);
     }
     SetActorMoveCode(actor, moveCode);
     UpdateActorMoveCodeExecutor(actor);
@@ -1808,7 +1809,7 @@ static void FldActSys_FreeConfigArc(MMSys *system) {
 }
 
 void LoadMModelSystemInfoCache(MMSys *mmSys, s32 index) {
-    GFL_ArcSysRead(mmSys->actorConfigCache, 0x39, index);
+    GFL_ArcSysRead(mmSys->actorConfigCache, ARCID_FIELD_ACTOR_CONFIG, index);
 }
 
 void GetMMSysMdlInfoCacheEntry(MMSys *system, u32 index, FieldActorConfig *config) {
@@ -2084,8 +2085,8 @@ void ZoneNPC_SetRailPos(ZoneNPC *npc, u16 railIndex, u16 frontPos, u16 sidePos) 
 void FldAct_SetMoveCodeFuncs(FieldActor *actor, const FieldActorMoveCode *moveCode) {
     MMSys *system = GetActorMModelSystem(actor);
 
-    if (actor->moveCodeVTable->unkC != NULL) {
-        actor->moveCodeVTable->unkC(actor);
+    if (actor->moveCodeVTable->delete != NULL) {
+        actor->moveCodeVTable->delete(actor);
     }
     SetActorMoveCode(actor, moveCode->code);
     actor->moveCodeVTable = moveCode;

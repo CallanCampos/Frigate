@@ -244,7 +244,8 @@ typedef struct {
     WbtSetupMatch secondRound[2];
     StrBuf *tournamentName;
     StrBuf *unk9C;
-    u32 unkA0;
+    // Whether the list screen runs through EventFieldSubprocessTransition_Create
+    u32 useTransition;
 } WbtSetup;
 
 // wbt_system.c

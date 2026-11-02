@@ -55,7 +55,7 @@ the same. So Frigate runs C that no hash has proven: where it behaves differentl
 - **Names come from the ROM where it has them.** Many files pass their own name to an allocation or an assert, so the
   overlays embed strings such as `"startmenu.c"`, and [source files](../../docs/source-files.md) gives each file's
   evidence. `config/<version>/arm9/**/symbols.txt` maps names to addresses and back; a name made of an address,
-  such as `func_ov167_0219bdfc`, marks a function nobody has named yet.
+  such as `func_ov167_0219c99c`, marks a function nobody has named yet.
 - **Run the game to the point you care about** and look: `--screenshot PATH` writes both screens when the run ends,
   `--run-dir DIR --run-dump LABEL=SYMBOL:SIZE@FRAMES` writes a global's memory at chosen frames, and a run that reaches
   code with no C stops with that function's name, address and caller ([below](#when-the-game-stops)).

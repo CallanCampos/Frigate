@@ -47,9 +47,6 @@
 // one. Before the battle it shows the briefing of the scene a line at a time; after it, the movie's credits scroll
 // by while the audience reacts to how the movie went. Named after the ROM's "pkwd_briefing.c"
 
-// The archive of the movies' data, as in event_pokewood.c
-#define ARCID_PKWD_MOVIE 269
-
 #define MOVIE_COUNT 41
 // The movies from here on credit an actor rather than the player
 #define MOVIE_NO_PLAYER 40
@@ -1468,7 +1465,7 @@ static void PkwdBriefing_LoadCredits(PkwdBriefingParam *param, PkwdBriefingText 
     GFL_StrBufFree(strbuf);
     GFL_MsgDataFree(msgData);
 
-    file = GFL_ArcSysReadHeapNew(ARCID_PKWD_MOVIE, movie, HEAPID_TAIL(heapId));
+    file = GFL_ArcSysReadHeapNew(ARCID_POKEWOOD_MOVIE, movie, HEAPID_TAIL(heapId));
     text->credits[CREDIT_DIRECTOR_NAME] =
         GFL_MsgDataLoadStrbufNew(text->msgData, PkwdBriefingCommon_Text_DavidPokench + file->director);
     starLevel = file->starLevel;

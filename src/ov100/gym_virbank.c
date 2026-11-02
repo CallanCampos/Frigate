@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/vars.h"
 #include "constants/zones.h"
@@ -15,8 +16,6 @@
 #include "system/iss_sys.h"
 
 #define GIMMICK_WORK_ID 1
-// The archive of the gym's models
-#define GIMMICK_ARCID 0x108
 
 #define MODEL_COUNT 3
 // How many frames the music takes to fade to a volume
@@ -50,9 +49,9 @@ static const G3DSceneAnimationSetup sAnimations[] = { { 1, 0 }, { 2, 0 } };
 static const int sGridSizes[2][2] = { { 18, 12 }, { 16, 17 } };
 
 static const G3DSceneResourceSetup sResources[3] = {
-    { GIMMICK_ARCID, 0, 0 },
-    { GIMMICK_ARCID, 1, 0 },
-    { GIMMICK_ARCID, 2, 0 },
+    { ARCID_GYM_VIRBANK, 0, 0 },
+    { ARCID_GYM_VIRBANK, 1, 0 },
+    { ARCID_GYM_VIRBANK, 2, 0 },
 };
 
 static const G3DSceneActorSetup sActors[3] = {
@@ -194,14 +193,14 @@ static void GymVirbank_StepAnimations(VirbankWork *work) {
 
 // Unmutes the music's tracks as the event variables say, and sets its volume
 static void GymVirbank_InitMusic(VirbankMusic *music, Field *field) {
-    BOOL unmute0 = TRUE;
+    BOOL unmuteSwitch1 = TRUE;
     VirbankWork *work = Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
     EventWork *eventWork = GameData_GetEventWork(GSYS_GetGameData(Field_GetGameSystem(field)));
-    u16 *var0 = EventWork_GetWkPtr(eventWork, EVENT_WORK_0x4000);
-    u16 *var1 = EventWork_GetWkPtr(eventWork, EVENT_WORK_0x4001);
-    u16 *var2 = EventWork_GetWkPtr(eventWork, EVENT_WORK_0x4002);
-    u16 *var3 = EventWork_GetWkPtr(eventWork, EVENT_WORK_0x4003);
-    BOOL unmute1;
+    u16 *switch1Var = EventWork_GetWkPtr(eventWork, EVENT_WORK_0x4000);
+    u16 *switch2Var = EventWork_GetWkPtr(eventWork, EVENT_WORK_0x4001);
+    u16 *switch3Var = EventWork_GetWkPtr(eventWork, EVENT_WORK_0x4002);
+    u16 *switch4Var = EventWork_GetWkPtr(eventWork, EVENT_WORK_0x4003);
+    BOOL unmuteSwitch2;
     u8 i;
     FieldExpObjAnm *anm;
     u32 volumeIndex;
@@ -209,17 +208,17 @@ static void GymVirbank_InitMusic(VirbankMusic *music, Field *field) {
     music->field = field;
     music->switchSys = ISS_GetSwitchSys(GameSystem_GetISS(Field_GetGameSystem(field)));
     music->volumeIndex = 0xff;
-    if (*var0 != 0) {
-        unmute0 = FALSE;
+    if (*switch1Var != 0) {
+        unmuteSwitch1 = FALSE;
     }
-    unmute1 = (*var1 == 0) ? TRUE : FALSE;
-    BOOL unmute2 = (*var2 == 0) ? TRUE : FALSE;
-    BOOL unmute3 = (*var3 == 0) ? TRUE : FALSE;
-    ISSSwitch_ReqSwitchMuteStateChange(music->switchSys, 3, unmute2, SEQ_BGM_POISONE_GYM_01);
-    ISSSwitch_ReqSwitchMuteStateChange(music->switchSys, 2, unmute1, SEQ_BGM_POISONE_GYM_01);
-    ISSSwitch_ReqSwitchMuteStateChange(music->switchSys, 1, unmute0, SEQ_BGM_POISONE_GYM_01);
-    ISSSwitch_ReqSwitchMuteStateChange(music->switchSys, 4, unmute3, SEQ_BGM_POISONE_GYM_01);
-    if (*var2 == 1) {
+    unmuteSwitch2 = (*switch2Var == 0) ? TRUE : FALSE;
+    BOOL unmuteSwitch3 = (*switch3Var == 0) ? TRUE : FALSE;
+    BOOL unmuteSwitch4 = (*switch4Var == 0) ? TRUE : FALSE;
+    ISSSwitch_ReqSwitchMuteStateChange(music->switchSys, 3, unmuteSwitch3, SEQ_BGM_POISONE_GYM_01);
+    ISSSwitch_ReqSwitchMuteStateChange(music->switchSys, 2, unmuteSwitch2, SEQ_BGM_POISONE_GYM_01);
+    ISSSwitch_ReqSwitchMuteStateChange(music->switchSys, 1, unmuteSwitch1, SEQ_BGM_POISONE_GYM_01);
+    ISSSwitch_ReqSwitchMuteStateChange(music->switchSys, 4, unmuteSwitch4, SEQ_BGM_POISONE_GYM_01);
+    if (*switch3Var == 1) {
         for (i = 0; i < MODEL_COUNT; i++) {
             anm = FieldExpObj_GetAnmInfo(work->expObj, 0, i, 0);
             FieldExpObj_SetAnm(work->expObj, 0, i, 0, FALSE);

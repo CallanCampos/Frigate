@@ -40,7 +40,7 @@ int WorldTrade_Demo_Init(WorldTradeWork *wk, int seq) {
     case WT_MODE_UPLOAD:
         param->recvPkm = param->sendPkm = WorldTradeData_GetPkmPtr(wk->param->worldtrade_data);
         param->partnerStatus = wk->partnerStatus = WorldTrade_MakePartnerStatus(&wk->uploadPokemonData);
-        procs = &data_ov194_021c6400;
+        procs = &POKEMONTRADE_GTS_DEPOSIT_PROC_FUNCTIONS;
         break;
     case WT_MODE_DOWNLOAD:
         if (wk->uploadPokemonData.isTrade) {
@@ -50,7 +50,7 @@ int WorldTrade_Demo_Init(WorldTradeWork *wk, int seq) {
         }
         param->sendPkm = param->recvPkm;
         param->partnerStatus = wk->partnerStatus = WorldTrade_MakePartnerStatus(&wk->uploadPokemonData);
-        procs = &data_ov194_021c63b8;
+        procs = &POKEMONTRADE_GTS_WITHDRAW_PROC_FUNCTIONS;
         break;
     case WT_MODE_DOWNLOAD_EX:
         param->recvPkm = wk->uploadPokemonData.isTrade ? (PartyPkm *)wk->uploadPokemonData.postData
@@ -58,7 +58,7 @@ int WorldTrade_Demo_Init(WorldTradeWork *wk, int seq) {
         WorldTradeData_GetPkm(wk->param->worldtrade_data, wk->sentPokemon);
         param->sendPkm = wk->sentPokemon;
         param->partnerStatus = wk->partnerStatus = WorldTrade_MakePartnerStatus(&wk->uploadPokemonData);
-        procs = &data_ov194_021c63d0;
+        procs = &POKEMONTRADE_GTS_TRADE_PROC_FUNCTIONS;
         break;
     case WT_MODE_EXCHANGE:
         copyPartyPkm(wk->demoPokemon, wk->sentPokemon);
@@ -66,7 +66,7 @@ int WorldTrade_Demo_Init(WorldTradeWork *wk, int seq) {
         param->recvPkm = (PartyPkm *)wk->downloadPokemonData[wk->touchTrainerPos].postData;
         param->partnerStatus = wk->partnerStatus =
             WorldTrade_MakePartnerStatus(&wk->downloadPokemonData[wk->touchTrainerPos]);
-        procs = &data_ov194_021c63d0;
+        procs = &POKEMONTRADE_GTS_TRADE_PROC_FUNCTIONS;
         break;
     default:
         GFL_ASSERT(0);

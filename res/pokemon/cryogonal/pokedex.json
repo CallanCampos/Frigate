@@ -1,0 +1,11 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "C",
+    "shapes": [ 0 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_TWIST_MOUNTAIN": [ "grass" ]
+        }
+    }
+}

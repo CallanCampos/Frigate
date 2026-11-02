@@ -73,6 +73,18 @@ enum {
 #define FLAG_KEY_CHOICE 0x4
 #define FLAG_FLASHING 0x8
 
+// Ends the lists of graphics to load, of windows and of actors
+#define LIST_END 0xff
+
+// What BChoiceMain_ReadInput read. A touch shares a value with up; its own flag tells them apart
+enum {
+    INPUT_NONE,
+    INPUT_UP,
+    INPUT_DOWN,
+    INPUT_CONFIRM,
+    INPUT_TOUCH = INPUT_UP,
+};
+
 typedef struct {
     BmpWin *window;
     u8 dirty;
@@ -237,31 +249,31 @@ static const TouchRect *sBChoiceTouchRectTables[3] = { sBChoiceTouchRects2, sBCh
 static const BChoiceBGLoad sBChoiceScreenLoads2[3] = {
     { 7, 3, 0, 0 },
     { 6, 4, 0, 0 },
-    { 0xff, 0, 0, 0 },
+    { LIST_END, 0, 0, 0 },
 };
 
 static const BChoiceBGLoad sBChoiceScreenLoads4[3] = {
     { 7, 3, 0, 0 },
     { 6, 6, 0, 0 },
-    { 0xff, 0, 0, 0 },
+    { LIST_END, 0, 0, 0 },
 };
 
 static const BChoiceBGLoad sBChoiceCharLoads[3] = {
     { 7, 2, 0, 0 },
     { 6, 2, 0, 0 },
-    { 0xff, 0, 0, 0 },
+    { LIST_END, 0, 0, 0 },
 };
 
 static const BChoiceBGLoad sBChoiceScreenLoads3[3] = {
     { 7, 3, 0, 0 },
     { 6, 5, 0, 0 },
-    { 0xff, 0, 0, 0 },
+    { LIST_END, 0, 0, 0 },
 };
 
 // The palettes of the choices' buttons without the flash, by choice
 static const BChoicePaletteLoad sBChoicePaletteLoads[2] = {
     { 4, 0, 0, 7 },
-    { 0xff, 0, 0, 0 },
+    { LIST_END, 0, 0, 0 },
 };
 
 static const BChoiceBGLoad *sBChoiceScreenLoadTables[3] = { sBChoiceScreenLoads2, sBChoiceScreenLoads3,
@@ -271,26 +283,26 @@ static const BChoiceWindowSetup sBChoiceWindowSetups3[4] = {
     { 5, 2, 3, 28, 2, 8 },
     { 5, 2, 9, 28, 2, 8 },
     { 5, 2, 15, 28, 2, 8 },
-    { 0xff, 0, 0, 0, 0, 0 },
+    { LIST_END, 0, 0, 0, 0, 0 },
 };
 
 static const BChoiceWindowSetup sBChoiceWindowSetups2[3] = {
     { 5, 2, 6, 28, 2, 8 },
     { 5, 2, 13, 28, 2, 8 },
-    { 0xff, 0, 0, 0, 0, 0 },
+    { LIST_END, 0, 0, 0, 0, 0 },
 };
 
 static const BChoiceWindowSetup sBChoiceWindowSetups4[5] = {
-    { 5, 2, 2, 28, 2, 8 },  { 5, 2, 7, 28, 2, 8 },   { 5, 2, 12, 28, 2, 8 },
-    { 5, 2, 17, 28, 2, 8 }, { 0xff, 0, 0, 0, 0, 0 },
+    { 5, 2, 2, 28, 2, 8 },  { 5, 2, 7, 28, 2, 8 },       { 5, 2, 12, 28, 2, 8 },
+    { 5, 2, 17, 28, 2, 8 }, { LIST_END, 0, 0, 0, 0, 0 },
 };
 
 static const BChoiceWindowSetup *sBChoiceWindowSetupTables[3] = { sBChoiceWindowSetups2, sBChoiceWindowSetups3,
                                                                   sBChoiceWindowSetups4 };
 
 static const BChoiceActorSetup sBChoiceActorSetups[5] = {
-    { 0, 48, 1, 0, 0, 1, 0, 0 }, { 1, 48, 1, 0, 0, 1, 0, 0 },   { 2, 48, 1, 0, 0, 1, 0, 0 },
-    { 3, 48, 1, 0, 0, 1, 0, 0 }, { 0xff, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 48, 1, 0, 0, 1, 0, 0 }, { 1, 48, 1, 0, 0, 1, 0, 0 },       { 2, 48, 1, 0, 0, 1, 0, 0 },
+    { 3, 48, 1, 0, 0, 1, 0, 0 }, { LIST_END, 0, 0, 0, 0, 0, 0, 0 },
 };
 
 // The cursor's palette, characters and cells in BChoiceWork's resources, and the number of its actors
@@ -552,7 +564,7 @@ static BOOL BChoiceMain_ReadInput(BChoiceWork *work) {
     s32 touchIndex = 0;
     BOOL touched = FALSE;
     BOOL choosing = TRUE;
-    u32 input = 0;
+    u32 input = INPUT_NONE;
     BOOL refresh = FALSE;
 
     if (work->flags & FLAG_REFRESH) {
@@ -562,23 +574,23 @@ static BOOL BChoiceMain_ReadInput(BChoiceWork *work) {
     if (!refresh) {
         touchIndex = BChoiceMain_GetTouched(work, work->layout);
         if (touchIndex >= 0 && touchIndex < work->layout + 2) {
-            input = 1;
+            input = INPUT_TOUCH;
             touched = TRUE;
         }
-        if (input == 0) {
+        if (input == INPUT_NONE) {
             if (GCTX_HIDGetTypedKeys() & PAD_KEY_UP) {
-                input = 1;
+                input = INPUT_UP;
             } else if (GCTX_HIDGetTypedKeys() & PAD_KEY_DOWN) {
-                input = 2;
+                input = INPUT_DOWN;
             } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
-                input = 3;
+                input = INPUT_CONFIRM;
             }
         }
     }
-    if (input != 0) {
+    if (input != INPUT_NONE) {
         if (!touched) {
             if (work->flags & FLAG_KEYS) {
-                if (input == 1) {
+                if (input == INPUT_UP) {
                     if (work->cursor != 0) {
                         GFL_SndSEPlay(SEQ_SE_SELECT1);
                     }
@@ -587,7 +599,7 @@ static BOOL BChoiceMain_ReadInput(BChoiceWork *work) {
                         work->cursor = 0;
                     }
                     refresh = TRUE;
-                } else if (input == 2) {
+                } else if (input == INPUT_DOWN) {
                     if (work->cursor != work->layout + 1) {
                         GFL_SndSEPlay(SEQ_SE_SELECT1);
                     }
@@ -596,7 +608,7 @@ static BOOL BChoiceMain_ReadInput(BChoiceWork *work) {
                         work->cursor = work->layout + 1;
                     }
                     refresh = TRUE;
-                } else if (input == 3) {
+                } else if (input == INPUT_CONFIRM) {
                     work->choice = work->cursor;
                     choosing = FALSE;
                     work->flags |= FLAG_KEY_CHOICE;
@@ -629,7 +641,7 @@ static void BChoiceMain_LoadGraphics(BChoiceWork *work, int layout) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_B_CHOICE, HEAPID_TAIL(heapId));
 
     for (i = 0; i < 8; i++) {
-        if (paletteLoad->type == 0xff) {
+        if (paletteLoad->type == LIST_END) {
             break;
         }
         GFL_G2DIOLoadArcNCLRDefault(arc, paletteLoad->fileId, paletteLoad->type, paletteLoad->offset,
@@ -637,14 +649,14 @@ static void BChoiceMain_LoadGraphics(BChoiceWork *work, int layout) {
         paletteLoad++;
     }
     for (i = 0; i < 8; i++) {
-        if (charLoad->bg == 0xff) {
+        if (charLoad->bg == LIST_END) {
             break;
         }
         GFL_BGSysLoadArcNCGRStatic(arc, charLoad->fileId, charLoad->bg, charLoad->offset, 0, FALSE, heapId);
         charLoad++;
     }
     for (i = 0; i < 8; i++) {
-        if (screenLoad->bg == 0xff) {
+        if (screenLoad->bg == LIST_END) {
             break;
         }
         loadBGScrToVramByFileNoReserveNegAlign(arc, screenLoad->fileId, screenLoad->bg, screenLoad->offset, 0, FALSE,
@@ -659,7 +671,7 @@ static void BChoiceMain_CreateWindows(BChoiceWork *work, int layout) {
     const BChoiceWindowSetup *setup = sBChoiceWindowSetupTables[layout];
 
     for (i = 0; i < WINDOW_MAX; i++) {
-        if (setup->bg == 0xff) {
+        if (setup->bg == LIST_END) {
             break;
         }
         work->windows[i].window =
@@ -775,7 +787,7 @@ static void BChoiceMain_CreateActors(BChoiceWork *work, u32 surface, const BChoi
     s16 cells = resources[2];
     s16 count = resources[3];
     for (i = 0; i < count; i++) {
-        if (setups->sequence == 0xff) {
+        if (setups->sequence == LIST_END) {
             break;
         }
         u32 position = setups->position * 2;

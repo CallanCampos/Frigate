@@ -1,0 +1,33 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The zones' fog: res/field/fog/fog.json",
+    "description": "ARCID_ZONE_FOG_TABLE (a/0/8/0): its fogs, a file each, and its last file, ZONE_FOG_TABLE_FILE in zonedata.c, the table of the zones that have a fog. FieldFogCtrl (field_zonefog.c) loads a zone's fog, and the sunny weather fades it in (weather_sunny.c). tools/data/zone_fog_data.py packs them.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "fogs", "zones" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "fogs": {
+            "type": "array", "minItems": 29, "maxItems": 29,
+            "description": "The fogs, files 0 to 28, by their number; there are always 29, as the code reads the table from file 29",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "offset", "slope" ],
+                "properties": {
+                    "offset": { "type": "integer", "minimum": 0, "maximum": 32767, "description": "Where the fog starts, a depth from 0 to 0x7fff (WeatherTask_GetZoneFogOffset, FieldFog_SetOffset)" },
+                    "slope": { "type": "integer", "minimum": 0, "maximum": 10, "description": "How fast it thickens: each step of the fog's table covers 0x400 >> slope of depth (WeatherTask_GetZoneFogSlope, FieldFog_SetDepthShift)" }
+                }
+            }
+        },
+        "zones": {
+            "type": "array",
+            "description": "The zones that have a fog, a ZoneValue each, which GetZoneFogIndex searches in order; a zone that isn't here has none",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "zone", "fog" ],
+                "properties": {
+                    "zone": { "type": [ "string", "integer" ], "x-constant": "ZONE_", "minimum": 0, "maximum": 65535, "description": "A ZONE_* constant" },
+                    "fog": { "type": "integer", "minimum": 0, "maximum": 28, "description": "The zone's fog, its number in fogs" }
+                }
+            }
+        }
+    }
+}

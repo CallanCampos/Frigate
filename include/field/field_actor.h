@@ -14,6 +14,8 @@
 
 // The UID of the player's actor
 #define ACTOR_UID_PLAYER 0xff
+// The actor that follows the player (MOVE_CODE_FOLLOW_PLAYER), for EventActionCall_Create
+#define ACTOR_UID_FOLLOWER 0xf2
 
 // A position on the grid of 16-unit tiles. The game copies it as 8 bytes, with a field after z
 typedef struct {
@@ -60,9 +62,9 @@ enum {
     ACTOR_BILLBOARD_SIZE_64,
 };
 
-// An actor's place on a rail, from swan's ActorPositionRail. unk0 is ACTOR_RAIL_POS_SET once the place is set
+// An actor's place on a rail, from swan's ActorPositionRail. magic is ACTOR_RAIL_POS_SET once the place is set
 typedef struct {
-    u32 unk0;
+    u32 magic;
     RailPosition position;
 } ActorPositionRail;
 
@@ -103,13 +105,13 @@ struct ZoneNPC {
     } pos;
 };
 
-// An actor's move code and its functions, called with the actor: unkC before the code is changed
+// An actor's move code and its functions, called with the actor: delete before the code is changed
 typedef struct {
     u32 code;
-    void (*unk4)(FieldActor *actor);
-    void (*unk8)(FieldActor *actor);
-    void (*unkC)(FieldActor *actor);
-    void (*unk10)(FieldActor *actor);
+    void (*init)(FieldActor *actor);
+    void (*move)(FieldActor *actor);
+    void (*delete)(FieldActor *actor);
+    void (*returnProc)(FieldActor *actor);
 } FieldActorMoveCode;
 
 // The saved positions of the strength boulders that were moved, in grid units, by the slots of field_actor.c's table of
@@ -425,7 +427,8 @@ enum {
     DRAW_STATUS_ANIME_13,
 };
 void FldAct_SetDrawStatus(FieldActor *actor, u32 value);
-void func_ov012_02167564(FieldActor *actor, u32 value);
+// Actor flag 0x4000, which hides the actor's reflection (fldeff_reflect.c), as fishing does
+void SetActorReflectionHidden(FieldActor *actor, u32 value);
 // Sets x and z to the center of a tile, leaving y
 void ConvGXZToVector(s16 x, s16 z, VecFx32 *pos);
 void SpawnAllZoneNPCs(MMSys *mmSys, ZoneNPC *npcs, s32 zoneId, u32 count, EventWork *eventWork);
@@ -617,8 +620,9 @@ ActorG3DSystem *FldActSys_GetActorG3DSystem(MMSys *system);
 NoGridMapper *FldActSys_GetNoGridMapper(MMSys *system);
 // The camera angle that FldActSys_InitDraw set, or 0
 u16 FldActSys_GetCameraAngle(MMSys *system);
-u32 func_ov012_02166fc0(MMSys *system);
-void func_ov012_02166fc4(MMSys *system, u32 value);
+// The lights that fldeff_reflect.c gives the reflections' billboard actors
+u32 FldActSys_GetReflectLights(MMSys *system);
+void FldActSys_SetReflectLights(MMSys *system, u32 value);
 // The number of event types (constants/actor_event_types.h), by which field_actor_evtype.c's tables go
 #define ACTOR_EVENT_TYPE_MAX 21
 void SetActorEvType(FieldActor *actor, u16 evType);
@@ -658,12 +662,13 @@ void FldActSys_SetDrawInited(MMSys *system, BOOL flag);
 // Whether the actor exists
 BOOL FldAct_IsInUse(FieldActor *actor);
 BOOL FldAct_IsDrawCreated(FieldActor *actor);
-BOOL func_ov012_0216754c(FieldActor *actor);
+BOOL IsActorReflectionHidden(FieldActor *actor);
 void SetActorFlag8000(FieldActor *actor, BOOL value);
-BOOL func_ov012_021675b4(FieldActor *actor);
+// Whether actor flag 0x100, which SetActorFlag256 sets, is clear
+BOOL IsActorFlag256Clear(FieldActor *actor);
 void SetActorFlag256(FieldActor *actor, BOOL value);
 void SetActorFlag32(FieldActor *actor, BOOL value);
-void FldAct_SetHeightCalcDisabled(FieldActor *actor, BOOL a1);
+void FldAct_SetHeightCalcDisabled(FieldActor *actor, BOOL disabled);
 void FldAct_SetIgnoreDisableAll(FieldActor *actor, BOOL value);
 void FldAct_SetMapAttrDisabled(FieldActor *actor, BOOL value);
 void FldAct_SetMoveBitAttrEffectOff(FieldActor *actor, BOOL value);

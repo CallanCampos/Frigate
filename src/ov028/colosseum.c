@@ -208,10 +208,10 @@ void Colosseum_BuildBattlePlayers(UnionColosseum *colosseum, GameSystem *gsys, C
     int slot;
 
     MI_CpuFill8(players, 0, sizeof(ColosseumPlayers));
-    players->battle.unk44 = 3;
+    players->battle.demoType = 3;
     for (i = 0; i < COLOSSEUM_MEMBER_MAX; i++) {
         if (colosseum->partyReady[i] == 0) {
-            players->battle.unk44 = 1;
+            players->battle.demoType = 1;
             break;
         }
         member_max++;
@@ -224,7 +224,7 @@ void Colosseum_BuildBattlePlayers(UnionColosseum *colosseum, GameSystem *gsys, C
 
         if ((team & 1) == (selfTeam & 1)) {
             slot = 0;
-        } else if (players->battle.unk44 == 1) {
+        } else if (players->battle.demoType == 1) {
             slot = 1;
         } else {
             slot = 2;

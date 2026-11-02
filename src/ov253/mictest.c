@@ -60,6 +60,35 @@ enum {
 #define RES_NOTE 6
 #define RES_BACK_BUTTON 9
 
+// The steps of MicTest_SeqWipeIn
+enum {
+    WIPE_IN_STEP_START,
+    WIPE_IN_STEP_WAIT,
+    WIPE_IN_STEP_NEXT,
+};
+
+// The steps of MicTest_SeqListen
+enum {
+    LISTEN_STEP_START_MIC,
+    LISTEN_STEP_WAIT_EXIT,
+    LISTEN_STEP_STOP_MIC,
+    LISTEN_STEP_NEXT,
+};
+
+// The steps of MicTest_SeqPressBack
+enum {
+    PRESS_BACK_STEP_START,
+    PRESS_BACK_STEP_WAIT,
+    PRESS_BACK_STEP_NEXT,
+};
+
+// The steps of MicTest_SeqWipeOut
+enum {
+    WIPE_OUT_STEP_START,
+    WIPE_OUT_STEP_WAIT,
+    WIPE_OUT_STEP_NEXT,
+};
+
 typedef struct MicTestSeq MicTestSeq;
 typedef void (*MicTestSeqFunc)(MicTestSeq *seq, u32 *state);
 
@@ -341,16 +370,16 @@ static void MicTest_SeqWipeIn(MicTestSeq *seq, u32 *state) {
     MicTestWork *wk = MicTestSeq_GetWork(seq);
 
     switch (*state) {
-    case 0:
+    case WIPE_IN_STEP_START:
         GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
-        *state = 1;
+        *state = WIPE_IN_STEP_WAIT;
         break;
-    case 1:
+    case WIPE_IN_STEP_WAIT:
         if (GFL_WipeIsFinished()) {
-            *state = 2;
+            *state = WIPE_IN_STEP_NEXT;
         }
         break;
-    case 2:
+    case WIPE_IN_STEP_NEXT:
         MicTestSeq_SetFunc(seq, MicTest_SeqListen);
         break;
     }
@@ -360,23 +389,23 @@ static void MicTest_SeqListen(MicTestSeq *seq, u32 *state) {
     MicTestWork *wk = MicTestSeq_GetWork(seq);
 
     switch (*state) {
-    case 0:
+    case LISTEN_STEP_START_MIC:
         MicTestMic_Start(&wk->mic);
-        *state = 1;
+        *state = LISTEN_STEP_WAIT_EXIT;
         break;
-    case 1:
+    case LISTEN_STEP_WAIT_EXIT:
         if (MicTest_IsExitPressed()) {
             if (SndMic_IsOverLimit()) {
                 GFL_SndSEPlay(SEQ_SE_CANCEL1);
-                *state = 2;
+                *state = LISTEN_STEP_STOP_MIC;
             }
         }
         break;
-    case 2:
+    case LISTEN_STEP_STOP_MIC:
         MicTestMic_Stop(&wk->mic);
-        *state = 3;
+        *state = LISTEN_STEP_NEXT;
         break;
-    case 3:
+    case LISTEN_STEP_NEXT:
         MicTestSeq_SetFunc(seq, MicTest_SeqPressBack);
         break;
     }
@@ -386,16 +415,16 @@ static void MicTest_SeqPressBack(MicTestSeq *seq, u32 *state) {
     MicTestWork *wk = MicTestSeq_GetWork(seq);
 
     switch (*state) {
-    case 0:
+    case PRESS_BACK_STEP_START:
         ClActor_SetSequence(wk->actors[ACTOR_BACK_BUTTON], 1);
-        *state = 1;
+        *state = PRESS_BACK_STEP_WAIT;
         break;
-    case 1:
+    case PRESS_BACK_STEP_WAIT:
         if (!ClActor_IsAnimActive(wk->actors[ACTOR_BACK_BUTTON])) {
-            *state = 2;
+            *state = PRESS_BACK_STEP_NEXT;
         }
         break;
-    case 2:
+    case PRESS_BACK_STEP_NEXT:
         MicTestSeq_SetFunc(seq, MicTest_SeqWipeOut);
         break;
     }
@@ -405,16 +434,16 @@ static void MicTest_SeqWipeOut(MicTestSeq *seq, u32 *state) {
     MicTestWork *wk = MicTestSeq_GetWork(seq);
 
     switch (*state) {
-    case 0:
+    case WIPE_OUT_STEP_START:
         GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
-        *state = 1;
+        *state = WIPE_OUT_STEP_WAIT;
         break;
-    case 1:
+    case WIPE_OUT_STEP_WAIT:
         if (GFL_WipeIsFinished()) {
-            *state = 2;
+            *state = WIPE_OUT_STEP_NEXT;
         }
         break;
-    case 2:
+    case WIPE_OUT_STEP_NEXT:
         MicTestSeq_SetFunc(seq, MicTest_SeqEnd);
         break;
     }

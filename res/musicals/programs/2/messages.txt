@@ -1,0 +1,4 @@
+MusicalProgram2_Text_SweetSoiree = A Sweet Soirée
+MusicalProgram2_Text_Empty =
+MusicalProgram2_Text_Empty_2 =
+\pad{3c}

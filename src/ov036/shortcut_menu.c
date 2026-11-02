@@ -151,7 +151,7 @@ ShortcutMenuApp *ShortcutMenu_Create(GameData *gameData, u32 mode, ShortcutMenuP
 
     work = GFL_HeapAllocate(heapId, sizeof(*work), FALSE, "shortcut_menu.c", 253);
     MI_CpuFill8(work, 0, sizeof(*work));
-    work->code = 0;
+    work->code = SHORTCUT_MENU_RESULT_NONE;
     work->item = 0xff;
     work->listPos = listPos;
     GFL_BGSysCreateBG(BG, &sBgSetup, BGMODE_TEXT);
@@ -254,13 +254,13 @@ void ShortcutMenu_Main(ShortcutMenuApp *work) {
         input = GetInput(&work->menu);
         switch (input) {
         case BMPMENULIST_NULL:
-            work->code = 0;
+            work->code = SHORTCUT_MENU_RESULT_NONE;
             break;
         case BMPMENULIST_CANCEL:
-            work->code = 2;
+            work->code = SHORTCUT_MENU_RESULT_CANCELLED;
             break;
         default:
-            work->code = 1;
+            work->code = SHORTCUT_MENU_RESULT_SELECTED;
             work->item = input;
             break;
         }
@@ -289,7 +289,7 @@ u32 ShortcutMenu_RunPrint(ShortcutMenuApp *work) {
 
 void ShortcutMenu_Start(ShortcutMenuApp *work) {
     if (work->state == STATE_CLOSED) {
-        work->code = 0;
+        work->code = SHORTCUT_MENU_RESULT_NONE;
         work->item = 0xff;
         GFL_BGSysSetBGEnabled(BG, TRUE);
         work->state = STATE_OPENING;

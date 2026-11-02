@@ -78,6 +78,14 @@ typedef struct {
     u8 blink;
 } CtvtGameCamRoulette;
 
+// The steps of the exchange of each picture
+enum {
+    EXCHANGE_RECEIVE,
+    EXCHANGE_SEND_SYNC,
+    EXCHANGE_WAIT_SYNC,
+    EXCHANGE_DONE,
+};
+
 // The exchange of the pictures with the others in the call
 typedef struct {
     HeapID heapId;
@@ -250,15 +258,15 @@ CtvtGameCamTask *CtvtGameCam_StartTask(CtvtGameCam *cam, HeapID heapId) {
 
 int CtvtGameCam_UpdateTask(CtvtGameCamTask *task) {
     if (CtvtGameCamExchange_IsSomeoneGone(&task->exchange) == TRUE) {
-        return 2;
+        return CTVT_GAME_CAM_ERROR;
     }
     CtvtGameCamSeq_Update(&task->seq);
     CtvtGameCamExchange_Update(&task->exchange, task->cam->members);
     PrintQueue_Main(task->printQueue);
     if (CtvtGameCamSeq_IsDone(&task->seq) && CtvtGameCamExchange_IsDone(&task->exchange)) {
-        return 1;
+        return CTVT_GAME_CAM_DONE;
     }
-    return 0;
+    return CTVT_GAME_CAM_RUNNING;
 }
 
 void CtvtGameCam_EndTask(CtvtGameCamTask *task) {
@@ -698,7 +706,7 @@ static void CtvtGameCamExchange_Update(CtvtGameCamExchange *exchange, CtvtGameMe
         return;
     }
     switch (exchange->state) {
-    case 0: {
+    case EXCHANGE_RECEIVE: {
         u8 finished;
         u8 slot = 0;
         u8 selfNetId;
@@ -727,31 +735,31 @@ static void CtvtGameCamExchange_Update(CtvtGameCamExchange *exchange, CtvtGameMe
             }
         }
         if (finished == exchange->receiving) {
-            exchange->state = 1;
+            exchange->state = EXCHANGE_SEND_SYNC;
             NetLdata_IsSendDone();
             return;
         }
         break;
     }
-    case 1:
+    case EXCHANGE_SEND_SYNC:
         if (exchange->waiting == FALSE) {
             NetHandle_SendTimingPair(NetHandle_GetOwn(), (u8)(exchange->picture + 32), 32);
-            exchange->state = 2;
+            exchange->state = EXCHANGE_WAIT_SYNC;
             return;
         }
         break;
-    case 2:
+    case EXCHANGE_WAIT_SYNC:
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), (u8)(exchange->picture + 32), 32) == TRUE) {
-            exchange->state = 0;
+            exchange->state = EXCHANGE_RECEIVE;
             exchange->waiting = TRUE;
             exchange->picture++;
             if (exchange->picture == 3) {
                 exchange->done = TRUE;
-                exchange->state = 3;
+                exchange->state = EXCHANGE_DONE;
             }
         }
         break;
-    case 3:
+    case EXCHANGE_DONE:
         break;
     }
 }

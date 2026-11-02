@@ -301,14 +301,14 @@ BOOL Scrcmd_Proc_CallPokedexDiploma(VM *vm, FieldScriptEnv *env) {
     case 0:
         award = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(PokedexAwardParam), TRUE, "scrcmd_proc.c", 546);
         award->gameData = gameData;
-        award->unk04 = value;
+        award->skipIntro = value;
         CreateScrCmdOverlayProcess(vm, env, OVERLAY_REGIONAL_POKEDEX_AWARD, &REGIONAL_POKEDEX_AWARD_PROC_FUNCTIONS,
                                    award, NULL, NULL);
         break;
     case 1:
         award = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(PokedexAwardParam), TRUE, "scrcmd_proc.c", 554);
         award->gameData = gameData;
-        award->unk04 = value;
+        award->skipIntro = value;
         CreateScrCmdOverlayProcess(vm, env, OVERLAY_NATIONAL_POKEDEX_AWARD, &NATIONAL_POKEDEX_AWARD_PROC_FUNCTIONS,
                                    award, NULL, NULL);
         break;
@@ -385,9 +385,9 @@ BOOL Scrcmd_Proc_NetConnectWiFiBattle(VM *vm, FieldScriptEnv *env) {
         break;
     }
     args.field = GSYS_GetField(gsys);
-    args.unk4 = 1;
-    args.unk8 = option;
-    args.unkC = type;
+    args.startFrom = 1;
+    args.teamSource = option;
+    args.battleType = type;
     event = GameEvent_CreateOverlayDelegate(gsys, OVERLAY_ID(2), EventWifiBattleMatch_CreateFromArgs, &args);
     ScriptWork_CallEvent(work, event);
     return TRUE;
@@ -415,7 +415,7 @@ BOOL Scrcmd_Proc_NetConnectBattleVideo(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov012_02157b7c(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Proc_GimmickSetNimbasaGym(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     u16 value;
 
@@ -427,7 +427,7 @@ BOOL func_ov012_02157b7c(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02157bb4(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Proc_GimmickResetOpelucid(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
 
     gsys = FieldScriptEnv_GetGameSystem(env);
@@ -437,7 +437,7 @@ BOOL func_ov012_02157bb4(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02157bdc(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Proc_GimmickSetNimbasaFlags(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     u16 *first;
     u16 *second;

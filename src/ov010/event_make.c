@@ -32,7 +32,7 @@ BOOL BattleProc_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     BattleParam *battle = param;
     BattleProcWork *procWork = work;
 
-    if (battle->unk14 == 1 && GFL_NetErrCheck()) {
+    if (battle->markNetErrShown == TRUE && GFL_NetErrCheck()) {
         GFL_NetErrMarkShown();
     }
     FreeGameProcManager(procWork->manager);
@@ -68,10 +68,10 @@ BOOL BattleProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
     }
     switch (*state) {
     case 0:
-        if (battle->setup->fieldSituation.unk1a == 0) {
-            battle->players->unk44 = 1;
+        if (battle->setup->fieldSituation.multiMode == 0) {
+            battle->players->demoType = 1;
         } else {
-            battle->players->unk44 = 3;
+            battle->players->demoType = 3;
         }
         QueueGameProc(procWork->manager, OVERLAY_ID(305), &CommBtlDemoProc, battle->players);
         *state = 1;
@@ -80,7 +80,7 @@ BOOL BattleProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
         if (running == TRUE) {
             break;
         }
-        if (battle->setup->fieldSituation.unk1a == 0) {
+        if (battle->setup->fieldSituation.multiMode == 0) {
             *state = 6;
         } else {
             *state = 2;
@@ -118,7 +118,7 @@ BOOL BattleProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
         procWork->ov167Loaded = TRUE;
         GFL_OvlLoad(OVERLAY_ID(167));
         procWork->commandsSet = TRUE;
-        NetCommand_AddTable(0x100, data_ov167_021d7448, 9, NULL);
+        NetCommand_AddTable(0x100, BTL_NET_COMMANDS, 9, NULL);
         GFL_NetSendTiming(NetHandle_GetOwn(), 0xc8);
         *state = 7;
         break;
@@ -130,7 +130,7 @@ BOOL BattleProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
     case 8:
         procWork->vsPlayerLoaded = TRUE;
         BattleRec_Init(HEAPID_BATTLE_PROC);
-        QueueGameProc(procWork->manager, -1, &data_ov167_021d6ce0, battle->setup);
+        QueueGameProc(procWork->manager, -1, &BATTLE_PROC_FUNCTIONS, battle->setup);
         *state = 9;
         break;
     case 9:
@@ -160,10 +160,10 @@ BOOL BattleProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
         *state = 13;
         break;
     case 13:
-        if (battle->setup->fieldSituation.unk1a == 0) {
-            battle->players->unk44 = 2;
+        if (battle->setup->fieldSituation.multiMode == 0) {
+            battle->players->demoType = 2;
         } else {
-            battle->players->unk44 = 4;
+            battle->players->demoType = 4;
         }
         switch (battle->setup->result) {
         case BTL_RESULT_VICTORY:
@@ -183,7 +183,7 @@ BOOL BattleProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
             battle->players->result = 2;
             break;
         }
-        if (battle->setup->fieldSituation.unk1a == 0) {
+        if (battle->setup->fieldSituation.multiMode == 0) {
             last = 1;
             first = 0;
             second = 1;
@@ -259,17 +259,17 @@ BOOL BattleProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
 GameEvent *eventMakeFunc(GameSystem *gsys, void *data) {
     const EventMakeArgs *args = data;
 
-    return EventMake_Create(gsys, args->setup, args->players, args->unk08);
+    return EventMake_Create(gsys, args->setup, args->players, args->markNetErrShown);
 }
 
-GameEvent *EventMake_Create(GameSystem *gsys, BtlSetup *setup, BattlePlayers *players, u32 a3) {
+GameEvent *EventMake_Create(GameSystem *gsys, BtlSetup *setup, BattlePlayers *players, u32 markNetErrShown) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventMake_Callback, sizeof(EventMakeWork));
     EventMakeWork *work = GameEvent_GetData(event);
 
     work->gsys = gsys;
     work->setup = setup;
     work->players = players;
-    work->unk0C = a3;
+    work->markNetErrShown = markNetErrShown;
     return event;
 }
 
@@ -286,7 +286,7 @@ GameEventReturnCode EventMake_Callback(GameEvent *event, u32 *state, void *data)
         param->players = work->players;
         param->rule = work->players->rule;
         param->unk10 = work->players->unk4C;
-        param->unk14 = work->unk0C;
+        param->markNetErrShown = work->markNetErrShown;
         GSYS_QueueProc(gsys, -1, &data_ov010_0215039c, param);
         (*state)++;
         break;

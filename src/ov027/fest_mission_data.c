@@ -21,7 +21,7 @@ const u8 data_ov027_021711c0[8] = { 0, 1, 1, 3, 2, 2, 0, 0 };
 
 FestivalText *getTextFileForFestMissions(HeapID heapId) {
     FestivalText *text = GFL_HeapAllocate(heapId, sizeof(FestivalText), TRUE, "fest_mission_data.c", 0x46);
-    text->archive = GFL_ArcSysCreateFileHandle(0x121, heapId);
+    text->archive = GFL_ArcSysCreateFileHandle(ARCID_FMISSION_DATA, heapId);
     text->message = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_GET_TEXT_FILE_FOR_FEST_MISSIONS, heapId);
     return text;
 }
@@ -67,14 +67,14 @@ void FestMission_Load(ArcTool *arc, u8 index, u32 level, FestMissionConfig *miss
     mission->info.index = index;
     mission->info.level = level;
     mission->info.target = params->target;
-    mission->info.unk0_20 = params->unk0C;
+    mission->info.targetVariant = params->unk0C;
     mission->info.unk0_30 = 0;
     mission->info.unk0_31 = MISSION_VERSION_BIT;
     mission->info.unk4_0 = params->unk0E;
     mission->info.unk4_10 = params->levels[level].unk3;
     mission->info.count = params->levels[level].count;
     mission->info.unk4_31 = params->unk00;
-    mission->info.unk8_0 = params->unk14;
+    mission->info.stagePatterns = params->unk14;
     mission->info.requiredFlag = params->unk12;
     mission->info.unk8_30 = params->unk03;
     mission->info.unkC_0 = 0;

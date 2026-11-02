@@ -122,7 +122,7 @@ L_0199:
     WorkAdd 0x8022, 0x8001
     VMStackPop 0x8001
     VMStackPop 0x8000
-    Cmd_021F 0x8022, 0x8010
+    SeasonTrainerGetObjCode 0x8022, 0x8010
     WorkGet EVENT_WORK_0x4020, 0x8010
     WorkGet EVENT_WORK_0x4173, 0x8023
     WorkSetConst EVENT_WORK_0x4188, 0

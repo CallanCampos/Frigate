@@ -888,7 +888,7 @@ void WorldTrade_PokeInfoPrint(MsgData *msgManager, WordSet *wordSet, BmpWin **wi
 
 u16 *WorldTrade_PokedexSortDataGet(int heapId, int idx, int *num) {
     u32 size;
-    u16 *data = GFL_ArcSysReadHeapNewLZGetLen(97, 5, FALSE, heapId, &size);
+    u16 *data = GFL_ArcSysReadHeapNewLZGetLen(ARCID_POKEDEX_DATA, 5, FALSE, heapId, &size);
 
     *num = size / 2;
     return data;
@@ -917,7 +917,7 @@ u8 *WorldTrade_SinnohPokedexDataGet(int heapId) {
     u32 num;
 
     MIi_CpuClearFast(0, table, MONSNO_TABLE_SIZE);
-    data = GFL_ArcSysReadHeapNewLZGetLen(97, 4, FALSE, heapId, &size);
+    data = GFL_ArcSysReadHeapNewLZGetLen(ARCID_POKEDEX_DATA, 4, FALSE, heapId, &size);
     num = size / 2;
     for (; i < num; i++) {
         if (data[i] < MONSNO_TABLE_SIZE) {

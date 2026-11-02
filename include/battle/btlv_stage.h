@@ -10,15 +10,18 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
-// rule: 0 single, 1 double, 2 triple, 3 rotation. stageId and variant pick the grounds from file 2 of archive 151;
-// unk 1 or 2 picks stage 27 instead
-BtlvStage *BtlvStage_Create(u32 rule, u32 stageId, u8 variant, HeapID heapId, u32 unk);
+// battleStyle is BTL_STYLE_*. stageId and variant pick the grounds from file 2 of archive 151; a studioMode
+// (BTL_STUDIO_MODE_*) other than none picks stage 27 instead
+BtlvStage *BtlvStage_Create(u32 battleStyle, u32 stageId, u8 variant, HeapID heapId, u32 studioMode);
 void BtlvStage_Delete(BtlvStage *stage);
 void BtlvStage_Main(BtlvStage *stage);
 void BtlvStage_Draw(BtlvStage *stage);
 void BtlvStage_StartPaletteFade(BtlvStage *stage, u8 startEvy, u8 targetEvy, u8 wait, u16 color);
 BOOL BtlvStage_IsPaletteFading(BtlvStage *stage);
-// side 0 or 1, or 2 for both
+// The side BtlvStage_SetVanish takes for both grounds
+#define BTLV_STAGE_SIDE_BOTH 2
+
+// side 0 or 1, or BTLV_STAGE_SIDE_BOTH
 void BtlvStage_SetVanish(BtlvStage *stage, u32 side, BOOL hide);
 void BtlvStage_StartAnimation(BtlvStage *stage, u32 side, u32 anm, fx32 speed, s32 frames);
 BOOL BtlvStage_IsAnimating(BtlvStage *stage);

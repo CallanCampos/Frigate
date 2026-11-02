@@ -1,0 +1,12 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "V",
+    "shapes": [ 3 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_LOSTLORN_FOREST": [ "grass" ],
+            "ZONE_ROUTE_20": [ "dark_grass" ]
+        }
+    }
+}

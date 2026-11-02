@@ -9,7 +9,7 @@
 // Function names from swan.
 void GetEntreeForestActorParamBits(u32 *paramBits, FieldActor *actor);
 u16 GetActorUserParam0(FieldActor *actor);
-GameEvent *EventEntreeForestWarp_Create(GameSystem *gsys, u32 mode, const VecFx32 *position, u32 arg3, u32 arg4);
+GameEvent *EventEntreeForestWarp_Create(GameSystem *gsys, u32 playSound, const VecFx32 *position, u32 dir, u32 area);
 GameEvent *CheckEntralinkForestFirstWarpEvent(Field *field, GameSystem *gsys, FieldPlayer *player);
 
 // A Pokémon of the Entree Forest, packed in a word that its actor keeps in params 1 and 2

@@ -1,0 +1,17 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "A",
+    "shapes": [ 2 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_P2_LABORATORY": [ "rippling_surf" ],
+            "ZONE_ROUTE_4": [ "rippling_surf" ],
+            "ZONE_ROUTE_17": [ "rippling_surf" ],
+            "ZONE_ROUTE_18": [ "rippling_surf" ],
+            "ZONE_VIRBANK_CITY": [ "rippling_surf" ],
+            "ZONE_ROUTE_21": [ "rippling_surf" ],
+            "ZONE_VIRBANK_COMPLEX": [ "rippling_surf" ]
+        }
+    }
+}

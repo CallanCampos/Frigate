@@ -1,5 +1,6 @@
 #include "types.h"
 #include "app/musical/musical_system.h"
+#include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -9,9 +10,8 @@
 
 // Overlay 210's musical_system.c, named after its string: the musical's Pokémon and the program's data
 
-// The archives of the four built-in programs, one each (our name)
-#define ARCID_MUSICAL_PROGRAM 112
-// The first program that is the downloaded one, read from the save data
+// The four built-in programs are one file each of ARCID_MUSICAL_PROGRAM. The first program that is the downloaded one,
+// read from the save data
 #define MUSICAL_PROGRAM_DOWNLOAD 4
 
 #define MUSICAL_ITEM_NONE 0xff
@@ -38,8 +38,8 @@ MusicalPoke *MusicalSystem_InitPokeFromPkm(PartyPkm *pkm, HeapID heapId) {
     poke->points = 0;
     for (i = 0; i < 9; i++) {
         poke->equips[i].itemId = MUSICAL_ITEM_NONE;
-        poke->equips[i].unk2 = 0;
-        poke->unk54[i] = FALSE;
+        poke->equips[i].rotation = 0;
+        poke->likedEquips[i] = FALSE;
     }
     poke->species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
     poke->sex = PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL);
@@ -58,13 +58,13 @@ MusicalPoke *MusicalSystem_InitPoke(u16 species, u8 sex, u8 form, u8 rare, u32 p
     poke->points = 0;
     for (i = 0; i < 9; i++) {
         poke->equips[i].itemId = MUSICAL_ITEM_NONE;
-        poke->equips[i].unk2 = 0;
-        poke->unk54[i] = FALSE;
+        poke->equips[i].rotation = 0;
+        poke->likedEquips[i] = FALSE;
     }
     for (i = 0; i < 4; i++) {
-        poke->unk4C[i] = 0;
+        poke->kindPoints[i] = 0;
     }
-    poke->unk78 = 0;
+    poke->handPropUse = 0;
     poke->species = species;
     poke->sex = sex;
     poke->form = form;

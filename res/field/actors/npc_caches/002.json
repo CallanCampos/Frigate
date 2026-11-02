@@ -1,0 +1,23 @@
+{
+    "$schema": "../npc_cache.schema.json",
+    "codes": [
+        "OBJ_CODE_POKEMON_UXIE",
+        "OBJ_CODE_132",
+        "OBJ_CODE_19",
+        "OBJ_CODE_BACKERS_F",
+        "OBJ_CODE_27",
+        "OBJ_CODE_BACKPACKER_F",
+        "OBJ_CODE_SCHOOL_KID_F",
+        "OBJ_CODE_DANCER",
+        "OBJ_CODE_CLERK_F",
+        "OBJ_CODE_ARTIST",
+        "OBJ_CODE_210",
+        "OBJ_CODE_110",
+        "OBJ_CODE_BLACK_BELT",
+        "OBJ_CODE_BATTLE_GIRL",
+        "OBJ_CODE_ACE_TRAINER_M",
+        "OBJ_CODE_ACE_TRAINER_F",
+        "OBJ_CODE_SCHOOL_KID_M",
+        "OBJ_CODE_14"
+    ]
+}

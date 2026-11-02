@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/flags.h"
 #include "constants/zones.h"
 #include "field/field_palace.h"
@@ -115,7 +116,7 @@ typedef struct {
 void FieldPalaceSys_LoadLuminanceTable(FieldPalaceSys *sys, u32 fileId, u16 zoneId, u32 season, HeapID heapId) {
     u32 i;
     BOOL found = FALSE;
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0xdb, HEAPID_TAIL(heapId));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_FIELD_PALACE_SYS, HEAPID_TAIL(heapId));
     u16 area = (ZoneData_GetAreaID(zoneId) - 2) / 4 + 1;
     u32 size;
     PalaceLuminanceEntry *entries = GFL_ArcToolReadHeapNewLZGetLen(arc, fileId, FALSE, HEAPID_TAIL(heapId), &size);

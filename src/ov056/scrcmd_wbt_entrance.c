@@ -15,6 +15,7 @@
 #include "system/game_data.h"
 #include "system/game_event.h"
 #include "system/game_system.h"
+#include "text/script/global_10655.h"
 
 // The commands of the Pokémon World Tournament's entrance (plugin 6) that overlay 55 doesn't have
 
@@ -108,29 +109,43 @@ BOOL Scrcmd_WbtEntrance_CallEntryPartySelect(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
+enum {
+    TOURNAMENT_TYPE_EXPERT = 2,
+    TOURNAMENT_DOWNLOADED = 3,
+};
+
+// Sets a variable to the message that says why the player can't enter: one for a downloaded tournament, else one by the
+// regulation, or the one four messages on for the Type Expert Tournament
 BOOL func_ov056_021e77b0(VM *vm, FieldScriptEnv *env) {
-    static const u16 sTable[] = { 29, 48, 30, 49, 31, 50, 32, 51, 33, 52, 34, 53, 35, 54, 36, 55, 37, 48 };
+    // Pairs of a regulation and its message
+    static const u16 sRegulationMessages[] = {
+        29, Global10655_Text_DontMeetConditionsCant,     30, Global10655_Text_DontMeetConditionsCant_2,
+        31, Global10655_Text_DontMeetConditionsCant_3,   32, Global10655_Text_DontMeetConditionsCannot,
+        33, Global10655_Text_DontMeetConditionsCant_4,   34, Global10655_Text_DontMeetConditionsCant_5,
+        35, Global10655_Text_DontMeetConditionsCannot_2, 36, Global10655_Text_DontMeetConditionsCant_6,
+        37, Global10655_Text_DontMeetConditionsCant,
+    };
     u16 *var = ScriptReadVar(vm, env);
     WbtSystem *sys = WbtCmd_GetSystem(env);
-    u32 value = 48;
+    u32 message = Global10655_Text_DontMeetConditionsCant;
     unsigned int i;
 
-    if (WbtSystem_GetTournament(sys) == 3) {
-        value = 60;
+    if (WbtSystem_GetTournament(sys) == TOURNAMENT_DOWNLOADED) {
+        message = Global10655_Text_DontMeetConditionsCant_11;
     } else {
         u8 regulation = WbtSystem_GetRegulationId(sys);
 
-        for (i = 0; i < NELEMS(sTable); i += 2) {
-            if (regulation == sTable[i]) {
-                value = sTable[i + 1];
+        for (i = 0; i < NELEMS(sRegulationMessages); i += 2) {
+            if (regulation == sRegulationMessages[i]) {
+                message = sRegulationMessages[i + 1];
                 break;
             }
         }
-        if (WbtSystem_GetTournament(sys) == 2) {
-            value += 4;
+        if (WbtSystem_GetTournament(sys) == TOURNAMENT_TYPE_EXPERT) {
+            message += 4;
         }
     }
-    *var = value;
+    *var = message;
     return FALSE;
 }
 
@@ -169,25 +184,25 @@ BOOL Scrcmd_WbtEntrance_MakeRentalParty(VM *vm, FieldScriptEnv *env) {
 // Sets three variables to the Trainers that the save's three entries name, for those with unk8_0 of at least 3
 BOOL Scrcmd_WbtEntrance_GetSlotTrainerObjCodes(VM *vm, FieldScriptEnv *env) {
     WbtSave *save = GameData_GetWbtSave(FieldScriptEnv_GetGameData(env));
-    u16 *var1 = ScriptReadVar(vm, env);
-    u16 *var2 = ScriptReadVar(vm, env);
-    u16 *var3 = ScriptReadVar(vm, env);
+    u16 *objCode1 = ScriptReadVar(vm, env);
+    u16 *objCode2 = ScriptReadVar(vm, env);
+    u16 *objCode3 = ScriptReadVar(vm, env);
     u16 index1 = WbtSave_GetSlot(save, 0);
     u16 index2 = WbtSave_GetSlot(save, 1);
     u16 index3 = WbtSave_GetSlot(save, 2);
     WbtTrainers *trainers = WbtTrainers_Load(FieldScriptEnv_GetHeapID(env));
 
-    *var1 = 0;
-    *var2 = 0;
-    *var3 = 0;
+    *objCode1 = 0;
+    *objCode2 = 0;
+    *objCode3 = 0;
     if (WbtTrainers_IsValid(trainers, index1) && WbtTrainers_GetRank(trainers, index1) >= 3) {
-        *var1 = WbtTrainers_GetObjCode(trainers, index1);
+        *objCode1 = WbtTrainers_GetObjCode(trainers, index1);
     }
     if (WbtTrainers_IsValid(trainers, index2) && WbtTrainers_GetRank(trainers, index2) >= 3) {
-        *var2 = WbtTrainers_GetObjCode(trainers, index2);
+        *objCode2 = WbtTrainers_GetObjCode(trainers, index2);
     }
     if (WbtTrainers_IsValid(trainers, index3) && WbtTrainers_GetRank(trainers, index3) >= 3) {
-        *var3 = WbtTrainers_GetObjCode(trainers, index3);
+        *objCode3 = WbtTrainers_GetObjCode(trainers, index3);
     }
     WbtTrainers_Free(trainers);
     return FALSE;
@@ -216,7 +231,7 @@ BOOL Scrcmd_WbtEntrance_SetDownloadSlot(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = WbtCmd_GetSystem(env);
 
     WbtSystem_SetDownloadSlot(sys, ScriptReadAny(vm, env));
-    if (WbtSystem_GetTournament(sys) == 3) {
+    if (WbtSystem_GetTournament(sys) == TOURNAMENT_DOWNLOADED) {
         WbtMakeMatch_LoadDownload(sys, gameData);
     }
     return FALSE;

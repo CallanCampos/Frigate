@@ -70,7 +70,7 @@ typedef struct {
 typedef struct {
     u8 msgForm : 2; // the name's message, by sex mark
     u8 selectable : 1;
-    u8 unk1;
+    u8 iconAnim; // set as the command screen's is (1, 2 fainted, 3 a status condition), but nothing reads it
     u16 unk2;
     s16 hp; // 0: no mon in that position, or it has fainted
     s16 maxHp;
@@ -96,18 +96,28 @@ typedef struct {
     BOOL moveUsable[3][4];
 } BtlvInputRotationParam;
 
+// The recorder screen's message, BtlvInputRecorderParam's mode: none, or the message 8 after it, with BG 4 scrolled
+enum {
+    BTLV_RECORDER_MSG_NONE,
+    BTLV_RECORDER_MSG_PAUSED,
+    BTLV_RECORDER_MSG_DATA_CORRUPTED,
+    BTLV_RECORDER_MSG_SKIPPING,
+};
+
 // Screen 6, the recorder screen
 typedef struct {
-    s32 unk0;
-    s32 unk4; // printed left of the slash, in red when it differs from unk0
-    s32 unk8; // printed right of it
-    u32 mode; // 0 none, 1-3 a message (message 9-11) and BG 4 scrolled
+    // The chapter played, the one skipped to (printed left of the slash, in red when it differs) and the last one
+    // (printed right of it)
+    s32 chapter;
+    s32 targetChapter;
+    s32 maxChapter;
+    u32 mode;
 } BtlvInputRecorderParam;
 
 BtlvInput *BtlvInput_CreateSimple(GameData *gameData, u32 rule, PaletteFade *paletteFade, Font *font, u8 *keyCursorFlag,
                                   HeapID heapId);
-BtlvInput *BtlvInput_CreateForBattle(GameData *gameData, u32 rule, u32 unk54, PaletteFade *paletteFade, Font *font,
-                                     u8 *keyCursorFlag, u32 scdState, u8 unk328, u32 fileSet, u32 typeCount,
+BtlvInput *BtlvInput_CreateForBattle(GameData *gameData, u32 rule, u32 battleType, PaletteFade *paletteFade, Font *font,
+                                     u8 *keyCursorFlag, u32 scdState, u8 multiMode, u32 studioMode, u32 typeCount,
                                      u32 typeMask, BOOL noCancel, HeapID heapId);
 void BtlvInput_Delete(BtlvInput *work);
 void BtlvInput_Update(BtlvInput *work);

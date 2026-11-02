@@ -389,7 +389,7 @@ void FieldScript_ResetMapLocalEvents(EventWork *eventWork) {
     EventWork_WorkResetRange(eventWork, 0x4000, 0x401f);
 }
 
-void FieldScript_CallPlayerInitSetup(GameSystem *gsys, u32 a1) {
+void FieldScript_CallPlayerInitSetup(GameSystem *gsys, u32 unused) {
     FieldScript_Run(gsys, NULL, 0x2580, 2);
 }
 
@@ -417,7 +417,7 @@ void FieldScript_Run(GameSystem *gsys, ScriptWork *work, u16 scriptId, u32 featu
     }
 }
 
-u32 FieldScript_CallZoneInitCore(GameSystem *gsys, u32 arg1, u32 mode, u32 featureLevel) {
+u32 FieldScript_CallZoneInitCore(GameSystem *gsys, u32 unused, u32 mode, u32 featureLevel) {
     GameData *gameData;
     EventData *eventData;
     const u8 *script;
@@ -438,22 +438,22 @@ u32 FieldScript_CallZoneInitCore(GameSystem *gsys, u32 arg1, u32 mode, u32 featu
     return result;
 }
 
-void FieldScript_CallOnZoneReload(GameSystem *gsys, u32 arg1) {
-    FieldScript_CallZoneInitCore(gsys, arg1, 4, 1);
+void FieldScript_CallOnZoneReload(GameSystem *gsys, u32 unused) {
+    FieldScript_CallZoneInitCore(gsys, unused, 4, 1);
 }
 
-void FieldScript_CallOnZoneNewLoad(GameSystem *gsys, u32 arg1) {
-    FieldScript_CallZoneInitCore(gsys, arg1, 3, 1);
+void FieldScript_CallOnZoneNewLoad(GameSystem *gsys, u32 unused) {
+    FieldScript_CallZoneInitCore(gsys, unused, 3, 1);
 }
 
-void FieldScript_CallOnZoneInit(GameSystem *gsys, u32 arg1) {
+void FieldScript_CallOnZoneInit(GameSystem *gsys, u32 unused) {
     GameData *gameData;
     EventWork *eventWork;
 
     gameData = GSYS_GetGameData(gsys);
     eventWork = GameData_GetEventWork(gameData);
     FieldScript_ResetMapLocalEvents(eventWork);
-    FieldScript_CallZoneInitCore(gsys, arg1, 2, 2);
+    FieldScript_CallZoneInitCore(gsys, unused, 2, 2);
 }
 
 GameEvent *FieldScript_CheckSceneChangeEvent(GameSystem *gsys, HeapID heapId) {
@@ -546,7 +546,7 @@ VM *FieldScript_CreateVM(HeapID heapId, ScriptWork *work, u16 zoneId, u16 script
 
     reduced = FieldScript_IsVMFeatureSetReduced(featureLevel);
     args.zoneId = zoneId;
-    args.unk02 = scriptId;
+    args.scriptId = scriptId;
     args.featureLevel = featureLevel;
     args.reducedFeatureLevel = reduced;
     args.work = work;
@@ -564,12 +564,12 @@ VM *FieldScript_CreateVM(HeapID heapId, ScriptWork *work, u16 zoneId, u16 script
     vm = VM_Create(heapId, &param);
     VM_ChangeEnv(vm, env);
     scriptOffset = FieldScript_ResolveSCRID(zoneId, scriptId, &fileId, &msgArcId, &msgFileNo);
-    vm->unk38 = (uptr)FieldScript_LoadData(fileId, heapId);
+    vm->scriptData = (uptr)FieldScript_LoadData(fileId, heapId);
     workSize -= 0x41;
     if (!reduced && msgFileNo != workSize) {
         SetFieldScriptEnvMsgData(env, msgArcId, msgFileNo);
     }
-    VM_LoadScript(vm, (void *)vm->unk38);
+    VM_LoadScript(vm, (void *)vm->scriptData);
     vm->pc += scriptOffset * 4;
     vm->pc += (s32)VM_Read32(vm);
     FieldScript_AttachOpcodeGuard(vm);
@@ -581,7 +581,7 @@ void FieldScript_FreeVM(VM *vm) {
 
     env = VM_GetEnv(vm);
     FreeFieldScriptEnv(env);
-    GFL_HeapFree((void *)vm->unk38);
+    GFL_HeapFree((void *)vm->scriptData);
     VM_Free(vm);
 }
 

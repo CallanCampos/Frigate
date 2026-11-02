@@ -1,0 +1,27 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "T",
+    "shapes": [ 10 ],
+    "area": {
+        "black2": {
+            "all_year": true,
+            "places": {
+                "ZONE_PINWHEEL_FOREST": [ "shaking_grass" ],
+                "ZONE_ROUTE_15": [ "shaking_grass" ],
+                "ZONE_ROUTE_18": [ "shaking_grass" ],
+                "ZONE_ROUTE_23": [ "shaking_grass" ],
+                "ZONE_VICTORY_ROAD": [ "grass", "dark_grass" ]
+            }
+        },
+        "white2": {
+            "all_year": true,
+            "places": {
+                "ZONE_PINWHEEL_FOREST": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_15": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_18": [ "grass", "dark_grass" ],
+                "ZONE_ROUTE_23": [ "grass", "dark_grass" ],
+                "ZONE_VICTORY_ROAD": [ "grass", "dark_grass" ]
+            }
+        }
+    }
+}

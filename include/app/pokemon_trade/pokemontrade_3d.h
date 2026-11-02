@@ -37,7 +37,7 @@ void Poketrade3D_CreateIcaStreamsForMode(PokemonTrade3DWork *work, int path);
 void Poketrade3D_CreateIcaStreamsEnding(PokemonTrade3DWork *work);
 void Poketrade3D_FreeParticleResources(PokemonTrade3DWork *work);
 void Poketrade3D_InitParticleSystems(PokemonTrade3DWork *work);
-void func_ov194_021c1db4(PokemonTrade3DWork *work);
+void Poketrade3D_SetupParticleSystemsLow(PokemonTrade3DWork *work);
 void Poketrade3D_SetupParticleSystemsHigh(PokemonTrade3DWork *work);
 void Poketrade3D_ExitParticleManager(PokemonTrade3DWork *work, int count);
 void Poketrade3D_InitTradeParticleSet(PokemonTrade3DWork *work);
@@ -49,7 +49,9 @@ void Poketrade3D_AddUnitAndInit(PokemonTradeWork *wk, int sceneId);
 void Poketrade3D_RemoveCurrentUnit(PokemonTradeWork *wk);
 // Adds the sprite of a Pokémon on a side, facing front or back, mirrored if asked and the species allows it
 void Poketrade3D_AddPokemonMcss(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror);
-void Poketrade3D_AddPokemonMcssFlipped(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror, BOOL a5);
+// The same, but always facing front if asked
+void Poketrade3D_AddPokemonMcssFlipped(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror,
+                                       BOOL alwaysFront);
 void Poketrade3D_AddPokemonMcssPlain(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror);
 void Poketrade3D_DeleteMcssSlot(PokemonTradeWork *wk, int side);
 void Poketrade3D_FadeTexturePalette(PokemonTradeWork *wk);

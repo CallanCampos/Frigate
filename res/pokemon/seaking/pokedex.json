@@ -1,0 +1,18 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "S",
+    "shapes": [ 2 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_STRIATON_CITY": [ "rippling_fishing" ],
+            "ZONE_PINWHEEL_FOREST": [ "rippling_fishing" ],
+            "ZONE_ABUNDANT_SHRINE": [ "rippling_fishing" ],
+            "ZONE_ROUTE_3": [ "rippling_fishing" ],
+            "ZONE_ROUTE_11": [ "rippling_fishing" ],
+            "ZONE_ROUTE_14": [ "rippling_fishing" ],
+            "ZONE_ASPERTIA_CITY": [ "rippling_fishing" ],
+            "ZONE_ROUTE_22": [ "rippling_fishing" ]
+        }
+    }
+}

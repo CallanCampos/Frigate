@@ -46,7 +46,7 @@ L_009A:
     WorkSetConst 0x8021, 0
 
 L_00A0:
-    Cmd_017B 0x8020, 0x8021
+    GimmickSetNimbasaFlags 0x8020, 0x8021
     VMHalt
 
 Script_13:

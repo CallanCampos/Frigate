@@ -169,7 +169,7 @@ static const WifiBattleMatchStep sWifiBattleMatchSysSteps[STEP_COUNT] = {
     { OVERLAY_ID(306), &BtlRecSelProcFunctions, WifiBattleMatchSys_CreateResultParam, WifiBattleMatchSys_FinishResult },
     { OVERLAY_ID(190), &WIFILOGOUT_PROC_FUNCTIONS, WifiBattleMatchSys_CreateLogoutParam,
       WifiBattleMatchSys_FinishLogout },
-    { OVERLAY_NONE, &data_ov167_021d6ce0, WifiBattleMatchSys_CreateReplayParam, WifiBattleMatchSys_FinishReplay },
+    { OVERLAY_NONE, &BATTLE_PROC_FUNCTIONS, WifiBattleMatchSys_CreateReplayParam, WifiBattleMatchSys_FinishReplay },
 };
 
 // clang-format on
@@ -181,7 +181,7 @@ static BOOL WifiBattleMatchSys_Init(GameProc *proc, u32 *state, void *param, voi
     PokeParty *party;
     HeapID parentHeapId;
 
-    switch (matchParam->unk8) {
+    switch (matchParam->startFrom) {
     case 1:
         parentHeapId = HEAPID_USER;
         break;
@@ -208,7 +208,7 @@ static BOOL WifiBattleMatchSys_Init(GameProc *proc, u32 *state, void *param, voi
     BattleRec_Init(HEAPID_WIFIBATTLEMATCH);
     WifiBattleMatchSys_AllocPlayers(sys, HEAPID_WIFIBATTLEMATCH);
     sys->chain = WifiBattleMatchSys_ChainCreate(sWifiBattleMatchSysSteps, STEP_COUNT, sys, HEAPID_WIFIBATTLEMATCH);
-    switch (sys->param.unk8) {
+    switch (sys->param.startFrom) {
     case 0:
         sys->mode = 0;
         WifiBattleMatchSys_ChainSetNext(sys->chain, STEP_CHAMPIONSHIP);
@@ -222,7 +222,7 @@ static BOOL WifiBattleMatchSys_Init(GameProc *proc, u32 *state, void *param, voi
         break;
     }
     player = sys->player;
-    switch (sys->param.unkC) {
+    switch (sys->param.teamSource) {
     case 0:
         party = GameData_GetParty(sys->param.gameData);
         MI_CpuCopy8(party, player->partyData, PokeParty_GetSaveDataSize());
@@ -250,7 +250,7 @@ static BOOL WifiBattleMatchSys_Exit(GameProc *proc, u32 *state, void *param, voi
     if (sys->ownsGameData) {
         GameData_Free(sys->param.gameData);
     }
-    if (sys->param.unk8 != 1) {
+    if (sys->param.startFrom != 1) {
         OS_ResetSystem(0);
     }
     if (sys->param.unk10 != 0) {
@@ -435,7 +435,7 @@ static void *WifiBattleMatchSys_CreateListParam(WifiBattleMatchChain *chain, Hea
     param = GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchListParam), FALSE, "wifibattlematch_sys.c", 815);
     MI_CpuFill8(param, 0, sizeof(WifiBattleMatchListParam));
     if (sys->mode - 2 <= 1) {
-        switch (sys->param.unk4) {
+        switch (sys->param.battleType) {
         case 0:
             fileId = 0xf;
             break;
@@ -549,7 +549,7 @@ static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, H
     param->setup = BtlSetup_Create(heapId);
     GFL_OvlLoad(OVERLAY_ID(167));
     if (sys->mode - 2 <= 1) {
-        switch (sys->param.unk4) {
+        switch (sys->param.battleType) {
         default:
         case 0:
             fileId = 0xf;
@@ -615,9 +615,9 @@ static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, H
         GFL_ASSERT(0);
     }
     if (sys->mode == 3) {
-        battleType = sys->param.unk4 + 0x17;
+        battleType = sys->param.battleType + 0x17;
     } else if (sys->mode == 2) {
-        battleType = sys->param.unk4 + 0x1c;
+        battleType = sys->param.battleType + 0x1c;
     } else {
         param0D = Regulation_GetParam(regulation, REGULATION_PARAM_LAUNCHER);
         value = Regulation_GetParam(regulation, REGULATION_PARAM_BATTLE_TYPE);
@@ -629,17 +629,17 @@ static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, H
     param->players->base.rule = battleType;
     if (sys->mode - 2 <= 1) {
         param->setup->fieldSituation.bgm = SEQ_BGM_VS_TRAINER_WIFI;
-        param->setup->fieldSituation.unk12 = SEQ_BGM_WIN2;
+        param->setup->fieldSituation.winBgm = SEQ_BGM_WIN2;
     } else if (sys->mode == 0) {
         entry = TournamentBlock_GetEntry(tournament, 0);
         value = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_VARIANT);
         param12 = Regulation_GetParam(TournamentEntry_GetRegulation(entry), REGULATION_PARAM_18);
         if (value == 1) {
             param->setup->fieldSituation.bgm = SEQ_BGM_VS_WCS;
-            param->setup->fieldSituation.unk12 = SEQ_BGM_WIN5;
+            param->setup->fieldSituation.winBgm = SEQ_BGM_WIN5;
         } else {
             param->setup->fieldSituation.bgm = SEQ_BGM_VS_SUBWAY_TRAINER;
-            param->setup->fieldSituation.unk12 = SEQ_BGM_WIN2;
+            param->setup->fieldSituation.winBgm = SEQ_BGM_WIN2;
         }
         if (param12 - 2 <= 1) {
             param->setup->fieldSituation.env.terrain = 0xe;
@@ -652,10 +652,10 @@ static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, H
         param12 = Regulation_GetParam(TournamentEntry_GetRegulation(entry), REGULATION_PARAM_18);
         if (value == 1) {
             param->setup->fieldSituation.bgm = SEQ_BGM_VS_WCS;
-            param->setup->fieldSituation.unk12 = SEQ_BGM_WIN5;
+            param->setup->fieldSituation.winBgm = SEQ_BGM_WIN5;
         } else {
             param->setup->fieldSituation.bgm = SEQ_BGM_VS_SUBWAY_TRAINER;
-            param->setup->fieldSituation.unk12 = SEQ_BGM_WIN2;
+            param->setup->fieldSituation.winBgm = SEQ_BGM_WIN2;
         }
         if (param12 - 2 <= 1) {
             param->setup->fieldSituation.env.terrain = 0xe;
@@ -707,7 +707,7 @@ static BOOL WifiBattleMatchSys_FinishBattle(WifiBattleMatchChain *chain, void *p
                                            value, setup, &sys->battleResult, 0);
         }
     } else if (sys->mode == 2) {
-        regulation = PokeRegulation_LoadNew(sys->param.unk4 + 0xf, HEAPID_WIFIBATTLEMATCH);
+        regulation = PokeRegulation_LoadNew(sys->param.battleType + 0xf, HEAPID_WIFIBATTLEMATCH);
         if (result == 0) {
             WifiBattleMatchSys_BuildReport(&sys->report, sys->party, sys->otherParty, sys->otherPlayer, regulation, 0,
                                            setup, &sys->battleResult, 2);
@@ -755,7 +755,7 @@ static void *WifiBattleMatchSys_CreateLoginParam(WifiBattleMatchChain *chain, He
     param->unk4 = 0;
     param->unk8 = 1;
     param->buffer = sys->unk40;
-    if (sys->param.unk8 == 0) {
+    if (sys->param.startFrom == 0) {
         serviceId = 0x24;
     } else {
         serviceId = 0x34;
@@ -781,7 +781,7 @@ static BOOL WifiBattleMatchSys_FinishLogin(WifiBattleMatchChain *chain, void *pa
         WifiBattleMatchSys_ChainSetNext(chain, STEP_NET);
         break;
     case 1:
-        if (sys->param.unk8 == 0) {
+        if (sys->param.startFrom == 0) {
             WifiBattleMatchSys_ChainSetNext(chain, STEP_CHAMPIONSHIP);
         } else {
             WifiBattleMatchSys_ChainEnd(chain);
@@ -853,9 +853,9 @@ static void *WifiBattleMatchSys_CreateResultParam(WifiBattleMatchChain *chain, H
 
     MI_CpuFill8(param, 0, sizeof(Ov306Param));
     if (sys->mode == 3) {
-        battleType = sys->param.unk4 + 0x17;
+        battleType = sys->param.battleType + 0x17;
     } else if (sys->mode == 2) {
-        battleType = sys->param.unk4 + 0x1c;
+        battleType = sys->param.battleType + 0x1c;
     } else {
         if (sys->mode == 0) {
             index = 0;
@@ -957,7 +957,7 @@ static BOOL WifiBattleMatchSys_FinishReplay(WifiBattleMatchChain *chain, void *p
     BtlSetup *setup = param;
 
     GFL_SndBGMStopImmediate();
-    GFL_HeapFree(setup->unk34[0]);
+    GFL_HeapFree(setup->playerInfo[0]);
     BtlSetup_FreeForRecord(setup);
     GFL_HeapFree(setup);
     GFL_OvlUnload(OVERLAY_ID(167));

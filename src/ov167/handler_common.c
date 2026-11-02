@@ -14,11 +14,11 @@
 
 // Whether a mon is among the event's targets
 BOOL IsEventTargetMon(u32 monId) {
-    u32 count = BattleEventVar_GetValue(5);
+    u32 count = BattleEventVar_GetValue(BTL_EVAR_TARGET_COUNT);
     u32 i;
 
     for (i = 0; i < count; i++) {
-        if (monId == BattleEventVar_GetValue(6 + i)) {
+        if (monId == BattleEventVar_GetValue(BTL_EVAR_TARGET_1 + i)) {
             return TRUE;
         }
     }
@@ -106,25 +106,26 @@ BOOL IsItemSwapBlocked(BtlServerFlow *flow, u8 monId, u8 otherId) {
 
 // Magic Coat and Magic Bounce: bounce a status move that can be reflected back at its user
 void CommonMagicCoatCheckMoveEffect(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
-    u8 attacker = BattleEventVar_GetValue(2);
+    u8 attacker = BattleEventVar_GetValue(BTL_EVAR_MON);
 
     if (!IsAllyMonID(attacker, monId)) {
-        u16 move = BattleEventVar_GetValue(0x12);
+        u16 move = BattleEventVar_GetValue(BTL_EVAR_MOVE);
 
-        if (PML_MoveGetQuality(move) == 0xb && getMoveFlag(move, 4) && BattleEventVar_RewriteValue(0x22, 0x19)) {
+        if (PML_MoveGetQuality(move) == MOVE_QUALITY_SIDE && getMoveFlag(move, 4) &&
+            BattleEventVar_RewriteValue(BTL_EVAR_FAIL_CAUSE, 0x19)) {
             BtlServerFlow_AddMagicCoatReflect(flow, monId, attacker);
         }
     }
 }
 
 void CommonMagicCoatWait(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
-    if (monId == BattleEventVar_GetValue(4) && BattleEventVar_GetValue(0x4e) == 0 &&
-        !IsSemiInvulnMove(GetBattleMon(flow, monId)) && getMoveFlag(BattleEventVar_GetValue(0x12), 4) &&
-        BattleEventVar_RewriteValue(0x40, 1)) {
-        u8 attacker = BattleEventVar_GetValue(3);
+    if (monId == BattleEventVar_GetValue(BTL_EVAR_DEFENDER) && BattleEventVar_GetValue(BTL_EVAR_REFLECTED_FLAG) == 0 &&
+        !IsSemiInvulnMove(GetBattleMon(flow, monId)) && getMoveFlag(BattleEventVar_GetValue(BTL_EVAR_MOVE), 4) &&
+        BattleEventVar_RewriteValue(BTL_EVAR_NO_EFFECT_FLAG, 1)) {
+        u8 attacker = BattleEventVar_GetValue(BTL_EVAR_ATTACKER);
 
         BtlServerFlow_AddMagicCoatReflect(flow, monId, attacker);
-        BattleEventVar_RewriteValue(0x51, 1);
+        BattleEventVar_RewriteValue(BTL_EVAR_FLAG, 1);
     }
 }
 
@@ -132,28 +133,28 @@ void CommonMagicCoatWait(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s
 void CommonMoveProtectedMessage(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
     BattleHandlerMessageParam *param;
 
-    if (monId == BattleEventVar_GetValue(2) && !IsSemiInvulnMove(GetBattleMon(flow, monId))) {
-        param = BattleHandler_PushWork(flow, 4, monId);
+    if (monId == BattleEventVar_GetValue(BTL_EVAR_MON) && !IsSemiInvulnMove(GetBattleMon(flow, monId))) {
+        param = BattleHandler_PushWork(flow, BTL_HANDLER_MESSAGE, monId);
         BattleHandler_StrSetup(&param->string, 2, 0x2fc);
         BattleHandler_AddArg(&param->string, monId);
-        BattleHandler_AddArg(&param->string, BattleEventVar_GetValue(0x12));
+        BattleHandler_AddArg(&param->string, BattleEventVar_GetValue(BTL_EVAR_MOVE));
         BattleHandler_PopWork(flow, param);
     }
 }
 
 void MultiplyBasePower(u32 factor) {
-    factor *= BattleEventVar_GetValue(0x30);
-    BattleEventVar_RewriteValue(0x30, factor);
+    factor *= BattleEventVar_GetValue(BTL_EVAR_POWER);
+    BattleEventVar_RewriteValue(BTL_EVAR_POWER, factor);
 }
 
 void CommonRunCalcSkip(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
-    if (IsAllyMonID(BattleEventVar_GetValue(2), monId)) {
-        BattleEventVar_RewriteValue(0x51, 1);
+    if (IsAllyMonID(BattleEventVar_GetValue(BTL_EVAR_MON), monId)) {
+        BattleEventVar_RewriteValue(BTL_EVAR_FLAG, 1);
     }
 }
 
 BOOL CommonCheckRunMessage(BattleEventItem *item, BtlServerFlow *flow, u8 monId) {
-    if (IsAllyMonID(BattleEventVar_GetValue(2), monId) && BattleEventVar_RewriteValue(0x51, 1)) {
+    if (IsAllyMonID(BattleEventVar_GetValue(BTL_EVAR_MON), monId) && BattleEventVar_RewriteValue(BTL_EVAR_FLAG, 1)) {
         return TRUE;
     }
     return FALSE;

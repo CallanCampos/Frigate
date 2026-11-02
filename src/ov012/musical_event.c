@@ -3,6 +3,7 @@
 #include "constants/pokemon.h"
 #include "constants/text_banks.h"
 #include "constants/version.h"
+#include "constants/zones.h"
 #include "field/event_mapchange.h"
 #include "field/event_sound.h"
 #include "field/field.h"
@@ -83,17 +84,48 @@ static u8 MusicalEvent_GetNpcIndex(MusicalEventWork *work, u8 pos);
 static u32 MusicalEvent_GetPlayerTrainerClass(PlayerInfo *info);
 static void MusicalEvent_SetReceivedProgram(MusicalEventWork *work);
 
-static const VecFx32 data_ov012_0216ade4 = { FX32_CONST(232), 0, FX32_CONST(200) };
+// The event's states, in work->state: online, the players' data and the program first, then the dressing room, the
+// stage and the photo, each with its script on the field, and after a network error the hall again. 1 and 25 only
+// go on to the next state
+enum {
+    MUSICAL_STATE_LEAVE_FOR_DRESS_UP,
+    MUSICAL_STATE_BEFORE_DRESS_UP,
+    MUSICAL_STATE_WARP_TO_HALL,
+    MUSICAL_STATE_DRESS_UP,
+    MUSICAL_STATE_WAIT_DRESS_UP,
+    MUSICAL_STATE_STAGE,
+    MUSICAL_STATE_WAIT_STAGE,
+    MUSICAL_STATE_SHOT,
+    MUSICAL_STATE_WAIT_SHOT,
+    MUSICAL_STATE_HALL_SCRIPT,
+    MUSICAL_STATE_END,
+    MUSICAL_STATE_WAIT_PLAYERS,
+    MUSICAL_STATE_WAIT_PROGRAM,
+    MUSICAL_STATE_WARP_TO_DRESSING_ROOM,
+    MUSICAL_STATE_DRESSING_ROOM_SCRIPT,
+    MUSICAL_STATE_RETURN_AFTER_DRESS_UP = 16,
+    MUSICAL_STATE_STAGE_SCRIPT,
+    MUSICAL_STATE_LEAVE_FOR_STAGE,
+    MUSICAL_STATE_RETURN_AFTER_SHOT,
+    MUSICAL_STATE_SHOW_END_SCRIPT,
+    MUSICAL_STATE_ERROR_RETURN_TO_FIELD = 22,
+    MUSICAL_STATE_ERROR,
+    MUSICAL_STATE_ERROR_WARP_TO_HALL,
+    MUSICAL_STATE_ERROR_WAIT,
+    MUSICAL_STATE_ERROR_SCRIPT,
+};
+
+static const VecFx32 sHallPos = { FX32_CONST(232), 0, FX32_CONST(200) };
 // MWCC lays these two out in the reverse of their definitions
-static const VecFx32 data_ov012_0216adfc = { FX32_CONST(168), 0, FX32_CONST(200) };
-static const VecFx32 data_ov012_0216adf0 = { FX32_CONST(136), 0, FX32_CONST(200) };
+static const VecFx32 sHallOnlinePos = { FX32_CONST(168), 0, FX32_CONST(200) };
+static const VecFx32 sDressingRoomPos = { FX32_CONST(136), 0, FX32_CONST(200) };
 
 // The total points from which a number of the program's prize slots is drawn, from 10 slots down
-static const u16 data_ov012_0216ae08[10] = { 12000, 8000, 5500, 3500, 2000, 1000, 500, 250, 100, 0 };
+static const u16 sGiftCountPoints[10] = { 12000, 8000, 5500, 3500, 2000, 1000, 500, 250, 100, 0 };
 
 // The props each program can give
 // clang-format off
-static const u8 data_ov012_0216ae1c[7][40] = {
+static const u8 sProgramGiftProps[7][40] = {
     {0x19, 0x1a, 0x4b, 0x21, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x30, 0x31, 0x32, 0x3c, 0x40, 0x46, 0x47, 0x48, 0x51,
      0x53, 0x55, 0x5e, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x08, 0x0d, 0x0e, 0x12, 0x24, 0x25, 0x10, 0x11, 0x14, 0x15, 0x20},
     {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x09, 0x0a, 0x0b, 0x0c, 0x0f, 0x13, 0x16, 0x1b, 0x1c, 0x1f, 0x2f, 0x49,
@@ -150,7 +182,7 @@ GameEvent *MusicalEvent_Create(GameSystem *gsys, GameData *gameData, u8 slot, BO
                                       MusicalSave_GetProgram(work->musicalSave), HEAPID_MUSICAL_EVENT);
     }
     if (work->online == TRUE) {
-        work->state = 11;
+        work->state = MUSICAL_STATE_WAIT_PLAYERS;
         work->subState = 0;
         MusComm_SetUp(work->comm, GetGameDataPlayerInfo(work->gameData), PokeParty_GetBoxPkm(work->pkm), work->gameComm,
                       work->ov210, HEAPID_GAMEEVENT);
@@ -169,7 +201,7 @@ GameEvent *MusicalEvent_Create(GameSystem *gsys, GameData *gameData, u8 slot, BO
         }
         work->playerPos = work->order[0];
         work->program = MusicalProgram_Create(HEAPID_GAMEEVENT, work->ov210, shots);
-        work->state = 13;
+        work->state = MUSICAL_STATE_WARP_TO_DRESSING_ROOM;
         work->subState = 0;
     }
     return event;
@@ -180,7 +212,7 @@ static GameEventReturnCode MusicalEvent_Callback(GameEvent *event, u32 *state, v
 
     MusicalEvent_CheckNetError(work);
     switch (work->state) {
-    case 11:
+    case MUSICAL_STATE_WAIT_PLAYERS:
         if (MusComm_AreAllInfoReceived(work->commWork->comm) == TRUE) {
             u32 program = 0;
             u32 cpus = 0;
@@ -194,7 +226,7 @@ static GameEventReturnCode MusicalEvent_Callback(GameEvent *event, u32 *state, v
                 cpus = MusicalProgram_PackNpcs(work->program);
             }
             MusComm_BeginDataTiming(work->commWork->comm, program, cpus);
-            work->state = 12;
+            work->state = MUSICAL_STATE_WAIT_PROGRAM;
             rivals = getHollow_RivalData(work->save);
             for (i = 0; i < 4; i++) {
                 if (MusComm_GetSelfPos(work->commWork->comm) != MusComm_GetPlayerPos(work->commWork->comm, i)) {
@@ -206,155 +238,155 @@ static GameEventReturnCode MusicalEvent_Callback(GameEvent *event, u32 *state, v
                 }
             }
         } else if (work->error == TRUE) {
-            work->state = 23;
+            work->state = MUSICAL_STATE_ERROR;
         }
         break;
-    case 12:
+    case MUSICAL_STATE_WAIT_PROGRAM:
         if (MusComm_IsProgramReceived(work->commWork->comm) == TRUE) {
             u8 i;
 
-            work->state = 13;
+            work->state = MUSICAL_STATE_WARP_TO_DRESSING_ROOM;
             for (i = 0; i < 4; i++) {
                 work->order[i] = MusComm_GetPlayerPos(work->commWork->comm, i);
             }
             work->playerPos = MusComm_GetSelfPos(work->commWork->comm);
             MusicalEvent_SetReceivedProgram(work);
         } else if (work->error == TRUE) {
-            work->state = 23;
+            work->state = MUSICAL_STATE_ERROR;
         }
         break;
-    case 13:
+    case MUSICAL_STATE_WARP_TO_DRESSING_ROOM:
         MusicalEvent_WarpToDressingRoom(event, work);
-        work->state = 14;
+        work->state = MUSICAL_STATE_DRESSING_ROOM_SCRIPT;
         break;
-    case 14:
+    case MUSICAL_STATE_DRESSING_ROOM_SCRIPT:
         MusicalEvent_InitPoke(work);
         MusicalEvent_CallScript(event, work, 3);
-        work->state = 0;
+        work->state = MUSICAL_STATE_LEAVE_FOR_DRESS_UP;
         break;
-    case 0:
+    case MUSICAL_STATE_LEAVE_FOR_DRESS_UP:
         if (work->error == TRUE && work->subState == 0) {
-            work->state = 23;
+            work->state = MUSICAL_STATE_ERROR;
         } else if (MusicalEvent_LeaveField(event, work) == TRUE) {
             work->subState = 0;
-            work->state = 1;
+            work->state = MUSICAL_STATE_BEFORE_DRESS_UP;
         }
         break;
-    case 1:
-        work->state = 3;
+    case MUSICAL_STATE_BEFORE_DRESS_UP:
+        work->state = MUSICAL_STATE_DRESS_UP;
         break;
-    case 3:
+    case MUSICAL_STATE_DRESS_UP:
         MusicalEvent_CreateDressUpParam(work);
-        GSYS_QueueProc(work->gsys, OVERLAY_NONE, &data_ov012_0216dfc4, work->dressUp);
-        work->state = 4;
+        GSYS_QueueProc(work->gsys, OVERLAY_NONE, &MUSICAL_DRESSUP_PROC_FUNCTIONS, work->dressUp);
+        work->state = MUSICAL_STATE_WAIT_DRESS_UP;
         break;
-    case 4:
+    case MUSICAL_STATE_WAIT_DRESS_UP:
         if (GSYS_GetProcMgrState(work->gsys) == FALSE) {
             MusicalEvent_SendPoke(work);
-            work->state = 16;
+            work->state = MUSICAL_STATE_RETURN_AFTER_DRESS_UP;
         }
         break;
-    case 16:
+    case MUSICAL_STATE_RETURN_AFTER_DRESS_UP:
         if (MusicalEvent_ReturnToField(event, work) == TRUE) {
             work->subState = 0;
-            work->state = 17;
+            work->state = MUSICAL_STATE_STAGE_SCRIPT;
             if (work->error == TRUE) {
-                work->state = 23;
+                work->state = MUSICAL_STATE_ERROR;
             }
         }
         break;
-    case 17:
+    case MUSICAL_STATE_STAGE_SCRIPT:
         MusicalEvent_CallScript(event, work, 4);
-        work->state = 18;
+        work->state = MUSICAL_STATE_LEAVE_FOR_STAGE;
         break;
-    case 18:
+    case MUSICAL_STATE_LEAVE_FOR_STAGE:
         if (work->error == TRUE && work->subState == 0) {
-            work->state = 23;
+            work->state = MUSICAL_STATE_ERROR;
         } else if (MusicalEvent_LeaveField(event, work) == TRUE) {
             work->subState = 0;
-            work->state = 5;
+            work->state = MUSICAL_STATE_STAGE;
         }
         break;
-    case 5:
+    case MUSICAL_STATE_STAGE:
         if (work->error == TRUE) {
-            work->state = 22;
+            work->state = MUSICAL_STATE_ERROR_RETURN_TO_FIELD;
         } else {
             MusicalEvent_CreateStageParam(work);
-            GSYS_QueueProc(work->gsys, OVERLAY_NONE, &data_ov012_0216dfe8, work->stage);
-            work->state = 6;
+            GSYS_QueueProc(work->gsys, OVERLAY_NONE, &MUSICAL_STAGE_PROC_FUNCTIONS, work->stage);
+            work->state = MUSICAL_STATE_WAIT_STAGE;
         }
         break;
-    case 6:
+    case MUSICAL_STATE_WAIT_STAGE:
         if (GSYS_GetProcMgrState(work->gsys) == FALSE) {
             MusicalEvent_AddLikedPropPoints(work);
-            work->state = 7;
+            work->state = MUSICAL_STATE_SHOT;
             if (work->error == TRUE) {
-                work->state = 22;
+                work->state = MUSICAL_STATE_ERROR_RETURN_TO_FIELD;
             }
         }
         break;
-    case 7:
+    case MUSICAL_STATE_SHOT:
         MusicalEvent_TakeShot(work);
         GSYS_QueueProc(work->gsys, OVERLAY_ID(209), &MUSICAL_SHOT_PROC_FUNCTIONS, work->shot);
-        work->state = 8;
+        work->state = MUSICAL_STATE_WAIT_SHOT;
         break;
-    case 8:
+    case MUSICAL_STATE_WAIT_SHOT:
         if (GSYS_GetProcMgrState(work->gsys) == FALSE) {
-            work->state = 19;
+            work->state = MUSICAL_STATE_RETURN_AFTER_SHOT;
             if (work->error == TRUE) {
-                work->state = 22;
+                work->state = MUSICAL_STATE_ERROR_RETURN_TO_FIELD;
             }
         }
         break;
-    case 19:
+    case MUSICAL_STATE_RETURN_AFTER_SHOT:
         if (MusicalEvent_ReturnToField(event, work) == TRUE) {
             work->subState = 0;
-            work->state = 20;
+            work->state = MUSICAL_STATE_SHOW_END_SCRIPT;
             MusicalEvent_DrawAudienceGifts(work);
             MusicalEvent_RecordShow(work);
         }
         break;
-    case 20:
+    case MUSICAL_STATE_SHOW_END_SCRIPT:
         MusicalEvent_CallScript(event, work, 5);
-        work->state = 2;
+        work->state = MUSICAL_STATE_WARP_TO_HALL;
         break;
-    case 2:
+    case MUSICAL_STATE_WARP_TO_HALL:
         if (work->error == TRUE) {
-            work->state = 23;
+            work->state = MUSICAL_STATE_ERROR;
         } else {
             MusicalEvent_Release(work);
             MusicalEvent_WarpToHall(event, work);
-            work->state = 9;
+            work->state = MUSICAL_STATE_HALL_SCRIPT;
         }
         break;
-    case 9:
+    case MUSICAL_STATE_HALL_SCRIPT:
         MusicalEvent_CallScript(event, work, 10454);
-        work->state = 10;
+        work->state = MUSICAL_STATE_END;
         break;
-    case 10:
+    case MUSICAL_STATE_END:
         GFL_HeapDumpOnFailure(HEAPID_GAMEEVENT);
         GFL_HeapDelete(HEAPID_MUSICAL_EVENT);
         return GAMEEVENT_DONE;
-    case 22:
+    case MUSICAL_STATE_ERROR_RETURN_TO_FIELD:
         if (MusicalEvent_ReturnToField(event, work) == TRUE) {
-            work->state = 23;
+            work->state = MUSICAL_STATE_ERROR;
         }
         break;
-    case 23:
+    case MUSICAL_STATE_ERROR:
         GFL_NetErrMarkShown();
-        work->state = 24;
+        work->state = MUSICAL_STATE_ERROR_WARP_TO_HALL;
         break;
-    case 24:
+    case MUSICAL_STATE_ERROR_WARP_TO_HALL:
         MusicalEvent_Release(work);
         MusicalEvent_WarpToHall(event, work);
-        work->state = 25;
+        work->state = MUSICAL_STATE_ERROR_WAIT;
         break;
-    case 25:
-        work->state = 26;
+    case MUSICAL_STATE_ERROR_WAIT:
+        work->state = MUSICAL_STATE_ERROR_SCRIPT;
         break;
-    case 26:
+    case MUSICAL_STATE_ERROR_SCRIPT:
         MusicalEvent_CallScript(event, work, 10455);
-        work->state = 10;
+        work->state = MUSICAL_STATE_END;
         break;
     }
     return GAMEEVENT_CONTINUE;
@@ -448,7 +480,7 @@ static void MusicalEvent_AddLikedPropPoints(MusicalEventWork *work) {
             for (j = 0; j < 2; j++) {
                 slot = MusComm_GetPlayerEquip(work->comm, i, j);
                 if (slot != 0xff) {
-                    poke->unk54[slot] = TRUE;
+                    poke->likedEquips[slot] = TRUE;
                 }
             }
         }
@@ -457,7 +489,7 @@ static void MusicalEvent_AddLikedPropPoints(MusicalEventWork *work) {
     for (i = 0; i < 4; i++) {
         poke = work->stage->pokes[i];
         for (j = 0; j < 9; j++) {
-            if (poke->unk54[j] == TRUE) {
+            if (poke->likedEquips[j] == TRUE) {
                 kind = MusItemData_GetKind(items, poke->equips[j].itemId);
                 poke->points += MusicalProgram_GetPropPoints(work->program, kind);
             }
@@ -492,7 +524,7 @@ static void MusicalEvent_TakeShot(MusicalEventWork *work) {
     work->shot->comm = work->comm;
     shot = work->shot->shot;
     RTC_GetCachedDate(&date);
-    shot->unk0_0 = MusicalProgram_GetBaseProgramId(work->program);
+    shot->programId = MusicalProgram_GetBaseProgramId(work->program);
     shot->year = date.year;
     shot->month = date.month;
     shot->day = date.day;
@@ -546,7 +578,7 @@ static void MusicalEvent_TakeShot(MusicalEventWork *work) {
             if (poke->equips[j].itemId != 0xff) {
                 slot = poke->equips[j].slot;
                 shot->pokes[pos].equips[slot].itemId = poke->equips[j].itemId;
-                shot->pokes[pos].equips[slot].rotation = poke->equips[j].unk2;
+                shot->pokes[pos].equips[slot].rotation = poke->equips[j].rotation;
                 shot->pokes[pos].equips[slot].pos = j;
             }
         }
@@ -659,7 +691,7 @@ static void MusicalEvent_DrawAudienceGifts(MusicalEventWork *work) {
         }
     }
     for (i = 0; i < 10; i++) {
-        if (data_ov012_0216ae08[i] <= total) {
+        if (sGiftCountPoints[i] <= total) {
             count = 10 - i;
             break;
         }
@@ -668,7 +700,7 @@ static void MusicalEvent_DrawAudienceGifts(MusicalEventWork *work) {
     if (program < 7) {
         numProps = 0;
         for (i = 0; i < 40; i++) {
-            prop = data_ov012_0216ae1c[program][i];
+            prop = sProgramGiftProps[program][i];
             if (MusicalSave_HasProp(work->musicalSave, prop) == FALSE) {
                 props[numProps] = prop;
                 numProps++;
@@ -760,23 +792,23 @@ static BOOL MusicalEvent_LeaveField(GameEvent *event, MusicalEventWork *work) {
 // Warps to the dressing room, to the player's place in it
 static void MusicalEvent_WarpToDressingRoom(GameEvent *event, MusicalEventWork *work) {
     Field *field = GSYS_GetField(work->gsys);
-    VecFx32 pos = data_ov012_0216adf0;
+    VecFx32 pos = sDressingRoomPos;
 
     pos.x += work->playerPos * FX32_CONST(32);
-    GameEvent_ChainNext(event, EventMapChange_CreateGridDefault(work->gsys, field, 78, &pos, 0));
+    GameEvent_ChainNext(event, EventMapChange_CreateGridDefault(work->gsys, field, ZONE_MUSICAL_THEATER_2, &pos, 0));
 }
 
 // Warps back to the musical hall
 static void MusicalEvent_WarpToHall(GameEvent *event, MusicalEventWork *work) {
     Field *field = GSYS_GetField(work->gsys);
-    VecFx32 pos = data_ov012_0216ade4;
-    VecFx32 onlinePos = data_ov012_0216adfc;
+    VecFx32 pos = sHallPos;
+    VecFx32 onlinePos = sHallOnlinePos;
     GameEvent *next;
 
     if (work->online == TRUE) {
-        next = EventMapChange_CreateGridDefault(work->gsys, field, 77, &onlinePos, 1);
+        next = EventMapChange_CreateGridDefault(work->gsys, field, ZONE_MUSICAL_THEATER, &onlinePos, 1);
     } else {
-        next = EventMapChange_CreateGridDefault(work->gsys, field, 77, &pos, 1);
+        next = EventMapChange_CreateGridDefault(work->gsys, field, ZONE_MUSICAL_THEATER, &pos, 1);
     }
     GameEvent_ChainNext(event, next);
 }
@@ -899,11 +931,11 @@ u8 MusicalEvent_GetBestPropKind(MusicalEventWork *work, u8 pos) {
     poke = work->stage->pokes[pos];
 
     while (i < 4) {
-        if (max < poke->unk4C[i]) {
+        if (max < poke->kindPoints[i]) {
             tie = FALSE;
             best = i;
-            max = poke->unk4C[i];
-        } else if (max == poke->unk4C[i]) {
+            max = poke->kindPoints[i];
+        } else if (max == poke->kindPoints[i]) {
             tie = TRUE;
         }
         i++;
@@ -988,8 +1020,8 @@ void MusicalEvent_WordSetPokeName(MusicalEventWork *work, u8 pos, WordSet *wordS
 }
 
 static void MusicalEvent_SetReceivedProgram(MusicalEventWork *work) {
-    u32 program = MusComm_GetUnk144(work->comm);
-    u32 cpus = MusComm_GetUnk148(work->comm);
+    u32 program = MusComm_GetProgramPoints(work->comm);
+    u32 cpus = MusComm_GetProgramNpcs(work->comm);
 
     if (work->program == NULL) {
         work->program = MusicalProgram_Create(HEAPID_GAMEEVENT, work->ov210, 0);

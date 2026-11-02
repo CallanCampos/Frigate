@@ -1,0 +1,19 @@
+{
+    "$schema": "event.schema.json",
+    "pitch": 7498,
+    "yaw": 32768,
+    "distance": 1994752,
+    "target": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+    },
+    "animate": {
+        "extra_translation": false,
+        "pitch": true,
+        "yaw": true,
+        "distance": true,
+        "fov": false,
+        "target": false
+    }
+}

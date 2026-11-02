@@ -163,50 +163,60 @@ u32 getNameGenderStatus(PartyPkm *pkm) {
     u32 species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
     u32 sex = PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL);
     if (species == SPECIES_NIDORAN_M || species == SPECIES_NIDORAN_F) {
-        if (PokeParty_GetParam(pkm, 0x75, NULL) == 0) {
+        if (PokeParty_GetParam(pkm, PKM_PARAM_IS_NICKNAMED, NULL) == 0) {
             return 0;
         }
     }
     switch (sex) {
-    case 2:
+    case GENDER_UNKNOWN:
     default:
         return 0;
-    case 0:
+    case GENDER_MALE:
         return 1;
-    case 1:
+    case GENDER_FEMALE:
         return 2;
     }
 }
+
+// The steps of the Day Care's choice of a party Pokémon: the field closes for the party list, and opens again
+enum {
+    DAY_CARE_SELECT_STEP_FADE_OUT,
+    DAY_CARE_SELECT_STEP_CLOSE_FIELD,
+    DAY_CARE_SELECT_STEP_POKE_LIST,
+    DAY_CARE_SELECT_STEP_OPEN_FIELD,
+    DAY_CARE_SELECT_STEP_FADE_IN,
+    DAY_CARE_SELECT_STEP_END,
+};
 
 GameEventReturnCode EventDayCarePokeSelect_Callback(GameEvent *event, u32 *state, void *data) {
     DayCarePokeSelectWork *work = data;
     GameSystem *gsys = work->gsys;
 
     switch (*state) {
-    case 0:
+    case DAY_CARE_SELECT_STEP_FADE_OUT:
         GameEvent_ChainNext(
             event, CallFieldMapEntranceOutTransitionDefault(gsys, work->field, FIELD_TRANSITION_FADE_BLACK, 0));
-        *state = 1;
+        *state = DAY_CARE_SELECT_STEP_CLOSE_FIELD;
         break;
-    case 1:
+    case DAY_CARE_SELECT_STEP_CLOSE_FIELD:
         GameEvent_ChainNext(event, CreateFieldCloseEvent(gsys, work->field));
         work->partyParam->index = work->summaryParam->partyIndex;
-        *state = 2;
+        *state = DAY_CARE_SELECT_STEP_POKE_LIST;
         break;
-    case 2:
+    case DAY_CARE_SELECT_STEP_POKE_LIST:
         GameEvent_ChainNext(event, EventPokeList_Create(gsys, work->field, work->partyParam, work->summaryParam));
-        *state = 3;
+        *state = DAY_CARE_SELECT_STEP_OPEN_FIELD;
         break;
-    case 3:
+    case DAY_CARE_SELECT_STEP_OPEN_FIELD:
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
-        *state = 4;
+        *state = DAY_CARE_SELECT_STEP_FADE_IN;
         break;
-    case 4:
+    case DAY_CARE_SELECT_STEP_FADE_IN:
         GameEvent_ChainNext(
             event, CallFieldMapEntranceInTransition(gsys, work->field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
-        *state = 5;
+        *state = DAY_CARE_SELECT_STEP_END;
         break;
-    case 5:
+    case DAY_CARE_SELECT_STEP_END:
         *work->result = work->partyParam->index;
         GFL_HeapFree(work->partyParam);
         GFL_HeapFree(work->summaryParam);

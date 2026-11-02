@@ -209,11 +209,11 @@ u32 BeaconDetailSub_Input(BeaconDetailWork *work) {
     u32 keys = GCTX_HIDGetPressedKeys();
 
     if (GSYS_IsLowBatteryCGearOff(work->param->gsys)) {
-        work->param->unk0A = TRUE;
+        work->param->lowBatteryExit = TRUE;
         return BEACON_DETAIL_SEQ_FADE_OUT;
     }
     if (touched == TOUCHBAR_ICON_RETURN) {
-        work->param->unk0A = FALSE;
+        work->param->lowBatteryExit = FALSE;
         return BEACON_DETAIL_SEQ_FADE_OUT;
     }
     if (touched == TOUCHBAR_ICON_UP && work->index != 0) {

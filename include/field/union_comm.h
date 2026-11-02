@@ -48,7 +48,7 @@ typedef struct {
     u8 state : 3;
     u8 gender : 1;
     u8 valid : 1;
-    u8 unk07_5 : 3;
+    u8 wantedKind : 3; // UNION_WANT_*
     u8 version;
     u8 language;
     u8 unk0A;
@@ -128,8 +128,8 @@ struct UnionGroup {
 // This machine's state, which its beacon is built from
 typedef struct {
     u8 activity;
-    u8 step; // 0x2a when idle; the beacon sends it
-    u8 unk02;
+    u8 step;       // 0x2a when idle; the beacon sends it
+    u8 wantedKind; // UNION_WANT_*: picked on the touch screen, which marks the players who want the same
     u16 look[4];
     u16 counter;
     u8 changed;
@@ -147,6 +147,17 @@ typedef struct {
     u8 seq;
     u8 mac78[6]; // the player to show the focus effect on
 } UnionSelf;
+
+// What the player wants to do, picked with an icon of the touch screen. UnionEff_GetKindStep gives a beacon's activity
+// in the same values
+enum {
+    UNION_WANT_NONE,
+    UNION_WANT_BATTLE,
+    UNION_WANT_TRADE,
+    UNION_WANT_3,
+    UNION_WANT_DRAW,
+    UNION_WANT_SPIN_TRADE,
+};
 
 // A step of the system, run by overlay 34
 typedef BOOL (*UnionSituFunc)(UnionSystem *unisys, UnionSelf *situ, Field *field, u8 *seq);
@@ -230,7 +241,7 @@ struct UnionSystem {
     u8 entryReply;      // 1 when this machine's entry request was accepted, 2 when refused
     u8 entryAcceptedTo; // a bit per net ID
     u8 entryRepliedTo;
-    u8 unk282E;
+    u8 greetingRequested; // the touch screen's first icon was touched: starts UNION_STEP_GREETING
     u8 unk282F;
     UnionSelf situ; // the ROM's name for it
     UnionBeacon beacon;

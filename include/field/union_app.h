@@ -12,6 +12,8 @@
 // union_comm.c) drives it and handles its commands. No names here are swan's
 
 #define UNION_APP_MEMBER_MAX 5
+// In current and currentPending: no member is being handled, or no turn is left to send
+#define UNION_APP_NET_ID_NONE 0xff
 
 // Whether others can still enter, set by UnionApp_CloseEntry, UnionApp_OpenEntry and UnionApp_LimitEntry
 enum {
@@ -58,9 +60,11 @@ struct UnionApp {
     u8 hasProfile;
     // Those waiting for their turn to be handled at 0x10
     u8 queued;
+    // The net ID whose turn it is, and the same until it has been told
     u8 current;
     u8 currentPending;
-    u8 unk12;
+    // A child: the parent has told it that its turn has come
+    u8 turnReceived;
     u8 unk13;
     u32 unk14;
     u8 unk18[8];

@@ -1,6 +1,6 @@
-// The battle view's 2D cell actors: up to three OBJ actors the effects load, move, scale and fade, and in mode 1 a
-// turn gauge with a popup that shows a message. The name is the ROM's string, from GFL_HeapAllocate's asserts. The
-// names are ours; swan has none for this file
+// The battle view's 2D cell actors: up to three OBJ actors the effects load, move, scale and fade, and while a movie is
+// filmed a turn gauge with a popup that shows a message. The name is the ROM's string, from GFL_HeapAllocate's asserts.
+// The names are ours; swan has none for this file
 
 #include "battle/btlv_clact.h"
 #include "types.h"
@@ -8,6 +8,7 @@
 #include "battle/btl_string.h"
 #include "battle/btlv_effect.h"
 #include "constants/arc.h"
+#include "constants/battle.h"
 #include "gfl/arc.h"
 #include "gfl/bmp.h"
 #include "gfl/clact.h"
@@ -37,7 +38,7 @@ struct BtlvClact {
     BtlvClactEntry popup[2]; // 0x198  the popup and the message drawn into the gauge's characters
     u32 moveFlags;           // 0x1b8  bit n: entries[n] moves, bit 31: the popup shows
     u32 scaleFlags;          // 0x1bc  bit n: entries[n] scales
-    u32 mode;                // 0x1c0  GetStudioMode's value. 1: the gauge, 2: no effect actors
+    u32 studioMode;          // 0x1c0  BTL_STUDIO_MODE_*: a film has the gauge, a playback no effect actors
     HeapID heapId;           // 0x1c4
 };
 
@@ -64,16 +65,16 @@ static void BtlvClact_PopupTask(TCB *tcb, void *data);
 static void BtlvClact_StartPopupTask(BtlvClact *wk, int number);
 static void BtlvClact_PrintPopupMessage(BtlvClact *wk, int number, Font *font);
 
-static const ClActorSetup data_ov168_021f3594 = { 16, 16, 0, 0, 0 };
-static const ClActorSetupEx data_ov168_021f359c = { { 0, 0, 0, 0, 1 }, { 0, 0 }, FX32_ONE, FX32_ONE, 0, 1 };
-static const ClActorSetupEx data_ov168_021f35b4 = { { 0, 0, 0, 0, 0 }, { 0, 0 }, FX32_ONE, FX32_ONE, 0, 0 };
+static const ClActorSetup GAUGE_ACTOR_SETUP = { 16, 16, 0, 0, 0 };
+static const ClActorSetupEx EFFECT_ACTOR_SETUP = { { 0, 0, 0, 0, 1 }, { 0, 0 }, FX32_ONE, FX32_ONE, 0, 1 };
+static const ClActorSetupEx POPUP_ACTOR_SETUP = { { 0, 0, 0, 0, 0 }, { 0, 0 }, FX32_ONE, FX32_ONE, 0, 0 };
 
-BtlvClact *BtlvClact_Create(TCBManager *tcbManager, HeapID heapId, u32 mode) {
+BtlvClact *BtlvClact_Create(TCBManager *tcbManager, HeapID heapId, u32 studioMode) {
     BtlvClact *wk = GFL_HeapAllocate(heapId, sizeof(BtlvClact), TRUE, "btlv_clact.c", 0x56);
 
     wk->tcbManager = tcbManager;
     wk->heapId = heapId;
-    wk->mode = mode;
+    wk->studioMode = studioMode;
     wk->unit = ClActUnit_Create(25, 0, heapId);
     BtlvClact_InitGauge(wk);
     return wk;
@@ -102,12 +103,12 @@ int BtlvClact_AddActor(BtlvClact *wk, u32 arcId, u32 fileId, s16 x, s16 y, fx32 
 
 int BtlvClact_AddActorEx(BtlvClact *wk, u32 arcId, u32 charFileId, u32 plttFileId, u32 cellFileId, u32 animFileId,
                          s16 x, s16 y, fx32 scaleX, fx32 scaleY) {
-    ClActorSetupEx setup = data_ov168_021f359c;
+    ClActorSetupEx setup = EFFECT_ACTOR_SETUP;
     ArcTool *arc;
     PaletteFade *fade;
     int i;
 
-    if (wk->mode == 2) {
+    if (wk->studioMode == BTL_STUDIO_MODE_PLAYBACK) {
         return 0;
     }
 
@@ -140,13 +141,13 @@ int BtlvClact_AddActorEx(BtlvClact *wk, u32 arcId, u32 charFileId, u32 plttFileI
 }
 
 static void BtlvClact_InitGauge(BtlvClact *wk) {
-    ClActorSetup setup = data_ov168_021f3594;
-    ClActorSetupEx setupEx = data_ov168_021f35b4;
+    ClActorSetup setup = GAUGE_ACTOR_SETUP;
+    ClActorSetupEx setupEx = POPUP_ACTOR_SETUP;
     ArcTool *arc;
     PaletteFade *fade;
     int i;
 
-    if (wk->mode != 1) {
+    if (wk->studioMode != BTL_STUDIO_MODE_FILM) {
         return;
     }
 
@@ -230,7 +231,7 @@ void BtlvClact_DeleteActor(BtlvClact *wk, int index) {
 static void BtlvClact_ExitGauge(BtlvClact *wk) {
     int i;
 
-    if (wk->mode == 1) {
+    if (wk->studioMode == BTL_STUDIO_MODE_FILM) {
         for (i = 0; i < 2; i++) {
             ClActor_Delete(wk->popup[i].actor);
             wk->popup[i].actor = NULL;
@@ -334,15 +335,15 @@ static void BtlvClact_AddMoveTask(BtlvClact *wk, int index, int type, VecFx32 *s
     task->move.end.z = end->z;
 
     switch (type) {
-    case 0:
+    case BTLV_EFFTOOL_MOVE_JUMP:
         break;
-    case 1:
+    case BTLV_EFFTOOL_MOVE_STEP:
         BtlvEffTool_CalcStepVec(&task->move.start, end, &task->move.step, FX32_CONST(frames));
         break;
-    case 3:
+    case BTLV_EFFTOOL_MOVE_SHAKE:
         task->move.stepTimeReset *= 2;
         task->move.count *= 2;
-    case 2:
+    case BTLV_EFFTOOL_MOVE_SWING:
         task->move.step.x = FX_Div(end->x, FX32_CONST(frames));
         task->move.step.y = FX_Div(end->y, FX32_CONST(frames));
         task->move.step.z = FX_Div(end->z, FX32_CONST(frames));

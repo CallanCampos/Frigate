@@ -81,7 +81,7 @@ struct FieldActor {
     u16 param2;
     u16 nextAcmd;
     u16 acmdState;
-    u16 unk2A;
+    u16 drawStatus;
     s16 areaW;
     s16 areaH;
     GPosXYZ defaultGPos;
@@ -91,8 +91,8 @@ struct FieldActor {
     s16 unk42;
     VecFx32 wPos;
     VecFx32 wPosOffset;
-    VecFx32 unk5C;
-    VecFx32 unk68;
+    VecFx32 outerDrawOffset;
+    VecFx32 attrDrawOffset;
     u32 currentTileUnder;
     u32 currentTileUnderOrigY;
     u8 collisionWidth;
@@ -108,8 +108,8 @@ struct FieldActor {
     const FieldActorSceneNodeVTable *sceneNodeVTable;
     ActorPositionRail defaultRailPos;
     u32 unkA0;
-    u8 unkA4[0x10];
-    u8 unkB4[0x10];
+    u8 moveSubProcWork[0x10];
+    u8 moveCmdWork[0x10];
     u8 billboardActorWork[0x20];
     FieldActorConfig config;
 };
@@ -120,9 +120,11 @@ struct MMSys {
     s16 actorCount;
     HeapID heapId;
     HeapID fieldHeapId;
-    u16 unkC;
+    // The priority of the actors' tasks
+    u16 taskPriority;
     u16 unkE;
-    u32 unk10;
+    // The lights of the reflections' billboard actors: 1, or 8 in the Infinity dungeon
+    u32 reflectLights;
     ArcTool *dataArc;
     ArcTool *actorConfigArc;
     FieldActor *actorHeap;

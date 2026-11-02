@@ -21,6 +21,13 @@
 // How long a new balloon bounces in, in frames
 #define CTVT_GAME_BALLOON_BOUNCE_FRAMES 60
 
+// The swings of a wobble: one way, the other way past the middle, then back to the middle
+enum {
+    WOBBLE_FORWARD,
+    WOBBLE_BACKWARD,
+    WOBBLE_SETTLE,
+};
+
 // Where the others' balloons are, by the order of their members
 static const VecFx32 sBalloonPositions[] = {
     { 0, FX32_CONST(2), FX32_CONST(-20) },
@@ -50,7 +57,7 @@ CtvtGameBalloon *CtvtGameBalloon_Create(CtvtGame *game, u16 netId, u8 pos, BOOL 
     balloon->alpha = CTVT_GAME_ALPHA_MAX;
     balloon->popping = FALSE;
     balloon->wobbleAngle = 0;
-    balloon->wobblePhase = 0;
+    balloon->wobblePhase = WOBBLE_FORWARD;
     balloon->wobbling = FALSE;
     if (netId == selfNetId) {
         MTX_Identity33_(&balloon->srt.rotation);
@@ -114,23 +121,23 @@ void CtvtGameBalloon_Update(CtvtGameBalloon *balloon) {
             }
             if (balloon->wobbling == TRUE) {
                 switch (balloon->wobblePhase) {
-                case 0:
+                case WOBBLE_FORWARD:
                     balloon->wobbleAngle += 0x100;
                     if (balloon->wobbleAngle >= 0xc00) {
-                        balloon->wobblePhase = 1;
+                        balloon->wobblePhase = WOBBLE_BACKWARD;
                     }
                     break;
-                case 1:
+                case WOBBLE_BACKWARD:
                     balloon->wobbleAngle -= 0x100;
                     if (balloon->wobbleAngle <= -0xc00) {
-                        balloon->wobblePhase = 2;
+                        balloon->wobblePhase = WOBBLE_SETTLE;
                     }
                     break;
-                case 2:
+                case WOBBLE_SETTLE:
                     balloon->wobbleAngle += 0x80;
                     if (balloon->wobbleAngle >= 0) {
                         balloon->wobbleAngle = 0;
-                        balloon->wobblePhase = 0;
+                        balloon->wobblePhase = WOBBLE_FORWARD;
                         balloon->wobbling = FALSE;
                     }
                     break;
@@ -179,23 +186,23 @@ void CtvtGameBalloon_Update(CtvtGameBalloon *balloon) {
             }
         } else if (balloon->wobbling == TRUE) {
             switch (balloon->wobblePhase) {
-            case 0:
+            case WOBBLE_FORWARD:
                 balloon->wobbleAngle += 0xa0;
                 if (balloon->wobbleAngle >= 0x400) {
-                    balloon->wobblePhase = 1;
+                    balloon->wobblePhase = WOBBLE_BACKWARD;
                 }
                 break;
-            case 1:
+            case WOBBLE_BACKWARD:
                 balloon->wobbleAngle -= 0x50;
                 if (balloon->wobbleAngle <= -0x400) {
-                    balloon->wobblePhase = 2;
+                    balloon->wobblePhase = WOBBLE_SETTLE;
                 }
                 break;
-            case 2:
+            case WOBBLE_SETTLE:
                 balloon->wobbleAngle += 0x40;
                 if (balloon->wobbleAngle >= 0) {
                     balloon->wobbleAngle = 0;
-                    balloon->wobblePhase = 0;
+                    balloon->wobblePhase = WOBBLE_FORWARD;
                     balloon->wobbling = FALSE;
                 }
                 break;

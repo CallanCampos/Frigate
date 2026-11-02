@@ -62,7 +62,7 @@ static void PoketradeNego_StepQuitMenuChoice(PokemonTradeWork *wk);
 static void PoketradeNego_StepOpenQuitMenu(PokemonTradeWork *wk);
 static void PoketradeNego_StepWaitSync25(PokemonTradeWork *wk);
 static void PoketradeNego_StepSendSync25(PokemonTradeWork *wk);
-static void func_ov194_021bc938(PokemonTradeWork *wk);
+static void PoketradeNego_StepWaitKeyAfterReplies(PokemonTradeWork *wk);
 static void PoketradeNego_StepResolveReplies(PokemonTradeWork *wk);
 static void PoketradeNego_StepSendReply(PokemonTradeWork *wk);
 static void PoketradeNego_StepWaitReplySync(PokemonTradeWork *wk);
@@ -103,7 +103,7 @@ static void PoketradeNego_StepWipeToBrowse(PokemonTradeWork *wk);
 static void PoketradeNego_StepSendReady(PokemonTradeWork *wk);
 static void PoketradeNego_StepWaitReadySync(PokemonTradeWork *wk);
 static void PoketradeNego_StepSendCheckResult(PokemonTradeWork *wk);
-static void PoketradeNego_AbortHttpRequest(void *work, int a1, int code, int error);
+static void PoketradeNego_AbortHttpRequest(void *work, int code, int type, int error);
 static void PoketradeNego_StepPollMonCheck(PokemonTradeWork *wk);
 static void PoketradeNego_StepStartMonCheck(PokemonTradeWork *wk);
 static void PoketradeNego_StepRetryMonCheck(PokemonTradeWork *wk);
@@ -152,7 +152,7 @@ BOOL PokemonTrade_CanTradeMon(PokemonTradeWork *wk, BoxPkm *pkm) {
     BOOL found;
     u32 i = 0;
     species = PML_PkmGetParam(pkm, PKM_PARAM_SPECIES, NULL);
-    if (wk->type == 3) {
+    if (wk->type == TRADE_TYPE_GTSNEGO) {
         wasEncrypted = PML_PkmDecrypt(pkm);
         for (; i < NELEMS(sBlockedFields); i++) {
             found = PML_PkmGetParam(pkm, sBlockedFields[i], NULL);
@@ -226,7 +226,7 @@ static int PoketradeNego_CountOwnOffers(PokemonTradeWork *wk) {
 }
 
 BOOL PoketradeNego_CheckCancelTouch(PokemonTradeWork *wk) {
-    if (wk->type == 3) {
+    if (wk->type == TRADE_TYPE_GTSNEGO) {
         if (wk->menuWin == NULL) {
             PoketradeSave_OpenTaskMenuWindow(wk, 155);
         }
@@ -239,9 +239,9 @@ BOOL PoketradeNego_CheckCancelTouch(PokemonTradeWork *wk) {
     return FALSE;
 }
 
-void PoketradeNego_CloseCancelMenu(PokemonTradeWork *wk, u32 a1, u32 a2) {
-    if (wk->type == 3) {
-        PoketradeSave_CloseTaskMenuWindow(wk, a1, a2);
+void PoketradeNego_CloseCancelMenu(PokemonTradeWork *wk, u32 showActor, u32 showButton) {
+    if (wk->type == TRADE_TYPE_GTSNEGO) {
+        PoketradeSave_CloseTaskMenuWindow(wk, showActor, showButton);
     }
 }
 
@@ -398,28 +398,28 @@ void PoketradeNego_DrawPlayerNames(PokemonTradeWork *wk) {
     infos[0] = wk->myInfo;
     infos[1] = wk->partnerInfo;
     GFL_BGSysLoadNCLRDefault(getUINarcIdx(), 31, 0, 0x1a0, 0x20, wk->heapId);
-    if (wk->unk5D4 != NULL) {
-        BmpWin_Free(wk->unk5D4);
-        BmpWin_Free(wk->unk5D8);
+    if (wk->headerWindow != NULL) {
+        BmpWin_Free(wk->headerWindow);
+        BmpWin_Free(wk->nameWindow);
     }
     window = BmpWin_CreateDynamic(3, 0, 0, 32, 2, 13, FALSE);
-    wk->unk5D4 = window;
+    wk->headerWindow = window;
     GFL_TextRndUpdateColorIndexLUT(14, 15, 0);
-    if (wk->type == 3 && wk->unk1050[0] != -1) {
+    if (wk->type == TRADE_TYPE_GTSNEGO && wk->wantedLevel[0] != -1) {
         GFL_MsgDataLoadStrbuf(wk->msgData, 134, wk->drawStr);
         GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(window), 8, 2, wk->drawStr, wk->font);
-        GFL_MsgDataLoadStrbuf(wk->msgData, wk->unk1050[0] + 124, wk->drawStr);
+        GFL_MsgDataLoadStrbuf(wk->msgData, wk->wantedLevel[0] + 124, wk->drawStr);
         GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(window), 136, 2, wk->drawStr, wk->font);
     }
     BmpWin_FlushChar(window);
     BmpWin_FlushMap(window);
     window = BmpWin_CreateDynamic(3, 0, 3, 32, 8, 5, FALSE);
-    wk->unk5D8 = window;
+    wk->nameWindow = window;
     for (i = 0; i < 2; i++) {
         if (infos[i] != NULL) {
             int x;
             int msg;
-            if (wk->type == 3 && wk->unk1048[i] != -1) {
+            if (wk->type == TRADE_TYPE_GTSNEGO && wk->wantedKind[i] != -1) {
                 msg = 118;
             } else {
                 msg = 129;
@@ -430,9 +430,9 @@ void PoketradeNego_DrawPlayerNames(PokemonTradeWork *wk) {
             GFL_WordSetFormatStrbuf(wk->wordSet, wk->drawStr, wk->drawTemplate);
             x = xs[i] * 8;
             GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(window), x, 2, wk->drawStr, wk->font);
-            if (wk->type == 3 && wk->unk1048[i] != -1) {
+            if (wk->type == TRADE_TYPE_GTSNEGO && wk->wantedKind[i] != -1) {
                 GFL_TextRndUpdateColorIndexLUT(3, 4, 0);
-                GFL_MsgDataLoadStrbuf(wk->msgData, wk->unk1048[i] + 119, wk->drawStr);
+                GFL_MsgDataLoadStrbuf(wk->msgData, wk->wantedKind[i] + 119, wk->drawStr);
                 GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(window), x + 4, 34, wk->drawStr, wk->font);
             }
         }
@@ -445,12 +445,13 @@ void PoketradeNego_DrawPlayerNames(PokemonTradeWork *wk) {
 void PoketradeNego_DrawOfferStatusLabel(PokemonTradeWork *wk, int side, u32 msg, BOOL force) {
     u32 xs[] = { 2, 19 };
     BmpWin *window;
-    if (force || (wk->unk11E8[side] != 3 && wk->unk11EA && PokemonTrade_IsNegoType(wk))) {
-        if (wk->unk5BC[side] != NULL) {
-            BmpWin_Free(wk->unk5BC[side]);
+    if (force ||
+        (wk->statusLabels[side] != TRADE_STATUS_DRAWN && wk->showStatusLabels && PokemonTrade_IsNegoType(wk))) {
+        if (wk->sideWindows[side] != NULL) {
+            BmpWin_Free(wk->sideWindows[side]);
         }
-        wk->unk5BC[side] = BmpWin_CreateDynamic(3, xs[side], 16, 12, 2, 5, FALSE);
-        window = wk->unk5BC[side];
+        wk->sideWindows[side] = BmpWin_CreateDynamic(3, xs[side], 16, 12, 2, 5, FALSE);
+        window = wk->sideWindows[side];
         GFL_TextRndUpdateColorIndexLUT(5, 6, 0);
         msg += 115;
         GFL_MsgDataLoadStrbuf(wk->msgData, msg, wk->drawStr);
@@ -458,30 +459,30 @@ void PoketradeNego_DrawOfferStatusLabel(PokemonTradeWork *wk, int side, u32 msg,
         BmpWin_FlushChar(window);
         BmpWin_FlushMap(window);
         GFL_BGSysQueueScrLoad(3);
-        wk->unk11E8[side] = 3;
+        wk->statusLabels[side] = TRADE_STATUS_DRAWN;
     }
 }
 
 void PoketradeNego_DeleteHeaderWindows(PokemonTradeWork *wk) {
-    if (wk->unk5BC[0] != NULL) {
-        BmpWin_ClearScreen(wk->unk5BC[0]);
-        BmpWin_Free(wk->unk5BC[0]);
-        wk->unk5BC[0] = NULL;
+    if (wk->sideWindows[0] != NULL) {
+        BmpWin_ClearScreen(wk->sideWindows[0]);
+        BmpWin_Free(wk->sideWindows[0]);
+        wk->sideWindows[0] = NULL;
     }
-    if (wk->unk5BC[1] != NULL) {
-        BmpWin_ClearScreen(wk->unk5BC[1]);
-        BmpWin_Free(wk->unk5BC[1]);
-        wk->unk5BC[1] = NULL;
+    if (wk->sideWindows[1] != NULL) {
+        BmpWin_ClearScreen(wk->sideWindows[1]);
+        BmpWin_Free(wk->sideWindows[1]);
+        wk->sideWindows[1] = NULL;
     }
-    if (wk->unk5D4 != NULL) {
-        BmpWin_ClearScreen(wk->unk5D4);
-        BmpWin_Free(wk->unk5D4);
-        wk->unk5D4 = NULL;
+    if (wk->headerWindow != NULL) {
+        BmpWin_ClearScreen(wk->headerWindow);
+        BmpWin_Free(wk->headerWindow);
+        wk->headerWindow = NULL;
     }
-    if (wk->unk5D8 != NULL) {
-        BmpWin_ClearScreen(wk->unk5D8);
-        BmpWin_Free(wk->unk5D8);
-        wk->unk5D8 = NULL;
+    if (wk->nameWindow != NULL) {
+        BmpWin_ClearScreen(wk->nameWindow);
+        BmpWin_Free(wk->nameWindow);
+        wk->nameWindow = NULL;
     }
     GFL_BGSysQueueScrLoad(3);
 }
@@ -535,7 +536,8 @@ static void PoketradeNego_StepSendSync25(PokemonTradeWork *wk) {
     }
 }
 
-static void func_ov194_021bc938(PokemonTradeWork *wk) {
+// After the message of why the trade can't go on, waits for a key or the screen before waiting for the other player
+static void PoketradeNego_StepWaitKeyAfterReplies(PokemonTradeWork *wk) {
     NetHandle_GetOwn();
     if (PoketradeSave_IsMessagePrintDone(wk) && (PokemonTrade_GetPressedKeys() || PokemonTrade_GetTouched())) {
         GFL_MsgDataLoadStrbuf(wk->msgData, 137, wk->strbuf);
@@ -558,51 +560,51 @@ static void PoketradeNego_StepResolveReplies(PokemonTradeWork *wk) {
         return;
     }
     PoketradeNego_CloseCancelMenu(wk, 0, 0);
-    if (wk->command[myId] == 13 && wk->command[otherId] == 13) {
+    if (wk->command[myId] == TRADE_SELECT_NEGO_TRADE && wk->command[otherId] == TRADE_SELECT_NEGO_TRADE) {
         PokemonTrade_SetSyncRange(NetHandle_GetOwn(), 13, wk);
         PokemonTrade_SetState(wk, PokemonTrade_StepWaitCursorSync);
         return;
     }
     mine = wk->command[myId];
     other = wk->command[otherId];
-    if (other == 5) {
+    if (other == TRADE_SELECT_LAST_PKM) {
         msg = 97;
-    } else if (mine == 5) {
+    } else if (mine == TRADE_SELECT_LAST_PKM) {
         msg = 98;
-    } else if (other == 7) {
+    } else if (other == TRADE_SELECT_BAD_PKM) {
         msg = 99;
-    } else if (mine == 7) {
+    } else if (mine == TRADE_SELECT_BAD_PKM) {
         msg = 100;
-    } else if (other == 8) {
+    } else if (other == TRADE_SELECT_PARTNER_BAD_PKM) {
         msg = 100;
-    } else if (mine == 8) {
+    } else if (mine == TRADE_SELECT_PARTNER_BAD_PKM) {
         msg = 99;
-    } else if (other == 6) {
+    } else if (other == TRADE_SELECT_MAIL_FULL) {
         msg = 97;
-    } else if (mine == 6) {
+    } else if (mine == TRADE_SELECT_MAIL_FULL) {
         msg = 112;
-    } else if (other == 14) {
+    } else if (other == TRADE_SELECT_NEGO_CANCEL) {
         msg = 152;
-    } else if (mine == 14) {
+    } else if (mine == TRADE_SELECT_NEGO_CANCEL) {
         msg = 151;
     }
     GFL_MsgDataLoadStrbuf(wk->msgData, msg, wk->strbuf);
     PoketradeSave_OpenMessageWindowTop(wk);
-    wk->command[0] = 0;
-    wk->command[1] = 0;
-    PokemonTrade_SetState(wk, func_ov194_021bc938);
+    wk->command[0] = TRADE_SELECT_NONE;
+    wk->command[1] = TRADE_SELECT_NONE;
+    PokemonTrade_SetState(wk, PoketradeNego_StepWaitKeyAfterReplies);
 }
 
 static void PoketradeNego_StepSendReply(PokemonTradeWork *wk) {
-    u8 command = 13;
+    u8 command = TRADE_SELECT_NEGO_TRADE;
     if (PokemonTrade_IsSelfMonReady(wk)) {
-        command = 5;
+        command = TRADE_SELECT_LAST_PKM;
     } else if (PokemonTrade_IsCurrentSideMonInvalid(wk)) {
-        command = 7;
+        command = TRADE_SELECT_BAD_PKM;
     } else if (PokemonTrade_IsOtherSideMonInvalid(wk)) {
-        command = 8;
+        command = TRADE_SELECT_PARTNER_BAD_PKM;
     } else if (PokemonTrade_IsMonTradeable(wk)) {
-        command = 6;
+        command = TRADE_SELECT_MAIL_FULL;
     }
     if (GFL_NetSendCommand(NetHandle_GetOwn(), TRADE_NET_CMD_SELECT, 1, &command)) {
         PokemonTrade_SetSyncRange(NetHandle_GetOwn(), 0x1d, wk);
@@ -612,8 +614,8 @@ static void PoketradeNego_StepSendReply(PokemonTradeWork *wk) {
 
 static void PoketradeNego_StepWaitReplySync(PokemonTradeWork *wk) {
     if (!PokemonTrade_IsNetwork(wk)) {
-        wk->command[0] = 13;
-        wk->command[1] = 13;
+        wk->command[0] = TRADE_SELECT_NEGO_TRADE;
+        wk->command[1] = TRADE_SELECT_NEGO_TRADE;
         PokemonTrade_SetState(wk, PoketradeNego_StepResolveReplies);
         return;
     }
@@ -626,7 +628,7 @@ static void PoketradeNego_StepWaitReplySync(PokemonTradeWork *wk) {
 }
 
 static void PoketradeNego_StepSendCancelReply(PokemonTradeWork *wk) {
-    if (PokemonTrade_SendSelect(14)) {
+    if (PokemonTrade_SendSelect(TRADE_SELECT_NEGO_CANCEL)) {
         PokemonTrade_SetSyncRange(NetHandle_GetOwn(), 0x1d, wk);
         PokemonTrade_SetState(wk, PoketradeNego_StepResolveReplies);
     }
@@ -634,8 +636,8 @@ static void PoketradeNego_StepSendCancelReply(PokemonTradeWork *wk) {
 
 static void PoketradeNego_StepWaitCancelSync(PokemonTradeWork *wk) {
     if (!PokemonTrade_IsNetwork(wk)) {
-        wk->command[0] = 14;
-        wk->command[1] = 14;
+        wk->command[0] = TRADE_SELECT_NEGO_CANCEL;
+        wk->command[1] = TRADE_SELECT_NEGO_CANCEL;
         PokemonTrade_SetState(wk, PoketradeNego_StepResolveReplies);
         return;
     }
@@ -705,7 +707,7 @@ static void PoketradeNego_StepResolveConfirm(PokemonTradeWork *wk) {
         return;
     }
     PoketradeNego_CloseCancelMenu(wk, 0, 0);
-    if (wk->command[myId] == 11 && wk->command[otherId] == 11) {
+    if (wk->command[myId] == TRADE_SELECT_NEGO_CHOOSE && wk->command[otherId] == TRADE_SELECT_NEGO_CHOOSE) {
         GFL_MsgDataLoadStrbuf(wk->msgData, 147, wk->strbufTemplate);
         for (i = 0; i < 2; i++) {
             loadPokemonNicknameToStrbuf(wk->wordSet, i, PokemonTrade_GetPkm(wk, i));
@@ -715,18 +717,18 @@ static void PoketradeNego_StepResolveConfirm(PokemonTradeWork *wk) {
         PokemonTrade_SetState(wk, PoketradeNego_StepOpenConfirmMenu);
         return;
     }
-    if (wk->command[otherId] == 12) {
+    if (wk->command[otherId] == TRADE_SELECT_NEGO_RESELECT) {
         wk->waitTimer = 120;
         msg = 148;
-        if (wk->type == 3 && wk->checkCount >= 3) {
+        if (wk->type == TRADE_TYPE_GTSNEGO && wk->checkCount >= 3) {
             PokemonTrade_ClearNetAutoExit(wk);
             PokemonTrade_SetState(wk, PokemonTrade_FadeOutToEnd);
             return;
         }
-    } else if (wk->command[myId] == 12) {
+    } else if (wk->command[myId] == TRADE_SELECT_NEGO_RESELECT) {
         wk->waitTimer = 120;
         msg = 150;
-        if (wk->type == 3 && wk->checkCount >= 3) {
+        if (wk->type == TRADE_TYPE_GTSNEGO && wk->checkCount >= 3) {
             PokemonTrade_ClearNetAutoExit(wk);
             PokemonTrade_SetState(wk, PokemonTrade_FadeOutToEnd);
             return;
@@ -734,8 +736,8 @@ static void PoketradeNego_StepResolveConfirm(PokemonTradeWork *wk) {
     }
     GFL_MsgDataLoadStrbuf(wk->msgData, msg, wk->strbuf);
     PoketradeSave_OpenMessageWindowTop(wk);
-    wk->command[0] = 0;
-    wk->command[1] = 0;
+    wk->command[0] = TRADE_SELECT_NONE;
+    wk->command[1] = TRADE_SELECT_NONE;
     if (PokemonTrade_IsNetwork(wk)) {
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x19, 8);
     }
@@ -744,7 +746,7 @@ static void PoketradeNego_StepResolveConfirm(PokemonTradeWork *wk) {
 }
 
 static void PoketradeNego_StepSendConfirm(PokemonTradeWork *wk) {
-    if (PokemonTrade_SendSelect(11)) {
+    if (PokemonTrade_SendSelect(TRADE_SELECT_NEGO_CHOOSE)) {
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x1c, 8);
         PokemonTrade_SetState(wk, PoketradeNego_StepResolveConfirm);
     }
@@ -758,8 +760,8 @@ static void PoketradeNego_StepBeginConfirm(PokemonTradeWork *wk) {
     if (!PokemonTrade_IsNetwork(wk)) {
         PartyPkm *pkm;
         u32 size;
-        wk->command[0] = 11;
-        wk->command[1] = 11;
+        wk->command[0] = TRADE_SELECT_NEGO_CHOOSE;
+        wk->command[1] = TRADE_SELECT_NEGO_CHOOSE;
         pkm = wk->negoPkm[0][0];
         PokemonTrade_SetSideMon(wk, 1, pkm);
         size = PokeParty_GetPkmRawSize();
@@ -824,7 +826,7 @@ static void PoketradeNego_StepReturnFromSummary(PokemonTradeWork *wk) {
         GFL_ArcToolFree(arc);
         Poketrade3D_AddUnitAndInit(wk, 0);
         GFL_BGSysQueueScrLoad(3);
-        wk->unk11F3 = 0;
+        wk->inSummary = 0;
         if (PokemonTrade_IsMonValid((u8 *)PokemonTrade_GetPkm(wk, 1))) {
             PokemonTrade_SetSideMon(wk, 1, PokemonTrade_GetPkm(wk, 1));
         }
@@ -898,7 +900,7 @@ static void PoketradeNego_StepOpenSummaryFromBrowse(PokemonTradeWork *wk) {
         int slot = index % 3;
         int side = index / 3;
         PartyPkm *pkm = wk->negoPkm[1 - side][slot];
-        wk->unk11F3 = 1;
+        wk->inSummary = 1;
         if (pkm != NULL && PokeParty_GetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL)) {
             PoketradeSave_OpenSummaryScreen(wk, pkm);
             Poketrade2D_UpdateOfferIconHighlight(wk, side, slot);
@@ -944,10 +946,10 @@ static void PoketradeNego_StepOpenOfferActionMenu(PokemonTradeWork *wk) {
 }
 
 static void PoketradeNego_StepSendOfferMon(PokemonTradeWork *wk) {
-    if (wk->unk11FB_0 != 1) {
+    if (wk->awaitingMonAck != 1) {
         if (!PokemonTrade_IsNetwork(wk) ||
-            GFL_NetSendCommand(NetHandle_GetOwn(), TRADE_NET_CMD_UNK1, PokeParty_GetPkmRawSize(), wk->recvPkm[2])) {
-            wk->unk11FB_0 = 1;
+            GFL_NetSendCommand(NetHandle_GetOwn(), TRADE_NET_CMD_MON, PokeParty_GetPkmRawSize(), wk->recvPkm[2])) {
+            wk->awaitingMonAck = 1;
             PokemonTrade_SetState(wk, PoketradeNego_StepOpenOfferActionMenu);
         }
     }
@@ -958,9 +960,9 @@ static void PoketradeNego_StepSendOfferIndex(PokemonTradeWork *wk) {
         u8 inParty = PokemonTrade_GetSideValue(wk, 0);
         // BUG: The command's receiver reads one byte, but a Pokémon's size is sent from the one-byte local
 #ifdef BUGFIX
-        if (!GFL_NetSendCommand(NetHandle_GetOwn(), TRADE_NET_CMD_UNK16, sizeof(inParty), &inParty)) {
+        if (!GFL_NetSendCommand(NetHandle_GetOwn(), TRADE_NET_CMD_IN_PARTY, sizeof(inParty), &inParty)) {
 #else
-        if (!GFL_NetSendCommand(NetHandle_GetOwn(), TRADE_NET_CMD_UNK16, PokeParty_GetPkmRawSize(), &inParty)) {
+        if (!GFL_NetSendCommand(NetHandle_GetOwn(), TRADE_NET_CMD_IN_PARTY, PokeParty_GetPkmRawSize(), &inParty)) {
 #endif
             return;
         }
@@ -975,7 +977,7 @@ static BOOL PoketradeNego_TrySelectOffer(PokemonTradeWork *wk, int index) {
     if (index != -1) {
         if (wk->negoSlot[1 - side][slot] != -1) {
             PartyPkm *pkm = wk->negoPkm[1 - side][slot];
-            u32 value = wk->unkFF0[1 - side][slot];
+            u32 value = wk->negoInParty[1 - side][slot];
             if (pkm != NULL && PokeParty_GetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL)) {
                 wk->cursor = index;
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -1026,7 +1028,7 @@ static void PoketradeNego_StepWaitMessageThenWipe(PokemonTradeWork *wk) {
 }
 
 static void PoketradeNego_StepSendDeclineConfirm(PokemonTradeWork *wk) {
-    if (PokemonTrade_SendSelect(12)) {
+    if (PokemonTrade_SendSelect(TRADE_SELECT_NEGO_RESELECT)) {
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x1c, 8);
         PokemonTrade_SetState(wk, PoketradeNego_StepResolveConfirm);
     }
@@ -1170,8 +1172,8 @@ static void PoketradeNego_StepBuildBrowseScene(PokemonTradeWork *wk) {
     TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_RETURN, TRUE);
     TouchBar_SetIconActive(wk->touchBar, TOUCHBAR_ICON_RETURN, FALSE);
     PoketradeSave_DrawOfferListWindows(wk, 6);
-    wk->unk108C = 0;
-    wk->unk1084 = 1;
+    wk->bgScrollX = 0;
+    wk->bgScrollPending = 1;
     Poketrade2D_SetupCursorBg(wk);
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
     PokemonTrade_SetState(wk, PoketradeNego_StepWaitWipeBrowse);
@@ -1184,7 +1186,7 @@ static void PoketradeNego_StepWaitWipeToBrowse(PokemonTradeWork *wk) {
 }
 
 static void PoketradeNego_StepWipeToBrowse(PokemonTradeWork *wk) {
-    if (!PokemonTrade_IsNetwork(wk) || wk->unk1060 != 0) {
+    if (!PokemonTrade_IsNetwork(wk) || wk->partnerReady != 0) {
         GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
         PokemonTrade_SetState(wk, PoketradeNego_StepWaitWipeToBrowse);
     }
@@ -1194,7 +1196,7 @@ static void PoketradeNego_StepSendReady(PokemonTradeWork *wk) {
     NetHandle *handle = NetHandle_GetOwn();
     if (PokemonTrade_IsNetwork(wk)) {
         u8 data = 1;
-        if (GFL_NetSendCommand(handle, TRADE_NET_CMD_UNKA, 1, &data)) {
+        if (GFL_NetSendCommand(handle, TRADE_NET_CMD_READY, 1, &data)) {
             PokemonTrade_SetState(wk, PoketradeNego_StepWipeToBrowse);
         }
     } else {
@@ -1206,17 +1208,17 @@ static void PoketradeNego_StepWaitReadySync(PokemonTradeWork *wk) {
     if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x15, 8)) {
         int msg;
         u8 result = wk->checkResult;
-        if (result == 0 && wk->partnerCheckResult == 0) {
+        if (result == TRADE_CHECK_OK && wk->partnerCheckResult == TRADE_CHECK_OK) {
             PokemonTrade_SetState(wk, PoketradeNego_StepSendReady);
             return;
         }
-        if (result == 0xf0) {
+        if (result == TRADE_CHECK_HTTP_400) {
             msg = 159;
-        } else if (result == 0xf1) {
+        } else if (result == TRADE_CHECK_HTTP_401) {
             msg = 160;
-        } else if (result == 0xf2) {
+        } else if (result == TRADE_CHECK_HTTP_408) {
             msg = 161;
-        } else if (result == 0xff) {
+        } else if (result == TRADE_CHECK_HTTP_ERROR) {
             msg = 162;
         } else if ((wk->partnerCheckResult & 0xf0) == 0xf0) {
             msg = 162;
@@ -1235,22 +1237,22 @@ static void PoketradeNego_StepWaitReadySync(PokemonTradeWork *wk) {
 
 static void PoketradeNego_StepSendCheckResult(PokemonTradeWork *wk) {
     NetHandle *handle = NetHandle_GetOwn();
-    wk->unk109A = 0;
+    wk->checkedPkmRenamed = 0;
     if (GFL_NetSendCommand(handle, TRADE_NET_CMD_CHECK_RESULT, 1, &wk->checkResult)) {
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x15, 8);
-        if (wk->type == 2) {
+        if (wk->type == TRADE_TYPE_WIFICLUB) {
             DWCRap_SetMic(FALSE);
         }
         PokemonTrade_SetState(wk, PoketradeNego_StepWaitReadySync);
     }
 }
 
-static void PoketradeNego_AbortHttpRequest(void *work, int a1, int code, int error) {
+static void PoketradeNego_AbortHttpRequest(void *work, int code, int type, int error) {
     PokemonTradeWork *wk = work;
-    if (wk->unk0 != NULL) {
-        NHttpRap_EndRequest(wk->unk0);
-        NHttpRap_Destroy(wk->unk0);
-        wk->unk0 = NULL;
+    if (wk->http != NULL) {
+        NHttpRap_EndRequest(wk->http);
+        NHttpRap_Destroy(wk->http);
+        wk->http = NULL;
         DWCRapCommon_EndSubHeap();
     }
 }
@@ -1260,12 +1262,12 @@ static void PoketradeNego_StepPollMonCheck(PokemonTradeWork *wk) {
     int i;
     u8 count = 0;
     void *response;
-    int status = NHttpRap_GetStatus(wk->unk0);
-    int result = NHttpRap_Poll(wk->unk0);
+    int status = NHttpRap_GetStatus(wk->http);
+    int result = NHttpRap_Poll(wk->http);
     if (result == 0 && status == 200) {
-        response = NHttpRap_GetAnswer(wk->unk0);
+        response = NHttpRap_GetAnswer(wk->http);
         wk->checkResult = NHttpRap_GetCheckStatus(response);
-        if (wk->checkResult == 1 && wk->unk109A == 0) {
+        if (wk->checkResult == TRADE_CHECK_INVALID && wk->checkedPkmRenamed == 0) {
             for (i = 0; i < 3; i++) {
                 if (PokemonTrade_IsMonValid((u8 *)wk->negoPkm[1][i])) {
                     PartyPkm *pkm = wk->negoPkm[1][i];
@@ -1289,7 +1291,7 @@ static void PoketradeNego_StepPollMonCheck(PokemonTradeWork *wk) {
                     count++;
                 }
             }
-            wk->unk109A = 1;
+            wk->checkedPkmRenamed = 1;
             PokemonTrade_SetState(wk, PoketradeNego_StepStartMonCheck);
         } else {
             PokemonTrade_SetState(wk, PoketradeNego_StepSendCheckResult);
@@ -1301,26 +1303,26 @@ static void PoketradeNego_StepPollMonCheck(PokemonTradeWork *wk) {
         }
         switch (status) {
         case 400:
-            error = 0xf0;
+            error = TRADE_CHECK_HTTP_400;
             break;
         case 401:
-            error = 0xf1;
+            error = TRADE_CHECK_HTTP_401;
             break;
         case 408:
-            error = 0xf2;
+            error = TRADE_CHECK_HTTP_408;
             break;
         default:
-            error = 0xff;
+            error = TRADE_CHECK_HTTP_ERROR;
             break;
         }
         wk->checkResult = error;
-        NHttpRap_EndRequest(wk->unk0);
+        NHttpRap_EndRequest(wk->http);
         PokemonTrade_SetState(wk, PoketradeNego_StepSendCheckResult);
     }
-    if (wk->unk0 != NULL) {
-        NHttpRap_FreePostData(wk->unk0);
-        NHttpRap_Destroy(wk->unk0);
-        wk->unk0 = NULL;
+    if (wk->http != NULL) {
+        NHttpRap_FreePostData(wk->http);
+        NHttpRap_Destroy(wk->http);
+        wk->http = NULL;
         DWCRapCommon_EndSubHeap();
         DWCRap_SetErrorFunc(NULL, NULL);
     }
@@ -1331,21 +1333,21 @@ static void PoketradeNego_StepStartMonCheck(PokemonTradeWork *wk) {
     int i;
     int count = 0;
     DWCRapCommon_SetSubHeap(13, 0x10000, wk->heapId);
-    wk->unk0 = NHttpRap_Create(wk->heapId, PlayerInfo_GetProfileId(wk->myInfo), wk->param->buffer);
+    wk->http = NHttpRap_Create(wk->heapId, PlayerInfo_GetProfileId(wk->myInfo), wk->param->buffer);
     DWCRap_SetErrorFunc(PoketradeNego_AbortHttpRequest, wk);
     for (i = 0; i < 3; i++) {
         if (PokemonTrade_IsMonValid((u8 *)wk->negoPkm[1][i])) {
             count++;
         }
     }
-    NHttpRap_BeginPost(wk->unk0, wk->heapId, PokeParty_GetPkmRawSize() * count, 2);
+    NHttpRap_BeginPost(wk->http, wk->heapId, PokeParty_GetPkmRawSize() * count, 2);
     for (i = 0; i < 3; i++) {
         if (PokemonTrade_IsMonValid((u8 *)wk->negoPkm[1][i])) {
-            NHttpRap_AddPostData(wk->unk0, wk->negoPkm[1][i], PokeParty_GetPkmRawSize());
+            NHttpRap_AddPostData(wk->http, wk->negoPkm[1][i], PokeParty_GetPkmRawSize());
         }
     }
-    NHttpRap_SendValidate(wk->unk0);
-    NHttpRap_StartRequest(wk->unk0);
+    NHttpRap_SendValidate(wk->http);
+    NHttpRap_StartRequest(wk->http);
     PokemonTrade_SetState(wk, PoketradeNego_StepPollMonCheck);
 }
 
@@ -1367,7 +1369,7 @@ static void PoketradeNego_StepRetryMonCheck(PokemonTradeWork *wk) {
 
 static void PoketradeNego_StepBeginMonCheckWipe(PokemonTradeWork *wk) {
     GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
-    if (wk->type == 2) {
+    if (wk->type == TRADE_TYPE_WIFICLUB) {
         DWCRap_SetMic(TRUE);
     }
     PokemonTrade_SetState(wk, PoketradeNego_StepRetryMonCheck);
@@ -1386,43 +1388,43 @@ static void PoketradeNego_StepResolveFinalAgree(PokemonTradeWork *wk) {
         return;
     }
     PoketradeNego_CloseCancelMenu(wk, 0, 0);
-    wk->unk11EA = 0;
-    wk->unk11E8[0] = 3;
-    wk->unk11E8[1] = 3;
-    if (wk->command[myId] == 10 && wk->command[otherId] == 10) {
-        PoketradeNego_DrawOfferStatusLabel(wk, 0, 1, TRUE);
-        PoketradeNego_DrawOfferStatusLabel(wk, 1, 1, TRUE);
-        if (wk->type == 3) {
+    wk->showStatusLabels = 0;
+    wk->statusLabels[0] = TRADE_STATUS_DRAWN;
+    wk->statusLabels[1] = TRADE_STATUS_DRAWN;
+    if (wk->command[myId] == TRADE_SELECT_NEGO_AGREE && wk->command[otherId] == TRADE_SELECT_NEGO_AGREE) {
+        PoketradeNego_DrawOfferStatusLabel(wk, 0, TRADE_STATUS_SELECTED, TRUE);
+        PoketradeNego_DrawOfferStatusLabel(wk, 1, TRADE_STATUS_SELECTED, TRUE);
+        if (wk->type == TRADE_TYPE_GTSNEGO) {
             PokemonTrade_SetState(wk, PoketradeNego_StepBeginMonCheckWipe);
             return;
         }
         PokemonTrade_SetState(wk, PoketradeNego_StepSendReady);
         return;
     }
-    if (wk->command[myId] == 4 && wk->command[otherId] == 4) {
+    if (wk->command[myId] == TRADE_SELECT_END && wk->command[otherId] == TRADE_SELECT_END) {
         wk->param->next = 3;
         PokemonTrade_SetState(wk, PokemonTrade_FadeOutToEnd);
         return;
     }
-    if (wk->command[otherId] == 4) {
+    if (wk->command[otherId] == TRADE_SELECT_END) {
         msg = 97;
-    } else if (wk->command[myId] == 4) {
+    } else if (wk->command[myId] == TRADE_SELECT_END) {
         msg = 103;
     }
     GFL_MsgDataLoadStrbuf(wk->msgData, msg, wk->strbuf);
     PoketradeSave_OpenMessageWindowTop(wk);
-    wk->command[0] = 0;
-    wk->command[1] = 0;
-    wk->unk11E8[0] = 0;
-    wk->unk11E8[1] = 0;
+    wk->command[0] = TRADE_SELECT_NONE;
+    wk->command[1] = TRADE_SELECT_NONE;
+    wk->statusLabels[0] = TRADE_STATUS_SELECTING;
+    wk->statusLabels[1] = TRADE_STATUS_SELECTING;
     PokemonTrade_SetState(wk, PokemonTrade_StepShowWaitMessageA);
 }
 
 static void PoketradeNego_StepSendFinalAgree(PokemonTradeWork *wk) {
     NetHandle *handle = NetHandle_GetOwn();
     if (PokemonTrade_IsNetwork(wk)) {
-        u8 data = 1;
-        if (GFL_NetSendCommand(handle, TRADE_NET_CMD_UNKF, 1, &data)) {
+        u8 data = TRADE_STATUS_SELECTED;
+        if (GFL_NetSendCommand(handle, TRADE_NET_CMD_STATUS, 1, &data)) {
             PokemonTrade_SetState(wk, PoketradeNego_StepResolveFinalAgree);
         }
     } else {
@@ -1434,14 +1436,14 @@ static void PoketradeNego_StepSendFinalReady(PokemonTradeWork *wk) {
     NetHandle *handle = NetHandle_GetOwn();
     if (PoketradeSave_IsMessagePrintDone(wk)) {
         if (PokemonTrade_IsNetwork(wk)) {
-            u8 command = 10;
+            u8 command = TRADE_SELECT_NEGO_AGREE;
             if (GFL_NetSendCommand(handle, TRADE_NET_CMD_SELECT, 1, &command)) {
                 NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x1a, 8);
                 PokemonTrade_SetState(wk, PoketradeNego_StepSendFinalAgree);
             }
         } else {
-            wk->command[0] = 10;
-            wk->command[1] = 10;
+            wk->command[0] = TRADE_SELECT_NEGO_AGREE;
+            wk->command[1] = TRADE_SELECT_NEGO_AGREE;
             PokemonTrade_SetState(wk, PoketradeNego_StepSendFinalAgree);
         }
     }
@@ -1556,7 +1558,7 @@ BOOL PoketradeNego_IsMonOwnOffer(PokemonTradeWork *wk, int column, int row) {
 BOOL PoketradeNego_IsMonPeerSelected(PokemonTradeWork *wk, int column, int row) {
     int box = PokemonTrade_GetColumnBox(column, wk);
     int slot = PokemonTrade_GetColumnSlot(column, row);
-    if (wk->unkF94 == slot && wk->unkF98 == box) {
+    if (wk->targetSlot == slot && wk->targetBox == box) {
         return TRUE;
     }
     return FALSE;
@@ -1569,15 +1571,15 @@ static void PoketradeNego_StepWaitTouchRelease(PokemonTradeWork *wk) {
 }
 
 void PoketradeNego_StepSendOfferRemoval(PokemonTradeWork *wk) {
-    int index = PoketradeNego_FindOfferIndex(wk, wk->unkF98, wk->unkF94);
+    int index = PoketradeNego_FindOfferIndex(wk, wk->targetBox, wk->targetSlot);
     if (!PokemonTrade_IsNetwork(wk) ||
         GFL_NetSendCommand(NetHandle_GetOwn(), TRADE_NET_CMD_WITHDRAW, sizeof(index), &index)) {
         wk->selectSlot = -1;
         wk->selectBox = -1;
         wk->heldSlot = -1;
         wk->heldBox = -1;
-        wk->unkF94 = -1;
-        wk->unkF98 = -1;
+        wk->targetSlot = -1;
+        wk->targetBox = -1;
         if (index != -1) {
             PoketradeNego_RemoveOffer(wk, 0, index);
             Poketrade2D_DeleteOfferIconActor(wk, 0, index);
@@ -1595,11 +1597,11 @@ void PoketradeNego_InitOfferMarkers(PokemonTradeWork *wk) {
     }
 }
 
-void PoketradeNego_SetOfferMarkersState(PokemonTradeWork *wk, BOOL a1) {
+void PoketradeNego_SetOfferMarkersState(PokemonTradeWork *wk, BOOL visible) {
     int i;
     if (PokemonTrade_IsNegoType(wk)) {
         for (i = 0; i < 4; i++) {
-            Poketrade2D_SetMarkerActorVisible(wk, i, a1);
+            Poketrade2D_SetMarkerActorVisible(wk, i, visible);
         }
     }
 }
@@ -1625,7 +1627,7 @@ void PoketradeNego_PollMarkerTouch(PokemonTradeWork *wk) {
         Poketrade2D_SetMarkerActorAnim(wk, index);
         PoketradeNego_FlashMarker(wk, index, 0);
         if (PokemonTrade_IsNetwork(wk)) {
-            GFL_NetSendCommand(NetHandle_GetOwn(), TRADE_NET_CMD_UNKD, 1, &index);
+            GFL_NetSendCommand(NetHandle_GetOwn(), TRADE_NET_CMD_STAMP, 1, &index);
         }
     }
 }
@@ -1634,9 +1636,9 @@ void PoketradeNego_TickMarkerTimers(PokemonTradeWork *wk) {
     int i;
     if (PokemonTrade_IsNegoType(wk)) {
         for (i = 0; i < 2; i++) {
-            if (wk->unk11E4[i] != 0) {
-                wk->unk11E4[i]--;
-                if (wk->unk11E4[i] == 0) {
+            if (wk->stampTimers[i] != 0) {
+                wk->stampTimers[i]--;
+                if (wk->stampTimers[i] == 0) {
                     Poketrade2D_DeleteMarkerButtonPair(wk, i);
                 }
             }
@@ -1647,7 +1649,7 @@ void PoketradeNego_TickMarkerTimers(PokemonTradeWork *wk) {
 void PoketradeNego_FlashMarker(PokemonTradeWork *wk, u32 index, int side) {
     if (PokemonTrade_IsNegoType(wk)) {
         Poketrade2D_CreateMarkerButtonActor(wk, index, side);
-        wk->unk11E4[side] = 60;
+        wk->stampTimers[side] = 60;
         if (!GFL_SndIsPlaying(SEQ_SE_SELECT3)) {
             GFL_SndSEPlay(SEQ_SE_SELECT3);
         }
@@ -1672,7 +1674,7 @@ void PoketradeNego_ExitMarkers(PokemonTradeWork *wk) {
 
 void PoketradeNego_ShowOfferSlotMon(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
     Poketrade2D_SetOfferIconsVisible(wk, side, FALSE);
-    if (wk->unk11E2[side] != 0) {
+    if (wk->offerCardTimers[side] != 0) {
         PoketradeSave_DeletePartnerOfferCard(wk, side);
         Poketrade3D_DeleteMcssSlot(wk, side);
     }
@@ -1685,10 +1687,10 @@ void PoketradeNego_ShowOfferSlotMon(PokemonTradeWork *wk, int side, PartyPkm *pk
 void PoketradeNego_TickOfferSlotTimers(PokemonTradeWork *wk) {
     int i;
     for (i = 0; i < 2; i++) {
-        if (wk->unk11E2[i] != 0) {
-            wk->unk11E2[i]--;
+        if (wk->offerCardTimers[i] != 0) {
+            wk->offerCardTimers[i]--;
             Poketrade2D_SetOfferIconsVisible(wk, i, FALSE);
-            if (wk->unk11E2[i] == 0) {
+            if (wk->offerCardTimers[i] == 0) {
                 PoketradeSave_DeletePartnerOfferCard(wk, i);
                 GFL_BGSysFillScrArea(1, 0, i * 16, 0, 16, 24, 16);
                 GFL_BGSysQueueScrLoad(1);
@@ -1701,7 +1703,7 @@ void PoketradeNego_TickOfferSlotTimers(PokemonTradeWork *wk) {
 
 static BOOL PoketradeNego_SendOfferMon(PokemonTradeWork *wk, PartyPkm *pkm, int command) {
     NetHandle *handle = NetHandle_GetOwn();
-    if (wk->unk11FB_0) {
+    if (wk->awaitingMonAck) {
         return FALSE;
     }
     MI_CpuCopy8(pkm, wk->recvPkm[2], PokeParty_GetPkmRawSize());
@@ -1709,6 +1711,6 @@ static BOOL PoketradeNego_SendOfferMon(PokemonTradeWork *wk, PartyPkm *pkm, int 
                                      TRUE)) {
         return FALSE;
     }
-    wk->unk11FB_0 = 1;
+    wk->awaitingMonAck = 1;
     return TRUE;
 }

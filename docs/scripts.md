@@ -1,6 +1,6 @@
 # Scripts
 
-The script VM in `src/system/vm.c` runs four sets of commands: field events, the trainer AI, battle move animations and
+The script VM in `src/system/vm.c` runs four sets of commands: field events, the trainer AI, battle animations and
 musicals. Scripts are files in the ROM's NARC archives. Each command is a 16-bit ID followed by its arguments.
 
 The trainer AI scripts are built from source. Archive `a/1/6/9` holds 14 scripts, one per AI flag, which run in turn
@@ -58,6 +58,103 @@ where they are valid, then as tables, and otherwise kept as `.byte`. A value com
 as a constant when every way to the comparison loads the same kind of value. Labels are named after their offset,
 unless `--labels` gives names.
 
+## Battle animation scripts
+
+The battle effect VM, `src/ov168/btlv_effvm.c`, plays the animations of the moves and of the battle's other effects,
+which the encounters' openings and the sending in of Pokémon (`btlv_scu.c`), the server's effect commands
+(`btlv_core.c`) and Pokéstar Studios' battles (`btl_client.c`) start. Its scripts are built from source in `res/battle/animations/`, with the macros in `include/asm/btlv_effvm.inc`. An effect number below
+`BTLV_EFFECT_FIRST` (0x231) is a move, whose script is the member of archive `a/0/6/5` with the move's number, written
+in `moves/<move>.s` after `generated/moves.txt`; the 41 members past the last move are copies of Pound's, numbered
+`560.s` to `600.s`, which nothing plays. The other effects are the 115 members of `a/0/6/6`, from `BTLV_EFFECT_FIRST`
+up, written in `effects/NNN.s` by their member: the code that starts them (`BtlvEffect_Start` and the others) gives only
+their numbers. Both versions have the same archives, and members with the same bytes keep a file
+each.
+
+A script file starts with the number of its variants and their code, in `ScriptHeader` and `ScriptVariant`. A variant
+is the turn of a two-turn move, or a case of a move that looks different, which `BtlvEffvmParam`'s `variant` picks.
+
+```
+Pound:
+    CameraMovePreset 1, 11, 16, 0, 8
+    Wait EFFVM_WAIT_ALL
+    ParticleLoad 165
+    EmitterAdd 165, 0, EFFVM_EMIT_DEFENDER, 8, 0x2000, 0, 0, 0x1000, 0x1000, 0x1000, 0x1000
+    PlaySE SEQ_SE_W001_01, 1, EFFVM_DEFENDER, 0, 0, 115, 0, 0, 0
+    McssScale EFFVM_DEFENDER, 2, 0x19a, -0x19a, 2, 0, 1
+    Wait EFFVM_WAIT_ALL
+    End
+```
+
+Each macro is one command of `btlv_effvm.c`'s `MOVE_SCRCMD`, named after its handler as the field's are:
+`BtlvEffvm_CmdCameraMove` is `CameraMove`. Its arguments are 32-bit, in the order the handler reads them. Particles are
+the resources of `ARCID_BTLV_EFFVM_PARTICLES` (`res/particles/btlv_effvm_particles/`) and their emitters, by number;
+sounds are `SEQ_*` constants, and `Call` and `ChangeScript` take a move or `BTLV_EFFECT_FIRST + N`, the script of
+`effects/NNN.s`. fx32 values are written in hex, 0x1000 for 1. Jumps are labels, relative to the end of the command.
+The macros define the VM's own codes, where the handlers show what they are: the attacker, the defender and the other
+targets besides the positions 0 to 13 (`EFFVM_ATTACKER`), the emitters' positions (`EFFVM_EMIT_*`), what `Wait` waits
+for (`EFFVM_WAIT_*`), the comparisons of `IfVarConst` (`EFFVM_CMP_*`), and the variables that the scripts test and set
+(`EFFVM_VAR_*`, with a position added for those of each position, as in `EFFVM_VAR_WEIGHT + 3`); a value compared with
+a flag is `TRUE` or `FALSE`.
+
+The scripts are source, edited by hand. `tools/script/btlv_effvm_script.py` disassembled them, and writes the macros
+from `MOVE_SCRCMD`. After handlers are renamed, its `sync`, which `sync_handler_names.py` runs too, writes the macros
+again and renames the commands in the scripts:
+
+```sh
+python3 tools/script/btlv_effvm_script.py inc include/asm/btlv_effvm.inc
+python3 tools/script/btlv_effvm_script.py disasm extract/b2_us/files/a/0/6/5 OUTPUT_DIR moves
+python3 tools/script/btlv_effvm_script.py disasm extract/b2_us/files/a/0/6/6 OUTPUT_DIR effects
+python3 tools/script/btlv_effvm_script.py sync
+```
+
+The disassembler follows the code from each variant. Bytes it does not reach are decoded as commands where they trace
+cleanly, and otherwise kept as `.byte`; every byte of both archives decodes as commands. `ninja` builds the archives
+as it builds the trainer AI's. `configure.py`'s `ARCHIVE_LISTS` orders the move scripts by `generated/moves.txt`, and
+the numbered files follow; the effects, which have no list, are all numbered.
+
+## Musical stage scripts
+
+Overlay 209's stage VM (`sta_act_script.c`) plays the musical's performances. Each program's stage scripts are member 2
+of its archive (see [Musical programs](data.md#musical-programs)), built from `res/musicals/programs/<n>/script.s`
+with the macros in `include/asm/sta_script.inc`. A script file starts with the offsets of its scripts, in
+`ScriptHeader` and a `ScriptEntry` each; a program's has 14, of which the game reads the first, `Main`, and the third
+to sixth, `Position0` to `Position3`, the scripts of the four positions on the stage, which `StaActing_StartScripts`
+runs beside `Main` where they differ from it. Each script runs from its label to its `End`; there are no jumps.
+
+```
+    SetPokeMask TRUE, TRUE, TRUE, TRUE
+    PokeScript STA_SCRIPT_OWN_POKE, 1
+    Wait 700
+    StopBgm
+    SyncWait 2
+    PlayBgm SEQ_BGM_MSL_01
+    AudienceFocus 0
+    LightAdd 0, 0
+    LightFollow 0, 0, 2175, 0, -0x28000, 0
+```
+
+Each macro is one command of `script_command.c`'s `STA_SCRIPT_COMMANDS`, named after its handler as the field's are:
+`StaScriptCmd_PokeMove` is `PokeMove`. Its arguments are 32-bit, in the order the handler reads them, named after the
+handler's variables. Pokémon are positions, 0 to 3, or `STA_SCRIPT_OWN_POKE`, those the script was started for or
+that `SetPokeMask` set; a flag the handler compares with `TRUE` or tests is `TRUE` or `FALSE`, as a move's `wait`,
+which makes the script wait for it; sequences are `SEQ_*` constants; and fx32 values are written in hex, 0x1000 for 1.
+`SyncWait` makes a synced script wait until every synced script waits, so that `Main` and the positions' scripts keep
+in step; `PrintMessage` prints a message of the program's `messages.txt` by its line.
+
+The scripts are source, edited by hand. `tools/script/sta_script.py` disassembled them, and writes the macros from
+`STA_SCRIPT_COMMANDS`; after handlers are renamed, its `sync`, which `sync_handler_names.py` runs too, writes the
+macros again and renames the commands in the scripts:
+
+```sh
+python3 tools/script/sta_script.py inc include/asm/sta_script.inc
+python3 tools/script/sta_script.py disasm SCRIPT OUTPUT.s --program N
+python3 tools/script/sta_script.py sync
+```
+
+The build assembles each `script.s` as it does the other scripts and gives the binaries to the programs' packer,
+which puts each in its archive among the members of other kinds: `configure.py`'s `PACK_SCRIPTS` names, for a
+`DATA_PACKS` packer, the scripts of its data directory that it takes with `--scripts`.
+
 ## Field scripts
 
 The field scripts, archive `a/0/5/6`, are built from source in `res/field/scripts/<file>.s`, with the macros in
@@ -78,9 +175,9 @@ L_015C:
 
 A command's handler is `Scrcmd_<Group>_<Name>`, where `<Group>` is its file, `scrcmd_<group>.c` (or the file's name
 without `event_` for the few outside those), and the command is `<Name>`: `Scrcmd_Vm_FlagReset` is `FlagReset`, and
-`Scrcmd_Msg_InfoMsgClose` `InfoMsgClose`. swan's handlers (`s0024_FlagReset`) take this form too. A few handlers that
-are still address-named are named after the function they call, such as `IsFestMissionAvailable`. Those whose calls only
-tell the save data they use get its area, such as `HighLinkCmd_0170`, and the rest are `Cmd_NNNN`.
+`Scrcmd_Msg_InfoMsgClose` `InfoMsgClose`. swan's handlers (`s0024_FlagReset`) take this form too. Handlers that are
+still address-named and whose calls only tell the save data they use get its area, such as `AreaNPCCmd_0218`, and the
+rest are `Cmd_NNNN`.
 
 Commands from ID 1000 up come from the script plugin, overlays that the zone loads. They take their handler's `<Name>`
 once it has one, as the base commands do (`Scrcmd_BadgeGate_PlayCheck` is `PlayCheck`), with the group in front where

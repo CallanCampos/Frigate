@@ -36,8 +36,8 @@ BtlSetup *BsubwayScr_CreateBtlSetup(BSubwayScrWork *bsw, GameSystem *gsys) {
         pkm = PokeParty_GetPkm(source, bsw->memberSlots[i]);
         PokeParty_AddPkm(party, pkm);
     }
-    result =
-        SetupTrialHouseBattle(gsys, party, bsw->playMode, bsw->trainers, &bsw->unk2C8[bsw->unkC_5], bsw->memberCount);
+    result = SetupTrialHouseBattle(gsys, party, bsw->playMode, bsw->trainers, &bsw->partners[bsw->partnerIndex],
+                                   bsw->memberCount);
     GFL_HeapFree(party);
     return result;
 }
@@ -96,10 +96,10 @@ u16 BsubwayScr_DrawTrainerNo(BSubwayScrWork *bsw, u16 level, u8 index, u32 mode,
     super = FALSE;
     boss = -1;
     switch (mode) {
-    case 5:
-    case 6:
-    case 7:
-    case 8:
+    case BSUBWAY_MODE_SUPER_SINGLE:
+    case BSUBWAY_MODE_SUPER_DOUBLE:
+    case BSUBWAY_MODE_SUPER_MULTI:
+    case BSUBWAY_MODE_SUPER_COMM_MULTI:
         super = TRUE;
         break;
     }
@@ -114,26 +114,26 @@ u16 BsubwayScr_DrawTrainerNo(BSubwayScrWork *bsw, u16 level, u8 index, u32 mode,
     }
     if (boss != -1) {
         switch (mode) {
-        case 0:
-        case 5:
+        case BSUBWAY_MODE_SINGLE:
+        case BSUBWAY_MODE_SUPER_SINGLE:
             if (boss == 0) {
                 trainerId = 0x132;
             } else if (boss == 1) {
                 trainerId = 0x133;
             }
             break;
-        case 1:
-        case 6:
+        case BSUBWAY_MODE_DOUBLE:
+        case BSUBWAY_MODE_SUPER_DOUBLE:
             if (boss == 0) {
                 trainerId = 0x134;
             } else if (boss == 1) {
                 trainerId = 0x135;
             }
             break;
-        case 2:
-        case 3:
-        case 7:
-        case 8:
+        case BSUBWAY_MODE_MULTI:
+        case BSUBWAY_MODE_COMM_MULTI:
+        case BSUBWAY_MODE_SUPER_MULTI:
+        case BSUBWAY_MODE_SUPER_COMM_MULTI:
             if (boss == 0) {
                 if (side == 0) {
                     trainerId = 0x137;

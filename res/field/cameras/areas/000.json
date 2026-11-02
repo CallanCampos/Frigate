@@ -1,0 +1,77 @@
+{
+    "$schema": "../area.schema.json",
+    "areas": [
+        {
+            "shape": "rect",
+            "grid_x": 5,
+            "grid_z": 25,
+            "grid_w": 55,
+            "unk06": 1,
+            "grid_h": 18,
+            "unk0A": 0,
+            "start": {
+                "pitch": 1999,
+                "yaw": 0,
+                "distance": 1310720,
+                "target_offset": {
+                    "x": 0,
+                    "y": 270336,
+                    "z": 110592
+                },
+                "fov": 3640
+            },
+            "end": {
+                "pitch": 11237,
+                "yaw": 0,
+                "distance": 1331200,
+                "target_offset": {
+                    "x": 0,
+                    "y": 389120,
+                    "z": 86016
+                },
+                "fov": 3640
+            },
+            "forbid_delay_manager": false,
+            "unk3C": 0,
+            "stay": "FieldCameraAreaCalc_RECT_PitchYawTZLookatFOV_STAY",
+            "enter": "FieldCameraAreaCalc_RECT_PitchYawTZLookatFOV_BeginDisableDelay",
+            "exit": "FieldCameraAreaCalc_RECT_PitchYawTZLookatFOV_ResetEnableDelay"
+        },
+        {
+            "shape": "rect",
+            "grid_x": 5,
+            "grid_z": 0,
+            "grid_w": 55,
+            "unk06": 1,
+            "grid_h": 25,
+            "unk0A": 0,
+            "start": {
+                "pitch": 1999,
+                "yaw": 0,
+                "distance": 1581056,
+                "target_offset": {
+                    "x": 0,
+                    "y": 401408,
+                    "z": 57344
+                },
+                "fov": 2690
+            },
+            "end": {
+                "pitch": 1999,
+                "yaw": 0,
+                "distance": 1310720,
+                "target_offset": {
+                    "x": 0,
+                    "y": 270336,
+                    "z": 110592
+                },
+                "fov": 3640
+            },
+            "forbid_delay_manager": false,
+            "unk3C": 0,
+            "stay": "FieldCameraAreaCalc_RECT_PitchYawTZLookatFOV_STAY",
+            "enter": "FieldCameraAreaCalc_RECT_PitchYawTZLookatFOV_BeginDisableDelay",
+            "exit": "FieldCameraAreaCalc_RECT_PitchYawTZLookatFOV_ResetEnableDelay"
+        }
+    ]
+}

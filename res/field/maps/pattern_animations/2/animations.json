@@ -1,0 +1,53 @@
+{
+    "$schema": "../pattern_animation.schema.json",
+    "animations": [
+        {
+            "length": 15,
+            "textures": [
+                {
+                    "name": "in85_fire.1",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "in85_fire.2",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "in85_fire.3",
+                    "format": "palette16",
+                    "color0_transparent": true
+                },
+                {
+                    "name": "in85_fire.4",
+                    "format": "palette16",
+                    "color0_transparent": true
+                }
+            ],
+            "palettes": [
+                [ "in85_fire.1_pl", "in85_fire.2_pl", "in85_fire.3_pl", "in85_fire.4_pl" ]
+            ],
+            "targets": [
+                [
+                    {
+                        "frame": 0,
+                        "texture": "in85_fire.1"
+                    },
+                    {
+                        "frame": 4,
+                        "texture": "in85_fire.2"
+                    },
+                    {
+                        "frame": 8,
+                        "texture": "in85_fire.3"
+                    },
+                    {
+                        "frame": 11,
+                        "texture": "in85_fire.4"
+                    }
+                ]
+            ]
+        }
+    ]
+}

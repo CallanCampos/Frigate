@@ -1,0 +1,15 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "B",
+    "shapes": [ 4 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_LOSTLORN_FOREST": [ "surf", "rippling_surf" ],
+            "ZONE_ROUTE_11": [ "surf", "rippling_surf" ],
+            "ZONE_ROUTE_14": [ "surf", "rippling_surf" ],
+            "ZONE_ROUTE_23": [ "surf", "rippling_surf" ],
+            "ZONE_VICTORY_ROAD": [ "surf", "rippling_surf" ]
+        }
+    }
+}

@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/vars.h"
 #include "field/field.h"
@@ -28,8 +29,6 @@
 #define GIMMICK_WORK_ID 1
 // The gimmick state's flags area of the pressed switches
 #define GIMMICK_FLAGS_ID 7
-// The archive of the gym's models
-#define GIMMICK_ARCID 0x8a
 
 #define PAD_COUNT 82
 #define PAD_MODEL_COUNT 41
@@ -224,11 +223,11 @@ static const G3DSceneActorSetup sGymDriftveilActors[ACTOR_COUNT] = {
 
 // clang-format off
 static const G3DSceneResourceSetup sGymDriftveilResources[18] = {
-    { GIMMICK_ARCID, 0, 0 },    { GIMMICK_ARCID, 1, 0 },    { GIMMICK_ARCID, 2, 0 },    { GIMMICK_ARCID, 3, 0 },
-    { GIMMICK_ARCID, 4, 0 },    { GIMMICK_ARCID, 9, 0 },    { GIMMICK_ARCID, 0xa, 0 },  { GIMMICK_ARCID, 0xb, 0 },
-    { GIMMICK_ARCID, 0xc, 0 },  { GIMMICK_ARCID, 5, 0 },    { GIMMICK_ARCID, 6, 0 },    { GIMMICK_ARCID, 7, 0 },
-    { GIMMICK_ARCID, 8, 0 },    { GIMMICK_ARCID, 0xd, 0 },  { GIMMICK_ARCID, 0xe, 0 },  { GIMMICK_ARCID, 0xf, 0 },
-    { GIMMICK_ARCID, 0x10, 0 }, { GIMMICK_ARCID, 0x11, 0 },
+    { ARCID_GYM_DRIFTVEIL, 0, 0 },    { ARCID_GYM_DRIFTVEIL, 1, 0 },    { ARCID_GYM_DRIFTVEIL, 2, 0 },    { ARCID_GYM_DRIFTVEIL, 3, 0 },
+    { ARCID_GYM_DRIFTVEIL, 4, 0 },    { ARCID_GYM_DRIFTVEIL, 9, 0 },    { ARCID_GYM_DRIFTVEIL, 0xa, 0 },  { ARCID_GYM_DRIFTVEIL, 0xb, 0 },
+    { ARCID_GYM_DRIFTVEIL, 0xc, 0 },  { ARCID_GYM_DRIFTVEIL, 5, 0 },    { ARCID_GYM_DRIFTVEIL, 6, 0 },    { ARCID_GYM_DRIFTVEIL, 7, 0 },
+    { ARCID_GYM_DRIFTVEIL, 8, 0 },    { ARCID_GYM_DRIFTVEIL, 0xd, 0 },  { ARCID_GYM_DRIFTVEIL, 0xe, 0 },  { ARCID_GYM_DRIFTVEIL, 0xf, 0 },
+    { ARCID_GYM_DRIFTVEIL, 0x10, 0 }, { ARCID_GYM_DRIFTVEIL, 0x11, 0 },
 };
 
 // clang-format on

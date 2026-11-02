@@ -43,12 +43,12 @@ ElScoreboard *ElScoreboard_Create(G3DResource *texture, const char *texName, con
     board->unk10 = -1;
     board->unk14 = -1;
     if (G3DTextDraw_CreateResource(texture, texName, 0, plName, text, a4, a5, 0xc40, heapId, &resource)) {
-        board->unk8 = resource.unk4;
-        board->unkC = resource.unk8;
-        board->unk10 = resource.unkC;
-        board->unk4 = resource.unk0;
-        board->unk6 = resource.unk2;
-        board->unk14 = resource.unk10;
+        board->unk8 = resource.texVramKey;
+        board->unkC = resource.plttVramKey;
+        board->unk10 = resource.texOffset;
+        board->unk4 = resource.widthIndex;
+        board->unk6 = resource.heightIndex;
+        board->unk14 = resource.plttOffset;
         board->frame = 0;
     }
     return board;

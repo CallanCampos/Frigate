@@ -357,7 +357,7 @@ static void BrCore_RecordBefore(void *param, void *work, const void *preParam, u
     p->unk2C = &wk->param->data->unk_1720;
     p->isRecovery = FALSE;
     p->recordInfo = &wk->param->data->recordInfo;
-    p->unk3C = &wk->param->data->unk_17bc;
+    p->unk3C = &wk->param->data->recReadComplete;
 
     switch (preID) {
     case BR_PROCID_MENU: {
@@ -416,7 +416,7 @@ static void BrCore_RecordAfter(void *param, void *work) {
     BrCoreWork *wk = work;
 
     if (p->result == 1) {
-        wk->param->result = 1;
+        wk->param->result = BR_CORE_RESULT_PLAY_VIDEO;
     }
 }
 

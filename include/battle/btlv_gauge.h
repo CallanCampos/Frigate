@@ -17,8 +17,17 @@ typedef enum {
     BTLV_GAUGE_POS_MAX = 8,
 } BtlvGaugePos;
 
-// mode 2 shows no gauges and only keeps the statuses
-BtlvGauge *BtlvGauge_Create(Font *font, u32 mode, HeapID heapId);
+// The status icon's sequences, which BtlvGauge_SetStatus picks by condition (CONDITION_*) and BtlvGauge_GetStatus
+// returns; sequence 7 is condition 6's
+#define BTLV_GAUGE_STATUS_PARALYSIS 1
+#define BTLV_GAUGE_STATUS_FREEZE 2
+#define BTLV_GAUGE_STATUS_SLEEP 3
+#define BTLV_GAUGE_STATUS_POISON 4
+#define BTLV_GAUGE_STATUS_BURN 5
+#define BTLV_GAUGE_STATUS_NONE 8
+
+// studioMode is BTL_STUDIO_MODE_*: a movie's playback shows no gauges and only keeps the statuses
+BtlvGauge *BtlvGauge_Create(Font *font, u32 studioMode, HeapID heapId);
 void BtlvGauge_Delete(BtlvGauge *gauge);
 void BtlvGauge_Update(BtlvGauge *gauge);
 // type is the battle's style, BTL_STYLE_*; index the gauge, by view position, even for the player's side

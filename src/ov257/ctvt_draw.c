@@ -74,6 +74,23 @@ enum {
     DRAW_TOOL_STAMP,
 };
 
+// The buttons of the bottom screen: one for each tool, at its DRAW_TOOL_* index, then these two. The menu button
+// does what X does
+enum {
+    DRAW_BUTTON_SWAP_VIEW = CTVT_DRAW_TOOL_BUTTONS,
+    DRAW_BUTTON_MENU,
+};
+
+// The steps of CtvtDraw_UpdateCancel's sync with the others
+enum {
+    CANCEL_SYNC_NONE,
+    CANCEL_SYNC_SEND,
+    CANCEL_SYNC_WAIT,
+};
+
+// The last point of a stroke before its first one
+#define DRAW_NO_POINT 0xffff
+
 struct CtvtDraw {
     int state;
     u8 slideTarget;
@@ -190,12 +207,12 @@ void CtvtDraw_Enter(CommTvtWork *sys, CtvtDraw *draw) {
     } else {
         setup.sequence = 10;
     }
-    draw->buttons[4] = CtvtDraw_CreateActor(sys, 4, 0, 8, &setup, 0, heapId);
+    draw->buttons[DRAW_BUTTON_SWAP_VIEW] = CtvtDraw_CreateActor(sys, 4, 0, 8, &setup, 0, heapId);
     setup.x = 224;
     setup.y = 192;
     setup.sequence = 1;
-    draw->buttons[5] = CtvtDraw_CreateActor(sys, 7, 3, 10, &setup, 0, heapId);
-    ClActor_SetAutoAnim(draw->buttons[5], TRUE);
+    draw->buttons[DRAW_BUTTON_MENU] = CtvtDraw_CreateActor(sys, 7, 3, 10, &setup, 0, heapId);
+    ClActor_SetAutoAnim(draw->buttons[DRAW_BUTTON_MENU], TRUE);
     for (i = 0; i < CTVT_DRAW_BUTTONS; i++) {
         ClActor_SetVisible(draw->buttons[i], TRUE);
     }
@@ -255,7 +272,7 @@ void CtvtDraw_Enter(CommTvtWork *sys, CtvtDraw *draw) {
     draw->slideTarget = CTVT_DRAW_SLIDE;
     draw->slide = CTVT_DRAW_SLIDE;
     draw->cursorPhase = 0;
-    draw->syncState = 0;
+    draw->syncState = CANCEL_SYNC_NONE;
     draw->stroking = FALSE;
     draw->inputHandled = FALSE;
     draw->penMenuOpen = FALSE;
@@ -328,7 +345,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
     draw->inputHandled = FALSE;
     switch (draw->state) {
     case DRAW_STATE_FADE_IN:
-        if (func_ov257_021aaa74(sys) == TRUE) {
+        if (CommTvt_GetFadeInBoth(sys) == TRUE) {
             GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, heapId);
         } else {
             GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, heapId);
@@ -355,7 +372,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
     case DRAW_STATE_WAIT_FADE_OUT:
         if (GFL_WipeIsFinished() == TRUE) {
             if (draw->exit == FALSE) {
-                if (draw->syncState != 0) {
+                if (draw->syncState != CANCEL_SYNC_NONE) {
                     CtvtDraw_UpdateCancel(sys, draw);
                     break;
                 }
@@ -381,7 +398,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
     case DRAW_STATE_DISCONNECTED:
         CtvtComm_Disconnect(sys, CommTvt_GetComm(sys));
         CtvtDraw_PrintMessage(sys, draw, 36);
-        CommTvt_SetMessageActive(sys, TRUE);
+        CommTvt_SetEnding(sys, TRUE);
         draw->state = DRAW_STATE_WAIT_DISCONNECTED;
         CtvtCamera_EndRecording(sys, CommTvt_GetCamera(sys));
         draw->waitSound = TRUE;
@@ -390,20 +407,20 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
         if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             draw->exit = TRUE;
             draw->state = DRAW_STATE_FADE_OUT;
-            CommTvt_SetMessageActive(sys, TRUE);
+            CommTvt_SetEnding(sys, TRUE);
             CtvtCamera_StopCamera(sys, CommTvt_GetCamera(sys));
             draw->waitSound = TRUE;
         }
         break;
     case DRAW_STATE_SEND_PARENT_EXIT:
-        if (CtvtComm_SendPacket(sys, CommTvt_GetComm(sys), CTVT_PACKET_UNK_A, 0) == TRUE) {
+        if (CtvtComm_SendPacket(sys, CommTvt_GetComm(sys), CTVT_PACKET_EXIT, 0) == TRUE) {
             draw->state = DRAW_STATE_PARENT_LEFT;
         }
         break;
     case DRAW_STATE_PARENT_LEFT:
         CtvtComm_Disconnect(sys, CommTvt_GetComm(sys));
         CtvtDraw_PrintMessage(sys, draw, 37);
-        CommTvt_SetMessageActive(sys, TRUE);
+        CommTvt_SetEnding(sys, TRUE);
         draw->state = DRAW_STATE_WAIT_PARENT_LEFT;
         draw->waitFrames = 0;
         CtvtCamera_EndRecording(sys, CommTvt_GetCamera(sys));
@@ -424,7 +441,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
         if (CtvtComm_IsSynced(sys, CommTvt_GetComm(sys), 47) == TRUE) {
             draw->exit = TRUE;
             draw->state = DRAW_STATE_FADE_OUT;
-            CommTvt_SetMessageActive(sys, TRUE);
+            CommTvt_SetEnding(sys, TRUE);
             CtvtCamera_StopCamera(sys, CommTvt_GetCamera(sys));
             draw->waitSound = TRUE;
         }
@@ -432,7 +449,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
     case DRAW_STATE_ALONE:
         CtvtComm_Disconnect(sys, CommTvt_GetComm(sys));
         CtvtDraw_PrintMessage(sys, draw, 38);
-        CommTvt_SetMessageActive(sys, TRUE);
+        CommTvt_SetEnding(sys, TRUE);
         draw->state = DRAW_STATE_WAIT_ALONE;
         CtvtCamera_EndRecording(sys, CommTvt_GetCamera(sys));
         draw->waitSound = TRUE;
@@ -441,7 +458,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
         if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             draw->exit = TRUE;
             draw->state = DRAW_STATE_FADE_OUT;
-            CommTvt_SetMessageActive(sys, TRUE);
+            CommTvt_SetEnding(sys, TRUE);
             CtvtCamera_StopCamera(sys, CommTvt_GetCamera(sys));
             draw->waitSound = TRUE;
         }
@@ -529,11 +546,12 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
 
 static void CtvtDraw_UpdateMenu(CommTvtWork *sys, CtvtDraw *draw) {
     if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) && draw->menuWindowPending == FALSE) {
-        if (ClActor_IsAnimActive(draw->buttons[5]) == FALSE || ClActor_GetSequence(draw->buttons[5]) == 1) {
+        if (ClActor_IsAnimActive(draw->buttons[DRAW_BUTTON_MENU]) == FALSE ||
+            ClActor_GetSequence(draw->buttons[DRAW_BUTTON_MENU]) == 1) {
             draw->state = DRAW_STATE_DRAW;
             draw->slideTarget = 0;
             CtvtDraw_PrintMenu(sys, draw, TRUE);
-            ClActor_SetSequence(draw->buttons[5], 1);
+            ClActor_SetSequence(draw->buttons[DRAW_BUTTON_MENU], 1);
             GFL_SndSEPlay(SEQ_SE_SYS_45);
         }
     } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
@@ -609,7 +627,7 @@ static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
         ClActor_SetAutoAnim(draw->stampMenu, TRUE);
         GFL_SndSEPlay(SEQ_SE_SYS_45);
     }
-    if (hit == 4) {
+    if (hit == DRAW_BUTTON_SWAP_VIEW) {
         CommTvt_ToggleViewSwapped(sys);
         CtvtDraw_RefreshButtons(sys, draw);
         draw->inputHandled = TRUE;
@@ -653,7 +671,8 @@ static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
             ClActor_SetVisible(draw->selectFrame, FALSE);
         }
     }
-    if (((GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) || (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) || hit == 5) &&
+    if (((GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) || (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) ||
+         hit == DRAW_BUTTON_MENU) &&
         draw->menuWindowPending == FALSE) {
         draw->state = DRAW_STATE_MENU;
         draw->slideTarget = CTVT_DRAW_SLIDE;
@@ -669,7 +688,7 @@ static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
         CtvtDraw_PrintMenu(sys, draw, FALSE);
         CtvtDraw_CloseMenus(sys, draw);
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        ClActor_SetSequence(draw->buttons[5], 9);
+        ClActor_SetSequence(draw->buttons[DRAW_BUTTON_MENU], 9);
     }
     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_SELECT | PAD_BUTTON_START)) {
         CommTvt_ToggleViewSwapped(sys);
@@ -795,8 +814,8 @@ static void CtvtDraw_UpdateStroke(CommTvtWork *sys, CtvtDraw *draw) {
             GFL_SndSEPlay(SEQ_SE_SYS_46);
         } else {
             draw->stroking = TRUE;
-            draw->lastX = 0xffff;
-            draw->lastY = 0xffff;
+            draw->lastX = DRAW_NO_POINT;
+            draw->lastY = DRAW_NO_POINT;
             CtvtDraw_CloseMenus(sys, draw);
         }
     }
@@ -805,7 +824,7 @@ static void CtvtDraw_UpdateStroke(CommTvtWork *sys, CtvtDraw *draw) {
 
         GFL_HIDGetTouchHeldPoint(&touchX, &touchY);
         if (draw->stroking == TRUE) {
-            if (draw->lastX != 0xffff && draw->lastY != 0xffff) {
+            if (draw->lastX != DRAW_NO_POINT && draw->lastY != DRAW_NO_POINT) {
                 BOOL full;
 
                 memberCount = CommTvt_GetMemberCount(sys);
@@ -843,7 +862,8 @@ static void CtvtDraw_UpdateSlide(CommTvtWork *sys, CtvtDraw *draw) {
     BOOL moved = FALSE;
     u8 i;
 
-    if (ClActor_IsAnimActive(draw->buttons[5]) == FALSE || ClActor_GetSequence(draw->buttons[5]) == 1) {
+    if (ClActor_IsAnimActive(draw->buttons[DRAW_BUTTON_MENU]) == FALSE ||
+        ClActor_GetSequence(draw->buttons[DRAW_BUTTON_MENU]) == 1) {
         if (draw->slideTarget < draw->slide) {
             draw->slide -= CTVT_DRAW_SLIDE;
             moved = TRUE;
@@ -859,7 +879,7 @@ static void CtvtDraw_UpdateSlide(CommTvtWork *sys, CtvtDraw *draw) {
 
             ClActor_GetSurfacePos(draw->buttons[i], &pos, 0);
             pos.y = draw->slide + 180;
-            if (i == 5) {
+            if (i == DRAW_BUTTON_MENU) {
                 pos.y -= 12;
             }
             ClActor_SetSurfacePos(draw->buttons[i], &pos, 0);
@@ -873,9 +893,9 @@ static void CtvtDraw_RefreshButtons(CommTvtWork *sys, CtvtDraw *draw) {
     ClActor_SetSequence(draw->buttons[2], sEraserButtonAnims[draw->tool == DRAW_TOOL_ERASER ? 1 : 0]);
     ClActor_SetSequence(draw->buttons[3], sStampButtonAnims[draw->tool == DRAW_TOOL_STAMP ? 1 : 0]);
     if (CommTvt_GetViewSwapped(sys) == TRUE) {
-        ClActor_SetSequence(draw->buttons[4], 12);
+        ClActor_SetSequence(draw->buttons[DRAW_BUTTON_SWAP_VIEW], 12);
     } else {
-        ClActor_SetSequence(draw->buttons[4], 10);
+        ClActor_SetSequence(draw->buttons[DRAW_BUTTON_SWAP_VIEW], 10);
     }
     if (draw->tool != DRAW_TOOL_PEN && draw->penMenuOpen == TRUE) {
         draw->penMenuOpen = FALSE;
@@ -1003,20 +1023,20 @@ static void CtvtDraw_CloseMenus(CommTvtWork *sys, CtvtDraw *draw) {
 static void CtvtDraw_UpdateCancel(CommTvtWork *sys, CtvtDraw *draw) {
     CtvtTalk *talk = CommTvt_GetTalk(sys);
 
-    if (CtvtTalk_IsGameCancelled(talk) == TRUE && draw->syncState == 0) {
-        draw->syncState = 1;
+    if (CtvtTalk_IsGameCancelled(talk) == TRUE && draw->syncState == CANCEL_SYNC_NONE) {
+        draw->syncState = CANCEL_SYNC_SEND;
     }
     switch (draw->syncState) {
-    case 0:
+    case CANCEL_SYNC_NONE:
         break;
-    case 1:
+    case CANCEL_SYNC_SEND:
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 10, 32);
-        draw->syncState = 2;
+        draw->syncState = CANCEL_SYNC_WAIT;
         break;
-    case 2:
+    case CANCEL_SYNC_WAIT:
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 10, 32) == TRUE) {
             CtvtTalk_SetGameCancelled(talk, FALSE);
-            draw->syncState = 0;
+            draw->syncState = CANCEL_SYNC_NONE;
         }
         break;
     }

@@ -1,0 +1,2315 @@
+{
+    "$schema": "missions.schema.json",
+    "missions": [
+        {
+            "kind": 4,
+            "message": "GetTextFileForFestMissions_Text_FirstBerrySearch",
+            "result_message": "GetTextFileForFestMissions_Text_CollectMoreBerriesWithin",
+            "target": 5,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_PREMIER_BALL",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 5,
+                    "unk3": 5
+                },
+                {
+                    "seconds": 180,
+                    "count": 5,
+                    "unk3": 5
+                },
+                {
+                    "seconds": 180,
+                    "count": 5,
+                    "unk3": 5
+                },
+                {
+                    "seconds": 180,
+                    "count": 5,
+                    "unk3": 5
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 0,
+            "unk14": 157988,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 4,
+            "message": "GetTextFileForFestMissions_Text_CollectBerries",
+            "result_message": "GetTextFileForFestMissions_Text_CollectMoreBerriesWithin_2",
+            "target": 5,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_PREMIER_BALL",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 3,
+                    "unk3": 2
+                },
+                {
+                    "seconds": 180,
+                    "count": 6,
+                    "unk3": 4
+                },
+                {
+                    "seconds": 180,
+                    "count": 12,
+                    "unk3": 8
+                },
+                {
+                    "seconds": 180,
+                    "count": 25,
+                    "unk3": 15
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 0,
+            "unk14": 92386,
+            "header_unk01": 0,
+            "header_unk02": 2444,
+            "params_unk01": 0
+        },
+        {
+            "kind": 4,
+            "message": "GetTextFileForFestMissions_Text_FindLostItems",
+            "result_message": "GetTextFileForFestMissions_Text_CollectMoreLostItems",
+            "target": 2,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_PREMIER_BALL",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 10,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 300,
+                    "count": 15,
+                    "unk3": 5
+                },
+                {
+                    "seconds": 300,
+                    "count": 20,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 300,
+                    "count": 40,
+                    "unk3": 15
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 2444,
+            "unk14": 91292,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_FindLostBoys",
+            "result_message": "GetTextFileForFestMissions_Text_FindMoreLostChildren",
+            "target": 0,
+            "target_kind": 1,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_MOOMOO_MILK",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 4,
+                    "unk3": 4
+                },
+                {
+                    "seconds": 180,
+                    "count": 8,
+                    "unk3": 8
+                },
+                {
+                    "seconds": 180,
+                    "count": 16,
+                    "unk3": 16
+                },
+                {
+                    "seconds": 180,
+                    "count": 50,
+                    "unk3": 25
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 12,
+            "unk10": 0,
+            "unk14": 91884,
+            "header_unk01": 0,
+            "header_unk02": 2445,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_EnjoyShopping",
+            "result_message": "GetTextFileForFestMissions_Text_EnjoyBargainShoppingSpeak",
+            "target": 3,
+            "target_kind": 4,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_NUGGET",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 3,
+                    "unk3": 2
+                },
+                {
+                    "seconds": 180,
+                    "count": 6,
+                    "unk3": 5
+                },
+                {
+                    "seconds": 180,
+                    "count": 12,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 180,
+                    "count": 25,
+                    "unk3": 15
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 2445,
+            "unk14": 91876,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 1,
+            "message": "GetTextFileForFestMissions_Text_Find",
+            "result_message": "GetTextFileForFestMissions_Text_FindRustlingGrassDefeat",
+            "target": "SPECIES_AUDINO",
+            "target_kind": 2,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_MAX_REPEL",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 1,
+                    "unk3": 5
+                },
+                {
+                    "seconds": 300,
+                    "count": 5,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 300,
+                    "count": 10,
+                    "unk3": 20
+                },
+                {
+                    "seconds": 300,
+                    "count": 50,
+                    "unk3": 50
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 10,
+            "unk10": 0,
+            "unk14": 0,
+            "header_unk01": 0,
+            "header_unk02": 2462,
+            "params_unk01": 0
+        },
+        {
+            "kind": 1,
+            "message": "GetTextFileForFestMissions_Text_SearchPokemon",
+            "result_message": "GetTextFileForFestMissions_Text_FindPokemonRustlingGrass_2",
+            "target": "SPECIES_NONE",
+            "target_kind": 2,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_NONE",
+            "required_flag": 0,
+            "extra_seconds_index": 1,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 3,
+                    "unk3": 5
+                },
+                {
+                    "seconds": 180,
+                    "count": 5,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 180,
+                    "count": 10,
+                    "unk3": 15
+                },
+                {
+                    "seconds": 300,
+                    "count": 50,
+                    "unk3": 20
+                }
+            ],
+            "unk00": 1,
+            "unk03": 1,
+            "unk04": 0,
+            "unk10": 2462,
+            "unk14": 0,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_TrainMartialArtists",
+            "result_message": "GetTextFileForFestMissions_Text_FightNoviceMartialArtists",
+            "target": 6,
+            "target_kind": 1,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_MAX_REVIVE",
+            "required_flag": "EVENT_FLAG_ARRIVED_CASTELIA_CITY",
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 2,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 300,
+                    "count": 4,
+                    "unk3": 6
+                },
+                {
+                    "seconds": 300,
+                    "count": 8,
+                    "unk3": 12
+                },
+                {
+                    "seconds": 300,
+                    "count": 100,
+                    "unk3": 60
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 2452,
+            "unk14": 92443,
+            "header_unk01": 0,
+            "header_unk02": 2548,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_SparringTrainers",
+            "result_message": "GetTextFileForFestMissions_Text_FightNoviceMartialArtists_2",
+            "target": 6,
+            "target_kind": 1,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_NONE",
+            "required_flag": "EVENT_FLAG_ARRIVED_CASTELIA_CITY",
+            "extra_seconds_index": 2,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 10,
+                    "unk3": 2
+                },
+                {
+                    "seconds": 180,
+                    "count": 30,
+                    "unk3": 4
+                },
+                {
+                    "seconds": 300,
+                    "count": 50,
+                    "unk3": 8
+                },
+                {
+                    "seconds": 300,
+                    "count": 100,
+                    "unk3": 10
+                }
+            ],
+            "unk00": 1,
+            "unk03": 1,
+            "unk04": 0,
+            "unk10": 2548,
+            "unk14": 91930,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 4,
+            "message": "GetTextFileForFestMissions_Text_GetRichQuick",
+            "result_message": "GetTextFileForFestMissions_Text_CollectMoreTreasuresWithin",
+            "target": 1,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_STAR_PIECE",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 3,
+                    "unk3": 2
+                },
+                {
+                    "seconds": 180,
+                    "count": 6,
+                    "unk3": 5
+                },
+                {
+                    "seconds": 180,
+                    "count": 12,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 180,
+                    "count": 25,
+                    "unk3": 15
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 5,
+            "unk10": 2447,
+            "unk14": 91857,
+            "header_unk01": 2,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 4,
+            "message": "GetTextFileForFestMissions_Text_TreasureHunting",
+            "result_message": "GetTextFileForFestMissions_Text_CollectItemsCavesForests",
+            "target": 9,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_STAR_PIECE",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 6,
+                    "unk3": 2
+                },
+                {
+                    "seconds": 180,
+                    "count": 12,
+                    "unk3": 5
+                },
+                {
+                    "seconds": 180,
+                    "count": 24,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 180,
+                    "count": 50,
+                    "unk3": 15
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 5,
+            "unk10": 2447,
+            "unk14": 92443,
+            "header_unk01": 1,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_ExcitingTrading",
+            "result_message": "GetTextFileForFestMissions_Text_TradeItemsMorePeople_2",
+            "target": 2,
+            "target_kind": 1,
+            "variant": 2,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_NUGGET",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 2,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 300,
+                    "count": 4,
+                    "unk3": 6
+                },
+                {
+                    "seconds": 300,
+                    "count": 8,
+                    "unk3": 12
+                },
+                {
+                    "seconds": 300,
+                    "count": 50,
+                    "unk3": 50
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 2453,
+            "unk14": 92379,
+            "header_unk01": 2,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_ExhilaratingTrading",
+            "result_message": "GetTextFileForFestMissions_Text_TradeItemsMorePeople_3",
+            "target": 2,
+            "target_kind": 1,
+            "variant": 1,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_NUGGET",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 2,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 300,
+                    "count": 4,
+                    "unk3": 6
+                },
+                {
+                    "seconds": 300,
+                    "count": 8,
+                    "unk3": 12
+                },
+                {
+                    "seconds": 300,
+                    "count": 50,
+                    "unk3": 50
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 2453,
+            "unk14": 92379,
+            "header_unk01": 1,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 1,
+            "message": "GetTextFileForFestMissions_Text_Find",
+            "result_message": "GetTextFileForFestMissions_Text_FindRustlingGrassPokemon",
+            "target": "SPECIES_EMOLGA",
+            "target_kind": 2,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_MAX_REPEL",
+            "required_flag": "EVENT_FLAG_0x09c8",
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 1,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 300,
+                    "count": 5,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 300,
+                    "count": 10,
+                    "unk3": 15
+                },
+                {
+                    "seconds": 300,
+                    "count": 30,
+                    "unk3": 40
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 10,
+            "unk10": 2504,
+            "unk14": 0,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 3,
+            "message": "GetTextFileForFestMissions_Text_WingsFallingDrawbridge",
+            "result_message": "GetTextFileForFestMissions_Text_PickUpCollectWings",
+            "target": 1,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_RARE_CANDY",
+            "required_flag": "EVENT_FLAG_0x09cb",
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 5,
+                    "unk3": 1
+                },
+                {
+                    "seconds": 180,
+                    "count": 10,
+                    "unk3": 2
+                },
+                {
+                    "seconds": 180,
+                    "count": 40,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 180,
+                    "count": 100,
+                    "unk3": 30
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 2457,
+            "unk14": 0,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 3,
+            "message": "GetTextFileForFestMissions_Text_FindTreasures",
+            "result_message": "GetTextFileForFestMissions_Text_FindTreasuresWhichCan",
+            "target": 2,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_COMET_SHARD",
+            "required_flag": "EVENT_FLAG_ARRIVED_DRIFTVEIL_CITY",
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 5,
+                    "unk3": 1
+                },
+                {
+                    "seconds": 180,
+                    "count": 10,
+                    "unk3": 2
+                },
+                {
+                    "seconds": 180,
+                    "count": 40,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 180,
+                    "count": 100,
+                    "unk3": 30
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 2458,
+            "unk14": 0,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 2,
+            "message": "GetTextFileForFestMissions_Text_MushroomsHideSeek",
+            "result_message": "GetTextFileForFestMissions_Text_FindFoongusHidingTall",
+            "target": 0,
+            "target_kind": 2,
+            "variant": 0,
+            "reward_item": "ITEM_BIG_MUSHROOM",
+            "second_item": "ITEM_BALM_MUSHROOM",
+            "required_flag": "EVENT_FLAG_0x09cc",
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 3,
+                    "unk3": 5
+                },
+                {
+                    "seconds": 300,
+                    "count": 10,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 300,
+                    "count": 30,
+                    "unk3": 30
+                },
+                {
+                    "seconds": 180,
+                    "count": 5,
+                    "unk3": 5
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 2456,
+            "unk14": 0,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 4,
+            "message": "GetTextFileForFestMissions_Text_FindMysteriousOres",
+            "result_message": "GetTextFileForFestMissions_Text_FindMysteriousOresSearch",
+            "target": 7,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_MAX_REVIVE",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 10,
+                    "unk3": 1
+                },
+                {
+                    "seconds": 300,
+                    "count": 20,
+                    "unk3": 2
+                },
+                {
+                    "seconds": 300,
+                    "count": 30,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 180,
+                    "count": 30,
+                    "unk3": 5
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 5,
+            "unk10": 2448,
+            "unk14": 91921,
+            "header_unk01": 2,
+            "header_unk02": 2549,
+            "params_unk01": 0
+        },
+        {
+            "kind": 4,
+            "message": "GetTextFileForFestMissions_Text_FindShiningOres",
+            "result_message": "GetTextFileForFestMissions_Text_FindShiningOresSearch",
+            "target": 8,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_MAX_REVIVE",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 10,
+                    "unk3": 1
+                },
+                {
+                    "seconds": 300,
+                    "count": 20,
+                    "unk3": 2
+                },
+                {
+                    "seconds": 300,
+                    "count": 30,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 180,
+                    "count": 30,
+                    "unk3": 5
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 5,
+            "unk10": 2448,
+            "unk14": 91921,
+            "header_unk01": 1,
+            "header_unk02": 2549,
+            "params_unk01": 0
+        },
+        {
+            "kind": 4,
+            "message": "GetTextFileForFestMissions_Text_LostTreasures",
+            "result_message": "GetTextFileForFestMissions_Text_FindLostRelicTreasures",
+            "target": 12,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_NONE",
+            "required_flag": 0,
+            "extra_seconds_index": 1,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 2,
+                    "unk3": 2
+                },
+                {
+                    "seconds": 300,
+                    "count": 4,
+                    "unk3": 4
+                },
+                {
+                    "seconds": 300,
+                    "count": 10,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 300,
+                    "count": 30,
+                    "unk3": 30
+                }
+            ],
+            "unk00": 1,
+            "unk03": 1,
+            "unk04": 0,
+            "unk10": 2549,
+            "unk14": 58505,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 4,
+            "message": "GetTextFileForFestMissions_Text_BigHarvestBerries",
+            "result_message": "GetTextFileForFestMissions_Text_CollectMoreBerriesWithin_3",
+            "target": 6,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_LUM_BERRY",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 6,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 180,
+                    "count": 12,
+                    "unk3": 6
+                },
+                {
+                    "seconds": 180,
+                    "count": 24,
+                    "unk3": 8
+                },
+                {
+                    "seconds": 180,
+                    "count": 100,
+                    "unk3": 50
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 10,
+            "unk10": 2449,
+            "unk14": 92834,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 3,
+            "message": "GetTextFileForFestMissions_Text_RingBell",
+            "result_message": "GetTextFileForFestMissions_Text_RingBellTopCelestial",
+            "target": 0,
+            "target_kind": 4,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_STARDUST",
+            "required_flag": "EVENT_FLAG_ARRIVED_MISTRALTON_CITY",
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 1,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 180,
+                    "count": 2,
+                    "unk3": 6
+                },
+                {
+                    "seconds": 180,
+                    "count": 8,
+                    "unk3": 12
+                },
+                {
+                    "seconds": 180,
+                    "count": 10,
+                    "unk3": 30
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 5,
+            "unk10": 2513,
+            "unk14": 0,
+            "header_unk01": 0,
+            "header_unk02": 2550,
+            "params_unk01": 0
+        },
+        {
+            "kind": 3,
+            "message": "GetTextFileForFestMissions_Text_BellRingsTimes",
+            "result_message": "GetTextFileForFestMissions_Text_RingBellTopCelestial_2",
+            "target": 0,
+            "target_kind": 4,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_NONE",
+            "required_flag": "EVENT_FLAG_ARRIVED_MISTRALTON_CITY",
+            "extra_seconds_index": 2,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 3,
+                    "unk3": 1
+                },
+                {
+                    "seconds": 180,
+                    "count": 5,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 180,
+                    "count": 7,
+                    "unk3": 12
+                },
+                {
+                    "seconds": 180,
+                    "count": 10,
+                    "unk3": 30
+                }
+            ],
+            "unk00": 1,
+            "unk03": 1,
+            "unk04": 0,
+            "unk10": 2550,
+            "unk14": 0,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_PathAce",
+            "result_message": "GetTextFileForFestMissions_Text_TrainingPartnerAceTrainers",
+            "target": 6,
+            "target_kind": 1,
+            "variant": 1,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_RARE_CANDY",
+            "required_flag": "EVENT_FLAG_ARRIVED_OPELUCID_CITY",
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 3,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 300,
+                    "count": 6,
+                    "unk3": 6
+                },
+                {
+                    "seconds": 300,
+                    "count": 12,
+                    "unk3": 12
+                },
+                {
+                    "seconds": 300,
+                    "count": 50,
+                    "unk3": 50
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 2481,
+            "unk14": 91867,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_ShockingShopping",
+            "result_message": "GetTextFileForFestMissions_Text_SpeakMenWearingBlack",
+            "target": 3,
+            "target_kind": 4,
+            "variant": 4,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_RARE_CANDY",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 4,
+                    "unk3": 4
+                },
+                {
+                    "seconds": 180,
+                    "count": 8,
+                    "unk3": 8
+                },
+                {
+                    "seconds": 180,
+                    "count": 32,
+                    "unk3": 15
+                },
+                {
+                    "seconds": 180,
+                    "count": 100,
+                    "unk3": 100
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 2459,
+            "unk14": 91931,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_MemoryTraining",
+            "result_message": "GetTextFileForFestMissions_Text_SpeakClownsTownsRoads_2",
+            "target": 5,
+            "target_kind": 4,
+            "variant": 0,
+            "reward_item": "ITEM_HEART_SCALE",
+            "second_item": "ITEM_NONE",
+            "required_flag": 0,
+            "extra_seconds_index": 1,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 6,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 180,
+                    "count": 10,
+                    "unk3": 4
+                },
+                {
+                    "seconds": 180,
+                    "count": 12,
+                    "unk3": 5
+                },
+                {
+                    "seconds": 300,
+                    "count": 50,
+                    "unk3": 10
+                }
+            ],
+            "unk00": 1,
+            "unk03": 1,
+            "unk04": 0,
+            "unk10": 2454,
+            "unk14": 92452,
+            "header_unk01": 0,
+            "header_unk02": 2551,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_PushLimitMemory",
+            "result_message": "GetTextFileForFestMissions_Text_SpeakClownsTownsRoads",
+            "target": 5,
+            "target_kind": 4,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_HEART_SCALE",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 5,
+                    "unk3": 6
+                },
+                {
+                    "seconds": 300,
+                    "count": 10,
+                    "unk3": 12
+                },
+                {
+                    "seconds": 300,
+                    "count": 40,
+                    "unk3": 40
+                },
+                {
+                    "seconds": 180,
+                    "count": 10,
+                    "unk3": 1
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 5,
+            "unk10": 2551,
+            "unk14": 92451,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 1,
+            "message": "GetTextFileForFestMissions_Text_FindRustlingGrass",
+            "result_message": "GetTextFileForFestMissions_Text_FindPokemonRustlingGrass",
+            "target": "SPECIES_NONE",
+            "target_kind": 2,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_MAX_REPEL",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 600,
+                    "count": 5,
+                    "unk3": 5
+                },
+                {
+                    "seconds": 600,
+                    "count": 10,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 600,
+                    "count": 20,
+                    "unk3": 20
+                },
+                {
+                    "seconds": 600,
+                    "count": 100,
+                    "unk3": 50
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 10,
+            "unk10": 2400,
+            "unk14": 0,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 4,
+            "message": "GetTextFileForFestMissions_Text_FindShards",
+            "result_message": "GetTextFileForFestMissions_Text_CollectMoreShardsWithin",
+            "target": 0,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_STAR_PIECE",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 3,
+                    "unk3": 2
+                },
+                {
+                    "seconds": 180,
+                    "count": 16,
+                    "unk3": 4
+                },
+                {
+                    "seconds": 180,
+                    "count": 32,
+                    "unk3": 8
+                },
+                {
+                    "seconds": 180,
+                    "count": 100,
+                    "unk3": 30
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 5,
+            "unk10": 2400,
+            "unk14": 91931,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 4,
+            "message": "GetTextFileForFestMissions_Text_ForgottenLostItems",
+            "result_message": "GetTextFileForFestMissions_Text_CollectMoreLostItems_2",
+            "target": 3,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_PREMIER_BALL",
+            "required_flag": "EVENT_FLAG_0x0960",
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 120,
+                    "count": 5,
+                    "unk3": 1
+                },
+                {
+                    "seconds": 120,
+                    "count": 10,
+                    "unk3": 2
+                },
+                {
+                    "seconds": 120,
+                    "count": 50,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 120,
+                    "count": 100,
+                    "unk3": 30
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 5,
+            "unk10": 2400,
+            "unk14": 92323,
+            "header_unk01": 2,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 4,
+            "message": "GetTextFileForFestMissions_Text_NotFoundLostItems",
+            "result_message": "GetTextFileForFestMissions_Text_CollectMoreLostItems_3",
+            "target": 4,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_PREMIER_BALL",
+            "required_flag": "EVENT_FLAG_0x0960",
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 120,
+                    "count": 5,
+                    "unk3": 1
+                },
+                {
+                    "seconds": 120,
+                    "count": 10,
+                    "unk3": 2
+                },
+                {
+                    "seconds": 120,
+                    "count": 50,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 120,
+                    "count": 100,
+                    "unk3": 30
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 5,
+            "unk10": 2400,
+            "unk14": 92323,
+            "header_unk01": 1,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_WhatBestPrice",
+            "result_message": "GetTextFileForFestMissions_Text_SpeakMenWearingBlack_2",
+            "target": 3,
+            "target_kind": 4,
+            "variant": 2,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_HEART_SCALE",
+            "required_flag": "EVENT_FLAG_0x0960",
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 6,
+                    "unk3": 2
+                },
+                {
+                    "seconds": 180,
+                    "count": 12,
+                    "unk3": 4
+                },
+                {
+                    "seconds": 180,
+                    "count": 40,
+                    "unk3": 8
+                },
+                {
+                    "seconds": 180,
+                    "count": 50,
+                    "unk3": 10
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 2400,
+            "unk14": 91931,
+            "header_unk01": 2,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_WhatRealPrice",
+            "result_message": "GetTextFileForFestMissions_Text_SpeakMenWearingBlack_3",
+            "target": 3,
+            "target_kind": 4,
+            "variant": 1,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_HEART_SCALE",
+            "required_flag": "EVENT_FLAG_0x0960",
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 6,
+                    "unk3": 2
+                },
+                {
+                    "seconds": 180,
+                    "count": 12,
+                    "unk3": 4
+                },
+                {
+                    "seconds": 180,
+                    "count": 40,
+                    "unk3": 8
+                },
+                {
+                    "seconds": 180,
+                    "count": 50,
+                    "unk3": 10
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 2400,
+            "unk14": 91931,
+            "header_unk01": 1,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_GiveItem",
+            "result_message": "GetTextFileForFestMissions_Text_FindMoreYoungstersWho",
+            "target": 1,
+            "target_kind": 1,
+            "variant": 0,
+            "reward_item": "ITEM_MAX_REPEL",
+            "second_item": "ITEM_PP_MAX",
+            "required_flag": "EVENT_FLAG_0x0960",
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 10,
+                    "unk3": 5
+                },
+                {
+                    "seconds": 300,
+                    "count": 15,
+                    "unk3": 7
+                },
+                {
+                    "seconds": 300,
+                    "count": 20,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 300,
+                    "count": 40,
+                    "unk3": 15
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 2400,
+            "unk14": 92452,
+            "header_unk01": 0,
+            "header_unk02": 2460,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_GreatTradeUp",
+            "result_message": "GetTextFileForFestMissions_Text_TradeItemsMorePeople",
+            "target": 2,
+            "target_kind": 1,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_NUGGET",
+            "required_flag": "EVENT_FLAG_0x0960",
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 3,
+                    "unk3": 5
+                },
+                {
+                    "seconds": 180,
+                    "count": 6,
+                    "unk3": 8
+                },
+                {
+                    "seconds": 180,
+                    "count": 80,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 180,
+                    "count": 10,
+                    "unk3": 5
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 2460,
+            "unk14": 91805,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 3,
+            "message": "GetTextFileForFestMissions_Text_SearchHiddenGrottoes",
+            "result_message": "GetTextFileForFestMissions_Text_VisitHiddenGrottoesDifferent",
+            "target": 5,
+            "target_kind": 2,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_BIG_MUSHROOM",
+            "required_flag": "EVENT_FLAG_0x0960",
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 600,
+                    "count": 1,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 600,
+                    "count": 3,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 600,
+                    "count": 10,
+                    "unk3": 30
+                },
+                {
+                    "seconds": 300,
+                    "count": 3,
+                    "unk3": 10
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 10,
+            "unk10": 2400,
+            "unk14": 0,
+            "header_unk01": 0,
+            "header_unk02": 2461,
+            "params_unk01": 0
+        },
+        {
+            "kind": 3,
+            "message": "GetTextFileForFestMissions_Text_NoisyHiddenGrottoes",
+            "result_message": "GetTextFileForFestMissions_Text_VisitHiddenGrottoesDifferent_2",
+            "target": 5,
+            "target_kind": 2,
+            "variant": 2,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_PREMIER_BALL",
+            "required_flag": "EVENT_FLAG_0x0960",
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 600,
+                    "count": 3,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 600,
+                    "count": 5,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 600,
+                    "count": 10,
+                    "unk3": 20
+                },
+                {
+                    "seconds": 600,
+                    "count": 30,
+                    "unk3": 30
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 5,
+            "unk10": 2461,
+            "unk14": 0,
+            "header_unk01": 2,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 3,
+            "message": "GetTextFileForFestMissions_Text_QuietHiddenGrottoes",
+            "result_message": "GetTextFileForFestMissions_Text_VisitHiddenGrottoesDifferent_3",
+            "target": 5,
+            "target_kind": 2,
+            "variant": 1,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_PREMIER_BALL",
+            "required_flag": "EVENT_FLAG_0x0960",
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 600,
+                    "count": 3,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 600,
+                    "count": 5,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 600,
+                    "count": 10,
+                    "unk3": 20
+                },
+                {
+                    "seconds": 600,
+                    "count": 30,
+                    "unk3": 30
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 5,
+            "unk10": 2461,
+            "unk14": 0,
+            "header_unk01": 1,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 3,
+            "message": "GetTextFileForFestMissions_Text_FishingCompetition",
+            "result_message": "GetTextFileForFestMissions_Text_UseSuperRodCatch",
+            "target": 4,
+            "target_kind": 4,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_DIVE_BALL",
+            "required_flag": "EVENT_FLAG_0x0985",
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 5,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 180,
+                    "count": 10,
+                    "unk3": 6
+                },
+                {
+                    "seconds": 180,
+                    "count": 20,
+                    "unk3": 12
+                },
+                {
+                    "seconds": 180,
+                    "count": 30,
+                    "unk3": 50
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 10,
+            "unk10": 2437,
+            "unk14": 0,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 4,
+            "message": "GetTextFileForFestMissions_Text_MulchCollector",
+            "result_message": "GetTextFileForFestMissions_Text_CollectMoreMulchesWithin",
+            "target": 10,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_PEARL_STRING",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 6,
+                    "unk3": 1
+                },
+                {
+                    "seconds": 180,
+                    "count": 12,
+                    "unk3": 2
+                },
+                {
+                    "seconds": 180,
+                    "count": 24,
+                    "unk3": 4
+                },
+                {
+                    "seconds": 90,
+                    "count": 9,
+                    "unk3": 2
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 2450,
+            "unk14": 92881,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 4,
+            "message": "GetTextFileForFestMissions_Text_WhereFlutteringHearts",
+            "result_message": "GetTextFileForFestMissions_Text_CollectMoreItemsTowns",
+            "target": 11,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_HEART_SCALE",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 10,
+                    "unk3": 2
+                },
+                {
+                    "seconds": 300,
+                    "count": 20,
+                    "unk3": 4
+                },
+                {
+                    "seconds": 300,
+                    "count": 40,
+                    "unk3": 8
+                },
+                {
+                    "seconds": 300,
+                    "count": 100,
+                    "unk3": 50
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 10,
+            "unk10": 2451,
+            "unk14": 91827,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_RockPaperScissorsCompetition",
+            "result_message": "GetTextFileForFestMissions_Text_FindPreschoolersPlayRock",
+            "target": 4,
+            "target_kind": 1,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_LUCKY_PUNCH",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 5,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 180,
+                    "count": 10,
+                    "unk3": 15
+                },
+                {
+                    "seconds": 180,
+                    "count": 50,
+                    "unk3": 30
+                },
+                {
+                    "seconds": 180,
+                    "count": 100,
+                    "unk3": 100
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 5,
+            "unk10": 2455,
+            "unk14": 91820,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 3,
+            "message": "GetTextFileForFestMissions_Text_TakeWalkEggs",
+            "result_message": "GetTextFileForFestMissions_Text_HatchPokemonEggsWalk",
+            "target": 3,
+            "target_kind": 4,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_RARE_CANDY",
+            "required_flag": "EVENT_FLAG_0x0069",
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 600,
+                    "count": 3,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 600,
+                    "count": 12,
+                    "unk3": 6
+                },
+                {
+                    "seconds": 600,
+                    "count": 50,
+                    "unk3": 12
+                },
+                {
+                    "seconds": 600,
+                    "count": 100,
+                    "unk3": 20
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 105,
+            "unk14": 0,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 1,
+            "message": "GetTextFileForFestMissions_Text_Find",
+            "result_message": "GetTextFileForFestMissions_Text_FindTryFindDust",
+            "target": "SPECIES_STEELIX",
+            "target_kind": 2,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_MAX_REPEL",
+            "required_flag": "EVENT_FLAG_0x0960",
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 1,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 300,
+                    "count": 5,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 300,
+                    "count": 10,
+                    "unk3": 15
+                },
+                {
+                    "seconds": 300,
+                    "count": 30,
+                    "unk3": 40
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 10,
+            "unk10": 2400,
+            "unk14": 0,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 4,
+            "message": "GetTextFileForFestMissions_Text_BerryHuntingAdventure",
+            "result_message": "GetTextFileForFestMissions_Text_GoManyDifferentPlaces",
+            "target": 15,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_LUM_BERRY",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 5,
+                    "unk3": 5
+                },
+                {
+                    "seconds": 180,
+                    "count": 20,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 180,
+                    "count": 30,
+                    "unk3": 15
+                },
+                {
+                    "seconds": 180,
+                    "count": 100,
+                    "unk3": 50
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 10,
+            "unk10": 2557,
+            "unk14": 93027,
+            "header_unk01": 0,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 3,
+            "message": "GetTextFileForFestMissions_Text_FindPokemon",
+            "result_message": "GetTextFileForFestMissions_Text_HasBeenReportedUncommon",
+            "target": 5,
+            "target_kind": 2,
+            "variant": 3,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_PREMIER_BALL",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 600,
+                    "count": 30,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 600,
+                    "count": 30,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 600,
+                    "count": 30,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 600,
+                    "count": 5,
+                    "unk3": 10
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 10,
+            "unk10": 0,
+            "unk14": 0,
+            "header_unk01": 3,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_PokemonCenterQuizChampion",
+            "result_message": "GetTextFileForFestMissions_Text_SpeakScientistsTownsRoads_2",
+            "target": 8,
+            "target_kind": 4,
+            "variant": 17,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_MASTER_BALL",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 100,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 300,
+                    "count": 100,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 300,
+                    "count": 100,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 300,
+                    "count": 5,
+                    "unk3": 10
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 0,
+            "unk14": 91885,
+            "header_unk01": 3,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 4,
+            "message": "GetTextFileForFestMissions_Text_FindRareBerries",
+            "result_message": "GetTextFileForFestMissions_Text_RareBerriesHaveBeen",
+            "target": 14,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_ENIGMA_BERRY",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 100,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 300,
+                    "count": 100,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 300,
+                    "count": 100,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 300,
+                    "count": 5,
+                    "unk3": 10
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 0,
+            "unk14": 92899,
+            "header_unk01": 3,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 4,
+            "message": "GetTextFileForFestMissions_Text_RarePieces",
+            "result_message": "GetTextFileForFestMissions_Text_GetRareItemsSaid",
+            "target": 13,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_RELIC_CROWN",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 250,
+                    "unk3": 30
+                },
+                {
+                    "seconds": 300,
+                    "count": 250,
+                    "unk3": 30
+                },
+                {
+                    "seconds": 300,
+                    "count": 250,
+                    "unk3": 30
+                },
+                {
+                    "seconds": 300,
+                    "count": 5,
+                    "unk3": 30
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 0,
+            "unk14": 93027,
+            "header_unk01": 3,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_ShoppingImpossible",
+            "result_message": "GetTextFileForFestMissions_Text_AgainMenWearingBlack",
+            "target": 3,
+            "target_kind": 4,
+            "variant": 3,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_STAR_PIECE",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 50,
+                    "unk3": 30
+                },
+                {
+                    "seconds": 180,
+                    "count": 50,
+                    "unk3": 30
+                },
+                {
+                    "seconds": 180,
+                    "count": 50,
+                    "unk3": 30
+                },
+                {
+                    "seconds": 180,
+                    "count": 5,
+                    "unk3": 30
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 50,
+            "unk10": 0,
+            "unk14": 93027,
+            "header_unk01": 3,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_WomenPokemonCenters",
+            "result_message": "GetTextFileForFestMissions_Text_SpeakPokemonCenterWomen",
+            "target": 7,
+            "target_kind": 4,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_PREMIER_BALL",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 50,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 180,
+                    "count": 50,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 180,
+                    "count": 50,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 180,
+                    "count": 5,
+                    "unk3": 10
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 10,
+            "unk10": 0,
+            "unk14": 91885,
+            "header_unk01": 3,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_PokemonQuizChampionship",
+            "result_message": "GetTextFileForFestMissions_Text_SpeakScientistsTownsRoads_4",
+            "target": 8,
+            "target_kind": 4,
+            "variant": 18,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_RARE_CANDY",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 10,
+                    "unk3": 1
+                },
+                {
+                    "seconds": 300,
+                    "count": 20,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 300,
+                    "count": 50,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 300,
+                    "count": 100,
+                    "unk3": 30
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 5,
+            "unk10": 0,
+            "unk14": 91877,
+            "header_unk01": 4,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_EndlessBattles",
+            "result_message": "GetTextFileForFestMissions_Text_TryEndlessTrainingVeterans",
+            "target": 6,
+            "target_kind": 1,
+            "variant": 2,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_PP_UP",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 600,
+                    "count": 10,
+                    "unk3": 1
+                },
+                {
+                    "seconds": 600,
+                    "count": 15,
+                    "unk3": 3
+                },
+                {
+                    "seconds": 600,
+                    "count": 30,
+                    "unk3": 5
+                },
+                {
+                    "seconds": 600,
+                    "count": 100,
+                    "unk3": 30
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 10,
+            "unk10": 0,
+            "unk14": 59675,
+            "header_unk01": 5,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 5,
+            "message": "GetTextFileForFestMissions_Text_GiftsFromPokemonCenter",
+            "result_message": "GetTextFileForFestMissions_Text_SpeakPokemonCenterWomen_2",
+            "target": 7,
+            "target_kind": 4,
+            "variant": 1,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_PREMIER_BALL",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 180,
+                    "count": 3,
+                    "unk3": 5
+                },
+                {
+                    "seconds": 180,
+                    "count": 10,
+                    "unk3": 10
+                },
+                {
+                    "seconds": 180,
+                    "count": 30,
+                    "unk3": 30
+                },
+                {
+                    "seconds": 180,
+                    "count": 50,
+                    "unk3": 50
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 10,
+            "unk10": 0,
+            "unk14": 91885,
+            "header_unk01": 6,
+            "header_unk02": 0,
+            "params_unk01": 0
+        },
+        {
+            "kind": 4,
+            "message": "GetTextFileForFestMissions_Text_BerryFestival",
+            "result_message": "GetTextFileForFestMissions_Text_RareBerriesHaveBeen_2",
+            "target": 16,
+            "target_kind": 3,
+            "variant": 0,
+            "reward_item": "ITEM_PASS_ORB",
+            "second_item": "ITEM_STARF_BERRY",
+            "required_flag": 0,
+            "extra_seconds_index": 0,
+            "levels": [
+                {
+                    "seconds": 300,
+                    "count": 10,
+                    "unk3": 5
+                },
+                {
+                    "seconds": 300,
+                    "count": 30,
+                    "unk3": 15
+                },
+                {
+                    "seconds": 300,
+                    "count": 100,
+                    "unk3": 50
+                },
+                {
+                    "seconds": 300,
+                    "count": 50,
+                    "unk3": 5
+                }
+            ],
+            "unk00": 0,
+            "unk03": 2,
+            "unk04": 1,
+            "unk10": 0,
+            "unk14": 59545,
+            "header_unk01": 7,
+            "header_unk02": 0,
+            "params_unk01": 0
+        }
+    ]
+}

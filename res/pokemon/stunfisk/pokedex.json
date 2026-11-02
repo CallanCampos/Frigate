@@ -1,0 +1,30 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "S",
+    "shapes": [ 2 ],
+    "area": {
+        "all_year": false,
+        "seasons": {
+            "spring": {
+                "ZONE_ICIRRUS_CITY": [ "grass", "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+                "ZONE_MOOR_OF_ICIRRUS": [ "grass", "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+                "ZONE_ROUTE_8": [ "grass", "surf", "rippling_surf", "fishing", "rippling_fishing" ]
+            },
+            "summer": {
+                "ZONE_ICIRRUS_CITY": [ "grass", "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+                "ZONE_MOOR_OF_ICIRRUS": [ "grass", "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+                "ZONE_ROUTE_8": [ "grass", "surf", "rippling_surf", "fishing", "rippling_fishing" ]
+            },
+            "autumn": {
+                "ZONE_ICIRRUS_CITY": [ "grass", "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+                "ZONE_MOOR_OF_ICIRRUS": [ "grass", "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+                "ZONE_ROUTE_8": [ "grass", "surf", "rippling_surf", "fishing", "rippling_fishing" ]
+            },
+            "winter": {
+                "ZONE_ICIRRUS_CITY": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+                "ZONE_MOOR_OF_ICIRRUS": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+                "ZONE_ROUTE_8": [ "surf", "rippling_surf", "fishing", "rippling_fishing" ]
+            }
+        }
+    }
+}

@@ -16,23 +16,31 @@ GameEvent *EventCGearShutdown_Create(GameSystem *gsys) {
     return event;
 }
 
+// The steps of the shutdown: show the C-Gear's power-off screen, wait for it to finish, and go back to the default
+// subscreen
+enum {
+    CGEAR_SHUTDOWN_STEP_POWER_OFF,
+    CGEAR_SHUTDOWN_STEP_WAIT,
+    CGEAR_SHUTDOWN_STEP_END,
+};
+
 GameEventReturnCode EventCGearShutdown_Callback(GameEvent *event, u32 *state, void *eventData) {
     struct CGearShutdownData *data = eventData;
 
     switch (*state) {
-    case 0:
-        FieldSubscreen_ReqChange(data->subscreen, 9);
+    case CGEAR_SHUTDOWN_STEP_POWER_OFF:
+        FieldSubscreen_ReqChange(data->subscreen, FLD_SUBSCREEN_ID_CGEAR_POWEROFF);
         (*state)++;
         break;
-    case 1:
+    case CGEAR_SHUTDOWN_STEP_WAIT:
         if (FieldSubscreen_GetReturnSubscreen(data->subscreen) != 0xe) {
             break;
         }
         FieldSubscreen_ResetReturnSubscreen(data->subscreen);
         (*state)++;
         break;
-    case 2:
-        FieldSubscreen_ReqChange(data->subscreen, 0);
+    case CGEAR_SHUTDOWN_STEP_END:
+        FieldSubscreen_ReqChange(data->subscreen, FLD_SUBSCREEN_ID_DEFAULT);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;

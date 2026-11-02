@@ -109,6 +109,15 @@ def export_one(apicula, model_dir, texture_dir, entry, texture_blob):
             picture["uri"] = image_uri(texture_dir, canonical)
         binary = gltfs[0].with_suffix(".bin").read_bytes()
     write_glb(model_dir / "model.glb", document, binary)
+    data = {"$schema": "../../../../field_prop_model.schema.json", "res_id": res_id,
+            **glb_fields(model_dir, name, nitro)}
+    write(model_dir / "data.json", data)
+
+
+def glb_fields(model_dir, name, nitro):
+    """Returns the data.json fields of a model's GLB as Apicula exported it, from its Nitro model (a BMD0 file of one
+    model): "transformed" where its positions went through the model's node transforms, "positions" where the packer
+    can't yet work those out from the GLB's joints, and "glb_sha256", the hash of the GLB."""
     doc, primitives, binary = mesh_primitives(model_dir, name)
     positions = accessor_values(doc, binary, primitives[0]["attributes"]["POSITION"])
     block = u32(nitro, 16)
@@ -125,13 +134,13 @@ def export_one(apicula, model_dir, texture_dir, entry, texture_blob):
             direct = patch_model(wrapped(nitro), positions, name) == wrapped(nitro)
         except ValueError:
             direct = False
-    data = {"$schema": "../../../../field_prop_model.schema.json", "res_id": res_id}
+    data = {}
     if not direct:
         data["transformed"] = True
         if needs_baseline(model_dir, name, nitro):
             data["positions"] = positions
     data["glb_sha256"] = hashlib.sha256((model_dir / "model.glb").read_bytes()).hexdigest()
-    write(model_dir / "data.json", data)
+    return data
 
 
 def prop_kind(directory):

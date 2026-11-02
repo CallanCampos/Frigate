@@ -1,0 +1,181 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A battle regulation: res/battle/regulations/<n>.json",
+    "description": "Regulation n of ARCID_REGULATION (a/1/0/6; Regulation in regulation.h), which PokeRegulation_Load and PokeRegulation_LoadNew (poke_regulation.c) read by number, as the Union Room, the Wi-Fi and wireless battles, the Battle Subway and Pokéstar Studios (regulation 5) do, and which tools/data/regulation_data.py packs. A field the code doesn't read keeps its C name.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "name",
+        "unk1",
+        "min_count",
+        "max_count",
+        "level",
+        "level_mode",
+        "max_level_total",
+        "allow_same_species",
+        "allow_same_item",
+        "banned_species",
+        "banned_items",
+        "required_species",
+        "required_form",
+        "launcher",
+        "unkac",
+        "unkb3",
+        "unkb4",
+        "allow_nicknames",
+        "unkb6",
+        "unkb7",
+        "show_partners",
+        "time_limit",
+        "battle_type",
+        "max_battles"
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "This schema, for editors"
+        },
+        "name": {
+            "type": "string",
+            "pattern": "^LoadBattleTypeTextToStrbuf_Text_",
+            "description": "The regulation's name, a message of res/text/system/load_battle_type_text_to_strbuf.txt (makeStrbufLoadBattleTypeText)"
+        },
+        "unk1": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255,
+            "description": "REGULATION_PARAM_1"
+        },
+        "min_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255,
+            "description": "The fewest Pokémon a team may enter"
+        },
+        "max_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255,
+            "description": "The most Pokémon a team may enter"
+        },
+        "level": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255,
+            "description": "The level that level_mode applies"
+        },
+        "level_mode": {
+            "enum": [ "none", "minimum", "maximum", "cap", "all", "raise" ],
+            "description": "How the level applies (getLevel): not at all, as the least or most level a Pokémon may have, as a cap that higher levels are set down to, as every Pokémon's level, or as the least level, which lower levels are raised to"
+        },
+        "max_level_total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535,
+            "description": "The most that the team's levels may add up to, 0 for no limit"
+        },
+        "allow_same_species": {
+            "type": "boolean",
+            "description": "Whether two Pokémon of one species may be entered"
+        },
+        "allow_same_item": {
+            "type": "boolean",
+            "description": "Whether two Pokémon holding one item may be entered"
+        },
+        "banned_species": {
+            "type": "array",
+            "description": "The species that may not be entered, a bit each (bannedSpecies, 0x52 bytes)",
+            "items": {
+                "type": [ "string", "integer" ],
+                "x-constant": "SPECIES_",
+                "minimum": 0,
+                "maximum": 655
+            }
+        },
+        "banned_items": {
+            "type": "array",
+            "description": "The items that may not be held, a bit each (bannedItems, 0x4c bytes)",
+            "items": {
+                "type": [ "string", "integer" ],
+                "x-constant": "ITEM_",
+                "minimum": 0,
+                "maximum": 607
+            }
+        },
+        "required_species": {
+            "type": "string",
+            "x-constant": "SPECIES_",
+            "description": "The species the team must have, SPECIES_NONE for none"
+        },
+        "required_form": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255,
+            "description": "Its form"
+        },
+        "launcher": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255,
+            "description": "Whether the Wonder Launcher is used: 0 not, 1 it is, 2 the players choose"
+        },
+        "unkac": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 55
+            },
+            "description": "The bits of unkAC, 7 bytes, which Regulation_CheckParamBit reads and Regulation_GetShooterSettings copies for the Wonder Launcher"
+        },
+        "unkb3": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255,
+            "description": "REGULATION_PARAM_15"
+        },
+        "unkb4": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255,
+            "description": "REGULATION_PARAM_16"
+        },
+        "allow_nicknames": {
+            "type": "boolean",
+            "description": "Whether the Pokémon's nicknames are kept"
+        },
+        "unkb6": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255,
+            "description": "REGULATION_PARAM_18"
+        },
+        "unkb7": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255,
+            "description": "Unread"
+        },
+        "show_partners": {
+            "type": "boolean",
+            "description": "Whether the partners' teams are shown in the selection"
+        },
+        "time_limit": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255,
+            "description": "The selection's time limit"
+        },
+        "battle_type": {
+            "enum": [ "single", "double", "triple", "rotation", "multi" ],
+            "description": "The battle it is for (battleType), as wifibattlematch_sys.c sets them up"
+        },
+        "max_battles": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255,
+            "description": "How many battles may be played, 0 for no limit"
+        }
+    }
+}

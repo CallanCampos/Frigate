@@ -80,7 +80,14 @@ BOOL BrNet_IsRequestEnd(BrNet *net);
 // Returns a status from 0 to 3 and consumes any valid GDS result, including those returning 0.
 // msgID may be NULL and is written only for results that map to a message; otherwise it is unchanged.
 BOOL BrNet_GetResultMsg(BrNet *net, u32 *msgID);
-// 2 once the connection has had an error, which ends the Battle Recorder's screens
+// What BrNet_CheckError finds. BR_NET_ERROR_FAILED ends the Battle Recorder's screens
+enum {
+    BR_NET_ERROR_NONE,
+    BR_NET_ERROR_DISCONNECTED,
+    BR_NET_ERROR_FAILED,
+};
+
+// Returns a BR_NET_ERROR_*
 u32 BrNet_CheckError(BrNet *net);
 // TRUE once the connection has failed
 BOOL BrNet_IsFailed(BrNet *net);

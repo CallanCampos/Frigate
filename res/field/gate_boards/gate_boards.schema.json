@@ -1,0 +1,80 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The gates' news boards: res/field/gate_boards/gates.json or news.json",
+    "description": "One of the two archives of the gate gimmick's news boards (field_gimmick_gate.c), as a list of its members in order: gates.json, ARCID_FIELD_GIMMICK_GATE_ZONE_DATA (a/1/7/2), or news.json, ARCID_FIELD_GIMMICK_GATE_BOARD_ENTRIES (a/1/6/4). tools/data/gate_board_data.py packs them.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "gates": {
+            "type": "array",
+            "description": "The gates' boards, a GimmickGateZoneData each. GimmickGate_LoadZoneData takes the first whose zone is the player's and whose version is the game's or null; in zones 0x177 and 0x17b it takes the next one instead when the player's city (GameData_GetMyCity) is 1",
+            "items": {
+                "type": "object", "additionalProperties": false,
+                "required": [ "zone", "version", "position", "direction", "animation", "enabled", "messages", "weather_zones" ],
+                "properties": {
+                    "zone": { "$ref": "#/$defs/zone" },
+                    "version": { "$ref": "#/$defs/version" },
+                    "position": {
+                        "type": "object", "additionalProperties": false, "required": [ "x", "y", "z" ],
+                        "description": "Where the board stands, in whole units (GimmickGate_PlaceBoard shifts them into fx32)",
+                        "properties": { "x": { "$ref": "#/$defs/u32" }, "y": { "$ref": "#/$defs/u32" }, "z": { "$ref": "#/$defs/u32" } }
+                    },
+                    "direction": {
+                        "type": [ "string", "integer" ], "x-constant": "DIR_", "minimum": 0, "maximum": 3,
+                        "description": "The DIR_* the board faces: DIR_DOWN turns it 0 degrees, DIR_RIGHT 90, DIR_UP 180 and DIR_LEFT 270 (GimmickGate_PlaceBoard); it also sets the camera of the board's event (gimmick_obj_elboard.c)"
+                    },
+                    "animation": { "type": "integer", "minimum": 0, "maximum": 14, "description": "The board model's animation, an index of sBoardAnimations (GimmickGate_StartBoardAnimation)" },
+                    "enabled": { "type": "boolean", "description": "Whether the board shows its messages at all" },
+                    "messages": {
+                        "type": "object", "additionalProperties": false,
+                        "required": [ "date", "message1", "swarm", "rotation", "weekdays" ],
+                        "description": "The board's messages (messageIds), numbers of the system text bank 0x2b",
+                        "properties": {
+                            "date": { "$ref": "#/$defs/u32", "description": "messageIds[0], the date's (GimmickGate_AddDateMessage)" },
+                            "message1": { "$ref": "#/$defs/u32", "description": "messageIds[1], which the code never reads" },
+                            "swarm": { "$ref": "#/$defs/u32", "description": "messageIds[2], the swarm's (GimmickGate_AddSwarmMessage)" },
+                            "rotation": {
+                                "type": "array", "minItems": 9, "maxItems": 9, "items": { "$ref": "#/$defs/u32" },
+                                "description": "messageIds[3] to [11], which GimmickGate_AddWeekdayMessage3 to 5 pick three of by the day of the week, a day apart"
+                            },
+                            "weekdays": {
+                                "type": "array", "minItems": 7, "maxItems": 7, "items": { "$ref": "#/$defs/u32" },
+                                "description": "messageIds[12] to [18], the message of each day from Monday to Sunday (GimmickGate_AddWeekdayMessage6)"
+                            }
+                        }
+                    },
+                    "weather_zones": {
+                        "$ref": "#/$defs/zones",
+                        "description": "The zones whose weather the board reports when no roamer or reported weather gives one (fallbackZones, GimmickGate_GetWeatherZones)"
+                    }
+                }
+            }
+        },
+        "news": {
+            "type": "array",
+            "description": "The news, a GimmickGateBoardEntry each, all loaded by GimmickGate_LoadBoardEntries; a board shows the news whose flag is set and whose zones have its own",
+            "items": {
+                "type": "object", "additionalProperties": false,
+                "required": [ "version", "flag", "clear_flag", "message", "type", "zones" ],
+                "properties": {
+                    "version": { "$ref": "#/$defs/version" },
+                    "flag": { "type": [ "string", "integer" ], "minimum": 0, "maximum": 65535, "description": "The event flag that turns the news on, a constant of generated/flags.txt (flagId)" },
+                    "clear_flag": { "type": "boolean", "description": "Whether showing the news clears its flag (unk08, GimmickGate_AddBoardMessage)" },
+                    "message": { "$ref": "#/$defs/u32", "description": "The news' message, a number of the system text bank 0x2b (unk0c, GimmickGate_AddEntryMessage)" },
+                    "type": { "$ref": "#/$defs/u32", "description": "0 for news shown alone, by GimmickGate_FindBoardEntry, or 2 for news listed with the others of type 2, up to three (GimmickGate_FindListEntry)" },
+                    "zones": { "$ref": "#/$defs/zones", "description": "The gates whose boards show the news; none for every board" }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "u32": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+        "zone": { "type": [ "string", "integer" ], "x-constant": "ZONE_", "minimum": 0, "maximum": 65535, "description": "A ZONE_* constant" },
+        "zones": { "type": "array", "maxItems": 4, "items": { "$ref": "#/$defs/zone" }, "description": "Up to four zones; the rest of the four are ZONE_MAX, none" },
+        "version": {
+            "anyOf": [ { "type": "null" }, { "type": [ "string", "integer" ], "x-constant": "VERSION_", "minimum": 1, "maximum": 255 } ],
+            "description": "The VERSION_* this applies in, or null for both"
+        }
+    }
+}

@@ -229,10 +229,10 @@ BOOL TrainerCard_Init(GameProc *proc, u32 *state, void *param, void *work) {
     } else {
         wk->side = 0;
     }
-    wk->param->next = 0;
+    wk->param->next = TRCARD_NEXT_END;
     wk->unk32E8 = 0;
     wk->unk31E0 = 0;
-    if (wk->data->unk04_4) {
+    if (wk->data->signBlinks) {
         wk->blinkMode = 0;
     } else {
         wk->blinkMode = 2;
@@ -258,9 +258,9 @@ BOOL TrainerCard_Init(GameProc *proc, u32 *state, void *param, void *work) {
 
 // Steps the union room appearance to the next of the trainer's gender
 static void TrainerCard_NextUnionView(TrainerCardData *data) {
-    data->unk06++;
-    if (data->unk06 > (data->gender + 1) * 8 - 1) {
-        data->unk06 = data->gender * 8;
+    data->unionView++;
+    if (data->unionView > (data->gender + 1) * 8 - 1) {
+        data->unionView = data->gender * 8;
     }
 }
 
@@ -326,20 +326,20 @@ BOOL TrainerCard_Main(GameProc *proc, u32 *state, void *param, void *work) {
         break;
     case TRCARD_SEQ_GREETING:
         GFL_WipeSet(WIPE_MODE_SUB_FIRST, 4, 4, 0, 6, 1, wk->heapId);
-        wk->param->next = 1;
+        wk->param->next = TRCARD_NEXT_GREETING;
         *state = TRCARD_SEQ_FADE_OUT;
         break;
     case TRCARD_SEQ_BADGES:
         if (!ClActor_IsAnimActive(wk->obj.actors[TRCARD_ACTOR_BADGES])) {
             GFL_WipeSet(WIPE_MODE_SUB_FIRST, 4, 4, 0, 6, 1, wk->heapId);
-            wk->param->next = 2;
+            wk->param->next = TRCARD_NEXT_BADGES;
             *state = TRCARD_SEQ_FADE_OUT;
         }
         break;
     case TRCARD_SEQ_MEDALS:
         if (!ClActor_IsAnimActive(wk->obj.actors[TRCARD_ACTOR_RANK])) {
             GFL_WipeSet(WIPE_MODE_SUB_FIRST, 4, 4, 0, 6, 1, wk->heapId);
-            wk->param->next = 4;
+            wk->param->next = TRCARD_NEXT_MEDALS;
             *state = TRCARD_SEQ_FADE_OUT;
         }
         break;
@@ -365,17 +365,17 @@ BOOL TrainerCard_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     PlayerInfo *info;
     TimeSigSave *timeSig;
 
-    if (!wk->data->unk04_5) {
-        TrainerCard_PackSign(wk->signPixels, wk->data->unk74);
-        MI_CpuCopy8(wk->data->unk74, TimeSigSave_GetSignature(getTimeSigSaveBlock(wk->param->gameData)),
+    if (!wk->data->isLocked) {
+        TrainerCard_PackSign(wk->signPixels, wk->data->signature);
+        MI_CpuCopy8(wk->data->signature, TimeSigSave_GetSignature(getTimeSigSaveBlock(wk->param->gameData)),
                     TRCARD_SIGN_BYTES);
     }
     if (cardParam->canEdit) {
         info = GetGameDataPlayerInfo(wk->param->gameData);
         timeSig = getTimeSigSaveBlock(wk->param->gameData);
-        PlayerInfo_SetUnionView(info, wk->data->unk06);
-        TimeSigSave_SetPersonality(timeSig, wk->data->unk48);
-        TimeSigSave_SetSignBlinks(timeSig, wk->data->unk04_4);
+        PlayerInfo_SetUnionView(info, wk->data->unionView);
+        TimeSigSave_SetPersonality(timeSig, wk->data->personality);
+        TimeSigSave_SetSignBlinks(timeSig, wk->data->signBlinks);
     }
     PMSDraw_Delete(wk->pmsDraw);
     TrainerCard_ResetAffine();
@@ -531,8 +531,8 @@ static u32 TrainerCard_GetFrontScreenFile(u32 version) {
 }
 
 static void TrainerCard_LoadGraphics(TrainerCardWork *wk) {
-    TrainerCard_LoadCardPalette(wk, wk->data->stars, wk->data->unk04_2);
-    if (!wk->data->unk04_7) {
+    TrainerCard_LoadCardPalette(wk, wk->data->stars, wk->data->hasPokedex);
+    if (!wk->data->isOtherCard) {
         wk->charRes = GFL_G2DIOReadBGNCGR(ARCID_TRAINER_CARD_GRA, 36, FALSE, &wk->charData, wk->heapId);
         if (!wk->data->gender) {
             wk->scrRes = GFL_G2DIOReadNSCR(ARCID_TRAINER_CARD_GRA, 50, FALSE, &wk->scrData, wk->heapId);
@@ -540,10 +540,10 @@ static void TrainerCard_LoadGraphics(TrainerCardWork *wk) {
             wk->scrRes = GFL_G2DIOReadNSCR(ARCID_TRAINER_CARD_GRA, 51, FALSE, &wk->scrData, wk->heapId);
         }
     } else {
-        wk->charRes = GFL_G2DIOReadBGNCGR(ARCID_TRAINER_CARD_UNION_GRA, sTrainerCardUnionGra[wk->data->unk06].chars,
+        wk->charRes = GFL_G2DIOReadBGNCGR(ARCID_TRAINER_CARD_UNION_GRA, sTrainerCardUnionGra[wk->data->unionView].chars,
                                           FALSE, &wk->charData, wk->heapId);
         wk->scrRes = GFL_G2DIOReadNSCR(ARCID_TRAINER_CARD_UNION_GRA, 32, FALSE, &wk->scrData, wk->heapId);
-        TrainerCard_LoadUnionPalette(wk, wk->data->unk06);
+        TrainerCard_LoadUnionPalette(wk, wk->data->unionView);
     }
     TrainerCard_DrawTrainer(wk);
     GFL_BGSysLoadNCGRStatic(ARCID_TRAINER_CARD_GRA, TrainerCard_GetFrontCharFile(wk->data->version), 6, 0, 0, FALSE,
@@ -555,7 +555,7 @@ static void TrainerCard_LoadGraphics(TrainerCardWork *wk) {
     GFL_BGSysLoadNCGRStatic(ARCID_TRAINER_CARD_GRA, 35, 3, 0, 0, FALSE, wk->heapId);
     loadBGScrToVramByNarcNoReserveNegAlign(ARCID_TRAINER_CARD_GRA, 47, 3, 0, 0, FALSE, wk->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_TRAINER_CARD_GRA, 18, 0, 0, 0x20, wk->heapId);
-    TrainerCard_UnpackSign(wk->data->unk74, wk->signPixels);
+    TrainerCard_UnpackSign(wk->data->signature, wk->signPixels);
     GFL_BGSysLoadNCGRStatic(getUINarcIdx(), AppMenuCommon_GetBarBgCharFile(), 4, 0, 0, FALSE, wk->heapId);
     loadBGScrToVramByNarcNoReserveNegAlign(getUINarcIdx(), AppMenuCommon_GetBarScreenFile(), 4, 0, 0, FALSE,
                                            wk->heapId);
@@ -589,7 +589,7 @@ static void TrainerCard_LoadBackScreen(TrainerCardWork *wk, u32 version) {
     } else {
         version = 1;
     }
-    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_TRAINER_CARD_GRA, files[wk->data->unk04_4][version], 6, 0, 0, FALSE,
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_TRAINER_CARD_GRA, files[wk->data->signBlinks][version], 6, 0, 0, FALSE,
                                            wk->heapId);
 }
 
@@ -710,9 +710,9 @@ static void TrainerCard_SetButtonsEdit(TrainerCardWork *wk, int side) {
         TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_RETURN, 1, TRUE);
         TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_EXIT, 0, TRUE);
         TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_FLIP, 22, TRUE);
-        TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_ZOOM, 18, wk->data->unk04_4 ^ 1);
-        TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_BRUSH, 8 - wk->brush * 2, wk->data->unk04_4 ^ 1);
-        TrainerCard_SetPenButton(wk, wk->data->unk04_4, TRUE);
+        TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_ZOOM, 18, wk->data->signBlinks ^ 1);
+        TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_BRUSH, 8 - wk->brush * 2, wk->data->signBlinks ^ 1);
+        TrainerCard_SetPenButton(wk, wk->data->signBlinks, TRUE);
         TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_SHORTCUT,
                            GameData_IsShortcutRegistered(wk->param->gameData, SHORTCUT_TRAINER_CARD_BACK) + 6, TRUE);
     } else {
@@ -740,7 +740,7 @@ static void TrainerCard_SetButtonsLocked(TrainerCardWork *wk, int side) {
         TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_ZOOM, 18, FALSE);
         TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_FLIP, 22, TRUE);
         TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_BRUSH, 8 - wk->brush * 2, FALSE);
-        TrainerCard_SetPenButton(wk, wk->data->unk04_4, FALSE);
+        TrainerCard_SetPenButton(wk, wk->data->signBlinks, FALSE);
         TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_SHORTCUT,
                            GameData_IsShortcutRegistered(wk->param->gameData, SHORTCUT_TRAINER_CARD_BACK) + 6, TRUE);
     }
@@ -761,13 +761,13 @@ static void TrainerCard_SetButtonsOther(TrainerCardWork *wk, int side) {
         TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_ZOOM, 18, FALSE);
         TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_FLIP, 22, TRUE);
         TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_BRUSH, 8 - wk->brush * 2, FALSE);
-        TrainerCard_SetPenButton(wk, wk->data->unk04_4, FALSE);
+        TrainerCard_SetPenButton(wk, wk->data->signBlinks, FALSE);
         TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_SHORTCUT, 6, FALSE);
     }
 }
 
 static void TrainerCard_SetButtons(TrainerCardWork *wk, int side) {
-    if (wk->data->unk04_7 == TRUE) {
+    if (wk->data->isOtherCard == TRUE) {
         TrainerCard_SetButtonsOther(wk, side);
     } else if (wk->param->canEdit == FALSE) {
         TrainerCard_SetButtonsLocked(wk, side);
@@ -1006,7 +1006,7 @@ static int TrainerCard_KeyInput(TrainerCardWork *wk) {
             return TRCARD_INPUT_RETURN;
         }
     } else if (keys & PAD_BUTTON_X) {
-        if (wk->zoomed == 0 && !wk->data->unk04_7) {
+        if (wk->zoomed == 0 && !wk->data->isOtherCard) {
             TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_EXIT, 8, TRUE);
             GFL_SndSEPlay(SEQ_SE_SW_CARD_05);
             return TRCARD_INPUT_EXIT;
@@ -1017,23 +1017,23 @@ static int TrainerCard_KeyInput(TrainerCardWork *wk) {
             return TRCARD_INPUT_FLIP;
         }
     } else if (keys & PAD_BUTTON_Y) {
-        if (!wk->data->unk04_7) {
+        if (!wk->data->isOtherCard) {
             TrainerCard_ToggleShortcut(wk);
         }
     } else if (keys & PAD_BUTTON_A) {
-        if (!wk->data->unk04_7 && wk->side == 0) {
+        if (!wk->data->isOtherCard && wk->side == 0) {
             GFL_SndSEPlay(SEQ_SE_SW_CARD_01);
             TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_BADGES, 17, TRUE);
             return TRCARD_INPUT_BADGES;
         }
     } else if (keys & PAD_BUTTON_L) {
-        if (!wk->data->unk04_7 && wk->zoomed == 1 && wk->zoomSide == 1) {
+        if (!wk->data->isOtherCard && wk->zoomed == 1 && wk->zoomSide == 1) {
             GFL_SndSEPlay(SEQ_SE_SW_CARD_02);
             wk->subSeq = 12;
             return TRCARD_INPUT_ZOOM;
         }
     } else if (keys & PAD_BUTTON_R) {
-        if (!wk->data->unk04_7 && wk->zoomed == 1 && wk->zoomSide == 0) {
+        if (!wk->data->isOtherCard && wk->zoomed == 1 && wk->zoomSide == 0) {
             GFL_SndSEPlay(SEQ_SE_SW_CARD_02);
             wk->subSeq = 13;
             return TRCARD_INPUT_ZOOM;
@@ -1090,7 +1090,7 @@ static void TrainerCard_SetSignBlink(TrainerCardWork *wk, int eraser) {
 }
 
 static BOOL TrainerCard_IsLocked(TrainerCardWork *wk, int button) {
-    if (wk->data->unk04_5 && button >= 3 && button <= 9) {
+    if (wk->data->isLocked && button >= 3 && button <= 9) {
         return TRUE;
     }
     return FALSE;
@@ -1117,10 +1117,10 @@ static int TrainerCard_TouchCard(TrainerCardWork *wk, int button) {
     case 3:
         if (wk->side != 0) {
             if (wk->param->shownData->canEdit) {
-                TrainerCard_PressPenButton(wk, wk->data->unk04_4);
-                wk->data->unk04_4 ^= 1;
+                TrainerCard_PressPenButton(wk, wk->data->signBlinks);
+                wk->data->signBlinks ^= 1;
                 TrainerCard_LoadBackScreen(wk, wk->data->version);
-                TrainerCard_SetSignBlink(wk, wk->data->unk04_4);
+                TrainerCard_SetSignBlink(wk, wk->data->signBlinks);
                 GFL_SndSEPlay(SEQ_SE_SW_CARD_02);
             }
         } else {
@@ -1130,7 +1130,7 @@ static int TrainerCard_TouchCard(TrainerCardWork *wk, int button) {
         }
         break;
     case 4:
-        if (wk->side != 0 && !wk->data->unk04_4 && wk->param->shownData->canEdit) {
+        if (wk->side != 0 && !wk->data->signBlinks && wk->param->shownData->canEdit) {
             if (wk->zoomed == 0) {
                 TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_ZOOM, 19, TRUE);
                 GFL_SndSEPlay(SEQ_SE_SW_CARD_10);
@@ -1144,7 +1144,7 @@ static int TrainerCard_TouchCard(TrainerCardWork *wk, int button) {
         }
         break;
     case 5:
-        if (wk->side != 0 && wk->param->shownData->canEdit && !wk->data->unk04_4) {
+        if (wk->side != 0 && wk->param->shownData->canEdit && !wk->data->signBlinks) {
             GFL_SndSEPlay(SEQ_SE_SW_CARD_02);
             TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_BRUSH, 9 - wk->brush * 2, TRUE);
             wk->brush ^= 1;
@@ -1350,7 +1350,7 @@ static int TrainerCard_TouchInput(TrainerCardWork *wk) {
     int hit;
     int input;
 
-    if (!wk->data->unk04_7) {
+    if (!wk->data->isOtherCard) {
         if (wk->zoomed == 0) {
             hit = GFL_HIDGetTouchPressedRect(sTrainerCardRects);
         } else {
@@ -1411,12 +1411,12 @@ static void TrainerCard_HandleInput(TrainerCardWork *wk, int input, u32 *state) 
         break;
     case TRCARD_INPUT_RETURN:
         *state = TRCARD_SEQ_RETURN;
-        wk->param->next = 0;
+        wk->param->next = TRCARD_NEXT_END;
         wk->param->result = 0;
         break;
     case TRCARD_INPUT_EXIT:
         *state = TRCARD_SEQ_EXIT;
-        wk->param->next = 0;
+        wk->param->next = TRCARD_NEXT_END;
         wk->param->result = 1;
         break;
     case TRCARD_INPUT_UNION_VIEW:
@@ -1424,17 +1424,17 @@ static void TrainerCard_HandleInput(TrainerCardWork *wk, int input, u32 *state) 
             TimeSigSave_SetUnionViewChanged(getTimeSigSaveBlock(wk->param->gameData));
             GFL_SndSEPlay(SEQ_SE_SW_CARD_02);
             TrainerCard_NextUnionView(wk->data);
-            TrCardBmp_DrawUnionView(wk, wk->data->unk06, TRUE);
+            TrCardBmp_DrawUnionView(wk, wk->data->unionView, TRUE);
         }
         break;
     case TRCARD_INPUT_PERSONALITY:
         if (wk->param->shownData->canEdit) {
             GFL_SndSEPlay(SEQ_SE_SW_CARD_02);
-            wk->data->unk48++;
-            if (wk->data->unk48 > 24) {
-                wk->data->unk48 = 0;
+            wk->data->personality++;
+            if (wk->data->personality > 24) {
+                wk->data->personality = 0;
             }
-            TrCardBmp_DrawPersonality(wk, wk->data->unk48, TRUE);
+            TrCardBmp_DrawPersonality(wk, wk->data->personality, TRUE);
         }
         break;
     case TRCARD_INPUT_BADGES:
@@ -1573,7 +1573,7 @@ static void TrainerCard_LoadSign(u32 bg, const u8 *pixels, u8 mode) {
 }
 
 static void TrainerCard_UpdateSignBlink(TrainerCardWork *wk) {
-    if (wk->side != 0 && wk->data->unk04_4) {
+    if (wk->side != 0 && wk->data->signBlinks) {
         wk->blinkCount++;
         if (wk->blinkCount > 20) {
             wk->blinkMode ^= 1;
@@ -1609,7 +1609,7 @@ static void TrainerCard_ReadPen(TrainerCardWork *wk, int zoomed) {
     u32 x;
     u32 y;
 
-    if (wk->data->unk04_5 || wk->data->unk04_4 == TRUE) {
+    if (wk->data->isLocked || wk->data->signBlinks == TRUE) {
         return;
     }
     if (GFL_HIDGetTouchHeldPoint(&x, &y)) {

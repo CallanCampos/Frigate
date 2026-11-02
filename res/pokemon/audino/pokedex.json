@@ -1,0 +1,40 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "A",
+    "shapes": [ 9 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_CASTELIA_CITY": [ "shaking_grass" ],
+            "ZONE_DREAMYARD": [ "shaking_grass" ],
+            "ZONE_PINWHEEL_FOREST": [ "shaking_grass" ],
+            "ZONE_DRAGONSPIRAL_TOWER": [ "shaking_grass" ],
+            "ZONE_GIANT_CHASM": [ "shaking_grass" ],
+            "ZONE_P2_LABORATORY": [ "shaking_grass" ],
+            "ZONE_ABUNDANT_SHRINE": [ "shaking_grass" ],
+            "ZONE_LOSTLORN_FOREST": [ "shaking_grass" ],
+            "ZONE_ROUTE_1": [ "shaking_grass" ],
+            "ZONE_ROUTE_2": [ "shaking_grass" ],
+            "ZONE_ROUTE_3": [ "shaking_grass" ],
+            "ZONE_ROUTE_5": [ "shaking_grass" ],
+            "ZONE_ROUTE_6": [ "shaking_grass" ],
+            "ZONE_ROUTE_7": [ "shaking_grass" ],
+            "ZONE_ROUTE_9": [ "shaking_grass" ],
+            "ZONE_ROUTE_11": [ "shaking_grass" ],
+            "ZONE_ROUTE_12": [ "shaking_grass" ],
+            "ZONE_ROUTE_13": [ "shaking_grass" ],
+            "ZONE_ROUTE_14": [ "shaking_grass" ],
+            "ZONE_ROUTE_15": [ "shaking_grass" ],
+            "ZONE_ROUTE_16": [ "shaking_grass" ],
+            "ZONE_ROUTE_18": [ "shaking_grass" ],
+            "ZONE_VILLAGE_BRIDGE": [ "shaking_grass" ],
+            "ZONE_ROUTE_20": [ "shaking_grass" ],
+            "ZONE_ROUTE_22": [ "shaking_grass" ],
+            "ZONE_FLOCCESY_RANCH": [ "shaking_grass" ],
+            "ZONE_VIRBANK_COMPLEX": [ "shaking_grass" ],
+            "ZONE_REVERSAL_MOUNTAIN": [ "shaking_grass" ],
+            "ZONE_ROUTE_23": [ "shaking_grass" ],
+            "ZONE_VICTORY_ROAD": [ "shaking_grass" ]
+        }
+    }
+}

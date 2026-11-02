@@ -1,0 +1,104 @@
+{
+    "$schema": "../program.schema.json",
+    "base_program": 1,
+    "points": [ 40, 40, 80, 20 ],
+    "bonus": 20,
+    "prop_list": 2,
+    "unk07": [ 170, 0, 0, 1, 1 ],
+    "performers": [
+        {
+            "species": "SPECIES_GOTHITA",
+            "form": 1,
+            "obj_code": "OBJ_CODE_SCHOOL_KID_F",
+            "name": "BtlMain9_Text_Kayla",
+            "personality_byte_2": 1,
+            "unk06": 65533,
+            "min_shots": 0,
+            "props": [
+                [ 20, 7 ],
+                [ 16, 0 ],
+                [ 5, 5 ],
+                [ 74, 2 ]
+            ]
+        },
+        {
+            "species": "SPECIES_MINCCINO",
+            "form": 1,
+            "obj_code": "OBJ_CODE_LADY",
+            "name": "BtlMain9_Text_Lima",
+            "personality_byte_2": 1,
+            "unk06": 2000,
+            "min_shots": 0,
+            "props": [
+                [ 28, 7 ],
+                [ 95, 2 ],
+                [ 39, 5 ]
+            ]
+        },
+        {
+            "species": "SPECIES_EMOLGA",
+            "form": 0,
+            "obj_code": "OBJ_CODE_PKMN_BREEDER_M",
+            "name": "BtlMain9_Text_Leon",
+            "personality_byte_2": 0,
+            "unk06": 65534,
+            "min_shots": 0,
+            "props": [
+                [ 3, 0 ],
+                [ 14, 1 ],
+                [ 33, 7 ],
+                [ 10, 5 ]
+            ]
+        },
+        {
+            "species": "SPECIES_SNIVY",
+            "form": 0,
+            "obj_code": "OBJ_CODE_GENTLEMAN",
+            "name": "BtlMain9_Text_Carl",
+            "personality_byte_2": 0,
+            "unk06": 65533,
+            "min_shots": 250,
+            "props": [
+                [ 63, 7 ],
+                [ 59, 8 ],
+                [ 1, 1 ],
+                [ 69, 3 ],
+                [ 66, 5 ]
+            ]
+        },
+        {
+            "species": "SPECIES_PANSEAR",
+            "form": 1,
+            "obj_code": "OBJ_CODE_VETERAN_F",
+            "name": "BtlMain9_Text_Ailee",
+            "personality_byte_2": 1,
+            "unk06": 65533,
+            "min_shots": 250,
+            "props": [
+                [ 68, 7 ],
+                [ 19, 8 ],
+                [ 62, 2 ],
+                [ 60, 3 ],
+                [ 61, 5 ]
+            ]
+        },
+        {
+            "species": "SPECIES_WHIMSICOTT",
+            "form": 1,
+            "obj_code": "OBJ_CODE_PSYCHIC_F",
+            "name": "BtlMain9_Text_Nitza",
+            "personality_byte_2": 1,
+            "unk06": 1800,
+            "min_shots": 1000,
+            "props": [
+                [ 50, 7 ],
+                [ 86, 8 ],
+                [ 10, 0 ],
+                [ 2, 1 ],
+                [ 34, 2 ],
+                [ 69, 3 ],
+                [ 9, 5 ]
+            ]
+        }
+    ]
+}

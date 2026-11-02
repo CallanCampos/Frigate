@@ -1,0 +1,13 @@
+{
+    "$schema": "../pokedex.schema.json",
+    "initial": "G",
+    "shapes": [ 11 ],
+    "area": {
+        "all_year": true,
+        "places": {
+            "ZONE_DREAMYARD": [ "grass", "dark_grass" ],
+            "ZONE_CELESTIAL_TOWER_2": [ "grass" ],
+            "ZONE_STRANGE_HOUSE": [ "grass" ]
+        }
+    }
+}

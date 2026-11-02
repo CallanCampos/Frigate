@@ -1,0 +1,102 @@
+{
+    "$schema": "../program.schema.json",
+    "base_program": 0,
+    "points": [ 80, 20, 40, 40 ],
+    "bonus": 20,
+    "prop_list": 0,
+    "unk07": [ 170, 0, 0, 1, 1 ],
+    "performers": [
+        {
+            "species": "SPECIES_PATRAT",
+            "form": 0,
+            "obj_code": "OBJ_CODE_YOUNGSTER",
+            "name": "BtlMain9_Text_Eugene",
+            "personality_byte_2": 0,
+            "unk06": 1050,
+            "min_shots": 0,
+            "props": [
+                [ 43, 2 ],
+                [ 4, 5 ],
+                [ 68, 7 ]
+            ]
+        },
+        {
+            "species": "SPECIES_THROH",
+            "form": 0,
+            "obj_code": "OBJ_CODE_BLACK_BELT",
+            "name": "BtlMain9_Text_Hudson",
+            "personality_byte_2": 0,
+            "unk06": 65534,
+            "min_shots": 0,
+            "props": [
+                [ 92, 7 ],
+                [ 81, 8 ],
+                [ 86, 4 ]
+            ]
+        },
+        {
+            "species": "SPECIES_PETILIL",
+            "form": 1,
+            "obj_code": "OBJ_CODE_PKMN_RANGER_F",
+            "name": "BtlMain9_Text_Gilda",
+            "personality_byte_2": 1,
+            "unk06": 65534,
+            "min_shots": 0,
+            "props": [
+                [ 50, 7 ],
+                [ 51, 8 ],
+                [ 59, 2 ]
+            ]
+        },
+        {
+            "species": "SPECIES_OSHAWOTT",
+            "form": 0,
+            "obj_code": "OBJ_CODE_WORKER_26",
+            "name": "BtlMain9_Text_Chad",
+            "personality_byte_2": 0,
+            "unk06": 950,
+            "min_shots": 250,
+            "props": [
+                [ 30, 7 ],
+                [ 33, 8 ],
+                [ 35, 2 ],
+                [ 29, 4 ],
+                [ 15, 5 ]
+            ]
+        },
+        {
+            "species": "SPECIES_GOTHORITA",
+            "form": 1,
+            "obj_code": "OBJ_CODE_LASS",
+            "name": "BtlMain9_Text_Leina",
+            "personality_byte_2": 1,
+            "unk06": 65533,
+            "min_shots": 250,
+            "props": [
+                [ 84, 8 ],
+                [ 75, 7 ],
+                [ 0, 1 ],
+                [ 2, 0 ],
+                [ 74, 2 ]
+            ]
+        },
+        {
+            "species": "SPECIES_SIMISEAR",
+            "form": 0,
+            "obj_code": "OBJ_CODE_ACE_TRAINER_M",
+            "name": "BtlMain9_Text_Ricou",
+            "personality_byte_2": 0,
+            "unk06": 1200,
+            "min_shots": 1000,
+            "props": [
+                [ 31, 8 ],
+                [ 65, 7 ],
+                [ 10, 1 ],
+                [ 53, 2 ],
+                [ 52, 4 ],
+                [ 4, 5 ],
+                [ 87, 6 ]
+            ]
+        }
+    ]
+}

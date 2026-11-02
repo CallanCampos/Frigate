@@ -22,9 +22,18 @@ struct CtvtGameCam {
     int type;
 };
 
+// What CtvtGameCam_UpdateTask returns
+enum {
+    CTVT_GAME_CAM_RUNNING,
+    // The pictures are taken and exchanged
+    CTVT_GAME_CAM_DONE,
+    // Someone left the call
+    CTVT_GAME_CAM_ERROR,
+};
+
 // Starts taking the pictures
 CtvtGameCamTask *CtvtGameCam_StartTask(CtvtGameCam *cam, HeapID heapId);
-// 0 while the pictures are taken, 1 when they are and 2 on an error
+// A CTVT_GAME_CAM_*
 int CtvtGameCam_UpdateTask(CtvtGameCamTask *task);
 void CtvtGameCam_EndTask(CtvtGameCamTask *task);
 // type is the game's, CTVT_GAME_TYPE_*, and members the others in the call

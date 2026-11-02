@@ -1,12 +1,13 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field_map.h"
 #include "field/field_prop.h"
 #include "gfl/arc_util.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
 
-// Patches of map land data (land_data_patch.c, after the file name that its allocation passes): a file of archive 0x9a
-// that starts with the offsets of its cell grid and its buildings. Function names from swan
+// Patches of map land data (land_data_patch.c, after the file name that its allocation passes): a file of
+// ARCID_LAND_DATA_PATCH that starts with the offsets of its cell grid and its buildings. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0); the layouts are ours
 
 // A map cell
@@ -37,7 +38,7 @@ static LandPatchBuildings *GetLandDataPatchBMDataPtr(LandDataPatch *patch);
 LandDataPatch *ReadLandDataPatchA154Data(u16 fileId, HeapID heapId) {
     LandDataPatch *patch = GFL_HeapAllocate(heapId, sizeof(LandDataPatch), TRUE, "land_data_patch.c", 79);
 
-    patch->data = GFL_ArcSysReadHeapNewLZ(0x9a, fileId, FALSE, heapId);
+    patch->data = GFL_ArcSysReadHeapNewLZ(ARCID_LAND_DATA_PATCH, fileId, FALSE, heapId);
     return patch;
 }
 

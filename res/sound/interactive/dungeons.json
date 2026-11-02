@@ -1,0 +1,215 @@
+{
+    "$schema": "interactive_sound.schema.json",
+    "dungeons": [
+        {
+            "zone": "ZONE_DREAMYARD",
+            "pitch": {
+                "spring": 0,
+                "summer": 0,
+                "autumn": 0,
+                "winter": 0
+            },
+            "tempo": {
+                "spring": 256,
+                "summer": 256,
+                "autumn": 256,
+                "winter": 256
+            },
+            "pan": {
+                "spring": 0,
+                "summer": 0,
+                "autumn": 0,
+                "winter": 0
+            }
+        },
+        {
+            "zone": "ZONE_DREAMYARD_2",
+            "pitch": {
+                "spring": -192,
+                "summer": -192,
+                "autumn": -192,
+                "winter": -192
+            },
+            "tempo": {
+                "spring": 235,
+                "summer": 235,
+                "autumn": 235,
+                "winter": 235
+            },
+            "pan": {
+                "spring": 0,
+                "summer": 0,
+                "autumn": 0,
+                "winter": 0
+            }
+        },
+        {
+            "zone": "ZONE_CHARGESTONE_CAVE_2",
+            "pitch": {
+                "spring": 0,
+                "summer": 0,
+                "autumn": 0,
+                "winter": 0
+            },
+            "tempo": {
+                "spring": 256,
+                "summer": 256,
+                "autumn": 256,
+                "winter": 256
+            },
+            "pan": {
+                "spring": 0,
+                "summer": 0,
+                "autumn": 0,
+                "winter": 0
+            }
+        },
+        {
+            "zone": "ZONE_CHARGESTONE_CAVE_3",
+            "pitch": {
+                "spring": -192,
+                "summer": -192,
+                "autumn": -192,
+                "winter": -192
+            },
+            "tempo": {
+                "spring": 235,
+                "summer": 235,
+                "autumn": 235,
+                "winter": 235
+            },
+            "pan": {
+                "spring": 0,
+                "summer": 0,
+                "autumn": 0,
+                "winter": 0
+            }
+        },
+        {
+            "zone": "ZONE_CHARGESTONE_CAVE_4",
+            "pitch": {
+                "spring": -384,
+                "summer": -384,
+                "autumn": -384,
+                "winter": -384
+            },
+            "tempo": {
+                "spring": 215,
+                "summer": 215,
+                "autumn": 215,
+                "winter": 215
+            },
+            "pan": {
+                "spring": 0,
+                "summer": 0,
+                "autumn": 0,
+                "winter": 0
+            }
+        },
+        {
+            "zone": "ZONE_WELLSPRING_CAVE",
+            "pitch": {
+                "spring": 0,
+                "summer": 0,
+                "autumn": 0,
+                "winter": 0
+            },
+            "tempo": {
+                "spring": 256,
+                "summer": 256,
+                "autumn": 256,
+                "winter": 256
+            },
+            "pan": {
+                "spring": 0,
+                "summer": 0,
+                "autumn": 0,
+                "winter": 0
+            }
+        },
+        {
+            "zone": "ZONE_WELLSPRING_CAVE_2",
+            "pitch": {
+                "spring": -192,
+                "summer": -192,
+                "autumn": -192,
+                "winter": -192
+            },
+            "tempo": {
+                "spring": 235,
+                "summer": 235,
+                "autumn": 235,
+                "winter": 235
+            },
+            "pan": {
+                "spring": 0,
+                "summer": 0,
+                "autumn": 0,
+                "winter": 0
+            }
+        },
+        {
+            "zone": "ZONE_CHALLENGERS_CAVE",
+            "pitch": {
+                "spring": 0,
+                "summer": 0,
+                "autumn": 0,
+                "winter": 0
+            },
+            "tempo": {
+                "spring": 256,
+                "summer": 256,
+                "autumn": 256,
+                "winter": 256
+            },
+            "pan": {
+                "spring": 0,
+                "summer": 0,
+                "autumn": 0,
+                "winter": 0
+            }
+        },
+        {
+            "zone": "ZONE_CHALLENGERS_CAVE_2",
+            "pitch": {
+                "spring": -192,
+                "summer": -192,
+                "autumn": -192,
+                "winter": -192
+            },
+            "tempo": {
+                "spring": 235,
+                "summer": 235,
+                "autumn": 235,
+                "winter": 235
+            },
+            "pan": {
+                "spring": 0,
+                "summer": 0,
+                "autumn": 0,
+                "winter": 0
+            }
+        },
+        {
+            "zone": "ZONE_CHALLENGERS_CAVE_3",
+            "pitch": {
+                "spring": -384,
+                "summer": -384,
+                "autumn": -384,
+                "winter": -384
+            },
+            "tempo": {
+                "spring": 215,
+                "summer": 215,
+                "autumn": 215,
+                "winter": 215
+            },
+            "pan": {
+                "spring": 0,
+                "summer": 0,
+                "autumn": 0,
+                "winter": 0
+            }
+        }
+    ]
+}

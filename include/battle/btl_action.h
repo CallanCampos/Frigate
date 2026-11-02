@@ -26,7 +26,8 @@ union BattleAction {
         u32 target : 3;
         u32 move : 16;
         u32 unk23 : 3;
-        u32 unk26 : 1;
+        // BattleAction_SetMoveInfoFlag's
+        u32 moveInfoFlag : 1;
         u32 unk27 : 5;
     } bits;
     // An item use
@@ -40,9 +41,11 @@ union BattleAction {
     // A switch, to the party slot
     struct {
         u32 action : 4;
-        u32 unk4 : 3;
+        // The position switched out
+        u32 pos : 3;
         u32 slot : 3;
-        u32 unk10 : 1;
+        // Set when no Pokémon is left to switch in (BattleAction_SetChangeDepleteParam)
+        u32 deplete : 1;
         u32 unk11 : 21;
     } change;
 };

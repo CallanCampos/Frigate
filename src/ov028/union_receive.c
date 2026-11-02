@@ -59,7 +59,7 @@ enum {
     UNION_NET_CMD_ENTRY_REPLY_2,
     UNION_NET_CMD_ENTRY_REPLY_1,
     UNION_NET_CMD_ENQUEUE,
-    UNION_NET_CMD_UNKE,
+    UNION_NET_CMD_TURN,
     UNION_NET_CMD_REQUEST_STATUS,
     UNION_NET_CMD_STATUS,
     UNION_NET_CMD_APP_PROFILE,
@@ -286,7 +286,7 @@ BOOL UnionMain_SendEnqueue(void) {
     return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), 0, UNION_NET_CMD_ENQUEUE, 0, NULL, TRUE, FALSE, FALSE);
 }
 
-void UnionNet_RecvUnkE(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvTurn(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
 
     if (unisys->alloc.uniapp == NULL) {
@@ -296,8 +296,8 @@ void UnionNet_RecvUnkE(int netId, int size, const void *data, void *work, NetHan
     UnionApp_SetTurnReceived(unisys->alloc.uniapp);
 }
 
-BOOL UnionMain_SendUnkE(u8 netId) {
-    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), netId, UNION_NET_CMD_UNKE, 0, NULL, TRUE, FALSE, FALSE);
+BOOL UnionMain_SendTurn(u8 netId) {
+    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), netId, UNION_NET_CMD_TURN, 0, NULL, TRUE, FALSE, FALSE);
 }
 
 void UnionNet_RecvRequestStatus(int netId, int size, const void *data, void *work, NetHandle *handle) {

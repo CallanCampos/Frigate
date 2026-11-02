@@ -13,7 +13,7 @@
 // The script plugin of the Pokémon League's rooms (plugin 3), commands from 1000. The Elite Four's rooms are numbered
 // from 1 in the order of their cameras
 
-static void PokemonLeague_DisableRailLines(Field *field, u16 a1);
+static void PokemonLeague_DisableRailLines(Field *field, u16 room);
 static u32 PokemonLeague_GetRoomCamera(u16 room);
 
 static BOOL Scrcmd_PokemonLeague_DisableRailLines(VM *vm, FieldScriptEnv *env) {
@@ -35,12 +35,12 @@ static BOOL Scrcmd_PokemonLeague_SetCamera(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static void PokemonLeague_DisableRailLines(Field *field, u16 a1) {
+static void PokemonLeague_DisableRailLines(Field *field, u16 room) {
     NoGridMapper *mapper = Field_GetNoGridMapper(field);
 
     FieldNoGridMapper_SetLineEnabled(mapper, 1, FALSE);
     FieldNoGridMapper_SetLineEnabled(mapper, 2, FALSE);
-    if (a1 == 0) {
+    if (room == 0) {
         FieldNoGridMapper_SetLineEnabled(mapper, 3, FALSE);
     }
 }

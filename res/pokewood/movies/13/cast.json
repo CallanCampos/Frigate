@@ -1,0 +1,115 @@
+{
+    "$schema": "../../cast.schema.json",
+    "player": [
+        {
+            "species": "SPECIES_STARMIE",
+            "shown_species": "SPECIES_STARMIE",
+            "level": 58,
+            "form": 0,
+            "sex": "GENDER_UNKNOWN",
+            "nature": "NATURE_TIMID",
+            "ability": 0,
+            "held_item": "ITEM_FOCUS_SASH",
+            "moves": [ "MOVE_REFLECT", "MOVE_RECOVER", "MOVE_BRINE", "MOVE_NONE" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 20,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 20,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 252,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        },
+        {
+            "species": "SPECIES_SLOWBRO",
+            "shown_species": "SPECIES_SLOWBRO",
+            "level": 55,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_TIMID",
+            "ability": 0,
+            "held_item": "ITEM_SITRUS_BERRY",
+            "moves": [ "MOVE_WITHDRAW", "MOVE_AMNESIA", "MOVE_RAIN_DANCE", "MOVE_BRINE" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 20,
+                "defense": 0,
+                "speed": 31,
+                "special_attack": 20,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 252,
+                "attack": 0,
+                "defense": 0,
+                "speed": 252,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        }
+    ],
+    "opponent": [
+        {
+            "species": "SPECIES_TYRANITAR",
+            "shown_species": "SPECIES_TYRANITAR",
+            "level": 60,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_NAUGHTY",
+            "ability": 0,
+            "held_item": "ITEM_SCOPE_LENS",
+            "moves": [ "MOVE_EARTHQUAKE", "MOVE_HYPER_BEAM", "MOVE_DRAGON_PULSE", "MOVE_CRUNCH" ],
+            "ivs": {
+                "hp": 0,
+                "attack": 31,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 31,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 6,
+                "attack": 252,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 252,
+                "special_defense": 0
+            }
+        },
+        {
+            "species": "SPECIES_TYRANITAR",
+            "shown_species": "SPECIES_TYRANITAR",
+            "level": 58,
+            "form": 0,
+            "sex": "GENDER_FEMALE",
+            "nature": "NATURE_NAUGHTY",
+            "ability": 0,
+            "held_item": "ITEM_SCOPE_LENS",
+            "moves": [ "MOVE_DRAGON_TAIL", "MOVE_FIRE_PUNCH", "MOVE_THUNDER_PUNCH", "MOVE_ICE_PUNCH" ],
+            "ivs": {
+                "hp": 0,
+                "attack": 31,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 31,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 6,
+                "attack": 252,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 252,
+                "special_defense": 0
+            }
+        }
+    ]
+}

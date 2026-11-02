@@ -1,0 +1,88 @@
+{
+    "$schema": "../../cast.schema.json",
+    "player": [
+        {
+            "species": "SPECIES_VULLABY",
+            "shown_species": "SPECIES_VULLABY",
+            "level": 42,
+            "form": 0,
+            "sex": "GENDER_FEMALE",
+            "nature": "NATURE_NAUGHTY",
+            "ability": 0,
+            "held_item": "ITEM_NONE",
+            "moves": [ "MOVE_WHIRLWIND", "MOVE_THIEF", "MOVE_REST", "MOVE_PLUCK" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 31,
+                "defense": 15,
+                "speed": 31,
+                "special_attack": 0,
+                "special_defense": 31
+            },
+            "evs": {
+                "hp": 252,
+                "attack": 0,
+                "defense": 0,
+                "speed": 6,
+                "special_attack": 0,
+                "special_defense": 252
+            }
+        }
+    ],
+    "opponent": [
+        {
+            "species": "SPECIES_FERROSEED",
+            "shown_species": "SPECIES_FERROSEED",
+            "level": 52,
+            "form": 0,
+            "sex": "GENDER_FEMALE",
+            "nature": "NATURE_NAUGHTY",
+            "ability": 0,
+            "held_item": "ITEM_CHESTO_BERRY",
+            "moves": [ "MOVE_SPIKES", "MOVE_IRON_DEFENSE", "MOVE_LEECH_SEED", "MOVE_PIN_MISSILE" ],
+            "ivs": {
+                "hp": 31,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 252,
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        },
+        {
+            "species": "SPECIES_BEHEEYEM",
+            "shown_species": "SPECIES_BEHEEYEM",
+            "level": 40,
+            "form": 0,
+            "sex": "GENDER_MALE",
+            "nature": "NATURE_NAUGHTY",
+            "ability": 0,
+            "held_item": "ITEM_CHESTO_BERRY",
+            "moves": [ "MOVE_HEADBUTT", "MOVE_ROCK_SLIDE", "MOVE_CHARGE_BEAM", "MOVE_THUNDERBOLT" ],
+            "ivs": {
+                "hp": 0,
+                "attack": 31,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            },
+            "evs": {
+                "hp": 0,
+                "attack": 255,
+                "defense": 0,
+                "speed": 0,
+                "special_attack": 0,
+                "special_defense": 0
+            }
+        }
+    ]
+}
