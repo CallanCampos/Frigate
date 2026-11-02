@@ -274,4 +274,5 @@ tests check all three calls on every host; the ordinary generated ROM-symbol tra
 recovered AuthService code, but NULL and ordinary buffers both terminate with a named diagnostic and exit 70.
 `tests/hal/test_gscrypt.c` and its subprocess checker cover both cases without inventing an implementation.
 
-[Physical CARD foundation](card/README.md) and [absolute device waits](os/README.md) are test-activated; the production reader remains unchanged.
+[Physical CARD foundation](card/README.md) and [absolute device waits](os/README.md) are test-activated; the production
+reader remains unchanged.

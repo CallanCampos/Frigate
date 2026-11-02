@@ -13,10 +13,10 @@ name: Frigate CI
 # later, made and tested on Apple Silicon and on Intel, with macOS 26 and with macOS 15, the oldest runners that aren't
 # deprecated; and the sanitized build on macOS and Linux (sanitize, port/docs/sanitizers.md,
 # port/docs/adr/0014-sanitized-build-game-heaps-poisoned-ds-isms-ignorelisted.md). Beside them, sync-tooling tests the
-# upstream sync's policy (port/tools/upstream_sync.py, sync_upstream.sh) in scratch Git repositories, and
-# frigate-ci, the one job of this workflow that the main ruleset requires, passes only when every job above succeeded
-# (port/docs/adr/0018-protected-main-and-sync-prs.md). Each job builds its own copy and uploads nothing: the port's
-# compiled game code is never uploaded (port/CLAUDE.md).
+# upstream sync's policy (port/tools/upstream_sync.py, sync_upstream.sh) in scratch Git repositories and checks the
+# documents' links and tables (port/tools/check_docs.py), and frigate-ci, the one job of this workflow that the main
+# ruleset requires, passes only when every job above succeeded (port/docs/adr/0018-protected-main-and-sync-prs.md).
+# Each job builds its own copy and uploads nothing: the port's compiled game code is never uploaded (port/CLAUDE.md).
 on:
   push:
     branches: [main]
@@ -288,7 +288,9 @@ jobs:
       - name: The smoke test, the one route that runs without the ROM
         run: ctest --test-dir build/port-san -L route -LE oracle --output-on-failure
 
-  # Exercises the maintainer's upstream merge policy in isolated Git repositories, without ROMs or secrets.
+  # Exercises the maintainer's upstream merge policy in isolated Git repositories, without ROMs or secrets; and checks
+  # Frigate's documents (port/tools/check_docs.py): their relative links and anchors, and their tables' cells as GitHub
+  # splits them, after testing the check on its fixtures, so that a change that breaks a link or a table fails here
   sync-tooling:
     name: Sync tooling tests
     runs-on: ubuntu-26.04
@@ -306,6 +308,12 @@ jobs:
 
       - name: Test upstream sync policy
         run: python -m unittest discover -s port/tools/tests -p test_upstream_sync.py
+
+      - name: Test the documents check
+        run: python -m unittest discover -s port/tools/tests -p test_check_docs.py
+
+      - name: Check the documents' links and tables
+        run: python port/tools/check_docs.py
 
   # A single stable required check: a failed, cancelled or skipped build must never make the PR mergeable.
   # Keep needs in sync with every build/test job above. Matrix jobs report success only when every leg succeeds.

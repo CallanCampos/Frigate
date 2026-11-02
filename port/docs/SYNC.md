@@ -24,22 +24,23 @@ A missing scheduled event alone does not establish its cause.
 
 1. Leaves an existing canonical `codex/upstream-sync-*` PR's head and body unchanged, a draft conflict proposal
    included. It retries a missing owner review request on a ready bot proposal; an existing request or completed owner
-   review is left alone. This bounds review work to one proposal and avoids dismissing approvals whenever upstream advances.
+   review is left alone. This bounds review work to one proposal and avoids dismissing approvals whenever upstream
+   advances.
 2. Fetches upstream `main`, verifies continuity against the last recorded upstream parent, and checks incoming
    messages for cross-repository issue references. It stops on upstream workflow changes, including add/revert
    pairs, because the sync App deliberately has no Workflows permission. These three stops come before anything is
    pushed, a draft included.
 3. Merges upstream into reviewed Frigate `main` in Git's object store first (`git merge-tree --write-tree`, git 2.38
-   or later, which changes no file or branch). If that conflicts, it merges nothing: it pushes upstream's head, unchanged, to a fresh topic branch and
-   opens a **draft conflict proposal**, a draft PR that lists the conflicting files and the commands that resolve it
-   ([below](#conflicts-and-stopped-syncs)). It never commits conflict markers, chooses upstream's version
-   automatically or discards port changes. Otherwise it creates a fresh branch from `main` and performs a real
-   `--no-ff` merge.
+   or later, which changes no file or branch). If that conflicts, it merges nothing: it pushes upstream's head,
+   unchanged, to a fresh topic branch and opens a **draft conflict proposal**, a draft PR that lists the conflicting
+   files and the commands that resolve it ([below](#conflicts-and-stopped-syncs)). It never commits conflict markers,
+   chooses upstream's version automatically or discards port changes. Otherwise it creates a fresh branch from `main`
+   and performs a real `--no-ff` merge.
 4. Pushes only the topic branch and opens a PR, recovering its URL if creation succeeded but its response failed.
    It requests CallanCampos review separately: a failure warns and the next scheduled run retries the request without
-   pushing or changing the PR. Owner-authored local proposals request no self-review. A draft requests none; GitHub notifies
-   its code owners when its resolved merge makes it ready. Local verification stays missing until a maintainer runs the verifier; a
-   missing required status blocks merging.
+   pushing or changing the PR. Owner-authored local proposals request no self-review. A draft requests none; GitHub
+   notifies its code owners when its resolved merge makes it ready. Local verification stays missing until a maintainer
+   runs the verifier; a missing required status blocks merging.
 
 The publishing job runs trusted git/gh logic from Frigate's base, disables Git hooks, and never executes incoming
 build scripts with its write token. The usual PR workflows perform compilation and host tests on separate hosted
@@ -120,6 +121,14 @@ fail the pointer cast guard (`game_ptrcasts`) waits for a follow-up feature PR
 sanitizer ignorelist holds, so also look in `port/` for the names the sync removes (the `symbols.txt` files' and the
 C's identifiers at the two upstream commits), and in decomp-findings.md and game-changes.md for the files it
 completes; the follow-up that brings them up to date says what upstream now calls them ([lessons.md](lessons.md)).
+
+CI's `Sync tooling tests` job also runs the documents check ([../tools/check_docs.py](../tools/check_docs.py)) on every
+PR, sync PRs included. Frigate's documents (the landing page, port/README.md, MODDING.md and docs/README.md among
+them) link to files that upstream owns: its root README.md, CONTRIBUTING.md and LICENSE, and `docs/`'s guides. A sync
+that renames or removes one of those files, or a heading that a link names, fails that job although the sync tooling
+is fine: the merged tree has a broken link. The link's fix is a native fix that the merged tree needs, which the merge
+carries ([below](#a-sync-merge-carries-only-the-sync)), and the sync's PR and STATUS.md entry name it with the upstream
+commit that forced it; a link in a record gets the broken link's fix that records take ([below](#records-are-added-to)).
 
 When all four required checks pass on an up-to-date branch, approve contributor/bot PRs and merge using **Create a
 merge commit**. No auto-merge is enabled. The owner-authored exception is review-only; it still requires the PR,
@@ -207,11 +216,12 @@ STATUS.md entry its `PORT_SHA` filled in, as [STATUS.md](STATUS.md#how-to-add-an
   On 2026-10-25, [probe run 40233990444](https://github.com/CallanCampos/Frigate/actions/runs/40233990444)
   proved publication of a novel test commit whose tree exactly matched frozen upstream `3af718cd9e77`, with the
   existing narrow sync App and no Workflows permission. Its unique ref was deleted and the token revoked; the full
-  evidence and limits are in [ADR 0024's dated amendment](adr/0024-a-conflicting-sync-proposes-a-draft-of-upstreams-head.md#branch-publication-probe-2026-10-25).
+  evidence and limits are in [ADR 0024's dated
+  amendment](adr/0024-a-conflicting-sync-proposes-a-draft-of-upstreams-head.md#branch-publication-probe-2026-10-25).
   Actual conflicting draft-PR creation and promotion have not been trialed live. This branch-only test does not promise
-  acceptance of every future tree or policy: should GitHub refuse a later push, the run fails with the conflicting
-  files in its error, and the same local commands resolve it on a branch of any `codex/upstream-sync-` name. Do not
-  expand the App's permissions to bypass that failure.
+  acceptance of every future tree or policy: should GitHub refuse a later push, the run fails with the conflicting files
+  in its error, and the same local commands resolve it on a branch of any `codex/upstream-sync-` name. Do not expand the
+  App's permissions to bypass that failure.
 - **Merge conflict (local exit 3):** inspect every conflict. Use upstream's new structure, then reapply the port's
   documented adaptation from game-changes.md at its new location, or document why upstream makes it unnecessary.
   Stage only resolved files, commit the merge with `git commit --no-edit --cleanup=strip`, then rerun the local

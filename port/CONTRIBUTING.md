@@ -49,6 +49,10 @@ Tests that need your ROM skip without it. Report skips and checks you could not 
 See [the test guide](tests/README.md) for coverage and [the sanitized build](docs/sanitizers.md) for memory checks.
 White 2 uses a separate build directory with `-DPORT_VERSION=w2_us`, as the quick start describes.
 
+After changing a document, run `python3 port/tools/check_docs.py`, which needs no ROM or build: it checks every
+Markdown document's links, anchors and tables as GitHub renders them, as CI does on every PR
+([the tools guide](tools/README.md)). Report its last line.
+
 With both personal ROM dumps and the decomp toolchain prepared as in the repository's root README, run
 `python3 configure.py && ninja`: both Black 2 and White 2 must match their SHA1s (T0). Report the host build (T1,
 with the pointer cast guard's line from `python3 port/tools/check_ptrcasts.py --build-dir build/port --report`; the
@@ -69,12 +73,12 @@ resolutions, never feature work, which goes in commits or PRs of its own
 
 Every change reaches `main` through a PR, including maintainer work and upstream syncs. Main rejects force pushes
 and deletion. Required checks are **Compile src/ and lib/**, **Code standards**, **Frigate CI** (all supported host
-and sanitizer jobs plus sync-tool tests), and **Frigate local verification**. The branch must include the latest
-`main`; new commits require fresh checks and review. Public CI runs automatically for established contributors;
-GitHub may require run approval for first-time contributors with new GitHub accounts. A maintainer inspects code
-and workflow changes before granting a requested run approval. CI uses hosted runners and needs no ROM or App
-secrets. Sync PRs use a dedicated App so their CI also starts automatically; [SYNC.md](docs/SYNC.md) covers setup.
-An automatic or approved CI run does not approve the proposed code.
+and sanitizer jobs plus sync-tool tests and the documents check), and **Frigate local verification**. The branch must
+include the latest `main`; new commits require fresh checks and review. Public CI runs automatically for established
+contributors; GitHub may require run approval for first-time contributors with new GitHub accounts. A maintainer
+inspects code and workflow changes before granting a requested run approval. CI uses hosted runners and needs no ROM
+or App secrets. Sync PRs use a dedicated App so their CI also starts automatically; [SYNC.md](docs/SYNC.md) covers
+setup. An automatic or approved CI run does not approve the proposed code.
 
 After reviewing the code, the maintainer checks out the PR head in a separate prepared worktree and runs:
 
