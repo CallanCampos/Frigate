@@ -25,7 +25,7 @@ CI checks every document's links, anchors and tables with [../tools/check_docs.p
 | [game-changes.md](game-changes.md) | Every change Frigate makes outside `port/`, with its kind, its guard and its proof that the ROMs stay byte for byte |
 | [decomp-findings.md](decomp-findings.md) | Where the decomp's C that the ROM doesn't link behaves differently from the ROM, or is unresolved |
 | [lessons.md](lessons.md) | What port work taught that the code doesn't show, newest first |
-| [sanitizers.md](sanitizers.md) | The sanitized build (T5): how to run it and read its reports, what Frigate tells the sanitizers, the checks it leaves out and why, what it can't see, and what it found |
+| [sanitizers.md](sanitizers.md) | The sanitized build (T5): how to run it and read its reports, Phase 5's criterion for sanitizer-clean replays (ADR 0033) and its runner of T5's set, ctest's routes and the program alone from the oracle's saves ([../tools/strict_routes.py](../tools/strict_routes.py)), what Frigate tells the sanitizers, the checks it leaves out and why, what it can't see, and what it found |
 
 ## Records
 

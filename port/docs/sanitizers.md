@@ -16,6 +16,7 @@ cmake --build build/port-san                        # build/port-san/frigate-bla
 ctest --test-dir build/port-san -j4 --output-on-failure        # every test, sanitized
 ctest --test-dir build/port-san -L route -LE oracle            # the routes that need no oracle
 ctest --test-dir build/port-san -L route                       # every route, with the oracle in build/port-san/oracle
+port/tools/strict_routes.py run --build-dir build/port-san     # T5's set: those routes, then the program alone
 ```
 
 - **White 2** is `-DPORT_VERSION=w2_us` in a directory of its own (`build/port-san-w2`).
@@ -23,6 +24,20 @@ ctest --test-dir build/port-san -L route                       # every route, wi
   replays, the oracle's sequences and the port's checks of their hashes, the smoke test).
   The oracle's need its program and the ROM build's link map, as in the plain build
   ([../tests/README.md](../tests/README.md)); without the ROM they skip, as in CI.
+- **The routes from the oracle's saves:** [../tools/strict_routes.py](../tools/strict_routes.py) runs T5's set in one
+  strict tree: the routes that need no oracle, through ctest, then the program alone, as one route by hand below, on
+  each of the oracle's comparison sequences that has no `_hashes` reference for the version (CONTINUE, the field menu
+  and its apps, Hugh's battle, Route 19, the catch, the PC, Floccesy Town to Route 20) and on both of the port's legs
+  of each round trip, each from the save it starts from. Both halves run with
+  `ASAN_OPTIONS=detect_leaks=1:detect_stack_use_after_return=1` in place of the caller's sanitizer options, and each
+  case is judged by [Phase 5's criterion](#phase-5s-criterion): ctest's verdict for a route, and for a run of the
+  program alone status 0, every frame and no report. Before anything runs, it checks that the build is strict and that
+  its program runs under ASan and has UBSan's function check (`function_type_mismatch` among its symbols).
+  `strict_routes.py list` shows the program-alone cases, and `--only NAME` runs one of them or one of ctest's routes.
+  The saves come from the build's `oracle-saves`, which ctest's `oracle_saves` and `oracle_floccesy_save` make in a
+  tree with the oracle, or from `--save-cache`: a tree without the oracle, such as White 2's, takes them from
+  `oracle.py save NAME... --version w2_us --save-cache build/port-san-w2/oracle-saves --oracle BIN`. It never runs
+  melonDS; a missing save skips its case with that command.
 - **One route by hand:** `build/port-san/frigate-black2 --headless --frames 4300 --watchdog 60 --save-dir
   /tmp/san-saves --input port/tests/replay/start_menu.pbwinput`. A run that hits a report aborts (SIGABRT, status 134)
   on every host: [../hal/os/sanitizers.c](../hal/os/sanitizers.c) makes `abort_on_error=1` the runtime's default.
@@ -51,7 +66,9 @@ ctest --test-dir build/port-san -L route                       # every route, wi
   the game's `main()`: the smoke test passes on the line the program logs before it looks for the ROM
   (`port/app/main.c`), whatever status the program then exits with, and the ROM check stops it there
   (`port_rom_boot`), so LeakSanitizer's check at its exit on Linux covers the program's start-up as far as that look.
-  The routes themselves run only on a machine with the ROM (a nightly run of them is still to come).
+  The routes themselves run only on a machine with the ROM (they run on demand: the owner declined scheduled runs on
+  2026-11-01, [ADR 0031](adr/0031-per-game-frame-digests-against-a-content-addressed-oracle-cache.md), proposed;
+  [ADR 0033](adr/0033-sanitizer-clean-replays-by-the-strict-routes-and-the-program-alone.md)).
 - **A survey** of every report of a route, rather than the first: `-DPORT_SANITIZE=ON -DPORT_SANITIZE_RECOVER=ON` in
   another build directory (the second alone is refused) makes every check go on after a report, and ASan's
   `halt_on_error=0` the default ([../hal/os/sanitizers.c](../hal/os/sanitizers.c)). ASan reports each place once
@@ -78,6 +95,40 @@ ctest --test-dir build/port-san -L route                       # every route, wi
     [../tools/ctest_one_slice.sh](../tools/ctest_one_slice.sh) the other, the x86_64 one under Rosetta on Apple
     Silicon, where ASan runs too. That is how the x86_64 code's routes are checked here: CI's Intel runners have no
     ROM. Its app is a sanitized one, never one to give out, and `package_macos.sh --distribution` refuses it too.
+
+## Phase 5's criterion
+
+Phase 5's "sanitizer-clean replays" ([PLAN.md §7](PLAN.md#phase-5-the-whole-game-hardened)) are what
+[ADR 0033](adr/0033-sanitizer-clean-replays-by-the-strict-routes-and-the-program-alone.md) proposes, for the owner to
+decide; this section states its proposal. On macOS arm64, in both versions, the strict build (`-DPORT_SANITIZE=ON`,
+`PORT_SANITIZE_RECOVER` off, `RelWithDebInfo`, upstream LLVM, Homebrew's on a Mac, for the function check and
+LeakSanitizer that Apple clang lacks) runs T5's set, each distinct run once, with
+[../tools/strict_routes.py](../tools/strict_routes.py) ([above](#running-it)), under
+`ASAN_OPTIONS=detect_leaks=1:detect_stack_use_after_return=1`: every route that needs no oracle (`ctest -L route -LE
+oracle`), clean when ctest passes it, and the program alone from the oracle's saves, clean when it exits with status 0
+after all its frames and its output has none of the reports on which ctest fails a test of this build. The set is
+clean when every case is, in both versions, on one head; a case that skips is a gap, not a pass. The runner refuses a
+build that isn't strict (no `PORT_SANITIZE`, a survey build, another language's ROM, another checkout's build, Apple
+clang) and a program that doesn't run under ASan or has no function check, holds each start save to the SHA-1 that
+`SAVES` keeps, fails a trap stop even where a sequence allows one (a trap leaves without the leak check), and writes a
+table of every case (`--summary`).
+
+- **Exceptions, and nothing else** (the ADR's item 5): the three entries of
+  [../cmake/sanitizer_ignorelist.txt](../cmake/sanitizer_ignorelist.txt) (R1 and R2, R3, R13), each with its traced
+  cause; H1's read; and, in the save lab's map sweep alone once it lands, a zone's stop that the sweep declares with its
+  traced cause, that zone clean up to its stop. No runtime suppression of an ASan or UBSan report counts. LeakSanitizer
+  may be given one file of suppressions, by [the rule below](#reading-a-report), for a leak inside SDL3 or a system
+  library; none exists, and a leak in Frigate's or the game's code is fixed, never suppressed. Each new exception
+  changes the criterion, so it comes in a pull request the owner reviews, with its traced cause. Every other report is
+  fixed in a pull request of its own, with its row here and a regression test, and the cases that showed it run again
+  in both versions.
+- **When** (the ADR's item 7): no run is scheduled. The whole set is due on a release candidate's head, on the pull
+  request that ends a leg of the story, and on one that changes how every route's program is built (the strict
+  build's sanitizer flags, say); a maintainer may run it at any other time, and should after a merge that changes code
+  that every route runs. A pull request that fixes a report runs the cases that showed it again, in both versions. A
+  pull request that adds or changes a route owes none: it may run its cases as its T5, in both versions
+  (`strict_routes.py run --only NAME`), and otherwise records T5 as not run, and its leg's whole run covers it. No
+  strict route is in the merge gate.
 
 ## Reading a report
 
@@ -302,6 +353,18 @@ input, names the cause, a write into the field heap between its blocks, and the 
 | Report | Where | What the game does | What the host does |
 | --- | --- | --- | --- |
 | H9 | `src/ov129/sp_poke_gimmick.c:235`, `SpPokeGimmickB_Init`, from `FieldRoutine_MapLoad` as the café loads | Allocates the special Pokémon gimmick's work block 1 at the DS's size of `SpPokeGimmickWork`, 0x30, and writes its curve's address at offset 56, which a host's pointers put 8 bytes past the block (ASan, use-after-poison, a write of 8): the head of the field heap's next free block, whose free list then lost the rest of the heap, so the scene's first file read found it full | Fixed in the game's file: `sizeof(SpPokeGimmickWork)`, which is 0x30 on the DS ([game-changes.md](game-changes.md)); `integrate_sp_poke_gimmick` gives each gimmick a block of exactly its size under ASan. The café loads, and the strict build runs its 2,200 frames without a report ([STATUS.md](STATUS.md)) |
+
+### Main's first baseline of T5's set
+
+On 2026-11-02 [../tools/strict_routes.py](../tools/strict_routes.py) ran T5's set as
+[ADR 0033](adr/0033-sanitizer-clean-replays-by-the-strict-routes-and-the-program-alone.md) (proposed) defines it, on
+`9672f23751` (`main` at `c6fcdd3f59` with this runner; `port/`, `src/`, `lib/` and `include/` clean), in the strict
+build of each game (Homebrew clang 23.1.3, `RelWithDebInfo`, `PORT_SANITIZE=ON`, `PORT_SANITIZE_RECOVER=OFF`), with
+`ASAN_OPTIONS=detect_leaks=1:detect_stack_use_after_return=1`, two runs at a time: ctest's routes that need no oracle,
+17 in Black 2 and 15 in White 2, then the program alone in 16 cases of 147,920 frames in each game, from the oracle's
+saves held to their SHA-1s and from the saves that the round trips' make legs left. Every case of both games was
+clean, with no report: Black 2's 33 in 1,935 s and White 2's 31 in 1,958 s, of wall time. With no report there is no
+new row above; each case's frames and time are in [STATUS.md](STATUS.md)'s entry of the day.
 
 ### The reports' lines
 

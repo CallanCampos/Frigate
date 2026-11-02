@@ -3,6 +3,37 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-11-02: the strict routes' runner (T5-A)
+
+- **A warning that only Homebrew's clang gives hides from the plain builds.** Homebrew clang 23 warns of a static that
+  is set and never read (`-Wunused-but-set-global`), which Apple clang 21 doesn't know, so the backup tests'
+  `sReplyData` (`port/tests/rom/test_backup.c`, since 2026-10-17) passed every plain build and verification and
+  stopped T5-A's first strict build. A port change is warning-free when both compilers say so: its file's command from
+  the strict tree's `compile_commands.json`, given to Apple clang without the sanitizers' flags and to Homebrew's with
+  them, in both games, takes seconds.
+- **A tool that runs a program from another directory needs the program's whole path.** `strict_routes.py` runs each
+  case in a directory of its own; given the build as T5's commands give it, `--build-dir build/port-san`, it named the
+  program from the caller's directory only, and the first calibration failed at once ("No such file or directory"),
+  while the preflight, run from the caller's directory, passed. The test's made-up build had a whole temporary path,
+  so it never met a relative one. A stand-in for a program should fail as an executable does when its path doesn't
+  name it from where it starts, and a test should give the tool a relative path.
+- **ctest's JUnit file is a runner's reading of ctest.** `ctest --output-junit FILE` (CMake 3.21 and later) writes
+  each test's name, time, status (`run`, `fail`, `notrun`), failure message (`Failed`, `Timeout`) and output, the
+  passing tests' too, so a tool that runs ctest reads its verdicts there rather than from the console's lines.
+- **A module made from its source for a mutant needs its name in `sys.modules` while its source runs.** `dataclasses`
+  reads a field's annotation, a string under `from __future__ import annotations`, through
+  `sys.modules[cls.__module__]`, so `exec` of a source that defines a dataclass into a bare `types.ModuleType` fails
+  (`'NoneType' object has no attribute '__dict__'`). `test_savelab.py`'s loader never met it, since `savelab.py` has
+  no dataclass; `test_strict_routes.py`'s registers the mutant under its own name for the `exec`
+  (`mock.patch.dict(sys.modules, ...)`).
+- **A mutant should fail its test by an assertion, not an error.** The mutant that leaves ctest's half out first made
+  its test fail by a `FileNotFoundError`, reading a record the stand-in never wrote: an error that a broken test gives
+  too. Assert what the test needs (here, that ctest ran) before reading it, and check each mutant's failures apart
+  from its errors.
+- **Count the exact-head verifications by the PRs they verify, not by `pgrep`'s lines.** Three runs of
+  `sync_upstream.sh --verify-pr` showed as four lines, one through a shell that the Bash tool wraps and two without, so
+  halving the lines counted two; the distinct PR numbers in the lines count the runs.
+
 ## 2026-11-02: Youngster Terrell's first decision
 
 - **Place each of the DS's AI suspensions from the AI's own context, not from the draws.** Terrell's AI has one flag and
