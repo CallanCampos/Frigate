@@ -121,6 +121,21 @@ endforeach()
 # Source-level initialization must hold even without the production zero-init safety net. Source options are last.
 set_property(SOURCE tests/integrate/pokedex_form.c APPEND PROPERTY COMPILE_OPTIONS -ftrivial-auto-var-init=pattern)
 
+# The special Pokémon's field gimmicks (src/ov129/sp_poke_gimmick.c) in a fixture TU, its ordinary object excluded and
+# the other genuine objects resolving its dependencies, with typed spies for the field's gimmick work, heap and 3D
+# scenes only: each gimmick's work block, a host block of exactly the size the gimmick asks for, holds
+# SpPokeGimmickWork, and its writes stay in it under ASan and UBSan (the map sweep's exit at CONTINUE into
+# ZONE_CASTELIA_CITY_22). No ROM
+add_executable(port_sp_poke_gimmick_tests tests/integrate/sp_poke_gimmick.c
+    "$<FILTER:$<TARGET_OBJECTS:pokebw2_game>,EXCLUDE,/sp_poke_gimmick[.]c[.](o|obj)$>"
+    $<TARGET_OBJECTS:port_hal> ${port_gfx_objects} "${PORT_GEN}/stubs.c")
+target_link_libraries(port_sp_poke_gimmick_tests PRIVATE port_decomp_env SDL3::SDL3)
+target_include_directories(port_sp_poke_gimmick_tests PRIVATE "${REPO_ROOT}" "${CMAKE_CURRENT_SOURCE_DIR}")
+target_compile_options(port_sp_poke_gimmick_tests PRIVATE -fsanitize=address,undefined -fno-sanitize-recover=all)
+target_link_options(port_sp_poke_gimmick_tests PRIVATE -fsanitize=address,undefined)
+add_test(NAME integrate_sp_poke_gimmick COMMAND port_sp_poke_gimmick_tests)
+set_tests_properties(integrate_sp_poke_gimmick PROPERTIES TIMEOUT 60)
+
 # Exact actual trainer-AI definitions, without the unrelated callback table retained by ELF ASan/COFF linkers.
 # The generator fails closed on source-boundary changes; selected command bodies and the VM keep all sanitizers.
 set(tr_ai_projection "${PORT_GEN}/tr_ai_tables_source.inc")

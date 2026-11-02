@@ -149,7 +149,8 @@ static const ExitStatus sExitStatuses[] = {
     { PORT_TRAP_EXIT_STATUS,
       "the game reached code or data that has no C yet (port/hal/trap.c), which the message names" },
     { PORT_OS_TERMINATE_STATUS,
-      "the game stopped itself (OS_Terminate); also a DMA call that the host's card never makes (MIi_CardDmaCopy32)" },
+      "the game stopped itself (OS_Terminate), as when one of its heaps has no room for a block; also a DMA call that "
+      "the host's card never makes (MIi_CardDmaCopy32)" },
     { EXIT_DEADLOCK, "every thread waits for an interrupt that nothing can raise" },
     { EXIT_WATCHDOG, "the watchdog: a frame took longer than --watchdog seconds of host time" },
     { PORT_OS_RESET_STATUS, "the game reset the console (OS_ResetSystem), which Frigate can't do in place yet" },
