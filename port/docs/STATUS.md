@@ -34,22 +34,25 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 ## 2026-11-02: stations held to melonDS: Floccesy Ranch's gate in both games, ADR 0032 proposed (save lab L2)
 
-- **Upstream:** `41f42ca1af`, as reviewed main `c6fcdd3f59` (PR 75's merge) has it; this change merges no upstream
+- **Upstream:** `41f42ca1af`, as reviewed main `2d3b99c9ee` (PR 77's merge) has it; this change merges no upstream
   commit.
 - **Port:** `PORT_SHA`, on the topic branch `port-save-lab-stations` from `e936696a97` (PR 71's merge): `7c06f6bdc8`
   (the work), `016f0aee48` (the merge of `main` at `c6fcdd3f59`, PR 75: the documents check and PR 74's follow-ups,
-  in `port/` and two of Frigate's own files under `.github/`, nothing a station runs) and this record's update after
-  it. The merge keeps both new STATUS.md entries, this one first. This entry fills the save lab's (L1's) `PORT_SHA`
-  with `a9d91adf59`, as the documents' entry does too, and the documents' with `7d87f98b8c`.
+  in `port/` and two of Frigate's own files under `.github/`, nothing a station runs), `e293cd1fc0` (this record's
+  update after it), `ed1333301b` (the merge of `main` at `2d3b99c9ee`, PR 77: Youngster Terrell's battle to its cut,
+  a sequence and its documents, nothing a station runs; with it, this entry's and ADR 0032's sentences on the story's
+  coverage say what `main` does) and this record's update after that. Each merge keeps the new STATUS.md entries,
+  this one first. This entry fills the save lab's (L1's) `PORT_SHA` with `a9d91adf59`, the documents' (PR 75's) with
+  `7d87f98b8c`, as the Terrell entry does too, and the Terrell entry's with `a7d768e2ee`.
 - **ROM (T0):** `python3 configure.py && ninja` in the branch's fresh worktree, 14,039 steps at `-j4`: both SHA1s match
   (Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`), no
-  compiler warning; again on the work's tree (2 steps, the checks) and on the merge with `main` at `c6fcdd3f59`
-  (2 steps), the same SHA1s and no warning. This change adds no ROM input.
+  compiler warning; again on the work's tree (2 steps, the checks) and on each merge with `main`, at `c6fcdd3f59` and
+  at `2d3b99c9ee` (2 steps each), the same SHA1s and no warning. This change adds no ROM input.
 - **Host build (T1):** fresh arm64 macOS RelWithDebInfo builds of both games with the oracle (`build/port-oracle`,
   `build/port-oracle-w2`, `-DPORT_BUILD_ORACLE=ON -DPORT_SANITIZE_RECOVER=OFF -DPORT_FRAME_TIME_REPORT_ONLY=OFF`,
   Apple clang, ninja at `-j4`) pass with no warning in a file under `port/`: each log's 748 warning lines are the
   decomp's own C in `src/` and `lib/`, as on main, five of them `pm.c`'s `.ltdmain` pragmas compiled through
-  `port/hal/pm/pm_host.c`. After the merge both build again with no warning (nothing they compile changed).
+  `port/hal/pm/pm_host.c`. After each merge both build again with no warning (nothing they compile changed).
 - **Tests:**
   - T2/T6: `ctest -LE 'route|oracle'` (`CTEST_PARALLEL_LEVEL=3`) passes in both games, 363 tests each: 359 pass,
     `lab_stations`, `lab_savelab`, `oracle_compare` and `game_ptrcasts` among them, and 4 skip, the setups this
@@ -87,10 +90,14 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     `oracle.py save first_save starter_save center_save route19_save catch_save floccesy_save --save-cache` took all six
     from the cache by their pins in both games, as the station tests' fixtures then did. None is committed.
   - After the merge of `main` at `c6fcdd3f59`: T2/T6 again in both games, 359 of 363 passing and the same 4 skipping;
-    T3 again, Black 2 17 of 17 (275 s) and White 2 15 of 15 (298 s); the cast guard's line the same. T4 and its control not
-    again: the merge brings documents, the documents check and its tests, `port-ci.yml` and the progress and research
-    tools, none of which a station runs. The documents check, `python3 port/tools/check_docs.py`: 99 documents, 1
-    problem, allowed (`port/docs/research/platinum-port.md:25`, a record), 0 allowlist rows to fix.
+    T3 again, Black 2 17 of 17 (275 s) and White 2 15 of 15 (298 s); the cast guard's line the same. After the merge
+    at `2d3b99c9ee`: T2/T6 359 of 363 in both games and the same 4 skips, T3 Black 2 17 of 17 (183 s) and White 2
+    15 of 15 (168 s), the cast guard's line the same. T4 and its control not again: the first merge brings documents,
+    the documents check and its tests, `port-ci.yml` and the progress and research tools, the second the terrell
+    sequence (its `SEQUENCES` entry, two causes, its input files and registration, `test_compare.py`'s tests of it) and
+    documents, none of which a station runs. The documents check, `python3 port/tools/check_docs.py`, on the final
+    tree: 99 documents, 1 problem, allowed (`port/docs/research/platinum-port.md:25`, a record), 0 allowlist rows to
+    fix.
   - T5 and T7 not run: no game, platform or app code changed.
 - **Tiers/trap stubs:** not measured: no game or host code changed.
 - **64-bit warnings:** the pointer cast guard passes in both games (`game_ptrcasts`), and `check_ptrcasts.py
