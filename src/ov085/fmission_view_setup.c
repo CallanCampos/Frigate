@@ -305,13 +305,18 @@ static GameEventReturnCode FMissionViewSetup_CallEvent(GameEvent *event, u32 *st
     return GAMEEVENT_CONTINUE;
 }
 
+enum {
+    STEP_PRESS_BUTTON,
+    STEP_WAIT_BUTTON_ANIM,
+};
+
 static BOOL FMissionViewSetup_CallButton(FMissionView *view, FMissionViewCallEvent *call) {
     switch (call->seq) {
-    case 0:
+    case STEP_PRESS_BUTTON:
         FMissionView_SetButtonState(view, call->param, FMISSION_VIEW_BUTTON_STATE_PRESSED);
         call->seq++;
         return FALSE;
-    case 1:
+    case STEP_WAIT_BUTTON_ANIM:
         if (FMissionView_IsButtonAnimating(view, call->param)) {
             return FALSE;
         }
@@ -328,15 +333,20 @@ static BOOL FMissionViewSetup_CallTasks(FMissionView *view, FMissionViewCallEven
     return FALSE;
 }
 
+enum {
+    STEP_START_FLASH,
+    STEP_WAIT_MENU_FLASH,
+};
+
 static BOOL FMissionViewSetup_CallMenuButton(FMissionView *view, FMissionViewCallEvent *call) {
     AppTaskMenuWin *button = (AppTaskMenuWin *)call->param;
 
     switch (call->seq) {
-    case 0:
+    case STEP_START_FLASH:
         AppTaskMenuWin_SetFlashing(button, TRUE);
         call->seq++;
         break;
-    case 1:
+    case STEP_WAIT_MENU_FLASH:
         AppTaskMenuWin_Update(button);
         if (AppTaskMenuWin_IsFlashFinished(button)) {
             AppTaskMenuWin_ResetFlash(button);
@@ -378,11 +388,11 @@ static void FMissionViewSetup_InitData(FMissionView *view) {
     view->wifiList = GameData_GetWifiList(view->gameData);
     view->bag = GameData_GetBag(view->gameData);
     view->trainerCard = getTrainerCardData_wrapper(save);
-    view->unk33C = TrainerCard_GetPasserbyCount(view->trainerCard);
+    view->passerbyCount = TrainerCard_GetPasserbyCount(view->trainerCard);
     info = SaveControl_GetPlayerInfo(save);
     view->trainerId = getTrainerID(info);
     view->gender = getTrainerGender(info);
-    view->unk3D = PlayerInfo_GetUnionView(info);
+    view->unionView = PlayerInfo_GetUnionView(info);
     view->version = GAME_VERSION;
     view->entry = FMissionLogFV_AllocEntry(view->heapId);
     view->unk54 = FMissionLogFV_AllocEntry(view->heapId);
