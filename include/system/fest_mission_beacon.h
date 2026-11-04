@@ -53,9 +53,9 @@ enum {
 
 typedef struct {
     FestMissionLogEntry entries[FEST_MISSION_LOG_MAX];
-    u8 unk4EC;
+    u8 newestIndex;
     u8 count;
-    u8 unk4EE;
+    u8 top;
 } FestMissionLog;
 
 // A Pass Power a player gave during the mission

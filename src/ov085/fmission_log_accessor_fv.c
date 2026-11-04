@@ -27,11 +27,11 @@ u8 FMissionLogFV_GetCount(FestMissionLog *log) {
 }
 
 u8 FMissionLogFV_GetTop(FestMissionLog *log) {
-    return log->unk4EE;
+    return log->top;
 }
 
 void FMissionLogFV_SetTop(FestMissionLog *log, u8 top) {
-    log->unk4EE = top;
+    log->top = top;
 }
 
 FestMissionLogEntry *FMissionLogFV_AllocEntry(HeapID heapId) {
@@ -50,7 +50,7 @@ BOOL FMissionLogFV_PopEntry(FestMissionLog *log, FestMissionLogEntry *dest) {
 }
 
 int FMissionLogFV_GetIndex(FestMissionLog *log, int offset) {
-    int index = log->unk4EC;
+    int index = log->newestIndex;
 
     if (offset < 0) {
         index = index + offset + FEST_MISSION_LOG_MAX;
@@ -64,7 +64,7 @@ int FMissionLogFV_PushEntry(FestMissionLog *log, FestMissionLogEntry *entry) {
     int index = FMissionLogFV_GetIndex(log, -1);
 
     log->entries[index] = *entry;
-    log->unk4EC = index;
+    log->newestIndex = index;
     if (log->count < FEST_MISSION_LOG_MAX) {
         log->count++;
     }
