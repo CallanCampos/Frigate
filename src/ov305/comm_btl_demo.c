@@ -56,6 +56,25 @@ enum {
     SCENE_COUNT,
 };
 
+// The steps of the scenes, by the counter of the scene
+enum {
+    START_STEP_LOAD_BALLS,
+    START_STEP_WAIT_BALLS,
+    START_STEP_VS,
+};
+
+enum {
+    RESULT_STEP_LOAD_BALLS,
+    RESULT_STEP_WAIT_BALLS,
+    RESULT_STEP_LABELS,
+};
+
+enum {
+    DRAW_STEP_LOAD,
+    DRAW_STEP_LABEL,
+    DRAW_STEP_IDLE,
+};
+
 // The 3D scenes, each a model with two animations
 enum {
     G3D_SCENE_SINGLE_START,
@@ -514,7 +533,7 @@ static BOOL CommBtlDemoStart_Main(UIScene *scene, void *param) {
 
     CommBtlDemo_UpdateTrainers(wk);
     switch (counter) {
-    case 0:
+    case START_STEP_LOAD_BALLS:
         CommBtlDemoG3D_LoadParticles(&wk->g3d, FILE_PARTICLES_BALL);
         if (CommBtlDemo_IsSingle(wk->type)) {
             CommBtlDemoG3D_LoadScene(&wk->g3d, G3D_SCENE_SINGLE_START);
@@ -526,7 +545,7 @@ static BOOL CommBtlDemoStart_Main(UIScene *scene, void *param) {
         CommBtlDemo_StartBalls(wk);
         UIScene_IncCounter(scene);
         break;
-    case 1:
+    case START_STEP_WAIT_BALLS:
         if (!CommBtlDemoG3D_UpdateAnim(&wk->g3d)) {
             CommBtlDemoG3D_LoadScene(&wk->g3d, G3D_SCENE_VS);
             if (wk->param->competition) {
@@ -538,7 +557,7 @@ static BOOL CommBtlDemoStart_Main(UIScene *scene, void *param) {
             UIScene_IncCounter(scene);
         }
         break;
-    case 2:
+    case START_STEP_VS:
         CommBtlDemoG3D_UpdateAnim(&wk->g3d);
         if (wk->timer == 15) {
             GFL_SndSEPlay(CommBtlDemo_GetSE(SE_VS, wk->param->competition));
@@ -608,7 +627,7 @@ static BOOL CommBtlDemoResult_Main(UIScene *scene, void *param) {
     CommBtlDemo_UpdateTrainers(wk);
     CommBtlDemoResult_Update(&wk->result);
     switch (counter) {
-    case 0:
+    case RESULT_STEP_LOAD_BALLS:
         if (CommBtlDemo_IsSingle(wk->type)) {
             CommBtlDemoG3D_LoadScene(&wk->g3d, G3D_SCENE_SINGLE_END);
         } else {
@@ -618,7 +637,7 @@ static BOOL CommBtlDemoResult_Main(UIScene *scene, void *param) {
         CommBtlDemo_StartBalls(wk);
         UIScene_IncCounter(scene);
         break;
-    case 1:
+    case RESULT_STEP_WAIT_BALLS:
         if (!CommBtlDemoG3D_UpdateAnim(&wk->g3d)) {
             if (wk->battleResult == COMM_BTL_DEMO_RESULT_DRAW) {
                 return TRUE;
@@ -628,7 +647,7 @@ static BOOL CommBtlDemoResult_Main(UIScene *scene, void *param) {
             UIScene_IncCounter(scene);
         }
         break;
-    case 2:
+    case RESULT_STEP_LABELS:
         if (wk->timer == 15) {
             u32 side = wk->battleResult == COMM_BTL_DEMO_RESULT_WIN ? 0 : 1;
 
@@ -725,12 +744,12 @@ static BOOL CommBtlDemoDraw_Main(UIScene *scene, void *param) {
     CommBtlDemo_UpdateTrainers(wk);
     CommBtlDemoResult_Update(&wk->result);
     switch (counter) {
-    case 0:
+    case DRAW_STEP_LOAD:
         CommBtlDemoG3D_LoadScene(&wk->g3d, G3D_SCENE_DRAW);
         wk->timer = 0;
         UIScene_IncCounter(scene);
         break;
-    case 1:
+    case DRAW_STEP_LABEL:
         if (wk->timer++ == 30) {
             CommBtlDemoResult_ShowLabel(&wk->result, LABEL_MIDDLE, 2);
         }
@@ -739,7 +758,7 @@ static BOOL CommBtlDemoDraw_Main(UIScene *scene, void *param) {
             return TRUE;
         }
         break;
-    case 2:
+    case DRAW_STEP_IDLE:
         break;
     }
     return FALSE;

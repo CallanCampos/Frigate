@@ -161,6 +161,8 @@ enum {
 #define MENU_ITEM_NONE 22
 
 #define MEDAL_NAME_NONE 0xff
+// The cursor's medal when it was on none
+#define MEDAL_NONE 0xff
 
 #define COLOR_NAME PRINT_COLOR(2, 3, 1)
 #define COLOR_INFO PRINT_COLOR(1, 2, 0)
@@ -865,7 +867,7 @@ static void MedalBoxApp_InitColumn(MedalBoxApp *work) {
     u8 medal = GameData_GetMedalBoxCursorMedal(work->param->gameData);
     int index = MedalBoxDataSys_FindMedal(&work->data, medal);
 
-    if (medal != 0xff) {
+    if (medal != MEDAL_NONE) {
         work->column = index / MEDALBOX_COLUMN_SIZE;
     } else {
         work->column = 0;
@@ -1047,10 +1049,16 @@ static int MedalBoxApp_GetBG(int index) {
     return sMedalBoxBGs[index].bg;
 }
 
+enum {
+    START_STEP_INIT,
+    START_STEP_FADE_IN,
+    START_STEP_UNCOVER,
+};
+
 // Fades in, then lets the cover slide off the medals while the case comes down on the top screen
 static BOOL MedalBoxApp_SeqStart(MedalBoxApp *work) {
     switch (work->subSeq) {
-    case 0: {
+    case START_STEP_INIT: {
         ClActorPos pos;
 
         GFL_FadeSet(3, 16, 0, 0);
@@ -1063,13 +1071,13 @@ static BOOL MedalBoxApp_SeqStart(MedalBoxApp *work) {
         work->subSeq++;
         break;
     }
-    case 1:
+    case START_STEP_FADE_IN:
         if (!GFL_FadeIsRunning()) {
             GFL_SndSEPlay(SEQ_SE_MD_01);
             work->subSeq++;
         }
         break;
-    case 2: {
+    case START_STEP_UNCOVER: {
         ClActorPos coverPos;
         ClActorPos pos;
         BOOL coverDone = FALSE;
@@ -1117,7 +1125,7 @@ static void MedalBoxApp_RestoreCursor(MedalBoxApp *work) {
         u8 medal = GameData_GetMedalBoxCursorMedal(work->param->gameData);
         int index = MedalBoxDataSys_FindMedal(&work->data, medal);
 
-        if (medal != 0xff) {
+        if (medal != MEDAL_NONE) {
             MedalBoxApp_SetCursor(work, index % MEDALBOX_COLUMN_SIZE, TRUE);
         } else {
             MedalBoxApp_SetCursor(work, 0, TRUE);
@@ -1297,10 +1305,16 @@ static BOOL MedalBoxApp_UpdateDrag(MedalBoxApp *work) {
     return FALSE;
 }
 
+enum {
+    SCROLL_STEP_START,
+    SCROLL_STEP_MOVE,
+    SCROLL_STEP_FINISH,
+};
+
 // Scrolls the columns by scrollCount columns
 static BOOL MedalBoxApp_SeqScroll(MedalBoxApp *work) {
     switch (work->subSeq) {
-    case 0:
+    case SCROLL_STEP_START:
         MedalBoxApp_ClearNames(work);
         MedalBoxApp_SetCursorMode(work, CURSOR_HIDDEN, 0xff);
         if (work->scrollDir == 1) {
@@ -1313,7 +1327,7 @@ static BOOL MedalBoxApp_SeqScroll(MedalBoxApp *work) {
         GFL_SndSEPlay(SEQ_SE_MD_02);
         work->subSeq++;
         // fallthrough
-    case 1:
+    case SCROLL_STEP_MOVE:
         if (MedalBoxApp_Scroll(work, work->scrollSpeed * work->scrollDir)) {
             work->scrollCount--;
             if (work->scrollCount <= 0) {
@@ -1323,7 +1337,7 @@ static BOOL MedalBoxApp_SeqScroll(MedalBoxApp *work) {
             }
         }
         break;
-    case 2: {
+    case SCROLL_STEP_FINISH: {
         u8 top = work->cursor / MEDALBOX_COLUMN_SIZE * MEDALBOX_COLUMN_SIZE;
         ClActorPos pos;
 
@@ -1910,26 +1924,33 @@ static void MedalBoxApp_SetScrollSpeed(MedalBoxApp *work, u32 speed) {
     work->scrollSpeed = speed;
 }
 
+enum {
+    EXIT_STEP_PRESS,
+    EXIT_STEP_PRESS_WAIT,
+    EXIT_STEP_FADE_OUT,
+    EXIT_STEP_FADE_WAIT,
+};
+
 static BOOL MedalBoxApp_SeqExit(MedalBoxApp *work) {
     ClActor *button = work->actors[ACTOR_EXIT];
 
     switch (work->subSeq) {
-    case 0:
+    case EXIT_STEP_PRESS:
         ClActor_SetSequence(button, 8);
         ClActor_SetAutoAnim(button, TRUE);
         GFL_SndSEPlay(SEQ_SE_CLOSE1);
         work->subSeq++;
         break;
-    case 1:
+    case EXIT_STEP_PRESS_WAIT:
         if (!ClActor_IsAnimActive(button)) {
             work->subSeq++;
         }
         break;
-    case 2:
+    case EXIT_STEP_FADE_OUT:
         GFL_FadeSet(3, 0, 16, 0);
         work->subSeq++;
         break;
-    case 3:
+    case EXIT_STEP_FADE_WAIT:
         if (!GFL_FadeIsRunning()) {
             work->param->result = MEDALBOX_RESULT_EXIT;
             return TRUE;
@@ -1939,26 +1960,33 @@ static BOOL MedalBoxApp_SeqExit(MedalBoxApp *work) {
     return FALSE;
 }
 
+enum {
+    RETURN_STEP_PRESS,
+    RETURN_STEP_PRESS_WAIT,
+    RETURN_STEP_FADE_OUT,
+    RETURN_STEP_FADE_WAIT,
+};
+
 static BOOL MedalBoxApp_SeqReturn(MedalBoxApp *work) {
     ClActor *button = work->actors[ACTOR_RETURN];
 
     switch (work->subSeq) {
-    case 0:
+    case RETURN_STEP_PRESS:
         ClActor_SetSequence(button, 9);
         ClActor_SetAutoAnim(button, TRUE);
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         work->subSeq++;
         break;
-    case 1:
+    case RETURN_STEP_PRESS_WAIT:
         if (!ClActor_IsAnimActive(button)) {
             work->subSeq++;
         }
         break;
-    case 2:
+    case RETURN_STEP_FADE_OUT:
         GFL_FadeSet(3, 0, 16, 0);
         work->subSeq++;
         break;
-    case 3:
+    case RETURN_STEP_FADE_WAIT:
         if (!GFL_FadeIsRunning()) {
             work->param->result = MEDALBOX_RESULT_RETURN;
             return TRUE;
@@ -1968,19 +1996,25 @@ static BOOL MedalBoxApp_SeqReturn(MedalBoxApp *work) {
     return FALSE;
 }
 
+enum {
+    SLIDER_STEP_START,
+    SLIDER_STEP_HELD,
+    SLIDER_STEP_SETTLE,
+};
+
 // The slider is held: the columns run after it, and go on to its column once it is let go
 static BOOL MedalBoxApp_SeqSlider(MedalBoxApp *work) {
     u32 x;
     u32 y;
 
     switch (work->subSeq) {
-    case 0:
+    case SLIDER_STEP_START:
         MedalBoxApp_ClearNames(work);
         MedalBoxApp_SetCursorMode(work, CURSOR_HIDDEN, 0xff);
         work->scrollSpeed = FX32_CONST(9);
         work->subSeq++;
         // fallthrough
-    case 1:
+    case SLIDER_STEP_HELD:
         if (GFL_HIDGetTouchHeldPoint(&x, &y)) {
             if (x < SLIDER_X) {
                 work->sliderX = 0;
@@ -1999,7 +2033,7 @@ static BOOL MedalBoxApp_SeqSlider(MedalBoxApp *work) {
             work->subSeq++;
         }
         break;
-    case 2:
+    case SLIDER_STEP_SETTLE:
         if (MedalBoxApp_UpdateSlider(work) == TRUE) {
             work->prevCursor = work->cursor;
             MedalBoxApp_SetCursorMode(work, CURSOR_TOUCH, 0xff);
@@ -2062,10 +2096,17 @@ static BOOL MedalBoxApp_UpdateSlider(MedalBoxApp *work) {
     return FALSE;
 }
 
+enum {
+    MENU_STEP_PRESS,
+    MENU_STEP_PRESS_WAIT,
+    MENU_STEP_OPEN,
+    MENU_STEP_CHOOSE,
+};
+
 // The menu of the view and the orders
 static BOOL MedalBoxApp_SeqMenu(MedalBoxApp *work) {
     switch (work->subSeq) {
-    case 0: {
+    case MENU_STEP_PRESS: {
         u8 column = MedalBoxApp_GetCursorColumn(work);
 
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -2083,12 +2124,12 @@ static BOOL MedalBoxApp_SeqMenu(MedalBoxApp *work) {
         work->subSeq++;
         break;
     }
-    case 1:
+    case MENU_STEP_PRESS_WAIT:
         if (!ClActor_IsAnimActive(work->actors[ACTOR_MENU])) {
             work->subSeq++;
         }
         break;
-    case 2:
+    case MENU_STEP_OPEN:
         GX_SetVisibleWnd(GX_WNDMASK_NONE);
         GFL_BGSysSetBGPriority(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), 0);
         GFL_BGSysMoveBGReq(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), BG_MOVE_SET_X, 0);
@@ -2098,7 +2139,7 @@ static BOOL MedalBoxApp_SeqMenu(MedalBoxApp *work) {
         GFL_BGSysSetBGEnabled(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), TRUE);
         work->subSeq++;
         break;
-    case 3: {
+    case MENU_STEP_CHOOSE: {
         u8 pos;
 
         AppTaskMenu_Update(work->menu);
@@ -2217,16 +2258,24 @@ static void MedalBoxApp_OpenMenu(MedalBoxApp *work) {
     }
 }
 
+enum {
+    VIEW_STEP_START,
+    VIEW_STEP_COVER,
+    VIEW_STEP_SWITCH,
+    VIEW_STEP_WAIT,
+    VIEW_STEP_UNCOVER,
+};
+
 // Changes the view behind the cover: with five columns the touch screen's back moves aside
 static BOOL MedalBoxApp_SeqChangeView(MedalBoxApp *work) {
     switch (work->subSeq) {
-    case 0:
+    case VIEW_STEP_START:
         GFL_SndSEPlay(SEQ_SE_MD_04);
         MedalBoxApp_ClearNames(work);
         ClActor_SetVisible(work->actors[ACTOR_FAVORITE], FALSE);
         work->subSeq++;
         // fallthrough
-    case 1: {
+    case VIEW_STEP_COVER: {
         ClActorPos pos;
         BOOL backDone = TRUE;
         BOOL coverDone = FALSE;
@@ -2256,7 +2305,7 @@ static BOOL MedalBoxApp_SeqChangeView(MedalBoxApp *work) {
         }
         break;
     }
-    case 2:
+    case VIEW_STEP_SWITCH:
         if (work->view == VIEW_NAMES) {
             work->view = VIEW_COLUMNS;
         } else {
@@ -2269,13 +2318,13 @@ static BOOL MedalBoxApp_SeqChangeView(MedalBoxApp *work) {
         work->wait = 0;
         work->subSeq++;
         break;
-    case 3:
+    case VIEW_STEP_WAIT:
         work->wait++;
         if (work->wait > 6) {
             work->subSeq++;
         }
         break;
-    case 4: {
+    case VIEW_STEP_UNCOVER: {
         ClActorPos pos;
         BOOL coverDone = FALSE;
         BOOL backDone = TRUE;
@@ -2318,19 +2367,26 @@ static BOOL MedalBoxApp_SeqChangeView(MedalBoxApp *work) {
     return FALSE;
 }
 
+enum {
+    FAVORITE_STEP_START,
+    FAVORITE_STEP_SHOW,
+    FAVORITE_STEP_WAIT,
+    FAVORITE_STEP_CLOSE,
+};
+
 // The message after a favorite medal was registered or removed
 static BOOL MedalBoxApp_SeqFavorite(MedalBoxApp *work) {
     StrBuf *str;
 
     switch (work->subSeq) {
-    case 0:
+    case FAVORITE_STEP_START:
         GFL_BGSysSetBGEnabled(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), FALSE);
         GX_SetVisibleWnd(GX_WNDMASK_NONE);
         GFL_BGSysSetBGPriority(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), 0);
         GFL_BGSysMoveBGReq(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), BG_MOVE_SET_X, 0);
         work->subSeq++;
         break;
-    case 1:
+    case FAVORITE_STEP_SHOW:
         if (work->favoriteResult != FAVORITE_HINT) {
             GFL_SndSEPlay(SEQ_SE_SAVE);
         } else {
@@ -2353,7 +2409,7 @@ static BOOL MedalBoxApp_SeqFavorite(MedalBoxApp *work) {
         GFL_BGSysSetBGEnabled(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), TRUE);
         work->subSeq++;
         break;
-    case 2: {
+    case FAVORITE_STEP_WAIT: {
         int i;
 
         for (i = 0; i < 4; i++) {
@@ -2365,7 +2421,7 @@ static BOOL MedalBoxApp_SeqFavorite(MedalBoxApp *work) {
         }
         break;
     }
-    case 3:
+    case FAVORITE_STEP_CLOSE:
         MedalBoxApp_CloseMessage(work);
         MedalBoxApp_ReloadMenuBG(work);
         GX_SetVisibleWnd(GX_WNDMASK_OW);
@@ -2390,16 +2446,24 @@ static void MedalBoxApp_SetFavorite(MedalBoxApp *work, u16 medal, int result) {
     }
 }
 
+enum {
+    SORT_STEP_START,
+    SORT_STEP_COVER,
+    SORT_STEP_SORT,
+    SORT_STEP_WAIT,
+    SORT_STEP_UNCOVER,
+};
+
 // Shows the medals in their new order from the first column, behind the cover
 static BOOL MedalBoxApp_SeqSort(MedalBoxApp *work) {
     switch (work->subSeq) {
-    case 0:
+    case SORT_STEP_START:
         GFL_SndSEPlay(SEQ_SE_MD_04);
         MedalBoxApp_ClearNames(work);
         ClActor_SetVisible(work->actors[ACTOR_FAVORITE], FALSE);
         work->subSeq++;
         // fallthrough
-    case 1: {
+    case SORT_STEP_COVER: {
         ClActorPos pos;
         BOOL backDone = TRUE;
         BOOL coverDone = FALSE;
@@ -2429,7 +2493,7 @@ static BOOL MedalBoxApp_SeqSort(MedalBoxApp *work) {
         }
         break;
     }
-    case 2:
+    case SORT_STEP_SORT:
         work->column = 0;
         MedalBoxApp_DrawColumns(work, FALSE, TRUE);
         MedalBoxApp_ClearNames(work);
@@ -2437,13 +2501,13 @@ static BOOL MedalBoxApp_SeqSort(MedalBoxApp *work) {
         work->wait = 0;
         work->subSeq++;
         break;
-    case 3:
+    case SORT_STEP_WAIT:
         work->wait++;
         if (work->wait > 6) {
             work->subSeq++;
         }
         break;
-    case 4: {
+    case SORT_STEP_UNCOVER: {
         ClActorPos pos;
         BOOL coverDone = FALSE;
         BOOL backDone = TRUE;
@@ -2483,17 +2547,24 @@ static BOOL MedalBoxApp_SeqSort(MedalBoxApp *work) {
     return FALSE;
 }
 
+enum {
+    MANUAL_STEP_START,
+    MANUAL_STEP_SHOW,
+    MANUAL_STEP_WAIT,
+    MANUAL_STEP_CLOSE,
+};
+
 // The message of the manual, the first time the box is opened
 static BOOL MedalBoxApp_SeqManual(MedalBoxApp *work) {
     switch (work->subSeq) {
-    case 0:
+    case MANUAL_STEP_START:
         GFL_BGSysSetBGEnabled(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), FALSE);
         GX_SetVisibleWnd(GX_WNDMASK_NONE);
         GFL_BGSysSetBGPriority(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), 0);
         GFL_BGSysMoveBGReq(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), BG_MOVE_SET_X, 0);
         work->subSeq++;
         break;
-    case 1: {
+    case MANUAL_STEP_SHOW: {
         StrBuf *str = GFL_MsgDataLoadStrbufNew(work->msgData[MSG_UI], Title10_Text_ManualWedgedInsideMedal);
 
         MedalBoxApp_ShowMessage(work, str);
@@ -2503,14 +2574,14 @@ static BOOL MedalBoxApp_SeqManual(MedalBoxApp *work) {
         work->subSeq++;
         break;
     }
-    case 2:
+    case MANUAL_STEP_WAIT:
         BlinkPalAnm_Main(work->blinkAnm);
         if (work->stream == NULL) {
             GFL_BGSysSetBGEnabled(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), FALSE);
             work->subSeq++;
         }
         break;
-    case 3:
+    case MANUAL_STEP_CLOSE:
         MedalBoxApp_CloseMessage(work);
         MedalBoxApp_ReloadMenuBG(work);
         GX_SetVisibleWnd(GX_WNDMASK_OW);

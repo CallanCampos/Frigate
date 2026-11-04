@@ -800,7 +800,7 @@ static void *WifiBattleMatchSys_CreateExchangeParam(WifiBattleMatchChain *chain,
     param->gameData = &sys->param.gameData;
     param->party = sys->party;
     param->otherParty = sys->otherParty;
-    param->unk14 = &sys->unk7D4;
+    param->netData = &sys->unk7D4;
     param->unk18 = &sys->unk8A8;
     if (sys->mode == 1) {
         param->mode = WIFIBATTLEMATCH_EXCHANGE_IRC;
@@ -910,7 +910,7 @@ static void *WifiBattleMatchSys_CreateLogoutParam(WifiBattleMatchChain *chain, H
     param->unk4 = 0;
     param->unk8 = 1;
     if (sys->unk24) {
-        param->unk10 = 0x12;
+        param->wipeFlags = 0x12;
     }
     return param;
 }

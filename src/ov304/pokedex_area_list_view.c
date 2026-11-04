@@ -870,13 +870,13 @@ static u32 PokedexAreaListView_GetItemScreen(PokedexHabitatSummary *area) {
     }
     complete = TRUE;
     for (i = 0; i < POKEDEX_AREA_LIST_KINDS; i++) {
-        if (area->conditions[i] == 1 && area->states[i] != 2) {
+        if (area->conditions[i] == 1 && area->states[i] != POKEDEX_HABITAT_STATE_CAUGHT) {
             complete = FALSE;
             break;
         }
     }
     for (i = 0; i < POKEDEX_AREA_LIST_KINDS; i++) {
-        if (area->display[i] == 1) {
+        if (area->display[i] == POKEDEX_HABITAT_DISPLAY_PARTIAL) {
             partial = TRUE;
             break;
         }
@@ -968,21 +968,21 @@ static void PokedexAreaListView_SetRowMarks(PokedexAreaListView *view, u32 index
     marks[1].visible = FALSE;
     marks[2].visible = FALSE;
     if (kind2 == 1) {
-        if (area->display[2] != 4) {
+        if (area->display[2] != POKEDEX_HABITAT_DISPLAY_NONE) {
             marks[place].anim = anims[area->display[2]];
             marks[place].visible = TRUE;
         }
         place++;
     }
     if (kind1 == 1) {
-        if (area->display[1] != 4) {
+        if (area->display[1] != POKEDEX_HABITAT_DISPLAY_NONE) {
             marks[place].anim = anims[area->display[1]];
             marks[place].visible = TRUE;
         }
         place++;
     }
     if (kind0 == 1) {
-        if (area->display[0] != 4) {
+        if (area->display[0] != POKEDEX_HABITAT_DISPLAY_NONE) {
             marks[place].anim = anims[area->display[0]];
             marks[place].visible = TRUE;
         }
@@ -1111,7 +1111,9 @@ static void PokedexAreaListView_UpdatePageButtons(PokedexAreaListView *view, BOO
     s16 cursor = PokedexAreaListView_GetListCursor(view);
 
     if (!PokedexAreaListView_IsActorAnimating(view, POKEDEX_AREA_LIST_OBJ_PAGE_UP) ||
-        PokedexAreaListView_GetActorAnim(view, POKEDEX_AREA_LIST_OBJ_PAGE_UP) != 12 || force == TRUE) {
+        PokedexAreaListView_GetActorAnim(view, POKEDEX_AREA_LIST_OBJ_PAGE_UP) !=
+            POKEDEX_AREA_LIST_ANIM_PAGE_UP_PRESSED ||
+        force == TRUE) {
         if (scroll == 0 && cursor == 0) {
             PokedexAreaListView_SetActorAnim(view, POKEDEX_AREA_LIST_OBJ_PAGE_UP, 18);
         } else {
@@ -1119,7 +1121,9 @@ static void PokedexAreaListView_UpdatePageButtons(PokedexAreaListView *view, BOO
         }
     }
     if (!PokedexAreaListView_IsActorAnimating(view, POKEDEX_AREA_LIST_OBJ_PAGE_DOWN) ||
-        PokedexAreaListView_GetActorAnim(view, POKEDEX_AREA_LIST_OBJ_PAGE_DOWN) != 13 || force == TRUE) {
+        PokedexAreaListView_GetActorAnim(view, POKEDEX_AREA_LIST_OBJ_PAGE_DOWN) !=
+            POKEDEX_AREA_LIST_ANIM_PAGE_DOWN_PRESSED ||
+        force == TRUE) {
         if (PokedexAreaListView_IsAtBottom(view)) {
             PokedexAreaListView_SetActorAnim(view, POKEDEX_AREA_LIST_OBJ_PAGE_DOWN, 19);
         } else {

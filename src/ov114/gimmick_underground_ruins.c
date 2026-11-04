@@ -15,6 +15,9 @@ typedef struct {
     Field *field;
 } GimmickWork;
 
+// The actors 1 to 4 are the models the scripts show one of, and this one is shown to begin with
+#define ACTOR_DEFAULT_MODEL 4
+
 static void UndergroundRuins_LoadScene(GimmickWork *work);
 static void UndergroundRuins_FreeScene(GimmickWork *work);
 static void UndergroundRuins_StepAnimations(GimmickWork *work);
@@ -137,7 +140,7 @@ static void UndergroundRuins_LoadScene(GimmickWork *work) {
         matrix->translation.y = 0;
         matrix->translation.z = FX32_CONST(112);
         FieldExpObj_SetActorCulling(work->expObj, 0, actor, 1);
-        if (actor == 4) {
+        if (actor == ACTOR_DEFAULT_MODEL) {
             FieldExpObj_SetActorHidden(work->expObj, 0, actor, FALSE);
         } else {
             FieldExpObj_SetActorHidden(work->expObj, 0, actor, TRUE);

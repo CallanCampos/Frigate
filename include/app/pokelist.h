@@ -67,9 +67,9 @@ typedef struct {
     // Seconds left to pick, counted down while timerEnabled is set
     u16 timeLeft;
     // The state and error of overlay 164's sync (net_sync.c), which takes the parameters as its NetSyncWork, and
-    // the list ends once unk73 is 1
+    // the list ends once forceExit is 1
     u8 unk72;
-    u8 unk73;
+    u8 forceExit;
     u32 partnerCount;
     PokeListPartnerParam partners[3];
     BOOL showPartners;

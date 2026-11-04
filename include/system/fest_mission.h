@@ -24,13 +24,15 @@ typedef struct {
     // Which of the target's variants the mission uses: a table index or file, by the target
     u32 targetVariant : 10;
     u32 unk0_30 : 1;
-    u32 unk0_31 : 1;
+    // Whether the mission is of Black 2, and of White 2 when clear
+    u32 isBlack : 1;
     // The item of the mission's reward
-    u32 unk4_0 : 10;
-    u32 unk4_10 : 7;
+    u32 rewardItem : 10;
+    u32 rewardItemCount : 7;
     // The total score the mission wants
     u32 count : 14;
-    u32 unk4_31 : 1;
+    // The mission ends once its target is reached, with its time left shown
+    u32 endsAtTarget : 1;
     // 3 bits for each of a zone's 6 stages, which pick how many sparkles or people the zone has
     u32 stagePatterns : 18;
     // An event flag that must be set to join the mission, or 0
@@ -41,8 +43,8 @@ typedef struct {
     // The mission's seconds left
     u32 seconds : 12;
     // A second item, or 0
-    u32 unkC_22 : 10;
-    u16 unk10_0 : 6;
+    u32 rewardItem2 : 10;
+    u16 rewardItem2Count : 6;
     // What the mission's target counts, which picks its goal's message, its "Target:" line and its icon
     u16 targetKind : 3;
     // Which of FestMission_ExtraSeconds a gain of time counts
@@ -68,7 +70,8 @@ struct FestMissionConfig {
     u8 unk1A;
     // The seed of the mission's random choices, drawn when it starts, which its beacons send
     u32 seed;
-    u32 unk20;
+    // The mission's seconds left when it ended
+    u32 secondsLeftAtEnd;
     // When the mission's time started, in the RTC's seconds, or -1 until it starts (FestMissionConfig_StartTimer)
     s64 startSeconds;
 }; // size: 0x2c

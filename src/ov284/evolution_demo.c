@@ -56,6 +56,17 @@
 
 #define ACTOR_COUNT 6
 
+// What PokeParty_LearnNextLevelMove returns while there is nothing to learn yet, and the slot that is picked when no
+// move is forgotten
+#define LEARN_MOVE_PENDING 0xfffe
+#define FORGET_SLOT_NONE 4
+
+// The events of the message that says a move was forgotten
+enum {
+    PRINT_EVENT_FORGET_SOUND = 3,
+    PRINT_EVENT_WAIT_SOUND = 5,
+};
+
 // The steps of the process
 enum {
     EVOLUTION_DEMO_WAIT,
@@ -189,10 +200,10 @@ typedef struct {
     PStatusParam *pstatusParam;
     EvolutionDemoView *view;
     EvolutionDemoEffect *effect;
-    BOOL unk10C;
-    BOOL unk110;
-    BOOL unk114;
-    BOOL unk118;
+    BOOL soundTimerOn;
+    BOOL returnedSoundPlayed;
+    BOOL reverseHandled;
+    BOOL tradeSoundPlayed;
     GameProcManager *procManager;
 } EvolutionDemoWork;
 
@@ -275,10 +286,10 @@ static BOOL EvolutionDemo_Init(GameProc *proc, u32 *state, void *param, void *wo
     GFL_FadeSet(3, 16, 16, -16);
     EvolutionDemo_InitBGM(param, wk);
     wk->vblankTask = GFL_VBlankTCBAdd(EvolutionDemo_VBlank, wk, 1);
-    wk->unk10C = FALSE;
-    wk->unk110 = FALSE;
-    wk->unk114 = FALSE;
-    wk->unk118 = FALSE;
+    wk->soundTimerOn = FALSE;
+    wk->returnedSoundPlayed = FALSE;
+    wk->reverseHandled = FALSE;
+    wk->tradeSoundPlayed = FALSE;
     wk->procManager = CreateGameProcManager(wk->heapId);
     EvolutionDemo_InitGraphics(param, wk);
     GFL_NetSetIconScreen(0, wk->heapId);
@@ -368,7 +379,7 @@ static BOOL EvolutionDemo_Main(GameProc *proc, u32 *state, void *param, void *wo
             EvolutionDemoView_Evolve(wk->view);
             EvolutionDemoEffect_Start(wk->effect);
             GFL_SndSEPlay(SEQ_SE_SHDEMO_01);
-            wk->unk10C = TRUE;
+            wk->soundTimerOn = TRUE;
             wk->wait = 0;
         }
         break;
@@ -385,15 +396,15 @@ static BOOL EvolutionDemo_Main(GameProc *proc, u32 *state, void *param, void *wo
         if (EvolutionDemoView_HavePiecesStarted(wk->view)) {
             EvolutionDemo_PlayTrade(param, wk);
         }
-        if (EvolutionDemoView_GetUnk3C(wk->view)) {
+        if (EvolutionDemoView_ShouldPushBGM(wk->view)) {
             EvolutionDemo_PushBGM(param, wk);
         }
         if (EvolutionDemoView_HavePiecesReturned(wk->view)) {
             EvolutionDemoEffect_Start3D(wk->effect);
-            if (wk->unk110 == FALSE) {
+            if (wk->returnedSoundPlayed == FALSE) {
                 GFL_SndSEPlay(SEQ_SE_SHDEMO_04);
-                wk->unk10C = FALSE;
-                wk->unk110 = TRUE;
+                wk->soundTimerOn = FALSE;
+                wk->returnedSoundPlayed = TRUE;
             }
         }
         if (EvolutionDemoEffect_Is3DHeld(wk->effect)) {
@@ -401,18 +412,18 @@ static BOOL EvolutionDemo_Main(GameProc *proc, u32 *state, void *param, void *wo
         }
         if (EvolutionDemoEffect_Is3DReversing(wk->effect)) {
             EvolutionDemoView_FadeIn(wk->view);
-            if (wk->unk114 == FALSE) {
+            if (wk->reverseHandled == FALSE) {
                 if (wk->cancelled == FALSE) {
-                    wk->unk10C = TRUE;
+                    wk->soundTimerOn = TRUE;
                 }
-                wk->unk114 = TRUE;
+                wk->reverseHandled = TRUE;
             }
         }
-        if (wk->unk10C) {
-            if (wk->unk118 == FALSE && wk->wait >= 90) {
+        if (wk->soundTimerOn) {
+            if (wk->tradeSoundPlayed == FALSE && wk->wait >= 90) {
                 if (EvolutionDemo_IsTradePlaying(param, wk)) {
                     GFL_SndSEPlay(SEQ_SE_SHDEMO_02);
-                    wk->unk118 = TRUE;
+                    wk->tradeSoundPlayed = TRUE;
                 }
             } else if (wk->wait == 530 || wk->wait == 585 || wk->wait == 640 || wk->wait == 695) {
                 GFL_SndSEPlay(SEQ_SE_SHDEMO_03);
@@ -505,7 +516,7 @@ static BOOL EvolutionDemo_Main(GameProc *proc, u32 *state, void *param, void *wo
         wk->move = PokeParty_LearnNextLevelMove(wk->pkm, &wk->learnIndex, wk->heapId);
         if (wk->move == 0) {
             wk->state = EVOLUTION_DEMO_END;
-        } else if (wk->move != 0xfffe) {
+        } else if (wk->move != LEARN_MOVE_PENDING) {
             if (wk->move & 0x8000) {
                 wk->move &= 0x7fff;
                 wk->state = EVOLUTION_DEMO_PRINT_WANTS_MOVE;
@@ -663,7 +674,7 @@ static BOOL EvolutionDemo_Main(GameProc *proc, u32 *state, void *param, void *wo
     case EVOLUTION_DEMO_OV287_END:
         if (GFL_FadeIsRunning() == FALSE) {
             wk->slot = wk->ov287Param.slot;
-            if (wk->slot == 4) {
+            if (wk->slot == FORGET_SLOT_NONE) {
                 wk->state = EVOLUTION_DEMO_GIVE_UP;
             } else {
                 wk->forgetMove = PokeParty_GetParam(wk->pkm, PKM_PARAM_MOVE1 + wk->slot, NULL);
@@ -1149,10 +1160,10 @@ static void EvolutionDemo_UpdateMsg(EvolutionDemoParam *param, EvolutionDemoWork
 // Plays the sounds of the message that the Pokémon forgot a move
 static BOOL EvolutionDemo_OnPrintEvent(u32 event) {
     switch (event) {
-    case 3:
+    case PRINT_EVENT_FORGET_SOUND:
         GFL_SndSEPlay(SEQ_SE_KON);
         break;
-    case 5:
+    case PRINT_EVENT_WAIT_SOUND:
         return GFL_SndPlayerIsActiveAny();
     }
     return FALSE;

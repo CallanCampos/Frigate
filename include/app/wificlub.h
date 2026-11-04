@@ -32,7 +32,7 @@ typedef struct {
     u8 unk46;
     // The friend's index in the friend list, plus 1
     u8 friendIndex;
-    u8 unk48;
+    u8 launcher;
     u8 unk49;
     u8 unk4A[2];
 } WifiClubData;

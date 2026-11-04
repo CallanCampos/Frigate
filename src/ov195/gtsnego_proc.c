@@ -82,6 +82,33 @@ enum {
     GTSNEGO_KEY_COUNT,
 };
 
+// What DWC_CheckProfanityProcess returns once the server has answered
+#define PROFANITY_PROCESS_DONE 2
+
+// The six arrows of the search's settings, left then right of each
+enum {
+    ARROW_LEVEL_LEFT,
+    ARROW_LEVEL_RIGHT,
+    ARROW_MY_KIND_LEFT,
+    ARROW_MY_KIND_RIGHT,
+    ARROW_WANT_KIND_LEFT,
+    ARROW_WANT_KIND_RIGHT,
+};
+
+// The touch areas of the friend list: its three rows, and the button below
+enum {
+    FRIEND_RECT_ROW_1,
+    FRIEND_RECT_ROW_2,
+    FRIEND_RECT_ROW_3,
+    FRIEND_RECT_BUTTON,
+};
+
+// The items of a yes/no menu
+enum {
+    MENU_YES,
+    MENU_NO,
+};
+
 typedef struct GtsNegoWork GtsNegoWork;
 typedef void (*GtsNegoStateFunc)(GtsNegoWork *wk);
 
@@ -104,7 +131,7 @@ typedef struct {
     const u16 *words;
     char result;
     int badCount;
-    u16 unk24;
+    u16 heapId;
 } GtsNegoNameCheck;
 
 struct GtsNegoWork {
@@ -388,32 +415,32 @@ static int GtsNego_PressArrow(int arrow, GtsNegoWork *wk) {
     int cursor = 0;
 
     switch (arrow) {
-    case 0:
+    case ARROW_LEVEL_LEFT:
         GtsNego_AddLevel(-1, wk);
         cursor = GTSNEGO_CURSOR_LEVEL;
         GtsNegoMessage_SetLevel(wk->msg, wk->level);
         break;
-    case 1:
+    case ARROW_LEVEL_RIGHT:
         GtsNego_AddLevel(1, wk);
         cursor = GTSNEGO_CURSOR_LEVEL;
         GtsNegoMessage_SetLevel(wk->msg, wk->level);
         break;
-    case 2:
+    case ARROW_MY_KIND_LEFT:
         GtsNego_AddMyKind(-1, wk);
         cursor = GTSNEGO_CURSOR_MY_KIND;
         GtsNegoMessage_SetMyKind(wk->msg, wk->myKind);
         break;
-    case 3:
+    case ARROW_MY_KIND_RIGHT:
         GtsNego_AddMyKind(1, wk);
         cursor = GTSNEGO_CURSOR_MY_KIND;
         GtsNegoMessage_SetMyKind(wk->msg, wk->myKind);
         break;
-    case 4:
+    case ARROW_WANT_KIND_LEFT:
         GtsNego_AddWantKind(-1, wk);
         cursor = GTSNEGO_CURSOR_WANT_KIND;
         GtsNegoMessage_SetWantKind(wk->msg, wk->wantKind);
         break;
-    case 5:
+    case ARROW_WANT_KIND_RIGHT:
         GtsNego_AddWantKind(1, wk);
         cursor = GTSNEGO_CURSOR_WANT_KIND;
         GtsNegoMessage_SetWantKind(wk->msg, wk->wantKind);
@@ -542,7 +569,7 @@ static void GtsNego_StateSendPerson(GtsNegoWork *wk) {
 static void GtsNego_StateWaitNameCheck(GtsNegoWork *wk) {
     PlayerInfo *partner = wk->param->playerInfo2;
     BOOL bad = FALSE;
-    BOOL done = DWC_CheckProfanityProcess() == 2;
+    BOOL done = DWC_CheckProfanityProcess() == PROFANITY_PROCESS_DONE;
     u32 id;
 
     if (done) {
@@ -561,7 +588,7 @@ static void GtsNego_StateWaitNameCheck(GtsNegoWork *wk) {
         PlayerInfo_Copy(partner, GameData_GetPlayerInfoByNetID(wk->gameData, 1 - NetSystem_GetNetId()));
         id = getIDAsUInt(partner);
         Misc_AddMetTrainer(getHollow_RivalData(wk->save), id);
-        if (PlayerInfo_GetVersion(partner) == 22 || PlayerInfo_GetVersion(partner) == 23) {
+        if (PlayerInfo_GetVersion(partner) == VERSION_WHITE2 || PlayerInfo_GetVersion(partner) == VERSION_BLACK2) {
             GtsNego_ChangeState(wk, GtsNego_StateSendPerson, 740);
         } else {
             GtsNego_ChangeState(wk, GtsNego_StateShowPartner, 745);
@@ -576,7 +603,7 @@ static void GtsNego_StateStartNameCheck(GtsNegoWork *wk) {
     u32 i = 0;
 
     MI_CpuFill8(&wk->nameCheck, 0, sizeof(GtsNegoNameCheck));
-    wk->nameCheck.unk24 = HEAPID_GTSNEGO;
+    wk->nameCheck.heapId = HEAPID_GTSNEGO;
     chars = GFL_StrBufGetStringPtr(name);
     for (; i < GFL_StrBufGetCharCount(name) + 1; i++) {
         u16 c = chars[i];
@@ -1024,7 +1051,7 @@ static void GtsNego_StateWaitFriendConfirm(GtsNegoWork *wk) {
         wk->menu = NULL;
         TouchBar_SetIconVisible(GtsNegoDisp_GetTouchBar(wk->disp), TOUCHBAR_ICON_RETURN, TRUE);
         switch (pos) {
-        case 0:
+        case MENU_YES:
             GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_SearchingRightPersonTrade);
             GtsNegoDisp_ShowSearching(wk->disp);
             GtsNegoMessage_PrintTitle(wk->msg, GtsnegoProc_Text_TradeSearch);
@@ -1034,7 +1061,7 @@ static void GtsNego_StateWaitFriendConfirm(GtsNegoWork *wk) {
             wk->param->result = GTSNEGO_RESULT_RENDEZVOUS;
             GtsNego_ChangeState(wk, GtsNego_StateStartSearch, 1666);
             break;
-        case 1:
+        case MENU_NO:
             GtsNegoDisp_SetDim(wk->disp, FALSE, GTSNEGO_DIM_ALL);
             GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_PleaseSelectWhoWish);
             if (!GCTX_HIDIsUsingTouch()) {
@@ -1052,7 +1079,7 @@ static void GtsNego_StateWaitFriendConfirm(GtsNegoWork *wk) {
 static void GtsNego_StateOpenFriendConfirm(GtsNegoWork *wk) {
     if (GtsNegoMessage_IsDone(wk->msg)) {
         TouchBar_SetIconVisible(GtsNegoDisp_GetTouchBar(wk->disp), TOUCHBAR_ICON_RETURN, FALSE);
-        wk->menu = GtsNegoMessage_CreateConfirm(wk->msg, 1);
+        wk->menu = GtsNegoMessage_CreateConfirm(wk->msg, GTSNEGO_MENU_LOW);
         GtsNegoDisp_SetDim(wk->disp, TRUE, GTSNEGO_DIM_LIST_MENU);
         GtsNegoDisp_SetKnobAnimating(wk->disp, FALSE);
         GtsNego_ChangeState(wk, GtsNego_StateWaitFriendConfirm, 1698);
@@ -1242,22 +1269,22 @@ static void GtsNego_StateFriendList(GtsNegoWork *wk) {
         }
         touched = GFL_HIDGetTouchPressedRect(sGtsNegoFriendRects);
         switch (touched) {
-        case 3:
+        case FRIEND_RECT_BUTTON:
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             AppTaskMenuWin_SetFlashing(wk->button, TRUE);
             GtsNego_ChangeState(wk, GtsNego_StateWaitAnyFriendPressed, 2014);
             return;
-        case 2:
+        case FRIEND_RECT_ROW_3:
             if (wk->scroll.count < 3) {
                 break;
             }
             // fallthrough
-        case 1:
+        case FRIEND_RECT_ROW_2:
             if (wk->scroll.count < 2) {
                 break;
             }
             // fallthrough
-        case 0:
+        case FRIEND_RECT_ROW_1:
             GCTX_HIDSetUsingTouch(TRUE);
             wk->friendCursor = touched + GTSNEGO_CURSOR_FRIEND_1;
             GtsNegoDisp_SetCursor(wk->disp, NULL, wk->friendCursor);
@@ -1415,12 +1442,12 @@ static void GtsNego_StateWaitExitConfirm(GtsNegoWork *wk) {
         GtsNegoMessage_FreeMenu(wk->menu);
         wk->menu = NULL;
         switch (pos) {
-        case 0:
+        case MENU_YES:
             wk->param->result = GTSNEGO_RESULT_EXIT;
             wk->timer = 0;
             GtsNego_ChangeState(wk, GtsNego_StateWaitThenFadeOut, 2339);
             break;
-        case 1:
+        case MENU_NO:
             if (!wk->notEnoughPokemon) {
                 GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_PleaseSelectHowTrade);
             } else {
@@ -1440,7 +1467,7 @@ static void GtsNego_StateWaitExitConfirm(GtsNegoWork *wk) {
 static void GtsNego_StateOpenExitConfirm(GtsNegoWork *wk) {
     if (GtsNegoMessage_IsDone(wk->msg)) {
         TouchBar_SetIconVisible(GtsNegoDisp_GetTouchBar(wk->disp), TOUCHBAR_ICON_RETURN, FALSE);
-        wk->menu = GtsNegoMessage_CreateYesNo(wk->msg, 1);
+        wk->menu = GtsNegoMessage_CreateYesNo(wk->msg, GTSNEGO_MENU_LOW);
         GtsNegoDisp_SetDim(wk->disp, TRUE, GTSNEGO_DIM_MAIN_MENU);
         GtsNegoDisp_SetCursor(wk->disp, NULL, GTSNEGO_CURSOR_NONE);
         GtsNego_ChangeState(wk, GtsNego_StateWaitExitConfirm, 2370);

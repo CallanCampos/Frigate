@@ -15,7 +15,7 @@
 typedef struct {
     u8 type;
     u8 gender;
-    u16 unk2;
+    u16 objCode;
     u8 trainerClass;
     // Whether the Trainer takes part in tournaments 11, 4, 10, 12, 14, 13 and 15, from bit 0
     u8 inTournament11 : 1;
@@ -30,7 +30,7 @@ typedef struct {
     u8 tournament;
     // The type the Type Expert Tournament picks the Trainer for, where TYPE_NULL is any
     u8 expertType;
-    u8 unk8_0 : 3;
+    u8 rank : 3;
     u8 unk8_3 : 5;
     u8 unk9;
     // The music of the battle against the Trainer and of winning it
@@ -46,20 +46,28 @@ typedef struct {
 
 // One of the eight Trainers of a tournament
 typedef struct {
-    u8 unk0_0 : 3; // 3 for the player
-    u8 unk0_3 : 1;
-    u8 unk0_4 : 3; // The Trainer's rank, which decides a match between ranks that differ
-    u8 unk0_7 : 1;
+    u8 kind : 3;
+    u8 gender : 1;
+    u8 rank : 3; // The Trainer's rank, which decides a match between ranks that differ
+    u8 hasSpecialPokemon : 1;
     u8 type;
-    u8 unk2;
-    u8 unk3_0 : 6;
-    u8 unk3_6 : 2;
+    u8 trainerId;
+    u8 iv : 6;
+    u8 downloadedRound : 2;
     u16 objCode;
-    u16 unk6_0 : 12;
+    u16 trainerClass : 12;
     u16 unk6_12 : 4;
     StrBuf *name;
-    StrBuf *unkC;
+    StrBuf *className;
 } WbtEntrant;
+
+// WbtEntrant's kind
+enum {
+    WBT_ENTRANT_KIND_TABLE,
+    WBT_ENTRANT_KIND_DOWNLOADED,
+    WBT_ENTRANT_KIND_DOWNLOADED_TABLE,
+    WBT_ENTRANT_KIND_PLAYER,
+};
 
 // The result of a match of the bracket: whether the first Trainer won, and how
 typedef struct {
@@ -69,8 +77,8 @@ typedef struct {
 
 typedef struct {
     u8 type;
-    u8 unk1;
-    u16 unk2;
+    u8 rank;
+    u16 index;
 } WbtUnk18A;
 
 // A tournament downloaded to the save
@@ -85,7 +93,7 @@ typedef struct {
     u8 unk8[0x52];
     u8 unk5A[0x4c];
     u8 unkA6;
-    u8 unkA7;
+    u8 battleType;
     u8 unkA8;
     u8 unkA9;
     u16 unkAA;
@@ -128,7 +136,7 @@ typedef struct {
     u16 name[16];
     u16 className[0x16];
     u16 lines[4][0x4a];
-    u8 unk3D4;
+    u8 classIndex;
     u8 messageSets[6];
     u8 unk3DB;
     u16 unk3DC;
@@ -156,7 +164,7 @@ struct WbtSystem {
     u32 round;
     // The Type Expert Tournament's type
     u8 type;
-    u8 unk1D;
+    u8 downloadSlot;
     // The map's season, rolled when the tournament starts
     u8 season;
     u8 unk1F;
@@ -167,16 +175,16 @@ struct WbtSystem {
     Regulation regulation;
     WbtUnk18A unk18A;
     u8 unk18E[2];
-    // Whether the downloaded tournament of the slot unk1D is in the save and its checksum holds
+    // Whether the downloaded tournament of the slot downloadSlot is in the save and its checksum holds
     BOOL downloadValid;
     WbtDownload download;
     // The kind and rank of the seven Trainers a downloaded tournament picks, from the second
     WbtUnk18A downloadSlots[7];
     u8 unk13A4[4];
-    u8 unk13A8;
+    u8 useBattleBox;
     u8 unk13A9[3];
     // The Battle Box's party
-    PokeParty *unk13AC;
+    PokeParty *battleBoxParty;
     u8 castSlots[6];
     // The Pokémon the party screen showed the summary of, and how it ended
     u16 listIndex;
@@ -192,10 +200,10 @@ struct WbtSystem {
     StrBuf *unk13D4;
     StrBuf *unk13D8;
     // One for each round. Tournaments 1 and 10 award their total as Battle Points
-    u8 unk13DC[3];
+    u8 roundRemaining[3];
     u8 unk13DF;
     // The script variable that plugin 6 passes with EventWbtPokeSelect_Create's event
-    u16 *unk13E0;
+    u16 *resultVar;
     u32 unk13E4;
 };
 
@@ -221,9 +229,9 @@ void LoadPWTTournamentTypeText(HeapID heapId, u32 tournament, StrBuf *strbuf);
 // The overworld setup of the tournament's Trainers, which overlay 22 shows
 typedef struct {
     StrBuf *name;
-    s16 unk4;
-    u8 unk6;
-    u8 unk7;
+    s16 resIndex;
+    u8 face;
+    u8 gender;
     u8 rank;
     u8 type;
     u8 isPlayer;
@@ -231,19 +239,19 @@ typedef struct {
 } WbtSetupEntrant;
 
 typedef struct {
-    u32 unk0;
-    u8 unk4;
+    u32 firstWon;
+    u8 message;
     u8 pad5[3];
 } WbtSetupMatch;
 
 typedef struct {
     GameSystem *gsys;
-    u32 unk4;
+    u32 mode;
     WbtSetupEntrant entrants[8];
     WbtSetupMatch firstRound[4];
     WbtSetupMatch secondRound[2];
     StrBuf *tournamentName;
-    StrBuf *unk9C;
+    StrBuf *styleName;
     // Whether the list screen runs through EventFieldSubprocessTransition_Create
     u32 useTransition;
 } WbtSetup;

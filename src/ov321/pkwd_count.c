@@ -40,6 +40,9 @@
 #define TIMER_COUNT 4
 #define LOAD_COUNT_MAX 8
 
+// What ends the lists of loads, actors and windows, in the field that tells
+#define TABLE_END 0xff
+
 // The flags of the work
 #define FLAG_WIPE_IN_DONE 0x1
 #define FLAG_LEADER_DONE 0x2
@@ -59,6 +62,13 @@ enum {
     STEP_WAIT_TITLE = 310,
     STEP_WAIT_TITLE_FADE_OUT = 320,
     STEP_END = 10000,
+};
+
+enum {
+    MAIN_WAIT_WIPE_IN,
+    MAIN_RUN,
+    MAIN_WIPE_OUT,
+    MAIN_WAIT_WIPE_OUT,
 };
 
 // How the scenes of the leader arrange the BG
@@ -347,22 +357,22 @@ static BOOL PkwdCount_Main(GameProc *proc, u32 *state, void *param, void *work) 
     PkwdCountWork *wk = work;
 
     switch (*state) {
-    case 0:
+    case MAIN_WAIT_WIPE_IN:
         if (GFL_WipeIsFinished()) {
             (*state)++;
             wk->flags |= FLAG_WIPE_IN_DONE;
         }
         break;
-    case 1:
+    case MAIN_RUN:
         if (wk->step == STEP_END) {
             (*state)++;
         }
         break;
-    case 2:
+    case MAIN_WIPE_OUT:
         GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 6, 1, wk->heapId);
         (*state)++;
         break;
-    case 3:
+    case MAIN_WAIT_WIPE_OUT:
         if (GFL_WipeIsFinished()) {
             return TRUE;
         }
@@ -535,20 +545,20 @@ static void PkwdCount_LoadGraphics(PkwdCountWork *wk) {
     int i;
 
     for (i = 0; i < LOAD_COUNT_MAX; i++, palette++) {
-        if (palette->target == 0xff) {
+        if (palette->target == TABLE_END) {
             break;
         }
         GFL_G2DIOLoadArcNCLRDefault(arc, palette->fileId, palette->target, palette->offset << 5, palette->extra << 5,
                                     wk->heapId);
     }
     for (i = 0; i < LOAD_COUNT_MAX; i++, chars++) {
-        if (chars->target == 0xff) {
+        if (chars->target == TABLE_END) {
             break;
         }
         GFL_BGSysLoadArcNCGRStatic(arc, chars->fileId, chars->target, chars->offset, 0, FALSE, wk->heapId);
     }
     for (i = 0; i < LOAD_COUNT_MAX; i++, screen++) {
-        if (screen->target == 0xff) {
+        if (screen->target == TABLE_END) {
             break;
         }
         loadBGScrToVramByFileNoReserveNegAlign(arc, screen->fileId, screen->target, screen->offset, 0, FALSE,
@@ -633,7 +643,7 @@ static void PkwdCount_CreateActors(PkwdCountWork *wk, u32 surface, const PkwdCou
         BOOL visible;
         BOOL animated;
 
-        if (entries->sequence == 0xff) {
+        if (entries->sequence == TABLE_END) {
             break;
         }
         positionIdx = entries->positionIdx * 2;
@@ -857,7 +867,7 @@ static void PkwdCount_InitWindows(PkwdCountWork *wk) {
     ArcTool *arc;
 
     for (i = 0; i < WINDOW_COUNT; i++, setup++) {
-        if (setup->bg == 0xff) {
+        if (setup->bg == TABLE_END) {
             break;
         }
         wk->windows[i].window =

@@ -46,6 +46,21 @@
 // No ball is picked
 #define PSEL_CHOICE_NONE 4
 
+// The three balls, in the order of sPselSpecies
+enum {
+    PSEL_CHOICE_SNIVY,
+    PSEL_CHOICE_TEPIG,
+    PSEL_CHOICE_OSHAWOTT,
+};
+
+// The fade-in of the Pokemon
+enum {
+    PSEL_POKE_FADE_NONE,
+    PSEL_POKE_FADE_SHOW,
+    PSEL_POKE_FADE_ALPHA,
+    PSEL_POKE_FADE_FINISH,
+};
+
 // The members of the archive (ARCID_PSEL) that the code names
 enum {
     PSEL_ARC_SUB_BG_NCLR = 7,
@@ -393,6 +408,7 @@ static const G3DSceneSetup sPselScene = {
 };
 
 // The three balls, and the button that confirms the choice
+#define PSEL_TOUCH_BUTTON 3
 // clang-format off
 static const TouchRect sPselTouchRects[] = {
     { TOUCH_RECT_CIRCLE, 60, 90, 27 },
@@ -486,13 +502,13 @@ static BOOL PselProc_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     GCTX_HIDSetUsingTouch(wk->touchMode);
     GFL_FadeSetUpdateFreq(wk->fadeFreq);
     switch (wk->choice) {
-    case 0:
+    case PSEL_CHOICE_SNIVY:
         *wk->param->result = 0;
         break;
-    case 1:
+    case PSEL_CHOICE_TEPIG:
         *wk->param->result = 1;
         break;
-    case 2:
+    case PSEL_CHOICE_OSHAWOTT:
         *wk->param->result = 2;
         break;
     default:
@@ -815,7 +831,7 @@ static void PselPoke_Load(PselWork *wk) {
         wk->poke[i].unmoved = FALSE;
     }
     wk->fadeCount = 0;
-    wk->fadeState = 0;
+    wk->fadeState = PSEL_POKE_FADE_NONE;
 }
 
 static void PselPoke_Unload(PselWork *wk) {
@@ -1081,12 +1097,12 @@ static void PselPoke_StartFadeIn(PselWork *wk) {
         ClActor_SetObjMode(wk->poke[i].clact[0], GX_OAM_MODE_XLU);
     }
     wk->fadeCount = 0;
-    wk->fadeState = 1;
+    wk->fadeState = PSEL_POKE_FADE_SHOW;
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0, 0x3f, wk->fadeCount, 16 - wk->fadeCount);
 }
 
 static BOOL PselPoke_IsFadeInDone(PselWork *wk) {
-    if (wk->fadeState == 0) {
+    if (wk->fadeState == PSEL_POKE_FADE_NONE) {
         return TRUE;
     }
     return FALSE;
@@ -1096,29 +1112,29 @@ static void PselPoke_UpdateFadeIn(PselWork *wk) {
     u8 i;
 
     switch (wk->fadeState) {
-    case 1:
+    case PSEL_POKE_FADE_SHOW:
         for (i = 0; i < PSEL_POKE_COUNT; i++) {
             ClActor_SetVisible(wk->poke[i].clact[0], TRUE);
         }
-        wk->fadeState = 2;
+        wk->fadeState = PSEL_POKE_FADE_ALPHA;
         break;
-    case 2:
+    case PSEL_POKE_FADE_ALPHA:
         if (wk->fadeCount < 16) {
             wk->fadeCount++;
             if (wk->fadeCount == 16) {
                 for (i = 0; i < PSEL_POKE_COUNT; i++) {
                     ClActor_SetObjMode(wk->poke[i].clact[0], GX_OAM_MODE_NORMAL);
                 }
-                wk->fadeState = 3;
+                wk->fadeState = PSEL_POKE_FADE_FINISH;
             }
             G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0, 0x3f, wk->fadeCount, 16 - wk->fadeCount);
         } else {
-            wk->fadeState = 3;
+            wk->fadeState = PSEL_POKE_FADE_FINISH;
         }
         break;
-    case 3:
+    case PSEL_POKE_FADE_FINISH:
         G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, 0x3f, 8, 8);
-        wk->fadeState = 0;
+        wk->fadeState = PSEL_POKE_FADE_NONE;
         break;
     }
 }
@@ -1351,7 +1367,7 @@ static BOOL PselText_UpdateStream(PselWork *wk) {
     BOOL done = FALSE;
 
     switch (PrintStream_GetState(wk->stream)) {
-    case 0:
+    case PRINT_STREAM_RUNNING:
         if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchHeld()) {
             PrintStream_SkipWait(wk->stream, 0);
             if (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
@@ -1361,7 +1377,7 @@ static BOOL PselText_UpdateStream(PselWork *wk) {
             }
         }
         break;
-    case 1:
+    case PRINT_STREAM_PAUSED:
         if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
             PrintStream_Continue(wk->stream);
             if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
@@ -1371,7 +1387,7 @@ static BOOL PselText_UpdateStream(PselWork *wk) {
             }
         }
         break;
-    case 2:
+    case PRINT_STREAM_DONE:
         done = TRUE;
         break;
     }
@@ -1743,6 +1759,11 @@ static s32 PselSeq_Load(PselWork *wk, s32 *step) {
     return PSEL_SEQ_FADE_IN;
 }
 
+enum {
+    PSEL_FADE_IN_STEP_START,
+    PSEL_FADE_IN_STEP_WAIT,
+};
+
 static s32 PselSeq_FadeIn(PselWork *wk, s32 *step) {
     if (wk->frame >= 16) {
         Psel3D_UpdateIntro(wk);
@@ -1751,11 +1772,11 @@ static s32 PselSeq_FadeIn(PselWork *wk, s32 *step) {
     PselPoke_Update(wk);
     PselPal_Update(wk);
     switch (*step) {
-    case 0:
+    case PSEL_FADE_IN_STEP_START:
         GFL_FadeSet(FADE_ENGINE_A_WHITE, 16, 0, 2);
         (*step)++;
         break;
-    case 1:
+    case PSEL_FADE_IN_STEP_WAIT:
         if (!GFL_FadeIsRunning()) {
             wk->frame = 0;
             return PSEL_SEQ_MAIN;
@@ -1766,6 +1787,26 @@ static s32 PselSeq_FadeIn(PselWork *wk, s32 *step) {
     return PSEL_SEQ_FADE_IN;
 }
 
+enum {
+    PSEL_MAIN_STEP_INTRO,
+    PSEL_MAIN_STEP_INTRO_FADE,
+    PSEL_MAIN_STEP_WAIT_TEXT,
+    PSEL_MAIN_STEP_START_CHOICE,
+    PSEL_MAIN_STEP_CHOOSE,
+    PSEL_MAIN_STEP_SHOW_BUTTON,
+    PSEL_MAIN_STEP_CHOOSE_BUTTON,
+    PSEL_MAIN_STEP_BUTTON_FLASH,
+    PSEL_MAIN_STEP_ASK,
+    PSEL_MAIN_STEP_ASK_ZOOM,
+    PSEL_MAIN_STEP_OPEN_YES_NO,
+    PSEL_MAIN_STEP_YES_NO,
+    PSEL_MAIN_STEP_ZOOM_OUT,
+    PSEL_MAIN_STEP_ZOOM_OUT_WAIT,
+    PSEL_MAIN_STEP_DECIDE,
+    PSEL_MAIN_STEP_DECIDE_WAIT,
+    PSEL_MAIN_STEP_END,
+};
+
 static s32 PselSeq_Main(PselWork *wk, s32 *step) {
     // Set when the Pokémon at the front changes, to clear its name
     BOOL changed = FALSE;
@@ -1775,7 +1816,7 @@ static s32 PselSeq_Main(PselWork *wk, s32 *step) {
     PselPoke_UpdateFadeIn(wk);
     PselPal_Update(wk);
     switch (*step) {
-    case 0:
+    case PSEL_MAIN_STEP_INTRO:
         Psel3D_UpdateIntro(wk);
         if (wk->introFrame == PSEL_INTRO_FLASH_FRAME) {
             GFL_SndSEPlay(SEQ_SE_SW_BELLBOX_01);
@@ -1791,25 +1832,25 @@ static s32 PselSeq_Main(PselWork *wk, s32 *step) {
                 wk->objs[i].draw = TRUE;
             }
         } else if (wk->introFrame == PSEL_INTRO_FRAMES) {
-            *step = 1;
+            *step = PSEL_MAIN_STEP_INTRO_FADE;
         }
         break;
-    case 1:
+    case PSEL_MAIN_STEP_INTRO_FADE:
         if (GFL_FadeIsRunning() == TRUE) {
             return PSEL_SEQ_MAIN;
         }
         wk->bgRequest |= PSEL_BG_REQ_MAIN_ON;
         PselText_StartStream(wk, AspertiaCity_Text_ChoosePokemon);
-        *step = 2;
+        *step = PSEL_MAIN_STEP_WAIT_TEXT;
         PselPoke_StartFadeIn(wk);
         break;
-    case 2:
+    case PSEL_MAIN_STEP_WAIT_TEXT:
         if (PselText_UpdateStream(wk) && PselPoke_IsFadeInDone(wk)) {
-            *step = 3;
+            *step = PSEL_MAIN_STEP_START_CHOICE;
             wk->touchMode = TRUE;
         }
         break;
-    case 3:
+    case PSEL_MAIN_STEP_START_CHOICE:
         if (!wk->touchMode) {
             if (wk->choice == PSEL_CHOICE_NONE) {
                 changed = TRUE;
@@ -1828,9 +1869,9 @@ static s32 PselSeq_Main(PselWork *wk, s32 *step) {
             PselBGPal_SetTarget(wk, 3);
             changed = TRUE;
         }
-        *step = 4;
+        *step = PSEL_MAIN_STEP_CHOOSE;
         break;
-    case 4:
+    case PSEL_MAIN_STEP_CHOOSE:
         if (!wk->touchMode) {
             if (GCTX_HIDGetPressedKeys()) {
                 BOOL moved = FALSE;
@@ -1838,7 +1879,7 @@ static s32 PselSeq_Main(PselWork *wk, s32 *step) {
                 if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
                     GFL_SndSEPlay(SEQ_SE_DECIDE1);
                     PselCursor_Show(wk, FALSE);
-                    *step = 8;
+                    *step = PSEL_MAIN_STEP_ASK;
                 } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_LEFT) {
                     if (wk->choice > 0) {
                         wk->choice--;
@@ -1872,13 +1913,13 @@ static s32 PselSeq_Main(PselWork *wk, s32 *step) {
                     PselPoke_Select(wk, wk->choice);
                     PselBGPal_SetTarget(wk, PSEL_BG_PAL_OF(wk->choice));
                     wk->touchMode = TRUE;
-                    *step = 5;
+                    *step = PSEL_MAIN_STEP_SHOW_BUTTON;
                 }
             }
         } else {
             if (GCTX_HIDGetPressedKeys()) {
                 wk->touchMode = FALSE;
-                *step = 3;
+                *step = PSEL_MAIN_STEP_START_CHOICE;
             } else if (GFL_HIDIsTouchPressed()) {
                 s32 hit = GFL_HIDGetTouchPressedRect(sPselTouchRects);
 
@@ -1889,35 +1930,35 @@ static s32 PselSeq_Main(PselWork *wk, s32 *step) {
                     PselPoke_Select(wk, wk->choice);
                     PselBGPal_SetTarget(wk, PSEL_BG_PAL_OF(wk->choice));
                     changed = TRUE;
-                    *step = 5;
+                    *step = PSEL_MAIN_STEP_SHOW_BUTTON;
                 }
             }
         }
         break;
-    case 5:
+    case PSEL_MAIN_STEP_SHOW_BUTTON:
         PselButton_Create(wk);
-        *step = 6;
+        *step = PSEL_MAIN_STEP_CHOOSE_BUTTON;
         break;
-    case 6:
+    case PSEL_MAIN_STEP_CHOOSE_BUTTON:
         PselButton_Update(wk);
         if (GCTX_HIDGetPressedKeys()) {
             wk->touchMode = FALSE;
             if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
                 PselButton_Decide(wk);
-                *step = 7;
+                *step = PSEL_MAIN_STEP_BUTTON_FLASH;
             } else {
                 PselButton_Free(wk);
                 GFL_BGSysQueueScrLoad(2);
-                *step = 3;
+                *step = PSEL_MAIN_STEP_START_CHOICE;
             }
         } else if (GFL_HIDIsTouchPressed()) {
             s32 hit = GFL_HIDGetTouchPressedRect(sPselTouchRects);
 
-            if (hit == 3) {
+            if (hit == PSEL_TOUCH_BUTTON) {
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
                 PselButton_Decide(wk);
-                *step = 7;
+                *step = PSEL_MAIN_STEP_BUTTON_FLASH;
             } else if (hit >= 0 && hit <= 2) {
                 if (wk->choice != hit) {
                     GFL_SndSEPlay(SEQ_SE_SELECT1);
@@ -1930,31 +1971,31 @@ static s32 PselSeq_Main(PselWork *wk, s32 *step) {
             }
         }
         break;
-    case 7:
+    case PSEL_MAIN_STEP_BUTTON_FLASH:
         PselButton_Update(wk);
         if (PselButton_IsFlashFinished(wk)) {
             PselButton_Free(wk);
             GFL_BGSysQueueScrLoad(2);
-            *step = 8;
+            *step = PSEL_MAIN_STEP_ASK;
         }
         break;
-    case 8:
+    case PSEL_MAIN_STEP_ASK:
         PselText_StartStream(wk, AspertiaCity_Text_PokemonWant);
         PselCamera_StartZoom(wk, wk->choice, FALSE);
-        *step = 9;
+        *step = PSEL_MAIN_STEP_ASK_ZOOM;
         break;
-    case 9:
+    case PSEL_MAIN_STEP_ASK_ZOOM:
         PselCamera_UpdateZoom(wk);
         if (PselText_UpdateStream(wk) && PselCamera_IsZoomDone(wk)) {
-            *step = 10;
+            *step = PSEL_MAIN_STEP_OPEN_YES_NO;
         }
         break;
-    case 10:
+    case PSEL_MAIN_STEP_OPEN_YES_NO:
         GCTX_HIDSetUsingTouch(wk->touchMode);
         PselYesNo_Create(wk);
-        *step = 11;
+        *step = PSEL_MAIN_STEP_YES_NO;
         break;
-    case 11:
+    case PSEL_MAIN_STEP_YES_NO:
         PselYesNo_Update(wk);
         if (PselYesNo_IsFlashFinished(wk)) {
             BOOL yes = PselYesNo_IsYes(wk);
@@ -1964,35 +2005,35 @@ static s32 PselSeq_Main(PselWork *wk, s32 *step) {
             if (yes) {
                 wk->bgRequest |= PSEL_BG_REQ_MAIN_OFF;
                 PselText_ClearStream(wk);
-                *step = 14;
+                *step = PSEL_MAIN_STEP_DECIDE;
             } else {
                 PselText_StartStream(wk, AspertiaCity_Text_ChoosePokemon);
-                *step = 12;
+                *step = PSEL_MAIN_STEP_ZOOM_OUT;
             }
         }
         break;
-    case 12:
+    case PSEL_MAIN_STEP_ZOOM_OUT:
         PselCamera_StartZoom(wk, wk->choice, TRUE);
-        *step = 13;
+        *step = PSEL_MAIN_STEP_ZOOM_OUT_WAIT;
         break;
-    case 13:
+    case PSEL_MAIN_STEP_ZOOM_OUT_WAIT:
         PselCamera_UpdateZoom(wk);
         if (PselCamera_IsZoomDone(wk)) {
-            *step = 3;
+            *step = PSEL_MAIN_STEP_START_CHOICE;
         }
         break;
-    case 14:
+    case PSEL_MAIN_STEP_DECIDE:
         PselCamera_StartDecide(wk, wk->choice);
         GFL_SndSEPlay(SEQ_SE_SDEMO_03);
-        *step = 15;
+        *step = PSEL_MAIN_STEP_DECIDE_WAIT;
         break;
-    case 15:
+    case PSEL_MAIN_STEP_DECIDE_WAIT:
         PselCamera_UpdateDecide(wk);
         if (wk->cameraFrame == sPselCameraFrames[wk->cameraBall].fadeOut - 2) {
-            *step = 16;
+            *step = PSEL_MAIN_STEP_END;
         }
         break;
-    case 16:
+    case PSEL_MAIN_STEP_END:
         PselCamera_UpdateDecide(wk);
         wk->frame = 0;
         return PSEL_SEQ_FADE_OUT;
@@ -2011,17 +2052,22 @@ static s32 PselSeq_Main(PselWork *wk, s32 *step) {
     return PSEL_SEQ_MAIN;
 }
 
+enum {
+    PSEL_FADE_OUT_STEP_START,
+    PSEL_FADE_OUT_STEP_WAIT,
+};
+
 static s32 PselSeq_FadeOut(PselWork *wk, s32 *step) {
     PselCamera_UpdateDecide(wk);
     PselBall_Update(wk);
     PselPoke_Update(wk);
     PselPal_Update(wk);
     switch (*step) {
-    case 0:
+    case PSEL_FADE_OUT_STEP_START:
         GFL_FadeSet(FADE_ENGINE_A_WHITE | FADE_ENGINE_B_WHITE, 0, 16, 2);
         (*step)++;
         break;
-    case 1:
+    case PSEL_FADE_OUT_STEP_WAIT:
         if (!GFL_FadeIsRunning()) {
             wk->frame = 0;
             return PSEL_SEQ_UNLOAD;

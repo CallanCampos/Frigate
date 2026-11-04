@@ -40,6 +40,9 @@
 
 #define DIGIT_COUNT 4
 
+// What ends a table of setups
+#define TABLE_END 0xff
+
 // A palette or characters of the screen's archive, and where they go
 typedef struct {
     u8 target;
@@ -114,23 +117,23 @@ static const FMissionAppDrawActorGroup sFMissionAppDrawReturnActorGroup = { 3, 4
 static const FMissionAppDrawBGFile sFMissionAppDrawMissionPalettes[] = {
     { PALTYPE_SUB_BG, 4, 0, 2 },
     { PALTYPE_MAIN_BG, 6, 0, 2 },
-    { 0xff },
+    { TABLE_END },
 };
 
 static const FMissionAppDrawBGFile sFMissionAppDrawResultPalettes[] = {
     { PALTYPE_SUB_BG, 4, 2, 2 },
     { PALTYPE_MAIN_BG, 6, 2, 2 },
-    { 0xff },
+    { TABLE_END },
 };
 
 static const FMissionAppDrawActorSetup sFMissionAppDrawRecordActorSetups[] = {
     { 8, 64, 1, FALSE, 0, ACTOR_AUTO_ANIM, 12 },
-    { 0xff },
+    { TABLE_END },
 };
 
 static const FMissionAppDrawActorSetup sFMissionAppDrawReturnActorSetups[] = {
     { 1, 48, 1, TRUE, 0, ACTOR_AUTO_ANIM, 11 },
-    { 0xff },
+    { TABLE_END },
 };
 
 // The result's messages
@@ -147,7 +150,7 @@ static const s16 sFMissionAppDrawMessages[] = {
 };
 
 static const FMissionAppDrawBGFile sFMissionAppDrawChars[] = {
-    { 7, 5 }, { 6, 5 }, { 3, 7 }, { 2, 7 }, { 0xff },
+    { 7, 5 }, { 6, 5 }, { 3, 7 }, { 2, 7 }, { TABLE_END },
 };
 
 static const FMissionAppDrawObjFile sFMissionAppDrawObjFiles[] = {
@@ -170,7 +173,7 @@ static const FMissionAppDrawScreenFile sFMissionAppDrawScreens[] = {
     { 3, 13, 0, FMISSION_APP_MODE_MISSION }, { 2, 11, 0, FMISSION_APP_MODE_MISSION },
     { 7, 10, 0, FMISSION_APP_MODE_RESULT },  { 6, 9, 0, FMISSION_APP_MODE_RESULT },
     { 3, 13, 0, FMISSION_APP_MODE_RESULT },  { 2, 12, 0, FMISSION_APP_MODE_RESULT },
-    { 0xff },
+    { TABLE_END },
 };
 
 // clang-format on
@@ -183,7 +186,7 @@ static const FMissionAppDrawActorSetup sFMissionAppDrawMissionActorSetups[] = {
     { 0, 64, 1, TRUE, 0, 0, 3 },                { 0, 64, 1, TRUE, 0, 0, 3 },
     { 0, 64, 1, TRUE, 0, 0, 4 },                { 0, 64, 1, TRUE, 0, 0, 4 },
     { 0, 64, 1, TRUE, 0, 0, 4 },                { 0, 64, 1, TRUE, 0, 0, 4 },
-    { 0xff },
+    { TABLE_END },
 };
 
 // clang-format on
@@ -196,7 +199,7 @@ static const FMissionAppDrawActorSetup sFMissionAppDrawResultActorSetups[] = {
     { 0, 64, 1, FALSE, 0, 0, 8 },               { 0, 64, 1, FALSE, 0, 0, 7 },
     { 0, 64, 1, FALSE, 0, 0, 7 },               { 0, 64, 1, FALSE, 0, 0, 7 },
     { 0, 64, 1, FALSE, 0, 0, 7 },               { 8, 64, 1, FALSE, 0, ACTOR_AUTO_ANIM, 9 },
-    { 8, 64, 1, FALSE, 0, ACTOR_AUTO_ANIM, 10 }, { 0xff },
+    { 8, 64, 1, FALSE, 0, ACTOR_AUTO_ANIM, 10 }, { TABLE_END },
 };
 
 // clang-format on
@@ -207,7 +210,7 @@ static const FMissionAppDrawWindowSetup sFMissionAppDrawMissionWindows[] = {
     { 4, 3, 16, 12, 2, 8 }, { 4, 23, 10, 6, 2, 8 }, { 4, 23, 13, 6, 2, 8 }, { 4, 23, 16, 6, 2, 8 },
     { 0, 3, 1, 8, 2, 8 },   { 0, 3, 4, 7, 2, 8 },   { 0, 3, 7, 10, 2, 8 },  { 0, 13, 7, 8, 2, 8 },
     { 0, 3, 13, 28, 8, 8 }, { 0, 21, 1, 8, 2, 8 },  { 0, 10, 4, 19, 2, 8 }, { 0, 21, 7, 8, 2, 8 },
-    { 5, 2, 21, 28, 2, 8 }, { 5, 34, 21, 28, 2, 8 }, { 0xff },
+    { 5, 2, 21, 28, 2, 8 }, { 5, 34, 21, 28, 2, 8 }, { TABLE_END },
 };
 
 // clang-format on
@@ -219,7 +222,7 @@ static const FMissionAppDrawWindowSetup sFMissionAppDrawResultWindows[] = {
     { 0, 3, 1, 8, 2, 8 },   { 0, 3, 4, 7, 2, 8 },   { 0, 3, 7, 10, 2, 8 },   { 0, 13, 7, 8, 2, 8 },
     { 0, 3, 12, 8, 2, 8 },  { 0, 3, 15, 12, 2, 8 }, { 0, 3, 18, 10, 2, 8 },  { 0, 21, 1, 8, 2, 8 },
     { 0, 10, 4, 19, 2, 8 }, { 0, 21, 7, 8, 2, 8 },  { 0, 13, 12, 16, 2, 8 }, { 0, 23, 15, 6, 2, 8 },
-    { 0, 13, 18, 16, 2, 8 }, { 5, 1, 19, 30, 4, 8 }, { 0xff },
+    { 0, 13, 18, 16, 2, 8 }, { 5, 1, 19, 30, 4, 8 }, { TABLE_END },
 };
 
 // clang-format on
@@ -275,7 +278,7 @@ static void FMissionAppDraw_LoadBG(FMissionApp *work, u32 mode) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_FMISSION_APP, work->heapId);
 
     for (i = 0; i < 8; i++) {
-        if (palette->target == 0xff) {
+        if (palette->target == TABLE_END) {
             break;
         }
         GFL_G2DIOLoadArcNCLR(arc, palette->file, palette->target, palette->offset * 32, 0, palette->count * 32,
@@ -283,14 +286,14 @@ static void FMissionAppDraw_LoadBG(FMissionApp *work, u32 mode) {
         palette++;
     }
     for (i = 0; i < 8; i++) {
-        if (chars->target == 0xff) {
+        if (chars->target == TABLE_END) {
             break;
         }
         GFL_BGSysLoadArcNCGRStatic(arc, chars->file, chars->target, chars->offset, 0, TRUE, work->heapId);
         chars++;
     }
     for (i = 0; i < 8; i++) {
-        if (screen->target == 0xff) {
+        if (screen->target == TABLE_END) {
             break;
         }
         if (screen->mode == mode) {
@@ -329,7 +332,7 @@ static void FMissionAppDraw_InitWindows(FMissionApp *work, u32 mode) {
     ArcTool *arc;
 
     for (i = 0; i < FMISSION_APP_WINDOW_COUNT; i++) {
-        if (setup->bg == 0xff) {
+        if (setup->bg == TABLE_END) {
             break;
         }
         work->windows[i].window =
@@ -392,7 +395,7 @@ static void FMissionAppDraw_AddActors(FMissionApp *work, u32 vramType, const FMi
         BOOL visible;
         BOOL autoAnim;
 
-        if (setups->sequence == 0xff) {
+        if (setups->sequence == TABLE_END) {
             break;
         }
         pos = setups->pos * 2;

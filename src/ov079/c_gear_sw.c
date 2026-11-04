@@ -59,6 +59,56 @@
 #define SKIN_COUNT 5
 #define MARKER_POS_COUNT 42
 #define BEACON_COUNT 10
+// What CGearSw_FindMarkerPos returns if no place is near
+#define MARKER_POS_NONE 0xff
+// The wireless lamp's cycle step that shows a new beacon
+#define WIRELESS_CYCLE_BEACON 2
+
+// What Intrude_GetAlertState reports while someone asks for the player, and Intrude_GetVisitProgress once a visit is
+// done
+#define INTRUDE_ALERT_ASKED 3
+#define INTRUDE_VISIT_DONE 2
+
+// The ways a lamp blinks, which CGearSw_TryLampPattern takes
+enum {
+    LAMP_PATTERN_QUICK,
+    LAMP_PATTERN_SLOW,
+    LAMP_PATTERN_TWICE,
+    LAMP_PATTERN_FAST,
+    LAMP_PATTERN_LIGHT,
+};
+
+// The steps of the effects that play on the touch screen, which effectSeq counts
+enum {
+    EFFECT_STEP_START,
+    EFFECT_STEP_WAIT,
+};
+
+// The steps of the panels' appearing, which panelSeq counts
+enum {
+    FLASH_STEP_HIDE,
+    FLASH_STEP_START,
+    FLASH_STEP_WAIT,
+};
+
+enum {
+    OPEN_STEP_START,
+    OPEN_STEP_WAIT,
+};
+
+// The steps of a panel's fade
+enum {
+    PANEL_TASK_DELAY,
+    PANEL_TASK_FADE_IN,
+    PANEL_TASK_FADE_OUT,
+};
+
+// The panels that carry more than the colors: the one with the logo, the title's, and the buttons'
+enum {
+    PANEL_LOGO = 0,
+    PANEL_TITLE = 2,
+    PANEL_BUTTONS = 4,
+};
 
 // What the player touched, which CGearSw_CheckEvent makes an event of
 enum {
@@ -525,16 +575,16 @@ static CGearSwTouchEffect *CGearSw_GetFreeTouchEffect(CGearSw *work) {
 
 static BOOL CGearSw_UpdateTouchEffect(CGearSw *work) {
     switch (work->effectSeq) {
-    case 0:
+    case EFFECT_STEP_START:
         CGearSw_SetActorPos(work->actors[ACTOR_TOUCH], work->touchX, work->touchY);
         CGearSw_SetActorAnim(work->actors[ACTOR_TOUCH], work->marker + 28);
         ClActor_SetVisible(work->actors[ACTOR_TOUCH], TRUE);
         work->effectSeq++;
         break;
-    case 1:
+    case EFFECT_STEP_WAIT:
         if (!ClActor_IsAnimActive(work->actors[ACTOR_TOUCH])) {
             ClActor_SetVisible(work->actors[ACTOR_TOUCH], FALSE);
-            work->effectSeq = 0;
+            work->effectSeq = EFFECT_STEP_START;
             return TRUE;
         }
         break;
@@ -606,20 +656,20 @@ static void CGearSw_SetLampPattern(CGearSw *work, int pattern, int lamp, BOOL in
 
     busy = 0;
     idle = TRUE;
-    slow = 1;
-    light = 4;
-    fast = 3;
-    twice = 2;
+    slow = LAMP_PATTERN_SLOW;
+    light = LAMP_PATTERN_LIGHT;
+    fast = LAMP_PATTERN_FAST;
+    twice = LAMP_PATTERN_TWICE;
     if (init) {
-        fast = 0;
-        twice = 0;
-        slow = 0;
-        light = 0;
+        fast = LAMP_PATTERN_QUICK;
+        twice = LAMP_PATTERN_QUICK;
+        slow = LAMP_PATTERN_QUICK;
+        light = LAMP_PATTERN_QUICK;
     }
     bits = WihDwc_GetStatus(GameData_GetWifiList(work->gameData));
     intrude = Intrude_GetAlertState(comm);
     if (alert) {
-        if (intrude == 3) {
+        if (intrude == INTRUDE_ALERT_ASKED) {
             CGearSw_TryLampPattern(work, 1, 3, fast, pattern, lamp);
         } else if (bits & 8) {
             busy |= 2;
@@ -647,15 +697,16 @@ static void CGearSw_SetLampPattern(CGearSw *work, int pattern, int lamp, BOOL in
             CGearSw_TryLampPattern(work, 2, 0, twice, pattern, lamp);
         }
         if (intrude != 0) {
-            if (intrude != 3) {
+            if (intrude != INTRUDE_ALERT_ASKED) {
                 CGearSw_TryLampPattern(work, 1, 3, twice, pattern, lamp);
             }
         } else {
             for (i = 0; i < 3; i++) {
                 work->wirelessCycle = (work->wirelessCycle + 1) % 3;
-                if ((sWirelessBits[work->wirelessCycle] & bits) || (work->wirelessCycle == 2 && work->newBeacon)) {
+                if ((sWirelessBits[work->wirelessCycle] & bits) ||
+                    (work->wirelessCycle == WIRELESS_CYCLE_BEACON && work->newBeacon)) {
                     if (CGearSw_TryLampPattern(work, 1, sWirelessPalettes[work->wirelessCycle], twice, pattern, lamp)) {
-                        if (work->wirelessCycle == 2) {
+                        if (work->wirelessCycle == WIRELESS_CYCLE_BEACON) {
                             work->newBeacon = FALSE;
                         }
                         break;
@@ -744,19 +795,19 @@ static void CGearSw_UpdateLamps(CGearSw *work) {
 
     for (lamp = 0; lamp < LAMP_COUNT; lamp++) {
         switch (work->lampPatterns[lamp]) {
-        case 3:
+        case LAMP_PATTERN_FAST:
             CGearSw_BlinkLampFast(work, lamp, &work->patterns[work->lampPatterns[lamp]]);
             break;
-        case 1:
+        case LAMP_PATTERN_SLOW:
             CGearSw_BlinkLampSlow(work, lamp, &work->patterns[work->lampPatterns[lamp]]);
             break;
-        case 2:
+        case LAMP_PATTERN_TWICE:
             CGearSw_BlinkLampTwice(work, lamp, &work->patterns[work->lampPatterns[lamp]]);
             break;
-        case 0:
+        case LAMP_PATTERN_QUICK:
             CGearSw_BlinkLampQuick(work, lamp, &work->patterns[work->lampPatterns[lamp]]);
             break;
-        case 4:
+        case LAMP_PATTERN_LIGHT:
             CGearSw_LightLamp(work, lamp, &work->patterns[work->lampPatterns[lamp]]);
             break;
         }
@@ -1186,7 +1237,7 @@ static void CGearSw_DragMarker(CGearSw *work) {
     if (!GFL_HIDGetTouchHeldPoint(&x, &y)) {
         u32 pos = CGearSw_FindMarkerPos(work, work->marker, work->touchX, work->touchY);
 
-        if (pos != 0xff) {
+        if (pos != MARKER_POS_NONE) {
             work->markerPos[work->marker] = pos;
             CGearSettings_SetColor(work->settings, work->marker, pos);
         }
@@ -1477,11 +1528,11 @@ static BOOL CGearSw_FlashPanels(CGearSw *work) {
     int i;
 
     switch (work->panelSeq) {
-    case 0:
+    case FLASH_STEP_HIDE:
         CGearSw_HidePanels(work);
         work->panelSeq++;
         break;
-    case 1:
+    case FLASH_STEP_START:
         if (CGearSw_IsScreenShown(work)) {
             work->panelTasks = 0;
             for (i = 0; i < PANEL_COUNT; i++) {
@@ -1490,7 +1541,7 @@ static BOOL CGearSw_FlashPanels(CGearSw *work) {
             work->panelSeq++;
         }
         break;
-    case 2:
+    case FLASH_STEP_WAIT:
         if (work->panelTasks == 0) {
             return TRUE;
         }
@@ -1504,14 +1555,14 @@ static BOOL CGearSw_OpenPanels(CGearSw *work) {
     int i;
 
     switch (work->panelSeq) {
-    case 0:
+    case OPEN_STEP_START:
         work->panelTasks = 0;
         for (i = PANEL_COUNT - 1; i >= 0; i--) {
             CGearSw_AddPanelTask(work, TRUE, i, work->panels[i], (PANEL_COUNT - 1 - i) * 3, &work->panelTasks);
         }
         work->panelSeq++;
         break;
-    case 1:
+    case OPEN_STEP_WAIT:
         if (work->panelTasks == 0) {
             CGearSw_ShowPanels(work);
             return TRUE;
@@ -1553,12 +1604,12 @@ static void CGearSw_PanelTask(TCBEx *task, void *data) {
     colors[0] = 0x7fff;
     colors[1] = sDarkColors[work->gender];
     switch (panelTask->seq) {
-    case 0:
+    case PANEL_TASK_DELAY:
         if (panelTask->delay-- == 0) {
             panelTask->seq++;
         }
         break;
-    case 1:
+    case PANEL_TASK_FADE_IN:
         panelTask->fraction += panelTask->step;
         fraction = panelTask->fraction;
         alpha = fraction < 0 ? -fraction : fraction;
@@ -1576,7 +1627,7 @@ static void CGearSw_PanelTask(TCBEx *task, void *data) {
             panelTask->seq++;
         }
         break;
-    case 2:
+    case PANEL_TASK_FADE_OUT:
         panelTask->fraction += panelTask->step;
         fraction = panelTask->fraction;
         alpha = fraction < 0 ? -fraction : fraction;
@@ -1659,7 +1710,7 @@ static void CGearSw_UpdateBeacons(CGearSw *work) {
     beaconNo = GameBeaconSys_GetReceiveCount();
     if (!work->newBeacon) {
         index = 0;
-        if (GameBeaconSys_GetNextNew(&index) != 30) {
+        if (GameBeaconSys_GetNextNew(&index) != GAME_BEACON_LOG_MAX) {
             work->newBeacon = TRUE;
         }
     }
@@ -1710,11 +1761,11 @@ static void CGearSw_LoadPanelColors(CGearSw *work, u8 panel, u8 color) {
         }
     }
     switch (panel) {
-    case 2:
+    case PANEL_TITLE:
         PaletteFade_LoadData(work->fade, &colors[3], PALFADE_BUFFER_SUB_OBJ, 4, 6);
         PaletteFade_LoadData(work->fade, &colors[6], PALFADE_BUFFER_SUB_OBJ, 0x14, 6);
         break;
-    case 4:
+    case PANEL_BUTTONS:
         PaletteFade_LoadData(work->fade, &colors[3], PALFADE_BUFFER_SUB_OBJ, 1, 6);
         PaletteFade_LoadData(work->fade, &colors[6], PALFADE_BUFFER_SUB_OBJ, 0x11, 6);
         break;
@@ -1732,11 +1783,11 @@ static void CGearSw_BlendPanel(CGearSw *work, u8 panel, u8 fraction, u16 color) 
         }
     }
     switch (panel) {
-    case 2:
+    case PANEL_TITLE:
         PaletteFade_BlendBuffer(work->fade, PALFADE_BUFFER_SUB_OBJ, 4, 3, fraction, color);
         PaletteFade_BlendBuffer(work->fade, PALFADE_BUFFER_SUB_OBJ, 0x14, 3, fraction, color);
         break;
-    case 4:
+    case PANEL_BUTTONS:
         PaletteFade_BlendBuffer(work->fade, PALFADE_BUFFER_SUB_OBJ, 1, 3, fraction, color);
         PaletteFade_BlendBuffer(work->fade, PALFADE_BUFFER_SUB_OBJ, 0x11, 3, fraction, color);
         break;
@@ -1755,7 +1806,7 @@ static void CGearSw_SetPanelVisible(CGearSw *work, int panel, BOOL visible) {
         }
     }
     switch (panel) {
-    case 0:
+    case PANEL_LOGO:
         if (work->beacons) {
             ClActor_SetVisible(work->actors[ACTOR_LOGO], visible);
             if (work->noticeShown) {
@@ -1763,10 +1814,10 @@ static void CGearSw_SetPanelVisible(CGearSw *work, int panel, BOOL visible) {
             }
         }
         break;
-    case 2:
+    case PANEL_TITLE:
         ClActor_SetVisible(work->actors[ACTOR_TITLE], visible);
         break;
-    case 4:
+    case PANEL_BUTTONS:
         for (i = 0; i <= ACTOR_RADAR; i++) {
             if (i == ACTOR_TITLE) {
                 continue;
@@ -1854,7 +1905,7 @@ static BOOL CGearSw_IsMarkerNear(CGearSw *work, int marker, int x, int y) {
     return FALSE;
 }
 
-// The free place nearest to a point, or 0xff if none is near
+// The free place nearest to a point, or MARKER_POS_NONE if none is near
 static u32 CGearSw_FindMarkerPos(CGearSw *work, int marker, u8 x, u8 y) {
     fx32 nearestDistance = 0x7fffffff;
     int nearest;
@@ -1873,7 +1924,7 @@ static u32 CGearSw_FindMarkerPos(CGearSw *work, int marker, u8 x, u8 y) {
         }
     }
     if (nearestDistance > FX32_CONST(32)) {
-        return 0xff;
+        return MARKER_POS_NONE;
     }
     return (u8)nearest;
 }
@@ -2173,7 +2224,7 @@ static void CGearSw_Init(CGearSw *work, CGearSettings *settings, FieldSubscreen 
         CGearSw_StateFlash(work);
     }
     comm = GSYS_GetGameCommSystem(gsys);
-    if (comm != NULL && Intrude_GetVisitProgress(comm) == 2) {
+    if (comm != NULL && Intrude_GetVisitProgress(comm) == INTRUDE_VISIT_DONE) {
         Intrude_SetCompleted(comm);
     }
 }
@@ -2181,7 +2232,7 @@ static void CGearSw_Init(CGearSw *work, CGearSettings *settings, FieldSubscreen 
 static void CGearSw_Exit(CGearSw *work) {
     GameCommSys *comm = GSYS_GetGameCommSystem(work->gsys);
 
-    if (comm != NULL && Intrude_GetVisitProgress(comm) == 2) {
+    if (comm != NULL && Intrude_GetVisitProgress(comm) == INTRUDE_VISIT_DONE) {
         Intrude_SetCompleted(comm);
     }
     CGearSw_StopNoticeGlow(work);
@@ -2358,17 +2409,17 @@ void CGearSw_StopRinging(CGearSw *work) {
 
 static BOOL CGearSw_UpdateButtonAnim(CGearSw *work) {
     switch (work->effectSeq) {
-    case 0:
+    case EFFECT_STEP_START:
         CGearSw_SetActorAnim(work->actors[work->buttonActor], work->buttonAnim);
         ClActor_SetAutoAnim(work->actors[work->buttonActor], TRUE);
         ClActor_SetAutoAnim(work->actors[work->buttonActor + 1], TRUE);
         work->effectSeq++;
         break;
-    case 1:
+    case EFFECT_STEP_WAIT:
         ClActor_SetAutoAnim(work->actors[work->buttonActor], TRUE);
         ClActor_SetAutoAnim(work->actors[work->buttonActor + 1], TRUE);
         if (!ClActor_IsAnimActive(work->actors[work->buttonActor])) {
-            work->effectSeq = 0;
+            work->effectSeq = EFFECT_STEP_START;
             return TRUE;
         }
         break;
@@ -2380,15 +2431,15 @@ static BOOL CGearSw_UpdateButtonAnim(CGearSw *work) {
 
 static BOOL CGearSw_UpdateButtonFlash(CGearSw *work) {
     switch (work->effectSeq) {
-    case 0:
+    case EFFECT_STEP_START:
         if (work->buttonActor == ACTOR_EDIT) {
             CGearSwFlash_Start(&work->flash, 1 << 5);
         }
         work->effectSeq++;
         break;
-    case 1:
+    case EFFECT_STEP_WAIT:
         if (CGearSwFlash_Update(&work->flash)) {
-            work->effectSeq = 0;
+            work->effectSeq = EFFECT_STEP_START;
             return TRUE;
         }
         break;
@@ -2657,7 +2708,7 @@ static void CGearSw_SetActive(CGearSw *work, BOOL active) {
 }
 
 static void CGearSw_UpdateIntrudeAlert(CGearSw *work, u32 state) {
-    if (state == 3) {
+    if (state == INTRUDE_ALERT_ASKED) {
         if (!work->intruded) {
             CGearSw_SetAlert(work, TRUE, FALSE);
             work->intruded = TRUE;

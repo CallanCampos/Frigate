@@ -12,8 +12,8 @@
 typedef struct WF2DMAP_OBJDRAWSYS WF2DMAP_OBJDRAWSYS;
 typedef struct WF2DMAP_OBJDRAWWK WF2DMAP_OBJDRAWWK;
 
-// Loads the player's character (charaId, a WF_2DC_CHARA_*) and the shadow. unk1 is never used
-WF2DMAP_OBJDRAWSYS *WF2DMAP_OBJDrawSysInit(ClActUnit *unit, void *unk1, u32 objNum, u32 charaId, u32 moveType,
+// Loads the player's character (charaId, a WF_2DC_CHARA_*) and the shadow. unused is never read
+WF2DMAP_OBJDRAWSYS *WF2DMAP_OBJDrawSysInit(ClActUnit *unit, void *unused, u32 objNum, u32 charaId, u32 moveType,
                                            u32 vramType, u32 heapId);
 void WF2DMAP_OBJDrawSysExit(WF2DMAP_OBJDRAWSYS *sys);
 void WF2DMAP_OBJDrawSysAllResDel(WF2DMAP_OBJDRAWSYS *sys);

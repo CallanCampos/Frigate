@@ -156,7 +156,7 @@ BOOL PokeList_Init(PokeListWork *wk) {
     wk->demo = 0;
     wk->timeUp = FALSE;
     wk->unk284 = FALSE;
-    wk->param->unk73 = 0;
+    wk->param->forceExit = 0;
     wk->unk28 = TRUE;
     wk->playHealSe = FALSE;
     for (i = 0; i < POKELIST_CL_RES_COUNT; i++) {
@@ -964,7 +964,7 @@ static void PokeList_ShowModeMessage(PokeListWork *wk) {
 
 // A Pokémon was picked: what happens depends on the mode
 static void PokeList_SelectPokemon(PokeListWork *wk) {
-    if (wk->param->unk73 == 1) {
+    if (wk->param->forceExit == 1) {
         wk->state = 19;
         return;
     }
@@ -1761,7 +1761,7 @@ static void func_ov165_0219c7e8(PokeListWork *wk) {
     if (wk->input != 4) {
         wk->subState = 2;
     }
-    if (wk->param->unk73 == 1) {
+    if (wk->param->forceExit == 1) {
         wk->subState = 2;
         wk->input = 1;
     }
@@ -2070,7 +2070,7 @@ static void PokeList_UpdateMenu(PokeListWork *wk) {
             wk->menuItem = item;
             wk->subState = 2;
         }
-        if (wk->param->unk73 == 1) {
+        if (wk->param->forceExit == 1) {
             wk->subState = 2;
         }
         break;
@@ -2119,7 +2119,7 @@ static void func_ov165_0219cf70(PokeListWork *wk) {
 
 // Does what the menu item picked does
 static void PokeList_DoMenuItem(PokeListWork *wk) {
-    if (wk->param->unk73 == 1) {
+    if (wk->param->forceExit == 1) {
         wk->state = 19;
         return;
     }

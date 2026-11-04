@@ -184,7 +184,7 @@ int FrameList_GetScroll(FrameList *list);
 BOOL FrameList_CanScrollDown(FrameList *list);
 void FrameList_SetCursor(FrameList *list, int pos);
 void FrameList_ShowCursor(FrameList *list);
-void FrameList_SetShownRows(FrameList *list, int a1);
+void FrameList_SetShownRows(FrameList *list, int shownRows);
 void FrameList_SetKeyMask(FrameList *list, u32 a1);
 void FrameList_ScrollBlocking(FrameList *list, int a1);
 u32 FrameList_GetScrollFrames(FrameList *list);

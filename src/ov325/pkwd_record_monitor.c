@@ -62,6 +62,26 @@
 #define SCORE_MAX 9999
 #define SCORE_MIN (-9998)
 
+// What ends the tables of loads, of windows and of labels
+#define LOAD_END 0xff
+#define WINDOW_END 0xff
+#define LABEL_END 0xffff
+
+// The steps of the process
+enum {
+    MAIN_STEP_WAIT_FADE_IN,
+    MAIN_STEP_WAIT_END,
+    MAIN_STEP_FADE_OUT,
+    MAIN_STEP_WAIT_FADE_OUT,
+};
+
+// What the list's input was: nothing, a move of the cursor, or a pick
+enum {
+    INPUT_NONE,
+    INPUT_MOVE,
+    INPUT_DECIDE,
+};
+
 // The groups of cell actors
 enum {
     // The return button and the arrows of the list
@@ -634,22 +654,22 @@ static BOOL PkwdRecordMonitor_Main(GameProc *proc, u32 *state, void *param, void
     PkwdRecordMonitorWork *wk = work;
 
     switch (*state) {
-    case 0:
+    case MAIN_STEP_WAIT_FADE_IN:
         if (GFL_WipeIsFinished()) {
             (*state)++;
             wk->flags |= FLAG_FADED_IN;
         }
         break;
-    case 1:
+    case MAIN_STEP_WAIT_END:
         if (wk->state == STATE_END) {
             (*state)++;
         }
         break;
-    case 2:
+    case MAIN_STEP_FADE_OUT:
         GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 6, 1, wk->heapId);
         (*state)++;
         break;
-    case 3:
+    case MAIN_STEP_WAIT_FADE_OUT:
         if (GFL_WipeIsFinished()) {
             return TRUE;
         }
@@ -777,7 +797,7 @@ static void PkwdRecordMonitor_LoadBG(PkwdRecordMonitorWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
 
     for (i = 0; i < LOAD_MAX; i++) {
-        if (palette->target == 0xff) {
+        if (palette->target == LOAD_END) {
             break;
         }
         GFL_G2DIOLoadArcNCLRDefault(arc, palette->fileId, palette->target, palette->offset * 0x20, palette->size * 0x20,
@@ -785,14 +805,14 @@ static void PkwdRecordMonitor_LoadBG(PkwdRecordMonitorWork *wk) {
         palette++;
     }
     for (i = 0; i < LOAD_MAX; i++) {
-        if (chars->target == 0xff) {
+        if (chars->target == LOAD_END) {
             break;
         }
         GFL_BGSysLoadArcNCGRStatic(arc, chars->fileId, chars->target, chars->offset, 0, FALSE, wk->heapId);
         chars++;
     }
     for (i = 0; i < LOAD_MAX; i++) {
-        if (screen->target == 0xff) {
+        if (screen->target == LOAD_END) {
             break;
         }
         loadBGScrToVramByFileNoReserveNegAlign(arc, screen->fileId, screen->target, screen->offset, 0, FALSE,
@@ -1106,7 +1126,7 @@ static void PkwdRecordMonitor_CreateWindows(PkwdRecordMonitorWork *wk, u32 scree
         PkwdRecordMonitor_FreeWindows(wk, SCREEN_SUB);
     }
     for (i = 0; i < WINDOW_MAX; i++) {
-        if (setup->bg == 0xff) {
+        if (setup->bg == WINDOW_END) {
             break;
         }
         if (screen == SCREEN_MAIN) {
@@ -1235,7 +1255,7 @@ static void PkwdRecordMonitor_PrintLabels(PkwdRecordMonitorWork *wk, u32 screen,
         u16 window;
         StrBuf *strbuf;
 
-        if (labels[i].message == 0xffff) {
+        if (labels[i].message == LABEL_END) {
             break;
         }
         message = labels[i].message;
@@ -1386,7 +1406,7 @@ static void PkwdRecordMonitor_ExitMode(PkwdRecordMonitorWork *wk) {
 static void PkwdRecordMonitor_Input(PkwdRecordMonitorWork *wk) {
     u32 redraw = 0;
     BOOL cancel = FALSE;
-    u32 input = 0;
+    u32 input = INPUT_NONE;
     u32 action;
     s32 touch;
 
@@ -1396,10 +1416,10 @@ static void PkwdRecordMonitor_Input(PkwdRecordMonitorWork *wk) {
     action = PkwdRecordMonitor_HandleListResult(wk, PkwdRecordMonitor_UpdateList(wk));
     if (action == ACTION_MOVE) {
         redraw = 2;
-        input = 1;
+        input = INPUT_MOVE;
     } else if (action == ACTION_DECIDE || action == ACTION_DECIDE_TOUCH) {
         redraw = 1;
-        input = 2;
+        input = INPUT_DECIDE;
     }
     if (wk->flags & FLAG_CURSOR_MOVED) {
         redraw = 1;
@@ -1430,7 +1450,7 @@ static void PkwdRecordMonitor_Input(PkwdRecordMonitorWork *wk) {
         wk->flags |= FLAG_REDRAW;
     }
     if (!wk->keyMode) {
-        if (GCTX_HIDGetPressedKeys() != 0 || input == 2) {
+        if (GCTX_HIDGetPressedKeys() != 0 || input == INPUT_DECIDE) {
             wk->listState = LIST_STATE_OPEN_DETAILS;
             wk->keyMode = TRUE;
         }

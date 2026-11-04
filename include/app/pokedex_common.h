@@ -31,6 +31,22 @@ typedef struct {
     BOOL conditions[3];
 } PokedexHabitatConditions;
 
+// How much of an area's species a player has, for each condition
+enum {
+    POKEDEX_HABITAT_STATE_UNSEEN,
+    POKEDEX_HABITAT_STATE_SEEN,
+    POKEDEX_HABITAT_STATE_CAUGHT,
+};
+
+// What the awards' list shows of a condition: it is not complete or its award is not given yet, all of its species are
+// caught or seen and the award is given, or it does not apply
+enum {
+    POKEDEX_HABITAT_DISPLAY_PARTIAL = 1,
+    POKEDEX_HABITAT_DISPLAY_CAUGHT,
+    POKEDEX_HABITAT_DISPLAY_SEEN,
+    POKEDEX_HABITAT_DISPLAY_NONE,
+};
+
 // A species in an area, in its file
 typedef struct {
     u16 species;
@@ -46,7 +62,8 @@ typedef struct {
     u8 values[3];
     // The conditions that make the area shown, 1 for each
     u8 conditions[3];
-    u16 unk6;
+    // What the screen says lives on the area's land: an index of PokedexHabitat_GetHabitatMessage's messages
+    u16 landKind;
     u16 count;
     PokedexHabitatFileEntry entries[30];
 } PokedexHabitatFile;
@@ -65,7 +82,8 @@ typedef struct {
 typedef struct {
     u16 zone;
     u16 values[3];
-    u32 unk8;
+    // Which of the land habitats it is, as the habitat message's table lists them
+    u32 landKind;
     PokedexHabitatSpecies species[30];
     // For each condition: 2 if all of its species are caught, 1 if all are seen, else 0
     u32 states[3];

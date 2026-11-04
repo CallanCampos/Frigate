@@ -86,7 +86,7 @@ BOOL PStatus_Init(PStatusWork *wk) {
     u8 i;
 
     wk->partyIndex = wk->param->partyIndex;
-    wk->shownPartyIndex = 0xff;
+    wk->shownPartyIndex = PSTATUS_PARTY_INDEX_NONE;
     wk->bgScrollFrames = 0;
     wk->lastVBlankCount = OS_GetVBlankCount();
     wk->shownPage = PSTA_PAGE_NONE;
@@ -972,7 +972,7 @@ static void PStatus_LoadPokemon(PStatusWork *wk) {
 static void PStatus_StartRedraw(PStatusWork *wk) {
     PStatus_SetDecrypted(wk, TRUE);
     if (wk->shownPartyIndex != wk->partyIndex) {
-        if (wk->shownPartyIndex != 0xff) {
+        if (wk->shownPartyIndex != PSTATUS_PARTY_INDEX_NONE) {
             PStaSub_Unload(wk, wk->sub);
             PStaRibbon_UnloadPokemon(wk, wk->ribbon);
         }
@@ -1047,7 +1047,7 @@ static void PStatus_UpdateRedraw(PStatusWork *wk) {
         return;
     }
     if (wk->shownPartyIndex != wk->partyIndex) {
-        if (wk->shownPartyIndex != 0xff) {
+        if (wk->shownPartyIndex != PSTATUS_PARTY_INDEX_NONE) {
             PStaSub_Clear(wk, wk->sub);
         }
         PStaSub_Draw(wk, wk->sub);

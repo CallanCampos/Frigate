@@ -22,6 +22,19 @@
 // The net command that sends the team picked, after the party list's commands
 #define BATTLE_SELECT_NET_CMD_BASE 0x2f00
 
+// The steps of the selection, in wk->state
+enum {
+    STEP_OPEN_LIST,
+    STEP_LIST,
+    STEP_LIST_DONE,
+    STEP_OPEN_STATUS,
+    STEP_STATUS,
+    STEP_STATUS_DONE,
+    STEP_COPY_PICKED,
+    STEP_SEND,
+    STEP_WAIT_SYNC,
+};
+
 typedef struct {
     u32 state;
     PokeListParam pokeList;
@@ -77,7 +90,7 @@ static BOOL BattleSelect_Init(GameProc *proc, u32 *state, void *param, void *wor
     BattleSelect_SetupStatus(param, wk, &wk->status);
     wk->frames = 0;
     wk->lastVBlankCount = OS_GetVBlankCount();
-    wk->state = 0;
+    wk->state = STEP_OPEN_LIST;
     return TRUE;
 }
 
@@ -107,52 +120,52 @@ static BOOL BattleSelect_Main(GameProc *proc, u32 *state, void *param, void *wor
     NetSync_Update((NetSyncWork *)&wk->pokeList);
 
     switch (wk->state) {
-    case 0:
+    case STEP_OPEN_LIST:
         GFL_OvlLoad(OVERLAY_ID(165));
         QueueGameProc(wk->procManager, OVERLAY_NONE, &POKELIST_PROC_FUNCTIONS, &wk->pokeList);
-        wk->state = 1;
+        wk->state = STEP_LIST;
         break;
-    case 1:
+    case STEP_LIST:
         if (!GFL_ProcMgrUpdate(wk->procManager)) {
-            wk->state = 2;
+            wk->state = STEP_LIST_DONE;
         }
         break;
-    case 2:
+    case STEP_LIST_DONE:
         GFL_OvlUnload(OVERLAY_ID(165));
         if (wk->pokeList.result == 1) {
             wk->status.partyIndex = wk->pokeList.index;
-            wk->state = 3;
+            wk->state = STEP_OPEN_STATUS;
         } else {
             select->result = 0;
-            wk->state = 6;
+            wk->state = STEP_COPY_PICKED;
         }
         break;
-    case 6:
+    case STEP_COPY_PICKED:
         for (i = 0; i < 6; i++) {
             if (wk->pokeList.picked[i] != 0) {
-                PokeParty_AddPkm(select->unk1C, PokeParty_GetPkm(select->party, wk->pokeList.picked[i] - 1));
+                PokeParty_AddPkm(select->pickedParty, PokeParty_GetPkm(select->party, wk->pokeList.picked[i] - 1));
             }
         }
-        wk->state = 7;
+        wk->state = STEP_SEND;
         break;
-    case 7:
+    case STEP_SEND:
         if (GFL_NetSendCommandToMachine(NetHandle_GetOwn(), 0xff, BATTLE_SELECT_NET_CMD_BASE,
-                                        PokeParty_GetSaveDataSize(), select->unk1C, 0, FALSE, TRUE)) {
+                                        PokeParty_GetSaveDataSize(), select->pickedParty, 0, FALSE, TRUE)) {
             NetHandle_SendTimingPair(NetHandle_GetOwn(), 20, 0x2f);
-            wk->state = 8;
+            wk->state = STEP_WAIT_SYNC;
         }
         break;
-    case 8:
+    case STEP_WAIT_SYNC:
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 20, 0x2f)) {
             return TRUE;
         }
         break;
-    case 3:
+    case STEP_OPEN_STATUS:
         GFL_OvlLoad(OVERLAY_PSTATUS);
         QueueGameProc(wk->procManager, OVERLAY_NONE, &PSTATUS_PROC_FUNCTIONS, &wk->status);
-        wk->state = 4;
+        wk->state = STEP_STATUS;
         break;
-    case 4:
+    case STEP_STATUS:
         if (wk->pokeList.timerEnabled == TRUE && wk->pokeList.timeLeft == 0) {
             wk->status.forceExit = TRUE;
         }
@@ -160,18 +173,19 @@ static BOOL BattleSelect_Main(GameProc *proc, u32 *state, void *param, void *wor
             wk->status.forceExit = TRUE;
         }
         if (!GFL_ProcMgrUpdate(wk->procManager)) {
-            wk->state = 5;
+            wk->state = STEP_STATUS_DONE;
         }
         break;
-    case 5:
+    case STEP_STATUS_DONE:
         GFL_OvlUnload(OVERLAY_PSTATUS);
         wk->pokeList.index = wk->status.partyIndex;
-        wk->state = 0;
+        wk->state = STEP_OPEN_LIST;
         break;
     }
 
     // Outside the screens, a lost connection ends the selection
-    if (GFL_NetIsInitialized() && wk->state != 1 && wk->state != 2 && wk->state != 4 && wk->state != 5) {
+    if (GFL_NetIsInitialized() && wk->state != STEP_LIST && wk->state != STEP_LIST_DONE && wk->state != STEP_STATUS &&
+        wk->state != STEP_STATUS_DONE) {
         if (DWCRapCommon_CheckError(1, 1)) {
             select->result = 1;
             return TRUE;

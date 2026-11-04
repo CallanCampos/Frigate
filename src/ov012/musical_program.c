@@ -59,7 +59,7 @@ MusicalProgram *MusicalProgram_Create(HeapID heapId, Ov210Work *ov210, u16 shots
     u8 temp;
 
     program = GFL_HeapAllocate(heapId, sizeof(MusicalProgram), FALSE, "musical_program.c", 100);
-    program->data = ov210->unk4;
+    program->data = ov210->programData;
     for (i = 0; i < 4; i++) {
         program->points[i] = 0;
         program->propPoints[i] = 0;

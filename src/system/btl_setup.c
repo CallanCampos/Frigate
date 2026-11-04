@@ -73,8 +73,8 @@ void BtlSetup_FreeContents(BtlSetup *setup) {
             GFL_HeapFree(setup->playerInfo[i]);
         }
     }
-    if (setup->unkB0 != NULL) {
-        GFL_HeapFree(setup->unkB0);
+    if (setup->recBuffer != NULL) {
+        GFL_HeapFree(setup->recBuffer);
     }
     MI_CpuFill8(setup, 0, sizeof(BtlSetup));
 }
@@ -212,7 +212,7 @@ static void BtlSetup_LoadGameData(BtlSetup *setup, GameData *gameData, BtlFieldS
     setup->fieldSituation.unk18 = 0;
     setup->fieldSituation.unk19 = 0;
     setup->fieldSituation.multiMode = 0;
-    setup->unkB0 = NULL;
+    setup->recBuffer = NULL;
     setup->fieldSituation.unk1b = 0;
     setup->unkDD_0 = FALSE;
     setup->gameData = gameData;
@@ -494,7 +494,7 @@ void BtlSetup_PostProcessTrialHouse(BtlSetup *setup) {
 }
 
 void BtlSetup_AllocRecBuffer(BtlSetup *setup, HeapID heapId) {
-    if (setup->unkB0 == NULL) {
-        setup->unkB0 = GFL_HeapAllocate(heapId, 0xc00, FALSE, "btl_setup.c", 1035);
+    if (setup->recBuffer == NULL) {
+        setup->recBuffer = GFL_HeapAllocate(heapId, 0xc00, FALSE, "btl_setup.c", 1035);
     }
 }

@@ -17,6 +17,32 @@
 
 #define HEAPID_BATTLE_PROC 0x76
 
+enum {
+    PROC_STEP_COMM_DEMO = 0,
+    PROC_STEP_COMM_DEMO_WAIT,
+    PROC_STEP_SYNC_LIST,
+    PROC_STEP_SYNC_LIST_WAIT,
+    PROC_STEP_MULTI_LIST,
+    PROC_STEP_MULTI_LIST_WAIT,
+    PROC_STEP_LOAD_BATTLE,
+    PROC_STEP_LOAD_BATTLE_WAIT,
+    PROC_STEP_BATTLE,
+    PROC_STEP_BATTLE_WAIT,
+    PROC_STEP_BATTLE_ENDED,
+    PROC_STEP_SYNC_END,
+    PROC_STEP_SYNC_END_WAIT,
+    PROC_STEP_RESULT_DEMO,
+    PROC_STEP_RESULT_DEMO_WAIT,
+    PROC_STEP_SAVE_SELECT,
+    PROC_STEP_SAVE_SELECT_WAIT,
+    PROC_STEP_DONE,
+};
+
+enum {
+    EVENT_STEP_START,
+    EVENT_STEP_WAIT,
+};
+
 const GameProcFunctions data_ov010_0215039c = { BattleProc_Init, BattleProc_Main, BattleProc_Exit };
 
 BOOL BattleProc_Init(GameProc *proc, u32 *state, void *param, void *work) {
@@ -54,7 +80,7 @@ BOOL BattleProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
     u32 source;
     BOOL saved;
 
-    if (running != TRUE && GFL_NetErrCheck() && (s32)*state >= 0 && (s32)*state < 13) {
+    if (running != TRUE && GFL_NetErrCheck() && (s32)*state >= 0 && (s32)*state < PROC_STEP_RESULT_DEMO) {
         if (procWork->commandsSet == TRUE) {
             NetCommand_RemoveTable(0x100);
         }
@@ -67,35 +93,35 @@ BOOL BattleProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
         return TRUE;
     }
     switch (*state) {
-    case 0:
+    case PROC_STEP_COMM_DEMO:
         if (battle->setup->fieldSituation.multiMode == 0) {
             battle->players->demoType = 1;
         } else {
             battle->players->demoType = 3;
         }
         QueueGameProc(procWork->manager, OVERLAY_ID(305), &CommBtlDemoProc, battle->players);
-        *state = 1;
+        *state = PROC_STEP_COMM_DEMO_WAIT;
         break;
-    case 1:
+    case PROC_STEP_COMM_DEMO_WAIT:
         if (running == TRUE) {
             break;
         }
         if (battle->setup->fieldSituation.multiMode == 0) {
-            *state = 6;
+            *state = PROC_STEP_LOAD_BATTLE;
         } else {
-            *state = 2;
+            *state = PROC_STEP_SYNC_LIST;
         }
         break;
-    case 2:
+    case PROC_STEP_SYNC_LIST:
         GFL_NetSendTiming(NetHandle_GetOwn(), 0xc9);
-        *state = 3;
+        *state = PROC_STEP_SYNC_LIST_WAIT;
         break;
-    case 3:
+    case PROC_STEP_SYNC_LIST_WAIT:
         if (GFL_NetIsTimingRecv(NetHandle_GetOwn(), 0xc9)) {
-            *state = 4;
+            *state = PROC_STEP_MULTI_LIST;
         }
         break;
-    case 4:
+    case PROC_STEP_MULTI_LIST:
         if (battle->setup->fieldSituation.unk19 <= 1) {
             procWork->ov171Param.flipped = 0;
             procWork->ov171Param.party0 = battle->players->players[0].party;
@@ -106,47 +132,47 @@ BOOL BattleProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
             procWork->ov171Param.party1 = battle->players->players[0].party;
         }
         QueueGameProc(procWork->manager, OVERLAY_ID(171), &VS_MULTI_LIST_PROC_FUNCTIONS, &procWork->ov171Param);
-        *state = 5;
+        *state = PROC_STEP_MULTI_LIST_WAIT;
         break;
-    case 5:
+    case PROC_STEP_MULTI_LIST_WAIT:
         if (running == TRUE) {
             break;
         }
-        *state = 6;
+        *state = PROC_STEP_LOAD_BATTLE;
         break;
-    case 6:
+    case PROC_STEP_LOAD_BATTLE:
         procWork->ov167Loaded = TRUE;
         GFL_OvlLoad(OVERLAY_ID(167));
         procWork->commandsSet = TRUE;
         NetCommand_AddTable(0x100, BTL_NET_COMMANDS, 9, NULL);
         GFL_NetSendTiming(NetHandle_GetOwn(), 0xc8);
-        *state = 7;
+        *state = PROC_STEP_LOAD_BATTLE_WAIT;
         break;
-    case 7:
+    case PROC_STEP_LOAD_BATTLE_WAIT:
         if (GFL_NetIsTimingRecv(NetHandle_GetOwn(), 0xc8)) {
-            *state = 8;
+            *state = PROC_STEP_BATTLE;
         }
         break;
-    case 8:
+    case PROC_STEP_BATTLE:
         procWork->vsPlayerLoaded = TRUE;
         BattleRec_Init(HEAPID_BATTLE_PROC);
         QueueGameProc(procWork->manager, -1, &BATTLE_PROC_FUNCTIONS, battle->setup);
-        *state = 9;
+        *state = PROC_STEP_BATTLE_WAIT;
         break;
-    case 9:
+    case PROC_STEP_BATTLE_WAIT:
         if (running == TRUE) {
             break;
         }
-        *state = 10;
+        *state = PROC_STEP_BATTLE_ENDED;
         break;
-    case 10:
-        *state = 11;
+    case PROC_STEP_BATTLE_ENDED:
+        *state = PROC_STEP_SYNC_END;
         break;
-    case 11:
+    case PROC_STEP_SYNC_END:
         GFL_NetSendTiming(NetHandle_GetOwn(), 0xca);
-        *state = 12;
+        *state = PROC_STEP_SYNC_END_WAIT;
         break;
-    case 12:
+    case PROC_STEP_SYNC_END_WAIT:
         if (!GFL_NetIsTimingRecv(NetHandle_GetOwn(), 0xca)) {
             break;
         }
@@ -157,9 +183,9 @@ BOOL BattleProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
         BattleRec_LoadToolOverlay();
         BattleRecTool_StoreSetup(battle->setup);
         BattleRec_UnloadToolOverlay();
-        *state = 13;
+        *state = PROC_STEP_RESULT_DEMO;
         break;
-    case 13:
+    case PROC_STEP_RESULT_DEMO:
         if (battle->setup->fieldSituation.multiMode == 0) {
             battle->players->demoType = 2;
         } else {
@@ -215,23 +241,23 @@ BOOL BattleProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
             }
         }
         if (battle->setup->result == BTL_RESULT_6) {
-            *state = 16;
+            *state = PROC_STEP_SAVE_SELECT_WAIT;
             break;
         }
         QueueGameProc(procWork->manager, OVERLAY_ID(305), &CommBtlDemoProc, battle->players);
-        *state = 14;
+        *state = PROC_STEP_RESULT_DEMO_WAIT;
         break;
-    case 14:
+    case PROC_STEP_RESULT_DEMO_WAIT:
         if (running == TRUE) {
             break;
         }
-        *state = 15;
+        *state = PROC_STEP_SAVE_SELECT;
         break;
-    case 15:
-        if (battle->setup->unkB0 == NULL) {
+    case PROC_STEP_SAVE_SELECT:
+        if (battle->setup->recBuffer == NULL) {
             saved = FALSE;
         } else {
-            saved = BattleRec_IsVersionSupported(battle->setup->unkAD) ? TRUE : FALSE;
+            saved = BattleRec_IsVersionSupported(battle->setup->commonVersion) ? TRUE : FALSE;
         }
         battle->ov306Param.gameData = battle->gameData;
         battle->ov306Param.unk4 = saved;
@@ -240,17 +266,17 @@ BOOL BattleProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
         battle->ov306Param.unk10 = battle->rule;
         battle->ov306Param.unk14 = battle->unk10;
         QueueGameProc(procWork->manager, OVERLAY_ID(306), &BtlRecSelProcFunctions, &battle->ov306Param);
-        *state = 16;
+        *state = PROC_STEP_SAVE_SELECT_WAIT;
         break;
-    case 16:
+    case PROC_STEP_SAVE_SELECT_WAIT:
         if (running == TRUE) {
             break;
         }
         freeVSPlayerBlkClearPtr();
         procWork->vsPlayerLoaded = FALSE;
-        *state = 17;
+        *state = PROC_STEP_DONE;
         break;
-    case 17:
+    case PROC_STEP_DONE:
         return TRUE;
     }
     return FALSE;
@@ -279,7 +305,7 @@ GameEventReturnCode EventMake_Callback(GameEvent *event, u32 *state, void *data)
     BattleParam *param;
 
     switch (*state) {
-    case 0:
+    case EVENT_STEP_START:
         param = &work->param;
         work->param.gameData = GSYS_GetGameData(gsys);
         param->setup = work->setup;
@@ -290,7 +316,7 @@ GameEventReturnCode EventMake_Callback(GameEvent *event, u32 *state, void *data)
         GSYS_QueueProc(gsys, -1, &data_ov010_0215039c, param);
         (*state)++;
         break;
-    case 1:
+    case EVENT_STEP_WAIT:
         if (!GSYS_GetProcMgrState(gsys)) {
             return GAMEEVENT_DONE;
         }

@@ -69,6 +69,56 @@
 #define OUTLINE_FIRST 1
 #define OUTLINE_SECOND 2
 
+// The steps of IrcSyncCheck_Main
+enum {
+    MAIN_STEP_START,
+    MAIN_STEP_FADE_IN,
+    MAIN_STEP_WAIT_FADE_IN,
+    MAIN_STEP_RUN,
+    MAIN_STEP_FADE_OUT,
+    MAIN_STEP_WAIT_FADE_OUT,
+    MAIN_STEP_END,
+};
+
+// The steps of the waits for a thumb on the first outline and of the traces
+enum {
+    WAIT_FIRST_STEP_PRINT,
+    WAIT_FIRST_STEP_WAIT_PRESS,
+};
+
+enum {
+    TRACE_A_STEP_FIRST,
+    TRACE_A_STEP_WAIT_SECOND,
+    TRACE_A_STEP_RETRY,
+};
+
+enum {
+    TRACE_B_STEP_TRACE,
+    TRACE_B_STEP_RETRY,
+};
+
+// The steps of IrcSyncCheck_StepInterrupted
+enum {
+    INTERRUPTED_STEP_CHECK,
+    INTERRUPTED_STEP_SET_RESULT,
+    INTERRUPTED_STEP_PRINT,
+    INTERRUPTED_STEP_EXCHANGE_IDS,
+    INTERRUPTED_STEP_END,
+};
+
+// The steps of IrcSyncNet_Send
+enum {
+    NET_STEP_STORE,
+    NET_STEP_SEND,
+    NET_STEP_WAIT_RECEIVED,
+};
+
+// The two thumbs
+enum {
+    THUMB_FIRST,
+    THUMB_SECOND,
+};
+
 // The steps of IrcSyncCheck_StepResult
 enum {
     RESULT_EXCHANGE_IDS_FIRST,
@@ -386,7 +436,7 @@ static BOOL IrcSyncCheck_Init(GameProc *proc, u32 *state, void *param, void *wor
     wk = GFL_ProcInitSubsystem(proc, sizeof(IrcSyncCheckWork), HEAP_ID);
     MI_CpuFill8(wk, 0, sizeof(IrcSyncCheckWork));
     wk->param = syncParam;
-    wk->param->unk11 = 0;
+    wk->param->retries = 0;
     IrcSyncNet_Init(&wk->net, wk->param->sys);
     IrcSyncCheckGraphic_Create(&wk->graphic, HEAP_ID);
     IrcSyncCheckText_Init(&wk->text, FALSE, HEAP_ID);
@@ -443,36 +493,36 @@ static BOOL IrcSyncCheck_Main(GameProc *proc, u32 *state, void *param, void *wor
     IrcSyncCheckWork *wk = work;
 
     switch (*state) {
-    case 0:
-        *state = 1;
+    case MAIN_STEP_START:
+        *state = MAIN_STEP_FADE_IN;
         break;
-    case 1:
+    case MAIN_STEP_FADE_IN:
         GFL_FadeSet(3, 16, 0, 0);
-        *state = 2;
+        *state = MAIN_STEP_WAIT_FADE_IN;
         break;
-    case 2:
+    case MAIN_STEP_WAIT_FADE_IN:
         if (GFL_FadeIsRunning()) {
             break;
         }
-        *state = 3;
+        *state = MAIN_STEP_RUN;
         break;
-    case 3:
+    case MAIN_STEP_RUN:
         wk->step(wk, &wk->stepState);
         if (wk->stepDone) {
-            *state = 4;
+            *state = MAIN_STEP_FADE_OUT;
         }
         break;
-    case 4:
+    case MAIN_STEP_FADE_OUT:
         GFL_FadeSet(3, 0, 16, 0);
-        *state = 5;
+        *state = MAIN_STEP_WAIT_FADE_OUT;
         break;
-    case 5:
+    case MAIN_STEP_WAIT_FADE_OUT:
         if (GFL_FadeIsRunning()) {
             break;
         }
-        *state = 6;
+        *state = MAIN_STEP_END;
         break;
-    case 6:
+    case MAIN_STEP_END:
         return TRUE;
     }
     if (IrcSyncCheckText_Update(&wk->text)) {
@@ -944,7 +994,7 @@ static void IrcSyncCheck_StepWaitFirst(IrcSyncCheckWork *wk, u16 *state) {
         IrcSyncCheck_SetStepDone(wk);
     } else if (!IrcAppBar_IsPressedOrDone(wk->button)) {
         switch (*state) {
-        case 0:
+        case WAIT_FIRST_STEP_PRINT:
             if (IrcSyncTrace_IsDone(&wk->traceA)) {
                 IrcSyncCheckWindow_PrintMsg(&wk->messageWindow, &wk->text, BtlMain3_Text_PleaseRemoveBothThumbs, 0, 0);
             } else {
@@ -964,9 +1014,9 @@ static void IrcSyncCheck_StepWaitFirst(IrcSyncCheckWork *wk, u16 *state) {
             GFL_SndStop();
             IrcSyncCheck_ShowOutlines(OUTLINE_FIRST, HEAP_ID);
             wk->hintTimer = 0;
-            *state = 1;
+            *state = WAIT_FIRST_STEP_WAIT_PRESS;
             break;
-        case 1:
+        case WAIT_FIRST_STEP_WAIT_PRESS:
             if (IrcSyncRect_IsPressed(&sIrcSyncCheckRectFirst, first)) {
                 IrcSyncCheck_ShowOutlines(0, HEAP_ID);
                 wk->hintTimer = 0;
@@ -978,7 +1028,7 @@ static void IrcSyncCheck_StepWaitFirst(IrcSyncCheckWork *wk, u16 *state) {
                 if (IrcSyncTrace_IsDone(&wk->traceA)) {
                     IrcSyncCheckWindow_PrintMsg(&wk->messageWindow, &wk->text, BtlMain3_Text_KeepLeftThumbSteady, 0, 0);
                     IrcSyncCheck_ShowOutlines(OUTLINE_FIRST | OUTLINE_SECOND, HEAP_ID);
-                    IrcSyncCheck_SetStepAt(wk, IrcSyncCheck_StepTraceA, 1);
+                    IrcSyncCheck_SetStepAt(wk, IrcSyncCheck_StepTraceA, TRACE_A_STEP_WAIT_SECOND);
                 } else {
                     if (wk->param->gsys != NULL) {
                         IrcSyncCheckWindow_PrintMsgPlayer(&wk->messageWindow, &wk->text,
@@ -1021,12 +1071,12 @@ static void IrcSyncCheck_StepTraceA(IrcSyncCheckWork *wk, u16 *state) {
         IrcSyncCheck_SetStepDone(wk);
     } else if (!IrcAppBar_IsPressedOrDone(wk->button)) {
         switch (*state) {
-        case 0:
+        case TRACE_A_STEP_FIRST:
             if (IrcSyncRect_IsHeld(&sIrcSyncCheckRectFirst, &point)) {
                 if (IrcSyncTrace_Update(trace, &sIrcSyncCheckRectFirst)) {
                     IrcSyncCheckWindow_PrintMsg(&wk->messageWindow, &wk->text, BtlMain3_Text_KeepLeftThumbSteady, 0, 0);
                     IrcSyncCheck_ShowOutlines(OUTLINE_FIRST | OUTLINE_SECOND, HEAP_ID);
-                    *state = 1;
+                    *state = TRACE_A_STEP_WAIT_SECOND;
                 }
                 thumbs = IrcSyncCheckGraphic_GetThumbs(&wk->graphic);
                 IrcSyncCheckThumbs_SetAnimation(thumbs, 0, 1);
@@ -1035,14 +1085,14 @@ static void IrcSyncCheck_StepTraceA(IrcSyncCheckWork *wk, u16 *state) {
                 if (IrcSyncTrace_IsDone(trace)) {
                     IrcSyncCheckWindow_PrintMsg(&wk->messageWindow, &wk->text, BtlMain3_Text_KeepLeftThumbSteady, 0, 0);
                     IrcSyncCheck_ShowOutlines(OUTLINE_FIRST | OUTLINE_SECOND, HEAP_ID);
-                    *state = 1;
+                    *state = TRACE_A_STEP_WAIT_SECOND;
                 } else {
                     IrcSyncTrace_Clear(trace);
                 }
-                *state = 2;
+                *state = TRACE_A_STEP_RETRY;
             }
             break;
-        case 1:
+        case TRACE_A_STEP_WAIT_SECOND:
             if (IrcSyncRect_IsHeld(&sIrcSyncCheckRectSecond, second)) {
                 IrcSyncCheck_ShowOutlines(0, HEAP_ID);
                 if (wk->param->gsys != NULL) {
@@ -1059,10 +1109,10 @@ static void IrcSyncCheck_StepTraceA(IrcSyncCheckWork *wk, u16 *state) {
                 IrcSyncCheckThumbs_Place(thumbs, 1, second->x, second->y);
                 GFL_SndSEPlay(SEQ_SE_SYS_23);
             } else if (!IrcSyncRect_IsHeld(&sIrcSyncCheckRectFirst, &point)) {
-                *state = 2;
+                *state = TRACE_A_STEP_RETRY;
             }
             break;
-        case 2:
+        case TRACE_A_STEP_RETRY:
             wk->retries++;
             IrcSyncCheck_SetStep(wk, IrcSyncCheck_StepWaitFirst);
             break;
@@ -1084,7 +1134,7 @@ static void IrcSyncCheck_StepTraceB(IrcSyncCheckWork *wk, u16 *state) {
         IrcSyncCheck_SetStepDone(wk);
     } else if (!IrcAppBar_IsPressedOrDone(wk->button)) {
         switch (*state) {
-        case 0:
+        case TRACE_B_STEP_TRACE:
             if (IrcSyncRect_IsHeld(&sIrcSyncCheckRectSecond, &point)) {
                 if (IrcSyncTrace_Update(trace, &sIrcSyncCheckRectSecond)) {
                     IrcSyncCheckWindow_PrintMsg(&wk->messageWindow, &wk->text,
@@ -1099,10 +1149,10 @@ static void IrcSyncCheck_StepTraceB(IrcSyncCheckWork *wk, u16 *state) {
                 thumbs = IrcSyncCheckGraphic_GetThumbs(&wk->graphic);
                 IrcSyncCheckThumbs_SetAnimation(thumbs, 1, 0);
                 IrcSyncTrace_Clear(trace);
-                *state = 1;
+                *state = TRACE_B_STEP_RETRY;
             }
             break;
-        case 1:
+        case TRACE_B_STEP_RETRY:
             wk->retries++;
             IrcSyncCheck_SetStep(wk, IrcSyncCheck_StepWaitFirst);
             break;
@@ -1179,10 +1229,10 @@ static void IrcSyncCheck_StepResult(IrcSyncCheckWork *wk, u16 *state) {
         if (wk->counter++ < DONE_FRAMES) {
             return;
         }
-        wk->param->unk10 = IrcSyncCheck_ComputeScore(wk);
+        wk->param->score = IrcSyncCheck_ComputeScore(wk);
         IrcSyncNet_GetReceived(&wk->net, &received);
-        wk->param->unk11 = wk->retries + received.retries;
-        wk->param->unk12 = received.isNew;
+        wk->param->retries = wk->retries + received.retries;
+        wk->param->isNew = received.isNew;
         wk->param->result = IRC_SYNC_CHECK_RESULT_DONE;
         *state = RESULT_FINISH;
         return;
@@ -1203,34 +1253,34 @@ static void IrcSyncCheck_StepResult(IrcSyncCheckWork *wk, u16 *state) {
 // The link broke: ends the screen
 static void IrcSyncCheck_StepInterrupted(IrcSyncCheckWork *wk, u16 *state) {
     switch (*state) {
-    case 0:
+    case INTERRUPTED_STEP_CHECK:
         if (CompatibleIrcSys_GetPendingCount(wk->param->sys) > 0) {
-            *state = 1;
+            *state = INTERRUPTED_STEP_SET_RESULT;
             return;
         }
         if (CompatibleIrcSys_GetPendingCount(wk->param->sys) < 0) {
-            wk->param->unk10 = 0;
+            wk->param->score = 0;
             wk->param->result = IRC_SYNC_CHECK_RESULT_INTERRUPTED;
             IrcSyncCheck_SetStepDone(wk);
             return;
         }
         break;
-    case 1:
-        wk->param->unk10 = 0;
+    case INTERRUPTED_STEP_SET_RESULT:
+        wk->param->score = 0;
         wk->param->result = IRC_SYNC_CHECK_RESULT_INTERRUPTED;
-        *state = 2;
+        *state = INTERRUPTED_STEP_PRINT;
         break;
-    case 2:
+    case INTERRUPTED_STEP_PRINT:
         IrcSyncCheckWindow_PrintMsg(&wk->messageWindow, &wk->text, BtlMain3_Text_ConnectionInterruptedPleaseCreate, 0,
                                     0);
-        *state = 3;
+        *state = INTERRUPTED_STEP_EXCHANGE_IDS;
         break;
-    case 3:
+    case INTERRUPTED_STEP_EXCHANGE_IDS:
         if (CompatibleIrcSys_ExchangeIds(wk->param->sys, 6)) {
-            *state = 4;
+            *state = INTERRUPTED_STEP_END;
         }
         break;
-    case 4:
+    case INTERRUPTED_STEP_END:
         IrcSyncCheck_SetStepDone(wk);
         break;
     }
@@ -1250,20 +1300,20 @@ static void IrcSyncNet_Free(IrcSyncNet *net) {
 // Sends the data, and returns TRUE once the other player's has also arrived
 static BOOL IrcSyncNet_Send(IrcSyncNet *net, const IrcSyncData *data) {
     switch (net->state) {
-    case 0:
+    case NET_STEP_STORE:
         net->send = *data;
-        net->state = 1;
+        net->state = NET_STEP_SEND;
         break;
-    case 1:
+    case NET_STEP_SEND:
         if (CompatibleIrcSys_SendEx(net->sys, NET_COMMAND_BASE, sizeof(IrcSyncData), &net->send,
                                     !GFL_NetGetHandleNetId(NetHandle_GetOwn()), 0, FALSE, TRUE)) {
-            net->state = 2;
+            net->state = NET_STEP_WAIT_RECEIVED;
         }
         break;
-    case 2:
+    case NET_STEP_WAIT_RECEIVED:
         if (net->received) {
             net->received = FALSE;
-            net->state = 0;
+            net->state = NET_STEP_STORE;
             return TRUE;
         }
         break;
@@ -1338,7 +1388,7 @@ static void IrcSyncCheckThumbs_Place(IrcSyncCheckThumbs *thumbs, int index, int 
     VecFx32 direction;
 
     switch (index) {
-    case 0:
+    case THUMB_FIRST:
         NNS_G3dScrPosToWorldLine(x, y, &nearPos, &farPos);
         VEC_Subtract(&farPos, &nearPos, &direction);
         VEC_Normalize(&direction, &direction);
@@ -1347,7 +1397,7 @@ static void IrcSyncCheckThumbs_Place(IrcSyncCheckThumbs *thumbs, int index, int 
         thumbs->lastX = x;
         thumbs->lastY = y;
         break;
-    case 1:
+    case THUMB_SECOND:
         NNS_G3dScrPosToWorldLine(thumbs->lastX + (x - thumbs->lastX) * 2, thumbs->lastY + (y - thumbs->lastY) * 2,
                                  &nearPos, &farPos);
         VEC_Subtract(&farPos, &nearPos, &direction);

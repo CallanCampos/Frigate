@@ -71,7 +71,7 @@ typedef struct {
     const char *attr2;
     const char *attr3;
     NetCommonDownloadSelectFunc select;
-    u32 unk14;
+    u32 fileSize;
 } NetCommonDownloadFileListArgs;
 
 typedef struct {

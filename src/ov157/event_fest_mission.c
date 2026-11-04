@@ -41,6 +41,53 @@
 #define MEDAL_MISSION_JOIN_1 0xe3
 #define MEDAL_MISSION_JOIN_10 0xe4
 
+// The steps of a message
+enum {
+    MSG_STEP_PRINT,
+    MSG_STEP_WAIT_BUTTON,
+};
+
+// The steps of the event that starts a mission
+enum {
+    START_STEP_BEGIN,
+    START_STEP_WAIT_MUSIC,
+    START_STEP_CLOSE_WINDOW,
+    START_STEP_CLOSE_FIELD,
+    START_STEP_OPEN_FIELD,
+    START_STEP_TRANSITION_IN,
+    START_STEP_EXIT,
+};
+
+// The steps of the event that shows a message
+enum {
+    MESSAGE_STEP_SHOW,
+    MESSAGE_STEP_RECORD,
+};
+
+// The steps of the event that opens the menu
+enum {
+    MENU_STEP_EFFECT,
+    MENU_STEP_MESSAGE,
+    MENU_STEP_OPEN,
+};
+
+// The steps of the event that shows the mission's information
+enum {
+    INFO_STEP_MESSAGE,
+    INFO_STEP_SHOW,
+    INFO_STEP_WAIT_BUTTON,
+};
+
+// The steps of the event that ends a mission
+enum {
+    END_STEP_MESSAGE,
+    END_STEP_TRANSITION_OUT,
+    END_STEP_RESTORE_MUSIC,
+    END_STEP_CLOSE_FIELD,
+    END_STEP_OPEN_FIELD,
+    END_STEP_TRANSITION_IN,
+};
+
 typedef struct {
     u8 unk00;
     // Whether the player joins another's mission, rather than hosting it
@@ -207,7 +254,7 @@ static GameEventReturnCode FestMissionMsg_Callback(GameEvent *event, u32 *state,
     FestMissionMsgWork *work = data;
 
     switch (work->state) {
-    case 0:
+    case MSG_STEP_PRINT:
         if (MsgBGPrinter_InfoSysWinMain(work->window)) {
             if (!work->waitButton) {
                 break;
@@ -215,7 +262,7 @@ static GameEventReturnCode FestMissionMsg_Callback(GameEvent *event, u32 *state,
             work->state++;
         }
         return GAMEEVENT_CONTINUE;
-    case 1:
+    case MSG_STEP_WAIT_BUTTON:
         if (!(GCTX_HIDGetPressedKeys() &
               (PAD_BUTTON_A | PAD_BUTTON_B | PAD_KEY_RIGHT | PAD_KEY_LEFT | PAD_KEY_UP | PAD_KEY_DOWN))) {
             return GAMEEVENT_CONTINUE;
@@ -240,7 +287,7 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
     GameEvent *next;
 
     switch (*state) {
-    case 0:
+    case START_STEP_BEGIN:
         save = GameData_GetSaveControl(work->gameData);
         records = FestRecords_GetFromSave(save);
         medalBox = SaveControl_GetMedalBox(save);
@@ -276,7 +323,7 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
         FestMission_PrintStart(work);
         (*state)++;
         break;
-    case 1:
+    case START_STEP_WAIT_MUSIC:
         if (GFL_SndBGMIsPlaying()) {
             break;
         }
@@ -289,13 +336,13 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
         }
         (*state)++;
         break;
-    case 2:
+    case START_STEP_CLOSE_WINDOW:
         MsgBGPrinter_ClearInfoMsgWin(work->window);
         MsgBGPrinter_DeleteInfoMsgWin(work->window);
         FesGimmick_StartMission(Field_GetFesGimmick(work->field));
         FestMission_OnZoneEnter(work->gsys, Field_GetPlayerStateZoneID(work->field));
         if (!work->joined) {
-            *state = 6;
+            *state = START_STEP_EXIT;
             break;
         }
         GFL_SndSEPlay(SEQ_SE_W295_01);
@@ -303,22 +350,22 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
             event, CallFieldMapEntranceOutTransitionDefault(work->gsys, work->field, FIELD_TRANSITION_FADE_WHITE, 0));
         (*state)++;
         break;
-    case 3:
+    case START_STEP_CLOSE_FIELD:
         EncountSystem_CancelPhenomenon(Field_GetEncountSystem(work->field));
         FieldSubscreen_ChangeImm(Field_GetSubscreen(work->field), 10);
         GameEvent_ChainNext(event, CreateFieldCloseEvent(work->gsys, work->field));
         (*state)++;
         break;
-    case 4:
+    case START_STEP_OPEN_FIELD:
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(work->gsys));
         (*state)++;
         break;
-    case 5:
+    case START_STEP_TRANSITION_IN:
         GameEvent_ChainNext(
             event, CallFieldMapEntranceInTransition(work->gsys, work->field, FIELD_TRANSITION_FADE_WHITE, 0, 1, 0, 0));
         (*state)++;
         break;
-    case 6:
+    case START_STEP_EXIT:
         if (work->joined) {
             LinkFestival_StartTimer(work->festival, work->joined);
         }
@@ -332,11 +379,11 @@ static GameEventReturnCode EventFestMissionMessage_Callback(GameEvent *event, u3
     FestMissionEventWork *work = data;
 
     switch (*state) {
-    case 0:
+    case MESSAGE_STEP_SHOW:
         FestMissionMsg_Call(work->gsys, event, work->msgBGSys, work->msgData, work->messageType + 4, TRUE);
         (*state)++;
         break;
-    case 1:
+    case MESSAGE_STEP_RECORD:
         FestMissionOffers_Remove(work->festival, &work->mission);
         LinkFestival_AddRecord(work->festival, &work->mission);
         FestMissionEvent_Exit(work);
@@ -350,15 +397,15 @@ static GameEventReturnCode EventFestMissionMenu_Callback(GameEvent *event, u32 *
     u32 menuArgs;
 
     switch (*state) {
-    case 0:
+    case MENU_STEP_EFFECT:
         GameEvent_ChainNext(event, EventFieldEffect_Create(work->gsys, Field_Get3DCi(work->field), 0x69));
         (*state)++;
         break;
-    case 1:
+    case MENU_STEP_MESSAGE:
         FestMissionMsg_CallNoWait(work->gsys, event, work->msgBGSys, work->msgData, 1);
         (*state)++;
         break;
-    case 2:
+    case MENU_STEP_OPEN:
         menuArgs = 1;
         GameEvent_ChainNext(event, GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_EVENT_FESTIVAL,
                                                                    EventFestival_Create, &menuArgs));
@@ -375,17 +422,17 @@ static GameEventReturnCode EventFestMissionInfo_Callback(GameEvent *event, u32 *
     FestMissionEventWork *work = data;
 
     switch (*state) {
-    case 0:
+    case INFO_STEP_MESSAGE:
         FestMissionMsg_CallNoWait(work->gsys, event, work->msgBGSys, work->msgData, 2);
         (*state)++;
         break;
-    case 1:
+    case INFO_STEP_SHOW:
         work->window = MsgBGPrinter_CreateInfoMsgWin(work->msgBGSys, work->msgData, 1, 1, 30, 20);
         MsgBGPrinter_ClearInfoMsgWin(work->window);
         FestMission_PrintInfo(work);
         (*state)++;
         break;
-    case 2:
+    case INFO_STEP_WAIT_BUTTON:
         if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
             (*state)++;
         }
@@ -405,16 +452,16 @@ static GameEventReturnCode EventFestMissionEnd_Callback(GameEvent *event, u32 *s
     u32 bgm;
 
     switch (*state) {
-    case 0:
+    case END_STEP_MESSAGE:
         FestMissionMsg_CallNoWait(work->gsys, event, work->msgBGSys, work->msgData, work->endType + 3);
         (*state)++;
         break;
-    case 1:
+    case END_STEP_TRANSITION_OUT:
         GameEvent_ChainNext(
             event, CallFieldMapEntranceOutTransitionDefault(work->gsys, work->field, FIELD_TRANSITION_FADE_WHITE, 0));
         (*state)++;
         break;
-    case 2:
+    case END_STEP_RESTORE_MUSIC:
         FesGimmick_EndMission(Field_GetFesGimmick(work->field));
         bgm = LinkFestival_GetNormalChangeBGMID(work->festival);
         if (bgm != (u32)-1) {
@@ -422,15 +469,15 @@ static GameEventReturnCode EventFestMissionEnd_Callback(GameEvent *event, u32 *s
         }
         (*state)++;
         break;
-    case 3:
+    case END_STEP_CLOSE_FIELD:
         GameEvent_ChainNext(event, CreateFieldCloseEvent(work->gsys, work->field));
         (*state)++;
         break;
-    case 4:
+    case END_STEP_OPEN_FIELD:
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(work->gsys));
         (*state)++;
         break;
-    case 5:
+    case END_STEP_TRANSITION_IN:
         FieldSubscreen_ChangeImm(Field_GetSubscreen(work->field), 0);
         GameEvent_ChainNext(
             event, CallFieldMapEntranceInTransition(work->gsys, work->field, FIELD_TRANSITION_FADE_WHITE, 0, 1, 0, 0));

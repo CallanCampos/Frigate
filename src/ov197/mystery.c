@@ -1314,7 +1314,7 @@ static void MysterySeq_WifiLogin(MysterySeq *seq, u32 *state, void *work) {
         wk->loginParam->unk4 = 0;
         wk->loginParam->unk8 = 1;
         wk->loginParam->buffer = NULL;
-        wk->loginParam->unk18 = 0;
+        wk->loginParam->keepBgm = 0;
         wk->loginParam->unkC = 9;
         if (MysteryGiftSave_GetKind(wk->giftSave) == 0) {
             wk->loginParam->unk14 = 2;

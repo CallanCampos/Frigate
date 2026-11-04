@@ -88,7 +88,7 @@ static void FesMissionHollow_Shuffle(u8 *list, int count, MATHRandContext32 *ran
 
 BOOL FesMissionHollow_IsActive(FesGimmick *gimmick) {
     FestMissionConfig *mission = GetFestMissionCfg(gimmick->festival);
-    if (mission->info.target == 5 && mission->info.targetVariant != 0) {
+    if (mission->info.target == FES_MISSION_TARGET_HOLLOW && mission->info.targetVariant != 0) {
         return TRUE;
     }
     return FALSE;

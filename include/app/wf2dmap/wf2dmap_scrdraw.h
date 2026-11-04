@@ -27,8 +27,8 @@ typedef struct {
 
 typedef struct WF2DMAP_SCRDRAW WF2DMAP_SCRDRAW;
 
-// unk1 is never used
-WF2DMAP_SCRDRAW *WF2DMAP_SCRDrawSysInit(ClActRenderer *renderer, void *unk1, const WF2DMAP_SCRDRAWINIT *init,
+// unused is never read
+WF2DMAP_SCRDRAW *WF2DMAP_SCRDrawSysInit(ClActRenderer *renderer, void *unused, const WF2DMAP_SCRDRAWINIT *init,
                                         u32 heapId);
 void WF2DMAP_SCRDrawSysExit(WF2DMAP_SCRDRAW *sys);
 void WF2DMAP_SCRDrawSysMain(WF2DMAP_SCRDRAW *sys, const WF2DMAP_SCROLL *scroll);

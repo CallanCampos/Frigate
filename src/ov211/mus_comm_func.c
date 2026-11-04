@@ -94,6 +94,28 @@ enum {
 #define MUS_COMM_EQUIP_NONE 10
 #define MUS_COMM_EQUIP_QUEUE_MAX 8
 #define MUS_COMM_EQUIP_QUEUE_EMPTY 0xffff
+// A slot of a player's equips that has no result yet
+#define MUS_COMM_EQUIP_RESULT_NONE 0xff
+
+// The roles of MusCommWork's role
+#define MUS_COMM_ROLE_PARENT 1
+#define MUS_COMM_ROLE_CHILD 2
+
+// How a prop's use went, as its player's machine hears it: the audience's reaction is the one of a prop with few points
+// or with many (see StaActing_ScoreItem)
+enum {
+    MUS_COMM_EQUIP_RESULT_PLAIN = 1,
+    MUS_COMM_EQUIP_RESULT_GOOD,
+};
+
+// What MusCommWork's soundState is
+enum {
+    MUS_COMM_SOUND_IDLE,
+    MUS_COMM_SOUND_SEND_SIZE,
+    MUS_COMM_SOUND_WAIT_SIZE,
+    MUS_COMM_SOUND_SEND_CHUNK,
+    MUS_COMM_SOUND_WAIT_CHUNK,
+};
 
 // A small message
 typedef struct {
@@ -145,7 +167,7 @@ struct MusCommWork {
     BOOL unk18;
     u8 unk1C;
     MusCommBeacon beacon;
-    // 1 for the parent, 2 for a child
+    // MUS_COMM_ROLE_*
     s32 role;
     s32 state;
     GameCommSys *comm;
@@ -182,7 +204,7 @@ struct MusCommWork {
     BOOL programReceived;
     BOOL msgArcReceived;
     BOOL scriptReceived;
-    // The sound data's state: 1 to start sending, 2 waiting, 3 to send a chunk, 4 waiting for the chunk to be sent
+    // MUS_COMM_SOUND_*: the size is sent, then the chunks one at a time
     s32 soundState;
     // The position of the Pokémon in the limelight, 4 or more for none
     u8 limelightPos;
@@ -320,11 +342,19 @@ void *MusComm_Init(u32 *seq, void *param) {
     return work;
 }
 
+// The steps of leaving: tell the others, wait for them, and handle an error
+enum {
+    MUS_COMM_EXIT_START,
+    MUS_COMM_EXIT_WAIT_TIMING,
+    MUS_COMM_EXIT_LEAVE,
+    MUS_COMM_EXIT_ERROR = 10,
+};
+
 BOOL MusComm_Exit(u32 *seq, void *param, void *work_) {
     MusCommWork *work = param;
 
     switch ((int)*seq) {
-    case 0:
+    case MUS_COMM_EXIT_START:
         if (GFL_NetGetNegotiatedCount() <= 1) {
             GFL_NetExit(NULL);
             return TRUE;
@@ -335,20 +365,20 @@ BOOL MusComm_Exit(u32 *seq, void *param, void *work_) {
         if (work->ready == 1) {
             GFL_NetSetDisconnectError(FALSE);
             MusComm_SendTiming(work, MUS_COMM_TIMING_START);
-            *seq = 1;
+            *seq = MUS_COMM_EXIT_WAIT_TIMING;
         } else {
-            *seq = 2;
+            *seq = MUS_COMM_EXIT_LEAVE;
         }
         break;
-    case 1:
+    case MUS_COMM_EXIT_WAIT_TIMING:
         if (MusComm_IsTimingReached(work, MUS_COMM_TIMING_START) == TRUE) {
-            *seq = 2;
+            *seq = MUS_COMM_EXIT_LEAVE;
         }
         if (GFL_NetGetNegotiatedCount() <= 1 || GFL_NetErrCheck()) {
-            *seq = 10;
+            *seq = MUS_COMM_EXIT_ERROR;
         }
         break;
-    case 2:
+    case MUS_COMM_EXIT_LEAVE:
         if (work->ready == 0) {
             GFL_NetExit(NULL);
             return TRUE;
@@ -362,10 +392,10 @@ BOOL MusComm_Exit(u32 *seq, void *param, void *work_) {
             return TRUE;
         }
         if (GFL_NetErrCheck()) {
-            *seq = 10;
+            *seq = MUS_COMM_EXIT_ERROR;
         }
         break;
-    case 10:
+    case MUS_COMM_EXIT_ERROR:
         if (GFL_NetErrCheck()) {
             GSYS_SetNetErrorPending(work->gsys, 1);
         }
@@ -389,18 +419,18 @@ void MusComm_Update(u32 *seq, void *param, void *work) {
 
 void MusComm_UpdateRole(MusCommWork *comm) {
     if (GFL_NetIsParent() == 1) {
-        comm->role = 1;
+        comm->role = MUS_COMM_ROLE_PARENT;
     } else {
-        comm->role = 2;
+        comm->role = MUS_COMM_ROLE_CHILD;
     }
 }
 
 void MusComm_RegisterCommands(MusCommWork *comm) {
     NetCommand_AddTable(MUS_COMM_CMD_MSG, sMusCommCommands, NELEMS(sMusCommCommands), comm);
     if (GFL_NetIsParent() == 1) {
-        comm->role = 1;
+        comm->role = MUS_COMM_ROLE_PARENT;
     } else {
-        comm->role = 2;
+        comm->role = MUS_COMM_ROLE_CHILD;
     }
 }
 
@@ -434,7 +464,7 @@ void MusComm_SetUp(MusCommWork *comm, PlayerInfo *info, BoxPkm *pkm, GameCommSys
         comm->players[i].info = (PlayerInfo *)(comm->players[i].data + 4);
         comm->players[i].pkm = (BoxPkm *)(comm->players[i].data + 4 + PlayerInfo_GetSize());
         for (j = 0; j < 2; j++) {
-            comm->players[i].equips[j] = 0xff;
+            comm->players[i].equips[j] = MUS_COMM_EQUIP_RESULT_NONE;
         }
     }
     comm->musicalId = MusicalSave_GetTotalPoints(musical);
@@ -458,7 +488,7 @@ void MusComm_SetUp(MusCommWork *comm, PlayerInfo *info, BoxPkm *pkm, GameCommSys
     comm->msgArcSizeReceived = FALSE;
     comm->programReceived = FALSE;
     comm->msgArcReceived = FALSE;
-    comm->soundState = 0;
+    comm->soundState = MUS_COMM_SOUND_IDLE;
     comm->sendPlayerValues = FALSE;
     comm->equipQueued = FALSE;
     comm->limelightPos = 4;
@@ -532,7 +562,7 @@ static void MusComm_Main(MusCommWork *work) {
         break;
     case MUS_COMM_STATE_BOOT_WAIT:
         if (MusComm_IsTimingReached(work, MUS_COMM_TIMING_BOOT) == 1 && MusComm_SendPlayerData(work) == 1) {
-            if (work->role == 1) {
+            if (work->role == MUS_COMM_ROLE_PARENT) {
                 work->state = MUS_COMM_STATE_SEND_POSITIONS;
             } else {
                 work->state = MUS_COMM_STATE_WAIT_REQUEST;
@@ -559,7 +589,7 @@ static void MusComm_Main(MusCommWork *work) {
         break;
     case MUS_COMM_STATE_DATA_TIMING:
         if (MusComm_IsTimingReached(work, MUS_COMM_TIMING_DATA) == 1) {
-            if (work->role == 1) {
+            if (work->role == MUS_COMM_ROLE_PARENT) {
                 work->state = MUS_COMM_STATE_SEND_UNK144;
             } else {
                 work->state = MUS_COMM_STATE_WAIT_PROGRAM;
@@ -590,7 +620,7 @@ static void MusComm_Main(MusCommWork *work) {
         break;
     case MUS_COMM_STATE_PROGRAM_TIMING:
         if (MusComm_IsTimingReached(work, MUS_COMM_TIMING_PROGRAM) == 1) {
-            if (work->role == 1) {
+            if (work->role == MUS_COMM_ROLE_PARENT) {
                 if (MusComm_SendMsgArcSize(work) == 1) {
                     work->state = MUS_COMM_STATE_SEND_MSG_ARC_SIZE;
                 }
@@ -624,7 +654,7 @@ static void MusComm_Main(MusCommWork *work) {
         break;
     case MUS_COMM_STATE_SEND_POKE:
         if (MusComm_SendPoke(work, work->poke) == 1) {
-            if (work->role == 1) {
+            if (work->role == MUS_COMM_ROLE_PARENT) {
                 work->state = MUS_COMM_STATE_SEND_ALL_POKES;
             } else {
                 work->state = MUS_COMM_STATE_POKES_SENT;
@@ -786,12 +816,12 @@ static void MusComm_RecvMsg(int netId, int size, const void *data, void *work_, 
         break;
     case MUS_MSG_PLAYER_VALUE:
         work->players[netId].unk18 = msg->value;
-        if (work->role == 1) {
+        if (work->role == MUS_COMM_ROLE_PARENT) {
             work->sendPlayerValues = TRUE;
         }
         break;
     case MUS_MSG_ALL_PLAYER_VALUES:
-        if (work->role != 1) {
+        if (work->role != MUS_COMM_ROLE_PARENT) {
             work->players[0].unk18 = msg->value & 0xf;
             work->players[1].unk18 = (msg->value & 0xf0) >> 4;
             work->players[2].unk18 = (msg->value & 0xf00) >> 8;
@@ -799,29 +829,29 @@ static void MusComm_RecvMsg(int netId, int size, const void *data, void *work_, 
         }
         break;
     case MUS_MSG_PROGRAM_SIZE:
-        if (work->role == 2) {
-            work->ov210->unk4 = GFL_HeapAllocate(HEAPID_GAMEEVENT, msg->value, FALSE, "mus_comm_func.c", 1220);
+        if (work->role == MUS_COMM_ROLE_CHILD) {
+            work->ov210->programData = GFL_HeapAllocate(HEAPID_GAMEEVENT, msg->value, FALSE, "mus_comm_func.c", 1220);
             work->ov210->size[0] = msg->value;
         }
         work->programSizeReceived = TRUE;
         break;
     case MUS_MSG_MSG_ARC_SIZE:
-        if (work->role == 2) {
+        if (work->role == MUS_COMM_ROLE_CHILD) {
             work->ov210->msgArc = GFL_HeapAllocate(HEAPID_MUSICAL_EVENT, msg->value, FALSE, "mus_comm_func.c", 1229);
             work->ov210->size[1] = msg->value;
         }
         work->msgArcSizeReceived = TRUE;
         break;
     case MUS_MSG_SCRIPT_SIZE:
-        if (work->role == 2) {
+        if (work->role == MUS_COMM_ROLE_CHILD) {
             work->ov210->script = GFL_HeapAllocate(HEAPID_MUSICAL_EVENT, msg->value, FALSE, "mus_comm_func.c", 1238);
             work->ov210->size[2] = msg->value;
         }
         work->scriptSizeReceived = TRUE;
         break;
     case MUS_MSG_SOUND_SIZE:
-        if (work->role == 1) {
-            work->soundState = 3;
+        if (work->role == MUS_COMM_ROLE_PARENT) {
+            work->soundState = MUS_COMM_SOUND_SEND_CHUNK;
         } else {
             work->ov210->soundData = GFL_HeapAllocate(HEAPID_MUSICAL_EVENT, msg->value, FALSE, "mus_comm_func.c", 1251);
             work->ov210->soundDataSize = msg->value;
@@ -834,7 +864,7 @@ static void MusComm_RecvMsg(int netId, int size, const void *data, void *work_, 
         work->programNpcs = msg->value;
         break;
     case MUS_MSG_EQUIP_REQUEST:
-        if (work->role == 1) {
+        if (work->role == MUS_COMM_ROLE_PARENT) {
             work->players[netId].equipRequested = TRUE;
             work->players[netId].equipRequest = msg->value;
         }
@@ -861,14 +891,14 @@ static void MusComm_RecvMsg(int netId, int size, const void *data, void *work_, 
         u8 equip = msg->value;
 
         for (j = 0; j < 2; j++) {
-            if (work->players[pos].equips[j] == 0xff) {
+            if (work->players[pos].equips[j] == MUS_COMM_EQUIP_RESULT_NONE) {
                 work->players[pos].equips[j] = equip;
                 break;
             }
         }
-        if (result == 1) {
+        if (result == MUS_COMM_EQUIP_RESULT_PLAIN) {
             GFL_SndSEPlay(SEQ_SE_MSCL_11);
-        } else if (result == 2) {
+        } else if (result == MUS_COMM_EQUIP_RESULT_GOOD) {
             GFL_SndSEPlay(SEQ_SE_MSCL_10);
         }
         break;
@@ -1041,7 +1071,7 @@ void MusComm_StartSendingSound(MusCommWork *comm) {
     if (comm->soundStarted == 0) {
         comm->soundStarted = TRUE;
         comm->soundChunk = 0;
-        comm->soundState = 1;
+        comm->soundState = MUS_COMM_SOUND_SEND_SIZE;
         comm->soundChunkSent = FALSE;
     }
 }
@@ -1051,27 +1081,27 @@ static void MusComm_SendSoundData(MusCommWork *work) {
         return;
     }
     switch (work->soundState) {
-    case 0:
+    case MUS_COMM_SOUND_IDLE:
         break;
-    case 1:
+    case MUS_COMM_SOUND_SEND_SIZE:
         if (MusComm_SendMsg(work, MUS_MSG_SOUND_SIZE, work->ov210->soundDataSize, 0xff) == 1) {
-            work->soundState = 2;
+            work->soundState = MUS_COMM_SOUND_WAIT_SIZE;
         }
         break;
-    case 2:
+    case MUS_COMM_SOUND_WAIT_SIZE:
         break;
-    case 3:
+    case MUS_COMM_SOUND_SEND_CHUNK:
         if (MusComm_SendSoundChunk(work, work->soundChunk) == 1) {
             work->soundChunkSent = TRUE;
-            work->soundState = 4;
+            work->soundState = MUS_COMM_SOUND_WAIT_CHUNK;
         }
         break;
-    case 4:
+    case MUS_COMM_SOUND_WAIT_CHUNK:
         if (work->soundChunkSent == 0) {
             if (work->soundChunk * MUS_COMM_SOUND_CHUNK_SIZE >= work->ov210->soundDataSize) {
                 work->soundStarted = FALSE;
             } else {
-                work->soundState = 3;
+                work->soundState = MUS_COMM_SOUND_SEND_CHUNK;
             }
         }
         break;
@@ -1131,23 +1161,23 @@ static BOOL MusComm_SendScriptSize(MusCommWork *work) {
 static BOOL MusComm_SendProgram(MusCommWork *work) {
     NetHandle *handle;
 
-    MusComm_CheckData(work->ov210->unk4, work->ov210->size[0], 2);
+    MusComm_CheckData(work->ov210->programData, work->ov210->size[0], 2);
     handle = NetHandle_Get(0xff);
-    return GFL_NetSendCommandToMachine(handle, 0xff, MUS_COMM_CMD_PROGRAM_DATA, work->ov210->size[0], work->ov210->unk4,
-                                       1, FALSE, TRUE);
+    return GFL_NetSendCommandToMachine(handle, 0xff, MUS_COMM_CMD_PROGRAM_DATA, work->ov210->size[0],
+                                       work->ov210->programData, 1, FALSE, TRUE);
 }
 
 static void MusComm_RecvProgram(int netId, int size, const void *data, void *work, NetHandle *handle) {
     MusCommWork *comm = work;
 
     comm->programReceived = TRUE;
-    MusComm_CheckData(comm->ov210->unk4, comm->ov210->size[0], 0xc);
+    MusComm_CheckData(comm->ov210->programData, comm->ov210->size[0], 0xc);
 }
 
 static void *MusComm_GetProgramBuffer(int netId, void *work, int size) {
     MusCommWork *comm = work;
 
-    return comm->ov210->unk4;
+    return comm->ov210->programData;
 }
 
 static BOOL MusComm_SendMsgArc(MusCommWork *work) {
@@ -1279,8 +1309,8 @@ u32 MusComm_GetProgramNpcs(MusCommWork *comm) {
     return comm->programNpcs;
 }
 
-u8 MusComm_GetPlayerEquip(MusCommWork *comm, u8 index, u8 a2) {
-    return comm->players[index].equips[a2];
+u8 MusComm_GetPlayerEquip(MusCommWork *comm, u8 index, u8 equip) {
+    return comm->players[index].equips[equip];
 }
 
 void MusComm_SetEquipRequest(MusCommWork *comm, u8 pos, u8 equip) {

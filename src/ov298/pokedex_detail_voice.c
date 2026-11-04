@@ -377,8 +377,8 @@ static BOOL PokedexDetailVoice_Main(PokedexDetailProcSys *sys, int *seq, void *p
         PokedexDetailVoice_CreateTime(param, wk, common);
         PokedexDetailVoice_PrintTime(param, wk, common, 0, 0);
         wk->bgChars = PokedexDetail_LoadBG(FALSE, param->heapId, 2, 1, 0, 5, ARCID_POKEDEX_GRA, 1, 11, 43, 0);
-        wk->backgroundMain = PokedexDetailBackground_Create(param->heapId, 2, 0, 2, 3);
-        wk->backgroundSub = PokedexDetailBackground_Create(param->heapId, 2, 4, 1, 2);
+        wk->backgroundMain = PokedexDetailBackground_Create(param->heapId, POKEDEX_DETAIL_PAGE_VOICE - 1, 0, 2, 3);
+        wk->backgroundSub = PokedexDetailBackground_Create(param->heapId, POKEDEX_DETAIL_PAGE_VOICE - 1, 4, 1, 2);
         PokedexDetailVoice_SetTimeDigits(param, wk, common, 0, 0);
         PokedexDetailVoice_CreateWave(param, wk, common);
         PokedexDetailPalFade_ReadPalettes(wk->palFade);

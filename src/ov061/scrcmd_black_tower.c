@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/version.h"
 #include "field/battle_facility.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -21,13 +22,6 @@ typedef struct {
     u32 unk0;
     u32 unk4;
 } BlackTowerUnkPair;
-
-// The one value here that differs by version
-#ifdef BLACK2
-#define AREA_VERSION_UNK 0x17
-#else
-#define AREA_VERSION_UNK 0x16
-#endif
 
 static const BlackTowerUnkPair *func_ov061_021e5f94(FieldScriptEnv *env);
 
@@ -63,9 +57,9 @@ static BOOL Scrcmd_BlackTower_SetProgress(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     SaveControl *save = GameData_GetSaveControl(gameData);
     u8 value = ScriptReadAny(vm, env);
-    u16 unk = GameData_GetMyCity(gameData);
+    u16 version = GameData_GetMyCity(gameData);
 
-    KeyDataSave_SetProgress(getKeyDataBlkAddress(save), value, unk);
+    KeyDataSave_SetProgress(getKeyDataBlkAddress(save), value, version);
     return FALSE;
 }
 
@@ -292,6 +286,20 @@ static BOOL Scrcmd_BlackTower_GetVersion(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
+// What Scrcmd_BlackTower_GetInfo is asked for
+enum {
+    BLACK_TOWER_INFO_AREA_FIRST_FLOOR,
+    BLACK_TOWER_INFO_AREA_FLOOR_COUNT,
+    BLACK_TOWER_INFO_ROOM,
+    BLACK_TOWER_INFO_TRAINER_COUNT,
+    BLACK_TOWER_INFO_DEFEATED_TRAINERS,
+    BLACK_TOWER_INFO_IS_BELOW_GOAL,
+    BLACK_TOWER_INFO_FLOOR_IN_AREA,
+    BLACK_TOWER_INFO_REWARD_ITEM = 9,
+    BLACK_TOWER_INFO_REWARD_COUNT,
+    BLACK_TOWER_INFO_NO_PROGRESS,
+};
+
 static BOOL Scrcmd_BlackTower_GetInfo(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
@@ -301,42 +309,42 @@ static BOOL Scrcmd_BlackTower_GetInfo(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
     KeyDataSave *keyData =
         getKeyDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
-    u8 unk;
-    u8 unk2;
+    u8 value;
+    u8 progress1;
 
     switch (info) {
-    case 0:
+    case BLACK_TOWER_INFO_AREA_FIRST_FLOOR:
         *var = KeyDataSave_GetAreaFirstFloor((u8)arg);
         break;
-    case 1:
+    case BLACK_TOWER_INFO_AREA_FLOOR_COUNT:
         *var = KeyDataSave_GetAreaFloorCount(arg);
         break;
-    case 2:
+    case BLACK_TOWER_INFO_ROOM:
         *var = KeyDataSave_GetRoom(keyData);
         break;
-    case 6:
+    case BLACK_TOWER_INFO_FLOOR_IN_AREA:
         *var = KeyDataSave_GetFloorInArea(keyData);
         break;
-    case 3:
+    case BLACK_TOWER_INFO_TRAINER_COUNT:
         *var = InfinityDungeon_CountTrainers(dungeon);
         break;
-    case 4:
+    case BLACK_TOWER_INFO_DEFEATED_TRAINERS:
         *var = KeyDataSave_CountDefeatedTrainers(keyData);
         break;
-    case 5:
-        unk = KeyDataSave_GetRoom(keyData);
-        *var = InfinityDungeon_IsBelowGoal(dungeon, KeyDataSave_GetFloorInArea(keyData), unk);
+    case BLACK_TOWER_INFO_IS_BELOW_GOAL:
+        value = KeyDataSave_GetRoom(keyData);
+        *var = InfinityDungeon_IsBelowGoal(dungeon, KeyDataSave_GetFloorInArea(keyData), value);
         break;
-    case 9:
+    case BLACK_TOWER_INFO_REWARD_ITEM:
         *var = dungeon->rewardItem;
         break;
-    case 10:
+    case BLACK_TOWER_INFO_REWARD_COUNT:
         *var = dungeon->rewardCount;
         break;
-    case 11:
-        unk = KeyDataSave_GetProgress(keyData, 0);
-        unk2 = KeyDataSave_GetProgress(keyData, 1);
-        if (unk == 0 && unk2 == 0) {
+    case BLACK_TOWER_INFO_NO_PROGRESS:
+        value = KeyDataSave_GetProgress(keyData, 0);
+        progress1 = KeyDataSave_GetProgress(keyData, 1);
+        if (value == 0 && progress1 == 0) {
             *var = TRUE;
         } else {
             *var = FALSE;
@@ -346,8 +354,8 @@ static BOOL Scrcmd_BlackTower_GetInfo(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-// Used in the area where InfinityDungeon_GetVersion returns 0x17
-static const BlackTowerUnkPair sUnkPairs17[] = {
+// Used when InfinityDungeon_GetVersion returns VERSION_BLACK2
+static const BlackTowerUnkPair sUnkPairsBlack2[] = {
     { 0xb8, 0x22 }, { 0xba, 0x23 }, { 0xbc, 0x24 }, { 0xbe, 0x25 },  { 0xc0, 0x20 },  { 0xc2, 0x1f },
     { 0xc4, 0x1e }, { 0xc6, 0x21 }, { 0xc8, 0x20 }, { 0xca, 0x130 }, { 0x1f9, 0x21 },
 };
@@ -361,10 +369,10 @@ static const BlackTowerUnkPair *func_ov061_021e5f94(FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
     u8 level = KeyDataSave_GetArea(getKeyDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
-    u32 area = InfinityDungeon_GetVersion(dungeon);
-    const BlackTowerUnkPair *pairs = area == 0x17 ? sUnkPairs17 : sUnkPairs;
+    u32 version = InfinityDungeon_GetVersion(dungeon);
+    const BlackTowerUnkPair *pairs = version == VERSION_BLACK2 ? sUnkPairsBlack2 : sUnkPairs;
 
-    if (level == 9 && area != AREA_VERSION_UNK) {
+    if (level == 9 && version != GAME_VERSION) {
         level++;
     }
     return &pairs[level];

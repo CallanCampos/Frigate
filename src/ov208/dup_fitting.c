@@ -77,6 +77,56 @@ enum {
     DUP_FITTING_STATE_DONE_WAIT,
 };
 
+// How the held prop is held, and where it was taken from
+enum {
+    DUP_FITTING_HOLD_NONE,
+    DUP_FITTING_HOLD_RING,
+    DUP_FITTING_HOLD_PULLED,
+};
+
+enum {
+    DUP_FITTING_FROM_NONE,
+    DUP_FITTING_FROM_RING,
+    DUP_FITTING_FROM_STAGE,
+    DUP_FITTING_FROM_POKEMON,
+};
+
+// What the confirmation screen gives back each frame, and its two buttons
+enum {
+    DUP_FITTING_CONFIRM_PENDING,
+    DUP_FITTING_CONFIRM_ACCEPTED = 2,
+};
+
+enum {
+    DUP_FITTING_CONFIRM_BUTTON_OK,
+    DUP_FITTING_CONFIRM_BUTTON_BACK,
+};
+
+// The steps of the demonstration: the ring spins to a prop and back, then the hand drags a prop out and back
+enum {
+    DUP_FITTING_DEMO_SPIN = 1,
+    DUP_FITTING_DEMO_SPIN_WAIT,
+    DUP_FITTING_DEMO_SPIN_BACK,
+    DUP_FITTING_DEMO_SPIN_BACK_WAIT,
+    DUP_FITTING_DEMO_DRAG_OUT,
+    DUP_FITTING_DEMO_DRAG_OUT_WAIT,
+    DUP_FITTING_DEMO_DRAG_BACK,
+    DUP_FITTING_DEMO_DRAG_BACK_WAIT,
+    DUP_FITTING_DEMO_END,
+};
+
+// The kinds of prop, which the category messages are named after; the second of the ears and of the arms is its own
+enum {
+    DUP_FITTING_CATEGORY_EAR,
+    DUP_FITTING_CATEGORY_EAR_2,
+    DUP_FITTING_CATEGORY_HEAD,
+    DUP_FITTING_CATEGORY_FACE,
+    DUP_FITTING_CATEGORY_BODY,
+    DUP_FITTING_CATEGORY_WAIST,
+    DUP_FITTING_CATEGORY_ARM,
+    DUP_FITTING_CATEGORY_ARM_2,
+};
+
 struct DupFittingWork {
     HeapID heapId;
     MusicalDressUpParam *param;
@@ -248,8 +298,8 @@ DupFittingWork *DupFitting_Create(MusicalDressUpParam *param, HeapID heapId) {
     work->touching = FALSE;
     work->dragging = FALSE;
     work->heldNode = NULL;
-    work->holdState = 0;
-    work->holdKind = 0;
+    work->holdState = DUP_FITTING_HOLD_NONE;
+    work->holdKind = DUP_FITTING_FROM_NONE;
     work->autoScroll = FALSE;
     work->category = DUP_FITTING_CATEGORY_ORIGINAL;
     work->angle = 0;
@@ -392,7 +442,7 @@ u32 DupFitting_Main(DupFittingWork *work) {
         DupFitting_UpdateTransition(work);
         break;
     case DUP_FITTING_STATE_CONFIRM:
-        if (DupFitting_UpdateConfirm(work) == 2) {
+        if (DupFitting_UpdateConfirm(work) == DUP_FITTING_CONFIRM_ACCEPTED) {
             work->state = DUP_FITTING_STATE_DONE_WAIT;
             work->confirmTimer = 0;
             ClActor_SetVisible(work->okMark, TRUE);
@@ -1216,7 +1266,7 @@ static void DupFitting_UpdateInput(DupFittingWork *work) {
         if (work->touchY < 16) {
             work->touchY = 16;
         }
-        if (work->holdState == 2 && work->heldNode != NULL) {
+        if (work->holdState == DUP_FITTING_HOLD_PULLED && work->heldNode != NULL) {
             DupFitting_UpdateHeldItem(work, TRUE);
         } else if (work->touchStart == TRUE) {
             picked = DupFitting_PickFromList(work, work->wornList, 3);
@@ -1229,7 +1279,7 @@ static void DupFitting_UpdateInput(DupFittingWork *work) {
             }
         }
         if (picked == FALSE && selected == FALSE) {
-            if ((work->heldNode == NULL && work->touchStart == TRUE) || work->holdState == 1) {
+            if ((work->heldNode == NULL && work->touchStart == TRUE) || work->holdState == DUP_FITTING_HOLD_RING) {
                 s16 dy = work->touchY - 80;
                 s16 dx = work->touchX - 128;
                 BOOL inner = DupFitting_IsInEllipse(dx, dy, 28, 7.0f / 13.0f);
@@ -1239,8 +1289,9 @@ static void DupFitting_UpdateInput(DupFittingWork *work) {
                     ringDragged = TRUE;
                     DupFitting_UpdateCarouselDrag(work, dx, dy);
                 } else if ((inner == FALSE && outer == FALSE) || (inner == TRUE && outer == TRUE)) {
-                    if (DupFittingItemList_IsFull(work->stageList) == FALSE && work->holdState == 1 &&
-                        work->heldNode != NULL && MATH_ABS(work->angleSpeed) < 364) {
+                    if (DupFittingItemList_IsFull(work->stageList) == FALSE &&
+                        work->holdState == DUP_FITTING_HOLD_RING && work->heldNode != NULL &&
+                        MATH_ABS(work->angleSpeed) < 364) {
                         DupFitting_PullOffCopy(work);
                     }
                 }
@@ -1262,7 +1313,7 @@ static void DupFitting_UpdateInput(DupFittingWork *work) {
         BOOL inner = DupFitting_IsInEllipse(dx, dy, 28, 7.0f / 13.0f);
         BOOL outer = DupFitting_IsInEllipse(dx, dy, 68, 17.0f / 23.0f);
 
-        if (work->holdState == 2 && work->heldNode != NULL) {
+        if (work->holdState == DUP_FITTING_HOLD_PULLED && work->heldNode != NULL) {
             if (work->hoverPos != DUP_FITTING_EQUIP_NONE) {
                 DupFitting_WearItem(work);
             } else if (inner == FALSE && outer == TRUE) {
@@ -1275,8 +1326,8 @@ static void DupFitting_UpdateInput(DupFittingWork *work) {
         }
         work->dragging = FALSE;
         work->heldNode = NULL;
-        work->holdState = 0;
-        work->holdKind = 0;
+        work->holdState = DUP_FITTING_HOLD_NONE;
+        work->holdKind = DUP_FITTING_FROM_NONE;
         work->hoverPos = DUP_FITTING_EQUIP_NONE;
     }
     if (work->angleSpeed != 0 && ringDragged == FALSE) {
@@ -1325,7 +1376,7 @@ static void DupFitting_UpdateCarouselDrag(DupFittingWork *work, s16 x, s16 y) {
                 hit = TRUE;
                 if (entry->used == FALSE) {
                     work->heldNode = node;
-                    work->holdState = 1;
+                    work->holdState = DUP_FITTING_HOLD_RING;
                     node = NULL;
                 }
             }
@@ -1334,7 +1385,7 @@ static void DupFitting_UpdateCarouselDrag(DupFittingWork *work, s16 x, s16 y) {
             }
         }
         if (work->touchStart == TRUE && hit == TRUE && work->heldNode == NULL) {
-            work->holdState = 1;
+            work->holdState = DUP_FITTING_HOLD_RING;
             GFL_SndSEPlay(SEQ_SE_BEEP);
         }
     }
@@ -1382,7 +1433,7 @@ static BOOL DupFitting_PickFromList(DupFittingWork *work, DupFittingItemList *li
         if (DupFittingItemNode_IsAtPoint(node, work->touchX, work->touchY) == TRUE) {
             DupFittingPoint *pos = DupFittingItemNode_GetPos(node);
 
-            work->holdState = 2;
+            work->holdState = DUP_FITTING_HOLD_PULLED;
             work->heldNode = node;
             GFL_SndSEPlay(SEQ_SE_MSCL_02);
             work->holdKind = kind;
@@ -1420,7 +1471,7 @@ static void DupFitting_UpdateHeldItem(DupFittingWork *work, BOOL playSound) {
             vec.z = 26 * FX32_ONE;
         }
         if (DupFitting_HasWornInCategory(work, work->hoverPos) == FALSE) {
-            work->holdKind = 3;
+            work->holdKind = DUP_FITTING_FROM_POKEMON;
             work->holdOrigin.x = target.x;
             work->holdOrigin.y = target.y;
         }
@@ -1476,12 +1527,12 @@ static void DupFitting_PullOffCopy(DupFittingWork *work) {
     MusItemDraw_SetSize(work->itemSys, newDraw, size[1], size[0]);
     MusItemDraw_SetUseOffset(work->itemSys, newDraw, FALSE);
     origin = DupFittingItemNode_GetPos(work->heldNode);
-    work->holdKind = 1;
+    work->holdKind = DUP_FITTING_FROM_RING;
     work->holdOrigin.x = origin->x;
     work->holdOrigin.y = origin->y;
-    work->holdState = 2;
+    work->holdState = DUP_FITTING_HOLD_PULLED;
     work->heldNode = node;
-    work->holdKind = 1;
+    work->holdKind = DUP_FITTING_FROM_RING;
     entry->used = TRUE;
     DupFitting_RefreshCarouselItems(work);
     GFL_SndSEPlay(SEQ_SE_MSCL_04);
@@ -1631,7 +1682,7 @@ static void DupFitting_WearItem(DupFittingWork *work) {
 }
 
 static void DupFitting_ReleaseHeld(DupFittingWork *work) {
-    if (work->holdKind == 2) {
+    if (work->holdKind == DUP_FITTING_FROM_STAGE) {
         VecFx32 vec = { 0, 0, FX32_CONST(70) };
         MusItemDraw *draw = DupFittingItemNode_GetDraw(work->heldNode);
         DupFittingPoint touch;
@@ -1645,7 +1696,7 @@ static void DupFitting_ReleaseHeld(DupFittingWork *work) {
         DupFittingItemNode_SetPos(work->heldNode, &work->holdOrigin);
         DupFittingItemNode_SetFrames(work->heldNode, 10);
         DupFitting_RaiseHeldItem(work);
-    } else if (work->holdKind == 3) {
+    } else if (work->holdKind == DUP_FITTING_FROM_POKEMON) {
         VecFx32 vec;
         MusItemDraw *draw = DupFittingItemNode_GetDraw(work->heldNode);
         s32 pos = DupFittingItemNode_GetEquipPos(work->heldNode);
@@ -1680,7 +1731,7 @@ static void DupFitting_ReleaseHeld(DupFittingWork *work) {
         work->hoverPos = pos;
         DupFitting_WearItem(work);
         work->hoverPos = DUP_FITTING_EQUIP_NONE;
-    } else if (work->holdKind == 1) {
+    } else if (work->holdKind == DUP_FITTING_FROM_RING) {
         MusItemDraw *draw;
         DupFittingPoint touch;
 
@@ -1714,8 +1765,8 @@ static BOOL DupFitting_SelectCategory(DupFittingWork *work) {
     pos = DupFitting_FindNearestEquipPos(work, NULL, touch, &distance);
     if (pos != DUP_FITTING_EQUIP_NONE) {
         category = MusItemData_GetPosGroup(pos);
-        if (category == 7) {
-            category = 6;
+        if (category == DUP_FITTING_CATEGORY_ARM_2) {
+            category = DUP_FITTING_CATEGORY_ARM;
         }
         if (category == work->category) {
             DupFitting_SortEntries(work, DUP_FITTING_CATEGORY_ORIGINAL, index);
@@ -2057,12 +2108,12 @@ static u32 DupFitting_UpdateConfirm(DupFittingWork *work) {
     GFL_HIDGetTouchHeldPoint(&work->touchX, &work->touchY);
     hit = GFL_HIDGetTouchPressedRect(rects);
     switch (hit) {
-    case 0:
+    case DUP_FITTING_CONFIRM_BUTTON_OK:
         DupFitting_SaveWornItems(work);
         GFL_SndSEPlay(SEQ_SE_DECIDE3);
         DupFitting_ShowTouchEffect(work);
-        return 2;
-    case 1: {
+        return DUP_FITTING_CONFIRM_ACCEPTED;
+    case DUP_FITTING_CONFIRM_BUTTON_BACK: {
         WordSet *wordSet;
 
         work->state = DUP_FITTING_STATE_CONFIRM_OUT;
@@ -2081,7 +2132,7 @@ static u32 DupFitting_UpdateConfirm(DupFittingWork *work) {
         break;
     }
     DupFitting_UpdateShadow(work);
-    return 0;
+    return DUP_FITTING_CONFIRM_PENDING;
 }
 
 static void DupFitting_ResetRotations(DupFittingWork *work) {
@@ -2218,7 +2269,7 @@ static void DupFitting_StartDemo(DupFittingWork *work) {
 
     work->demo = TRUE;
     work->demoFrame = 0;
-    work->demoStage = 1;
+    work->demoStage = DUP_FITTING_DEMO_SPIN;
     i = 5;
     do {
         if (work->sorted[i]->used != TRUE) {
@@ -2246,46 +2297,46 @@ static void DupFitting_EndDemo(DupFittingWork *work) {
 
 static void DupFitting_UpdateDemo(DupFittingWork *work) {
     switch (work->demoStage) {
-    case 1: {
+    case DUP_FITTING_DEMO_SPIN: {
         u8 item = work->demoItem;
 
         DupFitting_DemoRotate(work, item * DUP_FITTING_RING_STEP, item * DUP_FITTING_RING_STEP, item * 15);
         break;
     }
-    case 2:
+    case DUP_FITTING_DEMO_SPIN_WAIT:
         DupFitting_DemoWait(work, 30);
         break;
-    case 3: {
+    case DUP_FITTING_DEMO_SPIN_BACK: {
         u8 item = work->demoItem;
         u16 target = item * DUP_FITTING_RING_STEP;
 
         DupFitting_DemoRotate(work, -target, -(item * DUP_FITTING_RING_STEP), item * 15);
         break;
     }
-    case 4:
+    case DUP_FITTING_DEMO_SPIN_BACK_WAIT:
         DupFitting_DemoWait(work, 30);
         break;
-    case 5: {
+    case DUP_FITTING_DEMO_DRAG_OUT: {
         DupFittingPoint from = { 162, 120 };
         DupFittingPoint to = { 192, 160 };
 
         DupFitting_DemoMoveHand(work, &from, &to, 60);
         break;
     }
-    case 6:
+    case DUP_FITTING_DEMO_DRAG_OUT_WAIT:
         DupFitting_DemoWait(work, 30);
         break;
-    case 7: {
+    case DUP_FITTING_DEMO_DRAG_BACK: {
         DupFittingPoint from = { 192, 160 };
         DupFittingPoint to = { 162, 120 };
 
         DupFitting_DemoMoveHand(work, &from, &to, 60);
         break;
     }
-    case 8:
+    case DUP_FITTING_DEMO_DRAG_BACK_WAIT:
         DupFitting_DemoWait(work, 30);
         break;
-    case 9:
+    case DUP_FITTING_DEMO_END:
         DupFitting_EndDemo(work);
         return;
     }
@@ -2425,24 +2476,24 @@ static void DupFitting_PrintCategory(DupFittingWork *work, s32 category) {
     }
     messageId = 0;
     switch (category) {
-    case 0:
-    case 1:
+    case DUP_FITTING_CATEGORY_EAR:
+    case DUP_FITTING_CATEGORY_EAR_2:
         messageId = TitleS005dWordSetMusicalInfo_Text_Ear;
         break;
-    case 2:
+    case DUP_FITTING_CATEGORY_HEAD:
         messageId = TitleS005dWordSetMusicalInfo_Text_Head;
         break;
-    case 3:
+    case DUP_FITTING_CATEGORY_FACE:
         messageId = TitleS005dWordSetMusicalInfo_Text_Face_3;
         break;
-    case 4:
+    case DUP_FITTING_CATEGORY_BODY:
         messageId = TitleS005dWordSetMusicalInfo_Text_Body;
         break;
-    case 5:
+    case DUP_FITTING_CATEGORY_WAIST:
         messageId = TitleS005dWordSetMusicalInfo_Text_Waist;
         break;
-    case 6:
-    case 7:
+    case DUP_FITTING_CATEGORY_ARM:
+    case DUP_FITTING_CATEGORY_ARM_2:
         messageId = TitleS005dWordSetMusicalInfo_Text_Arm;
         break;
     }

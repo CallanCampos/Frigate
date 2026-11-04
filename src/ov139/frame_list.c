@@ -1399,9 +1399,9 @@ void FrameList_RedrawCursor(FrameList *list) {
     SetCursorRow(list, LIST_CURSOR_NONE, list->cursor);
 }
 
-void FrameList_SetShownRows(FrameList *list, int a1) {
-    list->shownRows = a1;
-    if (list->firstRow > a1) {
+void FrameList_SetShownRows(FrameList *list, int shownRows) {
+    list->shownRows = shownRows;
+    if (list->firstRow > shownRows) {
         list->firstRow = 0;
     }
 }

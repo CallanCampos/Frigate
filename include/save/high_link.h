@@ -88,7 +88,7 @@ typedef struct {
     u8 level1;
     u8 level2;
     // The price in Pass Orbs, which the description shows
-    u16 unk02;
+    u16 price;
     u16 name;
     u16 info;
     // The strength of the effect: a percentage, an amount or a level

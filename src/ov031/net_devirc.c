@@ -26,7 +26,7 @@ static BOOL NetDevIrc_IsLinked(void);
 static BOOL NetDevIrc_IsConnectedSlot(void);
 static BOOL NetDevIrc_IsInitialized(void);
 static int NetDevIrc_GetConnectBits(void);
-static BOOL NetDevIrc_GetUnkCF0(void);
+static BOOL NetDevIrc_IsSendBlocked(void);
 static void NetDevIrc_StartLink(void);
 static void NetDevIrc_SetTimeoutSlot(int frames);
 static void NetDevIrc_SetPeerFilterSlot(GFLNetPeerFilter filter);
@@ -128,8 +128,8 @@ static int NetDevIrc_GetConnectBits(void) {
     return 0;
 }
 
-static BOOL NetDevIrc_GetUnkCF0(void) {
-    return NetIrc_GetUnkCF0();
+static BOOL NetDevIrc_IsSendBlocked(void) {
+    return NetIrc_IsSendBlocked();
 }
 
 static void NetDevIrc_StartLink(void) {
@@ -164,7 +164,7 @@ static GFLNetDevTable NetDevIrcTable = {
     .isSendTurn = NetDevIrc_GetSendTurn,
     .isPeerSeen = NetDevIrc_GetPeerSeen,
     .isLinked = NetDevIrc_IsLinked,
-    .unkB0 = NetDevIrc_GetUnkCF0,
+    .isSendBlocked = NetDevIrc_IsSendBlocked,
     .startLink = NetDevIrc_StartLink,
     .setTimeout = NetDevIrc_SetTimeoutSlot,
     .setPeerFilter = NetDevIrc_SetPeerFilterSlot,

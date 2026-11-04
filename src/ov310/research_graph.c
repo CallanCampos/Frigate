@@ -848,13 +848,18 @@ static void ResearchGraph_SeqSetup(ResearchGraph *wk) {
     ResearchGraph_EndSeq(wk);
 }
 
+enum {
+    RESTART_STEP_REQUEST = 0,
+    RESTART_STEP_WAIT,
+};
+
 static void ResearchGraph_SeqRestartComm(ResearchGraph *wk) {
     switch (ResearchGraph_GetSeqState(wk)) {
-    case 0:
+    case RESTART_STEP_REQUEST:
         ResearchGraph_RequestCommRestart(wk);
         ResearchGraph_NextSeqState(wk);
         break;
-    case 1:
+    case RESTART_STEP_WAIT:
         if (ResearchGraph_RestartComm(wk)) {
             ResearchGraph_EndSeq(wk);
         }
@@ -1110,9 +1115,15 @@ static void ResearchGraph_SeqCursor(ResearchGraph *wk) {
     }
 }
 
+enum {
+    OPEN_STEP_LOAD = 0,
+    OPEN_STEP_WAIT,
+    OPEN_STEP_SHOW,
+};
+
 static void ResearchGraph_SeqOpen(ResearchGraph *wk) {
     switch (ResearchGraph_GetSeqState(wk)) {
-    case 0:
+    case OPEN_STEP_LOAD:
         ResearchGraph_LoadData(wk);
         ResearchGraph_ClearNewResults(wk);
         ResearchGraph_ShowMessage(wk);
@@ -1124,7 +1135,7 @@ static void ResearchGraph_SeqOpen(ResearchGraph *wk) {
         ResearchGraph_SetArrowsVisible(wk, FALSE);
         ResearchGraph_NextSeqState(wk);
         break;
-    case 1:
+    case OPEN_STEP_WAIT:
         if (!GFL_SndPlayerIsActiveAny()) {
             if (wk->seqFrames >= OPEN_FRAMES) {
                 ResearchGraph_NextSeqState(wk);
@@ -1133,7 +1144,7 @@ static void ResearchGraph_SeqOpen(ResearchGraph *wk) {
             }
         }
         break;
-    case 2:
+    case OPEN_STEP_SHOW:
         wk->resultsShown = TRUE;
         ResearchGraph_FadeButtons(wk, TRUE);
         ResearchGraph_SetCursor(wk, CURSOR_ANSWER);
@@ -1157,13 +1168,18 @@ static void ResearchGraph_SeqOpen(ResearchGraph *wk) {
     }
 }
 
+enum {
+    PERCENT_STEP_SETUP = 0,
+    PERCENT_STEP_SHOW,
+};
+
 static void ResearchGraph_SeqShowPercentages(ResearchGraph *wk) {
     switch (ResearchGraph_GetSeqState(wk)) {
-    case 0:
+    case PERCENT_STEP_SETUP:
         ResearchGraph_SetupPercentages(wk);
         ResearchGraph_NextSeqState(wk);
         break;
-    case 1:
+    case PERCENT_STEP_SHOW:
         if (wk->seqFrames % PERCENTAGE_INTERVAL == 0) {
             ResearchGraph_ShowPercentage(wk, wk->percentagesShown++);
         }
@@ -1174,14 +1190,19 @@ static void ResearchGraph_SeqShowPercentages(ResearchGraph *wk) {
     }
 }
 
+enum {
+    FLASH_IN_STEP_START = 0,
+    FLASH_IN_STEP_WAIT,
+};
+
 static void ResearchGraph_SeqFlashIn(ResearchGraph *wk) {
     switch (ResearchGraph_GetSeqState(wk)) {
-    case 0:
+    case FLASH_IN_STEP_START:
         ResearchGraph_StopPaletteAnime(wk, ANIME_BUTTON_DISABLE);
         ResearchGraph_FlashIn(wk);
         ResearchGraph_NextSeqState(wk);
         break;
-    case 1:
+    case FLASH_IN_STEP_WAIT:
         if (ResearchGraph_IsPaletteFadeDone(wk)) {
             ResearchGraph_EndSeq(wk);
         }
@@ -1189,13 +1210,18 @@ static void ResearchGraph_SeqFlashIn(ResearchGraph *wk) {
     }
 }
 
+enum {
+    FLASH_OUT_STEP_START = 0,
+    FLASH_OUT_STEP_WAIT,
+};
+
 static void ResearchGraph_SeqFlashOut(ResearchGraph *wk) {
     switch (ResearchGraph_GetSeqState(wk)) {
-    case 0:
+    case FLASH_OUT_STEP_START:
         ResearchGraph_FlashOut(wk);
         ResearchGraph_NextSeqState(wk);
         break;
-    case 1:
+    case FLASH_OUT_STEP_WAIT:
         if (ResearchGraph_IsPaletteFadeDone(wk)) {
             ResearchGraph_UpdateButton(wk);
             ResearchGraph_EndSeq(wk);
@@ -1204,9 +1230,15 @@ static void ResearchGraph_SeqFlashOut(ResearchGraph *wk) {
     }
 }
 
+enum {
+    UPDATE_TOUCH_STEP_START = 0,
+    UPDATE_TOUCH_STEP_WAIT,
+    UPDATE_TOUCH_STEP_SWAP,
+};
+
 static void ResearchGraph_SeqUpdateTouch(ResearchGraph *wk) {
     switch (ResearchGraph_GetSeqState(wk)) {
-    case 0:
+    case UPDATE_TOUCH_STEP_START:
         wk->updating = TRUE;
         ResearchGraph_ClearNewResults(wk);
         ResearchGraph_ResetUpdateFrames(wk);
@@ -1227,7 +1259,7 @@ static void ResearchGraph_SeqUpdateTouch(ResearchGraph *wk) {
         CircleGraph_RequestGrow(ResearchGraph_GetNextGraph(wk));
         ResearchGraph_NextSeqState(wk);
         break;
-    case 1:
+    case UPDATE_TOUCH_STEP_WAIT:
         if (!GFL_SndPlayerIsActiveAny()) {
             if (wk->seqFrames >= UPDATE_FRAMES) {
                 ResearchGraph_NextSeqState(wk);
@@ -1236,7 +1268,7 @@ static void ResearchGraph_SeqUpdateTouch(ResearchGraph *wk) {
             }
         }
         break;
-    case 2:
+    case UPDATE_TOUCH_STEP_SWAP:
         wk->updating = FALSE;
         ResearchGraph_SwapGraphs(wk);
         CircleGraph_SetVisible(ResearchGraph_GetNextGraph(wk), FALSE);
@@ -1255,9 +1287,15 @@ static void ResearchGraph_SeqUpdateTouch(ResearchGraph *wk) {
     }
 }
 
+enum {
+    UPDATE_CURSOR_STEP_START = 0,
+    UPDATE_CURSOR_STEP_WAIT,
+    UPDATE_CURSOR_STEP_SWAP,
+};
+
 static void ResearchGraph_SeqUpdateCursor(ResearchGraph *wk) {
     switch (ResearchGraph_GetSeqState(wk)) {
-    case 0:
+    case UPDATE_CURSOR_STEP_START:
         wk->updating = TRUE;
         ResearchGraph_ClearNewResults(wk);
         ResearchGraph_ResetUpdateFrames(wk);
@@ -1279,7 +1317,7 @@ static void ResearchGraph_SeqUpdateCursor(ResearchGraph *wk) {
         CircleGraph_RequestGrow(ResearchGraph_GetNextGraph(wk));
         ResearchGraph_NextSeqState(wk);
         break;
-    case 1:
+    case UPDATE_CURSOR_STEP_WAIT:
         if (!GFL_SndPlayerIsActiveAny()) {
             if (wk->seqFrames >= UPDATE_FRAMES) {
                 ResearchGraph_NextSeqState(wk);
@@ -1288,7 +1326,7 @@ static void ResearchGraph_SeqUpdateCursor(ResearchGraph *wk) {
             }
         }
         break;
-    case 2:
+    case UPDATE_CURSOR_STEP_SWAP:
         wk->updating = FALSE;
         ResearchGraph_SwapGraphs(wk);
         CircleGraph_SetVisible(ResearchGraph_GetNextGraph(wk), FALSE);
@@ -1308,13 +1346,18 @@ static void ResearchGraph_SeqUpdateCursor(ResearchGraph *wk) {
     }
 }
 
+enum {
+    FADE_OUT_STEP_START = 0,
+    FADE_OUT_STEP_WAIT,
+};
+
 static void ResearchGraph_SeqFadeOut(ResearchGraph *wk) {
     switch (ResearchGraph_GetSeqState(wk)) {
-    case 0:
+    case FADE_OUT_STEP_START:
         ResearchGraph_FadeOut();
         ResearchGraph_NextSeqState(wk);
         break;
-    case 1:
+    case FADE_OUT_STEP_WAIT:
         if (!GFL_FadeIsRunning()) {
             ResearchGraph_EndSeq(wk);
         }

@@ -10,8 +10,9 @@
 
 // Called with a Wi-Fi library error the connection has queued: its code, its type and its kind, and the work
 typedef void (*DWCRapErrorFunc)(void *work, int code, int type, int error);
-// Asked about a connection event, with its work and three of the event's values
-typedef u32 (*DWCRapEventFunc)(void *work, int a1, int event, int a3);
+// Asked about a connection event, with its work and the code, the event and the error of the error that the connection
+// has queued
+typedef u32 (*DWCRapEventFunc)(void *work, int code, int event, int error);
 
 // Asked whether to take a machine in: its friend index, or -1 for one that is nobody's friend, and the game's work
 typedef BOOL (*DWCRapRequestFunc)(int index, void *work);
@@ -72,9 +73,11 @@ void DWCRap_Shutdown(void);
 void DWCRap_SetOwnStatusData(const char *data, int size);
 // A friend's location data, and their state
 char *DWCRap_GetFriendStatusData(int index);
+// The state of a friend that DWCRap_Connect can join: the one that waits as the match server
+#define DWCRAP_FRIEND_STATUS_JOINABLE 6
 u8 DWCRap_GetFriendStatus(int index);
 // Connects to a friend, or to anybody if the index is negative; returns 0, or a negative number when it can't yet
-int DWCRap_Connect(int friendIndex, int numEntry, BOOL a2);
+int DWCRap_Connect(int friendIndex, int numEntry, BOOL twoEntries);
 // The friend index of the connection
 int DWCRap_GetFriendIndex(void);
 BOOL DWCRap_GetVoiceChatSpeaking(void);

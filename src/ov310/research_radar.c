@@ -113,16 +113,21 @@ static const BGSysVRAMConfig sRadarVRAMConfig = {
 
 GameProcFunctions RESEARCH_RADAR_PROC_FUNCTIONS = { ResearchRadar_Init, ResearchRadar_Main, ResearchRadar_Exit };
 
+enum {
+    INIT_STEP_PROC = 0,
+    INIT_STEP_SETUP,
+};
+
 static BOOL ResearchRadar_Init(GameProc *proc, u32 *state, void *param, void *work) {
     ResearchRadarWork *wk = work;
     GameSystem **gsys = param;
 
     switch (*state) {
-    case 0:
+    case INIT_STEP_PROC:
         GFL_ProcInitSubsystem(proc, sizeof(ResearchRadarWork), HEAPID_USER);
         (*state)++;
         break;
-    case 1:
+    case INIT_STEP_SETUP:
         ResearchRadar_InitWork(wk, *gsys);
         GFL_BGSysSetVRAMBanks(&sRadarVRAMConfig);
         GFL_BGSysSetDisplayLayout(0);

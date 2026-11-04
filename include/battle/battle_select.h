@@ -19,7 +19,7 @@ typedef struct {
     GameData *gameData;
     u8 unk18;
     // Gets the Pokémon picked
-    PokeParty *unk1C;
+    PokeParty *pickedParty;
     // Where each player's team picked arrives, by net ID
     PokeParty *parties[2];
     // 1 if the selection ended because the connection was lost

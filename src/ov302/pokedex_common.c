@@ -133,8 +133,11 @@ static BOOL PokedexCommon_IsInHabitat(PokeDexSave *pokedex, const PokedexHabitat
     return FALSE;
 }
 
+// What no species found yet is
+#define NO_SPECIES 0xffff
+
 void PokedexCommon_SelectSeen(PokeDexSave *pokedex, const u16 *list, u16 count) {
-    u16 first = 0xffff;
+    u16 first = NO_SPECIES;
     u16 current = PokeDex_GetLastSpecies(pokedex);
     u16 i;
 
@@ -143,12 +146,12 @@ void PokedexCommon_SelectSeen(PokeDexSave *pokedex, const u16 *list, u16 count) 
             if (current == list[i]) {
                 return;
             }
-            if (first == 0xffff) {
+            if (first == NO_SPECIES) {
                 first = list[i];
             }
         }
     }
-    if (first != 0xffff) {
+    if (first != NO_SPECIES) {
         PokeDex_SetLastSpecies(pokedex, first);
     }
 }
@@ -185,9 +188,12 @@ void PokedexCommon_WipeOut(HeapID heapId) {
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, heapId);
 }
 
+// How many frames the BGs wait between moving by a pixel
+#define BG_SCROLL_FRAMES 4
+
 void PokedexCommon_ScrollBGs(u8 bg1, u8 bg2, int *timer) {
     (*timer)++;
-    if (*timer == 4) {
+    if (*timer == BG_SCROLL_FRAMES) {
         GFL_BGSysMoveBGReq(bg1, BG_MOVE_RIGHT, 1);
         GFL_BGSysMoveBGReq(bg2, BG_MOVE_RIGHT, 1);
         *timer = 0;
@@ -276,12 +282,12 @@ void PokedexCommon_BuildHabitatList(PokedexHabitatSave *habitat, PokedexHabitatL
                     MI_CpuFill8(area, 0, 4);
                     area->complete = 1;
                     area->zone = entry->zone;
-                    area->unk8 = file.unk6;
+                    area->landKind = file.landKind;
                     PokedexCommon_GetHabitatStates(area->states, &file, pokedex);
                     for (j = 0; j < 3; j++) {
                         area->values[j] = file.values[j];
                         if (file.conditions[j] == 1) {
-                            if (area->states[j] != 2 || conditions.conditions[j] == 0) {
+                            if (area->states[j] != POKEDEX_HABITAT_STATE_CAUGHT || conditions.conditions[j] == 0) {
                                 area->complete = 0;
                             }
                         }
@@ -370,26 +376,26 @@ void PokedexCommon_BuildHabitatSummary(PokedexHabitatSave *habitat, PokedexHabit
 
                     if (area->conditions[j] == 1) {
                         switch (area->states[j]) {
-                        case 2:
-                            if (done == 2) {
-                                area->display[j] = 2;
+                        case POKEDEX_HABITAT_STATE_CAUGHT:
+                            if (done == POKEDEX_HABITAT_STATE_CAUGHT) {
+                                area->display[j] = POKEDEX_HABITAT_DISPLAY_CAUGHT;
                             } else {
-                                area->display[j] = 1;
+                                area->display[j] = POKEDEX_HABITAT_DISPLAY_PARTIAL;
                             }
                             break;
-                        case 1:
-                            if (done == 1) {
-                                area->display[j] = 3;
+                        case POKEDEX_HABITAT_STATE_SEEN:
+                            if (done == POKEDEX_HABITAT_STATE_SEEN) {
+                                area->display[j] = POKEDEX_HABITAT_DISPLAY_SEEN;
                             } else {
-                                area->display[j] = 1;
+                                area->display[j] = POKEDEX_HABITAT_DISPLAY_PARTIAL;
                             }
                             break;
-                        case 0:
-                            area->display[j] = 4;
+                        case POKEDEX_HABITAT_STATE_UNSEEN:
+                            area->display[j] = POKEDEX_HABITAT_DISPLAY_NONE;
                             break;
                         }
                     } else {
-                        area->display[j] = 4;
+                        area->display[j] = POKEDEX_HABITAT_DISPLAY_NONE;
                     }
                 }
                 index++;
@@ -405,9 +411,9 @@ static void PokedexCommon_GetHabitatStates(u32 *states, const PokedexHabitatFile
     u8 j;
     u8 k;
 
-    states[0] = 2;
-    states[1] = 2;
-    states[2] = 2;
+    states[0] = POKEDEX_HABITAT_STATE_CAUGHT;
+    states[1] = POKEDEX_HABITAT_STATE_CAUGHT;
+    states[2] = POKEDEX_HABITAT_STATE_CAUGHT;
     for (i = 0; i < file->count; i++) {
         MI_CpuFill8(present, 0, 3);
         for (j = 0; j < 3; j++) {
@@ -417,11 +423,11 @@ static void PokedexCommon_GetHabitatStates(u32 *states, const PokedexHabitatFile
         }
         for (j = 0; j < 3; j++) {
             if (present[j] >= 1) {
-                if (states[j] == 2 && !PokeDex_IsCaught(pokedex, file->entries[i].species)) {
-                    states[j] = 1;
+                if (states[j] == POKEDEX_HABITAT_STATE_CAUGHT && !PokeDex_IsCaught(pokedex, file->entries[i].species)) {
+                    states[j] = POKEDEX_HABITAT_STATE_SEEN;
                 }
-                if (states[j] == 1 && !PokeDex_IsSeen(pokedex, file->entries[i].species)) {
-                    states[j] = 0;
+                if (states[j] == POKEDEX_HABITAT_STATE_SEEN && !PokeDex_IsSeen(pokedex, file->entries[i].species)) {
+                    states[j] = POKEDEX_HABITAT_STATE_UNSEEN;
                 }
             }
         }

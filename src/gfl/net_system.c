@@ -809,7 +809,7 @@ static BOOL NetSystem_WritePacket(u8 *packet, NetQueue *queue, int size, u8 seq)
     queue->pending = FALSE;
     packet[PACKET_CONNECT_BITS] = sys->pDevTable->getConnectBits();
     if (NetQueue_IsEmpty(queue) || ((ini->bNetType == GFL_NET_TYPE_IRC || ini->bNetType == GFL_NET_TYPE_IRC_WIRELESS) &&
-                                    sys->pDevTable->unkB0() == TRUE)) {
+                                    sys->pDevTable->isSendBlocked() == TRUE)) {
         packet[PACKET_FLAGS] = PACKET_FLAGS_NONE;
         return FALSE;
     }

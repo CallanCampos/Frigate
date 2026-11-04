@@ -9748,7 +9748,7 @@ overlays/ov031 0x021758c8 NetDevIrc_IsLinked
 overlays/ov031 0x021758d0 NetDevIrc_IsConnectedSlot
 overlays/ov031 0x021758d8 NetDevIrc_IsInitialized
 overlays/ov031 0x021758e0 NetDevIrc_GetConnectBits
-overlays/ov031 0x021758f4 NetDevIrc_GetUnkCF0
+overlays/ov031 0x021758f4 NetDevIrc_IsSendBlocked
 overlays/ov031 0x021758fc NetDevIrc_StartLink
 overlays/ov031 0x02175904 NetDevIrc_SetTimeoutSlot
 overlays/ov031 0x0217590c NetDevIrc_SetPeerFilterSlot
@@ -9762,7 +9762,7 @@ overlays/ov031 0x02175a04 NetDevIrc_SetPeerFilter
 overlays/ov031 0x02175a10 NetIrc_SetInitialized
 overlays/ov031 0x02175a38 NetIrc_IsInitialized
 overlays/ov031 0x02175a44 NetIrc_GetSendTurn
-overlays/ov031 0x02175a50 NetIrc_GetUnkCF0
+overlays/ov031 0x02175a50 NetIrc_IsSendBlocked
 overlays/ov031 0x02175a60 NetIrc_CanSend
 overlays/ov031 0x02175a94 NetIrc_Send
 overlays/ov031 0x02175af8 NetIrc_SendPending
@@ -34515,7 +34515,7 @@ overlays/ov284 0x021e51b8 EvolutionDemoView_Reveal
 overlays/ov284 0x021e51c0 EvolutionDemoView_FadeIn
 overlays/ov284 0x021e51c8 EvolutionDemoView_IsDone
 overlays/ov284 0x021e51cc EvolutionDemoView_HavePiecesStarted
-overlays/ov284 0x021e51d0 EvolutionDemoView_GetUnk3C
+overlays/ov284 0x021e51d0 EvolutionDemoView_ShouldPushBGM
 overlays/ov284 0x021e51d4 EvolutionDemoView_Cancel
 overlays/ov284 0x021e51f8 EvolutionDemoView_InitMcss
 overlays/ov284 0x021e5218 EvolutionDemoView_FreeMcss

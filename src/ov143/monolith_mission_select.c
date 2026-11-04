@@ -1480,10 +1480,12 @@ static BOOL MonolithMission_IsAvailable(MonolithScreenParam *screen, MonolithMis
     if (!available) {
         return FALSE;
     }
-    if (mfw->missions[index].params.unk10 != 0 && !EventWork_FlagGet(eventWork, mfw->missions[index].params.unk10)) {
+    if (mfw->missions[index].params.unlockFlag != 0 &&
+        !EventWork_FlagGet(eventWork, mfw->missions[index].params.unlockFlag)) {
         return FALSE;
     }
-    if (mfw->missions[index].params.unk12 != 0 && !EventWork_FlagGet(eventWork, mfw->missions[index].params.unk12)) {
+    if (mfw->missions[index].params.requiredFlag != 0 &&
+        !EventWork_FlagGet(eventWork, mfw->missions[index].params.requiredFlag)) {
         return FALSE;
     }
     return TRUE;

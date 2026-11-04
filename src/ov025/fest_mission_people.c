@@ -12,11 +12,12 @@
 #include "system/game_data.h"
 #include "system/game_system.h"
 
-// A kind of person a mission's target places: the object code of their model and a flag
+// A kind of person a mission's target places: the object code of their model and which of the salesman messages they
+// use
 typedef struct {
     u16 objCode;
-    // Whether the items of a target 3 mission are on sale
-    u16 unk2;
+    // Added to the salesman message by FesGimmick_IsOnSale
+    u16 msgIndex;
 } FesMissionPerson;
 
 // The people of one target, by the mission's variant
@@ -258,7 +259,7 @@ static const FesMissionPerson *FesMissionPeople_GetPerson(FestMissionConfig *mis
 }
 
 u8 FesMissionPeople_IsOnSale(FestMissionConfig *mission) {
-    return FesMissionPeople_GetPerson(mission)->unk2;
+    return FesMissionPeople_GetPerson(mission)->msgIndex;
 }
 
 u16 FesMissionPeople_GetObjCode(FesMissionWork *work, FestMissionConfig *mission) {

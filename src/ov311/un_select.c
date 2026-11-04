@@ -248,15 +248,20 @@ static FrameListSetup sUnSelectListSetup = {
     NULL,
 };
 
+enum {
+    INIT_STEP_SETUP = 0,
+    INIT_STEP_DRAW,
+};
+
 static BOOL UnSelect_Init(GameProc *proc, u32 *state, void *param, void *work) {
     UnSelectWork *wk;
 
     switch (*state) {
-    case 0:
+    case INIT_STEP_SETUP:
         UnSelect_Setup(proc, param);
         (*state)++;
         break;
-    case 1:
+    case INIT_STEP_DRAW:
         wk = work;
         if (!FrameList_Draw(wk->list)) {
             return TRUE;
@@ -266,21 +271,27 @@ static BOOL UnSelect_Init(GameProc *proc, u32 *state, void *param, void *work) {
     return FALSE;
 }
 
+enum {
+    EXIT_STEP_FADE = 0,
+    EXIT_STEP_FADE_WAIT,
+    EXIT_STEP_FREE,
+};
+
 static BOOL UnSelect_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     UnSelectWork *wk = work;
     HeapID heapId;
 
     switch (*state) {
-    case 0:
+    case EXIT_STEP_FADE:
         GFL_FadeSet(3, 0, 16, 1);
         (*state)++;
         break;
-    case 1:
+    case EXIT_STEP_FADE_WAIT:
         if (GFL_FadeIsRunning() != TRUE) {
             (*state)++;
         }
         break;
-    case 2:
+    case EXIT_STEP_FREE:
         GFL_TCBRemove(wk->hblankTask);
         G2_BlendNone();
         G2S_BlendNone();
@@ -301,21 +312,27 @@ static BOOL UnSelect_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     return FALSE;
 }
 
+enum {
+    MAIN_STEP_FADE_IN = 0,
+    MAIN_STEP_FADE_WAIT,
+    MAIN_STEP_SCENE,
+};
+
 static BOOL UnSelect_Main(GameProc *proc, u32 *state, void *param, void *work) {
     UnSelectWork *wk = work;
     BOOL end = FALSE;
 
     switch (*state) {
-    case 0:
+    case MAIN_STEP_FADE_IN:
         GFL_FadeSet(3, 16, 0, 1);
         (*state)++;
         break;
-    case 1:
+    case MAIN_STEP_FADE_WAIT:
         if (!GFL_FadeIsRunning()) {
             (*state)++;
         }
         break;
-    case 2:
+    case MAIN_STEP_SCENE:
         if (UIScene_Main(wk->scene)) {
             end = TRUE;
         }
@@ -534,18 +551,18 @@ static void UnSelectMsg_Print(UnSelectMsg *msg, u32 msgId) {
 static BOOL UnSelectMsg_Wait(UnSelectMsg *msg) {
     if (msg->stream != NULL) {
         switch (PrintStream_GetState(msg->stream)) {
-        case 2:
+        case PRINT_STREAM_DONE:
             PrintStream_Delete(msg->stream);
             msg->stream = NULL;
             return TRUE;
-        case 1:
+        case PRINT_STREAM_PAUSED:
             if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_A || GCTX_HIDGetPressedKeys() == PAD_BUTTON_B ||
                 GFL_HIDIsTouchPressed()) {
                 PrintStream_Continue(msg->stream);
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
             }
             break;
-        case 0:
+        case PRINT_STREAM_RUNNING:
             if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchHeld()) {
                 PrintStream_SkipWait(msg->stream, 0);
             }
@@ -776,32 +793,45 @@ static BOOL UnSelect_ListEnd(UIScene *scene, void *param) {
     return TRUE;
 }
 
+enum {
+    CONFIRM_BEGIN_STEP_DIM = 0,
+    CONFIRM_BEGIN_STEP_PRINT,
+    CONFIRM_BEGIN_STEP_WAIT,
+    CONFIRM_BEGIN_STEP_MENU,
+};
+
 static BOOL UnSelect_ConfirmBegin(UIScene *scene, void *param) {
     UnSelectWork *wk = param;
 
     switch (UIScene_GetCounter(scene)) {
-    case 0:
+    case CONFIRM_BEGIN_STEP_DIM:
         UnSelect_StartDim();
         UIScene_IncCounter(scene);
         break;
-    case 1:
+    case CONFIRM_BEGIN_STEP_PRINT:
         if (GFL_FadeIsRunning() != TRUE && BrightnessController_IsTransitionComplete(1)) {
             loadCountryToStrbuf(wk->msg->wordSet, 0, sUnSelectCountries[wk->selected]);
             UnSelectMsg_Print(wk->msg, UnSelect_Text_WillGoFloor);
             UIScene_IncCounter(scene);
         }
         break;
-    case 2:
+    case CONFIRM_BEGIN_STEP_WAIT:
         if (UnSelectMsg_Wait(wk->msg)) {
             UIScene_IncCounter(scene);
         }
         break;
-    case 3:
+    case CONFIRM_BEGIN_STEP_MENU:
         wk->menu = UnSelect_CreateYesNo(wk->menuRes, UnSelectMsg_GetMsgData(wk->msg), wk->heapId);
         return TRUE;
     }
     return FALSE;
 }
+
+// The choices of the confirmation
+enum {
+    CONFIRM_YES,
+    CONFIRM_NO,
+};
 
 static BOOL UnSelect_ConfirmRun(UIScene *scene, void *param) {
     UnSelectWork *wk = param;
@@ -809,14 +839,14 @@ static BOOL UnSelect_ConfirmRun(UIScene *scene, void *param) {
     UnSelect_UpdateMenu(wk->menu);
     if (AppTaskMenu_IsFlashFinished(wk->menu)) {
         switch (AppTaskMenu_GetCursorPos(wk->menu)) {
-        case 0:
+        case CONFIRM_YES:
             UnSelect_SetResult(wk, UN_SELECT_RESULT_SELECTED);
             UnSelect_StartUndim();
             UnSelectMsg_ClearFrame(wk->msg);
             UnSelect_FreeMenu(wk->menu);
             UIScene_SetNext(scene, UI_SCENE_END);
             break;
-        case 1:
+        case CONFIRM_NO:
             UnSelect_StartUndim();
             UnSelectMsg_ClearFrame(wk->msg);
             UnSelect_FreeMenu(wk->menu);
@@ -835,21 +865,27 @@ static BOOL UnSelect_ConfirmEnd(UIScene *scene, void *param) {
     return TRUE;
 }
 
+enum {
+    SAME_FLOOR_STEP_DIM = 0,
+    SAME_FLOOR_STEP_PRINT,
+    SAME_FLOOR_STEP_DONE,
+};
+
 static BOOL UnSelect_SameFloorBegin(UIScene *scene, void *param) {
     UnSelectWork *wk = param;
 
     switch (UIScene_GetCounter(scene)) {
-    case 0:
+    case SAME_FLOOR_STEP_DIM:
         UnSelect_StartDim();
         UIScene_IncCounter(scene);
         break;
-    case 1:
+    case SAME_FLOOR_STEP_PRINT:
         if (GFL_FadeIsRunning() != TRUE && BrightnessController_IsTransitionComplete(1)) {
             UnSelectMsg_Print(wk->msg, UnSelect_Text_SelectedCurrentFloor);
             UIScene_IncCounter(scene);
         }
         break;
-    case 2:
+    case SAME_FLOOR_STEP_DONE:
         return TRUE;
     }
     return FALSE;

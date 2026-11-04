@@ -45,6 +45,7 @@
 #define NO_PATH 0xff
 #define NO_CAR -1
 #define NO_SPOT -1
+#define SPOT_NOT_FOUND 0xff
 
 // How long a car waits at a station, in frames
 #define STATION_WAIT 90
@@ -256,7 +257,7 @@ static u8 RollerCoaster_FindSpot(int x, int z) {
             return i;
         }
     }
-    return 0xff;
+    return SPOT_NOT_FOUND;
 }
 
 static u8 RollerCoaster_GetCarPath(RollerCoasterWork *work, u8 car) {
@@ -501,6 +502,11 @@ GameEvent *RollerCoaster_CreateSwitchEvent(GameSystem *gsys, u8 switchId) {
     return event;
 }
 
+enum {
+    SWITCH_STEP_START,
+    SWITCH_STEP_WAIT_ANIM,
+};
+
 static GameEventReturnCode RollerCoaster_SwitchEvent(GameEvent *event, u32 *state, void *data) {
     Field *field = GSYS_GetField(GameEvent_GetGameSystem(event));
     FieldExpObjSystem *expObj = Field_GetExpObjSystem(field);
@@ -509,13 +515,13 @@ static GameEventReturnCode RollerCoaster_SwitchEvent(GameEvent *event, u32 *stat
         GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field))), GIMMICK_STATE_ID);
 
     switch (*state) {
-    case 0: {
+    case SWITCH_STEP_START: {
         u8 switchActor;
         u8 trackActor;
 
         work->switchState = save->switches[work->switchId];
-        switchActor = work->switchId + 4;
-        trackActor = work->switchId + 8;
+        switchActor = work->switchId + ACTOR_SWITCH;
+        trackActor = work->switchId + ACTOR_TRACK;
         if (work->switchState == 0) {
             FieldExpObj_SetAnm(expObj, 0, switchActor, 0, FALSE);
             FieldExpObj_SetAnm(expObj, 0, trackActor, 0, FALSE);
@@ -541,9 +547,9 @@ static GameEventReturnCode RollerCoaster_SwitchEvent(GameEvent *event, u32 *stat
         (*state)++;
         break;
     }
-    case 1: {
-        u8 switchActor = work->switchId + 4;
-        u8 trackActor = work->switchId + 8;
+    case SWITCH_STEP_WAIT_ANIM: {
+        u8 switchActor = work->switchId + ACTOR_SWITCH;
+        u8 trackActor = work->switchId + ACTOR_TRACK;
         FieldExpObjAnm *switchAnm = FieldExpObj_GetAnmInfo(expObj, 0, switchActor, work->switchState);
         FieldExpObjAnm *trackAnm = FieldExpObj_GetAnmInfo(expObj, 0, trackActor, work->switchState);
 
@@ -572,7 +578,7 @@ GameEvent *RollerCoaster_CheckRide(GameSystem *gsys) {
     }
     FieldPlayer_GetWPos(player, &pos);
     spot = RollerCoaster_FindSpot(pos.x / GRID_SIZE, pos.z / GRID_SIZE);
-    if (spot == 0xff) {
+    if (spot == SPOT_NOT_FOUND) {
         return NULL;
     }
     if (RollerCoaster_IsCarAtSpot(work, spot)) {
@@ -629,6 +635,21 @@ static void RollerCoaster_SetIntroSeen(RollerCoasterSave *save, u8 car) {
     }
 }
 
+// The ride: boarding (the car lowers, a script runs, the car sets off with the player hidden), riding until the car
+// waits at a station and the player presses down, then getting off in the same way
+enum {
+    RIDE_STEP_BOARD_START,
+    RIDE_STEP_BOARD_WAIT,
+    RIDE_STEP_BOARD_RESUME,
+    RIDE_STEP_BOARD_FINISH,
+    RIDE_STEP_RIDING,
+    RIDE_STEP_ALIGHT_START,
+    RIDE_STEP_ALIGHT_WAIT,
+    RIDE_STEP_ALIGHT_SCRIPT,
+    RIDE_STEP_ALIGHT_RESUME,
+    RIDE_STEP_ALIGHT_FINISH,
+};
+
 static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state, void *data) {
     Field *field = GSYS_GetField(GameEvent_GetGameSystem(event));
     FieldExpObjSystem *expObj = Field_GetExpObjSystem(field);
@@ -646,7 +667,7 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
     // The saved state is fetched but not used
     GimmickState_GetUserData(GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field))), GIMMICK_STATE_ID);
     switch (*state) {
-    case 0:
+    case RIDE_STEP_BOARD_START:
         work->curve = GFL_G3DCurveCreateToLoadBufferEntire(HEAPID_TAIL(HEAPID_FIELDMAP), ARCID_ROLLER_COASTER,
                                                            sRideCurves[work->ridePath], work->curveBuffer,
                                                            sizeof(work->curveBuffer));
@@ -655,19 +676,19 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
         GFL_SndSEPlay(SEQ_SE_FLD_22);
         (*state)++;
         break;
-    case 1:
+    case RIDE_STEP_BOARD_WAIT:
         if (RollerCoaster_GetAnmFrame(expObj, actor, 0) >= FX32_CONST(15)) {
             FieldExpObjAnm_SetPaused(anmInfo, TRUE);
             EventScriptCall_Start(event, SCRIPT_RIDE_START, NULL, 0, HEAPID_TAIL(HEAPID_FIELDMAP));
             (*state)++;
         }
         break;
-    case 2:
+    case RIDE_STEP_BOARD_RESUME:
         FieldExpObjAnm_SetPaused(anmInfo, FALSE);
         GFL_SndSEPlay(SEQ_SE_FLD_22);
         (*state)++;
         break;
-    case 3:
+    case RIDE_STEP_BOARD_FINISH:
         if (FieldExpObjAnm_IsPlaybackFinished(anmInfo)) {
             SetActorHidden(FieldPlayer_GetActor(Field_GetPlayer(field)), TRUE);
             FieldExpObjAnm_SetPaused(anmInfo, TRUE);
@@ -683,12 +704,12 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
             (*state)++;
         }
         break;
-    case 4:
+    case RIDE_STEP_RIDING:
         if (work->stations[car] != NO_SPOT && (GCTX_HIDGetHeldKeys() & PAD_KEY_DOWN)) {
             (*state)++;
         }
         break;
-    case 5: {
+    case RIDE_STEP_ALIGHT_START: {
         FieldExpObjAnm *pathAnm = RollerCoaster_GetAnm(expObj, actor, work->ridePath + 1);
         FieldActor *playerActor;
 
@@ -703,7 +724,7 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
         (*state)++;
         break;
     }
-    case 6:
+    case RIDE_STEP_ALIGHT_WAIT:
         if (RollerCoaster_GetAnmFrame(expObj, actor, 0) >= FX32_CONST(15)) {
             FieldExpObjAnm_SetPaused(anmInfo, TRUE);
             {
@@ -719,16 +740,16 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
             (*state)++;
         }
         break;
-    case 7:
+    case RIDE_STEP_ALIGHT_SCRIPT:
         EventScriptCall_Start(event, SCRIPT_RIDE_END, NULL, 0, HEAPID_TAIL(HEAPID_FIELDMAP));
         (*state)++;
         break;
-    case 8:
+    case RIDE_STEP_ALIGHT_RESUME:
         FieldExpObjAnm_SetPaused(anmInfo, FALSE);
         GFL_SndSEPlay(SEQ_SE_FLD_22);
         (*state)++;
         break;
-    case 9:
+    case RIDE_STEP_ALIGHT_FINISH:
         if (FieldExpObjAnm_IsPlaybackFinished(anmInfo)) {
             FieldExpObjAnm_SetPaused(anmInfo, TRUE);
             RollerCoaster_SetAnmPaused(expObj, actor, work->ridePath + 1, FALSE);
@@ -829,6 +850,17 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
     return GAMEEVENT_CONTINUE;
 }
 
+// The first ride of a car: a script, then the car lowers and a script runs on it, and the car finishes its animation
+// before the end script replaces the event
+enum {
+    INTRO_STEP_START_SCRIPT,
+    INTRO_STEP_BOARD_START,
+    INTRO_STEP_BOARD_WAIT,
+    INTRO_STEP_BOARD_RESUME,
+    INTRO_STEP_BOARD_FINISH,
+    INTRO_STEP_DONE,
+};
+
 static GameEventReturnCode RollerCoaster_IntroEvent(GameEvent *event, u32 *state, void *data) {
     Field *field = GSYS_GetField(GameEvent_GetGameSystem(event));
     FieldExpObjSystem *expObj = Field_GetExpObjSystem(field);
@@ -840,29 +872,29 @@ static GameEventReturnCode RollerCoaster_IntroEvent(GameEvent *event, u32 *state
     // The saved state is fetched but not used
     GimmickState_GetUserData(GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field))), GIMMICK_STATE_ID);
     switch (*state) {
-    case 0:
+    case INTRO_STEP_START_SCRIPT:
         EventScriptCall_Start(event, SCRIPT_INTRO_START, NULL, 0, HEAPID_TAIL(HEAPID_FIELDMAP));
         (*state)++;
         break;
-    case 1:
+    case INTRO_STEP_BOARD_START:
         RollerCoaster_SetAnmFrame(expObj, actor, 0, 0);
         FieldExpObjAnm_SetPaused(anmInfo, FALSE);
         GFL_SndSEPlay(SEQ_SE_FLD_22);
         (*state)++;
         break;
-    case 2:
+    case INTRO_STEP_BOARD_WAIT:
         if (RollerCoaster_GetAnmFrame(expObj, actor, 0) >= FX32_CONST(15)) {
             FieldExpObjAnm_SetPaused(anmInfo, TRUE);
             EventScriptCall_Start(event, SCRIPT_INTRO_RIDE, NULL, 0, HEAPID_TAIL(HEAPID_FIELDMAP));
             (*state)++;
         }
         break;
-    case 3:
+    case INTRO_STEP_BOARD_RESUME:
         FieldExpObjAnm_SetPaused(anmInfo, FALSE);
         GFL_SndSEPlay(SEQ_SE_FLD_22);
         (*state)++;
         break;
-    case 4:
+    case INTRO_STEP_BOARD_FINISH:
         if (FieldExpObjAnm_IsPlaybackFinished(anmInfo)) {
             FieldExpObjAnm_SetPaused(anmInfo, TRUE);
             RollerCoaster_SetAnmPaused(expObj, actor, work->ridePath + 1, FALSE);
@@ -873,7 +905,7 @@ static GameEventReturnCode RollerCoaster_IntroEvent(GameEvent *event, u32 *state
             (*state)++;
         }
         break;
-    case 5:
+    case INTRO_STEP_DONE:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;

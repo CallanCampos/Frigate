@@ -37,6 +37,43 @@ enum {
 
 typedef int (*HallOfFameDemoSeqFunction)(HallOfFameDemoWork *wk);
 
+// The steps of the first part, which shows each Pokémon: a sprite slides in, then the plates, and all slide out
+enum {
+    FIRST_STEP_WAIT,
+    FIRST_STEP_SOUND,
+    FIRST_STEP_WAIT_SOUND,
+    FIRST_STEP_SHOW_POKE,
+    FIRST_STEP_SLIDE_BACK_SPRITE,
+    FIRST_STEP_TYPE_PARTICLES,
+    FIRST_STEP_NAME_PARTICLE_1,
+    FIRST_STEP_SLIDE_TITLE,
+    FIRST_STEP_NAME_PARTICLE_0,
+    FIRST_STEP_SLIDE_NAME,
+    FIRST_STEP_SLIDE_FRONT_SPRITE,
+    FIRST_STEP_CRY,
+    FIRST_STEP_WAIT_CRY,
+    FIRST_STEP_SLIDE_OUT_SPRITE,
+    FIRST_STEP_SLIDE_OUT_NAME,
+    FIRST_STEP_SLIDE_OUT_TITLE,
+    FIRST_STEP_NEXT,
+};
+
+// The steps of the second part, in which the trainer drops in and the Pokémon cross the screen
+enum {
+    SECOND_STEP_WAIT,
+    SECOND_STEP_SOUND,
+    SECOND_STEP_DROP_TRAINERS,
+    SECOND_STEP_OPEN_PLATES,
+    SECOND_STEP_WAIT_PLATES,
+    SECOND_STEP_SHOW_PLAYER,
+    SECOND_STEP_SHOW_TITLE,
+    SECOND_STEP_CONFETTI,
+    SECOND_STEP_WAIT_POKE,
+    SECOND_STEP_SLIDE_IN_POKE,
+    SECOND_STEP_HOLD_POKE,
+    SECOND_STEP_SLIDE_OUT_POKE,
+};
+
 static int HallOfFameDemoSeq_Init(HallOfFameDemoWork *wk);
 static int HallOfFameDemoSeq_Release(HallOfFameDemoWork *wk);
 static int HallOfFameDemoSeq_Wipe(HallOfFameDemoWork *wk);
@@ -149,14 +186,14 @@ static int HallOfFameDemoSeq_Exit1st(HallOfFameDemoWork *wk) {
 // it stops, then the Pokémon cries and all slide out again
 static int HallOfFameDemoSeq_Main1st(HallOfFameDemoWork *wk) {
     switch (wk->subSeq) {
-    case 0:
+    case FIRST_STEP_WAIT:
         wk->subSeq++;
         return HallOfFameDemoSeq_SetWait(wk, 32);
-    case 1:
+    case FIRST_STEP_SOUND:
         GFL_SndSEPlay(SEQ_SE_DDEMO_02A);
         wk->subSeq++;
         break;
-    case 2:
+    case FIRST_STEP_WAIT_SOUND:
         wk->count++;
         if (wk->count == 48) {
             GFL_SndSEPlay(SEQ_SE_DDEMO_02B);
@@ -164,7 +201,7 @@ static int HallOfFameDemoSeq_Main1st(HallOfFameDemoWork *wk) {
             wk->subSeq++;
         }
         break;
-    case 3:
+    case FIRST_STEP_SHOW_POKE:
         if (GFL_SndIsPlaying(SEQ_SE_DDEMO_02B) == FALSE) {
             GFL_SndSEPlay(SEQ_SE_DDEMO_01);
             HallOfFameDemoMain_GetPokeData(wk);
@@ -179,7 +216,7 @@ static int HallOfFameDemoSeq_Main1st(HallOfFameDemoWork *wk) {
             return HallOfFameDemoSeq_SetFadeIn(wk, SEQ_1ST_MAIN);
         }
         break;
-    case 4:
+    case FIRST_STEP_SLIDE_BACK_SPRITE:
         if (wk->count == 22) {
             wk->subSeq++;
             return HallOfFameDemoSeq_SetWait(wk, 8);
@@ -187,16 +224,16 @@ static int HallOfFameDemoSeq_Main1st(HallOfFameDemoWork *wk) {
         HallOfFameDemoObj_Move(wk, HALL_OF_FAME_DEMO_OBJ_POKE_BACK, -16, 0);
         wk->count++;
         break;
-    case 5:
+    case FIRST_STEP_TYPE_PARTICLES:
         HallOfFameDemoMain_SetTypeParticle(wk, 0);
         HallOfFameDemoMain_SetTypeParticle(wk, 1);
         wk->subSeq++;
         return HallOfFameDemoSeq_SetWait(wk, 8);
-    case 6:
+    case FIRST_STEP_NAME_PARTICLE_1:
         HallOfFameDemoMain_SetNameParticle(wk, 1);
         wk->subSeq++;
         // fallthrough
-    case 7: {
+    case FIRST_STEP_SLIDE_TITLE: {
         s16 x, y;
 
         HallOfFameDemoObj_GetPos(wk, HALL_OF_FAME_DEMO_OBJ_PLATE_TITLE, &x, &y);
@@ -212,11 +249,11 @@ static int HallOfFameDemoSeq_Main1st(HallOfFameDemoWork *wk) {
         HallOfFameDemoObj_MoveFontOam(wk);
         break;
     }
-    case 8:
+    case FIRST_STEP_NAME_PARTICLE_0:
         HallOfFameDemoMain_SetNameParticle(wk, 0);
         wk->subSeq++;
         // fallthrough
-    case 9: {
+    case FIRST_STEP_SLIDE_NAME: {
         BOOL shaking = HallOfFameDemoSeq_Shake(wk, HALL_OF_FAME_DEMO_OBJ_PLATE_TITLE);
         s16 x, y;
 
@@ -233,7 +270,7 @@ static int HallOfFameDemoSeq_Main1st(HallOfFameDemoWork *wk) {
         HallOfFameDemoObj_MoveFontOam(wk);
         break;
     }
-    case 10: {
+    case FIRST_STEP_SLIDE_FRONT_SPRITE: {
         BOOL shaking = HallOfFameDemoSeq_Shake(wk, HALL_OF_FAME_DEMO_OBJ_PLATE_NAME);
         s16 x, y;
 
@@ -250,7 +287,7 @@ static int HallOfFameDemoSeq_Main1st(HallOfFameDemoWork *wk) {
         HallOfFameDemoObj_MoveFontOam(wk);
         break;
     }
-    case 11:
+    case FIRST_STEP_CRY:
         if (HallOfFameDemoSeq_Shake(wk, HALL_OF_FAME_DEMO_OBJ_POKE_FRONT) == FALSE) {
             PokeVoice_StartPlayback(wk->voice);
             HallOfFameDemoObj_SetVisible(wk, HALL_OF_FAME_DEMO_OBJ_FLASH, TRUE);
@@ -259,13 +296,13 @@ static int HallOfFameDemoSeq_Main1st(HallOfFameDemoWork *wk) {
             return HallOfFameDemoSeq_SetWait(wk, 128);
         }
         break;
-    case 12:
+    case FIRST_STEP_WAIT_CRY:
         if (PokeVoice_IsPlaying(wk->voice) == FALSE &&
             HallOfFameDemoObj_IsAnimating(wk, HALL_OF_FAME_DEMO_OBJ_FLASH) == FALSE) {
             wk->subSeq++;
         }
         break;
-    case 13: {
+    case FIRST_STEP_SLIDE_OUT_SPRITE: {
         s16 x, y;
 
         HallOfFameDemoObj_GetPos(wk, HALL_OF_FAME_DEMO_OBJ_POKE_FRONT, &x, &y);
@@ -276,7 +313,7 @@ static int HallOfFameDemoSeq_Main1st(HallOfFameDemoWork *wk) {
         }
         break;
     }
-    case 14: {
+    case FIRST_STEP_SLIDE_OUT_NAME: {
         s16 x, y;
 
         HallOfFameDemoObj_GetPos(wk, HALL_OF_FAME_DEMO_OBJ_PLATE_NAME, &x, &y);
@@ -288,7 +325,7 @@ static int HallOfFameDemoSeq_Main1st(HallOfFameDemoWork *wk) {
         HallOfFameDemoObj_MoveFontOam(wk);
         break;
     }
-    case 15: {
+    case FIRST_STEP_SLIDE_OUT_TITLE: {
         s16 x, y;
 
         HallOfFameDemoObj_GetPos(wk, HALL_OF_FAME_DEMO_OBJ_PLATE_TITLE, &x, &y);
@@ -300,16 +337,16 @@ static int HallOfFameDemoSeq_Main1st(HallOfFameDemoWork *wk) {
         wk->subSeq++;
         return HallOfFameDemoSeq_SetFadeOut(wk, SEQ_1ST_MAIN, 6);
     }
-    case 16:
+    case FIRST_STEP_NEXT:
         HallOfFameDemoMain_DeleteNameParticle(wk);
         HallOfFameDemoMain_DeleteTypeParticle(wk);
         wk->monIndex++;
         if (wk->monIndex == wk->monCount) {
             wk->monIndex = 0;
-            wk->subSeq = 0;
+            wk->subSeq = FIRST_STEP_WAIT;
             return SEQ_1ST_EXIT;
         }
-        wk->subSeq = 3;
+        wk->subSeq = FIRST_STEP_SHOW_POKE;
         break;
     }
     return SEQ_1ST_MAIN;
@@ -349,14 +386,14 @@ static int HallOfFameDemoSeq_Main2nd(HallOfFameDemoWork *wk) {
         return SEQ_2ND_EXIT;
     }
     switch (wk->subSeq) {
-    case 0:
+    case SECOND_STEP_WAIT:
         wk->subSeq++;
         return HallOfFameDemoSeq_SetWait(wk, 32);
-    case 1:
+    case SECOND_STEP_SOUND:
         GFL_SndSEPlay(SEQ_SE_DDEMO_03);
         wk->subSeq++;
         break;
-    case 2:
+    case SECOND_STEP_DROP_TRAINERS:
         if (wk->count != 51) {
             HallOfFameDemoObj_Move(wk, HALL_OF_FAME_DEMO_OBJ_TRAINER_MAIN, 0, 8);
             HallOfFameDemoObj_Move(wk, HALL_OF_FAME_DEMO_OBJ_TRAINER_SUB, 0, 8);
@@ -367,29 +404,29 @@ static int HallOfFameDemoSeq_Main2nd(HallOfFameDemoWork *wk) {
             return HallOfFameDemoSeq_SetWait(wk, 32);
         }
         break;
-    case 3:
+    case SECOND_STEP_OPEN_PLATES:
         HallOfFameDemoObj_SetVisible(wk, HALL_OF_FAME_DEMO_OBJ_PLATE_UPPER, TRUE);
         HallOfFameDemoObj_SetVisible(wk, HALL_OF_FAME_DEMO_OBJ_PLATE_LOWER, TRUE);
         HallOfFameDemoObj_SetAnime(wk, HALL_OF_FAME_DEMO_OBJ_PLATE_UPPER, 2);
         HallOfFameDemoObj_SetAnime(wk, HALL_OF_FAME_DEMO_OBJ_PLATE_LOWER, 2);
         wk->subSeq++;
         break;
-    case 4:
+    case SECOND_STEP_WAIT_PLATES:
         if (HallOfFameDemoObj_IsAnimating(wk, HALL_OF_FAME_DEMO_OBJ_PLATE_UPPER) == FALSE) {
             GFL_SndSEPlay(SEQ_SE_DDEMO_04);
             wk->subSeq++;
             return HallOfFameDemoSeq_SetWait(wk, 16);
         }
         break;
-    case 5:
+    case SECOND_STEP_SHOW_PLAYER:
         HallOfFameDemoObj_SetFontOamVisible(wk, HALL_OF_FAME_DEMO_FOAM_PLAYER, TRUE);
         wk->subSeq++;
         return HallOfFameDemoSeq_SetWait(wk, 32);
-    case 6:
+    case SECOND_STEP_SHOW_TITLE:
         HallOfFameDemoObj_SetFontOamVisible(wk, HALL_OF_FAME_DEMO_FOAM_TITLE_2ND, TRUE);
         wk->subSeq++;
         break;
-    case 7:
+    case SECOND_STEP_CONFETTI:
         if (wk->count == 300) {
             wk->count = 0;
             wk->subSeq++;
@@ -397,7 +434,7 @@ static int HallOfFameDemoSeq_Main2nd(HallOfFameDemoWork *wk) {
             wk->count++;
         }
         break;
-    case 8: {
+    case SECOND_STEP_WAIT_POKE: {
         BOOL start = FALSE;
 
         if (wk->monIndex == 0) {
@@ -418,7 +455,7 @@ static int HallOfFameDemoSeq_Main2nd(HallOfFameDemoWork *wk) {
         }
         break;
     }
-    case 9:
+    case SECOND_STEP_SLIDE_IN_POKE:
         if (wk->count != 20) {
             HallOfFameDemoMain_MoveMcss(wk, -8);
             wk->count++;
@@ -428,7 +465,7 @@ static int HallOfFameDemoSeq_Main2nd(HallOfFameDemoWork *wk) {
             wk->subSeq++;
         }
         break;
-    case 10:
+    case SECOND_STEP_HOLD_POKE:
         if (wk->count != 128) {
             wk->count++;
         } else {
@@ -437,7 +474,7 @@ static int HallOfFameDemoSeq_Main2nd(HallOfFameDemoWork *wk) {
             wk->subSeq++;
         }
         break;
-    case 11:
+    case SECOND_STEP_SLIDE_OUT_POKE:
         if (wk->mcssAnmEnd != FALSE) {
             if (wk->count != 24) {
                 HallOfFameDemoMain_MoveMcss(wk, -8);
@@ -449,15 +486,15 @@ static int HallOfFameDemoSeq_Main2nd(HallOfFameDemoWork *wk) {
                 if (wk->monIndex == wk->monCount) {
                     wk->monIndex = 0;
                 }
-                wk->subSeq = 8;
+                wk->subSeq = SECOND_STEP_WAIT_POKE;
             }
         }
         break;
     }
-    if (wk->subSeq >= 6) {
+    if (wk->subSeq >= SECOND_STEP_SHOW_TITLE) {
         HallOfFameDemoObj_MainConfetti(wk);
     }
-    if (wk->subSeq >= 8 && wk->end == FALSE) {
+    if (wk->subSeq >= SECOND_STEP_WAIT_POKE && wk->end == FALSE) {
         if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed() == TRUE) {
             wk->end = TRUE;
             GFL_SndBGMFadeOut(220);

@@ -824,7 +824,7 @@ static void PStaSkill_HandleTouch(PStatusWork *wk, PStaSkillWork *skill) {
                 ClActor_SetVisible(skill->actors[4], TRUE);
                 if (hit == 0) {
                     ClActor_SetSequence(skill->actors[4], 3);
-                } else if (hit == 3) {
+                } else if (hit == PLATE_NEW - 1) {
                     ClActor_SetSequence(skill->actors[4], 4);
                 } else {
                     ClActor_SetSequence(skill->actors[4], 2);
@@ -1192,11 +1192,11 @@ static void PStaSkill_ShowHmMessage(PStatusWork *wk, PStaSkillWork *skill, BOOL 
 
 static u16 PStaSkill_GetStatColor(PStatusWork *wk, PStaSkillWork *skill, u8 nature, u32 stat) {
     switch (statAffectedByNature(nature, stat)) {
-    case 1:
+    case NATURE_STAT_RAISED:
         return PRINT_COLOR(15, 9, 0);
-    case -1:
+    case NATURE_STAT_LOWERED:
         return PRINT_COLOR(15, 10, 0);
-    case 0:
+    case NATURE_STAT_NEUTRAL:
     default:
         return PRINT_COLOR(15, 2, 0);
     }

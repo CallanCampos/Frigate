@@ -46,7 +46,7 @@ void MusComm_BeginProgramTiming(MusCommWork *comm);
 void MusComm_BeginSendPoke(MusCommWork *comm, MusicalPoke *poke);
 u32 MusComm_GetProgramPoints(MusCommWork *comm);
 u32 MusComm_GetProgramNpcs(MusCommWork *comm);
-u8 MusComm_GetPlayerEquip(MusCommWork *comm, u8 index, u8 a2);
+u8 MusComm_GetPlayerEquip(MusCommWork *comm, u8 index, u8 equip);
 // The network init data, which overlay 174 gets as a number
 const GFLNetInitData *MusComm_GetNetInitData(GameData *gameData);
 // Its GameCommSys callbacks for GAME_COMM_NO_MUSICAL (see game_comm.c)

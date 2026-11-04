@@ -76,15 +76,15 @@ static BOOL WifiLogoutProc_Init(GameProc *proc, u32 *state, void *param, void *w
     MI_CpuFill8(wk, 0, sizeof(WifiLogoutWork));
     wk->param = logoutParam;
     wk->heapId = HEAPID_WIFILOGOUT;
-    if (logoutParam->unk10 == 0) {
-        logoutParam->unk10 = 6;
+    if (logoutParam->wipeFlags == 0) {
+        logoutParam->wipeFlags = 6;
     }
     wk->disp = WifiLoginDisp_Create(wk->heapId, logoutParam->unk4, logoutParam->unk8);
     wk->msg = WifiLoginMessage_Create(wk->heapId, TEXT_BANK_WIFI_ERROR, logoutParam->unk8);
     WifiLogout_ChangeState(wk, WifiLogout_StateStartFadeIn, 173);
     if (logoutParam->unk4 == 0) {
         WifiLoginMessage_PrintTitle(wk->msg, WifiError_Text_DisconnectFromNintendoWfc);
-        if (logoutParam->unkC == 0) {
+        if (logoutParam->keepBgm == 0) {
             GFL_SndBGMPlay(SEQ_BGM_WIFI_ACCESS, SND_CHANNEL_MASK_ALL);
         }
     }
@@ -147,7 +147,7 @@ static BOOL WifiLogout_RunState(WifiLogoutWork *work) {
 
 static void WifiLogout_StateStartFadeIn(WifiLogoutWork *work) {
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN,
-                (work->param->unk10 & 8) ? WIPE_COLOR_WHITE : WIPE_COLOR_BLACK, 6, 1, work->heapId);
+                (work->param->wipeFlags & 8) ? WIPE_COLOR_WHITE : WIPE_COLOR_BLACK, 6, 1, work->heapId);
     WifiLogout_ChangeState(work, WifiLogout_StateWaitFadeIn, 352);
 }
 
@@ -201,9 +201,9 @@ static void WifiLogout_StateWaitDisconnectedMessage(WifiLogoutWork *work) {
 }
 
 static void WifiLogout_StateStartFadeOut(WifiLogoutWork *work) {
-    u32 color = (work->param->unk10 & 0x10) ? WIPE_COLOR_WHITE : WIPE_COLOR_BLACK;
+    u32 color = (work->param->wipeFlags & 0x10) ? WIPE_COLOR_WHITE : WIPE_COLOR_BLACK;
 
-    if (work->param->unkC == 0) {
+    if (work->param->keepBgm == 0) {
         GFL_SndBGMFadeOut(6);
     }
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, color, 6, 1, work->heapId);

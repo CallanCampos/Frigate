@@ -59,7 +59,7 @@ static GFLNetDevTable sNetDevWirelessTable = {
     .update = NetDevWireless_Update,
     .disconnect = NetDevWireless_Unk10,
     .end = NetDevWireless_End,
-    .unk18 = NetDevWireless_ResetPipe,
+    .clearBeacons = NetDevWireless_ResetPipe,
     .unk1C = NetDevWireless_ReturnTrue1C,
     .unk20 = NetDevWireless_ReturnTrue20,
     .unk24 = NetDevWireless_ReturnTrue24,
@@ -281,7 +281,7 @@ static int NetDevWireless_GetSignalLevel(void) {
 static int NetDevWireless_GetError(void) {
     int error = WH_GetLastError();
 
-    if (error == 5) {
+    if (error == WM_ERRCODE_NO_DATASET) {
         error = 0;
     }
     if (NetWhpipe_IsStopped() && error == 0) {

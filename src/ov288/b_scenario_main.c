@@ -105,6 +105,31 @@ enum {
     INPUT_TOUCH,
 };
 
+// The choices of each page, which the touch screen's buttons and the cursor share: the other pages, the previous and
+// next ones, and back
+enum {
+    SUMMARY_CURSOR_SCRIPT,
+    SUMMARY_CURSOR_CAST,
+    SUMMARY_CURSOR_BACK,
+};
+
+enum {
+    SCRIPT_CURSOR_CAST,
+    SCRIPT_CURSOR_PREV,
+    SCRIPT_CURSOR_NEXT,
+    SCRIPT_CURSOR_BACK,
+};
+
+enum {
+    CAST_CURSOR_SCRIPT,
+    CAST_CURSOR_PREV,
+    CAST_CURSOR_NEXT,
+    CAST_CURSOR_BACK,
+};
+
+// What ends a table of labels, in the label that comes first
+#define BSCENARIO_LABEL_END 0xffff
+
 // A label of a page: the index of its text in sBScenarioLabelMessages, its window, whether it is in the text's
 // color, and the message file
 typedef struct {
@@ -202,11 +227,11 @@ static const s16 sBScenarioCastMessages[11] = {
 static const BScenarioLabel sBScenarioScriptLabels[3] = {
     { 4, 5, FALSE, 0 },
     { 8, 0, FALSE, 1 },
-    { 0xffff, 0, 0, 0 },
+    { BSCENARIO_LABEL_END, 0, 0, 0 },
 };
 
 static const BScenarioLabel sBScenarioCastLabels[5] = {
-    { 5, 0, FALSE, 0 }, { 6, 3, TRUE, 0 }, { 7, 9, TRUE, 0 }, { 3, 11, FALSE, 0 }, { 0xffff, 0, 0, 0 },
+    { 5, 0, FALSE, 0 }, { 6, 3, TRUE, 0 }, { 7, 9, TRUE, 0 }, { 3, 11, FALSE, 0 }, { BSCENARIO_LABEL_END, 0, 0, 0 },
 };
 
 // The series of each film, which gives the screen its colors
@@ -235,7 +260,7 @@ static const s16 sBScenarioScriptWindowIndices[2] = { 8, 3 };
 
 static const BScenarioLabel sBScenarioSummaryLabels[6] = {
     { 0, 0, TRUE, 0 },  { 1, 1, TRUE, 0 },  { 2, 2, TRUE, 0 },
-    { 3, 6, FALSE, 0 }, { 4, 7, FALSE, 0 }, { 0xffff, 0, 0, 0 },
+    { 3, 6, FALSE, 0 }, { 4, 7, FALSE, 0 }, { BSCENARIO_LABEL_END, 0, 0, 0 },
 };
 
 static const BScenarioLabel *sBScenarioLabelTables[3] = { sBScenarioSummaryLabels, sBScenarioScriptLabels,
@@ -611,13 +636,13 @@ static void BScenarioMain_SummaryInput(BScenarioWork *work) {
     if (!refresh) {
         s32 touch = BScenarioGraphic_GetTouched(work, PAGE_SUMMARY);
 
-        if (touch == 1) {
+        if (touch == SUMMARY_CURSOR_CAST) {
             input = INPUT_TOUCH;
             touched = TRUE;
-        } else if (touch == 0) {
+        } else if (touch == SUMMARY_CURSOR_SCRIPT) {
             input = INPUT_TOUCH + 1;
             touched = TRUE;
-        } else if (touch == 2) {
+        } else if (touch == SUMMARY_CURSOR_BACK) {
             input = INPUT_BACK;
             touched = TRUE;
         }
@@ -646,7 +671,7 @@ static void BScenarioMain_SummaryInput(BScenarioWork *work) {
                     }
                     refresh = TRUE;
                 } else if (input == INPUT_RIGHT) {
-                    if (work->summaryCursor != 2) {
+                    if (work->summaryCursor != SUMMARY_CURSOR_BACK) {
                         GFL_SndSEPlay(SEQ_SE_SELECT1);
                     }
                     work->summaryCursor++;
@@ -655,12 +680,12 @@ static void BScenarioMain_SummaryInput(BScenarioWork *work) {
                     }
                     refresh = TRUE;
                 } else if (input == INPUT_DECIDE) {
-                    if (work->summaryCursor == 0) {
+                    if (work->summaryCursor == SUMMARY_CURSOR_SCRIPT) {
                         BScenarioGraphic_StartFlash(work, 0);
                         work->pageStep = PAGE_STEP_FLASH;
                         work->scriptCursor = 0;
                         GFL_SndSEPlay(SEQ_SE_DECIDE2);
-                    } else if (work->summaryCursor == 1) {
+                    } else if (work->summaryCursor == SUMMARY_CURSOR_CAST) {
                         BScenarioGraphic_StartFlash(work, 1);
                         work->pageStep = PAGE_STEP_FLASH_CAST;
                         // The touch screen's way clears the cast page's cursor instead
@@ -809,16 +834,16 @@ static void BScenarioMain_ScriptInput(BScenarioWork *work) {
     if (!refresh) {
         s32 touch = BScenarioGraphic_GetTouched(work, PAGE_SCRIPT);
 
-        if (touch == 0) {
+        if (touch == SCRIPT_CURSOR_CAST) {
             input = INPUT_TOUCH;
             touched = TRUE;
-        } else if (touch == 1) {
+        } else if (touch == SCRIPT_CURSOR_PREV) {
             input = INPUT_TOUCH + 1;
             touched = TRUE;
-        } else if (touch == 2) {
+        } else if (touch == SCRIPT_CURSOR_NEXT) {
             input = INPUT_TOUCH + 2;
             touched = TRUE;
-        } else if (touch == 3) {
+        } else if (touch == SCRIPT_CURSOR_BACK) {
             input = INPUT_BACK;
             touched = TRUE;
         }
@@ -847,7 +872,7 @@ static void BScenarioMain_ScriptInput(BScenarioWork *work) {
                     }
                     refresh = TRUE;
                 } else if (input == INPUT_RIGHT) {
-                    if (work->scriptCursor != 3) {
+                    if (work->scriptCursor != SCRIPT_CURSOR_BACK) {
                         GFL_SndSEPlay(SEQ_SE_SELECT1);
                     }
                     work->scriptCursor++;
@@ -856,11 +881,11 @@ static void BScenarioMain_ScriptInput(BScenarioWork *work) {
                     }
                     refresh = TRUE;
                 } else if (input == INPUT_DECIDE) {
-                    if (work->scriptCursor == 0) {
+                    if (work->scriptCursor == SCRIPT_CURSOR_CAST) {
                         BScenarioGraphic_StartFlash(work, 2);
                         work->pageStep = PAGE_STEP_FLASH;
                         GFL_SndSEPlay(SEQ_SE_DECIDE2);
-                    } else if (work->scriptCursor == 1) {
+                    } else if (work->scriptCursor == SCRIPT_CURSOR_PREV) {
                         if (work->scriptPage != 0) {
                             GFL_SndSEPlay(SEQ_SE_DECIDE2);
                         }
@@ -877,7 +902,7 @@ static void BScenarioMain_ScriptInput(BScenarioWork *work) {
                             work->flags |= BSCENARIO_FLAG_NEXT_ANIM;
                         }
                         BScenarioMain_UpdateArrows(work, PAGE_SCRIPT, FALSE);
-                    } else if (work->scriptCursor == 2) {
+                    } else if (work->scriptCursor == SCRIPT_CURSOR_NEXT) {
                         int pages = BScenarioMain_GetScriptPageCount(work);
 
                         if (work->scriptPage != pages - 1) {
@@ -1096,16 +1121,16 @@ static void BScenarioMain_CastInput(BScenarioWork *work) {
     if (!refresh) {
         s32 touch = BScenarioGraphic_GetTouched(work, PAGE_CAST);
 
-        if (touch == 0) {
+        if (touch == CAST_CURSOR_SCRIPT) {
             input = INPUT_TOUCH;
             touched = TRUE;
-        } else if (touch == 1) {
+        } else if (touch == CAST_CURSOR_PREV) {
             input = INPUT_TOUCH + 1;
             touched = TRUE;
-        } else if (touch == 2) {
+        } else if (touch == CAST_CURSOR_NEXT) {
             input = INPUT_TOUCH + 2;
             touched = TRUE;
-        } else if (touch == 3) {
+        } else if (touch == CAST_CURSOR_BACK) {
             input = INPUT_BACK;
             touched = TRUE;
         }
@@ -1134,7 +1159,7 @@ static void BScenarioMain_CastInput(BScenarioWork *work) {
                     }
                     refresh = TRUE;
                 } else if (input == INPUT_RIGHT) {
-                    if (work->castCursor != 3) {
+                    if (work->castCursor != CAST_CURSOR_BACK) {
                         GFL_SndSEPlay(SEQ_SE_SELECT1);
                     }
                     work->castCursor++;
@@ -1143,11 +1168,11 @@ static void BScenarioMain_CastInput(BScenarioWork *work) {
                     }
                     refresh = TRUE;
                 } else if (input == INPUT_DECIDE) {
-                    if (work->castCursor == 0) {
+                    if (work->castCursor == CAST_CURSOR_SCRIPT) {
                         BScenarioGraphic_StartFlash(work, 3);
                         work->pageStep = PAGE_STEP_FLASH;
                         GFL_SndSEPlay(SEQ_SE_DECIDE2);
-                    } else if (work->castCursor == 1) {
+                    } else if (work->castCursor == CAST_CURSOR_PREV) {
                         if (!(work->flags & BSCENARIO_FLAG_PREV_END)) {
                             GFL_SndSEPlay(SEQ_SE_DECIDE2);
                             work->castIndex--;
@@ -1158,7 +1183,7 @@ static void BScenarioMain_CastInput(BScenarioWork *work) {
                             BScenarioGraphic_SetButtonAnim(work, BSCENARIO_BUTTON_PREV, 4);
                             work->pageStep = PAGE_STEP_PREV;
                         }
-                    } else if (work->castCursor == 2) {
+                    } else if (work->castCursor == CAST_CURSOR_NEXT) {
                         if (!(work->flags & BSCENARIO_FLAG_NEXT_END)) {
                             GFL_SndSEPlay(SEQ_SE_DECIDE2);
                             work->castIndex++;
@@ -1437,7 +1462,7 @@ static void BScenarioMain_PrintLabels(BScenarioWork *work, int page) {
         u32 align;
         StrBuf *str;
 
-        if (label == 0xffff) {
+        if (label == BSCENARIO_LABEL_END) {
             break;
         }
         window = labels[i].window;

@@ -20,6 +20,12 @@
 #define WIFILOGIN_MESSAGE_STYLE_PDWACC 0
 #define WIFILOGIN_MESSAGE_STYLE_GSYNC 1
 
+// Where the yes/no menu goes on the screen
+enum {
+    WIFILOGIN_MENU_LAYOUT_HIGH,
+    WIFILOGIN_MENU_LAYOUT_LOW,
+};
+
 // The yes/no menu, of the style's kind
 typedef struct {
     u32 style;
@@ -41,7 +47,7 @@ typedef struct WifiLoginMessage {
     Font *font;
     StrBuf *strbuf;
     BmpWin *messageWin;
-    BmpWin *unk30;
+    BmpWin *noticeWin;
     BmpWin *titleWin;
     PrintStream *stream;
     AppPrintsysCommon printsys;

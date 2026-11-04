@@ -96,6 +96,7 @@ enum {
     MANAGER_RUN,
     MANAGER_UNUSED_2,
     MANAGER_PLAYED,
+    MANAGER_UNUSED_4,
 };
 
 typedef struct {
@@ -196,7 +197,7 @@ struct EvolutionDemoView {
     BOOL done;
     BOOL piecesStarted;
     // Set with piecesReturned
-    BOOL unk3C;
+    BOOL pushBGM;
     BOOL cancelled;
     f32 scale;
     // Which of the sprites is shown
@@ -295,7 +296,7 @@ EvolutionDemoView *EvolutionDemoView_Create(HeapID heapId, BOOL played, PartyPkm
     view->evolveRequested = FALSE;
     view->done = FALSE;
     view->piecesStarted = FALSE;
-    view->unk3C = FALSE;
+    view->pushBGM = FALSE;
     view->cancelled = FALSE;
     view->scale = 16.0f;
     if (view->played == FALSE) {
@@ -396,7 +397,7 @@ void EvolutionDemoView_Update(EvolutionDemoView *view) {
         if (view->frame >= 30) {
             view->state = VIEW_WAIT_REVEAL;
             view->frame = 0;
-            view->unk3C = TRUE;
+            view->pushBGM = TRUE;
             view->piecesReturned = TRUE;
         } else {
             view->frame++;
@@ -405,7 +406,7 @@ void EvolutionDemoView_Update(EvolutionDemoView *view) {
     case VIEW_CANCELLED:
         if (EvolutionDemoView_ArePiecesReturned(view)) {
             view->state = VIEW_WAIT_REVEAL;
-            view->unk3C = TRUE;
+            view->pushBGM = TRUE;
             view->piecesReturned = TRUE;
         }
         break;
@@ -518,8 +519,8 @@ BOOL EvolutionDemoView_HavePiecesStarted(EvolutionDemoView *view) {
     return view->piecesStarted;
 }
 
-BOOL EvolutionDemoView_GetUnk3C(EvolutionDemoView *view) {
-    return view->unk3C;
+BOOL EvolutionDemoView_ShouldPushBGM(EvolutionDemoView *view) {
+    return view->pushBGM;
 }
 
 BOOL EvolutionDemoView_Cancel(EvolutionDemoView *view) {
@@ -811,7 +812,7 @@ static void EvolutionDemoView_StartPieces(EvolutionDemoView *view) {
 static BOOL EvolutionDemoView_ArePiecesMoving(EvolutionDemoView *view) {
     PiecesManager *manager = view->pieces;
 
-    if (manager->state != MANAGER_WAIT && manager->state != 4) {
+    if (manager->state != MANAGER_WAIT && manager->state != MANAGER_UNUSED_4) {
         return TRUE;
     }
     return FALSE;

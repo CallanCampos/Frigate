@@ -123,7 +123,7 @@ void FMissionLogFApp_EndMission(LinkFestival *festival, FMissionAppResult *resul
     if (players > 1 && LinkFestival_IsBestMine(festival)) {
         FestRecords_AddTopScore(funfest);
     }
-    result->seconds = festival->config.unk20;
+    result->seconds = festival->config.secondsLeftAtEnd;
     if (result->cleared) {
         u16 score;
         BOOL second;
@@ -139,15 +139,15 @@ void FMissionLogFApp_EndMission(LinkFestival *festival, FMissionAppResult *resul
         FestRecords_AddCompleted(funfest);
         if (!festival->info->unk0_30) {
             FestRecords_UpdateMissionLevel(funfest, (u8)festival->info->index, festival->info->level + 1);
-            if (festival->missionHeader->unk02 != 0) {
-                EventWork_FlagSet(eventWork, festival->missionHeader->unk02);
+            if (festival->missionHeader->clearFlag != 0) {
+                EventWork_FlagSet(eventWork, festival->missionHeader->clearFlag);
             }
         }
         score = festival->config.missionId;
         second = FALSE;
         LinkFestival_GetMemberCount(festival);
-        result->item = festival->info->unk4_0;
-        result->itemCount = festival->info->unk4_10;
+        result->item = festival->info->rewardItem;
+        result->itemCount = festival->info->rewardItemCount;
         info = festival->info;
         switch (info->unk8_30) {
         case 1: {
@@ -186,17 +186,17 @@ void FMissionLogFApp_EndMission(LinkFestival *festival, FMissionAppResult *resul
         if (result->bonusCount > 99) {
             result->bonusCount = 99;
         }
-        if (festival->info->unkC_22 != 0 && festival->info->unk10_0 != 0 && second) {
-            result->item2 = festival->info->unkC_22;
-            result->item2Count = festival->info->unk10_0;
+        if (festival->info->rewardItem2 != 0 && festival->info->rewardItem2Count != 0 && second) {
+            result->item2 = festival->info->rewardItem2;
+            result->item2Count = festival->info->rewardItem2Count;
         }
         levels = GameData_GetMyPassPowerLevels(festival->gameData);
-        points = FestRecords_GetLevelPoints(funfest, festival->info->unk0_31);
+        points = FestRecords_GetLevelPoints(funfest, festival->info->isBlack);
         points += result->total;
         if (points > 1000) {
             points = 1000;
         }
-        if (!festival->info->unk0_31) {
+        if (!festival->info->isBlack) {
             level = PassPowerLevel_GetWhite(levels);
         } else {
             level = PassPowerLevel_GetBlack(levels);
@@ -219,13 +219,13 @@ void FMissionLogFApp_EndMission(LinkFestival *festival, FMissionAppResult *resul
             gained = 10;
             points = 0;
         }
-        result->isBlack = festival->info->unk0_31;
-        if (!festival->info->unk0_31) {
+        result->isBlack = festival->info->isBlack;
+        if (!festival->info->isBlack) {
             result->levels = HighLinkSave_AddWhiteLevel(levels, gained);
         } else {
             result->levels = HighLinkSave_AddBlackLevel(levels, gained);
         }
-        FestRecords_SetLevelPoints(funfest, festival->info->unk0_31, (u16)points);
+        FestRecords_SetLevelPoints(funfest, festival->info->isBlack, (u16)points);
         FMissionLogFApp_GiveMedals(festival, result, medalBox, funfest);
     }
 }

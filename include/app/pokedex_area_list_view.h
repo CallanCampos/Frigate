@@ -76,6 +76,10 @@ typedef struct {
     ClActorPos pos;
 } PokedexAreaListMark;
 
+// The animations of the page buttons while they are pressed
+#define POKEDEX_AREA_LIST_ANIM_PAGE_UP_PRESSED 12
+#define POKEDEX_AREA_LIST_ANIM_PAGE_DOWN_PRESSED 13
+
 // 0x6f4 bytes
 typedef struct {
     u32 unk0;

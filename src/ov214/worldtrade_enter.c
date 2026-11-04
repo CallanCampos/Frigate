@@ -324,8 +324,8 @@ static int Enter_WifiConnectionLogin(WorldTradeWork *wk) {
     param->unk8 = 1;
     param->buffer = wk->wifiLoginBuffer;
     param->unkC = 30;
-    param->unk20 = Enter_LoginCallback;
-    param->unk24 = wk;
+    param->callback = Enter_LoginCallback;
+    param->callbackData = wk;
     wk->loginSeq = LOGIN_INTERNET_CONNECT;
     if (wk->subProcessMode == WT_MODE_RELOGIN) {
         param->unk14 = 1;

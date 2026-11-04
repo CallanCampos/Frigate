@@ -48,14 +48,6 @@
 
 #define SEASON_COUNT POKEDEX_SEASON_COUNT
 
-// A habitat's kinds
-typedef enum {
-    TYPE_LAND,
-    TYPE_WATER,
-    TYPE_FISHING,
-    TYPE_COUNT,
-} PokedexHabitatType;
-
 // A species' status in PokedexHabitatSpecies
 enum {
     STATUS_NONE,
@@ -111,7 +103,7 @@ enum {
     LIST_TOUCH_EXIT,
     LIST_TOUCH_RETURN,
     LIST_TOUCH_TAB,
-    LIST_TOUCH_AREA_UP = LIST_TOUCH_TAB + TYPE_COUNT,
+    LIST_TOUCH_AREA_UP = LIST_TOUCH_TAB + POKEDEX_HABITAT_KIND_COUNT,
     LIST_TOUCH_AREA_DOWN,
     LIST_TOUCH_SEASON_LEFT,
     LIST_TOUCH_SEASON_RIGHT,
@@ -149,8 +141,8 @@ typedef struct {
     // The stamp that the area is being given, an AWARD_*
     u32 award;
     // Whether each kind of habitat has Pokémon in the area, and how many of them the player has, as an AWARD_*
-    BOOL typeShown[TYPE_COUNT];
-    u32 typeState[TYPE_COUNT];
+    BOOL typeShown[POKEDEX_HABITAT_KIND_COUNT];
+    u32 typeState[POKEDEX_HABITAT_KIND_COUNT];
     u32 species[POKEDEX_HABITAT_ICON_COUNT];
     // An ACTION_*
     u32 action;
@@ -396,9 +388,15 @@ static void PokedexHabitat_SetSequence(PokedexHabitatWork *wk, u32 seq, u32 acti
     wk->step = 0;
 }
 
+enum {
+    FADE_IN_STEP_WAIT_PRINT,
+    FADE_IN_STEP_WAIT_FADE,
+    FADE_IN_STEP_SLIDE,
+};
+
 static void PokedexHabitat_SeqFadeIn(PokedexHabitatWork *wk) {
     switch (wk->step) {
-    case 0:
+    case FADE_IN_STEP_WAIT_PRINT:
         if (PokedexHabitatGraphic_IsPrinted(&wk->graphic)) {
             wk->slideMain = SLIDE_DISTANCE;
             wk->slideSub = -SLIDE_DISTANCE;
@@ -408,14 +406,14 @@ static void PokedexHabitat_SeqFadeIn(PokedexHabitatWork *wk) {
             wk->step++;
         }
         break;
-    case 1:
+    case FADE_IN_STEP_WAIT_FADE:
         if (!PokedexHabitatGraphic_IsFading(&wk->graphic)) {
             GX_SetMasterBrightness(0);
             GXS_SetMasterBrightness(0);
             wk->step++;
         }
         break;
-    case 2:
+    case FADE_IN_STEP_SLIDE:
         if (!PokedexHabitatGraphic_IsFading(&wk->graphic)) {
             GFL_BGSysSetBGEnabled(6, TRUE);
             GFL_BGSysSetBGEnabled(7, TRUE);
@@ -439,9 +437,14 @@ static void PokedexHabitat_SeqFadeIn(PokedexHabitatWork *wk) {
     }
 }
 
+enum {
+    FADE_OUT_STEP_START,
+    FADE_OUT_STEP_SLIDE,
+};
+
 static void PokedexHabitat_SeqFadeOut(PokedexHabitatWork *wk) {
     switch (wk->step) {
-    case 0:
+    case FADE_OUT_STEP_START:
         if (PokedexHabitatGraphic_IsPrinted(&wk->graphic)) {
             u16 backdrop;
 
@@ -459,7 +462,7 @@ static void PokedexHabitat_SeqFadeOut(PokedexHabitatWork *wk) {
             wk->step++;
         }
         break;
-    case 1:
+    case FADE_OUT_STEP_SLIDE:
         if (!PokedexHabitatGraphic_IsFading(&wk->graphic)) {
             if (wk->slideMain >= SLIDE_DISTANCE) {
                 GX_SetMasterBrightness(-16);
@@ -491,14 +494,14 @@ static void PokedexHabitat_SeqList(PokedexHabitatWork *wk) {
     case LIST_TOUCH_RETURN:
         PokedexHabitat_SetSequence(wk, SEQ_BUTTON, ACTION_RETURN);
         break;
-    case LIST_TOUCH_TAB + TYPE_LAND:
-        PokedexHabitat_SelectType(wk, TYPE_LAND);
+    case LIST_TOUCH_TAB + POKEDEX_HABITAT_KIND_LAND:
+        PokedexHabitat_SelectType(wk, POKEDEX_HABITAT_KIND_LAND);
         break;
-    case LIST_TOUCH_TAB + TYPE_WATER:
-        PokedexHabitat_SelectType(wk, TYPE_WATER);
+    case LIST_TOUCH_TAB + POKEDEX_HABITAT_KIND_WATER:
+        PokedexHabitat_SelectType(wk, POKEDEX_HABITAT_KIND_WATER);
         break;
-    case LIST_TOUCH_TAB + TYPE_FISHING:
-        PokedexHabitat_SelectType(wk, TYPE_FISHING);
+    case LIST_TOUCH_TAB + POKEDEX_HABITAT_KIND_FISHING:
+        PokedexHabitat_SelectType(wk, POKEDEX_HABITAT_KIND_FISHING);
         break;
     case LIST_TOUCH_AREA_UP:
         if (wk->areaCount > 1) {
@@ -610,19 +613,24 @@ static void PokedexHabitat_ListKeys(PokedexHabitatWork *wk) {
     }
 }
 
+enum {
+    LEAVE_CURSOR_STEP_PRESS,
+    LEAVE_CURSOR_STEP_WAIT,
+};
+
 // Back from the cursor to the list
 static void PokedexHabitat_SeqLeaveCursor(PokedexHabitatWork *wk) {
     ClActor *actor = PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_RETURN);
 
     switch (wk->step) {
-    case 0:
+    case LEAVE_CURSOR_STEP_PRESS:
         ClActor_SetAnimTime(actor, 0);
         ClActor_SetSequence(actor, 9);
         ClActor_SetAutoAnim(actor, TRUE);
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         wk->step++;
         break;
-    case 1:
+    case LEAVE_CURSOR_STEP_WAIT:
         if (!GFL_SndPlayerIsActiveAny() && !ClActor_IsAnimActive(actor)) {
             PokedexHabitat_SetCursor(wk, wk->cursor, FALSE);
             PokedexHabitat_ShowListButtons(wk);
@@ -635,13 +643,19 @@ static void PokedexHabitat_SeqLeaveCursor(PokedexHabitatWork *wk) {
     }
 }
 
+enum {
+    CURSOR_STEP_START,
+    CURSOR_STEP_WAIT_SOUND,
+    CURSOR_STEP_INPUT,
+};
+
 // The cursor on the Pokémon, which chooses one to see in the Pokédex
 static void PokedexHabitat_SeqCursor(PokedexHabitatWork *wk) {
     PokedexHabitatArea *area = PokedexHabitat_GetArea(wk);
     int hit = GFL_HIDGetTouchPressedRect(sPokedexHabitatCursorTouchRects);
 
     switch (wk->step) {
-    case 0:
+    case CURSOR_STEP_START:
         PokedexHabitat_HideListButtons(wk);
         if (wk->action == ACTION_DECIDE) {
             PokedexHabitat_SetSequence(wk, SEQ_MOVE_CURSOR, ACTION_NONE);
@@ -652,12 +666,12 @@ static void PokedexHabitat_SeqCursor(PokedexHabitatWork *wk) {
             wk->step++;
         }
         break;
-    case 1:
+    case CURSOR_STEP_WAIT_SOUND:
         if (!GFL_SndPlayerIsActiveAny()) {
             wk->step++;
         }
         break;
-    case 2:
+    case CURSOR_STEP_INPUT:
         switch (hit) {
         case CURSOR_TOUCH_RETURN:
             PokedexHabitat_SetSequence(wk, SEQ_LEAVE_CURSOR, ACTION_RETURN);
@@ -731,9 +745,14 @@ static void PokedexHabitat_CursorKeys(PokedexHabitatWork *wk) {
     }
 }
 
+enum {
+    INIT_STEP_LOAD,
+    INIT_STEP_WAIT_ICONS,
+};
+
 static void PokedexHabitat_SeqInit(PokedexHabitatWork *wk) {
     switch (wk->step) {
-    case 0:
+    case INIT_STEP_LOAD:
         PokedexHabitatGraphic_FillWindow(POKEDEX_HABITAT_WIN_MAIN, 0, &wk->graphic);
         GFL_NetSetIconScreen(TRUE, HEAPID_POKEDEX_HABITAT);
         PokedexHabitat_LoadSave(wk);
@@ -745,7 +764,7 @@ static void PokedexHabitat_SeqInit(PokedexHabitatWork *wk) {
         PokedexHabitat_UpdateShortcut(wk);
         wk->step++;
         break;
-    case 1:
+    case INIT_STEP_WAIT_ICONS:
         if (PokedexHabitatGraphic_AreIconsLoaded(&wk->graphic) &&
             !PokedexHabitatGraphic_IsPaletteRequested(&wk->graphic)) {
             PokedexHabitat_SetSequence(wk, SEQ_FADE_IN, ACTION_NONE);
@@ -754,6 +773,11 @@ static void PokedexHabitat_SeqInit(PokedexHabitatWork *wk) {
         break;
     }
 }
+
+enum {
+    BUTTON_STEP_PRESS,
+    BUTTON_STEP_WAIT,
+};
 
 // A button that leaves the screen: it sets the result, and saves what the list showed
 static void PokedexHabitat_SeqButton(PokedexHabitatWork *wk) {
@@ -773,7 +797,7 @@ static void PokedexHabitat_SeqButton(PokedexHabitatWork *wk) {
     }
 
     switch (wk->step) {
-    case 0:
+    case BUTTON_STEP_PRESS:
         PokedexHabitatSave_SetZone(wk->habitat, PokedexHabitat_GetArea(wk)->zone);
         if (wk->action == ACTION_EXIT) {
             ClActor_SetSequence(actor, 8);
@@ -794,13 +818,18 @@ static void PokedexHabitat_SeqButton(PokedexHabitatWork *wk) {
         ClActor_SetAutoAnim(actor, TRUE);
         wk->step++;
         break;
-    case 1:
+    case BUTTON_STEP_WAIT:
         if (!ClActor_IsAnimActive(actor)) {
             PokedexHabitat_SetSequence(wk, SEQ_FADE_OUT, ACTION_NONE);
         }
         break;
     }
 }
+
+enum {
+    CHANGE_SEASON_STEP_START,
+    CHANGE_SEASON_STEP_WAIT,
+};
 
 static void PokedexHabitat_SeqChangeSeason(PokedexHabitatWork *wk) {
     ClActor *pressed;
@@ -816,7 +845,7 @@ static void PokedexHabitat_SeqChangeSeason(PokedexHabitatWork *wk) {
     }
 
     switch (wk->step) {
-    case 0:
+    case CHANGE_SEASON_STEP_START:
         ClActor_RestartAnim(other);
         ClActor_StopAnim(other);
         if (wk->action == ACTION_LEFT) {
@@ -839,7 +868,7 @@ static void PokedexHabitat_SeqChangeSeason(PokedexHabitatWork *wk) {
         GFL_SndSEPlay(SEQ_SE_SELECT3);
         wk->step++;
         // fallthrough
-    case 1:
+    case CHANGE_SEASON_STEP_WAIT:
         if (PokedexHabitatGraphic_AreIconsLoaded(&wk->graphic) &&
             !PokedexHabitatGraphic_IsPaletteRequested(&wk->graphic) && !ClActor_IsAnimActive(pressed)) {
             if (wk->action == ACTION_LEFT) {
@@ -862,6 +891,12 @@ static void PokedexHabitat_SeqChangeSeason(PokedexHabitatWork *wk) {
     }
 }
 
+enum {
+    CHANGE_AREA_STEP_START,
+    CHANGE_AREA_STEP_UPDATE,
+    CHANGE_AREA_STEP_WAIT,
+};
+
 static void PokedexHabitat_SeqChangeArea(PokedexHabitatWork *wk) {
     ClActor *actor;
     int anim;
@@ -875,7 +910,7 @@ static void PokedexHabitat_SeqChangeArea(PokedexHabitatWork *wk) {
     }
 
     switch (wk->step) {
-    case 0:
+    case CHANGE_AREA_STEP_START:
         wk->season = PokedexHabitatSave_GetSeason(wk->habitat);
         wk->type = wk->chosenType;
         if (wk->action == ACTION_UP) {
@@ -895,7 +930,7 @@ static void PokedexHabitat_SeqChangeArea(PokedexHabitatWork *wk) {
         ClActor_StartAnim(actor);
         wk->step++;
         // fallthrough
-    case 1:
+    case CHANGE_AREA_STEP_UPDATE:
         PokedexHabitat_CheckTypes(wk);
         PokedexHabitat_UpdateList(wk);
         PokedexHabitat_UpdateTabs(wk);
@@ -904,7 +939,7 @@ static void PokedexHabitat_SeqChangeArea(PokedexHabitatWork *wk) {
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         wk->step++;
         // fallthrough
-    case 2:
+    case CHANGE_AREA_STEP_WAIT:
         if (PokedexHabitatGraphic_AreIconsLoaded(&wk->graphic) &&
             !PokedexHabitatGraphic_IsPaletteRequested(&wk->graphic) && PokedexHabitatGraphic_IsPrinted(&wk->graphic)) {
             u32 award = PokedexHabitat_GetAward(wk);
@@ -940,23 +975,29 @@ static void PokedexHabitat_UpdateStamp(PokedexHabitatWork *wk) {
     }
 }
 
+enum {
+    CHANGE_TYPE_STEP_START,
+    CHANGE_TYPE_STEP_WAIT_ANIM,
+    CHANGE_TYPE_STEP_WAIT_LOAD,
+};
+
 static void PokedexHabitat_SeqChangeType(PokedexHabitatWork *wk) {
-    u32 anims[TYPE_COUNT] = { 19, 20, 21 };
+    u32 anims[POKEDEX_HABITAT_KIND_COUNT] = { 19, 20, 21 };
     ClActor *actor;
 
     switch (wk->step) {
-    case 0:
+    case CHANGE_TYPE_STEP_START:
         if (wk->action == ACTION_LEFT) {
             wk->type--;
             if (wk->type < 0) {
-                wk->type = TYPE_COUNT - 1;
+                wk->type = POKEDEX_HABITAT_KIND_COUNT - 1;
             }
             if (wk->typeShown[wk->type] == FALSE) {
                 PokedexHabitat_SkipType(wk, FALSE);
             }
         } else if (wk->action == ACTION_RIGHT) {
             wk->type++;
-            if (wk->type >= TYPE_COUNT) {
+            if (wk->type >= POKEDEX_HABITAT_KIND_COUNT) {
                 wk->type = 0;
             }
             if (wk->typeShown[wk->type] == FALSE) {
@@ -973,7 +1014,7 @@ static void PokedexHabitat_SeqChangeType(PokedexHabitatWork *wk) {
         ClActor_SetAutoAnim(actor, TRUE);
         wk->step++;
         break;
-    case 1:
+    case CHANGE_TYPE_STEP_WAIT_ANIM:
         actor = PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_TAB + wk->type);
         if (!ClActor_IsAnimActive(actor)) {
             ClActor_SetAutoAnim(actor, FALSE);
@@ -982,7 +1023,7 @@ static void PokedexHabitat_SeqChangeType(PokedexHabitatWork *wk) {
             wk->step++;
         }
         break;
-    case 2:
+    case CHANGE_TYPE_STEP_WAIT_LOAD:
         if (PokedexHabitatGraphic_AreIconsLoaded(&wk->graphic) &&
             !PokedexHabitatGraphic_IsPaletteRequested(&wk->graphic) && PokedexHabitatGraphic_IsPrinted(&wk->graphic)) {
             u32 award = PokedexHabitat_GetAward(wk);
@@ -1004,9 +1045,9 @@ static void PokedexHabitat_SkipType(PokedexHabitatWork *wk, int forward) {
     int i;
 
     if (forward == TRUE) {
-        for (i = 0; i < TYPE_COUNT; i++) {
+        for (i = 0; i < POKEDEX_HABITAT_KIND_COUNT; i++) {
             wk->type++;
-            if (wk->type >= TYPE_COUNT) {
+            if (wk->type >= POKEDEX_HABITAT_KIND_COUNT) {
                 wk->type = 0;
             }
             if (wk->typeShown[wk->type] == TRUE) {
@@ -1014,10 +1055,10 @@ static void PokedexHabitat_SkipType(PokedexHabitatWork *wk, int forward) {
             }
         }
     } else {
-        for (i = 0; i < TYPE_COUNT; i++) {
+        for (i = 0; i < POKEDEX_HABITAT_KIND_COUNT; i++) {
             wk->type--;
             if (wk->type < 0) {
-                wk->type = TYPE_COUNT - 1;
+                wk->type = POKEDEX_HABITAT_KIND_COUNT - 1;
             }
             if (wk->typeShown[wk->type] == TRUE) {
                 return;
@@ -1026,9 +1067,14 @@ static void PokedexHabitat_SkipType(PokedexHabitatWork *wk, int forward) {
     }
 }
 
+enum {
+    MOVE_CURSOR_STEP_MOVE,
+    MOVE_CURSOR_STEP_DONE,
+};
+
 static void PokedexHabitat_SeqMoveCursor(PokedexHabitatWork *wk) {
     switch (wk->step) {
-    case 0: {
+    case MOVE_CURSOR_STEP_MOVE: {
         int column = 0;
         int row = 0;
         int old = wk->cursor;
@@ -1117,11 +1163,21 @@ static void PokedexHabitat_SeqMoveCursor(PokedexHabitatWork *wk) {
         wk->step++;
     }
         // fallthrough
-    case 1:
+    case MOVE_CURSOR_STEP_DONE:
         PokedexHabitat_SetSequence(wk, SEQ_CURSOR, ACTION_NONE);
         break;
     }
 }
+
+enum {
+    AWARD_STEP_AREA_MESSAGE,
+    AWARD_STEP_WAIT_JINGLE,
+    AWARD_STEP_WAIT_INPUT,
+    AWARD_STEP_STAMP,
+    AWARD_STEP_WAIT_STAMP,
+    AWARD_STEP_SAVE,
+    AWARD_STEP_DONE,
+};
 
 // Stamps the area: with the message and the jingle for the whole area, then the stamp of the kind of habitat
 static void PokedexHabitat_SeqAward(PokedexHabitatWork *wk) {
@@ -1129,7 +1185,7 @@ static void PokedexHabitat_SeqAward(PokedexHabitatWork *wk) {
     ClActor *actor;
 
     switch (wk->step) {
-    case 0:
+    case AWARD_STEP_AREA_MESSAGE:
         if (wk->award == AWARD_AREA) {
             StrBuf *strbuf;
             StrBuf *format;
@@ -1149,16 +1205,16 @@ static void PokedexHabitat_SeqAward(PokedexHabitatWork *wk) {
             PokedexHabitatSave_SetHabitatFlag(wk->habitat, PokedexHabitat_GetHabitatIndex(area->zone));
             wk->step++;
         } else {
-            wk->step = 3;
+            wk->step = AWARD_STEP_STAMP;
         }
         break;
-    case 1:
+    case AWARD_STEP_WAIT_JINGLE:
         if (!GFL_SndBGMIsPlaying() && PokedexHabitatGraphic_GetMessageState(&wk->graphic) == PRINT_STREAM_DONE) {
             PokedexHabitatGraphic_WaitMessage(&wk->graphic);
             wk->step++;
         }
         break;
-    case 2:
+    case AWARD_STEP_WAIT_INPUT:
         if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed() == TRUE) {
             u32 award;
             int habitat;
@@ -1169,7 +1225,7 @@ static void PokedexHabitat_SeqAward(PokedexHabitatWork *wk) {
             PokedexHabitatGraphic_CloseMessage(&wk->graphic);
             award = PokedexHabitat_GetAward(wk);
             habitat = PokedexHabitat_GetHabitatIndex(area->zone);
-            for (type = TYPE_LAND; type < TYPE_COUNT; type++) {
+            for (type = POKEDEX_HABITAT_KIND_LAND; type < POKEDEX_HABITAT_KIND_COUNT; type++) {
                 PokedexHabitatSave_SetHabitatField(wk->habitat, habitat, type, AWARD_CAUGHT);
             }
             if (award != AWARD_NONE) {
@@ -1177,11 +1233,11 @@ static void PokedexHabitat_SeqAward(PokedexHabitatWork *wk) {
             } else {
                 PokedexHabitat_UpdateNewMarks(wk);
                 PokedexHabitat_SetSequence(wk, SEQ_LIST, ACTION_NONE);
-                wk->step = 6;
+                wk->step = AWARD_STEP_DONE;
             }
         }
         break;
-    case 3:
+    case AWARD_STEP_STAMP:
         actor = PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_STAMP);
         if (wk->award == AWARD_CAUGHT || wk->award == AWARD_AREA) {
             PokedexHabitatGraphic_StartActorAnim(&wk->graphic, POKEDEX_HABITAT_OBJ_STAMP, 26);
@@ -1192,7 +1248,7 @@ static void PokedexHabitat_SeqAward(PokedexHabitatWork *wk) {
         wk->timer = 0;
         wk->step++;
         break;
-    case 4:
+    case AWARD_STEP_WAIT_STAMP:
         actor = PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_STAMP);
         if (wk->timer == 19) {
             GFL_SndSEPlay(SEQ_SE_SW_ZUKANSTUMP_01);
@@ -1203,7 +1259,7 @@ static void PokedexHabitat_SeqAward(PokedexHabitatWork *wk) {
             wk->step++;
         }
         break;
-    case 5:
+    case AWARD_STEP_SAVE:
         area = PokedexHabitat_GetArea(wk);
         if (wk->award != AWARD_AREA) {
             int habitat = PokedexHabitat_GetHabitatIndex(area->zone);
@@ -1223,12 +1279,18 @@ static void PokedexHabitat_SeqAward(PokedexHabitatWork *wk) {
     }
 }
 
+enum {
+    ALL_COMPLETE_STEP_PRINT,
+    ALL_COMPLETE_STEP_WAIT,
+    ALL_COMPLETE_STEP_CLOSE,
+};
+
 // The message of the first stamp of each kind
 static void PokedexHabitat_SeqAllComplete(PokedexHabitatWork *wk) {
     StrBuf *strbuf;
 
     switch (wk->step) {
-    case 0:
+    case ALL_COMPLETE_STEP_PRINT:
         if (wk->award == AWARD_CAUGHT) {
             strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, PokedexHabitat_Text_WhenAllPokemonHabitat_2);
             PokedexHabitatSave_SetCaughtMessageShown(wk->habitat);
@@ -1241,13 +1303,13 @@ static void PokedexHabitat_SeqAllComplete(PokedexHabitatWork *wk) {
         GFL_StrBufFree(strbuf);
         wk->step++;
         break;
-    case 1:
+    case ALL_COMPLETE_STEP_WAIT:
         if (PokedexHabitatGraphic_GetMessageState(&wk->graphic) == PRINT_STREAM_DONE) {
             PokedexHabitatGraphic_WaitMessage(&wk->graphic);
             wk->step++;
         }
         break;
-    case 2: {
+    case ALL_COMPLETE_STEP_CLOSE: {
         PokedexHabitatArea *area = PokedexHabitat_GetArea(wk);
 
         PokedexHabitatGraphic_CloseMessage(&wk->graphic);
@@ -1267,7 +1329,7 @@ static void PokedexHabitat_PrintHabitat(PokedexHabitatWork *wk) {
     StrBuf *format;
 
     if (wk->empty == FALSE) {
-        message = PokedexHabitat_GetHabitatMessage(wk->type, area->unk8);
+        message = PokedexHabitat_GetHabitatMessage(wk->type, area->landKind);
     } else {
         message = PokedexHabitat_Text_NoPokemonLivesHere;
     }
@@ -1298,11 +1360,11 @@ static u32 PokedexHabitat_GetHabitatMessage(u32 type, u32 land) {
 static u32 PokedexHabitat_ChooseMessage(u32 type, u32 land, const u32 *landMessages, u32 water, u32 fishing) {
     u32 message = 0;
 
-    if (type == TYPE_LAND) {
+    if (type == POKEDEX_HABITAT_KIND_LAND) {
         message = landMessages[land];
-    } else if (type == TYPE_WATER) {
+    } else if (type == POKEDEX_HABITAT_KIND_WATER) {
         message = water;
-    } else if (type == TYPE_FISHING) {
+    } else if (type == POKEDEX_HABITAT_KIND_FISHING) {
         message = fishing;
     }
     return message;
@@ -1388,26 +1450,26 @@ static void PokedexHabitat_LoadSpecies(PokedexHabitatWork *wk) {
 }
 
 static void PokedexHabitat_UpdateTabs(PokedexHabitatWork *wk) {
-    if (wk->type == TYPE_LAND) {
-        PokedexHabitatGraphic_SetTab(&wk->graphic, TYPE_LAND, POKEDEX_HABITAT_TAB_CHOSEN);
-    } else if (wk->typeShown[TYPE_LAND] == TRUE) {
-        PokedexHabitatGraphic_SetTab(&wk->graphic, TYPE_LAND, POKEDEX_HABITAT_TAB_SHOWN);
+    if (wk->type == POKEDEX_HABITAT_KIND_LAND) {
+        PokedexHabitatGraphic_SetTab(&wk->graphic, POKEDEX_HABITAT_KIND_LAND, POKEDEX_HABITAT_TAB_CHOSEN);
+    } else if (wk->typeShown[POKEDEX_HABITAT_KIND_LAND] == TRUE) {
+        PokedexHabitatGraphic_SetTab(&wk->graphic, POKEDEX_HABITAT_KIND_LAND, POKEDEX_HABITAT_TAB_SHOWN);
     } else {
-        PokedexHabitatGraphic_SetTab(&wk->graphic, TYPE_LAND, POKEDEX_HABITAT_TAB_HIDDEN);
+        PokedexHabitatGraphic_SetTab(&wk->graphic, POKEDEX_HABITAT_KIND_LAND, POKEDEX_HABITAT_TAB_HIDDEN);
     }
-    if (wk->type == TYPE_WATER) {
-        PokedexHabitatGraphic_SetTab(&wk->graphic, TYPE_WATER, POKEDEX_HABITAT_TAB_CHOSEN);
-    } else if (wk->typeShown[TYPE_WATER] == TRUE) {
-        PokedexHabitatGraphic_SetTab(&wk->graphic, TYPE_WATER, POKEDEX_HABITAT_TAB_SHOWN);
+    if (wk->type == POKEDEX_HABITAT_KIND_WATER) {
+        PokedexHabitatGraphic_SetTab(&wk->graphic, POKEDEX_HABITAT_KIND_WATER, POKEDEX_HABITAT_TAB_CHOSEN);
+    } else if (wk->typeShown[POKEDEX_HABITAT_KIND_WATER] == TRUE) {
+        PokedexHabitatGraphic_SetTab(&wk->graphic, POKEDEX_HABITAT_KIND_WATER, POKEDEX_HABITAT_TAB_SHOWN);
     } else {
-        PokedexHabitatGraphic_SetTab(&wk->graphic, TYPE_WATER, POKEDEX_HABITAT_TAB_HIDDEN);
+        PokedexHabitatGraphic_SetTab(&wk->graphic, POKEDEX_HABITAT_KIND_WATER, POKEDEX_HABITAT_TAB_HIDDEN);
     }
-    if (wk->type == TYPE_FISHING) {
-        PokedexHabitatGraphic_SetTab(&wk->graphic, TYPE_FISHING, POKEDEX_HABITAT_TAB_CHOSEN);
-    } else if (wk->typeShown[TYPE_FISHING] == TRUE) {
-        PokedexHabitatGraphic_SetTab(&wk->graphic, TYPE_FISHING, POKEDEX_HABITAT_TAB_SHOWN);
+    if (wk->type == POKEDEX_HABITAT_KIND_FISHING) {
+        PokedexHabitatGraphic_SetTab(&wk->graphic, POKEDEX_HABITAT_KIND_FISHING, POKEDEX_HABITAT_TAB_CHOSEN);
+    } else if (wk->typeShown[POKEDEX_HABITAT_KIND_FISHING] == TRUE) {
+        PokedexHabitatGraphic_SetTab(&wk->graphic, POKEDEX_HABITAT_KIND_FISHING, POKEDEX_HABITAT_TAB_SHOWN);
     } else {
-        PokedexHabitatGraphic_SetTab(&wk->graphic, TYPE_FISHING, POKEDEX_HABITAT_TAB_HIDDEN);
+        PokedexHabitatGraphic_SetTab(&wk->graphic, POKEDEX_HABITAT_KIND_FISHING, POKEDEX_HABITAT_TAB_HIDDEN);
     }
     PokedexHabitatGraphic_RequestPalette(&wk->graphic, wk->type);
     PokedexHabitat_UpdateNewMarks(wk);
@@ -1415,10 +1477,11 @@ static void PokedexHabitat_UpdateTabs(PokedexHabitatWork *wk) {
 }
 
 static void PokedexHabitat_UpdateNewMarks(PokedexHabitatWork *wk) {
-    PokedexHabitat_UpdateNewMark(wk, TYPE_LAND, PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_NEW));
-    PokedexHabitat_UpdateNewMark(wk, TYPE_WATER,
+    PokedexHabitat_UpdateNewMark(wk, POKEDEX_HABITAT_KIND_LAND,
+                                 PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_NEW));
+    PokedexHabitat_UpdateNewMark(wk, POKEDEX_HABITAT_KIND_WATER,
                                  PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_NEW + 1));
-    PokedexHabitat_UpdateNewMark(wk, TYPE_FISHING,
+    PokedexHabitat_UpdateNewMark(wk, POKEDEX_HABITAT_KIND_FISHING,
                                  PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_NEW + 2));
 }
 
@@ -1470,7 +1533,7 @@ static void PokedexHabitat_CheckTypes(PokedexHabitatWork *wk) {
     PokedexHabitatSpecies *species = PokedexHabitat_GetArea(wk)->species;
 
     MI_CpuFill8(wk->typeShown, 0, sizeof(wk->typeShown));
-    for (type = 0; type < TYPE_COUNT; type++) {
+    for (type = 0; type < POKEDEX_HABITAT_KIND_COUNT; type++) {
         BOOL seen = TRUE;
         BOOL caught = TRUE;
 
@@ -1506,11 +1569,11 @@ static void PokedexHabitat_CheckTypes(PokedexHabitatWork *wk) {
 static void PokedexHabitat_HideListButtons(PokedexHabitatWork *wk) {
     ClActor *actor;
 
-    actor = PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_TAB + TYPE_LAND);
+    actor = PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_TAB + POKEDEX_HABITAT_KIND_LAND);
     ClActor_SetVisible(actor, FALSE);
-    actor = PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_TAB + TYPE_WATER);
+    actor = PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_TAB + POKEDEX_HABITAT_KIND_WATER);
     ClActor_SetVisible(actor, FALSE);
-    actor = PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_TAB + TYPE_FISHING);
+    actor = PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_TAB + POKEDEX_HABITAT_KIND_FISHING);
     ClActor_SetVisible(actor, FALSE);
     actor = PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_AREA_UP);
     ClActor_SetVisible(actor, FALSE);
@@ -1532,12 +1595,15 @@ static void PokedexHabitat_HideListButtons(PokedexHabitatWork *wk) {
 static void PokedexHabitat_ShowListButtons(PokedexHabitatWork *wk) {
     PokedexHabitatArea *area = PokedexHabitat_GetArea(wk);
 
-    ClActor_SetVisible(PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_TAB + TYPE_LAND),
-                       wk->typeShown[TYPE_LAND]);
-    ClActor_SetVisible(PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_TAB + TYPE_WATER),
-                       wk->typeShown[TYPE_WATER]);
-    ClActor_SetVisible(PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_TAB + TYPE_FISHING),
-                       wk->typeShown[TYPE_FISHING]);
+    ClActor_SetVisible(
+        PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_TAB + POKEDEX_HABITAT_KIND_LAND),
+        wk->typeShown[POKEDEX_HABITAT_KIND_LAND]);
+    ClActor_SetVisible(
+        PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_TAB + POKEDEX_HABITAT_KIND_WATER),
+        wk->typeShown[POKEDEX_HABITAT_KIND_WATER]);
+    ClActor_SetVisible(
+        PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_TAB + POKEDEX_HABITAT_KIND_FISHING),
+        wk->typeShown[POKEDEX_HABITAT_KIND_FISHING]);
     if (wk->areaCount > 1) {
         ClActor_SetVisible(PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_AREA_UP), TRUE);
         ClActor_SetVisible(PokedexHabitatGraphic_GetActor(&wk->graphic, POKEDEX_HABITAT_OBJ_AREA_DOWN), TRUE);
@@ -1662,7 +1728,7 @@ static BOOL PokedexHabitat_HasSeveralTypes(PokedexHabitatWork *wk) {
     int count = 0;
     int i;
 
-    for (i = 0; i < TYPE_COUNT; i++) {
+    for (i = 0; i < POKEDEX_HABITAT_KIND_COUNT; i++) {
         if (wk->typeShown[i] == TRUE) {
             count++;
         }

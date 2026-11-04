@@ -571,13 +571,18 @@ static void ResearchTop_SeqWait(ResearchTop *wk) {
     }
 }
 
+enum {
+    FADE_OUT_STEP_START = 0,
+    FADE_OUT_STEP_WAIT,
+};
+
 static void ResearchTop_SeqFadeOut(ResearchTop *wk) {
     switch (ResearchTop_GetSeqState(wk)) {
-    case 0:
+    case FADE_OUT_STEP_START:
         ResearchTop_FadeOut();
         ResearchTop_NextSeqState(wk);
         break;
-    case 1:
+    case FADE_OUT_STEP_WAIT:
         if (!GFL_FadeIsRunning()) {
             ResearchTop_EndSeq(wk);
         }

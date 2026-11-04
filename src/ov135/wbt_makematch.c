@@ -60,6 +60,20 @@ enum {
     WBT_STATUS_PICKED,
 };
 
+// What a slot of a downloaded tournament picks
+enum {
+    WBT_SLOT_FIRST_TEN,
+    WBT_SLOT_SECOND_TEN,
+    WBT_SLOT_DOWNLOADED,
+    WBT_SLOT_NUMBER,
+};
+
+// The tournaments that have a name here; the rest go by their number
+enum {
+    WBT_TOURNAMENT_TYPE_EXPERT = 2,
+    WBT_TOURNAMENT_DOWNLOADED,
+};
+
 // Any, for the count of Trainers the player has beaten
 #define WBT_ANY 2
 
@@ -93,13 +107,14 @@ static void WbtMakeMatch_PickTypeExpert(WbtMakeMatch *m, WbtBracketEntry *result
 static void WbtMakeMatch_PickBracket(GameData *gameData, WbtMatchParam *param, WbtBracketEntry *result);
 static void WbtMakeMatch_ShuffleEntrants(MATHRandContext32 *rand, WbtEntrant **items, u32 count);
 static void WbtMakeMatch_PlaceEntrants(WbtEntrant *entrants, u64 seed, HeapID heapId);
-static void WbtEntrant_Set(WbtEntrant *entrant, u32 unk0_0, u32 unk2, u8 unk0_3, u8 rank, u8 unk3_0, u8 unk3_6,
-                           BOOL unk0_7, u8 type, u16 objCode, u16 trainerClass, u8 unk6_12);
+static void WbtEntrant_Set(WbtEntrant *entrant, u32 kind, u32 trainerId, u8 gender, u8 rank, u8 iv, u8 downloadedRound,
+                           BOOL hasSpecialPokemon, u8 type, u16 objCode, u16 trainerClass, u8 unk6_12);
 static void WbtEntrant_SetFromTable(WbtSystem *sys, HeapID heapId, WbtEntrant *entrant, u32 index);
 static void WbtEntrant_SetPlayer(WbtEntrant *entrant, WbtSystem *sys, GameData *gameData);
-static void WbtEntrant_SetDownloaded(WbtEntrant *entrant, const WbtDownloadedTrainer *trainer, u32 unk3_6, u8 rank);
+static void WbtEntrant_SetDownloaded(WbtEntrant *entrant, const WbtDownloadedTrainer *trainer, u32 downloadedRound,
+                                     u8 rank);
 static void WbtEntrant_SetTableForDownloaded(WbtEntrant *entrant, WbtSystem *sys, u8 index,
-                                             WbtDownloadedTrainer *trainer, u32 unk3_6, u32 rank);
+                                             WbtDownloadedTrainer *trainer, u32 downloadedRound, u32 rank);
 static void WbtMakeMatch_SetEntrants(WbtSystem *sys, GameData *gameData, WbtBracketEntry *result);
 static BOOL WbtMakeMatch_IsDownloadValid(GameData *gameData, u32 slot);
 static void WbtMakeMatch_ClearDownload(WbtSystem *sys);
@@ -143,7 +158,7 @@ static u32 WbtMakeMatch_CountCandidates(WbtMakeMatch *m, u32 status, u32 rank, u
     int i;
 
     for (i = 0; i < m->param->trainerCount; i++) {
-        if (m->status[i] == status && (rank == 0 || rank == m->param->trainers[i].unk8_0) &&
+        if (m->status[i] == status && (rank == 0 || rank == m->param->trainers[i].rank) &&
             (encountered == WBT_ANY || encountered == m->encountered[i])) {
             count++;
         }
@@ -157,7 +172,7 @@ static u32 WbtMakeMatch_FindCandidate(WbtMakeMatch *m, u32 rank, u32 encountered
     u32 i;
 
     for (i = 0; i < m->param->trainerCount; i++) {
-        if (m->status[i] == WBT_STATUS_CANDIDATE && (rank == 0 || rank == m->param->trainers[i].unk8_0) &&
+        if (m->status[i] == WBT_STATUS_CANDIDATE && (rank == 0 || rank == m->param->trainers[i].rank) &&
             (encountered == WBT_ANY || encountered == m->encountered[i])) {
             left--;
             if (left == 0) {
@@ -198,7 +213,7 @@ static int WbtMakeMatch_PickRank(WbtMakeMatch *m, u32 rank, u8 count) {
         }
     }
     for (i = 0; i < m->param->trainerCount; i++) {
-        if (status[i] == WBT_STATUS_CANDIDATE && (rank == 0 || rank == m->param->trainers[i].unk8_0)) {
+        if (status[i] == WBT_STATUS_CANDIDATE && (rank == 0 || rank == m->param->trainers[i].rank)) {
             status[i] = WBT_STATUS_UNUSED;
         }
     }
@@ -223,7 +238,7 @@ static BOOL WbtMakeMatch_IsEligible(const WbtMatchParam *param, WbtTrainer *trai
     case 8:
     case 9:
         return trainer->tournament == param->tournament;
-    case 2:
+    case WBT_TOURNAMENT_TYPE_EXPERT:
         return trainer->expertType == param->type || trainer->expertType == TYPE_NULL;
     case 4:
         return trainer->inTournament4;
@@ -231,7 +246,7 @@ static BOOL WbtMakeMatch_IsEligible(const WbtMatchParam *param, WbtTrainer *trai
         return trainer->inTournament11;
     case 10:
         return trainer->inTournament10;
-    case 3:
+    case WBT_TOURNAMENT_DOWNLOADED:
         return TRUE;
     }
     return FALSE;
@@ -276,22 +291,22 @@ static void WbtMakeMatch_PickDownloaded(const WbtUnk18A *slots, WbtMakeMatch *m,
         int slot = i - 1;
 
         switch (slots[slot].type) {
-        case 0:
+        case WBT_SLOT_FIRST_TEN:
         default:
             result[i].kind = WBT_KIND_TABLE;
             result[i].index = 0x44 + order[next++];
             break;
-        case 1:
+        case WBT_SLOT_SECOND_TEN:
             result[i].kind = WBT_KIND_TABLE;
             result[i].index = 0x4e + order[next++];
             break;
-        case 3:
+        case WBT_SLOT_NUMBER:
             result[i].kind = WBT_KIND_TABLE;
-            result[i].index = slots[slot].unk2;
+            result[i].index = slots[slot].index;
             break;
-        case 2:
+        case WBT_SLOT_DOWNLOADED:
             result[i].kind = WBT_KIND_CAST_FIRST + slot;
-            result[i].index = slots[slot].unk2;
+            result[i].index = slots[slot].index;
             break;
         }
     }
@@ -397,7 +412,7 @@ static void WbtMakeMatch_PickBracket(GameData *gameData, WbtMatchParam *param, W
     case 1:
         WbtMakeMatch_PickTournament1(m, result);
         break;
-    case 2:
+    case WBT_TOURNAMENT_TYPE_EXPERT:
         WbtMakeMatch_PickTypeExpert(m, result);
         break;
     case 5:
@@ -425,7 +440,7 @@ static void WbtMakeMatch_PickBracket(GameData *gameData, WbtMatchParam *param, W
     case 13:
         WbtMakeMatch_PickTournament13(m, result);
         break;
-    case 3:
+    case WBT_TOURNAMENT_DOWNLOADED:
         WbtMakeMatch_PickDownloaded(param->downloadSlots, m, result);
         break;
     }
@@ -478,7 +493,7 @@ static void WbtMakeMatch_PlaceEntrants(WbtEntrant *entrants, u64 seed, HeapID he
     WbtMakeMatch_ShuffleEntrants(&rand, others, 8);
     playerPlace = 8 - 9;
     for (i = 0; i < 8; i++) {
-        if (WbtEntrant_GetKind(others[i]) == 3) {
+        if (WbtEntrant_GetKind(others[i]) == WBT_ENTRANT_KIND_PLAYER) {
             places[i] = others[i];
             playerPlace = i;
             for (; i < 7; i++) {
@@ -516,18 +531,18 @@ static void WbtMakeMatch_PlaceEntrants(WbtEntrant *entrants, u64 seed, HeapID he
     GFL_HeapFree(copy);
 }
 
-static void WbtEntrant_Set(WbtEntrant *entrant, u32 unk0_0, u32 unk2, u8 unk0_3, u8 rank, u8 unk3_0, u8 unk3_6,
-                           BOOL unk0_7, u8 type, u16 objCode, u16 trainerClass, u8 unk6_12) {
-    entrant->unk0_0 = unk0_0;
-    entrant->unk2 = unk2;
-    entrant->unk0_3 = unk0_3;
-    entrant->unk0_4 = rank;
-    entrant->unk3_0 = unk3_0;
-    entrant->unk3_6 = unk3_6;
-    entrant->unk0_7 = unk0_7;
+static void WbtEntrant_Set(WbtEntrant *entrant, u32 kind, u32 trainerId, u8 gender, u8 rank, u8 iv, u8 downloadedRound,
+                           BOOL hasSpecialPokemon, u8 type, u16 objCode, u16 trainerClass, u8 unk6_12) {
+    entrant->kind = kind;
+    entrant->trainerId = trainerId;
+    entrant->gender = gender;
+    entrant->rank = rank;
+    entrant->iv = iv;
+    entrant->downloadedRound = downloadedRound;
+    entrant->hasSpecialPokemon = hasSpecialPokemon;
     entrant->type = type;
     entrant->objCode = objCode;
-    entrant->unk6_0 = trainerClass;
+    entrant->trainerClass = trainerClass;
     entrant->unk6_12 = unk6_12;
 }
 
@@ -536,8 +551,8 @@ static void WbtEntrant_SetFromTable(WbtSystem *sys, HeapID heapId, WbtEntrant *e
     WbtTrainer trainer;
 
     WbtTrainers_Get(sys->trainers, index, &trainer);
-    WbtEntrant_Set(entrant, 0, index, trainer.gender, trainer.unk8_0, trainer.unk8_3, 0, trainer.unkE != 0,
-                   trainer.type, trainer.unk2, trainer.trainerClass, 15);
+    WbtEntrant_Set(entrant, WBT_ENTRANT_KIND_TABLE, index, trainer.gender, trainer.rank, trainer.unk8_3, 0,
+                   trainer.unkE != 0, trainer.type, trainer.objCode, trainer.trainerClass, 15);
     WbtTool_LoadTrainerName(heapId, index, entrant->name);
 }
 
@@ -556,31 +571,32 @@ static void WbtEntrant_SetPlayer(WbtEntrant *entrant, WbtSystem *sys, GameData *
         objCode = 0xf0;
         isFemale = 1;
     }
-    WbtEntrant_Set(entrant, 3, 0, gender, rank, 0, 0, FALSE, WbtTool_GetPartyMainType(sys->partyBC, sys->seed), objCode,
-                   isFemale, 1);
+    WbtEntrant_Set(entrant, WBT_ENTRANT_KIND_PLAYER, 0, gender, rank, 0, 0, FALSE,
+                   WbtTool_GetPartyMainType(sys->partyBC, sys->seed), objCode, isFemale, 1);
     textCopy(playerInfo->name, entrant->name);
 }
 
 // A Trainer of a downloaded tournament
-static void WbtEntrant_SetDownloaded(WbtEntrant *entrant, const WbtDownloadedTrainer *trainer, u32 unk3_6, u8 rank) {
-    u32 trainerClass = WbtTool_GetDownloadedTrainerClass(trainer->unk3D4);
+static void WbtEntrant_SetDownloaded(WbtEntrant *entrant, const WbtDownloadedTrainer *trainer, u32 downloadedRound,
+                                     u8 rank) {
+    u32 trainerClass = WbtTool_GetDownloadedTrainerClass(trainer->classIndex);
     u32 objCode = BtlInst_GetTrainerClassObjCode(trainerClass);
 
-    WbtEntrant_Set(entrant, 1, 0, TrainerClass_GetSex(trainerClass), rank, 0, unk3_6, FALSE, TYPE_NULL, objCode,
-                   trainerClass, trainer->unk3DC);
+    WbtEntrant_Set(entrant, WBT_ENTRANT_KIND_DOWNLOADED, 0, TrainerClass_GetSex(trainerClass), rank, 0, downloadedRound,
+                   FALSE, TYPE_NULL, objCode, trainerClass, trainer->unk3DC);
     GFL_StrBufLoadFixedString(entrant->name, trainer->name, 14);
-    GFL_StrBufLoadFixedString(entrant->unkC, trainer->className, 22);
+    GFL_StrBufLoadFixedString(entrant->className, trainer->className, 22);
 }
 
 // A Trainer of the table that a downloaded tournament uses in place of one of its own; the original takes the
 // downloaded Trainer and a rank too, and does nothing with them
 static void WbtEntrant_SetTableForDownloaded(WbtEntrant *entrant, WbtSystem *sys, u8 index,
-                                             WbtDownloadedTrainer *trainer, u32 unk3_6, u32 rank) {
+                                             WbtDownloadedTrainer *trainer, u32 downloadedRound, u32 rank) {
     WbtTrainer table;
 
     WbtTrainers_Get(sys->trainers, index, &table);
-    WbtEntrant_Set(entrant, 2, index, table.gender, table.unk8_0, table.unk8_3, unk3_6, FALSE, table.type, table.unk2,
-                   table.trainerClass, 15);
+    WbtEntrant_Set(entrant, WBT_ENTRANT_KIND_DOWNLOADED_TABLE, index, table.gender, table.rank, table.unk8_3,
+                   downloadedRound, FALSE, table.type, table.objCode, table.trainerClass, 15);
     WbtTool_LoadTrainerName(sys->heapId, index, entrant->name);
 }
 
@@ -597,7 +613,7 @@ static void WbtMakeMatch_SetEntrants(WbtSystem *sys, GameData *gameData, WbtBrac
         switch (result[i].kind) {
         case WBT_KIND_PLAYER:
             WbtEntrant_SetPlayer(entrant, sys, gameData);
-            WbtTool_LoadTrainerClassName(sys->heapId, entrant->unk2, entrant->unkC);
+            WbtTool_LoadTrainerClassName(sys->heapId, entrant->trainerId, entrant->className);
             break;
         case WBT_KIND_CAST_FIRST:
         case WBT_KIND_CAST_FIRST + 1:
@@ -611,7 +627,7 @@ static void WbtMakeMatch_SetEntrants(WbtSystem *sys, GameData *gameData, WbtBrac
                 u8 index = result[i].index - 1;
 
                 WbtEntrant_SetTableForDownloaded(entrant, sys, index, trainer, result[i].kind - WBT_KIND_CAST_FIRST, 3);
-                WbtTool_LoadTrainerClassName(sys->heapId, index, entrant->unkC);
+                WbtTool_LoadTrainerClassName(sys->heapId, index, entrant->className);
             }
             break;
         default:
@@ -621,11 +637,11 @@ static void WbtMakeMatch_SetEntrants(WbtSystem *sys, GameData *gameData, WbtBrac
                 GFL_StrBufLoadString(entrant->name,
                                      getPtrToRivalName(getHollow_RivalData(GameData_GetSaveControl(gameData))));
             }
-            WbtTool_LoadTrainerClassName(sys->heapId, entrant->unk2, entrant->unkC);
+            WbtTool_LoadTrainerClassName(sys->heapId, entrant->trainerId, entrant->className);
             break;
         }
-        if (sys->tournament == 3 && entrant->unk0_0 != 3) {
-            entrant->unk0_4 = sys->downloadSlots[rankIndex].unk1;
+        if (sys->tournament == WBT_TOURNAMENT_DOWNLOADED && entrant->kind != WBT_ENTRANT_KIND_PLAYER) {
+            entrant->rank = sys->downloadSlots[rankIndex].rank;
             rankIndex++;
         }
         switch (sys->tournament) {
@@ -665,7 +681,7 @@ u8 WbtMakeMatch_GetBattlePoints(WbtSystem *sys) {
         int i;
 
         for (i = 0, total = 0; i < 3; i++) {
-            total += sys->unk13DC[i];
+            total += sys->roundRemaining[i];
         }
         return total;
     }
@@ -715,7 +731,7 @@ void WbtMakeMatch_LoadDownload(WbtSystem *sys, GameData *gameData) {
     SaveControl *save;
     void *data;
 
-    slot = sys->unk1D;
+    slot = sys->downloadSlot;
     valid = FALSE;
     if (slot == 0) {
         WbtMakeMatch_ClearDownload(sys);
@@ -729,7 +745,7 @@ void WbtMakeMatch_LoadDownload(WbtSystem *sys, GameData *gameData) {
     }
     if (valid) {
         MIi_CpuCopy32(data, &sys->download, 0x1214);
-        sys->style = WbtStyle_Clamp(sys->download.tournament.unkA7);
+        sys->style = WbtStyle_Clamp(sys->download.tournament.battleType);
     } else {
         MIi_CpuClear32(0, &sys->download, 0x1214);
     }
@@ -742,9 +758,9 @@ void WbtMakeMatch_ReadPick(WbtSystem *sys, PokeListParam *param) {
     sys->listIndex = param->index;
     sys->listResult = param->result;
     if (sys->listResult != 0 || sys->listIndex == 7 || sys->listIndex == 8) {
-        *sys->unk13E0 = 0;
+        *sys->resultVar = 0;
     } else {
-        *sys->unk13E0 = 1;
+        *sys->resultVar = 1;
     }
 }
 
@@ -752,17 +768,17 @@ PokeParty *WbtMakeMatch_GetParty(WbtSystem *sys, GameData *gameData) {
     if (sys->tournament == 12 || sys->tournament == 13) {
         return sys->partyC4;
     }
-    if (sys->unk13A8 == 0) {
+    if (sys->useBattleBox == 0) {
         return GameData_GetParty(gameData);
     }
-    return sys->unk13AC;
+    return sys->battleBoxParty;
 }
 
 void WbtMakeMatch_LoadBattleBoxParty(WbtSystem *sys, GameData *gameData) {
     BattleBoxSave *battleBox = getBattleBox(GameData_GetSaveControl(gameData));
 
     if (BattleBoxSave_HasPkm(battleBox)) {
-        sys->unk13AC = convertBoxedPokeSetToParty(battleBox, sys->heapId);
+        sys->battleBoxParty = convertBoxedPokeSetToParty(battleBox, sys->heapId);
     }
 }
 

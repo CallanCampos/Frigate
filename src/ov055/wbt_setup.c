@@ -17,23 +17,23 @@ static const u16 sScoreUnk[] = { 8, 13, 18, 23, 28 };
 static void WbtSetup_SetEntrant(HeapID heapId, GameData *gameData, WbtSetupEntrant *dest, const WbtEntrant *entrant);
 static void WbtSetup_SetMatches(WbtSystem *sys, WbtSetup *setup);
 static u8 func_ov055_021e6a14(u32 index);
-static void WbtSetup_LoadActorConfig(ArcTool *handle, u16 objCode, u8 *unk6, s16 *unk4);
+static void WbtSetup_LoadActorConfig(ArcTool *handle, u16 objCode, u8 *face, s16 *resIndex);
 
 WbtSetup *WbtSetup_Create(HeapID heapId, GameSystem *gsys) {
     WbtSetup *setup = GFL_HeapAllocate(heapId, sizeof(WbtSetup), TRUE, "wbt_setup.c", 57);
     int i;
 
     setup->gsys = gsys;
-    setup->unk4 = 0;
+    setup->mode = 0;
     setup->tournamentName = GFL_StrBufCreate(40, heapId);
-    setup->unk9C = GFL_StrBufCreate(40, heapId);
+    setup->styleName = GFL_StrBufCreate(40, heapId);
     for (i = 0; i < 8; i++) {
         WbtSetupEntrant *entrant = &setup->entrants[i];
 
         entrant->name = GFL_StrBufCreate(16, heapId);
-        entrant->unk4 = 36;
-        entrant->unk6 = 2;
-        entrant->unk7 = 0;
+        entrant->resIndex = 36;
+        entrant->face = 2;
+        entrant->gender = 0;
         entrant->rank = 1;
         entrant->type = 0;
     }
@@ -48,7 +48,7 @@ void WbtSetup_Free(WbtSetup *setup) {
         GFL_StrBufFree(setup->entrants[i].name);
     }
     GFL_StrBufFree(setup->tournamentName);
-    GFL_StrBufFree(setup->unk9C);
+    GFL_StrBufFree(setup->styleName);
     GFL_HeapFree(setup);
 }
 
@@ -76,23 +76,23 @@ void WbtSetup_Load(GameSystem *gsys, WbtSystem *sys, WbtSetup *setup) {
         round = 2;
         break;
     }
-    setup->unk4 = round;
+    setup->mode = round;
     WbtSystem_LoadTournamentName(sys, WbtSystem_GetTournament(sys), setup->tournamentName);
-    WbtStyle_LoadName(WbtSystem_GetStyle(sys), setup->unk9C);
+    WbtStyle_LoadName(WbtSystem_GetStyle(sys), setup->styleName);
 }
 
 static void WbtSetup_SetEntrant(HeapID heapId, GameData *gameData, WbtSetupEntrant *dest, const WbtEntrant *entrant) {
     ArcTool *handle;
     u16 objCode;
 
-    dest->isPlayer = entrant->unk0_0 == 3 ? TRUE : FALSE;
-    dest->rank = entrant->unk0_4;
+    dest->isPlayer = entrant->kind == 3 ? TRUE : FALSE;
+    dest->rank = entrant->rank;
     dest->type = entrant->type;
-    dest->unk7 = entrant->unk0_3;
+    dest->gender = entrant->gender;
     WbtEntrant_GetName(entrant, dest->name);
     objCode = entrant->objCode;
     handle = GFL_ArcSysCreateFileHandle(ARCID_MMODEL_TBL, heapId);
-    WbtSetup_LoadActorConfig(handle, objCode, &dest->unk6, &dest->unk4);
+    WbtSetup_LoadActorConfig(handle, objCode, &dest->face, &dest->resIndex);
     GFL_ArcToolFree(handle);
 }
 
@@ -104,14 +104,14 @@ static void WbtSetup_SetMatches(WbtSystem *sys, WbtSetup *setup) {
     for (i = 0; i < 4; i++) {
         dest = &setup->firstRound[i];
         match = &sys->matches[i];
-        dest->unk0 = match->firstWon;
-        dest->unk4 = sScoreUnk[match->score];
+        dest->firstWon = match->firstWon;
+        dest->message = sScoreUnk[match->score];
     }
     for (i = 0; i < 2; i++) {
         dest = &setup->secondRound[i];
         match = &sys->matches[i + 4];
-        dest->unk0 = match->firstWon;
-        dest->unk4 = sScoreUnk[match->score];
+        dest->firstWon = match->firstWon;
+        dest->message = sScoreUnk[match->score];
     }
 }
 
@@ -119,13 +119,13 @@ static u8 func_ov055_021e6a14(u32 index) {
     return FIELD_BILLBOARD_ANIM_SETS[index].animations[1]->face;
 }
 
-static void WbtSetup_LoadActorConfig(ArcTool *handle, u16 objCode, u8 *unk6, s16 *unk4) {
+static void WbtSetup_LoadActorConfig(ArcTool *handle, u16 objCode, u8 *face, s16 *resIndex) {
     FieldActorConfig record;
     u32 offset = GetIndexOfObjID(objCode) * sizeof(FieldActorConfig) + 4;
 
     GFL_ArcToolReadRange(handle, 0, offset, sizeof(record), &record);
-    *unk6 = func_ov055_021e6a14(record.spriteControllerType);
-    *unk4 = record.rscIndices.res1;
+    *face = func_ov055_021e6a14(record.spriteControllerType);
+    *resIndex = record.rscIndices.res1;
 }
 
 WbtOv326Param *WbtSetup_CreateWinRecordParam(HeapID heapId, GameSystem *gsys, u16 *var) {

@@ -59,6 +59,54 @@
 #define CONNECTED_FRAMES 60
 #define FINISH_FRAMES 30
 
+// The steps of the proc's main function
+enum {
+    MAIN_START,
+    MAIN_FADE_IN,
+    MAIN_WAIT_FADE_IN,
+    MAIN_RUN,
+    MAIN_FADE_OUT,
+    MAIN_WAIT_FADE_OUT,
+    MAIN_END,
+};
+
+// The buttons of the menu, and none chosen
+enum {
+    MENU_BUTTON_CHECK,
+    MENU_BUTTON_RANKING,
+    MENU_BUTTON_NONE,
+};
+
+// The steps of IrcCompatMenu_StepMenu, _StepFinish, _StepReturn and _StepCancel
+enum {
+    MENU_INIT,
+    MENU_WAIT_CHOICE,
+    MENU_START_CONNECT,
+};
+
+enum {
+    FINISH_WAIT,
+    FINISH_DONE,
+};
+
+enum {
+    RETURN_PRINT,
+    RETURN_END_NET,
+    RETURN_BACK_TO_MENU,
+};
+
+enum {
+    CANCEL_INIT,
+    CANCEL_END_NET,
+    CANCEL_FINISH,
+};
+
+// What a button does while it is touched
+enum {
+    BUTTONS_IDLE,
+    BUTTONS_FLASH,
+};
+
 // The steps of IrcCompatMenu_StepConnect
 enum {
     CONNECT_RESET,
@@ -388,41 +436,41 @@ static BOOL IrcCompatMenu_Main(GameProc *proc, u32 *state, void *param, void *wo
     IrcCompatMenuWork *wk = work;
 
     switch (*state) {
-    case 0:
-        *state = 1;
+    case MAIN_START:
+        *state = MAIN_FADE_IN;
         break;
-    case 1:
+    case MAIN_FADE_IN:
         GFL_FadeSet(3, 16, 0, 0);
-        *state = 2;
+        *state = MAIN_WAIT_FADE_IN;
         break;
-    case 2:
+    case MAIN_WAIT_FADE_IN:
         if (GFL_FadeIsRunning()) {
             break;
         }
         ClActor_SetAutoAnim(IrcCompatMenuGraphic_GetActor(&wk->graphic, ACTOR_BACKGROUND), TRUE);
         IrcCompatMenuScroll_Start(&wk->scroll);
         GFL_SndBGMPlay(SEQ_ME_AISHOU_KIDOU, SND_CHANNEL_MASK_ALL);
-        *state = 3;
+        *state = MAIN_RUN;
         break;
-    case 3:
+    case MAIN_RUN:
         IrcCompatMenuHearts_Update(&wk->hearts);
         IrcCompatMenuScroll_Update(&wk->scroll);
         wk->step(wk, &wk->stepState);
         if (wk->stepDone) {
-            *state = 4;
+            *state = MAIN_FADE_OUT;
         }
         break;
-    case 4:
+    case MAIN_FADE_OUT:
         GFL_FadeSet(3, 0, 16, 0);
-        *state = 5;
+        *state = MAIN_WAIT_FADE_OUT;
         break;
-    case 5:
+    case MAIN_WAIT_FADE_OUT:
         if (GFL_FadeIsRunning()) {
             break;
         }
-        *state = 6;
+        *state = MAIN_END;
         break;
-    case 6:
+    case MAIN_END:
         return TRUE;
     }
     IrcCompatMenu_UpdateAll(wk);
@@ -810,23 +858,23 @@ static void IrcCompatMenu_StepConnect(IrcCompatMenuWork *wk, u16 *state) {
 // Lets the player choose a button, and waits for the other player's choice
 static void IrcCompatMenu_StepMenu(IrcCompatMenuWork *wk, u16 *state) {
     switch (*state) {
-    case 0:
-        wk->choice = 2;
+    case MENU_INIT:
+        wk->choice = MENU_BUTTON_NONE;
         wk->choiceSent = FALSE;
         wk->startTime = OS_TicksToMilliSeconds((u32)OS_GetTick());
-        *state = 1;
+        *state = MENU_WAIT_CHOICE;
         break;
-    case 1:
+    case MENU_WAIT_CHOICE:
         IrcCompatMenuButtons_Update(&wk->buttons);
         if (IrcCompatMenuButtons_IsTouched(&wk->buttons)) {
             IrcAppBar_SetActive(wk->button, FALSE);
         }
         if (IrcCompatMenuButtons_GetResult(&wk->buttons, &wk->choice)) {
             switch (wk->choice) {
-            case 0:
-                *state = 2;
+            case MENU_BUTTON_CHECK:
+                *state = MENU_START_CONNECT;
                 break;
-            case 1:
+            case MENU_BUTTON_RANKING:
                 wk->param->result = IRC_COMPAT_MENU_RESULT_RANKING;
                 IrcCompatMenu_SetStep(wk, IrcCompatMenu_StepFinish);
                 break;
@@ -842,7 +890,7 @@ static void IrcCompatMenu_StepMenu(IrcCompatMenuWork *wk, u16 *state) {
             return;
         }
         break;
-    case 2:
+    case MENU_START_CONNECT:
         IrcCompatMenuWindow_PrintMsg(&wk->messageWindow, &wk->text, BtlMain4_Text_CreateInfraredConnectionStart, 0, 0);
         IrcAppBar_SetLabel(wk->button, IRC_APPBAR_LABEL_BACK);
         IrcAppBar_SetActive(wk->button, FALSE);
@@ -854,17 +902,17 @@ static void IrcCompatMenu_StepMenu(IrcCompatMenuWork *wk, u16 *state) {
 // Waits a moment, and then ends the screen
 static void IrcCompatMenu_StepFinish(IrcCompatMenuWork *wk, u16 *state) {
     switch (*state) {
-    case 0:
+    case FINISH_WAIT:
         if (wk->param->result == IRC_COMPAT_MENU_RESULT_RANKING) {
             if (wk->timer++ > 10) {
                 wk->timer = 0;
-                *state = 1;
+                *state = FINISH_DONE;
             }
         } else {
-            *state = 1;
+            *state = FINISH_DONE;
         }
         break;
-    case 1:
+    case FINISH_DONE:
         IrcCompatMenu_SetStepDone(wk);
         break;
     }
@@ -873,18 +921,18 @@ static void IrcCompatMenu_StepFinish(IrcCompatMenuWork *wk, u16 *state) {
 // Closes the link that the screen found open, and goes to the menu
 static void IrcCompatMenu_StepReturn(IrcCompatMenuWork *wk, u16 *state) {
     switch (*state) {
-    case 0:
+    case RETURN_PRINT:
         IrcCompatMenuWindow_PrintMsg(&wk->messageWindow, &wk->text, BtlMain4_Text_TapMenuTouchScreen, 0, 0);
         CompatibleIrcSys_ResetCounts(wk->param->sys);
         CompatibleIrcSys_ResetState(wk->param->sys);
-        *state = 1;
+        *state = RETURN_END_NET;
         break;
-    case 1:
+    case RETURN_END_NET:
         if (CompatibleIrcSys_EndNet(wk->param->sys)) {
-            *state = 2;
+            *state = RETURN_BACK_TO_MENU;
         }
         break;
-    case 2:
+    case RETURN_BACK_TO_MENU:
         IrcCompatMenu_SetStep(wk, IrcCompatMenu_StepMenu);
         break;
     }
@@ -893,17 +941,17 @@ static void IrcCompatMenu_StepReturn(IrcCompatMenuWork *wk, u16 *state) {
 // Closes the link when the player cancelled, and ends the screen
 static void IrcCompatMenu_StepCancel(IrcCompatMenuWork *wk, u16 *state) {
     switch (*state) {
-    case 0:
-        *state = 1;
+    case CANCEL_INIT:
+        *state = CANCEL_END_NET;
         CompatibleIrcSys_ResetCounts(wk->param->sys);
         CompatibleIrcSys_ResetState(wk->param->sys);
         break;
-    case 1:
+    case CANCEL_END_NET:
         if (CompatibleIrcSys_EndNet(wk->param->sys)) {
-            *state = 2;
+            *state = CANCEL_FINISH;
         }
         break;
-    case 2:
+    case CANCEL_FINISH:
         wk->param->result = IRC_COMPAT_MENU_RESULT_QUIT;
         IrcCompatMenu_SetStepDone(wk);
         break;
@@ -990,15 +1038,15 @@ static inline u8 IrcCompatMenuButtons_GetBG(const IrcCompatMenuButtons *buttons,
 // Runs the buttons: a touched button flashes for a few frames, and then counts as pressed
 static void IrcCompatMenuButtons_Update(IrcCompatMenuButtons *buttons) {
     switch (buttons->state) {
-    case 0:
+    case BUTTONS_IDLE:
         buttons->pressed = 0;
         if (GFL_BMN_Main(buttons->manager) && buttons->enabled) {
             GFL_SndSEPlay(SEQ_SE_SELECT1);
             buttons->frame = 0;
-            buttons->state = 1;
+            buttons->state = BUTTONS_FLASH;
         }
         break;
-    case 1: {
+    case BUTTONS_FLASH: {
         u8 flash = (buttons->frame / 4) % 2;
         u8 bg = IrcCompatMenuButtons_GetBG(buttons, buttons->touched);
         u8 x = buttons->defs[buttons->touched].x;
@@ -1009,11 +1057,11 @@ static void IrcCompatMenuButtons_Update(IrcCompatMenuButtons *buttons) {
         u8 flashPalette;
 
         switch (buttons->touched) {
-        case 0:
+        case MENU_BUTTON_CHECK:
             flashPalette = 12;
             normalPalette = 11;
             break;
-        case 1:
+        case MENU_BUTTON_RANKING:
             flashPalette = 9;
             normalPalette = 4;
             break;
@@ -1028,7 +1076,7 @@ static void IrcCompatMenuButtons_Update(IrcCompatMenuButtons *buttons) {
         buttons->frame++;
         if (buttons->frame >= 16) {
             buttons->pressed = 1;
-            buttons->state = 0;
+            buttons->state = BUTTONS_IDLE;
         }
         break;
     }
@@ -1071,10 +1119,10 @@ static void IrcCompatMenuButtons_Reset(IrcCompatMenuButtons *buttons) {
         u8 palette;
 
         switch (i) {
-        case 0:
+        case MENU_BUTTON_CHECK:
             palette = 11;
             break;
-        case 1:
+        case MENU_BUTTON_RANKING:
             palette = 4;
             break;
         }

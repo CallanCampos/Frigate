@@ -30,6 +30,40 @@
 #include "system/game_system.h"
 #include "system/ringtone_sys.h"
 
+enum {
+    STEP_SAVE_BGM = 0,
+    STEP_CLOSE_FIELD = 1,
+    STEP_START = 2,
+    STEP_NET_END_WAIT = 4,
+    STEP_OPEN_FIELD = 5,
+    STEP_ENTRANCE_TRANSITION = 6,
+    STEP_DONE = 7,
+    STEP_CLEAR_LOGIN = 8,
+    STEP_LOGIN = 9,
+    STEP_LOGIN_WAIT = 10,
+    STEP_LOGOUT = 30,
+    STEP_LOGOUT_WAIT = 31,
+    STEP_CLUB = 11,
+    STEP_CLUB_RESULT = 12,
+    STEP_BATTLE_SELECT = 13,
+    STEP_BATTLE_SELECT_RESULT = 14,
+    STEP_BATTLE_SYNC = 15,
+    STEP_BATTLE_START = 16,
+    STEP_BATTLE_END = 17,
+    STEP_TRADE_INIT = 18,
+    STEP_TRADE = 19,
+    STEP_TRADE_RESULT = 20,
+    STEP_EVOLVE = 21,
+    STEP_EVOLVE_END = 22,
+    STEP_TVT = 23,
+    STEP_TVT_END = 24,
+    STEP_NET_EXIT = 28,
+    STEP_NET_EXIT_WAIT = 29,
+    STEP_LEAVE = 25,
+    STEP_LEAVE_2 = 26,
+    STEP_LEAVE_3 = 27,
+};
+
 typedef struct {
     u8 battleMode;
     u16 nextState;
@@ -72,68 +106,83 @@ void EventWifiClub_SetupBattleSelect(EventWifiClub *wk, GameData *gameData, u32 
 void EventWifiClub_SetBattleParty(EventWifiClub *wk, GameData *gameData, u32 unused);
 void EventWifiClub_ResetForLogin(EventWifiClub *wk);
 
+enum {
+    WIFICLUB_BATTLE_SINGLE = 7,
+    WIFICLUB_BATTLE_SINGLE_FLAT,
+    WIFICLUB_BATTLE_DOUBLE,
+    WIFICLUB_BATTLE_DOUBLE_FLAT,
+    WIFICLUB_BATTLE_TRIPLE,
+    WIFICLUB_BATTLE_TRIPLE_FLAT,
+    WIFICLUB_BATTLE_ROTATION,
+    WIFICLUB_BATTLE_ROTATION_FLAT,
+};
+
 static WifiClubMode sWifiClubModes[16] = {
-    { 0, 25 }, { 0, 9 },  { 0, 25 },  { 0, 25 },  { 0, 25 },  { 0, 23 },  { 0, 18 },  { 7, 13 },
-    { 8, 13 }, { 9, 13 }, { 10, 13 }, { 11, 13 }, { 12, 13 }, { 13, 13 }, { 14, 13 }, { 0, 25 },
+    { 0, STEP_LEAVE },          { 0, STEP_LOGIN },          { 0, STEP_LEAVE },
+    { 0, STEP_LEAVE },          { 0, STEP_LEAVE },          { 0, STEP_TVT },
+    { 0, STEP_TRADE_INIT },     { 7, STEP_BATTLE_SELECT },  { 8, STEP_BATTLE_SELECT },
+    { 9, STEP_BATTLE_SELECT },  { 10, STEP_BATTLE_SELECT }, { 11, STEP_BATTLE_SELECT },
+    { 12, STEP_BATTLE_SELECT }, { 13, STEP_BATTLE_SELECT }, { 14, STEP_BATTLE_SELECT },
+    { 0, STEP_LEAVE },
 };
 
 void EventWifiClub_SetupBattle(EventWifiClub *wk, u32 mode) {
     GameData *gameData = GSYS_GetGameData(wk->gsys);
-    u8 unk48 = wk->club->unk48;
+    u8 launcher = wk->club->launcher;
     u32 rule;
 
-    if (unk48) {
+    if (launcher) {
         Regulation_SetParam(wk->club->regulation, REGULATION_PARAM_LAUNCHER, TRUE);
     } else {
         Regulation_SetParam(wk->club->regulation, REGULATION_PARAM_LAUNCHER, FALSE);
     }
 
     switch (mode) {
-    case 8:
+    case WIFICLUB_BATTLE_SINGLE_FLAT:
         rule = 1;
-        if (unk48) {
+        if (launcher) {
             rule = 3;
         }
         break;
-    case 7:
+    case WIFICLUB_BATTLE_SINGLE:
         rule = 0;
-        if (unk48) {
+        if (launcher) {
             rule = 2;
         }
         break;
-    case 10:
+    case WIFICLUB_BATTLE_DOUBLE_FLAT:
         rule = 5;
-        if (unk48) {
+        if (launcher) {
             rule = 7;
         }
         break;
-    case 9:
+    case WIFICLUB_BATTLE_DOUBLE:
         rule = 4;
-        if (unk48) {
+        if (launcher) {
             rule = 6;
         }
         break;
-    case 12:
+    case WIFICLUB_BATTLE_TRIPLE_FLAT:
         rule = 9;
-        if (unk48) {
+        if (launcher) {
             rule = 11;
         }
         break;
-    case 11:
+    case WIFICLUB_BATTLE_TRIPLE:
         rule = 8;
-        if (unk48) {
+        if (launcher) {
             rule = 10;
         }
         break;
-    case 14:
+    case WIFICLUB_BATTLE_ROTATION_FLAT:
         rule = 13;
-        if (unk48) {
+        if (launcher) {
             rule = 15;
         }
         break;
-    case 13:
+    case WIFICLUB_BATTLE_ROTATION:
         rule = 12;
-        if (unk48) {
+        if (launcher) {
             rule = 14;
         }
         break;
@@ -142,20 +191,20 @@ void EventWifiClub_SetupBattle(EventWifiClub *wk, u32 mode) {
     wk->battle.unk10 = 0;
 
     switch (mode) {
-    case 7:
-    case 8:
+    case WIFICLUB_BATTLE_SINGLE:
+    case WIFICLUB_BATTLE_SINGLE_FLAT:
         BtlSetup_SetNet1v1Single(wk->btlSetup, gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
         break;
-    case 9:
-    case 10:
+    case WIFICLUB_BATTLE_DOUBLE:
+    case WIFICLUB_BATTLE_DOUBLE_FLAT:
         BtlSetup_SetNet1v1Double(wk->btlSetup, gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
         break;
-    case 11:
-    case 12:
+    case WIFICLUB_BATTLE_TRIPLE:
+    case WIFICLUB_BATTLE_TRIPLE_FLAT:
         BtlSetup_SetNetTriple(wk->btlSetup, gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
         break;
-    case 13:
-    case 14:
+    case WIFICLUB_BATTLE_ROTATION:
+    case WIFICLUB_BATTLE_ROTATION_FLAT:
         BtlSetup_SetNetRotation(wk->btlSetup, gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
         break;
     }
@@ -181,7 +230,7 @@ void EventWifiClub_SetupBattleSelect(EventWifiClub *wk, GameData *gameData, u32 
     select->gameData = gameData;
     select->unk18 = 0;
     PokeParty_Init(wk->party);
-    select->unk1C = wk->party;
+    select->pickedParty = wk->party;
     select->parties[0] = wk->club->parties[0];
     select->parties[1] = wk->club->parties[1];
 }
@@ -203,12 +252,12 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
     u32 seq = *state;
 
     switch (seq) {
-    case 0:
+    case STEP_SAVE_BGM:
         wk->bgm = GFL_SndBGMGetID();
         GFL_SndBGMFadeOut(6);
         (*state)++;
         break;
-    case 1:
+    case STEP_CLOSE_FIELD:
         // Wait for the comm system to shut down
         if (!GameCommSys_BootCheck(GSYS_GetGameCommSystem(gsys))) {
             wk->unk10 = 0;
@@ -216,11 +265,11 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
             (*state)++;
         }
         break;
-    case 2:
+    case STEP_START:
         GFL_SndSetVolumeControlCallbacks();
-        *state = 8;
+        *state = STEP_CLEAR_LOGIN;
         break;
-    case 4:
+    case STEP_NET_END_WAIT:
         if (GFL_NetIsEnded()) {
             (*state)++;
             EventWifiClub_Free(wk);
@@ -229,38 +278,38 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
             GFL_SndBGMFadeIn(60);
         }
         break;
-    case 5:
+    case STEP_OPEN_FIELD:
         RingtoneSys_RestoreLidCallbacks();
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
         (*state)++;
         break;
-    case 6:
+    case STEP_ENTRANCE_TRANSITION:
         if (wk->useTransitions) {
             GameEvent_ChainNext(
                 event, CallFieldMapEntranceInTransition(gsys, wk->field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         }
         (*state)++;
         break;
-    case 7:
+    case STEP_DONE:
         return GAMEEVENT_DONE;
-    case 8:
+    case STEP_CLEAR_LOGIN:
         MI_CpuFill8(&wk->login, 0, sizeof(WifiLoginParam));
-        *state = 9;
+        *state = STEP_LOGIN;
         wk->login.unk14 = 0;
         break;
-    case 9:
+    case STEP_LOGIN:
         wk->login.gameData = GSYS_GetGameData(gsys);
         wk->login.unk8 = 1;
         wk->login.unk4 = 0;
         wk->login.unkC = 10;
-        wk->login.unk18 = 1;
+        wk->login.keepBgm = 1;
         GFL_SndBGMPlay(SEQ_BGM_WIFI_ACCESS, SND_CHANNEL_MASK_ALL);
         wk->procManager = CreateGameProcManager(HEAPID_GAMEEVENT);
         QueueGameProc(wk->procManager, OVERLAY_WIFILOGIN, &WIFILOGIN_PROC_FUNCTIONS, &wk->login);
         wk->club->mode = 0;
-        *state = 10;
+        *state = STEP_LOGIN_WAIT;
         break;
-    case 10:
+    case STEP_LOGIN_WAIT:
         if (GFL_ProcMgrUpdate(wk->procManager)) {
             GFL_NetErrShow(0);
             return GAMEEVENT_CONTINUE;
@@ -268,39 +317,39 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         FreeGameProcManager(wk->procManager);
         if (wk->login.result == 1) {
             GFL_SndBGMFadeOut(6);
-            *state = 25;
+            *state = STEP_LEAVE;
         } else if (!WifiList_CountFriends(GameData_GetWifiList(wk->gameData))) {
-            *state = 30;
+            *state = STEP_LOGOUT;
         } else if (wk->login.result == 0) {
-            *state = 11;
+            *state = STEP_CLUB;
             GFL_SndBGMFadeOut(6);
         } else {
             GFL_SndBGMFadeOut(6);
-            *state = 25;
+            *state = STEP_LEAVE;
         }
         break;
-    case 30:
+    case STEP_LOGOUT:
         wk->logout.gameData = GSYS_GetGameData(gsys);
         wk->logout.unk8 = 1;
         wk->logout.unk4 = 0;
-        wk->logout.unkC = 1;
-        wk->logout.unk10 = 0;
+        wk->logout.keepBgm = 1;
+        wk->logout.wipeFlags = 0;
         wk->logout.unk14 = 0;
         wk->logout.unk18 = 0;
         wk->procManager = CreateGameProcManager(HEAPID_GAMEEVENT);
         QueueGameProc(wk->procManager, OVERLAY_WIFILOGIN, &WIFILOGOUT_PROC_FUNCTIONS, &wk->logout);
         (*state)++;
         break;
-    case 31:
+    case STEP_LOGOUT_WAIT:
         if (GFL_ProcMgrUpdate(wk->procManager)) {
             GFL_NetErrShow(0);
             return GAMEEVENT_CONTINUE;
         }
         FreeGameProcManager(wk->procManager);
         GFL_SndBGMFadeOut(6);
-        *state = 4;
+        *state = STEP_NET_END_WAIT;
         break;
-    case 11:
+    case STEP_CLUB:
         GFL_OvlLoad(OVERLAY_WIFICLUB_MAIN);
         GFL_OvlLoad(OVERLAY_APP_UI);
         WIFI_STATUS_SetMyMac(wk->club->buffer);
@@ -311,7 +360,7 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         GSYS_QueueProcAsEvent(wk->event, OVERLAY_WIFICLUB, &WIFICLUB_PROC_FUNCTIONS, wk->club);
         (*state)++;
         break;
-    case 12:
+    case STEP_CLUB_RESULT:
         *state = sWifiClubModes[wk->club->mode].nextState;
         if (wk->club->mode == 1) {
             wk->login.unk14 = 1;
@@ -321,21 +370,21 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         GFL_OvlUnload(OVERLAY_APP_UI);
         GFL_OvlUnload(OVERLAY_WIFICLUB_MAIN);
         break;
-    case 13:
+    case STEP_BATTLE_SELECT:
         EventWifiClub_SetupBattleSelect(wk, GSYS_GetGameData(gsys), seq);
         wk->btlSetup = BtlSetup_Create(HEAPID_GAMEEVENT);
         EventWifiClub_SetupBattle(wk, wk->club->mode);
         GSYS_QueueProcAsEvent(wk->event, OVERLAY_BATTLE_SELECT, &BATTLE_SELECT_PROC_FUNCTIONS, &wk->select);
         (*state)++;
         break;
-    case 14:
+    case STEP_BATTLE_SELECT_RESULT:
         if (wk->select.result == 1) {
             if (GFL_NetIsInitialized()) {
                 wk->club->unk49 = 0;
-                *state = 11;
+                *state = STEP_CLUB;
             } else {
                 EventWifiClub_ResetForLogin(wk);
-                *state = 9;
+                *state = STEP_LOGIN;
             }
         } else {
             EventWifiClub_SetBattleParty(wk, GSYS_GetGameData(gsys), seq);
@@ -345,17 +394,17 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
             (*state)++;
         }
         break;
-    case 15:
+    case STEP_BATTLE_SYNC:
         if (!GFL_NetIsInitialized() || GFL_NetErrCheck()) {
             GFL_NetErrShutdown();
             GFL_NetErrShowScreen();
             EventWifiClub_ResetForLogin(wk);
-            *state = 9;
+            *state = STEP_LOGIN;
         } else if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 100, 10)) {
             (*state)++;
         }
         break;
-    case 16: {
+    case STEP_BATTLE_START: {
         int i;
 
         GFL_SndBGMPlay(SEQ_BGM_VS_TRAINER_WIFI, SND_CHANNEL_MASK_ALL);
@@ -383,10 +432,10 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         (*state)++;
         break;
     }
-    case 17:
+    case STEP_BATTLE_END:
         if (!GFL_NetIsInitialized()) {
             EventWifiClub_ResetForLogin(wk);
-            *state = 9;
+            *state = STEP_LOGIN;
         } else {
             if (wk->players.result == 0) {
                 WifiList_AddFriendRecord(GameData_GetWifiList(GSYS_GetGameData(wk->gsys)), wk->club->friendIndex - 1, 1,
@@ -396,38 +445,38 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
                                          1, 0);
             }
             NetCommand_RemoveTable(0x100);
-            *state = 11;
+            *state = STEP_CLUB;
         }
         break;
-    case 18:
+    case STEP_TRADE_INIT:
         wk->trade.next = 0;
         wk->trade.friendIndex = wk->club->friendIndex;
         (*state)++;
         break;
-    case 19:
+    case STEP_TRADE:
         wk->trade.gameData = GSYS_GetGameData(gsys);
         GSYS_QueueProcAsEvent(wk->event, OVERLAY_POKEMONTRADE, &POKEMONTRADE_WIFICLUB_PROC_FUNCTIONS, &wk->trade);
         (*state)++;
         break;
-    case 20:
+    case STEP_TRADE_RESULT:
         switch (wk->trade.next) {
-        case 1:
-            *state = 21;
+        case TRADE_NEXT_EVOLVE:
+            *state = STEP_EVOLVE;
             break;
-        case 2:
+        case TRADE_NEXT_NEGOTIATE:
             wk->club->mode = 1;
-            *state = 11;
+            *state = STEP_CLUB;
             break;
         default:
-            *state = 11;
+            *state = STEP_CLUB;
             break;
         }
         if (!GFL_NetIsInitialized()) {
             EventWifiClub_ResetForLogin(wk);
-            *state = 9;
+            *state = STEP_LOGIN;
         }
         break;
-    case 21: {
+    case STEP_EVOLVE: {
         EvolutionDemoParam *evolution =
             GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(EvolutionDemoParam), FALSE, "event_wificlub.c", 582);
 
@@ -440,45 +489,45 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         evolution->canCancel = FALSE;
         wk->trade.evolution = evolution;
         GSYS_QueueProcAsEvent(wk->event, OVERLAY_EVOLUTION_DEMO, &EVOLUTION_DEMO_PROC_FUNCTIONS, evolution);
-        *state = 22;
+        *state = STEP_EVOLVE_END;
         break;
     }
-    case 22:
+    case STEP_EVOLVE_END:
         GFL_HeapFree(wk->trade.evolution);
-        wk->trade.next = 1;
-        *state = 19;
+        wk->trade.next = TRADE_NEXT_EVOLVE;
+        *state = STEP_TRADE;
         if (!GFL_NetIsInitialized()) {
             EventWifiClub_ResetForLogin(wk);
-            *state = 9;
+            *state = STEP_LOGIN;
         }
         break;
-    case 23:
+    case STEP_TVT:
         wk->tvt.gameData = GSYS_GetGameData(gsys);
         wk->tvt.startMode = COMM_TVT_START_EXISTING;
         GSYS_QueueProcAsEvent(wk->event, OVERLAY_COMM_TVT, &COMM_TVT_PROC_FUNCTIONS, &wk->tvt);
         (*state)++;
         break;
-    case 24:
+    case STEP_TVT_END:
         if (!GFL_NetIsInitialized()) {
             EventWifiClub_ResetForLogin(wk);
-            *state = 9;
+            *state = STEP_LOGIN;
         } else {
-            *state = 11;
+            *state = STEP_CLUB;
         }
         break;
-    case 28:
+    case STEP_NET_EXIT:
         GFL_NetExit(0);
-        *state = 29;
+        *state = STEP_NET_EXIT_WAIT;
         break;
-    case 29:
+    case STEP_NET_EXIT_WAIT:
         if (GFL_NetIsNotInitialized()) {
-            *state = 4;
+            *state = STEP_NET_END_WAIT;
         }
         break;
-    case 25:
-    case 26:
-    case 27:
-        *state = 4;
+    case STEP_LEAVE:
+    case STEP_LEAVE_2:
+    case STEP_LEAVE_3:
+        *state = STEP_NET_END_WAIT;
         break;
     }
     return GAMEEVENT_CONTINUE;

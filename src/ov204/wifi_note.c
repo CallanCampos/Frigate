@@ -395,7 +395,8 @@ typedef struct {
     u16 wait;
     // Whether a record was shown before this one
     u16 moved;
-    u32 unk10;
+    // Which row of tabs: 0 for three tabs, 1 for eight
+    u32 tabLayout;
     WifiNoteInfoArea areas[FRIEND_INFO_AREA_COUNT];
     WifiNoteInfoScreen screens[FRIEND_INFO_SCREEN_COUNT];
     PrintWindow areaWindows[2];
@@ -438,6 +439,33 @@ typedef struct {
 } WifiNoteListPos;
 
 typedef void (*WifiNoteScrollFunc)(WifiNoteFriendList *list, WifiNoteDraw *draw, s16 page, s16 prevPage);
+
+enum {
+    STATE_RUN,
+    STATE_WAIT,
+};
+
+// What the stream of a message is doing
+enum {
+    STREAM_PRINTING,
+    STREAM_WAITING,
+    STREAM_DONE,
+};
+
+// What the yes and no menu returns
+enum {
+    MENU_YES,
+    MENU_NO,
+};
+
+// The flash of a picked button: its palette is dim, then lit, twice
+enum {
+    BUTTON_SEQ_START,
+    BUTTON_SEQ_DIM_FIRST,
+    BUTTON_SEQ_LIT_FIRST,
+    BUTTON_SEQ_DIM_SECOND,
+    BUTTON_SEQ_LIT_SECOND,
+};
 
 static BOOL WifiNote_ProcInit(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL WifiNote_ProcMain(GameProc *proc, u32 *state, void *param, void *work);
@@ -886,7 +914,7 @@ static BOOL WifiNote_ProcMain(GameProc *proc, u32 *state, void *param, void *wor
     BOOL done;
 
     switch (*state) {
-    case 0:
+    case STATE_RUN:
         switch (wk->mode) {
         case WIFI_NOTE_MODE_SELECT:
             done = WifiNoteModeSelect_Main(&wk->modeSelect, &wk->data, &wk->draw, HEAPID_WIFI_NOTE);
@@ -914,13 +942,13 @@ static BOOL WifiNote_ProcMain(GameProc *proc, u32 *state, void *param, void *wor
             wk->mode = wk->data.nextMode;
             wk->data.seq = wk->data.nextSeq;
             wk->wait = 4;
-            *state = 1;
+            *state = STATE_WAIT;
         }
         break;
-    case 1:
+    case STATE_WAIT:
         wk->wait--;
         if (wk->wait <= 0) {
-            *state = 0;
+            *state = STATE_RUN;
         }
         break;
     }
@@ -1498,7 +1526,7 @@ static BOOL WifiNoteModeSelect_Main(WifiNoteModeSelect *select, WifiNoteData *da
         break;
     case MODE_SELECT_SEQ_CODE_YES_NO:
         switch (WifiNote_UpdateMenu(select->menu)) {
-        case 0: {
+        case MENU_YES: {
             u32 error;
 
             data->touch = GCTX_HIDIsUsingTouch();
@@ -1513,7 +1541,7 @@ static BOOL WifiNoteModeSelect_Main(WifiNoteModeSelect *select, WifiNoteData *da
             }
             break;
         }
-        case 1:
+        case MENU_NO:
             data->touch = GCTX_HIDIsUsingTouch();
             WifiNoteModeSelect_ClearMessage(select, draw);
             WifiNoteModeSelect_DrawCursor(select);
@@ -1710,13 +1738,13 @@ static void WifiNoteModeSelect_StartMessage(WifiNoteModeSelect *select, WifiNote
 // the message is over
 static BOOL WifiNote_UpdateStream(PrintStream *stream, BOOL *paused) {
     switch (PrintStream_GetState(stream)) {
-    case 0:
+    case STREAM_PRINTING:
         if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             PrintStream_SkipWait(stream, 0);
         }
         *paused = FALSE;
         break;
-    case 1:
+    case STREAM_WAITING:
         if (*paused == FALSE) {
             if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
@@ -1725,7 +1753,7 @@ static BOOL WifiNote_UpdateStream(PrintStream *stream, BOOL *paused) {
             }
         }
         break;
-    case 2:
+    case STREAM_DONE:
         PrintStream_Delete(stream);
         *paused = FALSE;
         return FALSE;
@@ -1907,12 +1935,12 @@ static BOOL WifiNoteFriendList_Main(WifiNoteFriendList *list, WifiNoteData *data
         break;
     case FRIEND_LIST_SEQ_DELETE_YES_NO:
         switch (WifiNote_UpdateMenu(list->menu)) {
-        case 0:
+        case MENU_YES:
             data->touch = GCTX_HIDIsUsingTouch();
             WifiNoteFriendList_ClearMessage(list, draw);
             data->seq = FRIEND_LIST_SEQ_DELETE_START;
             break;
-        case 1:
+        case MENU_NO:
             data->touch = GCTX_HIDIsUsingTouch();
             WifiNoteFriendList_ClearMessage(list, draw);
             data->seq = FRIEND_LIST_SEQ_MAIN;
@@ -2919,7 +2947,7 @@ static void WifiNoteMyCode_Hide(WifiNoteMyCode *myCode, WifiNoteDraw *draw) {
 }
 
 static void WifiNoteFriendInfo_Init(WifiNoteFriendInfo *info, WifiNoteData *data, WifiNoteDraw *draw, HeapID heapId) {
-    info->unk10 = 1;
+    info->tabLayout = 1;
     WifiNoteFriendInfo_InitDraw(info, data, draw, heapId);
 }
 
@@ -3271,7 +3299,7 @@ static void WifiNoteFriendInfo_SetPage(WifiNoteFriendInfo *info, WifiNoteData *d
 
 // Draws the row of the record's tabs, and a tab over it as the current one unless it is 0xff
 static void WifiNoteFriendInfo_DrawTabs(WifiNoteFriendInfo *info, WifiNoteDraw *draw, u32 tab) {
-    if (info->unk10 == 1) {
+    if (info->tabLayout == 1) {
         GFL_BGSysLoadScrArea(2, 0, 20, 32, 4, draw->screens.screen[1]->rawData, 0, 12,
                              draw->screens.screen[1]->screenWidth / 8, draw->screens.screen[1]->screenHeight / 8);
     } else {
@@ -3282,9 +3310,9 @@ static void WifiNoteFriendInfo_DrawTabs(WifiNoteFriendInfo *info, WifiNoteDraw *
         GFL_BGSysQueueScrLoad(2);
         return;
     }
-    GFL_BGSysLoadScrArea(2, sWifiNoteFriendInfoTabX[info->unk10][tab], 20,
-                         sWifiNoteFriendInfoTabWidth[info->unk10][tab], 4, draw->screens.screen[1]->rawData,
-                         sWifiNoteFriendInfoTabX[info->unk10][tab], sWifiNoteFriendInfoTabSrcY[info->unk10],
+    GFL_BGSysLoadScrArea(2, sWifiNoteFriendInfoTabX[info->tabLayout][tab], 20,
+                         sWifiNoteFriendInfoTabWidth[info->tabLayout][tab], 4, draw->screens.screen[1]->rawData,
+                         sWifiNoteFriendInfoTabX[info->tabLayout][tab], sWifiNoteFriendInfoTabSrcY[info->tabLayout],
                          draw->screens.screen[1]->screenWidth / 8, draw->screens.screen[1]->screenHeight / 8);
     GFL_BGSysQueueScrLoad(2);
 }
@@ -3554,12 +3582,12 @@ static void WifiNoteModeSelect_DrawCursor(WifiNoteModeSelect *select) {
 // Flashes the picked button twice. Returns FALSE once it is over
 static BOOL WifiNoteModeSelect_UpdateButton(WifiNoteModeSelect *select) {
     switch (select->buttonSeq) {
-    case 0:
+    case BUTTON_SEQ_START:
         WifiNoteModeSelect_SetButtonPalette(select->cursor, 1);
         select->buttonCount = 0;
         select->buttonSeq++;
         break;
-    case 1:
+    case BUTTON_SEQ_DIM_FIRST:
         select->buttonCount++;
         if (select->buttonCount == 4) {
             WifiNoteModeSelect_SetButtonPalette(select->cursor, 2);
@@ -3567,7 +3595,7 @@ static BOOL WifiNoteModeSelect_UpdateButton(WifiNoteModeSelect *select) {
             select->buttonSeq++;
         }
         break;
-    case 2:
+    case BUTTON_SEQ_LIT_FIRST:
         select->buttonCount++;
         if (select->buttonCount == 4) {
             WifiNoteModeSelect_SetButtonPalette(select->cursor, 1);
@@ -3575,7 +3603,7 @@ static BOOL WifiNoteModeSelect_UpdateButton(WifiNoteModeSelect *select) {
             select->buttonSeq++;
         }
         break;
-    case 3:
+    case BUTTON_SEQ_DIM_SECOND:
         select->buttonCount++;
         if (select->buttonCount == 4) {
             WifiNoteModeSelect_SetButtonPalette(select->cursor, 2);
@@ -3583,7 +3611,7 @@ static BOOL WifiNoteModeSelect_UpdateButton(WifiNoteModeSelect *select) {
             select->buttonSeq++;
         }
         break;
-    case 4:
+    case BUTTON_SEQ_LIT_SECOND:
         select->buttonCount++;
         if (select->buttonCount == 4) {
             select->buttonSeq = 0;
@@ -3635,12 +3663,12 @@ static void WifiNoteFriendList_DrawCursor(WifiNoteFriendList *list) {
 
 static BOOL WifiNoteFriendList_UpdateButton(WifiNoteFriendList *list) {
     switch (list->buttonSeq) {
-    case 0:
+    case BUTTON_SEQ_START:
         WifiNoteFriendList_SetButtonPalette(list->pos, 1);
         list->buttonCount = 0;
         list->buttonSeq++;
         break;
-    case 1:
+    case BUTTON_SEQ_DIM_FIRST:
         list->buttonCount++;
         if (list->buttonCount == 4) {
             WifiNoteFriendList_SetButtonPalette(list->pos, 2);
@@ -3648,7 +3676,7 @@ static BOOL WifiNoteFriendList_UpdateButton(WifiNoteFriendList *list) {
             list->buttonSeq++;
         }
         break;
-    case 2:
+    case BUTTON_SEQ_LIT_FIRST:
         list->buttonCount++;
         if (list->buttonCount == 4) {
             WifiNoteFriendList_SetButtonPalette(list->pos, 1);
@@ -3656,7 +3684,7 @@ static BOOL WifiNoteFriendList_UpdateButton(WifiNoteFriendList *list) {
             list->buttonSeq++;
         }
         break;
-    case 3:
+    case BUTTON_SEQ_DIM_SECOND:
         list->buttonCount++;
         if (list->buttonCount == 4) {
             WifiNoteFriendList_SetButtonPalette(list->pos, 2);
@@ -3664,7 +3692,7 @@ static BOOL WifiNoteFriendList_UpdateButton(WifiNoteFriendList *list) {
             list->buttonSeq++;
         }
         break;
-    case 4:
+    case BUTTON_SEQ_LIT_SECOND:
         list->buttonCount++;
         if (list->buttonCount == 4) {
             list->buttonSeq = 0;

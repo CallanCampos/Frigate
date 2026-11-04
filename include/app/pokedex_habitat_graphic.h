@@ -61,6 +61,14 @@ enum {
 };
 
 // How PokedexHabitatGraphic_SetTab shows a tab
+// A habitat's kinds, which are also the tabs and the palettes
+typedef enum {
+    POKEDEX_HABITAT_KIND_LAND,
+    POKEDEX_HABITAT_KIND_WATER,
+    POKEDEX_HABITAT_KIND_FISHING,
+    POKEDEX_HABITAT_KIND_COUNT,
+} PokedexHabitatType;
+
 enum {
     POKEDEX_HABITAT_TAB_CHOSEN,
     POKEDEX_HABITAT_TAB_SHOWN,

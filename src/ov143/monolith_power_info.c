@@ -282,7 +282,7 @@ static void MonolithPowerInfo_DrawDescription(MonolithScreenParam *screen, Monol
             show = TRUE;
         }
         if (show == TRUE) {
-            WordSetNumber(wk->wordSet, 0, wk->passPowerData[passPower].unk02, 4, 0, TRUE);
+            WordSetNumber(wk->wordSet, 0, wk->passPowerData[passPower].price, 4, 0, TRUE);
             info = GFL_MsgDataLoadStrbufNew(wk->msgPowerInfo, wk->passPowerData[passPower].info);
             format = GFL_MsgDataLoadStrbufNew(wk->msgMonolith, 41);
             str = GFL_StrBufCreate(64, HEAPID_MONOLITH);

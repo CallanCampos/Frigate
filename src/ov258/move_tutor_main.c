@@ -90,11 +90,24 @@ enum {
 
 // The cursor's positions: the list's rows, then
 enum {
-    POS_ARROW_DOWN = 4,
+    POS_ROW_0,
+    POS_ROW_1,
+    POS_ROW_2,
+    POS_ROW_3,
+    POS_ARROW_DOWN,
     POS_ARROW_UP,
     POS_RETURN,
     POS_TEACH,
     POS_QUIT,
+};
+
+// The events of the messages' stream
+enum {
+    STREAM_EVENT_WAIT_SOUND = 1,
+    STREAM_EVENT_WAIT_SOUND_ALT,
+    STREAM_EVENT_PLAY_FORGET_SOUND,
+    STREAM_EVENT_START_FANFARE,
+    STREAM_EVENT_WAIT_FANFARE,
 };
 
 // The buttons shown once a move is picked by touch
@@ -826,10 +839,10 @@ static u32 MoveTutor_SeqSelect(MoveTutorWork *work) {
     work->prevPos = CursorMove_GetPos(work->cursor);
     pos = CursorMove_Update(work->cursor);
     switch (pos) {
-    case 0:
-    case 1:
-    case 2:
-    case 3:
+    case POS_ROW_0:
+    case POS_ROW_1:
+    case POS_ROW_2:
+    case POS_ROW_3:
         if (!GFL_HIDIsTouchPressed()) {
             if (work->param->scroll + pos < work->moveCount) {
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -1261,19 +1274,19 @@ static void MoveTutor_ClearMessage(MoveTutorWork *work) {
 // The messages' events: wait for the sounds, play the forgetting sound, and play the fanfare and wait for it
 static BOOL MoveTutor_StreamCallback(u32 event) {
     switch (event) {
-    case 1:
+    case STREAM_EVENT_WAIT_SOUND:
         return GFL_SndPlayerIsActiveAny();
-    case 2:
+    case STREAM_EVENT_WAIT_SOUND_ALT:
         return GFL_SndPlayerIsActiveAny();
-    case 3:
+    case STREAM_EVENT_PLAY_FORGET_SOUND:
         GFL_SndSEPlay(SEQ_SE_KON);
         break;
-    case 4:
+    case STREAM_EVENT_START_FANFARE:
         GFL_SndBGMSetPaused(TRUE);
         GFL_SndBGMPush();
         GFL_SndBGMPlay(SEQ_ME_LVUP, 0xffff);
         break;
-    case 5:
+    case STREAM_EVENT_WAIT_FANFARE:
         if (!GFL_SndBGMIsPlaying()) {
             GFL_SndBGMPop();
             GFL_SndBGMSetPaused(FALSE);
@@ -1624,7 +1637,7 @@ static void MoveTutor_CursorMove(void *data, int pos, int prevPos) {
             MoveTutor_DrawMoveInfo(work, NO_MOVE);
         }
     } else if (pos == POS_RETURN) {
-        if (prevPos == 3 && work->param->scroll + LIST_ROWS < work->moveCount) {
+        if (prevPos == LIST_ROWS - 1 && work->param->scroll + LIST_ROWS < work->moveCount) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             pos = 3;
             CursorMove_SetPos(work->cursor, pos);

@@ -465,18 +465,46 @@ static void WbtDownloadStack_Pop(WbtDownloadStack *stack) {
     }
 }
 
+// The steps of the stack's functions, in their states
+enum {
+    FADE_IN_START,
+    FADE_IN_WAIT,
+    FADE_IN_END,
+};
+
+enum {
+    FADE_OUT_START,
+    FADE_OUT_WAIT,
+    FADE_OUT_END,
+};
+
+enum {
+    FIRST_FADE_IN,
+    FIRST_DOWNLOAD,
+    FIRST_FADE_OUT,
+    FIRST_END,
+};
+
+enum {
+    DOWNLOAD_REQUEST,
+    DOWNLOAD_WAIT,
+    DOWNLOAD_CHECK,
+    DOWNLOAD_WAIT_MESSAGE,
+    DOWNLOAD_END,
+};
+
 static void WbtDownloadNet_FadeInStep(WbtDownloadStack *stack, u32 *state, void *userData) {
     switch (*state) {
-    case 0:
+    case FADE_IN_START:
         GFL_FadeSet(3, 16, 0, 0);
         (*state)++;
         break;
-    case 1:
+    case FADE_IN_WAIT:
         if (!GFL_FadeIsRunning()) {
             (*state)++;
         }
         break;
-    case 2:
+    case FADE_IN_END:
         WbtDownloadStack_Pop(stack);
         break;
     }
@@ -484,16 +512,16 @@ static void WbtDownloadNet_FadeInStep(WbtDownloadStack *stack, u32 *state, void 
 
 static void WbtDownloadNet_FadeOutStep(WbtDownloadStack *stack, u32 *state, void *userData) {
     switch (*state) {
-    case 0:
+    case FADE_OUT_START:
         GFL_FadeSet(3, 0, 16, 0);
         (*state)++;
         break;
-    case 1:
+    case FADE_OUT_WAIT:
         if (!GFL_FadeIsRunning()) {
             (*state)++;
         }
         break;
-    case 2:
+    case FADE_OUT_END:
         WbtDownloadStack_Pop(stack);
         break;
     }
@@ -582,19 +610,19 @@ static BOOL WbtDownloadNet_Main(GameProc *proc, u32 *state, void *param, void *w
 
 static void WbtDownloadNet_FirstStep(WbtDownloadStack *stack, u32 *state, void *userData) {
     switch (*state) {
-    case 0:
+    case FIRST_FADE_IN:
         WbtDownloadStack_Push(stack, WbtDownloadNet_FadeInStep);
         (*state)++;
         break;
-    case 1:
+    case FIRST_DOWNLOAD:
         WbtDownloadStack_Push(stack, WbtDownloadNet_DownloadStep);
         (*state)++;
         break;
-    case 2:
+    case FIRST_FADE_OUT:
         WbtDownloadStack_Push(stack, WbtDownloadNet_FadeOutStep);
         (*state)++;
         break;
-    case 3:
+    case FIRST_END:
         WbtDownloadStack_Pop(stack);
         break;
     }
@@ -648,7 +676,7 @@ static void WbtDownloadNet_DownloadStep(WbtDownloadStack *stack, u32 *state, voi
     WbtDownloadNetWork *wk = userData;
 
     switch (*state) {
-    case 0: {
+    case DOWNLOAD_REQUEST: {
         NetCommonDownloadFileListArgs args;
 
         MI_CpuFill8(&args, 0, sizeof(NetCommonDownloadFileListArgs));
@@ -658,13 +686,13 @@ static void WbtDownloadNet_DownloadStep(WbtDownloadStack *stack, u32 *state, voi
         args.attr2 = "\0";
         args.attr3 = "\0";
         args.select = WbtDownloadNet_SelectFile;
-        args.unk14 = WBT_DOWNLOAD_FILE_SIZE;
+        args.fileSize = WBT_DOWNLOAD_FILE_SIZE;
         if (NetCommonDownload_Request(wk->download, NET_COMMON_DOWNLOAD_FILE_LIST, &args)) {
             (*state)++;
         }
         break;
     }
-    case 1:
+    case DOWNLOAD_WAIT:
         if (NetCommonDownload_GetKind(wk->download) == NET_COMMON_DOWNLOAD_KIND_IDLE) {
             void *data = NetCommonDownload_GetData(wk->download);
 
@@ -674,7 +702,7 @@ static void WbtDownloadNet_DownloadStep(WbtDownloadStack *stack, u32 *state, voi
             (*state)++;
         }
         break;
-    case 2: {
+    case DOWNLOAD_CHECK: {
         WbtDownloadFile *file = NetCommonDownload_GetData(wk->download);
         BOOL success = FALSE;
 
@@ -723,12 +751,12 @@ static void WbtDownloadNet_DownloadStep(WbtDownloadStack *stack, u32 *state, voi
         (*state)++;
         break;
     }
-    case 3:
+    case DOWNLOAD_WAIT_MESSAGE:
         if (WbtDownloadMessage_IsDone(wk->message)) {
             (*state)++;
         }
         break;
-    case 4:
+    case DOWNLOAD_END:
         WbtDownloadStack_Pop(stack);
         break;
     }

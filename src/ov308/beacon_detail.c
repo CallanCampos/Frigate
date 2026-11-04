@@ -56,6 +56,9 @@ typedef struct {
     u16 cellFile;
 } BeaconDetailObjResFiles;
 
+// The index of the beacon shown, until the one the screen was opened for is found
+#define BEACON_DETAIL_INDEX_NONE 0xff
+
 static BOOL BeaconDetail_Init(GameProc *proc, u32 *state, void *param, void *data);
 static BOOL BeaconDetail_Exit(GameProc *proc, u32 *state, void *param, void *data);
 static BOOL BeaconDetail_Main(GameProc *proc, u32 *state, void *param, void *data);
@@ -187,13 +190,18 @@ static u32 BeaconDetail_SeqWait(BeaconDetailWork *work) {
     return BEACON_DETAIL_SEQ_INPUT;
 }
 
+enum {
+    STEP_START,
+    STEP_WAIT,
+};
+
 static u32 BeaconDetail_SeqInit(BeaconDetailWork *work) {
     switch (work->seq) {
-    case 0:
+    case STEP_START:
         BeaconDetailSub_Start(work);
         work->seq++;
         break;
-    case 1:
+    case STEP_WAIT:
         if (PrintQueue_IsEmpty(work->printQueue)) {
             work->seq = 0;
             return BEACON_DETAIL_SEQ_FADE_IN;
@@ -205,11 +213,11 @@ static u32 BeaconDetail_SeqInit(BeaconDetailWork *work) {
 
 static u32 BeaconDetail_SeqFadeIn(BeaconDetailWork *work) {
     switch (work->seq) {
-    case 0:
+    case STEP_START:
         GFL_FadeSet(3, 16, 0, 0);
         work->seq++;
         break;
-    case 1:
+    case STEP_WAIT:
         if (!GFL_FadeIsRunning()) {
             work->seq = 0;
             return BEACON_DETAIL_SEQ_INPUT;
@@ -221,7 +229,7 @@ static u32 BeaconDetail_SeqFadeIn(BeaconDetailWork *work) {
 
 static u32 BeaconDetail_SeqFadeOut(BeaconDetailWork *work) {
     switch (work->seq) {
-    case 0:
+    case STEP_START:
         // The return button's animation ends first, unless the game itself ends the screen
         if (!work->param->lowBatteryExit) {
             BeaconDetail_UpdateTouchBar(work->touchBar);
@@ -232,7 +240,7 @@ static u32 BeaconDetail_SeqFadeOut(BeaconDetailWork *work) {
         GFL_FadeSet(3, 0, 16, 0);
         work->seq++;
         break;
-    case 1:
+    case STEP_WAIT:
         if (!GFL_FadeIsRunning()) {
             work->seq = 0;
             return BEACON_DETAIL_SEQ_END;
@@ -251,7 +259,7 @@ static void BeaconDetail_InitData(BeaconDetailWork *work) {
     work->beaconStatus = GameData_GetBeaconStatus(work->param->gameData);
     work->infoTable = BeaconStatus_GetInfoTable(work->beaconStatus);
     count = GameBeaconInfoTable_GetCount(work->infoTable);
-    work->index = 0xff;
+    work->index = BEACON_DETAIL_INDEX_NONE;
     for (i = 0; i < count; i++) {
         GameBeaconInfoTable_RingGet(work->infoTable, work->beacon, &work->time, i);
         if (GameBeacon_IsInvalid(work->beacon) || GameBeacon_IsGiftType(work->beacon)) {
@@ -262,7 +270,7 @@ static void BeaconDetail_InitData(BeaconDetailWork *work) {
         }
         work->logIndices[work->count++] = i;
     }
-    if (work->index == 0xff || work->index >= work->count) {
+    if (work->index == BEACON_DETAIL_INDEX_NONE || work->index >= work->count) {
         work->index = 0;
     }
     if (work->count == 0) {

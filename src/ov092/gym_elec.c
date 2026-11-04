@@ -46,6 +46,69 @@
 
 #define FOG_TABLE_SIZE 32
 
+// The gym's progress, as it is saved
+enum {
+    PROGRESS_START,
+    PROGRESS_STAGE_1,
+    PROGRESS_STAGE_2,
+    PROGRESS_FOG_CLEARED,
+    PROGRESS_COMPLETE,
+};
+
+// The steps from one stage of the progress to the next, which the progress event plays
+enum {
+    TRANSITION_STAGE_1,
+    TRANSITION_STAGE_2,
+    TRANSITION_FOG_CLEARED,
+};
+
+// The steps of the progress event
+enum {
+    PROGRESS_EVENT_START,
+    PROGRESS_EVENT_WAIT_FADE,
+    PROGRESS_EVENT_APPLY,
+    PROGRESS_EVENT_END,
+};
+
+// What GymElec_ShowModel shows
+enum {
+    MODEL_SHOW_FIRST,
+    MODEL_SHOW_BY_GENDER,
+};
+
+// What GymElec_ShowStageObject5 does to the object
+enum {
+    STAGE_OBJECT_5_FADE_IN,
+    STAGE_OBJECT_5_PLAY,
+};
+
+// The modes of the effects: none, and bursts with the sound of a switch, the second one's more often
+enum {
+    EFFECTS_MODE_IDLE,
+    EFFECTS_MODE_BURSTS,
+    EFFECTS_MODE_BURSTS_FAST,
+};
+
+// The steps of the idle mode
+enum {
+    EFFECT_IDLE_START,
+    EFFECT_IDLE_DONE,
+};
+
+// The steps of the modes that burst: set the effect up, start a burst, and wait for the next one
+enum {
+    EFFECT_STEP_START,
+    EFFECT_STEP_BURST,
+    EFFECT_STEP_WAIT,
+};
+
+// The steps of a burst: place its objects, wait for their animations to end, and free it
+enum {
+    BURST_STEP_START,
+    BURST_STEP_PLAYING,
+    BURST_STEP_END,
+};
+
 // The gym's saved state
 typedef struct {
     u16 progress;
@@ -404,15 +467,15 @@ GameEvent *GymElec_SetProgress(GameSystem *gsys, u8 progress) {
 
     GymElecSave_SetProgress(wk->save, progress);
     switch (progress) {
-    case 0:
+    case PROGRESS_START:
         return NULL;
-    case 1:
-        return GymElec_CreateProgressEvent(gsys, wk->fog, wk->stageObjects, wk->effects, 0);
-    case 2:
-        return GymElec_CreateProgressEvent(gsys, wk->fog, wk->stageObjects, wk->effects, 1);
-    case 3:
-        return GymElec_CreateProgressEvent(gsys, wk->fog, wk->stageObjects, wk->effects, 2);
-    case 4:
+    case PROGRESS_STAGE_1:
+        return GymElec_CreateProgressEvent(gsys, wk->fog, wk->stageObjects, wk->effects, TRANSITION_STAGE_1);
+    case PROGRESS_STAGE_2:
+        return GymElec_CreateProgressEvent(gsys, wk->fog, wk->stageObjects, wk->effects, TRANSITION_STAGE_2);
+    case PROGRESS_FOG_CLEARED:
+        return GymElec_CreateProgressEvent(gsys, wk->fog, wk->stageObjects, wk->effects, TRANSITION_FOG_CLEARED);
+    case PROGRESS_COMPLETE:
         return NULL;
     }
     return NULL;
@@ -440,10 +503,10 @@ void GymElec_ShowModel(Field *field, u32 mode) {
     GymElecWork *wk = Field_GetGimmickWorkBlock(field, GIMMICK_ID);
 
     switch (mode) {
-    case 0:
+    case MODEL_SHOW_FIRST:
         GymElecModels_Show(wk->models, 0);
         break;
-    case 1:
+    case MODEL_SHOW_BY_GENDER:
         if (FieldPlayer_GetSex(Field_GetPlayer(field)) == GENDER_MALE) {
             GymElecModels_Show(wk->models, 1);
         } else {
@@ -457,10 +520,10 @@ void GymElec_ShowStageObject5(Field *field, u32 mode) {
     GymElecWork *wk = Field_GetGimmickWorkBlock(field, GIMMICK_ID);
 
     switch (mode) {
-    case 0:
+    case STAGE_OBJECT_5_FADE_IN:
         GymElecStageObjects_FadeIn(wk->stageObjects, 5, 60);
         break;
-    case 1:
+    case STAGE_OBJECT_5_PLAY:
         GymElecStageObjects_Play(wk->stageObjects, 5);
         break;
     }
@@ -483,20 +546,20 @@ static GymElecSave *GymElec_GetSave(Field *field) {
 
 static void GymElec_ApplyProgress(GymElecWork *wk, GymElecSave *save, Field *field) {
     switch (GymElecSave_GetProgress(save)) {
-    case 0:
+    case PROGRESS_START:
         GymElecFog_SetEnabled(wk->fog, TRUE);
         GymElecFog_SetStage(wk->fog, 0);
         ISSSwitch_ReqSwitchMuteStateChange(wk->switchSys, 1, FALSE, SEQ_BGM_ERECTRIC_GYM_01);
         ISSSwitch_ReqSwitchMuteStateChange(wk->switchSys, 2, FALSE, SEQ_BGM_ERECTRIC_GYM_01);
         break;
-    case 1:
+    case PROGRESS_STAGE_1:
         GymElecFog_SetEnabled(wk->fog, TRUE);
         GymElecFog_SetStage(wk->fog, 1);
         ISSSwitch_ReqSwitchMuteStateChange(wk->switchSys, 1, TRUE, SEQ_BGM_ERECTRIC_GYM_01);
         GymElecStageObjects_ShowEnd(wk->stageObjects, 0);
         GymElecStageObjects_Play(wk->stageObjects, 3);
         break;
-    case 2:
+    case PROGRESS_STAGE_2:
         GymElecFog_SetEnabled(wk->fog, TRUE);
         GymElecFog_SetStage(wk->fog, 2);
         ISSSwitch_ReqSwitchMuteStateChange(wk->switchSys, 1, TRUE, SEQ_BGM_ERECTRIC_GYM_01);
@@ -506,7 +569,7 @@ static void GymElec_ApplyProgress(GymElecWork *wk, GymElecSave *save, Field *fie
         GymElecStageObjects_Play(wk->stageObjects, 3);
         GymElecStageObjects_Play(wk->stageObjects, 4);
         break;
-    case 3:
+    case PROGRESS_FOG_CLEARED:
         GymElecFog_SetEnabled(wk->fog, FALSE);
         GymElecStageObjects_ShowEnd(wk->stageObjects, 0);
         GymElecStageObjects_ShowEnd(wk->stageObjects, 1);
@@ -515,7 +578,7 @@ static void GymElec_ApplyProgress(GymElecWork *wk, GymElecSave *save, Field *fie
         GymElecStageObjects_Play(wk->stageObjects, 4);
         GymElecModels_Show(wk->models, 0);
         break;
-    case 4:
+    case PROGRESS_COMPLETE:
         GymElecFog_SetEnabled(wk->fog, FALSE);
         GymElecStageObjects_ShowEnd(wk->stageObjects, 0);
         GymElecStageObjects_ShowEnd(wk->stageObjects, 1);
@@ -523,7 +586,7 @@ static void GymElec_ApplyProgress(GymElecWork *wk, GymElecSave *save, Field *fie
         GymElecStageObjects_Play(wk->stageObjects, 3);
         GymElecStageObjects_Play(wk->stageObjects, 4);
         GymElecStageObjects_Play(wk->stageObjects, 5);
-        GymElec_ShowModel(field, 1);
+        GymElec_ShowModel(field, MODEL_SHOW_BY_GENDER);
         break;
     }
 }
@@ -975,18 +1038,18 @@ static void GymElecEffects_Update(GymElecEffects *effects) {
 }
 
 static void GymElecEffects_SetMode(GymElecEffects *effects, u32 mode) {
-    effects->state = 0;
+    effects->state = EFFECT_STEP_START;
     switch (mode) {
-    case 0:
+    case EFFECTS_MODE_IDLE:
         if (GFL_SndIsPlaying(SEQ_SE_GYM_E04)) {
             GFL_SndStop();
         }
         effects->func = GymElecEffects_Mode0;
         break;
-    case 1:
+    case EFFECTS_MODE_BURSTS:
         effects->func = GymElecEffects_Mode1;
         break;
-    case 2:
+    case EFFECTS_MODE_BURSTS_FAST:
         effects->func = GymElecEffects_Mode2;
         break;
     }
@@ -1036,14 +1099,14 @@ static void GymElecEffects_Mode0(GymElecEffects *effects) {
     int i;
 
     switch (effects->state) {
-    case 0:
+    case EFFECT_IDLE_START:
         for (i = 0; i < EFFECT_OBJECT_COUNT; i++) {
             GymElecObject_ClearAll(effects->objects[i]);
             GymElecObject_Play(effects->objects[i], 0);
         }
         effects->state++;
         break;
-    case 1:
+    case EFFECT_IDLE_DONE:
         break;
     }
 }
@@ -1052,7 +1115,7 @@ static void GymElecEffects_Mode1(GymElecEffects *effects) {
     int i;
 
     switch (effects->state) {
-    case 0:
+    case EFFECT_STEP_START:
         GFL_SndSEPlay(SEQ_SE_GYM_E01);
         for (i = 0; i < EFFECT_OBJECT_COUNT; i++) {
             GymElecObject_ClearAll(effects->objects[i]);
@@ -1060,14 +1123,14 @@ static void GymElecEffects_Mode1(GymElecEffects *effects) {
         }
         effects->state++;
         break;
-    case 1:
+    case EFFECT_STEP_BURST:
         effects->wait = GFL_RandomLCAlt(4) + 5;
         GymElecEffects_StartBurst(effects);
         effects->state++;
         break;
-    case 2:
+    case EFFECT_STEP_WAIT:
         if (effects->wait-- <= 0) {
-            effects->state = 1;
+            effects->state = EFFECT_STEP_BURST;
         }
         break;
     }
@@ -1077,7 +1140,7 @@ static void GymElecEffects_Mode2(GymElecEffects *effects) {
     int i;
 
     switch (effects->state) {
-    case 0:
+    case EFFECT_STEP_START:
         GFL_SndSEPlay(SEQ_SE_GYM_E04);
         for (i = 0; i < EFFECT_OBJECT_COUNT; i++) {
             GymElecObject_ClearAll(effects->objects[i]);
@@ -1085,14 +1148,14 @@ static void GymElecEffects_Mode2(GymElecEffects *effects) {
         }
         effects->state++;
         break;
-    case 1:
+    case EFFECT_STEP_BURST:
         effects->wait = GFL_RandomLCAlt(4) + 4;
         GymElecEffects_StartBurst(effects);
         effects->state++;
         break;
-    case 2:
+    case EFFECT_STEP_WAIT:
         if (effects->wait-- <= 0) {
-            effects->state = 1;
+            effects->state = EFFECT_STEP_BURST;
         }
         break;
     }
@@ -1118,7 +1181,7 @@ static void GymElecBurst_Update(Burst *burst, const VecFx32 *playerPos) {
         return;
     }
     switch (burst->state) {
-    case 0:
+    case BURST_STEP_START:
         GFL_SndSEPlay(SEQ_SE_GYM_E02);
         for (i = 0; i < burst->count; i++) {
             VEC_Add(&burst->offsets[i], playerPos, &pos);
@@ -1130,7 +1193,7 @@ static void GymElecBurst_Update(Burst *burst, const VecFx32 *playerPos) {
         }
         burst->state++;
         break;
-    case 1:
+    case BURST_STEP_PLAYING:
         done = TRUE;
         for (i = 0; i < burst->count; i++) {
             if (GymElecObject_IsAllFinished(burst->objects[i])) {
@@ -1143,7 +1206,7 @@ static void GymElecBurst_Update(Burst *burst, const VecFx32 *playerPos) {
             burst->state++;
         }
         break;
-    case 2:
+    case BURST_STEP_END:
         burst->active = FALSE;
         break;
     }
@@ -1153,7 +1216,7 @@ static void GymElecBurst_Start(Burst *burst, const VecFx32 *offsets, s32 count) 
     int i;
 
     burst->active = TRUE;
-    burst->state = 0;
+    burst->state = BURST_STEP_START;
     burst->count = count;
     for (i = 0; i < burst->count; i++) {
         burst->offsets[i] = offsets[i];
@@ -1183,45 +1246,45 @@ static GameEventReturnCode GymElec_ProgressEvent(GameEvent *event, u32 *state, v
     ProgressEventWork *work = data;
 
     switch (*state) {
-    case 0:
+    case PROGRESS_EVENT_START:
         switch (work->progress) {
-        case 0:
+        case TRANSITION_STAGE_1:
             ISSSwitchSys_ReqSwitchFadeIn(work->switchSys, 1);
             GymElecStageObjects_FadeIn(work->stageObjects, 3, 60);
             break;
-        case 1:
+        case TRANSITION_STAGE_2:
             ISSSwitchSys_ReqSwitchFadeIn(work->switchSys, 2);
             GymElecStageObjects_FadeIn(work->stageObjects, 4, 60);
             break;
-        case 2:
+        case TRANSITION_FOG_CLEARED:
             break;
         }
         GymElecFog_StartFade(work->fog, 60);
         (*state)++;
         break;
-    case 1:
+    case PROGRESS_EVENT_WAIT_FADE:
         if (GymElecFog_IsFadeDone(work->fog)) {
             (*state)++;
         }
         break;
-    case 2:
+    case PROGRESS_EVENT_APPLY:
         switch (work->progress) {
-        case 0:
+        case TRANSITION_STAGE_1:
             GymElecStageObjects_Play(work->stageObjects, 0);
             GymElecFog_SetStage(work->fog, 1);
             break;
-        case 1:
+        case TRANSITION_STAGE_2:
             GymElecStageObjects_Play(work->stageObjects, 1);
             GymElecFog_SetStage(work->fog, 2);
             break;
-        case 2:
+        case TRANSITION_FOG_CLEARED:
             GymElecStageObjects_Play(work->stageObjects, 2);
             GymElecFog_SetEnabled(work->fog, FALSE);
             break;
         }
         (*state)++;
         break;
-    case 3:
+    case PROGRESS_EVENT_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;

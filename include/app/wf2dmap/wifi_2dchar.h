@@ -48,8 +48,8 @@ typedef struct {
 typedef struct WF_2DCSYS WF_2DCSYS;
 typedef struct WF_2DCWK WF_2DCWK;
 
-// unk1 is never used
-WF_2DCSYS *WF_2DC_SysInit(ClActUnit *unit, void *unk1, u32 objNum, u32 heapId);
+// unused is never read
+WF_2DCSYS *WF_2DC_SysInit(ClActUnit *unit, void *unused, u32 objNum, u32 heapId);
 void WF_2DC_SysExit(WF_2DCSYS *sys);
 void WF_2DC_ResSet(WF_2DCSYS *sys, u32 charaId, u32 vramType, u32 moveType, u32 heapId);
 void WF_2DC_AllResDel(WF_2DCSYS *sys);

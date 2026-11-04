@@ -1,5 +1,6 @@
 #include "types.h"
 #include "app/musical/mus_item_data.h"
+#include "app/musical/mus_poke_draw.h"
 #include "constants/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/heap.h"
@@ -68,8 +69,8 @@ BOOL MusItemData_CanEquipAtPos(MusicalItemData *item, s32 pos) {
             return TRUE;
         }
         break;
-    case 7:
-    case 8:
+    case MUS_POKE_DRAW_EQUIP_HAND_R:
+    case MUS_POKE_DRAW_EQUIP_HAND_L:
         if (item->flags & 0x40) {
             return TRUE;
         }
@@ -189,9 +190,9 @@ s32 MusItemData_GetPosGroup(s32 pos) {
         return 4;
     case 6:
         return 5;
-    case 7:
+    case MUS_POKE_DRAW_EQUIP_HAND_R:
         return 6;
-    case 8:
+    case MUS_POKE_DRAW_EQUIP_HAND_L:
         return 7;
     case 9:
         return 8;
@@ -200,7 +201,7 @@ s32 MusItemData_GetPosGroup(s32 pos) {
 }
 
 u32 MusItemData_GetKind(MusItemData *items, u16 itemId) {
-    return MusItemData_GetItem(items, itemId)->unk9;
+    return MusItemData_GetItem(items, itemId)->kind;
 }
 
 u8 MusItemData_GetEffect(MusItemData *items, u16 itemId) {

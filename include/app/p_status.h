@@ -48,6 +48,9 @@ enum {
     PSTATUS_RESULT_CLOSE,
 };
 
+// A party index that is no Pokemon: in the parameter, the first one of the data is shown; in the work, none is yet
+#define PSTATUS_PARTY_INDEX_NONE 0xff
+
 typedef struct {
     // A PartyPkm, a PokeParty or an array of BoxPkm, by dataType
     void *party;

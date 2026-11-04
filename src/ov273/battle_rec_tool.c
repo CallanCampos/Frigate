@@ -416,11 +416,11 @@ static void BattleRecTool_LoadTrainer(BtlSetupTrainer *trainer, const BattleRecT
 }
 
 static BOOL BattleRecTool_StoreRecData(const BtlSetup *setup, BattleRecBody *body) {
-    void *data = setup->unkB0;
+    void *data = setup->recBuffer;
     u32 size;
 
     if (data != NULL) {
-        size = setup->unkB4;
+        size = setup->recSize;
         if (size < sizeof(body->data)) {
             body->dataSize = size;
             MI_CpuCopy8(data, body->data, size);
@@ -431,8 +431,8 @@ static BOOL BattleRecTool_StoreRecData(const BtlSetup *setup, BattleRecBody *bod
 }
 
 static BOOL BattleRecTool_LoadRecData(BtlSetup *setup, const BattleRecBody *body) {
-    setup->unkB4 = body->dataSize;
-    MI_CpuCopy8(body->data, setup->unkB0, setup->unkB4);
+    setup->recSize = body->dataSize;
+    MI_CpuCopy8(body->data, setup->recBuffer, setup->recSize);
     return TRUE;
 }
 
@@ -479,11 +479,11 @@ static void BattleRecTool_LoadPokewoodParty(BtlSetup *setup, PokewoodBlock *bloc
 }
 
 static BOOL BattleRecTool_StorePokewoodRecData(const BtlSetup *setup, PokewoodBlock *block) {
-    void *data = setup->unkB0;
+    void *data = setup->recBuffer;
     u32 size;
 
     if (data != NULL) {
-        size = setup->unkB4;
+        size = setup->recSize;
         if (size < sizeof(block->data)) {
             block->dataSize = size;
             MI_CpuCopy8(data, block->data, size);
@@ -494,8 +494,8 @@ static BOOL BattleRecTool_StorePokewoodRecData(const BtlSetup *setup, PokewoodBl
 }
 
 static BOOL BattleRecTool_LoadPokewoodRecData(BtlSetup *setup, const PokewoodBlock *block) {
-    setup->unkB4 = block->dataSize;
-    MI_CpuCopy8(block->data, setup->unkB0, setup->unkB4);
+    setup->recSize = block->dataSize;
+    MI_CpuCopy8(block->data, setup->recBuffer, setup->recSize);
     return TRUE;
 }
 

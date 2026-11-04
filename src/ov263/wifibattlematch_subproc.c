@@ -39,6 +39,40 @@ typedef struct {
     void *link;
 } WifiBattleMatchExchangeWork;
 
+// The steps of WifiBattleMatchList_Main, and of the exchange of the teams over Wi-Fi and over infrared
+enum {
+    LIST_START_POKELIST,
+    LIST_WAIT_POKELIST,
+    LIST_POKELIST_DONE,
+    LIST_START_STATUS,
+    LIST_WAIT_STATUS,
+    LIST_STATUS_DONE,
+};
+
+enum {
+    WIFI_TIMING1_SEND,
+    WIFI_TIMING1_WAIT,
+    WIFI_CREATE_LINK,
+    WIFI_TIMING2_SEND,
+    WIFI_TIMING2_WAIT,
+    WIFI_SEND_PARTY,
+    WIFI_TAKE_PARTY,
+    WIFI_TIMING3_SEND,
+    WIFI_TIMING3_WAIT,
+    WIFI_DELETE_LINK,
+    WIFI_TIMING4_SEND,
+    WIFI_TIMING4_WAIT,
+};
+
+enum {
+    IRC_START,
+    IRC_TIMING_SEND,
+    IRC_TIMING_WAIT,
+    IRC_SEND_PARTY,
+    IRC_TAKE_PARTY,
+    IRC_DONE,
+};
+
 static BOOL WifiBattleMatchList_Init(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL WifiBattleMatchList_Exit(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL WifiBattleMatchList_Main(GameProc *proc, u32 *state, void *param, void *work);
@@ -130,7 +164,7 @@ static BOOL WifiBattleMatchList_Main(GameProc *proc, u32 *state, void *param, vo
             if (GFL_NetErrCheck()) {
                 GFL_NetErrMarkShown();
                 list->result = 2;
-                wk->pokeList.unk73 = 1;
+                wk->pokeList.forceExit = 1;
                 wk->status.forceExit = TRUE;
             }
         } else {
@@ -140,14 +174,14 @@ static BOOL WifiBattleMatchList_Main(GameProc *proc, u32 *state, void *param, vo
                 break;
             case DWCRAP_RESULT_TIMEOUT:
                 list->result = 3;
-                wk->pokeList.unk73 = 1;
+                wk->pokeList.forceExit = 1;
                 wk->status.forceExit = TRUE;
                 break;
             case DWCRAP_RESULT_DISCONNECTED:
             case DWCRAP_RESULT_FAILED:
             default:
                 list->result = 1;
-                wk->pokeList.unk73 = 1;
+                wk->pokeList.forceExit = 1;
                 wk->status.forceExit = TRUE;
                 break;
             }
@@ -155,50 +189,50 @@ static BOOL WifiBattleMatchList_Main(GameProc *proc, u32 *state, void *param, vo
     }
 
     switch (wk->state) {
-    case 0:
+    case LIST_START_POKELIST:
         GFL_OvlLoad(OVERLAY_ID(165));
         QueueGameProc(wk->procManager, OVERLAY_NONE, &POKELIST_PROC_FUNCTIONS, &wk->pokeList);
-        wk->state = 1;
+        wk->state = LIST_WAIT_POKELIST;
         break;
-    case 1:
+    case LIST_WAIT_POKELIST:
         if (!GFL_ProcMgrUpdate(wk->procManager)) {
-            wk->state = 2;
+            wk->state = LIST_POKELIST_DONE;
         }
         break;
-    case 2:
+    case LIST_POKELIST_DONE:
         GFL_OvlUnload(OVERLAY_ID(165));
         if (wk->pokeList.result == 1) {
             wk->status.partyIndex = wk->pokeList.index;
-            wk->state = 3;
+            wk->state = LIST_START_STATUS;
         } else {
             return TRUE;
         }
         break;
-    case 3:
+    case LIST_START_STATUS:
         GFL_OvlLoad(OVERLAY_PSTATUS);
         QueueGameProc(wk->procManager, OVERLAY_NONE, &PSTATUS_PROC_FUNCTIONS, &wk->status);
-        wk->state = 4;
+        wk->state = LIST_WAIT_STATUS;
         break;
-    case 4:
+    case LIST_WAIT_STATUS:
         if (wk->pokeList.timerEnabled == TRUE && wk->pokeList.timeLeft == 0) {
             wk->status.forceExit = TRUE;
         }
         if (!GFL_ProcMgrUpdate(wk->procManager)) {
-            wk->state = 5;
+            wk->state = LIST_STATUS_DONE;
         }
         break;
-    case 5:
+    case LIST_STATUS_DONE:
         GFL_OvlUnload(OVERLAY_PSTATUS);
-        if (!wk->pokeList.unk73) {
+        if (!wk->pokeList.forceExit) {
             wk->pokeList.index = wk->status.partyIndex;
-            wk->state = 0;
+            wk->state = LIST_START_POKELIST;
         } else {
             return TRUE;
         }
         break;
     }
 
-    if (!wk->pokeList.unk73) {
+    if (!wk->pokeList.forceExit) {
         NetSync_Update((NetSyncWork *)&wk->pokeList);
     }
     return FALSE;
@@ -213,23 +247,23 @@ static void WifiBattleMatchList_SetupPokeList(WifiBattleMatchListParam *param, W
     PokeListParam_Setup(pokeList, param->gameData, 0x1a, wk->party);
     pokeList->regulation = regulation;
     switch (regulation->battleType) {
-    case 0:
+    case REGULATION_BATTLE_SINGLE:
         pokeList->unk48 = 0;
         pokeList->partnerCount = 1;
         break;
-    case 1:
+    case REGULATION_BATTLE_DOUBLE:
         pokeList->unk48 = 1;
         pokeList->partnerCount = 1;
         break;
-    case 2:
+    case REGULATION_BATTLE_TRIPLE:
         pokeList->unk48 = 1;
         pokeList->partnerCount = 1;
         break;
-    case 3:
+    case REGULATION_BATTLE_ROTATION:
         pokeList->unk48 = 1;
         pokeList->partnerCount = 1;
         break;
-    case 4:
+    case REGULATION_BATTLE_MULTI:
         pokeList->unk48 = 2;
         pokeList->partnerCount = 2;
         break;
@@ -360,51 +394,51 @@ static BOOL WifiBattleMatchExchange_MainWifi(WifiBattleMatchExchangeWork *wk, Wi
     }
 
     switch (*state) {
-    case 0:
+    case WIFI_TIMING1_SEND:
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x10, 0x24);
         (*state)++;
         break;
-    case 1:
+    case WIFI_TIMING1_WAIT:
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x10, 0x24)) {
             (*state)++;
         }
         break;
-    case 2:
+    case WIFI_CREATE_LINK:
         GFL_OvlLoad(OVERLAY_ID(139));
         GFL_OvlLoad(OVERLAY_ID(189));
         GFL_OvlLoad(OVERLAY_ID(260));
-        wk->link = WifiBattleMatchNet_Create(param->unk14, *param->gameData, 0, HEAPID_WIFIBATTLEMATCH_SUBPROC);
+        wk->link = WifiBattleMatchNet_Create(param->netData, *param->gameData, 0, HEAPID_WIFIBATTLEMATCH_SUBPROC);
         (*state)++;
         break;
-    case 3:
+    case WIFI_TIMING2_SEND:
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x11, 0x24);
         (*state)++;
         break;
-    case 4:
+    case WIFI_TIMING2_WAIT:
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x11, 0x24)) {
             (*state)++;
         }
         break;
-    case 5:
+    case WIFI_SEND_PARTY:
         if (WifiBattleMatchNet_SendParty(wk->link, param->party)) {
             (*state)++;
         }
         break;
-    case 6:
+    case WIFI_TAKE_PARTY:
         if (WifiBattleMatchNet_TakeParty(wk->link, param->otherParty)) {
             (*state)++;
         }
         break;
-    case 7:
+    case WIFI_TIMING3_SEND:
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x12, 0x24);
         (*state)++;
         break;
-    case 8:
+    case WIFI_TIMING3_WAIT:
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x12, 0x24)) {
             (*state)++;
         }
         break;
-    case 9:
+    case WIFI_DELETE_LINK:
         WifiBattleMatchNet_Delete(wk->link);
         wk->link = NULL;
         GFL_OvlUnload(OVERLAY_ID(260));
@@ -412,11 +446,11 @@ static BOOL WifiBattleMatchExchange_MainWifi(WifiBattleMatchExchangeWork *wk, Wi
         GFL_OvlUnload(OVERLAY_ID(139));
         (*state)++;
         break;
-    case 10:
+    case WIFI_TIMING4_SEND:
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x13, 0x24);
         (*state)++;
         break;
-    case 11:
+    case WIFI_TIMING4_WAIT:
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x13, 0x24)) {
             return TRUE;
         }
@@ -449,29 +483,29 @@ static BOOL WifiBattleMatchExchange_MainIrc(WifiBattleMatchExchangeWork *wk, Wif
     }
 
     switch (*state) {
-    case 0:
+    case IRC_START:
         (*state)++;
         break;
-    case 1:
+    case IRC_TIMING_SEND:
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x11, 0x1f);
         (*state)++;
         break;
-    case 2:
+    case IRC_TIMING_WAIT:
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x11, 0x1f)) {
             (*state)++;
         }
         break;
-    case 3:
+    case IRC_SEND_PARTY:
         if (LiveBattleMatchIrc_SendParty(wk->link, param->party)) {
             (*state)++;
         }
         break;
-    case 4:
+    case IRC_TAKE_PARTY:
         if (LiveBattleMatchIrc_TakeParty(wk->link, param->otherParty)) {
             (*state)++;
         }
         break;
-    case 5:
+    case IRC_DONE:
         return TRUE;
     }
     LiveBattleMatchIrc_Main(wk->link);

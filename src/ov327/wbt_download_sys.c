@@ -213,7 +213,7 @@ static void *WbtDownload_SetupLogin(HeapID heapId, WbtDownloadWork *wk, u32 prev
     login->unk4 = 0;
     login->unk8 = 1;
     login->buffer = NULL;
-    login->unk18 = 1;
+    login->keepBgm = 1;
     login->unkC = 0x36;
     if (prevStep == WBT_DOWNLOAD_STEP_DOWNLOAD) {
         login->unk14 = 1;
@@ -245,8 +245,8 @@ static void *WbtDownload_SetupLogout(HeapID heapId, WbtDownloadWork *wk, u32 pre
     logout->gameData = wk->param->gameData;
     logout->unk4 = 0;
     logout->unk8 = 1;
-    logout->unkC = 1;
-    logout->unk10 = 0;
+    logout->keepBgm = 1;
+    logout->wipeFlags = 0;
     return logout;
 }
 
