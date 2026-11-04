@@ -54,6 +54,6 @@ void PlayerInfo_SetUnionView(PlayerInfo *info, u8 value);
 u8 TrainerInfo_GetRegion(PlayerInfo *info);
 void PlayerInfo_SetVersion(PlayerInfo *info, u8 value);
 void PlayerInfo_SetRegion(PlayerInfo *info, u8 value);
-void PlayerInfo_SetCountryAndProvince(PlayerInfo *info, int a1, int a2);
+void PlayerInfo_SetCountryAndProvince(PlayerInfo *info, int country, int province);
 
 #endif // POKEBW2_SAVE_PLAYER_INFO_H
