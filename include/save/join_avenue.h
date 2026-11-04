@@ -44,7 +44,8 @@ typedef enum {
     JOIN_AVE_PARAM_RANK = 17,
     JOIN_AVE_PARAM_UNK_18 = 18,
     JOIN_AVE_PARAM_SHOP_ID = 19,
-    JOIN_AVE_PARAM_UNK_20 = 20,
+    // Set once the person's shop item was raffled (Scrcmd_Resort_MarkRaffled); entries and records keep it too
+    JOIN_AVE_PARAM_RAFFLED = 20,
     // When the person arrived
     JOIN_AVE_PARAM_YEAR = 21,
     JOIN_AVE_PARAM_MONTH = 22,
@@ -52,7 +53,8 @@ typedef enum {
     JOIN_AVE_PARAM_HOUR = 24,
     JOIN_AVE_PARAM_MINUTE = 25,
     JOIN_AVE_PARAM_UNK_26 = 26,
-    JOIN_AVE_PARAM_UNK_27 = 27,
+    // Set while the player talks to the person, when a visitor can't be merged into them
+    JOIN_AVE_PARAM_TALKING = 27,
     // How the person last came, a JOIN_AVE_STATUS_*; setting it keeps the lowest
     JOIN_AVE_PARAM_STATUS = 28,
     JOIN_AVE_PARAM_UNK_29 = 29,
@@ -184,7 +186,7 @@ struct JoinAvenuePerson {
     JoinAvenueProfile profile;
     JoinAvenueShopChoice choice;
     JoinAvenueData data[JOIN_AVE_DATA_COUNT];
-    u16 unkA0;
+    u16 raffled;
     u8 unkA2;
     u8 year;
     u8 month;
@@ -203,7 +205,7 @@ struct JoinAvenuePerson {
     JoinAvenueShop shop;
     u32 unkB8;
     u32 dataMask : 9;
-    u32 unkBC_9 : 1;
+    u32 talking : 1;
     u32 status : 3;
     u32 slot : 8;
     u32 row : 7;
@@ -231,7 +233,7 @@ struct JoinAvenueRecord {
     u8 year;
     u8 month;
     u8 day;
-    u8 unk33;
+    u8 raffled;
     JoinAvenueMessage message1;
     JoinAvenueMessage message2;
     u32 seed;
@@ -245,7 +247,7 @@ struct JoinAvenueEntry {
     u8 unk4C[2];
     // 0 or 1 by the type it was made with, or 2 to 4
     u8 unk4E;
-    u8 unk4F;
+    u8 raffled;
     u16 species;
     u16 unk52;
     u8 row;

@@ -750,7 +750,7 @@ static BOOL JoinAvenuePerson_Copy(JoinAvenuePerson *person, const JoinAvenuePers
 static u32 JoinAvenuePerson_MergeVisitor(JoinAvenuePerson *person, const JoinAvenueVisitor *visitor) {
     BOOL changed = FALSE;
 
-    if (joinAveTextHandler(person, JOIN_AVE_PARAM_UNK_27, NULL)) {
+    if (joinAveTextHandler(person, JOIN_AVE_PARAM_TALKING, NULL)) {
         return 2;
     }
     if (person->profile.trainerType != visitor->profile.trainerType) {
@@ -775,7 +775,7 @@ static u32 JoinAvenuePerson_MergePerson(JoinAvenuePerson *person, const JoinAven
     JoinAvenueData *data;
     BOOL changed;
 
-    if (joinAveTextHandler(person, JOIN_AVE_PARAM_UNK_27, NULL)) {
+    if (joinAveTextHandler(person, JOIN_AVE_PARAM_TALKING, NULL)) {
         return 2;
     }
     changed = FALSE;
@@ -801,7 +801,7 @@ static u32 JoinAvenuePerson_MergePerson(JoinAvenuePerson *person, const JoinAven
 static u32 JoinAvenuePerson_MergeEntry(JoinAvenuePerson *person, const JoinAvenueEntry *entry) {
     BOOL changed = FALSE;
 
-    if (joinAveTextHandler(person, JOIN_AVE_PARAM_UNK_27, NULL)) {
+    if (joinAveTextHandler(person, JOIN_AVE_PARAM_TALKING, NULL)) {
         return 2;
     }
     if (person->profile.trainerType != entry->profile.trainerType) {
@@ -878,8 +878,8 @@ u32 joinAveTextHandler(const JoinAvenuePerson *person, JoinAvenuePersonParam par
         return person->choice.rank;
     case JOIN_AVE_PARAM_SHOP_ID:
         return person->choice.shopId;
-    case JOIN_AVE_PARAM_UNK_20:
-        return person->unkA0;
+    case JOIN_AVE_PARAM_RAFFLED:
+        return person->raffled;
     case JOIN_AVE_PARAM_YEAR:
         return person->year;
     case JOIN_AVE_PARAM_MONTH:
@@ -892,8 +892,8 @@ u32 joinAveTextHandler(const JoinAvenuePerson *person, JoinAvenuePersonParam par
         return person->minute;
     case JOIN_AVE_PARAM_UNK_26:
         return person->unkA8;
-    case JOIN_AVE_PARAM_UNK_27:
-        return person->unkBC_9;
+    case JOIN_AVE_PARAM_TALKING:
+        return person->talking;
     case JOIN_AVE_PARAM_STATUS:
         return person->status;
     case JOIN_AVE_PARAM_UNK_29:
@@ -1075,8 +1075,8 @@ void JoinAvenuePerson_SetParam(JoinAvenuePerson *person, JoinAvenuePersonParam p
     case JOIN_AVE_PARAM_RANK:
         person->choice.rank = value;
         break;
-    case JOIN_AVE_PARAM_UNK_20:
-        person->unkA0 = value;
+    case JOIN_AVE_PARAM_RAFFLED:
+        person->raffled = value;
         break;
     case JOIN_AVE_PARAM_YEAR:
         person->year = value;
@@ -1096,8 +1096,8 @@ void JoinAvenuePerson_SetParam(JoinAvenuePerson *person, JoinAvenuePersonParam p
     case JOIN_AVE_PARAM_UNK_26:
         person->unkA8 = value;
         break;
-    case JOIN_AVE_PARAM_UNK_27:
-        person->unkBC_9 = value;
+    case JOIN_AVE_PARAM_TALKING:
+        person->talking = value;
         break;
     case JOIN_AVE_PARAM_STATUS:
         // Keeps the lowest status set since it was cleared
@@ -1408,8 +1408,8 @@ u32 JoinAvenueEntry_GetParam(JoinAvenueEntry *entry, JoinAvenuePersonParam param
         MI_CpuCopy8(entry->profile.name, buffer, sizeof(entry->profile.name));
         ((u16 *)buffer)[7] = GFL_StrBufGetTerminator();
         return 0;
-    case JOIN_AVE_PARAM_UNK_20:
-        return entry->unk4F;
+    case JOIN_AVE_PARAM_RAFFLED:
+        return entry->raffled;
     case JOIN_AVE_PARAM_SEED:
         return entry->seed;
     case JOIN_AVE_PARAM_SHOP_KIND:
@@ -1521,8 +1521,8 @@ void JoinAvenueEntry_SetParam(JoinAvenueEntry *entry, JoinAvenuePersonParam para
     case JOIN_AVE_PARAM_DAY:
         entry->day = value;
         break;
-    case JOIN_AVE_PARAM_UNK_20:
-        entry->unk4F = value;
+    case JOIN_AVE_PARAM_RAFFLED:
+        entry->raffled = value;
         break;
     case JOIN_AVE_PARAM_UNK_38:
         break;
@@ -1835,7 +1835,7 @@ void JoinAvenuePerson_InitFromPerson(JoinAvenuePerson *person, const JoinAvenueP
     }
     person->slot = slot;
     person->row = row;
-    JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_UNK_27, 0);
+    JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_TALKING, 0);
     JoinAvenuePerson_SetupShopKind(person, shops);
 }
 
@@ -1852,7 +1852,7 @@ void JoinAvenuePerson_InitFromEntry(JoinAvenuePerson *person, const JoinAvenueEn
     person->choice.shopId = entry->shopId;
     person->slot = slot;
     person->row = row;
-    JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_UNK_27, 0);
+    JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_TALKING, 0);
     JoinAvenuePerson_SetupShopKind(person, shops);
 }
 
@@ -1963,8 +1963,8 @@ u32 JoinAvenueRecord_GetParam(JoinAvenueRecord *record, JoinAvenuePersonParam pa
         return record->profile.gender;
     case JOIN_AVE_PARAM_TRAINER_TYPE:
         return record->profile.trainerType;
-    case JOIN_AVE_PARAM_UNK_20:
-        return record->unk33;
+    case JOIN_AVE_PARAM_RAFFLED:
+        return record->raffled;
     case JOIN_AVE_PARAM_SEED:
         return record->seed;
     case JOIN_AVE_PARAM_YEAR:
@@ -2004,8 +2004,8 @@ void JoinAvenueRecord_SetParam(JoinAvenueRecord *record, JoinAvenuePersonParam p
     case JOIN_AVE_PARAM_DAY:
         record->day = value;
         break;
-    case JOIN_AVE_PARAM_UNK_20:
-        record->unk33 = value;
+    case JOIN_AVE_PARAM_RAFFLED:
+        record->raffled = value;
         break;
     case JOIN_AVE_PARAM_SEED:
         record->seed = value;

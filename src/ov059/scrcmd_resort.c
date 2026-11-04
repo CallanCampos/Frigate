@@ -60,7 +60,7 @@ BOOL Scrcmd_Resort_StartTalk(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ResortPerson *person = ResortSys_GetScriptPerson(env, ResortCmd_GetPeople(GSYS_GetField(gsys)));
 
-    ResortPerson_SetParam(person, JOIN_AVE_PARAM_UNK_27, 1);
+    ResortPerson_SetParam(person, JOIN_AVE_PARAM_TALKING, 1);
     ResortPerson_SetTalking(person, 1);
     if (checkForMidnight(GSYS_GetGameData(gsys)) && ResortPerson_GetAttr(person, 0) == 0) {
         JoinAvenueShop_SetField(ResortPerson_GetShop(person), 3, -1);
@@ -73,7 +73,7 @@ BOOL Scrcmd_Resort_EndTalk(VM *vm, FieldScriptEnv *env) {
         ResortSys_GetScriptPerson(env, ResortCmd_GetPeople(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
 
     if (person != NULL) {
-        ResortPerson_SetParam(person, JOIN_AVE_PARAM_UNK_27, 0);
+        ResortPerson_SetParam(person, JOIN_AVE_PARAM_TALKING, 0);
         ResortPerson_SetTalking(person, 0);
     }
     return FALSE;
@@ -135,9 +135,9 @@ BOOL Scrcmd_Resort_GetValue(VM *vm, FieldScriptEnv *env) {
         break;
     }
     case 3:
-        if (ResortPerson_GetParam(person, JOIN_AVE_PARAM_UNK_20, NULL) == 0) {
+        if (ResortPerson_GetParam(person, JOIN_AVE_PARAM_RAFFLED, NULL) == 0) {
             *var = ResortData_RaffleShopItem(data, ResortSys_GetUnk24Table(sys), ResortSys_GetRanks(sys), info);
-            ResortPerson_SetParam(person, JOIN_AVE_PARAM_UNK_20, 1);
+            ResortPerson_SetParam(person, JOIN_AVE_PARAM_RAFFLED, 1);
         } else {
             *var = 0;
         }
@@ -1003,7 +1003,7 @@ BOOL Scrcmd_Resort_MarkRaffled(VM *vm, FieldScriptEnv *env) {
     gsys = FieldScriptEnv_GetGameSystem(env);
     FieldScriptEnv_GetGameData(env);
     ResortPerson_SetParam(ResortSys_GetScriptPerson(env, ResortCmd_GetPeople(GSYS_GetField(gsys))),
-                          JOIN_AVE_PARAM_UNK_20, 1);
+                          JOIN_AVE_PARAM_RAFFLED, 1);
     return FALSE;
 }
 
