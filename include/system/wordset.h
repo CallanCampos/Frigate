@@ -28,9 +28,9 @@ void loadPokemonSpeciesTextNameToStrbuf(WordSet *wordSet, u32 index, PartyPkm *p
 void loadMoveNameToStrbuf(WordSet *wordSet, u32 index, u32 move);
 void loadItemNameToStrbuf(WordSet *wordSet, u32 index, u32 item);
 void loadPassPowerToStrbuf(WordSet *wordSet, u32 index, u32 passPower);
-void WordSet_LoadFestivalMission(WordSet *wordSet, u32 index, u8 value, s32 arg3);
+void WordSet_LoadFestivalMission(WordSet *wordSet, u32 index, u8 mission, s32 level);
 // An item's name: the plural when plural is set, else the one in message file 481 when a4 is set
-void loadItemText(WordSet *wordSet, u32 index, u32 item, BOOL plural, BOOL a4);
+void loadItemText(WordSet *wordSet, u32 index, u32 item, BOOL plural, BOOL withArticle);
 void loadBagPocketNameToStrbuf(WordSet *wordSet, u32 index, u32 pocket);
 // Puts the player's name in a word set
 void copyVarForText(WordSet *wordSet, u32 index, PlayerInfo *playerInfo);

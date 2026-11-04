@@ -192,10 +192,10 @@ void loadItemsNameToStrbuf(WordSet *wordSet, u32 index, u32 item) {
     GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_ITEM_NAMES_PLURAL, item);
 }
 
-void loadItemText(WordSet *wordSet, u32 index, u32 item, BOOL plural, BOOL a4) {
+void loadItemText(WordSet *wordSet, u32 index, u32 item, BOOL plural, BOOL withArticle) {
     if (plural) {
         loadItemsNameToStrbuf(wordSet, index, item);
-    } else if (a4) {
+    } else if (withArticle) {
         loadItemTextNameToStrbuf(wordSet, index, item);
     } else {
         loadItemNameToStrbuf(wordSet, index, item);
@@ -393,7 +393,7 @@ void WordSet_LoadPWTTournamentType(WordSet *wordSet, u32 index, u32 tournament) 
     GFL_WordSetCopyStrbuf(wordSet, index, wordSet->tmp, NULL);
 }
 
-void WordSet_LoadFestivalMission(WordSet *wordSet, u32 index, u8 mission, s32 a3) {
+void WordSet_LoadFestivalMission(WordSet *wordSet, u32 index, u8 mission, s32 level) {
     FestMissionConfig *buffer;
     FestivalText *text;
 
@@ -401,12 +401,12 @@ void WordSet_LoadFestivalMission(WordSet *wordSet, u32 index, u8 mission, s32 a3
         GFL_WordSetClearBuf(wordSet, index);
         return;
     }
-    if (a3 >= 4) {
-        a3 = 0;
+    if (level >= 4) {
+        level = 0;
     }
     buffer = allocateForFestMission(HEAPID_TAIL((HeapID)wordSet->heapId));
     text = getTextFileForFestMissions(HEAPID_TAIL((HeapID)wordSet->heapId));
-    FestMission_Load(text->archive, mission, a3, buffer);
+    FestMission_Load(text->archive, mission, level, buffer);
     FestMission_GetMessage(text, wordSet->tmp, buffer, HEAPID_TAIL((HeapID)wordSet->heapId));
     GFL_WordSetCopyStrbuf(wordSet, index, wordSet->tmp, NULL);
     FestivalText_Free(text);
