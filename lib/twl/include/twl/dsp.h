@@ -239,8 +239,8 @@ static inline void DSP_MaskSemaphore(u16 mask) {
 
 // dsp_process.c: a process is a COFF image that the DSP runs. Its program goes to the shared WRAM B and its data to
 // WRAM C, in banks of 32 KB that the ARM9 gives it from the ones its context allows, and its events (the 16 bits of the
-// semaphore from the DSP and its 3 replies) call the callbacks of its context. The named functions have TwlSDK's names;
-// the ones named by address are not known.
+// semaphore from the DSP and its 3 replies) call the callbacks of its context. The functions have TwlSDK's names, the
+// ones that libntr's headers don't have from the symbols that Black 1's decompilation (aletheia) recovered.
 #define DSP_HOOK_SEMAPHORE_(id) (1 << (id))
 #define DSP_HOOK_REPLY_(id) (1 << (16 + (id)))
 #define DSP_HOOK_MAX (16 + 3)
