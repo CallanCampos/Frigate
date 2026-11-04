@@ -119,6 +119,8 @@ enum {
 #define JAPAN_ROTATION_Y_MAX (-0x27e0)
 #define WORLD_ROTATION_X_MAX 0x3e00
 
+#define GEONET_TOUCH_NONE 0xffff
+
 enum {
     SEQ_INIT,
     SEQ_FADE_IN,
@@ -1015,7 +1017,7 @@ static void Geonet_GetTouchMove(GeonetWork *work, int prevX, int prevY, int *key
     int x = 0;
     int y = 0;
 
-    if (work->touchX != 0xffff) {
+    if (work->touchX != GEONET_TOUCH_NONE) {
         x = work->touchX - prevX;
         if (x < 0) {
             x ^= -1;
@@ -1027,7 +1029,7 @@ static void Geonet_GetTouchMove(GeonetWork *work, int prevX, int prevY, int *key
     *keysX = dirX;
     *moveX = x & 0x3f;
 
-    if (work->touchY != 0xffff) {
+    if (work->touchY != GEONET_TOUCH_NONE) {
         y = work->touchY - prevY;
         if (y < 0) {
             y ^= -1;
