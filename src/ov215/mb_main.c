@@ -375,7 +375,7 @@ void MailBox_LoadMails(MailBoxWork *work) {
 
     work->view->mailCount = 0;
     for (i = 0; i < MAIL_COUNT; i++) {
-        work->view->pageMails[i] = 0xff;
+        work->view->pageMails[i] = MAILBOX_NO_MAIL;
         work->view->mails[i] = MailBox_CopyMail(work->mails, 0, i, HEAPID_MAILBOX_VIEW);
         if (MailData_IsValid(work->view->mails[i]) == TRUE) {
             work->view->pageMails[work->view->mailCount] = i;
@@ -405,7 +405,7 @@ void MailBox_UpdateMailList(MailBoxWork *work) {
     u16 i;
 
     for (i = 0; i < MAILBOX_PAGE_SIZE; i++) {
-        if (mails[i] == 0xff) {
+        if (mails[i] == MAILBOX_NO_MAIL) {
             BGWinFrame_Hide(work->view->frames, frame);
         } else {
             MailBox_DrawMailFrame(work, frame, window, mails[i]);

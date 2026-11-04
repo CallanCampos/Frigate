@@ -337,7 +337,7 @@ static u32 MailBox_StateSelectMail(MailBoxWork *work) {
     case 7:
     case 8:
     case 9:
-        if (*(work->view->pageMails + result + MAILBOX_PAGE_SIZE * work->page) == 0xff) {
+        if (*(work->view->pageMails + result + MAILBOX_PAGE_SIZE * work->page) == MAILBOX_NO_MAIL) {
             break;
         }
         work->cursor = result;

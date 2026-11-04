@@ -38,6 +38,7 @@
 #define MAILBOX_MSG_FILE TEXT_BANK_BTL_SERVER_FLOW_2
 
 #define MAILBOX_PAGE_SIZE 10
+#define MAILBOX_NO_MAIL 0xff
 
 // The windows of the screen's view
 #define MAILBOX_WINDOW_COUNT 32
