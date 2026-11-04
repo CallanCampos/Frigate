@@ -633,7 +633,7 @@ static BOOL MonolithMission_Main(GameProc *proc, u32 *state, void *param, void *
     case MONOLITH_MISSION_SEQ_WAIT_DISCONNECT:
         if (GameCommSys_BootCheck(mfw->comm) == 0) {
             if (GFL_NetErrCheck() == FALSE) {
-                func_0202be00(mfw->comm);
+                GameCommSys_ClearCounter(mfw->comm);
             }
             (*state)++;
         }

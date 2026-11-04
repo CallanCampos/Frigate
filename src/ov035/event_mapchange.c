@@ -1336,7 +1336,7 @@ GameEvent *EventEntralinkWarp_CreateOut(GameSystem *gsys) {
     GameCommSys *comm = GSYS_GetGameCommSystem(gsys);
 
     if (!GameCommSys_BootCheck(comm)) {
-        func_0202be00(comm);
+        GameCommSys_ClearCounter(comm);
     }
     GameData_SetForceSeasonSync(gameData, FALSE);
     GameData_SetNetID(gameData, 0);
@@ -1860,7 +1860,7 @@ GameEventReturnCode EventEntralinkWarpIn_Callback(GameEvent *event, u32 *state, 
     }
     case ENTRALINK_IN_WAIT_BOOT:
         if (!GameCommSys_BootCheck(comm)) {
-            func_0202be00(comm);
+            GameCommSys_ClearCounter(comm);
             GameData_SetForceSeasonSync(wk->gameData, TRUE);
             GameData_SetNetID(wk->gameData, NetSystem_GetNetId());
             GameEvent_ChainNext(event, EventEntralinkWarp_Create(wk->gsys, wk->field, &wk->spawn));

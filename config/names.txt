@@ -1769,6 +1769,7 @@
 . 0x0202bde0 GameCommSys_IsTransitioning
 . 0x0202bdf4 GameCommSys_GetWork
 . 0x0202bdfc GameCommSys_GetLastCommNo
+. 0x0202be00 GameCommSys_ClearCounter
 . 0x0202be08 GameCommSys_GetCounter
 . 0x0202be0c GameComm_SetSeq
 . 0x0202be14 GameCommSys_SetInResearchGraph

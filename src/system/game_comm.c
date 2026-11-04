@@ -58,7 +58,7 @@ struct GameCommSys {
     u8 inFunfestMission : 1;
     u8 commNo;
     u8 lastCommNo;
-    u32 unk8;
+    u32 counter;
     GameCommSeq seq;
     void *param;
     void *work;
@@ -180,7 +180,7 @@ void GameCommSys_Main(GameCommSys *comm) {
             comm->work = funcs->init(&seq->subSeq, comm->param);
         }
         comm->lastCommNo = comm->commNo;
-        comm->unk8 = 0;
+        comm->counter = 0;
         GameComm_SetSeq(seq, GAME_COMM_SEQ_INIT_WAIT);
         break;
     case GAME_COMM_SEQ_INIT_WAIT:
@@ -308,12 +308,12 @@ u8 GameCommSys_GetLastCommNo(GameCommSys *comm) {
     return comm->lastCommNo;
 }
 
-void func_0202be00(GameCommSys *comm) {
-    comm->unk8 = 0;
+void GameCommSys_ClearCounter(GameCommSys *comm) {
+    comm->counter = 0;
 }
 
 u32 GameCommSys_GetCounter(GameCommSys *comm) {
-    return comm->unk8;
+    return comm->counter;
 }
 
 static void GameComm_SetSeq(GameCommSeq *seq, u8 next) {

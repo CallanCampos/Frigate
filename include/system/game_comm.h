@@ -49,7 +49,7 @@ void *GameCommSys_GetWork(GameCommSys *comm);
 GameData *getBasePlayerBlk(GameCommSys *comm);
 // The GameCommNo of the communication booted last
 u8 GameCommSys_GetLastCommNo(GameCommSys *comm);
-void func_0202be00(GameCommSys *comm);
+void GameCommSys_ClearCounter(GameCommSys *comm);
 u32 GameCommSys_GetCounter(GameCommSys *comm);
 void GameCommSys_SetInResearchGraph(GameCommSys *comm, BOOL flag);
 void GameCommSys_SetInFunfestMission(GameCommSys *comm, BOOL flag);
