@@ -546,6 +546,21 @@ static void EventPokewood_ResumeFieldMusic(GameSystem *gsys, GameData *gameData,
     FieldSnd_ResumeAmbience(fieldSound, 2);
 }
 
+enum {
+    STEP_FADE_OUT_BGM,
+    STEP_CLOSE_FIELD,
+    STEP_START_TITLE,
+    STEP_FREE_TITLE,
+    STEP_START_BRIEFING,
+    STEP_END_BRIEFING,
+    STEP_START_BATTLE,
+    STEP_START_RESULT,
+    STEP_OPEN_FIELD,
+    STEP_RESUME_MUSIC,
+    STEP_RECORD_RESULT,
+    STEP_WATCH_DONE,
+};
+
 // Runs a movie that is watched: the title card, the briefing, the battle, and the screen after it
 static GameEventReturnCode EventPokewood_RunWatch(GameEvent *event, u32 *state, void *data) {
     PokewoodMovieEvent *wk = data;
@@ -558,59 +573,59 @@ static GameEventReturnCode EventPokewood_RunWatch(GameEvent *event, u32 *state, 
     PokewoodSave *save = PokewoodSave_Get(gameData);
 
     switch (*state) {
-    case 0:
+    case STEP_FADE_OUT_BGM:
         wk->setup = EventPokewood_CreateSetup(param, gsys, gameData, field, param->heapId);
         GameEvent_ChainNext(event, CreateBGMFadeOutEvent(gsys, 20));
         (*state)++;
         break;
-    case 1:
+    case STEP_CLOSE_FIELD:
         GameEvent_ChainNext(event, CreateFieldCloseEvent(gsys, field));
         (*state)++;
         break;
-    case 2:
+    case STEP_START_TITLE:
         EventPokewood_InitTitleParam(&param->title, wk->setup);
         GSYS_QueueProcAsEvent(event, OVERLAY_PKWD_COUNT, &PKWD_COUNT_PROC_FUNCTIONS, &param->title);
         (*state)++;
         break;
-    case 3:
+    case STEP_FREE_TITLE:
         EventPokewood_FreeTitleParam(&param->title);
         (*state)++;
         break;
-    case 4:
+    case STEP_START_BRIEFING:
         EventPokewood_InitBriefingParam(&param->briefing, wk->setup, playerInfo, gameData);
         GSYS_QueueProcAsEvent(event, OVERLAY_PKWD_BRIEFING, &PKWD_BRIEFING_PROC_FUNCTIONS, &param->briefing);
         (*state)++;
         break;
-    case 5:
+    case STEP_END_BRIEFING:
         wk->setup->audience = param->briefing.audience;
         if (param->briefing.skip != 0) {
-            *state = 8;
+            *state = STEP_OPEN_FIELD;
         } else {
             (*state)++;
         }
         EventPokewood_OnBriefingDone(&param->briefing);
         break;
-    case 6:
+    case STEP_START_BATTLE:
         GFL_SndBGMPlay(wk->setup->fieldSituation.bgm, 0xffff);
         GSYS_QueueProcAsEvent(event, OVERLAY_ID(167), &BATTLE_PROC_FUNCTIONS, wk->setup);
         (*state)++;
         break;
-    case 7:
+    case STEP_START_RESULT:
         if (wk->setup->unk134 == 0) {
             EventPokewood_InitResultParam(&param->result, wk->setup, playerInfo, gameData);
             GSYS_QueueProcAsEvent(event, OVERLAY_PKWD_BRIEFING, &PKWD_BRIEFING_CREDITS_PROC_FUNCTIONS, &param->result);
         }
         (*state)++;
         break;
-    case 8:
+    case STEP_OPEN_FIELD:
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
         (*state)++;
         break;
-    case 9:
+    case STEP_RESUME_MUSIC:
         EventPokewood_ResumeFieldMusic(gsys, gameData, event, field, fieldSound);
         (*state)++;
         break;
-    case 10: {
+    case STEP_RECORD_RESULT: {
         PokewoodSystem *sys;
         u16 *var;
 
@@ -634,7 +649,7 @@ static GameEventReturnCode EventPokewood_RunWatch(GameEvent *event, u32 *state, 
         (*state)++;
         break;
     }
-    case 11:
+    case STEP_WATCH_DONE:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -658,6 +673,20 @@ static void EventPokewood_LoadSlotInfo(GameData *gameData, HeapID heapId, Pokewo
 }
 
 // Runs a movie that the player films: the battle, and what it records
+enum {
+    STEP_FILM_START_BGM,
+    STEP_FILM_START_ENCOUNTER,
+    STEP_FILM_CLOSE_FIELD,
+    STEP_FILM_START_BATTLE,
+    STEP_FILM_STORE_RESULT,
+    STEP_FILM_BGM_FADE_POP,
+    STEP_FILM_OPEN_FIELD,
+    STEP_FILM_BGM_FADE_WAIT,
+    STEP_FILM_MAP_ENTRANCE_IN,
+    STEP_FILM_RECORD_RESULT,
+    STEP_FILM_DONE,
+};
+
 static GameEventReturnCode EventPokewood_RunFilm(GameEvent *event, u32 *state, void *data) {
     PokewoodMovieEvent *wk = data;
     PokewoodMovieParam *param = wk->param;
@@ -667,49 +696,49 @@ static GameEventReturnCode EventPokewood_RunFilm(GameEvent *event, u32 *state, v
     FieldSound *fieldSound = GameData_GetFieldSoundSystem(gameData);
 
     switch (*state) {
-    case 0:
+    case STEP_FILM_START_BGM:
         wk->setup = EventPokewood_CreateSetup(param, gsys, gameData, field, param->heapId);
         GameEvent_ChainNext(event, EventBattleBGMPlay_Create(gsys, wk->setup->fieldSituation.bgm));
         (*state)++;
         break;
-    case 1:
+    case STEP_FILM_START_ENCOUNTER:
         EncEff_StartEvent(Field_GetEncEff(field), event, 29);
         (*state)++;
         break;
-    case 2:
+    case STEP_FILM_CLOSE_FIELD:
         GameEvent_ChainNext(event, CreateFieldCloseEvent(gsys, field));
         (*state)++;
         break;
-    case 3:
+    case STEP_FILM_START_BATTLE:
         FieldSnd_SetPlayerVolumeFade(fieldSound, 127, 1);
         GSYS_QueueProcAsEvent(event, OVERLAY_ID(167), &BATTLE_PROC_FUNCTIONS, wk->setup);
         (*state)++;
         break;
-    case 4:
+    case STEP_FILM_STORE_RESULT:
         if (wk->setup->result != BTL_RESULT_FLEE) {
             EventPokewood_LoadSlotInfo(gameData, param->heapId, param);
             EventPokewood_StoreRecordedSetup(gameData, wk->setup, param->heapId);
         }
         (*state)++;
         break;
-    case 5:
+    case STEP_FILM_BGM_FADE_POP:
         GameEvent_ChainNext(event, EventBGMFadePop_Create(gsys));
         (*state)++;
         break;
-    case 6:
+    case STEP_FILM_OPEN_FIELD:
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
         (*state)++;
         break;
-    case 7:
+    case STEP_FILM_BGM_FADE_WAIT:
         GameEvent_ChainNext(event, EventBGMFadeWait_Create(gsys));
         (*state)++;
         break;
-    case 8:
+    case STEP_FILM_MAP_ENTRANCE_IN:
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         (*state)++;
         break;
-    case 9: {
+    case STEP_FILM_RECORD_RESULT: {
         PokewoodSystem *sys;
         u16 *var;
 
@@ -726,7 +755,7 @@ static GameEventReturnCode EventPokewood_RunFilm(GameEvent *event, u32 *state, v
         (*state)++;
         break;
     }
-    case 10:
+    case STEP_FILM_DONE:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -746,6 +775,11 @@ static GameEvent *EventPokewood_CreateRunEvent(GameSystem *gsys, PokewoodMoviePa
     return event;
 }
 
+enum {
+    STEP_START_RUN,
+    STEP_SAVE_BLOCK,
+};
+
 // Runs a movie, keeping its data in the Pokewood block meanwhile
 static GameEventReturnCode EventPokewood_RunMovie(GameEvent *event, u32 *state, void *data) {
     PokewoodMovieParam *param = data;
@@ -753,12 +787,12 @@ static GameEventReturnCode EventPokewood_RunMovie(GameEvent *event, u32 *state, 
     PokewoodSystem *sys = *GameData_GetPokewoodSystemPtr(GSYS_GetGameData(gsys));
 
     switch (*state) {
-    case 0:
+    case STEP_START_RUN:
         allocatePokewoodBlk(param->heapId);
         GameEvent_ChainNext(event, EventPokewood_CreateRunEvent(gsys, param));
-        *state = 1;
+        *state = STEP_SAVE_BLOCK;
         break;
-    case 1:
+    case STEP_SAVE_BLOCK:
         savePokewoodBlk(PokewoodSystem_GetPokewoodBlk(sys));
         freeAndClearPokewoodBlk();
         return GAMEEVENT_DONE;
@@ -818,16 +852,21 @@ GameEvent *EventPokewood_CreateMoviePickerEvent(GameSystem *gsys, void *args) {
     return event;
 }
 
+enum {
+    STEP_OPEN_PICKER,
+    STEP_SET_MOVIE,
+};
+
 static GameEventReturnCode EventPokewood_RunPicker(GameEvent *event, u32 *state, void *data) {
     PokewoodPickerEvent *wk = data;
 
     switch (*state) {
-    case 0:
+    case STEP_OPEN_PICKER:
         GameEvent_ChainNext(event, EventFieldSubprocessTransition_Create(wk->gsys, wk->field, OVERLAY_ID(322),
                                                                          &PKWD_BOOK_PROC_FUNCTIONS, &wk->param));
-        *state = 1;
+        *state = STEP_SET_MOVIE;
         break;
-    case 1:
+    case STEP_SET_MOVIE:
         if (wk->param.result != NULL && *wk->param.result == -1) {
             *wk->param.result = 41;
         } else {
@@ -852,17 +891,22 @@ GameEvent *EventPokewood_CreateMenuEvent(GameSystem *gsys, void *args) {
     return event;
 }
 
+enum {
+    STEP_OPEN_MENU,
+    STEP_FINISH_MENU,
+};
+
 static GameEventReturnCode EventPokewood_RunMenu(GameEvent *event, u32 *state, void *data) {
     PokewoodMenuEvent *wk = data;
 
     switch (*state) {
-    case 0:
+    case STEP_OPEN_MENU:
         GameEvent_ChainNext(event,
                             EventFieldSubprocessTransition_Create(wk->gsys, wk->field, OVERLAY_ID(323),
                                                                   &PKWD_SELECTSCREEN_PROC_FUNCTIONS, &wk->param));
-        *state = 1;
+        *state = STEP_FINISH_MENU;
         break;
-    case 1:
+    case STEP_FINISH_MENU:
         if (wk->param.result != NULL && *wk->param.result == PKWD_SELECTSCREEN_CANCEL) {
             *wk->param.result = PKWD_SELECTSCREEN_CANCEL;
         } else {
@@ -873,35 +917,44 @@ static GameEventReturnCode EventPokewood_RunMenu(GameEvent *event, u32 *state, v
     return GAMEEVENT_CONTINUE;
 }
 
+enum {
+    STEP_CAST_FADE_OUT,
+    STEP_CAST_CLOSE_FIELD,
+    STEP_CAST_SELECT,
+    STEP_CAST_OPEN_FIELD,
+    STEP_CAST_FADE_IN,
+    STEP_SET_CAST,
+};
+
 // Picks the cast from the party
 static GameEventReturnCode EventPokewood_RunCastSelect(GameEvent *event, u32 *state, void *data) {
     PokewoodCastEvent *wk = data;
     GameSystem *gsys = wk->gsys;
 
     switch (*state) {
-    case 0:
+    case STEP_CAST_FADE_OUT:
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceOutTransitionDefault(gsys, wk->field, FIELD_TRANSITION_FADE_BLACK, 0));
         (*state)++;
         break;
-    case 1:
+    case STEP_CAST_CLOSE_FIELD:
         GameEvent_ChainNext(event, CreateFieldCloseEvent(gsys, wk->field));
         (*state)++;
         break;
-    case 2:
+    case STEP_CAST_SELECT:
         GameEvent_ChainNext(event, EventPokeList_Create(gsys, wk->field, &wk->pokeList, &wk->status));
         (*state)++;
         break;
-    case 3:
+    case STEP_CAST_OPEN_FIELD:
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
         (*state)++;
         break;
-    case 4:
+    case STEP_CAST_FADE_IN:
         GameEvent_ChainNext(event,
                             CallFieldMapEntranceInTransition(gsys, wk->field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         (*state)++;
         break;
-    case 5:
+    case STEP_SET_CAST:
         PokewoodSystem_SetCastFromPokeList(wk->sys, &wk->pokeList);
         return GAMEEVENT_DONE;
     }
@@ -1006,17 +1059,22 @@ GameEvent *EventPokewood_CreateScreenEvent(GameSystem *gsys, void *args) {
     return event;
 }
 
+enum {
+    STEP_OPEN_MONITOR,
+    STEP_SCREEN_DONE,
+};
+
 static GameEventReturnCode EventPokewood_RunScreen(GameEvent *event, u32 *state, void *data) {
     PokewoodScreenEvent *wk = data;
 
     switch (*state) {
-    case 0:
+    case STEP_OPEN_MONITOR:
         GameEvent_ChainNext(event,
                             EventFieldSubprocessTransition_Create(wk->gsys, wk->field, OVERLAY_PKWD_RECORD_MONITOR,
                                                                   &PKWD_RECORD_MONITOR_PROC_FUNCTIONS, &wk->param));
-        *state = 1;
+        *state = STEP_SCREEN_DONE;
         break;
-    case 1:
+    case STEP_SCREEN_DONE:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
