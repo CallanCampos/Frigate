@@ -746,12 +746,17 @@ static void WbtStadiumGimmick_AddEndTask(GimmickWork *work) {
     FieldTaskManager_AddTask(manager, task, 0);
 }
 
+enum {
+    STEP_WAIT_ANM,
+    STEP_END,
+};
+
 static BOOL WbtStadiumGimmick_EndTask(void *data) {
     PortraitTaskData *task = data;
     FieldExpObjSystem *expObj = task->work->expObj;
 
     switch (task->state) {
-    case 0:
+    case STEP_WAIT_ANM:
         if (FieldExpObjAnm_IsPlaybackFinished(FieldExpObj_GetAnmInfo(expObj, 2, 0, 0)) == TRUE) {
             u8 i;
 
@@ -763,10 +768,10 @@ static BOOL WbtStadiumGimmick_EndTask(void *data) {
                 FieldExpObjAnm_SetLooped(anm, FALSE);
                 FieldExpObjAnm_SetPaused(anm, FALSE);
             }
-            task->state = 1;
+            task->state = STEP_END;
         }
         break;
-    case 1:
+    case STEP_END:
         return TRUE;
     }
     return FALSE;
