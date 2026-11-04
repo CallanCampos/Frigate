@@ -2,8 +2,8 @@
 // interface and its clock, starting and stopping a capture, and the interface's control bits (the transfer size, the
 // trimming, the output format, the interrupt). ARM code. The ROM names none of it; the file's name is a guess, after
 // the SDK's camera.h, whose Core names twl/camera.h gives: the TWL-SDK Function Reference Manual's, and libntr's for
-// the interrupt bits (camera_intr.h). The functions have those names where they are known, and keep their default
-// names otherwise.
+// the interrupt bits (camera_intr.h). The static CAMERA_GetTransferLinesCore has the name of the TwlSDK symbol that
+// Black 1's decompilation (aletheia) recovered from camera.o at the same address.
 //
 // The interface has two registers in the I/O space after SCFG_CLK: 0x04004200, which the reset writes, and 0x04004202,
 // the control word. The functions that change the control word do so with the interrupts off.
@@ -30,7 +30,7 @@
 #define CAMERA_CNT_TRIMMING 0x4000
 #define CAMERA_CNT_CAPTURE 0x8000 // Set to start a capture, and on until it ends
 
-static u32 func_027022e0(void);
+static u32 CAMERA_GetTransferLinesCore(void);
 
 // Resets the interface: the interface's clock on, its first register cleared, the camera's clock on for the reset, and
 // then off again, with the SDK's delays in between
@@ -143,7 +143,7 @@ void CAMERA_SetTransferLinesCore(int lines) {
 }
 
 // The number of lines per transfer that the control word holds
-static u32 func_027022e0(void) {
+static u32 CAMERA_GetTransferLinesCore(void) {
     return (reg_CAMERA_CNT & CAMERA_CNT_LINES_MASK) + 1;
 }
 
@@ -164,7 +164,7 @@ int CAMERA_GetMaxLinesRoundCore(u16 width, u16 height) {
 
 // The bytes of one transfer, two per pixel of a line
 u32 CAMERA_GetBytesAtOnceCore(u16 width) {
-    return width * 2 * func_027022e0();
+    return width * 2 * CAMERA_GetTransferLinesCore();
 }
 
 u16 CAMERA_SizeToWidthCore(CAMERASize size) {
