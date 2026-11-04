@@ -28,8 +28,8 @@ struct DreamWorldSave {
     u16 results[DREAM_WORLD_RESULT_MAX][DREAM_WORLD_RESULT_WORDS];
     u8 unk1A2;
     u8 asleep;
-    // From the Dream World's result
-    u8 unk1A4;
+    // From the Dream World's result (DreamWorldSave_SetMode)
+    u8 mode;
     // Set once the Game Sync ID was shown
     u8 idShown;
     // The index of the chosen result entry, DREAM_WORLD_RESULT_INDEX_NONE for none, and a flag with it
@@ -49,7 +49,7 @@ PartyPkm *DreamWorldSave_GetPkm(DreamWorldSave *dreamWorld);
 void DreamWorldSave_SetPkm(DreamWorldSave *dreamWorld, PartyPkm *pkm);
 // Whether a species' bit is set in a list of species flags
 BOOL DreamWorldSave_TestSpeciesFlag(const u8 *flags, int species);
-void func_020099d8(DreamWorldSave *dreamWorld, u8 value);
+void DreamWorldSave_SetMode(DreamWorldSave *dreamWorld, u8 value);
 u8 DreamWorldSave_GetMode(DreamWorldSave *dreamWorld);
 void DreamWorldSave_SetIDShown(DreamWorldSave *dreamWorld, u8 value);
 u8 DreamWorldSave_GetIDShown(DreamWorldSave *dreamWorld);

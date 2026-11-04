@@ -604,7 +604,7 @@ static void GSync_StateReceive(GSyncWork *wk) {
         GSync_SetItems(dreamWorld, wk->result);
         GSync_AddForestPokemonList(wk, dreamWorld, wk->result);
         GSync_SetEntries(dreamWorld, wk->result);
-        func_020099d8(dreamWorld, wk->result->unk5A);
+        DreamWorldSave_SetMode(dreamWorld, wk->result->unk5A);
         GSync_AddJoinAvenuePeople(wk->gameData, wk->result->people, wk->heapId);
     } else {
         int i;

@@ -258,6 +258,7 @@
 . 0x02009998 DreamWorldSave_GetPkm
 . 0x0200999c DreamWorldSave_SetPkm
 . 0x020099b4 DreamWorldSave_TestSpeciesFlag
+. 0x020099d8 DreamWorldSave_SetMode
 . 0x020099e0 DreamWorldSave_GetMode
 . 0x020099e8 DreamWorldSave_SetIDShown
 . 0x020099f4 DreamWorldSave_GetIDShown

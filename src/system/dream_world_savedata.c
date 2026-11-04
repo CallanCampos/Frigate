@@ -46,12 +46,12 @@ BOOL DreamWorldSave_TestSpeciesFlag(const u8 *flags, int species) {
     return FALSE;
 }
 
-void func_020099d8(DreamWorldSave *dreamWorld, u8 value) {
-    dreamWorld->unk1A4 = value;
+void DreamWorldSave_SetMode(DreamWorldSave *dreamWorld, u8 value) {
+    dreamWorld->mode = value;
 }
 
 u8 DreamWorldSave_GetMode(DreamWorldSave *dreamWorld) {
-    return dreamWorld->unk1A4;
+    return dreamWorld->mode;
 }
 
 void DreamWorldSave_SetIDShown(DreamWorldSave *dreamWorld, u8 value) {
