@@ -108,17 +108,23 @@ void IntroG3d_Draw(IntroG3d *g3d) {
     }
 }
 
+enum {
+    STEP_G3D_OPEN_START,
+    STEP_G3D_OPEN_ANIM,
+    STEP_G3D_OPEN_DONE,
+};
+
 BOOL IntroG3d_Open(IntroG3d *g3d) {
     G3DActor *actor;
     BOOL playing3;
     BOOL playing4;
 
     switch (g3d->state) {
-    case 0:
+    case STEP_G3D_OPEN_START:
         G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 1, 9, 0, 0);
         GFL_SndSEPlay(SEQ_SE_OPEN2);
         g3d->state++;
-    case 1:
+    case STEP_G3D_OPEN_ANIM:
         actor = GFL_G3DMgrGetActor(g3d->manager, g3d->scene);
         playing3 = GFL_G3DActorStepAnmFrame(actor, 3, FX32_ONE);
         playing4 = GFL_G3DActorStepAnmFrame(actor, 4, FX32_ONE);
@@ -132,7 +138,7 @@ BOOL IntroG3d_Open(IntroG3d *g3d) {
             g3d->state++;
         }
         break;
-    case 2:
+    case STEP_G3D_OPEN_DONE:
         return TRUE;
     }
     return FALSE;
