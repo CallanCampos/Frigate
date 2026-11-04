@@ -1,8 +1,9 @@
 // TwlSDK's microphone library (libspi), the DSi's limited sampling in the LTD autoload: the same PXI commands as
 // NitroSDK's MIC_StartAutoSampling and MIC_StopAutoSampling (nitro/spi/mic.c), with commands of their own and a check
 // of the sampling rate, which the Limited functions call when the console runs in its DSi mode. ARM code. The ROM names
-// none of it; the file's name is a guess (the SDK's may be mic_ex.c or micex.c), and the functions have the names of
-// libntr's micex.h where they are known. The synchronous ones wait for the answer on a message queue.
+// none of it; the file's name is a guess (Black 1's decompilation, aletheia, has micex.o of libmicex.TWL.HYB.a), and
+// the functions have the names of libntr's micex.h where they are known, and the statics those of the TwlSDK symbols
+// that aletheia recovered at the same addresses. The synchronous ones wait for the answer on a message queue.
 
 #include "types.h"
 #include "nitro/mic.h"
@@ -33,9 +34,9 @@
 #define MIC_ALIGN_MASK 0x1f
 
 static MICResult MICEXi_StopLimitedSamplingAsync(MICCallback callback, void *arg);
-static void func_02703f60(MICResult result, void *arg);
-static BOOL func_02703f7c(void *buffer, u32 size, u32 rate, u8 type);
-static BOOL func_02704088(void);
+static void MicexSyncCallback(MICResult result, void *arg);
+static BOOL MicexStartLimitedSampling(void *buffer, u32 size, u32 rate, u8 type);
+static BOOL MicexStopLimitedSampling(void);
 
 MICResult MICEXi_StartLimitedSampling(const MICAutoParam *param) {
     MICResult result;
@@ -46,7 +47,7 @@ MICResult MICEXi_StartLimitedSampling(const MICAutoParam *param) {
         return MIC_RESULT_ILLEGAL_STATUS;
     }
     OS_InitMessageQueue(&queue, messages, 1);
-    result = MICEXi_StartLimitedSamplingAsync(param, func_02703f60, &queue);
+    result = MICEXi_StartLimitedSamplingAsync(param, MicexSyncCallback, &queue);
     if (result == MIC_RESULT_SUCCESS) {
         OS_ReceiveMessage(&queue, (OSMessage *)&result, OS_MESSAGE_BLOCK);
     }
@@ -120,7 +121,7 @@ MICResult MICEXi_StartLimitedSamplingAsync(const MICAutoParam *param, MICCallbac
     work->callbackArg = arg;
     work->full = param->full_callback;
     work->fullArg = param->full_arg;
-    if (func_02703f7c(param->buffer, param->size, param->rate, mode)) {
+    if (MicexStartLimitedSampling(param->buffer, param->size, param->rate, mode)) {
         return MIC_RESULT_SUCCESS;
     }
     work->lock = FALSE;
@@ -136,7 +137,7 @@ MICResult MICEXi_StopLimitedSampling(void) {
         return MIC_RESULT_ILLEGAL_STATUS;
     }
     OS_InitMessageQueue(&queue, messages, 1);
-    result = MICEXi_StopLimitedSamplingAsync(func_02703f60, &queue);
+    result = MICEXi_StopLimitedSamplingAsync(MicexSyncCallback, &queue);
     if (result == MIC_RESULT_SUCCESS) {
         OS_ReceiveMessage(&queue, (OSMessage *)&result, OS_MESSAGE_BLOCK);
     }
@@ -157,7 +158,7 @@ static MICResult MICEXi_StopLimitedSamplingAsync(MICCallback callback, void *arg
 
     work->callback = callback;
     work->callbackArg = arg;
-    if (func_02704088()) {
+    if (MicexStopLimitedSampling()) {
         return MIC_RESULT_SUCCESS;
     }
     work->lock = FALSE;
@@ -165,7 +166,7 @@ static MICResult MICEXi_StopLimitedSamplingAsync(MICCallback callback, void *arg
 }
 
 // The callback of the synchronous calls: hands the result to the message queue that waits for it
-static void func_02703f60(MICResult result, void *arg) {
+static void MicexSyncCallback(MICResult result, void *arg) {
     OS_SendMessage(arg, (OSMessage)result, OS_MESSAGE_NOBLOCK);
 }
 
@@ -173,7 +174,7 @@ static void func_02703f60(MICResult result, void *arg) {
 #define MIC_PXI_SEND(data) PXI_SendWordByFifo(PXI_FIFO_TAG_MIC, (data), FALSE)
 
 // Sends the command that starts the sampling, in seven words
-static BOOL func_02703f7c(void *buffer, u32 size, u32 rate, u8 type) {
+static BOOL MicexStartLimitedSampling(void *buffer, u32 size, u32 rate, u8 type) {
     if (MIC_PXI_SEND(SPI_PXI_START_BIT | MIC_PXI_COMMAND(MICEX_PXI_COMMAND_LIMITED_ON) | type) < 0) {
         return FALSE;
     }
@@ -199,7 +200,7 @@ static BOOL func_02703f7c(void *buffer, u32 size, u32 rate, u8 type) {
 }
 
 // Sends the command that stops the sampling
-static BOOL func_02704088(void) {
+static BOOL MicexStopLimitedSampling(void) {
     if (MIC_PXI_SEND(SPI_PXI_START_BIT | SPI_PXI_END_BIT | MIC_PXI_COMMAND(MICEX_PXI_COMMAND_LIMITED_OFF)) < 0) {
         return FALSE;
     }
