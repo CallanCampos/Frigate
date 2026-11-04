@@ -26,6 +26,8 @@
 . 0x02004df4 MIi_UncompressBackward
 . 0x02004eac NitroStartUp
 . 0x02004eb0 OSi_ReferSymbol
+. 0x02004fd4 CountUntilHalfwordChanges
+. 0x02004ffc SetTwlCpuSpeed
 . 0x02005094 cardi_backup_assert
 . 0x020051d8 SetMainMemoryPriorityBlocked
 . 0x020051e4 IsMainMemoryPriorityFree

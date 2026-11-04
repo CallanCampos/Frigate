@@ -38,8 +38,8 @@ CPSi_Signature kind:data(any) addr:0x020050ac
 SOCLi_Signature kind:data(any) addr:0x020050c4
 VCTi_Signature kind:data(any) addr:0x02005108
 sha1_block_constants kind:data(any) addr:0x02077cd4
-func_02004fd4 kind:function(arm,size=0x28) addr:0x02004fd4
-func_02004ffc kind:function(arm,size=0x34) addr:0x02004ffc
+CountUntilHalfwordChanges kind:function(arm,size=0x28) addr:0x02004fd4
+SetTwlCpuSpeed kind:function(arm,size=0x34) addr:0x02004ffc
 main kind:function(thumb,size=0xb4) addr:0x02005124
 SetMainMemoryPriorityBlocked kind:function(thumb,size=0xc) addr:0x020051d8
 IsMainMemoryPriorityFree kind:function(thumb,size=0x48) addr:0x020051e4

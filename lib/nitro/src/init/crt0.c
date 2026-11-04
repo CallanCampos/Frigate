@@ -6,7 +6,7 @@
 // have NitroSDK's names, as ntrtwl's reconstruction of NitroSDK has them; AutoloadCallback and BuildInfo keep dsd's
 // names for NitroSDK's _start_AutoloadDoneCallback and _start_ModuleParams, since dsd needs them. The rest is
 // TwlSDK's split of the start-up, which the reference, older than TwlSDK, doesn't have: those functions keep swan's
-// names, or ours, or their addresses.
+// names, or have ours.
 //
 // The module parameters among the code, BuildInfo and the LTD module's, hold the addresses of the two modules'
 // autoload lists, which the build writes after each module's autoload blocks, and the modules' bounds: dsd's linker
@@ -35,8 +35,8 @@ static BOOL asm_HWIsDSi(void);
 static void asm_MemCpy32Fast(void *dest, const void *src, u32 size);
 static void boot_MemSet32Fast(void *dest, u32 value, u32 size);
 static void WaitForHalfword(vu16 *address, u16 value);
-static void func_02004fd4(vu16 *counter, vu16 *watched);
-static BOOL func_02004ffc(BOOL enable, s32 delay);
+static void CountUntilHalfwordChanges(vu16 *counter, vu16 *watched);
+static BOOL SetTwlCpuSpeed(BOOL enable, s32 delay);
 
 // The module parameters sit among the code, in .text
 #pragma define_section textdata ".text"                                                                                \
@@ -70,7 +70,7 @@ asm void _start(void) {
     streqh r2, [r1, #0x0]
     // Wait for the ARM7, from the start of ITCM since the ARM7 may be using main memory: first for its word to
     // change, counting in the ARM9's, then for it to become 4
-    ldr r1, =func_02004fd4
+    ldr r1, =CountUntilHalfwordChanges
     ldr r2, =0x1ff8000
     add r3, r2, #0x28
 @copy_counter:
@@ -100,7 +100,7 @@ asm void _start(void) {
     // On a DSi, set bit 0 of REG_SCFG_CLK, from ITCM too, copied from its end backward
     bl asm_HWIsDSi
     bne @not_dsi
-    ldr r1, =func_02004ffc
+    ldr r1, =SetTwlCpuSpeed
     ldr r2, =0x1ff8000
     add r2, r2, #0x1c
     mov r3, #0x34
@@ -629,7 +629,7 @@ __declspec(section "textdata") void *const BuildInfo[9] = {
 
 // clang-format off
 // Counts in counter until the halfword at watched changes. _start runs it from ITCM
-static asm void func_02004fd4(vu16 *counter, vu16 *watched) {
+static asm void CountUntilHalfwordChanges(vu16 *counter, vu16 *watched) {
     ldrh r2, [r1, #0x0]
     ldrh r3, [r0, #0x0]
 @count:
@@ -643,9 +643,9 @@ static asm void func_02004fd4(vu16 *counter, vu16 *watched) {
     bx lr
 }
 
-// Sets bit 0 of REG_SCFG_CLK if enable, clears it otherwise, and when that changes it waits for delay / 4 loops.
-// Returns the bit as it was. _start runs it from ITCM
-static asm BOOL func_02004ffc(BOOL enable, s32 delay) {
+// Sets bit 0 of REG_SCFG_CLK, the ARM9's clock (134 MHz when set, 67 MHz when clear), if enable, clears it otherwise,
+// and when that changes it waits for delay / 4 loops. Returns the bit as it was. _start runs it from ITCM
+static asm BOOL SetTwlCpuSpeed(BOOL enable, s32 delay) {
     cmp r0, #0x0
     ldr r3, =REG_SCFG_CLK_ADDR
     ldrh r0, [r3, #0x0]
