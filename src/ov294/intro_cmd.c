@@ -248,13 +248,18 @@ static void IntroCmd_FinishYesNo(IntroCmd *cmd, s32 choice) {
     cmd->pc += 2;
 }
 
+enum {
+    STEP_YESNO_SETUP,
+    STEP_YESNO_WAIT,
+};
+
 static BOOL IntroCmd_YesNo(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     IntroMenuItem items[2];
     s32 choice;
     u32 result;
 
     switch (work->state) {
-    case 0:
+    case STEP_YESNO_SETUP:
         items[0].message = args[0];
         items[0].value = 0;
         items[1].message = args[1];
@@ -262,7 +267,7 @@ static BOOL IntroCmd_YesNo(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
         IntroMsg_OpenMenu(cmd->msg, items, 2, args[2]);
         work->state++;
         break;
-    case 1:
+    case STEP_YESNO_WAIT:
         IntroMsg_UpdateMenu(cmd->msg);
         result = IntroMsg_GetMenuResult(cmd->msg, &choice);
         if (result == INTRO_MENU_CHOSEN) {
@@ -326,13 +331,18 @@ static BOOL IntroCmd_Wait(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     return FALSE;
 }
 
+enum {
+    STEP_FADE_START,
+    STEP_FADE_WAIT,
+};
+
 static BOOL IntroCmd_Fade(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     switch (work->state) {
-    case 0:
+    case STEP_FADE_START:
         GFL_FadeSet(args[0], args[1], args[2], args[3]);
         work->state++;
         break;
-    case 1:
+    case STEP_FADE_WAIT:
         if (!GFL_FadeIsRunning()) {
             return TRUE;
         }
@@ -414,13 +424,18 @@ static BOOL IntroCmd_SetWord(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     return TRUE;
 }
 
+enum {
+    STEP_MSG_PRINT,
+    STEP_MSG_WAIT,
+};
+
 static BOOL IntroCmd_Message(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     switch (work->state) {
-    case 0:
+    case STEP_MSG_PRINT:
         IntroMsg_Print(cmd->msg, args[0], args[1]);
         work->state++;
         break;
-    case 1:
+    case STEP_MSG_WAIT:
         if (IntroMsg_UpdatePrint(cmd->msg)) {
             return TRUE;
         }
@@ -466,9 +481,14 @@ static BOOL IntroCmd_MoveSpriteX(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     return IntroMcss_MoveX(cmd->mcss, args[0], args[1], args[2]);
 }
 
+enum {
+    STEP_SPRITE_SET_ALPHA,
+    STEP_SPRITE_FADE,
+};
+
 static BOOL IntroCmd_FadeSprite(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     switch (work->state) {
-    case 0:
+    case STEP_SPRITE_SET_ALPHA:
         if (args[1]) {
             IntroMcss_SetAlpha(cmd->mcss, args[0], 1);
         } else {
@@ -478,7 +498,7 @@ static BOOL IntroCmd_FadeSprite(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
         work->counter = 31;
         work->state++;
         break;
-    case 1:
+    case STEP_SPRITE_FADE:
         work->counter -= 2;
         if (work->counter <= 0) {
             IntroMcss_SetAlpha(cmd->mcss, args[0], 31);
@@ -495,16 +515,21 @@ static BOOL IntroCmd_FadeSprite(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     return FALSE;
 }
 
+enum {
+    STEP_TALK_PRINT,
+    STEP_TALK_WAIT,
+};
+
 static BOOL IntroCmd_Talk(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     s32 message = args[0];
     s32 sprite = args[1];
 
     switch (work->state) {
-    case 0:
+    case STEP_TALK_PRINT:
         IntroMsg_Print(cmd->msg, message, args[2]);
         work->state++;
         break;
-    case 1:
+    case STEP_TALK_WAIT:
         if (IntroMsg_UpdatePrint(cmd->msg)) {
             IntroMcss_SetFlipV(cmd->mcss, sprite, TRUE);
             return TRUE;
@@ -531,13 +556,18 @@ static BOOL IntroCmd_SaveStart(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     return TRUE;
 }
 
+enum {
+    STEP_PAUSE_SAVE,
+    STEP_WAIT_SAVE_PAUSE,
+};
+
 static BOOL IntroCmd_SavePause(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     switch (work->state) {
-    case 0:
+    case STEP_PAUSE_SAVE:
         SaveControlIntr_Pause(cmd->saveTask);
         work->state++;
         break;
-    case 1:
+    case STEP_WAIT_SAVE_PAUSE:
         if (SaveControlIntr_IsPausedOrDone(cmd->saveTask) == TRUE) {
             return TRUE;
         }
@@ -556,9 +586,15 @@ static BOOL IntroCmd_Save43(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     return TRUE;
 }
 
+enum {
+    STEP_SAVE_WAIT_DONE,
+    STEP_SAVE_SHOW_ICON,
+    STEP_SAVE_HIDE_ICON,
+};
+
 static BOOL IntroCmd_SaveWait(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     switch (work->state) {
-    case 0:
+    case STEP_SAVE_WAIT_DONE:
         if (SaveControlIntr_IsDone(cmd->saveTask) == TRUE) {
             return TRUE;
         }
@@ -566,13 +602,13 @@ static BOOL IntroCmd_SaveWait(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
         IntroMsg_Print(cmd->msg, 5, FALSE);
         work->state++;
         break;
-    case 1:
+    case STEP_SAVE_SHOW_ICON:
         if (IntroMsg_UpdatePrint(cmd->msg) == TRUE) {
             IntroMsg_ShowWaitIcon(cmd->msg);
             work->state++;
         }
         break;
-    case 2:
+    case STEP_SAVE_HIDE_ICON:
         if (SaveControlIntr_IsDone(cmd->saveTask) == TRUE) {
             IntroMsg_HideWaitIcon(cmd->msg);
             return TRUE;
@@ -605,9 +641,16 @@ static BOOL IntroCmd_SetGender(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
 }
 
 // The Pokémon drops to its place, then plays its animation and cries
+enum {
+    STEP_POKE_WAIT_COUNT,
+    STEP_POKE_DROP,
+    STEP_POKE_ANIMATE,
+    STEP_POKE_WAIT_VOICE,
+};
+
 static BOOL IntroCmd_PokemonAppear(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     switch (work->state) {
-    case 0:
+    case STEP_POKE_WAIT_COUNT:
         if (work->counter == 3) {
             work->counter = 0;
             work->state++;
@@ -615,22 +658,22 @@ static BOOL IntroCmd_PokemonAppear(IntroCmd *cmd, IntroCmdWork *work, s32 *args)
             work->counter++;
         }
         break;
-    case 1:
+    case STEP_POKE_DROP:
         if (IntroMcss_DecreaseY(cmd->mcss, FX32_ONE, FX32_CONST(-11.5)) == TRUE) {
             GFL_SndSEPlay(SEQ_SE_TOUJOU_INTRO);
             work->state++;
         }
         break;
-    case 2:
+    case STEP_POKE_ANIMATE:
         if (!GFL_SndPlayerIsActiveAny()) {
             IntroMcss_SetAnimation(cmd->mcss, INTRO_SPRITE_POKEMON, 0, TRUE);
             PokeVoice_StartPlayback(cmd->param->pokeVoice);
             work->state++;
         }
         break;
-    case 3:
+    case STEP_POKE_WAIT_VOICE:
         if (!PokeVoice_IsPlaying(cmd->param->pokeVoice)) {
-            work->state = 0;
+            work->state = STEP_POKE_WAIT_COUNT;
             return TRUE;
         }
         break;
@@ -662,13 +705,21 @@ static BOOL IntroCmd_OpenModel(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
 }
 
 // The model turns left for the boy and right for the girl. work->counter is the choice, 0 for the boy
+enum {
+    STEP_GENDER_SETUP,
+    STEP_GENDER_WAIT_KEY,
+    STEP_GENDER_SET,
+    STEP_GENDER_ANIM,
+    STEP_GENDER_ANIM_BACK,
+};
+
 static BOOL IntroCmd_ChooseGender(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     switch (work->state) {
-    case 0:
+    case STEP_GENDER_SETUP:
         IntroG3d_SetMode(cmd->g3d, 0);
-        work->state = 4;
+        work->state = STEP_GENDER_ANIM_BACK;
         break;
-    case 1:
+    case STEP_GENDER_WAIT_KEY:
         if (GCTX_HIDGetPressedKeys() & PAD_KEY_RIGHT) {
             if (work->counter == 1) {
                 break;
@@ -676,7 +727,7 @@ static BOOL IntroCmd_ChooseGender(IntroCmd *cmd, IntroCmdWork *work, s32 *args) 
             GFL_SndSEPlay(SEQ_SE_SELECT1);
             IntroG3d_SetMode(cmd->g3d, 2);
             work->counter = 1;
-            work->state = 4;
+            work->state = STEP_GENDER_ANIM_BACK;
         } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_LEFT) {
             if (work->counter == 0) {
                 break;
@@ -684,13 +735,13 @@ static BOOL IntroCmd_ChooseGender(IntroCmd *cmd, IntroCmdWork *work, s32 *args) 
             GFL_SndSEPlay(SEQ_SE_SELECT1);
             IntroG3d_SetMode(cmd->g3d, 1);
             work->counter = 0;
-            work->state = 4;
+            work->state = STEP_GENDER_ANIM_BACK;
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
             GFL_SndSEPlay(SEQ_SE_DECIDE2);
             work->state++;
         }
         break;
-    case 2: {
+    case STEP_GENDER_SET: {
         PlayerInfo *info = cmd->param->playerInfo;
 
         if (work->counter == 0) {
@@ -703,14 +754,14 @@ static BOOL IntroCmd_ChooseGender(IntroCmd *cmd, IntroCmdWork *work, s32 *args) 
         work->state++;
         break;
     }
-    case 3:
+    case STEP_GENDER_ANIM:
         if (IntroG3d_Animate(cmd->g3d)) {
             return TRUE;
         }
         break;
-    case 4:
+    case STEP_GENDER_ANIM_BACK:
         if (IntroG3d_Animate(cmd->g3d)) {
-            work->state = 1;
+            work->state = STEP_GENDER_WAIT_KEY;
         }
         break;
     }
@@ -820,23 +871,28 @@ static BOOL IntroCmd_FreeObj(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
 }
 
 // Fades the actor in over 16 frames with the blend registers
+enum {
+    STEP_OBJ_IN_START = 0,
+    STEP_OBJ_IN_DONE = 16,
+};
+
 static BOOL IntroCmd_ObjFadeIn(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     u32 i;
 
     switch (work->state) {
-    case 0:
+    case STEP_OBJ_IN_START:
         G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, 12, 0, 16);
         ClActor_SetObjMode(cmd->obj, GX_OAM_MODE_XLU);
         ClActor_SetVisible(cmd->obj, TRUE);
         work->state++;
         break;
-    case 16:
+    case STEP_OBJ_IN_DONE:
         for (i = 0; i < 3; i++) {
             if (ClActor_GetObjMode(cmd->obj) == GX_OAM_MODE_XLU) {
                 ClActor_SetObjMode(cmd->obj, GX_OAM_MODE_NORMAL);
             }
         }
-        work->state = 0;
+        work->state = STEP_OBJ_IN_START;
         return TRUE;
     default:
         work->state++;
@@ -846,23 +902,28 @@ static BOOL IntroCmd_ObjFadeIn(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     return FALSE;
 }
 
+enum {
+    STEP_OBJ_OUT_START = 0,
+    STEP_OBJ_OUT_DONE = 16,
+};
+
 static BOOL IntroCmd_ObjFadeOut(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     u32 i;
 
     switch (work->state) {
-    case 0:
+    case STEP_OBJ_OUT_START:
         G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, 12, 16, 0);
         for (i = 0; i < 3; i++) {
             ClActor_SetObjMode(cmd->obj, GX_OAM_MODE_XLU);
         }
         work->state++;
         break;
-    case 16:
+    case STEP_OBJ_OUT_DONE:
         for (i = 0; i < 3; i++) {
             ClActor_SetObjMode(cmd->obj, GX_OAM_MODE_NORMAL);
             ClActor_SetVisible(cmd->obj, FALSE);
         }
-        work->state = 0;
+        work->state = STEP_OBJ_OUT_START;
         return TRUE;
     default:
         work->state++;

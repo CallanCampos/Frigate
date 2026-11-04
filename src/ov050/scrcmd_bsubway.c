@@ -139,9 +139,9 @@ BOOL Scrcmd_Bsubway_CreateWork(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
     GameSystem *gsys = ScriptWork_GetGameSystem(work);
-    u16 a1 = VM_Read16(vm);
+    u16 resume = VM_Read16(vm);
 
-    BsubwayScr_CreateWork(gsys, a1, ScriptReadAny(vm, env));
+    BsubwayScr_CreateWork(gsys, resume, ScriptReadAny(vm, env));
     return FALSE;
 }
 
@@ -1043,11 +1043,17 @@ static BOOL ScriptNative_BSubwayRecvWait(VM *vm, void *env) {
     return FALSE;
 }
 
+enum {
+    STEP_REMOVE_COMMANDS,
+    STEP_EXIT_NET,
+    STEP_WAIT_NET_END,
+};
+
 static GameEventReturnCode EventBSubwayCommEnd_Callback(GameEvent *event, u32 *state, void *data) {
     BSubwayScrWork **bsw = data;
 
     switch (*state) {
-    case 0:
+    case STEP_REMOVE_COMMANDS:
         if (GFL_NetIsParent() == TRUE) {
             GFL_NetSetDisconnectError(FALSE);
         }
@@ -1056,7 +1062,7 @@ static GameEventReturnCode EventBSubwayCommEnd_Callback(GameEvent *event, u32 *s
         }
         (*state)++;
         break;
-    case 1:
+    case STEP_EXIT_NET:
         if (GFL_NetIsParent() == TRUE) {
             if (GFL_NetGetNegotiatedCount() <= 1) {
                 GFL_NetExit(0);
@@ -1067,7 +1073,7 @@ static GameEventReturnCode EventBSubwayCommEnd_Callback(GameEvent *event, u32 *s
             (*state)++;
         }
         break;
-    case 2:
+    case STEP_WAIT_NET_END:
         if (GFL_NetIsEnded() == TRUE) {
             return GAMEEVENT_DONE;
         }
@@ -1084,22 +1090,29 @@ static GameEvent *EventBSubwayCommEnd_Create(GameSystem *gsys, BSubwayScrWork *b
     return event;
 }
 
+enum {
+    STEP_SET_WAIT,
+    STEP_OPEN_YES_NO,
+    STEP_WAIT_YES_NO,
+    STEP_CLOSE_MENU,
+};
+
 static GameEventReturnCode EventBSubwayMsgWindow_Callback(GameEvent *event, u32 *state, void *data) {
     BSubwayMsgEvent *wk = data;
     ScriptWork *work = FieldScriptEnv_GetScriptWork(wk->env);
 
     switch (*state) {
-    case 0:
+    case STEP_SET_WAIT:
         FieldScriptEnv_SetWaitCounter(wk->env, 1);
         (*state)++;
-    case 1:
+    case STEP_OPEN_YES_NO:
         if (FieldScriptEnv_UpdateWaitCounter(wk->env) == TRUE) {
             wk->window = MsgBGPrinter_CreateYesNoMenu(
                 Field_GetMsgBGSys(GSYS_GetField(FieldScriptEnv_GetGameSystem(wk->env))), wk->message);
             (*state)++;
         }
         break;
-    case 2:
+    case STEP_WAIT_YES_NO:
         switch (MsgBGPrinter_YesNoMenuMain(wk->window)) {
         case 0:
             *wk->var = 0;
@@ -1113,7 +1126,7 @@ static GameEventReturnCode EventBSubwayMsgWindow_Callback(GameEvent *event, u32 
             break;
         }
         break;
-    case 3:
+    case STEP_CLOSE_MENU:
         MsgBGPrinter_DeleteMenuFunc(wk->window);
         return GAMEEVENT_DONE;
     }

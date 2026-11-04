@@ -90,15 +90,15 @@ static u16 *WbtBattle_GetDownloadedLine(WbtSystem *sys, u8 round, u32 index, u16
 void WbtBattle_SwapPickedPokemon(WbtSystem *sys) {
     HeapID heapId = HEAPID_TAIL(sys->heapId);
     PartyPkm *tmp = GFL_HeapAllocate(heapId, PokeParty_GetPkmRawSize(), FALSE, "wbt_battle.c", 251);
-    PartyPkm *first = PokeParty_GetPkm(sys->partyBC, sys->unk13C8[0]);
-    PartyPkm *second = PokeParty_GetPkm(sys->partyC0, sys->unk13C8[2]);
+    PartyPkm *first = PokeParty_GetPkm(sys->partyBC, sys->picks[0]);
+    PartyPkm *second = PokeParty_GetPkm(sys->partyC0, sys->picks[2]);
 
     copyPartyPkm(first, tmp);
     copyPartyPkm(second, first);
     copyPartyPkm(tmp, second);
     if (sys->style == 2) {
-        first = PokeParty_GetPkm(sys->partyBC, sys->unk13C8[1]);
-        second = PokeParty_GetPkm(sys->partyC0, sys->unk13C8[3]);
+        first = PokeParty_GetPkm(sys->partyBC, sys->picks[1]);
+        second = PokeParty_GetPkm(sys->partyC0, sys->picks[3]);
         copyPartyPkm(first, tmp);
         copyPartyPkm(second, first);
         copyPartyPkm(tmp, second);
@@ -106,45 +106,47 @@ void WbtBattle_SwapPickedPokemon(WbtSystem *sys) {
     GFL_HeapFree(tmp);
 }
 
+#define WBT_PICK_NONE 0xff
+
 void WbtBattle_ResetPicks(WbtSystem *sys) {
     PokeParty_Copy(sys->partyC4, sys->partyBC);
-    sys->unk13C8[0] = GFL_RandomLC(WbtSystem_GetEntryCount(sys));
-    sys->unk13C8[1] = 0xff;
-    sys->unk13C8[2] = 0xff;
-    sys->unk13C8[3] = 0xff;
+    sys->picks[0] = GFL_RandomLC(WbtSystem_GetEntryCount(sys));
+    sys->picks[1] = WBT_PICK_NONE;
+    sys->picks[2] = WBT_PICK_NONE;
+    sys->picks[3] = WBT_PICK_NONE;
 }
 
 void WbtBattle_SetPick(WbtSystem *sys, u32 index, u8 value) {
-    sys->unk13C8[index] = value;
+    sys->picks[index] = value;
 }
 
-void WbtBattle_RandomPick(WbtSystem *sys, u32 a1) {
+void WbtBattle_RandomPick(WbtSystem *sys, u32 index) {
     u32 count = WbtSystem_GetEntryCount(sys);
     u8 value;
 
-    switch (a1) {
+    switch (index) {
     case 0:
     case 2:
         value = GFL_RandomLC(count);
         break;
     case 1:
         value = GFL_RandomLC(count - 1);
-        if (value >= sys->unk13C8[0]) {
+        if (value >= sys->picks[0]) {
             value = value + 1;
         }
         break;
     case 3:
         value = GFL_RandomLC(count - 1);
-        if (value >= sys->unk13C8[2]) {
+        if (value >= sys->picks[2]) {
             value = value + 1;
         }
         break;
     }
-    WbtBattle_SetPick(sys, a1, value);
+    WbtBattle_SetPick(sys, index, value);
 }
 
 u8 WbtBattle_GetPick(WbtSystem *sys, u32 index) {
-    return sys->unk13C8[index];
+    return sys->picks[index];
 }
 
 WbtPartyList *WbtBattle_CreatePartyList(FieldScriptEnv *env, WbtSystem *sys) {

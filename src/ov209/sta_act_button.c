@@ -15,6 +15,8 @@
 #include "nitro/os.h"
 #include "nnsys/g3d.h"
 
+#define STA_ACT_ITEM_NONE 0xff
+
 // Overlay 209's sta_act_button.c: the buttons of the props in the player's Pokémon's hands, which show the prop's
 // texture copied into the button's characters
 
@@ -48,10 +50,10 @@ StaActButton *StaActButton_InitSystem(HeapID heapId, StaActing *stage, MusicalPo
 
 void StaActButton_TermSystem(StaActButton *sys) {
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    if (sys->itemIds[0] != 0xff) {
+    if (sys->itemIds[0] != STA_ACT_ITEM_NONE) {
         ClActor_Delete(sys->buttons[0]);
     }
-    if (sys->itemIds[1] != 0xff) {
+    if (sys->itemIds[1] != STA_ACT_ITEM_NONE) {
         ClActor_Delete(sys->buttons[1]);
     }
     ClActor_Delete(sys->effect);
@@ -78,7 +80,7 @@ void StaActButton_UpdateSystem(StaActButton *sys) {
         s32 hit = GFL_HIDGetTouchPressedRect(rects);
 
         G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, 0x10, 0);
-        if (hit != TOUCH_RECT_NONE && sys->itemIds[hit] != 0xff && sys->used[hit] == FALSE) {
+        if (hit != TOUCH_RECT_NONE && sys->itemIds[hit] != STA_ACT_ITEM_NONE && sys->used[hit] == FALSE) {
             ClActorPos pos;
 
             if (hit == 0) {
@@ -139,7 +141,7 @@ static void StaActButton_InitGraphic(StaActButton *sys) {
     sys->cellAnims[2] = ClActSys_LoadCellAnims(arc, 18, 22, sys->heapId);
     GFL_ArcToolFree(arc);
     for (i = 0; i < 2; i++) {
-        if (sys->itemIds[i] != 0xff) {
+        if (sys->itemIds[i] != STA_ACT_ITEM_NONE) {
             u32 size = MusItemData_GetTexSize(MusItemData_GetItem(itemData, sys->itemIds[i]));
 
             if (i == 0) {
@@ -242,11 +244,11 @@ static void StaActButton_LoadItemTexture(StaActButton *sys, u8 index, u16 itemId
 }
 
 void StaActButton_SetShowFlg(StaActButton *sys, BOOL show) {
-    if (sys->itemIds[0] != 0xff) {
+    if (sys->itemIds[0] != STA_ACT_ITEM_NONE) {
         ClActor_SetVisible(sys->buttons[0], show);
         ClActor_SetVisible(sys->items[0], show);
     }
-    if (sys->itemIds[1] != 0xff) {
+    if (sys->itemIds[1] != STA_ACT_ITEM_NONE) {
         ClActor_SetVisible(sys->buttons[1], show);
         ClActor_SetVisible(sys->items[1], show);
     }

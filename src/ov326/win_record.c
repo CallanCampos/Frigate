@@ -422,25 +422,32 @@ static BOOL WinRecord_Exit(GameProc *proc, u32 *state, void *param, void *work) 
     return TRUE;
 }
 
+enum {
+    STEP_WAIT_WIPE_IN,
+    STEP_WAIT_SEQ_END,
+    STEP_WIPE_OUT,
+    STEP_WAIT_WIPE_OUT,
+};
+
 static BOOL WinRecord_Main(GameProc *proc, u32 *state, void *param, void *work) {
     WinRecordWork *wk = work;
 
     switch (*state) {
-    case 0:
+    case STEP_WAIT_WIPE_IN:
         if (GFL_WipeIsFinished()) {
             (*state)++;
         }
         break;
-    case 1:
+    case STEP_WAIT_SEQ_END:
         if (wk->seq == WIN_RECORD_SEQ_END && PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
             (*state)++;
         }
         break;
-    case 2:
+    case STEP_WIPE_OUT:
         GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
         (*state)++;
         break;
-    case 3:
+    case STEP_WAIT_WIPE_OUT:
         if (GFL_WipeIsFinished()) {
             return TRUE;
         }

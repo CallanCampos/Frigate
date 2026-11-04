@@ -168,7 +168,7 @@ struct FMissionView {
     u32 passPower;
     u32 trainerId;
     u8 gender;
-    u8 unk3D;
+    u8 unionView;
     u8 version;
     BeaconStatus *beaconStatus;
     // The festival's queue of new entries, the log the view shows, and the Pass Powers the players gave
@@ -247,7 +247,7 @@ struct FMissionView {
     FMissionViewWin wins[FMISSION_VIEW_WIN_COUNT];
     FMissionViewPanel panels[FMISSION_VIEW_PANEL_COUNT];
     ClActor *buttons[FMISSION_VIEW_BUTTON_COUNT];
-    u32 unk33C;
+    u32 passerbyCount;
     u8 unk340[0x60];
     // The icons' characters and palettes, which are copied into a panel's own
     FMissionViewIconChars iconChars[FMISSION_VIEW_LOOK_COUNT];

@@ -886,11 +886,16 @@ static void BeaconViewPanel_StartMove(BeaconViewWork *work, BeaconViewPanel *pan
     (*data->pending)++;
 }
 
+enum {
+    STEP_MOVE_PANEL,
+    STEP_CLEAR_PANEL,
+};
+
 static void BeaconViewPanel_MoveTask(TCBEx *task, void *data) {
     BeaconViewMoveTask *move = data;
 
     switch (move->seq) {
-    case 0:
+    case STEP_MOVE_PANEL:
         if (move->delay != 0) {
             move->delay--;
             return;
@@ -908,7 +913,7 @@ static void BeaconViewPanel_MoveTask(TCBEx *task, void *data) {
             return;
         }
         break;
-    case 1:
+    case STEP_CLEAR_PANEL:
     default:
         if (move->panel->printTask != NULL) {
             return;
@@ -942,13 +947,19 @@ void BeaconView_StartJump(BeaconViewWork *work, u8 top) {
     work->pending++;
 }
 
+enum {
+    STEP_JUMP_WAIT_TASKS,
+    STEP_JUMP_SET_LINES,
+    STEP_JUMP_WAIT_PRINT,
+};
+
 static void BeaconView_JumpTask(TCBEx *task, void *data) {
     int i;
     BeaconViewJumpTask *jump = data;
     BeaconViewWork *work = jump->work;
 
     switch (jump->seq) {
-    case 0:
+    case STEP_JUMP_WAIT_TASKS:
         for (i = 0; i < jump->count; i++) {
             if (jump->panels[i]->printTask != NULL) {
                 return;
@@ -956,7 +967,7 @@ static void BeaconView_JumpTask(TCBEx *task, void *data) {
         }
         jump->seq++;
         return;
-    case 1:
+    case STEP_JUMP_SET_LINES:
         for (i = 0; i < jump->count; i++) {
             u8 dataIndex = GameBeaconInfoTable_RingIndex(work->log, jump->top + i);
 
@@ -967,7 +978,7 @@ static void BeaconView_JumpTask(TCBEx *task, void *data) {
         }
         jump->seq++;
         return;
-    case 2:
+    case STEP_JUMP_WAIT_PRINT:
         if (jump->printing > 0) {
             return;
         }
@@ -1032,6 +1043,12 @@ static void BeaconView_StartMessage(BeaconViewWork *work, const StrBuf *strbuf, 
     (*data->pending)++;
 }
 
+enum {
+    STEP_MSG_PRINT,
+    STEP_MSG_SLIDE_IN,
+    STEP_MSG_WAIT_TOUCH,
+};
+
 static void BeaconView_MessageTask(TCBEx *task, void *data) {
     BeaconViewMessageTask *message = data;
 
@@ -1039,15 +1056,15 @@ static void BeaconView_MessageTask(TCBEx *task, void *data) {
         return;
     }
     switch (message->seq) {
-    case 0:
+    case STEP_MSG_PRINT:
         BeaconView_PrintMessage(message->work, message->work->strMessage, &message->printing);
         message->seq++;
         return;
-    case 1:
+    case STEP_MSG_SLIDE_IN:
         BeaconView_StartBGSlide(message->work->tcbManager, 6, FALSE, &message->printing);
         message->seq++;
         return;
-    case 2:
+    case STEP_MSG_WAIT_TOUCH:
         if (!BeaconView_WaitTimerOrTouch(&message->timer, 6)) {
             return;
         }
@@ -1102,6 +1119,16 @@ void BeaconView_OfferPassPower(BeaconViewWork *work, u32 passPower, u8 record, i
     (*data->pending)++;
 }
 
+enum {
+    STEP_PASS_PRINT,
+    STEP_PASS_SLIDE_IN,
+    STEP_PASS_OPEN_MENU,
+    STEP_PASS_WAIT_MENU,
+    STEP_PASS_CHECK_CANCEL,
+    STEP_PASS_WAIT_FLASH,
+    STEP_PASS_CLEAR,
+};
+
 static void BeaconView_PassPowerTask(TCBEx *task, void *data) {
     BeaconViewPassPowerTask *offer = data;
     BeaconViewWork *work = offer->work;
@@ -1111,23 +1138,23 @@ static void BeaconView_PassPowerTask(TCBEx *task, void *data) {
         return;
     }
     switch (offer->seq) {
-    case 0:
+    case STEP_PASS_PRINT:
         BeaconView_ExpandMessage(work, sBeaconViewPassPowerMessages[offer->record]);
         BeaconView_PrintMessage(work, work->strExpand, &offer->printing);
         offer->seq++;
         return;
-    case 1:
+    case STEP_PASS_SLIDE_IN:
         BeaconView_StartBGSlide(work->tcbManager, 6, FALSE, &offer->printing);
         offer->seq++;
         return;
-    case 2:
+    case STEP_PASS_OPEN_MENU:
         BeaconView_SetPrintTimeLimit(work->printQueue, TRUE);
         BeaconViewMenu_Open(work->menu, 0);
         BeaconView_ClearTotal(work);
         BeaconView_SetButtonsVisible(work, FALSE);
         offer->seq++;
         return;
-    case 3:
+    case STEP_PASS_WAIT_MENU:
         button = BeaconViewMenu_Update(work->menu);
         if (button < 0) {
             return;
@@ -1136,35 +1163,35 @@ static void BeaconView_PassPowerTask(TCBEx *task, void *data) {
         switch (offer->button) {
         case 0:
             BeaconView_RequestEvent(work, BEACON_VIEW_EVENT_PASS_POWER_LIST);
-            offer->seq = 3;
+            offer->seq = STEP_PASS_WAIT_MENU;
             return;
         case 1:
             work->usePassPower = offer->passPower;
             BeaconView_RequestEvent(work, BEACON_VIEW_EVENT_PASS_POWER_USE);
-            offer->seq = 4;
+            offer->seq = STEP_PASS_CHECK_CANCEL;
             return;
         case 2:
-            offer->seq = 5;
+            offer->seq = STEP_PASS_WAIT_FLASH;
             return;
         }
         return;
-    case 4:
+    case STEP_PASS_CHECK_CANCEL:
         // The event was called off: ask again
         if (work->usePassPower != PASS_POWER_NONE) {
             work->usePassPower = PASS_POWER_NONE;
-            offer->seq = 3;
+            offer->seq = STEP_PASS_WAIT_MENU;
             return;
         }
         BeaconViewMenu_Close(work->menu);
-        offer->seq = 6;
+        offer->seq = STEP_PASS_CLEAR;
         return;
-    case 5:
+    case STEP_PASS_WAIT_FLASH:
         if (!BeaconViewMenu_WaitFlash(work->menu, offer->button)) {
             return;
         }
         offer->seq++;
         return;
-    case 6:
+    case STEP_PASS_CLEAR:
         if (offer->record == TRUE) {
             BeaconStatus_PopRecord(work->status);
         } else {
@@ -1203,6 +1230,16 @@ void BeaconView_OfferMission(BeaconViewWork *work, const FestMissionConfig *conf
     (*data->pending)++;
 }
 
+enum {
+    STEP_MISSION_PRINT,
+    STEP_MISSION_SLIDE_IN,
+    STEP_MISSION_OPEN_MENU,
+    STEP_MISSION_WAIT_MENU,
+    STEP_MISSION_CHECK_CANCEL,
+    STEP_MISSION_WAIT_FLASH,
+    STEP_MISSION_PRINT_TOTAL,
+};
+
 static void BeaconView_MissionTask(TCBEx *task, void *data) {
     BeaconViewMissionTask *offer = data;
     BeaconViewWork *work = offer->work;
@@ -1213,23 +1250,23 @@ static void BeaconView_MissionTask(TCBEx *task, void *data) {
         return;
     }
     switch (offer->seq) {
-    case 0:
+    case STEP_MISSION_PRINT:
         BeaconView_ExpandMessage(work, offer->config.info.unk0_30 + GameBeacon_Text_WantJoinFunfestMission);
         BeaconView_PrintMessage(work, work->strExpand, &offer->printing);
         offer->seq++;
         return;
-    case 1:
+    case STEP_MISSION_SLIDE_IN:
         BeaconView_StartBGSlide(work->tcbManager, 6, FALSE, &offer->printing);
         offer->seq++;
         return;
-    case 2:
+    case STEP_MISSION_OPEN_MENU:
         BeaconView_SetPrintTimeLimit(work->printQueue, TRUE);
         BeaconViewMenu_Open(work->menu, 0);
         BeaconView_ClearTotal(work);
         BeaconView_SetButtonsVisible(work, FALSE);
         offer->seq++;
         return;
-    case 3:
+    case STEP_MISSION_WAIT_MENU:
         button = BeaconViewMenu_Update(work->menu);
         if (button < 0) {
             return;
@@ -1242,12 +1279,12 @@ static void BeaconView_MissionTask(TCBEx *task, void *data) {
             work->missionButton = offer->button;
             if (refusal == 0 || refusal == 3) {
                 BeaconView_RequestEvent(work, BEACON_VIEW_EVENT_MISSION_INFO);
-                offer->seq = 3;
+                offer->seq = STEP_MISSION_WAIT_MENU;
                 return;
             }
             work->missionRefusal = refusal;
             BeaconView_RequestEvent(work, BEACON_VIEW_EVENT_MISSION_MESSAGE);
-            offer->seq = 4;
+            offer->seq = STEP_MISSION_CHECK_CANCEL;
             return;
         case 1:
             refusal = BeaconView_CheckMissionRefusal(work, &offer->config, offer->button);
@@ -1259,31 +1296,31 @@ static void BeaconView_MissionTask(TCBEx *task, void *data) {
                 work->missionRefusal = refusal;
                 BeaconView_RequestEvent(work, BEACON_VIEW_EVENT_MISSION_MESSAGE);
             }
-            offer->seq = 4;
+            offer->seq = STEP_MISSION_CHECK_CANCEL;
             return;
         case 2:
             LinkFestival_AddRecord(work->festival, &offer->config);
-            offer->seq = 5;
+            offer->seq = STEP_MISSION_WAIT_FLASH;
             return;
         }
         return;
-    case 4:
+    case STEP_MISSION_CHECK_CANCEL:
         // The event was called off: ask again
         if (work->mission.info.index != FEST_MISSION_NONE) {
             ClearFesMissionCfg(&work->mission);
-            offer->seq = 3;
+            offer->seq = STEP_MISSION_WAIT_MENU;
             return;
         }
         BeaconViewMenu_Close(work->menu);
-        offer->seq = 6;
+        offer->seq = STEP_MISSION_PRINT_TOTAL;
         return;
-    case 5:
+    case STEP_MISSION_WAIT_FLASH:
         if (!BeaconViewMenu_WaitFlash(work->menu, offer->button)) {
             return;
         }
         offer->seq++;
         return;
-    case 6:
+    case STEP_MISSION_PRINT_TOTAL:
         BeaconView_PrintTotal(work, GameBeacon_Text_Total, &offer->printing);
         BeaconView_SetButtonsVisible(work, TRUE);
         BeaconView_StartBGSlide(work->tcbManager, 6, TRUE, &offer->printing);

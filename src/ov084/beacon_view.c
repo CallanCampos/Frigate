@@ -520,16 +520,23 @@ BOOL BeaconView_IsButtonAnimating(BeaconViewWork *work, int button) {
     return ClActor_IsAnimActive(work->actors[button]);
 }
 
+enum {
+    STEP_NEW_WAIT_PRINT,
+    STEP_NEW_SHOW_MESSAGE,
+    STEP_NEW_PRINT_TOTAL,
+    STEP_NEW_ADD_LINE,
+};
+
 // Shows a beacon just taken: its message, then its line, which pushes the others down when the player is new
 static BOOL BeaconView_ShowNewBeacon(BeaconViewWork *work) {
     switch (work->subSeq) {
-    case 0:
+    case STEP_NEW_WAIT_PRINT:
         if (work->newPanel->printTask != NULL) {
             break;
         }
         work->subSeq++;
         break;
-    case 1: {
+    case STEP_NEW_SHOW_MESSAGE: {
         BOOL message = BeaconView_ShowBeaconMessage(work, work->newBeacon, work->isNew);
 
         if (!work->isNew) {
@@ -547,13 +554,13 @@ static BOOL BeaconView_ShowNewBeacon(BeaconViewWork *work) {
         work->subSeq++;
         break;
     }
-    case 2:
+    case STEP_NEW_PRINT_TOTAL:
         BeaconView_PrintCount(work);
         BeaconView_PrintTotal(work, GameBeacon_Text_Total, &work->pending);
         BeaconView_CheckRecords(work, work->newBeacon, work->oldCount);
         work->subSeq++;
         break;
-    case 3: {
+    case STEP_NEW_ADD_LINE: {
         BOOL atTop = TRUE;
 
         if (work->top != 0) {

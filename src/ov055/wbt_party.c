@@ -286,7 +286,7 @@ static void WbtParty_MakeParty(WbtSystem *sys, PokeParty *party, u32 a2, u8 a3, 
         }
     }
     MI_CpuFill8(picked, 0, sizeof(picked));
-    switch (sys->unk13E4) {
+    switch (sys->rentalMode) {
     case 0:
     default:
         files = WbtParty_CreateRentalFiles(sys->tournament, 0, heapId, &fileCount);

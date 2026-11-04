@@ -85,9 +85,9 @@ void FestMissionLog_Clear(FestMissionLog *log) {
     for (i = 0; i < FEST_MISSION_LOG_MAX; i++) {
         FestMissionLogEntry_Clear(&log->entries[i]);
     }
-    log->unk4EC = 0;
+    log->newestIndex = 0;
     log->count = 0;
-    log->unk4EE = 0;
+    log->top = 0;
 }
 
 // Adds an entry, over the oldest when the log is full, and returns where it went

@@ -186,23 +186,33 @@ static BOOL BrCore_ProcExit(GameProc *proc, u32 *state, void *param, void *work)
     return TRUE;
 }
 
+enum {
+    STEP_START,
+    STEP_FADE_IN,
+    STEP_WAIT_FADE_IN,
+    STEP_RUN,
+    STEP_FADE_OUT,
+    STEP_WAIT_FADE_OUT,
+    STEP_END,
+};
+
 static BOOL BrCore_ProcMain(GameProc *proc, u32 *state, void *param, void *work) {
     BrCoreWork *wk = work;
 
     switch (*state) {
-    case 0:
-        *state = 1;
+    case STEP_START:
+        *state = STEP_FADE_IN;
         break;
-    case 1:
+    case STEP_FADE_IN:
         GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 0, 0);
-        *state = 2;
+        *state = STEP_WAIT_FADE_IN;
         break;
-    case 2:
+    case STEP_WAIT_FADE_IN:
         if (!GFL_FadeIsRunning()) {
-            *state = 3;
+            *state = STEP_RUN;
         }
         break;
-    case 3:
+    case STEP_RUN:
         BrFade_Main(wk->fade);
         BrSidebar_Main(wk->sidebar);
         BrProcSys_Main(wk->procSys);
@@ -211,19 +221,19 @@ static BOOL BrCore_ProcMain(GameProc *proc, u32 *state, void *param, void *work)
             BrNet_Main(wk->net);
         }
         if (BrProcSys_IsEnd(wk->procSys)) {
-            *state = 4;
+            *state = STEP_FADE_OUT;
         }
         break;
-    case 4:
+    case STEP_FADE_OUT:
         GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 0, 16, 0);
-        *state = 5;
+        *state = STEP_WAIT_FADE_OUT;
         break;
-    case 5:
+    case STEP_WAIT_FADE_OUT:
         if (!GFL_FadeIsRunning()) {
-            *state = 6;
+            *state = STEP_END;
         }
         break;
-    case 6:
+    case STEP_END:
         return TRUE;
     }
     return FALSE;

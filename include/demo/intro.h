@@ -93,7 +93,7 @@ void IntroMsg_Print(IntroMsg *msg, u32 messageId, BOOL frame);
 void IntroMsg_Clear(IntroMsg *msg);
 u32 IntroMsg_GetPrintState(IntroMsg *msg);
 BOOL IntroMsg_UpdatePrint(IntroMsg *msg);
-void IntroMsg_OpenMenu(IntroMsg *msg, const IntroMenuItem *items, u32 count, BOOL a3);
+void IntroMsg_OpenMenu(IntroMsg *msg, const IntroMenuItem *items, u32 count, BOOL cancelable);
 void IntroMsg_CloseMenu(IntroMsg *msg);
 void IntroMsg_UpdateMenu(IntroMsg *msg);
 u32 IntroMsg_GetMenuResult(IntroMsg *msg, s32 *value);
@@ -112,7 +112,7 @@ void IntroMcss_SetAnimation(IntroMcss *mcss, u8 index, u32 animation, BOOL resta
 BOOL IntroMcss_IsAnimationEnded(IntroMcss *mcss, u8 index);
 void IntroMcss_ClearAnimationEnded(IntroMcss *mcss, u8 index);
 void IntroMcss_SetAlpha(IntroMcss *mcss, u8 index, u32 alpha);
-void IntroMcss_SetFlipV(IntroMcss *mcss, u8 index, BOOL a2);
+void IntroMcss_SetFlipV(IntroMcss *mcss, u8 index, BOOL enable);
 BOOL IntroMcss_MoveX(IntroMcss *mcss, u8 index, fx32 step, fx32 target);
 BOOL IntroMcss_DecreaseY(IntroMcss *mcss, fx32 step, fx32 min);
 void IntroMcss_Update(IntroMcss *mcss);

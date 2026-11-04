@@ -427,7 +427,7 @@ typedef struct {
     // The frames left for a called friend to answer
     s32 callTimer;
     // The frames the player has been in the room since the last connection
-    s32 unk1C8;
+    s32 roomFrames;
     // The state: an index of sWifiP2PMatchSeqFuncs
     int seq;
     // What the proc returns to event_wificlub.c (WifiClubData.mode)
@@ -450,7 +450,7 @@ typedef struct {
     u16 friendNo;
     u16 unk244;
     // What the player chose in the game mode menu
-    u16 unk246;
+    u16 gameModeChoice;
     WifiClubData *parent;
     // A copy of the partner's status
     WIFI_STATUS targetStatus;
@@ -4511,8 +4511,8 @@ static int WifiP2PMatch_StateRoom(WIFIP2PMATCH_WORK *wk, int seq) {
         return seq;
     }
     if (wk->preConnect != -1) {
-        wk->unk1C8++;
-        if (wk->unk1C8 > 60 * 60) {
+        wk->roomFrames++;
+        if (wk->roomFrames > 60 * 60) {
             NetState_RecordError(0, 0, 0, 0x3f1);
             return seq;
         }
@@ -4590,7 +4590,7 @@ static int WifiP2PMatch_StateRoom(WIFIP2PMATCH_WORK *wk, int seq) {
         if (wk->unk1351 == 0) {
             WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_WantsJoin, FALSE);
         }
-        wk->unk1C8 = 0;
+        wk->roomFrames = 0;
     } else if (wk->preConnect != -1 && DWCRap_GetLastNetId() == -1) {
         DWCRap_SetVoiceChatEnabled(0);
         WIFI_STATUS_SetUseVChat(wk->myStatus, WIFI_STATUS_GetVChatStatus(wk->myStatus));
@@ -4669,8 +4669,8 @@ static int WifiP2PMatch_StateRoomMessage(WIFIP2PMATCH_WORK *wk, int seq) {
     u32 ret = WIFI_MCR_RET_NONE;
 
     if (wk->preConnect != -1) {
-        wk->unk1C8++;
-        if (wk->unk1C8 > 60 * 60) {
+        wk->roomFrames++;
+        if (wk->roomFrames > 60 * 60) {
             NetState_RecordError(0, 0, 0, 0x3f1);
             return seq;
         }
@@ -4699,7 +4699,7 @@ static int WifiP2PMatch_StateRoomMessage(WIFIP2PMATCH_WORK *wk, int seq) {
         if (wk->unk1351 == 0) {
             WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_WantsJoin, FALSE);
         }
-        wk->unk1C8 = 0;
+        wk->roomFrames = 0;
     } else if (DWCRap_GetLastIndex() != -1) {
         WifiP2PMatch_SetFriendNameWord(wk, DWCRap_GetLastIndex());
         WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
@@ -5253,7 +5253,7 @@ static int WifiP2PMatch_StateRecruitMenu(WIFIP2PMATCH_WORK *wk, int seq) {
     }
     WifiP2PMatch_RoomPause(wk, TRUE);
     wk->timer = 0;
-    wk->unk246 = ret;
+    wk->gameModeChoice = ret;
     wk->seq = WIFIP2PMATCH_SEQ_RECRUIT_START;
     return seq;
 }
@@ -5261,7 +5261,7 @@ static int WifiP2PMatch_StateRecruitMenu(WIFIP2PMATCH_WORK *wk, int seq) {
 static int WifiP2PMatch_StateRecruitStart(WIFIP2PMATCH_WORK *wk, int seq) {
     wk->timer--;
     if (wk->timer < 0) {
-        WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_RECRUIT, wk->unk246);
+        WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_RECRUIT, wk->gameModeChoice);
         wk->seq = WIFIP2PMATCH_SEQ_ROOM_MESSAGE;
     }
     return seq;
