@@ -4,9 +4,9 @@
 // TwlSDK's DSP library, the graphics component (guessed file name, after the SDK's dsp_graphics.c): the DSP process
 // that scales the camera's pictures, as a COFF image in the LTD autoload's .rodata. The ARM9 tells it what to scale
 // through the pipe of port 3 and the DSP answers on reply 1, which the ARM9 either waits for or has
-// DSPi_GraphicsReplyHook handle from the DSP's interrupt. ARM code in the DSi-only LTD autoload. The ROM names none of
-// it; the functions have the SDK's names where twl/dsp.h knows them, and DSPi_GraphicsReplyHook, which Black 1 doesn't
-// have, has ours.
+// DSPi_GraphicsEvents handle from the DSP's interrupt. ARM code in the DSi-only LTD autoload. The ROM names none of
+// it; the functions have the SDK's names where twl/dsp.h knows them, and DSPi_GraphicsEvents, which Black 1 doesn't
+// have, is named for the process's events that it takes.
 
 // What the DSP gets to scale one picture, as its pipe carries it
 typedef struct DSPScalingRequest {
@@ -27,15 +27,15 @@ typedef struct DSPScalingRequest {
 #define DSP_GRAPHICS_PIPE_PORT 3
 #define DSP_GRAPHICS_RESULT_OK 1
 
-static void DSPi_GraphicsReplyHook(void *arg);
+static void DSPi_GraphicsEvents(void *arg);
 
-// The component's state. The two flags are volatile because DSPi_GraphicsReplyHook clears them in the DSP's interrupt
+// The component's state. The two flags are volatile because DSPi_GraphicsEvents clears them in the DSP's interrupt
 // while DSPi_ScalingCore may be looking at them
 static DSPPipe sGraphicsPipe;
 static u16 sGraphicsResult;
 static volatile BOOL sGraphicsAsync;
 static DSP_GraphicsCallback sGraphicsCallback;
-// Cleared by DSPi_GraphicsReplyHook in the DSP's interrupt
+// Cleared by DSPi_GraphicsEvents in the DSP's interrupt
 static volatile BOOL sGraphicsBusy;
 static BOOL sGraphicsLoaded;
 static DSPProcessContext sGraphicsContext;
@@ -51,7 +51,7 @@ void DSPi_OpenStaticComponentGraphicsCore(FSFile *file) {
 
 // The DSP's answer to an asynchronous scaling: whether it worked or not, the scaling is over, and only a success is
 // called back
-static void DSPi_GraphicsReplyHook(void *arg) {
+static void DSPi_GraphicsEvents(void *arg) {
     if (sGraphicsAsync) {
         sGraphicsResult = DSP_RecvData(DSP_GRAPHICS_REPLY);
         if (sGraphicsResult == DSP_GRAPHICS_RESULT_OK) {
@@ -74,7 +74,7 @@ BOOL DSPi_LoadGraphicsCore(FSFile *file, int slotB, int slotC) {
         sGraphicsAsync = FALSE;
         DSP_InitProcessContext(&sGraphicsContext, "graphics");
         sGraphicsContext.flags |= DSP_PROCESS_FLAG_USING_OS;
-        DSP_SetProcessHook(&sGraphicsContext, DSP_HOOK_REPLY_(DSP_GRAPHICS_REPLY), DSPi_GraphicsReplyHook, NULL);
+        DSP_SetProcessHook(&sGraphicsContext, DSP_HOOK_REPLY_(DSP_GRAPHICS_REPLY), DSPi_GraphicsEvents, NULL);
         if (DSP_ExecuteProcess(&sGraphicsContext, file, slotB, slotC)) {
             sGraphicsLoaded = TRUE;
         }
@@ -103,7 +103,7 @@ BOOL DSPi_ScalingCore(const void *src, void *dst, u16 imageWidth, u16 imageHeigh
     sGraphicsCallback = callback;
     sGraphicsAsync = async;
     if (async) {
-        DSP_SetProcessHook(&sGraphicsContext, DSP_HOOK_REPLY_(DSP_GRAPHICS_REPLY), DSPi_GraphicsReplyHook, NULL);
+        DSP_SetProcessHook(&sGraphicsContext, DSP_HOOK_REPLY_(DSP_GRAPHICS_REPLY), DSPi_GraphicsEvents, NULL);
     } else {
         DSP_SetProcessHook(&sGraphicsContext, DSP_HOOK_REPLY_(DSP_GRAPHICS_REPLY), NULL, NULL);
     }

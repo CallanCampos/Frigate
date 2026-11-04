@@ -11,8 +11,8 @@
 // component. As with the camera, the SDK's inline functions only call it on a DSi. The public functions and types have
 // the names of the TWL-SDK Function Reference Manual, and the Core functions, the process and pipe types those of
 // libntr's reconstruction of TwlSDK's headers (dsp_util.h, g711.h, graphics.h, dsp_if.h, process.h, pipe.h), from what
-// they do; the rest have the names of the TwlSDK symbols that Black 1's decompilation (aletheia) recovered, or ours
-// where Black 1 lacks the code (DSPi_GraphicsReplyHook).
+// they do; the rest have the names of the TwlSDK symbols that Black 1's decompilation (aletheia) recovered, and
+// DSPi_GraphicsEvents, which Black 1 lacks, is named for the process's events that it takes.
 
 void DSPi_StopSoundCore(void); // stops the sound playing
 BOOL DSPi_PlayShutterSoundCore(const void *src, u32 length);
