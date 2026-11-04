@@ -858,12 +858,12 @@ BOOL GameBeacon_HasMissionInfo(const GameBeacon *beacon) {
     return TRUE;
 }
 
-u32 GameBeaconSys_AddMissionScore(u32 a0, u16 a1) {
+u32 GameBeaconSys_AddMissionScore(u32 kind, u16 value) {
     if (GameBeaconSys == NULL || GameBeaconSys->gsys == NULL) {
         return 0;
     }
     if (getStatusOfFesMission(GSYS_GetLinkFestival(GameBeaconSys->gsys)) != 0) {
-        return LinkFestival_AddMissionScore(GameBeaconSys->gsys, a0, a1) + 1;
+        return LinkFestival_AddMissionScore(GameBeaconSys->gsys, kind, value) + 1;
     }
     return 0;
 }

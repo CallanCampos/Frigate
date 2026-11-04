@@ -216,7 +216,7 @@ BOOL GameBeacon_IsMissionType(const GameBeacon *beacon);
 // Whether the beacon's type is 0x3c to 0x66
 BOOL GameBeacon_HasMissionInfo(const GameBeacon *beacon);
 // 1 + LinkFestival_AddMissionScore's result while a Funfest mission is on, else 0
-u32 GameBeaconSys_AddMissionScore(u32 a0, u16 a1);
+u32 GameBeaconSys_AddMissionScore(u32 kind, u16 value);
 // Whether a beacon of type may replace the current one, by their priorities
 BOOL GameBeaconSys_CanSendType(u16 type);
 // Whether species is one of the special Pokémon (legendaries and such)
