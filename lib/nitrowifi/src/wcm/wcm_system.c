@@ -160,7 +160,7 @@ s32 WCM_StartupAsync(WCMConfig *config, WCMNotify notify) {
         break;
     case 2:
         if (OS_IsRunOnTwl()) {
-            result = func_02769930();
+            result = WCMi_NwmifStartupAsync();
             break;
         }
         // Mode 2 without DSi hardware is unsupported, like any other mode
@@ -203,7 +203,7 @@ s32 WCM_CleanupAsync(void) {
         break;
     case 2:
         if (OS_IsRunOnTwl()) {
-            result = func_02769a30();
+            result = WCMi_NwmifCleanupAsync();
             break;
         }
         // Mode 2 without DSi hardware is unsupported, like any other mode
@@ -239,7 +239,7 @@ static s32 WCM_BeginSearchAsync(const u8 *bssid, const u8 *essid, u32 option) {
         break;
     case 2:
         if (OS_IsRunOnTwl()) {
-            result = func_02769aa4(bssid, essid, option);
+            result = WCMi_NwmifBeginSearchAsync(bssid, essid, option);
             break;
         }
         // Mode 2 without DSi hardware is unsupported, like any other mode
@@ -344,7 +344,7 @@ s32 WCM_ConnectAsync(void *bssDesc, void *wepDesc, u32 option) {
         break;
     case 2:
         if (OS_IsRunOnTwl()) {
-            result = func_02769b80();
+            result = WCMi_NwmifConnectAsync();
             break;
         }
         // Mode 2 without DSi hardware is unsupported, like any other mode
@@ -389,7 +389,7 @@ s32 WCM_DisconnectAsync(void) {
             break;
         case 2:
             if (OS_IsRunOnTwl()) {
-                result = func_02769c70();
+                result = WCMi_NwmifDisconnectAsync();
                 break;
             }
             // Mode 2 without DSi hardware is unsupported, like any other mode
@@ -441,7 +441,7 @@ s32 WCM_TerminateAsync(void) {
             break;
         case 2:
             if (OS_IsRunOnTwl()) {
-                result = func_02769ce8();
+                result = WCMi_NwmifTerminateAsync();
                 break;
             }
             // Mode 2 without DSi hardware is unsupported, like any other mode
@@ -521,7 +521,7 @@ s32 WCM_GetAllowedChannel(void) {
             return WCMi_WmifGetAllowedChannel();
         case 2:
             if (OS_IsRunOnTwl()) {
-                return func_02769e54();
+                return WCMi_NwmifGetAllowedChannel();
             }
             break;
         }
