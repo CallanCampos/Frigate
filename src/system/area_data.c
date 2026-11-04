@@ -1,6 +1,7 @@
 #include "system/area_data.h"
 #include "types.h"
 #include "constants/arc.h"
+#include "constants/areas.h"
 #include "gfl/heap.h"
 #include "system/file_util.h"
 
@@ -92,8 +93,8 @@ BOOL AreaData_IsWbt(u16 areaId) {
     return FALSE;
 }
 
-BOOL func_02018fa8(u16 areaId) {
-    if (areaId == 0x106) {
+BOOL AreaData_IsHiddenGrotto(u16 areaId) {
+    if (areaId == AREA_HIDDEN_GROTTO) {
         return TRUE;
     }
     return FALSE;

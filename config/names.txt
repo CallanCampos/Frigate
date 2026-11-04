@@ -1247,6 +1247,7 @@
 . 0x02018f60 AreaData_IsInfinityDungeon
 . 0x02018f78 AreaData_IsJoinAvenue
 . 0x02018f90 AreaData_IsWbt
+. 0x02018fa8 AreaData_IsHiddenGrotto
 . 0x0201906c CreateZoneChangeDataRail
 . 0x02019314 FieldStatus_GetInLinkedWorld
 . 0x02019318 FieldStatus_SetInLinkedWorld

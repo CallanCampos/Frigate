@@ -49,7 +49,7 @@ BOOL RivalSelect_RemoveHollowActor(FesGimmick *gimmick) {
     u8 rival;
     FieldActor *actor;
 
-    if (func_02018fa8(ZoneData_GetAreaID(Field_GetPlayerStateZoneID(gimmick->field))) == TRUE) {
+    if (AreaData_IsHiddenGrotto(ZoneData_GetAreaID(Field_GetPlayerStateZoneID(gimmick->field))) == TRUE) {
         rival = getHollowNum(getHollow_RivalData(GameData_GetSaveControl(gimmick->gameData)));
         if (RivalSelect_IsSelectedAndActive(gimmick, rival) == TRUE) {
             actor = FindFieldActor(gimmick->actors, 0xe0);

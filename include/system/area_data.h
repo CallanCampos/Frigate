@@ -44,6 +44,6 @@ BOOL AreaData_HasSeasons(u16 areaId);
 BOOL AreaData_IsInfinityDungeon(u16 areaId);
 BOOL AreaData_IsJoinAvenue(u16 areaId);
 BOOL AreaData_IsWbt(u16 areaId);
-BOOL func_02018fa8(u16 areaId);
+BOOL AreaData_IsHiddenGrotto(u16 areaId);
 
 #endif // POKEBW2_SYSTEM_AREA_DATA_H
