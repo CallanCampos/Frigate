@@ -112,12 +112,16 @@ struct BSubwayScrWork {
     // The partners entry of a multi train's partner, or 5 plus the gender of a wireless partner
     u16 partnerIndex : 3;
     u16 unkC_8 : 1;
-    u16 unkC_9 : 1;
-    u16 unkC_10 : 2;
+    // Set when the network is already up, so that the train only adds its commands to it and removes them
+    u16 useExistingNet : 1;
+    // Whether battle video slot 4 holds a video: 0 before it is checked, 1 when it doesn't, 2 when it does or one was
+    // saved
+    u16 videoState : 2;
     u16 unkC_12 : 1;
     u16 unkC_13 : 3;
     u16 winCount;
-    u16 unk10;
+    // The header's counter, for BattleRec_FinishAndSaveSlot
+    u16 videoCounter;
     // The BSUBWAY_COMM_* command to send
     u16 sendCommand;
     u8 unk14[4];
@@ -158,18 +162,21 @@ struct BSubwayScrWork {
     // 1 when only this machine's command is awaited
     u8 recvMode;
     u8 unk726;
-    u8 unk727;
+    // The timing that the script waits for both machines to reach
+    u8 timing;
     // What the partner's command answered
     u16 recvResult;
-    u16 unk72A;
+    // The script variable that a wait for a timing or a command gets its result in
+    u16 resultVarId;
     PlayerInfo partner;
     u8 unk74C[0x58];
     IrcBattleMatchParam ircMatchParam;
     PokeParty *allocatedBuffer;
     BtlSetup *btlSetup;
     Ov306Param ov306Param;
-    u16 unk7EC;
-    u16 unk7EE;
+    // BattleRec_FinishAndSaveSlot's steps
+    u16 videoSeq;
+    u16 videoSaveSeq;
 };
 
 // Overlay 12's bsubway_comm.c
