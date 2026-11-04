@@ -239,21 +239,21 @@ BOOL NetSystem_StartWireless(int size, HeapID heapId) {
     return TRUE;
 }
 
-int NetSystem_CanConnectFriend(int a0) {
+int NetSystem_CanConnectFriend(int index) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    return sys->pDevTable->canConnectFriend(a0);
+    return sys->pDevTable->canConnectFriend(index);
 }
 
 static BOOL NetSystem_RecvInfraredCallback(u16 netId, u8 *data, u16 size) {
     return NetSystem_RecvInfraredPacket(netId, data, size);
 }
 
-BOOL NetSystem_StartInfrared(int a0) {
+BOOL NetSystem_StartInfrared(int changeTgid) {
     GFLNetInitData *ini = GFL_NetGetInitData();
     GFLNetSys *sys = GFL_NetGetSys();
 
-    ini->changeTgid = a0;
+    ini->changeTgid = changeTgid;
     sys->pDevTable->setRecvCallback(NetSystem_RecvInfraredCallback);
     NetSystem_Alloc(0x80, ini->heapId, FALSE);
     NetSystem_ResetMachine(0);
@@ -282,17 +282,17 @@ static void NetSystem_OnConnectAsChild(int netId) {
     }
 }
 
-int NetSystem_StartParent(int a0, int size, int a2, BOOL (*callback)(void)) {
+int NetSystem_StartParent(int changeTgid, int size, int anyChannel, BOOL (*callback)(void)) {
     GFLNetInitData *ini = GFL_NetGetInitData();
     GFLNetSys *sys = GFL_NetGetSys();
     BOOL useSysSize;
 
-    ini->changeTgid = a0;
+    ini->changeTgid = changeTgid;
     sys->pDevTable->setDisconnectCallback(NetSystem_OnConnectAsParent);
     sys->pDevTable->setRecvCallback(NetSystem_RecvPacket);
     useSysSize = sys->aNetInit.bMPMode && sys->aNetInit.parentPacketSize;
     NetSystem_Alloc(size, GFL_NetGetInitData()->heapId, useSysSize);
-    return sys->pDevTable->startParent(a2, callback);
+    return sys->pDevTable->startParent(anyChannel, callback);
 }
 
 BOOL NetSystem_StartScan(int a0, int size) {
