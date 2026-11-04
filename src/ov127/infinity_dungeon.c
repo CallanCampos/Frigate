@@ -356,13 +356,13 @@ void InfinityDungeonRoomChange_CreateNpcs(InfinityDungeonRoomChange *roomChange,
     }
 }
 
-GameEvent *InfinityDungeon_CreateBattleEvent(GameSystem *gsys, Field *field, u8 a2) {
+GameEvent *InfinityDungeon_CreateBattleEvent(GameSystem *gsys, Field *field, u8 slot) {
     KeyDataSave *keyData = getKeyDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
     u32 mode = KeyDataSave_GetArea(keyData);
     InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(field);
     u32 floor = KeyDataSave_GetFloorInArea(keyData);
-    u16 seed = InfinityDungeon_GetBattleSeed(dungeon, floor, a2);
-    u16 trainerId = InfinityDungeon_GetTrainerId(dungeon, floor, a2);
+    u16 seed = InfinityDungeon_GetBattleSeed(dungeon, floor, slot);
+    u16 trainerId = InfinityDungeon_GetTrainerId(dungeon, floor, slot);
     u8 version = InfinityDungeon_GetVersion(dungeon);
     MATHRandContext32 rand;
     BSubwayTrainer trainer;
@@ -538,7 +538,7 @@ static u32 InfinityDungeon_GetGoalRoom(InfinityDungeon *dungeon) {
     return 0;
 }
 
-u32 InfinityDungeon_GetNpcScript(KeyDataSave *keyData, InfinityDungeon *dungeon, u16 objCode, u8 a3) {
+u32 InfinityDungeon_GetNpcScript(KeyDataSave *keyData, InfinityDungeon *dungeon, u16 objCode, u8 slot) {
     InfinityDungeonNpcScriptArg arg;
     u8 floor = KeyDataSave_GetFloorInArea(keyData);
     InfinityDungeonNpcScriptFunc firstTimeScripts[9] = {
@@ -559,7 +559,7 @@ u32 InfinityDungeon_GetNpcScript(KeyDataSave *keyData, InfinityDungeon *dungeon,
     };
     BOOL defeated = InfinityDungeon_IsTargetDefeated(dungeon, keyData);
     u8 npcIndex = InfinityDungeon_GetNpcIndex(objCode);
-    u32 scriptIndex = InfinityDungeon_GetNpcScriptIndex(dungeon, objCode, floor, a3);
+    u32 scriptIndex = InfinityDungeon_GetNpcScriptIndex(dungeon, objCode, floor, slot);
 
     arg.dungeon = dungeon;
     arg.npcIndex = npcIndex;
@@ -571,10 +571,10 @@ u32 InfinityDungeon_GetNpcScript(KeyDataSave *keyData, InfinityDungeon *dungeon,
     }
 }
 
-u32 InfinityDungeon_GetNpcScriptByResult(KeyDataSave *keyData, InfinityDungeon *dungeon, u16 objCode, u16 a3) {
+u32 InfinityDungeon_GetNpcScriptByResult(KeyDataSave *keyData, InfinityDungeon *dungeon, u16 objCode, u16 result) {
     u32 npcIndex = InfinityDungeon_GetNpcIndex(objCode);
 
-    if (a3 == 1) {
+    if (result == 1) {
         return 0x1ec + npcIndex;
     }
     return 0x1f6 + npcIndex;

@@ -8,10 +8,10 @@
 // and NPC templates, its trainers and the tables by rank, the generator's shuffles, the seeds, the trainer slots of a
 // room, and the layout of the floors
 
-u8 InfinityDungeon_GetRoomNpcCount(u8 a0);
-u16 InfinityDungeon_IsTargetSlot(InfinityDungeon *gimmick, u8 a1, u8 a2);
+u8 InfinityDungeon_GetRoomNpcCount(u8 type);
+u16 InfinityDungeon_IsTargetSlot(InfinityDungeon *gimmick, u8 floor, u8 slot);
 u8 InfinityDungeon_GetVersion(InfinityDungeon *gimmick);
-u16 InfinityDungeon_GetTrainerId(InfinityDungeon *gimmick, u8 a1, u8 a2);
+u16 InfinityDungeon_GetTrainerId(InfinityDungeon *gimmick, u8 floor, u8 slot);
 const u16 *InfinityDungeon_GetRoomZones(u8 version);
 const InfinityDungeonPos *InfinityDungeon_GetFloorPos(u8 version);
 const InfinityDungeonPos *InfinityDungeon_GetArrivalPos(u32 index);

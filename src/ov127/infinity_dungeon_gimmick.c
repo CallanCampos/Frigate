@@ -76,7 +76,7 @@ typedef struct {
     u32 defaultsIndex;
 } LiftEvent;
 
-static void InfinityDungeonGimmick_Init(InfinityDungeonGimmick *gimmick, Field *field, KeyDataSave *keyData, u16 a3);
+static void InfinityDungeonGimmick_Init(InfinityDungeonGimmick *gimmick, Field *field, KeyDataSave *keyData, u16 city);
 static void InfinityDungeonGimmick_SetupScene(InfinityDungeon *dungeon, InfinityDungeonGimmick *gimmick);
 static const ObjectPlacement *InfinityDungeonGimmick_GetPlacements(InfinityDungeonGimmick *gimmick);
 static GameEventReturnCode InfinityDungeonGimmick_DoorEvent(GameEvent *event, u32 *state, void *data);
@@ -231,7 +231,7 @@ static void InfinityDungeonGimmick_SetupScene(InfinityDungeon *dungeon, Infinity
     }
 
     if (gimmick->zoneId - ZONE_WHITE_TREEHOLLOW <= 1) {
-        u32 level = KeyDataSave_GetProgress(gimmick->keyData, gimmick->unk50);
+        u32 level = KeyDataSave_GetProgress(gimmick->keyData, gimmick->city);
         InfinityDungeonObject *machineA = &gimmick->objects[OBJECT_MACHINE_A];
         InfinityDungeonObject *machineB = &gimmick->objects[OBJECT_MACHINE_B];
 
@@ -268,13 +268,13 @@ static void InfinityDungeonGimmick_SetupScene(InfinityDungeon *dungeon, Infinity
     }
 }
 
-static void InfinityDungeonGimmick_Init(InfinityDungeonGimmick *gimmick, Field *field, KeyDataSave *keyData, u16 a3) {
+static void InfinityDungeonGimmick_Init(InfinityDungeonGimmick *gimmick, Field *field, KeyDataSave *keyData, u16 city) {
     MI_CpuFill8(gimmick, 0, INIT_CLEAR_SIZE);
     gimmick->field = field;
     gimmick->zoneId = Field_GetPlayerStateZoneID(field);
     gimmick->expObjSystem = Field_GetExpObjSystem(gimmick->field);
     gimmick->keyData = keyData;
-    gimmick->unk50 = a3;
+    gimmick->city = city;
 }
 
 static const ObjectPlacement *InfinityDungeonGimmick_GetPlacements(InfinityDungeonGimmick *gimmick) {
@@ -624,18 +624,18 @@ void InfinityDungeonGimmick_CallRoomChange(ScriptWork *work, GameSystem *gsys, I
     roomChange->outTransition = outTransition;
 }
 
-void InfinityDungeonGimmick_CallFloorChange(ScriptWork *work, GameSystem *gsys, InfinityDungeon *dungeon, u16 a3) {
+void InfinityDungeonGimmick_CallFloorChange(ScriptWork *work, GameSystem *gsys, InfinityDungeon *dungeon, u16 floor) {
     KeyDataSave *keyData = getKeyDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
     GameEvent *event;
     InfinityDungeonRoomChange *roomChange;
     u8 level;
 
-    KeyDataSave_SetFloor(keyData, a3);
+    KeyDataSave_SetFloor(keyData, floor);
     level = KeyDataSave_GetArea(keyData);
     event = GameEvent_Create(gsys, NULL, InfinityDungeonRoomChange_Event, sizeof(InfinityDungeonRoomChange));
     ScriptWork_CallEvent(work, event);
     roomChange = GameEvent_GetData(event);
-    roomChange->nextFloor = InfinityDungeonGimmick_GetFloorInLevel(a3, level);
+    roomChange->nextFloor = InfinityDungeonGimmick_GetFloorInLevel(floor, level);
     roomChange->mode = 1;
     roomChange->dungeon = dungeon;
     roomChange->direction = 1;

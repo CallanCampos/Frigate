@@ -32,7 +32,8 @@ typedef struct {
     Field *field;
     InfinityDungeonObject objects[INFINITY_DUNGEON_OBJECT_COUNT];
     KeyDataSave *keyData;
-    u32 unk50;
+    // GameData_GetMyCity's, whose KeyDataSave_GetProgress picks the machine that shows
+    u32 city;
     InfinityDungeon *dungeon;
     FieldPropHandle *walls[INFINITY_DUNGEON_WALL_COUNT];
 } InfinityDungeonGimmick; // what InfinityDungeonGimmick_Setup allocates in the field's gimmick work
@@ -70,7 +71,7 @@ GameEvent *InfinityDungeonGimmick_CreateMachineEvent(GameSystem *gsys, Field *fi
 GameEvent *InfinityDungeonGimmick_CreateLiftEvent(GameSystem *gsys, Field *field);
 void InfinityDungeonGimmick_CallRoomChange(ScriptWork *work, GameSystem *gsys, InfinityDungeon *dungeon, u16 direction,
                                            u8 inTransition, u8 outTransition);
-void InfinityDungeonGimmick_CallFloorChange(ScriptWork *work, GameSystem *gsys, InfinityDungeon *dungeon, u16 a3);
+void InfinityDungeonGimmick_CallFloorChange(ScriptWork *work, GameSystem *gsys, InfinityDungeon *dungeon, u16 floor);
 void InfinityDungeonRoomChange_Init(InfinityDungeonRoomChange *roomChange, GameSystem *gsys);
 InfinityDungeonRoom *InfinityDungeonRoomChange_GetRoom(InfinityDungeonRoomChange *roomChange);
 // Puts a wall prop in a passage
