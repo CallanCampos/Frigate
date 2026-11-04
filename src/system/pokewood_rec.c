@@ -139,10 +139,10 @@ u32 Pokewood_GetLoadedMovieField(u32 field, u32 a1) {
     case POKEWOOD_BLOCK_FIELD_PKM_5:
         BattleRecTool_LoadPkm(&sBlock->party.pkm[field - POKEWOOD_BLOCK_FIELD_PKM_0], (PartyPkm *)a1);
         return 1;
-    case POKEWOOD_BLOCK_FIELD_UNK128:
-        return sBlock->unk128;
-    case POKEWOOD_BLOCK_FIELD_UNKE0:
-        return sBlock->unkE0;
+    case POKEWOOD_BLOCK_FIELD_AUDIENCE_COUNT:
+        return sBlock->audienceCount;
+    case POKEWOOD_BLOCK_FIELD_STUDIO_CAST:
+        return sBlock->studioCast;
     case POKEWOOD_BLOCK_FIELD_DATE:
         return sBlock->date;
     case POKEWOOD_BLOCK_FIELD_TIME:

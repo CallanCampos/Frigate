@@ -538,12 +538,12 @@ static void BattleRecTool_LoadPokewoodInfo(BtlSetup *setup, const PokewoodBattle
 }
 
 static void BattleRecTool_StorePokewoodExtra(const BtlSetup *setup, PokewoodBlock *block) {
-    block->unk128 = setup->audienceCount;
-    block->unkE0 = setup->unkE0;
+    block->audienceCount = setup->audienceCount;
+    block->studioCast = setup->studioCast;
     block->score = setup->studioScore;
 }
 
 static void BattleRecTool_LoadPokewoodExtra(BtlSetup *setup, const PokewoodBlock *block) {
-    setup->audienceCount = block->unk128;
-    setup->unkE0 = block->unkE0;
+    setup->audienceCount = block->audienceCount;
+    setup->studioCast = block->studioCast;
 }

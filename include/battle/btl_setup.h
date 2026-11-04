@@ -141,7 +141,8 @@ struct BtlSetup {
     u8 noPokedexRegistration : 1;
     u8 unkDE_1 : 7;
     u8 unkDF;
-    u8 unkE0;
+    // Pokéstar Studios: 1 when the studio gives the cast, 0 when the player's own Pokémon act
+    u8 studioCast;
     // Whether each party slot's Pokémon appeared in the battle
     u8 appeared[6];
     // The party slots each client sends out

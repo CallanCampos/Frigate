@@ -348,10 +348,10 @@ static BtlSetup *EventPokewood_CreateFilmSetup(GameSystem *gsys, Field *field, H
     setup->playerInfo[0] = GetGameDataPlayerInfo(gameData);
     if (PokewoodSystem_GetUsePlayerCast(*sys) == 1) {
         PokewoodSystem_CopyCast(*sys, gameData, setup->party[0]);
-        setup->unkE0 = 0;
+        setup->studioCast = 0;
     } else {
         EventPokewood_CreateCastParty(playerInfo, setup->party[0], heapId, movie, 0);
-        setup->unkE0 = 1;
+        setup->studioCast = 1;
     }
     GFL_HeapFree(buffer);
     setup->studioMode = BTL_STUDIO_MODE_FILM;

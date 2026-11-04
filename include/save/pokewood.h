@@ -43,8 +43,9 @@ typedef struct {
     BattleRecParty party;
     BattleRecClient client;
     u16 trainerClass;
-    u8 unk128;
-    u8 unkE0;
+    // The battle setup's audienceCount and studioCast
+    u8 audienceCount;
+    u8 studioCast;
     // When the movie was saved: the year, month, day and day of the week, and the hour, minute and second, a byte
     // each from the top
     u32 date;
@@ -68,8 +69,8 @@ enum {
     // Makes the party Pokémon that the second argument points to of a Pokémon of the cast, and gives 1
     POKEWOOD_BLOCK_FIELD_PKM_0,
     POKEWOOD_BLOCK_FIELD_PKM_5 = POKEWOOD_BLOCK_FIELD_PKM_0 + 5,
-    POKEWOOD_BLOCK_FIELD_UNK128,
-    POKEWOOD_BLOCK_FIELD_UNKE0,
+    POKEWOOD_BLOCK_FIELD_AUDIENCE_COUNT,
+    POKEWOOD_BLOCK_FIELD_STUDIO_CAST,
     POKEWOOD_BLOCK_FIELD_DATE,
     POKEWOOD_BLOCK_FIELD_TIME,
     POKEWOOD_BLOCK_FIELD_SCORE,
