@@ -35,8 +35,8 @@ typedef struct MailEdit {
     u8 cursor;
     u32 trainerId;
     u8 unk08;
-    u8 unk09;
-    u8 unk0A;
+    u8 region;
+    u8 gameVersion;
     u8 design;
     StrBuf *name;
     u8 unk10[6];
