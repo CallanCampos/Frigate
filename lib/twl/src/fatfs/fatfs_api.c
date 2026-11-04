@@ -4,8 +4,9 @@
 // game keeps is here: getting a request buffer, sending it, waiting for it and giving it back, and the one request
 // that the exit code sends. The ROM names none of it; the file name and those of the types and data are descriptive
 // guesses, the public functions and the command and result values have the names of libntr's reconstruction of
-// TwlSDK's fatfs headers (api.h, types.h), and the others keep their default names (twl/fatfs.h says what the public
-// ones do).
+// TwlSDK's fatfs headers (api.h, types.h) (twl/fatfs.h says what the public ones do), and the request functions those
+// of the TwlSDK symbols that Black 1's decompilation (aletheia) recovered at the same addresses, from an object of
+// their own in the SDK, libfatfs.TWL.HYB.a's fatfs_request.o.
 
 #include "types.h"
 #include "nitro/os.h"
@@ -73,19 +74,19 @@ typedef struct FatfsState {
     FatfsRequest *interruptRequest; // 0x68
 } FatfsState;
 
-static void func_027040b4(FatfsRequest *request);
-static OSThread *func_027040ec(void);
-static FatfsRequest *func_0270410c(u32 command);
-static FatfsRequest *func_027041e8(u32 command);
-static void func_02704230(FatfsRequest *request);
-static void func_02704258(FatfsRequest *request);
-static void func_02704264(FatfsRequest *request);
+static void FATFSi_SendToPXI(FatfsRequest *request);
+static OSThread *FATFSi_GetThreadHandle(void);
+static FatfsRequest *FATFSi_AllocateCommandBuffer(u32 command);
+static FatfsRequest *FATFSi_AllocateEmergencyCommandBuffer(u32 command);
+static void FATFSi_FreeCommandBuffer(FatfsRequest *request);
+static void FATFSi_PostRequest(FatfsRequest *request);
+static void FATFSi_WaitForRequest(FatfsRequest *request);
 
 static BOOL sFatfsInitialized;
 static FatfsState sFatfs;
 
 // Sends the ARM7 the request: its address in units of 32 bytes, the size of a cache line
-static void func_027040b4(FatfsRequest *request) {
+static void FATFSi_SendToPXI(FatfsRequest *request) {
     u32 addr;
 
     DC_FlushRange(request, FATFS_REQUEST_SIZE);
@@ -95,7 +96,7 @@ static void func_027040b4(FatfsRequest *request) {
 }
 
 // The id of the running thread
-static OSThread *func_027040ec(void) {
+static OSThread *FATFSi_GetThreadHandle(void) {
     if (OS_GetProcMode() == FATFS_IRQ_MODE) {
         return FATFS_IRQ_THREAD;
     }
@@ -110,7 +111,7 @@ static inline FatfsRequest *TakeReservedRequest(void) {
     OSIntrMode irq;
 
     irq = OS_DisableInterrupts();
-    current = func_027040ec();
+    current = FATFSi_GetThreadHandle();
     for (candidate = sFatfs.reserved; candidate != NULL; candidate = candidate->nextReserved) {
         if (candidate->owner == current) {
             candidate->owner = NULL;
@@ -125,7 +126,7 @@ static inline FatfsRequest *TakeReservedRequest(void) {
 
 // Takes a request for the command: the one that was reserved for the thread, or else the shared one, after waiting for
 // the thread that has it. The thread's entry in the library's list gets it
-static FatfsRequest *func_0270410c(u32 command) {
+static FatfsRequest *FATFSi_AllocateCommandBuffer(u32 command) {
     FatfsRequest *request;
     FatfsThread *thread;
     OSThread *current;
@@ -139,7 +140,7 @@ static FatfsRequest *func_0270410c(u32 command) {
     }
 
     irq = OS_DisableInterrupts();
-    current = func_027040ec();
+    current = FATFSi_GetThreadHandle();
     for (thread = sFatfs.threads; thread != NULL; thread = thread->next) {
         if (thread->thread == current) {
             thread->request = request;
@@ -155,11 +156,11 @@ static FatfsRequest *func_0270410c(u32 command) {
 }
 
 // The same for any context: an interrupt handler gets its own request
-static FatfsRequest *func_027041e8(u32 command) {
+static FatfsRequest *FATFSi_AllocateEmergencyCommandBuffer(u32 command) {
     FatfsRequest *request;
 
     if (OS_GetProcMode() != FATFS_IRQ_MODE) {
-        return func_0270410c(command);
+        return FATFSi_AllocateCommandBuffer(command);
     }
     request = sFatfs.interruptRequest;
     request->command = command;
@@ -170,20 +171,20 @@ static FatfsRequest *func_027041e8(u32 command) {
 }
 
 // Gives back the request: only the shared one is under the mutex
-static void func_02704230(FatfsRequest *request) {
+static void FATFSi_FreeCommandBuffer(FatfsRequest *request) {
     if (request == sFatfs.sharedRequest) {
         OS_UnlockMutex(&sFatfs.mutex);
     }
 }
 
 // Sends the request
-static void func_02704258(FatfsRequest *request) {
-    func_027040b4(request);
+static void FATFSi_PostRequest(FatfsRequest *request) {
+    FATFSi_SendToPXI(request);
 }
 
 // Waits until the request is in the list of the done ones and takes it out. A thread sleeps meanwhile; an interrupt
 // handler takes the words from the FIFO and spins
-static void func_02704264(FatfsRequest *request) {
+static void FATFSi_WaitForRequest(FatfsRequest *request) {
     BOOL waiting = TRUE;
 
     while (waiting) {
@@ -216,12 +217,12 @@ BOOL FATFSi_IsInitialized(void) {
 }
 
 BOOL FATFS_UnmountAll(void) {
-    FatfsRequest *request = func_027041e8(FATFS_COMMAND_UNMOUNT_ALL);
+    FatfsRequest *request = FATFSi_AllocateEmergencyCommandBuffer(FATFS_COMMAND_UNMOUNT_ALL);
     BOOL success;
 
-    func_02704258(request);
-    func_02704264(request);
+    FATFSi_PostRequest(request);
+    FATFSi_WaitForRequest(request);
     success = request->result == FATFS_RESULT_SUCCESS;
-    func_02704230(request);
+    FATFSi_FreeCommandBuffer(request);
     return success;
 }
