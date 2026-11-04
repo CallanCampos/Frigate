@@ -567,12 +567,17 @@ void FMissionView_TransferPanels(FMissionView *view) {
 }
 
 // Brings the new entry in at the top of the list, and offers the Pass Power of one that another player used
+enum {
+    STEP_ADD_PANEL,
+    STEP_OFFER_PASS_POWER,
+};
+
 static BOOL FMissionView_AddNewEntry(FMissionView *view) {
     if (view->pending != 0) {
         return FALSE;
     }
     switch (view->subSeq) {
-    case 0: {
+    case STEP_ADD_PANEL: {
         u32 kind;
         u32 se;
 
@@ -608,7 +613,7 @@ static BOOL FMissionView_AddNewEntry(FMissionView *view) {
         view->subSeq++;
         break;
     }
-    case 1:
+    case STEP_OFFER_PASS_POWER:
         if (FMissionLogEntryFV_IsOwn(view->newEntry) ||
             FMissionLogEntryFV_GetKind(view->newEntry) != LOG_KIND_PASS_POWER) {
             return TRUE;
@@ -624,15 +629,20 @@ static BOOL FMissionView_AddNewEntry(FMissionView *view) {
     return FALSE;
 }
 
+enum {
+    STEP_START_QUIT,
+    STEP_WAIT_QUIT,
+};
+
 // Asks whether to quit the mission, and waits for the answer's tasks
 static BOOL FMissionView_Quit(FMissionView *view) {
     switch (view->subSeq) {
-    case 0:
+    case STEP_START_QUIT:
         BeaconView_SetPrintTimeLimit(view->printQueue, TRUE);
         FMissionView_StartQuit(view);
         view->subSeq++;
         break;
-    case 1:
+    case STEP_WAIT_QUIT:
         if (view->pending == 0) {
             BeaconView_SetPrintTimeLimit(view->printQueue, FALSE);
             view->subSeq = 0;
@@ -1012,13 +1022,18 @@ static void FMissionView_AddPanel(FMissionView *view, FestMissionLogEntry *entry
     }
 }
 
+enum {
+    STEP_SLIDE_PANELS,
+    STEP_FINISH_SLIDE,
+};
+
 static void FMissionView_PanelTask(TCBEx *task, void *data) {
     FMissionViewPanelTask *slide = data;
     FMissionView *view = slide->view;
     int i;
 
     switch (slide->seq) {
-    case 0:
+    case STEP_SLIDE_PANELS:
         if (!FMissionView_ShowPanelWhenPrinted(view, slide->panel)) {
             return;
         }
@@ -1049,7 +1064,7 @@ static void FMissionView_PanelTask(TCBEx *task, void *data) {
         }
         slide->seq++;
         break;
-    case 1:
+    case STEP_FINISH_SLIDE:
     default:
         if (slide->pending != NULL) {
             (*slide->pending)--;
@@ -1078,6 +1093,12 @@ static void FMissionView_StartMessage(FMissionView *view, StrBuf *strbuf, int *p
     (*pending)++;
 }
 
+enum {
+    STEP_PRINT_MESSAGE,
+    STEP_SLIDE_IN,
+    STEP_WAIT_INPUT,
+};
+
 static void FMissionView_MessageTask(TCBEx *task, void *data) {
     FMissionViewMessageTask *message = data;
 
@@ -1085,15 +1106,15 @@ static void FMissionView_MessageTask(TCBEx *task, void *data) {
         return;
     }
     switch (message->seq) {
-    case 0:
+    case STEP_PRINT_MESSAGE:
         FMissionView_PrintMessage(message->view, message->view->messageCopy, &message->wait);
         message->seq++;
         break;
-    case 1:
+    case STEP_SLIDE_IN:
         BeaconView_StartBGSlide(message->view->tcbManager, 6, FALSE, &message->wait);
         message->seq++;
         break;
-    case 2:
+    case STEP_WAIT_INPUT:
         if (BeaconView_WaitTimerOrTouch(&message->timer, 6)) {
             BeaconView_StartBGSlide(message->view->tcbManager, 6, TRUE, &message->wait);
             message->seq++;
@@ -1149,6 +1170,16 @@ static BOOL FMissionView_StartPassPower(FMissionView *view, u32 passPower, int r
     return TRUE;
 }
 
+enum {
+    STEP_PRINT_OFFER,
+    STEP_SLIDE_OFFER_IN,
+    STEP_OPEN_OFFER_MENU,
+    STEP_WAIT_OFFER_MENU,
+    STEP_CHECK_USE,
+    STEP_WAIT_OFFER_FLASH,
+    STEP_SLIDE_OFFER_OUT,
+};
+
 static void FMissionView_PassPowerTask(TCBEx *task, void *data) {
     FMissionViewPassPowerTask *offer = data;
     FMissionView *view = offer->view;
@@ -1157,22 +1188,22 @@ static void FMissionView_PassPowerTask(TCBEx *task, void *data) {
         return;
     }
     switch (offer->seq) {
-    case 0:
+    case STEP_PRINT_OFFER:
         FMissionView_LoadMessage(view, FmissionViewSetup_Text_UseActivated);
         FMissionView_PrintMessage(view, view->message, &offer->wait);
         offer->seq++;
         break;
-    case 1:
+    case STEP_SLIDE_OFFER_IN:
         BeaconView_StartBGSlide(view->tcbManager, 6, FALSE, &offer->wait);
         offer->seq++;
         break;
-    case 2:
+    case STEP_OPEN_OFFER_MENU:
         BeaconView_SetPrintTimeLimit(view->printQueue, TRUE);
         BeaconViewMenu_Open(view->menu, 0);
         FMissionView_SetButtonsVisible(view, FALSE);
         offer->seq++;
         break;
-    case 3: {
+    case STEP_WAIT_OFFER_MENU: {
         int button = BeaconViewMenu_Update(view->menu);
 
         if (button < 0) {
@@ -1182,37 +1213,37 @@ static void FMissionView_PassPowerTask(TCBEx *task, void *data) {
         switch (offer->button) {
         case PASS_POWER_MENU_LIST:
             FMissionViewSetup_RequestEvent(view, FMISSION_VIEW_EVENT_PASS_POWER_LIST);
-            offer->seq = 3;
+            offer->seq = STEP_WAIT_OFFER_MENU;
             break;
         case PASS_POWER_MENU_USE:
             view->usePassPower = offer->passPower;
             FMissionViewSetup_RequestEvent(view, FMISSION_VIEW_EVENT_USE_PASS_POWER);
-            offer->seq = 4;
+            offer->seq = STEP_CHECK_USE;
             break;
         case PASS_POWER_MENU_CANCEL:
             FMissionLogFV_RemovePassPower(view->passPowers, offer->received);
-            offer->seq = 5;
+            offer->seq = STEP_WAIT_OFFER_FLASH;
             break;
         }
         break;
     }
-    case 4:
+    case STEP_CHECK_USE:
         // The event sets usePassPower back when the player didn't use the Pass Power after all
         if (view->usePassPower != PASS_POWER_NONE) {
             view->usePassPower = PASS_POWER_NONE;
-            offer->seq = 3;
+            offer->seq = STEP_WAIT_OFFER_MENU;
         } else {
             FMissionLogFV_RemovePassPower(view->passPowers, offer->received);
             BeaconViewMenu_Close(view->menu);
-            offer->seq = 6;
+            offer->seq = STEP_SLIDE_OFFER_OUT;
         }
         break;
-    case 5:
+    case STEP_WAIT_OFFER_FLASH:
         if (BeaconViewMenu_WaitFlash(view->menu, offer->button)) {
             offer->seq++;
         }
         break;
-    case 6:
+    case STEP_SLIDE_OFFER_OUT:
         FMissionView_SetButtonsVisible(view, TRUE);
         BeaconView_StartBGSlide(view->tcbManager, 6, TRUE, &offer->wait);
         offer->seq++;
@@ -1246,6 +1277,16 @@ static void FMissionView_StartQuitTask(FMissionView *view, int *pending) {
     (*pending)++;
 }
 
+enum {
+    STEP_PRINT_QUIT,
+    STEP_SLIDE_QUIT_IN,
+    STEP_OPEN_QUIT_MENU,
+    STEP_WAIT_QUIT_MENU,
+    STEP_CHECK_QUIT_EVENT,
+    STEP_WAIT_QUIT_FLASH,
+    STEP_SLIDE_QUIT_OUT,
+};
+
 static void FMissionView_QuitTask(TCBEx *task, void *data) {
     FMissionViewQuitTask *quit = data;
     FMissionView *view = quit->view;
@@ -1254,22 +1295,22 @@ static void FMissionView_QuitTask(TCBEx *task, void *data) {
         return;
     }
     switch (quit->seq) {
-    case 0:
+    case STEP_PRINT_QUIT:
         FMissionView_LoadMessage(view, FmissionViewSetup_Text_QuitFunfestMission);
         FMissionView_PrintMessage(view, view->message, &quit->wait);
         quit->seq++;
         break;
-    case 1:
+    case STEP_SLIDE_QUIT_IN:
         BeaconView_StartBGSlide(view->tcbManager, 6, FALSE, &quit->wait);
         quit->seq++;
         break;
-    case 2:
+    case STEP_OPEN_QUIT_MENU:
         BeaconView_SetPrintTimeLimit(view->printQueue, TRUE);
         BeaconViewMenu_Open(view->menu, 1);
         FMissionView_SetButtonsVisible(view, FALSE);
         quit->seq++;
         break;
-    case 3: {
+    case STEP_WAIT_QUIT_MENU: {
         int button = BeaconViewMenu_Update(view->menu);
 
         if (button < 0) {
@@ -1278,26 +1319,26 @@ static void FMissionView_QuitTask(TCBEx *task, void *data) {
         quit->button = button;
         if (quit->button == 0) {
             FMissionViewSetup_RequestEvent(view, FMISSION_VIEW_EVENT_QUIT);
-            quit->seq = 4;
+            quit->seq = STEP_CHECK_QUIT_EVENT;
         } else {
-            quit->seq = 5;
+            quit->seq = STEP_WAIT_QUIT_FLASH;
         }
         break;
     }
-    case 4:
+    case STEP_CHECK_QUIT_EVENT:
         if (!view->eventDone) {
-            quit->seq = 3;
+            quit->seq = STEP_WAIT_QUIT_MENU;
         } else {
             BeaconViewMenu_Close(view->menu);
-            quit->seq = 6;
+            quit->seq = STEP_SLIDE_QUIT_OUT;
         }
         break;
-    case 5:
+    case STEP_WAIT_QUIT_FLASH:
         if (BeaconViewMenu_WaitFlash(view->menu, quit->button)) {
             quit->seq++;
         }
         break;
-    case 6:
+    case STEP_SLIDE_QUIT_OUT:
         FMissionView_SetButtonsVisible(view, TRUE);
         BeaconView_StartBGSlide(view->tcbManager, 6, TRUE, &quit->wait);
         quit->seq++;
