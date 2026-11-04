@@ -17,7 +17,7 @@ void NetState_StartScan(void);
 // Runs the state, each frame. Returns TRUE when the network is not running
 BOOL NetState_Update(void);
 void NetState_StartParent(HeapID unused);
-void NetState_StartChangeover(int a0, void (*callback)(void *work), int a2);
+void NetState_StartChangeover(int heapId, void (*callback)(void *work), int useParentMac);
 void NetState_SetChangeoverMode(int mode, int a1, const u8 *mac);
 // Command handlers
 void NetState_RecvExit(int netId, int size, const void *data, void *work, NetHandle *handle);
