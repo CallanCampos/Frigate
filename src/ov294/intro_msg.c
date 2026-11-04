@@ -183,7 +183,7 @@ static PrintWindow *IntroMsg_InitMenuPrint(IntroMsg *msg, BmpWin *window) {
     return &msg->menuPrint;
 }
 
-void IntroMsg_OpenMenu(IntroMsg *msg, const IntroMenuItem *items, u32 count, BOOL a3) {
+void IntroMsg_OpenMenu(IntroMsg *msg, const IntroMenuItem *items, u32 count, BOOL cancelable) {
     IntroMenu *menu;
     BmpWin *window;
     const IntroMenuItem *item;
@@ -231,7 +231,7 @@ void IntroMsg_OpenMenu(IntroMsg *msg, const IntroMenuItem *items, u32 count, BOO
     BmpWin_FlushMap(window);
     GFL_BGSysLoadScr(BmpWin_GetBGIndex(window));
     BmpWin_DrawFrame(window, WINFRAME_TRANSFER_VBLANK, FRAME_0_CHAR, FRAME_0_PALETTE);
-    if (a3) {
+    if (cancelable) {
         BmpMenuList_SetCancelDisabled(menu->list, 0);
     } else {
         BmpMenuList_SetCancelDisabled(menu->list, 1);

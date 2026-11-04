@@ -120,8 +120,8 @@ void IntroMcss_SetAlpha(IntroMcss *mcss, u8 index, u32 alpha) {
     MCSS_SetAlpha(mcss->sprites[index].mcss, alpha);
 }
 
-void IntroMcss_SetFlipV(IntroMcss *mcss, u8 index, BOOL a2) {
-    if (a2) {
+void IntroMcss_SetFlipV(IntroMcss *mcss, u8 index, BOOL enable) {
+    if (enable) {
         MCSS_EnableFlipV(mcss->sprites[index].mcss);
     } else {
         MCSS_DisableFlipV(mcss->sprites[index].mcss);
