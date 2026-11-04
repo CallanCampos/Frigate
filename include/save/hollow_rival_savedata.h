@@ -19,7 +19,8 @@ struct HollowRivalSave {
     u8 hasSpecies : 1;
     u8 met : 1;
     u16 species;
-    u8 unk14[4];
+    // A bit for each hollow, which the scripts count
+    u8 hollowFlags[4];
 };
 
 u8 HollowRivalSave_GetFlag(HollowRivalSave *hollowRival, u16 index);

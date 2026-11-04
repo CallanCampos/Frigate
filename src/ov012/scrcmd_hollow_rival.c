@@ -46,7 +46,7 @@ BOOL func_ov012_0216a748(VM *vm, FieldScriptEnv *env) {
     block = getHollow_RivalBlk(GameData_GetSaveControl(gameData));
     count = 0;
     for (i = 0; i < HOLLOW_COUNT; i++) {
-        if (func_0200ffd4(block, i)) {
+        if (HollowRivalSave_GetHollowFlag(block, i)) {
             count++;
         }
     }

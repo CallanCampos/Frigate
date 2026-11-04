@@ -761,6 +761,7 @@
 . 0x0200ffb4 HollowRivalSave_GetSpecies
 . 0x0200ffb8 HollowRivalSave_SetMet
 . 0x0200ffcc HollowRivalSave_IsMet
+. 0x0200ffd4 HollowRivalSave_GetHollowFlag
 . 0x0200fffc JoinAvenueSave_GetSize
 . 0x02010004 JoinAvenueSave_Init
 . 0x02010050 JoinAvenue_GetPersonList

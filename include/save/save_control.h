@@ -258,7 +258,7 @@ u16 HollowRivalSave_GetMeeting(HollowRivalSave *block);
 void HollowRivalSave_SetHasSpecies(HollowRivalSave *block, u32 value);
 void HollowRivalSave_SetSpecies(HollowRivalSave *block, u16 value);
 void HollowRivalSave_SetMet(HollowRivalSave *block, u32 value);
-BOOL func_0200ffd4(HollowRivalSave *block, int index);
+BOOL HollowRivalSave_GetHollowFlag(HollowRivalSave *block, int index);
 // The C-Gear's save block (getCGearDataBlkAddress)
 // Copies the C-Gear's record at index, 4 u16
 void Misc_AddMetTrainer(RivalDataSave *rivalData, u32 id);

@@ -71,12 +71,12 @@ BOOL HollowRivalSave_IsMet(HollowRivalSave *hollowRival) {
     return hollowRival->met;
 }
 
-BOOL func_0200ffd4(HollowRivalSave *hollowRival, int index) {
+BOOL HollowRivalSave_GetHollowFlag(HollowRivalSave *hollowRival, int index) {
     // BUG: the mask is whether the bit's number isn't 0, not the bit, so this is bit 0 of the byte for every index
     // but the first of each byte, which gives FALSE
 #ifdef BUGFIX
-    return (hollowRival->unk14[index / 8] >> (index % 8)) & 1;
+    return (hollowRival->hollowFlags[index / 8] >> (index % 8)) & 1;
 #else
-    return hollowRival->unk14[index / 8] & (index % 8 != 0);
+    return hollowRival->hollowFlags[index / 8] & (index % 8 != 0);
 #endif
 }
