@@ -40,7 +40,7 @@ BOOL NetState_IsWifiConnecting(void);
 BOOL NetState_IsWifiReady(void);
 void NetState_EndWifi(void (*callback)(void *work));
 void NetState_StartWifiLogin(void);
-void NetState_SetAutoExit(u8 a0);
+void NetState_SetAutoExit(u8 autoExit);
 void NetState_SetDisconnectError(int a0);
 BOOL NetState_SetError(u8 a0);
 void NetState_ClearError(void);
