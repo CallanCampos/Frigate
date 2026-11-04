@@ -206,17 +206,23 @@ void BPlistAnm_StartButtonAnm(BPlistWork *work, u8 button) {
     work->animActive = TRUE;
 }
 
+enum {
+    STEP_BUTTON_LIGHT,
+    STEP_BUTTON_UNLIGHT,
+    STEP_BUTTON_END,
+};
+
 void BPlistAnm_MainButtonAnm(BPlistWork *work) {
     if (!work->animActive) {
         return;
     }
 
     switch (work->animSeq) {
-    case 0:
+    case STEP_BUTTON_LIGHT:
         BPlistAnm_PutButton(work, work->animButton, 1, work->animMode);
         work->animSeq++;
         break;
-    case 1:
+    case STEP_BUTTON_UNLIGHT:
         if (work->animCount == 4) {
             BPlistAnm_PutButton(work, work->animButton, 0, work->animMode);
             work->animCount = 0;
@@ -225,10 +231,10 @@ void BPlistAnm_MainButtonAnm(BPlistWork *work) {
             work->animCount++;
         }
         break;
-    case 2:
+    case STEP_BUTTON_END:
         if (work->animCount == 1) {
             work->animCount = 0;
-            work->animSeq = 0;
+            work->animSeq = STEP_BUTTON_LIGHT;
             work->animActive = FALSE;
         } else {
             work->animCount++;
