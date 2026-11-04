@@ -1042,7 +1042,7 @@ static void DriftveilGym_ResetFreight(FieldExpObjSystem *expObj) {
 // Stores the switches that are pressed in the save, a bit each
 static void DriftveilGym_SaveSwitches(GimmickState *gimmickState, const BOOL *pressed) {
     u8 byte = 0;
-    u8 *flags = func_0200bac8(gimmickState, GIMMICK_FLAGS_ID);
+    u8 *flags = GimmickState_GetFlags(gimmickState, GIMMICK_FLAGS_ID);
     u8 i;
 
     for (i = 0; i < SWITCH_COUNT; i++) {
@@ -1059,7 +1059,7 @@ static void DriftveilGym_SaveSwitches(GimmickState *gimmickState, const BOOL *pr
 
 static void DriftveilGym_LoadSwitches(GimmickState *gimmickState, BOOL *pressed) {
     u8 byte = 0;
-    u8 *flags = func_0200bac8(gimmickState, GIMMICK_FLAGS_ID);
+    u8 *flags = GimmickState_GetFlags(gimmickState, GIMMICK_FLAGS_ID);
     u8 i;
 
     for (i = 0; i < SWITCH_COUNT; i++) {

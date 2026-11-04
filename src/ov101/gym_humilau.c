@@ -1280,7 +1280,7 @@ static u8 GymHumilauState_GetSlot(HumilauGymState *state, int slot) {
 
 // The shortcut's flag is in the gimmick's flags after its user data
 static void GymHumilau_SetShortcutUsed(GimmickState *gimmickState, BOOL used) {
-    u8 *flag = func_0200bacc(gimmickState, GIMMICK_ID);
+    u8 *flag = GimmickState_GetExtraFlags(gimmickState, GIMMICK_ID);
 
     if (used == TRUE) {
         *flag = TRUE;
@@ -1290,7 +1290,7 @@ static void GymHumilau_SetShortcutUsed(GimmickState *gimmickState, BOOL used) {
 }
 
 static BOOL GymHumilau_IsShortcutUsed(GimmickState *gimmickState) {
-    u8 *flag = func_0200bacc(gimmickState, GIMMICK_ID);
+    u8 *flag = GimmickState_GetExtraFlags(gimmickState, GIMMICK_ID);
 
     if (*flag == TRUE) {
         return TRUE;

@@ -13,8 +13,9 @@ struct GimmickState {
     s32 id;
     // The gimmick's own data
     u32 work[GIMMICK_WORK_MAX];
-    u8 unk84[0x5];
-    u8 unk89[0xb];
+    // Flags the gimmick keeps besides its data (GimmickState_GetFlags, GimmickState_GetExtraFlags)
+    u8 flags[0x5];
+    u8 extraFlags[0xb];
 }; // size: 0x94
 
 u32 GimmickSave_GetBlockSize(void);
@@ -25,8 +26,8 @@ void *GimmickState_SetID(GimmickState *gimmick, u32 gimmickId);
 // The gimmick's own data. The ID is not checked
 void *GimmickState_GetUserData(GimmickState *gimmick, u32 gimmickId);
 // The two areas after the user data. The ID is not checked
-u8 *func_0200bac8(GimmickState *gimmick, u32 gimmickId);
-u8 *func_0200bacc(GimmickState *gimmick, u32 gimmickId);
+u8 *GimmickState_GetFlags(GimmickState *gimmick, u32 gimmickId);
+u8 *GimmickState_GetExtraFlags(GimmickState *gimmick, u32 gimmickId);
 u32 GimmickState_GetID(GimmickState *gimmick);
 void GimmickState_StoreSave(const GimmickState *gimmick, SaveControl *save);
 void GimmickState_LoadSave(SaveControl *save, GimmickState *gimmick);

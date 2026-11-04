@@ -452,6 +452,8 @@
 . 0x0200b934 TournamentTeam_GetField
 . 0x0200b974 TournamentTeam_SetField
 . 0x0200b9c4 TournamentTeam_SetFromParty
+. 0x0200bac8 GimmickState_GetFlags
+. 0x0200bacc GimmickState_GetExtraFlags
 . 0x0200bb00 BattleRec_AllocVideo
 . 0x0200bb24 BattleRec_Init
 . 0x0200bb5c BattleRec_FreeVideo
