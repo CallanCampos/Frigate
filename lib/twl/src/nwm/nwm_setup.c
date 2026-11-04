@@ -1,5 +1,6 @@
 // TwlSDK's NWM, the DSi's wireless manager, ARM9 side, its setup: NWM_Init sets the library up with the system area
-// that the game gives it. ARM code in the DSi-only LTD autoload; the file's name is ours
+// that the game gives it. ARM code in the DSi-only LTD autoload; the file's name is ours. NWMi_InitCore has the name of
+// the TwlSDK symbol that Black 1's decompilation (aletheia) recovered from nwm_init.o at the same address
 
 #include "types.h"
 #include "nitro/mi.h"
@@ -10,9 +11,9 @@
 #include "nwm_private.h"
 #include "twl/nwm.h"
 
-static NWMRetCode func_02702468(NWMSys *sys, u32 size, u32 dmaNo);
+static NWMRetCode NWMi_InitCore(NWMSys *sys, u32 size, u32 dmaNo);
 
-// The zero initializer gives the flag a second literal for its address, as the original has: func_02702468 reads and
+// The zero initializer gives the flag a second literal for its address, as the original has: NWMi_InitCore reads and
 // stores it through one literal and passes DC_StoreRange its address through another
 u8 NWMi_SetUpDone = FALSE;
 
@@ -20,10 +21,10 @@ NWMRetCode NWM_Init(void *sysBuf, u32 bufSize, u8 dmaNo) {
     if (!NWMi_CheckEnableFlag()) {
         return NWM_RETCODE_NWM_DISABLE;
     }
-    return func_02702468(sysBuf, bufSize, dmaNo);
+    return NWMi_InitCore(sysBuf, bufSize, dmaNo);
 }
 
-static NWMRetCode func_02702468(NWMSys *sys, u32 size, u32 dmaNo) {
+static NWMRetCode NWMi_InitCore(NWMSys *sys, u32 size, u32 dmaNo) {
     OSIntrMode irq;
     int i;
 

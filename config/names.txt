@@ -5894,6 +5894,7 @@ ltd_autoload_0 0x0270234c CAMERA_GetBytesAtOnceCore
 ltd_autoload_0 0x02702364 CAMERA_SizeToWidthCore
 ltd_autoload_0 0x027023cc CAMERA_SizeToHeightCore
 ltd_autoload_0 0x02702434 NWM_Init
+ltd_autoload_0 0x02702468 NWMi_InitCore
 ltd_autoload_0 0x02702698 NWMi_CheckInitialized
 ltd_autoload_0 0x027026b4 NWMi_CheckEnableFlag
 ltd_autoload_0 0x027026dc NWMi_GetSystemWork
