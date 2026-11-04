@@ -303,15 +303,20 @@ void PMSIVCategory_StartDisableBG(PMSIVCategory *wk) {
     PMSIVTool_SetupScrollWork(&wk->scroll, 1, PMSIV_TOOL_SCROLL_Y, 0, 6);
 }
 
+enum {
+    STEP_SCROLL,
+    STEP_BRIGHT,
+};
+
 BOOL PMSIVCategory_WaitDisableBG(PMSIVCategory *wk) {
     switch (wk->seq) {
-    case 0:
+    case STEP_SCROLL:
         if (PMSIVTool_WaitScroll(&wk->scroll)) {
             PMSIVTool_SetupBrightWork(&wk->blend, GX_BLEND_PLANEMASK_BG1, 0, -10, 16);
             wk->seq++;
         }
         break;
-    case 1:
+    case STEP_BRIGHT:
         return PMSIVTool_WaitBright(&wk->blend);
     }
     return FALSE;
