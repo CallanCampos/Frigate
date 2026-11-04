@@ -14,8 +14,8 @@ typedef struct {
 } WbtDownloadData; // size: 0x1214
 
 // The size of the block of 0xc8 bytes and its initial state
-u32 func_020103f4(void);
-void func_020103f8(void *block);
+u32 ExtraBlock20_GetSize(void);
+void ExtraBlock20_Clear(void *block);
 // The size of a downloaded tournament and its initial state
 u32 WbtDownloadData_GetSize(void);
 void WbtDownloadData_Clear(void *block);

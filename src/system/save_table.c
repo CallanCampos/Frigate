@@ -194,7 +194,7 @@ static const SaveBlockDef sExtraTournament2[] = {
 };
 
 static const SaveBlockDef sExtraBlock20[] = {
-    { 0, func_020103f4, func_020103f8 },
+    { 0, ExtraBlock20_GetSize, ExtraBlock20_Clear },
 };
 
 const SaveDataParams save_block_data = {

@@ -795,6 +795,8 @@
 . 0x020103e8 KeyDataSave_GetMoney
 . 0x020103ec KeyDataSave_SetMoney
 . 0x020103f0 KeyDataSave_GetKeyInfo
+. 0x020103f4 ExtraBlock20_GetSize
+. 0x020103f8 ExtraBlock20_Clear
 . 0x0201040c WbtDownloadData_GetSize
 . 0x02010414 WbtDownloadData_Clear
 . 0x02010428 WbtDownloadData_IsCRCValid

@@ -7,12 +7,12 @@
 // the Pokémon World Tournament, with the check of its checksum. The ROM has no string for the file, so the name is
 // descriptive.
 
-u32 func_020103f4(void) {
+u32 ExtraBlock20_GetSize(void) {
     return 0xc8;
 }
 
-void func_020103f8(void *block) {
-    MI_CpuFill8(block, 0, func_020103f4());
+void ExtraBlock20_Clear(void *block) {
+    MI_CpuFill8(block, 0, ExtraBlock20_GetSize());
 }
 
 u32 WbtDownloadData_GetSize(void) {
