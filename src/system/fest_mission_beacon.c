@@ -274,7 +274,7 @@ BOOL FestMission_IsBeaconInvalid(LinkFestival *festival, const GameBeacon *beaco
         return TRUE;
     }
     FetchFestMissionCfgGimmickID(festival, info->index, header);
-    if (header->unk01 == 3 && !info->unk0_30) {
+    if (header->version == 3 && !info->unk0_30) {
         return TRUE;
     }
     if (FestMission_CheckFuncs[header->kind](info)) {

@@ -489,12 +489,12 @@ static BOOL LinkFestival_HasRecord(LinkFestival *festival, FestMissionConfig *co
 }
 
 static void FestMissionRecord_Set(FestMissionRecord *record, const FestMissionConfig *config) {
-    record->mission.unk4 = config->seed;
+    record->mission.seed = config->seed;
     record->mission.unk0 = config->unk00[0];
 }
 
 static BOOL FestMissionRecord_Matches(const FestMissionRecord *record, const FestMissionConfig *config) {
-    if (record->mission.unk4 != config->seed || record->mission.unk0 != config->unk00[0]) {
+    if (record->mission.seed != config->seed || record->mission.unk0 != config->unk00[0]) {
         return FALSE;
     }
     return TRUE;

@@ -19,7 +19,9 @@ struct FestivalText {
 typedef struct {
     // The kind of the mission's target, an index into data_ov027_021711c0
     u8 kind;
-    u8 unk01;
+    // Where the mission is available: 0 in both versions, 1 in White 2 alone and 2 in Black 2 alone, and 4 to 7
+    // once a download that isOneShotDRObtained checks (as this minus 2) is received
+    u8 version;
     // An event flag that is set when the mission is cleared for the first time, or 0
     u16 clearFlag;
 } FestMissionHeader;
@@ -34,19 +36,20 @@ enum {
 
 // A mission's entry in file 1
 typedef struct {
-    u8 unk00;
+    // FestMissionInfo's fields of the same names
+    u8 endsAtTarget;
     u8 unk01;
     u8 extraSecondsIndex;
     u8 unk03;
-    u8 unk04;
+    u8 rewardItem2Count;
     // What the mission's target counts, which picks the unit of its score (FestMissionInfo's targetKind)
     u8 targetKind;
     u8 messageId;
     u8 resultMessageId;
-    u16 unk08;
+    u16 rewardItem2;
     u16 target;
     u16 targetVariant;
-    u16 unk0E;
+    u16 rewardItem;
     u16 unlockFlag;
     u16 requiredFlag;
     u32 stagePatterns;
@@ -54,7 +57,7 @@ typedef struct {
     struct {
         u16 seconds;
         u8 count;
-        u8 unk3;
+        u8 rewardItemCount;
     } levels[4];
 } FestMissionParams;
 

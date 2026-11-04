@@ -256,7 +256,7 @@ static void FMissionLogFApp_GiveMedals(LinkFestival *festival, FMissionAppResult
             excluded = FEST_MISSION_VERSION_BLACK2;
         }
         for (i = 1; i < FEST_MISSION_COUNT; i++) {
-            u8 kind = ((FestMissionHeader *)festival->headers)[i].unk01;
+            u8 kind = ((FestMissionHeader *)festival->headers)[i].version;
 
             if (kind >= 3 || excluded == kind || i == 44) {
                 continue;

@@ -96,7 +96,7 @@ enum {
 #define MONOLITH_MISSION_RECORD_NEW 1
 #define MONOLITH_MISSION_RECORD_SEEN 2
 
-// The value of a mission's header.unk01 that makes it available in this version alone: 2 in Black 2, 1 in White 2.
+// The value of a mission's header.version that makes it available in this version alone: 2 in Black 2, 1 in White 2.
 // 0 is available in both, and 4 to 7 need a download
 #ifdef BLACK2
 #define MONOLITH_MISSION_UNLOCK_VERSION 2
@@ -1461,7 +1461,7 @@ static BOOL MonolithMission_IsAvailable(MonolithScreenParam *screen, MonolithMis
         return FALSE;
     }
     available = FALSE;
-    switch (mfw->missions[index].header.unk01) {
+    switch (mfw->missions[index].header.version) {
     case 0:
         available = TRUE;
         break;
@@ -1474,7 +1474,7 @@ static BOOL MonolithMission_IsAvailable(MonolithScreenParam *screen, MonolithMis
     case 7:
         playerInfo = GetGameDataPlayerInfo(gameData);
         available = isOneShotDRObtained(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData)),
-                                        mfw->missions[index].header.unk01 - 2, playerInfo);
+                                        mfw->missions[index].header.version - 2, playerInfo);
         break;
     }
     if (!available) {

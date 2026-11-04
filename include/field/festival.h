@@ -17,10 +17,10 @@ typedef union {
     struct {
         u32 index : 7;
     } header;
-    // A mission the player has seen: its config's unk00[0] and unk1C
+    // A mission the player has seen: its config's unk00[0] and seed
     struct {
         u32 unk0;
-        u32 unk4;
+        u32 seed;
     } mission;
     // Another player in the current mission
     struct {
