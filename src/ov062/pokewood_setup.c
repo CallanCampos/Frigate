@@ -87,8 +87,8 @@ void PokewoodSetup_FreeRecordMonitorParam(PkwdRecordMonitorParam *param) {
 }
 
 static void Pokewood_KeepMovieResults(PokewoodSystem *sys, GameData *gameData, PokewoodSave *save, u32 slot) {
-    func_02011124(save, PokewoodSystem_GetMovie(sys));
-    func_020111a8(save, slot, 0);
+    PokewoodSave_SetMovieFilmed(save, PokewoodSystem_GetMovie(sys));
+    PokewoodSave_SetSlotWatched(save, slot, 0);
     PokewoodSystem_PushLastSeries(gameData, sys, slot);
     Pokewood_CheckMedals(gameData);
     PokewoodSystem_KeepBestRecord(gameData, sys);

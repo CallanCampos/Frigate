@@ -266,7 +266,7 @@ void PokewoodSystem_RecordScore(GameData *gameData, PokewoodSystem *sys) {
 void PokewoodSystem_AddGradePoints(GameData *gameData, PokewoodSystem *sys, u32 result, u32 slot) {
     PokewoodSave *save = PokewoodSave_Get(gameData);
 
-    if (func_020111a0(save, slot) == 0) {
+    if (PokewoodSave_IsSlotWatched(save, slot) == 0) {
         PokewoodSave_AddLevelPoints(save, sAmounts[result]);
     }
 }

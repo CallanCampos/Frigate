@@ -2542,7 +2542,7 @@ static void PkwdBook_ListMovies(PkwdBookWork *wk) {
     for (i = 0; i < LIST_MOVIE_COUNT; i++) {
         if (PokewoodSave_IsMovieUnlocked(wk->param->save, i) == TRUE) {
             wk->movies[count].movie = i;
-            if (!func_02011118(wk->param->save, i)) {
+            if (!PokewoodSave_IsMovieFilmed(wk->param->save, i)) {
                 wk->movies[count].isNew = TRUE;
             }
             wk->movies[count].series = sPkwdBookSeries[i] & 3;

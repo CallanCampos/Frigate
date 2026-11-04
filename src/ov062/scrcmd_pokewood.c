@@ -379,14 +379,14 @@ static BOOL Scrcmd_Pokewood_GetSlotFlag(VM *vm, FieldScriptEnv *env) {
     u16 slot = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_020111a0(save, slot);
+    *var = PokewoodSave_IsSlotWatched(save, slot);
     return FALSE;
 }
 
 static BOOL Scrcmd_Pokewood_SetSlotFlag(VM *vm, FieldScriptEnv *env) {
     PokewoodSave *save = Pokewood_GetSave(env);
 
-    func_020111a8(save, ScriptReadAny(vm, env), 1);
+    PokewoodSave_SetSlotWatched(save, ScriptReadAny(vm, env), 1);
     return FALSE;
 }
 

@@ -85,11 +85,13 @@ enum {
 struct PokewoodSave {
     // Flag list 0, the movies that can be filmed
     u32 unlockedMovies[POKEWOOD_FLAG_WORDS];
-    u32 flags1[POKEWOOD_FLAG_WORDS];
+    // Flag list 1, the movies that have been filmed
+    u32 filmedMovies[POKEWOOD_FLAG_WORDS];
     u32 flags2[POKEWOOD_FLAG_WORDS];
     // Flag list 3, the unlocked movies that the scripts have announced
     u32 announcedMovies[POKEWOOD_FLAG_WORDS];
-    u8 slots[POKEWOOD_SLOT_COUNT];
+    // Whether the movie of each slot has been watched, cleared when a new one is filmed into it
+    u8 slotWatched[POKEWOOD_SLOT_COUNT];
     PokewoodRecord records[POKEWOOD_MOVIE_COUNT];
     // The points, 0 to 99, that give the level from 0 to 4
     s16 levelPoints;
@@ -110,19 +112,19 @@ PokewoodSave *PokewoodSave_Get(GameData *gameData);
 // Flag lists 0 to 6 of the save, with a flag for each movie
 BOOL PokewoodSave_CheckFlag(PokewoodSave *save, u32 list, u32 movie);
 void PokewoodSave_SetFlag(PokewoodSave *save, u32 list, u32 movie);
-// PokewoodSave_CheckFlag for list 0, whether a movie is unlocked, and for list 1
+// PokewoodSave_CheckFlag for list 0, whether a movie is unlocked, and for list 1, whether it has been filmed
 BOOL PokewoodSave_IsMovieUnlocked(PokewoodSave *save, u32 movie);
-BOOL func_02011118(PokewoodSave *save, u32 movie);
+BOOL PokewoodSave_IsMovieFilmed(PokewoodSave *save, u32 movie);
 // PokewoodSave_SetFlag for list 1
-void func_02011124(PokewoodSave *save, u32 movie);
+void PokewoodSave_SetMovieFilmed(PokewoodSave *save, u32 movie);
 // Keeps record as the movie's best if it scored at least as much
 void PokewoodSave_UpdateRecord(PokewoodSave *save, u32 movie, const PokewoodRecord *record);
 // Marks a movie's record as there and as seen
 void PokewoodSave_MarkRecordSeen(PokewoodSave *save, u32 movie);
 PokewoodRecord *PokewoodSave_GetRecord(PokewoodSave *save, u32 movie);
-// A byte for each of 8 slots
-u8 func_020111a0(PokewoodSave *save, u32 slot);
-void func_020111a8(PokewoodSave *save, u32 slot, u8 value);
+// Whether the movie of a slot has been watched
+u8 PokewoodSave_IsSlotWatched(PokewoodSave *save, u32 slot);
+void PokewoodSave_SetSlotWatched(PokewoodSave *save, u32 slot, u8 value);
 // The level points, 0 to 99, adding to them, and the level from 0 to 4 that points give
 s16 PokewoodSave_GetLevelPoints(PokewoodSave *save);
 void PokewoodSave_AddLevelPoints(PokewoodSave *save, int amount);

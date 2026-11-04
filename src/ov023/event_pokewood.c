@@ -463,7 +463,7 @@ static BtlSetup *EventPokewood_CreateSetup(PokewoodMovieParam *param, GameSystem
         GFL_HeapFree(file);
         Config_SetBattleScene(setup->config, 0);
         setup->unkDD_7 = 1;
-        if (setup->unkDF < POKEWOOD_MOVIE_COUNT && func_020111a0(save, param->slot) != 0) {
+        if (setup->unkDF < POKEWOOD_MOVIE_COUNT && PokewoodSave_IsSlotWatched(save, param->slot) != 0) {
             setup->unkDD_7 = 0;
         }
         break;

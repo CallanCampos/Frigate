@@ -712,7 +712,7 @@ static void PkwdSelectScreen_ShowNewMarks(PkwdSelectScreenWork *wk, u32 page) {
     for (i = 0; i < PAGE_SIZE; i++) {
         s32 screen = i + page * PAGE_SIZE;
 
-        if (!func_020111a0(wk->param->save, screen)) {
+        if (!PokewoodSave_IsSlotWatched(wk->param->save, screen)) {
             ClActor_SetVisible(wk->newMarks[i], wk->sorted[screen]->loaded);
         } else {
             ClActor_SetVisible(wk->newMarks[i], FALSE);
@@ -835,7 +835,7 @@ static void PkwdSelectScreen_LoadMovies(PkwdSelectScreenWork *wk, PkwdSelectScre
             wk->movies[i].rank = Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_ENDING, 0);
             wk->movies[i].date = Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_DATE, 0);
             wk->movies[i].time = Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_TIME, 0);
-            wk->movies[i].watched = func_020111a0(param->save, i);
+            wk->movies[i].watched = PokewoodSave_IsSlotWatched(param->save, i);
             for (j = 0; j < CAST_COUNT; j++) {
                 Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_PKM_0 + j, (u32)pkm);
                 wk->movies[i].cast[j] = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
