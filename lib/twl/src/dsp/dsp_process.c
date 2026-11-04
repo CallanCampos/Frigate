@@ -386,7 +386,7 @@ BOOL DSP_ExecuteProcess(DSPProcessContext *context, FSFile *image, int banksB, i
     }
     DSP_InitPipe();
     OS_SetIrqFunction(OS_IE_DSP, DSPi_MasterInterrupts);
-    DSP_SetProcessHook(context, 0x48000, func_027070dc, NULL);
+    DSP_SetProcessHook(context, 0x48000, DSP_HookPipeNotification, NULL);
     OS_EnableIrqMask(OS_IE_DSP);
     if (DSP_MapAndLoadProcessImage(context, image, banksB, banksC)) {
         OSIntrMode irq = OS_DisableInterrupts();

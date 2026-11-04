@@ -292,7 +292,8 @@ typedef struct DSPPipe {
     u16 flags;   // port * 2 + peer in the low byte, and the flags
 } DSPPipe;
 
-// A flag of a pipe's flags: the DSP writes to this port requests for the files (func_02706b60's thread answers them)
+// A flag of a pipe's flags: the DSP writes to this port requests for the files, which the file server thread that
+// DSPi_NotifyFileIOUpdation starts answers
 #define DSP_PIPE_FILE_FLAG 0x100
 
 // What a pipe's events call: the user data of DSP_SetPipeCallback, the port and the peer (the pipe's direction)
@@ -314,6 +315,6 @@ void DSP_ReadPipe(DSPPipe *pipe, void *dst, u16 length);
 void DSP_WritePipe(DSPPipe *pipe, const void *src, u16 length);
 // The callback of the DSP's events (DSPHookFunction): hands each change of a pipe to its port's callback, and to the
 // file server thread when the pipe has the file flag
-void func_027070dc(void *userData);
+void DSP_HookPipeNotification(void *userData);
 
 #endif // POKEBW2_TWL_DSP_H
