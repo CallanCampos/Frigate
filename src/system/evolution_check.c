@@ -27,7 +27,7 @@ static u16 EVOLVE_MOSSROCK_ZONES[] = { ZONE_PINWHEEL_FOREST_2 };
 static u16 EVOLVE_ELEC_ZONES[] = { ZONE_CHARGESTONE_CAVE_2, ZONE_CHARGESTONE_CAVE_3, ZONE_CHARGESTONE_CAVE_4 };
 static u16 EVOLVE_ELEC2_ZONES[] = { ZONE_CHARGESTONE_CAVE_2, ZONE_CHARGESTONE_CAVE_3, ZONE_CHARGESTONE_CAVE_4 };
 
-u16 CheckEvolveSpecies(PokeParty *party, PartyPkm *pkm, u32 mode, u32 a3, u8 season, u32 *method, HeapID heapId) {
+u16 CheckEvolveSpecies(PokeParty *party, PartyPkm *pkm, u32 mode, u32 param, u8 season, u32 *method, HeapID heapId) {
     Evolution *evo;
     u16 species;
     u16 item;
@@ -167,7 +167,7 @@ u16 CheckEvolveSpecies(PokeParty *party, PartyPkm *pkm, u32 mode, u32 a3, u8 sea
                 break;
             case EVO_METHOD_LEVEL_MAGNETIC_FIELD:
                 for (j = 0; j < NELEMS(EVOLVE_ELEC_ZONES); j++) {
-                    if (a3 == EVOLVE_ELEC_ZONES[j]) {
+                    if (param == EVOLVE_ELEC_ZONES[j]) {
                         result = evo[i].species;
                         break;
                     }
@@ -175,7 +175,7 @@ u16 CheckEvolveSpecies(PokeParty *party, PartyPkm *pkm, u32 mode, u32 a3, u8 sea
                 break;
             case EVO_METHOD_LEVEL_MOSS_ROCK:
                 for (j = 0; j < NELEMS(EVOLVE_MOSSROCK_ZONES); j++) {
-                    if (a3 == EVOLVE_MOSSROCK_ZONES[j]) {
+                    if (param == EVOLVE_MOSSROCK_ZONES[j]) {
                         result = evo[i].species;
                         break;
                     }
@@ -183,7 +183,7 @@ u16 CheckEvolveSpecies(PokeParty *party, PartyPkm *pkm, u32 mode, u32 a3, u8 sea
                 break;
             case EVO_METHOD_LEVEL_ICE_ROCK:
                 for (j = 0; j < NELEMS(EVOLVE_ICEROCK_ZONES); j++) {
-                    if (a3 == EVOLVE_ICEROCK_ZONES[j]) {
+                    if (param == EVOLVE_ICEROCK_ZONES[j]) {
                         result = evo[i].species;
                         break;
                     }
@@ -191,7 +191,7 @@ u16 CheckEvolveSpecies(PokeParty *party, PartyPkm *pkm, u32 mode, u32 a3, u8 sea
                 break;
             case 28:
                 for (j = 0; j < NELEMS(EVOLVE_ELEC2_ZONES); j++) {
-                    if (a3 == EVOLVE_ELEC2_ZONES[j]) {
+                    if (param == EVOLVE_ELEC2_ZONES[j]) {
                         result = evo[i].species;
                         break;
                     }
@@ -217,11 +217,11 @@ u16 CheckEvolveSpecies(PokeParty *party, PartyPkm *pkm, u32 mode, u32 a3, u8 sea
                 break;
             case EVO_METHOD_TRADE_WITH_SPECIES:
                 // Karrablast and Shelmet evolve when traded for each other, unless the partner holds an Everstone
-                if (GetItemParam(PokeParty_GetParam((PartyPkm *)a3, PKM_PARAM_ITEM, NULL), ITEM_PARAM_HOLD_EFFECT,
+                if (GetItemParam(PokeParty_GetParam((PartyPkm *)param, PKM_PARAM_ITEM, NULL), ITEM_PARAM_HOLD_EFFECT,
                                  heapId) != HOLD_EFFECT_NO_EVOLVE) {
                     if ((PokeParty_GetParam(pkm, PKM_PARAM_LEGAL_SPECIES, NULL) == SPECIES_KARRABLAST &&
-                         PokeParty_GetParam((PartyPkm *)a3, PKM_PARAM_LEGAL_SPECIES, NULL) == SPECIES_SHELMET) ||
-                        (PokeParty_GetParam((PartyPkm *)a3, PKM_PARAM_LEGAL_SPECIES, NULL) == SPECIES_KARRABLAST &&
+                         PokeParty_GetParam((PartyPkm *)param, PKM_PARAM_LEGAL_SPECIES, NULL) == SPECIES_SHELMET) ||
+                        (PokeParty_GetParam((PartyPkm *)param, PKM_PARAM_LEGAL_SPECIES, NULL) == SPECIES_KARRABLAST &&
                          PokeParty_GetParam(pkm, PKM_PARAM_LEGAL_SPECIES, NULL) == SPECIES_SHELMET)) {
                         result = evo[i].species;
                     }
@@ -237,15 +237,15 @@ u16 CheckEvolveSpecies(PokeParty *party, PartyPkm *pkm, u32 mode, u32 a3, u8 sea
     case EVO_CHECK_ITEM_UNUSED:
     case EVO_CHECK_ITEM:
         for (i = 0; i < EVOLUTION_COUNT; i++) {
-            if (evo[i].method == EVO_METHOD_ITEM && a3 == evo[i].param) {
+            if (evo[i].method == EVO_METHOD_ITEM && param == evo[i].param) {
                 result = evo[i].species;
             }
             if (evo[i].method == EVO_METHOD_ITEM_MALE && PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL) == 0 &&
-                a3 == evo[i].param) {
+                param == evo[i].param) {
                 result = evo[i].species;
             }
             if (evo[i].method == EVO_METHOD_ITEM_FEMALE && PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL) == 1 &&
-                a3 == evo[i].param) {
+                param == evo[i].param) {
                 result = evo[i].species;
             }
             if (result != 0) {
