@@ -1015,8 +1015,8 @@ u8 GameData_GetMedalBoxCursorMedal(GameData *gameData) {
     return gameData->medalBoxCursorMedal;
 }
 
-void GameData_SetJoinAvenueSeason(GameData *gameData, u8 a1) {
-    gameData->joinAvenueSeason = a1;
+void GameData_SetJoinAvenueSeason(GameData *gameData, u8 season) {
+    gameData->joinAvenueSeason = season;
 }
 
 u8 GameData_GetJoinAvenueSeason(GameData *gameData) {

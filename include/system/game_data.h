@@ -177,7 +177,7 @@ WbtSystem **GameData_GetWbtSystemPtr(GameData *gameData);
 WbtSave *GameData_GetWbtSave(GameData *gameData);
 // The save's play time
 PlayTime *GameData_GetPlayTime(GameData *gameData);
-void GameData_SetJoinAvenueSeason(GameData *gameData, u8 a1);
+void GameData_SetJoinAvenueSeason(GameData *gameData, u8 season);
 ResortWork *GameData_GetResortWork(GameData *gameData);
 u32 GetScrPluginNo(GameData *gameData);
 void SetScrPluginNo(GameData *gameData, u32 pluginNo);
