@@ -36,7 +36,7 @@ UnionColosseum *Colosseum_Create(GameData *gameData, GameSystem *gsys, const Pla
     }
     for (i = 0; i < COLOSSEUM_MEMBER_MAX; i++) {
         colosseum->unkCC[i] = 0xff;
-        colosseum->unkD0[i] = 0xff;
+        colosseum->voteReply[i] = 0xff;
     }
     colosseum->unkDC = 0xff;
     colosseum->unkDD = 0xff;
@@ -108,7 +108,7 @@ BOOL Colosseum_Vote(UnionColosseum *colosseum, u32 netId, u8 value) {
             accepted = TRUE;
         }
     }
-    colosseum->unkD0[netId] = accepted;
+    colosseum->voteReply[netId] = accepted;
     return accepted;
 }
 
@@ -117,10 +117,10 @@ void Colosseum_SendVoteReplies(UnionColosseum *colosseum) {
 
     if (GFL_NetIsParent()) {
         for (i = 0; i < COLOSSEUM_MEMBER_MAX; i++) {
-            u8 value = colosseum->unkD0[i];
+            u8 value = colosseum->voteReply[i];
 
-            if (value != 0xff && Colosseum_SendUnk5(colosseum, i, value) == TRUE) {
-                colosseum->unkD0[i] = 0xff;
+            if (value != 0xff && Colosseum_SendVoteReply(colosseum, i, value) == TRUE) {
+                colosseum->voteReply[i] = 0xff;
             }
         }
     }
@@ -133,21 +133,21 @@ void Colosseum_UpdateReadySync(UnionColosseum *colosseum) {
     if (GFL_NetIsParent()) {
         count = 0;
         for (i = 0; i < COLOSSEUM_MEMBER_MAX; i++) {
-            if (colosseum->unkD4[i] == 1) {
+            if (colosseum->readyReceived[i] == 1) {
                 count++;
             }
         }
         if (count == GFL_NetGetNegotiatedCount()) {
-            if (Colosseum_SendUnkB() == TRUE) {
+            if (Colosseum_SendAllReady() == TRUE) {
                 for (i = 0; i < COLOSSEUM_MEMBER_MAX; i++) {
-                    colosseum->unkD4[i] = 0;
-                    colosseum->unkD8[i] = 0;
+                    colosseum->readyReceived[i] = 0;
+                    colosseum->cancelReceived[i] = 0;
                 }
             }
         } else {
             for (i = 0; i < COLOSSEUM_MEMBER_MAX; i++) {
-                if (colosseum->unkD8[i] == 1 && Colosseum_SendUnkA(i) == TRUE) {
-                    colosseum->unkD8[i] = 0;
+                if (colosseum->cancelReceived[i] == 1 && Colosseum_SendCancelAck(i) == TRUE) {
+                    colosseum->cancelReceived[i] = 0;
                 }
             }
         }

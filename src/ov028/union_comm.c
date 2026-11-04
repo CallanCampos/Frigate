@@ -164,7 +164,7 @@ void UnionComm_OnNetReady(void *work) {
 BOOL UnionComm_Exit(u32 *seq, void *param, void *work) {
     UnionSystem *unisys = work;
 
-    unisys->unk3634 = TRUE;
+    unisys->exiting = TRUE;
     if (unisys->commState < 3) {
         return FALSE;
     }
@@ -366,15 +366,15 @@ static void UnionComm_UpdateColosseum(UnionSystem *unisys) {
     if (UnionMain_IsFieldReady(unisys) == TRUE) {
         if (!UnionCommand_IsActive(unisys)) {
             CommPlayer_Update(unisys->param->gsys, unisys->colosseum_sys->commPlayer);
-            if (unisys->colosseum_sys->unk17F == 0) {
-                if (CommPlayer_GetMyStatus(unisys->colosseum_sys->commPlayer,
-                                           (CommPlayerStatus *)unisys->colosseum_sys->unk04) == TRUE) {
-                    unisys->colosseum_sys->unk17F = 1;
+            if (unisys->colosseum_sys->statusChanged == 0) {
+                if (CommPlayer_GetMyStatus(unisys->colosseum_sys->commPlayer, &unisys->colosseum_sys->myStatus) ==
+                    TRUE) {
+                    unisys->colosseum_sys->statusChanged = 1;
                 }
             }
-            if (unisys->colosseum_sys->unk17F == 1) {
-                if (Colosseum_SendChoice((ColosseumChoice *)unisys->colosseum_sys->unk04) == TRUE) {
-                    unisys->colosseum_sys->unk17F = 0;
+            if (unisys->colosseum_sys->statusChanged == 1) {
+                if (Colosseum_SendChoice((ColosseumChoice *)&unisys->colosseum_sys->myStatus) == TRUE) {
+                    unisys->colosseum_sys->statusChanged = 0;
                 }
             }
         }
@@ -499,7 +499,7 @@ static void UnionComm_BuildBeacon(UnionSystem *unisys, UnionBeacon *beacon) {
     beacon->country = UnityTowerVisitor_GetCountry(unisys->param->playerInfo);
     beacon->province = UnityTowerVisitor_GetProvince(unisys->param->playerInfo);
     beacon->memberList = self->mycomm.memberList;
-    WifiList_CreateExchangeToken(GameData_GetWifiList(GSYS_GetGameData(unisys->param->gsys)), &beacon->unk50);
+    WifiList_CreateExchangeToken(GameData_GetWifiList(GSYS_GetGameData(unisys->param->gsys)), &beacon->friendToken);
     if (unisys->alloc.uniapp != NULL) {
         beacon->entryClosed = UnionApp_IsEntryClosed(unisys->alloc.uniapp);
     } else {

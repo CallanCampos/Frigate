@@ -63,7 +63,7 @@ typedef struct {
         UnionMemberList memberList;
     };
     // The friend data token of the player, for the Union Room
-    DWCFriendData unk50;
+    DWCFriendData friendToken;
     u32 trainerId;
     u8 unk60[4];
 } UnionBeacon;
@@ -271,7 +271,8 @@ struct UnionSystem {
     u8 updateDisabled;
     u32 unk362C;
     u32 unk3630;
-    u32 unk3634;
+    // Set once UnionComm_Exit starts
+    u32 exiting;
 };
 
 // Allocates the system for the boot parameters

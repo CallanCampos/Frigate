@@ -136,7 +136,7 @@ u32 UnionMain_GetAtCounter(UnionSystem *unisys) {
 }
 
 u32 UnionMain_GetExiting(UnionSystem *unisys) {
-    return unisys->unk3634;
+    return unisys->exiting;
 }
 
 void UnionMain_SetWantedKind(UnionSystem *unisys, u8 value) {

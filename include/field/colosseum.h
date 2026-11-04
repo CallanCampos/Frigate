@@ -30,7 +30,8 @@ typedef struct {
 
 struct UnionColosseum {
     CommPlayerSys *commPlayer; // from CommPlayer_Init
-    u8 unk04[0x14];
+    // The player's own position, from CommPlayer_GetMyStatus, which union_comm.c sends when it changed
+    CommPlayerStatus myStatus;
     ColosseumMember members[COLOSSEUM_MEMBER_MAX];
     u8 unkC8_0 : 1;
     u8 unkC8_1 : 1;
@@ -39,9 +40,11 @@ struct UnionColosseum {
     u8 unkCA;
     u8 unkCB;
     u8 unkCC[4];
-    u8 unkD0[4];
-    u8 unkD4[4];
-    u8 unkD8[4];
+    // The parent's answers to each player's vote, 0xff once sent
+    u8 voteReply[4];
+    // The players whose ready the parent received, and those who took it back, whom it still has to answer
+    u8 readyReceived[4];
+    u8 cancelReceived[4];
     u8 unkDC;
     u8 unkDD;
     u8 unkDE;
@@ -60,7 +63,8 @@ struct UnionColosseum {
     u8 unk176[2];
     CommEntryMenu *entryMenu; // the menu that gathers the players for a multi battle
     u8 unk17C[3];
-    u8 unk17F;
+    // Set while myStatus waits to be sent
+    u8 statusChanged;
 };
 
 // Registers the colosseum's net commands, with the UnionSystem as their work
@@ -93,9 +97,9 @@ void Colosseum_BuildBattlePlayers(UnionColosseum *colosseum, GameSystem *gsys, C
 void Colosseum_ClearPlayers(ColosseumPlayers *players);
 
 // What colosseum_comm.c and colosseum.c use of each other
-BOOL Colosseum_SendUnk5(UnionColosseum *colosseum, u32 netId, u32 value);
-BOOL Colosseum_SendUnkA(u32 netId);
-BOOL Colosseum_SendUnkB(void);
+BOOL Colosseum_SendVoteReply(UnionColosseum *colosseum, u32 netId, u32 value);
+BOOL Colosseum_SendCancelAck(u32 netId);
+BOOL Colosseum_SendAllReady(void);
 u8 Colosseum_GetUnkDC(const UnionColosseum *colosseum);
 void Colosseum_SetUnkDD(UnionColosseum *colosseum, u32 value);
 BOOL Colosseum_Vote(UnionColosseum *colosseum, u32 netId, u8 value);
