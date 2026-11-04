@@ -31,12 +31,13 @@ typedef struct {
     // The type the Type Expert Tournament picks the Trainer for, where TYPE_NULL is any
     u8 expertType;
     u8 rank : 3;
-    u8 unk8_3 : 5;
+    u8 iv : 5;
     u8 unk9;
     // The music of the battle against the Trainer and of winning it
     u16 bgm;
     u16 winBgm;
-    u16 unkE;
+    // Nonzero when the Trainer has a special Pokémon
+    u16 specialPokemon;
 } WbtTrainer;
 
 typedef struct {
@@ -56,7 +57,8 @@ typedef struct {
     u8 downloadedRound : 2;
     u16 objCode;
     u16 trainerClass : 12;
-    u16 unk6_12 : 4;
+    // The battle's AI: bits 0 to 2 are AI flags 0 to 2, and bit 3 is AI flag 7
+    u16 aiBits : 4;
     StrBuf *name;
     StrBuf *className;
 } WbtEntrant;
@@ -83,18 +85,20 @@ typedef struct {
 
 // A tournament downloaded to the save
 typedef struct {
-    u8 unk0;
-    u8 unk1;
-    u8 unk2;
-    u8 unk3;
-    u16 unk4;
-    u8 unk6;
-    u8 unk7;
-    u8 unk8[0x52];
-    u8 unk5A[0x4c];
+    // The tournament's regulation, which WbtSystem_GetRegulation copies
+    u8 minCount;
+    u8 maxCount;
+    u8 level;
+    u8 levelMode;
+    u16 maxLevelTotal;
+    u8 allowSameSpecies;
+    u8 allowSameItem;
+    u8 bannedSpecies[0x52];
+    u8 bannedItems[0x4c];
     u8 unkA6;
     u8 battleType;
-    u8 unkA8;
+    // Set for a World Championships tournament, which has their music and its own battle background
+    u8 isWcs;
     u8 unkA9;
     u16 unkAA;
 } WbtDownloadedTournament;
@@ -104,7 +108,8 @@ typedef struct {
     u16 species;
     u16 nickname[11];
     u16 item;
-    u8 unk1A_0 : 1;
+    // Whether PML_GenPID makes the Pokémon shiny
+    u8 shiny : 1;
     u8 unk1A_1 : 7;
     // The ability, by its number
     u8 ability;
@@ -139,7 +144,8 @@ typedef struct {
     u8 classIndex;
     u8 messageSets[6];
     u8 unk3DB;
-    u16 unk3DC;
+    // WbtEntrant's aiBits
+    u16 aiBits;
     u8 unk3DE[2];
 } WbtDownloadedTrainer;
 
@@ -196,9 +202,9 @@ struct WbtSystem {
     u8 picks[4];
     WbtPartyList *partyList;
     u8 unk13D0[4];
-    // The texts that the battle shows after winning and after losing
-    StrBuf *unk13D4;
-    StrBuf *unk13D8;
+    // The opponent's lines when it loses and when it wins, which the battle shows
+    StrBuf *trainerLoseMsg;
+    StrBuf *trainerWinMsg;
     // One for each round. Tournaments 1 and 10 award their total as Battle Points
     u8 roundRemaining[3];
     u8 unk13DF;
@@ -213,9 +219,10 @@ typedef struct {
     // Which of the save's 29 counts the tournament's wins go to. The Type Expert Tournament, tournament 2, counts
     // each of the 17 types in 0 to 16 instead
     u8 record;
-    u8 unk3;
+    u8 category;
     u8 kind;
-    u8 unk5;
+    // Which of the arcs of Trainers the tournament takes its Trainers from
+    u8 trainerArc;
     // The Battle Points for winning, by battle style
     u8 battlePoints[4];
 } WbtTournamentInfo;
@@ -345,9 +352,10 @@ typedef struct {
 typedef struct {
     GameSystem *gsys;
     u32 unk4;
-    u32 unk8;
-    u16 *unkC;
-    u16 *unk10;
+    u32 mode;
+    // The script variables that get whether the player answered yes, and the slot picked from 1, or 0
+    u16 *yesVar;
+    u16 *slotVar;
 } WbtOv326Param2;
 
 // wbt_setup.c
@@ -356,7 +364,7 @@ void WbtSetup_Free(WbtSetup *setup);
 void WbtSetup_Load(GameSystem *gsys, WbtSystem *sys, WbtSetup *setup);
 WbtOv326Param *WbtSetup_CreateWinRecordParam(HeapID heapId, GameSystem *gsys, u16 *var);
 void WbtSetup_FreeWinRecordParam(WbtOv326Param *param);
-WbtOv326Param2 *WbtSetup_CreateDownloadParam(HeapID heapId, GameSystem *gsys, u32 a2, u16 *var1, u16 *var2);
+WbtOv326Param2 *WbtSetup_CreateDownloadParam(HeapID heapId, GameSystem *gsys, u32 mode, u16 *yesVar, u16 *slotVar);
 void WbtSetup_FreeDownloadParam(WbtOv326Param2 *param);
 
 // wbt_party.c

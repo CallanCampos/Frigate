@@ -29,8 +29,8 @@ void WbtStadiumGimmick_LoadPortraitScene(Field *field, u8 position, u8 side);
 // Plays the intro of actor 5
 void WbtStadiumGimmick_PlayIntro(Field *field);
 // Switches between the lights of actors 7 to 10
-void WbtStadiumGimmick_SwitchLights(Field *field, u8 a1, u8 a2);
+void WbtStadiumGimmick_SwitchLights(Field *field, u8 which, u8 pair);
 // Plays the animations of actors 11 to 14
-void WbtStadiumGimmick_PlayCrowd(Field *field, u8 a1);
+void WbtStadiumGimmick_PlayCrowd(Field *field, u8 which);
 
 #endif // POKEBW2_FIELD_WBT_STADIUM_GIMMICK_H

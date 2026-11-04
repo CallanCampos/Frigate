@@ -19,7 +19,7 @@ typedef struct {
     u32 unk4;
 } WbtBattleStyle;
 
-static const u16 sUnk5Messages[] = { 248, 251, 254 };
+static const u16 sTrainerArcs[] = { 248, 251, 254 };
 static const u8 sUnk74fe[] = {
     2, 50, 24, 17, 52, 74, 57, 15, 3, 49, 25, 18, 46, 65, 62, 14, 27, 28, 70, 71, 4, 5, 35, 36, 51, 64, 66, 67, 48, 87,
 };
@@ -276,14 +276,14 @@ u32 WbtTournament_GetKind(u32 tournament) {
 BOOL WbtTournament_IsInCategory(u32 tournament, u32 value) {
     const WbtTournamentInfo *info = GetPWTTournamentInfo(tournament);
 
-    if (info->unk3 == value) {
+    if (info->category == value) {
         return TRUE;
     }
     return FALSE;
 }
 
 u16 WbtTournament_GetTrainerArc(u32 tournament) {
-    return sUnk5Messages[GetPWTTournamentInfo(tournament)->unk5];
+    return sTrainerArcs[GetPWTTournamentInfo(tournament)->trainerArc];
 }
 
 u32 WbtTournament_GetBattlePoints(u32 tournament, int style) {

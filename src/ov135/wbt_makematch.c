@@ -108,7 +108,7 @@ static void WbtMakeMatch_PickBracket(GameData *gameData, WbtMatchParam *param, W
 static void WbtMakeMatch_ShuffleEntrants(MATHRandContext32 *rand, WbtEntrant **items, u32 count);
 static void WbtMakeMatch_PlaceEntrants(WbtEntrant *entrants, u64 seed, HeapID heapId);
 static void WbtEntrant_Set(WbtEntrant *entrant, u32 kind, u32 trainerId, u8 gender, u8 rank, u8 iv, u8 downloadedRound,
-                           BOOL hasSpecialPokemon, u8 type, u16 objCode, u16 trainerClass, u8 unk6_12);
+                           BOOL hasSpecialPokemon, u8 type, u16 objCode, u16 trainerClass, u8 aiBits);
 static void WbtEntrant_SetFromTable(WbtSystem *sys, HeapID heapId, WbtEntrant *entrant, u32 index);
 static void WbtEntrant_SetPlayer(WbtEntrant *entrant, WbtSystem *sys, GameData *gameData);
 static void WbtEntrant_SetDownloaded(WbtEntrant *entrant, const WbtDownloadedTrainer *trainer, u32 downloadedRound,
@@ -532,7 +532,7 @@ static void WbtMakeMatch_PlaceEntrants(WbtEntrant *entrants, u64 seed, HeapID he
 }
 
 static void WbtEntrant_Set(WbtEntrant *entrant, u32 kind, u32 trainerId, u8 gender, u8 rank, u8 iv, u8 downloadedRound,
-                           BOOL hasSpecialPokemon, u8 type, u16 objCode, u16 trainerClass, u8 unk6_12) {
+                           BOOL hasSpecialPokemon, u8 type, u16 objCode, u16 trainerClass, u8 aiBits) {
     entrant->kind = kind;
     entrant->trainerId = trainerId;
     entrant->gender = gender;
@@ -543,7 +543,7 @@ static void WbtEntrant_Set(WbtEntrant *entrant, u32 kind, u32 trainerId, u8 gend
     entrant->type = type;
     entrant->objCode = objCode;
     entrant->trainerClass = trainerClass;
-    entrant->unk6_12 = unk6_12;
+    entrant->aiBits = aiBits;
 }
 
 // A Trainer of the table
@@ -551,8 +551,8 @@ static void WbtEntrant_SetFromTable(WbtSystem *sys, HeapID heapId, WbtEntrant *e
     WbtTrainer trainer;
 
     WbtTrainers_Get(sys->trainers, index, &trainer);
-    WbtEntrant_Set(entrant, WBT_ENTRANT_KIND_TABLE, index, trainer.gender, trainer.rank, trainer.unk8_3, 0,
-                   trainer.unkE != 0, trainer.type, trainer.objCode, trainer.trainerClass, 15);
+    WbtEntrant_Set(entrant, WBT_ENTRANT_KIND_TABLE, index, trainer.gender, trainer.rank, trainer.iv, 0,
+                   trainer.specialPokemon != 0, trainer.type, trainer.objCode, trainer.trainerClass, 15);
     WbtTool_LoadTrainerName(heapId, index, entrant->name);
 }
 
@@ -583,7 +583,7 @@ static void WbtEntrant_SetDownloaded(WbtEntrant *entrant, const WbtDownloadedTra
     u32 objCode = BtlInst_GetTrainerClassObjCode(trainerClass);
 
     WbtEntrant_Set(entrant, WBT_ENTRANT_KIND_DOWNLOADED, 0, TrainerClass_GetSex(trainerClass), rank, 0, downloadedRound,
-                   FALSE, TYPE_NULL, objCode, trainerClass, trainer->unk3DC);
+                   FALSE, TYPE_NULL, objCode, trainerClass, trainer->aiBits);
     GFL_StrBufLoadFixedString(entrant->name, trainer->name, 14);
     GFL_StrBufLoadFixedString(entrant->className, trainer->className, 22);
 }
@@ -595,7 +595,7 @@ static void WbtEntrant_SetTableForDownloaded(WbtEntrant *entrant, WbtSystem *sys
     WbtTrainer table;
 
     WbtTrainers_Get(sys->trainers, index, &table);
-    WbtEntrant_Set(entrant, WBT_ENTRANT_KIND_DOWNLOADED_TABLE, index, table.gender, table.rank, table.unk8_3,
+    WbtEntrant_Set(entrant, WBT_ENTRANT_KIND_DOWNLOADED_TABLE, index, table.gender, table.rank, table.iv,
                    downloadedRound, FALSE, table.type, table.objCode, table.trainerClass, 15);
     WbtTool_LoadTrainerName(sys->heapId, index, entrant->name);
 }

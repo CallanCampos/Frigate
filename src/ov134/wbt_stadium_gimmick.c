@@ -267,26 +267,26 @@ void WbtStadiumGimmick_PlayIntro(Field *field) {
     work->introPlaying = TRUE;
 }
 
-void WbtStadiumGimmick_SwitchLights(Field *field, u8 a1, u8 a2) {
+void WbtStadiumGimmick_SwitchLights(Field *field, u8 which, u8 pair) {
     GimmickWork *work = Field_GetGimmickWorkBlock(field, 1);
     u16 hidden;
     u16 shown;
 
-    if (a2 == 0) {
-        hidden = a1 == 0 ? 7 : 9;
-        shown = a1 == 0 ? 9 : 7;
+    if (pair == 0) {
+        hidden = which == 0 ? 7 : 9;
+        shown = which == 0 ? 9 : 7;
     } else {
-        hidden = a1 == 0 ? 8 : 10;
-        shown = a1 == 0 ? 10 : 8;
+        hidden = which == 0 ? 8 : 10;
+        shown = which == 0 ? 10 : 8;
     }
     FieldExpObj_SetActorHidden(work->expObj, 0, shown, FALSE);
     FieldExpObj_SetActorHidden(work->expObj, 0, hidden, TRUE);
 }
 
-void WbtStadiumGimmick_PlayCrowd(Field *field, u8 a1) {
+void WbtStadiumGimmick_PlayCrowd(Field *field, u8 which) {
     GimmickWork *work = Field_GetGimmickWorkBlock(field, 1);
 
-    switch (a1) {
+    switch (which) {
     case 0:
         WbtStadiumGimmick_StartAnmsActor11(work);
         break;

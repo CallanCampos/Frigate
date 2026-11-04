@@ -29,6 +29,6 @@ u32 WbtBattle_GetOpponentFlag(WbtSystem *sys);
 u16 WbtBattle_GetOpponentObjCode(WbtSystem *sys);
 // The opponent's name
 void WbtBattle_GetOpponentName(WbtSystem *sys, StrBuf *strbuf);
-void WbtBattle_LoadOpponentLine(WbtSystem *sys, int a1, StrBuf *strbuf);
+void WbtBattle_LoadOpponentLine(WbtSystem *sys, int index, StrBuf *strbuf);
 
 #endif // POKEBW2_FIELD_WBT_BATTLE_H

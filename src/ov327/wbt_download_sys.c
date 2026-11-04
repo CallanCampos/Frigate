@@ -298,7 +298,7 @@ static void *WbtDownload_SetupTournaments(HeapID heapId, WbtDownloadWork *wk, u3
 
     tournaments->gsys = wk->param->gsys;
     tournaments->unk4 = (u32)wk->buffer;
-    tournaments->unk8 = 1;
+    tournaments->mode = 1;
     return tournaments;
 }
 

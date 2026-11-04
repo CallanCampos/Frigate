@@ -14218,7 +14218,7 @@ overlays/ov055 0x021e7374 sSecondMatches
 overlays/ov055 0x021e7394 sFirstOpponents
 overlays/ov055 0x021e73b4 sThirdMatches
 overlays/ov055 0x021e73d4 sTypeChart
-overlays/ov055 0x021e74f8 sUnk5Messages
+overlays/ov055 0x021e74f8 sTrainerArcs
 overlays/ov055 0x021e74fe sUnk74fe
 overlays/ov055 0x021e751c sBattleStyles
 overlays/ov055 0x021e753c sScoreUnk

@@ -214,7 +214,7 @@ static void TDownload_InitWork(TDownloadWork *wk) {
     int i;
 
     wk->seq = 0;
-    wk->mode = wk->param->unk8;
+    wk->mode = wk->param->mode;
     wk->flags = 0;
     wk->objFlags = 0;
     wk->bgScroll = 0;
@@ -275,21 +275,21 @@ static void TDownload_ExitWork(TDownloadWork *wk) {
     int i;
 
     if (wk->objFlags & T_DOWNLOAD_OBJ_FLAG_YES) {
-        if (wk->param->unkC != NULL) {
-            *wk->param->unkC = TRUE;
+        if (wk->param->yesVar != NULL) {
+            *wk->param->yesVar = TRUE;
         }
     } else {
-        if (wk->param->unkC != NULL) {
-            *wk->param->unkC = FALSE;
+        if (wk->param->yesVar != NULL) {
+            *wk->param->yesVar = FALSE;
         }
     }
     if (wk->flags & T_DOWNLOAD_FLAG_SELECTED) {
-        if (wk->param->unk10 != NULL) {
-            *wk->param->unk10 = wk->slotPos + 1;
+        if (wk->param->slotVar != NULL) {
+            *wk->param->slotVar = wk->slotPos + 1;
         }
     } else {
-        if (wk->param->unk10 != NULL) {
-            *wk->param->unk10 = 0;
+        if (wk->param->slotVar != NULL) {
+            *wk->param->slotVar = 0;
         }
     }
     TDownloadUtil_FreeList(wk);

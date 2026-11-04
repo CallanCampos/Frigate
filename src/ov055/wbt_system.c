@@ -175,7 +175,7 @@ static void WbtEntrant_Init(WbtEntrant *entrant, HeapID heapId) {
     entrant->downloadedRound = 0;
     entrant->objCode = 0xe7;
     entrant->trainerClass = 0;
-    entrant->unk6_12 = 1;
+    entrant->aiBits = 1;
     entrant->name = GFL_StrBufCreate(16, heapId);
     entrant->className = GFL_StrBufCreate(0x16, heapId);
 }
@@ -288,18 +288,18 @@ Regulation *WbtSystem_GetRegulation(WbtSystem *sys) {
         int i;
 
         MI_CpuFill8(&sys->regulation, 0, sizeof(sys->regulation));
-        sys->regulation.minCount = downloaded->unk0;
-        sys->regulation.maxCount = downloaded->unk1;
-        sys->regulation.level = downloaded->unk2;
-        sys->regulation.levelMode = downloaded->unk3;
-        sys->regulation.maxLevelTotal = downloaded->unk4;
-        sys->regulation.allowSameSpecies = downloaded->unk6;
-        sys->regulation.allowSameItem = downloaded->unk7;
+        sys->regulation.minCount = downloaded->minCount;
+        sys->regulation.maxCount = downloaded->maxCount;
+        sys->regulation.level = downloaded->level;
+        sys->regulation.levelMode = downloaded->levelMode;
+        sys->regulation.maxLevelTotal = downloaded->maxLevelTotal;
+        sys->regulation.allowSameSpecies = downloaded->allowSameSpecies;
+        sys->regulation.allowSameItem = downloaded->allowSameItem;
         for (i = 0; i < 0x52; i++) {
-            sys->regulation.bannedSpecies[i] = downloaded->unk8[i];
+            sys->regulation.bannedSpecies[i] = downloaded->bannedSpecies[i];
         }
         for (i = 0; i < 0x4c; i++) {
-            sys->regulation.bannedItems[i] = downloaded->unk5A[i];
+            sys->regulation.bannedItems[i] = downloaded->bannedItems[i];
         }
         sys->regulation.battleType = downloaded->battleType;
     } else {

@@ -147,14 +147,14 @@ void WbtSetup_FreeWinRecordParam(WbtOv326Param *param) {
     GFL_HeapFree(param);
 }
 
-WbtOv326Param2 *WbtSetup_CreateDownloadParam(HeapID heapId, GameSystem *gsys, u32 a2, u16 *var1, u16 *var2) {
+WbtOv326Param2 *WbtSetup_CreateDownloadParam(HeapID heapId, GameSystem *gsys, u32 mode, u16 *yesVar, u16 *slotVar) {
     GameData *gameData = GSYS_GetGameData(gsys);
     WbtOv326Param2 *param = GFL_HeapAllocate(heapId, sizeof(WbtOv326Param2), TRUE, "wbt_setup.c", 390);
 
     param->gsys = gsys;
-    param->unk8 = a2;
-    param->unkC = var1;
-    param->unk10 = var2;
+    param->mode = mode;
+    param->yesVar = yesVar;
+    param->slotVar = slotVar;
     return param;
 }
 

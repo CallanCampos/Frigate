@@ -128,7 +128,7 @@ sSecondMatches kind:data(any) addr:0x021e7374
 sFirstOpponents kind:data(any) addr:0x021e7394
 sThirdMatches kind:data(any) addr:0x021e73b4
 sTypeChart kind:data(any) addr:0x021e73d4
-sUnk5Messages kind:data(any) addr:0x021e74f8
+sTrainerArcs kind:data(any) addr:0x021e74f8
 sUnk74fe kind:data(any) addr:0x021e74fe
 sBattleStyles kind:data(any) addr:0x021e751c
 data_ov055_021e751e kind:data(any) addr:0x021e751e
