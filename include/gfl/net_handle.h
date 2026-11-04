@@ -73,9 +73,9 @@ void NetHandle_RecvTimingFromMachine(int netId, int size, const void *data, void
 void NetHandle_RecvTimingFromServer(int netId, int size, const void *data, void *work, NetHandle *handle);
 // Sends a timing number to synchronize on, which NetHandle_IsTimingRecv and NetHandle_IsTimingPairRecv check for
 void NetHandle_SendTiming(NetHandle *handle, u16 timing);
-void NetHandle_SendTimingPair(NetHandle *handle, u32 a1, u32 a2);
+void NetHandle_SendTimingPair(NetHandle *handle, u32 timingLow, u32 timingHigh);
 BOOL NetHandle_IsTimingRecv(NetHandle *handle, u16 timing);
-BOOL NetHandle_IsTimingPairRecv(NetHandle *handle, u32 a1, u32 a2);
+BOOL NetHandle_IsTimingPairRecv(NetHandle *handle, u32 timingLow, u32 timingHigh);
 void NetHandle_Update(void);
 void NetHandle_RecvNegotiation(int netId, int size, u8 *data, void *work, NetHandle *handle);
 void NetHandle_RecvNegotiationReply(int netId, int size, NetNegotiation *negotiation, void *work, NetHandle *handle);
@@ -83,7 +83,7 @@ void NetHandle_RecvForget(int netId, int size, u8 *data);
 // Forgets a machine, as when it disconnects
 void NetHandle_Forget(int netID);
 void NetHandle_RecvData(int netID, int size, const void *data, void *work, NetHandle *handle);
-void NetHandle_SendTimingPairToMachines(NetHandle *handle, int a1, int a2, int a3);
+void NetHandle_SendTimingPairToMachines(NetHandle *handle, int timingLow, int timingHigh, int netIds);
 void NetHandle_SetNegotiationCommandBase(NetHandle *handle, int value);
 
 #endif // POKEBW2_GFL_NET_HANDLE_H
