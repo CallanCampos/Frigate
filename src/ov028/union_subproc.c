@@ -192,35 +192,47 @@ static BOOL UnionCommand_TrainerCard(GameSystem *gsys, UnionSystem *unisys, Fiel
     return FALSE;
 }
 
+enum {
+    STEP_FADE_OUT,
+    STEP_CLOSE_FIELD,
+    STEP_START_TRADE,
+    STEP_WAIT_TRADE,
+    STEP_START_EVOLVE,
+    STEP_WAIT_EVOLVE,
+    STEP_OPEN_FIELD,
+    STEP_FADE_IN,
+    STEP_END,
+};
+
 static BOOL UnionCommand_Trade(GameSystem *gsys, UnionSystem *unisys, Field *field, void *arg, GameEvent *event,
                                GameEvent **next, u8 *step) {
     PokemonTradeParam *trade = arg;
     EvolutionDemoParam *evolution;
 
     switch (*step) {
-    case 0:
+    case STEP_FADE_OUT:
         *next = CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0);
         (*step)++;
         break;
-    case 1:
+    case STEP_CLOSE_FIELD:
         *next = CreateFieldCloseEvent(gsys, field);
         (*step)++;
         break;
-    case 2:
+    case STEP_START_TRADE:
         GSYS_QueueProc(gsys, OVERLAY_POKEMONTRADE, &POKEMONTRADE_UNION_PROC_FUNCTIONS, trade);
         (*step)++;
         break;
-    case 3:
+    case STEP_WAIT_TRADE:
         if (GSYS_GetProcMgrState(gsys) != 0) {
             break;
         }
         if (trade->next == TRADE_NEXT_EVOLVE) {
-            *step = 4;
+            *step = STEP_START_EVOLVE;
         } else {
-            *step = 6;
+            *step = STEP_OPEN_FIELD;
         }
         break;
-    case 4:
+    case STEP_START_EVOLVE:
         evolution = trade->evolution;
         evolution->gameData = trade->gameData;
         evolution->party = trade->party;
@@ -233,24 +245,24 @@ static BOOL UnionCommand_Trade(GameSystem *gsys, UnionSystem *unisys, Field *fie
         GSYS_QueueProc(gsys, OVERLAY_EVOLUTION_DEMO, &EVOLUTION_DEMO_PROC_FUNCTIONS, evolution);
         (*step)++;
         break;
-    case 5:
+    case STEP_WAIT_EVOLVE:
         if (GSYS_GetProcMgrState(gsys) != 0) {
             break;
         }
         if (GFL_NetErrCheck()) {
-            *step = 6;
+            *step = STEP_OPEN_FIELD;
         } else {
             trade->next = TRADE_NEXT_EVOLVE;
-            *step = 2;
+            *step = STEP_START_TRADE;
         }
         break;
-    case 6:
+    case STEP_OPEN_FIELD:
         *next = EventFieldOpen_CreateHeadless(gsys);
-        *step = 7;
+        *step = STEP_FADE_IN;
         break;
-    case 7:
+    case STEP_FADE_IN:
         *next = CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0);
-        *step = 8;
+        *step = STEP_END;
         break;
     default:
         return TRUE;
