@@ -1,7 +1,9 @@
 // NitroWiFi's WCM, its backend for the DSi's wireless (mode 2), in the LTD autoload's .ltdmain: the steps that
 // wcm_system.c's calls take through TwlSDK's NWM where the DS's take them through WM, and NWM's callbacks, which move
 // WCM's state machine and notify WCM's user. It mirrors wcm_wmif.c, the WM backend, step for step. The ROM names none
-// of it: the file's name is descriptive, and the functions keep their default names.
+// of it: the file's name is descriptive (TwlSDK's libwcm calls the object nwmif.o), and the functions have the names of
+// the TwlWiFi symbols that Black 1's decompilation (aletheia) recovered from that object, in the same order.
+// WCMi_NwmifSetDCFData and its callbacks keep the DCF of the WM backend's names, though NWM sends a frame.
 #include "nitrowifi/wcm_dsi.h"
 #include "nitro/math.h"
 #include "nitro/mi.h"
@@ -13,16 +15,16 @@
 // The index of the command 8's connection, from the access point's capability bits
 static u8 sConnectIndex;
 
-static void func_02769e60(void);
-static void func_0276a0ac(void *arg);
-static void func_0276a3d4(void *arg);
-static void func_0276a6b4(void *arg);
-static void func_0276a8dc(void *arg);
-static void func_0276a9e4(void *arg);
-static void func_0276ab40(void *arg);
-static void func_0276ac94(const u8 *bssid, const u8 *essid, u32 option);
-static void func_0276adcc(void *arg);
-static void func_0276ae24(void *arg);
+static void WcmNwmReset(void);
+static void WcmNwmcbCommon(void *arg);
+static void WcmNwmcbScanEx(void *arg);
+static void WcmNwmcbConnect(void *arg);
+static void WcmNwmcbDisconnect(void *arg);
+static void WcmNwmcbSetRecvFrmBuf(void *arg);
+static void WcmNwmcbUnsetRecvFrmBuf(void *arg);
+static void WcmEditScanExParam(const u8 *bssid, const u8 *essid, u32 option);
+static void WcmNwmcbSetDCFData(void *arg);
+static void WcmNwmcbSetDCFDataAsync(void *arg);
 
 // clang-format off
 // TwlSDK's section for the DSi-only code that the LTD autoload's .ltdmain holds
@@ -31,7 +33,7 @@ static void func_0276ae24(void *arg);
 #pragma section LTDMAIN begin
 
 // The startup's first step: sets NWM up in the work and loads the device
-s32 func_02769930(void) {
+s32 WCMi_NwmifStartupAsync(void) {
     WCMWork *work = WCMi_GetSystemWork();
 
     switch (NWM_Init(work->nwmSystemBuffer, 0x3000, work->dmaNo)) {
@@ -48,7 +50,7 @@ s32 func_02769930(void) {
         return 7;
     }
     work->nwmConnectionFailureReason = 0;
-    switch (NWM_LoadDevice(func_0276a0ac)) {
+    switch (NWM_LoadDevice(WcmNwmcbCommon)) {
     case 2:
         WCMi_SetPhase(2);
         work->pendingNotify = 1;
@@ -64,10 +66,10 @@ s32 func_02769930(void) {
     return 3;
 }
 
-s32 func_02769a30(void) {
+s32 WCMi_NwmifCleanupAsync(void) {
     WCMWork *work = WCMi_GetSystemWork();
 
-    switch (NWM_Close(func_0276a0ac)) {
+    switch (NWM_Close(WcmNwmcbCommon)) {
     case 2:
         WCMi_SetPhase(4);
         work->pendingNotify = 2;
@@ -82,25 +84,25 @@ s32 func_02769a30(void) {
     return 3;
 }
 
-s32 func_02769aa4(const u8 *bssid, const u8 *essid, u32 option) {
+s32 WCMi_NwmifBeginSearchAsync(const u8 *bssid, const u8 *essid, u32 option) {
     WCMWork *work = WCMi_GetSystemWork();
 
     switch (work->state) {
     case 5:
-        func_0276ac94(bssid, essid, option);
+        WcmEditScanExParam(bssid, essid, option);
         return 2;
     case 6:
-        func_0276ac94(bssid, essid, option);
+        WcmEditScanExParam(bssid, essid, option);
         return 0;
     case 3:
         break;
     default:
         return 1;
     }
-    func_0276ac94(bssid, essid, option);
+    WcmEditScanExParam(bssid, essid, option);
     DC_InvalidateRange(work->nwmScanRequest.scanBuf, work->nwmScanRequest.scanBufSize);
     work->nwmScanCount++;
-    switch (NWM_StartScanEx(func_0276a3d4, &work->nwmScanRequest)) {
+    switch (NWM_StartScanEx(WcmNwmcbScanEx, &work->nwmScanRequest)) {
     case 2:
         WCMi_SetPhase(5);
         work->pendingNotify = 3;
@@ -115,7 +117,7 @@ s32 func_02769aa4(const u8 *bssid, const u8 *essid, u32 option) {
     return 3;
 }
 
-s32 func_02769b80(void) {
+s32 WCMi_NwmifConnectAsync(void) {
     NWMWpaParam pmk;
     WCMWork *work = WCMi_GetSystemWork();
     s32 result;
@@ -130,7 +132,7 @@ s32 func_02769b80(void) {
         if ((work->searchOption & WCM_OPTION_AUTH_SHAREDKEY) == WCM_OPTION_AUTH_SHAREDKEY) {
             authMode = 1;
         }
-        result = NWM_SetWEPKey(func_0276a0ac, work->connectionStorage.mode, work->connectionStorage.argument,
+        result = NWM_SetWEPKey(WcmNwmcbCommon, work->connectionStorage.mode, work->connectionStorage.argument,
                                work->connectionStorage.data, authMode);
         break;
     }
@@ -140,7 +142,7 @@ s32 func_02769b80(void) {
     case 7:
         MI_CpuCopy8(work->connectionStorage.data, pmk.psk, sizeof(pmk.psk));
         pmk.auth = work->connectionStorage.mode;
-        result = NWM_SetWPAPSK(func_0276a0ac, &pmk);
+        result = NWM_SetWPAPSK(WcmNwmcbCommon, &pmk);
         break;
     }
     switch (result) {
@@ -158,10 +160,10 @@ s32 func_02769b80(void) {
     return 3;
 }
 
-s32 func_02769c70(void) {
+s32 WCMi_NwmifDisconnectAsync(void) {
     WCMWork *work = WCMi_GetSystemWork();
 
-    switch (NWM_UnsetReceivingFrameBuffer(func_0276ab40, 0)) {
+    switch (NWM_UnsetReceivingFrameBuffer(WcmNwmcbUnsetRecvFrmBuf, 0)) {
     case 2:
         WCMi_SetPhase(10);
         work->pendingNotify = 6;
@@ -177,7 +179,7 @@ s32 func_02769c70(void) {
 }
 
 // Brings NWM back down from the state it is in, one command at a time
-s32 func_02769ce8(void) {
+s32 WCMi_NwmifTerminateAsync(void) {
     WCMWork *work = WCMi_GetSystemWork();
     s32 result;
 
@@ -191,13 +193,13 @@ s32 func_02769ce8(void) {
         }
         break;
     case 2:
-        result = NWM_UnloadDevice(func_0276a0ac);
+        result = NWM_UnloadDevice(WcmNwmcbCommon);
         break;
     case 3:
-        result = NWM_Close(func_0276a0ac);
+        result = NWM_Close(WcmNwmcbCommon);
         break;
     case 4:
-        result = NWM_Disconnect(func_0276a8dc);
+        result = NWM_Disconnect(WcmNwmcbDisconnect);
         break;
     default:
         work->resetPending = 1;
@@ -219,15 +221,15 @@ s32 func_02769ce8(void) {
     return 3;
 }
 
-s32 func_02769dc4(const u8 *dst, const void *buffer, u16 byteLength, void (*completion)(s32 result)) {
+s32 WCMi_NwmifSetDCFData(const u8 *dst, const void *buffer, u16 byteLength, void (*completion)(s32 result)) {
     WCMCpsifWork *global = WCMi_GetCpsifWork();
     NWMCallbackFunc callback;
 
     if (completion == NULL) {
-        callback = func_0276adcc;
+        callback = WcmNwmcbSetDCFData;
     } else {
         global->sendCompletion = completion;
-        callback = func_0276ae24;
+        callback = WcmNwmcbSetDCFDataAsync;
     }
     switch (NWM_SendFrame(callback, dst, buffer, byteLength)) {
     case 2:
@@ -252,13 +254,13 @@ s32 func_02769dc4(const u8 *dst, const void *buffer, u16 byteLength, void (*comp
 }
 
 // The channels that the DSi's wireless allows, from bit 0 for channel 1
-s32 func_02769e54(void) {
-    return (u16)(func_02702980() >> 1);
+s32 WCMi_NwmifGetAllowedChannel(void) {
+    return (u16)(NWM_GetAllowedChannel() >> 1);
 }
 
 // What wcm_wmif.c's reset request and its completion do, at once, since NWM has no reset command: ends the operation of
 // the state WCM is in
-static void func_02769e60(void) {
+static void WcmNwmReset(void) {
     WCMWork *work = WCMi_GetSystemWork();
 
     if (work->resetPending == 0) {
@@ -294,7 +296,7 @@ static void func_02769e60(void) {
             WCMi_Notify(0, &work->connectBss, 0, 0x2ba);
             break;
         case 13:
-            switch (NWM_Close(func_0276a0ac)) {
+            switch (NWM_Close(WcmNwmcbCommon)) {
             case 2:
                 break;
             case 6:
@@ -318,7 +320,7 @@ static void func_02769e60(void) {
 
 // The callback of NWM's device and connection commands, which takes the startup, the cleanup and the connection on
 // to their next command
-static void func_0276a0ac(void *arg) {
+static void WcmNwmcbCommon(void *arg) {
     const NWMCallback *event = arg;
     s32 result = 13;
     WCMWork *work = WCMi_GetSystemWork();
@@ -327,7 +329,7 @@ static void func_0276a0ac(void *arg) {
     case 0:
         switch (event->apiid) {
         case 3:
-            result = NWM_Open(func_0276a0ac);
+            result = NWM_Open(WcmNwmcbCommon);
             break;
         case 4:
             result = NWM_End();
@@ -353,17 +355,18 @@ static void func_0276a0ac(void *arg) {
             WCMi_Notify(0, NULL, 0, 0x316);
             return;
         case 6:
-            result = NWM_UnloadDevice(func_0276a0ac);
+            result = NWM_UnloadDevice(WcmNwmcbCommon);
             break;
         case 13:
         case 18:
-            result = NWM_SetPowerSaveMode(func_0276a0ac,
+            result = NWM_SetPowerSaveMode(WcmNwmcbCommon,
                                           (work->searchOption & WCM_OPTION_POWER_ACTIVE) == WCM_OPTION_POWER_ACTIVE
                                               ? NWM_POWERMODE_ACTIVE
                                               : NWM_POWERMODE_STANDARD);
             break;
         case 14:
-            result = NWM_SetReceivingFrameBuffer(func_0276a9e4, work->ioBuffer.nwm, sizeof(work->ioBuffer.nwm), 0);
+            result =
+                NWM_SetReceivingFrameBuffer(WcmNwmcbSetRecvFrmBuf, work->ioBuffer.nwm, sizeof(work->ioBuffer.nwm), 0);
             break;
         }
         switch (result) {
@@ -398,7 +401,7 @@ static void func_0276a0ac(void *arg) {
 }
 
 // The scan's callback: reports the access points found and scans the next channel, until the search stops
-static void func_0276a3d4(void *arg) {
+static void WcmNwmcbScanEx(void *arg) {
     const NWMStartScanCallback *event = arg;
     s32 result = 13;
     WCMWork *work = WCMi_GetSystemWork();
@@ -434,7 +437,7 @@ static void func_0276a3d4(void *arg) {
                 (u16)((1 << WCMi_GetNextScanChannel((u16)(32 - MATH_CountLeadingZerosFunc(event->channelList)))) >> 1);
             DC_StoreRange(work->nwmScanRequest.scanBuf, work->nwmScanRequest.scanBufSize);
             work->nwmScanCount++;
-            result = NWM_StartScanEx(func_0276a3d4, &work->nwmScanRequest);
+            result = NWM_StartScanEx(WcmNwmcbScanEx, &work->nwmScanRequest);
             break;
         case 7:
             result = 2;
@@ -442,7 +445,7 @@ static void func_0276a3d4(void *arg) {
             WCMi_Notify(0, NULL, 0, 0x3d7);
             break;
         case 13:
-            func_02769e60();
+            WcmNwmReset();
             return;
         }
         switch (result) {
@@ -460,7 +463,7 @@ static void func_0276a3d4(void *arg) {
         }
         break;
     case 1:
-        func_02769e60();
+        WcmNwmReset();
         break;
     case 3:
     case 4:
@@ -472,7 +475,7 @@ static void func_0276a3d4(void *arg) {
 }
 
 // The callback of the command 8: the connection made, or why it failed
-static void func_0276a6b4(void *arg) {
+static void WcmNwmcbConnect(void *arg) {
     const NWMConnectCallback *event = arg;
     WCMWork *work = WCMi_GetSystemWork();
     u16 nwmState = NWM_GetState();
@@ -482,7 +485,7 @@ static void func_0276a6b4(void *arg) {
         if (nwmState == 4) {
             if (work->state == 12) {
                 WCMi_SetPhase(8);
-                func_02769e60();
+                WcmNwmReset();
                 return;
             }
             work->nwmAssociationId = event->aid;
@@ -526,14 +529,14 @@ static void func_0276a6b4(void *arg) {
                     break;
                 }
             case 12:
-                func_02769e60();
+                WcmNwmReset();
                 break;
             }
             break;
         case 3:
             if (work->state == 8) {
                 work->nwmAssociationId = 0;
-                func_02769e60();
+                WcmNwmReset();
             }
             break;
         default:
@@ -544,7 +547,7 @@ static void func_0276a6b4(void *arg) {
         break;
     case 5:
         WCMi_SetPhase(8);
-        func_02769e60();
+        WcmNwmReset();
         break;
     case 3:
     case 4:
@@ -556,7 +559,7 @@ static void func_0276a6b4(void *arg) {
 }
 
 // The disconnection's callback
-static void func_0276a8dc(void *arg) {
+static void WcmNwmcbDisconnect(void *arg) {
     const NWMCallback *event = arg;
     WCMWork *work = WCMi_GetSystemWork();
 
@@ -564,9 +567,9 @@ static void func_0276a8dc(void *arg) {
     case 0:
         if (work->state == 12) {
             WCMi_SetPhase(10);
-            func_02769e60();
+            WcmNwmReset();
         } else if (work->state == 13) {
-            func_02769e60();
+            WcmNwmReset();
         } else {
             work->nwmAssociationId = 0;
             WCMi_SetPhase(3);
@@ -576,7 +579,7 @@ static void func_0276a8dc(void *arg) {
     case 1:
     case 3:
         WCMi_SetPhase(10);
-        func_02769e60();
+        WcmNwmReset();
         break;
     case 4:
     default:
@@ -587,7 +590,7 @@ static void func_0276a8dc(void *arg) {
 }
 
 // The callback of the receive buffer: once it is set, connects to the access point; then hands WCM each frame received
-static void func_0276a9e4(void *arg) {
+static void WcmNwmcbSetRecvFrmBuf(void *arg) {
     const NWMReceivingFrameCallback *event = arg;
     WCMWork *work = WCMi_GetSystemWork();
 
@@ -595,7 +598,7 @@ static void func_0276a9e4(void *arg) {
     case 0:
         if (work->state == 12) {
             WCMi_SetPhase(8);
-            func_02769e60();
+            WcmNwmReset();
             return;
         }
         if (work->connectBss.capaInfo & 2) {
@@ -603,7 +606,7 @@ static void func_0276a9e4(void *arg) {
         } else {
             sConnectIndex = 0;
         }
-        switch (NWM_Connect(func_0276a6b4, sConnectIndex, (const NWMBssDesc *)&work->connectBss)) {
+        switch (NWM_Connect(WcmNwmcbConnect, sConnectIndex, (const NWMBssDesc *)&work->connectBss)) {
         case 2:
             break;
         case 6:
@@ -636,7 +639,7 @@ static void func_0276a9e4(void *arg) {
 }
 
 // The callback of the command 0xc, which readies the disconnection: disconnects
-static void func_0276ab40(void *arg) {
+static void WcmNwmcbUnsetRecvFrmBuf(void *arg) {
     const NWMCallback *event = arg;
     WCMWork *work = WCMi_GetSystemWork();
 
@@ -644,9 +647,9 @@ static void func_0276ab40(void *arg) {
     case 0:
         if (work->state == 12) {
             WCMi_SetPhase(10);
-            func_02769e60();
+            WcmNwmReset();
         } else {
-            switch (NWM_Disconnect(func_0276a8dc)) {
+            switch (NWM_Disconnect(WcmNwmcbDisconnect)) {
             case 2:
                 WCMi_SetPhase(10);
                 work->pendingNotify = 6;
@@ -657,7 +660,7 @@ static void func_0276ab40(void *arg) {
                 break;
             case 3:
                 WCMi_SetPhase(10);
-                func_02769e60();
+                WcmNwmReset();
                 break;
             default:
                 WCMi_SetPhase(11);
@@ -676,7 +679,7 @@ static void func_0276ab40(void *arg) {
 }
 
 // Fills in the scan request of a search
-static void func_0276ac94(const u8 *bssid, const u8 *essid, u32 option) {
+static void WcmEditScanExParam(const u8 *bssid, const u8 *essid, u32 option) {
     WCMWork *work = WCMi_GetSystemWork();
     u16 channelTime;
 
@@ -715,7 +718,7 @@ static void func_0276ac94(const u8 *bssid, const u8 *essid, u32 option) {
 }
 
 // The callback of a frame sent while the sender waits for it
-static void func_0276adcc(void *arg) {
+static void WcmNwmcbSetDCFData(void *arg) {
     WCMCpsifWork *global = WCMi_GetCpsifWork();
     const NWMCallback *event = arg;
 
@@ -730,7 +733,7 @@ static void func_0276adcc(void *arg) {
 }
 
 // The callback of a frame sent with a completion function, which it runs
-static void func_0276ae24(void *arg) {
+static void WcmNwmcbSetDCFDataAsync(void *arg) {
     WCMCpsifWork *global = WCMi_GetCpsifWork();
     const NWMCallback *event = arg;
     s32 status;

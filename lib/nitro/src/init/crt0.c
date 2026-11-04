@@ -5,8 +5,10 @@
 // assembly, so they are MWCC asm functions. The file name is NitroSDK's. _start, INITi_CpuClear32 and NitroStartUp
 // have NitroSDK's names, as ntrtwl's reconstruction of NitroSDK has them; AutoloadCallback and BuildInfo keep dsd's
 // names for NitroSDK's _start_AutoloadDoneCallback and _start_ModuleParams, since dsd needs them. The rest is
-// TwlSDK's split of the start-up, which the reference, older than TwlSDK, doesn't have: those functions keep swan's
-// names, or ours, or their addresses.
+// TwlSDK's split of the start-up, which the reference, older than TwlSDK, doesn't have: the INITi_ functions have the
+// names of the TwlSDK symbols that Black 1's decompilation (aletheia) recovered from crt0.HYB.TWL.o at the same
+// addresses and sizes, and the three routines that _start runs from ITCM, which have no symbols there, are named in
+// the same object's style for what they do (microcode_).
 //
 // The module parameters among the code, BuildInfo and the LTD module's, hold the addresses of the two modules'
 // autoload lists, which the build writes after each module's autoload blocks, and the modules' bounds: dsd's linker
@@ -25,18 +27,18 @@
 // The entry point, which the ROM header gives
 void _start(void);
 static void INITi_CpuClear32(u32 value, void *dest, u32 size);
-static void boot_InitTCM(void);
+static void INITi_InitCoprocessor(void);
 static void INITi_InitRegion(void);
-static void boot_BootstrapExec(void);
+static void INITi_DoAutoload(void);
 static void INITi_ShelterStaticInitializer(const u32 *functions);
 static void INITi_CallStaticInitializers(void);
 static void NitroStartUp(void);
-static BOOL asm_HWIsDSi(void);
-static void asm_MemCpy32Fast(void *dest, const void *src, u32 size);
-static void boot_MemSet32Fast(void *dest, u32 value, u32 size);
-static void WaitForHalfword(vu16 *address, u16 value);
-static void func_02004fd4(vu16 *counter, vu16 *watched);
-static BOOL func_02004ffc(BOOL enable, s32 delay);
+static BOOL INITi_IsRunOnTwl(void);
+static void INITi_Copy32(void *dest, const void *src, u32 size);
+static void INITi_Fill32(void *dest, u32 value, u32 size);
+static void microcode_WaitAgreement(vu16 *address, u16 value);
+static void microcode_ShakeHand(vu16 *counter, vu16 *watched);
+static BOOL microcode_SwitchCpuClock(BOOL enable, s32 delay);
 
 // The module parameters sit among the code, in .text
 #pragma define_section textdata ".text"                                                                                \
@@ -52,7 +54,7 @@ asm void _start(void) {
     // Disable the interrupts (REG_IME) and set up the CP15
     mov ip, #0x4000000
     str ip, [ip, #0x208]
-    bl boot_InitTCM
+    bl INITi_InitCoprocessor
     // Clear the system's shared words at the end of main memory, and mark the boot as from the card if nothing
     // else did
     mov r0, #0x0
@@ -70,7 +72,7 @@ asm void _start(void) {
     streqh r2, [r1, #0x0]
     // Wait for the ARM7, from the start of ITCM since the ARM7 may be using main memory: first for its word to
     // change, counting in the ARM9's, then for it to become 4
-    ldr r1, =func_02004fd4
+    ldr r1, =microcode_ShakeHand
     ldr r2, =0x1ff8000
     add r3, r2, #0x28
 @copy_counter:
@@ -85,7 +87,7 @@ asm void _start(void) {
     ldr r1, =0x2fffc26
     ldr r2, =0x1ff8000
     blx r2
-    ldr r1, =WaitForHalfword
+    ldr r1, =microcode_WaitAgreement
     ldr r2, =0x1ff8000
     add r3, r2, #0x1c
 @copy_wait:
@@ -98,9 +100,9 @@ asm void _start(void) {
     ldr r2, =0x1ff8000
     blx r2
     // On a DSi, set bit 0 of REG_SCFG_CLK, from ITCM too, copied from its end backward
-    bl asm_HWIsDSi
+    bl INITi_IsRunOnTwl
     bne @not_dsi
-    ldr r1, =func_02004ffc
+    ldr r1, =microcode_SwitchCpuClock
     ldr r2, =0x1ff8000
     add r2, r2, #0x1c
     mov r3, #0x34
@@ -142,18 +144,18 @@ asm void _start(void) {
     mov r1, #0x0
     ldr r0, =0x5000000
     mov r2, #0x400
-    bl boot_MemSet32Fast
+    bl INITi_Fill32
     ldr r0, =0x7000000
     mov r2, #0x400
-    bl boot_MemSet32Fast
+    bl INITi_Fill32
     // Decompress the module and do the autoloads, then clear the static .bss
-    bl boot_BootstrapExec
+    bl INITi_DoAutoload
     mov r1, #0x0
     ldr r3, =BuildInfo
     ldr r0, [r3, #0xc]
     ldr r2, [r3, #0x10]
     subs r2, r2, r0
-    blgt boot_MemSet32Fast
+    blgt INITi_Fill32
     // The IRQ handler's address, in the last word of DTCM
     ldr r1, =SDK_AUTOLOAD_DTCM_START
     add r1, r1, #0x3fc0
@@ -187,7 +189,7 @@ static asm void INITi_CpuClear32(u32 value, void *dest, u32 size) {
 
 // Cleans the data cache if it is on, and sets up the CP15: the caches and the protection unit off, ITCM at 0 and
 // DTCM at SDK_AUTOLOAD_DTCM_START (16 KB), both enabled
-static asm void boot_InitTCM(void) {
+static asm void INITi_InitCoprocessor(void) {
     mrc p15, 0, r0, c1, c0, 0
     tst r0, #0x1
     beq @set_up
@@ -237,7 +239,7 @@ static asm void INITi_InitRegion(void) {
     mcr p15, 0, r0, c6, c5, 0
     ldr r0, =0xffff001d
     mcr p15, 0, r0, c6, c6, 0
-    bl asm_HWIsDSi
+    bl INITi_IsRunOnTwl
     bne @ds
     ldr r0, =0x2000031
     mcr p15, 0, r0, c6, c1, 0
@@ -292,7 +294,7 @@ static asm void INITi_InitRegion(void) {
 // initializers} after the block's data) to its place, clearing its .bss after it and flushing the caches for it
 // unless it is in ITCM or DTCM. On a DSi whose launcher loaded the LTD module, does the same for that module's list.
 // Then calls AutoloadCallback with the two modules' parameters
-static asm void boot_BootstrapExec(void) {
+static asm void INITi_DoAutoload(void) {
     stmdb sp!, {lr}
     ldr r1, =BuildInfo
     ldr r0, [r1, #0x14]
@@ -308,7 +310,7 @@ static asm void boot_BootstrapExec(void) {
     ldr r0, [ip], #0x4
     ldr r2, [ip], #0x4
     stmdb sp!, {r0}
-    bl asm_MemCpy32Fast
+    bl INITi_Copy32
     stmdb sp!, {r0, r1}
     ldr r0, [ip], #0x4
     stmdb sp!, {ip}
@@ -317,7 +319,7 @@ static asm void boot_BootstrapExec(void) {
     ldmia sp!, {r0}
     mov r1, #0x0
     ldr r2, [ip], #0x4
-    bl boot_MemSet32Fast
+    bl INITi_Fill32
     ldmia sp!, {r1, r2}
     mov r3, #0x1000000
     cmp r2, r3
@@ -341,7 +343,7 @@ static asm void boot_BootstrapExec(void) {
     ldmia sp!, {r3}
     b @static_block
 @static_done:
-    bl asm_HWIsDSi
+    bl INITi_IsRunOnTwl
     bne @done
     ldr r1, =0x2ffe1cc
     ldr r0, [r1, #0x0]
@@ -361,7 +363,7 @@ static asm void boot_BootstrapExec(void) {
     ldr r0, [ip], #0x4
     ldr r2, [ip], #0x4
     stmdb sp!, {r0}
-    bl asm_MemCpy32Fast
+    bl INITi_Copy32
     stmdb sp!, {r0, r1}
     ldr r0, [ip], #0x4
     stmdb sp!, {ip}
@@ -370,7 +372,7 @@ static asm void boot_BootstrapExec(void) {
     ldmia sp!, {r0}
     mov r1, #0x0
     ldr r2, [ip], #0x4
-    bl boot_MemSet32Fast
+    bl INITi_Fill32
     ldmia sp!, {r1, r2}
     mov r3, #0x1000000
     cmp r2, r3
@@ -528,7 +530,7 @@ asm void OSi_ReferSymbol(void *symbol) {
 }
 
 // TRUE on a DSi in its own mode, from REG_SCFG_A9ROM
-static asm BOOL asm_HWIsDSi(void) {
+static asm BOOL INITi_IsRunOnTwl(void) {
     ldr r0, =REG_SCFG_A9ROM_ADDR
     ldrb r0, [r0, #0x0]
     and r0, r0, #0x3
@@ -539,8 +541,8 @@ static asm BOOL asm_HWIsDSi(void) {
 }
 
 // Copies size bytes (a multiple of 4) from src to dest, 32 bytes at a time while it can. Returns the end of dest in
-// r0 and of src in r1, which boot_BootstrapExec goes on from
-static asm void asm_MemCpy32Fast(void *dest, const void *src, u32 size) {
+// r0 and of src in r1, which INITi_DoAutoload goes on from
+static asm void INITi_Copy32(void *dest, const void *src, u32 size) {
     stmdb sp!, {r3, r4, r5, r6, r7, r8, r9, r10, r11}
     bics r3, r2, #0x1f
     beq @tail
@@ -565,7 +567,7 @@ static asm void asm_MemCpy32Fast(void *dest, const void *src, u32 size) {
 }
 
 // Fills size bytes (a multiple of 4) at dest with value, 32 bytes at a time while it can
-static asm void boot_MemSet32Fast(void *dest, u32 value, u32 size) {
+static asm void INITi_Fill32(void *dest, u32 value, u32 size) {
     stmdb sp!, {r3, r4, r5, r6, r7, r8, r9, r10, r11}
     mov r4, r1
     mov r5, r1
@@ -605,7 +607,7 @@ __declspec(section "textdata") void *const LtdModuleParams[6] = {
 
 // clang-format off
 // Waits until the halfword at address is value, a little while between reads. _start runs it from ITCM
-static asm void WaitForHalfword(vu16 *address, u16 value) {
+static asm void microcode_WaitAgreement(vu16 *address, u16 value) {
 @read:
     ldrh r2, [r0]
     cmp r1, r2
@@ -629,7 +631,7 @@ __declspec(section "textdata") void *const BuildInfo[9] = {
 
 // clang-format off
 // Counts in counter until the halfword at watched changes. _start runs it from ITCM
-static asm void func_02004fd4(vu16 *counter, vu16 *watched) {
+static asm void microcode_ShakeHand(vu16 *counter, vu16 *watched) {
     ldrh r2, [r1, #0x0]
     ldrh r3, [r0, #0x0]
 @count:
@@ -643,9 +645,9 @@ static asm void func_02004fd4(vu16 *counter, vu16 *watched) {
     bx lr
 }
 
-// Sets bit 0 of REG_SCFG_CLK if enable, clears it otherwise, and when that changes it waits for delay / 4 loops.
-// Returns the bit as it was. _start runs it from ITCM
-static asm BOOL func_02004ffc(BOOL enable, s32 delay) {
+// Sets bit 0 of REG_SCFG_CLK, the ARM9's clock (134 MHz when set, 67 MHz when clear), if enable, clears it otherwise,
+// and when that changes it waits for delay / 4 loops. Returns the bit as it was. _start runs it from ITCM
+static asm BOOL microcode_SwitchCpuClock(BOOL enable, s32 delay) {
     cmp r0, #0x0
     ldr r3, =REG_SCFG_CLK_ADDR
     ldrh r0, [r3, #0x0]

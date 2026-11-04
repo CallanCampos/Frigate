@@ -108,7 +108,7 @@ s32 WCM_SendDCFDataEx(const u8 *dst, const u8 *header, s32 headerLen, const u8 *
         break;
     case 2:
         if (OS_IsRunOnTwl()) {
-            func_02769dc4(dst, work, (u16)sentLen, NULL);
+            WCMi_NwmifSetDCFData(dst, work, (u16)sentLen, NULL);
         }
         break;
     default:

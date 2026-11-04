@@ -184,7 +184,7 @@ static BOOL DWCi_StartMatchingAfterSearchOwn(void);
 static void DWCi_SetSuspendRequest(int a, MatchCallback b, int c);
 static BOOL DWCi_ProcessSuspendRequest(void);
 static BOOL DWCi_SendSuspendRequest(int value);
-static BOOL func_ov011_02167f0c(void);
+static BOOL DWCi_IsServerSuspendEnabled(void);
 static void DWCi_SetMatchCnt(DWCMatchControl *match);
 static void DWCi_SetHostState(int mode);
 static u8 DWCi_GetHostState(void);
@@ -206,7 +206,7 @@ static int DWCi_GetTopologyType(void);
 static void DWCi_ClearMeshMakingTempInfo(void);
 static void DWCi_ApplyPendingSuspend(void);
 static void DWCi_FinishSuspendRequest(int cancelled);
-static int func_ov011_021686b8(void);
+static int DWCi_GetGT2NumConnection(void);
 static const char *DWCi_GetResvDenyReasonString(int code);
 static void disp_match_state(int oldState, int newState);
 
@@ -303,7 +303,7 @@ static BOOL DWCi_UpdateSuspendState(void) {
     }
     mask = DWCi_GetMatchCnt()->suspendAidBitmap;
     mask &= DWC_GetAIDBitmap();
-    if (func_ov011_02167f0c() == 0) {
+    if (DWCi_IsServerSuspendEnabled() == 0) {
         mask &= ~(1 << DWC_GetMyAID());
     }
     if ((DWC_GetAIDBitmap() ^ mask) == 0) {
@@ -2025,7 +2025,7 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
         break;
     }
     case 9: {
-        node = DWCi_GetNodeInfoByIndex(func_ov011_021686b8() - 1 - DWCi_GetMatchCnt()->clLinkProgress);
+        node = DWCi_GetNodeInfoByIndex(DWCi_GetGT2NumConnection() - 1 - DWCi_GetMatchCnt()->clLinkProgress);
         if (DWCi_GetMatchCnt()->state != 0x10 || node == NULL || node->profileId != data[0]) {
             break;
         }
@@ -2821,8 +2821,8 @@ static int DWCi_SendClientLinkRequest(void) {
 
     saved = DWCi_GetMatchCnt()->self;
     me = &saved;
-    if (DWCi_GetMatchCnt()->clLinkProgress < func_ov011_021686b8() - 1) {
-        index = (func_ov011_021686b8() - 1 - DWCi_GetMatchCnt()->clLinkProgress) & 0xff;
+    if (DWCi_GetMatchCnt()->clLinkProgress < DWCi_GetGT2NumConnection() - 1) {
+        index = (DWCi_GetGT2NumConnection() - 1 - DWCi_GetMatchCnt()->clLinkProgress) & 0xff;
         DWCi_SetMatchStatus(0x10);
         node = DWCi_GetNodeInfoByIndex(index);
         data[0] = node->profileId;
@@ -4416,7 +4416,7 @@ static BOOL DWCi_SetSuspendAndNotify(u8 index, int set, int mode) {
         DWCi_GPSetServerStatus(-1);
     }
     flags = DWCi_GetMatchCnt()->suspendAidBitmap;
-    if (func_ov011_02167f0c() == 0) {
+    if (DWCi_IsServerSuspendEnabled() == 0) {
         flags &= ~(1 << DWC_GetMyAID());
     }
     hasSet = DWCi_UpdateSuspendState();
@@ -4564,7 +4564,7 @@ static BOOL DWCi_SendSuspendRequest(int value) {
     return TRUE;
 }
 
-static BOOL func_ov011_02167f0c(void) {
+static BOOL DWCi_IsServerSuspendEnabled(void) {
     if (DWC_IsServerMyself() != 0) {
         if (DWCi_GetMatchCnt()->state == 0xd || DWCi_GetMatchCnt()->state == 0x16) {
             return TRUE;
@@ -4916,7 +4916,7 @@ BOOL DWCi_IsFullMesh(void) {
     return FALSE;
 }
 
-static int func_ov011_021686b8(void) {
+static int DWCi_GetGT2NumConnection(void) {
     return DWCi_GetNumNodeInfo();
 }
 

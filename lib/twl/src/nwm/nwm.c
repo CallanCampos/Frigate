@@ -3,10 +3,11 @@
 // before the application exits, and the sending of the commands' buffers. ARM code in the DSi-only LTD autoload. The
 // ROM names none of it; the file's name and those of the private types and data are descriptive guesses, and the
 // functions have the names of libntr's reconstruction of TwlSDK's headers (nwm.h, nwm_arm9_private.h), by the API ID
-// each command sends, where those are known, and keep their default names otherwise. NWM_Init and its flag are
-// nwm_setup.c's, and the system area and the events nwm_events.c's, whose statics are each laid out on their own. The
-// SDK has more files here (cybervisi0n/libntr's reconstruction splits this part further), whose boundaries the ROM does
-// not show
+// each command sends, where those are known, and the others those of the TwlSDK symbols that Black 1's decompilation
+// (aletheia) recovered from nwm_unloaddev.o, nwm_sendframe.o, nwm_recvframe.o, nwm_cmd.o and nwm_installfirm.o at the
+// same addresses. NWM_Init and its flag are nwm_setup.c's, and the system area and the events nwm_events.c's, whose
+// statics are each laid out on their own. The SDK has more files here (cybervisi0n/libntr's reconstruction splits this
+// part further, and those objects are the SDK's), whose boundaries the ROM does not show
 
 #include "types.h"
 #include "nitro/mi.h"
@@ -18,17 +19,17 @@
 #include "twl/nwm.h"
 #include <stdarg.h>
 
-static NWMRetCode func_02702ca0(NWMCallbackFunc callback);
-static void func_02702d68(void *event);
-static void func_02702d7c(void *arg);
-static void func_02703764(const u8 *destAddr, const u8 *srcAddr, u8 *frame, u32 size);
-static void func_027038bc(void *event);
+static NWMRetCode NWMi_ForceUnloadDevice(NWMCallbackFunc callback);
+static void NWMi_ForceUnloadDeviceCallback(void *event);
+static void NWMi_ForceExit(void *arg);
+static void NWMi_AddMACHeader(const u8 *destAddr, const u8 *srcAddr, u8 *frame, u32 size);
+static void NWMi_ReceivingFrameCallback(void *event);
 static void NWMi_SetCallbackTable(NWMApiid id, NWMCallbackFunc callback);
 static void NWMi_SetReceiveCallbackTable(NWMFramePort port, NWMCallbackFunc callback);
 static NWMRetCode NWMi_SendCommand(NWMApiid id, u16 paramNum, ...);
-static NWMRetCode func_02703b24(const void *cmd, u32 size);
-static NWMCmdBuf *func_02703b98(void);
-static BOOL func_02703c28(void);
+static NWMRetCode NWMi_SendCommandDirect(const void *cmd, u32 size);
+static NWMCmdBuf *NwmGetCommandBuffer4Arm7(void);
+static BOOL NWMi_CheckFirmDataParamIntegrity(void);
 
 // A pointer in the DSi's shared memory to a block of its settings. The library checks the 16 bytes at 0x1e0 of it:
 // a word whose upper half is the CRC-16 of the 12 bytes that follow it
@@ -63,7 +64,7 @@ NWMRetCode NWM_End(void) {
     }
     irq = OS_DisableInterrupts();
     NWMi_SystemArea->status->state = NWM_STATE_NONE;
-    func_027026ec();
+    NWMi_ClearFifoRecvFlag();
     PXI_SetFifoRecvCallback(PXI_FIFO_TAG_NWM, NULL);
     NWMi_SystemArea = NULL;
     NWMi_SetUpDone = FALSE;
@@ -83,11 +84,11 @@ NWMRetCode NWM_LoadDevice(NWMCallbackFunc callback) {
     if (NWMi_IsAPIActive(NWM_APIID_LOAD_DEVICE) == TRUE) {
         return NWM_RETCODE_ILLEGAL_STATE;
     }
-    func_02703c28();
+    NWMi_CheckFirmDataParamIntegrity();
     NWMi_SetCallbackTable(NWM_APIID_LOAD_DEVICE, callback);
-    func_02702a40();
+    NWMi_RegisterSleepCallback();
     info = &NWMi_UnloadOnExit;
-    PM_SetExitCallbackInfo(info, func_02702d7c, NULL);
+    PM_SetExitCallbackInfo(info, NWMi_ForceExit, NULL);
     PMi_InsertPostExitCallbackEx(info, NWM_PM_PRIORITY);
     result = NWMi_SendCommand(NWM_APIID_LOAD_DEVICE, 4, sys->info, sys->status, sys->event, 0);
     if (result == NWM_RETCODE_SUCCESS || result == NWM_RETCODE_OPERATING) {
@@ -116,7 +117,7 @@ NWMRetCode NWM_UnloadDevice(NWMCallbackFunc callback) {
 }
 
 // Unloads the device in any state after the initialized one
-static NWMRetCode func_02702ca0(NWMCallbackFunc callback) {
+static NWMRetCode NWMi_ForceUnloadDevice(NWMCallbackFunc callback) {
     NWMRetCode result;
 
     result = NWMi_CheckState(5, NWM_STATE_INITIALIZED, NWM_STATE_LOADED, NWM_STATE_DISCONNECTED,
@@ -136,12 +137,12 @@ static NWMRetCode func_02702ca0(NWMCallbackFunc callback) {
     return result;
 }
 
-static void func_02702d68(void *event) {
+static void NWMi_ForceUnloadDeviceCallback(void *event) {
     sUnloaded = TRUE;
 }
 
 // Runs before the application exits: waits for the ARM7 to finish what it is doing, then unloads the device
-static void func_02702d7c(void *arg) {
+static void NWMi_ForceExit(void *arg) {
     s32 timeout;
     NWMSys *sys;
 
@@ -164,7 +165,7 @@ static void func_02702d7c(void *arg) {
         return;
     }
     sUnloaded = FALSE;
-    func_02702ca0(func_02702d68);
+    NWMi_ForceUnloadDevice(NWMi_ForceUnloadDeviceCallback);
     do {
         OS_SpinWaitSysCycles(NWM_EXIT_SPIN_STEP);
         PXIi_HandlerRecvFifoNotEmpty();
@@ -266,7 +267,7 @@ NWMRetCode NWM_StartScanEx(NWMCallbackFunc callback, const NWMScanExParam *param
     cmd.ssidMatchLength = param->ssidMatchLength;
     MI_CpuCopy8(param->ssid, cmd.ssid, 32);
     MI_CpuCopy8(param->bssid, cmd.bssid, 6);
-    result = func_02703b24(&cmd, sizeof(cmd));
+    result = NWMi_SendCommandDirect(&cmd, sizeof(cmd));
     if (result == NWM_RETCODE_SUCCESS || result == NWM_RETCODE_OPERATING) {
         result = NWM_RETCODE_OPERATING;
     }
@@ -339,7 +340,7 @@ NWMRetCode NWM_Connect(NWMCallbackFunc callback, u8 nwType, const NWMBssDesc *pB
     MI_CpuCopy8(pBdesc, sBlockBuf, pBdesc->length);
     DC_StoreRange(cmd.bssDesc, 0x200);
     DC_StoreRange(&cmd, 8);
-    result = func_02703b24(&cmd, 8);
+    result = NWMi_SendCommandDirect(&cmd, 8);
     if (result == NWM_RETCODE_SUCCESS || result == NWM_RETCODE_OPERATING) {
         result = NWM_RETCODE_OPERATING;
     }
@@ -408,7 +409,7 @@ NWMRetCode NWM_SetWEPKey(NWMCallbackFunc callback, u16 wepmode, u16 wepkeyid, co
     cmd.wepmode = wepmode;
     cmd.authMode = authMode;
     MI_CpuCopy8(wepkey, cmd.wepkey, 0x50);
-    result = func_02703b24(&cmd, sizeof(cmd));
+    result = NWMi_SendCommandDirect(&cmd, sizeof(cmd));
     if (result == NWM_RETCODE_SUCCESS || result == NWM_RETCODE_OPERATING) {
         result = NWM_RETCODE_OPERATING;
     }
@@ -450,7 +451,7 @@ NWMRetCode NWM_SendFrame(NWMCallbackFunc callback, const u8 *destAddr, const u16
     }
     DC_StoreRange(sendFrame, sendFrameSize);
     // The library writes the MAC addresses into the frame that the SDK's API takes as const
-    func_02703764(destAddr, sys->status->macAddr, (u8 *)sendFrame, sendFrameSize);
+    NWMi_AddMACHeader(destAddr, sys->status->macAddr, (u8 *)sendFrame, sendFrameSize);
     DC_StoreRange(sendFrame, 14);
     result = NWMi_SendCommand(NWM_APIID_SEND_FRAME, 3, callback, sendFrame, sendFrameSize);
     // Only the result 0 leaves without restoring the interrupts, and the command never gives it
@@ -462,7 +463,7 @@ NWMRetCode NWM_SendFrame(NWMCallbackFunc callback, const u8 *destAddr, const u16
 }
 
 // Writes the two MAC addresses at the start of the frame
-static void func_02703764(const u8 *destAddr, const u8 *srcAddr, u8 *frame, u32 size) {
+static void NWMi_AddMACHeader(const u8 *destAddr, const u8 *srcAddr, u8 *frame, u32 size) {
     if (size < 14) {
         return;
     }
@@ -480,7 +481,7 @@ NWMRetCode NWM_SetReceivingFrameBuffer(NWMCallbackFunc callback, u8 *recvBuf, u1
     }
     MIi_DmaFill32(sys->dmaNo, recvBuf, 0, recvBufSize, TRUE);
     DC_StoreRange(recvBuf, recvBufSize);
-    NWMi_SetCallbackTable(NWM_APIID_SET_RECEIVING_BUF, func_027038bc);
+    NWMi_SetCallbackTable(NWM_APIID_SET_RECEIVING_BUF, NWMi_ReceivingFrameCallback);
     NWMi_SetReceiveCallbackTable(protocol, callback);
     result = NWMi_SendCommand(NWM_APIID_SET_RECEIVING_BUF, 3, recvBuf, recvBufSize, protocol);
     if (result == NWM_RETCODE_SUCCESS) {
@@ -508,7 +509,7 @@ NWMRetCode NWM_UnsetReceivingFrameBuffer(NWMCallbackFunc callback, u16 protocol)
 
 // The callback of the command that gives the ARM7 a buffer to receive in: runs the callback of the event's index
 // with the event, and when the buffer is full gives it to the ARM7 again
-static void func_027038bc(void *event) {
+static void NWMi_ReceivingFrameCallback(void *event) {
     NWMEvent *ev = event;
     NWMSys *sys = NWMi_GetSystemWork();
     BOOL ok;
@@ -563,7 +564,7 @@ NWMRetCode NWM_SetWPAPSK(NWMCallbackFunc callback, NWMWpaParam *param) {
     cmd.cmd = NWM_APIID_SET_WPA_PSK;
     cmd.auth = param->auth;
     MI_CpuCopy8(param->psk, cmd.psk, 32);
-    result = func_02703b24(&cmd, sizeof(cmd));
+    result = NWMi_SendCommandDirect(&cmd, sizeof(cmd));
     if (result == NWM_RETCODE_SUCCESS || result == NWM_RETCODE_OPERATING) {
         result = NWM_RETCODE_OPERATING;
     }
@@ -587,7 +588,7 @@ static NWMRetCode NWMi_SendCommand(NWMApiid id, u16 paramNum, ...) {
     NWMSys *sys = NWMi_GetSystemWork();
     NWMRetCode result;
 
-    buf = func_02703b98();
+    buf = NwmGetCommandBuffer4Arm7();
     if (buf == NULL) {
         return NWM_RETCODE_FIFO_ERROR;
     }
@@ -607,13 +608,13 @@ static NWMRetCode NWMi_SendCommand(NWMApiid id, u16 paramNum, ...) {
 }
 
 // Sends a command that is a struct
-static NWMRetCode func_02703b24(const void *cmd, u32 size) {
+static NWMRetCode NWMi_SendCommandDirect(const void *cmd, u32 size) {
     NWMSys *sys = NWMi_GetSystemWork();
     NWMCmdBuf *buf;
     int sent;
     NWMRetCode result;
 
-    buf = func_02703b98();
+    buf = NwmGetCommandBuffer4Arm7();
     if (buf == NULL) {
         return NWM_RETCODE_FIFO_ERROR;
     }
@@ -629,7 +630,7 @@ static NWMRetCode func_02703b24(const void *cmd, u32 size) {
 }
 
 // Takes the next command buffer that the ARM7 is done with, or NULL when the queue is empty
-static NWMCmdBuf *func_02703b98(void) {
+static NWMCmdBuf *NwmGetCommandBuffer4Arm7(void) {
     NWMCmdBuf *buf = NULL;
     NWMSys *sys = NWMi_GetSystemWork();
 
@@ -648,7 +649,7 @@ static NWMCmdBuf *func_02703b98(void) {
 }
 
 // Whether the CRC of the wireless settings is right (the result is not used)
-static BOOL func_02703c28(void) {
+static BOOL NWMi_CheckFirmDataParamIntegrity(void) {
     u8 *settings = *(u8 **)NWM_SETTINGS_PTR;
 
     return SVC_GetCRC16(0xffff, settings + 0x1e4, 12) == *(u32 *)(settings + 0x1e0) >> 16;

@@ -126,7 +126,7 @@ typedef enum DWCBmReadResult {
     DWC_BM_READ_FAILED = -1,
     DWC_BM_READ_OK,
 } DWCBmReadResult;
-DWCBmReadResult func_0205e038(void *work, int unused);
+DWCBmReadResult NCFG_ReadConfigEx(void *work, int unused);
 
 // dwc_bm_init.c, DWC_BM_Init. The same checks for the console the game runs on, then the Wi-Fi ID that the settings
 // hold is kept. The work area is 0x1000 bytes. Returns the result of the checks, or -10001 when the four pages of the

@@ -9,26 +9,26 @@ void SVC_SHA1Init(SVCSHA1Context *context) {
     if (!OSi_IsRunOnTwl()) {
         OS_Terminate();
     }
-    func_027696e8(context);
+    SVCi_SHA1InitCore(context);
 }
 
 void SVC_SHA1Update(SVCSHA1Context *context, const void *input, u32 len) {
     if (!OSi_IsRunOnTwl()) {
         OS_Terminate();
     }
-    func_027696f4(context, input, len);
+    SVCi_SHA1UpdateCore(context, input, len);
 }
 
 void SVC_SHA1GetHash(SVCSHA1Context *context, void *digest) {
     if (!OSi_IsRunOnTwl()) {
         OS_Terminate();
     }
-    func_027696f8(context, digest);
+    SVCi_SHA1GetHashCore(context, digest);
 }
 
 void SVC_CalcHMACSHA1(void *digest, const void *bin_ptr, u32 bin_len, const void *key_ptr, u32 key_len) {
     if (!OSi_IsRunOnTwl()) {
         OS_Terminate();
     }
-    func_027698b4(digest, bin_ptr, bin_len, key_ptr, key_len);
+    SVCi_CalcHMACSHA1Core(digest, bin_ptr, bin_len, key_ptr, key_len);
 }

@@ -1,12 +1,13 @@
 // TwlSDK's camera library (libcamera), the PXI and I2C API in the DSi's LTD autoload: the commands that the ARM9 sends
 // to the ARM7, which drives the cameras' I2C bus, and the interrupt, thread and PM callbacks that keep the cameras
-// running. ARM code. The ROM names none of it; the file's name is a guess, after the SDK's camera_api.h. The functions,
-// the PXI commands and results have the names of libntr's reconstruction of TwlSDK's headers (camera_api.h, fifo.h),
-// by the command each function sends; those still named by address are not known.
+// running. ARM code. The ROM names none of it; the file's name is a guess, after the SDK's camera_api.h. The public
+// functions, the PXI commands and results have the names of libntr's reconstruction of TwlSDK's headers (camera_api.h,
+// fifo.h), by the command each function sends; the others have those of the TwlSDK symbols that Black 1's
+// decompilation (aletheia) recovered from camera_api.o at the same addresses.
 //
 // Each command is a word of the camera's PXI tag, with a payload of three bytes per further word, and the ARM7
 // answers it in the same form. camera_api.c caches what the settings were set to (CAMERASettings) so that, when the
-// camera stops answering, the thread starts the camera again and sends them all anew (func_02700230).
+// camera stops answering, the thread starts the camera again and sends them all anew (CAMERA_Reboot).
 //
 // The file is built with -ipa function (file_flags in lib/twl/library.toml): every static has a literal of its own, and
 // sUnused, which nothing reads, stays in .bss. The work is one object: its fields beyond 0xfff are reached through a
@@ -112,10 +113,10 @@ static CAMERAWork sCameraWork;
 static u32 sUnused; // Nothing reads it; the library's other code that used it was stripped
 static BOOL sCameraInitialized;
 
-static void func_02701aa0(PXIFifoTag tag, u32 data, BOOL err);
-static void func_02701fd8(CAMERAResult result, void *arg);
-static void func_02702028(void);
-static void func_02702070(void *arg);
+static void CameraPxiCallback(PXIFifoTag tag, u32 data, BOOL err);
+static void CameraSyncCallback(CAMERAResult result, void *arg);
+static void CameraWaitBusy(void);
+static void CameraStandbyCallback(void *arg);
 static CAMERAResult CAMERA_I2CInitAsyncCore(CAMERASelect camera, CAMERACallback callback, void *arg);
 static CAMERAResult CAMERA_I2CActivateAsyncCore(CAMERASelect camera, CAMERACallback callback, void *arg);
 static CAMERAResult CAMERA_I2CContextSwitchAsyncCore(CAMERASelect camera, CAMERAContext context,
@@ -139,16 +140,16 @@ static CAMERAResult CAMERA_I2CAutoExposureAsyncCore(CAMERASelect camera, BOOL on
 static CAMERAResult CAMERA_I2CAutoWhiteBalanceAsyncCore(CAMERASelect camera, BOOL on, CAMERACallback callback,
                                                         void *arg);
 static CAMERAResult CAMERA_SetLEDAsyncCore(BOOL isBlink, CAMERACallback callback, void *arg);
-static BOOL func_027019b4(u32 command, u32 length, u8 data);
-static void func_02701a60(const u8 *data);
+static BOOL CameraSendPxiCommand(u32 command, u32 length, u8 data);
+static void CameraSendPxiData(const u8 *data);
 // The bytes of a command after the first go out three at a time, so a command's buffer has room for the two bytes
 // that the last three can reach past its size
 #define CAMERA_COMMAND_BUFFER_SIZE(size) ((size) + 2)
-static void func_02701fe8(CAMERAResult result);
-static void func_027001f0(void);
+static void CameraCallCallbackAndUnlock(CAMERAResult result);
+static void CAMERA_GoReboot(void);
 
 // The interrupt of the camera interface: a frame is ready, or the buffer overflowed
-static void func_02700078(void) {
+static void CAMERA_CameraIntr(void) {
     OS_SetIrqCheckFlag(OS_IE_CAMERA);
     if (CAMERA_GetErrorStatus()) {
         if (sCameraWork.bufferErrorCallback != NULL) {
@@ -174,9 +175,8 @@ void CAMERA_SetRebootCallbackCore(CAMERAIntrCallback callback) {
     sCameraWork.rebootCallback = callback;
 }
 
-// What a camera's white balance, sharpness and exposure are for a photo mode (func_02700128, func_02700168 and
-// func_027001b8)
-static CAMERAWhiteBalance func_02700128(CAMERAPhotoMode mode) {
+// What a camera's white balance, sharpness and exposure are for a photo mode
+static CAMERAWhiteBalance CAMERA_GetWhiteBalanceFromPhotoMode(CAMERAPhotoMode mode) {
     switch (mode) {
     case CAMERA_PHOTO_MODE_NORMAL:
     case CAMERA_PHOTO_MODE_PORTRAIT:
@@ -191,7 +191,7 @@ static CAMERAWhiteBalance func_02700128(CAMERAPhotoMode mode) {
     }
 }
 
-static int func_02700168(CAMERAPhotoMode mode) {
+static int CAMERA_GetSharpnessFromPhotoMode(CAMERAPhotoMode mode) {
     switch (mode) {
     case CAMERA_PHOTO_MODE_NORMAL:
         return 0;
@@ -208,7 +208,7 @@ static int func_02700168(CAMERAPhotoMode mode) {
     }
 }
 
-static int func_027001b8(CAMERAPhotoMode mode) {
+static int CAMERA_GetExposureFromPhotoMode(CAMERAPhotoMode mode) {
     switch (mode) {
     case CAMERA_PHOTO_MODE_NORMAL:
     case CAMERA_PHOTO_MODE_PORTRAIT:
@@ -223,7 +223,7 @@ static int func_027001b8(CAMERAPhotoMode mode) {
 }
 
 // The camera answered with a wrong state: count it and wake the thread
-static void func_027001f0(void) {
+static void CAMERA_GoReboot(void) {
     sCameraWork.busy = TRUE;
     sCameraWork.errorCount++;
     OS_SendMessage(&sCameraWork.queue, 0, OS_MESSAGE_NOBLOCK);
@@ -232,177 +232,179 @@ static void func_027001f0(void) {
 // The callback of the commands that start the camera again: sends the next setting that is not the camera's default,
 // one command per step, until all are sent. A step is the argument that the command before gave; a case whose
 // setting is the default falls through to the next step
-static void func_02700230(CAMERAResult result, void *arg) {
+static void CAMERA_Reboot(CAMERAResult result, void *arg) {
     if (result != CAMERA_RESULT_SUCCESS) {
         return;
     }
     switch ((int)arg) {
     case 0:
-        CAMERA_I2CInitAsyncCore(CAMERA_SELECT_BOTH, func_02700230, (void *)1);
+        CAMERA_I2CInitAsyncCore(CAMERA_SELECT_BOTH, CAMERA_Reboot, (void *)1);
         return;
     case 1:
         if (sCameraWork.settings[0].photoMode != CAMERA_PHOTO_MODE_PORTRAIT) {
-            CAMERA_I2CPhotoModeAsyncCore(CAMERA_SELECT_IN, sCameraWork.settings[0].photoMode, func_02700230, (void *)2);
+            CAMERA_I2CPhotoModeAsyncCore(CAMERA_SELECT_IN, sCameraWork.settings[0].photoMode, CAMERA_Reboot, (void *)2);
             return;
         }
     case 2:
         if (sCameraWork.settings[1].photoMode != CAMERA_PHOTO_MODE_NORMAL) {
-            CAMERA_I2CPhotoModeAsyncCore(CAMERA_SELECT_OUT, sCameraWork.settings[1].photoMode, func_02700230,
+            CAMERA_I2CPhotoModeAsyncCore(CAMERA_SELECT_OUT, sCameraWork.settings[1].photoMode, CAMERA_Reboot,
                                          (void *)3);
             return;
         }
     case 3:
         if (sCameraWork.settings[0].size[0] != CAMERA_SIZE_DS_LCD) {
             CAMERA_I2CSizeExAsyncCore(CAMERA_SELECT_IN, CAMERA_CONTEXT_A, sCameraWork.settings[0].size[0],
-                                      func_02700230, (void *)4);
+                                      CAMERA_Reboot, (void *)4);
             return;
         }
     case 4:
         if (sCameraWork.settings[0].size[1] != CAMERA_SIZE_VGA) {
             CAMERA_I2CSizeExAsyncCore(CAMERA_SELECT_IN, CAMERA_CONTEXT_B, sCameraWork.settings[0].size[1],
-                                      func_02700230, (void *)5);
+                                      CAMERA_Reboot, (void *)5);
             return;
         }
     case 5:
         if (sCameraWork.settings[1].size[0] != CAMERA_SIZE_DS_LCD) {
             CAMERA_I2CSizeExAsyncCore(CAMERA_SELECT_OUT, CAMERA_CONTEXT_A, sCameraWork.settings[1].size[0],
-                                      func_02700230, (void *)6);
+                                      CAMERA_Reboot, (void *)6);
             return;
         }
     case 6:
         if (sCameraWork.settings[1].size[1] != CAMERA_SIZE_VGA) {
             CAMERA_I2CSizeExAsyncCore(CAMERA_SELECT_OUT, CAMERA_CONTEXT_B, sCameraWork.settings[1].size[1],
-                                      func_02700230, (void *)7);
+                                      CAMERA_Reboot, (void *)7);
             return;
         }
     case 7:
         if (sCameraWork.settings[0].frameRate != CAMERA_FRAME_RATE_15) {
-            CAMERA_I2CFrameRateAsyncCore(CAMERA_SELECT_IN, sCameraWork.settings[0].frameRate, func_02700230, (void *)8);
+            CAMERA_I2CFrameRateAsyncCore(CAMERA_SELECT_IN, sCameraWork.settings[0].frameRate, CAMERA_Reboot, (void *)8);
             return;
         }
     case 8:
         if (sCameraWork.settings[1].frameRate != CAMERA_FRAME_RATE_15) {
-            CAMERA_I2CFrameRateAsyncCore(CAMERA_SELECT_OUT, sCameraWork.settings[1].frameRate, func_02700230,
+            CAMERA_I2CFrameRateAsyncCore(CAMERA_SELECT_OUT, sCameraWork.settings[1].frameRate, CAMERA_Reboot,
                                          (void *)9);
             return;
         }
     case 9:
         if (sCameraWork.settings[0].effect[0] != CAMERA_EFFECT_NONE) {
             CAMERA_I2CEffectExAsyncCore(CAMERA_SELECT_IN, CAMERA_CONTEXT_A, sCameraWork.settings[0].effect[0],
-                                        func_02700230, (void *)10);
+                                        CAMERA_Reboot, (void *)10);
             return;
         }
     case 10:
         if (sCameraWork.settings[0].effect[1] != CAMERA_EFFECT_NONE) {
             CAMERA_I2CEffectExAsyncCore(CAMERA_SELECT_IN, CAMERA_CONTEXT_B, sCameraWork.settings[0].effect[1],
-                                        func_02700230, (void *)11);
+                                        CAMERA_Reboot, (void *)11);
             return;
         }
     case 11:
         if (sCameraWork.settings[1].effect[0] != CAMERA_EFFECT_NONE) {
             CAMERA_I2CEffectExAsyncCore(CAMERA_SELECT_OUT, CAMERA_CONTEXT_A, sCameraWork.settings[1].effect[0],
-                                        func_02700230, (void *)12);
+                                        CAMERA_Reboot, (void *)12);
             return;
         }
     case 12:
         if (sCameraWork.settings[1].effect[1] != CAMERA_EFFECT_NONE) {
             CAMERA_I2CEffectExAsyncCore(CAMERA_SELECT_OUT, CAMERA_CONTEXT_B, sCameraWork.settings[1].effect[1],
-                                        func_02700230, (void *)13);
+                                        CAMERA_Reboot, (void *)13);
             return;
         }
     case 13:
         if (sCameraWork.settings[0].flip[0] != CAMERA_FLIP_HORIZONTAL) {
             CAMERA_I2CFlipExAsyncCore(CAMERA_SELECT_IN, CAMERA_CONTEXT_A, sCameraWork.settings[0].flip[0],
-                                      func_02700230, (void *)14);
+                                      CAMERA_Reboot, (void *)14);
             return;
         }
     case 14:
         if (sCameraWork.settings[0].flip[1] != CAMERA_FLIP_HORIZONTAL) {
             CAMERA_I2CFlipExAsyncCore(CAMERA_SELECT_IN, CAMERA_CONTEXT_B, sCameraWork.settings[0].flip[1],
-                                      func_02700230, (void *)15);
+                                      CAMERA_Reboot, (void *)15);
             return;
         }
     case 15:
         if (sCameraWork.settings[1].flip[0] != CAMERA_FLIP_NONE) {
             CAMERA_I2CFlipExAsyncCore(CAMERA_SELECT_OUT, CAMERA_CONTEXT_A, sCameraWork.settings[1].flip[0],
-                                      func_02700230, (void *)16);
+                                      CAMERA_Reboot, (void *)16);
             return;
         }
     case 16:
         if (sCameraWork.settings[1].flip[1] != CAMERA_FLIP_NONE) {
             CAMERA_I2CFlipExAsyncCore(CAMERA_SELECT_OUT, CAMERA_CONTEXT_B, sCameraWork.settings[1].flip[1],
-                                      func_02700230, (void *)17);
+                                      CAMERA_Reboot, (void *)17);
             return;
         }
     case 17:
-        if (sCameraWork.settings[0].whiteBalance != func_02700128(sCameraWork.settings[0].photoMode)) {
-            CAMERA_I2CWhiteBalanceAsyncCore(CAMERA_SELECT_IN, sCameraWork.settings[0].whiteBalance, func_02700230,
+        if (sCameraWork.settings[0].whiteBalance !=
+            CAMERA_GetWhiteBalanceFromPhotoMode(sCameraWork.settings[0].photoMode)) {
+            CAMERA_I2CWhiteBalanceAsyncCore(CAMERA_SELECT_IN, sCameraWork.settings[0].whiteBalance, CAMERA_Reboot,
                                             (void *)18);
             return;
         }
     case 18:
-        if (sCameraWork.settings[1].whiteBalance != func_02700128(sCameraWork.settings[1].photoMode)) {
-            CAMERA_I2CWhiteBalanceAsyncCore(CAMERA_SELECT_OUT, sCameraWork.settings[1].whiteBalance, func_02700230,
+        if (sCameraWork.settings[1].whiteBalance !=
+            CAMERA_GetWhiteBalanceFromPhotoMode(sCameraWork.settings[1].photoMode)) {
+            CAMERA_I2CWhiteBalanceAsyncCore(CAMERA_SELECT_OUT, sCameraWork.settings[1].whiteBalance, CAMERA_Reboot,
                                             (void *)19);
             return;
         }
     case 19: {
         int exposure = sCameraWork.settings[0].exposure;
-        if (exposure != func_027001b8(sCameraWork.settings[0].photoMode)) {
-            CAMERA_I2CExposureAsyncCore(CAMERA_SELECT_IN, exposure, func_02700230, (void *)20);
+        if (exposure != CAMERA_GetExposureFromPhotoMode(sCameraWork.settings[0].photoMode)) {
+            CAMERA_I2CExposureAsyncCore(CAMERA_SELECT_IN, exposure, CAMERA_Reboot, (void *)20);
             return;
         }
     }
     case 20: {
         int exposure = sCameraWork.settings[1].exposure;
-        if (exposure != func_027001b8(sCameraWork.settings[1].photoMode)) {
-            CAMERA_I2CExposureAsyncCore(CAMERA_SELECT_OUT, exposure, func_02700230, (void *)21);
+        if (exposure != CAMERA_GetExposureFromPhotoMode(sCameraWork.settings[1].photoMode)) {
+            CAMERA_I2CExposureAsyncCore(CAMERA_SELECT_OUT, exposure, CAMERA_Reboot, (void *)21);
             return;
         }
     }
     case 21: {
         int sharpness = sCameraWork.settings[0].sharpness;
-        if (sharpness != func_02700168(sCameraWork.settings[0].photoMode)) {
-            CAMERA_I2CSharpnessAsyncCore(CAMERA_SELECT_IN, sharpness, func_02700230, (void *)22);
+        if (sharpness != CAMERA_GetSharpnessFromPhotoMode(sCameraWork.settings[0].photoMode)) {
+            CAMERA_I2CSharpnessAsyncCore(CAMERA_SELECT_IN, sharpness, CAMERA_Reboot, (void *)22);
             return;
         }
     }
     case 22: {
         int sharpness = sCameraWork.settings[1].sharpness;
-        if (sharpness != func_02700168(sCameraWork.settings[1].photoMode)) {
-            CAMERA_I2CSharpnessAsyncCore(CAMERA_SELECT_OUT, sharpness, func_02700230, (void *)23);
+        if (sharpness != CAMERA_GetSharpnessFromPhotoMode(sCameraWork.settings[1].photoMode)) {
+            CAMERA_I2CSharpnessAsyncCore(CAMERA_SELECT_OUT, sharpness, CAMERA_Reboot, (void *)23);
             return;
         }
     }
     case 23:
         if (sCameraWork.settings[0].autoExposure != TRUE) {
-            CAMERA_I2CAutoExposureAsyncCore(CAMERA_SELECT_IN, sCameraWork.settings[0].autoExposure, func_02700230,
+            CAMERA_I2CAutoExposureAsyncCore(CAMERA_SELECT_IN, sCameraWork.settings[0].autoExposure, CAMERA_Reboot,
                                             (void *)24);
             return;
         }
     case 24:
         if (sCameraWork.settings[1].autoExposure != TRUE) {
-            CAMERA_I2CAutoExposureAsyncCore(CAMERA_SELECT_OUT, sCameraWork.settings[1].autoExposure, func_02700230,
+            CAMERA_I2CAutoExposureAsyncCore(CAMERA_SELECT_OUT, sCameraWork.settings[1].autoExposure, CAMERA_Reboot,
                                             (void *)25);
             return;
         }
     case 25:
         if (sCameraWork.settings[0].autoWhiteBalance != TRUE) {
             CAMERA_I2CAutoWhiteBalanceAsyncCore(CAMERA_SELECT_IN, sCameraWork.settings[0].autoWhiteBalance,
-                                                func_02700230, (void *)26);
+                                                CAMERA_Reboot, (void *)26);
             return;
         }
     case 26:
         if (sCameraWork.settings[1].autoWhiteBalance != TRUE) {
             CAMERA_I2CAutoWhiteBalanceAsyncCore(CAMERA_SELECT_OUT, sCameraWork.settings[1].autoWhiteBalance,
-                                                func_02700230, (void *)27);
+                                                CAMERA_Reboot, (void *)27);
             return;
         }
     case 27: {
         CAMERAContext context = sCameraWork.settings[0].context;
         if (context != CAMERA_CONTEXT_A) {
             if (OS_IsRunOnTwl() == TRUE) {
-                CAMERA_I2CContextSwitchAsyncCore(CAMERA_SELECT_IN, context, func_02700230, (void *)28);
+                CAMERA_I2CContextSwitchAsyncCore(CAMERA_SELECT_IN, context, CAMERA_Reboot, (void *)28);
             }
             return;
         }
@@ -411,20 +413,20 @@ static void func_02700230(CAMERAResult result, void *arg) {
         CAMERAContext context = sCameraWork.settings[1].context;
         if (context != CAMERA_CONTEXT_A) {
             if (OS_IsRunOnTwl() == TRUE) {
-                CAMERA_I2CContextSwitchAsyncCore(CAMERA_SELECT_OUT, context, func_02700230, (void *)29);
+                CAMERA_I2CContextSwitchAsyncCore(CAMERA_SELECT_OUT, context, CAMERA_Reboot, (void *)29);
             }
             return;
         }
     }
     case 29:
         if (sCameraWork.activeCamera != CAMERA_SELECT_NONE) {
-            CAMERA_I2CActivateAsyncCore(sCameraWork.activeCamera, func_02700230, (void *)30);
+            CAMERA_I2CActivateAsyncCore(sCameraWork.activeCamera, CAMERA_Reboot, (void *)30);
             return;
         }
     case 30:
         if (sCameraWork.activeCamera == CAMERA_SELECT_OUT && sCameraWork.settings[1].ledBlink == TRUE) {
             if (OS_IsRunOnTwl() == TRUE) {
-                CAMERA_SetLEDAsyncCore(TRUE, func_02700230, (void *)31);
+                CAMERA_SetLEDAsyncCore(TRUE, CAMERA_Reboot, (void *)31);
             }
             return;
         }
@@ -439,12 +441,12 @@ static void func_02700230(CAMERAResult result, void *arg) {
 
 // Checks that the camera may take a command: FATAL_ERROR, after it has stopped the active camera, once it failed more
 // than twice, ILLEGAL_STATUS while it is being started again
-static CAMERAResult func_027007c8(void) {
+static CAMERAResult CAMERA_CheckRetryCount(void) {
     if (sCameraWork.errorCount > 2) {
         if (sCameraWork.activeCamera != CAMERA_SELECT_NONE) {
             sCameraWork.stopClock = TRUE;
             sCameraWork.activeCamera = CAMERA_SELECT_NONE;
-            func_027019b4(CAMERA_PXI_COMMAND_ACTIVATE, 1, 0);
+            CameraSendPxiCommand(CAMERA_PXI_COMMAND_ACTIVATE, 1, 0);
         }
         return CAMERA_RESULT_FATAL_ERROR;
     }
@@ -457,7 +459,7 @@ static CAMERAResult func_027007c8(void) {
 // The thread: every 100 ms it looks for an answer that said the camera was in a wrong state and, every second, for a
 // frame; if there is none for a second, it counts that as a failure as well. On a failure it resets the interface
 // and sends the settings again
-static void func_02700824(void *arg) {
+static void CAMERA_MonitorThread(void *arg) {
     OSMessage message;
     int elapsed;
 
@@ -486,7 +488,7 @@ static void func_02700824(void *arg) {
             sCameraWork.busy = TRUE;
             sCameraWork.errorCount++;
         }
-        if (func_027007c8() == CAMERA_RESULT_FATAL_ERROR) {
+        if (CAMERA_CheckRetryCount() == CAMERA_RESULT_FATAL_ERROR) {
             sCameraWork.busy = FALSE;
             if (sCameraWork.rebootCallback != NULL) {
                 sCameraWork.rebootCallback(CAMERA_RESULT_FATAL_ERROR);
@@ -497,7 +499,7 @@ static void func_02700824(void *arg) {
         CAMERA_ResetCore();
         OS_DisableInterrupts();
         sCameraWork.busy = FALSE;
-        func_02700230(CAMERA_RESULT_SUCCESS, NULL);
+        CAMERA_Reboot(CAMERA_RESULT_SUCCESS, NULL);
     }
 }
 
@@ -520,18 +522,18 @@ CAMERAResult CAMERA_InitCore(void) {
     if (!PXI_IsCallbackReady(PXI_FIFO_TAG_CAMERA, PXI_PROC_ARM7)) {
         return CAMERA_RESULT_FATAL_ERROR;
     }
-    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_CAMERA, func_02701aa0);
+    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_CAMERA, CameraPxiCallback);
     CAMERA_ResetCore();
     CAMERA_StopCaptureCore();
     CAMERA_ClearBufferCore();
-    PM_SetSleepCallbackInfo(&sCameraWork.sleepInfo, func_02702070, NULL);
+    PM_SetSleepCallbackInfo(&sCameraWork.sleepInfo, CameraStandbyCallback, NULL);
     PMi_InsertPreSleepCallbackEx(&sCameraWork.sleepInfo, CAMERA_PM_CALLBACK_PRIORITY);
-    PM_SetExitCallbackInfo(&sCameraWork.exitInfo, func_02702070, NULL);
+    PM_SetExitCallbackInfo(&sCameraWork.exitInfo, CameraStandbyCallback, NULL);
     PMi_InsertPostExitCallbackEx(&sCameraWork.exitInfo, CAMERA_PM_CALLBACK_PRIORITY);
     CAMERA_SetVsyncInterruptCore(CAMERA_INTR_VSYNC_NEGATIVE_EDGE);
     CAMERA_SetBufferErrorInterruptCore(TRUE);
     CAMERA_SetMasterInterruptCore(TRUE);
-    OS_SetIrqFunction(OS_IE_CAMERA, func_02700078);
+    OS_SetIrqFunction(OS_IE_CAMERA, CAMERA_CameraIntr);
     OS_EnableIrqMask(OS_IE_CAMERA);
     sCameraWork.settings[0].size[0] = CAMERA_SIZE_DS_LCD;
     sCameraWork.settings[0].size[1] = CAMERA_SIZE_VGA;
@@ -564,8 +566,8 @@ CAMERAResult CAMERA_InitCore(void) {
     sCameraWork.settings[1].context = CAMERA_CONTEXT_A;
     sCameraWork.settings[1].ledBlink = 0;
     OS_InitMessageQueue(&sCameraWork.queue, sCameraWork.messages, 1);
-    OS_CreateThread(&sCameraWork.thread, func_02700824, NULL, sCameraWork.stack + CAMERA_STACK_SIZE / sizeof(u32),
-                    CAMERA_STACK_SIZE, CAMERA_THREAD_PRIORITY);
+    OS_CreateThread(&sCameraWork.thread, CAMERA_MonitorThread, NULL,
+                    sCameraWork.stack + CAMERA_STACK_SIZE / sizeof(u32), CAMERA_STACK_SIZE, CAMERA_THREAD_PRIORITY);
     OS_WakeupThreadDirect(&sCameraWork.thread);
     return CAMERA_RESULT_SUCCESS;
 }
@@ -591,7 +593,7 @@ void CAMERA_EndCore(void) {
 }
 
 // Stops the capture, waits for the interface to finish, clears its buffer and deactivates the cameras
-CAMERAResult func_02700bd0(void) {
+CAMERAResult CAMERA_StopCore(void) {
     int timeout = 0x1991b0;
 
     CAMERA_StopCaptureCore();
@@ -604,7 +606,7 @@ CAMERAResult func_02700bd0(void) {
 
 // Starts the I2C of the cameras
 static CAMERAResult CAMERA_I2CInitAsyncCore(CAMERASelect camera, CAMERACallback callback, void *arg) {
-    CAMERAResult state = func_027007c8();
+    CAMERAResult state = CAMERA_CheckRetryCount();
     OSIntrMode enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
@@ -623,22 +625,22 @@ static CAMERAResult CAMERA_I2CInitAsyncCore(CAMERASelect camera, CAMERACallback 
     sCameraWork.callback = callback;
     sCameraWork.callbackArg = arg;
     sCameraWork.stopClock = TRUE;
-    return func_027019b4(CAMERA_PXI_COMMAND_INIT, 1, camera) ? CAMERA_RESULT_SUCCESS : CAMERA_RESULT_SEND_ERROR;
+    return CameraSendPxiCommand(CAMERA_PXI_COMMAND_INIT, 1, camera) ? CAMERA_RESULT_SUCCESS : CAMERA_RESULT_SEND_ERROR;
 }
 
 CAMERAResult CAMERA_I2CInitCore(CAMERASelect camera) {
-    CAMERAResult result = CAMERA_I2CInitAsyncCore(camera, func_02701fd8, NULL);
+    CAMERAResult result = CAMERA_I2CInitAsyncCore(camera, CameraSyncCallback, NULL);
 
     sCameraWork.result = result;
     if (result == CAMERA_RESULT_SUCCESS) {
-        func_02702028();
+        CameraWaitBusy();
     }
     return sCameraWork.result;
 }
 
 // Activates a camera, or none
 static CAMERAResult CAMERA_I2CActivateAsyncCore(CAMERASelect camera, CAMERACallback callback, void *arg) {
-    CAMERAResult state = func_027007c8();
+    CAMERAResult state = CAMERA_CheckRetryCount();
     OSIntrMode enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
@@ -666,15 +668,16 @@ static CAMERAResult CAMERA_I2CActivateAsyncCore(CAMERASelect camera, CAMERACallb
         sCameraWork.sentValue = 0;
     }
     sCameraWork.vsyncTick = OS_GetTick();
-    return func_027019b4(CAMERA_PXI_COMMAND_ACTIVATE, 1, camera) ? CAMERA_RESULT_SUCCESS : CAMERA_RESULT_SEND_ERROR;
+    return CameraSendPxiCommand(CAMERA_PXI_COMMAND_ACTIVATE, 1, camera) ? CAMERA_RESULT_SUCCESS
+                                                                        : CAMERA_RESULT_SEND_ERROR;
 }
 
 CAMERAResult CAMERA_I2CActivateCore(CAMERASelect camera) {
-    CAMERAResult result = CAMERA_I2CActivateAsyncCore(camera, func_02701fd8, NULL);
+    CAMERAResult result = CAMERA_I2CActivateAsyncCore(camera, CameraSyncCallback, NULL);
 
     sCameraWork.result = result;
     if (result == CAMERA_RESULT_SUCCESS) {
-        func_02702028();
+        CameraWaitBusy();
     }
     return sCameraWork.result;
 }
@@ -682,7 +685,7 @@ CAMERAResult CAMERA_I2CActivateCore(CAMERASelect camera) {
 // Chooses the context of a camera that it uses
 static CAMERAResult CAMERA_I2CContextSwitchAsyncCore(CAMERASelect camera, CAMERAContext context,
                                                      CAMERACallback callback, void *arg) {
-    CAMERAResult state = func_027007c8();
+    CAMERAResult state = CAMERA_CheckRetryCount();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
     OSIntrMode enabled;
 
@@ -708,16 +711,16 @@ static CAMERAResult CAMERA_I2CContextSwitchAsyncCore(CAMERASelect camera, CAMERA
     data[1] = context;
     sCameraWork.sentCamera = camera;
     sCameraWork.sentValue = context;
-    if (!func_027019b4(CAMERA_PXI_COMMAND_CONTEXT_SWITCH, 2, data[0])) {
+    if (!CameraSendPxiCommand(CAMERA_PXI_COMMAND_CONTEXT_SWITCH, 2, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
-    func_02701a60(&data[1]);
+    CameraSendPxiData(&data[1]);
     return CAMERA_RESULT_SUCCESS;
 }
 
 static CAMERAResult CAMERA_I2CSizeExAsyncCore(CAMERASelect camera, CAMERAContext context, CAMERASize size,
                                               CAMERACallback callback, void *arg) {
-    CAMERAResult state = func_027007c8();
+    CAMERAResult state = CAMERA_CheckRetryCount();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(3)];
     OSIntrMode enabled;
 
@@ -757,26 +760,26 @@ static CAMERAResult CAMERA_I2CSizeExAsyncCore(CAMERASelect camera, CAMERAContext
     sCameraWork.sentCamera = camera;
     sCameraWork.sentContext = context;
     sCameraWork.sentValue = size;
-    if (!func_027019b4(CAMERA_PXI_COMMAND_SIZE, 3, data[0])) {
+    if (!CameraSendPxiCommand(CAMERA_PXI_COMMAND_SIZE, 3, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
-    func_02701a60(&data[1]);
+    CameraSendPxiData(&data[1]);
     return CAMERA_RESULT_SUCCESS;
 }
 
 CAMERAResult CAMERA_I2CSizeExCore(CAMERASelect camera, CAMERAContext context, CAMERASize size) {
-    CAMERAResult result = CAMERA_I2CSizeExAsyncCore(camera, context, size, func_02701fd8, NULL);
+    CAMERAResult result = CAMERA_I2CSizeExAsyncCore(camera, context, size, CameraSyncCallback, NULL);
 
     sCameraWork.result = result;
     if (result == CAMERA_RESULT_SUCCESS) {
-        func_02702028();
+        CameraWaitBusy();
     }
     return sCameraWork.result;
 }
 
 static CAMERAResult CAMERA_I2CFrameRateAsyncCore(CAMERASelect camera, CAMERAFrameRate rate, CAMERACallback callback,
                                                  void *arg) {
-    CAMERAResult state = func_027007c8();
+    CAMERAResult state = CAMERA_CheckRetryCount();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
     OSIntrMode enabled;
 
@@ -816,16 +819,16 @@ static CAMERAResult CAMERA_I2CFrameRateAsyncCore(CAMERASelect camera, CAMERAFram
     data[1] = rate;
     sCameraWork.sentCamera = camera;
     sCameraWork.sentValue = rate;
-    if (!func_027019b4(CAMERA_PXI_COMMAND_FRAME_RATE, 2, data[0])) {
+    if (!CameraSendPxiCommand(CAMERA_PXI_COMMAND_FRAME_RATE, 2, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
-    func_02701a60(&data[1]);
+    CameraSendPxiData(&data[1]);
     return CAMERA_RESULT_SUCCESS;
 }
 
 static CAMERAResult CAMERA_I2CEffectExAsyncCore(CAMERASelect camera, CAMERAContext context, CAMERAEffect effect,
                                                 CAMERACallback callback, void *arg) {
-    CAMERAResult state = func_027007c8();
+    CAMERAResult state = CAMERA_CheckRetryCount();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(3)];
     OSIntrMode enabled;
 
@@ -864,26 +867,26 @@ static CAMERAResult CAMERA_I2CEffectExAsyncCore(CAMERASelect camera, CAMERAConte
     sCameraWork.sentCamera = camera;
     sCameraWork.sentContext = context;
     sCameraWork.sentValue = effect;
-    if (!func_027019b4(CAMERA_PXI_COMMAND_EFFECT, 3, data[0])) {
+    if (!CameraSendPxiCommand(CAMERA_PXI_COMMAND_EFFECT, 3, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
-    func_02701a60(&data[1]);
+    CameraSendPxiData(&data[1]);
     return CAMERA_RESULT_SUCCESS;
 }
 
 CAMERAResult CAMERA_I2CEffectExCore(CAMERASelect camera, CAMERAContext context, CAMERAEffect effect) {
-    CAMERAResult result = CAMERA_I2CEffectExAsyncCore(camera, context, effect, func_02701fd8, NULL);
+    CAMERAResult result = CAMERA_I2CEffectExAsyncCore(camera, context, effect, CameraSyncCallback, NULL);
 
     sCameraWork.result = result;
     if (result == CAMERA_RESULT_SUCCESS) {
-        func_02702028();
+        CameraWaitBusy();
     }
     return sCameraWork.result;
 }
 
 static CAMERAResult CAMERA_I2CFlipExAsyncCore(CAMERASelect camera, CAMERAContext context, CAMERAFlip flip,
                                               CAMERACallback callback, void *arg) {
-    CAMERAResult state = func_027007c8();
+    CAMERAResult state = CAMERA_CheckRetryCount();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(3)];
     OSIntrMode enabled;
 
@@ -920,16 +923,16 @@ static CAMERAResult CAMERA_I2CFlipExAsyncCore(CAMERASelect camera, CAMERAContext
     sCameraWork.sentCamera = camera;
     sCameraWork.sentContext = context;
     sCameraWork.sentValue = flip;
-    if (!func_027019b4(CAMERA_PXI_COMMAND_FLIP, 3, data[0])) {
+    if (!CameraSendPxiCommand(CAMERA_PXI_COMMAND_FLIP, 3, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
-    func_02701a60(&data[1]);
+    CameraSendPxiData(&data[1]);
     return CAMERA_RESULT_SUCCESS;
 }
 
 static CAMERAResult CAMERA_I2CPhotoModeAsyncCore(CAMERASelect camera, CAMERAPhotoMode mode, CAMERACallback callback,
                                                  void *arg) {
-    CAMERAResult state = func_027007c8();
+    CAMERAResult state = CAMERA_CheckRetryCount();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
     OSIntrMode enabled;
 
@@ -962,16 +965,16 @@ static CAMERAResult CAMERA_I2CPhotoModeAsyncCore(CAMERASelect camera, CAMERAPhot
     data[1] = mode;
     sCameraWork.sentCamera = camera;
     sCameraWork.sentValue = mode;
-    if (!func_027019b4(CAMERA_PXI_COMMAND_PHOTO_MODE, 2, data[0])) {
+    if (!CameraSendPxiCommand(CAMERA_PXI_COMMAND_PHOTO_MODE, 2, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
-    func_02701a60(&data[1]);
+    CameraSendPxiData(&data[1]);
     return CAMERA_RESULT_SUCCESS;
 }
 
 static CAMERAResult CAMERA_I2CWhiteBalanceAsyncCore(CAMERASelect camera, CAMERAWhiteBalance whiteBalance,
                                                     CAMERACallback callback, void *arg) {
-    CAMERAResult state = func_027007c8();
+    CAMERAResult state = CAMERA_CheckRetryCount();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
     OSIntrMode enabled;
 
@@ -1005,15 +1008,15 @@ static CAMERAResult CAMERA_I2CWhiteBalanceAsyncCore(CAMERASelect camera, CAMERAW
     data[1] = whiteBalance;
     sCameraWork.sentCamera = camera;
     sCameraWork.sentValue = whiteBalance;
-    if (!func_027019b4(CAMERA_PXI_COMMAND_WHITE_BALANCE, 2, data[0])) {
+    if (!CameraSendPxiCommand(CAMERA_PXI_COMMAND_WHITE_BALANCE, 2, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
-    func_02701a60(&data[1]);
+    CameraSendPxiData(&data[1]);
     return CAMERA_RESULT_SUCCESS;
 }
 
 static CAMERAResult CAMERA_I2CExposureAsyncCore(CAMERASelect camera, int exposure, CAMERACallback callback, void *arg) {
-    CAMERAResult state = func_027007c8();
+    CAMERAResult state = CAMERA_CheckRetryCount();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
     OSIntrMode enabled;
 
@@ -1039,16 +1042,16 @@ static CAMERAResult CAMERA_I2CExposureAsyncCore(CAMERASelect camera, int exposur
     data[1] = exposure;
     sCameraWork.sentCamera = camera;
     sCameraWork.sentValue = exposure;
-    if (!func_027019b4(CAMERA_PXI_COMMAND_EXPOSURE, 2, data[0])) {
+    if (!CameraSendPxiCommand(CAMERA_PXI_COMMAND_EXPOSURE, 2, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
-    func_02701a60(&data[1]);
+    CameraSendPxiData(&data[1]);
     return CAMERA_RESULT_SUCCESS;
 }
 
 static CAMERAResult CAMERA_I2CSharpnessAsyncCore(CAMERASelect camera, int sharpness, CAMERACallback callback,
                                                  void *arg) {
-    CAMERAResult state = func_027007c8();
+    CAMERAResult state = CAMERA_CheckRetryCount();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
     OSIntrMode enabled;
 
@@ -1074,15 +1077,15 @@ static CAMERAResult CAMERA_I2CSharpnessAsyncCore(CAMERASelect camera, int sharpn
     data[1] = sharpness;
     sCameraWork.sentCamera = camera;
     sCameraWork.sentValue = sharpness;
-    if (!func_027019b4(CAMERA_PXI_COMMAND_SHARPNESS, 2, data[0])) {
+    if (!CameraSendPxiCommand(CAMERA_PXI_COMMAND_SHARPNESS, 2, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
-    func_02701a60(&data[1]);
+    CameraSendPxiData(&data[1]);
     return CAMERA_RESULT_SUCCESS;
 }
 
 static CAMERAResult CAMERA_I2CAutoExposureAsyncCore(CAMERASelect camera, BOOL on, CAMERACallback callback, void *arg) {
-    CAMERAResult state = func_027007c8();
+    CAMERAResult state = CAMERA_CheckRetryCount();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
     OSIntrMode enabled;
 
@@ -1105,26 +1108,26 @@ static CAMERAResult CAMERA_I2CAutoExposureAsyncCore(CAMERASelect camera, BOOL on
     data[1] = on != FALSE;
     sCameraWork.sentCamera = camera;
     sCameraWork.sentValue = on;
-    if (!func_027019b4(CAMERA_PXI_COMMAND_AUTO_EXPOSURE, 2, data[0])) {
+    if (!CameraSendPxiCommand(CAMERA_PXI_COMMAND_AUTO_EXPOSURE, 2, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
-    func_02701a60(&data[1]);
+    CameraSendPxiData(&data[1]);
     return CAMERA_RESULT_SUCCESS;
 }
 
 CAMERAResult CAMERA_I2CAutoExposureCore(CAMERASelect camera, BOOL on) {
-    CAMERAResult result = CAMERA_I2CAutoExposureAsyncCore(camera, on, func_02701fd8, NULL);
+    CAMERAResult result = CAMERA_I2CAutoExposureAsyncCore(camera, on, CameraSyncCallback, NULL);
 
     sCameraWork.result = result;
     if (result == CAMERA_RESULT_SUCCESS) {
-        func_02702028();
+        CameraWaitBusy();
     }
     return sCameraWork.result;
 }
 
 static CAMERAResult CAMERA_I2CAutoWhiteBalanceAsyncCore(CAMERASelect camera, BOOL on, CAMERACallback callback,
                                                         void *arg) {
-    CAMERAResult state = func_027007c8();
+    CAMERAResult state = CAMERA_CheckRetryCount();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
     OSIntrMode enabled;
 
@@ -1154,19 +1157,19 @@ static CAMERAResult CAMERA_I2CAutoWhiteBalanceAsyncCore(CAMERASelect camera, BOO
     data[1] = on != FALSE;
     sCameraWork.sentCamera = camera;
     sCameraWork.sentValue = on;
-    if (!func_027019b4(CAMERA_PXI_COMMAND_AUTO_WHITE_BALANCE, 2, data[0])) {
+    if (!CameraSendPxiCommand(CAMERA_PXI_COMMAND_AUTO_WHITE_BALANCE, 2, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
-    func_02701a60(&data[1]);
+    CameraSendPxiData(&data[1]);
     return CAMERA_RESULT_SUCCESS;
 }
 
 CAMERAResult CAMERA_I2CAutoWhiteBalanceCore(CAMERASelect camera, BOOL on) {
-    CAMERAResult result = CAMERA_I2CAutoWhiteBalanceAsyncCore(camera, on, func_02701fd8, NULL);
+    CAMERAResult result = CAMERA_I2CAutoWhiteBalanceAsyncCore(camera, on, CameraSyncCallback, NULL);
 
     sCameraWork.result = result;
     if (result == CAMERA_RESULT_SUCCESS) {
-        func_02702028();
+        CameraWaitBusy();
     }
     return sCameraWork.result;
 }
@@ -1183,11 +1186,12 @@ static CAMERAResult CAMERA_SetLEDAsyncCore(BOOL isBlink, CAMERACallback callback
     sCameraWork.callback = callback;
     sCameraWork.callbackArg = arg;
     sCameraWork.sentValue = isBlink;
-    return func_027019b4(CAMERA_PXI_COMMAND_SET_LED, 1, isBlink) ? CAMERA_RESULT_SUCCESS : CAMERA_RESULT_SEND_ERROR;
+    return CameraSendPxiCommand(CAMERA_PXI_COMMAND_SET_LED, 1, isBlink) ? CAMERA_RESULT_SUCCESS
+                                                                        : CAMERA_RESULT_SEND_ERROR;
 }
 
 // Sends the first word of a command, with its first byte of data, after turning the interface's clock on
-static BOOL func_027019b4(u32 command, u32 length, u8 data) {
+static BOOL CameraSendPxiCommand(u32 command, u32 length, u8 data) {
     u32 word = ((command << 8) & 0x7f00) | CAMERA_PXI_START | ((length << 16) & 0xff0000) | (data & 0xff);
     OSIntrMode enabled;
     u16 clk;
@@ -1214,7 +1218,7 @@ static BOOL func_027019b4(u32 command, u32 length, u8 data) {
 }
 
 // Sends the next three bytes of a command
-static void func_02701a60(const u8 *data) {
+static void CameraSendPxiData(const u8 *data) {
     u32 word = (data[0] << 16) | (data[1] << 8) | data[2];
 
     while (PXI_SendWordByFifo(PXI_FIFO_TAG_CAMERA, word, FALSE) < 0) {
@@ -1232,11 +1236,11 @@ static void func_02701a60(const u8 *data) {
 
 // The camera interface's PXI callback: puts together an answer from its words and, with the whole answer, updates
 // what the settings are
-static void func_02701aa0(PXIFifoTag tag, u32 data, BOOL err) {
+static void CameraPxiCallback(PXIFifoTag tag, u32 data, BOOL err) {
     CAMERAResult result;
 
     if (err) {
-        func_02701fe8(CAMERA_RESULT_FATAL_ERROR);
+        CameraCallCallbackAndUnlock(CAMERA_RESULT_FATAL_ERROR);
         return;
     }
     if (data & CAMERA_PXI_START) {
@@ -1246,7 +1250,7 @@ static void func_02701aa0(PXIFifoTag tag, u32 data, BOOL err) {
         sCameraWork.response = data & 0xff;
     } else {
         if (sCameraWork.buffer == NULL) {
-            func_02701fe8(CAMERA_RESULT_FATAL_ERROR);
+            CameraCallCallbackAndUnlock(CAMERA_RESULT_FATAL_ERROR);
             return;
         }
         if (sCameraWork.received < sCameraWork.bufferSize) {
@@ -1469,19 +1473,19 @@ static void func_02701aa0(PXIFifoTag tag, u32 data, BOOL err) {
         result = CAMERA_RESULT_FATAL_ERROR;
         break;
     }
-    func_02701fe8(result);
+    CameraCallCallbackAndUnlock(result);
     if (result == CAMERA_RESULT_ILLEGAL_STATUS) {
-        func_027001f0();
+        CAMERA_GoReboot();
     }
 }
 
 // The synchronous functions' callback
-static void func_02701fd8(CAMERAResult result, void *arg) {
+static void CameraSyncCallback(CAMERAResult result, void *arg) {
     sCameraWork.result = result;
 }
 
 // Ends the command that is on its way: calls its callback with the result
-static void func_02701fe8(CAMERAResult result) {
+static void CameraCallCallbackAndUnlock(CAMERAResult result) {
     CAMERACallback callback;
 
     if (sCameraWork.busy) {
@@ -1496,7 +1500,7 @@ static void func_02701fe8(CAMERAResult result) {
 }
 
 // Waits for the command to end, by reading the PXI FIFO itself when the interrupts are off
-static void func_02702028(void) {
+static void CameraWaitBusy(void) {
     CAMERAWork *work = &sCameraWork;
 
     while (work->busy) {
@@ -1507,6 +1511,6 @@ static void func_02702028(void) {
 }
 
 // The PM callback, for the system sleeping and exiting: deactivates the cameras
-static void func_02702070(void *arg) {
+static void CameraStandbyCallback(void *arg) {
     CAMERA_I2CActivateCore(CAMERA_SELECT_NONE);
 }

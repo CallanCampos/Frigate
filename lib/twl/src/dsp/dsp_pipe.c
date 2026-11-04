@@ -8,8 +8,10 @@
 // TwlSDK's DSP library, the pipes (guessed file name, after the SDK's dsp_pipe.c): the access to the DSP's data memory
 // by bytes, the pipes that the ARM9 and the DSP's processes talk through, the interrupt that wakes the readers when the
 // DSP writes one, and the file server thread that opens, reads and writes files for the DSP. ARM code in the DSi-only
-// LTD autoload. The ROM names none of it; the functions have the SDK's names where twl/dsp.h knows them, and keep their
-// default names otherwise.
+// LTD autoload. The ROM names none of it; the functions have the SDK's names where twl/dsp.h knows them, and the others
+// those of the TwlSDK symbols that Black 1's decompilation (aletheia) recovered at the same addresses: the access by
+// bytes (DSP_LoadData, DSP_Store8 and DSP_StoreData) from libdsp.TWL.HYB.a's dsp_byteaccess.o, an object of its own,
+// and the rest from its dsp_pipe.o.
 
 // What the DSP asks of the file server, as the first half word of a message on a port that has the file flag
 #define DSP_FILE_OPEN 0        // mode and a path (its length in half words, then the text): opens the file in the ROM
@@ -31,24 +33,25 @@ typedef struct DSPFileServer {
     OSThread thread;
     OSMessage message;
     OSMessageQueue queue;
-    // the ports that have a request, a bit each: the DSP's interrupt sets them (func_02706b60) as the thread reads them
+    // the ports that have a request, a bit each: the DSP's interrupt sets them (DSPi_NotifyFileIOUpdation) as the
+    // thread reads them
     volatile u32 requests;
     FSFile files[DSP_PORT_COUNT];
     u8 stack[DSP_FILE_STACK_SIZE];
 } DSPFileServer;
 
-static void func_02706530(u32 address, u8 value);
-static void func_027067b4(void *arg);
-static void func_02706b60(int port);
-static void func_02706c2c(void *userData, int port, int peer);
-static void func_02706cb4(DSPPipe *pipe);
-static void func_02706dfc(DSPPipe *pipe);
-static void func_02706e18(DSPPipe *pipe);
+static void DSP_Store8(u32 address, u8 value);
+static void DSPi_FileIOProc(void *arg);
+static void DSPi_NotifyFileIOUpdation(int port);
+static void DSPi_PipeCallbackToConsole(void *userData, int port, int peer);
+static void DSPi_WaitForPipe(DSPPipe *pipe);
+static void DSP_SyncPipe(DSPPipe *pipe);
+static void DSP_FlushPipe(DSPPipe *pipe);
 
 // The byte address in the DSP's memory of the pipe headers, which the DSP sends when it starts
 static u32 sPipeBase;
 static OSThreadQueue sPipeQueue; // the threads that wait for a pipe to change
-// The callback and its user data of each port. The default for the first port is func_02706c2c
+// The callback and its user data of each port. The default for the first port is DSPi_PipeCallbackToConsole
 static DSPPipeCallback sPipeCallbacks[DSP_PORT_COUNT];
 static void *sPipeUserData[DSP_PORT_COUNT];
 static DSPPipe sPipes[DSP_PORT_COUNT][2]; // for the callers that pass no pipe to DSP_LoadPipe
@@ -83,7 +86,7 @@ static inline void DSPi_WriteWord(u16 wordAddress, u16 word) {
 }
 
 // Reads length bytes at a byte address in the DSP's memory
-static void func_0270633c(u32 address, u8 *dst, u32 length) {
+static void DSP_LoadData(u32 address, u8 *dst, u32 length) {
     if (length == 0) {
         return;
     }
@@ -116,7 +119,7 @@ static void func_0270633c(u32 address, u8 *dst, u32 length) {
 }
 
 // Writes one byte at a byte address, by writing the half word it is in
-static void func_02706530(u32 address, u8 value) {
+static void DSP_Store8(u32 address, u8 value) {
     if ((address & 1) == 0) {
         u16 word = DSPi_ReadWord(address >> 1);
         DSPi_WriteWord(address >> 1, (word & 0xff00) | (value & 0xff));
@@ -127,12 +130,12 @@ static void func_02706530(u32 address, u8 value) {
 }
 
 // Writes length bytes at a byte address in the DSP's memory
-static void func_02706694(u32 address, const u8 *src, u32 length) {
+static void DSP_StoreData(u32 address, const u8 *src, u32 length) {
     if (length == 0) {
         return;
     }
     if (address & 1) {
-        func_02706530(address, *src++);
+        DSP_Store8(address, *src++);
         address++;
         length--;
     }
@@ -153,12 +156,12 @@ static void func_02706694(u32 address, const u8 *src, u32 length) {
         }
     }
     if (length != 0) {
-        func_02706530(address, *src);
+        DSP_Store8(address, *src);
     }
 }
 
 // The file server's thread: answers the requests that the DSP writes on its pipes, port by port
-static void func_027067b4(void *arg) {
+static void DSPi_FileIOProc(void *arg) {
     DSPFileServer *server = arg;
 
     for (;;) {
@@ -277,7 +280,7 @@ static void func_027067b4(void *arg) {
 }
 
 // Asks the file server to look at the pipes of a port, and starts it if it is not running yet
-static void func_02706b60(int port) {
+static void DSPi_NotifyFileIOUpdation(int port) {
     DSPFileServer *server = &sFileServer;
     OSIntrMode irq = OS_DisableInterrupts();
 
@@ -289,7 +292,7 @@ static void func_02706b60(int port) {
         OS_InitMessageQueue(&server->queue, &server->message, 1);
         server->requests = 0;
         server->started = TRUE;
-        OS_CreateThread(&server->thread, func_027067b4, server, server->stack + DSP_FILE_STACK_SIZE,
+        OS_CreateThread(&server->thread, DSPi_FileIOProc, server, server->stack + DSP_FILE_STACK_SIZE,
                         DSP_FILE_STACK_SIZE, DSP_FILE_THREAD_PRIORITY);
         OS_WakeupThreadDirect(&server->thread);
     }
@@ -299,7 +302,7 @@ static void func_02706b60(int port) {
 }
 
 // The callback of the first port: reads what the DSP wrote there, and drops it
-static void func_02706c2c(void *userData, int port, int peer) {
+static void DSPi_PipeCallbackToConsole(void *userData, int port, int peer) {
     DSPPipe pipe;
     u8 buffer[0x80];
     u16 length;
@@ -322,9 +325,9 @@ static void func_02706c2c(void *userData, int port, int peer) {
 }
 
 // Waits for the DSP to change a pipe, and gets its header again
-static void func_02706cb4(DSPPipe *pipe) {
+static void DSPi_WaitForPipe(DSPPipe *pipe) {
     OS_SleepThread(&sPipeQueue);
-    func_02706dfc(pipe);
+    DSP_SyncPipe(pipe);
 }
 
 void DSP_InitPipe(void) {
@@ -336,7 +339,7 @@ void DSP_InitPipe(void) {
         sPipeCallbacks[i] = NULL;
         sPipeUserData[i] = NULL;
     }
-    sPipeCallbacks[0] = func_02706c2c;
+    sPipeCallbacks[0] = DSPi_PipeCallbackToConsole;
 }
 
 void DSP_SetPipeCallback(int port, DSPPipeCallback callback, void *userData) {
@@ -357,24 +360,24 @@ DSPPipe *DSP_LoadPipe(DSPPipe *pipe, int port, int peer) {
         if (pipe == NULL) {
             pipe = &sPipes[port][peer];
         }
-        func_0270633c(address, (u8 *)pipe, sizeof(DSPPipe));
+        DSP_LoadData(address, (u8 *)pipe, sizeof(DSPPipe));
     }
     return pipe;
 }
 
 // Gets the header of a pipe from the DSP again
-static void func_02706dfc(DSPPipe *pipe) {
+static void DSP_SyncPipe(DSPPipe *pipe) {
     DSP_LoadPipe(pipe, (pipe->flags & 0xff) >> 1, pipe->flags & 1);
 }
 
 // Tells the DSP that the ARM9 moved the pipe's read or write position
-static void func_02706e18(DSPPipe *pipe) {
+static void DSP_FlushPipe(DSPPipe *pipe) {
     u32 address = sPipeBase + ((pipe->flags & 0xff) >> 1) * sizeof(sPipes[0]) + (pipe->flags & 1) * sizeof(DSPPipe);
 
     if ((pipe->flags & 1) == 0) {
-        func_02706694(address + 4, (u8 *)&pipe->rpos, 2);
+        DSP_StoreData(address + 4, (u8 *)&pipe->rpos, 2);
     } else {
-        func_02706694(address + 6, (u8 *)&pipe->wpos, 2);
+        DSP_StoreData(address + 6, (u8 *)&pipe->wpos, 2);
     }
     DSP_SendData(2, pipe->flags & 0xff);
 }
@@ -389,23 +392,23 @@ void DSP_ReadPipe(DSPPipe *pipe, void *dst, u16 length) {
     OSIntrMode irq = OS_DisableInterrupts();
     BOOL moved = FALSE;
 
-    func_02706dfc(pipe);
+    DSP_SyncPipe(pipe);
     while (length != 0) {
         u16 writePos = pipe->wpos;
         u16 readPos = pipe->rpos;
         u16 difference = readPos ^ writePos;
         if (difference == 0) {
             if (moved) {
-                func_02706e18(pipe);
+                DSP_FlushPipe(pipe);
                 moved = FALSE;
             }
-            func_02706cb4(pipe);
+            DSPi_WaitForPipe(pipe);
         } else {
             u16 offset = readPos & ~0x8000;
             u16 end = (difference < 0x8000) ? (writePos & ~0x8000) : pipe->length;
             u16 count = (length < end - offset) ? length : end - offset;
             count = count & ~(DSP_MEMORY_UNIT - 1);
-            func_0270633c(pipe->address * 2 + offset, dst, count);
+            DSP_LoadData(pipe->address * 2 + offset, dst, count);
             length -= count;
             dst = (u8 *)dst + count;
             pipe->rpos = (offset + count < pipe->length) ? readPos + count : ~readPos & 0x8000;
@@ -413,7 +416,7 @@ void DSP_ReadPipe(DSPPipe *pipe, void *dst, u16 length) {
         }
     }
     if (moved) {
-        func_02706e18(pipe);
+        DSP_FlushPipe(pipe);
     }
     OS_RestoreInterrupts(irq);
 }
@@ -422,23 +425,23 @@ void DSP_WritePipe(DSPPipe *pipe, const void *src, u16 length) {
     OSIntrMode irq = OS_DisableInterrupts();
     BOOL moved = FALSE;
 
-    func_02706dfc(pipe);
+    DSP_SyncPipe(pipe);
     while (length != 0) {
         u16 writePos = pipe->wpos;
         u16 readPos = pipe->rpos;
         u16 difference = readPos ^ writePos;
         if (difference == 0x8000) {
             if (moved) {
-                func_02706e18(pipe);
+                DSP_FlushPipe(pipe);
                 moved = FALSE;
             }
-            func_02706cb4(pipe);
+            DSPi_WaitForPipe(pipe);
         } else {
             u16 offset = writePos & ~0x8000;
             u16 end = (difference < 0x8000) ? pipe->length : (readPos & ~0x8000);
             u16 count = (length < end - offset) ? length : end - offset;
             count = count & ~(DSP_MEMORY_UNIT - 1);
-            func_02706694(pipe->address * 2 + offset, src, count);
+            DSP_StoreData(pipe->address * 2 + offset, src, count);
             length -= count;
             src = (const u8 *)src + count;
             pipe->wpos = (offset + count < pipe->length) ? writePos + count : ~writePos & 0x8000;
@@ -446,7 +449,7 @@ void DSP_WritePipe(DSPPipe *pipe, const void *src, u16 length) {
         }
     }
     if (moved) {
-        func_02706e18(pipe);
+        DSP_FlushPipe(pipe);
     }
     OS_RestoreInterrupts(irq);
 }
@@ -454,7 +457,7 @@ void DSP_WritePipe(DSPPipe *pipe, const void *src, u16 length) {
 // The DSP's interrupt: the first word the DSP sends on the third reply is the pipes' address, and each after it is a
 // port and a peer (direction) that changed, which goes to the port's callback, or to the file server if it has the file
 // flag
-void func_027070dc(void *userData) {
+void DSP_HookPipeNotification(void *userData) {
     while (DSP_GetSemaphore() & 0x8000 || DSP_RecvDataIsReady(2)) {
         DSP_ClearSemaphore(0x8000);
         while (DSP_RecvDataIsReady(2)) {
@@ -471,7 +474,7 @@ void func_027070dc(void *userData) {
                         DSPPipe pipe;
                         DSP_LoadPipe(&pipe, port, peer);
                         if (peer == 0 && (pipe.flags & DSP_PIPE_FILE_FLAG)) {
-                            func_02706b60(port);
+                            DSPi_NotifyFileIOUpdation(port);
                         }
                     }
                 }

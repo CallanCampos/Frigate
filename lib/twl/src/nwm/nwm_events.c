@@ -1,5 +1,7 @@
 // TwlSDK's NWM, the DSi's wireless manager, ARM9 side: the system area, the events that come back from the ARM7, the
-// state that it reports and the sleep callback. ARM code in the DSi-only LTD autoload; the file's name is ours
+// state that it reports and the sleep callback. ARM code in the DSi-only LTD autoload; the file's name is ours. The
+// functions that libntr's headers don't name have the names of the TwlSDK symbols that Black 1's decompilation
+// (aletheia) recovered from nwm_system.o at the same addresses
 
 #include "types.h"
 #include "nitro/mi.h"
@@ -9,8 +11,8 @@
 #include "nwm_private.h"
 #include "twl/nwm.h"
 
-static void func_02702a78(void);
-static void func_02702a8c(void *arg);
+static void NWMi_DeleteSleepCallback(void);
+static void NwmSleepCallback(void *arg);
 
 // The system area, the callback that exits the application when the console sleeps, and the one that unloads the
 // device before it exits (NWM_LoadDevice puts it). Built with -ipa file, the functions reach all three from the
@@ -26,7 +28,7 @@ NWMSys *NWMi_GetSystemWork(void) {
 }
 
 // Clears the flag by which the ARM7 says it has something for the ARM9
-void func_027026ec(void) {
+void NWMi_ClearFifoRecvFlag(void) {
     NWMInfo *info;
 
     if (NWMi_SystemArea == NULL) {
@@ -41,7 +43,7 @@ void func_027026ec(void) {
 }
 
 // The PXI callback: takes the event that the ARM7 points to, runs the callbacks and gives the buffer back
-void func_02702740(PXIFifoTag tag, u32 data, BOOL err) {
+void NWMi_ReceiveFifo9(PXIFifoTag tag, u32 data, BOOL err) {
     NWMSys *sys = NWMi_SystemArea;
     NWMEvent *event = (NWMEvent *)data;
     NWMCallbackFunc callback;
@@ -69,7 +71,7 @@ void func_02702740(PXIFifoTag tag, u32 data, BOOL err) {
     }
     if ((event->cmd == NWM_APIID_LOAD_DEVICE && event->result != 0) ||
         (event->cmd == NWM_APIID_UNLOAD_DEVICE && event->result == 0) || event->cmd == NWM_APIID_INSTALL_FIRMWARE) {
-        func_02702a78();
+        NWMi_DeleteSleepCallback();
     }
     if (event->cmd == NWM_APIID_SEND_FRAME && event->result != NWM_RETCODE_INDICATION &&
         event->u04.sendCallback != NULL) {
@@ -91,7 +93,7 @@ void func_02702740(PXIFifoTag tag, u32 data, BOOL err) {
     MI_CpuFill8(event, 0, sizeof(NWMEvent));
     DC_StoreRange(event, sizeof(NWMEvent));
     if (sys != NULL) {
-        func_027026ec();
+        NWMi_ClearFifoRecvFlag();
     }
 }
 
@@ -136,8 +138,8 @@ NWMRetCode NWMi_CheckState(s32 paramNum, ...) {
     return result;
 }
 
-u16 func_02702980(void) {
-    return NWMi_GetSystemWork()->status->unk_9e;
+u16 NWM_GetAllowedChannel(void) {
+    return NWMi_GetSystemWork()->status->allowedChannel;
 }
 
 u16 NWM_GetDispersionScanPeriod(u16 scanType) {
@@ -159,15 +161,15 @@ u16 NWM_GetDispersionScanPeriod(u16 scanType) {
 }
 
 // Puts the callback that exits the application before the console sleeps (the wireless would be on)
-void func_02702a40(void) {
-    PM_SetSleepCallbackInfo(&sNwmSleepCallback, func_02702a8c, NULL);
+void NWMi_RegisterSleepCallback(void) {
+    PM_SetSleepCallbackInfo(&sNwmSleepCallback, NwmSleepCallback, NULL);
     PMi_InsertPreSleepCallbackEx(&sNwmSleepCallback, NWM_PM_PRIORITY);
 }
 
-static void func_02702a78(void) {
+static void NWMi_DeleteSleepCallback(void) {
     PM_DeletePreSleepCallback(&sNwmSleepCallback);
 }
 
-static void func_02702a8c(void *arg) {
+static void NwmSleepCallback(void *arg) {
     OS_Terminate();
 }

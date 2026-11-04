@@ -2,7 +2,9 @@
 // DWC's or TwlWiFi's network configuration layer. It reads the pages of the settings of an NTR console, and of a TWL
 // console too, checks the CRC16 of each and what the connection in it holds, and writes back the pages with the bad
 // ones emptied and the mask of the connections in use made again. DWC_BM_Init is the only caller of the two checks;
-// one more function reads the pages for the game's local configuration (wih_dwc.c).
+// one more function reads the pages for the game's local configuration (wih_dwc.c). NCFG_ReadConfig has the name of
+// the libncfg symbol that Black 1's decompilation (aletheia) recovered at the same place; that game has no
+// NCFG_ReadConfigEx, which reads the TWL pages as well, as NCFG_CheckConfigEx checks them.
 
 #include "bm_internal.h"
 #include "dwc/bm.h"
@@ -37,7 +39,7 @@ typedef struct TwlWork {
     MATHCRC16Table crcTable;
 } TwlWork;
 
-static DWCBmReadResult func_0205e020(DWCMemPage *pages);
+static DWCBmReadResult NCFG_ReadConfig(DWCMemPage *pages);
 static int checkConfig(DWCMemPage *pages, const MATHCRC16Table *table);
 static int checkConfigEx(TwlWork *work, const MATHCRC16Table *table);
 static void initPage(DWCMemPage *pages, int index);
@@ -55,7 +57,7 @@ static BOOL NCFGi_CheckIp(const u8 *address, const u8 *mask);
 static BOOL NCFGi_CheckAddress(const u8 *address);
 
 // Reads the four pages of the NTR settings
-static DWCBmReadResult func_0205e020(DWCMemPage *pages) {
+static DWCBmReadResult NCFG_ReadConfig(DWCMemPage *pages) {
     if (readAllSlots(pages)) {
         return DWC_BM_READ_OK;
     }
@@ -76,9 +78,9 @@ static inline BOOL readTwlPages(TwlWork *twl, BOOL ntrRead) {
 }
 
 // Reads the settings into the work area of the local configuration: the NTR pages at +0x600, and the TWL's at +0
-DWCBmReadResult func_0205e038(void *work, int unused) {
+DWCBmReadResult NCFG_ReadConfigEx(void *work, int unused) {
     TwlWork *twl = work;
-    BOOL ntrRead = func_0205e020(twl->ntrPages) == DWC_BM_READ_OK;
+    BOOL ntrRead = NCFG_ReadConfig(twl->ntrPages) == DWC_BM_READ_OK;
 
     if (readTwlPages(twl, ntrRead)) {
         return DWC_BM_READ_OK;

@@ -113,7 +113,7 @@ typedef void (*CAMERACallback)(CAMERAResult result, void *arg);
 
 CAMERAResult CAMERA_InitCore(void);
 void CAMERA_EndCore(void);
-CAMERAResult func_02700bd0(void); // puts both cameras to standby, called before CAMERA_End
+CAMERAResult CAMERA_StopCore(void); // stops the capture and puts both cameras to standby, called before CAMERA_End
 CAMERAResult CAMERA_I2CInitCore(CAMERASelect camera);
 CAMERAResult CAMERA_I2CActivateCore(CAMERASelect camera);
 CAMERAResult CAMERA_I2CSizeExCore(CAMERASelect camera, CAMERAContext context, CAMERASize size);
@@ -168,10 +168,10 @@ static inline void CAMERA_End(void) {
     }
 }
 
-// Not an SDK name: what the SDK calls the function is unknown
+// Not an SDK name: what the SDK calls this wrapper of CAMERA_StopCore is unknown
 static inline CAMERAResult CAMERA_I2CStop(void) {
     if (OS_IsRunOnTwl() == TRUE) {
-        return func_02700bd0();
+        return CAMERA_StopCore();
     }
     return CAMERA_RESULT_FATAL_ERROR;
 }

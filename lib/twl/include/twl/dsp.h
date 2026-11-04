@@ -11,7 +11,8 @@
 // component. As with the camera, the SDK's inline functions only call it on a DSi. The public functions and types have
 // the names of the TWL-SDK Function Reference Manual, and the Core functions, the process and pipe types those of
 // libntr's reconstruction of TwlSDK's headers (dsp_util.h, g711.h, graphics.h, dsp_if.h, process.h, pipe.h), from what
-// they do; some keep their default names.
+// they do; the rest have the names of the TwlSDK symbols that Black 1's decompilation (aletheia) recovered, and
+// DSPi_GraphicsEvents, which Black 1 lacks, is named for the process's events that it takes.
 
 void DSPi_StopSoundCore(void); // stops the sound playing
 BOOL DSPi_PlayShutterSoundCore(const void *src, u32 length);
@@ -239,8 +240,8 @@ static inline void DSP_MaskSemaphore(u16 mask) {
 
 // dsp_process.c: a process is a COFF image that the DSP runs. Its program goes to the shared WRAM B and its data to
 // WRAM C, in banks of 32 KB that the ARM9 gives it from the ones its context allows, and its events (the 16 bits of the
-// semaphore from the DSP and its 3 replies) call the callbacks of its context. The named functions have TwlSDK's names;
-// the ones named by address are not known.
+// semaphore from the DSP and its 3 replies) call the callbacks of its context. The functions have TwlSDK's names, the
+// ones that libntr's headers don't have from the symbols that Black 1's decompilation (aletheia) recovered.
 #define DSP_HOOK_SEMAPHORE_(id) (1 << (id))
 #define DSP_HOOK_REPLY_(id) (1 << (16 + (id)))
 #define DSP_HOOK_MAX (16 + 3)
@@ -292,7 +293,8 @@ typedef struct DSPPipe {
     u16 flags;   // port * 2 + peer in the low byte, and the flags
 } DSPPipe;
 
-// A flag of a pipe's flags: the DSP writes to this port requests for the files (func_02706b60's thread answers them)
+// A flag of a pipe's flags: the DSP writes to this port requests for the files, which the file server thread that
+// DSPi_NotifyFileIOUpdation starts answers
 #define DSP_PIPE_FILE_FLAG 0x100
 
 // What a pipe's events call: the user data of DSP_SetPipeCallback, the port and the peer (the pipe's direction)
@@ -314,6 +316,6 @@ void DSP_ReadPipe(DSPPipe *pipe, void *dst, u16 length);
 void DSP_WritePipe(DSPPipe *pipe, const void *src, u16 length);
 // The callback of the DSP's events (DSPHookFunction): hands each change of a pipe to its port's callback, and to the
 // file server thread when the pipe has the file flag
-void func_027070dc(void *userData);
+void DSP_HookPipeNotification(void *userData);
 
 #endif // POKEBW2_TWL_DSP_H

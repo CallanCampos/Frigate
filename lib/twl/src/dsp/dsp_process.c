@@ -7,7 +7,8 @@
 // TwlSDK's DSP library, the DSP's processes (guessed file name, after the SDK's dsp_process.c): a context for each COFF
 // image, which this file loads into the shared WRAM B and C and hands to the DSP, the interrupt that calls the
 // context's callbacks, and the list of the running processes. ARM code in the DSi-only LTD autoload. The ROM names none
-// of it; the functions have the SDK's names where twl/dsp.h knows them, and keep their default names otherwise.
+// of it; the functions have the SDK's names where twl/dsp.h knows them, and the others those of the TwlSDK symbols that
+// Black 1's decompilation (aletheia) recovered from libdsp.TWL.HYB.a's dsp_process.o at the same addresses.
 
 // The COFF image's file header and a section header
 typedef struct COFFHeader {
@@ -56,17 +57,18 @@ typedef struct COFFSection {
 
 typedef BOOL (*COFFSectionFunc)(DSPProcessContext *context, const COFFHeader *header, const COFFSection *section);
 
-static void func_027052b4(void);
-static void func_027052fc(void *arg);
-static void func_02705320(void *arg);
-static void func_0270532c(void);
-static BOOL func_027053d4(DSPProcessContext *context, u32 offset, void *dst, u32 size);
-static BOOL func_0270541c(DSPProcessContext *context, MIWramPos wram, int slot, MIWramProc proc);
-static BOOL func_027054e4(DSPProcessContext *context, const COFFHeader *header, const COFFSection *section);
-static BOOL func_02705980(DSPProcessContext *context, COFFSectionFunc callback);
-static BOOL func_02705a4c(DSPProcessContext *context, MIWramPos wram, u32 start, u32 length, MIWramProc proc);
-static BOOL func_02705acc(DSPProcessContext *context, FSFile *image, int banksB, int banksC);
-static void func_02705c20(void);
+static void DSP_StopDSPComponent(void);
+static void DSPi_ShutdownCallback(void *arg);
+static void DSPi_PreSleepCallback(void *arg);
+static void DSPi_MasterInterrupts(void);
+static BOOL DSPi_ReadProcessImage(DSPProcessContext *context, u32 offset, void *dst, u32 size);
+static BOOL DSPi_CommitWram(DSPProcessContext *context, MIWramPos wram, int slot, MIWramProc proc);
+static BOOL DSPi_MapAndLoadProcessImageCallback(DSPProcessContext *context, const COFFHeader *header,
+                                                const COFFSection *section);
+static BOOL DSP_EnumSections(DSPProcessContext *context, COFFSectionFunc callback);
+static BOOL DSP_SwitchProcessMemory(DSPProcessContext *context, MIWramPos wram, u32 start, u32 length, MIWramProc proc);
+static BOOL DSP_MapAndLoadProcessImage(DSPProcessContext *context, FSFile *image, int banksB, int banksC);
+static void DSP_HookPostStartProcess(void);
 
 // Where a word of the process's memory is in the ARM9's memory
 static inline void *DSPi_GetWramAddress(DSPProcessContext *context, MIWramPos wram, int wordAddress) {
@@ -83,14 +85,14 @@ static PMSleepCallbackInfo sDspSleepCallbackInfo;
 static BOOL sSleepCallbackSet;
 
 // Tells the DSP's OS to quit, and waits for its answer
-static void func_027052b4(void) {
+static void DSP_StopDSPComponent(void) {
     sProcessList->hookFactors = 0;
     DSP_SendData(2, 0x8000);
     DSP_RecvData(2);
 }
 
 // Before the system exits: quits every process
-static void func_027052fc(void *arg) {
+static void DSPi_ShutdownCallback(void *arg) {
     for (;;) {
         DSPProcessContext *context = DSP_FindProcess(NULL);
         if (context == NULL) {
@@ -101,12 +103,12 @@ static void func_027052fc(void *arg) {
 }
 
 // Before the system sleeps: ends the game
-static void func_02705320(void *arg) {
+static void DSPi_PreSleepCallback(void *arg) {
     OS_Terminate();
 }
 
 // The DSP's interrupt: calls the callback of each event that the first process has a callback for, until none is left
-static void func_0270532c(void) {
+static void DSPi_MasterInterrupts(void) {
     DSPProcessContext *context = sProcessList;
     if (context != NULL) {
         for (;;) {
@@ -126,7 +128,7 @@ static void func_0270532c(void) {
 }
 
 // Reads size bytes of the image from offset
-static BOOL func_027053d4(DSPProcessContext *context, u32 offset, void *dst, u32 size) {
+static BOOL DSPi_ReadProcessImage(DSPProcessContext *context, u32 offset, void *dst, u32 size) {
     BOOL ok = FALSE;
     if (FS_SeekFile(context->image, offset, FS_SEEK_SET)) {
         ok = (size == FS_ReadFile(context->image, dst, size));
@@ -135,7 +137,7 @@ static BOOL func_027053d4(DSPProcessContext *context, u32 offset, void *dst, u32
 }
 
 // Gives the bank behind a slot of the process to a processor
-static BOOL func_0270541c(DSPProcessContext *context, MIWramPos wram, int slot, MIWramProc proc) {
+static BOOL DSPi_CommitWram(DSPProcessContext *context, MIWramPos wram, int slot, MIWramProc proc) {
     int bank = (wram == MI_WRAM_B) ? context->slotOfSegmentCode[slot] : context->slotOfSegmentData[slot];
     BOOL given = FALSE;
     if (!MI_IsWramSlotUsed(wram, bank) ||
@@ -154,7 +156,8 @@ static BOOL func_0270541c(DSPProcessContext *context, MIWramPos wram, int slot, 
 }
 
 // Loads one section of the image into the banks of its slots, taking a bank for each slot that has none yet
-static BOOL func_027054e4(DSPProcessContext *context, const COFFHeader *header, const COFFSection *section) {
+static BOOL DSPi_MapAndLoadProcessImageCallback(DSPProcessContext *context, const COFFHeader *header,
+                                                const COFFSection *section) {
     int empty;
     const char *name = section->name.chars;
     BOOL result = TRUE;
@@ -169,7 +172,7 @@ static BOOL func_027054e4(DSPProcessContext *context, const COFFHeader *header, 
         u32 stringTable = header->symbolTable + header->symbolCount * COFF_SYMBOL_SIZE;
         u32 offset = stringTable + section->name.longName.offset;
         name = nameBuffer;
-        if (!func_027053d4(context, offset, nameBuffer, sizeof(nameBuffer))) {
+        if (!DSPi_ReadProcessImage(context, offset, nameBuffer, sizeof(nameBuffer))) {
             return FALSE;
         }
     }
@@ -235,14 +238,15 @@ static BOOL func_027054e4(DSPProcessContext *context, const COFFHeader *header, 
                 banks[slot] = bank;
                 *freeMask &= ~(1 << bank);
                 *used |= 1 << slot;
-                if (!func_0270541c(context, wram, slot, MI_WRAM_ARM9)) {
+                if (!DSPi_CommitWram(context, wram, slot, MI_WRAM_ARM9)) {
                     result = FALSE;
                     break;
                 }
                 MIi_CpuClearFast(0, DSPi_GetWramAddress(context, wram, slot << 14), DSP_BANK_SIZE);
             }
             if (!empty) {
-                if (!func_027053d4(context, fileOffset, DSPi_GetWramAddress(context, wram, address / 2), chunk)) {
+                if (!DSPi_ReadProcessImage(context, fileOffset, DSPi_GetWramAddress(context, wram, address / 2),
+                                           chunk)) {
                     result = FALSE;
                     break;
                 }
@@ -279,15 +283,15 @@ void DSP_InitProcessContext(DSPProcessContext *context, const char *name) {
 }
 
 // Calls callback with each section of the image that has contents to load
-static BOOL func_02705980(DSPProcessContext *context, COFFSectionFunc callback) {
+static BOOL DSP_EnumSections(DSPProcessContext *context, COFFSectionFunc callback) {
     COFFHeader header;
     COFFSection section;
     BOOL result = FALSE;
-    if (func_027053d4(context, 0, &header, sizeof(header))) {
+    if (DSPi_ReadProcessImage(context, 0, &header, sizeof(header))) {
         u32 offset = header.optionalSize + sizeof(header);
         int i;
         for (i = 0; i < header.sectionCount; i++) {
-            if (!func_027053d4(context, offset + i * sizeof(section), &section, sizeof(section))) {
+            if (!DSPi_ReadProcessImage(context, offset + i * sizeof(section), &section, sizeof(section))) {
                 break;
             }
             if (!(section.flags & COFF_SECTION_NOT_LOADED) && section.size != 0 && callback != NULL) {
@@ -302,7 +306,8 @@ static BOOL func_02705980(DSPProcessContext *context, COFFSectionFunc callback) 
 }
 
 // Gives the banks of the slots that cover length words from start to a processor
-static BOOL func_02705a4c(DSPProcessContext *context, MIWramPos wram, u32 start, u32 length, MIWramProc proc) {
+static BOOL DSP_SwitchProcessMemory(DSPProcessContext *context, MIWramPos wram, u32 start, u32 length,
+                                    MIWramProc proc) {
     int slot;
     int lastSlot;
     int *used;
@@ -314,7 +319,7 @@ static BOOL func_02705a4c(DSPProcessContext *context, MIWramPos wram, u32 start,
     used = (wram == MI_WRAM_B) ? &context->segmentCode : &context->segmentData;
     for (slot = start >> 15; slot <= lastSlot; slot++) {
         if (*used & (1 << slot)) {
-            if (!func_0270541c(context, wram, slot, proc)) {
+            if (!DSPi_CommitWram(context, wram, slot, proc)) {
                 return FALSE;
             }
         }
@@ -323,16 +328,16 @@ static BOOL func_02705a4c(DSPProcessContext *context, MIWramPos wram, u32 start,
 }
 
 // Loads the image and gives its banks to the DSP
-static BOOL func_02705acc(DSPProcessContext *context, FSFile *image, int banksB, int banksC) {
+static BOOL DSP_MapAndLoadProcessImage(DSPProcessContext *context, FSFile *image, int banksB, int banksC) {
     BOOL ok = FALSE;
     context->image = image;
     context->slotB = banksB;
     context->slotC = banksC;
-    if (func_02705980(context, func_027054e4)) {
+    if (DSP_EnumSections(context, DSPi_MapAndLoadProcessImageCallback)) {
         DC_FlushRange((void *)MI_GetWramMapStart_B(), 0x40000);
         DC_FlushRange((void *)MI_GetWramMapStart_C(), 0x40000);
-        if (func_02705a4c(context, MI_WRAM_B, 0, 0x20000, MI_WRAM_DSP)) {
-            if (func_02705a4c(context, MI_WRAM_C, 0, 0x20000, MI_WRAM_DSP)) {
+        if (DSP_SwitchProcessMemory(context, MI_WRAM_B, 0, 0x20000, MI_WRAM_DSP)) {
+            if (DSP_SwitchProcessMemory(context, MI_WRAM_C, 0, 0x20000, MI_WRAM_DSP)) {
                 ok = TRUE;
             }
         }
@@ -371,7 +376,7 @@ void DSP_SetProcessHook(DSPProcessContext *context, int events, DSPHookFunction 
     OS_RestoreInterrupts(irq);
 }
 
-static void func_02705c20(void) {
+static void DSP_HookPostStartProcess(void) {
 }
 
 BOOL DSP_ExecuteProcess(DSPProcessContext *context, FSFile *image, int banksB, int banksC) {
@@ -380,10 +385,10 @@ BOOL DSP_ExecuteProcess(DSPProcessContext *context, FSFile *image, int banksB, i
         FS_Init(-1);
     }
     DSP_InitPipe();
-    OS_SetIrqFunction(OS_IE_DSP, func_0270532c);
-    DSP_SetProcessHook(context, 0x48000, func_027070dc, NULL);
+    OS_SetIrqFunction(OS_IE_DSP, DSPi_MasterInterrupts);
+    DSP_SetProcessHook(context, 0x48000, DSP_HookPipeNotification, NULL);
     OS_EnableIrqMask(OS_IE_DSP);
-    if (func_02705acc(context, image, banksB, banksC)) {
+    if (DSP_MapAndLoadProcessImage(context, image, banksB, banksC)) {
         OSIntrMode irq = OS_DisableInterrupts();
         DSPProcessContext **link = &sProcessList;
         while (*link != NULL && *link != context) {
@@ -392,19 +397,19 @@ BOOL DSP_ExecuteProcess(DSPProcessContext *context, FSFile *image, int banksB, i
         *link = context;
         context->image = NULL;
         if (!sExitCallbackSet) {
-            PM_SetExitCallbackInfo(&sDspExitCallbackInfo, func_027052fc, NULL);
+            PM_SetExitCallbackInfo(&sDspExitCallbackInfo, DSPi_ShutdownCallback, NULL);
             PMi_InsertPostExitCallbackEx(&sDspExitCallbackInfo, DSP_PM_PRIORITY);
             sExitCallbackSet = TRUE;
         }
         if (!sSleepCallbackSet) {
-            PM_SetSleepCallbackInfo(&sDspSleepCallbackInfo, func_02705320, NULL);
+            PM_SetSleepCallbackInfo(&sDspSleepCallbackInfo, DSPi_PreSleepCallback, NULL);
             PMi_InsertPreSleepCallbackEx(&sDspSleepCallbackInfo, DSP_PM_PRIORITY);
             sSleepCallbackSet = TRUE;
         }
         DSP_PowerOn();
         DSP_ResetOffEx(context->hookFactors >> 16);
         DSP_MaskSemaphore(~context->hookFactors);
-        func_02705c20();
+        DSP_HookPostStartProcess();
         if (context->flags & DSP_PROCESS_FLAG_USING_OS) {
             u16 port;
 
@@ -417,7 +422,7 @@ BOOL DSP_ExecuteProcess(DSPProcessContext *context, FSFile *image, int banksB, i
                 } while (reply != 1);
             }
         }
-        func_0270532c();
+        DSPi_MasterInterrupts();
         started = TRUE;
         OS_RestoreInterrupts(irq);
     }
@@ -428,7 +433,7 @@ void DSP_QuitProcess(DSPProcessContext *context) {
     OSIntrMode irq;
     DSPProcessContext **link;
     DSPProcessContext *node;
-    func_027052b4();
+    DSP_StopDSPComponent();
     irq = OS_DisableInterrupts();
     DSP_ResetOn();
     DSP_PowerOff();

@@ -8,10 +8,10 @@ typedef struct {
     u32 keyLength;
 } SVCHMACSHA1Context;
 
-static void func_02769704(void *digest, const void *input, u32 len);
-static void func_02769708(SVCHMACSHA1Context *context, const void *key, u32 keyLength);
-static void func_027697e0(SVCHMACSHA1Context *context, const void *input, u32 len);
-static void func_027697fc(SVCHMACSHA1Context *context, void *digest);
+static void SVCi_CalcSHA1Core(void *digest, const void *input, u32 len);
+static void SVCi_HMACSHA1InitCore(SVCHMACSHA1Context *context, const void *key, u32 keyLength);
+static void SVCi_HMACSHA1UpdateCore(SVCHMACSHA1Context *context, const void *input, u32 len);
+static void SVCi_HMACSHA1GetHashCore(SVCHMACSHA1Context *context, void *digest);
 
 // clang-format off
 // TwlSDK's section for the DSi-only code that the LTD autoload's .ltdmain holds
@@ -21,7 +21,7 @@ static void func_027697fc(SVCHMACSHA1Context *context, void *digest);
 
 // clang-format off
 // This BIOS entry point needs the SHA-1 init SVC instruction.
-asm void func_027696e8(SVCSHA1Context *context) {
+asm void SVCi_SHA1InitCore(SVCSHA1Context *context) {
     mov r3, #0x60
     add r3, r0
     mov r2, #0
@@ -31,13 +31,13 @@ asm void func_027696e8(SVCSHA1Context *context) {
 }
 
 // This BIOS entry point needs the SHA-1 update SVC instruction.
-asm void func_027696f4(SVCSHA1Context *context, const void *input, u32 len) {
+asm void SVCi_SHA1UpdateCore(SVCSHA1Context *context, const void *input, u32 len) {
     swi 0x25
     bx lr
 }
 
 // This BIOS entry point needs the SHA-1 final SVC instruction and its argument order.
-asm void func_027696f8(SVCSHA1Context *context, void *digest) {
+asm void SVCi_SHA1GetHashCore(SVCSHA1Context *context, void *digest) {
     mov ip, r1
     mov r1, r0
     mov r0, ip
@@ -46,7 +46,7 @@ asm void func_027696f8(SVCSHA1Context *context, void *digest) {
 }
 
 // This BIOS entry point needs the one-shot SHA-1 SVC instruction.
-static asm void func_02769704(void *digest, const void *input, u32 len) {
+static asm void SVCi_CalcSHA1Core(void *digest, const void *input, u32 len) {
     swi 0x27
     bx lr
 }
@@ -54,7 +54,7 @@ static asm void func_02769704(void *digest, const void *input, u32 len) {
 
 #pragma thumb off
 
-static void func_02769708(SVCHMACSHA1Context *context, const void *key, u32 keyLength) {
+static void SVCi_HMACSHA1InitCore(SVCHMACSHA1Context *context, const void *key, u32 keyLength) {
     u8 pad[64];
     int i;
 
@@ -63,7 +63,7 @@ static void func_02769708(SVCHMACSHA1Context *context, const void *key, u32 keyL
     }
 
     if (keyLength > sizeof(context->key)) {
-        func_02769704(context->key, key, keyLength);
+        SVCi_CalcSHA1Core(context->key, key, keyLength);
         context->keyLength = 20;
     } else {
         MI_CpuCopy8(key, context->key, keyLength);
@@ -77,17 +77,17 @@ static void func_02769708(SVCHMACSHA1Context *context, const void *key, u32 keyL
         pad[i] = 0x36;
     }
 
-    func_027696e8(&context->sha1);
-    func_027696f4(&context->sha1, pad, sizeof(pad));
+    SVCi_SHA1InitCore(&context->sha1);
+    SVCi_SHA1UpdateCore(&context->sha1, pad, sizeof(pad));
 }
 
-static void func_027697e0(SVCHMACSHA1Context *context, const void *input, u32 len) {
+static void SVCi_HMACSHA1UpdateCore(SVCHMACSHA1Context *context, const void *input, u32 len) {
     if (context != NULL && len != 0 && input != NULL) {
-        func_027696f4(&context->sha1, input, len);
+        SVCi_SHA1UpdateCore(&context->sha1, input, len);
     }
 }
 
-static void func_027697fc(SVCHMACSHA1Context *context, void *digest) {
+static void SVCi_HMACSHA1GetHashCore(SVCHMACSHA1Context *context, void *digest) {
     u8 pad[64];
     u8 innerHash[20];
     int i;
@@ -96,7 +96,7 @@ static void func_027697fc(SVCHMACSHA1Context *context, void *digest) {
         return;
     }
 
-    func_027696f8(&context->sha1, innerHash);
+    SVCi_SHA1GetHashCore(&context->sha1, innerHash);
     for (i = 0; i < context->keyLength; i++) {
         pad[i] = context->key[i] ^ 0x5c;
     }
@@ -104,13 +104,13 @@ static void func_027697fc(SVCHMACSHA1Context *context, void *digest) {
         pad[i] = 0x5c;
     }
 
-    func_027696e8(&context->sha1);
-    func_027696f4(&context->sha1, pad, sizeof(pad));
-    func_027696f4(&context->sha1, innerHash, sizeof(innerHash));
-    func_027696f8(&context->sha1, digest);
+    SVCi_SHA1InitCore(&context->sha1);
+    SVCi_SHA1UpdateCore(&context->sha1, pad, sizeof(pad));
+    SVCi_SHA1UpdateCore(&context->sha1, innerHash, sizeof(innerHash));
+    SVCi_SHA1GetHashCore(&context->sha1, digest);
 }
 
-void func_027698b4(void *digest, const void *input, u32 len, const void *key, u32 keyLength) {
+void SVCi_CalcHMACSHA1Core(void *digest, const void *input, u32 len, const void *key, u32 keyLength) {
     SVCHMACSHA1Context context;
 
     if (digest == NULL) {
@@ -123,9 +123,9 @@ void func_027698b4(void *digest, const void *input, u32 len, const void *key, u3
         return;
     }
 
-    func_02769708(&context, key, keyLength);
-    func_027697e0(&context, input, len);
-    func_027697fc(&context, digest);
+    SVCi_HMACSHA1InitCore(&context, key, keyLength);
+    SVCi_HMACSHA1UpdateCore(&context, input, len);
+    SVCi_HMACSHA1GetHashCore(&context, digest);
 }
 
 #pragma section LTDMAIN end
