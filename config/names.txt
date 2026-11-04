@@ -6160,6 +6160,14 @@ ltd_autoload_0 0x02769588 PM_SetAutoExit
 ltd_autoload_0 0x02769594 PM_GetAutoExit
 ltd_autoload_0 0x027695a0 PMi_CallPostExitCallbackAndReset
 ltd_autoload_0 0x027696c0 PMi_TryLockForReset
+ltd_autoload_0 0x027696e8 SVCi_SHA1Init
+ltd_autoload_0 0x027696f4 SVCi_SHA1Update
+ltd_autoload_0 0x027696f8 SVCi_SHA1GetHash
+ltd_autoload_0 0x02769704 SVCi_CalcSHA1
+ltd_autoload_0 0x02769708 SVCi_HMACSHA1Init
+ltd_autoload_0 0x027697e0 SVCi_HMACSHA1Update
+ltd_autoload_0 0x027697fc SVCi_HMACSHA1GetHash
+ltd_autoload_0 0x027698b4 SVCi_CalcHMACSHA1
 ltd_autoload_0 0x0276aebc sPriority
 ltd_autoload_0 0x0276aee0 sSecureAreaStart
 ltd_autoload_0 0x0276aee4 sSecureAreaSize
