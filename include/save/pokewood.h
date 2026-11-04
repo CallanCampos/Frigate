@@ -134,9 +134,9 @@ int PokewoodSave_GetLevelOfPoints(int value);
 BOOL PokewoodSave_GetLevelBit(PokewoodSave *save, u32 bit);
 void PokewoodSave_SetLevelBit(PokewoodSave *save, u32 bit, u32 value);
 // The series (plus 1, 0 for none) of the last four movies filmed, from the newest (0) to the oldest (3), which
-// PokewoodSave_PushLastSeries pushes a2 onto
+// PokewoodSave_PushLastSeries pushes a series onto, keeping only those still in a slot of slotSeries
 u8 PokewoodSave_GetLastSeries(PokewoodSave *save, u32 index);
-void PokewoodSave_PushLastSeries(PokewoodSave *save, u32 a1, u32 a2, u8 *a3);
+void PokewoodSave_PushLastSeries(PokewoodSave *save, u32 slot, u32 series, u8 *slotSeries);
 // How many movies have their flag set in a list
 u32 PokewoodSave_CountFlags(PokewoodSave *save, u32 list);
 

@@ -169,7 +169,7 @@ u8 PokewoodSave_GetLastSeries(PokewoodSave *save, u32 index) {
     return save->lastSeries[index];
 }
 
-void PokewoodSave_PushLastSeries(PokewoodSave *save, u32 a1, u32 a2, u8 *a3) {
+void PokewoodSave_PushLastSeries(PokewoodSave *save, u32 slot, u32 series, u8 *slotSeries) {
     int i;
     int j;
     int count;
@@ -177,12 +177,12 @@ void PokewoodSave_PushLastSeries(PokewoodSave *save, u32 a1, u32 a2, u8 *a3) {
     save->lastSeries[3] = save->lastSeries[2];
     save->lastSeries[2] = save->lastSeries[1];
     save->lastSeries[1] = save->lastSeries[0];
-    save->lastSeries[0] = a2;
-    a3[a1] = 0;
+    save->lastSeries[0] = series;
+    slotSeries[slot] = 0;
     for (i = 1; i < POKEWOOD_LAST_SERIES_COUNT; i++) {
         count = 0;
         for (j = 0; j < POKEWOOD_SLOT_COUNT; j++) {
-            if (save->lastSeries[i] == a3[j]) {
+            if (save->lastSeries[i] == slotSeries[j]) {
                 count++;
             }
         }
