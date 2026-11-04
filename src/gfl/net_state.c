@@ -39,11 +39,14 @@ struct NetState {
     u8 unk49;
     // Set when the other machine asked to disconnect (base command 11)
     u8 disconnectReceived;
-    u8 unk4B;
+    // Set when a Wi-Fi disconnect was asked for on a machine other than the server, which then only checks for the
+    // close (DWCRap_RequestClose's checkOnly) instead of requesting it
+    u8 disconnectAsChild;
     u8 unk4C;
     u8 errorFlag;
     s8 errorCode;
-    u8 unk4F;
+    // NetState_SetAutoExit's value
+    u8 autoExit;
     // What the last call set the device's disconnect error to
     u8 disconnectError;
     // Whether ending the network has been requested
@@ -757,7 +760,7 @@ static void NetState_WifiDisconnecting(NetState *state) {
     BOOL a0 = FALSE;
 
     NetSystem_SetWifiConnected(0);
-    if (!state->unk4B) {
+    if (!state->disconnectAsChild) {
         a0 = TRUE;
     }
     if (sys->pDevTable->close(a0, 0)) {
@@ -776,12 +779,12 @@ void NetState_WifiDisconnect(BOOL a0) {
     if (_pNetState != NULL) {
         if (a0) {
             if (NetSystem_GetNetId() == 0) {
-                _pNetState->unk4B = FALSE;
+                _pNetState->disconnectAsChild = FALSE;
             } else {
-                _pNetState->unk4B = TRUE;
+                _pNetState->disconnectAsChild = TRUE;
             }
         } else {
-            _pNetState->unk4B = FALSE;
+            _pNetState->disconnectAsChild = FALSE;
         }
         NetState_SetFuncLine(_pNetState, NetState_WifiDisconnecting, 0, 1639);
         NetState_WifiDisconnecting(_pNetState);
@@ -881,9 +884,9 @@ void NetState_StartWifiLogin(void) {
     }
 }
 
-void NetState_SetAutoExit(u8 a0) {
+void NetState_SetAutoExit(u8 autoExit) {
     if (_pNetState != NULL) {
-        _pNetState->unk4F = a0;
+        _pNetState->autoExit = autoExit;
     }
 }
 
