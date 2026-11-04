@@ -328,13 +328,18 @@ static GameEventReturnCode BeaconView_WaitEvent(GameEvent *event, u32 *state, vo
     return GAMEEVENT_CONTINUE;
 }
 
+enum {
+    STEP_START_BUTTON_ANIM,
+    STEP_WAIT_BUTTON_ANIM,
+};
+
 static BOOL BeaconView_WaitButton(BeaconViewWork *work, BeaconViewEvent *event) {
     switch (event->seq) {
-    case 0:
+    case STEP_START_BUTTON_ANIM:
         BeaconView_SetButtonAnim(work, event->param, 1);
         event->seq++;
         return FALSE;
-    case 1:
+    case STEP_WAIT_BUTTON_ANIM:
         if (BeaconView_IsButtonAnimating(work, event->param)) {
             return FALSE;
         }
@@ -351,15 +356,20 @@ static BOOL BeaconView_WaitTasks(BeaconViewWork *work, BeaconViewEvent *event) {
     return FALSE;
 }
 
+enum {
+    STEP_START_FLASH,
+    STEP_WAIT_FLASH,
+};
+
 static BOOL BeaconView_WaitMenuButton(BeaconViewWork *work, BeaconViewEvent *event) {
     AppTaskMenuWin *win = (AppTaskMenuWin *)event->param;
 
     switch (event->seq) {
-    case 0:
+    case STEP_START_FLASH:
         AppTaskMenuWin_SetFlashing(win, TRUE);
         event->seq++;
         break;
-    case 1:
+    case STEP_WAIT_FLASH:
         AppTaskMenuWin_Update(win);
         if (AppTaskMenuWin_IsFlashFinished(win)) {
             AppTaskMenuWin_ResetFlash(win);
@@ -370,13 +380,18 @@ static BOOL BeaconView_WaitMenuButton(BeaconViewWork *work, BeaconViewEvent *eve
     return FALSE;
 }
 
+enum {
+    STEP_START_MEDAL_ANIM,
+    STEP_WAIT_MEDAL_ANIM,
+};
+
 static BOOL BeaconView_WaitMedal(BeaconViewWork *work, BeaconViewEvent *event) {
     switch (event->seq) {
-    case 0:
+    case STEP_START_MEDAL_ANIM:
         BeaconView_SetActorAnim(work->panels[event->param].medal, 23);
         event->seq++;
         return FALSE;
-    case 1:
+    case STEP_WAIT_MEDAL_ANIM:
         if (ClActor_IsAnimActive(work->panels[event->param].medal)) {
             return FALSE;
         }
