@@ -98,12 +98,12 @@ enum {
 
 // Prints a string into a window a character at a time
 PrintStream *PrintStream_Create(BmpWin *window, s16 x, s16 y, const StrBuf *strbuf, Font *font, s32 wait,
-                                TCBExManager *tcbManager, u32 a7, HeapID heapId, u16 a9);
+                                TCBExManager *tcbManager, u32 priority, HeapID heapId, u16 backgroundColor);
 // PrintStream_Create with a callback, which the stream calls with events such as the 3 and 5 of the evolution demo's
 // messages, and which returns whether to wait
 typedef BOOL (*PrintStreamCallback)(u32 event);
 PrintStream *PrintStream_CreateWithCallback(BmpWin *window, s16 x, s16 y, const StrBuf *strbuf, Font *font, s32 wait,
-                                            TCBExManager *tcbManager, u32 a7, HeapID heapId, u16 a9,
+                                            TCBExManager *tcbManager, u32 priority, HeapID heapId, u16 backgroundColor,
                                             PrintStreamCallback callback);
 void PrintStream_Pause(PrintStream *stream);
 void PrintStream_Resume(PrintStream *stream);
