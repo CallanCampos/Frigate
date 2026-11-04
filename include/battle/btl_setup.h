@@ -180,23 +180,29 @@ void BtlSetup_SetWildMulti(BtlSetup *setup, GameData *gameData, PokeParty *party
 void BtlSetup_SetFlag(BtlSetup *setup, u32 flag);
 void BtlSetup_Free(BtlSetup *setup);
 PokeParty *BtlSetup_GetParty(BtlSetup *setup, u32 index);
-void BtlSetup_SetNet1v1Double(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, HeapID heapId);
-void BtlSetup_SetNet1v1Single(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, HeapID heapId);
-void BtlSetup_SetNetRotation(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, HeapID heapId);
-void BtlSetup_SetNetTriple(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, HeapID heapId);
-void BtlSetup_SetNetMultiVsNet(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, u8 a4, HeapID heapId);
+// Battles over the network: commMode is the adapters' mode (BtlAdapter_InitSystem, 0 for a battle alone) and
+// clientId the player's client, its net ID where it isn't given
+void BtlSetup_SetNet1v1Double(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 commMode, HeapID heapId);
+void BtlSetup_SetNet1v1Single(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 commMode, HeapID heapId);
+void BtlSetup_SetNetRotation(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 commMode, HeapID heapId);
+void BtlSetup_SetNetTriple(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 commMode, HeapID heapId);
+void BtlSetup_SetNetMultiVsNet(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 commMode, u8 clientId,
+                               HeapID heapId);
 // Battles against trainers, in the surroundings that SaveBtlFieldStatus saved
-void BtlSetup_SetTrainer1v1Single(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status, u32 a3, HeapID heapId);
-void BtlSetup_SetTrainer1v1Double(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status, u32 a3, HeapID heapId);
-void BtlSetup_SetTrainer2v2(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status, u32 a3, u32 a4, u32 a5,
-                            HeapID heapId);
+void BtlSetup_SetTrainer1v1Single(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status, u32 trainerId,
+                                  HeapID heapId);
+void BtlSetup_SetTrainer1v1Double(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status, u32 trainerId,
+                                  HeapID heapId);
+void BtlSetup_SetTrainer2v2(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status, u32 partnerId, u32 trainerId,
+                            u32 trainerId2, HeapID heapId);
 void BtlSetup_SetTrainer1v2(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status, u32 trainerId, u32 trainerId2,
                             HeapID heapId);
-void BtlSetup_SetTrainer3v3(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status, u32 a3, HeapID heapId);
-void BtlSetup_SetTrainerRotation(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status, u32 a3, HeapID heapId);
+void BtlSetup_SetTrainer3v3(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status, u32 trainerId, HeapID heapId);
+void BtlSetup_SetTrainerRotation(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status, u32 trainerId,
+                                 HeapID heapId);
 // A multi battle of two linked players against trainers
-void BtlSetup_SetNetMultiVsAI(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, u8 a4, u32 a5, u32 a6,
-                              HeapID heapId);
+void BtlSetup_SetNetMultiVsAI(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 commMode, u8 clientId,
+                              u32 trainerId, u32 trainerId2, HeapID heapId);
 void BtlSetup_PostProcessTrialHouse(BtlSetup *setup);
 // The capture demonstration, between the two parties
 void BtlSetup_SetCaptureDemo(BtlSetup *setup, GameData *gameData, PokeParty *party, PokeParty *enemyParty,
@@ -205,7 +211,7 @@ void BtlSetup_SetCaptureDemo(BtlSetup *setup, GameData *gameData, PokeParty *par
 void adjustPkmLvForChallengeKeys(BtlSetup *setup, GameData *gameData, u16 zoneId);
 // Frees what the setup holds and clears it
 void BtlSetup_FreeContents(BtlSetup *setup);
-void BtlSetup_SetParty(BtlSetup *setup, PokeParty *party, u32 a2);
+void BtlSetup_SetParty(BtlSetup *setup, PokeParty *party, u32 client);
 void BtlSetup_ApplyRegulation(BtlSetup *setup, Regulation *regulation, HeapID heapId);
 // Gives a battle's trainer a name buffer and empty words
 BtlSetupTrainer *TrainerBattleSetup_Create(HeapID heapId);
