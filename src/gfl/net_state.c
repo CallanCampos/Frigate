@@ -93,7 +93,7 @@ static void NetState_ChangeoverWaitIdleForParent(NetState *state);
 static void NetState_ChangeoverChildWait(NetState *state);
 static void NetState_IrcConnect(NetState *state);
 static void NetState_ChangeoverSwapRoles(NetState *state);
-static void NetState_InitChangeoverMode(int mode, int a1, const u8 *mac);
+static void NetState_InitChangeoverMode(int mode, int useParentMac, const u8 *mac);
 static void NetState_ChangeoverChildToParent(NetState *state);
 static void NetState_ExitIfAlone(NetState *state);
 static void NetState_EndWaitIdle(NetState *state);
@@ -464,11 +464,11 @@ static void NetState_IrcConnect(NetState *state) {
     }
 }
 
-void NetState_StartChangeover(int a0, void (*callback)(void *work), int a2) {
+void NetState_StartChangeover(int heapId, void (*callback)(void *work), int useParentMac) {
     GFLNetInitData *ini = GFL_NetGetInitData();
 
     GFL_NetGetSys();
-    NetState_InitChangeoverMode(0, a2, NULL);
+    NetState_InitChangeoverMode(0, useParentMac, NULL);
     if (ini->bNetType == GFL_NET_TYPE_IRC || ini->bNetType == GFL_NET_TYPE_IRC_WIRELESS) {
         NetSystem_StartInfrared(0);
         _pNetState->connectCallback = callback;
@@ -496,9 +496,9 @@ static void NetState_ChangeoverSwapRoles(NetState *state) {
     }
 }
 
-static void NetState_InitChangeoverMode(int mode, int a1, const u8 *mac) {
+static void NetState_InitChangeoverMode(int mode, int useParentMac, const u8 *mac) {
     GFL_NetGetSys();
-    _pNetState->useParentMac = a1;
+    _pNetState->useParentMac = useParentMac;
     _pNetState->mode = mode;
     if (mac != NULL) {
         MI_CpuCopy8(mac, _pNetState->parentMac, sizeof(_pNetState->parentMac));

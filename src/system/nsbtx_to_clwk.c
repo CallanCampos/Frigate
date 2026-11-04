@@ -51,9 +51,9 @@ static void NsbtxToClwk_CopyTile(const u8 *src, u8 *dest, int *srcOffset, int *d
     }
 }
 
-void NsbtxToClwk_LoadTexture(ClActor *actor, u32 arcId, u32 fileId, u8 texture, u16 width, u16 height, u32 a6, u32 a7,
-                             HeapID heapId) {
-    NsbtxToClwk_LoadTextureEx(actor, arcId, fileId, texture, width, height, a6, a7, NULL, 0, heapId);
+void NsbtxToClwk_LoadTexture(ClActor *actor, u32 arcId, u32 fileId, u8 texture, u16 width, u16 height, u32 offset,
+                             u32 vramType, HeapID heapId) {
+    NsbtxToClwk_LoadTextureEx(actor, arcId, fileId, texture, width, height, offset, vramType, NULL, 0, heapId);
 }
 
 void NsbtxToClwk_LoadTextureEx(ClActor *actor, u32 arcId, u32 fileId, u8 texture, u16 width, u16 height, u32 offset,

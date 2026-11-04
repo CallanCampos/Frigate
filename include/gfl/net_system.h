@@ -8,9 +8,9 @@
 // number, and reading the commands in the packets that arrive
 
 BOOL NetSystem_StartWireless(int size, HeapID heapId);
-int NetSystem_CanConnectFriend(int a0);
-BOOL NetSystem_StartInfrared(int a0);
-int NetSystem_StartParent(int a0, int size, int a2, BOOL (*callback)(void));
+int NetSystem_CanConnectFriend(int index);
+BOOL NetSystem_StartInfrared(int changeTgid);
+int NetSystem_StartParent(int changeTgid, int size, int anyChannel, BOOL (*callback)(void));
 BOOL NetSystem_StartScan(int a0, int size);
 BOOL NetSystem_StartSearch(int size);
 void NetSystem_HoldScan(int a0);

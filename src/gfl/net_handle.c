@@ -276,9 +276,9 @@ void NetHandle_SendTiming(NetHandle *handle, u16 timing) {
     }
 }
 
-void NetHandle_SendTimingPair(NetHandle *handle, u32 a1, u32 a2) {
+void NetHandle_SendTimingPair(NetHandle *handle, u32 timingLow, u32 timingHigh) {
     if (handle != NULL) {
-        handle->timingSend = a1 + (a2 << 8);
+        handle->timingSend = timingLow + (timingHigh << 8);
         handle->timingNetIds = 0xff;
         if (NetHandle_GetNetId(handle) == GFL_NET_NETID_SERVER) {
             handle->timingSendPending = FALSE;
@@ -295,11 +295,11 @@ BOOL NetHandle_IsTimingRecv(NetHandle *handle, u16 timing) {
     return FALSE;
 }
 
-BOOL NetHandle_IsTimingPairRecv(NetHandle *handle, u32 a1, u32 a2) {
+BOOL NetHandle_IsTimingPairRecv(NetHandle *handle, u32 timingLow, u32 timingHigh) {
     if (handle == NULL) {
         return TRUE;
     }
-    if (handle->timingRecv == a1 + (a2 << 8)) {
+    if (handle->timingRecv == timingLow + (timingHigh << 8)) {
         return TRUE;
     }
     return FALSE;
@@ -529,10 +529,10 @@ void NetHandle_RecvData(int netID, int size, const void *data, void *work, NetHa
     }
 }
 
-void NetHandle_SendTimingPairToMachines(NetHandle *handle, int a1, int a2, int a3) {
+void NetHandle_SendTimingPairToMachines(NetHandle *handle, int timingLow, int timingHigh, int netIds) {
     if (handle != NULL) {
-        handle->timingSend = a1 + (a2 << 8);
-        handle->timingNetIds = a3;
+        handle->timingSend = timingLow + (timingHigh << 8);
+        handle->timingNetIds = netIds;
         if (NetHandle_GetNetId(handle) == GFL_NET_NETID_SERVER) {
             handle->timingSendPending = FALSE;
         } else {

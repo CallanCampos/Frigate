@@ -274,7 +274,7 @@ void NetDefine_UnloadDevice(int type);
 void NetBgmVolume_Set(u16 trackMask, s32 volume);
 
 // net.c: starts and ends the network, and passes calls to the device and the other parts of the library
-void GFL_NetBoot(int a0, int a1, HeapID parentHeapId, HeapID heapId);
+void GFL_NetBoot(int libraryHeapId, int unused, HeapID parentHeapId, HeapID heapId);
 void GFL_NetInit(const GFLNetInitData *pNetInit, void (*callback)(void *work), void *work);
 BOOL GFL_NetIsInitialized(void);
 // Whether the network has ended
@@ -318,12 +318,13 @@ void GFL_NetSetIconScreen(BOOL top, HeapID heapId);
 BOOL GFL_NetIsParent(void);
 // Whether a machine's negotiation has been accepted
 BOOL GFL_NetIsHandleNegotiated(NetHandle *handle);
-// Send a command to every machine, or to one; the game's commands wait for the negotiation
+// Send a command to every machine, or to one; the game's commands wait for the negotiation. With noDuplicate, a command
+// that is still queued from this machine isn't sent again
 BOOL GFL_NetSendCommand(NetHandle *handle, int command, u16 size, const void *data);
-BOOL GFL_NetSendCommandToMachine(NetHandle *handle, u8 sendID, u16 command, u32 size, const void *data, u32 a5, BOOL a6,
-                                 BOOL noCopy);
-BOOL GFL_NetSendCommandToBits(NetHandle *handle, int dest, u16 command, int size, const void *data, u32 a5, BOOL a6,
-                              BOOL noCopy);
+BOOL GFL_NetSendCommandToMachine(NetHandle *handle, u8 sendID, u16 command, u32 size, const void *data, u32 unused,
+                                 BOOL noDuplicate, BOOL noCopy);
+BOOL GFL_NetSendCommandToBits(NetHandle *handle, int dest, u16 command, int size, const void *data, u32 unused,
+                              BOOL noDuplicate, BOOL noCopy);
 BOOL GFL_NetIsSendQueueEmpty(NetHandle *handle);
 void GFL_NetSendTiming(NetHandle *handle, u16 timing);
 BOOL GFL_NetIsTimingRecv(NetHandle *handle, u16 timing);

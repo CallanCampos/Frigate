@@ -28,11 +28,11 @@ static void GFL_NetFinishExit(void *work);
 static void GFL_NetSetInitIconPos(int x, int y);
 static void GFL_NetRefreshIcon(void);
 
-void GFL_NetBoot(int a0, int a1, HeapID parentHeapId, HeapID heapId) {
+void GFL_NetBoot(int libraryHeapId, int unused, HeapID parentHeapId, HeapID heapId) {
     const GFLNetDevTable *pDevTable = NetDefine_LoadDevice(GFL_NET_TYPE_WIFI);
 
     if (pDevTable != NULL) {
-        pDevTable->prepare(a0, a1);
+        pDevTable->prepare(libraryHeapId, unused);
     }
     NetDefine_UnloadDevice(GFL_NET_TYPE_WIFI);
     if (parentHeapId != heapId) {
@@ -423,35 +423,35 @@ BOOL GFL_NetSendCommand(NetHandle *handle, int command, u16 size, const void *da
     return NetSystem_QueueCommand(command, (u8 *)data, size, 0, NetHandle_GetNetId(handle), 0xff, FALSE);
 }
 
-BOOL GFL_NetSendCommandToMachine(NetHandle *handle, u8 sendID, u16 command, u32 size, const void *data, u32 a5, BOOL a6,
-                                 BOOL noCopy) {
+BOOL GFL_NetSendCommandToMachine(NetHandle *handle, u8 sendID, u16 command, u32 size, const void *data, u32 unused,
+                                 BOOL noDuplicate, BOOL noCopy) {
     GFLNetInitData *ini = GFL_NetGetInitData();
     u8 dest = 0xff;
 
     if (!GFL_NetIsHandleNegotiated(handle) && command >= GFL_NET_CMD_BASE_COUNT) {
         return FALSE;
     }
-    if (a6 && NetSystem_HasQueuedCommand(command, NetHandle_GetNetId(handle))) {
+    if (noDuplicate && NetSystem_HasQueuedCommand(command, NetHandle_GetNetId(handle))) {
         return FALSE;
     }
     if (sendID != 0xff) {
         GFL_ASSERT(sendID < 7);
         dest = 1 << sendID;
     }
-    return NetSystem_QueueCommand(command, (u8 *)data, size, a5, NetHandle_GetNetId(handle), dest, noCopy);
+    return NetSystem_QueueCommand(command, (u8 *)data, size, unused, NetHandle_GetNetId(handle), dest, noCopy);
 }
 
-BOOL GFL_NetSendCommandToBits(NetHandle *handle, int dest, u16 command, int size, const void *data, u32 a5, BOOL a6,
-                              BOOL noCopy) {
+BOOL GFL_NetSendCommandToBits(NetHandle *handle, int dest, u16 command, int size, const void *data, u32 unused,
+                              BOOL noDuplicate, BOOL noCopy) {
     GFLNetInitData *ini = GFL_NetGetInitData();
 
     if (!GFL_NetIsHandleNegotiated(handle) && command >= GFL_NET_CMD_BASE_COUNT) {
         return FALSE;
     }
-    if (a6 && NetSystem_HasQueuedCommand(command, NetHandle_GetNetId(handle))) {
+    if (noDuplicate && NetSystem_HasQueuedCommand(command, NetHandle_GetNetId(handle))) {
         return FALSE;
     }
-    return NetSystem_QueueCommand(command, (u8 *)data, size, a5, NetHandle_GetNetId(handle), dest, noCopy);
+    return NetSystem_QueueCommand(command, (u8 *)data, size, unused, NetHandle_GetNetId(handle), dest, noCopy);
 }
 
 BOOL GFL_NetIsSendQueueEmpty(NetHandle *handle) {

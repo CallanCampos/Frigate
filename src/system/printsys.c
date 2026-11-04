@@ -551,15 +551,16 @@ static const u16 *GFL_TextRndExecColorCmd(TextRenderer *renderer, const u16 *cmd
 }
 
 PrintStream *PrintStream_Create(BmpWin *window, s16 x, s16 y, const StrBuf *strbuf, Font *font, s32 wait,
-                                TCBExManager *tcbManager, u32 a7, HeapID heapId, u16 a9) {
-    return PrintStream_CreateWithCallback(window, x, y, strbuf, font, wait, tcbManager, a7, heapId, a9, NULL);
+                                TCBExManager *tcbManager, u32 priority, HeapID heapId, u16 backgroundColor) {
+    return PrintStream_CreateWithCallback(window, x, y, strbuf, font, wait, tcbManager, priority, heapId,
+                                          backgroundColor, NULL);
 }
 
 PrintStream *PrintStream_CreateWithCallback(BmpWin *window, s16 x, s16 y, const StrBuf *strbuf, Font *font, s32 wait,
-                                            TCBExManager *tcbManager, u32 a7, HeapID heapId, u16 a9,
+                                            TCBExManager *tcbManager, u32 priority, HeapID heapId, u16 backgroundColor,
                                             PrintStreamCallback callback) {
     GFLBitmap *bitmap = BmpWin_GetBitmap(window);
-    TCBEx *task = GFL_TCBExMgrAddTask(tcbManager, PrintStream_Task, sizeof(PrintStream), a7);
+    TCBEx *task = GFL_TCBExMgrAddTask(tcbManager, PrintStream_Task, sizeof(PrintStream), priority);
     PrintStream *stream = GFL_TCBExGetData(task);
     u8 steps[2];
 
@@ -578,7 +579,7 @@ PrintStream *PrintStream_CreateWithCallback(BmpWin *window, s16 x, s16 y, const 
     stream->window = window;
     stream->bitmap = bitmap;
     stream->state = PRINT_STREAM_RUNNING;
-    stream->backgroundColor = a9;
+    stream->backgroundColor = backgroundColor;
     stream->pageMode = PRINT_STREAM_PAGE_CLEAR;
     stream->scrollOffset = 0;
     stream->continueRequested = FALSE;
