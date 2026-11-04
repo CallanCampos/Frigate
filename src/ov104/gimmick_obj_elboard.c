@@ -268,6 +268,16 @@ BOOL GimmickGateZoneData_Load(GimmickGateZoneData *dest, u32 arcId, u32 fileId) 
     return TRUE;
 }
 
+enum {
+    STEP_SAVE_CAMERA,
+    STEP_MOVE_TO_BOARD,
+    STEP_WAIT_MOVE,
+    STEP_WAIT_INPUT,
+    STEP_RETURN_CAMERA,
+    STEP_WAIT_RETURN,
+    STEP_END,
+};
+
 GameEventReturnCode GimmickGateEvent_ViewBoard(GameEvent *event, u32 *state, void *data) {
     GimmickGateEventData *work = data;
     Field *field = work->field;
@@ -284,14 +294,14 @@ GameEventReturnCode GimmickGateEvent_ViewBoard(GameEvent *event, u32 *state, voi
     u32 keys;
 
     switch (*state) {
-    case 0:
+    case STEP_SAVE_CAMERA:
         work->pitch = FieldCamera_CoordsGetPitch(camera);
         work->yaw = FieldCamera_CoordsGetYaw(camera);
         work->zoom = FieldCamera_CoordsGetZoom(camera);
         FieldCamera_CoordsGetTargetOffset(camera, &work->targetOffset);
         (*state)++;
         break;
-    case 1:
+    case STEP_MOVE_TO_BOARD:
         switch (GimmickGate_GetDirection(field)) {
         case 1:
         default:
@@ -321,18 +331,18 @@ GameEventReturnCode GimmickGateEvent_ViewBoard(GameEvent *event, u32 *state, voi
         FieldTaskManager_AddTask(tasks, offsetTask, 0);
         (*state)++;
         break;
-    case 2:
+    case STEP_WAIT_MOVE:
         if (FieldTaskManager_IsIdle(tasks)) {
             (*state)++;
         }
         break;
-    case 3:
+    case STEP_WAIT_INPUT:
         keys = GCTX_HIDGetPressedKeys();
         if (keys & PAD_KEY_LEFT || keys & PAD_KEY_RIGHT || keys & PAD_KEY_DOWN || keys & PAD_BUTTON_B) {
             (*state)++;
         }
         break;
-    case 4:
+    case STEP_RETURN_CAMERA:
         zoomTask = FieldCameraMoveTaskZoom_Create(field, work->duration, work->zoom);
         pitchTask = FieldCameraMoveTaskPitch_Callback(field, work->duration, work->pitch);
         yawTask = FieldCameraMoveTaskYaw_Callback(field, work->duration, work->yaw);
@@ -343,12 +353,12 @@ GameEventReturnCode GimmickGateEvent_ViewBoard(GameEvent *event, u32 *state, voi
         FieldTaskManager_AddTask(tasks, offsetTask, 0);
         (*state)++;
         break;
-    case 5:
+    case STEP_WAIT_RETURN:
         if (FieldTaskManager_IsIdle(tasks)) {
             (*state)++;
         }
         break;
-    case 6:
+    case STEP_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -383,10 +393,10 @@ BOOL GimmickGateBoardEntry_MatchesZone(GimmickGateBoardEntry *entry, u16 zone) {
 }
 
 BOOL GimmickGateBoardEntry_MatchesVersion(GimmickGateBoardEntry *entry) {
-    if (entry->unk00 == 0) {
+    if (entry->version == 0) {
         return TRUE;
     }
-    if (entry->unk00 == getGameVersion()) {
+    if (entry->version == getGameVersion()) {
         return TRUE;
     }
     return FALSE;
