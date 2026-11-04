@@ -283,8 +283,8 @@ ClActUnit *ClActUnit_Create(u16 count, u8 priority, HeapID heapId);
 void ClActUnit_Delete(ClActUnit *unit);
 void ClActUnit_SetActive(ClActUnit *unit, BOOL active);
 BOOL ClActUnit_IsActive(ClActUnit *unit);
-void ClActUnit_SetVisibleAnimOnly(ClActUnit *unit, BOOL a1);
-void ClActUnit_SetSharedParams(ClActUnit *unit, BOOL a1);
+void ClActUnit_SetVisibleAnimOnly(ClActUnit *unit, BOOL visibleAnimOnly);
+void ClActUnit_SetSharedParams(ClActUnit *unit, BOOL sharedParams);
 void ClActUnit_SetRenderer(ClActUnit *unit, ClActRenderer *renderer);
 void ClActUnit_UseSystemRenderer(ClActUnit *unit);
 

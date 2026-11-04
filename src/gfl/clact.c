@@ -702,12 +702,12 @@ BOOL ClActUnit_IsActive(ClActUnit *unit) {
     return unit->active;
 }
 
-void ClActUnit_SetVisibleAnimOnly(ClActUnit *unit, BOOL a1) {
-    unit->visibleAnimOnly = a1;
+void ClActUnit_SetVisibleAnimOnly(ClActUnit *unit, BOOL visibleAnimOnly) {
+    unit->visibleAnimOnly = visibleAnimOnly;
 }
 
-void ClActUnit_SetSharedParams(ClActUnit *unit, BOOL a1) {
-    unit->sharedParams = a1;
+void ClActUnit_SetSharedParams(ClActUnit *unit, BOOL sharedParams) {
+    unit->sharedParams = sharedParams;
 }
 
 void ClActUnit_SetRenderer(ClActUnit *unit, ClActRenderer *renderer) {
