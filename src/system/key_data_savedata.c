@@ -21,7 +21,7 @@ void KeyDataSave_Init(KeyDataSave *keyData) {
 void KeyDataSave_ClearRun(KeyDataSave *keyData) {
     MI_CpuFill8(keyData->trainerFlags, 0, sizeof(keyData->trainerFlags));
     keyData->flags = 0;
-    keyData->unk1C = 0;
+    keyData->inChallenge = 0;
     keyData->floor = 0;
     keyData->room = 0;
 }
@@ -60,8 +60,8 @@ u16 KeyDataSave_CountDefeatedTrainers(KeyDataSave *keyData) {
     return count;
 }
 
-u8 func_020102d0(KeyDataSave *keyData) {
-    return keyData->unk1C;
+u8 KeyDataSave_IsInChallenge(KeyDataSave *keyData) {
+    return keyData->inChallenge;
 }
 
 // The floor within the area reached
@@ -99,8 +99,8 @@ void KeyDataSave_SetTrainerDefeated(KeyDataSave *keyData, u32 a1, u32 bit, BOOL 
     }
 }
 
-void func_02010334(KeyDataSave *keyData, u8 value) {
-    keyData->unk1C = value;
+void KeyDataSave_SetInChallenge(KeyDataSave *keyData, u8 value) {
+    keyData->inChallenge = value;
 }
 
 void KeyDataSave_SetFloor(KeyDataSave *keyData, u8 value) {

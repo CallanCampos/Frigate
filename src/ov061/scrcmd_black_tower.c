@@ -249,19 +249,19 @@ static BOOL Scrcmd_BlackTower_GetTrainerClass(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL func_ov061_021e5da4(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_BlackTower_IsInChallenge(VM *vm, FieldScriptEnv *env) {
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_020102d0(getKeyDataBlkAddress(save));
+    *var = KeyDataSave_IsInChallenge(getKeyDataBlkAddress(save));
     return FALSE;
 }
 
-static BOOL func_ov061_021e5dd4(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_BlackTower_SetInChallenge(VM *vm, FieldScriptEnv *env) {
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     u8 value = ScriptReadAny(vm, env);
 
-    func_02010334(getKeyDataBlkAddress(save), value);
+    KeyDataSave_SetInChallenge(getKeyDataBlkAddress(save), value);
     return FALSE;
 }
 
@@ -465,8 +465,8 @@ const FieldScriptCommand BLACK_TOWER_SCRIPT_COMMANDS[] = {
     Scrcmd_BlackTower_GetGoalFloor,
     Scrcmd_BlackTower_GetTrainerClass,
     Scrcmd_BlackTower_SetProgress,
-    func_ov061_021e5da4,
-    func_ov061_021e5dd4,
+    Scrcmd_BlackTower_IsInChallenge,
+    Scrcmd_BlackTower_SetInChallenge,
     Scrcmd_BlackTower_GetTrainerId,
     Scrcmd_BlackTower_GetVersion,
     Scrcmd_BlackTower_GetInfo,

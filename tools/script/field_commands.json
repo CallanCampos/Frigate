@@ -6813,7 +6813,7 @@
      "area": "Keys"
     },
     "1020": {
-     "handler": "func_ov061_021e5da4",
+     "handler": "Scrcmd_BlackTower_IsInChallenge",
      "overlay": 61,
      "args": [
       "var"
@@ -6821,7 +6821,7 @@
      "area": "Keys"
     },
     "1021": {
-     "handler": "func_ov061_021e5dd4",
+     "handler": "Scrcmd_BlackTower_SetInChallenge",
      "overlay": 61,
      "args": [
       "any"

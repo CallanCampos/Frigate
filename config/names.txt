@@ -778,11 +778,13 @@
 . 0x02010284 KeyDataSave_GetSeed
 . 0x02010288 KeyDataSave_IsTrainerDefeated
 . 0x020102a4 KeyDataSave_CountDefeatedTrainers
+. 0x020102d0 KeyDataSave_IsInChallenge
 . 0x020102d4 KeyDataSave_GetFloorInArea
 . 0x020102ec KeyDataSave_GetRoom
 . 0x020102f0 KeyDataSave_SetProgress
 . 0x02010300 KeyDataSave_SetSeed
 . 0x02010304 KeyDataSave_SetTrainerDefeated
+. 0x02010334 KeyDataSave_SetInChallenge
 . 0x02010338 KeyDataSave_SetFloor
 . 0x0201033c KeyDataSave_SetRoom
 . 0x02010340 KeyDataSave_IsFlagSet
@@ -14403,6 +14405,8 @@ overlays/ov061 0x021e5c5c Scrcmd_BlackTower_GetSpecialTrainerFlag
 overlays/ov061 0x021e5cb8 Scrcmd_BlackTower_GetGoalFloor
 overlays/ov061 0x021e5d0c Scrcmd_BlackTower_GetRoomNpcCount
 overlays/ov061 0x021e5d58 Scrcmd_BlackTower_GetTrainerClass
+overlays/ov061 0x021e5da4 Scrcmd_BlackTower_IsInChallenge
+overlays/ov061 0x021e5dd4 Scrcmd_BlackTower_SetInChallenge
 overlays/ov061 0x021e5e08 Scrcmd_BlackTower_GetTrainerId
 overlays/ov061 0x021e5e60 Scrcmd_BlackTower_GetVersion
 overlays/ov061 0x021e5e98 Scrcmd_BlackTower_GetInfo

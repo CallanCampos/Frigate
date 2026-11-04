@@ -17,7 +17,8 @@ struct KeyDataSave {
     // A bit for each Trainer of each of five floors, set when defeated
     u32 trainerFlags[KEY_DATA_TRAINER_FLAG_WORDS];
     u32 flags;
-    u8 unk1C;
+    // Set while a challenge runs, so a challenge left unfinished is found as given up
+    u8 inChallenge;
     // The floors climbed, counted through all areas, and the room of the floor
     u8 floor;
     u8 room;

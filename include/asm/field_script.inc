@@ -4668,14 +4668,12 @@
     .2byte \a0
     .endm
 
-    // func_ov061_021e5da4
-    .macro Plugin9_Cmd1020 a0
+    .macro IsInChallenge a0
     FieldCommand 1020
     .2byte \a0
     .endm
 
-    // func_ov061_021e5dd4
-    .macro Plugin9_Cmd1021 a0
+    .macro SetInChallenge a0
     FieldCommand 1021
     .2byte \a0
     .endm

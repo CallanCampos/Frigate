@@ -859,7 +859,7 @@ L_0DF8:
     ActorCmdWait
 
 L_0E1A:
-    Plugin9_Cmd1020 0x803d
+    IsInChallenge 0x803d
     KeyInfoGetMyCityProgress 0x8024
     VMStackPush 0x803d
     VMStackPushConst 1
@@ -1127,7 +1127,7 @@ L_1218:
     ActorMsgClose
 
 L_121C:
-    Plugin9_Cmd1021 0
+    SetInChallenge 0
     PedometerEnd
     PokePartyRecoverAll
     WorkSetConst 0x803d, 0
@@ -1528,7 +1528,7 @@ L_1859:
 
 L_1865:
     ActorMsgClose
-    Plugin9_Cmd1021 1
+    SetInChallenge 1
     PlayerGetGPos 0x8047, 0x8048
     VMStackPush 0x8048
     VMStackPushConst 6
