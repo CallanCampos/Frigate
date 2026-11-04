@@ -346,8 +346,8 @@ LinkFestival *GSYS_GetLinkFestival(GameSystem *gsys) {
     return gsys->festival;
 }
 
-void GSYS_SetNetErrorPending(GameSystem *gsys, u32 a1) {
-    gsys->netErrorPending = a1;
+void GSYS_SetNetErrorPending(GameSystem *gsys, u32 pending) {
+    gsys->netErrorPending = pending;
 }
 
 u8 GSYS_IsNetErrorPending(GameSystem *gsys) {

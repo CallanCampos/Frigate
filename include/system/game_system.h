@@ -73,7 +73,7 @@ BOOL GSYS_CheckNowEvent(GameSystem *gsys);
 void GSYS_QueueProc(GameSystem *gsys, s32 overlayId, const GameProcFunctions *functions, void *param);
 void GSYS_QueueProcAsEvent(GameEvent *event, s32 overlayId, const GameProcFunctions *functions, void *param);
 BOOL GSYS_TryBootGameComm(GameSystem *gsys);
-void GSYS_SetNetErrorPending(GameSystem *gsys, u32 a1);
+void GSYS_SetNetErrorPending(GameSystem *gsys, u32 pending);
 u8 GSYS_IsNetErrorPending(GameSystem *gsys);
 void GSYS_SetGameCommPaused(GameSystem *gsys, u32 value);
 u8 GSYS_IsGameCommPaused(GameSystem *gsys);
