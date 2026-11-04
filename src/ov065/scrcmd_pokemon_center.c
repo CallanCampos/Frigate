@@ -62,12 +62,12 @@ enum {
     MATCH_INFO_TIMED_OUT,
     // Reads and resets the points that the scripts award with Scrcmd_PokemonCenter_AddBattlePoints
     MATCH_INFO_TAKE_BATTLE_POINTS,
-    MATCH_INFO_UNK_A3,
+    MATCH_INFO_RESULT_PENDING,
 };
 
 // What Scrcmd_PokemonCenter_SetMatchState does
 enum {
-    MATCH_ACTION_SET_UNK_A3 = 4,
+    MATCH_ACTION_SET_RESULT_PENDING = 4,
     MATCH_ACTION_COUNT_RECORD_0x35,
 };
 
@@ -841,8 +841,8 @@ BOOL Scrcmd_PokemonCenter_GetMatchState(VM *vm, FieldScriptEnv *env) {
         *var = GameData_GetCounter(gameData);
         GameData_ResetCounter(gameData);
         break;
-    case MATCH_INFO_UNK_A3:
-        *var = func_0200f384(record);
+    case MATCH_INFO_RESULT_PENDING:
+        *var = RecordSave_IsMatchResultPending(record);
         break;
     }
     return FALSE;
@@ -865,7 +865,8 @@ BOOL Scrcmd_PokemonCenter_ClearMatchInProgress(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-// MATCH_ACTION_SET_UNK_A3 sets the value that Scrcmd_PokemonCenter_GetMatchState's MATCH_INFO_UNK_A3 returns
+// MATCH_ACTION_SET_RESULT_PENDING sets the flag that Scrcmd_PokemonCenter_GetMatchState's MATCH_INFO_RESULT_PENDING
+// returns: set when a Random Matchup starts, cleared once its result was taken
 BOOL Scrcmd_PokemonCenter_SetMatchState(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
@@ -874,8 +875,8 @@ BOOL Scrcmd_PokemonCenter_SetMatchState(VM *vm, FieldScriptEnv *env) {
     u16 value = ScriptReadAny(vm, env);
 
     switch (action) {
-    case MATCH_ACTION_SET_UNK_A3:
-        func_0200f37c(record, value);
+    case MATCH_ACTION_SET_RESULT_PENDING:
+        RecordSave_SetMatchResultPending(record, value);
         break;
     case MATCH_ACTION_COUNT_RECORD_0x35:
         RecordAddOne(getTrainerCardInfoBlkAddress(save), 0x35);

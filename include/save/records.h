@@ -88,7 +88,8 @@ struct RecordSave {
     // The console and the time, in seconds, a match was started at, and whether it is still in progress
     /* 0x9c */ u8 macAddress[BATTLEMATCH_MAC_ADDRESS_SIZE];
     /* 0xa2 */ u8 matchInProgress;
-    /* 0xa3 */ u8 unkA3;
+    // Set while a Random Matchup's result is still to be taken at the Pokémon Center
+    /* 0xa3 */ u8 matchResultPending;
     /* 0xa4 */ s64 matchSeconds;
 }; // size: 0xac
 
@@ -132,8 +133,8 @@ void RecordSave_SetMatchInProgress(RecordSave *record);
 u8 RecordSave_IsMatchInProgress(RecordSave *record);
 u32 RecordSave_IsMacAddressSame(RecordSave *record);
 u32 RecordSave_IsMatchTimedOut(RecordSave *record);
-void func_0200f37c(RecordSave *record, u32 value);
-u8 func_0200f384(RecordSave *record);
+void RecordSave_SetMatchResultPending(RecordSave *record, u32 value);
+u8 RecordSave_IsMatchResultPending(RecordSave *record);
 // The results of the random matches and the Wi-Fi competition, which the competition cards read, and the live
 // competition's
 RndMatchData *RecordSave_GetRndMatch(RecordSave *record);

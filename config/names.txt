@@ -711,6 +711,8 @@
 . 0x0200f308 RecordSave_IsMacAddressSame
 . 0x0200f334 RecordSave_IsMatchTimedOut
 . 0x0200f368 RecordSave_UpdateMatchSeconds
+. 0x0200f37c RecordSave_SetMatchResultPending
+. 0x0200f384 RecordSave_IsMatchResultPending
 . 0x0200f38c getSeconds
 . 0x0200f3b8 HallOfFameSave_GetSize
 . 0x0200f3c0 HallOfFameTeam_GetSize

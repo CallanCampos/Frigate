@@ -84,12 +84,12 @@ void RecordSave_UpdateMatchSeconds(RecordSave *record) {
     record->matchSeconds = getSeconds();
 }
 
-void func_0200f37c(RecordSave *record, u32 value) {
-    record->unkA3 = value;
+void RecordSave_SetMatchResultPending(RecordSave *record, u32 value) {
+    record->matchResultPending = value;
 }
 
-u8 func_0200f384(RecordSave *record) {
-    return record->unkA3;
+u8 RecordSave_IsMatchResultPending(RecordSave *record) {
+    return record->matchResultPending;
 }
 
 // The seconds since 2000 without the offset of the console's clock, which changing the clock doesn't change
