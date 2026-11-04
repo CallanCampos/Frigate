@@ -101,7 +101,7 @@ void HighLinkSave_SetSpecialPowerFlag(HighLinkSave *save, u32 id) {
     }
 }
 
-void HighLinkSave_GetSpecialFlags(HighLinkSave *save, u8 *dest, u32 a2) {
+void HighLinkSave_GetSpecialFlags(HighLinkSave *save, u8 *dest, u32 count) {
     int i;
 
     for (i = 0; i < 2; i++) {
