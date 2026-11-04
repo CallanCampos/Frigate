@@ -23,31 +23,31 @@ u32 BattleRecOv_SaveVideo(GameData *gameData, u32 slot, BOOL secure, u16 *seq, u
     switch (*seq) {
     case SAVE_STEP_PREPARE:
         if (secure == TRUE) {
-            data_02140f64->header.secure = secure;
-            data_02140f64->header.magic = BATTLE_REC_MAGIC;
-            data_02140f64->header.crc = getCRC16(&data_02140f64->header, BATTLE_REC_HEADER_CRC_SIZE);
+            gBattleRecVideo->header.secure = secure;
+            gBattleRecVideo->header.magic = BATTLE_REC_MAGIC;
+            gBattleRecVideo->header.crc = getCRC16(&gBattleRecVideo->header, BATTLE_REC_HEADER_CRC_SIZE);
         }
-        decryptVSPlayer(&data_02140f64->body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(&data_02140f64->body));
+        decryptVSPlayer(&gBattleRecVideo->body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(&gBattleRecVideo->body));
         (*seq)++;
         break;
     case SAVE_STEP_WRITE:
-        return BattleRec_SaveSlot(gameData, data_02140f64, slot, saveSeq, heapId);
+        return BattleRec_SaveSlot(gameData, gBattleRecVideo, slot, saveSeq, heapId);
     }
     return 0;
 }
 
 void BattleRecOv_EncryptBody(SaveControl *save) {
-    decryptVSPlayer(&data_02140f64->body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(&data_02140f64->body));
+    decryptVSPlayer(&gBattleRecVideo->body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(&gBattleRecVideo->body));
 }
 
 u32 BattleRecOv_SaveDataNumber(GameData *gameData, u64 dataNumber, u16 *seq, u16 *saveSeq, HeapID heapId) {
     switch (*seq) {
     case SAVE_STEP_PREPARE:
-        data_02140f64->header.dataNumber = dataNumber;
+        gBattleRecVideo->header.dataNumber = dataNumber;
         (*seq)++;
         break;
     case SAVE_STEP_WRITE:
-        return BattleRec_SaveSlot(gameData, data_02140f64, 0, saveSeq, heapId);
+        return BattleRec_SaveSlot(gameData, gBattleRecVideo, 0, saveSeq, heapId);
     }
     return 0;
 }
@@ -55,14 +55,14 @@ u32 BattleRecOv_SaveDataNumber(GameData *gameData, u64 dataNumber, u16 *seq, u16
 u32 BattleRecOv_SaveSecureVideo(GameData *gameData, u32 slot, u16 *seq, u16 *saveSeq, HeapID heapId) {
     switch (*seq) {
     case SAVE_STEP_PREPARE:
-        data_02140f64->header.secure = TRUE;
-        data_02140f64->header.magic = BATTLE_REC_MAGIC;
-        data_02140f64->header.crc = getCRC16(&data_02140f64->header, BATTLE_REC_HEADER_CRC_SIZE);
-        decryptVSPlayer(&data_02140f64->body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(&data_02140f64->body));
+        gBattleRecVideo->header.secure = TRUE;
+        gBattleRecVideo->header.magic = BATTLE_REC_MAGIC;
+        gBattleRecVideo->header.crc = getCRC16(&gBattleRecVideo->header, BATTLE_REC_HEADER_CRC_SIZE);
+        decryptVSPlayer(&gBattleRecVideo->body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(&gBattleRecVideo->body));
         (*seq)++;
         break;
     case SAVE_STEP_WRITE:
-        return BattleRec_SaveSlot(gameData, data_02140f64, slot, saveSeq, heapId);
+        return BattleRec_SaveSlot(gameData, gBattleRecVideo, slot, saveSeq, heapId);
     }
     return 0;
 }
@@ -86,5 +86,5 @@ u32 BattleRecOv_DeleteVideoMain(GameData *gameData, u32 block) {
 }
 
 BattleRecVideo *BattleRecOv_GetVideo(void) {
-    return data_02140f64;
+    return gBattleRecVideo;
 }

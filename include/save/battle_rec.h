@@ -163,14 +163,14 @@ typedef struct {
 // The size that the body's CRC covers, and that is encrypted
 #define BATTLE_REC_BODY_CRC_SIZE offsetof(BattleRecBody, crc)
 
-// The battle video that is loaded, data_02140f64 (battle_rec.c).
+// The battle video that is loaded, gBattleRecVideo (battle_rec.c).
 typedef struct {
     u8 profile[0x80];
     BattleRecHeader header;
     BattleRecBody body;
 } BattleRecVideo;
 
-extern BattleRecVideo *data_02140f64;
+extern BattleRecVideo *gBattleRecVideo;
 
 // The values of a header that BattleRec_GetHeaderValue gives
 enum {

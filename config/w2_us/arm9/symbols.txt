@@ -9019,7 +9019,7 @@ data_0214022d_w2_us kind:bss addr:0x0214022d
 sSndMic kind:bss addr:0x02140f98
 sSndStream kind:bss addr:0x02140f9c
 SaveControlWork kind:bss addr:0x02140fa0
-data_02140f64 kind:bss addr:0x02140fa4
+gBattleRecVideo kind:bss addr:0x02140fa4
 sStartSeconds kind:bss addr:0x02140fa8
 sAddStep kind:bss addr:0x02140fb0
 sBlock kind:bss addr:0x02140fb4

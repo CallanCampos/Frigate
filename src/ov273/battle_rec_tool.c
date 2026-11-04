@@ -210,7 +210,7 @@ void BattleRecTool_StoreSetup(BtlSetup *setup) {
     switch (setup->studioMode) {
     case BTL_STUDIO_MODE_NONE:
     default:
-        body = &data_02140f64->body;
+        body = &gBattleRecVideo->body;
         BattleRecTool_StoreParties(setup, body);
         BattleRecTool_StoreClients(setup, body->clients, 4);
         BattleRecTool_StoreRecData(setup, body);
@@ -236,7 +236,7 @@ void BattleRecTool_LoadSetup(BtlSetup *setup, u32 mode, HeapID heapId) {
     switch (mode) {
     case 0:
     default:
-        body = &data_02140f64->body;
+        body = &gBattleRecVideo->body;
         BattleRecTool_LoadParties(setup, body, heapId);
         BattleRecTool_LoadClients(setup, body->clients, 4);
         BattleRecTool_LoadRecData(setup, body);

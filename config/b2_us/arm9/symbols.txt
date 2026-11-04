@@ -9001,7 +9001,7 @@ sBuffer kind:bss addr:0x0213b328
 sSndMic kind:bss addr:0x02140f58
 sSndStream kind:bss addr:0x02140f5c
 SaveControlWork kind:bss addr:0x02140f60
-data_02140f64 kind:bss addr:0x02140f64
+gBattleRecVideo kind:bss addr:0x02140f64
 sStartSeconds kind:bss addr:0x02140f68
 sAddStep kind:bss addr:0x02140f70
 sBlock kind:bss addr:0x02140f74

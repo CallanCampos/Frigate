@@ -5585,6 +5585,7 @@
 . 0x02140f58 sSndMic
 . 0x02140f5c sSndStream
 . 0x02140f60 SaveControlWork
+. 0x02140f64 gBattleRecVideo
 . 0x02140f68 sStartSeconds
 . 0x02140f70 sAddStep
 . 0x02140f74 sBlock
