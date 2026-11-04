@@ -661,10 +661,10 @@ void MCSS_GetPositionOffset(MCSS *mcss, VecFx32 *out) {
     out->z = mcss->posOffset.z;
 }
 
-void MCSS_SetPositionOffset(MCSS *mcss, VecFx32 *a1) {
-    mcss->posOffset.x = a1->x;
-    mcss->posOffset.y = a1->y;
-    mcss->posOffset.z = a1->z;
+void MCSS_SetPositionOffset(MCSS *mcss, VecFx32 *offset) {
+    mcss->posOffset.x = offset->x;
+    mcss->posOffset.y = offset->y;
+    mcss->posOffset.z = offset->z;
 }
 
 void MCSS_GetScale(MCSS *mcss, VecFx32 *out) {

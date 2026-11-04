@@ -97,7 +97,7 @@ void MCSS_StartFade(MCSS *mcss, u8 startLevel, u8 endLevel, s32 wait, u32 color)
 BOOL MCSS_IsFading(MCSS *mcss);
 void MCSS_SetNoShadow(MCSS *mcss, u32 a1);
 void MCSS_SetShadowAlpha(MCSS *mcss, u32 a1);
-void MCSS_SetPositionOffset(MCSS *mcss, VecFx32 *a1);
+void MCSS_SetPositionOffset(MCSS *mcss, VecFx32 *offset);
 u16 MCSS_GetHeight(MCSS *mcss);
 u16 MCSS_GetWidth(MCSS *mcss);
 s16 MCSS_GetOffsetX(MCSS *mcss);
