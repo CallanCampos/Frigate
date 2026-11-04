@@ -98,9 +98,9 @@ u32 BtlSetup_CheckFlag(BtlSetup *setup, u32 flag) {
 void BtlSetup_ApplyRegulation(BtlSetup *setup, Regulation *regulation, HeapID heapId) {
     int i;
 
-    setup->unk8E = Regulation_GetParam(regulation, REGULATION_PARAM_16) * 60;
-    setup->unk8C = Regulation_GetParam(regulation, REGULATION_PARAM_15) * 60;
-    Regulation_GetShooterSettings(regulation, (RegulationUnkAC *)setup->unk90);
+    setup->unk8E = Regulation_GetParam(regulation, REGULATION_PARAM_COMMAND_TIME_LIMIT) * 60;
+    setup->unk8C = Regulation_GetParam(regulation, REGULATION_PARAM_GAME_TIME_LIMIT) * 60;
+    Regulation_GetShooterSettings(regulation, (RegulationShooterSettings *)setup->unk90);
     switch (Regulation_GetParam(regulation, REGULATION_PARAM_18)) {
     case 0:
         break;

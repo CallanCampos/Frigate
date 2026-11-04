@@ -91,11 +91,11 @@ u32 Regulation_GetParam(Regulation *regulation, u32 param) {
     case REGULATION_PARAM_LAUNCHER:
         value = regulation->launcher;
         break;
-    case REGULATION_PARAM_15:
-        value = regulation->unkB3;
+    case REGULATION_PARAM_GAME_TIME_LIMIT:
+        value = regulation->gameTimeLimit;
         break;
-    case REGULATION_PARAM_16:
-        value = regulation->unkB4;
+    case REGULATION_PARAM_COMMAND_TIME_LIMIT:
+        value = regulation->commandTimeLimit;
         break;
     case REGULATION_PARAM_ALLOW_NICKNAMES:
         value = regulation->allowNicknames;
@@ -179,11 +179,11 @@ void Regulation_SetParam(Regulation *regulation, u32 param, int value) {
             regulation->launcher = value;
         }
         break;
-    case REGULATION_PARAM_15:
-        regulation->unkB3 = value;
+    case REGULATION_PARAM_GAME_TIME_LIMIT:
+        regulation->gameTimeLimit = value;
         break;
-    case REGULATION_PARAM_16:
-        regulation->unkB4 = value;
+    case REGULATION_PARAM_COMMAND_TIME_LIMIT:
+        regulation->commandTimeLimit = value;
         break;
     case REGULATION_PARAM_ALLOW_NICKNAMES:
         if (value < 2) {
@@ -229,8 +229,8 @@ BOOL Regulation_CheckParamBit(Regulation *regulation, u32 param, int index) {
             return TRUE;
         }
         break;
-    case REGULATION_PARAM_BITS_AC:
-        if (regulation->unkAC[byte] & (1 << bit)) {
+    case REGULATION_PARAM_SHOOTER_DISABLED_ITEMS:
+        if (regulation->shooterDisabledItems[byte] & (1 << bit)) {
             return TRUE;
         }
         break;
@@ -238,13 +238,13 @@ BOOL Regulation_CheckParamBit(Regulation *regulation, u32 param, int index) {
     return FALSE;
 }
 
-void Regulation_GetShooterSettings(Regulation *regulation, RegulationUnkAC *out) {
-    MI_CpuFill8(out, 0, sizeof(RegulationUnkAC));
+void Regulation_GetShooterSettings(Regulation *regulation, RegulationShooterSettings *out) {
+    MI_CpuFill8(out, 0, sizeof(RegulationShooterSettings));
     out->launcher = Regulation_GetParam(regulation, REGULATION_PARAM_LAUNCHER);
     if (out->launcher >= 2) {
         out->launcher = 1;
     }
-    MI_CpuCopy8(regulation->unkAC, out->unk0, sizeof(out->unk0));
+    MI_CpuCopy8(regulation->shooterDisabledItems, out->disabledItems, sizeof(out->disabledItems));
 }
 
 void *TournamentEntry_GetCardData(TournamentEntry *tournament) {

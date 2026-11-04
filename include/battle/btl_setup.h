@@ -93,7 +93,7 @@ struct BtlSetup {
     CommPlayerSupport *unk88;
     u16 unk8C;
     u16 unk8E;
-    // What Regulation_GetShooterSettings fills in from a regulation, a RegulationUnkAC
+    // What Regulation_GetShooterSettings fills in from a regulation, a RegulationShooterSettings
     u8 unk90[7];
     u8 unk97;
     // The player's badges

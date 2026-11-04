@@ -25,9 +25,9 @@ enum {
     REGULATION_PARAM_REQUIRED_FORM,
     REGULATION_PARAM_LAUNCHER,
     // A bit array as well
-    REGULATION_PARAM_BITS_AC,
-    REGULATION_PARAM_15,
-    REGULATION_PARAM_16,
+    REGULATION_PARAM_SHOOTER_DISABLED_ITEMS,
+    REGULATION_PARAM_GAME_TIME_LIMIT,
+    REGULATION_PARAM_COMMAND_TIME_LIMIT,
     REGULATION_PARAM_ALLOW_NICKNAMES,
     REGULATION_PARAM_18,
     REGULATION_PARAM_SHOW_PARTNERS,
@@ -67,9 +67,11 @@ struct Regulation {
     u8 requiredForm;
     // The Wonder Launcher: 2 leaves it to the players
     u8 launcher;
-    u8 unkAC[0x7];
-    u8 unkB3;
-    u8 unkB4;
+    // A bit for each Shooter item that can't be used (ShooterItem_IsEnabled)
+    u8 shooterDisabledItems[0x7];
+    // The battle's time limit and each turn's command time limit, which the battle setup multiplies by 60
+    u8 gameTimeLimit;
+    u8 commandTimeLimit;
     // Whether nicknames are kept
     u8 allowNicknames;
     u8 unkB6;
@@ -84,9 +86,9 @@ struct Regulation {
 
 // What Regulation_GetShooterSettings fills in from a regulation
 typedef struct {
-    u8 unk0[0x7];
+    u8 disabledItems[0x7];
     u8 launcher;
-} RegulationUnkAC;
+} RegulationShooterSettings;
 
 // The rules of a battle, such as the level cap
 Regulation *Regulation_Create(HeapID heapId);
@@ -97,7 +99,7 @@ StrBuf *makeStrbufLoadBattleTypeText(Regulation *regulation, HeapID heapId);
 u32 Regulation_GetParam(Regulation *regulation, u32 param);
 // Whether a bit of one of the regulation's bit arrays is set
 BOOL Regulation_CheckParamBit(Regulation *regulation, u32 param, int index);
-void Regulation_GetShooterSettings(Regulation *regulation, RegulationUnkAC *out);
+void Regulation_GetShooterSettings(Regulation *regulation, RegulationShooterSettings *out);
 // poke_regulation.c, which the ROM names: checks of Pokémon and parties against a regulation. Names are not swan's
 
 // What a party fails a regulation by, which PokeRegulation_CheckPicked, PokeRegulation_CheckPartyCanEnter and
