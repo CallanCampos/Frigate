@@ -77,11 +77,11 @@ u8 WbtSystem_GetType(WbtSystem *sys) {
 }
 
 void WbtSystem_SetCategory(WbtSystem *sys, u32 value) {
-    sys->unk14 = value;
+    sys->category = value;
 }
 
 u32 WbtSystem_GetCategory(WbtSystem *sys) {
-    return sys->unk14;
+    return sys->category;
 }
 
 void WbtSystem_SetRound(WbtSystem *sys, u32 round) {
@@ -125,7 +125,7 @@ WbtPartyList *WbtSystem_GetPartyList(WbtSystem *sys) {
 }
 
 void WbtSystem_SetRentalMode(WbtSystem *sys, u32 value) {
-    sys->unk13E4 = value;
+    sys->rentalMode = value;
 }
 
 WbtEntrant *WbtSystem_GetEntrant(WbtSystem *sys, u32 index) {

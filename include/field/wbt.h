@@ -160,7 +160,7 @@ struct WbtSystem {
     u32 tournament;
     // The battle style, which starts out as 4, out of range
     u32 style;
-    u32 unk14;
+    u32 category;
     u32 round;
     // The Type Expert Tournament's type
     u8 type;
@@ -204,7 +204,7 @@ struct WbtSystem {
     u8 unk13DF;
     // The script variable that plugin 6 passes with EventWbtPokeSelect_Create's event
     u16 *resultVar;
-    u32 unk13E4;
+    u32 rentalMode;
 };
 
 // A tournament's type, from overlay 36's table of tournaments 1 to 15
