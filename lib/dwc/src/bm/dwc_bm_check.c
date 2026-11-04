@@ -4,7 +4,7 @@
 // ones emptied and the mask of the connections in use made again. DWC_BM_Init is the only caller of the two checks;
 // one more function reads the pages for the game's local configuration (wih_dwc.c). NCFG_ReadConfig has the name of
 // the libncfg symbol that Black 1's decompilation (aletheia) recovered at the same place; that game has no
-// NCFG_ReadConfigEx, whose name is ours, after the two checks'.
+// NCFG_ReadConfigEx, which reads the TWL pages as well, as NCFG_CheckConfigEx checks them.
 
 #include "bm_internal.h"
 #include "dwc/bm.h"
