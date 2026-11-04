@@ -90,11 +90,11 @@ JoinAvenueInfo *JoinAvenue_GetInfo(JoinAvenueSave *joinAvenue) {
     return &joinAvenue->info;
 }
 
-u32 JoinAvenue_Add(JoinAvenueSave *joinAvenue, GameData *gameData, void *entry, u32 a3) {
-    u32 result = JoinAvenue_MergeExisting(joinAvenue, gameData, entry, a3);
+u32 JoinAvenue_Add(JoinAvenueSave *joinAvenue, GameData *gameData, void *entry, u32 kind) {
+    u32 result = JoinAvenue_MergeExisting(joinAvenue, gameData, entry, kind);
 
     if (result == JOIN_AVE_ADD_NOT_FOUND) {
-        result = JoinAvenue_MergeOrAdd(joinAvenue, gameData, entry, a3);
+        result = JoinAvenue_MergeOrAdd(joinAvenue, gameData, entry, kind);
     }
     return result;
 }
@@ -104,12 +104,13 @@ void JoinAvenue_ResetAddStep(JoinAvenueSave *joinAvenue) {
 }
 
 // The same as JoinAvenue_Add over two calls, FALSE until the result is out
-BOOL JoinAvenue_AddStepwise(JoinAvenueSave *joinAvenue, GameData *gameData, JoinAvenueVisitor *work, u32 a3, u32 *out) {
+BOOL JoinAvenue_AddStepwise(JoinAvenueSave *joinAvenue, GameData *gameData, JoinAvenueVisitor *work, u32 kind,
+                            u32 *out) {
     u32 result;
 
     switch (sAddStep) {
     case 0:
-        result = JoinAvenue_MergeExisting(joinAvenue, gameData, work, a3);
+        result = JoinAvenue_MergeExisting(joinAvenue, gameData, work, kind);
         if (result == JOIN_AVE_ADD_NOT_FOUND) {
             sAddStep++;
             break;
@@ -117,7 +118,7 @@ BOOL JoinAvenue_AddStepwise(JoinAvenueSave *joinAvenue, GameData *gameData, Join
         *out = result;
         return TRUE;
     case 1:
-        *out = JoinAvenue_MergeOrAdd(joinAvenue, gameData, work, a3);
+        *out = JoinAvenue_MergeOrAdd(joinAvenue, gameData, work, kind);
         return TRUE;
     }
     return FALSE;
