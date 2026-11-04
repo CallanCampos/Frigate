@@ -30,8 +30,8 @@ KeyDataSave *getKeyDataBlkAddress(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_KEY_DATA);
 }
 
-u8 KeyDataSave_GetProgress(KeyDataSave *keyData, u32 a1) {
-    if (a1 == 0) {
+u8 KeyDataSave_GetProgress(KeyDataSave *keyData, u32 kind) {
+    if (kind == 0) {
         return keyData->progress;
     }
     return keyData->progressOther;
@@ -41,8 +41,8 @@ u32 KeyDataSave_GetSeed(KeyDataSave *keyData) {
     return keyData->seed;
 }
 
-BOOL KeyDataSave_IsTrainerDefeated(KeyDataSave *keyData, u32 a1, u32 bit) {
-    return (keyData->trainerFlags[a1] & (1 << bit)) != 0;
+BOOL KeyDataSave_IsTrainerDefeated(KeyDataSave *keyData, u32 word, u32 bit) {
+    return (keyData->trainerFlags[word] & (1 << bit)) != 0;
 }
 
 // How many Trainers have been defeated
@@ -73,8 +73,8 @@ u8 KeyDataSave_GetRoom(KeyDataSave *keyData) {
     return keyData->room;
 }
 
-void KeyDataSave_SetProgress(KeyDataSave *keyData, u8 value, u32 a2) {
-    if (a2 == 0) {
+void KeyDataSave_SetProgress(KeyDataSave *keyData, u8 value, u32 kind) {
+    if (kind == 0) {
         keyData->progress = value;
     } else {
         keyData->progressOther = value;
@@ -85,17 +85,17 @@ void KeyDataSave_SetSeed(KeyDataSave *keyData, u32 value) {
     keyData->seed = value;
 }
 
-void KeyDataSave_SetTrainerDefeated(KeyDataSave *keyData, u32 a1, u32 bit, BOOL set) {
+void KeyDataSave_SetTrainerDefeated(KeyDataSave *keyData, u32 word, u32 bit, BOOL set) {
     u32 mask;
 
     if (set == FALSE) {
         mask = 0xffffffff;
         mask ^= 1 << bit;
-        keyData->trainerFlags[a1] &= mask;
+        keyData->trainerFlags[word] &= mask;
     } else {
         mask = 1;
         mask <<= bit;
-        keyData->trainerFlags[a1] |= mask;
+        keyData->trainerFlags[word] |= mask;
     }
 }
 
@@ -142,21 +142,21 @@ u8 KeyDataSave_GetArea(KeyDataSave *keyData) {
 }
 
 // The floors of the areas before one
-u8 KeyDataSave_GetAreaFirstFloor(int a0) {
+u8 KeyDataSave_GetAreaFirstFloor(int area) {
     int i;
     int floors = 0;
 
-    for (i = 0; i < a0; i++) {
+    for (i = 0; i < area; i++) {
         floors += KeyDataSave_GetAreaFloorCount(i);
     }
     return floors;
 }
 
 // The floors of an area
-u8 KeyDataSave_GetAreaFloorCount(u8 a0) {
+u8 KeyDataSave_GetAreaFloorCount(u8 area) {
     u8 floors[KEY_DATA_AREA_COUNT] = { 1, 1, 1, 1, 1, 2, 3, 2, 3, 4 };
 
-    return floors[a0];
+    return floors[area];
 }
 
 u32 KeyDataSave_GetMoney(KeyDataSave *keyData) {

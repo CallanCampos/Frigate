@@ -150,7 +150,7 @@ u32 MusicalDist_GetDataSize(MusicalDistWork *work);
 // Imports a downloaded musical, a step a frame until it returns TRUE
 MusicalDistWork *MusicalDist_StartWrite(GameData *gameData, void *data, u32 size, HeapID heapId);
 BOOL MusicalDist_WriteStep(MusicalDistWork *work);
-void *getAddressOfExtraSaveBlk(SaveControl *save, u32 block, u32 arg2);
+void *getAddressOfExtraSaveBlk(SaveControl *save, u32 extraId, u32 block);
 void freeIntermediateSaveExtraBlksAfterLoad2(SaveControl *save, u32 block);
 u32 SaveControl_GetStatus(SaveControl *save);
 void SaveControl_GetChangedSize(SaveControl *save, u32 *changed, u32 *total);
@@ -207,15 +207,16 @@ void SymbolSave_RemoveSlot(AreaNPCSave *npcData, u32 index);
 // Whether the Entree Forest Pokémon, packed as EntreeForestPokemon is, is valid, checking its form when check is set
 BOOL SymbolSave_HasPokemon(SaveControl *save, u32 *pokemon, HeapID heapId, BOOL check);
 void SymbolSave_UpdateDeepestArea(AreaNPCSave *npcData, u16 index);
-// Puts a Pokémon from the Dream World in the Entree Forest: its species, a2, sex and form, a5 below 9, and size 2 for
-// a big overworld sprite or 3
-void SymbolSave_AddPokemon(AreaNPCSave *npcData, u16 species, u16 a2, u8 sex, u8 form, u8 a5, u32 size);
+// Puts a Pokémon from the Dream World in the Entree Forest: its species, move, sex and form, an actor type below 9,
+// and size 2 for a big overworld sprite or 3
+void SymbolSave_AddPokemon(AreaNPCSave *npcData, u16 species, u16 move, u8 sex, u8 form, u8 actorType, u32 size);
 
 // Returns a pointer to one of the save's blocks
 void *SaveControl_GetBlockPtr(SaveControl *save, u32 block);
-u32 BattleRec_IsSlotValid(SaveControl *save, HeapID a1, u32 *result, u32 a3);
-u32 BattleRec_FinishAndSaveSlot(GameData *gameData, HeapID a1, u32 a2, u32 a3, u32 a4, u16 *a5, u16 *a6);
-u32 BattleRec_IsVersionSupported(u8 a0);
+u32 BattleRec_IsSlotValid(SaveControl *save, HeapID heapId, u32 *result, u32 slot);
+u32 BattleRec_FinishAndSaveSlot(GameData *gameData, HeapID heapId, u32 modeIndex, u32 counter, u32 slot, u16 *seq,
+                                u16 *saveSeq);
+u32 BattleRec_IsVersionSupported(u8 version);
 void BattleRec_LoadToolOverlay(void);
 void BattleRec_UnloadToolOverlay(void);
 
@@ -223,24 +224,24 @@ void BattleRec_UnloadToolOverlay(void);
 // Trainers there that have been defeated (CheckTrainerAlreadyDefeated)
 KeyDataSave *getKeyDataBlkAddress(SaveControl *save);
 void KeyDataSave_ClearRun(KeyDataSave *keyData);
-u8 KeyDataSave_GetProgress(KeyDataSave *keyData, u32 a1);
+u8 KeyDataSave_GetProgress(KeyDataSave *keyData, u32 kind);
 u32 KeyDataSave_GetSeed(KeyDataSave *keyData);
-BOOL KeyDataSave_IsTrainerDefeated(KeyDataSave *keyData, u32 a1, u32 bit);
+BOOL KeyDataSave_IsTrainerDefeated(KeyDataSave *keyData, u32 word, u32 bit);
 u16 KeyDataSave_CountDefeatedTrainers(KeyDataSave *keyData);
 u8 KeyDataSave_IsInChallenge(KeyDataSave *keyData);
 u8 KeyDataSave_GetFloorInArea(KeyDataSave *keyData);
 u8 KeyDataSave_GetRoom(KeyDataSave *keyData);
-void KeyDataSave_SetProgress(KeyDataSave *keyData, u8 value, u32 a2);
+void KeyDataSave_SetProgress(KeyDataSave *keyData, u8 value, u32 kind);
 void KeyDataSave_SetSeed(KeyDataSave *keyData, u32 value);
-void KeyDataSave_SetTrainerDefeated(KeyDataSave *keyData, u32 a1, u32 bit, BOOL set);
+void KeyDataSave_SetTrainerDefeated(KeyDataSave *keyData, u32 word, u32 bit, BOOL set);
 void KeyDataSave_SetInChallenge(KeyDataSave *keyData, u8 value);
 void KeyDataSave_SetFloor(KeyDataSave *keyData, u8 value);
 void KeyDataSave_SetRoom(KeyDataSave *keyData, u8 value);
 BOOL KeyDataSave_IsFlagSet(KeyDataSave *keyData, u32 bit);
 void KeyDataSave_SetFlag(KeyDataSave *keyData, u32 bit, BOOL set);
 u8 KeyDataSave_GetArea(KeyDataSave *keyData);
-u8 KeyDataSave_GetAreaFirstFloor(int a0);
-u8 KeyDataSave_GetAreaFloorCount(u8 a0);
+u8 KeyDataSave_GetAreaFirstFloor(int area);
+u8 KeyDataSave_GetAreaFloorCount(u8 area);
 u32 KeyDataSave_GetMoney(KeyDataSave *keyData);
 void KeyDataSave_SetMoney(KeyDataSave *keyData, u32 value);
 

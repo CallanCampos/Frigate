@@ -122,7 +122,7 @@ void SymbolSave_RemoveSlot(AreaNPCSave *npcData, u32 index) {
     decryptNpcData(npcData);
 }
 
-void SymbolSave_AddPokemon(AreaNPCSave *npcData, u16 species, u16 a2, u8 sex, u8 form, u8 a5, u32 size) {
+void SymbolSave_AddPokemon(AreaNPCSave *npcData, u16 species, u16 move, u8 sex, u8 form, u8 actorType, u32 size) {
     u32 start;
     u32 end;
     u32 slot;
@@ -139,10 +139,10 @@ void SymbolSave_AddPokemon(AreaNPCSave *npcData, u16 species, u16 a2, u8 sex, u8
         pokemon = &npcData->pokemon[slot];
     }
     pokemon->species = species;
-    pokemon->move = a2;
+    pokemon->move = move;
     pokemon->sex = sex;
     pokemon->form = form;
-    pokemon->actorType = a5;
+    pokemon->actorType = actorType;
     if (size == SYMBOL_KIND_FREE_LARGE) {
         if (npcData->group < 1) {
             npcData->group++;

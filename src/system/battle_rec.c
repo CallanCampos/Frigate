@@ -129,20 +129,20 @@ BattleRecVideo *BattleRec_LoadVideo(SaveControl *save, HeapID heapId, u32 *resul
 }
 
 // Whether a slot has a valid video, without keeping it. result gets the u32 result of BattleRec_LoadToCurrent
-u32 BattleRec_IsSlotValid(SaveControl *save, HeapID a1, u32 *result, u32 a3) {
+u32 BattleRec_IsSlotValid(SaveControl *save, HeapID heapId, u32 *result, u32 slot) {
     BattleRecVideo *video;
     BattleRecBody *body;
 
-    *result = SaveControl_OpenExtraBlock(save, BattleRec_GetExtraBlock(a3), a1);
-    video = getAddressOfExtraSaveBlk(save, BattleRec_GetExtraBlock(a3), 0);
+    *result = SaveControl_OpenExtraBlock(save, BattleRec_GetExtraBlock(slot), heapId);
+    video = getAddressOfExtraSaveBlk(save, BattleRec_GetExtraBlock(slot), 0);
     if (*result == 0) {
         *result = 0;
-        freeIntermediateSaveExtraBlksAfterLoad(save, BattleRec_GetExtraBlock(a3));
+        freeIntermediateSaveExtraBlksAfterLoad(save, BattleRec_GetExtraBlock(slot));
         return FALSE;
     }
     if (*result != 1) {
         *result = 3;
-        freeIntermediateSaveExtraBlksAfterLoad(save, BattleRec_GetExtraBlock(a3));
+        freeIntermediateSaveExtraBlksAfterLoad(save, BattleRec_GetExtraBlock(slot));
         return FALSE;
     }
 
@@ -150,16 +150,16 @@ u32 BattleRec_IsSlotValid(SaveControl *save, HeapID a1, u32 *result, u32 a3) {
     __decryptData(body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(body));
     if (BattleRec_IsEmpty(save, video) == TRUE) {
         *result = 0;
-        freeIntermediateSaveExtraBlksAfterLoad(save, BattleRec_GetExtraBlock(a3));
+        freeIntermediateSaveExtraBlksAfterLoad(save, BattleRec_GetExtraBlock(slot));
         return FALSE;
     }
     if (!BattleRec_IsValid(save, video)) {
         *result = 2;
-        freeIntermediateSaveExtraBlksAfterLoad(save, BattleRec_GetExtraBlock(a3));
+        freeIntermediateSaveExtraBlksAfterLoad(save, BattleRec_GetExtraBlock(slot));
         return FALSE;
     }
     *result = 1;
-    freeIntermediateSaveExtraBlksAfterLoad(save, BattleRec_GetExtraBlock(a3));
+    freeIntermediateSaveExtraBlksAfterLoad(save, BattleRec_GetExtraBlock(slot));
     return TRUE;
 }
 
@@ -184,32 +184,32 @@ u32 BattleRec_SaveSlot(GameData *gameData, BattleRecVideo *video, u32 slot, u16 
     return 0;
 }
 
-// Makes the loaded video's header, signs and encrypts the video and saves it to slot a4, a step each call like
-// BattleRec_SaveSlot. a1 is the heap, a2 the index of the battle mode and a3 the header's counter. 3 if no video is
-// loaded
-u32 BattleRec_FinishAndSaveSlot(GameData *gameData, HeapID a1, u32 a2, u32 a3, u32 a4, u16 *a5, u16 *a6) {
+// Makes the loaded video's header from the index of its battle mode and its counter, signs and encrypts the video and
+// saves it to a slot, a step each call like BattleRec_SaveSlot, whose step saveSeq is. 3 if no video is loaded
+u32 BattleRec_FinishAndSaveSlot(GameData *gameData, HeapID heapId, u32 modeIndex, u32 counter, u32 slot, u16 *seq,
+                                u16 *saveSeq) {
     SaveControl *save = GameData_GetSaveControl(gameData);
     BattleRecHeader *header;
     BattleRecBody *body;
 
-    switch (*a5) {
+    switch (*seq) {
     case 0:
         if (gBattleRecVideo == NULL) {
             return 3;
         }
         header = &gBattleRecVideo->header;
         body = &gBattleRecVideo->body;
-        BattleRec_MakeHeader(save, header, body, a2, a3);
+        BattleRec_MakeHeader(save, header, body, modeIndex, counter);
         header->magic = BATTLE_REC_MAGIC;
         header->crc = getCRC16(header, BATTLE_REC_HEADER_CRC_SIZE);
         body->magic = BATTLE_REC_MAGIC;
         BattleRec_UpdateBodyCRC(body);
         decryptVSPlayer(body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(body));
-        *a6 = 0;
-        (*a5)++;
+        *saveSeq = 0;
+        (*seq)++;
         break;
     case 1:
-        return BattleRec_SaveSlot(gameData, gBattleRecVideo, a4, a6, a1);
+        return BattleRec_SaveSlot(gameData, gBattleRecVideo, slot, saveSeq, heapId);
     }
     return 0;
 }
@@ -376,8 +376,8 @@ u64 BattleRec_GetHeaderValue(BattleRecHeader *header, u32 id, u32 index) {
 }
 
 // Whether a video of this version can be played
-u32 BattleRec_IsVersionSupported(u8 a0) {
-    if (a0 <= BATTLE_REC_VERSION) {
+u32 BattleRec_IsVersionSupported(u8 version) {
+    if (version <= BATTLE_REC_VERSION) {
         return TRUE;
     }
     return FALSE;

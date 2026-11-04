@@ -349,9 +349,9 @@ u32 SaveControl_ContinueExtraSave(SaveControl *ctrl, u32 extra_id) {
     return SaveData_DualSaveStep(ctrl->sv, ctrl->sv_extra[extra_id]);
 }
 
-void *getAddressOfExtraSaveBlk(SaveControl *ctrl, u32 extra_id, u32 arg2) {
+void *getAddressOfExtraSaveBlk(SaveControl *ctrl, u32 extra_id, u32 block) {
     GFL_ASSERT(ctrl->sv_extra[extra_id] != NULL);
-    return SaveData_GetBlockPtr(ctrl->sv_extra[extra_id], arg2);
+    return SaveData_GetBlockPtr(ctrl->sv_extra[extra_id], block);
 }
 
 void SaveControl_ClearExtraBlock(SaveControl *ctrl, u32 extra_id, HeapID heapId) {
