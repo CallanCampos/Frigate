@@ -284,7 +284,7 @@ void setupDownloadPlayConfig(HeapID heapId) {
 
 void downloadPlayConfigForWifi(void) {
     GFL_ASSERT(_localcfg);
-    func_0205e038(_localcfg, 0);
+    NCFG_ReadConfigEx(_localcfg, 0);
 }
 
 int WihDwc_FindFriendInvite(WifiList *wifiList) {

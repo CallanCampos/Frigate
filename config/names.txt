@@ -3502,6 +3502,8 @@
 . 0x0205dee8 ReadNVRAM
 . 0x0205df50 WriteNVRAM
 . 0x0205dfb8 VerifyNVRAM
+. 0x0205e020 NCFG_ReadConfig
+. 0x0205e038 NCFG_ReadConfigEx
 . 0x0205e094 NCFG_CheckConfig
 . 0x0205e0f0 NCFG_CheckConfigEx
 . 0x0205e160 checkConfig
