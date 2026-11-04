@@ -184,7 +184,7 @@ static BOOL DWCi_StartMatchingAfterSearchOwn(void);
 static void DWCi_SetSuspendRequest(int a, MatchCallback b, int c);
 static BOOL DWCi_ProcessSuspendRequest(void);
 static BOOL DWCi_SendSuspendRequest(int value);
-static BOOL func_ov011_02167f0c(void);
+static BOOL DWCi_IsServerSuspendEnabled(void);
 static void DWCi_SetMatchCnt(DWCMatchControl *match);
 static void DWCi_SetHostState(int mode);
 static u8 DWCi_GetHostState(void);
@@ -303,7 +303,7 @@ static BOOL DWCi_UpdateSuspendState(void) {
     }
     mask = DWCi_GetMatchCnt()->suspendAidBitmap;
     mask &= DWC_GetAIDBitmap();
-    if (func_ov011_02167f0c() == 0) {
+    if (DWCi_IsServerSuspendEnabled() == 0) {
         mask &= ~(1 << DWC_GetMyAID());
     }
     if ((DWC_GetAIDBitmap() ^ mask) == 0) {
@@ -4416,7 +4416,7 @@ static BOOL DWCi_SetSuspendAndNotify(u8 index, int set, int mode) {
         DWCi_GPSetServerStatus(-1);
     }
     flags = DWCi_GetMatchCnt()->suspendAidBitmap;
-    if (func_ov011_02167f0c() == 0) {
+    if (DWCi_IsServerSuspendEnabled() == 0) {
         flags &= ~(1 << DWC_GetMyAID());
     }
     hasSet = DWCi_UpdateSuspendState();
@@ -4564,7 +4564,7 @@ static BOOL DWCi_SendSuspendRequest(int value) {
     return TRUE;
 }
 
-static BOOL func_ov011_02167f0c(void) {
+static BOOL DWCi_IsServerSuspendEnabled(void) {
     if (DWC_IsServerMyself() != 0) {
         if (DWCi_GetMatchCnt()->state == 0xd || DWCi_GetMatchCnt()->state == 0x16) {
             return TRUE;

@@ -6922,6 +6922,7 @@ overlays/ov011 0x02167c28 DWCi_StartMatchingAfterSearchOwn
 overlays/ov011 0x02167d24 DWCi_SetSuspendRequest
 overlays/ov011 0x02167d6c DWCi_ProcessSuspendRequest
 overlays/ov011 0x02167de0 DWCi_SendSuspendRequest
+overlays/ov011 0x02167f0c DWCi_IsServerSuspendEnabled
 overlays/ov011 0x02167f3c DWCi_IsSvDownState
 overlays/ov011 0x02167f58 DWCi_SetMatchCnt
 overlays/ov011 0x02167f6c DWCi_GetMatchCnt
