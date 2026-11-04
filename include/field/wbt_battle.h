@@ -11,7 +11,7 @@
 void WbtBattle_SwapPickedPokemon(WbtSystem *sys);
 void WbtBattle_ResetPicks(WbtSystem *sys);
 void WbtBattle_SetPick(WbtSystem *sys, u32 index, u8 value);
-void WbtBattle_RandomPick(WbtSystem *sys, u32 a1);
+void WbtBattle_RandomPick(WbtSystem *sys, u32 index);
 u8 WbtBattle_GetPick(WbtSystem *sys, u32 index);
 WbtPartyList *WbtBattle_CreatePartyList(FieldScriptEnv *env, WbtSystem *sys);
 void WbtBattle_ShowPartyList(WbtPartyList *work);

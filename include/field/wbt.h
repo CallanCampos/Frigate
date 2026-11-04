@@ -193,7 +193,7 @@ struct WbtSystem {
     PokeParty *partyBC;
     PokeParty *partyC0;
     PokeParty *partyC4;
-    u8 unk13C8[4];
+    u8 picks[4];
     WbtPartyList *partyList;
     u8 unk13D0[4];
     // The texts that the battle shows after winning and after losing
