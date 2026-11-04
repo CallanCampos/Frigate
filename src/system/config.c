@@ -29,10 +29,10 @@ void Config_Init(Config *config) {
     MI_CpuFill8(config, 0, sizeof(Config));
     config->textSpeed = 1;
     config->soundFlags = 0;
-    config->unk6 = 0;
-    config->unk7 = 0;
+    config->battleStyle = 0;
+    config->battleScene = 0;
     config->kanji = 0;
-    config->unk9 = 1;
+    config->saveBeforeIR = 1;
     config->cgearOn = 0;
 }
 
@@ -53,19 +53,19 @@ void Config_SetSoundFlags(Config *config, u32 value) {
 }
 
 BOOL Config_GetBattleScene(const Config *config) {
-    return config->unk7;
+    return config->battleScene;
 }
 
 void Config_SetBattleScene(Config *config, u32 value) {
-    config->unk7 = value;
+    config->battleScene = value;
 }
 
 BOOL Config_GetBattleStyle(const Config *config) {
-    return config->unk6;
+    return config->battleStyle;
 }
 
 void Config_SetBattleStyle(Config *config, u32 value) {
-    config->unk6 = value;
+    config->battleStyle = value;
 }
 
 u32 Config_GetKanji(const Config *config) {
@@ -82,11 +82,11 @@ void Config_ApplyMsgLanguage(const Config *config) {
 }
 
 u32 Config_GetSaveBeforeIR(const Config *config) {
-    return config->unk9;
+    return config->saveBeforeIR;
 }
 
 void Config_SetSaveBeforeIR(Config *config, u32 value) {
-    config->unk9 = value;
+    config->saveBeforeIR = value;
 }
 
 u32 Config_GetCGearOn(const Config *config) {

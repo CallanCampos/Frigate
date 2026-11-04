@@ -6,15 +6,15 @@
 #include "struct_decls.h"
 
 // The options, which a save keeps at the start of the block that getTrainerDataBlkAddress returns, so a pointer to one
-// is that block's. The field names are guessed, apart from kanji and cgearOn, which the code's use shows
+// is that block's. The fields are named after their accessors; kanji and cgearOn after what the code does with them
 struct Config {
     u16 textSpeed : 4;
     u16 soundFlags : 2;
-    u16 unk6 : 1;
-    u16 unk7 : 1;
+    u16 battleStyle : 1;
+    u16 battleScene : 1;
     // The kana or kanji text of the Japanese version, which also sets the message language
     u16 kanji : 1;
-    u16 unk9 : 1;
+    u16 saveBeforeIR : 1;
     // Whether the C-Gear is on, which a continue sets from the answer to the start menu's question
     u16 cgearOn : 1;
     u16 : 5;
