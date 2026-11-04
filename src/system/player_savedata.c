@@ -49,8 +49,8 @@ void SaveControl_SavePlayerState(SaveControl *save, const PlayerState *state) {
     playerSave->location.zoneId = state->zoneId;
     playerSave->location.pos = state->position;
     playerSave->location.railPos = state->railPos;
-    playerSave->location.unk18 = state->rotation;
-    playerSave->location.unk1A = state->isRail;
+    playerSave->location.rotation = state->rotation;
+    playerSave->location.isRail = state->isRail;
     playerSave->location.exState = state->exState;
 }
 
@@ -60,8 +60,8 @@ void SaveControl_LoadPlayerState(SaveControl *save, PlayerState *state) {
     state->zoneId = playerSave->location.zoneId;
     state->position = playerSave->location.pos;
     state->railPos = playerSave->location.railPos;
-    state->rotation = playerSave->location.unk18;
-    state->isRail = playerSave->location.unk1A;
+    state->rotation = playerSave->location.rotation;
+    state->isRail = playerSave->location.isRail;
     state->exState = playerSave->location.exState;
 }
 

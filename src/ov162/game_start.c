@@ -422,7 +422,7 @@ static BOOL Continue_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     SaveControl_GetPlayerLocation(save, &location);
     GCTX_ProcMgrReplaceProc(
         OVERLAY_NONE, &GAMESYSTEM_PROC_FUNCTIONS,
-        GameSystem_CreateProcData(GAME_ENTRYPOINT_FIELD_CONTINUE, location.zoneId, &location.pos, location.unk18));
+        GameSystem_CreateProcData(GAME_ENTRYPOINT_FIELD_CONTINUE, location.zoneId, &location.pos, location.rotation));
     Config_SetCGearOn(wk->config, cgearOn);
     TrainerGameInfo_SetStartMenuFlags(wk->gameInfo, gameInfoValues[0]);
     TrainerGameInfo_SetKeyNotice(wk->gameInfo, gameInfoValues[1]);

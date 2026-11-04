@@ -11,8 +11,8 @@ typedef struct {
     u16 zoneId;
     VecFx32 pos;
     RailPosition railPos;
-    s16 unk18;
-    u8 unk1A;
+    s16 rotation;
+    u8 isRail;
     u8 exState;
 } SaveLocation;
 
