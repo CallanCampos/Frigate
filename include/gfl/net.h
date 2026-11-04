@@ -233,7 +233,7 @@ void GFL_NetErrUpdate(void);
 // What the game is to do about the network's error, if there is one: 1 to go on, 2 to end the connection
 BOOL GFL_NetErrCheck(void);
 void GFL_NetErrMarkShown(void);
-BOOL GFL_NetErrShow(u32 a0);
+BOOL GFL_NetErrShow(u32 fatal);
 // Shows the fatal error screen for a Wi-Fi error with the message given
 void GFL_NetErrShowWifi(u32 message);
 // GFL_NetErrShow(1)

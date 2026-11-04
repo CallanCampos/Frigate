@@ -267,8 +267,8 @@ void GFL_NetErrUpdate(void) {
     }
 }
 
-BOOL GFL_NetErrShow(u32 a0) {
-    return GFL_NetErrShowCore(a0);
+BOOL GFL_NetErrShow(u32 fatal) {
+    return GFL_NetErrShowCore(fatal);
 }
 
 void GFL_NetErrShowWifi(u32 message) {
