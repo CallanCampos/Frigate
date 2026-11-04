@@ -32,20 +32,26 @@ void PMSIVTool_SetupScrollWork(PMSIVToolScrollWork *wk, u32 bg, int direction, i
     wk->seq = 0;
 }
 
+enum {
+    STEP_ADD_TASK,
+    STEP_WAIT_TIMER,
+    STEP_DONE,
+};
+
 BOOL PMSIVTool_WaitScroll(PMSIVToolScrollWork *wk) {
     switch (wk->seq) {
-    case 0:
+    case STEP_ADD_TASK:
         wk->tcb = PMSIView_AddVTask(PMSIVTool_ScrollTask, wk, 0);
         wk->seq++;
         break;
-    case 1:
+    case STEP_WAIT_TIMER:
         if (wk->timer == 0) {
             GFL_TCBRemove(wk->tcb);
             wk->seq++;
             return TRUE;
         }
         break;
-    case 2:
+    case STEP_DONE:
         return TRUE;
     }
     return FALSE;
