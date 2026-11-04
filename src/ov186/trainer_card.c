@@ -776,12 +776,21 @@ static void TrainerCard_SetButtons(TrainerCardWork *wk, int side) {
     }
 }
 
+enum {
+    STEP_FLIP_START,
+    STEP_FLIP_NARROW,
+    STEP_FLIP_SWAP_SIDE,
+    STEP_FLIP_DRAW_SIDE,
+    STEP_FLIP_FLUSH,
+    STEP_FLIP_WIDEN,
+};
+
 // Flips the card over: it narrows to a line, changes side and widens again. TRUE when done
 static BOOL TrainerCard_FlipSeq(TrainerCardWork *wk) {
     BOOL done = FALSE;
 
     switch (wk->subSeq) {
-    case 0:
+    case STEP_FLIP_START:
         wk->flipAngle = 0;
         wk->scaleX = TRCARD_SCALE;
         wk->scaleY = TRCARD_SCALE;
@@ -792,7 +801,7 @@ static BOOL TrainerCard_FlipSeq(TrainerCardWork *wk) {
         TrainerCard_SetSideActors(wk, 2, wk->param->canEdit);
         wk->subSeq++;
         break;
-    case 1:
+    case STEP_FLIP_NARROW:
         wk->scaleX = FX_Mul(FX_CosIdx(wk->flipAngle), TRCARD_SCALE);
         if (wk->scaleX <= 0x80) {
             wk->scaleX = 0x80;
@@ -803,13 +812,13 @@ static BOOL TrainerCard_FlipSeq(TrainerCardWork *wk) {
             wk->flipAngle = 0x4000;
         }
         break;
-    case 2:
+    case STEP_FLIP_SWAP_SIDE:
         wk->side ^= 1;
         TrainerCard_LoadSideScreen(wk);
         TrainerCard_SetButtons(wk, wk->side);
         wk->subSeq++;
         break;
-    case 3:
+    case STEP_FLIP_DRAW_SIDE:
         if (wk->side == 0) {
             TrainerCard_DrawTrainer(wk);
         } else {
@@ -817,11 +826,11 @@ static BOOL TrainerCard_FlipSeq(TrainerCardWork *wk) {
         }
         wk->subSeq++;
         break;
-    case 4:
+    case STEP_FLIP_FLUSH:
         TrCardBmp_Flush(wk, wk->win);
         wk->subSeq++;
         break;
-    case 5:
+    case STEP_FLIP_WIDEN:
         wk->flipAngle -= 0x400;
         if (wk->flipAngle <= 0) {
             wk->flipAngle = 0;
