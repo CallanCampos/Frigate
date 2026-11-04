@@ -175,7 +175,7 @@ void LinkFestival_StartMission(LinkFestival *festival, const FestMissionConfig *
     GameData_SetFunfestMission(festival->gameData, TRUE);
 }
 
-void LinkFestival_StartTimer(LinkFestival *festival, u32 arg1) {
+void LinkFestival_StartTimer(LinkFestival *festival, u32 unused) {
     if (isFesMissionAvailable(&festival->config)) {
         if (festival->config.startSeconds == -1) {
             FestMissionConfig_StartTimer(&festival->config);
@@ -298,9 +298,9 @@ BOOL LinkFestival_IsMissionOver(LinkFestival *festival) {
     return over;
 }
 
-u32 LinkFestival_AddMissionScore(GameSystem *gsys, u32 a1, u32 a2) {
+u32 LinkFestival_AddMissionScore(GameSystem *gsys, u32 kind, u32 value) {
     LinkFestival *festival = GSYS_GetLinkFestival(gsys);
-    BOOL result = FestMissionConfig_AddScore(&festival->config, a1, a2, 1);
+    BOOL result = FestMissionConfig_AddScore(&festival->config, kind, value, 1);
 
     if (result) {
         LinkFestival_UpdateBest(festival, 0, festival->config.missionId, NULL);

@@ -157,7 +157,7 @@ BOOL LinkFestival_IsNewZoneFromOutside(LinkFestival *festival, u16 zoneId);
 BOOL LinkFestival_IsTargetReached(LinkFestival *festival, u32 *total);
 // Ends the mission when it is cleared or out of time, and says whether it did
 BOOL LinkFestival_IsMissionOver(LinkFestival *festival);
-u32 LinkFestival_AddMissionScore(GameSystem *gsys, u32 a1, u32 a2);
+u32 LinkFestival_AddMissionScore(GameSystem *gsys, u32 kind, u32 value);
 // The players in the mission, or 0 without one
 int LinkFestival_GetMemberCount(LinkFestival *festival);
 // Remembers a mission seen while none is on
@@ -173,7 +173,7 @@ LinkFestivalBest *LinkFestivalBest_Create(HeapID heapId);
 void LinkFestivalBest_Free(LinkFestivalBest *best);
 void FestMissionEntry_Clear(FestMissionEntry *entry);
 int LinkFestival_UpdateMember(LinkFestival *festival, FestMissionEntry *entry, u32 *out);
-void LinkFestival_StartTimer(LinkFestival *festival, u32 arg1);
+void LinkFestival_StartTimer(LinkFestival *festival, u32 unused);
 u32 GetTrainerCardTextMSGID(u32 type);
 FieldFMissionInfo *FieldFMissionInfo_Create(GameSystem *gsys, HeapID heapId);
 void FieldFMissionInfo_Free(FieldFMissionInfo *work);
