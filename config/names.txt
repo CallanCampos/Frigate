@@ -2607,7 +2607,9 @@
 . 0x020413c8 NetState_BeginScan
 . 0x020413f0 NetState_StartScan
 . 0x02041410 NetState_Update
+. 0x02041440 NetState_ParentStarted
 . 0x02041444 NetState_Parent
+. 0x02041448 NetState_OnParentStarted
 . 0x02041468 NetState_BeginParent
 . 0x020414a0 NetState_EnterParent
 . 0x020414c0 NetState_StartParent
@@ -2620,6 +2622,7 @@
 . 0x0204165c NetState_ChangeoverParentNegotiate
 . 0x020416c8 NetState_ChangeoverParentWait
 . 0x02041750 NetState_ChangeoverParentStarted
+. 0x02041774 NetState_OnChangeoverParentStarted
 . 0x02041798 NetState_ChangeoverStartParent
 . 0x020417e8 NetState_ChangeoverChildNegotiate
 . 0x02041810 NetState_ChangeoverChildWaitNegotiated
@@ -2629,6 +2632,7 @@
 . 0x02041940 NetState_ChangeoverChildWait
 . 0x020419a8 NetState_IrcConnect
 . 0x02041a30 NetState_StartChangeover
+. 0x02041af4 NetState_ChangeoverSwapRoles
 . 0x02041b70 NetState_InitChangeoverMode
 . 0x02041bc8 NetState_ChangeoverChildToParent
 . 0x02041c00 NetState_SetChangeoverMode
@@ -2645,6 +2649,7 @@
 . 0x02041e30 NetState_WifiError
 . 0x02041e34 NetState_WifiMatchEnded
 . 0x02041e38 NetState_WifiFailed
+. 0x02041e3c NetState_WifiUpdate
 . 0x02041e74 NetState_WifiConnected
 . 0x02041e90 NetState_SetErrorCode
 . 0x02041ea4 NetState_WifiConnecting
