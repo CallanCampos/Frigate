@@ -182,8 +182,8 @@ NWMRetCode NWM_Init(void *sysBuf, u32 bufSize, u8 dmaNo);
 NWMRetCode NWMi_CheckInitialized(void);
 // The library's state (NWMState), 0 when it is not initialized
 u16 NWM_GetState(void);
-// A halfword (at 0x9e) of the ARM7's status block
-u16 func_02702980(void);
+// The channels that the ARM7 allows, from bit 1 for channel 1 (WCM shifts them down by one), from its status block
+u16 NWM_GetAllowedChannel(void);
 // A number from the console's MAC address and the VBlank count: 30 to 39 when the scan type is 1, else 105 to 114
 u16 NWM_GetDispersionScanPeriod(u16 scanType);
 NWMRetCode NWM_End(void);

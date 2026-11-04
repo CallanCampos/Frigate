@@ -44,7 +44,7 @@ typedef struct NWMStatus {
     u8 unk_26[0x1a];
     u8 macAddr[6];
     u8 unk_46[0x58];
-    u16 unk_9e;
+    u16 allowedChannel; // NWM_GetAllowedChannel's
     u8 unk_a0[0x20];
 } NWMStatus;
 
@@ -90,9 +90,9 @@ BOOL NWMi_CheckEnableFlag(void);
 extern NWMSys *NWMi_SystemArea;
 extern PMExitCallbackInfo NWMi_UnloadOnExit;
 NWMSys *NWMi_GetSystemWork(void);
-void func_027026ec(void);
-void func_02702740(PXIFifoTag tag, u32 data, BOOL err);
+void NWMi_ClearFifoRecvFlag(void);
+void NWMi_ReceiveFifo9(PXIFifoTag tag, u32 data, BOOL err);
 NWMRetCode NWMi_CheckState(s32 paramNum, ...);
-void func_02702a40(void);
+void NWMi_RegisterSleepCallback(void);
 
 #endif // POKEBW2_TWL_NWM_PRIVATE_H

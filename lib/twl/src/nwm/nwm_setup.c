@@ -61,7 +61,7 @@ static NWMRetCode NWMi_InitCore(NWMSys *sys, u32 size, u32 dmaNo) {
     NWMi_SystemArea->info = (NWMInfo *)(NWMi_SystemArea + 1);
     NWMi_SystemArea->status = (NWMStatus *)(NWMi_SystemArea->info + 1);
     NWMi_SystemArea->event = (NWMEvent *)(NWMi_SystemArea->status + 1);
-    func_027026ec();
+    NWMi_ClearFifoRecvFlag();
     NWMi_SystemArea->dmaNo = dmaNo;
     OS_InitMessageQueue(&NWMi_SystemArea->freeQueue, NWMi_SystemArea->freeMsgs, NWM_CMD_BUF_COUNT);
     for (i = 0; i < NWM_CMD_BUF_COUNT; i++) {
@@ -69,7 +69,7 @@ static NWMRetCode NWMi_InitCore(NWMSys *sys, u32 size, u32 dmaNo) {
         DC_StoreRange(&NWMi_SystemArea->cmdBuf[i], 2);
         OS_SendMessage(&NWMi_SystemArea->freeQueue, &NWMi_SystemArea->cmdBuf[i], OS_MESSAGE_BLOCK);
     }
-    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_NWM, func_02702740);
+    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_NWM, NWMi_ReceiveFifo9);
     MI_CpuFill8(NWMi_SystemArea->unk_2120, 0, sizeof(NWMi_SystemArea->unk_2120));
     NWMi_SetUpDone = TRUE;
     NWMi_SystemArea->status->state = NWM_STATE_INITIALIZED;

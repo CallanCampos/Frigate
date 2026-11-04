@@ -63,7 +63,7 @@ NWMRetCode NWM_End(void) {
     }
     irq = OS_DisableInterrupts();
     NWMi_SystemArea->status->state = NWM_STATE_NONE;
-    func_027026ec();
+    NWMi_ClearFifoRecvFlag();
     PXI_SetFifoRecvCallback(PXI_FIFO_TAG_NWM, NULL);
     NWMi_SystemArea = NULL;
     NWMi_SetUpDone = FALSE;
@@ -85,7 +85,7 @@ NWMRetCode NWM_LoadDevice(NWMCallbackFunc callback) {
     }
     func_02703c28();
     NWMi_SetCallbackTable(NWM_APIID_LOAD_DEVICE, callback);
-    func_02702a40();
+    NWMi_RegisterSleepCallback();
     info = &NWMi_UnloadOnExit;
     PM_SetExitCallbackInfo(info, func_02702d7c, NULL);
     PMi_InsertPostExitCallbackEx(info, NWM_PM_PRIORITY);

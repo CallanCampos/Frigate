@@ -253,7 +253,7 @@ s32 func_02769dc4(const u8 *dst, const void *buffer, u16 byteLength, void (*comp
 
 // The channels that the DSi's wireless allows, from bit 0 for channel 1
 s32 func_02769e54(void) {
-    return (u16)(func_02702980() >> 1);
+    return (u16)(NWM_GetAllowedChannel() >> 1);
 }
 
 // What wcm_wmif.c's reset request and its completion do, at once, since NWM has no reset command: ends the operation of
