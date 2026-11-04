@@ -31,6 +31,9 @@
 #include "system/wordset.h"
 #include "text/system/gym_insect.h"
 
+#define GIMMICK_GATE_WEATHER_NONE 0xffff
+#define GIMMICK_GATE_ZONE_NONE 0xffff
+
 struct GimmickGateMessageList {
     u8 count;
     u8 padding[3];
@@ -714,7 +717,7 @@ void GimmickGate_AddSwarmMessage(GimmickGateWork *work) {
     ElboardMessageArg arg;
 
     zone = getSwarmLevelRangeFromData(work->gameData);
-    if (zone == 0xffff || (zone == 0x159 && GameData_GetSeason(work->gameData) == SEASON_WINTER)) {
+    if (zone == GIMMICK_GATE_ZONE_NONE || (zone == 0x159 && GameData_GetSeason(work->gameData) == SEASON_WINTER)) {
         return;
     }
     wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
@@ -972,7 +975,7 @@ s32 GimmickGateZoneList_Count(const GimmickGateZoneList *list) {
 
     count = 0;
     for (index = 0; index < 4; index++) {
-        if (list->zones[index] != ZONE_MAX && list->weather[index] != 0xffff) {
+        if (list->zones[index] != ZONE_MAX && list->weather[index] != GIMMICK_GATE_WEATHER_NONE) {
             count++;
         }
     }
@@ -1000,7 +1003,7 @@ void GimmickGate_GetWeatherZones(GimmickGateWork *work, GimmickGateZoneList *out
     GimmickGate_GetReportedWeatherZones(work, &second);
     GimmickGate_GetRoamerZones(work, &first);
     for (i = 0; i < 4; i++) {
-        if (first.zones[i] == ZONE_MAX || first.weather[i] == 0xffff || count >= 2) {
+        if (first.zones[i] == ZONE_MAX || first.weather[i] == GIMMICK_GATE_WEATHER_NONE || count >= 2) {
             break;
         }
         out->zones[count] = first.zones[i];
@@ -1008,7 +1011,7 @@ void GimmickGate_GetWeatherZones(GimmickGateWork *work, GimmickGateZoneList *out
         count++;
     }
     for (i = 0; i < 4; i++) {
-        if (second.zones[i] == ZONE_MAX || second.weather[i] == 0xffff || count >= 2) {
+        if (second.zones[i] == ZONE_MAX || second.weather[i] == GIMMICK_GATE_WEATHER_NONE || count >= 2) {
             break;
         }
         out->zones[count] = second.zones[i];
@@ -1080,7 +1083,7 @@ void GimmickGate_GetRoamerZones(GimmickGateWork *work, GimmickGateZoneList *list
             break;
         }
         zone = EncountSave_GetRoamingPkmZone(save, (u8)slot);
-        if (zone != 0xffff) {
+        if (zone != GIMMICK_GATE_ZONE_NONE) {
             list->zones[0] = zone;
             list->weather[0] = weather;
         }
