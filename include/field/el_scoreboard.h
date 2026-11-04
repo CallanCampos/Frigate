@@ -6,7 +6,7 @@
 #include "struct_decls.h"
 
 ElScoreboard *ElScoreboard_Create(G3DResource *texture, const char *texName, const char *plName, const StrBuf *text,
-                                  u16 a4, u16 a5, HeapID heapId);
+                                  u16 x, u16 y, HeapID heapId);
 void ElScoreboard_Free(ElScoreboard *board);
 void ElScoreboard_Update(ElScoreboard *board);
 

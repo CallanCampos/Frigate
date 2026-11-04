@@ -143,7 +143,8 @@ typedef struct {
     // 1 for a player of a White version
     u8 colorSet;
     u8 medalCount;
-    u16 unkA;
+    // GameBeacon_GetFavoriteMedal, 0xffff on Black and White
+    u16 favoriteMedal;
     u16 trainerId;
     s16 x;
     s16 y;

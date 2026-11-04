@@ -144,7 +144,7 @@ void FieldGimmickBSubway_Move(Field *field) {
     }
 }
 
-void FieldGimmickBSubway_StartTrainEffect(Field *field, u32 a1, const VecFx32 *pos) {
+void FieldGimmickBSubway_StartTrainEffect(Field *field, u32 trainIdx, const VecFx32 *pos) {
     u16 heapId;
     GimmickState *state;
     u32 index;
@@ -155,7 +155,7 @@ void FieldGimmickBSubway_StartTrainEffect(Field *field, u32 a1, const VecFx32 *p
     state = GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field)));
     GetZoneGimmick(Field_GetPlayerStateZoneID(field), &gimmickId, &index);
     train = ((BSubwayGimmickWork *)GimmickState_GetUserData(state, gimmickId))->data;
-    train->effect = FldeffBtrain_Start(Field_GetFieldEffects(field), a1, pos);
+    train->effect = FldeffBtrain_Start(Field_GetFieldEffects(field), trainIdx, pos);
 }
 
 FieldEffectTask *FieldGimmickBSubway_GetTrainEffect(Field *field) {

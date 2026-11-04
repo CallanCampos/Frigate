@@ -24,8 +24,10 @@ struct GimmickGateZoneData {
 struct GimmickGateBoardEntry {
     u32 version;
     u32 flagId;
-    u32 unk08;
-    u32 unk0c;
+    // 1 when the flag is cleared once the entry is on the board (news.json's clear_flag)
+    u32 clearFlag;
+    // In message file 0x2b
+    u32 messageId;
     u32 type;
     u32 zones[4];
 };

@@ -12,7 +12,7 @@ void FieldGimmickBSubway_Setup(Field *field);
 void FieldGimmickBSubway_End(Field *field);
 void FieldGimmickBSubway_Move(Field *field);
 // Starts the field effect of the zone's train, which FieldGimmickBSubway_GetTrainEffect returns
-void FieldGimmickBSubway_StartTrainEffect(Field *field, u32 a1, const VecFx32 *pos);
+void FieldGimmickBSubway_StartTrainEffect(Field *field, u32 trainIdx, const VecFx32 *pos);
 FieldEffectTask *FieldGimmickBSubway_GetTrainEffect(Field *field);
 // Stops the shaking of zone 75's train
 void FieldGimmickBSubway_StopShake(Field *field);

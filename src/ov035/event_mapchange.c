@@ -87,7 +87,8 @@ struct EventMapChange {
     u32 departureTransitionType;
     u8 mode;
     VecFx32 unk34;
-    BOOL unk40;
+    // Whether a change of season that the map change finds is applied
+    BOOL canChangeSeason;
     BOOL seasonChanged;
     u16 prevSeason;
     u16 season;
@@ -455,7 +456,7 @@ void EventMapChange_SetupWarpSequenceOut(EventMapChange *wk, GameEvent *parent) 
     warp->spawn = wk->spawn;
     warp->outTransition = GetOutTransitionTypeBetweenZones(wk->zoneId, wk->spawn.zoneId);
     warp->inTransition = GetInTransitionTypeBetweenZones(wk->zoneId, wk->spawn.zoneId);
-    warp->seasonChanged = (wk->unk40 && wk->seasonChanged) ? TRUE : FALSE;
+    warp->seasonChanged = (wk->canChangeSeason && wk->seasonChanged) ? TRUE : FALSE;
     warp->startSeason = Season_GetNext(wk->prevSeason);
     warp->endSeason = wk->season;
     warp->zoneBGMChanged = 0;
@@ -474,7 +475,7 @@ void EventMapChange_SetupWarpSequenceIn(EventMapChange *wk, GameEvent *parent) {
     warp->spawn = wk->spawn;
     warp->outTransition = GetOutTransitionTypeBetweenZones(wk->zoneId, wk->spawn.zoneId);
     warp->inTransition = GetInTransitionTypeBetweenZones(wk->zoneId, wk->spawn.zoneId);
-    warp->seasonChanged = (wk->unk40 && wk->seasonChanged) ? TRUE : FALSE;
+    warp->seasonChanged = (wk->canChangeSeason && wk->seasonChanged) ? TRUE : FALSE;
     warp->startSeason = Season_GetNext(wk->prevSeason);
     warp->endSeason = wk->season;
     if (wk->spawn.changeType == ZONE_SPAWN_CHANGE_TYPE_POSITION) {
@@ -535,7 +536,7 @@ GameEventReturnCode EventMapChangeCore_Callback(GameEvent *event, u32 *state, vo
     case CORE_RUN_CHECKS:
         DSPROT_CHECKED_CALL(DSProt_CallRunChecks2, EventMapChange_DSProtNop, EventMapChange_DSProtTamper1, wk, gsys);
         FieldMapControl_DeleteAllActors(gsys);
-        if (wk->unk40 && wk->seasonChanged) {
+        if (wk->canChangeSeason && wk->seasonChanged) {
             AdventureTime *adventureTime;
             u8 season;
             PokeParty *party;
@@ -718,7 +719,7 @@ GameEventReturnCode EventMapChangeFakeWarp_Callback(GameEvent *event, u32 *state
         (*state)++;
         break;
     case 1:
-        if (wk->unk40 && wk->seasonChanged) {
+        if (wk->canChangeSeason && wk->seasonChanged) {
             GameEvent_ChainNext(event,
                                 CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
         } else {
@@ -733,7 +734,7 @@ GameEventReturnCode EventMapChangeFakeWarp_Callback(GameEvent *event, u32 *state
         (*state)++;
         break;
     case 3:
-        if (wk->unk40 && wk->seasonChanged) {
+        if (wk->canChangeSeason && wk->seasonChanged) {
             GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_SEASON, 0, 0,
                                                                         wk->prevSeason, wk->season));
         } else {
@@ -1148,7 +1149,7 @@ void InitMapChangeEvent(EventMapChange *wk, GameSystem *gsys) {
     wk->gameData = gameData;
     wk->field = field;
     wk->zoneId = Field_GetPlayerStateZoneID(field);
-    wk->unk40 = FALSE;
+    wk->canChangeSeason = FALSE;
     wk->seasonChanged = FALSE;
     wk->prevSeason = season;
     wk->season = season;
@@ -1156,7 +1157,7 @@ void InitMapChangeEvent(EventMapChange *wk, GameSystem *gsys) {
 }
 
 GameEvent *EventMapChangeWarp_CreateGrid(GameSystem *gsys, Field *field, u16 zoneId, const VecFx32 *pos, u16 dir,
-                                         BOOL unk40) {
+                                         BOOL canChangeSeason) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventMapChangeWarp_Callback, sizeof(EventMapChange));
     EventMapChange *wk = GameEvent_GetData(event);
 
@@ -1164,13 +1165,13 @@ GameEvent *EventMapChangeWarp_CreateGrid(GameSystem *gsys, Field *field, u16 zon
     dir = ConvDirToWarpDir(dir);
     CreateZoneChangeData(&wk->spawn, zoneId, dir, pos->x, pos->y, pos->z);
     wk->departureTransitionType = WARP_TRANSITION_NONE;
-    wk->unk40 = unk40;
+    wk->canChangeSeason = canChangeSeason;
     wk->lensFlareStarted = TRUE;
     return event;
 }
 
 GameEvent *EventMapChangeWarp_CreateRail(GameSystem *gsys, Field *field, u16 zoneId, const RailPosition *pos, u16 dir,
-                                         BOOL unk40) {
+                                         BOOL canChangeSeason) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventMapChangeWarp_Callback, sizeof(EventMapChange));
     EventMapChange *wk = GameEvent_GetData(event);
 
@@ -1178,13 +1179,13 @@ GameEvent *EventMapChangeWarp_CreateRail(GameSystem *gsys, Field *field, u16 zon
     dir = ConvDirToWarpDir(dir);
     CreateZoneChangeDataRail(&wk->spawn, zoneId, dir, pos->componentId, pos->posFront, pos->posSide);
     wk->departureTransitionType = WARP_TRANSITION_NONE;
-    wk->unk40 = unk40;
+    wk->canChangeSeason = canChangeSeason;
     wk->lensFlareStarted = TRUE;
     return event;
 }
 
 GameEvent *EventMapChange_CreateRail(GameSystem *gsys, Field *field, u16 zoneId, const RailPosition *pos, u16 dir,
-                                     BOOL unk40) {
+                                     BOOL canChangeSeason) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventMapChange_Callback, sizeof(EventMapChange));
     EventMapChange *wk = GameEvent_GetData(event);
 
@@ -1192,7 +1193,7 @@ GameEvent *EventMapChange_CreateRail(GameSystem *gsys, Field *field, u16 zoneId,
     dir = ConvDirToWarpDir(dir);
     CreateZoneChangeDataRail(&wk->spawn, zoneId, dir, pos->componentId, pos->posFront, pos->posSide);
     wk->departureTransitionType = WARP_TRANSITION_NONE;
-    wk->unk40 = unk40;
+    wk->canChangeSeason = canChangeSeason;
     return event;
 }
 
@@ -1217,7 +1218,7 @@ GameEvent *EventMapChangeEscapeRope_Create(Field *field, GameSystem *gsys) {
     AdjustEscapeRopeSpawn(wk->gameData, &wk->spawn);
     wk->spawn.changeType = ZONE_SPAWN_CHANGE_TYPE_POSITION;
     wk->departureTransitionType = WARP_TRANSITION_NONE;
-    wk->unk40 = TRUE;
+    wk->canChangeSeason = TRUE;
     return event;
 }
 
@@ -1230,7 +1231,7 @@ GameEvent *EventMapChangeDig_Create(GameSystem *gsys) {
     AdjustEscapeRopeSpawn(wk->gameData, &wk->spawn);
     wk->spawn.changeType = ZONE_SPAWN_CHANGE_TYPE_POSITION;
     wk->departureTransitionType = WARP_TRANSITION_NONE;
-    wk->unk40 = TRUE;
+    wk->canChangeSeason = TRUE;
     return event;
 }
 
@@ -1288,7 +1289,7 @@ GameEvent *EventMapChangeWarpPad_Create(GameSystem *gsys, Field *field, u16 zone
     dir = ConvDirToWarpDir(dir);
     CreateZoneChangeData(&wk->spawn, zoneId, dir, pos->x, pos->y, pos->z);
     wk->departureTransitionType = WARP_TRANSITION_WARP_PAD;
-    wk->unk40 = FALSE;
+    wk->canChangeSeason = FALSE;
     wk->lensFlareStarted = TRUE;
     return event;
 }
@@ -1361,7 +1362,7 @@ void EventEntralinkWarp_CreateReturnLocation(ZoneSpawnInfo *spawn, Field *field)
     }
 }
 
-GameEvent *EventMapChangeWarp_CreateFromEntity(GameSystem *gsys, Field *field, ZoneWarp *warp, u32 a3) {
+GameEvent *EventMapChangeWarp_CreateFromEntity(GameSystem *gsys, Field *field, ZoneWarp *warp, u32 direction) {
     EventMapChange *wk;
     GameEvent *event;
     ZoneSpawnInfo *remember;
@@ -1371,11 +1372,11 @@ GameEvent *EventMapChangeWarp_CreateFromEntity(GameSystem *gsys, Field *field, Z
     event = GameEvent_Create(gsys, NULL, EventMapChangeWarp_Callback, sizeof(EventMapChange));
     wk = GameEvent_GetData(event);
     InitMapChangeEvent(wk, gsys);
-    wk->unk40 = TRUE;
+    wk->canChangeSeason = TRUE;
     if (IsWarpDestId256(warp)) {
         wk->spawn = *GameData_GetNextZone(gameData);
     } else {
-        SetupWarpParamByWarp(warp, &wk->spawn, a3);
+        SetupWarpParamByWarp(warp, &wk->spawn, direction);
     }
     wk->departureTransitionType = GetWarpTransitionType(warp);
 
@@ -1809,7 +1810,7 @@ GameEventReturnCode EventEntralinkWarp_Callback(GameEvent *event, u32 *state, vo
         InitMapChangeEvent(mapChangeWk, gsys);
         mapChangeWk->spawn = wk->spawn;
         mapChangeWk->departureTransitionType = WARP_TRANSITION_NONE;
-        mapChangeWk->unk40 = FALSE;
+        mapChangeWk->canChangeSeason = FALSE;
         GameEvent_ChainNext(event, mapChange);
         (*state)++;
         break;

@@ -120,12 +120,12 @@ void UnityTower_IncrementCountryCount(UnityTowerSurveySave *save) {
 
 void UnityTower_SetRatingLevel(UnityTowerSurveySave *save, s32 value) {
     if (value < 5) {
-        save->unk347 = value;
+        save->ratingLevel = value;
     }
 }
 
 u8 UnityTower_GetRatingLevel(UnityTowerSurveySave *save) {
-    return save->unk347;
+    return save->ratingLevel;
 }
 
 void setPlayerSurveys(UnityTowerSurveySave *save, s32 hobby) {

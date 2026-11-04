@@ -171,8 +171,8 @@ u16 FldAct_GetObjCode(FieldActor *actor);
 void FldAct_Transplant(FieldActor *actor, const ZoneNPC *npc);
 u16 GetActorMotionDir(FieldActor *actor);
 BOOL FldAct_CheckAcmdSet(FieldActor *actor);
-void RailActorAnim_GetBillboardActorAnime(FieldActor *actor, u16 *a1, u16 *a2);
-void RailActorAnim_SetBillboardActorAnime(FieldActor *actor, u16 a1, u16 a2);
+void RailActorAnim_GetBillboardActorAnime(FieldActor *actor, u16 *anim, u16 *step);
+void RailActorAnim_SetBillboardActorAnime(FieldActor *actor, u16 anim, u16 step);
 // Sets the frame of the model's animation for a time. FALSE if the actor has no model
 BOOL RailActorAnim_SyncFrameGroup(FieldActor *actor, u16 time);
 // Overlay 36's field_actor_acmd.c: whether the actor is free of its action command, and field_actor_movecode_pair.c's

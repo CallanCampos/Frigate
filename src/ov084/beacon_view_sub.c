@@ -463,7 +463,7 @@ void BeaconViewPanel_SetVisible(BeaconViewPanel *panel, BOOL visible) {
     BmpOam_ActorSetDrawEnable(panel->oam.actor, visible);
     ClActor_SetVisible(panel->trainer, visible);
     ClActor_SetVisible(panel->base, visible);
-    if (!visible || panel->unkA != 0xffff) {
+    if (!visible || panel->favoriteMedal != 0xffff) {
         BeaconViewPanel_SetMedalVisible(panel, visible);
     }
     if (!visible) {
@@ -619,7 +619,7 @@ static void BeaconViewPanel_SetRank(BeaconViewWork *work, BeaconViewPanel *panel
 }
 
 BOOL BeaconViewPanel_HasNoMedals(BeaconViewPanel *panel) {
-    if (panel->medalCount == 0 || panel->unkA >= 0xff) {
+    if (panel->medalCount == 0 || panel->favoriteMedal >= 0xff) {
         return TRUE;
     }
     return FALSE;
@@ -630,13 +630,13 @@ static void BeaconViewPanel_SetMedals(BeaconViewWork *work, BeaconViewPanel *pan
 
     // Black and White have no medals
     if (panel->version == VERSION_WHITE || panel->version == VERSION_BLACK) {
-        panel->unkA = 0xffff;
+        panel->favoriteMedal = 0xffff;
         panel->medalCount = 0;
         BeaconViewPanel_SetMedalVisible(panel, FALSE);
         return;
     }
     panel->medalCount = GameBeacon_GetMedalCount(beacon);
-    panel->unkA = GameBeacon_GetFavoriteMedal(beacon);
+    panel->favoriteMedal = GameBeacon_GetFavoriteMedal(beacon);
     if (BeaconViewPanel_HasNoMedals(panel)) {
         BeaconView_SetActorAnim(panel->medal, 24);
     } else {

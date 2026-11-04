@@ -12,11 +12,11 @@ GameEvent *EventGameOpening_Create(GameSystem *gsys, GameSystemProcData *procDat
 GameEvent *EventFieldFirst_Create(GameSystem *gsys, GameSystemProcData *procData);
 GameEvent *EventFieldContinue_Create(GameSystem *gsys, GameSystemProcData *procData);
 GameEvent *EventMapChangeWarp_CreateGrid(GameSystem *gsys, Field *field, u16 zoneId, const VecFx32 *pos, u16 dir,
-                                         BOOL unk40);
+                                         BOOL canChangeSeason);
 GameEvent *EventMapChangeWarp_CreateRail(GameSystem *gsys, Field *field, u16 zoneId, const RailPosition *pos, u16 dir,
-                                         BOOL unk40);
+                                         BOOL canChangeSeason);
 GameEvent *EventMapChange_CreateRail(GameSystem *gsys, Field *field, u16 zoneId, const RailPosition *pos, u16 dir,
-                                     BOOL unk40);
+                                     BOOL canChangeSeason);
 GameEvent *EventMapChangeQuicksand_Create(GameSystem *gsys, Field *field, const VecFx32 *effectPos, u16 zoneId,
                                           VecFx32 *pos);
 GameEvent *EventMapChangeEscapeRope_Create(Field *field, GameSystem *gsys);
@@ -33,7 +33,7 @@ GameEvent *EventEntralinkWarp_Create(GameSystem *gsys, Field *field, ZoneSpawnIn
 GameEvent *EventEntralinkWarp_CreateOut(GameSystem *gsys);
 GameEventReturnCode EventEntralinkWarpReturn_Callback(GameEvent *event, u32 *state, void *data);
 void EventEntralinkWarp_CreateReturnLocation(ZoneSpawnInfo *spawn, Field *field);
-GameEvent *EventMapChangeWarp_CreateFromEntity(GameSystem *gsys, Field *field, ZoneWarp *warp, u32 a3);
+GameEvent *EventMapChangeWarp_CreateFromEntity(GameSystem *gsys, Field *field, ZoneWarp *warp, u32 direction);
 GameEvent *EventMapChange_CreateGrid(GameSystem *gsys, Field *field, u8 mode, u16 zoneId, VecFx32 *pos, u16 dir);
 GameEvent *EventMapChange_CreateGridDefault(GameSystem *gsys, Field *field, u16 zoneId, VecFx32 *pos, u16 dir);
 GameEvent *EventMapChange_CreateForFly(GameSystem *gsys, Field *field, u32 unused, ZoneSpawnInfo *spawn, u16 warpDir);

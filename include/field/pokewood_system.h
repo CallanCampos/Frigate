@@ -47,7 +47,8 @@ struct PokewoodSystem {
     PokewoodBlock *pokewoodBlk;
     PokewoodRecord record;
     u32 studioEnding;
-    u8 unkF8[8];
+    // The series of each slot's movie, from event_pokewood.c's slotInfo, for PokewoodSave_PushLastSeries
+    u8 slotSeries[8];
 };
 
 // pokewood_system.c

@@ -77,7 +77,7 @@ struct UnityTowerSurveySave {
     // The player's own answer to the survey, below 9
     u8 hobby;
     // Below 5, sent in trades as the visitor's unk26_0
-    u8 unk347;
+    u8 ratingLevel;
     // UNITY_TOWER_REGION_* for each of 64 regions of each country from 1 on
     u8 regions[UNITY_TOWER_REGION_BYTES];
 }; // size: 0x1338

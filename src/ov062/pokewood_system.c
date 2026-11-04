@@ -304,7 +304,7 @@ void PokewoodSystem_PushLastSeries(GameData *gameData, PokewoodSystem *sys, u32 
     PokewoodSave *save = PokewoodSave_Get(gameData);
 
     if (sys->movie < POKEWOOD_MOVIE_COUNT) {
-        PokewoodSave_PushLastSeries(save, slot, sMovieSeries[sys->movie] + 1, sys->unkF8);
+        PokewoodSave_PushLastSeries(save, slot, sMovieSeries[sys->movie] + 1, sys->slotSeries);
     }
 }
 
@@ -312,6 +312,6 @@ void PokewoodSystem_SetSlotInfo(PokewoodSystem *sys, const u8 *src) {
     int i;
 
     for (i = 0; i < 8; i++) {
-        sys->unkF8[i] = src[i];
+        sys->slotSeries[i] = src[i];
     }
 }

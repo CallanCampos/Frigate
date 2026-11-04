@@ -33,7 +33,7 @@ static const u16 *sScoreboardPalettes[4] = { sScoreboardPalette3, sScoreboardPal
 void ElScoreboard_UploadPalette(ElScoreboardPaletteTarget *target, s32 frame);
 
 ElScoreboard *ElScoreboard_Create(G3DResource *texture, const char *texName, const char *plName, const StrBuf *text,
-                                  u16 a4, u16 a5, HeapID heapId) {
+                                  u16 x, u16 y, HeapID heapId) {
     G3DTextDrawResource resource;
     ElScoreboard *board = GFL_HeapAllocate(heapId, sizeof(ElScoreboard), TRUE, "el_scoreboard.c", 412);
 
@@ -42,7 +42,7 @@ ElScoreboard *ElScoreboard_Create(G3DResource *texture, const char *texName, con
     board->unk6 = G3DTextDraw_GetTexDimCount() - 1;
     board->unk10 = -1;
     board->unk14 = -1;
-    if (G3DTextDraw_CreateResource(texture, texName, 0, plName, text, a4, a5, 0xc40, heapId, &resource)) {
+    if (G3DTextDraw_CreateResource(texture, texName, 0, plName, text, x, y, 0xc40, heapId, &resource)) {
         board->unk8 = resource.texVramKey;
         board->unkC = resource.plttVramKey;
         board->unk10 = resource.texOffset;

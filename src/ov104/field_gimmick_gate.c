@@ -573,7 +573,7 @@ void GimmickGate_AddBoardMessage(GimmickGateWork *work, ElboardMessageArg *messa
     } else {
         GimmickGate_AddMessage(work, kind, 0);
     }
-    if (kind == 8 && entry->unk08 == 1) {
+    if (kind == 8 && entry->clearFlag == 1) {
         EventWork_FlagReset(GameData_GetEventWork(work->gameData), entry->flagId);
     }
 }
@@ -952,7 +952,7 @@ void GimmickGate_AddEntryMessage(GimmickGateWork *work, GimmickGateBoardEntry *e
     arg.plName = sBoardPlNames[index];
     arg.messageArc = 2;
     arg.messageFile = 0x2b;
-    arg.messageId = entry->unk0c;
+    arg.messageId = entry->messageId;
     arg.wordSet = NULL;
     GimmickGate_AddBoardMessage(work, &arg, 8, entry);
 }
