@@ -206,7 +206,7 @@ static int DWCi_GetTopologyType(void);
 static void DWCi_ClearMeshMakingTempInfo(void);
 static void DWCi_ApplyPendingSuspend(void);
 static void DWCi_FinishSuspendRequest(int cancelled);
-static int func_ov011_021686b8(void);
+static int DWCi_GetGT2NumConnection(void);
 static const char *DWCi_GetResvDenyReasonString(int code);
 static void disp_match_state(int oldState, int newState);
 
@@ -2025,7 +2025,7 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
         break;
     }
     case 9: {
-        node = DWCi_GetNodeInfoByIndex(func_ov011_021686b8() - 1 - DWCi_GetMatchCnt()->clLinkProgress);
+        node = DWCi_GetNodeInfoByIndex(DWCi_GetGT2NumConnection() - 1 - DWCi_GetMatchCnt()->clLinkProgress);
         if (DWCi_GetMatchCnt()->state != 0x10 || node == NULL || node->profileId != data[0]) {
             break;
         }
@@ -2821,8 +2821,8 @@ static int DWCi_SendClientLinkRequest(void) {
 
     saved = DWCi_GetMatchCnt()->self;
     me = &saved;
-    if (DWCi_GetMatchCnt()->clLinkProgress < func_ov011_021686b8() - 1) {
-        index = (func_ov011_021686b8() - 1 - DWCi_GetMatchCnt()->clLinkProgress) & 0xff;
+    if (DWCi_GetMatchCnt()->clLinkProgress < DWCi_GetGT2NumConnection() - 1) {
+        index = (DWCi_GetGT2NumConnection() - 1 - DWCi_GetMatchCnt()->clLinkProgress) & 0xff;
         DWCi_SetMatchStatus(0x10);
         node = DWCi_GetNodeInfoByIndex(index);
         data[0] = node->profileId;
@@ -4916,7 +4916,7 @@ BOOL DWCi_IsFullMesh(void) {
     return FALSE;
 }
 
-static int func_ov011_021686b8(void) {
+static int DWCi_GetGT2NumConnection(void) {
     return DWCi_GetNumNodeInfo();
 }
 

@@ -7064,6 +7064,7 @@ overlays/ov011 0x021685fc DWCi_ClearMeshMakingTempInfo
 overlays/ov011 0x02168620 DWCi_ApplyPendingSuspend
 overlays/ov011 0x02168654 DWCi_FinishSuspendRequest
 overlays/ov011 0x021686a0 DWCi_IsFullMesh
+overlays/ov011 0x021686b8 DWCi_GetGT2NumConnection
 overlays/ov011 0x021686c0 DWCi_GetBuddyStatusLCK
 overlays/ov011 0x021686f8 DWCi_GetResvDenyReasonString
 overlays/ov011 0x0216876c disp_match_state
