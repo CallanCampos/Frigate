@@ -161,7 +161,7 @@ void PokeVoice_SetMasterVolume(u32 volume);
 // The microphone, which records Chatot's cry: set up, free, and record into a buffer, calling back when done
 void setupMic(HeapID heapId);
 void ampOffFreeBlocks(void);
-void SndMic_AddCount(u32 a0);
+void SndMic_AddCount(u32 count);
 BOOL SndMic_IsOverLimit(void);
 // 0 once the recording has started
 u32 SndMic_StartRecording(void (*callback)(u32 result, u32 *done), u32 *done);

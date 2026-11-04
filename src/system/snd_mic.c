@@ -56,11 +56,11 @@ void ampOffFreeBlocks(void) {
     GFL_HeapFree(sSndMic);
 }
 
-void SndMic_AddCount(u32 a0) {
+void SndMic_AddCount(u32 count) {
     SndMic *mic = sSndMic;
 
     if (mic->enabled && !SndMic_IsOverLimit()) {
-        mic->count += a0;
+        mic->count += count;
     }
 }
 
