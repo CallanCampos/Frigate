@@ -270,13 +270,18 @@ static const SpinTradeReceiptSeqFunc sSeqFuncs[SPIN_TRADE_RECEIPT_SEQ_COUNT] = {
     SpinTradeReceiptSeq_Start,
 };
 
+enum {
+    STEP_LOAD,
+    STEP_RESET,
+};
+
 BOOL SpinTradeReceipt_Init(GameProc *proc, u32 *state, void *param, void *work) {
     SpinTradeProcWork *g2p = param;
     SpinTradeReceiptWork *wk;
     ArcTool *arc;
 
     switch (*state) {
-    case 0:
+    case STEP_LOAD:
         GFL_BGSysDisableAllA();
         GFL_BGSysDisableAllB();
         GX_SetVisiblePlane(0);
@@ -308,8 +313,8 @@ BOOL SpinTradeReceipt_Init(GameProc *proc, u32 *state, void *param, void *work) 
         GFL_ArcToolFree(arc);
         (*state)++;
         break;
-    case 1:
-        *state = 0;
+    case STEP_RESET:
+        *state = STEP_LOAD;
         return TRUE;
     }
     return FALSE;
