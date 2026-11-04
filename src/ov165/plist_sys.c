@@ -506,7 +506,7 @@ static void PokeList_InitGraphics(PokeListWork *wk) {
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 16, 10);
     GFL_BGSysMoveBG(2, BG_MOVE_SET_X, 128);
     GFL_BGSysMoveBG(1, BG_MOVE_SET_X, 128);
-    clactSetup = data_02093f08;
+    clactSetup = gClActSysSetupSplitScreens;
     ClActSys_Create(&clactSetup, &vramConfig, wk->heapId);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);

@@ -305,7 +305,7 @@ static void MailView_PrintMail(MailSysWork *work) {
 }
 
 static void MailView_CreateClAct(MailSysWork *work) {
-    ClActSys_Create(&data_02093f08, &MailSys_VRAMConfig, work->heapId);
+    ClActSys_Create(&gClActSysSetupSplitScreens, &MailSys_VRAMConfig, work->heapId);
     work->clUnit = ClActUnit_Create(4, 0, work->heapId);
     ClActUnit_UseSystemRenderer(work->clUnit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);

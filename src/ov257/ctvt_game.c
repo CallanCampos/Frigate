@@ -2632,7 +2632,7 @@ static void CtvtGame_InitGraphics(CtvtGame *game, HeapID heapId) {
     CtvtGame_InitBGs(game, heapId);
     CtvtGame_Init3D(game, heapId);
     {
-        ClActSysSetup setup = data_02093f08;
+        ClActSysSetup setup = gClActSysSetupSplitScreens;
 
         ClActSys_Create(&setup, &sCtvtGameVRAMConfig, heapId);
     }

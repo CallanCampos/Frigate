@@ -484,7 +484,7 @@ static void MicTest_VBlank(TCB *tcb, void *data) {
 }
 
 static void MicTest_InitClAct(MicTestWork *wk, u32 heapId) {
-    ClActSys_Create(&data_02093f08, &sMicTestVRAMConfig, heapId);
+    ClActSys_Create(&gClActSysSetupSplitScreens, &sMicTestVRAMConfig, heapId);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }

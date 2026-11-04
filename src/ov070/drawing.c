@@ -571,7 +571,7 @@ static void Drawing_LoadGraphics(DrawingWork *wk, ArcTool *arc) {
 static void Drawing_LoadActorResources(DrawingWork *wk, ArcTool *arc) {
     ArcTool *commonArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_DRAWING);
 
-    ClActSys_Create(&data_02093f08, &sDrawingVRAMConfig, HEAPID_DRAWING);
+    ClActSys_Create(&gClActSysSetupSplitScreens, &sDrawingVRAMConfig, HEAPID_DRAWING);
     wk->actorUnit = ClActUnit_Create(53, 1, HEAPID_DRAWING);
     wk->resources[DRAWING_RES_MAIN].chars = ClActSys_LoadChars(arc, 3, FALSE, 0, HEAPID_DRAWING);
     wk->resources[DRAWING_RES_MAIN].palette = ClActSys_LoadPltt(arc, 0, 0, 0, HEAPID_DRAWING);

@@ -570,7 +570,7 @@ static void BadgeView_FreePalette(BadgeViewWork *wk) {
 static void BadgeView_InitObj(BadgeViewWork *wk) {
     ArcTool *barArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_TRAINER_CARD_SCREEN);
 
-    ClActSys_Create(&data_02093f08, &sBadgeViewVRAMConfig, HEAPID_TRAINER_CARD_SCREEN);
+    ClActSys_Create(&gClActSysSetupSplitScreens, &sBadgeViewVRAMConfig, HEAPID_TRAINER_CARD_SCREEN);
     wk->unit = ClActUnit_Create(BADGE_ACTOR_COUNT, 1, HEAPID_TRAINER_CARD_SCREEN);
     GFL_BGSysSetBGEnabledA(0x10, TRUE);
     GFL_BGSysSetBGEnabledB(0x10, TRUE);

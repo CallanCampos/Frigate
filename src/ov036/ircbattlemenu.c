@@ -1304,7 +1304,7 @@ static BOOL IrcMenu_Init(GameProc *proc, u32 *state, void *param, void *work) {
     }
     GFL_BGSysSetEnabledBGsA(0);
     GFL_BGSysSetEnabledBGsB(0);
-    ClActSys_Create(&data_02093f08, &sIrcMenuVRAMConfig, wk->heapId);
+    ClActSys_Create(&gClActSysSetupSplitScreens, &sIrcMenuVRAMConfig, wk->heapId);
     wk->clUnit = ClActUnit_Create(40, 0, wk->heapId);
     wk->vblankTask = GFL_VBlankTCBAdd(IrcMenu_VBlank, wk, 0);
     IrcMenu_CreateBGs(wk);

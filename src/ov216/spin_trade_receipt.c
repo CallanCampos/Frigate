@@ -654,7 +654,7 @@ static void SpinTradeReceipt_InitActorSys(SpinTradeReceiptWork *wk, ArcTool *unu
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_2DCHAR, HEAPID_SPIN_TRADE);
     int i;
 
-    ClActSys_Create(&data_02093f08, &sVRAMConfig, HEAPID_SPIN_TRADE);
+    ClActSys_Create(&gClActSysSetupSplitScreens, &sVRAMConfig, HEAPID_SPIN_TRADE);
     wk->actorUnit = ClActUnit_Create(30, 1, HEAPID_SPIN_TRADE);
     for (i = 0; i < SPIN_TRADE_MEMBER_MAX; i++) {
         wk->resources[SPIN_TRADE_RECEIPT_RES_CHAR + i] =

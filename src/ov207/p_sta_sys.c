@@ -321,7 +321,7 @@ static void PStatus_InitGraphics(PStatusWork *wk) {
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2,
                        GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ, 13, 16);
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 13, 16);
-    clactSetup = data_02093f08;
+    clactSetup = gClActSysSetupSplitScreens;
     clactSetup.charCount = 110;
     ClActSys_Create(&clactSetup, &sPStatusVRAMConfig, wk->heapId);
     wk->actorUnit = ClActUnit_Create(96, 0, wk->heapId);

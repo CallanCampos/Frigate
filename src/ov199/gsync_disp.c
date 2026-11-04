@@ -166,7 +166,7 @@ GSyncDisp *GSyncDisp_Create(HeapID heapId) {
     GXS_DispOn();
     GX_DispOn();
     GFL_BGSysCreate(disp->heapId);
-    ClActSys_Create(&data_02093f24, &sGSyncDispVRAMConfig, disp->heapId);
+    ClActSys_Create(&gClActSysSetupJoinedScreens, &sGSyncDispVRAMConfig, disp->heapId);
     disp->clUnit = ClActUnit_Create(40, 0, disp->heapId);
     GFL_BGSysSetVRAMBanks(&sGSyncDispVRAMConfig);
     GFL_BGSysSetLCDConfig(&sGSyncDispLCDConfig);

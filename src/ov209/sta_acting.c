@@ -583,7 +583,7 @@ static void StaActing_InitGraphics(StaActing *stage) {
         stage->billboardActor = BillboardActorScene_Create(&setup, stage->heapId);
         BillboardActorScene_SetScale(stage->billboardActor, &scale);
     }
-    ClActSys_Create(&data_02093f08, &STA_ACTING_VRAM_CONFIG, stage->heapId);
+    ClActSys_Create(&gClActSysSetupSplitScreens, &STA_ACTING_VRAM_CONFIG, stage->heapId);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3, GX_BLEND_PLANEMASK_BG0, 0, 10);

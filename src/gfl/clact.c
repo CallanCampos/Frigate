@@ -223,7 +223,7 @@ static void ClActResMan_SetupCharsFromFile(ClActResMan *man, u32 idx, void *file
 // the order that lays them out as in the ROM
 static const u16 sSurfaceTypes[2] = { NNS_G2D_SURFACETYPE_MAIN2D, NNS_G2D_SURFACETYPE_SUB2D };
 // Unused
-const u16 data_02093e44[2] = { NNS_G2D_VRAM_TYPE_2DMAIN, NNS_G2D_VRAM_TYPE_2DSUB };
+const u16 gClActVramTypes[2] = { NNS_G2D_VRAM_TYPE_2DMAIN, NNS_G2D_VRAM_TYPE_2DSUB };
 static void (*const sTransferFuncs[2])(const void *src, u32 offset, u32 size) = {
     GX_LoadOBJ,
     GXS_LoadOBJ,
@@ -289,7 +289,7 @@ static void (*const sAnimTickFuncs[3])(ClActAnim *anim, fx32 frames) = {
     ClActAnim_TickVramTransfer,
     ClActAnim_TickMultiCell,
 };
-const ClActSysSetup data_02093f08 = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 32, 32, 32, 32, 16, 16 };
+const ClActSysSetup gClActSysSetupSplitScreens = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 32, 32, 32, 32, 16, 16 };
 static void (*sAnimSetSpeedFuncs[3])(ClActAnim *anim, fx32 speed) = {
     ClActAnim_SetSpeedCell,
     ClActAnim_SetSpeedVramTransfer,
@@ -300,7 +300,7 @@ static void (*sAnimRestartFuncs[3])(ClActAnim *anim) = {
     ClActAnim_RestartVramTransfer,
     ClActAnim_RestartMultiCell,
 };
-const ClActSysSetup data_02093f24 = { 0, 0, 0, 192, 4, 124, 4, 124, 0, 32, 32, 32, 32, 16, 16 };
+const ClActSysSetup gClActSysSetupJoinedScreens = { 0, 0, 0, 192, 4, 124, 4, 124, 0, 32, 32, 32, 32, 16, 16 };
 static void (*renderers[4])(ClActUnit *unit) = {
     mainRenderer,
     visibleAnimRenderer,

@@ -1176,7 +1176,7 @@ static void WifiNoteDraw_ExitBG(WifiNoteDraw *draw) {
 }
 
 static void WifiNoteDraw_InitClAct(WifiNoteDraw *draw, HeapID heapId) {
-    ClActSysSetup setup = data_02093f08;
+    ClActSysSetup setup = gClActSysSetupSplitScreens;
     ArcTool *arc;
 
     setup.oamStartMain = 16;

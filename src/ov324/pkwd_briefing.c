@@ -1696,7 +1696,7 @@ static void PkwdBriefingSet_Free(PkwdBriefingSet *set) {
 }
 
 static void PkwdBriefingClAct_Init(PkwdBriefingClAct *clact, HeapID heapId) {
-    ClActSys_Create(&data_02093f08, &sPkwdBriefingVRAMConfig, heapId);
+    ClActSys_Create(&gClActSysSetupSplitScreens, &sPkwdBriefingVRAMConfig, heapId);
     clact->unit = ClActUnit_Create(64, 0, heapId);
     ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, FALSE);

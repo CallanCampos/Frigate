@@ -1187,7 +1187,7 @@ static void IrcBattleMatch_InitScreen(IrcBattleMatch *work) {
     work->windowFrameChars = LoadCursorImageEndOfHeap(5, 14, 0, work->heapId);
     GFL_FadeSet(3, 16, 0, 2);
     IrcBattleMatch_ShowConnectMessage(work);
-    ClActSys_Create(&data_02093f08, &sIrcBattleMatchVRAMConfig, work->heapId);
+    ClActSys_Create(&gClActSysSetupSplitScreens, &sIrcBattleMatchVRAMConfig, work->heapId);
     work->actUnit = ClActUnit_Create(40, 0, work->heapId);
     work->vblankTcb = GFL_VBlankTCBAdd(IrcBattleMatch_VBlank, work, 0);
     work->printQueue = PrintQueue_CreateDefault(work->heapId);

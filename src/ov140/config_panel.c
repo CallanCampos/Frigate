@@ -817,7 +817,7 @@ static void ConfigPanelObj_Init(ConfigPanelObj *obj, const BGSysVRAMConfig *vram
     ClActorSetup setup;
 
     MI_CpuFill8(obj, 0, sizeof(ConfigPanelObj));
-    ClActSys_Create(&data_02093f08, vramConfig, heapId);
+    ClActSys_Create(&gClActSysSetupSplitScreens, vramConfig, heapId);
     obj->unit = ClActUnit_Create(128, 0, heapId);
     ClActUnit_UseSystemRenderer(obj->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);

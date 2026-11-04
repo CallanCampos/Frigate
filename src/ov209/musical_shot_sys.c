@@ -213,7 +213,7 @@ static void MusicalShotSys_InitGraphics(MusicalShotSys *sys) {
     GFL_BGSysCreate(sys->heapId);
     BmpWin_InitAllocator(sys->heapId);
     GFL_BGSysSetLCDConfig(&MUSICAL_SHOT_LCD_CONFIG);
-    ClActSys_Create(&data_02093f08, &MUSICAL_SHOT_VRAM_CONFIG, sys->heapId);
+    ClActSys_Create(&gClActSysSetupSplitScreens, &MUSICAL_SHOT_VRAM_CONFIG, sys->heapId);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
 }
 

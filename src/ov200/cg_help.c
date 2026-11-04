@@ -307,7 +307,7 @@ static void CGHelp_InitBGs(CGHelp *help) {
     CGHelp_CreateBG(&sBGSetupFrame, BG_FRAME, BGMODE_TEXT);
     CGHelp_CreateBG(&sBGSetupScrolling, BG_SCROLLING, BGMODE_TEXT);
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG3, 15, 4);
-    clActSetup = data_02093f08;
+    clActSetup = gClActSysSetupSplitScreens;
     clActSetup.charCount = 0x40;
     ClActSys_Create(&clActSetup, &sVRAMConfig, help->heapId);
     help->clActUnit = ClActUnit_Create(0x30, 0, help->heapId);

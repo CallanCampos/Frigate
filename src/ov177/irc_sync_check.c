@@ -637,7 +637,7 @@ static void IrcSyncCheckClAct_Init(IrcSyncCheckClAct *clact, const BGSysVRAMConf
     int i;
 
     MI_CpuFill8(clact, 0, sizeof(IrcSyncCheckClAct));
-    ClActSys_Create(&data_02093f08, vramConfig, heapId);
+    ClActSys_Create(&gClActSysSetupSplitScreens, vramConfig, heapId);
     clact->unit = ClActUnit_Create(128, 0, heapId);
     ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);

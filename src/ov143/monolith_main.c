@@ -393,7 +393,7 @@ static void Monolith_FreeText(MonolithWork *wk) {
 }
 
 static void Monolith_CreateActors(MonolithWork *wk) {
-    ClActSysSetup setup = data_02093f08;
+    ClActSysSetup setup = gClActSysSetupSplitScreens;
 
     setup.oamStartMain = 4;
     setup.oamCountMain = 124;

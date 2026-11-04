@@ -432,7 +432,7 @@ static void BSubwayRecords_FreeFrames(BSubwayRecordsWork *wk) {
 static void BSubwayRecords_InitObjRes(BSubwayRecordsWork *wk) {
     ArcTool *uiArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_BSUBWAY_RECORDS);
 
-    ClActSys_Create(&data_02093f08, &sBSubwayRecordsVRAMConfig, HEAPID_BSUBWAY_RECORDS);
+    ClActSys_Create(&gClActSysSetupSplitScreens, &sBSubwayRecordsVRAMConfig, HEAPID_BSUBWAY_RECORDS);
     wk->clUnits[0] = ClActUnit_Create(4, 1, HEAPID_BSUBWAY_RECORDS);
     wk->clUnits[1] = ClActUnit_Create(2, 1, HEAPID_BSUBWAY_RECORDS);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);

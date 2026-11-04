@@ -689,7 +689,7 @@ static void TitleObj_Init(TitleObj *obj, HeapID heapId) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_TITLE, heapId);
     ClActorSetup setup;
 
-    ClActSys_Create(&data_02093f08, &sVRAMConfig, heapId);
+    ClActSys_Create(&gClActSysSetupSplitScreens, &sVRAMConfig, heapId);
     obj->unit = ClActUnit_Create(64, 0, heapId);
     ClActUnit_UseSystemRenderer(obj->unit);
     obj->chars = ClActSys_LoadChars(arc, 5, 1, 1, heapId);

@@ -25,7 +25,7 @@ typedef struct {
 void TrCardObj_Init(TrainerCardObjWork *obj, const BGSysVRAMConfig *vram) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_TRAINER_CARD_GRA, obj->heapId);
 
-    ClActSys_Create(&data_02093f08, vram, obj->heapId);
+    ClActSys_Create(&gClActSysSetupSplitScreens, vram, obj->heapId);
     obj->unit = ClActUnit_Create(35, 0, obj->heapId);
     obj->res[0].palette = ClActSys_LoadPlttRange(arc, 15, CLACT_VRAM_SUB, 0, 0, 5, obj->heapId);
     obj->res[0].chars = ClActSys_LoadChars(arc, 34, FALSE, CLACT_VRAM_SUB, obj->heapId);

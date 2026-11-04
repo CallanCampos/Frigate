@@ -134,7 +134,7 @@ PMSInputView *PMSIView_Create(const PMSInputWork *mwk, const PMSInputData *dwk) 
         vwk->mwk = mwk;
         vwk->dwk = dwk;
         vwk->keyMode = PMSInput_GetKeyModePtr(mwk);
-        ClActSys_Create(&data_02093f08, &sPMSIViewVRAMConfig, HEAPID_PMS_INPUT);
+        ClActSys_Create(&gClActSysSetupSplitScreens, &sPMSIViewVRAMConfig, HEAPID_PMS_INPUT);
         vwk->actUnit = ClActUnit_Create(128, 0, HEAPID_PMS_INPUT);
         GFL_BGSysCreate(HEAPID_PMS_INPUT);
         BmpWin_InitAllocator(HEAPID_PMS_INPUT);

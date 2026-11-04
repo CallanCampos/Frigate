@@ -795,7 +795,7 @@ static void DupFitting_InitGraphics(DupFittingWork *work) {
     DupFitting_InitBG(&DUP_FITTING_BG6_SETUP, 6);
     GFL_BGSysSetBGEnabled(0, TRUE);
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0, 0xf, 4, 16);
-    clactSetup = data_02093f08;
+    clactSetup = gClActSysSetupSplitScreens;
     clactSetup.oamStartMain = 16;
     clactSetup.oamCountMain = 112;
     ClActSys_Create(&clactSetup, &DUP_FITTING_VRAM_CONFIG, work->heapId);

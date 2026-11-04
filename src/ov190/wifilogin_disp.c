@@ -632,7 +632,7 @@ static void WifiLoginDisp_LoadGSyncGraphics(WifiLoginDisp *disp) {
 }
 
 static void WifiLoginDisp_InitClAct(WifiLoginDisp *disp) {
-    ClActSys_Create(&data_02093f08, &sWifiLoginDispVRAMConfig, disp->heapId);
+    ClActSys_Create(&gClActSysSetupSplitScreens, &sWifiLoginDispVRAMConfig, disp->heapId);
     disp->clUnit = ClActUnit_Create(40, 0, disp->heapId);
     disp->vblankTask = GFL_VBlankTCBAdd(WifiLoginDisp_VBlank, disp, 0);
 }

@@ -8050,7 +8050,7 @@ DEFAULT_LOOKAT kind:data(any) addr:0x02093de8
 sOBJImageLoadFuncs kind:data(any) addr:0x02093e0c
 obj_char_lut kind:data(any) addr:0x02093e1c
 pltt_type_lut kind:data(any) addr:0x02093e24
-data_02093e44 kind:data(any) addr:0x02093e44
+gClActVramTypes kind:data(any) addr:0x02093e44
 sSurfaceTypes kind:data(any) addr:0x02093e48
 sTransferFuncs kind:data(any) addr:0x02093e4c
 sAnimSetFrameFuncs kind:data(any) addr:0x02093e54
@@ -8064,8 +8064,8 @@ sAnimGetCtrlFuncs2 kind:data(any) addr:0x02093ec0
 sAnimTickFuncs kind:data(any) addr:0x02093ecc
 sSurfaceFuncs kind:data(any) addr:0x02093ed8
 sCharDataTemplate kind:data(any) addr:0x02093ef0
-data_02093f08 kind:data(any) addr:0x02093f08
-data_02093f24 kind:data(any) addr:0x02093f24
+gClActSysSetupSplitScreens kind:data(any) addr:0x02093f08
+gClActSysSetupJoinedScreens kind:data(any) addr:0x02093f24
 sSpecialChars kind:data(any) addr:0x02093f40
 data_02093f42 kind:data(any) addr:0x02093f42
 BILLBOARD_ACTOR_PIXEL_FORMATS kind:data(any) addr:0x02093f80

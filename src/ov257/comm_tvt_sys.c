@@ -509,7 +509,7 @@ static void CommTvt_InitGraphics(CommTvtWork *sys) {
     G2_SetBG3Priority(2);
     GFL_BGSysSetBGEnabled(2, TRUE);
     GFL_BGSysSetBGEnabled(3, TRUE);
-    clactSetup = data_02093f08;
+    clactSetup = gClActSysSetupSplitScreens;
     ClActSys_Create(&clactSetup, &sCommTvtVRAMConfig, sys->heapId);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);

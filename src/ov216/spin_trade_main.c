@@ -2037,7 +2037,7 @@ static void SpinTradeMain_SetSubFade(SpinTradeMainWork *g2m, int evy) {
 }
 
 static void SpinTradeMain_InitClAct(SpinTradeMainWork *g2m) {
-    ClActSys_Create(&data_02093f08, &sSpinTradeVRAMConfig, HEAPID_SPIN_TRADE);
+    ClActSys_Create(&gClActSysSetupSplitScreens, &sSpinTradeVRAMConfig, HEAPID_SPIN_TRADE);
     g2m->clactUnit = ClActUnit_Create(30, 1, HEAPID_SPIN_TRADE);
 }
 

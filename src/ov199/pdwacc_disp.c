@@ -83,7 +83,7 @@ PdwAccDisp *PdwAccDisp_Create(HeapID heapId) {
     GXS_DispOn();
     GX_DispOn();
     GFL_BGSysCreate(disp->heapId);
-    ClActSys_Create(&data_02093f24, &sPdwAccVRAMConfig, disp->heapId);
+    ClActSys_Create(&gClActSysSetupJoinedScreens, &sPdwAccVRAMConfig, disp->heapId);
     disp->clUnit = ClActUnit_Create(40, 0, disp->heapId);
     GFL_BGSysSetVRAMBanks(&sPdwAccVRAMConfig);
     GFL_BGSysSetLCDConfig(&sPdwAccLCDConfig);

@@ -693,7 +693,7 @@ static void MBParent_InitGraphics(MBParentWork *wk) {
     } else {
         GFL_BGSysSetBGEnabled(6, FALSE);
     }
-    clactSetup = data_02093f08;
+    clactSetup = gClActSysSetupSplitScreens;
     clactSetup.charCount = 64;
     ClActSys_Create(&clactSetup, &sVRAMConfig, wk->heapId);
     wk->actorUnit = ClActUnit_Create(8, 0, wk->heapId);

@@ -46,7 +46,7 @@ static void CodeInDisp_LoadButtonTextPltt(CodeInWork *wk);
 static void CodeInDisp_AddButtonText(CodeInWork *wk, int button, int x, int y, int unused);
 
 void CodeInDisp_InitActors(CodeInWork *wk, const BGSysVRAMConfig *vramConfig) {
-    ClActSysSetup setup = data_02093f08;
+    ClActSysSetup setup = gClActSysSetupSplitScreens;
 
     setup.oamStartMain = 16;
     setup.oamCountMain = 112;

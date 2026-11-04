@@ -719,7 +719,7 @@ static void StaffRoll_LoadGraphics(ArcTool *arc) {
 static void StaffRoll_InitClAct(ArcTool *arc, StaffRollClAct *clact) {
     ClActorSetup setup;
 
-    ClActSys_Create(&data_02093f08, &sStaffRollVRAMConfig, HEAPID_STAFF_ROLL);
+    ClActSys_Create(&gClActSysSetupSplitScreens, &sStaffRollVRAMConfig, HEAPID_STAFF_ROLL);
     clact->unit = ClActUnit_Create(1, 0, HEAPID_TAIL(HEAPID_STAFF_ROLL));
     ClActUnit_UseSystemRenderer(clact->unit);
     clact->chars = ClActSys_LoadChars(arc, ACTOR_CHAR_FILE, FALSE, 0, HEAPID_TAIL(HEAPID_STAFF_ROLL));

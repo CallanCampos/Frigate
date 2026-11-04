@@ -5412,6 +5412,7 @@
 . 0x02093378 sDaysBeforeMonth
 . 0x02093390 sDefaultFont
 . 0x02093e0c sOBJImageLoadFuncs
+. 0x02093e44 gClActVramTypes
 . 0x02093e48 sSurfaceTypes
 . 0x02093e4c sTransferFuncs
 . 0x02093e54 sAnimSetFrameFuncs
@@ -5425,6 +5426,8 @@
 . 0x02093ecc sAnimTickFuncs
 . 0x02093ed8 sSurfaceFuncs
 . 0x02093ef0 sCharDataTemplate
+. 0x02093f08 gClActSysSetupSplitScreens
+. 0x02093f24 gClActSysSetupJoinedScreens
 . 0x02093f40 sSpecialChars
 . 0x02093f80 BILLBOARD_ACTOR_PIXEL_FORMATS
 . 0x02093f94 ACTOR_BB_SIZETBL
